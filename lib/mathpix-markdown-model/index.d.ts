@@ -29,8 +29,8 @@ declare class MathpixMarkdown_Model {
     showTimeLog?: boolean;
     setOptions(disableRules: string[], isCheckFormula?: boolean, showTimeLog?: boolean): void;
     checkFormula: (mathString: string, showTimeLog?: boolean) => string;
-    texReset: any;
-    getLastEquationNumber: any;
+    texReset: (n?: number) => void;
+    getLastEquationNumber: () => any;
     markdownToHTML: (markdown: string, options: TMarkdownItOptions) => string;
     showTocInContainer: (html: string, containerName?: string) => void;
     getTocContainerHTML: (html: string) => string;

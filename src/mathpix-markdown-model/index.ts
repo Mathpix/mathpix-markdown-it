@@ -176,7 +176,8 @@ class MathpixMarkdown_Model {
         try {
             const el = document.getElementById('SVG-styles');
             if (!el) {
-                document.head.appendChild(MathJax.Stylesheet());
+              const MathJaxStyle: any = MathJax.Stylesheet();
+              document.head.appendChild(MathJaxStyle);
             }
 
             const elStyle = document.getElementById('Mathpix-styles');
@@ -210,11 +211,12 @@ class MathpixMarkdown_Model {
     };
 
     getMathjaxStyle = () => {
-      return MathJax.Stylesheet().children[0].value;
-    }
+      const MathJaxStyle: any = MathJax.Stylesheet();
+      return MathJaxStyle.children[0].value;
+    };
 
     getMathpixStyle = (stylePreview: boolean = false, showToc: boolean = false, tocContainerName: string = 'toc') => {
-      const MathJaxStyle = MathJax.Stylesheet();
+      const MathJaxStyle: any = MathJax.Stylesheet();
       let style: string = ContainerStyle + MathJaxStyle.children[0].value + MathpixStyle(stylePreview) + codeStyles + tabularStyles;
       if (showToc) {}
       return stylePreview

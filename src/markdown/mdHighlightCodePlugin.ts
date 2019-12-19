@@ -11,8 +11,9 @@ const maybe = f => {
 // Highlight with given language.
 const highlight = (code, lang) => {
   if(lang.toLowerCase() === 'latex') lang = 'tex';
+  if (!lang) return '';
   return maybe(() => hljs.highlight(lang, code, true).value) || ''
-}
+};
 
 // Highlight with given language or automatically.
 const highlightAuto = (code, lang) => (
@@ -22,7 +23,7 @@ const highlightAuto = (code, lang) => (
 );
 
 // Wrap a render function to add `hljs` class to code blocks.
-const wrap = render => (...args) => (  
+const wrap = render => (...args) => (
   render.apply(render, args)
       .replace('<code class="', '<code class="hljs ')
       .replace('<code>', '<code class="hljs">')

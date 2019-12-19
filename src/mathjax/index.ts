@@ -2,7 +2,6 @@ import {mathjax as MJ} from 'mathjax-full/js/mathjax.js';
 import {TeX} from 'mathjax-full/js/input/tex.js';
 import {MathML} from "mathjax-full/js/input/mathml.js";
 import {SVG} from 'mathjax-full/js/output/svg.js';
-import {HTMLMathItem} from 'mathjax-full/js/handlers/html/HTMLMathItem.js';
 import {RegisterHTMLHandler} from 'mathjax-full/js/handlers/html.js';
 import {browserAdaptor} from 'mathjax-full/js/adaptors/browserAdaptor.js';
 import {liteAdaptor} from 'mathjax-full/js/adaptors/liteAdaptor.js';
@@ -76,7 +75,7 @@ export const MathJax = {
    *    @param {number} scale   The scaling factor (unitless)
    * }
    */
-  Typeset: function(string, display=true, metric={}) {
+  Typeset: function(string, display=true, metric: any={}) {
     const {em = 16, ex = 8, cwidth = 1200, lwidth = 100000, scale = 1} = metric;
     const node = docTeX.convert(string, {display: display, em: em, ex: ex, containerWidth: cwidth, lineWidth: lwidth, scale: scale});
     return adaptor.outerHTML(node);
@@ -96,7 +95,7 @@ export const MathJax = {
    * }
    */
 
-  TypesetMathML: function(string, display=true, metric={}) {
+  TypesetMathML: function(string, display=true, metric: any={}) {
     const {em = 16, ex = 8, cwidth = 1200, lwidth = 100000, scale = 1} = metric;
     const node = docMathML.convert(string, {display: display, em: em, ex: ex, containerWidth: cwidth, lineWidth: lwidth, scale: scale});
     return adaptor.outerHTML(node);
@@ -105,11 +104,12 @@ export const MathJax = {
   //
   //  Reset tags and labels
   //
-  Reset: function (n) {
+  Reset: function (n = 0) {
     if (n) {n--} else {n = 0}
     tex.parseOptions.tags.reset(n);
   },
   GetLastEquationNumber: function () {
-    return tex.parseOptions.tags.counter;
+    const tags: any = tex.parseOptions.tags;
+    return tags.counter;
   }
 };

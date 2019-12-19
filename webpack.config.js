@@ -47,7 +47,6 @@ const indexConfig = Object.assign({}, config, {
   },
   plugins: [
     new CopyPlugin([
-      { from: './src/mathjax/index.js', to: './lib/mathjax/index.js' },
       { from: './src/mathjax/my-BaseMappings.js', to: './lib/mathjax/my-BaseMappings.js' },
     ]),
   ],
