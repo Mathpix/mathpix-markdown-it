@@ -64,11 +64,11 @@ export const MathpixStyle = (setTextAlignJustify: boolean = true) => {
         color: red;
     }
 
-    img {
+    #preview-content img, #setText img {
         max-width: 100%;
     }
     
-    blockquote {
+    #preview-content blockquote,  #setText blockquote {
         page-break-inside: avoid;
         color: #666;
         margin: 0 0 1em 0;
@@ -76,19 +76,19 @@ export const MathpixStyle = (setTextAlignJustify: boolean = true) => {
         border-left: .5em solid #eee;
     }
 
-    pre {
+    #preview-content pre, #setText pre {
         border: 1px solid #ccc;
         page-break-inside: avoid;
         padding: 0.5em;
         background: #f8f8fa;
     }
-    .empty {
+    #preview-content .empty, #setText .empty {
         text-align: center;
         font-size: 18px;
         padding: 50px 0 !important;
     }
 
-    #setText table, #preview table {
+    #setText table, #preview-content table {
         display: block; 
         overflow: auto;
         width: 100%;
@@ -96,64 +96,64 @@ export const MathpixStyle = (setTextAlignJustify: boolean = true) => {
         page-break-inside: avoid;
     }
       
-    #setText table th, #preview table th {
+    #setText table th, #preview-content table th {
         text-align: center;
         font-weight: bold;
     }
     
-    #setText table td, #preview table td,
-    #setText table th, #preview table th {
+    #setText table td, #preview-content table td,
+    #setText table th, #preview-content table th {
         border: 1px solid #dfe2e5;
         padding: 6px 13px;
     }
       
-    #setText table tr, #preview table tr {
+    #setText table tr, #preview-content table tr {
         background-color: #fff;
         border-top: 1px solid #c6cbd1;
     }
     
-    #setText table tr:nth-child(2n), #preview table tr:nth-child(2n) {
+    #setText table tr:nth-child(2n), #preview-content table tr:nth-child(2n) {
         background-color: #f6f8fa;
     }
 
     
-    .main-title, .author {
+    #setText .main-title, #setText .author, #preview-content .main-title, #preview-content .author  {
         text-align: center;
         margin: 0 auto;
     }
     
-    .main-title {
+    #preview-content .main-title, #setText .main-title {
         line-height: 1.2;
         margin-bottom: 1em;
     }
 
-    .author {
+    #preview-content .author, #setText .author  {
         display: flex;
         justify-content: center;
         flex-wrap: wrap;
     }
 
-    .author p {
+    #preview-content .author p, #setText .author p {
         min-width: 30%;
         max-width: 50%;
         padding: 0 7px;
     }
 
-    .author span {
+    #preview-content .author span, #setText .author span {
         display: block;
         text-align: center;
     }
 
-    .section-title {
+    #preview-content .section-title, #setText .section-title {
         margin-top: 1.5em;
     }
 
-    .abstract {
+    #preview-content .abstract, #setText .abstract {
         text-align: justify;
         margin-bottom: 1em;
     }
 
-    .abstract p {
+    #preview-content .abstract p, #setText .abstract p {
         margin-bottom: 0;
     }
 
@@ -171,11 +171,11 @@ export const MathpixStyle = (setTextAlignJustify: boolean = true) => {
         margin-top: 1px;
       }
 
-      img {
+      #preview-content img, #setText img {
         display: block;
       }
       
-      .figure_img img {
+      #preview-content .figure_img img, #setText .figure_img img {
         display: inline;
       }
 
@@ -183,13 +183,13 @@ export const MathpixStyle = (setTextAlignJustify: boolean = true) => {
         word-break: break-word;
       }
 
-      h1 {
+      #preview-content h1, #setText h1 {
         page-break-inside: avoid;
         position: relative;
         border: 2px solid transparent;
       }
   
-      h1::after {
+      #preview-content h1::after, #setText h1::after {
         content: "";
         display: block;
         height: 100px;
@@ -197,13 +197,13 @@ export const MathpixStyle = (setTextAlignJustify: boolean = true) => {
         position: relative;
       }
   
-      h2 {
+      #preview-content h2, #setText h2 {
         page-break-inside: avoid;
         position: relative;
         border: 2px solid transparent;
       }
   
-      h2::after {
+      #preview-content h2::after, #setText h2::after {
         content: "";
         display: block;
         height: 100px;
@@ -211,13 +211,13 @@ export const MathpixStyle = (setTextAlignJustify: boolean = true) => {
         position: relative;
       }
   
-      h3 {
+      #preview-content h3, #setText h3 {
         page-break-inside: avoid;
         position: relative;
         border: 2px solid transparent;
       }
   
-      h3::after {
+      #preview-content h3::after, #setText h3::after {
         content: "";
         display: block;
         height: 100px;
@@ -225,13 +225,13 @@ export const MathpixStyle = (setTextAlignJustify: boolean = true) => {
         position: relative;
       }
   
-      h4 {
+      #preview-content h4, #setText h4 {
         page-break-inside: avoid;
         position: relative;
         border: 2px solid transparent;
       }
   
-      h4::after {
+      #preview-content h4::after, #setText h4::after {
         content: "";
         display: block;
         height: 100px;
@@ -239,13 +239,13 @@ export const MathpixStyle = (setTextAlignJustify: boolean = true) => {
         position: relative;
       }
   
-      h5 {
+      #preview-content h5, #setText h5 {
         page-break-inside: avoid;
         position: relative;
         border: 2px solid transparent;
       }
   
-      h5::after {
+      #preview-content h5::after, #setText h5::after {
         content: "";
         display: block;
         height: 100px;
@@ -253,13 +253,13 @@ export const MathpixStyle = (setTextAlignJustify: boolean = true) => {
         position: relative;
       }
   
-      h6 {
+      #preview-content h6, #setText h6 {
         page-break-inside: avoid;
         position: relative;
         border: 2px solid transparent;
       }
   
-      h6::after {
+      #preview-content h6::after, #setText h6::after {
         content: "";
         display: block;
         height: 100px;
@@ -270,13 +270,13 @@ export const MathpixStyle = (setTextAlignJustify: boolean = true) => {
 `};
 
 export const codeStyles = `
-    code {
+    #preview-content code, #setText code {
       font-family: Inconsolata;
       font-size: inherit;
       display: initial;
       background: #f8f8fa;
     }
-    pre code {
+    #preview-content pre code, #setText pre code {
       font-size: inherit;
       display: block;
       color: #333;
@@ -381,7 +381,7 @@ export const codeStyles = `
     .hljs-strong {
       font-weight: bold;
     }
-`
+`;
 
 export const PreviewStyle = `
   #preview {

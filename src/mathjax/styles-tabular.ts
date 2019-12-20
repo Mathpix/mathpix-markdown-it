@@ -18,6 +18,9 @@ export const tabularStyles = `
     #tabular {
         display: inline !important;
     }
+    #tabular td > p {
+        margin-bottom: 0;
+    }
     #tabular td._empty {
       height: 1.3em;
     }
