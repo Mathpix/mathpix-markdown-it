@@ -31,7 +31,7 @@
     "markdown-it-multimd-table": "^3.2.3",
     "markdown-it-sub": "^1.0.0",
     "markdown-it-sup": "^1.0.0",
-    "mathjax-full": "https://github.com/Mathpix/MathJax-src.git",
+    "mathjax-full": "^3.0.0",
     "react": "^16.7.0",
     "react-dom": "^16.7.0",
     "react-emotion": "^10.0.0"
