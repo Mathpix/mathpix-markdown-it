@@ -76,13 +76,11 @@ const InlineBlockBeginAlign: RuleBlock = (state, startLine) => {
 
 export const BeginAlign: RuleBlock = (state, startLine, endLine) => {
   let token: Token;
-  let terminate: boolean;
 
   let pos: number = state.bMarks[startLine] + state.tShift[startLine];
   let max: number = state.eMarks[startLine];
 
   let nextLine: number = startLine + 1;
-  const terminatorRules = state.md.block.ruler.getRules('paragraph');
   let lineText: string = state.src.slice(pos, max);
   let resText: string = '';
 
@@ -125,16 +123,6 @@ export const BeginAlign: RuleBlock = (state, startLine, endLine) => {
 
     // quirk for blockquotes, this line should already be checked by that rule
     if (state.sCount[nextLine] < 0) { continue; }
-
-    // Some tags can terminate paragraph without empty line.
-    terminate = false;
-    for (let i = 0, l = terminatorRules.length; i < l; i++) {
-      if (terminatorRules[i](state, nextLine, endLine, true)) {
-        terminate = true;
-        break;
-      }
-    }
-    if (terminate) { break; }
   }
 
   if (!isCloseTagExist) {

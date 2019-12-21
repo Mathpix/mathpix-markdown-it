@@ -185,14 +185,12 @@ export const StatePushTabularBlock = (state, startLine: number, nextLine: number
 export const BeginTabular: RuleBlock = (state, startLine: number, endLine: number) => {
   ClearSubTableLists();
   ClearSubMathLists();
-  let terminate: boolean;
   const openTag: RegExp = /\\begin\s{0,}{tabular}/;
   const closeTag: RegExp = /\\end\s{0,}{tabular}/;
   let pos: number = state.bMarks[startLine] + state.tShift[startLine];
   let max: number = state.eMarks[startLine];
   let nextLine: number = startLine + 1;
 
-  const terminatorRules = state.md.block.ruler.getRules('paragraph');
   let lineText: string = state.src.slice(pos, max);
   let dopDivB: string = '';
 
@@ -274,16 +272,6 @@ export const BeginTabular: RuleBlock = (state, startLine: number, endLine: numbe
 
     // quirk for blockquotes, this line should already be checked by that rule
     if (state.sCount[nextLine] < 0) { continue; }
-
-    // Some tags can terminate paragraph without empty line.
-    terminate = false;
-    for (let i = 0, l = terminatorRules.length; i < l; i++) {
-      if (terminatorRules[i](state, nextLine, endLine, true)) {
-        terminate = true;
-        break;
-      }
-    }
-    if (terminate) { break; }
   }
   return StatePushTabularBlock(state, startLine, nextLine, resString, 'center');
 };
