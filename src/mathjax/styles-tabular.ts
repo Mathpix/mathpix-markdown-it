@@ -20,6 +20,7 @@ export const tabularStyles = `
     }
     #tabular td > p {
         margin-bottom: 0;
+        margin-top: 0;
     }
     #tabular td._empty {
       height: 1.3em;
