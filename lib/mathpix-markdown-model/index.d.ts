@@ -40,6 +40,7 @@ declare class MathpixMarkdown_Model {
     loadMathJax: (notScrolling?: boolean, setTextAlignJustify?: boolean, isResetBodyStyles?: boolean) => boolean;
     convertToHTML: (str: string, options: TMarkdownItOptions) => string;
     getMathjaxStyle: () => any;
+    getMathpixStyleOnly: () => string;
     getMathpixStyle: (stylePreview?: boolean, showToc?: boolean, tocContainerName?: string) => string;
     render: (text: string, options?: optionsMathpixMarkdown) => string;
 }

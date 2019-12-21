@@ -215,6 +215,12 @@ class MathpixMarkdown_Model {
       return MathJaxStyle.children[0].value;
     };
 
+    getMathpixStyleOnly = () => {
+      const MathJaxStyle: any = MathJax.Stylesheet();
+      let style: string =  MathJaxStyle.children[0].value + MathpixStyle(false) + codeStyles + tabularStyles;
+      return style;
+    };
+
     getMathpixStyle = (stylePreview: boolean = false, showToc: boolean = false, tocContainerName: string = 'toc') => {
       const MathJaxStyle: any = MathJax.Stylesheet();
       let style: string = ContainerStyle + MathJaxStyle.children[0].value + MathpixStyle(stylePreview) + codeStyles + tabularStyles;
