@@ -208,18 +208,22 @@ export const ParseTabular = (str: string, i: number, align: string=''): Array<TT
       let params = getParams(str, posBegin + '\\begin{tabular}'.length);
       if (params) {
         align = params.align;
-        const subT = str.slice(params.index, posEnd);
-        const subRes:Array<TTokenTabular> = setTokensTabular(subT, params.align);
-        str = pushSubTabular(str, subRes, posBegin, posEnd, i);
+        //const subT = str.slice(params.index, posEnd);
+        const subT = str.slice(posBegin, posEnd+ '\\end{tabular}'.length);
+       // const subRes:Array<TTokenTabular> = setTokensTabular(subT, params.align);
+       // str = pushSubTabular(str, subRes, posBegin, posEnd, i);
+        str = pushSubTabular(str, subT, posBegin, posEnd, i);
         res = ParseTabular(str, 0, align);
       } else {
         let match = str
           .slice(posBegin)
           .match(/(?:\\begin{tabular}\s{0,}\{([^}]*)\})/);
 
-        const subT = str.slice(posBegin + match.index + match[0].length, posEnd)
-        const subRes:Array<TTokenTabular> = setTokensTabular(subT, match[1]);
-        str = pushSubTabular(str, subRes, posBegin + match.index, posEnd, i);
+        //const subT = str.slice(posBegin + match.index + match[0].length, posEnd)
+        const subT = str.slice(posBegin, posEnd + '\\end{tabular}'.length);
+        //const subRes:Array<TTokenTabular> = setTokensTabular(subT, match[1]);
+       //str = pushSubTabular(str, subRes, posBegin + match.index, posEnd, i);
+        str = pushSubTabular(str, subT, posBegin + match.index, posEnd, i);
         res = ParseTabular(str, 0, align);
       }
     } else {

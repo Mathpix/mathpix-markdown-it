@@ -99,6 +99,12 @@ const StatePushContent = (state, startLine: number, nextLine: number, content: s
 
 const StatePushTableContent = (state, startLine: number, nextLine: number, content: string, align: string, type: string) => {
   if (openTagAlign.test(content)) {
+    const matchT = content.match(openTagTabular);
+    const matchA = content.match(openTagAlign);
+    if (matchT && matchT.index < matchA.index) {
+      StatePushContent(state, startLine, nextLine, content, align, type);
+      return;
+    }
     let res = SeparateInlineBlocksBeginAlign(state, startLine, nextLine, content, align);
     if (res && res.length > 0) {
       for (let i=0; i < res.length; i++) {
@@ -235,7 +241,7 @@ export const BeginTable: RuleBlock = (state, startLine, endLine) => {
 
     if (closeTag.test(lineText)) {
       isCloseTagExist = true;
-      break;
+      if (state.isEmpty(nextLine+1)) { break }
     }
     resText += lineText;
 

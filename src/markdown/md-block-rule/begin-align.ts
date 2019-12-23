@@ -113,7 +113,7 @@ export const BeginAlign: RuleBlock = (state, startLine, endLine) => {
 
     if (closeTag.test(lineText)) {
       isCloseTagExist = true;
-      break;
+      if (state.isEmpty(nextLine+1)) { break }
     }
     resText += lineText;
 

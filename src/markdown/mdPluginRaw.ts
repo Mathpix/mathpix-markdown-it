@@ -1,4 +1,6 @@
 import { MathJax } from "../mathjax/";
+import { inlineTabular } from "./md-inline-rule/tabulare";
+import { renderTabulare } from './md-renderer-rules/render-tabulare';
 
 let mathNumber = [];
 
@@ -732,6 +734,7 @@ const mapping = {
   equation_math_not_number: "EquationMathNotNumber",
   reference_note: "Reference_note",
   reference_note_block: "Reference_note block",
+  tabulare: "Tabulare",
   usepackage_geometry: "Usepackage_geometry",
   display_mathML: "DisplayMathML",
   inline_mathML: "InlineMathML"
@@ -757,11 +760,14 @@ export default options => {
     md.inline.ruler.before("html_inline", "mathML", inlineMathML);
     md.inline.ruler.before("escape", "refs", refs);
     md.inline.ruler.before("escape", "multiMath", multiMath);
+    md.inline.ruler.before("multiMath", "inlineTabular", inlineTabular);
     md.inline.ruler.push("simpleMath", simpleMath);
 
     Object.keys(mapping).forEach(key => {
       md.renderer.rules[key] = (tokens, idx) => {
         switch (tokens[idx].type) {
+          case "tabulare":
+            return renderTabulare(tokens, tokens[idx], options, md.renderer);
           case "reference_note":
             return renderReference(tokens[idx]);
           case "reference_note_block":

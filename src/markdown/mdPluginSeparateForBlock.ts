@@ -1,6 +1,7 @@
 import { MarkdownIt } from 'markdown-it';
 import { isSpace } from './common';
 import { resetCounter } from './mdPluginText';
+import {openTag as openTagTabular, closeTag as closeTagTabular} from "./md-block-rule/begin-tabular";
 
 export default (md: MarkdownIt) => {
   md.core.ruler.after('normalize', 'separateForBlock', state => {
@@ -62,14 +63,40 @@ export default (md: MarkdownIt) => {
     let isOpen: boolean = false;
     let last: string = '';
 
+    let isOpenContent = false;
     for (let i = 0; i < arr.length; i++) {
       const item: string = arr[i];
-      const matchB: RegExpMatchArray = item.match(beginTag);
-      if (matchB) {
-        const align = matchB[1];
-        closeTag = endTag(align);
+      if (!isOpenContent) {
+        isOpenContent = openTagTabular.test(item);
       }
-      const matchE: RegExpMatchArray = item.match(closeTag);
+      if (isOpenContent) {
+        if (closeTagTabular.test(item)) {
+          isOpenContent = false
+        }
+      }
+      if (isOpenContent) {
+        arr2.push(item);
+        continue
+      }
+
+
+      let matchB: RegExpMatchArray = item.match(beginTag);
+      if (matchB) {
+        const str = item.slice(0, matchB.index);
+        if (str.indexOf('`') !== -1) {
+          matchB = null
+        } else {
+          const align = matchB[1];
+          closeTag = endTag(align);
+        }
+      }
+      let matchE: RegExpMatchArray = item.match(closeTag);
+      if (matchE) {
+        const str = item.slice(matchE.index);
+        if (str.indexOf('`') !== -1) {
+          matchE = null
+        }
+      }
       if (!matchE && isOpen) {
         arr2.push(item);
         continue;
@@ -164,7 +191,6 @@ export default (md: MarkdownIt) => {
       arr2.push(item);
       last = item;
     }
-
     state.src = arr2.join('\n');
   });
 }

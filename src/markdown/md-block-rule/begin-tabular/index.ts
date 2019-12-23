@@ -2,19 +2,19 @@ import { RuleBlock, Token } from 'markdown-it';
 import { ParseTabular } from './parse-tabular';
 import { ClearSubMathLists } from "./sub-math";
 import { ClearSubTableLists } from "./sub-tabular";
-import { pushError, CheckParseError } from '../parse-error';
+import { CheckParseError } from '../parse-error';
 import { getParams } from './common';
 import {StatePushIncludeGraphics} from "../../md-inline-rule/includegraphics";
 
 export const openTag: RegExp = /(?:\\begin\s{0,}{tabular}\s{0,}\{([^}]*)\})/;
 export const openTagG: RegExp = /(?:\\begin\s{0,}{tabular}\s{0,}\{([^}]*)\})/g;
-const closeTag: RegExp = /(?:\\end\s{0,}{tabular})/;
+export const closeTag: RegExp = /(?:\\end\s{0,}{tabular})/;
 const closeTagG: RegExp = /(?:\\end\s{0,}{tabular})/g;
 
 type TTypeContent = {type?: string, content?: string, align?: string}
 type TTypeContentList = Array<TTypeContent>;
 export type TAttrs = string[];
-export type TTokenTabular = {token: string, tag: string, n: number, content?: string, attrs?: Array<TAttrs>};
+export type TTokenTabular = {token: string, tag: string, n: number, content?: string, attrs?: Array<TAttrs>, children?: Token};
 export type TMulti = {mr?: number, mc?: number, attrs: Array<TAttrs>, content?: string, subTable?: Array<TTokenTabular>}
 
 const addContentToList = (str: string): TTypeContentList => {
@@ -45,20 +45,10 @@ const addContentToList = (str: string): TTypeContentList => {
   return res;
 };
 
-const parseInlineTabular = (str: string): TTypeContentList | null => {
+export const parseInlineTabular = (str: string): TTypeContentList | null => {
   let mB: RegExpMatchArray = str.match(openTagG);
   let mE: RegExpMatchArray = str.match(closeTagG);
   if (!mB || !mE) {
-    if (mB && !mE) {
-      pushError('Not found end{tabular}!')
-    }
-    if (!mB && mE) {
-      pushError('Not found begin{tabular}!')
-    }
-    return null;
-  }
-  if (mB.length !== mE.length) {
-    pushError('Open and close tags mismatch!');
     return null;
   }
 
@@ -124,9 +114,8 @@ const StatePushParagraphClose = (state) => {
   state.push('paragraph_close', 'div', -1);
 };
 
-const StatePushTabulars = (state, cTabular: TTypeContentList, align: string) => {
+export const StatePushTabulars = (state, cTabular: TTypeContentList, align: string) => {
   let token: Token;
-
   for (let i = 0; i < cTabular.length; i++) {
     if (cTabular[i].type === 'inline') {
       if (!StatePushIncludeGraphics(state, -1, -1, cTabular[i].content, align)) {
