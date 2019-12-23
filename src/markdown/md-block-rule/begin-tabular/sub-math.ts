@@ -7,6 +7,10 @@ export const ClearSubMathLists = (): void => {
   mathTable = [];
 };
 
+export const mathTablePush = (item: TSubMath) => {
+  mathTable.push(item)
+}
+
 export const getMathTableContent = (sub: string, i: number): string => {
   let resContent: string = sub;
   sub = sub.trim();
