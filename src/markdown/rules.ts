@@ -86,7 +86,7 @@ export function withLineNumbers(renderer) {
       = injectLineNumbers;
     renderer.renderer.rules.html_block  = html_block_injectLineNumbers;
     renderer.renderer.rules.code_block
-      = renderer.renderer.rules.fence
+    //   = renderer.renderer.rules.fence
       = code_block_injectLineNumbers;
   return renderer;
 }

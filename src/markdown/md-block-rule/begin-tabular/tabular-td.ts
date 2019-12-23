@@ -93,6 +93,7 @@ export const AddTd = (content: string, aligns: TAligns| null, lines: TLines, spa
   if (!content) {
     attrs.push(['class', '_empty'])
   }
+  content = content.split('\n').join('');
   res.push({token:'td_open', tag: 'td', n: 1, attrs: attrs});
   if (content) {
     if (decimal && parseFloat(content)) {

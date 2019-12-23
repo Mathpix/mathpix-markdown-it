@@ -7,7 +7,6 @@ import { getMathTableContent, getSubMath } from './sub-math';
 import { getSubTabular, pushSubTabular } from './sub-tabular';
 import { getMultiColumnMultiRow, getCurrentMC, getMC } from './multi-column-row';
 
-
 const getNumCol = (cells: string[]): number => {
   let res: number = 0;
   for (let i = 0; i < cells.length; i++) {
@@ -163,8 +162,6 @@ const setTokensTabular = (str: string, align: string = ''): Array<TTokenTabular>
           continue;
         }
 
-
-
         const parseMath = getMathTableContent(cells[j], 0);
         let content = '';
         if (parseMath) {
@@ -200,7 +197,6 @@ const setTokensTabular = (str: string, align: string = ''): Array<TTokenTabular>
 export const ParseTabular = (str: string, i: number, align: string=''): Array<TTokenTabular> | null => {
   let res: Array<TTokenTabular> = [];
   let posEnd: number = str.indexOf('\\end{tabular}');
-
   if (posEnd > 0) {
     let posBegin = str.slice(i, posEnd).lastIndexOf('\\begin{tabular}');
 

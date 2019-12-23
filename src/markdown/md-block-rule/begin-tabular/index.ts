@@ -2,9 +2,10 @@ import { RuleBlock, Token } from 'markdown-it';
 import { ParseTabular } from './parse-tabular';
 import { ClearSubMathLists } from "./sub-math";
 import { ClearSubTableLists } from "./sub-tabular";
-import { CheckParseError } from '../parse-error';
+import { pushError, CheckParseError } from '../parse-error';
 import { getParams } from './common';
 import {StatePushIncludeGraphics} from "../../md-inline-rule/includegraphics";
+import { getSubCode, codeInlineContent } from "./sub-code";
 
 export const openTag: RegExp = /(?:\\begin\s{0,}{tabular}\s{0,}\{([^}]*)\})/;
 export const openTagG: RegExp = /(?:\\begin\s{0,}{tabular}\s{0,}\{([^}]*)\})/g;
@@ -46,9 +47,20 @@ const addContentToList = (str: string): TTypeContentList => {
 };
 
 export const parseInlineTabular = (str: string): TTypeContentList | null => {
+  str = getSubCode(str);
   let mB: RegExpMatchArray = str.match(openTagG);
   let mE: RegExpMatchArray = str.match(closeTagG);
   if (!mB || !mE) {
+    if (mB && !mE) {
+      pushError('Not found end{tabular}!')
+    }
+    if (!mB && mE) {
+      pushError('Not found begin{tabular}!')
+    }
+    return null;
+  }
+  if (mB.length !== mE.length) {
+    pushError('Open and close tags mismatch!');
     return null;
   }
 
@@ -56,7 +68,7 @@ export const parseInlineTabular = (str: string): TTypeContentList | null => {
   let pos: number = 0;
   let posB: number = 0;
   let posE: number = 0;
-
+//debugger
   for (let i = 0; i< str.length; i++) {
     const matchB = str
       .slice(posB)
@@ -98,6 +110,7 @@ export const parseInlineTabular = (str: string): TTypeContentList | null => {
       }
     }
   }
+  res = codeInlineContent(res, 'inline')
   return res;
 };
 
@@ -243,7 +256,7 @@ export const BeginTabular: RuleBlock = (state, startLine: number, endLine: numbe
     max = state.eMarks[nextLine];
     lineText = state.src.slice(pos, max);
 
-    resString +=  lineText;
+    resString += '\n' + lineText;
     if (iOpen > 0) {
       if (closeTag.test(lineText)) {
         iOpen--;
