@@ -1,14 +1,14 @@
 import {TTokenTabular} from "./index";
 import {getContent} from "./common";
 
-type TSubTabular = {id: string, parsed: Array<TTokenTabular>};
+type TSubTabular = {id: string, parsed: Array<TTokenTabular>|string};
 var subTabular: Array<TSubTabular> = [];
 
 export const ClearSubTableLists = (): void => {
   subTabular = [];
 };
 
-export const pushSubTabular = (str: string, subRes: Array<TTokenTabular>, posBegin: number=0, posEnd: number, i: number=0): string => {
+export const pushSubTabular = (str: string, subRes: Array<TTokenTabular> | string, posBegin: number=0, posEnd: number, i: number=0): string => {
   const id = `f${(+new Date +  (Math.random()*100000).toFixed()).toString()}`;
   subTabular.push({id: id, parsed: subRes});
   if (posBegin > 0) {
@@ -19,7 +19,7 @@ export const pushSubTabular = (str: string, subRes: Array<TTokenTabular>, posBeg
 };
 
 export const getSubTabular = (sub: string, i: number, isCell: boolean = true): Array<TTokenTabular> | null => {
-  let res: Array<TTokenTabular> = [];
+  let res: Array<TTokenTabular>| any = [];
   let lastIndex: number = 0;
   sub = sub.trim();
   if (isCell) {sub = getContent(sub, true)}
@@ -43,19 +43,15 @@ export const getSubTabular = (sub: string, i: number, isCell: boolean = true): A
     if (index >= 0) {
       const iB: number = sub.indexOf(cellM[j]);
       const strB: string = sub.slice(0, iB).trim();
-      if (strB && strB.length > 0) {
-        res.push({token: 'inline', tag: '', n: 0, content: strB})
-      }
-      res = res.concat(subTabular[index].parsed);
       lastIndex = iB + cellM[j].length;
 
       sub = sub.slice(lastIndex)
+      let strE: string = '';
       if (j === cellM.length - 1) {
-        const strE: string = sub;
-        if (strE && strE.length > 0) {
-          res.push({token: 'inline', tag: '', n: 0, content: strE})
-        }
+         strE = sub;
       }
+      const st = strB + subTabular[index].parsed + strE;
+      res.push({token: 'inline', tag: '', n: 0, content: st})
     }
   }
   return res;

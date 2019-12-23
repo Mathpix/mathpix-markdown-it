@@ -5,16 +5,17 @@ import { ClearSubTableLists } from "./sub-tabular";
 import { pushError, CheckParseError } from '../parse-error';
 import { getParams } from './common';
 import {StatePushIncludeGraphics} from "../../md-inline-rule/includegraphics";
+import { getSubCode, codeInlineContent } from "./sub-code";
 
 export const openTag: RegExp = /(?:\\begin\s{0,}{tabular}\s{0,}\{([^}]*)\})/;
 export const openTagG: RegExp = /(?:\\begin\s{0,}{tabular}\s{0,}\{([^}]*)\})/g;
-const closeTag: RegExp = /(?:\\end\s{0,}{tabular})/;
+export const closeTag: RegExp = /(?:\\end\s{0,}{tabular})/;
 const closeTagG: RegExp = /(?:\\end\s{0,}{tabular})/g;
 
 type TTypeContent = {type?: string, content?: string, align?: string}
 type TTypeContentList = Array<TTypeContent>;
 export type TAttrs = string[];
-export type TTokenTabular = {token: string, tag: string, n: number, content?: string, attrs?: Array<TAttrs>};
+export type TTokenTabular = {token: string, tag: string, n: number, content?: string, attrs?: Array<TAttrs>, children?: Token};
 export type TMulti = {mr?: number, mc?: number, attrs: Array<TAttrs>, content?: string, subTable?: Array<TTokenTabular>}
 
 const addContentToList = (str: string): TTypeContentList => {
@@ -45,7 +46,8 @@ const addContentToList = (str: string): TTypeContentList => {
   return res;
 };
 
-const parseInlineTabular = (str: string): TTypeContentList | null => {
+export const parseInlineTabular = (str: string): TTypeContentList | null => {
+  str = getSubCode(str);
   let mB: RegExpMatchArray = str.match(openTagG);
   let mE: RegExpMatchArray = str.match(closeTagG);
   if (!mB || !mE) {
@@ -66,7 +68,7 @@ const parseInlineTabular = (str: string): TTypeContentList | null => {
   let pos: number = 0;
   let posB: number = 0;
   let posE: number = 0;
-
+//debugger
   for (let i = 0; i< str.length; i++) {
     const matchB = str
       .slice(posB)
@@ -108,6 +110,7 @@ const parseInlineTabular = (str: string): TTypeContentList | null => {
       }
     }
   }
+  res = codeInlineContent(res, 'inline')
   return res;
 };
 
@@ -124,9 +127,8 @@ const StatePushParagraphClose = (state) => {
   state.push('paragraph_close', 'div', -1);
 };
 
-const StatePushTabulars = (state, cTabular: TTypeContentList, align: string) => {
+export const StatePushTabulars = (state, cTabular: TTypeContentList, align: string) => {
   let token: Token;
-
   for (let i = 0; i < cTabular.length; i++) {
     if (cTabular[i].type === 'inline') {
       if (!StatePushIncludeGraphics(state, -1, -1, cTabular[i].content, align)) {
@@ -254,7 +256,7 @@ export const BeginTabular: RuleBlock = (state, startLine: number, endLine: numbe
     max = state.eMarks[nextLine];
     lineText = state.src.slice(pos, max);
 
-    resString +=  lineText;
+    resString += '\n' + lineText;
     if (iOpen > 0) {
       if (closeTag.test(lineText)) {
         iOpen--;
