@@ -12,7 +12,7 @@ export const codeInlineContent = (res, type: string = 'inline') => {
 };
 
 const getSubCodeBlock = (str: string): string  => {
-  const match = str.match(/(?:```([^]*)```)/);
+  const match = str.match(/(?:```([^```]*)```)/);
   if (match) {
     const id: string = `f${(+new Date +  (Math.random()*100000).toFixed()).toString()}`;
     mathTablePush({id: id, content: match[0]});
@@ -32,6 +32,9 @@ export const getSubCode = (str: string): string => {
 
   for (let ii = 0; ii< str.length; ii++) {
     if (str.charCodeAt(ii) === 0x60) {
+      if (str.charCodeAt(ii+1) === 0x60) {
+        ii += 1;
+      }
       if (c.length === 0) {
         c += str[ii]
       } else {
