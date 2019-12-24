@@ -65,11 +65,7 @@ export const MathpixStyle = (setTextAlignJustify: boolean = true) => {
     }
 
     #preview-content svg, #setText svg {
-        max-width: initial !important;
-    }
-
-    #preview-content img, #setText img {
-        max-width: initial !important;
+        min-width: initial !important;
     }
 
     #preview-content img, #setText img {
