@@ -64,6 +64,10 @@ export const MathpixStyle = (setTextAlignJustify: boolean = true) => {
         color: red;
     }
 
+    #preview-content svg, #setText svg {
+        max-width: initial !important;
+    }
+
     #preview-content img, #setText img {
         max-width: initial !important;
     }
