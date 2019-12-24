@@ -3,25 +3,31 @@ import { mathTablePush, getMathTableContent } from './sub-math';
 
 export const codeInlineContent = (res, type: string = 'inline') => {
   res
-    .filter(item => item.type === type)
     .map(item => {
-      item.content = getMathTableContent(item.content, 0)
+      if (item.type === type) {
+        const code = getMathTableContent(item.content, 0);
+        item.content = code ? code : item.content
+      }
       return item
     });
   return res;
 };
 
 const getSubCodeBlock = (str: string): string  => {
-  const match = str.match(/(?:```([^```]*)```)/);
+  const match = str.match(/(?:```)/);
   if (match) {
-    const id: string = `f${(+new Date +  (Math.random()*100000).toFixed()).toString()}`;
-    mathTablePush({id: id, content: match[0]});
-    str = str.slice(0, match.index) + `{${id}}` + str.slice( match.index + match[0].length)
-    str = getSubCodeBlock(str)
+    const end = str.indexOf('```', match.index + 3);
+    if (end > -1) {
+      const id: string = `f${(+new Date +  (Math.random()*100000).toFixed()).toString()}`;
+      mathTablePush({id: id, content: str.slice(match.index, end + 3)});
+      str = str.slice(0, match.index) + `{${id}}` + str.slice( end + 3)
+      str = getSubCodeBlock(str)
+    }
     return str
   } else {
     return str
   }
+
 }
 
 export const getSubCode = (str: string): string => {

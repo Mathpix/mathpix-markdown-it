@@ -68,7 +68,6 @@ export const parseInlineTabular = (str: string): TTypeContentList | null => {
   let pos: number = 0;
   let posB: number = 0;
   let posE: number = 0;
-//debugger
   for (let i = 0; i< str.length; i++) {
     const matchB = str
       .slice(posB)
@@ -110,7 +109,7 @@ export const parseInlineTabular = (str: string): TTypeContentList | null => {
       }
     }
   }
-  res = codeInlineContent(res, 'inline')
+  res = codeInlineContent(res, 'inline');
   return res;
 };
 
@@ -256,7 +255,7 @@ export const BeginTabular: RuleBlock = (state, startLine: number, endLine: numbe
     max = state.eMarks[nextLine];
     lineText = state.src.slice(pos, max);
 
-    resString += '\n' + lineText;
+    resString += lineText;
     if (iOpen > 0) {
       if (closeTag.test(lineText)) {
         iOpen--;
