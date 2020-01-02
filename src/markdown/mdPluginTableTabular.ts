@@ -5,11 +5,15 @@ import { BeginAlign } from './md-block-rule/begin-align';
 import { BeginTable, ClearTableNumbers, ClearFigureNumbers } from './md-block-rule/begin-table';
 import { InlineIncludeGraphics } from './md-inline-rule/includegraphics';
 import { CaptionTable, InlineDecimal, IncludeGraphics } from './md-renderer-rules';
+import { ClearSubTableLists } from "./md-block-rule/begin-tabular/sub-tabular";
+import { ClearSubMathLists } from "./md-block-rule/begin-tabular/sub-math";
 
 export default (md: MarkdownIt, options) => {
   const width = options.width;
   ClearTableNumbers();
   ClearFigureNumbers();
+  ClearSubTableLists();
+  ClearSubMathLists();
   md.block.ruler.after("fence","BeginTabular", BeginTabular);
   md.block.ruler.before("BeginTabular", "BeginAlign", BeginAlign);
   md.block.ruler.before("BeginAlign", "BeginTable", BeginTable);
