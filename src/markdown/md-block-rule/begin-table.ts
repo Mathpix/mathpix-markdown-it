@@ -201,7 +201,6 @@ export const BeginTable: RuleBlock = (state, startLine, endLine) => {
   if (!match) {
     match = lineText.match(openTag);
   }
-
   if (!match) {
     return false;
   }
@@ -242,7 +241,7 @@ export const BeginTable: RuleBlock = (state, startLine, endLine) => {
       isCloseTagExist = true;
       if (state.isEmpty(nextLine+1)) { break }
     }
-    resText += '\n' + lineText;
+    resText += lineText;
 
     // this would be a code block normally, but after paragraph
     // it's considered a lazy continuation regardless of what's there

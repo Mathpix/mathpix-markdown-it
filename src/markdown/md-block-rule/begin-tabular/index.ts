@@ -1,7 +1,5 @@
 import { RuleBlock, Token } from 'markdown-it';
 import { ParseTabular } from './parse-tabular';
-import { ClearSubMathLists } from "./sub-math";
-import { ClearSubTableLists } from "./sub-tabular";
 import { pushError, CheckParseError } from '../parse-error';
 import { getParams } from './common';
 import {StatePushIncludeGraphics} from "../../md-inline-rule/includegraphics";
@@ -184,8 +182,6 @@ export const StatePushTabularBlock = (state, startLine: number, nextLine: number
 };
 
 export const BeginTabular: RuleBlock = (state, startLine: number, endLine: number) => {
-  ClearSubTableLists();
-  ClearSubMathLists();
   const openTag: RegExp = /\\begin\s{0,}{tabular}/;
   const closeTag: RegExp = /\\end\s{0,}{tabular}/;
   let pos: number = state.bMarks[startLine] + state.tShift[startLine];
@@ -193,42 +189,11 @@ export const BeginTabular: RuleBlock = (state, startLine: number, endLine: numbe
   let nextLine: number = startLine + 1;
 
   let lineText: string = state.src.slice(pos, max);
-  let dopDivB: string = '';
-
-  let oldStartLine: number = startLine;
-  let oldNextLine: number = nextLine;
-
-  if (!openTag.test(lineText)) {
-    dopDivB = lineText + '\n';
-    if (openTag.test(state.src.slice(pos, state.eMarks[endLine]))) {
-      for (; nextLine <= endLine; nextLine++) {
-        if (lineText === '') {
-          dopDivB = '';
-          break;
-        }
-        pos = state.bMarks[nextLine] + state.tShift[nextLine];
-        max = state.eMarks[nextLine];
-        lineText = state.src.slice(pos, max);
-        if (openTag.test(lineText)) {
-          oldNextLine = nextLine;
-          startLine = nextLine;
-          nextLine += 1;
-          break
-        }
-        dopDivB += lineText + '\n';
-      }
-    } else {
-      return false;
-    }
-    if (dopDivB &&  dopDivB.length > 0) {
-      if (!StatePushIncludeGraphics(state, oldStartLine, oldNextLine, dopDivB, '')) {
-        StatePushDiv(state, oldStartLine, oldNextLine, dopDivB);
-      }
-    }
-  }
 
   let resString: string = '';
   let iOpen: number = openTag.test(lineText) ? 1 : 0;
+  if (!iOpen) return false;
+
 
   if (iOpen > 0) {
     const match: RegExpMatchArray = lineText.match(/(?:\\begin\s{0,}{tabular})/);
