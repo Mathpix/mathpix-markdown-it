@@ -35,8 +35,7 @@ export const tabularStyles = `
     }  
     .table_tabular {
         overflow-x: auto;
-        padding-bottom: 0.5em;
-        padding: 0 2px;
+        padding: 0 2px 0.5em 2px;
     }
     .figure_img {
        margin-bottom: 0.5em;
