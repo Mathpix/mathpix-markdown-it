@@ -36,7 +36,8 @@
     "mathjax-full": "https://github.com/Mathpix/MathJax-src.git",
     "react": "^16.7.0",
     "react-dom": "^16.7.0",
-    "react-emotion": "^10.0.0"
+    "react-emotion": "^10.0.0",
+    "tslib": "^1.10.0"
   },
   "devDependencies": {
     "@babel/core": "^7.4.0",
