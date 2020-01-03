@@ -86,7 +86,7 @@ export const MathpixStyle = (setTextAlignJustify: boolean = true) => {
         padding: 0.5em;
         background: #f8f8fa;
     }
-    #preview .empty {
+    .empty {
         text-align: center;
         font-size: 18px;
         padding: 50px 0 !important;
