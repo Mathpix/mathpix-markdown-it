@@ -86,7 +86,7 @@ export const MathpixStyle = (setTextAlignJustify: boolean = true) => {
         padding: 0.5em;
         background: #f8f8fa;
     }
-    #preview-content .empty, #setText .empty {
+    #preview .empty {
         text-align: center;
         font-size: 18px;
         padding: 50px 0 !important;
@@ -270,6 +270,13 @@ export const MathpixStyle = (setTextAlignJustify: boolean = true) => {
         margin-bottom: -100px;
         position: relative;
       }
+    }
+    #preview-content sup, #setText sup {
+      top: -.5em;
+      position: relative;
+      font-size: 75%;
+      line-height: 0;
+      vertical-align: baseline;
     }
 `};
 
