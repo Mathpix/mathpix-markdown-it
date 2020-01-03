@@ -2,8 +2,10 @@
   "name": "mathpix-markdown-it",
   "version": "1.0.0",
   "description": "Component that can render Mathpix output",
-  "main": "index.js",
+  "main": "lib/index.js",
   "scripts": {
+    "compile": "npx tsc",
+    "compile:dev": "npx tsc --watch",
     "build": "npx tsc && webpack --mode=production --config webpack.config.js",
     "dev": "npx tsc &&  webpack --mode=development --config webpack.dev.js --watch"
   },

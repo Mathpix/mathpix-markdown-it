@@ -17,7 +17,7 @@ const config = {
 const indexConfig = Object.assign({}, config, {
   entry: ["@babel/polyfill", path.join(__dirname, './src/index.tsx')],
   output: {
-    path: path.resolve(__dirname, './'),
+    path: path.resolve(__dirname, './es5/'),
     filename: `index.js`,
     libraryTarget: 'commonjs2'
   },
@@ -46,9 +46,6 @@ const indexConfig = Object.assign({}, config, {
     ]
   },
   plugins: [
-    new CopyPlugin([
-      { from: './src/mathjax/my-BaseMappings.js', to: './lib/mathjax/my-BaseMappings.js' },
-    ]),
   ],
   externals: {
     'react': 'commonjs react'
