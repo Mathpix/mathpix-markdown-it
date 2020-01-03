@@ -1,4 +1,5 @@
 /src
 /node_modules
 webpack.config.js
+webpack.dev.js
 .gitignore

@@ -16,7 +16,7 @@ import "mathjax-full/js/input/tex/color/ColorConfiguration.js";
 import "mathjax-full/js/input/tex/mhchem/MhchemConfiguration.js";
 import MathJaxConfig from './mathJaxConfig';
 
-require("./my-BaseMappings.js");
+require("./my-BaseMappings");
 
 import {BaseConfiguration} from 'mathjax-full/js/input/tex/base/BaseConfiguration.js';
 BaseConfiguration.handler.macro.push('wasysym-mathchar0mo');

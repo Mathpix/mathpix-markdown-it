@@ -15,7 +15,7 @@ const indexConfig = Object.assign({}, config, {
   devtool: 'source-map',
 
   output: {
-    path: path.resolve(__dirname, './'),
+    path: path.resolve(__dirname, './es5/'),
     filename: `index.js`,
     libraryTarget: 'commonjs2'
   },
