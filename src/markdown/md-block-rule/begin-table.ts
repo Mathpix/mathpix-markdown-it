@@ -193,6 +193,11 @@ export const BeginTable: RuleBlock = (state, startLine, endLine) => {
 
   let nextLine: number = startLine + 1;
   let lineText: string = state.src.slice(pos, max);
+
+  if (lineText.charCodeAt(0) !== 0x5c /* \ */) {
+    return false;
+  }
+
   let content: string = '';
   let resText: string = '';
   let isCloseTagExist = false;
@@ -210,7 +215,7 @@ export const BeginTable: RuleBlock = (state, startLine, endLine) => {
     return false;
   }
   const closeTag = endTag(type);
-
+//debugger
   if (closeTag.test(lineText)) {
     if (InlineBlockBeginTable(state, startLine)) {
       return true;

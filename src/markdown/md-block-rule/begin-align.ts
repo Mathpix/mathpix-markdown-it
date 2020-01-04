@@ -82,6 +82,9 @@ export const BeginAlign: RuleBlock = (state, startLine, endLine) => {
 
   let nextLine: number = startLine + 1;
   let lineText: string = state.src.slice(pos, max);
+  if (lineText.charCodeAt(0) !== 0x5c /* \ */) {
+    return false;
+  }
   let resText: string = '';
 
   let isCloseTagExist = false;

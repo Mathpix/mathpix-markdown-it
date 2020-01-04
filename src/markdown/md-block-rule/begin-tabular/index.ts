@@ -189,6 +189,9 @@ export const BeginTabular: RuleBlock = (state, startLine: number, endLine: numbe
   let nextLine: number = startLine + 1;
 
   let lineText: string = state.src.slice(pos, max);
+  if (lineText.charCodeAt(0) !== 0x5c /* \ */) {
+    return false;
+  }
 
   let resString: string = '';
   let iOpen: number = openTag.test(lineText) ? 1 : 0;
