@@ -32,7 +32,8 @@ const MathJaxConfig = {
         exFactor: 0.5 // default size of ex in em units when ex size can't be determined
     },
     SVG: {
-        fontCache: 'none',             // or 'global' or 'local'
+        fontCache: 'none',             // or 'global' or 'local',
+        mtextInheritFont: true
     }
 };
 

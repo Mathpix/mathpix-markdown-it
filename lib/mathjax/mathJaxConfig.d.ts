@@ -23,6 +23,7 @@ declare const MathJaxConfig: {
     };
     SVG: {
         fontCache: string;
+        mtextInheritFont: boolean;
     };
 };
 export default MathJaxConfig;
