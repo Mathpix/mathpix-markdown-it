@@ -17,6 +17,7 @@ export interface optionsMathpixMarkdown {
     htmlTags?: boolean; // Enable HTML tags in source
     breaks?: boolean,
     typographer?: boolean,
+    linkify?: boolean,
     width?: number;
     showToc?: boolean;
     overflowY?: string; //default 'unset'
@@ -26,6 +27,7 @@ export type TMarkdownItOptions = {
   htmlTags?: boolean,
   breaks?: boolean,
   typographer?: boolean,
+  linkify?: boolean,
   width?: number,
   lineNumbering?: boolean
 }
@@ -233,7 +235,7 @@ class MathpixMarkdown_Model {
     render = ( text: string, options?: optionsMathpixMarkdown ):string => {
         const { alignMathBlock='center', display='block', isCheckFormula=false, showTimeLog=false,
           isDisableFancy=false, fontSize=null, padding=null, htmlTags=false, width=0, showToc = false,
-          overflowY='unset', breaks = true, typographer = true
+          overflowY='unset', breaks = true, typographer = true, linkify = true
         } = options || {};
         const disableRules = isDisableFancy ? this.disableFancyArrayDef : options ? options.disableRules || [] : [];
         if (!showToc) {
@@ -247,7 +249,7 @@ class MathpixMarkdown_Model {
                 <div id='container-ruller'></div>
                 <div id='setText' style='display: ${display}; justify-content: inherit;${styleFontSize}${stylePadding}' >
                     ${this.convertToHTML(text, 
-              {htmlTags: htmlTags, breaks: breaks, typographer: typographer, width: width})}
+              {htmlTags: htmlTags, breaks: breaks, typographer: typographer, linkify: linkify, width: width})}
                 </div>
             </div>`
         );
