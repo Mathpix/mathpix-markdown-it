@@ -48,10 +48,11 @@ class App extends Component {
 | `isDisableFancy` | boolean&nbsp;*`false`*       | `true` - disables processing of special characters (Example: `(c)`, `+`, `-` )                                        |
 | `disableRules`   | array of strings&nbsp;*`[]`* | We can pass a list of rules for markdown rendering that should be disabled but only if `isDisableFancy` is not `true`.|
 |                  |                              | Example:  `disableRules = ['replacements'] ` will disable fancy characters processing.                                |
-| `htmlTags`       | boolean;*`false`*            | Enable HTML tags in source
-| `breaks`         | boolean;*`true`*             | Convert `\n` in paragraphs into `<br>`
-| `typographer`    | boolean;*`true`*             | Enable some language-neutral replacement + quotes beautification
-| `width`          | number;*`1200`*              | Text container width 
+| `htmlTags`       | boolean;*`false`*            | Enable HTML tags in source                                                                                            |
+| `breaks`         | boolean;*`true`*             | Convert `\n` in paragraphs into `<br>`                                                                                |
+| `typographer`    | boolean;*`false`*            | Enable some language-neutral replacement + quotes beautification                                                      |
+| `linkify`        | boolean;*`false`*            | Autoconvert URL-like text to links                                                                                    |
+| `width`          | number;*`1200`*              | Text container width                                                                                                  |
 
 ### Sample for non-React UI code
 
@@ -73,6 +74,7 @@ You can also use certain functions to get styles and rendering in html:
 | `htmlTags`       | boolean;*`false`*            | Enable HTML tags in source                                                                                            |
 | `breaks`         | boolean;*`true`*             | Convert `\n` in paragraphs into `<br>`                                                                                |
 | `typographer`    | boolean;*`true`*             | Enable some language-neutral replacement + quotes beautification                                                      |
+| `linkify`        | boolean;*`true`*             | Autoconvert URL-like text to links                                                                                    |
 | `width`          | number;*`1200`*              | Text container width                                                                                                  |
 | `lineNumbering`  | boolean;*`false`*            | Recommended for synchronization with a text editor.                                                                   |
 
@@ -86,10 +88,11 @@ You can also use certain functions to get styles and rendering in html:
 | `isDisableFancy` | boolean&nbsp;*`false`*       | `true` - disables processing of special characters (Example: `(c)`, `+`, `-` )                                        |
 | `disableRules`   | array of strings&nbsp;*`[]`* | We can pass a list of rules for markdown rendering that should be disabled but only if `isDisableFancy` is not `true`.|
 |                  |                              | Example:  `disableRules = ['replacements'] ` will disable fancy characters processing.                                |
-| `htmlTags`       | boolean;*`false`*            | Enable HTML tags in source
-| `breaks`         | boolean;*`true`*             | Convert `\n` in paragraphs into `<br>`
-| `typographer`    | boolean;*`true`*             | Enable some language-neutral replacement + quotes beautification
-| `width`          | number;*`1200`*              | Text container width 
+| `htmlTags`       | boolean;*`false`*            | Enable HTML tags in source                                                                                            |
+| `breaks`         | boolean;*`true`*             | Convert `\n` in paragraphs into `<br>`                                                                                |
+| `typographer`    | boolean;*`true`*             | Enable some language-neutral replacement + quotes beautification                                                      |
+| `linkify`        | boolean;*`true`*             | Autoconvert URL-like text to links                                                                                    |
+| `width`          | number;*`1200`*              | Text container width                                                                                                  |
 
 
 ### Sample for node

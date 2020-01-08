@@ -7,6 +7,7 @@ import { InlineIncludeGraphics } from './md-inline-rule/includegraphics';
 import { CaptionTable, InlineDecimal, IncludeGraphics } from './md-renderer-rules';
 import { ClearSubTableLists } from "./md-block-rule/begin-tabular/sub-tabular";
 import { ClearSubMathLists } from "./md-block-rule/begin-tabular/sub-math";
+import {ClearParseError} from "./md-block-rule/parse-error";
 
 export default (md: MarkdownIt, options) => {
   const width = options.width;
@@ -14,6 +15,7 @@ export default (md: MarkdownIt, options) => {
   ClearFigureNumbers();
   ClearSubTableLists();
   ClearSubMathLists();
+  ClearParseError();
   md.block.ruler.after("fence","BeginTabular", BeginTabular);
   md.block.ruler.before("BeginTabular", "BeginAlign", BeginAlign);
   md.block.ruler.before("BeginAlign", "BeginTable", BeginTable);

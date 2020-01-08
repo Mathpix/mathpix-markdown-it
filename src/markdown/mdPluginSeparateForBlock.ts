@@ -49,7 +49,6 @@ export default (md: MarkdownIt) => {
   });
 
   md.core.ruler.after('normalize', 'separateBeforeBlock', state => {
-    resetCounter();
     const beginTag: RegExp = /\\(?:begin\s{0,}\{(center|left|right|table|figure)\})/;
     let closeTag: RegExp = /\\(?:end\s{0,}\{(center|left|right|table|figure)\})/;
     const endTag = (arg: string): RegExp  => { return new RegExp('\\end\s{0,}\{(' + arg + ')\}')};
@@ -64,6 +63,9 @@ export default (md: MarkdownIt) => {
     let last: string = '';
 
     let isOpenContent = false;
+    let matchB: RegExpMatchArray; //= item.match(beginTag);
+    let matchE: RegExpMatchArray; //= item.match(closeTag);
+    let isInline: boolean = false;
     for (let i = 0; i < arr.length; i++) {
       const item: string = arr[i];
       if (!isOpenContent) {
@@ -76,21 +78,31 @@ export default (md: MarkdownIt) => {
       }
       if (isOpenContent) {
         arr2.push(item);
+        last = item;
         continue
       }
 
-
-      let matchB: RegExpMatchArray = item.match(beginTag);
-      if (matchB) {
-        const str = item.slice(0, matchB.index);
-        if (str.indexOf('`') !== -1) {
-          matchB = null
-        } else {
-          const align = matchB[1];
-          closeTag = endTag(align);
+      if (!matchB) {
+        matchB =  item.match(beginTag);
+        if (matchB) {
+          const str = item.slice(0, matchB.index);
+          if (str.indexOf('`') !== -1) {
+            matchB = null
+          } else {
+            const align = matchB[1];
+            closeTag = endTag(align);
+          }
         }
+        isInline = closeTag.test(item)
       }
-      let matchE: RegExpMatchArray = item.match(closeTag);
+      if (!matchB) {
+        arr2.push(item);
+        last = item;
+        continue;
+      }
+      matchE = item.match(closeTag);
+
+
       if (matchE) {
         const str = item.slice(matchE.index);
         if (str.indexOf('`') !== -1) {
@@ -99,10 +111,11 @@ export default (md: MarkdownIt) => {
       }
       if (!matchE && isOpen) {
         arr2.push(item);
+        last = item;
         continue;
       }
 
-      if (matchB && matchE) {
+      if (matchB && matchE && isInline) {
         isOpen = false;
 
         if (matchB.index === 0 || item.slice(0, matchB.index).trim() === ''){
@@ -148,7 +161,8 @@ export default (md: MarkdownIt) => {
           }
 
         }
-
+        matchB = null;
+        last = item;
         continue;
 
       }
@@ -167,6 +181,9 @@ export default (md: MarkdownIt) => {
             arr2.push('\n');
           }
         }
+        matchB = null;
+        matchE = null;
+        last = item;
         continue;
       }
       if (matchB) {
@@ -186,6 +203,7 @@ export default (md: MarkdownIt) => {
           arr2.push('\n');
           arr2.push(s2);
         }
+        last = item;
         continue;
       }
       arr2.push(item);
