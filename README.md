@@ -5,6 +5,10 @@ It not only supports LaTeX math mode (e.g. standard Markdown),
 it also supports some aspects of LaTeX text mode, such as `title`, `author`, `abstract`, `tabular`, `figure` environment.
 Using marking Markdown, LaTeX, MathML you get a high-quality display of notations on HTML-pages.
 
+## See the documentation for more details
++ [What is Mathpix Markdown?](https://mathpix.com/docs/mathpix-markdown/overview)
++ [Syntax Reference](https://mathpix.com/docs/mathpix-markdown/syntax-reference)
++ [LaTeX Table Syntax](https://mathpix.com/docs/mathpix-markdown/tables)
 
 This repository contains `mathpix-markdown-it` source files written in TypeScript.
 They are compiled into JavaScript files.
@@ -30,8 +34,8 @@ class App extends Component {
     return (
       <MathpixLoader>
           <MathpixMarkdown text="\\(ax^2 + bx + c = 0\\)"/>
-	      <MathpixMarkdown text="$x = \frac { - b \pm \sqrt { b ^ { 2 } - 4 a c } } { 2 a }$"/>
-	      ...
+          <MathpixMarkdown text="$x = \frac { - b \pm \sqrt { b ^ { 2 } - 4 a c } } { 2 a }$"/>
+          ...
       </MathpixLoader>
     );
   }
@@ -106,8 +110,8 @@ const {MathpixMarkdownModel} = require('mathpix-markdown-it/es5');
 ```
 
 ```js
-  const htmlMM = MathpixMarkdownModel.render(text, options);
-  const mathpixStyles = MathpixMarkdownModel.getMathpixStyleOnly();
+const htmlMM = MathpixMarkdownModel.render(text, options);
+const mathpixStyles = MathpixMarkdownModel.getMathpixStyleOnly();
 ```
 Before using mathpix-markdown-it in node applications, should be to define global variables
 
