@@ -64,7 +64,6 @@ const setTokensTabular = (str: string, align: string = ''): Array<TTokenTabular>
     res.push({token:'tr_open', tag: 'tr', n: 1, attrs: [[ 'style', 'border-top: none !important; border-bottom: none !important;' ]]});
 
     let cells = cellsAll[i].split('&');
-
     for (let j = 0; j < numCol; j++) {
       const ic: number = getCurrentMC(cells, j);
 

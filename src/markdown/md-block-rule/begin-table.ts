@@ -246,7 +246,12 @@ export const BeginTable: RuleBlock = (state, startLine, endLine) => {
       isCloseTagExist = true;
       if (state.isEmpty(nextLine+1)) { break }
     }
-    resText += lineText;
+    if (resText && lineText) {
+      resText += '\n' + lineText;
+    } else {
+      resText += lineText;
+    }
+
 
     // this would be a code block normally, but after paragraph
     // it's considered a lazy continuation regardless of what's there
@@ -305,7 +310,7 @@ export const BeginTable: RuleBlock = (state, startLine, endLine) => {
   } else {
     nextLine += 1;
   }
-
+  content = content.trim();
   StatePushTableContent(state, startLine, nextLine, content, align, type);
 
   if (!captionFirst) {
