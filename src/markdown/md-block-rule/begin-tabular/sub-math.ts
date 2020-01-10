@@ -1,4 +1,5 @@
 import { getContent } from './common';
+import {findEndMarkerPos} from "../../mdPluginRaw";
 
 type TSubMath = {id: string, content: string}
 var mathTable: Array<TSubMath> = [];
@@ -57,7 +58,7 @@ export const getSubMath = (str: string): string => {
       endMarker = match[0];
     }
 
-    const endMarkerPos: number = str.indexOf(endMarker, startMathPos);
+    const endMarkerPos = findEndMarkerPos(str, endMarker, startMathPos);
     if (endMarkerPos === -1) {
       return str;
     }
