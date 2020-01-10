@@ -224,7 +224,7 @@ export const getRowLines = (rows: string[], numCol: number): TParselines => {
   const clineTag: RegExp = /\\cline\s{0,}\{([^}]*)\}/;
   const clineSpaceTag: RegExp = /\[(.*?)\]\s{0,}\\cline\s{0,}\{([^}]*)\}/;
   for (let i = 0; i < rows.length; i++) {
-    let matchR = rows[i].trim().match(lineSpaceTag);
+    let matchR = rows[i].split('\n').join('').trim().match(lineSpaceTag);
     if (!matchR) {
       res[i] = new Array(numCol).fill('none');
       resSpace[i] = new Array(numCol).fill('none');

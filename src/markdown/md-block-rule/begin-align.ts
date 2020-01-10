@@ -118,7 +118,13 @@ export const BeginAlign: RuleBlock = (state, startLine, endLine) => {
       isCloseTagExist = true;
       if (state.isEmpty(nextLine+1)) { break }
     }
-    resText += lineText;
+
+    if (resText && lineText) {
+      resText += '\n' + lineText;
+    } else {
+      resText += lineText;
+    }
+
 
     // this would be a code block normally, but after paragraph
     // it's considered a lazy continuation regardless of what's there
@@ -160,7 +166,7 @@ export const BeginAlign: RuleBlock = (state, startLine, endLine) => {
   state.parentType = 'paragraph';
   state.env.align = align;
 
-  const content = resText;
+  const content = resText.trim();
   if (!StatePushTabularBlock(state, startLine, nextLine, content, align)) {
     if (!StatePushIncludeGraphics(state, startLine, nextLine, content, align)) {
       StatePushDiv(state, startLine, nextLine, content);
