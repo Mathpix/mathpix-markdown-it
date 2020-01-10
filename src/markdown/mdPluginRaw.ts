@@ -214,6 +214,17 @@ function multiMath(state, silent) {
   return true;
 }
 
+export const findEndMarkerPos = (str: string, endMarker: string, i: number): number => {
+  let index: number;
+  index = str.indexOf(endMarker, i);
+  if (index > 0) {
+    if (str.charCodeAt(index-1) === 0x5c /* \ */) {
+      index = findEndMarkerPos(str, endMarker, index+1)
+    }
+  }
+  return index;
+};
+
 function refs(state, silent) {
   let startMathPos = state.pos;
   if (state.src.charCodeAt(startMathPos) !== 0x5c /* \ */) {
@@ -306,8 +317,7 @@ function simpleMath(state, silent) {
       return false;
     }
   }
-
-  const endMarkerPos = state.src.indexOf(endMarker, startMathPos);
+  const endMarkerPos = findEndMarkerPos(state.src, endMarker, startMathPos);
   if (endMarkerPos === -1) {
     return false;
   }

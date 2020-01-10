@@ -1,3 +1,5 @@
+import {findEndMarkerPos} from "../markdown/mdPluginRaw";
+
 export const checkFormula = (mathString:string, showTimeLog:boolean=false) => {
     const startTime = new Date().getTime();
     let res_mathString = "";
@@ -38,13 +40,15 @@ export const checkFormula = (mathString:string, showTimeLog:boolean=false) => {
             else if (match[1]) { endMarker = `\\end{${match[1]}}`; }
         }
 
-        const endMarkerPos = mathString.indexOf(endMarker, startMathPos);
+        const endMarkerPos = (endMarker === '$$' || endMarker === '$')
+              ? findEndMarkerPos(mathString, endMarker, startMathPos)
+              : mathString.indexOf(endMarker, startMathPos);
 
         if (endMarkerPos === -1) {
             res_mathString = res_mathString + mathString.substr(idx, mathString.length);
             break
         }
-        const ln =  mathString.indexOf(endMarker, startMathPos)+endMarker.length;
+        const ln =  endMarkerPos + endMarker.length;
         const str2 = mathString.substr(idx, ln-idx).split("\n").join("");
 
         res_mathString = res_mathString + str2;
