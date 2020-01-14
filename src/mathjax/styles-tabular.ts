@@ -41,5 +41,4 @@ export const tabularStyles = `
        margin-bottom: 0.5em;
        overflow-x: auto;
     }
-}
 `;
