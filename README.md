@@ -53,6 +53,7 @@ class App extends Component {
 | `disableRules`   | array of strings&nbsp;*`[]`* | We can pass a list of rules for markdown rendering that should be disabled but only if `isDisableFancy` is not `true`.|
 |                  |                              | Example:  `disableRules = ['replacements'] ` will disable fancy characters processing.                                |
 | `htmlTags`       | boolean;*`false`*            | Enable HTML tags in source                                                                                            |
+| `xhtmlOut`       | boolean;*`false`*            | Use `/` to close single tags (`<br />`)                                                                               |
 | `breaks`         | boolean;*`true`*             | Convert `\n` in paragraphs into `<br>`                                                                                |
 | `typographer`    | boolean;*`false`*            | Enable some language-neutral replacement + quotes beautification                                                      |
 | `linkify`        | boolean;*`false`*            | Autoconvert URL-like text to links                                                                                    |
@@ -78,6 +79,7 @@ You can also use certain functions to get styles and rendering in html:
 |                  | type&nbsp;*`default`*        |  description                                                                                                          |
 |------------------|------------------------------|-----------------------------------------------------------------------------------------------------------------------|
 | `htmlTags`       | boolean;*`false`*            | Enable HTML tags in source                                                                                            |
+| `xhtmlOut`       | boolean;*`false`*            | Use `/` to close single tags (`<br />`)                                                                               |
 | `breaks`         | boolean;*`true`*             | Convert `\n` in paragraphs into `<br>`                                                                                |
 | `typographer`    | boolean;*`true`*             | Enable some language-neutral replacement + quotes beautification                                                      |
 | `linkify`        | boolean;*`true`*             | Autoconvert URL-like text to links                                                                                    |
@@ -95,6 +97,7 @@ You can also use certain functions to get styles and rendering in html:
 | `disableRules`   | array of strings&nbsp;*`[]`* | We can pass a list of rules for markdown rendering that should be disabled but only if `isDisableFancy` is not `true`.|
 |                  |                              | Example:  `disableRules = ['replacements'] ` will disable fancy characters processing.                                |
 | `htmlTags`       | boolean;*`false`*            | Enable HTML tags in source                                                                                            |
+| `xhtmlOut`       | boolean;*`false`*            | Use `/` to close single tags (`<br />`)                                                                               |
 | `breaks`         | boolean;*`true`*             | Convert `\n` in paragraphs into `<br>`                                                                                |
 | `typographer`    | boolean;*`true`*             | Enable some language-neutral replacement + quotes beautification                                                      |
 | `linkify`        | boolean;*`true`*             | Autoconvert URL-like text to links                                                                                    |

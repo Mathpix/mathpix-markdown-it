@@ -9,10 +9,10 @@ import {MathpixMarkdownModel as MM, TMarkdownItOptions} from '../mathpix-markdow
 
 /** md renderer */
 const mdInit = (options: TMarkdownItOptions) => {
-  const {htmlTags = false, width = 1200, breaks = true, typographer = true, linkify = true} = options;
+  const {htmlTags = false, xhtmlOut = false, width = 1200, breaks = true, typographer = true, linkify = true} = options;
   return require("markdown-it")({
     html: htmlTags,
-    xhtmlOut: false,
+    xhtmlOut: xhtmlOut,
     breaks: breaks,
     langPrefix: "language-",
     linkify: linkify,

@@ -12,6 +12,7 @@ export interface optionsMathpixMarkdown {
     breaks?: boolean;
     typographer?: boolean;
     linkify?: boolean;
+    xhtmlOut?: boolean;
     width?: number;
     showToc?: boolean;
     overflowY?: string;
@@ -21,6 +22,7 @@ export declare type TMarkdownItOptions = {
     breaks?: boolean;
     typographer?: boolean;
     linkify?: boolean;
+    xhtmlOut?: boolean;
     width?: number;
     lineNumbering?: boolean;
 };
