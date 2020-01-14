@@ -4,4 +4,4 @@
 webpack.config.js
 webpack.dev.js
 .gitignore
-.yarnignore
+.npmignore
