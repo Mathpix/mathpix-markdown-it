@@ -1,5 +1,6 @@
 /src
 /node_modules
+/examples
 webpack.config.js
 webpack.dev.js
 .gitignore

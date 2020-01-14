@@ -26,18 +26,18 @@ const indexConfig = Object.assign({}, config, {
       {
         test: /\.tsx?$/,
         include: path.resolve(__dirname, 'src'),
-        exclude: /(node_modules|bower_components|bundle|lib)/,
+        exclude: /(examples|node_modules|bower_components|bundle|lib)/,
         loader: 'ts-loader',
       },
       {
         test: /\.js?$/,
         include: path.resolve(__dirname, 'src'),
-        exclude: /(node_modules|bower_components|bundle|lib)/,
+        exclude: /(examples|node_modules|bower_components|bundle|lib)/,
         loader: 'babel-loader',
       },
       {
         test: /\.css$/,
-        exclude: /node_modules/,
+        exclude: /examples|node_modules/,
         use: [
           MiniCssExtractPlugin.loader,
           "css-loader"
