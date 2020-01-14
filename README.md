@@ -66,6 +66,8 @@ You can also use certain functions to get styles and rendering in html:
 
 `const mathpixStyles = MathpixMarkdownModel.getMathpixStyleOnly();` - It returns styles as a string.
 
+`const mathpixFontsStyles = MathpixMarkdownModel.getMathpixFontsStyle();` - It returns fonts styles as a string.
+
 `const html = MathpixMarkdownModel.markdownToHTML(content, options: TMarkdownItOptions);` - It returns a rendered html element as a string.
 
 `const htmlMM = MathpixMarkdownModel.render(text, options: optionsMathpixMarkdown);` - Returns a rendered HTML element as a string and wraps it in a container. Should be used to render the entire document.

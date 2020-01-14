@@ -2,6 +2,7 @@ import {checkFormula} from './check-formula';
 import {markdownToHTML as markdownHTML} from "../markdown";
 import {MathpixStyle, PreviewStyle, ContainerStyle, codeStyles, TocStyle, resetBodyStyles} from "../mathjax/styles";
 import { tabularStyles } from "../mathjax/styles-tabular";
+import { fontsStyles } from "../mathjax/styles-fonts";
 import {MathJax} from '../mathjax';
 import * as CSS from 'csstype'; // at top of file
 
@@ -230,6 +231,10 @@ class MathpixMarkdown_Model {
       return stylePreview
         ? showToc ? style + PreviewStyle + TocStyle(tocContainerName) : style + PreviewStyle
         : style;
+    };
+
+    getMathpixFontsStyle = () => {
+      return fontsStyles
     };
 
     render = ( text: string, options?: optionsMathpixMarkdown ):string => {
