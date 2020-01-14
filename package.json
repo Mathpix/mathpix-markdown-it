@@ -3,6 +3,11 @@
   "version": "1.0.0",
   "description": "Component that can render Mathpix output",
   "main": "lib/index.js",
+  "files": [
+    "/es5",
+    "/lib",
+    "README.md"
+  ],
   "scripts": {
     "compile": "npx tsc",
     "compile:dev": "npx tsc --watch",
