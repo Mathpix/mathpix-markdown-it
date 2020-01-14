@@ -106,6 +106,8 @@ You can also use certain functions to get styles and rendering in html:
 
 ### Sample for node
 
+[Example to use mathpix-markdown-it in the node application](https://github.com/Mathpix/mathpix-markdown-it/tree/master/examples/mathpix-markdown-it-node-examples)
+
 ```js
 const {MathpixMarkdownModel} = require('mathpix-markdown-it'); 
 ```
