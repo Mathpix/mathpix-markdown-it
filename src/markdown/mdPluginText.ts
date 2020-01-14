@@ -213,16 +213,13 @@ const textTypes: RuleInline = (state) => {
   }
   const match = state.src
     .slice(++startPos)
-    .match(/^(?:url|textit|textbf|author)/); // eslint-disable-line
+    .match(/^(?:textit|textbf|author)/); // eslint-disable-line
 
   if (!match) {
     return false;
   }
   startPos += match[0].length;
   switch (match[0]) {
-    case "url":
-      type = 'url';
-      break;
     case "textit":
       type = "textit";
       break;
@@ -252,6 +249,122 @@ const textTypes: RuleInline = (state) => {
   const token = state.push(type, "", 0);
   token.content = state.src.slice(startPos + 1, nextPos - endMarker.length);
   state.pos = nextPos;
+  return true;
+};
+
+const linkifyURL: RuleInline = (state) => {
+  const urlTag: RegExp = /(?:(www|http:|https:)+[^\s]+[\w])/;
+  let startPos = state.pos;
+  let
+    beginMarker: string = "{",
+    endMarker: string = "}";
+
+  if (state.src.charCodeAt(startPos) !== 0x5c /* \ */) {
+    return false;
+  }
+  const match = state.src
+    .slice(++startPos)
+    .match(/^(?:url)/); // eslint-disable-line
+
+  if (!match) {
+    return false;
+  }
+  startPos += match[0].length;
+
+  if (state.src[startPos] !== beginMarker) {
+    return false;
+  }
+  const endMarkerPos = state.src.indexOf(endMarker, startPos);
+  if (endMarkerPos === -1) {
+    return false;
+  }
+
+  const nextPos = endMarkerPos + endMarker.length;
+  let token;
+  const text = state.src.slice(startPos + 1, nextPos - endMarker.length);
+  if (!text || text.trim().length === 0) {
+    state.pos = nextPos;
+    return true;
+  }
+
+  if (!state.md.linkify.test(text) || !urlTag.test(text)) {
+    token         = state.push('textUrl', '', 0);
+    token.content = text;
+    state.pos = nextPos;
+    return true;
+  }
+
+  const links = state.md.linkify.match(text);
+
+  let level = 1;
+  let lastPos = 0;
+  let pos;
+
+  state.md.options.linkify = false
+
+  for (let ln = 0; ln < links.length; ln++) {
+    const url = links[ln].url;
+    const fullUrl = state.md.normalizeLink(url);
+    if (!state.md.validateLink(fullUrl)) { continue; }
+
+    let urlText = links[ln].text;
+
+    if (!urlTag.test(urlText)) {
+      pos = links[ln].index;
+      if (pos > lastPos) {
+        token         = state.push('textUrl', '', 0);
+        token.content = text.slice(lastPos, pos);
+        token.level   = level;
+      }
+      token         = state.push('textUrl', '', 0);
+      lastPos = links[ln].lastIndex;
+      token.content = text.slice(pos, lastPos);
+      token.level   = level;
+      continue;
+    }
+
+    if (!links[ln].schema) {
+      urlText = state.md.normalizeLinkText('http://' + urlText).replace(/^http:\/\//, '');
+    } else if (links[ln].schema === 'mailto:' && !/^mailto:/i.test(urlText)) {
+      urlText = state.md.normalizeLinkText('mailto:' + urlText).replace(/^mailto:/, '');
+    } else {
+      urlText = state.md.normalizeLinkText(urlText);
+    }
+
+    pos = links[ln].index;
+
+    if (pos > lastPos) {
+      token         = state.push('textUrl', '', 0);
+      token.content = text.slice(lastPos, pos);
+      token.level   = level;
+    }
+
+    token         = state.push('link_open', 'a', 1);
+    token.attrs   = [ [ 'href', fullUrl ] ];
+    token.level   = level++;
+    token.markup  = 'linkify';
+    token.info    = 'auto';
+
+    token         = state.push('text', '', 0);
+    token.content = urlText;
+    token.level   = level;
+
+    token         = state.push('link_close', 'a', -1);
+    token.level   = --level;
+    token.markup  = 'linkify';
+    token.info    = 'auto';
+
+    lastPos = links[ln].lastIndex;
+  }
+
+  if (lastPos < text.length) {
+    token         = state.push('textUrl', '', 0);
+    token.content = text.slice(lastPos);
+    token.level   = level;
+  }
+
+  state.pos = nextPos;
+
   return true;
 };
 
@@ -307,6 +420,10 @@ const renderItalicText = token => `<em>${token.content}</em>`;
 
 const renderUrl = token => `<a href="${token.content}">${token.content}</a>`;
 
+const renderTextUrl = token => {
+  return `<a href="#" class="text-url">${token.content}</a>`
+};
+
 const mapping = {
   section: "Section",
   title: "Title",
@@ -315,7 +432,8 @@ const mapping = {
   subsubsection: "Subsubsection",
   textbf: "TextBold",
   textit: "TextIt",
-  url: "Url,"
+  url: "Url",
+  textUrl: "textUrl"
 };
 
 export default () => {
@@ -324,6 +442,7 @@ export default () => {
     md.block.ruler.before("paragraphDiv", "abstractBlock", abstractBlock);
 
     md.inline.ruler.before("multiMath", "textTypes", textTypes);
+    md.inline.ruler.before('textTypes', 'linkifyURL', linkifyURL);
     Object.keys(mapping).forEach(key => {
       md.renderer.rules[key] = (tokens, idx) => {
         switch (tokens[idx].type) {
@@ -343,6 +462,8 @@ export default () => {
             return renderItalicText(tokens[idx]);
           case "url":
             return renderUrl(tokens[idx]);
+          case "textUrl":
+            return renderTextUrl(tokens[idx]);
           default:
             return '';
         }

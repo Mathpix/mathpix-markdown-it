@@ -278,6 +278,16 @@ export const MathpixStyle = (setTextAlignJustify: boolean = true) => {
       line-height: 0;
       vertical-align: baseline;
     }
+    
+    #preview-content .text-url, #setText .text-url {
+      color: #0B93ff;
+      cursor: text;
+      pointer-events: none;
+    }
+    
+    #preview-content .text-url a:hover, #setText .text-url a:hover {
+      color: #0B93ff;
+    }
 `};
 
 export const codeStyles = `
