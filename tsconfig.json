@@ -19,6 +19,7 @@
         "noUnusedLocals": true
     },
     "exclude": [
+        "examples",
         "node_modules",
         "template",
         "lib",
