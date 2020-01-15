@@ -9,8 +9,8 @@ var linkTables = [];
 var couterTables = 0;
 var linkFigures = [];
 var couterFigures = 0;
-const openTag: RegExp = /\\begin\s{0,}\{(table|figure)\}/;
-const openTagH: RegExp = /\\begin\s{0,}\{(table|figure)\}\s{0,}\[(H|\!H|H\!|h|\!h|h\!|t|\!t|b|\!b|p|\!p)\]/;
+export const openTag: RegExp = /\\begin\s{0,}\{(table|figure)\}/;
+export const openTagH: RegExp = /\\begin\s{0,}\{(table|figure)\}\s{0,}\[(H|\!H|H\!|h|\!h|h\!|t|\!t|b|\!b|p|\!p)\]/;
 const captionTag: RegExp = /\\caption\s{0,}\{([^}]*)\}/;
 const captionTagG: RegExp = /\\caption\s{0,}\{([^}]*)\}/g;
 const labelTag: RegExp = /\\label\s{0,}\{([^}]*)\}/;
@@ -172,7 +172,7 @@ const InlineBlockBeginTable: RuleBlock = (state, startLine) => {
   state.env.label = label;
   state.env.caption = caption;
   state.env.align = align;
-  StatePushPatagraphOpenTable(state, startLine, startLine, type);
+  StatePushPatagraphOpenTable(state, startLine, startLine+1, type);
   if (captionFirst) {
     StatePushCaptionTable(state, type);
   }
@@ -244,7 +244,9 @@ export const BeginTable: RuleBlock = (state, startLine, endLine) => {
 
     if (closeTag.test(lineText)) {
       isCloseTagExist = true;
-      if (state.isEmpty(nextLine+1)) { break }
+      lineText += '\n';
+      break
+      //if (state.isEmpty(nextLine+1)) { break }
     }
     if (resText && lineText) {
       resText += '\n' + lineText;
@@ -296,7 +298,7 @@ export const BeginTable: RuleBlock = (state, startLine, endLine) => {
   state.env.label = label;
   state.env.caption = caption;
   state.env.align = align;
-  StatePushPatagraphOpenTable(state, startLine, nextLine, type);
+  StatePushPatagraphOpenTable(state, startLine, (pE > 0) ? nextLine  : nextLine + 1, type);
 
   if (captionFirst) {
     StatePushCaptionTable(state, type);
@@ -317,6 +319,6 @@ export const BeginTable: RuleBlock = (state, startLine, endLine) => {
     StatePushCaptionTable(state, type);
   }
   state.push('paragraph_close', 'div', -1);
-  state.line = nextLine+1;
+  state.line = nextLine;
   return true;
 };

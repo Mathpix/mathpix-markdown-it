@@ -50,7 +50,7 @@ const InlineBlockBeginAlign: RuleBlock = (state, startLine) => {
     [ 'class', 'center' ],
     [ 'style', `text-align: ${align ? align : 'center'}`]
   ];
-  token.map    = [startLine, startLine];
+  token.map    = [startLine, startLine + 1];
   if (pB > 0) {
     state.tShift[startLine] = pB;
   }
@@ -116,7 +116,9 @@ export const BeginAlign: RuleBlock = (state, startLine, endLine) => {
 
     if (closeTag.test(lineText)) {
       isCloseTagExist = true;
-      if (state.isEmpty(nextLine+1)) { break }
+      lineText += '\n';
+      break
+      //if (state.isEmpty(nextLine+1)) { break }
     }
 
     if (resText && lineText) {
@@ -151,7 +153,8 @@ export const BeginAlign: RuleBlock = (state, startLine, endLine) => {
     [ 'class', 'center' ],
     [ 'style', `text-align: ${align ? align : 'center'}`]
   ];
-  token.map    = [startLine, nextLine];
+  token.map    = [startLine, (pE > 0) ? nextLine : nextLine + 1];
+
   if (pB > 0) {
     state.tShift[startLine] = pB;
   } else {
@@ -174,6 +177,6 @@ export const BeginAlign: RuleBlock = (state, startLine, endLine) => {
   }
 
   token = state.push('paragraph_close', 'div', -1);
-  state.line = nextLine+1;
+  state.line = nextLine;
   return true;
 };

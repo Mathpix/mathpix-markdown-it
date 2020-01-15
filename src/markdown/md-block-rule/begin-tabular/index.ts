@@ -223,14 +223,17 @@ export const BeginTabular: RuleBlock = (state, startLine: number, endLine: numbe
     max = state.eMarks[nextLine];
     lineText = state.src.slice(pos, max);
 
-    resString += '\n' + lineText;
     if (iOpen > 0) {
       if (closeTag.test(lineText)) {
         iOpen--;
       }
     } else {
-      if (state.isEmpty(nextLine)) { break }
+      lineText += '\n';
+      break
+      //if (state.isEmpty(nextLine)) { break }
     }
+
+    resString += '\n' + lineText;
 
     if (openTag.test(lineText)) {
       iOpen++;

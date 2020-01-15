@@ -1,7 +1,7 @@
 import { ConfiguredMathJaxPlugin, CustomTagPlugin, HighlightPlugin,
     tocPlugin,
     anchorPlugin,
-    separateForBlockPlugin,
+    //separateForBlockPlugin,
     tableTabularPlugin
 } from "./mdPluginConfigured";
 import { withLineNumbers } from "./rules";
@@ -20,7 +20,7 @@ const mdInit = (options: TMarkdownItOptions) => {
     quotes: "“”‘’"
   })
     .use(tableTabularPlugin, {width: width})
-    .use(separateForBlockPlugin)
+ //   .use(separateForBlockPlugin)
     .use(ConfiguredMathJaxPlugin({width: width}))
     .use(CustomTagPlugin())
     .use(HighlightPlugin, {auto: false})
