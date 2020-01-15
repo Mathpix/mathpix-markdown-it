@@ -576,8 +576,8 @@ function paragraphDiv(state, startLine/*, endLine*/) {
  // resetCounter();
   let isMathOpen = false;
   let openedAuthorBlock = false;
-  const pickStartTag: RegExp = /\\begin{(abstract|equation|equation\*)}|\\\[/;
-  const pickEndTag: RegExp = /\\end{(abstract|equation|equation\*)}|\\\]/;
+  const pickStartTag: RegExp = /\\begin{(abstract|equation|equation|center|left|right|table|figure|tabular\*)}|\\\[/;
+  const pickEndTag: RegExp = /\\end{(abstract|equation|equation|center|left|right|table|figure|tabular\*)}|\\\]/;
   const pickTag: RegExp = /^\\(?:title|section|subsection)/;
 
   let content, terminate, i, l, token, oldParentType, lineText, mml,
@@ -661,7 +661,6 @@ function paragraphDiv(state, startLine/*, endLine*/) {
     }
     if (terminate) { break; }
   }
-
   content = state.getLines(startLine, nextLine, state.blkIndent, false).trim();
 
   state.line = nextLine;
