@@ -25,5 +25,6 @@ declare const MathJaxConfig: {
         fontCache: string;
         mtextInheritFont: boolean;
     };
+    CHTML: any;
 };
 export default MathJaxConfig;

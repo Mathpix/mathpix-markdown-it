@@ -16,6 +16,7 @@ export interface optionsMathpixMarkdown {
     width?: number;
     showToc?: boolean;
     overflowY?: string;
+    outMath?: TOutputMath;
 }
 export declare type TMarkdownItOptions = {
     htmlTags?: boolean;
@@ -25,6 +26,14 @@ export declare type TMarkdownItOptions = {
     xhtmlOut?: boolean;
     width?: number;
     lineNumbering?: boolean;
+    outMath?: TOutputMath;
+};
+export declare type TOutputMath = {
+    OutputJax?: string;
+    include_svg?: boolean;
+    include_mathml?: boolean;
+    include_asciimath?: boolean;
+    include_latex?: boolean;
 };
 declare class MathpixMarkdown_Model {
     disableFancyArrayDef: string[];

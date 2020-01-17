@@ -34,7 +34,8 @@ const MathJaxConfig = {
     SVG: {
         fontCache: 'none',             // or 'global' or 'local',
         mtextInheritFont: true
-    }
+    },
+    CHTML: null
 };
 
 export default MathJaxConfig;

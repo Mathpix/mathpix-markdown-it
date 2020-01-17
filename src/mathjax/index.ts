@@ -54,6 +54,42 @@ let docTeX = MJ.document(domNode, { InputJax: tex, OutputJax: svg });
 let docMathML = MJ.document(domNode, { InputJax: mml, OutputJax: svg });
 
 
+import { SerializedMmlVisitor as MmlVisitor } from 'mathjax-full/js/core/MmlTree/SerializedMmlVisitor.js';
+const visitor = new MmlVisitor();
+
+const toMathML = (node => visitor.visitTree(node));
+
+const addDataAttributeIntoOunputJax = (docTeX, outMath) => {
+  const {include_mathml = true, include_latex = true} = outMath;
+
+  if (include_mathml && include_latex) {
+    docTeX.outputJax.postFilters.add((args) => {
+      const math = args.math, node = args.data;
+      if (!node.setAttribute && !node.attributes) { return }
+
+      const original = (math.math
+        ? math.math
+        : math.inputJax.processStrings ? '' : math.start.node.outerHTML
+      );
+      if (!node.setAttribute) { //LiteElement
+        if (include_latex) {
+        node.attributes['data-original'] = original.replace(/\n\s*/g, '');
+        }
+        if (include_mathml) {
+          node.attributes['data-mathml'] = toMathML(math.root).replace(/\n\s*/g, '');
+        }
+      } else {
+        if (include_latex) {
+          node.setAttribute('data-original', original.replace(/\n\s*/g, ''));
+        }
+        if (include_mathml) {
+          node.setAttribute('data-mathml', toMathML(math.root).replace(/\n\s*/g, ''));
+        }
+      }
+    });
+  }
+};
+
 export const MathJax = {
   //
   //  Return the stylesheet DOM node
@@ -75,8 +111,10 @@ export const MathJax = {
    *    @param {number} scale   The scaling factor (unitless)
    * }
    */
-  Typeset: function(string, display=true, metric: any={}) {
+  Typeset: function(string, options: any={}) {
+    const {display = true, metric = {}, outMath = {}} = options;
     const {em = 16, ex = 8, cwidth = 1200, lwidth = 100000, scale = 1} = metric;
+    addDataAttributeIntoOunputJax(docTeX, outMath);
     const node = docTeX.convert(string, {display: display, em: em, ex: ex, containerWidth: cwidth, lineWidth: lwidth, scale: scale});
     return adaptor.outerHTML(node);
   },

@@ -23,6 +23,7 @@ export interface optionsMathpixMarkdown {
     width?: number;
     showToc?: boolean;
     overflowY?: string; //default 'unset'
+    outMath?: TOutputMath;
 }
 
 export type TMarkdownItOptions = {
@@ -32,7 +33,16 @@ export type TMarkdownItOptions = {
   linkify?: boolean,
   xhtmlOut?: boolean,
   width?: number,
-  lineNumbering?: boolean
+  lineNumbering?: boolean,
+  outMath?: TOutputMath
+}
+
+export type TOutputMath = {
+  OutputJax?: string,
+  include_svg?: boolean,
+  include_mathml?: boolean,
+  include_asciimath?: boolean,
+  include_latex?: boolean
 }
 
 class MathpixMarkdown_Model {

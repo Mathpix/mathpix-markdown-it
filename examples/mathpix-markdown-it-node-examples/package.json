@@ -12,7 +12,7 @@
     "ejs": "^3.0.1",
     "express": "^4.17.1",
     "jsdom": "^16.0.0",
-    "mathpix-markdown-it": "git+https://github.com/Mathpix/mathpix-markdown-it.git",
+    "mathpix-markdown-it": "git+https://github.com/Mathpix/mathpix-markdown-it.git#feature",
     "window": "^4.2.6"
   }
 }

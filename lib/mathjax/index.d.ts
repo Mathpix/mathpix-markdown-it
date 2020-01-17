@@ -21,7 +21,7 @@ export declare const MathJax: {
      *    @param {number} scale   The scaling factor (unitless)
      * }
      */
-    Typeset: (string: any, display?: boolean, metric?: any) => any;
+    Typeset: (string: any, options?: any) => any;
     /**
      * Typeset a MathML expression and return the SVG tree for it
      *
