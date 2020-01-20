@@ -1,0 +1,250 @@
+# MultiMarkdown Tables: Other Notes
+From [MultiMarkdown 5](http://fletcher.github.io/MultiMarkdown-5)
+
+Standards:
+
+
+.
+First Header  | Second Header | Third Header |
+------------  | :-----------: | -----------: |
+Content       |   **Cell**    |         Cell |
+New section   |     More      |         Data |
+.
+<table>
+<thead>
+<tr>
+<th>First Header</th>
+<th style="text-align:center">Second Header</th>
+<th style="text-align:right">Third Header</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Content</td>
+<td style="text-align:center"><strong>Cell</strong></td>
+<td style="text-align:right">Cell</td>
+</tr>
+<tr>
+<td>New section</td>
+<td style="text-align:center">More</td>
+<td style="text-align:right">Data</td>
+</tr>
+</tbody>
+</table>
+.
+
+Requirement 1: There must be at least one | per line:
+NOTE: Assumed legal pipe chars, could be leading, tailing or both
+
+(Against at line 4)
+
+.
+First Header  | Second Header | Third Header |
+------------  | :-----------: | -----------: |
+Content      \|   **Cell**   \|         Cell |
+New section  \|     More     `|`        Data\|
+.
+<table>
+<thead>
+<tr>
+<th>First Header</th>
+<th style="text-align:center">Second Header</th>
+<th style="text-align:right">Third Header</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Content      |   <strong>Cell</strong>   |         Cell</td>
+</tr>
+</tbody>
+</table>
+<p>New section  |     More     <code>|</code>        Data|</p>
+.
+
+(Against at line 1)
+
+.
+First Header \| Second Header`|`Third Header\|
+------------  | :-----------: | -----------: |
+Content       |   **Cell**    |         Cell |
+New section   |      More     |        Data  |
+.
+<p>First Header | Second Header<code>|</code>Third Header|
+------------  | :-----------: | -----------: |
+Content       |   <strong>Cell</strong>    |         Cell |
+New section   |      More     |        Data  |</p>
+.
+
+Requirement 2: The “separator” line between headers and table content must contain only |,-, =, :,., +, or spaces:
+NOTE: no implementation details about denoting wrappable, follows MultiMarkdown-5 `extend` class
+
+
+.
+First Header  | Second Header | Third Header |
+============  | :==========:+ | -----------: |
+Content       |   **Cell**    |         Cell |
+New section   |     More      |         Data |
+.
+<table>
+<thead>
+<tr>
+<th>First Header</th>
+<th style="text-align:center" class="extend">Second Header</th>
+<th style="text-align:right">Third Header</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Content</td>
+<td style="text-align:center" class="extend"><strong>Cell</strong></td>
+<td style="text-align:right">Cell</td>
+</tr>
+<tr>
+<td>New section</td>
+<td style="text-align:center" class="extend">More</td>
+<td style="text-align:right">Data</td>
+</tr>
+</tbody>
+</table>
+.
+
+Requirement 3: Cell content must be on one line only:
+
+
+.
+First Header  | Second Header | Third Header |
+------------  | :-----------: | -----------: |
+Content       |   **Cell**    |         Cell |
+New section   |     1. More
+                    2. MORE!  |         Data |
+.
+<table>
+<thead>
+<tr>
+<th>First Header</th>
+<th style="text-align:center">Second Header</th>
+<th style="text-align:right">Third Header</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Content</td>
+<td style="text-align:center"><strong>Cell</strong></td>
+<td style="text-align:right">Cell</td>
+</tr>
+<tr>
+<td>New section</td>
+<td style="text-align:center">1. More</td>
+</tr>
+<tr>
+<td>2. MORE!</td>
+<td style="text-align:center">Data</td>
+</tr>
+</tbody>
+</table>
+.
+
+Requirement 4: Columns are separated by |:
+NOTE: Defined in PHP Markdown Extra. Test cases ignored.
+
+Requirement 5: The first line of the table, and the alignment/divider line, must start at the beginning of the line:
+NOTE: The example in MultiMarkdown breaks this requirement. I altered this rule as follows:
+The headers of the table, and the alignment/divider line, must start at the beginning of the line
+    ^^^^^^^
+
+
+.
+|             |   Grouping    |              |
+|             |               |  Grouping 2  |
+First Header  | Second Header | Third Header |
+------------  | :-----------: | -----------: |
+Content       |   **Cell**    |         Cell |
+New section   |     More      |         Data |
+.
+<table>
+<thead>
+<tr>
+<th></th>
+<th style="text-align:center">Grouping</th>
+<th style="text-align:right"></th>
+</tr>
+<tr>
+<th></th>
+<th style="text-align:center"></th>
+<th style="text-align:right">Grouping 2</th>
+</tr>
+<tr>
+<th>First Header</th>
+<th style="text-align:center">Second Header</th>
+<th style="text-align:right">Third Header</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Content</td>
+<td style="text-align:center"><strong>Cell</strong></td>
+<td style="text-align:right">Cell</td>
+</tr>
+<tr>
+<td>New section</td>
+<td style="text-align:center">More</td>
+<td style="text-align:right">Data</td>
+</tr>
+</tbody>
+</table>
+.
+
+
+.
+|             |   Grouping    |              |
+------------  |               |  Grouping 2  |
+------------  | Second Header | Third Header |
+------------  | :-----------: | -----------: |
+Content       |   **Cell**    |         Cell |
+New section   |     More      |         Data |
+.
+<table>
+<thead>
+<tr>
+<th></th>
+<th style="text-align:center">Grouping</th>
+<th style="text-align:right"></th>
+</tr>
+<tr>
+<th>------------</th>
+<th style="text-align:center"></th>
+<th style="text-align:right">Grouping 2</th>
+</tr>
+<tr>
+<th>------------</th>
+<th style="text-align:center">Second Header</th>
+<th style="text-align:right">Third Header</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Content</td>
+<td style="text-align:center"><strong>Cell</strong></td>
+<td style="text-align:right">Cell</td>
+</tr>
+<tr>
+<td>New section</td>
+<td style="text-align:center">More</td>
+<td style="text-align:right">Data</td>
+</tr>
+</tbody>
+</table>
+.
+
+
+.
+|             |   Grouping    |              |
+------------  | ------------- | -----------r |
+Content       |   **Cell**    |         Cell |
+New section   |     More      |         Data |
+.
+<p>|             |   Grouping    |              |
+------------  | ------------- | -----------r |
+Content       |   <strong>Cell</strong>    |         Cell |
+New section   |     More      |         Data |</p>
+.

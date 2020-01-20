@@ -47,7 +47,13 @@ app.get('/', (req, res) => {
   const options = {
     display: 'block',
     htmlTags: true,
-    width: 800
+    width: 800,
+    outMath: {
+      include_mathml: false,
+      include_asciimath: false,
+      include_latex: false,
+      include_svg: false
+    }
   };
   const htmlMM = MathpixMarkdownModel.render(data, options);
   const mathFontsStyle = MathpixMarkdownModel.getMathpixFontsStyle();

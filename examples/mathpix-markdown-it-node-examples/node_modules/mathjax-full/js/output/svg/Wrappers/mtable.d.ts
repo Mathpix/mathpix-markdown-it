@@ -1,0 +1,33 @@
+import { SVGWrapper } from '../Wrapper.js';
+import { SVGWrapperFactory } from '../WrapperFactory.js';
+import { CommonMtable } from '../../common/Wrappers/mtable.js';
+import { SVGmtr } from './mtr.js';
+import { SVGmtd } from './mtd.js';
+import { MmlNode } from '../../../core/MmlTree/MmlNode.js';
+import { OptionList } from '../../../util/Options.js';
+import { StyleList } from '../../common/CssStyles.js';
+declare const SVGmtable_base: import("../Wrapper.js").Constructor<CommonMtable<SVGmtd<any, any, any>, SVGmtr<any, any, any>>> & import("../Wrapper.js").Constructor<SVGWrapper<any, any, any>>;
+export declare class SVGmtable<N, T, D> extends SVGmtable_base {
+    static kind: string;
+    static styles: StyleList;
+    labels: N;
+    constructor(factory: SVGWrapperFactory<N, T, D>, node: MmlNode, parent?: SVGWrapper<N, T, D>);
+    toSVG(parent: N): void;
+    protected placeRows(svg: N): void;
+    protected getRowHD(equal: boolean, HD: number, H: number, D: number): number[];
+    handleColor(): void;
+    protected handleColumnLines(svg: N): void;
+    protected handleRowLines(svg: N): void;
+    protected handleFrame(svg: N): void;
+    protected handlePWidth(svg: N): number;
+    protected lineClass(style: string): string;
+    protected makeFrame(w: number, h: number, d: number, style: string): any;
+    protected makeVLine(x: number, style: string, t: number): any;
+    protected makeHLine(y: number, style: string, t: number): any;
+    protected setLineThickness(t: number, style: string, properties: OptionList): OptionList;
+    protected handleLabels(svg: N, parent: N, dx: number): void;
+    protected spaceLabels(): void;
+    protected topTable(svg: N, labels: N, side: string): void;
+    protected subTable(svg: N, labels: N, side: string, dx: number): void;
+}
+export {};

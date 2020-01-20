@@ -1,0 +1,84 @@
+# Support merging cells vertically
+
+Requirement: '^^' in a cell indicates it should be merged with the cell above
+
+.
+| A                |||
+|------|------|------|
+| B    | C    | D    |
+| ^^   | E    | F    |
+| G          || H    |
+| ^^         || I    |
+.
+<table>
+<thead>
+<tr>
+<th colspan="3">A</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td rowspan="2">B</td>
+<td>C</td>
+<td>D</td>
+</tr>
+<tr>
+<td>E</td>
+<td>F</td>
+</tr>
+<tr>
+<td colspan="2" rowspan="2">G</td>
+<td>H</td>
+</tr>
+<tr>
+<td>I</td>
+</tr>
+</tbody>
+</table>
+.
+
+Should work with multilines
+
+.
+| A                |||
+|------|------|------|
+| B    | C    | D    \
+| B    | C    | D    |
+| ^^   | E    | F    \
+|      | E    | F    |
+
+.
+<table>
+<thead>
+<tr>
+<th colspan="3">A</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td rowspan="2">
+<p>B
+B</p>
+</td>
+<td>
+<p>C
+C</p>
+</td>
+<td>
+<p>D
+D</p>
+</td>
+</tr>
+<tr>
+<td>
+<p>E
+E</p>
+</td>
+<td>
+<p>F
+F</p>
+</td>
+</tr>
+</tbody>
+</table>
+.

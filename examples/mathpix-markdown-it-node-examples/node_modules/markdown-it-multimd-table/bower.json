@@ -1,0 +1,37 @@
+{
+  "name": "markdown-it-multimd-table",
+  "description": "Multimarkdown table syntax plugin for markdown-it markdown parser",
+  "main": "index.js",
+  "authors": [
+    "RedBug312"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "markdown-it-plugin",
+    "markdown-it",
+    "markdown",
+    "multimarkdown",
+    "table"
+  ],
+  "homepage": "https://github.com/RedBug312/markdown-it-multimd-table",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies":{
+    "markdown-it": "^5.0.3"
+  },
+  "devDependencies": {
+    "browserify": "*",
+    "coveralls": "^2.11.2",
+    "eslint": "^3.19.0",
+    "eslint-plugin-nodeca": "^1.0.0",
+    "istanbul": "*",
+    "markdown-it-testgen": "~0.1.0",
+    "mocha": "*",
+    "uglify-js": "^2.7.3"
+  }
+}

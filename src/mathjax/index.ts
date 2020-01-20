@@ -53,15 +53,25 @@ const svg = new SVG(svgConfig);
 let docTeX = MJ.document(domNode, { InputJax: tex, OutputJax: svg });
 let docMathML = MJ.document(domNode, { InputJax: mml, OutputJax: svg });
 
+const AsciiMath = require('mathjax-full/js/input/asciimath.js').AsciiMath;
+const asciimath = new AsciiMath();
+let docAsciiMath = MJ.document(domNode, { InputJax: asciimath, OutputJax: svg });
 
-import { SerializedMmlVisitor as MmlVisitor } from 'mathjax-full/js/core/MmlTree/SerializedMmlVisitor.js';
+///import { SerializedMmlVisitor as MmlVisitor } from 'mathjax-full/js/core/MmlTree/SerializedMmlVisitor.js';
+import { SerializedMmlVisitor as MmlVisitor } from './SerializedAscii';
 const visitor = new MmlVisitor();
 
-const toMathML = (node => visitor.visitTree(node));
+
+const toMathML = (node => {
+  console.log('toMathML=>node=>', node)
+  console.log('toMathML=>visitor=>', visitor)
+  return visitor.visitTree(node)
+});
 
 const OuterHTML = (node, math, outMath) => {
   const {include_mathml = true, include_asciimath = true, include_latex = true, include_svg = true} = outMath;
 
+  console.log('OuterHTML=>math=>', math)
   let outHTML = '';
 
   if (include_mathml) {
@@ -70,7 +80,18 @@ const OuterHTML = (node, math, outMath) => {
 
   if (include_asciimath) {
     if (!outHTML) { outHTML += '\n'}
-    outHTML +=  '<asciimath style="display: none">' + '</asciimath>';
+    var convert = require('mathml-to-asciimath');
+    console.log('!!!!!! math.root =>', math.root)
+    const asciimml = convert(toMathML(math.root) ); // => '1 + 2'
+    console.log('!!!!!! asciimml =>', asciimml)
+    outHTML +=  '<asciimath style="display: none">' +asciimml+ '</asciimath>';
+
+
+    const asciiSvg = docAsciiMath.convert(asciimml)
+    const htmlSvgA = adaptor.outerHTML(asciiSvg)
+    if (!outHTML) { outHTML += '\n'}
+    outHTML += htmlSvgA
+      console.log('htmlSvgA=>', htmlSvgA)
   }
 
   if (include_latex) {
