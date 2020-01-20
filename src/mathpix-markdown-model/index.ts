@@ -38,11 +38,10 @@ export type TMarkdownItOptions = {
 }
 
 export type TOutputMath = {
-  OutputJax?: string,
-  include_svg?: boolean,
   include_mathml?: boolean,
   include_asciimath?: boolean,
-  include_latex?: boolean
+  include_latex?: boolean,
+  include_svg?: boolean
 }
 
 class MathpixMarkdown_Model {

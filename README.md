@@ -58,6 +58,7 @@ class App extends Component {
 | `typographer`    | boolean;*`false`*            | Enable some language-neutral replacement + quotes beautification                                                      |
 | `linkify`        | boolean;*`false`*            | Autoconvert URL-like text to links                                                                                    |
 | `width`          | number;*`1200`*              | Text container width                                                                                                  |
+| `outMath`        | TOutputMath;*`{}`*           | Options to output html                                                                                                |
 
 ### Sample for non-React UI code
 
@@ -85,6 +86,7 @@ You can also use certain functions to get styles and rendering in html:
 | `linkify`        | boolean;*`true`*             | Autoconvert URL-like text to links                                                                                    |
 | `width`          | number;*`1200`*              | Text container width                                                                                                  |
 | `lineNumbering`  | boolean;*`false`*            | Recommended for synchronization with a text editor.                                                                   |
+| `outMath`        | TOutputMath;*`{}`*           | Options to output html                                                                                                |
 
 ## optionsMathpixMarkdown
 
@@ -102,7 +104,18 @@ You can also use certain functions to get styles and rendering in html:
 | `typographer`    | boolean;*`true`*             | Enable some language-neutral replacement + quotes beautification                                                      |
 | `linkify`        | boolean;*`true`*             | Autoconvert URL-like text to links                                                                                    |
 | `width`          | number;*`1200`*              | Text container width                                                                                                  |
+| `outMath`        | TOutputMath;*`{}`*           | Options to output html                                                                                                |
 
+
+## TOutputMath
+
+|                     | type&nbsp;*`default`*        |  description                                                                                                       |
+|---------------------|------------------------------|--------------------------------------------------------------------------------------------------------------------|
+| `include_mathml`    | boolean&nbsp;*`true`*        | should outputs mathml `<mathml style="display: none"><math>...</math></mathml>`                                    |
+| `include_asciimath` | boolean&nbsp;*`true`*        | should outputs asciimath `<asciimath style="display: none">...</asciimath>`                                        |
+| `include_latex`     | boolean&nbsp;*`true`*        | should outputs latex `<latex style="display: none">...</latex>`                                                    |
+| `include_svg`       | boolean&nbsp;*`true`*        | should outputs svg `<mjx-container class="MathJax" jax="SVG"><svg>...</svg></mjx-container>`                       |
+ 
 
 ### Sample for node
 

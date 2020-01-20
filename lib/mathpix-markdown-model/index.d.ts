@@ -29,11 +29,10 @@ export declare type TMarkdownItOptions = {
     outMath?: TOutputMath;
 };
 export declare type TOutputMath = {
-    OutputJax?: string;
-    include_svg?: boolean;
     include_mathml?: boolean;
     include_asciimath?: boolean;
     include_latex?: boolean;
+    include_svg?: boolean;
 };
 declare class MathpixMarkdown_Model {
     disableFancyArrayDef: string[];
