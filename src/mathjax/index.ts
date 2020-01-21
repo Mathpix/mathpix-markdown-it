@@ -60,7 +60,7 @@ const visitor = new MmlVisitor();
 const toMathML = (node => visitor.visitTree(node));
 
 const OuterHTML = (node, math, outMath) => {
-  const {include_mathml = true, include_asciimath = true, include_latex = true, include_svg = true} = outMath;
+  const {include_mathml = false, include_asciimath = false, include_latex = true, include_svg = true} = outMath;
 
   let outHTML = '';
 
