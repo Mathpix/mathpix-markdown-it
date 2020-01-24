@@ -77,7 +77,6 @@ const OuterHTML = (node, math, outMath) => {
   if (include_mathml) {
     outHTML +=  '<mathml style="display: none">' + toMathML(math.root) + '</mathml>';
   }
-
   if (include_asciimath) {
     if (!outHTML) { outHTML += '\n'}
     const asciimml = toAsciiML(math.root, optionAscii);
