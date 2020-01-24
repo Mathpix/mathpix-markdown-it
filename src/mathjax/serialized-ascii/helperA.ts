@@ -191,6 +191,7 @@ export const AMsymbols = [
   {input:"cdots", tag:"mo", output:"\u22EF", tex:null, ttype:CONST},
   {input:"vdots", tag:"mo", output:"\u22EE", tex:null, ttype:CONST},
   {input:"ddots", tag:"mo", output:"\u22F1", tex:null, ttype:CONST},
+  {input:"dots", tag:"mo", output:"\u2026", tex:null, ttype:CONST},
   {input:"diamond", tag:"mo", output:"\u22C4", tex:null, ttype:CONST},
   {input:"square", tag:"mo", output:"\u25A1", tex:null, ttype:CONST},
   {input:"|__", tag:"mo", output:"\u230A",  tex:"lfloor", ttype:CONST},

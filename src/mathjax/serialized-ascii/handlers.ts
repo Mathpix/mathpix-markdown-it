@@ -26,6 +26,9 @@ const needFirstSpase = (node) => {
 };
 
 const needLastSpase = (node) => {
+  if (node.parent.kind === "msubsup") {
+    return false
+  }
   if (isLastChild(node)) {
     return false
   } else {

@@ -1,0 +1,859 @@
+#
+# Test cases for latex post-processing.
+#
+# Cases can have different results for the following formats:
+#    a -- latex_anno
+#    n -- latex_normal
+#    s -- latex_simplified
+#    t -- latex_styled
+#    l -- latex_list
+#    c -- latex_style + rm_spaces
+#    T -- text
+#    A -- asciimath
+#    m -- MathML (without the enclosing <math></math> element
+#
+# Note an expected singleton list result should be specified by the
+# single element instead of an array, e.g., 'foo' instead of '["foo"]'.
+#
+# Also, string results have unescaped backslashes (just use a single '\')
+# but list results are produced by JSON.stringify and therefore require
+# escaping ("\\").
+#
+
+a = b + c
+    cA: a=b+c
+    A: a=b+c
+    m: <mi>a</mi><mo>=</mo><mi>b</mi><mo>+</mo><mi>c</mi>
+[1, 2)
+    A: [1,2)
+    m: <mo>[</mo><mn>1</mn><mo separator="true">,</mo><mn>2</mn><mo>)</mo>
+x^2 + 2
+    c: x^2+2
+    A: x^(2)+2
+    m: <msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><mn>2</mn>
+\begin{array}{c}{a1}&{a2}\\{b1}&{b2}\end{array}
+    ans: \left. \begin{array}{c}{a1}&{a2}\\{b1}&{b2}\end{array} \right.
+    A: [a1,a2],[b1,b2]
+    l: ["a1 a2","b1 b2"]
+    m: <mtable columnalign="center"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>a</mi><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>a</mi><mn>2</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>b</mi><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>b</mi><mn>2</mn></mstyle></mtd></mtr></mtable>
+
+# base
+1 3 5
+    anstclTXLA: 135
+    A: 135
+    m: <mn>135</mn>
+1 , 3 x , 5
+    anst: 1,3 x , 5
+    c: 1,3 x, 5
+    l: ["1","3 x","5"]
+    A: 1,3x,5
+    m: <mn>1</mn><mo separator="true">,</mo><mn>3</mn><mi>x</mi><mo separator="true">,</mo><mn>5</mn>
+
+# latex_normal
+before\mathbb { foo }after
+    nsl: before foo after
+    c: before\mathbb{foo}after
+    A: beforefooafter
+    m: <mi>b</mi><mi>e</mi><mi>f</mi><mi>o</mi><mi>r</mi><mi>e</mi><mrow><mi>f</mi><mi>o</mi><mi>o</mi></mrow><mi>a</mi><mi>f</mi><mi>t</mi><mi>e</mi><mi>r</mi>
+before\mathbf { bar }after
+    nsl: before bar after
+    c: before\mathbf{bar}after
+    A: beforebarafter
+    m: <mi>b</mi><mi>e</mi><mi>f</mi><mi>o</mi><mi>r</mi><mi>e</mi><mrow><mi mathvariant="bold">b</mi><mi mathvariant="bold">a</mi><mi mathvariant="bold">r</mi></mrow><mi>a</mi><mi>f</mi><mi>t</mi><mi>e</mi><mi>r</mi>
+before\mathcal { baz }after
+    nsl: before baz after
+    c: before\mathcal{baz}after
+    A: beforebazafter
+    m: <mi>b</mi><mi>e</mi><mi>f</mi><mi>o</mi><mi>r</mi><mi>e</mi><mrow><mi>b</mi><mi>a</mi><mi>z</mi></mrow><mi>a</mi><mi>f</mi><mi>t</mi><mi>e</mi><mi>r</mi>
+\left\{\begin{array}{ l l r } { x - y - z } & { = } & { 2} \\ { 2x + y + z } & { = } & { 1} \\ { 3x - 2y - z } & { = } & { 5}\end{array}\right.
+    ns: \left\{\begin{array}{l}{ x - y - z = 2}\\{ 2x + y + z = 1}\\{ 3x - 2y - z = 5}\end{array}\right.
+    c: \left\{\begin{array}{llr}{x-y-z} & {=} & {2} \\ {2x+y+z} & {=} & {1} \\ {3x-2y-z} & {=} & {5}\end{array}\right.
+    l: ["x - y - z = 2","2x + y + z = 1","3x - 2y - z = 5"]
+    A: {[x-y-z,=,2],[2x+y+z,=,1],[3x-2y-z,=,5]:}
+    m: <mo fence="true">{</mo><mtable columnalign="left left right"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>x</mi><mo>−</mo><mi>y</mi><mo>−</mo><mi>z</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mo>=</mo></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn><mi>x</mi><mo>+</mo><mi>y</mi><mo>+</mo><mi>z</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mo>=</mo></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>3</mn><mi>x</mi><mo>−</mo><mn>2</mn><mi>y</mi><mo>−</mo><mi>z</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mo>=</mo></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>5</mn></mstyle></mtd></mtr></mtable>
+
+# latex_anno
+\operatorname { s i n }
+    astcl: \sin
+    nMn: \operatorname { sin }
+    A: sin
+    m: <mi>sin</mi>
+\begin{array}{lll}\operatorname{s i n}&x&y\\(x^2)&x&y\end{array}
+    asl: \left. \begin{array}{lll}\sin&x&y\\(x^2)&x&y\end{array} \right.
+    l: ["\\sin x y","(x^2) x y"]
+    nMn: \left. \begin{array}{lll}\operatorname { sin }&x&y\\(x^2)&x&y\end{array} \right.
+    t: \begin{array}{lll}\sin&x&y\\\left(x^2\right)&x&y\end{array}
+    c: \begin{array}{lll}\sin &x&y\\\left(x^2\right)&x&y\end{array}
+    A: [sin,x,y],[(x^(2)),x,y]
+    m: <mtable columnalign="left left left"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>sin</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>x</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>y</mi></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mo>(</mo><msup><mi>x</mi><mn>2</mn></msup><mo>)</mo></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>x</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>y</mi></mstyle></mtd></mtr></mtable>
+\left.\begin{array}{lll}\operatorname{s i n}&x&y\\(x^2)&x&y\end{array}\right.
+    a: \left.\begin{array}{lll}\sin&x&y\\(x^2)&x&y\end{array}\right.
+    sl: \left.\begin{array}{lll}\sin&x&y\\(x^2)&x&y\end{array}\right.
+    nMn: \left.\begin{array}{lll}\operatorname { sin }&x&y\\(x^2)&x&y\end{array}\right.
+    t: \begin{array}{lll}\sin&x&y\\\left(x^2\right)&x&y\end{array}
+    c: \begin{array}{lll}\sin &x&y\\\left(x^2\right)&x&y\end{array}
+    l: ["\\sin x y","(x^2) x y"]
+    A: {:[sin,x,y],[(x^(2)),x,y]:}
+    m: <mtable columnalign="left left left"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>sin</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>x</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>y</mi></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mo>(</mo><msup><mi>x</mi><mn>2</mn></msup><mo>)</mo></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>x</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>y</mi></mstyle></mtd></mtr></mtable>
+a \operatorname { m o d } b
+    astcl: a \bmod b
+    nMn: a \operatorname { mod } b
+    A: a mod b
+    m: <mi>a</mi><mi>mod</mi><mi>b</mi>
+
+T _ { x } \left( \theta _ { r } \right) = \left[ \begin{array} { l l l l } { 1} & { 0} & { 0} & { 0} \\ { 0} & { \operatorname { c o s } \theta _ { r } } & { \operatorname { s i n } \theta _ { r } } & { 0} \\ { 0} & { - \operatorname { s i n } \theta _ { r } } & { \operatorname { c o s } \theta _ { r } } & { 0} \\ { 0} & { 0} & { 0} & { 1} \end{array} \right]
+    astl: T _ { x } \left( \theta _ { r } \right) = \left[ \begin{array} { l l l l } { 1} & { 0} & { 0} & { 0} \\ { 0} & { \cos \theta _ { r } } & { \sin \theta _ { r } } & { 0} \\ { 0} & { - \sin \theta _ { r } } & { \cos \theta _ { r } } & { 0} \\ { 0} & { 0} & { 0} & { 1} \end{array} \right]
+    c: T_{x}\left(\theta_{r}\right)=\left[ \begin{array}{llll}{1} & {0} & {0} & {0} \\ {0} & {\cos \theta_{r}} & {\sin \theta_{r}} & {0} \\ {0} & {-\sin \theta_{r}} & {\cos \theta_{r}} & {0} \\ {0} & {0} & {0} & {1}\end{array}\right]
+    n: T _ { x } \left( \theta _ { r } \right) = \left[ \begin{array} { l l l l } { 1} & { 0} & { 0} & { 0} \\ { 0} & { \operatorname { cos } \theta _ { r } } & { \operatorname { sin } \theta _ { r } } & { 0} \\ { 0} & { - \operatorname { sin } \theta _ { r } } & { \operatorname { cos } \theta _ { r } } & { 0} \\ { 0} & { 0} & { 0} & { 1} \end{array} \right]
+    A: T_(x)(theta_(r))=[[1,0,0,0],[0,cos theta_(r),sin theta_(r),0],[0,-sin theta_(r),cos theta_(r),0],[0,0,0,1]]
+    m: <msub><mi>T</mi><mi>x</mi></msub><mo>(</mo><msub><mi>θ</mi><mi>r</mi></msub><mo>)</mo><mo>=</mo><mo fence="true">[</mo><mtable columnalign="left left left left"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>cos</mi><msub><mi>θ</mi><mi>r</mi></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>sin</mi><msub><mi>θ</mi><mi>r</mi></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mo>−</mo><mi>sin</mi><msub><mi>θ</mi><mi>r</mi></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>cos</mi><msub><mi>θ</mi><mi>r</mi></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd></mtr></mtable><mo fence="true">]</mo>
+
+# latex_simplified
+\operatorname{foo}
+    anstl: \operatorname { foo }
+    A: foo
+    m: <mi>foo</mi>
+2 . x
+    #sl: 2 \cdot x
+    A: 2.x
+    m: <mn>2</mn><mo>.</mo><mi>x</mi>
+1 2 \longdiv { 24 }
+    sl: \frac { 24 } { 12 }
+    A: ((24)/(12))
+    m: <mn>12</mn><menclose notation="longdiv"><mn>24</mn></menclose>
+\sqrt [ 2 ] { 2 }
+    sl: \sqrt[ 2 ] { 2 }
+    c: \sqrt[2]{2}
+    A: root(2)(2)
+    m: <mroot><mn>2</mn><mn>2</mn></mroot>
+\left.\begin{array}{r}{a}\\{b}\\{c}\\\hline\end{array}\right.
+    sl: a + b + c
+    tc: \begin{array}{r}{a}\\{b}\\{c}\\\hline\end{array}
+    A: {:[a],[b],[c],[hline]:}
+    m: <menclose notation="bottom"><mtable columnalign="right"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>a</mi></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>b</mi></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>c</mi></mstyle></mtd></mtr></mtable></menclose>
+\left\{\begin{array}{r}{a}\\{b}\\{c}\\\hline\end{array}\right\}
+    sl: a + b + c
+    A: {[a],[b],[c],[hline]}
+    m: <mo fence="true">{</mo><menclose notation="bottom"><mtable columnalign="right"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>a</mi></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>b</mi></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>c</mi></mstyle></mtd></mtr></mtable></menclose><mo fence="true">}</mo>
+\left.\begin{array}{r}{a}\\{-b}\\{\times c}\\\hline\end{array}\right.
+    sl: a-b\times c
+    tc: \begin{array}{r}{a}\\{-b}\\{\times c}\\\hline\end{array}
+    A: {:[a],[-b],[times c],[hline]:}
+    m: <menclose notation="bottom"><mtable columnalign="right"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>a</mi></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mo>−</mo><mi>b</mi></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mo>×</mo><mi>c</mi></mstyle></mtd></mtr></mtable></menclose>
+\left\{\begin{array}{r}{a}\\{-b}\\{\times c}\\\hline\end{array}\right\}
+    sl: a-b\times c
+    A: {[a],[-b],[times c],[hline]}
+    m: <mo fence="true">{</mo><menclose notation="bottom"><mtable columnalign="right"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>a</mi></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mo>−</mo><mi>b</mi></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mo>×</mo><mi>c</mi></mstyle></mtd></mtr></mtable></menclose><mo fence="true">}</mo>
+# latex_list
+\left.\begin{array}{ll}{a1}&{a2}\\{b1}&{b2}\end{array}\right.
+    tc: \begin{array}{ll}{a1}&{a2}\\{b1}&{b2}\end{array}
+    l: ["a1 a2","b1 b2"]
+    A: {:[a1,a2],[b1,b2]:}
+    m: <mtable columnalign="left left"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>a</mi><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>a</mi><mn>2</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>b</mi><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>b</mi><mn>2</mn></mstyle></mtd></mtr></mtable>
+\left\{\begin{array}{r}{6x+2y \leq 12}\\{x+y \leq 5}\\{x \geq 0}\\{y \geq 0}\end{array}\right.
+    l: ["6x+2y \\leq 12","x+y \\leq 5","x \\geq 0","y \\geq 0"]
+    A: {[6x+2y<=12],[x+y<=5],[x>=0],[y>=0]:}
+    m: <mo fence="true">{</mo><mtable columnalign="right"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>6</mn><mi>x</mi><mo>+</mo><mn>2</mn><mi>y</mi><mo>≤</mo><mn>12</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>x</mi><mo>+</mo><mi>y</mi><mo>≤</mo><mn>5</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>x</mi><mo>≥</mo><mn>0</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>y</mi><mo>≥</mo><mn>0</mn></mstyle></mtd></mtr></mtable>
+f(x) = \left\{\begin{array}{ll}{-x+3}&{\text{if}x \leq -1}\\{-3x+1}&{\text{if}x > -1}\end{array}\right.
+    c: f(x)=\left\{\begin{array}{ll}{-x+3}&{\text{if}x \leq-1}\\{-3x+1}&{\text{if}x>-1}\end{array}\right.
+    l: ["f(x) = -x+3 \\left\\{x \\leq -1\\right\\}","f(x) = -3x+1 \\left\\{x > -1\\right\\}"]
+    A: f(x)={[-x+3,"if"x<=-1],[-3x+1,"if"x>-1]:}
+    Ml: ["f(x) = -x+3 \\text{if}x \\leq -1","f(x) = -3x+1 \\text{if}x > -1"]
+    m: <mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>=</mo><mo fence="true">{</mo><mtable columnalign="left left"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mo>−</mo><mi>x</mi><mo>+</mo><mn>3</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext>if</mtext><mi>x</mi><mo>≤</mo><mo>−</mo><mn>1</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mo>−</mo><mn>3</mn><mi>x</mi><mo>+</mo><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext>if</mtext><mi>x</mi><mo>&gt;</mo><mo>−</mo><mn>1</mn></mstyle></mtd></mtr></mtable>
+
+\operatorname{unknown} \left\{\begin{array}{ll}{-x+3}&{\text{if}x \leq -1}\\{-3x+1}&{\text{if}x > -1}\end{array}\right. \operatorname{unknown}
+    anst: \operatorname { unknown } \left\{\begin{array}{ll}{-x+3}&{\text{if}x \leq -1}\\{-3x+1}&{\text{if}x > -1}\end{array}\right. \operatorname { unknown }
+    c: \operatorname{unknown} \left\{\begin{array}{ll}{-x+3}&{\text{if}x \leq-1}\\{-3x+1}&{\text{if}x>-1}\end{array}\right. \operatorname{unknown}
+    l: ["\\operatorname { unknown } -x+3 \\left\\{x \\leq -1\\right\\} \\operatorname { unknown }","\\operatorname { unknown } -3x+1 \\left\\{x > -1\\right\\} \\operatorname { unknown }"]
+    A: unknown{[-x+3,"if"x<=-1],[-3x+1,"if"x>-1]:}unknown
+    m: <mi>unknown</mi><mo fence="true">{</mo><mtable columnalign="left left"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mo>−</mo><mi>x</mi><mo>+</mo><mn>3</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext>if</mtext><mi>x</mi><mo>≤</mo><mo>−</mo><mn>1</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mo>−</mo><mn>3</mn><mi>x</mi><mo>+</mo><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext>if</mtext><mi>x</mi><mo>&gt;</mo><mo>−</mo><mn>1</mn></mstyle></mtd></mtr></mtable><mi>unknown</mi>
+    Ml: ["\\operatorname { unknown } -x+3 \\text{if}x \\leq -1 \\operatorname { unknown }","\\operatorname { unknown } -3x+1 \\text{if}x > -1 \\operatorname { unknown }"]
+
+\left\{\begin{array}{rl}{6x+2y}&{ \leq 12}\\{x + y}&{\leq 5} \\ {x} & {\geq 0} \\ {y} & {\geq 0}\end{array}\right.
+    ns: \left\{\begin{array}{l}{6x+2y \leq 12}\\{x + y \leq 5}\\{x \geq 0}\\{y \geq 0}\end{array}\right.
+    at: \left\{\begin{aligned}6x+2y& \leq 12\\x + y&\leq 5\\x&\geq 0\\y&\geq 0\end{aligned}\right.
+    c: \left\{\begin{aligned}6x+2y& \leq 12\\x+y&\leq 5\\x&\geq 0\\y&\geq 0\end{aligned}\right.
+    l: ["6x+2y \\leq 12","x + y \\leq 5","x \\geq 0","y \\geq 0"]
+    A: {[6x+2y,<=12],[x+y,<=5],[x,>=0],[y,>=0]:}
+    m: <mo fence="true">{</mo><mtable columnalign="right left"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>6</mn><mi>x</mi><mo>+</mo><mn>2</mn><mi>y</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mo>≤</mo><mn>12</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>x</mi><mo>+</mo><mi>y</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mo>≤</mo><mn>5</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>x</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mo>≥</mo><mn>0</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>y</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mo>≥</mo><mn>0</mn></mstyle></mtd></mtr></mtable>
+x - 2y = - 35 \text{ and } 2x - y = 55
+    c: x-2y=-35 \text{ and } 2x-y=55
+    l: ["x - 2y = - 35","2x - y = 55"]
+    A: x-2y=-35" and "2x-y=55
+    Ml: x - 2y = - 35 \text{ and } 2x - y = 55
+    T: \( x - 2y = - 35 \) and \( 2x - y = 55 \)
+    X: $x-2y=-35$ and $2x-y=55$
+    m: <mi>x</mi><mo>−</mo><mn>2</mn><mi>y</mi><mo>=</mo><mo>−</mo><mn>35</mn><mtext> and </mtext><mn>2</mn><mi>x</mi><mo>−</mo><mi>y</mi><mo>=</mo><mn>55</mn>
+
+\left. \begin{array} { r l } { \hat { V } _ { L } } & { = \sum _ { \mathbf { m } , \mathbf { n } } \sum _ { l , m _ { l } } v _ { l } ( k _ { m ^ { 2 } } , k _ { n ^ { 2 } } ) Y _ { l m _ { l } } ^ { * } ( \hat { \mathbf { m } } ) Y _ { l m _ { l } } ( \hat { \mathbf { n } } ) | \mathbf { m } \rangle \langle \mathbf { n } | } \\ { } & { = \sum _ { m ^ { 2 } , n ^ { 2 } } \sum _ { l } v _ { l } ( k _ { m ^ { 2 } } , k _ { n ^ { 2 } } ) \sum _ { m _ { l } } ( \sum _ { \mathbf { m } } Y _ { l m _ { l } } ^ { * } ( \hat { \mathbf { m } } ) | \mathbf { m } \rangle ) ( \sum _ { \hat { \mathbf { n } } } Y _ { l m _ { l } } ( \hat { \mathbf { n } } ) \langle \mathbf { n } | ) } \end{array} \right.
+    a: \left. \begin{aligned} \hat { V } _ { L } & = \sum _ { \mathbf { m } , \mathbf { n } } \sum _ { l , m _ { l } } v _ { l } ( k _ { m ^ { 2 } } , k _ { n ^ { 2 } } ) Y _ { l m _ { l } } ^ { * } ( \hat { \mathbf { m } } ) Y _ { l m _ { l } } ( \hat { \mathbf { n } } ) | \mathbf { m } \rangle \langle \mathbf { n } | \\ & = \sum _ { m ^ { 2 } , n ^ { 2 } } \sum _ { l } v _ { l } ( k _ { m ^ { 2 } } , k _ { n ^ { 2 } } ) \sum _ { m _ { l } } ( \sum _ { \mathbf { m } } Y _ { l m _ { l } } ^ { * } ( \hat { \mathbf { m } } ) | \mathbf { m } \rangle ) ( \sum _ { \hat { \mathbf { n } } } Y _ { l m _ { l } } ( \hat { \mathbf { n } } ) \langle \mathbf { n } | ) \end{aligned} \right.
+    ns: \left. \begin{array}{l}{ \hat { V } _ { L } = \sum _ { m , n } \sum _ { l , m _ { l } } v _ { l } ( k _ { m ^ { 2 } } , k _ { n ^ { 2 } } ) Y _ { l m _ { l } } ^ { * } ( \hat { m } ) Y _ { l m _ { l } } ( \hat { n } ) | m \rangle \langle n | }\\{ = \sum _ { m ^ { 2 } , n ^ { 2 } } \sum _ { l } v _ { l } ( k _ { m ^ { 2 } } , k _ { n ^ { 2 } } ) \sum _ { m _ { l } } ( \sum _ { m } Y _ { l m _ { l } } ^ { * } ( \hat { m } ) | m \rangle ) ( \sum _ { \hat { n } } Y _ { l m _ { l } } ( \hat { n } ) \langle n | ) }\end{array} \right.
+    t: \begin{aligned} \hat { V } _ { L } & = \sum _ { \mathbf { m } , \mathbf { n } } \sum _ { l , m _ { l } } v _ { l } \left( k _ { m ^ { 2 } } , k _ { n ^ { 2 } } \right) Y _ { l m _ { l } } ^ { * } ( \hat { \mathbf { m } } ) Y _ { l m _ { l } } ( \hat { \mathbf { n } } ) | \mathbf { m } \rangle \langle \mathbf { n } | \\ & = \sum _ { m ^ { 2 } , n ^ { 2 } } \sum _ { l } v _ { l } \left( k _ { m ^ { 2 } } , k _ { n ^ { 2 } } \right) \sum _ { m _ { l } } \left( \sum _ { \mathbf { m } } Y _ { l m _ { l } } ^ { * } ( \hat { \mathbf { m } } ) | \mathbf { m } \rangle \right) \left( \sum _ { \hat { \mathbf { n } } } Y _ { l m _ { l } } ( \hat { \mathbf { n } } ) \langle \mathbf { n } | \right) \end{aligned}
+    c: \begin{aligned} \hat{V}_{L} &=\sum_{\mathbf{m}, \mathbf{n}} \sum_{l, m_{l}} v_{l}\left(k_{m^{2}}, k_{n^{2}}\right) Y_{l m_{l}}^{*}(\hat{\mathbf{m}}) Y_{l m_{l}}(\hat{\mathbf{n}})|\mathbf{m}\rangle\langle\mathbf{n}| \\ &=\sum_{m^{2}, n^{2}} \sum_{l} v_{l}\left(k_{m^{2}}, k_{n^{2}}\right) \sum_{m_{l}}\left(\sum_{\mathbf{m}} Y_{l m_{l}}^{*}(\hat{\mathbf{m}})|\mathbf{m}\rangle\right)\left(\sum_{\hat{\mathbf{n}}} Y_{l m_{l}}(\hat{\mathbf{n}})\langle\mathbf{n}|\right) \end{aligned}
+    l: ["\\hat { V } _ { L } = \\sum _ { m n } \\sum _ { l m _ { l } } v _ { l } ( k _ { m ^ { 2 } } k _ { n ^ { 2 } } ) Y _ { l m _ { l } } ^ { * } ( \\hat { m } ) Y _ { l m _ { l } } ( \\hat { n } ) | m \\rangle \\langle n |","= \\sum _ { m ^ { 2 } n ^ { 2 } } \\sum _ { l } v _ { l } ( k _ { m ^ { 2 } } k _ { n ^ { 2 } } ) \\sum _ { m _ { l } } ( \\sum _ { m } Y _ { l m _ { l } } ^ { * } ( \\hat { m } ) | m \\rangle ) ( \\sum _ { \\hat { n } } Y _ { l m _ { l } } ( \\hat { n } ) \\langle n | )"]
+    Ml: ["\\hat { V } _ { L } = \\sum _ { m","n } \\sum _ { l","m _ { l } } v _ { l } ( k _ { m ^ { 2 } }","k _ { n ^ { 2 } } ) Y _ { l m _ { l } } ^ { * } ( \\hat { m } ) Y _ { l m _ { l } } ( \\hat { n } ) | m \\rangle \\langle n |","= \\sum _ { m ^ { 2 }","n ^ { 2 } } \\sum _ { l } v _ { l } ( k _ { m ^ { 2 } }","k _ { n ^ { 2 } } ) \\sum _ { m _ { l } } ( \\sum _ { m } Y _ { l m _ { l } } ^ { * } ( \\hat { m } ) | m \\rangle ) ( \\sum _ { \\hat { n } } Y _ { l m _ { l } } ( \\hat { n } ) \\langle n | )"]
+    A: {:[hat V_(L),=sum_(m,n)sum_(l,m_(l))v_(l)(k_(m^(2)),k_(n^(2)))Y_(lm_(l))^(*)(hat m)Y_(lm_(l))(hat n)|m:)(:n|],[,=sum_(m^(2),n^(2))sum_(l)v_(l)(k_(m^(2)),k_(n^(2)))sum_(m_(l))(sum_(m)Y_(lm_(l))^(*)(hat m)|m:))(sum_(hat n)Y_(lm_(l))(hat n)(:n|)]:}
+    m: <mtable columnalign="right left"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><msub><mrow><mover accent="true"><mi>V</mi><mo>^</mo></mover></mrow><mi>L</mi></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mo>=</mo><msub><mo>∑</mo><mrow><mrow><mi mathvariant="bold">m</mi></mrow><mo separator="true">,</mo><mrow><mi mathvariant="bold">n</mi></mrow></mrow></msub><msub><mo>∑</mo><mrow><mi>l</mi><mo separator="true">,</mo><msub><mi>m</mi><mi>l</mi></msub></mrow></msub><msub><mi>v</mi><mi>l</mi></msub><mo>(</mo><msub><mi>k</mi><mrow><msup><mi>m</mi><mn>2</mn></msup></mrow></msub><mo separator="true">,</mo><msub><mi>k</mi><mrow><msup><mi>n</mi><mn>2</mn></msup></mrow></msub><mo>)</mo><msubsup><mi>Y</mi><mrow><mi>l</mi><msub><mi>m</mi><mi>l</mi></msub></mrow><mi>*</mi></msubsup><mo>(</mo><mover accent="true"><mrow><mi mathvariant="bold">m</mi></mrow><mo>^</mo></mover><mo>)</mo><msub><mi>Y</mi><mrow><mi>l</mi><msub><mi>m</mi><mi>l</mi></msub></mrow></msub><mo>(</mo><mover accent="true"><mrow><mi mathvariant="bold">n</mi></mrow><mo>^</mo></mover><mo>)</mo><mo>∣</mo><mrow><mi mathvariant="bold">m</mi></mrow><mo>⟩</mo><mo>⟨</mo><mrow><mi mathvariant="bold">n</mi></mrow><mo>∣</mo></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mo>=</mo><msub><mo>∑</mo><mrow><msup><mi>m</mi><mn>2</mn></msup><mo separator="true">,</mo><msup><mi>n</mi><mn>2</mn></msup></mrow></msub><msub><mo>∑</mo><mi>l</mi></msub><msub><mi>v</mi><mi>l</mi></msub><mo>(</mo><msub><mi>k</mi><mrow><msup><mi>m</mi><mn>2</mn></msup></mrow></msub><mo separator="true">,</mo><msub><mi>k</mi><mrow><msup><mi>n</mi><mn>2</mn></msup></mrow></msub><mo>)</mo><msub><mo>∑</mo><mrow><msub><mi>m</mi><mi>l</mi></msub></mrow></msub><mo>(</mo><msub><mo>∑</mo><mrow><mi mathvariant="bold">m</mi></mrow></msub><msubsup><mi>Y</mi><mrow><mi>l</mi><msub><mi>m</mi><mi>l</mi></msub></mrow><mi>*</mi></msubsup><mo>(</mo><mover accent="true"><mrow><mi mathvariant="bold">m</mi></mrow><mo>^</mo></mover><mo>)</mo><mo>∣</mo><mrow><mi mathvariant="bold">m</mi></mrow><mo>⟩</mo><mo>)</mo><mo>(</mo><msub><mo>∑</mo><mrow><mover accent="true"><mrow><mi mathvariant="bold">n</mi></mrow><mo>^</mo></mover></mrow></msub><msub><mi>Y</mi><mrow><mi>l</mi><msub><mi>m</mi><mi>l</mi></msub></mrow></msub><mo>(</mo><mover accent="true"><mrow><mi mathvariant="bold">n</mi></mrow><mo>^</mo></mover><mo>)</mo><mo>⟨</mo><mrow><mi mathvariant="bold">n</mi></mrow><mo>∣</mo><mo>)</mo></mstyle></mtd></mtr></mtable>
+
+
+(5, 2)\text{ and }(2 , 8)
+    l: ["(5, 2)","(2,8)"]
+    anstcMl: (5, 2)\text{ and }(2,8)
+    T: \( (5, 2) \) and \( (2,8) \)
+    X: $(5, 2)$ and $(2,8)$
+    A: (5,2)" and "(2,8)
+    m: <mo>(</mo><mn>5</mn><mo separator="true">,</mo><mn>2</mn><mo>)</mo><mtext> and </mtext><mo>(</mo><mn>2</mn><mo separator="true">,</mo><mn>8</mn><mo>)</mo>
+
+f ( x ) = \left\{ \begin{array} { l l } { x ^ { 2} + 1,} & { x > 1} \\ { 1,} & { x = 1} \\ { x + 1,} & { x < 1} \end{array} \right.
+    c: f(x)=\left\{\begin{array}{ll}{x^{2}+1,} & {x>1} \\ {1,} & {x=1} \\ {x+1,} & {x<1}\end{array}\right.
+    l: ["f ( x ) = x ^ { 2} + 1 \\left\\{ x > 1\\right\\}","f ( x ) = 1 \\left\\{ x = 1\\right\\}","f ( x ) = x + 1 \\left\\{ x < 1\\right\\}"]
+    Ml: ["f ( x ) = x ^ { 2} + 1","x > 1","f ( x ) = 1","x = 1","f ( x ) = x + 1","x < 1"]
+    A: f(x)={[x^(2)+1,,x>1],[1,,x=1],[x+1,,x<1]:}
+    m: <mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>=</mo><mo fence="true">{</mo><mtable columnalign="left left"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><mn>1</mn><mo separator="true">,</mo></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>x</mi><mo>&gt;</mo><mn>1</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn><mo separator="true">,</mo></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>x</mi><mo>=</mo><mn>1</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>x</mi><mo>+</mo><mn>1</mn><mo separator="true">,</mo></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>x</mi><mo>&lt;</mo><mn>1</mn></mstyle></mtd></mtr></mtable>
+
+f(x)= \left\{ \begin{array} {ll} { x e ^ {2x} } & { \text{ si } } & { x < 0} \\ { \frac { \operatorname { ln } ( x + 1) } { x + 1} } & { \text{ si } } & { x \geq 0} \end{array} \right.
+    nMn: f(x)= \left\{ \begin{array} {ll} { x e ^ {2x} } & { \text{ si } } & { x < 0} \\ { \frac { \operatorname { ln } ( x + 1) } { x + 1} } & { \text{ si } } & { x \geq 0} \end{array} \right.
+    ast: f(x)= \left\{ \begin{array} {ll} { x e ^ {2x} } & { \text{ si } } & { x < 0} \\ { \frac { \ln ( x + 1) } { x + 1} } & { \text{ si } } & { x \geq 0} \end{array} \right.
+    c: f(x)=\left\{\begin{array}{ll}{x e^{2x}} & {\text{ si }} & {x<0} \\ {\frac{\ln (x+1)}{x+1}} & {\text{ si }} & {x \geq 0}\end{array}\right.
+    l: ["f(x)= x e ^ {2x} \\left\\{ x < 0\\right\\}","f(x)= \\frac { \\ln ( x + 1) } { x + 1} \\left\\{ x \\geq 0\\right\\}"]
+    A: f(x)={[xe^(2x)," si ",x<0],[(ln(x+1))/(x+1)," si ",x>=0]:}
+    m: <mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>=</mo><mo fence="true">{</mo><mtable columnalign="left left"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>x</mi><msup><mi>e</mi><mrow><mn>2</mn><mi>x</mi></mrow></msup></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext> si </mtext></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>x</mi><mo>&lt;</mo><mn>0</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mfrac><mrow><mi>ln</mi><mo>(</mo><mi>x</mi><mo>+</mo><mn>1</mn><mo>)</mo></mrow><mrow><mi>x</mi><mo>+</mo><mn>1</mn></mrow></mfrac></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext> si </mtext></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>x</mi><mo>≥</mo><mn>0</mn></mstyle></mtd></mtr></mtable>
+    Ml: ["f(x)= x e ^ {2x} \\text{ si } x < 0","f(x)= \\frac { \\ln ( x + 1) } { x + 1} \\text{ si } x \\geq 0"]
+
+\left\{ \begin{array} { r } { x \geq 0,y \geq 0} \\ { 2x + y \leq 8} \\ { x + y \geq 4} \end{array} \right.
+    c: \left\{\begin{array}{r}{x \geq 0,y \geq 0} \\ {2x+y \leq 8} \\ {x+y \geq 4}\end{array}\right.
+    #l: ["x \\geq 0","y \\geq 0","2x + y \\leq 8", "x + y \\geq 4"]
+    l: ["x \\geq 0 \\left\\{y \\geq 0\\right\\}","2x + y \\leq 8","x + y \\geq 4"]
+    Ml: ["x \\geq 0","y \\geq 0","2x + y \\leq 8","x + y \\geq 4"]
+    A: {[x>=0,y>=0],[2x+y<=8],[x+y>=4]:}
+    m: <mo fence="true">{</mo><mtable columnalign="right"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>x</mi><mo>≥</mo><mn>0</mn><mo separator="true">,</mo><mi>y</mi><mo>≥</mo><mn>0</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn><mi>x</mi><mo>+</mo><mi>y</mi><mo>≤</mo><mn>8</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>x</mi><mo>+</mo><mi>y</mi><mo>≥</mo><mn>4</mn></mstyle></mtd></mtr></mtable>
+
+f ( x ) = \left\{ \begin{array} { l l } { 2 x + 5 } & { \text { khi } x < - 1 } \\ { x ^ { 2 } + 2 } & { \text { khi } x \geq - 1 } \end{array} \right.
+    c: f(x)=\left\{\begin{array}{ll}{2 x+5} & {\text { khi } x<-1} \\ {x^{2}+2} & {\text { khi } x \geq-1}\end{array}\right.
+    l: ["f ( x ) = 2 x + 5 \\left\\{ x < - 1\\right\\}","f ( x ) = x ^ { 2 } + 2 \\left\\{ x \\geq - 1\\right\\}"]
+    A: f(x)={[2x+5," khi "x<-1],[x^(2)+2," khi "x>=-1]:}
+    m: <mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>=</mo><mo fence="true">{</mo><mtable columnalign="left left"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn><mi>x</mi><mo>+</mo><mn>5</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext> khi </mtext><mi>x</mi><mo>&lt;</mo><mo>−</mo><mn>1</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><mn>2</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext> khi </mtext><mi>x</mi><mo>≥</mo><mo>−</mo><mn>1</mn></mstyle></mtd></mtr></mtable>
+    Ml: ["f ( x ) = 2 x + 5 \\text { khi } x < - 1","f ( x ) = x ^ { 2 } + 2 \\text { khi } x \\geq - 1"]
+
+f ( x ) = \left\{ \begin{array} { l } { 2x + 5\text{ if } x < 0} \\ { x - 1\text{ if } x > 0} \end{array} \right.
+    c: f(x)=\left\{\begin{array}{l}{2x+5\text{ if } x<0} \\ {x-1\text{ if } x>0}\end{array}\right.
+    l: ["f ( x ) = 2x + 5 \\left\\{ x < 0\\right\\}","f ( x ) = x - 1 \\left\\{ x > 0\\right\\}"]
+    A: f(x)={[2x+5" if "x<0],[x-1" if "x>0]:}
+    m: <mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>=</mo><mo fence="true">{</mo><mtable columnalign="left"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn><mi>x</mi><mo>+</mo><mn>5</mn><mtext> if </mtext><mi>x</mi><mo>&lt;</mo><mn>0</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>x</mi><mo>−</mo><mn>1</mn><mtext> if </mtext><mi>x</mi><mo>&gt;</mo><mn>0</mn></mstyle></mtd></mtr></mtable>
+    Ml: ["f ( x ) = 2x + 5\\text{ if } x < 0","f ( x ) = x - 1\\text{ if } x > 0"]
+
+y = x ^ { 2} ,y = x ^ { 2} + \operatorname{sin} ( x ^ { 3} )
+    nMn: y = x ^ { 2} ,y = x ^ { 2} + \operatorname { sin } ( x ^ { 3} )
+    as: y = x ^ { 2} ,y = x ^ { 2} + \sin ( x ^ { 3} )
+    t: y = x ^ { 2} ,y = x ^ { 2} + \sin \left( x ^ { 3} \right)
+    c: y=x^{2},y=x^{2}+\sin \left(x^{3}\right)
+    l: ["y = x ^ { 2}","y = x ^ { 2} + \\sin ( x ^ { 3} )"]
+    A: y=x^(2),y=x^(2)+sin(x^(3))
+    m: <mi>y</mi><mo>=</mo><msup><mi>x</mi><mn>2</mn></msup><mo separator="true">,</mo><mi>y</mi><mo>=</mo><msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><mi>sin</mi><mo>(</mo><msup><mi>x</mi><mn>3</mn></msup><mo>)</mo>
+
+f ( x ) = \text{ foo } + \left\{ \begin{array} { l } { 2x + 5\text{ if } x < 0} \\ { x - 1\text{ if } x > 0} \end{array} \right.
+    c: f(x)=\text{ foo }+\left\{\begin{array}{l}{2x+5\text{ if } x<0} \\ {x-1\text{ if } x>0}\end{array}\right.
+    l: ["f ( x ) = \\text{ foo } + 2x + 5 \\left\\{ x < 0\\right\\}","f ( x ) = \\text{ foo } + x - 1 \\left\\{ x > 0\\right\\}"]
+    Ml: ["f ( x ) = \\text{ foo } + 2x + 5\\text{ if } x < 0","f ( x ) = \\text{ foo } + x - 1\\text{ if } x > 0"]
+    T: \( f ( x ) = \) foo \( + \left\{ \begin{array} { l } { 2x + 5\text{ if } x < 0} \\ { x - 1\text{ if } x > 0} \end{array} \right. \)
+    X: $f(x)=$ foo $+\left\{\begin{array}{l}{2x+5\text{ if } x<0} \\ {x-1\text{ if } x>0}\end{array}\right.$
+    A: f(x)=" foo "+{[2x+5" if "x<0],[x-1" if "x>0]:}
+    m: <mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>=</mo><mtext> foo </mtext><mo>+</mo><mo fence="true">{</mo><mtable columnalign="left"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn><mi>x</mi><mo>+</mo><mn>5</mn><mtext> if </mtext><mi>x</mi><mo>&lt;</mo><mn>0</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>x</mi><mo>−</mo><mn>1</mn><mtext> if </mtext><mi>x</mi><mo>&gt;</mo><mn>0</mn></mstyle></mtd></mtr></mtable>
+
+# latex_styled
+\operatorname{sen}
+    n: \operatorname { sen }
+    astl: \sin
+    t: \operatorname { sen }
+    A: sin
+    m: <mi>sen</mi>
+(x^2 + 1)
+    t: \left(x^2 + 1\right)
+    c: \left(x^2+1\right)
+    A: (x^(2)+1)
+    m: <mo>(</mo><msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><mn>1</mn><mo>)</mo>
+\{\frac{1}{2}\}
+    tc: \left\{\frac{1}{2}\right\}
+    A: {(1)/(2)}
+    m: <mo>{</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>}</mo>
+\langle \frac{1}{2} \rangle
+    t: \left\langle \frac{1}{2} \right\rangle
+    c: \left\langle\frac{1}{2}\right\rangle
+    A: (:(1)/(2):)
+    m: <mo>⟨</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>⟩</mo>
+\lfloor \frac{1}{2} \rfloor
+    t: \left\lfloor \frac{1}{2} \right\rfloor
+    c: \left\lfloor\frac{1}{2}\right\rfloor
+    A: |__(1)/(2)__|
+    m: <mo>⌊</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>⌋</mo>
+\lceil \frac{1}{2} \rceil
+    t: \left\lceil \frac{1}{2} \right\rceil
+    c: \left\lceil\frac{1}{2}\right\rceil
+    A: |~(1)/(2)~|
+    m: <mo>⌈</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>⌉</mo>
+\llcorner \frac{1}{2} \lrcorner
+    t: \left\llcorner \frac{1}{2} \right\lrcorner
+    c: \left\llcorner\frac{1}{2}\right\lrcorner
+    A: llcorner(1)/(2)lrcorner
+    m: <mo>└</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>┘</mo>
+\ulcorner \frac{1}{2} \urcorner
+    t: \left\ulcorner \frac{1}{2} \right\urcorner
+    c: \left\ulcorner\frac{1}{2}\right\urcorner
+    A: ulcorner(1)/(2)urcorner
+    m: <mo>┌</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>┐</mo>
+\langle x \rangle y
+    c: \langle x\rangle y
+    A: (:x:)y
+    m: <mo>⟨</mo><mi>x</mi><mo>⟩</mo><mi>y</mi>
+\langle (x) \rangle (y)
+    c: \langle(x)\rangle(y)
+    A: (:(x):)(y)
+    m: <mo>⟨</mo><mo>(</mo><mi>x</mi><mo>)</mo><mo>⟩</mo><mo>(</mo><mi>y</mi><mo>)</mo>
+(x^2 + (2x + 1))
+    t: \left(x^2 + (2x + 1)\right)
+    c: \left(x^2+(2x+1)\right)
+    A: (x^(2)+(2x+1))
+    m: <mo>(</mo><msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><mo>(</mo><mn>2</mn><mi>x</mi><mo>+</mo><mn>1</mn><mo>)</mo><mo>)</mo>
+(x^2) + (2x + 1) + (y^2)
+    t: \left(x^2\right) + (2x + 1) + \left(y^2\right)
+    c: \left(x^2\right)+(2x+1)+\left(y^2\right)
+    A: (x^(2))+(2x+1)+(y^(2))
+    m: <mo>(</mo><msup><mi>x</mi><mn>2</mn></msup><mo>)</mo><mo>+</mo><mo>(</mo><mn>2</mn><mi>x</mi><mo>+</mo><mn>1</mn><mo>)</mo><mo>+</mo><mo>(</mo><msup><mi>y</mi><mn>2</mn></msup><mo>)</mo>
+(1 + (x^2 + 2x))
+    t: \left(1 + \left(x^2 + 2x\right)\right)
+    c: \left(1+\left(x^2+2x\right)\right)
+    A: (1+(x^(2)+2x))
+    m: <mo>(</mo><mn>1</mn><mo>+</mo><mo>(</mo><msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><mn>2</mn><mi>x</mi><mo>)</mo><mo>)</mo>
+(1+\{2+\frac{1}{2}\}+(3+4))+(5+6)
+    tc: \left(1+\left\{2+\frac{1}{2}\right\}+(3+4)\right)+(5+6)
+    A: (1+{2+(1)/(2)}+(3+4))+(5+6)
+    m: <mo>(</mo><mn>1</mn><mo>+</mo><mo>{</mo><mn>2</mn><mo>+</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>}</mo><mo>+</mo><mo>(</mo><mn>3</mn><mo>+</mo><mn>4</mn><mo>)</mo><mo>)</mo><mo>+</mo><mo>(</mo><mn>5</mn><mo>+</mo><mn>6</mn><mo>)</mo>
+(1+\{2+\frac{1}{2}\}+(3+4))+(5+6))
+    tc: \left.\left(1+\left\{2+\frac{1}{2}\right\}+(3+4)\right)+(5+6)\right)
+    A: (1+{2+(1)/(2)}+(3+4))+(5+6))
+    m: <mo>(</mo><mn>1</mn><mo>+</mo><mo>{</mo><mn>2</mn><mo>+</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>}</mo><mo>+</mo><mo>(</mo><mn>3</mn><mo>+</mo><mn>4</mn><mo>)</mo><mo>)</mo><mo>+</mo><mo>(</mo><mn>5</mn><mo>+</mo><mn>6</mn><mo>)</mo><mo>)</mo>
+(1+\frac{3+(x^2))}{2})
+    tc: \left(1+\frac{\left.3+\left(x^2\right)\right)}{2}\right)
+    A: (1+(3+(x^(2))))/(2))
+    m: <mo>(</mo><mn>1</mn><mo>+</mo><mfrac><mrow><mn>3</mn><mo>+</mo><mo>(</mo><msup><mi>x</mi><mn>2</mn></msup><mo>)</mo><mo>)</mo></mrow><mn>2</mn></mfrac><mo>)</mo>
+(1 + \int x dx) + (\prod x) + (\sum y)
+    t: \left(1 + \int x dx\right) + \left(\prod x\right) + \left(\sum y\right)
+    c: \left(1+\int x dx\right)+\left(\prod x\right)+\left(\sum y\right)
+    A: (1+int xdx)+(prod x)+(sum y)
+    m: <mo>(</mo><mn>1</mn><mo>+</mo><mo>∫</mo><mi>x</mi><mi>d</mi><mi>x</mi><mo>)</mo><mo>+</mo><mo>(</mo><mo>∏</mo><mi>x</mi><mo>)</mo><mo>+</mo><mo>(</mo><mo>∑</mo><mi>y</mi><mo>)</mo>
+a | x y ^ 3 | ( b | c ^ 3 )
+    t: a \left| x y ^ 3 \right| \left( b | c ^ 3 \right)
+    c: a\left|x y^3\right|\left(b | c^3\right)
+    A: a|xy^(3)|(b|c^(3))
+    m: <mi>a</mi><mo>∣</mo><mi>x</mi><msup><mi>y</mi><mn>3</mn></msup><mo>∣</mo><mo>(</mo><mi>b</mi><mo>∣</mo><msup><mi>c</mi><mn>3</mn></msup><mo>)</mo>
+a | _ b ^ c + a | ^ b _ c + a | _ b + a | ^ c
+    t: \left. a \right| _ b ^ c + \left. a \right| ^ b _ c + \left. a \right| _ b + \left. a \right| ^ c
+    c: \left.a\right|_ b ^ c+\left.a\right|^ b _ c+\left.a\right|_ b+\left.a\right|^ c
+    A: a|_(b)^(c)+a|_(c)^(b)+a|_(b)+a|^(c)
+    m: <msubsup><mrow><mi>a</mi><mo>∣</mo></mrow><mi>b</mi><mi>c</mi></msubsup><mo>+</mo><msubsup><mrow><mi>a</mi><mo>∣</mo></mrow><mi>c</mi><mi>b</mi></msubsup><mo>+</mo><msub><mrow><mi>a</mi><mo>∣</mo></mrow><mi>b</mi></msub><mo>+</mo><msup><mrow><mi>a</mi><mo>∣</mo></mrow><mi>c</mi></msup>
+a | _ { \operatorname{s i n} ( \pi ) }
+    asl: a | _ { \sin ( \pi ) }
+    n: a | _ { \operatorname { sin } ( \pi ) }
+    t: \left. a \right| _ { \sin ( \pi ) }
+    c: \left.a\right|_{\sin (\pi)}
+    A: a|_(sin(pi))
+    m: <msub><mrow><mi>a</mi><mo>∣</mo></mrow><mrow><mi>sin</mi><mo>(</mo><mi>π</mi><mo>)</mo></mrow></msub>
+a _ {k} | _ { I _ { m } } = : u _ { k } ^ { m } \in V,
+    t: \left. a _ {k} \right| _ { I _ { m } } = : u _ { k } ^ { m } \in V,
+    c: \left.a_{k}\right|_{I_{m}}=: u_{k}^{m} \in V,
+    l: a _ {k} | _ { I _ { m } } = : u _ { k } ^ { m } \in V
+    T: \( \left. a _ {k} \right| _ { I _ { m } } =: u _ { k } ^ { m } \in V, \)
+    A: a_(k)|_(I_(m))=:u_(k)^(m)in V,
+    m: <msub><mrow><msub><mi>a</mi><mi>k</mi></msub><mo>∣</mo></mrow><mrow><msub><mi>I</mi><mi>m</mi></msub></mrow></msub><mo>=</mo><mo>:</mo><msubsup><mi>u</mi><mi>k</mi><mi>m</mi></msubsup><mo>∈</mo><mi>V</mi><mo separator="true">,</mo>
+h \theta ( L ) = - k \frac { d \theta } { d x } | _ { x = L }
+    t: h \theta ( L ) = - \left. k \frac { d \theta } { d x } \right| _ { x = L }
+    c: h \theta(L)=-\left.k \frac{d \theta}{d x}\right|_{x=L}
+    A: h theta(L)=-k(d theta)/(dx)|_(x=L)
+    m: <mi>h</mi><mi>θ</mi><mo>(</mo><mi>L</mi><mo>)</mo><mo>=</mo><mo>−</mo><msub><mrow><mi>k</mi><mfrac><mrow><mi>d</mi><mi>θ</mi></mrow><mrow><mi>d</mi><mi>x</mi></mrow></mfrac><mo>∣</mo></mrow><mrow><mi>x</mi><mo>=</mo><mi>L</mi></mrow></msub>
+f ( a | b ) = x | _ { x _ 0 } ^ { x _ 1 }
+    t: f ( a | b ) = \left. x \right| _ { x _ 0 } ^ { x _ 1 }
+    c: f(a | b)=\left.x\right|_{x_0} ^{x_1}
+    A: f(a|b)=x|_(x_(0))^(x_(1))
+    m: <mi>f</mi><mo>(</mo><mi>a</mi><mo>∣</mo><mi>b</mi><mo>)</mo><mo>=</mo><msubsup><mrow><mi>x</mi><mo>∣</mo></mrow><mrow><msub><mi>x</mi><mn>0</mn></msub></mrow><mrow><msub><mi>x</mi><mn>1</mn></msub></mrow></msubsup>
+x \times \frac{1}{2}y|_{a}^{b}
+    t: x \times \left. \frac{1}{2}y \right| _{a}^{b}
+    c: x \times\left.\frac{1}{2}y\right|_{a}^{b}
+    A: x times(1)/(2)y|_(a)^(b)
+    m: <mi>x</mi><mo>×</mo><msubsup><mrow><mfrac><mn>1</mn><mn>2</mn></mfrac><mi>y</mi><mo>∣</mo></mrow><mrow><mi>a</mi></mrow><mrow><mi>b</mi></mrow></msubsup>
+a \| x y ^ 3 \| ( b | c ^ 3 )
+    t: a \left\| x y ^ 3 \right\| \left( b | c ^ 3 \right)
+    c: a\left\|x y^3\right\|\left(b | c^3\right)
+    A: a|xy^(3)|(b|c^(3))
+    m: <mi>a</mi><mo>∥</mo><mi>x</mi><msup><mi>y</mi><mn>3</mn></msup><mo>∥</mo><mo>(</mo><mi>b</mi><mo>∣</mo><msup><mi>c</mi><mn>3</mn></msup><mo>)</mo>
+1+\int_{vR}^{v}(\frac{\epsilon(bu-F(u)-I))}{(F(u)-W(u)+I)^{2}})\frac{\partial W(u)}{\partial w_{0}}du
+    tc: 1+\int_{vR}^{v}\left(\frac{\epsilon(bu-F(u)-I))}{(F(u)-W(u)+I)^{2}}\right)\frac{\partial W(u)}{\partial w_{0}}du
+    A: 1+int_(vR)^(v)((epsilon(bu-F(u)-I)))/((F(u)-W(u)+I)^(2)))(del W(u))/(del w_(0))du
+    m: <mn>1</mn><mo>+</mo><msubsup><mo>∫</mo><mrow><mi>v</mi><mi>R</mi></mrow><mi>v</mi></msubsup><mo>(</mo><mfrac><mrow><mi>ϵ</mi><mo>(</mo><mi>b</mi><mi>u</mi><mo>−</mo><mi>F</mi><mo>(</mo><mi>u</mi><mo>)</mo><mo>−</mo><mi>I</mi><mo>)</mo><mo>)</mo></mrow><mrow><msup><mrow><mo>(</mo><mi>F</mi><mo>(</mo><mi>u</mi><mo>)</mo><mo>−</mo><mi>W</mi><mo>(</mo><mi>u</mi><mo>)</mo><mo>+</mo><mi>I</mi><mo>)</mo></mrow><mn>2</mn></msup></mrow></mfrac><mo>)</mo><mfrac><mrow><mo>∂</mo><mi>W</mi><mo>(</mo><mi>u</mi><mo>)</mo></mrow><mrow><mo>∂</mo><msub><mi>w</mi><mn>0</mn></msub></mrow></mfrac><mi>d</mi><mi>u</mi>
+\begin{aligned}{(x^2)}\end{aligned}
+    tc: \begin{aligned}{\left(x^2\right)}\end{aligned}
+    A: [(x^(2))]
+    m: <mrow><mo>(</mo><msup><mi>x</mi><mn>2</mn></msup><mo>)</mo></mrow>
+k : [ \left( \begin{array} { l } { x } \\ { y } \\ { z } \end{array} \right) - \left( \begin{array} { c } { 4 } \\ { 8 } \\ { - 2 } \end{array} \right) ] ^ { 2 } = 5 ^ { 2 }
+    t: k : \left[ \left( \begin{array} { l } { x } \\ { y } \\ { z } \end{array} \right) - \left( \begin{array} { c } { 4 } \\ { 8 } \\ { - 2 } \end{array} \right) \right] ^ { 2 } = 5 ^ { 2 }
+    c: k:\left[\left( \begin{array}{l}{x} \\ {y} \\ {z}\end{array}\right)-\left( \begin{array}{c}{4} \\ {8} \\ {-2}\end{array}\right)\right]^{2}=5^{2}
+    T: \( k: \left[ \left( \begin{array} { l } { x } \\ { y } \\ { z } \end{array} \right) - \left( \begin{array} { c } { 4 } \\ { 8 } \\ { - 2 } \end{array} \right) \right] ^ { 2 } = 5 ^ { 2 } \)
+    A: k:[([x],[y],[z])-([4],[8],[-2])]^(2)=5^(2)
+    m: <mi>k</mi><mo>:</mo><msup><mrow><mo>[</mo><mo fence="true">(</mo><mtable columnalign="left"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>x</mi></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>y</mi></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>z</mi></mstyle></mtd></mtr></mtable><mo fence="true">)</mo><mo>−</mo><mo fence="true">(</mo><mtable columnalign="center"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>4</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>8</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mo>−</mo><mn>2</mn></mstyle></mtd></mtr></mtable><mo fence="true">)</mo><mo>]</mo></mrow><mn>2</mn></msup><mo>=</mo><msup><mn>5</mn><mn>2</mn></msup>
+
+\bigoplus\bigcup\bigcap\geqq\leqq\longrightarrow\top\longleftrightarrow\Longrightarrow\longrightarrow\longleftarrow\Longleftarrow\Longleftrightarrow\longmapsto\widetilde{x}\widehat{x}
+    nsl: \oplus\cup\cap\geq\leq\rightarrow T\leftrightarrow\Rightarrow\rightarrow\leftarrow\Leftarrow\Leftrightarrow\mapsto\tilde{x}\hat{x}
+    A: bigoplus uuu nnn>=<=longrightarrow TT longleftrightarrow Longrightarrow longrightarrow longleftarrow Longleftarrow Longleftrightarrow longmapsto widetilde x widehat x
+    m: <mo>⨁</mo><mo>⋃</mo><mo>⋂</mo><mo>≧</mo><mo>≦</mo><mo>⟶</mo><mi>⊤</mi><mo>⟷</mo><mo>⟹</mo><mo>⟶</mo><mo>⟵</mo><mo>⟸</mo><mo>⟺</mo><mo>⟼</mo><mover accent="true"><mi>x</mi><mo stretchy="true">~</mo></mover><mover accent="true"><mi>x</mi><mo stretchy="true">^</mo></mover>
+
+d s ^ { 2} = ( d X ^ { 0} ) ^ { 2} - R ( X ^ { 0} ) ^ { 2} \sum _ { i = 1} ^ { D - 1} ( d X ^ { i } ) ^ { 2}
+    t: d s ^ { 2} = \left( d X ^ { 0} \right) ^ { 2} - R \left( X ^ { 0} \right) ^ { 2} \sum _ { i = 1} ^ { D - 1} \left( d X ^ { i } \right) ^ { 2}
+    c: d s^{2}=\left(d X^{0}\right)^{2}-R\left(X^{0}\right)^{2} \sum_{i=1}^{D-1}\left(d X^{i}\right)^{2}
+    A: ds^(2)=(dX^(0))^(2)-R(X^(0))^(2)sum_(i=1)^(D-1)(dX^(i))^(2)
+    m: <mi>d</mi><msup><mi>s</mi><mn>2</mn></msup><mo>=</mo><msup><mrow><mo>(</mo><mi>d</mi><msup><mi>X</mi><mn>0</mn></msup><mo>)</mo></mrow><mn>2</mn></msup><mo>−</mo><mi>R</mi><msup><mrow><mo>(</mo><msup><mi>X</mi><mn>0</mn></msup><mo>)</mo></mrow><mn>2</mn></msup><msubsup><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mrow><mi>D</mi><mo>−</mo><mn>1</mn></mrow></msubsup><msup><mrow><mo>(</mo><mi>d</mi><msup><mi>X</mi><mi>i</mi></msup><mo>)</mo></mrow><mn>2</mn></msup>
+
+\Delta ( W _ { 1} ) ^ { i t } J ( W _ { 2} ) \Delta ( W _ { 1} ) ^ { - i t } = J ( l ( W _ { 1} ,t ) W _ { 2} )
+    t: \Delta \left( W _ { 1} \right) ^ { i t } J \left( W _ { 2} \right) \Delta \left( W _ { 1} \right) ^ { - i t } = J \left( l \left( W _ { 1} ,t \right) W _ { 2} \right)
+    c: \Delta\left(W_{1}\right)^{i t} J\left(W_{2}\right) \Delta\left(W_{1}\right)^{-i t}=J\left(l\left(W_{1},t\right) W_{2}\right)
+    A: Delta(W_(1))^(it)J(W_(2))Delta(W_(1))^(-it)=J(l(W_(1),t)W_(2))
+    m: <mi>Δ</mi><msup><mrow><mo>(</mo><msub><mi>W</mi><mn>1</mn></msub><mo>)</mo></mrow><mrow><mi>i</mi><mi>t</mi></mrow></msup><mi>J</mi><mo>(</mo><msub><mi>W</mi><mn>2</mn></msub><mo>)</mo><mi>Δ</mi><msup><mrow><mo>(</mo><msub><mi>W</mi><mn>1</mn></msub><mo>)</mo></mrow><mrow><mo>−</mo><mi>i</mi><mi>t</mi></mrow></msup><mo>=</mo><mi>J</mi><mo>(</mo><mi>l</mi><mo>(</mo><msub><mi>W</mi><mn>1</mn></msub><mo separator="true">,</mo><mi>t</mi><mo>)</mo><msub><mi>W</mi><mn>2</mn></msub><mo>)</mo>
+
+W ( R ,\gamma ) = \operatorname { Tr } _ { R } \mathcal { P } { \exp ( i \oint _ { \gamma } \mathbf { A } _ { \mu } d x ^ { \mu } ) } \equiv \chi _ { R } ( U _ { \gamma } )
+    nMn: W ( R ,\gamma ) = \operatorname { Tr } _ { R } P { \exp ( i \oint _ { \gamma } A _ { \mu } d x ^ { \mu } ) } \equiv \chi _ { R } ( U _ { \gamma } )
+    slMsl: W ( R ,\gamma ) = \operatorname { Tr } _ { R } P { \exp ( i \oint _ { \gamma } A _ { \mu } d x ^ { \mu } ) } \equiv \chi _ { R } ( U _ { \gamma } )
+    t: W ( R ,\gamma ) = \operatorname { Tr } _ { R } \mathcal { P } { \exp \left( i \oint _ { \gamma } \mathbf { A } _ { \mu } d x ^ { \mu } \right) } \equiv \chi _ { R } \left( U _ { \gamma } \right)
+    c: W(R,\gamma)=\operatorname{Tr}_{R} \mathcal{P}{\exp\left(i \oint_{\gamma} \mathbf{A}_{\mu} d x^{\mu}\right)} \equiv \chi_{R}\left(U_{\gamma}\right)
+    A: W(R,gamma)=Tr_(R)P exp(i oint_(gamma)A_(mu)dx^(mu))-=chi_(R)(U_(gamma))
+    m: <mi>W</mi><mo>(</mo><mi>R</mi><mo separator="true">,</mo><mi>γ</mi><mo>)</mo><mo>=</mo><msub><mi>Tr</mi><mi>R</mi></msub><mrow><mi mathvariant="script">P</mi></mrow><mrow><mi>exp</mi><mo>(</mo><mi>i</mi><msub><mo>∮</mo><mi>γ</mi></msub><msub><mrow><mi mathvariant="bold">A</mi></mrow><mi>μ</mi></msub><mi>d</mi><msup><mi>x</mi><mi>μ</mi></msup><mo>)</mo></mrow><mo>≡</mo><msub><mi>χ</mi><mi>R</mi></msub><mo>(</mo><msub><mi>U</mi><mi>γ</mi></msub><mo>)</mo>
+
+#\left. \begin{array} { r l } { H ^ { * } H } & { = \mathcal { F } ^ { * } ( \Phi _ { \varphi } ^ { - 1 } ) ^ { * } M _ { m } ^ { * } T ^ { * } T M _ { m } \Phi _ { \varphi } ^ { - 1 } \mathcal { F } } \\ { } & { \stackrel { ( a ) } { = } \mathcal { F } ^ { * } ( \Phi _ { \varphi } ^ { - 1 } ) ^ { * } M _ { | m | ^ { 2 } } \Phi _ { \varphi } ^ { - 1 } \mathcal { F } } \\ { } & { \stackrel { ( b ) } { = } \mathcal { F } ^ { * } | \operatorname { d e t } J _ { \varphi } | M _ { \Phi _ { e } | m | ^ { 2 } } \mathcal { F } } \end{array} \right.
+#    a: \left. \begin{aligned} H ^ { * } H & = \mathcal { F } ^ { * } ( \Phi _ { \varphi } ^ { - 1 } ) ^ { * } M _ { m } ^ { * } T ^ { * } T M _ { m } \Phi _ { \varphi } ^ { - 1 } \mathcal { F } \\ & \stackrel { ( a ) } { = } \mathcal { F } ^ { * } ( \Phi _ { \varphi } ^ { - 1 } ) ^ { * } M _ { | m | ^ { 2 } } \Phi _ { \varphi } ^ { - 1 } \mathcal { F } \\ & \stackrel { ( b ) } { = } \mathcal { F } ^ { * } | \operatorname { det } J _ { \varphi } | M _ { \Phi _ { e } | m | ^ { 2 } } \mathcal { F } \end{aligned} \right.
+#    ns: \left. \begin{array}{l}{ H ^ { * } H = F ^ { * } ( \Phi _ { \varphi } ^ { - 1 } ) ^ { * } M _ { m } ^ { * } T ^ { * } T M _ { m } \Phi _ { \varphi } ^ { - 1 } F }\\{ \stackrel { ( a ) } { = } F ^ { * } ( \Phi _ { \varphi } ^ { - 1 } ) ^ { * } M _ { | m | ^ { 2 } } \Phi _ { \varphi } ^ { - 1 } F }\\{ \stackrel { ( b ) } { = } F ^ { * } | \operatorname { det } J _ { \varphi } | M _ { \Phi _ { e } | m | ^ { 2 } } F }\end{array} \right.
+#    t: \begin{aligned} H ^ { * } H & = \mathcal { F } ^ { * } \left( \Phi _ { \varphi } ^ { - 1 } \right) ^ { * } M _ { m } ^ { * } T ^ { * } T M _ { m } \Phi _ { \varphi } ^ { - 1 } \mathcal { F } \\ & \stackrel { ( a ) } { = } \mathcal { F } ^ { * } \left( \Phi _ { \varphi } ^ { - 1 } \right) ^ { * } M _ { | m | ^ { 2 } } \Phi _ { \varphi } ^ { - 1 } \mathcal { F } \\ & \stackrel { ( b ) } { = } \mathcal { F } ^ { * } \left| \operatorname { det } J _ { \varphi } \right| M _ { \Phi _ { e } | m | ^ { 2 } } \mathcal { F } \end{aligned}
+#    c: \begin{aligned} H^{*} H &=\mathcal{F}^{*}\left(\Phi_{\varphi}^{-1}\right)^{*} M_{m}^{*} T^{*} T M_{m} \Phi_{\varphi}^{-1} \mathcal{F} \\ & \stackrel{(a)}{=} \mathcal{F}^{*}\left(\Phi_{\varphi}^{-1}\right)^{*} M_{|m|^{2}} \Phi_{\varphi}^{-1} \mathcal{F} \\ & \stackrel{(b)}{=} \mathcal{F}^{*}\left|\operatorname{det} J_{\varphi}\right| M_{\Phi_{e}|m|^{2}} \mathcal{F} \end{aligned}
+#    l: ["H ^ { * } H = F ^ { * } ( \\Phi _ { \\varphi } ^ { - 1 } ) ^ { * } M _ { m } ^ { * } T ^ { * } T M _ { m } \\Phi _ { \\varphi } ^ { - 1 } F","\\stackrel { ( a ) } { = } F ^ { * } ( \\Phi _ { \\varphi } ^ { - 1 } ) ^ { * } M _ { | m | ^ { 2 } } \\Phi _ { \\varphi } ^ { - 1 } F","\\stackrel { ( b ) } { = } F ^ { * } | \\operatorname { det } J _ { \\varphi } | M _ { \\Phi _ { e } | m | ^ { 2 } } F"]
+#    A: {:[H^(*)H,=F^(*)(Phi_(varphi)^(-1))^(*)M_(m)^(*)T^(*)TM_(m)Phi_(varphi)^(-1)F],[,(a)=F^(*)(Phi_(varphi)^(-1))^(*)M_(|m|^(2))Phi_(varphi)^(-1)F],[,(b)=F^(*)|det J_(varphi)|M_(Phi_(e)|m|^(2))F]:}
+#    m: <math><mtable columnalign="right left"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><msup><mi>H</mi><mi>*</mi></msup><mi>H</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mo>=</mo><msup><mrow><mi mathvariant="script">F</mi></mrow><mi>*</mi></msup><msup><mrow><mo>(</mo><msubsup><mi>Φ</mi><mi>φ</mi><mrow><mo>−</mo><mn>1</mn></mrow></msubsup><mo>)</mo></mrow><mi>*</mi></msup><msubsup><mi>M</mi><mi>m</mi><mi>*</mi></msubsup><msup><mi>T</mi><mi>*</mi></msup><mi>T</mi><msub><mi>M</mi><mi>m</mi></msub><msubsup><mi>Φ</mi><mi>φ</mi><mrow><mo>−</mo><mn>1</mn></mrow></msubsup><mrow><mi mathvariant="script">F</mi></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>stackrel</mi><mrow><mo>(</mo><mi>a</mi><mo>)</mo></mrow><mrow><mo>=</mo></mrow><msup><mrow><mi mathvariant="script">F</mi></mrow><mi>*</mi></msup><msup><mrow><mo>(</mo><msubsup><mi>Φ</mi><mi>φ</mi><mrow><mo>−</mo><mn>1</mn></mrow></msubsup><mo>)</mo></mrow><mi>*</mi></msup><msub><mi>M</mi><mrow><msup><mrow><mo>∣</mo><mi>m</mi><mo>∣</mo></mrow><mn>2</mn></msup></mrow></msub><msubsup><mi>Φ</mi><mi>φ</mi><mrow><mo>−</mo><mn>1</mn></mrow></msubsup><mrow><mi mathvariant="script">F</mi></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>stackrel</mi><mrow><mo>(</mo><mi>b</mi><mo>)</mo></mrow><mrow><mo>=</mo></mrow><msup><mrow><mi mathvariant="script">F</mi></mrow><mi>*</mi></msup><mo>∣</mo><mi>det</mi><msub><mi>J</mi><mi>φ</mi></msub><mo>∣</mo><msub><mi>M</mi><mrow><msub><mi>Φ</mi><mi>e</mi></msub><msup><mrow><mo>∣</mo><mi>m</mi><mo>∣</mo></mrow><mn>2</mn></msup></mrow></msub><mrow><mi mathvariant="script">F</mi></mrow></mstyle></mtd></mtr></mtable></math>
+
+a + \int dx
+    A: a+int dx
+    c: a+\int dx
+    m: <mi>a</mi><mo>+</mo><mo>∫</mo><mi>d</mi><mi>x</mi>
+a + \int\int dx
+    t: a + \iint dx
+    c: a+\iint dx
+    A: a+int int dx
+    m: <mi>a</mi><mo>+</mo><mo>∬</mo><mi>d</mi><mi>x</mi>
+a + \int \int\int dx
+    t: a + \iiint dx
+    c: a+\iiint dx
+    A: a+int int int dx
+    m: <mi>a</mi><mo>+</mo><mo>∭</mo><mi>d</mi><mi>x</mi>
+a + \int dx +\int\int dx+\int dx
+    t: a + \int dx +\iint dx+\int dx
+    c: a+\int dx+\iint dx+\int dx
+    A: a+int dx+int int dx+int dx
+    m: <mi>a</mi><mo>+</mo><mo>∫</mo><mi>d</mi><mi>x</mi><mo>+</mo><mo>∬</mo><mi>d</mi><mi>x</mi><mo>+</mo><mo>∫</mo><mi>d</mi><mi>x</mi>
+\int (x)
+    A: int(x)
+    c: \int(x)
+    m: <mo>∫</mo><mo>(</mo><mi>x</mi><mo>)</mo>
+
+1 6 \int _ { 0 } ^ { 3 } [ \frac { 1 } { 2 } \theta + \frac { 1 } { 4 } \operatorname { s i n } ( 2 \theta ) + \operatorname { c o s } ( \theta ) - \frac { 1 } { 3 } \operatorname { c o s } ^ { 3 } ( \theta ) ] | _ { 0 } ^ { 2 \pi } d z
+    asl: 16 \int _ { 0 } ^ { 3 } [ \frac { 1 } { 2 } \theta + \frac { 1 } { 4 } \sin ( 2 \theta ) + \cos ( \theta ) - \frac { 1 } { 3 } \cos ^ { 3 } ( \theta ) ] | _ { 0 } ^ { 2 \pi } d z
+    n: 16 \int _ { 0 } ^ { 3 } [ \frac { 1 } { 2 } \theta + \frac { 1 } { 4 } \operatorname { sin } ( 2 \theta ) + \operatorname { cos } ( \theta ) - \frac { 1 } { 3 } \operatorname { cos } ^ { 3 } ( \theta ) ] | _ { 0 } ^ { 2 \pi } d z
+    t: \left. 16 \int _ { 0 } ^ { 3 } \left[ \frac { 1 } { 2 } \theta + \frac { 1 } { 4 } \sin ( 2 \theta ) + \cos ( \theta ) - \frac { 1 } { 3 } \cos ^ { 3 } ( \theta ) \right] \right| _ { 0 } ^ { 2 \pi } d z
+    c: \left.16 \int_{0}^{3}\left[\frac{1}{2} \theta+\frac{1}{4} \sin (2 \theta)+\cos (\theta)-\frac{1}{3} \cos ^{3}(\theta)\right]\right|_{0} ^{2 \pi} d z
+    T: \( \left. 16 \int _ { 0 } ^ { 3 } \left[ \frac { 1 } { 2 } \theta + \frac { 1 } { 4 } \sin ( 2 \theta ) + \cos ( \theta ) - \frac { 1 } { 3 } \cos ^ { 3 } ( \theta ) \right] \right| _ { 0 } ^ { 2 \pi } d z \)
+    A: 16int_(0)^(3)[(1)/(2)theta+(1)/(4)sin(2 theta)+cos(theta)-(1)/(3)cos^(3)(theta)]|_(0)^(2 pi)dz
+    m: <msubsup><mrow><mn>16</mn><msubsup><mo>∫</mo><mn>0</mn><mn>3</mn></msubsup><mo>[</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mi>θ</mi><mo>+</mo><mfrac><mn>1</mn><mn>4</mn></mfrac><mi>sin</mi><mo>(</mo><mn>2</mn><mi>θ</mi><mo>)</mo><mo>+</mo><mi>cos</mi><mo>(</mo><mi>θ</mi><mo>)</mo><mo>−</mo><mfrac><mn>1</mn><mn>3</mn></mfrac><msup><mi>cos</mi><mn>3</mn></msup><mo>(</mo><mi>θ</mi><mo>)</mo><mo>]</mo><mo>∣</mo></mrow><mrow><mn>0</mn></mrow><mrow><mn>2</mn><mi>π</mi></mrow></msubsup><mi>d</mi><mi>z</mi>
+
+# Styled adds \left\right inside array item; other formats remove \mathbb.
+\left.\begin{array}{rl}{(x^\mathbb{2})}&{\mathcal{=}y^2}\end{array}\right.
+    ns: \left.\begin{array}{l}{(x^2) =y^2}\end{array}\right.
+    a: \left.\begin{aligned}(x^\mathbb{2})&\mathcal{=}y^2\end{aligned}\right.
+    tc: \begin{aligned}\left(x^\mathbb{2}\right)&\mathcal{=}y^2\end{aligned}
+    l: (x^2) =y^2
+    A: {:[(x^(2)),=y^(2)]:}
+    m: <mtable columnalign="right left"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mo>(</mo><msup><mi>x</mi><mrow><mi>2</mi></mrow></msup><mo>)</mo></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi>=</mi></mrow><msup><mi>y</mi><mn>2</mn></msup></mstyle></mtd></mtr></mtable>
+\begin{aligned}{(x^\mathbb{2})}&{\mathcal{=}y^2}\end{aligned}
+    nsl: \begin{aligned}{(x^2)}&{=y^2}\end{aligned}
+    tc: \begin{aligned}{\left(x^\mathbb{2}\right)}&{\mathcal{=}y^2}\end{aligned}
+    A: [(x^(2)),=y^(2)]
+    m: <mrow><mo>(</mo><msup><mi>x</mi><mrow><mi>2</mi></mrow></msup><mo>)</mo></mrow><mrow><mrow><mi>=</mi></mrow><msup><mi>y</mi><mn>2</mn></msup></mrow>
+
+# Normal transformation is single-column array, styled transforms to aligned.
+\left. \begin{array} { r l } { x + y } & { = 3 } \\ { y } & { = x ^ { 2 } - 8 x + 15 } \end{array} \right.
+    ns: \left. \begin{array}{l}{ x + y = 3 }\\{ y = x ^ { 2 } - 8 x + 15 }\end{array} \right.
+    a: \left. \begin{aligned} x + y & = 3 \\ y & = x ^ { 2 } - 8 x + 15 \end{aligned} \right.
+    t: \begin{aligned} x + y & = 3 \\ y & = x ^ { 2 } - 8 x + 15 \end{aligned}
+    c: \begin{aligned} x+y &=3 \\ y &=x^{2}-8 x+15 \end{aligned}
+    l: ["x + y = 3","y = x ^ { 2 } - 8 x + 15"]
+    A: {:[x+y,=3],[y,=x^(2)-8x+15]:}
+    m: <mtable columnalign="right left"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>x</mi><mo>+</mo><mi>y</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mo>=</mo><mn>3</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>y</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mo>=</mo><msup><mi>x</mi><mn>2</mn></msup><mo>−</mo><mn>8</mn><mi>x</mi><mo>+</mo><mn>15</mn></mstyle></mtd></mtr></mtable>
+
+\left\{\begin{array}{rl}{x+y}&{=3}\\{y} & {=x^{2}-8x+15}\end{array}\right\}
+    ns: \left\{\begin{array}{l}{x+y =3}\\{y =x^{2}-8x+15}\end{array}\right\}
+    atc: \left\{\begin{aligned}x+y&=3\\y&=x^{2}-8x+15\end{aligned}\right\}
+    l: ["x+y =3","y =x^{2}-8x+15"]
+    A: {[x+y,=3],[y,=x^(2)-8x+15]}
+    m: <mo fence="true">{</mo><mtable columnalign="right left"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>x</mi><mo>+</mo><mi>y</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mo>=</mo><mn>3</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>y</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mo>=</mo><msup><mi>x</mi><mn>2</mn></msup><mo>−</mo><mn>8</mn><mi>x</mi><mo>+</mo><mn>15</mn></mstyle></mtd></mtr></mtable><mo fence="true">}</mo>
+
+\left.\begin{array}{l}\text{above }\\x^2\\\text{ below}\end{array}\right.
+    ns: \left.\begin{array}{l}\text{above }\\x^2\\\text{ below}\end{array}\right.
+    tc: \begin{array}{l}\text{above }\\x^2\\\text{ below}\end{array}
+    l: x^2
+    Ml: ["\\text{above }","x^2","\\text{ below}"]
+    TL: above\n\( x^2 \)\nbelow
+    X: above\n$x^2$\nbelow
+    A: {:["above "],[x^(2)],[" below"]:}
+    m: <mtable columnalign="left"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext>above </mtext></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><msup><mi>x</mi><mn>2</mn></msup></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext> below</mtext></mstyle></mtd></mtr></mtable>
+
+# Spaces before parens prevent styled transformation.
+\left ( \frac{1}{2} \right )
+    A: ((1)/(2))
+    c: \left (\frac{1}{2}\right )
+    m: <mo>(</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>)</mo>
+\left \{ \frac{1}{2} \right \}
+    A: {(1)/(2)}
+    c: \left \{\frac{1}{2}\right \}
+    m: <mo>{</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>}</mo>
+\left \langle \frac{1}{2} \right \rangle
+    A: (1)/(2)
+    c: \left \langle\frac{1}{2}\right \rangle
+    m: <mo>⟨</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>⟩</mo>
+
+# \text prevents styled transformation.
+\{ \text{ \frac{1}{2} } \}
+    c: \{\text{ \frac{1}{2} }\}
+    A: {" (1)/(2) "}
+    m: <mo>{</mo><mtext> \frac{1}{2} </mtext><mo>}</mo>
+
+\operatorname { Pr }\left(\text { test error } \leqslant \text { training error }+\sqrt{\frac{1}{N}\left[D\left(\log \left(\frac{2 N}{D}\right)+1\right)-\log \left(\frac{\eta}{4}\right)\right]}\right)=1-\eta
+    nsl: \operatorname { Pr }\left(\text { test error } \leq \text { training error }+\sqrt{\frac{1}{N}\left[D\left(\log \left(\frac{2 N}{D}\right)+1\right)-\log \left(\frac{\eta}{4}\right)\right]}\right)=1-\eta
+    c: \operatorname{Pr}\left(\text { test error } \leqslant \text { training error }+\sqrt{\frac{1}{N}\left[D\left(\log\left(\frac{2 N}{D}\right)+1\right)-\log\left(\frac{\eta}{4}\right)\right]}\right)=1-\eta
+    A: Pr(" test error "leqslant" training error "+sqrt((1)/(N)[D(log((2N)/(D))+1)-log((eta)/(4))]))=1-eta
+    m: <mi>Pr</mi><mo>(</mo><mtext> test error </mtext><mo>⩽</mo><mtext> training error </mtext><mo>+</mo><msqrt><mrow><mfrac><mn>1</mn><mi>N</mi></mfrac><mo>[</mo><mi>D</mi><mo>(</mo><mi>log</mi><mo>(</mo><mfrac><mrow><mn>2</mn><mi>N</mi></mrow><mi>D</mi></mfrac><mo>)</mo><mo>+</mo><mn>1</mn><mo>)</mo><mo>−</mo><mi>log</mi><mo>(</mo><mfrac><mi>η</mi><mn>4</mn></mfrac><mo>)</mo><mo>]</mo></mrow></msqrt><mo>)</mo><mo>=</mo><mn>1</mn><mo>−</mo><mi>η</mi>
+
+\begin{array}{c}{}\end{array}
+    ans: \left. \begin{array}{c}{}\end{array} \right.
+    l: []
+    TX: ""
+    A: []
+    m: <mtable columnalign="center"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"></mstyle></mtd></mtr></mtable>
+
+\| x + \left( \begin{array}{c}{x}\end{array} \right) \|
+    t: \left\| x + \left( \begin{array}{c}{x}\end{array} \right) \right\|
+    c: \left\|x+\left( \begin{array}{c}{x}\end{array}\right)\right\|
+    A: |x+([x])|
+    m: <mo>∥</mo><mi>x</mi><mo>+</mo><mo fence="true">(</mo><mtable columnalign="center"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>x</mi></mstyle></mtd></mtr></mtable><mo fence="true">)</mo><mo>∥</mo>
+
+
+# Unmatched scopes prevents styled transformation.
+{(}x^2{)}
+    A: (x^(2))
+    m: <mrow><mo>(</mo></mrow><msup><mi>x</mi><mn>2</mn></msup><mrow><mo>)</mo></mrow>
+
+# No tall parens for overbrace and underbrace.
+#(\overbrace{x}^{y})(\underbrace{x}_y)
+#    A: (obrace(x)^(y))(ubrace(x)_(y))
+#    m: <mrow><mo>(</mo><mi>\overbrace</mi><msup><mrow><mi>x</mi></mrow><mrow><mi>y</mi></mrow></msup><mo>)</mo><mo>(</mo><mo>∋</mo><msub><mrow><mi>x</mi></mrow><mi>y</mi></msub><mo>)</mo></mrow>
+
+# Single-column or non-operator column prevents aligned transformation.
+\left.\begin{array}{c}{a1}&{a2}\\{b1}&{b2}\end{array}\right.
+    tc: \begin{array}{c}{a1}&{a2}\\{b1}&{b2}\end{array}
+    l: ["a1 a2","b1 b2"]
+    A: {:[a1,a2],[b1,b2]:}
+    m: <mtable columnalign="center"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>a</mi><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>a</mi><mn>2</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>b</mi><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>b</mi><mn>2</mn></mstyle></mtd></mtr></mtable>
+
+\left.\begin{array}{rl}{a1}&{a2}\\{b1}&{b2}\end{array}\right.
+    ns: \left.\begin{array}{rl}{a1}&{a2}\\{b1}&{b2}\end{array}\right.
+    tc: \begin{array}{rl}{a1}&{a2}\\{b1}&{b2}\end{array}
+    l: ["a1 a2","b1 b2"]
+    A: {:[a1,a2],[b1,b2]:}
+    m: <mtable columnalign="right left"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>a</mi><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>a</mi><mn>2</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>b</mi><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>b</mi><mn>2</mn></mstyle></mtd></mtr></mtable>
+
+# Paren or bracket prevent aligned transformation.
+\left(\begin{array}{rl}{x+y}&{=3}\\{y} & {=x^{2}-8x+15}\end{array}\right)
+    A: ([x+y,=3],[y,=x^(2)-8x+15])
+    m: <mo fence="true">(</mo><mtable columnalign="right left"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>x</mi><mo>+</mo><mi>y</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mo>=</mo><mn>3</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>y</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mo>=</mo><msup><mi>x</mi><mn>2</mn></msup><mo>−</mo><mn>8</mn><mi>x</mi><mo>+</mo><mn>15</mn></mstyle></mtd></mtr></mtable><mo fence="true">)</mo>
+\left[\begin{array}{rl}{x+y}&{=3}\\{y} & {=x^{2}-8x+15}\end{array}\right]
+    A: [[x+y,=3],[y,=x^(2)-8x+15]]
+    m: <mo fence="true">[</mo><mtable columnalign="right left"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>x</mi><mo>+</mo><mi>y</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mo>=</mo><mn>3</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>y</mi></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mo>=</mo><msup><mi>x</mi><mn>2</mn></msup><mo>−</mo><mn>8</mn><mi>x</mi><mo>+</mo><mn>15</mn></mstyle></mtd></mtr></mtable><mo fence="true">]</mo>
+
+# Unmatched parens in array item.
+\begin{array}{l}{\text{2}^{5}2^{2}+[(b}\end{array}
+    ans: \left. \begin{array}{l}{\text{2}^{5}2^{2}+[(b}\end{array} \right.
+    c: \begin{array}{l}{\text{2}^{5}2^{2}+[(b}\end{array}
+    l: ^{5}2^{2}+[(b
+    Ml: \text{2}^{5}2^{2}+[(b
+    T: 2\( ^{5}2^{2}+[(b \)
+    X: 2$^{5}2^{2}+[(b$
+    A: ["2"^(5)2^(2)+[(b]
+    m: <mtable columnalign="left"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext>2</mtext><msup><mrow></mrow><mn>5</mn></msup><msup><mn>2</mn><mn>2</mn></msup><mo>+</mo><mo>[</mo><mo>(</mo><mi>b</mi></mstyle></mtd></mtr></mtable>
+
+\vec{a}
+    A: vec a
+    m: <mover accent="true"><mi>a</mi><mo stretchy="true">⃗</mo></mover>
+
+\vec{ab}
+    tc: \overrightarrow{ab}
+    T: \( \overrightarrow{ab} \)
+    A: vec ab
+    m: <mover accent="true"><mrow><mi>a</mi><mi>b</mi></mrow><mo stretchy="true">⃗</mo></mover>
+
+\vec{ab_1}
+    tc: \overrightarrow{ab_1}
+    T: \( \overrightarrow{ab_1} \)
+    A: vec ab_(1)
+    m: <mover accent="true"><mrow><msub><mrow><mi>a</mi><mi>b</mi></mrow><mn>1</mn></msub></mrow><mo stretchy="true">⃗</mo></mover>
+
+\vec{\theta}
+    A: vec theta
+    m: <mover accent="true"><mi>θ</mi><mo stretchy="true">⃗</mo></mover>
+
+# text
+a + \text {This is }\text{text} + b
+    c: a+\text {This is }\text{text}+b
+    l: ["a +","+ b"]
+    Ml: a + \text {This is }\text{text} + b
+    T: \( a + \)This is text\( + b \)
+    X: $a+$This is text$+b$
+    A: a+"This is ""text"+b
+    m: <mi>a</mi><mo>+</mo><mtext>This is </mtext><mtext>text</mtext><mo>+</mo><mi>b</mi>
+
+\text { foo } - 4 ^ { \text { superscript } } \text { bar }
+    nst: - 4 ^ { \text { superscript } }
+    t: - 4 ^ { \text {superscript } }
+    c: -4^{\text {superscript }}
+    l: - 4 ^ { \text { superscript } }
+    Mnstl: \text { foo } - 4 ^ { \text { superscript } } \text { bar }
+    Mt: \text { foo } - 4 ^ { \text {superscript } } \text { bar }
+    Mc: \text { foo }-4^{\text {superscript }} \text { bar }
+    T: foo \( - 4 ^ { \text {superscript } } \) bar
+    X: foo $-4^{\text {superscript }}$ bar
+    A: " foo "-4^(" superscript ")" bar "
+    m: <mtext> foo </mtext><mo>−</mo><msup><mn>4</mn><mrow><mtext> superscript </mtext></mrow></msup><mtext> bar </mtext>
+
+\text{The latex for }\operatorname{sin}(x)\text{is \operatorname{sin}(x).}
+    n: \operatorname { sin }(x)
+    stl: \sin(x)
+    c: \sin (x)
+    Mn: \text{The latex for }\operatorname { sin }(x)\text{is \operatorname{sin}(x).}
+    Mc: \text{The latex for }\sin (x)\text{is \operatorname{sin}(x).}
+    aMstl: \text{The latex for }\sin(x)\text{is \operatorname{sin}(x).}
+    T: The latex for \( \sin(x) \)is \operatorname{sin}(x).
+    X: The latex for $\sin (x)$is \operatorname{sin}(x).
+    A: "The latex for "sin(x)"is sin(x)."
+    m: <mtext>The latex for </mtext><mi>sin</mi><mo>(</mo><mi>x</mi><mo>)</mo><mtext>is \operatorname{sin}(x).</mtext>
+
+\left.\begin{array}{l}\text{Now is}\\\text{the time}\end{array}\right.
+    nstc: ""
+    l: []
+    Mns: \left.\begin{array}{l}\text{Now is}\\\text{the time}\end{array}\right.
+    Mtc: \begin{array}{l}\text{Now is}\\\text{the time}\end{array}
+    Ml: ["\\text{Now is}","\\text{the time}"]
+    TXL: Now is\nthe time
+    A: {:["Now is"],["the time"]:}
+    m: <mtable columnalign="left"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext>Now is</mtext></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext>the time</mtext></mstyle></mtd></mtr></mtable>
+
+\left.\begin{array}{l}\text{Now is}\\\text{the time}\\\text{for all good men}\\\text{to come to the aid}\end{array}\right.
+    nstc: ""
+    l: []
+    Mns: \left.\begin{array}{l}\text{Now is}\\\text{the time}\\\text{for all good men}\\\text{to come to the aid}\end{array}\right.
+    Mtc: \begin{array}{l}\text{Now is}\\\text{the time}\\\text{for all good men}\\\text{to come to the aid}\end{array}
+    Ml: ["\\text{Now is}","\\text{the time}","\\text{for all good men}","\\text{to come to the aid}"]
+    TXL: Now is\nthe time\nfor all good men\nto come to the aid
+    A: {:["Now is"],["the time"],["for all good men"],["to come to the aid"]:}
+    m: <mtable columnalign="left"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext>Now is</mtext></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext>the time</mtext></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext>for all good men</mtext></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext>to come to the aid</mtext></mstyle></mtd></mtr></mtable>
+
+#\left.\begin{array}{l}\text{Another test}\end{array}x^2\right.
+
+\text { Figure } 1.1 : \text { Relative translational motion }
+    aMnstl: \text { Figure } 1.1 : \text { Relative translational motion }
+    nst: 1.1 :
+    l: 1.1 :
+    c: 1.1:
+    Mc: \text { Figure } 1.1: \text { Relative translational motion }
+    TX: Figure 1.1: Relative translational motion
+    A: " Figure "1.1:" Relative translational motion "
+    m: <mtext> Figure </mtext><mn>1.1</mn><mo>:</mo><mtext> Relative translational motion </mtext>
+
+\text { Under the simple parameterization } ( 4.1 ) \text { of }
+    aMnstcl: \text { Under the simple parameterization } ( 4.1 ) \text { of }
+    nstl: ( 4.1 )
+    c: (4.1)
+    T: Under the simple parameterization ( 4.1 ) of
+    X: Under the simple parameterization ( 4.1) of
+    Mc: \text { Under the simple parameterization }(4.1) \text { of }
+    A: " Under the simple parameterization "(4.1)" of "
+    m: <mtext> Under the simple parameterization </mtext><mo>(</mo><mn>4.1</mn><mo>)</mo><mtext> of </mtext>
+
+\text { Supposons que } u _ { 0 } \in ] 0 , 1 [ \text { . }
+    ans: \text { Supposons que } u _ { 0 } \in ] 0,1 [ \text { . }
+    t: \text { Supposons que } \left. u _ { 0 } \in \right] 0,1 [ \text { . }
+    c: \text { Supposons que }\left.u_{0} \in\right] 0,1[ \text { . }
+    l: ["\\text { Supposons que } u _ { 0 } \\in ] 0","1 [ \\text { . }"]
+    T: Supposons que \( \left. u _ { 0 } \in \right] 0,1 [ \).
+    X: Supposons que $\left.u_{0} \in\right] 0,1[$.
+    A: " Supposons que "u_(0)in]0,1[" ."
+    m: <mtext> Supposons que </mtext><msub><mi>u</mi><mn>0</mn></msub><mo>∈</mo><mo>]</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo>[</mo><mtext> . </mtext>
+
+#\text { capital } _ { j } = \text { log number of firms } _ { j }
+#    c: \text { capital }_{j}=\text { log number of firms }_{j}
+#    A: " capital "_(j)=" log number of firms "_(j)
+#    m: <msub><mrow><mtext> capital </mtext></mrow><mi>j</mi></msub><mo>=</mo><msub><mrow><mtext> log number of firms </mtext></mrow><mi>j</mi></msub>
+
+\begin{array}{rlrl}{-i x_{+} \cdot \tilde{\sigma} \tau_{+}} & {=2 \overline{\theta}_{b} p_{+}} & {} & {p \prec 0} \\ {2 \theta^{a} \tau_{+}} & {=\delta_{b}^{a} p_{+}} & {} & {p \succ 0}\end{array}
+    a: \left. \begin{aligned}-i x_{+} \cdot \tilde{\sigma} \tau_{+}&=2 \overline{\theta}_{b} p_{+}&&p \prec 0\\2 \theta^{a} \tau_{+}&=\delta_{b}^{a} p_{+}&&p \succ 0\end{aligned} \right.
+    ns: \left. \begin{array}{rlrl}{-i x_{+} \cdot \tilde{\sigma} \tau_{+}} & {=2 \overline{\theta}_{b} p_{+}} & {} & {p \prec 0} \\ {2 \theta^{a} \tau_{+}} & {=\delta_{b}^{a} p_{+}} & {} & {p \succ 0}\end{array} \right.
+    tc: \begin{aligned}-i x_{+} \cdot \tilde{\sigma} \tau_{+}&=2 \bar{\theta}_{b} p_{+}&&p \prec 0\\2 \theta^{a} \tau_{+}&=\delta_{b}^{a} p_{+}&&p \succ 0\end{aligned}
+    l: ["-i x_{+} \\cdot \\tilde{\\sigma} \\tau_{+} =2 \\overline{\\theta}_{b} p_{+} p \\prec 0","2 \\theta^{a} \\tau_{+} =\\delta_{b}^{a} p_{+} p \\succ 0"]
+    A: [-ix_(+)*tilde sigma tau_(+),=2bar(theta)_(b)p_(+),,p-<0],[2 theta^(a)tau_(+),=delta_(b)^(a)p_(+),,p>-0]
+    m: <mtable columnalign="right left right left"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mo>−</mo><mi>i</mi><msub><mi>x</mi><mrow><mo>+</mo></mrow></msub><mo>⋅</mo><mover accent="true"><mi>σ</mi><mo>~</mo></mover><msub><mi>τ</mi><mrow><mo>+</mo></mrow></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mo>=</mo><mn>2</mn><msub><mrow><mover accent="true"><mi>θ</mi><mo stretchy="true">‾</mo></mover></mrow><mi>b</mi></msub><msub><mi>p</mi><mrow><mo>+</mo></mrow></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>p</mi><mo>≺</mo><mn>0</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn><msup><mi>θ</mi><mi>a</mi></msup><msub><mi>τ</mi><mrow><mo>+</mo></mrow></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mo>=</mo><msubsup><mi>δ</mi><mi>b</mi><mi>a</mi></msubsup><msub><mi>p</mi><mrow><mo>+</mo></mrow></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>p</mi><mo>≻</mo><mn>0</mn></mstyle></mtd></mtr></mtable>
+
+\left.\begin{array} { l } \text{This is one of the best things I have seen in a while.} \\ \text{They use the same pink dye that they use on bank} \\ \text{notes. This makes the Ivory unsellable and it can't} \\ \text{be consumed. (the animals are not harmed and it is} \end{array} \right.
+    nstc: ""
+    l: []
+    aMns: \left.\begin{array} { l } \text{This is one of the best things I have seen in a while.} \\ \text{They use the same pink dye that they use on bank} \\ \text{notes. This makes the Ivory unsellable and it can't} \\ \text{be consumed. (the animals are not harmed and it is} \end{array} \right.
+    Mt: \begin{array} { l } \text{This is one of the best things I have seen in a while.} \\ \text{They use the same pink dye that they use on bank} \\ \text{notes. This makes the Ivory unsellable and it can't} \\ \text{be consumed. (the animals are not harmed and it is} \end{array}
+    Mc: \begin{array}{l}\text{This is one of the best things I have seen in a while.} \\ \text{They use the same pink dye that they use on bank} \\ \text{notes. This makes the Ivory unsellable and it can't} \\ \text{be consumed. (the animals are not harmed and it is}\end{array}
+    Ml: ["\\text{This is one of the best things I have seen in a while.}","\\text{They use the same pink dye that they use on bank}","\\text{notes. This makes the Ivory unsellable and it can't}","\\text{be consumed. (the animals are not harmed and it is}"]
+    TX: This is one of the best things I have seen in a while.\nThey use the same pink dye that they use on bank\nnotes. This makes the Ivory unsellable and it can't\nbe consumed. (the animals are not harmed and it is
+    A: {:["This is one of the best things I have seen in a while."],["They use the same pink dye that they use on bank"],["notes.This makes the Ivory unsellable and it can't"],["be consumed.(the animals are not harmed and it is"]:}
+    m: <mtable columnalign="left"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext>This is one of the best things I have seen in a while.</mtext></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext>They use the same pink dye that they use on bank</mtext></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext>notes. This makes the Ivory unsellable and it can&#x27;t</mtext></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext>be consumed. (the animals are not harmed and it is</mtext></mstyle></mtd></mtr></mtable>
+
+\left.\begin{array}{l}{\text{foo}} \\ { \theta + C }\end{array} \right.
+    t: \begin{array}{l}{\text{foo}} \\ { \theta + C }\end{array}
+    c: \begin{array}{l}{\text{foo}} \\ {\theta+C}\end{array}
+    l: \theta + C
+    TL: foo\n\( \theta + C \)
+    X: foo\n$\theta+C$
+    A: {:["foo"],[theta+C]:}
+    m: <mtable columnalign="left"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext>foo</mtext></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>θ</mi><mo>+</mo><mi>C</mi></mstyle></mtd></mtr></mtable>
+    Ml: ["\\text{foo}","\\theta + C"]
+
+\begin{array} { l } { \text { This } } \\ { \qquad x + y } \\ { \text { and this is cool } } \\ { \qquad \operatorname { s i n } ( x ) } \end{array}
+    n: \left. \begin{array} { l } { \text { This } } \\ { \qquad x + y } \\ { \text { and this is cool } } \\ { \qquad \operatorname { sin } ( x ) } \end{array} \right.
+    as: \left. \begin{array} { l } { \text { This } } \\ { \qquad x + y } \\ { \text { and this is cool } } \\ { \qquad \sin ( x ) } \end{array} \right.
+    t: \begin{array} { l } { \text { This } } \\ { \qquad x + y } \\ { \text { and this is cool } } \\ { \qquad \sin ( x ) } \end{array}
+    c: \begin{array}{l}{\text { This }} \\ {\qquad x+y} \\ {\text { and this is cool }} \\ {\qquad \sin (x)}\end{array}
+    l: ["x + y","\\sin ( x )"]
+    TL: This\n\[ x + y \]\nand this is cool\n\[ \sin ( x ) \]
+    X: This\n\[ x+y \]\nand this is cool\n\[ \sin (x) \]
+    A: [" This "],[qquad x+y],[" and this is cool "],[qquad sin(x)]
+    m: <mtable columnalign="left"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext> This </mtext></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mspace width="2em" /><mi>x</mi><mo>+</mo><mi>y</mi></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext> and this is cool </mtext></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mspace width="2em" /><mi>sin</mi><mo>(</mo><mi>x</mi><mo>)</mo></mstyle></mtd></mtr></mtable>
+    Ml: ["\\text { This }","\\qquad x + y","\\text { and this is cool }","\\qquad \\sin ( x )"]
+
+\begin{array} { l } { \text { How do we represent tables internally to do } } \\ { \text { recognition? } } \\ { \text { What is our preferred table format for editing in our } } \\ { \text { apps? } } \end{array}
+    ans: \left. \begin{array} { l } { \text { How do we represent tables internally to do } } \\ { \text { recognition? } } \\ { \text { What is our preferred table format for editing in our } } \\ { \text { apps? } } \end{array} \right.
+    c: \begin{array}{l}{\text { How do we represent tables internally to do }} \\ {\text { recognition? }} \\ {\text { What is our preferred table format for editing in our }} \\ {\text { apps? }}\end{array}
+    l: []
+    Ml: ["\\text { How do we represent tables internally to do }","\\text { recognition? }","\\text { What is our preferred table format for editing in our }","\\text { apps? }"]
+    A: [" How do we represent tables internally to do "],[" recognition? "],[" What is our preferred table format for editing in our "],[" apps? "]
+    m: <mtable columnalign="left"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext> How do we represent tables internally to do </mtext></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext> recognition? </mtext></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext> What is our preferred table format for editing in our </mtext></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext> apps? </mtext></mstyle></mtd></mtr></mtable>
+    TX: How do we represent tables internally to do\nrecognition?\nWhat is our preferred table format for editing in our\napps?
+    L: How do we represent tables internally to do recognition?\nWhat is our preferred table format for editing in our apps?
+
+\begin{array} { l } { \text { A relatively long line of text that ends with a colon: } } \\ { \text { leave the newline } } \end{array}
+    ans: \left. \begin{array} { l } { \text { A relatively long line of text that ends with a colon: } } \\ { \text { leave the newline } } \end{array} \right.
+    c: \begin{array}{l}{\text { A relatively long line of text that ends with a colon: }} \\ {\text { leave the newline }}\end{array}
+    l: []
+    Ml: ["\\text { A relatively long line of text that ends with a colon: }","\\text { leave the newline }"]
+    TXL: A relatively long line of text that ends with a colon:\nleave the newline
+    A: [" A relatively long line of text that ends with a colon: "],[" leave the newline "]
+    m: <mtable columnalign="left"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext> A relatively long line of text that ends with a colon: </mtext></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext> leave the newline </mtext></mstyle></mtd></mtr></mtable>
+
+\begin{array} { l } { \text { A relatively long line of text that is followed by } } \\ { \text { - a line that looks like a list item } } \end{array}
+    ans: \left. \begin{array} { l } { \text { A relatively long line of text that is followed by } } \\ { \text { - a line that looks like a list item } } \end{array} \right.
+    c: \begin{array}{l}{\text { A relatively long line of text that is followed by }} \\ {\text { - a line that looks like a list item }}\end{array}
+    l: []
+    Ml: ["\\text { A relatively long line of text that is followed by }","\\text { - a line that looks like a list item }"]
+    TXL: A relatively long line of text that is followed by\n- a line that looks like a list item
+    A: [" A relatively long line of text that is followed by "],[" - a line that looks like a list item "]
+    m: <mtable columnalign="left"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext> A relatively long line of text that is followed by </mtext></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext> - a line that looks like a list item </mtext></mstyle></mtd></mtr></mtable>
+
+\begin{array} { l } { \text { A relatively long line of text that is followed by } } \\ { \text { 3.2 a line that looks like an enumerated list item } } \end{array}
+    ans: \left. \begin{array} { l } { \text { A relatively long line of text that is followed by } } \\ { \text { 3.2 a line that looks like an enumerated list item } } \end{array} \right.
+    c: \begin{array}{l}{\text { A relatively long line of text that is followed by }} \\ {\text { 3.2 a line that looks like an enumerated list item }}\end{array}
+    l: []
+    Ml: ["\\text { A relatively long line of text that is followed by }","\\text { 3.2 a line that looks like an enumerated list item }"]
+    TXL: A relatively long line of text that is followed by\n3.2 a line that looks like an enumerated list item
+    A: [" A relatively long line of text that is followed by "],[" 3.2a line that looks like an enumerated list item "]
+    m: <mtable columnalign="left"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext> A relatively long line of text that is followed by </mtext></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mtext> 3.2 a line that looks like an enumerated list item </mtext></mstyle></mtd></mtr></mtable>
+
+\begin{array} { l } { a + b + c + d + e + f + g + h + i + j + k + l + } \\ { m + n } \end{array}
+    ans: \left. \begin{array} { l } { a + b + c + d + e + f + g + h + i + j + k + l + } \\ { m + n } \end{array} \right.
+    c: \begin{array}{l}{a+b+c+d+e+f+g+h+i+j+k+l+} \\ {m+n}\end{array}
+    l: ["a + b + c + d + e + f + g + h + i + j + k + l +","m + n"]
+    TL: \( a + b + c + d + e + f + g + h + i + j + k + l + \)\n\( m + n \)
+    X: $a+b+c+d+e+f+g+h+i+j+k+l+$\n$m+n$
+    D: \[ \begin{array} { l } { a + b + c + d + e + f + g + h + i + j + k + l + } \\ { m + n } \end{array} \]
+    A: [a+b+c+d+e+f+g+h+i+j+k+l+],[m+n]
+    m: <mtable columnalign="left"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>a</mi><mo>+</mo><mi>b</mi><mo>+</mo><mi>c</mi><mo>+</mo><mi>d</mi><mo>+</mo><mi>e</mi><mo>+</mo><mi>f</mi><mo>+</mo><mi>g</mi><mo>+</mo><mi>h</mi><mo>+</mo><mi>i</mi><mo>+</mo><mi>j</mi><mo>+</mo><mi>k</mi><mo>+</mo><mi>l</mi><mo>+</mo></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>m</mi><mo>+</mo><mi>n</mi></mstyle></mtd></mtr></mtable>
+
+
+# textdisplay
+x ^ 2
+    c: x^2
+    A: x^(2)
+    m: <msup><mi>x</mi><mn>2</mn></msup>
+
+\{ \begin{array} { l } { 4 x - 3 y = 6 } \\ { y = - 3 x + 15 } \end{array}
+    anst: \left\{ \begin{array} { l } { 4 x - 3 y = 6 } \\ { y = - 3 x + 15 } \end{array} \right.
+    c: \left\{\begin{array}{l}{4 x-3 y=6} \\ {y=-3 x+15}\end{array}\right.
+    l: ["4 x - 3 y = 6","y = - 3 x + 15"]
+    A: {[4x-3y=6],[y=-3x+15]
+    m: <mo>{</mo><mtable columnalign="left"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>4</mn><mi>x</mi><mo>−</mo><mn>3</mn><mi>y</mi><mo>=</mo><mn>6</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mi>y</mi><mo>=</mo><mo>−</mo><mn>3</mn><mi>x</mi><mo>+</mo><mn>15</mn></mstyle></mtd></mtr></mtable>
+
+
+# MathML tests
+10^3
+    A: 10^(3)
+    m: <msup><mn>10</mn><mn>3</mn></msup>
+
+.3
+    TX: .3
+    A: .3
+    m: <mn>.3</mn>
+
+\int_a^b
+    A: int_(a)^(b)
+    m: <msubsup><mo>∫</mo><mi>a</mi><mi>b</mi></msubsup>
+
+\sum_{i=0}^{10}
+    A: sum_(i=0)^(10)
+    m: <msubsup><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>0</mn></mrow><mn>10</mn></msubsup>
+
+a\pm b
+    A: a+-b
+    m: <mi>a</mi><mo>±</mo><mi>b</mi>
+
+x\approx y
+    A: x~~y
+    m: <mi>x</mi><mo>≈</mo><mi>y</mi>
+
+x\cdot y
+    A: x*y
+    m: <mi>x</mi><mo>⋅</mo><mi>y</mi>
+
+a \dots b
+    A: a dots b
+    m: <mi>a</mi><mo>…</mo><mi>b</mi>
+
+\frac{n!}{k!(n-k)!}
+    A: (n!)/(k!(n-k)!)
+    m: <mfrac><mrow><mi>n</mi><mo>!</mo></mrow><mrow><mi>k</mi><mo>!</mo><mo>(</mo><mi>n</mi><mo>−</mo><mi>k</mi><mo>)</mo><mo>!</mo></mrow></mfrac>
+
+\lim_{x\rightarrow 0}{x^2}
+    A: lim_(x rarr0)x^(2)
+    m: <msub><mi>lim</mi><mrow><mi>x</mi><mo>→</mo><mn>0</mn></mrow></msub><mrow><msup><mi>x</mi><mn>2</mn></msup></mrow>
+
+\overline{xyz}
+    A: bar(xyz)
+    m: <mover accent="true"><mrow><mi>x</mi><mi>y</mi><mi>z</mi></mrow><mo stretchy="true">‾</mo></mover>
+
+\operatorname { archyp } \operatorname { tan } ( x )
+    astl: \operatorname { archyp } \tan ( x )
+    c: \operatorname{archyp} \tan (x)
+    A: archyp tan(x)
+    m: <mi>archyp</mi><mi>tan</mi><mo>(</mo><mi>x</mi><mo>)</mo>
