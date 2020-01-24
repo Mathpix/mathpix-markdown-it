@@ -2,6 +2,7 @@ import {mathjax as MJ} from 'mathjax-full/js/mathjax.js';
 import {TeX} from 'mathjax-full/js/input/tex.js';
 import {MathML} from "mathjax-full/js/input/mathml.js";
 import {SVG} from 'mathjax-full/js/output/svg.js';
+import {AsciiMath} from 'mathjax-full/js/input/asciimath.js';
 import {RegisterHTMLHandler} from 'mathjax-full/js/handlers/html.js';
 import {browserAdaptor} from 'mathjax-full/js/adaptors/browserAdaptor.js';
 import {liteAdaptor} from 'mathjax-full/js/adaptors/liteAdaptor.js';
@@ -53,25 +54,24 @@ const svg = new SVG(svgConfig);
 let docTeX = MJ.document(domNode, { InputJax: tex, OutputJax: svg });
 let docMathML = MJ.document(domNode, { InputJax: mml, OutputJax: svg });
 
-const AsciiMath = require('mathjax-full/js/input/asciimath.js').AsciiMath;
-const asciimath = new AsciiMath();
-let docAsciiMath = MJ.document(domNode, { InputJax: asciimath, OutputJax: svg });
-
-///import { SerializedMmlVisitor as MmlVisitor } from 'mathjax-full/js/core/MmlTree/SerializedMmlVisitor.js';
-import { SerializedMmlVisitor as MmlVisitor } from './SerializedAscii';
-const visitor = new MmlVisitor();
-
+import { SerializedMmlVisitor as MmlVisitor } from 'mathjax-full/js/core/MmlTree/SerializedMmlVisitor.js';
+import { SerializedAsciiVisitor as AsciiVisitor } from './serialized-ascii';
 
 const toMathML = (node => {
-  console.log('toMathML=>node=>', node)
-  console.log('toMathML=>visitor=>', visitor)
+  const visitor = new MmlVisitor();
   return visitor.visitTree(node)
 });
 
-const OuterHTML = (node, math, outMath) => {
-  const {include_mathml = true, include_asciimath = true, include_latex = true, include_svg = true} = outMath;
+const toAsciiML = ((node, optionAscii) => {
+  const visitorA = new AsciiVisitor(optionAscii);
+  return visitorA.visitTree(node)
+});
 
-  console.log('OuterHTML=>math=>', math)
+
+const OuterHTML = (node, math, outMath) => {
+  const {include_mathml = false, include_asciimath = false, include_latex = true, include_svg = true,
+  optionAscii = {showStyle: false}} = outMath;
+
   let outHTML = '';
 
   if (include_mathml) {
@@ -80,18 +80,8 @@ const OuterHTML = (node, math, outMath) => {
 
   if (include_asciimath) {
     if (!outHTML) { outHTML += '\n'}
-    var convert = require('mathml-to-asciimath');
-    console.log('!!!!!! math.root =>', math.root)
-    const asciimml = convert(toMathML(math.root) ); // => '1 + 2'
-    console.log('!!!!!! asciimml =>', asciimml)
-    outHTML +=  '<asciimath style="display: none">' +asciimml+ '</asciimath>';
-
-
-    const asciiSvg = docAsciiMath.convert(asciimml)
-    const htmlSvgA = adaptor.outerHTML(asciiSvg)
-    if (!outHTML) { outHTML += '\n'}
-    outHTML += htmlSvgA
-      console.log('htmlSvgA=>', htmlSvgA)
+    const asciimml = toAsciiML(math.root, optionAscii);
+    outHTML +=  '<asciimath style="display: none;">' + asciimml + '</asciimath>';
   }
 
   if (include_latex) {
@@ -135,7 +125,7 @@ export const MathJax = {
     const {em = 16, ex = 8, cwidth = 1200, lwidth = 100000, scale = 1} = metric;
     const node = docTeX.convert(string, {display: display, em: em, ex: ex, containerWidth: cwidth, lineWidth: lwidth, scale: scale});
     const outputJax = docTeX.outputJax as any;
-    return OuterHTML(node, outputJax.math, outMath);// adaptor.outerHTML(node);
+    return OuterHTML(node, outputJax.math, outMath);
   },
 
   /**
@@ -156,6 +146,14 @@ export const MathJax = {
     const {em = 16, ex = 8, cwidth = 1200, lwidth = 100000, scale = 1} = metric;
     const node = docMathML.convert(string, {display: display, em: em, ex: ex, containerWidth: cwidth, lineWidth: lwidth, scale: scale});
     return adaptor.outerHTML(node);
+  },
+
+  AsciiMathToSvg: function(string, display=true, metric: any={}) {
+    const {em = 16, ex = 8, cwidth = 1200, lwidth = 100000, scale = 1} = metric;
+    const asciimath = new AsciiMath({});
+    let docAsciiMath = MJ.document(domNode, { InputJax: asciimath, OutputJax: svg });
+    const node = docAsciiMath.convert(string, {display: display, em: em, ex: ex, containerWidth: cwidth, lineWidth: lwidth, scale: scale})
+    return adaptor.outerHTML(node)
   },
 
   //

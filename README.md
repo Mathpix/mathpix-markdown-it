@@ -111,8 +111,8 @@ You can also use certain functions to get styles and rendering in html:
 
 |                     | type&nbsp;*`default`*        |  description                                                                                                       |
 |---------------------|------------------------------|--------------------------------------------------------------------------------------------------------------------|
-| `include_mathml`    | boolean&nbsp;*`true`*        | should outputs mathml `<mathml style="display: none"><math>...</math></mathml>`                                    |
-| `include_asciimath` | boolean&nbsp;*`true`*        | should outputs asciimath `<asciimath style="display: none">...</asciimath>`                                        |
+| `include_mathml`    | boolean&nbsp;*`false`*       | should outputs mathml `<mathml style="display: none"><math>...</math></mathml>`                                    |
+| `include_asciimath` | boolean&nbsp;*`false`*       | should outputs asciimath `<asciimath style="display: none">...</asciimath>`                                        |
 | `include_latex`     | boolean&nbsp;*`true`*        | should outputs latex `<latex style="display: none">...</latex>`                                                    |
 | `include_svg`       | boolean&nbsp;*`true`*        | should outputs svg `<mjx-container class="MathJax" jax="SVG"><svg>...</svg></mjx-container>`                       |
  

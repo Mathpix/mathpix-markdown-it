@@ -251,7 +251,8 @@ class MathpixMarkdown_Model {
     render = ( text: string, options?: optionsMathpixMarkdown ):string => {
         const { alignMathBlock='center', display='block', isCheckFormula=false, showTimeLog=false,
           isDisableFancy=false, fontSize=null, padding=null, htmlTags=false, width=0, showToc = false,
-          overflowY='unset', breaks = true, typographer = true, linkify = true, xhtmlOut = false
+          overflowY='unset', breaks = true, typographer = true, linkify = true, xhtmlOut = false,
+          outMath = {}
         } = options || {};
         const disableRules = isDisableFancy ? this.disableFancyArrayDef : options ? options.disableRules || [] : [];
         if (!showToc) {
@@ -265,7 +266,7 @@ class MathpixMarkdown_Model {
                 <div id='container-ruller'></div>
                 <div id='setText' style='display: ${display}; justify-content: inherit;${styleFontSize}${stylePadding}' >
                     ${this.convertToHTML(text, 
-              {htmlTags: htmlTags, xhtmlOut: xhtmlOut, breaks: breaks, typographer: typographer, linkify: linkify, width: width})}
+              {htmlTags: htmlTags, xhtmlOut: xhtmlOut, breaks: breaks, typographer: typographer, linkify: linkify, width: width, outMath: outMath})}
                 </div>
             </div>`
         );

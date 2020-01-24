@@ -1,5 +1,5 @@
 /node_modules
-/examples/node_modules
-/examples/package-lock.json
+/examples/mathpix-markdown-it-node-examples/node_modules
+/examples/mathpix-markdown-it-node-examples/package-lock.json
 package-lock.json
 /.idea
