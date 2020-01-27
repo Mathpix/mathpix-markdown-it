@@ -8,6 +8,12 @@ import "mathjax-full/js/input/tex/color/ColorConfiguration.js";
 import "mathjax-full/js/input/tex/mhchem/MhchemConfiguration.js";
 export declare const MathJax: {
     Stylesheet: () => unknown;
+    TexConvert: (string: any, options?: any) => {
+        mathml?: string;
+        asciimath?: string;
+        latex?: string;
+        svg?: string;
+    };
     /**
      * Typeset a TeX expression and return the SVG tree for it
      *

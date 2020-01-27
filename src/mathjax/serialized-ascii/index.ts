@@ -30,6 +30,13 @@ export class SerializedAsciiVisitor extends MmlVisitor {
       return false;
     }
 
+    if (this.options.extraBrackets) {
+      if (element.parent.parent && (element.parent.parent.kind === 'msup' || element.parent.parent.kind === 'msub'|| element.parent.parent.kind === 'msubsup'
+        || element.parent.parent.kind === 'mover' || element.parent.parent.kind === 'munder'|| element.parent.parent.kind === 'munderover')) {
+        return false;
+      }
+    }
+
     if (element.parent.kind === 'TeXAtom' && element.parent.parent.kind === 'inferredMrow') {
       return false;
     }
@@ -43,7 +50,7 @@ export class SerializedAsciiVisitor extends MmlVisitor {
     if (element.properties && element.properties.open === '(' && element.properties.close === ')') {
       return false;
     }
-    const firstChild = element.childNodes[0];
+   const firstChild = element.childNodes[0];
 
     if (element.childNodes.length == 1 && firstChild.kind == 'mtext') {
       return false;
@@ -107,7 +114,16 @@ export class SerializedAsciiVisitor extends MmlVisitor {
   protected childNodeMml(node: MmlNode, space: string, nl: string) {
     const handleCh = handle.bind(this);
     let mml = '';
-    mml += handleCh(node, this);
+    if (node.kind === 'mover' && node.childNodes.length > 1 && node.childNodes[0].kind === 'TeXAtom' && node.childNodes[1].kind === 'TeXAtom') {
+      const firstChild: any = node.childNodes[0];
+      firstChild.properties.needBrackets = true;
+      mml += handleCh(firstChild, this);
+      mml += '^';
+      mml += '(' + handleCh(node.childNodes[1], this) + ')';
+    } else {
+      mml += handleCh(node, this);
+    }
+
     return mml;
   }
 

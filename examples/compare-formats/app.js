@@ -98,20 +98,26 @@ console.log('->arrA->', arrA.length)
     outHTML += '\n';
     outHTML += '  <code style="display: block;"> <span>Latex => </span>' + latex + '</code>';
     outHTML += '\n';
+    asc
+      .replace('/&amp;/g','&')
+      .replace('/&lt;/g','<')
+      .replace('/&lt;/g','<')
+      .replace('/&gt;/g','>')
+      .replace('/&quot;/g','\"')
+      .replace('/&nbsp;/g','\u0160')
     outHTML += '  <code style="display: block;"> <span>ASCIIMATH => </span>' + asc + '</code>';
     outHTML += '\n';
     outHTML += '  <code style="display: block;"> <span>ASCIIMATH_OLD => </span>' + arrA[i] + '</code>';
     outHTML += '\n';
     outHTML += '</p>';
     outHTML += '\n';
-
-    outText +=' Latex => ' + latex + '\n';
-    outText +=' ASCIIMATH => ' + asc + '\n';
-    outText +=' ASCIIMATH_OLD => ' + arrA[i] + '\n';
-    outText += '\n';
+    outText += `{\n`;
+    outText += `  latex: \`${latex}\`,\n`;
+    outText += `  ascii: \`${asc}\`,\n`;
+    outText += `  ascii_old: \`${arrA[i].trim()}\`\n`;
+    outText += `},\n`;
   }
   //const htmlMM = MathpixMarkdownModel.render(data, options);
-
 
   const config = {
     site: {

@@ -26,6 +26,7 @@ const needFirstSpase = (node) => {
 };
 
 const needLastSpase = (node) => {
+  let haveSpace: boolean = false;
   if (node.parent.kind === "msubsup") {
     return false
   }
@@ -36,6 +37,7 @@ const needLastSpase = (node) => {
     let next = node.parent.childNodes[index+1];
     if (next.childNodes[0].kind === 'text' && next.childNodes[0].text === '\u2061' && !isLastChild(next)) {
       next = node.parent.childNodes[index+2];
+      haveSpace = true;
     }
 
     if(next.kind === 'mi' || next.kind === 'mo') {
@@ -43,9 +45,10 @@ const needLastSpase = (node) => {
       if (next.childNodes[0].kind === 'text' && next.childNodes[0].text === '\u2061') {
         return true
       }
-      return regW.test(text[0])
+      const abs = SymbolToAM(next.kind, text);
+      return regW.test(abs)
     } else {
-      return false
+      return haveSpace;
     }
   }
 };
@@ -53,8 +56,9 @@ const needLastSpase = (node) => {
 
 export const SymbolToAM = (tag: string, output: string, atr = null) => {
   let tags = null;
+  const atrsNames = atr ? Object.getOwnPropertyNames(atr) : [];
   output = tag !== 'mtext' ? output.split(' ').join('') : output;
-  if (atr) {
+  if (atr && atrsNames.length > 0) {
     for (let [atname, atval] of Object.entries(atr)) {
       tags = AMsymbols.find(item => (item.tag === "mstyle" && item.atname === atname && item.atval === atval));
       if (tags ) {
@@ -70,7 +74,7 @@ export const SymbolToAM = (tag: string, output: string, atr = null) => {
   }
 
   //need split
-  if (!tags && atr && atr.stretchy === false) {
+  if (!tags && atr && atrsNames.length > 0 && Object.getOwnPropertyNames(atr)&& atr.stretchy === false) {
     const sp = output.split('');
     let res = ''
     for (let i = 0; i < sp.length; i++) {
@@ -85,10 +89,24 @@ export const SymbolToAM = (tag: string, output: string, atr = null) => {
 
 };
 
-export const FindSymbolToAM = (tag: string, output: string): string => {
+export const FindSymbolToAM = (tag: string, output: string, atr = null): string => {
   output = output.split(' ').join('');
-  const tags = AMsymbols.find(item => (item.tag === tag && item.output === output));
+  let tags = null;
+  if (atr && atr.stretchy) {
+    tags = AMsymbols.find(item => (item.tag === tag && item.output === output && item.stretchy));
+  }
+  if (!tags) {
+    tags = AMsymbols.find(item => (item.tag === tag && item.output === output));
+  }
   return tags ? tags.input : '';
+};
+
+const getChilrenText = (node): string => {
+  let text: string = '';
+  node.childNodes.forEach(child => {
+    text += child.text
+  });
+  return text
 };
 
 const defHandle = (node, serialize) => {
@@ -180,15 +198,17 @@ const mover = (handlerApi) => {
     const secondChild = node.childNodes[1];
     if (secondChild.kind === 'mo') {
       const t = serialize.visitNode(secondChild, '');
-      const asc = FindSymbolToAM('mover', t);
+      const asc = FindSymbolToAM('mover', t, getAttributes(secondChild));
       if (asc ) {
-        mml += asc + '(';
-        mml += serialize.visitNode(firstChild, '');
+        mml += ' ' +asc + '(' ;
+        mml += serialize.visitNode(firstChild, '').trim();
         mml += ')';
       } else {
         mml += serialize.visitNode(firstChild, '');
         mml += '^';
+        mml += serialize.options.extraBrackets ? '(' : '';
         mml += serialize.visitNode(secondChild, '');
+        mml += serialize.options.extraBrackets ? ')' : '';
       }
     } else {
       mml += handlerApi.handleAll(node, serialize);
@@ -216,7 +236,9 @@ const munder = (handlerApi) => {
     } else {
       mml += serialize.visitNode(firstChild, '');
       mml += '_';
+      mml += serialize.options.extraBrackets ? '(' : '';
       mml += serialize.visitNode(secondChild, '');
+      mml += serialize.options.extraBrackets ? ')' : '';
     }
     return mml;
   }
@@ -231,9 +253,13 @@ const munderover = () => {
 
     mml += serialize.visitNode(firstChild, '');
     mml += '_';
+    mml += serialize.options.extraBrackets ? '(' : '';
     mml += serialize.visitNode(secondChild, '');
+    mml += serialize.options.extraBrackets ? ')' : '';
     mml += '^';
+    mml += serialize.options.extraBrackets ? '(' : '';
     mml += serialize.visitNode(thirdChild, '');
+    mml += serialize.options.extraBrackets ? ')' : '';
     return mml;
   }
 };
@@ -245,7 +271,9 @@ const msub = () => {
     const secondChild = node.childNodes[1];
     mml += serialize.visitNode(firstChild, '');
     mml += '_';
+    mml += serialize.options.extraBrackets ? '(' : '';
     mml += serialize.visitNode(secondChild, '');
+    mml += serialize.options.extraBrackets ? ')' : '';
     return mml;
   }
 };
@@ -258,7 +286,9 @@ const msup = () =>  {
 
     mml += serialize.visitNode(firstChild, '');
     mml += '^';
+    mml += serialize.options.extraBrackets ? '(' : '';
     mml += serialize.visitNode(secondChild, '');
+    mml += serialize.options.extraBrackets ? ')' : '';
     return mml;
   }
 };
@@ -273,9 +303,13 @@ const msubsup = () => {
 
     mml += serialize.visitNode(firstChild, '');
     mml += '_';
+    mml += '(';
     mml += serialize.visitNode(secondChild, '');
+    mml += ')';
     mml += '^';
+    mml += '(';
     mml += serialize.visitNode(thirdChild, '');
+    mml += ')';
     return mml;
   }
 };
@@ -308,16 +342,16 @@ const mfrac = () => {
     let mml = '';
     const firstChild = node.childNodes[0];
     const secondChild = node.childNodes[1];
-    if (firstChild.kind === "mrow" && firstChild.childNodes.length > 1) {
+    if ((firstChild.kind === "mrow" && firstChild.childNodes.length > 1) || serialize.options.extraBrackets) {
       mml += '(';
       mml += serialize.visitNode(firstChild, '');
       mml += ')';
-    } else {
+     } else {
       mml += serialize.visitNode(firstChild, '');
     }
     mml += '/';
 
-    if (secondChild.kind === "mrow" && secondChild.childNodes.length > 1) {
+   if ((secondChild.kind === "mrow" && secondChild.childNodes.length > 1)|| serialize.options.extraBrackets) {
       mml += '(';
       mml += serialize.visitNode(secondChild, '');
       mml += ')';
@@ -371,14 +405,12 @@ const mi = () => {
 const mo = () => {
   return  (node, serialize) => {
     let mml = '';
-    const firstChild: any = node.childNodes[0];
-    const value = firstChild.text;
-
+    const value = getChilrenText(node);
     let abs = SymbolToAM(node.kind, value, getAttributes(node));
-    if (abs.length > 1 && regW.test(abs[0])) {
-      mml += needFirstSpase(node) ? ' ' : '';
+    if (abs.length > 1) {
+      mml += regW.test(abs[0]) && needFirstSpase(node) ? ' ' : '';
       mml += abs;
-      mml += needLastSpase(node) ? ' ' : '';
+      mml += regW.test(abs[abs.length-1]) && needLastSpase(node) ? ' ' : '';
     } else {
       mml += abs ;
     }

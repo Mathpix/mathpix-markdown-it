@@ -5,9 +5,10 @@ export declare const AMsymbols: ({
     tex: string;
     ttype: number;
     invisible?: undefined;
+    acc?: undefined;
+    stretchy?: undefined;
     func?: undefined;
     rewriteleftright?: undefined;
-    acc?: undefined;
     atname?: undefined;
     atval?: undefined;
     codes?: undefined;
@@ -18,9 +19,24 @@ export declare const AMsymbols: ({
     tex: any;
     ttype: number;
     invisible: boolean;
+    acc?: undefined;
+    stretchy?: undefined;
     func?: undefined;
     rewriteleftright?: undefined;
-    acc?: undefined;
+    atname?: undefined;
+    atval?: undefined;
+    codes?: undefined;
+} | {
+    input: string;
+    tag: string;
+    output: string;
+    tex: any;
+    ttype: number;
+    acc: boolean;
+    stretchy: boolean;
+    invisible?: undefined;
+    func?: undefined;
+    rewriteleftright?: undefined;
     atname?: undefined;
     atval?: undefined;
     codes?: undefined;
@@ -32,8 +48,9 @@ export declare const AMsymbols: ({
     ttype: number;
     func: boolean;
     invisible?: undefined;
-    rewriteleftright?: undefined;
     acc?: undefined;
+    stretchy?: undefined;
+    rewriteleftright?: undefined;
     atname?: undefined;
     atval?: undefined;
     codes?: undefined;
@@ -45,8 +62,9 @@ export declare const AMsymbols: ({
     ttype: number;
     rewriteleftright: string[];
     invisible?: undefined;
-    func?: undefined;
     acc?: undefined;
+    stretchy?: undefined;
+    func?: undefined;
     atname?: undefined;
     atval?: undefined;
     codes?: undefined;
@@ -58,6 +76,7 @@ export declare const AMsymbols: ({
     ttype: number;
     acc: boolean;
     invisible?: undefined;
+    stretchy?: undefined;
     func?: undefined;
     rewriteleftright?: undefined;
     atname?: undefined;
@@ -70,9 +89,10 @@ export declare const AMsymbols: ({
     output?: undefined;
     tex?: undefined;
     invisible?: undefined;
+    acc?: undefined;
+    stretchy?: undefined;
     func?: undefined;
     rewriteleftright?: undefined;
-    acc?: undefined;
     atname?: undefined;
     atval?: undefined;
     codes?: undefined;
@@ -85,9 +105,10 @@ export declare const AMsymbols: ({
     tex: any;
     ttype: number;
     invisible?: undefined;
+    acc?: undefined;
+    stretchy?: undefined;
     func?: undefined;
     rewriteleftright?: undefined;
-    acc?: undefined;
     codes?: undefined;
 } | {
     input: string;
@@ -99,7 +120,8 @@ export declare const AMsymbols: ({
     ttype: number;
     codes: string[];
     invisible?: undefined;
+    acc?: undefined;
+    stretchy?: undefined;
     func?: undefined;
     rewriteleftright?: undefined;
-    acc?: undefined;
 })[];

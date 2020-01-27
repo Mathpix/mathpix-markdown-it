@@ -67,33 +67,55 @@ const toAsciiML = ((node, optionAscii) => {
   return visitorA.visitTree(node)
 });
 
-
-const OuterHTML = (node, math, outMath) => {
+const OuterData = (node, math, outMath) => {
   const {include_mathml = false, include_asciimath = false, include_latex = true, include_svg = true,
-  optionAscii = {showStyle: false}} = outMath;
-
-  let outHTML = '';
+    optionAscii = {
+      showStyle: false,
+      extraBrackets: true
+    }} = outMath;
+  let res: {
+    mathml?: string,
+    asciimath?: string,
+    latex?: string,
+    svg?: string
+  } = {};
 
   if (include_mathml) {
-    outHTML +=  '<mathml style="display: none">' + toMathML(math.root) + '</mathml>';
+    res.mathml = toMathML(math.root);
   }
   if (include_asciimath) {
-    if (!outHTML) { outHTML += '\n'}
-    const asciimml = toAsciiML(math.root, optionAscii);
-    outHTML +=  '<asciimath style="display: none;">' + asciimml + '</asciimath>';
+    res.asciimath = toAsciiML(math.root, optionAscii);
   }
-
   if (include_latex) {
-    if (!outHTML) { outHTML += '\n'}
-    const original = (math.math
+    res.latex = (math.math
       ? math.math
       : math.inputJax.processStrings ? '' : math.start.node.outerHTML);
-    outHTML += '<latex style="display: none">' + original + '</latex>';
+  }
+  if (include_svg) {
+    res.svg = adaptor.outerHTML(node)
+  }
+  return res;
+};
+
+const OuterHTML = (data) => {
+  let outHTML = '';
+
+  if (data.mathml) {
+    outHTML +=  '<mathml style="display: none">' + data.mathml + '</mathml>';
+  }
+  if (data.asciimath) {
+    if (!outHTML) { outHTML += '\n'}
+    outHTML +=  '<asciimath style="display: none;">' + data.asciimath + '</asciimath>';
   }
 
-  if (include_svg) {
+  if (data.latex) {
     if (!outHTML) { outHTML += '\n'}
-    outHTML += adaptor.outerHTML(node)
+    outHTML += '<latex style="display: none">' + data.latex + '</latex>';
+  }
+
+  if (data.svg) {
+    if (!outHTML) { outHTML += '\n'}
+    outHTML += data.svg;
   }
 
   return outHTML;
@@ -105,6 +127,13 @@ export const MathJax = {
   //
   Stylesheet: function () {
     return svg.styleSheet(docTeX);
+  },
+  TexConvert: function(string, options: any={}) {
+    const {display = true, metric = {}, outMath = {}} = options;
+    const {em = 16, ex = 8, cwidth = 1200, lwidth = 100000, scale = 1} = metric;
+    const node = docTeX.convert(string, {display: display, em: em, ex: ex, containerWidth: cwidth, lineWidth: lwidth, scale: scale});
+    const outputJax = docTeX.outputJax as any;
+    return OuterData(node, outputJax.math, outMath);
   },
   /**
    * Typeset a TeX expression and return the SVG tree for it
@@ -120,11 +149,7 @@ export const MathJax = {
    * }
    */
   Typeset: function(string, options: any={}) {
-    const {display = true, metric = {}, outMath = {}} = options;
-    const {em = 16, ex = 8, cwidth = 1200, lwidth = 100000, scale = 1} = metric;
-    const node = docTeX.convert(string, {display: display, em: em, ex: ex, containerWidth: cwidth, lineWidth: lwidth, scale: scale});
-    const outputJax = docTeX.outputJax as any;
-    return OuterHTML(node, outputJax.math, outMath);
+    return OuterHTML(this.TexConvert(string, options));
   },
 
   /**
