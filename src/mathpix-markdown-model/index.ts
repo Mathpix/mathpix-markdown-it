@@ -36,7 +36,7 @@ export type TMarkdownItOptions = {
 }
 
 class MathpixMarkdown_Model {
-    public disableFancyArrayDef = ['replacements', 'list', 'usepackage', 'separateForBlock', 'toc'];
+    public disableFancyArrayDef = ['replacements', 'list', 'usepackage', 'toc'];
     public disableRules: string[];
     public isCheckFormula?: boolean;
     public showTimeLog?: boolean;
