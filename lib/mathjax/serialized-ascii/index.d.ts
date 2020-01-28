@@ -14,4 +14,5 @@ export declare class SerializedAsciiVisitor extends MmlVisitor {
     visitDefault(node: MmlNode, space: string): string;
     protected childNodeMml(node: MmlNode, space: string, nl: string): string;
     protected getAttributes(node: MmlNode): import("mathjax-full/js/core/Tree/Node").PropertyList;
+    protected getAttributesDefaults(node: MmlNode): import("mathjax-full/js/core/Tree/Node").PropertyList;
 }

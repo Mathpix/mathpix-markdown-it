@@ -6,6 +6,7 @@ import 'mathjax-full/js/input/tex/newcommand/NewcommandConfiguration.js';
 import 'mathjax-full/js/input/tex/unicode/UnicodeConfiguration.js';
 import "mathjax-full/js/input/tex/color/ColorConfiguration.js";
 import "mathjax-full/js/input/tex/mhchem/MhchemConfiguration.js";
+import "mathjax-full/js/input/tex/enclose/EncloseConfiguration";
 export declare const MathJax: {
     Stylesheet: () => unknown;
     TexConvert: (string: any, options?: any) => {

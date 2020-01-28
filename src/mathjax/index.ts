@@ -15,6 +15,7 @@ import 'mathjax-full/js/input/tex/newcommand/NewcommandConfiguration.js';
 import 'mathjax-full/js/input/tex/unicode/UnicodeConfiguration.js';
 import "mathjax-full/js/input/tex/color/ColorConfiguration.js";
 import "mathjax-full/js/input/tex/mhchem/MhchemConfiguration.js";
+import "mathjax-full/js/input/tex/enclose/EncloseConfiguration";
 import MathJaxConfig from './mathJaxConfig';
 
 require("./my-BaseMappings");
@@ -79,7 +80,6 @@ const OuterData = (node, math, outMath) => {
     latex?: string,
     svg?: string
   } = {};
-
   if (include_mathml) {
     res.mathml = toMathML(math.root);
   }
@@ -107,7 +107,6 @@ const OuterHTML = (data) => {
     if (!outHTML) { outHTML += '\n'}
     outHTML +=  '<asciimath style="display: none;">' + data.asciimath + '</asciimath>';
   }
-
   if (data.latex) {
     if (!outHTML) { outHTML += '\n'}
     outHTML += '<latex style="display: none">' + data.latex + '</latex>';

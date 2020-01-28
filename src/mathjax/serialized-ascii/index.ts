@@ -76,6 +76,40 @@ export class SerializedAsciiVisitor extends MmlVisitor {
 
   public visitInferredMrowNode(node: MmlNode, space: string) {
     let mml = [];
+    const iclose: number = node.childNodes.findIndex(child => child.kind === 'menclose');
+    if (iclose > -1) {
+      const mclose: any = node.childNodes[iclose];
+      const atr = this.getAttributes(mclose);
+      const atrDef = this.getAttributesDefaults(mclose);
+      let longdiv = '';
+      if ((!atr.notation && atrDef.notation === "longdiv") || atr.notation.toString().indexOf("longdiv") !== -1) {
+        if (iclose === 0) {
+          longdiv += '(()/(';
+          longdiv += this.visitNode(mclose, '');
+          longdiv += '))';
+        } else {
+          if (iclose-1 > 0) {
+            for (let i = 0; i < iclose-1; i++) {
+              longdiv += this.visitNode(node.childNodes[i], space);
+            }
+          }
+          longdiv += '((';
+          const firstChild = node.childNodes[iclose-1];
+          longdiv += this.visitNode(firstChild, '');
+          longdiv += ')/(';
+          longdiv += this.visitNode(mclose, '');
+          longdiv += '))';
+
+          if (iclose < node.childNodes.length-1) {
+            for (let i = iclose+1; i < node.childNodes.length; i++) {
+              longdiv += this.visitNode(node.childNodes[i], space);
+            }
+          }
+        }
+        mml.push(longdiv);
+        return mml.join('');
+      }
+    }
 
     const addParens = this.needsGrouping(node);
     const group = addParens ? this.needsGroupingStyle(node) : null;
@@ -129,5 +163,8 @@ export class SerializedAsciiVisitor extends MmlVisitor {
 
   protected getAttributes(node: MmlNode) {
     return node.attributes.getAllAttributes();
+  }
+  protected getAttributesDefaults(node: MmlNode) {
+    return node.attributes.getAllDefaults();
   }
 }

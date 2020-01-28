@@ -54,11 +54,11 @@ const needLastSpase = (node) => {
 };
 
 
-export const SymbolToAM = (tag: string, output: string, atr = null) => {
+export const SymbolToAM = (tag: string, output: string, atr = null, showStyle = false) => {
   let tags = null;
   const atrsNames = atr ? Object.getOwnPropertyNames(atr) : [];
   output = tag !== 'mtext' ? output.split(' ').join('') : output;
-  if (atr && atrsNames.length > 0) {
+  if (showStyle && atr && atrsNames.length > 0) {
     for (let [atname, atval] of Object.entries(atr)) {
       tags = AMsymbols.find(item => (item.tag === "mstyle" && item.atname === atname && item.atval === atval));
       if (tags ) {
@@ -129,15 +129,10 @@ const menclose = (handlerApi) => {
       isRight = atr.notation.toString().indexOf('right') > -1;
       isBottom = atr.notation.toString().indexOf('bottom') > -1;
     }
-    const parent: any = node.parent;
-    const isParenrLeft = (parent.properties && (parent.properties.open === '{' || parent.properties.open === '(' || parent.properties.open === '['));
-    const isParenrRight = (parent.properties && (parent.properties.close === '}' || parent.properties.close === ')' || parent.properties.close === ']'));
-
-    mml += isLeft ? '[' : isParenrLeft ? '' :'{:';
+    mml += isLeft ? '[' : '';
     mml += handlerApi.handleAll(node, serialize);
     mml += isBottom ? ',[hline]' : '';
-    mml += isRight ? ']' : isParenrRight ? '' : ':}';
-
+    mml += isRight ? ']' : '';
     return mml;
   };
 };
@@ -145,23 +140,10 @@ const menclose = (handlerApi) => {
 const mtable = () => {
   return  (node, serialize) => {
     let mml = '';
-    const parent: any = node.parent;
-    //const atr = this.getAttributes(node);
-    let isLeft = (node.parent.parent.kind !== 'menclose')
-      ?(parent.properties && (parent.properties.open === '{' || parent.properties.open === '(' || parent.properties.open === '['))
-      :true;
-    let isRight = (node.parent.parent.kind !== 'menclose')
-      ?(parent.properties && (parent.properties.close === '}' || parent.properties.close === ')' || parent.properties.close === ']'))
-      :true;
-
-    mml += isLeft ? '' : '{:';
-
     for (let i = 0; i < node.childNodes.length; i++) {
       if (i>0) {mml += ','}
       mml += serialize.visitNode(node.childNodes[i], '');
     }
-
-    mml += isRight ? '' : ':}';
     return mml;
   }
 };
@@ -169,14 +151,12 @@ const mtable = () => {
 const mtr = () => {
   return  (node, serialize) => {
     let mml = '';
-    mml += node.parent.childNodes.length > 1 ? '[' : '';
-    //mml += '[' ;
+    mml += node.parent.childNodes.length > 1 || serialize.options.extraBrackets ? '[' : '';
     for (let i = 0; i < node.childNodes.length; i++) {
       if (i>0) {mml += ','}
       mml += serialize.visitNode(node.childNodes[i], '');
     }
-    mml += node.parent.childNodes.length > 1 ? ']' : '';
-    //mml +=  ']';
+    mml += node.parent.childNodes.length > 1 || serialize.options.extraBrackets  ? ']' : '';
     return mml;
   }
 };
@@ -406,7 +386,12 @@ const mo = () => {
   return  (node, serialize) => {
     let mml = '';
     const value = getChilrenText(node);
-    let abs = SymbolToAM(node.kind, value, getAttributes(node));
+    const atr = getAttributes(node);
+    if (atr && atr.hasOwnProperty('fence') && atr.fence) {
+      mml += node.texClass === 4 ? '{:' : '';
+      mml += node.texClass === 5 ? ':}' : '';
+    }
+    let abs = SymbolToAM(node.kind, value, atr, serialize.options.showStyle);
     if (abs.length > 1) {
       mml += regW.test(abs[0]) && needFirstSpase(node) ? ' ' : '';
       mml += abs;
@@ -457,6 +442,7 @@ const handlerApi = {
 const handlers = {
   mi:     mi(),
   mo:     mo(),
+  mn:     mo(),
   mfrac:  mfrac(),
   msup:   msup(),
   msub:   msub(),
