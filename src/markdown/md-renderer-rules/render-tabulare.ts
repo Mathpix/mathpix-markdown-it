@@ -66,6 +66,17 @@ const renderInlineTokenBlock = (tokens, options, renderer) =>{
 };
 
 export const renderTabulare = (a, token, options, renderer) => {
+  const {include_tsv = true} = options.outMath;
   const tabulare = renderInlineTokenBlock(token.children, options, renderer);
-  return `<div class="inline-tabulare">${tabulare}</div>`
+  const tsv = include_tsv && token.tsv
+    ? `<tsv style="display: none">${token.tsv}</tsv>`
+    : '';
+  return `<div class="inline-tabulare">${tabulare}${tsv}</div>`
+};
+
+export const renderTSV = (a, token, options) => {
+  const {include_tsv = true} = options.outMath;
+  return include_tsv
+    ? `<tsv style="display: none">${token.content}</tsv>`
+    : '' ;
 };

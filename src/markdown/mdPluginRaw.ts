@@ -1,6 +1,6 @@
 import { MathJax } from "../mathjax/";
 import { inlineTabular } from "./md-inline-rule/tabulare";
-import { renderTabulare } from './md-renderer-rules/render-tabulare';
+import { renderTabulare, renderTSV } from './md-renderer-rules/render-tabulare';
 
 let mathNumber = [];
 
@@ -744,6 +744,7 @@ const mapping = {
   reference_note: "Reference_note",
   reference_note_block: "Reference_note block",
   tabulare: "Tabulare",
+  tsv: "TSV",
   usepackage_geometry: "Usepackage_geometry",
   display_mathML: "DisplayMathML",
   inline_mathML: "InlineMathML"
@@ -777,6 +778,8 @@ export default options => {
         switch (tokens[idx].type) {
           case "tabulare":
             return renderTabulare(tokens, tokens[idx], options, md.renderer);
+          case "tsv":
+            return renderTSV(tokens, tokens[idx], options);
           case "reference_note":
             return renderReference(tokens[idx]);
           case "reference_note_block":
