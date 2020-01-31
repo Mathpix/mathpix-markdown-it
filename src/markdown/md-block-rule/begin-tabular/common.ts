@@ -1,3 +1,5 @@
+import {separateByColumns} from "./parse-tabular";
+
 export type TParselines = {cLines: Array<Array<string>>, cSpaces: Array<Array<string>>}
 const lineSpaceTag: RegExp = /\[(.*?)\]\s{0,}\\hline|\[(.*?)\]\s{0,}\\hhline|\[(.*?)\]\s{0,}\\hdashline|\[(.*?)\]\s{0,}\\cline\s{0,}\{([^}]*)\}|\\hline|\\hhline|\\hdashline|\\cline\s{0,}\{([^}]*)\}|^\[(.*?)\]/g;
 
@@ -191,7 +193,7 @@ export const getDecimal = (cAlign: Array<string>, cellsAll: Array<string>): Arra
       decimal[index] = {l: 0, r: 0}
     }});
   cellsAll.map ((item, i) => {
-    let cells = cellsAll[i].split('&');
+    let cells = separateByColumns(cellsAll[i]);
     cells.map((cell, j) => {
       if (decimal[j]) {
         let content = getContent(cell);
