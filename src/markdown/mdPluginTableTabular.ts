@@ -16,7 +16,8 @@ export default (md: MarkdownIt, options) => {
   ClearSubTableLists();
   ClearSubMathLists();
   ClearParseError();
-  md.block.ruler.after("fence","BeginTabular", BeginTabular);
+  Object.assign(md.options, options);
+  md.block.ruler.after("fence","BeginTabular", BeginTabular, options);
   md.block.ruler.before("BeginTabular", "BeginAlign", BeginAlign);
   md.block.ruler.before("BeginAlign", "BeginTable", BeginTable);
   md.inline.ruler.before("escape", "InlineIncludeGraphics", InlineIncludeGraphics);

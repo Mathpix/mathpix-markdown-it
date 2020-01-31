@@ -1,4 +1,4 @@
-import { TTokenTabular } from "./index";
+import { TTokenTabular, tsvPush } from "./index";
 import {addHLineIntoStyle, AddTd, AddTdSubTable } from "./tabular-td";
 import {getContent, getRowLines,getCellsAll, getDecimal, TDecimal,
   TAlignData, getVerticallyColumnAlign, getParams, getColumnLines
@@ -28,6 +28,7 @@ const getRows = (str: string): string[] => {
 const setTokensTabular = (str: string, align: string = ''): Array<TTokenTabular>|null => {
   let res: Array<TTokenTabular> = [];
   const rows: string[] = getRows(str);
+  let tsv_row = [];
 
   let cellsAll: string[] = getCellsAll(rows);
   const numCol: number = getNumCol(cellsAll);
@@ -46,16 +47,19 @@ const setTokensTabular = (str: string, align: string = ''): Array<TTokenTabular>
   let MR: Array<number> = new Array(numCol).fill(0);
 
   for (let i = 0; i < rows.length; i++) {
+    tsv_row = new Array(numCol).fill('');
     if (!cellsAll[i] || cellsAll[i].length === 0) {
       if (i < cellsAll.length-1) {
         res.push({token:'tr_open', tag: 'tr', n: 1, attrs: [[ 'style', 'border-top: none !important; border-bottom: none !important;' ]]});
         for (let k = 0; k < numCol; k++) {
           let cRight = k === numCol-1 ?  cLines[cLines.length-1] :cLines[k+1];
           let cLeft = k === 0 ? cLines[0] : '';
-          res = res.concat(AddTd('', {h: cAlign[k], v: vAlign[k], w: cWidth[k]},
+          const data = AddTd('', {h: cAlign[k], v: vAlign[k], w: cWidth[k]},
             {left: cLeft, right: cRight, bottom: CellsHLines[i+1][k], top: i === 0 ? CellsHLines[i][k]: ''},
             CellsHLSpaces[i+1][k]
-          ));
+          );
+          tsv_row[k] = data.content;
+          res = res.concat(data.res);
         }
         res.push({token:'tr_close', tag: 'tr', n: -1});
       }
@@ -74,10 +78,12 @@ const setTokensTabular = (str: string, align: string = ''): Array<TTokenTabular>
         for (let k = ic; k < numCol; k++) {
           let cRight = k === numCol-1 ?  cLines[cLines.length-1] :cLines[k+1];
           let cLeft = k === 0 ? cLines[0] : '';
-          res = res.concat(AddTd('', {h: cAlign[k], v: vAlign[k], w: cWidth[k]},
+          const data = AddTd('', {h: cAlign[k], v: vAlign[k], w: cWidth[k]},
             {left: cLeft, right: cRight, bottom: CellsHLines[i+1][k], top: i === 0 ? CellsHLines[i][k]: ''},
             CellsHLSpaces[i+1][k]
-            ));
+          );
+          tsv_row[k] = data.content;
+          res = res.concat(data.res);
         }
         break;
       }
@@ -137,7 +143,8 @@ const setTokensTabular = (str: string, align: string = ''): Array<TTokenTabular>
             res = res.concat(multi.subTable);
           } else {
             if (multi.content) {
-              res.push({token:'inline', tag: '', n: 0, content: multi.content})
+              res.push({token:'inline', tag: '', n: 0, content: multi.content});
+              tsv_row[j] = multi.content;
             }
           }
 
@@ -158,6 +165,9 @@ const setTokensTabular = (str: string, align: string = ''): Array<TTokenTabular>
             {h: cAlign[ic], v: vAlign[ic], w: cWidth[ic]},
              {left: cLeft, right: cRight, bottom: CellsHLines[i+1][ic], top: i === 0 ? CellsHLines[i][ic] : ''}
             ));
+          for (let si=0; si< parseSub.length; si++) {
+            tsv_row[j] += parseSub[si].id;
+          }
           continue;
         }
 
@@ -168,24 +178,29 @@ const setTokensTabular = (str: string, align: string = ''): Array<TTokenTabular>
         } else {
           content = getContent(cells[j])
         }
-        res = res.concat(AddTd(content,
+        const data = AddTd(content,
           {h: cAlign[ic], v: vAlign[ic], w: cWidth[ic]},
            {left: cLeft, right: cRight, bottom: CellsHLines[i+1][ic], top: i === 0 ? CellsHLines[i][ic]: ''},
             CellsHLSpaces[i+1][ic], decimal[ic]
-          ));
+          );
+        tsv_row[ic] = data.content;
+        res = res.concat(data.res);
       } else {
         MR[ic] = MR[ic] > 0 ? MR[ic] - 1 : 0;
         if (MR[ic] && MR[ic] > 0) {
           continue
         }
-        res = res.concat(AddTd('',
+        const data = AddTd('',
           {h: cAlign[ic], v: vAlign[ic], w: cWidth[ic]},
            {left: cLeft, right: cRight, bottom: CellsHLines[i+1][ic], top: i === 0 ? CellsHLines[i][ic]: ''},
             CellsHLSpaces[i+1][ic]
-          ));
+          );
+        tsv_row[ic] = data.content;
+        res = res.concat(data.res);
       }
 
     }
+    tsvPush(tsv_row);
     res.push({token:'tr_close', tag: 'tr', n: -1});
   }
   res.push({token:'tbody_close', tag: 'tbody', n: -1});

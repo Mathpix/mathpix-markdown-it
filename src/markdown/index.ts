@@ -20,7 +20,7 @@ const mdInit = (options: TMarkdownItOptions) => {
     typographer: typographer,
     quotes: "“”‘’"
   })
-    .use(tableTabularPlugin, {width: width})
+    .use(tableTabularPlugin, {width: width, outMath: outMath})
  //   .use(separateForBlockPlugin)
     .use(ConfiguredMathJaxPlugin({width: width, outMath: outMath}))
     .use(CustomTagPlugin())

@@ -13,7 +13,7 @@ const closeTagG: RegExp = /(?:\\end\s{0,}{tabular})/g;
 type TTypeContent = {type?: string, content?: string, align?: string}
 type TTypeContentList = Array<TTypeContent>;
 export type TAttrs = string[];
-export type TTokenTabular = {token: string, tag: string, n: number, content?: string, attrs?: Array<TAttrs>, children?: Token};
+export type TTokenTabular = {token: string, tag: string, n: number, content?: string, attrs?: Array<TAttrs>, children?: Token, id?: string};
 export type TMulti = {mr?: number, mc?: number, attrs: Array<TAttrs>, content?: string, subTable?: Array<TTokenTabular>}
 
 const addContentToList = (str: string): TTypeContentList => {
@@ -124,8 +124,18 @@ const StatePushParagraphClose = (state) => {
   state.push('paragraph_close', 'div', -1);
 };
 
+var inner_tsv = [];
+export const tsvPush = (item) => {
+  inner_tsv.push(item);
+};
+
+export const getTsv = () => {
+  return inner_tsv
+};
+
 export const StatePushTabulars = (state, cTabular: TTypeContentList, align: string) => {
   let token: Token;
+  let res_tsv = [];
   for (let i = 0; i < cTabular.length; i++) {
     if (cTabular[i].type === 'inline') {
       if (!StatePushIncludeGraphics(state, -1, -1, cTabular[i].content, align)) {
@@ -135,7 +145,9 @@ export const StatePushTabulars = (state, cTabular: TTypeContentList, align: stri
       }
       continue;
     }
+    inner_tsv = [];
     const res: Array<TTokenTabular> | null = ParseTabular(cTabular[i].content, 0, cTabular[i].align);
+    let tsv = [].concat(inner_tsv);
     if (!res || res.length === 0) {
       continue;
     }
@@ -146,15 +158,34 @@ export const StatePushTabulars = (state, cTabular: TTypeContentList, align: stri
       }
       if (res[j].token === 'inline') {
         if (res[j].content) {
-          token.content  = res[j].content;
-          token.children = [];
+          let children = [];
+          inner_tsv = [];
+          state.md.inline.parse(res[j].content, state.md, state.env, children);
+          if (children.length > 0) {
+            token.content  = '';
+            token.children = children;
+          } else {
+            token.content  = res[j].content;
+            token.children = [];
+          }
+          if (res[j].id && inner_tsv.length > 0) {
+            tsv.map(item => {
+              let i = item.indexOf(res[j].id);
+              if (i !== -1 ) {
+                item[i] = inner_tsv;
+              }
+            })
+          }
         }
       } else {
         token.content  = res[j].content;
         token.children = [];
       }
     }
+    res_tsv.push(tsv);
+    tsv = [];
   }
+  StatePushTSVTable(state, res_tsv);
 };
 
 
@@ -167,6 +198,29 @@ export const StatePushDiv = (state, startLine: number, nextLine: number, content
   token.children = [];
   token.content = content;
   state.push('paragraph_close', 'div', -1);
+};
+
+export const TsvJoin = (tsv, options): string => {
+  const {tsv_separators = {}} = options.outMath;
+  const {column = '\t', row = '\n'} = tsv_separators;
+  if (!tsv || tsv.length === 0 ) {
+    return ''
+  }
+  return tsv.map(row => row.join(column)).join(row)
+};
+
+const StatePushTSVTable = (state, tsvList) => {
+  if (!tsvList || tsvList.length === 0 ) {
+    return
+  }
+  for (let i = 0; i < tsvList.length; i++) {
+    const tsv = tsvList[i];
+    const content = TsvJoin(tsv, state.md.options);
+
+    let token: Token;
+    token = state.push('tsv', '', 0);
+    token.content = content;
+  }
 };
 
 export const StatePushTabularBlock = (state, startLine: number, nextLine: number, content: string, align: string): boolean => {

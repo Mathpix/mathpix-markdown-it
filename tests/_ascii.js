@@ -13,7 +13,7 @@ const options = {outMath: {
 
 describe('Latex to ascii:', () => {
   describe('Testing same data:', () => {
-    const tests = require('./_data/_asciiData');
+    const tests = require('./_data/_ascii/_asciiData');
     tests.forEach(function(test) {
       it('Latex =>' + test.latex, function(done) {
         const data = MathJax.TexConvert(test.latex, options);
@@ -27,7 +27,7 @@ describe('Latex to ascii:', () => {
   });
 
   describe('Testing longDiv:', () => {
-    const tests = require('./_data/_asciiLongDiv');
+    const tests = require('./_data/_ascii/_asciiLongDiv');
     tests.forEach(function(test) {
       it('Latex =>' + test.latex, function(done) {
         const data = MathJax.TexConvert(test.latex, options);
@@ -41,7 +41,7 @@ describe('Latex to ascii:', () => {
   });
 
   describe('Testing Times:', () => {
-    const tests = require('./_data/_asciiTimes');
+    const tests = require('./_data/_ascii/_asciiTimes');
     tests.forEach(function(test) {
       it('Latex =>' + test.latex, function(done) {
         const data = MathJax.TexConvert(test.latex, options);
@@ -55,7 +55,7 @@ describe('Latex to ascii:', () => {
   });
 
   describe('Testing Space:', () => {
-    const tests = require('./_data/_asciiSpace');
+    const tests = require('./_data/_ascii/_asciiSpace');
     tests.forEach(function(test) {
       it('Latex =>' + test.latex, function(done) {
         const data = MathJax.TexConvert(test.latex, options);

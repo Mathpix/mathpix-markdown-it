@@ -33,6 +33,11 @@ export declare type TOutputMath = {
     include_asciimath?: boolean;
     include_latex?: boolean;
     include_svg?: boolean;
+    include_tsv?: boolean;
+    tsv_separators?: {
+        column?: string;
+        row?: string;
+    };
 };
 declare class MathpixMarkdown_Model {
     disableFancyArrayDef: string[];
@@ -43,6 +48,8 @@ declare class MathpixMarkdown_Model {
     checkFormula: (mathString: string, showTimeLog?: boolean) => string;
     texReset: (n?: number) => void;
     getLastEquationNumber: () => any;
+    parseMarkdownByHTML: (html: string, include_sub_math?: boolean) => any[];
+    parseMarkdownByElement: (el: HTMLElement | Document, include_sub_math?: boolean) => any[];
     markdownToHTML: (markdown: string, options: TMarkdownItOptions) => string;
     showTocInContainer: (html: string, containerName?: string) => void;
     getTocContainerHTML: (html: string) => string;

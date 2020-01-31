@@ -80,7 +80,7 @@ export const addHLineIntoStyle = (attrs: any[], line: string = '', pos: string =
   return addStyle(attrs, style);
 };
 
-export const AddTd = (content: string, aligns: TAligns| null, lines: TLines, space: string, decimal: TDecimal|null = null): Array<TTokenTabular> => {
+export const AddTd = (content: string, aligns: TAligns| null, lines: TLines, space: string, decimal: TDecimal|null = null): {res: Array<TTokenTabular>, content: string} => {
   let res: Array<TTokenTabular> = [];
   const attrs: Array<TAttrs> = [];
   const slyleLines = setColumnLines(aligns, lines);
@@ -110,7 +110,7 @@ export const AddTd = (content: string, aligns: TAligns| null, lines: TLines, spa
     }
   }
   res.push({token:'td_close', tag: 'td', n: -1});
-  return res;
+  return {res: res, content: content};
 };
 
 export const AddTdSubTable = (subTable: Array<TTokenTabular>, aligns: TAligns, lines: TLines): Array<TTokenTabular> => {

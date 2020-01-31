@@ -115,6 +115,8 @@ You can also use certain functions to get styles and rendering in html:
 | `include_asciimath` | boolean&nbsp;*`false`*       | should outputs asciimath `<asciimath style="display: none">...</asciimath>`                                        |
 | `include_latex`     | boolean&nbsp;*`true`*        | should outputs latex `<latex style="display: none">...</latex>`                                                    |
 | `include_svg`       | boolean&nbsp;*`true`*        | should outputs svg `<mjx-container class="MathJax" jax="SVG"><svg>...</svg></mjx-container>`                       |
+| `include_tsv`       | boolean&nbsp;*`false`*       | should outputs tsv `<tsv style="display: none">...</tsv>`                                                          |
+| `tsv_separators`    | `{column: '\t', row: '\n'}`  | Separators for tsv tables                                                                                          |
  
 
 ### Sample for node
