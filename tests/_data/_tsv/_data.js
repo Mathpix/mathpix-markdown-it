@@ -349,5 +349,16 @@ module.exports = [
       'Table \\ref{table:4} is an example.',
     tsv:  "alms's\teconomizes\t\t\t\trecondition\tbailing\tasymptotically\n" +
       'fiddle\tkitchenettes\t\t\t\t\tmisstates\t',
+  },
+  {
+    latex: '\\begin{tabular}{|c|c|}\\hline Feature & Component \\\\ \\hline \\hline Power lock & Door lock manager \\& Power lock \\\\ Door lock & Auto lock \\\\ Door relock & Auto lock \\\\ f_Automatic & c_Automatic \\\\ f_Manual & c_Manual \\\\ Shift out of Park & Gear in Park \\\\ f_Speed & c_Speed \\\\ \\hline\\end{tabular}',
+    tsv:   'Feature\tComponent\n' +
+      'Power lock\tDoor lock manager \\&amp; Power lock\n' +
+      'Door lock\tAuto lock\n' +
+      'Door relock\tAuto lock\n' +
+      'f_Automatic\tc_Automatic\n' +
+      'f_Manual\tc_Manual\n' +
+      'Shift out of Park\tGear in Park\n' +
+      'f_Speed\tc_Speed',
   }
 ];
