@@ -70,7 +70,13 @@ export const SymbolToAM = (tag: string, output: string, atr = null, showStyle = 
     }
   }
   if (!tags) {
-    tags = AMsymbols.find(item => (item.tag === tag && item.output === output));
+    tags = AMsymbols.find(item => {
+      if (tag === 'mo' || tag === 'mi') {
+        return (item.tag === 'mo' || item.tag === 'mi') && item.output === output
+      } else {
+        return item.tag === tag && item.output === output
+      }
+    });
   }
 
   //need split
@@ -78,7 +84,13 @@ export const SymbolToAM = (tag: string, output: string, atr = null, showStyle = 
     const sp = output.split('');
     let res = ''
     for (let i = 0; i < sp.length; i++) {
-      let tags = AMsymbols.find(item => (item.tag === tag && item.output === sp[i]));
+      let tags = AMsymbols.find(item => {
+        if (tag === 'mo' || tag === 'mi') {
+          return (item.tag === 'mo' || item.tag === 'mi') && item.output === sp[i]
+        } else {
+          return item.tag === tag && item.output === sp[i]
+        }
+      });
       res += i > 0 ? ' ' : '';
       res += tags && tags.input ? tags.input : sp[i];
     }
@@ -93,10 +105,23 @@ export const FindSymbolToAM = (tag: string, output: string, atr = null): string 
   output = output.split(' ').join('');
   let tags = null;
   if (atr && atr.stretchy) {
-    tags = AMsymbols.find(item => (item.tag === tag && item.output === output && item.stretchy));
+    tags = AMsymbols.find(item => {
+      if (tag === 'mo' || tag === 'mi') {
+        return (item.tag === 'mo' || item.tag === 'mi') && item.output === output && item.stretchy
+      } else {
+        return item.tag === tag && item.output === output && item.stretchy
+      }
+    });
   }
   if (!tags) {
-    tags = AMsymbols.find(item => (item.tag === tag && item.output === output));
+    tags = AMsymbols.find(item =>
+    {
+      if (tag === 'mo' || tag === 'mi') {
+        return (item.tag === 'mo' || item.tag === 'mi') && item.output === output
+      } else {
+        return item.tag === tag && item.output === output
+      }
+    });
   }
   return tags ? tags.input : '';
 };
