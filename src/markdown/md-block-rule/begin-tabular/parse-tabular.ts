@@ -7,10 +7,31 @@ import { getMathTableContent, getSubMath } from './sub-math';
 import { getSubTabular, pushSubTabular } from './sub-tabular';
 import { getMultiColumnMultiRow, getCurrentMC, getMC } from './multi-column-row';
 
+export const separateByColumns = (str: string) => {
+  const columns = [];
+  let index = 0;
+
+  for (let i = 0; i < str.length; i++) {
+    let pos = str.indexOf('&', i);
+    if (pos === -1) {
+      columns.push(str.slice(index));
+      break
+    }
+    if (pos > 0 && str.charCodeAt(pos-1) === 92) {
+      i = pos;
+      continue;
+    }
+    columns.push(str.slice(index, pos));
+    index = pos + 1;
+    i = pos;
+  }
+  return columns;
+};
+
 const getNumCol = (cells: string[]): number => {
   let res: number = 0;
   for (let i = 0; i < cells.length; i++) {
-    const columns = cells[i].split('&');
+    const columns = separateByColumns(cells[i]);
     let col: number = columns.length;
     for(let j=0; j < columns.length; j++) {
       col += getMC(columns[j])
@@ -63,7 +84,7 @@ const setTokensTabular = (str: string, align: string = ''): Array<TTokenTabular>
     }
     res.push({token:'tr_open', tag: 'tr', n: 1, attrs: [[ 'style', 'border-top: none !important; border-bottom: none !important;' ]]});
 
-    let cells = cellsAll[i].split('&');
+    let cells = separateByColumns(cellsAll[i]);
     for (let j = 0; j < numCol; j++) {
       const ic: number = getCurrentMC(cells, j);
 
