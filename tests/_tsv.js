@@ -29,7 +29,7 @@ describe('TSV:', () => {
     tests.forEach(function(test) {
       it('Latex =>' + test.latex, function(done) {
         const html = MM.render(test.latex, options);
-        const data = MM.parcerMarkdownHTML(html, false);
+        const data = MM.parseMarkdownByHTML(html, false);
         data.should.have.length(2);
         data[0].should.have.property('type', 'html');
         data[1].should.have.property('type', 'tsv');
@@ -52,7 +52,7 @@ describe('TSV:', () => {
             include_svg: false,
             include_tsv: false
           }});
-        const data = MM.parcerMarkdownHTML(html);
+        const data = MM.parseMarkdownByHTML(html);
         data.should.have.length(1);
         data[0].should.have.property('type', 'html');
         done();
@@ -66,7 +66,7 @@ describe('TSV:', () => {
           include_svg: false,
           include_tsv: false
         }});
-      const data = MM.parcerMarkdownHTML(html);
+      const data = MM.parseMarkdownByHTML(html);
       data.findIndex(item => item.type === 'tsv').should.equal(-1);
       done();
     });
@@ -79,7 +79,7 @@ describe('TSV:', () => {
           include_svg: false,
           include_tsv: false
         }});
-      const data = MM.parcerMarkdownHTML(html);
+      const data = MM.parseMarkdownByHTML(html);
       data.findIndex(item => item.type === 'tsv').should.equal(-1);
       done();
     });
@@ -92,7 +92,7 @@ describe('TSV:', () => {
           include_svg: true,
           include_tsv: true
         }});
-      const data = MM.parcerMarkdownHTML(html, false);
+      const data = MM.parseMarkdownByHTML(html, false);
       data.findIndex(item => item.type === 'asciimath').should.equal(-1);
       data.findIndex(item => item.type === 'mathm').should.equal(-1);
       data.findIndex(item => item.type === 'latex').should.equal(-1);
@@ -111,7 +111,7 @@ describe('TSV:', () => {
           include_svg: true,
           include_tsv: true
         }});
-      const data = MM.parcerMarkdownHTML(html);
+      const data = MM.parseMarkdownByHTML(html);
       data.should.have.length(22);
       data[0].should.have.property('type', 'html');
       data[1].should.have.property('type', 'tsv');
@@ -130,7 +130,7 @@ describe('TSV:', () => {
           include_svg: true,
           include_tsv: true
         }});
-      const data = MM.parcerMarkdownHTML(html, false);
+      const data = MM.parseMarkdownByHTML(html, false);
       data.findIndex(item => item.type === 'asciimath').should.equal(-1);
       data.findIndex(item => item.type === 'mathm').should.equal(-1);
       data.findIndex(item => item.type === 'latex').should.equal(-1);
@@ -149,7 +149,7 @@ describe('TSV:', () => {
           include_svg: true,
           include_tsv: true
         }});
-      const data = MM.parcerMarkdownHTML(html);
+      const data = MM.parseMarkdownByHTML(html);
       data.should.have.length(28);
       data[0].should.have.property('type', 'html');
       data[1].should.have.property('type', 'tsv');

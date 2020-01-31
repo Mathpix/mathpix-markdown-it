@@ -42,7 +42,11 @@ export type TOutputMath = {
   include_asciimath?: boolean,
   include_latex?: boolean,
   include_svg?: boolean,
-  include_tsv?: boolean
+  include_tsv?: boolean,
+  tsv_separators?: {
+    column?: string,
+    row?: string,
+  }
 }
 
 class MathpixMarkdown_Model {
@@ -61,15 +65,15 @@ class MathpixMarkdown_Model {
   texReset = MathJax.Reset;
   getLastEquationNumber = MathJax.GetLastEquationNumber;
 
-  parcerMarkdownHTML = (html: string, include_sub_math: boolean = true) => {
-    const res = [];
+  parseMarkdownByHTML = (html: string, include_sub_math: boolean = true) => {
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, "text/html");
-    let el = doc.getElementById('setText');
-    if (!el) {
-      el = doc.getElementById('preview-content');
-    }
 
+    return this.parseMarkdownByElement(doc, include_sub_math)
+  };
+
+  parseMarkdownByElement = (el: HTMLElement | Document, include_sub_math: boolean = true) => {
+    const res = [];
     if (!el) return null;
 
     const math_el = include_sub_math

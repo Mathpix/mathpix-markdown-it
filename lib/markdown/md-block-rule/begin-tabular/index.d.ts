@@ -30,6 +30,7 @@ export declare const tsvPush: (item: any) => void;
 export declare const getTsv: () => any[];
 export declare const StatePushTabulars: (state: any, cTabular: TTypeContentList, align: string) => void;
 export declare const StatePushDiv: (state: any, startLine: number, nextLine: number, content: string) => void;
+export declare const TsvJoin: (tsv: any, options: any) => string;
 export declare const StatePushTabularBlock: (state: any, startLine: number, nextLine: number, content: string, align: string) => boolean;
 export declare const BeginTabular: RuleBlock;
 export {};

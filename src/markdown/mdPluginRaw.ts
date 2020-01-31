@@ -762,7 +762,7 @@ export default options => {
   options = extend(options || {}, defaults);
 
   return md => {
-
+    Object.assign(md.options, options);
     md.block.ruler.before("paragraph", "paragraphDiv", paragraphDiv);
     md.block.ruler.at("code", codeBlock);
     md.inline.ruler.before("escape", "usepackage", usepackage);

@@ -1,4 +1,4 @@
-import {parseInlineTabular, TTokenTabular, getTsv} from "../md-block-rule/begin-tabular";
+import {parseInlineTabular, TTokenTabular, getTsv, TsvJoin} from "../md-block-rule/begin-tabular";
 import { ParseTabular } from "../md-block-rule/begin-tabular/parse-tabular";
 
 export const inlineTabular = (state, silent) => {
@@ -42,7 +42,7 @@ export const inlineTabular = (state, silent) => {
     }
     const tsv = getTsv();
     if (tsv && tsv.length > 0) {
-      token.tsv = tsv.map(row => row.join('\t')).join('\n');
+      token.tsv = TsvJoin(tsv, state.md.options)
     }
   }
   state.pos = nextPos;

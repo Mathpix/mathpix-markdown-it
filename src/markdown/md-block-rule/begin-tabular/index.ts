@@ -200,13 +200,22 @@ export const StatePushDiv = (state, startLine: number, nextLine: number, content
   state.push('paragraph_close', 'div', -1);
 };
 
+export const TsvJoin = (tsv, options): string => {
+  const {tsv_separators = {}} = options.outMath;
+  const {column = '\t', row = '\n'} = tsv_separators;
+  if (!tsv || tsv.length === 0 ) {
+    return ''
+  }
+  return tsv.map(row => row.join(column)).join(row)
+};
+
 const StatePushTSVTable = (state, tsvList) => {
   if (!tsvList || tsvList.length === 0 ) {
     return
   }
   for (let i = 0; i < tsvList.length; i++) {
     const tsv = tsvList[i];
-    const content = tsv.map(row => row.join('\t')).join('\n');
+    const content = TsvJoin(tsv, state.md.options);
 
     let token: Token;
     token = state.push('tsv', '', 0);
