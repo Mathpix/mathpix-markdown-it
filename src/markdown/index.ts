@@ -9,7 +9,8 @@ import {MathpixMarkdownModel as MM, TMarkdownItOptions} from '../mathpix-markdow
 
 /** md renderer */
 const mdInit = (options: TMarkdownItOptions) => {
-  const {htmlTags = false, xhtmlOut = false, width = 1200, breaks = true, typographer = true, linkify = true} = options;
+  const {htmlTags = false, xhtmlOut = false, width = 1200, breaks = true, typographer = true, linkify = true,
+          outMath = {}} = options;
   return require("markdown-it")({
     html: htmlTags,
     xhtmlOut: xhtmlOut,
@@ -19,9 +20,9 @@ const mdInit = (options: TMarkdownItOptions) => {
     typographer: typographer,
     quotes: "“”‘’"
   })
-    .use(tableTabularPlugin, {width: width})
+    .use(tableTabularPlugin, {width: width, outMath: outMath})
  //   .use(separateForBlockPlugin)
-    .use(ConfiguredMathJaxPlugin({width: width}))
+    .use(ConfiguredMathJaxPlugin({width: width, outMath: outMath}))
     .use(CustomTagPlugin())
     .use(HighlightPlugin, {auto: false})
     .use(anchorPlugin)

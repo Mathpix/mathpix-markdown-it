@@ -51,7 +51,7 @@ export const getSubTabular = (sub: string, i: number, isCell: boolean = true): A
          strE = sub;
       }
       const st = strB + subTabular[index].parsed + strE;
-      res.push({token: 'inline', tag: '', n: 0, content: st})
+      res.push({token: 'inline', tag: '', n: 0, content: st,  id: subTabular[index].id})
     }
   }
   return res;

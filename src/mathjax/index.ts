@@ -2,6 +2,7 @@ import {mathjax as MJ} from 'mathjax-full/js/mathjax.js';
 import {TeX} from 'mathjax-full/js/input/tex.js';
 import {MathML} from "mathjax-full/js/input/mathml.js";
 import {SVG} from 'mathjax-full/js/output/svg.js';
+import {AsciiMath} from 'mathjax-full/js/input/asciimath.js';
 import {RegisterHTMLHandler} from 'mathjax-full/js/handlers/html.js';
 import {browserAdaptor} from 'mathjax-full/js/adaptors/browserAdaptor.js';
 import {liteAdaptor} from 'mathjax-full/js/adaptors/liteAdaptor.js';
@@ -14,6 +15,7 @@ import 'mathjax-full/js/input/tex/newcommand/NewcommandConfiguration.js';
 import 'mathjax-full/js/input/tex/unicode/UnicodeConfiguration.js';
 import "mathjax-full/js/input/tex/color/ColorConfiguration.js";
 import "mathjax-full/js/input/tex/mhchem/MhchemConfiguration.js";
+import "mathjax-full/js/input/tex/enclose/EncloseConfiguration";
 import MathJaxConfig from './mathJaxConfig';
 
 require("./my-BaseMappings");
@@ -53,6 +55,74 @@ const svg = new SVG(svgConfig);
 let docTeX = MJ.document(domNode, { InputJax: tex, OutputJax: svg });
 let docMathML = MJ.document(domNode, { InputJax: mml, OutputJax: svg });
 
+import { SerializedMmlVisitor as MmlVisitor } from 'mathjax-full/js/core/MmlTree/SerializedMmlVisitor.js';
+import { SerializedAsciiVisitor as AsciiVisitor } from './serialized-ascii';
+
+const toMathML = (node => {
+  const visitor = new MmlVisitor();
+  return visitor.visitTree(node)
+});
+
+const toAsciiML = ((node, optionAscii) => {
+  const visitorA = new AsciiVisitor(optionAscii);
+  return visitorA.visitTree(node)
+});
+
+const OuterData = (node, math, outMath) => {
+  const {
+    include_mathml = false,
+    include_asciimath = false,
+    include_latex = false,
+    include_svg = true,
+    optionAscii = {
+      showStyle: false,
+      extraBrackets: true
+    }} = outMath;
+  let res: {
+    mathml?: string,
+    asciimath?: string,
+    latex?: string,
+    svg?: string
+  } = {};
+  if (include_mathml) {
+    res.mathml = toMathML(math.root);
+  }
+  if (include_asciimath) {
+    res.asciimath = toAsciiML(math.root, optionAscii);
+  }
+  if (include_latex) {
+    res.latex = (math.math
+      ? math.math
+      : math.inputJax.processStrings ? '' : math.start.node.outerHTML);
+  }
+  if (include_svg) {
+    res.svg = adaptor.outerHTML(node)
+  }
+  return res;
+};
+
+const OuterHTML = (data) => {
+  let outHTML = '';
+
+  if (data.mathml) {
+    outHTML +=  '<mathml style="display: none">' + data.mathml + '</mathml>';
+  }
+  if (data.asciimath) {
+    if (!outHTML) { outHTML += '\n'}
+    outHTML +=  '<asciimath style="display: none;">' + data.asciimath + '</asciimath>';
+  }
+  if (data.latex) {
+    if (!outHTML) { outHTML += '\n'}
+    outHTML += '<latex style="display: none">' + data.latex + '</latex>';
+  }
+
+  if (data.svg) {
+    if (!outHTML) { outHTML += '\n'}
+    outHTML += data.svg;
+  }
+
+  return outHTML;
+};
 
 export const MathJax = {
   //
@@ -61,7 +131,13 @@ export const MathJax = {
   Stylesheet: function () {
     return svg.styleSheet(docTeX);
   },
-
+  TexConvert: function(string, options: any={}) {
+    const {display = true, metric = {}, outMath = {}} = options;
+    const {em = 16, ex = 8, cwidth = 1200, lwidth = 100000, scale = 1} = metric;
+    const node = docTeX.convert(string, {display: display, em: em, ex: ex, containerWidth: cwidth, lineWidth: lwidth, scale: scale});
+    const outputJax = docTeX.outputJax as any;
+    return OuterData(node, outputJax.math, outMath);
+  },
   /**
    * Typeset a TeX expression and return the SVG tree for it
    *
@@ -75,10 +151,8 @@ export const MathJax = {
    *    @param {number} scale   The scaling factor (unitless)
    * }
    */
-  Typeset: function(string, display=true, metric: any={}) {
-    const {em = 16, ex = 8, cwidth = 1200, lwidth = 100000, scale = 1} = metric;
-    const node = docTeX.convert(string, {display: display, em: em, ex: ex, containerWidth: cwidth, lineWidth: lwidth, scale: scale});
-    return adaptor.outerHTML(node);
+  Typeset: function(string, options: any={}) {
+    return OuterHTML(this.TexConvert(string, options));
   },
 
   /**
@@ -99,6 +173,14 @@ export const MathJax = {
     const {em = 16, ex = 8, cwidth = 1200, lwidth = 100000, scale = 1} = metric;
     const node = docMathML.convert(string, {display: display, em: em, ex: ex, containerWidth: cwidth, lineWidth: lwidth, scale: scale});
     return adaptor.outerHTML(node);
+  },
+
+  AsciiMathToSvg: function(string, display=true, metric: any={}) {
+    const {em = 16, ex = 8, cwidth = 1200, lwidth = 100000, scale = 1} = metric;
+    const asciimath = new AsciiMath({});
+    let docAsciiMath = MJ.document(domNode, { InputJax: asciimath, OutputJax: svg });
+    const node = docAsciiMath.convert(string, {display: display, em: em, ex: ex, containerWidth: cwidth, lineWidth: lwidth, scale: scale})
+    return adaptor.outerHTML(node)
   },
 
   //

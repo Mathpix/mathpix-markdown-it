@@ -1,6 +1,6 @@
 import { MathJax } from "../mathjax/";
 import { inlineTabular } from "./md-inline-rule/tabulare";
-import { renderTabulare } from './md-renderer-rules/render-tabulare';
+import { renderTabulare, renderTSV } from './md-renderer-rules/render-tabulare';
 
 let mathNumber = [];
 
@@ -471,7 +471,7 @@ const renderMath = (a, token, options) => {
     if (token.type === 'display_mathML' || token.type === 'inline_mathML') {
       mathEquation = MathJax.TypesetMathML(math);
     } else {
-      mathEquation = MathJax.Typeset(math, isBlock, { cwidth: cwidth });
+      mathEquation = MathJax.Typeset(math, {display: isBlock, metric: { cwidth: cwidth }, outMath: options.outMath});
     }
   } catch (e) {
     console.log('ERROR MathJax =>', e.message, e);
@@ -744,6 +744,7 @@ const mapping = {
   reference_note: "Reference_note",
   reference_note_block: "Reference_note block",
   tabulare: "Tabulare",
+  tsv: "TSV",
   usepackage_geometry: "Usepackage_geometry",
   display_mathML: "DisplayMathML",
   inline_mathML: "InlineMathML"
@@ -761,7 +762,7 @@ export default options => {
   options = extend(options || {}, defaults);
 
   return md => {
-
+    Object.assign(md.options, options);
     md.block.ruler.before("paragraph", "paragraphDiv", paragraphDiv);
     md.block.ruler.at("code", codeBlock);
     md.inline.ruler.before("escape", "usepackage", usepackage);
@@ -777,6 +778,8 @@ export default options => {
         switch (tokens[idx].type) {
           case "tabulare":
             return renderTabulare(tokens, tokens[idx], options, md.renderer);
+          case "tsv":
+            return renderTSV(tokens, tokens[idx], options);
           case "reference_note":
             return renderReference(tokens[idx]);
           case "reference_note_block":

@@ -6,8 +6,15 @@ import 'mathjax-full/js/input/tex/newcommand/NewcommandConfiguration.js';
 import 'mathjax-full/js/input/tex/unicode/UnicodeConfiguration.js';
 import "mathjax-full/js/input/tex/color/ColorConfiguration.js";
 import "mathjax-full/js/input/tex/mhchem/MhchemConfiguration.js";
+import "mathjax-full/js/input/tex/enclose/EncloseConfiguration";
 export declare const MathJax: {
     Stylesheet: () => unknown;
+    TexConvert: (string: any, options?: any) => {
+        mathml?: string;
+        asciimath?: string;
+        latex?: string;
+        svg?: string;
+    };
     /**
      * Typeset a TeX expression and return the SVG tree for it
      *
@@ -21,7 +28,7 @@ export declare const MathJax: {
      *    @param {number} scale   The scaling factor (unitless)
      * }
      */
-    Typeset: (string: any, display?: boolean, metric?: any) => any;
+    Typeset: (string: any, options?: any) => string;
     /**
      * Typeset a MathML expression and return the SVG tree for it
      *
@@ -36,6 +43,7 @@ export declare const MathJax: {
      * }
      */
     TypesetMathML: (string: any, display?: boolean, metric?: any) => any;
+    AsciiMathToSvg: (string: any, display?: boolean, metric?: any) => any;
     Reset: (n?: number) => void;
     GetLastEquationNumber: () => any;
 };

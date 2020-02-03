@@ -1,13 +1,14 @@
 {
   "name": "mathpix-markdown-it",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Component that can render Mathpix output",
   "main": "lib/index.js",
   "scripts": {
     "compile": "npx tsc",
     "compile:dev": "npx tsc --watch",
     "build": "npx tsc && webpack --mode=production --config webpack.config.js",
-    "dev": "npx tsc &&  webpack --mode=development --config webpack.dev.js --watch"
+    "dev": "npx tsc &&  webpack --mode=development --config webpack.dev.js --watch",
+    "test": "mocha tests/*.js --exit"
   },
   "repository": {
     "type": "git",
@@ -23,6 +24,7 @@
     "@types/node": "^11.11.7",
     "@types/react": "^16.4.18",
     "@types/react-dom": "^16.0.9",
+    "chai": "^4.2.0",
     "highlight.js": "^9.15.8",
     "markdown-it": "^8.4.2",
     "markdown-it-deflist": "^2.0.3",
@@ -34,6 +36,7 @@
     "markdown-it-sub": "^1.0.0",
     "markdown-it-sup": "^1.0.0",
     "mathjax-full": "https://github.com/Mathpix/MathJax-src.git",
+    "mocha": "^7.0.1",
     "react": "^16.7.0",
     "react-dom": "^16.7.0",
     "react-emotion": "^10.0.0",
@@ -52,6 +55,7 @@
     "ts-loader": "^5.3.3",
     "typescript": "^3.2.4",
     "webpack": "4.28.3",
-    "webpack-cli": "^3.2.1"
+    "webpack-cli": "^3.2.1",
+    "window": "^4.2.6"
   }
 }

@@ -23,6 +23,7 @@ export interface optionsMathpixMarkdown {
     width?: number;
     showToc?: boolean;
     overflowY?: string; //default 'unset'
+    outMath?: TOutputMath;
 }
 
 export type TMarkdownItOptions = {
@@ -32,7 +33,20 @@ export type TMarkdownItOptions = {
   linkify?: boolean,
   xhtmlOut?: boolean,
   width?: number,
-  lineNumbering?: boolean
+  lineNumbering?: boolean,
+  outMath?: TOutputMath
+}
+
+export type TOutputMath = {
+  include_mathml?: boolean,
+  include_asciimath?: boolean,
+  include_latex?: boolean,
+  include_svg?: boolean,
+  include_tsv?: boolean,
+  tsv_separators?: {
+    column?: string,
+    row?: string,
+  }
 }
 
 class MathpixMarkdown_Model {
@@ -50,6 +64,38 @@ class MathpixMarkdown_Model {
 
   texReset = MathJax.Reset;
   getLastEquationNumber = MathJax.GetLastEquationNumber;
+
+  parseMarkdownByHTML = (html: string, include_sub_math: boolean = true) => {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, "text/html");
+
+    return this.parseMarkdownByElement(doc, include_sub_math)
+  };
+
+  parseMarkdownByElement = (el: HTMLElement | Document, include_sub_math: boolean = true) => {
+    const res = [];
+    if (!el) return null;
+
+    const math_el = include_sub_math
+      ? el.querySelectorAll('.math-inline, .math-block, .table_tabular, .inline-tabulare')
+      : el.querySelectorAll('div > .math-inline, div > .math-block, div > .table_tabular, div > .inline-tabulare');
+    if (!math_el) return null;
+
+
+    for (let i = 0; i < math_el.length; i++) {
+      for (let j = 0; j < math_el[i].children.length; j++) {
+        const child = math_el[i].children[j];
+        if (["MATHML", "ASCIIMATH", "LATEX", "MJX-CONTAINER", "TABLE", "TSV"].indexOf(child.tagName) !== -1) {
+          if (child.tagName==="MJX-CONTAINER" || child.tagName==="TABLE") {
+            res.push({type: "html", value: child.outerHTML});
+          } else {
+            res.push({type: child.tagName.toLowerCase(), value: child.innerHTML});
+          }
+        }
+      }
+    }
+    return res;
+  };
 
   markdownToHTML = (markdown: string, options: TMarkdownItOptions):string => {
     const { lineNumbering = false } = options;
@@ -242,7 +288,8 @@ class MathpixMarkdown_Model {
     render = ( text: string, options?: optionsMathpixMarkdown ):string => {
         const { alignMathBlock='center', display='block', isCheckFormula=false, showTimeLog=false,
           isDisableFancy=false, fontSize=null, padding=null, htmlTags=false, width=0, showToc = false,
-          overflowY='unset', breaks = true, typographer = true, linkify = true, xhtmlOut = false
+          overflowY='unset', breaks = true, typographer = true, linkify = true, xhtmlOut = false,
+          outMath = {}
         } = options || {};
         const disableRules = isDisableFancy ? this.disableFancyArrayDef : options ? options.disableRules || [] : [];
         if (!showToc) {
@@ -256,7 +303,7 @@ class MathpixMarkdown_Model {
                 <div id='container-ruller'></div>
                 <div id='setText' style='display: ${display}; justify-content: inherit;${styleFontSize}${stylePadding}' >
                     ${this.convertToHTML(text, 
-              {htmlTags: htmlTags, xhtmlOut: xhtmlOut, breaks: breaks, typographer: typographer, linkify: linkify, width: width})}
+              {htmlTags: htmlTags, xhtmlOut: xhtmlOut, breaks: breaks, typographer: typographer, linkify: linkify, width: width, outMath: outMath})}
                 </div>
             </div>`
         );

@@ -1,0 +1,1354 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <title>Mathpix Markdown Syntax Reference</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style> 
+        @import url('https://fonts.googleapis.com/css?family=IBM+Plex+Sans:400,500');
+        @import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700');
+        @import url('https://fonts.googleapis.com/css?family=Inconsolata');
+        @import url('https://cdn.mathpix.com/fonts/cmu.css');
+ </style>
+    <style> 
+  html,body {
+    width: 100%;
+    height: 100%;
+  }
+  *, *::before,*::after {
+    box-sizing: border-box;
+  }
+  @-ms-viewport {
+    width: device-width;
+  }
+  body {
+    margin: 0;
+    color: #1E2029;
+    font-size: 14px;
+    line-height: normal;
+  }
+  hr {
+    box-sizing: content-box;
+    height: 0;
+    overflow: visible;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    margin-top: 0;
+    margin-bottom: 0.5em;
+    color: rgba(0, 0, 0, 0.85);
+    font-weight: 500;
+  }
+  p {
+    margin-top: 0;
+    margin-bottom: 1em;
+  }
+  ol, ul, dl {
+    margin-top: 0;
+    margin-bottom: 1em;
+  }
+  ol ol, ul ul, ol ul, ul ol {
+    margin-bottom: 0;
+  }
+  dt {
+    font-weight: 500;
+  }
+  dd {
+    margin-bottom: 0.5em;
+    margin-left: 0;
+  }
+  blockquote {
+    margin: 0 0 1em;
+  }
+  dfn {
+    font-style: italic;
+  }
+  b, strong {
+    font-weight: bolder;
+  }
+  small {
+    font-size: 80%;
+  }
+  sub, sup {
+    position: relative;
+    font-size: 75%;
+    line-height: 0;
+    vertical-align: baseline;
+  }
+  sub {
+    bottom: -0.25em;
+  }
+  sup {
+    top: -0.5em;
+  }
+  a {
+    color: #0B93ff;
+    text-decoration: none;
+    background-color: transparent;
+    outline: none;
+    cursor: pointer;
+    transition: color 0.3s;
+  }
+  a:hover {
+    color: #33aaff;
+  }
+  a:active {
+    color: #0070d9;
+  }
+  a:active, a:hover {
+    text-decoration: none;
+    outline: 0;
+  }
+  a[disabled] {
+    color: rgba(0, 0, 0, 0.25);
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+  pre, code, kbd, samp {
+    font-size: 1em;
+  }
+  pre {
+    margin-top: 0;
+    margin-bottom: 1em;
+    overflow: auto;
+  }
+  figure {
+    margin: 0 0 1em;
+  }
+  img {
+    vertical-align: middle;
+    border-style: none;
+  }
+  svg:not(:root) {
+    overflow: hidden;
+  }
+  table {
+    border-collapse: collapse;
+  }
+  caption {
+    padding-top: 0.75em;
+    padding-bottom: 0.3em;
+    color: rgba(0, 0, 0, 0.45);
+    text-align: left;
+    caption-side: bottom;
+  }
+  th {
+    text-align: inherit;
+  }
+
+mjx-container[jax="SVG"] {
+  direction: ltr;
+}
+
+mjx-container[jax="SVG"] > svg {
+  overflow: visible;
+}
+
+mjx-container[jax="SVG"] > svg a {
+  fill: blue;
+  stroke: blue;
+}
+
+mjx-container[jax="SVG"][display="true"] {
+  display: block;
+  text-align: center;
+  margin: 1em 0;
+}
+
+mjx-container[jax="SVG"][justify="left"] {
+  text-align: left;
+}
+
+mjx-container[jax="SVG"][justify="right"] {
+  text-align: right;
+}
+
+g[data-mml-node="merror"] > g {
+  fill: red;
+  stroke: red;
+}
+
+g[data-mml-node="merror"] > rect[data-background] {
+  fill: yellow;
+  stroke: none;
+}
+
+g[data-mml-node="mtable"] > line[data-line] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > rect[data-frame] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > .mjx-dashed {
+  stroke-dasharray: 140;
+}
+
+g[data-mml-node="mtable"] > .mjx-dotted {
+  stroke-linecap: round;
+  stroke-dasharray: 0,140;
+}
+
+g[data-mml-node="mtable"] > svg {
+  overflow: visible;
+}
+
+[jax="SVG"] mjx-tool {
+  display: inline-block;
+  position: relative;
+  width: 0;
+  height: 0;
+}
+
+[jax="SVG"] mjx-tool > mjx-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+mjx-tool > mjx-tip {
+  display: inline-block;
+  padding: .2em;
+  border: 1px solid #888;
+  font-size: 70%;
+  background-color: #F8F8F8;
+  color: black;
+  box-shadow: 2px 2px 5px #AAAAAA;
+}
+
+g[data-mml-node="maction"][data-toggle] {
+  cursor: pointer;
+}
+
+mjx-status {
+  display: block;
+  position: fixed;
+  left: 1em;
+  bottom: 1em;
+  min-width: 25%;
+  padding: .2em .4em;
+  border: 1px solid #888;
+  font-size: 90%;
+  background-color: #F8F8F8;
+  color: black;
+}
+
+foreignObject[data-mjx-xml] {
+  font-family: initial;
+  line-height: normal;
+  overflow: visible;
+}
+
+.MathJax path {
+  stroke-width: 3;
+}
+
+    #setText > div {
+        justify-content: inherit;
+        margin-top: 0;
+        margin-bottom: 1em;
+        text-align: justify;
+    }
+    
+    #setText div:last-child {
+        margin-bottom: 0 !important;
+    }
+
+    #setText > br, #preview-content br {
+        line-height: 1.2;
+    }
+
+    #preview-content > div {
+        margin-top: 0;
+        margin-bottom: 1em;
+        text-align: justify;
+    }
+
+    #preview-content table {
+      margin-bottom: 1em;
+    }
+
+    #setText table {
+      margin-bottom: 1em;
+    }
+
+    mjx-container {
+      overflow-y: visible !important;
+      padding-top: 1px;
+      padding-bottom: 1px;
+    }
+    
+    .math-inline mjx-container {
+        display: inline-block !important;
+        page-break-inside: avoid;
+    }
+    .math-block {
+        align-items: center;
+        min-width: min-content;
+        page-break-after: auto;
+        page-break-inside: avoid;
+        margin-top: 1em;
+        margin-bottom: 1em;
+    }
+    .math-block p {
+        flex-shrink: 1;
+    }
+    .math-block mjx-container {
+        margin: 0 !important;
+    }
+    .math-error {
+        background-color: yellow;
+        color: red;
+    }
+
+    #preview-content svg, #setText svg {
+        min-width: initial !important;
+    }
+
+    #preview-content img, #setText img {
+        max-width: 100%;
+    }
+    
+    #preview-content blockquote,  #setText blockquote {
+        page-break-inside: avoid;
+        color: #666;
+        margin: 0 0 1em 0;
+        padding-left: 3em;
+        border-left: .5em solid #eee;
+    }
+
+    #preview-content pre, #setText pre {
+        border: 1px solid #ccc;
+        page-break-inside: avoid;
+        padding: 0.5em;
+        background: #f8f8fa;
+    }
+    .empty {
+        text-align: center;
+        font-size: 18px;
+        padding: 50px 0 !important;
+    }
+
+    #setText table, #preview-content table {
+        display: block; 
+        overflow: auto;
+        width: 100%;
+        border-collapse: collapse;
+        page-break-inside: avoid;
+    }
+      
+    #setText table th, #preview-content table th {
+        text-align: center;
+        font-weight: bold;
+    }
+    
+    #setText table td, #preview-content table td,
+    #setText table th, #preview-content table th {
+        border: 1px solid #dfe2e5;
+        padding: 6px 13px;
+    }
+      
+    #setText table tr, #preview-content table tr {
+        background-color: #fff;
+        border-top: 1px solid #c6cbd1;
+    }
+    
+    #setText table tr:nth-child(2n), #preview-content table tr:nth-child(2n) {
+        background-color: #f6f8fa;
+    }
+
+    
+    #setText .main-title, #setText .author, #preview-content .main-title, #preview-content .author  {
+        text-align: center;
+        margin: 0 auto;
+    }
+    
+    #preview-content .main-title, #setText .main-title {
+        line-height: 1.2;
+        margin-bottom: 1em;
+    }
+
+    #preview-content .author, #setText .author  {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    #preview-content .author p, #setText .author p {
+        min-width: 30%;
+        max-width: 50%;
+        padding: 0 7px;
+    }
+
+    #preview-content .author span, #setText .author span {
+        display: block;
+        text-align: center;
+    }
+
+    #preview-content .section-title, #setText .section-title {
+        margin-top: 1.5em;
+    }
+
+    #preview-content .abstract, #setText .abstract {
+        text-align: justify;
+        margin-bottom: 1em;
+    }
+
+    #preview-content .abstract p, #setText .abstract p {
+        margin-bottom: 0;
+    }
+
+    @media print {
+
+      #preview {
+        font-size: 10pt!important;
+      }
+
+      svg {
+        shape-rendering: crispEdges;
+      }
+
+      .math-block svg, math-inline svg {
+        margin-top: 1px;
+      }
+
+      #preview-content img, #setText img {
+        display: block;
+      }
+      
+      #preview-content .figure_img img, #setText .figure_img img {
+        display: inline;
+      }
+
+      .preview-right {
+        word-break: break-word;
+      }
+
+      #preview-content h1, #setText h1 {
+        page-break-inside: avoid;
+        position: relative;
+        border: 2px solid transparent;
+      }
+  
+      #preview-content h1::after, #setText h1::after {
+        content: "";
+        display: block;
+        height: 100px;
+        margin-bottom: -100px;
+        position: relative;
+      }
+  
+      #preview-content h2, #setText h2 {
+        page-break-inside: avoid;
+        position: relative;
+        border: 2px solid transparent;
+      }
+  
+      #preview-content h2::after, #setText h2::after {
+        content: "";
+        display: block;
+        height: 100px;
+        margin-bottom: -100px;
+        position: relative;
+      }
+  
+      #preview-content h3, #setText h3 {
+        page-break-inside: avoid;
+        position: relative;
+        border: 2px solid transparent;
+      }
+  
+      #preview-content h3::after, #setText h3::after {
+        content: "";
+        display: block;
+        height: 100px;
+        margin-bottom: -100px;
+        position: relative;
+      }
+  
+      #preview-content h4, #setText h4 {
+        page-break-inside: avoid;
+        position: relative;
+        border: 2px solid transparent;
+      }
+  
+      #preview-content h4::after, #setText h4::after {
+        content: "";
+        display: block;
+        height: 100px;
+        margin-bottom: -100px;
+        position: relative;
+      }
+  
+      #preview-content h5, #setText h5 {
+        page-break-inside: avoid;
+        position: relative;
+        border: 2px solid transparent;
+      }
+  
+      #preview-content h5::after, #setText h5::after {
+        content: "";
+        display: block;
+        height: 100px;
+        margin-bottom: -100px;
+        position: relative;
+      }
+  
+      #preview-content h6, #setText h6 {
+        page-break-inside: avoid;
+        position: relative;
+        border: 2px solid transparent;
+      }
+  
+      #preview-content h6::after, #setText h6::after {
+        content: "";
+        display: block;
+        height: 100px;
+        margin-bottom: -100px;
+        position: relative;
+      }
+    }
+    #preview-content sup, #setText sup {
+      top: -.5em;
+      position: relative;
+      font-size: 75%;
+      line-height: 0;
+      vertical-align: baseline;
+    }
+    
+    #preview-content .text-url, #setText .text-url {
+      color: #0B93ff;
+      cursor: text;
+      pointer-events: none;
+    }
+    
+    #preview-content .text-url a:hover, #setText .text-url a:hover {
+      color: #0B93ff;
+    }
+
+    #preview-content code, #setText code {
+      font-family: Inconsolata;
+      font-size: inherit;
+      display: initial;
+      background: #f8f8fa;
+    }
+    #preview-content pre code, #setText pre code {
+      font-size: inherit;
+      display: block;
+      color: #333;
+      overflow-x: auto;
+      font-size: 15px;
+    }
+
+    .hljs-comment,
+    .hljs-quote {
+      color: #998;
+      font-style: italic;
+    }
+
+    .hljs-command {
+      color: #005cc5;
+    }
+
+    .hljs-keyword,
+    .hljs-selector-tag,
+    .hljs-subst {
+      color: #d73a49;
+      font-weight: bold;
+    }
+
+    .hljs-number,
+    .hljs-literal,
+    .hljs-variable,
+    .hljs-template-variable,
+    .hljs-tag .hljs-attr {
+      color: #005cc5;
+    }
+
+    .hljs-string,
+    .hljs-doctag {
+      color: #24292e;
+    }
+
+    .hljs-title,
+    .hljs-section,
+    .hljs-selector-id {
+      color: #6f42c1;
+      font-weight: bold;
+    }
+
+    .hljs-subst {
+      font-weight: normal;
+    }
+
+    .hljs-type,
+    .hljs-class .hljs-title {
+      color: #458;
+      font-weight: bold;
+    }
+
+    .hljs-tag,
+    .hljs-name,
+    .hljs-attribute {
+      color: #000080;
+      font-weight: normal;
+    }
+
+    .hljs-regexp,
+    .hljs-link {
+      color: #009926;
+    }
+
+    .hljs-symbol,
+    .hljs-bullet {
+      color: #990073;
+    }
+
+    .hljs-built_in,
+    .hljs-builtin-name {
+      color: #24292e;
+    }
+
+    .hljs-meta {
+      color: #999;
+      font-weight: bold;
+    }
+
+    .hljs-meta-keyword {
+      color: #d73a49;
+    }
+
+    .hljs-meta-string {
+      color: #032f62;
+    }
+
+    .hljs-deletion {
+      background: #fdd;
+    }
+
+    .hljs-addition {
+      background: #dfd;
+    }
+
+    .hljs-emphasis {
+      font-style: italic;
+    }
+
+    .hljs-strong {
+      font-weight: bold;
+    }
+
+    .table_tabular table th,  .table_tabular table th {
+        border: none !important;
+        padding: 6px 13px;
+    }
+      
+    #tabular tr, #tabular tr {
+        border-top: none !important;
+        border-bottom: none !important;
+    }
+    #tabular td, #tabular td {
+        border-style: none !important;
+        background-color: #fff;
+        border-color: #000 !important;
+        word-break: keep-all;
+        padding: 0.1em 0.5em !important;
+    }
+    #tabular {
+        display: inline !important;
+    }
+    #tabular td > p {
+        margin-bottom: 0;
+        margin-top: 0;
+    }
+    #tabular td._empty {
+      height: 1.3em;
+    }
+    #tabular td .f {
+      opacity: 0;
+    }
+    
+    html[data-theme="dark"] #tabular tr, html[data-theme="dark"] #tabular td {
+      background-color: #202226;
+      border-color: #fff !important;
+    }  
+    .table_tabular {
+        overflow-x: auto;
+        padding: 0 2px 0.5em 2px;
+    }
+    .figure_img {
+       margin-bottom: 0.5em;
+       overflow-x: auto;
+    }
+
+  #preview {
+    font-family: 'CMU Serif', 'Georgia', Helvetica, Arial, sans-serif;
+    font-size: 17px;
+    visibility: visible;
+    word-break: break-word;
+    padding: 2.5em;
+    max-width: 800px;
+    margin: auto;
+    box-sizing: content-box;
+  }
+
+  #preview h1, #preview h2, #preview h3, #preview h4, #preview h5, #preview strong {
+    font-family: 'CMU Serif Bold', 'Georgia', Helvetica, Arial, sans-serif;
+  }
+
+  #preview  i, #preview  em {
+    font-family: 'CMU Serif Italic', 'Georgia', Helvetica, Arial, sans-serif;
+  }
+ </style>
+</head>
+<body>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$a = b + c$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>a=b+c</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> a=b+c</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$[1, 2)$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>[1,2)</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> [1,2)</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$x^2 + 2$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>x^(2)+2</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> x^(2)+2</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>\begin{array}{c}{a1}&{a2}\\{b1}&{b2}\end{array}</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>{:[a1,a2],[b1,b2]:}</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> [a1,a2],[b1,b2]</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$1 3 5$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>135</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> 135</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$1 , 3 x , 5$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>1,3x,5</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> 1,3x,5</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$before\mathbb { foo }after$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>beforefooafter</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> beforefooafter</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$before\mathbf { bar }after$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>beforebarafter</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> beforebarafter</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$before\mathcal { baz }after$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>beforebazafter</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> beforebazafter</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$\left\{\begin{array}{ l l r } { x - y - z } & { = } & { 2} \\ { 2x + y + z } & { = } & { 1} \\ { 3x - 2y - z } & { = } & { 5}\end{array}\right.$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>{[x−y−z,=,2],[2x+y+z,=,1],[3x−2y−z,=,5]:}</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> {[x-y-z,=,2],[2x+y+z,=,1],[3x-2y-z,=,5]:}</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$\operatorname { s i n }$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>sin</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> sin</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>\begin{array}{lll}\operatorname{s i n}&x&y\\(x^2)&x&y\end{array}</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>{:[sin,x,y],[(x^(2)),x,y]:}</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> [sin,x,y],[(x^(2)),x,y]</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$\left.\begin{array}{lll}\operatorname{s i n}&x&y\\(x^2)&x&y\end{array}\right.$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>{:[sin,x,y],[(x^(2)),x,y]:}</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> {:[sin,x,y],[(x^(2)),x,y]:}</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$a \operatorname { m o d } b$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>a mod ⁡b</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> a mod b</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$T _ { x } \left( \theta _ { r } \right) = \left[ \begin{array} { l l l l } { 1} & { 0} & { 0} & { 0} \\ { 0} & { \operatorname { c o s } \theta _ { r } } & { \operatorname { s i n } \theta _ { r } } & { 0} \\ { 0} & { - \operatorname { s i n } \theta _ { r } } & { \operatorname { c o s } \theta _ { r } } & { 0} \\ { 0} & { 0} & { 0} & { 1} \end{array} \right]$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>T_(x)(theta_(r))=[[1,0,0,0],[0,cos ⁡theta_(r),sin ⁡theta_(r),0],[0,−sin ⁡theta_(r),cos ⁡theta_(r),0],[0,0,0,1]]</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> T_(x)(theta_(r))=[[1,0,0,0],[0,cos theta_(r),sin theta_(r),0],[0,-sin theta_(r),cos theta_(r),0],[0,0,0,1]]</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$\operatorname{foo}$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>foo</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> foo</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$2 . x$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>2.x</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> 2.x</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$1 2 \longdiv { 24 }$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>12 bar("")"24)</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> ((24)/(12))</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$\sqrt [ 2 ] { 2 }$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>root(2)(2)</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> root(2)(2)</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$\left.\begin{array}{r}{a}\\{b}\\{c}\\\hline\end{array}\right.$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>{:[a],[b],[c],[hline]:}</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> {:[a],[b],[c],[hline]:}</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$\left\{\begin{array}{r}{a}\\{b}\\{c}\\\hline\end{array}\right\}$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>{[a],[b],[c],[hline]}</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> {[a],[b],[c],[hline]}</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$\left.\begin{array}{r}{a}\\{-b}\\{\times c}\\\hline\end{array}\right.$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>{:[a],[−b],[xx c],[hline]:}</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> {:[a],[-b],[times c],[hline]:}</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$\left\{\begin{array}{r}{a}\\{-b}\\{\times c}\\\hline\end{array}\right\}$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>{[a],[−b],[xx c],[hline]}</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> {[a],[-b],[times c],[hline]}</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$\left.\begin{array}{ll}{a1}&{a2}\\{b1}&{b2}\end{array}\right.$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>{:[a1,a2],[b1,b2]:}</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> {:[a1,a2],[b1,b2]:}</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$\left\{\begin{array}{r}{6x+2y \leq 12}\\{x+y \leq 5}\\{x \geq 0}\\{y \geq 0}\end{array}\right.$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>{[6x+2y&lt;=12],[x+y&lt;=5],[x&gt;=0],[y&gt;=0]:}</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> {[6x+2y<=12],[x+y<=5],[x>=0],[y>=0]:}</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$f(x) = \left\{\begin{array}{ll}{-x+3}&{\text{if}x \leq -1}\\{-3x+1}&{\text{if}x > -1}\end{array}\right.$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>f(x)={[−x+3,"if"x&lt;=−1],[−3x+1,"if"x&gt;−1]:}</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> f(x)={[-x+3,"if"x<=-1],[-3x+1,"if"x>-1]:}</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$\operatorname{unknown} \left\{\begin{array}{ll}{-x+3}&{\text{if}x \leq -1}\\{-3x+1}&{\text{if}x > -1}\end{array}\right. \operatorname{unknown}$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>unknown ⁡{[−x+3,"if"x&lt;=−1],[−3x+1,"if"x&gt;−1]:}unknown</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> unknown{[-x+3,"if"x<=-1],[-3x+1,"if"x>-1]:}unknown</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$\left\{\begin{array}{rl}{6x+2y}&{ \leq 12}\\{x + y}&{\leq 5} \\ {x} & {\geq 0} \\ {y} & {\geq 0}\end{array}\right.$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>{[6x+2y,&lt;=12],[x+y,&lt;=5],[x,&gt;=0],[y,&gt;=0]:}</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> {[6x+2y,<=12],[x+y,<=5],[x,>=0],[y,>=0]:}</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$x - 2y = - 35 \text{ and } 2x - y = 55$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>x−2y=−35"&nbsp;and&nbsp;"2x−y=55</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> x-2y=-35" and "2x-y=55</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$\left. \begin{array} { r l } { \hat { V } _ { L } } & { = \sum _ { \mathbf { m } , \mathbf { n } } \sum _ { l , m _ { l } } v _ { l } ( k _ { m ^ { 2 } } , k _ { n ^ { 2 } } ) Y _ { l m _ { l } } ^ { * } ( \hat { \mathbf { m } } ) Y _ { l m _ { l } } ( \hat { \mathbf { n } } ) | \mathbf { m } \rangle \langle \mathbf { n } | } \\ { } & { = \sum _ { m ^ { 2 } , n ^ { 2 } } \sum _ { l } v _ { l } ( k _ { m ^ { 2 } } , k _ { n ^ { 2 } } ) \sum _ { m _ { l } } ( \sum _ { \mathbf { m } } Y _ { l m _ { l } } ^ { * } ( \hat { \mathbf { m } } ) | \mathbf { m } \rangle ) ( \sum _ { \hat { \mathbf { n } } } Y _ { l m _ { l } } ( \hat { \mathbf { n } } ) \langle \mathbf { n } | ) } \end{array} \right.$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>{:[ hat(V)_(L),=sum_(m,n)sum_(l,m_(l))v_(l)(k_(m^(2)),k_(n^(2)))Y_(lm_(l))^(**)( hat(m))Y_(lm_(l))( hat(n))|m:)(:n|],[,=sum_(m^(2),n^(2))sum_(l)v_(l)(k_(m^(2)),k_(n^(2)))sum_(m_(l))(sum_(m)Y_(lm_(l))^(**)( hat(m))|m:))(sum_( hat(n))Y_(lm_(l))( hat(n))(:n|)]:}</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> {:[hat V_(L),=sum_(m,n)sum_(l,m_(l))v_(l)(k_(m^(2)),k_(n^(2)))Y_(lm_(l))^(*)(hat m)Y_(lm_(l))(hat n)|m:)(:n|],[,=sum_(m^(2),n^(2))sum_(l)v_(l)(k_(m^(2)),k_(n^(2)))sum_(m_(l))(sum_(m)Y_(lm_(l))^(*)(hat m)|m:))(sum_(hat n)Y_(lm_(l))(hat n)(:n|)]:}</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$(5, 2)\text{ and }(2 , 8)$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>(5,2)"&nbsp;and&nbsp;"(2,8)</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> (5,2)" and "(2,8)</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$f ( x ) = \left\{ \begin{array} { l l } { x ^ { 2} + 1,} & { x > 1} \\ { 1,} & { x = 1} \\ { x + 1,} & { x < 1} \end{array} \right.$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>f(x)={[x^(2)+1,,x&gt;1],[1,,x=1],[x+1,,x&lt;1]:}</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> f(x)={[x^(2)+1,,x>1],[1,,x=1],[x+1,,x<1]:}</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$f(x)= \left\{ \begin{array} {ll} { x e ^ {2x} } & { \text{ si } } & { x < 0} \\ { \frac { \operatorname { ln } ( x + 1) } { x + 1} } & { \text{ si } } & { x \geq 0} \end{array} \right.$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>f(x)={[xe^(2x),"&nbsp;si&nbsp;",x&lt;0],[(ln⁡(x+1))/(x+1),"&nbsp;si&nbsp;",x&gt;=0]:}</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> f(x)={[xe^(2x)," si ",x<0],[(ln(x+1))/(x+1)," si ",x>=0]:}</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$\left\{ \begin{array} { r } { x \geq 0,y \geq 0} \\ { 2x + y \leq 8} \\ { x + y \geq 4} \end{array} \right.$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>{[x&gt;=0,y&gt;=0],[2x+y&lt;=8],[x+y&gt;=4]:}</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> {[x>=0,y>=0],[2x+y<=8],[x+y>=4]:}</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$f ( x ) = \left\{ \begin{array} { l l } { 2 x + 5 } & { \text { khi } x < - 1 } \\ { x ^ { 2 } + 2 } & { \text { khi } x \geq - 1 } \end{array} \right.$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>f(x)={[2x+5,"&nbsp;khi&nbsp;"x&lt;−1],[x^(2)+2,"&nbsp;khi&nbsp;"x&gt;=−1]:}</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> f(x)={[2x+5," khi "x<-1],[x^(2)+2," khi "x>=-1]:}</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$f ( x ) = \left\{ \begin{array} { l } { 2x + 5\text{ if } x < 0} \\ { x - 1\text{ if } x > 0} \end{array} \right.$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>f(x)={[2x+5"&nbsp;if&nbsp;"x&lt;0],[x−1"&nbsp;if&nbsp;"x&gt;0]:}</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> f(x)={[2x+5" if "x<0],[x-1" if "x>0]:}</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$y = x ^ { 2} ,y = x ^ { 2} + \operatorname{sin} ( x ^ { 3} )$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>y=x^(2),y=x^(2)+sin⁡(x^(3))</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> y=x^(2),y=x^(2)+sin(x^(3))</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$f ( x ) = \text{ foo } + \left\{ \begin{array} { l } { 2x + 5\text{ if } x < 0} \\ { x - 1\text{ if } x > 0} \end{array} \right.$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>f(x)="&nbsp;foo&nbsp;"+{[2x+5"&nbsp;if&nbsp;"x&lt;0],[x−1"&nbsp;if&nbsp;"x&gt;0]:}</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> f(x)=" foo "+{[2x+5" if "x<0],[x-1" if "x>0]:}</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$\operatorname{sen}$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>sen</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> sin</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$(x^2 + 1)$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>(x^(2)+1)</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> (x^(2)+1)</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$\{\frac{1}{2}\}$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>{(1)/(2)}</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> {(1)/(2)}</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$\langle \frac{1}{2} \rangle$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>(:(1)/(2):)</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> (:(1)/(2):)</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$\lfloor \frac{1}{2} \rfloor$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>|__(1)/(2)__|</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> |__(1)/(2)__|</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$\lceil \frac{1}{2} \rceil$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>|~(1)/(2)~|</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> |~(1)/(2)~|</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$\llcorner \frac{1}{2} \lrcorner$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>llcorner(1)/(2)lrcorner</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> llcorner(1)/(2)lrcorner</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$\ulcorner \frac{1}{2} \urcorner$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>ulcorner(1)/(2)urcorner</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> ulcorner(1)/(2)urcorner</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$\langle x \rangle y$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>(:x:)y</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> (:x:)y</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$\langle (x) \rangle (y)$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>(:(x):)(y)</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> (:(x):)(y)</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$(x^2 + (2x + 1))$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>(x^(2)+(2x+1))</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> (x^(2)+(2x+1))</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$(x^2) + (2x + 1) + (y^2)$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>(x^(2))+(2x+1)+(y^(2))</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> (x^(2))+(2x+1)+(y^(2))</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$(1 + (x^2 + 2x))$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>(1+(x^(2)+2x))</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> (1+(x^(2)+2x))</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$(1+\{2+\frac{1}{2}\}+(3+4))+(5+6)$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>(1+{2+(1)/(2)}+(3+4))+(5+6)</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> (1+{2+(1)/(2)}+(3+4))+(5+6)</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$(1+\{2+\frac{1}{2}\}+(3+4))+(5+6))$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>(1+{2+(1)/(2)}+(3+4))+(5+6))</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> (1+{2+(1)/(2)}+(3+4))+(5+6))</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$(1+\frac{3+(x^2))}{2})$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>(1+(3+(x^(2))))/(2))</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> (1+(3+(x^(2))))/(2))</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$(1 + \int x dx) + (\prod x) + (\sum y)$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>(1+int xdx)+(prod x)+(sum y)</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> (1+int xdx)+(prod x)+(sum y)</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$a | x y ^ 3 | ( b | c ^ 3 )$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>a|xy^(3)|(b|c^(3))</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> a|xy^(3)|(b|c^(3))</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$a | _ b ^ c + a | ^ b _ c + a | _ b + a | ^ c$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>a|_(b)^(c)+a|_(c)^(b)+a|_(b)+a|^(c)</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> a|_(b)^(c)+a|_(c)^(b)+a|_(b)+a|^(c)</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$a | _ { \operatorname{s i n} ( \pi ) }$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>a|_(sin⁡(pi))</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> a|_(sin(pi))</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$a _ {k} | _ { I _ { m } } = : u _ { k } ^ { m } \in V,$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>a_(k)|_(I_(m))=:u_(k)^(m)in V,</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> a_(k)|_(I_(m))=:u_(k)^(m)in V,</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$h \theta ( L ) = - k \frac { d \theta } { d x } | _ { x = L }$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>h theta(L)=−k(d theta)/(dx)|_(x=L)</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> h theta(L)=-k(d theta)/(dx)|_(x=L)</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$f ( a | b ) = x | _ { x _ 0 } ^ { x _ 1 }$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>f(a|b)=x|_(x_(0))^(x_(1))</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> f(a|b)=x|_(x_(0))^(x_(1))</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$x \times \frac{1}{2}y|_{a}^{b}$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>x xx(1)/(2)y|_(a)^(b)</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> x times(1)/(2)y|_(a)^(b)</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$a \| x y ^ 3 \| ( b | c ^ 3 )$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>a|xy^(3)|(b|c^(3))</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> a|xy^(3)|(b|c^(3))</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$1+\int_{vR}^{v}(\frac{\epsilon(bu-F(u)-I))}{(F(u)-W(u)+I)^{2}})\frac{\partial W(u)}{\partial w_{0}}du$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>1+int_(vR)^(v)((epsilon(bu−F(u)−I)))/((F(u)−W(u)+I)^(2)))(del W(u))/(delw_(0))du</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> 1+int_(vR)^(v)((epsilon(bu-F(u)-I)))/((F(u)-W(u)+I)^(2)))(del W(u))/(del w_(0))du</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>\begin{aligned}{(x^2)}\end{aligned}</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>{:(x^(2)):}</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> [(x^(2))]</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$k : [ \left( \begin{array} { l } { x } \\ { y } \\ { z } \end{array} \right) - \left( \begin{array} { c } { 4 } \\ { 8 } \\ { - 2 } \end{array} \right) ] ^ { 2 } = 5 ^ { 2 }$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>k:[([x],[y],[z])−([4],[8],[−2])]^(2)=5^(2)</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> k:[([x],[y],[z])-([4],[8],[-2])]^(2)=5^(2)</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$\bigoplus\bigcup\bigcap\geqq\leqq\longrightarrow\top\longleftrightarrow\Longrightarrow\longrightarrow\longleftarrow\Longleftarrow\Longleftrightarrow\longmapsto\widetilde{x}\widehat{x}$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>bigoplus uuu nnn&gt;= &lt;= longrightarrow TT longleftrightarrow Longrightarrow longrightarrow longleftarrow Longleftarrow Longleftrightarrow longmapsto widetilde(x) widehat(x)</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> bigoplus uuu nnn>=<=longrightarrow TT longleftrightarrow Longrightarrow longrightarrow longleftarrow Longleftarrow Longleftrightarrow longmapsto widetilde x widehat x</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$d s ^ { 2} = ( d X ^ { 0} ) ^ { 2} - R ( X ^ { 0} ) ^ { 2} \sum _ { i = 1} ^ { D - 1} ( d X ^ { i } ) ^ { 2}$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>ds^(2)=(dX^(0))^(2)−R(X^(0))^(2)sum_(i=1)^(D−1)(dX^(i))^(2)</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> ds^(2)=(dX^(0))^(2)-R(X^(0))^(2)sum_(i=1)^(D-1)(dX^(i))^(2)</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$\Delta ( W _ { 1} ) ^ { i t } J ( W _ { 2} ) \Delta ( W _ { 1} ) ^ { - i t } = J ( l ( W _ { 1} ,t ) W _ { 2} )$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>Delta(W_(1))^(it)J(W_(2))Delta(W_(1))^(−it)=J(l(W_(1),t)W_(2))</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> Delta(W_(1))^(it)J(W_(2))Delta(W_(1))^(-it)=J(l(W_(1),t)W_(2))</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$W ( R ,\gamma ) = \operatorname { Tr } _ { R } \mathcal { P } { \exp ( i \oint _ { \gamma } \mathbf { A } _ { \mu } d x ^ { \mu } ) } \equiv \chi _ { R } ( U _ { \gamma } )$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>W(R,gamma)=Tr_(R)⁡Pexp⁡(ioint_(gamma)A_(mu)dx^(mu))-=chi_(R)(U_(gamma))</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> W(R,gamma)=Tr_(R)P exp(i oint_(gamma)A_(mu)dx^(mu))-=chi_(R)(U_(gamma))</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$a + \int dx$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>a+int dx</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> a+int dx</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$a + \int\int dx$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>a+int int dx</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> a+int int dx</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$a + \int \int\int dx$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>a+int int int dx</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> a+int int int dx</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$a + \int dx +\int\int dx+\int dx$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>a+int dx+int int dx+int dx</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> a+int dx+int int dx+int dx</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$\int (x)$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>int(x)</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> int(x)</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$1 6 \int _ { 0 } ^ { 3 } [ \frac { 1 } { 2 } \theta + \frac { 1 } { 4 } \operatorname { s i n } ( 2 \theta ) + \operatorname { c o s } ( \theta ) - \frac { 1 } { 3 } \operatorname { c o s } ^ { 3 } ( \theta ) ] | _ { 0 } ^ { 2 \pi } d z$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>16int_(0)^(3)[(1)/(2)theta+(1)/(4)sin⁡(2theta)+cos⁡(theta)−(1)/(3)cos^(3)⁡(theta)]|_(0)^(2pi)dz</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> 16int_(0)^(3)[(1)/(2)theta+(1)/(4)sin(2 theta)+cos(theta)-(1)/(3)cos^(3)(theta)]|_(0)^(2 pi)dz</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$\left.\begin{array}{rl}{(x^\mathbb{2})}&{\mathcal{=}y^2}\end{array}\right.$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>{:(x^(2)),mathcal(=)y^(2):}</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> {:[(x^(2)),=y^(2)]:}</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>\begin{aligned}{(x^\mathbb{2})}&{\mathcal{=}y^2}\end{aligned}</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>{:(x^(2)),mathcal(=)y^(2):}</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> [(x^(2)),=y^(2)]</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$\left. \begin{array} { r l } { x + y } & { = 3 } \\ { y } & { = x ^ { 2 } - 8 x + 15 } \end{array} \right.$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>{:[x+y,=3],[y,=x^(2)−8x+15]:}</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> {:[x+y,=3],[y,=x^(2)-8x+15]:}</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$\left\{\begin{array}{rl}{x+y}&{=3}\\{y} & {=x^{2}-8x+15}\end{array}\right\}$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>{[x+y,=3],[y,=x^(2)−8x+15]}</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> {[x+y,=3],[y,=x^(2)-8x+15]}</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$\left.\begin{array}{l}\text{above }\\x^2\\\text{ below}\end{array}\right.$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>{:["above&nbsp;"],[x^(2)],["&nbsp;below"]:}</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> {:["above "],[x^(2)],[" below"]:}</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$\left ( \frac{1}{2} \right )$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>((1)/(2))</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> ((1)/(2))</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$\left \{ \frac{1}{2} \right \}$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>{(1)/(2)}</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> {(1)/(2)}</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$\left \langle \frac{1}{2} \right \rangle$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>(:(1)/(2):)</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> (1)/(2)</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$\{ \text{ \frac{1}{2} } \}$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>{"&nbsp;\frac{1}{2}&nbsp;"}</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> {" (1)/(2) "}</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$\operatorname { Pr }\left(\text { test error } \leqslant \text { training error }+\sqrt{\frac{1}{N}\left[D\left(\log \left(\frac{2 N}{D}\right)+1\right)-\log \left(\frac{\eta}{4}\right)\right]}\right)=1-\eta$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>Pr ⁡("&nbsp;test error&nbsp;"⩽"&nbsp;training error&nbsp;"+sqrt(sqrt(((1)/(N)[D(log ⁡((2N)/(D))+1)−log ⁡((eta)/(4))])))=1−eta</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> Pr(" test error "leqslant" training error "+sqrt((1)/(N)[D(log((2N)/(D))+1)-log((eta)/(4))]))=1-eta</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>\begin{array}{c}{}\end{array}</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>{::}</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> []</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$\| x + \left( \begin{array}{c}{x}\end{array} \right) \|$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>|x+(x)|</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> |x+([x])|</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>${(}x^2{)}$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>(x^(2))</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> (x^(2))</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$\left.\begin{array}{c}{a1}&{a2}\\{b1}&{b2}\end{array}\right.$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>{:[a1,a2],[b1,b2]:}</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> {:[a1,a2],[b1,b2]:}</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$\left.\begin{array}{rl}{a1}&{a2}\\{b1}&{b2}\end{array}\right.$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>{:[a1,a2],[b1,b2]:}</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> {:[a1,a2],[b1,b2]:}</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$\left(\begin{array}{rl}{x+y}&{=3}\\{y} & {=x^{2}-8x+15}\end{array}\right)$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>([x+y,=3],[y,=x^(2)−8x+15])</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> ([x+y,=3],[y,=x^(2)-8x+15])</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$\left[\begin{array}{rl}{x+y}&{=3}\\{y} & {=x^{2}-8x+15}\end{array}\right]$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>[[x+y,=3],[y,=x^(2)−8x+15]]</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> [[x+y,=3],[y,=x^(2)-8x+15]]</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>\begin{array}{l}{\text{2}^{5}2^{2}+[(b}\end{array}</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>{:"2"^(5)2^(2)+[(b:}</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> ["2"^(5)2^(2)+[(b]</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$\vec{a}$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span> vec(a)</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> vec a</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$\vec{ab}$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span> vec(ab)</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> vec ab</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$\vec{ab_1}$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span> vec(ab_(1))</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> vec ab_(1)</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$\vec{\theta}$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span> vec(theta)</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> vec theta</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$a + \text {This is }\text{text} + b$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>a+"This is&nbsp;""text"+b</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> a+"This is ""text"+b</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$\text { foo } - 4 ^ { \text { superscript } } \text { bar }$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>"&nbsp;foo&nbsp;"−4^("&nbsp;superscript&nbsp;")"&nbsp;bar&nbsp;"</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> " foo "-4^(" superscript ")" bar "</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$\text{The latex for }\operatorname{sin}(x)\text{is \operatorname{sin}(x).}$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>"The latex for&nbsp;"sin⁡(x)"is \operatorname{sin}(x)."</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> "The latex for "sin(x)"is sin(x)."</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$\left.\begin{array}{l}\text{Now is}\\\text{the time}\end{array}\right.$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>{:["Now is"],["the time"]:}</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> {:["Now is"],["the time"]:}</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$\left.\begin{array}{l}\text{Now is}\\\text{the time}\\\text{for all good men}\\\text{to come to the aid}\end{array}\right.$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>{:["Now is"],["the time"],["for all good men"],["to come to the aid"]:}</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> {:["Now is"],["the time"],["for all good men"],["to come to the aid"]:}</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$\text { Figure } 1.1 : \text { Relative translational motion }$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>"&nbsp;Figure&nbsp;"1.1:"&nbsp;Relative translational motion&nbsp;"</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> " Figure "1.1:" Relative translational motion "</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$\text { Under the simple parameterization } ( 4.1 ) \text { of }$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>"&nbsp;Under the simple parameterization&nbsp;"(4.1)"&nbsp;of&nbsp;"</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> " Under the simple parameterization "(4.1)" of "</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$\text { Supposons que } u _ { 0 } \in ] 0 , 1 [ \text { . }$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>"&nbsp;Supposons que&nbsp;"u_(0)in]0,1["&nbsp;.&nbsp;"</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> " Supposons que "u_(0)in]0,1[" ."</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>\begin{array}{rlrl}{-i x_{+} \cdot \tilde{\sigma} \tau_{+}} & {=2 \overline{\theta}_{b} p_{+}} & {} & {p \prec 0} \\ {2 \theta^{a} \tau_{+}} & {=\delta_{b}^{a} p_{+}} & {} & {p \succ 0}\end{array}</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>{:[−ix_(+)* tilde(sigma)tau_(+),=2 bar(theta)_(b)p_(+),,p-&lt;0],[2theta^(a)tau_(+),=delta_(b)^(a)p_(+),,p&gt;-0]:}</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> [-ix_(+)*tilde sigma tau_(+),=2bar(theta)_(b)p_(+),,p-<0],[2 theta^(a)tau_(+),=delta_(b)^(a)p_(+),,p>-0]</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$\left.\begin{array} { l } \text{This is one of the best things I have seen in a while.} \\ \text{They use the same pink dye that they use on bank} \\ \text{notes. This makes the Ivory unsellable and it can't} \\ \text{be consumed. (the animals are not harmed and it is} \end{array} \right.$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>{:["This is one of the best things I have seen in a while."],["They use the same pink dye that they use on bank"],["notes. This makes the Ivory unsellable and it can't"],["be consumed. (the animals are not harmed and it is"]:}</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> {:["This is one of the best things I have seen in a while."],["They use the same pink dye that they use on bank"],["notes.This makes the Ivory unsellable and it can't"],["be consumed.(the animals are not harmed and it is"]:}</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$\left.\begin{array}{l}{\text{foo}} \\ { \theta + C }\end{array} \right.$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>{:["foo"],[theta+C]:}</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> {:["foo"],[theta+C]:}</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>\begin{array} { l } { \text { This } } \\ { \qquad x + y } \\ { \text { and this is cool } } \\ { \qquad \operatorname { s i n } ( x ) } \end{array}</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>{:["&nbsp;This&nbsp;"],[qquadx+y],["&nbsp;and this is cool&nbsp;"],[qquadsin⁡(x)]:}</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> [" This "],[qquad x+y],[" and this is cool "],[qquad sin(x)]</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>\begin{array} { l } { \text { How do we represent tables internally to do } } \\ { \text { recognition? } } \\ { \text { What is our preferred table format for editing in our } } \\ { \text { apps? } } \end{array}</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>{:["&nbsp;How do we represent tables internally to do&nbsp;"],["&nbsp;recognition?&nbsp;"],["&nbsp;What is our preferred table format for editing in our&nbsp;"],["&nbsp;apps?&nbsp;"]:}</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> [" How do we represent tables internally to do "],[" recognition? "],[" What is our preferred table format for editing in our "],[" apps? "]</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>\begin{array} { l } { \text { A relatively long line of text that ends with a colon: } } \\ { \text { leave the newline } } \end{array}</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>{:["&nbsp;A relatively long line of text that ends with a colon:&nbsp;"],["&nbsp;leave the newline&nbsp;"]:}</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> [" A relatively long line of text that ends with a colon: "],[" leave the newline "]</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>\begin{array} { l } { \text { A relatively long line of text that is followed by } } \\ { \text { - a line that looks like a list item } } \end{array}</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>{:["&nbsp;A relatively long line of text that is followed by&nbsp;"],["&nbsp;- a line that looks like a list item&nbsp;"]:}</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> [" A relatively long line of text that is followed by "],[" - a line that looks like a list item "]</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>\begin{array} { l } { \text { A relatively long line of text that is followed by } } \\ { \text { 3.2 a line that looks like an enumerated list item } } \end{array}</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>{:["&nbsp;A relatively long line of text that is followed by&nbsp;"],["&nbsp;3.2 a line that looks like an enumerated list item&nbsp;"]:}</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> [" A relatively long line of text that is followed by "],[" 3.2a line that looks like an enumerated list item "]</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>\begin{array} { l } { a + b + c + d + e + f + g + h + i + j + k + l + } \\ { m + n } \end{array}</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>{:[a+b+c+d+e+f+g+h+i+j+k+l+],[m+n]:}</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> [a+b+c+d+e+f+g+h+i+j+k+l+],[m+n]</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$x ^ 2$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>x^(2)</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> x^(2)</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$\{ \begin{array} { l } { 4 x - 3 y = 6 } \\ { y = - 3 x + 15 } \end{array}$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>{{:[4x−3y=6],[y=−3x+15]:}</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> {[4x-3y=6],[y=-3x+15]</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$10^3$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>10^(3)</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> 10^(3)</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$.3$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>.3</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> .3</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$\int_a^b$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>int_(a)^(b)</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> int_(a)^(b)</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$\sum_{i=0}^{10}$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>sum_(i=0)^(10)</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> sum_(i=0)^(10)</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$a\pm b$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>a+-b</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> a+-b</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$x\approx y$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>x~~y</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> x~~y</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$x\cdot y$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>x*y</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> x*y</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$a \dots b$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>a dots b</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> a dots b</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$\frac{n!}{k!(n-k)!}$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>(n!)/(k!(n−k)!)</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> (n!)/(k!(n-k)!)</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$\lim_{x\rightarrow 0}{x^2}$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>lim_(x rarr0)x^(2)</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> lim_(x rarr0)x^(2)</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$\overline{xyz}$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span> bar(xyz)</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> bar(xyz)</code>
+</p>
+<p>
+  <code style="display: block;"> <span>Latex => </span>$\operatorname { archyp } \operatorname { tan } ( x )$</code>
+  <code style="display: block;"> <span>ASCIIMATH => </span>archyp ⁡tan⁡(x)</code>
+  <code style="display: block;"> <span>ASCIIMATH_OLD => </span> archyp tan(x)</code>
+</p>
+
+</body>
+</html>
