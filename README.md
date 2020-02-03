@@ -1,11 +1,13 @@
 # What is Mathpix Markdown? 
 
-**mathpix-markdown** is a Markdown dialect which addresses limitations inherent in standard Markdown that appear when communicating scientific and mathematical information:
+[mathpix-markdown](https://mathpix.com/docs/mathpix-markdown/overview) is a Markdown dialect which addresses limitations inherent in standard Markdown that appear when communicating scientific and mathematical information:
 
 - lack of standardized support for math equations and math equation numbering and references
 - poor support for tables
 - no support for document elements common in academic publishing, such as abstracts, titles, and author lists
 - limited support for linking to tables, equations, and sections within a document
+
+# How is Mathpix Markdown different from regular Markdown?
 
 Mathpix Markdown addresses these limitations by adding support for the following standard Latex syntax elements which are already familiar to the scientific community:
 
@@ -13,19 +15,10 @@ Mathpix Markdown addresses these limitations by adding support for the following
 - block math via `\[ <latex math> \]` or `$$ <math> $$`
 - tables via `\begin{tabular} ... \end{tabular}`
 - figures and figure captions via `\begin{figure} \caption{...} ... \end{figure}`
-- numbered equation via `\begin{equation} <latex math> \end{equation}`
-- unnumbered equation via `\begin{equation*} <latex math> \end{equation*}`
-- additional equation environments: `\begin{align} ... \end{align}`, `\begin{split} ... \end{split}`, `\begin{gather} ... \end{gather}`
-- numbered and unnumbered equation enviornments `\begin{ELEM} ... \end{ELEM}` and `\begin{ELEM*} ... \end{ELEM*}` where ELEM=`equation|align|split|gather`
+- numbered and unnumbered equation enviornments `\begin{elem} ... \end{elem}` and `\begin{elem*} ... \end{elem*}` where elem=`equation|align|split|gather`
 - equation, table, and figure references via `\label`, `\ref`, `\eqref`, `\tag`
 - text formatting options `\title{...}`, `\author{...}`, `\begin{abstract}...\end{abstract}`, `\section{Section Title}`, `\subsection{Section Title}`, `\subsubsection{Section Title}`, `\textit{italicized text}`, `\textbf{bold text}`, `\url{link}`
 
-The design objective of Mathpix Markdown is to provide the least opinionated extensions to Markdown to make it suitable to communicate math and science.
-
-More documentation about Mathpix Markdown:
-+ [What is Mathpix Markdown?](https://mathpix.com/docs/mathpix-markdown/overview)
-+ [Syntax Reference](https://mathpix.com/docs/mathpix-markdown/syntax-reference)
-+ [LaTeX Table Syntax](https://mathpix.com/docs/mathpix-markdown/tables)
 
 # What is mathpix-markdown-it? 
 
@@ -38,9 +31,7 @@ It relies on the following open source libraries:
 
 # Quickstart
 
-## Installation
-
-**node.js**
+## NodeJS Installation
 
 ```bash
 npm install https://github.com/Mathpix/mathpix-markdown-it.git
