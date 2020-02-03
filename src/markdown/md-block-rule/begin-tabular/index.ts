@@ -4,6 +4,7 @@ import { pushError, CheckParseError } from '../parse-error';
 import { getParams } from './common';
 import {StatePushIncludeGraphics} from "../../md-inline-rule/includegraphics";
 import { getSubCode, codeInlineContent } from "./sub-code";
+import { MergeIneerTsvToTsv, getTsv, clearTsv, TsvJoin } from "../../common/tsv";
 
 export const openTag: RegExp = /(?:\\begin\s{0,}{tabular}\s{0,}\{([^}]*)\})/;
 export const openTagG: RegExp = /(?:\\begin\s{0,}{tabular}\s{0,}\{([^}]*)\})/g;
@@ -124,14 +125,6 @@ const StatePushParagraphClose = (state) => {
   state.push('paragraph_close', 'div', -1);
 };
 
-var inner_tsv = [];
-export const tsvPush = (item) => {
-  inner_tsv.push(item);
-};
-
-export const getTsv = () => {
-  return inner_tsv
-};
 
 export const StatePushTabulars = (state, cTabular: TTypeContentList, align: string) => {
   let token: Token;
@@ -145,9 +138,9 @@ export const StatePushTabulars = (state, cTabular: TTypeContentList, align: stri
       }
       continue;
     }
-    inner_tsv = [];
+    clearTsv();
     const res: Array<TTokenTabular> | null = ParseTabular(cTabular[i].content, 0, cTabular[i].align);
-    let tsv = [].concat(inner_tsv);
+    let tsv = [].concat(getTsv());
     if (!res || res.length === 0) {
       continue;
     }
@@ -159,7 +152,7 @@ export const StatePushTabulars = (state, cTabular: TTypeContentList, align: stri
       if (res[j].token === 'inline') {
         if (res[j].content) {
           let children = [];
-          inner_tsv = [];
+          clearTsv();
           state.md.inline.parse(res[j].content, state.md, state.env, children);
           if (children.length > 0) {
             token.content  = '';
@@ -168,13 +161,9 @@ export const StatePushTabulars = (state, cTabular: TTypeContentList, align: stri
             token.content  = res[j].content;
             token.children = [];
           }
+          const inner_tsv = [].concat(getTsv());
           if (res[j].id && inner_tsv.length > 0) {
-            tsv.map(item => {
-              let i = item.indexOf(res[j].id);
-              if (i !== -1 ) {
-                item[i] = inner_tsv;
-              }
-            })
+            tsv = MergeIneerTsvToTsv(inner_tsv, tsv, res[j].id, children);
           }
         }
       } else {
@@ -198,15 +187,6 @@ export const StatePushDiv = (state, startLine: number, nextLine: number, content
   token.children = [];
   token.content = content;
   state.push('paragraph_close', 'div', -1);
-};
-
-export const TsvJoin = (tsv, options): string => {
-  const {tsv_separators = {}} = options.outMath;
-  const {column = '\t', row = '\n'} = tsv_separators;
-  if (!tsv || tsv.length === 0 ) {
-    return ''
-  }
-  return tsv.map(row => row.join(column)).join(row)
 };
 
 const StatePushTSVTable = (state, tsvList) => {

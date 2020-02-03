@@ -1,4 +1,5 @@
-import { TTokenTabular, tsvPush } from "./index";
+import { TTokenTabular } from "./index";
+import { tsvPush } from "../../common/tsv";
 import {addHLineIntoStyle, AddTd, AddTdSubTable } from "./tabular-td";
 import {getContent, getRowLines,getCellsAll, getDecimal, TDecimal,
   TAlignData, getVerticallyColumnAlign, getParams, getColumnLines
@@ -49,7 +50,6 @@ const getRows = (str: string): string[] => {
 const setTokensTabular = (str: string, align: string = ''): Array<TTokenTabular>|null => {
   let res: Array<TTokenTabular> = [];
   const rows: string[] = getRows(str);
-  let tsv_row = [];
 
   let cellsAll: string[] = getCellsAll(rows);
   const numCol: number = getNumCol(cellsAll);
@@ -66,9 +66,8 @@ const setTokensTabular = (str: string, align: string = ''): Array<TTokenTabular>
   res.push({token:'tbody_open', tag: 'tbody', n: 1});
 
   let MR: Array<number> = new Array(numCol).fill(0);
-
   for (let i = 0; i < rows.length; i++) {
-    tsv_row = new Array(numCol).fill('');
+    let tsv_row = new Array(numCol).fill('');
     if (!cellsAll[i] || cellsAll[i].length === 0) {
       if (i < cellsAll.length-1) {
         res.push({token:'tr_open', tag: 'tr', n: 1, attrs: [[ 'style', 'border-top: none !important; border-bottom: none !important;' ]]});
@@ -187,6 +186,7 @@ const setTokensTabular = (str: string, align: string = ''): Array<TTokenTabular>
              {left: cLeft, right: cRight, bottom: CellsHLines[i+1][ic], top: i === 0 ? CellsHLines[i][ic] : ''}
             ));
           for (let si=0; si< parseSub.length; si++) {
+            tsv_row[j] += tsv_row[j].length > 0 ? ' ' : '';
             tsv_row[j] += parseSub[si].id;
           }
           continue;

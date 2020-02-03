@@ -1,6 +1,6 @@
 {
   "name": "mathpix-markdown-it",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Component that can render Mathpix output",
   "main": "lib/index.js",
   "scripts": {
