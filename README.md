@@ -79,7 +79,7 @@ The `MathpixMarkdown` React element accepts the following props:
 | `width`          | number;*`1200`*              | Text container width                                                                                                  |
 | `outMath`        | TOutputMath;*`{}`*           | Options to output html                                                                                                |
 
-## Non-React Javascript
+## Using mathpix-markdown-it functions in React app
 
 You can also use certain functions to get styles and rendering in html:
 
@@ -92,6 +92,33 @@ You can also use certain functions to get styles and rendering in html:
 `const html = MathpixMarkdownModel.markdownToHTML(content, options: TMarkdownItOptions);` - It returns a rendered html element as a string.
 
 `const htmlMM = MathpixMarkdownModel.render(text, options: optionsMathpixMarkdown);` - Returns a rendered HTML element as a string and wraps it in a container. Should be used to render the entire document.
+
+## Simple example
+
+```js
+import React from 'react';
+import { MathpixMarkdownModel as MM } from 'mathpix-markdown-it';
+
+class Preview extends React.Component {
+  componentDidMount() {
+    const isLoad = MM.loadMathJax();
+    if (isLoad) {
+      console.log('STYLE is loading')
+    } else {
+      console.log('STYLE is NOT loading')
+    }
+
+  }
+  render() {
+    const html = MM.render('$x = \\frac { - b \\pm \\sqrt { b ^ { 2 } - 4 a c } } { 2 a }$');
+    return (
+      <div className="content" dangerouslySetInnerHTML={{__html: html}}></div>
+    )
+  }
+}
+
+export default Preview;
+```
 
 
 ### TMarkdownItOptions
