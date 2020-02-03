@@ -69,7 +69,11 @@ const toAsciiML = ((node, optionAscii) => {
 });
 
 const OuterData = (node, math, outMath) => {
-  const {include_mathml = false, include_asciimath = false, include_latex = true, include_svg = true,
+  const {
+    include_mathml = false,
+    include_asciimath = false,
+    include_latex = false,
+    include_svg = true,
     optionAscii = {
       showStyle: false,
       extraBrackets: true
