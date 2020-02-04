@@ -1,0 +1,16 @@
+.App {
+  width: 800px;
+  margin: auto;
+}
+
+#preview-content {
+  min-height: 200px;
+  border: 1px solid gray;
+  margin-top: 20px;
+  padding: 10px;
+}
+
+textarea {
+  min-height: 200px;
+  width: 100%;
+}

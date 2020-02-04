@@ -1,0 +1,50 @@
+.App {
+  width: 800px;
+  margin: auto;
+}
+
+#preview-content {
+  min-height: 100px;
+  border: 1px solid gray;
+  margin-top: 20px;
+  padding: 10px;
+}
+
+.inputs {
+  display: flex;
+}
+
+.includes {
+  width: 100px;
+  margin-left: 20px;
+}
+
+.includes label {
+  display: block;
+  margin-bottom: 10px;
+}
+
+textarea {
+  min-height: 100px;
+  width: 100%;
+}
+
+.formats {
+  margin-top: 20px;
+}
+
+code {
+  font-family: Inconsolata;
+  background: #f8f8fa;
+  display: block;
+  color: #333;
+  overflow-x: auto;
+  font-size: 15px;
+  margin-bottom: 1em;
+  border: 1px solid #ccc;
+  page-break-inside: avoid;
+  padding: 0.5em;
+  max-height: 100px;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+}

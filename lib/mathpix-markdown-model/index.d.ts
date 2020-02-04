@@ -50,14 +50,14 @@ declare class MathpixMarkdown_Model {
     getLastEquationNumber: () => any;
     parseMarkdownByHTML: (html: string, include_sub_math?: boolean) => any[];
     parseMarkdownByElement: (el: HTMLElement | Document, include_sub_math?: boolean) => any[];
-    markdownToHTML: (markdown: string, options: TMarkdownItOptions) => string;
+    markdownToHTML: (markdown: string, options?: TMarkdownItOptions) => string;
     showTocInContainer: (html: string, containerName?: string) => void;
     getTocContainerHTML: (html: string) => string;
     checkEquationNumber: (html: string) => string;
     handleClick: (e: any) => void;
     scrollPage: (parent: any, offsetTarget: any) => void;
     loadMathJax: (notScrolling?: boolean, setTextAlignJustify?: boolean, isResetBodyStyles?: boolean) => boolean;
-    convertToHTML: (str: string, options: TMarkdownItOptions) => string;
+    convertToHTML: (str: string, options?: TMarkdownItOptions) => string;
     getMathjaxStyle: () => any;
     getMathpixStyleOnly: () => string;
     getMathpixStyle: (stylePreview?: boolean, showToc?: boolean, tocContainerName?: string) => string;
