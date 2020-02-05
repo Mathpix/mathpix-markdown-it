@@ -37,13 +37,13 @@ It relies on the following open source libraries:
 [npm](https://www.npmjs.com) usage:
 
 ```bash
-$ npm install https://github.com/Mathpix/mathpix-markdown-it.git
+$ npm install mathpix-markdown-it
 ```
 
 [yarn](https://classic.yarnpkg.com) usage:
 
 ```bash
-$ yarn add https://github.com/Mathpix/mathpix-markdown-it.git
+$ yarn add mathpix-markdown-it
 ```
 
 
@@ -239,7 +239,7 @@ It prints html to the console for string `\\(ax^2 + bx + c = 0\\)`
 1. Install packages:
 
 ```bash
-npm install https://github.com/Mathpix/mathpix-markdown-it.git jsdom window
+$ npm install mathpix-markdown-it jsdom window
 ```
 
 2. Node app.js:
