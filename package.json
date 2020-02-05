@@ -1,7 +1,35 @@
 {
   "name": "mathpix-markdown-it",
-  "version": "1.0.1",
-  "description": "Component that can render Mathpix output",
+  "version": "1.0.0",
+  "description": "Mathpix-markdown-it is an open source implementation of the mathpix-markdown spec written in Typescript. It relies on the following open source libraries: MathJax v3 (to render math with SVGs), markdown-it (for standard Markdown parsing)",
+  "keywords": [
+    "MathJax",
+    "markdown-it",
+    "math",
+    "svg",
+    "mathml",
+    "tex",
+    "latex",
+    "asciimath",
+    "html",
+    "conversion",
+    "browser",
+    "nodejs",
+    "react",
+    "equation",
+    "formula",
+    "tabular"
+  ],
+  "homepage": "https://github.com/Mathpix/mathpix-markdown-it#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mathpix/mathpix-markdown-it.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Mathpix/mathpix-markdown-it/issues"
+  },
+  "license": "ISC",
+  "author": "Mathpix",
   "main": "lib/index.js",
   "scripts": {
     "compile": "npx tsc",
@@ -10,16 +38,6 @@
     "dev": "npx tsc &&  webpack --mode=development --config webpack.dev.js --watch",
     "test": "mocha tests/*.js --exit"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Mathpix/mathpix-markdown-it.git"
-  },
-  "author": "Mathpix",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/Mathpix/mathpix-markdown-it/issues"
-  },
-  "homepage": "https://github.com/Mathpix/mathpix-markdown-it#readme",
   "dependencies": {
     "@types/node": "^11.11.7",
     "@types/react": "^16.4.18",
