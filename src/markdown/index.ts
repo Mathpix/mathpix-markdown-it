@@ -41,7 +41,7 @@ const mdInit = (options: TMarkdownItOptions) => {
 
 /** String transformtion pipeline */
 // @ts-ignore
-export const markdownToHtmlPipeline = (content: string, options: TMarkdownItOptions) => {
+export const markdownToHtmlPipeline = (content: string, options: TMarkdownItOptions = {}) => {
   const { lineNumbering = false } = options;
   let md = mdInit(options);
   // inject rules override
@@ -57,6 +57,6 @@ export const markdownToHtmlPipeline = (content: string, options: TMarkdownItOpti
 /**
  * convert a markdown text to html
  */
-export function markdownToHTML(markdown: string, options: TMarkdownItOptions): string {
+export function markdownToHTML(markdown: string, options: TMarkdownItOptions = {}): string {
   return markdownToHtmlPipeline(markdown, options);
 }

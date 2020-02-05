@@ -97,7 +97,7 @@ class MathpixMarkdown_Model {
     return res;
   };
 
-  markdownToHTML = (markdown: string, options: TMarkdownItOptions):string => {
+  markdownToHTML = (markdown: string, options: TMarkdownItOptions = {}):string => {
     const { lineNumbering = false } = options;
     let html = markdownHTML(markdown, options);
     if (!lineNumbering) {
@@ -249,7 +249,7 @@ class MathpixMarkdown_Model {
         }
     };
 
-    convertToHTML = (str:string, options: TMarkdownItOptions) => {
+    convertToHTML = (str:string, options: TMarkdownItOptions = {}) => {
         const startTime = new Date().getTime();
         const  mathString =  this.isCheckFormula ? this.checkFormula(str, this.showTimeLog): str;
         options.lineNumbering = false;
@@ -262,19 +262,23 @@ class MathpixMarkdown_Model {
     };
 
     getMathjaxStyle = () => {
-      const MathJaxStyle: any = MathJax.Stylesheet();
-      return MathJaxStyle.children[0].value;
+      try {
+        const MathJaxStyle: any = MathJax.Stylesheet();
+        return MathJaxStyle.children[0] && MathJaxStyle.children[0].value
+          ? MathJaxStyle.children[0].value
+          : MathJaxStyle.innerHTML;
+      } catch (e) {
+        return '';
+      }
     };
 
     getMathpixStyleOnly = () => {
-      const MathJaxStyle: any = MathJax.Stylesheet();
-      let style: string =  MathJaxStyle.children[0].value + MathpixStyle(false) + codeStyles + tabularStyles;
+      let style: string =  this.getMathjaxStyle() + MathpixStyle(false) + codeStyles + tabularStyles;
       return style;
     };
 
     getMathpixStyle = (stylePreview: boolean = false, showToc: boolean = false, tocContainerName: string = 'toc') => {
-      const MathJaxStyle: any = MathJax.Stylesheet();
-      let style: string = ContainerStyle + MathJaxStyle.children[0].value + MathpixStyle(stylePreview) + codeStyles + tabularStyles;
+      let style: string = ContainerStyle + this.getMathjaxStyle() + MathpixStyle(stylePreview) + codeStyles + tabularStyles;
       if (showToc) {}
       return stylePreview
         ? showToc ? style + PreviewStyle + TocStyle(tocContainerName) : style + PreviewStyle

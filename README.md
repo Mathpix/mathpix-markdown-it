@@ -40,6 +40,7 @@ npm install https://github.com/Mathpix/mathpix-markdown-it.git
 ## React usage
 
 We provide React components which make rendering mathpix-markdown easy for React applications:
+[Full example](https://github.com/Mathpix/mathpix-markdown-it/tree/dev/olga/readme/examples/react-app/use-components)
 
 ```js
 import {MathpixMarkdown, MathpixLoader} from 'mathpix-markdown-it';
@@ -79,19 +80,163 @@ The `MathpixMarkdown` React element accepts the following props:
 | `width`          | number;*`1200`*              | Text container width                                                                                                  |
 | `outMath`        | TOutputMath;*`{}`*           | Options to output html                                                                                                |
 
-## Non-React Javascript
+## Using MathpixMarkdownModel methods in React app
 
-You can also use certain functions to get styles and rendering in html:
+#### [Example to use render() method](https://github.com/Mathpix/mathpix-markdown-it/tree/dev/olga/readme/examples/react-app/use-render-method)
 
-`const isLoad = MathpixMarkdownModel.loadMathJax();` - If styles have not been added yet - add them to the style element. In case of an error, returns false.
+```js
+import * as React from 'react';
+import { MathpixMarkdownModel as MM } from 'mathpix-markdown-it';
 
-`const mathpixStyles = MathpixMarkdownModel.getMathpixStyleOnly();` - It returns styles as a string.
+class App extends React.Component {
+  componentDidMount() {
+    const elStyle = document.getElementById('Mathpix-styles');
+    if (!elStyle) {
+      const style = document.createElement("style");
+      style.setAttribute("id", "Mathpix-styles");
+      style.innerHTML = MM.getMathpixFontsStyle() + MM.getMathpixStyle(true);
+      document.head.appendChild(style);
+    }
+  }
+  render() {
+    const html = MM.render('$x = \\frac { - b \\pm \\sqrt { b ^ { 2 } - 4 a c } } { 2 a }$');
+    return (
+      <div className="App">
+        <div className="content" dangerouslySetInnerHTML={{__html: html}}></div>
+      </div>
+    )
+  }
+}
 
-`const mathpixFontsStyles = MathpixMarkdownModel.getMathpixFontsStyle();` - It returns fonts styles as a string.
+export default App;
 
-`const html = MathpixMarkdownModel.markdownToHTML(content, options: TMarkdownItOptions);` - It returns a rendered html element as a string.
+```
 
-`const htmlMM = MathpixMarkdownModel.render(text, options: optionsMathpixMarkdown);` - Returns a rendered HTML element as a string and wraps it in a container. Should be used to render the entire document.
+#### [Example to use markdownToHTML() method](https://github.com/Mathpix/mathpix-markdown-it/tree/dev/olga/readme/examples/react-app/use-markdownToHTML-method)
+
+```js
+class ConvertForm extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      value: '\\[\n' +
+        'y = \\frac { \\sum _ { i } w _ { i } y _ { i } } { \\sum _ { i } w _ { i } } , i = 1,2 \\ldots k\n' +
+        '\\]',
+      result: ''
+    };
+
+    this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+  }
+
+  handleChange(event) {
+    this.setState({value: event.target.value});
+  }
+
+  handleSubmit(event) {
+    event.preventDefault();
+    this.setState({result: MM.markdownToHTML(this.state.value)})
+  }
+
+  render() {
+    return (
+      <div>
+        <form onSubmit={this.handleSubmit}>
+          <h1>Input Text with Latex:</h1>
+          <textarea value={this.state.value} onChange={this.handleChange} />
+          <input type="submit" value="Convert" />
+        </form>
+        <div id='preview-content' dangerouslySetInnerHTML={{__html: this.state.result}}/>
+      </div>
+    );
+  }
+}
+```
+
+#### [Example conversion Latex to mathml/asciimath/tsv](https://github.com/Mathpix/mathpix-markdown-it/tree/dev/olga/readme/examples/react-app/use-parseMarkdownByHTML-method)
+
+Rendering methods have the ability to convert `Latex` representation to such formats as: `mathml`, `asciimath`, `tsv`
+
+```js
+const options = {
+      outMath: {
+        include_mathml: true,
+        include_asciimath: true,
+        include_latex: true,
+        include_svg: true,
+        include_tsv: true,
+      }
+    };
+    const html = MM.markdownToHTML(`$x^x$`, options);
+```
+
+`markdownToHTML()` returns an HTML string that will contain the formats specified in the options.
+
+For Latex formulas, the result will be:
+```html
+<span class="math-block">
+    <mathml style="display: none">...</mathml>
+    <asciimath style="display: none">...</asciimath>
+    <latex style="display: none">...</latex>
+    <mjx-comtainer class="MathJax" jax="SVG">..</mjx-comtainer>
+</span>
+```
+
+For tabular, the result will be:
+```html
+<div class="table_ tabular">
+    <table id="tabular">...</table>
+    <tsv style="display: none">...</tsv>
+</div>
+```
+
+Then calling the `parseMarkdownByHTML(html)` method will return all formats as a list from the incoming html string.
+
+```js
+[
+    {
+      "type": "mathml",
+      "value": "<math>...</math>"
+    },
+    {
+       "type": "asciimath",
+       "value": "x^(x)"
+     },
+    {
+       "type": "latex",
+       "value": "x^x
+     },
+    {
+       "type": "html",
+       "value": "<mjx-container>...</mjx-container>"
+     }
+]
+```
+
+
+
+### MathpixMarkdownModel methods
+
+| Style methods                                      | returns; | description                                                                                              |         |
+|----------------------------------------------------|----------|----------------------------------------------------------------------------------------------------------|---------|
+| loadMathJax()                                      | boolean; | Adds a style element into the head of the document and returns true. In case of an error, returns false. |[example](https://github.com/Mathpix/mathpix-markdown-it/tree/dev/olga/readme/examples/react-app/use-markdownToHTML-method)|
+| getMathpixStyleOnly()                              | string;  | It returns styles as a string.                                                                           |         |
+| getMathpixStyle(true)                              | string;  | It returns styles as a string including styles for container.                                            |[example](https://github.com/Mathpix/mathpix-markdown-it/tree/dev/olga/readme/examples/react-app/use-render-method)|
+| getMathpixFontsStyle()                             | boolean; | It returns fonts styles as a string.                                                                     |[example](https://github.com/Mathpix/mathpix-markdown-it/tree/dev/olga/readme/examples/react-app/use-render-method)|
+
+
+| Render methods                                     | returns; | description                                                                                                                                                                                  |         |
+|----------------------------------------------------|----------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
+| markdownToHTML(str, options: [TMarkdownItOptions](https://github.com/Mathpix/mathpix-markdown-it#tmarkdownitoptions)) | string;  | Renders input text to html element as a string.                                                                           |[example](https://github.com/Mathpix/mathpix-markdown-it/tree/dev/olga/readme/examples/react-app/use-markdownToHTML-method)|
+| render(str, options: [TMarkdownItOptions](https://github.com/Mathpix/mathpix-markdown-it#tmarkdownitoptions))         | string;  | Renders input text to  HTML element as a string and wraps it in a container. Should be used to render the entire document.|[example](https://github.com/Mathpix/mathpix-markdown-it/tree/dev/olga/readme/examples/react-app/use-render-method)|
+
+
+| Parser methods                                                                         | description                                                        |           |
+|----------------------------------------------------------------------------------------|--------------------------------------------------------------------|-----------|
+| parseMarkdownByHTML(html: string, include_sub_math: boolean = true)                    | It parses input html string and returns array of formats.          |[examples](https://github.com/Mathpix/mathpix-markdown-it/tree/dev/olga/readme/examples/react-app/use-parseMarkdownByHTML-method) |
+| parseMarkdownByElement(el: HTMLElement | Document, include_sub_math: boolean = true)   | It parses input html element and returns array of formats.         |           |
+
+Parser methods returns array of formats
 
 
 ### TMarkdownItOptions
@@ -140,7 +285,7 @@ You can also use certain functions to get styles and rendering in html:
 
 ## NodeJS
 
-[Example to use mathpix-markdown-it in the node application](https://github.com/Mathpix/mathpix-markdown-it/tree/master/examples/mathpix-markdown-it-node-examples)
+[Example to use mathpix-markdown-it in the node application](https://github.com/Mathpix/mathpix-markdown-it/tree/dev/olga/readme/examples/mathpix-markdown-it-node-examples)
 
 ```js
 const {MathpixMarkdownModel} = require('mathpix-markdown-it'); 
