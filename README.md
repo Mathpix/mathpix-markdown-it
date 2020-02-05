@@ -197,7 +197,7 @@ Then calling the `parseMarkdownByHTML(html)` method will return all formats as a
      },
     {
        "type": "latex",
-       "value": "x^x
+       "value": "x^x"
      },
     {
        "type": "html",
