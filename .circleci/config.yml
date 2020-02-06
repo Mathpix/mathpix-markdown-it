@@ -19,6 +19,23 @@ jobs:
         command: |
           npm run build
 
+    - run: sudo npm install -g mocha
+    - run: sudo npm install -g mocha-junit-reporter
+
+    - run: mkdir reports
+
+    # Run mocha
+    - run:
+        name: npm test
+        command: mocha tests/*.js --reporter mocha-junit-reporter --reporter-options mochaFile=reports/mocha/test-results.xml
+        when: always
+        # Upload results
+
+    - store_test_results:
+        path: reports
+
+    - store_artifacts:
+        path: ./reports/mocha/test-results.xml
 
   deploy-feature:
     working_directory: ~/app
