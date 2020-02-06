@@ -1,3 +1,8 @@
+# mathpix-markdown-it
+
+[![npm version](https://badge.fury.io/js/mathpix-markdown-it.svg)](https://badge.fury.io/js/mathpix-markdown-it)
+
+
 # What is Mathpix Markdown? 
 
 [mathpix-markdown](https://mathpix.com/docs/mathpix-markdown/overview) is a Markdown dialect which addresses limitations inherent in standard Markdown that appear when communicating scientific and mathematical information:
