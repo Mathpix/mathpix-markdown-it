@@ -36,8 +36,8 @@
     "compile:dev": "npx tsc --watch",
     "build": "npx tsc && webpack --mode=production --config webpack.config.js",
     "dev": "npx tsc &&  webpack --mode=development --config webpack.dev.js --watch",
-    "test": "mocha tests/*.js --exit",
-    "test:m": "mocha tests/*.js --reporter mocha-junit-reporter"
+    "test:dev": "mocha tests/*.js --exit",
+    "test": "mocha tests/*.js --reporter mocha-junit-reporter"
   },
   "dependencies": {
     "@types/node": "^11.11.7",
