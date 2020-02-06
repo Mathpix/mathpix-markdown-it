@@ -39,19 +39,23 @@ jobs:
         command: |
           npm run build
 
+    - run: npm install mocha-junit-reporter # just for CircleCI
 
-    - run: sudo npm install -g mocha
-    - run: sudo npm install -g mocha-junit-reporter
-    - run: mkdir ~/junit
+    - run: mkdir reports
+
+    # Run mocha
     - run:
-        command: mocha tests/*.js --reporter mocha-junit-reporter
-        environment:
-          MOCHA_FILE: junit/test-results.xml
+        name: npm test
+        command: ./node_modules/.bin/nyc ./node_modules/.bin/mocha --recursive --timeout=10000 --exit --reporter mocha-junit-reporter --reporter-options mochaFile=reports/mocha/test-results.xml
         when: always
+        # Upload results
+
     - store_test_results:
-        path: ~/junit
+        path: reports
+
     - store_artifacts:
-        path: ~/junit
+        path: ./reports/mocha/test-results.xml
+
 
 workflows:
   version: 2
