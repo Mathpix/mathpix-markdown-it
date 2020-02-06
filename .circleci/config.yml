@@ -1,0 +1,56 @@
+version: 2
+jobs:
+  deploy-production:
+    working_directory: ~/app
+
+    docker:
+    - image: circleci/node:latest
+
+    steps:
+    - checkout
+
+    - run:
+        name: Install node dependencies
+        command: |
+          npm install
+
+    - run:
+        name: Build static files
+        command: |
+          npm run build
+
+
+  deploy-feature:
+    working_directory: ~/app
+
+    docker:
+    - image: circleci/node:latest
+
+    steps:
+    - checkout
+
+    - run:
+        name: Install node dependencies
+        command: |
+          npm install
+
+    - run:
+        name: Build static files
+        command: |
+          npm run build
+
+
+workflows:
+  version: 2
+  build:
+    jobs:
+    - deploy-production:
+        filters:
+          branches:
+            only:
+            - master
+    - deploy-feature:
+        filters:
+          branches:
+            only:
+            - feature
