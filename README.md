@@ -2,6 +2,8 @@
 
 [![npm version](https://badge.fury.io/js/mathpix-markdown-it.svg)](https://badge.fury.io/js/mathpix-markdown-it)
 
+[![Build Status](https://img.shields.io/circleci/build/gh/Mathpix/mathpix-markdown-it/feature.svg?style=flat)](https://circleci.com/gh/Mathpix/mathpix-markdown-it/tree/feature)
+
 
 # What is Mathpix Markdown? 
 

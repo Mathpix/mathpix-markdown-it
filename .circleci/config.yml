@@ -39,29 +39,16 @@ jobs:
         command: |
           npm run build
 
-
-  test-feature:
-    working_directory: ~/app
-
-    docker:
-    - image: circleci/node:latest
-
-    steps:
-    - checkout
-
+    - run: mkdir ~/junit
     - run:
-        name: Install node dependencies
-        command: |
-          npm install
-
-    - run:
-        name: Build static files
-        command: |
-          npm run build
-    - run:
-        name: Tests
-        command: |
-          npm run test
+        command: mocha tests/*.js --reporter mocha-junit-reporter
+        environment:
+        MOCHA_FILE: ~/junit/test-results.xml
+        when: always
+    - store_test_results:
+        path: ~/junit
+    - store_artifacts:
+        path: ~/junit
 
 workflows:
   version: 2
@@ -73,13 +60,6 @@ workflows:
             only:
             - master
     - deploy-feature:
-        filters:
-          branches:
-            only:
-            - feature
-  test:
-    jobs:
-    - test-feature:
         filters:
           branches:
             only:
