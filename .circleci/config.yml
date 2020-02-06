@@ -39,13 +39,14 @@ jobs:
         command: |
           npm run build
 
+
+    - run: sudo npm install -g mocha
+    - run: sudo npm install -g mocha-junit-reporter
     - run: mkdir ~/junit
     - run:
-        name: Testing
-        command: |
-          npm run test
+        command: mocha tests/*.js --reporter mocha-junit-reporter
         environment:
-        MOCHA_FILE: ~/junit/test-results.xml
+          MOCHA_FILE: junit/test-results.xml
         when: always
     - store_test_results:
         path: ~/junit
