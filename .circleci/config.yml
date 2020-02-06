@@ -39,7 +39,8 @@ jobs:
         command: |
           npm run build
 
-    - run: npm install mocha-junit-reporter # just for CircleCI
+    - run: sudo npm install -g mocha
+    - run: sudo npm install -g mocha-junit-reporter
 
     - run: mkdir reports
 
