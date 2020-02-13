@@ -80,6 +80,19 @@ describe('Latex to ascii:', () => {
       });
     });
   });
+
+  describe('Testing More equation:', () => {
+    const tests = require('./_data/_ascii/_asciiMore');
+    tests.forEach(function(test) {
+      it('Latex =>' + test.latex, function(done) {
+        const data = MathJax.TexConvert(test.latex, options);
+        console.log('    LATEX         =>', test.latex);
+        console.log('    ASCIIMATH     =>', test.ascii);
+        data.should.have.property('asciimath', test.ascii);
+        done();
+      });
+    });
+  });
   // {
   //   latex: `\\left.\\begin{array}{l}{\\text{foo}} \\\\ { \\theta + C }\\end{array} \\right.`,
   //     ascii: `{:["foo"],[theta+C]:}`,
