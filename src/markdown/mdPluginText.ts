@@ -438,6 +438,7 @@ const mapping = {
 
 export default () => {
   return (md: MarkdownIt) => {
+    resetCounter();
     md.block.ruler.before("heading", "headingSection", headingSection);
     md.block.ruler.before("paragraphDiv", "abstractBlock", abstractBlock);
 
