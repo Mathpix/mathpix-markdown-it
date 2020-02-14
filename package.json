@@ -28,7 +28,7 @@
   "bugs": {
     "url": "https://github.com/Mathpix/mathpix-markdown-it/issues"
   },
-  "license": "ISC",
+  "license": "MIT",
   "author": "Mathpix",
   "main": "lib/index.js",
   "scripts": {
