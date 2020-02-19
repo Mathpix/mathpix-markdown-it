@@ -101,19 +101,23 @@ const OuterData = (node, math, outMath) => {
   return res;
 };
 
+const formatSource = (text: string) => {
+  return text.trim().replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+};
+
 const OuterHTML = (data) => {
   let outHTML = '';
 
   if (data.mathml) {
-    outHTML +=  '<mathml style="display: none">' + data.mathml + '</mathml>';
+    outHTML +=  '<mathml style="display: none">' + formatSource(data.mathml) + '</mathml>';
   }
   if (data.asciimath) {
     if (!outHTML) { outHTML += '\n'}
-    outHTML +=  '<asciimath style="display: none;">' + data.asciimath + '</asciimath>';
+    outHTML +=  '<asciimath style="display: none;">' + formatSource(data.asciimath) + '</asciimath>';
   }
   if (data.latex) {
     if (!outHTML) { outHTML += '\n'}
-    outHTML += '<latex style="display: none">' + data.latex + '</latex>';
+    outHTML += '<latex style="display: none">' + formatSource(data.latex) + '</latex>';
   }
 
   if (data.svg) {
