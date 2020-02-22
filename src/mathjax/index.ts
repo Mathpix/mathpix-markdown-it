@@ -109,7 +109,7 @@ const OuterHTML = (data) => {
   let outHTML = '';
 
   if (data.mathml) {
-    outHTML +=  '<mathml style="display: none">' + formatSource(data.mathml) + '</mathml>';
+    outHTML +=  '<mathml style="display: none">' + data.mathml + '</mathml>';
   }
   if (data.asciimath) {
     if (!outHTML) { outHTML += '\n'}
