@@ -49,6 +49,13 @@ export type TOutputMath = {
   }
 }
 
+const formatSourceHtml = (text: string) => {
+  return text.trim()
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>');
+};
+
 class MathpixMarkdown_Model {
     public disableFancyArrayDef = ['replacements', 'list', 'usepackage', 'toc'];
     public disableRules: string[];
@@ -89,7 +96,11 @@ class MathpixMarkdown_Model {
           if (child.tagName==="MJX-CONTAINER" || child.tagName==="TABLE") {
             res.push({type: "html", value: child.outerHTML});
           } else {
-            res.push({type: child.tagName.toLowerCase(), value: child.innerHTML});
+            res.push({
+              type: child.tagName.toLowerCase(),
+              value: child.tagName === 'LATEX' || child.tagName === 'ASCIIMATH'
+              ? formatSourceHtml(child.innerHTML)
+              : child.innerHTML});
           }
         }
       }
