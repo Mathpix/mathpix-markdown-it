@@ -166,7 +166,7 @@ const options = {
         include_tsv: true,
       }
     };
-    const html = MM.markdownToHTML(`$x^x$`, options);
+const html = MM.markdownToHTML(`$x^x$`, options);
 ```
 
 `markdownToHTML()` returns an HTML string that will contain the formats specified in the options.
