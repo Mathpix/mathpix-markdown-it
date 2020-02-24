@@ -62,3 +62,22 @@ describe('Check parseMarkdownByHTML:', () => {
     });
   });
 });
+
+describe('Check u2212 for asciimath:', () => {
+  const options = {
+    outMath: {
+      include_asciimath: true
+    }
+  };
+  const test = `\\[3-x\\]`;
+  const html = MM.render(test, options);
+  const parsed = MM.parseMarkdownByHTML(html, false);
+  describe('input_latex => ' + test, () => {
+    it('Should be return html =>', function(done) {
+      parsed[0].should.have.property('type', 'asciimath');
+      parsed[0].value.charCodeAt(1).should.equal(45);
+      parsed[0].value[1].should.equal('-');
+      done();
+    });
+  });
+});

@@ -1,12 +1,12 @@
 module.exports = [
   {
     latex: `\\left.\\begin{array}{r}{a}\\\\{-b}\\\\{\\times c}\\\\\\hline\\end{array}\\right.`,
-    ascii:     `{:[a],[−b],[xx c],[hline]:}`,
+    ascii:     `{:[a],[-b],[xx c],[hline]:}`,
     ascii_old: `{:[a],[-b],[times c],[hline]:}`
   },
   {
     latex: `\\left\\{\\begin{array}{r}{a}\\\\{-b}\\\\{\\times c}\\\\\\hline\\end{array}\\right\\}`,
-    ascii:     `{[a],[−b],[xx c],[hline]}`,
+    ascii:     `{[a],[-b],[xx c],[hline]}`,
     ascii_old: `{[a],[-b],[times c],[hline]}`
   },
   {
