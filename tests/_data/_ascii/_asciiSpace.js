@@ -1,7 +1,7 @@
 module.exports = [
   {
     latex: `\\operatorname{unknown} \\left\\{\\begin{array}{ll}{-x+3}&{\\text{if}x \\leq -1}\\\\{-3x+1}&{\\text{if}x > -1}\\end{array}\\right. \\operatorname{unknown}`,
-    ascii:     `unknown ⁡{[−x+3,"if"x<=−1],[−3x+1,"if"x>−1]:}unknown`,
+    ascii:     `unknown ⁡{[-x+3,"if"x<=-1],[-3x+1,"if"x>-1]:}unknown`,
     ascii_old: `unknown{[-x+3,"if"x<=-1],[-3x+1,"if"x>-1]:}unknown`
   },
   {
@@ -11,7 +11,7 @@ module.exports = [
   },
   {
     latex: `1+\\int_{vR}^{v}(\\frac{\\epsilon(bu-F(u)-I))}{(F(u)-W(u)+I)^{2}})\\frac{\\partial W(u)}{\\partial w_{0}}du`,
-    ascii:     `1+int_(vR)^(v)((epsilon(bu−F(u)−I)))/((F(u)−W(u)+I)^(2)))(del W(u))/(delw_(0))du`,
+    ascii:     `1+int_(vR)^(v)((epsilon(bu-F(u)-I)))/((F(u)-W(u)+I)^(2)))(del W(u))/(delw_(0))du`,
     ascii_old: `1+int_(vR)^(v)((epsilon(bu-F(u)-I)))/((F(u)-W(u)+I)^(2)))(del W(u))/(del w_(0))du`
   },
   {
@@ -26,12 +26,12 @@ module.exports = [
   },
   {
     latex: `1 6 \\int _ { 0 } ^ { 3 } [ \\frac { 1 } { 2 } \\theta + \\frac { 1 } { 4 } \\operatorname { s i n } ( 2 \\theta ) + \\operatorname { c o s } ( \\theta ) - \\frac { 1 } { 3 } \\operatorname { c o s } ^ { 3 } ( \\theta ) ] | _ { 0 } ^ { 2 \\pi } d z`,
-    ascii:     `16int_(0)^(3)[(1)/(2)theta+(1)/(4)sin⁡(2theta)+cos⁡(theta)−(1)/(3)cos^(3)⁡(theta)]|_(0)^(2pi)dz`,
+    ascii:     `16int_(0)^(3)[(1)/(2)theta+(1)/(4)sin⁡(2theta)+cos⁡(theta)-(1)/(3)cos^(3)⁡(theta)]|_(0)^(2pi)dz`,
     ascii_old: `16int_(0)^(3)[(1)/(2)theta+(1)/(4)sin(2 theta)+cos(theta)-(1)/(3)cos^(3)(theta)]|_(0)^(2 pi)dz`
   },
   {
     latex: `\\operatorname { Pr }\\left(\\text { test error } \\leqslant \\text { training error }+\\sqrt{\\frac{1}{N}\\left[D\\left(\\log \\left(\\frac{2 N}{D}\\right)+1\\right)-\\log \\left(\\frac{\\eta}{4}\\right)\\right]}\\right)=1-\\eta`,
-    ascii:     `Pr ⁡(" test error "⩽" training error "+sqrt(sqrt(((1)/(N)[D(log ⁡((2N)/(D))+1)−log ⁡((eta)/(4))])))=1−eta`,
+    ascii:     `Pr ⁡(" test error "⩽" training error "+sqrt(sqrt(((1)/(N)[D(log ⁡((2N)/(D))+1)-log ⁡((eta)/(4))])))=1-eta`,
     ascii_old: `Pr(" test error "leqslant" training error "+sqrt((1)/(N)[D(log((2N)/(D))+1)-log((eta)/(4))]))=1-eta`
   },
   {
@@ -61,7 +61,7 @@ module.exports = [
   },
   {
     latex: `\\begin{array}{rlrl}{-i x_{+} \\cdot \\tilde{\\sigma} \\tau_{+}} & {=2 \\overline{\\theta}_{b} p_{+}} & {} & {p \\prec 0} \\\\ {2 \\theta^{a} \\tau_{+}} & {=\\delta_{b}^{a} p_{+}} & {} & {p \\succ 0}\\end{array}`,
-    ascii:     `[−ix_(+)* tilde(sigma)tau_(+),=2 bar(theta)_(b)p_(+),,p-<0],[2theta^(a)tau_(+),=delta_(b)^(a)p_(+),,p>-0]`,
+    ascii:     `[-ix_(+)* tilde(sigma)tau_(+),=2 bar(theta)_(b)p_(+),,p-<0],[2theta^(a)tau_(+),=delta_(b)^(a)p_(+),,p>-0]`,
     ascii_old: `[-ix_(+)*tilde sigma tau_(+),=2bar(theta)_(b)p_(+),,p-<0],[2 theta^(a)tau_(+),=delta_(b)^(a)p_(+),,p>-0]`
   },
   {

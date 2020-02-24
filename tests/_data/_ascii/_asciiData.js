@@ -46,7 +46,7 @@ module.exports = [
   },
   {
     latex: `\\left\\{\\begin{array}{ l l r } { x - y - z } & { = } & { 2} \\\\ { 2x + y + z } & { = } & { 1} \\\\ { 3x - 2y - z } & { = } & { 5}\\end{array}\\right.`,
-    ascii:     `{[x−y−z,=,2],[2x+y+z,=,1],[3x−2y−z,=,5]:}`,
+    ascii:     `{[x-y-z,=,2],[2x+y+z,=,1],[3x-2y-z,=,5]:}`,
     ascii_old: `{[x-y-z,=,2],[2x+y+z,=,1],[3x-2y-z,=,5]:}`
   },
   {
@@ -71,7 +71,7 @@ module.exports = [
   },
   {
     latex: `T _ { x } \\left( \\theta _ { r } \\right) = \\left[ \\begin{array} { l l l l } { 1} & { 0} & { 0} & { 0} \\\\ { 0} & { \\operatorname { c o s } \\theta _ { r } } & { \\operatorname { s i n } \\theta _ { r } } & { 0} \\\\ { 0} & { - \\operatorname { s i n } \\theta _ { r } } & { \\operatorname { c o s } \\theta _ { r } } & { 0} \\\\ { 0} & { 0} & { 0} & { 1} \\end{array} \\right]`,
-    ascii:     `T_(x)(theta_(r))=[[1,0,0,0],[0,cos ⁡theta_(r),sin ⁡theta_(r),0],[0,−sin ⁡theta_(r),cos ⁡theta_(r),0],[0,0,0,1]]`,
+    ascii:     `T_(x)(theta_(r))=[[1,0,0,0],[0,cos ⁡theta_(r),sin ⁡theta_(r),0],[0,-sin ⁡theta_(r),cos ⁡theta_(r),0],[0,0,0,1]]`,
     ascii_old: `T_(x)(theta_(r))=[[1,0,0,0],[0,cos theta_(r),sin theta_(r),0],[0,-sin theta_(r),cos theta_(r),0],[0,0,0,1]]`
   },
   {
@@ -111,7 +111,7 @@ module.exports = [
   },
   {
     latex: `f(x) = \\left\\{\\begin{array}{ll}{-x+3}&{\\text{if}x \\leq -1}\\\\{-3x+1}&{\\text{if}x > -1}\\end{array}\\right.`,
-    ascii:     `f(x)={[−x+3,"if"x<=−1],[−3x+1,"if"x>−1]:}`,
+    ascii:     `f(x)={[-x+3,"if"x<=-1],[-3x+1,"if"x>-1]:}`,
     ascii_old: `f(x)={[-x+3,"if"x<=-1],[-3x+1,"if"x>-1]:}`
   },
   {
@@ -121,7 +121,7 @@ module.exports = [
   },
   {
     latex: `x - 2y = - 35 \\text{ and } 2x - y = 55`,
-    ascii:     `x−2y=−35" and "2x−y=55`,
+    ascii:     `x-2y=-35" and "2x-y=55`,
     ascii_old: `x-2y=-35" and "2x-y=55`
   },
   {
@@ -146,12 +146,12 @@ module.exports = [
   },
   {
     latex: `f ( x ) = \\left\\{ \\begin{array} { l l } { 2 x + 5 } & { \\text { khi } x < - 1 } \\\\ { x ^ { 2 } + 2 } & { \\text { khi } x \\geq - 1 } \\end{array} \\right.`,
-    ascii:     `f(x)={[2x+5," khi "x<−1],[x^(2)+2," khi "x>=−1]:}`,
+    ascii:     `f(x)={[2x+5," khi "x<-1],[x^(2)+2," khi "x>=-1]:}`,
     ascii_old: `f(x)={[2x+5," khi "x<-1],[x^(2)+2," khi "x>=-1]:}`
   },
   {
     latex: `f ( x ) = \\left\\{ \\begin{array} { l } { 2x + 5\\text{ if } x < 0} \\\\ { x - 1\\text{ if } x > 0} \\end{array} \\right.`,
-    ascii:     `f(x)={[2x+5" if "x<0],[x−1" if "x>0]:}`,
+    ascii:     `f(x)={[2x+5" if "x<0],[x-1" if "x>0]:}`,
     ascii_old: `f(x)={[2x+5" if "x<0],[x-1" if "x>0]:}`
   },
   {
@@ -161,7 +161,7 @@ module.exports = [
   },
   {
     latex: `f ( x ) = \\text{ foo } + \\left\\{ \\begin{array} { l } { 2x + 5\\text{ if } x < 0} \\\\ { x - 1\\text{ if } x > 0} \\end{array} \\right.`,
-    ascii:     `f(x)=" foo "+{[2x+5" if "x<0],[x−1" if "x>0]:}`,
+    ascii:     `f(x)=" foo "+{[2x+5" if "x<0],[x-1" if "x>0]:}`,
     ascii_old: `f(x)=" foo "+{[2x+5" if "x<0],[x-1" if "x>0]:}`
   },
   {
@@ -271,7 +271,7 @@ module.exports = [
   },
   {
     latex: `h \\theta ( L ) = - k \\frac { d \\theta } { d x } | _ { x = L }`,
-    ascii:     `h theta(L)=−k(d theta)/(dx)|_(x=L)`,
+    ascii:     `h theta(L)=-k(d theta)/(dx)|_(x=L)`,
     ascii_old: `h theta(L)=-k(d theta)/(dx)|_(x=L)`
   },
   {
@@ -291,17 +291,17 @@ module.exports = [
   },
   {
     latex: `k : [ \\left( \\begin{array} { l } { x } \\\\ { y } \\\\ { z } \\end{array} \\right) - \\left( \\begin{array} { c } { 4 } \\\\ { 8 } \\\\ { - 2 } \\end{array} \\right) ] ^ { 2 } = 5 ^ { 2 }`,
-    ascii:     `k:[([x],[y],[z])−([4],[8],[−2])]^(2)=5^(2)`,
+    ascii:     `k:[([x],[y],[z])-([4],[8],[-2])]^(2)=5^(2)`,
     ascii_old: `k:[([x],[y],[z])-([4],[8],[-2])]^(2)=5^(2)`
   },
   {
     latex: `d s ^ { 2} = ( d X ^ { 0} ) ^ { 2} - R ( X ^ { 0} ) ^ { 2} \\sum _ { i = 1} ^ { D - 1} ( d X ^ { i } ) ^ { 2}`,
-    ascii:     `ds^(2)=(dX^(0))^(2)−R(X^(0))^(2)sum_(i=1)^(D−1)(dX^(i))^(2)`,
+    ascii:     `ds^(2)=(dX^(0))^(2)-R(X^(0))^(2)sum_(i=1)^(D-1)(dX^(i))^(2)`,
     ascii_old: `ds^(2)=(dX^(0))^(2)-R(X^(0))^(2)sum_(i=1)^(D-1)(dX^(i))^(2)`
   },
   {
     latex: `\\Delta ( W _ { 1} ) ^ { i t } J ( W _ { 2} ) \\Delta ( W _ { 1} ) ^ { - i t } = J ( l ( W _ { 1} ,t ) W _ { 2} )`,
-    ascii:     `Delta(W_(1))^(it)J(W_(2))Delta(W_(1))^(−it)=J(l(W_(1),t)W_(2))`,
+    ascii:     `Delta(W_(1))^(it)J(W_(2))Delta(W_(1))^(-it)=J(l(W_(1),t)W_(2))`,
     ascii_old: `Delta(W_(1))^(it)J(W_(2))Delta(W_(1))^(-it)=J(l(W_(1),t)W_(2))`
   },
   {
@@ -341,12 +341,12 @@ module.exports = [
   },
   {
     latex: `\\left. \\begin{array} { r l } { x + y } & { = 3 } \\\\ { y } & { = x ^ { 2 } - 8 x + 15 } \\end{array} \\right.`,
-    ascii:     `{:[x+y,=3],[y,=x^(2)−8x+15]:}`,
+    ascii:     `{:[x+y,=3],[y,=x^(2)-8x+15]:}`,
     ascii_old: `{:[x+y,=3],[y,=x^(2)-8x+15]:}`
   },
   {
     latex: `\\left\\{\\begin{array}{rl}{x+y}&{=3}\\\\{y} & {=x^{2}-8x+15}\\end{array}\\right\\}`,
-    ascii:     `{[x+y,=3],[y,=x^(2)−8x+15]}`,
+    ascii:     `{[x+y,=3],[y,=x^(2)-8x+15]}`,
     ascii_old: `{[x+y,=3],[y,=x^(2)-8x+15]}`
   },
   {
@@ -391,12 +391,12 @@ module.exports = [
   },
   {
     latex: `\\left(\\begin{array}{rl}{x+y}&{=3}\\\\{y} & {=x^{2}-8x+15}\\end{array}\\right)`,
-    ascii:     `([x+y,=3],[y,=x^(2)−8x+15])`,
+    ascii:     `([x+y,=3],[y,=x^(2)-8x+15])`,
     ascii_old: `([x+y,=3],[y,=x^(2)-8x+15])`
   },
   {
     latex: `\\left[\\begin{array}{rl}{x+y}&{=3}\\\\{y} & {=x^{2}-8x+15}\\end{array}\\right]`,
-    ascii:     `[[x+y,=3],[y,=x^(2)−8x+15]]`,
+    ascii:     `[[x+y,=3],[y,=x^(2)-8x+15]]`,
     ascii_old: `[[x+y,=3],[y,=x^(2)-8x+15]]`
   },
   {
@@ -411,7 +411,7 @@ module.exports = [
   },
   {
     latex: `\\text { foo } - 4 ^ { \\text { superscript } } \\text { bar }`,
-    ascii:     `" foo "−4^(" superscript ")" bar "`,
+    ascii:     `" foo "-4^(" superscript ")" bar "`,
     ascii_old: `" foo "-4^(" superscript ")" bar "`
   },
   {
@@ -471,7 +471,7 @@ module.exports = [
   },
   {
     latex: `\\{ \\begin{array} { l } { 4 x - 3 y = 6 } \\\\ { y = - 3 x + 15 } \\end{array}`,
-    ascii:     `{[4x−3y=6],[y=−3x+15]`,
+    ascii:     `{[4x-3y=6],[y=-3x+15]`,
     ascii_old: `{[4x-3y=6],[y=-3x+15]`
   },
   {
@@ -516,7 +516,7 @@ module.exports = [
   },
   {
     latex: `\\frac{n!}{k!(n-k)!}`,
-    ascii:     `(n!)/(k!(n−k)!)`,
+    ascii:     `(n!)/(k!(n-k)!)`,
     ascii_old: `(n!)/(k!(n-k)!)`
   },
   {
