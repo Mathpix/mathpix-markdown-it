@@ -65,13 +65,24 @@ const renderInlineTokenBlock = (tokens, options, renderer) =>{
   return result;
 };
 
-export const renderTabulare = (a, token, options, renderer) => {
-  const {include_tsv = false} = options.outMath;
-  const tabulare = renderInlineTokenBlock(token.children, options, renderer);
+export const renderTabular = (a, token, options, renderer) => {
+  const { include_table_html = true } = options.outMath;
+  if (include_table_html) {
+    return renderInlineTokenBlock(token.children, options, renderer);
+  } else {
+    return '';
+  }
+};
+
+export const renderTabularInline = (a, token, options, renderer) => {
+  const {include_tsv = false, include_table_html = true} = options.outMath;
+  const tabular = include_table_html
+    ? renderInlineTokenBlock(token.children, options, renderer)
+    : '';
   const tsv = include_tsv && token.tsv
     ? `<tsv style="display: none">${token.tsv}</tsv>`
     : '';
-  return `<div class="inline-tabulare">${tabulare}${tsv}</div>`
+  return `<div class="inline-tabular">${tabular}${tsv}</div>`
 };
 
 export const renderTSV = (a, token, options) => {

@@ -90,9 +90,9 @@ console.log('->arrA->', arrA.length)
     const body = doc.body;
     const asciimath = body.getElementsByTagName('asciimath');
     const asc = asciimath && asciimath[0] ? asciimath[0].innerHTML : ''
-    console.log('Latex => ', latex)
-    console.log('ASCIIMATH => ', asc)
-    console.log('ASCIIMATH_OLD => ', arrA[i])
+    console.log('Latex         => ', latex)
+    console.log('ASCIIMATH     => ', asc)
+    console.log('ASCIIMATH_OLD =>', arrA[i])
     console.log('')
     outHTML += '<p>';
     outHTML += '\n';
@@ -107,13 +107,13 @@ console.log('->arrA->', arrA.length)
       .replace('/&nbsp;/g','\u0160')
     outHTML += '  <code style="display: block;"> <span>ASCIIMATH => </span>' + asc + '</code>';
     outHTML += '\n';
-    outHTML += '  <code style="display: block;"> <span>ASCIIMATH_OLD => </span>' + arrA[i] + '</code>';
+    outHTML += '  <code style="display: block;"> <span>ASCII_OLD => </span>' + arrA[i] + '</code>';
     outHTML += '\n';
     outHTML += '</p>';
     outHTML += '\n';
     outText += `{\n`;
-    outText += `  latex: \`${latex}\`,\n`;
-    outText += `  ascii: \`${asc}\`,\n`;
+    outText += `  latex:     \`${latex}\`,\n`;
+    outText += `  ascii:     \`${asc}\`,\n`;
     outText += `  ascii_old: \`${arrA[i].trim()}\`\n`;
     outText += `},\n`;
   }

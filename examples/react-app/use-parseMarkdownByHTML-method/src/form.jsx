@@ -25,6 +25,7 @@ class ConvertForm extends React.Component {
       include_latex: true,
       include_svg: true,
       include_tsv: true,
+      include_table_html: true,
       formats: ''
     };
 
@@ -56,6 +57,7 @@ class ConvertForm extends React.Component {
         include_latex: this.state.include_latex,
         include_svg: this.state.include_svg,
         include_tsv: this.state.include_tsv,
+        include_table_html: this.state.include_table_html,
       }
     };
     const html = MM.markdownToHTML(this.state.value, options);
@@ -112,6 +114,14 @@ class ConvertForm extends React.Component {
                   checked={this.state.include_tsv}
                   onChange={this.handleInputChange} />
                 tsv
+              </label>
+              <label>
+                <input
+                  name="include_table_html"
+                  type="checkbox"
+                  checked={this.state.include_table_html}
+                  onChange={this.handleInputChange} />
+                table html
               </label>
             </div>
           </div>

@@ -19,7 +19,7 @@ const renderColl = (coll, id, children) => {
         let str = '';
         children.forEach(item => {
           str += str.length > 0 ? ' ' : '';
-          str += item.type === 'tabulare' && item.tsvList ? item.tsvList.join(',') : item.content;
+          str += item.type === 'tabular_inline' && item.tsvList ? item.tsvList.join(',') : item.content;
         });
 
         return coll.slice(0, i) + str + coll.slice(i + id.length)

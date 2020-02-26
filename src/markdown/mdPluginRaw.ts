@@ -1,6 +1,6 @@
 import { MathJax } from "../mathjax/";
-import { inlineTabular } from "./md-inline-rule/tabulare";
-import { renderTabulare, renderTSV } from './md-renderer-rules/render-tabulare';
+import { inlineTabular } from "./md-inline-rule/tabular";
+import { renderTabular,renderTabularInline, renderTSV } from './md-renderer-rules/render-tabular';
 
 let mathNumber = [];
 
@@ -743,7 +743,8 @@ const mapping = {
   equation_math_not_number: "EquationMathNotNumber",
   reference_note: "Reference_note",
   reference_note_block: "Reference_note block",
-  tabulare: "Tabulare",
+  tabular: "Tabular",
+  tabular_inline: "Tabular_inline",
   tsv: "TSV",
   usepackage_geometry: "Usepackage_geometry",
   display_mathML: "DisplayMathML",
@@ -776,8 +777,10 @@ export default options => {
     Object.keys(mapping).forEach(key => {
       md.renderer.rules[key] = (tokens, idx) => {
         switch (tokens[idx].type) {
-          case "tabulare":
-            return renderTabulare(tokens, tokens[idx], options, md.renderer);
+          case "tabular":
+            return renderTabular(tokens, tokens[idx], options, md.renderer);
+          case "tabular_inline":
+            return renderTabularInline(tokens, tokens[idx], options, md.renderer);
           case "tsv":
             return renderTSV(tokens, tokens[idx], options);
           case "reference_note":
