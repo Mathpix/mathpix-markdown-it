@@ -58,7 +58,9 @@
     "react": "^16.7.0",
     "react-dom": "^16.7.0",
     "react-emotion": "^10.0.0",
-    "tslib": "^1.10.0"
+    "tslib": "^1.10.0",
+    "webpack": "^4.28.3",
+    "webpack-cli": "^3.2.1"
   },
   "devDependencies": {
     "@babel/core": "^7.4.0",
@@ -72,8 +74,6 @@
     "terser-webpack-plugin": "^1.2.3",
     "ts-loader": "^5.3.3",
     "typescript": "^3.2.4",
-    "webpack": "^4.28.3",
-    "webpack-cli": "^3.2.1",
     "window": "^4.2.6"
   }
 }

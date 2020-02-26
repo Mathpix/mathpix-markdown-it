@@ -125,6 +125,17 @@ const StatePushParagraphClose = (state) => {
   state.push('paragraph_close', 'div', -1);
 };
 
+export const inlineDecimalParse = (tok: TTokenTabular) => {
+  tok.token = 'inline';
+  tok.tag = '';
+  tok.children = [];
+  tok.children.push({
+    type: "inline_decimal",
+    content: tok.content,
+    block: false
+  });
+  return tok;
+};
 
 export const StatePushTabulars = (state, cTabular: TTypeContentList, align: string) => {
   let token: Token;
@@ -138,38 +149,47 @@ export const StatePushTabulars = (state, cTabular: TTypeContentList, align: stri
       }
       continue;
     }
+
+    token = state.push("tabular", "", 0);
+    token.content = cTabular[i].content;
+    token.children = [];
+
     clearTsv();
     const res: Array<TTokenTabular> | null = ParseTabular(cTabular[i].content, 0, cTabular[i].align);
     let tsv = [].concat(getTsv());
     if (!res || res.length === 0) {
       continue;
     }
+
     for (let j = 0; j < res.length; j++) {
-      token          = state.push(res[j].token, res[j].tag, res[j].n);
-      if (res[j].attrs) {
-        token.attrs  = [].concat(res[j].attrs);
-      }
+      let tok = res[j];
       if (res[j].token === 'inline') {
         if (res[j].content) {
           let children = [];
           clearTsv();
-          state.md.inline.parse(res[j].content, state.md, state.env, children);
+          state.md.inline.parse(tok.content, state.md, state.env, children);
           if (children.length > 0) {
-            token.content  = '';
-            token.children = children;
+            tok.content  = '';
+            tok.children = children;
           } else {
-            token.content  = res[j].content;
-            token.children = [];
+            tok.content  = res[j].content;
+            tok.children = [];
           }
           const inner_tsv = [].concat(getTsv());
           if (res[j].id && inner_tsv.length > 0) {
-            tsv = MergeIneerTsvToTsv(inner_tsv, tsv, res[j].id, children);
+            tsv = MergeIneerTsvToTsv(inner_tsv, tsv, res[j].id, tok.children);
           }
         }
       } else {
-        token.content  = res[j].content;
-        token.children = [];
+          if (res[j].token === 'inline_decimal') {
+            tok = inlineDecimalParse(tok);
+          } else {
+            tok.content  = res[j].content;
+            tok.children = [];
+          }
       }
+
+      token.children.push(tok)
     }
     res_tsv.push(tsv);
     tsv = [];

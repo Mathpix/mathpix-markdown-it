@@ -1,4 +1,4 @@
-import {parseInlineTabular, TTokenTabular} from "../md-block-rule/begin-tabular";
+import {parseInlineTabular, TTokenTabular, inlineDecimalParse} from "../md-block-rule/begin-tabular";
 import { ParseTabular } from "../md-block-rule/begin-tabular/parse-tabular";
 import { MergeIneerTsvToTsv, getTsv, clearTsv, TsvJoin} from "../common/tsv";
 
@@ -21,7 +21,7 @@ export const inlineTabular = (state, silent) => {
   }
   const nextPos = endMarkerPos + endMarker.length;
   if (!silent) {
-    const token = state.push("tabulare", "", 0);
+    const token = state.push("tabular_inline", "", 0);
     token.content = state.src.slice(startMathPos-1, endMarkerPos + '\\end{tabular}'.length);
     token.children =[];
     const cTabular =  parseInlineTabular(token.content);
@@ -34,19 +34,24 @@ export const inlineTabular = (state, silent) => {
       clearTsv();
       const res: Array<TTokenTabular> | null = ParseTabular(cTabular[i].content, 0, cTabular[i].align);
       let tsv = [].concat(getTsv());
-      for (let i = 0; i < res.length;  i++) {
-        const tok = res[i];
+
+      for (let j = 0; j < res.length;  j++) {
+        let tok = res[j];
         if (tok.token === 'inline') {
           let children = [];
           state.md.inline.parse(tok.content, state.md, state.env, children);
           tok.children = children;
-          if (res[i].id && tsv.length > 0) {
-            tsv = MergeIneerTsvToTsv(tsv, tsv, res[i].id, children);
+          if (res[j].id && tsv.length > 0) {
+            tsv = MergeIneerTsvToTsv(tsv, tsv, res[j].id, children);
             token.tsv = TsvJoin(tsv, state.md.options);
             token.tsvList = tsv;
           } else {
             token.tsv = TsvJoin(tsv, state.md.options);
             token.tsvList = tsv;
+          }
+        } else {
+          if (res[j].token === 'inline_decimal') {
+            tok = inlineDecimalParse(tok);
           }
         }
         token.children.push(tok);
