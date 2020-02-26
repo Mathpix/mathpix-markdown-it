@@ -42,6 +42,7 @@ export type TOutputMath = {
   include_asciimath?: boolean,
   include_latex?: boolean,
   include_svg?: boolean,
+  include_table_html?: boolean,
   include_tsv?: boolean,
   tsv_separators?: {
     column?: string,
@@ -84,8 +85,8 @@ class MathpixMarkdown_Model {
     if (!el) return null;
 
     const math_el = include_sub_math
-      ? el.querySelectorAll('.math-inline, .math-block, .table_tabular, .inline-tabulare')
-      : el.querySelectorAll('div > .math-inline, div > .math-block, div > .table_tabular, div > .inline-tabulare');
+      ? el.querySelectorAll('.math-inline, .math-block, .table_tabular, .inline-tabular')
+      : el.querySelectorAll('div > .math-inline, div > .math-block, div > .table_tabular, div > .inline-tabular');
     if (!math_el) return null;
 
 
@@ -94,7 +95,11 @@ class MathpixMarkdown_Model {
         const child = math_el[i].children[j];
         if (["MATHML", "ASCIIMATH", "LATEX", "MJX-CONTAINER", "TABLE", "TSV"].indexOf(child.tagName) !== -1) {
           if (child.tagName==="MJX-CONTAINER" || child.tagName==="TABLE") {
-            res.push({type: "html", value: child.outerHTML});
+            if (child.tagName === "TABLE") {
+              res.push({type: "html", value: child.outerHTML});
+            } else {
+              res.push({type: "svg", value: child.innerHTML});
+            }
           } else {
             res.push({
               type: child.tagName.toLowerCase(),
