@@ -164,6 +164,7 @@ const options = {
         include_latex: true,
         include_svg: true,
         include_tsv: true,
+        include_table_html: true,
       }
     };
 const html = MM.markdownToHTML(`$x^x$`, options);
@@ -191,6 +192,7 @@ For `tabular`, the result will be:
 
 Then calling the `parseMarkdownByHTML(html)` method will return all formats as a list from the incoming html string.
 
+For `Latex` formulas:
 ```js
 [
     {
@@ -206,12 +208,25 @@ Then calling the `parseMarkdownByHTML(html)` method will return all formats as a
        "value": "x^x"
      },
     {
-       "type": "html",
-       "value": "<mjx-container>...</mjx-container>"
+       "type": "svg",
+       "value": "<sgv>...</svg>"
      }
 ]
 ```
 
+For `tabular`:
+```js
+[
+    {
+      "type": "html",
+      "value": "<table>...</table>"
+    },
+    {
+       "type": "tsv",
+       "value": "<tsv>...</tsv>"
+     }
+]
+```
 
 ## NodeJS
 
@@ -372,9 +387,9 @@ The `MathpixMarkdown` React element accepts the following props:
 | `include_mathml`     | boolean&nbsp;*`false`*       | outputs mathml `<mathml style="display: none"><math>...</math></mathml>`                                           |
 | `include_asciimath`  | boolean&nbsp;*`false`*       | outputs asciimath `<asciimath style="display: none">...</asciimath>`                                               |
 | `include_latex`      | boolean&nbsp;*`true`*        | outputs latex `<latex style="display: none">...</latex>`                                                           |
-| `include_svg`        | boolean&nbsp;*`true`*        | outputs svg `<svg>...</svg>`                              |
+| `include_svg`        | boolean&nbsp;*`true`*        | outputs svg `<svg>...</svg>`                                                                                       |
 | `include_tsv`        | boolean&nbsp;*`false`*       | outputs tsv `<tsv style="display: none">...</tsv>`                                                                 |
-| `include_table_html` | boolean&nbsp;*`true`*        | outputs tsv `<table>...</table>`                                                                 |
+| `include_table_html` | boolean&nbsp;*`true`*        | outputs html table `<table>...</table>`                                                                            |
 | `tsv_separators`     | `{column: '\t', row: '\n'}`  | Separators for tsv tables                                                                                          |
  
 
