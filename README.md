@@ -152,6 +152,8 @@ class ConvertForm extends React.Component {
 }
 ```
 
+### Latex to mathml/asciimath/tsv conversion
+
 #### [Example of Latex to mathml/asciimath/tsv conversion](https://github.com/Mathpix/mathpix-markdown-it/tree/master/examples/react-app/use-parseMarkdownByHTML-method)
 
 Rendering methods have the ability to convert `Latex` representation to such formats as: `mathml`, `asciimath`, `tsv`
@@ -228,6 +230,70 @@ For `tabular`:
 ]
 ```
 
+#### Example of outMath option usage
+
+For `Latex` formulas:
+```js
+const options = {
+      outMath: {
+        include_mathml: false,
+        include_asciimath: true,
+        include_latex: false,
+      }
+    };
+const html = MM.markdownToHTML(`$x^x$`, options);
+const parsed = MM.parseMarkdownByHTML(html, false);
+```
+
+`html`:
+```html
+<span class="math-block">
+    <asciimath style="display: none">...</asciimath>
+    <mjx-comtainer class="MathJax" jax="SVG">..</mjx-comtainer>
+</span>
+```
+
+`parsed`:
+```js
+[
+    {
+       "type": "asciimath",
+       "value": "x^(x)"
+     },
+    {
+       "type": "svg",
+       "value": "<sgv>...</svg>"
+     }
+]
+```
+
+For `tabular`:
+```js
+const options = {
+      outMath: {
+        include_table_html: false,
+      }
+    };
+const html = MM.markdownToHTML(`\begin{tabular}{ c c } 1 & 2\\ 3 & 4\\ \end{tabular}`, options);
+const parsed = MM.parseMarkdownByHTML(html, false);
+```
+
+```html
+<div class="table_ tabular">
+    <tsv style="display: none">...</tsv>
+</div>
+```
+
+`parsed`:
+```js
+[
+    {
+       "type": "tsv",
+       "value": "<tsv>...</tsv>"
+     }
+]
+```
+
 
 ### Example of the include_sub_math option usage for tables containing nested tables and formulas
 
@@ -252,7 +318,7 @@ const options = {
     }
   };
 const html = MM.markdownToHTML(latex, options);
-const parsed = MM.parseMarkdownByHTML(html, false);
+const parsed = MM.parseMarkdownByHTML(html);
 ```
 
 `parsed`:
@@ -267,7 +333,7 @@ const parsed = MM.parseMarkdownByHTML(html, false);
   { type: 'mathml', value: '<math>\n  <msup>\n    <mi>x</mi>\n    <mn>1</mn>\n  </msup>\n</math>' },
   { type: 'asciimath', value: 'x^(1)' },
   { type: 'latex', value: 'x^1' },
-  { type: 'svg', value: '<svg >..</svg> },
+  { type: 'svg', value: '<svg >..</svg>' },
     
   { type: 'mathml', value: '<math>\n  <msup>\n    <mi>y</mi>\n    <mn>1</mn>\n  </msup>\n</math>' },
   { type: 'asciimath', value: 'y^(1)' },
