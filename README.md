@@ -331,7 +331,7 @@ const parsed = MathpixMarkdownModel.parseMarkdownByHTML(html);
 ```js
 [
   { 
-    type: 'thml',
+    type: 'html',
     value: '<table>..</table>'
   },
   { type: 'tsv', value: '1\t$x^1$\t3\n4\t$y^1$\t6\n7\t$z^1$\t9' },
