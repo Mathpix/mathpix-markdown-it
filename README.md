@@ -241,16 +241,19 @@ const options = {
         include_latex: false,
       }
     };
-const html = MM.markdownToHTML(`$x^x$`, options);
-const parsed = MM.parseMarkdownByHTML(html, false);
+const html = MathpixMarkdownModel.markdownToHTML(`$x^x$`, options);
+const parsed = MathpixMarkdownModel.parseMarkdownByHTML(html, false);
 ```
 
 `html`:
 ```html
-<span class="math-block">
-    <asciimath style="display: none">...</asciimath>
-    <mjx-comtainer class="MathJax" jax="SVG">..</mjx-comtainer>
-</span>
+<div>
+    <span class="math-inline">
+        <asciimath style="display: none;">x^(x)</asciimath>
+        <mjx-comtainer class="MathJax" jax="SVG"><svg>...</svg></mjx-comtainer>
+    </span>
+</div>
+
 ```
 
 `parsed`:
@@ -272,25 +275,28 @@ For `tabular`:
 const options = {
       outMath: {
         include_table_html: false,
+        include_tsv: true,
       }
     };
-const html = MM.markdownToHTML(`\begin{tabular}{ c c } 1 & 2\\ 3 & 4\\ \end{tabular}`, options);
-const parsed = MM.parseMarkdownByHTML(html, false);
+const html = MathpixMarkdownModel.markdownToHTML(`\\begin{tabular}{ c c } 1 & 2\\\\ 3 & 4\\\\ \\end{tabular}`, options);
+const parsed = MathpixMarkdownModel.parseMarkdownByHTML(html, false);
 ```
 
 ```html
-<div class="table_ tabular">
-    <tsv style="display: none">...</tsv>
+<div class="table_tabular " style="text-align: center">
+  <tsv style="display: none">1    2
+3       4</tsv>
 </div>
+
 ```
 
 `parsed`:
 ```js
 [
-    {
-       "type": "tsv",
-       "value": "<tsv>...</tsv>"
-     }
+  { 
+    type: 'tsv', 
+    value: '1\t2\n3\t4' 
+  }
 ]
 ```
 

@@ -26,36 +26,36 @@ const { JSDOM } = jsdom;
 global.DOMParser = new JSDOM().window.DOMParser;
 
 describe('Check parseMarkdownByHTML:', () => {
-    const tests = require('./_data/_parseMarkdownByHTML/_data');
-    tests.forEach(function(test) {
-      const html = MM.render(test.latex_input, options);
-      const data = MM.parseMarkdownByHTML(html, false);
-      describe('input_latex => ' + test.latex_input, () => {
-        it('Should be length = 4', (done) => {
-          data.should.have.length(4);
-          done();
-        });
-        it('Should be return mathml =>', function(done) {
-          data[0].should.have.property('type', 'mathml');
-          data[0].should.have.property('value', test.mathml);
-          done();
-        });
-        it('Should be return asciimath =>', function(done) {
-          data[1].should.have.property('type', 'asciimath');
-          data[1].should.have.property('value', test.asciimath);
-          done();
-        });
-        it('Should be return latex =>', function(done) {
-          data[2].should.have.property('type', 'latex');
-          data[2].should.have.property('value', test.latex);
-          done();
-        });
-        it('Should be return svg =>', function(done) {
-          data[3].should.have.property('type', 'svg');
-          const doc = JSDOM.fragment(data[3].value);
-          doc.firstChild.tagName.should.equal('svg');
-          done();
-        });
+  const tests = require('./_data/_parseMarkdownByHTML/_data');
+  tests.forEach(function(test) {
+    const html = MM.render(test.latex_input, options);
+    const data = MM.parseMarkdownByHTML(html, false);
+    describe('input_latex => ' + test.latex_input, () => {
+      it('Should be length = 4', (done) => {
+        data.should.have.length(4);
+        done();
+      });
+      it('Should be return mathml =>', function(done) {
+        data[0].should.have.property('type', 'mathml');
+        data[0].should.have.property('value', test.mathml);
+        done();
+      });
+      it('Should be return asciimath =>', function(done) {
+        data[1].should.have.property('type', 'asciimath');
+        data[1].should.have.property('value', test.asciimath);
+        done();
+      });
+      it('Should be return latex =>', function(done) {
+        data[2].should.have.property('type', 'latex');
+        data[2].should.have.property('value', test.latex);
+        done();
+      });
+      it('Should be return svg =>', function(done) {
+        data[3].should.have.property('type', 'svg');
+        const doc = JSDOM.fragment(data[3].value);
+        doc.firstChild.tagName.should.equal('svg');
+        done();
+      });
     });
   });
 });
@@ -78,3 +78,39 @@ describe('Check u2212 for asciimath:', () => {
     });
   });
 });
+
+describe('Test from example:', () => {
+  const latex = String.raw`\begin{tabular}{ l c r }
+                 1 & {$x^1$} & 3 \\
+                 4 & {$y^1$} & 6 \\
+                 7 & {$z^1$} & 9 \\
+               \end{tabular}`;
+  const options = {
+    outMath: {
+      include_asciimath: true,
+      include_mathml: true,
+      include_latex: true,
+      include_svg: true,
+      include_tsv: true,
+      include_table_html: true
+    }
+  };
+  const html = MM.markdownToHTML(latex, options);
+  const parsed = MM.parseMarkdownByHTML(html, false);
+
+  describe('input_latex => ' , () => {
+    it('Should be parser.length = 2', function(done) {
+      parsed.should.have.length(2);
+      done();
+    });
+    it('Should be have type: "html"', function(done) {
+      parsed[0].should.have.property('type', 'html');
+      done();
+    });
+    it('Should be have type: "tsv"', function(done) {
+      parsed[1].should.have.property('type', 'tsv');
+      done();
+    });
+  });
+});
+
