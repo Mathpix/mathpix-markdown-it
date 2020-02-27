@@ -308,11 +308,11 @@ const parsed = MathpixMarkdownModel.parseMarkdownByHTML(html, false);
 ##### By default, the include_sub_math option is enabled, and as a result will contain formats for the nested table and math.
 
 ```js
-const latex = `\begin{tabular}{ l c r }
-                 1 & {$x^1$} & 3 \\
-                 4 & {$y^1$} & 6 \\
-                 7 & {$z^1$} & 9 \\
-               \end{tabular}`;
+const latex = `\\begin{tabular}{ l c r }
+                 1 & {$x^1$} & 3 \\\\
+                 4 & {$y^1$} & 6 \\\\
+                 7 & {$z^1$} & 9 \\\\
+               \\end{tabular}`;
 const options = {
     outMath: {
         include_asciimath: true,
@@ -356,11 +356,11 @@ const parsed = MathpixMarkdownModel.parseMarkdownByHTML(html);
 ##### If you set the include_sub_math option in the false,  then as a result, will not contain formats for all the nested table and math.
 
 ```js
-const latex = `\begin{tabular}{ l c r }
-                 1 & {$x^1$} & 3 \\
-                 4 & {$y^1$} & 6 \\
-                 7 & {$z^1$} & 9 \\
-               \end{tabular}`;
+const latex = `\\begin{tabular}{ l c r }
+                 1 & {$x^1$} & 3 \\\\
+                 4 & {$y^1$} & 6 \\\\
+                 7 & {$z^1$} & 9 \\\\
+               \\end{tabular}`;
 const options = {
     outMath: {
         include_asciimath: true,
