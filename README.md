@@ -228,6 +228,96 @@ For `tabular`:
 ]
 ```
 
+
+### Example of the include_sub_math option usage for tables containing nested tables and formulas
+
+#### parseMarkdownByHTML(html: string, include_sub_math: boolean = true)
+
+##### By default, the include_sub_math option is enabled, and as a result will contain formats for the nested table and math.
+
+```js
+const latex = `\begin{tabular}{ l c r }
+                 1 & {$x^1$} & 3 \\
+                 4 & {$y^1$} & 6 \\
+                 7 & {$z^1$} & 9 \\
+               \end{tabular}`;
+const options = {
+    outMath: {
+        include_asciimath: true,
+        include_mathml: true,
+        include_latex: true,
+        include_svg: true,
+        include_tsv: true,
+        include_table_html: true
+    }
+  };
+const html = MM.markdownToHTML(latex, options);
+const parsed = MM.parseMarkdownByHTML(html, false);
+```
+
+`parsed`:
+```js
+[
+  { 
+    type: 'thml',
+    value: '<table>..</table>'
+  },
+  { type: 'tsv', value: '1\t$x^1$\t3\n4\t$y^1$\t6\n7\t$z^1$\t9' },
+  
+  { type: 'mathml', value: '<math>\n  <msup>\n    <mi>x</mi>\n    <mn>1</mn>\n  </msup>\n</math>' },
+  { type: 'asciimath', value: 'x^(1)' },
+  { type: 'latex', value: 'x^1' },
+  { type: 'svg', value: '<svg >..</svg> },
+    
+  { type: 'mathml', value: '<math>\n  <msup>\n    <mi>y</mi>\n    <mn>1</mn>\n  </msup>\n</math>' },
+  { type: 'asciimath', value: 'y^(1)' },
+  { type: 'latex', value: 'y^1' },
+  { type: 'svg', value: '<svg ></svg>' },
+      
+  { type: 'mathml', value: '<math>\n  <msup>\n    <mi>z</mi>\n    <mn>1</mn>\n  </msup>\n</math>' },
+  { type: 'asciimath', value: 'z^(1)' },
+  { type: 'latex', value: 'z^1' },
+  { type: 'svg', value: '<svg ></svg>' }
+]
+```
+
+##### If you set the include_sub_math option in the false,  then as a result, will not contain formats for all the nested table and math.
+
+```js
+const latex = `\begin{tabular}{ l c r }
+                 1 & {$x^1$} & 3 \\
+                 4 & {$y^1$} & 6 \\
+                 7 & {$z^1$} & 9 \\
+               \end{tabular}`;
+const options = {
+    outMath: {
+        include_asciimath: true,
+        include_mathml: true,
+        include_latex: true,
+        include_svg: true,
+        include_tsv: true,
+        include_table_html: true
+    }
+  };
+const html = MM.markdownToHTML(latex, options);
+const parsed = MM.parseMarkdownByHTML(html, false);
+```
+
+`parsed`:
+```js
+[
+  { 
+    type: 'thml',
+    value: '<table>..</table>'
+  },
+  { 
+    type: 'tsv', 
+    value: '1\t$x^1$\t3\n4\t$y^1$\t6\n7\t$z^1$\t9' 
+  }
+]
+```
+
+
 ## NodeJS
 
 ### [MathpixMarkdownModel methods usage](https://github.com/Mathpix/mathpix-markdown-it#mathpixmarkdownmodel-methods)
