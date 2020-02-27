@@ -169,7 +169,7 @@ const options = {
         include_table_html: true,
       }
     };
-const html = MM.markdownToHTML(`$x^x$`, options);
+const html = MathpixMarkdownModel.markdownToHTML(`$x^x$`, options);
 ```
 
 `markdownToHTML()` returns an HTML string that will contain the formats specified in the options.
@@ -323,8 +323,8 @@ const options = {
         include_table_html: true
     }
   };
-const html = MM.markdownToHTML(latex, options);
-const parsed = MM.parseMarkdownByHTML(html);
+const html = MathpixMarkdownModel.markdownToHTML(latex, options);
+const parsed = MathpixMarkdownModel.parseMarkdownByHTML(html);
 ```
 
 `parsed`:
@@ -371,8 +371,8 @@ const options = {
         include_table_html: true
     }
   };
-const html = MM.markdownToHTML(latex, options);
-const parsed = MM.parseMarkdownByHTML(html, false);
+const html = MathpixMarkdownModel.markdownToHTML(latex, options);
+const parsed = MathpixMarkdownModel.parseMarkdownByHTML(html, false);
 ```
 
 `parsed`:
