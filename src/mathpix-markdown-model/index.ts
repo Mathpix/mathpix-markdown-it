@@ -86,7 +86,7 @@ class MathpixMarkdown_Model {
 
     const math_el = include_sub_math
       ? el.querySelectorAll('.math-inline, .math-block, .table_tabular, .inline-tabular')
-      : el.querySelectorAll('div > .math-inline, div > .math-block, div > .table_tabular, div > .inline-tabular');
+      : el.querySelectorAll('div > .math-inline, div > .math-block, .table_tabular, div > .inline-tabular');
     if (!math_el) return null;
 
 
