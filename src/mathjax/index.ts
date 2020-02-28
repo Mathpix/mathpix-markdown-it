@@ -136,8 +136,12 @@ export const MathJax = {
     return svg.styleSheet(docTeX);
   },
   TexConvert: function(string, options: any={}) {
-    const {display = true, metric = {}, outMath = {}} = options;
+    const {display = true, metric = {}, outMath = {}, mathJax = {}} = options;
     const {em = 16, ex = 8, cwidth = 1200, lwidth = 100000, scale = 1} = metric;
+    const {mtextInheritFont = false} = mathJax;
+    if (mtextInheritFont) {
+      docTeX.outputJax.options.mtextInheritFont = true
+    }
     const node = docTeX.convert(string, {display: display, em: em, ex: ex, containerWidth: cwidth, lineWidth: lwidth, scale: scale});
     const outputJax = docTeX.outputJax as any;
     return OuterData(node, outputJax.math, outMath);

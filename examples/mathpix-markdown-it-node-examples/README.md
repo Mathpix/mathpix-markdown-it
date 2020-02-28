@@ -36,3 +36,11 @@ Result:
 }
 ```
 
+### Example of Latex to mathml/asciimath/tsv conversion
+
+1. `node conversion/math.js`
+2. `node conversion/tabular.js`
+3. `node conversion/math_outMath.js`
+4. `node conversion/tabular_outMath.js`
+5. `node conversion/tabular_include_sub_math.js`
+6  `node conversion/tabular_not_include_sub_math.js`

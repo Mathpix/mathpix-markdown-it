@@ -471,7 +471,8 @@ const renderMath = (a, token, options) => {
     if (token.type === 'display_mathML' || token.type === 'inline_mathML') {
       mathEquation = MathJax.TypesetMathML(math);
     } else {
-      mathEquation = MathJax.Typeset(math, {display: isBlock, metric: { cwidth: cwidth }, outMath: options.outMath});
+      mathEquation = MathJax.Typeset(math, {display: isBlock, metric: { cwidth: cwidth },
+        outMath: options.outMath, mathJax: options.mathJax});
     }
   } catch (e) {
     console.log('ERROR MathJax =>', e.message, e);
