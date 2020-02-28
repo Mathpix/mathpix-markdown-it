@@ -490,7 +490,7 @@ The `MathpixMarkdown` React element accepts the following props:
 | `linkify`        | boolean;*`false`*            | Autoconverts URL-like text to links                                                                                    |
 | `width`          | number;*`1200`*              | Sets text container width                                                                                              |
 | `outMath`        | [TOutputMath](https://github.com/Mathpix/mathpix-markdown-it#toutputmath);*`{}`*         | Sets options to output html                                                                                           |
-| `mathJax`        | TOutputMathJax;*`{}`*       | Sets options to output MathJax                                                                                         |
+| `mathJax`        | [TOutputMathJax](https://github.com/Mathpix/mathpix-markdown-it#toutputmathjax);*`{}`*       | Sets options to output MathJax                                                                                         |
 
 
 ## MathpixMarkdownModel methods
@@ -523,7 +523,7 @@ The `MathpixMarkdown` React element accepts the following props:
 | `width`          | number;*`1200`*              | Sets text container width                                                                                              |
 | `lineNumbering`  | boolean;*`false`*            | Sets line numbers. Recommended for synchronization with a text editor.                                                 |
 | `outMath`        | [TOutputMath](https://github.com/Mathpix/mathpix-markdown-it#toutputmath);*`{}`*           | Sets options to output html                                                                                            |
-| `mathJax`        | TOutputMathJax;*`{}`*       | Sets options to output MathJax                                                                                         |
+| `mathJax`        | [TOutputMathJax](https://github.com/Mathpix/mathpix-markdown-it#toutputmathjax);*`{}`*       | Sets options to output MathJax                                                                                         |
 
 ### optionsMathpixMarkdown
 
@@ -542,7 +542,7 @@ The `MathpixMarkdown` React element accepts the following props:
 | `linkify`        | boolean;*`true`*             | Autoconverts URL-like text to links                                                                                    |
 | `width`          | number;*`1200`*              | Sets text container width                                                                                              |
 | `outMath`        | [TOutputMath](https://github.com/Mathpix/mathpix-markdown-it#toutputmath);*`{}`*           | Sets options to output html                                                                                            |
-| `mathJax`        | TOutputMathJax;*`{}`*        | Sets options to output MathJax                                                                                         |
+| `mathJax`        | [TOutputMathJax](https://github.com/Mathpix/mathpix-markdown-it#toutputmathjax);*`{}`*        | Sets options to output MathJax                                                                                         |
 
 
 ### TOutputMath
