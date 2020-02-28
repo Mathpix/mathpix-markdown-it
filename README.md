@@ -402,6 +402,7 @@ const parsed = MathpixMarkdownModel.parseMarkdownByHTML(html, false);
 ### [MathpixMarkdownModel methods usage](https://github.com/Mathpix/mathpix-markdown-it#mathpixmarkdownmodel-methods)
 
 #### [Example of mathpix-markdown-it usage in the node application](https://github.com/Mathpix/mathpix-markdown-it/tree/master/examples/mathpix-markdown-it-node-examples)
+#### [Example of Latex to mathml/asciimath/tsv conversion in the node application](https://github.com/Mathpix/mathpix-markdown-it/tree/master/examples/mathpix-markdown-it-node-examples#example-of-latex-to-mathmlasciimathtsv-conversion)
 
 ```js
 const {MathpixMarkdownModel} = require('mathpix-markdown-it'); 
