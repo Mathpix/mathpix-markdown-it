@@ -75,7 +75,8 @@ const setTokensTabular = (str: string, align: string = ''): Array<TTokenTabular>
           let cRight = k === numCol-1 ?  cLines[cLines.length-1] :cLines[k+1];
           let cLeft = k === 0 ? cLines[0] : '';
           const data = AddTd('', {h: cAlign[k], v: vAlign[k], w: cWidth[k]},
-            {left: cLeft, right: cRight, bottom: CellsHLines[i+1][k], top: i === 0 ? CellsHLines[i][k]: ''},
+            {left: cLeft, right: cRight, bottom: CellsHLines[i+1] ? CellsHLines[i+1][k] : 'none',
+              top: i === 0 ? CellsHLines[i] ? CellsHLines[i][k] : 'none' : ''},
             CellsHLSpaces[i+1][k]
           );
           tsv_row[k] = data.content;
@@ -99,7 +100,8 @@ const setTokensTabular = (str: string, align: string = ''): Array<TTokenTabular>
           let cRight = k === numCol-1 ?  cLines[cLines.length-1] :cLines[k+1];
           let cLeft = k === 0 ? cLines[0] : '';
           const data = AddTd('', {h: cAlign[k], v: vAlign[k], w: cWidth[k]},
-            {left: cLeft, right: cRight, bottom: CellsHLines[i+1][k], top: i === 0 ? CellsHLines[i][k]: ''},
+            {left: cLeft, right: cRight, bottom: CellsHLines[i+1] ? CellsHLines[i+1][k] : 'none',
+              top: i === 0 ? CellsHLines[i] ? CellsHLines[i][k] : 'none' : ''},
             CellsHLSpaces[i+1][k]
           );
           tsv_row[k] = data.content;
@@ -115,8 +117,8 @@ const setTokensTabular = (str: string, align: string = ''): Array<TTokenTabular>
       if (cells[j] && cells[j].trim().length > 0) {
         const multi = getMultiColumnMultiRow(cells[j], {lLines: cLines[ic], align: cAlign[ic], rLines: cRight});
         if (multi) {
-          let mr = multi.mr;
-          let mc = multi.mc;
+          let mr = multi.mr > rows.length ? rows.length : multi.mr;
+          let mc = multi.mc > numCol ? numCol : multi.mc;
 
           if (mr && mr > 0) {
             if (mc && mc > 1) {
@@ -129,7 +131,7 @@ const setTokensTabular = (str: string, align: string = ''): Array<TTokenTabular>
             }
 
             if (mr+i >= rows.length-1) {
-              multi.attrs = addHLineIntoStyle(multi.attrs, CellsHLines[mr+i][ic]);
+              multi.attrs = addHLineIntoStyle(multi.attrs, CellsHLines[mr+i] ? CellsHLines[mr+i][ic] : 'none');
             }
 
           } else {
@@ -150,12 +152,12 @@ const setTokensTabular = (str: string, align: string = ''): Array<TTokenTabular>
 
 
           if (i === 0){
-            multi.attrs = addHLineIntoStyle(multi.attrs, CellsHLines[i][ic], 'top');
+            multi.attrs = addHLineIntoStyle(multi.attrs, CellsHLines[i] ? CellsHLines[i][ic] : 'none', 'top');
           }
           if (mr && mr > 0) {
-            multi.attrs = addHLineIntoStyle(multi.attrs, CellsHLines[mr+i][ic]);
+            multi.attrs = addHLineIntoStyle(multi.attrs, CellsHLines[mr+i] ? CellsHLines[mr+i][ic] : 'none');
           } else {
-            multi.attrs = addHLineIntoStyle(multi.attrs, CellsHLines[i+1][ic]);
+            multi.attrs = addHLineIntoStyle(multi.attrs, CellsHLines[i+1] ? CellsHLines[i+1][ic] : 'none');
           }
 
           res.push({token:'td_open', tag: 'td', n: 1, attrs: multi.attrs});
@@ -183,7 +185,8 @@ const setTokensTabular = (str: string, align: string = ''): Array<TTokenTabular>
         if (parseSub && parseSub.length > 0) {
           res = res.concat(AddTdSubTable(parseSub,
             {h: cAlign[ic], v: vAlign[ic], w: cWidth[ic]},
-             {left: cLeft, right: cRight, bottom: CellsHLines[i+1][ic], top: i === 0 ? CellsHLines[i][ic] : ''}
+             {left: cLeft, right: cRight, bottom: CellsHLines[i+1] ? CellsHLines[i+1][ic] : 'none',
+               top: i === 0 ? CellsHLines[i] ? CellsHLines[i][ic] : 'none' : ''}
             ));
           for (let si=0; si< parseSub.length; si++) {
             tsv_row[j] += tsv_row[j].length > 0 ? ' ' : '';
@@ -201,7 +204,8 @@ const setTokensTabular = (str: string, align: string = ''): Array<TTokenTabular>
         }
         const data = AddTd(content,
           {h: cAlign[ic], v: vAlign[ic], w: cWidth[ic]},
-           {left: cLeft, right: cRight, bottom: CellsHLines[i+1][ic], top: i === 0 ? CellsHLines[i][ic]: ''},
+           {left: cLeft, right: cRight, bottom: CellsHLines[i+1] ? CellsHLines[i+1][ic]: 'none',
+             top: i === 0 ? CellsHLines[i] ? CellsHLines[i][ic] : 'none' : ''},
             CellsHLSpaces[i+1][ic], decimal[ic]
           );
         tsv_row[ic] = data.content;
@@ -213,7 +217,8 @@ const setTokensTabular = (str: string, align: string = ''): Array<TTokenTabular>
         }
         const data = AddTd('',
           {h: cAlign[ic], v: vAlign[ic], w: cWidth[ic]},
-           {left: cLeft, right: cRight, bottom: CellsHLines[i+1][ic], top: i === 0 ? CellsHLines[i][ic]: ''},
+           {left: cLeft, right: cRight, bottom: CellsHLines[i+1] ? CellsHLines[i+1][ic] : 'none',
+             top: i === 0 ? CellsHLines[i] ? CellsHLines[i][ic] : 'none' : ''},
             CellsHLSpaces[i+1][ic]
           );
         tsv_row[ic] = data.content;
