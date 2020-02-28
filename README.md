@@ -160,13 +160,13 @@ Rendering methods have the ability to convert `Latex` representation to such for
 
 ```js
 const options = {
-      outMath: {
+      outMath: { //You can set which formats should be included into html result
         include_mathml: true,
         include_asciimath: true,
         include_latex: true,
-        include_svg: true,
+        include_svg: true, // sets in default
         include_tsv: true,
-        include_table_html: true,
+        include_table_html: true, // sets in default
       }
     };
 const html = MathpixMarkdownModel.markdownToHTML(`$x^x$`, options);
@@ -241,7 +241,8 @@ const options = {
         include_latex: false,
       }
     };
-const html = MathpixMarkdownModel.markdownToHTML(`$x^x$`, options);
+const latex = `$x^x$`;
+const html = MathpixMarkdownModel.markdownToHTML(latex, options);
 const parsed = MathpixMarkdownModel.parseMarkdownByHTML(html, false);
 ```
 
@@ -278,14 +279,20 @@ const options = {
         include_tsv: true,
       }
     };
-const html = MathpixMarkdownModel.markdownToHTML(`\\begin{tabular}{ c c } 1 & 2\\\\ 3 & 4\\\\ \\end{tabular}`, options);
+const latex = `\\begin{tabular}{ l c r }
+  1 & 2 & 3 \\\\
+  4 & 5 & 6 \\\\
+  7 & 8 & 9 \\\\
+\\end{tabular}`;
+const html = MathpixMarkdownModel.markdownToHTML(latex, options);
 const parsed = MathpixMarkdownModel.parseMarkdownByHTML(html, false);
 ```
 
 ```html
 <div class="table_tabular " style="text-align: center">
-  <tsv style="display: none">1    2
-3       4</tsv>
+  <tsv style="display: none">1    2       3
+4       5       6
+7       8       9</tsv>
 </div>
 
 ```
@@ -295,7 +302,7 @@ const parsed = MathpixMarkdownModel.parseMarkdownByHTML(html, false);
 [
   { 
     type: 'tsv', 
-    value: '1\t2\n3\t4' 
+    value: '1\t2\t3\n4\t5\t6\n7\t8\t9' 
   }
 ]
 ```
@@ -308,11 +315,6 @@ const parsed = MathpixMarkdownModel.parseMarkdownByHTML(html, false);
 ##### By default, the include_sub_math option is enabled, and as a result will contain formats for the nested table and math.
 
 ```js
-const latex = `\\begin{tabular}{ l c r }
-                 1 & {$x^1$} & 3 \\\\
-                 4 & {$y^1$} & 6 \\\\
-                 7 & {$z^1$} & 9 \\\\
-               \\end{tabular}`;
 const options = {
     outMath: {
         include_asciimath: true,
@@ -323,6 +325,11 @@ const options = {
         include_table_html: true
     }
   };
+const latex = `\\begin{tabular}{ l c r }
+                 1 & {$x^1$} & 3 \\\\
+                 4 & {$y^1$} & 6 \\\\
+                 7 & {$z^1$} & 9 \\\\
+               \\end{tabular}`;
 const html = MathpixMarkdownModel.markdownToHTML(latex, options);
 const parsed = MathpixMarkdownModel.parseMarkdownByHTML(html);
 ```
@@ -356,11 +363,6 @@ const parsed = MathpixMarkdownModel.parseMarkdownByHTML(html);
 ##### If you set the include_sub_math option in the false,  then as a result, will not contain formats for all the nested table and math.
 
 ```js
-const latex = `\\begin{tabular}{ l c r }
-                 1 & {$x^1$} & 3 \\\\
-                 4 & {$y^1$} & 6 \\\\
-                 7 & {$z^1$} & 9 \\\\
-               \\end{tabular}`;
 const options = {
     outMath: {
         include_asciimath: true,
@@ -371,6 +373,11 @@ const options = {
         include_table_html: true
     }
   };
+const latex = `\\begin{tabular}{ l c r }
+                 1 & {$x^1$} & 3 \\\\
+                 4 & {$y^1$} & 6 \\\\
+                 7 & {$z^1$} & 9 \\\\
+               \\end{tabular}`;
 const html = MathpixMarkdownModel.markdownToHTML(latex, options);
 const parsed = MathpixMarkdownModel.parseMarkdownByHTML(html, false);
 ```
