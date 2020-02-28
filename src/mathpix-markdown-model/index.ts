@@ -24,6 +24,7 @@ export interface optionsMathpixMarkdown {
     showToc?: boolean;
     overflowY?: string; //default 'unset'
     outMath?: TOutputMath;
+    mathJax?: TOutputMathJax;
 }
 
 export type TMarkdownItOptions = {
@@ -34,7 +35,8 @@ export type TMarkdownItOptions = {
   xhtmlOut?: boolean,
   width?: number,
   lineNumbering?: boolean,
-  outMath?: TOutputMath
+  outMath?: TOutputMath,
+  mathJax?: TOutputMathJax
 }
 
 export type TOutputMath = {
@@ -48,6 +50,10 @@ export type TOutputMath = {
     column?: string,
     row?: string,
   }
+}
+
+export type TOutputMathJax = {
+  mtextInheritFont?: boolean,
 }
 
 const formatSourceHtml = (text: string) => {
@@ -309,7 +315,7 @@ class MathpixMarkdown_Model {
         const { alignMathBlock='center', display='block', isCheckFormula=false, showTimeLog=false,
           isDisableFancy=false, fontSize=null, padding=null, htmlTags=false, width=0, showToc = false,
           overflowY='unset', breaks = true, typographer = true, linkify = true, xhtmlOut = false,
-          outMath = {}
+          outMath = {}, mathJax = {}
         } = options || {};
         const disableRules = isDisableFancy ? this.disableFancyArrayDef : options ? options.disableRules || [] : [];
         if (!showToc) {
@@ -323,7 +329,8 @@ class MathpixMarkdown_Model {
                 <div id='container-ruller'></div>
                 <div id='setText' style='display: ${display}; justify-content: inherit;${styleFontSize}${stylePadding}' >
                     ${this.convertToHTML(text, 
-              {htmlTags: htmlTags, xhtmlOut: xhtmlOut, breaks: breaks, typographer: typographer, linkify: linkify, width: width, outMath: outMath})}
+              {htmlTags: htmlTags, xhtmlOut: xhtmlOut, breaks: breaks, typographer: typographer, linkify: linkify, width: width, 
+                outMath: outMath, mathJax: mathJax})}
                 </div>
             </div>`
         );

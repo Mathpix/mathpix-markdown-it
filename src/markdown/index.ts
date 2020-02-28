@@ -10,7 +10,7 @@ import {MathpixMarkdownModel as MM, TMarkdownItOptions} from '../mathpix-markdow
 /** md renderer */
 const mdInit = (options: TMarkdownItOptions) => {
   const {htmlTags = false, xhtmlOut = false, width = 1200, breaks = true, typographer = true, linkify = true,
-          outMath = {}} = options;
+          outMath = {}, mathJax = {}} = options;
   return require("markdown-it")({
     html: htmlTags,
     xhtmlOut: xhtmlOut,
@@ -22,7 +22,7 @@ const mdInit = (options: TMarkdownItOptions) => {
   })
     .use(tableTabularPlugin, {width: width, outMath: outMath})
  //   .use(separateForBlockPlugin)
-    .use(ConfiguredMathJaxPlugin({width: width, outMath: outMath}))
+    .use(ConfiguredMathJaxPlugin({width: width, outMath: outMath, mathJax: mathJax}))
     .use(CustomTagPlugin())
     .use(HighlightPlugin, {auto: false})
     .use(anchorPlugin)

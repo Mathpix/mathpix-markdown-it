@@ -490,6 +490,7 @@ The `MathpixMarkdown` React element accepts the following props:
 | `linkify`        | boolean;*`false`*            | Autoconverts URL-like text to links                                                                                    |
 | `width`          | number;*`1200`*              | Sets text container width                                                                                              |
 | `outMath`        | [TOutputMath](https://github.com/Mathpix/mathpix-markdown-it#toutputmath);*`{}`*         | Sets options to output html                                                                                           |
+| `mathJax`        | TOutputMathJax;*`{}`*       | Sets options to output MathJax                                                                                         |
 
 
 ## MathpixMarkdownModel methods
@@ -522,6 +523,7 @@ The `MathpixMarkdown` React element accepts the following props:
 | `width`          | number;*`1200`*              | Sets text container width                                                                                              |
 | `lineNumbering`  | boolean;*`false`*            | Sets line numbers. Recommended for synchronization with a text editor.                                                 |
 | `outMath`        | [TOutputMath](https://github.com/Mathpix/mathpix-markdown-it#toutputmath);*`{}`*           | Sets options to output html                                                                                            |
+| `mathJax`        | TOutputMathJax;*`{}`*       | Sets options to output MathJax                                                                                         |
 
 ### optionsMathpixMarkdown
 
@@ -540,6 +542,7 @@ The `MathpixMarkdown` React element accepts the following props:
 | `linkify`        | boolean;*`true`*             | Autoconverts URL-like text to links                                                                                    |
 | `width`          | number;*`1200`*              | Sets text container width                                                                                              |
 | `outMath`        | [TOutputMath](https://github.com/Mathpix/mathpix-markdown-it#toutputmath);*`{}`*           | Sets options to output html                                                                                            |
+| `mathJax`        | TOutputMathJax;*`{}`*        | Sets options to output MathJax                                                                                         |
 
 
 ### TOutputMath
@@ -555,6 +558,11 @@ The `MathpixMarkdown` React element accepts the following props:
 | `tsv_separators`     | `{column: '\t', row: '\n'}`  | Separators for tsv tables                                                                                          |
  
 
+### TOutputMathJax
+
+|                      | type&nbsp;*`default`*        |  description                                                                                                       |
+|----------------------|------------------------------|--------------------------------------------------------------------------------------------------------------------|
+| `mtextInheritFont`   | boolean&nbsp;*`false`*       | true to make mtext elements use surrounding font                                                                    |
 
 # Development
 
