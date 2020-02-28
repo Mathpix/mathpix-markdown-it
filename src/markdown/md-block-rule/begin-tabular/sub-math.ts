@@ -62,6 +62,31 @@ export const getSubMath = (str: string): string => {
     if (endMarkerPos === -1) {
       return str;
     }
+    if (match[0] === "$" || match[0] === "$$") {
+      const beforeEndMarker = str.charCodeAt(endMarkerPos - 1);
+      if ( beforeEndMarker === 0x5c /* \ */ ||
+          (match.index > 0 && str.charCodeAt(match.index - 1)=== 0x5c /* \ */)
+      ) {
+        return str;
+      }
+      if (match[0] === "$") {
+        const afterStartMarker = str.charCodeAt(match.index + 1)
+        if ( beforeEndMarker  === 0x20 /* space */ ||
+             beforeEndMarker  === 0x09 /* \t */ ||
+             beforeEndMarker  === 0x0a /* \n */ ||
+             afterStartMarker === 0x20 /* space */ ||
+             afterStartMarker === 0x09 /* \t */ ||
+             afterStartMarker === 0x0a /* \n */
+        ) {
+          return str;
+        }
+      }
+      // Skip if closing $ is succeeded by a digit (eg $5 $10 ...)
+      const suffix = str.charCodeAt(endMarkerPos+1);
+      if (suffix >= 0x30 && suffix < 0x3a) {
+        return str;
+      }
+    }
     const nextPos: number = endMarkerPos + endMarker.length;
 
     const content: string = str.slice(match.index, nextPos);

@@ -1073,5 +1073,167 @@ module.exports = [
       '</tr>\n' +
       '</tbody>\n' +
       '</table>'
+  },
+  {
+    latex: '\\begin{tabular}{|l|l|}\n' +
+      '\\hline \\hline Plan 1 & Plan 2 \\\\\n' +
+      '\\hline Employee pays \\$100 & Employee pays \\$200 \\\\\n' +
+      '\\hline Plan pays 70\\% of the rest & Plan pays 80\\% of the rest \\\\\n' +
+      '\\hline\n' +
+      '\\end{tabular}',
+    tsv: 'Plan 1\tPlan 2\n' +
+      'Employee pays \\$100\tEmployee pays \\$200\n' +
+      'Plan pays 70\\% of the rest\tPlan pays 80\\% of the rest',
+    html: '<table id="tabular">\n' +
+      '<tbody>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: double !important; border-top-width: 3px !important; width: auto; vertical-align: middle; ">Plan 1</td>\n' +
+      '<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: double !important; border-top-width: 3px !important; width: auto; vertical-align: middle; ">Plan 2</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">Employee pays $100</td>\n' +
+      '<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">Employee pays $200</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">Plan pays 70% of the rest</td>\n' +
+      '<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">Plan pays 80% of the rest</td>\n' +
+      '</tr>\n' +
+      '</tbody>\n' +
+      '</table>'
+  },
+  {
+    latex: '\\begin{tabular}{|l|l|}\n' +
+      '\\hline \\hline Plan 1 & Plan 2 \\\\\n' +
+      '\\hline Employee pays \\$100 & Employee pays $200 \\\\\n' +
+      '\\hline Plan pays 70\\% of the rest & Plan pays 80\\% of the rest \\\\\n' +
+      '\\hline\n' +
+      '\\end{tabular}',
+    tsv: 'Plan 1\tPlan 2\n' +
+      'Employee pays \\$100\tEmployee pays $200\n' +
+      'Plan pays 70\\% of the rest\tPlan pays 80\\% of the rest',
+    html: '<table id="tabular">\n' +
+      '<tbody>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: double !important; border-top-width: 3px !important; width: auto; vertical-align: middle; ">Plan 1</td>\n' +
+      '<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: double !important; border-top-width: 3px !important; width: auto; vertical-align: middle; ">Plan 2</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">Employee pays $100</td>\n' +
+      '<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">Employee pays $200</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">Plan pays 70% of the rest</td>\n' +
+      '<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">Plan pays 80% of the rest</td>\n' +
+      '</tr>\n' +
+      '</tbody>\n' +
+      '</table>'
+  },
+  {
+    latex: '\\begin{tabular}{|l|l|}\n' +
+      '\\hline \\hline Plan 1 & Plan 2 \\\\\n' +
+      '\\hline Employee pays $100 & Employee pays $200 \\\\\n' +
+      '\\hline Plan pays 70\\% of the rest & Plan pays 80\\% of the rest \\\\\n' +
+      '\\hline\n' +
+      '\\end{tabular}',
+    tsv: 'Plan 1\tPlan 2\n' +
+      'Employee pays $100\tEmployee pays $200\n' +
+      'Plan pays 70\\% of the rest\tPlan pays 80\\% of the rest',
+    html: '<table id="tabular">\n' +
+      '<tbody>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: double !important; border-top-width: 3px !important; width: auto; vertical-align: middle; ">Plan 1</td>\n' +
+      '<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: double !important; border-top-width: 3px !important; width: auto; vertical-align: middle; ">Plan 2</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">Employee pays $100</td>\n' +
+      '<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">Employee pays $200</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">Plan pays 70% of the rest</td>\n' +
+      '<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">Plan pays 80% of the rest</td>\n' +
+      '</tr>\n' +
+      '</tbody>\n' +
+      '</table>'
+  },
+  {
+    latex: '\\begin{tabular}{|l|l|}\n' +
+      '\\hline \\hline Plan 1 & Plan 2 \\\\\n' +
+      '\\hline Employee pays $100 & Employee pays \\$200 \\\\\n' +
+      '\\hline Plan pays 70\\% of the rest & Plan pays 80\\% of the rest \\\\\n' +
+      '\\hline\n' +
+      '\\end{tabular}',
+    tsv: 'Plan 1\tPlan 2\n' +
+      'Employee pays $100\tEmployee pays \\$200\n' +
+      'Plan pays 70\\% of the rest\tPlan pays 80\\% of the rest',
+    html: '<table id="tabular">\n' +
+      '<tbody>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: double !important; border-top-width: 3px !important; width: auto; vertical-align: middle; ">Plan 1</td>\n' +
+      '<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: double !important; border-top-width: 3px !important; width: auto; vertical-align: middle; ">Plan 2</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">Employee pays $100</td>\n' +
+      '<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">Employee pays $200</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">Plan pays 70% of the rest</td>\n' +
+      '<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">Plan pays 80% of the rest</td>\n' +
+      '</tr>\n' +
+      '</tbody>\n' +
+      '</table>'
+  },
+  {
+    latex: '\\begin{tabular}{|l|l|}\n' +
+      '\\hline \\hline Plan 1 & Plan 2 \\\\\n' +
+      '\\hline Employee pays $100 & Employee pays$200 \\\\\n' +
+      '\\hline Plan pays 70\\% of the rest & Plan pays 80\\% of the rest \\\\\n' +
+      '\\hline\n' +
+      '\\end{tabular}',
+    tsv: 'Plan 1\tPlan 2\n' +
+      'Employee pays $100\tEmployee pays$200\n' +
+      'Plan pays 70\\% of the rest\tPlan pays 80\\% of the rest',
+    html: '<table id="tabular">\n' +
+      '<tbody>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: double !important; border-top-width: 3px !important; width: auto; vertical-align: middle; ">Plan 1</td>\n' +
+      '<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: double !important; border-top-width: 3px !important; width: auto; vertical-align: middle; ">Plan 2</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">Employee pays $100</td>\n' +
+      '<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">Employee pays$200</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">Plan pays 70% of the rest</td>\n' +
+      '<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">Plan pays 80% of the rest</td>\n' +
+      '</tr>\n' +
+      '</tbody>\n' +
+      '</table>'
+  },
+  {
+    latex: '\\begin{tabular}{|l|l|}\n' +
+      '\\hline \\hline Plan 1 & Plan 2 \\\\\n' +
+      '\\hline Employee pays $ 100 & Employee pays$ 200 \\\\\n' +
+      '\\hline Plan pays 70\\% of the rest & Plan pays 80\\% of the rest \\\\\n' +
+      '\\hline\n' +
+      '\\end{tabular}',
+    tsv: 'Plan 1\tPlan 2\n' +
+      'Employee pays $ 100\tEmployee pays$ 200\n' +
+      'Plan pays 70\\% of the rest\tPlan pays 80\\% of the rest',
+    html: '<table id="tabular">\n' +
+      '<tbody>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: double !important; border-top-width: 3px !important; width: auto; vertical-align: middle; ">Plan 1</td>\n' +
+      '<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: double !important; border-top-width: 3px !important; width: auto; vertical-align: middle; ">Plan 2</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">Employee pays $ 100</td>\n' +
+      '<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">Employee pays$ 200</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">Plan pays 70% of the rest</td>\n' +
+      '<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">Plan pays 80% of the rest</td>\n' +
+      '</tr>\n' +
+      '</tbody>\n' +
+      '</table>'
   }
 ];

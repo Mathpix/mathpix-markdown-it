@@ -77,6 +77,26 @@ describe('TSV:', () => {
       });
     });
 
+    describe('Default Options. \n Latex => ' + test.latex, () => {
+      const html = MM.render(test.latex);
+      const data = MM.parseMarkdownByHTML(html, false);
+
+      it('Should be parser.length = 1', function(done) {
+        data.should.have.length(1);
+        done();
+      });
+      it('Should be have type: "html"', function(done) {
+        data[0].should.have.property('type', 'html');
+        if (test.html_not_tsv) {
+          data[0].should.have.property('value', test.html_not_tsv);
+        } else {
+          if (test.html) {
+            data[0].should.have.property('value', test.html);
+          }
+        }
+        done();
+      });
+    });
 
     options.outMath.include_tsv = true;
     options.outMath.include_table_html = false;
