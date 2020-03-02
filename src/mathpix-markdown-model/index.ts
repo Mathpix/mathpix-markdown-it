@@ -59,6 +59,7 @@ export type TOutputMathJax = {
 const formatSourceHtml = (text: string) => {
   return text.trim()
     .replace(/&amp;/g, '&')
+    .replace(/&nbsp;/g, ' ')
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>');
 };

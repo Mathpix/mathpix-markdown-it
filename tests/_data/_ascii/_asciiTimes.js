@@ -22,7 +22,7 @@ module.exports = [
   },
   {
     latex: `\\{ \\text{ \\frac{1}{2} } \\}`,
-    ascii: `{" \\frac{1}{2} "}`,
+    ascii: `{" \\frac{1}{2} "}`,
     ascii_old: `{" (1)/(2) "}`
   },
 
