@@ -65,7 +65,8 @@ const toMathML = (node => {
 
 const toAsciiML = ((node, optionAscii) => {
   const visitorA = new AsciiVisitor(optionAscii);
-  return visitorA.visitTree(node)
+  let ascii = visitorA.visitTree(node);
+  return ascii ? ascii.trim() : ascii;
 });
 
 const OuterData = (node, math, outMath) => {
@@ -102,7 +103,10 @@ const OuterData = (node, math, outMath) => {
 };
 
 const formatSource = (text: string) => {
-  return text.trim().replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  return text.trim()
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
 };
 
 const OuterHTML = (data) => {

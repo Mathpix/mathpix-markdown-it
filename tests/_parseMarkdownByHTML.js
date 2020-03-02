@@ -1,6 +1,6 @@
 let chai = require('chai');
 let should = chai.should();
-
+const notIncludeSymbols = require('./_ascii');
 
 let MM = require('../lib/mathpix-markdown-model/index').MathpixMarkdownModel;
 
@@ -25,6 +25,7 @@ const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
 global.DOMParser = new JSDOM().window.DOMParser;
 
+
 describe('Check parseMarkdownByHTML:', () => {
   const tests = require('./_data/_parseMarkdownByHTML/_data');
   tests.forEach(function(test) {
@@ -43,6 +44,7 @@ describe('Check parseMarkdownByHTML:', () => {
       it('Should be return asciimath =>', function(done) {
         data[1].should.have.property('type', 'asciimath');
         data[1].should.have.property('value', test.asciimath);
+        notIncludeSymbols(data[1].value);
         done();
       });
       it('Should be return latex =>', function(done) {
@@ -74,6 +76,7 @@ describe('Check u2212 for asciimath:', () => {
       parsed[0].should.have.property('type', 'asciimath');
       parsed[0].value.charCodeAt(1).should.equal(45);
       parsed[0].value[1].should.equal('-');
+      notIncludeSymbols(parsed[0].value);
       done();
     });
   });

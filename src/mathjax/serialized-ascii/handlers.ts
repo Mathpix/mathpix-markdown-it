@@ -1,5 +1,5 @@
 import { MmlNode } from "mathjax-full/js/core/MmlTree/MmlNode";
-import { AMsymbols } from "./helperA";
+import {AMsymbols} from "./helperA";
 
 const regW: RegExp = /^\w/;
 
@@ -53,6 +53,9 @@ const needLastSpase = (node) => {
         const abs = SymbolToAM(next.kind, text);
         return regW.test(abs)
       } else {
+        if (next.kind === 'mrow') {
+          return false
+        }
         return haveSpace;
       }
     }
@@ -107,6 +110,10 @@ export const SymbolToAM = (tag: string, output: string, atr = null, showStyle = 
 
   return tags ? tags.input : output
 
+};
+
+export const FindSymbolReplace = (str: string) => {
+  return str.replace(/\u00A0/g, ' ')
 };
 
 export const FindSymbolToAM = (tag: string, output: string, atr = null): string => {
@@ -385,9 +392,9 @@ const msqrt = (handlerApi) => {
   return  (node, serialize) => {
     let mml = '';
     try {
-      mml += 'sqrt(';
-      mml += handlerApi.handleAll(node, serialize, mml);
-      mml += ')';
+      const firstChild = node.childNodes[0] ? node.childNodes[0] : null;
+      mml += 'sqrt';
+      mml += serialize.visitNode(firstChild, '');
       return mml;
     } catch (e) {
       console.error('mml => msqrt =>', e);
@@ -452,7 +459,7 @@ const mtext = () => {
         return mml;
       }
       const firstChild: any = node.childNodes[0];
-      const value = firstChild.text;
+      const value = FindSymbolReplace(firstChild.text);
       const asc = FindSymbolToAM(node.kind, value);
       if (asc) {
         mml += asc;
@@ -505,6 +512,9 @@ const mo = () => {
     let mml = '';
     try {
       const value = getChilrenText(node);
+      if (value === '\u2061') {
+        return mml;
+      }
       const atr = getAttributes(node);
       if (atr && atr.hasOwnProperty('fence') && atr.fence) {
         mml += node.texClass === 4 ? '{:' : '';
@@ -532,11 +542,15 @@ const mspace = (handlerApi) => {
     try {
       const atr = getAttributes(node);
       if (atr && atr.width === "2em") {
+        mml += node.parent.parent && needFirstSpase(node.parent.parent) ? ' ' : '';
         mml += 'qquad';
+        mml += node.parent.parent && needLastSpase(node.parent.parent) ? ' ' : '';
         return mml;
       }
       if (atr && atr.width === "1em") {
+        mml += node.parent.parent && needFirstSpase(node.parent.parent) ? ' ' : '';
         mml += 'quad';
+        mml += node.parent.parent && needLastSpase(node.parent.parent) ? ' ' : '';
         return mml;
       }
       mml += handlerApi.handleAll(node, serialize, mml);
