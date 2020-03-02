@@ -66,12 +66,12 @@ module.exports = [
   },
   {
     latex: `a \\operatorname { m o d } b`,
-    ascii:     `a mod ⁡b`,
+    ascii: `a mod b`,
     ascii_old: `a mod b`
   },
   {
     latex: `T _ { x } \\left( \\theta _ { r } \\right) = \\left[ \\begin{array} { l l l l } { 1} & { 0} & { 0} & { 0} \\\\ { 0} & { \\operatorname { c o s } \\theta _ { r } } & { \\operatorname { s i n } \\theta _ { r } } & { 0} \\\\ { 0} & { - \\operatorname { s i n } \\theta _ { r } } & { \\operatorname { c o s } \\theta _ { r } } & { 0} \\\\ { 0} & { 0} & { 0} & { 1} \\end{array} \\right]`,
-    ascii:     `T_(x)(theta_(r))=[[1,0,0,0],[0,cos ⁡theta_(r),sin ⁡theta_(r),0],[0,-sin ⁡theta_(r),cos ⁡theta_(r),0],[0,0,0,1]]`,
+    ascii: `T_(x)(theta_(r))=[[1,0,0,0],[0,cos theta_(r),sin theta_(r),0],[0,-sin theta_(r),cos theta_(r),0],[0,0,0,1]]`,
     ascii_old: `T_(x)(theta_(r))=[[1,0,0,0],[0,cos theta_(r),sin theta_(r),0],[0,-sin theta_(r),cos theta_(r),0],[0,0,0,1]]`
   },
   {
@@ -121,12 +121,12 @@ module.exports = [
   },
   {
     latex: `x - 2y = - 35 \\text{ and } 2x - y = 55`,
-    ascii:     `x-2y=-35" and "2x-y=55`,
+    ascii: `x-2y=-35" and "2x-y=55`,
     ascii_old: `x-2y=-35" and "2x-y=55`
   },
   {
     latex: `(5, 2)\\text{ and }(2 , 8)`,
-    ascii:     `(5,2)" and "(2,8)`,
+    ascii: `(5,2)" and "(2,8)`,
     ascii_old: `(5,2)" and "(2,8)`
   },
   {
@@ -136,7 +136,7 @@ module.exports = [
   },
   {
     latex: `f(x)= \\left\\{ \\begin{array} {ll} { x e ^ {2x} } & { \\text{ si } } & { x < 0} \\\\ { \\frac { \\operatorname { ln } ( x + 1) } { x + 1} } & { \\text{ si } } & { x \\geq 0} \\end{array} \\right.`,
-    ascii:     `f(x)={[xe^(2x)," si ",x<0],[(ln⁡(x+1))/(x+1)," si ",x>=0]:}`,
+    ascii: `f(x)={[xe^(2x)," si ",x<0],[(ln(x+1))/(x+1)," si ",x>=0]:}`,
     ascii_old: `f(x)={[xe^(2x)," si ",x<0],[(ln(x+1))/(x+1)," si ",x>=0]:}`
   },
   {
@@ -146,22 +146,22 @@ module.exports = [
   },
   {
     latex: `f ( x ) = \\left\\{ \\begin{array} { l l } { 2 x + 5 } & { \\text { khi } x < - 1 } \\\\ { x ^ { 2 } + 2 } & { \\text { khi } x \\geq - 1 } \\end{array} \\right.`,
-    ascii:     `f(x)={[2x+5," khi "x<-1],[x^(2)+2," khi "x>=-1]:}`,
+    ascii:     `f(x)={[2x+5," khi "x<-1],[x^(2)+2," khi "x>=-1]:}`,
     ascii_old: `f(x)={[2x+5," khi "x<-1],[x^(2)+2," khi "x>=-1]:}`
   },
   {
     latex: `f ( x ) = \\left\\{ \\begin{array} { l } { 2x + 5\\text{ if } x < 0} \\\\ { x - 1\\text{ if } x > 0} \\end{array} \\right.`,
-    ascii:     `f(x)={[2x+5" if "x<0],[x-1" if "x>0]:}`,
+    ascii: `f(x)={[2x+5" if "x<0],[x-1" if "x>0]:}`,
     ascii_old: `f(x)={[2x+5" if "x<0],[x-1" if "x>0]:}`
   },
   {
     latex: `y = x ^ { 2} ,y = x ^ { 2} + \\operatorname{sin} ( x ^ { 3} )`,
-    ascii:     `y=x^(2),y=x^(2)+sin⁡(x^(3))`,
+    ascii: `y=x^(2),y=x^(2)+sin(x^(3))`,
     ascii_old: `y=x^(2),y=x^(2)+sin(x^(3))`
   },
   {
     latex: `f ( x ) = \\text{ foo } + \\left\\{ \\begin{array} { l } { 2x + 5\\text{ if } x < 0} \\\\ { x - 1\\text{ if } x > 0} \\end{array} \\right.`,
-    ascii:     `f(x)=" foo "+{[2x+5" if "x<0],[x-1" if "x>0]:}`,
+    ascii: `f(x)=" foo "+{[2x+5" if "x<0],[x-1" if "x>0]:}`,
     ascii_old: `f(x)=" foo "+{[2x+5" if "x<0],[x-1" if "x>0]:}`
   },
   {
@@ -261,7 +261,7 @@ module.exports = [
   },
   {
     latex: `a | _ { \\operatorname{s i n} ( \\pi ) }`,
-    ascii:     `a|_(sin⁡(pi))`,
+    ascii: `a|_(sin(pi))`,
     ascii_old: `a|_(sin(pi))`
   },
   {
@@ -351,7 +351,7 @@ module.exports = [
   },
   {
     latex: `\\left.\\begin{array}{l}\\text{above }\\\\x^2\\\\\\text{ below}\\end{array}\\right.`,
-    ascii:     `{:["above "],[x^(2)],[" below"]:}`,
+    ascii: `{:["above "],[x^(2)],[" below"]:}`,
     ascii_old: `{:["above "],[x^(2)],[" below"]:}`
   },
   {
@@ -406,18 +406,18 @@ module.exports = [
   },
   {
     latex: `a + \\text {This is }\\text{text} + b`,
-    ascii:     `a+"This is ""text"+b`,
+    ascii: `a+"This is ""text"+b`,
     ascii_old: `a+"This is ""text"+b`
   },
   {
     latex: `\\text { foo } - 4 ^ { \\text { superscript } } \\text { bar }`,
-    ascii:     `" foo "-4^(" superscript ")" bar "`,
+    ascii: `" foo "-4^(" superscript ")" bar "`,
     ascii_old: `" foo "-4^(" superscript ")" bar "`
   },
   {
     latex: `\\text{The latex for }\\operatorname{sin}(x)\\text{is \\operatorname{sin}(x).}`,
-    ascii:     `"The latex for "sin⁡(x)"is \\operatorname{sin}(x)."`,
-    ascii_old: `"The latex for "sin(x)"is sin(x)."`
+    ascii: `"The latex for "sin(x)"is \\operatorname{sin}(x)."`,
+    ascii_old: `"The latex for "sin(x)"is \\operatorname{sin}(x)."`
   },
   {
     latex: `\\left.\\begin{array}{l}\\text{Now is}\\\\\\text{the time}\\end{array}\\right.`,
@@ -431,12 +431,12 @@ module.exports = [
   },
   {
     latex: `\\text { Figure } 1.1 : \\text { Relative translational motion }`,
-    ascii:     `" Figure "1.1:" Relative translational motion "`,
+    ascii: `" Figure "1.1:" Relative translational motion "`,
     ascii_old: `" Figure "1.1:" Relative translational motion "`
   },
   {
     latex: `\\text { Under the simple parameterization } ( 4.1 ) \\text { of }`,
-    ascii:     `" Under the simple parameterization "(4.1)" of "`,
+    ascii: `" Under the simple parameterization "(4.1)" of "`,
     ascii_old: `" Under the simple parameterization "(4.1)" of "`
   },
   {
@@ -446,17 +446,17 @@ module.exports = [
   },
   {
     latex: `\\begin{array} { l } { \\text { How do we represent tables internally to do } } \\\\ { \\text { recognition? } } \\\\ { \\text { What is our preferred table format for editing in our } } \\\\ { \\text { apps? } } \\end{array}`,
-    ascii:     `[" How do we represent tables internally to do "],[" recognition? "],[" What is our preferred table format for editing in our "],[" apps? "]`,
+    ascii: `[" How do we represent tables internally to do "],[" recognition? "],[" What is our preferred table format for editing in our "],[" apps? "]`,
     ascii_old: `[" How do we represent tables internally to do "],[" recognition? "],[" What is our preferred table format for editing in our "],[" apps? "]`
   },
   {
     latex: `\\begin{array} { l } { \\text { A relatively long line of text that ends with a colon: } } \\\\ { \\text { leave the newline } } \\end{array}`,
-    ascii:     `[" A relatively long line of text that ends with a colon: "],[" leave the newline "]`,
+    ascii: `[" A relatively long line of text that ends with a colon: "],[" leave the newline "]`,
     ascii_old: `[" A relatively long line of text that ends with a colon: "],[" leave the newline "]`
   },
   {
     latex: `\\begin{array} { l } { \\text { A relatively long line of text that is followed by } } \\\\ { \\text { - a line that looks like a list item } } \\end{array}`,
-    ascii:     `[" A relatively long line of text that is followed by "],[" - a line that looks like a list item "]`,
+    ascii: `[" A relatively long line of text that is followed by "],[" - a line that looks like a list item "]`,
     ascii_old: `[" A relatively long line of text that is followed by "],[" - a line that looks like a list item "]`
   },
   {
@@ -526,7 +526,7 @@ module.exports = [
   },
   {
     latex: `\\operatorname { archyp } \\operatorname { tan } ( x )`,
-    ascii:     `archyp ⁡tan⁡(x)`,
+    ascii: `archyp tan(x)`,
     ascii_old: `archyp tan(x)`
   },
 

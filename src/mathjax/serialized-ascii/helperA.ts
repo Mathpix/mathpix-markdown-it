@@ -102,6 +102,7 @@ export const AMsymbols = [
   {input:"gt=", tag:"mo", output:"\u2265", tex:"geq", ttype:CONST},
   {input:">=", tag:"mo", output:"\u2267", tex:"geqq", ttype:CONST},
   {input:"<=", tag:"mo", output:"\u2266", tex:"leqq", ttype:CONST},
+  {input:"leqslant", tag:"mo", output:"\u2A7D", tex:"leqslant", ttype:CONST},
   {input:"-<",  tag:"mo", output:"\u227A", tex:"prec", ttype:CONST},
   {input:"-lt", tag:"mo", output:"\u227A", tex:null, ttype:CONST},
   {input:">-",  tag:"mo", output:"\u227B", tex:"succ", ttype:CONST},

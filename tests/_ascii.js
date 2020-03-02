@@ -10,6 +10,18 @@ const options = {outMath: {
     include_svg: false
   }};
 
+const notIncludeSymbols = (asciimath) => {
+  asciimath.should
+    .not.include('&lt;')
+    .not.include('&gt;')
+    .not.include('&amp;')
+    .not.include('&nbsp;')
+    .not.include('\u00A0')
+    .not.include('\u2212')
+    .not.include('\u2061');
+};
+
+module.exports = notIncludeSymbols;
 
 describe('Latex to ascii:', () => {
   describe('Testing same data:', () => {
@@ -21,6 +33,8 @@ describe('Latex to ascii:', () => {
         console.log('    ASCIIMATH     =>', test.ascii);
         console.log('    ASCIIMATH_OLD =>', test.ascii_old);
         data.should.have.property('asciimath', test.ascii);
+        data.should.have.property('asciimath', test.ascii_old);
+        notIncludeSymbols(data.asciimath);
         done();
       });
     });
@@ -33,8 +47,11 @@ describe('Latex to ascii:', () => {
         const data = MathJax.TexConvert(test.latex, options);
         console.log('    LATEX         =>', test.latex);
         console.log('    ASCIIMATH     =>', test.ascii);
-        console.log('    ASCIIMATH_OLD =>', test.ascii_old);
+        if (test.ascii_old) {
+          console.log('    ASCIIMATH_OLD =>', test.ascii_old);
+        }
         data.should.have.property('asciimath', test.ascii);
+        notIncludeSymbols(data.asciimath);
         done();
       });
     });
@@ -49,6 +66,7 @@ describe('Latex to ascii:', () => {
         console.log('    ASCIIMATH     =>', test.ascii);
         console.log('    ASCIIMATH_OLD =>', test.ascii_old);
         data.should.have.property('asciimath', test.ascii);
+        notIncludeSymbols(data.asciimath);
         done();
       });
     });
@@ -63,6 +81,7 @@ describe('Latex to ascii:', () => {
         console.log('    ASCIIMATH     =>', test.ascii);
         console.log('    ASCIIMATH_OLD =>', test.ascii_old);
         data.should.have.property('asciimath', test.ascii);
+        notIncludeSymbols(data.asciimath);
         done();
       });
     });
@@ -76,6 +95,7 @@ describe('Latex to ascii:', () => {
         console.log('    LATEX         =>', test.latex);
         console.log('    ASCIIMATH     =>', test.ascii);
         data.should.have.property('asciimath', test.ascii);
+        notIncludeSymbols(data.asciimath);
         done();
       });
     });
@@ -89,6 +109,7 @@ describe('Latex to ascii:', () => {
         console.log('    LATEX         =>', test.latex);
         console.log('    ASCIIMATH     =>', test.ascii);
         data.should.have.property('asciimath', test.ascii);
+        notIncludeSymbols(data.asciimath);
         done();
       });
     });
