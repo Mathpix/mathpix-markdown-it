@@ -20,6 +20,8 @@ export interface optionsMathpixMarkdown {
     mathJax?: TOutputMathJax;
 }
 export declare type TMarkdownItOptions = {
+    isDisableFancy?: boolean;
+    disableRules?: string[];
     htmlTags?: boolean;
     breaks?: boolean;
     typographer?: boolean;

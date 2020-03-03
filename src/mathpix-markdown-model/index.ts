@@ -28,6 +28,8 @@ export interface optionsMathpixMarkdown {
 }
 
 export type TMarkdownItOptions = {
+  isDisableFancy?: boolean;
+  disableRules?: string[];
   htmlTags?: boolean,
   breaks?: boolean,
   typographer?: boolean,
@@ -121,7 +123,9 @@ class MathpixMarkdown_Model {
   };
 
   markdownToHTML = (markdown: string, options: TMarkdownItOptions = {}):string => {
-    const { lineNumbering = false } = options;
+    const { lineNumbering = false, isDisableFancy = false } = options;
+    const disableRules = isDisableFancy ? this.disableFancyArrayDef : options ? options.disableRules || [] : [];
+    this.setOptions(disableRules);
     let html = markdownHTML(markdown, options);
     if (!lineNumbering) {
       MathJax.Reset();
