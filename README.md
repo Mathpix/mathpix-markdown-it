@@ -543,13 +543,13 @@ The `MathpixMarkdown` React element accepts the following props:
 | `alignMathBlock` | string&nbsp;*`center`*       | aligns `math-block`                                                                                                    |
 | `display`        | string&nbsp;*`block`*        | `block` - the whole space, `inline-block` - renders in its actual size                                                 |
 | `showTimeLog`    | boolean&nbsp;*`false`*       | shows execution time in console                                                                                        |
-| `isDisableFancy` | boolean&nbsp;*`false`*       | `true` - disables processing of special characters (Example: `(c)`, `+`, `-` )                                         |
+| `isDisableFancy` | boolean&nbsp;*`false`*       | `true` - disables processing of special characters (Example: `+ item`, `- item` )                                      |
 | `disableRules`   | array of strings&nbsp;*`[]`* | You can pass a list of rules for markdown rendering that should be disabled but only if `isDisableFancy` is not `true`.|
 |                  |                              | Example:  `disableRules = ['replacements'] ` will disable fancy characters processing.                                 |
 | `htmlTags`       | boolean;*`false`*            | Enables HTML tags in source                                                                                            |
 | `xhtmlOut`       | boolean;*`false`*            | Uses `/` to close single tags (`<br />`)                                                                               |
 | `breaks`         | boolean;*`true`*             | Converts `\n` in paragraphs into `<br>`                                                                                |
-| `typographer`    | boolean;*`true`*             | Enables some language-neutral replacement + quotes beautification                                                      |
+| `typographer`    | boolean;*`true`*             | Enables some language-neutral replacement + quotes beautification (Example: `(c) (C) (r) (R) (tm) (TM) (p) (P) +-`)    |
 | `linkify`        | boolean;*`true`*             | Autoconverts URL-like text to links                                                                                    |
 | `width`          | number;*`1200`*              | Sets text container width                                                                                              |
 | `outMath`        | [TOutputMath](https://github.com/Mathpix/mathpix-markdown-it#toutputmath);*`{}`*           | Sets options to output html                                                                                            |
