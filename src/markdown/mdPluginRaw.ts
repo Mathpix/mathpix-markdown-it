@@ -155,6 +155,9 @@ function multiMath(state, silent) {
   if (!match) {
     return false;
   }
+  if (match[1] && (match[1] === 'itemize' || match[1] === 'enumerate')) {
+    return false;
+  }
 
   startMathPos += match[0].length;
   let type, endMarker, includeMarkers; // eslint-disable-line
@@ -580,6 +583,7 @@ function paragraphDiv(state, startLine/*, endLine*/) {
   const pickStartTag: RegExp = /\\begin{(abstract|equation|equation|center|left|right|table|figure|tabular\*)}|\\\[/;
   const pickEndTag: RegExp = /\\end{(abstract|equation|equation|center|left|right|table|figure|tabular\*)}|\\\]/;
   const pickTag: RegExp = /^\\(?:title|section|subsection)/;
+  const listStartTag: RegExp = /\\begin{(enumerate|itemize)}/;
 
   let content, terminate, i, l, token, oldParentType, lineText, mml,
     nextLine = startLine + 1,
@@ -604,6 +608,7 @@ function paragraphDiv(state, startLine/*, endLine*/) {
     isMathOpen = true;
   }
 
+  let listOpen = false;
   // jump line-by-line until empty one or EOF
   for (; nextLine < endLine; nextLine++) {
     const prewPos = state.bMarks[nextLine - 1] + state.tShift[nextLine - 1];
@@ -623,6 +628,10 @@ function paragraphDiv(state, startLine/*, endLine*/) {
     max = state.eMarks[nextLine];
     lineText = state.src.slice(pos, max);
 
+    if (listStartTag.test(prewLineText)) {
+      listOpen = true;
+    }
+
     if(lineText.includes('$$') && isMathOpen) {
       isMathOpen = false;
     } else if(lineText.includes('$$') && !isMathOpen) {
@@ -638,6 +647,11 @@ function paragraphDiv(state, startLine/*, endLine*/) {
       if (state.isEmpty(nextLine)||pickStartTag.test(lineText) || pickEndTag.test(prewLineText)) {
         break;
       }
+
+      if (listStartTag.test(lineText) && (prewLineText.indexOf('\\item') === -1 || !listOpen)) {
+        break;
+      }
+
       if (lineText.includes('$$') && isMathOpen || prewLineText.includes('$$') && !isMathOpen) {
         break;
       }
