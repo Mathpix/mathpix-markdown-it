@@ -1,2 +1,2 @@
 import { RuleInline } from 'markdown-it';
-export declare const reNewCommand: RuleInline;
+export declare const reNewCommandInLine: RuleInline;

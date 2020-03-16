@@ -43,7 +43,13 @@ const parseCommand = (str: string):{command: string, params: string, endPos: num
   return { command: command.trim(), params: params.trim(), endPos: endPos }
 };
 
-const reNewCommand = (state, lineText: string) => {
+export const parseOneCommand = (state, str) => {
+  const data = parseCommand(str);
+  ChangeLevel(state, data);
+  return data.endPos
+};
+
+export const reNewCommand = (state, lineText: string) => {
   if (lineText.charCodeAt(0) !== 0x5c /* \ */) {
     return;
   }
@@ -57,8 +63,7 @@ const reNewCommand = (state, lineText: string) => {
       continue
     }
     const str = arr[i];
-    const data = parseCommand(str);
-    ChangeLevel(state, data);
+    parseOneCommand(state, str);
   }
 };
 

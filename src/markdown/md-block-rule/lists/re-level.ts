@@ -116,3 +116,8 @@ export const ChangeLevel = (state, data) => {
   }
   return false;
 };
+
+
+export const clearItemizeLevelTokens = () => {
+  itemizeLevelTokens = [];
+};

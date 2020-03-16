@@ -1,8 +1,13 @@
 import { MarkdownIt } from 'markdown-it';
 import { Lists } from './md-block-rule/lists';
-import { SetDefaultItemizeLevel, SetDefaultEnumerateLevel } from './md-block-rule/lists/re-level';
+import {
+  SetDefaultItemizeLevel,
+  SetDefaultEnumerateLevel,
+  clearItemizeLevelTokens
+} from './md-block-rule/lists/re-level';
 import { ReNewCommand } from "./md-block-rule/renewcommand";
 import { listCloseInline, listBeginInline, listItemInline, listSetCounterInline } from "./md-inline-rule/lists"
+import { reNewCommandInLine } from "./md-inline-rule/renewcommand";
 import { textMode } from "./md-inline-rule/text-mode";
 
 import {
@@ -25,9 +30,11 @@ export default (md: MarkdownIt, options) => {
   Object.assign(md.options, options);
   SetDefaultItemizeLevel();
   SetDefaultEnumerateLevel();
+  clearItemizeLevelTokens();
   md.block.ruler.after("list","Lists", Lists, options);
   md.block.ruler.before("Lists", "ReNewCommand", ReNewCommand);
   md.inline.ruler.before('escape', 'list_begin_inline', listBeginInline);
+  md.inline.ruler.before('list_begin_inline', 'renewcommand_inline', reNewCommandInLine);
   md.inline.ruler.after('list_begin_inline', 'list_setcounter_inline', listSetCounterInline);
   md.inline.ruler.after('list_begin_inline', 'list_item_inline', listItemInline);
   md.inline.ruler.after('list_item_inline', 'list_close_inline', listCloseInline);

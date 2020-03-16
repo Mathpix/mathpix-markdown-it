@@ -48,8 +48,7 @@ export const textMode: RuleInline = (state, silent) => {
   if (silent) {
     return false;
   }
-
-  const textModeRegexp = new RegExp(Object.keys(textModeObj).join('|'));
+  const textModeRegexp = new RegExp('^(?:' + Object.keys(textModeObj).join('|') + ')');
   match = state.src
     .slice(++startMathPos)
     .match(textModeRegexp);

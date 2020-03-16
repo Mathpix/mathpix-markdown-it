@@ -1,5 +1,5 @@
 import { RuleBlock } from 'markdown-it';
-import { SetItemizeLevelTokens, GetItemizeLevelTokensByState, GetEnumerateLevel} from "./re-level";
+import {SetItemizeLevelTokens, GetItemizeLevelTokensByState, GetEnumerateLevel} from "./re-level";
 export enum TBegin {itemize = 'itemize', enumerate = 'enumerate'};
 const openTag: RegExp = /\\begin\s{0,}\{(itemize|enumerate)\}/;
 
@@ -53,9 +53,6 @@ const ListItems = (state, items, iLevel, eLevel, li) => {
 };
 
 const setTokenOpenList = (state, startLine, endLine, type, iLevel, eLevel) => {
-  // const eLevel = [].concat(enumerateLevel);
-  // const iLevel = [].concat(itemizeLevel);
-  // const iLevelTokens = GetItemizeLevelTokens();
   let token;
   if (type === TBegin.itemize) {
     token        = state.push('itemize_list_open', 'ul', 1);
@@ -71,7 +68,6 @@ const setTokenOpenList = (state, startLine, endLine, type, iLevel, eLevel) => {
   }
   token.map    = [ startLine, endLine ];
   token.itemizeLevel = iLevel;
- // token.itemizeLevelTokens = iLevelTokens;
   token.enumerateLevel = eLevel;
   token.prentLevel = state.prentLevel;
 };
@@ -87,7 +83,6 @@ const ListOpen = (state, startLine, lineText, iLevel, eLevel) => {
   if (!match && (state.parentType !== 'itemize' && state.parentType !== 'enumerate')) {
     return iOpen;
   }
-
   SetItemizeLevelTokens(state)
 
   if (match) {
@@ -141,7 +136,6 @@ export const Lists:RuleBlock = (state, startLine: number, endLine: number, silen
   const openTag: RegExp = /\\begin\s{0,}\{(itemize|enumerate)\}/;
   const closeTag: RegExp = /\\end\s{0,}\{(itemize|enumerate)\}/;
   const itemTag: RegExp = /\\item/;
-  //\setcounter{enumii}{4}
   const setcounterTag: RegExp = /\\setcounter\s{0,}\{([^}]*)\}\s{0,}\{([^}]*)\}/;
 
 
@@ -171,7 +165,12 @@ export const Lists:RuleBlock = (state, startLine: number, endLine: number, silen
   oldParentType = state.parentType;
   iOpen = ListOpen(state, startLine, lineText, iLevelT, eLevel);
   if (iOpen === 0) {
-    return  false
+    nextLine += 1;
+    state.line = nextLine;
+    state.startLine = nextLine;
+    state.parentType = oldParentType;
+    state.level = state.prentLevel < 0 ? 0 : state.prentLevel;
+    return true
   } else {
     nextLine += 1;
   }

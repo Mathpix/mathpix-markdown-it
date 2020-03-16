@@ -21,3 +21,4 @@ export declare const SetItemizeLevelTokensByIndex: (state: any, index: number) =
 export declare const GetItemizeLevelTokens: (data?: any) => any[];
 export declare const GetItemizeLevelTokensByState: (state: any) => any[];
 export declare const ChangeLevel: (state: any, data: any) => boolean;
+export declare const clearItemizeLevelTokens: () => void;

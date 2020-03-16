@@ -32,7 +32,7 @@ export const render_itemize_list_open = (tokens, index, renderer) => {
   }
   level_itemize++;
   list_injectLineNumbers(tokens, index, "itemize");
-  return `<ul ${renderer.renderAttrs(tokens[index])} style="list-style-type: none">`;
+  return `<ul${renderer.renderAttrs(tokens[index])} style="list-style-type: none">`;
 };
 
 export const render_enumerate_list_open = (tokens, index, renderer) => {
@@ -43,7 +43,7 @@ export const render_enumerate_list_open = (tokens, index, renderer) => {
   const itLevel = GetEnumerateLevel(tokens[index].enumerateLevel);
   const str = itLevel.length >= level_enumerate ? itLevel[level_enumerate-1] : 'decimal';
   list_injectLineNumbers(tokens, index, `enumerate ${str}`);
-  return `<ol ${renderer.renderAttrs(tokens[index])} style=" list-style-type: ${str}" >`;
+  return `<ol${renderer.renderAttrs(tokens[index])} style=" list-style-type: ${str}">`;
 };
 
 export const render_item_inline = (tokens, index, options, env, slf) => {
@@ -65,7 +65,7 @@ export const render_item_inline = (tokens, index, options, env, slf) => {
 
   if (token.parentType === "enumerate") {
     list_injectLineNumbers(tokens, index, `li_enumerate`);
-    return `<li ${slf.renderAttrs(token)} >${sContent}</li>`;
+    return `<li${slf.renderAttrs(token)}>${sContent}</li>`;
   } else {
     const itemizeLevelTokens = GetItemizeLevelTokens(token.itemizeLevel);
 
@@ -78,7 +78,7 @@ export const render_item_inline = (tokens, index, options, env, slf) => {
         : '.';
     }
     list_injectLineNumbers(tokens, index, `li_itemize`);
-    return `<li ${slf.renderAttrs(token)} ><span class="li_level">${span}</span>${sContent}</li>`;
+    return `<li${slf.renderAttrs(token)}><span class="li_level">${span}</span>${sContent}</li>`;
   }
 };
 

@@ -510,8 +510,12 @@ const renderMath = (a, token, options) => {
     }
   } else {
     return token.type === "inline_math" || token.type === "inline_mathML"
-      ? `<span ${tagRef} class="math-inline ${tagRef}" >${mathEquation}</span>`
-      : `<span ${tagRef} class="math-block ${tagRef}" >${mathEquation}</span>`;
+      ? tagRef
+        ? `<span ${tagRef} class="math-inline ${tagRef}">${mathEquation}</span>`
+        : `<span class="math-inline ${tagRef}">${mathEquation}</span>`
+      : tagRef
+        ? `<span ${tagRef} class="math-block ${tagRef}">${mathEquation}</span>`
+        : `<span class="math-block ${tagRef}">${mathEquation}</span>`;
   }
 
 };
