@@ -1,5 +1,6 @@
 import {PREVIEW_LINE_CLASS, PREVIEW_PARAGRAPH_PREFIX} from "../rules";
 import { GetItemizeLevelTokens, GetEnumerateLevel } from "../md-block-rule/lists/re-level";
+import { renderTabularInline } from "./render-tabular";
 
 var level_itemize = 0;
 var level_enumerate = 0;
@@ -53,7 +54,11 @@ export const render_item_inline = (tokens, index, options, env, slf) => {
   for (let i = 0; i < token.children.length; i++) {
     const tok = token.children[i]
     if (tok.children) {
-      content = slf.renderInline(tok.children, options);
+      if (tok.type = "tabular_inline") {
+        content = renderTabularInline(token.children, tok, options, slf)
+      } else {
+        content = slf.renderInline(tok.children, options);
+      }
     } else {
       content = slf.renderInline([tok], options);
     }
