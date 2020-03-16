@@ -5,6 +5,7 @@ import mdPluginTOC from './mdPluginTOC';
 import mdPluginAnchor from './mdPluginAnchor';
 import mdPluginSeparateForBlock from './mdPluginSeparateForBlock';
 import mdPluginTableTabular from './mdPluginTableTabular';
+import mdPluginList from './mdPluginLists';
 
 /**
  * configured custom mathjax plugin
@@ -22,3 +23,4 @@ export const separateForBlockPlugin = mdPluginSeparateForBlock;
 export const tocPlugin = mdPluginTOC;
 export const anchorPlugin = mdPluginAnchor;
 export const tableTabularPlugin = mdPluginTableTabular;
+export const listsPlugin = mdPluginList;

@@ -2,7 +2,8 @@ import { ConfiguredMathJaxPlugin, CustomTagPlugin, HighlightPlugin,
     tocPlugin,
     anchorPlugin,
     //separateForBlockPlugin,
-    tableTabularPlugin
+    tableTabularPlugin,
+    listsPlugin
 } from "./mdPluginConfigured";
 import { withLineNumbers } from "./rules";
 import {MathpixMarkdownModel as MM, TMarkdownItOptions} from '../mathpix-markdown-model'
@@ -21,6 +22,7 @@ const mdInit = (options: TMarkdownItOptions) => {
     quotes: "“”‘’"
   })
     .use(tableTabularPlugin, {width: width, outMath: outMath})
+    .use(listsPlugin, {width: width, outMath: outMath})
  //   .use(separateForBlockPlugin)
     .use(ConfiguredMathJaxPlugin({width: width, outMath: outMath, mathJax: mathJax}))
     .use(CustomTagPlugin())
