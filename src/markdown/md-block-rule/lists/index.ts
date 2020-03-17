@@ -1,4 +1,4 @@
-import { RuleBlock } from 'markdown-it';
+import { RuleBlock, Token } from 'markdown-it';
 import {SetItemizeLevelTokens, GetItemizeLevelTokensByState, GetEnumerateLevel} from "./re-level";
 export enum TBegin {itemize = 'itemize', enumerate = 'enumerate'};
 const openTag: RegExp = /\\begin\s{0,}\{(itemize|enumerate)\}/;
@@ -30,7 +30,8 @@ const ListItems = (state, items, iLevel, eLevel, li) => {
             token.marker = child.marker;
             token.markerTokens = child.markerTokens;
           }
-          token.parentType = state.types[state.types.length - 1];
+          token.parentType = state.types && state.types.length > 0 ? state.types[state.types.length - 1] : '';
+          token.parentStart = state.startLine;
 
           token.map = [item.startLine, item.endLine];
           token.content = child.content;
@@ -53,35 +54,36 @@ const ListItems = (state, items, iLevel, eLevel, li) => {
 };
 
 const setTokenOpenList = (state, startLine, endLine, type, iLevel, eLevel) => {
-  let token;
+  let token: Token;
   if (type === TBegin.itemize) {
     token        = state.push('itemize_list_open', 'ul', 1);
     state.prentLevel = (state.parentType !== 'itemize' && state.parentType !== 'enumerate') ? 0 : state.prentLevel + 1;
     state.parentType = 'itemize';
     state.types = ['itemize'];
-
   } else {
     token        = state.push('enumerate_list_open', 'ol', 1);
     state.prentLevel = (state.parentType !== 'itemize' && state.parentType !== 'enumerate') ? 0 : state.prentLevel + 1;
     state.parentType = 'enumerate';
     state.types = ['enumerate'];
   }
+  state.startLine = startLine;
   token.map    = [ startLine, endLine ];
   token.itemizeLevel = iLevel;
   token.enumerateLevel = eLevel;
   token.prentLevel = state.prentLevel;
+  return token;
 };
 
-const ListOpen = (state, startLine, lineText, iLevel, eLevel) => {
-  let token;
-  let iOpen = 0;
+const ListOpen = (state, startLine, lineText, iLevel, eLevel): {iOpen: number, tokenStart: Token|null } => {
+  let token: Token, tokenStart: Token|null = null;
+  let iOpen: number = 0;
   if (lineText.charCodeAt(0) !== 0x5c /* \ */) {
-    return iOpen;
+    return {iOpen: iOpen, tokenStart: tokenStart};
   }
 
   let match:RegExpMatchArray = lineText.match(openTag);
   if (!match && (state.parentType !== 'itemize' && state.parentType !== 'enumerate')) {
-    return iOpen;
+    return {iOpen: iOpen, tokenStart: tokenStart};
   }
   SetItemizeLevelTokens(state)
 
@@ -89,9 +91,9 @@ const ListOpen = (state, startLine, lineText, iLevel, eLevel) => {
     const strAfter = lineText.slice(match.index + match[0].length);
     const type = match[1].trim() in TBegin ? match[1].trim() : null;
     if (!type) {
-      return iOpen;
+      return {iOpen: iOpen, tokenStart: tokenStart};
     }
-    setTokenOpenList (state, startLine, startLine, type, iLevel, eLevel);
+    tokenStart = setTokenOpenList (state, startLine, startLine, type, iLevel, eLevel);
     iOpen++;
 
     if (strAfter && strAfter.trim().length > 0) {
@@ -103,7 +105,8 @@ const ListOpen = (state, startLine, lineText, iLevel, eLevel) => {
       for (let j = 0; j < children.length; j++) {
         const child = children[j];
         token = state.push(child.type, child.tag, 1);
-        token.parentType = state.types[state.types.length - 1];
+        token.parentType = state.types && state.types.length >0 ? state.types[state.types.length - 1] : '';
+        token.parentStart = state.startLine;
 
         token.map = [startLine, startLine];
         token.content = child.content;
@@ -112,10 +115,18 @@ const ListOpen = (state, startLine, lineText, iLevel, eLevel) => {
         token.enumerateLevel = eLevel;
         if (child.type === "enumerate_list_open" || child.type === "itemize_list_open") {
           state.prentLevel++;
+          if (child.type === "itemize_list_open") {
+            state.types.push('itemize');
+          } else {
+            state.types.push('enumerate');
+          }
           iOpen++;
         }
         if (child.type === "enumerate_list_close" || child.type === "itemize_list_close") {
           state.prentLevel--;
+          if (state.types && state.types.length > 0) {
+            state.types.pop();
+          }
           iOpen--;
         }
         if (child.type === "item_inline") {
@@ -127,7 +138,7 @@ const ListOpen = (state, startLine, lineText, iLevel, eLevel) => {
       state.env.isBlock = false;
     }
   }
-  return iOpen;
+  return {iOpen: iOpen, tokenStart: tokenStart};
 };
 
 
@@ -138,15 +149,15 @@ export const Lists:RuleBlock = (state, startLine: number, endLine: number, silen
   const itemTag: RegExp = /\\item/;
   const setcounterTag: RegExp = /\\setcounter\s{0,}\{([^}]*)\}\s{0,}\{([^}]*)\}/;
 
-
   let pos: number = state.bMarks[startLine] + state.tShift[startLine];
   let max: number = state.eMarks[startLine];
   let nextLine: number = startLine;// + 1;
+  let dStart = state.md.options.renderElement && state.md.options.renderElement.startLine
+    ? Number(state.md.options.renderElement.startLine)
+    : 0;
   let token,   oldParentType;
-  let iOpen = 0;
   let type: string;
   let li = null;
-  startLine = state.line;
 
   //debugger
   let lineText: string = state.src.slice(pos, max);
@@ -163,11 +174,12 @@ export const Lists:RuleBlock = (state, startLine: number, endLine: number, silen
   const iLevelT = GetItemizeLevelTokensByState(state);
 
   oldParentType = state.parentType;
-  iOpen = ListOpen(state, startLine, lineText, iLevelT, eLevel);
+  const data = ListOpen(state, startLine + dStart, lineText, iLevelT, eLevel);
+  let {iOpen = 0, tokenStart = null} = data;
   if (iOpen === 0) {
     nextLine += 1;
     state.line = nextLine;
-    state.startLine = nextLine;
+    state.startLine = '';
     state.parentType = oldParentType;
     state.level = state.prentLevel < 0 ? 0 : state.prentLevel;
     return true
@@ -187,7 +199,7 @@ export const Lists:RuleBlock = (state, startLine: number, endLine: number, silen
     lineText = state.src.slice(pos, max);
     if (itemTag.test(lineText)) {
       content = lineText;//.slice(match.index + match[0].length)
-      items.push({content: content.trim(), startLine: nextLine, endLine: nextLine});
+      items.push({content: content.trim(), startLine: nextLine+dStart, endLine: nextLine+dStart});
     }
     if (setcounterTag.test(lineText)) {
       match = lineText.match(setcounterTag);
@@ -201,18 +213,18 @@ export const Lists:RuleBlock = (state, startLine: number, endLine: number, silen
       if (closeTag.test(lineText)) {
         items = ListItems(state, items, iLevelT, eLevel, li);
         li = null;
-        if (state.types[state.types.length - 1] === TBegin.itemize) {
+        if (state.types && state.types.length > 0 && state.types[state.types.length - 1] === TBegin.itemize) {
           token        = state.push('itemize_list_close', 'ul', -1);
-          token.map    = [ startLine, nextLine ];
+          token.map    = [ startLine + dStart, nextLine + dStart ];
         } else {
           token        = state.push('enumerate_list_close', 'ol', -1);
-          token.map    = [ startLine, nextLine ];
+          token.map    = [ startLine + dStart, nextLine + dStart ];
         }
         token.level -= 1;
         state.level -= 1;
         state.prentLevel = state.prentLevel > 0 ? state.prentLevel - 1 : 0;
         token.prentLevel = state.prentLevel;
-        state.types.splice(-1,1)
+        state.types.pop()
         iOpen--;
         if (iOpen === 0) {
           haveClose = true;
@@ -233,14 +245,14 @@ export const Lists:RuleBlock = (state, startLine: number, endLine: number, silen
         }
         if (type === TBegin.itemize) {
           token        = state.push('itemize_list_open', 'ul', 1);
-          token.map    = [ startLine, startLine ];
+         // token.map    = [ nextLine + dStart, nextLine+dStart ];
           state.prentLevel = (state.parentType !== 'itemize' && state.parentType !== 'enumerate') ? 0 : state.prentLevel + 1;
           state.parentType = 'itemize';
           state.types.push('itemize');
 
         } else {
           token        = state.push('enumerate_list_open', 'ol', 1);
-          token.map    = [ startLine, startLine ];
+        //  token.map    = [ nextLine+dStart, nextLine+dStart ];
           state.prentLevel = (state.parentType !== 'itemize' && state.parentType !== 'enumerate') ? 0 : state.prentLevel + 1;
           state.parentType = 'enumerate';
           state.types.push('enumerate');
@@ -275,8 +287,11 @@ export const Lists:RuleBlock = (state, startLine: number, endLine: number, silen
     //return false
   }
   state.line = nextLine;
-  state.startLine = nextLine;
+  state.startLine = '';
   state.parentType = oldParentType;
   state.level = state.prentLevel < 0 ? 0 : state.prentLevel;
+  if (tokenStart) {
+    tokenStart.map[1] = nextLine + dStart
+  }
   return true
 };

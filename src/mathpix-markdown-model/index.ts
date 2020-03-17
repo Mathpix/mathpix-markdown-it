@@ -38,6 +38,10 @@ export type TMarkdownItOptions = {
   xhtmlOut?: boolean,
   width?: number,
   lineNumbering?: boolean,
+  renderElement?: {
+    inLine?: boolean,
+    startLine?: number,
+  },
   outMath?: TOutputMath,
   mathJax?: TOutputMathJax
 }
