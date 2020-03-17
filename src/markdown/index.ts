@@ -11,7 +11,7 @@ import {MathpixMarkdownModel as MM, TMarkdownItOptions} from '../mathpix-markdow
 /** md renderer */
 const mdInit = (options: TMarkdownItOptions) => {
   const {htmlTags = false, xhtmlOut = false, width = 1200, breaks = true, typographer = true, linkify = true,
-          outMath = {}, mathJax = {}} = options;
+          outMath = {}, mathJax = {}, renderElement = {}} = options;
   return require("markdown-it")({
     html: htmlTags,
     xhtmlOut: xhtmlOut,
@@ -22,7 +22,7 @@ const mdInit = (options: TMarkdownItOptions) => {
     quotes: "“”‘’"
   })
     .use(tableTabularPlugin, {width: width, outMath: outMath})
-    .use(listsPlugin, {width: width, outMath: outMath})
+    .use(listsPlugin, {width: width, outMath: outMath, renderElement: renderElement})
  //   .use(separateForBlockPlugin)
     .use(ConfiguredMathJaxPlugin({width: width, outMath: outMath, mathJax: mathJax}))
     .use(CustomTagPlugin())
@@ -53,7 +53,11 @@ export const markdownToHtmlPipeline = (content: string, options: TMarkdownItOpti
   if (MM.disableRules && MM.disableRules.length > 0) {
       md.disable(MM.disableRules);
   }
-  return md.render(content);
+  if (options.renderElement && options.renderElement.inLine) {
+    return md.renderInline(content);
+  } else {
+    return md.render(content);
+  }
 };
 
 /**
