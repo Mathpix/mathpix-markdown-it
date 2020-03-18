@@ -33,7 +33,7 @@ const ListItems = (state, items, iLevel, eLevel, li) => {
           token.parentType = state.types && state.types.length > 0 ? state.types[state.types.length - 1] : '';
           token.parentStart = state.startLine;
 
-          token.map = [item.startLine, item.endLine];
+          token.map = [item.startLine, item.endLine + 1];
           token.content = child.content;
           token.children = child.children;
           token.prentLevel = state.prentLevel;
@@ -93,7 +93,7 @@ const ListOpen = (state, startLine, lineText, iLevel, eLevel): {iOpen: number, t
     if (!type) {
       return {iOpen: iOpen, tokenStart: tokenStart};
     }
-    tokenStart = setTokenOpenList (state, startLine, startLine, type, iLevel, eLevel);
+    tokenStart = setTokenOpenList (state, startLine, startLine+1, type, iLevel, eLevel);
     iOpen++;
 
     if (strAfter && strAfter.trim().length > 0) {
