@@ -18,10 +18,10 @@ const list_injectLineNumbers = (tokens, idx, className = '') => {
     tokens[idx].attrJoin("class", className + ' ' + PREVIEW_PARAGRAPH_PREFIX + String(line)
       + ' ' + PREVIEW_LINE_CLASS + ' ' + listLine.join(' '));
     tokens[idx].attrJoin("data_line_start", `${String(line)}`);
-    tokens[idx].attrJoin("data_line_end", `${String(endLine)}`);
+    tokens[idx].attrJoin("data_line_end", `${String(endLine-1)}`);
     tokens[idx].attrJoin("data_line", `${String([line, endLine])}`);
-    tokens[idx].attrJoin("count_line", `${String(endLine-line + 1)}`);
-    if (tokens[idx].parentStart) {
+    tokens[idx].attrJoin("count_line", `${String(endLine-line)}`);
+    if (tokens[idx].hasOwnProperty('parentStart')) {
       tokens[idx].attrJoin("data_parent_line_start", `${String(tokens[idx].parentStart)}`);
     }
 
