@@ -19,11 +19,10 @@ const ListItems = (state, items, iLevel, eLevel, li) => {
             continue;
           }
           token = state.push(child.type, child.tag, 1);
+          token.attrs = child.attrs;
           if (child.type === "item_inline" && li && li.value) {
             token.startValue = li.value;
-            token.attrs = [
-              [ 'value', li.value.toString() ],
-            ];
+            token.attrSet('value', li.value.toString())
             li = null;
           }
           if (child.marker) {
