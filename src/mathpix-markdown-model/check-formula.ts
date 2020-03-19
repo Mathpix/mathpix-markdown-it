@@ -2,6 +2,7 @@ import {findEndMarkerPos} from "../markdown/mdPluginRaw";
 
 export const checkFormula = (mathString:string, showTimeLog:boolean=false) => {
     const startTime = new Date().getTime();
+    const latexBlockRule: RegExp = /abstract|center|left|right|table|figure|tabular|enumerate|itemize/;
     let res_mathString = "";
 
     let idx = 0;
@@ -28,6 +29,11 @@ export const checkFormula = (mathString:string, showTimeLog:boolean=false) => {
                 res_mathString = res_mathString + mathString[idx];
                 idx++;
                 continue;
+            }
+            if (latexBlockRule.test(match[1])) {
+              res_mathString = res_mathString + mathString[idx];
+              idx++;
+              continue;
             }
 
             startMathPos += match[0].length;
