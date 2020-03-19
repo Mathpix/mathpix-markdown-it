@@ -79,7 +79,11 @@ module.exports = [
       '\\item `\\labelenumiii` for Level 3\n' +
       '\\item `\\labelenumiv` for Level 4\n' +
       '\\end{itemize}',
-    html: `<ul class="itemize preview-paragraph-0 preview-line 0 1 2 3 4 5" data_line_start="0" data_line_end="5" data_line="0,6" count_line="6" style="list-style-type: none"><li class="li_itemize preview-paragraph-1 preview-line 1" data_line_start="1" data_line_end="1" data_line="1,2" count_line="1" data_parent_line_start="0"><span class="li_level">•</span><code>\\labelenumi</code> for Level 1</li><li class="li_itemize preview-paragraph-2 preview-line 2" data_line_start="2" data_line_end="2" data_line="2,3" count_line="1" data_parent_line_start="0"><span class="li_level">•</span><code>\\labelenumii</code> for Level 2</li><li class="li_itemize preview-paragraph-3 preview-line 3" data_line_start="3" data_line_end="3" data_line="3,4" count_line="1" data_parent_line_start="0"><span class="li_level">•</span><code>\\labelenumiii</code> for Level 3</li><li class="li_itemize preview-paragraph-4 preview-line 4" data_line_start="4" data_line_end="4" data_line="4,5" count_line="1" data_parent_line_start="0"><span class="li_level">•</span><code>\\labelenumiv</code> for Level 4</li></ul>`,
+    html: `<ul class="itemize preview-paragraph-0 preview-line 0 1 2 3 4 5" data_line_start="0" data_line_end="5" data_line="0,6" count_line="6" style="list-style-type: none"><li class="li_itemize block preview-paragraph-1 preview-line 1" data_line_start="1" data_line_end="1" data_line="1,2" count_line="1" data_parent_line_start="0"><span class="li_level">•</span><div><code>\\labelenumi</code> for Level 1</div>
+</li><li class="li_itemize block preview-paragraph-2 preview-line 2" data_line_start="2" data_line_end="2" data_line="2,3" count_line="1" data_parent_line_start="0"><span class="li_level">•</span><div><code>\\labelenumii</code> for Level 2</div>
+</li><li class="li_itemize block preview-paragraph-3 preview-line 3" data_line_start="3" data_line_end="3" data_line="3,4" count_line="1" data_parent_line_start="0"><span class="li_level">•</span><div><code>\\labelenumiii</code> for Level 3</div>
+</li><li class="li_itemize block preview-paragraph-4 preview-line 4" data_line_start="4" data_line_end="4" data_line="4,5" count_line="1" data_parent_line_start="0"><span class="li_level">•</span><div><code>\\labelenumiv</code> for Level 4</div>
+</li></ul>`,
   },
   {
     latex: '\\begin{itemize}\n' +
@@ -103,7 +107,11 @@ module.exports = [
       '\\item Level 3 is `\\textasteriskcentered` (*)\n' +
       '\\item Level 4 is `\\textperiodcentered` (·).\n' +
       '\\end{itemize}',
-    html: `<ul class="itemize preview-paragraph-0 preview-line 0 1 2 3 4 5" data_line_start="0" data_line_end="5" data_line="0,6" count_line="6" style="list-style-type: none"><li class="li_itemize preview-paragraph-1 preview-line 1" data_line_start="1" data_line_end="1" data_line="1,2" count_line="1" data_parent_line_start="0"><span class="li_level">•</span>Level 1 is <code>\\textbullet</code> (•),</li><li class="li_itemize preview-paragraph-2 preview-line 2" data_line_start="2" data_line_end="2" data_line="2,3" count_line="1" data_parent_line_start="0"><span class="li_level">•</span>Level 2 is <code>\\textendash</code> (–) ,</li><li class="li_itemize preview-paragraph-3 preview-line 3" data_line_start="3" data_line_end="3" data_line="3,4" count_line="1" data_parent_line_start="0"><span class="li_level">•</span>Level 3 is <code>\\textasteriskcentered</code> (*)</li><li class="li_itemize preview-paragraph-4 preview-line 4" data_line_start="4" data_line_end="4" data_line="4,5" count_line="1" data_parent_line_start="0"><span class="li_level">•</span>Level 4 is <code>\\textperiodcentered</code> (·).</li></ul>`,
+    html: `<ul class="itemize preview-paragraph-0 preview-line 0 1 2 3 4 5" data_line_start="0" data_line_end="5" data_line="0,6" count_line="6" style="list-style-type: none"><li class="li_itemize block preview-paragraph-1 preview-line 1" data_line_start="1" data_line_end="1" data_line="1,2" count_line="1" data_parent_line_start="0"><span class="li_level">•</span><div>Level 1 is <code>\\textbullet</code> (•),</div>
+</li><li class="li_itemize block preview-paragraph-2 preview-line 2" data_line_start="2" data_line_end="2" data_line="2,3" count_line="1" data_parent_line_start="0"><span class="li_level">•</span><div>Level 2 is <code>\\textendash</code> (–) ,</div>
+</li><li class="li_itemize block preview-paragraph-3 preview-line 3" data_line_start="3" data_line_end="3" data_line="3,4" count_line="1" data_parent_line_start="0"><span class="li_level">•</span><div>Level 3 is <code>\\textasteriskcentered</code> (*)</div>
+</li><li class="li_itemize block preview-paragraph-4 preview-line 4" data_line_start="4" data_line_end="4" data_line="4,5" count_line="1" data_parent_line_start="0"><span class="li_level">•</span><div>Level 4 is <code>\\textperiodcentered</code> (·).</div>
+</li></ul>`,
   },
   {
     latex: '\\renewcommand{\\labelitemi}{$\\blacksquare$}\n' +

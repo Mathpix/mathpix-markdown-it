@@ -1,5 +1,5 @@
 import { MarkdownIt } from 'markdown-it';
-import { Lists } from './md-block-rule/lists';
+import { Lists, ReRenderListsItem } from './md-block-rule/lists';
 import {
   SetDefaultItemizeLevel,
   SetDefaultEnumerateLevel,
@@ -15,7 +15,9 @@ import {
   render_enumerate_list_open,
   render_item_inline,
   render_itemize_list_close,
-  render_enumerate_list_close
+  render_enumerate_list_close,
+  render_latex_list_item_open,
+  render_latex_list_item_close
 } from "./md-renderer-rules/render-lists";
 
 const mapping = {
@@ -23,7 +25,9 @@ const mapping = {
   enumerate_list_open: "enumerate_list_open",
   itemize_list_close: "itemize_list_close",
   enumerate_list_close: "enumerate_list_close",
-  item_inline: "item_inline"
+  item_inline: "item_inline",
+  latex_list_item_open: "latex_list_item_open",
+  latex_list_item_close: "latex_list_item_close"
 };
 
 export default (md: MarkdownIt, options) => {
@@ -32,6 +36,10 @@ export default (md: MarkdownIt, options) => {
   SetDefaultEnumerateLevel();
   clearItemizeLevelTokens();
   md.block.ruler.after("list","Lists", Lists, options);
+  if (options.renderElement && (options.renderElement.class === 'li_enumerate' ||
+    options.renderElement.class === 'li_itemize')) {
+    md.block.ruler.before("Lists","ReRenderListsItem", ReRenderListsItem, options);
+  }
   md.block.ruler.before("Lists", "ReNewCommand", ReNewCommand);
   md.inline.ruler.before('escape', 'list_begin_inline', listBeginInline);
   md.inline.ruler.before('list_begin_inline', 'renewcommand_inline', reNewCommandInLine);
@@ -48,12 +56,16 @@ export default (md: MarkdownIt, options) => {
           return render_itemize_list_open(tokens, idx, slf);
         case "enumerate_list_open":
           return render_enumerate_list_open(tokens, idx, slf);
-        case "item_inline":
-          return render_item_inline(tokens, idx, options, env, slf);
+         case "item_inline":
+           return render_item_inline(tokens, idx, options, env, slf);
         case "itemize_list_close":
           return render_itemize_list_close();
         case "enumerate_list_close":
           return render_enumerate_list_close();
+        case "latex_list_item_open":
+          return render_latex_list_item_open(tokens, idx, options, env, slf);
+        case "latex_list_item_close":
+          return render_latex_list_item_close();
         default:
           return '';
       }

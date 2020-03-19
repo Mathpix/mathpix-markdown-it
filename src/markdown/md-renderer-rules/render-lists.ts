@@ -90,6 +90,34 @@ export const render_item_inline = (tokens, index, options, env, slf) => {
   }
 };
 
+export const render_latex_list_item_open = (tokens, index, options, env, slf) => {
+  const token = tokens[index];
+  if (token.parentType !== "itemize" && token.parentType !== "enumerate") {
+    return `<li>`;
+  }
+
+  if (token.parentType === "enumerate") {
+    list_injectLineNumbers(tokens, index, `li_enumerate block`);
+    return `<li${slf.renderAttrs(token)}>`;
+  } else {
+    const itemizeLevelTokens = GetItemizeLevelTokens(token.itemizeLevel);
+
+    let span = '.';
+    if (token.marker && token.markerTokens) {
+      span = slf.renderInline(token.markerTokens, options)
+    } else {
+      span = level_itemize > 0 && itemizeLevelTokens.length >= level_itemize
+        ? slf.renderInline(itemizeLevelTokens[level_itemize-1], options)
+        : '.';
+    }
+    list_injectLineNumbers(tokens, index, `li_itemize block`);
+    return `<li${slf.renderAttrs(token)}><span class="li_level">${span}</span>`;
+  }
+};
+
+export const render_latex_list_item_close = () => {
+  return `</li>`;
+};
 export const render_itemize_list_close = () => {
   level_itemize--;
   return `</ul>`;

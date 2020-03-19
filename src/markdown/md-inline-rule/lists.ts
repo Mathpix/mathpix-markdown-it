@@ -1,5 +1,5 @@
 import { RuleInline, Token } from 'markdown-it';
-import {TBegin} from "../md-block-rule/lists";
+import { TBegin, bItemTag } from "../md-block-rule/lists";
 
 export const listCloseInline: RuleInline = (state, silent) => {
   let token: Token;
@@ -85,7 +85,6 @@ export const listItemInline: RuleInline = (state, silent) => {
   let match: RegExpExecArray;
   let startMathPos: number = state.pos;
   const endItem: RegExp = /\\begin\s{0,}\{(itemize|enumerate)\}|\\end\s{0,}\{(itemize|enumerate)\}|\\item/;
-  const itemTag: RegExp = /^(?:item\s{0,}\[([^}]*)\]|item)/;
 
   if (state.src.charCodeAt(startMathPos) !== 0x5c /* \ */ ) {
     return false;
@@ -96,7 +95,7 @@ export const listItemInline: RuleInline = (state, silent) => {
 
   match = state.src
     .slice(++startMathPos)
-    .match(itemTag);
+    .match(bItemTag);
   if (!match){ return false}
 
   const matchEnd = state.src
