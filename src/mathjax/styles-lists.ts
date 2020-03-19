@@ -1,4 +1,3 @@
-//render_itemize_list
 export const listsStyles = `
   ol.enumerate, ul.itemize {
     padding-inline-start: 40px;
@@ -10,7 +9,7 @@ export const listsStyles = `
   .enumerate.lower-alpha > li {
     position: relative;
   }
-  .enumerate.lower-alpha li:before { 
+  .enumerate.lower-alpha > li:before { 
     content: "("counter(item, lower-alpha)")"; 
     counter-increment: item; 
     position: absolute;
