@@ -21,6 +21,7 @@ Mathpix Markdown addresses these limitations by adding support for the following
 - block math via `\[ <latex math> \]` or `$$ <math> $$`
 - tables via `\begin{tabular} ... \end{tabular}`
 - figures and figure captions via `\begin{figure} \caption{...} ... \end{figure}`
+- lists: unordered lists via `\begin{itemize} ... \end{itemize}` and ordered lists via `\begin{enumerate} ... \end{enumerate}`
 - numbered and unnumbered equation enviornments `\begin{elem} ... \end{elem}` and `\begin{elem*} ... \end{elem*}` where elem=`equation|align|split|gather`
 - equation, table, and figure references via `\label`, `\ref`, `\eqref`, `\tag`
 - text formatting options `\title{...}`, `\author{...}`, `\begin{abstract}...\end{abstract}`, `\section{Section Title}`, `\subsection{Section Title}`, `\subsubsection{Section Title}`, `\textit{italicized text}`, `\textbf{bold text}`, `\url{link}`
