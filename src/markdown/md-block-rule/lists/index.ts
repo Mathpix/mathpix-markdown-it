@@ -187,9 +187,10 @@ const setTokenCloseList = (state, startLine, endLine) => {
   state.types.pop()
 };
 
-const ListOpen = (state, startLine, lineText, iLevel, eLevel): {iOpen: number, tokenStart: Token|null } => {
+const ListOpen = (state, startLine, lineText, iLevel, eLevel): {iOpen: number, tokenStart: Token|null, li? } => {
   let token: Token, tokenStart: Token|null = null;
   let iOpen: number = 0;
+  let li = null;
   if (lineText.charCodeAt(0) !== 0x5c /* \ */) {
     return {iOpen: iOpen, tokenStart: tokenStart};
   }
@@ -217,6 +218,10 @@ const ListOpen = (state, startLine, lineText, iLevel, eLevel): {iOpen: number, t
 
       for (let j = 0; j < children.length; j++) {
         const child = children[j];
+        if (child.type === "setcounter") {
+          li = {value: child.content};
+          continue;
+        }
         token = state.push(child.type, child.tag, 1);
         token.parentType = state.types && state.types.length >0 ? state.types[state.types.length - 1] : '';
         token.parentStart = state.startLine;
@@ -243,6 +248,11 @@ const ListOpen = (state, startLine, lineText, iLevel, eLevel): {iOpen: number, t
           iOpen--;
         }
         if (child.type === "item_inline") {
+          if (li && li.value) {
+            token.startValue = li.value;
+            token.attrSet('value', li.value.toString())
+            li = null;
+          }
           token.prentLevel = state.prentLevel + 1;
         } else {
           token.prentLevel = state.prentLevel;
@@ -251,7 +261,7 @@ const ListOpen = (state, startLine, lineText, iLevel, eLevel): {iOpen: number, t
       state.env.isBlock = false;
     }
   }
-  return {iOpen: iOpen, tokenStart: tokenStart};
+  return {iOpen: iOpen, tokenStart: tokenStart, li};
 };
 
 const ItemsListPush = (items, content, startLine, endLine) => {
@@ -331,7 +341,7 @@ export const ReRenderListsItem:RuleBlock = (state, startLine: number, endLine: n
 export const Lists:RuleBlock = (state, startLine: number, endLine: number, silent) => {
   const openTag: RegExp = /\\begin\s{0,}\{(itemize|enumerate)\}/;
   const itemTag: RegExp = /\\item/;
-  const setcounterTag: RegExp = /\\setcounter\s{0,}\{([^}]*)\}\s{0,}\{([^}]*)\}/;
+  const setcounterTag: RegExp = /^(?:\\setcounter\s{0,}\{([^}]*)\}\s{0,}\{([^}]*)\})/;
 
   let pos: number = state.bMarks[startLine] + state.tShift[startLine];
   let max: number = state.eMarks[startLine];
@@ -341,7 +351,7 @@ export const Lists:RuleBlock = (state, startLine: number, endLine: number, silen
     : 0;
   let    oldParentType;
   let type: string;
-  let li = null;
+ // let li = null;
 
   let lineText: string = state.src.slice(pos, max);
   if (lineText.charCodeAt(0) !== 0x5c /* \ */) {
@@ -358,7 +368,7 @@ export const Lists:RuleBlock = (state, startLine: number, endLine: number, silen
 
   oldParentType = state.parentType;
   const data = ListOpen(state, startLine + dStart, lineText, iLevelT, eLevel);
-  let {iOpen = 0, tokenStart = null} = data;
+  let {iOpen = 0, tokenStart = null, li = null} = data;
   if (iOpen === 0) {
     nextLine += 1;
     state.line = nextLine;
@@ -379,7 +389,14 @@ export const Lists:RuleBlock = (state, startLine: number, endLine: number, silen
     if (setcounterTag.test(lineText)) {
       match = lineText.match(setcounterTag);
       if (match && match[2]) {
+        let sE = match.index + match[0].length < lineText.length
+          ?  lineText.slice(match.index + match[0].length)
+          : '';
+        sE = sE.trim();
         li = {value: match[2]};
+        if (sE.length > 0) {
+          items = ItemsAddToPrev(items, sE, nextLine);
+        }
         continue;
       }
     }
