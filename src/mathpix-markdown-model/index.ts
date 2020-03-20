@@ -3,6 +3,7 @@ import {markdownToHTML as markdownHTML} from "../markdown";
 import {MathpixStyle, PreviewStyle, ContainerStyle, codeStyles, TocStyle, resetBodyStyles} from "../mathjax/styles";
 import { tabularStyles } from "../mathjax/styles-tabular";
 import { fontsStyles } from "../mathjax/styles-fonts";
+import { listsStyles } from "../mathjax/styles-lists";
 import {MathJax} from '../mathjax';
 import * as CSS from 'csstype'; // at top of file
 
@@ -37,6 +38,11 @@ export type TMarkdownItOptions = {
   xhtmlOut?: boolean,
   width?: number,
   lineNumbering?: boolean,
+  renderElement?: {
+    inLine?: boolean,
+    startLine?: number,
+    class?: string
+  },
   outMath?: TOutputMath,
   mathJax?: TOutputMathJax
 }
@@ -266,7 +272,7 @@ class MathpixMarkdown_Model {
                 const style = document.createElement("style");
                 style.setAttribute("id", "Mathpix-styles");
                 let bodyStyles = isResetBodyStyles ? resetBodyStyles : '';
-                style.innerHTML = bodyStyles + MathpixStyle(setTextAlignJustify) + codeStyles + tabularStyles;
+                style.innerHTML = bodyStyles + MathpixStyle(setTextAlignJustify) + codeStyles + tabularStyles + listsStyles;
                 document.head.appendChild(style);
             }
             return true;
@@ -300,12 +306,12 @@ class MathpixMarkdown_Model {
     };
 
     getMathpixStyleOnly = () => {
-      let style: string =  this.getMathjaxStyle() + MathpixStyle(false) + codeStyles + tabularStyles;
+      let style: string =  this.getMathjaxStyle() + MathpixStyle(false) + codeStyles + tabularStyles + listsStyles;
       return style;
     };
 
     getMathpixStyle = (stylePreview: boolean = false, showToc: boolean = false, tocContainerName: string = 'toc') => {
-      let style: string = ContainerStyle + this.getMathjaxStyle() + MathpixStyle(stylePreview) + codeStyles + tabularStyles;
+      let style: string = ContainerStyle + this.getMathjaxStyle() + MathpixStyle(stylePreview) + codeStyles + tabularStyles + listsStyles;
       if (showToc) {}
       return stylePreview
         ? showToc ? style + PreviewStyle + TocStyle(tocContainerName) : style + PreviewStyle
