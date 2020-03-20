@@ -27,7 +27,8 @@ const mapping = {
   enumerate_list_close: "enumerate_list_close",
   item_inline: "item_inline",
   latex_list_item_open: "latex_list_item_open",
-  latex_list_item_close: "latex_list_item_close"
+  latex_list_item_close: "latex_list_item_close",
+  setcounter: "setcounter"
 };
 
 export default (md: MarkdownIt, options) => {
