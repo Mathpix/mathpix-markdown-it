@@ -109,22 +109,28 @@ const formatSource = (text: string) => {
     .replace(/>/g, '&gt;');
 };
 
-const OuterHTML = (data) => {
+const OuterHTML = (data, outMath) => {
+  const {
+    include_mathml = false,
+    include_asciimath = false,
+    include_latex = false,
+    include_svg = true,
+} = outMath;
   let outHTML = '';
 
-  if (data.mathml) {
+  if (include_mathml && data.mathml) {
     outHTML +=  '<mathml style="display: none">' + data.mathml + '</mathml>';
   }
-  if (data.asciimath) {
+  if (include_asciimath && data.asciimath) {
     if (!outHTML) { outHTML += '\n'}
     outHTML +=  '<asciimath style="display: none;">' + formatSource(data.asciimath) + '</asciimath>';
   }
-  if (data.latex) {
+  if (include_latex && data.latex) {
     if (!outHTML) { outHTML += '\n'}
     outHTML += '<latex style="display: none">' + formatSource(data.latex) + '</latex>';
   }
 
-  if (data.svg) {
+  if (include_svg && data.svg) {
     if (!outHTML) { outHTML += '\n'}
     outHTML += data.svg;
   }
@@ -150,6 +156,20 @@ export const MathJax = {
     const outputJax = docTeX.outputJax as any;
     return OuterData(node, outputJax.math, outMath);
   },
+  TexConvertToAscii: function(string, options: any={}) {
+    const {display = true, metric = {},
+      outMath = {}//, mathJax = {}
+    } = options;
+    const {em = 16, ex = 8, cwidth = 1200, lwidth = 100000, scale = 1} = metric;
+    docTeX.convert(string, {display: display, em: em, ex: ex, containerWidth: cwidth, lineWidth: lwidth, scale: scale});
+    const outputJax = docTeX.outputJax as any;
+    const {
+      optionAscii = {
+        showStyle: false,
+        extraBrackets: true
+      }} = outMath;
+    return toAsciiML(outputJax.math.root, optionAscii);
+  },
   /**
    * Typeset a TeX expression and return the SVG tree for it
    *
@@ -164,9 +184,17 @@ export const MathJax = {
    * }
    */
   Typeset: function(string, options: any={}) {
-    return OuterHTML(this.TexConvert(string, options));
+    return OuterHTML(this.TexConvert(string, options), options.outMath);
   },
 
+  TypesetSvgAndAscii: function(string, options: any={}) {
+    const { outMath = {} } = options;
+    const { include_asciimath = false } = outMath;
+    options.outMath.include_asciimath = true;
+    const data = this.TexConvert(string, options);
+    options.outMath.include_asciimath = include_asciimath
+    return {html: OuterHTML(data, outMath), ascii: data.asciimath};
+  },
   /**
    * Typeset a MathML expression and return the SVG tree for it
    *

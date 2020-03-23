@@ -58,7 +58,7 @@ export const render_item_inline = (tokens, index, options, env, slf) => {
     const tok = token.children[i]
     if (tok.children) {
       if (tok.type = "tabular_inline") {
-        content = renderTabularInline(token.children, tok, options, slf)
+        content = renderTabularInline(token.children, tok, options, env, slf)
       } else {
         content = slf.renderInline(tok.children, options);
       }

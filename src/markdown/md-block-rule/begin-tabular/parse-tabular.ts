@@ -1,5 +1,4 @@
 import { TTokenTabular } from "./index";
-import { tsvPush } from "../../common/tsv";
 import {addHLineIntoStyle, AddTd, AddTdSubTable } from "./tabular-td";
 import {getContent, getRowLines,getCellsAll, getDecimal, TDecimal,
   TAlignData, getVerticallyColumnAlign, getParams, getColumnLines
@@ -67,7 +66,6 @@ const setTokensTabular = (str: string, align: string = ''): Array<TTokenTabular>
 
   let MR: Array<number> = new Array(numCol).fill(0);
   for (let i = 0; i < rows.length; i++) {
-    let tsv_row = new Array(numCol).fill('');
     if (!cellsAll[i] || cellsAll[i].length === 0) {
       if (i < cellsAll.length-1) {
         res.push({token:'tr_open', tag: 'tr', n: 1, attrs: [[ 'style', 'border-top: none !important; border-bottom: none !important;' ]]});
@@ -79,7 +77,6 @@ const setTokensTabular = (str: string, align: string = ''): Array<TTokenTabular>
               top: i === 0 ? CellsHLines[i] ? CellsHLines[i][k] : 'none' : ''},
             CellsHLSpaces[i+1][k]
           );
-          tsv_row[k] = data.content;
           res = res.concat(data.res);
         }
         res.push({token:'tr_close', tag: 'tr', n: -1});
@@ -104,7 +101,6 @@ const setTokensTabular = (str: string, align: string = ''): Array<TTokenTabular>
               top: i === 0 ? CellsHLines[i] ? CellsHLines[i][k] : 'none' : ''},
             CellsHLSpaces[i+1][k]
           );
-          tsv_row[k] = data.content;
           res = res.concat(data.res);
         }
         break;
@@ -166,7 +162,6 @@ const setTokensTabular = (str: string, align: string = ''): Array<TTokenTabular>
           } else {
             if (multi.content) {
               res.push({token:'inline', tag: '', n: 0, content: multi.content});
-              tsv_row[j] = multi.content;
             }
           }
 
@@ -188,10 +183,6 @@ const setTokensTabular = (str: string, align: string = ''): Array<TTokenTabular>
              {left: cLeft, right: cRight, bottom: CellsHLines[i+1] ? CellsHLines[i+1][ic] : 'none',
                top: i === 0 ? CellsHLines[i] ? CellsHLines[i][ic] : 'none' : ''}
             ));
-          for (let si=0; si< parseSub.length; si++) {
-            tsv_row[j] += tsv_row[j].length > 0 ? ' ' : '';
-            tsv_row[j] += parseSub[si].id;
-          }
           continue;
         }
 
@@ -208,7 +199,6 @@ const setTokensTabular = (str: string, align: string = ''): Array<TTokenTabular>
              top: i === 0 ? CellsHLines[i] ? CellsHLines[i][ic] : 'none' : ''},
             CellsHLSpaces[i+1][ic], decimal[ic]
           );
-        tsv_row[ic] = data.content;
         res = res.concat(data.res);
       } else {
         MR[ic] = MR[ic] > 0 ? MR[ic] - 1 : 0;
@@ -221,12 +211,10 @@ const setTokensTabular = (str: string, align: string = ''): Array<TTokenTabular>
              top: i === 0 ? CellsHLines[i] ? CellsHLines[i][ic] : 'none' : ''},
             CellsHLSpaces[i+1][ic]
           );
-        tsv_row[ic] = data.content;
         res = res.concat(data.res);
       }
 
     }
-    tsvPush(tsv_row);
     res.push({token:'tr_close', tag: 'tr', n: -1});
   }
   res.push({token:'tbody_close', tag: 'tbody', n: -1});

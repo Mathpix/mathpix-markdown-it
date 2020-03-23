@@ -15,6 +15,7 @@ export declare const MathJax: {
         latex?: string;
         svg?: string;
     };
+    TexConvertToAscii: (string: any, options?: any) => any;
     /**
      * Typeset a TeX expression and return the SVG tree for it
      *
@@ -29,6 +30,10 @@ export declare const MathJax: {
      * }
      */
     Typeset: (string: any, options?: any) => string;
+    TypesetSvgAndAscii: (string: any, options?: any) => {
+        html: string;
+        ascii: string;
+    };
     /**
      * Typeset a MathML expression and return the SVG tree for it
      *

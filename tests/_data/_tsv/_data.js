@@ -152,8 +152,8 @@ module.exports = [
       '      2 & 10.1 & b & f\\\\\n' +
       '      3 & 23.113231 & c & g\\\\\n' +
       '    \\end{tabular}',
-    tsv: '\\textbf{Value 1}\t\\textbf{Value 2}\t\\textbf{Value 3}\t\\textbf{Value 4}\n' +
-      '$\\alpha$\t$\\beta$\t$\\gamma$\t$\\delta$\n' +
+    tsv: 'Value 1\tValue 2\tValue 3\tValue 4\n' +
+      'alpha\tbeta\tgamma\tdelta\n' +
       '1\t1110.1\ta\te\n' +
       '2\t10.1\tb\tf\n' +
       '3\t23.113231\tc\tg',
@@ -952,7 +952,7 @@ module.exports = [
       '\\caption{this is the table!}\n' +
       '\\label{table:7}\n' +
       '\\end{table}',
-    tsv: 'formula $\\frac{\\nabla^{2} A}{A}=-k^{2}$\tcell2\tcell3',
+    tsv: 'formula (grad^(2)A)/(A)=-k^(2)\tcell2\tcell3',
     html: '<table id="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
@@ -1030,7 +1030,7 @@ module.exports = [
   {
     latex: '\\begin{tabular}{|c|c|}\\hline Feature & Component \\\\ \\hline \\hline Power lock & Door lock manager \\& Power lock \\\\ Door lock & Auto lock \\\\ Door relock & Auto lock \\\\ f_Automatic & c_Automatic \\\\ f_Manual & c_Manual \\\\ Shift out of Park & Gear in Park \\\\ f_Speed & c_Speed \\\\ \\hline\\end{tabular}',
     tsv:   'Feature\tComponent\n' +
-      'Power lock\tDoor lock manager \\&amp; Power lock\n' +
+      'Power lock\tDoor lock manager & Power lock\n' +
       'Door lock\tAuto lock\n' +
       'Door relock\tAuto lock\n' +
       'f_Automatic\tc_Automatic\n' +
@@ -1082,8 +1082,8 @@ module.exports = [
       '\\hline\n' +
       '\\end{tabular}',
     tsv: 'Plan 1\tPlan 2\n' +
-      'Employee pays \\$100\tEmployee pays \\$200\n' +
-      'Plan pays 70\\% of the rest\tPlan pays 80\\% of the rest',
+      'Employee pays $100\tEmployee pays $200\n' +
+      'Plan pays 70% of the rest\tPlan pays 80% of the rest',
     html: '<table id="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
@@ -1109,8 +1109,8 @@ module.exports = [
       '\\hline\n' +
       '\\end{tabular}',
     tsv: 'Plan 1\tPlan 2\n' +
-      'Employee pays \\$100\tEmployee pays $200\n' +
-      'Plan pays 70\\% of the rest\tPlan pays 80\\% of the rest',
+      'Employee pays $100\tEmployee pays $200\n' +
+      'Plan pays 70% of the rest\tPlan pays 80% of the rest',
     html: '<table id="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
@@ -1137,7 +1137,7 @@ module.exports = [
       '\\end{tabular}',
     tsv: 'Plan 1\tPlan 2\n' +
       'Employee pays $100\tEmployee pays $200\n' +
-      'Plan pays 70\\% of the rest\tPlan pays 80\\% of the rest',
+      'Plan pays 70% of the rest\tPlan pays 80% of the rest',
     html: '<table id="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
@@ -1163,8 +1163,8 @@ module.exports = [
       '\\hline\n' +
       '\\end{tabular}',
     tsv: 'Plan 1\tPlan 2\n' +
-      'Employee pays $100\tEmployee pays \\$200\n' +
-      'Plan pays 70\\% of the rest\tPlan pays 80\\% of the rest',
+      'Employee pays $100\tEmployee pays $200\n' +
+      'Plan pays 70% of the rest\tPlan pays 80% of the rest',
     html: '<table id="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
@@ -1191,7 +1191,7 @@ module.exports = [
       '\\end{tabular}',
     tsv: 'Plan 1\tPlan 2\n' +
       'Employee pays $100\tEmployee pays$200\n' +
-      'Plan pays 70\\% of the rest\tPlan pays 80\\% of the rest',
+      'Plan pays 70% of the rest\tPlan pays 80% of the rest',
     html: '<table id="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
@@ -1218,7 +1218,7 @@ module.exports = [
       '\\end{tabular}',
     tsv: 'Plan 1\tPlan 2\n' +
       'Employee pays $ 100\tEmployee pays$ 200\n' +
-      'Plan pays 70\\% of the rest\tPlan pays 80\\% of the rest',
+      'Plan pays 70% of the rest\tPlan pays 80% of the rest',
     html: '<table id="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +

@@ -64,8 +64,9 @@ export type TOutputMathJax = {
   mtextInheritFont?: boolean,
 }
 
-const formatSourceHtml = (text: string) => {
-  return text.trim()
+const formatSourceHtml = (text: string, notTrim: boolean = false) => {
+  text = notTrim ? text : text.trim();
+  return text
     .replace(/&amp;/g, '&')
     .replace(/&nbsp;/g, ' ')
     .replace(/&lt;/g, '<')
@@ -118,8 +119,8 @@ class MathpixMarkdown_Model {
           } else {
             res.push({
               type: child.tagName.toLowerCase(),
-              value: child.tagName === 'LATEX' || child.tagName === 'ASCIIMATH'
-              ? formatSourceHtml(child.innerHTML)
+              value: child.tagName === 'LATEX' || child.tagName === 'ASCIIMATH' || child.tagName === 'TSV'
+              ? formatSourceHtml(child.innerHTML, child.tagName === 'TSV')
               : child.innerHTML});
           }
         }
