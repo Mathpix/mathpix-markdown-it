@@ -33,6 +33,7 @@ export declare type TMarkdownItOptions = {
         inLine?: boolean;
         startLine?: number;
         class?: string;
+        preview?: any;
     };
     outMath?: TOutputMath;
     mathJax?: TOutputMathJax;

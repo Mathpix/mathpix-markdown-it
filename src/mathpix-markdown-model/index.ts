@@ -41,7 +41,8 @@ export type TMarkdownItOptions = {
   renderElement?: {
     inLine?: boolean,
     startLine?: number,
-    class?: string
+    class?: string,
+    preview?: any
   },
   outMath?: TOutputMath,
   mathJax?: TOutputMathJax

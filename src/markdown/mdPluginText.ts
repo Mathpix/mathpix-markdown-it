@@ -475,6 +475,12 @@ export default () => {
       tokens[idx].attrPush(['target', '_blank']);
       tokens[idx].attrPush(['rel', 'noopener']);
 
+      if (!tokens[idx + 1] || !tokens[idx + 1].content) {
+          tokens[idx].attrPush([
+            'style', 'word-break: break-word'
+          ]);
+          return self.renderToken(tokens, idx, options)
+      }
 
       if (tokens[idx + 1].content.length > 40 && !tokens[idx + 1].content.includes(' ')) {
         tokens[idx].attrPush([

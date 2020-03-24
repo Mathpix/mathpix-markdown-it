@@ -562,11 +562,22 @@ const setStyle = (str) => {
   return newArr.join('; ');
 };
 
-const renderUsepackage = token => {
+
+const renderUsepackage = (token, options) => {
   if (token.type === "usepackage_geometry") {
-    const preview = document.getElementById('preview');
+    try {
+      if (!document) {
+        return ''
+      }
+    } catch (e) {
+      return ''
+    }
+    let preview = document.getElementById('preview');
+    if (options && options.renderElement && options.renderElement.preview) {
+      preview = options.renderElement.preview
+    }
     if (!preview) {
-      return false
+      return ''
     }
     const content = token.content;
     let strStyle = setStyle(content);
@@ -574,7 +585,7 @@ const renderUsepackage = token => {
     preview.setAttribute("style", strStyle);
     return `<span class="hidden">${strStyle}</span>`
   } else {
-    return false
+    return ''
   }
 };
 
@@ -822,7 +833,7 @@ export default options => {
           case "reference_note_block":
             return renderReference(tokens[idx]);
           case "usepackage_geometry":
-            return renderUsepackage(tokens[idx]);
+            return renderUsepackage(tokens[idx], options);
           default:
             return renderMath(tokens, tokens[idx], options);
         }
