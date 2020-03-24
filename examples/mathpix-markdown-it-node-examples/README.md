@@ -43,4 +43,4 @@ Result:
 3. `node conversion/math_outMath.js`
 4. `node conversion/tabular_outMath.js`
 5. `node conversion/tabular_include_sub_math.js`
-6.  `node conversion/tabular_not_include_sub_math.js`
+6. `node conversion/tabular_not_include_sub_math.js`
