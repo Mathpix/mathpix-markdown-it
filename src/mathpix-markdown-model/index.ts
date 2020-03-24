@@ -41,7 +41,8 @@ export type TMarkdownItOptions = {
   renderElement?: {
     inLine?: boolean,
     startLine?: number,
-    class?: string
+    class?: string,
+    preview?: any
   },
   outMath?: TOutputMath,
   mathJax?: TOutputMathJax
@@ -64,8 +65,9 @@ export type TOutputMathJax = {
   mtextInheritFont?: boolean,
 }
 
-const formatSourceHtml = (text: string) => {
-  return text.trim()
+const formatSourceHtml = (text: string, notTrim: boolean = false) => {
+  text = notTrim ? text : text.trim();
+  return text
     .replace(/&amp;/g, '&')
     .replace(/&nbsp;/g, ' ')
     .replace(/&lt;/g, '<')
@@ -118,8 +120,8 @@ class MathpixMarkdown_Model {
           } else {
             res.push({
               type: child.tagName.toLowerCase(),
-              value: child.tagName === 'LATEX' || child.tagName === 'ASCIIMATH'
-              ? formatSourceHtml(child.innerHTML)
+              value: child.tagName === 'LATEX' || child.tagName === 'ASCIIMATH' || child.tagName === 'TSV'
+              ? formatSourceHtml(child.innerHTML, child.tagName === 'TSV')
               : child.innerHTML});
           }
         }
@@ -329,6 +331,18 @@ class MathpixMarkdown_Model {
           outMath = {}, mathJax = {}
         } = options || {};
         const disableRules = isDisableFancy ? this.disableFancyArrayDef : options ? options.disableRules || [] : [];
+        const markdownItOptions: TMarkdownItOptions = {
+          isDisableFancy: isDisableFancy,
+          disableRules: disableRules,
+          htmlTags: htmlTags,
+          xhtmlOut: xhtmlOut,
+          breaks: breaks,
+          typographer: typographer,
+          linkify: linkify,
+          width: width,
+          outMath: outMath,
+          mathJax: mathJax
+        };
         if (!showToc) {
           disableRules.push('toc');
         }
@@ -339,9 +353,7 @@ class MathpixMarkdown_Model {
             `<div id='preview' style='justify-content:${alignMathBlock};overflow-y:${overflowY};will-change:transform;'>
                 <div id='container-ruller'></div>
                 <div id='setText' style='display: ${display}; justify-content: inherit;${styleFontSize}${stylePadding}' >
-                    ${this.convertToHTML(text, 
-              {htmlTags: htmlTags, xhtmlOut: xhtmlOut, breaks: breaks, typographer: typographer, linkify: linkify, width: width, 
-                outMath: outMath, mathJax: mathJax})}
+                    ${this.convertToHTML(text, markdownItOptions)}
                 </div>
             </div>`
         );

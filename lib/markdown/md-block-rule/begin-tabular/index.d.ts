@@ -17,6 +17,7 @@ export declare type TTokenTabular = {
     attrs?: Array<TAttrs>;
     children?: Token;
     id?: string;
+    ascii?: string;
 };
 export declare type TMulti = {
     mr?: number;

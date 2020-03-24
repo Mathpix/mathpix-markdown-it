@@ -152,8 +152,8 @@ module.exports = [
       '      2 & 10.1 & b & f\\\\\n' +
       '      3 & 23.113231 & c & g\\\\\n' +
       '    \\end{tabular}',
-    tsv: '\\textbf{Value 1}\t\\textbf{Value 2}\t\\textbf{Value 3}\t\\textbf{Value 4}\n' +
-      '$\\alpha$\t$\\beta$\t$\\gamma$\t$\\delta$\n' +
+    tsv: 'Value 1\tValue 2\tValue 3\tValue 4\n' +
+      'alpha\tbeta\tgamma\tdelta\n' +
       '1\t1110.1\ta\te\n' +
       '2\t10.1\tb\tf\n' +
       '3\t23.113231\tc\tg',
@@ -171,7 +171,7 @@ module.exports = [
       '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; "><span class="math-inline ">\n' +
       '<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.439ex" xmlns="http://www.w3.org/2000/svg" width="1.281ex" height="2.034ex" role="img" focusable="false" viewBox="0 -705 566 899"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="3B2" d="M29 -194Q23 -188 23 -186Q23 -183 102 134T186 465Q208 533 243 584T309 658Q365 705 429 705H431Q493 705 533 667T573 570Q573 465 469 396L482 383Q533 332 533 252Q533 139 448 65T257 -10Q227 -10 203 -2T165 17T143 40T131 59T126 65L62 -188Q60 -194 42 -194H29ZM353 431Q392 431 427 419L432 422Q436 426 439 429T449 439T461 453T472 471T484 495T493 524T501 560Q503 569 503 593Q503 611 502 616Q487 667 426 667Q384 667 347 643T286 582T247 514T224 455Q219 439 186 308T152 168Q151 163 151 147Q151 99 173 68Q204 26 260 26Q302 26 349 51T425 137Q441 171 449 214T457 279Q457 337 422 372Q380 358 347 358H337Q258 358 258 389Q258 396 261 403Q275 431 353 431Z"></path></g></g></g></svg></mjx-container></span></td>\n' +
       '<td style="text-align: right; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; "><span class="math-inline ">\n' +
-      '<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.489ex" xmlns="http://www.w3.org/2000/svg" width="1.172ex" height="1.486ex" role="img" focusable="false" viewBox="0 -441 518 657"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="3B3" d="M31 249Q11 249 11 258Q11 275 26 304T66 365T129 418T206 441Q233 441 239 440Q287 429 318 386T371 255Q385 195 385 170Q385 166 386 166L398 193Q418 244 443 300T486 391T508 430Q510 431 524 431H537Q543 425 543 422Q543 418 522 378T463 251T391 71Q385 55 378 6T357 -100Q341 -165 330 -190T303 -216Q286 -216 286 -188Q286 -138 340 32L346 51L347 69Q348 79 348 100Q348 257 291 317Q251 355 196 355Q148 355 108 329T51 260Q49 251 47 251Q45 249 31 249Z"></path></g></g></g></svg></mjx-container></span></td>\n' +
+      '<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.489ex" xmlns="http://www.w3.org/2000/svg" width="1.229ex" height="1.486ex" role="img" focusable="false" viewBox="0 -441 543 657"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="3B3" d="M31 249Q11 249 11 258Q11 275 26 304T66 365T129 418T206 441Q233 441 239 440Q287 429 318 386T371 255Q385 195 385 170Q385 166 386 166L398 193Q418 244 443 300T486 391T508 430Q510 431 524 431H537Q543 425 543 422Q543 418 522 378T463 251T391 71Q385 55 378 6T357 -100Q341 -165 330 -190T303 -216Q286 -216 286 -188Q286 -138 340 32L346 51L347 69Q348 79 348 100Q348 257 291 317Q251 355 196 355Q148 355 108 329T51 260Q49 251 47 251Q45 249 31 249Z"></path></g></g></g></svg></mjx-container></span></td>\n' +
       '<td style="text-align: left; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; "><span class="math-inline ">\n' +
       '<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.023ex" xmlns="http://www.w3.org/2000/svg" width="1.005ex" height="1.645ex" role="img" focusable="false" viewBox="0 -717 444 727"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="3B4" d="M195 609Q195 656 227 686T302 717Q319 716 351 709T407 697T433 690Q451 682 451 662Q451 644 438 628T403 612Q382 612 348 641T288 671T249 657T235 628Q235 584 334 463Q401 379 401 292Q401 169 340 80T205 -10H198Q127 -10 83 36T36 153Q36 286 151 382Q191 413 252 434Q252 435 245 449T230 481T214 521T201 566T195 609ZM112 130Q112 83 136 55T204 27Q233 27 256 51T291 111T309 178T316 232Q316 267 309 298T295 344T269 400L259 396Q215 381 183 342T137 256T118 179T112 130Z"></path></g></g></g></svg></mjx-container></span></td>\n' +
       '</tr>\n' +
@@ -952,7 +952,7 @@ module.exports = [
       '\\caption{this is the table!}\n' +
       '\\label{table:7}\n' +
       '\\end{table}',
-    tsv: 'formula $\\frac{\\nabla^{2} A}{A}=-k^{2}$\tcell2\tcell3',
+    tsv: 'formula (grad^(2)A)/(A)=-k^(2)\tcell2\tcell3',
     html: '<table id="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
@@ -1030,7 +1030,7 @@ module.exports = [
   {
     latex: '\\begin{tabular}{|c|c|}\\hline Feature & Component \\\\ \\hline \\hline Power lock & Door lock manager \\& Power lock \\\\ Door lock & Auto lock \\\\ Door relock & Auto lock \\\\ f_Automatic & c_Automatic \\\\ f_Manual & c_Manual \\\\ Shift out of Park & Gear in Park \\\\ f_Speed & c_Speed \\\\ \\hline\\end{tabular}',
     tsv:   'Feature\tComponent\n' +
-      'Power lock\tDoor lock manager \\&amp; Power lock\n' +
+      'Power lock\tDoor lock manager & Power lock\n' +
       'Door lock\tAuto lock\n' +
       'Door relock\tAuto lock\n' +
       'f_Automatic\tc_Automatic\n' +
@@ -1082,8 +1082,8 @@ module.exports = [
       '\\hline\n' +
       '\\end{tabular}',
     tsv: 'Plan 1\tPlan 2\n' +
-      'Employee pays \\$100\tEmployee pays \\$200\n' +
-      'Plan pays 70\\% of the rest\tPlan pays 80\\% of the rest',
+      'Employee pays $100\tEmployee pays $200\n' +
+      'Plan pays 70% of the rest\tPlan pays 80% of the rest',
     html: '<table id="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
@@ -1109,8 +1109,8 @@ module.exports = [
       '\\hline\n' +
       '\\end{tabular}',
     tsv: 'Plan 1\tPlan 2\n' +
-      'Employee pays \\$100\tEmployee pays $200\n' +
-      'Plan pays 70\\% of the rest\tPlan pays 80\\% of the rest',
+      'Employee pays $100\tEmployee pays $200\n' +
+      'Plan pays 70% of the rest\tPlan pays 80% of the rest',
     html: '<table id="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
@@ -1137,7 +1137,7 @@ module.exports = [
       '\\end{tabular}',
     tsv: 'Plan 1\tPlan 2\n' +
       'Employee pays $100\tEmployee pays $200\n' +
-      'Plan pays 70\\% of the rest\tPlan pays 80\\% of the rest',
+      'Plan pays 70% of the rest\tPlan pays 80% of the rest',
     html: '<table id="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
@@ -1163,8 +1163,8 @@ module.exports = [
       '\\hline\n' +
       '\\end{tabular}',
     tsv: 'Plan 1\tPlan 2\n' +
-      'Employee pays $100\tEmployee pays \\$200\n' +
-      'Plan pays 70\\% of the rest\tPlan pays 80\\% of the rest',
+      'Employee pays $100\tEmployee pays $200\n' +
+      'Plan pays 70% of the rest\tPlan pays 80% of the rest',
     html: '<table id="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
@@ -1191,7 +1191,7 @@ module.exports = [
       '\\end{tabular}',
     tsv: 'Plan 1\tPlan 2\n' +
       'Employee pays $100\tEmployee pays$200\n' +
-      'Plan pays 70\\% of the rest\tPlan pays 80\\% of the rest',
+      'Plan pays 70% of the rest\tPlan pays 80% of the rest',
     html: '<table id="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
@@ -1218,7 +1218,7 @@ module.exports = [
       '\\end{tabular}',
     tsv: 'Plan 1\tPlan 2\n' +
       'Employee pays $ 100\tEmployee pays$ 200\n' +
-      'Plan pays 70\\% of the rest\tPlan pays 80\\% of the rest',
+      'Plan pays 70% of the rest\tPlan pays 80% of the rest',
     html: '<table id="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +

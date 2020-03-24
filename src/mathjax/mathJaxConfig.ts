@@ -23,7 +23,8 @@ const MathJaxConfig = {
     },
     MathML: {
         parseAs: "html", // or 'xml'
-        forceReparse: false // Force the MathML to be reparsed?
+        forceReparse: true //Need to set true. Have bug in MathJax 3.0.1
+        //forceReparse: false // Force the MathML to be reparsed?
         //   (e.g., for XML parsing in an HTML document)
     },
     HTML: {

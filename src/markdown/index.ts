@@ -24,7 +24,7 @@ const mdInit = (options: TMarkdownItOptions) => {
     .use(tableTabularPlugin, {width: width, outMath: outMath})
     .use(listsPlugin, {width: width, outMath: outMath, renderElement: renderElement})
  //   .use(separateForBlockPlugin)
-    .use(ConfiguredMathJaxPlugin({width: width, outMath: outMath, mathJax: mathJax}))
+    .use(ConfiguredMathJaxPlugin({width: width, outMath: outMath, mathJax: mathJax, renderElement: renderElement}))
     .use(CustomTagPlugin())
     .use(HighlightPlugin, {auto: false})
     .use(anchorPlugin)
