@@ -1,6 +1,6 @@
 import { MathJax } from "../mathjax/";
 import { inlineTabular } from "./md-inline-rule/tabular";
-import { renderTabular,renderTabularInline, renderTSV } from './md-renderer-rules/render-tabular';
+import { renderTabularInline } from './md-renderer-rules/render-tabular';
 
 let mathNumber = [];
 
@@ -211,6 +211,9 @@ function multiMath(state, silent) {
     } else {
       token.content = state.src.slice(startMathPos, endMarkerPos);
     }
+    if (state.env.tabulare) {
+      token.return_asciimath = true;
+    }
   }
 
   state.pos = nextPos;
@@ -359,6 +362,9 @@ function simpleMath(state, silent) {
       0
     );
     token.content = state.src.slice(startMathPos, endMarkerPos);
+    if (state.env.tabulare) {
+      token.return_asciimath = true;
+    }
   }
   state.pos = nextPos;
   return true;
@@ -474,8 +480,17 @@ const renderMath = (a, token, options) => {
     if (token.type === 'display_mathML' || token.type === 'inline_mathML') {
       mathEquation = MathJax.TypesetMathML(math);
     } else {
-      mathEquation = MathJax.Typeset(math, {display: isBlock, metric: { cwidth: cwidth },
-        outMath: options.outMath, mathJax: options.mathJax});
+      if (token.return_asciimath) {
+        const data = MathJax.TypesetSvgAndAscii(math, {
+          display: isBlock, metric: {cwidth: cwidth},
+          outMath: options.outMath, mathJax: options.mathJax
+        });
+        mathEquation = data.html;
+        token.ascii = data.ascii
+      } else {
+         mathEquation = MathJax.Typeset(math, {display: isBlock, metric: { cwidth: cwidth },
+           outMath: options.outMath, mathJax: options.mathJax});
+      }
     }
   } catch (e) {
     console.log('ERROR MathJax =>', e.message, e);
@@ -547,11 +562,22 @@ const setStyle = (str) => {
   return newArr.join('; ');
 };
 
-const renderUsepackage = token => {
+
+const renderUsepackage = (token, options) => {
   if (token.type === "usepackage_geometry") {
-    const preview = document.getElementById('preview');
+    try {
+      if (!document) {
+        return ''
+      }
+    } catch (e) {
+      return ''
+    }
+    let preview = document.getElementById('preview');
+    if (options && options.renderElement && options.renderElement.preview) {
+      preview = options.renderElement.preview
+    }
     if (!preview) {
-      return false
+      return ''
     }
     const content = token.content;
     let strStyle = setStyle(content);
@@ -559,7 +585,7 @@ const renderUsepackage = token => {
     preview.setAttribute("style", strStyle);
     return `<span class="hidden">${strStyle}</span>`
   } else {
-    return false
+    return ''
   }
 };
 
@@ -764,7 +790,7 @@ const mapping = {
   reference_note_block: "Reference_note block",
   tabular: "Tabular",
   tabular_inline: "Tabular_inline",
-  tsv: "TSV",
+  // tsv: "TSV",
   usepackage_geometry: "Usepackage_geometry",
   display_mathML: "DisplayMathML",
   inline_mathML: "InlineMathML"
@@ -794,20 +820,20 @@ export default options => {
     md.inline.ruler.push("simpleMath", simpleMath);
 
     Object.keys(mapping).forEach(key => {
-      md.renderer.rules[key] = (tokens, idx) => {
+      md.renderer.rules[key] = (tokens, idx, options, env, slf) => {
         switch (tokens[idx].type) {
           case "tabular":
-            return renderTabular(tokens, tokens[idx], options, md.renderer);
+            return renderTabularInline(tokens, tokens[idx], options, env, slf);
           case "tabular_inline":
-            return renderTabularInline(tokens, tokens[idx], options, md.renderer);
-          case "tsv":
-            return renderTSV(tokens, tokens[idx], options);
+            return renderTabularInline(tokens, tokens[idx], options, env, slf);
+          // case "tsv":
+          //   return renderTSV(tokens, tokens[idx], options);
           case "reference_note":
             return renderReference(tokens[idx]);
           case "reference_note_block":
             return renderReference(tokens[idx]);
           case "usepackage_geometry":
-            return renderUsepackage(tokens[idx]);
+            return renderUsepackage(tokens[idx], options);
           default:
             return renderMath(tokens, tokens[idx], options);
         }

@@ -101,9 +101,9 @@ export const AddTd = (content: string, aligns: TAligns| null, lines: TLines, spa
       let fr: string = (arr[1] ? new Array(decimal.r- arr[1].length).fill(0) : new Array(decimal.r).fill(0)).join('');
       let fl: string = (arr[0] ? new Array(decimal.l- arr[0].length).fill(0) : new Array(decimal.l).fill(0)).join('');
       if (arr[1]) {
-        res.push({token:'inline_decimal', tag: '', n: 0, content: `${fl};${content};${fr}`});
+        res.push({token:'inline_decimal', tag: '', n: 0, content: `${fl};${content};${fr}`, ascii: content});
       } else {
-        res.push({token:'inline_decimal', tag: '', n: 0, content: `${fl};${content};.${fr}`});
+        res.push({token:'inline_decimal', tag: '', n: 0, content: `${fl};${content};.${fr}`, ascii: content});
       }
     } else {
       res.push({token:'inline', tag: '', n: 0, content: content});

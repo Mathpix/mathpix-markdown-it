@@ -177,7 +177,7 @@ const html = MathpixMarkdownModel.markdownToHTML(`$x^x$`, options);
 
 For `Latex` formulas, the result will be:
 ```html
-<span class="math-block">
+<span class="math-inline">
     <mathml style="display: none">...</mathml>
     <asciimath style="display: none">...</asciimath>
     <latex style="display: none">...</latex>
@@ -342,19 +342,19 @@ const parsed = MathpixMarkdownModel.parseMarkdownByHTML(html);
     type: 'html',
     value: '<table>..</table>'
   },
-  { type: 'tsv', value: '1\t$x^1$\t3\n4\t$y^1$\t6\n7\t$z^1$\t9' },
+  { type: 'tsv', value: '1\tx^(1)\t3\n4\ty^(1)\t6\n7\tz^(1)\t9' },
   
-  { type: 'mathml', value: '<math>\n  <msup>\n    <mi>x</mi>\n    <mn>1</mn>\n  </msup>\n</math>' },
+  { type: 'mathml', value: '<math xmlns="http://www.w3.org/1998/Math/MathML">\n  <msup>\n    <mi>x</mi>\n    <mn>1</mn>\n  </msup>\n</math>' },
   { type: 'asciimath', value: 'x^(1)' },
   { type: 'latex', value: 'x^1' },
   { type: 'svg', value: '<svg >..</svg>' },
     
-  { type: 'mathml', value: '<math>\n  <msup>\n    <mi>y</mi>\n    <mn>1</mn>\n  </msup>\n</math>' },
+  { type: 'mathml', value: '<math xmlns="http://www.w3.org/1998/Math/MathML">\n  <msup>\n    <mi>y</mi>\n    <mn>1</mn>\n  </msup>\n</math>' },
   { type: 'asciimath', value: 'y^(1)' },
   { type: 'latex', value: 'y^1' },
   { type: 'svg', value: '<svg ></svg>' },
       
-  { type: 'mathml', value: '<math>\n  <msup>\n    <mi>z</mi>\n    <mn>1</mn>\n  </msup>\n</math>' },
+  { type: 'mathml', value: '<math xmlns="http://www.w3.org/1998/Math/MathML">\n  <msup>\n    <mi>z</mi>\n    <mn>1</mn>\n  </msup>\n</math>' },
   { type: 'asciimath', value: 'z^(1)' },
   { type: 'latex', value: 'z^1' },
   { type: 'svg', value: '<svg ></svg>' }
@@ -392,7 +392,7 @@ const parsed = MathpixMarkdownModel.parseMarkdownByHTML(html, false);
   },
   { 
     type: 'tsv', 
-    value: '1\t$x^1$\t3\n4\t$y^1$\t6\n7\t$z^1$\t9' 
+    value: '1\tx^(1)\t3\n4\ty^(1)\t6\n7\tz^(1)\t9' 
   }
 ]
 ```

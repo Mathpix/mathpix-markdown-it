@@ -29,9 +29,9 @@ module.exports = [
       '\\caption{this is the table!}\n' +
       '\\label{table:6}\n' +
       '\\end{table}',
-    tsv: '\\(cell^1\\)\tdd$$\\frac{\\nabla^{2} A}{A}=-k^{2}$$ dd\tcell3\n' +
-      '\\(cell^4\\)\tcell5\t\\(cell^6\\)\n' +
-      'cell7\tcell $f^f$ 8\tcell9',
+    tsv: 'cell^(1)\tdd(grad^(2)A)/(A)=-k^(2) dd\tcell3\n' +
+      'cell^(4)\tcell5\tcell^(6)\n' +
+      'cell7\tcell f^(f) 8\tcell9',
   },
   {
     latex: '\\begin{table}[h]\n' +
@@ -45,8 +45,8 @@ module.exports = [
       '\\caption{this is the table!}\n' +
       '\\label{table:6}\n' +
       '\\end{table}',
-    tsv: '\\(cell^1\\)\tdd$$\\frac{\\nabla^{2} A}{A}=-k^{2}$$ dd\tcell3\n' +
-      '\\(cell^4\\)\tcell5\t\\(cell^6\\)\n' +
-      'a,$b^2$,c,aa,ab,ac,aaa,aab,aac\tcell $f^f$ 8\tcell9',
+    tsv: 'cell^(1)\tdd(grad^(2)A)/(A)=-k^(2) dd\tcell3\n' +
+      'cell^(4)\tcell5\tcell^(6)\n' +
+      'a,b^(2),c,aa,ab,ac,aaa,aab,aac\tcell f^(f) 8\tcell9',
   }
 ];
