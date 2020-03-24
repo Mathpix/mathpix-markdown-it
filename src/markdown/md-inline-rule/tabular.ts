@@ -35,7 +35,9 @@ export const inlineTabular = (state, silent) => {
         let tok = res[j];
         if (tok.token === 'inline') {
           let children = [];
+          state.env.tabulare = state.md.options.outMath.include_tsv;
           state.md.inline.parse(tok.content, state.md, state.env, children);
+          state.env.tabulare = false;
           tok.children = children;
         } else {
           if (res[j].token === 'inline_decimal') {
