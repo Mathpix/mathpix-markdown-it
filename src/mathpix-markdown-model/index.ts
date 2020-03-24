@@ -331,6 +331,18 @@ class MathpixMarkdown_Model {
           outMath = {}, mathJax = {}
         } = options || {};
         const disableRules = isDisableFancy ? this.disableFancyArrayDef : options ? options.disableRules || [] : [];
+        const markdownItOptions: TMarkdownItOptions = {
+          isDisableFancy: isDisableFancy,
+          disableRules: disableRules,
+          htmlTags: htmlTags,
+          xhtmlOut: xhtmlOut,
+          breaks: breaks,
+          typographer: typographer,
+          linkify: linkify,
+          width: width,
+          outMath: outMath,
+          mathJax: mathJax
+        };
         if (!showToc) {
           disableRules.push('toc');
         }
@@ -341,9 +353,7 @@ class MathpixMarkdown_Model {
             `<div id='preview' style='justify-content:${alignMathBlock};overflow-y:${overflowY};will-change:transform;'>
                 <div id='container-ruller'></div>
                 <div id='setText' style='display: ${display}; justify-content: inherit;${styleFontSize}${stylePadding}' >
-                    ${this.convertToHTML(text, 
-              {htmlTags: htmlTags, xhtmlOut: xhtmlOut, breaks: breaks, typographer: typographer, linkify: linkify, width: width, 
-                outMath: outMath, mathJax: mathJax})}
+                    ${this.convertToHTML(text, markdownItOptions)}
                 </div>
             </div>`
         );
