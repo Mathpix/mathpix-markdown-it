@@ -109,6 +109,13 @@ const formatSource = (text: string) => {
     .replace(/>/g, '&gt;');
 };
 
+const formatSourceMML = (text: string) => {
+  return text.trim()
+    .replace( /&#xA0;/g, ' ')
+    .replace( /\u00A0/g, ' ')
+    .replace(/&nbsp;/g, ' ');
+};
+
 const OuterHTML = (data, outMath) => {
   const {
     include_mathml = false,
@@ -117,9 +124,8 @@ const OuterHTML = (data, outMath) => {
     include_svg = true,
 } = outMath;
   let outHTML = '';
-
   if (include_mathml && data.mathml) {
-    outHTML +=  '<mathml style="display: none">' + data.mathml + '</mathml>';
+    outHTML +=  '<mathml style="display: none">' + formatSourceMML(data.mathml) + '</mathml>';
   }
   if (include_asciimath && data.asciimath) {
     if (!outHTML) { outHTML += '\n'}
