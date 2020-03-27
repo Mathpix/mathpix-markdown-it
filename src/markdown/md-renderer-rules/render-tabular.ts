@@ -40,6 +40,23 @@ const renderInlineTokenBlock = (tokens, options, env, slf) =>{
     }
     if (token.token === 'tr_close') {
       arrTsv.push(arrRow);
+      const l = arrRow &&  arrRow.length > 0 ? arrRow.length  : 0;
+      const l2 = rowspan &&  rowspan.length > 0 ? rowspan.length  : 0;
+      if (l < l2) {
+        for (let k = l; k < l2; k++) {
+          if (rowspan[k]) {
+            if (rowspan[k][1] && rowspan[k][1] > 1) {
+              for (let i = 0; i < rowspan[k][1]; i++) {
+                arrRow.push('');
+              }
+            } else {
+              arrRow.push('');
+            }
+            rowspan[k][0] -= 1;
+          }
+        }
+      }
+
     }
     if (token.token === 'td_open') {
       cell = '';
@@ -49,16 +66,31 @@ const renderInlineTokenBlock = (tokens, options, env, slf) =>{
       mr = mr ? Number(mr) : 0 ;
     }
     if (token.token === 'td_close') {
-      const l = arrRow &&  arrRow.length > 0 ? arrRow.length  : 0;
-      if (!mr && rowspan[l] && rowspan[l][0] > 0) {
-        if (rowspan[l][1] && rowspan[l][1] > 1) {
-          for (let i = 0; i < rowspan[l][1]; i++) {
-            arrRow.push('');
+      let l = arrRow &&  arrRow.length > 0 ? arrRow.length  : 0;
+      const l2 = rowspan &&  rowspan.length > 0 ? rowspan.length  : 0;
+      if (l < l2) {
+        for (let k = l; k < l2; k++) {
+          if (rowspan[k] && rowspan[k][0] && rowspan[k][0] > 0) {
+            if (rowspan[k] && rowspan[k][1] && rowspan[k][1] > 1) {
+              for (let i = 0; i < rowspan[k][1]; i++) {
+                arrRow.push('');
+              }
+            } else {
+              arrRow.push('');
+            }
+            if (rowspan[k] && rowspan[k][0]) {
+              rowspan[k][0] -= 1;
+            }
+          } else {
+            break
           }
-        } else {
-          arrRow.push('');
         }
-        rowspan[l][0] -= 1;
+
+
+      }
+
+      l = arrRow &&  arrRow.length > 0 ? arrRow.length  : 0;
+      if (!mr && rowspan[l] && rowspan[l][0] > 0) {
         arrRow.push(cell);
       } else {
         arrRow.push(cell);
