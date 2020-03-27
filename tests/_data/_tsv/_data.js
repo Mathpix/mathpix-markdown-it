@@ -1235,5 +1235,163 @@ module.exports = [
       '</tr>\n' +
       '</tbody>\n' +
       '</table>'
+  },
+  { latex: '\\begin{tabular}{|l|l|r|}\\hline\n' +
+      '\\multicolumn{2}{|c|}{Item}&  \\\\\\hline\n' +
+      'Animal & Description & Price (\\$) \\\\\\hline\n' +
+      '\\multirow{2}{*}{Gnat } & per gram & \\multirow{2}{*}{13.65} \\\\\\hline\n' +
+      '& \\multirow{2}{*}{each} &  \\\\\\hline\n' +
+      'Gnu &  & 92.50  \\\\\\hline\n' +
+      'Emu & stuffed  & 33.33  \\\\\\hline\n' +
+      'Armadillo & frozen  & 8.99  \\\\\\hline\n' +
+      '\\end{tabular}',
+  tsv: 'Item\t\t\n' +
+      'Animal\tDescription\tPrice ($)\n' +
+      'Gnat\tper gram\t13.65\n' +
+      '\teach\t\n' +
+      'Gnu\t\t92.50\n' +
+      'Emu\tstuffed\t33.33\n' +
+      'Armadillo\tfrozen\t8.99'
+  },
+  {
+    latex: '\\begin{tabular}{|l|l|r|}\n' +
+      '\\hline\n' +
+      '\\multicolumn{2}{|c|}{title1}                         & \\multirow{3}{*}{title1} \\\\ \\cline{1-2}\n' +
+      'Animal                & \\multirow{2}{*}{Description} &                         \\\\ \\cline{1-1}\n' +
+      '\\multirow{2}{*}{Gnat} &                              &                         \\\\ \\cline{2-3} \n' +
+      '                      & each                         & 0.01                    \\\\ \\hline\n' +
+      '\\multirow{2}{*}{Gnu}  & stuffed                      & \\multirow{2}{*}{92.50}  \\\\ \\cline{2-2}\n' +
+      '                      & stuffed                      &                         \\\\ \\hline\n' +
+      'Armadillo             & frozen                       & 8.99                    \\\\ \\hline\n' +
+      '\\end{tabular}',
+    tsv: 'title1\t\ttitle1\n' +
+      'Animal\tDescription\t\n' +
+      'Gnat\t\t\n' +
+      '\teach\t0.01\n' +
+      'Gnu\tstuffed\t92.50\n' +
+      '\tstuffed\t\n' +
+      'Armadillo\tfrozen\t8.99'
+  },
+  {
+    latex: '\\begin{tabular} { | c | c | c | } \\hline \\multirow{2}{*} {Total Production of Higgs Bosons} & \\multicolumn { 2 } { | c | } $\\mathcal { L } = 50 \\mathrm{~fb} ^ { - 1 }$ \\\\ \\cline{2-3} & $\\tan \\beta = 10$ & $\\tan \\beta = 30$ \\\\ \\hline \\hline $h ^ { 0 }$ & 1600 & 1800 \\\\ $H ^ { 0 }$ & 700 & 470 \\\\ $A ^ { 0 }$ & 900 & 935 \\\\ $H ^ { + } H ^ { - }$ & 7000 & 6500 \\\\ \\hline \\end{tabular}',
+    tsv: 'Total Production of Higgs Bosons\tL=50" "fb^(-1)\t\n' +
+      '\ttan beta=10\ttan beta=30\n' +
+      'h^(0)\t1600\t1800\n' +
+      'H^(0)\t700\t470\n' +
+      'A^(0)\t900\t935\n' +
+      'H^(+)H^(-)\t7000\t6500'
+  },
+  {
+    latex: '\\begin{tabular}{rccccc} \\hline $\\text{curve (chiller condition, }j\\text{)}$ &$\\hat{\\sigma}_{j}^{2}$& $\\hat{\\pi}_{j}$&$\\hat{a}_{12}$&$\\hat{a}_{21}$&$\\lambda_{j}$ \\\\ \\hline $\\text{black (off, }j=1\\text{)}$ &12.2&0.682&\\multirow{2}{*} 0.015 & \\multirow{2}{*} $<10^{-16}$& 0.050 \\\\ $\\text{red (on, }j=2\\text{)}$&400.2&0.318&&&0.006 \\\\ \\hline \\end{tabular}',
+    tsv: '"curve (chiller condition, "j")"\that(sigma)_(j)^(2)\that(pi)_(j)\that(a)_(12)\that(a)_(21)\tlambda_(j)\n' +
+      '"black (off, "j=1")"\t12.2\t0.682\t0.015\t<10^(-16)\t0.050\n' +
+      '"red (on, "j=2")"\t400.2\t0.318\t\t\t0.006'
+
+  },
+  {
+    latex: '\\begin{tabular}{c c c | c} \\multicolumn{3}{c|} \\multirow{3}{*} $\\mathbf{H}^{+}$ & $\\mathbf{0}$ \\\\ &&& $\\cdot$ \\\\ &&& $\\mathbf{0}$ \\\\ \\hline $\\mathbf{0}$ & $\\cdot$ & $\\mathbf{0}$ & $\\mathbf{H}^{-}$ \\end{tabular}',
+    tsv: 'H^(+)\t\t\t0\n\t\t\t*\n\t\t\t0\n0\t*\t0\tH^(-)'
+  },
+  {
+    latex: '\\begin{tabular}{|c|l|c|c|c|c|} \\cline{3-6} \\multicolumn{2}{c|} & {A} & {B} & {C} & {D} \\\\ \\hline \\multirow{3}{*} {Mean} & {Human}&0.069&0.134&0.094&0.157 \\\\ \\cline{2-6} & {Sculpt}&0.112&0.177&0.131&0.193 \\\\ \\cline{2-6} & $\\textbf{% Increase}$&$\\mathbf{63.1}$&$\\mathbf{32.5}$&$\\mathbf{39.3}$&$\\mathbf{23.1}$ \\\\ \\hline \\multirow{3}{*} {Median} & {Human}&0.065&0.127&0.091&0.156 \\\\ \\cline{2-6} & {Sculpt}& 0.091&0.169&0.127&0.183 \\\\ \\cline{2-6} & \\textbf{% Increase}&$\\mathbf{40.2}$&$\\mathbf{33.5}$&$\\mathbf{40.4}$&$\\mathbf{17.4}$ \\\\ \\hline \\end{tabular}',
+    tsv: '\t\tA\tB\tC\tD\n' +
+      'Mean\tHuman\t0.069\t0.134\t0.094\t0.157\n' +
+      '\tSculpt\t0.112\t0.177\t0.131\t0.193\n' +
+      '\t"% Increase"\t63.1\t32.5\t39.3\t23.1\n' +
+      'Median\tHuman\t0.065\t0.127\t0.091\t0.156\n' +
+      '\tSculpt\t0.091\t0.169\t0.127\t0.183\n' +
+      '\t% Increase\t40.2\t33.5\t40.4\t17.4'
+  },
+  {
+    latex: '\\begin{tabular}{|l|l|l|c|l|r|}\n' +
+      '\\hline\n' +
+      '1  & \\multirow{7}{*}{2} & \\multirow{6}{*}{3} & \\multirow{5}{*}{4}      & \\multirow{4}{*}{5} & 6  \\\\ \\cline{1-1} \\cline{6-6} \n' +
+      '7  &                    &                    &                         &                    & 12 \\\\ \\cline{1-1} \\cline{6-6} \n' +
+      '13 &                    &                    &                         &                    & 18 \\\\ \\cline{1-1} \\cline{6-6} \n' +
+      '19 &                    &                    &                         &                    & 24 \\\\ \\cline{1-1} \\cline{5-6} \n' +
+      '25 &                    &                    &                         & 29                 & 30 \\\\ \\cline{1-1} \\cline{4-6} \n' +
+      '31 &                    &                    & \\multicolumn{1}{l|}{34} & 35                 & 36 \\\\ \\cline{1-1} \\cline{3-6} \n' +
+      '37 &                    & 39                 & \\multicolumn{1}{l|}{40} & 41                 & 42 \\\\ \\hline\n' +
+      '\\end{tabular}',
+    tsv: '1\t2\t3\t4\t5\t6\n' +
+      '7\t\t\t\t\t12\n' +
+      '13\t\t\t\t\t18\n' +
+      '19\t\t\t\t\t24\n' +
+      '25\t\t\t\t29\t30\n' +
+      '31\t\t\t34\t35\t36\n' +
+      '37\t\t39\t40\t41\t42'
+  },
+  {
+    latex: '\\begin{tabular}{|l|l|l|c|l|r|l|l|l|}\n' +
+      '\\hline\n' +
+      '1                  & \\multirow{7}{*}{2} & \\multirow{6}{*}{3} & \\multirow{5}{*}{4}      & \\multirow{4}{*}{5} & 6                   & \\multirow{3}{*}{7}  & \\multirow{2}{*}{8} & 9                   \\\\ \\cline{1-1} \\cline{6-6} \\cline{9-9} \n' +
+      '\\multirow{5}{*}{7} &                    &                    &                         &                    & 12                  &                     &                    & 3                   \\\\ \\cline{6-6} \\cline{8-9} \n' +
+      '                   &                    &                    &                         &                    & 18                  &                     & 3                  & 3                   \\\\ \\cline{6-9} \n' +
+      '                   &                    &                    &                         &                    & \\multirow{4}{*}{24} & 25                  & 26                 & 27                  \\\\ \\cline{5-5} \\cline{7-9} \n' +
+      '                   &                    &                    &                         & 29                 &                     & \\multirow{3}{*}{31} & 32                 & 33                  \\\\ \\cline{4-5} \\cline{8-9} \n' +
+      '                   &                    &                    & \\multicolumn{1}{l|}{34} & 35                 &                     &                     & 38                 & \\multirow{2}{*}{39} \\\\ \\cline{1-1} \\cline{3-5} \\cline{8-8}\n' +
+      '37                 &                    & 39                 & \\multicolumn{1}{l|}{40} & 41                 &                     &                     & 44                 &                     \\\\ \\hline\n' +
+      '\\end{tabular}',
+    tsv: '1\t2\t3\t4\t5\t6\t7\t8\t9\n' +
+      '7\t\t\t\t\t12\t\t\t3\n' +
+      '\t\t\t\t\t18\t\t3\t3\n' +
+      '\t\t\t\t\t24\t25\t26\t27\n' +
+      '\t\t\t\t29\t\t31\t32\t33\n' +
+      '\t\t\t34\t35\t\t\t38\t39\n' +
+      '37\t\t39\t40\t41\t\t\t44\t'
+  },
+  {
+    latex: '\\begin{tabular}{|c|c|c|c|l|}\n' +
+      '\\hline \n' +
+      '2 & $\\pm \\frac{1}{\\sqrt{3}}$ & $\\pm 0.57735 \\ldots$ & \\multicolumn{2}{|c|}1 \\\\\n' +
+      '\\hline \n' +
+      '\\multirow{2}{*}3 & \\multicolumn{2}{|c|}0 & $\\frac{8}{9}$ & $0.888889 \\ldots$ \\\\\n' +
+      '\\hline \n' +
+      '& $\\pm \\sqrt{\\frac{3}{5}}$ & $\\pm 0.774597 \\ldots$ & $\\frac{5}{9}$ & $0.555556 \\ldots$ \\\\\n' +
+      '\\hline \n' +
+      '\\multirow{2}{*}4 & $\\pm \\sqrt{\\frac{3}{7}-\\frac{2}{7} \\sqrt{\\frac{6}{5}}}$ & $\\pm 0.339981 \\ldots$ & $\\frac{18+\\sqrt{30}}{36}$ & $0.652145 \\ldots$ \\\\\n' +
+      '\\hline\n' +
+      '& $\\pm \\sqrt{\\frac{3}{7}+\\frac{2}{7} \\sqrt{\\frac{6}{5}}}$ & $\\pm 0.861136 \\ldots$ & $\\frac{18-\\sqrt{30}}{36}$ & $0.347855 \\ldots$ \\\\\n' +
+      '\\hline\n' +
+      '\\multirow{3}{*}5 & \\multicolumn{2}{|c|}0 & $\\frac{128}{225}$ & $0.568889 \\ldots$ \\\\\n' +
+      '\\hline\n' +
+      '& $\\pm \\frac{1}{3} \\sqrt{5-2 \\sqrt{\\frac{10}{7}}}$ & $\\pm 0.538469 \\ldots$ & $\\frac{322+13 \\sqrt{70}}{900}$ & $0.478629 \\ldots$ \\\\\n' +
+      '\\hline\n' +
+      '& $\\pm \\frac{1}{3} \\sqrt{5+2 \\sqrt{\\frac{10}{7}}}$ & $\\pm 0.90618 \\ldots$ & $\\frac{322-13 \\sqrt{70}}{900}$ & $0.236927 \\ldots$ \\\\\n' +
+      '\\hline\n' +
+      '\\end{tabular}',
+    tsv: '2\t+-(1)/(sqrt3)\t+-0.57735 dots\t1\t\n' +
+      '3\t0\t\t(8)/(9)\t0.888889 dots\n' +
+      '\t+-sqrt((3)/(5))\t+-0.774597 dots\t(5)/(9)\t0.555556 dots\n' +
+      '4\t+-sqrt((3)/(7)-(2)/(7)sqrt((6)/(5)))\t+-0.339981 dots\t(18+sqrt30)/(36)\t0.652145 dots\n' +
+      '\t+-sqrt((3)/(7)+(2)/(7)sqrt((6)/(5)))\t+-0.861136 dots\t(18-sqrt30)/(36)\t0.347855 dots\n' +
+      '5\t0\t\t(128)/(225)\t0.568889 dots\n' +
+      '\t+-(1)/(3)sqrt(5-2sqrt((10)/(7)))\t+-0.538469 dots\t(322+13sqrt70)/(900)\t0.478629 dots\n' +
+      '\t+-(1)/(3)sqrt(5+2sqrt((10)/(7)))\t+-0.90618 dots\t(322-13sqrt70)/(900)\t0.236927 dots'
+  },
+  {latex: '\\begin{tabular}{|l|l|l|l|l|r|}\n' +
+      '\\hline\n' +
+      '1                   & 2                   & 3  & \\multicolumn{3}{c|}{4}                         \\\\ \\hline\n' +
+      '\\multirow{3}{*}{7}  & \\multicolumn{3}{l|}{8}                         & 11 & \\multirow{2}{*}{12} \\\\ \\cline{2-5}\n' +
+      '                    & \\multicolumn{4}{l|}{14}                             &                     \\\\ \\cline{2-6} \n' +
+      '                    & \\multirow{2}{*}{20} & 21 & \\multirow{4}{*}{22} & 23 & 24                  \\\\ \\cline{1-1} \\cline{3-3} \\cline{5-6} \n' +
+      '\\multirow{3}{*}{25} &                     & 27 &                     & \\multicolumn{2}{l|}{29}  \\\\ \\cline{2-3} \\cline{5-6} \n' +
+      '                    & \\multicolumn{2}{l|}{32}  &                     & 35 & 36                  \\\\ \\cline{2-3} \\cline{5-6} \n' +
+      '                    & 38                  & 39 &                     & \\multicolumn{2}{l|}{41}  \\\\ \\hline\n' +
+      '\\end{tabular}',
+  tsv: '1\t2\t3\t4\t\t\n' +
+    '7\t8\t\t\t11\t12\n' +
+    '\t14\t\t\t\t\n' +
+    '\t20\t21\t22\t23\t24\n' +
+    '25\t\t27\t\t29\t\n' +
+    '\t32\t\t\t35\t36\n' +
+    '\t38\t39\t\t41\t'},
+  {
+    latex: '\\begin{tabular}{|c|c|c|c|c|c|}\\hline \\multirow{2}{*} {} & \\multicolumn{2}{|c|} { Latency \\( (\\mathrm{s}) \\)} & \\multicolumn{2}{|c|} { Message Sizes \\( (\\mathrm{MB}) \\)} & \\multirow{2}{*} { Accuracy \\( \\% \\)} \\\\ \\cline { 2 - 5 } & offline & online & offline & online & \\\\ \\hline ReLU/CNN/MNIST (Figure 12) & 3.58 & 5.74 & 20.9 & 636.6 & 99.0 \\\\ \\hline ReLU/CNN/CIFAR-10 (Figure 13) & 472 & 72 & 3046 & 6226 & 81.61 \\\\ \\hline Sigmoidal/LSTM/PTB (Figure 14) & 13.9 & 4.39 & 86.7 & 474 & cross-entropy loss:4.79 \\\\ \\hline\\end{tabular}',
+    tsv: '\tLatency (s)\t\tMessage Sizes (MB)\t\tAccuracy %\n' +
+      '\toffline\tonline\toffline\tonline\t\n' +
+      'ReLU/CNN/MNIST (Figure 12)\t3.58\t5.74\t20.9\t636.6\t99.0\n' +
+      'ReLU/CNN/CIFAR-10 (Figure 13)\t472\t72\t3046\t6226\t81.61\n' +
+      'Sigmoidal/LSTM/PTB (Figure 14)\t13.9\t4.39\t86.7\t474\tcross-entropy loss:4.79'
   }
 ];

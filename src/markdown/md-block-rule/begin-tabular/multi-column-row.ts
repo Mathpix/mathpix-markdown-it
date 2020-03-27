@@ -65,7 +65,9 @@ export const getMultiColumnMultiRow = (str: string, params: {lLines: string, ali
     if (!matchMC) {
       attrs.push(setColumnLines({h: params.align ? params.align : ''}, {left: params.lLines,  right: params.rLines}))
     }
-    attrs.push(['rowspan', mr.toString()]);
+    if (mr > 0) {
+      attrs.push(['rowspan', mr.toString()]);
+    }
 
     w = w.trim().replace('*', 'auto');
     if (w && w.length > 0 ) {

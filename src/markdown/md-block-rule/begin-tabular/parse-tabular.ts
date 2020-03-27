@@ -87,13 +87,16 @@ const setTokensTabular = (str: string, align: string = ''): Array<TTokenTabular>
 
     let cells = separateByColumns(cellsAll[i]);
     for (let j = 0; j < numCol; j++) {
-      const ic: number = getCurrentMC(cells, j);
-
+      let ic: number = getCurrentMC(cells, j);
       if (ic >= numCol) {
         break;
       }
       if (j >= (cells.length) && ic < numCol) {
         for (let k = ic; k < numCol; k++) {
+          if (MR[k] && MR[k] > 0) {
+            MR[k] = MR[k] > 0 ? MR[k] - 1 : 0;
+            continue
+          }
           let cRight = k === numCol-1 ?  cLines[cLines.length-1] :cLines[k+1];
           let cLeft = k === 0 ? cLines[0] : '';
           const data = AddTd('', {h: cAlign[k], v: vAlign[k], w: cWidth[k]},
@@ -116,6 +119,31 @@ const setTokensTabular = (str: string, align: string = ''): Array<TTokenTabular>
           let mr = multi.mr > rows.length ? rows.length : multi.mr;
           let mc = multi.mc > numCol ? numCol : multi.mc;
 
+          if (mc && mc > 1) {
+            let d = ic - mc + 1;
+            if (MR[d] && MR[d] > 0) {
+              for (let k = 0; k < mc; k++) {
+                MR[d+k] = MR[d+k] > 0 ? MR[d+k] - 1 : 0;
+                if (MR[d+k] > 0) {
+                  mc -= 1;
+                }
+              }
+              if (mc < 1) {
+                continue
+              }
+            } else {
+              MR[ic] = MR[ic] > 0 ? MR[ic] - 1 : 0;
+            }
+
+          } else {
+            MR[ic] = MR[ic] > 0 ? MR[ic] - 1 : 0;
+            if (MR[ic] && MR[ic] > 0) {
+              continue
+            }
+          }
+
+          MR[ic] = MR[ic] > 0 ? MR[ic] - 1 : 0;
+
           if (mr && mr > 0) {
             if (mc && mc > 1) {
               let d = ic - mc + 1;
@@ -136,6 +164,7 @@ const setTokensTabular = (str: string, align: string = ''): Array<TTokenTabular>
               for (let k = 0; k < mc; k++) {
                 MR[d+k] = MR[d+k] > 0 ? MR[d+k] - 1 : 0;
               }
+              ic = d
             } else {
               MR[ic] = MR[ic] > 0 ? MR[ic] - 1 : 0;
             }
