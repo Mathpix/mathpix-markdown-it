@@ -49,6 +49,7 @@ export declare type TOutputMath = {
         column?: string;
         row?: string;
     };
+    not_catch_errors?: boolean;
 };
 export declare type TOutputMathJax = {
     mtextInheritFont?: boolean;
