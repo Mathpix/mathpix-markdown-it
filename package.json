@@ -53,7 +53,7 @@
     "markdown-it-multimd-table": "^3.2.3",
     "markdown-it-sub": "^1.0.0",
     "markdown-it-sup": "^1.0.0",
-    "mathjax-full": "^3.0.1",
+    "mathjax-full": "3.0.1",
     "mocha": "^7.0.1",
     "react": "^16.7.0",
     "react-dom": "^16.7.0",
