@@ -493,7 +493,14 @@ const renderMath = (a, token, options) => {
       }
     }
   } catch (e) {
-    console.log('ERROR MathJax =>', e.message, e);
+    console.error('ERROR MathJax =>', e.message, e);
+    if (options.outMath && options.outMath.not_catch_errors) {
+      throw ({
+        message: e.message,
+        error: e
+      })
+    }
+
     if (token.type === 'display_mathML' || token.type === 'inline_mathML') {
       mathEquation = `<span class="math-error">${math}</span>`;
     } else {

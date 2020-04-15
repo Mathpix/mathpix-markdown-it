@@ -410,8 +410,8 @@ const mroot = () => {
       const firstChild = node.childNodes[0] ? node.childNodes[0] : null;
       const secondChild = node.childNodes[1] ? node.childNodes[1] : null;
       mml += 'root';
-      mml += firstChild ? '(' + serialize.visitNode(firstChild, '') + ')' : '';
       mml += secondChild ? '(' + serialize.visitNode(secondChild, '') + ')' : '';
+      mml += firstChild ? '(' + serialize.visitNode(firstChild, '') + ')' : '';
       return mml;
     } catch (e) {
       console.error('mml => mroot =>', e);
