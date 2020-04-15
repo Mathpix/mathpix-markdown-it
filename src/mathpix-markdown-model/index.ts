@@ -58,7 +58,8 @@ export type TOutputMath = {
   tsv_separators?: {
     column?: string,
     row?: string,
-  }
+  },
+  not_catch_errors?: boolean
 }
 
 export type TOutputMathJax = {
