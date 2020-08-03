@@ -1,7 +1,7 @@
-import * as CSS from 'csstype';
+import { Property } from 'csstype';
 export interface optionsMathpixMarkdown {
-    alignMathBlock?: CSS.TextAlignProperty;
-    display?: CSS.DisplayProperty;
+    alignMathBlock?: Property.TextAlign;
+    display?: Property.Display;
     isCheckFormula?: boolean;
     showTimeLog?: boolean;
     isDisableFancy?: boolean;

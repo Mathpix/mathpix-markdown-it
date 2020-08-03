@@ -5,11 +5,11 @@ import { tabularStyles } from "../mathjax/styles-tabular";
 import { fontsStyles } from "../mathjax/styles-fonts";
 import { listsStyles } from "../mathjax/styles-lists";
 import {MathJax} from '../mathjax';
-import * as CSS from 'csstype'; // at top of file
+import { Property } from 'csstype'; // at top of file
 
 export interface optionsMathpixMarkdown {
-    alignMathBlock?: CSS.TextAlignProperty;
-    display?: CSS.DisplayProperty;
+    alignMathBlock?: Property.TextAlign;
+    display?: Property.Display;
     isCheckFormula?: boolean;
     showTimeLog?: boolean;
     isDisableFancy?: boolean;

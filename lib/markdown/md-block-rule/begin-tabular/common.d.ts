@@ -3,7 +3,7 @@ export declare type TParselines = {
     cSpaces: Array<Array<string>>;
 };
 export declare const getContent: (content: string, onlyOne?: boolean) => string;
-export declare const getColumnLines: (str: string, numCol?: number) => string[];
+export declare const getColumnLines: (str: string, numCol?: number) => Array<string>;
 export declare const getColumnAlign: (align: string) => string[] | [];
 export declare type TAlignData = {
     cAlign: Array<string>;
@@ -19,6 +19,6 @@ export declare type TDecimal = {
     l: number;
     r: number;
 };
-export declare const getDecimal: (cAlign: string[], cellsAll: string[]) => TDecimal[];
+export declare const getDecimal: (cAlign: Array<string>, cellsAll: Array<string>) => Array<TDecimal>;
 export declare const getCellsAll: (rows: string[]) => string[];
 export declare const getRowLines: (rows: string[], numCol: number) => TParselines;

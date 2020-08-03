@@ -26,7 +26,7 @@ export declare type TMulti = {
     content?: string;
     subTable?: Array<TTokenTabular>;
 };
-export declare const parseInlineTabular: (str: string) => TTypeContentList;
+export declare const parseInlineTabular: (str: string) => TTypeContentList | null;
 export declare const inlineDecimalParse: (tok: TTokenTabular) => TTokenTabular;
 export declare const StatePushTabulars: (state: any, cTabular: TTypeContentList, align: string) => void;
 export declare const StatePushDiv: (state: any, startLine: number, nextLine: number, content: string) => void;
