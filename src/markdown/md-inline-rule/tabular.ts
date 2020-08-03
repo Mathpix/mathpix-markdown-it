@@ -12,7 +12,6 @@ export const inlineTabular = (state, silent) => {
   if (!match) {
     return false;
   }
-  startMathPos += match[0].length;
   const endMarker= '\\end{tabular}';
   const endMarkerPos = state.src.lastIndexOf(endMarker);
   if (endMarkerPos === -1) {
