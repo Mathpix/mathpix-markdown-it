@@ -8,7 +8,7 @@ export const inlineTabular = (state, silent) => {
   }
   const match = state.src
     .slice(++startMathPos)
-    .match(/^(?:|begin\s{0,}{tabular})/);
+    .match(/^(?:begin\s{0,}{tabular})/);
   if (!match) {
     return false;
   }
