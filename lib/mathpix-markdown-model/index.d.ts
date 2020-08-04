@@ -1,7 +1,7 @@
-import * as CSS from 'csstype';
+import { Property } from 'csstype';
 export interface optionsMathpixMarkdown {
-    alignMathBlock?: CSS.TextAlignProperty;
-    display?: CSS.DisplayProperty;
+    alignMathBlock?: Property.TextAlign;
+    display?: Property.Display;
     isCheckFormula?: boolean;
     showTimeLog?: boolean;
     isDisableFancy?: boolean;
@@ -64,7 +64,7 @@ declare class MathpixMarkdown_Model {
     texReset: (n?: number) => void;
     getLastEquationNumber: () => any;
     parseMarkdownByHTML: (html: string, include_sub_math?: boolean) => any[];
-    parseMarkdownByElement: (el: Document | HTMLElement, include_sub_math?: boolean) => any[];
+    parseMarkdownByElement: (el: HTMLElement | Document, include_sub_math?: boolean) => any[];
     markdownToHTML: (markdown: string, options?: TMarkdownItOptions) => string;
     showTocInContainer: (html: string, containerName?: string) => void;
     getTocContainerHTML: (html: string) => string;

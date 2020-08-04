@@ -8,11 +8,10 @@ export const inlineTabular = (state, silent) => {
   }
   const match = state.src
     .slice(++startMathPos)
-    .match(/^(?:|begin\s{0,}{tabular})/);
+    .match(/^(?:begin\s{0,}{tabular})/);
   if (!match) {
     return false;
   }
-  startMathPos += match[0].length;
   const endMarker= '\\end{tabular}';
   const endMarkerPos = state.src.lastIndexOf(endMarker);
   if (endMarkerPos === -1) {
