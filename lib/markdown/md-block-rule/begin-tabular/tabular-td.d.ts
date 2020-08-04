@@ -11,12 +11,12 @@ declare type TAligns = {
     v?: string;
     w?: string;
 };
-export declare const setColumnLines: (aligns: TAligns, lines: TLines) => string[];
-export declare const addStyle: (attrs: any[], style: string) => TAttrs[];
-export declare const addHLineIntoStyle: (attrs: any[], line?: string, pos?: string) => TAttrs[];
-export declare const AddTd: (content: string, aligns: TAligns, lines: TLines, space: string, decimal?: TDecimal) => {
-    res: TTokenTabular[];
+export declare const setColumnLines: (aligns: TAligns | null, lines: TLines) => string[];
+export declare const addStyle: (attrs: any[], style: string) => Array<TAttrs>;
+export declare const addHLineIntoStyle: (attrs: any[], line?: string, pos?: string) => Array<TAttrs>;
+export declare const AddTd: (content: string, aligns: TAligns | null, lines: TLines, space: string, decimal?: TDecimal | null) => {
+    res: Array<TTokenTabular>;
     content: string;
 };
-export declare const AddTdSubTable: (subTable: TTokenTabular[], aligns: TAligns, lines: TLines) => TTokenTabular[];
+export declare const AddTdSubTable: (subTable: Array<TTokenTabular>, aligns: TAligns, lines: TLines) => Array<TTokenTabular>;
 export {};
