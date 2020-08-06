@@ -236,6 +236,7 @@ class MathpixMarkdown_Model {
               domNode[2].value = 'toc-link selected';
               const anchor: HTMLElement = document.getElementById(domNode.href.nodeValue.slice(1));
               if (!anchor) { return };
+              window.location.hash = anchor.id;
               offsetTarget = anchor.getBoundingClientRect().top + preview.scrollTop - 48;
               this.scrollPage(preview, offsetTarget);
             }
@@ -331,7 +332,17 @@ class MathpixMarkdown_Model {
           overflowY='unset', breaks = true, typographer = true, linkify = true, xhtmlOut = false,
           outMath = {}, mathJax = {}
         } = options || {};
+
         const disableRules = isDisableFancy ? this.disableFancyArrayDef : options ? options.disableRules || [] : [];
+        if (showToc) {
+          const index = disableRules.indexOf('toc');
+          if (disableRules.indexOf('toc') === -1) {
+            disableRules.splice(index, 1);
+          }
+        } else {
+          disableRules.push('toc');
+        }
+
         const markdownItOptions: TMarkdownItOptions = {
           isDisableFancy: isDisableFancy,
           disableRules: disableRules,
@@ -344,9 +355,7 @@ class MathpixMarkdown_Model {
           outMath: outMath,
           mathJax: mathJax
         };
-        if (!showToc) {
-          disableRules.push('toc');
-        }
+
         const styleFontSize = fontSize ? ` font-size: ${options.fontSize}px;` : '';
         const stylePadding = padding ? ` padding-left: ${options.padding}px; padding-right: ${options.padding}px;` : '';
         this.setOptions(disableRules, isCheckFormula, showTimeLog);
