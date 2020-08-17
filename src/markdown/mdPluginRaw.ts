@@ -617,8 +617,8 @@ function paragraphDiv(state, startLine/*, endLine*/) {
  // resetCounter();
   let isMathOpen = false;
   let openedAuthorBlock = false;
-  const pickStartTag: RegExp = /\\begin{(abstract|equation|equation|center|left|right|table|figure|tabular\*)}|\\\[/;
-  const pickEndTag: RegExp = /\\end{(abstract|equation|equation|center|left|right|table|figure|tabular\*)}|\\\]/;
+  const pickStartTag: RegExp = /\\begin{(abstract|equation|equation\*|center|left|right|table|figure|tabular)}|\\\[/;
+  const pickEndTag: RegExp = /\\end{(abstract|equation|equation\*|center|left|right|table|figure|tabular)}|\\\]/;
   const pickTag: RegExp = /^\\(?:title|section|subsection)/;
   const listStartTag: RegExp = /\\begin{(enumerate|itemize)}/;
 
