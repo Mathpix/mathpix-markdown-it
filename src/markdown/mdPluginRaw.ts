@@ -1,6 +1,10 @@
 import { MathJax } from "../mathjax/";
 import { inlineTabular } from "./md-inline-rule/tabular";
 import { renderTabularInline } from './md-renderer-rules/render-tabular';
+import { //isNotBackticked,
+  includesSimpleMathTag,
+  includesMultiMathTag,
+  includesMultiMathBeginTag } from './utils';
 
 let mathNumber = [];
 
@@ -647,7 +651,7 @@ function paragraphDiv(state, startLine/*, endLine*/) {
     return true;
   }
 
-  if(lineText.includes('$$')) {
+  if (includesSimpleMathTag(lineText)) {
     isMathOpen = true;
   }
 
@@ -656,20 +660,16 @@ function paragraphDiv(state, startLine/*, endLine*/) {
   let mathEndTag: RegExp | null = null;
   // jump line-by-line until empty one or EOF
   for (; nextLine < endLine; nextLine++) {
-    if (!isMathOpen && !isMath && mathStartTag.test(lineText) && !pickStartTag.test(lineText)) {
-      const match = lineText.match(mathStartTag);
-      isMath = true;
-      mathEndTag = null;
-      if (match[0] === "\\[" || match[0] === "\[") {
-        mathEndTag = /\\\]/;
-      } else if (match[0] === "\\(" || match[0] === "\(") {
-        mathEndTag = /\\\)/;
-      } else if (match[1]) {
-        mathEndTag = new RegExp(`\end{${match[1]}}`);
-      }
+    if (!isMathOpen && !isMath && mathStartTag.test(lineText) //&& !pickStartTag.test(lineText)
+    ) {
+      mathEndTag = includesMultiMathBeginTag(lineText, mathStartTag);
+      isMath = Boolean(mathEndTag);
     }
-    if (isMath && mathEndTag && mathEndTag.test(lineText) && !pickEndTag.test(lineText)) {
-      isMath = false
+    if (isMath && mathEndTag && mathEndTag.test(lineText) //&& !pickEndTag.test(lineText)
+    ) {
+      if (includesMultiMathTag(lineText, mathEndTag)) {
+        isMath = false
+      }
     }
 
     const prewPos = state.bMarks[nextLine - 1] + state.tShift[nextLine - 1];
@@ -693,10 +693,8 @@ function paragraphDiv(state, startLine/*, endLine*/) {
       listOpen = true;
     }
 
-    if(lineText.includes('$$') && isMathOpen) {
-      isMathOpen = false;
-    } else if(lineText.includes('$$') && !isMathOpen) {
-      isMathOpen = true;
+    if (includesSimpleMathTag(lineText)) {
+      isMathOpen = !isMathOpen
     }
 
     if (mml) {
@@ -715,7 +713,7 @@ function paragraphDiv(state, startLine/*, endLine*/) {
         break;
       }
 
-      if (lineText.includes('$$') && isMathOpen || prewLineText.includes('$$') && !isMathOpen) {
+      if (includesSimpleMathTag(lineText) && isMathOpen || includesSimpleMathTag(prewLineText) && !isMathOpen) {
         break;
       }
     }
@@ -729,7 +727,7 @@ function paragraphDiv(state, startLine/*, endLine*/) {
     // quirk for blockquotes, this line should already be checked by that rule
     if (state.sCount[nextLine] < 0) { continue; }
 
-    if (!isMath) {
+    if (!isMath && !isMathOpen) {
       // Some tags can terminate paragraph without empty line.
       terminate = false;
       for (i = 0, l = terminatorRules.length; i < l; i++) {
