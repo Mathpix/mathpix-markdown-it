@@ -617,8 +617,14 @@ function paragraphDiv(state, startLine/*, endLine*/) {
  // resetCounter();
   let isMathOpen = false;
   let openedAuthorBlock = false;
-  const pickStartTag: RegExp = /\\begin{(abstract|equation|equation\*|center|left|right|table|figure|tabular)}|\\\[/;
-  const pickEndTag: RegExp = /\\end{(abstract|equation|equation\*|center|left|right|table|figure|tabular)}|\\\]/;
+  // const pickStartTag: RegExp = /\\begin{(abstract|equation|equation\*|center|left|right|table|figure|tabular)}|\\\[/;
+  // const pickEndTag: RegExp = /\\end{(abstract|equation|equation\*|center|left|right|table|figure|tabular)}|\\\]/;
+  const pickStartTag: RegExp = /\\begin{(abstract|center|left|right|table|figure|tabular)}/;
+  const pickEndTag: RegExp = /\\end{(abstract|center|left|right|table|figure|tabular)}/;
+  const pickMathStartTag: RegExp = /\\begin{(equation|equation\*)}|\\\[/;
+  const pickMathEndTag: RegExp = /\\end{(equation|equation\*)}|\\\]/;
+  const mathStartTag: RegExp = /\\begin{([^}]*)}|\\\[|\\\(/;
+
   const pickTag: RegExp = /^\\(?:title|section|subsection)/;
   const listStartTag: RegExp = /\\begin{(enumerate|itemize)}/;
 
@@ -646,8 +652,26 @@ function paragraphDiv(state, startLine/*, endLine*/) {
   }
 
   let listOpen = false;
+  let isMath = false;
+  let mathEndTag: RegExp | null = null;
   // jump line-by-line until empty one or EOF
   for (; nextLine < endLine; nextLine++) {
+    if (!isMathOpen && !isMath && mathStartTag.test(lineText) && !pickStartTag.test(lineText)) {
+      const match = lineText.match(mathStartTag);
+      isMath = true;
+      mathEndTag = null;
+      if (match[0] === "\\[" || match[0] === "\[") {
+        mathEndTag = /\\\]/;
+      } else if (match[0] === "\\(" || match[0] === "\(") {
+        mathEndTag = /\\\)/;
+      } else if (match[1]) {
+        mathEndTag = new RegExp(`\end{${match[1]}}`);
+      }
+    }
+    if (isMath && mathEndTag && mathEndTag.test(lineText) && !pickEndTag.test(lineText)) {
+      isMath = false
+    }
+
     const prewPos = state.bMarks[nextLine - 1] + state.tShift[nextLine - 1];
     const prewMax = state.eMarks[nextLine - 1];
     let prewLineText = state.src.slice(prewPos, prewMax);
@@ -681,7 +705,9 @@ function paragraphDiv(state, startLine/*, endLine*/) {
       if (pickTag.test(prewLineText) || pickTag.test(lineText)) {
         break;
       }
-      if (state.isEmpty(nextLine)||pickStartTag.test(lineText) || pickEndTag.test(prewLineText)) {
+      if (state.isEmpty(nextLine)
+        || pickStartTag.test(lineText) || pickEndTag.test(prewLineText)
+        || (!isMath && (pickMathStartTag.test(lineText) || pickMathEndTag.test(prewLineText)))) {
         break;
       }
 
@@ -703,15 +729,17 @@ function paragraphDiv(state, startLine/*, endLine*/) {
     // quirk for blockquotes, this line should already be checked by that rule
     if (state.sCount[nextLine] < 0) { continue; }
 
-    // Some tags can terminate paragraph without empty line.
-    terminate = false;
-    for (i = 0, l = terminatorRules.length; i < l; i++) {
-      if (terminatorRules[i](state, nextLine, endLine, true)) {
-        terminate = true;
-        break;
+    if (!isMath) {
+      // Some tags can terminate paragraph without empty line.
+      terminate = false;
+      for (i = 0, l = terminatorRules.length; i < l; i++) {
+        if (terminatorRules[i](state, nextLine, endLine, true)) {
+          terminate = true;
+          break;
+        }
       }
+      if (terminate) { break; }
     }
-    if (terminate) { break; }
   }
   content = state.getLines(startLine, nextLine, state.blkIndent, false).trim();
 
