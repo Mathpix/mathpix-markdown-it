@@ -1,6 +1,10 @@
 import { MathJax } from "../mathjax/";
 import { inlineTabular } from "./md-inline-rule/tabular";
 import { renderTabularInline } from './md-renderer-rules/render-tabular';
+import { //isNotBackticked,
+  includesSimpleMathTag,
+  includesMultiMathTag,
+  includesMultiMathBeginTag } from './utils';
 
 let mathNumber = [];
 
@@ -617,8 +621,14 @@ function paragraphDiv(state, startLine/*, endLine*/) {
  // resetCounter();
   let isMathOpen = false;
   let openedAuthorBlock = false;
-  const pickStartTag: RegExp = /\\begin{(abstract|equation|equation\*|center|left|right|table|figure|tabular)}|\\\[/;
-  const pickEndTag: RegExp = /\\end{(abstract|equation|equation\*|center|left|right|table|figure|tabular)}|\\\]/;
+  // const pickStartTag: RegExp = /\\begin{(abstract|equation|equation\*|center|left|right|table|figure|tabular)}|\\\[/;
+  // const pickEndTag: RegExp = /\\end{(abstract|equation|equation\*|center|left|right|table|figure|tabular)}|\\\]/;
+  const pickStartTag: RegExp = /\\begin{(abstract|center|left|right|table|figure|tabular)}/;
+  const pickEndTag: RegExp = /\\end{(abstract|center|left|right|table|figure|tabular)}/;
+  const pickMathStartTag: RegExp = /\\begin{(equation|equation\*)}|\\\[/;
+  const pickMathEndTag: RegExp = /\\end{(equation|equation\*)}|\\\]/;
+  const mathStartTag: RegExp = /\\begin{([^}]*)}|\\\[|\\\(/;
+
   const pickTag: RegExp = /^\\(?:title|section|subsection)/;
   const listStartTag: RegExp = /\\begin{(enumerate|itemize)}/;
 
@@ -641,13 +651,27 @@ function paragraphDiv(state, startLine/*, endLine*/) {
     return true;
   }
 
-  if(lineText.includes('$$')) {
+  if (includesSimpleMathTag(lineText)) {
     isMathOpen = true;
   }
 
   let listOpen = false;
+  let isMath = false;
+  let mathEndTag: RegExp | null = null;
   // jump line-by-line until empty one or EOF
   for (; nextLine < endLine; nextLine++) {
+    if (!isMathOpen && !isMath && mathStartTag.test(lineText) //&& !pickStartTag.test(lineText)
+    ) {
+      mathEndTag = includesMultiMathBeginTag(lineText, mathStartTag);
+      isMath = Boolean(mathEndTag);
+    }
+    if (isMath && mathEndTag && mathEndTag.test(lineText) //&& !pickEndTag.test(lineText)
+    ) {
+      if (includesMultiMathTag(lineText, mathEndTag)) {
+        isMath = false
+      }
+    }
+
     const prewPos = state.bMarks[nextLine - 1] + state.tShift[nextLine - 1];
     const prewMax = state.eMarks[nextLine - 1];
     let prewLineText = state.src.slice(prewPos, prewMax);
@@ -669,10 +693,8 @@ function paragraphDiv(state, startLine/*, endLine*/) {
       listOpen = true;
     }
 
-    if(lineText.includes('$$') && isMathOpen) {
-      isMathOpen = false;
-    } else if(lineText.includes('$$') && !isMathOpen) {
-      isMathOpen = true;
+    if (includesSimpleMathTag(lineText)) {
+      isMathOpen = !isMathOpen
     }
 
     if (mml) {
@@ -681,7 +703,9 @@ function paragraphDiv(state, startLine/*, endLine*/) {
       if (pickTag.test(prewLineText) || pickTag.test(lineText)) {
         break;
       }
-      if (state.isEmpty(nextLine)||pickStartTag.test(lineText) || pickEndTag.test(prewLineText)) {
+      if (state.isEmpty(nextLine)
+        || pickStartTag.test(lineText) || pickEndTag.test(prewLineText)
+        || (!isMath && (pickMathStartTag.test(lineText) || pickMathEndTag.test(prewLineText)))) {
         break;
       }
 
@@ -689,7 +713,7 @@ function paragraphDiv(state, startLine/*, endLine*/) {
         break;
       }
 
-      if (lineText.includes('$$') && isMathOpen || prewLineText.includes('$$') && !isMathOpen) {
+      if (includesSimpleMathTag(lineText) && isMathOpen || includesSimpleMathTag(prewLineText) && !isMathOpen) {
         break;
       }
     }
@@ -703,15 +727,17 @@ function paragraphDiv(state, startLine/*, endLine*/) {
     // quirk for blockquotes, this line should already be checked by that rule
     if (state.sCount[nextLine] < 0) { continue; }
 
-    // Some tags can terminate paragraph without empty line.
-    terminate = false;
-    for (i = 0, l = terminatorRules.length; i < l; i++) {
-      if (terminatorRules[i](state, nextLine, endLine, true)) {
-        terminate = true;
-        break;
+    if (!isMath && !isMathOpen) {
+      // Some tags can terminate paragraph without empty line.
+      terminate = false;
+      for (i = 0, l = terminatorRules.length; i < l; i++) {
+        if (terminatorRules[i](state, nextLine, endLine, true)) {
+          terminate = true;
+          break;
+        }
       }
+      if (terminate) { break; }
     }
-    if (terminate) { break; }
   }
   content = state.getLines(startLine, nextLine, state.blkIndent, false).trim();
 
