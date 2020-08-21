@@ -1,3 +1,5 @@
+import { sanitize } from './sanitize';
+
 export const PREVIEW_PARAGRAPH_PREFIX = "preview-paragraph-";
 export const PREVIEW_LINE_CLASS = "preview-line";
 
@@ -28,7 +30,16 @@ function injectLineNumbers(tokens, idx, options, env, slf) {
 }
 
 function html_block_injectLineNumbers(tokens, idx, options, env, slf) {
+  const { htmlSanitize = {} } = options;
   let line, endLine, listLine;
+
+  if (htmlSanitize !== false) {
+    if (tokens[idx] && tokens[idx].content) {
+      console.log('tokens[idx]', tokens[idx])
+      console.log('sanitize(tokens[idx].content, htmlSanitize)=>', sanitize(tokens[idx].content, htmlSanitize))
+      tokens[idx].content = sanitize(tokens[idx].content, htmlSanitize);
+    }
+  }
 
   if (tokens[idx].map && tokens[idx].level === 0) {
     line = tokens[idx].map[0];
@@ -49,6 +60,24 @@ function html_block_injectLineNumbers(tokens, idx, options, env, slf) {
   return  '<div' + slf.renderAttrs(token) + '>' +
     tokens[idx].content +
     '</div>\n';
+}
+
+function html_block_Sanitize (tokens, idx, options, env, slf) {
+  const { htmlSanitize = {} } = options;
+  if (!tokens[idx].content) {
+    return '';
+  }
+  return sanitize(tokens[idx].content, htmlSanitize);
+}
+
+function html_inline_Sanitize (tokens, idx, options) {
+  const { htmlSanitize = {} } = options;
+  if (!tokens[idx].content) {
+    return '';
+  }
+  return  htmlSanitize && Object.keys(htmlSanitize).length > 0
+    ? sanitize(tokens[idx].content, Object.assign({}, { skipCloseTag: true }, htmlSanitize))
+    : sanitize(tokens[idx].content, { skipCloseTag: true });
 }
 
 function code_block_injectLineNumbers(tokens, idx, options, env, slf) {
@@ -84,9 +113,27 @@ export function withLineNumbers(renderer) {
       = renderer.renderer.rules.blockquote_open
       = renderer.renderer.rules.dl_open
       = injectLineNumbers;
-    renderer.renderer.rules.html_block  = html_block_injectLineNumbers;
     renderer.renderer.rules.code_block
     //   = renderer.renderer.rules.fence
       = code_block_injectLineNumbers;
   return renderer;
 }
+
+export const injectRenderRules = (renderer) => {
+  const { lineNumbering = false, htmlSanitize = {}, html = false } = renderer.options;
+  if (lineNumbering) {
+    withLineNumbers(renderer);
+    if (html) {
+      renderer.renderer.rules.html_block = html_block_injectLineNumbers;
+      if (htmlSanitize !== false) {
+        renderer.renderer.rules.html_inline  = html_inline_Sanitize;
+      }
+    }
+  } else {
+    if (html && htmlSanitize !== false) {
+      renderer.renderer.rules.html_block = html_block_Sanitize;
+      renderer.renderer.rules.html_inline  = html_inline_Sanitize;
+    }
+  }
+  return renderer;
+};

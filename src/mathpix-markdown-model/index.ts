@@ -26,6 +26,7 @@ export interface optionsMathpixMarkdown {
     overflowY?: string; //default 'unset'
     outMath?: TOutputMath;
     mathJax?: TOutputMathJax;
+    htmlSanitize?: THtmlSanitize;
 }
 
 export type TMarkdownItOptions = {
@@ -45,7 +46,8 @@ export type TMarkdownItOptions = {
     preview?: any
   },
   outMath?: TOutputMath,
-  mathJax?: TOutputMathJax
+  mathJax?: TOutputMathJax,
+  htmlSanitize?: THtmlSanitize;
 }
 
 export type TOutputMath = {
@@ -65,6 +67,10 @@ export type TOutputMath = {
 export type TOutputMathJax = {
   mtextInheritFont?: boolean,
 }
+
+export type THtmlSanitize = {
+  disallowedTagsMode?: 'recursiveEscape'
+} | false;
 
 const formatSourceHtml = (text: string, notTrim: boolean = false) => {
   text = notTrim ? text : text.trim();
@@ -330,8 +336,8 @@ class MathpixMarkdown_Model {
         const { alignMathBlock='center', display='block', isCheckFormula=false, showTimeLog=false,
           isDisableFancy=false, fontSize=null, padding=null, htmlTags=false, width=0, showToc = false,
           overflowY='unset', breaks = true, typographer = true, linkify = true, xhtmlOut = false,
-          outMath = {}, mathJax = {}
-        } = options || {};
+          outMath = {}, mathJax = {}, htmlSanitize = {}}
+         = options || {};
 
         const disableRules = isDisableFancy ? this.disableFancyArrayDef : options ? options.disableRules || [] : [];
         if (showToc) {
@@ -353,7 +359,8 @@ class MathpixMarkdown_Model {
           linkify: linkify,
           width: width,
           outMath: outMath,
-          mathJax: mathJax
+          mathJax: mathJax,
+          htmlSanitize: htmlSanitize
         };
 
         const styleFontSize = fontSize ? ` font-size: ${options.fontSize}px;` : '';

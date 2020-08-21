@@ -18,6 +18,7 @@ export interface optionsMathpixMarkdown {
     overflowY?: string;
     outMath?: TOutputMath;
     mathJax?: TOutputMathJax;
+    htmlSanitize?: THtmlSanitize;
 }
 export declare type TMarkdownItOptions = {
     isDisableFancy?: boolean;
@@ -37,6 +38,7 @@ export declare type TMarkdownItOptions = {
     };
     outMath?: TOutputMath;
     mathJax?: TOutputMathJax;
+    htmlSanitize?: THtmlSanitize;
 };
 export declare type TOutputMath = {
     include_mathml?: boolean;
@@ -54,6 +56,9 @@ export declare type TOutputMath = {
 export declare type TOutputMathJax = {
     mtextInheritFont?: boolean;
 };
+export declare type THtmlSanitize = {
+    disallowedTagsMode?: 'recursiveEscape';
+} | false;
 declare class MathpixMarkdown_Model {
     disableFancyArrayDef: string[];
     disableRules: string[];
