@@ -69,7 +69,7 @@ export type TOutputMathJax = {
 }
 
 export type THtmlSanitize = {
-  disallowedTagsMode?: 'recursiveEscape'
+  disallowedTagsMode?: string
 } | false;
 
 const formatSourceHtml = (text: string, notTrim: boolean = false) => {

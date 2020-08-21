@@ -57,7 +57,7 @@ export declare type TOutputMathJax = {
     mtextInheritFont?: boolean;
 };
 export declare type THtmlSanitize = {
-    disallowedTagsMode?: 'recursiveEscape';
+    disallowedTagsMode?: string;
 } | false;
 declare class MathpixMarkdown_Model {
     disableFancyArrayDef: string[];
