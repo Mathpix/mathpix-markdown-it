@@ -23,21 +23,6 @@ describe('Check SanitizeHtml for markdownToHTML. [disallowedTagsMode = recursive
   tests.forEach(function(test) {
     const sanitizeHtml = MM.markdownToHTML(test.html, options);
 
-    describe('Should be sanitize Html [disallowedTagsMode = recursiveEscape] => ' + test.html, () => {
-      it('Checking result html', (done) => {
-        sanitizeHtml.trim().should.equal(test.sanitize);
-        done();
-      });
-    });
-  });
-
-  options.htmlTags = true;
-  options.htmlSanitize = {
-    disallowedTagsMode: 'discard'
-  };
-  tests.forEach(function(test) {
-    const sanitizeHtml = MM.markdownToHTML(test.html, options);
-
     describe('Should be sanitize Html [disallowedTagsMode = discard] => ' + test.html, () => {
       it('Checking result html', (done) => {
         sanitizeHtml.trim().should.equal(test.discard);
@@ -46,6 +31,21 @@ describe('Check SanitizeHtml for markdownToHTML. [disallowedTagsMode = recursive
     });
   });
 
+  options.htmlTags = true;
+  options.htmlSanitize = {
+    disallowedTagsMode: 'recursiveEscape'
+  };
+
+  tests.forEach(function(test) {
+    const sanitizeHtml = MM.markdownToHTML(test.html, options);
+
+    describe('Should be sanitize Html [disallowedTagsMode = recursiveEscape] => ' + test.html, () => {
+      it('Checking result html', (done) => {
+        sanitizeHtml.trim().should.equal(test.sanitize);
+        done();
+      });
+    });
+  });
 
   options.htmlTags = true;
   options.htmlSanitize = false;
