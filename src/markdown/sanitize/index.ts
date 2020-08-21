@@ -58,7 +58,6 @@ const getSanitizerConfig = (options = {}) => {
     allowedTags: sanitizeHtml.defaults.allowedTags.concat(allowedTags),
     allowedClasses: allowedClasses,
     allowedAttributes: allowedAttributes,
-    disallowedTagsMode: 'recursiveEscape',
 
     exclusiveFilter: function (frame) {
       // Allow YouTube iframes
