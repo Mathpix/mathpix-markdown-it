@@ -5,13 +5,14 @@ import { ConfiguredMathJaxPlugin, CustomTagPlugin, HighlightPlugin,
     tableTabularPlugin,
     listsPlugin
 } from "./mdPluginConfigured";
-import { withLineNumbers } from "./rules";
+import { injectRenderRules } from "./rules";
 import {MathpixMarkdownModel as MM, TMarkdownItOptions} from '../mathpix-markdown-model'
 
 /** md renderer */
 const mdInit = (options: TMarkdownItOptions) => {
   const {htmlTags = false, xhtmlOut = false, width = 1200, breaks = true, typographer = true, linkify = true,
-          outMath = {}, mathJax = {}, renderElement = {}} = options;
+          outMath = {}, mathJax = {}, renderElement = {},
+          lineNumbering = false, htmlSanitize = true} = options;
   return require("markdown-it")({
     html: htmlTags,
     xhtmlOut: xhtmlOut,
@@ -19,7 +20,9 @@ const mdInit = (options: TMarkdownItOptions) => {
     langPrefix: "language-",
     linkify: linkify,
     typographer: typographer,
-    quotes: "“”‘’"
+    quotes: "“”‘’",
+    lineNumbering: lineNumbering,
+    htmlSanitize: htmlSanitize
   })
     .use(tableTabularPlugin, {width: width, outMath: outMath})
     .use(listsPlugin, {width: width, outMath: outMath, renderElement: renderElement})
@@ -44,12 +47,11 @@ const mdInit = (options: TMarkdownItOptions) => {
 /** String transformtion pipeline */
 // @ts-ignore
 export const markdownToHtmlPipeline = (content: string, options: TMarkdownItOptions = {}) => {
-  const { lineNumbering = false } = options;
   let md = mdInit(options);
+
   // inject rules override
-  if(lineNumbering){
-      md = withLineNumbers(md);
-  }
+  md = injectRenderRules(md);
+
   if (MM.disableRules && MM.disableRules.length > 0) {
       md.disable(MM.disableRules);
   }
