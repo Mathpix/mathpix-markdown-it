@@ -35,8 +35,6 @@ function html_block_injectLineNumbers(tokens, idx, options, env, slf) {
 
   if (htmlSanitize !== false) {
     if (tokens[idx] && tokens[idx].content) {
-      console.log('tokens[idx]', tokens[idx])
-      console.log('sanitize(tokens[idx].content, htmlSanitize)=>', sanitize(tokens[idx].content, htmlSanitize))
       tokens[idx].content = sanitize(tokens[idx].content, htmlSanitize);
     }
   }
