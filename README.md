@@ -536,6 +536,8 @@ The `MathpixMarkdown` React element accepts the following props:
 | `lineNumbering`  | boolean;*`false`*            | Sets line numbers. Recommended for synchronization with a text editor.                                                 |
 | `outMath`        | [TOutputMath](https://github.com/Mathpix/mathpix-markdown-it#toutputmath);*`{}`*           | Sets options to output html                                                                                            |
 | `mathJax`        | [TOutputMathJax](https://github.com/Mathpix/mathpix-markdown-it#toutputmathjax);*`{}`*       | Sets options to output MathJax                                                                                         |
+| `htmlSanitize`   | [THtmlSanitize](https://github.com/Mathpix/mathpix-markdown-it#thtmlsanitize);*`{}`*         | Sets html output options (if `htmlTags=true`). Cleans up user html input.                                              | 
+|                  |                              | Removes script tags and stuff. Removes broken and malicious html. Set to `false` to disable                            |
 
 ### optionsMathpixMarkdown
 
