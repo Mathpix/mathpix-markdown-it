@@ -1,5 +1,4 @@
 const sanitizeHtml = require('sanitize-html');
-const url = require('url');
 
 import { allowedTags, allowedAttributes, allowedClasses } from './consts';
 
@@ -58,14 +57,6 @@ const getSanitizerConfig = (options = {}) => {
     allowedTags: sanitizeHtml.defaults.allowedTags.concat(allowedTags),
     allowedClasses: allowedClasses,
     allowedAttributes: allowedAttributes,
-
-    exclusiveFilter: function (frame) {
-      // Allow YouTube iframes
-      if (frame.tag !== 'iframe') return false;
-
-      const parsed = url.parse(frame.attribs.src || '');
-      return !['www.youtube.com', 'youtube.com', 'youtu.be'].includes(parsed.hostname)
-    },
     transformTags: {
        '*': prefixHTMLids,
        'a': getNofollowSanitize(options),

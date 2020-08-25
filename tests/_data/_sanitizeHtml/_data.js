@@ -354,50 +354,50 @@ module.exports = [
   {
     html:     '<iframe src="https://www.embed.vevo.com/USUV71704255"></iframe>',
     dirty:    `<iframe src="https://www.embed.vevo.com/USUV71704255"></iframe>`,
-    discard:  ``,
-    sanitize: ''
+    discard:  `<iframe src="https://www.embed.vevo.com/USUV71704255"></iframe>`,
+    sanitize: '<iframe src="https://www.embed.vevo.com/USUV71704255"></iframe>'
   },
   {
     html:     '<iframe src="https://www.foo.us02web.zoom.us/embed/c2IlcS7AHxM"></iframe>',
     dirty:    `<iframe src="https://www.foo.us02web.zoom.us/embed/c2IlcS7AHxM"></iframe>`,
-    discard: ``,
-    sanitize: ''
+    discard:  `<iframe src="https://www.foo.us02web.zoom.us/embed/c2IlcS7AHxM"></iframe>`,
+    sanitize: '<iframe src="https://www.foo.us02web.zoom.us/embed/c2IlcS7AHxM"></iframe>'
   },
   {
     html:     '<iframe src="https://zoom.us/embed/c2IlcS7AHxM"></iframe>',
     dirty:    `<iframe src="https://zoom.us/embed/c2IlcS7AHxM"></iframe>`,
-    discard:  ``,
-    sanitize: ''
+    discard:  `<iframe src="https://zoom.us/embed/c2IlcS7AHxM"></iframe>`,
+    sanitize: '<iframe src="https://zoom.us/embed/c2IlcS7AHxM"></iframe>'
   },
   {
     html:     '<iframe src="https://www.prefix.us02web.zoom.us/embed/c2IlcS7AHxM"></iframe>',
     dirty:    `<iframe src="https://www.prefix.us02web.zoom.us/embed/c2IlcS7AHxM"></iframe>`,
-    discard:  ``,
-    sanitize: ''
+    discard:  `<iframe src="https://www.prefix.us02web.zoom.us/embed/c2IlcS7AHxM"></iframe>`,
+    sanitize: '<iframe src="https://www.prefix.us02web.zoom.us/embed/c2IlcS7AHxM"></iframe>'
   },
   {
     html:     '<iframe src="/foo"></iframe>',
     dirty:    `<iframe src="/foo"></iframe>`,
-    discard:  ``,
-    sanitize: ''
+    discard:  `<iframe src="/foo"></iframe>`,
+    sanitize: '<iframe src="/foo"></iframe>'
   },
   {
     html:     '<iframe src="/foo"></iframe><iframe src="https://www.youtube.com/embed/c2IlcS7AHxM"></iframe>',
     dirty:    `<iframe src="/foo"></iframe><iframe src="https://www.youtube.com/embed/c2IlcS7AHxM"></iframe>`,
-    discard:  `<iframe src="https://www.youtube.com/embed/c2IlcS7AHxM"></iframe>`,
-    sanitize: '<iframe src="https://www.youtube.com/embed/c2IlcS7AHxM"></iframe>'
+    discard:  `<iframe src="/foo"></iframe><iframe src="https://www.youtube.com/embed/c2IlcS7AHxM"></iframe>`,
+    sanitize: '<iframe src="/foo"></iframe><iframe src="https://www.youtube.com/embed/c2IlcS7AHxM"></iframe>'
   },
   {
     html:     '<iframe src="//www.youtube.com/embed/c2IlcS7AHxM"></iframe>',
     dirty:    `<iframe src="//www.youtube.com/embed/c2IlcS7AHxM"></iframe>`,
-    discard:  ``,
-    sanitize: ''
+    discard:  `<iframe src="//www.youtube.com/embed/c2IlcS7AHxM"></iframe>`,
+    sanitize: '<iframe src="//www.youtube.com/embed/c2IlcS7AHxM"></iframe>'
   },
   {
     html:     '<iframe name=\"IFRAME\" allowfullscreen=\"true\" sandbox=\"allow-forms allow-modals allow-orientation-lock allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation allow-same-origin allow-scripts allow-top-navigation\"></iframe>',
     dirty:    `<iframe name="IFRAME" allowfullscreen="true" sandbox="allow-forms allow-modals allow-orientation-lock allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation allow-same-origin allow-scripts allow-top-navigation"></iframe>`,
-    discard:  ``,
-    sanitize: ''
+    discard:  `<iframe name="IFRAME" allowfullscreen="true"></iframe>`,
+    sanitize: '<iframe name="IFRAME" allowfullscreen="true"></iframe>'
   },
   {
     html:     '<q cite=\"http://www.google.com\">HTTP</q><q cite=\"https://www.google.com\">HTTPS</q><q cite=\"mailto://www.google.com\">MAILTO</q><q cite=\"tel://www.google.com\">TEL</q><q cite=\"ftp://www.google.com\">FTP</q><q cite=\"data://www.google.com\">DATA</q><q cite=\"ldap://www.google.com\">LDAP</q><q cite=\"acrobat://www.google.com\">ACROBAT</q><q cite=\"vbscript://www.google.com\">VBSCRIPT</q><q cite=\"file://www.google.com\">FILE</q><q cite=\"rlogin://www.google.com\">RLOGIN</q><q cite=\"webcal://www.google.com\">WEBCAL</q><q cite=\"javascript://www.google.com\">JAVASCRIPT</q><q cite=\"mms://www.google.com\">MMS</q>',

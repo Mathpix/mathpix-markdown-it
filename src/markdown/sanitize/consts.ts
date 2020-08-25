@@ -83,6 +83,8 @@ export const allowedAttributes =  {
   var:        []
 };
 
+export const allowedSchemes = ['http', 'https', 'mailto', 'github-windows', 'github-mac'];
+
 export const allowedClasses = {
   a: ['anchor'],
   div: [

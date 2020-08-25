@@ -71,6 +71,7 @@ export declare const allowedAttributes: {
     ul: string[];
     var: any[];
 };
+export declare const allowedSchemes: string[];
 export declare const allowedClasses: {
     a: string[];
     div: string[];
