@@ -54,7 +54,7 @@ export const allowedAttributes =  {
   nl:         [],
   ol:         ['type', 'reversed', 'start'],
   p:          ['align'],
-  path:       ['d'],
+  path:       ['d', 'fill', 'stroke'],
   pre:        [],
   q:          ['cite'],
   rp:         [],
