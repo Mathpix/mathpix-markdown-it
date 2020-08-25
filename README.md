@@ -555,6 +555,8 @@ The `MathpixMarkdown` React element accepts the following props:
 | `width`          | number;*`1200`*              | Sets text container width                                                                                              |
 | `outMath`        | [TOutputMath](https://github.com/Mathpix/mathpix-markdown-it#toutputmath);*`{}`*           | Sets options to output html                                                                                            |
 | `mathJax`        | [TOutputMathJax](https://github.com/Mathpix/mathpix-markdown-it#toutputmathjax);*`{}`*        | Sets options to output MathJax                                                                                         |
+| `htmlSanitize`   | [THtmlSanitize](https://github.com/Mathpix/mathpix-markdown-it#thtmlsanitize);*`{}`*         | Sets html output options (if `htmlTags=true`). Cleans up user html input.                                              | 
+|                  |                              | Removes script tags and stuff. Removes broken and malicious html. Set to `false` to disable                            |
 
 
 ### TOutputMath
@@ -576,6 +578,17 @@ The `MathpixMarkdown` React element accepts the following props:
 |                      | type&nbsp;*`default`*        |  description                                                                                                       |
 |----------------------|------------------------------|--------------------------------------------------------------------------------------------------------------------|
 | `mtextInheritFont`   | boolean&nbsp;*`false`*       | true to make mtext elements use surrounding font                                                                   |
+
+
+### THtmlSanitize
+
+|                      | type&nbsp;*`default`*        |  description                                                                                                       |
+|----------------------|------------------------------|--------------------------------------------------------------------------------------------------------------------|
+| `disallowedTagsMode` | discard&nbsp;*`false`*       | `discard` (the default) - disallowed tags are discarded.                                                           |
+|                      |                              | `escape` - the disallowed tags are escaped rather than discarded. Any text or subtags is handled normally.         |
+|                      |                              | `recursiveEscape` - the disallowed tags are escaped rather than discarded, and the same treatment is applied       |
+|                      |                              | to all subtags, whether otherwise allowed or not.                                                                  |
+
 
 # Development
 
