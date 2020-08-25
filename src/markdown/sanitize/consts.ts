@@ -44,7 +44,7 @@ export const allowedAttributes =  {
   h6:         ['align'],
   hr:         ['align', 'color', 'noshade', 'size', 'width'],
   i:          [],
-  iframe:     ['align', 'allowfullscreen', 'frameborder', 'height', 'name', 'src', 'width'],
+  iframe:     ['align', 'allowfullscreen', 'frameborder', 'height', 'src', 'width'],
   img:        ['align', 'alt', 'border', 'height', 'hspace', 'src', 'vspace', 'width'],
   input:      ['align', 'alt', 'checked', 'disabled', 'type', 'value'],
   ins:        ['cite', 'datetime'],
@@ -83,7 +83,7 @@ export const allowedAttributes =  {
   var:        []
 };
 
-export const allowedSchemes = ['http', 'https', 'mailto', 'github-windows', 'github-mac'];
+export const allowedSchemes = ['http', 'https', 'mailto', 'github-windows', 'github-mac', 'data'];
 
 export const allowedClasses = {
   a: ['anchor'],
