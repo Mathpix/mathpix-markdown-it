@@ -1,0 +1,232 @@
+import {SerializedMmlVisitor} from 'mathjax-full/js/core/MmlTree/SerializedMmlVisitor.js';
+import { MmlMover, MmlMunder } from "mathjax-full/js/core/MmlTree/MmlNodes/munderover.js";
+import { TextNode } from "mathjax-full/js/core/MmlTree/MmlNode.js";
+
+export class MathMLVisitorWord<N, T, D> extends SerializedMmlVisitor {
+  options = null;
+
+  constructor(options) {
+    super();
+    this.options = options;
+  }
+
+  public visitTextNode(node: TextNode, space: string) {
+    const { unicodeConvert = false} = this.options;
+    return this.quoteHTML(node.getText(), unicodeConvert);
+  }
+
+  public restructureMtrForAligned(node: any, space: string): string {
+    let [nl] = (node.isToken || node.childNodes.length === 0 ? ['\n', ''] : ['\n', space]);
+    let mml: string = '';
+    const attributes = node.Parent && node.Parent.attributes
+      ? node.Parent.attributes.getAllAttributes()
+      : {};
+    const {columnalign = ''} = attributes;
+    if (!columnalign) {
+      return mml;
+    }
+    if (columnalign.indexOf('center') >= 0 ) {
+      return mml;
+    }
+
+    let space2 = space  + '  ';
+    let space3 = space2 + '  ';
+    let space4 = space3 + '  ';
+    let space5 = space4 + '  ';
+
+    // [aligned, align*, align]: 'rlrlrlrlrlrl', - Align all in left side
+    if (columnalign === "right left right left right left right left right left right left") {
+      mml += space + '<mtr>';
+      if (node.childNodes.length > 1) {
+        mml += nl + space2 + '<mtd>';
+        mml += nl + space3 + '<mrow>';
+        for (let i = 0; i < node.childNodes.length; i++) {
+          mml += nl + space4 + '<mrow>';
+          mml += nl + space5 + '<maligngroup/>';
+          const child = this.childNodeMml(node.childNodes[i], space5, nl);
+          mml += child.trim()
+            ? nl + child
+            : nl;
+          mml += space4 +'</mrow>';
+        }
+        mml += nl + space3 +'</mrow>';
+        mml += nl + space2 + '</mtd>';
+      } else {
+        mml += nl + space2 + '<mtd>';
+        mml += nl + space3 +'<mrow>';
+        mml += nl + space5 + '<maligngroup/>';
+        mml += nl + this.childNodeMml(node.childNodes[0], space5, nl);
+        mml += space3 +'</mrow>';
+        mml += nl + space2 + '</mtd>';
+      }
+      mml += nl + space + '</mtr>';
+      return mml
+    }
+
+    if (node.childNodes.length === 1) {
+      mml = space + '<mtr>';
+      mml += nl + space2 + '<mtd>';
+      mml += nl + space3 +'<mrow>';
+      mml += nl + space5 + '<maligngroup/>';
+      mml += nl + space5 + '<malignmark/>';
+      mml += nl + this.childNodeMml(node.childNodes[0], space5, nl);
+      mml += space3 +'</mrow>';
+      mml += nl + space2 + '</mtd>';
+      mml += nl + space + '</mtr>';
+      return mml
+    };
+
+
+    mml = space + '<mtr>';
+    mml += nl + space2 + '<mtd>';
+    mml += nl + space3 + '<mrow>';
+    for (let i = 0; i < node.childNodes.length; i++) {
+      mml += nl + space4 + '<maligngroup/>';
+      mml += nl + space4 + '<malignmark/>';
+      mml += nl + space4 + '<mrow>';
+      const child = this.childNodeMml(node.childNodes[i], space4, nl);
+      mml += child.trim()
+        ? nl + child
+        : nl;
+
+
+      if (i < node.childNodes.length - 1) {
+        mml += space4 + '<mo>&#xA0;&#xA0;</mo>';
+      }
+      mml += space4 +'</mrow>';
+    }
+    mml += nl + space3 +'</mrow>';
+    mml += nl + space2 + '</mtd>';
+
+    mml += nl + space + '</mtr>';
+    return mml;
+  };
+
+  public visitDefault(node: any, space: string) {
+    if (node.needRow) {
+      return this.pasteNodeToNewRow(node, space);
+    }
+    if (node.kind === 'msubsup') {
+      return this.visitMunderoverNode(node, space);
+    }
+
+    if (node.kind === 'mtr' && this.options.aligned
+      && node.Parent && node.Parent.kind === 'mtable') {
+      const mml = this.restructureMtrForAligned(node, space);
+      if (mml) {
+        return mml;
+      }
+    }
+
+    if (this.needConvertToFenced(node)) {
+      return this.convertToFenced(node, space)
+    }
+
+    return super.visitDefault(node,  space)
+  }
+
+  public needToAddRow = (node) => {
+    if (node.parent && node.parent.childNodes.length > 0) {
+      const index = node.parent.childNodes.findIndex(item => item === node);
+      if (index < node.parent.childNodes.length) {
+        let next = node.parent.childNodes[index+1];
+        if (next && next.kind  //&& next.kind !== 'mrow'
+        ) {
+          next.needRow = true;
+        }
+      }
+    }
+  };
+
+  public visitMunderoverNode(node: any, space: string) {
+    if (node.kind === "munder" || node.kind === "mover") {
+      node.attributes.attributes.accent = true;
+      node.attributes.attributes.accentunder = false;
+    }
+
+    this.needToAddRow(node);
+
+    const base = node.childNodes[node.base];
+
+    if (base && base.kind !== 'TeXAtom'
+      && (base.kind !== 'mrow' || this.needConvertToFenced(base))) {
+      base.needRow = true;
+    }
+
+    return super.visitDefault(node, space);
+  }
+
+  protected visitMunderNode(node: MmlMunder, space: string) {
+    return this.visitMunderoverNode(node, space);
+  }
+
+  protected visitMoverNode(node: MmlMover, space: string) {
+    return this.visitMunderoverNode(node, space);
+  }
+
+  protected quoteHTML(value: string, replaceAll = false) {
+    let result: string = value
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/\"/g, '&quot;');
+
+    if (replaceAll) {
+      result = result
+      .replace(/([\uD800-\uDBFF].)/g, (m, c) => {
+        return '&#x' + ((c.charCodeAt(0) - 0xD800) * 0x400 +
+          (c.charCodeAt(1) - 0xDC00) + 0x10000).toString(16).toUpperCase() + ';';
+      })
+      .replace(/([\u0080-\uD7FF\uE000-\uFFFF])/g, (m, c) => {
+        return '&#x' + c.charCodeAt(0).toString(16).toUpperCase() + ';';
+      });
+    }
+    return result;
+  }
+
+  public needConvertToFenced = (node: any) => {
+    let kind = node.kind;
+    let properties = node.properties;
+    return  kind === "mrow" && properties && properties.texClass === 7;
+  };
+
+  public pasteNodeToNewRow = (node: any, space) => {
+    let [nl, endspace] = (node.isToken || node.childNodes.length === 0 ? ['\n', ''] : ['\n', space]);
+    node.needRow = false;
+    return space + '<mrow>' + endspace
+      + nl + this.visitNode(node, space + '  ') + endspace
+      + nl + space + '</mrow>'  + endspace;
+  };
+
+  public convertToFenced = (node: any, space) => {
+    let [nl, endspace] = (node.isToken || node.childNodes.length === 0 ? ['\n', ''] : ['\n', space]);
+    if (node.needRow) {
+      return this.pasteNodeToNewRow(node, space);
+    }
+    let kind = node.kind;
+    let properties = node.properties;
+    let mml = space + '<mfenced';
+    mml += properties.open ? ` open="${properties.open}"`:  ' open=""';
+    mml += properties.close ? ` close="${properties.close}"`:  ' close=""';
+    mml += ' separators="|"';
+    mml += '>';
+
+    mml += nl + space + '  ' + '<' + kind + '>';
+    for (let i = 0; i < node.childNodes.length; i++) {
+      if (i === 0 && node.childNodes[i].kind === 'mo' && node.childNodes[i].texClass === 4) {
+        continue
+      }
+      if (i === node.childNodes.length - 1 && node.childNodes[i].kind === 'mo' && node.childNodes[i].texClass === 5) {
+        continue
+      }
+      const children = this.visitNode(node.childNodes[i], space + '    ');
+      mml += nl + children + endspace
+    }
+
+    mml += nl + space + '  ' + '</' + kind + '>' + endspace;
+
+    mml += nl + space + '</mfenced>';
+    return mml
+  };
+
+}

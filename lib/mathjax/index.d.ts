@@ -11,6 +11,7 @@ export declare const MathJax: {
     Stylesheet: () => unknown;
     TexConvert: (string: any, options?: any) => {
         mathml?: string;
+        mathml_word?: string;
         asciimath?: string;
         latex?: string;
         svg?: string;
