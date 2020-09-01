@@ -52,6 +52,7 @@ export type TMarkdownItOptions = {
 
 export type TOutputMath = {
   include_mathml?: boolean,
+  include_mathml_word?: boolean,
   include_asciimath?: boolean,
   include_latex?: boolean,
   include_svg?: boolean,
@@ -79,6 +80,13 @@ const formatSourceHtml = (text: string, notTrim: boolean = false) => {
     .replace(/&nbsp;/g, ' ')
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>');
+};
+
+const formatSourceHtmlWord = (text: string, notTrim: boolean = false) => {
+  text = notTrim ? text : text.trim();
+  return text
+    .replace(/<maligngroup><\/maligngroup>/g, '<maligngroup/>')
+    .replace(/<malignmark><\/malignmark>/g, '<malignmark/>');
 };
 
 class MathpixMarkdown_Model {
@@ -117,7 +125,7 @@ class MathpixMarkdown_Model {
     for (let i = 0; i < math_el.length; i++) {
       for (let j = 0; j < math_el[i].children.length; j++) {
         const child = math_el[i].children[j];
-        if (["MATHML", "ASCIIMATH", "LATEX", "MJX-CONTAINER", "TABLE", "TSV"].indexOf(child.tagName) !== -1) {
+        if (["MATHML", "MATHMLWORD", "ASCIIMATH", "LATEX", "MJX-CONTAINER", "TABLE", "TSV"].indexOf(child.tagName) !== -1) {
           if (child.tagName==="MJX-CONTAINER" || child.tagName==="TABLE") {
             if (child.tagName === "TABLE") {
               res.push({type: "html", value: child.outerHTML});
@@ -129,7 +137,10 @@ class MathpixMarkdown_Model {
               type: child.tagName.toLowerCase(),
               value: child.tagName === 'LATEX' || child.tagName === 'ASCIIMATH' || child.tagName === 'TSV'
               ? formatSourceHtml(child.innerHTML, child.tagName === 'TSV')
-              : child.innerHTML});
+              : child.tagName === 'MATHMLWORD'
+                  ? formatSourceHtmlWord(child.innerHTML)
+                  : child.innerHTML
+            });
           }
         }
       }

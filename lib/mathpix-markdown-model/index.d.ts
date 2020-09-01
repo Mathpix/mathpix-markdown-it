@@ -42,6 +42,7 @@ export declare type TMarkdownItOptions = {
 };
 export declare type TOutputMath = {
     include_mathml?: boolean;
+    include_mathml_word?: boolean;
     include_asciimath?: boolean;
     include_latex?: boolean;
     include_svg?: boolean;

@@ -57,9 +57,16 @@ let docMathML = MJ.document(domNode, { InputJax: mml, OutputJax: svg });
 
 import { SerializedMmlVisitor as MmlVisitor } from 'mathjax-full/js/core/MmlTree/SerializedMmlVisitor.js';
 import { SerializedAsciiVisitor as AsciiVisitor } from './serialized-ascii';
+import { MathMLVisitorWord } from './mathml-word';
 
 const toMathML = (node => {
   const visitor = new MmlVisitor();
+  return visitor.visitTree(node)
+});
+
+//MmlWordVisitor
+const toMathMLWord = (node => {
+  const visitor = new MathMLVisitorWord({aligned: true});
   return visitor.visitTree(node)
 });
 
@@ -72,6 +79,7 @@ const toAsciiML = ((node, optionAscii) => {
 const OuterData = (node, math, outMath) => {
   const {
     include_mathml = false,
+    include_mathml_word = false,
     include_asciimath = false,
     include_latex = false,
     include_svg = true,
@@ -81,6 +89,7 @@ const OuterData = (node, math, outMath) => {
     }} = outMath;
   let res: {
     mathml?: string,
+    mathml_word?: string,
     asciimath?: string,
     latex?: string,
     svg?: string
@@ -88,6 +97,11 @@ const OuterData = (node, math, outMath) => {
   if (include_mathml) {
     res.mathml = toMathML(math.root);
   }
+
+  if (include_mathml_word) {
+    res.mathml_word = toMathMLWord(math.root);
+  }
+
   if (include_asciimath) {
     res.asciimath = toAsciiML(math.root, optionAscii);
   }
@@ -119,6 +133,7 @@ const formatSourceMML = (text: string) => {
 const OuterHTML = (data, outMath) => {
   const {
     include_mathml = false,
+    include_mathml_word = false,
     include_asciimath = false,
     include_latex = false,
     include_svg = true,
@@ -126,6 +141,9 @@ const OuterHTML = (data, outMath) => {
   let outHTML = '';
   if (include_mathml && data.mathml) {
     outHTML +=  '<mathml style="display: none">' + formatSourceMML(data.mathml) + '</mathml>';
+  }
+  if (include_mathml_word && data.mathml_word) {
+    outHTML +=  '<mathmlword style="display: none">' + data.mathml_word + '</mathmlword>';
   }
   if (include_asciimath && data.asciimath) {
     if (!outHTML) { outHTML += '\n'}
