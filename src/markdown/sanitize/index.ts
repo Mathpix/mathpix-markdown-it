@@ -1,6 +1,6 @@
 const sanitizeHtml = require('sanitize-html');
 
-import { allowedTags, allowedAttributes, allowedClasses } from './consts';
+import { allowedTags, allowedAttributes, allowedClasses, allowedSchemes } from './consts';
 
 export const sanitize = (html: string, options = {}) => {
   let config;
@@ -57,6 +57,7 @@ const getSanitizerConfig = (options = {}) => {
     allowedTags: sanitizeHtml.defaults.allowedTags.concat(allowedTags),
     allowedClasses: allowedClasses,
     allowedAttributes: allowedAttributes,
+    allowedSchemes: allowedSchemes,
     transformTags: {
        '*': prefixHTMLids,
        'a': getNofollowSanitize(options),

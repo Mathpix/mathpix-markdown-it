@@ -51,14 +51,8 @@ module.exports = [
   {
     html:     `<a href="http://google.com">google</a><a href="https://google.com">https google</a><a href="ftp://example.com">ftp</a><a href="mailto:test@test.com">mailto</a><a href="/relative.html">relative</a><a href="javascript:alert(0)">javascript</a>`,
     dirty:    `<div><a href="http://google.com">google</a><a href="https://google.com">https google</a><a href="ftp://example.com">ftp</a><a href="mailto:test@test.com">mailto</a><a href="/relative.html">relative</a><a href="javascript:alert(0)">javascript</a></div>`,
-    discard:  `<div><a href="http://google.com">google</a><a href="https://google.com">https google</a><a href="ftp://example.com">ftp</a><a href="mailto:test@test.com">mailto</a><a href="/relative.html">relative</a><a>javascript</a></div>`,
-    sanitize: '<div><a href="http://google.com">google</a><a href="https://google.com">https google</a><a href="ftp://example.com">ftp</a><a href="mailto:test@test.com">mailto</a><a href="/relative.html">relative</a><a>javascript</a></div>'
-  },
-  {
-    html:     `<A HREF="http://google.com">google</a><a href="HTTPS://google.com">https google</a><a href="ftp://example.com">ftp</a><a href="mailto:test@test.com">mailto</a><a href="/relative.html">relative</a><a href="javascript:alert(0)">javascript</a>`,
-    dirty:    `<div><A HREF="http://google.com">google</a><a href="HTTPS://google.com">https google</a><a href="ftp://example.com">ftp</a><a href="mailto:test@test.com">mailto</a><a href="/relative.html">relative</a><a href="javascript:alert(0)">javascript</a></div>`,
-    discard:  `<div><a href="http://google.com">google</a><a href="HTTPS://google.com">https google</a><a href="ftp://example.com">ftp</a><a href="mailto:test@test.com">mailto</a><a href="/relative.html">relative</a><a>javascript</a></div>`,
-    sanitize: '<div><a href="http://google.com">google</a><a href="HTTPS://google.com">https google</a><a href="ftp://example.com">ftp</a><a href="mailto:test@test.com">mailto</a><a href="/relative.html">relative</a><a>javascript</a></div>'
+    discard:  `<div><a href="http://google.com">google</a><a href="https://google.com">https google</a><a>ftp</a><a href="mailto:test@test.com">mailto</a><a href="/relative.html">relative</a><a>javascript</a></div>`,
+    sanitize: '<div><a href="http://google.com">google</a><a href="https://google.com">https google</a><a>ftp</a><a href="mailto:test@test.com">mailto</a><a href="/relative.html">relative</a><a>javascript</a></div>'
   },
   {
     html:     `<script>alert("ruhroh!");</script><p>Paragraph</p>`,
@@ -396,14 +390,14 @@ module.exports = [
   {
     html:     '<iframe name=\"IFRAME\" allowfullscreen=\"true\" sandbox=\"allow-forms allow-modals allow-orientation-lock allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation allow-same-origin allow-scripts allow-top-navigation\"></iframe>',
     dirty:    `<iframe name="IFRAME" allowfullscreen="true" sandbox="allow-forms allow-modals allow-orientation-lock allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation allow-same-origin allow-scripts allow-top-navigation"></iframe>`,
-    discard:  `<iframe name="IFRAME" allowfullscreen="true"></iframe>`,
-    sanitize: '<iframe name="IFRAME" allowfullscreen="true"></iframe>'
+    discard:  `<iframe allowfullscreen="true"></iframe>`,
+    sanitize: `<iframe allowfullscreen="true"></iframe>`
   },
   {
     html:     '<q cite=\"http://www.google.com\">HTTP</q><q cite=\"https://www.google.com\">HTTPS</q><q cite=\"mailto://www.google.com\">MAILTO</q><q cite=\"tel://www.google.com\">TEL</q><q cite=\"ftp://www.google.com\">FTP</q><q cite=\"data://www.google.com\">DATA</q><q cite=\"ldap://www.google.com\">LDAP</q><q cite=\"acrobat://www.google.com\">ACROBAT</q><q cite=\"vbscript://www.google.com\">VBSCRIPT</q><q cite=\"file://www.google.com\">FILE</q><q cite=\"rlogin://www.google.com\">RLOGIN</q><q cite=\"webcal://www.google.com\">WEBCAL</q><q cite=\"javascript://www.google.com\">JAVASCRIPT</q><q cite=\"mms://www.google.com\">MMS</q>',
     dirty:    `<div><q cite="http://www.google.com">HTTP</q><q cite="https://www.google.com">HTTPS</q><q cite="mailto://www.google.com">MAILTO</q><q cite="tel://www.google.com">TEL</q><q cite="ftp://www.google.com">FTP</q><q cite="data://www.google.com">DATA</q><q cite="ldap://www.google.com">LDAP</q><q cite="acrobat://www.google.com">ACROBAT</q><q cite="vbscript://www.google.com">VBSCRIPT</q><q cite="file://www.google.com">FILE</q><q cite="rlogin://www.google.com">RLOGIN</q><q cite="webcal://www.google.com">WEBCAL</q><q cite="javascript://www.google.com">JAVASCRIPT</q><q cite="mms://www.google.com">MMS</q></div>`,
-    discard:  `<div><q cite="http://www.google.com">HTTP</q><q cite="https://www.google.com">HTTPS</q><q cite="mailto://www.google.com">MAILTO</q><q>TEL</q><q cite="ftp://www.google.com">FTP</q><q>DATA</q><q>LDAP</q><q>ACROBAT</q><q>VBSCRIPT</q><q>FILE</q><q>RLOGIN</q><q>WEBCAL</q><q>JAVASCRIPT</q><q>MMS</q></div>`,
-    sanitize: '<div><q cite="http://www.google.com">HTTP</q><q cite="https://www.google.com">HTTPS</q><q cite="mailto://www.google.com">MAILTO</q><q>TEL</q><q cite="ftp://www.google.com">FTP</q><q>DATA</q><q>LDAP</q><q>ACROBAT</q><q>VBSCRIPT</q><q>FILE</q><q>RLOGIN</q><q>WEBCAL</q><q>JAVASCRIPT</q><q>MMS</q></div>'
+    discard:  `<div><q cite="http://www.google.com">HTTP</q><q cite="https://www.google.com">HTTPS</q><q cite="mailto://www.google.com">MAILTO</q><q>TEL</q><q>FTP</q><q cite="data://www.google.com">DATA</q><q>LDAP</q><q>ACROBAT</q><q>VBSCRIPT</q><q>FILE</q><q>RLOGIN</q><q>WEBCAL</q><q>JAVASCRIPT</q><q>MMS</q></div>`,
+    sanitize: '<div><q cite="http://www.google.com">HTTP</q><q cite="https://www.google.com">HTTPS</q><q cite="mailto://www.google.com">MAILTO</q><q>TEL</q><q>FTP</q><q cite="data://www.google.com">DATA</q><q>LDAP</q><q>ACROBAT</q><q>VBSCRIPT</q><q>FILE</q><q>RLOGIN</q><q>WEBCAL</q><q>JAVASCRIPT</q><q>MMS</q></div>'
   },
   {
     html:     '<img src="<0&0;0.2&" />',
