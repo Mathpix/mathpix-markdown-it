@@ -86,7 +86,8 @@ const formatSourceHtmlWord = (text: string, notTrim: boolean = false) => {
   text = notTrim ? text : text.trim();
   return text
     .replace(/<maligngroup><\/maligngroup>/g, '<maligngroup/>')
-    .replace(/<malignmark><\/malignmark>/g, '<malignmark/>');
+    .replace(/<malignmark><\/malignmark>/g, '<malignmark/>')
+    .replace(/&nbsp;/g, '&#xA0;');
 };
 
 class MathpixMarkdown_Model {

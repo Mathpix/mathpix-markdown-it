@@ -1,5 +1,5 @@
 module.exports = [
-  // 1
+  //1
   {
     latex_input: '$\\lim_{x\\rightarrow 0}{x^2}$',
     mathmlword: '<math xmlns="http://www.w3.org/1998/Math/MathML">\n' +
@@ -896,7 +896,7 @@ module.exports = [
       '      <mo stretchy="false">(</mo>\n' +
       '      <mi>G</mi>\n' +
       '      <mo stretchy="false">)</mo>\n' +
-      '      <mtext>&nbsp;is closed&nbsp;</mtext>\n' +
+      '      <mtext>&#xA0;is closed&#xA0;</mtext>\n' +
       '    </mrow>\n' +
       '  </munder>\n' +
       '</math>'
@@ -1552,7 +1552,7 @@ module.exports = [
       '        <mrow>\n' +
       '          <mrow>\n' +
       '            <maligngroup/>\n' +
-      '            <mtext>&nbsp;Ta có&nbsp;</mtext>\n' +
+      '            <mtext>&#xA0;Ta có&#xA0;</mtext>\n' +
       '            <mi>V</mi>\n' +
       '            <mi>T</mi>\n' +
       '          </mrow>\n' +
@@ -1843,7 +1843,7 @@ module.exports = [
       '            </msup>\n' +
       '            <mo>=</mo>\n' +
       '            <mn>1</mn>\n' +
-      '            <mtext>&nbsp;(điều phải chứng minh).</mtext>\n' +
+      '            <mtext>&#xA0;(điều phải chứng minh).</mtext>\n' +
       '          </mrow>\n' +
       '        </mrow>\n' +
       '      </mtd>\n' +
@@ -2760,7 +2760,7 @@ module.exports = [
       '                    <mi>n</mi>\n' +
       '                  </mrow>\n' +
       '                </msub>            \n' +
-      '                <mtext>&nbsp;est une suite de Cauchy</mtext>            \n' +
+      '                <mtext>&#xA0;est une suite de Cauchy</mtext>            \n' +
       '              </mrow>            \n' +
       '            </mfenced>\n' +
       '          </mrow>\n' +
@@ -2785,7 +2785,7 @@ module.exports = [
       '                    <mi>n</mi>\n' +
       '                  </mrow>\n' +
       '                </msub>            \n' +
-      '                <mtext>&nbsp;est une suite convergente</mtext>            \n' +
+      '                <mtext>&#xA0;est une suite convergente</mtext>            \n' +
       '              </mrow>            \n' +
       '            </mfenced>\n' +
       '          </mrow>\n' +
@@ -2819,7 +2819,7 @@ module.exports = [
       '                </mrow>\n' +
       '              </msub>            \n' +
       '            </mrow>            \n' +
-      '            <mtext>&nbsp;est une série convergente&nbsp;</mtext>\n' +
+      '            <mtext>&#xA0;est une série convergente&#xA0;</mtext>\n' +
       '            <mo fence="false" stretchy="false">}</mo>\n' +
       '          </mrow>\n' +
       '        </mrow>\n' +
@@ -3941,14 +3941,14 @@ module.exports = [
       '                        <msub>\n' +
       '                          <mi>τ</mi>\n' +
       '                          <mrow>\n' +
-      '                            <mtext>div&nbsp;</mtext>\n' +
+      '                            <mtext>div&#xA0;</mtext>\n' +
       '                          </mrow>\n' +
       '                        </msub>                    \n' +
       '                        <mo>−</mo>                    \n' +
       '                        <msub>\n' +
       '                          <mi>τ</mi>\n' +
       '                          <mrow>\n' +
-      '                            <mtext>conv&nbsp;</mtext>\n' +
+      '                            <mtext>conv&#xA0;</mtext>\n' +
       '                          </mrow>\n' +
       '                        </msub>                    \n' +
       '                      </mrow>                    \n' +
@@ -4042,7 +4042,7 @@ module.exports = [
       '                        <msub>\n' +
       '                          <mi>τ</mi>\n' +
       '                          <mrow>\n' +
-      '                            <mtext>rec&nbsp;</mtext>\n' +
+      '                            <mtext>rec&#xA0;</mtext>\n' +
       '                          </mrow>\n' +
       '                        </msub>                    \n' +
       '                        <mo>−</mo>                    \n' +
@@ -4050,7 +4050,7 @@ module.exports = [
       '                        <msub>\n' +
       '                          <mi>τ</mi>\n' +
       '                          <mrow>\n' +
-      '                            <mtext>chain&nbsp;</mtext>\n' +
+      '                            <mtext>chain&#xA0;</mtext>\n' +
       '                          </mrow>\n' +
       '                        </msub>                    \n' +
       '                      </mrow>                    \n' +
@@ -4120,7 +4120,7 @@ module.exports = [
       '            <msub>\n' +
       '              <mi>τ</mi>\n' +
       '              <mrow>\n' +
-      '                <mtext>div&nbsp;</mtext>\n' +
+      '                <mtext>div&#xA0;</mtext>\n' +
       '              </mrow>\n' +
       '            </msub>\n' +
       '            <msup>\n' +
@@ -4194,7 +4194,7 @@ module.exports = [
       '            <msub>\n' +
       '              <mi>τ</mi>\n' +
       '              <mrow>\n' +
-      '                <mtext>conv&nbsp;</mtext>\n' +
+      '                <mtext>conv&#xA0;</mtext>\n' +
       '              </mrow>\n' +
       '            </msub>\n' +
       '            <munder accent="true" accentunder="false">\n' +
@@ -4276,7 +4276,7 @@ module.exports = [
       '            <msub>\n' +
       '              <mi>τ</mi>\n' +
       '              <mrow>\n' +
-      '                <mtext>chain&nbsp;</mtext>\n' +
+      '                <mtext>chain&#xA0;</mtext>\n' +
       '              </mrow>\n' +
       '            </msub>\n' +
       '            <munder accent="true" accentunder="false">\n' +
@@ -4453,12 +4453,12 @@ module.exports = [
       '              <mrow>\n' +
       '                <mi>x</mi>\n' +
       '                <mo>,</mo>\n' +
-      '                <mo>&nbsp;&nbsp;</mo>\n' +
+      '                <mo>&#xA0;&#xA0;</mo>\n' +
       '              </mrow>\n' +
       '              <maligngroup/>\n' +
       '              <malignmark/>\n' +
       '              <mrow>\n' +
-      '                <mtext>if&nbsp;</mtext>\n' +
+      '                <mtext>if&#xA0;</mtext>\n' +
       '                <mi>x</mi>\n' +
       '                <mo>&gt;</mo>\n' +
       '                <mn>0</mn>\n' +
@@ -4473,12 +4473,12 @@ module.exports = [
       '              <malignmark/>\n' +
       '              <mrow>\n' +
       '                <mn>0</mn>\n' +
-      '                <mo>&nbsp;&nbsp;</mo>\n' +
+      '                <mo>&#xA0;&#xA0;</mo>\n' +
       '              </mrow>\n' +
       '              <maligngroup/>\n' +
       '              <malignmark/>\n' +
       '              <mrow>\n' +
-      '                <mtext>if&nbsp;</mtext>\n' +
+      '                <mtext>if&#xA0;</mtext>\n' +
       '                <mi>x</mi>\n' +
       '                <mo>=</mo>\n' +
       '                <mn>0</mn>\n' +
@@ -4494,12 +4494,12 @@ module.exports = [
       '              <mrow>\n' +
       '                <mo>−</mo>\n' +
       '                <mi>x</mi>\n' +
-      '                <mo>&nbsp;&nbsp;</mo>\n' +
+      '                <mo>&#xA0;&#xA0;</mo>\n' +
       '              </mrow>\n' +
       '              <maligngroup/>\n' +
       '              <malignmark/>\n' +
       '              <mrow>\n' +
-      '                <mtext>if&nbsp;</mtext>\n' +
+      '                <mtext>if&#xA0;</mtext>\n' +
       '                <mi>x</mi>\n' +
       '                <mo>&lt;</mo>\n' +
       '                <mn>0</mn>\n' +
@@ -4716,7 +4716,7 @@ module.exports = [
       '                <mn>3</mn>\n' +
       '                <mi>y</mi>\n' +
       '                <mo>,</mo>\n' +
-      '                <mtext>&nbsp;if&nbsp;</mtext>\n' +
+      '                <mtext>&#xA0;if&#xA0;</mtext>\n' +
       '                <mi>y</mi>\n' +
       '                <mo>≤</mo>\n' +
       '                <mo>−</mo>\n' +
@@ -4731,7 +4731,7 @@ module.exports = [
       '                <malignmark/>\n' +
       '                <mn>5</mn>\n' +
       '                <mo>,</mo>\n' +
-      '                <mtext>&nbsp;if&nbsp;</mtext>\n' +
+      '                <mtext>&#xA0;if&#xA0;</mtext>\n' +
       '                <mo>−</mo>\n' +
       '                <mn>1</mn>\n' +
       '                <mo>&lt;</mo>\n' +
@@ -4754,7 +4754,7 @@ module.exports = [
       '                  <mo stretchy="false">|</mo>\n' +
       '                </mrow>\n' +
       '                <mo>,</mo>\n' +
-      '                <mtext>&nbsp;if&nbsp;</mtext>\n' +
+      '                <mtext>&#xA0;if&#xA0;</mtext>\n' +
       '                <mi>y</mi>\n' +
       '                <mo>≥</mo>\n' +
       '                <mn>3</mn>\n' +
@@ -5093,6 +5093,170 @@ module.exports = [
       '      </mtd>\n' +
       '    </mtr>\n' +
       '  </mtable>\n' +
+      '</math>'
+  },
+
+
+  {
+    latex_input: '$$\n' +
+      '\\Delta\\left[\\begin{array}{l}\n' +
+      'x \\\\\n' +
+      'y \\\\\n' +
+      'z\n' +
+      '\\end{array}\\right]=\\left[\\begin{array}{lll}\n' +
+      '1 & 0 & 0 \\\\\n' +
+      '0 & 1 & 1 \\\\\n' +
+      '0 & 0 & 1\n' +
+      '\\end{array}\\right]\\left[\\begin{array}{l}\n' +
+      'x \\\\\n' +
+      'y \\\\\n' +
+      'z\n' +
+      '\\end{array}\\right]\n' +
+      '$$',
+    mathmlword: '<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">\n' +
+      '  <mi mathvariant="normal">Δ</mi>\n' +
+      '  <mfenced open="[" close="]" separators="|">\n' +
+      '    <mrow>\n' +
+      '      <mtable columnalign="left" columnspacing="1em" rowspacing="4pt">\n' +
+      '        <mtr>\n' +
+      '          <mtd>\n' +
+      '            <mrow>\n' +
+      '                <maligngroup/>\n' +
+      '                <malignmark/>\n' +
+      '                <mi>x</mi>\n' +
+      '            </mrow>\n' +
+      '          </mtd>\n' +
+      '        </mtr>\n' +
+      '        <mtr>\n' +
+      '          <mtd>\n' +
+      '            <mrow>\n' +
+      '                <maligngroup/>\n' +
+      '                <malignmark/>\n' +
+      '                <mi>y</mi>\n' +
+      '            </mrow>\n' +
+      '          </mtd>\n' +
+      '        </mtr>\n' +
+      '        <mtr>\n' +
+      '          <mtd>\n' +
+      '            <mrow>\n' +
+      '                <maligngroup/>\n' +
+      '                <malignmark/>\n' +
+      '                <mi>z</mi>\n' +
+      '            </mrow>\n' +
+      '          </mtd>\n' +
+      '        </mtr>\n' +
+      '      </mtable>  \n' +
+      '    </mrow>  \n' +
+      '  </mfenced>\n' +
+      '  <mo>=</mo>\n' +
+      '  <mfenced open="[" close="]" separators="|">\n' +
+      '    <mrow>\n' +
+      '      <mtable columnalign="left left left" columnspacing="1em" rowspacing="4pt">\n' +
+      '        <mtr>\n' +
+      '          <mtd>\n' +
+      '            <mrow>\n' +
+      '              <maligngroup/>\n' +
+      '              <malignmark/>\n' +
+      '              <mrow>\n' +
+      '                <mn>1</mn>\n' +
+      '                <mo>&#xA0;&#xA0;</mo>\n' +
+      '              </mrow>\n' +
+      '              <maligngroup/>\n' +
+      '              <malignmark/>\n' +
+      '              <mrow>\n' +
+      '                <mn>0</mn>\n' +
+      '                <mo>&#xA0;&#xA0;</mo>\n' +
+      '              </mrow>\n' +
+      '              <maligngroup/>\n' +
+      '              <malignmark/>\n' +
+      '              <mrow>\n' +
+      '                <mn>0</mn>\n' +
+      '              </mrow>\n' +
+      '            </mrow>\n' +
+      '          </mtd>\n' +
+      '        </mtr>\n' +
+      '        <mtr>\n' +
+      '          <mtd>\n' +
+      '            <mrow>\n' +
+      '              <maligngroup/>\n' +
+      '              <malignmark/>\n' +
+      '              <mrow>\n' +
+      '                <mn>0</mn>\n' +
+      '                <mo>&#xA0;&#xA0;</mo>\n' +
+      '              </mrow>\n' +
+      '              <maligngroup/>\n' +
+      '              <malignmark/>\n' +
+      '              <mrow>\n' +
+      '                <mn>1</mn>\n' +
+      '                <mo>&#xA0;&#xA0;</mo>\n' +
+      '              </mrow>\n' +
+      '              <maligngroup/>\n' +
+      '              <malignmark/>\n' +
+      '              <mrow>\n' +
+      '                <mn>1</mn>\n' +
+      '              </mrow>\n' +
+      '            </mrow>\n' +
+      '          </mtd>\n' +
+      '        </mtr>\n' +
+      '        <mtr>\n' +
+      '          <mtd>\n' +
+      '            <mrow>\n' +
+      '              <maligngroup/>\n' +
+      '              <malignmark/>\n' +
+      '              <mrow>\n' +
+      '                <mn>0</mn>\n' +
+      '                <mo>&#xA0;&#xA0;</mo>\n' +
+      '              </mrow>\n' +
+      '              <maligngroup/>\n' +
+      '              <malignmark/>\n' +
+      '              <mrow>\n' +
+      '                <mn>0</mn>\n' +
+      '                <mo>&#xA0;&#xA0;</mo>\n' +
+      '              </mrow>\n' +
+      '              <maligngroup/>\n' +
+      '              <malignmark/>\n' +
+      '              <mrow>\n' +
+      '                <mn>1</mn>\n' +
+      '              </mrow>\n' +
+      '            </mrow>\n' +
+      '          </mtd>\n' +
+      '        </mtr>\n' +
+      '      </mtable>  \n' +
+      '    </mrow>  \n' +
+      '  </mfenced>\n' +
+      '  <mfenced open="[" close="]" separators="|">\n' +
+      '    <mrow>\n' +
+      '      <mtable columnalign="left" columnspacing="1em" rowspacing="4pt">\n' +
+      '        <mtr>\n' +
+      '          <mtd>\n' +
+      '            <mrow>\n' +
+      '                <maligngroup/>\n' +
+      '                <malignmark/>\n' +
+      '                <mi>x</mi>\n' +
+      '            </mrow>\n' +
+      '          </mtd>\n' +
+      '        </mtr>\n' +
+      '        <mtr>\n' +
+      '          <mtd>\n' +
+      '            <mrow>\n' +
+      '                <maligngroup/>\n' +
+      '                <malignmark/>\n' +
+      '                <mi>y</mi>\n' +
+      '            </mrow>\n' +
+      '          </mtd>\n' +
+      '        </mtr>\n' +
+      '        <mtr>\n' +
+      '          <mtd>\n' +
+      '            <mrow>\n' +
+      '                <maligngroup/>\n' +
+      '                <malignmark/>\n' +
+      '                <mi>z</mi>\n' +
+      '            </mrow>\n' +
+      '          </mtd>\n' +
+      '        </mtr>\n' +
+      '      </mtable>  \n' +
+      '    </mrow>  \n' +
+      '  </mfenced>\n' +
       '</math>'
   },
   // {
