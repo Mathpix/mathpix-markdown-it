@@ -1,4 +1,5 @@
 module.exports = [
+  // 1
   {
     latex_input: '$\\lim_{x\\rightarrow 0}{x^2}$',
     mathmlword: '<math xmlns="http://www.w3.org/1998/Math/MathML">\n' +
@@ -20,7 +21,7 @@ module.exports = [
       '  </mrow>\n' +
       '</math>'
   },
-
+// 2
   {
     latex_input: '\\[ \\begin{aligned} E ( \\hat { a } ) = E ( 2 \\bar { x } ) & = 2 E ( \\bar { x } ) \\\\ & = 2 \\left( \\frac {a} { 2 } \\right) \\\\ & = a \\end{aligned} \\]',
     mathmlword: '<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">\n' +
@@ -116,7 +117,7 @@ module.exports = [
       '  </mtable>\n' +
       '</math>'
   },
-
+// 3
   {
     latex_input: '\\[ \\left.\\begin{aligned} n(\\frac{7-k}{5+k}) &= 7G( U - T - J^{3} - \\nu S^{0} ) && k\\succ 6 \\\\ B^{7}&= 6-5G(U + \\frac{(J^{3} + \\nu S^{7})}{1}) && \\text {キャメロット} \\end{aligned}\\right. \\]',
     mathmlword: '<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">\n' +
@@ -244,7 +245,7 @@ module.exports = [
       '  </mfenced>\n' +
       '</math>'
   },
-
+// 4
   {
     latex_input: '\\[ \\begin{aligned} x _ { 0 } & = ( A _ { 1 } {}^ { * } A _ { 1 } ) ^ { - 1 } A _ { 1 }{} ^ { * } y \\\\ & = \\left( \\begin{array} { ll } \\frac{1}{10} & \\frac{1}{10} \\\\ \\frac { 1 } { 10 } & \\frac { 7 } { 20 } \\end{array} \\right) \\left( \\begin{array} { c c c c } - 3 & - 2 & 0 & 1 \\\\ 1 & 1 & 1 & 1 \\end{array} \\right) \\left( \\begin{array} { l } 9 \\\\ 6 \\\\ 2 \\\\ 1 \\end{array} \\right) \\\\ & = \\left( \\begin{array} { c } - 2 \\\\ \\frac { 5 } { 2 } \\end{array} \\right) \\end{aligned} \\]',
     mathmlword: '<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">\n' +
@@ -393,38 +394,22 @@ module.exports = [
       '                <mtable columnspacing="1em" rowspacing="4pt">\n' +
       '                  <mtr>\n' +
       '                    <mtd>\n' +
-      '                      <mrow>\n' +
-      '                          <maligngroup/>\n' +
-      '                          <malignmark/>\n' +
-      '                          <mn>9</mn>\n' +
-      '                      </mrow>\n' +
+      '                      <mn>9</mn>\n' +
       '                    </mtd>\n' +
       '                  </mtr>\n' +
       '                  <mtr>\n' +
       '                    <mtd>\n' +
-      '                      <mrow>\n' +
-      '                          <maligngroup/>\n' +
-      '                          <malignmark/>\n' +
-      '                          <mn>6</mn>\n' +
-      '                      </mrow>\n' +
+      '                      <mn>6</mn>\n' +
       '                    </mtd>\n' +
       '                  </mtr>\n' +
       '                  <mtr>\n' +
       '                    <mtd>\n' +
-      '                      <mrow>\n' +
-      '                          <maligngroup/>\n' +
-      '                          <malignmark/>\n' +
-      '                          <mn>2</mn>\n' +
-      '                      </mrow>\n' +
+      '                      <mn>2</mn>\n' +
       '                    </mtd>\n' +
       '                  </mtr>\n' +
       '                  <mtr>\n' +
       '                    <mtd>\n' +
-      '                      <mrow>\n' +
-      '                          <maligngroup/>\n' +
-      '                          <malignmark/>\n' +
-      '                          <mn>1</mn>\n' +
-      '                      </mrow>\n' +
+      '                      <mn>1</mn>\n' +
       '                    </mtd>\n' +
       '                  </mtr>\n' +
       '                </mtable>            \n' +
@@ -471,7 +456,7 @@ module.exports = [
       '  </mtable>\n' +
       '</math>'
   },
-
+// 5
   {
     latex_input: '\\[ \\begin{aligned} \\int \\underbrace { x } _ { u } \\underbrace { \\cos x d x } _ { d v } & = \\underbrace { x } _ { u } \\underbrace { \\sin x } _ { v } - \\int \\underbrace { \\sin x } _ { v } \\underbrace { d x } _ { d u } \\\\ & = x \\sin x - ( - \\cos x ) + C = x \\sin x + \\cos x + C \\blacktriangleleft \\end{aligned} \\]',
     mathmlword: '<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">\n' +
@@ -626,7 +611,7 @@ module.exports = [
       '  </mtable>\n' +
       '</math>'
   },
-
+// 6
   {
     latex_input: '\\[ \\begin{aligned} \\mu = \\int _ { - \\infty } ^ { \\infty } x f ( x ) d x & = \\int _ { 3 } ^ { 5 } x ( 0.075 x + 0.2 ) d x = \\int _ { 3 } ^ { 5 } \\left( 0.075 x ^ { 2 } + 0.2 x \\right) d x = \\frac { 0.75 x ^ { 3 } } { 3 } + \\left. \\frac { 0.2 x ^ { 2 } } { 2 } \\right| _ { 3 } ^ { 5 } \\\\ = & 3.125 + 2.5 - 0.675 - 0.9 = 4.05 \\end{aligned} \\]',
     mathmlword: '<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">\n' +
@@ -785,7 +770,7 @@ module.exports = [
       '  </mtable>\n' +
       '</math>'
   },
-
+// 7
   {
     latex_input: '$$\n' +
       '\\left(\\sum_{i=1}^{n} x_{i}^{\\prime} x_{i}\\right)^{-1}\n' +
@@ -841,6 +826,7 @@ module.exports = [
   //   latex_input: '\\[ \\left.\\begin{aligned} -\\sum_{i\\neq j} \\mathcal{J}_{ij}\\hat{S}_{i}\\cdot\\hat{S}_{j} &=-\\sum_{i\\neq j } \\mathcal{J}_{ij}[\\langle \\vec{S}_{i}\\rangle + (\\vec{S}_{i}-\\langle \\vec{S}_{i}\\rangle)][\\langle \\vec{S}_{j}\\rangle + (\\vec{S}_{j}-\\langle \\vec{S}_{j}\\rangle)] \\\\ &=-\\sum_{i\\neq j}\\mathcal{J}_{ij}\\langle\\vec{S}_{i}\\rangle\\langle\\vec{S}_{j}\\rangle-\\sum_{i}\\vec{S}_{i}\underbrace{\\left(2\\sum_{j=1}^{z}\\mathcal{J}_{ij}\\langle\\vec{S}_{j}\\rangle\\right)}_{g\\mu_{0}\\mu_{B}\\vec{H}_{\\mathrm{MF}}}+\\ldots \\end{aligned}\\right. \\]',
   //   mathmlword: ''
   // },
+// 8
   {
     latex_input: '$$\n' +
       '\\ddot{x}=\\epsilon\\left(1-x^{2}\\right) \\dot{x}-x\n' +
@@ -880,6 +866,7 @@ module.exports = [
       '  <mi>x</mi>\n' +
       '</math>'
   },
+// 9
   {
     latex_input: '$$\n' +
       'K \\subseteq \\underbrace{L(G)=L(G)}_{L(G) \\text { is closed }}\n' +
@@ -914,6 +901,7 @@ module.exports = [
       '  </munder>\n' +
       '</math>'
   },
+  //10
   {
     latex_input: '$$\n' +
       '\\overbrace{\\alpha \\frac{1}{n} \\sum_{c} s^{c}\\left(I^{* c}\\right)}\n' +
@@ -960,6 +948,7 @@ module.exports = [
       '  </mrow>\n' +
       '</math>'
   },
+  //11
   {
     latex_input: '$$\n' +
       'g_{\\mathrm{H} *}\\left(T_{\\mathrm{PBH}}\\right) \\simeq\\left\\{\\begin{array}{cc}\n' +
@@ -1098,6 +1087,7 @@ module.exports = [
       '  </mfenced>\n' +
       '</math>'
   },
+  //12
   {
     latex_input: '$$\n' +
       '\\left\\{\\begin{array}{l}\n' +
@@ -1166,6 +1156,7 @@ module.exports = [
       '  </mfenced>\n' +
       '</math>'
   },
+  //13
   {
     latex_input: '\\begin{aligned}\n' +
       'R_{\\nu} &=\\frac{\\Omega_{\\nu}}{\\Omega_{\\nu}+\\Omega_{\\gamma}} \\\\\n' +
@@ -1488,6 +1479,7 @@ module.exports = [
       '  </mtable>\n' +
       '</math>'
   },
+  //14
   {
     latex_input: '\\[ \\begin{aligned} f ( n + 3 ) & = ( n + 3 ) ^ { 2 } \\\\ & = n ^ { 2 } + 4 n + 3 \\end{aligned} \\]',
     mathmlword: '<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">\n' +
@@ -1550,7 +1542,7 @@ module.exports = [
       '  </mtable>\n' +
       '</math>'
   },
-
+//15
   {
     latex_input: '\\( \\begin{aligned} \\text { Ta có } V T & = \\sin ^ { 6 } \\alpha + \\cos ^ { 6 } \\alpha + 3 \\sin ^ { 2 } \\alpha \\cos ^ { 2 } \\alpha \\\\ & = \\left( \\sin ^ { 2 } \\alpha + \\cos ^ { 2 } \\alpha \\right) \\left( \\sin ^ { 4 } \\alpha - \\sin ^ { 2 } \\alpha \\cos ^ { 2 } \\alpha + \\cos ^ { 4 } \\alpha \\right) + 3 \\sin ^ { 2 } \\alpha \\cos ^ { 2 } \\alpha \\\\ & = \\sin ^ { 4 } \\alpha - \\sin ^ { 2 } \\alpha \\cos ^ { 2 } \\alpha + \\cos ^ { 4 } \\alpha + 3 \\sin ^ { 2 } \\alpha \\cos ^ { 2 } \\alpha \\\\ & = \\sin ^ { 4 } \\alpha + 2 \\sin ^ { 2 } \\alpha \\cos ^ { 2 } \\alpha + \\cos ^ { 4 } \\alpha \\\\ & = \\left( \\sin ^ { 2 } \\alpha + \\cos ^ { 2 } \\alpha \\right) ^ { 2 } = 1 \\text { (điều phải chứng minh).} \\end{aligned} \\)',
     mathmlword: '<math xmlns="http://www.w3.org/1998/Math/MathML">\n' +
@@ -1859,6 +1851,7 @@ module.exports = [
       '  </mtable>\n' +
       '</math>'
   },
+  // 16
   {
     latex_input: '\\[\\begin{aligned} A_{2}A_{1} & = \\left[\\begin{array}{ccc} \\sec \\varphi & - \\tan \\varphi & 0 \\\\ 0&1&0 \\\\ 0&0&1 \\end{array}\\right] \\left[\\begin{array}{ccc} 1&0&0 \\\\ \\sin \\varphi & \\cos \\varphi & 0\\\\ 0&0&1 \\end{array}\\right] \\\\ &= \\left[\\begin{array}{ccc} \\sec\\varphi -\\tan \\varphi \\sin\\varphi & -\\tan \\varphi \\cos\\varphi & 0 \\\\ \\sin\\varphi&\\cos \\varphi&0 \\\\ 0&0&1 \\end{array}\\right] \\\\ &= \\left[\\begin{array}{ccc} \\cos\\varphi & - \\sin\\varphi & 0 \\\\ \\sin\\varphi&\\cos\\varphi&0 \\\\ 0&0&1 \\end{array}\\right] \\end{aligned}\\]',
     mathmlword: '<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">\n' +
@@ -2113,6 +2106,7 @@ module.exports = [
       '  </mtable>\n' +
       '</math>'
   },
+  // 17
   {
     latex_input: '\\[ \\begin{aligned} A A ^ { * } & = \\left( \\begin{array} { c c c c } 1 & 1 & 1 & - 1 \\\\ 2 & - 1 & 0 & 1 \\end{array} \\right) \\left( \\begin{array} { c c } 1 & 2 \\\\ 1 & - 1 \\\\ 1 & 0 \\\\ - 1 & 1 \\end{array} \\right) \\\\ & = \\left( \\begin{array} { ll } 4 & 0 \\\\ 0 & 6 \\end{array} \\right) \\end{aligned} \\]',
     mathmlword: '<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">\n' +
@@ -2253,6 +2247,7 @@ module.exports = [
       '  </mtable>\n' +
       '</math>'
   },
+  // 18
   {
     latex_input: '\\[ \\begin{aligned} \\mathbf { Y }& \\triangleq \\left[ \\begin{array} { c } Y [ 0 ] \\\\ Y [ 1 ] \\\\ \\vdots \\\\ Y [ N - 1 ] \\end{array} \\right] = \\left[ \\begin{array} { c c c c } X [ 0 ] & 0 & \\cdots & 0 \\\\ 0 & X [ 1 ] & & \\vdots \\\\ \\vdots & & \\ddots & 0 \\\\ 0 & \\cdots & 0 & X [ N - 1 ] \\end{array} \\right] \\left[ \\begin{array} { c } H [ 0 ] \\\\ H [ 1 ] \\\\ \\vdots \\\\ H [ N - 1 ] \\end{array} \\right] + \\left[ \\begin{array} { c } Z [ 0 ] \\\\ Z [ 1 ] \\\\ \\vdots \\\\ Z [ N - 1 ] \\end{array} \\right] \\\\ &= \\mathbf{XH} + \\mathbf{Z} \\end{aligned} \\]',
     mathmlword: '<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">\n' +
@@ -2491,6 +2486,7 @@ module.exports = [
       '  </mtable>\n' +
       '</math>'
   },
+  // 19
   {
     latex_input: '\\(\\begin{aligned}|A \\not \\supset B \\not \\supset C \\not \\supset D| &=|A|+|B|+|C|+|D|-\\\\ &-|A \\not \\supset B|-|A \\not \\supset C|-|A \\not \\supset D|-|B \\not \\supset C|-|B \\not \\supset D|-|C \\not \\supset D|+\\\\ &+|A \\not \\supset B \\not \\supset C|+|A \\not \\supset B \\not \\supset D|+|A \\not \\supset C \\not \\supset D|+|B \\not \\supset C \\not \\supset D|-\\\\ &-|A \\not \\supset B \\not \\supset C \\not \\supset D| \\end{aligned}\\)',
     mathmlword: '<math xmlns="http://www.w3.org/1998/Math/MathML">\n' +
@@ -2714,6 +2710,7 @@ module.exports = [
       '  </mtable>\n' +
       '</math>'
   },
+  // 20
   {
     latex_input: '\\[ \\begin{aligned}\\{ \\lim _ { M } \\widetilde { Z } _ { M } = 0 \\}& \\Longleftrightarrow \\left\\{ Z _ { n } \\text { est une suite de Cauchy} \\right\\} \\\\& \\Longleftrightarrow \\left\\{ Z _ { n } \\text { est une suite convergente} \\right\\} \\\\& \\Longleftrightarrow \\{ \\sum _ { n } U _ { n } \\text { est une série convergente } \\}\\end{aligned} \\]',
     mathmlword: '<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">\n' +
@@ -2831,6 +2828,7 @@ module.exports = [
       '  </mtable>\n' +
       '</math>'
   },
+  // 21
   {
     latex_input: '\\[ \\left.\\begin{aligned} \\underbrace{\\left(\\sum_{j=1}^{z}\\right)}_{g\\mu_{0}\\mu_{B}\\vec{H}_{\\mathrm{MF}}} \\end{aligned}\\right. \\]',
     mathmlword: '<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">\n' +
@@ -2906,6 +2904,7 @@ module.exports = [
       '  </mfenced>\n' +
       '</math>'
   },
+  // 22
   {
     latex_input: '\\[ \\left.\\begin{aligned} -\\sum_{i\\neq j} \\mathcal{J}_{ij}\\hat{S}_{i}\\cdot\\hat{S}_{j} &=-\\sum_{i\\neq j } \\mathcal{J}_{ij}[\\langle \\vec{S}_{i}\\rangle + (\\vec{S}_{i}-\\langle \\vec{S}_{i}\\rangle)][\\langle \\vec{S}_{j}\\rangle + (\\vec{S}_{j}-\\langle \\vec{S}_{j}\\rangle)] \\\\ &=-\\sum_{i\\neq j}\\mathcal{J}_{ij}\\langle\\vec{S}_{i}\\rangle\\langle\\vec{S}_{j}\\rangle-\\sum_{i}\\vec{S}_{i}\\underbrace{\\left(2\\sum_{j=1}^{z}\\mathcal{J}_{ij}\\langle\\vec{S}_{j}\\rangle\\right)}_{g\\mu_{0}\\mu_{B}\\vec{H}_{\\mathrm{MF}}}+\\ldots \\end{aligned}\\right. \\]',
     mathmlword: '<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">\n' +
@@ -3278,6 +3277,7 @@ module.exports = [
       '  </mfenced>\n' +
       '</math>'
   },
+  // 23
   {
     latex_input: '\\[\\begin{aligned}\n' +
       '&=\\underbrace{\\left(\\begin{array}{cccccc}\n' +
@@ -3843,6 +3843,7 @@ module.exports = [
       '  </mtable>\n' +
       '</math>'
   },
+  // 24
   {
     latex_input: '\\[ \\begin{aligned} \\frac { 1 } { \\sigma ^ { 2 } } \\sum _ { i , j , k , l } \\Delta _ { i j k l } \\tilde { X } _ { i } \\tilde { X } _ { j } X _ { k } X _ { l } & = \\underbrace { \\left( 1 - \\tau _ { \\text {div } } - \\tau _ { \\text {conv } } \\right) } _ { A } \\sum _ { i } \\tilde { X } _ { i } \\tilde { X } _ { i } \\sum _ { k } X _ { k } X _ { k } \\\\ & + \\underbrace { \\left( \\tau _ { \\text {rec } } - 2 \\tau _ { \\text {chain } } \\right) } _ { B } \\left( \\sum _ { i } \\tilde { X } _ { i } X _ { i } \\right) ^ { 2 } \\\\ & + \\tau _ { \\text {div } } \\left( \\sum _ { i } \\tilde { X } _ { i } \\right) ^ { 2 } \\sum _ { k } X _ { k } X _ { k } \\\\ & + \\tau _ { \\text {conv } } \\sum _ { i } \\tilde { X } _ { i } \\tilde { X } _ { i } \\left( \\sum _ { k } X _ { k } \\right) ^ { 2 } \\\\ & + 2 \\tau _ { \\text {chain } } \\sum _ { i } \\tilde { X } _ { i } X _ { i } \\left( \\sum _ { j } \\tilde { X } _ { j } \\right) \\left( \\sum _ { k } X _ { k } \\right) \\end{aligned} \\]',
     mathmlword: '<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">\n' +
@@ -4369,6 +4370,7 @@ module.exports = [
   //   latex_input: '\\(\\begin{array}{|l|} \\hline\\text { Rules of Exponents } \\\\\\hline \\text { №1 } x^{n} \\cdot x^{m}=x^{n+m} \\\\\\text { №2 } \\frac{x^{n}}{x^{m}}=x^{n-m} \\\\\\text { №3 }(x \\cdot y)^{n}=x^{n} y^{n} \\\\\\text { №4 }\\left(\\frac{x}{y}\\right)^{n}=\\frac{x^{n}}{y^{n}} \\\\\\text { №5 }\\left(x^{m}\\right)^{n}=x^{m \\cdot n} \\\\ \\hline\\end{array} \\)',
   //   mathmlword: ''
   // },
+  // 25
   {
     latex_input: '\\[ A = \\left( \\begin{array} { c c c } a _ { 11 } & 0 & 0 \\\\ 0 & a _ { 22 } & 0 \\\\ 0 & 0 & a _ { 33 } \\end{array} \\right) \\]',
     mathmlword: '<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">\n' +
@@ -4430,6 +4432,7 @@ module.exports = [
       '  </mfenced>\n' +
       '</math>'
   },
+  // 26
   {
     latex_input: '\\[ | x | = \\left\\{ \\begin{array} {ll} x , & \\text{if } x > 0 \\\\ 0 & \\text{if } x = 0 \\\\ - x & \\text {if } x < 0 \\end{array} \\right. \\]',
     mathmlword: '<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">\n' +
@@ -4444,37 +4447,64 @@ module.exports = [
       '      <mtable columnalign="left left" columnspacing="1em" rowspacing="4pt">\n' +
       '        <mtr>\n' +
       '          <mtd>\n' +
-      '            <mi>x</mi>\n' +
-      '            <mo>,</mo>\n' +
-      '          </mtd>\n' +
-      '          <mtd>\n' +
-      '            <mtext>if&nbsp;</mtext>\n' +
-      '            <mi>x</mi>\n' +
-      '            <mo>&gt;</mo>\n' +
-      '            <mn>0</mn>\n' +
-      '          </mtd>\n' +
-      '        </mtr>\n' +
-      '        <mtr>\n' +
-      '          <mtd>\n' +
-      '            <mn>0</mn>\n' +
-      '          </mtd>\n' +
-      '          <mtd>\n' +
-      '            <mtext>if&nbsp;</mtext>\n' +
-      '            <mi>x</mi>\n' +
-      '            <mo>=</mo>\n' +
-      '            <mn>0</mn>\n' +
+      '            <mrow>\n' +
+      '              <maligngroup/>\n' +
+      '              <malignmark/>\n' +
+      '              <mrow>\n' +
+      '                <mi>x</mi>\n' +
+      '                <mo>,</mo>\n' +
+      '                <mo>&nbsp;&nbsp;</mo>\n' +
+      '              </mrow>\n' +
+      '              <maligngroup/>\n' +
+      '              <malignmark/>\n' +
+      '              <mrow>\n' +
+      '                <mtext>if&nbsp;</mtext>\n' +
+      '                <mi>x</mi>\n' +
+      '                <mo>&gt;</mo>\n' +
+      '                <mn>0</mn>\n' +
+      '              </mrow>\n' +
+      '            </mrow>\n' +
       '          </mtd>\n' +
       '        </mtr>\n' +
       '        <mtr>\n' +
       '          <mtd>\n' +
-      '            <mo>−</mo>\n' +
-      '            <mi>x</mi>\n' +
+      '            <mrow>\n' +
+      '              <maligngroup/>\n' +
+      '              <malignmark/>\n' +
+      '              <mrow>\n' +
+      '                <mn>0</mn>\n' +
+      '                <mo>&nbsp;&nbsp;</mo>\n' +
+      '              </mrow>\n' +
+      '              <maligngroup/>\n' +
+      '              <malignmark/>\n' +
+      '              <mrow>\n' +
+      '                <mtext>if&nbsp;</mtext>\n' +
+      '                <mi>x</mi>\n' +
+      '                <mo>=</mo>\n' +
+      '                <mn>0</mn>\n' +
+      '              </mrow>\n' +
+      '            </mrow>\n' +
       '          </mtd>\n' +
+      '        </mtr>\n' +
+      '        <mtr>\n' +
       '          <mtd>\n' +
-      '            <mtext>if&nbsp;</mtext>\n' +
-      '            <mi>x</mi>\n' +
-      '            <mo>&lt;</mo>\n' +
-      '            <mn>0</mn>\n' +
+      '            <mrow>\n' +
+      '              <maligngroup/>\n' +
+      '              <malignmark/>\n' +
+      '              <mrow>\n' +
+      '                <mo>−</mo>\n' +
+      '                <mi>x</mi>\n' +
+      '                <mo>&nbsp;&nbsp;</mo>\n' +
+      '              </mrow>\n' +
+      '              <maligngroup/>\n' +
+      '              <malignmark/>\n' +
+      '              <mrow>\n' +
+      '                <mtext>if&nbsp;</mtext>\n' +
+      '                <mi>x</mi>\n' +
+      '                <mo>&lt;</mo>\n' +
+      '                <mn>0</mn>\n' +
+      '              </mrow>\n' +
+      '            </mrow>\n' +
       '          </mtd>\n' +
       '        </mtr>\n' +
       '      </mtable>  \n' +
@@ -4666,10 +4696,408 @@ module.exports = [
       '  </mfenced>\n' +
       '</math>'
   },
+  {
+    latex_input: '\\[ f ( y ) = \\left( \\begin{array} { l } - 3y , \\text{ if } y \\leq -1 \\\\ 5, \\text{ if } -1 < y < 3 \\\\ |y-3| , \\text{ if } y \\geq 3 \\end{array} \\right. \\]',
+    mathmlword: '<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">\n' +
+      '  <mi>f</mi>\n' +
+      '  <mo stretchy="false">(</mo>\n' +
+      '  <mi>y</mi>\n' +
+      '  <mo stretchy="false">)</mo>\n' +
+      '  <mo>=</mo>\n' +
+      '  <mfenced open="(" close="" separators="|">\n' +
+      '    <mrow>\n' +
+      '      <mtable columnalign="left" columnspacing="1em" rowspacing="4pt">\n' +
+      '        <mtr>\n' +
+      '          <mtd>\n' +
+      '            <mrow>\n' +
+      '                <maligngroup/>\n' +
+      '                <malignmark/>\n' +
+      '                <mo>−</mo>\n' +
+      '                <mn>3</mn>\n' +
+      '                <mi>y</mi>\n' +
+      '                <mo>,</mo>\n' +
+      '                <mtext>&nbsp;if&nbsp;</mtext>\n' +
+      '                <mi>y</mi>\n' +
+      '                <mo>≤</mo>\n' +
+      '                <mo>−</mo>\n' +
+      '                <mn>1</mn>\n' +
+      '            </mrow>\n' +
+      '          </mtd>\n' +
+      '        </mtr>\n' +
+      '        <mtr>\n' +
+      '          <mtd>\n' +
+      '            <mrow>\n' +
+      '                <maligngroup/>\n' +
+      '                <malignmark/>\n' +
+      '                <mn>5</mn>\n' +
+      '                <mo>,</mo>\n' +
+      '                <mtext>&nbsp;if&nbsp;</mtext>\n' +
+      '                <mo>−</mo>\n' +
+      '                <mn>1</mn>\n' +
+      '                <mo>&lt;</mo>\n' +
+      '                <mi>y</mi>\n' +
+      '                <mo>&lt;</mo>\n' +
+      '                <mn>3</mn>\n' +
+      '            </mrow>\n' +
+      '          </mtd>\n' +
+      '        </mtr>\n' +
+      '        <mtr>\n' +
+      '          <mtd>\n' +
+      '            <mrow>\n' +
+      '                <maligngroup/>\n' +
+      '                <malignmark/>\n' +
+      '                <mo stretchy="false">|</mo>\n' +
+      '                <mi>y</mi>\n' +
+      '                <mo>−</mo>\n' +
+      '                <mn>3</mn>\n' +
+      '                <mrow>\n' +
+      '                  <mo stretchy="false">|</mo>\n' +
+      '                </mrow>\n' +
+      '                <mo>,</mo>\n' +
+      '                <mtext>&nbsp;if&nbsp;</mtext>\n' +
+      '                <mi>y</mi>\n' +
+      '                <mo>≥</mo>\n' +
+      '                <mn>3</mn>\n' +
+      '            </mrow>\n' +
+      '          </mtd>\n' +
+      '        </mtr>\n' +
+      '      </mtable>  \n' +
+      '    </mrow>  \n' +
+      '  </mfenced>\n' +
+      '</math>'
+  },
+  {
+    latex_input: '\\[ \\begin{aligned} y \\circ x & = (y \\circ x) \\circ e \\curvearrowright (G2) \\\\ & = (y \\circ x) \\circ (y \\circ z) \\curvearrowright (G1) \\\\ & = y \\circ (e \\circ z) \\curvearrowleft (1) \\\\ & = e \\curvearrowleft (2) \\end{aligned} \\]',
+    mathmlword: '<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">\n' +
+      '  <mtable displaystyle="true" columnalign="right left right left right left right left right left right left" columnspacing="0em 2em 0em 2em 0em 2em 0em 2em 0em 2em 0em" rowspacing="3pt">\n' +
+      '    <mtr>\n' +
+      '      <mtd>\n' +
+      '        <mrow>\n' +
+      '          <mrow>\n' +
+      '            <maligngroup/>\n' +
+      '            <mi>y</mi>\n' +
+      '            <mo>∘</mo>\n' +
+      '            <mi>x</mi>\n' +
+      '          </mrow>\n' +
+      '          <mrow>\n' +
+      '            <maligngroup/>\n' +
+      '            <mi></mi>\n' +
+      '            <mo>=</mo>\n' +
+      '            <mo stretchy="false">(</mo>\n' +
+      '            <mi>y</mi>\n' +
+      '            <mo>∘</mo>\n' +
+      '            <mi>x</mi>\n' +
+      '            <mo stretchy="false">)</mo>\n' +
+      '            <mo>∘</mo>\n' +
+      '            <mi>e</mi>\n' +
+      '            <mo>↷</mo>\n' +
+      '            <mo stretchy="false">(</mo>\n' +
+      '            <mi>G</mi>\n' +
+      '            <mn>2</mn>\n' +
+      '            <mo stretchy="false">)</mo>\n' +
+      '          </mrow>\n' +
+      '        </mrow>\n' +
+      '      </mtd>\n' +
+      '    </mtr>\n' +
+      '    <mtr>\n' +
+      '      <mtd>\n' +
+      '        <mrow>\n' +
+      '          <mrow>\n' +
+      '            <maligngroup/>\n' +
+      '          </mrow>\n' +
+      '          <mrow>\n' +
+      '            <maligngroup/>\n' +
+      '            <mi></mi>\n' +
+      '            <mo>=</mo>\n' +
+      '            <mo stretchy="false">(</mo>\n' +
+      '            <mi>y</mi>\n' +
+      '            <mo>∘</mo>\n' +
+      '            <mi>x</mi>\n' +
+      '            <mo stretchy="false">)</mo>\n' +
+      '            <mo>∘</mo>\n' +
+      '            <mo stretchy="false">(</mo>\n' +
+      '            <mi>y</mi>\n' +
+      '            <mo>∘</mo>\n' +
+      '            <mi>z</mi>\n' +
+      '            <mo stretchy="false">)</mo>\n' +
+      '            <mo>↷</mo>\n' +
+      '            <mo stretchy="false">(</mo>\n' +
+      '            <mi>G</mi>\n' +
+      '            <mn>1</mn>\n' +
+      '            <mo stretchy="false">)</mo>\n' +
+      '          </mrow>\n' +
+      '        </mrow>\n' +
+      '      </mtd>\n' +
+      '    </mtr>\n' +
+      '    <mtr>\n' +
+      '      <mtd>\n' +
+      '        <mrow>\n' +
+      '          <mrow>\n' +
+      '            <maligngroup/>\n' +
+      '          </mrow>\n' +
+      '          <mrow>\n' +
+      '            <maligngroup/>\n' +
+      '            <mi></mi>\n' +
+      '            <mo>=</mo>\n' +
+      '            <mi>y</mi>\n' +
+      '            <mo>∘</mo>\n' +
+      '            <mo stretchy="false">(</mo>\n' +
+      '            <mi>e</mi>\n' +
+      '            <mo>∘</mo>\n' +
+      '            <mi>z</mi>\n' +
+      '            <mo stretchy="false">)</mo>\n' +
+      '            <mo>↶</mo>\n' +
+      '            <mo stretchy="false">(</mo>\n' +
+      '            <mn>1</mn>\n' +
+      '            <mo stretchy="false">)</mo>\n' +
+      '          </mrow>\n' +
+      '        </mrow>\n' +
+      '      </mtd>\n' +
+      '    </mtr>\n' +
+      '    <mtr>\n' +
+      '      <mtd>\n' +
+      '        <mrow>\n' +
+      '          <mrow>\n' +
+      '            <maligngroup/>\n' +
+      '          </mrow>\n' +
+      '          <mrow>\n' +
+      '            <maligngroup/>\n' +
+      '            <mi></mi>\n' +
+      '            <mo>=</mo>\n' +
+      '            <mi>e</mi>\n' +
+      '            <mo>↶</mo>\n' +
+      '            <mo stretchy="false">(</mo>\n' +
+      '            <mn>2</mn>\n' +
+      '            <mo stretchy="false">)</mo>\n' +
+      '          </mrow>\n' +
+      '        </mrow>\n' +
+      '      </mtd>\n' +
+      '    </mtr>\n' +
+      '  </mtable>\n' +
+      '</math>'
+  },
+  {
+    latex_input: '\\[ \\begin{aligned} c ( x , t ) & = \\frac { e ^ { - x ^ { 2 } / 4 D t } } { 2 \\pi \\sqrt { D t } } \\int _ { - \\infty + i x / 2 \\sqrt { D t } } ^ { \\infty + i x / 2 \\sqrt { D t } } e ^ { - s ^ { 2 } } d s \\\\ & = \\frac { e ^ { - x ^ { 2} / 4 D t } } { 2 \\pi \\sqrt { D t } } \\underbrace { \\int _ { - \\infty } ^ { \\infty } e ^ { - s ^ { 2 } } d s } _ { \\sqrt { \\pi } } = \\frac { e ^ { - x ^ { 2} / 4 D t } } { \\sqrt { 4 \\pi D t } } .\\end{aligned} \\]',
+    mathmlword: '<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">\n' +
+      '  <mtable displaystyle="true" columnalign="right left right left right left right left right left right left" columnspacing="0em 2em 0em 2em 0em 2em 0em 2em 0em 2em 0em" rowspacing="3pt">\n' +
+      '    <mtr>\n' +
+      '      <mtd>\n' +
+      '        <mrow>\n' +
+      '          <mrow>\n' +
+      '            <maligngroup/>\n' +
+      '            <mi>c</mi>\n' +
+      '            <mo stretchy="false">(</mo>\n' +
+      '            <mi>x</mi>\n' +
+      '            <mo>,</mo>\n' +
+      '            <mi>t</mi>\n' +
+      '            <mo stretchy="false">)</mo>\n' +
+      '          </mrow>\n' +
+      '          <mrow>\n' +
+      '            <maligngroup/>\n' +
+      '            <mi></mi>\n' +
+      '            <mo>=</mo>\n' +
+      '            <mfrac>\n' +
+      '              <msup>\n' +
+      '                <mi>e</mi>\n' +
+      '                <mrow>\n' +
+      '                  <mo>−</mo>\n' +
+      '                  <msup>\n' +
+      '                    <mi>x</mi>\n' +
+      '                    <mrow>\n' +
+      '                      <mn>2</mn>\n' +
+      '                    </mrow>\n' +
+      '                  </msup>\n' +
+      '                  <mrow>\n' +
+      '                    <mo>/</mo>\n' +
+      '                  </mrow>\n' +
+      '                  <mn>4</mn>\n' +
+      '                  <mi>D</mi>\n' +
+      '                  <mi>t</mi>\n' +
+      '                </mrow>\n' +
+      '              </msup>\n' +
+      '              <mrow>\n' +
+      '                <mn>2</mn>\n' +
+      '                <mi>π</mi>\n' +
+      '                <msqrt>\n' +
+      '                  <mi>D</mi>\n' +
+      '                  <mi>t</mi>\n' +
+      '                </msqrt>\n' +
+      '              </mrow>\n' +
+      '            </mfrac>\n' +
+      '            <msubsup>\n' +
+      '              <mrow>\n' +
+      '                <mo data-mjx-texclass="OP">∫</mo>\n' +
+      '              </mrow>\n' +
+      '              <mrow>\n' +
+      '                <mo>−</mo>\n' +
+      '                <mi mathvariant="normal">∞</mi>\n' +
+      '                <mo>+</mo>\n' +
+      '                <mi>i</mi>\n' +
+      '                <mi>x</mi>\n' +
+      '                <mrow>\n' +
+      '                  <mo>/</mo>\n' +
+      '                </mrow>\n' +
+      '                <mn>2</mn>\n' +
+      '                <msqrt>\n' +
+      '                  <mi>D</mi>\n' +
+      '                  <mi>t</mi>\n' +
+      '                </msqrt>\n' +
+      '              </mrow>\n' +
+      '              <mrow>\n' +
+      '                <mi mathvariant="normal">∞</mi>\n' +
+      '                <mo>+</mo>\n' +
+      '                <mi>i</mi>\n' +
+      '                <mi>x</mi>\n' +
+      '                <mrow>\n' +
+      '                  <mo>/</mo>\n' +
+      '                </mrow>\n' +
+      '                <mn>2</mn>\n' +
+      '                <msqrt>\n' +
+      '                  <mi>D</mi>\n' +
+      '                  <mi>t</mi>\n' +
+      '                </msqrt>\n' +
+      '              </mrow>\n' +
+      '            </msubsup>\n' +
+      '            <mrow>            \n' +
+      '              <msup>\n' +
+      '                <mi>e</mi>\n' +
+      '                <mrow>\n' +
+      '                  <mo>−</mo>\n' +
+      '                  <msup>\n' +
+      '                    <mi>s</mi>\n' +
+      '                    <mrow>\n' +
+      '                      <mn>2</mn>\n' +
+      '                    </mrow>\n' +
+      '                  </msup>\n' +
+      '                </mrow>\n' +
+      '              </msup>            \n' +
+      '            </mrow>            \n' +
+      '            <mi>d</mi>\n' +
+      '            <mi>s</mi>\n' +
+      '          </mrow>\n' +
+      '        </mrow>\n' +
+      '      </mtd>\n' +
+      '    </mtr>\n' +
+      '    <mtr>\n' +
+      '      <mtd>\n' +
+      '        <mrow>\n' +
+      '          <mrow>\n' +
+      '            <maligngroup/>\n' +
+      '          </mrow>\n' +
+      '          <mrow>\n' +
+      '            <maligngroup/>\n' +
+      '            <mi></mi>\n' +
+      '            <mo>=</mo>\n' +
+      '            <mfrac>\n' +
+      '              <msup>\n' +
+      '                <mi>e</mi>\n' +
+      '                <mrow>\n' +
+      '                  <mo>−</mo>\n' +
+      '                  <msup>\n' +
+      '                    <mi>x</mi>\n' +
+      '                    <mrow>\n' +
+      '                      <mn>2</mn>\n' +
+      '                    </mrow>\n' +
+      '                  </msup>\n' +
+      '                  <mrow>\n' +
+      '                    <mo>/</mo>\n' +
+      '                  </mrow>\n' +
+      '                  <mn>4</mn>\n' +
+      '                  <mi>D</mi>\n' +
+      '                  <mi>t</mi>\n' +
+      '                </mrow>\n' +
+      '              </msup>\n' +
+      '              <mrow>\n' +
+      '                <mn>2</mn>\n' +
+      '                <mi>π</mi>\n' +
+      '                <msqrt>\n' +
+      '                  <mi>D</mi>\n' +
+      '                  <mi>t</mi>\n' +
+      '                </msqrt>\n' +
+      '              </mrow>\n' +
+      '            </mfrac>\n' +
+      '            <munder accent="true" accentunder="false">\n' +
+      '              <mrow data-mjx-texclass="OP">\n' +
+      '                <munder accent="true" accentunder="false">\n' +
+      '                  <mrow>\n' +
+      '                    <msubsup>\n' +
+      '                      <mrow>\n' +
+      '                        <mo data-mjx-texclass="OP">∫</mo>\n' +
+      '                      </mrow>\n' +
+      '                      <mrow>\n' +
+      '                        <mo>−</mo>\n' +
+      '                        <mi mathvariant="normal">∞</mi>\n' +
+      '                      </mrow>\n' +
+      '                      <mrow>\n' +
+      '                        <mi mathvariant="normal">∞</mi>\n' +
+      '                      </mrow>\n' +
+      '                    </msubsup>\n' +
+      '                    <mrow>                    \n' +
+      '                      <msup>\n' +
+      '                        <mi>e</mi>\n' +
+      '                        <mrow>\n' +
+      '                          <mo>−</mo>\n' +
+      '                          <msup>\n' +
+      '                            <mi>s</mi>\n' +
+      '                            <mrow>\n' +
+      '                              <mn>2</mn>\n' +
+      '                            </mrow>\n' +
+      '                          </msup>\n' +
+      '                        </mrow>\n' +
+      '                      </msup>                    \n' +
+      '                    </mrow>                    \n' +
+      '                    <mi>d</mi>\n' +
+      '                    <mi>s</mi>\n' +
+      '                  </mrow>\n' +
+      '                  <mo>⏟</mo>\n' +
+      '                </munder>\n' +
+      '              </mrow>\n' +
+      '              <mrow>\n' +
+      '                <msqrt>\n' +
+      '                  <mi>π</mi>\n' +
+      '                </msqrt>\n' +
+      '              </mrow>\n' +
+      '            </munder>\n' +
+      '            <mrow>\n' +
+      '              <mo>=</mo>\n' +
+      '            </mrow>\n' +
+      '            <mfrac>\n' +
+      '              <msup>\n' +
+      '                <mi>e</mi>\n' +
+      '                <mrow>\n' +
+      '                  <mo>−</mo>\n' +
+      '                  <msup>\n' +
+      '                    <mi>x</mi>\n' +
+      '                    <mrow>\n' +
+      '                      <mn>2</mn>\n' +
+      '                    </mrow>\n' +
+      '                  </msup>\n' +
+      '                  <mrow>\n' +
+      '                    <mo>/</mo>\n' +
+      '                  </mrow>\n' +
+      '                  <mn>4</mn>\n' +
+      '                  <mi>D</mi>\n' +
+      '                  <mi>t</mi>\n' +
+      '                </mrow>\n' +
+      '              </msup>\n' +
+      '              <msqrt>\n' +
+      '                <mn>4</mn>\n' +
+      '                <mi>π</mi>\n' +
+      '                <mi>D</mi>\n' +
+      '                <mi>t</mi>\n' +
+      '              </msqrt>\n' +
+      '            </mfrac>\n' +
+      '            <mo>.</mo>\n' +
+      '          </mrow>\n' +
+      '        </mrow>\n' +
+      '      </mtd>\n' +
+      '    </mtr>\n' +
+      '  </mtable>\n' +
+      '</math>'
+  },
   // {
   //   latex_input: '',
   //   mathmlword: ''
   // },
-
 
 ];

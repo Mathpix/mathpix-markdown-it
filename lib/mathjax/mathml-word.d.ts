@@ -7,6 +7,7 @@ export declare class MathMLVisitorWord<N, T, D> extends SerializedMmlVisitor {
     visitTextNode(node: TextNode, space: string): string;
     restructureMtrForAligned(node: any, space: string): string;
     visitDefault(node: any, space: string): string;
+    isSubTable: (node: any) => boolean;
     needToAddRow: (node: any) => void;
     visitMunderoverNode(node: any, space: string): string;
     protected visitMunderNode(node: MmlMunder, space: string): string;

@@ -84,16 +84,15 @@ export class MathMLVisitorWord<N, T, D> extends SerializedMmlVisitor {
       mml += nl + space4 + '<maligngroup/>';
       mml += nl + space4 + '<malignmark/>';
       mml += nl + space4 + '<mrow>';
-      const child = this.childNodeMml(node.childNodes[i], space4, nl);
+      const child = this.childNodeMml(node.childNodes[i], space5, nl);
       mml += child.trim()
         ? nl + child
         : nl;
 
-
       if (i < node.childNodes.length - 1) {
-        mml += space4 + '<mo>&#xA0;&#xA0;</mo>';
+        mml += space5 + '<mo>&#xA0;&#xA0;</mo>' + nl;
       }
-      mml += space4 +'</mrow>';
+      mml +=  space4 +'</mrow>';
     }
     mml += nl + space3 +'</mrow>';
     mml += nl + space2 + '</mtd>';
@@ -109,21 +108,35 @@ export class MathMLVisitorWord<N, T, D> extends SerializedMmlVisitor {
     if (node.kind === 'msubsup') {
       return this.visitMunderoverNode(node, space);
     }
-
     if (node.kind === 'mtr' && this.options.aligned
-      && node.Parent && node.Parent.kind === 'mtable') {
-      const mml = this.restructureMtrForAligned(node, space);
-      if (mml) {
-        return mml;
+      && node.Parent && node.Parent.kind === 'mtable'
+    ) {
+      if ( node.Parent.Parent && node.Parent.Parent.kind === 'math'
+        || !this.isSubTable(node.Parent)) {
+        const mml = this.restructureMtrForAligned(node, space);
+        if (mml) {
+          return mml;
+        }
       }
     }
 
     if (this.needConvertToFenced(node)) {
       return this.convertToFenced(node, space)
     }
-
     return super.visitDefault(node,  space)
   }
+
+  public isSubTable = (node) => {
+    let res = false;
+    while(node.Parent) {
+      if (node.Parent.kind === 'mtable') {
+        res = true;
+        break;
+      }
+      node = node.Parent;
+    }
+    return res;
+  };
 
   public needToAddRow = (node) => {
     if (node.parent && node.parent.childNodes.length > 0) {
