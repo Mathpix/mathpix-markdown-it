@@ -105,7 +105,7 @@ export class MathMLVisitorWord<N, T, D> extends SerializedMmlVisitor {
     if (node.needRow) {
       return this.pasteNodeToNewRow(node, space);
     }
-    if (node.kind === 'msubsup') {
+    if (node.kind === 'msubsup' || node.kind === 'msub' || node.kind === 'sup') {
       return this.visitMunderoverNode(node, space);
     }
     if (node.kind === 'mtr' && this.options.aligned
@@ -157,16 +157,23 @@ export class MathMLVisitorWord<N, T, D> extends SerializedMmlVisitor {
       node.attributes.attributes.accentunder = false;
     }
 
-    this.needToAddRow(node);
-
     const base = node.childNodes[node.base];
 
-    if (base && base.kind !== 'TeXAtom'
+    if (node.kind !== 'msup' && node.kind !== 'msub' && base && base.kind !== 'TeXAtom'
       && (base.kind !== 'mrow' || this.needConvertToFenced(base))) {
       base.needRow = true;
     }
 
-    return super.visitDefault(node, space);
+    let [nl] = (node.isToken || node.childNodes.length === 0 ? ['\n', ''] : ['\n', space]);
+    let space2 = space  + '  ';
+    let mml: string = super.visitDefault(node, space);
+
+    if (base.kind === 'mo' && base.properties.texClass === 1) {
+      mml += nl + space  + '<mrow>';
+      mml += nl + space2 + '<mo>' + String.fromCharCode(8202) + '</mo>';
+      mml += nl + space  + '</mrow>';
+    }
+    return mml;
   }
 
   protected visitMunderNode(node: MmlMunder, space: string) {
