@@ -90,7 +90,12 @@ export class MathMLVisitorWord<N, T, D> extends SerializedMmlVisitor {
         : nl;
 
       if (i < node.childNodes.length - 1) {
-        mml += space5 + '<mo>' + String.fromCharCode(8197) + '</mo>' + nl;
+        mml += space5 + '<mo>'
+          + String.fromCharCode(8197)
+          + String.fromCharCode(8197)
+          + String.fromCharCode(8197)
+          + String.fromCharCode(8197)
+          + '</mo>' + nl;
       }
       mml +=  space4 +'</mrow>';
     }

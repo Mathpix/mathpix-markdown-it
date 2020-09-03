@@ -4420,7 +4420,7 @@ module.exports = [
       '              <mrow>\n' +
       '                <mi>x</mi>\n' +
       '                <mo>,</mo>\n' +
-      '                <mo> </mo>\n' +
+      '                <mo>    </mo>\n' +
       '              </mrow>\n' +
       '              <maligngroup/>\n' +
       '              <malignmark/>\n' +
@@ -4440,7 +4440,7 @@ module.exports = [
       '              <malignmark/>\n' +
       '              <mrow>\n' +
       '                <mn>0</mn>\n' +
-      '                <mo> </mo>\n' +
+      '                <mo>    </mo>\n' +
       '              </mrow>\n' +
       '              <maligngroup/>\n' +
       '              <malignmark/>\n' +
@@ -4461,7 +4461,7 @@ module.exports = [
       '              <mrow>\n' +
       '                <mo>−</mo>\n' +
       '                <mi>x</mi>\n' +
-      '                <mo> </mo>\n' +
+      '                <mo>    </mo>\n' +
       '              </mrow>\n' +
       '              <maligngroup/>\n' +
       '              <malignmark/>\n' +
@@ -5130,13 +5130,13 @@ module.exports = [
       '              <malignmark/>\n' +
       '              <mrow>\n' +
       '                <mn>1</mn>\n' +
-      '                <mo> </mo>\n' +
+      '                <mo>    </mo>\n' +
       '              </mrow>\n' +
       '              <maligngroup/>\n' +
       '              <malignmark/>\n' +
       '              <mrow>\n' +
       '                <mn>0</mn>\n' +
-      '                <mo> </mo>\n' +
+      '                <mo>    </mo>\n' +
       '              </mrow>\n' +
       '              <maligngroup/>\n' +
       '              <malignmark/>\n' +
@@ -5153,13 +5153,13 @@ module.exports = [
       '              <malignmark/>\n' +
       '              <mrow>\n' +
       '                <mn>0</mn>\n' +
-      '                <mo> </mo>\n' +
+      '                <mo>    </mo>\n' +
       '              </mrow>\n' +
       '              <maligngroup/>\n' +
       '              <malignmark/>\n' +
       '              <mrow>\n' +
       '                <mn>1</mn>\n' +
-      '                <mo> </mo>\n' +
+      '                <mo>    </mo>\n' +
       '              </mrow>\n' +
       '              <maligngroup/>\n' +
       '              <malignmark/>\n' +
@@ -5176,13 +5176,13 @@ module.exports = [
       '              <malignmark/>\n' +
       '              <mrow>\n' +
       '                <mn>0</mn>\n' +
-      '                <mo> </mo>\n' +
+      '                <mo>    </mo>\n' +
       '              </mrow>\n' +
       '              <maligngroup/>\n' +
       '              <malignmark/>\n' +
       '              <mrow>\n' +
       '                <mn>0</mn>\n' +
-      '                <mo> </mo>\n' +
+      '                <mo>    </mo>\n' +
       '              </mrow>\n' +
       '              <maligngroup/>\n' +
       '              <malignmark/>\n' +
@@ -5257,7 +5257,7 @@ module.exports = [
       '                    <mn>1</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
-      '                <mo> </mo>\n' +
+      '                <mo>    </mo>\n' +
       '              </mrow>\n' +
       '              <maligngroup/>\n' +
       '              <malignmark/>\n' +
@@ -5268,7 +5268,7 @@ module.exports = [
       '                    <mn>2</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
-      '                <mo> </mo>\n' +
+      '                <mo>    </mo>\n' +
       '              </mrow>\n' +
       '              <maligngroup/>\n' +
       '              <malignmark/>\n' +
@@ -5427,7 +5427,7 @@ module.exports = [
       '                    <mn>11</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
-      '                <mo> </mo>\n' +
+      '                <mo>    </mo>\n' +
       '              </mrow>\n' +
       '              <maligngroup/>\n' +
       '              <malignmark/>\n' +
@@ -5438,7 +5438,7 @@ module.exports = [
       '                    <mn>12</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
-      '                <mo> </mo>\n' +
+      '                <mo>    </mo>\n' +
       '              </mrow>\n' +
       '              <maligngroup/>\n' +
       '              <malignmark/>\n' +
@@ -5465,7 +5465,7 @@ module.exports = [
       '                    <mn>21</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
-      '                <mo> </mo>\n' +
+      '                <mo>    </mo>\n' +
       '              </mrow>\n' +
       '              <maligngroup/>\n' +
       '              <malignmark/>\n' +
@@ -5476,7 +5476,7 @@ module.exports = [
       '                    <mn>22</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
-      '                <mo> </mo>\n' +
+      '                <mo>    </mo>\n' +
       '              </mrow>\n' +
       '              <maligngroup/>\n' +
       '              <malignmark/>\n' +
@@ -5503,7 +5503,7 @@ module.exports = [
       '                    <mn>31</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
-      '                <mo> </mo>\n' +
+      '                <mo>    </mo>\n' +
       '              </mrow>\n' +
       '              <maligngroup/>\n' +
       '              <malignmark/>\n' +
@@ -5514,7 +5514,7 @@ module.exports = [
       '                    <mn>32</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
-      '                <mo> </mo>\n' +
+      '                <mo>    </mo>\n' +
       '              </mrow>\n' +
       '              <maligngroup/>\n' +
       '              <malignmark/>\n' +
@@ -5541,7 +5541,7 @@ module.exports = [
       '                    <mn>41</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
-      '                <mo> </mo>\n' +
+      '                <mo>    </mo>\n' +
       '              </mrow>\n' +
       '              <maligngroup/>\n' +
       '              <malignmark/>\n' +
@@ -5552,7 +5552,7 @@ module.exports = [
       '                    <mn>42</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
-      '                <mo> </mo>\n' +
+      '                <mo>    </mo>\n' +
       '              </mrow>\n' +
       '              <maligngroup/>\n' +
       '              <malignmark/>\n' +
@@ -5579,7 +5579,7 @@ module.exports = [
       '                    <mn>51</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
-      '                <mo> </mo>\n' +
+      '                <mo>    </mo>\n' +
       '              </mrow>\n' +
       '              <maligngroup/>\n' +
       '              <malignmark/>\n' +
@@ -5590,7 +5590,7 @@ module.exports = [
       '                    <mn>52</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
-      '                <mo> </mo>\n' +
+      '                <mo>    </mo>\n' +
       '              </mrow>\n' +
       '              <maligngroup/>\n' +
       '              <malignmark/>\n' +
