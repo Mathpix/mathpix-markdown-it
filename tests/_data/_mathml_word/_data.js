@@ -4453,7 +4453,7 @@ module.exports = [
       '              <mrow>\n' +
       '                <mi>x</mi>\n' +
       '                <mo>,</mo>\n' +
-      '                <mo>&#xA0;&#xA0;</mo>\n' +
+      '                <mo> </mo>\n' +
       '              </mrow>\n' +
       '              <maligngroup/>\n' +
       '              <malignmark/>\n' +
@@ -4473,7 +4473,7 @@ module.exports = [
       '              <malignmark/>\n' +
       '              <mrow>\n' +
       '                <mn>0</mn>\n' +
-      '                <mo>&#xA0;&#xA0;</mo>\n' +
+      '                <mo> </mo>\n' +
       '              </mrow>\n' +
       '              <maligngroup/>\n' +
       '              <malignmark/>\n' +
@@ -4494,7 +4494,7 @@ module.exports = [
       '              <mrow>\n' +
       '                <mo>−</mo>\n' +
       '                <mi>x</mi>\n' +
-      '                <mo>&#xA0;&#xA0;</mo>\n' +
+      '                <mo> </mo>\n' +
       '              </mrow>\n' +
       '              <maligngroup/>\n' +
       '              <malignmark/>\n' +
@@ -5159,13 +5159,13 @@ module.exports = [
       '              <malignmark/>\n' +
       '              <mrow>\n' +
       '                <mn>1</mn>\n' +
-      '                <mo>&#xA0;&#xA0;</mo>\n' +
+      '                <mo> </mo>\n' +
       '              </mrow>\n' +
       '              <maligngroup/>\n' +
       '              <malignmark/>\n' +
       '              <mrow>\n' +
       '                <mn>0</mn>\n' +
-      '                <mo>&#xA0;&#xA0;</mo>\n' +
+      '                <mo> </mo>\n' +
       '              </mrow>\n' +
       '              <maligngroup/>\n' +
       '              <malignmark/>\n' +
@@ -5182,13 +5182,13 @@ module.exports = [
       '              <malignmark/>\n' +
       '              <mrow>\n' +
       '                <mn>0</mn>\n' +
-      '                <mo>&#xA0;&#xA0;</mo>\n' +
+      '                <mo> </mo>\n' +
       '              </mrow>\n' +
       '              <maligngroup/>\n' +
       '              <malignmark/>\n' +
       '              <mrow>\n' +
       '                <mn>1</mn>\n' +
-      '                <mo>&#xA0;&#xA0;</mo>\n' +
+      '                <mo> </mo>\n' +
       '              </mrow>\n' +
       '              <maligngroup/>\n' +
       '              <malignmark/>\n' +
@@ -5205,13 +5205,13 @@ module.exports = [
       '              <malignmark/>\n' +
       '              <mrow>\n' +
       '                <mn>0</mn>\n' +
-      '                <mo>&#xA0;&#xA0;</mo>\n' +
+      '                <mo> </mo>\n' +
       '              </mrow>\n' +
       '              <maligngroup/>\n' +
       '              <malignmark/>\n' +
       '              <mrow>\n' +
       '                <mn>0</mn>\n' +
-      '                <mo>&#xA0;&#xA0;</mo>\n' +
+      '                <mo> </mo>\n' +
       '              </mrow>\n' +
       '              <maligngroup/>\n' +
       '              <malignmark/>\n' +
@@ -5259,6 +5259,683 @@ module.exports = [
       '  </mfenced>\n' +
       '</math>'
   },
+
+  {
+    latex_input: '\\[\\left(\\begin{array}{lll}\n' +
+      'x_{1} & x_{2} & x_{3}\n' +
+      '\\end{array}\\right) \\cdot\\left(\\begin{array}{l}\n' +
+      'w_{1} \\\\\n' +
+      'w_{2} \\\\\n' +
+      'w_{3}\n' +
+      '\\end{array}\\right)=\\left(\\begin{array}{l}\n' +
+      'x_{1} w_{1}+x_{2} w_{2}+x_{3} w_{3}\n' +
+      '\\end{array}\\right)\\]',
+    mathmlword: '<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">\n' +
+      '  <mfenced open="(" close=")" separators="|">\n' +
+      '    <mrow>\n' +
+      '      <mtable columnalign="left left left" columnspacing="1em" rowspacing="4pt">\n' +
+      '        <mtr>\n' +
+      '          <mtd>\n' +
+      '            <mrow>\n' +
+      '              <maligngroup/>\n' +
+      '              <malignmark/>\n' +
+      '              <mrow>\n' +
+      '                <msub>\n' +
+      '                  <mi>x</mi>\n' +
+      '                  <mrow>\n' +
+      '                    <mn>1</mn>\n' +
+      '                  </mrow>\n' +
+      '                </msub>\n' +
+      '                <mo> </mo>\n' +
+      '              </mrow>\n' +
+      '              <maligngroup/>\n' +
+      '              <malignmark/>\n' +
+      '              <mrow>\n' +
+      '                <msub>\n' +
+      '                  <mi>x</mi>\n' +
+      '                  <mrow>\n' +
+      '                    <mn>2</mn>\n' +
+      '                  </mrow>\n' +
+      '                </msub>\n' +
+      '                <mo> </mo>\n' +
+      '              </mrow>\n' +
+      '              <maligngroup/>\n' +
+      '              <malignmark/>\n' +
+      '              <mrow>\n' +
+      '                <msub>\n' +
+      '                  <mi>x</mi>\n' +
+      '                  <mrow>\n' +
+      '                    <mn>3</mn>\n' +
+      '                  </mrow>\n' +
+      '                </msub>\n' +
+      '              </mrow>\n' +
+      '            </mrow>\n' +
+      '          </mtd>\n' +
+      '        </mtr>\n' +
+      '      </mtable>  \n' +
+      '    </mrow>  \n' +
+      '  </mfenced>\n' +
+      '  <mo>⋅</mo>\n' +
+      '  <mfenced open="(" close=")" separators="|">\n' +
+      '    <mrow>\n' +
+      '      <mtable columnalign="left" columnspacing="1em" rowspacing="4pt">\n' +
+      '        <mtr>\n' +
+      '          <mtd>\n' +
+      '            <mrow>\n' +
+      '                <maligngroup/>\n' +
+      '                <malignmark/>\n' +
+      '                <msub>\n' +
+      '                  <mi>w</mi>\n' +
+      '                  <mrow>\n' +
+      '                    <mn>1</mn>\n' +
+      '                  </mrow>\n' +
+      '                </msub>\n' +
+      '            </mrow>\n' +
+      '          </mtd>\n' +
+      '        </mtr>\n' +
+      '        <mtr>\n' +
+      '          <mtd>\n' +
+      '            <mrow>\n' +
+      '                <maligngroup/>\n' +
+      '                <malignmark/>\n' +
+      '                <msub>\n' +
+      '                  <mi>w</mi>\n' +
+      '                  <mrow>\n' +
+      '                    <mn>2</mn>\n' +
+      '                  </mrow>\n' +
+      '                </msub>\n' +
+      '            </mrow>\n' +
+      '          </mtd>\n' +
+      '        </mtr>\n' +
+      '        <mtr>\n' +
+      '          <mtd>\n' +
+      '            <mrow>\n' +
+      '                <maligngroup/>\n' +
+      '                <malignmark/>\n' +
+      '                <msub>\n' +
+      '                  <mi>w</mi>\n' +
+      '                  <mrow>\n' +
+      '                    <mn>3</mn>\n' +
+      '                  </mrow>\n' +
+      '                </msub>\n' +
+      '            </mrow>\n' +
+      '          </mtd>\n' +
+      '        </mtr>\n' +
+      '      </mtable>  \n' +
+      '    </mrow>  \n' +
+      '  </mfenced>\n' +
+      '  <mo>=</mo>\n' +
+      '  <mfenced open="(" close=")" separators="|">\n' +
+      '    <mrow>\n' +
+      '      <mtable columnalign="left" columnspacing="1em" rowspacing="4pt">\n' +
+      '        <mtr>\n' +
+      '          <mtd>\n' +
+      '            <mrow>\n' +
+      '                <maligngroup/>\n' +
+      '                <malignmark/>\n' +
+      '                <msub>\n' +
+      '                  <mi>x</mi>\n' +
+      '                  <mrow>\n' +
+      '                    <mn>1</mn>\n' +
+      '                  </mrow>\n' +
+      '                </msub>\n' +
+      '                <msub>\n' +
+      '                  <mi>w</mi>\n' +
+      '                  <mrow>\n' +
+      '                    <mn>1</mn>\n' +
+      '                  </mrow>\n' +
+      '                </msub>\n' +
+      '                <mo>+</mo>\n' +
+      '                <msub>\n' +
+      '                  <mi>x</mi>\n' +
+      '                  <mrow>\n' +
+      '                    <mn>2</mn>\n' +
+      '                  </mrow>\n' +
+      '                </msub>\n' +
+      '                <msub>\n' +
+      '                  <mi>w</mi>\n' +
+      '                  <mrow>\n' +
+      '                    <mn>2</mn>\n' +
+      '                  </mrow>\n' +
+      '                </msub>\n' +
+      '                <mo>+</mo>\n' +
+      '                <msub>\n' +
+      '                  <mi>x</mi>\n' +
+      '                  <mrow>\n' +
+      '                    <mn>3</mn>\n' +
+      '                  </mrow>\n' +
+      '                </msub>\n' +
+      '                <msub>\n' +
+      '                  <mi>w</mi>\n' +
+      '                  <mrow>\n' +
+      '                    <mn>3</mn>\n' +
+      '                  </mrow>\n' +
+      '                </msub>\n' +
+      '            </mrow>\n' +
+      '          </mtd>\n' +
+      '        </mtr>\n' +
+      '      </mtable>  \n' +
+      '    </mrow>  \n' +
+      '  </mfenced>\n' +
+      '</math>'
+  },
+  {
+    latex_input: '\\[\n' +
+      '\\left(\\begin{array}{lll}\n' +
+      'x_{11} & x_{12} & x_{13} \\\\\n' +
+      'x_{21} & x_{22} & x_{23} \\\\\n' +
+      'x_{31} & x_{32} & x_{33} \\\\\n' +
+      'x_{41} & x_{42} & x_{43} \\\\\n' +
+      'x_{51} & x_{52} & x_{53}\n' +
+      '\\end{array}\\right) \\cdot\\left(\\begin{array}{l}\n' +
+      'w_{1} \\\\\n' +
+      'w_{2} \\\\\n' +
+      'w_{3}\n' +
+      '\\end{array}\\right)=\\left(\\begin{array}{l}\n' +
+      'x_{11} w_{1}+x_{12} w_{2}+x_{13} w_{3} \\\\\n' +
+      'x_{21} w_{1}+x_{22} w_{2}+x_{23} w_{3} \\\\\n' +
+      'x_{31} w_{1}+x_{32} w_{2}+x_{33} w_{3} \\\\\n' +
+      'x_{41} w_{1}+x_{42} w_{2}+x_{43} w_{3} \\\\\n' +
+      'x_{51} w_{1}+x_{52} w_{2}+x_{53} w_{3}\n' +
+      '\\end{array}\\right)\n' +
+      '\\]',
+    mathmlword: '<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">\n' +
+      '  <mfenced open="(" close=")" separators="|">\n' +
+      '    <mrow>\n' +
+      '      <mtable columnalign="left left left" columnspacing="1em" rowspacing="4pt">\n' +
+      '        <mtr>\n' +
+      '          <mtd>\n' +
+      '            <mrow>\n' +
+      '              <maligngroup/>\n' +
+      '              <malignmark/>\n' +
+      '              <mrow>\n' +
+      '                <msub>\n' +
+      '                  <mi>x</mi>\n' +
+      '                  <mrow>\n' +
+      '                    <mn>11</mn>\n' +
+      '                  </mrow>\n' +
+      '                </msub>\n' +
+      '                <mo> </mo>\n' +
+      '              </mrow>\n' +
+      '              <maligngroup/>\n' +
+      '              <malignmark/>\n' +
+      '              <mrow>\n' +
+      '                <msub>\n' +
+      '                  <mi>x</mi>\n' +
+      '                  <mrow>\n' +
+      '                    <mn>12</mn>\n' +
+      '                  </mrow>\n' +
+      '                </msub>\n' +
+      '                <mo> </mo>\n' +
+      '              </mrow>\n' +
+      '              <maligngroup/>\n' +
+      '              <malignmark/>\n' +
+      '              <mrow>\n' +
+      '                <msub>\n' +
+      '                  <mi>x</mi>\n' +
+      '                  <mrow>\n' +
+      '                    <mn>13</mn>\n' +
+      '                  </mrow>\n' +
+      '                </msub>\n' +
+      '              </mrow>\n' +
+      '            </mrow>\n' +
+      '          </mtd>\n' +
+      '        </mtr>\n' +
+      '        <mtr>\n' +
+      '          <mtd>\n' +
+      '            <mrow>\n' +
+      '              <maligngroup/>\n' +
+      '              <malignmark/>\n' +
+      '              <mrow>\n' +
+      '                <msub>\n' +
+      '                  <mi>x</mi>\n' +
+      '                  <mrow>\n' +
+      '                    <mn>21</mn>\n' +
+      '                  </mrow>\n' +
+      '                </msub>\n' +
+      '                <mo> </mo>\n' +
+      '              </mrow>\n' +
+      '              <maligngroup/>\n' +
+      '              <malignmark/>\n' +
+      '              <mrow>\n' +
+      '                <msub>\n' +
+      '                  <mi>x</mi>\n' +
+      '                  <mrow>\n' +
+      '                    <mn>22</mn>\n' +
+      '                  </mrow>\n' +
+      '                </msub>\n' +
+      '                <mo> </mo>\n' +
+      '              </mrow>\n' +
+      '              <maligngroup/>\n' +
+      '              <malignmark/>\n' +
+      '              <mrow>\n' +
+      '                <msub>\n' +
+      '                  <mi>x</mi>\n' +
+      '                  <mrow>\n' +
+      '                    <mn>23</mn>\n' +
+      '                  </mrow>\n' +
+      '                </msub>\n' +
+      '              </mrow>\n' +
+      '            </mrow>\n' +
+      '          </mtd>\n' +
+      '        </mtr>\n' +
+      '        <mtr>\n' +
+      '          <mtd>\n' +
+      '            <mrow>\n' +
+      '              <maligngroup/>\n' +
+      '              <malignmark/>\n' +
+      '              <mrow>\n' +
+      '                <msub>\n' +
+      '                  <mi>x</mi>\n' +
+      '                  <mrow>\n' +
+      '                    <mn>31</mn>\n' +
+      '                  </mrow>\n' +
+      '                </msub>\n' +
+      '                <mo> </mo>\n' +
+      '              </mrow>\n' +
+      '              <maligngroup/>\n' +
+      '              <malignmark/>\n' +
+      '              <mrow>\n' +
+      '                <msub>\n' +
+      '                  <mi>x</mi>\n' +
+      '                  <mrow>\n' +
+      '                    <mn>32</mn>\n' +
+      '                  </mrow>\n' +
+      '                </msub>\n' +
+      '                <mo> </mo>\n' +
+      '              </mrow>\n' +
+      '              <maligngroup/>\n' +
+      '              <malignmark/>\n' +
+      '              <mrow>\n' +
+      '                <msub>\n' +
+      '                  <mi>x</mi>\n' +
+      '                  <mrow>\n' +
+      '                    <mn>33</mn>\n' +
+      '                  </mrow>\n' +
+      '                </msub>\n' +
+      '              </mrow>\n' +
+      '            </mrow>\n' +
+      '          </mtd>\n' +
+      '        </mtr>\n' +
+      '        <mtr>\n' +
+      '          <mtd>\n' +
+      '            <mrow>\n' +
+      '              <maligngroup/>\n' +
+      '              <malignmark/>\n' +
+      '              <mrow>\n' +
+      '                <msub>\n' +
+      '                  <mi>x</mi>\n' +
+      '                  <mrow>\n' +
+      '                    <mn>41</mn>\n' +
+      '                  </mrow>\n' +
+      '                </msub>\n' +
+      '                <mo> </mo>\n' +
+      '              </mrow>\n' +
+      '              <maligngroup/>\n' +
+      '              <malignmark/>\n' +
+      '              <mrow>\n' +
+      '                <msub>\n' +
+      '                  <mi>x</mi>\n' +
+      '                  <mrow>\n' +
+      '                    <mn>42</mn>\n' +
+      '                  </mrow>\n' +
+      '                </msub>\n' +
+      '                <mo> </mo>\n' +
+      '              </mrow>\n' +
+      '              <maligngroup/>\n' +
+      '              <malignmark/>\n' +
+      '              <mrow>\n' +
+      '                <msub>\n' +
+      '                  <mi>x</mi>\n' +
+      '                  <mrow>\n' +
+      '                    <mn>43</mn>\n' +
+      '                  </mrow>\n' +
+      '                </msub>\n' +
+      '              </mrow>\n' +
+      '            </mrow>\n' +
+      '          </mtd>\n' +
+      '        </mtr>\n' +
+      '        <mtr>\n' +
+      '          <mtd>\n' +
+      '            <mrow>\n' +
+      '              <maligngroup/>\n' +
+      '              <malignmark/>\n' +
+      '              <mrow>\n' +
+      '                <msub>\n' +
+      '                  <mi>x</mi>\n' +
+      '                  <mrow>\n' +
+      '                    <mn>51</mn>\n' +
+      '                  </mrow>\n' +
+      '                </msub>\n' +
+      '                <mo> </mo>\n' +
+      '              </mrow>\n' +
+      '              <maligngroup/>\n' +
+      '              <malignmark/>\n' +
+      '              <mrow>\n' +
+      '                <msub>\n' +
+      '                  <mi>x</mi>\n' +
+      '                  <mrow>\n' +
+      '                    <mn>52</mn>\n' +
+      '                  </mrow>\n' +
+      '                </msub>\n' +
+      '                <mo> </mo>\n' +
+      '              </mrow>\n' +
+      '              <maligngroup/>\n' +
+      '              <malignmark/>\n' +
+      '              <mrow>\n' +
+      '                <msub>\n' +
+      '                  <mi>x</mi>\n' +
+      '                  <mrow>\n' +
+      '                    <mn>53</mn>\n' +
+      '                  </mrow>\n' +
+      '                </msub>\n' +
+      '              </mrow>\n' +
+      '            </mrow>\n' +
+      '          </mtd>\n' +
+      '        </mtr>\n' +
+      '      </mtable>  \n' +
+      '    </mrow>  \n' +
+      '  </mfenced>\n' +
+      '  <mo>⋅</mo>\n' +
+      '  <mfenced open="(" close=")" separators="|">\n' +
+      '    <mrow>\n' +
+      '      <mtable columnalign="left" columnspacing="1em" rowspacing="4pt">\n' +
+      '        <mtr>\n' +
+      '          <mtd>\n' +
+      '            <mrow>\n' +
+      '                <maligngroup/>\n' +
+      '                <malignmark/>\n' +
+      '                <msub>\n' +
+      '                  <mi>w</mi>\n' +
+      '                  <mrow>\n' +
+      '                    <mn>1</mn>\n' +
+      '                  </mrow>\n' +
+      '                </msub>\n' +
+      '            </mrow>\n' +
+      '          </mtd>\n' +
+      '        </mtr>\n' +
+      '        <mtr>\n' +
+      '          <mtd>\n' +
+      '            <mrow>\n' +
+      '                <maligngroup/>\n' +
+      '                <malignmark/>\n' +
+      '                <msub>\n' +
+      '                  <mi>w</mi>\n' +
+      '                  <mrow>\n' +
+      '                    <mn>2</mn>\n' +
+      '                  </mrow>\n' +
+      '                </msub>\n' +
+      '            </mrow>\n' +
+      '          </mtd>\n' +
+      '        </mtr>\n' +
+      '        <mtr>\n' +
+      '          <mtd>\n' +
+      '            <mrow>\n' +
+      '                <maligngroup/>\n' +
+      '                <malignmark/>\n' +
+      '                <msub>\n' +
+      '                  <mi>w</mi>\n' +
+      '                  <mrow>\n' +
+      '                    <mn>3</mn>\n' +
+      '                  </mrow>\n' +
+      '                </msub>\n' +
+      '            </mrow>\n' +
+      '          </mtd>\n' +
+      '        </mtr>\n' +
+      '      </mtable>  \n' +
+      '    </mrow>  \n' +
+      '  </mfenced>\n' +
+      '  <mo>=</mo>\n' +
+      '  <mfenced open="(" close=")" separators="|">\n' +
+      '    <mrow>\n' +
+      '      <mtable columnalign="left" columnspacing="1em" rowspacing="4pt">\n' +
+      '        <mtr>\n' +
+      '          <mtd>\n' +
+      '            <mrow>\n' +
+      '                <maligngroup/>\n' +
+      '                <malignmark/>\n' +
+      '                <msub>\n' +
+      '                  <mi>x</mi>\n' +
+      '                  <mrow>\n' +
+      '                    <mn>11</mn>\n' +
+      '                  </mrow>\n' +
+      '                </msub>\n' +
+      '                <msub>\n' +
+      '                  <mi>w</mi>\n' +
+      '                  <mrow>\n' +
+      '                    <mn>1</mn>\n' +
+      '                  </mrow>\n' +
+      '                </msub>\n' +
+      '                <mo>+</mo>\n' +
+      '                <msub>\n' +
+      '                  <mi>x</mi>\n' +
+      '                  <mrow>\n' +
+      '                    <mn>12</mn>\n' +
+      '                  </mrow>\n' +
+      '                </msub>\n' +
+      '                <msub>\n' +
+      '                  <mi>w</mi>\n' +
+      '                  <mrow>\n' +
+      '                    <mn>2</mn>\n' +
+      '                  </mrow>\n' +
+      '                </msub>\n' +
+      '                <mo>+</mo>\n' +
+      '                <msub>\n' +
+      '                  <mi>x</mi>\n' +
+      '                  <mrow>\n' +
+      '                    <mn>13</mn>\n' +
+      '                  </mrow>\n' +
+      '                </msub>\n' +
+      '                <msub>\n' +
+      '                  <mi>w</mi>\n' +
+      '                  <mrow>\n' +
+      '                    <mn>3</mn>\n' +
+      '                  </mrow>\n' +
+      '                </msub>\n' +
+      '            </mrow>\n' +
+      '          </mtd>\n' +
+      '        </mtr>\n' +
+      '        <mtr>\n' +
+      '          <mtd>\n' +
+      '            <mrow>\n' +
+      '                <maligngroup/>\n' +
+      '                <malignmark/>\n' +
+      '                <msub>\n' +
+      '                  <mi>x</mi>\n' +
+      '                  <mrow>\n' +
+      '                    <mn>21</mn>\n' +
+      '                  </mrow>\n' +
+      '                </msub>\n' +
+      '                <msub>\n' +
+      '                  <mi>w</mi>\n' +
+      '                  <mrow>\n' +
+      '                    <mn>1</mn>\n' +
+      '                  </mrow>\n' +
+      '                </msub>\n' +
+      '                <mo>+</mo>\n' +
+      '                <msub>\n' +
+      '                  <mi>x</mi>\n' +
+      '                  <mrow>\n' +
+      '                    <mn>22</mn>\n' +
+      '                  </mrow>\n' +
+      '                </msub>\n' +
+      '                <msub>\n' +
+      '                  <mi>w</mi>\n' +
+      '                  <mrow>\n' +
+      '                    <mn>2</mn>\n' +
+      '                  </mrow>\n' +
+      '                </msub>\n' +
+      '                <mo>+</mo>\n' +
+      '                <msub>\n' +
+      '                  <mi>x</mi>\n' +
+      '                  <mrow>\n' +
+      '                    <mn>23</mn>\n' +
+      '                  </mrow>\n' +
+      '                </msub>\n' +
+      '                <msub>\n' +
+      '                  <mi>w</mi>\n' +
+      '                  <mrow>\n' +
+      '                    <mn>3</mn>\n' +
+      '                  </mrow>\n' +
+      '                </msub>\n' +
+      '            </mrow>\n' +
+      '          </mtd>\n' +
+      '        </mtr>\n' +
+      '        <mtr>\n' +
+      '          <mtd>\n' +
+      '            <mrow>\n' +
+      '                <maligngroup/>\n' +
+      '                <malignmark/>\n' +
+      '                <msub>\n' +
+      '                  <mi>x</mi>\n' +
+      '                  <mrow>\n' +
+      '                    <mn>31</mn>\n' +
+      '                  </mrow>\n' +
+      '                </msub>\n' +
+      '                <msub>\n' +
+      '                  <mi>w</mi>\n' +
+      '                  <mrow>\n' +
+      '                    <mn>1</mn>\n' +
+      '                  </mrow>\n' +
+      '                </msub>\n' +
+      '                <mo>+</mo>\n' +
+      '                <msub>\n' +
+      '                  <mi>x</mi>\n' +
+      '                  <mrow>\n' +
+      '                    <mn>32</mn>\n' +
+      '                  </mrow>\n' +
+      '                </msub>\n' +
+      '                <msub>\n' +
+      '                  <mi>w</mi>\n' +
+      '                  <mrow>\n' +
+      '                    <mn>2</mn>\n' +
+      '                  </mrow>\n' +
+      '                </msub>\n' +
+      '                <mo>+</mo>\n' +
+      '                <msub>\n' +
+      '                  <mi>x</mi>\n' +
+      '                  <mrow>\n' +
+      '                    <mn>33</mn>\n' +
+      '                  </mrow>\n' +
+      '                </msub>\n' +
+      '                <msub>\n' +
+      '                  <mi>w</mi>\n' +
+      '                  <mrow>\n' +
+      '                    <mn>3</mn>\n' +
+      '                  </mrow>\n' +
+      '                </msub>\n' +
+      '            </mrow>\n' +
+      '          </mtd>\n' +
+      '        </mtr>\n' +
+      '        <mtr>\n' +
+      '          <mtd>\n' +
+      '            <mrow>\n' +
+      '                <maligngroup/>\n' +
+      '                <malignmark/>\n' +
+      '                <msub>\n' +
+      '                  <mi>x</mi>\n' +
+      '                  <mrow>\n' +
+      '                    <mn>41</mn>\n' +
+      '                  </mrow>\n' +
+      '                </msub>\n' +
+      '                <msub>\n' +
+      '                  <mi>w</mi>\n' +
+      '                  <mrow>\n' +
+      '                    <mn>1</mn>\n' +
+      '                  </mrow>\n' +
+      '                </msub>\n' +
+      '                <mo>+</mo>\n' +
+      '                <msub>\n' +
+      '                  <mi>x</mi>\n' +
+      '                  <mrow>\n' +
+      '                    <mn>42</mn>\n' +
+      '                  </mrow>\n' +
+      '                </msub>\n' +
+      '                <msub>\n' +
+      '                  <mi>w</mi>\n' +
+      '                  <mrow>\n' +
+      '                    <mn>2</mn>\n' +
+      '                  </mrow>\n' +
+      '                </msub>\n' +
+      '                <mo>+</mo>\n' +
+      '                <msub>\n' +
+      '                  <mi>x</mi>\n' +
+      '                  <mrow>\n' +
+      '                    <mn>43</mn>\n' +
+      '                  </mrow>\n' +
+      '                </msub>\n' +
+      '                <msub>\n' +
+      '                  <mi>w</mi>\n' +
+      '                  <mrow>\n' +
+      '                    <mn>3</mn>\n' +
+      '                  </mrow>\n' +
+      '                </msub>\n' +
+      '            </mrow>\n' +
+      '          </mtd>\n' +
+      '        </mtr>\n' +
+      '        <mtr>\n' +
+      '          <mtd>\n' +
+      '            <mrow>\n' +
+      '                <maligngroup/>\n' +
+      '                <malignmark/>\n' +
+      '                <msub>\n' +
+      '                  <mi>x</mi>\n' +
+      '                  <mrow>\n' +
+      '                    <mn>51</mn>\n' +
+      '                  </mrow>\n' +
+      '                </msub>\n' +
+      '                <msub>\n' +
+      '                  <mi>w</mi>\n' +
+      '                  <mrow>\n' +
+      '                    <mn>1</mn>\n' +
+      '                  </mrow>\n' +
+      '                </msub>\n' +
+      '                <mo>+</mo>\n' +
+      '                <msub>\n' +
+      '                  <mi>x</mi>\n' +
+      '                  <mrow>\n' +
+      '                    <mn>52</mn>\n' +
+      '                  </mrow>\n' +
+      '                </msub>\n' +
+      '                <msub>\n' +
+      '                  <mi>w</mi>\n' +
+      '                  <mrow>\n' +
+      '                    <mn>2</mn>\n' +
+      '                  </mrow>\n' +
+      '                </msub>\n' +
+      '                <mo>+</mo>\n' +
+      '                <msub>\n' +
+      '                  <mi>x</mi>\n' +
+      '                  <mrow>\n' +
+      '                    <mn>53</mn>\n' +
+      '                  </mrow>\n' +
+      '                </msub>\n' +
+      '                <msub>\n' +
+      '                  <mi>w</mi>\n' +
+      '                  <mrow>\n' +
+      '                    <mn>3</mn>\n' +
+      '                  </mrow>\n' +
+      '                </msub>\n' +
+      '            </mrow>\n' +
+      '          </mtd>\n' +
+      '        </mtr>\n' +
+      '      </mtable>  \n' +
+      '    </mrow>  \n' +
+      '  </mfenced>\n' +
+      '</math>'
+  },
+  // {
+  //   latex_input: '',
+  //   mathmlword: ''
+  // },
+  // {
+  //   latex_input: '',
+  //   mathmlword: ''
+  // },
+  // {
+  //   latex_input: '',
+  //   mathmlword: ''
+  // },
   // {
   //   latex_input: '',
   //   mathmlword: ''
