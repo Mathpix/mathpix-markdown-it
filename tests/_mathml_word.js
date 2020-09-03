@@ -25,7 +25,7 @@ describe('Check mathml_word:', () => {
   tests.forEach(function(test, index) {
     const html = MM.render(test.latex_input, options);
     const data = MM.parseMarkdownByHTML(html, false);
-    describe(index + '. [input_latex] => ' + test.latex_input, () => {
+    describe((index + 1) + '. [input_latex] => ' + test.latex_input, () => {
       it('Should be return mathml_word =>', function(done) {
         data[0].should.have.property('type', 'mathmlword');
         data[0].should.have.property('value', test.mathmlword);
