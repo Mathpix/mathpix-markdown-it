@@ -3,7 +3,8 @@ import { ConfiguredMathJaxPlugin, CustomTagPlugin, HighlightPlugin,
     anchorPlugin,
     //separateForBlockPlugin,
     tableTabularPlugin,
-    listsPlugin
+    listsPlugin,
+    collapsiblePlugin
 } from "./mdPluginConfigured";
 import { injectRenderRules } from "./rules";
 import {MathpixMarkdownModel as MM, TMarkdownItOptions} from '../mathpix-markdown-model'
@@ -39,7 +40,7 @@ const mdInit = (options: TMarkdownItOptions) => {
     .use(require("markdown-it-deflist"))
     .use(require("markdown-it-mark"))
     .use(require("markdown-it-emoji"))
-    .use(require("markdown-it-collapsible"))
+    .use(collapsiblePlugin)
     .use(require("markdown-it-ins"));
 };
 

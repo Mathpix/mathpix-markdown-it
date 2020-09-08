@@ -23,3 +23,4 @@ export declare const anchorPlugin: {
 };
 export declare const tableTabularPlugin: (md: any, options: any) => void;
 export declare const listsPlugin: (md: any, options: any) => void;
+export declare const collapsiblePlugin: (md: any) => void;
