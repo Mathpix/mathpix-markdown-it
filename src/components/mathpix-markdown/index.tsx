@@ -10,7 +10,7 @@ class MathpixMarkdown extends React.Component<MathpixMarkdownProps> {
     render() {
         const { text, alignMathBlock='center', display='block', isCheckFormula=false, showTimeLog=false,isDisableFancy=false,
           htmlTags=false, width=0, breaks=true, typographer=false, linkify=false, xhtmlOut=false,
-          outMath={}, mathJax={}, htmlSanitize = {}} = this.props;
+          outMath={}, mathJax={}, htmlSanitize = {}, smiles = {}} = this.props;
         const disableRules = isDisableFancy ? MM.disableFancyArrayDef : this.props.disableRules || [];
         const markdownItOptions: TMarkdownItOptions = {
             isDisableFancy: isDisableFancy,
@@ -23,7 +23,8 @@ class MathpixMarkdown extends React.Component<MathpixMarkdownProps> {
             width: width,
             outMath: outMath,
             mathJax: mathJax,
-            htmlSanitize: htmlSanitize
+            htmlSanitize: htmlSanitize,
+            smiles: smiles
         };
 
          MM.setOptions(disableRules, isCheckFormula, showTimeLog);

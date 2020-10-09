@@ -9,7 +9,11 @@ import {
   THtmlSanitize
 } from "./mathpix-markdown-model";
 
+import { ISmilesOptions } from './markdown/md-chemistry';
+
 
 export {MathpixLoader, MathpixMarkdown, MathpixMarkdownModel,
-  TMarkdownItOptions, optionsMathpixMarkdown, TOutputMath, TOutputMathJax, THtmlSanitize};
+  TMarkdownItOptions, optionsMathpixMarkdown, TOutputMath, TOutputMathJax, THtmlSanitize,
+  ISmilesOptions
+};
 

@@ -2,6 +2,7 @@ const path = require('path');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const TerserPlugin = require('terser-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
+const webpack = require('webpack');
 
 
 const config = {
@@ -46,6 +47,7 @@ const indexConfig = Object.assign({}, config, {
     ]
   },
   plugins: [
+    new webpack.IgnorePlugin(/jsdom$/)
   ],
   externals: {
     'react': 'commonjs react'

@@ -6,6 +6,7 @@ import { fontsStyles } from "../mathjax/styles-fonts";
 import { listsStyles } from "../mathjax/styles-lists";
 import {MathJax} from '../mathjax';
 import { Property } from 'csstype'; // at top of file
+import { ISmilesOptions } from '../markdown/md-chemistry';
 
 export interface optionsMathpixMarkdown {
     alignMathBlock?: Property.TextAlign;
@@ -27,6 +28,7 @@ export interface optionsMathpixMarkdown {
     outMath?: TOutputMath;
     mathJax?: TOutputMathJax;
     htmlSanitize?: THtmlSanitize;
+    smiles?: ISmilesOptions;
 }
 
 export type TMarkdownItOptions = {
@@ -48,6 +50,7 @@ export type TMarkdownItOptions = {
   outMath?: TOutputMath,
   mathJax?: TOutputMathJax,
   htmlSanitize?: THtmlSanitize;
+  smiles?: ISmilesOptions;
 }
 
 export type TOutputMath = {
@@ -348,7 +351,7 @@ class MathpixMarkdown_Model {
         const { alignMathBlock='center', display='block', isCheckFormula=false, showTimeLog=false,
           isDisableFancy=false, fontSize=null, padding=null, htmlTags=false, width=0, showToc = false,
           overflowY='unset', breaks = true, typographer = true, linkify = true, xhtmlOut = false,
-          outMath = {}, mathJax = {}, htmlSanitize = {}}
+          outMath = {}, mathJax = {}, htmlSanitize = {}, smiles = {}}
          = options || {};
 
         const disableRules = isDisableFancy ? this.disableFancyArrayDef : options ? options.disableRules || [] : [];
@@ -372,7 +375,8 @@ class MathpixMarkdown_Model {
           width: width,
           outMath: outMath,
           mathJax: mathJax,
-          htmlSanitize: htmlSanitize
+          htmlSanitize: htmlSanitize,
+          smiles: smiles
         };
 
         const styleFontSize = fontSize ? ` font-size: ${options.fontSize}px;` : '';

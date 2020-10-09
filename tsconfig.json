@@ -16,7 +16,8 @@
         "noImplicitThis": true,
         "importHelpers": true,
         "suppressImplicitAnyIndexErrors": true,
-        "noUnusedLocals": true
+        "noUnusedLocals": true,
+        "downlevelIteration": true
     },
     "exclude": [
         "examples",
