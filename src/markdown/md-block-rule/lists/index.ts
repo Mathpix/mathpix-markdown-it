@@ -265,7 +265,6 @@ const ListOpen = (state, startLine, lineText, iLevel, eLevel): {iOpen: number, t
 };
 
 const ItemsListPush = (items, content, startLine, endLine) => {
- // debugger
   //const itemTag: RegExp = /\\item/;
   const index = content.indexOf('\\item')
   if (index > 0 ) {

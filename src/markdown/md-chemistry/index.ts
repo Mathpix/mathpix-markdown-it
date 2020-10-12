@@ -1,10 +1,12 @@
-import { MarkdownIt, RuleBlock } from 'markdown-it';
+import { MarkdownIt, RuleBlock, RuleInline } from 'markdown-it';
 import { ChemistryDrawer } from './chemisrty-drawer';
 import { ISmilesOptionsDef } from "./smiles-drawer/src/Drawer";
 import { PREVIEW_LINE_CLASS, PREVIEW_PARAGRAPH_PREFIX } from "../rules";
 
 export interface ISmilesOptions extends ISmilesOptionsDef {
   theme?: string,
+  stretch?: boolean,
+  scale?: number
 }
 
 function injectLineNumbersSmiles(tokens, idx, options, env, slf) {
@@ -28,7 +30,7 @@ function injectLineNumbersSmiles(tokens, idx, options, env, slf) {
   return slf.renderAttrs(token);
 }
 
-const slimesDrawerBlock: RuleBlock = (state, startLine: number, endLine: number, silent) => {
+const smilesDrawerBlock: RuleBlock = (state, startLine: number, endLine: number, silent) => {
   let pos: number = state.bMarks[startLine] + state.tShift[startLine];
   let max: number = state.eMarks[startLine];
   let haveEndMarker;
@@ -114,16 +116,57 @@ const slimesDrawerBlock: RuleBlock = (state, startLine: number, endLine: number,
 
   state.line = nextLine + (haveEndMarker ? 1 : 0);
 
-  token         = state.push('slimes', 'div', 0);
+  token         = state.push('smiles', 'div', 0);
   token.info    = params;
-  token.content = state.getLines(startLine + 1, nextLine, len, true);
+  let content = state.getLines(startLine + 1, nextLine, len, true);
+  content = content.trim();
+  content = content.replace(/\r|\n|\s+/g, '');
+  token.content = content;
   token.markup  = markup;
   token.map     = [ startLine, state.line ];
 
   return true;
 };
 
-const renderSlimesDrawerBlock = (tokens, idx, options, env, slf) => {
+const smilesDrawerInline: RuleInline = (state) => {
+  let startPos = state.pos;
+  let beginMarker: RegExp = /^<smiles>/;
+  let endMarker: string = '</smiles>';
+
+  if (state.src.charCodeAt(startPos) !== 0x3C /* < */) {
+    return false;
+  }
+
+  if (!beginMarker.test(state.src.slice(startPos))) {
+    return false;
+  }
+
+  const match = state.src
+    .slice(startPos)
+    .match(beginMarker);
+
+  if (!match) {
+    return false;
+  }
+
+  startPos += match[0].length;
+  const endPos = state.src.indexOf(endMarker, startPos);
+
+  if (endPos === -1) { return false; }
+  const nextPos = endPos + endMarker.length;
+  let content = state.src.slice(startPos, endPos);
+  content = content.trim();
+  content = content.replace(/\s+/g, '');
+
+  const token = state.push('smiles_inline', "", 0);
+
+  token.content = content.trim();
+  state.pos = nextPos;
+
+  return true;
+};
+
+const renderSmilesDrawerBlock = (tokens, idx, options, env, slf) => {
   const token = tokens[idx];
   if (!token.content) {
     return '';
@@ -139,17 +182,39 @@ const renderSlimesDrawerBlock = (tokens, idx, options, env, slf) => {
     ? injectLineNumbersSmiles(tokens, idx, options, env, slf)
     : '';
   if (attrs) {
-    return `<div ${attrs}>${resSvg}</div>`
+    return `<div ${attrs}><div class="smiles">${resSvg}</div></div>`
   }
-  return `<div>${resSvg}</div>`
+  return `<div><div class="smiles">${resSvg}</div></div>`
+};
+
+const renderSmilesDrawerInline = (tokens, idx, options, env, slf) => {
+  const token = tokens[idx];
+  if (!token.content) {
+    return '';
+  }
+  const id = `f${(+new Date).toString(16)}`;
+
+  const resSvg = ChemistryDrawer.drawSvgSync(token.content.trim(), id, options);
+  if (!resSvg) {
+    return '';
+  }
+
+  return `<div class="smiles-inline" style="display: inline-block">${resSvg}</div>`;
 };
 
 export default (md: MarkdownIt, options) => {
   Object.assign(md.options, options);
 
-  md.block.ruler.before('fence', 'slimesDrawerBlock', slimesDrawerBlock);
+  md.block.ruler.before('fence', 'smilesDrawerBlock', smilesDrawerBlock, {
+    alt: ["paragraph", "reference", "blockquote", "list"]
+  });
 
-  md.renderer.rules.slimes = (tokens, idx, options, env, slf) => {
-    return renderSlimesDrawerBlock(tokens, idx, options, env, slf);
+  md.inline.ruler.before('html_inline', 'smilesDrawerInline', smilesDrawerInline);
+
+  md.renderer.rules.smiles = (tokens, idx, options, env, slf) => {
+    return renderSmilesDrawerBlock(tokens, idx, options, env, slf);
+  };
+  md.renderer.rules.smiles_inline = (tokens, idx, options, env, slf) => {
+    return renderSmilesDrawerInline(tokens, idx, options, env, slf);
   }
 };
