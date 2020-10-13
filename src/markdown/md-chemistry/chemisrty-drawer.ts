@@ -1,12 +1,10 @@
 import SmilesDrawer from './smiles-drawer';
 import { IOptions } from './smiles-drawer/src/Drawer';
-import { initDocument } from '../dom-adaptor';
 import { ISmilesOptions } from './index';
 
 export const ChemistryDrawer = {
   drawSvgSync: function(content: string, id: string,
                         options: ISmilesOptions = {}): string {
-    initDocument();
     const { theme = 'light', stretch, scale = 3 } = options;
     let config: IOptions;
 
