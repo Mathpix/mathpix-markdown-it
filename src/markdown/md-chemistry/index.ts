@@ -6,7 +6,8 @@ import { PREVIEW_LINE_CLASS, PREVIEW_PARAGRAPH_PREFIX } from "../rules";
 export interface ISmilesOptions extends ISmilesOptionsDef {
   theme?: string,
   stretch?: boolean,
-  scale?: number
+  scale?: number,
+  fontSize?: number
 }
 
 function injectLineNumbersSmiles(tokens, idx, options, env, slf) {
