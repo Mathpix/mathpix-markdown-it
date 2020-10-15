@@ -71,6 +71,8 @@ class SvgWrapper {
 
   constructSvg() {
     // TODO: add the defs element to put gradients in
+    const elementClassName = this.opts.id ? 'element-' + this.opts.id : 'element';
+    const subClassName = this.opts.id ? 'sub-' + this.opts.id : 'sub';
     let defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs'),
       masks = document.createElementNS('http://www.w3.org/2000/svg', 'mask'),
       style = document.createElementNS('http://www.w3.org/2000/svg', 'style'),
@@ -88,11 +90,11 @@ class SvgWrapper {
 
     // create the css styles
     style.appendChild(document.createTextNode(`
-                .element {
+                .${elementClassName} {
                     font: ${this.opts.fontSizeLargePx ? this.opts.fontSizeLargePx + 'px' : this.opts.fontSizeLarge + 'pt'} Helvetica, Arial, sans-serif;
                     alignment-baseline: 'middle';
                 }
-                .sub {
+                .${subClassName} {
                     font: ${this.opts.fontSizeSmallPx ? this.opts.fontSizeSmallPx + 'px' : this.opts.fontSizeSmall + 'pt'} Helvetica, Arial, sans-serif;
                 }
             `));
@@ -185,10 +187,11 @@ class SvgWrapper {
    * @param {String} shift the type of text, either 'sub', or 'super'
    */
   createSubSuperScripts(text, shift) {
+    const subClassName = this.opts.id ? 'sub-' + this.opts.id : 'sub';
     let elem = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
     elem.setAttributeNS(null, 'baseline-shift', shift);
     elem.appendChild(document.createTextNode(text));
-    elem.setAttributeNS(null, 'class', 'sub');
+    elem.setAttributeNS(null, 'class', subClassName);
 
     return elem;
   }
@@ -457,6 +460,7 @@ class SvgWrapper {
   drawText(x, y, elementName, hydrogens, direction, isTerminal, charge, isotope, attachedPseudoElement = {}) {
     const dFont = this.opts.fontSizeLarge / 2;
     const radius = dFont + dFont/4;
+    const elementClassName = this.opts.id ? 'element-' + this.opts.id : 'element';
 
     let offsetX = this.offsetX,
       offsetY = this.offsetY,
@@ -505,7 +509,7 @@ class SvgWrapper {
     // now the text element
     textElem.setAttributeNS(null, 'x', pos.x + xShift);
     textElem.setAttributeNS(null, 'y', pos.y + yShift);
-    textElem.setAttributeNS(null, 'class', 'element');
+    textElem.setAttributeNS(null, 'class', elementClassName);
     textElem.setAttributeNS(null, 'fill', this.themeManager.getColor(elementName));
     textElem.setAttributeNS(null, 'style', `
                 text-anchor: start;
