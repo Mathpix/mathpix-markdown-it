@@ -215,7 +215,6 @@ export const BeginTable: RuleBlock = (state, startLine, endLine) => {
     return false;
   }
   const closeTag = endTag(type);
-//debugger
   if (closeTag.test(lineText)) {
     if (InlineBlockBeginTable(state, startLine)) {
       return true;

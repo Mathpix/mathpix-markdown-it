@@ -1,10 +1,10 @@
 import { ConfiguredMathJaxPlugin, CustomTagPlugin, HighlightPlugin,
     tocPlugin,
     anchorPlugin,
-    //separateForBlockPlugin,
     tableTabularPlugin,
     listsPlugin,
-    collapsiblePlugin
+    collapsiblePlugin,
+    chemistry
 } from "./mdPluginConfigured";
 import { injectRenderRules } from "./rules";
 import {MathpixMarkdownModel as MM, TMarkdownItOptions} from '../mathpix-markdown-model'
@@ -13,7 +13,7 @@ import {MathpixMarkdownModel as MM, TMarkdownItOptions} from '../mathpix-markdow
 const mdInit = (options: TMarkdownItOptions) => {
   const {htmlTags = false, xhtmlOut = false, width = 1200, breaks = true, typographer = true, linkify = true,
           outMath = {}, mathJax = {}, renderElement = {},
-          lineNumbering = false, htmlSanitize = true} = options;
+          lineNumbering = false, htmlSanitize = true, smiles = {}} = options;
   return require("markdown-it")({
     html: htmlTags,
     xhtmlOut: xhtmlOut,
@@ -25,9 +25,9 @@ const mdInit = (options: TMarkdownItOptions) => {
     lineNumbering: lineNumbering,
     htmlSanitize: htmlSanitize
   })
+    .use(chemistry, smiles )
     .use(tableTabularPlugin, {width: width, outMath: outMath})
     .use(listsPlugin, {width: width, outMath: outMath, renderElement: renderElement})
- //   .use(separateForBlockPlugin)
     .use(ConfiguredMathJaxPlugin({width: width, outMath: outMath, mathJax: mathJax, renderElement: renderElement}))
     .use(CustomTagPlugin())
     .use(HighlightPlugin, {auto: false})

@@ -1,4 +1,5 @@
 import { Property } from 'csstype';
+import { ISmilesOptions } from '../markdown/md-chemistry';
 export interface optionsMathpixMarkdown {
     alignMathBlock?: Property.TextAlign;
     display?: Property.Display;
@@ -19,6 +20,7 @@ export interface optionsMathpixMarkdown {
     outMath?: TOutputMath;
     mathJax?: TOutputMathJax;
     htmlSanitize?: THtmlSanitize;
+    smiles?: ISmilesOptions;
 }
 export declare type TMarkdownItOptions = {
     isDisableFancy?: boolean;
@@ -39,6 +41,7 @@ export declare type TMarkdownItOptions = {
     outMath?: TOutputMath;
     mathJax?: TOutputMathJax;
     htmlSanitize?: THtmlSanitize;
+    smiles?: ISmilesOptions;
 };
 export declare type TOutputMath = {
     include_mathml?: boolean;

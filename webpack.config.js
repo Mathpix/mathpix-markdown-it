@@ -1,8 +1,6 @@
 const path = require('path');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const TerserPlugin = require('terser-webpack-plugin');
-const CopyPlugin = require('copy-webpack-plugin');
-
 
 const config = {
   // TODO: Add common Configuration
@@ -45,8 +43,6 @@ const indexConfig = Object.assign({}, config, {
       }
     ]
   },
-  plugins: [
-  ],
   externals: {
     'react': 'commonjs react'
   },

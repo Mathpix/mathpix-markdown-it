@@ -7,6 +7,7 @@ import mdPluginSeparateForBlock from './mdPluginSeparateForBlock';
 import mdPluginTableTabular from './mdPluginTableTabular';
 import mdPluginList from './mdPluginLists';
 import mdPluginCollapsible from './mdPluginCollapsible';
+import mdPluginChemisrty from './md-chemistry';
 
 /**
  * configured custom mathjax plugin
@@ -26,3 +27,4 @@ export const anchorPlugin = mdPluginAnchor;
 export const tableTabularPlugin = mdPluginTableTabular;
 export const listsPlugin = mdPluginList;
 export const collapsiblePlugin = mdPluginCollapsible;
+export const chemistry = mdPluginChemisrty;
