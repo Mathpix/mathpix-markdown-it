@@ -25,7 +25,12 @@ Mathpix Markdown addresses these limitations by adding support for the following
 - numbered and unnumbered equation enviornments `\begin{elem} ... \end{elem}` and `\begin{elem*} ... \end{elem*}` where elem=`equation|align|split|gather`
 - equation, table, and figure references via `\label`, `\ref`, `\eqref`, `\tag`
 - text formatting options `\title{...}`, `\author{...}`, `\begin{abstract}...\end{abstract}`, `\section{Section Title}`, `\subsection{Section Title}`, `\subsubsection{Section Title}`, `\textit{italicized text}`, `\textbf{bold text}`, `\url{link}`
-
+- chemistry equation via `<smiles>OC(=O)c1cc(Cl)cs1</smiles>` or
+~~~
+```smiles
+OC(=O)c1cc(Cl)cs1
+```
+~~~
 
 # What is mathpix-markdown-it? 
 
@@ -500,6 +505,7 @@ The `MathpixMarkdown` React element accepts the following props:
 | `width`          | number;*`1200`*              | Sets text container width                                                                                              |
 | `outMath`        | [TOutputMath](https://github.com/Mathpix/mathpix-markdown-it#toutputmath);*`{}`*         | Sets options to output html                                                                                           |
 | `mathJax`        | [TOutputMathJax](https://github.com/Mathpix/mathpix-markdown-it#toutputmathjax);*`{}`*       | Sets options to output MathJax                                                                                         |
+| `smiles`         | [ISmilesOptions](https://github.com/Mathpix/mathpix-markdown-it#ismilesoptions);*`{}`*        | Sets options to output chemistry equation                                                                              |
 
 
 ## MathpixMarkdownModel methods
@@ -538,6 +544,7 @@ The `MathpixMarkdown` React element accepts the following props:
 | `mathJax`        | [TOutputMathJax](https://github.com/Mathpix/mathpix-markdown-it#toutputmathjax);*`{}`*       | Sets options to output MathJax                                                                                         |
 | `htmlSanitize`   | [THtmlSanitize](https://github.com/Mathpix/mathpix-markdown-it#thtmlsanitize);*`{}`*         | Sets html output options (if `htmlTags=true`). Cleans up user html input.                                              | 
 |                  |                              | Removes script tags and stuff. Removes broken and malicious html. Set to `false` to disable                            |
+| `smiles`         | [ISmilesOptions](https://github.com/Mathpix/mathpix-markdown-it#ismilesoptions);*`{}`*        | Sets options to output chemistry equation                                                                              |
 
 ### optionsMathpixMarkdown
 
@@ -559,7 +566,7 @@ The `MathpixMarkdown` React element accepts the following props:
 | `mathJax`        | [TOutputMathJax](https://github.com/Mathpix/mathpix-markdown-it#toutputmathjax);*`{}`*        | Sets options to output MathJax                                                                                         |
 | `htmlSanitize`   | [THtmlSanitize](https://github.com/Mathpix/mathpix-markdown-it#thtmlsanitize);*`{}`*         | Sets html output options (if `htmlTags=true`). Cleans up user html input.                                              | 
 |                  |                              | Removes script tags and stuff. Removes broken and malicious html. Set to `false` to disable                            |
-
+| `smiles`         | [ISmilesOptions](https://github.com/Mathpix/mathpix-markdown-it#ismilesoptions);*`{}`*        | Sets options to output chemistry equation                                                                              |
 
 ### TOutputMath
 
@@ -592,6 +599,13 @@ The `MathpixMarkdown` React element accepts the following props:
 |                      |                              | `recursiveEscape` - the disallowed tags are escaped rather than discarded, and the same treatment is applied       |
 |                      |                              | to all subtags, whether otherwise allowed or not.                                                                  |
 
+
+### ISmilesOptions
+
+|                      | type&nbsp;*`default`*        |  description                                                                                                       |
+|----------------------|------------------------------|--------------------------------------------------------------------------------------------------------------------|
+| `theme`              | string&nbsp;*`light`*        | Color theme                                                                                                        |
+| `fontSize`           | number&nbsp;*`14`*           | Font Size (in px)                                                                                                  |
 
 # Development
 
