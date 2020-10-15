@@ -24,7 +24,12 @@ class SvgWrapper {
 	public ctx: any;
 
   constructor(themeManager, target, options) {
-    this.svg = document.getElementById(target);
+    if (typeof target === 'string' || target instanceof String) {
+      this.svg = document.getElementById(target.toString());
+    } else {
+      this.svg = target;
+    }
+
     this.opts = options;
     this.gradientId = 0;
 
@@ -84,11 +89,11 @@ class SvgWrapper {
     // create the css styles
     style.appendChild(document.createTextNode(`
                 .element {
-                    font: ${this.opts.fontSizeLarge}pt Helvetica, Arial, sans-serif;
+                    font: ${this.opts.fontSizeLargePx ? this.opts.fontSizeLargePx + 'px' : this.opts.fontSizeLarge + 'pt'} Helvetica, Arial, sans-serif;
                     alignment-baseline: 'middle';
                 }
                 .sub {
-                    font: ${this.opts.fontSizeSmall}pt Helvetica, Arial, sans-serif;
+                    font: ${this.opts.fontSizeSmallPx ? this.opts.fontSizeSmallPx + 'px' : this.opts.fontSizeSmall + 'pt'} Helvetica, Arial, sans-serif;
                 }
             `));
 
@@ -283,7 +288,6 @@ class SvgWrapper {
       isNaN(line.to.x) || isNaN(line.to.y)) {
       return;
     }
-
     let
       // offsetX = this.offsetX,
       // offsetY = this.offsetY,
@@ -451,6 +455,9 @@ class SvgWrapper {
    * @param {Number} attachedPseudoElement.hyrogenCount The number of hydrogens attached to each atom matching the key.
    */
   drawText(x, y, elementName, hydrogens, direction, isTerminal, charge, isotope, attachedPseudoElement = {}) {
+    const dFont = this.opts.fontSizeLarge / 2;
+    const radius = dFont + dFont/4;
+
     let offsetX = this.offsetX,
       offsetY = this.offsetY,
       pos = {
@@ -462,13 +469,13 @@ class SvgWrapper {
       letterSpacing = 'normal',
       textOrientation = 'mixed',
       textDirection = 'direction: ltr;',
-      xShift = -2,
-      yShift = 2.5;
+      xShift = - dFont,
+      yShift = dFont;
 
     let mask = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
     mask.setAttributeNS(null, 'cx', pos.x);
     mask.setAttributeNS(null, 'cy', pos.y);
-    mask.setAttributeNS(null, 'r', '3.5');
+    mask.setAttributeNS(null, 'r', (radius).toString());
     mask.setAttributeNS(null, 'fill', 'black');
     this.maskElements.push(mask);
 
@@ -481,11 +488,14 @@ class SvgWrapper {
 
     if (direction === 'down' && !isTerminal) {
       xShift = 0;
-      yShift = -2;
+      yShift = -dFont - dFont/2;
     } else if (direction === 'up' && !isTerminal) {
-      xShift = 0.5;
+      xShift = 0;
+      yShift += dFont/2;
     } else if (direction === 'left') {
-      xShift = 2;
+      xShift = dFont;
+    } else if (direction === 'right') {
+      xShift += dFont/4;
     }
 
     if (direction === 'left' || (direction === 'up' && !isTerminal)) {
@@ -640,7 +650,6 @@ class SvgWrapper {
       u = Vector2.add(end, Vector2.multiplyScalar(normals[0], 1.5 + this.halfBondThickness)),
       v = Vector2.add(end, Vector2.multiplyScalar(normals[1], 1.5 + this.halfBondThickness)),
       w = Vector2.add(start, Vector2.multiplyScalar(normals[1], this.halfBondThickness));
-
     let polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon'),
       // gradient = this.createGradient(line, l.x, l.y, r.x, r.y);
       gradient = this.createGradient(line);
