@@ -606,6 +606,8 @@ The `MathpixMarkdown` React element accepts the following props:
 |----------------------|------------------------------|--------------------------------------------------------------------------------------------------------------------|
 | `theme`              | string&nbsp;*`light`*        | Color theme                                                                                                        |
 | `fontSize`           | number&nbsp;*`14`*           | Font Size (in px)                                                                                                  |
+| `disableGradient`    | boolean&nbsp;*`false`*       | Disable gradient coloring                                                                                          |
+| `disableColors`      | boolean&nbsp;*`false`*       | Disable all coloring                                                                                               |
 
 # Development
 

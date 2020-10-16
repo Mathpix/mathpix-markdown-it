@@ -1,5 +1,5 @@
 import { MarkdownIt, RuleBlock, RuleInline } from 'markdown-it';
-import { ChemistryDrawer } from './chemisrty-drawer';
+import { ChemistryDrawer } from './chemistry-drawer';
 import { ISmilesOptionsDef } from "./smiles-drawer/src/Drawer";
 import { PREVIEW_LINE_CLASS, PREVIEW_PARAGRAPH_PREFIX } from "../rules";
 
@@ -7,7 +7,10 @@ export interface ISmilesOptions extends ISmilesOptionsDef {
   theme?: string,
   stretch?: boolean,
   scale?: number,
-  fontSize?: number
+  fontSize?: number,
+  disableColors?: boolean,
+  disableGradient?: boolean,
+  autoScale?: boolean
 }
 
 function injectLineNumbersSmiles(tokens, idx, options, env, slf) {

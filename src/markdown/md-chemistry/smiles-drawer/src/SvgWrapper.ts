@@ -163,12 +163,18 @@ class SvgWrapper {
     gradient.setAttributeNS(null, 'x2', toX);
     gradient.setAttributeNS(null, 'y2', toY);
 
+    const firstColor = this.opts.disableGradient
+      ? this.themeManager.getColor(this.themeManager.getColor('C'))
+      : this.themeManager.getColor(line.getLeftElement()) || this.themeManager.getColor('C');
+    const secondColor = this.opts.disableGradient
+      ? this.themeManager.getColor(this.themeManager.getColor('C'))
+      : this.themeManager.getColor(line.getRightElement() || this.themeManager.getColor('C'));
     let firstStop = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
-    firstStop.setAttributeNS(null, 'stop-color', this.themeManager.getColor(line.getLeftElement()) || this.themeManager.getColor('C'));
+    firstStop.setAttributeNS(null, 'stop-color', firstColor);
     firstStop.setAttributeNS(null, 'offset', '20%');
 
     let secondStop = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
-    secondStop.setAttributeNS(null, 'stop-color', this.themeManager.getColor(line.getRightElement() || this.themeManager.getColor('C')));
+    secondStop.setAttributeNS(null, 'stop-color', secondColor);
     secondStop.setAttributeNS(null, 'offset', '100%');
 
     gradient.appendChild(firstStop);
@@ -360,11 +366,14 @@ class SvgWrapper {
    * @param {String} text The debug text.
    */
   drawDebugText(x, y, text) {
+    const color = this.opts.disableColors
+      ? this.themeManager.getColor('C')
+      : '#ff0000';
     let textElem = document.createElementNS('http://www.w3.org/2000/svg', 'text');
     textElem.setAttributeNS(null, 'x', x + this.offsetX);
     textElem.setAttributeNS(null, 'y', y + this.offsetY);
     textElem.setAttributeNS(null, 'class', 'debug');
-    textElem.setAttributeNS(null, 'fill', '#ff0000');
+    textElem.setAttributeNS(null, 'fill', color);
     textElem.setAttributeNS(null, 'style', `
                 font: 5px Droid Sans, sans-serif;
             `);

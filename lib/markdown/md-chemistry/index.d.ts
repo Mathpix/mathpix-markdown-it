@@ -4,6 +4,9 @@ export interface ISmilesOptions extends ISmilesOptionsDef {
     stretch?: boolean;
     scale?: number;
     fontSize?: number;
+    disableColors?: boolean;
+    disableGradient?: boolean;
+    autoScale?: boolean;
 }
 declare const _default: (md: any, options: any) => void;
 export default _default;
