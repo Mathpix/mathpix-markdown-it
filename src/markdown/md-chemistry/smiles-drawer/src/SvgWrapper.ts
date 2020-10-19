@@ -230,9 +230,9 @@ class SvgWrapper {
     // Add padding
     let padding = this.opts.padding;
     maxX += padding * 4;
-    maxY += padding;
+    maxY += padding * 2;
     minX -= padding * 4;
-    minY -= padding;
+    minY -= padding * 2;
 
     this.drawingWidth = maxX - minX;
     this.drawingHeight = maxY - minY;
