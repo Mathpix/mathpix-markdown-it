@@ -35,6 +35,7 @@ export interface ISmilesOptionsDef {
   shortBondLength?: number,
   bondSpacing?: number,
   atomVisualization?: string,
+  ringVisualization?: string, //'default', 'circle', 'aromatic'
   isomeric?: boolean,
   debug?: boolean,
   terminalCarbons?: boolean,
@@ -121,6 +122,7 @@ class Drawer {
       shortBondLength: 0.85,
       bondSpacing: 0.18 * 15,
       atomVisualization: 'default',
+      ringVisualization: 'default',
       isomeric: true,
       debug: false,
       terminalCarbons: false,
@@ -1059,6 +1061,10 @@ class Drawer {
       if (ring.isBenzeneLike(this.graph.vertices)) {
         return ring;
       } else if (size > maxSize) {
+        //NEED TO FIX
+        if (!ring.isBridged && !ring.isHaveElements && maxSize > 0) {
+          continue;
+        }
         maxSize = size;
         largestCommonRing = ring;
       }

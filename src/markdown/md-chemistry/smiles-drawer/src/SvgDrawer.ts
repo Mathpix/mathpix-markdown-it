@@ -3,11 +3,11 @@
 import ArrayHelper from './ArrayHelper';
 import Atom from './Atom';
 import Drawer from './Drawer';
-// import Graph from './Graph';
 import Line from './Line';
 import SvgWrapper from './SvgWrapper';
 import ThemeManager from './ThemeManager';
 import Vector2 from './Vector2';
+import { arraysCompare } from '../../../utils';
 
 class SvgDrawer {
 	public preprocessor: any;
@@ -44,6 +44,9 @@ class SvgDrawer {
     // Set the canvas to the appropriate size
     this.svgWrapper.determineDimensions(preprocessor.graph.vertices);
 
+    this.putEdgesForRings();
+    this.putEdgesLForRings();
+    this.checkEdgesRingsOnHaveLine();
     // Do the actual drawing
     this.drawEdges(preprocessor.opts.debug);
     this.drawVertices(preprocessor.opts.debug);
@@ -55,6 +58,286 @@ class SvgDrawer {
     }
 
     return this.svgWrapper.constructSvg();
+  }
+
+  putEdgesForRings() {
+    let preprocessor = this.preprocessor;
+    let rings = preprocessor.rings;
+    let graph = preprocessor.graph;
+    let edges = preprocessor.graph.edges;
+
+    for (let i = 0; i < rings.length; i++) {
+      const ring = rings[i];
+
+      const members = ring.membersS;
+      for (let j = 0; j < members.length; j++) {
+        const v = members[j];
+        let vertex = graph.vertices[v];
+
+        if (!ring.isHaveElements && vertex.value.element !== 'C') {
+          ring.isHaveElements = true
+        }
+        ring.elements.push(vertex.value.element);
+
+        const v2 = j < members.length - 1
+          ? members[j + 1]
+          : members[0];
+
+        const {item, isBetweenRings} = this.getEdgeBetweenVertexAB(v, v2);
+        let edge = edges[item];
+        if (edge?.isPartOfAromaticRing) {
+          if (ring.edges.indexOf(item) === -1) {
+            ring.edges.push(item);
+            edge.isPartOfRing = true;
+          }
+          if (isBetweenRings) {
+            if (ring.edgesR.indexOf(item) === -1) {
+              ring.edgesR.push(item);
+
+            }
+          }
+        }
+      }
+
+      if (ring.edgesR.length) {
+        const arr = [...ring.edges];
+
+        ring.edgesR.map(item => {
+          const index = arr.indexOf(item);
+          if (index > -1) {
+            arr.splice(index, 1);
+          }
+        });
+        if (!arr.length || arr.length < 1) {
+          ring.edges = [];
+        }
+      }
+    }
+  };
+
+  putEdgesLForRings() {
+    let preprocessor = this.preprocessor;
+    let rings = preprocessor.rings;
+    let graph = preprocessor.graph;
+    let edges = preprocessor.graph.edges;
+
+    for (let i = 0; i < rings.length; i++) {
+      const ring = rings[i];
+      if (this.isThiadiazole(ring)){
+        continue;
+      }
+
+      if (ring.elements.indexOf('S') !== -1
+        || ring.elements.indexOf('O') !== -1
+        || ring.elements.indexOf('N') !== -1
+      ) {
+        ring.edges.map(item => {
+          let edge = edges[item];
+          let vertexA = graph.vertices[edge.targetId];
+          let vertexB = graph.vertices[edge.sourceId];
+
+          if (vertexA.value.element !== 'S' && vertexA.value.element !== 'O'
+            && vertexB.value.element !== 'S' && vertexB.value.element !== 'O'
+            && !(vertexA.value.element === 'N' && vertexB.value.element === 'N')
+            && !this.isBridgeCommonRing(ring.id, vertexA, vertexB)
+          ) {
+            if (ring.edgesL.indexOf(item) === -1) {
+              ring.edgesL.push(item);
+            }
+            this.neighboursHasDoubleLine(vertexA, ring.members, ring.edges);
+          }
+        })
+      }
+
+      if (ring.edgesL?.length) {
+        ring.edgesL = ring.edgesL.sort((a, b) => {
+          return a - b;
+        })
+      }
+    }
+  };
+
+  checkEdgesRingsOnHaveLine() {
+    let preprocessor = this.preprocessor;
+    let rings = preprocessor.rings;
+    let edges = preprocessor.graph.edges;
+
+    for (let i = 0; i < rings.length; i++) {
+      const  ring = rings[i];
+      if (ring.isDrawed) {
+        continue;
+      }
+
+      if (ring.elements
+        && (ring.elements.indexOf('S') !== -1
+          || ring.elements.indexOf('O') !== -1
+          || ring.elements.indexOf('N') !== -1
+        )) {
+        for (let index = 0; index < ring.edgesL.length; index++) {
+          const item = ring.edgesL[index];
+          if (edges[item].isHaveLine) {
+            continue;
+          }
+          const iindex = index + 1;
+          if (iindex & 1) {
+            edges[item].isHaveLine = true;
+          }
+        }
+      } else {
+        for (let index = 0; index < ring.edges.length; index++) {
+          const item = ring.edges[index];
+          if (edges[item].isHaveLine) {
+            continue;
+          }
+          const iindex = index + 1;
+          if (iindex & 1) {
+            edges[item].isHaveLine = true;
+          }
+        }
+      }
+
+    }
+  };
+
+  getEdgeBetweenVertexAB(vA, vB){
+    let vertexA = this.preprocessor.graph.vertices[vA];
+    let vertexB = this.preprocessor.graph.vertices[vB];
+
+    let edgesA = [...vertexA.edges];
+    let edgesB = [...vertexB.edges];
+
+    const edges = edgesA.filter(i => edgesB.indexOf(i) >= 0);
+
+    return {
+      item: edges[0],
+      isBetweenRings: vertexA.value.rings?.length > 1 && vertexB.value.rings?.length > 1
+    };
+  }
+
+  isThiadiazole(ring) {
+    const elements = ring.elements;
+    let graph = this.preprocessor.graph;
+    if (elements.length !== 5) {
+      return false
+    }
+    const arr = elements.filter(item => item === 'N' || item === 'S');
+    if (arr?.length === 3
+      || arr.indexOf('S') !== -1
+    ) {
+      const members = ring.membersS;
+      const indexS = elements.indexOf('S');
+      if (indexS !== -1) {
+        const vS = members[indexS];
+        let vertex = graph.vertices[vS];
+        vertex.edges.map(item => {
+          if (ring.edges.indexOf(item) !== -1) {
+            const edge = this.preprocessor.graph.edges[item];
+            edge.isNotHaveLine = true;
+          }
+        });
+
+        let neighbours = vertex.neighbours;
+        neighbours.map(item => {
+          if (members.indexOf(item) !== -1) {
+            let vertexN = graph.vertices[item];
+            vertexN.edges.map(ed => {
+              if (ring.edges.indexOf(ed) !== -1) {
+                const edge = this.preprocessor.graph.edges[ed];
+                edge.isHaveLine = true;
+              }
+            })
+
+          }
+        })
+
+      }
+      ring.isDrawed = true;
+      return true
+    }
+
+    return false;
+  }
+
+  neighboursHasDoubleLine(vertex, members, edgesR) {
+    if (vertex.value.bondType === "=") {
+      const edges = vertex.edges;
+      edges.map(item => {
+        if (edgesR.indexOf(item) !== -1) {
+          const edge = this.preprocessor.graph.edges[item];
+          edge.isNotHaveLine = true;
+        }
+      });
+      return
+    }
+
+    let neighbours = vertex.neighbours;
+    neighbours = neighbours.filter( item => members.indexOf(item) === -1);
+
+    if (neighbours?.length) {
+      for (let i = 0; i < neighbours.length; i++) {
+        const vn = this.preprocessor.graph.vertices[neighbours[i]];
+        if (vn.value?.branchBond === '=') {
+          const edges = vertex.edges;
+          edges.map(item => {
+            if (edgesR.indexOf(item) !== -1) {
+              const edge = this.preprocessor.graph.edges[item];
+              edge.isNotHaveLine = true;
+            }
+          })
+        }
+      }
+    }
+
+  }
+
+  isBridgeCommonRing(ringId, vertexA, vertexB) {
+    let commonRings = this.preprocessor.getCommonRings(vertexA, vertexB);
+    if (commonRings?.length > 1) {
+      let index = commonRings.indexOf(ringId);
+      if (index > -1) {
+        commonRings.splice(index, 1);
+      }
+      if (commonRings?.length === 1) {
+        return this.preprocessor.rings[commonRings[0]].isBridged;
+      }
+    }
+    return false;
+  }
+
+  checkNeighboursEdges(edge, vertexA, vertexB) {
+    let res = false;
+    if (arraysCompare(vertexA.value.rings, vertexB.value.rings)) {
+      const edgesA = vertexA.edges;
+      const edgesB = vertexB.edges;
+
+      for (let i = 0; i < edgesA.length; i++) {
+        if (edgesA[i] === edge.id) {
+          continue;
+        }
+        const e = this.preprocessor.graph.edges[edgesA[i]];
+        if (!e.isNotHaveLine && e.isHaveLine) {
+          res = true;
+          break;
+        }
+      }
+
+      if (res) {
+        return res;
+      }
+
+      for (let i = 0; i < edgesB.length; i++) {
+        if (edgesB[i] === edge.id) {
+          continue;
+        }
+        const e = this.preprocessor.graph.edges[edgesB[i]];
+        if (!e.isNotHaveLine && e.isHaveLine) {
+          res = true;
+          break;
+        }
+      }
+
+    }
+    return false;
   }
 
   /**
@@ -81,7 +364,9 @@ class SvgDrawer {
       }
     });
     // Draw ring for implicitly defined aromatic rings
-    if (!this.preprocessor.bridgedRing) {
+    if (!this.preprocessor.bridgedRing
+      && this.preprocessor.opts.ringVisualization === 'circle'
+    ) {
       for (var i = 0; i < rings.length; i++) {
         let ring = rings[i];
 
@@ -122,7 +407,9 @@ class SvgDrawer {
     sides[1].multiplyScalar(10).add(a);
 
     if (edge.bondType === '=' || preprocessor.getRingbondType(vertexA, vertexB) === '=' ||
-      (edge.isPartOfAromaticRing && preprocessor.bridgedRing)) {
+      (edge.isPartOfAromaticRing && preprocessor.bridgedRing)
+      || (edge.isPartOfRing && opts.ringVisualization !== 'circle')
+    ) {
       // Always draw double bonds inside the ring
       let inRing = preprocessor.areVerticesInSameRing(vertexA, vertexB);
       let s = preprocessor.chooseSide(vertexA, vertexB, sides);
@@ -150,8 +437,15 @@ class SvgDrawer {
 
         // The shortened edge
         if (edge.isPartOfAromaticRing) {
-          // preprocessor.canvasWrapper.drawLine(line, true);
-          svgWrapper.drawLine(line, true);
+          if (opts.ringVisualization !== 'aromatic') {
+            if (!edge.isNotHaveLine && edge.isHaveLine
+              && !this.checkNeighboursEdges(edge, vertexA, vertexB)
+            ) {
+              svgWrapper.drawLine(line);
+            }
+          } else {
+            svgWrapper.drawLine(line, true);
+          }
         } else {
           // preprocessor.canvasWrapper.drawLine(line);
           svgWrapper.drawLine(line);

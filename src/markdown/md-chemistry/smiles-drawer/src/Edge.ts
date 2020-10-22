@@ -20,6 +20,10 @@ class Edge {
 	public isPartOfAromaticRing: any;
 	public center: any;
 	public wedge: any;
+	public isDraw: boolean;
+	public isNotHaveLine: boolean;
+	public isHaveLine: boolean;
+  public isPartOfRing: boolean;
 
     /**
      * The constructor for the class Edge.
@@ -37,6 +41,10 @@ class Edge {
         this.isPartOfAromaticRing = false;
         this.center = false;
         this.wedge = '';
+        this.isDraw = false;
+        this.isNotHaveLine = false;
+        this.isHaveLine = false;
+        this.isPartOfRing = false;
     }
 
     /**

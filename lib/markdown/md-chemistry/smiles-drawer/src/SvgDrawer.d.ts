@@ -15,6 +15,17 @@ declare class SvgDrawer {
      * @returns {Oject} The dimensions of the drawing in { width, height }
      */
     draw(data: any, target: any, themeName?: string, infoOnly?: boolean): any;
+    putEdgesForRings(): void;
+    putEdgesLForRings(): void;
+    checkEdgesRingsOnHaveLine(): void;
+    getEdgeBetweenVertexAB(vA: any, vB: any): {
+        item: any;
+        isBetweenRings: boolean;
+    };
+    isThiadiazole(ring: any): boolean;
+    neighboursHasDoubleLine(vertex: any, members: any, edgesR: any): void;
+    isBridgeCommonRing(ringId: any, vertexA: any, vertexB: any): any;
+    checkNeighboursEdges(edge: any, vertexA: any, vertexB: any): boolean;
     /**
      * Draw the actual edges as bonds.
      *
