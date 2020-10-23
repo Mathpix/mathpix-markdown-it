@@ -7,7 +7,7 @@ import Line from './Line';
 import SvgWrapper from './SvgWrapper';
 import ThemeManager from './ThemeManager';
 import Vector2 from './Vector2';
-import { arraysCompare } from '../../../utils';
+import { arraysCompare, arrayDelElement, arrayResortFromElement } from '../../../utils';
 
 class SvgDrawer {
 	public preprocessor: any;
@@ -126,6 +126,13 @@ class SvgDrawer {
       if (this.isThiadiazole(ring)){
         continue;
       }
+      if (this.isRing_ONN(ring)){
+        continue;
+      }
+      if (this.isRing_NNN(ring)){
+        continue;
+      }
+
 
       if (ring.elements.indexOf('S') !== -1
         || ring.elements.indexOf('O') !== -1
@@ -171,7 +178,7 @@ class SvgDrawer {
       if (ring.elements
         && (ring.elements.indexOf('S') !== -1
           || ring.elements.indexOf('O') !== -1
-          || ring.elements.indexOf('N') !== -1
+          || (ring.elements.indexOf('N') !== -1 && ring.elements.length === 5)
         )) {
         for (let index = 0; index < ring.edgesL.length; index++) {
           const item = ring.edgesL[index];
@@ -184,14 +191,45 @@ class SvgDrawer {
           }
         }
       } else {
+        let d = 1;
         for (let index = 0; index < ring.edges.length; index++) {
           const item = ring.edges[index];
+
+          const isHydrogensA = preprocessor.graph.vertices[edges[item].sourceId].value.bracket && Number(preprocessor.graph.vertices[edges[item].sourceId].value.bracket.hcount) > 0;
+          const isHydrogensB = preprocessor.graph.vertices[edges[item].targetId].value.bracket && Number(preprocessor.graph.vertices[edges[item].targetId].value.bracket.hcount) > 0;
+
+
           if (edges[item].isHaveLine) {
             continue;
           }
-          const iindex = index + 1;
+          if (isHydrogensA || isHydrogensB) {
+            continue;
+          }
+
+          if (index === 0) {
+
+            const vertexA = preprocessor.graph.vertices[edges[item].sourceId];
+            let needToNext = false;
+            for (let j = 0 ; j < vertexA.edges.length; j++) {
+              if (edges[vertexA.edges[j]].isHaveLine) {
+                needToNext = true;
+                break;
+              }
+            }
+            // iindex = index;
+            if (needToNext) {
+              d = 0;
+              continue;
+            } else {
+              d = 1;
+            }
+          }
+
+          const iindex = index + d;
           if (iindex & 1) {
-            edges[item].isHaveLine = true;
+            if (ring.edgesR.indexOf(item) === -1) {
+              edges[item].isHaveLine = true;
+            }
           }
         }
       }
@@ -214,6 +252,166 @@ class SvgDrawer {
     };
   }
 
+  isRing_ONN(ring) {
+    const elements = ring.elements;
+    let arrE = [...ring.edges];
+    let graph = this.preprocessor.graph;
+    if (elements.length !== 5) {
+      return false
+    }
+    const arr = elements.filter(item => item === 'N' || item === 'O');
+    if (
+      arr?.length > 0
+      && arr.indexOf('O') !== -1
+    ) {
+      const members = ring.membersS;
+      const indexS = elements.indexOf('O');
+      if (indexS !== -1) {
+        const vS = members[indexS];
+        let vertex = graph.vertices[vS];
+        vertex.edges.map(item => {
+          if (ring.edges.indexOf(item) !== -1) {
+            const edge = this.preprocessor.graph.edges[item];
+            edge.isNotHaveLine = true;
+            arrayDelElement(arrE, item);
+          }
+        });
+
+        let neighbours = vertex.neighbours;
+        neighbours.map(item => {
+          if (members.indexOf(item) !== -1) {
+            let vertexN = graph.vertices[item];
+            vertexN.edges.map(ed => {
+              if (ring.edges.indexOf(ed) !== -1) {
+                const edge = this.preprocessor.graph.edges[ed];
+                if (ring.edgesR.indexOf(edge.id) === -1) {
+                  edge.isHaveLine = true;
+                }
+                arrayDelElement(arrE, ed);
+              }
+            })
+
+          }
+        })
+
+      }
+      if (arrE?.length === 1 && ring.edgesR?.length && ring.edgesR.indexOf(arrE[0]) !== -1) {
+        this.drawCommonRing(ring.id, arrE[0]);
+      }
+
+      ring.isDrawed = true;
+      return true
+    }
+
+    return false;
+  }
+
+  isRing_NNN(ring) {
+    const elements = ring.elements;
+    let arrE = [...ring.edges];
+    let graph = this.preprocessor.graph;
+    if (elements.length !== 5) {
+      return false
+    }
+    const arr = elements.filter(item => item === 'N');
+    if (arr?.length > 0) {
+      const members = ring.membersS;
+      let indexS = this.findStartNbyEdges(members, elements);
+      if (indexS !== -1) {
+        const vS = members[indexS];
+        let vertex = graph.vertices[vS];
+
+        vertex.edges.map(item => {
+          if (ring.edges.indexOf(item) !== -1) {
+            const edge = this.preprocessor.graph.edges[item];
+            edge.isNotHaveLine = true;
+            arrayDelElement(arrE, item);
+
+            if (ring.edgesR?.length && ring.edgesR.indexOf(item) !== -1) {
+              this.drawCommonRing(ring.id, item);
+            }
+
+          }
+        });
+
+        let neighbours = vertex.neighbours.filter(item => members.indexOf(item) !== -1);
+        if (this.isHydrogenVertices(neighbours)) {
+          neighbours.map(item => {
+            const v = graph.vertices[item];
+            v.edges.map(ed => {
+              arrayDelElement(arrE, ed);
+            })
+          });
+          if (arrE?.length === 1) {
+            const edge = this.preprocessor.graph.edges[arrE[0]];
+            if (ring.edgesR.indexOf(edge.id) === -1) {
+              edge.isHaveLine = true;
+            }
+          }
+          ring.isDrawed = true;
+          return true;
+        }
+
+
+        neighbours.map(item => {
+          let vertexN = graph.vertices[item];
+          vertexN.edges.map(ed => {
+            if (ring.edges.indexOf(ed) !== -1) {
+              const edge = this.preprocessor.graph.edges[ed];
+
+              if (ring.edgesR.indexOf(edge.id) === -1) {
+                edge.isHaveLine = true;
+              }
+              arrayDelElement(arrE, ed);
+            }
+          })
+        })
+
+      }
+      if (arrE?.length === 1 && ring.edgesR?.length && ring.edgesR.indexOf(arrE[0]) !== -1) {
+        this.drawCommonRing(ring.id, arrE[0]);
+      }
+
+      ring.isDrawed = true;
+      return true
+    }
+
+    return false;
+  }
+
+  isHydrogenVertices(arr) {
+    let res = false;
+    for (let i = 0; i < arr.length; i++) {
+      if (this.preprocessor.graph.vertices[arr[i]].value.bracket && Number(this.preprocessor.graph.vertices[arr[i]].value.bracket.hcount) > 0) {
+        res = true;
+        break;
+      }
+    }
+    return res
+  }
+
+  findStartNbyEdges(members, elements) {
+    let res = -1;
+    for  (let i = 0; i < elements.length; i++) {
+      if (elements[i] !== 'N') {
+        continue;
+      }
+
+      const v = members[i];
+      const vertex = this.preprocessor.graph.vertices[v];
+      if (vertex.value.bracket?.charge === 1) {
+        continue;
+      }
+
+
+      if (vertex.edges.length > 2) {
+        res = i;
+        break;
+      }
+    }
+    return res;
+  }
+
   isThiadiazole(ring) {
     const elements = ring.elements;
     let graph = this.preprocessor.graph;
@@ -221,9 +419,7 @@ class SvgDrawer {
       return false
     }
     const arr = elements.filter(item => item === 'N' || item === 'S');
-    if (arr?.length === 3
-      || arr.indexOf('S') !== -1
-    ) {
+    if (arr?.length > 0 && arr.indexOf('S') !== -1) {
       const members = ring.membersS;
       const indexS = elements.indexOf('S');
       if (indexS !== -1) {
@@ -240,13 +436,16 @@ class SvgDrawer {
         neighbours.map(item => {
           if (members.indexOf(item) !== -1) {
             let vertexN = graph.vertices[item];
-            vertexN.edges.map(ed => {
-              if (ring.edges.indexOf(ed) !== -1) {
-                const edge = this.preprocessor.graph.edges[ed];
-                edge.isHaveLine = true;
-              }
-            })
-
+            if (!this.vertexHasBondType(vertexN)) {
+              vertexN.edges.map(ed => {
+                if (ring.edges.indexOf(ed) !== -1) {
+                  const edge = this.preprocessor.graph.edges[ed];
+                  if (ring.edgesR.indexOf(edge.id) === -1) {
+                    edge.isHaveLine = true;
+                  }
+                }
+              })
+            }
           }
         })
 
@@ -256,6 +455,18 @@ class SvgDrawer {
     }
 
     return false;
+  }
+
+  vertexHasBondType (vertex) {
+    let res = false;
+    for (let i = 0; i < vertex.edges.length; i++) {
+      const edge = this.preprocessor.graph.edges[vertex.edges[i]];
+      if (edge.bondType === "=") {
+        res = true;
+        break;
+      }
+    }
+    return res;
   }
 
   neighboursHasDoubleLine(vertex, members, edgesR) {
@@ -302,6 +513,41 @@ class SvgDrawer {
       }
     }
     return false;
+  }
+
+  drawCommonRing(ringId, iEdge) {
+    const edge = this.preprocessor.graph.edges[iEdge];
+    const vertexA = this.preprocessor.graph.vertices[edge.targetId];
+    const vertexB = this.preprocessor.graph.vertices[edge.sourceId];
+    let commonRings = this.preprocessor.getCommonRings(vertexA, vertexB);
+    if (commonRings?.length > 1) {
+      let index = commonRings.indexOf(ringId);
+      if (index > -1) {
+        commonRings.splice(index, 1);
+      }
+
+      if (commonRings?.length === 1) {
+        const ring = this.preprocessor.rings[commonRings[0]];
+        if (ring.members.length < 6) {
+          return
+        }
+
+        const edges = arrayResortFromElement(ring.edges, iEdge);
+
+        edges.map((item, index) => {
+          const ed = this.preprocessor.graph.edges[item];
+          if (index > 0) {
+            if (!(index & 1)) {
+              ed.isHaveLine = true;
+            }
+          } else {
+            ed.isNotHaveLine = true;
+          }
+        });
+
+        ring.isDrawed = true;
+      }
+    }
   }
 
   checkNeighboursEdges(edge, vertexA, vertexB) {

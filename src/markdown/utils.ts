@@ -124,3 +124,30 @@ export const includesMultiMathTag = (str, tag): boolean => {
 export const arraysCompare = (a1, a2) => {
   return a1.length == a2.length && a1.every((v,i)=>v === a2[i])
 };
+
+
+export const arrayDelElement = (arr, el) => {
+  const index = arr.indexOf(el);
+
+  if (index === -1) {
+    return arr;
+  }
+
+  return arr.splice(index, 1);
+};
+
+export const arrayResortFromElement = (arr, el) => {
+  const index = arr.indexOf(el);
+  const arrN1 = [...arr];
+  const arrN2 = [...arr];
+
+  if (index < arrN1.length-1 ){
+    const arr1 = arrN1.splice(0, index);
+    const arr2 = arrN2.splice(index+1);
+    return [el].concat(arr1.reverse(), arr2.reverse())
+  } else {
+    const arr1 = arrN1.splice(0, index);
+    return [el].concat(arr1.reverse())
+  }
+
+};

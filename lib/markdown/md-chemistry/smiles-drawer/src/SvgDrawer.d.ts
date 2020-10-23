@@ -22,9 +22,15 @@ declare class SvgDrawer {
         item: any;
         isBetweenRings: boolean;
     };
+    isRing_ONN(ring: any): boolean;
+    isRing_NNN(ring: any): boolean;
+    isHydrogenVertices(arr: any): boolean;
+    findStartNbyEdges(members: any, elements: any): number;
     isThiadiazole(ring: any): boolean;
+    vertexHasBondType(vertex: any): boolean;
     neighboursHasDoubleLine(vertex: any, members: any, edgesR: any): void;
     isBridgeCommonRing(ringId: any, vertexA: any, vertexB: any): any;
+    drawCommonRing(ringId: any, iEdge: any): void;
     checkNeighboursEdges(edge: any, vertexA: any, vertexB: any): boolean;
     /**
      * Draw the actual edges as bonds.

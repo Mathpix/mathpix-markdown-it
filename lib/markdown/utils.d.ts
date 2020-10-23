@@ -5,3 +5,5 @@ export declare const includesSimpleMathTag: (str: string, tag?: string) => boole
 export declare const includesMultiMathBeginTag: (str: any, tag: any) => RegExp | null;
 export declare const includesMultiMathTag: (str: any, tag: any) => boolean;
 export declare const arraysCompare: (a1: any, a2: any) => any;
+export declare const arrayDelElement: (arr: any, el: any) => any;
+export declare const arrayResortFromElement: (arr: any, el: any) => any[];

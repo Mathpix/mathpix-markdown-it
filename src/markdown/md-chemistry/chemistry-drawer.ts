@@ -8,7 +8,7 @@ export const ChemistryDrawer = {
   drawSvgSync: function(content: string, id: string,
                         options: ISmilesOptions = {}): string {
     initDocument();
-    const { theme = 'light', stretch, fontSize = 16,
+    const { theme = 'light', stretch, fontSize = 14,
       disableColors = true, autoScale
     } = options;
     let scale = options.scale || 1;
