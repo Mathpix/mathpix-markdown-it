@@ -17,7 +17,6 @@ export const setFontSize = (fontSize: number, options) => {
 };
 
 export const setDisableColors = (options) => {
-  console.log('[mmd] ==== setDisableColors=>')
   options.themes = {
     dark: {
       C:  '#fff',

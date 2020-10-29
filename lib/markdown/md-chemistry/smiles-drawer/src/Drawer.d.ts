@@ -24,6 +24,7 @@ export interface ISmilesOptionsDef {
     bondSpacing?: number;
     atomVisualization?: string;
     ringVisualization?: string;
+    ringAromaticVisualization?: string;
     isomeric?: boolean;
     debug?: boolean;
     terminalCarbons?: boolean;

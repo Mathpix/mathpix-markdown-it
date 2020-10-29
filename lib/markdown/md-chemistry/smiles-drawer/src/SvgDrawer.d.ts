@@ -20,17 +20,29 @@ declare class SvgDrawer {
     checkEdgesRingsOnHaveLine(): void;
     getEdgeBetweenVertexAB(vA: any, vB: any): {
         item: any;
-        isBetweenRings: boolean;
+        isBetweenRings: any;
+        bRings: any;
     };
+    isRing_SNN(ring: any): boolean;
     isRing_ONN(ring: any): boolean;
     isRing_NNN(ring: any): boolean;
     isHydrogenVertices(arr: any): boolean;
-    findStartNbyEdges(members: any, elements: any): number;
-    isThiadiazole(ring: any): boolean;
+    findStartNbyEdges(members: any, elements: any): {
+        indexS: number;
+        isHydrogen: boolean;
+    };
+    findStartNbyCommonRing(ring: any): number;
     vertexHasBondType(vertex: any): boolean;
     neighboursHasDoubleLine(vertex: any, members: any, edgesR: any): void;
     isBridgeCommonRing(ringId: any, vertexA: any, vertexB: any): any;
-    drawCommonRing(ringId: any, iEdge: any): void;
+    isAromaticCommonRing(ringId: any, edge: any): boolean;
+    drawCommonRing(ringId: any, iEdge: any, isCommonEdgeHaveLine?: boolean, isHydro?: boolean, isNotSetLast?: boolean, isNotResort?: boolean, indexStart?: number, reDraw?: boolean): void;
+    isSimpleRing(ring: any): boolean;
+    setLinesForEdges(ring: any, edges: any, isFirst?: boolean, isNotSetLast?: boolean, indexStart?: number, needReDraw?: boolean): void;
+    isNeighboursEdgesHaveLine(edge: any): any;
+    edgeVerticesAlreadyHasDoubleLine(edge: any): any;
+    edgeNeighboursCanNotHaveLine(ring: any, edge: any): boolean;
+    edgeCanNotHaveLine(edge: any): boolean;
     checkNeighboursEdges(edge: any, vertexA: any, vertexB: any): boolean;
     /**
      * Draw the actual edges as bonds.

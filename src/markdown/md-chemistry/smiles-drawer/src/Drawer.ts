@@ -36,6 +36,7 @@ export interface ISmilesOptionsDef {
   bondSpacing?: number,
   atomVisualization?: string,
   ringVisualization?: string, //'default', 'circle', 'aromatic'
+  ringAromaticVisualization?: string, // 'default', 'dashed'
   isomeric?: boolean,
   debug?: boolean,
   terminalCarbons?: boolean,
@@ -123,6 +124,7 @@ class Drawer {
       bondSpacing: 0.18 * 15,
       atomVisualization: 'default',
       ringVisualization: 'default',
+      ringAromaticVisualization: 'default',
       isomeric: true,
       debug: false,
       terminalCarbons: false,
@@ -1062,7 +1064,7 @@ class Drawer {
         return ring;
       } else if (size > maxSize) {
         //NEED TO FIX
-        if (!ring.isBridged && !ring.isHaveElements && maxSize > 0) {
+        if (( ring.edges.length < 1) && !ring.isHaveElements && maxSize > 0) {
           continue;
         }
         maxSize = size;

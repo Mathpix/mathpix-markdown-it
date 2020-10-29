@@ -10,7 +10,8 @@ export interface ISmilesOptions extends ISmilesOptionsDef {
   fontSize?: number,
   disableColors?: boolean,
   disableGradient?: boolean,
-  autoScale?: boolean
+  autoScale?: boolean,
+  isTesting?: boolean
 }
 
 function injectLineNumbersSmiles(tokens, idx, options, env, slf) {
@@ -175,7 +176,9 @@ const renderSmilesDrawerBlock = (tokens, idx, options, env, slf) => {
   if (!token.content) {
     return '';
   }
-  const id = `f${(+new Date).toString(16)}`;
+  const id = !options.isTesting
+    ?`f${(+new Date).toString(16)}`
+    : '';
 
   const resSvg = ChemistryDrawer.drawSvgSync(token.content.trim(), id, options);
   if (!resSvg) {
@@ -196,7 +199,9 @@ const renderSmilesDrawerInline = (tokens, idx, options, env, slf) => {
   if (!token.content) {
     return '';
   }
-  const id = `f${(+new Date).toString(16)}`;
+  const id = !options.isTesting
+    ? `f${(+new Date).toString(16)}`
+    : '';
 
   const resSvg = ChemistryDrawer.drawSvgSync(token.content.trim(), id, options);
   if (!resSvg) {

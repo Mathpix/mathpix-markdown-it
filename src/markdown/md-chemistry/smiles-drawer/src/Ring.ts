@@ -43,6 +43,8 @@ class Ring {
 	public canFlip: any;
 	public isDrawed: any;
 	public isHaveElements: boolean;
+	public hasHydrogen: boolean;
+	public hasOuterDoubleBond: boolean;
 
     /**
      * The constructor for the class Ring.
@@ -71,6 +73,8 @@ class Ring {
         this.canFlip = true;
         this.isDrawed = false;
         this.isHaveElements = false;
+        this.hasHydrogen = false;
+        this.hasOuterDoubleBond = false;
     }
 
     /**

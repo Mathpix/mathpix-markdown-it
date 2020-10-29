@@ -38,6 +38,8 @@ declare class Ring {
     canFlip: any;
     isDrawed: any;
     isHaveElements: boolean;
+    hasHydrogen: boolean;
+    hasOuterDoubleBond: boolean;
     /**
      * The constructor for the class Ring.
      *

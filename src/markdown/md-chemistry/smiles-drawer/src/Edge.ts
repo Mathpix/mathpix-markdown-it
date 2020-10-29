@@ -24,6 +24,10 @@ class Edge {
 	public isNotHaveLine: boolean;
 	public isHaveLine: boolean;
   public isPartOfRing: boolean;
+  public neighbours: any;
+  public rings: any;
+  public sourceHasOuterDoubleBond: boolean;
+  public targetHasOuterDoubleBond: boolean;
 
     /**
      * The constructor for the class Edge.
@@ -45,6 +49,10 @@ class Edge {
         this.isNotHaveLine = false;
         this.isHaveLine = false;
         this.isPartOfRing = false;
+        this.neighbours = [];
+        this.rings = [];
+        this.sourceHasOuterDoubleBond = false;
+        this.targetHasOuterDoubleBond = false;
     }
 
     /**

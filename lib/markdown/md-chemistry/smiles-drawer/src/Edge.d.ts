@@ -23,6 +23,10 @@ declare class Edge {
     isNotHaveLine: boolean;
     isHaveLine: boolean;
     isPartOfRing: boolean;
+    neighbours: any;
+    rings: any;
+    sourceHasOuterDoubleBond: boolean;
+    targetHasOuterDoubleBond: boolean;
     /**
      * The constructor for the class Edge.
      *
