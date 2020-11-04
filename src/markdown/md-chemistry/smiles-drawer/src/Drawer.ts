@@ -35,6 +35,8 @@ export interface ISmilesOptionsDef {
   shortBondLength?: number,
   bondSpacing?: number,
   atomVisualization?: string,
+  ringVisualization?: string, //'default', 'circle', 'aromatic'
+  ringAromaticVisualization?: string, // 'default', 'dashed'
   isomeric?: boolean,
   debug?: boolean,
   terminalCarbons?: boolean,
@@ -121,6 +123,8 @@ class Drawer {
       shortBondLength: 0.85,
       bondSpacing: 0.18 * 15,
       atomVisualization: 'default',
+      ringVisualization: 'default',
+      ringAromaticVisualization: 'default',
       isomeric: true,
       debug: false,
       terminalCarbons: false,
@@ -1052,15 +1056,65 @@ class Drawer {
     let maxSize = 0;
     let largestCommonRing = null;
 
+    if (commonRings.length === 1) {
+      return this.getRing(commonRings[0]);
+    }
+
     for (var i = 0; i < commonRings.length; i++) {
       let ring = this.getRing(commonRings[i]);
       let size = ring.getSize();
 
+      // if (ring.elements.indexOf('S') !== -1) {
+      //   return ring;
+      // }
       if (ring.isBenzeneLike(this.graph.vertices)) {
         return ring;
-      } else if (size > maxSize) {
-        maxSize = size;
-        largestCommonRing = ring;
+      } else {
+        if (size > maxSize) {
+          //NEED TO FIX
+          // if (( ring.edges.length < 1) //&& !ring.isHaveElements
+          // // && maxSize > 0
+          // ) {
+          //   continue;
+          // }
+          if ( maxSize > 0) {
+            if (largestCommonRing.members.length === 5
+              && largestCommonRing.elements.indexOf('S') !== -1
+              && largestCommonRing.neighbours.length === 1
+              && ring.edges.length < 1) {
+              continue;
+            }
+            if (largestCommonRing.members.length === 6
+              && largestCommonRing.edges.length < 1 && ring.edges.length < 1
+              && largestCommonRing.hasDoubleBondWithO
+            ) {
+              continue;
+            }
+          }
+          maxSize = size;
+          largestCommonRing = ring;
+
+        } else {
+          if ( size === maxSize
+            // && size === 6
+          ) {
+            if (largestCommonRing.elements.indexOf('O') !== -1) {
+              largestCommonRing = ring;
+              continue;
+            }
+
+            if (largestCommonRing.hasDoubleBondWithO && !ring.hasDoubleBondWithO) {
+              largestCommonRing = ring
+            } else {
+              if ( !ring.hasDoubleBondWithO &&
+                size === 6 &&
+                largestCommonRing.edges.length < 1 && ring.edges.length > 1){
+                largestCommonRing = ring;
+
+              }
+           }
+          }
+        }
       }
     }
 

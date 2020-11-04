@@ -19,6 +19,15 @@ declare class Edge {
     isPartOfAromaticRing: any;
     center: any;
     wedge: any;
+    isDraw: boolean;
+    isNotHaveLine: boolean;
+    isNotReDraw: boolean;
+    isHaveLine: boolean;
+    isPartOfRing: boolean;
+    neighbours: any;
+    rings: any;
+    sourceHasOuterDoubleBond: boolean;
+    targetHasOuterDoubleBond: boolean;
     /**
      * The constructor for the class Edge.
      *

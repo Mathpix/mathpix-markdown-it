@@ -24,7 +24,12 @@ import RingConnection from './RingConnection';
 class Ring {
 	public id: any;
 	public members: any;
+	public membersS: any;
 	public edges: any;
+	public edgesL: any;
+	public edgesR: any;
+	public edgesFix: any;
+	public elements: any;
 	public insiders: any;
 	public neighbours: any;
 	public positioned: any;
@@ -36,6 +41,11 @@ class Ring {
 	public isFused: any;
 	public centralAngle: any;
 	public canFlip: any;
+	public isDrawed: any;
+	public isHaveElements: boolean;
+	public hasHydrogen: boolean;
+	public hasOuterDoubleBond: boolean;
+	public hasDoubleBondWithO: boolean;
 
     /**
      * The constructor for the class Ring.
@@ -45,7 +55,13 @@ class Ring {
     constructor(members) {
         this.id = null;
         this.members = members;
+        this.membersS = [];
+       // this.membersS = [...members].sort((a, b) => a - b);
         this.edges = [];
+        this.edgesL = [];
+        this.edgesR = [];
+        this.edgesFix = [];
+        this.elements = [];
         this.insiders = [];
         this.neighbours = [];
         this.positioned = false;
@@ -57,6 +73,11 @@ class Ring {
         this.isFused = false;
         this.centralAngle = 0.0;
         this.canFlip = true;
+        this.isDrawed = false;
+        this.isHaveElements = false;
+        this.hasHydrogen = false;
+        this.hasOuterDoubleBond = false;
+        this.hasDoubleBondWithO = false;
     }
 
     /**

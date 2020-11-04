@@ -33,6 +33,7 @@ declare class Vertex {
     neighbours: any;
     neighbouringElements: any;
     forcePositioned: any;
+    hasDoubleBondWithO: boolean;
     /**
      * The constructor for the class Vertex.
      *
