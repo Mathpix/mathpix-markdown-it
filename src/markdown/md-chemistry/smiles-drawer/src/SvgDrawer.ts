@@ -380,8 +380,11 @@ class SvgDrawer {
                   && rEdges.length > 5
                   && !rhasHydrogen && !rhasOuterDoubleBond)
               ) {
+
                 ring.isDrawed = true;
-                if ( this.isNeighboursVerticesHaveCommonRing(edges[item], ring)) {
+                if ( this.isNeighboursVerticesHaveDoubleLine(edges[item], ring, true)
+                  ||
+                  this.isNeighboursVerticesHaveCommonRing(edges[item], ring)) {
                   edges[item].isNotHaveLine = false;
                   edges[item].isHaveLine = true;
                   this.drawCommonRing(ring.id, item, {
@@ -590,8 +593,10 @@ class SvgDrawer {
                 edge.isNotHaveLine = true;
               }
               if (ring.edgesR.indexOf(edge.id) !== -1) {
-                if ( ring.neighbours.length === 1
-                  && (this.isNeighboursVerticesHaveDoubleLine(edge, ring)
+
+                if ( ((ring.neighbours.length === 1 && ring.members.length > 5) && this.isNeighboursVerticesHaveDoubleLine(edge, ring))
+                  ||
+                  (this.isNeighboursVerticesHaveDoubleLine(edge, ring, true)
                     || this.isNeighboursVerticesHaveCommonRing(edge, ring)
                   )
                 ) {
@@ -638,15 +643,20 @@ class SvgDrawer {
     return false;
   }
 
-  isNeighboursVerticesHaveDoubleLine(edge, ring) {
+  isNeighboursVerticesHaveDoubleLine(edge, ring, notCurrentRing = false) {
     const graph = this.preprocessor.graph;
     let res = false;
 
-    const vertices = [].concat(graph.vertices[edge.sourceId].neighbours,
+    let vertices = [].concat(graph.vertices[edge.sourceId].neighbours,
       graph.vertices[edge.targetId].neighbours);
+
+    if (notCurrentRing) {
+      vertices = vertices.filter(item => ring.members.indexOf(item) === -1)
+    }
 
     for (let i = 0; i < vertices.length; i++) {
       const vertex = graph.vertices[vertices[i]];
+
       if (vertex.hasDoubleBondWithO
         && ((ring.members.length === 5 && vertex.value.rings.filter(item => item !== ring.id).length > 0)
            || ring.members.length > 5
@@ -806,8 +816,9 @@ class SvgDrawer {
               edge.isNotHaveLine = true;
             }
             if (ring.edgesR.indexOf(edge.id) !== -1) {
-              if ( ring.neighbours.length === 1
-                && (this.isNeighboursVerticesHaveDoubleLine(edge, ring)
+              if ( //ring.neighbours.length === 1
+                //&&
+                (this.isNeighboursVerticesHaveDoubleLine(edge, ring)
                   || this.isNeighboursVerticesHaveCommonRing(edge, ring)
                   || hasDoubleBondWithO
                 )) {
@@ -908,7 +919,11 @@ class SvgDrawer {
       const edges = vertex.edges.filter((e,i,a)=>a.indexOf(e)==i);
       if (edges.length > 2) {
         res = i;
-        break;
+        if (vertex.value.rings.length > 1) {
+          continue
+        } else {
+          break;
+        }
       }
 
       if ( members.length === 5 && this.isHydrogenVertices([v])) {
@@ -1102,8 +1117,9 @@ class SvgDrawer {
           }
         }
         if (this.preprocessor.opts.debug) {
-          console.log('ring=>', ring)
-          console.log('edges=>', edges)
+          console.log('[drawCommonRing] ring=>', ring)
+          console.log('[drawCommonRing] edges=>', edges)
+          console.log('[drawCommonRing] isNotSetLast=>', isNotSetLast)
         }
 
         ring.isDrawed = true;
@@ -1249,15 +1265,15 @@ class SvgDrawer {
     }
 
     for (let i = 0; i < vertexA.edges.length; i++) {
-      const edge = this.preprocessor.graph.edges[vertexA.edges[i]];
-      if (edge.bondType === '=' || (edge.isHaveLine && !edge.isNotHaveLine)) {
+      const edgeA = this.preprocessor.graph.edges[vertexA.edges[i]];
+      if (edgeA.bondType === '=' || (edgeA.isHaveLine && !edgeA.isNotHaveLine)) {
         res = true;
         break
       }
     }
     for (let i = 0; i < vertexB.edges.length; i++) {
-      const edge = this.preprocessor.graph.edges[vertexB.edges[i]];
-      if (edge.bondType === '=' || (edge.isHaveLine && !edge.isNotHaveLine)) {
+      const edgeB = this.preprocessor.graph.edges[vertexB.edges[i]];
+      if (edgeB.bondType === '=' || (edgeB.isHaveLine && !edgeB.isNotHaveLine)) {
         res = true;
         break
       }

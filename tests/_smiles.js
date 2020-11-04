@@ -12,7 +12,7 @@ const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
 global.DOMParser = new JSDOM().window.DOMParser;
 
-describe('Check Smiles:', () => {
+describe.only('Check Smiles:', () => {
   const options = {
     cwidth: 800,
     smiles: {
@@ -77,6 +77,19 @@ describe('Check Smiles:', () => {
 
   const tests3 = require('./_data/_smiles/_data3');
   tests3.forEach(function(test) {
+    if (test.smiles && test.svg) {
+      const html = MM.markdownToHTML(test.smiles, options);
+      describe('Smiles data2 [' + (test.id).toString() + '] => ' + test.smiles, () => {
+        it('Checking result html', (done) => {
+          html.trim().should.equal(test.svg);
+          done();
+        });
+      });
+    }
+  });
+
+  const tests4 = require('./_data/_smiles/_data3');
+  tests4.forEach(function(test) {
     if (test.smiles && test.svg) {
       const html = MM.markdownToHTML(test.smiles, options);
       describe('Smiles data2 [' + (test.id).toString() + '] => ' + test.smiles, () => {

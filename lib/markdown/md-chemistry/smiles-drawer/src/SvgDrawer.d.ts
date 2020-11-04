@@ -26,7 +26,7 @@ declare class SvgDrawer {
     };
     isRing_SNN(ring: any): boolean;
     isRing_ONN(ring: any): boolean;
-    isNeighboursVerticesHaveDoubleLine(edge: any, ring: any): boolean;
+    isNeighboursVerticesHaveDoubleLine(edge: any, ring: any, notCurrentRing?: boolean): boolean;
     isNeighboursVerticesHaveCommonRing(edge: any, ring: any): boolean;
     edgesHaveCommonRing(edges: any): boolean;
     isRing_NNN(ring: any): boolean;
