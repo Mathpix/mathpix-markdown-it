@@ -305,7 +305,6 @@ class SvgDrawer {
           || (vertexB.value.element === 'N' && vertexB.neighbourCount === 3)
         ) {
           edge.isNotHaveLine = true;
-          edge.setBondType('-');
           continue;
         }
         edge.isHaveLine = true;
@@ -328,11 +327,9 @@ class SvgDrawer {
           || (vertexB.value.element === 'N' && vertexB.neighbourCount === 3 && vertexB.neighbourCount !== vertexB.value.bondCount)
         ) {
           edge.isNotHaveLine = true;
-          edge.setBondType('-');
           continue;
         }
         edge.isHaveLine = true;
-        edge.setBondType('=');
         edge.isChecked = true;
       }
     }
@@ -350,7 +347,6 @@ class SvgDrawer {
 
     if (this.edgeHaveDoubleBound(edge)) {
       edge.isHaveLine = true;
-      edge.setBondType('=');
       edge.isChecked = true;
       if (ring && !ring.isStartedCheck) {
         let prev = false;
@@ -374,7 +370,6 @@ class SvgDrawer {
     if (this.checkVertex_N(vertexA)) {
       if (!this.edgeNeighboursHaveDoubleBound(edge, vertexA, vertexB)) {
         edge.isHaveLine = true;
-        edge.setBondType('=');
         edge.isChecked = true;
         return
       }
@@ -394,7 +389,6 @@ class SvgDrawer {
     ) {
       if (!edge.isBeforeNotHaveLine) {
         edge.isHaveLine = true;
-        edge.setBondType('=');
       }
       edge.isChecked = true;
 
@@ -422,7 +416,6 @@ class SvgDrawer {
 
     } else {
       edge.isNotHaveLine = true;
-      edge.setBondType('-');
       edge.isChecked = true;
     }
   };

@@ -12,7 +12,7 @@ const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
 global.DOMParser = new JSDOM().window.DOMParser;
 
-describe('Check Smiles:', () => {
+describe.only('Check Smiles:', () => {
   const options = {
     cwidth: 800,
     smiles: {
