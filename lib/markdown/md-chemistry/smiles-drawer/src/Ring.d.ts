@@ -21,9 +21,7 @@ declare class Ring {
     members: any;
     membersS: any;
     edges: any;
-    edgesL: any;
     edgesR: any;
-    edgesFix: any;
     elements: any;
     insiders: any;
     neighbours: any;
@@ -41,6 +39,7 @@ declare class Ring {
     hasHydrogen: boolean;
     hasOuterDoubleBond: boolean;
     hasDoubleBondWithO: boolean;
+    isStartedCheck: boolean;
     /**
      * The constructor for the class Ring.
      *

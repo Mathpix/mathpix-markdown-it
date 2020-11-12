@@ -131,7 +131,7 @@ class Drawer {
       explicitHydrogens: true,
       overlapSensitivity: 0.42,
       overlapResolutionIterations: 1,
-      compactDrawing: true,
+      compactDrawing: false,
       fontSizeLarge: 5,
       fontSizeSmall: 3,
       padding: 5.0,
