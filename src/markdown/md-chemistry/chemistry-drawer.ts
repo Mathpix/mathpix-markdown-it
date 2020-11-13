@@ -9,7 +9,7 @@ export const ChemistryDrawer = {
                         options: ISmilesOptions = {}): string {
     initDocument();
     const { theme = 'light', stretch, fontSize = 14,
-      disableColors, autoScale
+      disableColors = true, autoScale
     } = options;
     let scale = options.scale || 1;
     let config: IOptions = {};

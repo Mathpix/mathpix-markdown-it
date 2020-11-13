@@ -20,6 +20,21 @@ class Edge {
 	public isPartOfAromaticRing: any;
 	public center: any;
 	public wedge: any;
+	public isDraw: boolean;
+	public isNotHaveLine: boolean;
+	public isChecked: boolean;
+	public isNotReDraw: boolean;
+	public isHaveLine: boolean;
+	public isBeforeHaveLine: boolean;
+	public isBeforeNotHaveLine: boolean;
+  public isPartOfRing: boolean;
+  public neighbours: any;
+  public rings: any;
+  public sourceHasOuterDoubleBond: boolean;
+  public targetHasOuterDoubleBond: boolean;
+  public isAtomVertex: boolean;
+  public isAtomSlat: boolean;
+  public isBottomSlat: boolean;
 
     /**
      * The constructor for the class Edge.
@@ -37,6 +52,21 @@ class Edge {
         this.isPartOfAromaticRing = false;
         this.center = false;
         this.wedge = '';
+        this.isDraw = false;
+        this.isNotHaveLine = false;
+        this.isChecked = false;
+        this.isNotReDraw = false;
+        this.isHaveLine = false;
+        this.isBeforeHaveLine = false;
+        this.isBeforeNotHaveLine = false;
+        this.isPartOfRing = false;
+        this.neighbours = [];
+        this.rings = [];
+        this.sourceHasOuterDoubleBond = false;
+        this.targetHasOuterDoubleBond = false;
+        this.isAtomVertex = false;
+        this.isAtomSlat = false;
+        this.isBottomSlat = false;
     }
 
     /**
@@ -55,6 +85,7 @@ class Edge {
      */
     static get bonds() {
         return {
+            '.': 1,
             '-': 1,
             '/': 1,
             '\\': 1,

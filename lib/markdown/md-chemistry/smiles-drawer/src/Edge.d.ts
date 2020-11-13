@@ -19,6 +19,21 @@ declare class Edge {
     isPartOfAromaticRing: any;
     center: any;
     wedge: any;
+    isDraw: boolean;
+    isNotHaveLine: boolean;
+    isChecked: boolean;
+    isNotReDraw: boolean;
+    isHaveLine: boolean;
+    isBeforeHaveLine: boolean;
+    isBeforeNotHaveLine: boolean;
+    isPartOfRing: boolean;
+    neighbours: any;
+    rings: any;
+    sourceHasOuterDoubleBond: boolean;
+    targetHasOuterDoubleBond: boolean;
+    isAtomVertex: boolean;
+    isAtomSlat: boolean;
+    isBottomSlat: boolean;
     /**
      * The constructor for the class Edge.
      *
@@ -38,6 +53,7 @@ declare class Edge {
      * @returns {Object} The object containing the map.
      */
     static get bonds(): {
+        '.': number;
         '-': number;
         '/': number;
         '\\': number;

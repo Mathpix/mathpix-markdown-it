@@ -19,7 +19,10 @@
 declare class Ring {
     id: any;
     members: any;
+    membersS: any;
     edges: any;
+    edgesR: any;
+    elements: any;
     insiders: any;
     neighbours: any;
     positioned: any;
@@ -31,6 +34,12 @@ declare class Ring {
     isFused: any;
     centralAngle: any;
     canFlip: any;
+    isDrawed: any;
+    isHaveElements: boolean;
+    hasHydrogen: boolean;
+    hasOuterDoubleBond: boolean;
+    hasDoubleBondWithO: boolean;
+    isStartedCheck: boolean;
     /**
      * The constructor for the class Ring.
      *

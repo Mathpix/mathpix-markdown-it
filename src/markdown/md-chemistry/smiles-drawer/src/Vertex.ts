@@ -39,6 +39,8 @@ class Vertex {
 	public neighbours: any;
 	public neighbouringElements: any;
 	public forcePositioned: any;
+	public hasDoubleBondWithO: boolean;
+	public isAtomVertex: boolean;
 
   /**
    * The constructor for the class Vertex.
@@ -63,6 +65,8 @@ class Vertex {
     this.neighbours = Array();
     this.neighbouringElements = Array();
     this.forcePositioned = false;
+    this.hasDoubleBondWithO = false;
+    this.isAtomVertex = false;
   }
 
   /**

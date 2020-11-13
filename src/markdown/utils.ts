@@ -119,3 +119,68 @@ export const includesMultiMathTag = (str, tag): boolean => {
   }
   return result;
 };
+
+
+export const arraysCompare = (a1, a2) => {
+  if (a1.length < 2 || a2.length < 2) {
+    return false;
+  }
+  if (a1.length == a2.length) {
+    return  a1.every((v,i)=>v === a2[i])
+  } else {
+    if (a1.length < a2.length ) {
+      return a1.filter((item)=>a2.indexOf(item) === -1).length === 0
+    } else {
+      return a2.filter((item)=>a1.indexOf(item) === -1).length === 0
+      // return a2.every((v,i)=>v === a1[i])
+    }
+  }
+  // return a1.length == a2.length && a1.every((v,i)=>v === a2[i])
+};
+
+
+export const arrayDelElement = (arr, el) => {
+  const index = arr.indexOf(el);
+
+  if (index === -1) {
+    return arr;
+  }
+
+  return arr.splice(index, 1);
+};
+
+export const arrayResortFromElement = (arr, el, notReverse = false, nextEl = -1) => {
+  const index = arr.indexOf(el);
+  const arrN1 = [...arr];
+  const arrN2 = [...arr];
+
+  if (index < arrN1.length-1 ){
+    if (notReverse) {
+      const arr1 = arrN1.splice(0, index);
+      const arr2 = arrN2.splice(index+1);
+      if (nextEl !== -1) {
+        if (arr1.indexOf(nextEl) !== -1) {
+          return [el].concat(arr1.reverse(), arr2.reverse())
+        }
+        if (arr2.indexOf(nextEl) !== -1) {
+          return [el].concat(arr2, arr1)
+        }
+      }
+      return [el].concat(arr1.reverse(), arr2.reverse())
+      // return [el].concat(arr2, arr1)
+    } else {
+      const arr1 = arrN1.splice(0, index);
+      const arr2 = arrN2.splice(index+1);
+      return [el].concat(arr1.reverse(), arr2.reverse())
+    }
+
+  } else {
+    const arr1 = arrN1.splice(0, index);
+    if (notReverse) {
+      return [el].concat(arr1)
+    } else {
+      return [el].concat(arr1.reverse())
+    }
+  }
+
+};

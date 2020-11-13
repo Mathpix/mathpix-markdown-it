@@ -34,7 +34,10 @@ export interface ISmilesOptionsDef {
   bondLength?: number,
   shortBondLength?: number,
   bondSpacing?: number,
+  dCircle?: number,
   atomVisualization?: string,
+  ringVisualization?: string, //'default', 'circle', 'aromatic'
+  ringAromaticVisualization?: string, // 'default', 'dashed'
   isomeric?: boolean,
   debug?: boolean,
   terminalCarbons?: boolean,
@@ -118,16 +121,19 @@ class Drawer {
       height: 500,
       bondThickness: 0.6,
       bondLength: 15,
-      shortBondLength: 0.85,
+      shortBondLength: 0.8,
       bondSpacing: 0.18 * 15,
+      dCircle: 2,
       atomVisualization: 'default',
+      ringVisualization: 'default',
+      ringAromaticVisualization: 'default',
       isomeric: true,
       debug: false,
       terminalCarbons: false,
       explicitHydrogens: true,
       overlapSensitivity: 0.42,
       overlapResolutionIterations: 1,
-      compactDrawing: true,
+      compactDrawing: false,
       fontSizeLarge: 5,
       fontSizeSmall: 3,
       padding: 5.0,
@@ -1052,15 +1058,65 @@ class Drawer {
     let maxSize = 0;
     let largestCommonRing = null;
 
+    if (commonRings.length === 1) {
+      return this.getRing(commonRings[0]);
+    }
+
     for (var i = 0; i < commonRings.length; i++) {
       let ring = this.getRing(commonRings[i]);
       let size = ring.getSize();
 
+      // if (ring.elements.indexOf('S') !== -1) {
+      //   return ring;
+      // }
       if (ring.isBenzeneLike(this.graph.vertices)) {
         return ring;
-      } else if (size > maxSize) {
-        maxSize = size;
-        largestCommonRing = ring;
+      } else {
+        if (size > maxSize) {
+          //NEED TO FIX
+          // if (( ring.edges.length < 1) //&& !ring.isHaveElements
+          // // && maxSize > 0
+          // ) {
+          //   continue;
+          // }
+          if ( maxSize > 0) {
+            if (largestCommonRing.members.length === 5
+              && largestCommonRing.elements.indexOf('S') !== -1
+              && largestCommonRing.neighbours.length === 1
+              && ring.edges.length < 1) {
+              continue;
+            }
+            if (largestCommonRing.members.length === 6
+              && largestCommonRing.edges.length < 1 && ring.edges.length < 1
+              && largestCommonRing.hasDoubleBondWithO
+            ) {
+              continue;
+            }
+          }
+          maxSize = size;
+          largestCommonRing = ring;
+
+        } else {
+          if ( size === maxSize
+            // && size === 6
+          ) {
+            if (largestCommonRing.elements.indexOf('O') !== -1) {
+              largestCommonRing = ring;
+              continue;
+            }
+
+            if (largestCommonRing.hasDoubleBondWithO && !ring.hasDoubleBondWithO) {
+              largestCommonRing = ring
+            } else {
+              if ( !ring.hasDoubleBondWithO &&
+                size === 6 &&
+                largestCommonRing.edges.length < 1 && ring.edges.length > 1){
+                largestCommonRing = ring;
+
+              }
+           }
+          }
+        }
       }
     }
 

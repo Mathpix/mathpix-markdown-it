@@ -468,7 +468,7 @@ class SvgWrapper {
    */
   drawText(x, y, elementName, hydrogens, direction, isTerminal, charge, isotope, attachedPseudoElement = {}) {
     const dFont = this.opts.fontSizeLarge / 2;
-    const radius = dFont + dFont/4;
+    const radius = dFont + dFont/this.opts.dCircle;
     const elementClassName = this.opts.id ? 'element-' + this.opts.id : 'element';
 
     let offsetX = this.offsetX,

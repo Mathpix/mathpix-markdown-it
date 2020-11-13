@@ -90,7 +90,7 @@ class Atom {
     this.isDrawn = true;
     this.isConnectedToRing = false;
     this.neighbouringElements = Array();
-    this.isPartOfAromaticRing = element !== this.element;
+    this.isPartOfAromaticRing = element !== this.element || element === '*' || element == 'Se' || element == 'As';
     this.bondCount = 0;
     this.chirality = '';
     this.isStereoCenter = false;
