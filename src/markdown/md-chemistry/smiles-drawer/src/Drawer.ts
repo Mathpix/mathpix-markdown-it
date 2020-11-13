@@ -34,6 +34,7 @@ export interface ISmilesOptionsDef {
   bondLength?: number,
   shortBondLength?: number,
   bondSpacing?: number,
+  dCircle?: number,
   atomVisualization?: string,
   ringVisualization?: string, //'default', 'circle', 'aromatic'
   ringAromaticVisualization?: string, // 'default', 'dashed'
@@ -120,8 +121,9 @@ class Drawer {
       height: 500,
       bondThickness: 0.6,
       bondLength: 15,
-      shortBondLength: 0.85,
+      shortBondLength: 0.8,
       bondSpacing: 0.18 * 15,
+      dCircle: 2,
       atomVisualization: 'default',
       ringVisualization: 'default',
       ringAromaticVisualization: 'default',

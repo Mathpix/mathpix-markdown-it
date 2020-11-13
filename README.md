@@ -602,12 +602,14 @@ The `MathpixMarkdown` React element accepts the following props:
 
 ### ISmilesOptions
 
-|                      | type&nbsp;*`default`*        |  description                                                                                                       |
-|----------------------|------------------------------|--------------------------------------------------------------------------------------------------------------------|
-| `theme`              | string&nbsp;*`light`*        | Color theme                                                                                                        |
-| `fontSize`           | number&nbsp;*`14`*           | Font Size (in px)                                                                                                  |
-| `disableGradient`    | boolean&nbsp;*`false`*       | Disable gradient coloring                                                                                          |
-| `disableColors`      | boolean&nbsp;*`false`*       | Disable all coloring                                                                                               |
+|                             | type&nbsp;*`default`*       |  description                                                                                                                                |
+|-----------------------------|-----------------------------|---------------------------------------------------------------------------------------------------------------------------------------------|
+| `theme`                     | string&nbsp;*`light`*       | Color theme                                                                                                                                 |
+| `fontSize`                  | number&nbsp;*`14`*          | Font Size (in px)                                                                                                                           |
+| `disableGradient`           | boolean&nbsp;*`false`*      | Disable gradient coloring                                                                                                                   |
+| `disableColors`             | boolean&nbsp;*`false`*      | Disable all coloring                                                                                                                        |
+| `ringVisualization`         | string&nbsp;*`default`*     | Determines how to display aromatic rings. `circle` - a ring; `default` - alternating double and single lines.                               |
+| `ringAromaticVisualization` | string&nbsp;*`default`*     | For Bridged Rings. Determines how to display aromatic rings. `dashed` - dashed gray lines; `default` - alternating double and single lines. |
 
 # Development
 

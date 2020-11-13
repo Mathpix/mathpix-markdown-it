@@ -22,6 +22,7 @@ export interface ISmilesOptionsDef {
     bondLength?: number;
     shortBondLength?: number;
     bondSpacing?: number;
+    dCircle?: number;
     atomVisualization?: string;
     ringVisualization?: string;
     ringAromaticVisualization?: string;

@@ -16,7 +16,9 @@ describe.only('Check Smiles:', () => {
   const options = {
     cwidth: 800,
     smiles: {
-      isTesting: true
+      isTesting: true,
+      shortBondLength: 0.85,
+      dCircle: 4
     }
   };
   const simple_aromatic_rings = require('./_data/_smiles/_simple_aromatic_rings');
