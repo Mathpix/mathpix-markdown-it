@@ -70,6 +70,7 @@ export type TOutputMath = {
 
 export type TOutputMathJax = {
   mtextInheritFont?: boolean,
+  resetNumbers?: boolean
 }
 
 export type THtmlSanitize = {

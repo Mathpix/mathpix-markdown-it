@@ -841,6 +841,10 @@ export default options => {
   options = extend(options || {}, defaults);
 
   return md => {
+    if (options?.mathJax?.resetNumbers) {
+      MathJax.Reset();
+    }
+
     Object.assign(md.options, options);
     md.block.ruler.before("paragraph", "paragraphDiv", paragraphDiv);
     md.block.ruler.at("code", codeBlock);

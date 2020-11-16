@@ -59,6 +59,7 @@ export declare type TOutputMath = {
 };
 export declare type TOutputMathJax = {
     mtextInheritFont?: boolean;
+    resetNumbers?: boolean;
 };
 export declare type THtmlSanitize = {
     disallowedTagsMode?: string;
