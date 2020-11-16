@@ -1,30 +1,27 @@
 import MathJaxPlugin from "./mdPluginRaw";
-import mdPluginText from './mdPluginText';
+import TextPlugin from './mdPluginText';
 import highlightPlugin from './mdHighlightCodePlugin';
-import mdPluginTOC from './mdPluginTOC';
-import mdPluginAnchor from './mdPluginAnchor';
-import mdPluginSeparateForBlock from './mdPluginSeparateForBlock';
-import mdPluginTableTabular from './mdPluginTableTabular';
-import mdPluginList from './mdPluginLists';
-import mdPluginCollapsible from './mdPluginCollapsible';
-import mdPluginChemistry from './md-chemistry';
+import tocPlugin from './mdPluginTOC';
+import anchorPlugin from './mdPluginAnchor';
+import tableTabularPlugin from './mdPluginTableTabular';
+import listsPlugin from './mdPluginLists';
+import collapsiblePlugin from './mdPluginCollapsible';
+import ChemistryPlugin from './md-chemistry';
 
 /**
  * configured custom mathjax plugin
  */
-export const ConfiguredMathJaxPlugin = MathJaxPlugin;
+export const mdPluginMathJax = MathJaxPlugin;
 
 /**
  * configured custom tag plugin
  */
-export const CustomTagPlugin = mdPluginText;
+export const mdPluginText = TextPlugin;
+export const mdPluginHighlightCode = highlightPlugin;
+export const mdPluginTOC = tocPlugin;
+export const mdPluginAnchor = anchorPlugin;
+export const mdPluginTableTabular = tableTabularPlugin;
+export const mdPluginList = listsPlugin;
+export const mdPluginChemistry = ChemistryPlugin;
 
-export const HighlightPlugin = highlightPlugin;
-
-export const separateForBlockPlugin = mdPluginSeparateForBlock;
-export const tocPlugin = mdPluginTOC;
-export const anchorPlugin = mdPluginAnchor;
-export const tableTabularPlugin = mdPluginTableTabular;
-export const listsPlugin = mdPluginList;
-export const collapsiblePlugin = mdPluginCollapsible;
-export const chemistry = mdPluginChemistry;
+export const mdPluginCollapsible = collapsiblePlugin;
