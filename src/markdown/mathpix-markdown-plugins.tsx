@@ -11,6 +11,7 @@ import {
   mdPluginChemistry
 
 } from "./mdPluginConfigured";
+import { MathJax } from "../mathjax";
 
 
 const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
@@ -24,6 +25,8 @@ const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
     .use(mdPluginHighlightCode, { auto: false })
     .use(mdPluginAnchor)
     .use(mdPluginTOC);
+
+  MathJax.Reset();
 };
 
 export default mathpixMarkdownPlugin;
