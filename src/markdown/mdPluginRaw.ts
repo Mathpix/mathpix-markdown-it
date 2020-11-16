@@ -639,7 +639,7 @@ function paragraphDiv(state, startLine/*, endLine*/) {
     pos = state.bMarks[startLine] + state.tShift[startLine],
     max = state.eMarks[startLine];
 
-
+  MathJax.Reset();
 
   oldParentType = state.parentType;
   state.parentType = 'paragraph';
