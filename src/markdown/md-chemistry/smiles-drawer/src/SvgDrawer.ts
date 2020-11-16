@@ -253,7 +253,7 @@ class SvgDrawer {
         || (currentRing && currentRing.members.length >= 5 && edge.rings.length === 1
           && (this.getVertexElementFromRing(currentRing) !== '' || currentRing.members.length === 6)
           && vertexA.value.rings.length > 1 && vertexB.value.rings.length > 1))
-        && !(vertexA.value.element === 'N' && vertexB.value.element === 'N' && currentRing.members.length > 5)
+        && !(vertexA.value.element === 'N' && vertexB.value.element === 'N' && currentRing?.members.length > 5)
       ) {
 
         if (edge.isBottomSlat && currentRing && currentRing.neighbours.length === 1
