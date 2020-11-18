@@ -18,7 +18,8 @@ describe('Check Smiles:', () => {
     smiles: {
       isTesting: true,
       shortBondLength: 0.85,
-      dCircle: 4
+      dCircle: 4,
+      useCurrentColor: false
     }
   };
   const simple_aromatic_rings = require('./_data/_smiles/_simple_aromatic_rings');

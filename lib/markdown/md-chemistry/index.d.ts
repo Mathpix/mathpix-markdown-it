@@ -8,6 +8,7 @@ export interface ISmilesOptions extends ISmilesOptionsDef {
     disableGradient?: boolean;
     autoScale?: boolean;
     isTesting?: boolean;
+    useCurrentColor?: boolean;
 }
 declare const _default: (md: any, options: any) => void;
 export default _default;
