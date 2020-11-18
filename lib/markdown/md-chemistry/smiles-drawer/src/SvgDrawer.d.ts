@@ -58,6 +58,7 @@ declare class SvgDrawer {
      * @param {Boolean} debug A boolean indicating whether or not to draw debug helpers.
      */
     drawEdge(edgeId: any, debug: any): void;
+    allNeighboursHasDoubleLine(vertex: any): boolean;
     /**
      * Draws the vertices representing atoms to the canvas.
      *

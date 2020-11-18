@@ -1153,6 +1153,24 @@ class SvgDrawer {
     }
   }
 
+  allNeighboursHasDoubleLine(vertex){
+    const edges = vertex.edges;
+    if (edges.length < 2 || vertex.value.rings.length) {
+      return false;
+    }
+
+    let res = true;
+
+    for (let i = 0; i < edges.length; i++) {
+      const edge = this.preprocessor.graph.edges[edges[i]];
+      if (edge.bondType !== '=') {
+        res = false;
+        break;
+      }
+    }
+    return res;
+  }
+
   /**
    * Draws the vertices representing atoms to the canvas.
    *
@@ -1175,6 +1193,9 @@ class SvgDrawer {
       let element = atom.element;
       let hydrogens = Atom.maxBonds[element] - bondCount;
       let dir = vertex.getTextDirection(graph.vertices);
+
+      let isShowC = element === 'C' && this.allNeighboursHasDoubleLine(vertex);
+
       let isTerminal = opts.terminalCarbons || element !== 'C' || atom.hasAttachedPseudoElements ? vertex.isTerminal() : false;
       let isCarbon = atom.element === 'C';
 
@@ -1192,7 +1213,7 @@ class SvgDrawer {
 
       if (opts.atomVisualization === 'allballs') {
         svgWrapper.drawBall(vertex.position.x, vertex.position.y, element);
-      } else if ((atom.isDrawn && (!isCarbon || atom.drawExplicit || isTerminal || atom.hasAttachedPseudoElements)) || graph.vertices.length === 1) {
+      } else if ((atom.isDrawn && (!isCarbon || atom.drawExplicit || isTerminal || atom.hasAttachedPseudoElements) || isShowC) || graph.vertices.length === 1) {
         if (opts.atomVisualization === 'default') {
           svgWrapper.drawText(vertex.position.x, vertex.position.y,
             element, hydrogens, dir, isTerminal, charge, isotope, atom.getAttachedPseudoElements());
