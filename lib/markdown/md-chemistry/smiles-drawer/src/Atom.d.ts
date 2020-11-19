@@ -48,6 +48,7 @@ declare class Atom {
     plane: any;
     attachedPseudoElements: any;
     hasAttachedPseudoElements: any;
+    hasPseudoElements: any;
     isDrawn: any;
     isConnectedToRing: any;
     neighbouringElements: any;

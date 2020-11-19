@@ -1215,8 +1215,9 @@ class SvgDrawer {
         svgWrapper.drawBall(vertex.position.x, vertex.position.y, element);
       } else if ((atom.isDrawn && (!isCarbon || atom.drawExplicit || isTerminal || atom.hasAttachedPseudoElements) || isShowC) || graph.vertices.length === 1) {
         if (opts.atomVisualization === 'default') {
+          const isCentre = atom.hasPseudoElements && vertex.neighbours.length === 4 && !vertex.value.rings.length;
           svgWrapper.drawText(vertex.position.x, vertex.position.y,
-            element, hydrogens, dir, isTerminal, charge, isotope, atom.getAttachedPseudoElements());
+            element, hydrogens, dir, isTerminal, charge, isotope, atom.getAttachedPseudoElements(), isCentre);
         } else if (opts.atomVisualization === 'balls') {
           svgWrapper.drawBall(vertex.position.x, vertex.position.y, element);
         }

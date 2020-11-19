@@ -52,6 +52,7 @@ class Atom {
 	public plane: any;
 	public attachedPseudoElements: any;
 	public hasAttachedPseudoElements: any;
+	public hasPseudoElements: any;
 	public isDrawn: any;
 	public isConnectedToRing: any;
 	public neighbouringElements: any;
@@ -87,6 +88,7 @@ class Atom {
     this.plane = 0;
     this.attachedPseudoElements = {};
     this.hasAttachedPseudoElements = false;
+    this.hasPseudoElements = false;
     this.isDrawn = true;
     this.isConnectedToRing = false;
     this.neighbouringElements = Array();
