@@ -511,7 +511,11 @@ class SvgWrapper {
       if (isCentre && elementName.length === 2) {
         yShift = dFont;
       } else {
-        yShift += dFont/2;
+        if (elementName.length === 2) {
+          yShift = dFont;
+        } else {
+          yShift += dFont/2;
+        }
       }
     } else if (direction === 'left') {
       xShift = dFont;

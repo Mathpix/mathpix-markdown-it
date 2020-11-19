@@ -381,8 +381,119 @@ module.exports = [
   },
   {
     id: "7",
-    smiles: "<smiles>O=C=S</smiles>",
-    svg: ``
+    smiles: "<smiles>[Mg+2].O=Cl(=O)(=O)[O-].[O-]Cl(=O)(=O)=O</smiles>",
+    svg: `<div><div class="smiles-inline" style="display: inline-block"><svg id="smiles-" viewBox="0 0 248 112.30965553310591" style="width: 247.67878010926108px; overflow: visible;"><defs><linearGradient id="line-0" gradientUnits="userSpaceOnUse" x1="150.33016878820035" y1="57.93823014029661" x2="173.51800798705682" y2="44.550745750465296"><stop stop-color="#222" offset="20%"></stop><stop stop-color="#222" offset="100%"></stop></linearGradient><linearGradient id="line-1" gradientUnits="userSpaceOnUse" x1="151.11917967085378" y1="64.0298447109219" x2="178.39899049303784" y2="48.27986307582623"><stop stop-color="#222" offset="20%"></stop><stop stop-color="#222" offset="100%"></stop></linearGradient><linearGradient id="line-2" gradientUnits="userSpaceOnUse" x1="132.9139802404965" y1="89.8921326743044" x2="148.6639986053937" y2="62.612343058081166"><stop stop-color="#222" offset="20%"></stop><stop stop-color="#222" offset="100%"></stop></linearGradient><linearGradient id="line-3" gradientUnits="userSpaceOnUse" x1="137.8243423714167" y1="92.72713597998589" x2="153.57436073631388" y2="65.44734636376265"><stop stop-color="#222" offset="20%"></stop><stop stop-color="#222" offset="100%"></stop></linearGradient><linearGradient id="line-4" gradientUnits="userSpaceOnUse" x1="148.66399669685723" y1="65.44734305808052" x2="164.4139783319529" y2="92.72715388026452"><stop stop-color="#222" offset="20%"></stop><stop stop-color="#222" offset="100%"></stop></linearGradient><linearGradient id="line-5" gradientUnits="userSpaceOnUse" x1="153.57436264485034" y1="62.612346363763294" x2="169.32434427994602" y2="89.8921571859473"><stop stop-color="#222" offset="20%"></stop><stop stop-color="#222" offset="100%"></stop></linearGradient><linearGradient id="line-6" gradientUnits="userSpaceOnUse" x1="123.83939005463053" y1="48.27982634602472" x2="151.11917967085378" y2="64.0298447109219"><stop stop-color="#222" offset="20%"></stop><stop stop-color="#222" offset="100%"></stop></linearGradient><linearGradient id="line-7" gradientUnits="userSpaceOnUse" x1="69.27978961622325" y1="48.27978961622324" x2="96.55957923244651" y2="64.02980798112043"><stop stop-color="#222" offset="20%"></stop><stop stop-color="#222" offset="100%"></stop></linearGradient><linearGradient id="line-8" gradientUnits="userSpaceOnUse" x1="43.41750165284074" y1="30.074590185865986" x2="70.697291269064" y2="45.824608550763145"><stop stop-color="#222" offset="20%"></stop><stop stop-color="#222" offset="100%"></stop></linearGradient><linearGradient id="line-9" gradientUnits="userSpaceOnUse" x1="40.58249834715926" y1="34.98495231678618" x2="67.86228796338251" y2="50.734970681683336"><stop stop-color="#222" offset="20%"></stop><stop stop-color="#222" offset="100%"></stop></linearGradient><linearGradient id="line-10" gradientUnits="userSpaceOnUse" x1="71.73497068168335" y1="49.69729126906398" x2="87.48498904658052" y2="22.41750165284074"><stop stop-color="#222" offset="20%"></stop><stop stop-color="#222" offset="100%"></stop></linearGradient><linearGradient id="line-11" gradientUnits="userSpaceOnUse" x1="66.82460855076316" y1="46.8622879633825" x2="82.57462691566033" y2="19.58249834715926"><stop stop-color="#222" offset="20%"></stop><stop stop-color="#222" offset="100%"></stop></linearGradient><linearGradient id="line-12" gradientUnits="userSpaceOnUse" x1="51.074590185866" y1="74.14207757960577" x2="66.82460855076316" y2="46.8622879633825"><stop stop-color="#222" offset="20%"></stop><stop stop-color="#222" offset="100%"></stop></linearGradient><linearGradient id="line-13" gradientUnits="userSpaceOnUse" x1="55.984952316786185" y1="76.97708088528725" x2="71.73497068168335" y2="49.69729126906398"><stop stop-color="#222" offset="20%"></stop><stop stop-color="#222" offset="100%"></stop></linearGradient></defs><mask id="text-mask"><rect x="0" y="0" width="100%" height="100%" fill="white"></rect><circle cx="205.67878010926108" cy="64.02988144072339" r="6.5625" fill="black"></circle><circle cx="178.39899049303784" cy="48.27986307582623" r="6.5625" fill="black"></circle><circle cx="151.11917967085378" cy="64.0298447109219" r="6.5625" fill="black"></circle><circle cx="135.3691613059566" cy="91.30963432714515" r="6.5625" fill="black"></circle><circle cx="166.86916130594946" cy="91.30965553310591" r="6.5625" fill="black"></circle><circle cx="123.83939005463053" cy="48.27982634602472" r="6.5625" fill="black"></circle><circle cx="96.55957923244651" cy="64.02980798112043" r="6.5625" fill="black"></circle><circle cx="69.27978961622325" cy="48.27978961622324" r="6.5625" fill="black"></circle><circle cx="42" cy="32.52977125132608" r="6.5625" fill="black"></circle><circle cx="85.02980798112043" cy="21" r="6.5625" fill="black"></circle><circle cx="53.52977125132609" cy="75.55957923244651" r="6.5625" fill="black"></circle></mask><style>
+                .element {
+                    font: 14px Helvetica, Arial, sans-serif;
+                    alignment-baseline: 'middle';
+                }
+                .sub {
+                    font: 8.4px Helvetica, Arial, sans-serif;
+                }
+            </style><g mask="url(#text-mask)"><line x1="150.33016878820035" y1="57.93823014029661" x2="173.51800798705682" y2="44.550745750465296" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-0')"></line><line x1="151.11917967085378" y1="64.0298447109219" x2="178.39899049303784" y2="48.27986307582623" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-1')"></line><line x1="132.9139802404965" y1="89.8921326743044" x2="148.6639986053937" y2="62.612343058081166" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-2')"></line><line x1="137.8243423714167" y1="92.72713597998589" x2="153.57436073631388" y2="65.44734636376265" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-3')"></line><line x1="148.66399669685723" y1="65.44734305808052" x2="164.4139783319529" y2="92.72715388026452" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-4')"></line><line x1="153.57436264485034" y1="62.612346363763294" x2="169.32434427994602" y2="89.8921571859473" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-5')"></line><line x1="123.83939005463053" y1="48.27982634602472" x2="151.11917967085378" y2="64.0298447109219" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-6')"></line><line x1="69.27978961622325" y1="48.27978961622324" x2="96.55957923244651" y2="64.02980798112043" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-7')"></line><line x1="43.41750165284074" y1="30.074590185865986" x2="70.697291269064" y2="45.824608550763145" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-8')"></line><line x1="40.58249834715926" y1="34.98495231678618" x2="67.86228796338251" y2="50.734970681683336" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-9')"></line><line x1="71.73497068168335" y1="49.69729126906398" x2="87.48498904658052" y2="22.41750165284074" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-10')"></line><line x1="66.82460855076316" y1="46.8622879633825" x2="82.57462691566033" y2="19.58249834715926" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-11')"></line><line x1="51.074590185866" y1="74.14207757960577" x2="66.82460855076316" y2="46.8622879633825" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-12')"></line><line x1="55.984952316786185" y1="76.97708088528725" x2="71.73497068168335" y2="49.69729126906398" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-13')"></line></g><g><text x="201.74128010926108" y="69.27988144072339" class="element" fill="#222" style="
+                text-anchor: start;
+                writing-mode: horizontal-tb;
+                text-orientation: mixed;
+                letter-spacing: normal;
+                direction: ltr;
+            "><tspan style="
+                unicode-bidi: plaintext;
+                writing-mode: lr-tb;
+                letter-spacing: normal;
+                text-anchor: start;
+            ">Mg<tspan baseline-shift="super" class="sub">2+</tspan></tspan></text><text x="205.67878010926108" y="64.02988144072339" class="debug" fill="#ff0000" style="
+                font: 5px Droid Sans, sans-serif;
+            "></text><text x="178.39899049303784" y="56.15486307582623" class="element" fill="#222" style="
+                text-anchor: start;
+                writing-mode: vertical-rl;
+                text-orientation: upright;
+                letter-spacing: -1px;
+                direction: rtl; unicode-bidi: bidi-override;
+            "><tspan>O</tspan></text><text x="178.39899049303784" y="48.27986307582623" class="debug" fill="#ff0000" style="
+                font: 5px Droid Sans, sans-serif;
+            "></text><text x="151.11917967085378" y="69.2798447109219" class="element" fill="#222" style="
+                text-anchor: start;
+                writing-mode: vertical-rl;
+                text-orientation: upright;
+                letter-spacing: -1px;
+                direction: rtl; unicode-bidi: bidi-override;
+            "><tspan style="
+                unicode-bidi: plaintext;
+                writing-mode: lr-tb;
+                letter-spacing: normal;
+                text-anchor: middle;
+            ">Cl</tspan></text><text x="151.11917967085378" y="64.0298447109219" class="debug" fill="#ff0000" style="
+                font: 5px Droid Sans, sans-serif;
+            "></text><text x="130.1191613059566" y="96.55963432714515" class="element" fill="#222" style="
+                text-anchor: start;
+                writing-mode: horizontal-tb;
+                text-orientation: mixed;
+                letter-spacing: normal;
+                direction: ltr;
+            "><tspan>O</tspan></text><text x="135.3691613059566" y="91.30963432714515" class="debug" fill="#ff0000" style="
+                font: 5px Droid Sans, sans-serif;
+            "></text><text x="161.61916130594946" y="96.55965553310591" class="element" fill="#222" style="
+                text-anchor: start;
+                writing-mode: horizontal-tb;
+                text-orientation: mixed;
+                letter-spacing: normal;
+                direction: ltr;
+            "><tspan>O</tspan></text><text x="166.86916130594946" y="91.30965553310591" class="debug" fill="#ff0000" style="
+                font: 5px Droid Sans, sans-serif;
+            "></text><text x="123.83939005463053" y="56.15482634602472" class="element" fill="#222" style="
+                text-anchor: start;
+                writing-mode: vertical-rl;
+                text-orientation: upright;
+                letter-spacing: -1px;
+                direction: rtl; unicode-bidi: bidi-override;
+            "><tspan>O<tspan baseline-shift="super" class="sub">-</tspan></tspan></text><text x="123.83939005463053" y="48.27982634602472" class="debug" fill="#ff0000" style="
+                font: 5px Droid Sans, sans-serif;
+            "></text><text x="96.55957923244651" y="56.15480798112043" class="element" fill="#222" style="
+                text-anchor: start;
+                writing-mode: vertical-rl;
+                text-orientation: upright;
+                letter-spacing: -1px;
+                direction: ltr;
+            "><tspan>O<tspan baseline-shift="super" class="sub">-</tspan></tspan></text><text x="96.55957923244651" y="64.02980798112043" class="debug" fill="#ff0000" style="
+                font: 5px Droid Sans, sans-serif;
+            "></text><text x="69.27978961622325" y="53.52978961622324" class="element" fill="#222" style="
+                text-anchor: start;
+                writing-mode: vertical-rl;
+                text-orientation: upright;
+                letter-spacing: -1px;
+                direction: rtl; unicode-bidi: bidi-override;
+            "><tspan style="
+                unicode-bidi: plaintext;
+                writing-mode: lr-tb;
+                letter-spacing: normal;
+                text-anchor: middle;
+            ">Cl</tspan></text><text x="69.27978961622325" y="48.27978961622324" class="debug" fill="#ff0000" style="
+                font: 5px Droid Sans, sans-serif;
+            "></text><text x="47.25" y="37.77977125132608" class="element" fill="#222" style="
+                text-anchor: start;
+                writing-mode: horizontal-tb;
+                text-orientation: mixed;
+                letter-spacing: normal;
+                direction: rtl; unicode-bidi: bidi-override;
+            "><tspan>O</tspan></text><text x="42" y="32.52977125132608" class="debug" fill="#ff0000" style="
+                font: 5px Droid Sans, sans-serif;
+            "></text><text x="79.77980798112043" y="26.25" class="element" fill="#222" style="
+                text-anchor: start;
+                writing-mode: horizontal-tb;
+                text-orientation: mixed;
+                letter-spacing: normal;
+                direction: ltr;
+            "><tspan>O</tspan></text><text x="85.02980798112043" y="21" class="debug" fill="#ff0000" style="
+                font: 5px Droid Sans, sans-serif;
+            "></text><text x="48.27977125132609" y="80.80957923244651" class="element" fill="#222" style="
+                text-anchor: start;
+                writing-mode: horizontal-tb;
+                text-orientation: mixed;
+                letter-spacing: normal;
+                direction: ltr;
+            "><tspan>O</tspan></text><text x="53.52977125132609" y="75.55957923244651" class="debug" fill="#ff0000" style="
+                font: 5px Droid Sans, sans-serif;
+            "></text></g></svg></div></div>`
   },
   {
     id: "8",
