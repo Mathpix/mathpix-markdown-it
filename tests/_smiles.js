@@ -115,4 +115,17 @@ describe('Check Smiles:', () => {
       });
     }
   });
+
+  const tests6 = require('./_data/_smiles/_data6');
+  tests6.forEach(function(test) {
+    if (test.smiles && test.svg) {
+      const html = MM.markdownToHTML(test.smiles, options);
+      describe('Smiles data4 [' + (test.id).toString() + '] => ' + test.smiles, () => {
+        it('Checking result html', (done) => {
+          html.trim().should.equal(test.svg.trim());
+          done();
+        });
+      });
+    }
+  });
 });
