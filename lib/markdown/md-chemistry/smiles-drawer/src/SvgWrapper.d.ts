@@ -98,7 +98,7 @@ declare class SvgWrapper {
      * @param {Number} attachedPseudoElement.count The number of occurences that match the key.
      * @param {Number} attachedPseudoElement.hyrogenCount The number of hydrogens attached to each atom matching the key.
      */
-    drawText(x: any, y: any, elementName: any, hydrogens: any, direction: any, isTerminal: any, charge: any, isotope: any, attachedPseudoElement?: {}): void;
+    drawText(x: any, y: any, elementName: any, hydrogens: any, direction: any, isTerminal: any, charge: any, isotope: any, attachedPseudoElement: {}, isCentre: any): void;
     /**
      * @param {Line} line the line object to create the wedge from
      */

@@ -681,6 +681,10 @@ class Drawer {
     // Initialize pseudo elements or shortcuts
     if (this.opts.compactDrawing && this.opts.atomVisualization === 'default') {
       this.initPseudoElements();
+    } else {
+      if (this.opts.atomVisualization === 'default') {
+        this.initPseudoElements();
+      }
     }
 
     this.rotateDrawing();
@@ -3124,7 +3128,9 @@ class Drawer {
           continue;
         }
 
-        neighbour.value.isDrawn = false;
+        if (this.opts.compactDrawing) {
+          neighbour.value.isDrawn = false;
+        }
 
         let hydrogens = Atom.maxBonds[neighbour.value.element] - neighbour.value.bondCount;
         let charge = '';
@@ -3134,7 +3140,11 @@ class Drawer {
           charge = neighbour.value.bracket.charge || 0;
         }
 
-        vertex.value.attachPseudoElement(neighbour.value.element, previous ? previous.value.element : null, hydrogens, charge);
+        if (this.opts.compactDrawing) {
+          vertex.value.attachPseudoElement(neighbour.value.element, previous ? previous.value.element : null, hydrogens, charge);
+        } else {
+          vertex.value.hasPseudoElements = true;
+        }
       }
     }
 

@@ -466,7 +466,7 @@ class SvgWrapper {
    * @param {Number} attachedPseudoElement.count The number of occurences that match the key.
    * @param {Number} attachedPseudoElement.hyrogenCount The number of hydrogens attached to each atom matching the key.
    */
-  drawText(x, y, elementName, hydrogens, direction, isTerminal, charge, isotope, attachedPseudoElement = {}) {
+  drawText(x, y, elementName, hydrogens, direction, isTerminal, charge, isotope, attachedPseudoElement = {}, isCentre) {
     const dFont = this.opts.fontSizeLarge / 2;
     const radius = dFont + dFont/this.opts.dCircle;
     const elementClassName = this.opts.id ? 'element-' + this.opts.id : 'element';
@@ -499,16 +499,28 @@ class SvgWrapper {
       letterSpacing = '-1px';
     }
 
-    if (direction === 'down' && !isTerminal) {
+    if (direction === 'down' && (!isTerminal || isCentre)) {
       xShift = 0;
-      yShift = -dFont - dFont/2;
+      if (isCentre && elementName.length === 2) {
+        yShift = dFont;
+      } else {
+        yShift = -dFont - dFont/2;
+      }
     } else if (direction === 'up' && !isTerminal) {
       xShift = 0;
-      yShift += dFont/2;
+      if (isCentre && elementName.length === 2) {
+        yShift = dFont;
+      } else {
+        yShift += dFont/2;
+      }
     } else if (direction === 'left') {
       xShift = dFont;
     } else if (direction === 'right') {
-      xShift += dFont/4;
+      if (isCentre && elementName.length === 2) {
+        xShift -= dFont/2;
+      } else {
+        xShift += dFont/4;
+      }
     }
 
     if (direction === 'left' || (direction === 'up' && !isTerminal)) {
