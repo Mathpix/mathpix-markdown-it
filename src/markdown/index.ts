@@ -67,7 +67,7 @@ export const initMathpixMarkdown = (md, callback) => {
   renderer.render = (tokens, options, env) => {
     MM.texReset();
     const html = render.call(renderer, tokens, options, env);
-    const style = MM.getMathpixStyle();
+    const style = MM.getMathpixMarkdownStyles(false);
     return `<style id="mmd-vscode-style">${style}</style><div id="preview-content">${html}</div>`
   };
   return md;
