@@ -9,7 +9,6 @@ import { listsStyles } from "../styles/styles-lists";
 import {MathJax} from '../mathjax';
 import { Property } from 'csstype'; // at top of file
 import { ISmilesOptions } from '../markdown/md-chemistry';
-import * as domino from 'domino';
 
 export interface optionsMathpixMarkdown {
     alignMathBlock?: Property.TextAlign;
@@ -199,30 +198,6 @@ class MathpixMarkdown_Model {
     }
   };
 
-  checkEquationNumberNode = (html: string) => {
-    try {
-      const document = domino.createDocument(html);
-
-      const body = document.body;
-      const links = body.getElementsByClassName('clickable-link');
-      for(let i = 0; i < links.length; i++) {
-        const eq = links[i].getAttribute('value');
-        const equationNumber = document.getElementById(eq);
-        if (!equationNumber) {
-          links[i].innerHTML=`[${decodeURIComponent(eq)}]`;
-        } else {
-          const numbers = equationNumber.getAttribute('number');
-          if(numbers) {
-            links[i].innerHTML = `[${numbers.split(',')[0]}]`
-          }
-        }
-      }
-      return body.innerHTML;
-    } catch (e) {
-      return `<div>Error = ${e.message}</div>` + html;
-    }
-  };
-
   checkEquationNumber = (html: string) => {
     try {
       const parser = new DOMParser();
@@ -243,7 +218,7 @@ class MathpixMarkdown_Model {
       }
       return body.innerHTML;
     } catch (e) {
-      return this.checkEquationNumberNode(html);
+      return html;
     }
 
   };
