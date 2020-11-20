@@ -13,6 +13,13 @@ export const resetCounter: RuleInline = () => {
   subsectionParentCount = 0;
 };
 
+export const resetTextCounter: RuleInline = () => {
+  subsectionParentCount = 0;
+  sectionCount = 0;
+  subCount = 0;
+  subSubCount = 0;
+};
+
 const headingSection: RuleBlock = (state, startLine: number/*, endLine*/) => {
   sectionCount = 0;
   subCount = 0;

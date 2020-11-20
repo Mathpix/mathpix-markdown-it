@@ -1,6 +1,6 @@
 import { MarkdownIt } from 'markdown-it';
 import { MathpixMarkdownModel as MM } from "../mathpix-markdown-model";
-import { resetCounter } from './mdPluginText';
+import { resetTextCounter } from './mdPluginText';
 
 import {
   mdPluginMathJax,
@@ -76,7 +76,7 @@ export const initMathpixMarkdown = (md, callback) => {
 
   renderer.render = (tokens, options, env) => {
     MM.texReset();
-    resetCounter();
+    resetTextCounter();
 
     const html = render.call(renderer, tokens, options, env);
     const style = MM.getMathpixMarkdownStyles(false);
