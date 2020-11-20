@@ -1,8 +1,6 @@
-import {
-  mdPluginCollapsible
-} from "./mdPluginConfigured";
+import { mdPluginCollapsible } from "./mdPluginConfigured";
 
-import mathpixMarkdownPlugin from './mathpix-markdown-plugins';
+import { mathpixMarkdownPlugin } from './mathpix-markdown-plugins';
 
 import { injectRenderRules } from "./rules";
 import {MathpixMarkdownModel as MM, TMarkdownItOptions} from '../mathpix-markdown-model'
@@ -41,8 +39,6 @@ const mdInit = (options: TMarkdownItOptions) => {
     .use(mdPluginCollapsible)
     .use(require("markdown-it-ins"));
 };
-
-
 
 /** String transformtion pipeline */
 // @ts-ignore
