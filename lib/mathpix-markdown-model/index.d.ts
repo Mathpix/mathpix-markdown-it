@@ -77,6 +77,7 @@ declare class MathpixMarkdown_Model {
     markdownToHTML: (markdown: string, options?: TMarkdownItOptions) => string;
     showTocInContainer: (html: string, containerName?: string) => void;
     getTocContainerHTML: (html: string) => string;
+    checkEquationNumberNode: (html: string) => string;
     checkEquationNumber: (html: string) => string;
     handleClick: (e: any) => void;
     scrollPage: (parent: any, offsetTarget: any) => void;

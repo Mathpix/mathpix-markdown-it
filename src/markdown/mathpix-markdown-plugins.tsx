@@ -1,5 +1,5 @@
 import { MarkdownIt } from 'markdown-it';
-import { MathpixMarkdownModel as MM } from "../mathpix-markdown-model";
+import { MathpixMarkdownModel } from "../mathpix-markdown-model";
 import { resetTextCounter } from './mdPluginText';
 
 import {
@@ -77,13 +77,13 @@ export const initMathpixMarkdown = (md, callback) => {
   renderer.render = (tokens, options, env) => {
     let html = render.call(renderer, tokens, options, env);
 
-    MM.texReset();
+    MathpixMarkdownModel.texReset();
     resetTextCounter();
     if (html.indexOf('clickable-link') !== -1) {
-      html = MM.checkEquationNumber(html);
+      html = MathpixMarkdownModel.checkEquationNumber(html);
     }
 
-    const style = MM.getMathpixMarkdownStyles(false);
+    const style = MathpixMarkdownModel.getMathpixMarkdownStyles(false);
 
     let resHtml: string = `<style id="mmd-vscode-style">${style}</style>`;
     resHtml += '\n';
