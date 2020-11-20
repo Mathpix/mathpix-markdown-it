@@ -93,7 +93,7 @@ declare class Vector2 {
      * @param {Vector2} vec Another vector.
      * @returns {Number} Returns -1, 0 or 1 if the vector supplied as an argument is clockwise, neutral or counter-clockwise respectively to this vector in relation to the coordinate system.
      */
-    clockwise(vec: any): 1 | 0 | -1;
+    clockwise(vec: any): 0 | 1 | -1;
     /**
      * Checks whether or not this vector is in a clockwise or counter-clockwise rotational direction compared to another vector in relation to an arbitrary third vector.
      *
@@ -101,7 +101,7 @@ declare class Vector2 {
      * @param {Vector2} vec Another vector.
      * @returns {Number} Returns -1, 0 or 1 if the vector supplied as an argument is clockwise, neutral or counter-clockwise respectively to this vector in relation to an arbitrary third vector.
      */
-    relativeClockwise(center: any, vec: any): 1 | 0 | -1;
+    relativeClockwise(center: any, vec: any): 0 | 1 | -1;
     /**
      * Rotates this vector by a given number of radians around the origin of the coordinate system.
      *

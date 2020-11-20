@@ -1,7 +1,8 @@
 import MathpixLoader from './components/mathpix-loader';
 import MathpixMarkdown from './components/mathpix-markdown';
-import mathpixMarkdownPlugin from './markdown/mathpix-markdown-plugins';
-import { initMathpixMarkdown } from './markdown';
+import {
+  mathpixMarkdownPlugin,
+  initMathpixMarkdown } from './markdown/mathpix-markdown-plugins';
 
 import {
   mdPluginMathJax,
