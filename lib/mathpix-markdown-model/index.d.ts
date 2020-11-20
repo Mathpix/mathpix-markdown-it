@@ -85,6 +85,7 @@ declare class MathpixMarkdown_Model {
     getMathjaxStyle: () => any;
     getMathpixStyleOnly: () => string;
     getMathpixStyle: (stylePreview?: boolean, showToc?: boolean, tocContainerName?: string) => string;
+    getMathpixMarkdownStyles: (useColors?: boolean) => string;
     getMathpixFontsStyle: () => string;
     render: (text: string, options?: optionsMathpixMarkdown) => string;
 }

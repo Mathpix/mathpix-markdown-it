@@ -10,14 +10,15 @@ import { ClearSubMathLists } from "./md-block-rule/begin-tabular/sub-math";
 import {ClearParseError} from "./md-block-rule/parse-error";
 
 export default (md: MarkdownIt, options) => {
-  const width = options.width;
   ClearTableNumbers();
   ClearFigureNumbers();
   ClearSubTableLists();
   ClearSubMathLists();
   ClearParseError();
   Object.assign(md.options, options);
-  md.block.ruler.after("fence","BeginTabular", BeginTabular, options);
+  const width = md.options.width;
+
+  md.block.ruler.after("fence","BeginTabular", BeginTabular, md.options);
   md.block.ruler.before("BeginTabular", "BeginAlign", BeginAlign);
   md.block.ruler.before("BeginAlign", "BeginTable", BeginTable);
   md.inline.ruler.before("escape", "InlineIncludeGraphics", InlineIncludeGraphics);
