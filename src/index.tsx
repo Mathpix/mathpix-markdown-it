@@ -1,6 +1,8 @@
 import MathpixLoader from './components/mathpix-loader';
 import MathpixMarkdown from './components/mathpix-markdown';
 import mathpixMarkdownPlugin from './markdown/mathpix-markdown-plugins';
+import { initMathpixMarkdown } from './markdown';
+
 import {
   mdPluginMathJax,
   mdPluginHighlightCode,
@@ -26,6 +28,7 @@ import { ISmilesOptions } from './markdown/md-chemistry';
 export {
   MathpixLoader, MathpixMarkdown, MathpixMarkdownModel,
   mathpixMarkdownPlugin,
+  initMathpixMarkdown,
   mdPluginMathJax, mdPluginHighlightCode, mdPluginText, mdPluginTOC, mdPluginAnchor, mdPluginTableTabular, mdPluginList, mdPluginChemistry,
   TMarkdownItOptions, optionsMathpixMarkdown, TOutputMath, TOutputMathJax, THtmlSanitize,
   ISmilesOptions

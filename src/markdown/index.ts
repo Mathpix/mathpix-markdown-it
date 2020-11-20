@@ -42,7 +42,36 @@ const mdInit = (options: TMarkdownItOptions) => {
     .use(require("markdown-it-ins"));
 };
 
+const setOptionForPreview = (mdOption, mmdOptions) => {
+  const {width = 1200,  outMath = {}, smiles = {}, mathJax = {}, renderElement = {}, useInlineStyle = true,
+    htmlTags=false} = mmdOptions;
+  Object.assign(mdOption, smiles);
+  Object.assign(mdOption, {
+    width: width,
+    outMath: outMath,
+    mathJax: mathJax,
+    renderElement: renderElement,
+    useInlineStyle: useInlineStyle
+  });
+  mdOption.html = htmlTags;
+};
 
+export const initMathpixMarkdown = (md, callback) => {
+  const { parse, renderer } = md;
+  const { render } = renderer;
+  md.parse = (markdown, env) => {
+    const mmdOptions = callback();
+    setOptionForPreview(md.options, mmdOptions);
+    return parse.call(md, markdown, env)
+  };
+  renderer.render = (tokens, options, env) => {
+    MM.texReset();
+    const html = render.call(renderer, tokens, options, env);
+    const style = MM.getMathpixStyle();
+    return `<style id="mmd-vscode-style">${style}</style><div id="preview-content">${html}</div>`
+  };
+  return md;
+};
 
 /** String transformtion pipeline */
 // @ts-ignore
