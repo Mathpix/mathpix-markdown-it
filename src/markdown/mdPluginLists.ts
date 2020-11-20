@@ -33,13 +33,14 @@ const mapping = {
 
 export default (md: MarkdownIt, options) => {
   Object.assign(md.options, options);
+
   SetDefaultItemizeLevel();
   SetDefaultEnumerateLevel();
   clearItemizeLevelTokens();
-  md.block.ruler.after("list","Lists", Lists, options);
-  if (options.renderElement && (options.renderElement.class === 'li_enumerate' ||
-    options.renderElement.class === 'li_itemize')) {
-    md.block.ruler.before("Lists","ReRenderListsItem", ReRenderListsItem, options);
+  md.block.ruler.after("list","Lists", Lists, md.options);
+  if (md.options.renderElement && (md.options.renderElement.class === 'li_enumerate' ||
+    md.options.renderElement.class === 'li_itemize')) {
+    md.block.ruler.before("Lists","ReRenderListsItem", ReRenderListsItem, md.options);
   }
   md.block.ruler.before("Lists", "ReNewCommand", ReNewCommand);
   md.inline.ruler.before('escape', 'list_begin_inline', listBeginInline);
