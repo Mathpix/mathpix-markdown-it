@@ -84,7 +84,7 @@ export const MathpixStyle = (setTextAlignJustify: boolean = true, useColors: boo
         border: 1px solid #ccc;
         page-break-inside: avoid;
         padding: 0.5em;
-        background: #f8f8fa;
+        ${useColors ? 'background: #f8f8fa;' : ''}
     }
     .empty {
         text-align: center;
@@ -112,9 +112,8 @@ export const MathpixStyle = (setTextAlignJustify: boolean = true, useColors: boo
     }
       
     #setText table tr, #preview-content table tr {
-        ${useColors ? 'background-color: #fff;' : 'background-color: transparent;'}
-        background-color: #fff;
-        border-top: 1px solid #c6cbd1;
+        ${useColors ? 'background-color: #fff;' : ''}
+        border-top: 1px solid ${useColors ? '#c6cbd1' : 'currentColor'};
     }
     
     #setText table tr:nth-child(2n), #preview-content table tr:nth-child(2n) {
