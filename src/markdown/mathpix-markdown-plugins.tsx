@@ -78,7 +78,11 @@ export const initMathpixMarkdown = (md, callback) => {
     MM.texReset();
     resetTextCounter();
 
-    const html = render.call(renderer, tokens, options, env);
+    let html = render.call(renderer, tokens, options, env);
+    if (html.indexOf('clickable-link') !== -1) {
+      html = MM.checkEquationNumber(html);
+    }
+
     const style = MM.getMathpixMarkdownStyles(false);
 
     let resHtml: string = `<style id="mmd-vscode-style">${style}</style>`;
