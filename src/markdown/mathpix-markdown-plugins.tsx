@@ -75,10 +75,10 @@ export const initMathpixMarkdown = (md, callback) => {
   };
 
   renderer.render = (tokens, options, env) => {
+    let html = render.call(renderer, tokens, options, env);
+
     MM.texReset();
     resetTextCounter();
-
-    let html = render.call(renderer, tokens, options, env);
     if (html.indexOf('clickable-link') !== -1) {
       html = MM.checkEquationNumber(html);
     }
