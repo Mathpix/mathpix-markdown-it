@@ -1,11 +1,7 @@
-import { ConfiguredMathJaxPlugin, CustomTagPlugin, HighlightPlugin,
-    tocPlugin,
-    anchorPlugin,
-    tableTabularPlugin,
-    listsPlugin,
-    collapsiblePlugin,
-    chemistry
-} from "./mdPluginConfigured";
+import { mdPluginCollapsible } from "./mdPluginConfigured";
+
+import { mathpixMarkdownPlugin } from './mathpix-markdown-plugins';
+
 import { injectRenderRules } from "./rules";
 import {MathpixMarkdownModel as MM, TMarkdownItOptions} from '../mathpix-markdown-model'
 
@@ -14,6 +10,13 @@ const mdInit = (options: TMarkdownItOptions) => {
   const {htmlTags = false, xhtmlOut = false, width = 1200, breaks = true, typographer = true, linkify = true,
           outMath = {}, mathJax = {}, renderElement = {},
           lineNumbering = false, htmlSanitize = true, smiles = {}} = options;
+  const mmdOptions = {
+    width: width,
+    outMath: outMath,
+    mathJax: mathJax,
+    renderElement: renderElement,
+    smiles: smiles
+  };
   return require("markdown-it")({
     html: htmlTags,
     xhtmlOut: xhtmlOut,
@@ -25,14 +28,7 @@ const mdInit = (options: TMarkdownItOptions) => {
     lineNumbering: lineNumbering,
     htmlSanitize: htmlSanitize
   })
-    .use(chemistry, smiles )
-    .use(tableTabularPlugin, {width: width, outMath: outMath})
-    .use(listsPlugin, {width: width, outMath: outMath, renderElement: renderElement})
-    .use(ConfiguredMathJaxPlugin({width: width, outMath: outMath, mathJax: mathJax, renderElement: renderElement}))
-    .use(CustomTagPlugin())
-    .use(HighlightPlugin, {auto: false})
-    .use(anchorPlugin)
-    .use(tocPlugin)
+    .use(mathpixMarkdownPlugin, mmdOptions)
     .use(require('markdown-it-multimd-table'), {enableRowspan: true, enableMultilineRows: true})
     .use(require("markdown-it-footnote"))
     .use(require("markdown-it-sub"))
@@ -40,11 +36,9 @@ const mdInit = (options: TMarkdownItOptions) => {
     .use(require("markdown-it-deflist"))
     .use(require("markdown-it-mark"))
     .use(require("markdown-it-emoji"))
-    .use(collapsiblePlugin)
+    .use(mdPluginCollapsible)
     .use(require("markdown-it-ins"));
 };
-
-
 
 /** String transformtion pipeline */
 // @ts-ignore

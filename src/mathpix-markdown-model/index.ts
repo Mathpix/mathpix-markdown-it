@@ -1,9 +1,11 @@
 import {checkFormula} from './check-formula';
 import {markdownToHTML as markdownHTML} from "../markdown";
-import {MathpixStyle, PreviewStyle, ContainerStyle, codeStyles, TocStyle, resetBodyStyles} from "../mathjax/styles";
-import { tabularStyles } from "../mathjax/styles-tabular";
-import { fontsStyles } from "../mathjax/styles-fonts";
-import { listsStyles } from "../mathjax/styles-lists";
+import {MathpixStyle, PreviewStyle, TocStyle, resetBodyStyles} from "../styles";
+import { ContainerStyle } from "../styles/styles-container";
+import { codeStyles } from "../styles/styles-code";
+import { tabularStyles } from "../styles/styles-tabular";
+import { fontsStyles } from "../styles/styles-fonts";
+import { listsStyles } from "../styles/styles-lists";
 import {MathJax} from '../mathjax';
 import { Property } from 'csstype'; // at top of file
 import { ISmilesOptions } from '../markdown/md-chemistry';
@@ -297,7 +299,7 @@ class MathpixMarkdown_Model {
                 const style = document.createElement("style");
                 style.setAttribute("id", "Mathpix-styles");
                 let bodyStyles = isResetBodyStyles ? resetBodyStyles : '';
-                style.innerHTML = bodyStyles + MathpixStyle(setTextAlignJustify) + codeStyles + tabularStyles + listsStyles;
+                style.innerHTML = bodyStyles + MathpixStyle(setTextAlignJustify) + codeStyles + tabularStyles() + listsStyles;
                 document.head.appendChild(style);
             }
             return true;
@@ -331,16 +333,26 @@ class MathpixMarkdown_Model {
     };
 
     getMathpixStyleOnly = () => {
-      let style: string =  this.getMathjaxStyle() + MathpixStyle(false) + codeStyles + tabularStyles + listsStyles;
+      let style: string =  this.getMathjaxStyle() + MathpixStyle(false) + codeStyles + tabularStyles() + listsStyles;
       return style;
     };
 
     getMathpixStyle = (stylePreview: boolean = false, showToc: boolean = false, tocContainerName: string = 'toc') => {
-      let style: string = ContainerStyle + this.getMathjaxStyle() + MathpixStyle(stylePreview) + codeStyles + tabularStyles + listsStyles;
+      let style: string = ContainerStyle() + this.getMathjaxStyle() + MathpixStyle(stylePreview) + codeStyles + tabularStyles() + listsStyles;
       if (showToc) {}
       return stylePreview
         ? showToc ? style + PreviewStyle + TocStyle(tocContainerName) : style + PreviewStyle
         : style;
+    };
+
+    getMathpixMarkdownStyles = ( useColors: boolean = true) => {
+      let style: string = ContainerStyle(useColors);
+      style += this.getMathjaxStyle();
+      style += MathpixStyle(false, useColors);
+      // style += codeStyles;
+      style += tabularStyles(useColors);
+      style += listsStyles;
+      return style;
     };
 
     getMathpixFontsStyle = () => {

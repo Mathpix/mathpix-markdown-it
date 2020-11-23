@@ -2,14 +2,14 @@ import SmilesDrawer from './smiles-drawer';
 import { IOptions } from './smiles-drawer/src/Drawer';
 import { ISmilesOptions } from './index';
 import { initDocument } from '../dom-adaptor';
-import { setFontSize, setDisableColors, getScale } from './chemistry-options';
+import { setFontSize, setDisableColors, setThemesByDefault, getScale } from './chemistry-options';
 
 export const ChemistryDrawer = {
   drawSvgSync: function(content: string, id: string,
                         options: ISmilesOptions = {}): string {
     initDocument();
     const { theme = 'light', stretch, fontSize = 14,
-      disableColors = true, autoScale
+      disableColors = true, autoScale, useCurrentColor = true
     } = options;
     let scale = options.scale || 1;
     let config: IOptions = {};
@@ -20,8 +20,12 @@ export const ChemistryDrawer = {
       config = setFontSize(fontSize,{});
     }
 
+    const darkTextColor = useCurrentColor ? 'currentColor' : '#fff';
+    const lightTextColor = useCurrentColor ? 'currentColor' : '#222';
     if (disableColors) {
-      config = setDisableColors(config);
+      config = setDisableColors(config, darkTextColor, lightTextColor);
+    } else {
+      config = setThemesByDefault(config, darkTextColor, lightTextColor);
     }
 
     if (options) {
