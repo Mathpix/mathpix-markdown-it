@@ -184,3 +184,8 @@ export const arrayResortFromElement = (arr, el, notReverse = false, nextEl = -1)
   }
 
 };
+
+export const uid = () => {
+  return Date.now().toString(36)
+    + Math.random().toString(36).substr(2);
+};

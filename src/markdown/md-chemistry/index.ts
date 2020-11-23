@@ -2,6 +2,7 @@ import { MarkdownIt, RuleBlock, RuleInline } from 'markdown-it';
 import { ChemistryDrawer } from './chemistry-drawer';
 import { ISmilesOptionsDef } from "./smiles-drawer/src/Drawer";
 import { PREVIEW_LINE_CLASS, PREVIEW_PARAGRAPH_PREFIX } from "../rules";
+import { uid } from '../utils';
 
 export interface ISmilesOptions extends ISmilesOptionsDef {
   theme?: string,
@@ -178,7 +179,7 @@ const renderSmilesDrawerBlock = (tokens, idx, options, env, slf) => {
     return '';
   }
   const id = !options.isTesting
-    ?`f${(+new Date).toString(16)}`
+    ? uid()
     : '';
 
   const resSvg = ChemistryDrawer.drawSvgSync(token.content.trim(), id, options);
@@ -201,7 +202,7 @@ const renderSmilesDrawerInline = (tokens, idx, options, env, slf) => {
     return '';
   }
   const id = !options.isTesting
-    ? `f${(+new Date).toString(16)}`
+    ? uid()
     : '';
 
   const resSvg = ChemistryDrawer.drawSvgSync(token.content.trim(), id, options);
