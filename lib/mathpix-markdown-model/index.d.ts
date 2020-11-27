@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import { Property } from 'csstype';
 import { ISmilesOptions } from '../markdown/md-chemistry';
 export interface optionsMathpixMarkdown {
@@ -89,6 +90,7 @@ declare class MathpixMarkdown_Model {
     getMathpixFontsStyle: () => string;
     render: (text: string, options?: optionsMathpixMarkdown) => string;
     markdownToDOCX: (str: string, options?: TMarkdownItOptions) => string;
+    markdownToDOCX2: (str: string, options?: TMarkdownItOptions) => Promise<ArrayBuffer | Blob | Buffer>;
 }
 export declare const MathpixMarkdownModel: MathpixMarkdown_Model;
 export {};

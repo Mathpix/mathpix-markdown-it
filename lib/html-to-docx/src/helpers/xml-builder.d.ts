@@ -1,0 +1,12 @@
+declare const buildBold: () => import("xmlbuilder2/lib/interfaces").XMLBuilder;
+declare const buildItalics: () => import("xmlbuilder2/lib/interfaces").XMLBuilder;
+declare const buildUnderline: (type?: string) => import("xmlbuilder2/lib/interfaces").XMLBuilder;
+declare const buildLineBreak: (type?: string) => import("xmlbuilder2/lib/interfaces").XMLBuilder;
+declare const buildTextElement: (text: any) => import("xmlbuilder2/lib/interfaces").XMLBuilder;
+declare const fixupLineHeight: (lineHeight: any, fontSize: any) => number;
+declare const buildNumberingInstances: () => import("xmlbuilder2/lib/interfaces").XMLBuilder;
+declare const buildIndentation: () => import("xmlbuilder2/lib/interfaces").XMLBuilder;
+declare const buildParagraph: (vNode: any, attributes: any, docxDocumentInstance?: any) => import("xmlbuilder2/lib/interfaces").XMLBuilder;
+declare const buildTable: (vNode: any, attributes: any, docxDocumentInstance: any) => import("xmlbuilder2/lib/interfaces").XMLBuilder;
+declare const buildDrawing: (inlineOrAnchored: boolean, graphicType: any, attributes: any) => import("xmlbuilder2/lib/interfaces").XMLBuilder;
+export { buildParagraph, buildTable, buildNumberingInstances, buildLineBreak, buildIndentation, buildTextElement, buildBold, buildItalics, buildUnderline, buildDrawing, fixupLineHeight, };

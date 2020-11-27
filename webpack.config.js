@@ -9,6 +9,9 @@ const config = {
   },
   resolve: {
     extensions: [".tsx", ".ts", ".js"],
+  },
+  node: {
+    fs: 'empty'
   }
 };
 
