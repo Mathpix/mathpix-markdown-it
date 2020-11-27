@@ -88,6 +88,7 @@ declare class MathpixMarkdown_Model {
     getMathpixMarkdownStyles: (useColors?: boolean) => string;
     getMathpixFontsStyle: () => string;
     render: (text: string, options?: optionsMathpixMarkdown) => string;
+    markdownToDOCX: (str: string, options?: TMarkdownItOptions) => string;
 }
 export declare const MathpixMarkdownModel: MathpixMarkdown_Model;
 export {};

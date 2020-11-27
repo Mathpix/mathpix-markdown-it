@@ -10,6 +10,8 @@ import {MathJax} from '../mathjax';
 import { Property } from 'csstype'; // at top of file
 import { ISmilesOptions } from '../markdown/md-chemistry';
 
+// import HTMLtoDOCX from 'html-to-docx';
+
 export interface optionsMathpixMarkdown {
     alignMathBlock?: Property.TextAlign;
     display?: Property.Display;
@@ -402,6 +404,21 @@ class MathpixMarkdown_Model {
                 </div>
             </div>`
         );
+    };
+
+    markdownToDOCX = (str:string, options: TMarkdownItOptions = {}) => {
+      const  mathString =  this.isCheckFormula ? this.checkFormula(str, this.showTimeLog): str;
+      options.lineNumbering = false;
+      const outMath = {
+        include_mathml_word: true,
+        include_latex: false,
+      };
+
+      options.outMath = outMath;
+
+      const htmlString = this.markdownToHTML(mathString, options);
+      return htmlString;
+
     };
 }
 

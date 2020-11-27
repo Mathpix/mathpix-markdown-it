@@ -1,0 +1,1 @@
+{"version":3,"file":"index.js","sourceRoot":"","sources":["../../src/mmd-htm-to-docx/index.ts"],"names":[],"mappings":";;;AAAA,6CAAsC;AAEtC,IAAM,UAAU,GAAG,UAAO,UAAU;;;;oBACf,qBAAM,sBAAU,CAAC,UAAU,EAAE,IAAI,EAAE,EAAE,KAAK,EAAE,EAAE,GAAG,EAAE,EAAE,SAAS,EAAE,IAAI,EAAE,EAAE,EAAE,CAAC,EAAA;;gBAAxF,UAAU,GAAG,SAA2E;gBAC9F,sBAAO,UAAU,EAAC;;;KACnB,CAAC;AAEF,kBAAe,UAAU,CAAC"}

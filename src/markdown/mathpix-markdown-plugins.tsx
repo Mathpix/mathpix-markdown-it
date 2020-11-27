@@ -10,7 +10,8 @@ import {
   mdPluginAnchor,
   mdPluginTableTabular,
   mdPluginList,
-  mdPluginChemistry
+  mdPluginChemistry,
+  mdPluginSvgToBase64
 
 } from "./mdPluginConfigured";
 
@@ -32,7 +33,9 @@ export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
     .use(mdPluginText())
     .use(mdPluginHighlightCode, { auto: false })
     .use(mdPluginAnchor)
-    .use(mdPluginTOC);
+    .use(mdPluginTOC)
+    .use(mdPluginSvgToBase64)
+  ;
 };
 
 export const setBaseOptionsMd = (baseOption, mmdOptions) => {
