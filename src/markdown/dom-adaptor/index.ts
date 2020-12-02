@@ -10,7 +10,6 @@ export const initDocument = () => {
   try{
     document;
   } catch (e) {
-    console.log('[mmd] ;;;;;;;;;; initDocument ;;;;;;;;;');
     const domimpl = domino.createDOMImplementation();
     global.document = domimpl.createHTMLDocument();
   }
