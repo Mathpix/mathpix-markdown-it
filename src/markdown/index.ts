@@ -9,13 +9,14 @@ import {MathpixMarkdownModel as MM, TMarkdownItOptions} from '../mathpix-markdow
 const mdInit = (options: TMarkdownItOptions) => {
   const {htmlTags = false, xhtmlOut = false, width = 1200, breaks = true, typographer = true, linkify = true,
           outMath = {}, mathJax = {}, renderElement = {},
-          lineNumbering = false, htmlSanitize = true, smiles = {}} = options;
+          lineNumbering = false, htmlSanitize = true, smiles = {}, forDocx = false, openLinkInNewWindow =  true} = options;
   const mmdOptions = {
     width: width,
     outMath: outMath,
     mathJax: mathJax,
     renderElement: renderElement,
-    smiles: smiles
+    smiles: smiles,
+    forDocx: forDocx
   };
   return require("markdown-it")({
     html: htmlTags,
@@ -26,7 +27,8 @@ const mdInit = (options: TMarkdownItOptions) => {
     typographer: typographer,
     quotes: "“”‘’",
     lineNumbering: lineNumbering,
-    htmlSanitize: htmlSanitize
+    htmlSanitize: htmlSanitize,
+    openLinkInNewWindow: openLinkInNewWindow
   })
     .use(mathpixMarkdownPlugin, mmdOptions)
     .use(require('markdown-it-multimd-table'), {enableRowspan: true, enableMultilineRows: true})

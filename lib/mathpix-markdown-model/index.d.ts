@@ -21,6 +21,8 @@ export interface optionsMathpixMarkdown {
     mathJax?: TOutputMathJax;
     htmlSanitize?: THtmlSanitize;
     smiles?: ISmilesOptions;
+    forDocx?: boolean;
+    openLinkInNewWindow?: boolean;
 }
 export declare type TMarkdownItOptions = {
     isDisableFancy?: boolean;
@@ -42,6 +44,8 @@ export declare type TMarkdownItOptions = {
     mathJax?: TOutputMathJax;
     htmlSanitize?: THtmlSanitize;
     smiles?: ISmilesOptions;
+    forDocx?: boolean;
+    openLinkInNewWindow?: boolean;
 };
 export declare type TOutputMath = {
     include_mathml?: boolean;

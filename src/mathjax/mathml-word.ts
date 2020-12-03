@@ -113,7 +113,8 @@ export class MathMLVisitorWord<N, T, D> extends SerializedMmlVisitor {
     if (node.kind === 'msubsup' || node.kind === 'msub' || node.kind === 'sup') {
       return this.visitMunderoverNode(node, space);
     }
-    if (node.kind === 'mtr' && this.options.aligned
+    if ( !this.options.forDocx
+      && node.kind === 'mtr' && this.options.aligned
       && node.Parent && node.Parent.kind === 'mtable'
     ) {
       if ( node.Parent.Parent && node.Parent.Parent.kind === 'math'

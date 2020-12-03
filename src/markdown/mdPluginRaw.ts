@@ -493,7 +493,7 @@ const renderMath = (a, token, options) => {
         token.ascii = data.ascii
       } else {
          mathEquation = MathJax.Typeset(math, {display: isBlock, metric: { cwidth: cwidth },
-           outMath: options.outMath, mathJax: options.mathJax});
+           outMath: options.outMath, mathJax: options.mathJax, forDocx: options.forDocx});
       }
     }
   } catch (e) {
