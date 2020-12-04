@@ -465,6 +465,14 @@ const checkReference = data => {
     math: data.replace(/\\label\{([^}]*)\}/, "")
   };
 };
+const getWidthFromDocument = (cwidth = 1200) => {
+  try {
+    const el_container = document.getElementById('container-ruller');
+    return el_container ? el_container.offsetWidth : 1200;
+  } catch (e) {
+    return cwidth;
+  }
+};
 
 const renderMath = (a, token, options) => {
   const { tagId, math } = checkReference(token.content);
@@ -477,8 +485,7 @@ const renderMath = (a, token, options) => {
     if (options && options.width && options.width > 0) {
       cwidth = options.width;
     } else {
-      const el_container = document.getElementById('container-ruller');
-      cwidth = el_container ? el_container.offsetWidth : 1200;
+      cwidth = getWidthFromDocument(cwidth);
     }
 
     if (token.type === 'display_mathML' || token.type === 'inline_mathML') {
@@ -493,7 +500,7 @@ const renderMath = (a, token, options) => {
         token.ascii = data.ascii
       } else {
          mathEquation = MathJax.Typeset(math, {display: isBlock, metric: { cwidth: cwidth },
-           outMath: options.outMath, mathJax: options.mathJax});
+           outMath: options.outMath, mathJax: options.mathJax, forDocx: options.forDocx});
       }
     }
   } catch (e) {

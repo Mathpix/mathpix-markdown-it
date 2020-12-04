@@ -15,13 +15,14 @@ import {
 } from "./mdPluginConfigured";
 
 export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
-  const {width = 1200,  outMath = {}, smiles = {}, mathJax = {}, renderElement = {},} = options;
+  const {width = 1200,  outMath = {}, smiles = {}, mathJax = {}, renderElement = {}, forDocx = false} = options;
   Object.assign(md.options, smiles);
   Object.assign(md.options, {
     width: width,
     outMath: outMath,
     mathJax: mathJax,
-    renderElement: renderElement
+    renderElement: renderElement,
+    forDocx: forDocx
   });
 
   md
@@ -37,7 +38,7 @@ export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
 
 export const setBaseOptionsMd = (baseOption, mmdOptions) => {
   const {
-    htmlTags = false, xhtmlOut = false, breaks = true, typographer = true, linkify = true,
+    htmlTags = false, xhtmlOut = false, breaks = true, typographer = true, linkify = true, openLinkInNewWindow = true
   } = mmdOptions;
 
   baseOption.html = htmlTags;
@@ -47,7 +48,7 @@ export const setBaseOptionsMd = (baseOption, mmdOptions) => {
   baseOption.linkify = linkify;
   baseOption.typographer = typographer;
   baseOption.quotes = "“”‘’";
-
+  baseOption.openLinkInNewWindow = openLinkInNewWindow;
 };
 
 const setOptionForPreview = (mdOption, mmdOptions) => {

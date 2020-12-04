@@ -31,6 +31,8 @@ export interface optionsMathpixMarkdown {
     mathJax?: TOutputMathJax;
     htmlSanitize?: THtmlSanitize;
     smiles?: ISmilesOptions;
+    forDocx?: boolean;
+    openLinkInNewWindow?: boolean;
 }
 
 export type TMarkdownItOptions = {
@@ -53,6 +55,8 @@ export type TMarkdownItOptions = {
   mathJax?: TOutputMathJax,
   htmlSanitize?: THtmlSanitize;
   smiles?: ISmilesOptions;
+  forDocx?: boolean;
+  openLinkInNewWindow?: boolean;
 }
 
 export type TOutputMath = {
@@ -363,7 +367,7 @@ class MathpixMarkdown_Model {
         const { alignMathBlock='center', display='block', isCheckFormula=false, showTimeLog=false,
           isDisableFancy=false, fontSize=null, padding=null, htmlTags=false, width=0, showToc = false,
           overflowY='unset', breaks = true, typographer = true, linkify = true, xhtmlOut = false,
-          outMath = {}, mathJax = {}, htmlSanitize = {}, smiles = {}}
+          outMath = {}, mathJax = {}, htmlSanitize = {}, smiles = {}, openLinkInNewWindow = true}
          = options || {};
 
         const disableRules = isDisableFancy ? this.disableFancyArrayDef : options ? options.disableRules || [] : [];
@@ -388,7 +392,8 @@ class MathpixMarkdown_Model {
           outMath: outMath,
           mathJax: mathJax,
           htmlSanitize: htmlSanitize,
-          smiles: smiles
+          smiles: smiles,
+          openLinkInNewWindow: openLinkInNewWindow
         };
 
         const styleFontSize = fontSize ? ` font-size: ${options.fontSize}px;` : '';

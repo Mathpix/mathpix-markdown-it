@@ -65,8 +65,9 @@ const toMathML = (node => {
 });
 
 //MmlWordVisitor
-const toMathMLWord = (node => {
-  const visitor = new MathMLVisitorWord({aligned: true});
+const toMathMLWord = ((node, options) => {
+  options = Object.assign(options, {aligned: true});
+  const visitor = new MathMLVisitorWord(options);
   return visitor.visitTree(node)
 });
 
@@ -76,7 +77,7 @@ const toAsciiML = ((node, optionAscii) => {
   return ascii ? ascii.trim() : ascii;
 });
 
-const OuterData = (node, math, outMath) => {
+const OuterData = (node, math, outMath, forDocx = false) => {
   const {
     include_mathml = false,
     include_mathml_word = false,
@@ -99,7 +100,7 @@ const OuterData = (node, math, outMath) => {
   }
 
   if (include_mathml_word) {
-    res.mathml_word = toMathMLWord(math.root);
+    res.mathml_word = toMathMLWord(math.root, {forDocx: forDocx});
   }
 
   if (include_asciimath) {
@@ -170,7 +171,7 @@ export const MathJax = {
     return svg.styleSheet(docTeX);
   },
   TexConvert: function(string, options: any={}) {
-    const {display = true, metric = {}, outMath = {}, mathJax = {}} = options;
+    const {display = true, metric = {}, outMath = {}, mathJax = {}, forDocx={}} = options;
     const {em = 16, ex = 8, cwidth = 1200, lwidth = 100000, scale = 1} = metric;
     const {mtextInheritFont = false} = mathJax;
     if (mtextInheritFont) {
@@ -178,7 +179,7 @@ export const MathJax = {
     }
     const node = docTeX.convert(string, {display: display, em: em, ex: ex, containerWidth: cwidth, lineWidth: lwidth, scale: scale});
     const outputJax = docTeX.outputJax as any;
-    return OuterData(node, outputJax.math, outMath);
+    return OuterData(node, outputJax.math, outMath, forDocx);
   },
   TexConvertToAscii: function(string, options: any={}) {
     const {display = true, metric = {},
