@@ -232,8 +232,14 @@ export class MathMLVisitorWord<N, T, D> extends SerializedMmlVisitor {
     let kind = node.kind;
     let properties = node.properties;
     let mml = space + '<mfenced';
-    mml += properties.open ? ` open="${properties.open}"`:  ' open=""';
-    mml += properties.close ? ` close="${properties.close}"`:  ' close=""';
+    if (this.options.forDocx) {
+      mml += properties.open ? ` open="${properties.open}" branch_open="${properties.open}"`:  ' open="" branch_open=""';
+      mml += properties.close ? ` close="${properties.close}" branch_close="${properties.close}"`:  ' close="" branch_close=""';
+    } else {
+      mml += properties.open ? ` open="${properties.open}"`:  ' open=""';
+      mml += properties.close ? ` close="${properties.close}"`:  ' close=""';
+    }
+
     mml += ' separators="|"';
     mml += '>';
 
