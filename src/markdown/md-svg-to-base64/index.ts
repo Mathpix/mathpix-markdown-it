@@ -1,5 +1,5 @@
 import { MarkdownIt, RuleBlock } from 'markdown-it';
-import base64 from "./base64";
+import convertSvgToBase64 from "./convert-scv-to-base64";
 
 const HTML_SEQUENCES = [
   [/^<(svg)(?=(\s|>|$))/i, /<\/(svg)>/i, true],
@@ -54,11 +54,8 @@ const svgToBase64Block: RuleBlock = (state, startLine, endLine, silent) => {
   state.line = nextLine;
   token = state.push('html_inline', '', 0);
   const content = state.getLines(startLine, nextLine, state.blkIndent, true);
-  const PREFIX = 'data:image/svg+xml;base64,';
-  const base64Encode = PREFIX + base64.encode(content);
-  token.content = "<img src=\"" + base64Encode + "\"/>";
+  token.content = convertSvgToBase64(content);
   token.map = [startLine, nextLine];
-  console.log('state=>', state);
   return true;
 };
 export default (md: MarkdownIt, options) => {

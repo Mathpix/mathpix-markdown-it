@@ -3,6 +3,7 @@ import { ChemistryDrawer } from './chemistry-drawer';
 import { ISmilesOptionsDef } from "./smiles-drawer/src/Drawer";
 import { PREVIEW_LINE_CLASS, PREVIEW_PARAGRAPH_PREFIX } from "../rules";
 import { uid } from '../utils';
+import convertSvgToBase64 from "../md-svg-to-base64/convert-scv-to-base64";
 
 export interface ISmilesOptions extends ISmilesOptionsDef {
   theme?: string,
@@ -182,9 +183,13 @@ const renderSmilesDrawerBlock = (tokens, idx, options, env, slf) => {
     ? uid()
     : '';
 
-  const resSvg = ChemistryDrawer.drawSvgSync(token.content.trim(), id, options);
+  let resSvg = ChemistryDrawer.drawSvgSync(token.content.trim(), id, options);
   if (!resSvg) {
     return '';
+  }
+
+  if ( options.forDocx ) {
+    resSvg = convertSvgToBase64(resSvg);
   }
 
   const attrs = options?.lineNumbering
@@ -205,9 +210,12 @@ const renderSmilesDrawerInline = (tokens, idx, options, env, slf) => {
     ? uid()
     : '';
 
-  const resSvg = ChemistryDrawer.drawSvgSync(token.content.trim(), id, options);
+  let resSvg = ChemistryDrawer.drawSvgSync(token.content.trim(), id, options);
   if (!resSvg) {
     return '';
+  }
+  if ( options.forDocx ) {
+    resSvg = convertSvgToBase64(resSvg);
   }
 
   return `<div class="smiles-inline" style="display: inline-block">${resSvg}</div>`;
