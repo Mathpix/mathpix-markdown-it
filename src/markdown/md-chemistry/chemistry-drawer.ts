@@ -38,6 +38,7 @@ export const ChemistryDrawer = {
       const output_svg = document.createElement('svg');
       const svgId: string = 'smiles-' + id;
       output_svg.id = svgId;
+      output_svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
 
       const svg = svgDrawer.draw(tree, output_svg, theme, false);
 
