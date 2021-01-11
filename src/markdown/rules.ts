@@ -1,4 +1,5 @@
 import { sanitize } from './sanitize';
+import { injectInlineStyles } from './inline-styles';
 
 export const PREVIEW_PARAGRAPH_PREFIX = "preview-paragraph-";
 export const PREVIEW_LINE_CLASS = "preview-line";
@@ -101,7 +102,6 @@ function code_block_injectLineNumbers(tokens, idx, options, env, slf) {
         '</code></pre>\n';
 }
 
-
 /** overwrite paragraph_open and close rule to inject line number */
 export function withLineNumbers(renderer) {
   renderer.renderer.rules.paragraph_open
@@ -118,7 +118,10 @@ export function withLineNumbers(renderer) {
 }
 
 export const injectRenderRules = (renderer) => {
-  const { lineNumbering = false, htmlSanitize = {}, html = false } = renderer.options;
+  const { lineNumbering = false, htmlSanitize = {}, html = false, forDocx = false } = renderer.options;
+  if (forDocx) {
+    injectInlineStyles(renderer);
+  }
   if (lineNumbering) {
     withLineNumbers(renderer);
     if (html) {

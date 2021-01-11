@@ -10,7 +10,8 @@ import {
   mdPluginAnchor,
   mdPluginTableTabular,
   mdPluginList,
-  mdPluginChemistry
+  mdPluginChemistry,
+  mdPluginSvgToBase64
 
 } from "./mdPluginConfigured";
 
@@ -34,6 +35,10 @@ export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
     .use(mdPluginHighlightCode, { auto: false })
     .use(mdPluginAnchor)
     .use(mdPluginTOC);
+
+  if ( forDocx ) {
+    md.use(mdPluginSvgToBase64);
+  }
 };
 
 export const setBaseOptionsMd = (baseOption, mmdOptions) => {
