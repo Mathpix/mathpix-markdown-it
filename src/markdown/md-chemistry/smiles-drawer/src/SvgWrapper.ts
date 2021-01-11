@@ -484,6 +484,8 @@ class SvgWrapper {
       textDirection = 'direction: ltr;',
       xShift = - dFont,
       yShift = dFont;
+    let writingModeOld = 'rl-tb'; //Need for Arora
+    let textOrientationOld = ''; //Need for Arora
 
     let mask = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
     mask.setAttributeNS(null, 'cx', pos.x);
@@ -496,6 +498,8 @@ class SvgWrapper {
     if (/up|down/.test(direction) && !isTerminal) {
       writingMode = 'vertical-rl';
       textOrientation = 'upright';
+      writingModeOld = 'tb'; // Need for Arora
+      textOrientationOld = 'glyph-orientation-vertical: 0;'; // Need for Arora
       letterSpacing = '-1px';
     }
 
@@ -538,6 +542,8 @@ class SvgWrapper {
     textElem.setAttributeNS(null, 'fill', this.themeManager.getColor(elementName));
     textElem.setAttributeNS(null, 'style', `
                 text-anchor: start;
+                writing-mode: ${writingModeOld};
+                ${textOrientationOld ? textOrientationOld : ''}
                 writing-mode: ${writingMode};
                 text-orientation: ${textOrientation};
                 letter-spacing: ${letterSpacing};
@@ -555,8 +561,18 @@ class SvgWrapper {
                 letter-spacing: normal;
                 text-anchor: ${textAnchor};
             `);
+    } else {
+      textNode.setAttributeNS(null, 'style', 'display: block;');
     }
-    textNode.appendChild(document.createTextNode(elementName));
+    //For Arora
+    let isAdded = false;
+    if (hydrogens === 1 && (direction === 'left' || (direction === 'up' && !isTerminal))) {
+      textNode.appendChild(document.createTextNode(elementName + 'H'));
+      isAdded = true;
+    } else {
+      textNode.appendChild(document.createTextNode(elementName));
+    }
+
     textElem.appendChild(textNode);
 
     // Charge
@@ -589,7 +605,7 @@ class SvgWrapper {
       charge = 0;
     }
 
-    if (hydrogens > 0) {
+    if (!isAdded && hydrogens > 0) {
       let hydrogenElem = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
       hydrogenElem.setAttributeNS(null, 'style', 'unicode-bidi: plaintext;');
       hydrogenElem.appendChild(document.createTextNode('H'));

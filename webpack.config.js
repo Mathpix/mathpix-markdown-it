@@ -30,7 +30,7 @@ const indexConfig = Object.assign({}, config, {
       {
         test: /\.js?$/,
         include: path.resolve(__dirname, 'src'),
-        exclude: /(examples|node_modules|bower_components|bundle|lib)/,
+        exclude: /(examples|node_modules|bower_components|bundle|lib)\/(?![domino])/,
         loader: 'babel-loader',
       },
       {
