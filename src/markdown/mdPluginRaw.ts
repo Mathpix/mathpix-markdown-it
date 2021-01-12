@@ -750,6 +750,10 @@ function paragraphDiv(state, startLine/*, endLine*/) {
 
   state.line = nextLine;
   token = state.push('paragraph_open', 'div', 1);
+  if (state.md.options?.forDocx) {
+    token.attrSet('style', 'margin-top: 0; margin-bottom: 1em; text-align: justify;');
+  }
+
   token.map = [startLine, state.line];
   token = state.push('inline', '', 0);
   token.content = content;

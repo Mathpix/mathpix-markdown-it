@@ -46,6 +46,7 @@ const headingSection: RuleBlock = (state, startLine: number/*, endLine*/) => {
   if (!match) {
     return false;
   }
+  let attrStyle = '';
 
   startPos += match[0].length;
   switch (match[0]) {
@@ -53,6 +54,7 @@ const headingSection: RuleBlock = (state, startLine: number/*, endLine*/) => {
       level = 1;
       type = "title";
       className = "main-title";
+      attrStyle = 'text-align: center; margin: 0 auto; line-height: 1.2; margin-bottom: 1em;';
       break;
     case "section":
       level = 2;
@@ -61,6 +63,7 @@ const headingSection: RuleBlock = (state, startLine: number/*, endLine*/) => {
       subsectionParentCount++;
       isNewSect = true;
       className = "section-title";
+      attrStyle = 'margin-top: 1.5em;';
       break;
     case "subsection":
       isNewSubSection = true;
@@ -94,6 +97,9 @@ const headingSection: RuleBlock = (state, startLine: number/*, endLine*/) => {
   token.map = [startLine, state.line];
   token.attrJoin('type', type);
   token.attrJoin('class', className);
+  if (state.md.options?.forDocx && attrStyle) {
+    token.attrSet('style', attrStyle);
+  }
 
   token = state.push('inline', '', 0);
   token.content = content;
@@ -214,6 +220,7 @@ const textTypes: RuleInline = (state) => {
   let type: string = '',
     beginMarker: string = "{",
     endMarker: string = "}";
+  let arrtStyle: string = '';
 
   if (state.src.charCodeAt(startPos) !== 0x5c /* \ */) {
     return false;
@@ -235,6 +242,7 @@ const textTypes: RuleInline = (state) => {
       break;
     case "author":
       type = "author";
+      arrtStyle = 'text-align: center; margin: 0 auto; display: flex; justify-content: center; flex-wrap: wrap;';
       break;
     default:
       break;
@@ -254,6 +262,9 @@ const textTypes: RuleInline = (state) => {
   const nextPos = endMarkerPos + endMarker.length;
 
   const token = state.push(type, "", 0);
+  if (state.md.options?.forDocx && arrtStyle) {
+    token.attrSet('style', arrtStyle);
+  }
   token.content = state.src.slice(startPos + 1, nextPos - endMarker.length);
   state.pos = nextPos;
   return true;
@@ -410,15 +421,31 @@ const getAuthorColumnContent = content => {
   return res;
 }
 
-const renderAuthorToken: Renderer = (token) => {
+const renderAuthorToken: Renderer = (token, options) => {
   const columns = token.content.split('\\and');
   let res = '';
+  let attrStyle = options.forDocx
+    ? 'min-width: 30%; max-width: 50%; padding: 0 7px;'
+    : '';
+  let divStyle: string = options.forDocx
+    ? token.attrGet('style')
+    : '';
   columns.forEach(item => {
-    res += `<p>${getAuthorColumnContent(item)}</p>`
+    if (attrStyle) {
+      res += `<p style="${attrStyle}">${getAuthorColumnContent(item)}</p>`
+    } else {
+      res += `<p>${getAuthorColumnContent(item)}</p>`
+    }
   });
-  return `<div class="author">
+  if (divStyle) {
+    return `<div class="author" style="${divStyle}">
           ${res}
         </div>`;
+  } else {
+    return `<div class="author">
+          ${res}
+        </div>`;
+  }
 };
 
 const renderBoldText = token => `<strong>${token.content}</strong>`;
@@ -452,7 +479,7 @@ export default () => {
     md.inline.ruler.before("multiMath", "textTypes", textTypes);
     md.inline.ruler.before('textTypes', 'linkifyURL', linkifyURL);
     Object.keys(mapping).forEach(key => {
-      md.renderer.rules[key] = (tokens, idx) => {
+      md.renderer.rules[key] = (tokens, idx, options) => {
         switch (tokens[idx].type) {
           case "section":
             return renderSectionTitle(tokens[idx]);
@@ -463,7 +490,7 @@ export default () => {
           case "title":
             return renderDocTitle(tokens[idx]);
           case "author":
-            return renderAuthorToken(tokens[idx]);
+            return renderAuthorToken(tokens[idx], options);
           case "textbf":
             return renderBoldText(tokens[idx]);
           case "textit":
