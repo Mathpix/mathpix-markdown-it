@@ -485,6 +485,11 @@ class SvgWrapper {
       xShift = - dFont,
       yShift = dFont;
 
+    let writingModeOld = this.opts.supportSvg1
+      ? 'rl-tb'
+      : '';
+    let textOrientationOld = '';
+
     let mask = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
     mask.setAttributeNS(null, 'cx', pos.x);
     mask.setAttributeNS(null, 'cy', pos.y);
@@ -496,6 +501,10 @@ class SvgWrapper {
     if (/up|down/.test(direction) && !isTerminal) {
       writingMode = 'vertical-rl';
       textOrientation = 'upright';
+      writingModeOld = this.opts.supportSvg1
+        ? 'tb'
+        : '';
+      textOrientationOld = 'glyph-orientation-vertical: 0;'; // Need for Arora
       letterSpacing = '-1px';
     }
 
@@ -536,13 +545,26 @@ class SvgWrapper {
     textElem.setAttributeNS(null, 'y', pos.y + yShift);
     textElem.setAttributeNS(null, 'class', elementClassName);
     textElem.setAttributeNS(null, 'fill', this.themeManager.getColor(elementName));
-    textElem.setAttributeNS(null, 'style', `
+    if (this.opts.supportSvg1
+      && (writingModeOld || textOrientationOld)) {
+      textElem.setAttributeNS(null, 'style', `
+                  text-anchor: start;
+                  writing-mode: ${writingModeOld};
+                  ${textOrientationOld ? textOrientationOld : ''}
+                  writing-mode: ${writingMode};
+                  text-orientation: ${textOrientation};
+                  letter-spacing: ${letterSpacing};
+                  ${textDirection}
+              `);
+    } else {
+      textElem.setAttributeNS(null, 'style', `
                 text-anchor: start;
                 writing-mode: ${writingMode};
                 text-orientation: ${textOrientation};
                 letter-spacing: ${letterSpacing};
                 ${textDirection}
             `);
+    }
 
     let textNode = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
     // special case for element names that are 2 letters
@@ -556,7 +578,21 @@ class SvgWrapper {
                 text-anchor: ${textAnchor};
             `);
     }
-    textNode.appendChild(document.createTextNode(elementName));
+
+    let isAdded = false;
+    if (this.opts.supportSvg1
+      && hydrogens === 1 && (direction === 'left' || (direction === 'up' && !isTerminal)
+    )) {
+      if (direction === 'up' && !isTerminal) {
+        textNode.appendChild(document.createTextNode( 'H' + elementName));
+      } else {
+        textNode.appendChild(document.createTextNode(elementName + 'H'));
+      }
+      isAdded = true;
+    } else {
+      textNode.appendChild(document.createTextNode(elementName));
+    }
+
     textElem.appendChild(textNode);
 
     // Charge
@@ -589,7 +625,7 @@ class SvgWrapper {
       charge = 0;
     }
 
-    if (hydrogens > 0) {
+    if (!isAdded && hydrogens > 0) {
       let hydrogenElem = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
       hydrogenElem.setAttributeNS(null, 'style', 'unicode-bidi: plaintext;');
       hydrogenElem.appendChild(document.createTextNode('H'));

@@ -9,6 +9,7 @@ export interface ISmilesOptions extends ISmilesOptionsDef {
     autoScale?: boolean;
     isTesting?: boolean;
     useCurrentColor?: boolean;
+    supportSvg1?: boolean;
 }
 declare const _default: (md: any, options: any) => void;
 export default _default;

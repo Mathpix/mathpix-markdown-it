@@ -14,7 +14,8 @@ export interface ISmilesOptions extends ISmilesOptionsDef {
   disableGradient?: boolean,
   autoScale?: boolean,
   isTesting?: boolean,
-  useCurrentColor?: boolean
+  useCurrentColor?: boolean,
+  supportSvg1?: boolean
 }
 
 function injectLineNumbersSmiles(tokens, idx, options, env, slf) {
@@ -175,6 +176,8 @@ const smilesDrawerInline: RuleInline = (state) => {
 };
 
 const renderSmilesDrawerBlock = (tokens, idx, options, env, slf) => {
+  const { outMath = {} } = options;
+  const { include_smiles = false, include_svg = true  } = outMath;
   const token = tokens[idx];
   if (!token.content) {
     return '';
@@ -183,25 +186,31 @@ const renderSmilesDrawerBlock = (tokens, idx, options, env, slf) => {
     ? uid()
     : '';
 
-  let resSvg = ChemistryDrawer.drawSvgSync(token.content.trim(), id, options);
-  if (!resSvg) {
-    return '';
-  }
+  let resSvg = include_svg || options.forDocx
+    ? ChemistryDrawer.drawSvgSync(token.content.trim(), id, options)
+    : '';
 
-  if ( options.forDocx ) {
+
+  if ( resSvg && options.forDocx ) {
     resSvg = convertSvgToBase64(resSvg);
   }
 
   const attrs = options?.lineNumbering
     ? injectLineNumbersSmiles(tokens, idx, options, env, slf)
     : '';
+  const outputSmiles = include_smiles
+    ? '<smiles style="display: none">' + token.content.trim() + '</smiles>'
+    : '';
+
   if (attrs) {
-    return `<div ${attrs}><div class="smiles">${resSvg}</div></div>`
+    return `<div ${attrs}><div class="smiles">${outputSmiles}${resSvg}</div></div>`
   }
-  return `<div><div class="smiles">${resSvg}</div></div>`
+  return `<div><div class="smiles">${outputSmiles}${resSvg}</div></div>`
 };
 
 const renderSmilesDrawerInline = (tokens, idx, options, env, slf) => {
+  const { outMath = {} } = options;
+  const { include_smiles = false, include_svg = true } = outMath;
   const token = tokens[idx];
   if (!token.content) {
     return '';
@@ -210,15 +219,18 @@ const renderSmilesDrawerInline = (tokens, idx, options, env, slf) => {
     ? uid()
     : '';
 
-  let resSvg = ChemistryDrawer.drawSvgSync(token.content.trim(), id, options);
-  if (!resSvg) {
-    return '';
-  }
-  if ( options.forDocx ) {
+  let resSvg = include_svg || options.forDocx
+    ? ChemistryDrawer.drawSvgSync(token.content.trim(), id, options)
+    : '';
+
+  if ( resSvg && options.forDocx ) {
     resSvg = convertSvgToBase64(resSvg);
   }
 
-  return `<div class="smiles-inline" style="display: inline-block">${resSvg}</div>`;
+  const outputSmiles = include_smiles
+    ? '<smiles style="display: none">' + token.content.trim() + '</smiles>'
+    : '';
+  return `<div class="smiles-inline" style="display: inline-block">${outputSmiles}${resSvg}</div>`;
 };
 
 export default (md: MarkdownIt, options) => {

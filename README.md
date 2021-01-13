@@ -579,6 +579,7 @@ The `MathpixMarkdown` React element accepts the following props:
 | `include_svg`         | boolean&nbsp;*`true`*        | outputs svg `<svg>...</svg>`                                                                                      |
 | `include_tsv`         | boolean&nbsp;*`false`*       | outputs tsv `<tsv style="display: none">...</tsv>`                                                                |
 | `include_table_html`  | boolean&nbsp;*`true`*        | outputs html table `<table>...</table>`                                                                           |
+| `include_smiles`      | boolean&nbsp;*`false`*       | outputs smiles `<smiles>...</smiles>`                                                                             |
 | `tsv_separators`      | `{column: '\t', row: '\n'}`  | Separators for tsv tables                                                                                         |
 | `not_catch_errors`    | boolean&nbsp;*`false`*       | Do not catch math rendering errors                                                                                |
  

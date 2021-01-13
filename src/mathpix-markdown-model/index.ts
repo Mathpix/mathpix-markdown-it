@@ -67,6 +67,7 @@ export type TOutputMath = {
   include_svg?: boolean,
   include_table_html?: boolean,
   include_tsv?: boolean,
+  include_smiles?: boolean,
   tsv_separators?: {
     column?: string,
     row?: string,
@@ -127,15 +128,20 @@ class MathpixMarkdown_Model {
     if (!el) return null;
 
     const math_el = include_sub_math
-      ? el.querySelectorAll('.math-inline, .math-block, .table_tabular, .inline-tabular')
-      : el.querySelectorAll('div > .math-inline, div > .math-block, .table_tabular, div > .inline-tabular');
+      ? el.querySelectorAll('.math-inline, .math-block, .table_tabular, .inline-tabular, .smiles, .smiles-inline')
+      : el.querySelectorAll('div > .math-inline, div > .math-block, .table_tabular, div > .inline-tabular, div > .smiles, div > .smiles-inline');
     if (!math_el) return null;
-
 
     for (let i = 0; i < math_el.length; i++) {
       for (let j = 0; j < math_el[i].children.length; j++) {
         const child = math_el[i].children[j];
-        if (["MATHML", "MATHMLWORD", "ASCIIMATH", "LATEX", "MJX-CONTAINER", "TABLE", "TSV"].indexOf(child.tagName) !== -1) {
+
+        if (['smiles', 'smiles-inline'].includes(math_el[i].className) && child.tagName.toUpperCase() === 'SVG') {
+          res.push({type: "svg", value: child.outerHTML});
+          continue;
+        }
+
+        if (["MATHML", "MATHMLWORD", "ASCIIMATH", "LATEX", "MJX-CONTAINER", "TABLE", "TSV", "SMILES"].indexOf(child.tagName) !== -1) {
           if (child.tagName==="MJX-CONTAINER" || child.tagName==="TABLE") {
             if (child.tagName === "TABLE") {
               res.push({type: "html", value: child.outerHTML});
@@ -145,7 +151,7 @@ class MathpixMarkdown_Model {
           } else {
             res.push({
               type: child.tagName.toLowerCase(),
-              value: child.tagName === 'LATEX' || child.tagName === 'ASCIIMATH' || child.tagName === 'TSV'
+              value: child.tagName === 'LATEX' || child.tagName === 'ASCIIMATH' || child.tagName === 'TSV' || child.tagName === 'SMILES'
               ? formatSourceHtml(child.innerHTML, child.tagName === 'TSV')
               : child.tagName === 'MATHMLWORD'
                   ? formatSourceHtmlWord(child.innerHTML)

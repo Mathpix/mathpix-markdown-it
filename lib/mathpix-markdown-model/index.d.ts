@@ -55,6 +55,7 @@ export declare type TOutputMath = {
     include_svg?: boolean;
     include_table_html?: boolean;
     include_tsv?: boolean;
+    include_smiles?: boolean;
     tsv_separators?: {
         column?: string;
         row?: string;
