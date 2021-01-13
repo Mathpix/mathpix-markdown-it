@@ -45,7 +45,7 @@ export const ChemistryDrawer = {
       if (!stretch && svgDrawer.svgWrapper?.drawingWidth) {
         svg.style.width = `${svgDrawer.svgWrapper?.drawingWidth * scale}px`;
       }
-      if (!stretch && svgDrawer.svgWrapper?.drawingHeight) {
+      if (!stretch && !options.isTesting && svgDrawer.svgWrapper?.drawingHeight) {
         svg.style.height = `${svgDrawer.svgWrapper?.drawingHeight * scale}px`;
       }
       svg.style.overflow = 'visible';

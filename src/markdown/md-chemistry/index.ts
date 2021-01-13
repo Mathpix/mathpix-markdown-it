@@ -14,7 +14,8 @@ export interface ISmilesOptions extends ISmilesOptionsDef {
   disableGradient?: boolean,
   autoScale?: boolean,
   isTesting?: boolean,
-  useCurrentColor?: boolean
+  useCurrentColor?: boolean,
+  supportSvg1?: boolean
 }
 
 function injectLineNumbersSmiles(tokens, idx, options, env, slf) {
