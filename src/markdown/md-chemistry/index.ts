@@ -186,7 +186,7 @@ const renderSmilesDrawerBlock = (tokens, idx, options, env, slf) => {
     ? uid()
     : '';
 
-  let resSvg = include_svg
+  let resSvg = include_svg || options.forDocx
     ? ChemistryDrawer.drawSvgSync(token.content.trim(), id, options)
     : '';
 
@@ -219,7 +219,7 @@ const renderSmilesDrawerInline = (tokens, idx, options, env, slf) => {
     ? uid()
     : '';
 
-  let resSvg = include_svg
+  let resSvg = include_svg || options.forDocx
     ? ChemistryDrawer.drawSvgSync(token.content.trim(), id, options)
     : '';
 
