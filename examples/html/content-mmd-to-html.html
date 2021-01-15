@@ -2,8 +2,100 @@
 <html lang="en" data-lt-installed="true"><head>
   <meta charset="UTF-8">
   <title>Title</title>
-  <script src="https://cdn.jsdelivr.net/gh/Mathpix/mathpix-markdown-it/examples/html/data/syntax-ref.js"></script>
-
+  <script>
+    const text = '## Using Math mode LaTeX in Snip\n' +
+      '\n' +
+      'You can insert inline mathematics using LaTeX delimiters `$...$` or `\\(...\\)` like this $\\vec { F } = m \\vec { a }$ and this \\(ax^2 + bx + c = 0\\).\n' +
+      '\n' +
+      'You can insert non-numbered block mode mathematics by using the LaTeX delimiters `$$...$$`, `\\[...\\]`, `\\begin{equation*}...\\end{equation*}`, and `\\begin{align*}...\\end{align*}`:\n' +
+      '\n' +
+      '$$\n' +
+      'x = \\frac { - b \\pm \\sqrt { b ^ { 2 } - 4 a c } } { 2 a }\n' +
+      '$$\n' +
+      '\n' +
+      '\\[\n' +
+      'y = \\frac { \\sum _ { i } w _ { i } y _ { i } } { \\sum _ { i } w _ { i } } , i = 1,2 \\ldots k\n' +
+      '\\]\n' +
+      '\n' +
+      '\\begin{equation*}\n' +
+      'l ( \\theta ) = \\sum _ { i = 1 } ^ { m } \\log p ( x , \\theta )\n' +
+      '\\end{equation*}\n' +
+      '\n' +
+      '\\begin{align*}\n' +
+      't _ { 1 } + t _ { 2 } = \\frac { ( 2 L / c ) \\sqrt { 1 - u ^ { 2 } / c ^ { 2 } } } { 1 - u ^ { 2 } / c ^ { 2 } } = \\frac { 2 L / c } { \\sqrt { 1 - u ^ { 2 } / c ^ { 2 } } }\n' +
+      '\\end{align*}\n' +
+      '\n' +
+      '\n' +
+      'You can insert numbered block mode mathematics by using the LaTeX delimiters `\\begin{equation}...\\end{equation}` and `\\begin{align}...\\end{align}`:\n' +
+      '\n' +
+      '\\begin{equation}\n' +
+      'm = \\frac { m _ { 0 } } { \\sqrt { 1 - v ^ { 2 } / c ^ { 2 } } }\n' +
+      '\\end{equation}\n' +
+      '\n' +
+      '\\begin{align}\n' +
+      '^{|\\alpha|} \\sqrt{x^{\\alpha}} \\leq(x \\bullet \\alpha) /|\\alpha|\n' +
+      '\\end{align}\n' +
+      '\n' +
+      '\n' +
+      '### Use `\\label{}` and `\\ref{}` or `\\eqref{}` to link to any numbered equation in your document \n' +
+      '\n' +
+      'In equation \\eqref{eq:1}, we find the value of an\n' +
+      'interesting integral:\n' +
+      '\n' +
+      '\\begin{equation}\n' +
+      '  \\int_0^\\infty \\frac{x^3}{e^x-1}\\,dx = \\frac{\\pi^4}{15}\n' +
+      '  \\label{eq:1}\n' +
+      '\\end{equation}\n' +
+      '\n' +
+      '\\begin{equation}\n' +
+      '  \\| x + y \\| \\geq | \\| x | | - \\| y \\| |\n' +
+      '  \\label{eq:2}\n' +
+      '\\end{equation}\n' +
+      '\n' +
+      'Look at the Equation \\ref{eq:2}\n' +
+      '\n' +
+      '### Use `\\tag{}` to create a custom tag for your equation\n' +
+      '\n' +
+      'In addition to using numbered block mode equation syntax for standard numbering (ie. 1, 2, 3), you can use also include `\\tag{}` inside of your LaTeX delimiters to create a custom tag. Note that if `\\tag{}` is used in a numbered equation, it will override the document\'s numbering.\n' +
+      '\n' +
+      '$$\n' +
+      '\\frac{x\\left(x^{2 n}-x^{-2 n}\\right)}{x^{2 n}+x^{-2 n}}\n' +
+      '\\tag{1.1}\n' +
+      '$$\n' +
+      '\n' +
+      '\\begin{equation}\n' +
+      '\\max _{\\theta} \\mathbb{E}_{\\mathbf{z} \\sim \\mathcal{Z}_{T}}\\left[\\sum_{t=1}^{T} \\log p_{\\theta}\\left(x_{z_{t}} | \\mathbf{x}_{\\mathbf{z}_{<t}}\\right)\\right]\n' +
+      '\\tag{1.2}\n' +
+      '\\end{equation}\n' +
+      '\n' +
+      '### Other math mode LaTeX environments supported\n' +
+      '\n' +
+      'Snip also supports some less common math mode LaTeX environments, such as: \n' +
+      '\n' +
+      '`\\begin{split}...\\end{split}` to split your equation into smaller pieces: \n' +
+      '\n' +
+      '\\begin{split}\n' +
+      'a& =b+c-d\\\\\n' +
+      '& \\quad +e-f\\\\\n' +
+      '& =g+h\\\\\n' +
+      '& =i\n' +
+      '\\end{split}\n' +
+      '\n' +
+      '- Use `\\\\` to denote a new line and `&` to denote where the lines should align.\n' +
+      '- Need it numbered? Wrap it in `\\begin{equation}...\\end{equation}`\n' +
+      '\n' +
+      '`\\begin{gather}...\\end{gather}` for displaying a set of consecutive equations that don\'t require special alignment and `\\begin{gather*}...\\end{gather*}` if you don\'t want equation numbering: \n' +
+      '\n' +
+      '\\begin{gather}\n' +
+      'a_1=b_1+c_1\\\\\n' +
+      'a_2=b_2+c_2-d_2+e_2\n' +
+      '\\end{gather}\n' +
+      '\n' +
+      '\\begin{gather*}\n' +
+      'a_1=b_1+c_1\\\\\n' +
+      'a_2=b_2+c_2-d_2+e_2\n' +
+      '\\end{gather*}\n';
+  </script>
   <style>
     #content {
       max-width: 800px;

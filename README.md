@@ -498,8 +498,8 @@ MathJax from the CDN.  E.g.,
 
 ### Example of mathpix-markdown-it usage in the web browsers
 
-* [Example of render function usage](https://github.com/Mathpix/mathpix-markdown-it/tree/master/examples/html/content-mmd-to-html.html.md) ([View Demo](https://htmlpreview.github.io/?https://github.com/Mathpix/mathpix-markdown-it/blob/master/examples/html/content-mmd-to-html.html))
-* [Example of markdownToHTML function usage](https://github.com/Mathpix/mathpix-markdown-it/tree/master/examples/html/input-mmd-to-html.htm.md)([View Demo](https://htmlpreview.github.io/?https://github.com/Mathpix/mathpix-markdown-it/blob/master/examples/html/input-mmd-to-html.html))
+* [Example of render function usage](https://github.com/Mathpix/mathpix-markdown-it/blob/master/examples/html/content-mmd-to-html.html.md) ([View Demo](https://htmlpreview.github.io/?https://github.com/Mathpix/mathpix-markdown-it/blob/master/examples/html/content-mmd-to-html.html))
+* [Example of markdownToHTML function usage](https://github.com/Mathpix/mathpix-markdown-it/blob/master/examples/html/input-mmd-to-html.html.md)([View Demo](https://htmlpreview.github.io/?https://github.com/Mathpix/mathpix-markdown-it/blob/master/examples/html/input-mmd-to-html.html))
 
 
 # Documentation
