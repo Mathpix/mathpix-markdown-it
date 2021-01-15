@@ -29,3 +29,5 @@
 ```
 <div id="content"><div id="content-text"></div></div>
 ```
+
+[Run the example](https://htmlpreview.github.io/?https://github.com/Mathpix/mathpix-markdown-it/blob/master/examples/html/content-mmd-to-html.html)
