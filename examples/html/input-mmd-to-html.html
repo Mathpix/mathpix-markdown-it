@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en" data-lt-installed="true"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width">
+  <title>Convert markdown to html</title>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+
+  <script>
+    let script = document.createElement('script');
+    script.src = "../../es5/bundle.js";
+    document.head.append(script);
+
+    script.onload = function() {
+      const isLoaded = window.loadMathJax();
+      if (isLoaded) {
+        console.log('Styles loaded!')
+      }
+    }
+  </script>
+
+  <script>
+    function convert() {
+      const input = document.getElementById("input").value.trim();
+      const output = document.getElementById('output');
+      output.innerHTML = '';
+
+      const options = {
+        htmlTags: true
+      };
+      const html = window.markdownToHTML(input, options);
+      output.innerHTML = html;
+
+    }
+  </script>
+  <style>
+    #frame {
+      max-width: 80em;
+      margin: auto;
+    }
+    #input {
+      border: 1px solid grey;
+      margin: 0 0 .25em;
+      width: 100%;
+      font-size: 120%;
+      box-sizing: border-box;
+    }
+    #output {
+      font-size: 120%;
+      margin-top: .75em;
+      border: 1px solid grey;
+      padding: .25em;
+      min-height: 2em;
+    }
+    #output > pre {
+      margin-left: 5px;
+    }
+    .right {
+      float: right;
+    }
+  </style>
+</head>
+
+<body>
+<div id="frame">
+  <h1>Convert markdown to html </h1>
+
+  <textarea id="input" rows="15" cols="10">$x = {-b \pm \sqrt{b^2-4ac} \over 2a}$
+
+$$
+x = \frac { - b \pm \sqrt { b ^ { 2 } - 4 a c } } { 2 a }
+$$
+
+\(
+y = \frac { \sum _ { i } w _ { i } y _ { i } } { \sum _ { i } w _ { i } } , i = 1,2 \ldots k
+\)
+
+\[
+y = \frac { \sum _ { i } w _ { i } y _ { i } } { \sum _ { i } w _ { i } } , i = 1,2 \ldots k
+\]
+</textarea>
+
+  <br>
+
+  <div class="right">
+    <input type="button" value="Convert" id="render" onclick="convert()">
+  </div>
+  <br clear="all">
+  <div id="output"></div>
+
+</div>
+
+</body></html>

@@ -48,5 +48,45 @@ const indexConfig = Object.assign({}, config, {
   },
 });
 
+const bundleConfig = Object.assign({}, config,{
+  name: "bundle",
+  entry: {
+    main: [
+      '@babel/polyfill',
+      path.join(__dirname, './src/bundle.tsx'),
+    ]
+  },
+  output: {
+    path: path.resolve(__dirname, './es5/'),
+    filename: 'bundle.js',
+  },
+  module: {
+    rules: [
+      {
+        test: /\.tsx?$/,
+        include: path.resolve(__dirname, 'src'),
+        exclude: /(node_modules|bower_components|lib)/,
+        loader: 'ts-loader',
+      },
+      {
+        test: /\.js?$/,
+        include: path.resolve(__dirname, 'src'),
+        exclude: /(node_modules|bower_components)/,
+        use: {
+          loader: 'babel-loader',
+        }
+      },
+      {
+        test: /\.css$/,
+        exclude: /node_modules/,
+        use: [
+          MiniCssExtractPlugin.loader,
+          "css-loader"
+        ]
+      }
+    ]
+  }
+});
+
 // Return Array of Configurations
-module.exports = [ indexConfig ];
+module.exports = [ indexConfig, bundleConfig ];
