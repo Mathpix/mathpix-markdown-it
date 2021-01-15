@@ -477,9 +477,9 @@ node app.js
 
 ## Using mathpix-markdown-it in web browsers
 
-If you are loading mathpix-markdown-it from a CDN into a web page, there is no
+If you are loading `mathpix-markdown-it` from a CDN into a web page, there is no
 need to install anything.  Simply use a `script` tag that loads
-MathJax from the CDN.  E.g.,
+`mathpix-markdown-it` from the CDN.  E.g.,
 
 ``` html
   <script>
