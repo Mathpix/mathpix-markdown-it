@@ -4,7 +4,7 @@
 ``` html
   <script>
     let script = document.createElement('script');
-    script.src = "../../es5/bundle.js";
+    script.src = "https://cdn.jsdelivr.net/npm/mathpix-markdown-it@1.0.40/es5/bundle.js";
     document.head.append(script);
 
     script.onload = function() {
@@ -63,5 +63,3 @@ y = \frac { \sum _ { i } w _ { i } y _ { i } } { \sum _ { i } w _ { i } } , i = 
 
 </div>
 ```
-
-[Run the example](https://Mathpix.github.io/mathpix-markdown-it/examples/html/input-mmd-to-html.html)

@@ -4,7 +4,7 @@
 ``` html
   <script>
     let script = document.createElement('script');
-    script.src = "../../es5/bundle.js";
+    script.src = "https://cdn.jsdelivr.net/npm/mathpix-markdown-it@1.0.40/es5/bundle.js";
     document.head.append(script);
 
     script.onload = function() {
@@ -29,5 +29,3 @@
 ```
 <div id="content"><div id="content-text"></div></div>
 ```
-
-[Run the example](https://github.com/Mathpix/mathpix-markdown-it/tree/master/examples/html/content-mmd-to-html.html)
