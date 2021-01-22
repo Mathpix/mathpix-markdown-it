@@ -129,6 +129,23 @@ export class MathMLVisitorWord<N, T, D> extends SerializedMmlVisitor {
     if (this.needConvertToFenced(node)) {
       return this.convertToFenced(node, space)
     }
+
+    if (this.options.forDocx) {
+      if (node.kind === 'mo') {
+        if (node.properties && node.properties.hasOwnProperty('movablelimits')
+          && node.properties['movesupsub'] === true
+          && node.properties['texprimestyle'] === true
+          && node.properties['texClass'] === 1
+          && node.properties['movablelimits'] === false
+        ) {
+          if (node.attributes.attributes) {
+            node.attributes.attributes.movablelimits = false;
+          } else {
+            node.attributes.attributes = {movablelimits: false};
+          }
+        }
+      }
+    }
     return super.visitDefault(node,  space)
   }
 
