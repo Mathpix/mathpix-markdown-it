@@ -413,13 +413,19 @@ const renderSubSubsectionTitle: Renderer = token => {
   return `<span class="section-number">${token.secNumber}.</span><span class="sub_section-number">${subCount}.${++subSubCount}.</span> ${token.content}`
 };
 
-const getAuthorColumnContent = content => {
+const getAuthorColumnContent = (content, options) => {
   let res = '';
+
+  let attrStyle = options.forDocx
+    ? ' display: block; text-align: center;'
+    : '';
   content.trim().split('\\\\').forEach(item => {
-    res += `<span>${item.trim()}</span>`
-  })
+    res += attrStyle
+      ? `<span style="${attrStyle}">${item.trim()}</span>`
+      : `<span>${item.trim()}</span>`
+  });
   return res;
-}
+};
 
 const renderAuthorToken: Renderer = (token, options) => {
   const columns = token.content.split('\\and');
@@ -432,9 +438,9 @@ const renderAuthorToken: Renderer = (token, options) => {
     : '';
   columns.forEach(item => {
     if (attrStyle) {
-      res += `<p style="${attrStyle}">${getAuthorColumnContent(item)}</p>`
+      res += `<p style="${attrStyle}">${getAuthorColumnContent(item, options)}</p>`
     } else {
-      res += `<p>${getAuthorColumnContent(item)}</p>`
+      res += `<p>${getAuthorColumnContent(item, options)}</p>`
     }
   });
   if (divStyle) {

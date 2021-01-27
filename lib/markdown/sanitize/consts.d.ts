@@ -40,6 +40,8 @@ export declare const allowedAttributes: {
     img: string[];
     input: string[];
     ins: string[];
+    figure: any[];
+    figcaption: any[];
     kbd: any[];
     li: string[];
     meta: string[];

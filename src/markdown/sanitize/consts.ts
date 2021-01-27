@@ -5,7 +5,7 @@
 
 export const allowedTags = [
   'dd', 'del', 'details', 'div', 'dl', 'dt', 'h1', 'h2', 'iframe',
-  'img', 'input', 'ins', 'kbd', 'meta', 'path', 'pre', 'q', 'rp', 'rt', 'ruby',
+  'img', 'input', 'ins', 'figure', 'figcaption', 'kbd', 'meta', 'path', 'pre', 'q', 'rp', 'rt', 'ruby',
   's', 'samp', 'span', 'strike', 'sub', 'summary', 'sup', 'svg', 'tfoot', 'var'
 ];
 
@@ -48,6 +48,8 @@ export const allowedAttributes =  {
   img:        ['align', 'alt', 'border', 'height', 'hspace', 'src', 'vspace', 'width'],
   input:      ['align', 'alt', 'checked', 'disabled', 'type', 'value'],
   ins:        ['cite', 'datetime'],
+  figure:     [],
+  figcaption: [],
   kbd:        [],
   li:         ['type', 'value'],
   meta:       ['name', 'content'],
