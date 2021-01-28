@@ -164,7 +164,8 @@ const abstractBlock: RuleBlock = (state, startLine) => {
         abs = false;
         isCloseTagExist = true;
       } else {
-        resString += ' ' + lineText;
+        resString += resString ? ' ' : '';
+        resString += lineText;
       }
     } else {
       if (state.isEmpty(nextLine)) { break }
