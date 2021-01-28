@@ -1,3 +1,6 @@
+const escapeHtml = require('markdown-it/lib/common/utils').escapeHtml;
+const isSpace = require('markdown-it/lib/common/utils').isSpace;
+
 function rendererRuleInlineStyle(tokens, idx, options, env, slf) {
   const token = tokens[idx];
   let style = '';
@@ -17,6 +20,15 @@ function rendererRuleInlineStyle(tokens, idx, options, env, slf) {
   return slf.renderToken(tokens, idx, options, env, slf);
 }
 
+function rendererRuleText(tokens, idx) {
+  const ch = tokens[idx].content.charCodeAt(0);
+  if (isSpace(ch)) {
+    return escapeHtml(`&nbsp;` + tokens[idx].content.slice(1));
+  } else {
+    return escapeHtml(tokens[idx].content);
+  }
+}
+
 export function injectInlineStyles(renderer) {
   renderer.renderer.rules.paragraph_open
     = renderer.renderer.rules.heading_open
@@ -25,5 +37,7 @@ export function injectInlineStyles(renderer) {
     = renderer.renderer.rules.blockquote_open
     = renderer.renderer.rules.dl_open
     = rendererRuleInlineStyle;
+
+  renderer.renderer.rules.text = rendererRuleText;
   return renderer;
 }
