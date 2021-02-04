@@ -17,13 +17,17 @@ Here are the key benefits over plain Markdown:
 
 ![Editing an MMD file in VS Code](assets/mmd-vscode.png)
 
+# Mathpix Markdown Syntax reference
+
+Click [here](https://mathpix.com/docs/mathpix-markdown/syntax-reference) for the full syntax reference.
+
 # How to edit mmd files?
 
 Mathpix Markdown is an open format with multiple implementations:
 
-- you can use the [VS Code plugin](/docs/mathpix-markdown/how-to-mmd-vscode) (see picture above) to edit mmd files
+- you can use this Github repo and the `mathpix-markdown-it` npm library to render STEM content on your website
+- you can use the [VS Code plugin](https://mathpix.com/docs/mathpix-markdown/how-to-mmd-vscode) (see picture above) to edit mmd files
 - use can use our web editor [Snip Notes](https://snip.mathpix.com) to edit, export, and publish mmd files (with exports to pdf and docx formats)
-- you can use this Github repo to render content on your website
 - you can use our experimental static site generator [Spectra](https://github.com/mathpix/spectra) to edit local mmd files and see changes in real time
 
 # How is Mathpix Markdown different from regular Markdown?
