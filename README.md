@@ -6,12 +6,25 @@
 
 # What is Mathpix Markdown? 
 
-[mathpix-markdown](https://mathpix.com/docs/mathpix-markdown/overview) is a Markdown dialect which addresses limitations inherent in standard Markdown that appear when communicating scientific and mathematical information:
+[mathpix-markdown](https://mathpix.com/docs/mathpix-markdown/overview) is a superset of Markdown that adds helpful syntax for the STEM community, such as advanced equation, table, and chemistry support. Wherever possible, we borrow syntax from LaTeX. In other cases (such as chemistry) we invent new syntax that is backward compatible with Markdown.
 
-- lack of standardized support for math equations and math equation numbering and references
-- poor support for tables
-- no support for document elements common in academic publishing, such as abstracts, titles, and author lists
-- limited support for linking to tables, equations, and sections within a document
+Here are the key benefits over plain Markdown:
+- better equation support via LaTeX syntax (powered by MathJax), including equation numbering and referencing conventions from LaTeX
+- better support for tables, via the LaTeX tabular syntax, which allows for complex, nested tables often seen in scientific publications
+- advanced figure referencing via LaTeX syntax
+- support for abstracts, author lists, and linkable sections; these are a fact of life for academic publications
+- support for chemistry diagrams represented with SMILES markup, compatible with popular chemistry tools like Chemdraw
+
+![Editing an MMD file in VS Code](assets/mmd-vscode.png)
+
+# How to edit mmd files?
+
+Mathpix Markdown is an open format with multiple implementations:
+
+- you can use the [VS Code plugin](/docs/mathpix-markdown/how-to-mmd-vscode) (see picture above) to edit mmd files
+- use can use our web editor [Snip Notes](https://snip.mathpix.com) to edit, export, and publish mmd files (with exports to pdf and docx formats)
+- you can use this Github repo to render content on your website
+- you can use our experimental static site generator [Spectra](https://github.com/mathpix/spectra) to edit local mmd files and see changes in real time
 
 # How is Mathpix Markdown different from regular Markdown?
 
