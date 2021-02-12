@@ -47,9 +47,12 @@ const StatePushCaptionTable = (state, type: string): void => {
   token.attrs = [[`${type}-number`, num], ['class', `caption_${type}`]];
   token.children = [];
   token.content = `${type[0].toUpperCase()}${type.slice(1)} ${num}: ` + caption;
+  if (state.md.options.forLatex) {
+    token.latex = caption;
+  }
 };
 
-const StatePushPatagraphOpenTable = (state, startLine: number, nextLine: number, type: string) => {
+const StatePushPatagraphOpenTable = (state, startLine: number, nextLine: number, type: string, latex?:string) => {
   let token: Token;
   let label = state.env.label;
   let align = state.env.align;
@@ -57,6 +60,9 @@ const StatePushPatagraphOpenTable = (state, startLine: number, nextLine: number,
   let tagRef: string = '';
   let currentNumber: number = 0 ;
   token = state.push('paragraph_open', 'div', 1);
+  if (state.md.options.forLatex) {
+    token.latex = latex;
+  }
   if (!caption) {
     token.attrs = [['class', 'table ']];
   } else {
@@ -126,6 +132,7 @@ const InlineBlockBeginTable: RuleBlock = (state, startLine) => {
   let pos: number = state.bMarks[startLine] + state.tShift[startLine];
   let max: number = state.eMarks[startLine];
   let lineText: string = state.src.slice(pos, max);
+  let token;
 
   let match: RegExpMatchArray = lineText.match(openTagH);
   if (!match) {
@@ -146,7 +153,7 @@ const InlineBlockBeginTable: RuleBlock = (state, startLine) => {
   }
 
   let content = lineText.slice(match.index + match[0].length, matchE.index);
-
+  let hasAlignTagG = alignTagG.test(content);
   content = content.replace(alignTagG,'');
   matchE = content.match(captionTag);
   if (matchE) {
@@ -172,7 +179,11 @@ const InlineBlockBeginTable: RuleBlock = (state, startLine) => {
   state.env.label = label;
   state.env.caption = caption;
   state.env.align = align;
-  StatePushPatagraphOpenTable(state, startLine, startLine+1, type);
+  StatePushPatagraphOpenTable(state, startLine, startLine+1, type, match[0]);
+  if (state.md.options.forLatex && hasAlignTagG) {
+    token = state.push('latex_align', '', 0);
+    token.latex = '\\centering';
+  }
   if (captionFirst) {
     StatePushCaptionTable(state, type);
   }
@@ -182,7 +193,14 @@ const InlineBlockBeginTable: RuleBlock = (state, startLine) => {
   if (!captionFirst) {
     StatePushCaptionTable(state, type);
   }
-  state.push('paragraph_close', 'div', -1);
+  if (state.md.options.forLatex && label) {
+    token = state.push('latex_label', '', 0);
+    token.latex = label;
+  }
+  token = state.push('paragraph_close', 'div', -1);
+  if (state.md.options.forLatex && match && match[1]) {
+    token.latex = `\\end{${match[1]}}`
+  }
   state.line = startLine+1;
   return true;
 };
@@ -190,6 +208,7 @@ const InlineBlockBeginTable: RuleBlock = (state, startLine) => {
 export const BeginTable: RuleBlock = (state, startLine, endLine) => {
   let pos: number = state.bMarks[startLine] + state.tShift[startLine];
   let max: number = state.eMarks[startLine];
+  let token;
 
   let nextLine: number = startLine + 1;
   let lineText: string = state.src.slice(pos, max);
@@ -271,7 +290,7 @@ export const BeginTable: RuleBlock = (state, startLine, endLine) => {
     resText += lineText.slice(0, matchE.index);
     pE = matchE.index
   }
-
+  let hasAlignTagG = alignTagG.test(resText);
   content = resText.replace(alignTagG,'');
   matchE = content.match(captionTag);
   if (matchE) {
@@ -297,8 +316,11 @@ export const BeginTable: RuleBlock = (state, startLine, endLine) => {
   state.env.label = label;
   state.env.caption = caption;
   state.env.align = align;
-  StatePushPatagraphOpenTable(state, startLine, (pE > 0) ? nextLine  : nextLine + 1, type);
-
+  StatePushPatagraphOpenTable(state, startLine, (pE > 0) ? nextLine  : nextLine + 1, type, match[0]);
+  if (state.md.options.forLatex && hasAlignTagG) {
+    token = state.push('latex_align', '', 0);
+    token.latex = '\\centering';
+  }
   if (captionFirst) {
     StatePushCaptionTable(state, type);
   }
@@ -317,7 +339,14 @@ export const BeginTable: RuleBlock = (state, startLine, endLine) => {
   if (!captionFirst) {
     StatePushCaptionTable(state, type);
   }
-  state.push('paragraph_close', 'div', -1);
+  if (state.md.options.forLatex && label) {
+    token = state.push('latex_label', '', 0);
+    token.latex = label;
+  }
+  token = state.push('paragraph_close', 'div', -1);
+  if (state.md.options.forLatex && match && match[1]) {
+    token.latex = `\\end{${match[1]}}`
+  }
   state.line = nextLine;
   return true;
 };

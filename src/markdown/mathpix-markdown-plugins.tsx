@@ -16,14 +16,15 @@ import {
 } from "./mdPluginConfigured";
 
 export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
-  const {width = 1200,  outMath = {}, smiles = {}, mathJax = {}, renderElement = {}, forDocx = false} = options;
+  const {width = 1200,  outMath = {}, smiles = {}, mathJax = {}, renderElement = {}, forDocx = false, forLatex = false} = options;
   Object.assign(md.options, smiles);
   Object.assign(md.options, {
     width: width,
     outMath: outMath,
     mathJax: mathJax,
     renderElement: renderElement,
-    forDocx: forDocx
+    forDocx: forDocx,
+    forLatex: forLatex
   });
 
   md

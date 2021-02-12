@@ -22,6 +22,7 @@ export interface optionsMathpixMarkdown {
     htmlSanitize?: THtmlSanitize;
     smiles?: ISmilesOptions;
     forDocx?: boolean;
+    forLatex?: boolean;
     openLinkInNewWindow?: boolean;
 }
 export declare type TMarkdownItOptions = {
@@ -45,6 +46,7 @@ export declare type TMarkdownItOptions = {
     htmlSanitize?: THtmlSanitize;
     smiles?: ISmilesOptions;
     forDocx?: boolean;
+    forLatex?: boolean;
     openLinkInNewWindow?: boolean;
 };
 export declare type TOutputMath = {

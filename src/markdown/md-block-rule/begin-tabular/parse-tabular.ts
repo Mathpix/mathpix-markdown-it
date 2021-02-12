@@ -46,7 +46,7 @@ const getRows = (str: string): string[] => {
   return str.split('\\\\');
 };
 
-const setTokensTabular = (str: string, align: string = ''): Array<TTokenTabular>|null => {
+const setTokensTabular = (str: string, align: string = '', options: any = {}): Array<TTokenTabular>|null => {
   let res: Array<TTokenTabular> = [];
   const rows: string[] = getRows(str);
 
@@ -60,15 +60,23 @@ const setTokensTabular = (str: string, align: string = ''): Array<TTokenTabular>
   const cLines: Array<string> = getColumnLines(align, numCol);
   const {cAlign, vAlign, cWidth} = dataAlign;
   const decimal: Array<TDecimal> = getDecimal(cAlign, cellsAll);
+  const { forLatex = false } = options;
 
-  res.push({token:'table_open', tag: 'table', n: 1, attrs: [[ 'id', 'tabular' ]]});
-  res.push({token:'tbody_open', tag: 'tbody', n: 1});
+  res.push({token:'table_open', type:'table_open', tag: 'table', n: 1,
+    attrs: [[ 'id', 'tabular' ]],
+    latex: forLatex ? align : ''
+  });
+  res.push({token:'tbody_open', type:'tbody_open', tag: 'tbody', n: 1});
+
 
   let MR: Array<number> = new Array(numCol).fill(0);
   for (let i = 0; i < rows.length; i++) {
     if (!cellsAll[i] || cellsAll[i].length === 0) {
       if (i < cellsAll.length-1) {
-        res.push({token:'tr_open', tag: 'tr', n: 1, attrs: [[ 'style', 'border-top: none !important; border-bottom: none !important;' ]]});
+        res.push({token:'tr_open', type:'tr_open', tag: 'tr', n: 1,
+          attrs: [[ 'style', 'border-top: none !important; border-bottom: none !important;' ]],
+          latex: forLatex && data && data.sLines && data.sLines.length > i ? data.sLines[i] : ''
+        });
         for (let k = 0; k < numCol; k++) {
           let cRight = k === numCol-1 ?  cLines[cLines.length-1] :cLines[k+1];
           let cLeft = k === 0 ? cLines[0] : '';
@@ -79,11 +87,14 @@ const setTokensTabular = (str: string, align: string = ''): Array<TTokenTabular>
           );
           res = res.concat(data.res);
         }
-        res.push({token:'tr_close', tag: 'tr', n: -1});
+        res.push({token:'tr_close', type:'tr_close', tag: 'tr', n: -1});
       }
       continue;
     }
-    res.push({token:'tr_open', tag: 'tr', n: 1, attrs: [[ 'style', 'border-top: none !important; border-bottom: none !important;' ]]});
+    res.push({token:'tr_open', type:'tr_open', tag: 'tr', n: 1,
+      attrs: [[ 'style', 'border-top: none !important; border-bottom: none !important;' ]],
+      latex: forLatex && data && data.sLines && data.sLines.length > i ? data.sLines[i] : ''
+    });
 
     let cells = separateByColumns(cellsAll[i]);
     for (let j = 0; j < numCol; j++) {
@@ -138,6 +149,10 @@ const setTokensTabular = (str: string, align: string = ''): Array<TTokenTabular>
           } else {
             MR[ic] = MR[ic] > 0 ? MR[ic] - 1 : 0;
             if (MR[ic] && MR[ic] > 0) {
+              if (forLatex) {
+                res.push({token:'td_skip', type:'td_skip', tag: 'td', n: -1,
+                  latex: multi && multi.latex ? multi.latex : ''});
+              }
               continue
             }
           }
@@ -170,6 +185,10 @@ const setTokensTabular = (str: string, align: string = ''): Array<TTokenTabular>
             }
 
             if (MR[ic] && MR[ic] > 0) {
+              if (forLatex) {
+                res.push({token:'td_skip', type:'td_skip', tag: 'td', n: -1,
+                  latex: multi && multi.latex ? multi.latex : ''});
+              }
               continue
             }
 
@@ -185,22 +204,27 @@ const setTokensTabular = (str: string, align: string = ''): Array<TTokenTabular>
             multi.attrs = addHLineIntoStyle(multi.attrs, CellsHLines[i+1] ? CellsHLines[i+1][ic] : 'none');
           }
 
-          res.push({token:'td_open', tag: 'td', n: 1, attrs: multi.attrs});
+          res.push({token:'td_open', type:'td_open', tag: 'td', n: 1, attrs: multi.attrs,
+            latex: forLatex && multi && multi.latex ? multi.latex : ''});
           if (multi.subTable) {
             res = res.concat(multi.subTable);
           } else {
             if (multi.content) {
-              res.push({token:'inline', tag: '', n: 0, content: multi.content});
+              res.push({token:'inline', type:'inline', tag: '', n: 0, content: multi.content});
             }
           }
 
-          res.push({token:'td_close', tag: 'td', n: -1});
+          res.push({token:'td_close', type:'td_close', tag: 'td', n: -1});
           continue;
         }
 
         MR[ic] = MR[ic] > 0 ? MR[ic] - 1 : 0;
 
         if (MR[ic] && MR[ic] > 0) {
+          if (forLatex) {
+            res.push({token:'td_skip', type:'td_skip', tag: 'td', n: -1,
+              latex: multi && multi.latex ? multi.latex : ''});
+          }
           continue
         }
 
@@ -232,6 +256,9 @@ const setTokensTabular = (str: string, align: string = ''): Array<TTokenTabular>
       } else {
         MR[ic] = MR[ic] > 0 ? MR[ic] - 1 : 0;
         if (MR[ic] && MR[ic] > 0) {
+          if (forLatex) {
+            res.push({token:'td_skip', type:'td_skip', tag: 'td', n: -1});
+          }
           continue
         }
         const data = AddTd('',
@@ -244,14 +271,16 @@ const setTokensTabular = (str: string, align: string = ''): Array<TTokenTabular>
       }
 
     }
-    res.push({token:'tr_close', tag: 'tr', n: -1});
+    res.push({token:'tr_close', type:'tr_close', tag: 'tr', n: -1});
   }
-  res.push({token:'tbody_close', tag: 'tbody', n: -1});
-  res.push({token:'table_close', tag: 'table', n: -1});
+  res.push({token:'tbody_close', type:'tbody_close', tag: 'tbody', n: -1,
+    latex: forLatex && data && data.sLines && data.sLines.length ? data.sLines[data.sLines.length-1] : ''
+  });
+  res.push({token:'table_close', type:'table_close', tag: 'table', n: -1});
   return res;
 };
 
-export const ParseTabular = (str: string, i: number, align: string=''): Array<TTokenTabular> | null => {
+export const ParseTabular = (str: string, i: number, align: string='', options = {}): Array<TTokenTabular> | null => {
   let res: Array<TTokenTabular> = [];
   let posEnd: number = str.indexOf('\\end{tabular}');
   if (posEnd > 0) {
@@ -262,7 +291,7 @@ export const ParseTabular = (str: string, i: number, align: string=''): Array<TT
       if (params) {
         const subT = str.slice(posBegin, posEnd+ '\\end{tabular}'.length);
         str = pushSubTabular(str, subT, posBegin, posEnd, i);
-        res = ParseTabular(str, 0, align);
+        res = ParseTabular(str, 0, align, options);
       } else {
         let match = str
           .slice(posBegin)
@@ -270,16 +299,16 @@ export const ParseTabular = (str: string, i: number, align: string=''): Array<TT
 
         const subT = str.slice(posBegin, posEnd + '\\end{tabular}'.length);
         str = pushSubTabular(str, subT, posBegin + match.index, posEnd, i);
-        res = ParseTabular(str, 0, align);
+        res = ParseTabular(str, 0, align, options);
       }
     } else {
       const subT = str.slice(i, posEnd);
-      const subRes: Array<TTokenTabular> = setTokensTabular(subT, align);
+      const subRes: Array<TTokenTabular> = setTokensTabular(subT, align, options);
       str = pushSubTabular(str, subRes, 0, posEnd);
-      res = ParseTabular(str, 0, align);
+      res = ParseTabular(str, 0, align, options);
     }
   } else {
-    res = setTokensTabular(str, align);
+    res = setTokensTabular(str, align, options);
   }
   return res;
 };

@@ -50,6 +50,13 @@ const InlineBlockBeginAlign: RuleBlock = (state, startLine) => {
     [ 'class', 'center' ],
     [ 'style', `text-align: ${align ? align : 'center'}`]
   ];
+  if (state.md.options.forLatex) {
+    if (align && ['left', 'right'].includes(align)) {
+      token.latex = `\\begin{flush${align}}`;
+    } else {
+      token.latex = `\\begin{${align ? align : 'center'}}`
+    }
+  }
   token.map    = [startLine, startLine + 1];
   if (pB > 0) {
     state.tShift[startLine] = pB;
@@ -69,6 +76,13 @@ const InlineBlockBeginAlign: RuleBlock = (state, startLine) => {
     }
   }
   token = state.push('paragraph_close', 'div', -1);
+  if (state.md.options.forLatex) {
+    if (align && ['left', 'right'].includes(align)) {
+      token.latex = `\\end{flush${align}}`;
+    } else {
+      token.latex = `\\end{${align ? align : 'center'}}`
+    }
+  }
 
   state.line = startLine+1;
   return true;
@@ -153,6 +167,13 @@ export const BeginAlign: RuleBlock = (state, startLine, endLine) => {
     [ 'class', 'center' ],
     [ 'style', `text-align: ${align ? align : 'center'}`]
   ];
+  if (state.md.options.forLatex) {
+    if (align && ['left', 'right'].includes(align)) {
+      token.latex = `\\begin{flush${align}}`;
+    } else {
+      token.latex = `\\begin{${align ? align : 'center'}}`
+    }
+  }
   token.map    = [startLine, (pE > 0) ? nextLine : nextLine + 1];
 
   if (pB > 0) {
@@ -177,6 +198,13 @@ export const BeginAlign: RuleBlock = (state, startLine, endLine) => {
   }
 
   token = state.push('paragraph_close', 'div', -1);
+  if (state.md.options.forLatex) {
+    if (align && ['left', 'right'].includes(align)) {
+      token.latex = `\\end{flush${align}}`;
+    } else {
+      token.latex = `\\end{${align ? align : 'center'}}`
+    }
+  }
   state.line = nextLine;
   return true;
 };

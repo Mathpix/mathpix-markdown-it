@@ -387,6 +387,10 @@ export const Lists:RuleBlock = (state, startLine: number, endLine: number, silen
     lineText = state.src.slice(pos, max);
     if (setcounterTag.test(lineText)) {
       match = lineText.match(setcounterTag);
+      if (match && state.md.options && state.md.options.forLatex) {
+        let token = state.push("setcounter", "", 0);
+        token.latex = match[0].trim();
+      }
       if (match && match[2]) {
         let sE = match.index + match[0].length < lineText.length
           ?  lineText.slice(match.index + match[0].length)

@@ -32,6 +32,7 @@ export interface optionsMathpixMarkdown {
     htmlSanitize?: THtmlSanitize;
     smiles?: ISmilesOptions;
     forDocx?: boolean;
+    forLatex?: boolean;
     openLinkInNewWindow?: boolean;
 }
 
@@ -56,6 +57,7 @@ export type TMarkdownItOptions = {
   htmlSanitize?: THtmlSanitize;
   smiles?: ISmilesOptions;
   forDocx?: boolean;
+  forLatex?: boolean;
   openLinkInNewWindow?: boolean;
 }
 

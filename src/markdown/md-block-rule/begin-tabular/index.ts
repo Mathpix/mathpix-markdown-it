@@ -13,11 +13,11 @@ const closeTagG: RegExp = /(?:\\end\s{0,}{tabular})/g;
 type TTypeContent = {type?: string, content?: string, align?: string}
 type TTypeContentList = Array<TTypeContent>;
 export type TAttrs = string[];
-export type TTokenTabular = {token: string, tag: string, n: number, content?: string,
-  attrs?: Array<TAttrs>, children?: Token, id?: string, ascii?: string};
+export type TTokenTabular = {token: string, type: string, tag: string, n: number, content?: string,
+  attrs?: Array<TAttrs>, children?: Token, id?: string, ascii?: string, latex?: string};
 
 
-export type TMulti = {mr?: number, mc?: number, attrs: Array<TAttrs>, content?: string, subTable?: Array<TTokenTabular>}
+export type TMulti = {mr?: number, mc?: number, attrs: Array<TAttrs>, content?: string, subTable?: Array<TTokenTabular>, latex: string}
 
 const addContentToList = (str: string): TTypeContentList => {
   let res: TTypeContentList = [];
@@ -156,7 +156,7 @@ export const StatePushTabulars = (state, cTabular: TTypeContentList, align: stri
     token.content = cTabular[i].content;
     token.children = [];
 
-    const res: Array<TTokenTabular> | null = ParseTabular(cTabular[i].content, 0, cTabular[i].align);
+    const res: Array<TTokenTabular> | null = ParseTabular(cTabular[i].content, 0, cTabular[i].align, state.md.options);
     if (!res || res.length === 0) {
       continue;
     }

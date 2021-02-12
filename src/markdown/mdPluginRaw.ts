@@ -208,9 +208,19 @@ function multiMath(state, silent) {
 
   if (!silent) {
     const token = state.push(type, "", 0);
+    if (state.md.options.forLatex) {
+      if (match[1]) {
+        token.markup = match[1];
+      } else {
+        token.markup = endMarker;
+      }
+    }
     if (includeMarkers) {
       token.content = state.src.slice(state.pos, nextPos);
     } else if (type === "reference_note") {
+      if (state.md.options.forLatex) {
+        token.markup = match[0];
+      }
       token.content = match ? match[2] || match[3] : "";
     } else {
       token.content = state.src.slice(startMathPos, endMarkerPos);
@@ -368,6 +378,9 @@ function simpleMath(state, silent) {
     token.content = state.src.slice(startMathPos, endMarkerPos);
     if (state.env.tabulare) {
       token.return_asciimath = true;
+    }
+    if (state.md.options.forLatex) {
+      token.markup = endMarker;
     }
   }
   state.pos = nextPos;
