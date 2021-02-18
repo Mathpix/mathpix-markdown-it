@@ -179,7 +179,10 @@ const InlineBlockBeginTable: RuleBlock = (state, startLine) => {
   state.env.label = label;
   state.env.caption = caption;
   state.env.align = align;
-  StatePushPatagraphOpenTable(state, startLine, startLine+1, type, match[0]);
+  let latex = match[1] === 'figure' || match[1] === 'table'
+    ? `\\begin{${match[1]}}[h]`
+    : match[0];
+  StatePushPatagraphOpenTable(state, startLine, startLine+1, type, latex);
   if (state.md.options.forLatex && hasAlignTagG) {
     token = state.push('latex_align', '', 0);
     token.latex = '\\centering';
@@ -316,7 +319,10 @@ export const BeginTable: RuleBlock = (state, startLine, endLine) => {
   state.env.label = label;
   state.env.caption = caption;
   state.env.align = align;
-  StatePushPatagraphOpenTable(state, startLine, (pE > 0) ? nextLine  : nextLine + 1, type, match[0]);
+  let latex = match[1] === 'figure' || match[1] === 'table'
+    ? `\\begin{${match[1]}}[h]`
+    : match[0];
+  StatePushPatagraphOpenTable(state, startLine, (pE > 0) ? nextLine  : nextLine + 1, type, latex);
   if (state.md.options.forLatex && hasAlignTagG) {
     token = state.push('latex_align', '', 0);
     token.latex = '\\centering';
