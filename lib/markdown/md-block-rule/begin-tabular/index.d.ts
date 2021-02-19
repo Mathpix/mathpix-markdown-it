@@ -11,6 +11,7 @@ declare type TTypeContentList = Array<TTypeContent>;
 export declare type TAttrs = string[];
 export declare type TTokenTabular = {
     token: string;
+    type: string;
     tag: string;
     n: number;
     content?: string;
@@ -18,6 +19,7 @@ export declare type TTokenTabular = {
     children?: Token;
     id?: string;
     ascii?: string;
+    latex?: string;
 };
 export declare type TMulti = {
     mr?: number;
@@ -25,6 +27,7 @@ export declare type TMulti = {
     attrs: Array<TAttrs>;
     content?: string;
     subTable?: Array<TTokenTabular>;
+    latex: string;
 };
 export declare const parseInlineTabular: (str: string) => TTypeContentList | null;
 export declare const inlineDecimalParse: (tok: TTokenTabular) => TTokenTabular;

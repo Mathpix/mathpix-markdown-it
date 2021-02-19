@@ -93,6 +93,9 @@ const headingSection: RuleBlock = (state, startLine: number/*, endLine*/) => {
   state.line = startLine + 1;
 
   token = state.push('heading_open', 'h' + String(level), 1);
+  if (state.md.options.forLatex) {
+    token.latex = type;
+  }
   token.markup = '########'.slice(0, level);
   token.map = [startLine, state.line];
   token.attrJoin('type', type);
@@ -120,6 +123,9 @@ const headingSection: RuleBlock = (state, startLine: number/*, endLine*/) => {
 
   token = state.push('heading_close', 'h' + String(level), -1);
   token.markup = '########'.slice(0, level);
+  if (state.md.options.forLatex) {
+    token.latex = type;
+  }
   return true;
 };
 

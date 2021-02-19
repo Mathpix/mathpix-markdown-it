@@ -1,6 +1,6 @@
 import {separateByColumns} from "./parse-tabular";
 
-export type TParselines = {cLines: Array<Array<string>>, cSpaces: Array<Array<string>>}
+export type TParselines = {cLines: Array<Array<string>>, cSpaces: Array<Array<string>>, sLines: Array<string>}
 const lineSpaceTag: RegExp = /\[(.*?)\]\s{0,}\\hline|\[(.*?)\]\s{0,}\\hhline|\[(.*?)\]\s{0,}\\hdashline|\[(.*?)\]\s{0,}\\cline\s{0,}\{([^}]*)\}|\\hline|\\hhline|\\hdashline|\\cline\s{0,}\{([^}]*)\}|^\[(.*?)\]/g;
 
 export const getContent = (content: string, onlyOne: boolean = false): string => {
@@ -225,13 +225,16 @@ export const getRowLines = (rows: string[], numCol: number): TParselines => {
   const resSpace: Array<Array<string>> = [];
   const clineTag: RegExp = /\\cline\s{0,}\{([^}]*)\}/;
   const clineSpaceTag: RegExp = /\[(.*?)\]\s{0,}\\cline\s{0,}\{([^}]*)\}/;
+  const sLines = [];
   for (let i = 0; i < rows.length; i++) {
     let matchR = rows[i].split('\n').join('').trim().match(lineSpaceTag);
     if (!matchR) {
       res[i] = new Array(numCol).fill('none');
       resSpace[i] = new Array(numCol).fill('none');
+      sLines.push('');
       continue;
     }
+    sLines.push(matchR.join(''));
     let str = matchR.join(' ');
     if (!clineTag.test(str)) {
       let mS = str.match(/\[(.*?)\]/);
@@ -279,5 +282,5 @@ export const getRowLines = (rows: string[], numCol: number): TParselines => {
     res[res.length] = new Array(numCol).fill('none');
   }
   resSpace[resSpace.length] = new Array(numCol).fill('none');
-  return {cLines: res, cSpaces: resSpace};
+  return {cLines: res, cSpaces: resSpace, sLines: sLines};
 };

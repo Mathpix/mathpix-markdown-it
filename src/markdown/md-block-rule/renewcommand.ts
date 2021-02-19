@@ -85,7 +85,10 @@ export const ReNewCommand:RuleBlock = (state, startLine: number) => {
     }
   }
   reNewCommand(state, lineText.slice(match.index).trim());
-
+  if (state.md.options && state.md.options.forLatex) {
+    let token = state.push("renewcommand", "", 0);
+    token.latex = lineText.slice(match.index).trim();
+  }
   state.line = nextLine;
   return true
 

@@ -191,8 +191,9 @@ const renderSmilesDrawerBlock = (tokens, idx, options, env, slf) => {
     : '';
 
 
-  if ( resSvg && options.forDocx ) {
-    resSvg = convertSvgToBase64(resSvg);
+  if ( resSvg && (options.forDocx || options.forLatex ) ) {
+    const imgId = options.forLatex ? id : '';
+    resSvg = convertSvgToBase64(resSvg, imgId);
   }
 
   const attrs = options?.lineNumbering
@@ -223,8 +224,9 @@ const renderSmilesDrawerInline = (tokens, idx, options, env, slf) => {
     ? ChemistryDrawer.drawSvgSync(token.content.trim(), id, options)
     : '';
 
-  if ( resSvg && options.forDocx ) {
-    resSvg = convertSvgToBase64(resSvg);
+  if ( resSvg && (options.forDocx || options.forLatex ) ) {
+    const imgId = options.forLatex ? id : '';
+    resSvg = convertSvgToBase64(resSvg, imgId);
   }
 
   const outputSmiles = include_smiles

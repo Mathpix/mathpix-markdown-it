@@ -23,7 +23,11 @@ export const reNewCommandInLine: RuleInline = (state, silent) => {
   if (!match){ return false}
 
   const endPos = parseOneCommand(state, state.src.slice(startMathPos + match[0].length));
-
+  if (state.md.options && state.md.options.forLatex) {
+    let token = state.push("renewcommand", "", 0);
+    token.latex = state.src.slice(startMathPos + match[0].length)
+      .trim();
+  }
   state.pos = startMathPos + match[0].length + endPos + 1;
   return true;
 };

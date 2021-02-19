@@ -79,10 +79,18 @@ export const getMultiColumnMultiRow = (str: string, params: {lLines: string, ali
   if(!matchMC && !matchMR) {
     return null
   }
-
+  let latex = '';
+  if (matchMC) {
+    latex += matchMC[0].trim()
+  }
+  if (matchMR) {
+    latex += latex
+      ? `{${matchMR[0].trim()}}`
+      : matchMR[0].trim();
+  }
   const parseSub: Array<TTokenTabular>  = getSubTabular(str, 0);
   if (parseSub) {
-    return {mr: mr, mc: mc, attrs: attrs, content: '', subTable: parseSub}
+    return {mr: mr, mc: mc, attrs: attrs, content: '', subTable: parseSub, latex: latex}
   }
 
   const parseMath: string = getMathTableContent(str, 0);
@@ -92,5 +100,5 @@ export const getMultiColumnMultiRow = (str: string, params: {lLines: string, ali
   } else {
     content = getContent(str)
   }
-  return {mr: mr, mc: mc, attrs: attrs, content: content, subTable: null}
+  return {mr: mr, mc: mc, attrs: attrs, content: content, subTable: null, latex: latex}
 };

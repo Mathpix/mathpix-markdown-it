@@ -94,22 +94,25 @@ export const AddTd = (content: string, aligns: TAligns| null, lines: TLines, spa
     attrs.push(['class', '_empty'])
   }
   content = content.split('\n').join(' ');
-  res.push({token:'td_open', tag: 'td', n: 1, attrs: attrs});
+  res.push({token:'td_open', type:'td_open', tag: 'td', n: 1, attrs: attrs});
   if (content) {
     if (decimal && parseFloat(content)) {
       let arr = content.split('.');
       let fr: string = (arr[1] ? new Array(decimal.r- arr[1].length).fill(0) : new Array(decimal.r).fill(0)).join('');
       let fl: string = (arr[0] ? new Array(decimal.l- arr[0].length).fill(0) : new Array(decimal.l).fill(0)).join('');
       if (arr[1]) {
-        res.push({token:'inline_decimal', tag: '', n: 0, content: `${fl};${content};${fr}`, ascii: content});
+        res.push({token:'inline_decimal', type:'inline_decimal', tag: '', n: 0, content: `${fl};${content};${fr}`,
+          ascii: content,
+          latex: content});
       } else {
-        res.push({token:'inline_decimal', tag: '', n: 0, content: `${fl};${content};.${fr}`, ascii: content});
+        res.push({token:'inline_decimal', type:'inline_decimal', tag: '', n: 0, content: `${fl};${content};.${fr}`, ascii: content,
+          latex: content});
       }
     } else {
-      res.push({token:'inline', tag: '', n: 0, content: content});
+      res.push({token:'inline', type:'inline', tag: '', n: 0, content: content});
     }
   }
-  res.push({token:'td_close', tag: 'td', n: -1});
+  res.push({token:'td_close', type:'td_close', tag: 'td', n: -1});
   return {res: res, content: content};
 };
 
@@ -120,8 +123,8 @@ export const AddTdSubTable = (subTable: Array<TTokenTabular>, aligns: TAligns, l
 
   attrs.push(slyleLines);
 
-  res.push({token:'td_open', tag: 'td', n: 1, attrs: attrs});
+  res.push({token:'td_open', type:'td_open', tag: 'td', n: 1, attrs: attrs});
   res = res.concat(subTable);
-  res.push({token:'td_close', tag: 'td', n: -1});
+  res.push({token:'td_close', type:'td_close', tag: 'td', n: -1});
   return res;
 };

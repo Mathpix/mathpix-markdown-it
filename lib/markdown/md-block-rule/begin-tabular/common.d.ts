@@ -1,6 +1,7 @@
 export declare type TParselines = {
     cLines: Array<Array<string>>;
     cSpaces: Array<Array<string>>;
+    sLines: Array<string>;
 };
 export declare const getContent: (content: string, onlyOne?: boolean) => string;
 export declare const getColumnLines: (str: string, numCol?: number) => Array<string>;

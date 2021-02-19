@@ -44,7 +44,7 @@ const getAttrIncludeGraphics = (match: RegExpMatchArray, align: string) =>  {
   if (styles) {
     attrs = attrs.concat(styles.attr);
   }
-  return attrs;
+  return { attrs, latex: params };
 };
 
 export const ParseIncludeGraphics = (str: string, i: number, align: string='') => {
@@ -65,11 +65,11 @@ export const ParseIncludeGraphics = (str: string, i: number, align: string='') =
       res.push({token: 'inline', tag: '', n: 0,  content: str.slice(posB, posB + match.index), pos: posB + match.index});
     }
 
-    const attrs = getAttrIncludeGraphics(match, align);
+    const { attrs, latex } = getAttrIncludeGraphics(match, align);
 
     posB += match.index + match[0].length;
     i = posB;
-    res.push({token: 'includegraphics', tag: 'img', n: 0, attrs: attrs, content: '', pos: posB});
+    res.push({token: 'includegraphics', tag: 'img', n: 0, attrs: attrs, content: '', pos: posB, latex: latex});
   }
   return res;
 };
@@ -93,6 +93,9 @@ export const StatePushIncludeGraphics = (state, startLine: number, nextLine: num
       token.content  = res[j].content;
       token.children = [];
     }
+    if (state.md.options.forLatex && res[j].latex) {
+      token.latex = res[j].latex;
+    }
   }
   return true;
 };
@@ -111,12 +114,15 @@ export const InlineIncludeGraphics = (state, silent) => {
   }
 
 
-  const attrs = getAttrIncludeGraphics(match, '');
+  const { attrs, latex } = getAttrIncludeGraphics(match, '');
 
   if (!silent) {
     const token = state.push( "includegraphics", "img", 0);
     token.attrs = attrs;
     token.content = '';
+    if (state.md.options.forLatex) {
+      token.latex = latex;
+    }
   }
   state.pos = startMathPos + match.index + match[0].length;
   return true;
