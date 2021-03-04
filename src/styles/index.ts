@@ -24,7 +24,7 @@ export const MathpixStyle = (setTextAlignJustify: boolean = true, useColors: boo
     #preview-content > div {
         margin-top: 0;
         margin-bottom: 1em;
-        text-align: justify;
+        ${setTextAlignJustify ? 'text-align: justify;' : ''}
     }
 
     #preview-content table {
