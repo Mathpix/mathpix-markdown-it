@@ -324,7 +324,7 @@ module.exports = [
   {
     id: "6",
     smiles: "<smiles>F[Cn](=O)(=O)=O</smiles>",
-    svg: `<div><div class="smiles-inline" style="display: inline-block"><svg id="smiles-" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 147 104.99999999999365" style="width: 146.99999999999363px; overflow: visible;"><defs><linearGradient id="line-0" gradientUnits="userSpaceOnUse" x1="73.49999999999683" y1="52.49999999999683" x2="104.99999999999366" y2="52.50001413730401"><stop stop-color="#222" offset="20%"></stop><stop stop-color="#222" offset="100%"></stop></linearGradient><linearGradient id="line-1" gradientUnits="userSpaceOnUse" x1="42.00000127235764" y1="49.66498586268993" x2="73.50000127235447" y2="49.66499999999711"><stop stop-color="#222" offset="20%"></stop><stop stop-color="#222" offset="100%"></stop></linearGradient><linearGradient id="line-2" gradientUnits="userSpaceOnUse" x1="41.99999872764236" y1="55.334985862689365" x2="73.49999872763918" y2="55.33499999999654"><stop stop-color="#222" offset="20%"></stop><stop stop-color="#222" offset="100%"></stop></linearGradient><linearGradient id="line-3" gradientUnits="userSpaceOnUse" x1="76.33499999999654" y1="52.50000127235447" x2="76.33501413730372" y2="21.000001272357647"><stop stop-color="#222" offset="20%"></stop><stop stop-color="#222" offset="100%"></stop></linearGradient><linearGradient id="line-4" gradientUnits="userSpaceOnUse" x1="70.66499999999712" y1="52.49999872763918" x2="70.6650141373043" y2="20.999998727642353"><stop stop-color="#222" offset="20%"></stop><stop stop-color="#222" offset="100%"></stop></linearGradient><linearGradient id="line-5" gradientUnits="userSpaceOnUse" x1="70.66498586268993" y1="83.999998727636" x2="70.66499999999712" y2="52.49999872763918"><stop stop-color="#222" offset="20%"></stop><stop stop-color="#222" offset="100%"></stop></linearGradient><linearGradient id="line-6" gradientUnits="userSpaceOnUse" x1="76.33498586268936" y1="84.0000012723513" x2="76.33499999999654" y2="52.50000127235447"><stop stop-color="#222" offset="20%"></stop><stop stop-color="#222" offset="100%"></stop></linearGradient></defs><mask id="text-mask"><rect x="0" y="0" width="100%" height="100%" fill="white"></rect><circle cx="104.99999999999366" cy="52.50001413730401" r="6.5625" fill="black"></circle><circle cx="73.49999999999683" cy="52.49999999999683" r="6.5625" fill="black"></circle><circle cx="42" cy="52.49998586268964" r="6.5625" fill="black"></circle><circle cx="73.500014137304" cy="21" r="6.5625" fill="black"></circle><circle cx="73.49998586268964" cy="83.99999999999365" r="6.5625" fill="black"></circle></mask><style>
+    svg: `<div><div class="smiles-inline" style="display: inline-block"><svg id="smiles-" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 147 104.99999999999365" style="width: 146.99999999999363px; overflow: visible;"><defs><linearGradient id="line-0" gradientUnits="userSpaceOnUse" x1="73.49999999999683" y1="52.49999999999683" x2="104.99999999999366" y2="52.50001413730401"><stop stop-color="#222" offset="20%"></stop><stop stop-color="#222" offset="100%"></stop></linearGradient><linearGradient id="line-1" gradientUnits="userSpaceOnUse" x1="42.00000127235764" y1="49.66498586268993" x2="73.50000127235447" y2="49.66499999999711"><stop stop-color="#222" offset="20%"></stop><stop stop-color="#222" offset="100%"></stop></linearGradient><linearGradient id="line-2" gradientUnits="userSpaceOnUse" x1="41.99999872764236" y1="55.334985862689365" x2="73.49999872763918" y2="55.33499999999654"><stop stop-color="#222" offset="20%"></stop><stop stop-color="#222" offset="100%"></stop></linearGradient><linearGradient id="line-3" gradientUnits="userSpaceOnUse" x1="76.33499999999654" y1="52.50000127235447" x2="76.33501413730372" y2="21.000001272357647"><stop stop-color="#222" offset="20%"></stop><stop stop-color="#222" offset="100%"></stop></linearGradient><linearGradient id="line-4" gradientUnits="userSpaceOnUse" x1="70.66499999999712" y1="52.49999872763918" x2="70.6650141373043" y2="20.999998727642353"><stop stop-color="#222" offset="20%"></stop><stop stop-color="#222" offset="100%"></stop></linearGradient><linearGradient id="line-5" gradientUnits="userSpaceOnUse" x1="70.66498586268993" y1="83.999998727636" x2="70.66499999999712" y2="52.49999872763918"><stop stop-color="#222" offset="20%"></stop><stop stop-color="#222" offset="100%"></stop></linearGradient><linearGradient id="line-6" gradientUnits="userSpaceOnUse" x1="76.33498586268936" y1="84.0000012723513" x2="76.33499999999654" y2="52.50000127235447"><stop stop-color="#222" offset="20%"></stop><stop stop-color="#222" offset="100%"></stop></linearGradient></defs><mask id="text-mask"><rect x="0" y="0" width="100%" height="100%" fill="white"></rect><circle cx="104.99999999999366" cy="52.50001413730401" r="6.5625" fill="black"></circle><circle cx="73.49999999999683" cy="52.49999999999683" r="9.1875" fill="black"></circle><circle cx="42" cy="52.49998586268964" r="6.5625" fill="black"></circle><circle cx="73.500014137304" cy="21" r="6.5625" fill="black"></circle><circle cx="73.49998586268964" cy="83.99999999999365" r="6.5625" fill="black"></circle></mask><style>
                 .element {
                     font: 14px Helvetica, Arial, sans-serif;
                     alignment-baseline: 'middle';
@@ -497,7 +497,262 @@ module.exports = [
   },
   {
     id: "8",
-    smiles: "<smiles>O=C=S</smiles>",
-    svg: ``
+    smiles: "<smiles>Br[Mg]C1CCCCC1</smiles>",
+    svg: `<div><div class="smiles-inline" style="display: inline-block"><svg id="smiles-" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 194 96.55962871301199" style="width: 194.25002448648996px; overflow: visible;"><defs><linearGradient id="line-0" gradientUnits="userSpaceOnUse" x1="136.49999999996197" y1="48.279870905734725" x2="152.25002448648996" y2="21.000084823843086"><stop stop-color="#222" offset="20%"></stop><stop stop-color="#222" offset="100%"></stop></linearGradient><linearGradient id="line-1" gradientUnits="userSpaceOnUse" x1="104.99999999997463" y1="48.279842631120346" x2="136.49999999996197" y2="48.279870905734725"><stop stop-color="#222" offset="20%"></stop><stop stop-color="#222" offset="100%"></stop></linearGradient><linearGradient id="line-2" gradientUnits="userSpaceOnUse" x1="89.24997551344667" y1="75.55962871301199" x2="104.99999999997463" y2="48.279842631120346"><stop stop-color="#222" offset="20%"></stop><stop stop-color="#222" offset="100%"></stop></linearGradient><linearGradient id="line-3" gradientUnits="userSpaceOnUse" x1="89.25002448651524" y1="21.000028274614326" x2="104.99999999997463" y2="48.279842631120346"><stop stop-color="#222" offset="20%"></stop><stop stop-color="#222" offset="100%"></stop></linearGradient><linearGradient id="line-4" gradientUnits="userSpaceOnUse" x1="57.74997551345936" y1="75.55960043839765" x2="89.24997551344667" y2="75.55962871301199"><stop stop-color="#222" offset="20%"></stop><stop stop-color="#222" offset="100%"></stop></linearGradient><linearGradient id="line-5" gradientUnits="userSpaceOnUse" x1="57.75002448652795" y1="21" x2="89.25002448651524" y2="21.000028274614326"><stop stop-color="#222" offset="20%"></stop><stop stop-color="#222" offset="100%"></stop></linearGradient><linearGradient id="line-6" gradientUnits="userSpaceOnUse" x1="42" y1="48.27978608189166" x2="57.74997551345936" y2="75.55960043839765"><stop stop-color="#222" offset="20%"></stop><stop stop-color="#222" offset="100%"></stop></linearGradient><linearGradient id="line-7" gradientUnits="userSpaceOnUse" x1="42" y1="48.27978608189166" x2="57.75002448652795" y2="21"><stop stop-color="#222" offset="20%"></stop><stop stop-color="#222" offset="100%"></stop></linearGradient></defs><mask id="text-mask"><rect x="0" y="0" width="100%" height="100%" fill="white"></rect><circle cx="152.25002448648996" cy="21.000084823843086" r="7.875" fill="black"></circle><circle cx="136.49999999996197" cy="48.279870905734725" r="9.1875" fill="black"></circle></mask><style>
+                .element {
+                    font: 14px Helvetica, Arial, sans-serif;
+                    alignment-baseline: 'middle';
+                }
+                .sub {
+                    font: 8.4px Helvetica, Arial, sans-serif;
+                }
+            </style><g mask="url(#text-mask)"><line x1="136.49999999996197" y1="48.279870905734725" x2="152.25002448648996" y2="21.000084823843086" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-0')"></line><line x1="104.99999999997463" y1="48.279842631120346" x2="136.49999999996197" y2="48.279870905734725" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-1')"></line><line x1="89.24997551344667" y1="75.55962871301199" x2="104.99999999997463" y2="48.279842631120346" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-2')"></line><line x1="89.25002448651524" y1="21.000028274614326" x2="104.99999999997463" y2="48.279842631120346" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-3')"></line><line x1="57.74997551345936" y1="75.55960043839765" x2="89.24997551344667" y2="75.55962871301199" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-4')"></line><line x1="57.75002448652795" y1="21" x2="89.25002448651524" y2="21.000028274614326" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-5')"></line><line x1="42" y1="48.27978608189166" x2="57.74997551345936" y2="75.55960043839765" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-6')"></line><line x1="42" y1="48.27978608189166" x2="57.75002448652795" y2="21" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-7')"></line></g><g><text x="147.00002448648996" y="26.250084823843086" class="element" fill="#222" style="
+                text-anchor: start;
+                writing-mode: horizontal-tb;
+                text-orientation: mixed;
+                letter-spacing: normal;
+                direction: ltr;
+            "><tspan style="
+                unicode-bidi: plaintext;
+                writing-mode: lr-tb;
+                letter-spacing: normal;
+                text-anchor: middle;
+            ">Br</tspan></text><text x="152.25002448648996" y="21.000084823843086" class="debug" fill="#ff0000" style="
+                font: 5px Droid Sans, sans-serif;
+            "></text><text x="136.49999999996197" y="53.529870905734725" class="element" fill="#222" style="
+                text-anchor: start;
+                writing-mode: vertical-rl;
+                text-orientation: upright;
+                letter-spacing: -1px;
+                direction: ltr;
+            "><tspan style="
+                unicode-bidi: plaintext;
+                writing-mode: lr-tb;
+                letter-spacing: normal;
+                text-anchor: middle;
+            ">Mg</tspan></text><text x="136.49999999996197" y="48.279870905734725" class="debug" fill="#ff0000" style="
+                font: 5px Droid Sans, sans-serif;
+            "></text><text x="104.99999999997463" y="48.279842631120346" class="debug" fill="#ff0000" style="
+                font: 5px Droid Sans, sans-serif;
+            "></text><text x="89.24997551344667" y="75.55962871301199" class="debug" fill="#ff0000" style="
+                font: 5px Droid Sans, sans-serif;
+            "></text><text x="57.74997551345936" y="75.55960043839765" class="debug" fill="#ff0000" style="
+                font: 5px Droid Sans, sans-serif;
+            "></text><text x="42" y="48.27978608189166" class="debug" fill="#ff0000" style="
+                font: 5px Droid Sans, sans-serif;
+            "></text><text x="57.75002448652795" y="21" class="debug" fill="#ff0000" style="
+                font: 5px Droid Sans, sans-serif;
+            "></text><text x="89.25002448651524" y="21.000028274614326" class="debug" fill="#ff0000" style="
+                font: 5px Droid Sans, sans-serif;
+            "></text></g></svg></div></div>`
+  },
+
+  {
+    id: "9",
+    smiles: "<smiles>O[Mg]Br</smiles>",
+    svg: `<div><div class="smiles-inline" style="display: inline-block"><svg id="smiles-" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 139 57.75001836489717" style="width: 138.55960043840724px; overflow: visible;"><defs><linearGradient id="line-0" gradientUnits="userSpaceOnUse" x1="69.27981082218402" y1="21" x2="96.55960043840727" y2="36.75001836489717"><stop stop-color="#222" offset="20%"></stop><stop stop-color="#222" offset="100%"></stop></linearGradient><linearGradient id="line-1" gradientUnits="userSpaceOnUse" x1="42" y1="36.74998163509569" x2="69.27981082218402" y2="21"><stop stop-color="#222" offset="20%"></stop><stop stop-color="#222" offset="100%"></stop></linearGradient></defs><mask id="text-mask"><rect x="0" y="0" width="100%" height="100%" fill="white"></rect><circle cx="96.55960043840727" cy="36.75001836489717" r="6.5625" fill="black"></circle><circle cx="69.27981082218402" cy="21" r="11.8125" fill="black"></circle><circle cx="42" cy="36.74998163509569" r="6.5625" fill="black"></circle></mask><style>
+                .element {
+                    font: 14px Helvetica, Arial, sans-serif;
+                    alignment-baseline: 'middle';
+                }
+                .sub {
+                    font: 8.4px Helvetica, Arial, sans-serif;
+                }
+            </style><g mask="url(#text-mask)"><line x1="69.27981082218402" y1="21" x2="96.55960043840727" y2="36.75001836489717" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-0')"></line><line x1="42" y1="36.74998163509569" x2="69.27981082218402" y2="21" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-1')"></line></g><g><text x="92.62210043840727" y="42.00001836489717" class="element" fill="#222" style="
+                text-anchor: start;
+                writing-mode: horizontal-tb;
+                text-orientation: mixed;
+                letter-spacing: normal;
+                direction: ltr;
+            "><tspan>O</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="96.55960043840727" y="36.75001836489717" class="debug" fill="#ff0000" style="
+                font: 5px Droid Sans, sans-serif;
+            "></text><text x="69.27981082218402" y="26.25" class="element" fill="#222" style="
+                text-anchor: start;
+                writing-mode: vertical-rl;
+                text-orientation: upright;
+                letter-spacing: -1px;
+                direction: rtl; unicode-bidi: bidi-override;
+            "><tspan style="
+                unicode-bidi: plaintext;
+                writing-mode: lr-tb;
+                letter-spacing: normal;
+                text-anchor: middle;
+            ">Mg</tspan></text><text x="69.27981082218402" y="21" class="debug" fill="#ff0000" style="
+                font: 5px Droid Sans, sans-serif;
+            "></text><text x="47.25" y="41.99998163509569" class="element" fill="#222" style="
+                text-anchor: start;
+                writing-mode: horizontal-tb;
+                text-orientation: mixed;
+                letter-spacing: normal;
+                direction: rtl; unicode-bidi: bidi-override;
+            "><tspan style="
+                unicode-bidi: plaintext;
+                writing-mode: lr-tb;
+                letter-spacing: normal;
+                text-anchor: start;
+            ">Br</tspan></text><text x="42" y="36.74998163509569" class="debug" fill="#ff0000" style="
+                font: 5px Droid Sans, sans-serif;
+            "></text></g></svg></div></div>`
+  },
+
+  {
+    id: "10",
+    smiles: "<smiles>[Mg](O)Br</smiles>",
+    svg: `<div><div class="smiles-inline" style="display: inline-block"><svg id="smiles-" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 131 69.27978608189166" style="width: 131.25002448651526px; overflow: visible;"><defs><linearGradient id="line-0" gradientUnits="userSpaceOnUse" x1="57.75002448652796" y1="48.27978608189166" x2="89.25002448651527" y2="48.27975780727731"><stop stop-color="#222" offset="20%"></stop><stop stop-color="#222" offset="100%"></stop></linearGradient><linearGradient id="line-1" gradientUnits="userSpaceOnUse" x1="42" y1="21" x2="57.75002448652796" y2="48.27978608189166"><stop stop-color="#222" offset="20%"></stop><stop stop-color="#222" offset="100%"></stop></linearGradient></defs><mask id="text-mask"><rect x="0" y="0" width="100%" height="100%" fill="white"></rect><circle cx="57.75002448652796" cy="48.27978608189166" r="9.1875" fill="black"></circle><circle cx="89.25002448651527" cy="48.27975780727731" r="6.5625" fill="black"></circle><circle cx="42" cy="21" r="7.875" fill="black"></circle></mask><style>
+                .element {
+                    font: 14px Helvetica, Arial, sans-serif;
+                    alignment-baseline: 'middle';
+                }
+                .sub {
+                    font: 8.4px Helvetica, Arial, sans-serif;
+                }
+            </style><g mask="url(#text-mask)"><line x1="57.75002448652796" y1="48.27978608189166" x2="89.25002448651527" y2="48.27975780727731" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-0')"></line><line x1="42" y1="21" x2="57.75002448652796" y2="48.27978608189166" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-1')"></line></g><g><text x="57.75002448652796" y="53.52978608189166" class="element" fill="#222" style="
+                text-anchor: start;
+                writing-mode: vertical-rl;
+                text-orientation: upright;
+                letter-spacing: -1px;
+                direction: ltr;
+            "><tspan style="
+                unicode-bidi: plaintext;
+                writing-mode: lr-tb;
+                letter-spacing: normal;
+                text-anchor: middle;
+            ">Mg</tspan></text><text x="57.75002448652796" y="48.27978608189166" class="debug" fill="#ff0000" style="
+                font: 5px Droid Sans, sans-serif;
+            "></text><text x="85.31252448651527" y="53.52975780727731" class="element" fill="#222" style="
+                text-anchor: start;
+                writing-mode: horizontal-tb;
+                text-orientation: mixed;
+                letter-spacing: normal;
+                direction: ltr;
+            "><tspan>O</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="89.25002448651527" y="48.27975780727731" class="debug" fill="#ff0000" style="
+                font: 5px Droid Sans, sans-serif;
+            "></text><text x="36.75" y="26.25" class="element" fill="#222" style="
+                text-anchor: start;
+                writing-mode: horizontal-tb;
+                text-orientation: mixed;
+                letter-spacing: normal;
+                direction: ltr;
+            "><tspan style="
+                unicode-bidi: plaintext;
+                writing-mode: lr-tb;
+                letter-spacing: normal;
+                text-anchor: middle;
+            ">Br</tspan></text><text x="42" y="21" class="debug" fill="#ff0000" style="
+                font: 5px Droid Sans, sans-serif;
+            "></text></g></svg></div></div>`
+  },
+
+  {
+    id: "11",
+    smiles: "<smiles>[Mg](O)Br[Mg]</smiles>",
+    svg: `<div><div class="smiles-inline" style="display: inline-block"><svg id="smiles-" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 166 57.75001836490034" style="width: 165.83939712330059px; overflow: visible;"><defs><linearGradient id="line-0" gradientUnits="userSpaceOnUse" x1="96.55960043841827" y1="21.000012243267157" x2="123.83939712330059" y2="36.75001836490034"><stop stop-color="#222" offset="20%"></stop><stop stop-color="#222" offset="100%"></stop></linearGradient><linearGradient id="line-1" gradientUnits="userSpaceOnUse" x1="69.27979668488234" y1="36.75000612163318" x2="96.55960043841827" y2="21.000012243267157"><stop stop-color="#222" offset="20%"></stop><stop stop-color="#222" offset="100%"></stop></linearGradient><linearGradient id="line-2" gradientUnits="userSpaceOnUse" x1="42" y1="21" x2="69.27979668488234" y2="36.75000612163318"><stop stop-color="#222" offset="20%"></stop><stop stop-color="#222" offset="100%"></stop></linearGradient></defs><mask id="text-mask"><rect x="0" y="0" width="100%" height="100%" fill="white"></rect><circle cx="96.55960043841827" cy="21.000012243267157" r="11.8125" fill="black"></circle><circle cx="123.83939712330059" cy="36.75001836490034" r="6.5625" fill="black"></circle><circle cx="69.27979668488234" cy="36.75000612163318" r="7.21875" fill="black"></circle><circle cx="42" cy="21" r="6.5625" fill="black"></circle></mask><style>
+                .element {
+                    font: 14px Helvetica, Arial, sans-serif;
+                    alignment-baseline: 'middle';
+                }
+                .sub {
+                    font: 8.4px Helvetica, Arial, sans-serif;
+                }
+            </style><g mask="url(#text-mask)"><line x1="96.55960043841827" y1="21.000012243267157" x2="123.83939712330059" y2="36.75001836490034" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-0')"></line><line x1="69.27979668488234" y1="36.75000612163318" x2="96.55960043841827" y2="21.000012243267157" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-1')"></line><line x1="42" y1="21" x2="69.27979668488234" y2="36.75000612163318" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-2')"></line></g><g><text x="96.55960043841827" y="26.250012243267157" class="element" fill="#222" style="
+                text-anchor: start;
+                writing-mode: vertical-rl;
+                text-orientation: upright;
+                letter-spacing: -1px;
+                direction: rtl; unicode-bidi: bidi-override;
+            "><tspan style="
+                unicode-bidi: plaintext;
+                writing-mode: lr-tb;
+                letter-spacing: normal;
+                text-anchor: middle;
+            ">Mg</tspan></text><text x="96.55960043841827" y="21.000012243267157" class="debug" fill="#ff0000" style="
+                font: 5px Droid Sans, sans-serif;
+            "></text><text x="119.90189712330059" y="42.00001836490034" class="element" fill="#222" style="
+                text-anchor: start;
+                writing-mode: horizontal-tb;
+                text-orientation: mixed;
+                letter-spacing: normal;
+                direction: ltr;
+            "><tspan>O</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="123.83939712330059" y="36.75001836490034" class="debug" fill="#ff0000" style="
+                font: 5px Droid Sans, sans-serif;
+            "></text><text x="69.27979668488234" y="42.00000612163318" class="element" fill="#222" style="
+                text-anchor: start;
+                writing-mode: vertical-rl;
+                text-orientation: upright;
+                letter-spacing: -1px;
+                direction: ltr;
+            "><tspan style="
+                unicode-bidi: plaintext;
+                writing-mode: lr-tb;
+                letter-spacing: normal;
+                text-anchor: middle;
+            ">Br</tspan></text><text x="69.27979668488234" y="36.75000612163318" class="debug" fill="#ff0000" style="
+                font: 5px Droid Sans, sans-serif;
+            "></text><text x="47.25" y="26.25" class="element" fill="#222" style="
+                text-anchor: start;
+                writing-mode: horizontal-tb;
+                text-orientation: mixed;
+                letter-spacing: normal;
+                direction: rtl; unicode-bidi: bidi-override;
+            "><tspan style="
+                unicode-bidi: plaintext;
+                writing-mode: lr-tb;
+                letter-spacing: normal;
+                text-anchor: start;
+            ">Mg</tspan></text><text x="42" y="21" class="debug" fill="#ff0000" style="
+                font: 5px Droid Sans, sans-serif;
+            "></text></g></svg></div></div>`
+  },
+
+  {
+    id: "12",
+    smiles: "<smiles>C(=O)ClCCl</smiles>",
+    svg: `<div><div class="smiles-inline" style="display: inline-block"><svg id="smiles-" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 193 57.750018364900356" style="width: 193.11920087683654px; overflow: visible;"><defs><linearGradient id="line-0" gradientUnits="userSpaceOnUse" x1="123.05038784142641" y1="27.091626105668475" x2="146.23821502357637" y2="40.47913130905668"><stop stop-color="#222" offset="20%"></stop><stop stop-color="#222" offset="100%"></stop></linearGradient><linearGradient id="line-1" gradientUnits="userSpaceOnUse" x1="123.8394041919542" y1="21.000012243267165" x2="151.11920087683654" y2="36.75001836490035"><stop stop-color="#222" offset="20%"></stop><stop stop-color="#222" offset="100%"></stop></linearGradient><linearGradient id="line-2" gradientUnits="userSpaceOnUse" x1="96.55960043841827" y1="36.75000612163318" x2="123.8394041919542" y2="21.000012243267165"><stop stop-color="#222" offset="20%"></stop><stop stop-color="#222" offset="100%"></stop></linearGradient><linearGradient id="line-3" gradientUnits="userSpaceOnUse" x1="69.27980375353593" y1="21" x2="96.55960043841827" y2="36.75000612163318"><stop stop-color="#222" offset="20%"></stop><stop stop-color="#222" offset="100%"></stop></linearGradient><linearGradient id="line-4" gradientUnits="userSpaceOnUse" x1="42" y1="36.74999387836603" x2="69.27980375353593" y2="21"><stop stop-color="#222" offset="20%"></stop><stop stop-color="#222" offset="100%"></stop></linearGradient></defs><mask id="text-mask"><rect x="0" y="0" width="100%" height="100%" fill="white"></rect><circle cx="151.11920087683654" cy="36.75001836490035" r="6.5625" fill="black"></circle><circle cx="96.55960043841827" cy="36.75000612163318" r="6.5625" fill="black"></circle><circle cx="42" cy="36.74999387836603" r="6.5625" fill="black"></circle></mask><style>
+                .element {
+                    font: 14px Helvetica, Arial, sans-serif;
+                    alignment-baseline: 'middle';
+                }
+                .sub {
+                    font: 8.4px Helvetica, Arial, sans-serif;
+                }
+            </style><g mask="url(#text-mask)"><line x1="123.05038784142641" y1="27.091626105668475" x2="146.23821502357637" y2="40.47913130905668" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-0')"></line><line x1="123.8394041919542" y1="21.000012243267165" x2="151.11920087683654" y2="36.75001836490035" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-1')"></line><line x1="96.55960043841827" y1="36.75000612163318" x2="123.8394041919542" y2="21.000012243267165" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-2')"></line><line x1="69.27980375353593" y1="21" x2="96.55960043841827" y2="36.75000612163318" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-3')"></line><line x1="42" y1="36.74999387836603" x2="69.27980375353593" y2="21" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-4')"></line></g><g><text x="123.8394041919542" y="21.000012243267165" class="debug" fill="#ff0000" style="
+                font: 5px Droid Sans, sans-serif;
+            "></text><text x="147.18170087683654" y="42.00001836490035" class="element" fill="#222" style="
+                text-anchor: start;
+                writing-mode: horizontal-tb;
+                text-orientation: mixed;
+                letter-spacing: normal;
+                direction: ltr;
+            "><tspan>O</tspan></text><text x="151.11920087683654" y="36.75001836490035" class="debug" fill="#ff0000" style="
+                font: 5px Droid Sans, sans-serif;
+            "></text><text x="96.55960043841827" y="42.00000612163318" class="element" fill="#222" style="
+                text-anchor: start;
+                writing-mode: vertical-rl;
+                text-orientation: upright;
+                letter-spacing: -1px;
+                direction: ltr;
+            "><tspan style="
+                unicode-bidi: plaintext;
+                writing-mode: lr-tb;
+                letter-spacing: normal;
+                text-anchor: middle;
+            ">Cl</tspan></text><text x="96.55960043841827" y="36.75000612163318" class="debug" fill="#ff0000" style="
+                font: 5px Droid Sans, sans-serif;
+            "></text><text x="69.27980375353593" y="21" class="debug" fill="#ff0000" style="
+                font: 5px Droid Sans, sans-serif;
+            "></text><text x="47.25" y="41.99999387836603" class="element" fill="#222" style="
+                text-anchor: start;
+                writing-mode: horizontal-tb;
+                text-orientation: mixed;
+                letter-spacing: normal;
+                direction: rtl; unicode-bidi: bidi-override;
+            "><tspan style="
+                unicode-bidi: plaintext;
+                writing-mode: lr-tb;
+                letter-spacing: normal;
+                text-anchor: start;
+            ">Cl</tspan></text><text x="42" y="36.74999387836603" class="debug" fill="#ff0000" style="
+                font: 5px Droid Sans, sans-serif;
+            "></text></g></svg></div></div>`
   },
 ];

@@ -422,4 +422,5 @@ declare class Atom {
         Uuo: number;
     };
 }
+export declare const getAtomCoefficientForWidth: (atomName: any) => any;
 export default Atom;
