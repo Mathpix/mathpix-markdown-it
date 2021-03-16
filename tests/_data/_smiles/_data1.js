@@ -2855,7 +2855,7 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="102.01387288851612" y="221.39112136641012" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="106.49795468249769" y="256.5993865302689" class="element" fill="#222" style="
+            "></text><text x="111.74795468249769" y="256.5993865302689" class="element" fill="#222" style="
                 text-anchor: start;
                 writing-mode: horizontal-tb;
                 text-orientation: mixed;

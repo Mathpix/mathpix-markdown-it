@@ -6,6 +6,7 @@ import {
 
 import Line from './Line';
 import Vector2 from './Vector2';
+import { getAtomCoefficientForWidth } from './Atom';
 
 class SvgWrapper {
 	public svg: any;
@@ -468,7 +469,14 @@ class SvgWrapper {
    */
   drawText(x, y, elementName, hydrogens, direction, isTerminal, charge, isotope, attachedPseudoElement = {}, isCentre) {
     const dFont = this.opts.fontSizeLarge / 2;
-    const radius = dFont + dFont/this.opts.dCircle;
+    const coeffWidth = getAtomCoefficientForWidth(elementName);
+
+    let radius = dFont + dFont/this.opts.dCircle;
+    radius += (direction === 'down' || direction === 'up') && coeffWidth !== -1
+      ? direction === 'down'
+        ? dFont / (2 * coeffWidth)
+        : dFont / coeffWidth
+      : 0;
     const elementClassName = this.opts.id ? 'element-' + this.opts.id : 'element';
 
     let offsetX = this.offsetX,
@@ -508,9 +516,10 @@ class SvgWrapper {
       letterSpacing = '-1px';
     }
 
-    if (direction === 'down' && (!isTerminal || isCentre)) {
+
+    if (direction === 'down' && (!isTerminal || isCentre || elementName.length === 2)) {
       xShift = 0;
-      if (isCentre && elementName.length === 2) {
+      if ( elementName.length === 2 ) {
         yShift = dFont;
       } else {
         yShift = -dFont - dFont/2;
