@@ -1,5 +1,6 @@
 import { MarkdownIt, RuleBlock, RuleInline, Renderer, Token } from 'markdown-it';
-
+import { renderTabularInline } from "./md-renderer-rules/render-tabular";
+// import { escapeHtml }  from 'markdown-it/lib/common/utils';
 
 const getAbstractTemplate = (content) => `<h4 style="text-align: center">Abstract</h4><p style="text-indent: 1em">${content}</p>`;
 let subsectionParentCount: number = 0;
@@ -25,7 +26,7 @@ const headingSection: RuleBlock = (state, startLine: number/*, endLine*/) => {
   subCount = 0;
   subSubCount = 0;
 
-  let content: string, token: Token, lineText: string,
+  let token: Token, lineText: string,
     pos: number = state.bMarks[startLine] + state.tShift[startLine],
     max: number = state.eMarks[startLine];
 
@@ -87,8 +88,12 @@ const headingSection: RuleBlock = (state, startLine: number/*, endLine*/) => {
   if (endMarkerPos === -1) {
     return false;
   }
-  const nextPos: number = endMarkerPos + endMarker.length;
-  content = lineText.slice(startPos + 1, nextPos - endMarker.length);
+
+  let { res = false, content = '' } = findEndMarker(lineText, startPos);
+
+  if ( !res ) {
+    return false;
+  }
 
   state.line = startLine + 1;
 
@@ -109,7 +114,11 @@ const headingSection: RuleBlock = (state, startLine: number/*, endLine*/) => {
   token.type = type;
   token.is_numerable = is_numerable;
   token.map = [startLine, state.line];
-  token.children = [];
+
+  let children = [];
+  state.md.inline.parse(content.trim(), state.md, state.env, children);
+  token.children = children;
+
   if (type === "subsection") {
     token.secNumber = subsectionParentCount;
     token.isNewSect = isNewSect;
@@ -222,11 +231,112 @@ const abstractBlock: RuleBlock = (state, startLine) => {
   return true;
 };
 
+const findEndMarker = (str: string, startPos: number = 0, beginMarker: string = "{", endMarker: string = "}") => {
+  let content: string = '';
+  let nextPos: number = 0;
+  if ( str[startPos] !== beginMarker ) {
+    return { res: false }
+  }
+  let openBrackets = 1;
+  let openCode = 0;
+
+  for (let i = startPos + 1; i < str.length; i++) {
+    const chr = str[i];
+    nextPos = i;
+
+    if ( chr === '`') {
+      if (openCode > 0) {
+        openCode--;
+      } else {
+        openCode++;
+      }
+    }
+
+    if ( chr === beginMarker && openCode === 0) {
+      content += chr;
+      openBrackets++;
+      continue;
+    }
+
+    if ( chr === endMarker && openCode === 0) {
+      openBrackets--;
+      if (openBrackets > 0) {
+        content += chr;
+        continue;
+      }
+      break;
+    }
+
+    content += chr;
+  }
+  if ( openBrackets > 0 ) {
+    return { res: false }
+  }
+
+  return {
+    res: true,
+    content: content,
+    nextPos: nextPos + endMarker.length
+  };
+};
+
+const textAuthor: RuleInline = (state) => {
+  let startPos = state.pos;
+
+  if (state.src.charCodeAt(startPos) !== 0x5c /* \ */) {
+    return false;
+  }
+  const match = state.src
+    .slice(++startPos)
+    .match(/^(?:author)/); // eslint-disable-line
+
+  if (!match) {
+    return false;
+  }
+
+  startPos += match[0].length;
+
+  let {res = false, content = '', nextPos = 0 } = findEndMarker(state.src, startPos);
+
+  if ( !res ) {
+    return false;
+  }
+
+  const type = "author";
+  const arrtStyle = 'text-align: center; margin: 0 auto; display: flex; justify-content: center; flex-wrap: wrap;';
+
+  const token = state.push(type, "", 0);
+  if (state.md.options?.forDocx && arrtStyle) {
+    token.attrSet('style', arrtStyle);
+  }
+  token.content = content;
+  token.children = [];
+
+  const columns = content.split('\\and');
+  for (let i = 0; i < columns.length; i++) {
+    let colArr = columns[i].trim().split('\\\\');
+    let column = colArr.join('\n');
+
+    const newToken: Token = {};
+
+    newToken.type = 'inline';
+    newToken.content = column;
+
+    let children = [];
+    state.md.inline.parse(column, state.md, state.env, children);
+    newToken.children = children;
+    newToken.type = 'author_item';
+
+    token.children.push(newToken)
+  }
+
+  state.pos = nextPos;
+  return true;
+};
+
 const textTypes: RuleInline = (state) => {
   let startPos = state.pos;
-  let type: string = '',
-    beginMarker: string = "{",
-    endMarker: string = "}";
+  let type: string = '';
   let arrtStyle: string = '';
 
   if (state.src.charCodeAt(startPos) !== 0x5c /* \ */) {
@@ -234,7 +344,7 @@ const textTypes: RuleInline = (state) => {
   }
   const match = state.src
     .slice(++startPos)
-    .match(/^(?:textit|textbf|author)/); // eslint-disable-line
+    .match(/^(?:textit|textbf|texttt)/); // eslint-disable-line
 
   if (!match) {
     return false;
@@ -247,9 +357,8 @@ const textTypes: RuleInline = (state) => {
     case "textbf":
       type = "textbf";
       break;
-    case "author":
-      type = "author";
-      arrtStyle = 'text-align: center; margin: 0 auto; display: flex; justify-content: center; flex-wrap: wrap;';
+    case "texttt":
+      type = "texttt";
       break;
     default:
       break;
@@ -258,21 +367,26 @@ const textTypes: RuleInline = (state) => {
   if (!type || type === '') {
     return false;
   }
-  if (state.src[startPos] !== beginMarker) {
-    return false;
-  }
-  const endMarkerPos = state.src.indexOf(endMarker, startPos);
-  if (endMarkerPos === -1) {
+
+  let {res = false, content = '', nextPos = 0 } = findEndMarker(state.src, startPos);
+
+  if ( !res ) {
     return false;
   }
 
-  const nextPos = endMarkerPos + endMarker.length;
-
+  state.push(type + '_open', "", 0);
   const token = state.push(type, "", 0);
   if (state.md.options?.forDocx && arrtStyle) {
     token.attrSet('style', arrtStyle);
   }
-  token.content = state.src.slice(startPos + 1, nextPos - endMarker.length);
+  token.content = content;
+  token.children = [];
+
+  let children = [];
+  state.md.inline.parse(token.content.trim(), state.md, state.env, children);
+  token.children = children;
+
+  state.push(type + '_close', "", 0);
   state.pos = nextPos;
   return true;
 };
@@ -393,35 +507,66 @@ const linkifyURL: RuleInline = (state) => {
   return true;
 };
 
-const renderDocTitle: Renderer = token => (
-  `${token.content.split('\n').join('<br>')}`
-);
+const renderDocTitle: Renderer = (tokens, index, options, env, slf) => {
+  const token = tokens[index];
+  const content = renderInlineContent(token, options, env, slf);
+  return `${content.split('\n').join('<br>')}`
+};
 
-const renderSectionTitle: Renderer = token => {
+const renderInlineContent = (token, options, env, slf) => {
+  let sContent = '';
+  let content = '';
+  if (token.children && token.children.length) {
+    for (let i = 0; i < token.children.length; i++) {
+      const tok = token.children[i];
+      if (tok.children && tok.children.length > 1) {
+        if (tok.type === "tabular_inline") {
+          content = renderTabularInline(token.children, tok, options, env, slf)
+        } else {
+          content = slf.renderInline(tok.children, options);
+        }
+      } else {
+        content = slf.renderInline([tok], options);
+      }
+      sContent +=  content
+    }
+    return sContent;
+  }
+
+  return token.content;
+};
+
+const renderSectionTitle: Renderer = (tokens, index, options, env, slf) => {
+  const token = tokens[index];
   const sectionNumber = token.is_numerable
     ? `<span class="section-number">${++sectionCount}. </span>`
     : ``;
-  return `${sectionNumber}${token.content}`
+  const content = renderInlineContent(token, options, env, slf);
+  return `${sectionNumber}${content}`
 };
 
-const renderSubsectionTitle: Renderer = token => {
+const renderSubsectionTitle: Renderer = (tokens, index, options, env, slf) => {
+  const token = tokens[index];
   if (token.isNewSect) {
     subCount = 0;
   }
-  return `<span class="section-number">${token.secNumber}.</span><span class="sub_section-number">${++subCount}.</span> ${token.content}`
+  const content = renderInlineContent(token, options, env, slf);
+  return `<span class="section-number">${token.secNumber}.</span><span class="sub_section-number">${++subCount}.</span> ${content}`
 };
 
-// renderSubSubsectionTitle
-
-const renderSubSubsectionTitle: Renderer = token => {
+const renderSubSubsectionTitle: Renderer = (tokens, index, options, env, slf) => {
+  const token = tokens[index];
   if (token.isNewSubSection) {
     subSubCount = 0;
   }
-  return `<span class="section-number">${token.secNumber}.</span><span class="sub_section-number">${subCount}.${++subSubCount}.</span> ${token.content}`
+  const content = renderInlineContent(token, options, env, slf);
+  return `<span class="section-number">${token.secNumber}.</span><span class="sub_section-number">${subCount}.${++subSubCount}.</span> ${content}`
 };
 
-const getAuthorColumnContent = (content, options) => {
+const getAuthorItemToken = (tokens, index, options, env, slf) => {
   let res = '';
+  const token = tokens[index];
+  const content = renderInlineContent(token, options, env, slf);
 
   let attrStyle = options.forDocx
     ? ' display: block; text-align: center;'
@@ -434,8 +579,8 @@ const getAuthorColumnContent = (content, options) => {
   return res;
 };
 
-const renderAuthorToken: Renderer = (token, options) => {
-  const columns = token.content.split('\\and');
+const renderAuthorToken: Renderer = (tokens, index, options, env, slf) => {
+  const token = tokens[index];
   let res = '';
   let attrStyle = options.forDocx
     ? 'min-width: 30%; max-width: 50%; padding: 0 7px;'
@@ -443,13 +588,19 @@ const renderAuthorToken: Renderer = (token, options) => {
   let divStyle: string = options.forDocx
     ? token.attrGet('style')
     : '';
-  columns.forEach(item => {
-    if (attrStyle) {
-      res += `<p style="${attrStyle}">${getAuthorColumnContent(item, options)}</p>`
-    } else {
-      res += `<p>${getAuthorColumnContent(item, options)}</p>`
+  if (token.children && token.children.length) {
+    for (let i = 0; i < token.children.length; i++) {
+      const tok = token.children[i];
+
+      const content = renderInlineContent(tok, options, env, slf);
+      if (attrStyle) {
+        res += `<p style="${attrStyle}">${content}</p>`
+      } else {
+        res += `<p>${content}</p>`
+      }
     }
-  });
+  }
+
   if (divStyle) {
     return `<div class="author" style="${divStyle}">
           ${res}
@@ -461,9 +612,36 @@ const renderAuthorToken: Renderer = (token, options) => {
   }
 };
 
-const renderBoldText = token => `<strong>${token.content}</strong>`;
+const renderBoldText = (tokens, idx, options, env, slf) => {
+  const token = tokens[idx];
+  const content = renderInlineContent(token, options, env, slf);
 
-const renderItalicText = token => `<em>${token.content}</em>`;
+  return content;
+};
+
+const renderItalicText = (tokens, idx, options, env, slf) => {
+  const token = tokens[idx];
+  const content = renderInlineContent(token, options, env, slf);
+
+  return content;
+};
+
+const renderCodeInlineOpen = (tokens, idx, options, env, slf) => {
+  const token = tokens[idx];
+  return  '<code' + slf.renderAttrs(token) + '>';
+};
+
+const renderCodeInlineClose = () => {
+  return  '</code>';
+};
+
+const renderCodeInline = (tokens, idx, options, env, slf) => {
+  const token = tokens[idx];
+  // return escapeHtml(token.content);
+  const content = renderInlineContent(token, options, env, slf);
+
+  return content;
+};
 
 const renderUrl = token => `<a href="${token.content}">${token.content}</a>`;
 
@@ -471,14 +649,27 @@ const renderTextUrl = token => {
   return `<a href="#" class="text-url">${token.content}</a>`
 };
 
+const mappingTextStyles = {
+  textbf: "TextBold",
+  textbf_open: "TextBoldOpen",
+  textbf_close: "TextBoldClose",
+
+  textit: "TextIt",
+  textit_open: "TextItOpen",
+  textit_close: "TextItClose",
+
+  texttt: "texttt",
+  texttt_open: "texttt_open",
+  texttt_close: "texttt_close",
+};
+
 const mapping = {
   section: "Section",
   title: "Title",
   author: "Author",
+  author_item: "authorItem",
   subsection: "Subsection",
   subsubsection: "Subsubsection",
-  textbf: "TextBold",
-  textit: "TextIt",
   url: "Url",
   textUrl: "textUrl"
 };
@@ -490,24 +681,51 @@ export default () => {
     md.block.ruler.before("paragraphDiv", "abstractBlock", abstractBlock);
 
     md.inline.ruler.before("multiMath", "textTypes", textTypes);
+    md.inline.ruler.before("textTypes", "textAuthor", textAuthor);
     md.inline.ruler.before('textTypes', 'linkifyURL', linkifyURL);
+
+    Object.keys(mappingTextStyles).forEach(key => {
+      md.renderer.rules[key] = (tokens, idx, options, env, slf) => {
+        switch (tokens[idx].type) {
+          case "textbf":
+            return renderBoldText(tokens, idx, options, env, slf);
+          case "textbf_open":
+            return '<strong>';
+          case "textbf_close":
+            return '</strong>';
+          case "textit":
+            return renderItalicText(tokens, idx, options, env, slf);
+          case "textit_open":
+            return '<em>';
+          case "textit_close":
+            return '</em>';
+          case "texttt":
+            return renderCodeInline(tokens, idx, options, env, slf);
+          case "texttt_open":
+            return renderCodeInlineOpen(tokens, idx, options, env, slf);
+          case "texttt_close":
+            return renderCodeInlineClose();
+          default:
+            return '';
+        }
+      }
+    });
+
     Object.keys(mapping).forEach(key => {
-      md.renderer.rules[key] = (tokens, idx, options) => {
+      md.renderer.rules[key] = (tokens, idx, options, env, slf) => {
         switch (tokens[idx].type) {
           case "section":
-            return renderSectionTitle(tokens[idx]);
+            return renderSectionTitle(tokens, idx, options, env, slf);
           case "subsection":
-            return renderSubsectionTitle(tokens[idx]);
+            return renderSubsectionTitle(tokens, idx, options, env, slf);
           case "subsubsection":
-            return renderSubSubsectionTitle(tokens[idx]);
+            return renderSubSubsectionTitle(tokens, idx, options, env, slf);
           case "title":
-            return renderDocTitle(tokens[idx]);
+            return renderDocTitle(tokens, idx, options, env, slf);
           case "author":
-            return renderAuthorToken(tokens[idx], options);
-          case "textbf":
-            return renderBoldText(tokens[idx]);
-          case "textit":
-            return renderItalicText(tokens[idx]);
+            return renderAuthorToken(tokens, idx, options, env, slf);
+          case "author_item":
+            return getAuthorItemToken(tokens, idx, options, env, slf);
           case "url":
             return renderUrl(tokens[idx]);
           case "textUrl":

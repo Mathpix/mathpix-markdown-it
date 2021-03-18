@@ -637,10 +637,39 @@ const renderReference = token => {
   }
 };
 
+const getCoutOpenCloseBranches = (str: string, beginMarker: string = '{', endMarker: string = '}') => {
+  let openBrackets = 0;
+  let openCode = 0;
+
+  for (let i = 0; i < str.length; i++) {
+    let chr = str[i];
+    if ( chr === '`') {
+      if (openCode > 0) {
+        openCode--;
+      } else {
+        openCode++;
+      }
+    }
+
+    if ( chr !== beginMarker && chr !== endMarker ) {
+      continue;
+    }
+    if ( chr === beginMarker && openCode === 0) {
+      openBrackets++;
+      continue
+    }
+    if ( chr === endMarker && openCode === 0) {
+      openBrackets--;
+    }
+  }
+  return openBrackets;
+};
+
 function paragraphDiv(state, startLine/*, endLine*/) {
  // resetCounter();
   let isMathOpen = false;
   let openedAuthorBlock = false;
+  let openBrackets = 0;
   // const pickStartTag: RegExp = /\\begin{(abstract|equation|equation\*|center|left|right|table|figure|tabular)}|\\\[/;
   // const pickEndTag: RegExp = /\\end{(abstract|equation|equation\*|center|left|right|table|figure|tabular)}|\\\]/;
   const pickStartTag: RegExp = /\\begin{(abstract|center|left|right|table|figure|tabular)}/;
@@ -696,13 +725,19 @@ function paragraphDiv(state, startLine/*, endLine*/) {
     const prewMax = state.eMarks[nextLine - 1];
     let prewLineText = state.src.slice(prewPos, prewMax);
 
-    if (prewLineText.indexOf('}') !== -1 && openedAuthorBlock) {
-      openedAuthorBlock = false;
-      break;
+    if (openedAuthorBlock
+      && (prewLineText.indexOf('}') !== -1 || prewLineText.indexOf('{') !== -1)) {
+      openBrackets += getCoutOpenCloseBranches(prewLineText);
+
+      if (openBrackets === 0) {
+        openedAuthorBlock = false;
+        break;
+      }
     }
 
     if (prewLineText.indexOf('\\author') !== -1) {
       openedAuthorBlock = true;
+      openBrackets += getCoutOpenCloseBranches(prewLineText);
     }
 
     pos = state.bMarks[nextLine] + state.tShift[nextLine];
