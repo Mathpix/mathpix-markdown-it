@@ -314,20 +314,34 @@ const textAuthor: RuleInline = (state) => {
 
   const columns = content.split('\\and');
   for (let i = 0; i < columns.length; i++) {
-    let colArr = columns[i].trim().split('\\\\');
-    let column = colArr.join('\n');
+    let column = columns[i]
+      ? columns[i].trim()
+      : '';
 
-    const newToken: Token = {};
+    const tokenAuthorColumn: Token = {};
+    tokenAuthorColumn.type = 'author_column';
+    tokenAuthorColumn.content = column;
+    tokenAuthorColumn.children = [];
 
-    newToken.type = 'inline';
-    newToken.content = column;
+    let colArr = column.split('\\\\');
 
-    let children = [];
-    state.md.inline.parse(column, state.md, state.env, children);
-    newToken.children = children;
-    newToken.type = 'author_item';
+    if (colArr && colArr.length) {
+      for ( let j = 0; j < colArr.length; j++ ) {
+        const item = colArr[j] ? colArr[j].trim() : '';
 
-    token.children.push(newToken)
+        const newToken: Token = {};
+        newToken.type = 'author_item';
+        newToken.content = item;
+
+        let children = [];
+        state.md.inline.parse(item, state.md, state.env, children);
+        newToken.children = children;
+
+        tokenAuthorColumn.children.push(newToken);
+      }
+    }
+
+    token.children.push(tokenAuthorColumn)
   }
 
   state.pos = nextPos;
@@ -571,35 +585,43 @@ const getAuthorItemToken = (tokens, index, options, env, slf) => {
   let attrStyle = options.forDocx
     ? ' display: block; text-align: center;'
     : '';
-  content.trim().split('\\\\').forEach(item => {
-    res += attrStyle
-      ? `<span style="${attrStyle}">${item.trim()}</span>`
-      : `<span>${item.trim()}</span>`
-  });
+
+  res += attrStyle
+    ? `<span style="${attrStyle}">${content}</span>`
+    : `<span>${content}</span>`;
+
+  return res;
+};
+
+const getAuthorColumnToken = (tokens, index, options, env, slf) => {
+  let res = '';
+  const token = tokens[index];
+  let attrStyle = options.forDocx
+    ? 'min-width: 30%; max-width: 50%; padding: 0 7px;'
+    : '';
+
+  const content: string = token.children && token.children.length
+    ? slf.renderInline(token.children, options)
+    : renderInlineContent(token, options, env, slf);
+
+  if (attrStyle) {
+    res += `<p style="${attrStyle}">${content}</p>`
+  } else {
+    res += `<p>${content}</p>`
+  }
+
   return res;
 };
 
 const renderAuthorToken: Renderer = (tokens, index, options, env, slf) => {
   const token = tokens[index];
-  let res = '';
-  let attrStyle = options.forDocx
-    ? 'min-width: 30%; max-width: 50%; padding: 0 7px;'
-    : '';
   let divStyle: string = options.forDocx
     ? token.attrGet('style')
     : '';
-  if (token.children && token.children.length) {
-    for (let i = 0; i < token.children.length; i++) {
-      const tok = token.children[i];
 
-      const content = renderInlineContent(tok, options, env, slf);
-      if (attrStyle) {
-        res += `<p style="${attrStyle}">${content}</p>`
-      } else {
-        res += `<p>${content}</p>`
-      }
-    }
-  }
+  const res: string = token.children && token.children.length
+    ? slf.renderInline(token.children, options)
+    : renderInlineContent(token, options, env, slf);
 
   if (divStyle) {
     return `<div class="author" style="${divStyle}">
@@ -667,6 +689,7 @@ const mapping = {
   section: "Section",
   title: "Title",
   author: "Author",
+  author_column: "authorColumn",
   author_item: "authorItem",
   subsection: "Subsection",
   subsubsection: "Subsubsection",
@@ -724,6 +747,8 @@ export default () => {
             return renderDocTitle(tokens, idx, options, env, slf);
           case "author":
             return renderAuthorToken(tokens, idx, options, env, slf);
+          case "author_column":
+            return getAuthorColumnToken(tokens, idx, options, env, slf);
           case "author_item":
             return getAuthorItemToken(tokens, idx, options, env, slf);
           case "url":
