@@ -21,7 +21,7 @@ export const resetTextCounter: RuleInline = () => {
   subSubCount = 0;
 };
 
-const headingSection: RuleBlock = (state, startLine: number/*, endLine*/) => {
+const headingSection: RuleBlock = (state, startLine: number, endLine: number) => {
   sectionCount = 0;
   subCount = 0;
   subSubCount = 0;
@@ -30,10 +30,12 @@ const headingSection: RuleBlock = (state, startLine: number/*, endLine*/) => {
     pos: number = state.bMarks[startLine] + state.tShift[startLine],
     max: number = state.eMarks[startLine];
 
+  let nextLine: number = startLine + 1;
+
   let startPos: number = 0, type: string, className: string = '',
     is_numerable: boolean = false,
     beginMarker: string = "{",
-    endMarker: string = "}", level = 1;
+    level = 1;
 
   lineText = state.src.slice(pos, max).trim();
   if (state.src.charCodeAt(pos) !== 0x5c /* \ */) {
@@ -84,18 +86,47 @@ const headingSection: RuleBlock = (state, startLine: number/*, endLine*/) => {
   if (lineText[startPos] !== beginMarker) {
     return false;
   }
-  const endMarkerPos: number = lineText.indexOf(endMarker, startPos);
-  if (endMarkerPos === -1) {
-    return false;
-  }
 
   let { res = false, content = '' } = findEndMarker(lineText, startPos);
+  let resString = content;
+  resString = resString.split('\\\\').join('\n');
+  let hasEndMarker = false;
+  let last = nextLine;
 
-  if ( !res ) {
+  if (!res) {
+    for (; nextLine <= endLine; nextLine++) {
+      if (lineText === '') {
+        break;
+      }
+      pos = state.bMarks[nextLine] + state.tShift[nextLine];
+      max = state.eMarks[nextLine];
+      lineText = state.src.slice(pos, max);
+
+      let { res = false, content = '' } = findEndMarker(lineText, -1, "{", "}", true);
+      if (res) {
+        resString += resString ? ' ' : '';
+
+        content = content.split('\\\\').join('\n');
+        resString += content;
+        hasEndMarker = true;
+        break
+      }
+      resString += resString ? ' ' : '';
+      lineText = lineText.split('\\\\').join('\n');
+      resString += lineText;
+    }
+    last = nextLine + 1;
+  } else {
+    hasEndMarker = true;
+    last = nextLine;
+  }
+
+
+  if ( !hasEndMarker ) {
     return false;
   }
 
-  state.line = startLine + 1;
+  state.line = last;
 
   token = state.push('heading_open', 'h' + String(level), 1);
   if (state.md.options.forLatex) {
@@ -110,13 +141,13 @@ const headingSection: RuleBlock = (state, startLine: number/*, endLine*/) => {
   }
 
   token = state.push('inline', '', 0);
-  token.content = content;
+  token.content = resString;
   token.type = type;
   token.is_numerable = is_numerable;
   token.map = [startLine, state.line];
 
   let children = [];
-  state.md.inline.parse(content.trim(), state.md, state.env, children);
+  state.md.inline.parse(token.content.trim(), state.md, state.env, children);
   token.children = children;
 
   if (type === "subsection") {
@@ -231,10 +262,10 @@ const abstractBlock: RuleBlock = (state, startLine) => {
   return true;
 };
 
-const findEndMarker = (str: string, startPos: number = 0, beginMarker: string = "{", endMarker: string = "}") => {
+const findEndMarker = (str: string, startPos: number = 0, beginMarker: string = "{", endMarker: string = "}", onlyEnd = false) => {
   let content: string = '';
   let nextPos: number = 0;
-  if ( str[startPos] !== beginMarker ) {
+  if ( str[startPos] !== beginMarker && !onlyEnd ) {
     return { res: false }
   }
   let openBrackets = 1;
@@ -270,7 +301,10 @@ const findEndMarker = (str: string, startPos: number = 0, beginMarker: string = 
     content += chr;
   }
   if ( openBrackets > 0 ) {
-    return { res: false }
+    return {
+      res: false,
+      content: content
+    }
   }
 
   return {
@@ -527,7 +561,7 @@ const linkifyURL: RuleInline = (state) => {
 const renderDocTitle: Renderer = (tokens, index, options, env, slf) => {
   const token = tokens[index];
   const content = renderInlineContent(token, options, env, slf);
-  return `${content.split('\n').join('<br>')}`
+  return content;
 };
 
 const renderInlineContent = (token, options, env, slf) => {
