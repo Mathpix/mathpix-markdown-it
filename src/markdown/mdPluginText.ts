@@ -327,7 +327,10 @@ const textAuthor: RuleInline = (state) => {
 
     if (colArr && colArr.length) {
       for ( let j = 0; j < colArr.length; j++ ) {
-        const item = colArr[j] ? colArr[j].trim() : '';
+        let item = colArr[j] ? colArr[j].trim() : '';
+        let arrItem = item.split('\n');
+        arrItem = arrItem.map(item => item.trim());
+        item = arrItem.join(' ');
 
         const newToken: Token = {};
         newToken.type = 'author_item';
