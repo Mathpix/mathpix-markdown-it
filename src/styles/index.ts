@@ -143,7 +143,7 @@ export const MathpixStyle = (setTextAlignJustify: boolean = true, useColors: boo
         padding: 0 7px;
     }
 
-    #preview-content .author span, #setText .author span {
+    #preview-content .author > p > span, #setText .author > p > span {
         display: block;
         text-align: center;
     }
