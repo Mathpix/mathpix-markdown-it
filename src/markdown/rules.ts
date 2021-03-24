@@ -74,9 +74,11 @@ function html_inline_Sanitize (tokens, idx, options) {
   if (!tokens[idx].content) {
     return '';
   }
+  const hasNotCloseTag = tokens[idx].content.indexOf('/>') === -1;
+
   return  htmlSanitize && Object.keys(htmlSanitize).length > 0
-    ? sanitize(tokens[idx].content, Object.assign({}, { skipCloseTag: true }, htmlSanitize))
-    : sanitize(tokens[idx].content, { skipCloseTag: true });
+    ? sanitize(tokens[idx].content, Object.assign({}, { skipCloseTag: hasNotCloseTag }, htmlSanitize))
+    : sanitize(tokens[idx].content, { skipCloseTag: hasNotCloseTag });
 }
 
 function code_block_injectLineNumbers(tokens, idx, options, env, slf) {

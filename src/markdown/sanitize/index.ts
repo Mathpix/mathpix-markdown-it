@@ -1,6 +1,8 @@
 const sanitizeHtml = require('sanitize-html');
 
-import { allowedTags, allowedAttributes, allowedClasses, allowedSchemes } from './consts';
+import { //allowedTags, allowedAttributes,
+  generateAllowedTagsAndAttrs,
+  allowedClasses, allowedSchemes } from './consts';
 
 export const sanitize = (html: string, options = {}) => {
   let config;
@@ -52,18 +54,22 @@ function escapeHtml(s, quote) {
   return s;
 }
 
-const getSanitizerConfig = (options = {}) => {
+const getSanitizerConfig = (options = {}, addprefixHTMLids = false) => {
+  const data = generateAllowedTagsAndAttrs();
+  const transformTags = {
+    'a': getNofollowSanitize(options),
+    'td': sanitizeCellStyle,
+    'th': sanitizeCellStyle,
+  };
+  if ( addprefixHTMLids ) {
+    transformTags['*'] = prefixHTMLids;
+  }
   return {
-    allowedTags: sanitizeHtml.defaults.allowedTags.concat(allowedTags),
+    allowedTags: sanitizeHtml.defaults.allowedTags.concat(data.allowedTags),
     allowedClasses: allowedClasses,
-    allowedAttributes: allowedAttributes,
+    allowedAttributes: data.allowedAttributes,
     allowedSchemes: allowedSchemes,
-    transformTags: {
-       '*': prefixHTMLids,
-       'a': getNofollowSanitize(options),
-      'td': sanitizeCellStyle,
-      'th': sanitizeCellStyle,
-    }
+    transformTags: transformTags
   }
 };
 
