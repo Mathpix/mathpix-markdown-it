@@ -1,3 +1,6 @@
+import { svgTags, htmlTags } from "./tags";
+import { svgAttrs, htmlAttrs } from "./attrs";
+
 /** default sanitize allowedTags
  **  [ 'a', 'abbr', 'b', 'blockquote', 'br', 'caption', 'code', 'div', 'em', 'h3', 'h4', 'h5', 'h6', 'hr', 'i', 'iframe',
  **    'li', 'nl', 'ol', 'p', 'pre', 'strike', 'strong', 'table', 'tbody', 'td', 'th', 'thead', 'tr', 'ul']
@@ -56,7 +59,6 @@ export const allowedAttributes =  {
   nl:         [],
   ol:         ['type', 'reversed', 'start'],
   p:          ['align'],
-  path:       ['d', 'fill', 'stroke'],
   pre:        [],
   q:          ['cite'],
   rp:         [],
@@ -70,7 +72,6 @@ export const allowedAttributes =  {
   sub:        [],
   summary:    [],
   sup:        [],
-  svg:        ['aria-hidden', 'height', 'version', 'preserveAspectRatio', 'viewBox', 'width', 'x', 'y'],
   table:      ['align', 'background', 'bgcolor', 'border', 'bordercolor', 'cellpadding',
                'cellspacing', 'cols', 'frame', 'height', 'rules', 'summary', 'width'],
   tbody:      ['align', 'char', 'charoff', 'bgcolor', 'valign'],
@@ -83,6 +84,30 @@ export const allowedAttributes =  {
   tr:         ['align', 'bgcolor', 'bordercolor', 'char', 'charoff', 'valign'],
   ul:         ['type'],
   var:        []
+};
+
+export const generateAllowedTagsAndAttrs = (addHtmlTags = false) => {
+  let tags = allowedTags.concat(svgTags);
+  if (addHtmlTags) {
+    tags = tags.concat(htmlTags);
+  }
+  const attrs = {...allowedAttributes}
+
+  if (addHtmlTags) {
+    htmlTags.map(item => {
+      if (!Object(allowedAttributes).hasOwnProperty(item)) {
+        attrs[item] = htmlAttrs
+      }
+    });
+  }
+
+  svgTags.map(item => {
+    if (!Object(allowedAttributes).hasOwnProperty(item)) {
+      attrs[item] = svgAttrs
+    }
+  });
+
+  return { allowedTags: tags, allowedAttributes: attrs };
 };
 
 export const allowedSchemes = ['http', 'https', 'mailto', 'github-windows', 'github-mac', 'data'];
