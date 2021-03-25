@@ -798,6 +798,16 @@ export default () => {
       }
     });
 
+    md.renderer.rules.s_open = function (tokens, idx, options, env, self) {
+      let i = 0;
+      while ((idx + i) < tokens.length && tokens[idx + i].type !== 's_close') {
+        const token = tokens[idx+i];
+        token.attrSet('style', 'text-decoration: line-through; color: inherit;');
+        i++;
+      }
+      return self.renderToken(tokens, idx, options)
+    };
+
     md.renderer.rules.link_open = function (tokens, idx, options, env, self) {
       if (options.openLinkInNewWindow) {
         tokens[idx].attrPush(['target', '_blank']);
