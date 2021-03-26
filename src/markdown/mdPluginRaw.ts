@@ -591,9 +591,8 @@ const renderAsciiMath = (tokens, idx, options) => {
       cwidth = getWidthFromDocument(cwidth);
     }
 
-    mathEquation = MathJax.AsciiMathToSvg(math, false, { cwidth: cwidth });
-    // mathEquation = MathJax.AsciiMathToSvg(math, {display: false, metric: { cwidth: cwidth },
-    //   outMath: options.outMath, mathJax: options.mathJax, forDocx: options.forDocx});
+    mathEquation = MathJax.AsciiMathToSvg(math, {display: false, metric: { cwidth: cwidth },
+      outMath: options.outMath, mathJax: options.mathJax, forDocx: options.forDocx});
   } catch (e) {
     console.error('ERROR MathJax =>', e.message, e);
     if (options.outMath && options.outMath.not_catch_errors) {

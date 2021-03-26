@@ -49,7 +49,7 @@ export declare const MathJax: {
      * }
      */
     TypesetMathML: (string: any, display?: boolean, metric?: any) => any;
-    AsciiMathToSvg: (string: any, display?: boolean, metric?: any) => any;
+    AsciiMathToSvg: (string: any, options?: any) => string;
     Reset: (n?: number) => void;
     GetLastEquationNumber: () => any;
 };
