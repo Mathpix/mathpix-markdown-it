@@ -66,9 +66,13 @@ export declare type TOutputMath = {
 };
 export declare type TOutputMathJax = {
     mtextInheritFont?: boolean;
+    asciiMath?: TAsciiMath;
 };
 export declare type THtmlSanitize = {
     disallowedTagsMode?: string;
+} | false;
+export declare type TAsciiMath = {
+    useBacktick?: boolean;
 } | false;
 declare class MathpixMarkdown_Model {
     disableFancyArrayDef: string[];

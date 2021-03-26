@@ -79,10 +79,15 @@ export type TOutputMath = {
 
 export type TOutputMathJax = {
   mtextInheritFont?: boolean,
+  asciiMath?: TAsciiMath
 }
 
 export type THtmlSanitize = {
   disallowedTagsMode?: string
+} | false;
+
+export type TAsciiMath = {
+  useBacktick?: boolean,
 } | false;
 
 const formatSourceHtml = (text: string, notTrim: boolean = false) => {
