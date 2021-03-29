@@ -21,7 +21,7 @@ describe('Check rendering ascii:', () => {
   };
   const parser = new DOMParser();
 
-  let text = '\\$x=(-b+-sqrt(b^(2)-4ac))/(2a)\\$';
+  let text = '<ascii>x=(-b+-sqrt(b^(2)-4ac))/(2a)</ascii>';
   describe('Latex => ' + text, () => {
     let html = MM.markdownToHTML(text, options);
 
@@ -46,7 +46,7 @@ describe('Check rendering ascii:', () => {
   });
 
 
-  text = '\\$x=(-b+-sqrt(b^(2)-4ac))/(2a)\\$';
+  text = '<ascii>x=(-b+-sqrt(b^(2)-4ac))/(2a)</ascii>';
   options.mathJax = {
     asciiMath: false
   };

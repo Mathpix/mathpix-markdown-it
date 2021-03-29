@@ -22,7 +22,7 @@ const MathJaxConfig = {
         processRefs: true, // process \ref{...} outside of math mode,
     },
       asciimath: {
-        delimiters: [['\\$','\\$'], ['`','`']]
+        delimiters: [['<ascii>','</ascii>'], ['`','`']]
       },
     MathML: {
         parseAs: "html", // or 'xml'
