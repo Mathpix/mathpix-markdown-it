@@ -7,6 +7,15 @@ export const getTextWidth = (): number => {
   return el_container ? el_container.offsetWidth : 800;
 };
 
+export const getWidthFromDocument = (cwidth = 1200) => {
+  try {
+    const el_container = document.getElementById('container-ruller');
+    return el_container ? el_container.offsetWidth : 1200;
+  } catch (e) {
+    return cwidth;
+  }
+};
+
 export const isNotBackticked = (str: string, tag: string): boolean => {
   let
     pos = 0,
