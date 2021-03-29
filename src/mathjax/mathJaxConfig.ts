@@ -21,6 +21,9 @@ const MathJaxConfig = {
         processEnvironments: true, // process \begin{xxx}...\end{xxx} outside math mode
         processRefs: true, // process \ref{...} outside of math mode,
     },
+      asciimath: {
+        delimiters: [['\\$','\\$'], ['`','`']]
+      },
     MathML: {
         parseAs: "html", // or 'xml'
         forceReparse: true //Need to set true. Have bug in MathJax 3.0.1

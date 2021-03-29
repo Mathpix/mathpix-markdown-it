@@ -1,7 +1,7 @@
 import { MathJax } from "../mathjax/";
 import { inlineTabular } from "./md-inline-rule/tabular";
 import { renderTabularInline } from './md-renderer-rules/render-tabular';
-import { //isNotBackticked,
+import {
   includesSimpleMathTag,
   includesMultiMathTag,
   includesMultiMathBeginTag } from './utils';
@@ -307,6 +307,104 @@ function refs(state, silent) {
   return true;
 }
 
+const asciiMath = (state, silent) => {
+  const notRenderAsciiMath = state.md.options.mathJax
+    && Object(state.md.options.mathJax).hasOwnProperty('asciiMath')
+    && state.md.options.mathJax.asciiMath === false;
+  if (notRenderAsciiMath) {
+    return false;
+  }
+  let pos, afterStartMarker,
+    startMathPos = state.pos;
+
+  const asciiMarker = "\\$";
+
+  if (state.src.charCodeAt(startMathPos) !== 0x5c /* \ */) {
+    return false;
+  }
+  pos = ++startMathPos;
+  afterStartMarker = state.src.charCodeAt(pos)
+
+  if (afterStartMarker !== 0x24 /* $ */) {
+    return false;
+  }
+
+  if (state.src.charCodeAt(++startMathPos) === 0x24 /* $ */) {
+    return false;
+  }
+
+  const endMarkerPos = findEndMarkerPos(state.src, asciiMarker, startMathPos);
+  if (endMarkerPos === -1) {
+    return false;
+  }
+  if (state.src.charCodeAt(endMarkerPos - 1) === 0x5c /* \ */) {
+    return false;
+  }
+  const nextPos = endMarkerPos + asciiMarker.length;
+
+
+  if (!silent) {
+    const token = state.push("ascii_math", 0);
+    token.content = state.src.slice(startMathPos, endMarkerPos);
+    if (state.env.tabulare) {
+      token.return_asciimath = true;
+    }
+    if (state.md.options.forLatex) {
+      token.markup = startMathPos;
+    }
+  }
+  state.pos = nextPos;
+  return true;
+};
+
+
+const backtickAsAsciiMath = (state, silent) => {
+  const useBacktick = state.md.options.mathJax && state.md.options.mathJax.asciiMath &&  state.md.options.mathJax.asciiMath.useBacktick
+  if (!useBacktick) {
+    return false;
+  }
+
+  let start, marker, matchStart, matchEnd, token,
+    pos = state.pos,
+    ch = state.src.charCodeAt(pos);
+
+  if (ch !== 0x60/* ` */) {
+    return false;
+  }
+
+  start = pos;
+  pos++;
+
+  if (state.src.charCodeAt(pos) === 0x60/* ` */) {
+    return false;
+  }
+
+
+  marker = state.src.slice(start, pos);
+
+  matchStart = matchEnd = pos;
+
+  while ((matchStart = state.src.indexOf('`', matchEnd)) !== -1) {
+    matchEnd = matchStart + 1;
+
+    if (matchEnd - matchStart === marker.length) {
+      if (!silent) {
+        token         = state.push('ascii_math', 0);
+        token.markup  = marker;
+        token.content = state.src.slice(pos, matchStart)
+          .replace(/[ \n]+/g, ' ')
+          .trim();
+      }
+      state.pos = matchEnd;
+      return true;
+    }
+  }
+
+  if (!silent) { state.pending += marker; }
+  state.pos += marker.length;
+  return true;
+};
+
 function simpleMath(state, silent) {
   let pos, afterStartMarker,
     startMathPos = state.pos;
@@ -485,6 +583,40 @@ const getWidthFromDocument = (cwidth = 1200) => {
   } catch (e) {
     return cwidth;
   }
+};
+
+const renderAsciiMath = (tokens, idx, options) => {
+  const token = tokens[idx];
+  let mathEquation = null;
+  const math = token.content;
+  try {
+    let cwidth = 1200;
+    if (options && options.width && options.width > 0) {
+      cwidth = options.width;
+    } else {
+      cwidth = getWidthFromDocument(cwidth);
+    }
+
+    mathEquation = MathJax.AsciiMathToSvg(math, {display: false, metric: { cwidth: cwidth },
+      outMath: options.outMath, mathJax: options.mathJax, forDocx: options.forDocx});
+  } catch (e) {
+    console.error('ERROR MathJax =>', e.message, e);
+    if (options.outMath && options.outMath.not_catch_errors) {
+      throw ({
+        message: e.message,
+        error: e
+      })
+    }
+
+    if (token.type === 'display_mathML' || token.type === 'inline_mathML') {
+      mathEquation = `<span class="math-error">${math}</span>`;
+    } else {
+      mathEquation = math;
+      return `<p class="math-error">${mathEquation}</p>`;
+    }
+  }
+
+  return `<span class="math-inline ascii">${mathEquation}</span>`
 };
 
 const renderMath = (a, token, options) => {
@@ -885,7 +1017,8 @@ const mapping = {
   // tsv: "TSV",
   usepackage_geometry: "Usepackage_geometry",
   display_mathML: "DisplayMathML",
-  inline_mathML: "InlineMathML"
+  inline_mathML: "InlineMathML",
+  ascii_math: "ascii_math"
 };
 
 export default options => {
@@ -910,6 +1043,9 @@ export default options => {
     md.inline.ruler.before("escape", "multiMath", multiMath);
     md.inline.ruler.before("multiMath", "inlineTabular", inlineTabular);
     md.inline.ruler.push("simpleMath", simpleMath);
+    md.inline.ruler.before("multiMath", "asciiMath", asciiMath);
+    md.inline.ruler.before("asciiMath", "backtickAsAsciiMath", backtickAsAsciiMath);
+
 
     Object.keys(mapping).forEach(key => {
       md.renderer.rules[key] = (tokens, idx, options, env, slf) => {
@@ -926,6 +1062,8 @@ export default options => {
             return renderReference(tokens[idx]);
           case "usepackage_geometry":
             return renderUsepackage(tokens[idx], options);
+          case "ascii_math":
+            return renderAsciiMath(tokens, idx, options);
           default:
             return renderMath(tokens, tokens[idx], options);
         }

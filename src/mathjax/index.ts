@@ -117,6 +117,39 @@ const OuterData = (node, math, outMath, forDocx = false) => {
   return res;
 };
 
+const OuterDataAscii = (node, math, outMath, forDocx = false) => {
+  const {
+    include_mathml = false,
+    include_mathml_word = false,
+    include_asciimath = false,
+    include_svg = true,
+  } = outMath;
+  let res: {
+    mathml?: string,
+    mathml_word?: string,
+    asciimath?: string,
+    latex?: string,
+    svg?: string
+  } = {};
+  if (include_mathml) {
+    res.mathml = toMathML(math.root);
+  }
+
+  if (include_mathml_word) {
+    res.mathml_word = toMathMLWord(math.root, {forDocx: forDocx});
+  }
+
+  if (include_asciimath) {
+    res.asciimath = (math.math
+      ? math.math
+      : math.inputJax.processStrings ? '' : math.start.node.outerHTML);
+  }
+  if (include_svg) {
+    res.svg = adaptor.outerHTML(node)
+  }
+  return res;
+};
+
 const formatSource = (text: string) => {
   return text.trim()
     .replace(/&/g, '&amp;')
@@ -240,12 +273,17 @@ export const MathJax = {
     return adaptor.outerHTML(node);
   },
 
-  AsciiMathToSvg: function(string, display=true, metric: any={}) {
+  AsciiMathToSvg: function(string, options: any={}) {
+    const {display = true, metric = {}, outMath = {}, forDocx={}} = options;
     const {em = 16, ex = 8, cwidth = 1200, lwidth = 100000, scale = 1} = metric;
     const asciimath = new AsciiMath({});
+
     let docAsciiMath = MJ.document(domNode, { InputJax: asciimath, OutputJax: svg });
-    const node = docAsciiMath.convert(string, {display: display, em: em, ex: ex, containerWidth: cwidth, lineWidth: lwidth, scale: scale})
-    return adaptor.outerHTML(node)
+    const node = docAsciiMath.convert(string, {display: display, em: em, ex: ex, containerWidth: cwidth, lineWidth: lwidth, scale: scale});
+
+    const outputJax = docAsciiMath.outputJax as any;
+    const outerDataAscii = OuterDataAscii(node, outputJax.math, outMath, forDocx);
+    return OuterHTML(outerDataAscii, options.outMath);
   },
 
   //

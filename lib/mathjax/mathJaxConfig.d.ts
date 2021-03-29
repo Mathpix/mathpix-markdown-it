@@ -12,6 +12,9 @@ declare const MathJaxConfig: {
         processEnvironments: boolean;
         processRefs: boolean;
     };
+    asciimath: {
+        delimiters: string[][];
+    };
     MathML: {
         parseAs: string;
         forceReparse: boolean;
