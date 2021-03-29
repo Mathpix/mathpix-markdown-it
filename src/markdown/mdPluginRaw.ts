@@ -1,7 +1,7 @@
 import { MathJax } from "../mathjax/";
 import { inlineTabular } from "./md-inline-rule/tabular";
 import { renderTabularInline } from './md-renderer-rules/render-tabular';
-import { //isNotBackticked,
+import {
   includesSimpleMathTag,
   includesMultiMathTag,
   includesMultiMathBeginTag } from './utils';
@@ -308,6 +308,12 @@ function refs(state, silent) {
 }
 
 const asciiMath = (state, silent) => {
+  const notRenderAsciiMath = state.md.options.mathJax
+    && Object(state.md.options.mathJax).hasOwnProperty('asciiMath')
+    && state.md.options.mathJax.asciiMath === false;
+  if (notRenderAsciiMath) {
+    return false;
+  }
   let pos, afterStartMarker,
     startMathPos = state.pos;
 
