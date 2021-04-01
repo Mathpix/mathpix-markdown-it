@@ -755,7 +755,7 @@ function paragraphDiv(state, startLine/*, endLine*/) {
       }
       if (state.isEmpty(nextLine)
         || pickStartTag.test(lineText) || pickEndTag.test(prewLineText)
-        || (!isMath && (pickMathStartTag.test(lineText) || pickMathEndTag.test(prewLineText)))) {
+        || (!isMath && !openedAuthorBlock && (pickMathStartTag.test(lineText) || pickMathEndTag.test(prewLineText)))) {
         break;
       }
 
