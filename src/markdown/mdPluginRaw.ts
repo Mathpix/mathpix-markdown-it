@@ -8,22 +8,9 @@ import {
   includesMultiMathBeginTag,
   getWidthFromDocument
 } from './utils';
+import { openTagMML, closeTagMML } from './common/consts';
 
 let mathNumber = [];
-
-const attr_name = '[a-zA-Z_:][a-zA-Z0-9:._-]*';
-const unquoted = '[^"\'=<>`\\x00-\\x20]+';
-const single_quoted = "'[^']*'";
-const double_quoted = '"[^"]*"';
-const attr_value = '(?:' + unquoted + '|' + single_quoted + '|' + double_quoted + ')';
-const attribute = '(?:\\s+' + attr_name + '(?:\\s*=\\s*' + attr_value + ')?)';
-
-const open_tag = '<(math)' + attribute + '*\\s*\\/?>';
-const close_tag = '<\\/math*\\s*>';
-
-const openTagMML = new RegExp('(?:' + open_tag + ')');
-const closeTagMML = new RegExp('(?:' + close_tag + ')');
-
 
 function MathML(state, silent, pos, endMarker = '', type = "inline_mathML") {
   const markerBegin = RegExp('^</?(math)(?=(\\s|>|$))', 'i');

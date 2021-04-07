@@ -4,6 +4,7 @@ import { ISmilesOptionsDef } from "./smiles-drawer/src/Drawer";
 import { PREVIEW_LINE_CLASS, PREVIEW_PARAGRAPH_PREFIX } from "../rules";
 import { uid } from '../utils';
 import convertSvgToBase64 from "../md-svg-to-base64/convert-scv-to-base64";
+import { reOpenTagSmiles } from "../common/consts";
 
 export interface ISmilesOptions extends ISmilesOptionsDef {
   theme?: string,
@@ -139,7 +140,7 @@ const smilesDrawerBlock: RuleBlock = (state, startLine: number, endLine: number,
 
 const smilesDrawerInline: RuleInline = (state) => {
   let startPos = state.pos;
-  let beginMarker: RegExp = /^<smiles>/;
+  let beginMarker: RegExp = reOpenTagSmiles;
   let endMarker: string = '</smiles>';
 
   if (state.src.charCodeAt(startPos) !== 0x3C /* < */) {
