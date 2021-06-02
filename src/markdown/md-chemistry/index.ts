@@ -204,10 +204,15 @@ const renderSmilesDrawerBlock = (tokens, idx, options, env, slf) => {
     ? '<smiles style="display: none">' + token.content.trim() + '</smiles>'
     : '';
 
+  const maxWidth = options.maxWidth ? ` max-width: ${options.maxWidth}; overflow-x: scroll;` : '';
   if (attrs) {
-    return `<div ${attrs}><div class="smiles">${outputSmiles}${resSvg}</div></div>`
+    return maxWidth
+      ? `<div ${attrs}><div class="smiles" style="${maxWidth}">${outputSmiles}${resSvg}</div></div>`
+      : `<div ${attrs}><div class="smiles">${outputSmiles}${resSvg}</div></div>`
   }
-  return `<div><div class="smiles">${outputSmiles}${resSvg}</div></div>`
+  return maxWidth
+    ? `<div><div class="smiles" style="${maxWidth}">${outputSmiles}${resSvg}</div></div>`
+    : `<div><div class="smiles">${outputSmiles}${resSvg}</div></div>`
 };
 
 const renderSmilesDrawerInline = (tokens, idx, options, env, slf) => {
@@ -233,7 +238,11 @@ const renderSmilesDrawerInline = (tokens, idx, options, env, slf) => {
   const outputSmiles = include_smiles
     ? '<smiles style="display: none">' + token.content.trim() + '</smiles>'
     : '';
-  return `<div class="smiles-inline" style="display: inline-block">${outputSmiles}${resSvg}</div>`;
+
+  const maxWidth = options.maxWidth ? ` max-width: ${options.maxWidth}; overflow-x: scroll;` : '';
+  return maxWidth
+    ? `<div class="smiles-inline" style="display: inline-block;${maxWidth}">${outputSmiles}${resSvg}</div>`
+    : `<div class="smiles-inline" style="display: inline-block">${outputSmiles}${resSvg}</div>`;
 };
 
 export default (md: MarkdownIt, options) => {
