@@ -9,14 +9,17 @@ import {MathpixMarkdownModel as MM, TMarkdownItOptions} from '../mathpix-markdow
 const mdInit = (options: TMarkdownItOptions) => {
   const {htmlTags = false, xhtmlOut = false, width = 1200, breaks = true, typographer = true, linkify = true,
           outMath = {}, mathJax = {}, renderElement = {},
-          lineNumbering = false, htmlSanitize = true, smiles = {}, forDocx = false, openLinkInNewWindow =  true} = options;
+          lineNumbering = false, htmlSanitize = true, smiles = {}, forDocx = false, openLinkInNewWindow =  true,
+    maxWidth = ''
+  } = options;
   const mmdOptions = {
     width: width,
     outMath: outMath,
     mathJax: mathJax,
     renderElement: renderElement,
     smiles: smiles,
-    forDocx: forDocx
+    forDocx: forDocx,
+    maxWidth: maxWidth
   };
   return require("markdown-it")({
     html: htmlTags,

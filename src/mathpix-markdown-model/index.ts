@@ -34,6 +34,7 @@ export interface optionsMathpixMarkdown {
     forDocx?: boolean;
     forLatex?: boolean;
     openLinkInNewWindow?: boolean;
+    maxWidth?: string;
 }
 
 export type TMarkdownItOptions = {
@@ -59,6 +60,7 @@ export type TMarkdownItOptions = {
   forDocx?: boolean;
   forLatex?: boolean;
   openLinkInNewWindow?: boolean;
+  maxWidth?: string;
 }
 
 export type TOutputMath = {
@@ -300,7 +302,7 @@ class MathpixMarkdown_Model {
         }, 10);
     };
 
-    loadMathJax = (notScrolling:boolean=false, setTextAlignJustify: boolean=true, isResetBodyStyles: boolean=false):boolean => {
+    loadMathJax = (notScrolling:boolean=false, setTextAlignJustify: boolean=true, isResetBodyStyles: boolean=false, maxWidth: string = ''):boolean => {
         try {
             const el = document.getElementById('SVG-styles');
             if (!el) {
@@ -316,7 +318,7 @@ class MathpixMarkdown_Model {
                 const style = document.createElement("style");
                 style.setAttribute("id", "Mathpix-styles");
                 let bodyStyles = isResetBodyStyles ? resetBodyStyles : '';
-                style.innerHTML = bodyStyles + MathpixStyle(setTextAlignJustify) + codeStyles + tabularStyles() + listsStyles;
+                style.innerHTML = bodyStyles + MathpixStyle(setTextAlignJustify, true, maxWidth) + codeStyles + tabularStyles() + listsStyles;
                 document.head.appendChild(style);
             }
             return true;
@@ -380,7 +382,9 @@ class MathpixMarkdown_Model {
         const { alignMathBlock='center', display='block', isCheckFormula=false, showTimeLog=false,
           isDisableFancy=false, fontSize=null, padding=null, htmlTags=false, width=0, showToc = false,
           overflowY='unset', breaks = true, typographer = true, linkify = true, xhtmlOut = false,
-          outMath = {}, mathJax = {}, htmlSanitize = {}, smiles = {}, openLinkInNewWindow = true}
+          outMath = {}, mathJax = {}, htmlSanitize = {}, smiles = {}, openLinkInNewWindow = true,
+          maxWidth=''
+        }
          = options || {};
 
         const disableRules = isDisableFancy ? this.disableFancyArrayDef : options ? options.disableRules || [] : [];
@@ -406,16 +410,18 @@ class MathpixMarkdown_Model {
           mathJax: mathJax,
           htmlSanitize: htmlSanitize,
           smiles: smiles,
-          openLinkInNewWindow: openLinkInNewWindow
+          openLinkInNewWindow: openLinkInNewWindow,
+          maxWidth: maxWidth
         };
 
         const styleFontSize = fontSize ? ` font-size: ${options.fontSize}px;` : '';
         const stylePadding = padding ? ` padding-left: ${options.padding}px; padding-right: ${options.padding}px;` : '';
+        const styleMaxWidth = maxWidth ? ` max-width: ${maxWidth};` : '';
         this.setOptions(disableRules, isCheckFormula, showTimeLog);
         return (
             `<div id='preview' style='justify-content:${alignMathBlock};overflow-y:${overflowY};will-change:transform;'>
                 <div id='container-ruller'></div>
-                <div id='setText' style='display: ${display}; justify-content: inherit;${styleFontSize}${stylePadding}' >
+                <div id='setText' style='display: ${display}; justify-content: inherit;${styleFontSize}${stylePadding}${styleMaxWidth}' >
                     ${this.convertToHTML(text, markdownItOptions)}
                 </div>
             </div>`

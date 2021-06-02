@@ -24,6 +24,7 @@ export interface optionsMathpixMarkdown {
     forDocx?: boolean;
     forLatex?: boolean;
     openLinkInNewWindow?: boolean;
+    maxWidth?: string;
 }
 export declare type TMarkdownItOptions = {
     isDisableFancy?: boolean;
@@ -48,6 +49,7 @@ export declare type TMarkdownItOptions = {
     forDocx?: boolean;
     forLatex?: boolean;
     openLinkInNewWindow?: boolean;
+    maxWidth?: string;
 };
 export declare type TOutputMath = {
     include_mathml?: boolean;
@@ -91,7 +93,7 @@ declare class MathpixMarkdown_Model {
     checkEquationNumber: (html: string) => string;
     handleClick: (e: any) => void;
     scrollPage: (parent: any, offsetTarget: any) => void;
-    loadMathJax: (notScrolling?: boolean, setTextAlignJustify?: boolean, isResetBodyStyles?: boolean) => boolean;
+    loadMathJax: (notScrolling?: boolean, setTextAlignJustify?: boolean, isResetBodyStyles?: boolean, maxWidth?: string) => boolean;
     convertToHTML: (str: string, options?: TMarkdownItOptions) => string;
     getMathjaxStyle: () => any;
     getMathpixStyleOnly: () => string;
