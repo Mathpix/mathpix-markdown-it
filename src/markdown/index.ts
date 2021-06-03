@@ -10,6 +10,8 @@ const mdInit = (options: TMarkdownItOptions) => {
   const {htmlTags = false, xhtmlOut = false, width = 1200, breaks = true, typographer = true, linkify = true,
           outMath = {}, mathJax = {}, renderElement = {},
           lineNumbering = false, htmlSanitize = true, smiles = {}, forDocx = false, openLinkInNewWindow =  true,
+    isDisableEmoji=false,
+    isDisableEmojiShortcuts=false,
     maxWidth = ''
   } = options;
   const mmdOptions = {
@@ -21,7 +23,7 @@ const mdInit = (options: TMarkdownItOptions) => {
     forDocx: forDocx,
     maxWidth: maxWidth
   };
-  return require("markdown-it")({
+  let md = require("markdown-it")({
     html: htmlTags,
     xhtmlOut: xhtmlOut,
     breaks: breaks,
@@ -32,17 +34,26 @@ const mdInit = (options: TMarkdownItOptions) => {
     lineNumbering: lineNumbering,
     htmlSanitize: htmlSanitize,
     openLinkInNewWindow: openLinkInNewWindow
-  })
-    .use(mathpixMarkdownPlugin, mmdOptions)
+  });
+
+  md.use(mathpixMarkdownPlugin, mmdOptions)
     .use(require('markdown-it-multimd-table'), {enableRowspan: true, enableMultilineRows: true})
     .use(require("markdown-it-footnote"))
     .use(require("markdown-it-sub"))
     .use(require("markdown-it-sup"))
     .use(require("markdown-it-deflist"))
     .use(require("markdown-it-mark"))
-    .use(require("markdown-it-emoji"))
     .use(mdPluginCollapsible)
     .use(require("markdown-it-ins"));
+
+  if (!isDisableEmoji) {
+    if (isDisableEmojiShortcuts) {
+      md.use(require("markdown-it-emoji"), { shortcuts: {} })
+    } else {
+      md.use(require("markdown-it-emoji"))
+    }
+  }
+  return md;
 };
 
 /** String transformtion pipeline */

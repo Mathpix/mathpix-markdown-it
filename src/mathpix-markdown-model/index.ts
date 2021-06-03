@@ -16,6 +16,8 @@ export interface optionsMathpixMarkdown {
     isCheckFormula?: boolean;
     showTimeLog?: boolean;
     isDisableFancy?: boolean;
+    isDisableEmoji?: boolean;
+    isDisableEmojiShortcuts?: boolean;
     disableRules?: string[];
     fontSize?: number;
     padding?: number;
@@ -39,6 +41,8 @@ export interface optionsMathpixMarkdown {
 
 export type TMarkdownItOptions = {
   isDisableFancy?: boolean;
+  isDisableEmoji?: boolean;
+  isDisableEmojiShortcuts?: boolean;
   disableRules?: string[];
   htmlTags?: boolean,
   breaks?: boolean,
@@ -380,7 +384,7 @@ class MathpixMarkdown_Model {
 
     render = ( text: string, options?: optionsMathpixMarkdown ):string => {
         const { alignMathBlock='center', display='block', isCheckFormula=false, showTimeLog=false,
-          isDisableFancy=false, fontSize=null, padding=null, htmlTags=false, width=0, showToc = false,
+          isDisableFancy=false, isDisableEmoji=false, isDisableEmojiShortcuts=false, fontSize=null, padding=null, htmlTags=false, width=0, showToc = false,
           overflowY='unset', breaks = true, typographer = true, linkify = true, xhtmlOut = false,
           outMath = {}, mathJax = {}, htmlSanitize = {}, smiles = {}, openLinkInNewWindow = true,
           maxWidth=''
@@ -388,6 +392,7 @@ class MathpixMarkdown_Model {
          = options || {};
 
         const disableRules = isDisableFancy ? this.disableFancyArrayDef : options ? options.disableRules || [] : [];
+
         if (showToc) {
           const index = disableRules.indexOf('toc');
           if (disableRules.indexOf('toc') === -1) {
@@ -399,6 +404,8 @@ class MathpixMarkdown_Model {
 
         const markdownItOptions: TMarkdownItOptions = {
           isDisableFancy: isDisableFancy,
+          isDisableEmoji: isDisableEmoji,
+          isDisableEmojiShortcuts: isDisableEmojiShortcuts,
           disableRules: disableRules,
           htmlTags: htmlTags,
           xhtmlOut: xhtmlOut,
