@@ -110,7 +110,7 @@ const formatSourceHtmlWord = (text: string, notTrim: boolean = false) => {
 };
 
 class MathpixMarkdown_Model {
-    public disableFancyArrayDef = ['replacements', 'list', 'usepackage', 'toc'];
+    public disableFancyArrayDef = ['replacements', 'list', 'usepackage', 'toc', 'emoji'];
     public disableRules: string[];
     public isCheckFormula?: boolean;
     public showTimeLog?: boolean;
