@@ -11,10 +11,10 @@ export const MathpixStyle = (setTextAlignJustify: boolean = true, useColors: boo
         margin-top: 0;
         margin-bottom: 1em;
         ${setTextAlignJustify ? 'text-align: justify;' : ''}
-        ${maxWidth ? 'overflow-x: scroll;' : ''}
+        ${maxWidth ? 'overflow-x: auto;' : ''}
     }
     
-    ${maxWidth ? '#setText > blockquote, h1, h2, h3, h4, h5, h6 { overflow-x: scroll; }' : ''}
+    ${maxWidth ? '#setText > blockquote, h1, h2, h3, h4, h5, h6 { overflow-x: auto; }' : ''}
     
     #setText div:last-child {
         margin-bottom: 0 !important;
@@ -43,10 +43,10 @@ export const MathpixStyle = (setTextAlignJustify: boolean = true, useColors: boo
       padding-top: 1px;
       padding-bottom: 1px;
       ${maxWidth ? 'max-width:' + maxWidth + ';' : ''}
-      ${maxWidth ? 'overflow-x: scroll;' : ''}
+      ${maxWidth ? 'overflow-x: auto;' : ''}
     }
     
-    ${maxWidth ? 'mjx-container[jax="SVG"] > svg { overflow-x: scroll; }' : ''}
+    ${maxWidth ? 'mjx-container[jax="SVG"] > svg { overflow-x: auto; }' : ''}
     
     .math-inline mjx-container {
         display: inline-block !important;
