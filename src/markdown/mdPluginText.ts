@@ -574,10 +574,10 @@ const renderInlineContent = (token, options, env, slf) => {
         if (tok.type === "tabular_inline") {
           content = renderTabularInline(token.children, tok, options, env, slf)
         } else {
-          content = slf.renderInline(tok.children, options);
+          content = slf.renderInline(tok.children, options, env);
         }
       } else {
-        content = slf.renderInline([tok], options);
+        content = slf.renderInline([tok], options, env);
       }
       sContent +=  content
     }
@@ -772,7 +772,7 @@ export default () => {
     });
 
     Object.keys(mapping).forEach(key => {
-      md.renderer.rules[key] = (tokens, idx, options, env, slf) => {
+      md.renderer.rules[key] = (tokens, idx, options, env = {}, slf) => {
         switch (tokens[idx].type) {
           case "section":
             return renderSectionTitle(tokens, idx, options, env, slf);
