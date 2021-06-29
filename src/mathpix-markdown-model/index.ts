@@ -482,16 +482,16 @@ class MathpixMarkdown_Model {
     }
   };
 
-  renderAuthorsMmd = (authors: string, className = 'article-author', isOnlyInner = false) => {
+  renderAuthorsMmd = (authors: string, options: TMarkdownItOptions = {}, className = 'article-author', isOnlyInner = false) => {
     try {
       if (!authors) {
         return '';
       };
 
-      const htmlAuthors = window.markdownToHTML(`\\author{${authors}}`);
+      const htmlAuthors = this.markdownToHTML(`\\author{${authors}}`, options);
       const parser = new DOMParser();
       const doc = parser.parseFromString(htmlAuthors, "text/html");
-      const elAuthors = doc.body.firstChild as HTMLElement;;
+      const elAuthors = doc.body.firstChild as HTMLElement;
       if (isOnlyInner) {
         return elAuthors.innerHTML;
       }

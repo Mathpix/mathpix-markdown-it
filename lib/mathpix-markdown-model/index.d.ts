@@ -112,7 +112,7 @@ declare class MathpixMarkdown_Model {
         error: string;
     };
     renderTitleMmd: (title: string, options?: TMarkdownItOptions, className?: string, isOnlyInner?: boolean) => string;
-    renderAuthorsMmd: (authors: string, className?: string, isOnlyInner?: boolean) => string;
+    renderAuthorsMmd: (authors: string, options?: TMarkdownItOptions, className?: string, isOnlyInner?: boolean) => string;
 }
 export declare const MathpixMarkdownModel: MathpixMarkdown_Model;
 export {};
