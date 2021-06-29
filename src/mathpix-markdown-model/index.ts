@@ -9,6 +9,7 @@ import { listsStyles } from "../styles/styles-lists";
 import {MathJax} from '../mathjax';
 import { Property } from 'csstype'; // at top of file
 import { ISmilesOptions } from '../markdown/md-chemistry';
+import { yamlParser } from '../yaml-parser';
 
 export interface optionsMathpixMarkdown {
     alignMathBlock?: Property.TextAlign;
@@ -434,6 +435,73 @@ class MathpixMarkdown_Model {
             </div>`
         );
     };
+
+  mmdYamlToHTML = (mmd: string, options: TMarkdownItOptions = {}, isAddYamlToHtml = false) => {
+    try {
+      MathJax.Reset();
+      const { isDisableFancy = false } = options;
+      const disableRules = isDisableFancy ? this.disableFancyArrayDef : options ? options.disableRules || [] : [];
+      this.setOptions(disableRules);
+
+      const { metadata, content, error = ''} = yamlParser(mmd, isAddYamlToHtml);
+      let html = this.render(content, options);
+      if (html.indexOf('clickable-link') !== -1) {
+        html = this.checkEquationNumber(html);
+      }
+      return {
+        html: html,
+        metadata: metadata,
+        content: content,
+        error: error
+      }
+
+    } catch (err) {
+      console.log('ERROR => [mmdYamlToHTML] =>' + err);
+      console.error(err);
+      return null
+    }
+  }
+
+  renderTitleMmd = (title: string, options: TMarkdownItOptions = {}, className = 'article-title', isOnlyInner = false): string => {
+    try {
+      if (!title) {
+        return '';
+      }
+      const htmlTitle = this.markdownToHTML(`\\title{${title}}`, options);
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(htmlTitle, "text/html");
+      const elTitle = doc.body.firstChild as HTMLElement;
+      if (isOnlyInner) {
+        return elTitle.innerHTML;
+      }
+      elTitle.classList.add(className);
+      return elTitle.outerHTML;
+    } catch (err) {
+      console.error(err);
+      return ''
+    }
+  };
+
+  renderAuthorsMmd = (authors: string, options: TMarkdownItOptions = {}, className = 'article-author', isOnlyInner = false) => {
+    try {
+      if (!authors) {
+        return '';
+      };
+
+      const htmlAuthors = this.markdownToHTML(`\\author{${authors}}`, options);
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(htmlAuthors, "text/html");
+      const elAuthors = doc.body.firstChild as HTMLElement;
+      if (isOnlyInner) {
+        return elAuthors.innerHTML;
+      }
+      elAuthors.classList.add(className);
+      return elAuthors.outerHTML;
+    } catch (err) {
+      console.error(err);
+      return '';
+    }
+  }
 }
 
 export const MathpixMarkdownModel = new MathpixMarkdown_Model();
