@@ -1,0 +1,55 @@
+//Require the dev-dependencies
+let chai = require('chai');
+let should = chai.should();
+
+
+let MM = require('../lib/mathpix-markdown-model/index').MathpixMarkdownModel;
+
+const options = {outMath: {
+    include_asciimath: false,
+    include_mathml: false,
+    include_latex: false,
+    include_svg: false,
+    include_tsv: false
+  }};
+
+
+const Window = require('window');
+const window = new Window();
+global.window = window;
+global.document = window.document;
+
+const jsdom = require("jsdom");
+const { JSDOM } = jsdom;
+global.DOMParser = new JSDOM().window.DOMParser;
+
+describe('Set: include_table_markdown=true:', () => {
+  const tests = require('./_data/_table-markdown/_data');
+  tests.forEach(function(test) {
+    const options = {
+      outMath: {
+        include_table_markdown: true,
+        include_table_html: false
+      }
+    };
+    describe(`[${test.id}] Latex => ` + test.latex, () => {
+      const html = MM.render(test.latex, options);
+      const data = MM.parseMarkdownByHTML(html, false);
+
+      it('Should be parser.length = 1', function(done) {
+        data.should.have.length(1);
+        done();
+      });
+
+      it('Should be have type: "table-markdown"', function(done) {
+        data[0].should.have.property('type', 'table-markdown');
+        // console.log('value>',  data[0].value);
+        data[0].should.have.property('value', test.table_markdown);
+        done();
+      });
+    });
+
+
+  });
+
+});

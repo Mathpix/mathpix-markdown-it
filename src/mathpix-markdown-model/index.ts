@@ -76,6 +76,7 @@ export type TOutputMath = {
   include_svg?: boolean,
   include_table_html?: boolean,
   include_tsv?: boolean,
+  include_table_markdown?: boolean,
   include_smiles?: boolean,
   tsv_separators?: {
     column?: string,
@@ -155,7 +156,7 @@ class MathpixMarkdown_Model {
           continue;
         }
 
-        if (["MATHML", "MATHMLWORD", "ASCIIMATH", "LATEX", "MJX-CONTAINER", "TABLE", "TSV", "SMILES"].indexOf(child.tagName) !== -1) {
+        if (["MATHML", "MATHMLWORD", "ASCIIMATH", "LATEX", "MJX-CONTAINER", "TABLE", "TSV", "SMILES", "TABLE-MARKDOWN"].indexOf(child.tagName) !== -1) {
           if (child.tagName==="MJX-CONTAINER" || child.tagName==="TABLE") {
             if (child.tagName === "TABLE") {
               res.push({type: "html", value: child.outerHTML});
@@ -165,8 +166,8 @@ class MathpixMarkdown_Model {
           } else {
             res.push({
               type: child.tagName.toLowerCase(),
-              value: child.tagName === 'LATEX' || child.tagName === 'ASCIIMATH' || child.tagName === 'TSV' || child.tagName === 'SMILES'
-              ? formatSourceHtml(child.innerHTML, child.tagName === 'TSV')
+              value: child.tagName === 'LATEX' || child.tagName === 'ASCIIMATH' || child.tagName === 'TSV' || child.tagName === "TABLE-MARKDOWN" || child.tagName === 'SMILES'
+              ? formatSourceHtml(child.innerHTML, (child.tagName === 'TSV' || child.tagName === "TABLE-MARKDOWN"))
               : child.tagName === 'MATHMLWORD'
                   ? formatSourceHtmlWord(child.innerHTML)
                   : child.innerHTML

@@ -95,6 +95,7 @@ describe('Test from example:', () => {
       include_latex: true,
       include_svg: true,
       include_tsv: true,
+      include_table_markdown: true,
       include_table_html: true
     }
   };
@@ -102,8 +103,8 @@ describe('Test from example:', () => {
   const parsed = MM.parseMarkdownByHTML(html, false);
 
   describe('input_latex => ' , () => {
-    it('Should be parser.length = 2', function(done) {
-      parsed.should.have.length(2);
+    it('Should be parser.length = 3', function(done) {
+      parsed.should.have.length(3);
       done();
     });
     it('Should be have type: "html"', function(done) {
@@ -112,6 +113,10 @@ describe('Test from example:', () => {
     });
     it('Should be have type: "tsv"', function(done) {
       parsed[1].should.have.property('type', 'tsv');
+      done();
+    });
+    it('Should be have type: "table-markdown"', function(done) {
+      parsed[2].should.have.property('type', 'table-markdown');
       done();
     });
   });

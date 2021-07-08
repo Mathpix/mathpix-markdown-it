@@ -218,6 +218,9 @@ function multiMath(state, silent) {
     if (state.env.tabulare) {
       token.return_asciimath = true;
     }
+    if (state.md.options.outMath && state.md.options.outMath.include_table_markdown) {
+      token.latex = '\\' + match.input;
+    }
   }
 
   state.pos = nextPos;
@@ -371,6 +374,9 @@ function simpleMath(state, silent) {
     }
     if (state.md.options.forLatex) {
       token.markup = endMarker;
+    }
+    if (state.md.options.outMath && state.md.options.outMath.include_table_markdown) {
+      token.latex = endMarker + token.content + endMarker;
     }
   }
   state.pos = nextPos;

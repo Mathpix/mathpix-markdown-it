@@ -60,11 +60,15 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}): A
   const cLines: Array<string> = getColumnLines(align, numCol);
   const {cAlign, vAlign, cWidth} = dataAlign;
   const decimal: Array<TDecimal> = getDecimal(cAlign, cellsAll);
-  const { forLatex = false } = options;
+  const { forLatex = false, outMath = {} } = options;
 
   res.push({token:'table_open', type:'table_open', tag: 'table', n: 1,
     attrs: [[ 'id', 'tabular' ]],
-    latex: forLatex ? align : ''
+    latex: forLatex
+      ? align
+      : outMath.include_table_markdown
+        ? cAlign.join('|')
+        : ''
   });
   res.push({token:'tbody_open', type:'tbody_open', tag: 'tbody', n: 1});
 

@@ -135,7 +135,8 @@ export const inlineDecimalParse = (tok: TTokenTabular) => {
     type: "inline_decimal",
     content: tok.content,
     block: false,
-    ascii: tok.ascii
+    ascii: tok.ascii,
+    latex: tok.ascii
   });
   return tok;
 };
