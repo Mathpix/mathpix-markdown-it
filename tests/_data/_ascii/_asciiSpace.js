@@ -6,7 +6,7 @@ module.exports = [
   },
   {
     latex: `\\left. \\begin{array} { r l } { \\hat { V } _ { L } } & { = \\sum _ { \\mathbf { m } , \\mathbf { n } } \\sum _ { l , m _ { l } } v _ { l } ( k _ { m ^ { 2 } } , k _ { n ^ { 2 } } ) Y _ { l m _ { l } } ^ { * } ( \\hat { \\mathbf { m } } ) Y _ { l m _ { l } } ( \\hat { \\mathbf { n } } ) | \\mathbf { m } \\rangle \\langle \\mathbf { n } | } \\\\ { } & { = \\sum _ { m ^ { 2 } , n ^ { 2 } } \\sum _ { l } v _ { l } ( k _ { m ^ { 2 } } , k _ { n ^ { 2 } } ) \\sum _ { m _ { l } } ( \\sum _ { \\mathbf { m } } Y _ { l m _ { l } } ^ { * } ( \\hat { \\mathbf { m } } ) | \\mathbf { m } \\rangle ) ( \\sum _ { \\hat { \\mathbf { n } } } Y _ { l m _ { l } } ( \\hat { \\mathbf { n } } ) \\langle \\mathbf { n } | ) } \\end{array} \\right.`,
-    ascii:    `{:[ hat(V)_(L),=sum_(m,n)sum_(l,m_(l))v_(l)(k_(m^(2)),k_(n^(2)))Y_(lm_(l))^(**)( hat(m))Y_(lm_(l))( hat(n))|m:)(:n|],[,=sum_(m^(2),n^(2))sum_(l)v_(l)(k_(m^(2)),k_(n^(2)))sum_(m_(l))(sum_(m)Y_(lm_(l))^(**)( hat(m))|m:))(sum_( hat(n))Y_(lm_(l))( hat(n))(:n|)]:}`,
+    ascii:    `{:[ hat(V)_(L),{:=sum_(m,n)sum_(l,m_(l))v_(l)(k_(m^(2)),k_(n^(2)))Y_(lm_(l))^(**)( hat(m))Y_(lm_(l))( hat(n))|m:)(:n|:}],[,{:=sum_(m^(2),n^(2))sum_(l)v_(l)(k_(m^(2)),k_(n^(2)))sum_(m_(l))(sum_(m)Y_(lm_(l))^(**)( hat(m))|m:))(sum_( hat(n))Y_(lm_(l))( hat(n))(:n|):}]:}`,
     ascii_old: `{:[hat V_(L),=sum_(m,n)sum_(l,m_(l))v_(l)(k_(m^(2)),k_(n^(2)))Y_(lm_(l))^(*)(hat m)Y_(lm_(l))(hat n)|m:)(:n|],[,=sum_(m^(2),n^(2))sum_(l)v_(l)(k_(m^(2)),k_(n^(2)))sum_(m_(l))(sum_(m)Y_(lm_(l))^(*)(hat m)|m:))(sum_(hat n)Y_(lm_(l))(hat n)(:n|)]:}`,
   },
   {
@@ -61,7 +61,7 @@ module.exports = [
   },
   {
     latex: `\\begin{array}{rlrl}{-i x_{+} \\cdot \\tilde{\\sigma} \\tau_{+}} & {=2 \\overline{\\theta}_{b} p_{+}} & {} & {p \\prec 0} \\\\ {2 \\theta^{a} \\tau_{+}} & {=\\delta_{b}^{a} p_{+}} & {} & {p \\succ 0}\\end{array}`,
-    ascii:    `[-ix_(+)* tilde(sigma)tau_(+),=2 bar(theta)_(b)p_(+),,p-<0],[2theta^(a)tau_(+),=delta_(b)^(a)p_(+),,p>-0]`,
+    ascii:    `{:[{:-ix_(+)* tilde(sigma)tau_(+):},{:=2 bar(theta)_(b)p_(+):},,p-<0],[{:2theta^(a)tau_(+):},{:=delta_(b)^(a)p_(+):},,p>-0]:}`,
     ascii_old: `[-ix_(+)*tilde sigma tau_(+),=2bar(theta)_(b)p_(+),,p-<0],[2 theta^(a)tau_(+),=delta_(b)^(a)p_(+),,p>-0]`,
   },
   {
@@ -71,12 +71,12 @@ module.exports = [
   },
   {
     latex: `\\begin{array} { l } { \\text { This } } \\\\ { \\qquad x + y } \\\\ { \\text { and this is cool } } \\\\ { \\qquad \\operatorname { s i n } ( x ) } \\end{array}`,
-    ascii:    `[" This "],[qquad x+y],[" and this is cool "],[qquad sin(x)]`,
+    ascii:    `{:[" This "],[qquad x+y],[" and this is cool "],[qquad sin(x)]:}`,
     ascii_old: `[" This "],[qquad x+y],[" and this is cool "],[qquad sin(x)]`,
   },
   {
     latex: `\\begin{array} { l } { \\text { A relatively long line of text that is followed by } } \\\\ { \\text { 3.2 a line that looks like an enumerated list item } } \\end{array}`,
-    ascii:    `[" A relatively long line of text that is followed by "],[" 3.2 a line that looks like an enumerated list item "]`,
+    ascii:    `{:[" A relatively long line of text that is followed by "],[" 3.2 a line that looks like an enumerated list item "]:}`,
     ascii_old: `[" A relatively long line of text that is followed by "],[" 3.2a line that looks like an enumerated list item "]`,
   },
   {

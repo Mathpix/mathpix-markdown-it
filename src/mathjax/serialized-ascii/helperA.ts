@@ -149,6 +149,7 @@ export const AMsymbols = [
   {input:"{", tag:"mo", output:"{", tex:null, ttype:LEFTBRACKET},
   {input:"}", tag:"mo", output:"}", tex:null, ttype:RIGHTBRACKET},
   {input:"|", tag:"mo", output:"|", tex:null, ttype:LEFTRIGHT},
+  {input:"||", tag:"mo", output:"∥", tex:null, ttype:LEFTRIGHT},
   {input:"|", tag:"mo", output:"\u2225", tex:null, ttype:LEFTRIGHT},
   {input:"||", tag:"mo", output:"||", tex:null, ttype:LEFTRIGHT},
   {input:"(:", tag:"mo", output:"\u2329", tex:"langle", ttype:LEFTBRACKET},

@@ -16,7 +16,7 @@ module.exports = [
   },
   {
     latex: `\\begin{array}{c}{a1}&{a2}\\\\{b1}&{b2}\\end{array}`,
-    ascii:     `[a1,a2],[b1,b2]`,
+    ascii:     `{:[a1,a2],[b1,b2]:}`,
     ascii_old: `[a1,a2],[b1,b2]`
   },
   {
@@ -56,7 +56,7 @@ module.exports = [
   },
   {
     latex: `\\begin{array}{lll}\\operatorname{s i n}&x&y\\\\(x^2)&x&y\\end{array}`,
-    ascii:     `[sin,x,y],[(x^(2)),x,y]`,
+    ascii:     `{:[sin,x,y],[(x^(2)),x,y]:}`,
     ascii_old: `[sin,x,y],[(x^(2)),x,y]`
   },
   {
@@ -71,7 +71,7 @@ module.exports = [
   },
   {
     latex: `T _ { x } \\left( \\theta _ { r } \\right) = \\left[ \\begin{array} { l l l l } { 1} & { 0} & { 0} & { 0} \\\\ { 0} & { \\operatorname { c o s } \\theta _ { r } } & { \\operatorname { s i n } \\theta _ { r } } & { 0} \\\\ { 0} & { - \\operatorname { s i n } \\theta _ { r } } & { \\operatorname { c o s } \\theta _ { r } } & { 0} \\\\ { 0} & { 0} & { 0} & { 1} \\end{array} \\right]`,
-    ascii: `T_(x)(theta_(r))=[[1,0,0,0],[0,cos theta_(r),sin theta_(r),0],[0,-sin theta_(r),cos theta_(r),0],[0,0,0,1]]`,
+    ascii: `T_(x)(theta_(r))=[[1,0,0,0],[0,{:cos theta_(r):},{:sin theta_(r):},0],[0,{:-sin theta_(r):},{:cos theta_(r):},0],[0,0,0,1]]`,
     ascii_old: `T_(x)(theta_(r))=[[1,0,0,0],[0,cos theta_(r),sin theta_(r),0],[0,-sin theta_(r),cos theta_(r),0],[0,0,0,1]]`
   },
   {
@@ -281,12 +281,12 @@ module.exports = [
   },
   {
     latex: `a \\| x y ^ 3 \\| ( b | c ^ 3 )`,
-    ascii:     `a|xy^(3)|(b|c^(3))`,
+    ascii:     `a||xy^(3)||(b|c^(3))`,
     ascii_old: `a|xy^(3)|(b|c^(3))`
   },
   {
     latex: `\\begin{aligned}{(x^2)}\\end{aligned}`,
-    ascii:     `[(x^(2))]`,
+    ascii:     `{:(x^(2)):}`,
     ascii_old: `[(x^(2))]`
   },
   {
@@ -336,7 +336,7 @@ module.exports = [
   },
   {
     latex: `\\begin{aligned}{(x^\\mathbb{2})}&{\\mathcal{=}y^2}\\end{aligned}`,
-    ascii:     `[(x^(2)),=y^(2)]`,
+    ascii:     `{:[(x^(2)),=y^(2)]:}`,
     ascii_old: `[(x^(2)),=y^(2)]`
   },
   {
@@ -366,12 +366,12 @@ module.exports = [
   },
   {
     latex: `\\begin{array}{c}{}\\end{array}`,
-    ascii:     `[]`,
+    ascii:     `{::}`,
     ascii_old: `[]`
   },
   {
     latex: `\\| x + \\left( \\begin{array}{c}{x}\\end{array} \\right) \\|`,
-    ascii:     `|x+([x])|`,
+    ascii:     `||x+(x)||`,
     ascii_old: `|x+([x])|`
   },
   {
@@ -401,7 +401,7 @@ module.exports = [
   },
   {
     latex: `\\begin{array}{l}{\\text{2}^{5}2^{2}+[(b}\\end{array}`,
-    ascii:     `["2"^(5)2^(2)+[(b]`,
+    ascii:     `{:"2"^(5)2^(2)+[(b:}`,
     ascii_old: `["2"^(5)2^(2)+[(b]`
   },
   {
@@ -446,22 +446,22 @@ module.exports = [
   },
   {
     latex: `\\begin{array} { l } { \\text { How do we represent tables internally to do } } \\\\ { \\text { recognition? } } \\\\ { \\text { What is our preferred table format for editing in our } } \\\\ { \\text { apps? } } \\end{array}`,
-    ascii: `[" How do we represent tables internally to do "],[" recognition? "],[" What is our preferred table format for editing in our "],[" apps? "]`,
+    ascii: `{:[" How do we represent tables internally to do "],[" recognition? "],[" What is our preferred table format for editing in our "],[" apps? "]:}`,
     ascii_old: `[" How do we represent tables internally to do "],[" recognition? "],[" What is our preferred table format for editing in our "],[" apps? "]`
   },
   {
     latex: `\\begin{array} { l } { \\text { A relatively long line of text that ends with a colon: } } \\\\ { \\text { leave the newline } } \\end{array}`,
-    ascii: `[" A relatively long line of text that ends with a colon: "],[" leave the newline "]`,
+    ascii: `{:[" A relatively long line of text that ends with a colon: "],[" leave the newline "]:}`,
     ascii_old: `[" A relatively long line of text that ends with a colon: "],[" leave the newline "]`
   },
   {
     latex: `\\begin{array} { l } { \\text { A relatively long line of text that is followed by } } \\\\ { \\text { - a line that looks like a list item } } \\end{array}`,
-    ascii: `[" A relatively long line of text that is followed by "],[" - a line that looks like a list item "]`,
+    ascii: `{:[" A relatively long line of text that is followed by "],[" - a line that looks like a list item "]:}`,
     ascii_old: `[" A relatively long line of text that is followed by "],[" - a line that looks like a list item "]`
   },
   {
     latex: `\\begin{array} { l } { a + b + c + d + e + f + g + h + i + j + k + l + } \\\\ { m + n } \\end{array}`,
-    ascii:     `[a+b+c+d+e+f+g+h+i+j+k+l+],[m+n]`,
+    ascii:     `{:[a+b+c+d+e+f+g+h+i+j+k+l+],[m+n]:}`,
     ascii_old: `[a+b+c+d+e+f+g+h+i+j+k+l+],[m+n]`
   },
   {
@@ -471,7 +471,7 @@ module.exports = [
   },
   {
     latex: `\\{ \\begin{array} { l } { 4 x - 3 y = 6 } \\\\ { y = - 3 x + 15 } \\end{array}`,
-    ascii:     `{[4x-3y=6],[y=-3x+15]`,
+    ascii:     `{{:[4x-3y=6],[y=-3x+15]:}`,
     ascii_old: `{[4x-3y=6],[y=-3x+15]`
   },
   {
