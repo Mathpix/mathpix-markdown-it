@@ -614,18 +614,19 @@ The `MathpixMarkdown` React element accepts the following props:
 
 ### TOutputMath
 
-|                       | type&nbsp;*`default`*        |  description                                                                                                      |
-|-----------------------|------------------------------|-------------------------------------------------------------------------------------------------------------------|
-| `include_mathml`      | boolean&nbsp;*`false`*       | outputs mathml `<mathml style="display: none"><math>...</math></mathml>`                                          |
-| `include_mathml_word` | boolean&nbsp;*`false`*       | outputs mathml_word `<mathmlword style="display: none"><math>...</math></mathmlword>`                             |
-| `include_asciimath`   | boolean&nbsp;*`false`*       | outputs asciimath `<asciimath style="display: none">...</asciimath>`                                              |
-| `include_latex`       | boolean&nbsp;*`true`*        | outputs latex `<latex style="display: none">...</latex>`                                                          |
-| `include_svg`         | boolean&nbsp;*`true`*        | outputs svg `<svg>...</svg>`                                                                                      |
-| `include_tsv`         | boolean&nbsp;*`false`*       | outputs tsv `<tsv style="display: none">...</tsv>`                                                                |
-| `include_table_html`  | boolean&nbsp;*`true`*        | outputs html table `<table>...</table>`                                                                           |
-| `include_smiles`      | boolean&nbsp;*`false`*       | outputs smiles `<smiles>...</smiles>`                                                                             |
-| `tsv_separators`      | `{column: '\t', row: '\n'}`  | Separators for tsv tables                                                                                         |
-| `not_catch_errors`    | boolean&nbsp;*`false`*       | Do not catch math rendering errors                                                                                |
+|                          | type&nbsp;*`default`*        |  description                                                                                                      |
+|--------------------------|------------------------------|-------------------------------------------------------------------------------------------------------------------|
+| `include_mathml`         | boolean&nbsp;*`false`*       | outputs mathml `<mathml style="display: none"><math>...</math></mathml>`                                          |
+| `include_mathml_word`    | boolean&nbsp;*`false`*       | outputs mathml_word `<mathmlword style="display: none"><math>...</math></mathmlword>`                             |
+| `include_asciimath`      | boolean&nbsp;*`false`*       | outputs asciimath `<asciimath style="display: none">...</asciimath>`                                              |
+| `include_latex`          | boolean&nbsp;*`true`*        | outputs latex `<latex style="display: none">...</latex>`                                                          |
+| `include_svg`            | boolean&nbsp;*`true`*        | outputs svg `<svg>...</svg>`                                                                                      |
+| `include_tsv`            | boolean&nbsp;*`false`*       | outputs tsv `<tsv style="display: none">...</tsv>`                                                                |
+| `include_table_html`     | boolean&nbsp;*`true`*        | outputs html table `<table>...</table>`                                                                           |
+| `include_table_markdown` | boolean&nbsp;*`false`*       | outputs markdown table `<table-markdown>...</table-markdown>`                                                     |
+| `include_smiles`         | boolean&nbsp;*`false`*       | outputs smiles `<smiles>...</smiles>`                                                                             |
+| `tsv_separators`         | `{column: '\t', row: '\n'}`  | Separators for tsv tables                                                                                         |
+| `not_catch_errors`       | boolean&nbsp;*`false`*       | Do not catch math rendering errors                                                                                |
  
 
 ### TOutputMathJax
