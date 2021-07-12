@@ -44,7 +44,7 @@
     "@types/react-dom": "^17.0.0",
     "chai": "^4.2.0",
     "domino": "^2.1.6",
-    "highlight.js": "^9.15.8",
+    "highlight.js": "^10.4.1",
     "js-yaml": "^4.1.0",
     "markdown-it": "^8.4.2",
     "markdown-it-deflist": "^2.0.3",
