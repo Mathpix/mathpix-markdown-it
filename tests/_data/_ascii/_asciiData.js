@@ -16,7 +16,7 @@ module.exports = [
   },
   {
     latex: `\\begin{array}{c}{a1}&{a2}\\\\{b1}&{b2}\\end{array}`,
-    ascii:     `[a1,a2],[b1,b2]`,
+    ascii:     `{:[a1,a2],[b1,b2]:}`,
     ascii_old: `[a1,a2],[b1,b2]`
   },
   {
@@ -56,7 +56,7 @@ module.exports = [
   },
   {
     latex: `\\begin{array}{lll}\\operatorname{s i n}&x&y\\\\(x^2)&x&y\\end{array}`,
-    ascii:     `[sin,x,y],[(x^(2)),x,y]`,
+    ascii:     `{:[sin,x,y],[(x^(2)),x,y]:}`,
     ascii_old: `[sin,x,y],[(x^(2)),x,y]`
   },
   {
@@ -71,7 +71,7 @@ module.exports = [
   },
   {
     latex: `T _ { x } \\left( \\theta _ { r } \\right) = \\left[ \\begin{array} { l l l l } { 1} & { 0} & { 0} & { 0} \\\\ { 0} & { \\operatorname { c o s } \\theta _ { r } } & { \\operatorname { s i n } \\theta _ { r } } & { 0} \\\\ { 0} & { - \\operatorname { s i n } \\theta _ { r } } & { \\operatorname { c o s } \\theta _ { r } } & { 0} \\\\ { 0} & { 0} & { 0} & { 1} \\end{array} \\right]`,
-    ascii: `T_(x)(theta_(r))=[[1,0,0,0],[0,cos theta_(r),sin theta_(r),0],[0,-sin theta_(r),cos theta_(r),0],[0,0,0,1]]`,
+    ascii: `T_(x)(theta_(r))=[[1,0,0,0],[0,{:cos theta_(r):},{:sin theta_(r):},0],[0,{:-sin theta_(r):},{:cos theta_(r):},0],[0,0,0,1]]`,
     ascii_old: `T_(x)(theta_(r))=[[1,0,0,0],[0,cos theta_(r),sin theta_(r),0],[0,-sin theta_(r),cos theta_(r),0],[0,0,0,1]]`
   },
   {
@@ -106,17 +106,17 @@ module.exports = [
   },
   {
     latex: `\\left\\{\\begin{array}{r}{6x+2y \\leq 12}\\\\{x+y \\leq 5}\\\\{x \\geq 0}\\\\{y \\geq 0}\\end{array}\\right.`,
-    ascii:     `{[6x+2y<=12],[x+y<=5],[x>=0],[y>=0]:}`,
+    ascii:     `{[6x+2y <= 12],[x+y <= 5],[x >= 0],[y >= 0]:}`,
     ascii_old: `{[6x+2y<=12],[x+y<=5],[x>=0],[y>=0]:}`
   },
   {
     latex: `f(x) = \\left\\{\\begin{array}{ll}{-x+3}&{\\text{if}x \\leq -1}\\\\{-3x+1}&{\\text{if}x > -1}\\end{array}\\right.`,
-    ascii:     `f(x)={[-x+3,"if"x<=-1],[-3x+1,"if"x>-1]:}`,
+    ascii:     `f(x)={[-x+3,"if"x <= -1],[-3x+1,"if"x > -1]:}`,
     ascii_old: `f(x)={[-x+3,"if"x<=-1],[-3x+1,"if"x>-1]:}`
   },
   {
     latex: `\\left\\{\\begin{array}{rl}{6x+2y}&{ \\leq 12}\\\\{x + y}&{\\leq 5} \\\\ {x} & {\\geq 0} \\\\ {y} & {\\geq 0}\\end{array}\\right.`,
-    ascii:     `{[6x+2y,<=12],[x+y,<=5],[x,>=0],[y,>=0]:}`,
+    ascii:     `{[6x+2y, <= 12],[x+y, <= 5],[x, >= 0],[y, >= 0]:}`,
     ascii_old: `{[6x+2y,<=12],[x+y,<=5],[x,>=0],[y,>=0]:}`
   },
   {
@@ -131,27 +131,27 @@ module.exports = [
   },
   {
     latex: `f ( x ) = \\left\\{ \\begin{array} { l l } { x ^ { 2} + 1,} & { x > 1} \\\\ { 1,} & { x = 1} \\\\ { x + 1,} & { x < 1} \\end{array} \\right.`,
-    ascii:     `f(x)={[x^(2)+1,,x>1],[1,,x=1],[x+1,,x<1]:}`,
+    ascii:     `f(x)={[x^(2)+1",",x > 1],[1",",x=1],[x+1",",x < 1]:}`,
     ascii_old: `f(x)={[x^(2)+1,,x>1],[1,,x=1],[x+1,,x<1]:}`
   },
   {
     latex: `f(x)= \\left\\{ \\begin{array} {ll} { x e ^ {2x} } & { \\text{ si } } & { x < 0} \\\\ { \\frac { \\operatorname { ln } ( x + 1) } { x + 1} } & { \\text{ si } } & { x \\geq 0} \\end{array} \\right.`,
-    ascii: `f(x)={[xe^(2x)," si ",x<0],[(ln(x+1))/(x+1)," si ",x>=0]:}`,
+    ascii: `f(x)={[xe^(2x)," si ",x < 0],[(ln(x+1))/(x+1)," si ",x >= 0]:}`,
     ascii_old: `f(x)={[xe^(2x)," si ",x<0],[(ln(x+1))/(x+1)," si ",x>=0]:}`
   },
   {
     latex: `\\left\\{ \\begin{array} { r } { x \\geq 0,y \\geq 0} \\\\ { 2x + y \\leq 8} \\\\ { x + y \\geq 4} \\end{array} \\right.`,
-    ascii:     `{[x>=0,y>=0],[2x+y<=8],[x+y>=4]:}`,
+    ascii:     `{[x >= 0","y >= 0],[2x+y <= 8],[x+y >= 4]:}`,
     ascii_old: `{[x>=0,y>=0],[2x+y<=8],[x+y>=4]:}`
   },
   {
     latex: `f ( x ) = \\left\\{ \\begin{array} { l l } { 2 x + 5 } & { \\text { khi } x < - 1 } \\\\ { x ^ { 2 } + 2 } & { \\text { khi } x \\geq - 1 } \\end{array} \\right.`,
-    ascii:     `f(x)={[2x+5," khi "x<-1],[x^(2)+2," khi "x>=-1]:}`,
+    ascii:     `f(x)={[2x+5," khi "x < -1],[x^(2)+2," khi "x >= -1]:}`,
     ascii_old: `f(x)={[2x+5," khi "x<-1],[x^(2)+2," khi "x>=-1]:}`
   },
   {
     latex: `f ( x ) = \\left\\{ \\begin{array} { l } { 2x + 5\\text{ if } x < 0} \\\\ { x - 1\\text{ if } x > 0} \\end{array} \\right.`,
-    ascii: `f(x)={[2x+5" if "x<0],[x-1" if "x>0]:}`,
+    ascii: `f(x)={[2x+5" if "x < 0],[x-1" if "x > 0]:}`,
     ascii_old: `f(x)={[2x+5" if "x<0],[x-1" if "x>0]:}`
   },
   {
@@ -161,7 +161,7 @@ module.exports = [
   },
   {
     latex: `f ( x ) = \\text{ foo } + \\left\\{ \\begin{array} { l } { 2x + 5\\text{ if } x < 0} \\\\ { x - 1\\text{ if } x > 0} \\end{array} \\right.`,
-    ascii: `f(x)=" foo "+{[2x+5" if "x<0],[x-1" if "x>0]:}`,
+    ascii: `f(x)=" foo "+{[2x+5" if "x < 0],[x-1" if "x > 0]:}`,
     ascii_old: `f(x)=" foo "+{[2x+5" if "x<0],[x-1" if "x>0]:}`
   },
   {
@@ -281,12 +281,12 @@ module.exports = [
   },
   {
     latex: `a \\| x y ^ 3 \\| ( b | c ^ 3 )`,
-    ascii:     `a|xy^(3)|(b|c^(3))`,
+    ascii:     `a||xy^(3)||(b|c^(3))`,
     ascii_old: `a|xy^(3)|(b|c^(3))`
   },
   {
     latex: `\\begin{aligned}{(x^2)}\\end{aligned}`,
-    ascii:     `[(x^(2))]`,
+    ascii:     `{:(x^(2)):}`,
     ascii_old: `[(x^(2))]`
   },
   {
@@ -336,7 +336,7 @@ module.exports = [
   },
   {
     latex: `\\begin{aligned}{(x^\\mathbb{2})}&{\\mathcal{=}y^2}\\end{aligned}`,
-    ascii:     `[(x^(2)),=y^(2)]`,
+    ascii:     `{:[(x^(2)),=y^(2)]:}`,
     ascii_old: `[(x^(2)),=y^(2)]`
   },
   {
@@ -366,12 +366,12 @@ module.exports = [
   },
   {
     latex: `\\begin{array}{c}{}\\end{array}`,
-    ascii:     `[]`,
+    ascii:     `{::}`,
     ascii_old: `[]`
   },
   {
     latex: `\\| x + \\left( \\begin{array}{c}{x}\\end{array} \\right) \\|`,
-    ascii:     `|x+([x])|`,
+    ascii:     `||x+(x)||`,
     ascii_old: `|x+([x])|`
   },
   {
@@ -401,7 +401,7 @@ module.exports = [
   },
   {
     latex: `\\begin{array}{l}{\\text{2}^{5}2^{2}+[(b}\\end{array}`,
-    ascii:     `["2"^(5)2^(2)+[(b]`,
+    ascii:     `{:"2"^(5)2^(2)+[(b:}`,
     ascii_old: `["2"^(5)2^(2)+[(b]`
   },
   {
@@ -446,22 +446,22 @@ module.exports = [
   },
   {
     latex: `\\begin{array} { l } { \\text { How do we represent tables internally to do } } \\\\ { \\text { recognition? } } \\\\ { \\text { What is our preferred table format for editing in our } } \\\\ { \\text { apps? } } \\end{array}`,
-    ascii: `[" How do we represent tables internally to do "],[" recognition? "],[" What is our preferred table format for editing in our "],[" apps? "]`,
+    ascii: `{:[" How do we represent tables internally to do "],[" recognition? "],[" What is our preferred table format for editing in our "],[" apps? "]:}`,
     ascii_old: `[" How do we represent tables internally to do "],[" recognition? "],[" What is our preferred table format for editing in our "],[" apps? "]`
   },
   {
     latex: `\\begin{array} { l } { \\text { A relatively long line of text that ends with a colon: } } \\\\ { \\text { leave the newline } } \\end{array}`,
-    ascii: `[" A relatively long line of text that ends with a colon: "],[" leave the newline "]`,
+    ascii: `{:[" A relatively long line of text that ends with a colon: "],[" leave the newline "]:}`,
     ascii_old: `[" A relatively long line of text that ends with a colon: "],[" leave the newline "]`
   },
   {
     latex: `\\begin{array} { l } { \\text { A relatively long line of text that is followed by } } \\\\ { \\text { - a line that looks like a list item } } \\end{array}`,
-    ascii: `[" A relatively long line of text that is followed by "],[" - a line that looks like a list item "]`,
+    ascii: `{:[" A relatively long line of text that is followed by "],[" - a line that looks like a list item "]:}`,
     ascii_old: `[" A relatively long line of text that is followed by "],[" - a line that looks like a list item "]`
   },
   {
     latex: `\\begin{array} { l } { a + b + c + d + e + f + g + h + i + j + k + l + } \\\\ { m + n } \\end{array}`,
-    ascii:     `[a+b+c+d+e+f+g+h+i+j+k+l+],[m+n]`,
+    ascii:     `{:[a+b+c+d+e+f+g+h+i+j+k+l+],[m+n]:}`,
     ascii_old: `[a+b+c+d+e+f+g+h+i+j+k+l+],[m+n]`
   },
   {
@@ -471,7 +471,7 @@ module.exports = [
   },
   {
     latex: `\\{ \\begin{array} { l } { 4 x - 3 y = 6 } \\\\ { y = - 3 x + 15 } \\end{array}`,
-    ascii:     `{[4x-3y=6],[y=-3x+15]`,
+    ascii:     `{{:[4x-3y=6],[y=-3x+15]:}`,
     ascii_old: `{[4x-3y=6],[y=-3x+15]`
   },
   {
@@ -530,4 +530,26 @@ module.exports = [
     ascii_old: `archyp tan(x)`
   },
 
+  {
+    latex: '\\begin{array}{l}\n' +
+      '3 x+2 y=-2 \\\\\n' +
+      'x-2 y=-6\n' +
+      '\\end{array}',
+    ascii: `{:[3x+2y=-2],[x-2y=-6]:}`,
+  },
+  {
+    latex: '\\begin{aligned} \n' +
+      'x y &=-24 \\\\ \n' +
+      '5 x+4 y &=4 \n' +
+      '\\end{aligned}',
+    ascii: `{:[xy,=-24],[5x+4y,=4]:}`,
+  },
+  // {
+  //   latex: '',
+  //   ascii: ``,
+  // },
+  // {
+  //   latex: '',
+  //   ascii: ``,
+  // },
 ];

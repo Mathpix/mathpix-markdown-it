@@ -33,7 +33,6 @@ describe('Latex to ascii:', () => {
         console.log('    ASCIIMATH     =>', test.ascii);
         console.log('    ASCIIMATH_OLD =>', test.ascii_old);
         data.should.have.property('asciimath', test.ascii);
-        data.should.have.property('asciimath', test.ascii_old);
         notIncludeSymbols(data.asciimath);
         done();
       });

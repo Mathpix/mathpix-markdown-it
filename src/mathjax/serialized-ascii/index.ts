@@ -86,6 +86,7 @@ export class SerializedAsciiVisitor extends MmlVisitor {
     let mml = [];
     try {
       const iclose: number = node.childNodes.findIndex(child => child.kind === 'menclose');
+      const hasFunc = node.childNodes.find(child => (child.kind === 'msub'));
       if (iclose > -1) {
         const mclose: any = node.childNodes[iclose];
         const atr = this.getAttributes(mclose);
@@ -150,7 +151,18 @@ export class SerializedAsciiVisitor extends MmlVisitor {
       if (addParens && !group) {
         mml.push(')')
       }
-      return mml.join('');
+      //TeXAtom
+      const needBranch = node.parent && node.parent.kind === 'TeXAtom'
+        && node.parent.Parent && node.parent.Parent.kind === 'mtd'
+        && node.childNodes.length > 1;
+      let mmlContent = needBranch && hasFunc
+        ? '{:'
+        : '';
+      mmlContent += mml.join('');
+      mmlContent += needBranch && hasFunc
+        ? ':}'
+        : '';
+      return mmlContent;
     } catch (e) {
       return '';
     }

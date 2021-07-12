@@ -190,13 +190,58 @@ const mtable = () => {
   return  (node, serialize) => {
     let mml = '';
     try {
+      const parentIsMenclose = node.Parent && node.Parent.kind === 'menclose';
+
+      const isHasBranchOpen = node.parent && node.parent.kind === 'mrow'
+        && node.parent.properties
+        && node.parent.properties.hasOwnProperty('open');
+      const isHasBranchClose = node.parent && node.parent.kind === 'mrow'
+        && node.parent.properties
+        && node.parent.properties.hasOwnProperty('close');
+      mml += isHasBranchOpen || parentIsMenclose
+        ? ''
+        : '{:';
       for (let i = 0; i < node.childNodes.length; i++) {
-        if (i>0) {mml += ','}
+        if ( i>0 ) {
+          mml += ','
+        }
         mml += serialize.visitNode(node.childNodes[i], '');
       }
+      mml += isHasBranchClose || parentIsMenclose
+        ? ''
+        : ':}';
       return mml;
     } catch (e) {
       console.error('mml => mtable =>', e);
+      return mml;
+    }
+  }
+};
+
+const mrow = () => {
+  return  (node, serialize) => {
+    let mml = '';
+    try {
+      const isTexClass7 = node.properties && node.properties.texClass === 7
+        && node.parent && node.parent.kind === 'inferredMrow';
+
+      const needBranchOpen = node.properties
+        && node.properties.hasOwnProperty('open') && node.properties.open === '';
+      const needBranchClose = node.properties
+        && node.properties.hasOwnProperty('close') &&  node.properties.close === '';
+      mml += isTexClass7 && needBranchOpen
+        ? '{:'
+        : '';
+      for (let i = 0; i < node.childNodes.length; i++) {
+        mml += serialize.visitNode(node.childNodes[i], '');
+      }
+      mml += isTexClass7 && needBranchClose
+        ? ':}' : '';
+      if(isTexClass7 && (needBranchClose || needBranchOpen)) {
+      }
+      return mml;
+    } catch (e) {
+      console.error('mml => mrow =>', e);
       return mml;
     }
   }
@@ -206,13 +251,21 @@ const mtr = () => {
   return  (node, serialize) => {
     let mml = '';
     try {
-      mml += node.parent.childNodes.length > 1 || serialize.options.extraBrackets ? '[' : '';
+      const needBranch = node.parent && node.parent.parent && node.parent.parent.texClass === 7;
+      let mtrContent = '';
       for (let i = 0; i < node.childNodes.length; i++) {
-        if (i>0) {mml += ','}
-        mml += serialize.visitNode(node.childNodes[i], '');
+        if ( i>0 ) {
+          mtrContent += ','
+        }
+        mtrContent += serialize.visitNode(node.childNodes[i], '');
       }
-      mml += node.parent.childNodes.length > 1 || serialize.options.extraBrackets  ? ']' : '';
+
+      mml += node.parent.childNodes.length > 1 || needBranch || node.childNodes.length > 1
+        ? '[' + mtrContent + ']'
+        : mtrContent;
+
       return mml;
+
     } catch (e) {
       console.error('mml => mtr =>', e);
       return mml;
@@ -516,17 +569,17 @@ const mo = () => {
         return mml;
       }
       const atr = getAttributes(node);
-      if (atr && atr.hasOwnProperty('fence') && atr.fence) {
-        mml += node.texClass === 4 ? '{:' : '';
-        mml += node.texClass === 5 ? ':}' : '';
-      }
       let abs = SymbolToAM(node.kind, value, atr, serialize.options.showStyle);
       if (abs && abs.length > 1) {
         mml += regW.test(abs[0]) && needFirstSpase(node) ? ' ' : '';
         mml += abs;
         mml += regW.test(abs[abs.length-1]) && needLastSpase(node) ? ' ' : '';
       } else {
-        mml += abs ;
+        if (abs === ',' && node.Parent.kind === 'mtd') {
+          mml += '"' + abs + '"'
+        } else {
+          mml += abs ;
+        }
       }
       return mml;
     } catch (e) {
@@ -596,6 +649,7 @@ const handlers = {
   mspace: mspace(handlerApi),
   mtext:  mtext(),
   mtable:  mtable(),
+  mrow:  mrow(),
   mtr:  mtr(),
   mpadded: mpadded(handlerApi),
   mroot: mroot(),
