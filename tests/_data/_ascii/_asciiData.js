@@ -106,17 +106,17 @@ module.exports = [
   },
   {
     latex: `\\left\\{\\begin{array}{r}{6x+2y \\leq 12}\\\\{x+y \\leq 5}\\\\{x \\geq 0}\\\\{y \\geq 0}\\end{array}\\right.`,
-    ascii:     `{[6x+2y<=12],[x+y<=5],[x>=0],[y>=0]:}`,
+    ascii:     `{[6x+2y <= 12],[x+y <= 5],[x >= 0],[y >= 0]:}`,
     ascii_old: `{[6x+2y<=12],[x+y<=5],[x>=0],[y>=0]:}`
   },
   {
     latex: `f(x) = \\left\\{\\begin{array}{ll}{-x+3}&{\\text{if}x \\leq -1}\\\\{-3x+1}&{\\text{if}x > -1}\\end{array}\\right.`,
-    ascii:     `f(x)={[-x+3,"if"x<=-1],[-3x+1,"if"x>-1]:}`,
+    ascii:     `f(x)={[-x+3,"if"x <= -1],[-3x+1,"if"x > -1]:}`,
     ascii_old: `f(x)={[-x+3,"if"x<=-1],[-3x+1,"if"x>-1]:}`
   },
   {
     latex: `\\left\\{\\begin{array}{rl}{6x+2y}&{ \\leq 12}\\\\{x + y}&{\\leq 5} \\\\ {x} & {\\geq 0} \\\\ {y} & {\\geq 0}\\end{array}\\right.`,
-    ascii:     `{[6x+2y,<=12],[x+y,<=5],[x,>=0],[y,>=0]:}`,
+    ascii:     `{[6x+2y, <= 12],[x+y, <= 5],[x, >= 0],[y, >= 0]:}`,
     ascii_old: `{[6x+2y,<=12],[x+y,<=5],[x,>=0],[y,>=0]:}`
   },
   {
@@ -131,27 +131,27 @@ module.exports = [
   },
   {
     latex: `f ( x ) = \\left\\{ \\begin{array} { l l } { x ^ { 2} + 1,} & { x > 1} \\\\ { 1,} & { x = 1} \\\\ { x + 1,} & { x < 1} \\end{array} \\right.`,
-    ascii:     `f(x)={[x^(2)+1,,x>1],[1,,x=1],[x+1,,x<1]:}`,
+    ascii:     `f(x)={[x^(2)+1",",x > 1],[1",",x=1],[x+1",",x < 1]:}`,
     ascii_old: `f(x)={[x^(2)+1,,x>1],[1,,x=1],[x+1,,x<1]:}`
   },
   {
     latex: `f(x)= \\left\\{ \\begin{array} {ll} { x e ^ {2x} } & { \\text{ si } } & { x < 0} \\\\ { \\frac { \\operatorname { ln } ( x + 1) } { x + 1} } & { \\text{ si } } & { x \\geq 0} \\end{array} \\right.`,
-    ascii: `f(x)={[xe^(2x)," si ",x<0],[(ln(x+1))/(x+1)," si ",x>=0]:}`,
+    ascii: `f(x)={[xe^(2x)," si ",x < 0],[(ln(x+1))/(x+1)," si ",x >= 0]:}`,
     ascii_old: `f(x)={[xe^(2x)," si ",x<0],[(ln(x+1))/(x+1)," si ",x>=0]:}`
   },
   {
     latex: `\\left\\{ \\begin{array} { r } { x \\geq 0,y \\geq 0} \\\\ { 2x + y \\leq 8} \\\\ { x + y \\geq 4} \\end{array} \\right.`,
-    ascii:     `{[x>=0,y>=0],[2x+y<=8],[x+y>=4]:}`,
+    ascii:     `{[x >= 0","y >= 0],[2x+y <= 8],[x+y >= 4]:}`,
     ascii_old: `{[x>=0,y>=0],[2x+y<=8],[x+y>=4]:}`
   },
   {
     latex: `f ( x ) = \\left\\{ \\begin{array} { l l } { 2 x + 5 } & { \\text { khi } x < - 1 } \\\\ { x ^ { 2 } + 2 } & { \\text { khi } x \\geq - 1 } \\end{array} \\right.`,
-    ascii:     `f(x)={[2x+5," khi "x<-1],[x^(2)+2," khi "x>=-1]:}`,
+    ascii:     `f(x)={[2x+5," khi "x < -1],[x^(2)+2," khi "x >= -1]:}`,
     ascii_old: `f(x)={[2x+5," khi "x<-1],[x^(2)+2," khi "x>=-1]:}`
   },
   {
     latex: `f ( x ) = \\left\\{ \\begin{array} { l } { 2x + 5\\text{ if } x < 0} \\\\ { x - 1\\text{ if } x > 0} \\end{array} \\right.`,
-    ascii: `f(x)={[2x+5" if "x<0],[x-1" if "x>0]:}`,
+    ascii: `f(x)={[2x+5" if "x < 0],[x-1" if "x > 0]:}`,
     ascii_old: `f(x)={[2x+5" if "x<0],[x-1" if "x>0]:}`
   },
   {
@@ -161,7 +161,7 @@ module.exports = [
   },
   {
     latex: `f ( x ) = \\text{ foo } + \\left\\{ \\begin{array} { l } { 2x + 5\\text{ if } x < 0} \\\\ { x - 1\\text{ if } x > 0} \\end{array} \\right.`,
-    ascii: `f(x)=" foo "+{[2x+5" if "x<0],[x-1" if "x>0]:}`,
+    ascii: `f(x)=" foo "+{[2x+5" if "x < 0],[x-1" if "x > 0]:}`,
     ascii_old: `f(x)=" foo "+{[2x+5" if "x<0],[x-1" if "x>0]:}`
   },
   {
@@ -530,4 +530,26 @@ module.exports = [
     ascii_old: `archyp tan(x)`
   },
 
+  {
+    latex: '\\begin{array}{l}\n' +
+      '3 x+2 y=-2 \\\\\n' +
+      'x-2 y=-6\n' +
+      '\\end{array}',
+    ascii: `{:[3x+2y=-2],[x-2y=-6]:}`,
+  },
+  {
+    latex: '\\begin{aligned} \n' +
+      'x y &=-24 \\\\ \n' +
+      '5 x+4 y &=4 \n' +
+      '\\end{aligned}',
+    ascii: `{:[xy,=-24],[5x+4y,=4]:}`,
+  },
+  // {
+  //   latex: '',
+  //   ascii: ``,
+  // },
+  // {
+  //   latex: '',
+  //   ascii: ``,
+  // },
 ];

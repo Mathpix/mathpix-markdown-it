@@ -1284,7 +1284,7 @@ module.exports = [
   {
     latex: '\\begin{tabular}{rccccc} \\hline $\\text{curve (chiller condition, }j\\text{)}$ &$\\hat{\\sigma}_{j}^{2}$& $\\hat{\\pi}_{j}$&$\\hat{a}_{12}$&$\\hat{a}_{21}$&$\\lambda_{j}$ \\\\ \\hline $\\text{black (off, }j=1\\text{)}$ &12.2&0.682&\\multirow{2}{*} 0.015 & \\multirow{2}{*} $<10^{-16}$& 0.050 \\\\ $\\text{red (on, }j=2\\text{)}$&400.2&0.318&&&0.006 \\\\ \\hline \\end{tabular}',
     tsv: '"curve (chiller condition, "j")"\that(sigma)_(j)^(2)\that(pi)_(j)\that(a)_(12)\that(a)_(21)\tlambda_(j)\n' +
-      '"black (off, "j=1")"\t12.2\t0.682\t0.015\t<10^(-16)\t0.050\n' +
+      '"black (off, "j=1")"\t12.2\t0.682\t0.015\t< 10^(-16)\t0.050\n' +
       '"red (on, "j=2")"\t400.2\t0.318\t\t\t0.006'
 
   },

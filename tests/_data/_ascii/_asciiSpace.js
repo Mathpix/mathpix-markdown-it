@@ -1,12 +1,12 @@
 module.exports = [
   {
     latex: `\\operatorname{unknown} \\left\\{\\begin{array}{ll}{-x+3}&{\\text{if}x \\leq -1}\\\\{-3x+1}&{\\text{if}x > -1}\\end{array}\\right. \\operatorname{unknown}`,
-    ascii:    `unknown{[-x+3,"if"x<=-1],[-3x+1,"if"x>-1]:}unknown`,
+    ascii:    `unknown{[-x+3,"if"x <= -1],[-3x+1,"if"x > -1]:}unknown`,
     ascii_old: `unknown{[-x+3,"if"x<=-1],[-3x+1,"if"x>-1]:}unknown`
   },
   {
     latex: `\\left. \\begin{array} { r l } { \\hat { V } _ { L } } & { = \\sum _ { \\mathbf { m } , \\mathbf { n } } \\sum _ { l , m _ { l } } v _ { l } ( k _ { m ^ { 2 } } , k _ { n ^ { 2 } } ) Y _ { l m _ { l } } ^ { * } ( \\hat { \\mathbf { m } } ) Y _ { l m _ { l } } ( \\hat { \\mathbf { n } } ) | \\mathbf { m } \\rangle \\langle \\mathbf { n } | } \\\\ { } & { = \\sum _ { m ^ { 2 } , n ^ { 2 } } \\sum _ { l } v _ { l } ( k _ { m ^ { 2 } } , k _ { n ^ { 2 } } ) \\sum _ { m _ { l } } ( \\sum _ { \\mathbf { m } } Y _ { l m _ { l } } ^ { * } ( \\hat { \\mathbf { m } } ) | \\mathbf { m } \\rangle ) ( \\sum _ { \\hat { \\mathbf { n } } } Y _ { l m _ { l } } ( \\hat { \\mathbf { n } } ) \\langle \\mathbf { n } | ) } \\end{array} \\right.`,
-    ascii:    `{:[ hat(V)_(L),{:=sum_(m,n)sum_(l,m_(l))v_(l)(k_(m^(2)),k_(n^(2)))Y_(lm_(l))^(**)( hat(m))Y_(lm_(l))( hat(n))|m:)(:n|:}],[,{:=sum_(m^(2),n^(2))sum_(l)v_(l)(k_(m^(2)),k_(n^(2)))sum_(m_(l))(sum_(m)Y_(lm_(l))^(**)( hat(m))|m:))(sum_( hat(n))Y_(lm_(l))( hat(n))(:n|):}]:}`,
+    ascii:    `{:[ hat(V)_(L),{:=sum_(m,n)sum_(l,m_(l))v_(l)(k_(m^(2))","k_(n^(2)))Y_(lm_(l))^(**)( hat(m))Y_(lm_(l))( hat(n))|m:)(:n|:}],[,{:=sum_(m^(2),n^(2))sum_(l)v_(l)(k_(m^(2))","k_(n^(2)))sum_(m_(l))(sum_(m)Y_(lm_(l))^(**)( hat(m))|m:))(sum_( hat(n))Y_(lm_(l))( hat(n))(:n|):}]:}`,
     ascii_old: `{:[hat V_(L),=sum_(m,n)sum_(l,m_(l))v_(l)(k_(m^(2)),k_(n^(2)))Y_(lm_(l))^(*)(hat m)Y_(lm_(l))(hat n)|m:)(:n|],[,=sum_(m^(2),n^(2))sum_(l)v_(l)(k_(m^(2)),k_(n^(2)))sum_(m_(l))(sum_(m)Y_(lm_(l))^(*)(hat m)|m:))(sum_(hat n)Y_(lm_(l))(hat n)(:n|)]:}`,
   },
   {
@@ -16,7 +16,7 @@ module.exports = [
   },
   {
     latex: `\\bigoplus\\bigcup\\bigcap\\geqq\\leqq\\longrightarrow\\top\\longleftrightarrow\\Longrightarrow\\longrightarrow\\longleftarrow\\Longleftarrow\\Longleftrightarrow\\longmapsto\\widetilde{x}\\widehat{x}`,
-    ascii:    `bigoplus uuu nnn>= <= longrightarrow TT longleftrightarrow Longrightarrow longrightarrow longleftarrow Longleftarrow Longleftrightarrow longmapsto widetilde(x) widehat(x)`,
+    ascii:    `bigoplus uuu nnn >=   <=  longrightarrow TT longleftrightarrow Longrightarrow longrightarrow longleftarrow Longleftarrow Longleftrightarrow longmapsto widetilde(x) widehat(x)`,
     ascii_old: `bigoplus uuu nnn>=<=longrightarrow TT longleftrightarrow Longrightarrow longrightarrow longleftarrow Longleftarrow Longleftrightarrow longmapsto widetilde x widehat x`,
   },
   {

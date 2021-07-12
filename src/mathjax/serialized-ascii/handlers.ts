@@ -575,7 +575,11 @@ const mo = () => {
         mml += abs;
         mml += regW.test(abs[abs.length-1]) && needLastSpase(node) ? ' ' : '';
       } else {
-        mml += abs ;
+        if (abs === ',' && node.Parent.kind === 'mtd') {
+          mml += '"' + abs + '"'
+        } else {
+          mml += abs ;
+        }
       }
       return mml;
     } catch (e) {
