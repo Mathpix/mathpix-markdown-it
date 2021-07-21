@@ -4,6 +4,7 @@ import { mathpixMarkdownPlugin } from './mathpix-markdown-plugins';
 
 import { injectRenderRules } from "./rules";
 import {MathpixMarkdownModel as MM, TMarkdownItOptions} from '../mathpix-markdown-model'
+import { validateLinkEnableFile } from './mdOptions';
 
 /** md renderer */
 const mdInit = (options: TMarkdownItOptions) => {
@@ -12,7 +13,8 @@ const mdInit = (options: TMarkdownItOptions) => {
           lineNumbering = false, htmlSanitize = true, smiles = {}, forDocx = false, openLinkInNewWindow =  true,
     isDisableEmoji=false,
     isDisableEmojiShortcuts=false,
-    maxWidth = ''
+    maxWidth = '',
+    enableFileLinks = false
   } = options;
   const mmdOptions = {
     width: width,
@@ -53,6 +55,11 @@ const mdInit = (options: TMarkdownItOptions) => {
       md.use(require("markdown-it-emoji"))
     }
   }
+
+  if (enableFileLinks) {
+    md.validateLink = validateLinkEnableFile;
+  }
+
   return md;
 };
 

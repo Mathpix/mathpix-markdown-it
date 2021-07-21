@@ -26,6 +26,7 @@ export interface optionsMathpixMarkdown {
     breaks?: boolean,
     typographer?: boolean,
     linkify?: boolean,
+    enableFileLinks?: boolean,
     xhtmlOut?: boolean,
     width?: number;
     showToc?: boolean;
@@ -49,6 +50,7 @@ export type TMarkdownItOptions = {
   breaks?: boolean,
   typographer?: boolean,
   linkify?: boolean,
+  enableFileLinks?: boolean,
   xhtmlOut?: boolean,
   width?: number,
   lineNumbering?: boolean,
@@ -389,7 +391,8 @@ class MathpixMarkdown_Model {
           isDisableFancy=false, isDisableEmoji=false, isDisableEmojiShortcuts=false, fontSize=null, padding=null, htmlTags=false, width=0, showToc = false,
           overflowY='unset', breaks = true, typographer = true, linkify = true, xhtmlOut = false,
           outMath = {}, mathJax = {}, htmlSanitize = {}, smiles = {}, openLinkInNewWindow = true,
-          maxWidth=''
+          maxWidth='',
+          enableFileLinks=false
         }
          = options || {};
 
@@ -420,7 +423,8 @@ class MathpixMarkdown_Model {
           htmlSanitize: htmlSanitize,
           smiles: smiles,
           openLinkInNewWindow: openLinkInNewWindow,
-          maxWidth: maxWidth
+          maxWidth: maxWidth,
+          enableFileLinks: enableFileLinks
         };
 
         const styleFontSize = fontSize ? ` font-size: ${options.fontSize}px;` : '';
