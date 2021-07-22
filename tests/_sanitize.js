@@ -15,6 +15,7 @@ global.DOMParser = new JSDOM().window.DOMParser;
 describe('Check SanitizeHtml for markdownToHTML. [disallowedTagsMode = recursiveEscape]', () => {
   const options = {
     width: 800,
+    enableFileLinks: false
   };
   const tests = require('./_data/_sanitizeHtml/_data');
 

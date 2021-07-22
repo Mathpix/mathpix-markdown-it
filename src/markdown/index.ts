@@ -14,7 +14,7 @@ const mdInit = (options: TMarkdownItOptions) => {
     isDisableEmoji=false,
     isDisableEmojiShortcuts=false,
     maxWidth = '',
-    enableFileLinks = false
+    enableFileLinks = true
   } = options;
   const mmdOptions = {
     width: width,
@@ -23,7 +23,8 @@ const mdInit = (options: TMarkdownItOptions) => {
     renderElement: renderElement,
     smiles: smiles,
     forDocx: forDocx,
-    maxWidth: maxWidth
+    maxWidth: maxWidth,
+    enableFileLinks: enableFileLinks
   };
   let md = require("markdown-it")({
     html: htmlTags,
