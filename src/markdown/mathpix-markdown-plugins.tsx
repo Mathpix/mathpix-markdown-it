@@ -14,6 +14,7 @@ import {
   mdPluginSvgToBase64
 
 } from "./mdPluginConfigured";
+import { validateLinkEnableFile } from "./mdOptions";
 
 export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
   const {width = 1200,  outMath = {}, smiles = {}, mathJax = {}, renderElement = {}, forDocx = false, forLatex = false,
@@ -44,6 +45,10 @@ export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
 
   if ( forDocx ) {
     md.use(mdPluginSvgToBase64);
+  }
+
+  if (enableFileLinks) {
+    md.validateLink = validateLinkEnableFile;
   }
 };
 

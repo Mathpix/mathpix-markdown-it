@@ -4,7 +4,6 @@ import { mathpixMarkdownPlugin } from './mathpix-markdown-plugins';
 
 import { injectRenderRules } from "./rules";
 import {MathpixMarkdownModel as MM, TMarkdownItOptions} from '../mathpix-markdown-model'
-import { validateLinkEnableFile } from './mdOptions';
 
 /** md renderer */
 const mdInit = (options: TMarkdownItOptions) => {
@@ -55,10 +54,6 @@ const mdInit = (options: TMarkdownItOptions) => {
     } else {
       md.use(require("markdown-it-emoji"))
     }
-  }
-
-  if (enableFileLinks) {
-    md.validateLink = validateLinkEnableFile;
   }
 
   return md;
