@@ -31,12 +31,15 @@ function injectLineNumbers(tokens, idx, options, env, slf) {
 }
 
 function html_block_injectLineNumbers(tokens, idx, options, env, slf) {
-  const { htmlSanitize = {} } = options;
+  const { htmlSanitize = {}, enableFileLinks } = options;
   let line, endLine, listLine;
 
   if (htmlSanitize !== false) {
     if (tokens[idx] && tokens[idx].content) {
-      tokens[idx].content = sanitize(tokens[idx].content, htmlSanitize);
+      const optionsSanitize = {
+        enableFileLinks: enableFileLinks
+      };
+      tokens[idx].content = sanitize(tokens[idx].content, Object.assign({}, optionsSanitize, htmlSanitize));
     }
   }
 
@@ -62,23 +65,30 @@ function html_block_injectLineNumbers(tokens, idx, options, env, slf) {
 }
 
 function html_block_Sanitize (tokens, idx, options, env, slf) {
-  const { htmlSanitize = {} } = options;
+  const { htmlSanitize = {}, enableFileLinks = true } = options;
   if (!tokens[idx].content) {
     return '';
   }
-  return sanitize(tokens[idx].content, htmlSanitize);
+  const optionsSanitize = {
+    enableFileLinks: enableFileLinks
+  };
+  return sanitize(tokens[idx].content, Object.assign({}, optionsSanitize, htmlSanitize));
 }
 
 function html_inline_Sanitize (tokens, idx, options) {
-  const { htmlSanitize = {} } = options;
+  const { htmlSanitize = {}, enableFileLinks = true } = options;
   if (!tokens[idx].content) {
     return '';
   }
   const hasNotCloseTag = tokens[idx].content.indexOf('/>') === -1;
 
+  const optionsSanitize = {
+    skipCloseTag: hasNotCloseTag,
+    enableFileLinks: enableFileLinks
+  };
   return  htmlSanitize && Object.keys(htmlSanitize).length > 0
-    ? sanitize(tokens[idx].content, Object.assign({}, { skipCloseTag: hasNotCloseTag }, htmlSanitize))
-    : sanitize(tokens[idx].content, { skipCloseTag: hasNotCloseTag });
+    ? sanitize(tokens[idx].content, Object.assign({}, optionsSanitize, htmlSanitize))
+    : sanitize(tokens[idx].content, optionsSanitize);
 }
 
 function code_block_injectLineNumbers(tokens, idx, options, env, slf) {

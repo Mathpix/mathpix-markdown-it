@@ -2,7 +2,7 @@ const sanitizeHtml = require('sanitize-html');
 
 import { //allowedTags, allowedAttributes,
   generateAllowedTagsAndAttrs,
-  allowedClasses, allowedSchemes } from './consts';
+  allowedClasses, allowedSchemes, allowedSchemesFile } from './consts';
 
 export const sanitize = (html: string, options = {}) => {
   let config;
@@ -54,7 +54,7 @@ function escapeHtml(s, quote) {
   return s;
 }
 
-const getSanitizerConfig = (options = {}, addprefixHTMLids = false) => {
+const getSanitizerConfig = (options: any = {}, addprefixHTMLids = false) => {
   const data = generateAllowedTagsAndAttrs();
   const transformTags = {
     'a': getNofollowSanitize(options),
@@ -68,7 +68,7 @@ const getSanitizerConfig = (options = {}, addprefixHTMLids = false) => {
     allowedTags: sanitizeHtml.defaults.allowedTags.concat(data.allowedTags),
     allowedClasses: allowedClasses,
     allowedAttributes: data.allowedAttributes,
-    allowedSchemes: allowedSchemes,
+    allowedSchemes: options.enableFileLinks ? allowedSchemesFile : allowedSchemes,
     transformTags: transformTags
   }
 };

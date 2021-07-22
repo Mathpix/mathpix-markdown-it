@@ -111,6 +111,7 @@ export const generateAllowedTagsAndAttrs = (addHtmlTags = false) => {
 };
 
 export const allowedSchemes = ['http', 'https', 'mailto', 'github-windows', 'github-mac', 'data'];
+export const allowedSchemesFile = ['file', 'http', 'https', 'mailto', 'github-windows', 'github-mac', 'data'];
 
 export const allowedClasses = {
   a: ['anchor'],

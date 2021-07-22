@@ -17,7 +17,9 @@ import {
 
 export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
   const {width = 1200,  outMath = {}, smiles = {}, mathJax = {}, renderElement = {}, forDocx = false, forLatex = false,
-    maxWidth = ''} = options;
+    maxWidth = '',
+    enableFileLinks = true
+  } = options;
   Object.assign(md.options, smiles);
   Object.assign(md.options, {
     width: width,
@@ -26,7 +28,8 @@ export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
     renderElement: renderElement,
     forDocx: forDocx,
     forLatex: forLatex,
-    maxWidth: maxWidth
+    maxWidth: maxWidth,
+    enableFileLinks: enableFileLinks
   });
 
   md

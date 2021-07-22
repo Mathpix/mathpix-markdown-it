@@ -134,6 +134,7 @@ export declare const generateAllowedTagsAndAttrs: (addHtmlTags?: boolean) => {
     };
 };
 export declare const allowedSchemes: string[];
+export declare const allowedSchemesFile: string[];
 export declare const allowedClasses: {
     a: string[];
     div: string[];
