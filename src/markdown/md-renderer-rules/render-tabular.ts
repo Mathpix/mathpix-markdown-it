@@ -162,6 +162,12 @@ const renderInlineTokenBlock = (tokens, options, env, slf) =>{
 
           cellMd += getMdForChild(child);
           if (child.latex) {
+            if (options.outMath && options.outMath.table_markdown && options.outMath.table_markdown.math_as_ascii) {
+              if (child.ascii) {
+                cellMd += child.ascii;
+                continue;
+              }
+            }
             cellMd += child.latex.replace(/\|/, '\\|');
           } else {
             if (child.type === 'image') {

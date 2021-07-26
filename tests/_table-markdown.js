@@ -53,3 +53,41 @@ describe('Set: include_table_markdown=true:', () => {
   });
 
 });
+
+describe('Set: include_table_markdown=true:, math_as_ascii=true ', () => {
+  const tests = require('./_data/_table-markdown/_data');
+  tests.forEach(function(test) {
+    const options = {
+      outMath: {
+        include_table_markdown: true,
+        include_table_html: false,
+        table_markdown: {
+          math_as_ascii: true
+        }
+      }
+    };
+    describe(`[${test.id}] Latex => ` + test.latex, () => {
+      const html = MM.render(test.latex, options);
+      const data = MM.parseMarkdownByHTML(html, false);
+
+      it('Should be parser.length = 1', function(done) {
+        data.should.have.length(1);
+        done();
+      });
+
+      it('Should be have type: "table-markdown"', function(done) {
+        data[0].should.have.property('type', 'table-markdown');
+        // console.log('value>',  data[0].value);
+        if (test.table_markdown_math_as_ascii) {
+          data[0].should.have.property('value', test.table_markdown_math_as_ascii);
+        } else {
+          data[0].should.have.property('value', test.table_markdown);
+        }
+        done();
+      });
+    });
+
+
+  });
+
+});
