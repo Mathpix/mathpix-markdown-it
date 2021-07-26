@@ -71,6 +71,9 @@ export declare type TOutputMath = {
         column?: string;
         row?: string;
     };
+    table_markdown?: {
+        math_as_ascii?: boolean;
+    };
     not_catch_errors?: boolean;
 };
 export declare type TOutputMathJax = {

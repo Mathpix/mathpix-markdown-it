@@ -167,7 +167,9 @@ export const StatePushTabulars = (state, cTabular: TTypeContentList, align: stri
       if (res[j].token === 'inline') {
         if (res[j].content) {
           let children = [];
-          state.env.tabulare = state.md.options.outMath.include_tsv;
+          state.env.tabulare = state.md.options.outMath.include_tsv
+            || (state.md.options.outMath.include_table_markdown
+              && state.md.options.outMath.table_markdown && state.md.options.outMath.table_markdown.math_as_ascii);
           state.md.inline.parse(tok.content, state.md, state.env, children);
           state.env.tabulare = false;
           if (children.length > 0) {

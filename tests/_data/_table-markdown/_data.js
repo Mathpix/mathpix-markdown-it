@@ -85,6 +85,12 @@ module.exports = [
       '| 1 | 1110.1 | a | e |\n' +
       '| 2 | 10.1 | b | f |\n' +
       '| 3 | 23.113231 | c | g |',
+    table_markdown_math_as_ascii: '| **Value 1** | **Value 2** | **Value 3** | **Value 4** |\n' +
+      '| :--- | --- | ---: | :--- |\n' +
+      '| alpha | beta | gamma | delta |\n' +
+      '| 1 | 1110.1 | a | e |\n' +
+      '| 2 | 10.1 | b | f |\n' +
+      '| 3 | 23.113231 | c | g |'
   },
   {
     id: 8,
@@ -376,6 +382,8 @@ module.exports = [
       '\\end{table}',
     table_markdown: '| formula $\\frac{\\nabla^{2} A}{A}=-k^{2}$ | cell2 | cell3 |\n' +
       '| :---: | :---: | :---: |',
+    table_markdown_math_as_ascii: '| formula (grad^(2)A)/(A)=-k^(2) | cell2 | cell3 |\n' +
+      '| :---: | :---: | :---: |'
   },
   {
     id: 20,
@@ -552,6 +560,13 @@ module.exports = [
       '| $H ^ { 0 }$ | 700 | 470 |\n' +
       '| $A ^ { 0 }$ | 900 | 935 |\n' +
       '| $H ^ { + } H ^ { - }$ | 7000 | 6500 |',
+    table_markdown_math_as_ascii: '| Total Production of Higgs Bosons | L=50" "fb^(-1) |  |\n' +
+      '| :---: | :---: | :---: |\n' +
+      '|  | tan beta=10 | tan beta=30 |\n' +
+      '| h^(0) | 1600 | 1800 |\n' +
+      '| H^(0) | 700 | 470 |\n' +
+      '| A^(0) | 900 | 935 |\n' +
+      '| H^(+)H^(-) | 7000 | 6500 |'
   },
   {
     id: 32,
@@ -560,6 +575,10 @@ module.exports = [
       '| ---: | :---: | :---: | :---: | :---: | :---: |\n' +
       '| $\\text{black (off, }j=1\\text{)}$ | 12.2 | 0.682 | 0.015 | $<10^{-16}$ | 0.050 |\n' +
       '| $\\text{red (on, }j=2\\text{)}$ | 400.2 | 0.318 |  |  | 0.006 |',
+    table_markdown_math_as_ascii: '| "curve (chiller condition, "j")" | hat(sigma)_(j)^(2) | hat(pi)_(j) | hat(a)_(12) | hat(a)_(21) | lambda_(j) |\n' +
+      '| ---: | :---: | :---: | :---: | :---: | :---: |\n' +
+      '| "black (off, "j=1")" | 12.2 | 0.682 | 0.015 | < 10^(-16) | 0.050 |\n' +
+      '| "red (on, "j=2")" | 400.2 | 0.318 |  |  | 0.006 |'
 
   },
   {
@@ -570,6 +589,11 @@ module.exports = [
       '|  |  |  | $\\cdot$ |\n' +
       '|  |  |  | $\\mathbf{0}$ |\n' +
       '| $\\mathbf{0}$ | $\\cdot$ | $\\mathbf{0}$ | $\\mathbf{H}^{-}$ |',
+    table_markdown_math_as_ascii: '| H^(+) |  |  | 0 |\n' +
+      '| :---: | :---: | :---: | :---: |\n' +
+      '|  |  |  | * |\n' +
+      '|  |  |  | 0 |\n' +
+      '| 0 | * | 0 | H^(-) |'
   },
   {
     id: 34,
@@ -582,6 +606,14 @@ module.exports = [
       '| Median | Human | 0.065 | 0.127 | 0.091 | 0.156 |\n' +
       '|  | Sculpt | 0.091 | 0.169 | 0.127 | 0.183 |\n' +
       '|  | **% Increase** | $\\mathbf{40.2}$ | $\\mathbf{33.5}$ | $\\mathbf{40.4}$ | $\\mathbf{17.4}$ |',
+    table_markdown_math_as_ascii: '|  |  | A | B | C | D |\n' +
+      '| :---: | :--- | :---: | :---: | :---: | :---: |\n' +
+      '| Mean | Human | 0.069 | 0.134 | 0.094 | 0.157 |\n' +
+      '|  | Sculpt | 0.112 | 0.177 | 0.131 | 0.193 |\n' +
+      '|  | "% Increase" | 63.1 | 32.5 | 39.3 | 23.1 |\n' +
+      '| Median | Human | 0.065 | 0.127 | 0.091 | 0.156 |\n' +
+      '|  | Sculpt | 0.091 | 0.169 | 0.127 | 0.183 |\n' +
+      '|  | **% Increase** | 40.2 | 33.5 | 40.4 | 17.4 |'
   },
   {
     id: 35,
@@ -655,6 +687,15 @@ module.exports = [
       '| 5 | 0 |  | $\\frac{128}{225}$ | $0.568889 \\ldots$ |\n' +
       '|  | $\\pm \\frac{1}{3} \\sqrt{5-2 \\sqrt{\\frac{10}{7}}}$ | $\\pm 0.538469 \\ldots$ | $\\frac{322+13 \\sqrt{70}}{900}$ | $0.478629 \\ldots$ |\n' +
       '|  | $\\pm \\frac{1}{3} \\sqrt{5+2 \\sqrt{\\frac{10}{7}}}$ | $\\pm 0.90618 \\ldots$ | $\\frac{322-13 \\sqrt{70}}{900}$ | $0.236927 \\ldots$ |',
+    table_markdown_math_as_ascii: '| 2 | +-(1)/(sqrt3) | +-0.57735 dots | 1 |  |\n' +
+      '| :---: | :---: | :---: | :---: | :--- |\n' +
+      '| 3 | 0 |  | (8)/(9) | 0.888889 dots |\n' +
+      '|  | +-sqrt((3)/(5)) | +-0.774597 dots | (5)/(9) | 0.555556 dots |\n' +
+      '| 4 | +-sqrt((3)/(7)-(2)/(7)sqrt((6)/(5))) | +-0.339981 dots | (18+sqrt30)/(36) | 0.652145 dots |\n' +
+      '|  | +-sqrt((3)/(7)+(2)/(7)sqrt((6)/(5))) | +-0.861136 dots | (18-sqrt30)/(36) | 0.347855 dots |\n' +
+      '| 5 | 0 |  | (128)/(225) | 0.568889 dots |\n' +
+      '|  | +-(1)/(3)sqrt(5-2sqrt((10)/(7))) | +-0.538469 dots | (322+13sqrt70)/(900) | 0.478629 dots |\n' +
+      '|  | +-(1)/(3)sqrt(5+2sqrt((10)/(7))) | +-0.90618 dots | (322-13sqrt70)/(900) | 0.236927 dots |'
   },
   {
     id: 38,
@@ -686,6 +727,12 @@ module.exports = [
       '| ReLU/CNN/MNIST (Figure 12) | 3.58 | 5.74 | 20.9 | 636.6 | 99.0 |\n' +
       '| ReLU/CNN/CIFAR-10 (Figure 13) | 472 | 72 | 3046 | 6226 | 81.61 |\n' +
       '| Sigmoidal/LSTM/PTB (Figure 14) | 13.9 | 4.39 | 86.7 | 474 | cross-entropy loss:4.79 |',
+    table_markdown_math_as_ascii: '|  | Latency (s) |  | Message Sizes (MB) |  | Accuracy % |\n' +
+      '| :---: | :---: | :---: | :---: | :---: | :---: |\n' +
+      '|  | offline | online | offline | online |  |\n' +
+      '| ReLU/CNN/MNIST (Figure 12) | 3.58 | 5.74 | 20.9 | 636.6 | 99.0 |\n' +
+      '| ReLU/CNN/CIFAR-10 (Figure 13) | 472 | 72 | 3046 | 6226 | 81.61 |\n' +
+      '| Sigmoidal/LSTM/PTB (Figure 14) | 13.9 | 4.39 | 86.7 | 474 | cross-entropy loss:4.79 |'
   },
   {
     id: 40,
@@ -712,6 +759,12 @@ module.exports = [
     table_markdown:  '| *Value 1* | **Value 2** | `Value 3` | *Value 4* |\n' +
       '| :--- | --- | ---: | :--- |\n' +
       '| $\\alpha$ | $\\beta$ | $\\gamma$ | $\\delta$ |\n' +
+      '| ~~1~~ | `1110.1` | a | e |\n' +
+      '| ==2== | 10.1 | b | f |\n' +
+      '| 3 | 23.113231 | c | g |',
+    table_markdown_math_as_ascii: '| *Value 1* | **Value 2** | `Value 3` | *Value 4* |\n' +
+      '| :--- | --- | ---: | :--- |\n' +
+      '| alpha | beta | gamma | delta |\n' +
       '| ~~1~~ | `1110.1` | a | e |\n' +
       '| ==2== | 10.1 | b | f |\n' +
       '| 3 | 23.113231 | c | g |'
@@ -769,6 +822,12 @@ module.exports = [
     table_markdown:  '| *Value \\| 1* | **Value 2** | `Value 3` | *Value \\| 4* |\n' +
       '| :--- | --- | ---: | :--- |\n' +
       '| $\\alpha$ | $\\beta$ | $\\gamma$ | $\\delta$ |\n' +
+      '| ~~1 \\| g~~ | `1110.1 \\| 4` | a | e |\n' +
+      '| ==2 \\| f== | 10.1 | b | f |\n' +
+      '| 3 | 23.113231 | c | g |',
+    table_markdown_math_as_ascii: '| *Value \\| 1* | **Value 2** | `Value 3` | *Value \\| 4* |\n' +
+      '| :--- | --- | ---: | :--- |\n' +
+      '| alpha | beta | gamma | delta |\n' +
       '| ~~1 \\| g~~ | `1110.1 \\| 4` | a | e |\n' +
       '| ==2 \\| f== | 10.1 | b | f |\n' +
       '| 3 | 23.113231 | c | g |'
