@@ -589,6 +589,7 @@ The `MathpixMarkdown` React element accepts the following props:
 | `htmlSanitize`   | [THtmlSanitize](https://github.com/Mathpix/mathpix-markdown-it#thtmlsanitize);*`{}`*         | Sets html output options (if `htmlTags=true`). Cleans up user html input.                                              | 
 |                  |                              | Removes script tags and stuff. Removes broken and malicious html. Set to `false` to disable                            |
 | `smiles`         | [ISmilesOptions](https://github.com/Mathpix/mathpix-markdown-it#ismilesoptions);*`{}`*        | Sets options to output chemistry equation                                                                              |
+| `htmlWrapper`    | [THtmlWrapper](https://github.com/Mathpix/mathpix-markdown-it#thtmlwrapper);*`{}`*          | Sets options for output full html page                                                                                 |
 
 ### optionsMathpixMarkdown
 
@@ -656,6 +657,16 @@ The `MathpixMarkdown` React element accepts the following props:
 | `disableColors`             | boolean&nbsp;*`false`*      | Disable all coloring                                                                                                                        |
 | `ringVisualization`         | string&nbsp;*`default`*     | Determines how to display aromatic rings. `circle` - a ring; `default` - alternating double and single lines.                               |
 | `ringAromaticVisualization` | string&nbsp;*`default`*     | For Bridged Rings. Determines how to display aromatic rings. `dashed` - dashed gray lines; `default` - alternating double and single lines. |
+
+
+### THtmlWrapper
+
+|                             | type&nbsp;*`default`*       |  description                                                                                                                                |
+|-----------------------------|-----------------------------|---------------------------------------------------------------------------------------------------------------------------------------------|
+| `title`                     | string&nbsp;*`light`*       | Sets title for html page                                                                                                                    |
+| `includeStyles`             | boolean&nbsp;*`false`*      | Includes mathpix-markdown styles                                                                                                            |
+| `includeFonts`              | boolean&nbsp;*`false`*      | Includes mathpix-markdown fonts                                                                                                             |
+
 
 # Development
 
