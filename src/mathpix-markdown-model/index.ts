@@ -10,6 +10,7 @@ import {MathJax} from '../mathjax';
 import { Property } from 'csstype'; // at top of file
 import { ISmilesOptions } from '../markdown/md-chemistry';
 import { yamlParser } from '../yaml-parser';
+import { generateHtmlPage } from './html-page';
 
 export interface optionsMathpixMarkdown {
     alignMathBlock?: Property.TextAlign;
@@ -68,6 +69,7 @@ export type TMarkdownItOptions = {
   forLatex?: boolean;
   openLinkInNewWindow?: boolean;
   maxWidth?: string;
+  htmlWrapper?: THtmlWrapper | boolean;
 }
 
 export type TOutputMath = {
@@ -102,6 +104,12 @@ export type THtmlSanitize = {
 export type TAsciiMath = {
   useBacktick?: boolean,
 } | false;
+
+export type THtmlWrapper = {
+  title?: string,
+  includeStyles?: boolean,
+  includeFonts?: boolean
+}
 
 const formatSourceHtml = (text: string, notTrim: boolean = false) => {
   text = notTrim ? text : text.trim();
@@ -185,7 +193,7 @@ class MathpixMarkdown_Model {
   };
 
   markdownToHTML = (markdown: string, options: TMarkdownItOptions = {}):string => {
-    const { lineNumbering = false, isDisableFancy = false } = options;
+    const { lineNumbering = false, isDisableFancy = false,  htmlWrapper = false } = options;
     const disableRules = isDisableFancy ? this.disableFancyArrayDef : options ? options.disableRules || [] : [];
     this.setOptions(disableRules);
     let html = markdownHTML(markdown, options);
@@ -196,7 +204,25 @@ class MathpixMarkdown_Model {
       }
     }
 
-    return html;
+    if (!htmlWrapper) {
+      return html;
+    }
+
+    if (typeof htmlWrapper !== "boolean") {
+      const title = htmlWrapper.title
+        ? htmlWrapper.title
+        : '';
+
+      const styles = htmlWrapper.includeStyles
+        ? `<style>${this.getMathpixStyle(true)}</style>`
+        : '';
+      const fonts = htmlWrapper.includeFonts
+        ? '<link rel="stylesheet" href="https://cdn.mathpix.com/fonts/cmu.css"/>'
+        : '';
+      return generateHtmlPage(title, html, styles, fonts);
+    }
+
+    return generateHtmlPage('Title', html, '', '');
   };
 
   showTocInContainer = (html: string, containerName: string = 'toc') => {

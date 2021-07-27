@@ -56,6 +56,7 @@ export declare type TMarkdownItOptions = {
     forLatex?: boolean;
     openLinkInNewWindow?: boolean;
     maxWidth?: string;
+    htmlWrapper?: THtmlWrapper | boolean;
 };
 export declare type TOutputMath = {
     include_mathml?: boolean;
@@ -86,6 +87,11 @@ export declare type THtmlSanitize = {
 export declare type TAsciiMath = {
     useBacktick?: boolean;
 } | false;
+export declare type THtmlWrapper = {
+    title?: string;
+    includeStyles?: boolean;
+    includeFonts?: boolean;
+};
 declare class MathpixMarkdown_Model {
     disableFancyArrayDef: string[];
     disableRules: string[];
