@@ -13,7 +13,7 @@ const mdInit = (options: TMarkdownItOptions) => {
     isDisableEmoji=false,
     isDisableEmojiShortcuts=false,
     maxWidth = '',
-    enableFileLinks = true
+    enableFileLinks = false
   } = options;
   const mmdOptions = {
     width: width,

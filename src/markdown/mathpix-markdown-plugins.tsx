@@ -19,7 +19,7 @@ import { validateLinkEnableFile } from "./mdOptions";
 export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
   const {width = 1200,  outMath = {}, smiles = {}, mathJax = {}, renderElement = {}, forDocx = false, forLatex = false,
     maxWidth = '',
-    enableFileLinks = true
+    enableFileLinks = false
   } = options;
   Object.assign(md.options, smiles);
   Object.assign(md.options, {
