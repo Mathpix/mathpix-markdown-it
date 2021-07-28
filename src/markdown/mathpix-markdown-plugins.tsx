@@ -68,14 +68,15 @@ export const setBaseOptionsMd = (baseOption, mmdOptions) => {
 };
 
 const setOptionForPreview = (mdOption, mmdOptions) => {
-  const { width = 1200,  outMath = {}, smiles = {}, mathJax = {}, renderElement = {} } = mmdOptions;
+  const { width = 1200,  outMath = {}, smiles = {}, mathJax = {}, renderElement = {}, enableFileLinks = true } = mmdOptions;
 
   Object.assign(mdOption, smiles);
   Object.assign(mdOption, {
     width: width,
     outMath: outMath,
     mathJax: mathJax,
-    renderElement: renderElement
+    renderElement: renderElement,
+    enableFileLinks: enableFileLinks
   });
 
   setBaseOptionsMd(mdOption, mmdOptions);
