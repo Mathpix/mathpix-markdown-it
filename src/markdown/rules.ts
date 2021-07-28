@@ -65,7 +65,7 @@ function html_block_injectLineNumbers(tokens, idx, options, env, slf) {
 }
 
 function html_block_Sanitize (tokens, idx, options, env, slf) {
-  const { htmlSanitize = {}, enableFileLinks = true } = options;
+  const { htmlSanitize = {}, enableFileLinks = false } = options;
   if (!tokens[idx].content) {
     return '';
   }
@@ -76,7 +76,7 @@ function html_block_Sanitize (tokens, idx, options, env, slf) {
 }
 
 function html_inline_Sanitize (tokens, idx, options) {
-  const { htmlSanitize = {}, enableFileLinks = true } = options;
+  const { htmlSanitize = {}, enableFileLinks = false } = options;
   if (!tokens[idx].content) {
     return '';
   }

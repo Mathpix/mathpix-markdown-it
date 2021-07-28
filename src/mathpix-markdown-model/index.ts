@@ -421,7 +421,7 @@ class MathpixMarkdown_Model {
           overflowY='unset', breaks = true, typographer = true, linkify = true, xhtmlOut = false,
           outMath = {}, mathJax = {}, htmlSanitize = {}, smiles = {}, openLinkInNewWindow = true,
           maxWidth='',
-          enableFileLinks=true
+          enableFileLinks=false
         }
          = options || {};
 
