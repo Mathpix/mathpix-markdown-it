@@ -4451,9 +4451,9 @@ safe-regex@^1.1.0:
   resolved "https://registry.yarnpkg.com/safer-buffer/-/safer-buffer-2.1.2.tgz#44fa161b0187b9549dd84bb91802f9bd8385cd6a"
   integrity sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==
 
-"sanitize-html@https://github.com/Mathpix/sanitize-html.git":
-  version "1.27.4"
-  resolved "https://github.com/Mathpix/sanitize-html.git#2da76a400b9bd76fb9c567d394caffdafc75a255"
+"sanitize-html@https://github.com/Mathpix/sanitize-html.git#dev/olga/Set-version-2-4-0":
+  version "2.4.0"
+  resolved "https://github.com/Mathpix/sanitize-html.git#a1016a9a04eb4702feec58556b7b96ea0637f84d"
   dependencies:
     htmlparser2 "^4.1.0"
     lodash "^4.17.15"

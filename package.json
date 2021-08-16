@@ -60,7 +60,7 @@
     "react": "^16.7.0",
     "react-dom": "^16.7.0",
     "react-emotion": "^10.0.0",
-    "sanitize-html": "https://github.com/Mathpix/sanitize-html.git",
+    "sanitize-html": "https://github.com/Mathpix/sanitize-html.git#dev/olga/Set-version-2-4-0",
     "tslib": "^1.10.0"
   },
   "devDependencies": {
