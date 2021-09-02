@@ -21,7 +21,8 @@ new sm.CommandMap('wasysym-macros', {
   llbracket: ['Macro', '{[\\![}'],
   rrbracket: ['Macro', '{]\\!]}'],
   hhline: ['Macro', '\\hline \\hline'],
-  AA: ['Macro', '{\\unicode{x212B}}']
+  AA: ['Macro', '{\\unicode{x212B}}'],
+  pounds: ['Macro', '{\\it\\unicode{xA3}}']
 }, BaseMethods_js_1.default);
 
 //# sourceMappingURL=BaseMappings.js.map
