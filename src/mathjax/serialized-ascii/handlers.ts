@@ -252,15 +252,18 @@ const mtr = () => {
     let mml = '';
     try {
       const needBranch = node.parent && node.parent.parent && node.parent.parent.texClass === 7;
+      const display = node.attributes.get('displaystyle');
       let mtrContent = '';
       for (let i = 0; i < node.childNodes.length; i++) {
         if ( i>0 ) {
-          mtrContent += ','
+          mtrContent += display
+            ? ''
+            : ',';
         }
         mtrContent += serialize.visitNode(node.childNodes[i], '');
       }
 
-      mml += node.parent.childNodes.length > 1 || needBranch || node.childNodes.length > 1
+      mml += node.parent.childNodes.length > 1 || needBranch || (node.childNodes.length > 1 && !display)
         ? '[' + mtrContent + ']'
         : mtrContent;
 

@@ -336,7 +336,7 @@ module.exports = [
   },
   {
     latex: `\\begin{aligned}{(x^\\mathbb{2})}&{\\mathcal{=}y^2}\\end{aligned}`,
-    ascii:     `{:[(x^(2)),=y^(2)]:}`,
+    ascii:     `{:(x^(2))=y^(2):}`,
     ascii_old: `[(x^(2)),=y^(2)]`
   },
   {
@@ -542,7 +542,7 @@ module.exports = [
       'x y &=-24 \\\\ \n' +
       '5 x+4 y &=4 \n' +
       '\\end{aligned}',
-    ascii: `{:[xy,=-24],[5x+4y,=4]:}`,
+    ascii: `{:[xy=-24],[5x+4y=4]:}`,
   },
   // {
   //   latex: '',
