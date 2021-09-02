@@ -35,6 +35,8 @@ const textModeObj = {
   "textexclamdown": "\u00A1",//¡
   "textvisiblespace": "\u02FD",//˽
   "textgreater": "\u003E",//>
+
+  "pounds": "\u00A3",//£
 };
 
 export const textMode: RuleInline = (state, silent) => {
@@ -55,6 +57,7 @@ export const textMode: RuleInline = (state, silent) => {
   if (!match){ return false}
   token = state.push('text', '', 0);
   token.content = textModeObj[match[0]];
+  token.latex = '\\' + match[0];
   state.pos = startMathPos + match.index + match[0].length;
   return true
 };
