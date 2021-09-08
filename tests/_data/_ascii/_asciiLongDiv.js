@@ -26,7 +26,7 @@ module.exports = [
   },
   {
     latex: `12 \\sin{14} \\longdiv { 24 }`,
-    ascii: `12 sin ((14)/(24))`,
+    ascii: `((12 sin 14)/(24))`,
     ascii_old: `---`
   },
   {
@@ -43,7 +43,7 @@ module.exports = [
   },
   {
     latex: `2 x + 3 \\longdiv { 8 x ^ { 3 } - 4 x + 3 9 }`,
-    ascii: `2x+((3)/(8x^(3)-4x+39))`
+    ascii: `((2x+3)/(8x^(3)-4x+39))`
   },
   {
     latex: `3 \\longdiv { 3 4 5 }`,
@@ -55,7 +55,7 @@ module.exports = [
   },
   {
     latex: `x + 2\\longdiv { 2x ^ { 3} - x - 11}`,
-    ascii: `x+((2)/(2x^(3)-x-11))`
+    ascii: `((x+2)/(2x^(3)-x-11))`
   },
   {
     latex: `3 \\longdiv { 6 3 }`,
@@ -111,11 +111,11 @@ module.exports = [
   },
   {
     latex: `x ^ { 2} + x -1 \\longdiv { x ^ { 5} + x ^ { 4} - 2x ^ { 3} + 0+ x + 1 }`,
-    ascii: `x^(2)+x-((1)/(x^(5)+x^(4)-2x^(3)+0+x+1))`
+    ascii: `((x^(2)+x-1)/(x^(5)+x^(4)-2x^(3)+0+x+1))`
   },
   {
     latex: `3x + 2\\longdiv { 6x ^ { 2} - 5x + 4}`,
-    ascii: `3x+((2)/(6x^(2)-5x+4))`
+    ascii: `((3x+2)/(6x^(2)-5x+4))`
   },
   {
     latex: `4 1 \\longdiv { 2 3 0 }`,
@@ -125,4 +125,16 @@ module.exports = [
     latex: `12\\longdiv { 144}`,
     ascii: `((12)/(144))`
   },
+  {
+    latex: `x - \\frac { 3 } { 4 } \\longdiv { 8 x ^ { 3 } - 18 x ^ { 2 } - 11 x + 15 }`,
+    ascii: `((x-(3)/(4))/(8x^(3)-18x^(2)-11 x+15))`
+  },
+  {
+    latex: `x ^ { 2 } + 1 4 x + 4 9 g + {x ^ { 2 } + 1 4 x + 4 9 \\longdiv { x ^ { 2 } + 1 4 x }}`,
+    ascii: `x^(2)+14x+49g+((x^(2)+14x+49)/(x^(2)+14x))`
+  },
+  {
+    latex: `g + {x ^ { 2 } + 1 4 x + 4 9 \\longdiv { x ^ { 2 } + 1 4 x }}`,
+    ascii: `g+((x^(2)+14x+49)/(x^(2)+14x))`
+  }
 ];

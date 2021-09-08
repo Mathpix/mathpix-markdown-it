@@ -98,21 +98,12 @@ export class SerializedAsciiVisitor extends MmlVisitor {
             longdiv += this.visitNode(mclose, '');
             longdiv += '))';
           } else {
-            const firstChild = node.childNodes[iclose - 1];
             let mnList = [];
-            if (firstChild && firstChild.kind === 'mn') {
-              let i = 1;
-              while (iclose-i >= 0) {
-                let child = node.childNodes[iclose - i];
-                if (child && child.kind === 'mn') {
-                  mnList.unshift(child)
-                } else {
-                  break
-                }
-                i++
-              }
-            } else {
-              mnList.push(firstChild)
+            let i = 1;
+            while (iclose-i >= 0) {
+              let child = node.childNodes[iclose - i];
+              mnList.unshift(child);
+              i++
             }
 
             if (iclose - mnList.length > 0) {
