@@ -56,6 +56,23 @@ describe('Latex to ascii:', () => {
     });
   });
 
+  describe('Testing lcm:', () => {
+    const tests = require('./_data/_ascii/_ascii_lcm');
+    tests.forEach(function(test) {
+      it('Latex =>' + test.latex, function(done) {
+        const data = MathJax.TexConvert(test.latex, options);
+        console.log('    LATEX         =>', test.latex);
+        console.log('    ASCIIMATH     =>', test.ascii);
+        if (test.ascii_old) {
+          console.log('    ASCIIMATH_OLD =>', test.ascii_old);
+        }
+        data.should.have.property('asciimath', test.ascii);
+        notIncludeSymbols(data.asciimath);
+        done();
+      });
+    });
+  });
+
   describe('Testing Times:', () => {
     const tests = require('./_data/_ascii/_asciiTimes');
     tests.forEach(function(test) {

@@ -176,7 +176,12 @@ const menclose = (handlerApi) => {
       }
       mml += isLeft ? '[' : '';
       mml += handlerApi.handleAll(node, serialize);
-      mml += isBottom ? ',[hline]' : '';
+      if (atr && atr.lcm) {
+        mml += ''
+      } else {
+        mml += isBottom ? ',[hline]' : '';
+      }
+      
       mml += isRight ? ']' : '';
       return mml;
     } catch (e) {
@@ -280,8 +285,17 @@ const mpadded = (handlerApi) => {
   return  (node, serialize) => {
     let mml = '';
     try {
+      const mmlAdd = handlerApi.handleAll(node, serialize, mml);
+      if (node.Parent && node.Parent.kind === "menclose") {
+        const atr = getAttributes(node.Parent);
+        if (atr && atr.notation === 'bottom' && atr.lcm) {
+          if (!mmlAdd) {
+            return ''
+          }
+        }
+      }
       mml += '"';
-      mml += handlerApi.handleAll(node, serialize, mml);
+      mml += mmlAdd;
       mml += '"';
       return mml;
     } catch (e) {
@@ -582,6 +596,14 @@ const mo = () => {
           mml += '"' + abs + '"'
         } else {
           mml += abs ;
+        }
+      }
+      
+      if (node.Parent && node.Parent.kind === "mpadded" && node.Parent.Parent && node.Parent.Parent.kind === "menclose") {
+        const atr = getAttributes(node.Parent.Parent);
+        if ( atr.notation && atr.notation.toString().indexOf("bottom") !== -1) {
+          node.Parent.Parent.attributes.attributes.lcm = true;
+          return '';
         }
       }
       return mml;
