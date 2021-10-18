@@ -92,7 +92,13 @@ export class SerializedAsciiVisitor extends MmlVisitor {
         const atr = this.getAttributes(mclose);
         const atrDef = this.getAttributesDefaults(mclose);
         let longdiv = '';
-        if ((!atr.notation && atrDef.notation === "longdiv") || atr.notation.toString().indexOf("longdiv") !== -1) {
+
+        if ((!atr.notation && atrDef.notation === "longdiv") || 
+          (
+            atr.notation.toString().indexOf("longdiv") !== -1 ||
+            atr.notation.toString().indexOf("bottom") !== -1
+          )
+        ) {
           if (iclose === 0) {
             longdiv += '(()/(';
             longdiv += this.visitNode(mclose, '');

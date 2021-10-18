@@ -13,6 +13,7 @@ new sm.CommandMap('wasysym-macros', {
   Vmathcal: ['Macro', '{\\cal #1}', 1],
   Varangle: ['Macro', '{\\mathop{{<\\!\\!\\!\\!\\!\\small)}\\:}\\nolimits}'],
   longdiv: ['Macro', '\\enclose{longdiv}{#1}', 1],
+  lcm: ['Macro', '\\enclose{bottom}{\\smash{)}{#1}\\:}', 1], 
   oint: ['Macro', '{\\mathop{\\vcenter{\\mathchoice{\\huge\\unicode{x222E}\\,}{\\unicode{x222E}}{\\unicode{x222E}}{\\unicode{x222E}}}\\,}\\nolimits}'],
   oiint: ['Macro', '{\\mathop{\\vcenter{\\mathchoice{\\huge\\unicode{x222F}\\,}{\\unicode{x222F}}{\\unicode{x222F}}{\\unicode{x222F}}}\\,}\\nolimits}'],
   oiiint: ['Macro', '{\\mathop{\\vcenter{\\mathchoice{\\huge\\unicode{x2230}\\,}{\\unicode{x2230}}{\\unicode{x2230}}{\\unicode{x2230}}}\\,}\\nolimits}'],
