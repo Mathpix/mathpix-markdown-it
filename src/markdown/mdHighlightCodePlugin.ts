@@ -1,9 +1,5 @@
 import * as hljs from 'highlight.js';
 
-hljs.configure({
-  hideUpgradeWarningAcceptNoSupportOrSecurityUpdates: true
-});
-
 const maybe = f => {
   try {
     return f()
