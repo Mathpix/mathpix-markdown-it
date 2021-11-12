@@ -42,6 +42,7 @@ export declare type TMarkdownItOptions = {
     xhtmlOut?: boolean;
     width?: number;
     lineNumbering?: boolean;
+    startLine?: number;
     renderElement?: {
         inLine?: boolean;
         startLine?: number;
