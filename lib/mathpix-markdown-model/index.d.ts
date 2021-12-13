@@ -28,6 +28,7 @@ export interface optionsMathpixMarkdown {
     forLatex?: boolean;
     openLinkInNewWindow?: boolean;
     maxWidth?: string;
+    toc?: TTocOptions;
 }
 export declare type TMarkdownItOptions = {
     isDisableFancy?: boolean;
@@ -58,6 +59,7 @@ export declare type TMarkdownItOptions = {
     openLinkInNewWindow?: boolean;
     maxWidth?: string;
     htmlWrapper?: THtmlWrapper | boolean;
+    toc?: TTocOptions;
 };
 export declare type TOutputMath = {
     include_mathml?: boolean;
@@ -93,6 +95,13 @@ export declare type THtmlWrapper = {
     includeStyles?: boolean;
     includeFonts?: boolean;
 };
+export declare type TTocOptions = {
+    style?: TTocStyle;
+};
+export declare enum TTocStyle {
+    summary = "summary",
+    list = "list"
+}
 declare class MathpixMarkdown_Model {
     disableFancyArrayDef: string[];
     disableRules: string[];
