@@ -11,6 +11,7 @@ import { Property } from 'csstype'; // at top of file
 import { ISmilesOptions } from '../markdown/md-chemistry';
 import { yamlParser } from '../yaml-parser';
 import { generateHtmlPage } from './html-page';
+import { getMaxWidthStyle } from '../styles/halpers';
 
 export interface optionsMathpixMarkdown {
     alignMathBlock?: Property.TextAlign;
@@ -156,6 +157,8 @@ class MathpixMarkdown_Model {
   texReset = MathJax.Reset;
   getLastEquationNumber = MathJax.GetLastEquationNumber;
 
+  getMaxWidthStyle = getMaxWidthStyle;
+  
   parseMarkdownByHTML = (html: string, include_sub_math: boolean = true) => {
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, "text/html");

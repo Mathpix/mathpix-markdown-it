@@ -111,6 +111,7 @@ declare class MathpixMarkdown_Model {
     checkFormula: (mathString: string, showTimeLog?: boolean) => string;
     texReset: (n?: number) => void;
     getLastEquationNumber: () => any;
+    getMaxWidthStyle: (maxWidth?: string, isHideScroll?: boolean) => string;
     parseMarkdownByHTML: (html: string, include_sub_math?: boolean) => any[];
     parseMarkdownByElement: (el: HTMLElement | Document, include_sub_math?: boolean) => any[];
     markdownToHTML: (markdown: string, options?: TMarkdownItOptions) => string;
