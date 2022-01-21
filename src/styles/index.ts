@@ -4,7 +4,7 @@ export const resetBodyStyles = `
     line-height: normal;
   }
 `;
-export const MathpixStyle = (setTextAlignJustify: boolean = true, useColors: boolean = true, maxWidth: string = '') => {
+export const MathpixStyle = (setTextAlignJustify: boolean = true, useColors: boolean = true, maxWidth: string = '', scaleEquation = true ) => {
   return `
     #setText > div {
         justify-content: inherit;
@@ -39,6 +39,7 @@ export const MathpixStyle = (setTextAlignJustify: boolean = true, useColors: boo
     }
 
     mjx-container {
+      text-indent: 0;
       overflow-y: visible !important;
       padding-top: 1px;
       padding-bottom: 1px;
@@ -71,9 +72,7 @@ export const MathpixStyle = (setTextAlignJustify: boolean = true, useColors: boo
         color: red;
     }
 
-    #preview-content svg, #setText svg {
-        min-width: initial !important;
-    }
+    ${scaleEquation ? '#preview-content svg, #setText svg { min-width: initial !important;}' : ''}
 
     #preview-content img, #setText img {
         max-width: 100%;

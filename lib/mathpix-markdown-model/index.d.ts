@@ -28,6 +28,7 @@ export interface optionsMathpixMarkdown {
     forLatex?: boolean;
     openLinkInNewWindow?: boolean;
     maxWidth?: string;
+    toc?: TTocOptions;
 }
 export declare type TMarkdownItOptions = {
     isDisableFancy?: boolean;
@@ -42,6 +43,7 @@ export declare type TMarkdownItOptions = {
     xhtmlOut?: boolean;
     width?: number;
     lineNumbering?: boolean;
+    startLine?: number;
     renderElement?: {
         inLine?: boolean;
         startLine?: number;
@@ -57,6 +59,7 @@ export declare type TMarkdownItOptions = {
     openLinkInNewWindow?: boolean;
     maxWidth?: string;
     htmlWrapper?: THtmlWrapper | boolean;
+    toc?: TTocOptions;
 };
 export declare type TOutputMath = {
     include_mathml?: boolean;
@@ -92,6 +95,13 @@ export declare type THtmlWrapper = {
     includeStyles?: boolean;
     includeFonts?: boolean;
 };
+export declare type TTocOptions = {
+    style?: TTocStyle;
+};
+export declare enum TTocStyle {
+    summary = "summary",
+    list = "list"
+}
 declare class MathpixMarkdown_Model {
     disableFancyArrayDef: string[];
     disableRules: string[];
@@ -101,6 +111,7 @@ declare class MathpixMarkdown_Model {
     checkFormula: (mathString: string, showTimeLog?: boolean) => string;
     texReset: (n?: number) => void;
     getLastEquationNumber: () => any;
+    getMaxWidthStyle: (maxWidth?: string, isHideScroll?: boolean) => string;
     parseMarkdownByHTML: (html: string, include_sub_math?: boolean) => any[];
     parseMarkdownByElement: (el: HTMLElement | Document, include_sub_math?: boolean) => any[];
     markdownToHTML: (markdown: string, options?: TMarkdownItOptions) => string;
@@ -109,12 +120,12 @@ declare class MathpixMarkdown_Model {
     checkEquationNumber: (html: string) => string;
     handleClick: (e: any) => void;
     scrollPage: (parent: any, offsetTarget: any) => void;
-    loadMathJax: (notScrolling?: boolean, setTextAlignJustify?: boolean, isResetBodyStyles?: boolean, maxWidth?: string) => boolean;
+    loadMathJax: (notScrolling?: boolean, setTextAlignJustify?: boolean, isResetBodyStyles?: boolean, maxWidth?: string, scaleEquation?: boolean) => boolean;
     convertToHTML: (str: string, options?: TMarkdownItOptions) => string;
     getMathjaxStyle: () => any;
-    getMathpixStyleOnly: () => string;
-    getMathpixStyle: (stylePreview?: boolean, showToc?: boolean, tocContainerName?: string) => string;
-    getMathpixMarkdownStyles: (useColors?: boolean) => string;
+    getMathpixStyleOnly: (scaleEquation?: boolean) => string;
+    getMathpixStyle: (stylePreview?: boolean, showToc?: boolean, tocContainerName?: string, scaleEquation?: boolean) => string;
+    getMathpixMarkdownStyles: (useColors?: boolean, scaleEquation?: boolean) => string;
     getMathpixFontsStyle: () => string;
     render: (text: string, options?: optionsMathpixMarkdown) => string;
     mmdYamlToHTML: (mmd: string, options?: TMarkdownItOptions, isAddYamlToHtml?: boolean) => {

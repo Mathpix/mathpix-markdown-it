@@ -13,8 +13,8 @@ function injectLineNumbers(tokens, idx, options, env, slf) {
   let line, endLine, listLine;
 
   if (tokens[idx].map && tokens[idx].level === 0) {
-    line = tokens[idx].map[0];
-    endLine = tokens[idx].map[1];
+    line = options.startLine + tokens[idx].map[0];
+    endLine = options.startLine + tokens[idx].map[1];
     listLine = [];
     for (let i = line; i < endLine; i++) {
         listLine.push(i);
@@ -44,8 +44,8 @@ function html_block_injectLineNumbers(tokens, idx, options, env, slf) {
   }
 
   if (tokens[idx].map && tokens[idx].level === 0) {
-    line = tokens[idx].map[0];
-    endLine = tokens[idx].map[1];
+    line = options.startLine + tokens[idx].map[0];
+    endLine = options.startLine + tokens[idx].map[1];
     listLine = [];
     for (let i = line; i < endLine; i++) {
       listLine.push(i);
@@ -94,8 +94,8 @@ function html_inline_Sanitize (tokens, idx, options) {
 function code_block_injectLineNumbers(tokens, idx, options, env, slf) {
     let line, endLine, listLine;
     if (tokens[idx].map && tokens[idx].level === 0) {
-        line = tokens[idx].map[0];
-        endLine = tokens[idx].map[1];
+        line = options.startLine + tokens[idx].map[0];
+        endLine = options.startLine + tokens[idx].map[1];
         listLine = [];
         for (let i = line; i < endLine; i++) {
             listLine.push(i);

@@ -11,6 +11,7 @@ import { Property } from 'csstype'; // at top of file
 import { ISmilesOptions } from '../markdown/md-chemistry';
 import { yamlParser } from '../yaml-parser';
 import { generateHtmlPage } from './html-page';
+import { getMaxWidthStyle } from '../styles/halpers';
 
 export interface optionsMathpixMarkdown {
     alignMathBlock?: Property.TextAlign;
@@ -40,6 +41,7 @@ export interface optionsMathpixMarkdown {
     forLatex?: boolean;
     openLinkInNewWindow?: boolean;
     maxWidth?: string;
+    toc?: TTocOptions;
 }
 
 export type TMarkdownItOptions = {
@@ -55,6 +57,7 @@ export type TMarkdownItOptions = {
   xhtmlOut?: boolean,
   width?: number,
   lineNumbering?: boolean,
+  startLine?: number,
   renderElement?: {
     inLine?: boolean,
     startLine?: number,
@@ -70,6 +73,7 @@ export type TMarkdownItOptions = {
   openLinkInNewWindow?: boolean;
   maxWidth?: string;
   htmlWrapper?: THtmlWrapper | boolean;
+  toc?: TTocOptions;
 }
 
 export type TOutputMath = {
@@ -111,6 +115,15 @@ export type THtmlWrapper = {
   includeFonts?: boolean
 }
 
+export type TTocOptions = {
+  style?: TTocStyle
+};
+
+export enum TTocStyle {
+  summary = 'summary',
+  list = 'list'
+};
+
 const formatSourceHtml = (text: string, notTrim: boolean = false) => {
   text = notTrim ? text : text.trim();
   return text
@@ -144,6 +157,8 @@ class MathpixMarkdown_Model {
   texReset = MathJax.Reset;
   getLastEquationNumber = MathJax.GetLastEquationNumber;
 
+  getMaxWidthStyle = getMaxWidthStyle;
+  
   parseMarkdownByHTML = (html: string, include_sub_math: boolean = true) => {
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, "text/html");
@@ -339,7 +354,7 @@ class MathpixMarkdown_Model {
         }, 10);
     };
 
-    loadMathJax = (notScrolling:boolean=false, setTextAlignJustify: boolean=true, isResetBodyStyles: boolean=false, maxWidth: string = ''):boolean => {
+    loadMathJax = (notScrolling:boolean=false, setTextAlignJustify: boolean=true, isResetBodyStyles: boolean=false, maxWidth: string = '', scaleEquation = true):boolean => {
         try {
             const el = document.getElementById('SVG-styles');
             if (!el) {
@@ -355,7 +370,7 @@ class MathpixMarkdown_Model {
                 const style = document.createElement("style");
                 style.setAttribute("id", "Mathpix-styles");
                 let bodyStyles = isResetBodyStyles ? resetBodyStyles : '';
-                style.innerHTML = bodyStyles + MathpixStyle(setTextAlignJustify, true, maxWidth) + codeStyles + tabularStyles() + listsStyles;
+                style.innerHTML = bodyStyles + MathpixStyle(setTextAlignJustify, true, maxWidth, scaleEquation) + codeStyles + tabularStyles() + listsStyles;
                 document.head.appendChild(style);
             }
             return true;
@@ -388,23 +403,23 @@ class MathpixMarkdown_Model {
       }
     };
 
-    getMathpixStyleOnly = () => {
-      let style: string =  this.getMathjaxStyle() + MathpixStyle(false) + codeStyles + tabularStyles() + listsStyles;
+    getMathpixStyleOnly = (scaleEquation = true ) => {
+      let style: string =  this.getMathjaxStyle() + MathpixStyle(false, true, '', scaleEquation) + codeStyles + tabularStyles() + listsStyles;
       return style;
     };
 
-    getMathpixStyle = (stylePreview: boolean = false, showToc: boolean = false, tocContainerName: string = 'toc') => {
-      let style: string = ContainerStyle() + this.getMathjaxStyle() + MathpixStyle(stylePreview) + codeStyles + tabularStyles() + listsStyles;
+    getMathpixStyle = (stylePreview: boolean = false, showToc: boolean = false, tocContainerName: string = 'toc', scaleEquation = true ) => {
+      let style: string = ContainerStyle() + this.getMathjaxStyle() + MathpixStyle(stylePreview, true, '', scaleEquation) + codeStyles + tabularStyles() + listsStyles;
       if (showToc) {}
       return stylePreview
         ? showToc ? style + PreviewStyle + TocStyle(tocContainerName) : style + PreviewStyle
         : style;
     };
 
-    getMathpixMarkdownStyles = ( useColors: boolean = true) => {
+    getMathpixMarkdownStyles = ( useColors: boolean = true, scaleEquation = true ) => {
       let style: string = ContainerStyle(useColors);
       style += this.getMathjaxStyle();
-      style += MathpixStyle(false, useColors);
+      style += MathpixStyle(false, useColors, '', scaleEquation = true );
       // style += codeStyles;
       style += tabularStyles(useColors);
       style += listsStyles;
@@ -421,7 +436,8 @@ class MathpixMarkdown_Model {
           overflowY='unset', breaks = true, typographer = true, linkify = true, xhtmlOut = false,
           outMath = {}, mathJax = {}, htmlSanitize = {}, smiles = {}, openLinkInNewWindow = true,
           maxWidth='',
-          enableFileLinks=false
+          enableFileLinks=false,
+          toc = {}
         }
          = options || {};
 
@@ -453,7 +469,8 @@ class MathpixMarkdown_Model {
           smiles: smiles,
           openLinkInNewWindow: openLinkInNewWindow,
           maxWidth: maxWidth,
-          enableFileLinks: enableFileLinks
+          enableFileLinks: enableFileLinks,
+          toc: toc
         };
 
         const styleFontSize = fontSize ? ` font-size: ${options.fontSize}px;` : '';

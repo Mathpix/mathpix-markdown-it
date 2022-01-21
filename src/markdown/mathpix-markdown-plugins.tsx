@@ -19,7 +19,8 @@ import { validateLinkEnableFile } from "./mdOptions";
 export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
   const {width = 1200,  outMath = {}, smiles = {}, mathJax = {}, renderElement = {}, forDocx = false, forLatex = false,
     maxWidth = '',
-    enableFileLinks = false
+    enableFileLinks = false,
+    toc = {}
   } = options;
   Object.assign(md.options, smiles);
   Object.assign(md.options, {
@@ -41,7 +42,7 @@ export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
     .use(mdPluginText())
     .use(mdPluginHighlightCode, { auto: false })
     .use(mdPluginAnchor)
-    .use(mdPluginTOC);
+    .use(mdPluginTOC, {toc: toc});
 
   if ( forDocx ) {
     md.use(mdPluginSvgToBase64);

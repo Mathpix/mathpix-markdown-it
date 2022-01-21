@@ -20,6 +20,8 @@ const MathJaxConfig = {
         processEscapes: true, // use \$ to produce a litteral dollar sign
         processEnvironments: true, // process \begin{xxx}...\end{xxx} outside math mode
         processRefs: true, // process \ref{...} outside of math mode,
+        maxMacros: 10000,  //maximum number of macro substitutions per expression //10000
+        maxBuffer: 15 * 1024 // maximum size for the internal TeX string (5K) //5 * 1024
     },
       asciimath: {
         delimiters: [['<ascii>','</ascii>'], ['`','`']]

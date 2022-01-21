@@ -9,11 +9,12 @@ import {MathpixMarkdownModel as MM, TMarkdownItOptions} from '../mathpix-markdow
 const mdInit = (options: TMarkdownItOptions) => {
   const {htmlTags = false, xhtmlOut = false, width = 1200, breaks = true, typographer = true, linkify = true,
           outMath = {}, mathJax = {}, renderElement = {},
-          lineNumbering = false, htmlSanitize = true, smiles = {}, forDocx = false, openLinkInNewWindow =  true,
+          lineNumbering = false, startLine = 0, htmlSanitize = true, smiles = {}, forDocx = false, openLinkInNewWindow =  true,
     isDisableEmoji=false,
     isDisableEmojiShortcuts=false,
     maxWidth = '',
-    enableFileLinks = false
+    enableFileLinks = false,
+    toc = {}
   } = options;
   const mmdOptions = {
     width: width,
@@ -23,7 +24,8 @@ const mdInit = (options: TMarkdownItOptions) => {
     smiles: smiles,
     forDocx: forDocx,
     maxWidth: maxWidth,
-    enableFileLinks: enableFileLinks
+    enableFileLinks: enableFileLinks,
+    toc: toc
   };
   let md = require("markdown-it")({
     html: htmlTags,
@@ -34,6 +36,7 @@ const mdInit = (options: TMarkdownItOptions) => {
     typographer: typographer,
     quotes: "“”‘’",
     lineNumbering: lineNumbering,
+    startLine: startLine,
     htmlSanitize: htmlSanitize,
     openLinkInNewWindow: openLinkInNewWindow
   });

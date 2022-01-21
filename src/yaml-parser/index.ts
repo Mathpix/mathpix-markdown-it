@@ -3,7 +3,8 @@ import * as yaml from 'js-yaml';
 export interface IYamlParserResult {
   content: string,
   metadata: any,
-  error?: string
+  error?: string,
+  contentStartLine: number
 }
 
 export const yamlParser = (text: string, isAddYamlToHtml = false): IYamlParserResult => {
@@ -18,7 +19,8 @@ export const yamlParser = (text: string, isAddYamlToHtml = false): IYamlParserRe
 
   let result: IYamlParserResult = {
     content: text,
-    metadata: null
+    metadata: null,
+    contentStartLine: 0
   };
 
   try {
@@ -33,7 +35,8 @@ export const yamlParser = (text: string, isAddYamlToHtml = false): IYamlParserRe
 
         result = {
           metadata: metadata,
-          content: content.trim()
+          content: content.trim(),
+          contentStartLine: 0
         };
 
       }
@@ -42,10 +45,11 @@ export const yamlParser = (text: string, isAddYamlToHtml = false): IYamlParserRe
         let match = text.match(YAMKL_FILE_END);
         if (match) {
           const metadata = text.substring(0, match.index);
-
+          
           result = {
             metadata: metadata,
-            content: ''
+            content: '',
+            contentStartLine: 0
           };
         }
       }
@@ -57,6 +61,11 @@ export const yamlParser = (text: string, isAddYamlToHtml = false): IYamlParserRe
         }
       }
 
+      if (result.metadata) {
+        const arr = result.metadata.split('\n');
+        result.contentStartLine = arr.length + 3;
+      }
+      
       if (result.metadata) {
         let parseResult = null;
         try {

@@ -11,6 +11,8 @@ declare const MathJaxConfig: {
         processEscapes: boolean;
         processEnvironments: boolean;
         processRefs: boolean;
+        maxMacros: number;
+        maxBuffer: number;
     };
     asciimath: {
         delimiters: string[][];
