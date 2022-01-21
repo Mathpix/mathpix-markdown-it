@@ -119,12 +119,12 @@ declare class MathpixMarkdown_Model {
     checkEquationNumber: (html: string) => string;
     handleClick: (e: any) => void;
     scrollPage: (parent: any, offsetTarget: any) => void;
-    loadMathJax: (notScrolling?: boolean, setTextAlignJustify?: boolean, isResetBodyStyles?: boolean, maxWidth?: string) => boolean;
+    loadMathJax: (notScrolling?: boolean, setTextAlignJustify?: boolean, isResetBodyStyles?: boolean, maxWidth?: string, scaleEquation?: boolean) => boolean;
     convertToHTML: (str: string, options?: TMarkdownItOptions) => string;
     getMathjaxStyle: () => any;
-    getMathpixStyleOnly: () => string;
-    getMathpixStyle: (stylePreview?: boolean, showToc?: boolean, tocContainerName?: string) => string;
-    getMathpixMarkdownStyles: (useColors?: boolean) => string;
+    getMathpixStyleOnly: (scaleEquation?: boolean) => string;
+    getMathpixStyle: (stylePreview?: boolean, showToc?: boolean, tocContainerName?: string, scaleEquation?: boolean) => string;
+    getMathpixMarkdownStyles: (useColors?: boolean, scaleEquation?: boolean) => string;
     getMathpixFontsStyle: () => string;
     render: (text: string, options?: optionsMathpixMarkdown) => string;
     mmdYamlToHTML: (mmd: string, options?: TMarkdownItOptions, isAddYamlToHtml?: boolean) => {

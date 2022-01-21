@@ -351,7 +351,7 @@ class MathpixMarkdown_Model {
         }, 10);
     };
 
-    loadMathJax = (notScrolling:boolean=false, setTextAlignJustify: boolean=true, isResetBodyStyles: boolean=false, maxWidth: string = ''):boolean => {
+    loadMathJax = (notScrolling:boolean=false, setTextAlignJustify: boolean=true, isResetBodyStyles: boolean=false, maxWidth: string = '', scaleEquation = true):boolean => {
         try {
             const el = document.getElementById('SVG-styles');
             if (!el) {
@@ -367,7 +367,7 @@ class MathpixMarkdown_Model {
                 const style = document.createElement("style");
                 style.setAttribute("id", "Mathpix-styles");
                 let bodyStyles = isResetBodyStyles ? resetBodyStyles : '';
-                style.innerHTML = bodyStyles + MathpixStyle(setTextAlignJustify, true, maxWidth) + codeStyles + tabularStyles() + listsStyles;
+                style.innerHTML = bodyStyles + MathpixStyle(setTextAlignJustify, true, maxWidth, scaleEquation) + codeStyles + tabularStyles() + listsStyles;
                 document.head.appendChild(style);
             }
             return true;
@@ -400,23 +400,23 @@ class MathpixMarkdown_Model {
       }
     };
 
-    getMathpixStyleOnly = () => {
-      let style: string =  this.getMathjaxStyle() + MathpixStyle(false) + codeStyles + tabularStyles() + listsStyles;
+    getMathpixStyleOnly = (scaleEquation = true ) => {
+      let style: string =  this.getMathjaxStyle() + MathpixStyle(false, true, '', scaleEquation) + codeStyles + tabularStyles() + listsStyles;
       return style;
     };
 
-    getMathpixStyle = (stylePreview: boolean = false, showToc: boolean = false, tocContainerName: string = 'toc') => {
-      let style: string = ContainerStyle() + this.getMathjaxStyle() + MathpixStyle(stylePreview) + codeStyles + tabularStyles() + listsStyles;
+    getMathpixStyle = (stylePreview: boolean = false, showToc: boolean = false, tocContainerName: string = 'toc', scaleEquation = true ) => {
+      let style: string = ContainerStyle() + this.getMathjaxStyle() + MathpixStyle(stylePreview, true, '', scaleEquation) + codeStyles + tabularStyles() + listsStyles;
       if (showToc) {}
       return stylePreview
         ? showToc ? style + PreviewStyle + TocStyle(tocContainerName) : style + PreviewStyle
         : style;
     };
 
-    getMathpixMarkdownStyles = ( useColors: boolean = true) => {
+    getMathpixMarkdownStyles = ( useColors: boolean = true, scaleEquation = true ) => {
       let style: string = ContainerStyle(useColors);
       style += this.getMathjaxStyle();
-      style += MathpixStyle(false, useColors);
+      style += MathpixStyle(false, useColors, '', scaleEquation = true );
       // style += codeStyles;
       style += tabularStyles(useColors);
       style += listsStyles;
