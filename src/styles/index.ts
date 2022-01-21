@@ -39,6 +39,7 @@ export const MathpixStyle = (setTextAlignJustify: boolean = true, useColors: boo
     }
 
     mjx-container {
+      text-indent: 0;
       overflow-y: visible !important;
       padding-top: 1px;
       padding-bottom: 1px;
