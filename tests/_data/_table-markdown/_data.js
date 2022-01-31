@@ -560,7 +560,7 @@ module.exports = [
       '| $H ^ { 0 }$ | 700 | 470 |\n' +
       '| $A ^ { 0 }$ | 900 | 935 |\n' +
       '| $H ^ { + } H ^ { - }$ | 7000 | 6500 |',
-    table_markdown_math_as_ascii: '| Total Production of Higgs Bosons | L=50" "fb^(-1) |  |\n' +
+    table_markdown_math_as_ascii: '| Total Production of Higgs Bosons | L=50fb^(-1) |  |\n' +
       '| :---: | :---: | :---: |\n' +
       '|  | tan beta=10 | tan beta=30 |\n' +
       '| h^(0) | 1600 | 1800 |\n' +
