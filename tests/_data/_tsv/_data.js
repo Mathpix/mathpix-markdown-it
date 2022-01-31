@@ -1274,7 +1274,7 @@ module.exports = [
   },
   {
     latex: '\\begin{tabular} { | c | c | c | } \\hline \\multirow{2}{*} {Total Production of Higgs Bosons} & \\multicolumn { 2 } { | c | } $\\mathcal { L } = 50 \\mathrm{~fb} ^ { - 1 }$ \\\\ \\cline{2-3} & $\\tan \\beta = 10$ & $\\tan \\beta = 30$ \\\\ \\hline \\hline $h ^ { 0 }$ & 1600 & 1800 \\\\ $H ^ { 0 }$ & 700 & 470 \\\\ $A ^ { 0 }$ & 900 & 935 \\\\ $H ^ { + } H ^ { - }$ & 7000 & 6500 \\\\ \\hline \\end{tabular}',
-    tsv: 'Total Production of Higgs Bosons\tL=50" "fb^(-1)\t\n' +
+    tsv: 'Total Production of Higgs Bosons\tL=50fb^(-1)\t\n' +
       '\ttan beta=10\ttan beta=30\n' +
       'h^(0)\t1600\t1800\n' +
       'H^(0)\t700\t470\n' +

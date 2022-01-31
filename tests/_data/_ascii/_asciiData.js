@@ -544,12 +544,12 @@ module.exports = [
       '\\end{aligned}',
     ascii: `{:[xy=-24],[5x+4y=4]:}`,
   },
-  // {
-  //   latex: '',
-  //   ascii: ``,
-  // },
-  // {
-  //   latex: '',
-  //   ascii: ``,
-  // },
+  {
+    latex: 't=\\sqrt{\\frac{(2) 42}{9.8} \\mathrm{~m} / \\mathrm{s}^{2}}',
+    ascii: `t=sqrt(((2)42)/(9.8)m//s^(2))`,
+  },
+  {
+    latex: '200 \\mathrm{~V}',
+    ascii: `200V`,
+  },
 ];

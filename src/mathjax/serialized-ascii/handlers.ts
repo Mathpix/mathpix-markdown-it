@@ -538,7 +538,11 @@ const mtext = () => {
       if (value[0] === '(') {
         mml += value;
       } else {
-        mml += '"' + value + '"';
+        if ( !value || ( value && !value.trim())) {
+          mml += ''
+        } else {
+          mml += '"' + value + '"';
+        }
       }
       return mml;
     } catch (e) {
