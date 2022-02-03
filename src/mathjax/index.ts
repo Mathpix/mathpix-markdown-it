@@ -48,11 +48,21 @@ const texConfig = Object.assign({}, MathJaxConfig.TeX || {});
 const mmlConfig = Object.assign({}, MathJaxConfig.MathML || {});
 const svgConfig = Object.assign({}, MathJaxConfig.SVG || {});
 
+// @ts-ignore
+class MTeX extends TeX {
+  formatError(error) {
+    throw Error('TeX error: ' + error.message);
+  }
+}
+
+// @ts-ignore
+const mTex = new MTeX(texConfig);
 const tex = new TeX(texConfig);
 const mml = new MathML(mmlConfig);
 const svg = new SVG(svgConfig);
 
 let docTeX = MJ.document(domNode, { InputJax: tex, OutputJax: svg });
+let mDocTeX= MJ.document(domNode, { InputJax: mTex, OutputJax: svg });
 let docMathML = MJ.document(domNode, { InputJax: mml, OutputJax: svg });
 
 import { SerializedMmlVisitor as MmlVisitor } from 'mathjax-full/js/core/MmlTree/SerializedMmlVisitor.js';
@@ -117,6 +127,33 @@ const OuterData = (node, math, outMath, forDocx = false) => {
   return res;
 };
 
+const OuterDataError = (node, latex, error, outMath) => {
+  const {
+    include_latex = false,
+    include_svg = true,
+    include_error = false
+  } = outMath;
+  let res: {
+    mathml?: string,
+    mathml_word?: string,
+    asciimath?: string,
+    latex?: string,
+    svg?: string,
+    error?: string
+  } = {};
+
+  if (include_error && error) {
+    res.error = error.message
+  }
+  if (include_latex) {
+    res.latex = latex;
+  }
+  if (include_svg && node) {
+    res.svg = adaptor.outerHTML(node);
+  }
+  return res;
+};
+
 const OuterDataAscii = (node, math, outMath, forDocx = false) => {
   const {
     include_mathml = false,
@@ -171,6 +208,7 @@ const OuterHTML = (data, outMath) => {
     include_asciimath = false,
     include_latex = false,
     include_svg = true,
+    include_error = false
 } = outMath;
   let outHTML = '';
   if (include_mathml && data.mathml) {
@@ -186,6 +224,10 @@ const OuterHTML = (data, outMath) => {
   if (include_latex && data.latex) {
     if (!outHTML) { outHTML += '\n'}
     outHTML += '<latex style="display: none">' + formatSource(data.latex) + '</latex>';
+  }  
+  if (include_error && data.error) {
+    if (!outHTML) { outHTML += '\n'}
+    outHTML += '<error style="display: none">' + formatSource(data.error) + '</error>';
   }
 
   if (include_svg && data.svg) {
@@ -201,18 +243,26 @@ export const MathJax = {
   //  Return the stylesheet DOM node
   //
   Stylesheet: function () {
-    return svg.styleSheet(docTeX);
+    return svg.styleSheet(mDocTeX);
   },
   TexConvert: function(string, options: any={}) {
     const {display = true, metric = {}, outMath = {}, mathJax = {}, forDocx={}} = options;
     const {em = 16, ex = 8, cwidth = 1200, lwidth = 100000, scale = 1} = metric;
     const {mtextInheritFont = false} = mathJax;
     if (mtextInheritFont) {
-      docTeX.outputJax.options.mtextInheritFont = true
+      mDocTeX.outputJax.options.mtextInheritFont = true;
     }
-    const node = docTeX.convert(string, {display: display, em: em, ex: ex, containerWidth: cwidth, lineWidth: lwidth, scale: scale});
-    const outputJax = docTeX.outputJax as any;
-    return OuterData(node, outputJax.math, outMath, forDocx);
+    try {
+      const node = mDocTeX.convert(string, {display: display, em: em, ex: ex, containerWidth: cwidth, lineWidth: lwidth, scale: scale});
+      const outputJax = mDocTeX.outputJax as any;
+      return OuterData(node, outputJax.math, outMath, forDocx);
+    } catch (err) {
+      if (outMath && outMath.include_svg) {
+        const node = docTeX.convert(string, {display: display, em: em, ex: ex, containerWidth: cwidth, lineWidth: lwidth, scale: scale});
+        return OuterDataError(node, string, err, outMath);
+      }
+      return OuterDataError(null, string, err, outMath);
+    }
   },
   TexConvertToAscii: function(string, options: any={}) {
     const {display = true, metric = {},
@@ -291,10 +341,10 @@ export const MathJax = {
   //
   Reset: function (n = 0) {
     if (n) {n--} else {n = 0}
-    tex.parseOptions.tags.reset(n);
+    mTex.parseOptions.tags.reset(n);
   },
   GetLastEquationNumber: function () {
-    const tags: any = tex.parseOptions.tags;
+    const tags: any = mTex.parseOptions.tags;
     return tags.counter;
   }
 };

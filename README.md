@@ -628,6 +628,7 @@ The `MathpixMarkdown` React element accepts the following props:
 | `include_smiles`         | boolean&nbsp;*`false`*       | outputs smiles `<smiles>...</smiles>`                                                                             |
 | `tsv_separators`         | `{column: '\t', row: '\n'}`  | Separators for tsv tables                                                                                         |
 | `not_catch_errors`       | boolean&nbsp;*`false`*       | Do not catch math rendering errors                                                                                |
+| `include_error`          | boolean&nbsp;*`false`*       | outputs error `<error style="display: none">...</error>`                                                          |
  
 
 ### TOutputMathJax
