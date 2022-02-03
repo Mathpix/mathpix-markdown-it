@@ -71,6 +71,7 @@ export declare type TOutputMath = {
     include_tsv?: boolean;
     include_table_markdown?: boolean;
     include_smiles?: boolean;
+    include_error?: boolean;
     tsv_separators?: {
         column?: string;
         row?: string;
