@@ -3,14 +3,12 @@ let should = chai.should();
 
 let MM = require('../lib/mathpix-markdown-model/index').MathpixMarkdownModel;
 
-const Window = require('window');
-const window = new Window();
-global.window = window;
-global.document = window.document;
 
-const jsdom = require("jsdom");
-const { JSDOM } = jsdom;
-global.DOMParser = new JSDOM().window.DOMParser;
+const { JSDOM } = require("jsdom");
+const jsdom = new JSDOM();
+global.window = jsdom.window;
+global.document = jsdom.window.document;
+global.DOMParser = jsdom.window.DOMParser;
 
 describe('Check SanitizeHtml for markdownToHTML. [disallowedTagsMode = recursiveEscape]', () => {
   const options = {

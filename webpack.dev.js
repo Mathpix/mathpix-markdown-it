@@ -1,5 +1,6 @@
 const path = require('path');
 const CopyPlugin = require('copy-webpack-plugin');
+const NodePolyfillPlugin = require("node-polyfill-webpack-plugin");
 
 
 const config = {
@@ -46,6 +47,9 @@ const indexConfig = Object.assign({}, config, {
     new CopyPlugin([
       { from: './src/mathjax/my-BaseMappings.js', to: './lib/mathjax/my-BaseMappings.js' },
     ]),
+    new NodePolyfillPlugin({
+      excludeAliases: ["console"]
+    })
   ],
   externals: {
     'react': 'commonjs react'
