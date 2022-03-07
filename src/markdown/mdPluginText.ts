@@ -2,7 +2,6 @@ import { MarkdownIt, RuleBlock, RuleInline, Renderer, Token } from 'markdown-it'
 import { renderTabularInline } from "./md-renderer-rules/render-tabular";
 // import { escapeHtml }  from 'markdown-it/lib/common/utils';
 
-const getAbstractTemplate = (content) => `<h4 style="text-align: center">Abstract</h4><p style="text-indent: 1em">${content}</p>`;
 let subsectionParentCount: number = 0;
 let sectionCount: number = 0;
 let subCount: number = 0;
@@ -253,10 +252,27 @@ const abstractBlock: RuleBlock = (state, startLine) => {
   token.map = [startLine, nextLine];
   token.attrSet('class', 'abstract');
   token.attrSet('style', 'width: 80%; margin: 0 auto; margin-bottom: 1em; font-size: .9em;');
-  token = state.push('inline', '', 0);
-  token.content = getAbstractTemplate(tokenContent.join(`</p><p style="text-indent: 1em">`));
-  token.map = [startLine, state.line];
+
+  token = state.push('heading_open', 'h4', 1);
+  token.markup = '########'.slice(0, 4);
+  token.attrSet('id', 'abstract_head');
+  token.attrSet('class', 'abstract_head');
+  token.attrSet('style', 'text-align: center;');
+  token = state.push('text', '', 0);
+  token.content = 'Abstract';
   token.children = [];
+  token = state.push('heading_close', 'h4', -1);
+
+  for (let i = 0; i < tokenContent.length; i++) {
+    token = state.push('paragraph_open', 'p', 1);
+    token.attrSet('style', 'text-indent: 1em;');
+    
+    token = state.push('inline', '', 0);
+    token.content = tokenContent[i].trim();
+    token.map = [startLine, state.line];
+    token.children = [];
+    token = state.push('paragraph_close', 'p', -1);
+  }
   token = state.push('paragraph_close', 'div', -1);
   state.line = nextLine;
   return true;
