@@ -1,4 +1,4 @@
-const sanitizeHtml = require('sanitize-html');
+const sanitizeHtml = require('./sanitize-html');
 
 import { //allowedTags, allowedAttributes,
   generateAllowedTagsAndAttrs,

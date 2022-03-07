@@ -1,6 +1,7 @@
 const path = require('path');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const TerserPlugin = require('terser-webpack-plugin');
+const NodePolyfillPlugin = require("node-polyfill-webpack-plugin");
 
 const config = {
   // TODO: Add common Configuration
@@ -13,7 +14,8 @@ const config = {
 };
 
 const indexConfig = Object.assign({}, config, {
-  entry: ["@babel/polyfill", path.join(__dirname, './src/index.tsx')],
+  // entry: ["@babel/transform-runtime", path.join(__dirname, './src/index.tsx')],
+  entry: [ path.join(__dirname, './src/index.tsx')],
   output: {
     path: path.resolve(__dirname, './es5/'),
     filename: `index.js`,
@@ -43,6 +45,11 @@ const indexConfig = Object.assign({}, config, {
       }
     ]
   },
+  plugins: [
+    new NodePolyfillPlugin({
+      excludeAliases: ["console"]
+    })
+  ],
   externals: {
     'react': 'commonjs react'
   },
@@ -52,7 +59,7 @@ const bundleConfig = Object.assign({}, config,{
   name: "bundle",
   entry: {
     main: [
-      '@babel/polyfill',
+      // '@babel/polyfill',
       path.join(__dirname, './src/bundle.tsx'),
     ]
   },
@@ -85,7 +92,12 @@ const bundleConfig = Object.assign({}, config,{
         ]
       }
     ]
-  }
+  },
+  plugins: [
+    new NodePolyfillPlugin({
+      excludeAliases: ["console"]
+    })
+  ],
 });
 
 // Return Array of Configurations
