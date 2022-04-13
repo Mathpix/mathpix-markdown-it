@@ -4,7 +4,7 @@ export const resetBodyStyles = `
     line-height: normal;
   }
 `;
-export const MathpixStyle = (setTextAlignJustify: boolean = true, useColors: boolean = true, maxWidth: string = '', scaleEquation = true ) => {
+export const MathpixStyle = (setTextAlignJustify: boolean = false, useColors: boolean = true, maxWidth: string = '', scaleEquation = true ) => {
   return `
     #setText > div {
         justify-content: inherit;
