@@ -355,7 +355,7 @@ class MathpixMarkdown_Model {
         }, 10);
     };
 
-    loadMathJax = (notScrolling:boolean=false, setTextAlignJustify: boolean=true, isResetBodyStyles: boolean=false, maxWidth: string = '', scaleEquation = true):boolean => {
+    loadMathJax = (notScrolling:boolean=false, setTextAlignJustify: boolean=false, isResetBodyStyles: boolean=false, maxWidth: string = '', scaleEquation = true):boolean => {
         try {
             const el = document.getElementById('SVG-styles');
             if (!el) {
@@ -410,7 +410,7 @@ class MathpixMarkdown_Model {
     };
 
     getMathpixStyle = (stylePreview: boolean = false, showToc: boolean = false, tocContainerName: string = 'toc', scaleEquation = true ) => {
-      let style: string = ContainerStyle() + this.getMathjaxStyle() + MathpixStyle(stylePreview, true, '', scaleEquation) + codeStyles + tabularStyles() + listsStyles;
+      let style: string = ContainerStyle() + this.getMathjaxStyle() + MathpixStyle(false, true, '', scaleEquation) + codeStyles + tabularStyles() + listsStyles;
       if (showToc) {}
       return stylePreview
         ? showToc ? style + PreviewStyle + TocStyle(tocContainerName) : style + PreviewStyle
