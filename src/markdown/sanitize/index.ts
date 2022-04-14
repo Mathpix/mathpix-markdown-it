@@ -1,4 +1,5 @@
 const sanitizeHtml = require('./sanitize-html');
+const path = require('path');
 
 import { //allowedTags, allowedAttributes,
   generateAllowedTagsAndAttrs,
@@ -60,6 +61,7 @@ const getSanitizerConfig = (options: any = {}, addprefixHTMLids = false) => {
     'a': getNofollowSanitize(options),
     'td': sanitizeCellStyle,
     'th': sanitizeCellStyle,
+    'img': sanitizeImg
   };
   if ( addprefixHTMLids ) {
     transformTags['*'] = prefixHTMLids;
@@ -91,6 +93,21 @@ function sanitizeAnchorNofollow (tagName, attribs) {
   return sanitizeIdentity(tagName, attribs)
 }
 
+function sanitizeImg (tagName, attribs) {
+  if (attribs && !attribs.alt) {
+    if (attribs.title) {
+      attribs.alt = attribs.title;
+    } else {
+      const fileData = attribs.src ? path.parse(attribs.src) : null;
+      const fileName = fileData ? fileData.name : '';
+      attribs.alt = fileName ? fileName : 'Image';
+    }
+  }
+  return {
+    tagName: tagName,
+    attribs: attribs
+  }
+}
 // Allow table cell alignment
 function sanitizeCellStyle (tagName, attribs) {
   // if we don't add the 'style' to the allowedAttributes above, it will be
