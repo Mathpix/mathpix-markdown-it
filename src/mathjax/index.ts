@@ -1,4 +1,5 @@
 import {mathjax as MJ} from 'mathjax-full/js/mathjax.js';
+import 'mathjax-full/js/util/asyncLoad/node.js';
 import {TeX} from 'mathjax-full/js/input/tex.js';
 import {MathML} from "mathjax-full/js/input/mathml.js";
 import {SVG} from 'mathjax-full/js/output/svg.js';
@@ -7,15 +8,10 @@ import {RegisterHTMLHandler} from 'mathjax-full/js/handlers/html.js';
 import {browserAdaptor} from 'mathjax-full/js/adaptors/browserAdaptor.js';
 import {liteAdaptor} from 'mathjax-full/js/adaptors/liteAdaptor.js';
 
-import 'mathjax-full/js/input/tex/base/BaseConfiguration.js';
-import 'mathjax-full/js/input/tex/ams/AmsConfiguration.js';
-import 'mathjax-full/js/input/tex/noundefined/NoUndefinedConfiguration.js';
-import 'mathjax-full/js/input/tex/boldsymbol/BoldsymbolConfiguration.js';
-import 'mathjax-full/js/input/tex/newcommand/NewcommandConfiguration.js';
-import 'mathjax-full/js/input/tex/unicode/UnicodeConfiguration.js';
-import "mathjax-full/js/input/tex/color/ColorConfiguration.js";
-import "mathjax-full/js/input/tex/mhchem/MhchemConfiguration.js";
-import "mathjax-full/js/input/tex/enclose/EncloseConfiguration";
+import {STATE} from 'mathjax-full/js/core/MathItem.js';
+import 'mathjax-full/js/input/tex/AllPackages.js';
+import {EnrichHandler} from 'mathjax-full/js/a11y/semantic-enrich.js';
+
 import MathJaxConfig from './mathJaxConfig';
 
 require("./my-BaseMappings");
@@ -42,7 +38,10 @@ catch (e) {
   adaptor = liteAdaptor();
   domNode = '<html></html>';
 }
-RegisterHTMLHandler(adaptor);
+
+
+EnrichHandler(RegisterHTMLHandler(adaptor), new MathML());
+
 
 const texConfig = Object.assign({}, MathJaxConfig.TeX || {});
 const mmlConfig = Object.assign({}, MathJaxConfig.MathML || {});
@@ -61,8 +60,34 @@ const tex = new TeX(texConfig);
 const mml = new MathML(mmlConfig);
 const svg = new SVG(svgConfig);
 
-let docTeX = MJ.document(domNode, { InputJax: tex, OutputJax: svg });
-let mDocTeX= MJ.document(domNode, { InputJax: mTex, OutputJax: svg });
+let docTeX = MJ.document(domNode, { 
+  enrichSpeech: 'deep',
+  InputJax: tex, 
+  OutputJax: svg
+});
+
+let mDocTeX= MJ.document(domNode, { 
+  enrichSpeech: 'deep',
+  InputJax: mTex, 
+  OutputJax: svg,
+  renderActions: {
+    removeAttributes:
+    [
+      40,
+      (doc) => {},
+      (math, doc) => {
+        math.root.walkTree(node => {
+          const attributes = node.attributes.getAllAttributes();
+          for (const name of Object.keys(attributes)) {
+            if (name !== 'data-semantic-speech' && name.match(/^data-semantic-/)) {
+              delete attributes[name];
+            }
+          }
+        });
+      }
+    ]
+  }
+});
 let docMathML = MJ.document(domNode, { InputJax: mml, OutputJax: svg });
 
 import { SerializedMmlVisitor as MmlVisitor } from 'mathjax-full/js/core/MmlTree/SerializedMmlVisitor.js';
@@ -253,7 +278,12 @@ export const MathJax = {
       mDocTeX.outputJax.options.mtextInheritFont = true;
     }
     try {
-      const node = mDocTeX.convert(string, {display: display, em: em, ex: ex, containerWidth: cwidth, lineWidth: lwidth, scale: scale});
+      const node = mDocTeX.convert(string, {
+        end: STATE.ATTACHSPEECH,
+        display: display, 
+        em: em, 
+        ex: ex, 
+        containerWidth: cwidth, lineWidth: lwidth, scale: scale});
       const outputJax = mDocTeX.outputJax as any;
       return OuterData(node, outputJax.math, outMath, forDocx);
     } catch (err) {

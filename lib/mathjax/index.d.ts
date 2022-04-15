@@ -1,12 +1,5 @@
-import 'mathjax-full/js/input/tex/base/BaseConfiguration.js';
-import 'mathjax-full/js/input/tex/ams/AmsConfiguration.js';
-import 'mathjax-full/js/input/tex/noundefined/NoUndefinedConfiguration.js';
-import 'mathjax-full/js/input/tex/boldsymbol/BoldsymbolConfiguration.js';
-import 'mathjax-full/js/input/tex/newcommand/NewcommandConfiguration.js';
-import 'mathjax-full/js/input/tex/unicode/UnicodeConfiguration.js';
-import "mathjax-full/js/input/tex/color/ColorConfiguration.js";
-import "mathjax-full/js/input/tex/mhchem/MhchemConfiguration.js";
-import "mathjax-full/js/input/tex/enclose/EncloseConfiguration";
+import 'mathjax-full/js/util/asyncLoad/node.js';
+import 'mathjax-full/js/input/tex/AllPackages.js';
 export declare const MathJax: {
     Stylesheet: () => unknown;
     TexConvert: (string: any, options?: any) => {
