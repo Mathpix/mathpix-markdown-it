@@ -494,14 +494,19 @@ const renderMath = (a, token, options) => {
     } else {
       if (token.return_asciimath) {
         const data = MathJax.TypesetSvgAndAscii(math, {
-          display: isBlock, metric: {cwidth: cwidth},
-          outMath: options.outMath, mathJax: options.mathJax
+          display: isBlock, 
+          metric: {cwidth: cwidth},
+          outMath: options.outMath, 
+          mathJax: options.mathJax,
+          accessibility: options.accessibility
         });
         mathEquation = data.html;
         token.ascii = data.ascii
       } else {
          mathEquation = MathJax.Typeset(math, {display: isBlock, metric: { cwidth: cwidth },
-           outMath: options.outMath, mathJax: options.mathJax, forDocx: options.forDocx});
+           outMath: options.outMath, mathJax: options.mathJax, forDocx: options.forDocx,
+           accessibility: options.accessibility
+         });
       }
     }
   } catch (e) {

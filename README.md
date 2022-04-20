@@ -590,6 +590,7 @@ The `MathpixMarkdown` React element accepts the following props:
 |                  |                              | Removes script tags and stuff. Removes broken and malicious html. Set to `false` to disable                            |
 | `smiles`         | [ISmilesOptions](https://github.com/Mathpix/mathpix-markdown-it#ismilesoptions);*`{}`*        | Sets options to output chemistry equation                                                                              |
 | `htmlWrapper`    | [THtmlWrapper](https://github.com/Mathpix/mathpix-markdown-it#thtmlwrapper);*`{}`*          | Sets options for output full html page                                                                                 |
+| `accessibility`  | [TAccessibility](https://github.com/Mathpix/mathpix-markdown-it#taccessibility);*`{}`*        | Sets options to accessibility                                                                                          |
 
 ### optionsMathpixMarkdown
 
@@ -629,7 +630,7 @@ The `MathpixMarkdown` React element accepts the following props:
 | `tsv_separators`         | `{column: '\t', row: '\n'}`  | Separators for tsv tables                                                                                         |
 | `not_catch_errors`       | boolean&nbsp;*`false`*       | Do not catch math rendering errors                                                                                |
 | `include_error`          | boolean&nbsp;*`false`*       | outputs error `<error style="display: none">...</error>`                                                          |
- 
+| `include_speech`         | boolean&nbsp;*`false`*       | outputs speech `<speech>...</speech`                                                                              | 
 
 ### TOutputMathJax
 
@@ -668,6 +669,13 @@ The `MathpixMarkdown` React element accepts the following props:
 | `includeStyles`             | boolean&nbsp;*`false`*      | Includes mathpix-markdown styles                                                                                                            |
 | `includeFonts`              | boolean&nbsp;*`false`*      | Includes mathpix-markdown fonts                                                                                                             |
 
+
+### TAccessibility
+
+|                             | type&nbsp;*`default`*       | description
+|-----------------------------|-----------------------------|--------------------------------------------------------------------------------------------------------------------------------------------|
+| `assistiveMml`              | boolean&nbsp;*`false`*      | assistive-mml will be added to mjx-container                                                                                               |
+| `sre`                       | boolean&nbsp;*`false`*      | sre module to accessibility                                                                                                                |
 
 # Development
 

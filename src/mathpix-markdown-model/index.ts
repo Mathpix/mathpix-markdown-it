@@ -42,6 +42,7 @@ export interface optionsMathpixMarkdown {
     openLinkInNewWindow?: boolean;
     maxWidth?: string;
     toc?: TTocOptions;
+    accessibility?: TAccessibility;
 }
 
 export type TMarkdownItOptions = {
@@ -74,6 +75,7 @@ export type TMarkdownItOptions = {
   maxWidth?: string;
   htmlWrapper?: THtmlWrapper | boolean;
   toc?: TTocOptions;
+  accessibility?: TAccessibility;
 }
 
 export type TOutputMath = {
@@ -86,6 +88,7 @@ export type TOutputMath = {
   include_tsv?: boolean,
   include_table_markdown?: boolean,
   include_smiles?: boolean,
+  include_speech?: boolean,
   include_error?: boolean,
   tsv_separators?: {
     column?: string,
@@ -124,6 +127,11 @@ export enum TTocStyle {
   summary = 'summary',
   list = 'list'
 };
+
+export type TAccessibility = {
+  assistiveMml?: boolean,
+  sre?: boolean
+} | false;
 
 const formatSourceHtml = (text: string, notTrim: boolean = false) => {
   text = notTrim ? text : text.trim();
@@ -438,7 +446,8 @@ class MathpixMarkdown_Model {
           outMath = {}, mathJax = {}, htmlSanitize = {}, smiles = {}, openLinkInNewWindow = true,
           maxWidth='',
           enableFileLinks=false,
-          toc = {}
+          toc = {},
+          accessibility = false
         }
          = options || {};
 
@@ -471,7 +480,8 @@ class MathpixMarkdown_Model {
           openLinkInNewWindow: openLinkInNewWindow,
           maxWidth: maxWidth,
           enableFileLinks: enableFileLinks,
-          toc: toc
+          toc: toc,
+          accessibility: accessibility
         };
 
         const styleFontSize = fontSize ? ` font-size: ${options.fontSize}px;` : '';

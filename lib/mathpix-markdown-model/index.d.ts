@@ -29,6 +29,7 @@ export interface optionsMathpixMarkdown {
     openLinkInNewWindow?: boolean;
     maxWidth?: string;
     toc?: TTocOptions;
+    accessibility?: TAccessibility;
 }
 export declare type TMarkdownItOptions = {
     isDisableFancy?: boolean;
@@ -60,6 +61,7 @@ export declare type TMarkdownItOptions = {
     maxWidth?: string;
     htmlWrapper?: THtmlWrapper | boolean;
     toc?: TTocOptions;
+    accessibility?: TAccessibility;
 };
 export declare type TOutputMath = {
     include_mathml?: boolean;
@@ -71,6 +73,7 @@ export declare type TOutputMath = {
     include_tsv?: boolean;
     include_table_markdown?: boolean;
     include_smiles?: boolean;
+    include_speech?: boolean;
     include_error?: boolean;
     tsv_separators?: {
         column?: string;
@@ -103,6 +106,10 @@ export declare enum TTocStyle {
     summary = "summary",
     list = "list"
 }
+export declare type TAccessibility = {
+    assistiveMml?: boolean;
+    sre?: boolean;
+} | false;
 declare class MathpixMarkdown_Model {
     disableFancyArrayDef: string[];
     disableRules: string[];

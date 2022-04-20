@@ -25,6 +25,9 @@ describe('TSV:', () => {
   const tests = require('./_data/_tsv/_data');
   tests.forEach(function(test) {
     const options = {
+      accessibility: {
+        assistiveMml: false
+      },
       outMath: {
         include_tsv: true,
         include_table_html: true
@@ -76,7 +79,10 @@ describe('TSV:', () => {
     });
 
     describe('Default Options. \n Latex => ' + test.latex, () => {
-      const html = MM.render(test.latex);
+      const html = MM.render(test.latex, {
+        accessibility: {
+          assistiveMml: false
+        }});
       const data = MM.parseMarkdownByHTML(html, false);
 
       it('Should be parser.length = 1', function(done) {
@@ -125,7 +131,11 @@ describe('TSV:', () => {
             include_svg: false,
             include_tsv: false,
             include_table_html: true
-          }});
+          },
+          accessibility: {
+            assistiveMml: false
+          }
+        });
         const data = MM.parseMarkdownByHTML(html);
         data.should.have.length(1);
         data[0].should.have.property('type', 'html');
@@ -140,7 +150,11 @@ describe('TSV:', () => {
           include_svg: false,
           include_tsv: false,
           include_table_html: false
-        }});
+        },
+        accessibility: {
+          assistiveMml: false
+        }
+      });
       const data = MM.parseMarkdownByHTML(html);
       data.findIndex(item => item.type === 'tsv').should.equal(-1);
       done();
@@ -153,7 +167,11 @@ describe('TSV:', () => {
           include_latex: false,
           include_svg: false,
           include_tsv: false
-        }});
+        },
+        accessibility: {
+          assistiveMml: false
+        }
+      });
       const data = MM.parseMarkdownByHTML(html);
       data.findIndex(item => item.type === 'tsv').should.equal(-1);
       done();
@@ -167,7 +185,11 @@ describe('TSV:', () => {
           include_svg: true,
           include_tsv: true,
           include_table_html: true
-        }});
+        },
+        accessibility: {
+          assistiveMml: false
+        }
+      });
       const data = MM.parseMarkdownByHTML(html, false);
       data.findIndex(item => item.type === 'asciimath').should.equal(-1);
       data.findIndex(item => item.type === 'mathm').should.equal(-1);
@@ -187,7 +209,11 @@ describe('TSV:', () => {
           include_svg: true,
           include_tsv: true,
           include_table_html: true
-        }});
+        },
+        accessibility: {
+          assistiveMml: false
+        }
+      });
       const data = MM.parseMarkdownByHTML(html);
       data.should.have.length(22);
       data[0].should.have.property('type', 'html');
@@ -207,7 +233,11 @@ describe('TSV:', () => {
           include_svg: true,
           include_tsv: true,
           include_table_html: true
-        }});
+        },
+        accessibility: {
+          assistiveMml: false
+        }
+      });
       const data = MM.parseMarkdownByHTML(html, false);
       data.findIndex(item => item.type === 'asciimath').should.equal(-1);
       data.findIndex(item => item.type === 'mathm').should.equal(-1);
@@ -227,7 +257,11 @@ describe('TSV:', () => {
           include_svg: true,
           include_tsv: true,
           include_table_html: true
-        }});
+        },
+        accessibility: {
+          assistiveMml: false
+        }
+      });
       const data = MM.parseMarkdownByHTML(html);
       data.should.have.length(28);
       data[0].should.have.property('type', 'html');

@@ -5,6 +5,9 @@ let MM = require('../lib/mathpix-markdown-model/index').MathpixMarkdownModel;
 
 const options = {
   cwidth: 800,
+  accessibility: {
+    assistiveMml: false
+  },
 };
 
 

@@ -7,6 +7,9 @@ const options = {
   cwidth: 800,
   lineNumbering: false,
   htmlTags: true,
+  accessibility: {
+    assistiveMml: false
+  },
 };
 
 

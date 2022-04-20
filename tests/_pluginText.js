@@ -25,7 +25,6 @@ describe('Check pluginText:', () => {
   const tests = require('./_data/_pluginText/_data');
   tests.forEach(function(test) {
     const html = MM.markdownToHTML(test.latex, options);
-    console.log('html=>', html)
     describe('Latex => ' + test.latex, () => {
       it('Checking result html', (done) => {
         html.trim().should.equal(test.svg);

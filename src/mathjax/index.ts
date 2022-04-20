@@ -7,15 +7,10 @@ import {RegisterHTMLHandler} from 'mathjax-full/js/handlers/html.js';
 import {browserAdaptor} from 'mathjax-full/js/adaptors/browserAdaptor.js';
 import {liteAdaptor} from 'mathjax-full/js/adaptors/liteAdaptor.js';
 
-import 'mathjax-full/js/input/tex/base/BaseConfiguration.js';
-import 'mathjax-full/js/input/tex/ams/AmsConfiguration.js';
-import 'mathjax-full/js/input/tex/noundefined/NoUndefinedConfiguration.js';
-import 'mathjax-full/js/input/tex/boldsymbol/BoldsymbolConfiguration.js';
-import 'mathjax-full/js/input/tex/newcommand/NewcommandConfiguration.js';
-import 'mathjax-full/js/input/tex/unicode/UnicodeConfiguration.js';
-import "mathjax-full/js/input/tex/color/ColorConfiguration.js";
-import "mathjax-full/js/input/tex/mhchem/MhchemConfiguration.js";
-import "mathjax-full/js/input/tex/enclose/EncloseConfiguration";
+import 'mathjax-full/js/input/tex/AllPackages.js';
+import {AssistiveMmlHandler} from'mathjax-full/js/a11y/assistive-mml.js';
+import { getSpeech } from '../sre';
+
 import MathJaxConfig from './mathJaxConfig';
 
 require("./my-BaseMappings");
@@ -42,7 +37,13 @@ catch (e) {
   adaptor = liteAdaptor();
   domNode = '<html></html>';
 }
-RegisterHTMLHandler(adaptor);
+
+let handler: any = RegisterHTMLHandler(adaptor);
+
+/**
+ * TODO: Added settings for it 
+ * */
+AssistiveMmlHandler(handler);
 
 const texConfig = Object.assign({}, MathJaxConfig.TeX || {});
 const mmlConfig = Object.assign({}, MathJaxConfig.MathML || {});
@@ -62,12 +63,13 @@ const mml = new MathML(mmlConfig);
 const svg = new SVG(svgConfig);
 
 let docTeX = MJ.document(domNode, { InputJax: tex, OutputJax: svg });
-let mDocTeX= MJ.document(domNode, { InputJax: mTex, OutputJax: svg });
+let mDocTeX: MathDocument<any, any, any> = MJ.document(domNode, { InputJax: mTex, OutputJax: svg });
 let docMathML = MJ.document(domNode, { InputJax: mml, OutputJax: svg });
 
 import { SerializedMmlVisitor as MmlVisitor } from 'mathjax-full/js/core/MmlTree/SerializedMmlVisitor.js';
 import { SerializedAsciiVisitor as AsciiVisitor } from './serialized-ascii';
 import { MathMLVisitorWord } from './mathml-word';
+import { MathDocument } from "mathjax-full/js/core/MathDocument";
 
 const toMathML = (node => {
   const visitor = new MmlVisitor();
@@ -87,13 +89,14 @@ const toAsciiML = ((node, optionAscii) => {
   return ascii ? ascii.trim() : ascii;
 });
 
-const OuterData = (node, math, outMath, forDocx = false) => {
+const OuterData = (node, math, outMath, forDocx = false, accessibility?) => {
   const {
     include_mathml = false,
     include_mathml_word = false,
     include_asciimath = false,
     include_latex = false,
     include_svg = true,
+    include_speech = false,
     optionAscii = {
       showStyle: false,
       extraBrackets: true
@@ -103,8 +106,33 @@ const OuterData = (node, math, outMath, forDocx = false) => {
     mathml_word?: string,
     asciimath?: string,
     latex?: string,
-    svg?: string
+    svg?: string,
+    speech?: string
   } = {};
+
+  let speech = '';
+  if (accessibility) { 
+    if (accessibility.sre) {
+      const lastChild = adaptor.lastChild(node);
+      const mmlAssistive = adaptor.innerHTML(lastChild);
+      speech = getSpeech(accessibility.sre, mmlAssistive);
+      adaptor.setAttribute(node, 'aria-label', speech);
+      adaptor.setAttribute(node, 'role', "math")
+    }
+    
+    if (!accessibility.assistiveMml) {
+      const lastChild = adaptor.lastChild(node);
+      adaptor.remove(lastChild);
+
+      adaptor.removeAttribute(node, 'role');
+      adaptor.removeAttribute(node, 'style');
+
+      const firstChild = adaptor.firstChild(node);
+      adaptor.removeAttribute(firstChild, 'aria-hidden');
+    }
+  }
+  
+  
   if (include_mathml) {
     res.mathml = toMathML(math.root);
   }
@@ -123,6 +151,10 @@ const OuterData = (node, math, outMath, forDocx = false) => {
   }
   if (include_svg) {
     res.svg = adaptor.outerHTML(node)
+  }
+
+  if (include_speech && speech) {
+    res.speech = speech;
   }
   return res;
 };
@@ -189,6 +221,7 @@ const OuterDataAscii = (node, math, outMath, forDocx = false) => {
 
 const formatSource = (text: string) => {
   return text.trim()
+    .replace(/\u2062/g, '')
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
@@ -208,7 +241,8 @@ const OuterHTML = (data, outMath) => {
     include_asciimath = false,
     include_latex = false,
     include_svg = true,
-    include_error = false
+    include_error = false,
+    include_speech = false
 } = outMath;
   let outHTML = '';
   if (include_mathml && data.mathml) {
@@ -224,6 +258,10 @@ const OuterHTML = (data, outMath) => {
   if (include_latex && data.latex) {
     if (!outHTML) { outHTML += '\n'}
     outHTML += '<latex style="display: none">' + formatSource(data.latex) + '</latex>';
+  }    
+  if (include_speech && data.speech) {
+    if (!outHTML) { outHTML += '\n'}
+    outHTML += '<speech style="display: none">' + formatSource(data.speech) + '</speech>';
   }  
   if (include_error && data.error) {
     if (!outHTML) { outHTML += '\n'}
@@ -246,17 +284,22 @@ export const MathJax = {
     return svg.styleSheet(mDocTeX);
   },
   TexConvert: function(string, options: any={}) {
-    const {display = true, metric = {}, outMath = {}, mathJax = {}, forDocx={}} = options;
+    const {display = true, metric = {}, outMath = {}, mathJax = {}, forDocx={}, accessibility=false} = options;
     const {em = 16, ex = 8, cwidth = 1200, lwidth = 100000, scale = 1} = metric;
     const {mtextInheritFont = false} = mathJax;
     if (mtextInheritFont) {
       mDocTeX.outputJax.options.mtextInheritFont = true;
     }
     try {
-      const node = mDocTeX.convert(string, {display: display, em: em, ex: ex, containerWidth: cwidth, lineWidth: lwidth, scale: scale});
+      const node = mDocTeX.convert(string, {
+        display: display, 
+        em: em, 
+        ex: ex, 
+        containerWidth: cwidth, lineWidth: lwidth, scale: scale});
       const outputJax = mDocTeX.outputJax as any;
-      return OuterData(node, outputJax.math, outMath, forDocx);
+      return OuterData(node, outputJax.math, outMath, forDocx, accessibility);    
     } catch (err) {
+      console.log('ERROR=>', err);
       if (outMath && outMath.include_svg) {
         const node = docTeX.convert(string, {display: display, em: em, ex: ex, containerWidth: cwidth, lineWidth: lwidth, scale: scale});
         return OuterDataError(node, string, err, outMath);
