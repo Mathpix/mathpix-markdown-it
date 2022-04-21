@@ -105,7 +105,7 @@ const applySpeechToNode = (node, accessibility): string => {
 };
 
 const removeAssistiveMmlFromNode = (node, accessibility) => {
-  if ( accessibility && accessibility.assistiveMml) {
+  if (accessibility && accessibility.assistiveMml) {
     return;
   }
   const lastChild = adaptor.lastChild(node);
