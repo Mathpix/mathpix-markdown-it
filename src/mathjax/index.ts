@@ -98,6 +98,9 @@ const applySpeechToNode = (node, accessibility): string => {
   const speech = getSpeech(accessibility.sre, mmlAssistive);
   adaptor.setAttribute(node, 'aria-label', speech);
   adaptor.setAttribute(node, 'role', "math");
+  adaptor.setAttribute(node, 'tabindex', "0");
+  
+  adaptor.setAttribute(lastChild, 'aria-hidden', "true");
   return speech;
 };
 

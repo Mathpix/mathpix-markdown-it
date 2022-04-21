@@ -33,6 +33,7 @@ export const addAriaToMathHTML = (sre, html: string) => {
       }
 
       const speech = getSpeech(sre, elMml.innerHTML);
+      elMml.setAttribute('aria-hidden', "true");
       if (!speech) {
         continue;
       }
