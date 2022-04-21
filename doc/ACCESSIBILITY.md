@@ -9,8 +9,8 @@ To form accessibility attributes, the browser version of `speech-rule-engine` is
 This requires access to window and DOM
 
 ```js
-import { getSRE } from "mathpix-markdown-it/lib/sre/sre-browser";
-const sre = getSRE();
+import { loadSre } from "mathpix-markdown-it/lib/sre/sre-browser";
+const sre = loadSre();
 
 import { MathpixMarkdownModel } from "mathpix-markdown-it";
 
@@ -47,15 +47,15 @@ console.log('html => ', html);
 To form accessibility, the node version of `speech-rule-engine` is used.
 Modules are loaded asynchronously. 
 
-`const { getSRE } = require('../lib/sre/sre-node');`
+`const { loadSreAsync } = require('../lib/sre/sre-node');`
 
 
 ```js
-const { getSRE } = require('../lib/sre/sre-node');
+const { loadSreAsync } = require('../lib/sre/sre-node');
 const MathpixMarkdownModel = require('../lib/mathpix-markdown-model/index').MathpixMarkdownModel;
 
 ( async() => {
-  const sre = await getSRE();
+  const sre = await loadSreAsync();
 
   const options = {
     accessibility: {
@@ -136,9 +136,9 @@ const html = MM.markdownToHTML("$x^y$", mmdOptions);
 #### After the messages from the Web Worker with rendered html are received.
 
 ```js
-import { getSRE } from "mathpix-markdown-it/lib/sre/sre-browser";
+import { loadSre } from "mathpix-markdown-it/lib/sre/sre-browser";
 import { addAriaToMathHTML } from "mathpix-markdown-it/lib/sre";
-const sre = getSRE();
+const sre = loadSre();
 
 const htmlNew = addAriaToMathHTML(sre, html);
 ```

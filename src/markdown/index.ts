@@ -15,7 +15,7 @@ const mdInit = (options: TMarkdownItOptions) => {
     maxWidth = '',
     enableFileLinks = false,
     toc = {},
-    accessibility = false
+    accessibility = {}
   } = options;
   const mmdOptions = {
     width: width,

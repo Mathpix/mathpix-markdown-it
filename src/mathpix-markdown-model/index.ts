@@ -129,9 +129,9 @@ export enum TTocStyle {
 };
 
 export type TAccessibility = {
-  assistiveMml?: boolean,
-  sre?: boolean
-} | false;
+  assistiveMml?: boolean, //true to enable assitive MathML
+  sre?: object
+};
 
 const formatSourceHtml = (text: string, notTrim: boolean = false) => {
   text = notTrim ? text : text.trim();
@@ -447,7 +447,7 @@ class MathpixMarkdown_Model {
           maxWidth='',
           enableFileLinks=false,
           toc = {},
-          accessibility = false
+          accessibility = {}
         }
          = options || {};
 

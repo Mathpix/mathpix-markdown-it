@@ -33,7 +33,6 @@ export const addAriaToMathHTML = (sre, html: string) => {
       }
 
       const speech = getSpeech(sre, elMml.innerHTML);
-      
       if (!speech) {
         continue;
       }

@@ -25,9 +25,6 @@ describe('TSV:', () => {
   const tests = require('./_data/_tsv/_data');
   tests.forEach(function(test) {
     const options = {
-      accessibility: {
-        assistiveMml: false
-      },
       outMath: {
         include_tsv: true,
         include_table_html: true
@@ -79,10 +76,7 @@ describe('TSV:', () => {
     });
 
     describe('Default Options. \n Latex => ' + test.latex, () => {
-      const html = MM.render(test.latex, {
-        accessibility: {
-          assistiveMml: false
-        }});
+      const html = MM.render(test.latex);
       const data = MM.parseMarkdownByHTML(html, false);
 
       it('Should be parser.length = 1', function(done) {
@@ -131,9 +125,6 @@ describe('TSV:', () => {
             include_svg: false,
             include_tsv: false,
             include_table_html: true
-          },
-          accessibility: {
-            assistiveMml: false
           }
         });
         const data = MM.parseMarkdownByHTML(html);
@@ -150,9 +141,6 @@ describe('TSV:', () => {
           include_svg: false,
           include_tsv: false,
           include_table_html: false
-        },
-        accessibility: {
-          assistiveMml: false
         }
       });
       const data = MM.parseMarkdownByHTML(html);
@@ -167,9 +155,6 @@ describe('TSV:', () => {
           include_latex: false,
           include_svg: false,
           include_tsv: false
-        },
-        accessibility: {
-          assistiveMml: false
         }
       });
       const data = MM.parseMarkdownByHTML(html);
@@ -185,9 +170,6 @@ describe('TSV:', () => {
           include_svg: true,
           include_tsv: true,
           include_table_html: true
-        },
-        accessibility: {
-          assistiveMml: false
         }
       });
       const data = MM.parseMarkdownByHTML(html, false);
@@ -209,9 +191,6 @@ describe('TSV:', () => {
           include_svg: true,
           include_tsv: true,
           include_table_html: true
-        },
-        accessibility: {
-          assistiveMml: false
         }
       });
       const data = MM.parseMarkdownByHTML(html);
@@ -233,9 +212,6 @@ describe('TSV:', () => {
           include_svg: true,
           include_tsv: true,
           include_table_html: true
-        },
-        accessibility: {
-          assistiveMml: false
         }
       });
       const data = MM.parseMarkdownByHTML(html, false);
@@ -257,9 +233,6 @@ describe('TSV:', () => {
           include_svg: true,
           include_tsv: true,
           include_table_html: true
-        },
-        accessibility: {
-          assistiveMml: false
         }
       });
       const data = MM.parseMarkdownByHTML(html);

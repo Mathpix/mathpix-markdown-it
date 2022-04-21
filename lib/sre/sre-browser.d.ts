@@ -1,1 +1,1 @@
-export declare const getSRE: () => any;
+export declare const loadSre: (options?: {}) => any;

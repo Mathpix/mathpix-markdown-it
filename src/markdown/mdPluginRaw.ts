@@ -490,7 +490,12 @@ const renderMath = (a, token, options) => {
     }
 
     if (token.type === 'display_mathML' || token.type === 'inline_mathML') {
-      mathEquation = MathJax.TypesetMathML(math);
+      mathEquation = MathJax.TypesetMathML(math, {
+        display: true,
+        metric: {cwidth: cwidth},
+        outMath: options.outMath,
+        accessibility: options.accessibility
+      });
     } else {
       if (token.return_asciimath) {
         const data = MathJax.TypesetSvgAndAscii(math, {

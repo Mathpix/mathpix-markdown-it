@@ -674,8 +674,49 @@ The `MathpixMarkdown` React element accepts the following props:
 
 |                             | type&nbsp;*`default`*       | description
 |-----------------------------|-----------------------------|--------------------------------------------------------------------------------------------------------------------------------------------|
-| `assistiveMml`              | boolean&nbsp;*`false`*      | assistive-mml will be added to mjx-container                                                                                               |
-| `sre`                       | boolean&nbsp;*`false`*      | sre module to accessibility                                                                                                                |
+| `assistiveMml`              | boolean&nbsp;*`false`*      | Should Assistive MathML be enabled to math (mjx-container).                                                                                |
+| `sre`                       | object&nbsp;*`null`*        | spe object from library [speech-rule-engine](https://www.npmjs.com/package/speech-rule-engine) for semantic interpretation.                                                                    |
+|                             |                             | If this value is not set then the aria-label for accessibility will not be added to the math at render time.                               |  
+
+
+`sre` Has different loaders for node and browser.
+
+1. For **Browser libraries**, synchronous loading is used.
+```js
+import { loadSre } from "mathpix-markdown-it/lib/sre/sre-browser";
+const sre = loadSre();
+```
+
+2. For **Node modules**, asynchronous loading is used.
+
+```js
+const { loadSreAsync } = require('../lib/sre/sre-node');
+
+(async() => {
+  const sre = await loadSreAsync();
+})
+
+```
+
+Then just pass the resulting value to `accessibility.spe`
+```js
+accessibility: {
+     assistiveMml: true, // assistive-mml will be added to mjx-container
+     sre: sre
+   }
+```
+
+### Adding accessibility to math on already rendered html.
+
+`addAriaToMathHTML(sre, html)` function will add accessibility attributes. 
+Can only be used for **Browser libraries**
+
+```js
+import { loadSre } from "mathpix-markdown-it/lib/sre/sre-browser";
+const sre = loadSre();
+
+const htmlAssistive = addAriaToMathHTML(sre, html);
+```
 
 # Development
 

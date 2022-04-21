@@ -5,11 +5,10 @@ const MathpixMarkdownModel = require('../lib/mathpix-markdown-model/index').Math
 
 let  text = "$x^y$";
 
-const { getSRE } = require('../lib/sre/sre-node');
+const { loadSreAsync } = require('../lib/sre/sre-node');
 
 ( async() => {
-  const sre = await getSRE();
-
+  const sre = await loadSreAsync();
   const options = {
     htmlTags: true,
     width: 800,

@@ -108,8 +108,8 @@ export declare enum TTocStyle {
 }
 export declare type TAccessibility = {
     assistiveMml?: boolean;
-    sre?: boolean;
-} | false;
+    sre?: object;
+};
 declare class MathpixMarkdown_Model {
     disableFancyArrayDef: string[];
     disableRules: string[];

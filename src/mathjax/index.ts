@@ -89,6 +89,32 @@ const toAsciiML = ((node, optionAscii) => {
   return ascii ? ascii.trim() : ascii;
 });
 
+const applySpeechToNode = (node, accessibility): string => {
+  if (!accessibility || !accessibility.sre ) {
+    return '';
+  }
+  const lastChild = adaptor.lastChild(node);
+  const mmlAssistive = adaptor.innerHTML(lastChild);
+  const speech = getSpeech(accessibility.sre, mmlAssistive);
+  adaptor.setAttribute(node, 'aria-label', speech);
+  adaptor.setAttribute(node, 'role', "math");
+  return speech;
+};
+
+const removeAssistiveMmlFromNode = (node, accessibility) => {
+  if ( accessibility && accessibility.assistiveMml) {
+    return;
+  }
+  const lastChild = adaptor.lastChild(node);
+  adaptor.remove(lastChild);
+
+  adaptor.removeAttribute(node, 'role');
+  adaptor.removeAttribute(node, 'style');
+
+  const firstChild = adaptor.firstChild(node);
+  adaptor.removeAttribute(firstChild, 'aria-hidden');
+};
+
 const OuterData = (node, math, outMath, forDocx = false, accessibility?) => {
   const {
     include_mathml = false,
@@ -110,28 +136,8 @@ const OuterData = (node, math, outMath, forDocx = false, accessibility?) => {
     speech?: string
   } = {};
 
-  let speech = '';
-  if (accessibility) { 
-    if (accessibility.sre) {
-      const lastChild = adaptor.lastChild(node);
-      const mmlAssistive = adaptor.innerHTML(lastChild);
-      speech = getSpeech(accessibility.sre, mmlAssistive);
-      adaptor.setAttribute(node, 'aria-label', speech);
-      adaptor.setAttribute(node, 'role', "math")
-    }
-    
-    if (!accessibility.assistiveMml) {
-      const lastChild = adaptor.lastChild(node);
-      adaptor.remove(lastChild);
-
-      adaptor.removeAttribute(node, 'role');
-      adaptor.removeAttribute(node, 'style');
-
-      const firstChild = adaptor.firstChild(node);
-      adaptor.removeAttribute(firstChild, 'aria-hidden');
-    }
-  }
-  
+  const speech = applySpeechToNode(node, accessibility);
+  removeAssistiveMmlFromNode(node, accessibility);
   
   if (include_mathml) {
     res.mathml = toMathML(math.root);
@@ -186,12 +192,13 @@ const OuterDataError = (node, latex, error, outMath) => {
   return res;
 };
 
-const OuterDataAscii = (node, math, outMath, forDocx = false) => {
+const OuterDataAscii = (node, math, outMath, forDocx = false, accessibility?) => {
   const {
     include_mathml = false,
     include_mathml_word = false,
     include_asciimath = false,
     include_svg = true,
+    include_speech = false,
   } = outMath;
   let res: {
     mathml?: string,
@@ -199,7 +206,12 @@ const OuterDataAscii = (node, math, outMath, forDocx = false) => {
     asciimath?: string,
     latex?: string,
     svg?: string
+    speech?: string
   } = {};
+
+  const speech = applySpeechToNode(node, accessibility);
+  removeAssistiveMmlFromNode(node, accessibility);
+  
   if (include_mathml) {
     res.mathml = toMathML(math.root);
   }
@@ -215,6 +227,56 @@ const OuterDataAscii = (node, math, outMath, forDocx = false) => {
   }
   if (include_svg) {
     res.svg = adaptor.outerHTML(node)
+  }
+
+  if (include_speech && speech) {
+    res.speech = speech;
+  }
+  return res;
+};
+
+const OuterDataMathMl = (node, math, outMath, forDocx = false, accessibility?) => {
+  const {
+    include_mathml = false,
+    include_mathml_word = false,
+    include_asciimath = false,
+    include_svg = true,
+    include_speech = false,
+    optionAscii = {
+      showStyle: false,
+      extraBrackets: true
+    }
+  } = outMath;
+  let res: {
+    mathml?: string,
+    mathml_word?: string,
+    asciimath?: string,
+    latex?: string,
+    svg?: string
+    speech?: string
+  } = {};
+
+  const speech = applySpeechToNode(node, accessibility);
+  removeAssistiveMmlFromNode(node, accessibility);
+  
+  if (include_mathml) {
+    res.mathml = toMathML(math.root);
+  }
+
+  if (include_mathml_word) {
+    res.mathml_word = toMathMLWord(math.root, {forDocx: forDocx});
+  }
+
+  if (include_asciimath) {
+    res.asciimath = toAsciiML(math.root, optionAscii);
+  }
+
+  if (include_svg) {
+    res.svg = adaptor.outerHTML(node)
+  }
+
+  if (include_speech && speech) {
+    res.speech = speech;
   }
   return res;
 };
@@ -284,7 +346,7 @@ export const MathJax = {
     return svg.styleSheet(mDocTeX);
   },
   TexConvert: function(string, options: any={}) {
-    const {display = true, metric = {}, outMath = {}, mathJax = {}, forDocx={}, accessibility=false} = options;
+    const {display = true, metric = {}, outMath = {}, mathJax = {}, forDocx={}, accessibility} = options;
     const {em = 16, ex = 8, cwidth = 1200, lwidth = 100000, scale = 1} = metric;
     const {mtextInheritFont = false} = mathJax;
     if (mtextInheritFont) {
@@ -360,14 +422,19 @@ export const MathJax = {
    * }
    */
 
-  TypesetMathML: function(string, display=true, metric: any={}) {
+  TypesetMathML: function(string, options: any={}) {
+    const { display = true, metric = {}, outMath = {}, forDocx={}, accessibility } = options;
     const {em = 16, ex = 8, cwidth = 1200, lwidth = 100000, scale = 1} = metric;
     const node = docMathML.convert(string, {display: display, em: em, ex: ex, containerWidth: cwidth, lineWidth: lwidth, scale: scale});
-    return adaptor.outerHTML(node);
+    // return adaptor.outerHTML(node);
+    
+    const outputJax = docMathML.outputJax as any;
+    const outerDataMathMl = OuterDataMathMl(node, outputJax.math, outMath, forDocx, accessibility);
+    return OuterHTML(outerDataMathMl, options.outMath);
   },
 
   AsciiMathToSvg: function(string, options: any={}) {
-    const {display = true, metric = {}, outMath = {}, forDocx={}} = options;
+    const {display = true, metric = {}, outMath = {}, forDocx={}, accessibility} = options;
     const {em = 16, ex = 8, cwidth = 1200, lwidth = 100000, scale = 1} = metric;
     const asciimath = new AsciiMath({});
 
@@ -375,7 +442,7 @@ export const MathJax = {
     const node = docAsciiMath.convert(string, {display: display, em: em, ex: ex, containerWidth: cwidth, lineWidth: lwidth, scale: scale});
 
     const outputJax = docAsciiMath.outputJax as any;
-    const outerDataAscii = OuterDataAscii(node, outputJax.math, outMath, forDocx);
+    const outerDataAscii = OuterDataAscii(node, outputJax.math, outMath, forDocx, accessibility);
     return OuterHTML(outerDataAscii, options.outMath);
   },
 

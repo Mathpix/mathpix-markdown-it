@@ -48,7 +48,7 @@ export declare const MathJax: {
      *    @param {number} scale   The scaling factor (unitless)
      * }
      */
-    TypesetMathML: (string: any, display?: boolean, metric?: any) => any;
+    TypesetMathML: (string: any, options?: any) => string;
     AsciiMathToSvg: (string: any, options?: any) => string;
     Reset: (n?: number) => void;
     GetLastEquationNumber: () => any;

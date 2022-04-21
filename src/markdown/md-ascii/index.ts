@@ -110,7 +110,9 @@ export const renderAsciiMath = (tokens, idx, options) => {
     }
 
     mathEquation = MathJax.AsciiMathToSvg(math, {display: false, metric: { cwidth: cwidth },
-      outMath: options.outMath, mathJax: options.mathJax, forDocx: options.forDocx});
+      outMath: options.outMath, mathJax: options.mathJax, forDocx: options.forDocx,
+      accessibility: options.accessibility
+    });
   } catch (e) {
     console.error('ERROR MathJax =>', e.message, e);
     if (options.outMath && options.outMath.not_catch_errors) {
