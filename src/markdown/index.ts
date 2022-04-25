@@ -14,7 +14,8 @@ const mdInit = (options: TMarkdownItOptions) => {
     isDisableEmojiShortcuts=false,
     maxWidth = '',
     enableFileLinks = false,
-    toc = {}
+    toc = {},
+    accessibility = null
   } = options;
   const mmdOptions = {
     width: width,
@@ -25,7 +26,8 @@ const mdInit = (options: TMarkdownItOptions) => {
     forDocx: forDocx,
     maxWidth: maxWidth,
     enableFileLinks: enableFileLinks,
-    toc: toc
+    toc: toc,
+    accessibility: accessibility
   };
   let md = require("markdown-it")({
     html: htmlTags,

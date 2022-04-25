@@ -125,7 +125,8 @@ describe('TSV:', () => {
             include_svg: false,
             include_tsv: false,
             include_table_html: true
-          }});
+          }
+        });
         const data = MM.parseMarkdownByHTML(html);
         data.should.have.length(1);
         data[0].should.have.property('type', 'html');
@@ -140,7 +141,8 @@ describe('TSV:', () => {
           include_svg: false,
           include_tsv: false,
           include_table_html: false
-        }});
+        }
+      });
       const data = MM.parseMarkdownByHTML(html);
       data.findIndex(item => item.type === 'tsv').should.equal(-1);
       done();
@@ -153,7 +155,8 @@ describe('TSV:', () => {
           include_latex: false,
           include_svg: false,
           include_tsv: false
-        }});
+        }
+      });
       const data = MM.parseMarkdownByHTML(html);
       data.findIndex(item => item.type === 'tsv').should.equal(-1);
       done();
@@ -167,7 +170,8 @@ describe('TSV:', () => {
           include_svg: true,
           include_tsv: true,
           include_table_html: true
-        }});
+        }
+      });
       const data = MM.parseMarkdownByHTML(html, false);
       data.findIndex(item => item.type === 'asciimath').should.equal(-1);
       data.findIndex(item => item.type === 'mathm').should.equal(-1);
@@ -187,7 +191,8 @@ describe('TSV:', () => {
           include_svg: true,
           include_tsv: true,
           include_table_html: true
-        }});
+        }
+      });
       const data = MM.parseMarkdownByHTML(html);
       data.should.have.length(22);
       data[0].should.have.property('type', 'html');
@@ -207,7 +212,8 @@ describe('TSV:', () => {
           include_svg: true,
           include_tsv: true,
           include_table_html: true
-        }});
+        }
+      });
       const data = MM.parseMarkdownByHTML(html, false);
       data.findIndex(item => item.type === 'asciimath').should.equal(-1);
       data.findIndex(item => item.type === 'mathm').should.equal(-1);
@@ -227,7 +233,8 @@ describe('TSV:', () => {
           include_svg: true,
           include_tsv: true,
           include_table_html: true
-        }});
+        }
+      });
       const data = MM.parseMarkdownByHTML(html);
       data.should.have.length(28);
       data[0].should.have.property('type', 'html');

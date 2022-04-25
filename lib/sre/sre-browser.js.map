@@ -1,0 +1,1 @@
+{"version":3,"file":"sre-browser.js","sourceRoot":"","sources":["../../src/sre/sre-browser.ts"],"names":[],"mappings":";;;AAAA,mDAAqD;AAExC,QAAA,OAAO,GAAG,UAAC,OAAY;IAAZ,wBAAA,EAAA,YAAY;IAClC,IAAM,aAAa,GAAG,MAAM,CAAC,MAAM,CAAC,EAAE,EAAE,EAAC,MAAM,EAAE,WAAW,EAAC,EAAE,OAAO,CAAC,CAAC;IACxE,GAAG,CAAC,WAAW,CAAC,aAAa,CAAC,CAAC;IAC/B,OAAO,GAAG,CAAC;AACb,CAAC,CAAC"}
