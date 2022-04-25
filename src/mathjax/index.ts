@@ -1,75 +1,12 @@
-import {mathjax as MJ} from 'mathjax-full/js/mathjax.js';
-import {TeX} from 'mathjax-full/js/input/tex.js';
-import {MathML} from "mathjax-full/js/input/mathml.js";
-import {SVG} from 'mathjax-full/js/output/svg.js';
-import {AsciiMath} from 'mathjax-full/js/input/asciimath.js';
-import {RegisterHTMLHandler} from 'mathjax-full/js/handlers/html.js';
-import {browserAdaptor} from 'mathjax-full/js/adaptors/browserAdaptor.js';
-import {liteAdaptor} from 'mathjax-full/js/adaptors/liteAdaptor.js';
-
-import 'mathjax-full/js/input/tex/AllPackages.js';
-import {AssistiveMmlHandler} from'mathjax-full/js/a11y/assistive-mml.js';
-import { getSpeech } from '../sre';
-
-import MathJaxConfig from './mathJaxConfig';
-
-require("./my-BaseMappings");
-
-import {BaseConfiguration} from 'mathjax-full/js/input/tex/base/BaseConfiguration.js';
-BaseConfiguration.handler.macro.push('wasysym-mathchar0mo');
-//wasysym-macros
-BaseConfiguration.handler.macro.push('wasysym-macros');
-
-var adaptor,
-  domNode;
-
-try {
-  document;
-  if (document.getElementsByTagName('div').length > 0) {
-    adaptor = browserAdaptor();
-    domNode = document;
-  } else {
-    adaptor = liteAdaptor();
-    domNode = '<html></html>';
-  }
-}
-catch (e) {
-  adaptor = liteAdaptor();
-  domNode = '<html></html>';
-}
-
-let handler: any = RegisterHTMLHandler(adaptor);
-
-/**
- * TODO: Added settings for it 
- * */
-AssistiveMmlHandler(handler);
-
-const texConfig = Object.assign({}, MathJaxConfig.TeX || {});
-const mmlConfig = Object.assign({}, MathJaxConfig.MathML || {});
-const svgConfig = Object.assign({}, MathJaxConfig.SVG || {});
-
-// @ts-ignore
-class MTeX extends TeX {
-  formatError(error) {
-    throw Error('TeX error: ' + error.message);
-  }
-}
-
-// @ts-ignore
-const mTex = new MTeX(texConfig);
-const tex = new TeX(texConfig);
-const mml = new MathML(mmlConfig);
-const svg = new SVG(svgConfig);
-
-let docTeX = MJ.document(domNode, { InputJax: tex, OutputJax: svg });
-let mDocTeX: MathDocument<any, any, any> = MJ.document(domNode, { InputJax: mTex, OutputJax: svg });
-let docMathML = MJ.document(domNode, { InputJax: mml, OutputJax: svg });
+import { MathJaxConfigure, mTex, svg } from './mathjax';
 
 import { SerializedMmlVisitor as MmlVisitor } from 'mathjax-full/js/core/MmlTree/SerializedMmlVisitor.js';
 import { SerializedAsciiVisitor as AsciiVisitor } from './serialized-ascii';
 import { MathMLVisitorWord } from './mathml-word';
-import { MathDocument } from "mathjax-full/js/core/MathDocument";
+import { getSpeech } from '../sre';
+import { TAccessibility } from "../mathpix-markdown-model";
+
+const MJ = new MathJaxConfigure();
 
 const toMathML = (node => {
   const visitor = new MmlVisitor();
@@ -89,36 +26,19 @@ const toAsciiML = ((node, optionAscii) => {
   return ascii ? ascii.trim() : ascii;
 });
 
-const applySpeechToNode = (node, accessibility): string => {
-  if (!accessibility || !accessibility.sre ) {
-    return '';
-  }
+const applySpeechToNode = (adaptor, node, sre): string => {
   const lastChild = adaptor.lastChild(node);
   const mmlAssistive = adaptor.innerHTML(lastChild);
-  const speech = getSpeech(accessibility.sre, mmlAssistive);
+  const speech = getSpeech(sre, mmlAssistive);
   adaptor.setAttribute(node, 'aria-label', speech);
-  adaptor.setAttribute(node, 'role', "math");
-  adaptor.setAttribute(node, 'tabindex', "0");
-  
-  adaptor.setAttribute(lastChild, 'aria-hidden', "true");
+  adaptor.setAttribute(node, 'role', 'math');
+  adaptor.setAttribute(node, 'tabindex', '0');
+
+  adaptor.setAttribute(lastChild, 'aria-hidden', 'true');
   return speech;
 };
 
-const removeAssistiveMmlFromNode = (node, accessibility) => {
-  if (accessibility && accessibility.assistiveMml) {
-    return;
-  }
-  const lastChild = adaptor.lastChild(node);
-  adaptor.remove(lastChild);
-
-  adaptor.removeAttribute(node, 'role');
-  adaptor.removeAttribute(node, 'style');
-
-  const firstChild = adaptor.firstChild(node);
-  adaptor.removeAttribute(firstChild, 'aria-hidden');
-};
-
-const OuterData = (node, math, outMath, forDocx = false, accessibility?) => {
+const OuterData = (adaptor, node, math, outMath, forDocx = false, accessibility?) => {
   const {
     include_mathml = false,
     include_mathml_word = false,
@@ -128,9 +48,10 @@ const OuterData = (node, math, outMath, forDocx = false, accessibility?) => {
     include_speech = false,
     optionAscii = {
       showStyle: false,
-      extraBrackets: true
-    }} = outMath;
-  let res: {
+      extraBrackets: true,
+    },
+  } = outMath;
+  const res: {
     mathml?: string,
     mathml_word?: string,
     asciimath?: string,
@@ -139,8 +60,12 @@ const OuterData = (node, math, outMath, forDocx = false, accessibility?) => {
     speech?: string
   } = {};
 
-  const speech = applySpeechToNode(node, accessibility);
-  removeAssistiveMmlFromNode(node, accessibility);
+  if (accessibility && accessibility.sre) {
+    const speech = applySpeechToNode(adaptor, node, accessibility.sre);
+    if (include_speech && speech) {
+      res.speech = speech;
+    }
+  }
   
   if (include_mathml) {
     res.mathml = toMathML(math.root);
@@ -161,14 +86,10 @@ const OuterData = (node, math, outMath, forDocx = false, accessibility?) => {
   if (include_svg) {
     res.svg = adaptor.outerHTML(node)
   }
-
-  if (include_speech && speech) {
-    res.speech = speech;
-  }
   return res;
 };
 
-const OuterDataError = (node, latex, error, outMath) => {
+const OuterDataError = (adaptor, node, latex, error, outMath) => {
   const {
     include_latex = false,
     include_svg = true,
@@ -195,7 +116,7 @@ const OuterDataError = (node, latex, error, outMath) => {
   return res;
 };
 
-const OuterDataAscii = (node, math, outMath, forDocx = false, accessibility?) => {
+const OuterDataAscii = (adaptor, node, math, outMath, forDocx = false, accessibility?) => {
   const {
     include_mathml = false,
     include_mathml_word = false,
@@ -208,13 +129,17 @@ const OuterDataAscii = (node, math, outMath, forDocx = false, accessibility?) =>
     mathml_word?: string,
     asciimath?: string,
     latex?: string,
-    svg?: string
+    svg?: string,
     speech?: string
   } = {};
 
-  const speech = applySpeechToNode(node, accessibility);
-  removeAssistiveMmlFromNode(node, accessibility);
-  
+  if (accessibility && accessibility.sre) {
+    const speech = applySpeechToNode(adaptor, node, accessibility.sre);
+    if (include_speech && speech) {
+      res.speech = speech;
+    }
+  }
+
   if (include_mathml) {
     res.mathml = toMathML(math.root);
   }
@@ -232,13 +157,10 @@ const OuterDataAscii = (node, math, outMath, forDocx = false, accessibility?) =>
     res.svg = adaptor.outerHTML(node)
   }
 
-  if (include_speech && speech) {
-    res.speech = speech;
-  }
   return res;
 };
 
-const OuterDataMathMl = (node, math, outMath, forDocx = false, accessibility?) => {
+const OuterDataMathMl = (adaptor, node, math, outMath, forDocx = false, accessibility?) => {
   const {
     include_mathml = false,
     include_mathml_word = false,
@@ -255,13 +177,17 @@ const OuterDataMathMl = (node, math, outMath, forDocx = false, accessibility?) =
     mathml_word?: string,
     asciimath?: string,
     latex?: string,
-    svg?: string
+    svg?: string,
     speech?: string
   } = {};
 
-  const speech = applySpeechToNode(node, accessibility);
-  removeAssistiveMmlFromNode(node, accessibility);
-  
+  if (accessibility && accessibility.sre) {
+    const speech = applySpeechToNode(adaptor, node, accessibility.sre);
+    if (include_speech && speech) {
+      res.speech = speech;
+    }
+  }
+
   if (include_mathml) {
     res.mathml = toMathML(math.root);
   }
@@ -278,9 +204,6 @@ const OuterDataMathMl = (node, math, outMath, forDocx = false, accessibility?) =
     res.svg = adaptor.outerHTML(node)
   }
 
-  if (include_speech && speech) {
-    res.speech = speech;
-  }
   return res;
 };
 
@@ -308,7 +231,7 @@ const OuterHTML = (data, outMath) => {
     include_svg = true,
     include_error = false,
     include_speech = false
-} = outMath;
+  } = outMath;
   let outHTML = '';
   if (include_mathml && data.mathml) {
     outHTML +=  '<mathml style="display: none">' + formatSourceMML(data.mathml) + '</mathml>';
@@ -342,43 +265,66 @@ const OuterHTML = (data, outMath) => {
 };
 
 export const MathJax = {
+  assistiveMml: true,
+  
+  checkAccessibility: function (accessibility: TAccessibility = null) {
+    if (!this.assistiveMml && accessibility !== null) {
+      this.assistiveMml = true;
+      MJ.changeHandler(true);
+      return;
+    }
+    
+    if (this.assistiveMml && accessibility === null) {
+      this.assistiveMml = false;
+      MJ.changeHandler(false);
+    }
+  },
+  
   //
   //  Return the stylesheet DOM node
   //
   Stylesheet: function () {
-    return svg.styleSheet(mDocTeX);
+    return svg.styleSheet(MJ.mDocTeX);
   },
   TexConvert: function(string, options: any={}) {
-    const {display = true, metric = {}, outMath = {}, mathJax = {}, forDocx={}, accessibility} = options;
+    const {display = true, metric = {}, outMath = {}, mathJax = {}, forDocx={}, accessibility = null} = options;
     const {em = 16, ex = 8, cwidth = 1200, lwidth = 100000, scale = 1} = metric;
     const {mtextInheritFont = false} = mathJax;
+    this.checkAccessibility(accessibility);
+    
     if (mtextInheritFont) {
-      mDocTeX.outputJax.options.mtextInheritFont = true;
+      MJ.mDocTeX.outputJax.options.mtextInheritFont = true;
     }
     try {
-      const node = mDocTeX.convert(string, {
+      const node = MJ.mDocTeX.convert(string, {
         display: display, 
         em: em, 
         ex: ex, 
         containerWidth: cwidth, lineWidth: lwidth, scale: scale});
-      const outputJax = mDocTeX.outputJax as any;
-      return OuterData(node, outputJax.math, outMath, forDocx, accessibility);    
+      const outputJax = MJ.mDocTeX.outputJax as any;
+      return OuterData(MJ.adaptor, node, outputJax.math, outMath, forDocx, accessibility);
     } catch (err) {
       console.log('ERROR=>', err);
       if (outMath && outMath.include_svg) {
-        const node = docTeX.convert(string, {display: display, em: em, ex: ex, containerWidth: cwidth, lineWidth: lwidth, scale: scale});
-        return OuterDataError(node, string, err, outMath);
+        const node = MJ.docTeX.convert(string, {
+          display, em, ex, containerWidth: cwidth, lineWidth: lwidth, scale,
+        });
+        return OuterDataError(MJ.adaptor, node, string, err, outMath);
       }
-      return OuterDataError(null, string, err, outMath);
+      return OuterDataError(MJ.adaptor, null, string, err, outMath);
     }
   },
   TexConvertToAscii: function(string, options: any={}) {
     const {display = true, metric = {},
-      outMath = {}//, mathJax = {}
+      outMath = {}, accessibility = null
     } = options;
     const {em = 16, ex = 8, cwidth = 1200, lwidth = 100000, scale = 1} = metric;
-    docTeX.convert(string, {display: display, em: em, ex: ex, containerWidth: cwidth, lineWidth: lwidth, scale: scale});
-    const outputJax = docTeX.outputJax as any;
+    
+    this.checkAccessibility(accessibility);
+    MJ.docTeX.convert(string, {
+      display, em, ex, containerWidth: cwidth, lineWidth: lwidth, scale,
+    });
+    const outputJax = MJ.docTeX.outputJax as any;
     const {
       optionAscii = {
         showStyle: false,
@@ -390,14 +336,7 @@ export const MathJax = {
    * Typeset a TeX expression and return the SVG tree for it
    *
    * @param string {string}
-   * @param display {boolean}
-   * @param metric {
-   *    @param {number} em      The size of 1 em in pixels
-   *    @param {number} ex      The size of 1 ex in pixels
-   *    @param {number} cwidth  The container width in pixels
-   *    @param {number} lwidth  The line breaking width in pixels
-   *    @param {number} scale   The scaling factor (unitless)
-   * }
+   * @param options {}
    */
   Typeset: function(string, options: any={}) {
     return OuterHTML(this.TexConvert(string, options), options.outMath);
@@ -415,37 +354,30 @@ export const MathJax = {
    * Typeset a MathML expression and return the SVG tree for it
    *
    * @param string {string}
-   * @param display {boolean}
-   * @param metric {
-   *    @param {number} em      The size of 1 em in pixels
-   *    @param {number} ex      The size of 1 ex in pixels
-   *    @param {number} cwidth  The container width in pixels
-   *    @param {number} lwidth  The line breaking width in pixels
-   *    @param {number} scale   The scaling factor (unitless)
-   * }
+   * @param options {}
    */
 
   TypesetMathML: function(string, options: any={}) {
-    const { display = true, metric = {}, outMath = {}, forDocx={}, accessibility } = options;
+    const { display = true, metric = {}, outMath = {}, forDocx={}, accessibility = null } = options;
     const {em = 16, ex = 8, cwidth = 1200, lwidth = 100000, scale = 1} = metric;
-    const node = docMathML.convert(string, {display: display, em: em, ex: ex, containerWidth: cwidth, lineWidth: lwidth, scale: scale});
-    // return adaptor.outerHTML(node);
-    
-    const outputJax = docMathML.outputJax as any;
-    const outerDataMathMl = OuterDataMathMl(node, outputJax.math, outMath, forDocx, accessibility);
+
+    this.checkAccessibility(accessibility);
+    const node = MJ.docMathML.convert(string, {display: display, em: em, ex: ex, containerWidth: cwidth, lineWidth: lwidth, scale: scale});
+    const outputJax = MJ.docMathML.outputJax as any;
+    const outerDataMathMl = OuterDataMathMl(MJ.adaptor, node, outputJax.math, outMath, forDocx, accessibility);
     return OuterHTML(outerDataMathMl, options.outMath);
   },
 
   AsciiMathToSvg: function(string, options: any={}) {
-    const {display = true, metric = {}, outMath = {}, forDocx={}, accessibility} = options;
+    const {display = true, metric = {}, outMath = {}, forDocx={}, accessibility = null} = options;
     const {em = 16, ex = 8, cwidth = 1200, lwidth = 100000, scale = 1} = metric;
-    const asciimath = new AsciiMath({});
 
-    let docAsciiMath = MJ.document(domNode, { InputJax: asciimath, OutputJax: svg });
-    const node = docAsciiMath.convert(string, {display: display, em: em, ex: ex, containerWidth: cwidth, lineWidth: lwidth, scale: scale});
-
-    const outputJax = docAsciiMath.outputJax as any;
-    const outerDataAscii = OuterDataAscii(node, outputJax.math, outMath, forDocx, accessibility);
+    this.checkAccessibility(accessibility);
+    const node = MJ.docAsciiMath.convert(string, {
+      display, em, ex, containerWidth: cwidth, lineWidth: lwidth, scale,
+    });
+    const outputJax = MJ.docAsciiMath.outputJax as any;
+    const outerDataAscii = OuterDataAscii(MJ.adaptor, node, outputJax.math, outMath, forDocx, accessibility);
     return OuterHTML(outerDataAscii, options.outMath);
   },
 

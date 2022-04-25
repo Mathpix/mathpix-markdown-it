@@ -447,7 +447,7 @@ class MathpixMarkdown_Model {
           maxWidth='',
           enableFileLinks=false,
           toc = {},
-          accessibility = {}
+          accessibility = null
         }
          = options || {};
 
