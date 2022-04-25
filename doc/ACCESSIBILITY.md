@@ -47,12 +47,12 @@ console.log('html => ', html);
 To form accessibility, the node version of `speech-rule-engine` is used.
 Modules are loaded asynchronously. 
 
-`const { loadSreAsync } = require('../lib/sre/sre-node');`
+`const { loadSreAsync } = require('mathpix-markdown-it/lib/sre/sre-node');`
 
 
 ```js
-const { loadSreAsync } = require('../lib/sre/sre-node');
-const MathpixMarkdownModel = require('../lib/mathpix-markdown-model/index').MathpixMarkdownModel;
+const { loadSreAsync } = require('mathpix-markdown-it/lib/sre/sre-node');;
+const { MathpixMarkdownModel } = require('mathpix-markdown-it');
 
 ( async() => {
   const sre = await loadSreAsync();
