@@ -40,6 +40,7 @@ export const addAriaToMathHTML = (sre, html: string) => {
 
       elMath.setAttribute('aria-label', speech);
       elMath.setAttribute('role', "math");
+      elMath.setAttribute('tabindex', '0');
       
       const elSpeech = doc.createElement('speech');
       elSpeech.innerHTML = speech;
