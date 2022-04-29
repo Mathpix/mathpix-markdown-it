@@ -23,6 +23,13 @@ export const formatSource = (text: string) => {
     .replace(/>/g, '&gt;');
 };
 
+export const formatSourceMML = (text: string) => {
+  return text.trim()
+    .replace( /&#xA0;/g, ' ')
+    .replace( /\u00A0/g, ' ')
+    .replace(/&nbsp;/g, ' ');
+};
+
 export const parseMmdElement = (math_el, res = []) => {
   if (!math_el || !math_el.children || !math_el.children.length) return res;
   
@@ -68,34 +75,6 @@ export const parseMarkdownByElement = (el: HTMLElement | Document, include_sub_m
 
   for (let i = 0; i < math_el.length; i++) {
     res = parseMmdElement(math_el[i], res);
-    
-    // for (let j = 0; j < math_el[i].children.length; j++) {
-    //   const child = math_el[i].children[j];
-    //
-    //   if (['smiles', 'smiles-inline'].includes(math_el[i].className) && child.tagName.toUpperCase() === 'SVG') {
-    //     res.push({type: "svg", value: child.outerHTML});
-    //     continue;
-    //   }
-    //
-    //   if (["MATHML", "MATHMLWORD", "ASCIIMATH", "LATEX", "MJX-CONTAINER", "TABLE", "TSV", "SMILES", "TABLE-MARKDOWN", "ERROR"].indexOf(child.tagName) !== -1) {
-    //     if (child.tagName==="MJX-CONTAINER" || child.tagName==="TABLE") {
-    //       if (child.tagName === "TABLE") {
-    //         res.push({type: "html", value: child.outerHTML});
-    //       } else {
-    //         res.push({type: "svg", value: child.innerHTML});
-    //       }
-    //     } else {
-    //       res.push({
-    //         type: child.tagName.toLowerCase(),
-    //         value: child.tagName === 'LATEX' || child.tagName === 'ASCIIMATH' || child.tagName === 'ERROR' || child.tagName === 'TSV' || child.tagName === "TABLE-MARKDOWN" || child.tagName === 'SMILES'
-    //           ? formatSourceHtml(child.innerHTML, (child.tagName === 'TSV' || child.tagName === "TABLE-MARKDOWN"))
-    //           : child.tagName === 'MATHMLWORD'
-    //             ? formatSourceHtmlWord(child.innerHTML)
-    //             : child.innerHTML
-    //       });
-    //     }
-    //   }
-    // }
   }
   return res;
 };

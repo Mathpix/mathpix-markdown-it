@@ -1,6 +1,6 @@
 import * as copy from "copy-to-clipboard";
-import { classNameMenuItem, classNameMenuItemSource } from "./consts";
-import { formatSourceHtml } from "../../helpers/parse-mmd-element";
+import { classNameMenuItem, classNameMenuItemSource, eMathType } from "./consts";
+import { formatSourceHtml, formatSourceHtmlWord } from "../../helpers/parse-mmd-element";
 
 export const getMenuItems = () => {
   return document.querySelectorAll(`.${classNameMenuItem}`);
@@ -43,8 +43,20 @@ export const chooseItem = (el) => {
     const elSource = el.querySelector(`.${classNameMenuItemSource}`);
     if (elSource) {
       let source = elSource.innerHTML;
-      source = source ? formatSourceHtml(source) : '';
-      copy(source);
+      const dataType = elSource.getAttribute('data-type');
+      
+      if (dataType === eMathType.mathmlword) {
+        source = formatSourceHtmlWord(source);
+      } else {
+        source = dataType === eMathType.mathml 
+          ? source 
+          : formatSourceHtml(source);
+      }
+      
+      copy(source, {
+        format: 'text/plain',
+        debug: true
+      });
     }
     
     if (!el.classList.contains('active')) {

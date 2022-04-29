@@ -1,16 +1,6 @@
 import { mathMenuItems } from "./menu-items";
-import { chooseItem, clearActiveItem, chooseNextItem, choosePreviousItem } from "./menu-item-actions";
-import { clickInsideElement } from "./helper";
-import { classNameMenu, classNameContextMenu, classNameMenuItem } from "./consts";
-
-const handleClickMenuItem = (e) => {
-  const el = clickInsideElement(e, classNameMenuItem);
-  if (el) {
-    e.preventDefault();
-    clearActiveItem();
-    chooseItem(el);
-  }
-};
+import { chooseNextItem, choosePreviousItem } from "./menu-item-actions";
+import { classNameMenu, classNameContextMenu } from "./consts";
 
 const handleKeyDownMenuItem = (e) => {
   switch (e.key) {
@@ -27,7 +17,6 @@ const handleKeyDownMenuItem = (e) => {
 };
 
 const addEventListenerToMenu = (elMenu) => {
-  elMenu.addEventListener("click", handleClickMenuItem);
   elMenu.addEventListener('keydown', handleKeyDownMenuItem);
 };
 
@@ -36,7 +25,6 @@ const removeEventListenerFromMenu = () => {
   if (!elMenu) {
     return;
   }
-  elMenu.removeEventListener("click", handleClickMenuItem);
   elMenu.removeEventListener('keydown', handleKeyDownMenuItem);
 };
 
@@ -90,6 +78,11 @@ export const dropContextMenu = (elContextMenu?) => {
   } catch (err) {
     console.error(err);
   }
+};
+
+export const isOpenContextMenu = () => {
+  const elContextMenu = findContextMenuElement();
+  return Boolean(elContextMenu);
 };
 
 export const toggleMenuOn = (el) => {

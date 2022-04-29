@@ -28,7 +28,7 @@ export const menuStyle = () => {
     box-shadow: 0px 10px 20px #808080;
     -webkit-box-shadow: 0px 10px 20px #808080;
     -moz-box-shadow: 0px 10px 20px #808080;
-    -khtml-box-shadow: 0px 10px 20px #808080;
+    -khtml-box-shadow: 0px 10px 20px #808080; 
   }
 
   .mmd-menu-item-icon {
@@ -37,8 +37,7 @@ export const menuStyle = () => {
     align-items: center;
     display: flex;
     flex-shrink: 0;
-  
-    display: none;
+    display: none; 
   }
 
   .mmd-menu-item {
@@ -47,26 +46,24 @@ export const menuStyle = () => {
     padding-left: 1.25rem;
     padding-right: 1.25rem;
     display: flex;
-  
-    background: transparent;
-  
-    &.active {
-      padding-bottom: 0.5rem;
-      padding-top: 0.5rem;
-      padding-left: 1.25rem;
-      padding-right: 1.25rem;
-      background-color: #e1e0e5;
-  
-      .mmd-menu-item-icon {
-        display: flex;
-      }
-    }
+    background: transparent; 
+  }
+
+  .mmd-menu-item.active {
+    padding-bottom: 0.5rem;
+    padding-top: 0.5rem;
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+    background-color: #e1e0e5; 
+  }
+
+  .mmd-menu-item.active .mmd-menu-item-icon {
+    display: flex; 
   }
 
   .mmd-menu-item-container {
-    overflow: hidden;
+    overflow: hidden; 
   }
-
 
   .mmd-menu-item-title {
     color: #1e2029;
@@ -74,7 +71,7 @@ export const menuStyle = () => {
     text-overflow: ellipsis;
     overflow: hidden;
     font-size: .875rem;
-    line-height: 1.25rem;
+    line-height: 1.25rem; 
   }
 
   .mmd-menu-item-value {
@@ -83,7 +80,17 @@ export const menuStyle = () => {
     text-overflow: ellipsis;
     overflow: hidden;
     font-size: .75rem;
-    line-height: 1rem;
+    line-height: 1rem; 
+  }
+  
+  html[data-theme="dark"] .mmd-menu-item-title {
+    color: #ebefe7;
+  } 
+  html[data-theme="dark"] .mmd-menu-item.active .mmd-menu-item-title {
+    color: #1e2029;
+  }
+  html[data-theme="dark"] .mmd-menu {
+    background-color: #33363a;
   }
   `
 };

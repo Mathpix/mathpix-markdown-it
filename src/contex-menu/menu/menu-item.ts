@@ -1,21 +1,26 @@
 import { classNameMenuItem, eMathType } from "./consts";
-import { formatSource } from "../../helpers/parse-mmd-element";
+import { formatSource, formatSourceMML } from "../../helpers/parse-mmd-element";
 
 export const createMathMenuItem = (type, value: string) => {
   try {
     let itemTitle = '';
+    let sourceStr = '';
     switch (type) {
       case eMathType.latex:
         itemTitle = 'LaTeX';
+        sourceStr = formatSource(value);
         break;
       case eMathType.asciimath:
         itemTitle = 'Asciimath';
+        sourceStr = formatSource(value);
         break;
       case eMathType.mathml:
         itemTitle = 'Mathml';
+        sourceStr = formatSourceMML(value);
         break;
       case eMathType.mathmlword:
         itemTitle = 'Mathml (MS Word)';
+        sourceStr = value;
         break;
     }
     if (!itemTitle) {
@@ -43,8 +48,9 @@ export const createMathMenuItem = (type, value: string) => {
     
     const elItemSource = document.createElement('div');
     elItemSource.setAttribute('class', classNameMenuItem + '-source');
+    elItemSource.setAttribute('data-type', type);
     elItemSource.style.display = "none";
-    elItemSource.innerHTML = formatSource(value);
+    elItemSource.innerHTML = sourceStr;
     elItemContainer.appendChild(elItemSource);
 
     const elIcon = document.createElement('div');

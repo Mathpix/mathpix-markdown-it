@@ -1,4 +1,4 @@
-import { classNameMenu } from './consts';
+import { classNameMenu, SMALL_SCREEN_BREAKPOINT } from './consts';
 
 export const getPosition = (e) => {
   let posX = 0;
@@ -40,11 +40,16 @@ export const positionMenu = (e) => {
 
   const windowWidth = window.innerWidth;
   const windowHeight = window.innerHeight;
-
-  if ( (windowWidth - clickCoordsX) < menuWidth ) {
-    elMenu.style.left = windowWidth - menuWidth + "px";
+  
+  if (windowWidth <= SMALL_SCREEN_BREAKPOINT) {
+    elMenu.style.left = 0;
+    elMenu.style.maxWidth = '100vw';
   } else {
-    elMenu.style.left = clickCoordsX + "px";
+    if ( (windowWidth - clickCoordsX) < menuWidth ) {
+      elMenu.style.left = windowWidth - menuWidth + "px";
+    } else {
+      elMenu.style.left = clickCoordsX + "px";
+    }
   }
 
   if ( (windowHeight - clickCoordsY) < menuHeight ) {

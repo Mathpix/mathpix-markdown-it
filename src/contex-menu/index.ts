@@ -1,10 +1,10 @@
-import { toggleMenuOn, toggleMenuOff } from "./menu";
+import { toggleMenuOn, toggleMenuOff, isOpenContextMenu } from "./menu";
 import { positionMenu, clickInsideElement } from "./menu/helper";
 import { classNameMenuItem } from "./menu/consts";
+import { chooseItem, clearActiveItem } from "./menu/menu-item-actions";
 
 const handleContextMenu = (e) => {
   let elMath = clickInsideElement( e, 'MathJax' );
-  
   if (elMath && elMath.parentElement) {
     e.preventDefault();
     toggleMenuOn(elMath.parentElement);
@@ -15,14 +15,31 @@ const handleContextMenu = (e) => {
 };
 
 export const handleClick = (e) => {
+  if ("ontouchstart" in document.documentElement) {
+    let elMath = clickInsideElement(e, 'MathJax');
+    if (elMath) {
+      e.stopPropagation();
+      if (isOpenContextMenu()) {
+        toggleMenuOff();
+      } else {
+        toggleMenuOn(elMath.parentElement);
+        positionMenu(e);
+      }
+      return;
+    }
+  }
+  
   const elItem = clickInsideElement( e, classNameMenuItem );
-  if (!elItem) {
+  if (elItem) {
+    e.stopPropagation();
+    clearActiveItem();
+    chooseItem(elItem);
+  } else {
     toggleMenuOff();
   }
 };
 
 export const handleKeyUp = (e) => {
-  console.log('handleKeyUp=>e=>', e);
   if (e.key === 'Escape') {
     toggleMenuOff();
   }
