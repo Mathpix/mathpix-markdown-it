@@ -325,7 +325,12 @@ class MathpixMarkdown_Model {
                 const style = document.createElement("style");
                 style.setAttribute("id", "Mathpix-styles");
                 let bodyStyles = isResetBodyStyles ? resetBodyStyles : '';
-                style.innerHTML = bodyStyles + MathpixStyle(setTextAlignJustify, true, maxWidth, scaleEquation) + codeStyles + tabularStyles() + listsStyles;
+                style.innerHTML = bodyStyles 
+                  + MathpixStyle(setTextAlignJustify, true, maxWidth, scaleEquation) 
+                  + codeStyles 
+                  + tabularStyles() 
+                  + listsStyles 
+                  + menuStyle();
                 document.head.appendChild(style);
             }
             return true;
