@@ -3,6 +3,8 @@ import { positionMenu, clickInsideElement } from "./menu/helper";
 import { classNameMenuItem } from "./menu/consts";
 import { chooseItem, clearActiveItem } from "./menu/menu-item-actions";
 
+let isCloseByTouchStart = false;
+
 const handleContextMenu = (e) => {
   let elMath = clickInsideElement( e, 'MathJax' );
   if (elMath && elMath.parentElement) {
@@ -14,10 +16,25 @@ const handleContextMenu = (e) => {
   }
 };
 
+export const handleTouchStart = (e) => {
+  const elItem = clickInsideElement( e, classNameMenuItem );
+
+  isCloseByTouchStart = false;
+  if (isOpenContextMenu() && !elItem) {
+    e.stopPropagation();
+    toggleMenuOff();
+    isCloseByTouchStart = true;
+  }
+};
+
 export const handleClick = (e) => {
   if ("ontouchstart" in document.documentElement) {
     let elMath = clickInsideElement(e, 'MathJax');
     if (elMath) {
+      if (isCloseByTouchStart) {
+        isCloseByTouchStart = false;
+        return;
+      }
       e.stopPropagation();
       if (isOpenContextMenu()) {
         toggleMenuOff();
@@ -81,11 +98,22 @@ export const removeResizeListener = () => {
   document.removeEventListener( "resize", handleResize);
 };
 
+export const addTouchStartListener = () => {
+  document.addEventListener( "touchstart", handleTouchStart);
+};
+
+export const removeTouchStartListener = () => {
+  document.removeEventListener( "touchstart", handleTouchStart);
+};
+
+
+
 export const addListenerContextMenuEvents = () => {
   addContextMenuListener();
   addClickListener();
   addKeyUpListener();
   addResizeListener();
+  addTouchStartListener();
 };
 
 export const removeListenerContextMenuEvents = () => {
@@ -93,4 +121,5 @@ export const removeListenerContextMenuEvents = () => {
   removeClickListener();
   removeKeyUpListener();
   removeResizeListener();
+  removeTouchStartListener();
 };

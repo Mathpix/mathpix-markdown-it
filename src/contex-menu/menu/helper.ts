@@ -1,4 +1,4 @@
-import { classNameMenu, SMALL_SCREEN_BREAKPOINT } from './consts';
+import { classNameMenu, classNameContextMenu, SMALL_SCREEN_BREAKPOINT } from './consts';
 
 export const getPosition = (e) => {
   let posX = 0;
@@ -26,6 +26,10 @@ export const getMenuElement = () => {
   return document.querySelector(`.${classNameMenu}`);
 };
 
+export const getContextMenuElement = () => {
+  return document.querySelector(`.${classNameContextMenu}`);
+};
+
 export const positionMenu = (e) => {
   const elMenu: any = getMenuElement();
   if (!elMenu) {
@@ -43,13 +47,20 @@ export const positionMenu = (e) => {
   
   if (windowWidth <= SMALL_SCREEN_BREAKPOINT) {
     elMenu.style.left = 0;
+    elMenu.style.bottom = 0;
     elMenu.style.maxWidth = '100vw';
-  } else {
-    if ( (windowWidth - clickCoordsX) < menuWidth ) {
-      elMenu.style.left = windowWidth - menuWidth + "px";
-    } else {
-      elMenu.style.left = clickCoordsX + "px";
+    elMenu.classList.add('mmd-menu-sm');
+
+    const elContextMenu = getContextMenuElement();
+    if (elContextMenu && !elContextMenu.classList.contains(`${classNameContextMenu}-overlay`)) {
+      elContextMenu.classList.add(`${classNameContextMenu}-overlay`);
     }
+    return;
+  } 
+  if ( (windowWidth - clickCoordsX) < menuWidth ) {
+    elMenu.style.left = windowWidth - menuWidth + "px";
+  } else {
+    elMenu.style.left = clickCoordsX + "px";
   }
 
   if ( (windowHeight - clickCoordsY) < menuHeight ) {

@@ -7,7 +7,7 @@ export const menuStyle = () => {
     color: black;
     width: auto;
     padding: 5px 0px;
-    border: 1px solid #CCCCCC;
+    border: 1px solid #E5E6EB;
     margin: 0;
     cursor: default;
     font: menu;
@@ -29,6 +29,17 @@ export const menuStyle = () => {
     -webkit-box-shadow: 0px 10px 20px #808080;
     -moz-box-shadow: 0px 10px 20px #808080;
     -khtml-box-shadow: 0px 10px 20px #808080; 
+  }
+  
+  .mmd-menu:focus { outline: none; }
+  
+  .mmd-menu.mmd-menu-sm {
+    max-width: 100vw;
+    padding-bottom: 34px;
+    border-radius: 0;
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0;
+    -khtml-border-radius: 0;
   }
 
   .mmd-menu-item-icon {
@@ -91,6 +102,10 @@ export const menuStyle = () => {
   }
   html[data-theme="dark"] .mmd-menu {
     background-color: #33363a;
+  }
+  
+  .mmd-context-menu-overlay{
+    background: rgba(0, 0, 0, 0.56);
   }
   `
 };
