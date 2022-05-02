@@ -49,6 +49,7 @@ export const createContextMenu = (el) => {
     const elMenu = document.createElement('div');
     elMenu.setAttribute('class', classNameMenu);
     elMenu.setAttribute('role', 'menu');
+    elMenu.setAttribute('aria-label', 'Copy to Clipboard');
     elMenu.setAttribute('tabindex', '0');
 
     for (let i = 0; i < items.length; i++) {

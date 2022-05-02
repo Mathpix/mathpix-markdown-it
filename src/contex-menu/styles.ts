@@ -59,6 +59,7 @@ export const menuStyle = () => {
     display: flex;
     background: transparent; 
   }
+  .mmd-menu-item:focus { outline: none; }
 
   .mmd-menu-item.active {
     padding-bottom: 0.5rem;

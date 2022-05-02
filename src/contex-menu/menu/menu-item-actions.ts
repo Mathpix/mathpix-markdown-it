@@ -42,6 +42,7 @@ export const chooseItem = (el) => {
     
     const elSource = el.querySelector(`.${classNameMenuItemSource}`);
     if (elSource) {
+      el.focus();
       let source = elSource.innerHTML;
       const dataType = elSource.getAttribute('data-type');
       

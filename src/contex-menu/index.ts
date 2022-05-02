@@ -106,8 +106,6 @@ export const removeTouchStartListener = () => {
   document.removeEventListener( "touchstart", handleTouchStart);
 };
 
-
-
 export const addListenerContextMenuEvents = () => {
   addContextMenuListener();
   addClickListener();
