@@ -54,5 +54,3 @@ export const addAriaToMathHTML = (sre, html: string) => {
     return html;
   }
 };
-
-

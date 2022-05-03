@@ -5,6 +5,7 @@ import { SerializedAsciiVisitor as AsciiVisitor } from './serialized-ascii';
 import { MathMLVisitorWord } from './mathml-word';
 import { getSpeech } from '../sre';
 import { TAccessibility } from "../mathpix-markdown-model";
+import { formatSource, formatSourceMML } from "../helpers/parse-mmd-element";
 
 const MJ = new MathJaxConfigure();
 
@@ -205,21 +206,6 @@ const OuterDataMathMl = (adaptor, node, math, outMath, forDocx = false, accessib
   }
 
   return res;
-};
-
-const formatSource = (text: string) => {
-  return text.trim()
-    .replace(/\u2062/g, '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
-};
-
-const formatSourceMML = (text: string) => {
-  return text.trim()
-    .replace( /&#xA0;/g, ' ')
-    .replace( /\u00A0/g, ' ')
-    .replace(/&nbsp;/g, ' ');
 };
 
 const OuterHTML = (data, outMath) => {

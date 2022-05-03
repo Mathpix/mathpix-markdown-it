@@ -1,0 +1,16 @@
+export declare const handleTouchStart: (e: any) => void;
+export declare const handleClick: (e: any) => void;
+export declare const handleKeyUp: (e: any) => void;
+export declare const handleResize: () => void;
+export declare const addContextMenuListener: () => void;
+export declare const removeContextMenuListener: () => void;
+export declare const addClickListener: () => void;
+export declare const removeClickListener: () => void;
+export declare const addKeyUpListener: () => void;
+export declare const removeKeyUpListener: () => void;
+export declare const addResizeListener: () => void;
+export declare const removeResizeListener: () => void;
+export declare const addTouchStartListener: () => void;
+export declare const removeTouchStartListener: () => void;
+export declare const addListenerContextMenuEvents: () => void;
+export declare const removeListenerContextMenuEvents: () => void;

@@ -12,6 +12,8 @@ import { ISmilesOptions } from '../markdown/md-chemistry';
 import { yamlParser } from '../yaml-parser';
 import { generateHtmlPage } from './html-page';
 import { getMaxWidthStyle } from '../styles/halpers';
+import { parseMarkdownByElement } from '../helpers/parse-mmd-element';
+import { menuStyle } from '../contex-menu/styles';
 
 export interface optionsMathpixMarkdown {
     alignMathBlock?: Property.TextAlign;
@@ -133,23 +135,6 @@ export type TAccessibility = {
   sre?: object
 };
 
-const formatSourceHtml = (text: string, notTrim: boolean = false) => {
-  text = notTrim ? text : text.trim();
-  return text
-    .replace(/&amp;/g, '&')
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>');
-};
-
-const formatSourceHtmlWord = (text: string, notTrim: boolean = false) => {
-  text = notTrim ? text : text.trim();
-  return text
-    .replace(/<maligngroup><\/maligngroup>/g, '<maligngroup/>')
-    .replace(/<malignmark><\/malignmark>/g, '<malignmark/>')
-    .replace(/&nbsp;/g, '&#xA0;');
-};
-
 class MathpixMarkdown_Model {
     public disableFancyArrayDef = ['replacements', 'list', 'usepackage', 'toc'];
     public disableRules: string[];
@@ -174,47 +159,8 @@ class MathpixMarkdown_Model {
 
     return this.parseMarkdownByElement(doc, include_sub_math)
   };
-
-  parseMarkdownByElement = (el: HTMLElement | Document, include_sub_math: boolean = true) => {
-    const res = [];
-    if (!el) return null;
-
-    const math_el = include_sub_math
-      ? el.querySelectorAll('.math-inline, .math-block, .table_tabular, .inline-tabular, .smiles, .smiles-inline')
-      : el.querySelectorAll('div > .math-inline, div > .math-block, .table_tabular, div > .inline-tabular, div > .smiles, div > .smiles-inline');
-    if (!math_el) return null;
-
-    for (let i = 0; i < math_el.length; i++) {
-      for (let j = 0; j < math_el[i].children.length; j++) {
-        const child = math_el[i].children[j];
-
-        if (['smiles', 'smiles-inline'].includes(math_el[i].className) && child.tagName.toUpperCase() === 'SVG') {
-          res.push({type: "svg", value: child.outerHTML});
-          continue;
-        }
-
-        if (["MATHML", "MATHMLWORD", "ASCIIMATH", "LATEX", "MJX-CONTAINER", "TABLE", "TSV", "SMILES", "TABLE-MARKDOWN", "ERROR"].indexOf(child.tagName) !== -1) {
-          if (child.tagName==="MJX-CONTAINER" || child.tagName==="TABLE") {
-            if (child.tagName === "TABLE") {
-              res.push({type: "html", value: child.outerHTML});
-            } else {
-              res.push({type: "svg", value: child.innerHTML});
-            }
-          } else {
-            res.push({
-              type: child.tagName.toLowerCase(),
-              value: child.tagName === 'LATEX' || child.tagName === 'ASCIIMATH' || child.tagName === 'ERROR' || child.tagName === 'TSV' || child.tagName === "TABLE-MARKDOWN" || child.tagName === 'SMILES'
-              ? formatSourceHtml(child.innerHTML, (child.tagName === 'TSV' || child.tagName === "TABLE-MARKDOWN"))
-              : child.tagName === 'MATHMLWORD'
-                  ? formatSourceHtmlWord(child.innerHTML)
-                  : child.innerHTML
-            });
-          }
-        }
-      }
-    }
-    return res;
-  };
+  
+  parseMarkdownByElement = parseMarkdownByElement;
 
   markdownToHTML = (markdown: string, options: TMarkdownItOptions = {}):string => {
     const { lineNumbering = false, isDisableFancy = false,  htmlWrapper = false } = options;
@@ -379,7 +325,12 @@ class MathpixMarkdown_Model {
                 const style = document.createElement("style");
                 style.setAttribute("id", "Mathpix-styles");
                 let bodyStyles = isResetBodyStyles ? resetBodyStyles : '';
-                style.innerHTML = bodyStyles + MathpixStyle(setTextAlignJustify, true, maxWidth, scaleEquation) + codeStyles + tabularStyles() + listsStyles;
+                style.innerHTML = bodyStyles 
+                  + MathpixStyle(setTextAlignJustify, true, maxWidth, scaleEquation) 
+                  + codeStyles 
+                  + tabularStyles() 
+                  + listsStyles 
+                  + menuStyle();
                 document.head.appendChild(style);
             }
             return true;
@@ -413,16 +364,25 @@ class MathpixMarkdown_Model {
     };
 
     getMathpixStyleOnly = (scaleEquation = true ) => {
-      let style: string =  this.getMathjaxStyle() + MathpixStyle(false, true, '', scaleEquation) + codeStyles + tabularStyles() + listsStyles;
+      let style: string =  this.getMathjaxStyle() 
+        + MathpixStyle(false, true, '', scaleEquation) 
+        + codeStyles 
+        + tabularStyles() 
+        + listsStyles
+        + menuStyle();
       return style;
     };
 
     getMathpixStyle = (stylePreview: boolean = false, showToc: boolean = false, tocContainerName: string = 'toc', scaleEquation = true ) => {
       let style: string = ContainerStyle() + this.getMathjaxStyle() + MathpixStyle(false, true, '', scaleEquation) + codeStyles + tabularStyles() + listsStyles;
       if (showToc) {}
-      return stylePreview
-        ? showToc ? style + PreviewStyle + TocStyle(tocContainerName) : style + PreviewStyle
-        : style;
+      if (!stylePreview) {
+        return style;
+      }
+      
+      return showToc 
+          ? style + PreviewStyle + TocStyle(tocContainerName) + menuStyle()
+          : style + PreviewStyle + menuStyle();
     };
 
     getMathpixMarkdownStyles = ( useColors: boolean = true, scaleEquation = true ) => {

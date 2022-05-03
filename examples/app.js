@@ -30,7 +30,6 @@ const { loadSreAsync } = require('../lib/sre/sre-node');
   console.log('==>htmlMM=>[use accessibility] =>', htmlMM);
 
   htmlMM = MathpixMarkdownModel.markdownToHTML(text);
-
   console.log('==>htmlMM=>[not accessibility] =>', htmlMM)
 })();
 
