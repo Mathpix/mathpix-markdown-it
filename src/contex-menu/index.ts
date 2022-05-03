@@ -1,5 +1,5 @@
 import { toggleMenuOn, toggleMenuOff, isOpenContextMenu } from "./menu";
-import { positionMenu, clickInsideElement } from "./menu/helper";
+import { clickInsideElement } from "./menu/helper";
 import { classNameMenuItem } from "./menu/consts";
 import { chooseItem, clearActiveItem } from "./menu/menu-item-actions";
 
@@ -9,8 +9,7 @@ const handleContextMenu = (e) => {
   let elMath = clickInsideElement( e, 'MathJax' );
   if (elMath && elMath.parentElement) {
     e.preventDefault();
-    toggleMenuOn(elMath.parentElement);
-    positionMenu(e);
+    toggleMenuOn(elMath.parentElement, e);
   } else {
     toggleMenuOff();
   }
@@ -39,8 +38,7 @@ export const handleClick = (e) => {
       if (isOpenContextMenu()) {
         toggleMenuOff();
       } else {
-        toggleMenuOn(elMath.parentElement);
-        positionMenu(e);
+        toggleMenuOn(elMath.parentElement, e);
       }
       return;
     }

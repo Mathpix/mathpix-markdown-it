@@ -1,6 +1,8 @@
 import { mathMenuItems } from "./menu-items";
 import { chooseNextItem, choosePreviousItem } from "./menu-item-actions";
 import { classNameMenu, classNameContextMenu } from "./consts";
+import { getPositionMenuByClick } from "./helper";
+import { IMenuPosition } from "./interfaces";
 
 const handleKeyDownMenuItem = (e) => {
   switch (e.key) {
@@ -32,7 +34,7 @@ const findContextMenuElement = () => {
   return document.querySelector(`.${classNameContextMenu}`);
 };
 
-export const createContextMenu = (el) => {
+export const createContextMenu = (el, e) => {
   try {
     const items = mathMenuItems(el);
     if (!items || !items.length) {
@@ -54,6 +56,19 @@ export const createContextMenu = (el) => {
 
     for (let i = 0; i < items.length; i++) {
       elMenu.appendChild(items[i]);
+    }
+    
+    const resPos: IMenuPosition = getPositionMenuByClick(e, items.length);
+    if (resPos.className === 'mmd-menu-sm') {
+      elMenu.style.left = resPos.left;
+      elMenu.style.bottom = "0";
+      elMenu.style.position = 'fixed';
+      elMenu.style.maxWidth = resPos.maxWidth;
+      elMenu.classList.add(resPos.className);
+      elPosition.classList.add(`${classNameContextMenu}-overlay`);
+    } else {
+      elMenu.style.left = resPos.left;
+      elMenu.style.top = resPos.top;
     }
 
     addEventListenerToMenu(elMenu);
@@ -86,13 +101,13 @@ export const isOpenContextMenu = () => {
   return Boolean(elContextMenu);
 };
 
-export const toggleMenuOn = (el) => {
+export const toggleMenuOn = (el, e) => {
   const elContextMenu = findContextMenuElement();
   if (!elContextMenu) {
-    createContextMenu(el);
+    createContextMenu(el, e);
   } else {
     dropContextMenu(elContextMenu);
-    createContextMenu(el);
+    createContextMenu(el, e);
   }
 };
 

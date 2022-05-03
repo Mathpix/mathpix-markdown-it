@@ -1,4 +1,13 @@
-import { classNameMenu, classNameContextMenu, SMALL_SCREEN_BREAKPOINT } from './consts';
+import {
+  classNameMenu,
+  classNameContextMenu,
+  SMALL_SCREEN_BREAKPOINT, 
+  heightMenuItem,
+  paddingMenu,
+  maxWidthMenu,
+  paddingMenuBottomSmall
+} from "./consts";
+import { IMenuPosition } from "./interfaces";
 
 export const getPosition = (e) => {
   let posX = 0;
@@ -68,6 +77,44 @@ export const positionMenu = (e) => {
   } else {
     elMenu.style.top = clickCoordsY + "px";
   }
+};
+
+export const getPositionMenuByClick = (e, itemsLength): IMenuPosition => {
+  const clickCoords = getPosition(e);
+  const clickCoordsX = clickCoords.x;
+  const clickCoordsY = clickCoords.y;
+
+  let menuHeight = heightMenuItem * itemsLength + paddingMenu + 2;
+  const menuWidth = maxWidthMenu + 4;
+
+  const windowWidth = window.innerWidth;
+  const windowHeight = window.innerHeight;
+
+  const scrollTop = document.body.scrollTop + document.documentElement.scrollTop;
+  const res: IMenuPosition = {};
+  
+  if (windowWidth <= SMALL_SCREEN_BREAKPOINT) {
+    menuHeight += paddingMenuBottomSmall;
+    res.left = "0px";
+    res.top = windowHeight + scrollTop - menuHeight + "px";
+    res.maxWidth = '100vw';
+    res.className = 'mmd-menu-sm';
+    return res;
+  }
+
+  menuHeight += paddingMenu;
+  if ( (windowWidth - clickCoordsX) < menuWidth ) {
+    res.left = windowWidth - menuWidth + "px";
+  } else {
+    res.left = clickCoordsX + "px";
+  }
+
+  if ( (windowHeight + scrollTop - clickCoordsY) < menuHeight ) {
+    res.top = windowHeight + scrollTop - menuHeight + "px";
+  } else {
+    res.top = clickCoordsY + "px";
+  }
+  return res
 };
 
 export const clickInsideElement = ( e, className ) => {

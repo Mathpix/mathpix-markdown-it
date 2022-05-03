@@ -1,12 +1,14 @@
+import { heightMenuItem, paddingMenu, paddingMenuBottomSmall, maxWidthMenu } from "./menu/consts";
+
 export const menuStyle = () => {
   return `
   .mmd-menu {
-    max-width: 320px;
+    max-width: ${maxWidthMenu}px;
     position: absolute;
     background-color: white;
     color: black;
     width: auto;
-    padding: 5px 0px;
+    padding: ${paddingMenu}px 0px;
     border: 1px solid #E5E6EB;
     margin: 0;
     cursor: default;
@@ -35,7 +37,7 @@ export const menuStyle = () => {
   
   .mmd-menu.mmd-menu-sm {
     max-width: 100vw;
-    padding-bottom: 34px;
+    padding-bottom: ${paddingMenuBottomSmall}px;
     border-radius: 0;
     -webkit-border-radius: 0;
     -moz-border-radius: 0;
@@ -52,20 +54,18 @@ export const menuStyle = () => {
   }
 
   .mmd-menu-item {
-    padding-bottom: 0.5rem;
-    padding-top: 0.5rem;
+    padding-bottom: 8px;
+    padding-top: 8px;
     padding-left: 1.25rem;
     padding-right: 1.25rem;
     display: flex;
     background: transparent; 
+    height: ${heightMenuItem}px;
+    max-height: ${heightMenuItem}px;
   }
   .mmd-menu-item:focus { outline: none; }
 
   .mmd-menu-item.active {
-    padding-bottom: 0.5rem;
-    padding-top: 0.5rem;
-    padding-left: 1.25rem;
-    padding-right: 1.25rem;
     background-color: #e1e0e5; 
   }
 
@@ -82,8 +82,8 @@ export const menuStyle = () => {
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
-    font-size: .875rem;
-    line-height: 1.25rem; 
+    font-size: 14px;
+    line-height: 20px; 
   }
 
   .mmd-menu-item-value {
@@ -91,8 +91,8 @@ export const menuStyle = () => {
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
-    font-size: .75rem;
-    line-height: 1rem; 
+    font-size: 12px;
+    line-height: 16px; 
   }
   
   html[data-theme="dark"] .mmd-menu-item-title {
