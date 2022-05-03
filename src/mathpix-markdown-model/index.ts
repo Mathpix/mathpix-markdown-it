@@ -364,7 +364,12 @@ class MathpixMarkdown_Model {
     };
 
     getMathpixStyleOnly = (scaleEquation = true ) => {
-      let style: string =  this.getMathjaxStyle() + MathpixStyle(false, true, '', scaleEquation) + codeStyles + tabularStyles() + listsStyles;
+      let style: string =  this.getMathjaxStyle() 
+        + MathpixStyle(false, true, '', scaleEquation) 
+        + codeStyles 
+        + tabularStyles() 
+        + listsStyles
+        + menuStyle();
       return style;
     };
 
