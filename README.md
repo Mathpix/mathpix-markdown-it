@@ -570,6 +570,37 @@ _If the accessibility option is specified, then `assistive-mml` into `mjx-contai
 The math will then be read by screen readers as `x Superscript y`
     
 
+## Context menu for export math
+
+The context menu for selecting math export options is only available for browser libraries
+
+In the rendering options, specify the export formats that should be displayed in the menu:
+```js
+const html = MM.markdownToHTML("$x^y$", {
+outMath: {
+    include_error: true,
+    // Show in context menu:
+    include_asciimath: true,
+    include_latex: true,
+    include_mathml: true,
+    include_mathml_word: true,
+  }
+});
+```
+
+Then we can use:
+```js
+import {
+  addListenerContextMenuEvents,
+  removeListenerContextMenuEvents,
+} from "mathpix-markdown-it/lib/contex-menu";
+```
+
+`addListenerContextMenuEvents` - listens for events to invoke and create the context menu
+`removeListenerContextMenuEvents` - stop listening to these events
+
+<img width="370" alt="Screen Shot 2022-05-03 at 17 21 50" src="https://user-images.githubusercontent.com/32493105/166471623-fd3f6a5b-84e4-4d43-afcd-0384e83eb2df.png">
+
 
 # Documentation
 
