@@ -10,44 +10,27 @@ const { loadSreAsync } = require('../lib/sre/sre-node');
 ( async() => {
   const sre = await loadSreAsync();
   const options = {
-    // htmlTags: true,
+    htmlTags: true,
     width: 800,
-    // outMath: {
-    //   include_svg: true,
-    //   include_speech: true,
-    // }
+    outMath: {
+      include_svg: true,
+      include_speech: true,
+    }
   };
 
   let htmlMM = MathpixMarkdownModel.markdownToHTML(text, options);
-  console.log('==>html =>', htmlMM);
+  console.log('==>htmlMM=> [not accessibility] =>', htmlMM);
 
   htmlMM = MathpixMarkdownModel.markdownToHTML(text, {
     accessibility: {
         assistiveMml: true,
-      }
-  });
-  console.log('==>htmlA=>', htmlMM);  
-  
-  htmlMM = MathpixMarkdownModel.markdownToHTML(text, {
-    accessibility: {
-        // assistiveMml: true,
         sre: sre
       }
   });
-  console.log('==>htmlAL=>', htmlMM);
+  console.log('==>htmlMM=>[use accessibility] =>', htmlMM);
 
-  htmlMM = MathpixMarkdownModel.markdownToHTML(text, {
-    accessibility: {
-      assistiveMml: true,
-      sre: sre
-    },
-    outMath: {
-      // include_svg: true,
-      include_speech: true,
-    }
-  });
-
-  console.log('==>htmlS=>', htmlMM)
+  htmlMM = MathpixMarkdownModel.markdownToHTML(text);
+  console.log('==>htmlMM=>[not accessibility] =>', htmlMM)
 })();
 
 
