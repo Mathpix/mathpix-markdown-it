@@ -6,6 +6,7 @@ import { MathMLVisitorWord } from './mathml-word';
 import { getSpeech } from '../sre';
 import { TAccessibility } from "../mathpix-markdown-model";
 import { formatSource, formatSourceMML } from "../helpers/parse-mmd-element";
+import { spanToClass } from "../helpers/replace-span-to-class";
 
 const MJ = new MathJaxConfigure();
 
@@ -325,7 +326,8 @@ export const MathJax = {
    * @param options {}
    */
   Typeset: function(string, options: any={}) {
-    return OuterHTML(this.TexConvert(string, options), options.outMath);
+    const str = spanToClass(string);
+    return OuterHTML(this.TexConvert(str, options), options.outMath);
   },
 
   TypesetSvgAndAscii: function(string, options: any={}) {

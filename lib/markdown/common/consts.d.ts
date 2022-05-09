@@ -4,3 +4,7 @@ export declare const openTagMML: RegExp;
 export declare const closeTagMML: RegExp;
 export declare const open_tag_smiles: string;
 export declare const reOpenTagSmiles: RegExp;
+export declare const reSpan: RegExp;
+export declare const reSpanG: RegExp;
+export declare const openTagSpan: RegExp;
+export declare const closeTagSpan: RegExp;
