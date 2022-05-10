@@ -1,5 +1,6 @@
 import { MarkdownIt, RuleBlock, RuleInline, Renderer, Token } from 'markdown-it';
 import { renderTabularInline } from "./md-renderer-rules/render-tabular";
+import { closeTagSpan, reSpan } from "./common/consts";
 // import { escapeHtml }  from 'markdown-it/lib/common/utils';
 
 let subsectionParentCount: number = 0;
@@ -18,6 +19,53 @@ export const resetTextCounter: RuleInline = () => {
   sectionCount = 0;
   subCount = 0;
   subSubCount = 0;
+};
+
+const separatingSpan: RuleBlock = (state, startLine: number, endLine: number) => {
+  let lineText: string,
+    pos: number = state.bMarks[startLine] + state.tShift[startLine],
+    max: number = state.eMarks[startLine];
+
+  const markerBegin = RegExp('^</?(span)(?=(\\s|>|$))', 'i');
+  if (state.src.charCodeAt(pos) !== 0x3C/* < */) { 
+    return false; 
+  }
+
+  lineText = state.src.slice(pos, max);
+  const sMatch = lineText.match(markerBegin);
+  if (!sMatch) {
+    return false;
+  }
+
+  const sMatchEnd = lineText.match(closeTagSpan);
+  if (!sMatchEnd) {
+    return false;
+  }
+
+  let nextPos = pos + sMatchEnd.index + sMatchEnd[0].length;
+
+  if (nextPos < max) {
+    while(nextPos < max) {
+      const ch = state.src.charCodeAt(nextPos);
+      if (ch !== 0x20 /* space */) {
+        break;
+      }
+      nextPos++;
+    }
+  }
+  
+  const content = state.src.slice(pos, nextPos);
+  const match = content.match(reSpan);
+  if (!match || match.length < 3) {
+    return false
+  }
+  
+  state.tShift[startLine] += content.length;
+  const token: Token = state.push('inline', '', 0);
+  token.content = content;
+  token.children = [];
+  // state.pos = nextPos;
+  return true;
 };
 
 const headingSection: RuleBlock = (state, startLine: number, endLine: number) => {
@@ -86,12 +134,13 @@ const headingSection: RuleBlock = (state, startLine: number, endLine: number) =>
     return false;
   }
 
-  let { res = false, content = '' } = findEndMarker(lineText, startPos);
+  let { res = false, content = '', nextPos = 0 } = findEndMarker(lineText, startPos);
   let resString = content;
   resString = resString.split('\\\\').join('\n');
   let hasEndMarker = false;
   let last = nextLine;
 
+  let inlineStr = '';
   if (!res) {
     for (; nextLine <= endLine; nextLine++) {
       if (lineText === '') {
@@ -101,13 +150,16 @@ const headingSection: RuleBlock = (state, startLine: number, endLine: number) =>
       max = state.eMarks[nextLine];
       lineText = state.src.slice(pos, max);
 
-      let { res = false, content = '' } = findEndMarker(lineText, -1, "{", "}", true);
+      let { res = false, content = '', nextPos = 0 } = findEndMarker(lineText, -1, "{", "}", true);
       if (res) {
         resString += resString ? ' ' : '';
 
         content = content.split('\\\\').join('\n');
         resString += content;
         hasEndMarker = true;
+        if (nextPos && nextPos < lineText.length) {
+          inlineStr = lineText.slice(nextPos);
+        }
         break
       }
       resString += resString ? ' ' : '';
@@ -118,6 +170,9 @@ const headingSection: RuleBlock = (state, startLine: number, endLine: number) =>
   } else {
     hasEndMarker = true;
     last = nextLine;
+    if (nextPos && nextPos < lineText.length) {
+      inlineStr = lineText.slice(nextPos);
+    }
   }
 
 
@@ -165,6 +220,11 @@ const headingSection: RuleBlock = (state, startLine: number, endLine: number) =>
   if (state.md.options.forLatex) {
     token.latex = type;
   }
+  if (inlineStr && inlineStr.trim()) {
+    token = state.push('inline', '', 0);
+    token.content = inlineStr;
+    token.children = [];
+  }
   return true;
 };
 
@@ -188,6 +248,13 @@ const abstractBlock: RuleBlock = (state, startLine) => {
   }
   let resString = '';
   let abs = openTag.test(lineText);
+  let inline = '';
+  let lastLine = '';
+  
+  const match = lineText.match(openTag);
+  if (match) {
+    inline = lineText.slice(match.index + match[0].length);
+  }
   for (; nextLine < endLine; nextLine++) {
 
     if (closeTag.test(lineText)) {
@@ -202,6 +269,7 @@ const abstractBlock: RuleBlock = (state, startLine) => {
     pos = state.bMarks[nextLine] + state.tShift[nextLine];
     max = state.eMarks[nextLine];
     lineText = state.src.slice(pos, max);
+    lastLine = state.src.slice(pos, max);
 
     if (abs) {
       if (closeTag.test(lineText)) {
@@ -242,7 +310,23 @@ const abstractBlock: RuleBlock = (state, startLine) => {
   if (!isCloseTagExist) {
     return false;
   }
+
+  let strBeforeEnd = '';
+  let strAfterEnd = '';
+  if (lastLine) {
+    const matchEnd = lastLine.match(closeTag);
+    if (matchEnd) {
+      strBeforeEnd = lastLine.slice(0, matchEnd.index);
+      strAfterEnd = lastLine.slice(matchEnd.index + matchEnd[0].length);
+    }
+  }
   content = resString;
+  if (inline && inline.trim()) {
+    content = inline + content;
+  }
+  if (strBeforeEnd && strBeforeEnd.trim()) {
+    content += strBeforeEnd;
+  }
   const contentList = content.split('\n');
   const tokenContent = contentList.filter(item => {
     return item.trim().length > 0
@@ -274,6 +358,12 @@ const abstractBlock: RuleBlock = (state, startLine) => {
     token = state.push('paragraph_close', 'p', -1);
   }
   token = state.push('paragraph_close', 'div', -1);
+  
+  if (strAfterEnd && strAfterEnd.trim()) {
+    token = state.push('inline', '', 0);
+    token.content = strAfterEnd;
+    token.children = [];    
+  }
   state.line = nextLine;
   return true;
 };
@@ -754,6 +844,7 @@ export default () => {
   return (md: MarkdownIt) => {
     resetCounter();
     md.block.ruler.before("heading", "headingSection", headingSection);
+    md.block.ruler.before("headingSection", "separatingSpan", separatingSpan);
     md.block.ruler.before("paragraphDiv", "abstractBlock", abstractBlock);
 
     md.inline.ruler.before("multiMath", "textTypes", textTypes);

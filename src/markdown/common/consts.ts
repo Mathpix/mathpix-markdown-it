@@ -15,3 +15,7 @@ export const closeTagMML = new RegExp('(?:' + close_tag_mml + ')');
 export const open_tag_smiles = '^<(smiles)' + attribute + '*\\s*\\/?>';
 
 export const reOpenTagSmiles: RegExp = new RegExp('(?:' + open_tag_smiles + ')');
+
+export const reSpan: RegExp = /^<(span\s*(?:class="([^>]*)")\s*([^>]*))>(.*)<\/span\>/;
+const close_tag_span = '<\\/span*\\s*>';
+export const closeTagSpan = new RegExp('(?:' + close_tag_span + ')');
