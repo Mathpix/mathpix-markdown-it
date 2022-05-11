@@ -63,7 +63,7 @@
     "mathjax-full": "3.0.1",
     "node-polyfill-webpack-plugin": "^1.1.4",
     "parse-srcset": "^1.0.2",
-    "postcss": "^8.4.13",
+    "postcss": "^7.0.36",
     "react": "^16.7.0",
     "react-dom": "^16.7.0",
     "react-emotion": "^10.0.0",
