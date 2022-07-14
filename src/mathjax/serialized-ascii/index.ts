@@ -92,12 +92,49 @@ export class SerializedAsciiVisitor extends MmlVisitor {
         const atr = this.getAttributes(mclose);
         const atrDef = this.getAttributesDefaults(mclose);
         let longdiv = '';
+        let divisor = '';
+        let dividend = '';
+        /** \longdiv */
+        if ((!atr.notation && atrDef.notation === "longdiv") ||
+            atr.notation.toString().indexOf("longdiv") !== -1
+        ) {
+          if (iclose === 0) {
+            divisor = this.visitNode(mclose, '');
+            dividend = '';
+            longdiv += `((${divisor})/(${dividend}))`;
+          } else {
+            let mnList = [];
+            let i = 1;
+            while (iclose-i >= 0) {
+              let child = node.childNodes[iclose - i];
+              mnList.unshift(child);
+              i++
+            }
 
-        if ((!atr.notation && atrDef.notation === "longdiv") || 
-          (
-            atr.notation.toString().indexOf("longdiv") !== -1 ||
-            atr.notation.toString().indexOf("bottom") !== -1
-          )
+            if (iclose - mnList.length > 0) {
+              for (let i = 0; i < iclose - mnList.length; i++) {
+                longdiv += this.visitNode(node.childNodes[i], space);
+              }
+            }
+            divisor = this.visitNode(mclose, '');
+            dividend = '';
+            mnList.forEach(item => {
+              dividend += this.visitNode(item, '');
+            });
+            longdiv += `((${divisor})/(${dividend}))`;
+
+            if (iclose < node.childNodes.length - 1) {
+              for (let i = iclose + 1; i < node.childNodes.length; i++) {
+                longdiv += this.visitNode(node.childNodes[i], space);
+              }
+            }
+          }
+          mml.push(longdiv);
+          return mml.join('');
+        }
+        /** \lcm */
+        if ((!atr.notation && atrDef.notation === "bottom") 
+          || atr.notation.toString().indexOf("bottom") !== -1
         ) {
           if (iclose === 0) {
             longdiv += '(()/(';
