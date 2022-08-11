@@ -46,7 +46,7 @@ const indexConfig = Object.assign({}, config, {
   plugins: [
     new CopyPlugin({
       patterns: [
-        {from: './src/mathjax/**.js', to: './lib/mathjax/**.js'},
+        {from: './src/mathjax/**/*.js', to: './lib/mathjax/'},
       ]
     }),
     new NodePolyfillPlugin({
