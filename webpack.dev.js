@@ -44,9 +44,11 @@ const indexConfig = Object.assign({}, config, {
     ]
   },
   plugins: [
-    new CopyPlugin([
-      { from: './src/mathjax/my-BaseMappings.js', to: './lib/mathjax/my-BaseMappings.js' },
-    ]),
+    new CopyPlugin({
+      patterns: [
+        {from: './src/mathjax/**.js', to: './lib/mathjax/**.js'},
+      ]
+    }),
     new NodePolyfillPlugin({
       excludeAliases: ["console"]
     })
