@@ -84,6 +84,7 @@ export type TOutputMath = {
   include_mathml?: boolean,
   include_mathml_word?: boolean,
   include_asciimath?: boolean,
+  include_wolfram?: boolean,
   include_latex?: boolean,
   include_svg?: boolean,
   include_table_html?: boolean,

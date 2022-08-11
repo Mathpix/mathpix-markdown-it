@@ -3,6 +3,7 @@ import { MathJaxConfigure, mTex, svg } from './mathjax';
 import { SerializedMmlVisitor as MmlVisitor } from 'mathjax-full/js/core/MmlTree/SerializedMmlVisitor.js';
 import { SerializedAsciiVisitor as AsciiVisitor } from './serialized-ascii';
 import { MathMLVisitorWord } from './mathml-word';
+import { WolframVisitor } from './wolfram';
 import { getSpeech } from '../sre';
 import { TAccessibility } from "../mathpix-markdown-model";
 import { formatSource, formatSourceMML } from "../helpers/parse-mmd-element";
@@ -27,6 +28,12 @@ const toAsciiML = ((node, optionAscii) => {
   return ascii ? ascii.trim() : ascii;
 });
 
+const toWolfram = (node, optionsWolfram) => {
+  const visitor = new WolframVisitor(optionsWolfram);
+  const wolfram = visitor.visitTree(node);
+  return wolfram?.trim();
+}
+
 const applySpeechToNode = (adaptor, node, sre): string => {
   const lastChild = adaptor.lastChild(node);
   const mmlAssistive = adaptor.innerHTML(lastChild);
@@ -44,6 +51,7 @@ const OuterData = (adaptor, node, math, outMath, forDocx = false, accessibility?
     include_mathml = false,
     include_mathml_word = false,
     include_asciimath = false,
+    include_wolfram = false,
     include_latex = false,
     include_svg = true,
     include_speech = false,
@@ -56,6 +64,7 @@ const OuterData = (adaptor, node, math, outMath, forDocx = false, accessibility?
     mathml?: string,
     mathml_word?: string,
     asciimath?: string,
+    wolfram?: string,
     latex?: string,
     svg?: string,
     speech?: string
@@ -79,6 +88,11 @@ const OuterData = (adaptor, node, math, outMath, forDocx = false, accessibility?
   if (include_asciimath) {
     res.asciimath = toAsciiML(math.root, optionAscii);
   }
+
+  if (include_wolfram) {
+    res.wolfram = toWolfram(math.root, {})
+  }
+
   if (include_latex) {
     res.latex = (math.math
       ? math.math
