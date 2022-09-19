@@ -32,7 +32,8 @@ export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
     addPositionsToTokens = false,
     highlights = [],
     parserErrors = ParserErrors.show,
-    codeHighlight = {}
+    codeHighlight = {},
+    addSeparateTagIntoResultHtml = {}
   } = options;
   Object.assign(md.options, smiles);
   Object.assign(md.options, {
@@ -53,7 +54,8 @@ export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
     addPositionsToTokens: addPositionsToTokens,
     highlights: highlights,
     parserErrors: parserErrors,
-    codeHighlight: codeHighlight
+    codeHighlight: codeHighlight,
+    addSeparateTagIntoResultHtml: addSeparateTagIntoResultHtml
   });
 
   md

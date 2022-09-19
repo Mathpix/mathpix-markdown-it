@@ -40,6 +40,7 @@ export interface optionsMathpixMarkdown {
     highlights?: Array<THighlight>;
     parserErrors?: ParserErrors;
     codeHighlight?: CodeHighlight;
+    addSeparateTagIntoResultHtml?: TAddSeparateTagIntoResultHtml;
 }
 export type TMarkdownItOptions = {
     isDisableFancy?: boolean;
@@ -82,6 +83,7 @@ export type TMarkdownItOptions = {
     highlights?: Array<THighlight>;
     parserErrors?: ParserErrors;
     codeHighlight?: CodeHighlight;
+    addSeparateTagIntoResultHtml?: TAddSeparateTagIntoResultHtml;
 };
 export type TOutputMath = {
     include_mathml?: boolean;
@@ -158,6 +160,9 @@ export type THighlight = {
 export type TAccessibility = {
     assistiveMml?: boolean;
     sre?: object;
+};
+export type TAddSeparateTagIntoResultHtml = {
+    countHtmlElements?: number;
 };
 declare class MathpixMarkdown_Model {
     disableFancyArrayDef: string[];
