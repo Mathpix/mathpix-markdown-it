@@ -8,6 +8,7 @@ const escapeHtml = require('markdown-it/lib/common/utils').escapeHtml;
 
 /** custom rules to inject in the renderer pipeline (aka mini plugin) */
 
+let countHtmlSeparateTags = 1;
 /** inspired from https://github.com/markdown-it/markdown-it.github.io/blob/master/index.js#L9929 */
 function injectLineNumbers(tokens, idx, options, env, slf) {
   let line, endLine, listLine;
@@ -25,7 +26,15 @@ function injectLineNumbers(tokens, idx, options, env, slf) {
     tokens[idx].attrJoin("data_line_end", `${String(endLine-1)}`);
     tokens[idx].attrJoin("data_line", `${String([line, endLine])}`);
     tokens[idx].attrJoin("count_line", `${String(endLine-line)}`);
-
+    let rendered = slf.renderToken(tokens, idx, options, env, slf);
+    if (options.addSeparateTagIntoResultHtml?.countHtmlElements > 0) {
+      if (line > countHtmlSeparateTags * options.addSeparateTagIntoResultHtml.countHtmlElements 
+        || endLine > countHtmlSeparateTags * options.addSeparateTagIntoResultHtml.countHtmlElements) {
+          countHtmlSeparateTags++;
+          rendered = '<span class="separate"></span>' + rendered
+      }
+    }
+    return rendered;
   }
   return slf.renderToken(tokens, idx, options, env, slf);
 }
@@ -116,6 +125,7 @@ function code_block_injectLineNumbers(tokens, idx, options, env, slf) {
 
 /** overwrite paragraph_open and close rule to inject line number */
 export function withLineNumbers(renderer) {
+  countHtmlSeparateTags = 1;
   renderer.renderer.rules.paragraph_open
       = renderer.renderer.rules.heading_open
       = renderer.renderer.rules.ordered_list_open

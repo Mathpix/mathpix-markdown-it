@@ -22,7 +22,8 @@ export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
     enableFileLinks = false,
     toc = {},
     accessibility = null,
-    nonumbers = false
+    nonumbers = false,
+    addSeparateTagIntoResultHtml = {}
   } = options;
   Object.assign(md.options, smiles);
   Object.assign(md.options, {
@@ -35,7 +36,8 @@ export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
     maxWidth: maxWidth,
     enableFileLinks: enableFileLinks,
     accessibility: accessibility,
-    nonumbers: nonumbers
+    nonumbers: nonumbers,
+    addSeparateTagIntoResultHtml: addSeparateTagIntoResultHtml
   });
 
   md

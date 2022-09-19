@@ -46,6 +46,7 @@ export interface optionsMathpixMarkdown {
     toc?: TTocOptions;
     accessibility?: TAccessibility;
     nonumbers?: boolean;
+    addSeparateTagIntoResultHtml?: TAddSeparateTagIntoResultHtml;
 }
 
 export type TMarkdownItOptions = {
@@ -80,6 +81,7 @@ export type TMarkdownItOptions = {
   toc?: TTocOptions;
   accessibility?: TAccessibility;
   nonumbers?: boolean;
+  addSeparateTagIntoResultHtml?: TAddSeparateTagIntoResultHtml;
 }
 
 export type TOutputMath = {
@@ -135,6 +137,10 @@ export enum TTocStyle {
 export type TAccessibility = {
   assistiveMml?: boolean, //true to enable assitive MathML
   sre?: object
+};
+
+export type TAddSeparateTagIntoResultHtml = {
+  countHtmlElements?: number
 };
 
 class MathpixMarkdown_Model {
@@ -410,7 +416,8 @@ class MathpixMarkdown_Model {
           enableFileLinks=false,
           toc = {},
           accessibility = null,
-          nonumbers = false
+          nonumbers = false,
+          addSeparateTagIntoResultHtml = {}
         }
          = options || {};
 
@@ -445,7 +452,8 @@ class MathpixMarkdown_Model {
           enableFileLinks: enableFileLinks,
           toc: toc,
           accessibility: accessibility,
-          nonumbers: nonumbers
+          nonumbers: nonumbers,
+          addSeparateTagIntoResultHtml: addSeparateTagIntoResultHtml
         };
 
         const styleFontSize = fontSize ? ` font-size: ${options.fontSize}px;` : '';

@@ -31,6 +31,7 @@ export interface optionsMathpixMarkdown {
     toc?: TTocOptions;
     accessibility?: TAccessibility;
     nonumbers?: boolean;
+    addSeparateTagIntoResultHtml?: TAddSeparateTagIntoResultHtml;
 }
 export declare type TMarkdownItOptions = {
     isDisableFancy?: boolean;
@@ -64,6 +65,7 @@ export declare type TMarkdownItOptions = {
     toc?: TTocOptions;
     accessibility?: TAccessibility;
     nonumbers?: boolean;
+    addSeparateTagIntoResultHtml?: TAddSeparateTagIntoResultHtml;
 };
 export declare type TOutputMath = {
     include_mathml?: boolean;
@@ -111,6 +113,9 @@ export declare enum TTocStyle {
 export declare type TAccessibility = {
     assistiveMml?: boolean;
     sre?: object;
+};
+export declare type TAddSeparateTagIntoResultHtml = {
+    countHtmlElements?: number;
 };
 declare class MathpixMarkdown_Model {
     disableFancyArrayDef: string[];
