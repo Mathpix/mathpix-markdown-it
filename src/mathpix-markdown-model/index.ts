@@ -100,7 +100,10 @@ export type TOutputMath = {
   table_markdown?: {
     math_as_ascii?: boolean
   },
-  not_catch_errors?: boolean
+  not_catch_errors?: boolean,
+  wolfram_options?: {
+    unicode?: boolean
+  }
 }
 
 export type TOutputMathJax = {

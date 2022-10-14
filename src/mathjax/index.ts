@@ -59,6 +59,9 @@ const OuterData = (adaptor, node, math, outMath, forDocx = false, accessibility?
       showStyle: false,
       extraBrackets: true,
     },
+    wolfram_options = {
+      unicode: false
+    }
   } = outMath;
   const res: {
     mathml?: string,
@@ -90,7 +93,11 @@ const OuterData = (adaptor, node, math, outMath, forDocx = false, accessibility?
   }
 
   if (include_wolfram) {
-    res.wolfram = toWolfram(math.root, {})
+    const inputLatex = (math.math
+      ? math.math
+      : math.inputJax.processStrings ? '' : math.start.node.outerHTML);
+    wolfram_options.inputLatex = inputLatex;
+    res.wolfram = toWolfram(math.root, wolfram_options);
   }
 
   if (include_latex) {
@@ -227,6 +234,7 @@ const OuterHTML = (data, outMath) => {
     include_mathml = false,
     include_mathml_word = false,
     include_asciimath = false,
+    include_wolfram = false,
     include_latex = false,
     include_svg = true,
     include_error = false,
@@ -242,6 +250,10 @@ const OuterHTML = (data, outMath) => {
   if (include_asciimath && data.asciimath) {
     if (!outHTML) { outHTML += '\n'}
     outHTML +=  '<asciimath style="display: none;">' + formatSource(data.asciimath) + '</asciimath>';
+  }
+  if (include_wolfram && data.wolfram) {
+    if (!outHTML) { outHTML += '\n'}
+    outHTML +=  '<wolfram style="display: none;">' + formatSource(data.wolfram) + '</wolfram>';
   }
   if (include_latex && data.latex) {
     if (!outHTML) { outHTML += '\n'}

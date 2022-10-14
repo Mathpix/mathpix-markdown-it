@@ -67,6 +67,7 @@ export declare type TOutputMath = {
     include_mathml?: boolean;
     include_mathml_word?: boolean;
     include_asciimath?: boolean;
+    include_wolfram?: boolean;
     include_latex?: boolean;
     include_svg?: boolean;
     include_table_html?: boolean;
@@ -83,6 +84,9 @@ export declare type TOutputMath = {
         math_as_ascii?: boolean;
     };
     not_catch_errors?: boolean;
+    wolfram_options?: {
+        unicode?: boolean;
+    };
 };
 export declare type TOutputMathJax = {
     mtextInheritFont?: boolean;

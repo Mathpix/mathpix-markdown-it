@@ -7,6 +7,7 @@ export declare const MathJax: {
         mathml?: string;
         mathml_word?: string;
         asciimath?: string;
+        wolfram?: string;
         latex?: string;
         svg?: string;
         speech?: string;
