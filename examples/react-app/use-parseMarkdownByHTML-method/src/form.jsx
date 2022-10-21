@@ -6,7 +6,7 @@ class ConvertForm extends React.Component {
     super(props);
     this.state = {
       value: '\\[\n' +
-        'y = \\frac { \\sum _ { i } w _ { i } y _ { i } } { \\sum _ { i } w _ { i } } , i = 1,2 \\ldots k\n' +
+        '2 - \\sqrt [ 6 ] { \\frac { x ^ { 6 } y ^ { 5 } } { x ^ { 2 } } } \\times \\sqrt [ 6 ] { \\frac { x ^ { 3 } y ^ { 5 } } { x y ^ { 4 } } }\n' +
         '\\]' +
         '\n' +
         '\n' +
@@ -64,6 +64,7 @@ class ConvertForm extends React.Component {
     };
     const html = MM.markdownToHTML(this.state.value, options);
     const formats = MM.parseMarkdownByHTML(html);
+    console.log("formats=>",formats);
     this.setState({result: html})
     this.setState({formats: formats})
   }
@@ -142,7 +143,7 @@ class ConvertForm extends React.Component {
         <div className="formats">
           {this.state.formats && this.state.formats.length > 0 &&
             this.state.formats.map((item, index) => {
-              return <div className="item">
+              return <div className="item" key={index}>
                 <div>{item.type}</div>
                 <code>{item.value}</code>
               </div>

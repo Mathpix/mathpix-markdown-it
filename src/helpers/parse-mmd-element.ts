@@ -41,7 +41,7 @@ export const parseMmdElement = (math_el, res = []) => {
       continue;
     }
 
-    if (["MATHML", "MATHMLWORD", "ASCIIMATH", "LATEX", "MJX-CONTAINER", "TABLE", "TSV", "SMILES", "TABLE-MARKDOWN", "ERROR"].indexOf(child.tagName) !== -1) {
+    if (["MATHML", "MATHMLWORD", "ASCIIMATH", "WOLFRAM", "LATEX", "MJX-CONTAINER", "TABLE", "TSV", "SMILES", "TABLE-MARKDOWN", "ERROR"].indexOf(child.tagName) !== -1) {
       if (child.tagName==="MJX-CONTAINER" || child.tagName==="TABLE") {
         if (child.tagName === "TABLE") {
           res.push({type: "html", value: child.outerHTML});
@@ -51,7 +51,7 @@ export const parseMmdElement = (math_el, res = []) => {
       } else {
         res.push({
           type: child.tagName.toLowerCase(),
-          value: child.tagName === 'LATEX' || child.tagName === 'ASCIIMATH' || child.tagName === 'ERROR' || child.tagName === 'TSV' || child.tagName === "TABLE-MARKDOWN" || child.tagName === 'SMILES'
+          value: child.tagName === 'LATEX' || child.tagName === 'ASCIIMATH' || child.tagName === 'WOLFRAM' || child.tagName === 'ERROR' || child.tagName === 'TSV' || child.tagName === "TABLE-MARKDOWN" || child.tagName === 'SMILES'
             ? formatSourceHtml(child.innerHTML, (child.tagName === 'TSV' || child.tagName === "TABLE-MARKDOWN"))
             : child.tagName === 'MATHMLWORD'
               ? formatSourceHtmlWord(child.innerHTML)
