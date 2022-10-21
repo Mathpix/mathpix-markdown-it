@@ -28,7 +28,8 @@ module.exports = [
   {
     latex: `F = \\left( x ^ { \\prime } y ^ { \\prime } + z ^ { \\prime } \\right) ^ { \\prime } + z + x y + wz`,
     ascii: `F=(x^(')y^(')+z^('))^(')+z+xy+wz`,
-    wolfram: `F = (x' y' +z')' + z + x y + w z`
+    wolfram: `F = (x' y' +z')' + z + xy + wz`,
+    wolfram_: `F = (x' y' +z')' + z + x y + w z`,
   },   
   {
     latex: `u ^ { \\prime \\prime } + 4 ( 1 + E) u = 0 `,

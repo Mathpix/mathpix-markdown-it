@@ -172,20 +172,15 @@ const menclose = (handlerApi) => {
       const atr = getAttributes(node);
       let isLeft = false;
       let isRight = false;
-      let isBottom = false;
       if (atr && atr.notation) {
         isLeft = atr.notation.toString().indexOf('left') > -1;
         isRight = atr.notation.toString().indexOf('right') > -1;
-        isBottom = atr.notation.toString().indexOf('bottom') > -1;
       }
       mml += isLeft ? '[' : '';
       mml += handlerApi.handleAll(node, serialize);
       if (atr && atr.lcm) {
         mml += ''
-      } else {
-        mml += isBottom ? ',[hline]' : '';
       }
-      
       mml += isRight ? ']' : '';
       return mml;
     } catch (e) {
@@ -200,24 +195,41 @@ const mtable = () => {
     let mml = '';
     try {
       const parentIsMenclose = node.Parent && node.Parent.kind === 'menclose';
-
+      let openBranch = node.parent?.kind === 'mrow' 
+        ? node.parent.properties?.open : '';      
+      let closeBranch = node.parent?.kind === 'mrow' 
+        ? node.parent.properties?.close : '';
+      if (!openBranch && !closeBranch && node.parent?.kind === 'inferredMrow' && node.parent?.childNodes?.length > 1) {
+        const sFirst = node.parent.childNodes[0].kind === 'mo' ? serialize.visitNode(node.parent.childNodes[0], '') : '';
+        openBranch = sFirst?.trim() === '{' ? '{' : '';
+      }
+      const display = node.attributes?.attributes?.hasOwnProperty('displaystyle');// && node.prevClass !== 4;
       const isHasBranchOpen = node.parent && node.parent.kind === 'mrow'
         && node.parent.properties
-        && node.parent.properties.hasOwnProperty('open');
+        && node.parent.properties.hasOwnProperty('open') 
+        && (node.parent.properties.open === "{" || node.parent.properties.open === "");
       const isHasBranchClose = node.parent && node.parent.kind === 'mrow'
         && node.parent.properties
-        && node.parent.properties.hasOwnProperty('close');
-      mml += isHasBranchOpen || parentIsMenclose
+        && node.parent.properties.hasOwnProperty('close') 
+        && (node.parent.properties.close === "}" || node.parent.properties.close === "");
+      
+      const isNotMatrix = (openBranch === '{' && !closeBranch) 
+        || display
+        || (!isHasBranchClose && isHasBranchOpen);
+      
+      mml += isHasBranchOpen || openBranch === "{" ||
+      parentIsMenclose
         ? ''
         : '{';
-        // : '{:';
       for (let i = 0; i < node.childNodes.length; i++) {
-        if ( i>0 ) {
-          mml += ','
+        node.childNodes[i].isNotMatrix = isNotMatrix;
+        if (i > 0) {
+          mml += ', '
         }
         mml += serialize.visitNode(node.childNodes[i], '');
       }
-      mml += isHasBranchClose || parentIsMenclose
+      mml += isHasBranchClose || (!isHasBranchClose && isHasBranchOpen) ||
+      parentIsMenclose
         ? ''
         : '}';
       return mml;
@@ -234,19 +246,31 @@ const mrow = () => {
     try {
       const isTexClass7 = node.properties && node.properties.texClass === 7
         && node.parent && node.parent.kind === 'inferredMrow';
+      let openBranch = node.properties?.open;
+      let closeBranch = node.properties?.close;
+      /** In terms of notations, a matrix is an array of numbers enclosed by square brackets
+       * while a determinant is an array of numbers enclosed by two vertical bars.
+       * */
+      if (openBranch === '|' && closeBranch === '|' 
+        && node.childNodes.length === 3 && node.childNodes[1]?.kind === 'mtable') {
+        mml += ' det(';
+        mml += serialize.visitNode(node.childNodes[1], '');
+        mml += ')';
+        return mml;
+      }
 
       const needBranchOpen = node.properties
         && node.properties.hasOwnProperty('open') && node.properties.open === '';
       const needBranchClose = node.properties
         && node.properties.hasOwnProperty('close') &&  node.properties.close === '';
       mml += isTexClass7 && needBranchOpen
-        ? '{:'
+        ? '{'
         : '';
       for (let i = 0; i < node.childNodes.length; i++) {
         mml += serialize.visitNode(node.childNodes[i], '');
       }
       mml += isTexClass7 && needBranchClose
-        ? ':}' : '';
+        ? '}' : '';
       if(isTexClass7 && (needBranchClose || needBranchOpen)) {
       }
       return mml;
@@ -264,21 +288,28 @@ const mtr = () => {
       const needBranch = node.parent && node.parent.parent && node.parent.parent.texClass === 7;
       const display = node.attributes.get('displaystyle');
       let mtrContent = '';
+      let isNotMatrix = node.isNotMatrix;
       for (let i = 0; i < node.childNodes.length; i++) {
-        if ( i>0 ) {
-          mtrContent += display
+        const smd = serialize.visitNode(node.childNodes[i], '');
+        let smdBefore = i > 0 ? serialize.visitNode(node.childNodes[i - 1], '') : '';
+        smdBefore = smdBefore?.trim();
+        if (i > 0) {
+          /** Do not put a comma before and after the =, >=, <=, <, > sign */
+          const reOperations: RegExp = /^(?:=|>=|<=|<|>)/;
+          const hasCommaBefore = smdBefore?.length && smdBefore[smdBefore.length - 1] === ',';
+          if (!isNotMatrix) {
+            isNotMatrix = Boolean(hasCommaBefore || (smd?.trim()?.match(reOperations) || smdBefore?.match(reOperations)));
+          }
+          mtrContent += display || hasCommaBefore || (smd?.trim()?.match(reOperations) || smdBefore?.match(reOperations))
             ? ''
-            : ',';
+            : ', ';
         }
         mtrContent += serialize.visitNode(node.childNodes[i], '');
       }
-
-      mml += node.parent.childNodes.length > 1 || needBranch || (node.childNodes.length > 1 && !display)
+      mml += !isNotMatrix && (node.parent.childNodes.length > 1 || needBranch || (node.childNodes.length > 1 && !display))
         ? '{' + mtrContent + '}'
         : mtrContent;
-
       return mml;
-
     } catch (e) {
       console.error('mml => mtr =>', e);
       return mml;
@@ -500,7 +531,7 @@ const msup = () =>  {
       const secondChild = node.childNodes[1] ? node.childNodes[1] : null;
       const sSecondChild = secondChild ? serialize.visitNode(secondChild, '') : '';
 
-      if (firstChild?.kind === "mi" && !regW.test(sFirstChild)) {
+      if ((firstChild?.kind === "mi" && !regW.test(sFirstChild)) || firstChild?.kind === "mfrac") {
         mml += "(";
         mml += serialize.visitNode(firstChild, '');
         mml += ")";
@@ -756,11 +787,7 @@ const mo = () => {
         mml += abs;
         mml += regW.test(abs[abs.length-1]) && needLastSpase(node) ? ' ' : '';
       } else {
-        if (abs === ',' && node.Parent.kind === 'mtd') {
-          mml += '"' + abs + '"'
-        } else {
-          mml += abs ;
-        }
+        mml += abs ;
       }
       
       if (node.Parent && node.Parent.kind === "mpadded" && node.Parent.Parent && node.Parent.Parent.kind === "menclose") {

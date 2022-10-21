@@ -115,6 +115,8 @@ export class WolframVisitor extends MmlVisitor {
             dividend = '';
             longdiv += `((${divisor})/(${dividend}))`;
           } else {
+            let beforeLongdiv = "";
+            let afterLongdiv = "";
             let mnList = [];
             let i = 1;
             while (iclose-i >= 0) {
@@ -126,6 +128,7 @@ export class WolframVisitor extends MmlVisitor {
             if (iclose - mnList.length > 0) {
               for (let i = 0; i < iclose - mnList.length; i++) {
                 longdiv += this.visitNode(node.childNodes[i], space);
+                beforeLongdiv += longdiv;
               }
             }
             divisor = this.visitNode(mclose, '');
@@ -138,7 +141,15 @@ export class WolframVisitor extends MmlVisitor {
             if (iclose < node.childNodes.length - 1) {
               for (let i = iclose + 1; i < node.childNodes.length; i++) {
                 longdiv += this.visitNode(node.childNodes[i], space);
+                afterLongdiv += longdiv;
               }
+            }
+            if (node.parent?.kind === "math" && !beforeLongdiv && !afterLongdiv &&
+              divisor?.trim() && dividend?.trim() && (/[a-zA-Z]/.test(divisor?.trim()) || /[a-zA-Z]/.test(dividend?.trim()))
+            ) {
+              /** Divide a polynomial by another polynomial to find the quotient and remainder.
+               * Perform polynomial long division */
+              longdiv = 'long division ' + longdiv;
             }
           }
           mml.push(longdiv);
@@ -206,10 +217,29 @@ export class WolframVisitor extends MmlVisitor {
 
         let contentBefore = mml.join('');
         const sVisitNode = this.visitNode(child, space);
+        
+        //iint
+        if (child.kind === "mo" && sVisitNode?.trim() === 'iint') {
+          mml.push("int int ");
+          continue;
+        }        
+        //iiint
+        if (child.kind === "mo" && sVisitNode?.trim() === 'iiint') {
+          mml.push(" int int int ");
+          continue;
+        }
+        
+        if (mml.length && mml[mml.length - 1]?.trim() === "\u0394" && sVisitNode?.trim() !== "(") {
+          mml.push(" ");
+          mml.push(sVisitNode);
+          continue;
+        }
+        
         let sFunction = sVisitNode?.trim() ? getFunction(sVisitNode.trim()) : "";
         if (child.kind === "mo" 
           && i > 0
-          && sVisitNode?.trim() && ![",", "/", "×", ")", "]", "}", ".", "("].includes(sVisitNode?.trim())) {
+          && sVisitNode?.trim() 
+          && ![",", "/", "×", ")", "]", "}", ".", "("].includes(sVisitNode?.trim())) {
           
           if (child.kind === "mo" 
             && sVisitNode?.trim() && nOpenBranch > 0) {
@@ -248,12 +278,12 @@ export class WolframVisitor extends MmlVisitor {
         const childNext = i + 1 < node.childNodes.length 
           ? node.childNodes[i+1] 
           : null;
-        if ((
-          ((child.kind === "mi" || child.kind === "mn") 
+        if (((child.kind === "mn" 
             && sVisitNode !== "d"
             && (childNext?.kind === "mi" || childNext?.kind === "msub")) 
-          || (child.kind === "mo" && sVisitNode?.trim() && i > 0
-          && !["/","×", "(", "[", ")", "{",].includes(sVisitNode?.trim())) )
+          || 
+          (child.kind === "mo" && sVisitNode?.trim() && i > 0
+          && !["/","×", "(", "[", ")", "{"].includes(sVisitNode?.trim())) )
           && contentBefore?.length && (
             contentBefore[contentBefore.length - 1] !== " " 
             && contentBefore[contentBefore.length - 1] !== "."
@@ -276,14 +306,24 @@ export class WolframVisitor extends MmlVisitor {
         && node.parent.Parent && node.parent.Parent.kind === 'mtd'
         && node.childNodes.length > 1;
       let mmlContent = needBranch && hasFunc
-        ? '{:'
+        ? '{'
         : '';
       mmlContent += mml.join('');
       mmlContent += needBranch && hasFunc
-        ? ':}'
+        ? '}'
         : '';
       mmlContent = mmlContent.replace(/  /g, ' ');
-      mmlContent = mmlContent.replace(/ \)/g, ')');
+      mmlContent = mmlContent
+        .replace(/ \)/g, ')')
+        .replace(/\( /g, '(')
+        .replace(/ }/g, '}')
+        .replace(/{ /g, '{')
+        .replace(/ ,/g, ',')
+      ;
+      mmlContent = mmlContent
+        .replace(/ \|\||\|\| /g, '||')
+        .replace(/ \||\| /g, '|')
+      ;
       return mmlContent;
     } catch (e) {
       return '';

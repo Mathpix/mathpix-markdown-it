@@ -128,5 +128,83 @@ describe('Latex to wolfram:', () => {
         done();
       });
     });
+  });  
+  describe('Testing Systems of Equations:', () => {
+    const tests = require('./_data/_wolfram/_systems-of-equations');
+    tests.forEach(function(test) {
+      it('Latex =>' + test.latex, function(done) {
+        const data = MathJax.TexConvert(test.latex, options);
+        console.log('    LATEX         =>', test.latex);
+        console.log('    ASCIIMATH     =>', test.ascii);
+        console.log('    WOLFRAM =>', test.wolfram);
+        data.should.have.property('wolfram', test.wolfram);
+        /** If symbol can be unicode */
+        if (test.wolfram_u) {
+          const data_plain_text = MathJax.TexConvert(test.latex, Object.assign({},options, {
+            outMath:{
+              include_asciimath: true,
+              include_wolfram: true,
+              wolfram_options: {
+                unicode: true
+              }
+            }}));
+          data_plain_text.should.have.property('wolfram', test.wolfram_u);
+        }
+        notIncludeSymbols(data.asciimath);
+        done();
+      });
+    });
+  });  
+  describe('Testing Long Division:', () => {
+    const tests = require('./_data/_wolfram/_longDiv');
+    tests.forEach(function(test) {
+      it('Latex =>' + test.latex, function(done) {
+        const data = MathJax.TexConvert(test.latex, options);
+        console.log('    LATEX         =>', test.latex);
+        console.log('    ASCIIMATH     =>', test.ascii);
+        console.log('    WOLFRAM =>', test.wolfram);
+        data.should.have.property('wolfram', test.wolfram);
+        /** If symbol can be unicode */
+        if (test.wolfram_u) {
+          const data_plain_text = MathJax.TexConvert(test.latex, Object.assign({},options, {
+            outMath:{
+              include_asciimath: true,
+              include_wolfram: true,
+              wolfram_options: {
+                unicode: true
+              }
+            }}));
+          data_plain_text.should.have.property('wolfram', test.wolfram_u);
+        }
+        notIncludeSymbols(data.asciimath);
+        done();
+      });
+    });
+  });  
+  describe('Testing Integrals:', () => {
+    const tests = require('./_data/_wolfram/_integrals');
+    tests.forEach(function(test) {
+      it('Latex =>' + test.latex, function(done) {
+        const data = MathJax.TexConvert(test.latex, options);
+        console.log('    LATEX         =>', test.latex);
+        console.log('    ASCIIMATH     =>', test.ascii);
+        console.log('    WOLFRAM =>', test.wolfram);
+        data.should.have.property('wolfram', test.wolfram);
+        /** If symbol can be unicode */
+        if (test.wolfram_u) {
+          const data_plain_text = MathJax.TexConvert(test.latex, Object.assign({},options, {
+            outMath:{
+              include_asciimath: true,
+              include_wolfram: true,
+              wolfram_options: {
+                unicode: true
+              }
+            }}));
+          data_plain_text.should.have.property('wolfram', test.wolfram_u);
+        }
+        notIncludeSymbols(data.asciimath);
+        done();
+      });
+    });
   });
 });

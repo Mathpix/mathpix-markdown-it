@@ -2,14 +2,14 @@ module.exports = [
   {
     latex: `\\sum _ { i = 1 } ^ { 4 } ( - 1 ) ^ { i } \\frac { 1 } { ( 2 ) ^ { i } }`,
     ascii:     `sum_(i=1)^(4)(-1)^(i)(1)/((2)^(i))`,
-    wolfram: `sum_(i = 1)^4 ( - 1)^i 1/((2)^i)`,
+    wolfram: `sum_(i = 1)^4 (- 1)^i 1/((2)^i)`,
     wolfram_: `sum_(i=1)^4(-1)^i1/((2)^i)`,
   },
   {
     latex: `\\sum_{i=1}^n c=c n`,
     ascii:     `sum_(i=1)^(n)c=cn`,
-    wolfram: `sum_(i = 1)^n c = c n`,
-    wolfram_: `sum_(i=1)^nc=cn`,
+    wolfram: `sum_(i = 1)^n c = cn`,
+    wolfram_: `sum_(i=1)^nc=c n`,
   },
   {
     latex: `\\sum_{k=0}^{\\infty} a r^k=\\frac{a}{1-r}`,
@@ -36,7 +36,8 @@ module.exports = [
   {
     latex: `\\sum_{j=0}^{a s}\\left(8-j^{2}\\right)`,
     ascii: `sum_(j=0)^(as)(8-j^(2))`,
-    wolfram: `sum_(j = 0)^(a s) (8-j^2)`,
+    wolfram: `sum_(j = 0)^(as) (8-j^2)`,
+    wolfram_: `sum_(j = 0)^(a s) (8-j^2)`,
   },
 
   {
@@ -49,7 +50,8 @@ module.exports = [
   {
     latex: `\\sum _ { j = 1 } ^ { m } \\sum _ { j = 1 } ^ { n } a _ { i j } x _ { i } y _ { j }`,
     ascii: `sum_(j=1)^(m)sum_(j=1)^(n)a_(ij)x_(i)y_(j)`,
-    wolfram: `sum_(j = 1)^m sum_(j = 1)^n a_(i j)x_i y_j`,
+    wolfram: `sum_(j = 1)^m sum_(j = 1)^n a_(ij)x_i y_j`,
+    wolfram_: `sum_(j = 1)^m sum_(j = 1)^n a_(i j)x_i y_j`,
   },
   
   /** Alternatively, index and bounds of summation are sometimes omitted from the definition of summation
@@ -67,7 +69,8 @@ module.exports = [
   {
     latex: `\\dot { n } _ { i } = \\dot { n } _ { i 0 } + \\sum _ { j } \\dot { v } _ { i j } \\xi _ { \\mathrm{j} }`,
     ascii: `n^(˙)_(i)=n^(˙)_(i0)+sum_(j)v^(˙)_(ij)xi_(j)`,
-    wolfram: `(d(n_i)/dt) = (d(n_(i0))/dt) + sum_(j=1)^n (d(v_(i j))/dt)ξ_j`,
+    wolfram: `(d(n_i)/dt) = (d(n_(i0))/dt) + sum_(j=1)^n (d(v_(ij))/dt)ξ_j`,
+    wolfram_: `(d(n_i)/dt) = (d(n_(i0))/dt) + sum_(j=1)^n (d(v_(i j))/dt)ξ_j`,
   },
   {
     latex: `\\sum _ { i } w _ { i } y _ { i } `,
