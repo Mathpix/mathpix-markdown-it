@@ -1,5 +1,5 @@
 import { RuleInline, Token } from 'markdown-it';
-import { TBegin, bItemTag } from "../md-block-rule/lists";
+import { TBegin, bItemTag, reNumber } from "../md-block-rule/lists";
 
 export const listCloseInline: RuleInline = (state, silent) => {
   let token: Token;
@@ -140,7 +140,9 @@ export const listSetCounterInline: RuleInline = (state, silent) => {
   if (!match){ return false}
 
   if (match && match[2]) {
-    content =  match[2];
+    let startNumber = match[2]?.trim() && reNumber.test(match[2].trim())
+      ? Number(match[2].trim()) + 1 : 1;
+    content = startNumber.toString();
   } else {
     return false;
   }

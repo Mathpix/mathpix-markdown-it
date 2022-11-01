@@ -4,6 +4,7 @@ export enum TBegin {itemize = 'itemize', enumerate = 'enumerate'};
 const openTag: RegExp = /\\begin\s{0,}\{(itemize|enumerate)\}/;
 export const bItemTag: RegExp = /^(?:item\s{0,}\[([^\]]*)\]|item)/;
 const closeTag: RegExp = /\\end\s{0,}\{(itemize|enumerate)\}/;
+export const reNumber: RegExp = /^-?\d+$/;
 
 const setTokenListItemOpenBlock = (state, startLine, endLine, marker, li, iLevel, eLevel) => {
   let token;
@@ -15,7 +16,7 @@ const setTokenListItemOpenBlock = (state, startLine, endLine, marker, li, iLevel
     state.md.inline.parse(marker, state.md, state.env, chMarker);
     token.markerTokens = chMarker;
   }
-  if (li && li.value) {
+  if (li && li.hasOwnProperty('value')) {
     token.startValue = li.value;
     token.attrSet('value', li.value.toString())
     li = null;
@@ -71,7 +72,7 @@ const ListItems = (state, items, iLevel, eLevel, li, iOpen) => {
           let match = item.content.slice(1).match(bItemTag);
           if (match) {
             setTokenListItemOpenBlock(state, item.startLine, item.endLine + 1, match[1], li, iLevel, eLevel);
-            if (li && li.value) {
+            if (li && li.hasOwnProperty('value')) {
               li = null;
             }
 
@@ -91,7 +92,8 @@ const ListItems = (state, items, iLevel, eLevel, li, iOpen) => {
           }
           token = state.push(child.type, child.tag, 1);
           token.attrs = child.attrs;
-          if (child.type === "item_inline" && li && li.value) {
+          if (child.type === "item_inline" 
+            && li && li.hasOwnProperty('value')) {
             token.startValue = li.value;
             token.attrSet('value', li.value.toString())
             li = null;
@@ -396,7 +398,9 @@ export const Lists:RuleBlock = (state, startLine: number, endLine: number, silen
           ?  lineText.slice(match.index + match[0].length)
           : '';
         sE = sE.trim();
-        li = {value: match[2]};
+        let startNumber = match[2]?.trim() && reNumber.test(match[2].trim()) 
+          ? Number(match[2].trim()) + 1 : 1;
+        li = {value: startNumber};
         if (sE.length > 0) {
           items = ItemsAddToPrev(items, sE, nextLine);
         }
