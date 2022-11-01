@@ -161,6 +161,52 @@ module.exports = [
     html: `<ul class="itemize preview-paragraph-0 preview-line 0" data_line_start="0" data_line_end="0" data_line="0,1" count_line="1" style="list-style-type: none"><li class="li_itemize preview-paragraph-0 preview-line " data_line_start="0" data_line_end="-1" data_line="0,0" count_line="0" data_parent_line_start="0"><span class="li_level">•</span>One entry in the list</li><li class="li_itemize preview-paragraph-0 preview-line " data_line_start="0" data_line_end="-1" data_line="0,0" count_line="0" data_parent_line_start="0"><span class="li_level">•</span>Another entry in the list</li></ul><ul class="itemize preview-paragraph-3 preview-line 3 4 5 6 7 8 9 10 11 12 13 14 15" data_line_start="3" data_line_end="15" data_line="3,16" count_line="13" style="list-style-type: none"><li class="li_itemize preview-paragraph-4 preview-line 4" data_line_start="4" data_line_end="4" data_line="4,5" count_line="1" data_parent_line_start="3"><span class="li_level">¿</span>First Level</li><ul class="itemize" style="list-style-type: none"><li class="li_itemize preview-paragraph-6 preview-line 6" data_line_start="6" data_line_end="6" data_line="6,7" count_line="1" data_parent_line_start="3"><span class="li_level"><span class="math-inline ">
 <mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: 0" xmlns="http://www.w3.org/2000/svg" width="1.76ex" height="1.559ex" role="img" focusable="false" viewBox="0 -689 778 689"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="25FB" d="M71 0Q59 4 55 16V346L56 676Q64 686 70 689H709Q719 681 722 674V15Q719 10 709 1L390 0H71ZM682 40V649H95V40H682Z"></path></g></g></g></svg></mjx-container></span></span>Second Level</li><ul class="itemize" style="list-style-type: none"><li class="li_itemize preview-paragraph-8 preview-line 8" data_line_start="8" data_line_end="8" data_line="8,9" count_line="1" data_parent_line_start="3"><span class="li_level">∗</span>Third Level</li><ul class="itemize" style="list-style-type: none"><li class="li_itemize preview-paragraph-10 preview-line 10" data_line_start="10" data_line_end="10" data_line="10,11" count_line="1" data_parent_line_start="3"><span class="li_level">·</span>Fourth Level</li><li class="li_itemize preview-paragraph-10 preview-line 10" data_line_start="10" data_line_end="10" data_line="10,11" count_line="1" data_parent_line_start="3"><span class="li_level"><span class="math-inline ">
 <mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: 0" xmlns="http://www.w3.org/2000/svg" width="1.76ex" height="1.559ex" role="img" focusable="false" viewBox="0 -689 778 689"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="25FB" d="M71 0Q59 4 55 16V346L56 676Q64 686 70 689H709Q719 681 722 674V15Q719 10 709 1L390 0H71ZM682 40V649H95V40H682Z"></path></g></g></g></svg></mjx-container></span></span>Fourth Level</li><li class="li_itemize preview-paragraph-11 preview-line 11" data_line_start="11" data_line_end="11" data_line="11,12" count_line="1" data_parent_line_start="3"><span class="li_level">·</span>Fourth Levelfffy</li></ul></ul></ul></ul>`,
+  },
+  {
+    latex: '\\begin{enumerate}\n' +
+      '\\setcounter{enumi}{35}\n' +
+      '\\item Test\n' +
+      '\\end{enumerate}',
+    html: `<ol class="enumerate decimal preview-paragraph-0 preview-line 0 1 2 3" data_line_start="0" data_line_end="3" data_line="0,4" count_line="4" style=" list-style-type: decimal"><li value="36" class="li_enumerate preview-paragraph-2 preview-line 2" data_line_start="2" data_line_end="2" data_line="2,3" count_line="1" data_parent_line_start="0">Test</li></ol>`
+  },
+  {
+    latex: '\\begin{enumerate}\n' +
+      '  \\setcounter{enumi}{-1}\n' +
+      '  \\item Test\n' +
+      '\\end{enumerate}',
+    html: `<ol class="enumerate decimal preview-paragraph-0 preview-line 0 1 2 3" data_line_start="0" data_line_end="3" data_line="0,4" count_line="4" style=" list-style-type: decimal"><li value="0" class="li_enumerate preview-paragraph-2 preview-line 2" data_line_start="2" data_line_end="2" data_line="2,3" count_line="1" data_parent_line_start="0">Test</li></ol>`
+  },
+  {
+    latex: '\\begin{enumerate}\n' +
+      '  \\setcounter{enumi}{A}\n' +
+      '  \\item Test\n' +
+      '\\end{enumerate}',
+    html: `<ol class="enumerate decimal preview-paragraph-0 preview-line 0 1 2 3" data_line_start="0" data_line_end="3" data_line="0,4" count_line="4" style=" list-style-type: decimal"><li value="1" class="li_enumerate preview-paragraph-2 preview-line 2" data_line_start="2" data_line_end="2" data_line="2,3" count_line="1" data_parent_line_start="0">Test</li></ol>`
+  },
+  {
+    latex: '\\begin{enumerate}\n' +
+      '\\setcounter{enumi}{-2}\n' +
+      '\\item Test\n' +
+      '\\end{enumerate}',
+    html: `<ol class="enumerate decimal preview-paragraph-0 preview-line 0 1 2 3" data_line_start="0" data_line_end="3" data_line="0,4" count_line="4" style=" list-style-type: decimal"><li value="-1" class="li_enumerate preview-paragraph-2 preview-line 2" data_line_start="2" data_line_end="2" data_line="2,3" count_line="1" data_parent_line_start="0">Test</li></ol>`
+  },
+  {
+    latex: '\\begin{enumerate}\\setcounter{enumi}{-2}\n' +
+      '\\item Test\n' +
+      '\\end{enumerate}',
+    html: `<ol class="enumerate decimal preview-paragraph-0 preview-line 0 1 2" data_line_start="0" data_line_end="2" data_line="0,3" count_line="3" style=" list-style-type: decimal"><li value="-1" class="li_enumerate preview-paragraph-1 preview-line 1" data_line_start="1" data_line_end="1" data_line="1,2" count_line="1" data_parent_line_start="0">Test</li></ol>`
+  },
+  {
+    latex: '\\begin{enumerate}\\setcounter{enumi}{35}\n' +
+      '\\item Test\n' +
+      '\\end{enumerate}',
+    html: `<ol class="enumerate decimal preview-paragraph-0 preview-line 0 1 2" data_line_start="0" data_line_end="2" data_line="0,3" count_line="3" style=" list-style-type: decimal"><li value="36" class="li_enumerate preview-paragraph-1 preview-line 1" data_line_start="1" data_line_end="1" data_line="1,2" count_line="1" data_parent_line_start="0">Test</li></ol>`
+  },
+  {
+    latex: '\\begin{enumerate}\\setcounter{enumi}{-1}\n' +
+      '  \\item Test\n' +
+      '\\end{enumerate}',
+    html: `<ol class="enumerate decimal preview-paragraph-0 preview-line 0 1 2" data_line_start="0" data_line_end="2" data_line="0,3" count_line="3" style=" list-style-type: decimal"><li value="0" class="li_enumerate preview-paragraph-1 preview-line 1" data_line_start="1" data_line_end="1" data_line="1,2" count_line="1" data_parent_line_start="0">Test</li></ol>`
   }
 
 ];
