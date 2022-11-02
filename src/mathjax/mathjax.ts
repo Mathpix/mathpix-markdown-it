@@ -74,8 +74,8 @@ export class MathJaxConfigure {
   initTex = (nonumbers = false) => {
     if (nonumbers) {
       // @ts-ignore
-      this.mTex = new MTeX(Object.assign(texConfig, {tags: "none"}));
-      this.tex = new TeX(Object.assign(texConfig, {tags: "none"}));
+      this.mTex = new MTeX(Object.assign({}, texConfig, {tags: "none"}));
+      this.tex = new TeX(Object.assign({}, texConfig, {tags: "none"}));
     } else {
       // @ts-ignore
       this.mTex = new MTeX(texConfig);

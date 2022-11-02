@@ -257,12 +257,14 @@ export const MathJax = {
   checkAccessibility: function (accessibility: TAccessibility = null, nonumbers = false) {
     if (!this.assistiveMml && accessibility !== null) {
       this.assistiveMml = true;
+      this.nonumbers = nonumbers;
       MJ.changeHandler(true, nonumbers);
       return;
     }
     
     if (this.assistiveMml && accessibility === null) {
       this.assistiveMml = false;
+      this.nonumbers = nonumbers;
       MJ.changeHandler(false, nonumbers);
       return;
     }
