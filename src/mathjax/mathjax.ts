@@ -30,13 +30,13 @@ class MTeX extends TeX {
 }
 
 // @ts-ignore
-export const mTex = new MTeX(texConfig);
-export const tex = new TeX(texConfig);
 export const mml = new MathML(mmlConfig);
 export const svg = new SVG(svgConfig);
 export const asciimath = new AsciiMath({});
 
 export class MathJaxConfigure {
+  public mTex;
+  public tex;
   public mathjax;
   public adaptor;
   public domNode;
@@ -48,6 +48,7 @@ export class MathJaxConfigure {
   public docAsciiMath;
   
   constructor() {
+    this.initTex();
     this.chooseAdaptor();
     
     this.setHandler(true);
@@ -69,19 +70,32 @@ export class MathJaxConfigure {
       this.domNode = '<html></html>';
     }
   };
+
+  initTex = (nonumbers = false) => {
+    if (nonumbers) {
+      // @ts-ignore
+      this.mTex = new MTeX(Object.assign({}, texConfig, {tags: "none"}));
+      this.tex = new TeX(Object.assign({}, texConfig, {tags: "none"}));
+    } else {
+      // @ts-ignore
+      this.mTex = new MTeX(texConfig);
+      this.tex = new TeX(texConfig);
+    }
+  }
   
-  setHandler = (acssistiveMml = false) => {
+  setHandler = (acssistiveMml = false, nonumbers = false) => {
+    this.initTex(nonumbers)
     this.handler = RegisterHTMLHandler(this.adaptor);
     if (acssistiveMml) {
       AssistiveMmlHandler(this.handler);
     }
 
     this.docTeX = mathjax.document(this.domNode, {
-      InputJax: tex,
+      InputJax: this.tex,
       OutputJax: svg
     });
     this.mDocTeX= mathjax.document(this.domNode, {
-      InputJax: mTex,
+      InputJax: this.mTex,
       OutputJax: svg
     });
     this.docMathML = mathjax.document(this.domNode, {
@@ -94,10 +108,10 @@ export class MathJaxConfigure {
     });
   };
   
-  changeHandler = (acssistiveMml = false) => {
+  changeHandler = (acssistiveMml = false, nonumbers = false) => {
     if (this.handler) {
       mathjax.handlers.unregister(this.handler);
     }
-    this.setHandler(acssistiveMml);
+    this.setHandler(acssistiveMml, nonumbers);
   }
 }

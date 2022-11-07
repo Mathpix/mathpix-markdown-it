@@ -510,7 +510,8 @@ const renderMath = (a, token, options) => {
       } else {
          mathEquation = MathJax.Typeset(math, {display: isBlock, metric: { cwidth: cwidth },
            outMath: options.outMath, mathJax: options.mathJax, forDocx: options.forDocx,
-           accessibility: options.accessibility
+           accessibility: options.accessibility,
+           nonumbers: options.nonumbers
          });
       }
     }

@@ -1,4 +1,4 @@
-import { MathJaxConfigure, mTex, svg } from './mathjax';
+import { MathJaxConfigure, svg } from './mathjax';
 
 import { SerializedMmlVisitor as MmlVisitor } from 'mathjax-full/js/core/MmlTree/SerializedMmlVisitor.js';
 import { SerializedAsciiVisitor as AsciiVisitor } from './serialized-ascii';
@@ -252,17 +252,26 @@ const OuterHTML = (data, outMath) => {
 
 export const MathJax = {
   assistiveMml: true,
+  nonumbers: false,
   
-  checkAccessibility: function (accessibility: TAccessibility = null) {
+  checkAccessibility: function (accessibility: TAccessibility = null, nonumbers = false) {
     if (!this.assistiveMml && accessibility !== null) {
       this.assistiveMml = true;
-      MJ.changeHandler(true);
+      this.nonumbers = nonumbers;
+      MJ.changeHandler(true, nonumbers);
       return;
     }
     
     if (this.assistiveMml && accessibility === null) {
       this.assistiveMml = false;
-      MJ.changeHandler(false);
+      this.nonumbers = nonumbers;
+      MJ.changeHandler(false, nonumbers);
+      return;
+    }
+
+    if (this.nonumbers !== nonumbers) {
+      this.nonumbers = nonumbers;
+      MJ.changeHandler(this.assistiveMml, nonumbers);
     }
   },
   
@@ -273,10 +282,10 @@ export const MathJax = {
     return svg.styleSheet(MJ.mDocTeX);
   },
   TexConvert: function(string, options: any={}) {
-    const {display = true, metric = {}, outMath = {}, mathJax = {}, forDocx={}, accessibility = null} = options;
+    const {display = true, metric = {}, outMath = {}, mathJax = {}, forDocx={}, accessibility = null, nonumbers = false} = options;
     const {em = 16, ex = 8, cwidth = 1200, lwidth = 100000, scale = 1} = metric;
     const {mtextInheritFont = false} = mathJax;
-    this.checkAccessibility(accessibility);
+    this.checkAccessibility(accessibility, nonumbers);
     
     if (mtextInheritFont) {
       MJ.mDocTeX.outputJax.options.mtextInheritFont = true;
@@ -372,10 +381,10 @@ export const MathJax = {
   //
   Reset: function (n = 0) {
     if (n) {n--} else {n = 0}
-    mTex.parseOptions.tags.reset(n);
+    MJ.mTex.parseOptions.tags.reset(n);
   },
   GetLastEquationNumber: function () {
-    const tags: any = mTex.parseOptions.tags;
+    const tags: any = MJ.mTex.parseOptions.tags;
     return tags.counter;
   }
 };

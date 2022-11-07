@@ -45,6 +45,7 @@ export interface optionsMathpixMarkdown {
     maxWidth?: string;
     toc?: TTocOptions;
     accessibility?: TAccessibility;
+    nonumbers?: boolean;
 }
 
 export type TMarkdownItOptions = {
@@ -78,6 +79,7 @@ export type TMarkdownItOptions = {
   htmlWrapper?: THtmlWrapper | boolean;
   toc?: TTocOptions;
   accessibility?: TAccessibility;
+  nonumbers?: boolean;
 }
 
 export type TOutputMath = {
@@ -407,7 +409,8 @@ class MathpixMarkdown_Model {
           maxWidth='',
           enableFileLinks=false,
           toc = {},
-          accessibility = null
+          accessibility = null,
+          nonumbers = false
         }
          = options || {};
 
@@ -441,7 +444,8 @@ class MathpixMarkdown_Model {
           maxWidth: maxWidth,
           enableFileLinks: enableFileLinks,
           toc: toc,
-          accessibility: accessibility
+          accessibility: accessibility,
+          nonumbers: nonumbers
         };
 
         const styleFontSize = fontSize ? ` font-size: ${options.fontSize}px;` : '';

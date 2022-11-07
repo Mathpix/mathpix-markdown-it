@@ -4,5 +4,6 @@ export declare enum TBegin {
     enumerate = "enumerate"
 }
 export declare const bItemTag: RegExp;
+export declare const reNumber: RegExp;
 export declare const ReRenderListsItem: RuleBlock;
 export declare const Lists: RuleBlock;

@@ -13,7 +13,8 @@ class MathpixMarkdown extends React.Component<MathpixMarkdownProps> {
           htmlTags=false, width=0, breaks=true, typographer=false, linkify=false, xhtmlOut=false,
           outMath={}, mathJax={}, htmlSanitize = {}, smiles = {}, openLinkInNewWindow = true,
           enableFileLinks = false,
-          accessibility = null
+          accessibility = null,
+          nonumbers = false
         } = this.props;
         const disableRules = isDisableFancy ? MM.disableFancyArrayDef : this.props.disableRules || [];
         const markdownItOptions: TMarkdownItOptions = {
@@ -33,7 +34,8 @@ class MathpixMarkdown extends React.Component<MathpixMarkdownProps> {
             smiles: smiles,
             openLinkInNewWindow: openLinkInNewWindow,
             enableFileLinks: enableFileLinks,
-            accessibility: accessibility
+            accessibility: accessibility,
+            nonumbers: nonumbers
         };
 
          MM.setOptions(disableRules, isCheckFormula, showTimeLog);

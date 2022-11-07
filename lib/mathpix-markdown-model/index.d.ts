@@ -30,6 +30,7 @@ export interface optionsMathpixMarkdown {
     maxWidth?: string;
     toc?: TTocOptions;
     accessibility?: TAccessibility;
+    nonumbers?: boolean;
 }
 export declare type TMarkdownItOptions = {
     isDisableFancy?: boolean;
@@ -62,6 +63,7 @@ export declare type TMarkdownItOptions = {
     htmlWrapper?: THtmlWrapper | boolean;
     toc?: TTocOptions;
     accessibility?: TAccessibility;
+    nonumbers?: boolean;
 };
 export declare type TOutputMath = {
     include_mathml?: boolean;

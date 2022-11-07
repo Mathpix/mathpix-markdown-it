@@ -46,7 +46,9 @@ const StatePushCaptionTable = (state, type: string): void => {
   token = state.push('caption_table', '', 0);
   token.attrs = [[`${type}-number`, num], ['class', `caption_${type}`]];
   token.children = [];
-  token.content = `${type[0].toUpperCase()}${type.slice(1)} ${num}: ` + caption;
+  token.content = state.md?.options?.nonumbers
+    ? `${type[0].toUpperCase()}${type.slice(1)}: ` + caption
+    : `${type[0].toUpperCase()}${type.slice(1)} ${num}: ` + caption;
   if (state.md.options.forLatex) {
     token.latex = caption;
   }

@@ -15,7 +15,8 @@ const mdInit = (options: TMarkdownItOptions) => {
     maxWidth = '',
     enableFileLinks = false,
     toc = {},
-    accessibility = null
+    accessibility = null,
+    nonumbers = false
   } = options;
   const mmdOptions = {
     width: width,
@@ -27,7 +28,8 @@ const mdInit = (options: TMarkdownItOptions) => {
     maxWidth: maxWidth,
     enableFileLinks: enableFileLinks,
     toc: toc,
-    accessibility: accessibility
+    accessibility: accessibility,
+    nonumbers: nonumbers
   };
   let md = require("markdown-it")({
     html: htmlTags,
