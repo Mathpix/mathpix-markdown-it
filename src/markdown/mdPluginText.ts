@@ -389,11 +389,15 @@ const pageBreaksBlock: RuleBlock = (state, startLine: number) => {
   if (lineText.length > startPos) {
     strAfterEnd = lineText.slice(startPos);
   }
+  if (state.md.options.showHiddenTags || strAfterEnd?.trim()) {
+    token = state.push('paragraph_open', 'div', 1);
+    token.map = [startLine, nextLine];
+  }
   token = state.push("pagebreak", "", 0);
   token.content = '';
   if (state.md.options.forLatex) {
     token.latex = '\\' + match[0];
-    if (!strAfterEnd) {
+    if (!strAfterEnd || !strAfterEnd.trim()) {
       if (state.isEmpty(nextLine)) {
         token.latex += '\n\n'
       } else {
@@ -402,10 +406,13 @@ const pageBreaksBlock: RuleBlock = (state, startLine: number) => {
     }
   }
   token.children = [];
-  if (strAfterEnd && strAfterEnd.trim()) {
+  if (strAfterEnd?.trim()) {
     token = state.push('inline', '', 0);
     token.content = strAfterEnd;
     token.children = [];
+  }
+  if (state.md.options.showHiddenTags || strAfterEnd?.trim()) {
+    state.push('paragraph_close', 'div', -1);
   }
   state.line = nextLine;
   return true;
