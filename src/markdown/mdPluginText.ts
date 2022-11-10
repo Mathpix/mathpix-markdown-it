@@ -548,6 +548,28 @@ const textTypes: RuleInline = (state) => {
   return true;
 };
 
+const pageBreaks: RuleInline = (state) => {
+  let startPos = state.pos;
+  if (state.src.charCodeAt(startPos) !== 0x5c /* \ */) {
+    return false;
+  }
+  const match = state.src
+    .slice(++startPos)
+    .match(/^(?:pagebreak|clearpage|newpage)/); // eslint-disable-line
+  if (!match) {
+    return false;
+  }
+  const nextPos = startPos + match[0].length;
+  const token = state.push("pagebreak", "", 0);
+  token.content = '';
+  if (state.md.options.forLatex) {
+    token.latex = '\\' + match[0];
+  } 
+  token.children = [];
+  state.pos = nextPos;
+  return true;
+};
+
 const linkifyURL: RuleInline = (state) => {
   const urlTag: RegExp = /(?:(www|http:|https:)+[^\s]+[\w])/;
   let startPos = state.pos;
@@ -814,6 +836,19 @@ const renderTextUrl = token => {
   return `<a href="#" class="text-url">${token.content}</a>`
 };
 
+const renderPageBreaks = (tokens, idx, options, env = {}, slf) => {
+  if (options?.showHiddenTags) {
+    let html = `<div class="page-break d-flex" style="display:flex; font-size:0.9rem;">`;
+    const hrEl = `<hr style="flex-grow:1; border:0; border-top:0.025rem solid #999; margin:auto"/>`;
+    html += hrEl;
+    html += '<span style="padding-left:0.5rem; padding-right:0.5rem; color:#999;">' + 'Page Break' + '</span>';
+    html += hrEl;
+    html += '</div>';
+    return html;
+  }
+  return '';
+};
+
 const mappingTextStyles = {
   textbf: "TextBold",
   textbf_open: "TextBoldOpen",
@@ -850,6 +885,7 @@ export default () => {
     md.inline.ruler.before("multiMath", "textTypes", textTypes);
     md.inline.ruler.before("textTypes", "textAuthor", textAuthor);
     md.inline.ruler.before('textTypes', 'linkifyURL', linkifyURL);
+    md.inline.ruler.before('textTypes', 'pageBreaks', pageBreaks);
 
     Object.keys(mappingTextStyles).forEach(key => {
       md.renderer.rules[key] = (tokens, idx, options, env, slf) => {
@@ -904,6 +940,10 @@ export default () => {
         }
       }
     });
+    
+    md.renderer.rules.pagebreak = (tokens, idx, options, env = {}, slf) => {
+      return renderPageBreaks(tokens, idx, options, env, slf)
+    };
 
     md.renderer.rules.s_open = function (tokens, idx, options, env, self) {
       let i = 0;
