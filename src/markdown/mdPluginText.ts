@@ -368,6 +368,49 @@ const abstractBlock: RuleBlock = (state, startLine) => {
   return true;
 };
 
+const pageBreaksBlock: RuleBlock = (state, startLine: number) => {
+  let token: Token, lineText: string,
+    pos: number = state.bMarks[startLine] + state.tShift[startLine],
+    max: number = state.eMarks[startLine];
+  let nextLine: number = startLine + 1;
+  let startPos: number = 0;
+  lineText = state.src.slice(pos, max).trim();
+  if (state.src.charCodeAt(pos) !== 0x5c /* \ */) {
+    return false;
+  }
+  const match: RegExpMatchArray = lineText
+    .slice(++startPos)
+    .match(/^(?:pagebreak|clearpage|newpage)/);
+  if (!match) {
+    return false;
+  }
+  startPos += match[0].length;
+  let strAfterEnd = '';
+  if (lineText.length > startPos) {
+    strAfterEnd = lineText.slice(startPos);
+  }
+  token = state.push("pagebreak", "", 0);
+  token.content = '';
+  if (state.md.options.forLatex) {
+    token.latex = '\\' + match[0];
+    if (!strAfterEnd) {
+      if (state.isEmpty(nextLine)) {
+        token.latex += '\n\n'
+      } else {
+        token.latex += '\n'
+      }
+    }
+  }
+  token.children = [];
+  if (strAfterEnd && strAfterEnd.trim()) {
+    token = state.push('inline', '', 0);
+    token.content = strAfterEnd;
+    token.children = [];
+  }
+  state.line = nextLine;
+  return true;
+};
+
 const findEndMarker = (str: string, startPos: number = 0, beginMarker: string = "{", endMarker: string = "}", onlyEnd = false) => {
   let content: string = '';
   let nextPos: number = 0;
@@ -881,6 +924,7 @@ export default () => {
     md.block.ruler.before("heading", "headingSection", headingSection);
     md.block.ruler.before("headingSection", "separatingSpan", separatingSpan);
     md.block.ruler.before("paragraphDiv", "abstractBlock", abstractBlock);
+    md.block.ruler.before("paragraphDiv", "pageBreaksBlock", pageBreaksBlock);
 
     md.inline.ruler.before("multiMath", "textTypes", textTypes);
     md.inline.ruler.before("textTypes", "textAuthor", textAuthor);
