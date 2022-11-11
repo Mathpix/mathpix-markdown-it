@@ -29,8 +29,9 @@ export const listsStyles = `
   }
   .itemize > li > span.li_level { 
     position: absolute;
-    left: -40px;
-    width: 40px;
+    right: 100%;
+    white-space: nowrap;
+    width: max-content;;
     display: flex;
     justify-content: flex-end;
     padding-right: 10px;

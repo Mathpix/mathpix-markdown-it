@@ -36,6 +36,9 @@ export const render_itemize_list_open = (tokens, index, renderer) => {
   }
   level_itemize++;
   list_injectLineNumbers(tokens, index, "itemize");
+  if (level_itemize > 1) {
+    return `<li><ul${renderer.renderAttrs(tokens[index])} style="list-style-type: none">`;
+  }
   return `<ul${renderer.renderAttrs(tokens[index])} style="list-style-type: none">`;
 };
 
@@ -120,6 +123,9 @@ export const render_latex_list_item_close = () => {
 };
 export const render_itemize_list_close = () => {
   level_itemize--;
+  if ( level_itemize > 0) {
+    return `</ul></li>`
+  }
   return `</ul>`;
 };
 
