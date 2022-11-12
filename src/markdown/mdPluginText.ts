@@ -368,6 +368,56 @@ const abstractBlock: RuleBlock = (state, startLine) => {
   return true;
 };
 
+const pageBreaksBlock: RuleBlock = (state, startLine: number) => {
+  let token: Token, lineText: string,
+    pos: number = state.bMarks[startLine] + state.tShift[startLine],
+    max: number = state.eMarks[startLine];
+  let nextLine: number = startLine + 1;
+  let startPos: number = 0;
+  lineText = state.src.slice(pos, max).trim();
+  if (state.src.charCodeAt(pos) !== 0x5c /* \ */) {
+    return false;
+  }
+  const match: RegExpMatchArray = lineText
+    .slice(++startPos)
+    .match(/^(?:pagebreak|clearpage|newpage)/);
+  if (!match) {
+    return false;
+  }
+  startPos += match[0].length;
+  let strAfterEnd = '';
+  if (lineText.length > startPos) {
+    strAfterEnd = lineText.slice(startPos);
+  }
+  if (state.md.options.showHiddenTags || strAfterEnd?.trim()) {
+    token = state.push('paragraph_open', 'div', 1);
+    token.map = [startLine, nextLine];
+  }
+  token = state.push("pagebreak", "", 0);
+  token.content = '';
+  if (state.md.options.forLatex) {
+    token.latex = '\\' + match[0];
+    if (!strAfterEnd || !strAfterEnd.trim()) {
+      if (state.isEmpty(nextLine)) {
+        token.latex += '\n\n'
+      } else {
+        token.latex += '\n'
+      }
+    }
+  }
+  token.children = [];
+  if (strAfterEnd?.trim()) {
+    token = state.push('inline', '', 0);
+    token.content = strAfterEnd;
+    token.children = [];
+  }
+  if (state.md.options.showHiddenTags || strAfterEnd?.trim()) {
+    state.push('paragraph_close', 'div', -1);
+  }
+  state.line = nextLine;
+  return true;
+};
+
 const findEndMarker = (str: string, startPos: number = 0, beginMarker: string = "{", endMarker: string = "}", onlyEnd = false) => {
   let content: string = '';
   let nextPos: number = 0;
@@ -544,6 +594,28 @@ const textTypes: RuleInline = (state) => {
   token.children = children;
 
   state.push(type + '_close', "", 0);
+  state.pos = nextPos;
+  return true;
+};
+
+const pageBreaks: RuleInline = (state) => {
+  let startPos = state.pos;
+  if (state.src.charCodeAt(startPos) !== 0x5c /* \ */) {
+    return false;
+  }
+  const match = state.src
+    .slice(++startPos)
+    .match(/^(?:pagebreak|clearpage|newpage)/); // eslint-disable-line
+  if (!match) {
+    return false;
+  }
+  const nextPos = startPos + match[0].length;
+  const token = state.push("pagebreak", "", 0);
+  token.content = '';
+  if (state.md.options.forLatex) {
+    token.latex = '\\' + match[0];
+  } 
+  token.children = [];
   state.pos = nextPos;
   return true;
 };
@@ -814,6 +886,19 @@ const renderTextUrl = token => {
   return `<a href="#" class="text-url">${token.content}</a>`
 };
 
+const renderPageBreaks = (tokens, idx, options, env = {}, slf) => {
+  if (options?.showHiddenTags) {
+    let html = `<div class="page-break d-flex" style="display:flex; font-size:0.9rem;">`;
+    const hrEl = `<hr style="flex-grow:1; border:0; border-top:0.025rem solid #999; margin:auto"/>`;
+    html += hrEl;
+    html += '<span style="padding-left:0.5rem; padding-right:0.5rem; color:#999;">' + 'Page Break' + '</span>';
+    html += hrEl;
+    html += '</div>';
+    return html;
+  }
+  return '';
+};
+
 const mappingTextStyles = {
   textbf: "TextBold",
   textbf_open: "TextBoldOpen",
@@ -846,10 +931,12 @@ export default () => {
     md.block.ruler.before("heading", "headingSection", headingSection);
     md.block.ruler.before("headingSection", "separatingSpan", separatingSpan);
     md.block.ruler.before("paragraphDiv", "abstractBlock", abstractBlock);
+    md.block.ruler.before("paragraphDiv", "pageBreaksBlock", pageBreaksBlock);
 
     md.inline.ruler.before("multiMath", "textTypes", textTypes);
     md.inline.ruler.before("textTypes", "textAuthor", textAuthor);
     md.inline.ruler.before('textTypes', 'linkifyURL', linkifyURL);
+    md.inline.ruler.before('textTypes', 'pageBreaks', pageBreaks);
 
     Object.keys(mappingTextStyles).forEach(key => {
       md.renderer.rules[key] = (tokens, idx, options, env, slf) => {
@@ -904,6 +991,10 @@ export default () => {
         }
       }
     });
+    
+    md.renderer.rules.pagebreak = (tokens, idx, options, env = {}, slf) => {
+      return renderPageBreaks(tokens, idx, options, env, slf)
+    };
 
     md.renderer.rules.s_open = function (tokens, idx, options, env, self) {
       let i = 0;
