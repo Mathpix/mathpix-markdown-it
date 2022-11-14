@@ -389,7 +389,7 @@ const pageBreaksBlock: RuleBlock = (state, startLine: number) => {
   if (lineText.length > startPos) {
     strAfterEnd = lineText.slice(startPos);
   }
-  if (state.md.options.showHiddenTags || strAfterEnd?.trim()) {
+  if (state.md.options.showPageBreaks || strAfterEnd?.trim()) {
     token = state.push('paragraph_open', 'div', 1);
     token.map = [startLine, nextLine];
   }
@@ -411,7 +411,7 @@ const pageBreaksBlock: RuleBlock = (state, startLine: number) => {
     token.content = strAfterEnd;
     token.children = [];
   }
-  if (state.md.options.showHiddenTags || strAfterEnd?.trim()) {
+  if (state.md.options.showPageBreaks || strAfterEnd?.trim()) {
     state.push('paragraph_close', 'div', -1);
   }
   state.line = nextLine;
@@ -887,7 +887,7 @@ const renderTextUrl = token => {
 };
 
 const renderPageBreaks = (tokens, idx, options, env = {}, slf) => {
-  if (options?.showHiddenTags) {
+  if (options?.showPageBreaks) {
     let html = `<div class="page-break d-flex" style="display:flex; font-size:0.9rem;">`;
     const hrEl = `<hr style="flex-grow:1; border:0; border-top:0.025rem solid #999; margin:auto"/>`;
     html += hrEl;

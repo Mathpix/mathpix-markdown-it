@@ -31,7 +31,7 @@ export interface optionsMathpixMarkdown {
     toc?: TTocOptions;
     accessibility?: TAccessibility;
     nonumbers?: boolean;
-    showHiddenTags?: boolean;
+    showPageBreaks?: boolean;
 }
 export declare type TMarkdownItOptions = {
     isDisableFancy?: boolean;
@@ -65,7 +65,7 @@ export declare type TMarkdownItOptions = {
     toc?: TTocOptions;
     accessibility?: TAccessibility;
     nonumbers?: boolean;
-    showHiddenTags?: boolean;
+    showPageBreaks?: boolean;
 };
 export declare type TOutputMath = {
     include_mathml?: boolean;

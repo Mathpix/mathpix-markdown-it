@@ -23,7 +23,7 @@ export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
     toc = {},
     accessibility = null,
     nonumbers = false,
-    showHiddenTags = false
+    showPageBreaks = false
   } = options;
   Object.assign(md.options, smiles);
   Object.assign(md.options, {
@@ -37,7 +37,7 @@ export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
     enableFileLinks: enableFileLinks,
     accessibility: accessibility,
     nonumbers: nonumbers,
-    showHiddenTags: showHiddenTags 
+    showPageBreaks: showPageBreaks 
   });
 
   md

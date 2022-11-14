@@ -42,10 +42,10 @@ describe('Check Latex page break:', () => {
     });    
     
     const htmlShowHiddenTags = MM.markdownToHTML(test.latex, 
-      Object.assign({}, options, { showHiddenTags: true })).trim();
+      Object.assign({}, options, { showPageBreaks: true })).trim();
     describe('Latex => ' + test.latex, () => {
-      it('Checking result html with option showHiddenTags', (done) => {
-        htmlShowHiddenTags.should.equal(test.showHiddenTags);
+      it('Checking result html with option showPageBreaks', (done) => {
+        htmlShowHiddenTags.should.equal(test.showPageBreaks);
         done();
       });
     });

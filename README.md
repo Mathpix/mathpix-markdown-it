@@ -675,7 +675,7 @@ The `MathpixMarkdown` React element accepts the following props:
 | `htmlWrapper`    | [THtmlWrapper](https://github.com/Mathpix/mathpix-markdown-it#thtmlwrapper);*`{}`*          | Sets options for output full html page                                                                                 |
 | `accessibility`  | [TAccessibility](https://github.com/Mathpix/mathpix-markdown-it#taccessibility);*`{}`*        | Sets options to accessibility                                                                                          |
 | `nonumbers`      | boolean;*`false`*            | Sets options to prevent equations, tables, figure from being numbered                                                  |
-| `showHiddenTags` | boolean;*`false`*            | Hidden tags will be shown in html like page break                                                                      |
+| `showPageBreaks` | boolean;*`false`*            | Hidden tags will be shown in html like page break                                                                      |
 
 ### optionsMathpixMarkdown
 
@@ -699,7 +699,7 @@ The `MathpixMarkdown` React element accepts the following props:
 |                  |                              | Removes script tags and stuff. Removes broken and malicious html. Set to `false` to disable                            |
 | `smiles`         | [ISmilesOptions](https://github.com/Mathpix/mathpix-markdown-it#ismilesoptions);*`{}`*        | Sets options to output chemistry equation                                                                              |
 | `nonumbers`      | boolean;*`false`*            | Sets options to prevent equations, tables, figure from being numbered                                                  |
-| `showHiddenTags` | boolean;*`false`*            | Hidden tags will be shown in html like page break                                                                      |
+| `showPageBreaks` | boolean;*`false`*            | Hidden tags will be shown in html like page break                                                                      |
 
 ### TOutputMath
 
