@@ -15,7 +15,7 @@ class MathpixMarkdown extends React.Component<MathpixMarkdownProps> {
           enableFileLinks = false,
           accessibility = null,
           nonumbers = false,
-          showHiddenTags = false
+          showPageBreaks = false
         } = this.props;
         const disableRules = isDisableFancy ? MM.disableFancyArrayDef : this.props.disableRules || [];
         const markdownItOptions: TMarkdownItOptions = {
@@ -37,7 +37,7 @@ class MathpixMarkdown extends React.Component<MathpixMarkdownProps> {
             enableFileLinks: enableFileLinks,
             accessibility: accessibility,
             nonumbers: nonumbers,
-            showHiddenTags: showHiddenTags
+            showPageBreaks: showPageBreaks
         };
 
          MM.setOptions(disableRules, isCheckFormula, showTimeLog);
