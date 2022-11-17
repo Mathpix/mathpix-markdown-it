@@ -47,6 +47,8 @@ export interface optionsMathpixMarkdown {
     accessibility?: TAccessibility;
     nonumbers?: boolean;
     showPageBreaks?: boolean;
+    centerImages?: boolean;
+    centerTables?: boolean;
 }
 
 export type TMarkdownItOptions = {
@@ -82,6 +84,8 @@ export type TMarkdownItOptions = {
   accessibility?: TAccessibility;
   nonumbers?: boolean;
   showPageBreaks?: boolean;
+  centerImages?: boolean;
+  centerTables?: boolean;
 }
 
 export type TOutputMath = {
@@ -413,7 +417,9 @@ class MathpixMarkdown_Model {
           toc = {},
           accessibility = null,
           nonumbers = false,
-          showPageBreaks = false
+          showPageBreaks = false,
+          centerImages = true,
+          centerTables = true
         }
          = options || {};
 
@@ -449,7 +455,9 @@ class MathpixMarkdown_Model {
           toc: toc,
           accessibility: accessibility,
           nonumbers: nonumbers,
-          showPageBreaks: showPageBreaks
+          showPageBreaks: showPageBreaks,
+          centerImages: centerImages,
+          centerTables: centerTables
         };
 
         const styleFontSize = fontSize ? ` font-size: ${options.fontSize}px;` : '';
