@@ -15,7 +15,7 @@ global.document = jsdom.window.document;
 global.DOMParser = jsdom.window.DOMParser;
 
 
-describe('Check Mathjax with `nonumbers` option:', () => {
+describe('Check mmd image rendering:', () => {
   const tests = require('./_data/_image/_data');
   tests.forEach(function(test) {
     const html = MM.markdownToHTML(test.latex, options);

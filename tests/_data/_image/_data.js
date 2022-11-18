@@ -1,7 +1,7 @@
 module.exports = [
   {
     latex: "![original image](https://cdn.mathpix.com/snip/images/CJ2UE_bWzpjLlxKUaO9o69DgpbCy8d-E8_uBe2-IORY.original.fullsize.png)",
-    html: "<div><figure style=\"text-align: center\"><img src=\"https://cdn.mathpix.com/snip/images/CJ2UE_bWzpjLlxKUaO9o69DgpbCy8d-E8_uBe2-IORY.original.fullsize.png\" alt=\"original image\"></figure></div>",
+    html: "<div><figure style=\"text-align: center\"><img src=\"https://cdn.mathpix.com/snip/images/CJ2UE_bWzpjLlxKUaO9o69DgpbCy8d-E8_uBe2-IORY.original.fullsize.png\" alt=\"original image\" data-align=\"center\"></figure></div>",
     html_notCenterImages: "<div><figure><img src=\"https://cdn.mathpix.com/snip/images/CJ2UE_bWzpjLlxKUaO9o69DgpbCy8d-E8_uBe2-IORY.original.fullsize.png\" alt=\"original image\"></figure></div>",
   },
   {
@@ -41,14 +41,14 @@ test2</div>`
   {
     latex: `test1![original image](https://cdn.mathpix.com/snip/images/CJ2UE_bWzpjLlxKUaO9o69DgpbCy8d-E8_uBe2-IORY.original.fullsize.png ){width="50px", height="40px", right}
 test2`,
-    html: `<div>test1<img src="https://cdn.mathpix.com/snip/images/CJ2UE_bWzpjLlxKUaO9o69DgpbCy8d-E8_uBe2-IORY.original.fullsize.png" alt="original image" width="50px" height="40px" data-align="" style="width: 50px;height: 40px;"><br>
+    html: `<div>test1<img src="https://cdn.mathpix.com/snip/images/CJ2UE_bWzpjLlxKUaO9o69DgpbCy8d-E8_uBe2-IORY.original.fullsize.png" alt="original image" width="50px" height="40px" style="width: 50px;height: 40px;"><br>
 test2</div>`,
-    html_notCenterImages: `<div>test1<img src="https://cdn.mathpix.com/snip/images/CJ2UE_bWzpjLlxKUaO9o69DgpbCy8d-E8_uBe2-IORY.original.fullsize.png" alt="original image" width="50px" height="40px" data-align="" style="width: 50px;height: 40px;"><br>
+    html_notCenterImages: `<div>test1<img src="https://cdn.mathpix.com/snip/images/CJ2UE_bWzpjLlxKUaO9o69DgpbCy8d-E8_uBe2-IORY.original.fullsize.png" alt="original image" width="50px" height="40px" style="width: 50px;height: 40px;"><br>
 test2</div>`
   },  
   {
     latex: `![original image](https://cdn.mathpix.com/snip/images/CJ2UE_bWzpjLlxKUaO9o69DgpbCy8d-E8_uBe2-IORY.original.fullsize.png ){width="50px", height="40px"}test2`,
-    html: `<div><img src="https://cdn.mathpix.com/snip/images/CJ2UE_bWzpjLlxKUaO9o69DgpbCy8d-E8_uBe2-IORY.original.fullsize.png" alt="original image" width="50px" height="40px" data-align="" style="width: 50px;height: 40px;">test2</div>`,
+    html: `<div><img src="https://cdn.mathpix.com/snip/images/CJ2UE_bWzpjLlxKUaO9o69DgpbCy8d-E8_uBe2-IORY.original.fullsize.png" alt="original image" width="50px" height="40px" style="width: 50px;height: 40px;">test2</div>`,
     html_notCenterImages: `<div><img src="https://cdn.mathpix.com/snip/images/CJ2UE_bWzpjLlxKUaO9o69DgpbCy8d-E8_uBe2-IORY.original.fullsize.png" alt="original image" width="50px" height="40px" style="width: 50px;height: 40px;">test2</div>`
   },  
   // {

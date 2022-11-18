@@ -90,7 +90,6 @@ const parseImageParams = (str: string, align: string=''): IParseImageParams| nul
     res.push(['data-align', align]);
   }
   res.push(['style', style]);
-  latex += align ? latex ? ', ' + align : align : '';
   return style || res
     ? { attr: res,  align: align, latex: latex }
     : null;
@@ -292,6 +291,10 @@ export const imageWithSize = (state, silent) => {
     attrs = [ [ 'src', href ], [ 'alt', '' ] ];
     if (attrsStyles?.length) {
       attrs = attrs.concat(attrsStyles);
+    } else {
+      if (state.md.options.centerImages) {
+        attrs = attrs.concat([['data-align', 'center']])
+      }
     }
     token.attrs = attrs;
     token.children = tokens;
@@ -312,12 +315,8 @@ export const imageWithSize = (state, silent) => {
 
 export const renderRuleImage = (tokens, idx, options, env, slf) => {
   let token = tokens[idx];
-  let tokenBeforeType = idx - 1 >= 0 
-    ? tokens[idx-1].type
-    : '';
-  let tokenAfterType = idx + 1 < tokens.length 
-    ? tokens[idx+1].type 
-    : null;
+  let tokenBeforeType = idx - 1 >= 0 ? tokens[idx-1].type : '';
+  let tokenAfterType = idx + 1 < tokens.length ? tokens[idx+1].type : '';
 
   // "alt" attr MUST be set, even if empty. Because it's mandatory and
   // should be placed on proper position for tests.
@@ -332,13 +331,11 @@ export const renderRuleImage = (tokens, idx, options, env, slf) => {
     || (tokenAfterType === 'softbreak' && !tokenBeforeType)
     || (tokenBeforeType === 'softbreak' && tokenAfterType=== 'softbreak');
   let align = token.attrGet('data-align');
-  if (!canBeBlock && align) {
-    token.attrSet('data-align', '');
-  }
   
   if (canBeBlock) {
     if (!align && options.centerImages) {
       align = 'center';
+      token.attrSet('data-align', align);
     }
     let res = align 
       ? `<figure style="text-align: ${align}">` 
@@ -346,6 +343,12 @@ export const renderRuleImage = (tokens, idx, options, env, slf) => {
     res += slf.renderToken(tokens, idx, options);
     res += res = '</figure>';
     return res;
+  } else {
+    /** Remove data-align attribute from inline image */
+    if (align) {
+      const index = token.attrIndex('data-align');
+      token.attrs.splice(index, 1);
+    }
   }
   return slf.renderToken(tokens, idx, options);
 };
