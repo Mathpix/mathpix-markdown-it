@@ -196,7 +196,9 @@ const InlineBlockBeginTable: RuleBlock = (state, startLine) => {
   state.parentType = 'paragraph';
   state.env.label = label;
   state.env.caption = caption;
-  state.env.align = align;
+  const contentAlign = align ? align
+    : hasAlignTagG ? 'center' : '';
+  state.env.align = contentAlign;
   let latex = match[1] === 'figure' || match[1] === 'table'
     ? `\\begin{${match[1]}}[h]`
     : match[0];
@@ -209,7 +211,7 @@ const InlineBlockBeginTable: RuleBlock = (state, startLine) => {
     StatePushCaptionTable(state, type);
   }
 
-  StatePushTableContent(state, startLine, startLine + 1, content, align, type);
+  StatePushTableContent(state, startLine, startLine + 1, content, contentAlign, type);
 
   if (!captionFirst) {
     StatePushCaptionTable(state, type);
@@ -351,7 +353,9 @@ export const BeginTable: RuleBlock = (state, startLine, endLine) => {
   state.parentType = 'paragraph';
   state.env.label = label;
   state.env.caption = caption;
-  state.env.align = align;
+  const contentAlign = align ? align
+    : hasAlignTagG ? 'center' : '';
+  state.env.align = contentAlign;
   let latex = match[1] === 'figure' || match[1] === 'table'
     ? `\\begin{${match[1]}}[h]`
     : match[0];
@@ -374,7 +378,7 @@ export const BeginTable: RuleBlock = (state, startLine, endLine) => {
     nextLine += 1;
   }
   content = content.trim();
-  StatePushTableContent(state, startLine, nextLine, content, align, type);
+  StatePushTableContent(state, startLine, nextLine, content, contentAlign, type);
 
   if (!captionFirst) {
     StatePushCaptionTable(state, type);

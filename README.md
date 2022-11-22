@@ -676,6 +676,8 @@ The `MathpixMarkdown` React element accepts the following props:
 | `accessibility`  | [TAccessibility](https://github.com/Mathpix/mathpix-markdown-it#taccessibility);*`{}`*        | Sets options to accessibility                                                                                          |
 | `nonumbers`      | boolean;*`false`*            | Sets options to prevent equations, tables, figure from being numbered                                                  |
 | `showPageBreaks` | boolean;*`false`*            | Hidden tags will be shown in html like page break                                                                      |
+| `centerImages`   | boolean;*`true`*             | Center align images by default                                                                                         |
+| `centerTables`   | boolean;*`true`*             | Center align tables by default                                                                                         |
 
 ### optionsMathpixMarkdown
 
@@ -700,6 +702,8 @@ The `MathpixMarkdown` React element accepts the following props:
 | `smiles`         | [ISmilesOptions](https://github.com/Mathpix/mathpix-markdown-it#ismilesoptions);*`{}`*        | Sets options to output chemistry equation                                                                              |
 | `nonumbers`      | boolean;*`false`*            | Sets options to prevent equations, tables, figure from being numbered                                                  |
 | `showPageBreaks` | boolean;*`false`*            | Hidden tags will be shown in html like page break                                                                      |
+| `centerImages`   | boolean;*`true`*             | Center align images by default                                                                                         |
+| `centerTables`   | boolean;*`true`*             | Center align tables by default                                                                                         |
 
 ### TOutputMath
 
