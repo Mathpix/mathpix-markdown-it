@@ -16,6 +16,7 @@ const captionTagG: RegExp = /\\caption\s{0,}\{([^}]*)\}/g;
 const labelTag: RegExp = /\\label\s{0,}\{([^}]*)\}/;
 const labelTagG: RegExp = /\\label\s{0,}\{([^}]*)\}/g;
 const alignTagG: RegExp = /\\centering/g;
+const alignTagIncludeGraphicsG: RegExp = /\\includegraphics\[((.*)(center|left|right))\]\s{0,}\{([^{}]*)\}/g;
 
 enum TBegin {table = 'table', figure = 'figure'};
 
@@ -54,7 +55,7 @@ const StatePushCaptionTable = (state, type: string): void => {
   }
 };
 
-const StatePushPatagraphOpenTable = (state, startLine: number, nextLine: number, type: string, latex?:string) => {
+const StatePushPatagraphOpenTable = (state, startLine: number, nextLine: number, type: string, latex?:string, hasAlignTagG = false) => {
   let token: Token;
   let label = state.env.label;
   let align = state.env.align;
@@ -88,8 +89,20 @@ const StatePushPatagraphOpenTable = (state, startLine: number, nextLine: number,
         ['number', currentNumber.toString()]];
     }
   }
-
-  token.attrs.push(['style', `text-align: ${align ? align : 'center'}`]);
+  if (align) {
+    token.attrs.push(['style', `text-align: ${align}`]);
+    if (!hasAlignTagG && state.md.options.forLatex) {
+      if (type === TBegin.table && state.md.options.centerTables) {
+        token.attrSet('data-type', 'table');
+        token.attrSet('data-align', align);
+      }
+      if (type === TBegin.figure && state.md.options.centerImages) {
+        token.attrSet('data-type', 'figure');
+        token.attrSet('data-align', align);
+      }
+    }
+  }
+  
   token.map    = [startLine, nextLine];
 };
 
@@ -127,7 +140,6 @@ const StatePushTableContent = (state, startLine: number, nextLine: number, conte
 };
 
 const InlineBlockBeginTable: RuleBlock = (state, startLine) => {
-  let align = 'center';
   let caption: string;
   let label = '';
   let captionFirst: boolean = false;
@@ -153,9 +165,13 @@ const InlineBlockBeginTable: RuleBlock = (state, startLine) => {
   if (!matchE) {
     return false;
   }
-
+  let align = (state.md.options.centerTables && type === TBegin.table) 
+    || (state.md.options.centerImages && type === TBegin.figure)
+      ? 'center' : '';
   let content = lineText.slice(match.index + match[0].length, matchE.index);
   let hasAlignTagG = alignTagG.test(content);
+  const hasAlignTagIncludeGraphicsG = type === TBegin.figure
+    ? Boolean(content.match(alignTagIncludeGraphicsG)) : false;
   content = content.replace(alignTagG,'');
   matchE = content.match(captionTag);
   if (matchE) {
@@ -184,7 +200,7 @@ const InlineBlockBeginTable: RuleBlock = (state, startLine) => {
   let latex = match[1] === 'figure' || match[1] === 'table'
     ? `\\begin{${match[1]}}[h]`
     : match[0];
-  StatePushPatagraphOpenTable(state, startLine, startLine+1, type, latex);
+  StatePushPatagraphOpenTable(state, startLine, startLine+1, type, latex, hasAlignTagG || hasAlignTagIncludeGraphicsG);
   if (state.md.options.forLatex && hasAlignTagG) {
     token = state.push('latex_align', '', 0);
     token.latex = '\\centering';
@@ -205,6 +221,16 @@ const InlineBlockBeginTable: RuleBlock = (state, startLine) => {
   token = state.push('paragraph_close', 'div', -1);
   if (state.md.options.forLatex && match && match[1]) {
     token.latex = `\\end{${match[1]}}`
+  }
+  if (!hasAlignTagG && !hasAlignTagIncludeGraphicsG && state.md.options.forLatex) {
+    if (type === TBegin.table && state.md.options.centerTables) {
+      token.attrSet('data-type', 'table');
+      token.attrSet('data-align', align);
+    }
+    if (type === TBegin.figure && state.md.options.centerImages) {
+      token.attrSet('data-type', 'figure');
+      token.attrSet('data-align', align);
+    }
   }
   state.line = startLine+1;
   return true;
@@ -244,7 +270,9 @@ export const BeginTable: RuleBlock = (state, startLine, endLine) => {
       return true;
     }
   }
-  let align = 'center';
+  let align = (state.md.options.centerTables && type === TBegin.table)
+    || (state.md.options.centerImages && type === TBegin.figure) ? 'center' : '';
+  
   let caption: string;
   let label = '';
   let captionFirst: boolean = false;
@@ -297,6 +325,9 @@ export const BeginTable: RuleBlock = (state, startLine, endLine) => {
   }
   let hasAlignTagG = alignTagG.test(resText);
   content = resText.replace(alignTagG,'');
+  const hasAlignTagIncludeGraphicsG = type === TBegin.figure 
+    ? Boolean(content.match(alignTagIncludeGraphicsG)) : false;
+  
   matchE = content.match(captionTag);
   if (matchE) {
     caption = matchE[1];
@@ -324,7 +355,8 @@ export const BeginTable: RuleBlock = (state, startLine, endLine) => {
   let latex = match[1] === 'figure' || match[1] === 'table'
     ? `\\begin{${match[1]}}[h]`
     : match[0];
-  StatePushPatagraphOpenTable(state, startLine, (pE > 0) ? nextLine  : nextLine + 1, type, latex);
+  StatePushPatagraphOpenTable(state, startLine, (pE > 0) ? nextLine  : nextLine + 1, type, latex, 
+    hasAlignTagG || hasAlignTagIncludeGraphicsG);
   if (state.md.options.forLatex && hasAlignTagG) {
     token = state.push('latex_align', '', 0);
     token.latex = '\\centering';
@@ -354,6 +386,16 @@ export const BeginTable: RuleBlock = (state, startLine, endLine) => {
   token = state.push('paragraph_close', 'div', -1);
   if (state.md.options.forLatex && match && match[1]) {
     token.latex = `\\end{${match[1]}}`
+  }
+  if (!hasAlignTagG && !hasAlignTagIncludeGraphicsG && state.md.options.forLatex) {
+    if (type === TBegin.table && state.md.options.centerTables) {
+      token.attrSet('data-type', 'table');
+      token.attrSet('data-align', align);
+    }
+    if (type === TBegin.figure && state.md.options.centerImages) {
+      token.attrSet('data-type', 'figure');
+      token.attrSet('data-align', align);
+    }
   }
   state.line = nextLine;
   return true;
