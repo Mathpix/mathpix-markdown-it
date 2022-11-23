@@ -23,7 +23,9 @@ export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
     toc = {},
     accessibility = null,
     nonumbers = false,
-    showPageBreaks = false
+    showPageBreaks = false,
+    centerImages = true,
+    centerTables = true
   } = options;
   Object.assign(md.options, smiles);
   Object.assign(md.options, {
@@ -37,7 +39,9 @@ export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
     enableFileLinks: enableFileLinks,
     accessibility: accessibility,
     nonumbers: nonumbers,
-    showPageBreaks: showPageBreaks 
+    showPageBreaks: showPageBreaks,
+    centerImages: centerImages,
+    centerTables: centerTables
   });
 
   md

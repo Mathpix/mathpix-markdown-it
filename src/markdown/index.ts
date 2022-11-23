@@ -17,7 +17,9 @@ const mdInit = (options: TMarkdownItOptions) => {
     toc = {},
     accessibility = null,
     nonumbers = false,
-    showPageBreaks = false
+    showPageBreaks = false,
+    centerImages = true,
+    centerTables = true
   } = options;
   const mmdOptions = {
     width: width,
@@ -31,7 +33,9 @@ const mdInit = (options: TMarkdownItOptions) => {
     toc: toc,
     accessibility: accessibility,
     nonumbers: nonumbers,
-    showPageBreaks: showPageBreaks
+    showPageBreaks: showPageBreaks,
+    centerImages: centerImages,
+    centerTables: centerTables
   };
   let md = require("markdown-it")({
     html: htmlTags,

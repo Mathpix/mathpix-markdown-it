@@ -99,9 +99,9 @@ export const MathpixStyle = (setTextAlignJustify: boolean = false, useColors: bo
     }
 
     #setText table, #preview-content table {
-        display: block; 
+        display: table; 
         overflow: auto;
-        width: 100%;
+        max-width: 100%;
         border-collapse: collapse;
         page-break-inside: avoid;
     }

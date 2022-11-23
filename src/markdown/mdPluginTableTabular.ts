@@ -30,7 +30,7 @@ export default (md: MarkdownIt, options) => {
     return InlineDecimal(tokens, tokens[idx]);
   };
   md.renderer.rules.includegraphics = (tokens, idx, options, env, slf) => {
-    return IncludeGraphics(tokens, tokens[idx], slf, width);
+    return IncludeGraphics(tokens, tokens[idx], slf, width, options);
   }
 
 }

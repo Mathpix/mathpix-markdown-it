@@ -9,6 +9,7 @@ import {
   getWidthFromDocument
 } from './utils';
 import { openTagMML, closeTagMML } from './common/consts';
+import { imageWithSize, renderRuleImage } from './md-inline-rule/image';
 
 let mathNumber = [];
 
@@ -912,6 +913,8 @@ export default options => {
     md.inline.ruler.push("simpleMath", simpleMath);
     md.inline.ruler.before("multiMath", "asciiMath", asciiMath);
     md.inline.ruler.before("asciiMath", "backtickAsAsciiMath", backtickAsAsciiMath);
+    /** Replace image inline rule */
+    md.inline.ruler.at('image', imageWithSize);
 
 
     Object.keys(mapping).forEach(key => {
@@ -936,5 +939,7 @@ export default options => {
         }
       }
     });
+    
+    md.renderer.rules.image = (tokens, idx, options, env, slf) => renderRuleImage(tokens, idx, options, env, slf);
   };
 };

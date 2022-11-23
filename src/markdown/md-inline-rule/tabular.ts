@@ -32,6 +32,9 @@ export const inlineTabular = (state, silent) => {
 
       for (let j = 0; j < res.length;  j++) {
         let tok = res[j];
+        if (tok.token === 'table_open' && state.md.options?.forDocx ) {
+          tok.attrs.push(['data-type', 'subtable'])
+        }
         if (tok.token === 'inline') {
           let children = [];
           state.env.tabulare = state.md.options.outMath.include_tsv

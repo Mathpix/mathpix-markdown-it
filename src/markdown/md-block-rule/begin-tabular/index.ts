@@ -114,12 +114,20 @@ export const parseInlineTabular = (str: string): TTypeContentList | null => {
   return res;
 };
 
-const StatePushParagraphOpen = (state, startLine: number, align: string) => {
+const StatePushParagraphOpen = (state, startLine: number, align: string, centerTables = false) => {
   let token: Token;
   token = state.push('paragraph_open', 'div', 1);
   token.attrs = [['class', 'table_tabular ']];
-  token.attrs.push(['style', `text-align: ${align ? align : 'center'}`]);
-
+  if (align) {
+    token.attrs.push(['style', `text-align: ${align}`]);
+  } else {
+    if (centerTables) {
+      token.attrs.push(['style', `text-align: center}`]);
+    }
+  }
+  if (centerTables && state.md.options.forLatex) {
+    token.attrs.push(['data-align', align])
+  }
   token.map = [startLine, state.line];
 };
 
@@ -205,13 +213,13 @@ export const StatePushDiv = (state, startLine: number, nextLine: number, content
   state.push('paragraph_close', 'div', -1);
 };
 
-export const StatePushTabularBlock = (state, startLine: number, nextLine: number, content: string, align: string): boolean => {
+export const StatePushTabularBlock = (state, startLine: number, nextLine: number, content: string, align: string, centerTables = false): boolean => {
   const cTabular = parseInlineTabular(content);
   if (!cTabular || cTabular.length === 0) {
     return CheckParseError(state, startLine, nextLine, content)
   }
   state.line = nextLine;
-  StatePushParagraphOpen(state, startLine, align);
+  StatePushParagraphOpen(state, startLine, align, centerTables);
   StatePushTabulars(state, cTabular, align);
   StatePushParagraphClose(state);
   return true;
@@ -281,5 +289,9 @@ export const BeginTabular: RuleBlock = (state, startLine: number, endLine: numbe
     // quirk for blockquotes, this line should already be checked by that rule
     if (state.sCount[nextLine] < 0) { continue; }
   }
-  return StatePushTabularBlock(state, startLine, nextLine, resString, 'center');
+  if (state.md.options.centerTables) {
+    return StatePushTabularBlock(state, startLine, nextLine, resString, 'center', true);
+  } else {
+    return StatePushTabularBlock(state, startLine, nextLine, resString, '');
+  }
 };

@@ -15,11 +15,13 @@ export const InlineDecimal = (a, token) => {
   return `<span class="f">${arr[0]}</span><span class="decimal_left">${arr[1]?arr[1]:''}</span><span class="f">.${arr[2]?arr[2]:''}</span>`;
 };
 
-export const IncludeGraphics = (a, token, slf, width) => {
+export const IncludeGraphics = (a, token, slf, width, options) => {
   const textWidthTag: RegExp = /\\textwidth|\\linewidth/;
-  let  style = `text-align: ${token.attrGet('align')
-    ? token.attrGet('align')
-    : 'center'}; `;
+  let align = token.attrGet('align');
+  if (!align && options.centerImages) {
+    align = 'center';
+  }
+  let style = align ? `text-align: ${align}; ` : '';
   const h = token.attrGet('height');
   let styleImg = h ? `height: ${h}; ` : '';
   let w = token.attrGet('width');
@@ -39,7 +41,8 @@ export const IncludeGraphics = (a, token, slf, width) => {
   }
   if (!styleImg) {
     const textWidth = width ? width : getTextWidth();
-    styleImg  += `width: ${0.5 * textWidth}px; `;
+    /** max-width - prevent small images from being stretched */
+    styleImg  += `max-width: ${0.5 * textWidth}px; `;
   }
 
   const src = token.attrGet('src') ? `src=${token.attrGet('src')}` : '';
