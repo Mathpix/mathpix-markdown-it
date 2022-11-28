@@ -19,7 +19,8 @@ const mdInit = (options: TMarkdownItOptions) => {
     nonumbers = false,
     showPageBreaks = false,
     centerImages = true,
-    centerTables = true
+    centerTables = true,
+    enableCodeBlockRuleToLatexCommands = false
   } = options;
   const mmdOptions = {
     width: width,
@@ -36,7 +37,8 @@ const mdInit = (options: TMarkdownItOptions) => {
     nonumbers: nonumbers,
     showPageBreaks: showPageBreaks,
     centerImages: centerImages,
-    centerTables: centerTables
+    centerTables: centerTables,
+    enableCodeBlockRuleToLatexCommands: enableCodeBlockRuleToLatexCommands
   };
   let md = require("markdown-it")({
     html: htmlTags,

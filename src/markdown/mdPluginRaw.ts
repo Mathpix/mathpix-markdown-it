@@ -903,7 +903,9 @@ export default options => {
   return md => {
     Object.assign(md.options, options);
     md.block.ruler.before("paragraph", "paragraphDiv", paragraphDiv);
-    md.block.ruler.at("code", codeBlock);
+    if (!md.options.enableCodeBlockRuleToLatexCommands) {
+      md.block.ruler.at("code", codeBlock);
+    }
     md.inline.ruler.before("escape", "usepackage", usepackage);
     md.block.ruler.before("html_block", "mathMLBlock", mathMLBlock);
     md.inline.ruler.before("html_inline", "mathML", inlineMathML);

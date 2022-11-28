@@ -50,6 +50,7 @@ export interface optionsMathpixMarkdown {
     showPageBreaks?: boolean;
     centerImages?: boolean;
     centerTables?: boolean;
+    enableCodeBlockRuleToLatexCommands?: boolean;
 }
 
 export type TMarkdownItOptions = {
@@ -88,6 +89,7 @@ export type TMarkdownItOptions = {
   showPageBreaks?: boolean;
   centerImages?: boolean;
   centerTables?: boolean;
+  enableCodeBlockRuleToLatexCommands?: boolean;
 }
 
 export type TOutputMath = {
@@ -421,7 +423,8 @@ class MathpixMarkdown_Model {
           nonumbers = false,
           showPageBreaks = false,
           centerImages = true,
-          centerTables = true
+          centerTables = true,
+          enableCodeBlockRuleToLatexCommands = false
         }
          = options || {};
 
@@ -460,7 +463,8 @@ class MathpixMarkdown_Model {
           nonumbers: nonumbers,
           showPageBreaks: showPageBreaks,
           centerImages: centerImages,
-          centerTables: centerTables
+          centerTables: centerTables,
+          enableCodeBlockRuleToLatexCommands: enableCodeBlockRuleToLatexCommands
         };
 
         const styleFontSize = fontSize ? ` font-size: ${options.fontSize}px;` : '';

@@ -25,7 +25,8 @@ export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
     nonumbers = false,
     showPageBreaks = false,
     centerImages = true,
-    centerTables = true
+    centerTables = true,
+    enableCodeBlockRuleToLatexCommands = false
   } = options;
   Object.assign(md.options, smiles);
   Object.assign(md.options, {
@@ -41,7 +42,8 @@ export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
     nonumbers: nonumbers,
     showPageBreaks: showPageBreaks,
     centerImages: centerImages,
-    centerTables: centerTables
+    centerTables: centerTables,
+    enableCodeBlockRuleToLatexCommands: enableCodeBlockRuleToLatexCommands
   });
 
   md
