@@ -48,6 +48,16 @@ Mathpix Markdown addresses these limitations by adding support for the following
 OC(=O)c1cc(Cl)cs1
 ```
 ~~~
+- images (Markdown). Parse and render additional parameters such as width, height, alignment:
+~~~
+![foo](foo.png){ width=50% }
+![foo](foo.png){ width="36px" }
+![image](<src> "title"){width="20px",height="20px"}
+![image](<src> "title"){width="20px",height="20px",right}
+![image](<src> "title"){width="20px",height="20px", align="left"}
+~~~
+![Image properties](assets/mmd-image-properties.webp)
+
 
 # What is mathpix-markdown-it? 
 
