@@ -48,6 +48,16 @@ Mathpix Markdown addresses these limitations by adding support for the following
 OC(=O)c1cc(Cl)cs1
 ```
 ~~~
+- images (Markdown). Parse and render additional parameters such as width, height, alignment:
+~~~
+![foo](foo.png){ width=50% }
+![foo](foo.png){ width="36px" }
+![image](<src> "title"){width="20px",height="20px"}
+![image](<src> "title"){width="20px",height="20px",right}
+![image](<src> "title"){width="20px",height="20px", align="left"}
+~~~
+![Image properties](assets/mmd-image-properties.webp)
+
 
 # What is mathpix-markdown-it? 
 
@@ -678,6 +688,8 @@ The `MathpixMarkdown` React element accepts the following props:
 | `showPageBreaks` | boolean;*`false`*            | Hidden tags will be shown in html like page break                                                                      |
 | `centerImages`   | boolean;*`true`*             | Center align images by default                                                                                         |
 | `centerTables`   | boolean;*`true`*             | Center align tables by default                                                                                         |
+| `validateLink`   | function;*`null`*            | The function `(url: string) => void` to override md link validator                                                     |
+| `enableCodeBlockRuleForLatexCommands`| boolean;*`false`* | By default, if latex commands are indented (4 spaces / 1 tab) they do not become `Code Blocks`.               |
 
 ### optionsMathpixMarkdown
 
@@ -704,6 +716,8 @@ The `MathpixMarkdown` React element accepts the following props:
 | `showPageBreaks` | boolean;*`false`*            | Hidden tags will be shown in html like page break                                                                      |
 | `centerImages`   | boolean;*`true`*             | Center align images by default                                                                                         |
 | `centerTables`   | boolean;*`true`*             | Center align tables by default                                                                                         |
+| `validateLink`   | function;*`null`*            | The function `(url: string) => void` to override md link validator                                                     |
+| `enableCodeBlockRuleForLatexCommands`| boolean;*`false`* | By default, if latex commands are indented (4 spaces / 1 tab) they do not become `Code Blocks`.               |
 
 ### TOutputMath
 

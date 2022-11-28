@@ -16,6 +16,7 @@ export interface optionsMathpixMarkdown {
     typographer?: boolean;
     linkify?: boolean;
     enableFileLinks?: boolean;
+    validateLink?: (url: string) => void;
     xhtmlOut?: boolean;
     width?: number;
     showToc?: boolean;
@@ -34,6 +35,7 @@ export interface optionsMathpixMarkdown {
     showPageBreaks?: boolean;
     centerImages?: boolean;
     centerTables?: boolean;
+    enableCodeBlockRuleForLatexCommands?: boolean;
 }
 export declare type TMarkdownItOptions = {
     isDisableFancy?: boolean;
@@ -45,6 +47,7 @@ export declare type TMarkdownItOptions = {
     typographer?: boolean;
     linkify?: boolean;
     enableFileLinks?: boolean;
+    validateLink?: (url: string) => void;
     xhtmlOut?: boolean;
     width?: number;
     lineNumbering?: boolean;
@@ -70,6 +73,7 @@ export declare type TMarkdownItOptions = {
     showPageBreaks?: boolean;
     centerImages?: boolean;
     centerTables?: boolean;
+    enableCodeBlockRuleForLatexCommands?: boolean;
 };
 export declare type TOutputMath = {
     include_mathml?: boolean;

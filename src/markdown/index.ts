@@ -13,13 +13,14 @@ const mdInit = (options: TMarkdownItOptions) => {
     isDisableEmoji=false,
     isDisableEmojiShortcuts=false,
     maxWidth = '',
-    enableFileLinks = false,
+    enableFileLinks = false, validateLink = null,
     toc = {},
     accessibility = null,
     nonumbers = false,
     showPageBreaks = false,
     centerImages = true,
-    centerTables = true
+    centerTables = true,
+    enableCodeBlockRuleForLatexCommands = false
   } = options;
   const mmdOptions = {
     width: width,
@@ -30,12 +31,14 @@ const mdInit = (options: TMarkdownItOptions) => {
     forDocx: forDocx,
     maxWidth: maxWidth,
     enableFileLinks: enableFileLinks,
+    validateLink: validateLink,
     toc: toc,
     accessibility: accessibility,
     nonumbers: nonumbers,
     showPageBreaks: showPageBreaks,
     centerImages: centerImages,
-    centerTables: centerTables
+    centerTables: centerTables,
+    enableCodeBlockRuleForLatexCommands: enableCodeBlockRuleForLatexCommands
   };
   let md = require("markdown-it")({
     html: htmlTags,

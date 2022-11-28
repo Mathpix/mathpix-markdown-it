@@ -87,10 +87,17 @@ export const MathpixStyle = (setTextAlignJustify: boolean = false, useColors: bo
     }
 
     #preview-content pre, #setText pre {
-        border: 1px solid #ccc;
-        page-break-inside: avoid;
-        padding: 0.5em;
+        border: none;
+        padding: 0;
+        overflow: auto;
+        font-size: 85%;
+        line-height: 1.45;
+        border-radius: 6px;
+        box-sizing: border-box;
         ${useColors ? 'background: #f8f8fa;' : ''}
+    }
+    #preview-content pre code, #setText pre code{
+        padding: 1rem;
     }
     .empty {
         text-align: center;
