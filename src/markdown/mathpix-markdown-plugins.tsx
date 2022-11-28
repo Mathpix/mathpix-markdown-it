@@ -19,7 +19,7 @@ import { validateLinkEnableFile } from "./mdOptions";
 export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
   const {width = 1200,  outMath = {}, smiles = {}, mathJax = {}, renderElement = {}, forDocx = false, forLatex = false,
     maxWidth = '',
-    enableFileLinks = false,
+    enableFileLinks = false, validateLink = null,
     toc = {},
     accessibility = null,
     nonumbers = false,
@@ -58,8 +58,10 @@ export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
     md.use(mdPluginSvgToBase64);
   }
 
-  if (enableFileLinks) {
-    md.validateLink = validateLinkEnableFile;
+  if (enableFileLinks || validateLink) {
+    md.validateLink = validateLink 
+      ? validateLink 
+      : validateLinkEnableFile;
   }
 };
 

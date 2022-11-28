@@ -31,6 +31,7 @@ export interface optionsMathpixMarkdown {
     typographer?: boolean,
     linkify?: boolean,
     enableFileLinks?: boolean,
+    validateLink?: (url: string) => void;
     xhtmlOut?: boolean,
     width?: number;
     showToc?: boolean;
@@ -61,6 +62,7 @@ export type TMarkdownItOptions = {
   typographer?: boolean,
   linkify?: boolean,
   enableFileLinks?: boolean,
+  validateLink?: (url: string) => void,
   xhtmlOut?: boolean,
   width?: number,
   lineNumbering?: boolean,
@@ -413,7 +415,7 @@ class MathpixMarkdown_Model {
           overflowY='unset', breaks = true, typographer = true, linkify = true, xhtmlOut = false,
           outMath = {}, mathJax = {}, htmlSanitize = {}, smiles = {}, openLinkInNewWindow = true,
           maxWidth='',
-          enableFileLinks=false,
+          enableFileLinks=false, validateLink = null,
           toc = {},
           accessibility = null,
           nonumbers = false,
@@ -452,6 +454,7 @@ class MathpixMarkdown_Model {
           openLinkInNewWindow: openLinkInNewWindow,
           maxWidth: maxWidth,
           enableFileLinks: enableFileLinks,
+          validateLink: validateLink,
           toc: toc,
           accessibility: accessibility,
           nonumbers: nonumbers,
