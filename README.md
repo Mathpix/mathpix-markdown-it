@@ -689,7 +689,7 @@ The `MathpixMarkdown` React element accepts the following props:
 | `centerImages`   | boolean;*`true`*             | Center align images by default                                                                                         |
 | `centerTables`   | boolean;*`true`*             | Center align tables by default                                                                                         |
 | `validateLink`   | function;*`null`*            | The function `(url: string) => void` to override md link validator                                                     |
-| `enableCodeBlockRuleToLatexCommands`| boolean;*`false`* | By default for latex commands is to ignore rule `Code blocks` are normally indented four spaces or one tab.    |
+| `enableCodeBlockRuleForLatexCommands`| boolean;*`false`* | By default, if latex commands are indented (4 spaces / 1 tab) they do not become `Code Blocks`.               |
 
 ### optionsMathpixMarkdown
 
@@ -717,7 +717,7 @@ The `MathpixMarkdown` React element accepts the following props:
 | `centerImages`   | boolean;*`true`*             | Center align images by default                                                                                         |
 | `centerTables`   | boolean;*`true`*             | Center align tables by default                                                                                         |
 | `validateLink`   | function;*`null`*            | The function `(url: string) => void` to override md link validator                                                     |
-| `enableCodeBlockRuleToLatexCommands`| boolean;*`false`* | By default for latex commands is to ignore rule `Code blocks` are normally indented four spaces or one tab.    |
+| `enableCodeBlockRuleForLatexCommands`| boolean;*`false`* | By default, if latex commands are indented (4 spaces / 1 tab) they do not become `Code Blocks`.               |
 
 ### TOutputMath
 

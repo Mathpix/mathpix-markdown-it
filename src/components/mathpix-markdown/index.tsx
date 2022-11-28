@@ -18,7 +18,7 @@ class MathpixMarkdown extends React.Component<MathpixMarkdownProps> {
           showPageBreaks = false,
           centerImages = true,
           centerTables = true,
-          enableCodeBlockRuleToLatexCommands = false
+          enableCodeBlockRuleForLatexCommands = false
         } = this.props;
         const disableRules = isDisableFancy ? MM.disableFancyArrayDef : this.props.disableRules || [];
         const markdownItOptions: TMarkdownItOptions = {
@@ -44,7 +44,7 @@ class MathpixMarkdown extends React.Component<MathpixMarkdownProps> {
             showPageBreaks: showPageBreaks,
             centerImages: centerImages,
             centerTables: centerTables,
-            enableCodeBlockRuleToLatexCommands: enableCodeBlockRuleToLatexCommands
+            enableCodeBlockRuleForLatexCommands: enableCodeBlockRuleForLatexCommands
         };
 
          MM.setOptions(disableRules, isCheckFormula, showTimeLog);

@@ -35,7 +35,7 @@ export interface optionsMathpixMarkdown {
     showPageBreaks?: boolean;
     centerImages?: boolean;
     centerTables?: boolean;
-    enableCodeBlockRuleToLatexCommands?: boolean;
+    enableCodeBlockRuleForLatexCommands?: boolean;
 }
 export declare type TMarkdownItOptions = {
     isDisableFancy?: boolean;
@@ -73,7 +73,7 @@ export declare type TMarkdownItOptions = {
     showPageBreaks?: boolean;
     centerImages?: boolean;
     centerTables?: boolean;
-    enableCodeBlockRuleToLatexCommands?: boolean;
+    enableCodeBlockRuleForLatexCommands?: boolean;
 };
 export declare type TOutputMath = {
     include_mathml?: boolean;

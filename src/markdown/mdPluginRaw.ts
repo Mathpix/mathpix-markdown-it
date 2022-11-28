@@ -903,7 +903,7 @@ export default options => {
   return md => {
     Object.assign(md.options, options);
     md.block.ruler.before("paragraph", "paragraphDiv", paragraphDiv);
-    if (!md.options.enableCodeBlockRuleToLatexCommands) {
+    if (!md.options.enableCodeBlockRuleForLatexCommands) {
       md.block.ruler.at("code", codeBlock);
     }
     md.inline.ruler.before("escape", "usepackage", usepackage);
