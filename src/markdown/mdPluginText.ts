@@ -204,15 +204,23 @@ const headingSection: RuleBlock = (state, startLine: number, endLine: number) =>
   state.md.inline.parse(token.content.trim(), state.md, state.env, children);
   token.children = children;
 
+  if (type === "section") {
+    state.env.section = state.env.section ? state.env.section + 1 : 1;
+  }
+  
   if (type === "subsection") {
     token.secNumber = subsectionParentCount;
     token.isNewSect = isNewSect;
-    isNewSect = false
+    isNewSect = false;
+    state.env.subsection = !token.isNewSect 
+      ? state.env.subsection ? state.env.subsection + 1 : 1 : 1;
   }
   if (type === "subsubsection") {
     token.secNumber = subsectionParentCount;
     token.isNewSubSection = isNewSubSection;
-    isNewSubSection = false
+    isNewSubSection = false;
+    state.env.subsubsection = !token.isNewSubSection
+      ? state.env.subsubsection ? state.env.subsubsection + 1 : 1 : 1;
   }
 
   token = state.push('heading_close', 'h' + String(level), -1);

@@ -13,8 +13,7 @@ export const openTag: RegExp = /\\begin\s{0,}\{(table|figure)\}/;
 export const openTagH: RegExp = /\\begin\s{0,}\{(table|figure)\}\s{0,}\[(H|\!H|H\!|h|\!h|h\!|t|\!t|b|\!b|p|\!p)\]/;
 const captionTag: RegExp = /\\caption\s{0,}\{([^}]*)\}/;
 const captionTagG: RegExp = /\\caption\s{0,}\{([^}]*)\}/g;
-const labelTag: RegExp = /\\label\s{0,}\{([^}]*)\}/;
-const labelTagG: RegExp = /\\label\s{0,}\{([^}]*)\}/g;
+import { labelTag, labelTagG } from "../common/consts";
 const alignTagG: RegExp = /\\centering/g;
 const alignTagIncludeGraphicsG: RegExp = /\\includegraphics\[((.*)(center|left|right))\]\s{0,}\{([^{}]*)\}/g;
 
