@@ -1,5 +1,6 @@
 import { RuleBlock, Token } from 'markdown-it';
 import {SetItemizeLevelTokens, GetItemizeLevelTokensByState, GetEnumerateLevel} from "./re-level";
+import { SetTokensBlockParse } from"../helper";
 export enum TBegin {itemize = 'itemize', enumerate = 'enumerate'};
 const openTag: RegExp = /\\begin\s{0,}\{(itemize|enumerate)\}/;
 export const bItemTag: RegExp = /^(?:item\s{0,}\[([^\]]*)\]|item)/;
@@ -28,23 +29,6 @@ const setTokenListItemOpenBlock = (state, startLine, endLine, marker, li, iLevel
   token.prentLevel = state.prentLevel;
   token.itemizeLevel = iLevel;
   token.enumerateLevel = eLevel;
-};
-
-const SetTokensBlockParse = (state, content, startLine?, endLine?) => {
-  let token;
-  let children = [];
-  state.md.block.parse(content, state.md, state.env, children);
-
-  for (let j = 0; j < children.length; j++) {
-    const child = children[j];
-    token = state.push(child.type, child.tag, child.nesting);
-    token.attrs = child.attrs;
-    if (startLine && endLine) {
-      token.map = [startLine, endLine];
-    }
-    token.content = child.content;
-    token.children = child.children;
-  }
 };
 
 const ListItemsBlock = (state, items) => {

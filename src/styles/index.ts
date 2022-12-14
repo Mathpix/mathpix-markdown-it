@@ -28,6 +28,10 @@ export const MathpixStyle = (setTextAlignJustify: boolean = false, useColors: bo
         margin-top: 0;
         margin-bottom: 1em;
         ${setTextAlignJustify ? 'text-align: justify;' : ''}
+    }    
+    
+    .proof > div, .theorem > div {
+        margin-top: 1rem;
     }
 
     #preview-content table {
