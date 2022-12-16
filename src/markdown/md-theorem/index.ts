@@ -22,22 +22,21 @@ const renderTheoremOpen = (tokens, idx, options, env, slf) => {
   let styleBody = "";
   switch (envStyle) {
     case "definition":
-      styleTile = "font-weight: 600; font-style: normal;";
-      styleDescription = "font-style: normal; margin-right: 10px";
+      styleTile = "font-weight: bold; font-style: normal;";
+      styleDescription = "font-style: normal;";
       styleBody = "font-style: normal;";
       break;    
     case "plain":
-      styleTile = "font-weight: 600; font-style: normal;";
-      styleDescription = "font-weight: 600; font-style: normal; margin-right: 10px";
+      styleTile = "font-weight: bold; font-style: normal;";
+      styleDescription = "font-weight: bold; font-style: normal;";
       styleBody = "font-style: italic;";
       break;    
     case "remark":
       styleTile = "font-style: italic;";
-      styleDescription = "font-style: normal; margin-right: 10px";
+      styleDescription = "font-style: normal;";
       styleBody = "font-style: normal;";
       break;
   }
-  styleTile += envDescription ? " margin-right: 6px" : " margin-right: 10px";
   styleBody += " padding: 10px 0;";
   
   if (envIndex !== -1) {
@@ -52,13 +51,21 @@ const renderTheoremOpen = (tokens, idx, options, env, slf) => {
     textTitle += envStyle === "plain" ? '.' : textDescription ? '' : '.';
     textDescription += textDescription && envStyle === "plain" ? '' : '.';
     
-    const htmlDescription = envDescription ? `<span style="${styleDescription}">${textDescription}</span>` : '';
-    const htmlPrint = `<span style="${styleTile}">${textTitle}</span>`;
+    let htmlDescription = envDescription ? `<span style="${styleDescription}">${textDescription}</span>` : '';
+    let htmlPrint = `<span style="${styleTile}" class="theorem-title">${textTitle}</span>`;
+    const htmlSpaceMin = options.forDocx 
+      ? '<span>&nbsp;</span>'
+      : '<span style="margin-right: 10px"></span>';
+    const htmlSpace = options.forDocx 
+      ? '<span>&nbsp;&nbsp;</span>'
+      : '<span style="margin-right: 16px"></span>';
+    htmlPrint += envDescription ? htmlSpaceMin : htmlSpace;
+    htmlDescription += envDescription ? htmlSpace : '';
     const htmlTitle = htmlPrint + htmlDescription;
     
     return labelRef 
       ? `<div id="${labelRef}" class="theorem" style="${styleBody}">` + htmlTitle
-      : '<div class="theorem" style="${styleBody}">' + htmlTitle;
+      : `<div class="theorem" style="${styleBody}">` + htmlTitle;
   }
   return `<div class="theorem" style="${styleBody}">`;
 };
@@ -68,23 +75,18 @@ const renderProofOpen = (tokens, idx, options, env, slf) => {
   const envLabel = token.envLabel;
 
   const labelRef = envLabel ? encodeURIComponent(envLabel) : '';
-  const styleTile = "font-style: italic; margin-right: 10px";
+  const styleTile = "font-style: italic;";
   const styleBody = "font-style: normal; padding: 10px 0;";
-  const htmlTitle = `<span style="${styleTile}">Proof.</span>`;
+  let htmlTitle = `<span style="${styleTile}">Proof.</span>`;
+  const htmlSpaceMin = options.forDocx 
+  ? '<span>&nbsp;</span>'
+  : '<span style="margin-right: 10px"></span>';
+  htmlTitle += htmlSpaceMin;
 
   return labelRef
     ? `<div id="${labelRef}" class="proof" style="${styleBody}">` + htmlTitle
     : '<div class="proof" style="${styleBody}">' + htmlTitle;
 };
-
-// const renderQEDSymbol = (tokens, idx, options, env, slf) => {
-//   const token = tokens[idx];
-//   let qedHtml = '';
-//   for (let i = 0; i < token.children.length; i++) {
-//     qedHtml += slf.renderToken(token.children, i, options, env, slf);
-//   }
-//   return `<span>${qedHtml}</span>`;
-// };
 
 export const mappingTheorems = {
   newtheorem: "newtheorem",
