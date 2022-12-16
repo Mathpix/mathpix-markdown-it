@@ -6,7 +6,8 @@ import {
   reNewTheoremUnNumbered,
   reTheoremStyle,
   defTheoremStyle,
-  reNewCommandQedSymbol
+  reNewCommandQedSymbol,
+  labelTag
 } from "../common/consts";
 import { addTheoremEnvironment } from "./helper";
 
@@ -158,3 +159,29 @@ export const newCommandQedSymbol: RuleInline = (state) => {
   state.pos = nextPos;
   return true;
 };
+
+export const labelLatex: RuleInline = (state) => {
+  if (!state.md.options.forLatex) {
+    return false;
+  }
+  let startPos = state.pos;
+  if (state.src.charCodeAt(startPos) !== 0x5c /* \ */) {
+    return false;
+  }
+  let nextPos: number = startPos;
+  let latex: string = "";
+  let match: RegExpMatchArray =  state.src
+    .slice(startPos)
+    .match(labelTag);
+  if (!match) {
+    return false;
+  }
+  latex = match[0];
+  nextPos += match[0].length;
+  const token = state.push("label", "", 0);
+  token.content = "";
+  token.children = [];
+  token.latex = latex;
+  state.pos = nextPos;
+  return true;
+}

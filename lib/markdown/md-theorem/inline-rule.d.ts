@@ -19,3 +19,4 @@ export declare const newTheorem: RuleInline;
  * \renewcommand\qedsymbol{QED}
  */
 export declare const newCommandQedSymbol: RuleInline;
+export declare const labelLatex: RuleInline;

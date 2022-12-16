@@ -93,12 +93,18 @@ export const newTheoremBlock: RuleBlock = (state, startLine: number) => {
     const item = children[j];
     if (item.type === "newtheorem" || item.type === "theoremstyle" || item.type === "renewcommand_qedsymbol") {
       itemBefore = item;
+      if (state.md.options.forLatex) {
+        token.children.push(item);
+      }
       continue;
     }
 
     if ((itemBefore?.type === "newtheorem" || itemBefore?.type === "theoremstyle" || itemBefore?.type === "renewcommand_qedsymbol")
       && item.type === "softbreak") {
       itemBefore = item;
+      if (state.md.options.forLatex) {
+        token.children.push(item);
+      }
       continue;
     }
     token.children.push(item);
@@ -163,6 +169,8 @@ export const BeginTheorem: RuleBlock = (state, startLine, endLine) => {
     resText = lineText.slice(match.index + match[0].length)
   }
 
+  let latexBegin: string = match[0];
+  let latexEnd: string = "";
   for (; nextLine < endLine; nextLine++) {
     pos = state.bMarks[nextLine] + state.tShift[nextLine];
     max = state.eMarks[nextLine];
@@ -199,6 +207,7 @@ export const BeginTheorem: RuleBlock = (state, startLine, endLine) => {
   let matchE: RegExpMatchArray = lineText.match(closeTag);
   if (matchE) {
     resText += lineText.slice(0, matchE.index);
+    latexEnd = matchE[0];
     // pE = matchE.index
   }
 
@@ -218,7 +227,9 @@ export const BeginTheorem: RuleBlock = (state, startLine, endLine) => {
   match = resText.match(labelTag);
   if (match) {
     label = match[1];
-    resText = resText.replace(labelTagG, '')
+    if (!state.md.options.forLatex) {
+      resText = resText.replace(labelTagG, '')
+    }
   }
 
   const envIndex = envName
@@ -234,6 +245,9 @@ export const BeginTheorem: RuleBlock = (state, startLine, endLine) => {
   token.envLabel = label;
   token.envNumber = theoremNumber;
   token.envStyle = theoremEnvironments[envIndex].style;
+  if (state.md.options.forLatex) {
+    token.latex = latexBegin;
+  }
 
   if (label) {
     const index = envNumbers.findIndex(item => item.label === label);
@@ -248,6 +262,9 @@ export const BeginTheorem: RuleBlock = (state, startLine, endLine) => {
   SetTokensBlockParse(state, resText, 0, 0, true);
 
   token = state.push('theorem_close', 'div', -1);
+  if (state.md.options.forLatex) {
+    token.latex = latexEnd;
+  }
   token = state.push('paragraph_close', 'div', -1);
   return true;
 };
@@ -289,6 +306,8 @@ export const BeginProof: RuleBlock = (state, startLine, endLine) => {
     resText = lineText.slice(match.index + match[0].length)
   }
 
+  let latexBegin: string = match[0];
+  let latexEnd: string = "";
   for (; nextLine < endLine; nextLine++) {
     pos = state.bMarks[nextLine] + state.tShift[nextLine];
     max = state.eMarks[nextLine];
@@ -325,6 +344,7 @@ export const BeginProof: RuleBlock = (state, startLine, endLine) => {
   let matchE: RegExpMatchArray = lineText.match(closeTag);
   if (matchE) {
     resText += lineText.slice(0, matchE.index);
+    latexEnd = matchE[0];
     // pE = matchE.index
   }
   
@@ -350,6 +370,9 @@ export const BeginProof: RuleBlock = (state, startLine, endLine) => {
   token = state.push('proof_open', 'div', 1);
   token.envLabel = label;
   token.envNumber = proofNumber;
+  if (state.md.options.forLatex) {
+    token.latex = latexBegin;
+  }
 
   if (label) {
     const index = envNumbers.findIndex(item => item.label === label);
@@ -369,8 +392,7 @@ export const BeginProof: RuleBlock = (state, startLine, endLine) => {
   for (let j = 0; j < children.length; j++) {
     const child = children[j];
     
-    if (j === children.length - 1) {
-      
+    if ((j === children.length - 1) && !state.md.options.forLatex) {
       token = state.push("qedsymbol_open", "", 0);
       token.content = "";
       token.children = [];      
@@ -405,6 +427,9 @@ export const BeginProof: RuleBlock = (state, startLine, endLine) => {
   }
   
   token = state.push('proof_close', 'div', -1);
+  if (state.md.options.forLatex) {
+    token.latex = latexEnd;
+  }
   token = state.push('paragraph_close', 'div', -1);
   return true;
 };
