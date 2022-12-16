@@ -6,8 +6,7 @@ import {
   reNewTheoremUnNumbered,
   reTheoremStyle,
   defTheoremStyle,
-  reNewCommandQedSymbol,
-  labelTag
+  reNewCommandQedSymbol
 } from "../common/consts";
 import { addTheoremEnvironment } from "./helper";
 
@@ -172,7 +171,7 @@ export const labelLatex: RuleInline = (state) => {
   let latex: string = "";
   let match: RegExpMatchArray =  state.src
     .slice(startPos)
-    .match(labelTag);
+    .match(/^\\label\s{0,}\{([^}]*)\}/);
   if (!match) {
     return false;
   }
