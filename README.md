@@ -58,6 +58,30 @@ OC(=O)c1cc(Cl)cs1
 ~~~
 ![Image properties](assets/mmd-image-properties.webp)
 
+- [theorems and proofs](doc/theorems.md)
+
+```text
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+
+\begin{theorem}
+Let \(f\) be a function whose derivative exists in every point, then \(f\) 
+is a continuous function.
+\end{theorem}
+
+\begin{lemma}
+Given two line segments whose lengths are \(a\) and \(b\) respectively there 
+is a real number \(r\) such that \(b=ra\).
+\end{lemma}
+
+\begin{proof}
+To prove it by contradiction try and assume that the statement is false,
+proceed from there and at some point you will arrive to a contradiction.
+\end{proof}
+```
+
+![](doc/images/theorems_and_proofs.png)
+
 
 # What is mathpix-markdown-it? 
 

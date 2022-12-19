@@ -10,6 +10,10 @@ import {
 } from './utils';
 import { openTagMML, closeTagMML } from './common/consts';
 import { imageWithSize, renderRuleImage } from './md-inline-rule/image';
+import { renderTheorems } from './md-theorem';
+import { getTheoremNumberByLabel, resetTheoremEnvironments } from './md-theorem/helper';
+import { newTheoremBlock } from './md-theorem/block-rule';
+import { newTheorem, theoremStyle, newCommandQedSymbol, labelLatex } from './md-theorem/inline-rule';
 
 let mathNumber = [];
 
@@ -622,18 +626,19 @@ const renderUsepackage = (token, options) => {
 
 const renderReference = token => {
   const id: string = encodeURIComponent(token.content);
+  const theoremNumber = getTheoremNumberByLabel(token.content);
   if (token.type === "reference_note_block") {
     return `<div class="math-block"><a href="#${id}"
            style="cursor: pointer; text-decoration: none;"
            class="clickable-link"
            value=${id}
-        >${mathNumber[token.content] || '[' + token.content + ']'} </a></div>`
+        >${mathNumber[token.content] || theoremNumber || '[' + token.content + ']'} </a></div>`
   } else {
     return `<a href="#${id}"
            style="cursor: pointer; text-decoration: none;"
            class="clickable-link"
            value=${id}
-        >${mathNumber[token.content] || '[' + token.content + ']'} </a>`;
+        >${mathNumber[token.content] || theoremNumber || '[' + token.content + ']'} </a>`;
   }
 };
 
@@ -902,16 +907,22 @@ export default options => {
 
   return md => {
     Object.assign(md.options, options);
+    resetTheoremEnvironments();
     md.block.ruler.before("paragraph", "paragraphDiv", paragraphDiv);
     if (!md.options.enableCodeBlockRuleForLatexCommands) {
       md.block.ruler.at("code", codeBlock);
     }
+    md.block.ruler.before("ReNewCommand", "newTheoremBlock", newTheoremBlock)
     md.inline.ruler.before("escape", "usepackage", usepackage);
     md.block.ruler.before("html_block", "mathMLBlock", mathMLBlock);
     md.inline.ruler.before("html_inline", "mathML", inlineMathML);
     md.inline.ruler.before("escape", "refs", refs);
     md.inline.ruler.before("escape", "multiMath", multiMath);
     md.inline.ruler.before("multiMath", "inlineTabular", inlineTabular);
+    md.inline.ruler.before("multiMath", "labelLatex", labelLatex);
+    md.inline.ruler.before("multiMath", "theoremStyle", theoremStyle); /** Parse \theoremstyle */
+    md.inline.ruler.before("multiMath", "newTheorem", newTheorem); /** Parse \newtheorem */
+    md.inline.ruler.before("renewcommand_inline", "newCommandQedSymbol", newCommandQedSymbol); /** Parse \\renewcommand\qedsymbol{$\blacksquare$} */
     md.inline.ruler.push("simpleMath", simpleMath);
     md.inline.ruler.before("multiMath", "asciiMath", asciiMath);
     md.inline.ruler.before("asciiMath", "backtickAsAsciiMath", backtickAsAsciiMath);
@@ -943,5 +954,6 @@ export default options => {
     });
     
     md.renderer.rules.image = (tokens, idx, options, env, slf) => renderRuleImage(tokens, idx, options, env, slf);
+    renderTheorems(md);
   };
 };
