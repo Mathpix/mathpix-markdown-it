@@ -9,5 +9,9 @@ export declare const mappingTheorems: {
     qedsymbol_open: string;
     qedsymbol_close: string;
     renewcommand_qedsymbol: string;
+    theorem_description_open: string;
+    theorem_description_close: string;
+    theorem_print_open: string;
+    theorem_print_close: string;
 };
 export declare const renderTheorems: (md: any) => void;

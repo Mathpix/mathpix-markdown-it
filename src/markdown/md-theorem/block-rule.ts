@@ -48,7 +48,7 @@ export const newTheoremBlock: RuleBlock = (state, startLine: number) => {
 
   content = state.getLines(startLine, nextLine, state.blkIndent, false).trim();
 
-  const testNewTheorem = /\\newtheorem([^}]*)\s{0,}\{(?<name>[\w\s]+)\}/;
+  const testNewTheorem = /\\newtheorem([^}]*)\s{0,}\{(?<name>[^}]*)\}/;
   if (!testNewTheorem.test(content) && !reNewCommandQedSymbolG.test(content)) {
     return false;
   }
@@ -210,8 +210,7 @@ export const BeginTheorem: RuleBlock = (state, startLine, endLine) => {
     latexEnd = matchE[0];
     // pE = matchE.index
   }
-
-
+  
   state.line = nextLine + 1;
   token = state.push('paragraph_open', 'div', 1);
   token.map = [startLine, state.line];
@@ -244,10 +243,49 @@ export const BeginTheorem: RuleBlock = (state, startLine, endLine) => {
   token.envDescription = envDescription;
   token.envLabel = label;
   token.envNumber = theoremNumber;
-  token.envStyle = theoremEnvironments[envIndex].style;
+
+  const envItem = theoremEnvironments[envIndex];
+  token.envStyle = envItem.style;
+  
   if (state.md.options.forLatex) {
     token.latex = latexBegin;
   }
+
+  if (!state.md.options.forLatex) {
+    token = state.push("theorem_print_open", "", 0);
+    token.envStyle = envItem.style;
+    token.latex = envItem.print;
+    token.content = "";
+    token.children = [];
+    token = state.push("inline", "", 0);
+    token.content = envItem.print;
+    token.children = [];
+    token = state.push("theorem_print_close", "", 0);
+    token.envNumber = theoremNumber;
+    token.envStyle = envItem.style;
+    token.envDescription = envDescription;
+    token.environment = envName;
+    token.content = "";
+    token.children = [];
+    
+    if (envDescription) {
+      token = state.push("theorem_description_open", "", 0);
+      token.envStyle = envItem.style;
+      token.envDescription = envDescription;
+      token.latex = envDescription;
+      token.content = "";
+      token.children = [];
+      token = state.push("inline", "", 0);
+      token.content = envDescription;
+      token.children = [];
+      token = state.push("theorem_description_close", "", 0);
+      token.envStyle = envItem.style;
+      token.envDescription = envDescription;
+      token.content = "";
+      token.children = [];
+    }
+  }
+
 
   if (label) {
     const index = envNumbers.findIndex(item => item.label === label);

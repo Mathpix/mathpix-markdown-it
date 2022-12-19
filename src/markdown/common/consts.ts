@@ -23,14 +23,14 @@ export const closeTagSpan = new RegExp('(?:' + close_tag_span + ')');
 export const labelTag: RegExp = /\\label\s{0,}\{([^}]*)\}/;
 export const labelTagG: RegExp = /\\label\s{0,}\{([^}]*)\}/g;
 
-export const openTag: RegExp = /\\begin\s{0,}\{(?<name>[\w\s]+)\}/;
-export const openTagDescription: RegExp = /\\begin\s{0,}\{(?<name>[\w\s]+)\}\s{0,}\[(?<description>[\w\s]+)\]/;
+export const openTag: RegExp = /\\begin\s{0,}\{(?<name>[^}]*)\}/;
+export const openTagDescription: RegExp = /\\begin\s{0,}\{(?<name>[^}]*)\}\s{0,}\[(?<description>[^\]]*)\]/;
 export const openTagProof: RegExp = /\\begin\s{0,}\{([proof\s]+)\}/;
 
-export const reNewTheorem: RegExp = /^\\newtheorem\s{0,}\{(?<name>[\w\s]+)\}\s{0,}\{(?<print>[\w\s]+)\}/;
-export const reNewTheoremNumbered: RegExp = /^\\newtheorem\s{0,}\{(?<name>[\w\s]+)\}\s{0,}\{(?<print>[\w\s]+)\}\s{0,}\[(?<numbered>[\w\s]+)\]/;
-export const reNewTheoremNumbered2: RegExp = /^\\newtheorem\s{0,}\{(?<name>[\w\s]+)\}\s{0,}\[(?<numbered>[\w\s]+)\]\s{0,}\{(?<print>[\w\s]+)\}/;
-export const reNewTheoremUnNumbered: RegExp = /^\\newtheorem\*\s{0,}\{(?<name>[\w\s]+)\}\s{0,}\{(?<print>[\w\s]+)\}/;
+export const reNewTheorem: RegExp = /^\\newtheorem\s{0,}\{(?<name>[^}]*)\}\s{0,}\{(?<print>[^}]*)\}/;
+export const reNewTheoremNumbered: RegExp = /^\\newtheorem\s{0,}\{(?<name>[^}]*)\}\s{0,}\{(?<print>[^}]*)\}\s{0,}\[(?<numbered>[^\]]*)\]/;
+export const reNewTheoremNumbered2: RegExp = /^\\newtheorem\s{0,}\{(?<name>[^}]*)\}\s{0,}\[(?<numbered>[^\]]*)\]\s{0,}\{(?<print>[^}]*)\}/;
+export const reNewTheoremUnNumbered: RegExp = /^\\newtheorem\*\s{0,}\{(?<name>[^}]*)\}\s{0,}\{(?<print>[^}]*)\}/;
 export const reTheoremStyle: RegExp = /\\theoremstyle\s{0,}\{(definition|plain|remark)\}/;
 export const defTheoremStyle = "plain";
 export const reNewCommandQedSymbol: RegExp = /^\\renewcommand\s{0,}\\qedsymbol\s{0,}\{(?<qed>[^}]*)\}/;
