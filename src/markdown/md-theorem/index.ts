@@ -147,6 +147,7 @@ export const mappingTheorems = {
   theorem_description_close: "theorem_description_close",
   theorem_print_open: "theorem_print_open",
   theorem_print_close: "theorem_print_close",
+  theorem_setcounter: "theorem_setcounter",
 };
 
 export const renderTheorems = (md: MarkdownIt) => {
@@ -156,6 +157,7 @@ export const renderTheorems = (md: MarkdownIt) => {
         case "newtheorem":
         case "theoremstyle":
         case "renewcommand_qedsymbol":
+        case "theorem_setcounter":
           return '';
         case "theorem_open":
           return renderTheoremOpen(tokens, idx, options, env, slf);         

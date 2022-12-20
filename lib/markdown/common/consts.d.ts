@@ -16,10 +16,13 @@ export declare const reNewTheoremNumbered: RegExp;
 export declare const reNewTheoremNumbered2: RegExp;
 export declare const reNewTheoremUnNumbered: RegExp;
 export declare const reTheoremStyle: RegExp;
+export declare const reTheoremStyleG: RegExp;
 export declare const defTheoremStyle = "plain";
 export declare const reNewCommandQedSymbol: RegExp;
 export declare const reNewCommandQedSymbolG: RegExp;
 export declare const defQED = "$\\square$";
+export declare const reSetCounter: RegExp;
+export declare const reSetCounterG: RegExp;
 export declare const latexEnvironments: string[];
 /** https://docs.mathjax.org/en/v3.0-latest/input/tex/macros/index.html#environments */
 export declare const mathEnvironments: string[];

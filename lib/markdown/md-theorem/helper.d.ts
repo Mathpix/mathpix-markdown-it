@@ -13,6 +13,7 @@ export declare let envNumbers: any[];
 export declare let counterProof: number;
 export declare const getNextCounterProof: () => number;
 export declare const addTheoremEnvironment: (data: ITheoremEnvironment) => void;
+export declare const setCounterTheoremEnvironment: (envName: string, num: number) => boolean;
 export declare const getTheoremEnvironment: (name: string) => ITheoremEnvironment;
 export declare const getTheoremEnvironmentIndex: (name: string) => number;
 export declare const resetTheoremEnvironments: () => void;

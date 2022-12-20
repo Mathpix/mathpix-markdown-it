@@ -25,6 +25,18 @@ export const addTheoremEnvironment = (data: ITheoremEnvironment) => {
   }
 };
 
+export const setCounterTheoremEnvironment = (envName: string, num: number): boolean => {
+  const envIndex = envName
+    ? getTheoremEnvironmentIndex(envName)
+    : -1;
+  if (envIndex === -1) {
+    return false;
+  }
+  const envItem = theoremEnvironments[envIndex];
+  envItem.counter = num;
+  return true;
+};
+
 export const getTheoremEnvironment = (name: string) => {
   return theoremEnvironments?.length
     ? theoremEnvironments.find(item => item.name === name)

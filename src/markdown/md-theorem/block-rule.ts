@@ -10,7 +10,9 @@ import {
   openTagDescription,
   openTagProof,
   reNewCommandQedSymbolG,
-  defQED
+  defQED,
+  reTheoremStyleG,
+  reSetCounterG
 } from "../common/consts";
 import {
   theoremEnvironments,
@@ -49,7 +51,11 @@ export const newTheoremBlock: RuleBlock = (state, startLine: number) => {
   content = state.getLines(startLine, nextLine, state.blkIndent, false).trim();
 
   const testNewTheorem = /\\newtheorem([^}]*)\s{0,}\{(?<name>[^}]*)\}/;
-  if (!testNewTheorem.test(content) && !reNewCommandQedSymbolG.test(content)) {
+  if (!testNewTheorem.test(content) 
+    && !reNewCommandQedSymbolG.test(content)
+    && !reTheoremStyleG.test(content)
+    && !reSetCounterG.test(content)
+  ) {
     return false;
   }
 
@@ -61,7 +67,8 @@ export const newTheoremBlock: RuleBlock = (state, startLine: number) => {
     ? children.findIndex(item => (
       item.type === "newtheorem" 
       || item.type === "theoremstyle" 
-      || item.type === "renewcommand_qedsymbol" ))
+      || item.type === "renewcommand_qedsymbol"
+      || item.type === "theorem_setcounter" ))
     : -1;
 
   if (newTheoremIndex === -1) {
@@ -74,6 +81,7 @@ export const newTheoremBlock: RuleBlock = (state, startLine: number) => {
       && item.type !== "theoremstyle"
       && item.type !== "softbreak"
       && item.type !== "renewcommand_qedsymbol"
+      && item.type !== "theorem_setcounter"
     ));
   state.line = nextLine;
   token = state.push('paragraph_open', 'div', 1);
@@ -91,7 +99,8 @@ export const newTheoremBlock: RuleBlock = (state, startLine: number) => {
   let itemBefore = null;
   for (let j = 0; j < children.length; j++) {
     const item = children[j];
-    if (item.type === "newtheorem" || item.type === "theoremstyle" || item.type === "renewcommand_qedsymbol") {
+    if (item.type === "newtheorem" || item.type === "theoremstyle" 
+      || item.type === "renewcommand_qedsymbol" || item.type === "theorem_setcounter") {
       itemBefore = item;
       if (state.md.options.forLatex) {
         token.children.push(item);
@@ -99,7 +108,8 @@ export const newTheoremBlock: RuleBlock = (state, startLine: number) => {
       continue;
     }
 
-    if ((itemBefore?.type === "newtheorem" || itemBefore?.type === "theoremstyle" || itemBefore?.type === "renewcommand_qedsymbol")
+    if ((itemBefore?.type === "newtheorem" || itemBefore?.type === "theoremstyle" 
+      || itemBefore?.type === "renewcommand_qedsymbol" || itemBefore?.type === "theorem_setcounter")
       && item.type === "softbreak") {
       itemBefore = item;
       if (state.md.options.forLatex) {

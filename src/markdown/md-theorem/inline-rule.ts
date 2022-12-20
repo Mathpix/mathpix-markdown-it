@@ -6,9 +6,14 @@ import {
   reNewTheoremUnNumbered,
   reTheoremStyle,
   defTheoremStyle,
-  reNewCommandQedSymbol
+  reNewCommandQedSymbol,
+  reSetCounter
 } from "../common/consts";
-import { addTheoremEnvironment } from "./helper";
+import {
+  addTheoremEnvironment,
+  setCounterTheoremEnvironment
+} from "./helper";
+import {reNumber} from "../md-block-rule/lists";
 
 /**
  * \theoremstyle{definition} | \theoremstyle{plain} | \theoremstyle{remark}
@@ -118,6 +123,46 @@ export const newTheorem: RuleInline = (state) => {
     style: state.env?.theoremstyle ? state.env?.theoremstyle : defTheoremStyle
   });
   const token = state.push("newtheorem", "", 0);
+  token.content = "";
+  token.children = [];
+  if (state.md.options.forLatex) {
+    token.latex = content;
+  }
+  state.pos = nextPos;
+  return true;
+};
+
+export const setCounterTheorem: RuleInline = (state) => {
+  let startPos = state.pos;
+  if (state.src.charCodeAt(startPos) !== 0x5c /* \ */) {
+    return false;
+  }
+  let envName: string = "";
+  let numStr: string = "";
+  let nextPos: number = startPos;
+  let content: string = "";
+  let match: RegExpMatchArray = state.src
+    .slice(startPos)
+    .match(reSetCounter);
+
+  if (!match) {
+    return false;
+  }
+  content = match[0];
+  nextPos += match[0].length;
+  envName = match.groups?.name ? match.groups.name : match[1];
+  if (!envName) {
+    return false;
+  }
+  numStr = match.groups?.number ? match.groups.number : match[2];
+  numStr = numStr ? numStr.trim() : '';
+  const num = numStr && reNumber.test(numStr)
+    ? Number(match[2].trim()) : 0;
+  const res: boolean = setCounterTheoremEnvironment(envName, num);
+  if (!res) {
+    return false;
+  }
+  const token = state.push("theorem_setcounter", "", 0);
   token.content = "";
   token.children = [];
   if (state.md.options.forLatex) {

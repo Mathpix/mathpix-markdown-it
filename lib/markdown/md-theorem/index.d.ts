@@ -13,5 +13,6 @@ export declare const mappingTheorems: {
     theorem_description_close: string;
     theorem_print_open: string;
     theorem_print_close: string;
+    theorem_setcounter: string;
 };
 export declare const renderTheorems: (md: any) => void;

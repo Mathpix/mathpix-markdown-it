@@ -293,14 +293,126 @@ is a continuous function.</div>
 is a continuous function.</div>
 </div></div>`
   },  
-  // {
-  //   latex: '',
-  //   html: ``
-  // },  
-  // {
-  //   latex: '',
-  //   html: ``
-  // },  
+  {
+    latex: '\\newtheorem{theorem}{Theorem}\n' +
+      '\n' +
+      '\\section{Introduction}\n' +
+      'Theorems can easily be defined:\n' +
+      '\n' +
+      '\\begin{theorem}\n' +
+      'Let \\(f\\) be a function whose derivative exists in every point, then \\(f\\) \n' +
+      'is a continuous function.\n' +
+      '\\end{theorem}\n' +
+      '\n' +
+      '\\setcounter{theorem}{0}\n' +
+      '\n' +
+      '\\begin{theorem}\n' +
+      'Let \\(f\\) be a function whose derivative exists in every point, then \\(f\\) \n' +
+      'is a continuous function.\n' +
+      '\\end{theorem}\n' +
+      '\n' +
+      '\\setcounter{theorem}{-3}\n' +
+      '\n' +
+      '\\begin{theorem}\n' +
+      'Let \\(f\\) be a function whose derivative exists in every point, then \\(f\\) \n' +
+      'is a continuous function.\n' +
+      '\\end{theorem}',
+    html: `<div style="margin-top: 0; margin-bottom: 0;"></div>
+<h2 type="section" class="section-title" id="introduction">
+<span class="section-number">1. </span>Introduction</h2>
+<div>Theorems can easily be defined:</div>
+<div>
+<div class="theorem" style="font-style: italic; padding: 10px 0;"><span style="font-weight: bold; font-style: normal;" class="theorem-title">Theorem 1.</span><span style="margin-right: 16px"></span><div style="display: inline" data-display="inline">Let <span class="math-inline ">
+<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.464ex" xmlns="http://www.w3.org/2000/svg" width="1.244ex" height="2.059ex" role="img" focusable="false" viewBox="0 -705 550 910"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="66" d="M118 -162Q120 -162 124 -164T135 -167T147 -168Q160 -168 171 -155T187 -126Q197 -99 221 27T267 267T289 382V385H242Q195 385 192 387Q188 390 188 397L195 425Q197 430 203 430T250 431Q298 431 298 432Q298 434 307 482T319 540Q356 705 465 705Q502 703 526 683T550 630Q550 594 529 578T487 561Q443 561 443 603Q443 622 454 636T478 657L487 662Q471 668 457 668Q445 668 434 658T419 630Q412 601 403 552T387 469T380 433Q380 431 435 431Q480 431 487 430T498 424Q499 420 496 407T491 391Q489 386 482 386T428 385H372L349 263Q301 15 282 -47Q255 -132 212 -173Q175 -205 139 -205Q107 -205 81 -186T55 -132Q55 -95 76 -78T118 -61Q162 -61 162 -103Q162 -122 151 -136T127 -157L118 -162Z"></path></g></g></g></svg></mjx-container></span> be a function whose derivative exists in every point, then <span class="math-inline ">
+<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.464ex" xmlns="http://www.w3.org/2000/svg" width="1.244ex" height="2.059ex" role="img" focusable="false" viewBox="0 -705 550 910"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="66" d="M118 -162Q120 -162 124 -164T135 -167T147 -168Q160 -168 171 -155T187 -126Q197 -99 221 27T267 267T289 382V385H242Q195 385 192 387Q188 390 188 397L195 425Q197 430 203 430T250 431Q298 431 298 432Q298 434 307 482T319 540Q356 705 465 705Q502 703 526 683T550 630Q550 594 529 578T487 561Q443 561 443 603Q443 622 454 636T478 657L487 662Q471 668 457 668Q445 668 434 658T419 630Q412 601 403 552T387 469T380 433Q380 431 435 431Q480 431 487 430T498 424Q499 420 496 407T491 391Q489 386 482 386T428 385H372L349 263Q301 15 282 -47Q255 -132 212 -173Q175 -205 139 -205Q107 -205 81 -186T55 -132Q55 -95 76 -78T118 -61Q162 -61 162 -103Q162 -122 151 -136T127 -157L118 -162Z"></path></g></g></g></svg></mjx-container></span><br>
+is a continuous function.</div>
+</div></div>
+<div style="margin-top: 0; margin-bottom: 0;"></div>
+<div>
+<div class="theorem" style="font-style: italic; padding: 10px 0;"><span style="font-weight: bold; font-style: normal;" class="theorem-title">Theorem 1.</span><span style="margin-right: 16px"></span><div style="display: inline" data-display="inline">Let <span class="math-inline ">
+<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.464ex" xmlns="http://www.w3.org/2000/svg" width="1.244ex" height="2.059ex" role="img" focusable="false" viewBox="0 -705 550 910"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="66" d="M118 -162Q120 -162 124 -164T135 -167T147 -168Q160 -168 171 -155T187 -126Q197 -99 221 27T267 267T289 382V385H242Q195 385 192 387Q188 390 188 397L195 425Q197 430 203 430T250 431Q298 431 298 432Q298 434 307 482T319 540Q356 705 465 705Q502 703 526 683T550 630Q550 594 529 578T487 561Q443 561 443 603Q443 622 454 636T478 657L487 662Q471 668 457 668Q445 668 434 658T419 630Q412 601 403 552T387 469T380 433Q380 431 435 431Q480 431 487 430T498 424Q499 420 496 407T491 391Q489 386 482 386T428 385H372L349 263Q301 15 282 -47Q255 -132 212 -173Q175 -205 139 -205Q107 -205 81 -186T55 -132Q55 -95 76 -78T118 -61Q162 -61 162 -103Q162 -122 151 -136T127 -157L118 -162Z"></path></g></g></g></svg></mjx-container></span> be a function whose derivative exists in every point, then <span class="math-inline ">
+<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.464ex" xmlns="http://www.w3.org/2000/svg" width="1.244ex" height="2.059ex" role="img" focusable="false" viewBox="0 -705 550 910"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="66" d="M118 -162Q120 -162 124 -164T135 -167T147 -168Q160 -168 171 -155T187 -126Q197 -99 221 27T267 267T289 382V385H242Q195 385 192 387Q188 390 188 397L195 425Q197 430 203 430T250 431Q298 431 298 432Q298 434 307 482T319 540Q356 705 465 705Q502 703 526 683T550 630Q550 594 529 578T487 561Q443 561 443 603Q443 622 454 636T478 657L487 662Q471 668 457 668Q445 668 434 658T419 630Q412 601 403 552T387 469T380 433Q380 431 435 431Q480 431 487 430T498 424Q499 420 496 407T491 391Q489 386 482 386T428 385H372L349 263Q301 15 282 -47Q255 -132 212 -173Q175 -205 139 -205Q107 -205 81 -186T55 -132Q55 -95 76 -78T118 -61Q162 -61 162 -103Q162 -122 151 -136T127 -157L118 -162Z"></path></g></g></g></svg></mjx-container></span><br>
+is a continuous function.</div>
+</div></div>
+<div style="margin-top: 0; margin-bottom: 0;"></div>
+<div>
+<div class="theorem" style="font-style: italic; padding: 10px 0;"><span style="font-weight: bold; font-style: normal;" class="theorem-title">Theorem -2.</span><span style="margin-right: 16px"></span><div style="display: inline" data-display="inline">Let <span class="math-inline ">
+<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.464ex" xmlns="http://www.w3.org/2000/svg" width="1.244ex" height="2.059ex" role="img" focusable="false" viewBox="0 -705 550 910"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="66" d="M118 -162Q120 -162 124 -164T135 -167T147 -168Q160 -168 171 -155T187 -126Q197 -99 221 27T267 267T289 382V385H242Q195 385 192 387Q188 390 188 397L195 425Q197 430 203 430T250 431Q298 431 298 432Q298 434 307 482T319 540Q356 705 465 705Q502 703 526 683T550 630Q550 594 529 578T487 561Q443 561 443 603Q443 622 454 636T478 657L487 662Q471 668 457 668Q445 668 434 658T419 630Q412 601 403 552T387 469T380 433Q380 431 435 431Q480 431 487 430T498 424Q499 420 496 407T491 391Q489 386 482 386T428 385H372L349 263Q301 15 282 -47Q255 -132 212 -173Q175 -205 139 -205Q107 -205 81 -186T55 -132Q55 -95 76 -78T118 -61Q162 -61 162 -103Q162 -122 151 -136T127 -157L118 -162Z"></path></g></g></g></svg></mjx-container></span> be a function whose derivative exists in every point, then <span class="math-inline ">
+<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.464ex" xmlns="http://www.w3.org/2000/svg" width="1.244ex" height="2.059ex" role="img" focusable="false" viewBox="0 -705 550 910"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="66" d="M118 -162Q120 -162 124 -164T135 -167T147 -168Q160 -168 171 -155T187 -126Q197 -99 221 27T267 267T289 382V385H242Q195 385 192 387Q188 390 188 397L195 425Q197 430 203 430T250 431Q298 431 298 432Q298 434 307 482T319 540Q356 705 465 705Q502 703 526 683T550 630Q550 594 529 578T487 561Q443 561 443 603Q443 622 454 636T478 657L487 662Q471 668 457 668Q445 668 434 658T419 630Q412 601 403 552T387 469T380 433Q380 431 435 431Q480 431 487 430T498 424Q499 420 496 407T491 391Q489 386 482 386T428 385H372L349 263Q301 15 282 -47Q255 -132 212 -173Q175 -205 139 -205Q107 -205 81 -186T55 -132Q55 -95 76 -78T118 -61Q162 -61 162 -103Q162 -122 151 -136T127 -157L118 -162Z"></path></g></g></g></svg></mjx-container></span><br>
+is a continuous function.</div>
+</div></div>`
+  },  
+  {
+    latex: '\\newtheorem{theorem}{Theorem}[section]\n' +
+      '\\newtheorem{corollary}{Corollary}[theorem]\n' +
+      '\n' +
+      '\\section{Introduction}\n' +
+      'Theorems can easily be defined:\n' +
+      '\n' +
+      '\\begin{theorem}\n' +
+      'Let \\(f\\) be a function whose derivative exists in every point, then \\(f\\) \n' +
+      'is a continuous function.\n' +
+      '\\end{theorem}\n' +
+      '\n' +
+      '\\begin{corollary}\n' +
+      'There\'s no right rectangle whose sides measure 3cm, 4cm, and 6cm.\n' +
+      '\\end{corollary}\n' +
+      '\n' +
+      '\\setcounter{theorem}{5}\n' +
+      '\n' +
+      '\\begin{theorem}\n' +
+      'Let \\(f\\) be a function whose derivative exists in every point, then \\(f\\) \n' +
+      'is a continuous function.\n' +
+      '\\end{theorem}\n' +
+      '\n' +
+      '\\begin{corollary}\n' +
+      'There\'s no right rectangle whose sides measure 3cm, 4cm, and 6cm.\n' +
+      '\\end{corollary}\n' +
+      '\n' +
+      '\\setcounter{theorem}{0}\n' +
+      '\n' +
+      '\\begin{theorem}\n' +
+      'Let \\(f\\) be a function whose derivative exists in every point, then \\(f\\) \n' +
+      'is a continuous function.\n' +
+      '\\end{theorem}\n' +
+      '\n' +
+      '\\begin{corollary}\n' +
+      'There\'s no right rectangle whose sides measure 3cm, 4cm, and 6cm.\n' +
+      '\\end{corollary}',
+    html: `<div style="margin-top: 0; margin-bottom: 0;"></div>
+<h2 type="section" class="section-title" id="introduction">
+<span class="section-number">1. </span>Introduction</h2>
+<div>Theorems can easily be defined:</div>
+<div>
+<div class="theorem" style="font-style: italic; padding: 10px 0;"><span style="font-weight: bold; font-style: normal;" class="theorem-title">Theorem 1.1.</span><span style="margin-right: 16px"></span><div style="display: inline" data-display="inline">Let <span class="math-inline ">
+<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.464ex" xmlns="http://www.w3.org/2000/svg" width="1.244ex" height="2.059ex" role="img" focusable="false" viewBox="0 -705 550 910"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="66" d="M118 -162Q120 -162 124 -164T135 -167T147 -168Q160 -168 171 -155T187 -126Q197 -99 221 27T267 267T289 382V385H242Q195 385 192 387Q188 390 188 397L195 425Q197 430 203 430T250 431Q298 431 298 432Q298 434 307 482T319 540Q356 705 465 705Q502 703 526 683T550 630Q550 594 529 578T487 561Q443 561 443 603Q443 622 454 636T478 657L487 662Q471 668 457 668Q445 668 434 658T419 630Q412 601 403 552T387 469T380 433Q380 431 435 431Q480 431 487 430T498 424Q499 420 496 407T491 391Q489 386 482 386T428 385H372L349 263Q301 15 282 -47Q255 -132 212 -173Q175 -205 139 -205Q107 -205 81 -186T55 -132Q55 -95 76 -78T118 -61Q162 -61 162 -103Q162 -122 151 -136T127 -157L118 -162Z"></path></g></g></g></svg></mjx-container></span> be a function whose derivative exists in every point, then <span class="math-inline ">
+<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.464ex" xmlns="http://www.w3.org/2000/svg" width="1.244ex" height="2.059ex" role="img" focusable="false" viewBox="0 -705 550 910"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="66" d="M118 -162Q120 -162 124 -164T135 -167T147 -168Q160 -168 171 -155T187 -126Q197 -99 221 27T267 267T289 382V385H242Q195 385 192 387Q188 390 188 397L195 425Q197 430 203 430T250 431Q298 431 298 432Q298 434 307 482T319 540Q356 705 465 705Q502 703 526 683T550 630Q550 594 529 578T487 561Q443 561 443 603Q443 622 454 636T478 657L487 662Q471 668 457 668Q445 668 434 658T419 630Q412 601 403 552T387 469T380 433Q380 431 435 431Q480 431 487 430T498 424Q499 420 496 407T491 391Q489 386 482 386T428 385H372L349 263Q301 15 282 -47Q255 -132 212 -173Q175 -205 139 -205Q107 -205 81 -186T55 -132Q55 -95 76 -78T118 -61Q162 -61 162 -103Q162 -122 151 -136T127 -157L118 -162Z"></path></g></g></g></svg></mjx-container></span><br>
+is a continuous function.</div>
+</div></div>
+<div>
+<div class="theorem" style="font-style: italic; padding: 10px 0;"><span style="font-weight: bold; font-style: normal;" class="theorem-title">Corollary 1.1.1.</span><span style="margin-right: 16px"></span><div style="display: inline" data-display="inline">There’s no right rectangle whose sides measure 3cm, 4cm, and 6cm.</div>
+</div></div>
+<div style="margin-top: 0; margin-bottom: 0;"></div>
+<div>
+<div class="theorem" style="font-style: italic; padding: 10px 0;"><span style="font-weight: bold; font-style: normal;" class="theorem-title">Theorem 1.6.</span><span style="margin-right: 16px"></span><div style="display: inline" data-display="inline">Let <span class="math-inline ">
+<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.464ex" xmlns="http://www.w3.org/2000/svg" width="1.244ex" height="2.059ex" role="img" focusable="false" viewBox="0 -705 550 910"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="66" d="M118 -162Q120 -162 124 -164T135 -167T147 -168Q160 -168 171 -155T187 -126Q197 -99 221 27T267 267T289 382V385H242Q195 385 192 387Q188 390 188 397L195 425Q197 430 203 430T250 431Q298 431 298 432Q298 434 307 482T319 540Q356 705 465 705Q502 703 526 683T550 630Q550 594 529 578T487 561Q443 561 443 603Q443 622 454 636T478 657L487 662Q471 668 457 668Q445 668 434 658T419 630Q412 601 403 552T387 469T380 433Q380 431 435 431Q480 431 487 430T498 424Q499 420 496 407T491 391Q489 386 482 386T428 385H372L349 263Q301 15 282 -47Q255 -132 212 -173Q175 -205 139 -205Q107 -205 81 -186T55 -132Q55 -95 76 -78T118 -61Q162 -61 162 -103Q162 -122 151 -136T127 -157L118 -162Z"></path></g></g></g></svg></mjx-container></span> be a function whose derivative exists in every point, then <span class="math-inline ">
+<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.464ex" xmlns="http://www.w3.org/2000/svg" width="1.244ex" height="2.059ex" role="img" focusable="false" viewBox="0 -705 550 910"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="66" d="M118 -162Q120 -162 124 -164T135 -167T147 -168Q160 -168 171 -155T187 -126Q197 -99 221 27T267 267T289 382V385H242Q195 385 192 387Q188 390 188 397L195 425Q197 430 203 430T250 431Q298 431 298 432Q298 434 307 482T319 540Q356 705 465 705Q502 703 526 683T550 630Q550 594 529 578T487 561Q443 561 443 603Q443 622 454 636T478 657L487 662Q471 668 457 668Q445 668 434 658T419 630Q412 601 403 552T387 469T380 433Q380 431 435 431Q480 431 487 430T498 424Q499 420 496 407T491 391Q489 386 482 386T428 385H372L349 263Q301 15 282 -47Q255 -132 212 -173Q175 -205 139 -205Q107 -205 81 -186T55 -132Q55 -95 76 -78T118 -61Q162 -61 162 -103Q162 -122 151 -136T127 -157L118 -162Z"></path></g></g></g></svg></mjx-container></span><br>
+is a continuous function.</div>
+</div></div>
+<div>
+<div class="theorem" style="font-style: italic; padding: 10px 0;"><span style="font-weight: bold; font-style: normal;" class="theorem-title">Corollary 1.6.1.</span><span style="margin-right: 16px"></span><div style="display: inline" data-display="inline">There’s no right rectangle whose sides measure 3cm, 4cm, and 6cm.</div>
+</div></div>
+<div style="margin-top: 0; margin-bottom: 0;"></div>
+<div>
+<div class="theorem" style="font-style: italic; padding: 10px 0;"><span style="font-weight: bold; font-style: normal;" class="theorem-title">Theorem 1.1.</span><span style="margin-right: 16px"></span><div style="display: inline" data-display="inline">Let <span class="math-inline ">
+<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.464ex" xmlns="http://www.w3.org/2000/svg" width="1.244ex" height="2.059ex" role="img" focusable="false" viewBox="0 -705 550 910"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="66" d="M118 -162Q120 -162 124 -164T135 -167T147 -168Q160 -168 171 -155T187 -126Q197 -99 221 27T267 267T289 382V385H242Q195 385 192 387Q188 390 188 397L195 425Q197 430 203 430T250 431Q298 431 298 432Q298 434 307 482T319 540Q356 705 465 705Q502 703 526 683T550 630Q550 594 529 578T487 561Q443 561 443 603Q443 622 454 636T478 657L487 662Q471 668 457 668Q445 668 434 658T419 630Q412 601 403 552T387 469T380 433Q380 431 435 431Q480 431 487 430T498 424Q499 420 496 407T491 391Q489 386 482 386T428 385H372L349 263Q301 15 282 -47Q255 -132 212 -173Q175 -205 139 -205Q107 -205 81 -186T55 -132Q55 -95 76 -78T118 -61Q162 -61 162 -103Q162 -122 151 -136T127 -157L118 -162Z"></path></g></g></g></svg></mjx-container></span> be a function whose derivative exists in every point, then <span class="math-inline ">
+<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.464ex" xmlns="http://www.w3.org/2000/svg" width="1.244ex" height="2.059ex" role="img" focusable="false" viewBox="0 -705 550 910"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="66" d="M118 -162Q120 -162 124 -164T135 -167T147 -168Q160 -168 171 -155T187 -126Q197 -99 221 27T267 267T289 382V385H242Q195 385 192 387Q188 390 188 397L195 425Q197 430 203 430T250 431Q298 431 298 432Q298 434 307 482T319 540Q356 705 465 705Q502 703 526 683T550 630Q550 594 529 578T487 561Q443 561 443 603Q443 622 454 636T478 657L487 662Q471 668 457 668Q445 668 434 658T419 630Q412 601 403 552T387 469T380 433Q380 431 435 431Q480 431 487 430T498 424Q499 420 496 407T491 391Q489 386 482 386T428 385H372L349 263Q301 15 282 -47Q255 -132 212 -173Q175 -205 139 -205Q107 -205 81 -186T55 -132Q55 -95 76 -78T118 -61Q162 -61 162 -103Q162 -122 151 -136T127 -157L118 -162Z"></path></g></g></g></svg></mjx-container></span><br>
+is a continuous function.</div>
+</div></div>
+<div>
+<div class="theorem" style="font-style: italic; padding: 10px 0;"><span style="font-weight: bold; font-style: normal;" class="theorem-title">Corollary 1.1.1.</span><span style="margin-right: 16px"></span><div style="display: inline" data-display="inline">There’s no right rectangle whose sides measure 3cm, 4cm, and 6cm.</div>
+</div></div>`
+  },  
   // {
   //   latex: '',
   //   html: ``

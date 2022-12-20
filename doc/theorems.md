@@ -217,6 +217,45 @@ This example produces the following output:
 
 ![](images/theorem_06.png)
 
+
+## Start theorem counter from specific number
+
+`\setcounter{theoremenv}{number}`
+Sets count for `theoremenv` to contain the value number.
+
+- *Note:* number can be positive or negative.
+
+```tex
+\newtheorem{theorem}{Theorem}
+
+\section{Introduction}
+Theorems can easily be defined:
+
+\begin{theorem}
+Let \(f\) be a function whose derivative exists in every point, then \(f\) 
+is a continuous function.
+\end{theorem}
+
+\setcounter{theorem}{0}
+
+\begin{theorem}
+Let \(f\) be a function whose derivative exists in every point, then \(f\) 
+is a continuous function.
+\end{theorem}
+
+\setcounter{theorem}{-3}
+
+\begin{theorem}
+Let \(f\) be a function whose derivative exists in every point, then \(f\) 
+is a continuous function.
+\end{theorem}
+```
+
+This example produces the following output:
+
+![](images/theorem_07.png)
+
+
 ## Reference guide
 
 ### *Theorem styles*

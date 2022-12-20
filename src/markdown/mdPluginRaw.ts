@@ -13,7 +13,7 @@ import { imageWithSize, renderRuleImage } from './md-inline-rule/image';
 import { renderTheorems } from './md-theorem';
 import { getTheoremNumberByLabel, resetTheoremEnvironments } from './md-theorem/helper';
 import { newTheoremBlock } from './md-theorem/block-rule';
-import { newTheorem, theoremStyle, newCommandQedSymbol, labelLatex } from './md-theorem/inline-rule';
+import { newTheorem, theoremStyle, newCommandQedSymbol, labelLatex, setCounterTheorem } from './md-theorem/inline-rule';
 
 let mathNumber = [];
 
@@ -922,6 +922,7 @@ export default options => {
     md.inline.ruler.before("multiMath", "labelLatex", labelLatex);
     md.inline.ruler.before("multiMath", "theoremStyle", theoremStyle); /** Parse \theoremstyle */
     md.inline.ruler.before("multiMath", "newTheorem", newTheorem); /** Parse \newtheorem */
+    md.inline.ruler.before("multiMath", "setCounterTheorem", setCounterTheorem); /** Parse \newtheorem */
     md.inline.ruler.before("renewcommand_inline", "newCommandQedSymbol", newCommandQedSymbol); /** Parse \\renewcommand\qedsymbol{$\blacksquare$} */
     md.inline.ruler.push("simpleMath", simpleMath);
     md.inline.ruler.before("multiMath", "asciiMath", asciiMath);
