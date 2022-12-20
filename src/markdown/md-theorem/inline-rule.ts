@@ -11,7 +11,8 @@ import {
 } from "../common/consts";
 import {
   addTheoremEnvironment,
-  setCounterTheoremEnvironment
+  setCounterTheoremEnvironment,
+  addEnvironmentsCounter
 } from "./helper";
 import {reNumber} from "../md-block-rule/lists";
 
@@ -67,10 +68,16 @@ export const newTheorem: RuleInline = (state) => {
   let nextPos: number = startPos;
   let content: string = "";
   let isNumbered: boolean = true;
+  let useCounter = "";
   let match: RegExpMatchArray = state.src
     .slice(startPos)
     .match(reNewTheoremNumbered);
   if (match) {
+    /**
+     * \newtheorem{corollary}{Corollary}[theorem]
+     * An environment called corollary is created, 
+     * the counter of this new environment will be reset every time a new theorem environment is used.
+     * */
     envName = match.groups?.name ? match.groups.name : match[1];
     envPrint = match.groups?.print ? match.groups.print : match[2];
     numbered = match.groups?.numbered ? match.groups.numbered : match[3];
@@ -81,11 +88,17 @@ export const newTheorem: RuleInline = (state) => {
       .slice(startPos)
       .match(reNewTheoremNumbered2);
     if (match) {
+      /**
+       * \newtheorem{lemma}[theorem]{Lemma}
+       * In this case, the even though a new environment called lemma is created, 
+       * it will use the same counter as the theorem environment.
+       * */
       envName = match.groups?.name ? match.groups.name : match[1];
       numbered = match.groups?.numbered ? match.groups.numbered : match[2];
       envPrint = match.groups?.print ? match.groups.print : match[3];
       nextPos += match[0].length;
       content = match[0];
+      useCounter = numbered;
     } else {
       match = state.src
         .slice(startPos)
@@ -120,8 +133,16 @@ export const newTheorem: RuleInline = (state) => {
     counter: 0,
     isNumbered: isNumbered,
     counterName: numbered,
+    parents: [],
+    useCounter: useCounter,
     style: state.env?.theoremstyle ? state.env?.theoremstyle : defTheoremStyle
   });
+  if (isNumbered) {
+    addEnvironmentsCounter({
+      environment: envName,
+      counter: 0
+    });
+  }
   const token = state.push("newtheorem", "", 0);
   token.content = "";
   token.children = [];
