@@ -14,6 +14,7 @@ export declare const theoremStyle: RuleInline;
  *   [numbered] - is the sectional unit based on which the environments is to be numbered (this is optional
  * */
 export declare const newTheorem: RuleInline;
+export declare const setCounterTheorem: RuleInline;
 /**
  * \renewcommand\qedsymbol{$\blacksquare$}
  * \renewcommand\qedsymbol{QED}

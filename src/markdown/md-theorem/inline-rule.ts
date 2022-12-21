@@ -6,9 +6,15 @@ import {
   reNewTheoremUnNumbered,
   reTheoremStyle,
   defTheoremStyle,
-  reNewCommandQedSymbol
+  reNewCommandQedSymbol,
+  reSetCounter
 } from "../common/consts";
-import { addTheoremEnvironment } from "./helper";
+import {
+  addTheoremEnvironment,
+  setCounterTheoremEnvironment,
+  addEnvironmentsCounter
+} from "./helper";
+import {reNumber} from "../md-block-rule/lists";
 
 /**
  * \theoremstyle{definition} | \theoremstyle{plain} | \theoremstyle{remark}
@@ -62,10 +68,16 @@ export const newTheorem: RuleInline = (state) => {
   let nextPos: number = startPos;
   let content: string = "";
   let isNumbered: boolean = true;
+  let useCounter = "";
   let match: RegExpMatchArray = state.src
     .slice(startPos)
     .match(reNewTheoremNumbered);
   if (match) {
+    /**
+     * \newtheorem{corollary}{Corollary}[theorem]
+     * An environment called corollary is created, 
+     * the counter of this new environment will be reset every time a new theorem environment is used.
+     * */
     envName = match.groups?.name ? match.groups.name : match[1];
     envPrint = match.groups?.print ? match.groups.print : match[2];
     numbered = match.groups?.numbered ? match.groups.numbered : match[3];
@@ -76,11 +88,17 @@ export const newTheorem: RuleInline = (state) => {
       .slice(startPos)
       .match(reNewTheoremNumbered2);
     if (match) {
+      /**
+       * \newtheorem{lemma}[theorem]{Lemma}
+       * In this case, the even though a new environment called lemma is created, 
+       * it will use the same counter as the theorem environment.
+       * */
       envName = match.groups?.name ? match.groups.name : match[1];
       numbered = match.groups?.numbered ? match.groups.numbered : match[2];
       envPrint = match.groups?.print ? match.groups.print : match[3];
       nextPos += match[0].length;
       content = match[0];
+      useCounter = numbered;
     } else {
       match = state.src
         .slice(startPos)
@@ -115,9 +133,57 @@ export const newTheorem: RuleInline = (state) => {
     counter: 0,
     isNumbered: isNumbered,
     counterName: numbered,
+    parents: [],
+    useCounter: useCounter,
     style: state.env?.theoremstyle ? state.env?.theoremstyle : defTheoremStyle
   });
+  if (isNumbered) {
+    addEnvironmentsCounter({
+      environment: envName,
+      counter: 0
+    });
+  }
   const token = state.push("newtheorem", "", 0);
+  token.content = "";
+  token.children = [];
+  if (state.md.options.forLatex) {
+    token.latex = content;
+  }
+  state.pos = nextPos;
+  return true;
+};
+
+export const setCounterTheorem: RuleInline = (state) => {
+  let startPos = state.pos;
+  if (state.src.charCodeAt(startPos) !== 0x5c /* \ */) {
+    return false;
+  }
+  let envName: string = "";
+  let numStr: string = "";
+  let nextPos: number = startPos;
+  let content: string = "";
+  let match: RegExpMatchArray = state.src
+    .slice(startPos)
+    .match(reSetCounter);
+
+  if (!match) {
+    return false;
+  }
+  content = match[0];
+  nextPos += match[0].length;
+  envName = match.groups?.name ? match.groups.name : match[1];
+  if (!envName) {
+    return false;
+  }
+  numStr = match.groups?.number ? match.groups.number : match[2];
+  numStr = numStr ? numStr.trim() : '';
+  const num = numStr && reNumber.test(numStr)
+    ? Number(match[2].trim()) : 0;
+  const res: boolean = setCounterTheoremEnvironment(envName, num);
+  if (!res) {
+    return false;
+  }
+  const token = state.push("theorem_setcounter", "", 0);
   token.content = "";
   token.children = [];
   if (state.md.options.forLatex) {
