@@ -12,7 +12,8 @@ import {
   mdPluginAnchor,
   mdPluginTableTabular,
   mdPluginList,
-  mdPluginChemistry
+  mdPluginChemistry, 
+  mdPluginCollapsible
 } from "./markdown/mdPluginConfigured";
 
 import {
@@ -28,7 +29,7 @@ import { ISmilesOptions } from './markdown/md-chemistry';
 
 export {
   MathpixLoader, MathpixMarkdown, MathpixMarkdownModel,
-  mathpixMarkdownPlugin,
+  mathpixMarkdownPlugin, mdPluginCollapsible,
   initMathpixMarkdown,
   mdPluginMathJax, mdPluginHighlightCode, mdPluginText, mdPluginTOC, mdPluginAnchor, mdPluginTableTabular, mdPluginList, mdPluginChemistry,
   TMarkdownItOptions, optionsMathpixMarkdown, TOutputMath, TOutputMathJax, THtmlSanitize,
