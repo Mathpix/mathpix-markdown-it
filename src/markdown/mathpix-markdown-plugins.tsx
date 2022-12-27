@@ -1,6 +1,7 @@
 import { MarkdownIt } from 'markdown-it';
 import { MathpixMarkdownModel } from "../mathpix-markdown-model";
 import { resetTextCounter } from './mdPluginText';
+import { resetTheoremEnvironments } from './md-theorem/helper';
 
 import {
   mdPluginMathJax,
@@ -109,6 +110,7 @@ export const initMathpixMarkdown = (md, callback) => {
   renderer.render = (tokens, options, env) => {
     MathpixMarkdownModel.texReset();
     resetTextCounter();
+    resetTheoremEnvironments();
 
     let html = render.call(renderer, tokens, options, env);
 
