@@ -160,6 +160,7 @@ function multiMath(state, silent) {
 
   startMathPos += match[0].length;
   let type, endMarker, includeMarkers; // eslint-disable-line
+  let addParentheses = false;
   if (match[0] === "\\[") {
     type = "display_math";
     endMarker = "\\\\]";
@@ -174,6 +175,7 @@ function multiMath(state, silent) {
     endMarker = "\\)";
   } else if (match[0].includes("eqref")) {
     type = "reference_note";
+    addParentheses = true; /** add parentheses so that instead of printing a plain number as 5, it will print (5). */
     endMarker = "";
   } else if (match[0].includes("ref")) {
     type = "reference_note";
@@ -217,6 +219,7 @@ function multiMath(state, silent) {
         token.markup = match[0];
       }
       token.content = match ? match[2] || match[3] : "";
+      token.attrSet("data-parentheses", addParentheses.toString());
     } else {
       token.content = state.src.slice(startMathPos, endMarkerPos);
     }
@@ -539,12 +542,12 @@ const renderMath = (a, token, options) => {
 
   if (token.type === "equation_math_not_number") {
     if (tagId) {
-      mathNumber[tagId] = `[${0}]`;
+      mathNumber[tagId] = `${0}`;
     }
   } else {
     if (token.type === "equation_math") {
       if (tagId) {
-        mathNumber[tagId] = `[${begin_number}]`;
+        mathNumber[tagId] = `${begin_number}`;
       }
     }
   }
@@ -627,18 +630,25 @@ const renderUsepackage = (token, options) => {
 const renderReference = token => {
   const id: string = encodeURIComponent(token.content);
   const theoremNumber = getTheoremNumberByLabel(token.content);
+  const dataParentheses = token.attrGet("data-parentheses");
+  let reference = mathNumber[token.content] || theoremNumber;
+  if (dataParentheses === "true" &&  reference) {
+    reference = '(' + reference + ')'
+  }
   if (token.type === "reference_note_block") {
     return `<div class="math-block"><a href="#${id}"
            style="cursor: pointer; text-decoration: none;"
            class="clickable-link"
            value=${id}
-        >${mathNumber[token.content] || theoremNumber || '[' + token.content + ']'} </a></div>`
+           data-parentheses="${dataParentheses}"
+        >${reference|| '[' + token.content + ']'} </a></div>`
   } else {
     return `<a href="#${id}"
            style="cursor: pointer; text-decoration: none;"
            class="clickable-link"
            value=${id}
-        >${mathNumber[token.content] || theoremNumber || '[' + token.content + ']'} </a>`;
+           data-parentheses="${dataParentheses}"
+        >${reference || '[' + token.content + ']'} </a>`;
   }
 };
 
@@ -907,7 +917,12 @@ export default options => {
 
   return md => {
     Object.assign(md.options, options);
-    resetTheoremEnvironments();
+    const isRenderElement = md.options.renderElement && md.options.renderElement.hasOwnProperty('startLine');
+    /** Do not clear global lists for theorems if only one element is being rendered 
+     * and not all content is being rerendered */
+    if (!isRenderElement) {
+      resetTheoremEnvironments();
+    }
     md.block.ruler.before("paragraph", "paragraphDiv", paragraphDiv);
     if (!md.options.enableCodeBlockRuleForLatexCommands) {
       md.block.ruler.at("code", codeBlock);

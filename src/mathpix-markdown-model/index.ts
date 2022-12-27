@@ -245,12 +245,15 @@ class MathpixMarkdown_Model {
       for(let i = 0; i < links.length; i++) {
         const eq = links[i].getAttribute('value');
         const equationNumber = doc.getElementById(eq);
+        const dataParentheses = links[i].getAttribute("data-parentheses");
         if (!equationNumber) {
           links[i].innerHTML=`[${decodeURIComponent(eq)}]`;
         } else {
           const numbers = equationNumber.getAttribute('number');
           if(numbers) {
-            links[i].innerHTML = `[${numbers.split(',')[0]}]`
+            links[i].innerHTML = dataParentheses === "true" 
+              ? `(${numbers.split(',')[0]})`
+              : `${numbers.split(',')[0]}`
           }
         }
       }
