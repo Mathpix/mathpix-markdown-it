@@ -16,7 +16,7 @@ import {
 } from "../common/consts";
 import {
   theoremEnvironments,
-  envNumbers,
+  addTheoremLabel,
   getTheoremEnvironmentIndex,
   getTheoremNumber,
   getNextCounterProof
@@ -223,6 +223,7 @@ export const BeginTheorem: RuleBlock = (state, startLine, endLine) => {
   
   state.line = nextLine + 1;
   token = state.push('paragraph_open', 'div', 1);
+  token.attrSet('class','theorem_block');
   token.map = [startLine, state.line];
 
   if (strBefore && strBefore?.trim()) {
@@ -298,13 +299,11 @@ export const BeginTheorem: RuleBlock = (state, startLine, endLine) => {
 
 
   if (label) {
-    const index = envNumbers.findIndex(item => item.label === label);
-    if (index === -1) {
-      envNumbers.push({
-        label: label,
-        number: theoremNumber
-      })
-    }
+    /** Add a reference to the theorem to the global list theoremLabels */
+    addTheoremLabel({
+      label: label,
+      number: theoremNumber
+    })
   }
 
   SetTokensBlockParse(state, resText, 0, 0, true);
@@ -398,6 +397,7 @@ export const BeginProof: RuleBlock = (state, startLine, endLine) => {
   
   state.line = nextLine + 1;
   token = state.push('paragraph_open', 'div', 1);
+  token.attrSet('class','proof_block');
   token.map = [startLine, state.line];
 
   if (strBefore && strBefore?.trim()) {
@@ -423,13 +423,11 @@ export const BeginProof: RuleBlock = (state, startLine, endLine) => {
   }
 
   if (label) {
-    const index = envNumbers.findIndex(item => item.label === label);
-    if (index === -1) {
-      envNumbers.push({
-        label: label,
-        number: proofNumber.toString()
-      })
-    }
+    /** Add a reference to the theorem to the global list theoremLabels */
+    addTheoremLabel({
+      label: label,
+      number: proofNumber.toString()
+    })
   }
 
   const contentQED = state.env.qedsymbol ? state.env.qedsymbol : defQED;

@@ -26,6 +26,7 @@ import {
 } from "./mathpix-markdown-model";
 
 import { ISmilesOptions } from './markdown/md-chemistry';
+import { resetTheoremEnvironments } from './markdown/md-theorem/helper';
 
 export {
   MathpixLoader, MathpixMarkdown, MathpixMarkdownModel,
@@ -33,6 +34,7 @@ export {
   initMathpixMarkdown,
   mdPluginMathJax, mdPluginHighlightCode, mdPluginText, mdPluginTOC, mdPluginAnchor, mdPluginTableTabular, mdPluginList, mdPluginChemistry,
   TMarkdownItOptions, optionsMathpixMarkdown, TOutputMath, TOutputMathJax, THtmlSanitize,
-  ISmilesOptions
+  ISmilesOptions,
+  resetTheoremEnvironments
 };
 

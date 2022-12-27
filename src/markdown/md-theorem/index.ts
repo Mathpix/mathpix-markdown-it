@@ -4,6 +4,7 @@ import { theoremEnvironments, getTheoremEnvironmentIndex } from "./helper";
 const renderTheoremOpen = (tokens, idx, options, env, slf) => {
   const token = tokens[idx];
   const envLabel = token.envLabel;
+  const envNumber = token.envNumber;
   const envStyle = token.envStyle;
   /**
    * definition - boldface title, Roman body. Commonly used in definitions, conditions, problems and examples.
@@ -25,7 +26,7 @@ const renderTheoremOpen = (tokens, idx, options, env, slf) => {
   styleBody += " padding: 10px 0;";
   const labelRef = envLabel ? encodeURIComponent(envLabel) : '';
   return labelRef 
-    ? `<div id="${labelRef}" class="theorem" style="${styleBody}">`
+    ? `<div id="${labelRef}" class="theorem" number="${envNumber}" style="${styleBody}">`
     : `<div class="theorem" style="${styleBody}">`;
 };
 

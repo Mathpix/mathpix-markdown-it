@@ -21,8 +21,14 @@ export interface IEnvironmentsCounter {
   counter: number
 }
 
+export interface ITheoremLabel {
+  label: string, /** reference name */
+  number: string /** theorem number */
+}
+
 export let theoremEnvironments: Array<ITheoremEnvironment>  = [];
-export let envNumbers = [];
+/** Global list containing information about references to theorems: reference name, theorem number */
+export let theoremLabels: Array<ITheoremLabel> = [];
 export let counterProof = 0;
 export let environmentsCounter: Array<IEnvironmentsCounter> = [];
 
@@ -94,17 +100,34 @@ export const getTheoremEnvironmentIndex = (name: string) => {
     : -1;
 };
 
+/** Reset global counters for theorems and clear lists storing information about styles and descriptions of theorems */
 export const resetTheoremEnvironments = () => {
   theoremEnvironments = [];
   environmentsCounter = [];
+  theoremLabels = [];
+  counterProof = 0;
 };
 
 export const getTheoremNumberByLabel = (envLabel: string) => {
-  const index = envNumbers.findIndex(item => item.label === envLabel);
+  const index = theoremLabels.findIndex(item => item.label === envLabel);
   if (index === -1) {
     return '';
   }
-  return envNumbers[index].number;
+  return theoremLabels[index].number;
+};
+
+/** Add a reference to the theorem to the global list theoremLabels
+ *  whose elements contain information:
+ *    label - reference name
+ *    number - theorem number
+ * */
+export const addTheoremLabel = (theoremLabel: ITheoremLabel) => {
+  const index = theoremLabels?.length 
+    ? theoremLabels.findIndex(item => item.label === theoremLabel.label)
+    : -1;
+  if (index === -1) {
+    theoremLabels.push(theoremLabel);
+  }
 };
 
 const addParentsTheoremEnvironment = (parentsArr: Array<ITheoremEnvironmentParents>, parents: Array<ITheoremEnvironmentParents>) => {

@@ -18,8 +18,13 @@ export interface IEnvironmentsCounter {
     environment: string;
     counter: number;
 }
+export interface ITheoremLabel {
+    label: string; /** reference name */
+    number: string; /** theorem number */
+}
 export declare let theoremEnvironments: Array<ITheoremEnvironment>;
-export declare let envNumbers: any[];
+/** Global list containing information about references to theorems: reference name, theorem number */
+export declare let theoremLabels: Array<ITheoremLabel>;
 export declare let counterProof: number;
 export declare let environmentsCounter: Array<IEnvironmentsCounter>;
 export declare const addEnvironmentsCounter: (data: IEnvironmentsCounter) => void;
@@ -29,6 +34,13 @@ export declare const addTheoremEnvironment: (data: ITheoremEnvironment) => void;
 export declare const setCounterTheoremEnvironment: (envName: string, num: number) => boolean;
 export declare const getTheoremEnvironment: (name: string) => ITheoremEnvironment;
 export declare const getTheoremEnvironmentIndex: (name: string) => number;
+/** Reset global counters for theorems and clear lists storing information about styles and descriptions of theorems */
 export declare const resetTheoremEnvironments: () => void;
-export declare const getTheoremNumberByLabel: (envLabel: string) => any;
+export declare const getTheoremNumberByLabel: (envLabel: string) => string;
+/** Add a reference to the theorem to the global list theoremLabels
+ *  whose elements contain information:
+ *    label - reference name
+ *    number - theorem number
+ * */
+export declare const addTheoremLabel: (theoremLabel: ITheoremLabel) => void;
 export declare const getTheoremNumber: (envIndex: number, env: any) => string;
