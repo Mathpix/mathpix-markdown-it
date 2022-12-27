@@ -102,6 +102,7 @@ export const initMathpixMarkdown = (md, callback) => {
   const { render } = renderer;
 
   md.parse = (markdown, env) => {
+    resetTheoremEnvironments();
     const mmdOptions = callback();
     setOptionForPreview(md.options, mmdOptions);
     return parse.call(md, markdown, env)
@@ -110,7 +111,6 @@ export const initMathpixMarkdown = (md, callback) => {
   renderer.render = (tokens, options, env) => {
     MathpixMarkdownModel.texReset();
     resetTextCounter();
-    resetTheoremEnvironments();
 
     let html = render.call(renderer, tokens, options, env);
 
