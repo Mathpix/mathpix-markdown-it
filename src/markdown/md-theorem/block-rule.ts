@@ -9,6 +9,7 @@ import {
   openTag,
   openTagDescription,
   openTagProof,
+  reNewTheoremG,
   reNewCommandQedSymbolG,
   defQED,
   reTheoremStyleG,
@@ -50,8 +51,7 @@ export const newTheoremBlock: RuleBlock = (state, startLine: number) => {
 
   content = state.getLines(startLine, nextLine, state.blkIndent, false).trim();
 
-  const testNewTheorem = /\\newtheorem([^}]*)\s{0,}\{(?<name>[^}]*)\}/;
-  if (!testNewTheorem.test(content) 
+  if (!reNewTheoremG.test(content) 
     && !reNewCommandQedSymbolG.test(content)
     && !reTheoremStyleG.test(content)
     && !reSetCounterG.test(content)

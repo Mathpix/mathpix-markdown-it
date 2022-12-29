@@ -27,6 +27,9 @@ export const openTag: RegExp = /\\begin\s{0,}\{(?<name>[^}]*)\}/;
 export const openTagDescription: RegExp = /\\begin\s{0,}\{(?<name>[^}]*)\}\s{0,}\[(?<description>[^\]]*)\]/;
 export const openTagProof: RegExp = /\\begin\s{0,}\{([proof\s]+)\}/;
 
+export const reNewTheoremG: RegExp = /\\newtheorem([^}]*)\s{0,}\{(?<name>[^}]*)\}/;
+export const reNewTheoremInit: RegExp = /^\\newtheorem\s{0,}\{(?<name>[^}]*)\}/;
+export const reNewTheoremUnNumberedInit: RegExp = /^\\newtheorem\*\s{0,}\{(?<name>[^}]*)\}/;
 export const reNewTheorem: RegExp = /^\\newtheorem\s{0,}\{(?<name>[^}]*)\}\s{0,}\{(?<print>[^}]*)\}/;
 export const reNewTheoremNumbered: RegExp = /^\\newtheorem\s{0,}\{(?<name>[^}]*)\}\s{0,}\{(?<print>[^}]*)\}\s{0,}\[(?<numbered>[^\]]*)\]/;
 export const reNewTheoremNumbered2: RegExp = /^\\newtheorem\s{0,}\{(?<name>[^}]*)\}\s{0,}\[(?<numbered>[^\]]*)\]\s{0,}\{(?<print>[^}]*)\}/;
