@@ -165,6 +165,11 @@ const renderChildsTokens = (pos: number, tokens: TokenList, options) => {
       i++;
       continue;
     }
+    let dataUnnumbered = token.attrGet('data-unnumbered');
+    if (token.type === 'heading_close' && dataUnnumbered === "true") {
+      i++;
+      continue;
+    }
     let heading_id: string = '';
 
     if (heading_open && heading_open.type === 'heading_open') {
@@ -225,6 +230,11 @@ const getTocList = (pos: number, tokens: TokenList, options, levelSub = -1) => {
     let heading_open: Token = tokens[i - 2];
     let level: number = token.tag && parseInt(token.tag.substr(1, 1));
     if (token.type !== 'heading_close' || options.includeLevel.indexOf(level) == -1 || !types.includes(heading.type)) {
+      i++;
+      continue;
+    }
+    let dataUnnumbered = token.attrGet('data-unnumbered');
+    if (token.type === 'heading_close' && dataUnnumbered === "true") {
       i++;
       continue;
     }

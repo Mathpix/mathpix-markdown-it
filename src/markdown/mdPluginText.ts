@@ -92,12 +92,14 @@ const headingSection: RuleBlock = (state, startLine: number, endLine: number) =>
 
   const match: RegExpMatchArray = lineText
     .slice(++startPos)
-    .match(/^(?:title|section|subsection|subsubsection)/);
+    .match(/^(?:title|section\*|section|subsection\*|subsection|subsubsection\*|subsubsection)/);
 
+  console.log("[headingSection]=>match=>", match)
   if (!match) {
     return false;
   }
   let attrStyle = '';
+  let isUnNumbered: boolean = false;
 
   startPos += match[0].length;
   switch (match[0]) {
@@ -123,6 +125,29 @@ const headingSection: RuleBlock = (state, startLine: number, endLine: number) =>
       className = "sub_section-title";
       break;
     case "subsubsection":
+      level = 4;
+      type = "subsubsection";
+      className = "sub_sub_section-title";
+      break;    
+    case "section*":
+      isUnNumbered = true;
+      level = 2;
+      type = "section";
+      is_numerable = true;
+      subsectionParentCount++;
+      isNewSect = true;
+      className = "section-title";
+      attrStyle = 'margin-top: 1.5em;';
+      break;
+    case "subsection*":
+      isUnNumbered = true;
+      isNewSubSection = true;
+      level = 3;
+      type = "subsection";
+      className = "sub_section-title";
+      break;
+    case "subsubsection*":
+      isUnNumbered = true;
       level = 4;
       type = "subsubsection";
       className = "sub_sub_section-title";
@@ -190,6 +215,9 @@ const headingSection: RuleBlock = (state, startLine: number, endLine: number) =>
   token.markup = '########'.slice(0, level);
   token.map = [startLine, state.line];
   token.attrJoin('type', type);
+  if (isUnNumbered) {
+    token.attrJoin('data-unnumbered', "true");
+  }
   token.attrJoin('class', className);
   if (state.md.options?.forDocx && attrStyle) {
     token.attrSet('style', attrStyle);
@@ -199,6 +227,7 @@ const headingSection: RuleBlock = (state, startLine: number, endLine: number) =>
   token.content = resString;
   token.type = type;
   token.is_numerable = is_numerable;
+  token.isUnNumbered = isUnNumbered;
   token.map = [startLine, state.line];
 
   let children = [];
@@ -225,6 +254,9 @@ const headingSection: RuleBlock = (state, startLine: number, endLine: number) =>
   }
 
   token = state.push('heading_close', 'h' + String(level), -1);
+  if (isUnNumbered) {
+    token.attrJoin('data-unnumbered', "true");
+  }
   token.markup = '########'.slice(0, level);
   if (state.md.options.forLatex) {
     token.latex = type;
@@ -724,6 +756,9 @@ const renderInlineContent = (token, options, env, slf) => {
 
 const renderSectionTitle: Renderer = (tokens, index, options, env, slf) => {
   const token = tokens[index];
+  if (token.isUnNumbered) {
+    return renderInlineContent(token, options, env, slf);
+  }
   const sectionNumber = token.is_numerable
     ? `<span class="section-number">${++sectionCount}. </span>`
     : ``;
@@ -733,6 +768,9 @@ const renderSectionTitle: Renderer = (tokens, index, options, env, slf) => {
 
 const renderSubsectionTitle: Renderer = (tokens, index, options, env, slf) => {
   const token = tokens[index];
+  if (token.isUnNumbered) {
+    return renderInlineContent(token, options, env, slf);
+  }
   if (token.isNewSect) {
     subCount = 0;
   }
@@ -742,6 +780,9 @@ const renderSubsectionTitle: Renderer = (tokens, index, options, env, slf) => {
 
 const renderSubSubsectionTitle: Renderer = (tokens, index, options, env, slf) => {
   const token = tokens[index];
+  if (token.isUnNumbered) {
+    return renderInlineContent(token, options, env, slf);
+  }
   if (token.isNewSubSection) {
     subSubCount = 0;
   }
