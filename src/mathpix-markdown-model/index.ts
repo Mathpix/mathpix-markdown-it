@@ -134,7 +134,8 @@ export type THtmlWrapper = {
 }
 
 export type TTocOptions = {
-  style?: TTocStyle
+  style?: TTocStyle,
+  doNotGenerateParentId?: boolean /** Don't generate unique ParentId for nested blocks. Used to testing */
 };
 
 export enum TTocStyle {
@@ -224,12 +225,15 @@ class MathpixMarkdown_Model {
     }
   };
 
-  getTocContainerHTML = ( html: string ):string => {
+  getTocContainerHTML = (html: string, onlyContent = true):string => {
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, "text/html");
     const body = doc.body;
     const toc = body.getElementsByClassName('table-of-contents')[0];
     if (toc) {
+      if (!onlyContent) {
+        return `<div id="toc_container">` + toc.innerHTML + '</div>'
+      }
       return toc.innerHTML;
     }else {
       return '';
@@ -345,6 +349,7 @@ class MathpixMarkdown_Model {
                   + codeStyles 
                   + tabularStyles() 
                   + listsStyles 
+                  + TocStyle("toc")
                   + menuStyle();
                 document.head.appendChild(style);
             }

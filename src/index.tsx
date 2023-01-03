@@ -22,7 +22,8 @@ import {
   optionsMathpixMarkdown,
   TOutputMath,
   TOutputMathJax,
-  THtmlSanitize
+  THtmlSanitize,
+  TTocStyle
 } from "./mathpix-markdown-model";
 
 import { ISmilesOptions } from './markdown/md-chemistry';
@@ -35,6 +36,7 @@ export {
   mdPluginMathJax, mdPluginHighlightCode, mdPluginText, mdPluginTOC, mdPluginAnchor, mdPluginTableTabular, mdPluginList, mdPluginChemistry,
   TMarkdownItOptions, optionsMathpixMarkdown, TOutputMath, TOutputMathJax, THtmlSanitize,
   ISmilesOptions,
-  resetTheoremEnvironments
+  resetTheoremEnvironments,
+  TTocStyle
 };
 

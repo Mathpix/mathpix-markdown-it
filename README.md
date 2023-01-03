@@ -41,7 +41,7 @@ Mathpix Markdown addresses these limitations by adding support for the following
 - lists: unordered lists via `\begin{itemize} ... \end{itemize}` and ordered lists via `\begin{enumerate} ... \end{enumerate}`
 - numbered and unnumbered equation enviornments `\begin{elem} ... \end{elem}` and `\begin{elem*} ... \end{elem*}` where elem=`equation|align|split|gather`
 - equation, table, and figure references via `\label`, `\ref`, `\eqref`, `\tag`
-- text formatting options `\title{...}`, `\author{...}`, `\begin{abstract}...\end{abstract}`, `\section{Section Title}`, `\subsection{Section Title}`, `\subsubsection{Section Title}`, `\textit{italicized text}`, `\textbf{bold text}`, `\url{link}`
+- [text formatting options](doc/sections.md) `\title{...}`, `\author{...}`, `\begin{abstract}...\end{abstract}`, `\section{Section Title}`, `\subsection{Section Title}`, `\subsubsection{Section Title}`, `\textit{italicized text}`, `\textbf{bold text}`, `\url{link}`
 - chemistry equation via `<smiles>OC(=O)c1cc(Cl)cs1</smiles>` or
 ~~~
 ```smiles
