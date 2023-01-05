@@ -50,6 +50,10 @@ const renderTheoremPrintOpen = (tokens, idx, options, env, slf) => {
       styleTile = "font-style: italic;";
       break;
   }
+  if (options.forDocx) {
+    styleTile += 'display: inline;'
+    return`<div style="${styleTile}" class="theorem-title">`;
+  }
   return`<span style="${styleTile}" class="theorem-title">`;
 };
 
@@ -68,7 +72,7 @@ const renderTheoremPrintClose = (tokens, idx, options, env, slf) => {
       ? ' ' + envNumber
       : '';
     htmlPrint += envStyle === "plain" ? '.' : envDescription ? '' : '.';
-    htmlPrint += `</span>`;
+    htmlPrint += options.forDocx ? `</div>` : `</span>`;
     const htmlSpaceMin = options.forDocx
       ? '<span>&nbsp;</span>'
       : '<span style="margin-right: 10px"></span>';
@@ -78,7 +82,7 @@ const renderTheoremPrintClose = (tokens, idx, options, env, slf) => {
     htmlPrint += envDescription ? htmlSpaceMin : htmlSpace;
     return htmlPrint;
   }
-  return `</span>`;
+  return options.forDocx ? `</div>` : `</span>`;
 };
 
 const renderTheoremDescriptionOpen = (tokens, idx, options, env, slf) => {

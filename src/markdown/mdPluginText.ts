@@ -394,8 +394,15 @@ export const headingSection: RuleBlock = (state, startLine: number, endLine: num
     token.isNewSubSection = isNewSubSection;
     isNewSubSection = false;
     if (!isUnNumbered) {
-      subSubCount = !token.isNewSubSection
+      if (isNewSect) {
+        token.isNewSect = isNewSect;
+        isNewSect = false;
+        subCount = 0;
+        subSubCount = 1;
+      } else {
+        subSubCount = !token.isNewSubSection
         ? subSubCount ? subSubCount + 1 : 1 : 1;
+      }
       state.env.subsubsection = subSubCount;
       token.section = sectionCount;
       token.subsection = subCount;
