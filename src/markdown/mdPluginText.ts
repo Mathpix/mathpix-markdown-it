@@ -379,35 +379,34 @@ export const headingSection: RuleBlock = (state, startLine: number, endLine: num
     token.section = sectionCount;
   }
   
-  if (type === "subsection") {
+  if (type === "subsection" && !isUnNumbered) {
     token.isNewSect = isNewSect;
     isNewSect = false;
-    if (!isUnNumbered) {
-      subCount = !token.isNewSect 
-        ? subCount ? subCount + 1 : 1 : 1;
-      state.env.subsection = subCount;
-      token.section = sectionCount;
-      token.subsection = subCount;
-    }
+    subCount = !token.isNewSect 
+      ? subCount ? subCount + 1 : 1 : 1;
+    state.env.subsection = subCount;
+    token.section = sectionCount;
+    token.subsection = subCount;
   }
-  if (type === "subsubsection") {
+  if (type === "subsubsection" && !isUnNumbered) {
     token.isNewSubSection = isNewSubSection;
     isNewSubSection = false;
-    if (!isUnNumbered) {
-      if (isNewSect) {
-        token.isNewSect = isNewSect;
-        isNewSect = false;
+    if (isNewSect) {
+      token.isNewSect = isNewSect;
+      isNewSect = false;
+      if (state.env.hasOwnProperty('subsection') && state.env.subsection === subCount) {
         subCount = 0;
-        subSubCount = 1;
-      } else {
-        subSubCount = !token.isNewSubSection
-        ? subSubCount ? subSubCount + 1 : 1 : 1;
+        state.env.subsection = subCount;
       }
-      state.env.subsubsection = subSubCount;
-      token.section = sectionCount;
-      token.subsection = subCount;
-      token.subsubsection = subSubCount;
+      subSubCount = 1;
+    } else {
+      subSubCount = !token.isNewSubSection
+      ? subSubCount ? subSubCount + 1 : 1 : 1;
     }
+    state.env.subsubsection = subSubCount;
+    token.section = sectionCount;
+    token.subsection = subCount;
+    token.subsubsection = subSubCount;
   }
 
   token = state.push('heading_close', 'h' + String(level), -1);

@@ -428,10 +428,212 @@ Unnumbered second Subsection</h3>
     tocHtml: `<div id="toc_container"><ul><li class="toc-title-4"><a href="#subsubsection-number-should-be-0.0.1" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-0.0.1">subsubsection number should be 0.0.1</a></li><li class="toc-title-4"><a href="#subsubsection-number-should-be-0.0.2" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-0.0.2">subsubsection number should be 0.0.2</a></li><li class="toc-title-4"><a href="#subsubsection-number-should-be-0.0.3" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-0.0.3">subsubsection number should be 0.0.3</a></li><li class="toc-title-4"><a href="#subsubsection-number-should-be-0.0.4" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-0.0.4">subsubsection number should be 0.0.4</a></li><li class="toc-title-2"><a href="#section" style="cursor: pointer; text-decoration: none;" class="toc-link" value="section">section</a><ul><li class="toc-title-4"><a href="#subsubsection-number-should-be-1.0.1" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-1.0.1">subsubsection number should be 1.0.1</a></li><li class="toc-title-4"><a href="#subsubsection-number-should-be-1.0.2" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-1.0.2">subsubsection number should be 1.0.2</a></li><li class="toc-title-4"><a href="#subsubsection-number-should-be-1.0.3" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-1.0.3">subsubsection number should be 1.0.3</a></li><li class="toc-title-4"><a href="#subsubsection-number-should-be-1.0.4" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-1.0.4">subsubsection number should be 1.0.4</a></li></ul></li><li class="toc-title-2"><a href="#section-2" style="cursor: pointer; text-decoration: none;" class="toc-link" value="section-2">section</a><ul><li class="toc-title-4"><a href="#subsubsection-number-should-be-2.0.1" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-2.0.1">subsubsection number should be 2.0.1</a></li><li class="toc-title-4"><a href="#subsubsection-number-should-be-2.0.2" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-2.0.2">subsubsection number should be 2.0.2</a></li><li class="toc-title-4"><a href="#subsubsection-number-should-be-2.0.3" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-2.0.3">subsubsection number should be 2.0.3</a></li><li class="toc-title-4"><a href="#subsubsection-number-should-be-2.0.4" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-2.0.4">subsubsection number should be 2.0.4</a></li><li class="toc-title-3"><a href="#subsection" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsection">subsection</a><ul><li class="toc-title-4"><a href="#subsubsection-number-should-be-2.1.1" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-2.1.1">subsubsection number should be 2.1.1</a></li><li class="toc-title-4"><a href="#subsubsection-number-should-be-2.1.2" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-2.1.2">subsubsection number should be 2.1.2</a></li></ul></li></ul></li><li class="toc-title-2"><a href="#section-3" style="cursor: pointer; text-decoration: none;" class="toc-link" value="section-3">section</a><ul><li class="toc-title-4"><a href="#subsubsection-number-should-be-3.0.1" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-3.0.1">subsubsection number should be 3.0.1</a></li><li class="toc-title-4"><a href="#subsubsection-number-should-be-3.0.2" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-3.0.2">subsubsection number should be 3.0.2</a></li></ul></li></ul></div>`,
     tocHtmlSummary: `<div id="toc_container"><ul><li class="toc-title-4"><a href="#subsubsection-number-should-be-0.0.1" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-0.0.1">subsubsection number should be 0.0.1</a></li><li class="toc-title-4"><a href="#subsubsection-number-should-be-0.0.2" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-0.0.2">subsubsection number should be 0.0.2</a></li><li class="toc-title-4"><a href="#subsubsection-number-should-be-0.0.3" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-0.0.3">subsubsection number should be 0.0.3</a></li><li class="toc-title-4"><a href="#subsubsection-number-should-be-0.0.4" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-0.0.4">subsubsection number should be 0.0.4</a></li><li class="toc-title-2"><details><summary><a href="#section" style="cursor: pointer; text-decoration: none;" class="toc-link" value="section">section</a></summary><ul><li class="toc-title-4"><a href="#subsubsection-number-should-be-1.0.1" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-1.0.1">subsubsection number should be 1.0.1</a></li><li class="toc-title-4"><a href="#subsubsection-number-should-be-1.0.2" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-1.0.2">subsubsection number should be 1.0.2</a></li><li class="toc-title-4"><a href="#subsubsection-number-should-be-1.0.3" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-1.0.3">subsubsection number should be 1.0.3</a></li><li class="toc-title-4"><a href="#subsubsection-number-should-be-1.0.4" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-1.0.4">subsubsection number should be 1.0.4</a></li></ul></details></li><li class="toc-title-2"><details><summary><a href="#section-2" style="cursor: pointer; text-decoration: none;" class="toc-link" value="section-2">section</a></summary><ul><li class="toc-title-4"><a href="#subsubsection-number-should-be-2.0.1" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-2.0.1">subsubsection number should be 2.0.1</a></li><li class="toc-title-4"><a href="#subsubsection-number-should-be-2.0.2" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-2.0.2">subsubsection number should be 2.0.2</a></li><li class="toc-title-4"><a href="#subsubsection-number-should-be-2.0.3" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-2.0.3">subsubsection number should be 2.0.3</a></li><li class="toc-title-4"><a href="#subsubsection-number-should-be-2.0.4" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-2.0.4">subsubsection number should be 2.0.4</a></li><li class="toc-title-3"><details><summary><a href="#subsection" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsection">subsection</a></summary><ul><li class="toc-title-4"><a href="#subsubsection-number-should-be-2.1.1" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-2.1.1">subsubsection number should be 2.1.1</a></li><li class="toc-title-4"><a href="#subsubsection-number-should-be-2.1.2" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-2.1.2">subsubsection number should be 2.1.2</a></li></ul></details></li></ul></details></li><li class="toc-title-2"><details><summary><a href="#section-3" style="cursor: pointer; text-decoration: none;" class="toc-link" value="section-3">section</a></summary><ul><li class="toc-title-4"><a href="#subsubsection-number-should-be-3.0.1" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-3.0.1">subsubsection number should be 3.0.1</a></li><li class="toc-title-4"><a href="#subsubsection-number-should-be-3.0.2" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-3.0.2">subsubsection number should be 3.0.2</a></li></ul></details></li></ul></div>`,
   },
+  {
+   latex: "[[toc]]\n" +
+   "\n" +
+   "Change subsubsection number to 7 `\\setcounter{subsubsection}{7}`\n" +
+   "\n" +
+   "\\setcounter{subsubsection}{7}\n" +
+   "\n" +
+   "\\section*{section unnumbered}\n" +
+   "\n" +
+   "\\subsubsection*{subsubsection unnumbered}\n" +
+   "\n" +
+   "\\subsubsection{subsubsection number should be 0.0.8}\n" +
+   "\n" +
+   "Change subsubsection number to 1 `\\setcounter{subsubsection}{1}`\n" +
+   "\n" +
+   "\\setcounter{subsubsection}{1}\n" +
+   "\n" +
+   "\\subsubsection{subsubsection number should be 0.0.2}\n" +
+   "\n" +
+   "\\subsubsection*{subsubsection unnumbered}\n" +
+   "\n" +
+   "\\subsubsection{subsubsection number should be 0.0.3}\n" +
+   "\n" +
+   "\\subsubsection{subsubsection number should be 0.0.4}\n" +
+   "\n" +
+   "\\section{section}\n" +
+   "\n" +
+   "Change section number to 5 `\\setcounter{section}{5}`\n" +
+   "\\setcounter{section}{5}\n" +
+   "\n" +
+   "\\subsubsection{subsubsection number should be 5.0.1}\n" +
+   "\n" +
+   "\\subsubsection*{subsubsection unnumbered}\n" +
+   "\n" +
+   "Change section number to 7 `\\setcounter{section}{7}`\n" +
+   "\\setcounter{section}{7}\n" +
+   "\\subsubsection{subsubsection number should be 7.0.2}\n" +
+   "\n" +
+   "\\subsection*{subsection unnumbered}\n" +
+   "\n" +
+   "\\subsubsection*{subsubsection unnumbered}\n" +
+   "\n" +
+   "\\subsubsection{subsubsection number should be 7.0.3}\n" +
+   "\n" +
+   "\\subsubsection{subsubsection number should be 7.0.4}\n" +
+   "\n" +
+   "\\section*{section unnumbered}\n" +
+   "\n" +
+   "\\subsubsection*{subsubsection unnumbered}\n" +
+   "\n" +
+   "\\subsubsection*{subsubsection unnumbered}\n" +
+   "\n" +
+   "\\section{section}\n" +
+   "\n" +
+   "Change subsection number to 7 `\\setcounter{subsection}{7}`\n" +
+   "\\setcounter{subsection}{7}\n" +
+   "\n" +
+   "\\subsubsection{subsubsection number should be 8.7.1}\n" +
+   "\n" +
+   "\\subsubsection*{subsubsection unnumbered}\n" +
+   "\n" +
+   "\\subsection{subsection}\n" +
+   "\n" +
+   "\\subsubsection{subsubsection number should be 8.8.1}\n" +
+   "\n" +
+   "\\subsection*{subsection unnumbered}\n" +
+   "\n" +
+   "\\subsubsection{subsubsection number should be 8.8.2}\n" +
+   "\n" +
+   "Change subsubsection number to 7 `\\setcounter{subsubsection}{7}`\n" +
+   "\\setcounter{subsubsection}{7}\n" +
+   "\n" +
+   "\\subsubsection{subsubsection number should be 8.8.8}\n" +
+   "\n" +
+   "\\subsection{subsection}\n" +
+   "\n" +
+   "\\subsubsection{subsubsection number should be 8.9.1}\n" +
+   "\n" +
+   "\\subsubsection*{subsubsection unnumbered}\n" +
+   "\n" +
+   "\\subsubsection{subsubsection number should be 8.9.2}\n" +
+   "\n" +
+   "\\subsection*{subsection unnumbered}\n" +
+   "\n" +
+   "\\section{section}\n" +
+   "\n" +
+   "Change subsection number to 7 `\\setcounter{subsection}{7}`\n" +
+   "\\setcounter{subsection}{7}\n" +
+   "\n" +
+   "\\subsubsection*{subsubsection unnumbered}\n" +
+   "\n" +
+   "\\subsection*{subsection unnumbered}\n" +
+   "\n" +
+   "\\subsubsection{subsubsection number should be 9.7.1}\n" +
+   "\n" +
+   "\\subsection{subsection}\n" +
+   "\n" +
+   "\\subsection*{subsection unnumbered}\n" +
+   "\n" +
+   "\\subsubsection*{subsubsection unnumbered}\n" +
+   "\n" +
+   "\\subsection*{subsection unnumbered}\n" +
+   "\n" +
+   "\\subsubsection{subsubsection number should be 9.8.1}",
+   html: `<div><div class="table-of-contents" style="display: none"><ul><li class="toc-title-4"><a href="#subsubsection-number-should-be-0.0.8" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-0.0.8">subsubsection number should be 0.0.8</a></li><li class="toc-title-4"><a href="#subsubsection-number-should-be-0.0.2" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-0.0.2">subsubsection number should be 0.0.2</a></li><li class="toc-title-4"><a href="#subsubsection-number-should-be-0.0.3" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-0.0.3">subsubsection number should be 0.0.3</a></li><li class="toc-title-4"><a href="#subsubsection-number-should-be-0.0.4" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-0.0.4">subsubsection number should be 0.0.4</a></li><li class="toc-title-2"><a href="#section" style="cursor: pointer; text-decoration: none;" class="toc-link" value="section">section</a><ul><li class="toc-title-4"><a href="#subsubsection-number-should-be-5.0.1" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-5.0.1">subsubsection number should be 5.0.1</a></li><li class="toc-title-4"><a href="#subsubsection-number-should-be-7.0.2" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-7.0.2">subsubsection number should be 7.0.2</a></li><li class="toc-title-4"><a href="#subsubsection-number-should-be-7.0.3" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-7.0.3">subsubsection number should be 7.0.3</a></li><li class="toc-title-4"><a href="#subsubsection-number-should-be-7.0.4" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-7.0.4">subsubsection number should be 7.0.4</a></li></ul></li><li class="toc-title-2"><a href="#section-2" style="cursor: pointer; text-decoration: none;" class="toc-link" value="section-2">section</a><ul><li class="toc-title-4"><a href="#subsubsection-number-should-be-8.7.1" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-8.7.1">subsubsection number should be 8.7.1</a></li><li class="toc-title-3"><a href="#subsection" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsection">subsection</a><ul><li class="toc-title-4"><a href="#subsubsection-number-should-be-8.8.1" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-8.8.1">subsubsection number should be 8.8.1</a></li><li class="toc-title-4"><a href="#subsubsection-number-should-be-8.8.2" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-8.8.2">subsubsection number should be 8.8.2</a></li><li class="toc-title-4"><a href="#subsubsection-number-should-be-8.8.8" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-8.8.8">subsubsection number should be 8.8.8</a></li></ul></li><li class="toc-title-3"><a href="#subsection-2" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsection-2">subsection</a><ul><li class="toc-title-4"><a href="#subsubsection-number-should-be-8.9.1" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-8.9.1">subsubsection number should be 8.9.1</a></li><li class="toc-title-4"><a href="#subsubsection-number-should-be-8.9.2" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-8.9.2">subsubsection number should be 8.9.2</a></li></ul></li></ul></li><li class="toc-title-2"><a href="#section-3" style="cursor: pointer; text-decoration: none;" class="toc-link" value="section-3">section</a><ul><li class="toc-title-4"><a href="#subsubsection-number-should-be-9.7.1" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-9.7.1">subsubsection number should be 9.7.1</a></li><li class="toc-title-3"><a href="#subsection-3" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsection-3">subsection</a><ul><li class="toc-title-4"><a href="#subsubsection-number-should-be-9.8.1" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-9.8.1">subsubsection number should be 9.8.1</a></li></ul></li></ul></li></ul></div></div>
+<div>Change subsubsection number to 7 <code>\\setcounter{subsubsection}{7}</code></div>
+<div style="margin-top: 0; margin-bottom: 0;"></div>
+<h2 type="section" data-unnumbered="true" class="section-title" id="section-unnumbered">
+section unnumbered</h2>
+<h4 type="subsubsection" data-unnumbered="true" class="sub_sub_section-title" id="subsubsection-unnumbered">
+subsubsection unnumbered</h4>
+<h4 type="subsubsection" class="sub_sub_section-title" id="subsubsection-number-should-be-0.0.8">
+<span class="section-number">0.</span><span class="sub_section-number">0.8.</span> subsubsection number should be 0.0.8</h4>
+<div>Change subsubsection number to 1 <code>\\setcounter{subsubsection}{1}</code></div>
+<div style="margin-top: 0; margin-bottom: 0;"></div>
+<h4 type="subsubsection" class="sub_sub_section-title" id="subsubsection-number-should-be-0.0.2">
+<span class="section-number">0.</span><span class="sub_section-number">0.2.</span> subsubsection number should be 0.0.2</h4>
+<h4 type="subsubsection" data-unnumbered="true" class="sub_sub_section-title" id="subsubsection-unnumbered-2">
+subsubsection unnumbered</h4>
+<h4 type="subsubsection" class="sub_sub_section-title" id="subsubsection-number-should-be-0.0.3">
+<span class="section-number">0.</span><span class="sub_section-number">0.3.</span> subsubsection number should be 0.0.3</h4>
+<h4 type="subsubsection" class="sub_sub_section-title" id="subsubsection-number-should-be-0.0.4">
+<span class="section-number">0.</span><span class="sub_section-number">0.4.</span> subsubsection number should be 0.0.4</h4>
+<h2 type="section" class="section-title" id="section">
+<span class="section-number">1. </span>section</h2>
+<div style="margin-top: 0; margin-bottom: 1rem;">Change section number to 5 <code>\\setcounter{section}{5}</code><br>
+</div>
+<h4 type="subsubsection" class="sub_sub_section-title" id="subsubsection-number-should-be-5.0.1">
+<span class="section-number">5.</span><span class="sub_section-number">0.1.</span> subsubsection number should be 5.0.1</h4>
+<h4 type="subsubsection" data-unnumbered="true" class="sub_sub_section-title" id="subsubsection-unnumbered-3">
+subsubsection unnumbered</h4>
+<div style="margin-top: 0; margin-bottom: 1rem;">Change section number to 7 <code>\\setcounter{section}{7}</code><br>
+</div>
+<h4 type="subsubsection" class="sub_sub_section-title" id="subsubsection-number-should-be-7.0.2">
+<span class="section-number">7.</span><span class="sub_section-number">0.2.</span> subsubsection number should be 7.0.2</h4>
+<h3 type="subsection" data-unnumbered="true" class="sub_section-title" id="subsection-unnumbered">
+subsection unnumbered</h3>
+<h4 type="subsubsection" data-unnumbered="true" class="sub_sub_section-title" id="subsubsection-unnumbered-4">
+subsubsection unnumbered</h4>
+<h4 type="subsubsection" class="sub_sub_section-title" id="subsubsection-number-should-be-7.0.3">
+<span class="section-number">7.</span><span class="sub_section-number">0.3.</span> subsubsection number should be 7.0.3</h4>
+<h4 type="subsubsection" class="sub_sub_section-title" id="subsubsection-number-should-be-7.0.4">
+<span class="section-number">7.</span><span class="sub_section-number">0.4.</span> subsubsection number should be 7.0.4</h4>
+<h2 type="section" data-unnumbered="true" class="section-title" id="section-unnumbered-2">
+section unnumbered</h2>
+<h4 type="subsubsection" data-unnumbered="true" class="sub_sub_section-title" id="subsubsection-unnumbered-5">
+subsubsection unnumbered</h4>
+<h4 type="subsubsection" data-unnumbered="true" class="sub_sub_section-title" id="subsubsection-unnumbered-6">
+subsubsection unnumbered</h4>
+<h2 type="section" class="section-title" id="section-2">
+<span class="section-number">8. </span>section</h2>
+<div style="margin-top: 0; margin-bottom: 1rem;">Change subsection number to 7 <code>\\setcounter{subsection}{7}</code><br>
+</div>
+<h4 type="subsubsection" class="sub_sub_section-title" id="subsubsection-number-should-be-8.7.1">
+<span class="section-number">8.</span><span class="sub_section-number">7.1.</span> subsubsection number should be 8.7.1</h4>
+<h4 type="subsubsection" data-unnumbered="true" class="sub_sub_section-title" id="subsubsection-unnumbered-7">
+subsubsection unnumbered</h4>
+<h3 type="subsection" class="sub_section-title" id="subsection">
+<span class="section-number">8.</span><span class="sub_section-number">8.</span> subsection</h3>
+<h4 type="subsubsection" class="sub_sub_section-title" id="subsubsection-number-should-be-8.8.1">
+<span class="section-number">8.</span><span class="sub_section-number">8.1.</span> subsubsection number should be 8.8.1</h4>
+<h3 type="subsection" data-unnumbered="true" class="sub_section-title" id="subsection-unnumbered-2">
+subsection unnumbered</h3>
+<h4 type="subsubsection" class="sub_sub_section-title" id="subsubsection-number-should-be-8.8.2">
+<span class="section-number">8.</span><span class="sub_section-number">8.2.</span> subsubsection number should be 8.8.2</h4>
+<div style="margin-top: 0; margin-bottom: 1rem;">Change subsubsection number to 7 <code>\\setcounter{subsubsection}{7}</code><br>
+</div>
+<h4 type="subsubsection" class="sub_sub_section-title" id="subsubsection-number-should-be-8.8.8">
+<span class="section-number">8.</span><span class="sub_section-number">8.8.</span> subsubsection number should be 8.8.8</h4>
+<h3 type="subsection" class="sub_section-title" id="subsection-2">
+<span class="section-number">8.</span><span class="sub_section-number">9.</span> subsection</h3>
+<h4 type="subsubsection" class="sub_sub_section-title" id="subsubsection-number-should-be-8.9.1">
+<span class="section-number">8.</span><span class="sub_section-number">9.1.</span> subsubsection number should be 8.9.1</h4>
+<h4 type="subsubsection" data-unnumbered="true" class="sub_sub_section-title" id="subsubsection-unnumbered-8">
+subsubsection unnumbered</h4>
+<h4 type="subsubsection" class="sub_sub_section-title" id="subsubsection-number-should-be-8.9.2">
+<span class="section-number">8.</span><span class="sub_section-number">9.2.</span> subsubsection number should be 8.9.2</h4>
+<h3 type="subsection" data-unnumbered="true" class="sub_section-title" id="subsection-unnumbered-3">
+subsection unnumbered</h3>
+<h2 type="section" class="section-title" id="section-3">
+<span class="section-number">9. </span>section</h2>
+<div style="margin-top: 0; margin-bottom: 1rem;">Change subsection number to 7 <code>\\setcounter{subsection}{7}</code><br>
+</div>
+<h4 type="subsubsection" data-unnumbered="true" class="sub_sub_section-title" id="subsubsection-unnumbered-9">
+subsubsection unnumbered</h4>
+<h3 type="subsection" data-unnumbered="true" class="sub_section-title" id="subsection-unnumbered-4">
+subsection unnumbered</h3>
+<h4 type="subsubsection" class="sub_sub_section-title" id="subsubsection-number-should-be-9.7.1">
+<span class="section-number">9.</span><span class="sub_section-number">7.1.</span> subsubsection number should be 9.7.1</h4>
+<h3 type="subsection" class="sub_section-title" id="subsection-3">
+<span class="section-number">9.</span><span class="sub_section-number">8.</span> subsection</h3>
+<h3 type="subsection" data-unnumbered="true" class="sub_section-title" id="subsection-unnumbered-5">
+subsection unnumbered</h3>
+<h4 type="subsubsection" data-unnumbered="true" class="sub_sub_section-title" id="subsubsection-unnumbered-10">
+subsubsection unnumbered</h4>
+<h3 type="subsection" data-unnumbered="true" class="sub_section-title" id="subsection-unnumbered-6">
+subsection unnumbered</h3>
+<h4 type="subsubsection" class="sub_sub_section-title" id="subsubsection-number-should-be-9.8.1">
+<span class="section-number">9.</span><span class="sub_section-number">8.1.</span> subsubsection number should be 9.8.1</h4>`,
+   tocHtml: `<div id="toc_container"><ul><li class="toc-title-4"><a href="#subsubsection-number-should-be-0.0.8" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-0.0.8">subsubsection number should be 0.0.8</a></li><li class="toc-title-4"><a href="#subsubsection-number-should-be-0.0.2" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-0.0.2">subsubsection number should be 0.0.2</a></li><li class="toc-title-4"><a href="#subsubsection-number-should-be-0.0.3" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-0.0.3">subsubsection number should be 0.0.3</a></li><li class="toc-title-4"><a href="#subsubsection-number-should-be-0.0.4" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-0.0.4">subsubsection number should be 0.0.4</a></li><li class="toc-title-2"><a href="#section" style="cursor: pointer; text-decoration: none;" class="toc-link" value="section">section</a><ul><li class="toc-title-4"><a href="#subsubsection-number-should-be-5.0.1" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-5.0.1">subsubsection number should be 5.0.1</a></li><li class="toc-title-4"><a href="#subsubsection-number-should-be-7.0.2" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-7.0.2">subsubsection number should be 7.0.2</a></li><li class="toc-title-4"><a href="#subsubsection-number-should-be-7.0.3" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-7.0.3">subsubsection number should be 7.0.3</a></li><li class="toc-title-4"><a href="#subsubsection-number-should-be-7.0.4" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-7.0.4">subsubsection number should be 7.0.4</a></li></ul></li><li class="toc-title-2"><a href="#section-2" style="cursor: pointer; text-decoration: none;" class="toc-link" value="section-2">section</a><ul><li class="toc-title-4"><a href="#subsubsection-number-should-be-8.7.1" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-8.7.1">subsubsection number should be 8.7.1</a></li><li class="toc-title-3"><a href="#subsection" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsection">subsection</a><ul><li class="toc-title-4"><a href="#subsubsection-number-should-be-8.8.1" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-8.8.1">subsubsection number should be 8.8.1</a></li><li class="toc-title-4"><a href="#subsubsection-number-should-be-8.8.2" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-8.8.2">subsubsection number should be 8.8.2</a></li><li class="toc-title-4"><a href="#subsubsection-number-should-be-8.8.8" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-8.8.8">subsubsection number should be 8.8.8</a></li></ul></li><li class="toc-title-3"><a href="#subsection-2" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsection-2">subsection</a><ul><li class="toc-title-4"><a href="#subsubsection-number-should-be-8.9.1" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-8.9.1">subsubsection number should be 8.9.1</a></li><li class="toc-title-4"><a href="#subsubsection-number-should-be-8.9.2" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-8.9.2">subsubsection number should be 8.9.2</a></li></ul></li></ul></li><li class="toc-title-2"><a href="#section-3" style="cursor: pointer; text-decoration: none;" class="toc-link" value="section-3">section</a><ul><li class="toc-title-4"><a href="#subsubsection-number-should-be-9.7.1" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-9.7.1">subsubsection number should be 9.7.1</a></li><li class="toc-title-3"><a href="#subsection-3" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsection-3">subsection</a><ul><li class="toc-title-4"><a href="#subsubsection-number-should-be-9.8.1" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-9.8.1">subsubsection number should be 9.8.1</a></li></ul></li></ul></li></ul></div>`,
+   tocHtmlSummary: `<div id="toc_container"><ul><li class="toc-title-4"><a href="#subsubsection-number-should-be-0.0.8" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-0.0.8">subsubsection number should be 0.0.8</a></li><li class="toc-title-4"><a href="#subsubsection-number-should-be-0.0.2" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-0.0.2">subsubsection number should be 0.0.2</a></li><li class="toc-title-4"><a href="#subsubsection-number-should-be-0.0.3" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-0.0.3">subsubsection number should be 0.0.3</a></li><li class="toc-title-4"><a href="#subsubsection-number-should-be-0.0.4" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-0.0.4">subsubsection number should be 0.0.4</a></li><li class="toc-title-2"><details><summary><a href="#section" style="cursor: pointer; text-decoration: none;" class="toc-link" value="section">section</a></summary><ul><li class="toc-title-4"><a href="#subsubsection-number-should-be-5.0.1" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-5.0.1">subsubsection number should be 5.0.1</a></li><li class="toc-title-4"><a href="#subsubsection-number-should-be-7.0.2" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-7.0.2">subsubsection number should be 7.0.2</a></li><li class="toc-title-4"><a href="#subsubsection-number-should-be-7.0.3" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-7.0.3">subsubsection number should be 7.0.3</a></li><li class="toc-title-4"><a href="#subsubsection-number-should-be-7.0.4" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-7.0.4">subsubsection number should be 7.0.4</a></li></ul></details></li><li class="toc-title-2"><details><summary><a href="#section-2" style="cursor: pointer; text-decoration: none;" class="toc-link" value="section-2">section</a></summary><ul><li class="toc-title-4"><a href="#subsubsection-number-should-be-8.7.1" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-8.7.1">subsubsection number should be 8.7.1</a></li><li class="toc-title-3"><details><summary><a href="#subsection" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsection">subsection</a></summary><ul><li class="toc-title-4"><a href="#subsubsection-number-should-be-8.8.1" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-8.8.1">subsubsection number should be 8.8.1</a></li><li class="toc-title-4"><a href="#subsubsection-number-should-be-8.8.2" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-8.8.2">subsubsection number should be 8.8.2</a></li><li class="toc-title-4"><a href="#subsubsection-number-should-be-8.8.8" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-8.8.8">subsubsection number should be 8.8.8</a></li></ul></details></li><li class="toc-title-3"><details><summary><a href="#subsection-2" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsection-2">subsection</a></summary><ul><li class="toc-title-4"><a href="#subsubsection-number-should-be-8.9.1" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-8.9.1">subsubsection number should be 8.9.1</a></li><li class="toc-title-4"><a href="#subsubsection-number-should-be-8.9.2" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-8.9.2">subsubsection number should be 8.9.2</a></li></ul></details></li></ul></details></li><li class="toc-title-2"><details><summary><a href="#section-3" style="cursor: pointer; text-decoration: none;" class="toc-link" value="section-3">section</a></summary><ul><li class="toc-title-4"><a href="#subsubsection-number-should-be-9.7.1" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-9.7.1">subsubsection number should be 9.7.1</a></li><li class="toc-title-3"><details><summary><a href="#subsection-3" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsection-3">subsection</a></summary><ul><li class="toc-title-4"><a href="#subsubsection-number-should-be-9.8.1" style="cursor: pointer; text-decoration: none;" class="toc-link" value="subsubsection-number-should-be-9.8.1">subsubsection number should be 9.8.1</a></li></ul></details></li></ul></details></li></ul></div>`,
+ },
   // {
-  //   latex: "",
-  //   html: ``,
-  //   tocHtml: ``,
-  //   tocHtmlSummary: ``,
-  // },
+    //   latex: "",
+    //   html: ``,
+    //   tocHtml: ``,
+    //   tocHtmlSummary: ``,
+    // },
 ];
