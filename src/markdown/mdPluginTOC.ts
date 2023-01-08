@@ -61,21 +61,22 @@ const tocHide: RuleInline = (state, silent) => {
 };
 
 const renderTocOpen: Renderer = () => {
-  return `<div class="table-of-contents" style="display: none"}}>`;
+  return `<div class="table-of-contents" style="display: none">`;
 };
 
 const renderTocClose: Renderer = () => {
   return `</div>`;
 };
 
-const renderTocBody: Renderer = (tokens, index, options) => {
-  const { toc = {} } = options;
-  const { style = 'list' } = toc;
-  const isSummary = style === TTocStyle.summary;
-  
-  return isSummary 
-    ? renderTocAsSummary(0, gstate.tokens, options)
-    : renderChildsTokens(0, gstate.tokens, options)[1];
+const renderTocBody: Renderer = (tokens, index, options, env, slf) => {
+  let res: string = '';
+  const dataToc: ITocData = getTocList(0, gstate.tokens, options,-1, env, slf);
+
+  if (!dataToc || !dataToc.tocList?.length) {
+    return res;
+  }
+  res = renderList(dataToc.tocList, options, env, slf);
+  return res;
 };
 
 const types: string[] = [
@@ -83,152 +84,130 @@ const types: string[] = [
   'title',
   'section',
   'subsection',
-  'subsubsection'
+  'subsubsection',
+  'addcontentsline'
 ];
 
-const renderSub = (content, sub, parentId) => {
-  let res = '';
-  if (!sub || !sub.length || sub.length < 1) {
-    return res;
-  } 
-  const sunList = sub[1];
-
-  res += `<details id="${parentId}"><summary>`;
-  res += content;
-  res += '</summary>';
-  res += renderList(sunList);
-  res += '</details>';
-  return res;
-}; 
-
-const renderList = (tocList) => {
+/** Generating a nested list for nested headers */
+const renderSub = (renderedParentEl: string, tocList: Array<ITocItem>, parentId, options, env, slf) => {
   let res = '';
   if (!tocList || !tocList.length) {
     return res;
   }
-  
+  if (options.toc?.style === TTocStyle.summary) {
+    res += parentId
+      ? `<details id="${parentId}"><summary>`
+      : `<details><summary>`;
+    res += renderedParentEl;
+    res += '</summary>';
+    res += renderList(tocList, options, env, slf);
+    res += '</details>';
+  } else {
+    res += renderedParentEl;
+    res += renderList(tocList, options, env, slf);
+  }
+  return res;
+}; 
+
+/** Render tocList to html as unnumbered list <ul>...</ul> */
+const renderList = (tocList: Array<ITocItem>, options, env, slf) => {
+  let res = '';
+  if (!tocList || !tocList.length) {
+    return res;
+  }
+  const isSummary = options.toc?.style === TTocStyle.summary;
   res += '<ul>';
-  for ( let i = 0; i < tocList.length; i++) {
+  for (let i = 0; i < tocList.length; i++) {
     const item = tocList[i];
-    const { level, link, value, content} = item;
-
+    const { level, link, value, content, children = []} = item;
     res += `<li class="toc-title-${level}">`;
-
-    const parentId = item.subHeadings ? uid() : '';
+    const parentId = options.toc?.doNotGenerateParentId 
+      ? '' : item.subHeadings && isSummary ? uid() : '';
     const dataParentId = parentId 
       ? `data-parent-id="${parentId}" ` 
       : '';
-    
-    const renderLink = `<a href="${link}" style="cursor: pointer; text-decoration: none;" class="toc-link" value="${value}" ${dataParentId}>`
-                + content
-                + '</a>';
-    
+    /** To generate a link to the corresponding header in the DOM tree */
+    let renderLink = `<a href="${link}" style="cursor: pointer; text-decoration: none;" class="toc-link" value="${value}"`;
+    renderLink += dataParentId ? " " + dataParentId : '';
+    renderLink += '>';
+    if (children?.length) {
+      for (let j = 0; j < children.length; j++) {
+        const child = children[j];
+        /** Since a link cannot contain a nested link, all nested links should be replaced with <span>...</span> */
+        if (child.type === 'link_open') {
+          renderLink += '<span>';
+          continue;
+        }
+        if (child.type === 'link_close') {
+          renderLink += '</span>';
+          continue;
+        }
+        renderLink += slf.renderInline([child], options, env)
+      }
+    } else {
+      renderLink += content;
+    }
+    renderLink += '</a>';
     if (item.subHeadings) {
-      res += renderSub(renderLink, item.subHeadings, parentId)
+      /** Generating a nested list for nested headers */
+      res += renderSub(renderLink, item.subHeadings, parentId, options, env, slf)
     } else {
       res += renderLink;
     }
     res += '</li>';
   }
-
   res += '</ul>';
   return res;
 };
 
-const renderTocAsSummary = (pos: number, tokens: TokenList, options) => {
-  let res = '';
-  const tocList: any = getTocList(0, gstate.tokens, options)[1];
+export interface ITocItem {
+  level: number,
+  link: string,
+  value: string,
+  content: string,
+  children?: Array<Token>,
+  subHeadings?: Array<Token>
+}
 
-  if (!tocList || !tocList.length) {
-    return res;
-  }
-  res = renderList(tocList);
-  return res;
+export interface ITocData {
+  index: number, /** Index of the token in the array of tokens for building nested headers */
+  tocList: Array<ITocItem>
+}
+
+let slugsTocItems = {};
+export const clearSlugsTocItems = () => {
+  slugsTocItems = {};
 };
-
-const renderChildsTokens = (pos: number, tokens: TokenList, options) => {
-  const slugs = {};
-  let headings: Array<string> = [],
-    buffer: string = '',
-    currentLevel: number,
-    subHeadings,
-    size: number = tokens.length,
-    i: number = pos;
-
-  while(i < size) {
-    let token: Token = tokens[i];
-
-    let heading: Token = tokens[i - 1];
-    let heading_open: Token = tokens[i - 2];
-    let level: number = token.tag && parseInt(token.tag.substr(1, 1));
-    if (token.type !== 'heading_close' || options.includeLevel.indexOf(level) == -1 || !types.includes(heading.type)) {
-      i++;
-      continue;
-    }
-    let heading_id: string = '';
-
-    if (heading_open && heading_open.type === 'heading_open') {
-      heading_id = heading_open.attrGet('id');
-    }
-
-    if (!currentLevel) {
-      currentLevel = level;
-    } else {
-      if (level > currentLevel) {
-        subHeadings = renderChildsTokens(i, tokens, options);
-        buffer += subHeadings[1];
-        i = subHeadings[0];
-        continue;
-      }
-      if (level < currentLevel) {
-        // Finishing the sub headings
-        buffer += `</li>`;
-        headings.push(buffer);
-        return [i, `<ul>${headings.join('')}</ul}>`];
-      }
-      if (level == currentLevel) {
-        // Finishing the sub headings
-        buffer += `</li>`;
-        headings.push(buffer);
-      }
-    }
-
-    let slugifiedContent: string = heading_id !== '' ? heading_id : uniqueSlug(slugify(heading.content), slugs);
-    let link: string = "#"+slugifiedContent;
-
-    buffer = `<li class="toc-title-${level}"><a href="${link}" style="cursor: pointer; text-decoration: none;" class="toc-link" value="${slugifiedContent}">`;
-    buffer += heading.content;
-    buffer += `</a>`;
-    i++;
-  }
-  buffer += buffer === '' ? '' : `</li>`;
-  headings.push(buffer);
-  return [i, `<ul>${headings.join('')}</ul>`];
-};
-
-const getTocList = (pos: number, tokens: TokenList, options, levelSub = -1) => {
-  const slugs = {};
+/**
+ * The function loops through an array of tokens and returns the list needed to render toc.
+ * The resulting list is grouped by heading nesting levels.
+ * */
+const getTocList = (pos: number, tokens: TokenList, options, levelSub = -1, env, slf): ITocData => {
   let 
-    subHeadings,
+    subHeadings: Array<ITocItem>,
     size: number = tokens.length,
     i: number = pos;
-  
-  const tocList = [];
-  let tocItem = null;
-
-
+  const tocList: Array<ITocItem> = [];
+  let tocItem: ITocItem = null;
   let currentLevel = 0;
   while(i < size) {
     let token: Token = tokens[i];
-
     let heading: Token = tokens[i - 1];
     let heading_open: Token = tokens[i - 2];
-    let level: number = token.tag && parseInt(token.tag.substr(1, 1));
-    if (token.type !== 'heading_close' || options.includeLevel.indexOf(level) == -1 || !types.includes(heading.type)) {
+    let level: number = token.envLevel 
+      ? token.envLevel 
+      : token.tag && parseInt(token.tag.substr(1, 1));
+    if ((token.type !== 'heading_close' && token.type !== 'addcontentsline_close') 
+      || options.includeLevel.indexOf(level) == -1 || !types.includes(heading.type)) {
       i++;
       continue;
     }
     let heading_id: string = '';
+    /** Unnumbered sections will not go into the table of contents */
+    if (token.type === 'heading_close' && token.isUnNumbered) {
+      i++;
+      continue;
+    }
 
     if (heading_open && heading_open.type === 'heading_open') {
       heading_id = heading_open.attrGet('id');
@@ -238,14 +217,18 @@ const getTocList = (pos: number, tokens: TokenList, options, levelSub = -1) => {
       currentLevel = level;
     } else {
       if (level > currentLevel) {
-        subHeadings = getTocList(i, tokens, options, level);
-        i = subHeadings[0];
-        const last = tocList[tocList.length - 1];
-        if (last) {
-          last.subHeadings = subHeadings
+        const dataSubToc: ITocData = getTocList(i, tokens, options, level, env, slf);
+        subHeadings = dataSubToc ? dataSubToc.tocList : [];
+        i = dataSubToc.index;
+        const last: ITocItem = tocList[tocList.length - 1];
+        if (last && subHeadings?.length) {
+          if (last.subHeadings?.length) {
+            last.subHeadings = last.subHeadings.concat(subHeadings)
+          } else {
+            last.subHeadings = subHeadings
+          }
         }
-        subHeadings = null;
-        
+        subHeadings = [];
         continue;
       }
       if (level < currentLevel) {
@@ -255,21 +238,26 @@ const getTocList = (pos: number, tokens: TokenList, options, levelSub = -1) => {
       }
     }
 
-    let slugifiedContent: string = heading_id !== '' ? heading_id : uniqueSlug(slugify(heading.content), slugs);
-    let link: string = "#"+slugifiedContent;
+    let slugifiedContent: string = heading_id !== '' 
+      ? heading_id 
+      : uniqueSlug(slugify(heading.content), slugsTocItems);
+    let link: string = "#" + slugifiedContent;
 
     tocItem = {
       level: level,
       link: link,
       value: slugifiedContent,
-      content: heading.content
-
+      content: heading.content,
+      children: heading.children  
     };
     tocList.push(tocItem);
+    currentLevel = level;
     i++;
   }
-  
-  return [i, tocList];
+  return {
+    index: i, /** Index of the token in the array of tokens for building nested headers */
+    tocList: tocList
+  };
 };
 
 const mapping = {
@@ -279,8 +267,8 @@ const mapping = {
 };
 
 export default (md: MarkdownIt, opts) => {
-  const options = Object.assign({}, defaults, opts);
-
+  clearSlugsTocItems();
+  Object.assign(md.options, defaults, opts);
   // Catch all the tokens for iteration later
   md.core.ruler.push('grab_state', (state) => {
     gstate = state;
@@ -291,14 +279,14 @@ export default (md: MarkdownIt, opts) => {
   md.inline.ruler.push('tocHide', tocHide);
 
   Object.keys(mapping).forEach(key => {
-    md.renderer.rules[key] = (tokens, idx) => {
+    md.renderer.rules[key] = (tokens, idx, options, env, slf) => {
       switch (tokens[idx].type) {
         case "toc_open":
           return renderTocOpen();
         case "toc_close":
           return renderTocClose();
         case "toc_body":
-          return renderTocBody(tokens, idx, options);
+          return renderTocBody(tokens, idx, options, env, slf);
         default:
           return '';
       }

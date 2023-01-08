@@ -11,6 +11,9 @@ export declare const labelTagG: RegExp;
 export declare const openTag: RegExp;
 export declare const openTagDescription: RegExp;
 export declare const openTagProof: RegExp;
+export declare const reNewTheoremG: RegExp;
+export declare const reNewTheoremInit: RegExp;
+export declare const reNewTheoremUnNumberedInit: RegExp;
 export declare const reNewTheorem: RegExp;
 export declare const reNewTheoremNumbered: RegExp;
 export declare const reNewTheoremNumbered2: RegExp;
@@ -23,6 +26,8 @@ export declare const reNewCommandQedSymbolG: RegExp;
 export declare const defQED = "$\\square$";
 export declare const reSetCounter: RegExp;
 export declare const reSetCounterG: RegExp;
+export declare const reAddContentsLine: RegExp;
+export declare const reAddContentsLineG: RegExp;
 export declare const latexEnvironments: string[];
 /** https://docs.mathjax.org/en/v3.0-latest/input/tex/macros/index.html#environments */
 export declare const mathEnvironments: string[];

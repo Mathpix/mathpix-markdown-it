@@ -1,9 +1,8 @@
 import { RuleInline } from 'markdown-it';
+const isSpace = require('markdown-it/lib/common/utils').isSpace;
 import {
-  reNewTheorem,
-  reNewTheoremNumbered,
-  reNewTheoremNumbered2,
-  reNewTheoremUnNumbered,
+  reNewTheoremInit,
+  reNewTheoremUnNumberedInit,
   reTheoremStyle,
   defTheoremStyle,
   reNewCommandQedSymbol,
@@ -15,6 +14,7 @@ import {
   addEnvironmentsCounter
 } from "./helper";
 import {reNumber} from "../md-block-rule/lists";
+import { findEndMarker } from "../common";
 
 /**
  * \theoremstyle{definition} | \theoremstyle{plain} | \theoremstyle{remark}
@@ -62,6 +62,7 @@ export const newTheorem: RuleInline = (state) => {
   if (state.src.charCodeAt(startPos) !== 0x5c /* \ */) {
     return false;
   }
+  let max = state.posMax;
   let envName: string = "";
   let envPrint: string = "";
   let numbered: string = "";
@@ -69,64 +70,112 @@ export const newTheorem: RuleInline = (state) => {
   let content: string = "";
   let isNumbered: boolean = true;
   let useCounter = "";
+  /** \newtheorem{name} - numbered theorem */
   let match: RegExpMatchArray = state.src
     .slice(startPos)
-    .match(reNewTheoremNumbered);
-  if (match) {
-    /**
-     * \newtheorem{corollary}{Corollary}[theorem]
-     * An environment called corollary is created, 
-     * the counter of this new environment will be reset every time a new theorem environment is used.
-     * */
-    envName = match.groups?.name ? match.groups.name : match[1];
-    envPrint = match.groups?.print ? match.groups.print : match[2];
-    numbered = match.groups?.numbered ? match.groups.numbered : match[3];
-    nextPos += match[0].length;
-    content = match[0];
-  } else {
+    .match(reNewTheoremInit);
+  if (!match) {
+    isNumbered = false;
+    /** \newtheorem*{name} - unnumbered theorem */
     match = state.src
       .slice(startPos)
-      .match(reNewTheoremNumbered2);
-    if (match) {
-      /**
-       * \newtheorem{lemma}[theorem]{Lemma}
-       * In this case, the even though a new environment called lemma is created, 
-       * it will use the same counter as the theorem environment.
-       * */
-      envName = match.groups?.name ? match.groups.name : match[1];
-      numbered = match.groups?.numbered ? match.groups.numbered : match[2];
-      envPrint = match.groups?.print ? match.groups.print : match[3];
-      nextPos += match[0].length;
-      content = match[0];
+      .match(reNewTheoremUnNumberedInit);
+  }
+  if (!match) {
+    return false;
+  }
+  envName = match.groups?.name ? match.groups.name : match[1];
+  if (!envName) {
+    return false;
+  }
+  nextPos += match[0].length;
+  // \newtheorem{name}  {print}[numbered]
+  //                  ^^ skipping these spaces
+  for (; nextPos < max; nextPos++) {
+    const code = state.src.charCodeAt(nextPos);
+    if (!isSpace(code) && code !== 0x0A) { break; }
+  }
+  if (nextPos >= max) { 
+    return false; 
+  }
+  // \newtheorem*{name}{print}
+  //                  ^^ should be { 
+  if (!isNumbered && state.src.charCodeAt(nextPos) !== 123 /* { */) {
+    return false;
+  }
+  // \newtheorem{name}{print}[numbered] or \newtheorem{name}[numbered]{print}
+  //                  ^^ should be {                        ^^ should be [
+  if (state.src.charCodeAt(nextPos) !== 123 /* { */ && state.src.charCodeAt(nextPos) !== 0x5B/* [ */) {
+    return false;
+  }
+  let data = null;
+  let dataNumbered = null;
+  /**
+   * \newtheorem{corollary}{Corollary}[theorem]
+   * An environment called corollary is created,
+   * the counter of this new environment will be reset every time a new theorem environment is used.
+   * */
+  if (state.src.charCodeAt(nextPos) === 123  /* { */) {
+    data = findEndMarker(state.src, nextPos);
+    if (!data || !data.res) {
+      return false; /** can not find end marker */
+    }
+    envPrint = data.content;
+    nextPos = data.nextPos;
+    if (nextPos < max) {
+      // \newtheorem{name}{print}  [numbered]
+      //                         ^^ skipping these spaces
+      for (; nextPos < max; nextPos++) {
+        const code = state.src.charCodeAt(nextPos);
+        if (!isSpace(code) && code !== 0x0A) { break; }
+      }
+    }
+    if (nextPos < max && state.src.charCodeAt(nextPos) === 0x5B/* [ */) {
+      // \newtheorem{name}{print}[numbered]
+      //                         ^^ get numbered
+      dataNumbered = findEndMarker(state.src, nextPos, "[", "]");
+      if (!dataNumbered || !dataNumbered.res) {
+        return false; /** can not find end marker */
+      }
+      numbered = dataNumbered.content;
+      nextPos = dataNumbered.nextPos;
+    }
+  } else {
+    /**
+     * \newtheorem{lemma}[theorem]{Lemma}
+     * In this case, the even though a new environment called lemma is created,
+     * it will use the same counter as the theorem environment.
+     * */
+    if (state.src.charCodeAt(nextPos) === 0x5B/* [ */) {
+      dataNumbered = findEndMarker(state.src, nextPos, "[", "]");
+      if (!dataNumbered || !dataNumbered.res) {
+        return false; /** can not find end marker */
+      }
+      numbered = dataNumbered.content;
+      nextPos = dataNumbered.nextPos;
       useCounter = numbered;
-    } else {
-      match = state.src
-        .slice(startPos)
-        .match(reNewTheorem);
-      if (match) {
-        envName = match.groups?.name ? match.groups.name : match[1];
-        envPrint = match.groups?.print ? match.groups.print : match[2];
-        nextPos += match[0].length;
-        content = match[0];
-      } else {
-        match = state.src
-          .slice(startPos)
-          .match(reNewTheoremUnNumbered);
-        if (match) {
-          envName = match.groups?.name ? match.groups.name : match[1];
-          envPrint = match.groups?.print ? match.groups.print : match[2];
-          nextPos += match[0].length;
-          content = match[0];
-          isNumbered = false;
-        } else {
-          return false;
+      if (nextPos < max) {
+        // \newtheorem{name}[numbered]  {print}
+        //                            ^^ skipping these spaces
+        for (; nextPos < max; nextPos++) {
+          const code = state.src.charCodeAt(nextPos);
+          if (!isSpace(code) && code !== 0x0A) { break; }
         }
+      }
+      if (nextPos < max && state.src.charCodeAt(nextPos) === 123/* { */) {
+        // \newtheorem{name}[numbered]{print}
+        //                            ^^ get print
+        data = findEndMarker(state.src, nextPos);
+        if (!data || !data.res) {
+          return false; /** can not find end marker */
+        }
+        envPrint = data.content;
+        nextPos = data.nextPos;
       }
     }
   }
-  if (!envName || !envPrint) {
-    return false;
-  }
+  content = state.src.slice(startPos, nextPos);
+  
   addTheoremEnvironment({
     name: envName,
     print: envPrint,

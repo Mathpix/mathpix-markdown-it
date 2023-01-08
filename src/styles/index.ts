@@ -350,16 +350,16 @@ export const TocStyle = (containerName: string = 'toc') => `
   #toc_container .toc-title-1 {
     font-weight: 500; 
   }
-  #toc_container .toc-title-1 > a {
+  #toc_container .toc-title-1 a {
     font-size: 1.6em; 
   }
-  #toc_container .toc-title-2 > a {
+  #toc_container .toc-title-2 a {
     font-size: 1.3em; 
   }
   #toc_container .toc-title-3,  #toc_container .toc-title-4,  #toc_container .toc-title-5, .previewPage #toc_container .toc-title-6 {
     padding-left: 20px; 
   }
-  #toc_container .toc-title-3 > a,  #toc_container .toc-title-4 > a,  #toc_container .toc-title-5 > a, .previewPage #toc_container .toc-title-6 > a {
+  #toc_container .toc-title-3 a,  #toc_container .toc-title-4 > a,  #toc_container .toc-title-5 > a, .previewPage #toc_container .toc-title-6 > a {
     font-size: 1em;
     color: #979797; 
   }

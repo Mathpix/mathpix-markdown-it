@@ -1,24 +1,38 @@
 import { MarkdownIt, RuleBlock, RuleInline, Renderer, Token } from 'markdown-it';
+const isSpace = require('markdown-it/lib/common/utils').isSpace;
 import { renderTabularInline } from "./md-renderer-rules/render-tabular";
-import { closeTagSpan, reSpan } from "./common/consts";
+import { closeTagSpan, reSpan, reAddContentsLine } from "./common/consts";
+import { findEndMarker } from "./common";
 // import { escapeHtml }  from 'markdown-it/lib/common/utils';
 
-let subsectionParentCount: number = 0;
-let sectionCount: number = 0;
-let subCount: number = 0;
-let subSubCount: number = 0;
+export let sectionCount: number = 0;
+export let subCount: number = 0;
+export let subSubCount: number = 0;
 let isNewSect: boolean = false;
 let isNewSubSection: boolean = false;
 
 export const resetCounter: RuleInline = () => {
-  subsectionParentCount = 0;
+  resetTextCounter();
 };
 
 export const resetTextCounter: RuleInline = () => {
-  subsectionParentCount = 0;
   sectionCount = 0;
   subCount = 0;
   subSubCount = 0;
+};
+
+export const setTextCounterSection = (envName: string, num: number) => {
+  switch (envName) {
+    case "section":
+      sectionCount = num;
+      break;    
+    case "subsection":
+      subCount = num;
+      break;    
+    case "subsubsection":
+      subSubCount = num;
+      break;
+  }
 };
 
 const separatingSpan: RuleBlock = (state, startLine: number, endLine: number) => {
@@ -68,11 +82,139 @@ const separatingSpan: RuleBlock = (state, startLine: number, endLine: number) =>
   return true;
 };
 
-const headingSection: RuleBlock = (state, startLine: number, endLine: number) => {
-  sectionCount = 0;
-  subCount = 0;
-  subSubCount = 0;
+/**
+ * To add an unnumbered section to the table of contents, use the \addcontentsline command like this:
+ * \addcontentsline{toc}{section}{Unnumbered Section}
+ * */
+const addContentsLineBlock: RuleBlock = (state, startLine: number, endLine: number) => {
+  let token: Token, lineText: string,
+    pos: number = state.bMarks[startLine] + state.tShift[startLine],
+    max: number = state.eMarks[startLine];
+  let startPos: number = 0;
+  let nextLine: number = startLine + 1;
+  let latex: string = '';
+  lineText = state.src.slice(pos, max).trim();
+  if (state.src.charCodeAt(pos) !== 0x5c /* \ */) {
+    return false;
+  }
+  let match: RegExpMatchArray = lineText
+    .slice(startPos)
+    .match(reAddContentsLine);
+  if (!match) {
+    return false;
+  }
+  let envExp = match.groups?.exp ? match.groups.exp : match[1];
+  if (envExp !== 'toc') {
+    return false;
+  }
+  let envUnit = match.groups?.unit ? match.groups.unit : match[2];
+  if (!['section', 'subsection', 'subsubsection'].includes(envUnit)) {
+    return false;
+  }
+  startPos += match[0].length;
+  latex = match[0];
+  // nextPos += match[0].length;
+  // \addcontentsline{toc}{section} {Unnumbered Section}
+  //                               ^^ skipping these spaces
+  for (; startPos < max; startPos++) {
+    const code = lineText.charCodeAt(startPos);
+    if (!isSpace(code) && code !== 0x0A) { break; }
+  }
+  if (startPos >= max) {
+    return false;
+  }
+  // \addcontentsline{toc}{section}{Unnumbered Section}
+  //                               ^^ should be { 
+  if (lineText.charCodeAt(startPos) !== 123 /* { */) {
+    return false;
+  }
+  let { res = false, content = '', nextPos = 0 } = findEndMarker(lineText, startPos);
+  let resString = content;
+  let hasEndMarker = false;
+  let last = nextLine;
+  let inlineStr = '';
+  if (!res) {
+    for (; nextLine <= endLine; nextLine++) {
+      if (lineText === '') {
+        break;
+      }
+      pos = state.bMarks[nextLine] + state.tShift[nextLine];
+      max = state.eMarks[nextLine];
+      lineText = state.src.slice(pos, max);
 
+      let { res = false, content = '', nextPos = 0 } = findEndMarker(lineText, -1, "{", "}", true);
+      if (res) {
+        resString += resString ? ' ' : '';
+        resString += content;
+        hasEndMarker = true;
+        if (nextPos && nextPos < lineText.length) {
+          inlineStr = lineText.slice(nextPos);
+        }
+        break
+      }
+      resString += resString ? ' ' : '';
+      resString += lineText;
+    }
+    last = nextLine + 1;
+  } else {
+    hasEndMarker = true;
+    last = nextLine;
+    if (nextPos && nextPos < lineText.length) {
+      inlineStr = lineText.slice(nextPos);
+    }
+  }
+  if (!hasEndMarker) {
+    return false;
+  }
+  
+  let level;
+  switch (envUnit) {
+    case 'section':
+      level = 2;
+      break;
+    case 'subsection':
+      level = 3;
+      break;
+    case 'subsubsection':
+      level = 4;
+      break;
+  }
+
+  state.line = last;
+  token = state.push('addcontentsline_open', 'div', 1);
+  if (state.md.options.forLatex) {
+    token.latex = latex + '{';
+  }
+  token.map = [startLine, state.line];
+  token.envLevel = level;
+  token.attrJoin('class', 'addcontentsline');
+  token.attrSet('style', 'margin-top: 0; margin-bottom: 0;');
+  
+  token = state.push('inline', '', 0);
+  token.content = resString;
+  token.type = "addcontentsline";
+  token.map = [startLine, state.line];
+  if (state.md.options.forLatex) {
+    token.latex = resString;
+  }
+  let children = [];
+  state.md.inline.parse(token.content.trim(), state.md, state.env, children);
+  token.children = children;
+
+  token = state.push('addcontentsline_close', 'div', -1);
+  token.envLevel = level;
+  if (state.md.options.forLatex) {
+    token.latex = '}';
+  }
+  if (inlineStr && inlineStr.trim()) {
+    token = state.push('inline', '', 0);
+    token.content = inlineStr;
+    token.children = [];
+  }
+  return true;
+};
+
+export const headingSection: RuleBlock = (state, startLine: number, endLine: number, silent) => {
   let token: Token, lineText: string,
     pos: number = state.bMarks[startLine] + state.tShift[startLine],
     max: number = state.eMarks[startLine];
@@ -91,12 +233,13 @@ const headingSection: RuleBlock = (state, startLine: number, endLine: number) =>
 
   const match: RegExpMatchArray = lineText
     .slice(++startPos)
-    .match(/^(?:title|section|subsection|subsubsection)/);
+    .match(/^(?:title|section\*|section|subsection\*|subsection|subsubsection\*|subsubsection)/);
 
   if (!match) {
     return false;
   }
   let attrStyle = '';
+  let isUnNumbered: boolean = false;
 
   startPos += match[0].length;
   switch (match[0]) {
@@ -110,7 +253,6 @@ const headingSection: RuleBlock = (state, startLine: number, endLine: number) =>
       level = 2;
       type = "section";
       is_numerable = true;
-      subsectionParentCount++;
       isNewSect = true;
       className = "section-title";
       attrStyle = 'margin-top: 1.5em;';
@@ -122,6 +264,25 @@ const headingSection: RuleBlock = (state, startLine: number, endLine: number) =>
       className = "sub_section-title";
       break;
     case "subsubsection":
+      level = 4;
+      type = "subsubsection";
+      className = "sub_sub_section-title";
+      break;    
+    case "section*":
+      isUnNumbered = true;
+      level = 2;
+      type = "section";
+      className = "section-title";
+      attrStyle = 'margin-top: 1.5em;';
+      break;
+    case "subsection*":
+      isUnNumbered = true;
+      level = 3;
+      type = "subsection";
+      className = "sub_section-title";
+      break;
+    case "subsubsection*":
+      isUnNumbered = true;
       level = 4;
       type = "subsubsection";
       className = "sub_sub_section-title";
@@ -180,6 +341,9 @@ const headingSection: RuleBlock = (state, startLine: number, endLine: number) =>
     return false;
   }
 
+  /** For validation mode we can terminate immediately */
+  if (silent) { return true; }
+  
   state.line = last;
 
   token = state.push('heading_open', 'h' + String(level), 1);
@@ -189,6 +353,10 @@ const headingSection: RuleBlock = (state, startLine: number, endLine: number) =>
   token.markup = '########'.slice(0, level);
   token.map = [startLine, state.line];
   token.attrJoin('type', type);
+  token.isUnNumbered = isUnNumbered;
+  if (isUnNumbered) {
+    token.attrJoin('data-unnumbered', "true");
+  }
   token.attrJoin('class', className);
   if (state.md.options?.forDocx && attrStyle) {
     token.attrSet('style', attrStyle);
@@ -198,33 +366,53 @@ const headingSection: RuleBlock = (state, startLine: number, endLine: number) =>
   token.content = resString;
   token.type = type;
   token.is_numerable = is_numerable;
+  token.isUnNumbered = isUnNumbered;
   token.map = [startLine, state.line];
 
   let children = [];
   state.md.inline.parse(token.content.trim(), state.md, state.env, children);
   token.children = children;
 
-  if (type === "section") {
-    state.env.section = state.env.section ? state.env.section + 1 : 1;
+  if (type === "section" && !isUnNumbered) {
+    sectionCount = sectionCount ? sectionCount + 1 : 1;
+    state.env.section = sectionCount;
+    token.section = sectionCount;
   }
   
-  if (type === "subsection") {
-    token.secNumber = subsectionParentCount;
+  if (type === "subsection" && !isUnNumbered) {
     token.isNewSect = isNewSect;
     isNewSect = false;
-    state.env.subsection = !token.isNewSect 
-      ? state.env.subsection ? state.env.subsection + 1 : 1 : 1;
+    subCount = !token.isNewSect 
+      ? subCount ? subCount + 1 : 1 : 1;
+    state.env.subsection = subCount;
+    token.section = sectionCount;
+    token.subsection = subCount;
   }
-  if (type === "subsubsection") {
-    token.secNumber = subsectionParentCount;
+  if (type === "subsubsection" && !isUnNumbered) {
     token.isNewSubSection = isNewSubSection;
     isNewSubSection = false;
-    state.env.subsubsection = !token.isNewSubSection
-      ? state.env.subsubsection ? state.env.subsubsection + 1 : 1 : 1;
+    if (isNewSect) {
+      token.isNewSect = isNewSect;
+      isNewSect = false;
+      if (state.env.hasOwnProperty('subsection') && state.env.subsection === subCount) {
+        subCount = 0;
+        state.env.subsection = subCount;
+      }
+      subSubCount = 1;
+    } else {
+      subSubCount = !token.isNewSubSection
+      ? subSubCount ? subSubCount + 1 : 1 : 1;
+    }
+    state.env.subsubsection = subSubCount;
+    token.section = sectionCount;
+    token.subsection = subCount;
+    token.subsubsection = subSubCount;
   }
 
   token = state.push('heading_close', 'h' + String(level), -1);
+  token.isUnNumbered = isUnNumbered;
   token.markup = '########'.slice(0, level);
+  state.parentType = 'paragraph';
   if (state.md.options.forLatex) {
     token.latex = type;
   }
@@ -424,58 +612,6 @@ const pageBreaksBlock: RuleBlock = (state, startLine: number) => {
   }
   state.line = nextLine;
   return true;
-};
-
-const findEndMarker = (str: string, startPos: number = 0, beginMarker: string = "{", endMarker: string = "}", onlyEnd = false) => {
-  let content: string = '';
-  let nextPos: number = 0;
-  if ( str[startPos] !== beginMarker && !onlyEnd ) {
-    return { res: false }
-  }
-  let openBrackets = 1;
-  let openCode = 0;
-
-  for (let i = startPos + 1; i < str.length; i++) {
-    const chr = str[i];
-    nextPos = i;
-
-    if ( chr === '`') {
-      if (openCode > 0) {
-        openCode--;
-      } else {
-        openCode++;
-      }
-    }
-
-    if ( chr === beginMarker && openCode === 0) {
-      content += chr;
-      openBrackets++;
-      continue;
-    }
-
-    if ( chr === endMarker && openCode === 0) {
-      openBrackets--;
-      if (openBrackets > 0) {
-        content += chr;
-        continue;
-      }
-      break;
-    }
-
-    content += chr;
-  }
-  if ( openBrackets > 0 ) {
-    return {
-      res: false,
-      content: content
-    }
-  }
-
-  return {
-    res: true,
-    content: content,
-    nextPos: nextPos + endMarker.length
-  };
 };
 
 const textAuthor: RuleInline = (state) => {
@@ -750,7 +886,7 @@ const renderDocTitle: Renderer = (tokens, index, options, env, slf) => {
   return content;
 };
 
-const renderInlineContent = (token, options, env, slf) => {
+export const renderInlineContent = (token, options, env, slf) => {
   let sContent = '';
   let content = '';
   if (token.children && token.children.length) {
@@ -775,29 +911,32 @@ const renderInlineContent = (token, options, env, slf) => {
 
 const renderSectionTitle: Renderer = (tokens, index, options, env, slf) => {
   const token = tokens[index];
-  const sectionNumber = token.is_numerable
-    ? `<span class="section-number">${++sectionCount}. </span>`
-    : ``;
   const content = renderInlineContent(token, options, env, slf);
+  if (token.isUnNumbered) {
+    return content;
+  }
+  const sectionNumber = token.is_numerable
+    ? `<span class="section-number">${token.section}. </span>`
+    : ``;
   return `${sectionNumber}${content}`
 };
 
 const renderSubsectionTitle: Renderer = (tokens, index, options, env, slf) => {
   const token = tokens[index];
-  if (token.isNewSect) {
-    subCount = 0;
-  }
   const content = renderInlineContent(token, options, env, slf);
-  return `<span class="section-number">${token.secNumber}.</span><span class="sub_section-number">${++subCount}.</span> ${content}`
+  if (token.isUnNumbered) {
+    return content;
+  }
+  return `<span class="section-number">${token.section}.</span><span class="sub_section-number">${token.subsection}.</span> ${content}`
 };
 
 const renderSubSubsectionTitle: Renderer = (tokens, index, options, env, slf) => {
   const token = tokens[index];
-  if (token.isNewSubSection) {
-    subSubCount = 0;
-  }
   const content = renderInlineContent(token, options, env, slf);
-  return `<span class="section-number">${token.secNumber}.</span><span class="sub_section-number">${subCount}.${++subSubCount}.</span> ${content}`
+  if (token.isUnNumbered) {
+    return content;
+  }
+  return `<span class="section-number">${token.section}.</span><span class="sub_section-number">${token.subsection}.${token.subsubsection}.</span> ${content}`
 };
 
 const getAuthorItemToken = (tokens, index, options, env, slf) => {
@@ -930,13 +1069,15 @@ const mapping = {
   subsection: "Subsection",
   subsubsection: "Subsubsection",
   url: "Url",
-  textUrl: "textUrl"
+  textUrl: "textUrl",
+  addcontentsline: "addcontentsline"
 };
 
 export default () => {
   return (md: MarkdownIt) => {
     resetCounter();
     md.block.ruler.before("heading", "headingSection", headingSection);
+    md.block.ruler.before("heading", "addContentsLineBlock", addContentsLineBlock);
     md.block.ruler.before("headingSection", "separatingSpan", separatingSpan);
     md.block.ruler.before("paragraphDiv", "abstractBlock", abstractBlock);
     md.block.ruler.before("paragraphDiv", "pageBreaksBlock", pageBreaksBlock);
@@ -994,6 +1135,8 @@ export default () => {
             return renderUrl(tokens[idx]);
           case "textUrl":
             return renderTextUrl(tokens[idx]);
+          case "addcontentsline":
+            return '';
           default:
             return '';
         }

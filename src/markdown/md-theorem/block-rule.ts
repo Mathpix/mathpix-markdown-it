@@ -9,6 +9,7 @@ import {
   openTag,
   openTagDescription,
   openTagProof,
+  reNewTheoremG,
   reNewCommandQedSymbolG,
   defQED,
   reTheoremStyleG,
@@ -21,13 +22,18 @@ import {
   getTheoremNumber,
   getNextCounterProof
 } from "./helper";
+import {
+  headingSection
+} from "../mdPluginText";
 
 export const newTheoremBlock: RuleBlock = (state, startLine: number) => {
   let nextLine: number = startLine + 1;
   let endLine = state.lineMax;
   let terminate, i, l;
-  let terminatorRules = state.md.block.ruler.getRules('paragraph')
-
+  let terminatorRules = state.md.block.ruler.getRules('paragraph');
+  terminatorRules.push(headingSection);
+  terminatorRules.push(BeginTheorem);
+  terminatorRules.push(BeginProof);
   let content = '';
   let oldParentType = state.parentType;
   state.parentType = 'paragraph';
@@ -50,8 +56,7 @@ export const newTheoremBlock: RuleBlock = (state, startLine: number) => {
 
   content = state.getLines(startLine, nextLine, state.blkIndent, false).trim();
 
-  const testNewTheorem = /\\newtheorem([^}]*)\s{0,}\{(?<name>[^}]*)\}/;
-  if (!testNewTheorem.test(content) 
+  if (!reNewTheoremG.test(content) 
     && !reNewCommandQedSymbolG.test(content)
     && !reTheoremStyleG.test(content)
     && !reSetCounterG.test(content)
@@ -68,7 +73,8 @@ export const newTheoremBlock: RuleBlock = (state, startLine: number) => {
       item.type === "newtheorem" 
       || item.type === "theoremstyle" 
       || item.type === "renewcommand_qedsymbol"
-      || item.type === "theorem_setcounter" ))
+      || item.type === "theorem_setcounter"
+      || item.type === "section_setcounter" ))
     : -1;
 
   if (newTheoremIndex === -1) {
@@ -82,6 +88,7 @@ export const newTheoremBlock: RuleBlock = (state, startLine: number) => {
       && item.type !== "softbreak"
       && item.type !== "renewcommand_qedsymbol"
       && item.type !== "theorem_setcounter"
+      && item.type !== "section_setcounter"
     ));
   state.line = nextLine;
   token = state.push('paragraph_open', 'div', 1);
@@ -100,7 +107,8 @@ export const newTheoremBlock: RuleBlock = (state, startLine: number) => {
   for (let j = 0; j < children.length; j++) {
     const item = children[j];
     if (item.type === "newtheorem" || item.type === "theoremstyle" 
-      || item.type === "renewcommand_qedsymbol" || item.type === "theorem_setcounter") {
+      || item.type === "renewcommand_qedsymbol" 
+      || item.type === "theorem_setcounter" || item.type === "section_setcounter") {
       itemBefore = item;
       if (state.md.options.forLatex) {
         token.children.push(item);
@@ -109,7 +117,8 @@ export const newTheoremBlock: RuleBlock = (state, startLine: number) => {
     }
 
     if ((itemBefore?.type === "newtheorem" || itemBefore?.type === "theoremstyle" 
-      || itemBefore?.type === "renewcommand_qedsymbol" || itemBefore?.type === "theorem_setcounter")
+      || itemBefore?.type === "renewcommand_qedsymbol" 
+      || itemBefore?.type === "theorem_setcounter" || itemBefore?.type === "section_setcounter")
       && item.type === "softbreak") {
       itemBefore = item;
       if (state.md.options.forLatex) {
@@ -126,7 +135,7 @@ export const newTheoremBlock: RuleBlock = (state, startLine: number) => {
   return true;
 };
 
-export const BeginTheorem: RuleBlock = (state, startLine, endLine) => {
+export const BeginTheorem: RuleBlock = (state, startLine, endLine, silent) => {
   let pos: number = state.bMarks[startLine] + state.tShift[startLine];
   let max: number = state.eMarks[startLine];
   let token;
@@ -214,6 +223,11 @@ export const BeginTheorem: RuleBlock = (state, startLine, endLine) => {
     return false;
   }
 
+  /** For validation mode we can terminate immediately */
+  if (silent) { 
+    return true; 
+  }
+  
   let matchE: RegExpMatchArray = lineText.match(closeTag);
   if (matchE) {
     resText += lineText.slice(0, matchE.index);
@@ -316,7 +330,7 @@ export const BeginTheorem: RuleBlock = (state, startLine, endLine) => {
   return true;
 };
 
-export const BeginProof: RuleBlock = (state, startLine, endLine) => {
+export const BeginProof: RuleBlock = (state, startLine, endLine, silent) => {
   let pos: number = state.bMarks[startLine] + state.tShift[startLine];
   let max: number = state.eMarks[startLine];
   let token;
@@ -388,6 +402,11 @@ export const BeginProof: RuleBlock = (state, startLine, endLine) => {
     return false;
   }
 
+  /** For validation mode we can terminate immediately */
+  if (silent) {
+    return true;
+  }
+  
   let matchE: RegExpMatchArray = lineText.match(closeTag);
   if (matchE) {
     resText += lineText.slice(0, matchE.index);
