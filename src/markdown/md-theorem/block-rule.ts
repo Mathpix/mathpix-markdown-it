@@ -1,9 +1,7 @@
 import { RuleBlock } from 'markdown-it';
 import { SetTokensBlockParse } from"../md-block-rule/helper";
-import { endTag } from '../utils';
+import { endTag, uid } from '../utils';
 import {
-  labelTag,
-  labelTagG,
   latexEnvironments,
   mathEnvironments,
   openTag,
@@ -17,7 +15,6 @@ import {
 } from "../common/consts";
 import {
   theoremEnvironments,
-  addTheoremLabel,
   getTheoremEnvironmentIndex,
   getTheoremNumber,
   getNextCounterProof
@@ -25,6 +22,7 @@ import {
 import {
   headingSection
 } from "../mdPluginText";
+import { eLabelType } from "../common/labels";
 
 export const newTheoremBlock: RuleBlock = (state, startLine: number) => {
   let nextLine: number = startLine + 1;
@@ -246,16 +244,6 @@ export const BeginTheorem: RuleBlock = (state, startLine, endLine, silent) => {
     token.content = strBefore;
   }
 
-  /** Get label from theorem content */
-  let label = "";
-  match = resText.match(labelTag);
-  if (match) {
-    label = match[1];
-    if (!state.md.options.forLatex) {
-      resText = resText.replace(labelTagG, '')
-    }
-  }
-
   const envIndex = envName
     ? getTheoremEnvironmentIndex(envName)
     : -1;
@@ -266,8 +254,13 @@ export const BeginTheorem: RuleBlock = (state, startLine, endLine, silent) => {
   token = state.push('theorem_open', 'div', 1);
   token.environment = envName;
   token.envDescription = envDescription;
-  token.envLabel = label;
   token.envNumber = theoremNumber;
+  token.uuid = uid();
+  token.currentTag = {
+    type: eLabelType.theorem,
+    number: theoremNumber,
+    tokenUuidInParentBlock: token.uuid
+  };
 
   const envItem = theoremEnvironments[envIndex];
   token.envStyle = envItem.style;
@@ -310,16 +303,7 @@ export const BeginTheorem: RuleBlock = (state, startLine, endLine, silent) => {
       token.children = [];
     }
   }
-
-
-  if (label) {
-    /** Add a reference to the theorem to the global list theoremLabels */
-    addTheoremLabel({
-      label: label,
-      number: theoremNumber
-    })
-  }
-
+  
   SetTokensBlockParse(state, resText, 0, 0, true);
 
   token = state.push('theorem_close', 'div', -1);
@@ -327,6 +311,7 @@ export const BeginTheorem: RuleBlock = (state, startLine, endLine, silent) => {
     token.latex = latexEnd;
   }
   token = state.push('paragraph_close', 'div', -1);
+  token.currentTag = state.env.lastTag ? state.env.lastTag : {};
   return true;
 };
 
@@ -424,29 +409,18 @@ export const BeginProof: RuleBlock = (state, startLine, endLine, silent) => {
     token.children = [];
     token.content = strBefore;
   }
-
-  /** Get label from proof content */
-  let label = "";
-  match = resText.match(labelTag);
-  if (match) {
-    label = match[1];
-    resText = resText.replace(labelTagG, '')
-  }
   
   const proofNumber: number = getNextCounterProof();
   token = state.push('proof_open', 'div', 1);
-  token.envLabel = label;
   token.envNumber = proofNumber;
+  token.uuid = uid();
+  token.currentTag = {
+    type: eLabelType.theorem,
+    number: proofNumber,
+    tokenUuidInParentBlock: token.uuid
+  };
   if (state.md.options.forLatex) {
     token.latex = latexBegin;
-  }
-
-  if (label) {
-    /** Add a reference to the theorem to the global list theoremLabels */
-    addTheoremLabel({
-      label: label,
-      number: proofNumber.toString()
-    })
   }
 
   const contentQED = state.env.qedsymbol ? state.env.qedsymbol : defQED;
@@ -496,5 +470,6 @@ export const BeginProof: RuleBlock = (state, startLine, endLine, silent) => {
     token.latex = latexEnd;
   }
   token = state.push('paragraph_close', 'div', -1);
+  token.currentTag = state.env.lastTag ? state.env.lastTag : {};
   return true;
 };

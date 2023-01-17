@@ -3,7 +3,8 @@ const isSpace = require('markdown-it/lib/common/utils').isSpace;
 import { renderTabularInline } from "./md-renderer-rules/render-tabular";
 import { closeTagSpan, reSpan, reAddContentsLine } from "./common/consts";
 import { findEndMarker } from "./common";
-// import { escapeHtml }  from 'markdown-it/lib/common/utils';
+import { uid } from "./utils";
+import { ILabel, getLabelByUuidFromLabelsList } from "./common/labels";
 
 export let sectionCount: number = 0;
 export let subCount: number = 0;
@@ -377,6 +378,7 @@ export const headingSection: RuleBlock = (state, startLine: number, endLine: num
     sectionCount = sectionCount ? sectionCount + 1 : 1;
     state.env.section = sectionCount;
     token.section = sectionCount;
+    state.env.number = token.section;
   }
   
   if (type === "subsection" && !isUnNumbered) {
@@ -387,6 +389,7 @@ export const headingSection: RuleBlock = (state, startLine: number, endLine: num
     state.env.subsection = subCount;
     token.section = sectionCount;
     token.subsection = subCount;
+    state.env.number = token.section + '.' + token.subsection;
   }
   if (type === "subsubsection" && !isUnNumbered) {
     token.isNewSubSection = isNewSubSection;
@@ -407,8 +410,19 @@ export const headingSection: RuleBlock = (state, startLine: number, endLine: num
     token.section = sectionCount;
     token.subsection = subCount;
     token.subsubsection = subSubCount;
+    state.env.number = token.section + '.' + token.subsection + '.' + token.subsubsection;
   }
 
+  if (!isUnNumbered) {
+    token.uuid = uid();
+    token.currentTag = {
+      type: type,
+      number: state.env.number,
+      tokenUuidInParentBlock: token.uuid
+    };
+    state.env.type = type;
+    state.env.lastTag = {...token.currentTag};
+  }
   token = state.push('heading_close', 'h' + String(level), -1);
   token.isUnNumbered = isUnNumbered;
   token.markup = '########'.slice(0, level);
@@ -915,8 +929,11 @@ const renderSectionTitle: Renderer = (tokens, index, options, env, slf) => {
   if (token.isUnNumbered) {
     return content;
   }
+  const label: ILabel = token.uuid ? getLabelByUuidFromLabelsList(token.uuid) : null;
   const sectionNumber = token.is_numerable
-    ? `<span class="section-number">${token.section}. </span>`
+    ? label 
+      ? `<span id="${label.id}" class="section-number">${token.section}. </span>`
+      : `<span class="section-number">${token.section}. </span>`
     : ``;
   return `${sectionNumber}${content}`
 };
@@ -927,7 +944,10 @@ const renderSubsectionTitle: Renderer = (tokens, index, options, env, slf) => {
   if (token.isUnNumbered) {
     return content;
   }
-  return `<span class="section-number">${token.section}.</span><span class="sub_section-number">${token.subsection}.</span> ${content}`
+  const label: ILabel = token.uuid ? getLabelByUuidFromLabelsList(token.uuid) : null;
+  return label 
+    ? `<span id="${label.id}" class="section-number">${token.section}.</span><span class="sub_section-number">${token.subsection}.</span> ${content}`
+    : `<span class="section-number">${token.section}.</span><span class="sub_section-number">${token.subsection}.</span> ${content}`;
 };
 
 const renderSubSubsectionTitle: Renderer = (tokens, index, options, env, slf) => {
@@ -936,7 +956,10 @@ const renderSubSubsectionTitle: Renderer = (tokens, index, options, env, slf) =>
   if (token.isUnNumbered) {
     return content;
   }
-  return `<span class="section-number">${token.section}.</span><span class="sub_section-number">${token.subsection}.${token.subsubsection}.</span> ${content}`
+  const label: ILabel = token.uuid ? getLabelByUuidFromLabelsList(token.uuid) : null;
+  return label 
+    ? `<span id="${label.id}" class="section-number">${token.section}.</span><span class="sub_section-number">${token.subsection}.${token.subsubsection}.</span> ${content}`
+    : `<span class="section-number">${token.section}.</span><span class="sub_section-number">${token.subsection}.${token.subsubsection}.</span> ${content}`;
 };
 
 const getAuthorItemToken = (tokens, index, options, env, slf) => {

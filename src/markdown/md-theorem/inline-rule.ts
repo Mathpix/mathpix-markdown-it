@@ -15,6 +15,7 @@ import {
 } from "./helper";
 import {reNumber} from "../md-block-rule/lists";
 import { findEndMarker } from "../common";
+import { ILabel, addIntoLabelsList } from "../common/labels";
 
 /**
  * \theoremstyle{definition} | \theoremstyle{plain} | \theoremstyle{remark}
@@ -274,28 +275,38 @@ export const newCommandQedSymbol: RuleInline = (state) => {
   return true;
 };
 
-export const labelLatex: RuleInline = (state) => {
-  if (!state.md.options.forLatex) {
-    return false;
-  }
+export const labelLatex: RuleInline = (state, md, env) => {
   let startPos = state.pos;
   if (state.src.charCodeAt(startPos) !== 0x5c /* \ */) {
     return false;
   }
   let nextPos: number = startPos;
-  let latex: string = "";
   let match: RegExpMatchArray =  state.src
     .slice(startPos)
     .match(/^\\label\s{0,}\{([^}]*)\}/);
   if (!match) {
     return false;
   }
-  latex = match[0];
+  let labelKey = match[1];
+  let label: ILabel = null;
+  /** Add a reference to the theorem to the global labelsList */
+  if (state.env.currentTag) {
+    label = {
+      key: labelKey,
+      id: encodeURIComponent(labelKey),
+      tag: state.env.currentTag.number,
+      type: state.env.currentTag.type,
+      tokenUuidInParentBlock: state.env.currentTag.tokenUuidInParentBlock
+    };
+    addIntoLabelsList(label);
+  }
+  const latex = match[0];
   nextPos += match[0].length;
   const token = state.push("label", "", 0);
-  token.content = "";
+  token.content = labelKey;
   token.children = [];
   token.latex = latex;
+  token.hidden = true; /** Ignore this element when rendering to HTML */
   state.pos = nextPos;
   return true;
 }

@@ -182,9 +182,9 @@ class MathpixMarkdown_Model {
     let html = markdownHTML(markdown, options);
     if (!lineNumbering) {
       MathJax.Reset();
-      if (html.indexOf('clickable-link') !== -1) {
-        html = this.checkEquationNumber(html);
-      }
+      // if (html.indexOf('clickable-link') !== -1) {
+      //   html = this.checkEquationNumber(html);
+      // }
     }
 
     if (!htmlWrapper) {

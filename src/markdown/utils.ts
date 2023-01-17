@@ -198,3 +198,15 @@ export const uid = () => {
   return Date.now().toString(36)
     + Math.random().toString(36).substr(2);
 };
+
+/** Add attribute to begin of attribute list */
+export const attrSetToBegin = (attrs, name, value) => {
+  const index = attrs?.length 
+    ? attrs.findIndex(item => item[0] === name)
+    : -1;
+  if (index < 0) {
+    attrs.unshift([name, value])
+  } else {
+    attrs[index] = [name, value]
+  }
+};

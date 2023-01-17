@@ -9,3 +9,5 @@ export declare const arraysCompare: (a1: any, a2: any) => any;
 export declare const arrayDelElement: (arr: any, el: any) => any;
 export declare const arrayResortFromElement: (arr: any, el: any, notReverse?: boolean, nextEl?: number) => any[];
 export declare const uid: () => string;
+/** Add attribute to begin of attribute list */
+export declare const attrSetToBegin: (attrs: any, name: any, value: any) => void;
