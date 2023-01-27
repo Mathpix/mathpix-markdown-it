@@ -8,9 +8,14 @@ export declare const paddingMenu = 5;
 export declare const paddingMenuBottomSmall = 34;
 export declare const maxWidthMenu = 320;
 export declare const mathExportTypes: string[];
+/** Classes mmd for which the context menu is supported */
+export declare const mmdClassesForContextMenu: string[];
 export declare enum eMathType {
     latex = "latex",
     asciimath = "asciimath",
     mathml = "mathml",
-    mathmlword = "mathmlword"
+    mathmlword = "mathmlword",
+    tsv = "tsv",
+    table_markdown = "table-markdown",
+    smiles = "smiles"
 }
