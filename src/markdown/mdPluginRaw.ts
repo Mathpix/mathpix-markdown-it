@@ -15,6 +15,7 @@ import { renderTheorems } from './md-theorem';
 import { getTheoremNumberByLabel, resetTheoremEnvironments } from './md-theorem/helper';
 import { newTheoremBlock } from './md-theorem/block-rule';
 import { newTheorem, theoremStyle, newCommandQedSymbol, labelLatex, setCounterTheorem } from './md-theorem/inline-rule';
+const isSpace = require('markdown-it/lib/common/utils').isSpace;
 
 let mathNumber = [];
 
@@ -149,7 +150,21 @@ const getMathEnvironment = (str: string): string => {
   if (!str) {
     return '';
   }
-  const match = str.match(/^\\begin\{([^}]*)\}/);
+  let startPos = 0;
+  // {\begin{array}{c}...
+  // ^^ skipping first {
+  if (str.charCodeAt(startPos) === 123 /* { */) {
+    startPos++;
+  }
+  // {  \begin{array}{c}...
+  //  ^^ skipping these spaces
+  for (; startPos < str.length; startPos++) {
+    const code = str.charCodeAt(startPos);
+    if (!isSpace(code) && code !== 0x0A) { break; }
+  }
+  const match = str
+    .slice(startPos)
+    .match(/^\\begin\{([^}]*)\}/);
   return match && match[1] ? match[1].trim() : '';
 };
 
