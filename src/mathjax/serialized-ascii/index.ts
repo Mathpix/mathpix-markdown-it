@@ -15,6 +15,11 @@ export class SerializedAsciiVisitor extends MmlVisitor {
     return this.visitNode(node, '');
   }
 
+  public visitNode(node, ...args: any[]) {
+    this.setChildInheritedAttribute(node, 'toTsv');
+    return super.visitNode(node, ...args);
+  }
+  
   public visitTextNode(node: TextNode, space: string) {
     return node.getText();
   }
@@ -217,6 +222,23 @@ export class SerializedAsciiVisitor extends MmlVisitor {
       + '</annotation>';
   }
 
+  /** Apply inherited attribute to all children */
+  setChildInheritedAttribute = (node, attrName: string) => {
+    try {
+      const inherited = node.attributes.getAllInherited();
+      if (!inherited.hasOwnProperty(attrName) || !node.childNodes || !node.childNodes.length) {
+        return
+      }
+      for (const child of node.childNodes) {
+        if (child.attributes) {
+          child.attributes.setInherited(attrName, inherited[attrName]);
+        }
+      }
+    } catch (e) {
+      console.log("[MMD]=>error=>", e)
+    }
+
+  };
   public visitDefault(node: MmlNode, space: string) {
     return  this.childNodeMml(node,  '  ', '')
   }

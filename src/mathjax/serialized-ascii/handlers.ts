@@ -195,6 +195,8 @@ const mtable = () => {
   return  (node, serialize) => {
     let mml = '';
     try {
+      const toTsv = serialize.options.tableToTsv && node.Parent?.kind === 'math';
+      node.attributes.setInherited('toTsv', toTsv);       
       const parentIsMenclose = node.Parent && node.Parent.kind === 'menclose';
 
       const isHasBranchOpen = node.parent && node.parent.kind === 'mrow'
@@ -203,18 +205,29 @@ const mtable = () => {
       const isHasBranchClose = node.parent && node.parent.kind === 'mrow'
         && node.parent.properties
         && node.parent.properties.hasOwnProperty('close');
-      mml += isHasBranchOpen || parentIsMenclose
-        ? ''
-        : '{:';
+      if (toTsv) {
+        mml += '"'
+      } else {
+        mml += isHasBranchOpen || parentIsMenclose
+          ? ''
+          : '{:';
+      }
       for (let i = 0; i < node.childNodes.length; i++) {
         if ( i>0 ) {
-          mml += ','
+          mml += toTsv
+            ? serialize.options.tsv_separators?.row || '\n'
+            : ',';
         }
+        node.childNodes[i].attributes.setInherited('toTsv', toTsv);
         mml += serialize.visitNode(node.childNodes[i], '');
       }
-      mml += isHasBranchClose || parentIsMenclose
-        ? ''
-        : ':}';
+      if (toTsv) {
+        mml += '"'
+      } else {
+        mml += isHasBranchClose || parentIsMenclose
+          ? ''
+          : ':}';
+      }
       return mml;
     } catch (e) {
       console.error('mml => mtable =>', e);
@@ -259,18 +272,23 @@ const mtr = () => {
       const needBranch = node.parent && node.parent.parent && node.parent.parent.texClass === 7;
       const display = node.attributes.get('displaystyle');
       let mtrContent = '';
+      const toTsv = node.attributes.get('toTsv');
       for (let i = 0; i < node.childNodes.length; i++) {
         if ( i>0 ) {
           mtrContent += display
             ? ''
-            : ',';
+            : toTsv ? serialize.options.tsv_separators?.column || '\t' : ',';
         }
         mtrContent += serialize.visitNode(node.childNodes[i], '');
       }
-
-      mml += node.parent.childNodes.length > 1 || needBranch || (node.childNodes.length > 1 && !display)
-        ? '[' + mtrContent + ']'
-        : mtrContent;
+      if (toTsv) {
+        /** TODO: check tab */
+        mml += mtrContent
+      } else {
+        mml += node.parent.childNodes.length > 1 || needBranch || (node.childNodes.length > 1 && !display)
+          ? '[' + mtrContent + ']'
+          : mtrContent;
+      }
 
       return mml;
 
@@ -535,13 +553,20 @@ const mtext = () => {
         mml += asc;
         return mml;
       }
-      if (value[0] === '(') {
+      const toTsv = node.attributes.get('toTsv');
+      if (value[0] === '(' || toTsv) {
         mml += value;
       } else {
         if ( !value || ( value && !value.trim())) {
           mml += ''
         } else {
-          mml += '"' + value + '"';
+          /** For tsv: 
+           * If double-quotes are used to enclose fields, then a double-quote
+           * appearing inside a field must be escaped by preceding it with
+           * another double quote */
+          mml += serialize.options.tableToTsv ? '""' : '"';
+          mml += value;
+          mml += serialize.options.tableToTsv ? '""' : '"';
         }
       }
       return mml;

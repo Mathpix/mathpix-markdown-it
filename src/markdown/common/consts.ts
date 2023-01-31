@@ -89,3 +89,8 @@ export const mathEnvironments = [
   "Vmatrix",
   "vmatrix"
 ];
+
+export const tsvSeparatorsDef = {
+  column: '\t', 
+  row: '\n'
+};

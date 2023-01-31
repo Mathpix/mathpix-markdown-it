@@ -1,6 +1,8 @@
+import { tsvSeparatorsDef } from './consts';
+
 export const TsvJoin = (tsv, options): string => {
-  const {tsv_separators = {}} = options.outMath;
-  const {column = '\t', row = '\n'} = tsv_separators;
+  const {tsv_separators = {...tsvSeparatorsDef}} = options.outMath;
+  const {column, row} = tsv_separators;
   if (!tsv || tsv.length === 0 ) {
     return ''
   }

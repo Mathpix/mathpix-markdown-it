@@ -31,3 +31,7 @@ export declare const reAddContentsLineG: RegExp;
 export declare const latexEnvironments: string[];
 /** https://docs.mathjax.org/en/v3.0-latest/input/tex/macros/index.html#environments */
 export declare const mathEnvironments: string[];
+export declare const tsvSeparatorsDef: {
+    column: string;
+    row: string;
+};
