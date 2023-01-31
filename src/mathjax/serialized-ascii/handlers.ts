@@ -195,7 +195,8 @@ const mtable = () => {
   return  (node, serialize) => {
     let mml = '';
     try {
-      const toTsv = serialize.options.tableToTsv && node.Parent?.kind === 'math';
+      const toTsv = serialize.options.tableToTsv 
+        && (node.Parent?.kind === 'math' || (node.Parent?.kind === 'menclose' && node.Parent.Parent?.kind === 'math'));
       node.attributes.setInherited('toTsv', toTsv);       
       const parentIsMenclose = node.Parent && node.Parent.kind === 'menclose';
 
@@ -282,7 +283,6 @@ const mtr = () => {
         mtrContent += serialize.visitNode(node.childNodes[i], '');
       }
       if (toTsv) {
-        /** TODO: check tab */
         mml += mtrContent
       } else {
         mml += node.parent.childNodes.length > 1 || needBranch || (node.childNodes.length > 1 && !display)

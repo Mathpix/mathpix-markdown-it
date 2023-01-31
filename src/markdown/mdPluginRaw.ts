@@ -406,6 +406,7 @@ function simpleMath(state, silent) {
       0
     );
     token.content = state.src.slice(startMathPos, endMarkerPos);
+    token.math_env = getMathEnvironment(token.content);
     if (state.env.tabulare) {
       token.return_asciimath = true;
     }
