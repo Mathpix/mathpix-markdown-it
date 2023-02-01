@@ -224,6 +224,56 @@ module.exports = [
       'Plant and equipment (net)\t\t\t\n' +
       'Investments\t$1,000,000\t$820,000\t$716,000'
   },
+  {
+    latex: '\\begin{tabular}{ | l | c | }\\hline\n' +
+      '\\(\\begin{array}{c: c}1 & 2\\end{array}\\) & 2  \\\\ \\hline\n' +
+      '4 & 5 \\\\ \\hline\n' +
+      '\\end{tabular}',
+    tsv: '"1\t2"\t2\n' +
+      '4\t5'
+  },  
+  {
+    latex: '\\begin{tabular}{ | l | c | }\\hline\n' +
+      '\\(\\begin{array}{c: c}1 & 2 \\\\ 1 & 2 \\end{array}\\) & 2  \\\\ \\hline\n' +
+      '4 & 5 \\\\ \\hline\n' +
+      '\\end{tabular}',
+    tsv: '"1\t2\n' +
+      '1\t2"\t2\n' +
+      '4\t5'
+  },  
+  {
+    latex: '\\begin{tabular}{ | l | c | }\\hline\n' +
+      '\\( { \\begin{array}{c: c}1 & 2 \\\\ 1 & 2 \\end{array} } \\) & 2  \\\\ \\hline\n' +
+      '4 & 5 \\\\ \\hline\n' +
+      '\\end{tabular}',
+    tsv: '"1\t2\n' +
+      '1\t2"\t2\n' +
+      '4\t5'
+  },
+  {
+    latex: '\\begin{tabular}{ | l | c | }\\hline\n' +
+      '\\( \\left| \\begin{array}{c c}1 & 2 \\\\ 1 & 2 \\end{array} \\right| \\) & 2  \\\\ \\hline\n' +
+      '4 & 5 \\\\ \\hline\n' +
+      '\\end{tabular}',
+    tsv: '|[1,2],[1,2]|\t2\n' +
+      '4\t5'
+  },  
+  {
+    latex: '\\begin{tabular}{ | l | c | }\\hline\n' +
+      '\\( \\left[ \\begin{array}{c c}1 & 2 \\\\ 1 & 2 \\end{array} \\right] \\) & 2  \\\\ \\hline\n' +
+      '4 & 5 \\\\ \\hline\n' +
+      '\\end{tabular}',
+    tsv: '[[1,2],[1,2]]\t2\n' +
+      '4\t5'
+  },  
+  {
+    latex: '\\begin{tabular}{ | l | c | }\\hline\n' +
+      '\\( \\left\\{ \\begin{array}{l} x - 2z = 1 \\\\ y + z = 3 \\end{array} \\right. \\) & 2  \\\\ \\hline\n' +
+      '4 & 5 \\\\ \\hline\n' +
+      '\\end{tabular}',
+    tsv: '{[x-2z=1],[y+z=3]:}\t2\n' +
+      '4\t5'
+  },  
   // {
   //   latex: '',
   //   tsv: ''
