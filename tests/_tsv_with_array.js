@@ -46,7 +46,7 @@ describe('TSV with array:', () => {
         include_svg: false,
       }
     };
-    describe('Check table-markdown [include_sub_math=false]. Latex =>' + test.latex, () => {
+    describe('Check table-markdown [include_sub_math=true]. Latex =>' + test.latex, () => {
       const html = MM.render(test.latex, options);
       const data = MM.parseMarkdownByHTML(html, true);
       it('Should be have type: "html"', function(done) {
