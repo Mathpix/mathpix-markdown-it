@@ -58,7 +58,8 @@ const OuterData = (adaptor, node, math, outMath, forDocx = false, accessibility?
     asciimath?: string,
     latex?: string,
     svg?: string,
-    speech?: string
+    speech?: string,
+    asciimath_tsv?: string
   } = {};
 
   if (accessibility && accessibility.sre) {
@@ -77,6 +78,10 @@ const OuterData = (adaptor, node, math, outMath, forDocx = false, accessibility?
   }
 
   if (include_asciimath) {
+    if (optionAscii?.tableToTsv) {
+      res.asciimath_tsv = toAsciiML(math.root, optionAscii);
+      optionAscii.tableToTsv = false;
+    }
     res.asciimath = toAsciiML(math.root, optionAscii);
   }
   if (include_latex) {
@@ -342,8 +347,12 @@ export const MathJax = {
     const { include_asciimath = false } = outMath;
     options.outMath.include_asciimath = true;
     const data = this.TexConvert(string, options);
-    options.outMath.include_asciimath = include_asciimath
-    return {html: OuterHTML(data, outMath), ascii: data.asciimath};
+    options.outMath.include_asciimath = include_asciimath;
+    return {
+      html: OuterHTML(data, outMath), 
+      ascii: data.asciimath,
+      ascii_tsv: data['asciimath_tsv']
+    };
   },
   /**
    * Typeset a MathML expression and return the SVG tree for it

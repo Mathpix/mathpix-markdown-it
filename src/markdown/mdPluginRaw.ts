@@ -551,7 +551,8 @@ const renderMath = (a, token, options) => {
           accessibility: options.accessibility
         });
         mathEquation = data.html;
-        token.ascii = data.ascii
+        token.ascii = data.ascii;
+        token.ascii_tsv = data.ascii_tsv;
       } else {
          mathEquation = MathJax.Typeset(math, {display: isBlock, metric: { cwidth: cwidth },
            outMath: options.outMath, mathJax: options.mathJax, forDocx: options.forDocx,

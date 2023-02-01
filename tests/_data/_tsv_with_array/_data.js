@@ -187,7 +187,43 @@ module.exports = [
       '$"\t" net book value \n' +
       '$"\n' +
       'non-current assets\t250000\t95000\t155000'
-  },  
+  },
+  {
+    latex: '\\begin{tabular}{|l|c|c|c|}\\hline \\multicolumn{4}{|c|}{ as at 30 June 2020 (AUD\\$\'000) } \\\\\\hline \\multirow{2}{*}{\\( \\begin{array}{l}\\text { Current assets } \\\\\\text { Cash at bank }\\end{array} \\)} & 2020 & 2019 & 2018 \\\\\\cline { 2 - 4 } Receivables (net) & \\( \\$ 120,000 \\) & \\( \\$ 80,000 \\) & \\( \\$ 36,000 \\) \\\\Inventory & \\( \\$ 140,000 \\) & \\( \\$ 120,000 \\) & \\( \\$ 96,000 \\) \\\\Total current assets & \\( \\$ 180,000 \\) & \\( \\$ 170,000 \\) & \\( \\$ 128,000 \\) \\\\Non Current assets & \\( \\$ 440,000 \\) & \\( \\$ 370,000 \\) & \\( \\$ 260,000 \\) \\\\Plant and equipment (net) & & & \\\\Investments & \\( \\$ 1,000,000 \\) & \\( \\$ 820,000 \\) & \\( \\$ 716,000 \\) \\\\\\hline\\end{tabular}',
+    tsv: 'as at 30 June 2020 (AUD$\'000)\t\t\t\n' +
+      '" Current assets \n' +
+      ' Cash at bank "\t2020\t2019\t2018\n' +
+      '\t$120,000\t$80,000\t$36,000\n' +
+      'Inventory\t$140,000\t$120,000\t$96,000\n' +
+      'Total current assets\t$180,000\t$170,000\t$128,000\n' +
+      'Non Current assets\t$440,000\t$370,000\t$260,000\n' +
+      'Plant and equipment (net)\t\t\t\n' +
+      'Investments\t$1,000,000\t$820,000\t$716,000'
+  },
+  {
+    latex: '\\begin{tabular}{|l|c|c|c|}\\hline \\multicolumn{4}{|c|}{ as at 30 June 2020 (AUD $\'000) } \\\\\\hline \\multirow{2}{*}{\\( \\begin{array}{l}\\text { Current assets } $ \\\\\\text { Cash at bank }\\end{array} \\)} & 2020 & 2019 & 2018 \\\\\\cline { 2 - 4 } Receivables (net) & \\( \\$ 120,000 \\) & \\( \\$ 80,000 \\) & \\( \\$ 36,000 \\) \\\\Inventory & \\( \\$ 140,000 \\) & \\( \\$ 120,000 \\) & \\( \\$ 96,000 \\) \\\\Total current assets & \\( \\$ 180,000 \\) & \\( \\$ 170,000 \\) & \\( \\$ 128,000 \\) \\\\Non Current assets & \\( \\$ 440,000 \\) & \\( \\$ 370,000 \\) & \\( \\$ 260,000 \\) \\\\Plant and equipment (net) & & & \\\\Investments & \\( \\$ 1,000,000 \\) & \\( \\$ 820,000 \\) & \\( \\$ 716,000 \\) \\\\\\hline\\end{tabular}',
+    tsv: 'as at 30 June 2020 (AUD $\'000)\t\t\t\n' +
+      '" Current assets $\n' +
+      ' Cash at bank "\t2020\t2019\t2018\n' +
+      '\t$120,000\t$80,000\t$36,000\n' +
+      'Inventory\t$140,000\t$120,000\t$96,000\n' +
+      'Total current assets\t$180,000\t$170,000\t$128,000\n' +
+      'Non Current assets\t$440,000\t$370,000\t$260,000\n' +
+      'Plant and equipment (net)\t\t\t\n' +
+      'Investments\t$1,000,000\t$820,000\t$716,000'
+  },
+  {
+    latex: '\\begin{tabular}{|l|c|c|c|}\\hline \\multicolumn{4}{|c|}{ as at 30 June 2020 (AUD $\'000) } \\\\\\hline \\multirow{2}{*}{\\( \\begin{array}{l}\\text { Current assets }$1 \\\\\\text { Cash at bank }\\end{array} \\)} & 2020 & 2019 & 2018 \\\\\\cline { 2 - 4 } Receivables (net) & \\( \\$ 120,000 \\) & \\( \\$ 80,000 \\) & \\( \\$ 36,000 \\) \\\\Inventory & \\( \\$ 140,000 \\) & \\( \\$ 120,000 \\) & \\( \\$ 96,000 \\) \\\\Total current assets & \\( \\$ 180,000 \\) & \\( \\$ 170,000 \\) & \\( \\$ 128,000 \\) \\\\Non Current assets & \\( \\$ 440,000 \\) & \\( \\$ 370,000 \\) & \\( \\$ 260,000 \\) \\\\Plant and equipment (net) & & & \\\\Investments & \\( \\$ 1,000,000 \\) & \\( \\$ 820,000 \\) & \\( \\$ 716,000 \\) \\\\\\hline\\end{tabular}',
+    tsv: 'as at 30 June 2020 (AUD $\'000)\t\t\t\n' +
+      '" Current assets $1\n' +
+      ' Cash at bank "\t2020\t2019\t2018\n' +
+      '\t$120,000\t$80,000\t$36,000\n' +
+      'Inventory\t$140,000\t$120,000\t$96,000\n' +
+      'Total current assets\t$180,000\t$170,000\t$128,000\n' +
+      'Non Current assets\t$440,000\t$370,000\t$260,000\n' +
+      'Plant and equipment (net)\t\t\t\n' +
+      'Investments\t$1,000,000\t$820,000\t$716,000'
+  },
   // {
   //   latex: '',
   //   tsv: ''

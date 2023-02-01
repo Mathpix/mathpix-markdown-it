@@ -14,7 +14,7 @@ type TTypeContent = {type?: string, content?: string, align?: string}
 type TTypeContentList = Array<TTypeContent>;
 export type TAttrs = string[];
 export type TTokenTabular = {token: string, type: string, tag: string, n: number, content?: string,
-  attrs?: Array<TAttrs>, children?: Token, id?: string, ascii?: string, latex?: string};
+  attrs?: Array<TAttrs>, children?: Token, id?: string, ascii?: string, ascii_tsv?: string, latex?: string};
 
 
 export type TMulti = {mr?: number, mc?: number, attrs: Array<TAttrs>, content?: string, subTable?: Array<TTokenTabular>, latex: string}
@@ -144,6 +144,7 @@ export const inlineDecimalParse = (tok: TTokenTabular) => {
     content: tok.content,
     block: false,
     ascii: tok.ascii,
+    ascii_tsv: tok.ascii_tsv,
     latex: tok.ascii
   });
   return tok;

@@ -137,7 +137,7 @@ const renderInlineTokenBlock = (tokens, options, env, slf) =>{
 
           content += slf.renderInline([child], options);
           if (child.ascii) {
-            cell += child.ascii;
+            cell += child.ascii_tsv ? child.ascii_tsv : child.ascii;
           } else {
             cell += child.tsv ? child.tsv.join(',') : child.content;
           }
