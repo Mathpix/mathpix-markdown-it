@@ -34,6 +34,46 @@ module.exports = [
     latex: `a ^ b`,
     ascii:     `a^b`,
     wolfram: `a^b`
+  },  
+  {
+    latex: `314+278`,
+    ascii:     `314+278`,
+    wolfram: `314 + 278`
+  },   
+  {
+    latex: `314—278`,
+    ascii:     `314—278`,
+    wolfram: `314 — 278`
+  },  
+  {
+    latex: `314*278`,
+    ascii:     `314**278`,
+    wolfram: `314 * 278`
+  },  
+  {
+    latex: `314^{278}`,
+    ascii:     `314^(278)`,
+    wolfram: `314^278`
+  },  
+  {
+    latex: `(a^2+b^2)+(a^2-b^2)`,
+    ascii:     `(a^(2)+b^(2))+(a^(2)-b^(2))`,
+    wolfram: `(a^2 + b^2) + (a^2 - b^2)`
+  },  
+  {
+    latex: `(a^2+b^2)/(a^2-b^2)`,
+    ascii:     `(a^(2)+b^(2))//(a^(2)-b^(2))`,
+    wolfram: `(a^2 + b^2)/(a^2 - b^2)`
+  },  
+  {
+    latex: `(a+b)^(2+2/3)`,
+    ascii:     `(a+b)^(()2+2//3)`, //TODO: fix ascii
+    wolfram: `(a + b)^(2 + 2/3)`
+  },  
+  {
+    latex: `4 x^2 y^3`,
+    ascii:     `4x^(2)y^(3)`,
+    wolfram: `4 x^2 y^3`
   },
   {
     latex: `a = b + c`,
@@ -365,7 +405,7 @@ module.exports = [
   {
     latex: `\\beta _ { 0 } = \\frac { 2 \\lambda D } { a }`,
     ascii:  `beta_(0)=(2lambda D)/(a)`,
-    wolfram: `beta_(0) = (2lambda D)/a`,
+    wolfram: `beta_(0) = (2 lambda D)/a`,
     wolfram_u: `β_0 = (2λD)/a`,
   },    
   {
@@ -452,7 +492,7 @@ module.exports = [
   {
     latex: `\\begin{array} { l } { x ^ { 3 } + 5 x ^ { 2 } + 4 } \\\\ { \\frac { 1 2 x ^ { n } + 1 8 } { x ^ { n } + 3 } } \\end{array}`,
     ascii: `{:[x^(3)+5x^(2)+4],[(12x^(n)+18)/(x^(n)+3)]:}`,
-    wolfram: `{{x^3 + 5x^2 + 4}, {(12x^n +18)/(x^n +3)}}`,
+    wolfram: `{{x^3 + 5 x^2 + 4}, {(12 x^n +18)/(x^n +3)}}`,
   },
     {
     latex: `( x - 1 ) ( x + 3 ) \\cdot ( x - 3 )`,
@@ -478,12 +518,12 @@ module.exports = [
   {
     latex: `\\mathrm { b } \\text { of the hyperbola described in the equation? } \\mathrm { x } ^ { 2 } - 4 \\mathrm { y } ^ { 2 } - 6 \\mathrm { x } + 5 = 0`,
     ascii: `b" of the hyperbola described in the equation? "x^(2)-4y^(2)-6x+5=0`,
-    wolfram: `b of the hyperbola described in the equation? x^2 - 4y^2 - 6x + 5 = 0`,
+    wolfram: `b of the hyperbola described in the equation? x^2 - 4 y^2 - 6 x + 5 = 0`,
   },  
   {
     latex: `\\operatorname { s i n } \\widehat { A P E } = \\frac { \\frac { 1 2 \\sqrt { 1 5 } } { 5 } } { 3 \\sqrt { 1 0 } } = \\frac { 1 2 \\sqrt { 1 5 } } { 1 5 \\sqrt { 1 0 } } = \\frac { 4 \\sqrt { 3 } } { 5 \\sqrt { 2 } } = \\frac { 2 \\sqrt { 6 } } { 5 } .`,
     ascii:  `sin  widehat(APE)=((12sqrt(15))/(5))/(3sqrt(10))=(12sqrt(15))/(15sqrt(10))=(4sqrt3)/(5sqrt2)=(2sqrt6)/(5).`,
-    wolfram: `sin(widehat(APE)) = (12sqrt(15))/5/(3sqrt(10)) = (12sqrt(15))/(15sqrt(10)) = (4sqrt(3))/(5sqrt(2)) = (2sqrt(6))/5.`,
+    wolfram: `sin(widehat(APE)) = (12 sqrt(15))/5/(3 sqrt(10)) = (12 sqrt(15))/(15 sqrt(10)) = (4 sqrt(3))/(5 sqrt(2)) = (2 sqrt(6))/5.`,
   },      
   {
     latex: `\\operatorname { l i m } _ { x \\rightarrow 0 } \\frac { 1 } { x } =`,
@@ -670,7 +710,7 @@ module.exports = [
   {
     latex: `\\left\\lfloor \\frac { 1 } { 2 } \\left( \\sqrt { 1 + \\frac { 2 } { 3 c } } - 3 \\right) \\right\\rfloor .`,
     ascii: `|__(1)/(2)(sqrt(1+(2)/(3c))-3)__|.`,
-    wolfram: `⌊1/2(sqrt(1 + 2/(3c))-3)⌋.`,
+    wolfram: `⌊1/2(sqrt(1 + 2/(3 c))-3)⌋.`,
   },  
   {
     latex: `2 ^ { \\left\\lfloor \\log _ { 2 } \\left( \\begin{array} { l } N _ { t } \\\\ N _ { p } \\end{array} \\right) \\right\\rfloor}`,
@@ -680,7 +720,7 @@ module.exports = [
   {
     latex: `\\sum _ { k = 0 } ^ { 31 } \\left\\lfloor \\frac { 63 } { 2 k + 1 } \\right\\rfloor \\bmod 2`,
     ascii: `sum_(k=0)^(31)|__(63)/(2k+1)__|mod2`,
-    wolfram: `sum_(k = 0)^31 ⌊63/(2k+1)⌋ mod 2`,
+    wolfram: `sum_(k = 0)^31 ⌊63/(2 k+1)⌋ mod 2`,
   },  
   {
     latex: "\\left[ \\begin{array} { l l l l l l l } 1 & 2 & 3 & 4 & 5 & 6 & 7 \\\\ 1 & 2 & 3 & 4 & 1 & 1 & 1 \\\\ 1 & 1 & 1 & 1 & 1 & 1 & 1 \\\\ \\vdots & \\vdots & \\vdots & \\vdots & \\vdots & \\vdots & \\vdots \\\\ 1 & 2 & 1 & 2 & 1 & 2 & 1 \\\\ 0 & 1 & 1 & 0 & 1 & 1 & 1 \\\\ 1 & 2 & 3 & 4 & 5 & 6 & 7 \\end{array} \\right] ",
@@ -1085,17 +1125,17 @@ module.exports = [
   {
     latex: 't=\\sqrt{\\frac{(2) 42}{9.8} \\mathrm{~m} / \\mathrm{s}^{2}}',
     ascii: `t=sqrt(((2)42)/(9.8)m//s^(2))`,
-    wolfram: `t = sqrt(((2)42)/9.8m/s^2)`,
+    wolfram: `t = sqrt(((2)42)/9.8 m/s^2)`,
   },
   {
     latex: '200 \\mathrm{~V}',
     ascii: `200V`,
-    wolfram: `200V`,
+    wolfram: `200 V`,
   },
   {
     latex: `\\frac{\\sqrt[4]{32 z^{6} y^{3}}}{\\sqrt[4]{2 z^{2} y^{11}}}'`,
     ascii: '(root(4)(32z^(6)y^(3)))/(root(4)(2z^(2)y^(11)))',
-    wolfram: `((32z^6 y^3)^(1/4)/(2z^2 y^11)^(1/4))'`,
+    wolfram: `((32 z^6 y^3)^(1/4)/(2 z^2 y^11)^(1/4))'`,
   },
   {
     latex: `\\{ d \\} = \\left\\{ \\begin{array} { l } u \\\\ v \\end{array} \\right\\} = \\left[ \\begin{array} { l l l l l l } 1 & x & y & 0 & 0 & 0 \\\\ 0 & 0 & 0 & 1 & x & y \\end{array} \\right] \\left\\{ \\begin{array} { l } \\alpha _ { 1 } \\\\ \\alpha _ { 2 } \\\\ \\alpha _ { 3 } \\\\ \\alpha _ { 4 } \\\\ \\alpha _ { 5 } \\\\ \\alpha _ { 6 } \\end{array} \\right\\} = [ S ] \\{ \\alpha \\}`,
@@ -1105,7 +1145,7 @@ module.exports = [
   {
     latex: `[ c ] ^ { - 1 } = \\frac { 1 } { 2 A } \\left[ \\begin{array} { c c c c c c } a _ { i } & 0 & a _ { j } & 0 & a _ { k } & 0 \\\\ b _ { i } & 0 & b _ { j } & 0 & b _ { k } & 0 \\\\ c _ { i } & 0 & c _ { j } & 0 & c _ { k } & 0 \\\\ 0 & a _ { i } & 0 & a _ { j } & 0 & a _ { k } \\\\ 0 & b _ { i } & 0 & b _ { j } & 0 & b _ { k } \\\\ 0 & c _ { i } & 0 & c _ { j } & 0 & c _ { k } \\end{array} \\right]`,
     ascii: `[c]^(-1)=(1)/(2A)[[a_(i),0,a_(j),0,a_(k),0],[b_(i),0,b_(j),0,b_(k),0],[c_(i),0,c_(j),0,c_(k),0],[0,a_(i),0,a_(j),0,a_(k)],[0,b_(i),0,b_(j),0,b_(k)],[0,c_(i),0,c_(j),0,c_(k)]]`,
-    wolfram: `[c]^(-1) = 1/(2A)[{{a_i, 0, a_j, 0, a_(k), 0}, {b_i, 0, b_j, 0, b_(k), 0}, {c_i, 0, c_j, 0, c_(k), 0}, {0, a_i, 0, a_j, 0, a_(k)}, {0, b_i, 0, b_j, 0, b_(k)}, {0, c_i, 0, c_j, 0, c_(k)}}]`,
+    wolfram: `[c]^(-1) = 1/(2 A)[{{a_i, 0, a_j, 0, a_(k), 0}, {b_i, 0, b_j, 0, b_(k), 0}, {c_i, 0, c_j, 0, c_(k), 0}, {0, a_i, 0, a_j, 0, a_(k)}, {0, b_i, 0, b_j, 0, b_(k)}, {0, c_i, 0, c_j, 0, c_(k)}}]`,
   },  
   {
     latex: `2 A = \\left| \\begin{array} { l l l } 1 & x _ { i } & y _ { i } \\\\ 1 & x _ { j } & y _ { j } \\\\ 1 & x _ { k } & y _ { k } \\end{array} \\right| = \\left( x _ { i } - x _ { j } \\right) \\left( y _ { k } - y _ { j } \\right) - \\left( x _ { k } - x _ { j } \\right) \\left( y _ { j } - y _ { k } \\right)`,

@@ -4,6 +4,7 @@ import { SerializedMmlVisitor as MmlVisitor } from 'mathjax-full/js/core/MmlTree
 import { SerializedAsciiVisitor as AsciiVisitor } from './serialized-ascii';
 import { MathMLVisitorWord } from './mathml-word';
 import { WolframVisitor } from './wolfram';
+import { postProcessWolfram } from './serialized-wolfram/post-process';
 import { getSpeech } from '../sre';
 import { TAccessibility } from "../mathpix-markdown-model";
 import { formatSource, formatSourceMML } from "../helpers/parse-mmd-element";
@@ -30,9 +31,10 @@ const toAsciiML = ((node, optionAscii) => {
 
 const toWolfram = (node, optionsWolfram) => {
   const visitor = new WolframVisitor(optionsWolfram);
-  const wolfram = visitor.visitTree(node);
+  let wolfram = visitor.visitTree(node);
+  wolfram = postProcessWolfram(wolfram);
   return wolfram?.trim();
-}
+};
 
 const applySpeechToNode = (adaptor, node, sre): string => {
   const lastChild = adaptor.lastChild(node);

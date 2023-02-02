@@ -11,7 +11,7 @@ const isLastChild = (node) => {
   return node.parent && node.parent.childNodes && node.parent.childNodes[node.parent.childNodes.length -1] === node
 };
 
-const needFirstSpase = (node) => {
+const needFirstSpace = (node) => {
   try {
     if (isFirstChild(node)) {
       return false
@@ -30,7 +30,7 @@ const needFirstSpase = (node) => {
   }
 };
 
-const needLastSpase = (node) => {
+const needLastSpace = (node) => {
   let haveSpace: boolean = false;
   try {
     if (node.parent.kind === "msubsup") {
@@ -65,7 +65,6 @@ const needLastSpase = (node) => {
   }
 };
 
-
 export const SymbolToAM = (tag: string, output: string, atr = null, showStyle = false, isLogic = false, unicode = false) => {
   let tags = null;
   const atrsNames = atr ? Object.getOwnPropertyNames(atr) : [];
@@ -90,11 +89,10 @@ export const SymbolToAM = (tag: string, output: string, atr = null, showStyle = 
       }
     });
   }
-
   //need split
   if (!tags && atr && atrsNames.length > 0 && Object.getOwnPropertyNames(atr)&& atr.stretchy === false) {
     const sp = output.split('');
-    let res = ''
+    let res = '';
     for (let i = 0; i < sp.length; i++) {
       let tags = AMsymbols.find(item => {
         if (tag === 'mo' || tag === 'mi') {
@@ -145,7 +143,7 @@ export const FindSymbolToAM = (tag: string, output: string, atr = null): string 
   return tags ? tags.input : '';
 };
 
-const getChilrenText = (node): string => {
+const getChildrenText = (node): string => {
   let text: string = '';
   try {
     node.childNodes.forEach(child => {
@@ -163,8 +161,8 @@ const defHandle = (node, serialize) => {
 
 export const getAttributes = (node: MmlNode) =>{
   return node.attributes.getAllAttributes();
-}
-;
+};
+
 const menclose = (handlerApi) => {
   return  (node, serialize) => {
     let mml = '';
@@ -203,7 +201,9 @@ const mtable = () => {
         const sFirst = node.parent.childNodes[0].kind === 'mo' ? serialize.visitNode(node.parent.childNodes[0], '') : '';
         openBranch = sFirst?.trim() === '{' ? '{' : '';
       }
-      const display = node.attributes?.attributes?.hasOwnProperty('displaystyle');// && node.prevClass !== 4;
+      const isNumberedEquation = node.childNodes.length === 1 
+        && node.childNodes[0].kind === 'mlabeledtr';
+      const display = node.attributes?.attributes?.hasOwnProperty('displaystyle');
       const isHasBranchOpen = node.parent && node.parent.kind === 'mrow'
         && node.parent.properties
         && node.parent.properties.hasOwnProperty('open') 
@@ -217,7 +217,7 @@ const mtable = () => {
         || display
         || (!isHasBranchClose && isHasBranchOpen);
       
-      mml += isHasBranchOpen || openBranch === "{" ||
+      mml += isHasBranchOpen || openBranch === "{" || isNumberedEquation ||
       parentIsMenclose
         ? ''
         : '{';
@@ -228,7 +228,7 @@ const mtable = () => {
         }
         mml += serialize.visitNode(node.childNodes[i], '');
       }
-      mml += isHasBranchClose || (!isHasBranchClose && isHasBranchOpen) ||
+      mml += isHasBranchClose || (!isHasBranchClose && isHasBranchOpen) || isNumberedEquation ||
       parentIsMenclose
         ? ''
         : '}';
@@ -757,9 +757,9 @@ const mi = () => {
       let abs = SymbolToAM(node.kind, value, atr, false, serialize.isLogic, serialize.options.unicode);
       if (abs && abs.length > 1 && regW.test(abs[0])) {
         let sFunction = abs?.trim() ? getFunction(abs.trim()) : "";
-        mml += needFirstSpase(node) ? ' ' : '';
+        mml += needFirstSpace(node) ? ' ' : '';
         mml += abs;
-        mml += needLastSpase(node) && !sFunction ? ' ' : '';
+        mml += needLastSpace(node) && !sFunction ? ' ' : '';
       } else {
         mml += abs ;
       }
@@ -776,16 +776,16 @@ const mo = () => {
   return  (node, serialize) => {
     let mml = '';
     try {
-      const value = getChilrenText(node);
+      const value = getChildrenText(node);
       if (value === '\u2061') {
         return mml;
       }
       const atr = getAttributes(node);
       let abs = SymbolToAM(node.kind, value, atr, serialize.options.showStyle, serialize.isLogic, serialize.options.unicode);
       if (abs && abs.length > 1) {
-        mml += regW.test(abs[0]) && needFirstSpase(node) ? ' ' : '';
+        mml += regW.test(abs[0]) && needFirstSpace(node) ? ' ' : '';
         mml += abs;
-        mml += regW.test(abs[abs.length-1]) && needLastSpase(node) ? ' ' : '';
+        mml += regW.test(abs[abs.length-1]) && needLastSpace(node) ? ' ' : '';
       } else {
         mml += abs ;
       }
@@ -844,6 +844,25 @@ const  handleAll = (node, serialize, mml='') => {
   return mml;
 };
 
+const mlabeledtr = () => {
+  return (node, serialize) => {
+    let mml = '';
+    try {
+      for (let i = 0; i < node.childNodes.length; i++) {
+        const id = node.childNodes[i].attributes.get('id');
+        /** ignore equation number (mjx-eqn-1)*/
+        if (id && id.indexOf('mjx-eqn') !== -1) {
+          continue;
+        }
+        mml += serialize.visitNode(node.childNodes[i], '');
+      }
+      return mml;
+    } catch (e) {
+      console.error('mml => mlabeledtr =>', e);
+      return mml;
+    }
+  }
+};
 
 const handlerApi = {
   handle: handle,
@@ -870,4 +889,5 @@ const handlers = {
   mpadded: mpadded(handlerApi),
   mroot: mroot(),
   menclose:  menclose(handlerApi),
+  mlabeledtr: mlabeledtr()
 };

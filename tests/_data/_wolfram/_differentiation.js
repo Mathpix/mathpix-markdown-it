@@ -72,11 +72,26 @@ module.exports = [
   
   {
     latex: `1-\\cos\\dddot{x} = \\sqrt{1-\\sqrt{4\\cos^{2}\\ddot{x}-7\\cos^{4}\\ddddot{x}}}`,
-    wolfram: `1 - cos(d^3/dt^3)x = sqrt(1 - sqrt(4cos^2 (d^2/dt^2)x - 7cos^4 (d^4/dt^4)x))`
+    wolfram: `1 - cos(d^3/dt^3)x = sqrt(1 - sqrt(4 cos^2 (d^2/dt^2)x - 7 cos^4 (d^4/dt^4)x))`
   },  
-  {
-    latex: ``,
-    ascii: ``,
-    wolfram: ``
-  },
+  // {
+  //   latex: `\\left.\\frac{d}{d x} \\frac{1}{x}\\right|_{x=5}`,
+  //   ascii: `(d)/(dx)(1)/(x)|_(x=5)`,
+  //   wolfram: ``
+  // },  
+  // {
+  //   latex: ``,
+  //   ascii: ``,
+  //   wolfram: ``
+  // },  
+  // {
+  //   latex: ``,
+  //   ascii: ``,
+  //   wolfram: ``
+  // },  
+  // {
+  //   latex: ``,
+  //   ascii: ``,
+  //   wolfram: ``
+  // },
 ];

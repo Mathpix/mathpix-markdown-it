@@ -34,7 +34,7 @@ module.exports = [
   {
     latex: `\\int_0^{\\pi} (\\sin^2(x) + 2 \\sin^4(2 x)) dx`,
     ascii: `int_(0)^(pi)(sin^(2)(x)+2sin^(4)(2x))dx`,
-    wolfram: `int_0^pi (sin^2 (x) + 2sin^4 (2 x))dx`,
+    wolfram: `int_0^pi (sin^2 (x) + 2 sin^4 (2 x))dx`,
     wolfram_: `int_0^π (sin^2 (x) + 2sin^4 (2 x))dx`,
   },
   {
