@@ -274,14 +274,101 @@ module.exports = [
     tsv: '{[x-2z=1],[y+z=3]:}\t2\n' +
       '4\t5'
   },  
-  // {
-  //   latex: '',
-  //   tsv: ''
-  // },  
-  // {
-  //   latex: '',
-  //   tsv: ''
-  // },  
+  {
+    latex: '\\begin{tabular}{ | l | c | }\\hline\n' +
+      '\\(\\begin{array}{c} x \\\\\n' +
+      '\\smash{x}{y}\\end{array} \\) & 2  \\\\ \\hline\n' +
+      '4 & 5 \\\\ \\hline\n' +
+      '\\end{tabular}',
+    tsv: '"x\n' +
+      'xy"\t2\n' +
+      '4\t5'
+  },  
+  {
+    latex: '\\begin{tabular}{ | l | c | }\\hline\n' +
+      '\\(\\begin{array}{c} x, y \\\\\n' +
+      '\\smash{x}{y}\\end{array} \\) & 2  \\\\ \\hline\n' +
+      '4 & 5 \\\\ \\hline\n' +
+      '\\end{tabular}',
+    tsv: '"x,y\n' +
+      'xy"\t2\n' +
+      '4\t5'
+  },  
+  {
+    latex: '\\begin{tabular}{ | l | c | }\\hline\n' +
+      '\\(\\begin{array}{c} x, y \\\\\n' +
+      '\\begin{array}{c} w, z\\end{array}\\\\\n' +
+      '\\smash{x}{y}\\end{array} \\) & 2  \\\\ \\hline\n' +
+      '4 & 5 \\\\ \\hline\n' +
+      '\\end{tabular}',
+    tsv: '"x,y\n' +
+      '{:w"",""z:}\n' +
+      'xy"\t2\n' +
+      '4\t5'
+  },
+  {
+    latex: '\\begin{tabular}{ | l | c | }\\hline\n' +
+      '\\(\\begin{array}{c} x, y \\\\\n' +
+      '\\begin{array}{c} x1, y1 \\\\\n' +
+      '\\smash{x1}{y1}\\end{array}\\\\\n' +
+      '\\smash{x}{y}\\end{array} \\) & 2  \\\\ \\hline\n' +
+      '4 & 5 \\\\ \\hline\n' +
+      '\\end{tabular}',
+    tsv: '"x,y\n' +
+      '{:[x1"",""y1],[""(x1)""y1]:}\n' +
+      'xy"\t2\n' +
+      '4\t5'
+  },
+  {
+    latex: '\\begin{tabular}{ | l | c | }\\hline\n' +
+      '\\(\\begin{array}{c} x, "y" \\\\\n' +
+      '\\begin{array}{c} w, z\\end{array}\\\\\n' +
+      '\\smash{x}{y}\\end{array} \\) & 2  \\\\ \\hline\n' +
+      '4 & 5 \\\\ \\hline\n' +
+      '\\end{tabular}',
+    tsv: '"x,""y""\n' +
+      '{:w"",""z:}\n' +
+      'xy"\t2\n' +
+      '4\t5'
+  },  
+  {
+    latex: '\\begin{tabular}{ | l | c | }\\hline\n' +
+      '\\(\\begin{array}{c} x, \\text{"}y \\\\\n' +
+      '\\begin{array}{c} w, z\\end{array}\\\\\n' +
+      '\\smash{x}{y}\\end{array} \\) & 2  \\\\ \\hline\n' +
+      '4 & 5 \\\\ \\hline\n' +
+      '\\end{tabular}',
+    tsv: '"x,""y\n' +
+      '{:w"",""z:}\n' +
+      'xy"\t2\n' +
+      '4\t5'
+  },  
+  {
+    latex: '\\begin{tabular}{ | l | c | }\\hline\n' +
+      '\\(\\begin{array}{c} x, \\text{"some"}y \\\\\n' +
+      '\\begin{array}{c} w, z \\\\\n' +
+      '"x"\\end{array}\\\\\n' +
+      '\\smash{x}{y}\\end{array} \\) & 2  \\\\ \\hline\n' +
+      '4 & 5 \\\\ \\hline\n' +
+      '\\end{tabular}',
+    tsv: '"x,""some""y\n' +
+      '{:[w"",""z],[""x""]:}\n' +
+      'xy"\t2\n' +
+      '4\t5'
+  },  
+  {
+    latex: '\\begin{tabular}{ | l | c | }\\hline\n' +
+      '\\(\\begin{array}{c} x, \\text{"some"}y \\\\\n' +
+      '\\begin{array}{c} w, z \\\\\n' +
+      '\\text{"}x\\end{array}\\\\\n' +
+      '\\smash{x}{y}\\end{array} \\) & 2  \\\\ \\hline\n' +
+      '4 & 5 \\\\ \\hline\n' +
+      '\\end{tabular}',
+    tsv: '"x,""some""y\n' +
+      '{:[w"",""z],[""""""x]:}\n' +
+      'xy"\t2\n' +
+      '4\t5'
+  },  
   // {
   //   latex: '',
   //   tsv: ''
