@@ -1,0 +1,147 @@
+* {
+  box-sizing: border-box;
+}
+
+p {
+  margin-bottom: 10px;
+  margin-top: 0;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+td, th {
+  padding: 0;
+}
+
+ol, ul {
+  list-style: none;
+  margin-bottom: 0;
+  margin-top: 0;
+}
+
+button {
+  margin: 0;
+}
+
+details summary::-webkit-details-marker {
+  display: none;
+}
+
+details,
+details summary {
+  padding-left: 0;
+  background-image: none;
+  -webkit-appearance: none;
+}
+
+details:focus,
+summary:focus {
+  outline: 0;
+  outline: none;
+}
+
+details:not([open])>:not(summary) {
+  display: none!important;
+}
+
+[hidden][hidden] {
+  display: none!important;
+}
+
+[hidden] {
+  display: none!important;
+}
+
+.details-reset>summary {
+  list-style: none;
+}
+
+
+body {
+  overflow: hidden;
+  margin: 0;
+}
+.App {
+  margin: auto;
+  height: 100vh;
+  overflow: hidden;
+}
+
+#preview-content {
+  padding: 10px;
+}
+
+.inputs {
+  display: flex;
+}
+
+.includes {
+  width: 100px;
+  margin-left: 20px;
+}
+
+.includes label {
+  display: block;
+  margin-bottom: 10px;
+}
+
+textarea {
+  height: 100%;
+}
+
+.formats {
+  margin-top: 20px;
+}
+
+code {
+  font-family: Inconsolata;
+  background: #f8f8fa;
+  display: block;
+  color: #333;
+  overflow-x: auto;
+  font-size: 15px;
+  margin-bottom: 1em;
+  border: 1px solid #ccc;
+  page-break-inside: avoid;
+  padding: 0.5em;
+  max-height: 100px;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+.btn {
+  cursor: pointer;
+  height: 34px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 20px;
+  background-color: #fafbfc;
+  color: #2A42E0;
+  border: 1px solid #2A42E0;
+  box-sizing: border-box;
+  border-radius: 200px;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 14px;
+  line-height: 17px;
+  position: relative;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.toc ul {
+  list-style-type: none;
+  padding-left: 20px !important;
+}
+
+#toc_container {
+   padding: 20px !important; 
+}

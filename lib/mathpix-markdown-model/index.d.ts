@@ -16,6 +16,7 @@ export interface optionsMathpixMarkdown {
     typographer?: boolean;
     linkify?: boolean;
     enableFileLinks?: boolean;
+    validateLink?: (url: string) => void;
     xhtmlOut?: boolean;
     width?: number;
     showToc?: boolean;
@@ -30,6 +31,11 @@ export interface optionsMathpixMarkdown {
     maxWidth?: string;
     toc?: TTocOptions;
     accessibility?: TAccessibility;
+    nonumbers?: boolean;
+    showPageBreaks?: boolean;
+    centerImages?: boolean;
+    centerTables?: boolean;
+    enableCodeBlockRuleForLatexCommands?: boolean;
 }
 export declare type TMarkdownItOptions = {
     isDisableFancy?: boolean;
@@ -41,6 +47,7 @@ export declare type TMarkdownItOptions = {
     typographer?: boolean;
     linkify?: boolean;
     enableFileLinks?: boolean;
+    validateLink?: (url: string) => void;
     xhtmlOut?: boolean;
     width?: number;
     lineNumbering?: boolean;
@@ -62,6 +69,11 @@ export declare type TMarkdownItOptions = {
     htmlWrapper?: THtmlWrapper | boolean;
     toc?: TTocOptions;
     accessibility?: TAccessibility;
+    nonumbers?: boolean;
+    showPageBreaks?: boolean;
+    centerImages?: boolean;
+    centerTables?: boolean;
+    enableCodeBlockRuleForLatexCommands?: boolean;
 };
 export declare type TOutputMath = {
     include_mathml?: boolean;
@@ -105,6 +117,7 @@ export declare type THtmlWrapper = {
 };
 export declare type TTocOptions = {
     style?: TTocStyle;
+    doNotGenerateParentId?: boolean; /** Don't generate unique ParentId for nested blocks. Used to testing */
 };
 export declare enum TTocStyle {
     summary = "summary",
@@ -128,7 +141,7 @@ declare class MathpixMarkdown_Model {
     parseMarkdownByElement: (el: Document | HTMLElement, include_sub_math?: boolean) => any[];
     markdownToHTML: (markdown: string, options?: TMarkdownItOptions) => string;
     showTocInContainer: (html: string, containerName?: string) => void;
-    getTocContainerHTML: (html: string) => string;
+    getTocContainerHTML: (html: string, onlyContent?: boolean) => string;
     checkEquationNumber: (html: string) => string;
     handleClick: (e: any) => void;
     scrollPage: (parent: any, offsetTarget: any) => void;

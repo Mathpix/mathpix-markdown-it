@@ -17,3 +17,4 @@
 /examples/react-app/use-parseMarkdownByHTML-method/yarn.lock
 package-lock.json
 /.idea
+.DS_Store

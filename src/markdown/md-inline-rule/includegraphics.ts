@@ -76,6 +76,9 @@ export const ParseIncludeGraphics = (str: string, i: number, align: string='') =
 
 export const StatePushIncludeGraphics = (state, startLine: number, nextLine: number, content: string, align: string): boolean => {
   let token: Token;
+  if (!align && state.md.options.centerImages) {
+    align = 'center';
+  }
   const res = ParseIncludeGraphics(content, 0, align);
   if (!res || res.length === 0) {
     return false;
@@ -119,6 +122,9 @@ export const InlineIncludeGraphics = (state, silent) => {
   if (!silent) {
     const token = state.push( "includegraphics", "img", 0);
     token.attrs = attrs;
+    if (state.md.options.centerImages && state.env.align) {
+      token.attrSet('data-align', state.env.align);
+    }
     token.content = '';
     if (state.md.options.forLatex) {
       token.latex = latex;

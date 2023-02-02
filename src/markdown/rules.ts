@@ -30,6 +30,14 @@ function injectLineNumbers(tokens, idx, options, env, slf) {
   return slf.renderToken(tokens, idx, options, env, slf);
 }
 
+function injectCenterTables(tokens, idx, options, env, slf) {
+  const token = tokens[idx];
+  if (token.level === 0) {
+    token.attrJoin("align", "center");
+  }
+  return slf.renderToken(tokens, idx, options, env, slf);
+}
+
 function html_block_injectLineNumbers(tokens, idx, options, env, slf) {
   const { htmlSanitize = {}, enableFileLinks } = options;
   let line, endLine, listLine;
@@ -118,6 +126,7 @@ function code_block_injectLineNumbers(tokens, idx, options, env, slf) {
 export function withLineNumbers(renderer) {
   renderer.renderer.rules.paragraph_open
       = renderer.renderer.rules.heading_open
+      = renderer.renderer.rules.addcontentsline_open
       = renderer.renderer.rules.ordered_list_open
       = renderer.renderer.rules.bullet_list_open
       = renderer.renderer.rules.blockquote_open
@@ -130,7 +139,10 @@ export function withLineNumbers(renderer) {
 }
 
 export const injectRenderRules = (renderer) => {
-  const { lineNumbering = false, htmlSanitize = {}, html = false, forDocx = false } = renderer.options;
+  const { lineNumbering = false, htmlSanitize = {}, html = false, forDocx = false, centerTables = true } = renderer.options;
+  if (centerTables) {
+    renderer.renderer.rules.table_open = injectCenterTables;
+  }
   if (forDocx) {
     injectInlineStyles(renderer);
   }

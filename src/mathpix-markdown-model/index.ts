@@ -31,6 +31,7 @@ export interface optionsMathpixMarkdown {
     typographer?: boolean,
     linkify?: boolean,
     enableFileLinks?: boolean,
+    validateLink?: (url: string) => void;
     xhtmlOut?: boolean,
     width?: number;
     showToc?: boolean;
@@ -45,6 +46,11 @@ export interface optionsMathpixMarkdown {
     maxWidth?: string;
     toc?: TTocOptions;
     accessibility?: TAccessibility;
+    nonumbers?: boolean;
+    showPageBreaks?: boolean;
+    centerImages?: boolean;
+    centerTables?: boolean;
+    enableCodeBlockRuleForLatexCommands?: boolean;
 }
 
 export type TMarkdownItOptions = {
@@ -57,6 +63,7 @@ export type TMarkdownItOptions = {
   typographer?: boolean,
   linkify?: boolean,
   enableFileLinks?: boolean,
+  validateLink?: (url: string) => void,
   xhtmlOut?: boolean,
   width?: number,
   lineNumbering?: boolean,
@@ -78,6 +85,11 @@ export type TMarkdownItOptions = {
   htmlWrapper?: THtmlWrapper | boolean;
   toc?: TTocOptions;
   accessibility?: TAccessibility;
+  nonumbers?: boolean;
+  showPageBreaks?: boolean;
+  centerImages?: boolean;
+  centerTables?: boolean;
+  enableCodeBlockRuleForLatexCommands?: boolean;
 }
 
 export type TOutputMath = {
@@ -126,7 +138,8 @@ export type THtmlWrapper = {
 }
 
 export type TTocOptions = {
-  style?: TTocStyle
+  style?: TTocStyle,
+  doNotGenerateParentId?: boolean /** Don't generate unique ParentId for nested blocks. Used to testing */
 };
 
 export enum TTocStyle {
@@ -216,12 +229,15 @@ class MathpixMarkdown_Model {
     }
   };
 
-  getTocContainerHTML = ( html: string ):string => {
+  getTocContainerHTML = (html: string, onlyContent = true):string => {
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, "text/html");
     const body = doc.body;
     const toc = body.getElementsByClassName('table-of-contents')[0];
     if (toc) {
+      if (!onlyContent) {
+        return `<div id="toc_container">` + toc.innerHTML + '</div>'
+      }
       return toc.innerHTML;
     }else {
       return '';
@@ -237,12 +253,15 @@ class MathpixMarkdown_Model {
       for(let i = 0; i < links.length; i++) {
         const eq = links[i].getAttribute('value');
         const equationNumber = doc.getElementById(eq);
+        const dataParentheses = links[i].getAttribute("data-parentheses");
         if (!equationNumber) {
           links[i].innerHTML=`[${decodeURIComponent(eq)}]`;
         } else {
           const numbers = equationNumber.getAttribute('number');
           if(numbers) {
-            links[i].innerHTML = `[${numbers.split(',')[0]}]`
+            links[i].innerHTML = dataParentheses === "true" 
+              ? `(${numbers.split(',')[0]})`
+              : `${numbers.split(',')[0]}`
           }
         }
       }
@@ -334,6 +353,7 @@ class MathpixMarkdown_Model {
                   + codeStyles 
                   + tabularStyles() 
                   + listsStyles 
+                  + TocStyle("toc")
                   + menuStyle();
                 document.head.appendChild(style);
             }
@@ -409,9 +429,14 @@ class MathpixMarkdown_Model {
           overflowY='unset', breaks = true, typographer = true, linkify = true, xhtmlOut = false,
           outMath = {}, mathJax = {}, htmlSanitize = {}, smiles = {}, openLinkInNewWindow = true,
           maxWidth='',
-          enableFileLinks=false,
+          enableFileLinks=false, validateLink = null,
           toc = {},
-          accessibility = null
+          accessibility = null,
+          nonumbers = false,
+          showPageBreaks = false,
+          centerImages = true,
+          centerTables = true,
+          enableCodeBlockRuleForLatexCommands = false
         }
          = options || {};
 
@@ -444,8 +469,14 @@ class MathpixMarkdown_Model {
           openLinkInNewWindow: openLinkInNewWindow,
           maxWidth: maxWidth,
           enableFileLinks: enableFileLinks,
+          validateLink: validateLink,
           toc: toc,
-          accessibility: accessibility
+          accessibility: accessibility,
+          nonumbers: nonumbers,
+          showPageBreaks: showPageBreaks,
+          centerImages: centerImages,
+          centerTables: centerTables,
+          enableCodeBlockRuleForLatexCommands: enableCodeBlockRuleForLatexCommands
         };
 
         const styleFontSize = fontSize ? ` font-size: ${options.fontSize}px;` : '';

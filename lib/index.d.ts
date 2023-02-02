@@ -1,7 +1,8 @@
 import MathpixLoader from './components/mathpix-loader';
 import MathpixMarkdown from './components/mathpix-markdown';
 import { mathpixMarkdownPlugin, initMathpixMarkdown } from './markdown/mathpix-markdown-plugins';
-import { mdPluginMathJax, mdPluginHighlightCode, mdPluginText, mdPluginTOC, mdPluginAnchor, mdPluginTableTabular, mdPluginList, mdPluginChemistry } from "./markdown/mdPluginConfigured";
-import { MathpixMarkdownModel, TMarkdownItOptions, optionsMathpixMarkdown, TOutputMath, TOutputMathJax, THtmlSanitize } from "./mathpix-markdown-model";
+import { mdPluginMathJax, mdPluginHighlightCode, mdPluginText, mdPluginTOC, mdPluginAnchor, mdPluginTableTabular, mdPluginList, mdPluginChemistry, mdPluginCollapsible } from "./markdown/mdPluginConfigured";
+import { MathpixMarkdownModel, TMarkdownItOptions, optionsMathpixMarkdown, TOutputMath, TOutputMathJax, THtmlSanitize, TTocStyle } from "./mathpix-markdown-model";
 import { ISmilesOptions } from './markdown/md-chemistry';
-export { MathpixLoader, MathpixMarkdown, MathpixMarkdownModel, mathpixMarkdownPlugin, initMathpixMarkdown, mdPluginMathJax, mdPluginHighlightCode, mdPluginText, mdPluginTOC, mdPluginAnchor, mdPluginTableTabular, mdPluginList, mdPluginChemistry, TMarkdownItOptions, optionsMathpixMarkdown, TOutputMath, TOutputMathJax, THtmlSanitize, ISmilesOptions };
+import { resetTheoremEnvironments } from './markdown/md-theorem/helper';
+export { MathpixLoader, MathpixMarkdown, MathpixMarkdownModel, mathpixMarkdownPlugin, mdPluginCollapsible, initMathpixMarkdown, mdPluginMathJax, mdPluginHighlightCode, mdPluginText, mdPluginTOC, mdPluginAnchor, mdPluginTableTabular, mdPluginList, mdPluginChemistry, TMarkdownItOptions, optionsMathpixMarkdown, TOutputMath, TOutputMathJax, THtmlSanitize, ISmilesOptions, resetTheoremEnvironments, TTocStyle };

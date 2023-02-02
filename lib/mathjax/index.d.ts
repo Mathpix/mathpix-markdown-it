@@ -1,7 +1,8 @@
 import { TAccessibility } from "../mathpix-markdown-model";
 export declare const MathJax: {
     assistiveMml: boolean;
-    checkAccessibility: (accessibility?: TAccessibility) => void;
+    nonumbers: boolean;
+    checkAccessibility: (accessibility?: TAccessibility, nonumbers?: boolean) => void;
     Stylesheet: () => unknown;
     TexConvert: (string: any, options?: any) => {
         mathml?: string;

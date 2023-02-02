@@ -1,6 +1,7 @@
 import { MarkdownIt } from 'markdown-it';
 import { MathpixMarkdownModel } from "../mathpix-markdown-model";
 import { resetTextCounter } from './mdPluginText';
+import { resetTheoremEnvironments } from './md-theorem/helper';
 
 import {
   mdPluginMathJax,
@@ -19,9 +20,14 @@ import { validateLinkEnableFile } from "./mdOptions";
 export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
   const {width = 1200,  outMath = {}, smiles = {}, mathJax = {}, renderElement = {}, forDocx = false, forLatex = false,
     maxWidth = '',
-    enableFileLinks = false,
+    enableFileLinks = false, validateLink = null,
     toc = {},
-    accessibility = null
+    accessibility = null,
+    nonumbers = false,
+    showPageBreaks = false,
+    centerImages = true,
+    centerTables = true,
+    enableCodeBlockRuleForLatexCommands = false
   } = options;
   Object.assign(md.options, smiles);
   Object.assign(md.options, {
@@ -33,7 +39,12 @@ export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
     forLatex: forLatex,
     maxWidth: maxWidth,
     enableFileLinks: enableFileLinks,
-    accessibility: accessibility
+    accessibility: accessibility,
+    nonumbers: nonumbers,
+    showPageBreaks: showPageBreaks,
+    centerImages: centerImages,
+    centerTables: centerTables,
+    enableCodeBlockRuleForLatexCommands: enableCodeBlockRuleForLatexCommands
   });
 
   md
@@ -50,8 +61,10 @@ export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
     md.use(mdPluginSvgToBase64);
   }
 
-  if (enableFileLinks) {
-    md.validateLink = validateLinkEnableFile;
+  if (enableFileLinks || validateLink) {
+    md.validateLink = validateLink 
+      ? validateLink 
+      : validateLinkEnableFile;
   }
 };
 
@@ -89,6 +102,7 @@ export const initMathpixMarkdown = (md, callback) => {
   const { render } = renderer;
 
   md.parse = (markdown, env) => {
+    resetTheoremEnvironments();
     const mmdOptions = callback();
     setOptionForPreview(md.options, mmdOptions);
     return parse.call(md, markdown, env)

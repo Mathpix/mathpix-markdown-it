@@ -41,13 +41,47 @@ Mathpix Markdown addresses these limitations by adding support for the following
 - lists: unordered lists via `\begin{itemize} ... \end{itemize}` and ordered lists via `\begin{enumerate} ... \end{enumerate}`
 - numbered and unnumbered equation enviornments `\begin{elem} ... \end{elem}` and `\begin{elem*} ... \end{elem*}` where elem=`equation|align|split|gather`
 - equation, table, and figure references via `\label`, `\ref`, `\eqref`, `\tag`
-- text formatting options `\title{...}`, `\author{...}`, `\begin{abstract}...\end{abstract}`, `\section{Section Title}`, `\subsection{Section Title}`, `\subsubsection{Section Title}`, `\textit{italicized text}`, `\textbf{bold text}`, `\url{link}`
+- [text formatting options](doc/sections.md) `\title{...}`, `\author{...}`, `\begin{abstract}...\end{abstract}`, `\section{Section Title}`, `\subsection{Section Title}`, `\subsubsection{Section Title}`, `\textit{italicized text}`, `\textbf{bold text}`, `\url{link}`
 - chemistry equation via `<smiles>OC(=O)c1cc(Cl)cs1</smiles>` or
 ~~~
 ```smiles
 OC(=O)c1cc(Cl)cs1
 ```
 ~~~
+- images (Markdown). Parse and render additional parameters such as width, height, alignment:
+~~~
+![foo](foo.png){ width=50% }
+![foo](foo.png){ width="36px" }
+![image](<src> "title"){width="20px",height="20px"}
+![image](<src> "title"){width="20px",height="20px",right}
+![image](<src> "title"){width="20px",height="20px", align="left"}
+~~~
+![Image properties](assets/mmd-image-properties.webp)
+
+- [theorems and proofs](doc/theorems.md)
+
+```text
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+
+\begin{theorem}
+Let \(f\) be a function whose derivative exists in every point, then \(f\) 
+is a continuous function.
+\end{theorem}
+
+\begin{lemma}
+Given two line segments whose lengths are \(a\) and \(b\) respectively there 
+is a real number \(r\) such that \(b=ra\).
+\end{lemma}
+
+\begin{proof}
+To prove it by contradiction try and assume that the statement is false,
+proceed from there and at some point you will arrive to a contradiction.
+\end{proof}
+```
+
+![](doc/images/theorems_and_proofs.png)
+
 
 # What is mathpix-markdown-it? 
 
@@ -674,6 +708,12 @@ The `MathpixMarkdown` React element accepts the following props:
 | `smiles`         | [ISmilesOptions](https://github.com/Mathpix/mathpix-markdown-it#ismilesoptions);*`{}`*        | Sets options to output chemistry equation                                                                              |
 | `htmlWrapper`    | [THtmlWrapper](https://github.com/Mathpix/mathpix-markdown-it#thtmlwrapper);*`{}`*          | Sets options for output full html page                                                                                 |
 | `accessibility`  | [TAccessibility](https://github.com/Mathpix/mathpix-markdown-it#taccessibility);*`{}`*        | Sets options to accessibility                                                                                          |
+| `nonumbers`      | boolean;*`false`*            | Sets options to prevent equations, tables, figure from being numbered                                                  |
+| `showPageBreaks` | boolean;*`false`*            | Hidden tags will be shown in html like page break                                                                      |
+| `centerImages`   | boolean;*`true`*             | Center align images by default                                                                                         |
+| `centerTables`   | boolean;*`true`*             | Center align tables by default                                                                                         |
+| `validateLink`   | function;*`null`*            | The function `(url: string) => void` to override md link validator                                                     |
+| `enableCodeBlockRuleForLatexCommands`| boolean;*`false`* | By default, if latex commands are indented (4 spaces / 1 tab) they do not become `Code Blocks`.               |
 
 ### optionsMathpixMarkdown
 
@@ -696,6 +736,12 @@ The `MathpixMarkdown` React element accepts the following props:
 | `htmlSanitize`   | [THtmlSanitize](https://github.com/Mathpix/mathpix-markdown-it#thtmlsanitize);*`{}`*         | Sets html output options (if `htmlTags=true`). Cleans up user html input.                                              | 
 |                  |                              | Removes script tags and stuff. Removes broken and malicious html. Set to `false` to disable                            |
 | `smiles`         | [ISmilesOptions](https://github.com/Mathpix/mathpix-markdown-it#ismilesoptions);*`{}`*        | Sets options to output chemistry equation                                                                              |
+| `nonumbers`      | boolean;*`false`*            | Sets options to prevent equations, tables, figure from being numbered                                                  |
+| `showPageBreaks` | boolean;*`false`*            | Hidden tags will be shown in html like page break                                                                      |
+| `centerImages`   | boolean;*`true`*             | Center align images by default                                                                                         |
+| `centerTables`   | boolean;*`true`*             | Center align tables by default                                                                                         |
+| `validateLink`   | function;*`null`*            | The function `(url: string) => void` to override md link validator                                                     |
+| `enableCodeBlockRuleForLatexCommands`| boolean;*`false`* | By default, if latex commands are indented (4 spaces / 1 tab) they do not become `Code Blocks`.               |
 
 ### TOutputMath
 

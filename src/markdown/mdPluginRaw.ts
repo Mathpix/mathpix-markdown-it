@@ -9,6 +9,12 @@ import {
   getWidthFromDocument
 } from './utils';
 import { openTagMML, closeTagMML } from './common/consts';
+import { imageWithSize, renderRuleImage } from './md-inline-rule/image';
+import { setCounterSection } from './md-inline-rule/setcounter-section';
+import { renderTheorems } from './md-theorem';
+import { getTheoremNumberByLabel, resetTheoremEnvironments } from './md-theorem/helper';
+import { newTheoremBlock } from './md-theorem/block-rule';
+import { newTheorem, theoremStyle, newCommandQedSymbol, labelLatex, setCounterTheorem } from './md-theorem/inline-rule';
 
 let mathNumber = [];
 
@@ -155,6 +161,7 @@ function multiMath(state, silent) {
 
   startMathPos += match[0].length;
   let type, endMarker, includeMarkers; // eslint-disable-line
+  let addParentheses = false;
   if (match[0] === "\\[") {
     type = "display_math";
     endMarker = "\\\\]";
@@ -169,6 +176,7 @@ function multiMath(state, silent) {
     endMarker = "\\)";
   } else if (match[0].includes("eqref")) {
     type = "reference_note";
+    addParentheses = true; /** add parentheses so that instead of printing a plain number as 5, it will print (5). */
     endMarker = "";
   } else if (match[0].includes("ref")) {
     type = "reference_note";
@@ -212,6 +220,7 @@ function multiMath(state, silent) {
         token.markup = match[0];
       }
       token.content = match ? match[2] || match[3] : "";
+      token.attrSet("data-parentheses", addParentheses.toString());
     } else {
       token.content = state.src.slice(startMathPos, endMarkerPos);
     }
@@ -510,7 +519,8 @@ const renderMath = (a, token, options) => {
       } else {
          mathEquation = MathJax.Typeset(math, {display: isBlock, metric: { cwidth: cwidth },
            outMath: options.outMath, mathJax: options.mathJax, forDocx: options.forDocx,
-           accessibility: options.accessibility
+           accessibility: options.accessibility,
+           nonumbers: options.nonumbers
          });
       }
     }
@@ -533,12 +543,12 @@ const renderMath = (a, token, options) => {
 
   if (token.type === "equation_math_not_number") {
     if (tagId) {
-      mathNumber[tagId] = `[${0}]`;
+      mathNumber[tagId] = `${0}`;
     }
   } else {
     if (token.type === "equation_math") {
       if (tagId) {
-        mathNumber[tagId] = `[${begin_number}]`;
+        mathNumber[tagId] = `${begin_number}`;
       }
     }
   }
@@ -620,18 +630,26 @@ const renderUsepackage = (token, options) => {
 
 const renderReference = token => {
   const id: string = encodeURIComponent(token.content);
+  const theoremNumber = getTheoremNumberByLabel(token.content);
+  const dataParentheses = token.attrGet("data-parentheses");
+  let reference = mathNumber[token.content] || theoremNumber;
+  if (dataParentheses === "true" &&  reference) {
+    reference = '(' + reference + ')'
+  }
   if (token.type === "reference_note_block") {
     return `<div class="math-block"><a href="#${id}"
            style="cursor: pointer; text-decoration: none;"
            class="clickable-link"
            value=${id}
-        >${mathNumber[token.content] || '[' + token.content + ']'} </a></div>`
+           data-parentheses="${dataParentheses}"
+        >${reference|| '[' + token.content + ']'} </a></div>`
   } else {
     return `<a href="#${id}"
            style="cursor: pointer; text-decoration: none;"
            class="clickable-link"
            value=${id}
-        >${mathNumber[token.content] || '[' + token.content + ']'} </a>`;
+           data-parentheses="${dataParentheses}"
+        >${reference || '[' + token.content + ']'} </a>`;
   }
 };
 
@@ -900,17 +918,34 @@ export default options => {
 
   return md => {
     Object.assign(md.options, options);
+    const isRenderElement = md.options.renderElement && md.options.renderElement.hasOwnProperty('startLine');
+    /** Do not clear global lists for theorems if only one element is being rendered 
+     * and not all content is being rerendered */
+    if (!isRenderElement) {
+      resetTheoremEnvironments();
+    }
     md.block.ruler.before("paragraph", "paragraphDiv", paragraphDiv);
-    md.block.ruler.at("code", codeBlock);
+    if (!md.options.enableCodeBlockRuleForLatexCommands) {
+      md.block.ruler.at("code", codeBlock);
+    }
+    md.block.ruler.before("ReNewCommand", "newTheoremBlock", newTheoremBlock)
     md.inline.ruler.before("escape", "usepackage", usepackage);
     md.block.ruler.before("html_block", "mathMLBlock", mathMLBlock);
     md.inline.ruler.before("html_inline", "mathML", inlineMathML);
     md.inline.ruler.before("escape", "refs", refs);
     md.inline.ruler.before("escape", "multiMath", multiMath);
     md.inline.ruler.before("multiMath", "inlineTabular", inlineTabular);
+    md.inline.ruler.before("multiMath", "labelLatex", labelLatex);
+    md.inline.ruler.before("multiMath", "theoremStyle", theoremStyle); /** Parse \theoremstyle */
+    md.inline.ruler.before("multiMath", "newTheorem", newTheorem); /** Parse \newtheorem */
+    md.inline.ruler.before("multiMath", "setCounterTheorem", setCounterTheorem); /** Parse \newtheorem */
+    md.inline.ruler.before("setCounterTheorem", "setCounterSection", setCounterSection); /** Parse \setcounter{section} */
+    md.inline.ruler.before("renewcommand_inline", "newCommandQedSymbol", newCommandQedSymbol); /** Parse \\renewcommand\qedsymbol{$\blacksquare$} */
     md.inline.ruler.push("simpleMath", simpleMath);
     md.inline.ruler.before("multiMath", "asciiMath", asciiMath);
     md.inline.ruler.before("asciiMath", "backtickAsAsciiMath", backtickAsAsciiMath);
+    /** Replace image inline rule */
+    md.inline.ruler.at('image', imageWithSize);
 
 
     Object.keys(mapping).forEach(key => {
@@ -935,5 +970,8 @@ export default options => {
         }
       }
     });
+    
+    md.renderer.rules.image = (tokens, idx, options, env, slf) => renderRuleImage(tokens, idx, options, env, slf);
+    renderTheorems(md);
   };
 };

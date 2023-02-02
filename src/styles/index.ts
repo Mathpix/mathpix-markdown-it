@@ -28,6 +28,10 @@ export const MathpixStyle = (setTextAlignJustify: boolean = false, useColors: bo
         margin-top: 0;
         margin-bottom: 1em;
         ${setTextAlignJustify ? 'text-align: justify;' : ''}
+    }    
+    
+    .proof > div, .theorem > div {
+        margin-top: 1rem;
     }
 
     #preview-content table {
@@ -87,10 +91,17 @@ export const MathpixStyle = (setTextAlignJustify: boolean = false, useColors: bo
     }
 
     #preview-content pre, #setText pre {
-        border: 1px solid #ccc;
-        page-break-inside: avoid;
-        padding: 0.5em;
+        border: none;
+        padding: 0;
+        overflow: auto;
+        font-size: 85%;
+        line-height: 1.45;
+        border-radius: 6px;
+        box-sizing: border-box;
         ${useColors ? 'background: #f8f8fa;' : ''}
+    }
+    #preview-content pre code, #setText pre code{
+        padding: 1rem;
     }
     .empty {
         text-align: center;
@@ -99,9 +110,9 @@ export const MathpixStyle = (setTextAlignJustify: boolean = false, useColors: bo
     }
 
     #setText table, #preview-content table {
-        display: block; 
+        display: table; 
         overflow: auto;
-        width: 100%;
+        max-width: 100%;
         border-collapse: collapse;
         page-break-inside: avoid;
     }
@@ -339,16 +350,16 @@ export const TocStyle = (containerName: string = 'toc') => `
   #toc_container .toc-title-1 {
     font-weight: 500; 
   }
-  #toc_container .toc-title-1 > a {
+  #toc_container .toc-title-1 a {
     font-size: 1.6em; 
   }
-  #toc_container .toc-title-2 > a {
+  #toc_container .toc-title-2 a {
     font-size: 1.3em; 
   }
   #toc_container .toc-title-3,  #toc_container .toc-title-4,  #toc_container .toc-title-5, .previewPage #toc_container .toc-title-6 {
     padding-left: 20px; 
   }
-  #toc_container .toc-title-3 > a,  #toc_container .toc-title-4 > a,  #toc_container .toc-title-5 > a, .previewPage #toc_container .toc-title-6 > a {
+  #toc_container .toc-title-3 a,  #toc_container .toc-title-4 > a,  #toc_container .toc-title-5 > a, .previewPage #toc_container .toc-title-6 > a {
     font-size: 1em;
     color: #979797; 
   }

@@ -8,6 +8,7 @@ import { CaptionTable, InlineDecimal, IncludeGraphics } from './md-renderer-rule
 import { ClearSubTableLists } from "./md-block-rule/begin-tabular/sub-tabular";
 import { ClearSubMathLists } from "./md-block-rule/begin-tabular/sub-math";
 import {ClearParseError} from "./md-block-rule/parse-error";
+import { BeginTheorem, BeginProof } from "./md-theorem/block-rule";
 
 export default (md: MarkdownIt, options) => {
   ClearTableNumbers();
@@ -21,6 +22,8 @@ export default (md: MarkdownIt, options) => {
   md.block.ruler.after("fence","BeginTabular", BeginTabular, md.options);
   md.block.ruler.before("BeginTabular", "BeginAlign", BeginAlign);
   md.block.ruler.before("BeginAlign", "BeginTable", BeginTable);
+  md.block.ruler.after("BeginTabular", "BeginTheorem", BeginTheorem);
+  md.block.ruler.before("BeginTheorem", "BeginProof", BeginProof);
   md.inline.ruler.before("escape", "InlineIncludeGraphics", InlineIncludeGraphics);
 
   md.renderer.rules.caption_table = (tokens, idx) => {
@@ -30,7 +33,7 @@ export default (md: MarkdownIt, options) => {
     return InlineDecimal(tokens, tokens[idx]);
   };
   md.renderer.rules.includegraphics = (tokens, idx, options, env, slf) => {
-    return IncludeGraphics(tokens, tokens[idx], slf, width);
+    return IncludeGraphics(tokens, tokens[idx], slf, width, options);
   }
 
 }

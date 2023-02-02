@@ -29,3 +29,25 @@ describe('Check Latex Text Styles:', () => {
     });
   });
 });
+
+describe('Check Latex page break:', () => {
+  const tests = require('./_data/_latex-text/_pageBreak');
+  tests.forEach(function(test) {
+    const html = MM.markdownToHTML(test.latex, options).trim();
+    describe('Latex => ' + test.latex, () => {
+      it('Checking result html', (done) => {
+        html.should.equal(test.html);
+        done();
+      });
+    });    
+    
+    const htmlShowHiddenTags = MM.markdownToHTML(test.latex, 
+      Object.assign({}, options, { showPageBreaks: true })).trim();
+    describe('Latex => ' + test.latex, () => {
+      it('Checking result html with option showPageBreaks', (done) => {
+        htmlShowHiddenTags.should.equal(test.showPageBreaks);
+        done();
+      });
+    });
+  });
+});
