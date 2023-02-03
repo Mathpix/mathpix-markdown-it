@@ -6,7 +6,7 @@ class ConvertForm extends React.Component {
     super(props);
     this.state = {
       value: '\\[\n' +
-        'y = \\frac { \\sum _ { i } w _ { i } y _ { i } } { \\sum _ { i } w _ { i } } , i = 1,2 \\ldots k\n' +
+        '2 - \\sqrt [ 6 ] { \\frac { x ^ { 6 } y ^ { 5 } } { x ^ { 2 } } } \\times \\sqrt [ 6 ] { \\frac { x ^ { 3 } y ^ { 5 } } { x y ^ { 4 } } }\n' +
         '\\]' +
         '\n' +
         '\n' +
@@ -22,6 +22,7 @@ class ConvertForm extends React.Component {
       result: '',
       include_mathml: true,
       include_asciimath: true,
+      include_wolfram: true,
       include_latex: true,
       include_svg: true,
       include_tsv: true,
@@ -54,6 +55,7 @@ class ConvertForm extends React.Component {
       outMath: {
         include_mathml: this.state.include_mathml,
         include_asciimath: this.state.include_asciimath,
+        include_wolfram: this.state.include_wolfram,
         include_latex: this.state.include_latex,
         include_svg: this.state.include_svg,
         include_tsv: this.state.include_tsv,
@@ -62,6 +64,7 @@ class ConvertForm extends React.Component {
     };
     const html = MM.markdownToHTML(this.state.value, options);
     const formats = MM.parseMarkdownByHTML(html);
+    console.log("formats=>",formats);
     this.setState({result: html})
     this.setState({formats: formats})
   }
@@ -90,6 +93,14 @@ class ConvertForm extends React.Component {
                   checked={this.state.include_asciimath}
                   onChange={this.handleInputChange} />
                 asciimath
+              </label>
+              <label>
+                <input
+                  name="include_wolfram"
+                  type="checkbox"
+                  checked={this.state.include_wolfram}
+                  onChange={this.handleInputChange} />
+                wolfram
               </label>
               <label>
                 <input
@@ -132,7 +143,7 @@ class ConvertForm extends React.Component {
         <div className="formats">
           {this.state.formats && this.state.formats.length > 0 &&
             this.state.formats.map((item, index) => {
-              return <div className="item">
+              return <div className="item" key={index}>
                 <div>{item.type}</div>
                 <code>{item.value}</code>
               </div>

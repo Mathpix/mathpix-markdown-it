@@ -1,5 +1,5 @@
-import {MmlVisitor} from 'mathjax-full/js/core/MmlTree/MmlVisitor.js';
-import {MmlNode, TextNode, XMLNode} from 'mathjax-full/js/core/MmlTree/MmlNode.js';
+import { MmlVisitor } from 'mathjax-full/js/core/MmlTree/MmlVisitor.js';
+import { MmlNode, TextNode, XMLNode } from 'mathjax-full/js/core/MmlTree/MmlNode.js';
 
 import { handle } from "./handlers";
 
