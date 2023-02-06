@@ -304,7 +304,6 @@ const mpadded = (handlerApi) => {
     let mml = '';
     try {
       const mmlAdd = handlerApi.handleAll(node, serialize, mml);
-      const toTsv = node.attributes.get('toTsv');
       if (node.Parent && node.Parent.kind === "menclose") {
         const atr = getAttributes(node.Parent);
         if (atr && atr.notation === 'bottom' && atr.lcm) {
@@ -314,19 +313,11 @@ const mpadded = (handlerApi) => {
         }
       }
       /** For tsv:
-       * Do not add double-quote before and after ','
-       * For sub ascii:
-       * * If double-quotes are used to enclose fields, then a double-quote
-       * appearing inside a field must be escaped by preceding it with
-       * another double quote
+       * Omit the " in nested arrays
        * */
-      mml += serialize.options.tableToTsv ? 
-        toTsv ? '' : '""' 
-        : '"';
+      mml += serialize.options.tableToTsv ? '' : '"';
       mml += mmlAdd;
-      mml += serialize.options.tableToTsv ? 
-        toTsv ? '' : '""' 
-        : '"';
+      mml += serialize.options.tableToTsv ? '' : '"';
       return mml;
     } catch (e) {
       console.error('mml => mpadded =>', e);
@@ -568,7 +559,7 @@ const mtext = () => {
       const toTsv = node.attributes.get('toTsv');
       if (value[0] === '(' || toTsv) {
         if (toTsv) {
-          value = value.replace(/"/g, '""')
+          value = value.replace(/"/g, '')
         }
         mml += value;
       } else {
@@ -576,13 +567,9 @@ const mtext = () => {
           mml += ''
         } else {
           /** For tsv: 
-           * If double-quotes are used to enclose fields, then a double-quote
-           * appearing inside a field must be escaped by preceding it with
-           * another double quote */
+           * Omit the " in nested arrays */
           if (serialize.options.tableToTsv) {
-            mml += '""';
-            mml += value.replace(/"/g, '""');
-            mml += '""';
+            mml += value.replace(/"/g, '');
           } else {
             mml += '"' + value + '"';
           }
@@ -633,7 +620,6 @@ const mo = () => {
       if (value === '\u2061') {
         return mml;
       }
-      const toTsv = node.attributes.get('toTsv');
       const atr = getAttributes(node);
       let abs = SymbolToAM(node.kind, value, atr, serialize.options.showStyle);
       if (abs && abs.length > 1) {
@@ -643,23 +629,12 @@ const mo = () => {
       } else {
         if (abs === ',' && node.Parent.kind === 'mtd') {
           /** For tsv:
-           * Do not add double-quote before and after ',' 
-           * For sub ascii:
-           * * If double-quotes are used to enclose fields, then a double-quote
-           * appearing inside a field must be escaped by preceding it with
-           * another double quote
-           * */
-          mml += serialize.options.tableToTsv 
-            ? toTsv ? '' : '""' 
-            : '"';
+           * Omit the " in nested arrays */
+          mml += serialize.options.tableToTsv ? '' : '"';
           mml += abs;
-          mml += serialize.options.tableToTsv 
-            ? toTsv ? '' : '""'
-            : '"';
+          mml += serialize.options.tableToTsv ? '' : '"';
         } else {
-          mml += abs === '"' && serialize.options.tableToTsv 
-            ? '""' 
-            : abs ;
+          mml += abs === '"' && serialize.options.tableToTsv ? '' : abs ;
         }
       }
       

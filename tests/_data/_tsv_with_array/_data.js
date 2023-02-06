@@ -8,14 +8,12 @@ module.exports = [
       'non-current assets\t250000\t95000\t155000'
   },
   /** For tsv:
-   * If double-quotes are used to enclose fields, then a double-quote
-   * appearing inside a field must be escaped by preceding it with
-   * another double quote */
+   * Omit the " in nested arrays */
   {
     latex: '\\begin{tabular}{|l|c|c|c|}\\hline & \\( \\begin{array}{c}\\text { cost } \\\\ \\$ \\begin{array}{c}\\text { cost } \\\\ \\$\\end{array} \n' +
       ' \\end{array} \\)  & \\( \\begin{array}{c}\\text { depreciation } \\\\ \\$\\end{array} \\) & \\( \\begin{array}{c}\\text { net book value } \\\\ \\$\\end{array} \\) \\\\ \\hline non-current assets & 250000 & 95000 & 155000 \\\\ \\hline\\end{tabular}',
     tsv: '\t" cost \n' +
-      '${:["" cost ""],[$]:}"\t" depreciation \n' +
+      '${:[ cost ],[$]:}"\t" depreciation \n' +
       '$"\t" net book value \n' +
       '$"\n' +
       'non-current assets\t250000\t95000\t155000'
@@ -302,7 +300,7 @@ module.exports = [
       '4 & 5 \\\\ \\hline\n' +
       '\\end{tabular}',
     tsv: '"x,y\n' +
-      '{:w"",""z:}\n' +
+      '{:w,z:}\n' +
       'xy"\t2\n' +
       '4\t5'
   },
@@ -315,7 +313,7 @@ module.exports = [
       '4 & 5 \\\\ \\hline\n' +
       '\\end{tabular}',
     tsv: '"x,y\n' +
-      '{:[x1"",""y1],[""(x1)""y1]:}\n' +
+      '{:[x1,y1],[(x1)y1]:}\n' +
       'xy"\t2\n' +
       '4\t5'
   },
@@ -326,8 +324,8 @@ module.exports = [
       '\\smash{x}{y}\\end{array} \\) & 2  \\\\ \\hline\n' +
       '4 & 5 \\\\ \\hline\n' +
       '\\end{tabular}',
-    tsv: '"x,""y""\n' +
-      '{:w"",""z:}\n' +
+    tsv: '"x,y\n' +
+      '{:w,z:}\n' +
       'xy"\t2\n' +
       '4\t5'
   },  
@@ -338,34 +336,34 @@ module.exports = [
       '\\smash{x}{y}\\end{array} \\) & 2  \\\\ \\hline\n' +
       '4 & 5 \\\\ \\hline\n' +
       '\\end{tabular}',
-    tsv: '"x,""y\n' +
-      '{:w"",""z:}\n' +
+    tsv: '"x,y\n' +
+      '{:w,z:}\n' +
       'xy"\t2\n' +
       '4\t5'
   },  
   {
     latex: '\\begin{tabular}{ | l | c | }\\hline\n' +
-      '\\(\\begin{array}{c} x, \\text{"some"}y \\\\\n' +
+      '\\(\\begin{array}{c} x, \\text{"some" }y \\\\\n' +
       '\\begin{array}{c} w, z \\\\\n' +
       '"x"\\end{array}\\\\\n' +
       '\\smash{x}{y}\\end{array} \\) & 2  \\\\ \\hline\n' +
       '4 & 5 \\\\ \\hline\n' +
       '\\end{tabular}',
-    tsv: '"x,""some""y\n' +
-      '{:[w"",""z],[""x""]:}\n' +
+    tsv: '"x,some y\n' +
+      '{:[w,z],[x]:}\n' +
       'xy"\t2\n' +
       '4\t5'
   },  
   {
     latex: '\\begin{tabular}{ | l | c | }\\hline\n' +
-      '\\(\\begin{array}{c} x, \\text{"some"}y \\\\\n' +
+      '\\(\\begin{array}{c} x, \\text{"some "}y \\\\\n' +
       '\\begin{array}{c} w, z \\\\\n' +
       '\\text{"}x\\end{array}\\\\\n' +
       '\\smash{x}{y}\\end{array} \\) & 2  \\\\ \\hline\n' +
       '4 & 5 \\\\ \\hline\n' +
       '\\end{tabular}',
-    tsv: '"x,""some""y\n' +
-      '{:[w"",""z],[""""""x]:}\n' +
+    tsv: '"x,some y\n' +
+      '{:[w,z],[x]:}\n' +
       'xy"\t2\n' +
       '4\t5'
   },  
