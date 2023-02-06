@@ -168,20 +168,15 @@ const menclose = (handlerApi) => {
       const atr = getAttributes(node);
       let isLeft = false;
       let isRight = false;
-      let isBottom = false;
       if (atr && atr.notation) {
         isLeft = atr.notation.toString().indexOf('left') > -1;
         isRight = atr.notation.toString().indexOf('right') > -1;
-        isBottom = atr.notation.toString().indexOf('bottom') > -1;
       }
       mml += isLeft ? '[' : '';
       mml += handlerApi.handleAll(node, serialize);
       if (atr && atr.lcm) {
         mml += ''
-      } else {
-        mml += isBottom ? ',[hline]' : '';
-      }
-      
+      } 
       mml += isRight ? ']' : '';
       return mml;
     } catch (e) {
