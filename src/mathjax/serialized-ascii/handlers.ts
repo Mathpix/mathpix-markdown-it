@@ -197,7 +197,8 @@ const mtable = () => {
     try {
       const toTsv = serialize.options.tableToTsv 
         && (node.Parent?.kind === 'math' || (node.Parent?.kind === 'menclose' && node.Parent.Parent?.kind === 'math'));
-      node.attributes.setInherited('toTsv', toTsv);       
+      node.attributes.setInherited('toTsv', toTsv);  
+      const envName = node.attributes.get('name');
       const parentIsMenclose = node.Parent && node.Parent.kind === 'menclose';
 
       const isHasBranchOpen = node.parent && node.parent.kind === 'mrow'
@@ -206,28 +207,33 @@ const mtable = () => {
       const isHasBranchClose = node.parent && node.parent.kind === 'mrow'
         && node.parent.properties
         && node.parent.properties.hasOwnProperty('close');
-      if (toTsv) {
-        mml += '"'
-      } else {
-        mml += isHasBranchOpen || parentIsMenclose
-          ? ''
-          : '{:';
-      }
+
+      /** Do not flatten nested arrays if it is a matrix or system of equations */
+      const itShouldBeFlatten = envName === 'array' &&
+        !isHasBranchOpen && !parentIsMenclose && !isHasBranchClose && !parentIsMenclose;
+      let mmlTableContent = '';
       for (let i = 0; i < node.childNodes.length; i++) {
-        if ( i>0 ) {
-          mml += toTsv
+        if (i > 0) {
+          mmlTableContent += toTsv
             ? serialize.options.tsv_separators?.row || '\n'
-            : ',';
+            : itShouldBeFlatten ? ', ' : ',';
         }
         node.childNodes[i].attributes.setInherited('toTsv', toTsv);
-        mml += serialize.visitNode(node.childNodes[i], '');
+        node.childNodes[i].attributes.setInherited('itShouldBeFlatten', itShouldBeFlatten);
+        mmlTableContent += serialize.visitNode(node.childNodes[i], '');
       }
       if (toTsv) {
+        mml += '"';
+        mml += mmlTableContent;
         mml += '"'
       } else {
-        mml += isHasBranchClose || parentIsMenclose
-          ? ''
-          : ':}';
+        if (itShouldBeFlatten) {
+          mml += mmlTableContent;
+        } else {
+          mml += isHasBranchOpen || parentIsMenclose ? '' : '{:';
+          mml += mmlTableContent;
+          mml += isHasBranchClose || parentIsMenclose ? '' : ':}';
+        }
       }
       return mml;
     } catch (e) {
@@ -274,15 +280,18 @@ const mtr = () => {
       const display = node.attributes.get('displaystyle');
       let mtrContent = '';
       const toTsv = node.attributes.get('toTsv');
+      const itShouldBeFlatten = node.attributes.get('itShouldBeFlatten');
       for (let i = 0; i < node.childNodes.length; i++) {
-        if ( i>0 ) {
+        if (i > 0) {
           mtrContent += display
             ? ''
-            : toTsv ? serialize.options.tsv_separators?.column || '\t' : ',';
+            : toTsv ? serialize.options.tsv_separators?.column || '\t' 
+              : itShouldBeFlatten ? ', ' : ',';
         }
-        mtrContent += serialize.visitNode(node.childNodes[i], '');
+        let mmlCell = serialize.visitNode(node.childNodes[i], '');
+        mtrContent += !toTsv && itShouldBeFlatten ? mmlCell?.trimEnd() : mmlCell;
       }
-      if (toTsv) {
+      if (toTsv || itShouldBeFlatten) {
         mml += mtrContent
       } else {
         mml += node.parent.childNodes.length > 1 || needBranch || (node.childNodes.length > 1 && !display)
