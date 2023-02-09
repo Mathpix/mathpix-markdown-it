@@ -1,7 +1,7 @@
 module.exports = [
   {
     latex: `\\left.\\begin{array}{r}{a}\\\\{-b}\\\\{\\times c}\\\\\\hline\\end{array}\\right.`,
-    ascii:     `{:[a],[-b],[xx c]:}`,
+    ascii:     `a-bxx c`, //vertical math
     ascii_old: `{:[a],[-b],[times c]:}`
   },
   {

@@ -1,4 +1,4 @@
-import { MmlNode } from "mathjax-full/js/core/MmlTree/MmlNode";
+import { MmlNode, TEXCLASS } from "mathjax-full/js/core/MmlTree/MmlNode";
 import {AMsymbols} from "./helperA";
 
 const regW: RegExp = /^\w/;
@@ -186,43 +186,185 @@ const menclose = (handlerApi) => {
   };
 };
 
+const getNodeFromRow = (node) => {
+  if (node.childNodes.length === 1 && (
+    node.childNodes[0].isKind('inferredMrow') || node.childNodes[0].isKind('TeXAtom'))) {
+    node = getNodeFromRow(node.childNodes[0]);
+  }
+  return node;
+};
+
+const getDataForVerticalMath = (serialize, node) => {
+  let mtdNode = getNodeFromRow(node);
+  let res = {
+    collChildrenCanBeFlat: true,
+    startedFromMathOperation: false,
+    mmlCollFlat: ''
+  };
+  for (let k = 0; k < mtdNode.childNodes.length; k++) {
+    const child = mtdNode.childNodes[k];
+    /** The element is wrapped in curly braces:
+     *  e.g. {\times 1}*/
+    if (child.isKind('inferredMrow') || child.isKind('TeXAtom')) {
+      const data: any = getDataForVerticalMath(serialize, child);
+      if (!data.collChildrenCanBeFlat) {
+        res.collChildrenCanBeFlat = false;
+      }
+      if (data.startedFromMathOperation) {
+        res.startedFromMathOperation = true;
+      }
+      res.mmlCollFlat += data.mmlCollFlat;
+      continue;
+    }
+    const mmlChild = serialize.visitNode(child, '');
+    /**TODO: add more operators */
+    if (mmlChild === '=' 
+      || mmlChild.trim() === '>' || mmlChild.trim() === '<'
+      || mmlChild.trim() === '>=' || mmlChild.trim() === '<='
+    ) {
+      res.collChildrenCanBeFlat = false;
+    }
+    if (!child.isKind('mstyle')) {
+      if (k === 0 && child.kind === 'mo') {
+        const text = getChilrenText(child);
+        if (text === '+' || text === '-'
+          || text === '\u2212' //"-"
+          || text === '\u00D7' //times
+        ) {
+          res.startedFromMathOperation = true;
+        }
+      }
+      res.mmlCollFlat += mmlChild === '","' ? ',' : mmlChild;
+    }
+  }
+  return res;
+};
+
 const mtable = () => {
   return  (node, serialize) => {
     let mml = '';
     try {
+      /** MathJax: <mrow> came from \left...\right
+       *   so treat as subexpression (TeX class INNER). */
+      const isSubExpression = node.parent?.texClass === TEXCLASS.INNER;
+      const parentIsMenclose = node.Parent?.kind === 'menclose';
+      const countRow = node.childNodes.length;
       const toTsv = serialize.options.tableToTsv 
-        && (node.Parent?.kind === 'math' || (node.Parent?.kind === 'menclose' && node.Parent.Parent?.kind === 'math'));
+        && (node.Parent?.kind === 'math' || (parentIsMenclose && node.Parent.Parent?.kind === 'math'));
       node.attributes.setInherited('toTsv', toTsv);  
+      const columnAlign = node.attributes.get('columnalign');
+      const arrRowLines = node.attributes.isSet('rowlines') ? node.attributes.get('rowlines').split(' ') : [];
       const envName = node.attributes.get('name');
-      const parentIsMenclose = node.Parent && node.Parent.kind === 'menclose';
+      /** Check if a table is enclosed in brackets */
+      const isHasBranchOpen = node.parent && node.parent.kind === 'mrow' && node.parent.properties?.hasOwnProperty('open');
+      const isHasBranchClose = node.parent && node.parent.kind === 'mrow' && node.parent.properties?.hasOwnProperty('close');
+      const thereAreBracketsIn_parent = (isHasBranchOpen && node.parent.properties['open'])
+        || (isHasBranchClose && node.parent.properties['close']);
+      const thereAreBracketsIn_Parent = parentIsMenclose && node.Parent.Parent?.isKind('mrow') 
+        && ((node.Parent.Parent.properties?.hasOwnProperty('open') && node.Parent.Parent.properties['open'])
+          || (node.Parent.Parent.properties?.hasOwnProperty('close') && node.Parent.Parent.properties['close']));
+      /** It is a matrix or system of equations with brackets */
+      const isMatrixOrSystemOfEquations = thereAreBracketsIn_parent || thereAreBracketsIn_Parent;
+      const itShouldBeFlatten = envName === 'array' && !isHasBranchOpen && !isHasBranchClose && !parentIsMenclose;
+      /** Vertical math:
+       * \begin{array}{r} and it should not be a matrix and not a system of equations */
+      let isVerticalMath = columnAlign === 'right' && !isMatrixOrSystemOfEquations;
+      const arrRows = [];
+      let startedFromMathOperation = false;
+      for (let i = 0; i < countRow; i++) {
+        const mtrNode = node.childNodes[i];
+        mtrNode.attributes.setInherited('toTsv', toTsv);
+        mtrNode.attributes.setInherited('itShouldBeFlatten', itShouldBeFlatten);
+        /** */
+        let mmlRow = '';
+        let mmlRowFlat = '';
+        const countColl = mtrNode.childNodes?.length;
 
-      const isHasBranchOpen = node.parent && node.parent.kind === 'mrow'
-        && node.parent.properties
-        && node.parent.properties.hasOwnProperty('open');
-      const isHasBranchClose = node.parent && node.parent.kind === 'mrow'
-        && node.parent.properties
-        && node.parent.properties.hasOwnProperty('close');
+        /** It's EqnArray or AmsEqnArray or AlignAt.
+         *  eqnarray*, align, align*, split, gather, gather*, aligned, gathered, alignat, alignat*, alignedat */
+        const isEqnArrayRow = mtrNode.attributes.get('displaystyle');
+        
+        for (let j = 0; j < countColl; j++) {
+          if (j > 0 && !isEqnArrayRow) {
+            mmlRow += toTsv ? serialize.options.tsv_separators?.column || '\t'
+              : itShouldBeFlatten ? ', ' : ',';
+          }
+          let mtdNode = mtrNode.childNodes[j];
+          let mmlColl = serialize.visitNode(mtdNode, '');
+          let mmlCollFlat = '';
+          if (isVerticalMath) {
+            const dataColl = getDataForVerticalMath(serialize, mtdNode);
+            mmlCollFlat = dataColl.mmlCollFlat;
+            if (dataColl.startedFromMathOperation) {
+              startedFromMathOperation = true;
+            }
+            if (!dataColl.collChildrenCanBeFlat) {
+              isVerticalMath = false;
+            }
+          }
+          mmlRow += !toTsv && itShouldBeFlatten ? mmlColl.trimEnd() : mmlColl;
+          mmlRowFlat += mmlCollFlat;
+        }
 
-      /** Do not flatten nested arrays if it is a matrix or system of equations */
-      const itShouldBeFlatten = envName === 'array' &&
-        !isHasBranchOpen && !parentIsMenclose && !isHasBranchClose && !parentIsMenclose;
+        /** For vertical math, if the horizontal line is in front of the answer, then replace it with an equals sign */
+        if (isVerticalMath && 
+          arrRowLines?.length && arrRowLines?.length > i && arrRowLines[i] !== 'none') {
+          mmlRowFlat += '=';
+        }
+        if (toTsv || itShouldBeFlatten) {
+          arrRows.push({
+            mmlRow: mmlRow,
+            mmlRowFlat: mmlRowFlat,
+            encloseToSquareBrackets: false
+          });
+          continue;
+        }
+        /** It's EqnArray or AmsEqnArray or AlignAt.
+         *  eqnarray*, align, align*, split, gather, gather*, aligned, gathered, alignat, alignat*, alignedat */
+        const isEqnArray = mtrNode.attributes?.get('displaystyle');
+        arrRows.push({
+          mmlRow: mmlRow,
+          mmlRowFlat: mmlRowFlat,
+          encloseToSquareBrackets: countRow > 1 || isSubExpression || (countColl > 1 && !isEqnArray)
+        });
+      }
+      
+      /** If none of the row starts with math operation (+, -, times)
+       * then it can't be vertical math */
+      if (!startedFromMathOperation) {
+        isVerticalMath = false;
+      }
       let mmlTableContent = '';
-      for (let i = 0; i < node.childNodes.length; i++) {
-        if (i > 0) {
+      
+      for (let i = 0; i < arrRows.length; i++) {
+        if (i > 0 && !isVerticalMath) {
           mmlTableContent += toTsv
             ? serialize.options.tsv_separators?.row || '\n'
             : itShouldBeFlatten ? ', ' : ',';
         }
-        node.childNodes[i].attributes.setInherited('toTsv', toTsv);
-        node.childNodes[i].attributes.setInherited('itShouldBeFlatten', itShouldBeFlatten);
-        mmlTableContent += serialize.visitNode(node.childNodes[i], '');
+        let mmlRow = isVerticalMath 
+          ? arrRows[i].mmlRowFlat 
+          : arrRows[i].mmlRow;
+        mmlTableContent += arrRows[i].encloseToSquareBrackets && !isVerticalMath
+          ? '[' + mmlRow + ']'
+          : mmlRow;
       }
+      
+      if (isVerticalMath) {
+        if (node.Parent?.isKind('mrow')) {
+          node.Parent.attributes.setInherited('isVerticalMath', true)
+        }
+        if (node.Parent?.isKind('menclose') && node.Parent?.Parent?.isKind('mrow'))  {
+          node.Parent.Parent.attributes.setInherited('isVerticalMath', true)
+        }
+      }
+      
       if (toTsv) {
         mml += '"';
         mml += mmlTableContent;
         mml += '"'
       } else {
-        if (itShouldBeFlatten) {
+        if (itShouldBeFlatten || isVerticalMath) {
           mml += mmlTableContent;
         } else {
           mml += isHasBranchOpen || parentIsMenclose ? '' : '{:';
@@ -242,23 +384,23 @@ const mrow = () => {
   return  (node, serialize) => {
     let mml = '';
     try {
-      const isTexClass7 = node.properties && node.properties.texClass === 7
+      const isTexClass7 = node.properties && node.properties.texClass === TEXCLASS.INNER
         && node.parent && node.parent.kind === 'inferredMrow';
-
       const needBranchOpen = node.properties
         && node.properties.hasOwnProperty('open') && node.properties.open === '';
       const needBranchClose = node.properties
         && node.properties.hasOwnProperty('close') &&  node.properties.close === '';
-      mml += isTexClass7 && needBranchOpen
+      let mmlContent = '';
+      for (let i = 0; i < node.childNodes.length; i++) {
+        mmlContent += serialize.visitNode(node.childNodes[i], '');
+      }
+      const isVerticalMath = node.attributes.get('isVerticalMath');
+      mml += isTexClass7 && needBranchOpen && !isVerticalMath
         ? '{:'
         : '';
-      for (let i = 0; i < node.childNodes.length; i++) {
-        mml += serialize.visitNode(node.childNodes[i], '');
-      }
-      mml += isTexClass7 && needBranchClose
+      mml += mmlContent;
+      mml += isTexClass7 && needBranchClose && !isVerticalMath
         ? ':}' : '';
-      if(isTexClass7 && (needBranchClose || needBranchOpen)) {
-      }
       return mml;
     } catch (e) {
       console.error('mml => mrow =>', e);
@@ -271,31 +413,20 @@ const mtr = () => {
   return  (node, serialize) => {
     let mml = '';
     try {
-      const needBranch = node.parent && node.parent.parent && node.parent.parent.texClass === 7;
-      const display = node.attributes.get('displaystyle');
-      let mtrContent = '';
+      /** It's EqnArray or AmsEqnArray or AlignAt.
+       *  eqnarray*, align, align*, split, gather, gather*, aligned, gathered, alignat, alignat*, alignedat */
+      const isEqnArray = node.attributes.get('displaystyle');
       const toTsv = node.attributes.get('toTsv');
       const itShouldBeFlatten = node.attributes.get('itShouldBeFlatten');
       for (let i = 0; i < node.childNodes.length; i++) {
-        if (i > 0) {
-          mtrContent += display
-            ? ''
-            : toTsv ? serialize.options.tsv_separators?.column || '\t' 
+        if (i > 0 && !isEqnArray) {
+          mml += toTsv ? serialize.options.tsv_separators?.column || '\t' 
               : itShouldBeFlatten ? ', ' : ',';
         }
         let mmlCell = serialize.visitNode(node.childNodes[i], '');
-        mtrContent += !toTsv && itShouldBeFlatten ? mmlCell?.trimEnd() : mmlCell;
+        mml += !toTsv && itShouldBeFlatten ? mmlCell?.trimEnd() : mmlCell;
       }
-      if (toTsv || itShouldBeFlatten) {
-        mml += mtrContent
-      } else {
-        mml += node.parent.childNodes.length > 1 || needBranch || (node.childNodes.length > 1 && !display)
-          ? '[' + mtrContent + ']'
-          : mtrContent;
-      }
-
       return mml;
-
     } catch (e) {
       console.error('mml => mtr =>', e);
       return mml;
