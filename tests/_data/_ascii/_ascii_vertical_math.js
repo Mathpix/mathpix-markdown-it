@@ -81,6 +81,42 @@ module.exports = [
     ascii: `100000xx1100000`,
   },
   {
+    latex: `u _ { B } \\left( c _ { k } \\right) = \\sqrt {\\begin{array}{r} \\left( \\frac { \\partial c _ { k } } { \\partial c _ { w \\mathrm{H}_{2}\\mathrm{O}} } \\right) ^ { 2 } u _ { B } ^ { 2 } \\left( c _ { w \\mathrm{H}_{2}\\mathrm{O}} \\right) + \\left( \\frac { \\partial c _ { k } } { \\partial m _ { 1\\mathrm{H}_{2}\\mathrm{O}} } \\right) ^ { 2 } u _ { B } ^ { 2 } \\left( m _ { 1 \\mathrm{H}_{2}\\mathrm{O}}\\right) + \\left( \\frac { \\partial c _ { k } } { \\partial m _ { 2 \\mathrm{H}_{2}\\mathrm{O} } } \\right) ^ { 2 } u _ { B } ^ { 2 } \\left( m _ { 2 \\mathrm{H}_{2}\\mathrm{O}} \\right) \\\\+\\left(\\frac{\\partial c_{k}}{\\partial T_{k}}\\right)^{2}u^{2}_{B}(T_{k})+\\left(\\frac{\\partial c_{k}}{\\partial T_{1\\mathrm{H}_{2}\\mathrm{O}}}\\right)^{2}u_{B}^{2}(T_{1\\mathrm{H}_{2}\\mathrm{O}})+\\left(\\frac{\\partial c_{k}}{\\partial T_{2\\mathrm{H}_{2}\\mathrm{O}}}\\right)^{2}u_{B}^{2}(T_{2\\mathrm{H}_{2}\\mathrm{O}})\\end{array}}`,
+    ascii: `u_(B)(c_(k))=sqrt(((delc_(k))/(delc_(wH_(2)O)))^(2)u_(B)^(2)(c_(wH_(2)O))+((delc_(k))/(delm_(1H_(2)O)))^(2)u_(B)^(2)(m_(1H_(2)O))+((delc_(k))/(delm_(2H_(2)O)))^(2)u_(B)^(2)(m_(2H_(2)O))+((delc_(k))/(delT_(k)))^(2)u_(B)^(2)(T_(k))+((delc_(k))/(delT_(1H_(2)O)))^(2)u_(B)^(2)(T_(1H_(2)O))+((delc_(k))/(delT_(2H_(2)O)))^(2)u_(B)^(2)(T_(2H_(2)O)))`,
+  },
+  {
+    latex: `\\begin{array}{r}
+4241 \\\\
+2067 \\\\
+763 \\\\
++\\quad 1529 \\\\
+\\hline
+\\end{array}`,
+    ascii: `4241+2067+763+1529`,
+  },
+  {
+    latex: `\\begin{array} {r} 
+356 \\\\ 
+123 \\\\
++ \\quad 299 \\\\ \\hline \\end{array}`,
+    ascii: `356+123+299`,
+  },
+  {
+    latex: `\\begin{array} {r} 
+356 \\\\ 
+- 123 \\\\
++ \\quad 299 \\\\ \\hline \\end{array}`,
+    ascii: `356-123+299`,
+  },
+  {
+    latex: `\\begin{array} { r } 90 \\\\ 80\\\\- \\quad 5 \\\\ \\hline 5 \\end{array}`,
+    ascii: `90-80-5=5`,
+  },
+  {
+    latex: `\\begin{array} { r } { 89} \\\\ { \\div 80} \\\\ \\hline \\end{array}`,
+    ascii: `89-:80`,
+  },
+  {
     latex: ``,
     ascii: ``,
   },
@@ -140,6 +176,14 @@ module.exports = [
   {
     latex: `\\left.\\begin{array} { r } 4x - y > - 5 \\\\ - 2x + 2y - 3z < 19 \\end{array} \\right.`,
     ascii: `{:[4x-y > -5],[-2x+2y-3z < 19]:}`,
+  },
+  {
+    latex: `\\begin{array}{r}-11.644\\\\(2.807)\\end{array}`,
+    ascii: `{:[-11.644],[(2.807)]:}`,
+  },
+  {
+    latex: `\\begin{array}{r}y _ { i } \\geqslant \\theta \\\\ -y _ { i } \\leqslant 0\\\\\\in R \\end{array}`,
+    ascii: `{:[y_(i) >= theta],[-y_(i) <= 0],[in R]:}`,
   },
   {
     latex: ``,

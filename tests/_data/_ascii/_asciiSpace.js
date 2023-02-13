@@ -31,7 +31,7 @@ module.exports = [
   },
   {
     latex: `\\operatorname { Pr }\\left(\\text { test error } \\leqslant \\text { training error }+\\sqrt{\\frac{1}{N}\\left[D\\left(\\log \\left(\\frac{2 N}{D}\\right)+1\\right)-\\log \\left(\\frac{\\eta}{4}\\right)\\right]}\\right)=1-\\eta`,
-    ascii:    `Pr(" test error "leqslant" training error "+sqrt((1)/(N)[D(log((2N)/(D))+1)-log((eta)/(4))]))=1-eta`,
+    ascii:    `Pr(" test error " <= " training error "+sqrt((1)/(N)[D(log((2N)/(D))+1)-log((eta)/(4))]))=1-eta`,
     ascii_old: `Pr(" test error "leqslant" training error "+sqrt((1)/(N)[D(log((2N)/(D))+1)-log((eta)/(4))]))=1-eta`,
   },
   {

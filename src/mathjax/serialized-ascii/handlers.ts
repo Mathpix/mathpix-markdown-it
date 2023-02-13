@@ -1,5 +1,5 @@
 import { MmlNode, TEXCLASS } from "mathjax-full/js/core/MmlTree/MmlNode";
-import {AMsymbols} from "./helperA";
+import { AMsymbols, eSymbolType } from "./helperA";
 
 const regW: RegExp = /^\w/;
 
@@ -64,6 +64,10 @@ const needLastSpase = (node) => {
   }
 };
 
+export const getSymbolType = (tag: string, output: string) => {
+  const tags = AMsymbols.find(item => (item.tag === tag && item.output === output));
+  return tags ? tags.symbolType : ''
+};
 
 export const SymbolToAM = (tag: string, output: string, atr = null, showStyle = false) => {
   let tags = null;
@@ -194,47 +198,55 @@ const getNodeFromRow = (node) => {
   return node;
 };
 
-const getDataForVerticalMath = (serialize, node) => {
+const getDataForVerticalMath = (serialize, node, rowNumber) => {
   let mtdNode = getNodeFromRow(node);
   let res = {
-    collChildrenCanBeFlat: true,
+    collChildrenCanBeVerticalMath: true,
     startedFromMathOperation: false,
-    mmlCollFlat: ''
+    mmlCollVerticalMath: '',
+    mathOperation: ''
   };
   for (let k = 0; k < mtdNode.childNodes.length; k++) {
     const child = mtdNode.childNodes[k];
     /** The element is wrapped in curly braces:
      *  e.g. {\times 1}*/
     if (child.isKind('inferredMrow') || child.isKind('TeXAtom')) {
-      const data: any = getDataForVerticalMath(serialize, child);
-      if (!data.collChildrenCanBeFlat) {
-        res.collChildrenCanBeFlat = false;
+      const data: any = getDataForVerticalMath(serialize, child, rowNumber);
+      if (!data.collChildrenCanBeVerticalMath) {
+        res.collChildrenCanBeVerticalMath = false;
       }
       if (data.startedFromMathOperation) {
         res.startedFromMathOperation = true;
       }
-      res.mmlCollFlat += data.mmlCollFlat;
+      if (data.mathOperation) {
+        res.mathOperation = data.mathOperation;
+      }
+      res.mmlCollVerticalMath += data.mmlCollVerticalMath;
       continue;
     }
     const mmlChild = serialize.visitNode(child, '');
-    /**TODO: add more operators */
-    if (mmlChild === '=' 
-      || mmlChild.trim() === '>' || mmlChild.trim() === '<'
-      || mmlChild.trim() === '>=' || mmlChild.trim() === '<='
-    ) {
-      res.collChildrenCanBeFlat = false;
+    const text = getChilrenText(child);
+    if (child.kind === 'mo') {
+      const symbolType = getSymbolType('mo', text);
+      if (symbolType === eSymbolType.logical 
+        || symbolType === eSymbolType.relation 
+        || symbolType === eSymbolType.arrow) {
+        res.collChildrenCanBeVerticalMath = false;
+      }
     }
     if (!child.isKind('mstyle')) {
-      if (k === 0 && child.kind === 'mo') {
+      if (k === 0 && child.kind === 'mo' && rowNumber > 0) {
         const text = getChilrenText(child);
         if (text === '+' || text === '-'
           || text === '\u2212' //"-"
           || text === '\u00D7' //times
+          || text === '\u00F7' //div
         ) {
+          res.mathOperation = mmlChild;
           res.startedFromMathOperation = true;
         }
       }
-      res.mmlCollFlat += mmlChild === '","' ? ',' : mmlChild;
+      res.mmlCollVerticalMath += mmlChild === '","' ? ',' : mmlChild;
     }
   }
   return res;
@@ -275,11 +287,10 @@ const mtable = () => {
         const mtrNode = node.childNodes[i];
         mtrNode.attributes.setInherited('toTsv', toTsv);
         mtrNode.attributes.setInherited('itShouldBeFlatten', itShouldBeFlatten);
-        /** */
         let mmlRow = '';
-        let mmlRowFlat = '';
+        let mmlRowVerticalMath = '';
+        let mathOperation = '';
         const countColl = mtrNode.childNodes?.length;
-
         /** It's EqnArray or AmsEqnArray or AlignAt.
          *  eqnarray*, align, align*, split, gather, gather*, aligned, gathered, alignat, alignat*, alignedat */
         const isEqnArrayRow = mtrNode.attributes.get('displaystyle');
@@ -291,30 +302,32 @@ const mtable = () => {
           }
           let mtdNode = mtrNode.childNodes[j];
           let mmlColl = serialize.visitNode(mtdNode, '');
-          let mmlCollFlat = '';
+          let mmlCollVerticalMath = '';
           if (isVerticalMath) {
-            const dataColl = getDataForVerticalMath(serialize, mtdNode);
-            mmlCollFlat = dataColl.mmlCollFlat;
+            const dataColl = getDataForVerticalMath(serialize, mtdNode, i);
+            mmlCollVerticalMath = dataColl.mmlCollVerticalMath;
             if (dataColl.startedFromMathOperation) {
               startedFromMathOperation = true;
+              mathOperation = dataColl.mathOperation;
             }
-            if (!dataColl.collChildrenCanBeFlat) {
+            if (!dataColl.collChildrenCanBeVerticalMath) {
               isVerticalMath = false;
             }
           }
           mmlRow += !toTsv && itShouldBeFlatten ? mmlColl.trimEnd() : mmlColl;
-          mmlRowFlat += mmlCollFlat;
+          mmlRowVerticalMath += mmlCollVerticalMath;
         }
 
         /** For vertical math, if the horizontal line is in front of the answer, then replace it with an equals sign */
         if (isVerticalMath && 
           arrRowLines?.length && arrRowLines?.length > i && arrRowLines[i] !== 'none') {
-          mmlRowFlat += '=';
+          mmlRowVerticalMath += '=';
         }
         if (toTsv || itShouldBeFlatten) {
           arrRows.push({
             mmlRow: mmlRow,
-            mmlRowFlat: mmlRowFlat,
+            mmlRowVerticalMath: mmlRowVerticalMath,
+            mathOperation: mathOperation,
             encloseToSquareBrackets: false
           });
           continue;
@@ -324,7 +337,8 @@ const mtable = () => {
         const isEqnArray = mtrNode.attributes?.get('displaystyle');
         arrRows.push({
           mmlRow: mmlRow,
-          mmlRowFlat: mmlRowFlat,
+          mmlRowVerticalMath: mmlRowVerticalMath,
+          mathOperation: mathOperation,
           encloseToSquareBrackets: countRow > 1 || isSubExpression || (countColl > 1 && !isEqnArray)
         });
       }
@@ -334,8 +348,20 @@ const mtable = () => {
       if (!startedFromMathOperation) {
         isVerticalMath = false;
       }
+      /** Check for the need to set mathematical operations before each line */
+      if (isVerticalMath && arrRows.length > 2) {
+        let mathOperation = '';
+        for (let i = arrRows.length - 1; i >= 0; i--) {
+          if (arrRows[i].mathOperation) {
+            mathOperation = arrRows[i].mathOperation;
+            continue
+          }
+          if (mathOperation && i > 0) {
+            arrRows[i].mmlRowVerticalMath = mathOperation + arrRows[i].mmlRowVerticalMath;
+          }
+        }
+      }
       let mmlTableContent = '';
-      
       for (let i = 0; i < arrRows.length; i++) {
         if (i > 0 && !isVerticalMath) {
           mmlTableContent += toTsv
@@ -343,7 +369,7 @@ const mtable = () => {
             : itShouldBeFlatten ? ', ' : ',';
         }
         let mmlRow = isVerticalMath 
-          ? arrRows[i].mmlRowFlat 
+          ? arrRows[i].mmlRowVerticalMath 
           : arrRows[i].mmlRow;
         mmlTableContent += arrRows[i].encloseToSquareBrackets && !isVerticalMath
           ? '[' + mmlRow + ']'
