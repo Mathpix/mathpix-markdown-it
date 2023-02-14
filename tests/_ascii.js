@@ -129,7 +129,25 @@ describe('Latex to ascii:', () => {
         done();
       });
     });
+  });  
+  
+  describe('Testing vertical math:', () => {
+    const tests = require('./_data/_ascii/_ascii_vertical_math');
+    tests.forEach(function(test) {
+      if (test.latex) {
+        it('Latex =>' + test.latex, function(done) {
+          const data = MathJax.TexConvert(test.latex, options);
+          console.log('    LATEX         =>', test.latex);
+          console.log('    ASCIIMATH     =>', test.ascii);
+          data.should.have.property('asciimath', test.ascii);
+          notIncludeSymbols(data.asciimath);
+          done();
+        });
+      }
+    });
   });
+  
+  
   // {
   //   latex: `\\left.\\begin{array}{l}{\\text{foo}} \\\\ { \\theta + C }\\end{array} \\right.`,
   //     ascii: `{:["foo"],[theta+C]:}`,

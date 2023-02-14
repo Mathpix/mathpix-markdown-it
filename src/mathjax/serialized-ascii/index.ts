@@ -17,6 +17,7 @@ export class SerializedAsciiVisitor extends MmlVisitor {
 
   public visitNode(node, ...args: any[]) {
     this.setChildInheritedAttribute(node, 'toTsv');
+    // this.setChildInheritedAttribute(node, 'isVerticalMath');
     return super.visitNode(node, ...args);
   }
   
@@ -95,6 +96,7 @@ export class SerializedAsciiVisitor extends MmlVisitor {
       if (iclose > -1) {
         const mclose: any = node.childNodes[iclose];
         const atr = this.getAttributes(mclose);
+        const isFrame = mclose.attributes.get('isFrame');
         const atrDef = this.getAttributesDefaults(mclose);
         let longdiv = '';
         let divisor = '';
@@ -138,8 +140,8 @@ export class SerializedAsciiVisitor extends MmlVisitor {
           return mml.join('');
         }
         /** \lcm */
-        if ((!atr.notation && atrDef.notation === "bottom") 
-          || atr.notation.toString().indexOf("bottom") !== -1
+        if (!isFrame && ((!atr.notation && atrDef.notation === "bottom") 
+          || atr.notation.toString().indexOf("bottom") !== -1)
         ) {
           if (iclose === 0) {
             longdiv += '(()/(';
