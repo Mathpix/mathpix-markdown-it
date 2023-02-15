@@ -5,5 +5,5 @@ declare type TSubMath = {
 export declare const ClearSubMathLists: () => void;
 export declare const mathTablePush: (item: TSubMath) => void;
 export declare const getMathTableContent: (sub: string, i: number) => string;
-export declare const getSubMath: (str: string) => string;
+export declare const getSubMath: (str: string, startPos?: number) => string;
 export {};

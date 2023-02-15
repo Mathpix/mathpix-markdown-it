@@ -21,6 +21,18 @@ export const createMathMenuItem = (type, value: string) => {
       case eMathType.mathmlword:
         itemTitle = 'Mathml (MS Word)';
         sourceStr = value;
+        break;      
+      case eMathType.tsv:
+        itemTitle = 'TSV';
+        sourceStr = value;
+        break;      
+      case eMathType.table_markdown:
+        itemTitle = 'Markdown';
+        sourceStr = value;
+        break;      
+      case eMathType.smiles:
+        itemTitle = 'Smiles';
+        sourceStr = value;
         break;
     }
     if (!itemTitle) {

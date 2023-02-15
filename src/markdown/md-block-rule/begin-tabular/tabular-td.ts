@@ -103,9 +103,10 @@ export const AddTd = (content: string, aligns: TAligns| null, lines: TLines, spa
       if (arr[1]) {
         res.push({token:'inline_decimal', type:'inline_decimal', tag: '', n: 0, content: `${fl};${content};${fr}`,
           ascii: content,
+          ascii_tsv: content,
           latex: content});
       } else {
-        res.push({token:'inline_decimal', type:'inline_decimal', tag: '', n: 0, content: `${fl};${content};.${fr}`, ascii: content,
+        res.push({token:'inline_decimal', type:'inline_decimal', tag: '', n: 0, content: `${fl};${content};.${fr}`, ascii: content, ascii_tsv: content,
           latex: content});
       }
     } else {

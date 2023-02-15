@@ -11,6 +11,7 @@ export declare const MathJax: {
         latex?: string;
         svg?: string;
         speech?: string;
+        asciimath_tsv?: string;
     } | {
         mathml?: string;
         mathml_word?: string;
@@ -30,6 +31,7 @@ export declare const MathJax: {
     TypesetSvgAndAscii: (string: any, options?: any) => {
         html: string;
         ascii: string;
+        ascii_tsv: any;
     };
     /**
      * Typeset a MathML expression and return the SVG tree for it

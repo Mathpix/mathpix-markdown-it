@@ -443,7 +443,7 @@ const parsed = MathpixMarkdownModel.parseMarkdownByHTML(html, false);
 ```js
 [
   { 
-    type: 'thml',
+    type: 'html',
     value: '<table>..</table>'
   },
   { 

@@ -45,6 +45,8 @@ export const reSetCounterG: RegExp = /\\setcounter\s{0,}\{(?<name>[^}]*)\}\s{0,}
 export const reAddContentsLine: RegExp = /^\\addcontentsline\s{0,}\{(?<exp>[^}]*)\}\s{0,}\{(?<unit>[^}]*)\}/;
 export const reAddContentsLineG: RegExp = /^\\addcontentsline\s{0,}\{(?<exp>[^}]*)\}\s{0,}\{(?<unit>[^}]*)\}/;
 
+export const reMultiRowWithVPos: RegExp = /(?:\\multirow\s{0,}\[(?<vpos>[^\]]*)\]\s{0,}\{(?<nrows>[^}]*)\}\s{0,}\{(?<width>[^}]*)\})/;
+export const reMultiRow: RegExp = /(?:\\multirow\s{0,}\{(?<nrows>[^}]*)\}\s{0,}\{(?<width>[^}]*)\})/;
 
 export const latexEnvironments = [
   "figure",
@@ -89,3 +91,8 @@ export const mathEnvironments = [
   "Vmatrix",
   "vmatrix"
 ];
+
+export const tsvSeparatorsDef = {
+  column: '\t', 
+  row: '\n'
+};

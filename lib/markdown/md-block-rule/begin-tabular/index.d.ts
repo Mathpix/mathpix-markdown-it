@@ -19,6 +19,7 @@ export declare type TTokenTabular = {
     children?: Token;
     id?: string;
     ascii?: string;
+    ascii_tsv?: string;
     latex?: string;
 };
 export declare type TMulti = {
