@@ -3,6 +3,7 @@ import {addStyle, setColumnLines} from "./tabular-td";
 import {getSubTabular} from "./sub-tabular";
 import {getMathTableContent} from "./sub-math";
 import {getContent, getColumnAlign, getColumnLines} from "./common";
+import { reMultiRowWithVPos, reMultiRow } from "../../common/consts";
 
 export const getMC = (cell: string): number => {
   cell = cell.trim();
@@ -57,13 +58,31 @@ export const getMultiColumnMultiRow = (str: string, params: {lLines: string, ali
     str = str.slice(0, matchMC.index) + str.slice(matchMC.index + matchMC[0].length);
   }
 
+  let vpos = '', nrows = '', width = '';
   let matchMR: RegExpMatchArray = str
-    .match(/(?:\\multirow\s{0,}\{([^}]*)\}\s{0,}\{([^}]*)\})/);
+    .match(reMultiRowWithVPos);
   if (matchMR) {
-    mr = Number(matchMR[1]);
-    let w: string = matchMR[2] || '';
+    vpos = matchMR.groups?.vpos ? matchMR.groups.vpos : matchMR[1];
+    nrows = matchMR.groups?.nrows ? matchMR.groups.nrows : matchMR[2];
+    width = matchMR.groups?.width ? matchMR.groups.width : matchMR[3];
+  } else {
+    matchMR = str.match(reMultiRow);
+    if (matchMR) {
+      nrows = matchMR.groups?.nrows ? matchMR.groups.nrows : matchMR[1];
+      width = matchMR.groups?.width ? matchMR.groups.width : matchMR[2];
+    }
+  }
+  if (matchMR) {
+    mr = Number(nrows);
+    let w: string = width || '';
+    vpos = vpos ? vpos.trim() : '';
     if (!matchMC) {
-      attrs.push(setColumnLines({h: params.align ? params.align : ''}, {left: params.lLines,  right: params.rLines}))
+      attrs.push(setColumnLines(
+        {
+          h: params.align ? params.align : '',
+          v: vpos === 't' ? 'top' : vpos === 'b' ? 'bottom' : '',
+        }, 
+        {left: params.lLines,  right: params.rLines}))
     }
     if (mr > 0) {
       attrs.push(['rowspan', mr.toString()]);
