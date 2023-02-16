@@ -143,5 +143,69 @@ La variable nbt est une chaine de caracteres car la fonction strO per-</div>
 </tbody>
 </table>
 </div></div>`
+  },
+  {
+    latex: `\\begin{tabular}{ |c|c|c|c| } \\hline
+col1 & col2 & col3 \\\\\\hline
+\\multirow[t]{3}{4em}{Multiple row} & cell2 & cell3 \\\\ \\hline
+& cell5 & cell6 \\\\ \\hline
+& cell8 & cell9 \\\\ \\hline
+\\end{tabular}`,
+    svg: `<div class="table_tabular " style="text-align: center">
+<div class="inline-tabular"><table id="tabular">
+<tbody>
+<tr style="border-top: none !important; border-bottom: none !important;">
+<td style="text-align: center; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; ">col1</td>
+<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; ">col2</td>
+<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; ">col3</td>
+</tr>
+<tr style="border-top: none !important; border-bottom: none !important;">
+<td style="text-align: center; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom: none !important; border-top: none !important; vertical-align: top; width: 4em; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; " rowspan="3">Multiple row</td>
+<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">cell2</td>
+<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">cell3</td>
+</tr>
+<tr style="border-top: none !important; border-bottom: none !important;">
+<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">cell5</td>
+<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">cell6</td>
+</tr>
+<tr style="border-top: none !important; border-bottom: none !important;">
+<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">cell8</td>
+<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">cell9</td>
+</tr>
+</tbody>
+</table>
+</div></div>`
+  },
+  {
+    latex: `\\begin{tabular}{ |c|c|c|c| } \\hline
+col1 & col2 & col3 \\\\\\hline
+\\multirow[b]{3}{4em}{Multiple row} & cell2 & cell3 \\\\ \\hline
+& cell5 & cell6 \\\\ \\hline
+& cell8 & cell9 \\\\ \\hline
+\\end{tabular}`,
+    svg: `<div class="table_tabular " style="text-align: center">
+<div class="inline-tabular"><table id="tabular">
+<tbody>
+<tr style="border-top: none !important; border-bottom: none !important;">
+<td style="text-align: center; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; ">col1</td>
+<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; ">col2</td>
+<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; ">col3</td>
+</tr>
+<tr style="border-top: none !important; border-bottom: none !important;">
+<td style="text-align: center; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom: none !important; border-top: none !important; vertical-align: bottom; width: 4em; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; " rowspan="3">Multiple row</td>
+<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">cell2</td>
+<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">cell3</td>
+</tr>
+<tr style="border-top: none !important; border-bottom: none !important;">
+<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">cell5</td>
+<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">cell6</td>
+</tr>
+<tr style="border-top: none !important; border-bottom: none !important;">
+<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">cell8</td>
+<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">cell9</td>
+</tr>
+</tbody>
+</table>
+</div></div>`
   }
 ];

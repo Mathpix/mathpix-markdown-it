@@ -14,6 +14,7 @@ export interface IOuterData {
   mathml?: string,
   mathml_word?: string,
   asciimath?: string,
+  asciimath_tsv?: string,
   latex?: string,
   svg?: string,
   speech?: string,
@@ -82,6 +83,10 @@ const OuterData = (adaptor, node, math, outMath, forDocx = false, accessibility?
     res.mathml_word = toMathMLWord(math.root, {forDocx: forDocx});
   }
 
+  if (optionAscii?.tableToTsv) {
+    res.asciimath_tsv = toAsciiML(math.root, optionAscii);
+    optionAscii.tableToTsv = false;
+  }
   if (include_asciimath) {
     res.asciimath = toAsciiML(math.root, optionAscii);
   }
@@ -301,7 +306,16 @@ export const MathJax = {
       MJ.mDocTeX.outputJax.options.mtextInheritFont = true;
     }
     try {
-      const node = MJ.mDocTeX.convert(string, {
+      /** Here we use different package settings.
+       * In order to flatten arrays in asccimath for TSV we add an extra attribute to the internal mml tree.
+       * So for \begin{array} we add a name attribute that points to the environment */
+      const node = options?.outMath?.optionAscii?.tableToTsv 
+        ? MJ.docTeXTSV.convert(string, {
+        display: display, 
+        em: em, 
+        ex: ex, 
+        containerWidth: cwidth, lineWidth: lwidth, scale: scale})
+        : MJ.mDocTeX.convert(string, {
         display: display, 
         em: em, 
         ex: ex, 
@@ -355,11 +369,31 @@ export const MathJax = {
     const { outMath = {} } = options;
     const { include_asciimath = false } = outMath;
     options.outMath.include_asciimath = true;
+    let dataTSV = null;
+    if (options?.outMath?.optionAscii?.tableToTsv) {
+      /** Get only asccimath converted for TSV */
+      dataTSV = this.TexConvert(string, Object.assign({}, options, {
+        outMath: {
+          include_asciimath: true,
+          include_mathml: false,
+          include_mathml_word: false,
+          include_latex: false,
+          include_svg: false,
+          include_error: false,
+          include_speech: false,
+          optionAscii: {
+            ...options.outMath.optionAscii
+          }
+        }
+      }));
+      options.outMath.optionAscii.tableToTsv = false;
+    }
     const data: IOuterData = this.TexConvert(string, options);
-    options.outMath.include_asciimath = include_asciimath
+    options.outMath.include_asciimath = include_asciimath;
     return {
       html: OuterHTML(data, outMath), 
       ascii: data.asciimath,
+      ascii_tsv: dataTSV?.['asciimath_tsv'],
       labels: data.labels
     };
   },

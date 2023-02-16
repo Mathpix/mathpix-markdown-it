@@ -32,11 +32,13 @@ export const getMathTableContent = (sub: string, i: number): string => {
   return resContent;
 };
 
-export const getSubMath = (str: string): string => {
+export const getSubMath = (str: string, startPos = 0): string => {
   const match: RegExpMatchArray = str
+    .slice(startPos)
     .match(/(?:\\\\\[|\\\[|\\\\\(|\\\(|\$\$|\$|\\begin\{([^}]*)\}|eqref\{([^}]*)\}|ref\{([^}]*)\})/);
   if (match) {
-    let startMathPos: number = match.index + match[0].length;
+    let beginMarkerPos: number = startPos + match.index;
+    let startMathPos: number = beginMarkerPos + match[0].length;
     let endMarker: string;
     if (match[0] === "\\\\[") {
       endMarker = "\\\\]";
@@ -57,20 +59,23 @@ export const getSubMath = (str: string): string => {
     } else if (match[0] === "$") {
       endMarker = match[0];
     }
-
     const endMarkerPos = findEndMarkerPos(str, endMarker, startMathPos);
     if (endMarkerPos === -1) {
+      /** If the end marker is not found, it is necessary to search further, excluding the current marker. */
+      str = getSubMath(str, startMathPos);
       return str;
     }
     if (match[0] === "$" || match[0] === "$$") {
       const beforeEndMarker = str.charCodeAt(endMarkerPos - 1);
       if ( beforeEndMarker === 0x5c /* \ */ ||
-          (match.index > 0 && str.charCodeAt(match.index - 1)=== 0x5c /* \ */)
+          (beginMarkerPos > 0 && str.charCodeAt(beginMarkerPos - 1)=== 0x5c /* \ */)
       ) {
+        /** If the marker is shielded, it is necessary to search further, excluding the current marker. */
+        str = getSubMath(str, startMathPos);
         return str;
       }
       if (match[0] === "$") {
-        const afterStartMarker = str.charCodeAt(match.index + 1)
+        const afterStartMarker = str.charCodeAt(beginMarkerPos + 1)
         if ( beforeEndMarker  === 0x20 /* space */ ||
              beforeEndMarker  === 0x09 /* \t */ ||
              beforeEndMarker  === 0x0a /* \n */ ||
@@ -78,23 +83,25 @@ export const getSubMath = (str: string): string => {
              afterStartMarker === 0x09 /* \t */ ||
              afterStartMarker === 0x0a /* \n */
         ) {
+          str = getSubMath(str, startMathPos);
           return str;
         }
       }
       // Skip if closing $ is succeeded by a digit (eg $5 $10 ...)
       const suffix = str.charCodeAt(endMarkerPos+1);
       if (suffix >= 0x30 && suffix < 0x3a) {
+        str = getSubMath(str, startMathPos);
         return str;
       }
     }
     const nextPos: number = endMarkerPos + endMarker.length;
 
-    const content: string = str.slice(match.index, nextPos);
+    const content: string = str.slice(beginMarkerPos, nextPos);
 
     const id: string = `f${(+new Date +  (Math.random()*100000).toFixed()).toString()}`;
     mathTable.push({id: id, content: content});
-    str = str.slice(0, match.index) + `{${id}}` + str.slice(endMarkerPos + endMarker.length);
-    str = getSubMath(str);
+    str = str.slice(0, startPos) + str.slice(startPos, beginMarkerPos) + `{${id}}` + str.slice(endMarkerPos + endMarker.length);
+    str = getSubMath(str, startPos);
   }
   return str;
 };

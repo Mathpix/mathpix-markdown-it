@@ -136,5 +136,10 @@ module.exports = [
   {
     latex: `g + {x ^ { 2 } + 1 4 x + 4 9 \\lcm { x ^ { 2 } + 1 4 x }}`,
     ascii: `g+((x^(2)+14x+49)/(x^(2)+14x))`
+  },
+  /** Here mclose has a notation: 'bottom' attribute, but this should not be converted to lcm */
+  {
+    latex: `\\begin{array} { c } 3 \\frac { 1 } { 6 }  \\\\ 3 \\\\\\hline \\end{array}`,
+    ascii: `[3(1)/(6)],[3]`
   }
 ];

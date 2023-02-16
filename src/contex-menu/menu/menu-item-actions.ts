@@ -51,7 +51,7 @@ export const chooseItem = (el) => {
       } else {
         source = dataType === eMathType.mathml 
           ? source 
-          : formatSourceHtml(source);
+          : formatSourceHtml(source, dataType === eMathType.tsv);
       }
       
       copy(source, {

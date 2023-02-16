@@ -117,17 +117,35 @@ export const getPositionMenuByClick = (e, itemsLength): IMenuPosition => {
   return res
 };
 
-export const clickInsideElement = ( e, className ) => {
-  let el = e.target;
-  if ( el.classList.contains(className) ) {
-    return el;
-  } else {
-    while ( el = el.parentNode ) {
-      if ( el.classList && el.classList.contains(className) ) {
-        return el;
+export const findClassInElement = (el, classNamesList): string => {
+  let className = '';
+  if (el?.classList) {
+    for (let i = 0; i < classNamesList.length; i++) {
+      if (el.classList.contains(classNamesList[i])) {
+        className = classNamesList[i];
+        break;
       }
     }
   }
+  return className;
+};
 
-  return null;
+export const clickInsideElement = (e, classNamesList) => {
+  let el = e.target;
+  let className = findClassInElement(el, classNamesList);
+  if (className) {
+    return className === 'MathJax' ? el.parentNode : el;
+  } else {
+    let elParent = null;
+    while (el = el.parentNode) {
+      className = findClassInElement(el, classNamesList);
+      if (className) {
+        if (className === 'inline-tabular') {
+          return el;
+        }
+        elParent = className === 'MathJax' ? el.parentNode : el;
+      }
+    }
+    return elParent;
+  }
 };

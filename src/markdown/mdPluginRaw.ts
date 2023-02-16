@@ -8,7 +8,7 @@ import {
   includesMultiMathBeginTag,
   getWidthFromDocument
 } from './utils';
-import { openTagMML, closeTagMML } from './common/consts';
+import { openTagMML, closeTagMML, tsvSeparatorsDef } from './common/consts';
 import { imageWithSize, renderRuleImage } from './md-inline-rule/image';
 import { setCounterSection } from './md-inline-rule/setcounter-section';
 import { renderTheorems } from './md-theorem';
@@ -24,6 +24,7 @@ import {
   addIntoLabelsList, 
   getLabelByKeyFromLabelsList 
 } from "./common/labels";
+const isSpace = require('markdown-it/lib/common/utils').isSpace;
 
 function MathML(state, silent, pos, endMarker = '', type = "inline_mathML") {
   const markerBegin = RegExp('^</?(math)(?=(\\s|>|$))', 'i');
@@ -153,6 +154,29 @@ function mathMLBlock(state, startLine/*, endLine*/) {
   return true;
 };
 
+const getMathEnvironment = (str: string): string => {
+  str = str.trim();
+  if (!str) {
+    return '';
+  }
+  let startPos = 0;
+  // {\begin{array}{c}...
+  // ^^ skipping first {
+  if (str.charCodeAt(startPos) === 123 /* { */) {
+    startPos++;
+  }
+  // {  \begin{array}{c}...
+  //  ^^ skipping these spaces
+  for (; startPos < str.length; startPos++) {
+    const code = str.charCodeAt(startPos);
+    if (!isSpace(code) && code !== 0x0A) { break; }
+  }
+  const match = str
+    .slice(startPos)
+    .match(/^\\begin\{([^}]*)\}/);
+  return match && match[1] ? match[1].trim() : '';
+};
+
 function multiMath(state, silent) {
   let startMathPos = state.pos;
   if (state.src.charCodeAt(startMathPos) !== 0x5c /* \ */) {
@@ -171,6 +195,7 @@ function multiMath(state, silent) {
   startMathPos += match[0].length;
   let type, endMarker, includeMarkers; // eslint-disable-line
   let addParentheses = false;
+  let math_env = '';
   if (match[0] === "\\[") {
     type = "display_math";
     endMarker = "\\\\]";
@@ -191,6 +216,7 @@ function multiMath(state, silent) {
     type = "reference_note";
     endMarker = "";
   } else if (match[1] && match[1] !== 'abstract') {
+    math_env = match[1].trim();
     if (match[1].indexOf('*') > 0) {
       type = "equation_math_not_number";
     } else {
@@ -224,6 +250,7 @@ function multiMath(state, silent) {
     }
     if (includeMarkers) {
       token.content = state.src.slice(state.pos, nextPos);
+      token.math_env = math_env;
     } else if (type === "reference_note") {
       if (state.md.options.forLatex) {
         token.markup = match[0];
@@ -232,6 +259,7 @@ function multiMath(state, silent) {
       token.attrSet("data-parentheses", addParentheses.toString());
     } else {
       token.content = state.src.slice(startMathPos, endMarkerPos);
+      token.math_env = getMathEnvironment(token.content);
     }
     if (state.env.tabulare) {
       token.return_asciimath = true;
@@ -393,6 +421,7 @@ function simpleMath(state, silent) {
       0
     );
     token.content = state.src.slice(startMathPos, endMarkerPos);
+    token.math_env = getMathEnvironment(token.content);
     if (state.env.tabulare) {
       token.return_asciimath = true;
     }
@@ -519,12 +548,20 @@ const convertMathToHtml = (state, token, options) => {
         const data = MathJax.TypesetSvgAndAscii(math, {
           display: isBlock,
           metric: {cwidth: cwidth},
-          outMath: options.outMath,
+          outMath: Object.assign({}, options.outMath, {
+            optionAscii: {
+              showStyle: false,
+              extraBrackets: true,
+              tableToTsv: token.math_env === "array",
+              tsv_separators: {...tsvSeparatorsDef}
+            },
+          }),
           mathJax: options.mathJax,
           accessibility: options.accessibility
         });
         token.mathEquation = data.html;
         token.ascii = data.ascii;
+        token.ascii_tsv = data.ascii_tsv;
         token.labels = data.labels;
       } else {
         MathJax.Reset(begin_number);

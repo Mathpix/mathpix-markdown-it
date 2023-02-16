@@ -91,13 +91,13 @@ module.exports = [
   },
   {
     latex: `\\left.\\begin{array}{r}{a}\\\\{b}\\\\{c}\\\\\\hline\\end{array}\\right.`,
-    ascii:     `{:[a],[b],[c],[hline]:}`,
-    ascii_old: `{:[a],[b],[c],[hline]:}`
+    ascii:     `{:[a],[b],[c]:}`,
+    ascii_old: `{:[a],[b],[c]:}`
   },
   {
     latex: `\\left\\{\\begin{array}{r}{a}\\\\{b}\\\\{c}\\\\\\hline\\end{array}\\right\\}`,
-    ascii:     `{[a],[b],[c],[hline]}`,
-    ascii_old: `{[a],[b],[c],[hline]}`
+    ascii:     `{[a],[b],[c]}`,
+    ascii_old: `{[a],[b],[c]}`
   },
   {
     latex: `\\left.\\begin{array}{ll}{a1}&{a2}\\\\{b1}&{b2}\\end{array}\\right.`,

@@ -832,11 +832,78 @@ module.exports = [
       '| ==2 \\| f== | 10.1 | b | f |\n' +
       '| 3 | 23.113231 | c | g |'
   },
+  {
+    id: 46,
+    latex: '\\begin{tabular}{|l|c|c|c|}\\hline \\multicolumn{4}{|c|}{ as at 30 June 2020 (AUD\\$\'000) } \\\\\\hline \\multirow{2}{*}{\\( \\begin{array}{l}\\text { Current assets } \\\\\\text { Cash at bank }\\end{array} \\)} & 2020 & 2019 & 2018 \\\\\\cline { 2 - 4 } Receivables (net) & \\( \\$ 120,000 \\) & \\( \\$ 80,000 \\) & \\( \\$ 36,000 \\) \\\\Inventory & \\( \\$ 140,000 \\) & \\( \\$ 120,000 \\) & \\( \\$ 96,000 \\) \\\\Total current assets & \\( \\$ 180,000 \\) & \\( \\$ 170,000 \\) & \\( \\$ 128,000 \\) \\\\Non Current assets & \\( \\$ 440,000 \\) & \\( \\$ 370,000 \\) & \\( \\$ 260,000 \\) \\\\Plant and equipment (net) & & & \\\\Investments & \\( \\$ 1,000,000 \\) & \\( \\$ 820,000 \\) & \\( \\$ 716,000 \\) \\\\\\hline\\end{tabular}',
+    table_markdown:  '| as at 30 June 2020 (AUD$\'000) |  |  |  |\n' +
+      '| :--- | :---: | :---: | :---: |\n' +
+      '| \\( \\begin{array}{l}\\text { Current assets } \\\\\\text { Cash at bank }\\end{array} \\) | 2020 | 2019 | 2018 |\n' +
+      '|  | \\( \\$ 120,000 \\) | \\( \\$ 80,000 \\) | \\( \\$ 36,000 \\) |\n' +
+      '| Inventory | \\( \\$ 140,000 \\) | \\( \\$ 120,000 \\) | \\( \\$ 96,000 \\) |\n' +
+      '| Total current assets | \\( \\$ 180,000 \\) | \\( \\$ 170,000 \\) | \\( \\$ 128,000 \\) |\n' +
+      '| Non Current assets | \\( \\$ 440,000 \\) | \\( \\$ 370,000 \\) | \\( \\$ 260,000 \\) |\n' +
+      '| Plant and equipment (net) |  |  |  |\n' +
+      '| Investments | \\( \\$ 1,000,000 \\) | \\( \\$ 820,000 \\) | \\( \\$ 716,000 \\) |',
+    table_markdown_math_as_ascii: '| as at 30 June 2020 (AUD$\'000) |  |  |  |\n' +
+      '| :--- | :---: | :---: | :---: |\n' +
+      '| {:[" Current assets "],[" Cash at bank "]:} | 2020 | 2019 | 2018 |\n' +
+      '|  | $120,000 | $80,000 | $36,000 |\n' +
+      '| Inventory | $140,000 | $120,000 | $96,000 |\n' +
+      '| Total current assets | $180,000 | $170,000 | $128,000 |\n' +
+      '| Non Current assets | $440,000 | $370,000 | $260,000 |\n' +
+      '| Plant and equipment (net) |  |  |  |\n' +
+      '| Investments | $1,000,000 | $820,000 | $716,000 |'
+  },
+  {
+    id: 47,
+    latex: '\\begin{tabular}{|l|c|c|c|}\\hline \\multicolumn{4}{|c|}{ as at 30 June 2020 (AUD $\'000) } \\\\\\hline \\multirow{2}{*}{\\( \\begin{array}{l}\\text { Current assets } $ \\\\\\text { Cash at bank }\\end{array} \\)} & 2020 & 2019 & 2018 \\\\\\cline { 2 - 4 } Receivables (net) & \\( \\$ 120,000 \\) & \\( \\$ 80,000 \\) & \\( \\$ 36,000 \\) \\\\Inventory & \\( \\$ 140,000 \\) & \\( \\$ 120,000 \\) & \\( \\$ 96,000 \\) \\\\Total current assets & \\( \\$ 180,000 \\) & \\( \\$ 170,000 \\) & \\( \\$ 128,000 \\) \\\\Non Current assets & \\( \\$ 440,000 \\) & \\( \\$ 370,000 \\) & \\( \\$ 260,000 \\) \\\\Plant and equipment (net) & & & \\\\Investments & \\( \\$ 1,000,000 \\) & \\( \\$ 820,000 \\) & \\( \\$ 716,000 \\) \\\\\\hline\\end{tabular}',
+    table_markdown:  '| as at 30 June 2020 (AUD $\'000) |  |  |  |\n' +
+      '| :--- | :---: | :---: | :---: |\n' +
+      '| \\( \\begin{array}{l}\\text { Current assets } $ \\\\\\text { Cash at bank }\\end{array} \\) | 2020 | 2019 | 2018 |\n' +
+      '|  | \\( \\$ 120,000 \\) | \\( \\$ 80,000 \\) | \\( \\$ 36,000 \\) |\n' +
+      '| Inventory | \\( \\$ 140,000 \\) | \\( \\$ 120,000 \\) | \\( \\$ 96,000 \\) |\n' +
+      '| Total current assets | \\( \\$ 180,000 \\) | \\( \\$ 170,000 \\) | \\( \\$ 128,000 \\) |\n' +
+      '| Non Current assets | \\( \\$ 440,000 \\) | \\( \\$ 370,000 \\) | \\( \\$ 260,000 \\) |\n' +
+      '| Plant and equipment (net) |  |  |  |\n' +
+      '| Investments | \\( \\$ 1,000,000 \\) | \\( \\$ 820,000 \\) | \\( \\$ 716,000 \\) |',
+    table_markdown_math_as_ascii: '| as at 30 June 2020 (AUD $\'000) |  |  |  |\n' +
+      '| :--- | :---: | :---: | :---: |\n' +
+      '| {:[" Current assets "$],[" Cash at bank "]:} | 2020 | 2019 | 2018 |\n' +
+      '|  | $120,000 | $80,000 | $36,000 |\n' +
+      '| Inventory | $140,000 | $120,000 | $96,000 |\n' +
+      '| Total current assets | $180,000 | $170,000 | $128,000 |\n' +
+      '| Non Current assets | $440,000 | $370,000 | $260,000 |\n' +
+      '| Plant and equipment (net) |  |  |  |\n' +
+      '| Investments | $1,000,000 | $820,000 | $716,000 |'
+  },  
+  {
+    id: 48,
+    latex: '\\begin{tabular}{|l|c|c|c|}\\hline \\multicolumn{4}{|c|}{ as at 30 June 2020 (AUD $\'000) } \\\\\\hline \\multirow{2}{*}{\\( \\begin{array}{l}\\text { Current assets }$1 \\\\\\text { Cash at bank }\\end{array} \\)} & 2020 & 2019 & 2018 \\\\\\cline { 2 - 4 } Receivables (net) & \\( \\$ 120,000 \\) & \\( \\$ 80,000 \\) & \\( \\$ 36,000 \\) \\\\Inventory & \\( \\$ 140,000 \\) & \\( \\$ 120,000 \\) & \\( \\$ 96,000 \\) \\\\Total current assets & \\( \\$ 180,000 \\) & \\( \\$ 170,000 \\) & \\( \\$ 128,000 \\) \\\\Non Current assets & \\( \\$ 440,000 \\) & \\( \\$ 370,000 \\) & \\( \\$ 260,000 \\) \\\\Plant and equipment (net) & & & \\\\Investments & \\( \\$ 1,000,000 \\) & \\( \\$ 820,000 \\) & \\( \\$ 716,000 \\) \\\\\\hline\\end{tabular}',
+    table_markdown:  '| as at 30 June 2020 (AUD $\'000) |  |  |  |\n' +
+      '| :--- | :---: | :---: | :---: |\n' +
+      '| \\( \\begin{array}{l}\\text { Current assets }$1 \\\\\\text { Cash at bank }\\end{array} \\) | 2020 | 2019 | 2018 |\n' +
+      '|  | \\( \\$ 120,000 \\) | \\( \\$ 80,000 \\) | \\( \\$ 36,000 \\) |\n' +
+      '| Inventory | \\( \\$ 140,000 \\) | \\( \\$ 120,000 \\) | \\( \\$ 96,000 \\) |\n' +
+      '| Total current assets | \\( \\$ 180,000 \\) | \\( \\$ 170,000 \\) | \\( \\$ 128,000 \\) |\n' +
+      '| Non Current assets | \\( \\$ 440,000 \\) | \\( \\$ 370,000 \\) | \\( \\$ 260,000 \\) |\n' +
+      '| Plant and equipment (net) |  |  |  |\n' +
+      '| Investments | \\( \\$ 1,000,000 \\) | \\( \\$ 820,000 \\) | \\( \\$ 716,000 \\) |',
+    table_markdown_math_as_ascii: '| as at 30 June 2020 (AUD $\'000) |  |  |  |\n' +
+      '| :--- | :---: | :---: | :---: |\n' +
+      '| {:[" Current assets "$1],[" Cash at bank "]:} | 2020 | 2019 | 2018 |\n' +
+      '|  | $120,000 | $80,000 | $36,000 |\n' +
+      '| Inventory | $140,000 | $120,000 | $96,000 |\n' +
+      '| Total current assets | $180,000 | $170,000 | $128,000 |\n' +
+      '| Non Current assets | $440,000 | $370,000 | $260,000 |\n' +
+      '| Plant and equipment (net) |  |  |  |\n' +
+      '| Investments | $1,000,000 | $820,000 | $716,000 |'
+    
+  },  
   // {
   //   id: 40,
   //   latex: '',
   //   table_markdown:  ''
-  // },
+  // },  
   // {
   //   id: 40,
   //   latex: '',

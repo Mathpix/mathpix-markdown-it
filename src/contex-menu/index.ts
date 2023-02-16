@@ -1,22 +1,22 @@
 import { toggleMenuOn, toggleMenuOff, isOpenContextMenu } from "./menu";
 import { clickInsideElement } from "./menu/helper";
-import { classNameMenuItem } from "./menu/consts";
+import { classNameMenuItem, mmdClassesForContextMenu } from "./menu/consts";
 import { chooseItem, clearActiveItem } from "./menu/menu-item-actions";
 
 let isCloseByTouchStart = false;
 
 const handleContextMenu = (e) => {
-  let elMath = clickInsideElement( e, 'MathJax' );
-  if (elMath && elMath.parentElement) {
+  let mmdEl = clickInsideElement(e, mmdClassesForContextMenu);
+  if (mmdEl) {
     e.preventDefault();
-    toggleMenuOn(elMath.parentElement, e);
+    toggleMenuOn(mmdEl, e);
   } else {
     toggleMenuOff();
   }
 };
 
 export const handleTouchStart = (e) => {
-  const elItem = clickInsideElement( e, classNameMenuItem );
+  const elItem = clickInsideElement( e, [classNameMenuItem] );
 
   isCloseByTouchStart = false;
   if (isOpenContextMenu() && !elItem) {
@@ -28,8 +28,8 @@ export const handleTouchStart = (e) => {
 
 export const handleClick = (e) => {
   if ("ontouchstart" in document.documentElement) {
-    let elMath = clickInsideElement(e, 'MathJax');
-    if (elMath) {
+    let mmdEl = clickInsideElement(e, mmdClassesForContextMenu);
+    if (mmdEl) {
       if (isCloseByTouchStart) {
         isCloseByTouchStart = false;
         return;
@@ -38,13 +38,13 @@ export const handleClick = (e) => {
       if (isOpenContextMenu()) {
         toggleMenuOff();
       } else {
-        toggleMenuOn(elMath.parentElement, e);
+        toggleMenuOn(mmdEl, e);
       }
       return;
     }
   }
   
-  const elItem = clickInsideElement( e, classNameMenuItem );
+  const elItem = clickInsideElement( e, [classNameMenuItem] );
   if (elItem) {
     e.stopPropagation();
     clearActiveItem();

@@ -8,6 +8,8 @@ import {browserAdaptor} from 'mathjax-full/js/adaptors/browserAdaptor.js';
 import {liteAdaptor} from 'mathjax-full/js/adaptors/liteAdaptor.js';
 
 import 'mathjax-full/js/input/tex/AllPackages.js';
+/** Load configuration for additional package array */
+import './helpers/array/ArrayConfiguration';
 import {AssistiveMmlHandler} from'mathjax-full/js/a11y/assistive-mml.js';
 
 import MathJaxConfig from './mathJaxConfig';
@@ -19,6 +21,10 @@ BaseConfiguration.handler.macro.push('wasysym-mathchar0mo');
 BaseConfiguration.handler.macro.push('wasysym-macros');
 
 const texConfig = Object.assign({}, MathJaxConfig.TeX || {});
+/** for TSV, add the array package, which will add an additional name attribute that points to the environment */
+const texTSVConfig = Object.assign({}, texConfig,  {
+  packages: [].concat(texConfig['packages'], ['array'])
+});
 const mmlConfig = Object.assign({}, MathJaxConfig.MathML || {});
 const svgConfig = Object.assign({}, MathJaxConfig.SVG || {});
 
@@ -37,12 +43,14 @@ export const asciimath = new AsciiMath({});
 export class MathJaxConfigure {
   public mTex;
   public tex;
+  public texTSV;
   public mathjax;
   public adaptor;
   public domNode;
   public handler;
 
   public docTeX;
+  public docTeXTSV;
   public mDocTeX;
   public docMathML;
   public docAsciiMath;
@@ -76,10 +84,12 @@ export class MathJaxConfigure {
       // @ts-ignore
       this.mTex = new MTeX(Object.assign({}, texConfig, {tags: "none"}));
       this.tex = new TeX(Object.assign({}, texConfig, {tags: "none"}));
+      this.texTSV = new TeX(Object.assign({}, texTSVConfig, {tags: "none"}));
     } else {
       // @ts-ignore
       this.mTex = new MTeX(texConfig);
       this.tex = new TeX(texConfig);
+      this.texTSV = new TeX(texTSVConfig);
     }
   }
   
@@ -92,6 +102,10 @@ export class MathJaxConfigure {
 
     this.docTeX = mathjax.document(this.domNode, {
       InputJax: this.tex,
+      OutputJax: svg
+    });    
+    this.docTeXTSV = mathjax.document(this.domNode, {
+      InputJax: this.texTSV,
       OutputJax: svg
     });
     this.mDocTeX= mathjax.document(this.domNode, {

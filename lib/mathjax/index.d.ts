@@ -4,6 +4,7 @@ export interface IOuterData {
     mathml?: string;
     mathml_word?: string;
     asciimath?: string;
+    asciimath_tsv?: string;
     latex?: string;
     svg?: string;
     speech?: string;
@@ -33,6 +34,7 @@ export declare const MathJax: {
     TypesetSvgAndAscii: (string: any, options?: any) => {
         html: string;
         ascii: string;
+        ascii_tsv: any;
         labels: {
             [key: string]: Label;
         };
