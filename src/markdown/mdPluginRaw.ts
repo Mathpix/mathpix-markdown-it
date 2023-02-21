@@ -14,7 +14,15 @@ import { setCounterSection } from './md-inline-rule/setcounter-section';
 import { renderTheorems } from './md-theorem';
 import { resetTheoremEnvironments } from './md-theorem/helper';
 import { newTheoremBlock } from './md-theorem/block-rule';
-import { newTheorem, theoremStyle, newCommandQedSymbol, labelLatex, setCounterTheorem } from './md-theorem/inline-rule';
+import { 
+  newTheorem, 
+  theoremStyle, 
+  newCommandQedSymbol, 
+  labelLatex, 
+  captionLatex,
+  centeringLatex,
+  setCounterTheorem 
+} from './md-theorem/inline-rule';
 import { coreInline } from './md-inline-rule/core-inline';
 import { softBreak, hardBreak } from './md-renderer-rules/breaks';
 import { 
@@ -999,6 +1007,8 @@ export default options => {
     md.inline.ruler.before("escape", "multiMath", multiMath);
     md.inline.ruler.before("multiMath", "inlineTabular", inlineTabular);
     md.inline.ruler.before("multiMath", "labelLatex", labelLatex);
+    md.inline.ruler.before("multiMath", "captionLatex", captionLatex);
+    md.inline.ruler.before("multiMath", "centeringLatex", centeringLatex);
     md.inline.ruler.before("multiMath", "theoremStyle", theoremStyle); /** Parse \theoremstyle */
     md.inline.ruler.before("multiMath", "newTheorem", newTheorem); /** Parse \newtheorem */
     md.inline.ruler.before("multiMath", "setCounterTheorem", setCounterTheorem); /** Parse \newtheorem */

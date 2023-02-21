@@ -306,7 +306,59 @@ export const labelLatex: RuleInline = (state, md, env) => {
   token.content = labelKey;
   token.children = [];
   token.latex = latex;
+  token.currentTag = state.env?.currentTag ? {...state.env.currentTag} : {};
   token.hidden = true; /** Ignore this element when rendering to HTML */
   state.pos = nextPos;
   return true;
-}
+};
+
+export const captionLatex: RuleInline = (state, md, env) => {
+  const captionTag: RegExp = /^\\caption\s{0,}\{([^}]*)\}/;
+  let startPos = state.pos;
+  if (state.src.charCodeAt(startPos) !== 0x5c /* \ */) {
+    return false;
+  }
+  let nextPos: number = startPos;
+  let match: RegExpMatchArray =  state.src
+    .slice(startPos)
+    .match(captionTag);
+  if (!match) {
+    return false;
+  }
+  const latex = match[0];
+  nextPos += match[0].length;
+  const token = state.push("caption", "", 0);
+  token.content = match[1]
+  token.children = [];
+  token.latex = latex;
+  token.currentTag = state.env?.currentTag ? {...state.env.currentTag} : {};
+  token.hidden = true; /** Ignore this element when rendering to HTML */
+  state.pos = nextPos;
+  return true;
+};
+
+export const centeringLatex: RuleInline = (state, md, env) => {
+  const alignTagG: RegExp = /^\\centering/;
+  let startPos = state.pos;
+  if (state.src.charCodeAt(startPos) !== 0x5c /* \ */) {
+    return false;
+  }
+  let nextPos: number = startPos;
+  let match: RegExpMatchArray =  state.src
+    .slice(startPos)
+    .match(alignTagG);
+  if (!match) {
+    return false;
+  }
+  const latex = match[0];
+  nextPos += match[0].length;
+  const token = state.push("centering", "", 0);
+  token.content = '';
+  token.children = [];
+  token.latex = latex;
+  token.currentTag = state.env?.currentTag ? {...state.env.currentTag} : {};
+  token.hidden = true; /** Ignore this element when rendering to HTML */
+  state.pos = nextPos;
+  return true;
+};
+

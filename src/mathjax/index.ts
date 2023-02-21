@@ -97,11 +97,11 @@ const OuterData = (adaptor, node, math, outMath, forDocx = false, accessibility?
   }
   if (include_svg) {
     res.svg = adaptor.outerHTML(node);
-    /** Get information about the current labels. */
-    res.labels = math.inputJax.parseOptions?.tags?.labels
-      ? {...math.inputJax.parseOptions.tags.labels}
-      : null;
   }
+  /** Get information about the current labels. */
+  res.labels = math.inputJax.parseOptions?.tags?.labels
+    ? {...math.inputJax.parseOptions.tags.labels}
+    : null;
   return res;
 };
 

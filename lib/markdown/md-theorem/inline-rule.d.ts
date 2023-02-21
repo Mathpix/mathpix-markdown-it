@@ -21,3 +21,5 @@ export declare const setCounterTheorem: RuleInline;
  */
 export declare const newCommandQedSymbol: RuleInline;
 export declare const labelLatex: RuleInline;
+export declare const captionLatex: RuleInline;
+export declare const centeringLatex: RuleInline;

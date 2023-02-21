@@ -56,8 +56,9 @@ export const ParseIncludeGraphics = (str: string, i: number, align: string='') =
       .slice(posB)
       .match(includegraphicsTag);
     if (!match) {
-      if (str.slice(posB) && str.slice(posB).trim().length > 0) {
-        res.push({token: 'inline', tag: '', n: 0,  content: str, pos: posB + str.length});
+      let content = str.slice(posB);
+      if (content && content.trim().length > 0) {
+        res.push({token: 'inline', tag: '', n: 0,  content: content, pos: posB + content.length});
       }
       break
     }

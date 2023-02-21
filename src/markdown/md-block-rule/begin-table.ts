@@ -155,22 +155,26 @@ const InlineBlockBeginTable: RuleBlock = (state, startLine) => {
   const hasAlignTagIncludeGraphicsG = type === TBegin.figure
     ? Boolean(content.match(alignTagIncludeGraphicsG)) : false;
   content = content.replace(alignTagG,'');
-  matchE = content.match(captionTag);
-  if (matchE) {
-    caption = matchE[1];
-    let matchT: RegExpMatchArray;
-    if (type === TBegin.table) {
-      matchT = lineText.match(openTagTabular);
-    } else {
-      matchT = lineText.match(includegraphicsTag);
+  if (!state.md.options.forLatex) {
+    matchE = content.match(captionTag);
+    if (matchE) {
+      caption = matchE[1];
+      let matchT: RegExpMatchArray;
+      if (type === TBegin.table) {
+        matchT = lineText.match(openTagTabular);
+      } else {
+        matchT = lineText.match(includegraphicsTag);
+      }
+      if (matchT && matchE.index < matchT.index) {
+        captionFirst = true;
+      }
+      content = content.replace(captionTagG, '')
     }
-    if (matchT && matchE.index < matchT.index) {
-      captionFirst = true;
-    }
-    content = content.replace(captionTagG, '')
   }
+
   state.parentType = 'paragraph';
   state.env.caption = caption;
+  state.env.envType = type;
   const contentAlign = align ? align
     : hasAlignTagG ? 'center' : '';
   state.env.align = contentAlign;
@@ -182,13 +186,13 @@ const InlineBlockBeginTable: RuleBlock = (state, startLine) => {
     token = state.push('latex_align', '', 0);
     token.latex = '\\centering';
   }
-  if (captionFirst) {
+  if (captionFirst && !state.md.options.forLatex) {
     StatePushCaptionTable(state, type);
   }
 
   StatePushTableContent(state, startLine, startLine + 1, content, contentAlign, type);
 
-  if (!captionFirst) {
+  if (!captionFirst && !state.md.options.forLatex) {
     StatePushCaptionTable(state, type);
   }
   token = state.push('paragraph_close', 'div', -1);
@@ -296,24 +300,29 @@ export const BeginTable: RuleBlock = (state, startLine, endLine) => {
     resText += lineText.slice(0, matchE.index);
     pE = matchE.index
   }
-  let hasAlignTagG = alignTagG.test(resText);
-  content = resText.replace(alignTagG,'');
+  let matchAlignTagG = resText.match(alignTagG);
+  const hasAlignTagG = Boolean(matchAlignTagG);
+  content = state.md.options.forLatex 
+    ? resText 
+    : resText.replace(alignTagG,'');
   const hasAlignTagIncludeGraphicsG = type === TBegin.figure 
     ? Boolean(content.match(alignTagIncludeGraphicsG)) : false;
   
-  matchE = content.match(captionTag);
-  if (matchE) {
-    caption = matchE[1];
-    let matchT: RegExpMatchArray;
-    if (type === TBegin.table) {
-       matchT = content.match(openTagTabular);
-    } else {
-       matchT = content.match(includegraphicsTag);
+  if (!state.md.options.forLatex) {
+    matchE = content.match(captionTag);
+    if (matchE) {
+      caption = matchE[1];
+      let matchT: RegExpMatchArray;
+      if (type === TBegin.table) {
+        matchT = content.match(openTagTabular);
+      } else {
+        matchT = content.match(includegraphicsTag);
+      }
+      if (matchT && matchE.index < matchT.index) {
+        captionFirst = true;
+      }
+      content = content.replace(captionTagG, '')
     }
-    if (matchT && matchE.index < matchT.index) {
-      captionFirst = true;
-    }
-    content = content.replace(captionTagG, '')
   }
 
   state.parentType = 'paragraph';
@@ -325,12 +334,8 @@ export const BeginTable: RuleBlock = (state, startLine, endLine) => {
     ? `\\begin{${match[1]}}[h]`
     : match[0];
   StatePushPatagraphOpenTable(state, startLine, (pE > 0) ? nextLine  : nextLine + 1, type, latex, 
-    hasAlignTagG || hasAlignTagIncludeGraphicsG);
-  if (state.md.options.forLatex && hasAlignTagG) {
-    token = state.push('latex_align', '', 0);
-    token.latex = '\\centering';
-  }
-  if (captionFirst) {
+    (hasAlignTagG || hasAlignTagIncludeGraphicsG));
+  if (captionFirst && !state.md.options.forLatex) {
     StatePushCaptionTable(state, type);
   }
   if (pB > 0) {
@@ -345,7 +350,7 @@ export const BeginTable: RuleBlock = (state, startLine, endLine) => {
   content = content.trim();
   StatePushTableContent(state, startLine, nextLine, content, contentAlign, type);
 
-  if (!captionFirst) {
+  if (!captionFirst && !state.md.options.forLatex) {
     StatePushCaptionTable(state, type);
   }
   token = state.push('paragraph_close', 'div', -1);
