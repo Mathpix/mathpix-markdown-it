@@ -16,6 +16,7 @@ import { getTheoremNumberByLabel, resetTheoremEnvironments } from './md-theorem/
 import { newTheoremBlock } from './md-theorem/block-rule';
 import { newTheorem, theoremStyle, newCommandQedSymbol, labelLatex, setCounterTheorem } from './md-theorem/inline-rule';
 const isSpace = require('markdown-it/lib/common/utils').isSpace;
+import { envArraysShouldBeFlattenInTSV } from '../helpers/consts';
 
 let mathNumber = [];
 
@@ -543,7 +544,7 @@ const renderMath = (a, token, options) => {
             optionAscii: {
               showStyle: false,
               extraBrackets: true,
-              tableToTsv: token.math_env === "array",
+              tableToTsv: envArraysShouldBeFlattenInTSV.includes(token.math_env),
               tsv_separators: {...tsvSeparatorsDef}
             },
           }), 

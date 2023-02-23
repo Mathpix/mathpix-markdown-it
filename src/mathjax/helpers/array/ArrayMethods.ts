@@ -29,4 +29,25 @@ ArrayMethods.AlignedArray = function(parser: TexParser, begin: StackItem) {
   return ParseUtil.setArrayAlign(item as sitem.ArrayItem, align);
 };
 
+/**
+ * Replace the AmsMethods.AmsEqnArray method to set the name attribute which points to the environment.
+ * Used for aligned, gathered
+ * */
+ArrayMethods.AmsEqnArray = function(parser: TexParser, begin: StackItem,
+                                    numbered: boolean, taggable: boolean,
+                                    align: string, spacing: string,
+                                    style: string) {
+  const envName = begin.getName();
+  const args = parser.GetBrackets('\\begin{' + envName + '}');
+  const array: any = BaseMethods.EqnArray(parser, begin, numbered, taggable, align, spacing, style);
+  if (array.hasOwnProperty('arraydef')) {
+    array.arraydef['name'] = envName
+  } else {
+    array['arraydef'] = {
+      name: envName
+    }
+  }
+  return ParseUtil.setArrayAlign(array, args);
+};
+
 export default ArrayMethods;

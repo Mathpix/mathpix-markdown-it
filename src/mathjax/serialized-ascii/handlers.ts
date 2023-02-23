@@ -1,5 +1,6 @@
 import { MmlNode, TEXCLASS } from "mathjax-full/js/core/MmlTree/MmlNode";
 import { AMsymbols, eSymbolType } from "./helperA";
+import { envArraysShouldBeFlattenInTSV } from "../../helpers/consts";
 
 const regW: RegExp = /^\w/;
 
@@ -277,7 +278,8 @@ const mtable = () => {
           || (node.Parent.Parent.properties?.hasOwnProperty('close') && node.Parent.Parent.properties['close']));
       /** It is a matrix or system of equations with brackets */
       const isMatrixOrSystemOfEquations = thereAreBracketsIn_parent || thereAreBracketsIn_Parent;
-      const itShouldBeFlatten = envName === 'array' && !isHasBranchOpen && !isHasBranchClose && !parentIsMenclose;
+      const itShouldBeFlatten = envArraysShouldBeFlattenInTSV.includes(envName) 
+        && !isHasBranchOpen && !isHasBranchClose && !parentIsMenclose;
       /** Vertical math:
        * \begin{array}{r} and it should not be a matrix and not a system of equations */
       let isVerticalMath = columnAlign === 'right' && !isMatrixOrSystemOfEquations;
