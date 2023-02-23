@@ -34,11 +34,12 @@ module.exports = [
       { type: 'asciimath', value: '{:[" net book value "],[$]:}' }
     ]
   },
-  /** In tsv matrix and aligned should be as asciimath */
+  /** In tsv matrix as asciimath and aligned should be same as array */
   {
     latex: '\\begin{tabular}{|l|c|c|c|}\\hline & \\( \\begin{array}{c}\\text { cost } \\\\ \\$\\end{array} \\) & \\( \\begin{matrix}\\text { depreciation } \\\\ \\$\\end{matrix} \\) & \\( \\begin{aligned}\\text { net book value } \\\\ \\$\\end{aligned} \\) \\\\ \\hline non-current assets & 250000 & 95000 & 155000 \\\\ \\hline\\end{tabular}',
     tsv: '\t" cost \n' +
-      '$"\t{:[" depreciation "],[$]:}\t{:[" net book value "],[$]:}\n' +
+      '$"\t{:[" depreciation "],[$]:}\t" net book value \n' +
+      '$"\n' +
       'non-current assets\t250000\t95000\t155000',
     table_markdown: '|  | \\( \\begin{array}{c}\\text { cost } \\\\ \\$\\end{array} \\) | \\( \\begin{matrix}\\text { depreciation } \\\\ \\$\\end{matrix} \\) | \\( \\begin{aligned}\\text { net book value } \\\\ \\$\\end{aligned} \\) |\n' +
       '| :--- | :---: | :---: | :---: |\n' +
