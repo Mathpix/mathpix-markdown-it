@@ -139,7 +139,17 @@ const renderInlineTokenBlock = (tokens, options, env, slf) =>{
           if (child.ascii) {
             cell += child.ascii_tsv ? child.ascii_tsv : child.ascii;
           } else {
-            cell += child.tsv ? child.tsv.join(',') : child.content;
+            if (token.type === 'subTabular') {
+              if (token.parents?.length) {
+                cell += child.tsv ? child.tsv.join(',') : child.content;
+              } else {
+                cell += child.tsv 
+                  ? '"' + TsvJoin(child.tsv, options) + '"' 
+                  : child.content;
+              }
+            } else {
+              cell += child.tsv ? child.tsv.join(',') : child.content;
+            }
           }
 
 

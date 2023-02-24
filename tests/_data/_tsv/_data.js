@@ -725,7 +725,21 @@ module.exports = [
       '\\caption{this is the table!}\n' +
       '\\label{table:4}\n' +
       '\\end{table}',
-    tsv: '\tA\tB\nFoo\t1,2,3,4\t2,5,9,8\nBar\t1,2,3,4\t31,23,16,42',
+    tsv: '\tA\tB\n' +
+      'Foo\t"1\n' +
+      '2\n' +
+      '3\n' +
+      '4"\t"2\n' +
+      '5\n' +
+      '9\n' +
+      '8"\n' +
+      'Bar\t"1\n' +
+      '2\n' +
+      '3\n' +
+      '4"\t"31\n' +
+      '23\n' +
+      '16\n' +
+      '42"',
     html_not_tsv: '<table id="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
