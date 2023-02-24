@@ -144,10 +144,13 @@ const renderInlineTokenBlock = (tokens, options, env, slf) =>{
 
 
           if (child.type === 'link_open') {
+            cell += child.attrGet('href');
             let link = getMdLink(child, token, j);
             link = link.replace(/\|/, '\\|');
             if (link) {
               cellMd += link;
+              content += slf.renderInline([token.children[j+1]], options);
+              content += slf.renderInline([token.children[j+2]], options);
               j += 2;
               continue;
             }
@@ -171,7 +174,9 @@ const renderInlineTokenBlock = (tokens, options, env, slf) =>{
             cellMd += child.latex.replace(/\|/, '\\|');
           } else {
             if (child.type === 'image') {
-              let img = `![${child.attrGet('alt')}](${child.attrGet('src')})`;
+              const src = child.attrGet('src');
+              cell += src;
+              let img = `![${child.attrGet('alt')}](${src})`;
               img = img.replace(/\|/, '\\|');
               cellMd += img;
             } else {

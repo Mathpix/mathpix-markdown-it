@@ -1393,5 +1393,16 @@ module.exports = [
       'ReLU/CNN/MNIST (Figure 12)\t3.58\t5.74\t20.9\t636.6\t99.0\n' +
       'ReLU/CNN/CIFAR-10 (Figure 13)\t472\t72\t3046\t6226\t81.61\n' +
       'Sigmoidal/LSTM/PTB (Figure 14)\t13.9\t4.39\t86.7\t474\tcross-entropy loss:4.79'
+  },
+  {
+    latex: '\\begin{tabular}{|c|c|}\n' +
+      '\\hline Image: & ![](https://cdn.mathpix.com/cropped/2023_02_22_6fd8bab63bd5a61e0117g-15.jpg?height=454\\&width=968\\&top_left_y=293\\&top_left_x=544) \\\\\n' +
+      '\\hline Image type: & Logic circut \\\\ \\hline\n' +
+      'Link: & [This is a link to the Mathpix website](http://mathpix.com) \\\\\n' +
+      '\\hline\n' +
+      '\\end{tabular}',
+    tsv: 'Image:\thttps://cdn.mathpix.com/cropped/2023_02_22_6fd8bab63bd5a61e0117g-15.jpg?height=454&width=968&top_left_y=293&top_left_x=544\n' +
+      'Image type:\tLogic circut\n' +
+      'Link:\thttp://mathpix.com'
   }
 ];
