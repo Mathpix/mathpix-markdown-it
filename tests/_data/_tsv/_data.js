@@ -1404,5 +1404,26 @@ module.exports = [
     tsv: 'Image:\thttps://cdn.mathpix.com/cropped/2023_02_22_6fd8bab63bd5a61e0117g-15.jpg?height=454&width=968&top_left_y=293&top_left_x=544\n' +
       'Image type:\tLogic circut\n' +
       'Link:\thttp://mathpix.com'
+  },
+  {
+    latex: '\\begin{tabular}{|c|c|}\n' +
+      '\\hline Image: & {\\includegraphics[max width=\\textwidth]{https://cdn.mathpix.com/cropped/2023_02_22_6fd8bab63bd5a61e0117g-15.jpg?height=454\\&width=968\\&top_left_y=293\\&top_left_x=544}} \\\\\n' +
+      '\\hline Image type: & Logic circut \\\\ \\hline\n' +
+      'Link: & [This is a link to the Mathpix website](http://mathpix.com) \\\\\n' +
+      '\\hline\n' +
+      '\\end{tabular}',
+    tsv: 'Image:\thttps://cdn.mathpix.com/cropped/2023_02_22_6fd8bab63bd5a61e0117g-15.jpg?height=454&width=968&top_left_y=293&top_left_x=544\n' +
+      'Image type:\tLogic circut\n' +
+      'Link:\thttp://mathpix.com'
+  },
+  {
+    latex: '\\begin{tabular}{|c|c|}\n' +
+      '\\hline Image mmd: & ![](https://mañana.com/logo.jpg) \\\\\n' +
+      '\\hline Image latex: & {\\includegraphics[max width=\\textwidth]{https://mañana.com/logo.jpg}} \\\\ \\hline\n' +
+      'Link mmd: & [link mmd](https://mañana.com/logo.jpg) \\\\ \\hline\n' +
+      '\\end{tabular}',
+    tsv: 'Image mmd:\thttps://xn--maana-pta.com/logo.jpg\n' +
+      'Image latex:\thttps://xn--maana-pta.com/logo.jpg\n' +
+      'Link mmd:\thttps://xn--maana-pta.com/logo.jpg'
   }
 ];

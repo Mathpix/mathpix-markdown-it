@@ -149,9 +149,14 @@ const renderInlineTokenBlock = (tokens, options, env, slf) =>{
             link = link.replace(/\|/, '\\|');
             if (link) {
               cellMd += link;
-              content += slf.renderInline([token.children[j+1]], options);
-              content += slf.renderInline([token.children[j+2]], options);
-              j += 2;
+              if ((j + 1) < token.children.length) {
+                content += slf.renderInline([token.children[j+1]], options);
+                j++;
+              }
+              if ((j + 2) < token.children.length) {
+                content += slf.renderInline([token.children[j+2]], options);
+                j++;
+              }
               continue;
             }
           }
@@ -173,7 +178,7 @@ const renderInlineTokenBlock = (tokens, options, env, slf) =>{
             }
             cellMd += child.latex.replace(/\|/, '\\|');
           } else {
-            if (child.type === 'image') {
+            if (child.type === 'image' || child.type === 'includegraphics') {
               const src = child.attrGet('src');
               cell += src;
               let img = `![${child.attrGet('alt')}](${src})`;
