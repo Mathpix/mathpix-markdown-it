@@ -1439,5 +1439,60 @@ module.exports = [
     tsv: 'Image mmd:\thttps://xn--maana-pta.com/logo.jpg\n' +
       'Image latex:\thttps://xn--maana-pta.com/logo.jpg\n' +
       'Link mmd:\thttps://xn--maana-pta.com/logo.jpg'
+  },
+  {
+    latex: '\\begin{tabular}{|c|c|}\n' +
+      '\\hline \\begin{tabular}{l} Text \\\\ More text\\end{tabular} & 1 \\\\\n' +
+      '\\hline 2 & 2 \\\\\n' +
+      '\\hline\n' +
+      '\\end{tabular}',
+    tsv: '"Text\n' +
+      'More text"\t1\n' +
+      '2\t2'
+  },
+  {
+    latex: '\\begin{tabular}{|c|c|}\n' +
+      '\\hline \\begin{tabular}{l} Text \\\\ More text\\end{tabular} & 1 \\\\\n' +
+      '\\hline \\begin{tabular}{l} \\begin{tabular}{l} \\begin{tabular}{l} Text \\\\ More text\\end{tabular} \\\\ More text\\end{tabular}  \\\\ More text\\end{tabular}  & 2 \\\\\n' +
+      '\\hline\n' +
+      '\\end{tabular}',
+    tsv: '"Text\n' +
+      'More text"\t1\n' +
+      '"Text,More text,More text\n' +
+      'More text"\t2'
+  },
+  {
+    latex: '\\begin{tabular}{|c|c|} \\hline  \n' +
+      'mt1 & \\begin{tabular}{|l|} \\hline  t1 \\\\ \\hline t2 \\\\ \\hline \\end{tabular} \\\\ \\hline \n' +
+      'mt3 & mt4 \\\\ \\hline \n' +
+      '\\end{tabular}',
+    tsv: 'mt1\t"t1\n' +
+      't2"\n' +
+      'mt3\tmt4'
+  },
+  {
+    latex: '\\begin{tabular}{|c|c|} \\hline  \n' +
+      '\\begin{array}{l} a1 \\\\ a2 \\end{array} & \\begin{tabular}{|l|} \\hline  t1 \\\\ \\hline t2 \\\\ \\hline \\end{tabular} \\\\ \\hline \n' +
+      '\\begin{tabular}{|l|l|} \\hline  t1 & t2 \\\\ \\hline t3 & t4 \\\\ \\hline \\end{tabular} & mt4 \\\\ \\hline \n' +
+      '\\end{tabular}',
+    tsv: '"a1\n' +
+      'a2"\t"t1\n' +
+      't2"\n' +
+      '"t1\tt2\n' +
+      't3\tt4"\tmt4'
+  },
+  {
+    latex: '\\begin{tabular}{|c|c|} \\hline  \n' +
+      '\\begin{array}{l} a1 \\\\ a2 \\end{array} \n' +
+      '& \\begin{tabular}{|l|} \\hline  t1 \\\\ \\hline t2 \\\\ \\hline \\end{tabular} \\\\ \\hline \n' +
+      '\\begin{tabular}{|l|l|} \\hline  t1 & t2 \\\\ \\hline t3 & t4 \\\\ \\hline \\end{tabular} \n' +
+      '& \\begin{array}{l} a1 & a2 \\\\ a3 & a4 \\end{array} \\\\ \\hline \n' +
+      '\\end{tabular}',
+    tsv: '"a1\n' +
+      'a2"\t"t1\n' +
+      't2"\n' +
+      '"t1\tt2\n' +
+      't3\tt4"\t"a1\ta2\n' +
+      'a3\ta4"'
   }
 ];
