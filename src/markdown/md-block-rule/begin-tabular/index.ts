@@ -227,11 +227,12 @@ export const StatePushTabularBlock = (state, startLine: number, nextLine: number
 };
 
 export const BeginTabular: RuleBlock = (state, startLine: number, endLine: number) => {
-  const openTag: RegExp = /\\begin\s{0,}{tabular}/;
   const closeTag: RegExp = /\\end\s{0,}{tabular}/;
   let pos: number = state.bMarks[startLine] + state.tShift[startLine];
   let max: number = state.eMarks[startLine];
   let nextLine: number = startLine + 1;
+  let matchOpenG = null;
+  let matchCloseG = null;
 
   let lineText: string = state.src.slice(pos, max);
   if (lineText.charCodeAt(0) !== 0x5c /* \ */) {
@@ -239,8 +240,10 @@ export const BeginTabular: RuleBlock = (state, startLine: number, endLine: numbe
   }
 
   let resString: string = '';
-  let iOpen: number = openTag.test(lineText) ? 1 : 0;
+  matchOpenG = lineText.match(openTagG);
+  let iOpen: number = matchOpenG?.length ? matchOpenG.length : 0;
   if (!iOpen) return false;
+  
 
 
   if (iOpen > 0) {
@@ -252,13 +255,16 @@ export const BeginTabular: RuleBlock = (state, startLine: number, endLine: numbe
       }
     }
     if (closeTag.test(lineText)) {
-      if (lineText.match(openTagG).length === lineText.match(closeTagG).length) {
-        iOpen--;
+      matchCloseG = lineText.match(closeTagG);
+      if (matchCloseG?.length) {
+        iOpen -= matchCloseG.length;
       }
     }
   }
 
   for (; nextLine <= endLine; nextLine++) {
+    matchOpenG = null;
+    matchCloseG = null;
     if (lineText === '') {
       if (iOpen === 0) {
         break;
@@ -269,8 +275,9 @@ export const BeginTabular: RuleBlock = (state, startLine: number, endLine: numbe
     lineText = state.src.slice(pos, max);
 
     if (iOpen > 0) {
-      if (closeTag.test(lineText)) {
-        iOpen--;
+      matchCloseG = lineText.match(closeTagG);
+      if (matchCloseG?.length) {
+        iOpen -= matchCloseG.length;
       }
     } else {
       lineText += '\n';
@@ -279,9 +286,9 @@ export const BeginTabular: RuleBlock = (state, startLine: number, endLine: numbe
     }
 
     resString += '\n' + lineText;
-
-    if (openTag.test(lineText)) {
-      iOpen++;
+    matchOpenG = lineText.match(openTagG);
+    if (matchOpenG?.length) {
+      iOpen += matchOpenG.length;
     }
     // this would be a code block normally, but after paragraph
     // it's considered a lazy continuation regardless of what's there
