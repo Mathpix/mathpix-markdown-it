@@ -28,6 +28,7 @@ import {
 
 import { ISmilesOptions } from './markdown/md-chemistry';
 import { resetTheoremEnvironments } from './markdown/md-theorem/helper';
+import { normalizeLink } from './helpers/normalize-link';
 
 export {
   MathpixLoader, MathpixMarkdown, MathpixMarkdownModel,
@@ -37,6 +38,7 @@ export {
   TMarkdownItOptions, optionsMathpixMarkdown, TOutputMath, TOutputMathJax, THtmlSanitize,
   ISmilesOptions,
   resetTheoremEnvironments,
-  TTocStyle
+  TTocStyle,
+  normalizeLink
 };
 
