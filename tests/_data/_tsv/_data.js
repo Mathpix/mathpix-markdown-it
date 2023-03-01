@@ -1494,5 +1494,100 @@ module.exports = [
       '"t1\tt2\n' +
       't3\tt4"\t"a1\ta2\n' +
       'a3\ta4"'
+  },
+  {
+    latex: '\\begin{tabular}{|c|c|} \\hline  \n' +
+      'mt1 & \n' +
+      '\\begin{tabular}{|l|} \\hline math \\begin{array}{l} na1 \\\\ na2 \\end{array} \\\\ \\hline t2 \\\\ \\hline \\end{tabular} \n' +
+      '\\\\ \\hline \n' +
+      '\\begin{tabular}{|l|l|} \\hline  t1 & t2 \\\\ \\hline t3 & t4 \\\\ \\hline \\end{tabular} & mt4 \\\\ \\hline \n' +
+      '\\end{tabular}',
+    tsv: 'mt1\t"math na1, na2\n' +
+      't2"\n' +
+      '"t1\tt2\n' +
+      't3\tt4"\tmt4'
+  },
+  {
+    latex: '\\begin{tabular}{ |l|l|l| }\n' +
+      '\\hline\n' +
+      '\\multicolumn{3}{ |c| }{\\begin{tabular}{|l|} \\hline  t1 \\\\ \\hline t2 \\\\ \\hline \\end{tabular}} \\\\\n' +
+      '\\hline\n' +
+      'cell1 & cell2 & cell3 \\\\\n' +
+      '\\hline\n' +
+      '\\end{tabular}',
+    tsv: '"t1\n' +
+      't2"\t\t\n' +
+      'cell1\tcell2\tcell3'
+  },
+  {
+    latex: '\\begin{tabular}{ |l|l|l| }\n' +
+      '\\hline\n' +
+      '\\multicolumn{3}{ |c| }{\\begin{array}{l} a1 & a2 \\\\ a3 & a4 \\end{array}} \\\\\n' +
+      '\\hline\n' +
+      'cell1 & cell2 & cell3 \\\\\n' +
+      '\\hline\n' +
+      '\\end{tabular}',
+    tsv: '"a1\ta2\n' +
+      'a3\ta4"\t\t\n' +
+      'cell1\tcell2\tcell3'
+  },
+  {
+    latex: '\\begin{tabular}{ |l|l|l| }\n' +
+      '\\hline\n' +
+      '\\multicolumn{3}{ |c| }{\\begin{tabular}{|l|} \\hline  t1 \\\\ \\hline \\begin{array}{l} a1 & a2 \\\\ a3 & a4 \\end{array} \\\\ \\hline \\end{tabular}} \\\\\n' +
+      '\\hline\n' +
+      'cell1 & cell2 & cell3 \\\\\n' +
+      '\\hline\n' +
+      '\\end{tabular}',
+    tsv: '"t1\n' +
+      'a1, a2, a3, a4"\t\t\n' +
+      'cell1\tcell2\tcell3'
+  },
+  {
+    latex: '\\begin{tabular}{ |l|l|l| }\n' +
+      '\\hline\n' +
+      '\\multicolumn{3}{ |c| }{\\begin{tabular}{|l|} \\hline  t1 \\\\ \\hline \\begin{tabular}{|l|l|} \\hline  t1 & t2 \\\\ \\hline t3 & t4 \\\\ \\hline \\end{tabular} \\\\ \\hline \\end{tabular}} \\\\\n' +
+      '\\hline\n' +
+      'cell1 & cell2 & cell3 \\\\\n' +
+      '\\hline\n' +
+      '\\end{tabular}',
+    tsv: '"t1\n' +
+      't1,t2,t3,t4"\t\t\n' +
+      'cell1\tcell2\tcell3'
+  },
+  {
+    latex: '\\begin{tabular}{ |l|l|l| }\n' +
+      '\\hline\n' +
+      '\\multicolumn{3}{ |c| }{\\begin{tabular}{|l|} \\hline  t1 \\\\ \\hline \\begin{tabular}{|l|} \\hline  t1 \\\\ \\hline t2 \\\\ \\hline \\end{tabular} \\\\ \\hline \\end{tabular}} \\\\\n' +
+      '\\hline\n' +
+      'Goalkeeper & GK & Paul Robinson \\\\ \\hline\n' +
+      '\\multirow{4}{*}{\\begin{tabular}{|l|} \\hline  t1 \\\\ \\hline t2 \\\\ \\hline \\end{tabular}} & LB & Lucas Radebe \\\\\n' +
+      ' & DC & Michael Duburry \\\\\n' +
+      ' & DC & Dominic Matteo \\\\\n' +
+      ' & RB & Didier Domi \\\\ \\hline\n' +
+      '\\multirow{3}{*}{\\begin{array}{l} a1 & a2 \\\\ a3 & a4 \\end{array}} & MC & David Batty \\\\\n' +
+      ' & MC & Eirik Bakke \\\\\n' +
+      ' & MC & Jody Morris \\\\ \\hline\n' +
+      'Forward & FW & Jamie McMaster \\\\ \\hline\n' +
+      '\\multirow{2}{*}{\\begin{tabular}{|l|} \\hline  t1 \\\\ \\hline \\begin{array}{l} a1 & a2 \\\\ a3 & a4 \\end{array} \\\\ \\hline \\end{tabular}} & ST & Alan Smith \\\\\n' +
+      ' & ST & Mark Viduka \\\\\n' +
+      '\\hline\n' +
+      '\\end{tabular}',
+    tsv: '"t1\n' +
+      't1,t2"\t\t\n' +
+      'Goalkeeper\tGK\tPaul Robinson\n' +
+      '"t1\n' +
+      't2"\tLB\tLucas Radebe\n' +
+      '\tDC\tMichael Duburry\n' +
+      '\tDC\tDominic Matteo\n' +
+      '\tRB\tDidier Domi\n' +
+      '"a1\ta2\n' +
+      'a3\ta4"\tMC\tDavid Batty\n' +
+      '\tMC\tEirik Bakke\n' +
+      '\tMC\tJody Morris\n' +
+      'Forward\tFW\tJamie McMaster\n' +
+      '"t1\n' +
+      'a1, a2, a3, a4"\tST\tAlan Smith\n' +
+      '\tST\tMark Viduka'
   }
 ];

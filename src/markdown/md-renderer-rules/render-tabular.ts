@@ -13,7 +13,7 @@ const tokenAttrGet = (token, name) => {
   return token.attrs[index][1]
 };
 
-const renderInlineTokenBlock = (tokens, options, env, slf) =>{
+const renderInlineTokenBlock = (tokens, options, env, slf, isSubTable = false) =>{
   let nextToken,
     result = '',
     needLf = false;
@@ -134,7 +134,9 @@ const renderInlineTokenBlock = (tokens, options, env, slf) =>{
         for (let j = 0; j < token.children.length; j++) {
           const child = token.children[j];
           // console.log('[child]=>', child);
-
+          if (child.type === "tabular_inline" || isSubTable) {
+            child.isSubTable = true;
+          }
           content += slf.renderInline([child], options);
           if (child.ascii) {
             cell += child.ascii_tsv ? child.ascii_tsv : child.ascii;
@@ -261,7 +263,7 @@ export const renderTabularInline = (a, token, options, env, slf) => {
   if (!include_tsv && !include_table_html && !include_table_markdown) {
     return ''
   }
-  const data = renderInlineTokenBlock(token.children, options, env, slf);
+  const data = renderInlineTokenBlock(token.children, options, env, slf, token.isSubTable);
   token.tsv = data.tsv;
   token.tableMd = data.tableMd;//tableMarkdownJoin(data.tableMd, data.align);
 
