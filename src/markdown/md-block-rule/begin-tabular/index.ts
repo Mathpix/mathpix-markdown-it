@@ -253,6 +253,11 @@ export const BeginTabular: RuleBlock = (state, startLine: number, endLine: numbe
     if (lineText === '') {
       if (iOpen === 0) {
         break;
+      } 
+      else {
+        if (pending) {
+          break;
+        }
       }
     }
     pos = state.bMarks[nextLine] + state.tShift[nextLine];

@@ -207,5 +207,45 @@ col1 & col2 & col3 \\\\\\hline
 </tbody>
 </table>
 </div></div>`
+  },
+  {
+    latex: `\\begin{tabular}{|l|l|} \\hline  \`\\begin{tabular}{|l|}\` & open tabular
+\\\\ \\hline 
+t1 & t2
+\\\\ \\hline \\end{tabular}`,
+    svg: `<div class="table_tabular " style="text-align: center">
+<div class="inline-tabular"><table id="tabular">
+<tbody>
+<tr style="border-top: none !important; border-bottom: none !important;">
+<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; "><code>\\begin{tabular}{|l|}</code></td>
+<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; ">open tabular</td>
+</tr>
+<tr style="border-top: none !important; border-bottom: none !important;">
+<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">t1</td>
+<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">t2</td>
+</tr>
+</tbody>
+</table>
+</div></div>`
+  },
+  {
+    latex: `\\begin{tabular}{|l|l|} \\hline  \`\\end{tabular}\` & close tabular
+\\\\ \\hline 
+t1 & t2
+\\\\ \\hline \\end{tabular}`,
+    svg: `<div class="table_tabular " style="text-align: center">
+<div class="inline-tabular"><table id="tabular">
+<tbody>
+<tr style="border-top: none !important; border-bottom: none !important;">
+<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; "><code>\\end{tabular}</code></td>
+<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; ">close tabular</td>
+</tr>
+<tr style="border-top: none !important; border-bottom: none !important;">
+<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">t1</td>
+<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">t2</td>
+</tr>
+</tbody>
+</table>
+</div></div>`
   }
 ];
