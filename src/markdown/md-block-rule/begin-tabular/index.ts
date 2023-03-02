@@ -4,6 +4,8 @@ import { pushError, CheckParseError } from '../parse-error';
 import { getParams } from './common';
 import {StatePushIncludeGraphics} from "../../md-inline-rule/includegraphics";
 import { getSubCode, codeInlineContent } from "./sub-code";
+import { findOpenCloseTags } from "../../utils";
+import { openTagTabular, closeTagTabular } from "../../common/consts";
 
 export const openTag: RegExp = /(?:\\begin\s{0,}{tabular}\s{0,}\{([^}]*)\})/;
 export const openTagG: RegExp = /(?:\\begin\s{0,}{tabular}\s{0,}\{([^}]*)\})/g;
@@ -227,44 +229,27 @@ export const StatePushTabularBlock = (state, startLine: number, nextLine: number
 };
 
 export const BeginTabular: RuleBlock = (state, startLine: number, endLine: number) => {
-  const closeTag: RegExp = /\\end\s{0,}{tabular}/;
   let pos: number = state.bMarks[startLine] + state.tShift[startLine];
   let max: number = state.eMarks[startLine];
   let nextLine: number = startLine + 1;
-  let matchOpenG = null;
-  let matchCloseG = null;
 
   let lineText: string = state.src.slice(pos, max);
   if (lineText.charCodeAt(0) !== 0x5c /* \ */) {
     return false;
   }
-
-  let resString: string = '';
-  matchOpenG = lineText.match(openTagG);
-  let iOpen: number = matchOpenG?.length ? matchOpenG.length : 0;
-  if (!iOpen) return false;
-  
-
-
-  if (iOpen > 0) {
-    const match: RegExpMatchArray = lineText.match(/(?:\\begin\s{0,}{tabular})/);
-    if (match) {
-      resString += lineText;
-      if (match.index > 0 && lineText.charCodeAt(match.index-1) === 0x60) {
-        return false;
-      }
-    }
-    if (closeTag.test(lineText)) {
-      matchCloseG = lineText.match(closeTagG);
-      if (matchCloseG?.length) {
-        iOpen -= matchCloseG.length;
-      }
-    }
+  let dataTags = findOpenCloseTags(lineText, openTagTabular, closeTagTabular);
+  let pending = dataTags?.pending ? dataTags.pending : '';
+  if (!dataTags?.arrOpen?.length) {
+    return false;
+  }
+  let iOpen: number = dataTags.arrOpen.length;
+  let resString: string = lineText;
+  if (dataTags?.arrClose?.length) {
+    iOpen -= dataTags.arrClose.length;
   }
 
   for (; nextLine <= endLine; nextLine++) {
-    matchOpenG = null;
-    matchCloseG = null;
+    dataTags = null;
     if (lineText === '') {
       if (iOpen === 0) {
         break;
@@ -275,9 +260,13 @@ export const BeginTabular: RuleBlock = (state, startLine: number, endLine: numbe
     lineText = state.src.slice(pos, max);
 
     if (iOpen > 0) {
-      matchCloseG = lineText.match(closeTagG);
-      if (matchCloseG?.length) {
-        iOpen -= matchCloseG.length;
+      dataTags = findOpenCloseTags(lineText, openTagTabular, closeTagTabular, pending);
+      pending = dataTags?.pending;
+      if (dataTags?.arrOpen?.length) {
+        iOpen += dataTags.arrOpen.length;
+      }      
+      if (dataTags?.arrClose?.length) {
+        iOpen -= dataTags.arrClose.length;
       }
     } else {
       lineText += '\n';
@@ -286,12 +275,6 @@ export const BeginTabular: RuleBlock = (state, startLine: number, endLine: numbe
     }
 
     resString += '\n' + lineText;
-    matchOpenG = lineText.match(openTagG);
-    if (matchOpenG?.length) {
-      iOpen += matchOpenG.length;
-    }
-    // this would be a code block normally, but after paragraph
-    // it's considered a lazy continuation regardless of what's there
     if (state.sCount[nextLine] - state.blkIndent > 3) { continue; }
 
     // quirk for blockquotes, this line should already be checked by that rule

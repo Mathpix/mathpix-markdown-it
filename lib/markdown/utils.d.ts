@@ -9,3 +9,24 @@ export declare const arraysCompare: (a1: any, a2: any) => any;
 export declare const arrayDelElement: (arr: any, el: any) => any;
 export declare const arrayResortFromElement: (arr: any, el: any, notReverse?: boolean, nextEl?: number) => any[];
 export declare const uid: () => string;
+export declare const findBackTick: (posStart: number, str: string, pending?: string) => {
+    marker: string;
+    posEnd: number;
+    content?: undefined;
+    pending?: undefined;
+} | {
+    marker: string;
+    content: string;
+    posEnd: any;
+    pending?: undefined;
+} | {
+    marker: string;
+    posEnd: number;
+    pending: string;
+    content?: undefined;
+};
+export declare const findOpenCloseTags: (str: string, tagOpen: any, tagClose: any, pendingBackTick?: string) => {
+    arrOpen: any[];
+    arrClose: any[];
+    pending: string;
+};
