@@ -198,3 +198,116 @@ export const uid = () => {
   return Date.now().toString(36)
     + Math.random().toString(36).substr(2);
 };
+
+export const findBackTick = (posStart: number, str: string, pending = '') => {
+  let pos = posStart;
+  let matchStart, matchEnd;
+  let max = str.length;
+  let ch = str.charCodeAt(pos);
+  if (ch !== 0x60/* ` */) { return null;}
+  let start = pos;
+  pos++;
+
+  while (pos < max && str.charCodeAt(pos) === 0x60/* ` */) { pos++; }
+
+  let marker = str.slice(start, pos);
+  if (pending === marker) {
+    return {
+      marker: marker,
+      posEnd: pos
+    }
+  }
+  matchStart = matchEnd = pos;
+
+  while ((matchStart = str.indexOf('`', matchEnd)) !== -1) {
+    matchEnd = matchStart + 1;
+
+    while (matchEnd < max && str.charCodeAt(matchEnd) === 0x60/* ` */) { matchEnd++; }
+
+    if (matchEnd - matchStart === marker.length) {
+      let content = str.slice(pos, matchStart)
+        .replace(/\n/g, ' ')
+        .replace(/^ (.+) $/, '$1');
+      let posEnd = matchEnd;
+      return {
+        marker: marker,
+        content: content,
+        posEnd: posEnd
+      }
+    }
+  }
+
+  let posEnd = posStart + marker.length;
+  return {
+    marker: marker,
+    posEnd: posEnd,
+    pending: marker
+  }
+};
+
+export const findOpenCloseTags = (str: string, tagOpen, tagClose, pendingBackTick = '') => {
+  let max = str.length;
+  let arrOpen = [];
+  let arrClose = [];
+  let pending = '';
+  let posStart = 0;
+  if (pendingBackTick) {
+    const index = str.indexOf(pendingBackTick);
+    if (index === -1) {
+      return {
+        arrOpen: arrOpen,
+        arrClose: arrClose,
+        pending: pendingBackTick
+      }
+    }
+    posStart = index + 1;
+    pendingBackTick = '';
+  }
+
+  for (let pos = posStart; pos < max; pos++) {
+    let ch = str.charCodeAt(pos);
+    if (ch === 0x60/* ` */) {
+      const data = findBackTick(pos, str, pendingBackTick);
+      if (data) {
+        if (data.pending) {
+          pending = data.pending;
+          break;
+        }
+        pos = data.posEnd;
+        continue;
+      }
+    }
+    if (str.charCodeAt(pos) === 0x5c /* \ */) {
+      let match: RegExpMatchArray = str
+        .slice(pos)
+        .match(tagOpen);
+      if (match) {
+        let posEnd = pos + match[0].length;
+        arrOpen.push({
+          posStart: pos + match.index,
+          content: match[0],
+          posEnd: posEnd
+        });
+        pos = posEnd
+      } else {
+        match = str
+          .slice(pos)
+          .match(tagClose);
+        if (match) {
+          let posEnd = pos + match[0].length;
+          arrClose.push({
+            posStart: pos + match.index,
+            content: match[0],
+            posEnd: posEnd
+          });
+          pos = posEnd
+        }
+      }
+    }
+  }
+  return {
+    arrOpen: arrOpen,
+    arrClose: arrClose,
+    pending: pending
+  }
+};

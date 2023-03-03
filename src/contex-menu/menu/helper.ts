@@ -130,19 +130,16 @@ export const findClassInElement = (el, classNamesList): string => {
   return className;
 };
 
-export const clickInsideElement = (e, classNamesList) => {
+export const clickInsideElement = (e, classNamesList, isMenuItem = true) => {
   let el = e.target;
-  let className = findClassInElement(el, classNamesList);
+  let className = isMenuItem ? findClassInElement(el, classNamesList) : '';
   if (className) {
-    return className === 'MathJax' ? el.parentNode : el;
+    return el;
   } else {
     let elParent = null;
     while (el = el.parentNode) {
       className = findClassInElement(el, classNamesList);
       if (className) {
-        if (className === 'inline-tabular') {
-          return el;
-        }
         elParent = className === 'MathJax' ? el.parentNode : el;
       }
     }

@@ -545,6 +545,7 @@ const renderMath = (a, token, options) => {
               showStyle: false,
               extraBrackets: true,
               tableToTsv: envArraysShouldBeFlattenInTSV.includes(token.math_env),
+              isSubTable: token.isSubTable,
               tsv_separators: {...tsvSeparatorsDef}
             },
           }), 

@@ -262,7 +262,7 @@ const mtable = () => {
       const isSubExpression = node.parent?.texClass === TEXCLASS.INNER;
       const parentIsMenclose = node.Parent?.kind === 'menclose';
       const countRow = node.childNodes.length;
-      const toTsv = serialize.options.tableToTsv 
+      const toTsv = serialize.options.tableToTsv && !serialize.options.isSubTable
         && (node.Parent?.kind === 'math' || (parentIsMenclose && node.Parent.Parent?.kind === 'math'));
       node.attributes.setInherited('toTsv', toTsv);  
       const columnAlign = node.attributes.get('columnalign');
