@@ -1,4 +1,5 @@
-export declare const endTag: (arg: string) => RegExp;
+export declare const endTag: (arg: string, shouldBeFirst?: boolean) => RegExp;
+export declare const beginTag: (arg: string, shouldBeFirst?: boolean) => RegExp;
 export declare const getTextWidth: () => number;
 export declare const getWidthFromDocument: (cwidth?: number) => number;
 export declare const isNotBackticked: (str: string, tag: string) => boolean;
@@ -29,4 +30,12 @@ export declare const findOpenCloseTags: (str: string, tagOpen: any, tagClose: an
     arrOpen: any[];
     arrClose: any[];
     pending: string;
+};
+/** To search for start and end markers in the entire string.
+ * The search stops if the end of the string is reached
+ * or the number of end markers is equal to the number of start markers
+ * */
+export declare const findOpenCloseTagsMathEnvironment: (str: string, tagOpen: RegExp, tagClose: RegExp) => {
+    arrOpen: any[];
+    arrClose: any[];
 };
