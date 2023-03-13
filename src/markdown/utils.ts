@@ -322,9 +322,9 @@ export const findOpenCloseTags = (str: string, tagOpen, tagClose, pendingBackTic
 
 /** To search for start and end markers in the entire string.
  * The search stops if the end of the string is reached 
- * or the number of end markers is equal to the number of start markers
+ * or if the number of end markers is equal to the number of start markers (for inline parser only isInline = true)
  * */
-export const findOpenCloseTagsMathEnvironment = (str: string, tagOpen: RegExp, tagClose: RegExp) => {
+export const findOpenCloseTagsMathEnvironment = (str: string, tagOpen: RegExp, tagClose: RegExp, isInline = true) => {
   let max = str.length;
   let arrOpen = [];
   let arrClose = [];
@@ -353,7 +353,7 @@ export const findOpenCloseTagsMathEnvironment = (str: string, tagOpen: RegExp, t
             content: match[0],
             posEnd: posEnd
           });
-          if (arrClose.length === arrOpen?.length) {
+          if (isInline && arrClose.length === arrOpen?.length) {
             break;
           }
           pos = posEnd - 1;
