@@ -6,7 +6,9 @@ import {
   includesSimpleMathTag,
   includesMultiMathTag,
   includesMultiMathBeginTag,
-  getWidthFromDocument
+  getWidthFromDocument,
+  findOpenCloseTagsMathEnvironment,
+  beginTag, endTag
 } from './utils';
 import { openTagMML, closeTagMML, tsvSeparatorsDef } from './common/consts';
 import { imageWithSize, renderRuleImage } from './md-inline-rule/image';
@@ -188,6 +190,7 @@ function multiMath(state, silent) {
   let type, endMarker, includeMarkers; // eslint-disable-line
   let addParentheses = false;
   let math_env = '';
+  let endMarkerPos = -1;
   if (match[0] === "\\[") {
     type = "display_math";
     endMarker = "\\\\]";
@@ -215,10 +218,19 @@ function multiMath(state, silent) {
       type = "equation_math";
     }
     endMarker = `\\end{${match[1]}}`;
+    const environment = match[1].trim();
+    const openTag: RegExp = beginTag(environment, true);
+    const closeTag: RegExp = endTag(environment, true);
+    const data = findOpenCloseTagsMathEnvironment(state.src.slice(state.pos), openTag, closeTag);
+    if (data?.arrClose?.length) {
+      endMarkerPos = state.pos + data.arrClose[data.arrClose.length - 1]?.posStart;
+    }
     includeMarkers = true;
   }
 
-  const endMarkerPos = state.src.indexOf(endMarker, startMathPos);
+  endMarkerPos = endMarkerPos !== -1 
+    ? endMarkerPos 
+    : state.src.indexOf(endMarker, startMathPos);
   if (endMarkerPos === -1) {
     return false;
   }

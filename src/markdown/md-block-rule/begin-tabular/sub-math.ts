@@ -1,5 +1,6 @@
 import { getContent } from './common';
 import {findEndMarkerPos} from "../../mdPluginRaw";
+import { beginTag, endTag, findOpenCloseTagsMathEnvironment } from "../../utils";
 
 type TSubMath = {id: string, content: string}
 var mathTable: Array<TSubMath> = [];
@@ -36,6 +37,7 @@ export const getSubMath = (str: string, startPos = 0): string => {
   const match: RegExpMatchArray = str
     .slice(startPos)
     .match(/(?:\\\\\[|\\\[|\\\\\(|\\\(|\$\$|\$|\\begin\{([^}]*)\}|eqref\{([^}]*)\}|ref\{([^}]*)\})/);
+  let endMarkerPos = -1;
   if (match) {
     let beginMarkerPos: number = startPos + match.index;
     let startMathPos: number = beginMarkerPos + match[0].length;
@@ -53,13 +55,22 @@ export const getSubMath = (str: string, startPos = 0): string => {
     } else if (match[0].includes("ref")) {
       endMarker = "";
     } else if (match[1] && match[1] !== 'abstract' && match[1] !== 'tabular') {
+      const environment = match[1].trim();
+      const openTag: RegExp = beginTag(environment, true);
+      const closeTag: RegExp = endTag(environment, true);
+      const data = findOpenCloseTagsMathEnvironment(str.slice(startPos), openTag, closeTag);
+      if (data?.arrClose?.length) {
+        endMarkerPos = startPos + data.arrClose[data.arrClose.length - 1]?.posStart;
+      }
       endMarker = `\\end{${match[1]}}`;
     } else if (match[0] === "$$") {
       endMarker = match[0];
     } else if (match[0] === "$") {
       endMarker = match[0];
     }
-    const endMarkerPos = findEndMarkerPos(str, endMarker, startMathPos);
+    endMarkerPos = endMarkerPos !== -1 
+      ? endMarkerPos 
+      : findEndMarkerPos(str, endMarker, startMathPos);
     if (endMarkerPos === -1) {
       /** If the end marker is not found, it is necessary to search further, excluding the current marker. */
       str = getSubMath(str, startMathPos);

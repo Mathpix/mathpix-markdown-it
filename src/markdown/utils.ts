@@ -1,5 +1,13 @@
-export const endTag = (arg: string): RegExp  => {
-  return new RegExp('\\\\end\s{0,}\{(' + arg + ')\}')
+export const endTag = (arg: string, shouldBeFirst = false): RegExp  => {
+  return shouldBeFirst 
+    ? new RegExp('^\\\\end\s{0,}\{(' + arg + ')\}') 
+    : new RegExp('\\\\end\s{0,}\{(' + arg + ')\}')
+};
+
+export const beginTag = (arg: string, shouldBeFirst = false): RegExp  => {
+  return shouldBeFirst 
+    ? new RegExp('^\\\\begin\s{0,}\{(' + arg + ')\}') 
+    : new RegExp('\\\\begin\s{0,}\{(' + arg + ')\}')
 };
 
 export const getTextWidth = (): number => {
@@ -309,5 +317,52 @@ export const findOpenCloseTags = (str: string, tagOpen, tagClose, pendingBackTic
     arrOpen: arrOpen,
     arrClose: arrClose,
     pending: pending
+  }
+};
+
+/** To search for start and end markers in the entire string.
+ * The search stops if the end of the string is reached 
+ * or if the number of end markers is equal to the number of start markers (for inline parser only isInline = true)
+ * */
+export const findOpenCloseTagsMathEnvironment = (str: string, tagOpen: RegExp, tagClose: RegExp, isInline = true) => {
+  let max = str.length;
+  let arrOpen = [];
+  let arrClose = [];
+  let posStart = 0;
+  for (let pos = posStart; pos < max; pos++) {
+    if (str.charCodeAt(pos) === 0x5c /* \ */) {
+      let match: RegExpMatchArray = str
+        .slice(pos)
+        .match(tagOpen);
+      if (match) {
+        let posEnd = pos + match[0].length;
+        arrOpen.push({
+          posStart: pos + match.index,
+          content: match[0],
+          posEnd: posEnd
+        });
+        pos = posEnd - 1;
+      } else {
+        match = str
+          .slice(pos)
+          .match(tagClose);
+        if (match) {
+          let posEnd = pos + match[0].length;
+          arrClose.push({
+            posStart: pos + match.index,
+            content: match[0],
+            posEnd: posEnd
+          });
+          if (isInline && arrClose.length === arrOpen?.length) {
+            break;
+          }
+          pos = posEnd - 1;
+        }
+      }
+    }
+  }
+  return {
+    arrOpen: arrOpen,
+    arrClose: arrClose,
   }
 };
