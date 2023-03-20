@@ -129,7 +129,7 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}): A
 
 
       if (cells[j] && cells[j].trim().length > 0) {
-        const multi = getMultiColumnMultiRow(cells[j], {lLines: cLines[ic], align: cAlign[ic], rLines: cRight});
+        const multi = getMultiColumnMultiRow(cells[j], {lLines: cLines[ic], align: cAlign[ic], rLines: cRight}, forLatex);
         if (multi) {
           let mr = multi.mr > rows.length ? rows.length : multi.mr;
           let mc = multi.mc > numCol ? numCol : multi.mc;
@@ -233,7 +233,7 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}): A
         }
 
 
-        const parseSub = getSubTabular(cells[j], 0);
+        const parseSub = getSubTabular(cells[j], 0, true, forLatex);
         if (parseSub && parseSub.length > 0) {
           res = res.concat(AddTdSubTable(parseSub,
             {h: cAlign[ic], v: vAlign[ic], w: cWidth[ic]},

@@ -6,7 +6,7 @@ import { chooseItem, clearActiveItem } from "./menu/menu-item-actions";
 let isCloseByTouchStart = false;
 
 const handleContextMenu = (e) => {
-  let mmdEl = clickInsideElement(e, mmdClassesForContextMenu);
+  let mmdEl = clickInsideElement(e, mmdClassesForContextMenu, false);
   if (mmdEl) {
     e.preventDefault();
     toggleMenuOn(mmdEl, e);
@@ -28,7 +28,7 @@ export const handleTouchStart = (e) => {
 
 export const handleClick = (e) => {
   if ("ontouchstart" in document.documentElement) {
-    let mmdEl = clickInsideElement(e, mmdClassesForContextMenu);
+    let mmdEl = clickInsideElement(e, mmdClassesForContextMenu, false);
     if (mmdEl) {
       if (isCloseByTouchStart) {
         isCloseByTouchStart = false;

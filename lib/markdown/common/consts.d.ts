@@ -30,6 +30,8 @@ export declare const reAddContentsLine: RegExp;
 export declare const reAddContentsLineG: RegExp;
 export declare const reMultiRowWithVPos: RegExp;
 export declare const reMultiRow: RegExp;
+export declare const openTagTabular: RegExp;
+export declare const closeTagTabular: RegExp;
 export declare const latexEnvironments: string[];
 /** https://docs.mathjax.org/en/v3.0-latest/input/tex/macros/index.html#environments */
 export declare const mathEnvironments: string[];

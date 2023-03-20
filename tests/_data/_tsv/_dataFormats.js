@@ -47,6 +47,8 @@ module.exports = [
       '\\end{table}',
     tsv: 'cell^(1)\tdd(grad^(2)A)/(A)=-k^(2) dd\tcell3\n' +
       'cell^(4)\tcell5\tcell^(6)\n' +
-      'a,b^(2),c,aa,ab,ac,aaa,aab,aac\tcell f^(f) 8\tcell9',
+      '"a\tb^(2)\tc\n' +
+      'aa\tab\tac\n' +
+      'aaa\taab\taac"\tcell f^(f) 8\tcell9',
   }
 ];

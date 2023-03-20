@@ -13,7 +13,7 @@ const tokenAttrGet = (token, name) => {
   return token.attrs[index][1]
 };
 
-const renderInlineTokenBlock = (tokens, options, env, slf) =>{
+const renderInlineTokenBlock = (tokens, options, env, slf, isSubTable = false) =>{
   let nextToken,
     result = '',
     needLf = false;
@@ -134,21 +134,41 @@ const renderInlineTokenBlock = (tokens, options, env, slf) =>{
         for (let j = 0; j < token.children.length; j++) {
           const child = token.children[j];
           // console.log('[child]=>', child);
-
+          if (child.type === "tabular_inline" || isSubTable) {
+            child.isSubTable = true;
+          }
           content += slf.renderInline([child], options);
           if (child.ascii) {
             cell += child.ascii_tsv ? child.ascii_tsv : child.ascii;
           } else {
-            cell += child.tsv ? child.tsv.join(',') : child.content;
+            if (token.type === 'subTabular') {
+              if (token.parents?.length) {
+                cell += child.tsv ? child.tsv.join(',') : child.content;
+              } else {
+                cell += child.tsv 
+                  ? '"' + TsvJoin(child.tsv, options) + '"' 
+                  : child.content;
+              }
+            } else {
+              cell += child.tsv ? child.tsv.join(',') : child.content;
+            }
           }
 
 
           if (child.type === 'link_open') {
+            cell += child.attrGet('href');
             let link = getMdLink(child, token, j);
             link = link.replace(/\|/, '\\|');
             if (link) {
               cellMd += link;
-              j += 2;
+              if ((j + 1) < token.children.length) {
+                content += slf.renderInline([token.children[j+1]], options);
+                j++;
+              }
+              if ((j + 2) < token.children.length) {
+                content += slf.renderInline([token.children[j+2]], options);
+                j++;
+              }
               continue;
             }
           }
@@ -170,8 +190,10 @@ const renderInlineTokenBlock = (tokens, options, env, slf) =>{
             }
             cellMd += child.latex.replace(/\|/, '\\|');
           } else {
-            if (child.type === 'image') {
-              let img = `![${child.attrGet('alt')}](${child.attrGet('src')})`;
+            if (child.type === 'image' || child.type === 'includegraphics') {
+              const src = child.attrGet('src');
+              cell += src;
+              let img = `![${child.attrGet('alt')}](${src})`;
               img = img.replace(/\|/, '\\|');
               cellMd += img;
             } else {
@@ -241,7 +263,7 @@ export const renderTabularInline = (a, token, options, env, slf) => {
   if (!include_tsv && !include_table_html && !include_table_markdown) {
     return ''
   }
-  const data = renderInlineTokenBlock(token.children, options, env, slf);
+  const data = renderInlineTokenBlock(token.children, options, env, slf, token.isSubTable);
   token.tsv = data.tsv;
   token.tableMd = data.tableMd;//tableMarkdownJoin(data.tableMd, data.align);
 

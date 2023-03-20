@@ -1,5 +1,7 @@
 import { Token } from 'markdown-it';
+import * as parseLinkDestination from 'markdown-it/lib/helpers/parse_link_destination';
 import { includegraphicsTag } from "./utils";
+import { normalizeLink } from "../../helpers/normalize-link";
 
 const parseParams = (str: string, align: string=''): {attr: Array<Array<string>>, align: string} |null => {
   if(!str) { return null}
@@ -36,7 +38,12 @@ const parseParams = (str: string, align: string=''): {attr: Array<Array<string>>
 };
 
 const getAttrIncludeGraphics = (match: RegExpMatchArray, align: string) =>  {
-  const href = match[2];
+  let href = match[2];
+  const res = href ? parseLinkDestination(href, 0, href.length) : null;
+  if (res?.ok) {
+    href = res.str;
+    href = normalizeLink(href)
+  }
   const params = match[1] ? match[1].replace(/\]|\[/g, ''): '';
 
   const styles: {attr:Array<Array<string>>, align:string} = parseParams(params, align);

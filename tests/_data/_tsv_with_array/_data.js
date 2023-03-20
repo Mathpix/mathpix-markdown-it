@@ -18,11 +18,12 @@ module.exports = [
       '$"\n' +
       'non-current assets\t250000\t95000\t155000'
   },  
-  /** In tsv matrix and aligned should be as asciimath */
+  /** In tsv matrix as asciimath and aligned should be same as array */
   {
     latex: '\\begin{tabular}{|l|c|c|c|}\\hline & \\( \\begin{array}{c}\\text { cost } \\\\ \\$\\end{array} \\) & \\( \\begin{matrix}\\text { depreciation } \\\\ \\$\\end{matrix} \\) & \\( \\begin{aligned}\\text { net book value } \\\\ \\$\\end{aligned} \\) \\\\ \\hline non-current assets & 250000 & 95000 & 155000 \\\\ \\hline\\end{tabular}',
     tsv: '\t" cost \n' +
-      '$"\t{:[" depreciation "],[$]:}\t{:[" net book value "],[$]:}\n' +
+      '$"\t{:[" depreciation "],[$]:}\t" net book value \n' +
+      '$"\n' +
       'non-current assets\t250000\t95000\t155000'
   },
   /** In this equation begin{array} should be as asciimath */
@@ -367,10 +368,15 @@ module.exports = [
       'xy"\t2\n' +
       '4\t5'
   },  
-  // {
-  //   latex: '',
-  //   tsv: ''
-  // },  
+  {
+    latex: '\\begin{tabular}{|l|l|} \\hline  \\begin{array}{|c|c|} \\hline  \n' +
+      'mt1 & \\begin{array}{|l|} \\hline  t1 \\\\ \\hline t2 \\\\ \\hline \\end{array} \\\\ \\hline \n' +
+      '\\begin{array}{|l|l|} \\hline  t1 & t2 \\\\ \\hline t3 & t4 \\\\ \\hline \\end{array} & mt4 \\\\ \\hline \n' +
+      '\\end{array} & t2 \\\\ \\hline t3 & t4 \\\\ \\hline \\end{tabular}',
+    tsv: '"mt1\tt1, t2\n' +
+      't1, t2, t3, t4\tmt4"\tt2\n' +
+      't3\tt4'
+  },  
   // {
   //   latex: '',
   //   tsv: ''

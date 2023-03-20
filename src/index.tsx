@@ -36,6 +36,7 @@ import {
   clearLabelsList 
 } from "./markdown/common/labels";
 
+import { normalizeLink } from './helpers/normalize-link';
 
 export {
   MathpixLoader, MathpixMarkdown, MathpixMarkdownModel,
@@ -46,6 +47,7 @@ export {
   ISmilesOptions,
   resetTheoremEnvironments,
   TTocStyle,
-  eLabelType, ILabel, getLabelsList, getLabelByKeyFromLabelsList, clearLabelsList
+  eLabelType, ILabel, getLabelsList, getLabelByKeyFromLabelsList, clearLabelsList,
+  normalizeLink
 };
 

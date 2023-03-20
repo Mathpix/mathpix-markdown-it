@@ -1,15 +1,34 @@
 import {TTokenTabular} from "./index";
 import {getContent} from "./common";
 
-type TSubTabular = {id: string, parsed: Array<TTokenTabular>|string};
+type TSubTabular = {id: string, parsed: Array<TTokenTabular>|string, parents?: Array<string>};
 var subTabular: Array<TSubTabular> = [];
 
 export const ClearSubTableLists = (): void => {
   subTabular = [];
 };
 
-export const pushSubTabular = (str: string, subRes: Array<TTokenTabular> | string, posBegin: number=0, posEnd: number, i: number=0): string => {
+export const pushSubTabular = (str: string, subRes: Array<TTokenTabular> | string, posBegin: number=0, posEnd: number, i: number=0, level=0): string => {
   const id = `f${(+new Date +  (Math.random()*100000).toFixed()).toString()}`;
+  if (typeof subRes === 'string') {
+    let match =  subRes.match(/(?:<<([\w]*)>>)/g);
+    match =  match ? match : subRes.match(/(?:<([\w]*)>)/g);
+    if (match) {
+      for (let j = 0; j < match.length; j++) {
+        let idSubTable = match[j].replace(/</g, '').replace(/>/g, '');
+        if (!idSubTable) { continue }
+        const index = subTabular.findIndex(item => item.id === idSubTable);
+        if (index < 0) {
+          continue;
+        }
+        if (subTabular[index].parents) {
+          subTabular[index].parents.push(id)
+        } else {
+          subTabular[index].parents = [id]
+        }
+      }
+    }
+  }
   subTabular.push({id: id, parsed: subRes});
   if (posBegin > 0) {
     return str.slice(i, posBegin) + `<<${id}>>` + str.slice(posEnd + '\\end{tabular}'.length, str.length);
@@ -18,7 +37,7 @@ export const pushSubTabular = (str: string, subRes: Array<TTokenTabular> | strin
   }
 };
 
-export const getSubTabular = (sub: string, i: number, isCell: boolean = true): Array<TTokenTabular> | null => {
+export const getSubTabular = (sub: string, i: number, isCell: boolean = true, forLatex = false): Array<TTokenTabular> | null => {
   let res: Array<TTokenTabular>| any = [];
   let lastIndex: number = 0;
   sub = sub.trim();
@@ -51,7 +70,19 @@ export const getSubTabular = (sub: string, i: number, isCell: boolean = true): A
          strE = sub;
       }
       const st = strB + subTabular[index].parsed + strE;
-      res.push({token: 'inline', tag: '', n: 0, content: st,  id: subTabular[index].id})
+      if (forLatex) {
+        res.push({token: 'inline', tag: '', n: 0, content: st,  id: subTabular[index].id})
+      } else {
+        res.push({
+          token: 'inline',
+          tag: '',
+          n: 0,
+          content: st,
+          id: subTabular[index].id,
+          parents: subTabular[index].parents,
+          type: 'subTabular'
+        })
+      }
     }
   }
   return res;

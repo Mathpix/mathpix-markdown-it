@@ -1,5 +1,6 @@
 import { MmlNode, TEXCLASS } from "mathjax-full/js/core/MmlTree/MmlNode";
 import { AMsymbols, eSymbolType } from "./helperA";
+import { envArraysShouldBeFlattenInTSV } from "../../helpers/consts";
 
 const regW: RegExp = /^\w/;
 
@@ -261,7 +262,7 @@ const mtable = () => {
       const isSubExpression = node.parent?.texClass === TEXCLASS.INNER;
       const parentIsMenclose = node.Parent?.kind === 'menclose';
       const countRow = node.childNodes.length;
-      const toTsv = serialize.options.tableToTsv 
+      const toTsv = serialize.options.tableToTsv && !serialize.options.isSubTable
         && (node.Parent?.kind === 'math' || (parentIsMenclose && node.Parent.Parent?.kind === 'math'));
       node.attributes.setInherited('toTsv', toTsv);  
       const columnAlign = node.attributes.get('columnalign');
@@ -277,7 +278,8 @@ const mtable = () => {
           || (node.Parent.Parent.properties?.hasOwnProperty('close') && node.Parent.Parent.properties['close']));
       /** It is a matrix or system of equations with brackets */
       const isMatrixOrSystemOfEquations = thereAreBracketsIn_parent || thereAreBracketsIn_Parent;
-      const itShouldBeFlatten = envName === 'array' && !isHasBranchOpen && !isHasBranchClose && !parentIsMenclose;
+      const itShouldBeFlatten = envArraysShouldBeFlattenInTSV.includes(envName) 
+        && !isHasBranchOpen && !isHasBranchClose && !parentIsMenclose;
       /** Vertical math:
        * \begin{array}{r} and it should not be a matrix and not a system of equations */
       let isVerticalMath = columnAlign === 'right' && !isMatrixOrSystemOfEquations;

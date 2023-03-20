@@ -35,7 +35,7 @@ export const getCurrentMC = (cells: string[], i: number): number => {
   return res;
 };
 
-export const getMultiColumnMultiRow = (str: string, params: {lLines: string, align: string, rLines: string}): TMulti | null => {
+export const getMultiColumnMultiRow = (str: string, params: {lLines: string, align: string, rLines: string}, forLatex = false): TMulti | null => {
   let attrs: Array<TAttrs> = [];
   let content: string = '';
   let mr: number = 0;
@@ -107,7 +107,7 @@ export const getMultiColumnMultiRow = (str: string, params: {lLines: string, ali
       ? `{${matchMR[0].trim()}}`
       : matchMR[0].trim();
   }
-  const parseSub: Array<TTokenTabular>  = getSubTabular(str, 0);
+  const parseSub: Array<TTokenTabular>  = getSubTabular(str, 0, true, forLatex);
   if (parseSub) {
     return {mr: mr, mc: mc, attrs: attrs, content: '', subTable: parseSub, latex: latex}
   }
