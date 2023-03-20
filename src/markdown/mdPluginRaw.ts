@@ -262,6 +262,9 @@ function multiMath(state, silent) {
 
   if (!silent) {
     const token = state.push(type, "", 0);
+    if (state.env.subTabular) {
+      token.isSubTable = true;
+    }
     if (state.md.options.forLatex) {
       if (match[1]) {
         token.markup = match[1];
