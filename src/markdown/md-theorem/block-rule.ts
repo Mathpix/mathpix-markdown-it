@@ -24,18 +24,26 @@ import {
 } from "../mdPluginText";
 import { eLabelType } from "../common/labels";
 
-export const newTheoremBlock: RuleBlock = (state, startLine: number) => {
+export const newTheoremBlock: RuleBlock = (state, startLine: number, endLine: number, silent) => {
   let nextLine: number = startLine + 1;
-  let endLine = state.lineMax;
   let terminate, i, l;
-  let terminatorRules = state.md.block.ruler.getRules('paragraph');
+  let terminatorRules = [].concat(state.md.block.ruler.getRules('paragraph'), 
+    state.md.block.ruler.getRules('newTheoremBlock'));
   terminatorRules.push(headingSection);
-  terminatorRules.push(BeginTheorem);
-  terminatorRules.push(BeginProof);
   let content = '';
   let oldParentType = state.parentType;
   state.parentType = 'paragraph';
-
+  terminate = false;
+  for (i = 0, l = terminatorRules.length; i < l; i++) {
+    if (terminatorRules[i](state, startLine, nextLine, true)) {
+      terminate = true;
+      break;
+    }
+  }
+  if (terminate) { 
+    return false; 
+  }
+  
   for (; nextLine < endLine && !state.isEmpty(nextLine); nextLine++) {
     if (state.sCount[nextLine] - state.blkIndent > 3) { continue; }
     // quirk for blockquotes, this line should already be checked by that rule
@@ -61,7 +69,10 @@ export const newTheoremBlock: RuleBlock = (state, startLine: number) => {
   ) {
     return false;
   }
-
+  /** For validation mode we can terminate immediately */
+  if (silent) {
+    return true;
+  }
   const children = [];
   state.md.inline.parse(content, state.md, state.env, children);
 
@@ -149,6 +160,10 @@ export const BeginTheorem: RuleBlock = (state, startLine, endLine, silent) => {
   if (!match) {
     return false;
   }
+  /** For validation mode we can terminate immediately */
+  if (silent) {
+    return true;
+  }
   let envName = match.groups?.name ? match.groups.name : match[1];
   envName = envName ? envName.trim() : '';
   let envDescription = match.groups?.description
@@ -219,11 +234,6 @@ export const BeginTheorem: RuleBlock = (state, startLine, endLine, silent) => {
 
   if (!isCloseTagExist) {
     return false;
-  }
-
-  /** For validation mode we can terminate immediately */
-  if (silent) { 
-    return true; 
   }
   
   let matchE: RegExpMatchArray = lineText.match(closeTag);
@@ -328,6 +338,10 @@ export const BeginProof: RuleBlock = (state, startLine, endLine, silent) => {
   if (!match) {
     return false;
   }
+  /** For validation mode we can terminate immediately */
+  if (silent) {
+    return true;
+  }
   let envName = match[1] ? match[1].trim() : '';
   if (!envName) {
     return false;
@@ -385,11 +399,6 @@ export const BeginProof: RuleBlock = (state, startLine, endLine, silent) => {
 
   if (!isCloseTagExist) {
     return false;
-  }
-
-  /** For validation mode we can terminate immediately */
-  if (silent) {
-    return true;
   }
   
   let matchE: RegExpMatchArray = lineText.match(closeTag);

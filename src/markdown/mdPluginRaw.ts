@@ -36,6 +36,7 @@ import {
 } from "./common/labels";
 const isSpace = require('markdown-it/lib/common/utils').isSpace;
 import { envArraysShouldBeFlattenInTSV } from '../helpers/consts';
+import { getTerminatedRules } from './common';
 
 function MathML(state, silent, pos, endMarker = '', type = "inline_mathML") {
   const markerBegin = RegExp('^</?(math)(?=(\\s|>|$))', 'i');
@@ -92,13 +93,12 @@ function inlineMathML(state, silent) {
 
 // BLOCK
 
-function mathMLBlock(state, startLine/*, endLine*/) {
+function mathMLBlock(state, startLine, endLine, silent) {
   const markerBegin = RegExp('^</?(math)(?=(\\s|>|$))', 'i');
   let content, terminate, i, l, token, oldParentType, lineText, mml,
     nextLine = startLine + 1,
-    terminatorRules = state.md.block.ruler.getRules('paragraph'),
-    endLine = state.lineMax,
-
+    terminatorRules = [].concat(state.md.block.ruler.getRules('paragraph'), 
+      state.md.block.ruler.getRules('mathMLBlock')),
     pos = state.bMarks[startLine] + state.tShift[startLine],
     max = state.eMarks[startLine];
 
@@ -112,7 +112,10 @@ function mathMLBlock(state, startLine/*, endLine*/) {
   mml = openTagMML.test(lineText);
 
   if (!markerBegin.test(lineText)) { return false; }
-
+  /** For validation mode we can terminate immediately */
+  if (silent) {
+    return true;
+  }
 
   // jump line-by-line until empty one or EOF
   for (; nextLine < endLine; nextLine++) {
@@ -291,7 +294,7 @@ function multiMath(state, silent) {
     if (state.md.options.outMath && state.md.options.outMath.include_table_markdown) {
       token.latex = '\\' + match.input;
     }
-    if (type !== "reference_note") {
+    if (type !== "reference_note" && !state.md.options.forLatex) {
       /** Perform math to conversion to html and get additional data from MathJax to pass it to render rules */
       convertMathToHtml(state, token, state.md.options);
     }
@@ -456,7 +459,9 @@ function simpleMath(state, silent) {
       token.latex = endMarker + token.content + endMarker;
     }
     /** Perform math to conversion to html and get additional data from MathJax to pass it to render rules */
-    convertMathToHtml(state, token, state.md.options);
+    if (!state.md.options.forLatex) {
+      convertMathToHtml(state, token, state.md.options);
+    }
   }
   state.pos = nextPos;
   return true;
@@ -1016,9 +1021,11 @@ export default options => {
     if (!md.options.enableCodeBlockRuleForLatexCommands) {
       md.block.ruler.at("code", codeBlock);
     }
-    md.block.ruler.before("ReNewCommand", "newTheoremBlock", newTheoremBlock)
+    md.block.ruler.before("ReNewCommand", "newTheoremBlock", newTheoremBlock, 
+      {alt: getTerminatedRules("newTheoremBlock")});
     md.inline.ruler.before("escape", "usepackage", usepackage);
-    md.block.ruler.before("html_block", "mathMLBlock", mathMLBlock);
+    md.block.ruler.before("html_block", "mathMLBlock", mathMLBlock,
+      {alt: getTerminatedRules("mathMLBlock")});
     md.inline.ruler.before("html_inline", "mathML", inlineMathML);
     md.inline.ruler.before("escape", "refs", refs);
     md.inline.ruler.before("escape", "multiMath", multiMath);

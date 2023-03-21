@@ -2,7 +2,7 @@ import { MarkdownIt, RuleBlock, RuleInline, Renderer, Token } from 'markdown-it'
 const isSpace = require('markdown-it/lib/common/utils').isSpace;
 import { renderTabularInline } from "./md-renderer-rules/render-tabular";
 import { closeTagSpan, reSpan, reAddContentsLine } from "./common/consts";
-import { findEndMarker } from "./common";
+import { findEndMarker, getTerminatedRules } from "./common";
 import { uid } from "./utils";
 import { ILabel, getLabelByUuidFromLabelsList } from "./common/labels";
 
@@ -36,7 +36,7 @@ export const setTextCounterSection = (envName: string, num: number) => {
   }
 };
 
-const separatingSpan: RuleBlock = (state, startLine: number, endLine: number) => {
+const separatingSpan: RuleBlock = (state, startLine: number, endLine: number, silent) => {
   let lineText: string,
     pos: number = state.bMarks[startLine] + state.tShift[startLine],
     max: number = state.eMarks[startLine];
@@ -56,7 +56,10 @@ const separatingSpan: RuleBlock = (state, startLine: number, endLine: number) =>
   if (!sMatchEnd) {
     return false;
   }
-
+  /** For validation mode we can terminate immediately */
+  if (silent) {
+    return true;
+  }
   let nextPos = pos + sMatchEnd.index + sMatchEnd[0].length;
 
   if (nextPos < max) {
@@ -87,7 +90,7 @@ const separatingSpan: RuleBlock = (state, startLine: number, endLine: number) =>
  * To add an unnumbered section to the table of contents, use the \addcontentsline command like this:
  * \addcontentsline{toc}{section}{Unnumbered Section}
  * */
-const addContentsLineBlock: RuleBlock = (state, startLine: number, endLine: number) => {
+const addContentsLineBlock: RuleBlock = (state, startLine: number, endLine: number, silent) => {
   let token: Token, lineText: string,
     pos: number = state.bMarks[startLine] + state.tShift[startLine],
     max: number = state.eMarks[startLine];
@@ -103,6 +106,10 @@ const addContentsLineBlock: RuleBlock = (state, startLine: number, endLine: numb
     .match(reAddContentsLine);
   if (!match) {
     return false;
+  }
+  /** For validation mode we can terminate immediately */
+  if (silent) {
+    return true;
   }
   let envExp = match.groups?.exp ? match.groups.exp : match[1];
   if (envExp !== 'toc') {
@@ -438,7 +445,7 @@ export const headingSection: RuleBlock = (state, startLine: number, endLine: num
   return true;
 };
 
-const abstractBlock: RuleBlock = (state, startLine) => {
+const abstractBlock: RuleBlock = (state, startLine, endLine, silent) => {
   let isBlockOpened = false;
   let token: Token;
   let content: string;
@@ -448,13 +455,16 @@ const abstractBlock: RuleBlock = (state, startLine) => {
   let pos: number = state.bMarks[startLine] + state.tShift[startLine];
   let max: number = state.eMarks[startLine];
   let nextLine: number = startLine + 1;
-  const endLine: number = state.lineMax;
   const terminatorRules = state.md.block.ruler.getRules('paragraph');
   let lineText: string = state.src.slice(pos, max);
   let isCloseTagExist = false;
 
   if (!openTag.test(lineText)) {
     return false;
+  }
+  /** For validation mode we can terminate immediately */
+  if (silent) {
+    return true;
   }
   let resString = '';
   let abs = openTag.test(lineText);
@@ -578,7 +588,7 @@ const abstractBlock: RuleBlock = (state, startLine) => {
   return true;
 };
 
-const pageBreaksBlock: RuleBlock = (state, startLine: number) => {
+const pageBreaksBlock: RuleBlock = (state, startLine: number, endLine, silent) => {
   let token: Token, lineText: string,
     pos: number = state.bMarks[startLine] + state.tShift[startLine],
     max: number = state.eMarks[startLine];
@@ -593,6 +603,10 @@ const pageBreaksBlock: RuleBlock = (state, startLine: number) => {
     .match(/^(?:pagebreak|clearpage|newpage)/);
   if (!match) {
     return false;
+  }
+  /** For validation mode we can terminate immediately */
+  if (silent) {
+    return true;
   }
   startPos += match[0].length;
   let strAfterEnd = '';
@@ -1099,11 +1113,16 @@ const mapping = {
 export default () => {
   return (md: MarkdownIt) => {
     resetCounter();
-    md.block.ruler.before("heading", "headingSection", headingSection);
-    md.block.ruler.before("heading", "addContentsLineBlock", addContentsLineBlock);
-    md.block.ruler.before("headingSection", "separatingSpan", separatingSpan);
-    md.block.ruler.before("paragraphDiv", "abstractBlock", abstractBlock);
-    md.block.ruler.before("paragraphDiv", "pageBreaksBlock", pageBreaksBlock);
+    md.block.ruler.before("heading", "headingSection", headingSection, 
+      {alt: getTerminatedRules('headingSection')});
+    md.block.ruler.before("heading", "addContentsLineBlock", addContentsLineBlock, 
+      {alt: getTerminatedRules('addContentsLineBlock')});
+    md.block.ruler.before("headingSection", "separatingSpan", separatingSpan,
+      {alt: getTerminatedRules('separatingSpan')});
+    md.block.ruler.before("paragraphDiv", "abstractBlock", abstractBlock,
+      {alt: getTerminatedRules('abstractBlock')});
+    md.block.ruler.before("paragraphDiv", "pageBreaksBlock", pageBreaksBlock,
+      {alt: getTerminatedRules('pageBreaksBlock')});
 
     md.inline.ruler.before("multiMath", "textTypes", textTypes);
     md.inline.ruler.before("textTypes", "textAuthor", textAuthor);

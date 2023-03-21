@@ -214,7 +214,7 @@ const InlineBlockBeginTable: RuleBlock = (state, startLine) => {
   return true;
 };
 
-export const BeginTable: RuleBlock = (state, startLine, endLine) => {
+export const BeginTable: RuleBlock = (state, startLine, endLine, silent) => {
   let pos: number = state.bMarks[startLine] + state.tShift[startLine];
   let max: number = state.eMarks[startLine];
   let token;
@@ -237,7 +237,10 @@ export const BeginTable: RuleBlock = (state, startLine, endLine) => {
   if (!match) {
     return false;
   }
-
+  /** For validation mode we can terminate immediately */
+  if (silent) {
+    return true;
+  }
   const type: string = match[1].trim() in TBegin ? match[1].trim() : null;
   if (!type) {
     return false;

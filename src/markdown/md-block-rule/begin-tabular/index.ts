@@ -229,7 +229,7 @@ export const StatePushTabularBlock = (state, startLine: number, nextLine: number
   return true;
 };
 
-export const BeginTabular: RuleBlock = (state, startLine: number, endLine: number) => {
+export const BeginTabular: RuleBlock = (state, startLine: number, endLine: number, silent) => {
   let pos: number = state.bMarks[startLine] + state.tShift[startLine];
   let max: number = state.eMarks[startLine];
   let nextLine: number = startLine + 1;
@@ -248,7 +248,10 @@ export const BeginTabular: RuleBlock = (state, startLine: number, endLine: numbe
   if (dataTags?.arrClose?.length) {
     iOpen -= dataTags.arrClose.length;
   }
-
+  /** For validation mode we can terminate immediately */
+  if (silent) {
+    return true;
+  }
   for (; nextLine <= endLine; nextLine++) {
     dataTags = null;
     if (lineText === '') {

@@ -88,7 +88,7 @@ const InlineBlockBeginAlign: RuleBlock = (state, startLine) => {
   return true;
 };
 
-export const BeginAlign: RuleBlock = (state, startLine, endLine) => {
+export const BeginAlign: RuleBlock = (state, startLine, endLine, silent) => {
   let token: Token;
 
   let pos: number = state.bMarks[startLine] + state.tShift[startLine];
@@ -108,6 +108,11 @@ export const BeginAlign: RuleBlock = (state, startLine, endLine) => {
     return false;
   }
 
+  /** For validation mode we can terminate immediately */
+  if (silent) {
+    return true;
+  }
+  
   let align = match[1];
   let closeTag = endTag(align);
   let  pB = 0;

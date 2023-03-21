@@ -39,3 +39,56 @@ export declare const tsvSeparatorsDef: {
     column: string;
     row: string;
 };
+/**
+ * key - name of block-rule;
+ * terminated - a list of rules that this rule can terminate. */
+export declare const terminatedRules: {
+    smilesDrawerBlock: {
+        terminated: string[];
+    };
+    BeginTable: {
+        terminated: string[];
+    };
+    BeginAlign: {
+        terminated: string[];
+    };
+    BeginTabular: {
+        terminated: string[];
+    };
+    BeginProof: {
+        terminated: string[];
+    };
+    BeginTheorem: {
+        terminated: string[];
+    };
+    newTheoremBlock: {
+        terminated: string[];
+    };
+    ReNewCommand: {
+        terminated: any[];
+    };
+    Lists: {
+        terminated: any[];
+    };
+    separatingSpan: {
+        terminated: any[];
+    };
+    headingSection: {
+        terminated: string[];
+    };
+    addContentsLineBlock: {
+        terminated: string[];
+    };
+    mathMLBlock: {
+        terminated: string[];
+    };
+    abstractBlock: {
+        terminated: any[];
+    };
+    pageBreaksBlock: {
+        terminated: string[];
+    };
+    paragraphDiv: {
+        terminated: any[];
+    };
+};
