@@ -79,6 +79,7 @@
     "babel-loader": "^8.1.0",
     "copy-webpack-plugin": "^10.2.4",
     "css-loader": "^6.6.0",
+    "escape-string-regexp": "^1.0.5",
     "jsdom": "^19.0.0",
     "loader-utils": "^3.2.0",
     "mini-css-extract-plugin": "^2.5.3",
