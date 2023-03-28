@@ -886,13 +886,17 @@ const doubleSlashToSoftBreak: RuleInline = (state) => {
   if (state.src.charCodeAt(nextPos) !== 0x5c /* \ */) {
     return false;
   }
-  const token = state.push('softbreak', 'br', 0);
-  token.inlinePos = {
-    start: startPos,
-    end: nextPos
-  };
-  state.pos = nextPos + 1;
-  return true;
+  if (state.env.doubleSlashToSoftBreak) {
+    const token = state.push('softbreak', 'br', 0);
+    token.inlinePos = {
+      start: startPos,
+      end: nextPos
+    };
+    state.pos = nextPos + 1;
+    return true;
+  } else {
+    return false;
+  }
 };
 
 const linkifyURL: RuleInline = (state) => {
