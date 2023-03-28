@@ -37,6 +37,7 @@ import {
 const isSpace = require('markdown-it/lib/common/utils').isSpace;
 import { envArraysShouldBeFlattenInTSV } from '../helpers/consts';
 import { getTerminatedRules } from './common';
+import { setPositions } from './md-core-rules/set-positions';
 
 function MathML(state, silent, pos, endMarker = '', type = "inline_mathML") {
   const markerBegin = RegExp('^</?(math)(?=(\\s|>|$))', 'i');
@@ -75,6 +76,10 @@ function MathML(state, silent, pos, endMarker = '', type = "inline_mathML") {
   if (!silent) {
     token = state.push(type, "", 0);
     token.content = content.trim();
+    token.inlinePos = {
+      start: state.pos,
+      end: nextPos
+    };
   }
   /** Perform math to conversion to html and get additional data from MathJax to pass it to render rules */
   convertMathToHtml(state, token, state.md.options);
@@ -294,6 +299,10 @@ function multiMath(state, silent) {
     if (state.md.options.outMath && state.md.options.outMath.include_table_markdown) {
       token.latex = '\\' + match.input;
     }
+    token.inlinePos = {
+      start: state.pos,
+      end: nextPos
+    };
     if (type !== "reference_note" && !state.md.options.forLatex) {
       /** Perform math to conversion to html and get additional data from MathJax to pass it to render rules */
       convertMathToHtml(state, token, state.md.options);
@@ -373,6 +382,10 @@ function refs(state, silent) {
     let children = [];
     state.md.inline.parse(token.content.trim(), state.md, state.env, children);
     token.children = children;
+    token.inlinePos = {
+      start: state.pos,
+      end: nextPos
+    };
   }
 
   state.pos = nextPos;
@@ -458,6 +471,10 @@ function simpleMath(state, silent) {
     if (state.md.options.outMath && state.md.options.outMath.include_table_markdown) {
       token.latex = endMarker + token.content + endMarker;
     }
+    token.inlinePos = {
+      start: state.pos,
+      end: nextPos
+    };
     /** Perform math to conversion to html and get additional data from MathJax to pass it to render rules */
     if (!state.md.options.forLatex) {
       convertMathToHtml(state, token, state.md.options);
@@ -536,6 +553,10 @@ function usepackage(state, silent) {
     const token = state.push(type, "geometry", 0);
     token.content = content;
     token.hidden = true;
+    token.inlinePos = {
+      start: state.pos,
+      end: nextPos
+    };
   }
 
   state.pos = nextPos;
@@ -1045,6 +1066,8 @@ export default options => {
     md.inline.ruler.at('image', imageWithSize);
     /** Replace inline core rule */
     md.core.ruler.at('inline', coreInline);
+    /** Set positions to tokens */
+    md.core.ruler.push('set_positions', setPositions);
 
     Object.keys(mapping).forEach(key => {
       md.renderer.rules[key] = (tokens, idx, options, env, slf) => {

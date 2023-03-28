@@ -30,13 +30,15 @@ const anchor = (md: MarkdownIt, opts) => {
         let title: string = '';
         if (types.includes(tokenType)) {
           const t: Token = tokens[tokens.indexOf(token) + 1];
-          title = types.includes(t.type) ? t.content : ''
+          title = types.includes(t.type) 
+            ? t.content_id ? t.content_id : t.content 
+            : '';
         } else {
           // Aggregate the next token children text.
           title = tokens[tokens.indexOf(token) + 1]
             .children
             .filter(token => token.type === 'text' || token.type === 'code_inline')
-            .reduce((acc, t) => acc + t.content, '');
+            .reduce((acc, t) => t.content_id ? acc + t.content_id : acc + t.content, '');
         }
 
         let slug: string = token.attrGet('id') || '';

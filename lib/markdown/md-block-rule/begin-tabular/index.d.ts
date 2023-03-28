@@ -32,7 +32,7 @@ export declare type TMulti = {
 };
 export declare const parseInlineTabular: (str: string) => TTypeContentList | null;
 export declare const inlineDecimalParse: (tok: TTokenTabular) => TTokenTabular;
-export declare const StatePushTabulars: (state: any, cTabular: TTypeContentList, align: string) => void;
+export declare const StatePushTabulars: (state: any, cTabular: TTypeContentList, align: string, startLine: number) => void;
 export declare const StatePushDiv: (state: any, startLine: number, nextLine: number, content: string) => void;
 export declare const StatePushTabularBlock: (state: any, startLine: number, nextLine: number, content: string, align: string, centerTables?: boolean) => boolean;
 export declare const BeginTabular: RuleBlock;

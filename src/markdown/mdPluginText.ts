@@ -234,7 +234,10 @@ export const headingSection: RuleBlock = (state, startLine: number, endLine: num
     beginMarker: string = "{",
     level = 1;
 
-  lineText = state.src.slice(pos, max).trim();
+  lineText = state.src.slice(pos, max);
+  /** line begin offsets */
+  let bMarks = lineText.length - lineText.trimLeft().length;
+  lineText = lineText.trimLeft();
   if (state.src.charCodeAt(pos) !== 0x5c /* \ */) {
     return false;
   }
@@ -246,6 +249,10 @@ export const headingSection: RuleBlock = (state, startLine: number, endLine: num
   if (!match) {
     return false;
   }
+
+  /** For validation mode we can terminate immediately */
+  if (silent) { return true; }
+
   let attrStyle = '';
   let isUnNumbered: boolean = false;
 
@@ -303,14 +310,15 @@ export const headingSection: RuleBlock = (state, startLine: number, endLine: num
     return false;
   }
 
-  let { res = false, content = '', nextPos = 0 } = findEndMarker(lineText, startPos);
+  let { res = false, content = '', nextPos = 0, endPos = 0 } = findEndMarker(lineText, startPos);
   let resString = content;
-  resString = resString.split('\\\\').join('\n');
+  // resString = resString.split('\\\\').join('\n');
   let hasEndMarker = false;
   let last = nextLine;
-
+  let eMarks = 0; //line end offsets
   let inlineStr = '';
   if (!res) {
+    // resString += resString ? ' ' : '';
     for (; nextLine <= endLine; nextLine++) {
       if (lineText === '') {
         break;
@@ -319,11 +327,12 @@ export const headingSection: RuleBlock = (state, startLine: number, endLine: num
       max = state.eMarks[nextLine];
       lineText = state.src.slice(pos, max);
 
-      let { res = false, content = '', nextPos = 0 } = findEndMarker(lineText, -1, "{", "}", true);
+      let { res = false, content = '', nextPos = 0, endPos = 0 } = findEndMarker(lineText, -1, "{", "}", true);
       if (res) {
+        eMarks = endPos + 1;
         resString += resString ? ' ' : '';
 
-        content = content.split('\\\\').join('\n');
+        // content = content.split('\\\\').join('\n');
         resString += content;
         hasEndMarker = true;
         if (nextPos && nextPos < lineText.length) {
@@ -332,11 +341,12 @@ export const headingSection: RuleBlock = (state, startLine: number, endLine: num
         break
       }
       resString += resString ? ' ' : '';
-      lineText = lineText.split('\\\\').join('\n');
+      // lineText = lineText.split('\\\\').join('\n');
       resString += lineText;
     }
     last = nextLine + 1;
   } else {
+    eMarks = endPos;
     hasEndMarker = true;
     last = nextLine;
     if (nextPos && nextPos < lineText.length) {
@@ -348,9 +358,6 @@ export const headingSection: RuleBlock = (state, startLine: number, endLine: num
   if ( !hasEndMarker ) {
     return false;
   }
-
-  /** For validation mode we can terminate immediately */
-  if (silent) { return true; }
   
   state.line = last;
 
@@ -372,13 +379,21 @@ export const headingSection: RuleBlock = (state, startLine: number, endLine: num
 
   token = state.push('inline', '', 0);
   token.content = resString;
+  token.content_id = resString.split('\\\\').join('\n');
   token.type = type;
   token.is_numerable = is_numerable;
   token.isUnNumbered = isUnNumbered;
   token.map = [startLine, state.line];
+  token.bMarks = bMarks;
+  token.eMarks = eMarks ? eMarks : token.bMarks + resString.length;
+  token.bMarksContent = bMarks + startPos + beginMarker.length;
+  token.eMarksContent = token.eMarks;
+  token.eMarks += 1;
 
   let children = [];
-  state.md.inline.parse(token.content.trim(), state.md, state.env, children);
+  state.env.doubleSlashToSoftBreak = true; /** for // - should be new line */
+  state.md.inline.parse(token.content, state.md, state.env, children);
+  state.env.doubleSlashToSoftBreak = false;
   token.children = children;
 
   if (type === "section" && !isUnNumbered) {
@@ -458,6 +473,7 @@ const abstractBlock: RuleBlock = (state, startLine, endLine, silent) => {
   const terminatorRules = state.md.block.ruler.getRules('paragraph');
   let lineText: string = state.src.slice(pos, max);
   let isCloseTagExist = false;
+  let arrContent = [];
 
   if (!openTag.test(lineText)) {
     return false;
@@ -475,6 +491,14 @@ const abstractBlock: RuleBlock = (state, startLine, endLine, silent) => {
   if (match) {
     inline = lineText.slice(match.index + match[0].length);
   }
+  if (inline) {
+    arrContent.push({
+      line: startLine,
+      bMarks: match.index + match[0].length,
+      eMarks: lineText.length,
+      content: inline
+    })
+  }
   for (; nextLine < endLine; nextLine++) {
 
     if (closeTag.test(lineText)) {
@@ -491,6 +515,14 @@ const abstractBlock: RuleBlock = (state, startLine, endLine, silent) => {
     lineText = state.src.slice(pos, max);
     lastLine = state.src.slice(pos, max);
 
+    if (!closeTag.test(lineText)) {
+      arrContent.push({
+        line: nextLine,
+        bMarks: 0,
+        eMarks: lineText.length,
+        content: lineText
+      });
+    }
     if (abs) {
       if (closeTag.test(lineText)) {
         isBlockOpened = false;
@@ -538,6 +570,18 @@ const abstractBlock: RuleBlock = (state, startLine, endLine, silent) => {
     if (matchEnd) {
       strBeforeEnd = lastLine.slice(0, matchEnd.index);
       strAfterEnd = lastLine.slice(matchEnd.index + matchEnd[0].length);
+      if (strBeforeEnd) {
+        arrContent.push({
+          line: nextLine,
+          eMarks: matchEnd.index + 1,
+          content: strBeforeEnd
+        });
+      } else {
+        if (arrContent?.length) {
+          arrContent[arrContent.length-1].line += 1;
+          arrContent[arrContent.length-1].eMarks += 1;
+        }
+      }
     }
   }
   content = resString;
@@ -546,6 +590,29 @@ const abstractBlock: RuleBlock = (state, startLine, endLine, silent) => {
   }
   if (strBeforeEnd && strBeforeEnd.trim()) {
     content += strBeforeEnd;
+  }
+
+  let contentItems = [];
+  let start = null;
+  for (let i = 0; i < arrContent.length; i++) {
+    if (!start) {
+      start = arrContent[i];
+      continue;
+    }
+    if (arrContent[i].content?.trim()) {
+      start.endLine = arrContent[i].line;
+      start.content += start.content ? ' ' : '';
+      start.content += arrContent[i].content;
+      start.eMarks = arrContent[i].eMarks ? arrContent[i].eMarks : 0;
+    } else {
+      start.endLine = arrContent[i].line;
+      start.eMarks = arrContent[i].eMarks ? arrContent[i].eMarks : 0;
+      contentItems.push(start);
+      start = null;
+    }
+  };
+  if (start) {
+    contentItems.push(start);
   }
   const contentList = content.split('\n');
   const tokenContent = contentList.filter(item => {
@@ -556,12 +623,14 @@ const abstractBlock: RuleBlock = (state, startLine, endLine, silent) => {
   token.map = [startLine, nextLine];
   token.attrSet('class', 'abstract');
   token.attrSet('style', 'width: 80%; margin: 0 auto; margin-bottom: 1em; font-size: .9em;');
+  token.mmd_type = 'abstract';
 
   token = state.push('heading_open', 'h4', 1);
   token.markup = '########'.slice(0, 4);
   token.attrSet('id', 'abstract_head');
   token.attrSet('class', 'abstract_head');
   token.attrSet('style', 'text-align: center;');
+  token.mmd_type = 'abstract_title';
   token = state.push('text', '', 0);
   token.content = 'Abstract';
   token.children = [];
@@ -573,8 +642,18 @@ const abstractBlock: RuleBlock = (state, startLine, endLine, silent) => {
     
     token = state.push('inline', '', 0);
     token.content = tokenContent[i].trim();
-    token.map = [startLine, state.line];
+    if (contentItems[i]) {
+      token.map = [contentItems[i].line,
+        contentItems[i].line 
+          ? contentItems[i].endLine 
+          : contentItems[i].line];
+      token.bMarks = contentItems[i].bMarks ? contentItems[i].bMarks : 0;
+      token.eMarks = contentItems[i].eMarks ? contentItems[i].eMarks : 0;
+    } else {
+      token.map = [startLine, state.line];
+    }
     token.children = [];
+    token.mmd_type = 'abstract_content';
     token = state.push('paragraph_close', 'p', -1);
   }
   token = state.push('paragraph_close', 'div', -1);
@@ -673,6 +752,12 @@ const textAuthor: RuleInline = (state) => {
   }
   token.content = content;
   token.children = [];
+  token.inlinePos = {
+    start: state.pos,
+    end: nextPos,
+    start_content: startPos + 1,
+    end_content: nextPos - 1,
+  };
 
   const columns = content.split('\\and');
   for (let i = 0; i < columns.length; i++) {
@@ -789,6 +874,24 @@ const pageBreaks: RuleInline = (state) => {
   } 
   token.children = [];
   state.pos = nextPos;
+  return true;
+};
+
+const doubleSlashToSoftBreak: RuleInline = (state) => {
+  let startPos = state.pos;
+  if (state.src.charCodeAt(startPos) !== 0x5c /* \ */) {
+    return false;
+  }
+  let nextPos = startPos + 1;
+  if (state.src.charCodeAt(nextPos) !== 0x5c /* \ */) {
+    return false;
+  }
+  const token = state.push('softbreak', 'br', 0);
+  token.inlinePos = {
+    start: startPos,
+    end: nextPos
+  };
+  state.pos = nextPos + 1;
   return true;
 };
 
@@ -1128,6 +1231,7 @@ export default () => {
     md.inline.ruler.before("textTypes", "textAuthor", textAuthor);
     md.inline.ruler.before('textTypes', 'linkifyURL', linkifyURL);
     md.inline.ruler.before('textTypes', 'pageBreaks', pageBreaks);
+    md.inline.ruler.before('textTypes', 'doubleSlashToSoftBreak', doubleSlashToSoftBreak);
 
     Object.keys(mappingTextStyles).forEach(key => {
       md.renderer.rules[key] = (tokens, idx, options, env, slf) => {

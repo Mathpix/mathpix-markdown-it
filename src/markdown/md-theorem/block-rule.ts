@@ -271,6 +271,8 @@ export const BeginTheorem: RuleBlock = (state, startLine, endLine, silent) => {
     number: theoremNumber,
     tokenUuidInParentBlock: token.uuid
   };
+  token.map = [startLine, state.line];
+  token.bMarks = strBefore ? strBefore.length : 0;
 
   const envItem = theoremEnvironments[envIndex];
   token.envStyle = envItem.style;
@@ -428,6 +430,8 @@ export const BeginProof: RuleBlock = (state, startLine, endLine, silent) => {
     number: proofNumber,
     tokenUuidInParentBlock: token.uuid
   };
+  token.map = [startLine, state.line];
+  token.bMarks = strBefore ? strBefore.length : 0;
   if (state.md.options.forLatex) {
     token.latex = latexBegin;
   }

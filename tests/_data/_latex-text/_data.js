@@ -150,20 +150,20 @@ Title <code>code text inline math equation <span class="math-inline ">
 <mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.025ex" xmlns="http://www.w3.org/2000/svg" width="2.322ex" height="1.553ex" role="img" focusable="false" viewBox="0 -675.5 1026.5 686.5"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><g data-mml-node="math"><g data-mml-node="msup"><g data-mml-node="mi"><path data-c="78" d="M52 289Q59 331 106 386T222 442Q257 442 286 424T329 379Q371 442 430 442Q467 442 494 420T522 361Q522 332 508 314T481 292T458 288Q439 288 427 299T415 328Q415 374 465 391Q454 404 425 404Q412 404 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145Q504 144 502 134Q486 77 440 33T333 -11Q263 -11 227 52Q186 -10 133 -10H127Q78 -10 57 16T35 71Q35 103 54 123T99 143Q142 143 142 101Q142 81 130 66T107 46T94 41L91 40Q91 39 97 36T113 29T132 26Q168 26 194 71Q203 87 217 139T245 247T261 313Q266 340 266 352Q266 380 251 392T217 404Q177 404 142 372T93 290Q91 281 88 280T72 278H58Q52 284 52 289Z"></path></g><g data-mml-node="mi" transform="translate(572, 363) scale(0.707)"><path data-c="75" d="M21 287Q21 295 30 318T55 370T99 420T158 442Q204 442 227 417T250 358Q250 340 216 246T182 105Q182 62 196 45T238 27T291 44T328 78L339 95Q341 99 377 247Q407 367 413 387T427 416Q444 431 463 431Q480 431 488 421T496 402L420 84Q419 79 419 68Q419 43 426 35T447 26Q469 29 482 57T512 145Q514 153 532 153Q551 153 551 144Q550 139 549 130T540 98T523 55T498 17T462 -8Q454 -10 438 -10Q372 -10 347 46Q345 45 336 36T318 21T296 6T267 -6T233 -11Q189 -11 155 7Q103 38 103 113Q103 170 138 262T173 379Q173 380 173 381Q173 390 173 393T169 400T158 404H154Q131 404 112 385T82 344T65 302T57 280Q55 278 41 278H27Q21 284 21 287Z"></path></g></g></g></g></svg></mjx-container></span></code></h1>`
   },
   {
-    latex: '\\title{Title \n' +
-      'with \n' +
-      'line \n' +
-      'break }',
+    latex: '\\title{Title\n' +
+      'with\n' +
+      'line\n' +
+      'break}',
     html: `<h1 type="title" class="main-title" id="title-with-line-break">
-Title with  line  break</h1>`
+Title with line break</h1>`
   },
   {
-    latex: '\\title{Title \\\\ can be \n' +
-      '\\\\ multiline }',
-    html: `<h1 type="title" class="main-title" id="titlecan-bemultiline">
-Title<br>
-can be<br>
-multiline</h1>`
+    latex: '\\title{Title \\\\ can be\n' +
+      '\\\\ multiline}',
+    html: `<h1 type="title" class="main-title" id="title-can-be-multiline">
+Title <br>
+ can be <br>
+ multiline</h1>`
   },
   {
     latex: '\\section{Section \\textit{italic text}}',
@@ -194,20 +194,20 @@ multiline</h1>`
   },
 
   {
-    latex: '\\section{Section \n' +
+    latex: '\\section{Section\n' +
       'with \n' +
       'line \n' +
-      'break }',
+      'break}',
     html: `<h2 type="section" class="section-title" id="section-with-line-break">
 <span class="section-number">1. </span>Section with  line  break</h2>`
   },
   {
-    latex: '\\section{Section \\\\ can be \n' +
-      '\\\\ multiline }',
+    latex: '\\section{Section \\\\ can be\n' +
+      '\\\\ multiline}',
     html: `<h2 type="section" class="section-title" id="section-can-be-multiline">
-<span class="section-number">1. </span>Section<br>
-can be<br>
-multiline</h2>`
+<span class="section-number">1. </span>Section <br>
+ can be <br>
+ multiline</h2>`
   },
 
   {
