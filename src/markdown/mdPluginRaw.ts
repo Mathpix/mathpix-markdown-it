@@ -1067,7 +1067,9 @@ export default options => {
     /** Replace inline core rule */
     md.core.ruler.at('inline', coreInline);
     /** Set positions to tokens */
-    md.core.ruler.push('set_positions', setPositions);
+    if (md.options.addPositionsToTokens) {
+      md.core.ruler.push('set_positions', setPositions);
+    }
 
     Object.keys(mapping).forEach(key => {
       md.renderer.rules[key] = (tokens, idx, options, env, slf) => {

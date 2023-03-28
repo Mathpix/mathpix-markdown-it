@@ -20,7 +20,8 @@ const mdInit = (options: TMarkdownItOptions) => {
     showPageBreaks = false,
     centerImages = true,
     centerTables = true,
-    enableCodeBlockRuleForLatexCommands = false
+    enableCodeBlockRuleForLatexCommands = false,
+    addPositionsToTokens = false
   } = options;
   const mmdOptions = {
     width: width,
@@ -38,7 +39,8 @@ const mdInit = (options: TMarkdownItOptions) => {
     showPageBreaks: showPageBreaks,
     centerImages: centerImages,
     centerTables: centerTables,
-    enableCodeBlockRuleForLatexCommands: enableCodeBlockRuleForLatexCommands
+    enableCodeBlockRuleForLatexCommands: enableCodeBlockRuleForLatexCommands,
+    addPositionsToTokens: addPositionsToTokens
   };
   let md = require("markdown-it")({
     html: htmlTags,
@@ -71,29 +73,6 @@ const mdInit = (options: TMarkdownItOptions) => {
       md.use(require("markdown-it-emoji"))
     }
   }
-
-  /**
-   * ParserBlock.parse(str, md, env, outTokens)
-   *
-   * Process input string and push block tokens into `outTokens`
-   **/
-  md.block.parse = function (src, md, env, outTokens) {
-    var state;
-    if (!src) { return; }
-    state = new this.State(src, md, env, outTokens);
-    if (!env.lines) {
-      /** Copy block state lines */
-      env.lines = {
-        bMarks: [...state.bMarks],
-        eMarks: [...state.eMarks],
-        line: [...state.line],
-        lineMax: [...state.lineMax],
-        sCount: [...state.sCount],
-        tShift: [...state.tShift],
-      }
-    }
-    this.tokenize(state, state.line, state.lineMax);
-  };
   return md;
 };
 

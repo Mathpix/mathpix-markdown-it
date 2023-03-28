@@ -1,5 +1,9 @@
 export const setPositions = (state) => {
   const lines = state.env?.lines ? {...state.env?.lines} : null;
+  if (!lines) {
+    console.log("Can not set positions. env.lines is not initialized.")
+    return;
+  }
   let offsetContent = 0;
   for (let i = 0; i < state.tokens.length; i++) {
     let token = state.tokens[i];

@@ -28,7 +28,8 @@ export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
     showPageBreaks = false,
     centerImages = true,
     centerTables = true,
-    enableCodeBlockRuleForLatexCommands = false
+    enableCodeBlockRuleForLatexCommands = false,
+    addPositionsToTokens = false
   } = options;
   Object.assign(md.options, smiles);
   Object.assign(md.options, {
@@ -45,7 +46,8 @@ export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
     showPageBreaks: showPageBreaks,
     centerImages: centerImages,
     centerTables: centerTables,
-    enableCodeBlockRuleForLatexCommands: enableCodeBlockRuleForLatexCommands
+    enableCodeBlockRuleForLatexCommands: enableCodeBlockRuleForLatexCommands,
+    addPositionsToTokens: addPositionsToTokens
   });
 
   md
@@ -67,6 +69,31 @@ export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
       ? validateLink 
       : validateLinkEnableFile;
   }
+  /**
+   * ParserBlock.parse(str, md, env, outTokens)
+   *
+   * Process input string and push block tokens into `outTokens`
+   **/
+  if (addPositionsToTokens) {
+    md.block.parse = function (src, md, env, outTokens) {
+      var state;
+      if (!src) { return; }
+      state = new this.State(src, md, env, outTokens);
+      if (!env.lines) {
+        /** Copy block state lines */
+        env.lines = {
+          bMarks: [...state.bMarks],
+          eMarks: [...state.eMarks],
+          line: [...state.line],
+          lineMax: [...state.lineMax],
+          sCount: [...state.sCount],
+          tShift: [...state.tShift],
+        }
+      }
+      this.tokenize(state, state.line, state.lineMax);
+    };
+  }
+
   injectLabelIdToParagraph(md);
 };
 
