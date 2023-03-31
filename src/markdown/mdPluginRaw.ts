@@ -8,7 +8,8 @@ import {
   includesMultiMathBeginTag,
   getWidthFromDocument,
   findOpenCloseTagsMathEnvironment,
-  beginTag, endTag
+  beginTag, endTag,
+  canonicalMath
 } from './utils';
 import { openTagMML, closeTagMML, tsvSeparatorsDef } from './common/consts';
 import { imageWithSize, renderRuleImage } from './md-inline-rule/image';
@@ -303,6 +304,7 @@ function multiMath(state, silent) {
       start: state.pos,
       end: nextPos
     };
+    token.canonicalized = token.content ? canonicalMath(token.content) : [];
     if (type !== "reference_note" && !state.md.options.forLatex) {
       /** Perform math to conversion to html and get additional data from MathJax to pass it to render rules */
       convertMathToHtml(state, token, state.md.options);
@@ -475,6 +477,7 @@ function simpleMath(state, silent) {
       start: state.pos,
       end: nextPos
     };
+    token.canonicalized = token.content ? canonicalMath(token.content) : [];
     /** Perform math to conversion to html and get additional data from MathJax to pass it to render rules */
     if (!state.md.options.forLatex) {
       convertMathToHtml(state, token, state.md.options);

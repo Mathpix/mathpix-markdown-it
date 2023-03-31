@@ -111,28 +111,22 @@ export const newTheoremBlock: RuleBlock = (state, startLine: number, endLine: nu
   token = state.push('inline', '', 0);
   token.content = "";
   token.children = [];
+  token.map = [startLine, state.line];
 
   let itemBefore = null;
   for (let j = 0; j < children.length; j++) {
     const item = children[j];
-    if (item.type === "newtheorem" || item.type === "theoremstyle" 
-      || item.type === "renewcommand_qedsymbol" 
-      || item.type === "theorem_setcounter" || item.type === "section_setcounter") {
-      itemBefore = item;
-      if (state.md.options.forLatex) {
-        token.children.push(item);
-      }
-      continue;
-    }
 
     if ((itemBefore?.type === "newtheorem" || itemBefore?.type === "theoremstyle" 
       || itemBefore?.type === "renewcommand_qedsymbol" 
       || itemBefore?.type === "theorem_setcounter" || itemBefore?.type === "section_setcounter")
       && item.type === "softbreak") {
+      item.hidden = true;
       itemBefore = item;
       if (state.md.options.forLatex) {
-        token.children.push(item);
+        item.hidden = false;
       }
+      token.children.push(item);
       continue;
     }
     token.children.push(item);

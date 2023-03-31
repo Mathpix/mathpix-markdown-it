@@ -378,3 +378,115 @@ export const findOpenCloseTagsMathEnvironment = (str: string, tagOpen: RegExp, t
     arrClose: arrClose,
   }
 };
+
+
+/**
+ * @return {string} Get and return a control-sequence name
+ */
+const GetCS = (str, i) => {
+  let CS = str.slice(i).match(/^([a-z]+|.) ?/i);
+  if (CS) {
+    i += CS[1].length;
+    return {
+      cs: CS[1],
+      next: i
+    };
+  } else {
+    i++;
+    return {
+      cs: ' ',
+      next: i
+    };
+  }
+};
+
+const getDigit = (str, i) => {
+  let CS = str.slice(i).match(/^([0-9.,]+|) ?/i);
+  if (CS) {
+    i += CS[1].length;
+    return {
+      cs: CS[1],
+      next: i
+    };
+  } else {
+    i++;
+    return {
+      cs: '',
+      next: i
+    };
+  }
+};
+
+const getLetter = (str, i) => {
+  let CS = str.slice(i).match(/^([a-z]+|) ?/i);
+  if (CS) {
+    i += CS[1].length;
+    return {
+      cs: CS[1],
+      next: i
+    };
+  } else {
+    i++;
+    return {
+      cs: '',
+      next: i
+    };
+  }
+};
+
+const nextIsSpace = (str, i) => {
+  return str.charAt(i).match(/\s/);
+};
+
+// const GetNext = (str, i) => {
+//   while (nextIsSpace(str, i)) {
+//     i++;
+//   }
+//   return {
+//     char: str.charAt(i),
+//     next: i
+//   };
+// };
+
+export const canonicalMath = (math) => {
+  if (!math || !math.trim()) {
+    return []
+  }
+  let arr = [];
+  let i = 0;
+  let c: string;
+  let n: number;
+  while (i < math.length) {
+    if (nextIsSpace(math, i)) {
+      i++;
+    }
+    c = math.charAt(i++);
+    n = c.charCodeAt(0);
+    if (n >= 0xD800 && n < 0xDC00) {
+      c += math.charAt(i++);
+    }
+    /** command */ 
+    if (/^\\/.test(c)) {
+      const { cs, next } = GetCS(math, i);
+      i = next;
+      arr.push(c + cs);
+      continue;
+    }
+    /** numbers */
+    if (/[0-9.,]/.test(c)) {
+      const { cs, next } = getDigit(math, i);
+      i = next;
+      arr.push(c + cs);
+      continue;
+    }
+    /** letters */
+    if (/[a-z]/i.test(c)) {
+      const { cs, next } = getLetter(math, i);
+      i = next;
+      arr.push(c + cs);
+      continue;
+    }
+    arr.push(c);
+  }
+  return arr;
+};
