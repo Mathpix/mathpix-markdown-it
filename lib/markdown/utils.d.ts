@@ -42,3 +42,4 @@ export declare const findOpenCloseTagsMathEnvironment: (str: string, tagOpen: Re
     arrClose: any[];
 };
 export declare const canonicalMath: (math: any) => any[];
+export declare const getSpacesFromLeft: (str: string) => number;

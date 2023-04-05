@@ -490,3 +490,9 @@ export const canonicalMath = (math) => {
   }
   return arr;
 };
+
+
+export const getSpacesFromLeft = (str: string) => {
+  let strTrimLeft = str ? str.trimLeft() : '';
+  return str ? str.length - strTrimLeft.length : 0;
+};

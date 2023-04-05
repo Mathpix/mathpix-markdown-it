@@ -115,3 +115,31 @@ describe('Testing positions for sections:', () => {
     });
   });
 });
+
+describe('Testing positions for author:', () => {
+  const tests = require('./_data/_tokenPositions/_data_author');
+  tests.forEach(function(test, index) {
+    it('MMD [' + index + ']=>' + test.mmd, function(done) {
+      const parseTokens = md.parse(test.mmd, {});
+      // const cleanTokens = getTokensTest(parseTokens);
+      // console.log("[cleanTokens]=>", JSON.stringify(cleanTokens, true, 2));
+      parseTokens.should.have.length(test.tokens.length);
+      checkTokens(parseTokens, test.tokens, test.mmd);
+      done();
+    });
+  });
+});
+
+describe('Testing positions for abstract:', () => {
+  const tests = require('./_data/_tokenPositions/_data_abstract');
+  tests.forEach(function(test, index) {
+    it('MMD [' + index + ']=>' + test.mmd, function(done) {
+      const parseTokens = md.parse(test.mmd, {});
+      // const cleanTokens = getTokensTest(parseTokens);
+      // console.log("[cleanTokens]=>", JSON.stringify(cleanTokens, true, 2));
+      parseTokens.should.have.length(test.tokens.length);
+      checkTokens(parseTokens, test.tokens, test.mmd);
+      done();
+    });
+  });
+});

@@ -206,6 +206,7 @@ module.exports = [
             "type": "text",
             "children": null,
             "content": "Change subsubsection number to 7 ",
+            "nextPos": 33,
             "positions": {
               "start": 0,
               "end": 33
@@ -216,11 +217,12 @@ module.exports = [
             "type": "code_inline",
             "children": null,
             "content": "\\setcounter{subsubsection}{7}",
+            "nextPos": 64,
             "positions": {
-              "start": 34,
-              "end": 63
+              "start": 33,
+              "end": 64
             },
-            "content_test_str": "\\setcounter{subsubsection}{7}"
+            "content_test_str": "`\\setcounter{subsubsection}{7}`"
           }
         ],
         "content": "Change subsubsection number to 7 `\\setcounter{subsubsection}{7}`",
@@ -256,6 +258,7 @@ module.exports = [
               "start": 0,
               "end": 29
             },
+            "nextPos": 29,
             "positions": {
               "start": 66,
               "end": 95
@@ -292,6 +295,7 @@ module.exports = [
             "type": "text",
             "children": null,
             "content": "section unnumbered",
+            "nextPos": 18,
             "positions": {
               "start": 107,
               "end": 125
@@ -331,6 +335,7 @@ module.exports = [
             "type": "text",
             "children": null,
             "content": "subsubsection unnumbered",
+            "nextPos": 24,
             "positions": {
               "start": 144,
               "end": 168
@@ -370,6 +375,7 @@ module.exports = [
             "type": "text",
             "children": null,
             "content": "subsubsection number should be 0.0.8",
+            "nextPos": 36,
             "positions": {
               "start": 186,
               "end": 222
@@ -409,6 +415,7 @@ module.exports = [
             "type": "text",
             "children": null,
             "content": "Change subsubsection number to 1 ",
+            "nextPos": 33,
             "positions": {
               "start": 225,
               "end": 258
@@ -419,11 +426,12 @@ module.exports = [
             "type": "code_inline",
             "children": null,
             "content": "\\setcounter{subsubsection}{1}",
+            "nextPos": 64,
             "positions": {
-              "start": 259,
-              "end": 288
+              "start": 258,
+              "end": 289
             },
-            "content_test_str": "\\setcounter{subsubsection}{1}"
+            "content_test_str": "`\\setcounter{subsubsection}{1}`"
           }
         ],
         "content": "Change subsubsection number to 1 `\\setcounter{subsubsection}{1}`",
@@ -459,6 +467,7 @@ module.exports = [
               "start": 0,
               "end": 29
             },
+            "nextPos": 29,
             "positions": {
               "start": 291,
               "end": 320
@@ -495,6 +504,7 @@ module.exports = [
             "type": "text",
             "children": null,
             "content": "subsubsection number should be 0.0.2",
+            "nextPos": 36,
             "positions": {
               "start": 337,
               "end": 373
@@ -534,6 +544,7 @@ module.exports = [
             "type": "text",
             "children": null,
             "content": "subsubsection unnumbered",
+            "nextPos": 24,
             "positions": {
               "start": 392,
               "end": 416
@@ -573,6 +584,7 @@ module.exports = [
             "type": "text",
             "children": null,
             "content": "subsubsection number should be 0.0.3",
+            "nextPos": 36,
             "positions": {
               "start": 434,
               "end": 470
@@ -612,6 +624,7 @@ module.exports = [
             "type": "text",
             "children": null,
             "content": "subsubsection number should be 0.0.4",
+            "nextPos": 36,
             "positions": {
               "start": 488,
               "end": 524
@@ -651,6 +664,7 @@ module.exports = [
             "type": "text",
             "children": null,
             "content": "section",
+            "nextPos": 7,
             "positions": {
               "start": 536,
               "end": 543
@@ -690,6 +704,7 @@ module.exports = [
             "type": "text",
             "children": null,
             "content": "Change section number to 5 ",
+            "nextPos": 27,
             "positions": {
               "start": 546,
               "end": 573
@@ -700,16 +715,18 @@ module.exports = [
             "type": "code_inline",
             "children": null,
             "content": "\\setcounter{section}{5}",
+            "nextPos": 52,
             "positions": {
-              "start": 574,
-              "end": 597
+              "start": 573,
+              "end": 598
             },
-            "content_test_str": "\\setcounter{section}{5}"
+            "content_test_str": "`\\setcounter{section}{5}`"
           },
           {
             "type": "softbreak",
             "children": null,
             "content": "",
+            "nextPos": 53,
             "positions": {
               "start": 598,
               "end": 599
@@ -724,6 +741,7 @@ module.exports = [
               "start": 53,
               "end": 76
             },
+            "nextPos": 76,
             "positions": {
               "start": 599,
               "end": 622
@@ -760,6 +778,7 @@ module.exports = [
             "type": "text",
             "children": null,
             "content": "subsubsection number should be 5.0.1",
+            "nextPos": 36,
             "positions": {
               "start": 639,
               "end": 675
@@ -799,6 +818,7 @@ module.exports = [
             "type": "text",
             "children": null,
             "content": "subsubsection unnumbered",
+            "nextPos": 24,
             "positions": {
               "start": 694,
               "end": 718
@@ -838,6 +858,7 @@ module.exports = [
             "type": "text",
             "children": null,
             "content": "Change section number to 7 ",
+            "nextPos": 27,
             "positions": {
               "start": 721,
               "end": 748
@@ -848,16 +869,18 @@ module.exports = [
             "type": "code_inline",
             "children": null,
             "content": "\\setcounter{section}{7}",
+            "nextPos": 52,
             "positions": {
-              "start": 749,
-              "end": 772
+              "start": 748,
+              "end": 773
             },
-            "content_test_str": "\\setcounter{section}{7}"
+            "content_test_str": "`\\setcounter{section}{7}`"
           },
           {
             "type": "softbreak",
             "children": null,
             "content": "",
+            "nextPos": 53,
             "positions": {
               "start": 773,
               "end": 774
@@ -872,6 +895,7 @@ module.exports = [
               "start": 53,
               "end": 76
             },
+            "nextPos": 76,
             "positions": {
               "start": 774,
               "end": 797
@@ -908,6 +932,7 @@ module.exports = [
             "type": "text",
             "children": null,
             "content": "subsubsection number should be 7.0.2",
+            "nextPos": 36,
             "positions": {
               "start": 813,
               "end": 849
@@ -947,6 +972,7 @@ module.exports = [
             "type": "text",
             "children": null,
             "content": "subsection unnumbered",
+            "nextPos": 21,
             "positions": {
               "start": 865,
               "end": 886
@@ -986,6 +1012,7 @@ module.exports = [
             "type": "text",
             "children": null,
             "content": "subsubsection unnumbered",
+            "nextPos": 24,
             "positions": {
               "start": 905,
               "end": 929
@@ -1025,6 +1052,7 @@ module.exports = [
             "type": "text",
             "children": null,
             "content": "subsubsection number should be 7.0.3",
+            "nextPos": 36,
             "positions": {
               "start": 947,
               "end": 983
@@ -1064,6 +1092,7 @@ module.exports = [
             "type": "text",
             "children": null,
             "content": "subsubsection number should be 7.0.4",
+            "nextPos": 36,
             "positions": {
               "start": 1001,
               "end": 1037
@@ -1103,6 +1132,7 @@ module.exports = [
             "type": "text",
             "children": null,
             "content": "section unnumbered",
+            "nextPos": 18,
             "positions": {
               "start": 1050,
               "end": 1068
@@ -1142,6 +1172,7 @@ module.exports = [
             "type": "text",
             "children": null,
             "content": "subsubsection unnumbered",
+            "nextPos": 24,
             "positions": {
               "start": 1087,
               "end": 1111
@@ -1181,6 +1212,7 @@ module.exports = [
             "type": "text",
             "children": null,
             "content": "subsubsection unnumbered",
+            "nextPos": 24,
             "positions": {
               "start": 1130,
               "end": 1154
@@ -1220,6 +1252,7 @@ module.exports = [
             "type": "text",
             "children": null,
             "content": "section",
+            "nextPos": 7,
             "positions": {
               "start": 1166,
               "end": 1173
@@ -1259,6 +1292,7 @@ module.exports = [
             "type": "text",
             "children": null,
             "content": "Change subsection number to 7 ",
+            "nextPos": 30,
             "positions": {
               "start": 1176,
               "end": 1206
@@ -1269,16 +1303,18 @@ module.exports = [
             "type": "code_inline",
             "children": null,
             "content": "\\setcounter{subsection}{7}",
+            "nextPos": 58,
             "positions": {
-              "start": 1207,
-              "end": 1233
+              "start": 1206,
+              "end": 1234
             },
-            "content_test_str": "\\setcounter{subsection}{7}"
+            "content_test_str": "`\\setcounter{subsection}{7}`"
           },
           {
             "type": "softbreak",
             "children": null,
             "content": "",
+            "nextPos": 59,
             "positions": {
               "start": 1234,
               "end": 1235
@@ -1293,6 +1329,7 @@ module.exports = [
               "start": 59,
               "end": 85
             },
+            "nextPos": 85,
             "positions": {
               "start": 1235,
               "end": 1261
@@ -1329,6 +1366,7 @@ module.exports = [
             "type": "text",
             "children": null,
             "content": "subsubsection number should be 8.7.1",
+            "nextPos": 36,
             "positions": {
               "start": 1278,
               "end": 1314
@@ -1368,6 +1406,7 @@ module.exports = [
             "type": "text",
             "children": null,
             "content": "subsubsection unnumbered",
+            "nextPos": 24,
             "positions": {
               "start": 1333,
               "end": 1357
@@ -1407,6 +1446,7 @@ module.exports = [
             "type": "text",
             "children": null,
             "content": "subsection",
+            "nextPos": 10,
             "positions": {
               "start": 1372,
               "end": 1382
@@ -1446,6 +1486,7 @@ module.exports = [
             "type": "text",
             "children": null,
             "content": "subsubsection number should be 8.8.1",
+            "nextPos": 36,
             "positions": {
               "start": 1400,
               "end": 1436
@@ -1485,6 +1526,7 @@ module.exports = [
             "type": "text",
             "children": null,
             "content": "subsection unnumbered",
+            "nextPos": 21,
             "positions": {
               "start": 1452,
               "end": 1473
@@ -1524,6 +1566,7 @@ module.exports = [
             "type": "text",
             "children": null,
             "content": "subsubsection number should be 8.8.2",
+            "nextPos": 36,
             "positions": {
               "start": 1491,
               "end": 1527
@@ -1563,6 +1606,7 @@ module.exports = [
             "type": "text",
             "children": null,
             "content": "Change subsubsection number to 7 ",
+            "nextPos": 33,
             "positions": {
               "start": 1530,
               "end": 1563
@@ -1573,16 +1617,18 @@ module.exports = [
             "type": "code_inline",
             "children": null,
             "content": "\\setcounter{subsubsection}{7}",
+            "nextPos": 64,
             "positions": {
-              "start": 1564,
-              "end": 1593
+              "start": 1563,
+              "end": 1594
             },
-            "content_test_str": "\\setcounter{subsubsection}{7}"
+            "content_test_str": "`\\setcounter{subsubsection}{7}`"
           },
           {
             "type": "softbreak",
             "children": null,
             "content": "",
+            "nextPos": 65,
             "positions": {
               "start": 1594,
               "end": 1595
@@ -1597,6 +1643,7 @@ module.exports = [
               "start": 65,
               "end": 94
             },
+            "nextPos": 94,
             "positions": {
               "start": 1595,
               "end": 1624
@@ -1633,6 +1680,7 @@ module.exports = [
             "type": "text",
             "children": null,
             "content": "subsubsection number should be 8.8.8",
+            "nextPos": 36,
             "positions": {
               "start": 1641,
               "end": 1677
@@ -1672,6 +1720,7 @@ module.exports = [
             "type": "text",
             "children": null,
             "content": "subsection",
+            "nextPos": 10,
             "positions": {
               "start": 1692,
               "end": 1702
@@ -1711,6 +1760,7 @@ module.exports = [
             "type": "text",
             "children": null,
             "content": "subsubsection number should be 8.9.1",
+            "nextPos": 36,
             "positions": {
               "start": 1720,
               "end": 1756
@@ -1750,6 +1800,7 @@ module.exports = [
             "type": "text",
             "children": null,
             "content": "subsubsection unnumbered",
+            "nextPos": 24,
             "positions": {
               "start": 1775,
               "end": 1799
@@ -1789,6 +1840,7 @@ module.exports = [
             "type": "text",
             "children": null,
             "content": "subsubsection number should be 8.9.2",
+            "nextPos": 36,
             "positions": {
               "start": 1817,
               "end": 1853
@@ -1828,6 +1880,7 @@ module.exports = [
             "type": "text",
             "children": null,
             "content": "subsection unnumbered",
+            "nextPos": 21,
             "positions": {
               "start": 1869,
               "end": 1890
@@ -1867,6 +1920,7 @@ module.exports = [
             "type": "text",
             "children": null,
             "content": "section",
+            "nextPos": 7,
             "positions": {
               "start": 1902,
               "end": 1909
@@ -1906,6 +1960,7 @@ module.exports = [
             "type": "text",
             "children": null,
             "content": "Change subsection number to 7 ",
+            "nextPos": 30,
             "positions": {
               "start": 1912,
               "end": 1942
@@ -1916,16 +1971,18 @@ module.exports = [
             "type": "code_inline",
             "children": null,
             "content": "\\setcounter{subsection}{7}",
+            "nextPos": 58,
             "positions": {
-              "start": 1943,
-              "end": 1969
+              "start": 1942,
+              "end": 1970
             },
-            "content_test_str": "\\setcounter{subsection}{7}"
+            "content_test_str": "`\\setcounter{subsection}{7}`"
           },
           {
             "type": "softbreak",
             "children": null,
             "content": "",
+            "nextPos": 59,
             "positions": {
               "start": 1970,
               "end": 1971
@@ -1940,6 +1997,7 @@ module.exports = [
               "start": 59,
               "end": 85
             },
+            "nextPos": 85,
             "positions": {
               "start": 1971,
               "end": 1997
@@ -1976,6 +2034,7 @@ module.exports = [
             "type": "text",
             "children": null,
             "content": "subsubsection unnumbered",
+            "nextPos": 24,
             "positions": {
               "start": 2015,
               "end": 2039
@@ -2015,6 +2074,7 @@ module.exports = [
             "type": "text",
             "children": null,
             "content": "subsection unnumbered",
+            "nextPos": 21,
             "positions": {
               "start": 2055,
               "end": 2076
@@ -2054,6 +2114,7 @@ module.exports = [
             "type": "text",
             "children": null,
             "content": "subsubsection number should be 9.7.1",
+            "nextPos": 36,
             "positions": {
               "start": 2094,
               "end": 2130
@@ -2093,6 +2154,7 @@ module.exports = [
             "type": "text",
             "children": null,
             "content": "subsection",
+            "nextPos": 10,
             "positions": {
               "start": 2145,
               "end": 2155
@@ -2132,6 +2194,7 @@ module.exports = [
             "type": "text",
             "children": null,
             "content": "subsection unnumbered",
+            "nextPos": 21,
             "positions": {
               "start": 2171,
               "end": 2192
@@ -2171,6 +2234,7 @@ module.exports = [
             "type": "text",
             "children": null,
             "content": "subsubsection unnumbered",
+            "nextPos": 24,
             "positions": {
               "start": 2211,
               "end": 2235
@@ -2210,6 +2274,7 @@ module.exports = [
             "type": "text",
             "children": null,
             "content": "subsection unnumbered",
+            "nextPos": 21,
             "positions": {
               "start": 2251,
               "end": 2272
@@ -2249,6 +2314,7 @@ module.exports = [
             "type": "text",
             "children": null,
             "content": "subsubsection number should be 9.8.1",
+            "nextPos": 36,
             "positions": {
               "start": 2290,
               "end": 2326

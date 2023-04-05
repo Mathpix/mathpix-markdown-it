@@ -3,8 +3,10 @@ const isSpace = require('markdown-it/lib/common/utils').isSpace;
 import { renderTabularInline } from "./md-renderer-rules/render-tabular";
 import { closeTagSpan, reSpan, reAddContentsLine } from "./common/consts";
 import { findEndMarker, getTerminatedRules } from "./common";
-import { uid } from "./utils";
+import { uid , getSpacesFromLeft } from "./utils";
 import { ILabel, getLabelByUuidFromLabelsList } from "./common/labels";
+import { textCollapse } from "./md-inline-rule/text-collapse";
+import { newlineToSpace } from "./md-inline-rule/new-line-to-space";
 
 export let sectionCount: number = 0;
 export let subCount: number = 0;
@@ -316,9 +318,12 @@ export const headingSection: RuleBlock = (state, startLine: number, endLine: num
   let hasEndMarker = false;
   let last = nextLine;
   let eMarks = 0; //line end offsets
+  let bMarksContent = startPos;
   let inlineStr = '';
   if (!res) {
     // resString += resString ? ' ' : '';
+    bMarksContent += content?.length ? 0 : 1;
+    bMarksContent += state.tShift[nextLine];
     for (; nextLine <= endLine; nextLine++) {
       if (lineText === '') {
         break;
@@ -386,7 +391,7 @@ export const headingSection: RuleBlock = (state, startLine: number, endLine: num
   token.map = [startLine, state.line];
   token.bMarks = bMarks;
   token.eMarks = eMarks ? eMarks : token.bMarks + resString.length;
-  token.bMarksContent = bMarks + startPos + beginMarker.length;
+  token.bMarksContent = bMarks + bMarksContent + beginMarker.length;
   token.eMarksContent = token.eMarks;
   token.eMarks += 1;
 
@@ -460,6 +465,7 @@ export const headingSection: RuleBlock = (state, startLine: number, endLine: num
   return true;
 };
 
+/** TODO: Need to change this rule to separate rendering of the entire block abstract */
 const abstractBlock: RuleBlock = (state, startLine, endLine, silent) => {
   let isBlockOpened = false;
   let token: Token;
@@ -491,10 +497,10 @@ const abstractBlock: RuleBlock = (state, startLine, endLine, silent) => {
   if (match) {
     inline = lineText.slice(match.index + match[0].length);
   }
-  if (inline) {
+  if (inline && inline.trim()) {
     arrContent.push({
       line: startLine,
-      bMarks: match.index + match[0].length,
+      bMarks:state.tShift[startLine] + match.index + match[0].length,
       eMarks: lineText.length,
       content: inline
     })
@@ -519,7 +525,7 @@ const abstractBlock: RuleBlock = (state, startLine, endLine, silent) => {
       arrContent.push({
         line: nextLine,
         bMarks: 0,
-        eMarks: lineText.length,
+        eMarks: state.tShift[nextLine] + lineText.length,
         content: lineText
       });
     }
@@ -578,7 +584,7 @@ const abstractBlock: RuleBlock = (state, startLine, endLine, silent) => {
         });
       } else {
         if (arrContent?.length) {
-          arrContent[arrContent.length-1].line += 1;
+          arrContent[arrContent.length-1].endLine = arrContent[arrContent.length-1].line + 1;
           arrContent[arrContent.length-1].eMarks += 1;
         }
       }
@@ -600,7 +606,7 @@ const abstractBlock: RuleBlock = (state, startLine, endLine, silent) => {
       continue;
     }
     if (arrContent[i].content?.trim()) {
-      start.endLine = arrContent[i].line;
+      start.endLine = arrContent[i].hasOwnProperty('endLine') ? arrContent[i].endLine : arrContent[i].line;
       start.content += start.content ? ' ' : '';
       start.content += arrContent[i].content;
       start.eMarks = arrContent[i].eMarks ? arrContent[i].eMarks : 0;
@@ -760,6 +766,7 @@ const textAuthor: RuleInline = (state) => {
   };
 
   const columns = content.split('\\and');
+  let pos = 0;
   for (let i = 0; i < columns.length; i++) {
     let column = columns[i]
       ? columns[i].trim()
@@ -769,22 +776,29 @@ const textAuthor: RuleInline = (state) => {
     tokenAuthorColumn.type = 'author_column';
     tokenAuthorColumn.content = column;
     tokenAuthorColumn.children = [];
+    
+    pos = pos + columns[i].length;
+    pos += i < columns.length - 1 ? '\\and'.length : 0;
+    tokenAuthorColumn.nextPos = pos;
 
-    let colArr = column.split('\\\\');
-
+    let colArr = columns[i].split('\\\\');
+    let posCol = 0;
     if (colArr && colArr.length) {
       for ( let j = 0; j < colArr.length; j++ ) {
         let item = colArr[j] ? colArr[j].trim() : '';
-        let arrItem = item.split('\n');
-        arrItem = arrItem.map(item => item.trim());
-        item = arrItem.join(' ');
 
         const newToken: Token = {};
         newToken.type = 'author_item';
         newToken.content = item;
-
+        newToken.offsetLeft = colArr[j].trim()?.length ? getSpacesFromLeft(colArr[j]) : 0;
+        posCol = posCol + colArr[j].length;
+        posCol += j < colArr.length - 1 ? '\\\\'.length : 0;
+        newToken.nextPos = posCol;
+        
         let children = [];
+        state.env.newlineToSpace = true;
         state.md.inline.parse(item, state.md, state.env, children);
+        state.env.newlineToSpace = true;
         newToken.children = children;
 
         tokenAuthorColumn.children.push(newToken);
@@ -832,18 +846,28 @@ const textTypes: RuleInline = (state) => {
     return false;
   }
 
-  let {res = false, content = '', nextPos = 0 } = findEndMarker(state.src, startPos);
+  let {res = false, content = '', nextPos = 0, endPos = 0 } = findEndMarker(state.src, startPos);
 
   if ( !res ) {
     return false;
   }
 
-  state.push(type + '_open', "", 0);
-  const token = state.push(type, "", 0);
+  let token = state.push(type + '_open', "", 0);
+  token.inlinePos = {
+    start: state.pos,
+    end: startPos + 1
+  };
+  token.nextPos = startPos + 1;
+  token = state.push(type, "", 0);
   if (state.md.options?.forDocx && arrtStyle) {
     token.attrSet('style', arrtStyle);
   }
   token.content = content;
+  token.inlinePos = {
+    start: startPos + 1,
+    end: endPos,
+  };
+  token.nextPos = endPos;
   token.children = [];
 
   let children = [];
@@ -852,6 +876,7 @@ const textTypes: RuleInline = (state) => {
 
   state.push(type + '_close', "", 0);
   state.pos = nextPos;
+  state.nextPos = nextPos;
   return true;
 };
 
@@ -930,6 +955,7 @@ const linkifyURL: RuleInline = (state) => {
   let token;
   const text = state.src.slice(startPos + 1, nextPos - endMarker.length);
   if (!text || text.trim().length === 0) {
+    text.nextPos = nextPos;
     state.pos = nextPos;
     return true;
   }
@@ -937,6 +963,7 @@ const linkifyURL: RuleInline = (state) => {
   if (!state.md.linkify.test(text) || !urlTag.test(text)) {
     token         = state.push('textUrl', '', 0);
     token.content = text;
+    token.nextPos = nextPos;
     state.pos = nextPos;
     return true;
   }
@@ -991,15 +1018,18 @@ const linkifyURL: RuleInline = (state) => {
     token.level   = level++;
     token.markup  = 'linkify';
     token.info    = 'auto';
+    token.nextPos = startPos + 1;
 
     token         = state.push('text', '', 0);
     token.content = urlText;
     token.level   = level;
+    token.nextPos = endMarkerPos;
 
     token         = state.push('link_close', 'a', -1);
     token.level   = --level;
     token.markup  = 'linkify';
     token.info    = 'auto';
+    token.nextPos = nextPos;
 
     lastPos = links[ln].lastIndex;
   }
@@ -1008,6 +1038,7 @@ const linkifyURL: RuleInline = (state) => {
     token         = state.push('textUrl', '', 0);
     token.content = text.slice(lastPos);
     token.level   = level;
+    state.nextPos = nextPos;
   }
 
   state.pos = nextPos;
@@ -1236,6 +1267,10 @@ export default () => {
     md.inline.ruler.before('textTypes', 'linkifyURL', linkifyURL);
     md.inline.ruler.before('textTypes', 'pageBreaks', pageBreaks);
     md.inline.ruler.before('textTypes', 'doubleSlashToSoftBreak', doubleSlashToSoftBreak);
+    md.inline.ruler.before('newline', 'newlineToSpace', newlineToSpace);
+    /** ParserInline#ruler2 -> Ruler
+     *[[Ruler]] instance. Second ruler used for post-processing **/
+    md.inline.ruler2.at('text_collapse', textCollapse);
 
     Object.keys(mappingTextStyles).forEach(key => {
       md.renderer.rules[key] = (tokens, idx, options, env, slf) => {
@@ -1292,6 +1327,10 @@ export default () => {
         }
       }
     });
+    
+    md.renderer.rules.flatNewLine = () => {
+      return ' '
+    };
     
     md.renderer.rules.pagebreak = (tokens, idx, options, env = {}, slf) => {
       return renderPageBreaks(tokens, idx, options, env, slf)
