@@ -1,5 +1,6 @@
 import { RuleInline, Token } from 'markdown-it';
 import { TBegin, bItemTag, reNumber } from "../md-block-rule/lists";
+import { getSpacesFromLeft } from "../utils";
 
 export const listCloseInline: RuleInline = (state, silent) => {
   let token: Token;
@@ -106,6 +107,12 @@ export const listItemInline: RuleInline = (state, silent) => {
     : state.src.slice(startMathPos + match.index + match[0].length)
   token        = state.push('item_inline', 'li', 0);
   token.parentType = state.parentType;
+  token.inlinePos = {
+    start_content: startMathPos + match.index + match[0].length,
+  };
+  token.inlinePos.start_content += getSpacesFromLeft(content);
+  token.inlinePos.end_content = token.inlinePos.start_content + content.length;
+  
   let children = [];
   state.md.inline.parse(content.trim(), state.md, state.env, children);
   token.children = children;

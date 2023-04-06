@@ -90,6 +90,9 @@ const ListItems = (state, items, iLevel, eLevel, li, iOpen) => {
           token.parentStart = state.startLine;
 
           token.map = [item.startLine, item.endLine + 1];
+          if (child.hasOwnProperty('inlinePos')) {
+            token.bMarks = child.inlinePos.start_content
+          }
           token.content = child.content;
           token.children = child.children;
           token.prentLevel = state.prentLevel;
