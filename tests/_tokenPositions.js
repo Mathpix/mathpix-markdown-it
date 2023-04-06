@@ -46,7 +46,9 @@ const getTokensTest = (tokens) => {
   const res = [];
   const attrDel = ['attrs', 'block', 'hidden', 'info', 'level', 'map', 'markup', 'meta', 'nesting', 'tag',
     'bMarksContent', 'currentTag', 'eMarks', 'eMarksContent', 'isNewSubSection', 'isUnNumbered', 'section', 'subsection',
-    'subsubsection', 'uuid', 'latex', 'is_numerable', 'bMarks', 'isNewSect', 'content_id', 'mathEquation'];
+    'subsubsection', 'uuid', 'latex', 'is_numerable', 'bMarks', 'isNewSect', 'content_id', 'mathEquation',
+    'itemizeLevel', 'enumerateLevel', 'prentLevel', 'parentStart'
+  ];
   for (let i = 0; i < tokens.length; i++) {
     let token = tokens[i];
     if (token.children?.length) {
@@ -137,6 +139,20 @@ describe('Testing positions for abstract:', () => {
       const parseTokens = md.parse(test.mmd, {});
       // const cleanTokens = getTokensTest(parseTokens);
       // console.log("[cleanTokens]=>", JSON.stringify(cleanTokens, true, 2));
+      parseTokens.should.have.length(test.tokens.length);
+      checkTokens(parseTokens, test.tokens, test.mmd);
+      done();
+    });
+  });
+});
+
+describe('Testing positions for lists:', () => {
+  const tests = require('./_data/_tokenPositions/_data_lists');
+  tests.forEach(function(test, index) {
+    it('MMD [' + index + ']=>' + test.mmd, function(done) {
+      const parseTokens = md.parse(test.mmd, {});
+      // const cleanTokens = getTokensTest(parseTokens);
+      // console.log("[cleanTokens]=>",index, JSON.stringify(cleanTokens, true, 2));
       parseTokens.should.have.length(test.tokens.length);
       checkTokens(parseTokens, test.tokens, test.mmd);
       done();
