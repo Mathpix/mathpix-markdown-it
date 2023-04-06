@@ -2924,5 +2924,397 @@ break }
         "content": ""
       }
     ]
+  },
+  {
+    mmd: 'This means that you can use all the standard **Markdown syntax** in addition to some **LaTeX features** that we will list below. \n' +
+      '\n' +
+      '123 \\pagebreak text\n' +
+      '\n' +
+      '123\\pagebreak\n' +
+      '\n' +
+      '\\pagebreak text\n' +
+      '\\clearpage\n' +
+      '\n' +
+      '\\newpage\n' +
+      '\n' +
+      '\\texttt{f}',
+    tokens: [
+      {
+        "type": "paragraph_open",
+        "children": null,
+        "content": "",
+        "positions": {
+          "start": 0,
+          "end": 129
+        },
+        "content_test_str": "This means that you can use all the standard **Markdown syntax** in addition to some **LaTeX features** that we will list below. "
+      },
+      {
+        "type": "inline",
+        "children": [
+          {
+            "type": "text",
+            "children": null,
+            "content": "This means that you can use all the standard ",
+            "nextPos": 45,
+            "positions": {
+              "start": 0,
+              "end": 45
+            },
+            "content_test_str": "This means that you can use all the standard "
+          },
+          {
+            "type": "strong_open",
+            "children": null,
+            "content": "",
+            "nextPos": 47,
+            "positions": {
+              "start": 45,
+              "end": 47
+            },
+            "content_test_str": "**"
+          },
+          {
+            "type": "text",
+            "children": null,
+            "content": "Markdown syntax",
+            "nextPos": 62,
+            "positions": {
+              "start": 47,
+              "end": 62
+            },
+            "content_test_str": "Markdown syntax"
+          },
+          {
+            "type": "strong_close",
+            "children": null,
+            "content": "",
+            "positions": {
+              "start": 62,
+              "end": 64
+            },
+            "content_test_str": "**"
+          },
+          {
+            "type": "text",
+            "children": null,
+            "content": " in addition to some ",
+            "nextPos": 85,
+            "positions": {
+              "start": 64,
+              "end": 85
+            },
+            "content_test_str": " in addition to some "
+          },
+          {
+            "type": "strong_open",
+            "children": null,
+            "content": "",
+            "nextPos": 87,
+            "positions": {
+              "start": 85,
+              "end": 87
+            },
+            "content_test_str": "**"
+          },
+          {
+            "type": "text",
+            "children": null,
+            "content": "LaTeX features",
+            "nextPos": 101,
+            "positions": {
+              "start": 87,
+              "end": 101
+            },
+            "content_test_str": "LaTeX features"
+          },
+          {
+            "type": "strong_close",
+            "children": null,
+            "content": "",
+            "positions": {
+              "start": 101,
+              "end": 103
+            },
+            "content_test_str": "**"
+          },
+          {
+            "type": "text",
+            "children": null,
+            "content": " that we will list below.",
+            "nextPos": 128,
+            "positions": {
+              "start": 103,
+              "end": 128
+            },
+            "content_test_str": " that we will list below."
+          }
+        ],
+        "content": "This means that you can use all the standard **Markdown syntax** in addition to some **LaTeX features** that we will list below.",
+        "positions": {
+          "start": 0,
+          "end": 129
+        },
+        "content_test_str": "This means that you can use all the standard **Markdown syntax** in addition to some **LaTeX features** that we will list below. "
+      },
+      {
+        "type": "paragraph_close",
+        "children": null,
+        "content": ""
+      },
+      {
+        "type": "paragraph_open",
+        "children": null,
+        "content": "",
+        "positions": {
+          "start": 131,
+          "end": 150
+        },
+        "content_test_str": "123 \\pagebreak text"
+      },
+      {
+        "type": "inline",
+        "children": [
+          {
+            "type": "text",
+            "children": null,
+            "content": "123 ",
+            "nextPos": 4,
+            "positions": {
+              "start": 131,
+              "end": 135
+            },
+            "content_test_str": "123 "
+          },
+          {
+            "type": "pagebreak",
+            "children": [],
+            "content": "",
+            "nextPos": 14,
+            "positions": {
+              "start": 135,
+              "end": 145
+            },
+            "content_test_str": "\\pagebreak"
+          },
+          {
+            "type": "text",
+            "children": null,
+            "content": " text",
+            "nextPos": 19,
+            "positions": {
+              "start": 145,
+              "end": 150
+            },
+            "content_test_str": " text"
+          }
+        ],
+        "content": "123 \\pagebreak text",
+        "positions": {
+          "start": 131,
+          "end": 150
+        },
+        "content_test_str": "123 \\pagebreak text"
+      },
+      {
+        "type": "paragraph_close",
+        "children": null,
+        "content": ""
+      },
+      {
+        "type": "paragraph_open",
+        "children": null,
+        "content": "",
+        "positions": {
+          "start": 152,
+          "end": 165
+        },
+        "content_test_str": "123\\pagebreak"
+      },
+      {
+        "type": "inline",
+        "children": [
+          {
+            "type": "text",
+            "children": null,
+            "content": "123",
+            "nextPos": 3,
+            "positions": {
+              "start": 152,
+              "end": 155
+            },
+            "content_test_str": "123"
+          },
+          {
+            "type": "pagebreak",
+            "children": [],
+            "content": "",
+            "nextPos": 13,
+            "positions": {
+              "start": 155,
+              "end": 165
+            },
+            "content_test_str": "\\pagebreak"
+          }
+        ],
+        "content": "123\\pagebreak",
+        "positions": {
+          "start": 152,
+          "end": 165
+        },
+        "content_test_str": "123\\pagebreak"
+      },
+      {
+        "type": "paragraph_close",
+        "children": null,
+        "content": ""
+      },
+      {
+        "type": "paragraph_open",
+        "children": null,
+        "content": "",
+        "positions": {
+          "start": 167,
+          "end": 182
+        },
+        "content_test_str": "\\pagebreak text"
+      },
+      {
+        "type": "pagebreak",
+        "children": [],
+        "content": "",
+        "positions": {
+          "start": 167,
+          "end": 177
+        },
+        "content_test_str": "\\pagebreak"
+      },
+      {
+        "type": "inline",
+        "children": [
+          {
+            "type": "text",
+            "children": null,
+            "content": " text",
+            "nextPos": 5,
+            "positions": {
+              "start": 177,
+              "end": 182
+            },
+            "content_test_str": " text"
+          }
+        ],
+        "content": " text",
+        "positions": {
+          "start": 177,
+          "end": 182
+        },
+        "content_test_str": " text"
+      },
+      {
+        "type": "paragraph_close",
+        "children": null,
+        "content": ""
+      },
+      {
+        "type": "pagebreak",
+        "children": [],
+        "content": "",
+        "positions": {
+          "start": 183,
+          "end": 193
+        },
+        "content_test_str": "\\clearpage"
+      },
+      {
+        "type": "pagebreak",
+        "children": [],
+        "content": "",
+        "positions": {
+          "start": 195,
+          "end": 203
+        },
+        "content_test_str": "\\newpage"
+      },
+      {
+        "type": "paragraph_open",
+        "children": null,
+        "content": "",
+        "positions": {
+          "start": 205,
+          "end": 215
+        },
+        "content_test_str": "\\texttt{f}"
+      },
+      {
+        "type": "inline",
+        "children": [
+          {
+            "type": "texttt_open",
+            "children": null,
+            "content": "",
+            "inlinePos": {
+              "start": 0,
+              "end": 8
+            },
+            "nextPos": 8,
+            "positions": {
+              "start": 205,
+              "end": 213
+            },
+            "content_test_str": "\\texttt{"
+          },
+          {
+            "type": "texttt",
+            "children": [
+              {
+                "type": "text",
+                "children": null,
+                "content": "f",
+                "nextPos": 1,
+                "positions": {
+                  "start": 213,
+                  "end": 214
+                },
+                "content_test_str": "f"
+              }
+            ],
+            "content": "f",
+            "inlinePos": {
+              "start": 8,
+              "end": 9
+            },
+            "nextPos": 9,
+            "positions": {
+              "start": 213,
+              "end": 214
+            },
+            "content_test_str": "f"
+          },
+          {
+            "type": "texttt_close",
+            "children": null,
+            "content": "",
+            "nextPos": 10,
+            "positions": {
+              "start": 214,
+              "end": 215
+            },
+            "content_test_str": "}"
+          }
+        ],
+        "content": "\\texttt{f}",
+        "positions": {
+          "start": 205,
+          "end": 215
+        },
+        "content_test_str": "\\texttt{f}"
+      },
+      {
+        "type": "paragraph_close",
+        "children": null,
+        "content": ""
+      }
+    ]
   }
 ];

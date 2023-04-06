@@ -722,6 +722,8 @@ const pageBreaksBlock: RuleBlock = (state, startLine: number, endLine, silent) =
     token = state.push('inline', '', 0);
     token.content = strAfterEnd;
     token.children = [];
+    token.bMarks = startPos;
+    token.map = [startLine, nextLine]
   }
   if (state.md.options.showPageBreaks || strAfterEnd?.trim()) {
     state.push('paragraph_close', 'div', -1);
