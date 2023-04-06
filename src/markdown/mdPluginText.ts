@@ -704,6 +704,9 @@ const pageBreaksBlock: RuleBlock = (state, startLine: number, endLine, silent) =
   }
   token = state.push("pagebreak", "", 0);
   token.content = '';
+  token.map = [startLine, nextLine];
+  token.bMarks = state.tShift[startLine];
+  token.eMarks = strAfterEnd ? startPos : 0;
   if (state.md.options.forLatex) {
     token.latex = '\\' + match[0];
     if (!strAfterEnd || !strAfterEnd.trim()) {
