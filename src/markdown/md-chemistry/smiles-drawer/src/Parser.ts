@@ -21,7 +21,10 @@ function buildMessage(expected, found): any {
 
       for (i = 0; i < expectation.parts.length; i++) {
         escapedParts += expectation.parts[i] instanceof Array ?
-          classEscape(expectation.parts[i][0]) + "-" + classEscape(expectation.parts[i][1]) :
+          expectation.parts[i]?.length > 3 
+            ? classEscape(expectation.parts[i][0]) + "-" + classEscape(expectation.parts[i][1]) + ", " 
+            + classEscape(expectation.parts[i][2]) + "-" + classEscape(expectation.parts[i][3])
+            : classEscape(expectation.parts[i][0]) + "-" + classEscape(expectation.parts[i][1]) :
           classEscape(expectation.parts[i]);
       }
 
@@ -340,7 +343,12 @@ function peg$parse(input, options) {
     peg$c79 = function (i) {
       return Number(i.join(""));
     },
-
+    /** Markush symbols */
+    peg$c80 = /^[RXYZ]/,
+    peg$c81 = peg$classExpectation([
+      ["a", "z", "1", "9"]
+    ], false, false),
+    
     peg$currPos = 0,
     // peg$savedPos = 0,
     peg$posDetailsCache = [{
@@ -1008,13 +1016,37 @@ function peg$parse(input, options) {
       }
     }
     if (s2 !== peg$FAILED) {
-      if (peg$c37.test(input.charAt(peg$currPos))) {
-        s3 = input.charAt(peg$currPos);
-        peg$currPos++;
+      /** Markush:
+       * first symbol can be R,X,Y,Z
+       * max number 199 - [R199]
+       * */
+      if (peg$c80.test(s2) && !peg$c37.test(input.charAt(peg$currPos))){
+        if (peg$c42.test(input.charAt(peg$currPos))) {
+          s3 = input.charAt(peg$currPos);
+          peg$currPos++;
+          if (peg$c44.test(input.charAt(peg$currPos))){
+            s3 += input.charAt(peg$currPos);
+            peg$currPos++;
+            if (peg$c44.test(input.charAt(peg$currPos))){
+              s3 += input.charAt(peg$currPos);
+              peg$currPos++;
+            }
+          }
+        } else {
+          s3 = peg$FAILED;
+          if (peg$silentFails === 0) {
+            peg$fail(peg$c81);
+          }
+        }
       } else {
-        s3 = peg$FAILED;
-        if (peg$silentFails === 0) {
-          peg$fail(peg$c38);
+        if (peg$c37.test(input.charAt(peg$currPos))) {
+          s3 = input.charAt(peg$currPos);
+          peg$currPos++;
+        } else {
+          s3 = peg$FAILED;
+          if (peg$silentFails === 0) {
+            peg$fail(peg$c38);
+          }
         }
       }
       if (s3 === peg$FAILED) {

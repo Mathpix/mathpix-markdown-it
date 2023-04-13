@@ -125,5 +125,18 @@ describe('Check Smiles:', () => {
         });
       });
     }
+  });  
+  
+  const testsMarkush = require('./_data/_smiles/_markush');
+  testsMarkush.forEach(function(test) {
+    if (test.smiles && test.svg) {
+      const html = MM.markdownToHTML(test.smiles, options);
+      describe('Smiles Markush structures [' + (test.id).toString() + '] => ' + test.smiles, () => {
+        it('Checking result html', (done) => {
+          html.trim().should.equal(test.svg.trim());
+          done();
+        });
+      });
+    }
   });
 });
