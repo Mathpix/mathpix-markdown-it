@@ -59,7 +59,8 @@ const OuterData = (adaptor, node, math, outMath, forDocx = false, accessibility?
     latex?: string,
     svg?: string,
     speech?: string,
-    asciimath_tsv?: string
+    asciimath_tsv?: string,
+    asciimath_csv?: string,
   } = {};
 
   if (accessibility && accessibility.sre) {
@@ -80,6 +81,10 @@ const OuterData = (adaptor, node, math, outMath, forDocx = false, accessibility?
   if (optionAscii?.tableToTsv) {
     res.asciimath_tsv = toAsciiML(math.root, optionAscii);
     optionAscii.tableToTsv = false;
+  }  
+  if (optionAscii?.tableToCsv) {
+    res.asciimath_csv = toAsciiML(math.root, optionAscii);
+    optionAscii.tableToCsv = false;
   }
   if (include_asciimath) {
     res.asciimath = toAsciiML(math.root, optionAscii);
@@ -297,9 +302,9 @@ export const MathJax = {
     }
     try {
       /** Here we use different package settings.
-       * In order to flatten arrays in asccimath for TSV we add an extra attribute to the internal mml tree.
+       * In order to flatten arrays in asccimath for TSV/CSV we add an extra attribute to the internal mml tree.
        * So for \begin{array} we add a name attribute that points to the environment */
-      const node = options?.outMath?.optionAscii?.tableToTsv 
+      const node = options?.outMath?.optionAscii?.tableToTsv || options?.outMath?.optionAscii?.tableToCsv
         ? MJ.docTeXTSV.convert(string, {
         display: display, 
         em: em, 
@@ -356,6 +361,7 @@ export const MathJax = {
     const { include_asciimath = false } = outMath;
     options.outMath.include_asciimath = true;
     let dataTSV = null;
+    let dataCSV = null;
     if (options?.outMath?.optionAscii?.tableToTsv) {
       /** Get only asccimath converted for TSV */
       dataTSV = this.TexConvert(string, Object.assign({}, options, {
@@ -373,13 +379,32 @@ export const MathJax = {
         }
       }));
       options.outMath.optionAscii.tableToTsv = false;
+    }    
+    if (options?.outMath?.optionAscii?.tableToCsv) {
+      /** Get only asccimath converted for CSV */
+      dataCSV = this.TexConvert(string, Object.assign({}, options, {
+        outMath: {
+          include_asciimath: true,
+          include_mathml: false,
+          include_mathml_word: false,
+          include_latex: false,
+          include_svg: false,
+          include_error: false,
+          include_speech: false,
+          optionAscii: {
+            ...options.outMath.optionAscii
+          }
+        }
+      }));
+      options.outMath.optionAscii.tableToCsv = false;
     }
     const data = this.TexConvert(string, options);
     options.outMath.include_asciimath = include_asciimath;
     return {
       html: OuterHTML(data, outMath), 
       ascii: data.asciimath,
-      ascii_tsv: dataTSV?.['asciimath_tsv']
+      ascii_tsv: dataTSV?.['asciimath_tsv'],
+      ascii_csv: dataCSV?.['asciimath_csv']
     };
   },
   /**

@@ -263,8 +263,10 @@ const mtable = () => {
       const parentIsMenclose = node.Parent?.kind === 'menclose';
       const countRow = node.childNodes.length;
       const toTsv = serialize.options.tableToTsv && !serialize.options.isSubTable
+        && (node.Parent?.kind === 'math' || (parentIsMenclose && node.Parent.Parent?.kind === 'math'));      
+      const toCsv = (serialize.options.tableToCsv || serialize.options.tableToCsv) && !serialize.options.isSubTable
         && (node.Parent?.kind === 'math' || (parentIsMenclose && node.Parent.Parent?.kind === 'math'));
-      node.attributes.setInherited('toTsv', toTsv);  
+      node.attributes.setInherited('toCsv', toCsv);  
       const columnAlign = node.attributes.get('columnalign');
       const arrRowLines = node.attributes.isSet('rowlines') ? node.attributes.get('rowlines').split(' ') : [];
       const envName = node.attributes.get('name');
@@ -288,6 +290,7 @@ const mtable = () => {
       for (let i = 0; i < countRow; i++) {
         const mtrNode = node.childNodes[i];
         mtrNode.attributes.setInherited('toTsv', toTsv);
+        mtrNode.attributes.setInherited('toCsv', toCsv);
         mtrNode.attributes.setInherited('itShouldBeFlatten', itShouldBeFlatten);
         let mmlRow = '';
         let mmlRowVerticalMath = '';
@@ -299,8 +302,11 @@ const mtable = () => {
         
         for (let j = 0; j < countColl; j++) {
           if (j > 0 && !isEqnArrayRow) {
-            mmlRow += toTsv ? serialize.options.tsv_separators?.column || '\t'
-              : itShouldBeFlatten ? ', ' : ',';
+            mmlRow += toTsv 
+              ? serialize.options.tsv_separators?.column || '\t'
+              : toCsv
+                ? serialize.options.csv_separators?.column || ','
+                : itShouldBeFlatten ? ', ' : ',';
           }
           let mtdNode = mtrNode.childNodes[j];
           let mmlColl = serialize.visitNode(mtdNode, '');
@@ -316,7 +322,7 @@ const mtable = () => {
               isVerticalMath = false;
             }
           }
-          mmlRow += !toTsv && itShouldBeFlatten ? mmlColl.trimEnd() : mmlColl;
+          mmlRow += !toTsv && !toCsv && itShouldBeFlatten ? mmlColl.trimEnd() : mmlColl;
           mmlRowVerticalMath += mmlCollVerticalMath;
         }
 
@@ -325,7 +331,7 @@ const mtable = () => {
           arrRowLines?.length && arrRowLines?.length > i && arrRowLines[i] !== 'none') {
           mmlRowVerticalMath += '=';
         }
-        if (toTsv || itShouldBeFlatten) {
+        if (toTsv || toCsv || itShouldBeFlatten) {
           arrRows.push({
             mmlRow: mmlRow,
             mmlRowVerticalMath: mmlRowVerticalMath,
@@ -368,7 +374,9 @@ const mtable = () => {
         if (i > 0 && !isVerticalMath) {
           mmlTableContent += toTsv
             ? serialize.options.tsv_separators?.row || '\n'
-            : itShouldBeFlatten ? ', ' : ',';
+            : toCsv 
+              ? serialize.options.csv_separators?.row || '\n'
+              : itShouldBeFlatten ? ', ' : ',';
         }
         let mmlRow = isVerticalMath 
           ? arrRows[i].mmlRowVerticalMath 
@@ -390,15 +398,19 @@ const mtable = () => {
       if (toTsv) {
         mml += '"';
         mml += mmlTableContent;
-        mml += '"'
+        mml += '"';
+        return mml;
+      }
+      if (toCsv) {
+        mml += mmlTableContent;
+        return mml;
+      }
+      if (itShouldBeFlatten || isVerticalMath) {
+        mml += mmlTableContent;
       } else {
-        if (itShouldBeFlatten || isVerticalMath) {
-          mml += mmlTableContent;
-        } else {
-          mml += isHasBranchOpen || parentIsMenclose ? '' : '{:';
-          mml += mmlTableContent;
-          mml += isHasBranchClose || parentIsMenclose ? '' : ':}';
-        }
+        mml += isHasBranchOpen || parentIsMenclose ? '' : '{:';
+        mml += mmlTableContent;
+        mml += isHasBranchClose || parentIsMenclose ? '' : ':}';
       }
       return mml;
     } catch (e) {
@@ -445,14 +457,18 @@ const mtr = () => {
        *  eqnarray*, align, align*, split, gather, gather*, aligned, gathered, alignat, alignat*, alignedat */
       const isEqnArray = node.attributes.get('displaystyle');
       const toTsv = node.attributes.get('toTsv');
+      const toCsv = node.attributes.get('toCsv');
       const itShouldBeFlatten = node.attributes.get('itShouldBeFlatten');
       for (let i = 0; i < node.childNodes.length; i++) {
         if (i > 0 && !isEqnArray) {
-          mml += toTsv ? serialize.options.tsv_separators?.column || '\t' 
+          mml += toTsv 
+            ? serialize.options.tsv_separators?.column || '\t' 
+            : toCsv 
+              ? serialize.options.csv_separators?.column || ',' 
               : itShouldBeFlatten ? ', ' : ',';
         }
         let mmlCell = serialize.visitNode(node.childNodes[i], '');
-        mml += !toTsv && itShouldBeFlatten ? mmlCell?.trimEnd() : mmlCell;
+        mml += !toTsv && !toCsv && itShouldBeFlatten ? mmlCell?.trimEnd() : mmlCell;
       }
       return mml;
     } catch (e) {
@@ -475,12 +491,12 @@ const mpadded = (handlerApi) => {
           }
         }
       }
-      /** For tsv:
+      /** For tsv/csv:
        * Omit the " in nested arrays
        * */
-      mml += serialize.options.tableToTsv ? '' : '"';
+      mml += serialize.options.tableToTsv || serialize.options.tableToCsv ? '' : '"';
       mml += mmlAdd;
-      mml += serialize.options.tableToTsv ? '' : '"';
+      mml += serialize.options.tableToTsv || serialize.options.tableToCsv ? '' : '"';
       return mml;
     } catch (e) {
       console.error('mml => mpadded =>', e);
@@ -720,8 +736,9 @@ const mtext = () => {
         return mml;
       }
       const toTsv = node.attributes.get('toTsv');
-      if (value[0] === '(' || toTsv) {
-        if (toTsv) {
+      const toCsv = node.attributes.get('toCsv');
+      if (value[0] === '(' || toTsv || toCsv) {
+        if (toTsv || toCsv) {
           value = value.replace(/"/g, '')
         }
         mml += value;
@@ -729,9 +746,9 @@ const mtext = () => {
         if ( !value || ( value && !value.trim())) {
           mml += ''
         } else {
-          /** For tsv: 
+          /** For tsv/csv: 
            * Omit the " in nested arrays */
-          if (serialize.options.tableToTsv) {
+          if (serialize.options.tableToTsv || serialize.options.tableToCsv) {
             mml += value.replace(/"/g, '');
           } else {
             mml += '"' + value + '"';
@@ -791,13 +808,15 @@ const mo = () => {
         mml += regW.test(abs[abs.length-1]) && needLastSpase(node) ? ' ' : '';
       } else {
         if (abs === ',' && node.Parent.kind === 'mtd') {
-          /** For tsv:
+          /** For tsv/csv:
            * Omit the " in nested arrays */
-          mml += serialize.options.tableToTsv ? '' : '"';
+          mml += serialize.options.tableToTsv || serialize.options.tableToCsv ? '' : '"';
           mml += abs;
-          mml += serialize.options.tableToTsv ? '' : '"';
+          mml += serialize.options.tableToTsv || serialize.options.tableToCsv ? '' : '"';
         } else {
-          mml += abs === '"' && serialize.options.tableToTsv ? '' : abs ;
+          mml += abs === '"' 
+            && (serialize.options.tableToTsv || serialize.options.tableToCsv) 
+              ? '' : abs ;
         }
       }
       

@@ -10,7 +10,7 @@ import {
   findOpenCloseTagsMathEnvironment,
   beginTag, endTag
 } from './utils';
-import { openTagMML, closeTagMML, tsvSeparatorsDef } from './common/consts';
+import { openTagMML, closeTagMML, tsvSeparatorsDef, csvSeparatorsDef } from './common/consts';
 import { imageWithSize, renderRuleImage } from './md-inline-rule/image';
 import { setCounterSection } from './md-inline-rule/setcounter-section';
 import { renderTheorems } from './md-theorem';
@@ -557,8 +557,10 @@ const renderMath = (a, token, options) => {
               showStyle: false,
               extraBrackets: true,
               tableToTsv: envArraysShouldBeFlattenInTSV.includes(token.math_env),
+              tableToCsv: envArraysShouldBeFlattenInTSV.includes(token.math_env),
               isSubTable: token.isSubTable,
-              tsv_separators: {...tsvSeparatorsDef}
+              tsv_separators: {...tsvSeparatorsDef},
+              csv_separators: {...csvSeparatorsDef}
             },
           }), 
           mathJax: options.mathJax,
@@ -567,6 +569,7 @@ const renderMath = (a, token, options) => {
         mathEquation = data.html;
         token.ascii = data.ascii;
         token.ascii_tsv = data.ascii_tsv;
+        token.ascii_csv = data.ascii_csv;
       } else {
          mathEquation = MathJax.Typeset(math, {display: isBlock, metric: { cwidth: cwidth },
            outMath: options.outMath, mathJax: options.mathJax, forDocx: options.forDocx,

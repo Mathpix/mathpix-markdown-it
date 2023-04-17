@@ -5,7 +5,12 @@ module.exports = [
       '$"\t" depreciation \n' +
       '$"\t" net book value \n' +
       '$"\n' +
-      'non-current assets\t250000\t95000\t155000'
+      'non-current assets\t250000\t95000\t155000',
+    csv: ',"cost \n' +
+      '$","depreciation \n' +
+      '$","net book value \n' +
+      '$"\n' +
+      'non-current assets,250000,95000,155000'
   },
   /** For tsv:
    * Omit the " in nested arrays */
@@ -16,7 +21,12 @@ module.exports = [
       '$ cost, $"\t" depreciation \n' +
       '$"\t" net book value \n' +
       '$"\n' +
-      'non-current assets\t250000\t95000\t155000'
+      'non-current assets\t250000\t95000\t155000',
+    csv: ',"cost \n' +
+      '$ cost, $","depreciation \n' +
+      '$","net book value \n' +
+      '$"\n' +
+      'non-current assets,250000,95000,155000'
   },  
   /** In tsv matrix as asciimath and aligned should be same as array */
   {
@@ -24,7 +34,11 @@ module.exports = [
     tsv: '\t" cost \n' +
       '$"\t{:[" depreciation "],[$]:}\t" net book value \n' +
       '$"\n' +
-      'non-current assets\t250000\t95000\t155000'
+      'non-current assets\t250000\t95000\t155000',
+    csv: ',"cost \n' +
+      '$","{:["" depreciation ""],[$]:}","net book value \n' +
+      '$"\n' +
+      'non-current assets,250000,95000,155000'
   },
   /** In this equation begin{array} should be as asciimath */
   {
@@ -43,7 +57,13 @@ module.exports = [
       '80 <= A < 100\t6\n' +
       '100 <= A < 120\t5\n' +
       '120 <= A < 140\t3\n' +
-      '110 < {:[-16 n],[1]:}\t'
+      '110 < {:[-16 n],[1]:}\t',
+    csv: 'Area (sq. ft),Number of Bedrooms\n' +
+      '60 <= A < 80,4\n' +
+      '80 <= A < 100,6\n' +
+      '100 <= A < 120,5\n' +
+      '120 <= A < 140,3\n' +
+      '"110 < {:[-16 n],[1]:}",'
   },  
   {
     latex: '\\begin{tabular}{|c|c|c|c|c|}\n' +
@@ -62,7 +82,14 @@ module.exports = [
       '2\t152\t149\t137\t143\n' +
       '3\t134\t133\t132\t127\n' +
       '4\t129\t127\t132\t129\n' +
-      '5\t147\t148\t144\t142'
+      '5\t147\t148\t144\t142',
+    csv: '"Coating Type \n' +
+      '1",""" Conductivity """,,,\n' +
+      ',143,141,150,146\n' +
+      '2,152,149,137,143\n' +
+      '3,134,133,132,127\n' +
+      '4,129,127,132,129\n' +
+      '5,147,148,144,142'
   },
   /** In this equation begin{array} should be as asciimath */
   {
@@ -85,7 +112,13 @@ module.exports = [
       '([10],[1])\t(2) 5\t\n' +
       '(quad)([5],[4])\t(3) 15\t\n' +
       '([6],[2])\t(4) 10\t\n' +
-      '(1)([7],[3])\t\t'
+      '(1)([7],[3])\t\t',
+    csv: 'NUMERO BINOMIAL,,RESULTADO\n' +
+      '"(quad)([3],[0])",(1) 35,\n' +
+      '"([10],[1])",(2) 5,\n' +
+      '"(quad)([5],[4])",(3) 15,\n' +
+      '"([6],[2])",(4) 10,\n' +
+      '"(1)([7],[3])",,'
   },  
   {
     latex: '\\begin{tabular}{l}\n' +
@@ -106,7 +139,15 @@ module.exports = [
       ' C \t End \t85\t100\t115\n' +
       ' D \t F \t19\t25\t31\n' +
       ' E \t End \t 91 \t100\t115\n' +
-      ' F \t End \t62\t65\t68"'
+      ' F \t End \t62\t65\t68"',
+    csv: 'Activity Precedes Optimistic Most Likely Pessimisti\n' +
+      '"Start A,B,C"\n' +
+      '"A , D ,38,50,62\n' +
+      ' B , E ,90,99,108\n' +
+      ' C , End ,85,100,115\n' +
+      ' D , F ,19,25,31\n' +
+      ' E , End , 91 ,100,115\n' +
+      ' F , End ,62,65,68"'
   },
   {
     latex: '\\begin{tabular}{|c|c|c|c|c|}\n' +
@@ -119,7 +160,11 @@ module.exports = [
     tsv: '" MSSM phases "\t\t" BMSSM phases "\t\t" vev phase \n' +
       'theta"\n' +
       'phi_(i)\tphi_(f)\tvartheta_(1)\tvartheta_(2)\t\n' +
-      'arg(M_(i)mu//b)\targ(A_(f)mu//b)\targ(epsilon_(1)//b)\targ(epsilon_(2)//b^(2))\tbar(arg(bH_(u)H_(d)))'
+      'arg(M_(i)mu//b)\targ(A_(f)mu//b)\targ(epsilon_(1)//b)\targ(epsilon_(2)//b^(2))\tbar(arg(bH_(u)H_(d)))',
+    csv: '""" MSSM phases """,,""" BMSSM phases """,,"vev phase \n' +
+      'theta"\n' +
+      'phi_(i),phi_(f),vartheta_(1),vartheta_(2),\n' +
+      'arg(M_(i)mu//b),arg(A_(f)mu//b),arg(epsilon_(1)//b),arg(epsilon_(2)//b^(2)),bar(arg(bH_(u)H_(d)))'
   },  
   {
     latex: '\\begin{tabular}{|c|c|c|c|c|c|}\n' +
@@ -150,7 +195,20 @@ module.exports = [
       '.\t" classification accuracy "\t\t\t\t\n' +
       'Door number\t0.674\t0.748\t0.837\t0.738\t0.788\n' +
       'Seat number\t0.672\t0.691\t0.711\t0.660\t0.700\n' +
-      'Car type\t0.541\t0.585\t0.627\t0.571\t0.612'
+      'Car type\t0.541\t0.585\t0.627\t0.571\t0.612',
+    csv: 'Viewpoint,bar(F),R,S,FS,RS\n' +
+      ',""" mean difference """,,,,\n' +
+      '"Maximum speed \n' +
+      ' (mean guess) \n' +
+      ' Displacement \n' +
+      ' (mean guess)",20.8,21.3,20.4,20.1,21.3\n' +
+      ',38.0,38.5,39.4,40.2,40.1\n' +
+      ',0.811,0.752,0.795,0.875,0.822\n' +
+      ',1.04,0.922,1.04,1.13,1.08\n' +
+      '.,""" classification accuracy """,,,,\n' +
+      'Door number,0.674,0.748,0.837,0.738,0.788\n' +
+      'Seat number,0.672,0.691,0.711,0.660,0.700\n' +
+      'Car type,0.541,0.585,0.627,0.571,0.612'
   },  
   {
     latex: '\\begin{tabular}{|c|c|c|c|c|c|}\n' +
@@ -177,7 +235,18 @@ module.exports = [
       '1000"\t" BOREXINO \n' +
       '300"\n' +
       '\t\t50\t50\t\t\n' +
-      '\t1 12\t0.25 1000\t1.1 55\t∼200 2\t∼800 0.08'
+      '\t1 12\t0.25 1000\t1.1 55\t∼200 2\t∼800 0.08',
+    csv: '"Detector \n' +
+      ' Mass of the \n' +
+      ' target, tons \n' +
+      ' Distance from \n' +
+      ' the source, km \n' +
+      'N(e^(+),n)d^(-1)","CHOOZ\'97 \n' +
+      '5",""" THIS PROJECT """,,"KamLand \n' +
+      '1000","BOREXINO \n' +
+      '300"\n' +
+      ',,50,50,,\n' +
+      ',1 12,0.25 1000,1.1 55,∼200 2,∼800 0.08'
   },  
   {
     latex: '\\begin{tabular}{|l|c|c|c|}\\hline &  $\\begin{array}{c}\\text { cost } \\\\ \\$\\end{array}$ & $$\\begin{array}{c}\\text { depreciation } \\\\ \\$\\end{array}$$ & \\( \\begin{array}{c}\\text { net book value } \\\\ \\$\\end{array} \\) \\\\ \\hline non-current assets & 250000 & 95000 & 155000 \\\\ \\hline\\end{tabular}',
@@ -185,7 +254,12 @@ module.exports = [
       '$"\t" depreciation \n' +
       '$"\t" net book value \n' +
       '$"\n' +
-      'non-current assets\t250000\t95000\t155000'
+      'non-current assets\t250000\t95000\t155000',
+    csv: ',"cost \n' +
+      '$","depreciation \n' +
+      '$","net book value \n' +
+      '$"\n' +
+      'non-current assets,250000,95000,155000'
   },
   {
     latex: '\\begin{tabular}{|l|c|c|c|}\\hline \\multicolumn{4}{|c|}{ as at 30 June 2020 (AUD\\$\'000) } \\\\\\hline \\multirow{2}{*}{\\( \\begin{array}{l}\\text { Current assets } \\\\\\text { Cash at bank }\\end{array} \\)} & 2020 & 2019 & 2018 \\\\\\cline { 2 - 4 } Receivables (net) & \\( \\$ 120,000 \\) & \\( \\$ 80,000 \\) & \\( \\$ 36,000 \\) \\\\Inventory & \\( \\$ 140,000 \\) & \\( \\$ 120,000 \\) & \\( \\$ 96,000 \\) \\\\Total current assets & \\( \\$ 180,000 \\) & \\( \\$ 170,000 \\) & \\( \\$ 128,000 \\) \\\\Non Current assets & \\( \\$ 440,000 \\) & \\( \\$ 370,000 \\) & \\( \\$ 260,000 \\) \\\\Plant and equipment (net) & & & \\\\Investments & \\( \\$ 1,000,000 \\) & \\( \\$ 820,000 \\) & \\( \\$ 716,000 \\) \\\\\\hline\\end{tabular}',
@@ -197,7 +271,16 @@ module.exports = [
       'Total current assets\t$180,000\t$170,000\t$128,000\n' +
       'Non Current assets\t$440,000\t$370,000\t$260,000\n' +
       'Plant and equipment (net)\t\t\t\n' +
-      'Investments\t$1,000,000\t$820,000\t$716,000'
+      'Investments\t$1,000,000\t$820,000\t$716,000',
+    csv: 'as at 30 June 2020 (AUD$\'000),,,\n' +
+      '"Current assets \n' +
+      ' Cash at bank",2020,2019,2018\n' +
+      ',"$120,000","$80,000","$36,000"\n' +
+      'Inventory,"$140,000","$120,000","$96,000"\n' +
+      'Total current assets,"$180,000","$170,000","$128,000"\n' +
+      'Non Current assets,"$440,000","$370,000","$260,000"\n' +
+      'Plant and equipment (net),,,\n' +
+      'Investments,"$1,000,000","$820,000","$716,000"'
   },
   {
     latex: '\\begin{tabular}{|l|c|c|c|}\\hline \\multicolumn{4}{|c|}{ as at 30 June 2020 (AUD $\'000) } \\\\\\hline \\multirow{2}{*}{\\( \\begin{array}{l}\\text { Current assets } $ \\\\\\text { Cash at bank }\\end{array} \\)} & 2020 & 2019 & 2018 \\\\\\cline { 2 - 4 } Receivables (net) & \\( \\$ 120,000 \\) & \\( \\$ 80,000 \\) & \\( \\$ 36,000 \\) \\\\Inventory & \\( \\$ 140,000 \\) & \\( \\$ 120,000 \\) & \\( \\$ 96,000 \\) \\\\Total current assets & \\( \\$ 180,000 \\) & \\( \\$ 170,000 \\) & \\( \\$ 128,000 \\) \\\\Non Current assets & \\( \\$ 440,000 \\) & \\( \\$ 370,000 \\) & \\( \\$ 260,000 \\) \\\\Plant and equipment (net) & & & \\\\Investments & \\( \\$ 1,000,000 \\) & \\( \\$ 820,000 \\) & \\( \\$ 716,000 \\) \\\\\\hline\\end{tabular}',
@@ -209,7 +292,16 @@ module.exports = [
       'Total current assets\t$180,000\t$170,000\t$128,000\n' +
       'Non Current assets\t$440,000\t$370,000\t$260,000\n' +
       'Plant and equipment (net)\t\t\t\n' +
-      'Investments\t$1,000,000\t$820,000\t$716,000'
+      'Investments\t$1,000,000\t$820,000\t$716,000',
+    csv: 'as at 30 June 2020 (AUD $\'000),,,\n' +
+      '"Current assets $\n' +
+      ' Cash at bank",2020,2019,2018\n' +
+      ',"$120,000","$80,000","$36,000"\n' +
+      'Inventory,"$140,000","$120,000","$96,000"\n' +
+      'Total current assets,"$180,000","$170,000","$128,000"\n' +
+      'Non Current assets,"$440,000","$370,000","$260,000"\n' +
+      'Plant and equipment (net),,,\n' +
+      'Investments,"$1,000,000","$820,000","$716,000"'
   },
   {
     latex: '\\begin{tabular}{|l|c|c|c|}\\hline \\multicolumn{4}{|c|}{ as at 30 June 2020 (AUD $\'000) } \\\\\\hline \\multirow{2}{*}{\\( \\begin{array}{l}\\text { Current assets }$1 \\\\\\text { Cash at bank }\\end{array} \\)} & 2020 & 2019 & 2018 \\\\\\cline { 2 - 4 } Receivables (net) & \\( \\$ 120,000 \\) & \\( \\$ 80,000 \\) & \\( \\$ 36,000 \\) \\\\Inventory & \\( \\$ 140,000 \\) & \\( \\$ 120,000 \\) & \\( \\$ 96,000 \\) \\\\Total current assets & \\( \\$ 180,000 \\) & \\( \\$ 170,000 \\) & \\( \\$ 128,000 \\) \\\\Non Current assets & \\( \\$ 440,000 \\) & \\( \\$ 370,000 \\) & \\( \\$ 260,000 \\) \\\\Plant and equipment (net) & & & \\\\Investments & \\( \\$ 1,000,000 \\) & \\( \\$ 820,000 \\) & \\( \\$ 716,000 \\) \\\\\\hline\\end{tabular}',
@@ -221,7 +313,16 @@ module.exports = [
       'Total current assets\t$180,000\t$170,000\t$128,000\n' +
       'Non Current assets\t$440,000\t$370,000\t$260,000\n' +
       'Plant and equipment (net)\t\t\t\n' +
-      'Investments\t$1,000,000\t$820,000\t$716,000'
+      'Investments\t$1,000,000\t$820,000\t$716,000',
+    csv: 'as at 30 June 2020 (AUD $\'000),,,\n' +
+      '"Current assets $1\n' +
+      ' Cash at bank",2020,2019,2018\n' +
+      ',"$120,000","$80,000","$36,000"\n' +
+      'Inventory,"$140,000","$120,000","$96,000"\n' +
+      'Total current assets,"$180,000","$170,000","$128,000"\n' +
+      'Non Current assets,"$440,000","$370,000","$260,000"\n' +
+      'Plant and equipment (net),,,\n' +
+      'Investments,"$1,000,000","$820,000","$716,000"'
   },
   {
     latex: '\\begin{tabular}{ | l | c | }\\hline\n' +
@@ -229,7 +330,9 @@ module.exports = [
       '4 & 5 \\\\ \\hline\n' +
       '\\end{tabular}',
     tsv: '"1\t2"\t2\n' +
-      '4\t5'
+      '4\t5',
+    csv: '"1,2",2\n' +
+      '4,5'
   },  
   {
     latex: '\\begin{tabular}{ | l | c | }\\hline\n' +
@@ -238,7 +341,10 @@ module.exports = [
       '\\end{tabular}',
     tsv: '"1\t2\n' +
       '1\t2"\t2\n' +
-      '4\t5'
+      '4\t5',
+    csv: '"1,2\n' +
+      '1,2",2\n' +
+      '4,5'
   },  
   {
     latex: '\\begin{tabular}{ | l | c | }\\hline\n' +
@@ -247,7 +353,10 @@ module.exports = [
       '\\end{tabular}',
     tsv: '"1\t2\n' +
       '1\t2"\t2\n' +
-      '4\t5'
+      '4\t5',
+    csv: '"1,2\n' +
+      '1,2",2\n' +
+      '4,5'
   },
   {
     latex: '\\begin{tabular}{ | l | c | }\\hline\n' +
@@ -255,7 +364,9 @@ module.exports = [
       '4 & 5 \\\\ \\hline\n' +
       '\\end{tabular}',
     tsv: '|[1,2],[1,2]|\t2\n' +
-      '4\t5'
+      '4\t5',
+    csv: '"|[1,2],[1,2]|",2\n' +
+      '4,5'
   },  
   {
     latex: '\\begin{tabular}{ | l | c | }\\hline\n' +
@@ -263,7 +374,9 @@ module.exports = [
       '4 & 5 \\\\ \\hline\n' +
       '\\end{tabular}',
     tsv: '[[1,2],[1,2]]\t2\n' +
-      '4\t5'
+      '4\t5',
+    csv: '"[[1,2],[1,2]]",2\n' +
+      '4,5'
   },  
   {
     latex: '\\begin{tabular}{ | l | c | }\\hline\n' +
@@ -271,7 +384,9 @@ module.exports = [
       '4 & 5 \\\\ \\hline\n' +
       '\\end{tabular}',
     tsv: '{[x-2z=1],[y+z=3]:}\t2\n' +
-      '4\t5'
+      '4\t5',
+    csv: '"{[x-2z=1],[y+z=3]:}",2\n' +
+      '4,5'
   },  
   {
     latex: '\\begin{tabular}{ | l | c | }\\hline\n' +
@@ -281,7 +396,10 @@ module.exports = [
       '\\end{tabular}',
     tsv: '"x\n' +
       'xy"\t2\n' +
-      '4\t5'
+      '4\t5',
+    csv: '"x\n' +
+      'xy",2\n' +
+      '4,5'
   },  
   {
     latex: '\\begin{tabular}{ | l | c | }\\hline\n' +
@@ -291,7 +409,10 @@ module.exports = [
       '\\end{tabular}',
     tsv: '"x,y\n' +
       'xy"\t2\n' +
-      '4\t5'
+      '4\t5',
+    csv: '"x,y\n' +
+      'xy",2\n' +
+      '4,5'
   },  
   {
     latex: '\\begin{tabular}{ | l | c | }\\hline\n' +
@@ -303,7 +424,11 @@ module.exports = [
     tsv: '"x,y\n' +
       'w,z\n' +
       'xy"\t2\n' +
-      '4\t5'
+      '4\t5',
+    csv: '"x,y\n' +
+      'w,z\n' +
+      'xy",2\n' +
+      '4,5'
   },
   {
     latex: '\\begin{tabular}{ | l | c | }\\hline\n' +
@@ -316,7 +441,11 @@ module.exports = [
     tsv: '"x,y\n' +
       'x1,y1, (x1)y1\n' +
       'xy"\t2\n' +
-      '4\t5'
+      '4\t5',
+    csv: '"x,y\n' +
+      'x1,y1, (x1)y1\n' +
+      'xy",2\n' +
+      '4,5'
   },
   {
     latex: '\\begin{tabular}{ | l | c | }\\hline\n' +
@@ -328,7 +457,11 @@ module.exports = [
     tsv: '"x,y\n' +
       'w,z\n' +
       'xy"\t2\n' +
-      '4\t5'
+      '4\t5',
+    csv: '"x,y\n' +
+      'w,z\n' +
+      'xy",2\n' +
+      '4,5'
   },  
   {
     latex: '\\begin{tabular}{ | l | c | }\\hline\n' +
@@ -340,7 +473,11 @@ module.exports = [
     tsv: '"x,y\n' +
       'w,z\n' +
       'xy"\t2\n' +
-      '4\t5'
+      '4\t5',
+    csv: '"x,y\n' +
+      'w,z\n' +
+      'xy",2\n' +
+      '4,5'
   },  
   {
     latex: '\\begin{tabular}{ | l | c | }\\hline\n' +
@@ -353,7 +490,11 @@ module.exports = [
     tsv: '"x,some y\n' +
       'w,z, x\n' +
       'xy"\t2\n' +
-      '4\t5'
+      '4\t5',
+    csv: '"x,some y\n' +
+      'w,z, x\n' +
+      'xy",2\n' +
+      '4,5'
   },  
   {
     latex: '\\begin{tabular}{ | l | c | }\\hline\n' +
@@ -366,7 +507,11 @@ module.exports = [
     tsv: '"x,some y\n' +
       'w,z, x\n' +
       'xy"\t2\n' +
-      '4\t5'
+      '4\t5',
+    csv: '"x,some y\n' +
+      'w,z, x\n' +
+      'xy",2\n' +
+      '4,5'
   },  
   {
     latex: '\\begin{tabular}{|l|l|} \\hline  \\begin{array}{|c|c|} \\hline  \n' +
@@ -375,7 +520,10 @@ module.exports = [
       '\\end{array} & t2 \\\\ \\hline t3 & t4 \\\\ \\hline \\end{tabular}',
     tsv: '"mt1\tt1, t2\n' +
       't1, t2, t3, t4\tmt4"\tt2\n' +
-      't3\tt4'
+      't3\tt4',
+    csv: '"mt1,t1, t2\n' +
+      't1, t2, t3, t4,mt4",t2\n' +
+      't3,t4'
   },  
   // {
   //   latex: '',

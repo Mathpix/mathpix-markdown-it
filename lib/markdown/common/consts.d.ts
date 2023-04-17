@@ -37,5 +37,10 @@ export declare const latexEnvironments: string[];
 export declare const mathEnvironments: string[];
 export declare const tsvSeparatorsDef: {
     column: string;
+    row: string; /** newline as the record delimiter */
+};
+export declare const csvSeparatorsDef: {
+    column: string;
     row: string;
+    toQuoteAllFields: boolean; /** to quote all fields whether or not they contain delimiters */
 };

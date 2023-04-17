@@ -17,6 +17,7 @@ export class SerializedAsciiVisitor extends MmlVisitor {
 
   public visitNode(node, ...args: any[]) {
     this.setChildInheritedAttribute(node, 'toTsv');
+    this.setChildInheritedAttribute(node, 'toCsv');
     // this.setChildInheritedAttribute(node, 'isVerticalMath');
     return super.visitNode(node, ...args);
   }
