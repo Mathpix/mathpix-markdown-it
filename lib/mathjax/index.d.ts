@@ -21,7 +21,7 @@ export declare const MathJax: {
         svg?: string;
         error?: string;
     };
-    TexConvertToAscii: (string: any, options?: any) => any;
+    TexConvertToAscii: (string: any, options?: any) => string;
     /**
      * Typeset a TeX expression and return the SVG tree for it
      *

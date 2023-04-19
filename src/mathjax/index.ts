@@ -6,6 +6,7 @@ import { MathMLVisitorWord } from './mathml-word';
 import { getSpeech } from '../sre';
 import { TAccessibility } from "../mathpix-markdown-model";
 import { formatSource, formatSourceMML } from "../helpers/parse-mmd-element";
+import { IAsciiData } from "./serialized-ascii/common";
 
 const MJ = new MathJaxConfigure();
 
@@ -21,10 +22,14 @@ const toMathMLWord = ((node, options) => {
   return visitor.visitTree(node)
 });
 
-const toAsciiML = ((node, optionAscii) => {
+const toAsciiML = ((node, optionAscii): IAsciiData => {
   const visitorA = new AsciiVisitor(optionAscii);
-  let ascii = visitorA.visitTree(node);
-  return ascii ? ascii.trim() : ascii;
+  let data: IAsciiData = visitorA.visitTree(node);
+  return {
+    ascii: data?.ascii ? data.ascii.trim() : data.ascii,
+    ascii_tsv: data?.ascii_tsv ? data.ascii_tsv.trim() : data.ascii_tsv,
+    ascii_csv: data?.ascii_csv ? data.ascii_csv.trim() : data.ascii_csv,
+  }
 });
 
 const applySpeechToNode = (adaptor, node, sre): string => {
@@ -77,18 +82,14 @@ const OuterData = (adaptor, node, math, outMath, forDocx = false, accessibility?
   if (include_mathml_word) {
     res.mathml_word = toMathMLWord(math.root, {forDocx: forDocx});
   }
-
-  if (optionAscii?.tableToTsv) {
-    res.asciimath_tsv = toAsciiML(math.root, optionAscii);
-    optionAscii.tableToTsv = false;
-  }  
-  if (optionAscii?.tableToCsv) {
-    res.asciimath_csv = toAsciiML(math.root, optionAscii);
-    optionAscii.tableToCsv = false;
+  
+  if (include_asciimath || optionAscii?.tableToCsv || optionAscii?.tableToTsv) {
+    const dataAscii: IAsciiData = toAsciiML(math.root, optionAscii);
+    res.asciimath = dataAscii.ascii;
+    res.asciimath_tsv = dataAscii.ascii_tsv;
+    res.asciimath_csv = dataAscii.ascii_csv;
   }
-  if (include_asciimath) {
-    res.asciimath = toAsciiML(math.root, optionAscii);
-  }
+  
   if (include_latex) {
     res.latex = (math.math
       ? math.math
@@ -208,7 +209,8 @@ const OuterDataMathMl = (adaptor, node, math, outMath, forDocx = false, accessib
   }
 
   if (include_asciimath) {
-    res.asciimath = toAsciiML(math.root, optionAscii);
+    const data: IAsciiData = toAsciiML(math.root, optionAscii);
+    res.asciimath = data.ascii;
   }
 
   if (include_svg) {
@@ -344,7 +346,8 @@ export const MathJax = {
         showStyle: false,
         extraBrackets: true
       }} = outMath;
-    return toAsciiML(outputJax.math.root, optionAscii);
+    const data: IAsciiData = toAsciiML(outputJax.math.root, optionAscii);
+    return data.ascii;
   },
   /**
    * Typeset a TeX expression and return the SVG tree for it
@@ -360,51 +363,13 @@ export const MathJax = {
     const { outMath = {} } = options;
     const { include_asciimath = false } = outMath;
     options.outMath.include_asciimath = true;
-    let dataTSV = null;
-    let dataCSV = null;
-    if (options?.outMath?.optionAscii?.tableToTsv) {
-      /** Get only asccimath converted for TSV */
-      dataTSV = this.TexConvert(string, Object.assign({}, options, {
-        outMath: {
-          include_asciimath: true,
-          include_mathml: false,
-          include_mathml_word: false,
-          include_latex: false,
-          include_svg: false,
-          include_error: false,
-          include_speech: false,
-          optionAscii: {
-            ...options.outMath.optionAscii
-          }
-        }
-      }));
-      options.outMath.optionAscii.tableToTsv = false;
-    }    
-    if (options?.outMath?.optionAscii?.tableToCsv) {
-      /** Get only asccimath converted for CSV */
-      dataCSV = this.TexConvert(string, Object.assign({}, options, {
-        outMath: {
-          include_asciimath: true,
-          include_mathml: false,
-          include_mathml_word: false,
-          include_latex: false,
-          include_svg: false,
-          include_error: false,
-          include_speech: false,
-          optionAscii: {
-            ...options.outMath.optionAscii
-          }
-        }
-      }));
-      options.outMath.optionAscii.tableToCsv = false;
-    }
     const data = this.TexConvert(string, options);
     options.outMath.include_asciimath = include_asciimath;
     return {
       html: OuterHTML(data, outMath), 
       ascii: data.asciimath,
-      ascii_tsv: dataTSV?.['asciimath_tsv'],
-      ascii_csv: dataCSV?.['asciimath_csv']
+      ascii_tsv: data?.['asciimath_tsv'],
+      ascii_csv: data?.['asciimath_csv']
     };
   },
   /**

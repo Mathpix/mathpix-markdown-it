@@ -556,8 +556,10 @@ const renderMath = (a, token, options) => {
             optionAscii: {
               showStyle: false,
               extraBrackets: true,
-              tableToTsv: envArraysShouldBeFlattenInTSV.includes(token.math_env),
-              tableToCsv: envArraysShouldBeFlattenInTSV.includes(token.math_env),
+              tableToTsv: options.outMath?.include_tsv 
+                && envArraysShouldBeFlattenInTSV.includes(token.math_env),
+              tableToCsv: options.outMath?.include_csv 
+                && envArraysShouldBeFlattenInTSV.includes(token.math_env),
               isSubTable: token.isSubTable,
               tsv_separators: {...tsvSeparatorsDef},
               csv_separators: {...csvSeparatorsDef}
