@@ -8,11 +8,12 @@ const regW: RegExp = /^\w/;
 const isFirstChild = (node) => {
   return node.parent && node.parent.childNodes[0] && node.parent.childNodes[0] === node
 };
+
 const isLastChild = (node) => {
   return node.parent && node.parent.childNodes && node.parent.childNodes[node.parent.childNodes.length -1] === node
 };
 
-const needFirstSpase = (node) => {
+const needFirstSpace = (node) => {
   try {
     if (isFirstChild(node)) {
       return false
@@ -31,7 +32,7 @@ const needFirstSpase = (node) => {
   }
 };
 
-const needLastSpase = (node) => {
+const needLastSpace = (node) => {
   let haveSpace: boolean = false;
   try {
     if (node.parent.kind === "msubsup") {
@@ -147,7 +148,7 @@ export const FindSymbolToAM = (tag: string, output: string, atr = null): string 
   return tags ? tags.input : '';
 };
 
-const getChilrenText = (node): string => {
+const getChildrenText = (node): string => {
   let text: string = '';
   try {
     node.childNodes.forEach(child => {
@@ -232,7 +233,7 @@ const getDataForVerticalMath = (serialize, node, rowNumber) => {
       continue;
     }
     const data: IAsciiData = serialize.visitNode(child, '');
-    const text = getChilrenText(child);
+    const text = getChildrenText(child);
     if (child.kind === 'mo') {
       const symbolType = getSymbolType('mo', text);
       if (symbolType === eSymbolType.logical 
@@ -243,7 +244,7 @@ const getDataForVerticalMath = (serialize, node, rowNumber) => {
     }
     if (!child.isKind('mstyle')) {
       if (k === 0 && child.kind === 'mo' && rowNumber > 0) {
-        const text = getChilrenText(child);
+        const text = getChildrenText(child);
         if (text === '+' || text === '-'
           || text === '\u2212' //"-"
           || text === '\u00D7' //times
@@ -1005,9 +1006,9 @@ const mi = () => {
         : null;
       let abs = SymbolToAM(node.kind, value, atr);
       if (abs && abs.length > 1 && regW.test(abs[0])) {
-        res = AddToAsciiData(res, [needFirstSpase(node) ? ' ' : '']);
+        res = AddToAsciiData(res, [needFirstSpace(node) ? ' ' : '']);
         res = AddToAsciiData(res, [abs]);
-        res = AddToAsciiData(res, [needLastSpase(node) ? ' ' : '']);
+        res = AddToAsciiData(res, [needLastSpace(node) ? ' ' : '']);
       } else {
         res = AddToAsciiData(res, [abs]);
       }
@@ -1027,16 +1028,16 @@ const mo = () => {
       ascii_csv: ''
     };
     try {
-      const value = getChilrenText(node);
+      const value = getChildrenText(node);
       if (value === '\u2061') {
         return res;
       }
       const atr = getAttributes(node);
       let abs = SymbolToAM(node.kind, value, atr, serialize.options.showStyle);
       if (abs && abs.length > 1) {
-        res = AddToAsciiData(res, [regW.test(abs[0]) && needFirstSpase(node) ? ' ' : '']);
+        res = AddToAsciiData(res, [regW.test(abs[0]) && needFirstSpace(node) ? ' ' : '']);
         res = AddToAsciiData(res, [abs]);
-        res = AddToAsciiData(res, [regW.test(abs[abs.length-1]) && needLastSpase(node) ? ' ' : '']);
+        res = AddToAsciiData(res, [regW.test(abs[abs.length-1]) && needLastSpace(node) ? ' ' : '']);
       } else {
         if (abs === ',' && node.Parent.kind === 'mtd') {
           /** For tsv/csv:
@@ -1084,15 +1085,15 @@ const mspace = (handlerApi) => {
     try {
       const atr = getAttributes(node);
       if (atr && atr.width === "2em") {
-        res = AddToAsciiData(res, [node.parent.parent && needFirstSpase(node.parent.parent) ? ' ' : '']);
+        res = AddToAsciiData(res, [node.parent.parent && needFirstSpace(node.parent.parent) ? ' ' : '']);
         res = AddToAsciiData(res, ['qquad']);
-        res = AddToAsciiData(res, [node.parent.parent && needLastSpase(node.parent.parent) ? ' ' : '']);
+        res = AddToAsciiData(res, [node.parent.parent && needLastSpace(node.parent.parent) ? ' ' : '']);
         return res;
       }
       if (atr && atr.width === "1em") {
-        res = AddToAsciiData(res, [node.parent.parent && needFirstSpase(node.parent.parent) ? ' ' : '']);
+        res = AddToAsciiData(res, [node.parent.parent && needFirstSpace(node.parent.parent) ? ' ' : '']);
         res = AddToAsciiData(res, ['quad']);
-        res = AddToAsciiData(res, [node.parent.parent && needLastSpase(node.parent.parent) ? ' ' : '']);
+        res = AddToAsciiData(res, [node.parent.parent && needLastSpace(node.parent.parent) ? ' ' : '']);
         return res;
       }
       const data: IAsciiData = handlerApi.handleAll(node, serialize);
