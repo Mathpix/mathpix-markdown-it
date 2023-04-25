@@ -159,18 +159,18 @@ const renderInlineTokenBlock = (tokens, options, env, slf, isSubTable = false) =
             if (token.type === 'subTabular') {
               if (token.parents?.length) {
                 cell += child.tsv ? child.tsv.join(',') : child.content;
-                cellCsv += child.tsv ? child.tsv.join(',') : child.content;
+                cellCsv += child.csv ? child.csv.join(',') : child.content;
               } else {
                 cell += child.tsv 
                   ? '"' + TsvJoin(child.tsv, options) + '"' 
                   : child.content;
-                cellCsv += child.tsv 
-                  ? CsvJoin(child.tsv, options, true)
+                cellCsv += child.csv 
+                  ? CsvJoin(child.csv, options, true)
                   : child.content;
               }
             } else {
               cell += child.tsv ? child.tsv.join(',') : child.content;
-              cellCsv += child.tsv ? child.tsv.join(',') : child.content;
+              cellCsv += child.csv ? child.csv.join(',') : child.content;
             }
           }
 

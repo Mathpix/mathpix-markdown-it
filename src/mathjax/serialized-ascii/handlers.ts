@@ -558,13 +558,13 @@ const mpadded = (handlerApi) => {
       res = AddToAsciiData(res, [
         '"', 
         serialize.options.tableToTsv ? '' : '"', 
-        serialize.options.tableToCsv ? '' : '"'
+        ''
       ]);
       res = AddToAsciiData(res, [mmlAdd.ascii, mmlAdd.ascii_tsv, mmlAdd.ascii_csv]);
       res = AddToAsciiData(res, [
         '"', 
         serialize.options.tableToTsv ? '' : '"', 
-        serialize.options.tableToCsv ? '' : '"'
+        ''
       ]);
       return res;
     } catch (e) {
@@ -976,7 +976,7 @@ const mtext = () => {
               : '"' + value + '"',
             serialize.options.tableToCsv
               ? value.replace(/"/g, '')
-              : '"' + value + '"'
+              : value
           ]);
         }
       }
@@ -1045,7 +1045,7 @@ const mo = () => {
           res = AddToAsciiData(res, [
             '"' + abs + '"',
             `${serialize.options.tableToTsv ? abs : '"' + abs + '"'}`,
-            `${serialize.options.tableToCsv ? abs : '"' + abs + '"'}`,
+            abs,
           ]);
         } else {
           res = AddToAsciiData(res, [

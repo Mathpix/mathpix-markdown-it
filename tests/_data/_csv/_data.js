@@ -709,12 +709,12 @@ module.exports = [
     tsv: '"curve (chiller condition, "j")"\that(sigma)_(j)^(2)\that(pi)_(j)\that(a)_(12)\that(a)_(21)\tlambda_(j)\n' +
       '"black (off, "j=1")"\t12.2\t0.682\t0.015\t< 10^(-16)\t0.050\n' +
       '"red (on, "j=2")"\t400.2\t0.318\t\t\t0.006',
-    csv: '"""curve (chiller condition, ""j"")""",hat(sigma)_(j)^(2),hat(pi)_(j),hat(a)_(12),hat(a)_(21),lambda_(j)\n' +
-      '"""black (off, ""j=1"")""",12.2,0.682,0.015,< 10^(-16),0.050\n' +
-      '"""red (on, ""j=2"")""",400.2,0.318,,,0.006',
-    csvQuoteAllFields: '"""curve (chiller condition, ""j"")""","hat(sigma)_(j)^(2)","hat(pi)_(j)","hat(a)_(12)","hat(a)_(21)","lambda_(j)"\n' +
-      '"""black (off, ""j=1"")""","12.2","0.682","0.015","< 10^(-16)","0.050"\n' +
-      '"""red (on, ""j=2"")""","400.2","0.318",,,"0.006"'
+    csv: '"curve (chiller condition, j)",hat(sigma)_(j)^(2),hat(pi)_(j),hat(a)_(12),hat(a)_(21),lambda_(j)\n' +
+      '"black (off, j=1)",12.2,0.682,0.015,< 10^(-16),0.050\n' +
+      '"red (on, j=2)",400.2,0.318,,,0.006',
+    csvQuoteAllFields: '"curve (chiller condition, j)","hat(sigma)_(j)^(2)","hat(pi)_(j)","hat(a)_(12)","hat(a)_(21)","lambda_(j)"\n' +
+      '"black (off, j=1)","12.2","0.682","0.015","< 10^(-16)","0.050"\n' +
+      '"red (on, j=2)","400.2","0.318",,,"0.006"'
   },
   {
     latex: '\\begin{tabular}{c c c | c} \\multicolumn{3}{c|} \\multirow{3}{*} $\\mathbf{H}^{+}$ & $\\mathbf{0}$ \\\\ &&& $\\cdot$ \\\\ &&& $\\mathbf{0}$ \\\\ \\hline $\\mathbf{0}$ & $\\cdot$ & $\\mathbf{0}$ & $\\mathbf{H}^{-}$ \\end{tabular}',
@@ -740,14 +740,14 @@ module.exports = [
     csv: ',,A,B,C,D\n' +
       'Mean,Human,0.069,0.134,0.094,0.157\n' +
       ',Sculpt,0.112,0.177,0.131,0.193\n' +
-      ',"""% Increase""",63.1,32.5,39.3,23.1\n' +
+      ',% Increase,63.1,32.5,39.3,23.1\n' +
       'Median,Human,0.065,0.127,0.091,0.156\n' +
       ',Sculpt,0.091,0.169,0.127,0.183\n' +
       ',% Increase,40.2,33.5,40.4,17.4',
     csvQuoteAllFields: ',,"A","B","C","D"\n' +
       '"Mean","Human","0.069","0.134","0.094","0.157"\n' +
       ',"Sculpt","0.112","0.177","0.131","0.193"\n' +
-      ',"""% Increase""","63.1","32.5","39.3","23.1"\n' +
+      ',"% Increase","63.1","32.5","39.3","23.1"\n' +
       '"Median","Human","0.065","0.127","0.091","0.156"\n' +
       ',"Sculpt","0.091","0.169","0.127","0.183"\n' +
       ',"% Increase","40.2","33.5","40.4","17.4"'
@@ -1168,5 +1168,35 @@ module.exports = [
       '"t1\n' +
       'a1, a2, a3, a4","ST","Alan Smith"\n' +
       ',"ST","Mark Viduka"'
-  }
+  },
+  {
+    latex: '\\begin{tabular}{ l c r }\n' +
+      '  1 & $\\text{Some text in math}$ & 3 \\\\\n' +
+      '  4 & $\\smash{x}{y}$ & 6\n' +
+      '\\end{tabular}',
+    tsv: '1\t"Some text in math"\t3\n' +
+      '4\t"x"y\t6',
+    csv: '1,Some text in math,3\n' +
+      '4,xy,6',
+    csvQuoteAllFields: '"1","Some text in math","3"\n' +
+      '"4","xy","6"'
+  },
+  {
+    latex: '\\begin{tabular}{ l c r }\n' +
+      '  1 & $\\text{Some text in math}$ & 3 \\\\\n' +
+      '  4 & $\\smash{x}{y}$ & $f ( x ) = \\left\\{ \\begin{array} { l l } { x ^ { 2} + 1,} & { x > 1} \\\\ { 1,} & { x = 1} \\\\ { x + 1,} & { x < 1} \\end{array} \\right.$\n' +
+      '\\end{tabular}',
+    tsv: '1\t"Some text in math"\t3\n' +
+      '4\t"x"y\tf(x)={[x^(2)+1",",x > 1],[1",",x=1],[x+1",",x < 1]:}',
+    csv: '1,Some text in math,3\n' +
+      '4,xy,"f(x)={[x^(2)+1,,x > 1],[1,,x=1],[x+1,,x < 1]:}"',
+    csvQuoteAllFields: '"1","Some text in math","3"\n' +
+      '"4","xy","f(x)={[x^(2)+1,,x > 1],[1,,x=1],[x+1,,x < 1]:}"'
+  },
+  // {
+  //   latex: '',
+  //   tsv: '',
+  //   csv: '',
+  //   csvQuoteAllFields: ''
+  // }
 ];

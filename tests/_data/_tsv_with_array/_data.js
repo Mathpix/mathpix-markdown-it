@@ -36,7 +36,7 @@ module.exports = [
       '$"\n' +
       'non-current assets\t250000\t95000\t155000',
     csv: ',"cost \n' +
-      '$","{:["" depreciation ""],[$]:}","net book value \n' +
+      '$","{:[ depreciation ],[$]:}","net book value \n' +
       '$"\n' +
       'non-current assets,250000,95000,155000'
   },
@@ -84,7 +84,7 @@ module.exports = [
       '4\t129\t127\t132\t129\n' +
       '5\t147\t148\t144\t142',
     csv: '"Coating Type \n' +
-      '1",""" Conductivity """,,,\n' +
+      '1",Conductivity,,,\n' +
       ',143,141,150,146\n' +
       '2,152,149,137,143\n' +
       '3,134,133,132,127\n' +
@@ -161,7 +161,7 @@ module.exports = [
       'theta"\n' +
       'phi_(i)\tphi_(f)\tvartheta_(1)\tvartheta_(2)\t\n' +
       'arg(M_(i)mu//b)\targ(A_(f)mu//b)\targ(epsilon_(1)//b)\targ(epsilon_(2)//b^(2))\tbar(arg(bH_(u)H_(d)))',
-    csv: '""" MSSM phases """,,""" BMSSM phases """,,"vev phase \n' +
+    csv: 'MSSM phases,,BMSSM phases,,"vev phase \n' +
       'theta"\n' +
       'phi_(i),phi_(f),vartheta_(1),vartheta_(2),\n' +
       'arg(M_(i)mu//b),arg(A_(f)mu//b),arg(epsilon_(1)//b),arg(epsilon_(2)//b^(2)),bar(arg(bH_(u)H_(d)))'
@@ -197,7 +197,7 @@ module.exports = [
       'Seat number\t0.672\t0.691\t0.711\t0.660\t0.700\n' +
       'Car type\t0.541\t0.585\t0.627\t0.571\t0.612',
     csv: 'Viewpoint,bar(F),R,S,FS,RS\n' +
-      ',""" mean difference """,,,,\n' +
+      ',mean difference,,,,\n' +
       '"Maximum speed \n' +
       ' (mean guess) \n' +
       ' Displacement \n' +
@@ -205,7 +205,7 @@ module.exports = [
       ',38.0,38.5,39.4,40.2,40.1\n' +
       ',0.811,0.752,0.795,0.875,0.822\n' +
       ',1.04,0.922,1.04,1.13,1.08\n' +
-      '.,""" classification accuracy """,,,,\n' +
+      '.,classification accuracy,,,,\n' +
       'Door number,0.674,0.748,0.837,0.738,0.788\n' +
       'Seat number,0.672,0.691,0.711,0.660,0.700\n' +
       'Car type,0.541,0.585,0.627,0.571,0.612'
@@ -242,7 +242,7 @@ module.exports = [
       ' Distance from \n' +
       ' the source, km \n' +
       'N(e^(+),n)d^(-1)","CHOOZ\'97 \n' +
-      '5",""" THIS PROJECT """,,"KamLand \n' +
+      '5",THIS PROJECT,,"KamLand \n' +
       '1000","BOREXINO \n' +
       '300"\n' +
       ',,50,50,,\n' +
