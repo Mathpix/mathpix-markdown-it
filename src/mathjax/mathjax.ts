@@ -21,7 +21,7 @@ BaseConfiguration.handler.macro.push('wasysym-mathchar0mo');
 BaseConfiguration.handler.macro.push('wasysym-macros');
 
 const texConfig = Object.assign({}, MathJaxConfig.TeX || {});
-/** for TSV, add the array package, which will add an additional name attribute that points to the environment */
+/** for TSV/CSV, add the array package, which will add an additional name attribute that points to the environment */
 const texTSVConfig = Object.assign({}, texConfig,  {
   packages: [].concat(texConfig['packages'], ['array'])
 });

@@ -100,6 +100,7 @@ export type TOutputMath = {
   include_svg?: boolean,
   include_table_html?: boolean,
   include_tsv?: boolean,
+  include_csv?: boolean,
   include_table_markdown?: boolean,
   include_smiles?: boolean,
   include_speech?: boolean,
@@ -107,6 +108,11 @@ export type TOutputMath = {
   tsv_separators?: {
     column?: string,
     row?: string,
+  },  
+  csv_separators?: {
+    column?: string,
+    row?: string,
+    toQuoteAllFields?: boolean /** to quote all fields whether or not they contain delimiters */
   },
   table_markdown?: {
     math_as_ascii?: boolean

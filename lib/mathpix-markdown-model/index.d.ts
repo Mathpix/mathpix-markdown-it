@@ -83,6 +83,7 @@ export declare type TOutputMath = {
     include_svg?: boolean;
     include_table_html?: boolean;
     include_tsv?: boolean;
+    include_csv?: boolean;
     include_table_markdown?: boolean;
     include_smiles?: boolean;
     include_speech?: boolean;
@@ -90,6 +91,11 @@ export declare type TOutputMath = {
     tsv_separators?: {
         column?: string;
         row?: string;
+    };
+    csv_separators?: {
+        column?: string;
+        row?: string;
+        toQuoteAllFields?: boolean; /** to quote all fields whether or not they contain delimiters */
     };
     table_markdown?: {
         math_as_ascii?: boolean;
@@ -134,7 +140,7 @@ declare class MathpixMarkdown_Model {
     getLastEquationNumber: () => any;
     getMaxWidthStyle: (maxWidth?: string, isHideScroll?: boolean) => string;
     parseMarkdownByHTML: (html: string, include_sub_math?: boolean) => any[];
-    parseMarkdownByElement: (el: HTMLElement | Document, include_sub_math?: boolean) => any[];
+    parseMarkdownByElement: (el: Document | HTMLElement, include_sub_math?: boolean) => any[];
     markdownToHTML: (markdown: string, options?: TMarkdownItOptions) => string;
     showTocInContainer: (html: string, containerName?: string) => void;
     getTocContainerHTML: (html: string, onlyContent?: boolean) => string;
