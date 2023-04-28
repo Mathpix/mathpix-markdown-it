@@ -10,7 +10,7 @@ import {
   findOpenCloseTagsMathEnvironment,
   beginTag, endTag
 } from './utils';
-import { openTagMML, closeTagMML, tsvSeparatorsDef } from './common/consts';
+import { openTagMML, closeTagMML, tsvSeparatorsDef, csvSeparatorsDef } from './common/consts';
 import { imageWithSize, renderRuleImage } from './md-inline-rule/image';
 import { setCounterSection } from './md-inline-rule/setcounter-section';
 import { renderTheorems } from './md-theorem';
@@ -581,9 +581,13 @@ const convertMathToHtml = (state, token, options) => {
             optionAscii: {
               showStyle: false,
               extraBrackets: true,
-              tableToTsv: envArraysShouldBeFlattenInTSV.includes(token.math_env),
+              tableToTsv: options.outMath?.include_tsv 
+                && envArraysShouldBeFlattenInTSV.includes(token.math_env),
+              tableToCsv: options.outMath?.include_csv 
+                && envArraysShouldBeFlattenInTSV.includes(token.math_env),
               isSubTable: token.isSubTable,
-              tsv_separators: {...tsvSeparatorsDef}
+              tsv_separators: {...tsvSeparatorsDef},
+              csv_separators: {...csvSeparatorsDef}
             },
           }),
           mathJax: options.mathJax,
@@ -592,6 +596,7 @@ const convertMathToHtml = (state, token, options) => {
         token.mathEquation = data.html;
         token.ascii = data.ascii;
         token.ascii_tsv = data.ascii_tsv;
+        token.ascii_csv = data.ascii_csv;
         token.labels = data.labels;
       } else {
         MathJax.Reset(begin_number);

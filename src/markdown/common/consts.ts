@@ -96,8 +96,14 @@ export const mathEnvironments = [
 ];
 
 export const tsvSeparatorsDef = {
-  column: '\t', 
-  row: '\n'
+  column: '\t', /** TAB as the field delimiter */
+  row: '\n' /** newline as the record delimiter */
+};
+
+export const csvSeparatorsDef = {
+  column: ',', /** comma as the field delimiter */
+  row: '\n', /** newline as the record delimiter */
+  toQuoteAllFields: false /** to quote all fields whether or not they contain delimiters */
 };
 
 /** 

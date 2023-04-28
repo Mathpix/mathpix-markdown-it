@@ -100,6 +100,7 @@ export type TOutputMath = {
   include_svg?: boolean,
   include_table_html?: boolean,
   include_tsv?: boolean,
+  include_csv?: boolean,
   include_table_markdown?: boolean,
   include_smiles?: boolean,
   include_speech?: boolean,
@@ -107,6 +108,11 @@ export type TOutputMath = {
   tsv_separators?: {
     column?: string,
     row?: string,
+  },  
+  csv_separators?: {
+    column?: string,
+    row?: string,
+    toQuoteAllFields?: boolean /** to quote all fields whether or not they contain delimiters */
   },
   table_markdown?: {
     math_as_ascii?: boolean
@@ -242,30 +248,13 @@ class MathpixMarkdown_Model {
 
   checkEquationNumber = (html: string) => {
     try {
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(html, "text/html");
-      const body = doc.body;
-      const links = body.getElementsByClassName('clickable-link');
-      for(let i = 0; i < links.length; i++) {
-        const eq = links[i].getAttribute('value');
-        const equationNumber = doc.getElementById(eq);
-        const dataParentheses = links[i].getAttribute("data-parentheses");
-        if (!equationNumber) {
-          links[i].innerHTML=`[${decodeURIComponent(eq)}]`;
-        } else {
-          const numbers = equationNumber.getAttribute('number');
-          if(numbers) {
-            links[i].innerHTML = dataParentheses === "true" 
-              ? `(${numbers.split(',')[0]})`
-              : `${numbers.split(',')[0]}`
-          }
-        }
-      }
-      return body.innerHTML;
+      /** This feature is no longer needed.
+       We don't remove it to avoid bugs in applications where it might be called. */
+      console.warn('Warning! This feature is deprecated. No need to use it anymore');
+      return html;
     } catch (e) {
       return html;
     }
-
   };
 
     handleClick = (e) => {
