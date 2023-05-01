@@ -370,6 +370,9 @@ export const MathJax = {
     return {
       html: OuterHTML(data, options.outMath),
       labels: data.labels,
+      ascii: data.asciimath,
+      ascii_tsv: data?.['asciimath_tsv'],
+      ascii_csv: data?.['asciimath_csv']
     }
   },
 

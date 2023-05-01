@@ -31,6 +31,9 @@ export declare const MathJax: {
         labels: {
             [key: string]: Label;
         };
+        ascii: string;
+        ascii_tsv: string;
+        ascii_csv: string;
     };
     TypesetSvgAndAscii: (string: any, options?: any) => {
         html: string;
