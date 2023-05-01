@@ -9,6 +9,7 @@ import { ClearSubTableLists } from "./md-block-rule/begin-tabular/sub-tabular";
 import { ClearSubMathLists } from "./md-block-rule/begin-tabular/sub-math";
 import {ClearParseError} from "./md-block-rule/parse-error";
 import { BeginTheorem, BeginProof } from "./md-theorem/block-rule";
+import { getTerminatedRules } from "./common";
 
 export default (md: MarkdownIt, options) => {
   ClearTableNumbers();
@@ -19,11 +20,16 @@ export default (md: MarkdownIt, options) => {
   Object.assign(md.options, options);
   const width = md.options.width;
 
-  md.block.ruler.after("fence","BeginTabular", BeginTabular, md.options);
-  md.block.ruler.before("BeginTabular", "BeginAlign", BeginAlign);
-  md.block.ruler.before("BeginAlign", "BeginTable", BeginTable);
-  md.block.ruler.after("BeginTabular", "BeginTheorem", BeginTheorem);
-  md.block.ruler.before("BeginTheorem", "BeginProof", BeginProof);
+  md.block.ruler.after("fence", "BeginTabular", BeginTabular, 
+    Object.assign({}, md.options, {alt: getTerminatedRules('BeginTabular')}));
+  md.block.ruler.before("BeginTabular", "BeginAlign", BeginAlign, 
+    {alt: getTerminatedRules('BeginAlign')});
+  md.block.ruler.before("BeginAlign", "BeginTable", BeginTable, 
+    {alt: getTerminatedRules('BeginTable')});
+  md.block.ruler.after("BeginTabular", "BeginTheorem", BeginTheorem, 
+    {alt: getTerminatedRules('BeginTheorem')});
+  md.block.ruler.before("BeginTheorem", "BeginProof", BeginProof, 
+    {alt: getTerminatedRules('BeginProof')});
   md.inline.ruler.before("escape", "InlineIncludeGraphics", InlineIncludeGraphics);
 
   md.renderer.rules.caption_table = (tokens, idx) => {

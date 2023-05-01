@@ -16,6 +16,7 @@ import {
 
 } from "./mdPluginConfigured";
 import { validateLinkEnableFile } from "./mdOptions";
+import { injectLabelIdToParagraph } from "./rules";
 
 export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
   const {width = 1200,  outMath = {}, smiles = {}, mathJax = {}, renderElement = {}, forDocx = false, forLatex = false,
@@ -66,6 +67,7 @@ export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
       ? validateLink 
       : validateLinkEnableFile;
   }
+  injectLabelIdToParagraph(md);
 };
 
 export const setBaseOptionsMd = (baseOption, mmdOptions) => {

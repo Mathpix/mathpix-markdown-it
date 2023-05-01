@@ -44,3 +44,56 @@ export declare const csvSeparatorsDef: {
     row: string;
     toQuoteAllFields: boolean; /** to quote all fields whether or not they contain delimiters */
 };
+/**
+ * key - name of block-rule;
+ * terminated - a list of rules that this rule can terminate. */
+export declare const terminatedRules: {
+    smilesDrawerBlock: {
+        terminated: string[];
+    };
+    BeginTable: {
+        terminated: string[];
+    };
+    BeginAlign: {
+        terminated: string[];
+    };
+    BeginTabular: {
+        terminated: string[];
+    };
+    BeginProof: {
+        terminated: string[];
+    };
+    BeginTheorem: {
+        terminated: string[];
+    };
+    newTheoremBlock: {
+        terminated: string[];
+    };
+    ReNewCommand: {
+        terminated: any[];
+    };
+    Lists: {
+        terminated: any[];
+    };
+    separatingSpan: {
+        terminated: any[];
+    };
+    headingSection: {
+        terminated: string[];
+    };
+    addContentsLineBlock: {
+        terminated: string[];
+    };
+    mathMLBlock: {
+        terminated: string[];
+    };
+    abstractBlock: {
+        terminated: any[];
+    };
+    pageBreaksBlock: {
+        terminated: string[];
+    };
+    paragraphDiv: {
+        terminated: any[];
+    };
+};

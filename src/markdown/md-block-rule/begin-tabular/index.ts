@@ -182,6 +182,7 @@ export const StatePushTabulars = (state, cTabular: TTypeContentList, align: stri
           state.env.tabulare = state.md.options.outMath.include_tsv
             || (state.md.options.outMath.include_table_markdown
               && state.md.options.outMath.table_markdown && state.md.options.outMath.table_markdown.math_as_ascii);
+          state.env.subTabular = res[j].type === 'subTabular';
           state.md.inline.parse(tok.content, state.md, state.env, children);
           state.env.tabulare = false;
           if (children.length > 0) {
@@ -229,7 +230,7 @@ export const StatePushTabularBlock = (state, startLine: number, nextLine: number
   return true;
 };
 
-export const BeginTabular: RuleBlock = (state, startLine: number, endLine: number) => {
+export const BeginTabular: RuleBlock = (state, startLine: number, endLine: number, silent) => {
   let pos: number = state.bMarks[startLine] + state.tShift[startLine];
   let max: number = state.eMarks[startLine];
   let nextLine: number = startLine + 1;
@@ -248,7 +249,10 @@ export const BeginTabular: RuleBlock = (state, startLine: number, endLine: numbe
   if (dataTags?.arrClose?.length) {
     iOpen -= dataTags.arrClose.length;
   }
-
+  /** For validation mode we can terminate immediately */
+  if (silent) {
+    return true;
+  }
   for (; nextLine <= endLine; nextLine++) {
     dataTags = null;
     if (lineText === '') {

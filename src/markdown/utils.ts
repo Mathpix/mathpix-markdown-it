@@ -215,6 +215,18 @@ export const uid = () => {
     + Math.random().toString(36).substr(2);
 };
 
+/** Add attribute to begin of attribute list */
+export const attrSetToBegin = (attrs, name, value) => {
+  const index = attrs?.length 
+    ? attrs.findIndex(item => item[0] === name)
+    : -1;
+  if (index < 0) {
+    attrs.unshift([name, value])
+  } else {
+    attrs[index] = [name, value]
+  }
+};
+
 export const findBackTick = (posStart: number, str: string, pending = '') => {
   let pos = posStart;
   let matchStart, matchEnd;
@@ -329,7 +341,7 @@ export const findOpenCloseTags = (str: string, tagOpen, tagClose, pendingBackTic
 };
 
 /** To search for start and end markers in the entire string.
- * The search stops if the end of the string is reached 
+ * The search stops if the end of the string is reached
  * or if the number of end markers is equal to the number of start markers (for inline parser only isInline = true)
  * */
 export const findOpenCloseTagsMathEnvironment = (str: string, tagOpen: RegExp, tagClose: RegExp, isInline = true) => {

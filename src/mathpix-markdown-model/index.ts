@@ -188,9 +188,9 @@ class MathpixMarkdown_Model {
     let html = markdownHTML(markdown, options);
     if (!lineNumbering) {
       MathJax.Reset();
-      if (html.indexOf('clickable-link') !== -1) {
-        html = this.checkEquationNumber(html);
-      }
+      // if (html.indexOf('clickable-link') !== -1) {
+      //   html = this.checkEquationNumber(html);
+      // }
     }
 
     if (!htmlWrapper) {
@@ -248,30 +248,13 @@ class MathpixMarkdown_Model {
 
   checkEquationNumber = (html: string) => {
     try {
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(html, "text/html");
-      const body = doc.body;
-      const links = body.getElementsByClassName('clickable-link');
-      for(let i = 0; i < links.length; i++) {
-        const eq = links[i].getAttribute('value');
-        const equationNumber = doc.getElementById(eq);
-        const dataParentheses = links[i].getAttribute("data-parentheses");
-        if (!equationNumber) {
-          links[i].innerHTML=`[${decodeURIComponent(eq)}]`;
-        } else {
-          const numbers = equationNumber.getAttribute('number');
-          if(numbers) {
-            links[i].innerHTML = dataParentheses === "true" 
-              ? `(${numbers.split(',')[0]})`
-              : `${numbers.split(',')[0]}`
-          }
-        }
-      }
-      return body.innerHTML;
+      /** This feature is no longer needed.
+       We don't remove it to avoid bugs in applications where it might be called. */
+      console.warn('Warning! This feature is deprecated. No need to use it anymore');
+      return html;
     } catch (e) {
       return html;
     }
-
   };
 
     handleClick = (e) => {

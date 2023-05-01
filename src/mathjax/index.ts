@@ -6,9 +6,24 @@ import { MathMLVisitorWord } from './mathml-word';
 import { getSpeech } from '../sre';
 import { TAccessibility } from "../mathpix-markdown-model";
 import { formatSource, formatSourceMML } from "../helpers/parse-mmd-element";
+import { Label } from 'mathjax-full/js/input/tex/Tags.js';
 import { IAsciiData } from "./serialized-ascii/common";
 
 const MJ = new MathJaxConfigure();
+
+export interface IOuterData {
+  mathml?: string,
+  mathml_word?: string,
+  asciimath?: string,
+  asciimath_tsv?: string,
+  asciimath_csv?: string,
+  latex?: string,
+  svg?: string,
+  speech?: string,
+  labels?: {
+    [key: string]: Label;
+  }
+}
 
 const toMathML = (node => {
   const visitor = new MmlVisitor();
@@ -44,7 +59,7 @@ const applySpeechToNode = (adaptor, node, sre): string => {
   return speech;
 };
 
-const OuterData = (adaptor, node, math, outMath, forDocx = false, accessibility?) => {
+const OuterData = (adaptor, node, math, outMath, forDocx = false, accessibility?): IOuterData => {
   const {
     include_mathml = false,
     include_mathml_word = false,
@@ -57,16 +72,7 @@ const OuterData = (adaptor, node, math, outMath, forDocx = false, accessibility?
       extraBrackets: true,
     },
   } = outMath;
-  const res: {
-    mathml?: string,
-    mathml_word?: string,
-    asciimath?: string,
-    latex?: string,
-    svg?: string,
-    speech?: string,
-    asciimath_tsv?: string,
-    asciimath_csv?: string,
-  } = {};
+  const res: IOuterData = {};
 
   if (accessibility && accessibility.sre) {
     const speech = applySpeechToNode(adaptor, node, accessibility.sre);
@@ -96,8 +102,12 @@ const OuterData = (adaptor, node, math, outMath, forDocx = false, accessibility?
       : math.inputJax.processStrings ? '' : math.start.node.outerHTML);
   }
   if (include_svg) {
-    res.svg = adaptor.outerHTML(node)
+    res.svg = adaptor.outerHTML(node);
   }
+  /** Get information about the current labels. */
+  res.labels = math.inputJax.parseOptions?.tags?.labels
+    ? {...math.inputJax.parseOptions.tags.labels}
+    : null;
   return res;
 };
 
@@ -293,7 +303,7 @@ export const MathJax = {
   Stylesheet: function () {
     return svg.styleSheet(MJ.mDocTeX);
   },
-  TexConvert: function(string, options: any={}) {
+  TexConvert: function(string, options: any={}): IOuterData {
     const {display = true, metric = {}, outMath = {}, mathJax = {}, forDocx={}, accessibility = null, nonumbers = false} = options;
     const {em = 16, ex = 8, cwidth = 1200, lwidth = 100000, scale = 1} = metric;
     const {mtextInheritFont = false} = mathJax;
@@ -356,7 +366,14 @@ export const MathJax = {
    * @param options {}
    */
   Typeset: function(string, options: any={}) {
-    return OuterHTML(this.TexConvert(string, options), options.outMath);
+    const data = this.TexConvert(string, options);
+    return {
+      html: OuterHTML(data, options.outMath),
+      labels: data.labels,
+      ascii: data.asciimath,
+      ascii_tsv: data?.['asciimath_tsv'],
+      ascii_csv: data?.['asciimath_csv']
+    }
   },
 
   TypesetSvgAndAscii: function(string, options: any={}) {
@@ -368,6 +385,7 @@ export const MathJax = {
     return {
       html: OuterHTML(data, outMath), 
       ascii: data.asciimath,
+      labels: data.labels,
       ascii_tsv: data?.['asciimath_tsv'],
       ascii_csv: data?.['asciimath_csv']
     };

@@ -1,5 +1,7 @@
 import { sanitize } from './sanitize';
 import { injectInlineStyles } from './inline-styles';
+import {getLabelByUuidFromLabelsList, ILabel} from "./common/labels";
+import { attrSetToBegin } from "./utils";
 
 export const PREVIEW_PARAGRAPH_PREFIX = "preview-paragraph-";
 export const PREVIEW_LINE_CLASS = "preview-line";
@@ -11,7 +13,14 @@ const escapeHtml = require('markdown-it/lib/common/utils').escapeHtml;
 /** inspired from https://github.com/markdown-it/markdown-it.github.io/blob/master/index.js#L9929 */
 function injectLineNumbers(tokens, idx, options, env, slf) {
   let line, endLine, listLine;
-
+  if (tokens[idx].uuid) {
+    const label: ILabel = getLabelByUuidFromLabelsList(tokens[idx].uuid);
+    if (label) {
+      attrSetToBegin(tokens[idx].attrs, 'number', label.tag);
+      attrSetToBegin(tokens[idx].attrs, 'class', `${label.type} ` + label.id);
+      attrSetToBegin(tokens[idx].attrs, 'id', label.id);
+    }
+  }
   if (tokens[idx].map && tokens[idx].level === 0) {
     line = options.startLine + tokens[idx].map[0];
     endLine = options.startLine + tokens[idx].map[1];
@@ -26,6 +35,18 @@ function injectLineNumbers(tokens, idx, options, env, slf) {
     tokens[idx].attrJoin("data_line", `${String([line, endLine])}`);
     tokens[idx].attrJoin("count_line", `${String(endLine-line)}`);
 
+  }
+  return slf.renderToken(tokens, idx, options, env, slf);
+}
+
+function injectLabelIdToParagraphOPen(tokens, idx, options, env, slf) {
+  if (tokens[idx].uuid) {
+    const label: ILabel = getLabelByUuidFromLabelsList(tokens[idx].uuid);
+    if (label) {
+      attrSetToBegin(tokens[idx].attrs, 'number', label.tag);
+      attrSetToBegin(tokens[idx].attrs, 'class', `${label.type} ` + label.id);
+      attrSetToBegin(tokens[idx].attrs, 'id', label.id);
+    }
   }
   return slf.renderToken(tokens, idx, options, env, slf);
 }
@@ -138,6 +159,12 @@ export function withLineNumbers(renderer) {
   return renderer;
 }
 
+export function injectLabelIdToParagraph(renderer) {
+  renderer.renderer.rules.paragraph_open
+    = injectLabelIdToParagraphOPen;
+  return renderer;
+}
+
 export const injectRenderRules = (renderer) => {
   const { lineNumbering = false, htmlSanitize = {}, html = false, forDocx = false, centerTables = true } = renderer.options;
   if (centerTables) {
@@ -155,6 +182,7 @@ export const injectRenderRules = (renderer) => {
       }
     }
   } else {
+    injectLabelIdToParagraph(renderer);
     if (html && htmlSanitize !== false) {
       renderer.renderer.rules.html_block = html_block_Sanitize;
       renderer.renderer.rules.html_inline  = html_inline_Sanitize;

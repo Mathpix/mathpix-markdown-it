@@ -2,38 +2,25 @@ import { RuleBlock, Token } from 'markdown-it';
 import { openTag as openTagTabular, StatePushTabularBlock, StatePushDiv } from './begin-tabular';
 import { StatePushIncludeGraphics } from '../md-inline-rule/includegraphics';
 import { openTag as openTagAlign, SeparateInlineBlocksBeginAlign } from './begin-align';
-import { endTag } from '../utils';
+import { endTag, uid } from '../utils';
 import {includegraphicsTag} from '../md-inline-rule/utils';
 
-var linkTables = [];
 var couterTables = 0;
-var linkFigures = [];
 var couterFigures = 0;
 export const openTag: RegExp = /\\begin\s{0,}\{(table|figure)\}/;
 export const openTagH: RegExp = /\\begin\s{0,}\{(table|figure)\}\s{0,}\[(H|\!H|H\!|h|\!h|h\!|t|\!t|b|\!b|p|\!p)\]/;
 const captionTag: RegExp = /\\caption\s{0,}\{([^}]*)\}/;
-const captionTagG: RegExp = /\\caption\s{0,}\{([^}]*)\}/g;
-import { labelTag, labelTagG } from "../common/consts";
+const captionTagG: RegExp = /\s{0,}\\caption\s{0,}\{([^}]*)\}\s{0,}/g;
 const alignTagG: RegExp = /\\centering/g;
 const alignTagIncludeGraphicsG: RegExp = /\\includegraphics\[((.*)(center|left|right))\]\s{0,}\{([^{}]*)\}/g;
 
 enum TBegin {table = 'table', figure = 'figure'};
 
-const getLastTableNumber = () => {
-  return couterTables;
-};
-
-const getLastFigureNumber = () => {
-  return couterFigures;
-};
-
 export const ClearTableNumbers = () => {
-  linkTables = [];
   couterTables = 0;
 };
 
 export const ClearFigureNumbers = () => {
-  linkFigures = [];
   couterFigures = 0;
 };
 
@@ -56,10 +43,8 @@ const StatePushCaptionTable = (state, type: string): void => {
 
 const StatePushPatagraphOpenTable = (state, startLine: number, nextLine: number, type: string, latex?:string, hasAlignTagG = false) => {
   let token: Token;
-  let label = state.env.label;
   let align = state.env.align;
   let caption = state.env.caption;
-  let tagRef: string = '';
   let currentNumber: number = 0 ;
   token = state.push('paragraph_open', 'div', 1);
   if (state.md.options.forLatex) {
@@ -69,25 +54,24 @@ const StatePushPatagraphOpenTable = (state, startLine: number, nextLine: number,
     token.attrs = [['class', 'table ']];
   } else {
     if (type === TBegin.table) {
-      tagRef = (label && (label) !== '') ? `${encodeURIComponent(label)}` : '';
-      linkTables[tagRef] = getLastTableNumber() + 1;
       couterTables += 1;
       currentNumber = couterTables;
     } else {
-      tagRef = (label && (label) !== '') ? `${encodeURIComponent(label)}` : '';
-      linkFigures[tagRef] = getLastFigureNumber() + 1;
       couterFigures += 1;
       currentNumber = couterFigures;
     }
-
-    if (tagRef && tagRef.length > 0) {
-      token.attrs = [[ 'id', tagRef ], ['class', `${type} ` + tagRef],
-        ['number', currentNumber.toString()]];
-    } else {
-      token.attrs = [['class', 'table'],
-        ['number', currentNumber.toString()]];
-    }
+    token.attrs = [['class', 'table'],
+      ['number', currentNumber.toString()]];
   }
+  state.env.number = currentNumber;
+  state.env.type = type;
+  token.uuid = uid();
+  token.currentTag = {
+    type: type,
+    number: currentNumber,
+    tokenUuidInParentBlock: token.uuid
+  };
+  
   if (align) {
     token.attrs.push(['style', `text-align: ${align}`]);
     if (!hasAlignTagG && state.md.options.forLatex) {
@@ -140,7 +124,6 @@ const StatePushTableContent = (state, startLine: number, nextLine: number, conte
 
 const InlineBlockBeginTable: RuleBlock = (state, startLine) => {
   let caption: string;
-  let label = '';
   let captionFirst: boolean = false;
   let pos: number = state.bMarks[startLine] + state.tShift[startLine];
   let max: number = state.eMarks[startLine];
@@ -172,29 +155,26 @@ const InlineBlockBeginTable: RuleBlock = (state, startLine) => {
   const hasAlignTagIncludeGraphicsG = type === TBegin.figure
     ? Boolean(content.match(alignTagIncludeGraphicsG)) : false;
   content = content.replace(alignTagG,'');
-  matchE = content.match(captionTag);
-  if (matchE) {
-    caption = matchE[1];
-    let matchT: RegExpMatchArray;
-    if (type === TBegin.table) {
-      matchT = lineText.match(openTagTabular);
-    } else {
-      matchT = lineText.match(includegraphicsTag);
+  if (!state.md.options.forLatex) {
+    matchE = content.match(captionTag);
+    if (matchE) {
+      caption = matchE[1];
+      let matchT: RegExpMatchArray;
+      if (type === TBegin.table) {
+        matchT = lineText.match(openTagTabular);
+      } else {
+        matchT = lineText.match(includegraphicsTag);
+      }
+      if (matchT && matchE.index < matchT.index) {
+        captionFirst = true;
+      }
+      content = content.replace(captionTagG, '')
     }
-    if (matchT && matchE.index < matchT.index) {
-      captionFirst = true;
-    }
-    content = content.replace(captionTagG, '')
-  }
-  matchE = content.match(labelTag);
-  if (matchE) {
-    label = matchE[1];
-    content = content.replace(labelTagG, '')
   }
 
   state.parentType = 'paragraph';
-  state.env.label = label;
   state.env.caption = caption;
+  state.env.envType = type;
   const contentAlign = align ? align
     : hasAlignTagG ? 'center' : '';
   state.env.align = contentAlign;
@@ -206,20 +186,17 @@ const InlineBlockBeginTable: RuleBlock = (state, startLine) => {
     token = state.push('latex_align', '', 0);
     token.latex = '\\centering';
   }
-  if (captionFirst) {
+  if (captionFirst && !state.md.options.forLatex) {
     StatePushCaptionTable(state, type);
   }
 
   StatePushTableContent(state, startLine, startLine + 1, content, contentAlign, type);
 
-  if (!captionFirst) {
+  if (!captionFirst && !state.md.options.forLatex) {
     StatePushCaptionTable(state, type);
   }
-  if (state.md.options.forLatex && label) {
-    token = state.push('latex_label', '', 0);
-    token.latex = label;
-  }
   token = state.push('paragraph_close', 'div', -1);
+  token.currentTag = state.env.lastTag ? state.env.lastTag : {};
   if (state.md.options.forLatex && match && match[1]) {
     token.latex = `\\end{${match[1]}}`
   }
@@ -237,7 +214,7 @@ const InlineBlockBeginTable: RuleBlock = (state, startLine) => {
   return true;
 };
 
-export const BeginTable: RuleBlock = (state, startLine, endLine) => {
+export const BeginTable: RuleBlock = (state, startLine, endLine, silent) => {
   let pos: number = state.bMarks[startLine] + state.tShift[startLine];
   let max: number = state.eMarks[startLine];
   let token;
@@ -260,7 +237,10 @@ export const BeginTable: RuleBlock = (state, startLine, endLine) => {
   if (!match) {
     return false;
   }
-
+  /** For validation mode we can terminate immediately */
+  if (silent) {
+    return true;
+  }
   const type: string = match[1].trim() in TBegin ? match[1].trim() : null;
   if (!type) {
     return false;
@@ -275,7 +255,6 @@ export const BeginTable: RuleBlock = (state, startLine, endLine) => {
     || (state.md.options.centerImages && type === TBegin.figure) ? 'center' : '';
   
   let caption: string;
-  let label = '';
   let captionFirst: boolean = false;
 
   let pB = 0;
@@ -324,33 +303,32 @@ export const BeginTable: RuleBlock = (state, startLine, endLine) => {
     resText += lineText.slice(0, matchE.index);
     pE = matchE.index
   }
-  let hasAlignTagG = alignTagG.test(resText);
-  content = resText.replace(alignTagG,'');
+  let matchAlignTagG = resText.match(alignTagG);
+  const hasAlignTagG = Boolean(matchAlignTagG);
+  content = state.md.options.forLatex 
+    ? resText 
+    : resText.replace(alignTagG,'');
   const hasAlignTagIncludeGraphicsG = type === TBegin.figure 
     ? Boolean(content.match(alignTagIncludeGraphicsG)) : false;
   
-  matchE = content.match(captionTag);
-  if (matchE) {
-    caption = matchE[1];
-    let matchT: RegExpMatchArray;
-    if (type === TBegin.table) {
-       matchT = content.match(openTagTabular);
-    } else {
-       matchT = content.match(includegraphicsTag);
+  if (!state.md.options.forLatex) {
+    matchE = content.match(captionTag);
+    if (matchE) {
+      caption = matchE[1];
+      let matchT: RegExpMatchArray;
+      if (type === TBegin.table) {
+        matchT = content.match(openTagTabular);
+      } else {
+        matchT = content.match(includegraphicsTag);
+      }
+      if (matchT && matchE.index < matchT.index) {
+        captionFirst = true;
+      }
+      content = content.replace(captionTagG, '')
     }
-    if (matchT && matchE.index < matchT.index) {
-      captionFirst = true;
-    }
-    content = content.replace(captionTagG, '')
-  }
-  matchE = content.match(labelTag);
-  if (matchE) {
-    label = matchE[1];
-    content = content.replace(labelTagG, '')
   }
 
   state.parentType = 'paragraph';
-  state.env.label = label;
   state.env.caption = caption;
   const contentAlign = align ? align
     : hasAlignTagG ? 'center' : '';
@@ -359,12 +337,8 @@ export const BeginTable: RuleBlock = (state, startLine, endLine) => {
     ? `\\begin{${match[1]}}[h]`
     : match[0];
   StatePushPatagraphOpenTable(state, startLine, (pE > 0) ? nextLine  : nextLine + 1, type, latex, 
-    hasAlignTagG || hasAlignTagIncludeGraphicsG);
-  if (state.md.options.forLatex && hasAlignTagG) {
-    token = state.push('latex_align', '', 0);
-    token.latex = '\\centering';
-  }
-  if (captionFirst) {
+    (hasAlignTagG || hasAlignTagIncludeGraphicsG));
+  if (captionFirst && !state.md.options.forLatex) {
     StatePushCaptionTable(state, type);
   }
   if (pB > 0) {
@@ -379,14 +353,11 @@ export const BeginTable: RuleBlock = (state, startLine, endLine) => {
   content = content.trim();
   StatePushTableContent(state, startLine, nextLine, content, contentAlign, type);
 
-  if (!captionFirst) {
+  if (!captionFirst && !state.md.options.forLatex) {
     StatePushCaptionTable(state, type);
   }
-  if (state.md.options.forLatex && label) {
-    token = state.push('latex_label', '', 0);
-    token.latex = label;
-  }
   token = state.push('paragraph_close', 'div', -1);
+  token.currentTag = state.env.lastTag ? state.env.lastTag : {};
   if (state.md.options.forLatex && match && match[1]) {
     token.latex = `\\end{${match[1]}}`
   }

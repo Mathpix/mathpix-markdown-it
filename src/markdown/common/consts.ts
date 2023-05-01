@@ -105,3 +105,57 @@ export const csvSeparatorsDef = {
   row: '\n', /** newline as the record delimiter */
   toQuoteAllFields: false /** to quote all fields whether or not they contain delimiters */
 };
+
+/** 
+ * key - name of block-rule;
+ * terminated - a list of rules that this rule can terminate. */
+export const terminatedRules = {
+  "smilesDrawerBlock": {
+    terminated: ['paragraph', 'reference', 'blockquote', 'list']
+  },
+  "BeginTable": {
+    terminated: ["newTheoremBlock"]
+  },
+  "BeginAlign": {
+    terminated: ["newTheoremBlock"]
+  },
+  "BeginTabular": {
+    terminated: ["newTheoremBlock"]
+  },
+  "BeginProof": {
+    terminated: ["newTheoremBlock"]
+  },
+  "BeginTheorem": {
+    terminated: ["newTheoremBlock"]
+  },
+  "newTheoremBlock": {
+    terminated: ["pageBreaksBlock"]
+  },
+  "ReNewCommand": {
+    terminated: []
+  },
+  "Lists": {
+    terminated: []
+  },
+  "separatingSpan": {
+    terminated: []
+  },
+  "headingSection": {
+    terminated: ["newTheoremBlock", "mathMLBlock"]
+  },
+  "addContentsLineBlock": {
+    terminated: ["newTheoremBlock"]
+  },
+  "mathMLBlock": {
+    terminated: ['newTheoremBlock']
+  },
+  "abstractBlock": {
+    terminated: []
+  },
+  "pageBreaksBlock": {
+    terminated: ['paragraph']
+  },
+  "paragraphDiv": {
+    terminated: []
+  }
+};

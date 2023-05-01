@@ -28,6 +28,14 @@ import {
 
 import { ISmilesOptions } from './markdown/md-chemistry';
 import { resetTheoremEnvironments } from './markdown/md-theorem/helper';
+import { 
+  eLabelType, 
+  ILabel, 
+  getLabelsList, 
+  getLabelByKeyFromLabelsList, 
+  clearLabelsList 
+} from "./markdown/common/labels";
+
 import { normalizeLink } from './helpers/normalize-link';
 
 export {
@@ -39,6 +47,7 @@ export {
   ISmilesOptions,
   resetTheoremEnvironments,
   TTocStyle,
+  eLabelType, ILabel, getLabelsList, getLabelByKeyFromLabelsList, clearLabelsList,
   normalizeLink
 };
 

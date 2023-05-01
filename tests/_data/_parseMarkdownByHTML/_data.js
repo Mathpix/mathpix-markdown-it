@@ -764,4 +764,35 @@ module.exports = [
       '  </mtable>\n' +
       '</math>'
   },
+  /** Label and tags */
+  {
+    latex_input: '\\begin{equation}\n' +
+      'ax^2 + bx + c = 0\n' +
+      '\\end{equation}',
+    latex:        '\\begin{equation}\nax^2 + bx + c = 0\n\\end{equation}',
+    asciimath: '{:(1)ax^(2)+bx+c=0:}',
+    mathml: '<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">\n' +
+      '  <mtable displaystyle="true">\n' +
+      '    <mlabeledtr>\n' +
+      '      <mtd id="mjx-eqn-1">\n' +
+      '        <mtext>(1)</mtext>\n' +
+      '      </mtd>\n' +
+      '      <mtd>\n' +
+      '        <mi>a</mi>\n' +
+      '        <msup>\n' +
+      '          <mi>x</mi>\n' +
+      '          <mn>2</mn>\n' +
+      '        </msup>\n' +
+      '        <mo>+</mo>\n' +
+      '        <mi>b</mi>\n' +
+      '        <mi>x</mi>\n' +
+      '        <mo>+</mo>\n' +
+      '        <mi>c</mi>\n' +
+      '        <mo>=</mo>\n' +
+      '        <mn>0</mn>\n' +
+      '      </mtd>\n' +
+      '    </mlabeledtr>\n' +
+      '  </mtable>\n' +
+      '</math>'
+  }
 ];

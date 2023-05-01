@@ -32,3 +32,4 @@ export declare const findEndMarker: (str: string, startPos?: number, beginMarker
     content: string;
     nextPos: number;
 };
+export declare const getTerminatedRules: (rule: string) => any[];

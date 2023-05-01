@@ -1,3 +1,5 @@
+import { terminatedRules } from './common/consts';
+
 const hasProp = Object.prototype.hasOwnProperty;
 
 export const tocRegexp = /^\[\[toc\]\]/im;
@@ -90,4 +92,12 @@ export const findEndMarker = (str: string, startPos: number = 0, beginMarker: st
     content: content,
     nextPos: nextPos + endMarker.length
   };
+};
+
+
+export const getTerminatedRules = (rule: string) => {
+  if (terminatedRules.hasOwnProperty(rule)) {
+    return [...terminatedRules[rule].terminated];
+  }
+  return [];
 };

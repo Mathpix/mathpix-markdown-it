@@ -1,9 +1,9 @@
 import { MarkdownIt } from 'markdown-it';
 import { theoremEnvironments, getTheoremEnvironmentIndex } from "./helper";
+import { ILabel, getLabelByUuidFromLabelsList } from "../common/labels";
 
 const renderTheoremOpen = (tokens, idx, options, env, slf) => {
   const token = tokens[idx];
-  const envLabel = token.envLabel;
   const envNumber = token.envNumber;
   const envStyle = token.envStyle;
   /**
@@ -24,7 +24,8 @@ const renderTheoremOpen = (tokens, idx, options, env, slf) => {
       break;
   }
   styleBody += " padding: 10px 0;";
-  const labelRef = envLabel ? encodeURIComponent(envLabel) : '';
+  const label: ILabel = token.uuid ? getLabelByUuidFromLabelsList(token.uuid) : null;
+  const labelRef = label ? label.id : '';
   return labelRef 
     ? `<div id="${labelRef}" class="theorem" number="${envNumber}" style="${styleBody}">`
     : `<div class="theorem" style="${styleBody}">`;
@@ -121,9 +122,8 @@ const renderTheoremDescriptionClose = (tokens, idx, options, env, slf) => {
 
 const renderProofOpen = (tokens, idx, options, env, slf) => {
   const token = tokens[idx];
-  const envLabel = token.envLabel;
-
-  const labelRef = envLabel ? encodeURIComponent(envLabel) : '';
+  const label: ILabel = token.uuid ? getLabelByUuidFromLabelsList(token.uuid) : null;
+  const labelRef = label ? label.id : '';
   const styleTile = "font-style: italic;";
   const styleBody = "font-style: normal; padding: 10px 0;";
   let htmlTitle = `<span style="${styleTile}">Proof.</span>`;

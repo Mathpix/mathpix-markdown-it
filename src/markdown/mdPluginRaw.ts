@@ -14,13 +14,29 @@ import { openTagMML, closeTagMML, tsvSeparatorsDef, csvSeparatorsDef } from './c
 import { imageWithSize, renderRuleImage } from './md-inline-rule/image';
 import { setCounterSection } from './md-inline-rule/setcounter-section';
 import { renderTheorems } from './md-theorem';
-import { getTheoremNumberByLabel, resetTheoremEnvironments } from './md-theorem/helper';
+import { resetTheoremEnvironments } from './md-theorem/helper';
 import { newTheoremBlock } from './md-theorem/block-rule';
-import { newTheorem, theoremStyle, newCommandQedSymbol, labelLatex, setCounterTheorem } from './md-theorem/inline-rule';
+import { 
+  newTheorem, 
+  theoremStyle, 
+  newCommandQedSymbol, 
+  labelLatex, 
+  captionLatex,
+  centeringLatex,
+  setCounterTheorem 
+} from './md-theorem/inline-rule';
+import { coreInline } from './md-inline-rule/core-inline';
+import { softBreak, hardBreak } from './md-renderer-rules/breaks';
+import { 
+  ILabel,
+  eLabelType,
+  clearLabelsList, 
+  addIntoLabelsList, 
+  getLabelByKeyFromLabelsList 
+} from "./common/labels";
 const isSpace = require('markdown-it/lib/common/utils').isSpace;
 import { envArraysShouldBeFlattenInTSV } from '../helpers/consts';
-
-let mathNumber = [];
+import { getTerminatedRules } from './common';
 
 function MathML(state, silent, pos, endMarker = '', type = "inline_mathML") {
   const markerBegin = RegExp('^</?(math)(?=(\\s|>|$))', 'i');
@@ -60,6 +76,8 @@ function MathML(state, silent, pos, endMarker = '', type = "inline_mathML") {
     token = state.push(type, "", 0);
     token.content = content.trim();
   }
+  /** Perform math to conversion to html and get additional data from MathJax to pass it to render rules */
+  convertMathToHtml(state, token, state.md.options);
   state.pos = nextPos;
   return true;
 }
@@ -75,13 +93,12 @@ function inlineMathML(state, silent) {
 
 // BLOCK
 
-function mathMLBlock(state, startLine/*, endLine*/) {
+function mathMLBlock(state, startLine, endLine, silent) {
   const markerBegin = RegExp('^</?(math)(?=(\\s|>|$))', 'i');
   let content, terminate, i, l, token, oldParentType, lineText, mml,
     nextLine = startLine + 1,
-    terminatorRules = state.md.block.ruler.getRules('paragraph'),
-    endLine = state.lineMax,
-
+    terminatorRules = [].concat(state.md.block.ruler.getRules('paragraph'), 
+      state.md.block.ruler.getRules('mathMLBlock')),
     pos = state.bMarks[startLine] + state.tShift[startLine],
     max = state.eMarks[startLine];
 
@@ -95,7 +112,10 @@ function mathMLBlock(state, startLine/*, endLine*/) {
   mml = openTagMML.test(lineText);
 
   if (!markerBegin.test(lineText)) { return false; }
-
+  /** For validation mode we can terminate immediately */
+  if (silent) {
+    return true;
+  }
 
   // jump line-by-line until empty one or EOF
   for (; nextLine < endLine; nextLine++) {
@@ -245,6 +265,9 @@ function multiMath(state, silent) {
 
   if (!silent) {
     const token = state.push(type, "", 0);
+    if (state.env.subTabular) {
+      token.isSubTable = true;
+    }
     if (state.md.options.forLatex) {
       if (match[1]) {
         token.markup = match[1];
@@ -271,8 +294,11 @@ function multiMath(state, silent) {
     if (state.md.options.outMath && state.md.options.outMath.include_table_markdown) {
       token.latex = '\\' + match.input;
     }
+    if (type !== "reference_note" && !state.md.options.forLatex) {
+      /** Perform math to conversion to html and get additional data from MathJax to pass it to render rules */
+      convertMathToHtml(state, token, state.md.options);
+    }
   }
-
   state.pos = nextPos;
   return true;
 }
@@ -344,6 +370,9 @@ function refs(state, silent) {
 
     const token = state.push(type, "", 0);
     token.content = matchRef ? matchRef[1] : "";
+    let children = [];
+    state.md.inline.parse(token.content.trim(), state.md, state.env, children);
+    token.children = children;
   }
 
   state.pos = nextPos;
@@ -428,6 +457,10 @@ function simpleMath(state, silent) {
     }
     if (state.md.options.outMath && state.md.options.outMath.include_table_markdown) {
       token.latex = endMarker + token.content + endMarker;
+    }
+    /** Perform math to conversion to html and get additional data from MathJax to pass it to render rules */
+    if (!state.md.options.forLatex) {
+      convertMathToHtml(state, token, state.md.options);
     }
   }
   state.pos = nextPos;
@@ -518,20 +551,11 @@ function extend(options, defaults) {
   }, options);
 }
 
-const checkReference = data => {
-  const match = data.match(/label\{([^}]*)\}/);
-  return {
-    tagId: match ? match[1] : "",
-    math: data.replace(/\\label\{([^}]*)\}/, "")
-  };
-};
-
-const renderMath = (a, token, options) => {
-  const { tagId, math } = checkReference(token.content);
+/** Perform math to conversion to html and get additional data from MathJax to pass it to render rules */
+const convertMathToHtml = (state, token, options) => {
+  const math = token.content;
   let isBlock = token.type !== 'inline_math';
-  let mathEquation = null;
   const begin_number = MathJax.GetLastEquationNumber() + 1;
-
   try {
     let cwidth = 1200;
     if (options && options.width && options.width > 0) {
@@ -541,7 +565,7 @@ const renderMath = (a, token, options) => {
     }
 
     if (token.type === 'display_mathML' || token.type === 'inline_mathML') {
-      mathEquation = MathJax.TypesetMathML(math, {
+      token.mathEquation = MathJax.TypesetMathML(math, {
         display: true,
         metric: {cwidth: cwidth},
         outMath: options.outMath,
@@ -549,8 +573,9 @@ const renderMath = (a, token, options) => {
       });
     } else {
       if (token.return_asciimath) {
+        MathJax.Reset(begin_number);
         const data = MathJax.TypesetSvgAndAscii(math, {
-          display: isBlock, 
+          display: isBlock,
           metric: {cwidth: cwidth},
           outMath: Object.assign({}, options.outMath, {
             optionAscii: {
@@ -564,70 +589,84 @@ const renderMath = (a, token, options) => {
               tsv_separators: {...tsvSeparatorsDef},
               csv_separators: {...csvSeparatorsDef}
             },
-          }), 
+          }),
           mathJax: options.mathJax,
           accessibility: options.accessibility
         });
-        mathEquation = data.html;
+        token.mathEquation = data.html;
         token.ascii = data.ascii;
         token.ascii_tsv = data.ascii_tsv;
         token.ascii_csv = data.ascii_csv;
+        token.labels = data.labels;
       } else {
-         mathEquation = MathJax.Typeset(math, {display: isBlock, metric: { cwidth: cwidth },
-           outMath: options.outMath, mathJax: options.mathJax, forDocx: options.forDocx,
-           accessibility: options.accessibility,
-           nonumbers: options.nonumbers
-         });
+        MathJax.Reset(begin_number);
+        const data = MathJax.Typeset(math, {display: isBlock, metric: { cwidth: cwidth },
+          outMath: options.outMath, mathJax: options.mathJax, forDocx: options.forDocx,
+          accessibility: options.accessibility,
+          nonumbers: options.nonumbers
+        });
+        token.mathEquation = data.html;
+        token.ascii = data.ascii;
+        token.ascii_tsv = data.ascii_tsv;
+        token.ascii_csv = data.ascii_csv;
+        token.labels = data.labels;
       }
     }
+    
+    const number = MathJax.GetLastEquationNumber();
+    let idLabels = '';
+    if (token.labels) {
+      /** generate parenID - needs to multiple labels */
+      let labelsKeys = token.labels ? Object.keys(token.labels) : [];
+      idLabels = labelsKeys?.length ? encodeURIComponent(labelsKeys.join('_')) : '';
+      for (const key in token.labels) {
+        const tagContent = token.labels[key].tag;
+        const tagChildrenTokens = [];
+        state.md.inline.parse(tagContent, state.md, state.env, tagChildrenTokens);
+        addIntoLabelsList({
+          key: key,
+          id: idLabels,
+          tag: tagContent,
+          tagId: token.labels[key].id,
+          tagChildrenTokens: tagChildrenTokens,
+          type: eLabelType.equation
+        });
+      }
+    }
+    token.idLabels = idLabels;
+    token.number= number;
+    token.begin_number= begin_number;
+    token.attrNumber = begin_number >= number
+      ? number.toString()
+      : begin_number.toString() + ',' + number.toString();
+    return token;
   } catch (e) {
     console.error('ERROR MathJax =>', e.message, e);
-    if (options.outMath && options.outMath.not_catch_errors) {
-      throw ({
-        message: e.message,
-        error: e
-      })
-    }
-
-    if (token.type === 'display_mathML' || token.type === 'inline_mathML') {
-      mathEquation = `<span class="math-error">${math}</span>`;
-    } else {
-      mathEquation = math;
-      return `<p class="math-error">${mathEquation}</p>`;
-    }
+    token.error = {
+      message: e.message,
+      error: e
+    };
+    return token;
   }
+};
 
-  if (token.type === "equation_math_not_number") {
-    if (tagId) {
-      mathNumber[tagId] = `${0}`;
-    }
-  } else {
-    if (token.type === "equation_math") {
-      if (tagId) {
-        mathNumber[tagId] = `${begin_number}`;
-      }
-    }
-  }
-  const tagRef = (tagId && (tagId) !== '') ? `id=${encodeURIComponent(tagId)}` : '';
-
+const renderMath = (a, token, options) => {
+  const mathEquation = token.mathEquation;
+  const attrNumber = token.attrNumber;
+  const idLabels = token.idLabels;
   if (token.type === "equation_math") {
-    const number = MathJax.GetLastEquationNumber();
-
-    if (begin_number === number) {
-      return `<span ${tagRef} class="math-block equation-number ${tagRef}" number="${number}">${mathEquation}</span>`
-    } else {
-      return `<span ${tagRef} class="math-block equation-number ${tagRef}" number="${begin_number},${number}">${mathEquation}</span>`
-    }
+    return idLabels 
+      ? `<span id="${idLabels}" class="math-block equation-number id=${idLabels}" number="${attrNumber}">${mathEquation}</span>`
+      : `<span  class="math-block equation-number " number="${attrNumber}">${mathEquation}</span>`
   } else {
     return token.type === "inline_math" || token.type === "inline_mathML"
-      ? tagRef
-        ? `<span ${tagRef} class="math-inline ${tagRef}">${mathEquation}</span>`
-        : `<span class="math-inline ${tagRef}">${mathEquation}</span>`
-      : tagRef
-        ? `<span ${tagRef} class="math-block ${tagRef}">${mathEquation}</span>`
-        : `<span class="math-block ${tagRef}">${mathEquation}</span>`;
+      ? idLabels
+        ? `<span id="${idLabels}" class="math-inline id=${idLabels}">${mathEquation}</span>`
+        : `<span class="math-inline ${idLabels}">${mathEquation}</span>`
+      : idLabels
+        ? `<span id="${idLabels}" class="math-block id=${idLabels}">${mathEquation}</span>`
+        : `<span class="math-block ${idLabels}">${mathEquation}</span>`;
   }
-
 };
 
 const setStyle = (str) => {
@@ -684,29 +723,33 @@ const renderUsepackage = (token, options) => {
   }
 };
 
-const renderReference = token => {
-  const id: string = encodeURIComponent(token.content);
-  const theoremNumber = getTheoremNumberByLabel(token.content);
+const renderReference = (token, options, env, slf) => {
+  let id: string = '';
+  let reference = '';
+  /** This attribute indicates that the reference should be enclosed in parentheses (the reference was declared as \eqref{}) */
   const dataParentheses = token.attrGet("data-parentheses");
-  let reference = mathNumber[token.content] || theoremNumber;
+  const label: ILabel = getLabelByKeyFromLabelsList(token.content);
+  if (label) {
+    id = label.id;
+    reference = label.tagChildrenTokens?.length 
+      ? slf.renderInline(label.tagChildrenTokens, options)
+      : label.tag;
+  }
   if (dataParentheses === "true" &&  reference) {
     reference = '(' + reference + ')'
   }
-  if (token.type === "reference_note_block") {
-    return `<div class="math-block"><a href="#${id}"
-           style="cursor: pointer; text-decoration: none;"
-           class="clickable-link"
-           value=${id}
-           data-parentheses="${dataParentheses}"
-        >${reference|| '[' + token.content + ']'} </a></div>`
-  } else {
-    return `<a href="#${id}"
-           style="cursor: pointer; text-decoration: none;"
-           class="clickable-link"
-           value=${id}
-           data-parentheses="${dataParentheses}"
-        >${reference || '[' + token.content + ']'} </a>`;
+  if (!reference) {
+    /** If the label could not be found in the list, then we display the content of this label */
+    reference = '[' + token.content + ']';
   }
+  let html = token.type === "reference_note_block" 
+    ? `<div class="math-block">`
+    : '';
+  html += `<a href="#${id}" style="cursor: pointer; text-decoration: none;" class="clickable-link" value="${id}" data-parentheses="${dataParentheses}">`;
+  html += reference;
+  html += '</a>';
+  html += token.type === "reference_note_block" ? '</div>' : '';
+  return html;
 };
 
 const getCoutOpenCloseBranches = (str: string, beginMarker: string = '{', endMarker: string = '}') => {
@@ -979,19 +1022,25 @@ export default options => {
      * and not all content is being rerendered */
     if (!isRenderElement) {
       resetTheoremEnvironments();
+      /** TODO: check it in vscode */
+      clearLabelsList(); /** Clean up the global list of all labels */
     }
     md.block.ruler.before("paragraph", "paragraphDiv", paragraphDiv);
     if (!md.options.enableCodeBlockRuleForLatexCommands) {
       md.block.ruler.at("code", codeBlock);
     }
-    md.block.ruler.before("ReNewCommand", "newTheoremBlock", newTheoremBlock)
+    md.block.ruler.before("ReNewCommand", "newTheoremBlock", newTheoremBlock, 
+      {alt: getTerminatedRules("newTheoremBlock")});
     md.inline.ruler.before("escape", "usepackage", usepackage);
-    md.block.ruler.before("html_block", "mathMLBlock", mathMLBlock);
+    md.block.ruler.before("html_block", "mathMLBlock", mathMLBlock,
+      {alt: getTerminatedRules("mathMLBlock")});
     md.inline.ruler.before("html_inline", "mathML", inlineMathML);
     md.inline.ruler.before("escape", "refs", refs);
     md.inline.ruler.before("escape", "multiMath", multiMath);
     md.inline.ruler.before("multiMath", "inlineTabular", inlineTabular);
     md.inline.ruler.before("multiMath", "labelLatex", labelLatex);
+    md.inline.ruler.before("multiMath", "captionLatex", captionLatex);
+    md.inline.ruler.before("multiMath", "centeringLatex", centeringLatex);
     md.inline.ruler.before("multiMath", "theoremStyle", theoremStyle); /** Parse \theoremstyle */
     md.inline.ruler.before("multiMath", "newTheorem", newTheorem); /** Parse \newtheorem */
     md.inline.ruler.before("multiMath", "setCounterTheorem", setCounterTheorem); /** Parse \newtheorem */
@@ -1002,7 +1051,8 @@ export default options => {
     md.inline.ruler.before("asciiMath", "backtickAsAsciiMath", backtickAsAsciiMath);
     /** Replace image inline rule */
     md.inline.ruler.at('image', imageWithSize);
-
+    /** Replace inline core rule */
+    md.core.ruler.at('inline', coreInline);
 
     Object.keys(mapping).forEach(key => {
       md.renderer.rules[key] = (tokens, idx, options, env, slf) => {
@@ -1014,9 +1064,9 @@ export default options => {
           // case "tsv":
           //   return renderTSV(tokens, tokens[idx], options);
           case "reference_note":
-            return renderReference(tokens[idx]);
+            return renderReference(tokens[idx], options, env, slf);
           case "reference_note_block":
-            return renderReference(tokens[idx]);
+            return renderReference(tokens[idx], options, env, slf);
           case "usepackage_geometry":
             return renderUsepackage(tokens[idx], options);
           case "ascii_math":
@@ -1026,7 +1076,12 @@ export default options => {
         }
       }
     });
-    
+    /**
+     * Replacing the default renderer rules(softbreak and hardbreak) to ignore insertion of line breaks after hidden tokens.
+     * Hidden tokens do not participate in rendering
+     * */
+    md.renderer.rules.softbreak = softBreak;    
+    md.renderer.rules.hardbreak = hardBreak;
     md.renderer.rules.image = (tokens, idx, options, env, slf) => renderRuleImage(tokens, idx, options, env, slf);
     renderTheorems(md);
   };

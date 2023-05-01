@@ -581,5 +581,219 @@ a continuous function.</div>
 <mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.213ex" xmlns="http://www.w3.org/2000/svg" width="7.121ex" height="2.398ex" role="img" focusable="false" viewBox="0 -966 3147.4 1060"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="78" d="M52 289Q59 331 106 386T222 442Q257 442 286 424T329 379Q371 442 430 442Q467 442 494 420T522 361Q522 332 508 314T481 292T458 288Q439 288 427 299T415 328Q415 374 465 391Q454 404 425 404Q412 404 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145Q504 144 502 134Q486 77 440 33T333 -11Q263 -11 227 52Q186 -10 133 -10H127Q78 -10 57 16T35 71Q35 103 54 123T99 143Q142 143 142 101Q142 81 130 66T107 46T94 41L91 40Q91 39 97 36T113 29T132 26Q168 26 194 71Q203 87 217 139T245 247T261 313Q266 340 266 352Q266 380 251 392T217 404Q177 404 142 372T93 290Q91 281 88 280T72 278H58Q52 284 52 289Z"></path></g><g data-mml-node="mo" transform="translate(794.2, 0)"><path data-c="2B" d="M56 237T56 250T70 270H369V420L370 570Q380 583 389 583Q402 583 409 568V270H707Q722 262 722 250T707 230H409V-68Q401 -82 391 -82H389H387Q375 -82 369 -68V230H70Q56 237 56 250Z"></path></g><g data-mml-node="msqrt" transform="translate(1794.4, 0)"><g transform="translate(853, 0)"><g data-mml-node="mn"><path data-c="34" d="M462 0Q444 3 333 3Q217 3 199 0H190V46H221Q241 46 248 46T265 48T279 53T286 61Q287 63 287 115V165H28V211L179 442Q332 674 334 675Q336 677 355 677H373L379 671V211H471V165H379V114Q379 73 379 66T385 54Q393 47 442 46H471V0H462ZM293 211V545L74 212L183 211H293Z"></path></g></g><g data-mml-node="mo" transform="translate(0, 106)"><path data-c="221A" d="M95 178Q89 178 81 186T72 200T103 230T169 280T207 309Q209 311 212 311H213Q219 311 227 294T281 177Q300 134 312 108L397 -77Q398 -77 501 136T707 565T814 786Q820 800 834 800Q841 800 846 794T853 782V776L620 293L385 -193Q381 -200 366 -200Q357 -200 354 -197Q352 -195 256 15L160 225L144 214Q129 202 113 190T95 178Z"></path></g><rect width="500" height="60" x="853" y="846"></rect></g></g></g></svg></mjx-container></span> Section <span class="math-inline ">
 <mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.025ex" xmlns="http://www.w3.org/2000/svg" width="1.294ex" height="1.025ex" role="img" focusable="false" viewBox="0 -442 572 453"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="78" d="M52 289Q59 331 106 386T222 442Q257 442 286 424T329 379Q371 442 430 442Q467 442 494 420T522 361Q522 332 508 314T481 292T458 288Q439 288 427 299T415 328Q415 374 465 391Q454 404 425 404Q412 404 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145Q504 144 502 134Q486 77 440 33T333 -11Q263 -11 227 52Q186 -10 133 -10H127Q78 -10 57 16T35 71Q35 103 54 123T99 143Q142 143 142 101Q142 81 130 66T107 46T94 41L91 40Q91 39 97 36T113 29T132 26Q168 26 194 71Q203 87 217 139T245 247T261 313Q266 340 266 352Q266 380 251 392T217 404Q177 404 142 372T93 290Q91 281 88 280T72 278H58Q52 284 52 289Z"></path></g></g></g></svg></mjx-container></span> <em>f</em> text 2.1.</span><span style="margin-right: 16px"></span><div style="display: inline" data-display="inline">Text theorem</div>
 </div></div>`
+  },
+  {
+    latex: 'Should be new paragraph after `\\theoremstyle{plain}` and before `<math>...</math>`\n' +
+      '\\theoremstyle{plain}\n' +
+      '<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">\n' +
+      '  <mi>x</mi>\n' +
+      '</math>\n' +
+      '\n' +
+      'Should be new paragraph after `\\newtheorem{thm}{Theorem}[section]` and before table\n' +
+      '\\newtheorem{thm}{Theorem}[section]\n' +
+      '\\begin{table}[h!]\n' +
+      '\\centering\n' +
+      '\\begin{tabular}{||c c c c||}\n' +
+      '\\hline\n' +
+      'Col1 & Col2 & Col2 & Col3 \\\\ [0.5ex]\n' +
+      '\\hline\\hline\n' +
+      '1 & 6 & 87837 & 787 \\\\\n' +
+      '2 & 7 & 78 & 5415 \\\\\n' +
+      '3 & 545 & 778 & 7507 \\\\\n' +
+      '4 & 545 & 18744 & 7560 \\\\\n' +
+      '5 & 88 & 788 & 6344 \\\\ [1ex]\n' +
+      '\\hline\n' +
+      '\\end{tabular}\n' +
+      '\\end{table}\n' +
+      '\n' +
+      'Should be new paragraph after `\\newtheorem{thm}{Theorem}[section]` and before table\n' +
+      '\\newtheorem{thm}{Theorem}[section]\n' +
+      '\\begin{right}\n' +
+      '\\begin{tabular}{ | l | c | r | }\n' +
+      '  \\hline\t\t\t\n' +
+      '  1 & 2 & 3 \\\\\n' +
+      '  4 & 5 & 6 \\\\\n' +
+      '  7 & 8 & 9 \\\\\n' +
+      '  \\hline  \n' +
+      '\\end{tabular}\n' +
+      '\\end{right}\n' +
+      '\n' +
+      'Should be new paragraph after `\\newtheorem{thm}{Theorem}[section]` and before tabular. Tabular should be centering.\n' +
+      '\\newtheorem{thm}{Theorem}[section]\n' +
+      '\\begin{tabular}{ | l | c | r | }\n' +
+      '  \\hline\t\t\t\n' +
+      '  1 & 2 & 3 \\\\\n' +
+      '  4 & 5 & 6 \\\\\n' +
+      '  7 & 8 & 9 \\\\\n' +
+      '  \\hline  \n' +
+      '\\end{tabular}\n' +
+      '\n' +
+      '\n' +
+      'Should be new paragraph after `\\newtheorem{lem}[thm]{Lemma}` and before `\\pagebreak`\n' +
+      '\\newtheorem{lem}[thm]{Lemma}\n' +
+      '\\pagebreak\n' +
+      '\n' +
+      '\n' +
+      '\\section*{Unnumbered first Section}\n' +
+      '\\newtheorem{prop}[thm]{Proposition}\n' +
+      '\n' +
+      '\\newtheorem*{cor}{Corollary}\n' +
+      '\\title{Bitcoin: A Peer-to-Peer Electronic Cash System}\n' +
+      '\n' +
+      'Should be abstract block:\n' +
+      '\\theoremstyle{plain}\n' +
+      '\\newtheorem{thm}{Theorem}[section]\n' +
+      '\\newtheorem{lem}[thm]{Lemma}\n' +
+      '\\newtheorem{prop}[thm]{Proposition}\n' +
+      '\\newtheorem*{cor}{Corollary}\n' +
+      '\\begin{abstract} \n' +
+      'A purely peer-to-peer version of electronic cash would allow online payments to be sent directly from one party to another without going through a financial institution. Digital signatures provide part of the solution, but the main benefits are lost if a trusted third party is still required to prevent double-spending. \n' +
+      '\\end{abstract}\n' +
+      '\\newtheorem{theorem}{Theorem}\n' +
+      '\n' +
+      '\n' +
+      '\\newtheorem*{cor}{Corollary}\n' +
+      '\\addcontentsline{toc}{section}{Unnumbered first Section}\n' +
+      '\n' +
+      '\n' +
+      '\\newtheorem*{cor}{Corollary}\n' +
+      '\\section{Introduction}\n' +
+      '\\newtheorem*{cor}{Corollary}\n' +
+      'Theorems can easily be defined:\n' +
+      '\n' +
+      '\\newtheorem*{cor}{Corollary}\n' +
+      '\\begin{theorem}\n' +
+      'Let \\(f\\) be a function whose derivative exists in every point, then \\(f\\) \n' +
+      'is a continuous function.\n' +
+      '\\end{theorem}\n' +
+      '\\newtheorem*{cor}{Corollary}',
+    html: '<div style="margin-top: 0; margin-bottom: 1rem;">Should be new paragraph after <code>\\theoremstyle{plain}</code> and before <code>&lt;math&gt;...&lt;/math&gt;</code><br>\n' +
+      '<span class="math-block ">\n' +
+      '<mjx-container class="MathJax" jax="SVG" display="true"><svg style="vertical-align: -0.025ex" xmlns="http://www.w3.org/2000/svg" width="1.294ex" height="1.025ex" role="img" focusable="false" viewBox="0 -442 572 453"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="78" d="M52 289Q59 331 106 386T222 442Q257 442 286 424T329 379Q371 442 430 442Q467 442 494 420T522 361Q522 332 508 314T481 292T458 288Q439 288 427 299T415 328Q415 374 465 391Q454 404 425 404Q412 404 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145Q504 144 502 134Q486 77 440 33T333 -11Q263 -11 227 52Q186 -10 133 -10H127Q78 -10 57 16T35 71Q35 103 54 123T99 143Q142 143 142 101Q142 81 130 66T107 46T94 41L91 40Q91 39 97 36T113 29T132 26Q168 26 194 71Q203 87 217 139T245 247T261 313Q266 340 266 352Q266 380 251 392T217 404Q177 404 142 372T93 290Q91 281 88 280T72 278H58Q52 284 52 289Z"></path></g></g></g></svg></mjx-container></span></div>\n' +
+      '<div style="margin-top: 0; margin-bottom: 1rem;">Should be new paragraph after <code>\\newtheorem{thm}{Theorem}[section]</code> and before table<br>\n' +
+      '</div>\n' +
+      '<div class="table " style="text-align: center">\n' +
+      '<div class="table_tabular " style="text-align: center">\n' +
+      '<div class="inline-tabular"><table id="tabular">\n' +
+      '<tbody>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: center; border-left-style: double !important; border-left-width: 3px !important; border-right: none !important; border-bottom-style: double !important; border-bottom-width: 3px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; padding-bottom: 0.5ex !important;">Col1</td>\n' +
+      '<td style="text-align: center; border-right: none !important; border-bottom-style: double !important; border-bottom-width: 3px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; padding-bottom: 0.5ex !important;">Col2</td>\n' +
+      '<td style="text-align: center; border-right: none !important; border-bottom-style: double !important; border-bottom-width: 3px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; padding-bottom: 0.5ex !important;">Col2</td>\n' +
+      '<td style="text-align: center; border-right-style: double !important; border-right-width: 3px !important; border-bottom-style: double !important; border-bottom-width: 3px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; padding-bottom: 0.5ex !important;">Col3</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: center; border-left-style: double !important; border-left-width: 3px !important; border-right: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">1</td>\n' +
+      '<td style="text-align: center; border-right: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">6</td>\n' +
+      '<td style="text-align: center; border-right: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">87837</td>\n' +
+      '<td style="text-align: center; border-right-style: double !important; border-right-width: 3px !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">787</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: center; border-left-style: double !important; border-left-width: 3px !important; border-right: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">2</td>\n' +
+      '<td style="text-align: center; border-right: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">7</td>\n' +
+      '<td style="text-align: center; border-right: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">78</td>\n' +
+      '<td style="text-align: center; border-right-style: double !important; border-right-width: 3px !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">5415</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: center; border-left-style: double !important; border-left-width: 3px !important; border-right: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">3</td>\n' +
+      '<td style="text-align: center; border-right: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">545</td>\n' +
+      '<td style="text-align: center; border-right: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">778</td>\n' +
+      '<td style="text-align: center; border-right-style: double !important; border-right-width: 3px !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">7507</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: center; border-left-style: double !important; border-left-width: 3px !important; border-right: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">4</td>\n' +
+      '<td style="text-align: center; border-right: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">545</td>\n' +
+      '<td style="text-align: center; border-right: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">18744</td>\n' +
+      '<td style="text-align: center; border-right-style: double !important; border-right-width: 3px !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">7560</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: center; border-left-style: double !important; border-left-width: 3px !important; border-right: none !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; padding-bottom: 1ex !important;">5</td>\n' +
+      '<td style="text-align: center; border-right: none !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; padding-bottom: 1ex !important;">88</td>\n' +
+      '<td style="text-align: center; border-right: none !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; padding-bottom: 1ex !important;">788</td>\n' +
+      '<td style="text-align: center; border-right-style: double !important; border-right-width: 3px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; padding-bottom: 1ex !important;">6344</td>\n' +
+      '</tr>\n' +
+      '</tbody>\n' +
+      '</table>\n' +
+      '</div></div>\n' +
+      '</div>\n' +
+      '<div style="margin-top: 0; margin-bottom: 1rem;">Should be new paragraph after <code>\\newtheorem{thm}{Theorem}[section]</code> and before table<br>\n' +
+      '</div>\n' +
+      '<div class="center" style="text-align: right">\n' +
+      '<div class="table_tabular " style="text-align: right">\n' +
+      '<div class="inline-tabular"><table id="tabular">\n' +
+      '<tbody>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom: none !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; ">1</td>\n' +
+      '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom: none !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; ">2</td>\n' +
+      '<td style="text-align: right; border-right-style: solid !important; border-right-width: 1px !important; border-bottom: none !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; ">3</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">4</td>\n' +
+      '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">5</td>\n' +
+      '<td style="text-align: right; border-right-style: solid !important; border-right-width: 1px !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">6</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">7</td>\n' +
+      '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">8</td>\n' +
+      '<td style="text-align: right; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">9</td>\n' +
+      '</tr>\n' +
+      '</tbody>\n' +
+      '</table>\n' +
+      '</div></div>\n' +
+      '</div>\n' +
+      '<div style="margin-top: 0; margin-bottom: 1rem;">Should be new paragraph after <code>\\newtheorem{thm}{Theorem}[section]</code> and before tabular. Tabular should be centering.<br>\n' +
+      '</div>\n' +
+      '<div class="table_tabular " style="text-align: center">\n' +
+      '<div class="inline-tabular"><table id="tabular">\n' +
+      '<tbody>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom: none !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; ">1</td>\n' +
+      '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom: none !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; ">2</td>\n' +
+      '<td style="text-align: right; border-right-style: solid !important; border-right-width: 1px !important; border-bottom: none !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; ">3</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">4</td>\n' +
+      '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">5</td>\n' +
+      '<td style="text-align: right; border-right-style: solid !important; border-right-width: 1px !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">6</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">7</td>\n' +
+      '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">8</td>\n' +
+      '<td style="text-align: right; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">9</td>\n' +
+      '</tr>\n' +
+      '</tbody>\n' +
+      '</table>\n' +
+      '</div></div>\n' +
+      '<div style="margin-top: 0; margin-bottom: 1rem;">Should be new paragraph after <code>\\newtheorem{lem}[thm]{Lemma}</code> and before <code>\\pagebreak</code><br>\n' +
+      '</div>\n' +
+      '<h2 type="section" data-unnumbered="true" class="section-title" id="unnumbered-first-section">\n' +
+      'Unnumbered first Section</h2>\n' +
+      '<div style="margin-top: 0; margin-bottom: 0;"></div>\n' +
+      '<div style="margin-top: 0; margin-bottom: 0;"></div>\n' +
+      '<h1 type="title" class="main-title" id="bitcoin%3A-a-peer-to-peer-electronic-cash-system">\n' +
+      'Bitcoin: A Peer-to-Peer Electronic Cash System</h1>\n' +
+      '<div style="margin-top: 0; margin-bottom: 1rem;">Should be abstract block:<br>\n' +
+      '</div>\n' +
+      '<div class="abstract" style="width: 80%; margin: 0 auto; margin-bottom: 1em; font-size: .9em;">\n' +
+      '<h4 id="abstract_head" class="abstract_head" style="text-align: center;">\n' +
+      'Abstract</h4>\n' +
+      '<p style="text-indent: 1em;">A purely peer-to-peer version of electronic cash would allow online payments to be sent directly from one party to another without going through a financial institution. Digital signatures provide part of the solution, but the main benefits are lost if a trusted third party is still required to prevent double-spending.</p>\n' +
+      '</div>\n' +
+      '<div style="margin-top: 0; margin-bottom: 0;"></div>\n' +
+      '<div style="margin-top: 0; margin-bottom: 0;"></div>\n' +
+      '<div class="addcontentsline" style="margin-top: 0; margin-bottom: 0;">\n' +
+      '</div>\n' +
+      '<div style="margin-top: 0; margin-bottom: 0;"></div>\n' +
+      '<h2 type="section" class="section-title" id="introduction">\n' +
+      '<span class="section-number">1. </span>Introduction</h2>\n' +
+      '<div style="margin-top: 0; margin-bottom: 1rem;">Theorems can easily be defined:</div>\n' +
+      '<div style="margin-top: 0; margin-bottom: 0;"></div>\n' +
+      '<div class="theorem_block">\n' +
+      '<div class="theorem" style="font-style: italic; padding: 10px 0;"><span style="font-weight: bold; font-style: normal;" class="theorem-title">Theorem 1.</span><span style="margin-right: 16px"></span><div style="display: inline" data-display="inline">Let <span class="math-inline ">\n' +
+      '<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.464ex" xmlns="http://www.w3.org/2000/svg" width="1.244ex" height="2.059ex" role="img" focusable="false" viewBox="0 -705 550 910"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="66" d="M118 -162Q120 -162 124 -164T135 -167T147 -168Q160 -168 171 -155T187 -126Q197 -99 221 27T267 267T289 382V385H242Q195 385 192 387Q188 390 188 397L195 425Q197 430 203 430T250 431Q298 431 298 432Q298 434 307 482T319 540Q356 705 465 705Q502 703 526 683T550 630Q550 594 529 578T487 561Q443 561 443 603Q443 622 454 636T478 657L487 662Q471 668 457 668Q445 668 434 658T419 630Q412 601 403 552T387 469T380 433Q380 431 435 431Q480 431 487 430T498 424Q499 420 496 407T491 391Q489 386 482 386T428 385H372L349 263Q301 15 282 -47Q255 -132 212 -173Q175 -205 139 -205Q107 -205 81 -186T55 -132Q55 -95 76 -78T118 -61Q162 -61 162 -103Q162 -122 151 -136T127 -157L118 -162Z"></path></g></g></g></svg></mjx-container></span> be a function whose derivative exists in every point, then <span class="math-inline ">\n' +
+      '<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.464ex" xmlns="http://www.w3.org/2000/svg" width="1.244ex" height="2.059ex" role="img" focusable="false" viewBox="0 -705 550 910"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="66" d="M118 -162Q120 -162 124 -164T135 -167T147 -168Q160 -168 171 -155T187 -126Q197 -99 221 27T267 267T289 382V385H242Q195 385 192 387Q188 390 188 397L195 425Q197 430 203 430T250 431Q298 431 298 432Q298 434 307 482T319 540Q356 705 465 705Q502 703 526 683T550 630Q550 594 529 578T487 561Q443 561 443 603Q443 622 454 636T478 657L487 662Q471 668 457 668Q445 668 434 658T419 630Q412 601 403 552T387 469T380 433Q380 431 435 431Q480 431 487 430T498 424Q499 420 496 407T491 391Q489 386 482 386T428 385H372L349 263Q301 15 282 -47Q255 -132 212 -173Q175 -205 139 -205Q107 -205 81 -186T55 -132Q55 -95 76 -78T118 -61Q162 -61 162 -103Q162 -122 151 -136T127 -157L118 -162Z"></path></g></g></g></svg></mjx-container></span><br>\n' +
+      'is a continuous function.</div>\n' +
+      '</div></div>\n' +
+      '<div style="margin-top: 0; margin-bottom: 0;"></div>'
   }
 ];
