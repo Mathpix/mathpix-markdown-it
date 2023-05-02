@@ -113,6 +113,10 @@ export type TOutputMath = {
     column?: string,
     row?: string,
     toQuoteAllFields?: boolean /** to quote all fields whether or not they contain delimiters */
+  },  
+  md_separators?: {
+    column?: string,
+    row?: string,
   },
   table_markdown?: {
     math_as_ascii?: boolean

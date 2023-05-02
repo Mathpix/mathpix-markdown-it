@@ -205,11 +205,13 @@ const renderInlineTokenBlock = (tokens, options, env, slf, isSubTable = false) =
           if (child.latex) {
             if (options.outMath && options.outMath.table_markdown && options.outMath.table_markdown.math_as_ascii) {
               if (child.ascii) {
-                cellMd += child.ascii;
+                cellMd += child.ascii_md ? child.ascii_md : child.ascii;
                 continue;
               }
             }
-            cellMd += child.latex.replace(/\|/, '\\|');
+            cellMd += child.latex
+              .replace(/\|/g, '\\|')
+              .replace(/\n/g, ' ');
           } else {
             if (child.type === 'image' || child.type === 'includegraphics') {
               const src = child.attrGet('src');
