@@ -6,6 +6,7 @@ export interface IOuterData {
     asciimath?: string;
     asciimath_tsv?: string;
     asciimath_csv?: string;
+    asciimath_md?: string;
     latex?: string;
     svg?: string;
     speech?: string;
@@ -34,6 +35,7 @@ export declare const MathJax: {
         ascii: string;
         ascii_tsv: string;
         ascii_csv: string;
+        ascii_md: string;
     };
     TypesetSvgAndAscii: (string: any, options?: any) => {
         html: string;
@@ -43,6 +45,7 @@ export declare const MathJax: {
         };
         ascii_tsv: string;
         ascii_csv: string;
+        ascii_md: string;
     };
     /**
      * Typeset a MathML expression and return the SVG tree for it

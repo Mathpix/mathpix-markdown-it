@@ -44,6 +44,10 @@ export declare const csvSeparatorsDef: {
     row: string;
     toQuoteAllFields: boolean; /** to quote all fields whether or not they contain delimiters */
 };
+export declare const mdSeparatorsDef: {
+    column: string;
+    row: string;
+};
 /**
  * key - name of block-rule;
  * terminated - a list of rules that this rule can terminate. */

@@ -106,6 +106,11 @@ export const csvSeparatorsDef = {
   toQuoteAllFields: false /** to quote all fields whether or not they contain delimiters */
 };
 
+export const mdSeparatorsDef = {
+  column: ' ', /** space as the field delimiter */
+  row: ' <br> ', /** <br> as the record delimiter */
+};
+
 /** 
  * key - name of block-rule;
  * terminated - a list of rules that this rule can terminate. */

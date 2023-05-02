@@ -21,6 +21,7 @@ export declare type TTokenTabular = {
     ascii?: string;
     ascii_tsv?: string;
     ascii_csv?: string;
+    ascii_md?: string;
     latex?: string;
 };
 export declare type TMulti = {

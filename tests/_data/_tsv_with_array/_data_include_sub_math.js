@@ -128,8 +128,7 @@ module.exports = [
       '3,134,133,132,127\n' +
       '4,129,127,132,129\n' +
       '5,147,148,144,142',
-    table_markdown: '| \\( \\begin{array}{c}\\text { Coating Type } \\\\\n' +
-      '\\hline 1\\end{array} \\) | \\( {\\text { Conductivity }} \\) |  |  |  |\n' +
+    table_markdown: '| \\( \\begin{array}{c}\\text { Coating Type } \\\\ \\hline 1\\end{array} \\) | \\( {\\text { Conductivity }} \\) |  |  |  |\n' +
       '| :---: | :---: | :---: | :---: | :---: |\n' +
       '|  | 143 | 141 | 150 | 146 |\n' +
       '| 2 | 152 | 149 | 137 | 143 |\n' +
@@ -240,8 +239,7 @@ module.exports = [
       'theta"\n' +
       'phi_(i),phi_(f),vartheta_(1),vartheta_(2),\n' +
       'arg(M_(i)mu//b),arg(A_(f)mu//b),arg(epsilon_(1)//b),arg(epsilon_(2)//b^(2)),bar(arg(bH_(u)H_(d)))',
-    table_markdown: '| \\( {\\text { MSSM phases }} \\) |  | \\( {\\text { BMSSM phases }} \\) |  | \\( {\\begin{array}{c}\\hline \\text { vev phase } \\\\\n' +
-      '\\theta\\end{array}} \\) |\n' +
+    table_markdown: '| \\( {\\text { MSSM phases }} \\) |  | \\( {\\text { BMSSM phases }} \\) |  | \\( {\\begin{array}{c}\\hline \\text { vev phase } \\\\ \\theta\\end{array}} \\) |\n' +
       '| :---: | :---: | :---: | :---: | :---: |\n' +
       '| \\( \\phi_{i} \\) | \\( \\phi_{f} \\) | \\( \\vartheta_{1} \\) | \\( \\vartheta_{2} \\) |  |\n' +
       '| \\( \\arg \\left(M_{i} \\mu / b\\right) \\) | \\( \\arg \\left(A_{f} \\mu / b\\right) \\) | \\( \\arg \\left(\\epsilon_{1} / b\\right) \\) | \\( \\arg \\left(\\epsilon_{2} / b^{2}\\right) \\) | \\( \\overline{\\arg \\left(b H_{u} H_{d}\\right)} \\) |',
@@ -306,10 +304,7 @@ module.exports = [
     table_markdown: '| Viewpoint | \\( \\bar{F} \\) | \\( \\mathrm{R} \\) | \\( \\mathrm{S} \\) | \\( \\mathrm{FS} \\) | \\( \\mathrm{RS} \\) |\n' +
       '| :---: | :---: | :---: | :---: | :---: | :---: |\n' +
       '|  | \\( {\\text { mean difference }} \\) |  |  |  |  |\n' +
-      '| \\( {\\begin{array}{c}\\hline \\text { Maximum speed } \\\\\n' +
-      '\\text { (mean guess) } \\\\\n' +
-      '\\text { Displacement } \\\\\n' +
-      '\\text { (mean guess) }\\end{array}} \\) | \\( 20.8 \\) | \\( 21.3 \\) | \\( 20.4 \\) | \\( 20.1 \\) | \\( 21.3 \\) |\n' +
+      '| \\( {\\begin{array}{c}\\hline \\text { Maximum speed } \\\\ \\text { (mean guess) } \\\\ \\text { Displacement } \\\\ \\text { (mean guess) }\\end{array}} \\) | \\( 20.8 \\) | \\( 21.3 \\) | \\( 20.4 \\) | \\( 20.1 \\) | \\( 21.3 \\) |\n' +
       '|  | \\( 38.0 \\) | \\( 38.5 \\) | \\( 39.4 \\) | \\( 40.2 \\) | \\( 40.1 \\) |\n' +
       '|  | \\( 0.811 \\) | \\( 0.752 \\) | \\( 0.795 \\) | \\( 0.875 \\) | \\( 0.822 \\) |\n' +
       '|  | \\( 1.04 \\) | \\( 0.922 \\) | \\( 1.04 \\) | \\( 1.13 \\) | \\( 1.08 \\) |\n' +
@@ -403,15 +398,7 @@ module.exports = [
       '300"\n' +
       ',,50,50,,\n' +
       ',1 12,0.25 1000,1.1 55,∼200 2,∼800 0.08',
-    table_markdown: '| \\( {\\begin{array}{c}\\text { Detector } \\\\\n' +
-      '\\hline \\text { Mass of the } \\\\\n' +
-      '\\text { target, tons } \\\\\n' +
-      '\\text { Distance from } \\\\\n' +
-      '\\text { the source, km } \\\\\n' +
-      "N\\left(e^{+}, \\mathrm{n}\\right) d^{-1}\\end{array}} \\) | \\( {\\begin{array}{c}\\text { CHOOZ'97 } \\\\\n" +
-      '5\\end{array}} \\) | \\( {\\text { THIS PROJECT }} \\) |  | \\( {\\begin{array}{c}\\text { KamLand } \\\\\n' +
-      '1000\\end{array}} \\) | \\( {\\begin{array}{c}\\text { BOREXINO } \\\\\n' +
-      '300\\end{array}} \\) |\n' +
+    table_markdown: '| \\( {\\begin{array}{c}\\text { Detector } \\\\ \\hline \\text { Mass of the } \\\\ \\text { target, tons } \\\\ \\text { Distance from } \\\\ \\text { the source, km } \\\\ N\\left(e^{+}, \\mathrm{n}\\right) d^{-1}\\end{array}} \\) | \\( {\\begin{array}{c}\\text { CHOOZ\'97 } \\\\ 5\\end{array}} \\) | \\( {\\text { THIS PROJECT }} \\) |  | \\( {\\begin{array}{c}\\text { KamLand } \\\\ 1000\\end{array}} \\) | \\( {\\begin{array}{c}\\text { BOREXINO } \\\\ 300\\end{array}} \\) |\n' +
       '| :---: | :---: | :---: | :---: | :---: | :---: |\n' +
       '|  |  | 50 | 50 |  |  |\n' +
       '|  | 1 12 | \\( 0.25 \\) 1000 1000 | \\( 1.1 \\) 55 55 | \\( \\sim 200 \\) 2 2 | \\( \\sim 800 \\) \\( 0.08 \\) \\( 0.08 \\) |',
