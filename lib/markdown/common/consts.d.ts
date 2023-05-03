@@ -101,3 +101,4 @@ export declare const terminatedRules: {
         terminated: any[];
     };
 };
+export declare const mathTokenTypes: string[];

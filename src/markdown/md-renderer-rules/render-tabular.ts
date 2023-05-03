@@ -1,6 +1,7 @@
 import { TsvJoin } from "../common/tsv";
 import { CsvJoin } from "../common/csv";
 import { tableMarkdownJoin, getMdForChild, getMdLink } from "../common/table-markdown";
+import { mathTokenTypes } from "../common/consts";
 
 const tokenAttrGet = (token, name) => {
   if (!name) { return ''}
@@ -209,7 +210,14 @@ const renderInlineTokenBlock = (tokens, options, env, slf, isSubTable = false) =
                 continue;
               }
             }
-            cellMd += child.latex
+            const begin_math_inline_delimiters = options.outMath?.table_markdown?.math_inline_delimiters?.length > 1 
+              ? options.outMath?.table_markdown?.math_inline_delimiters[0] : '$';            
+            const end_math_inline_delimiters = options.outMath?.table_markdown?.math_inline_delimiters?.length > 1 
+              ? options.outMath?.table_markdown?.math_inline_delimiters[1] : '$';
+            let mdContent = mathTokenTypes.includes(child.type)
+              ? begin_math_inline_delimiters + child.content?.trim() + end_math_inline_delimiters
+              : child.latex;
+            cellMd += mdContent                
               .replace(/\|/g, '\\|')
               .replace(/\n/g, ' ');
           } else {
