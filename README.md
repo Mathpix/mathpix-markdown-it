@@ -762,6 +762,8 @@ The `MathpixMarkdown` React element accepts the following props:
 | `not_catch_errors`       | boolean&nbsp;*`false`*       | Do not catch math rendering errors                                                                                |
 | `include_error`          | boolean&nbsp;*`false`*       | outputs error `<error style="display: none">...</error>`                                                          |
 | `include_speech`         | boolean&nbsp;*`false`*       | outputs speech `<speech>...</speech`                                                                              | 
+| `md_separators`          | `{column: ' ', row: ' <br> '}`| Separators for Markdown tables                                                                                   | 
+| `table_markdown`         | `{math_as_ascii: false, math_inline_delimiters: ['$','$']}`| By default, math goes into Markdown tables as latex and is enclosed in `$...$` delimiters. If `math_as_ascii` is set to `true`, then math will be represented as asciimath | 
 
 ### TOutputMathJax
 

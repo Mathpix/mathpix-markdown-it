@@ -164,3 +164,6 @@ export const terminatedRules = {
     terminated: []
   }
 };
+
+
+export const mathTokenTypes = ["display_math", "inline_math", "equation_math_not_number", "equation_math"];

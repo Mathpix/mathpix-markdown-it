@@ -6,7 +6,7 @@ module.exports = [
       '$"\t" net book value \n' +
       '$"\n' +
       'non-current assets\t250000\t95000\t155000',
-    table_markdown: '|  | \\( \\begin{array}{c}\\text { cost } \\\\ \\$\\end{array} \\) | \\( \\begin{array}{c}\\text { depreciation } \\\\ \\$\\end{array} \\) | \\( \\begin{array}{c}\\text { net book value } \\\\ \\$\\end{array} \\) |\n' +
+    table_markdown: '|  | $\\begin{array}{c}\\text { cost } \\\\ \\$\\end{array}$ | $\\begin{array}{c}\\text { depreciation } \\\\ \\$\\end{array}$ | $\\begin{array}{c}\\text { net book value } \\\\ \\$\\end{array}$ |\n' +
       '| :--- | :---: | :---: | :---: |\n' +
       '| non-current assets | 250000 | 95000 | 155000 |',
     csv: ',"cost \n' +
@@ -35,7 +35,7 @@ module.exports = [
       '$","net book value \n' +
       '$"\n' +
       'non-current assets,250000,95000,155000',
-    table_markdown: '|  | \\( \\begin{array}{c}\\text { cost } \\\\ \\$ \\begin{array}{c}\\text { cost } \\\\ \\$\\end{array}  \\end{array} \\) | \\( \\begin{array}{c}\\text { depreciation } \\\\ \\$\\end{array} \\) | \\( \\begin{array}{c}\\text { net book value } \\\\ \\$\\end{array} \\) |\n' +
+    table_markdown: '|  | $\\begin{array}{c}\\text { cost } \\\\ \\$ \\begin{array}{c}\\text { cost } \\\\ \\$\\end{array}  \\end{array}$ | $\\begin{array}{c}\\text { depreciation } \\\\ \\$\\end{array}$ | $\\begin{array}{c}\\text { net book value } \\\\ \\$\\end{array}$ |\n' +
       '| :--- | :---: | :---: | :---: |\n' +
       '| non-current assets | 250000 | 95000 | 155000 |',
     include_sub_math: [
@@ -55,7 +55,7 @@ module.exports = [
       '$","{:[ depreciation ],[$]:}","net book value \n' +
       '$"\n' +
       'non-current assets,250000,95000,155000',
-    table_markdown: '|  | \\( \\begin{array}{c}\\text { cost } \\\\ \\$\\end{array} \\) | \\( \\begin{matrix}\\text { depreciation } \\\\ \\$\\end{matrix} \\) | \\( \\begin{aligned}\\text { net book value } \\\\ \\$\\end{aligned} \\) |\n' +
+    table_markdown: '|  | $\\begin{array}{c}\\text { cost } \\\\ \\$\\end{array}$ | $\\begin{matrix}\\text { depreciation } \\\\ \\$\\end{matrix}$ | $\\begin{aligned}\\text { net book value } \\\\ \\$\\end{aligned}$ |\n' +
       '| :--- | :---: | :---: | :---: |\n' +
       '| non-current assets | 250000 | 95000 | 155000 |',
     include_sub_math: [
@@ -90,11 +90,11 @@ module.exports = [
       '"110 < {:[-16 n],[1]:}",',
     table_markdown: '| Area (sq. ft) | Number of Bedrooms |\n' +
       '| :---: | :---: |\n' +
-      '| \\( 60 \\leq A<80 \\) | 4 |\n' +
-      '| \\( 80 \\leq A<100 \\) | 6 |\n' +
-      '| \\( 100 \\leq A<120 \\) | 5 |\n' +
-      '| \\( 120 \\leq A<140 \\) | 3 |\n' +
-      '| \\( 110<\\begin{array}{c}-16 n \\\\ 1\\end{array} \\) |  |',
+      '| $60 \\leq A<80$ | 4 |\n' +
+      '| $80 \\leq A<100$ | 6 |\n' +
+      '| $100 \\leq A<120$ | 5 |\n' +
+      '| $120 \\leq A<140$ | 3 |\n' +
+      '| $110<\\begin{array}{c}-16 n \\\\ 1\\end{array}$ |  |',
     include_sub_math: [
       { type: 'asciimath', value: '60 <= A < 80' },
       { type: 'asciimath', value: '80 <= A < 100' },
@@ -128,7 +128,7 @@ module.exports = [
       '3,134,133,132,127\n' +
       '4,129,127,132,129\n' +
       '5,147,148,144,142',
-    table_markdown: '| \\( \\begin{array}{c}\\text { Coating Type } \\\\ \\hline 1\\end{array} \\) | \\( {\\text { Conductivity }} \\) |  |  |  |\n' +
+    table_markdown: '| $\\begin{array}{c}\\text { Coating Type } \\\\ \\hline 1\\end{array}$ | ${\\text { Conductivity }}$ |  |  |  |\n' +
       '| :---: | :---: | :---: | :---: | :---: |\n' +
       '|  | 143 | 141 | 150 | 146 |\n' +
       '| 2 | 152 | 149 | 137 | 143 |\n' +
@@ -170,11 +170,11 @@ module.exports = [
       '"(1)([7],[3])",,',
     table_markdown: '| NUMERO BINOMIAL |  | RESULTADO |\n' +
       '| :--- | :--- | :--- |\n' +
-      '| \\( (\\quad)\\left(\\begin{array}{l}3 \\\\ 0\\end{array}\\right) \\) | (1) 35 |  |\n' +
-      '| \\( \\left(\\begin{array}{c}10 \\\\ 1\\end{array}\\right) \\) | (2) 5 |  |\n' +
-      '| \\( (\\quad)\\left(\\begin{array}{l}5 \\\\ 4\\end{array}\\right) \\) | (3) 15 |  |\n' +
-      '| \\( \\left(\\begin{array}{l}6 \\\\ 2\\end{array}\\right) \\) | (4) 10 |  |\n' +
-      '| \\( (1)\\left(\\begin{array}{l}7 \\\\ 3\\end{array}\\right) \\) |  |  |',
+      '| $(\\quad)\\left(\\begin{array}{l}3 \\\\ 0\\end{array}\\right)$ | (1) 35 |  |\n' +
+      '| $\\left(\\begin{array}{c}10 \\\\ 1\\end{array}\\right)$ | (2) 5 |  |\n' +
+      '| $(\\quad)\\left(\\begin{array}{l}5 \\\\ 4\\end{array}\\right)$ | (3) 15 |  |\n' +
+      '| $\\left(\\begin{array}{l}6 \\\\ 2\\end{array}\\right)$ | (4) 10 |  |\n' +
+      '| $(1)\\left(\\begin{array}{l}7 \\\\ 3\\end{array}\\right)$ |  |  |',
     include_sub_math: [
       { type: 'asciimath', value: '(quad)([3],[0])' },
       { type: 'asciimath', value: '([10],[1])' },
@@ -213,8 +213,8 @@ module.exports = [
       ' F , End ,62,65,68"',
     table_markdown: '| Activity Precedes Optimistic Most Likely Pessimisti |\n' +
       '| :--- |\n' +
-      '| Start \\( A, B, C \\) |\n' +
-      '| \\( \\begin{array}{ccccc}\\text { A } & \\text { D } & 38 & 50 & 62 \\\\ \\text { B } & \\text { E } & 90 & 99 & 108 \\\\ \\text { C } & \\text { End } & 85 & 100 & 115 \\\\ \\text { D } & \\text { F } & 19 & 25 & 31 \\\\ \\text { E } & \\text { End } & \\text { 91 } & 100 & 115 \\\\ \\text { F } & \\text { End } & 62 & 65 & 68\\end{array} \\) |',
+      '| Start $A, B, C$ |\n' +
+      '| $\\begin{array}{ccccc}\\text { A } & \\text { D } & 38 & 50 & 62 \\\\ \\text { B } & \\text { E } & 90 & 99 & 108 \\\\ \\text { C } & \\text { End } & 85 & 100 & 115 \\\\ \\text { D } & \\text { F } & 19 & 25 & 31 \\\\ \\text { E } & \\text { End } & \\text { 91 } & 100 & 115 \\\\ \\text { F } & \\text { End } & 62 & 65 & 68\\end{array}$ |',
     include_sub_math: [
       { type: 'asciimath', value: 'A,B,C' },
       {
@@ -239,10 +239,10 @@ module.exports = [
       'theta"\n' +
       'phi_(i),phi_(f),vartheta_(1),vartheta_(2),\n' +
       'arg(M_(i)mu//b),arg(A_(f)mu//b),arg(epsilon_(1)//b),arg(epsilon_(2)//b^(2)),bar(arg(bH_(u)H_(d)))',
-    table_markdown: '| \\( {\\text { MSSM phases }} \\) |  | \\( {\\text { BMSSM phases }} \\) |  | \\( {\\begin{array}{c}\\hline \\text { vev phase } \\\\ \\theta\\end{array}} \\) |\n' +
+    table_markdown: '| ${\\text { MSSM phases }}$ |  | ${\\text { BMSSM phases }}$ |  | ${\\begin{array}{c}\\hline \\text { vev phase } \\\\ \\theta\\end{array}}$ |\n' +
       '| :---: | :---: | :---: | :---: | :---: |\n' +
-      '| \\( \\phi_{i} \\) | \\( \\phi_{f} \\) | \\( \\vartheta_{1} \\) | \\( \\vartheta_{2} \\) |  |\n' +
-      '| \\( \\arg \\left(M_{i} \\mu / b\\right) \\) | \\( \\arg \\left(A_{f} \\mu / b\\right) \\) | \\( \\arg \\left(\\epsilon_{1} / b\\right) \\) | \\( \\arg \\left(\\epsilon_{2} / b^{2}\\right) \\) | \\( \\overline{\\arg \\left(b H_{u} H_{d}\\right)} \\) |',
+      '| $\\phi_{i}$ | $\\phi_{f}$ | $\\vartheta_{1}$ | $\\vartheta_{2}$ |  |\n' +
+      '| $\\arg \\left(M_{i} \\mu / b\\right)$ | $\\arg \\left(A_{f} \\mu / b\\right)$ | $\\arg \\left(\\epsilon_{1} / b\\right)$ | $\\arg \\left(\\epsilon_{2} / b^{2}\\right)$ | $\\overline{\\arg \\left(b H_{u} H_{d}\\right)}$ |',
     include_sub_math: [
       { type: 'asciimath', value: '" MSSM phases "' },
       { type: 'asciimath', value: '" BMSSM phases "' },
@@ -301,17 +301,17 @@ module.exports = [
       'Door number,0.674,0.748,0.837,0.738,0.788\n' +
       'Seat number,0.672,0.691,0.711,0.660,0.700\n' +
       'Car type,0.541,0.585,0.627,0.571,0.612',
-    table_markdown: '| Viewpoint | \\( \\bar{F} \\) | \\( \\mathrm{R} \\) | \\( \\mathrm{S} \\) | \\( \\mathrm{FS} \\) | \\( \\mathrm{RS} \\) |\n' +
+    table_markdown: '| Viewpoint | $\\bar{F}$ | $\\mathrm{R}$ | $\\mathrm{S}$ | $\\mathrm{FS}$ | $\\mathrm{RS}$ |\n' +
       '| :---: | :---: | :---: | :---: | :---: | :---: |\n' +
-      '|  | \\( {\\text { mean difference }} \\) |  |  |  |  |\n' +
-      '| \\( {\\begin{array}{c}\\hline \\text { Maximum speed } \\\\ \\text { (mean guess) } \\\\ \\text { Displacement } \\\\ \\text { (mean guess) }\\end{array}} \\) | \\( 20.8 \\) | \\( 21.3 \\) | \\( 20.4 \\) | \\( 20.1 \\) | \\( 21.3 \\) |\n' +
-      '|  | \\( 38.0 \\) | \\( 38.5 \\) | \\( 39.4 \\) | \\( 40.2 \\) | \\( 40.1 \\) |\n' +
-      '|  | \\( 0.811 \\) | \\( 0.752 \\) | \\( 0.795 \\) | \\( 0.875 \\) | \\( 0.822 \\) |\n' +
-      '|  | \\( 1.04 \\) | \\( 0.922 \\) | \\( 1.04 \\) | \\( 1.13 \\) | \\( 1.08 \\) |\n' +
-      '| . | \\( {\\text { classification accuracy }} \\) |  |  |  |  |\n' +
-      '| Door number | \\( 0.674 \\) | \\( 0.748 \\) | \\( 0.837 \\) | \\( 0.738 \\) | \\( 0.788 \\) |\n' +
-      '| Seat number | \\( 0.672 \\) | \\( 0.691 \\) | \\( 0.711 \\) | \\( 0.660 \\) | \\( 0.700 \\) |\n' +
-      '| Car type | \\( 0.541 \\) | \\( 0.585 \\) | \\( 0.627 \\) | \\( 0.571 \\) | \\( 0.612 \\) |',
+      '|  | ${\\text { mean difference }}$ |  |  |  |  |\n' +
+      '| ${\\begin{array}{c}\\hline \\text { Maximum speed } \\\\ \\text { (mean guess) } \\\\ \\text { Displacement } \\\\ \\text { (mean guess) }\\end{array}}$ | $20.8$ | $21.3$ | $20.4$ | $20.1$ | $21.3$ |\n' +
+      '|  | $38.0$ | $38.5$ | $39.4$ | $40.2$ | $40.1$ |\n' +
+      '|  | $0.811$ | $0.752$ | $0.795$ | $0.875$ | $0.822$ |\n' +
+      '|  | $1.04$ | $0.922$ | $1.04$ | $1.13$ | $1.08$ |\n' +
+      '| . | ${\\text { classification accuracy }}$ |  |  |  |  |\n' +
+      '| Door number | $0.674$ | $0.748$ | $0.837$ | $0.738$ | $0.788$ |\n' +
+      '| Seat number | $0.672$ | $0.691$ | $0.711$ | $0.660$ | $0.700$ |\n' +
+      '| Car type | $0.541$ | $0.585$ | $0.627$ | $0.571$ | $0.612$ |',
     include_sub_math: [
       { type: 'asciimath', value: 'bar(F)' },
       { type: 'asciimath', value: 'R' },
@@ -398,10 +398,10 @@ module.exports = [
       '300"\n' +
       ',,50,50,,\n' +
       ',1 12,0.25 1000,1.1 55,∼200 2,∼800 0.08',
-    table_markdown: '| \\( {\\begin{array}{c}\\text { Detector } \\\\ \\hline \\text { Mass of the } \\\\ \\text { target, tons } \\\\ \\text { Distance from } \\\\ \\text { the source, km } \\\\ N\\left(e^{+}, \\mathrm{n}\\right) d^{-1}\\end{array}} \\) | \\( {\\begin{array}{c}\\text { CHOOZ\'97 } \\\\ 5\\end{array}} \\) | \\( {\\text { THIS PROJECT }} \\) |  | \\( {\\begin{array}{c}\\text { KamLand } \\\\ 1000\\end{array}} \\) | \\( {\\begin{array}{c}\\text { BOREXINO } \\\\ 300\\end{array}} \\) |\n' +
+    table_markdown: '| ${\\begin{array}{c}\\text { Detector } \\\\ \\hline \\text { Mass of the } \\\\ \\text { target, tons } \\\\ \\text { Distance from } \\\\ \\text { the source, km } \\\\ N\\left(e^{+}, \\mathrm{n}\\right) d^{-1}\\end{array}}$ | ${\\begin{array}{c}\\text { CHOOZ\'97 } \\\\ 5\\end{array}}$ | ${\\text { THIS PROJECT }}$ |  | ${\\begin{array}{c}\\text { KamLand } \\\\ 1000\\end{array}}$ | ${\\begin{array}{c}\\text { BOREXINO } \\\\ 300\\end{array}}$ |\n' +
       '| :---: | :---: | :---: | :---: | :---: | :---: |\n' +
       '|  |  | 50 | 50 |  |  |\n' +
-      '|  | 1 12 | \\( 0.25 \\) 1000 1000 | \\( 1.1 \\) 55 55 | \\( \\sim 200 \\) 2 2 | \\( \\sim 800 \\) \\( 0.08 \\) \\( 0.08 \\) |',
+      '|  | 1 12 | $0.25$ 1000 | $1.1$ 55 | $\\sim 200$ 2 | $\\sim 800$ $0.08$ |',
     include_sub_math: [
       {
         type: 'asciimath',
@@ -430,7 +430,7 @@ module.exports = [
       '$","net book value \n' +
       '$"\n' +
       'non-current assets,250000,95000,155000',
-    table_markdown: '|  | $\\begin{array}{c}\\text { cost } \\\\ \\$\\end{array}$ | $$\\begin{array}{c}\\text { depreciation } \\\\ \\$\\end{array}$$ | \\( \\begin{array}{c}\\text { net book value } \\\\ \\$\\end{array} \\) |\n' +
+    table_markdown: '|  | $\\begin{array}{c}\\text { cost } \\\\ \\$\\end{array}$ | $\\begin{array}{c}\\text { depreciation } \\\\ \\$\\end{array}$ | $\\begin{array}{c}\\text { net book value } \\\\ \\$\\end{array}$ |\n' +
       '| :--- | :---: | :---: | :---: |\n' +
       '| non-current assets | 250000 | 95000 | 155000 |',
     include_sub_math: [
@@ -461,13 +461,13 @@ module.exports = [
       'Investments,"$1,000,000","$820,000","$716,000"',
     table_markdown:  '| as at 30 June 2020 (AUD$\'000) |  |  |  |\n' +
       '| :--- | :---: | :---: | :---: |\n' +
-      '| \\( \\begin{array}{l}\\text { Current assets } \\\\\\text { Cash at bank }\\end{array} \\) | 2020 | 2019 | 2018 |\n' +
-      '|  | \\( \\$ 120,000 \\) | \\( \\$ 80,000 \\) | \\( \\$ 36,000 \\) |\n' +
-      '| Inventory | \\( \\$ 140,000 \\) | \\( \\$ 120,000 \\) | \\( \\$ 96,000 \\) |\n' +
-      '| Total current assets | \\( \\$ 180,000 \\) | \\( \\$ 170,000 \\) | \\( \\$ 128,000 \\) |\n' +
-      '| Non Current assets | \\( \\$ 440,000 \\) | \\( \\$ 370,000 \\) | \\( \\$ 260,000 \\) |\n' +
+      '| $\\begin{array}{l}\\text { Current assets } \\\\\\text { Cash at bank }\\end{array}$ | 2020 | 2019 | 2018 |\n' +
+      '|  | $\\$ 120,000$ | $\\$ 80,000$ | $\\$ 36,000$ |\n' +
+      '| Inventory | $\\$ 140,000$ | $\\$ 120,000$ | $\\$ 96,000$ |\n' +
+      '| Total current assets | $\\$ 180,000$ | $\\$ 170,000$ | $\\$ 128,000$ |\n' +
+      '| Non Current assets | $\\$ 440,000$ | $\\$ 370,000$ | $\\$ 260,000$ |\n' +
       '| Plant and equipment (net) |  |  |  |\n' +
-      '| Investments | \\( \\$ 1,000,000 \\) | \\( \\$ 820,000 \\) | \\( \\$ 716,000 \\) |',
+      '| Investments | $\\$ 1,000,000$ | $\\$ 820,000$ | $\\$ 716,000$ |',
     include_sub_math: [
       {
         type: 'asciimath',
@@ -512,13 +512,13 @@ module.exports = [
       'Investments,"$1,000,000","$820,000","$716,000"',
     table_markdown:  '| as at 30 June 2020 (AUD $\'000) |  |  |  |\n' +
       '| :--- | :---: | :---: | :---: |\n' +
-      '| \\( \\begin{array}{l}\\text { Current assets } $ \\\\\\text { Cash at bank }\\end{array} \\) | 2020 | 2019 | 2018 |\n' +
-      '|  | \\( \\$ 120,000 \\) | \\( \\$ 80,000 \\) | \\( \\$ 36,000 \\) |\n' +
-      '| Inventory | \\( \\$ 140,000 \\) | \\( \\$ 120,000 \\) | \\( \\$ 96,000 \\) |\n' +
-      '| Total current assets | \\( \\$ 180,000 \\) | \\( \\$ 170,000 \\) | \\( \\$ 128,000 \\) |\n' +
-      '| Non Current assets | \\( \\$ 440,000 \\) | \\( \\$ 370,000 \\) | \\( \\$ 260,000 \\) |\n' +
+      '| $\\begin{array}{l}\\text { Current assets } $ \\\\\\text { Cash at bank }\\end{array}$ | 2020 | 2019 | 2018 |\n' +
+      '|  | $\\$ 120,000$ | $\\$ 80,000$ | $\\$ 36,000$ |\n' +
+      '| Inventory | $\\$ 140,000$ | $\\$ 120,000$ | $\\$ 96,000$ |\n' +
+      '| Total current assets | $\\$ 180,000$ | $\\$ 170,000$ | $\\$ 128,000$ |\n' +
+      '| Non Current assets | $\\$ 440,000$ | $\\$ 370,000$ | $\\$ 260,000$ |\n' +
       '| Plant and equipment (net) |  |  |  |\n' +
-      '| Investments | \\( \\$ 1,000,000 \\) | \\( \\$ 820,000 \\) | \\( \\$ 716,000 \\) |',
+      '| Investments | $\\$ 1,000,000$ | $\\$ 820,000$ | $\\$ 716,000$ |',
     include_sub_math: [
       {
         type: 'asciimath',
@@ -563,13 +563,13 @@ module.exports = [
       'Investments,"$1,000,000","$820,000","$716,000"',
     table_markdown:  '| as at 30 June 2020 (AUD $\'000) |  |  |  |\n' +
       '| :--- | :---: | :---: | :---: |\n' +
-      '| \\( \\begin{array}{l}\\text { Current assets }$1 \\\\\\text { Cash at bank }\\end{array} \\) | 2020 | 2019 | 2018 |\n' +
-      '|  | \\( \\$ 120,000 \\) | \\( \\$ 80,000 \\) | \\( \\$ 36,000 \\) |\n' +
-      '| Inventory | \\( \\$ 140,000 \\) | \\( \\$ 120,000 \\) | \\( \\$ 96,000 \\) |\n' +
-      '| Total current assets | \\( \\$ 180,000 \\) | \\( \\$ 170,000 \\) | \\( \\$ 128,000 \\) |\n' +
-      '| Non Current assets | \\( \\$ 440,000 \\) | \\( \\$ 370,000 \\) | \\( \\$ 260,000 \\) |\n' +
+      '| $\\begin{array}{l}\\text { Current assets }$1 \\\\\\text { Cash at bank }\\end{array}$ | 2020 | 2019 | 2018 |\n' +
+      '|  | $\\$ 120,000$ | $\\$ 80,000$ | $\\$ 36,000$ |\n' +
+      '| Inventory | $\\$ 140,000$ | $\\$ 120,000$ | $\\$ 96,000$ |\n' +
+      '| Total current assets | $\\$ 180,000$ | $\\$ 170,000$ | $\\$ 128,000$ |\n' +
+      '| Non Current assets | $\\$ 440,000$ | $\\$ 370,000$ | $\\$ 260,000$ |\n' +
       '| Plant and equipment (net) |  |  |  |\n' +
-      '| Investments | \\( \\$ 1,000,000 \\) | \\( \\$ 820,000 \\) | \\( \\$ 716,000 \\) |',
+      '| Investments | $\\$ 1,000,000$ | $\\$ 820,000$ | $\\$ 716,000$ |',
     include_sub_math: [
       {
         type: 'asciimath',

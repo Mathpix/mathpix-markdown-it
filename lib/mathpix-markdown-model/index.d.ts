@@ -103,6 +103,7 @@ export declare type TOutputMath = {
     };
     table_markdown?: {
         math_as_ascii?: boolean;
+        math_inline_delimiters?: Array<string>;
     };
     not_catch_errors?: boolean;
 };

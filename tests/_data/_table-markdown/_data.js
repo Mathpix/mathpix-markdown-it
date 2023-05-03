@@ -721,7 +721,7 @@ module.exports = [
   {
     id: 39,
     latex: '\\begin{tabular}{|c|c|c|c|c|c|}\\hline \\multirow{2}{*} {} & \\multicolumn{2}{|c|} { Latency \\( (\\mathrm{s}) \\)} & \\multicolumn{2}{|c|} { Message Sizes \\( (\\mathrm{MB}) \\)} & \\multirow{2}{*} { Accuracy \\( \\% \\)} \\\\ \\cline { 2 - 5 } & offline & online & offline & online & \\\\ \\hline ReLU/CNN/MNIST (Figure 12) & 3.58 & 5.74 & 20.9 & 636.6 & 99.0 \\\\ \\hline ReLU/CNN/CIFAR-10 (Figure 13) & 472 & 72 & 3046 & 6226 & 81.61 \\\\ \\hline Sigmoidal/LSTM/PTB (Figure 14) & 13.9 & 4.39 & 86.7 & 474 & cross-entropy loss:4.79 \\\\ \\hline\\end{tabular}',
-    table_markdown:  '|  | Latency \\( (\\mathrm{s}) \\) |  | Message Sizes \\( (\\mathrm{MB}) \\) |  | Accuracy \\( \\% \\) |\n' +
+    table_markdown:  '|  | Latency $(\\mathrm{s})$ |  | Message Sizes $(\\mathrm{MB})$ |  | Accuracy $\\%$ |\n' +
       '| :---: | :---: | :---: | :---: | :---: | :---: |\n' +
       '|  | offline | online | offline | online |  |\n' +
       '| ReLU/CNN/MNIST (Figure 12) | 3.58 | 5.74 | 20.9 | 636.6 | 99.0 |\n' +
@@ -837,13 +837,13 @@ module.exports = [
     latex: '\\begin{tabular}{|l|c|c|c|}\\hline \\multicolumn{4}{|c|}{ as at 30 June 2020 (AUD\\$\'000) } \\\\\\hline \\multirow{2}{*}{\\( \\begin{array}{l}\\text { Current assets } \\\\\\text { Cash at bank }\\end{array} \\)} & 2020 & 2019 & 2018 \\\\\\cline { 2 - 4 } Receivables (net) & \\( \\$ 120,000 \\) & \\( \\$ 80,000 \\) & \\( \\$ 36,000 \\) \\\\Inventory & \\( \\$ 140,000 \\) & \\( \\$ 120,000 \\) & \\( \\$ 96,000 \\) \\\\Total current assets & \\( \\$ 180,000 \\) & \\( \\$ 170,000 \\) & \\( \\$ 128,000 \\) \\\\Non Current assets & \\( \\$ 440,000 \\) & \\( \\$ 370,000 \\) & \\( \\$ 260,000 \\) \\\\Plant and equipment (net) & & & \\\\Investments & \\( \\$ 1,000,000 \\) & \\( \\$ 820,000 \\) & \\( \\$ 716,000 \\) \\\\\\hline\\end{tabular}',
     table_markdown:  '| as at 30 June 2020 (AUD$\'000) |  |  |  |\n' +
       '| :--- | :---: | :---: | :---: |\n' +
-      '| \\( \\begin{array}{l}\\text { Current assets } \\\\\\text { Cash at bank }\\end{array} \\) | 2020 | 2019 | 2018 |\n' +
-      '|  | \\( \\$ 120,000 \\) | \\( \\$ 80,000 \\) | \\( \\$ 36,000 \\) |\n' +
-      '| Inventory | \\( \\$ 140,000 \\) | \\( \\$ 120,000 \\) | \\( \\$ 96,000 \\) |\n' +
-      '| Total current assets | \\( \\$ 180,000 \\) | \\( \\$ 170,000 \\) | \\( \\$ 128,000 \\) |\n' +
-      '| Non Current assets | \\( \\$ 440,000 \\) | \\( \\$ 370,000 \\) | \\( \\$ 260,000 \\) |\n' +
+      '| $\\begin{array}{l}\\text { Current assets } \\\\\\text { Cash at bank }\\end{array}$ | 2020 | 2019 | 2018 |\n' +
+      '|  | $\\$ 120,000$ | $\\$ 80,000$ | $\\$ 36,000$ |\n' +
+      '| Inventory | $\\$ 140,000$ | $\\$ 120,000$ | $\\$ 96,000$ |\n' +
+      '| Total current assets | $\\$ 180,000$ | $\\$ 170,000$ | $\\$ 128,000$ |\n' +
+      '| Non Current assets | $\\$ 440,000$ | $\\$ 370,000$ | $\\$ 260,000$ |\n' +
       '| Plant and equipment (net) |  |  |  |\n' +
-      '| Investments | \\( \\$ 1,000,000 \\) | \\( \\$ 820,000 \\) | \\( \\$ 716,000 \\) |',
+      '| Investments | $\\$ 1,000,000$ | $\\$ 820,000$ | $\\$ 716,000$ |',
     table_markdown_math_as_ascii: '| as at 30 June 2020 (AUD$\'000) |  |  |  |\n' +
       '| :--- | :---: | :---: | :---: |\n' +
       '| Current assets  <br>  Cash at bank | 2020 | 2019 | 2018 |\n' +
@@ -859,13 +859,13 @@ module.exports = [
     latex: '\\begin{tabular}{|l|c|c|c|}\\hline \\multicolumn{4}{|c|}{ as at 30 June 2020 (AUD $\'000) } \\\\\\hline \\multirow{2}{*}{\\( \\begin{array}{l}\\text { Current assets } $ \\\\\\text { Cash at bank }\\end{array} \\)} & 2020 & 2019 & 2018 \\\\\\cline { 2 - 4 } Receivables (net) & \\( \\$ 120,000 \\) & \\( \\$ 80,000 \\) & \\( \\$ 36,000 \\) \\\\Inventory & \\( \\$ 140,000 \\) & \\( \\$ 120,000 \\) & \\( \\$ 96,000 \\) \\\\Total current assets & \\( \\$ 180,000 \\) & \\( \\$ 170,000 \\) & \\( \\$ 128,000 \\) \\\\Non Current assets & \\( \\$ 440,000 \\) & \\( \\$ 370,000 \\) & \\( \\$ 260,000 \\) \\\\Plant and equipment (net) & & & \\\\Investments & \\( \\$ 1,000,000 \\) & \\( \\$ 820,000 \\) & \\( \\$ 716,000 \\) \\\\\\hline\\end{tabular}',
     table_markdown:  '| as at 30 June 2020 (AUD $\'000) |  |  |  |\n' +
       '| :--- | :---: | :---: | :---: |\n' +
-      '| \\( \\begin{array}{l}\\text { Current assets } $ \\\\\\text { Cash at bank }\\end{array} \\) | 2020 | 2019 | 2018 |\n' +
-      '|  | \\( \\$ 120,000 \\) | \\( \\$ 80,000 \\) | \\( \\$ 36,000 \\) |\n' +
-      '| Inventory | \\( \\$ 140,000 \\) | \\( \\$ 120,000 \\) | \\( \\$ 96,000 \\) |\n' +
-      '| Total current assets | \\( \\$ 180,000 \\) | \\( \\$ 170,000 \\) | \\( \\$ 128,000 \\) |\n' +
-      '| Non Current assets | \\( \\$ 440,000 \\) | \\( \\$ 370,000 \\) | \\( \\$ 260,000 \\) |\n' +
+      '| $\\begin{array}{l}\\text { Current assets } $ \\\\\\text { Cash at bank }\\end{array}$ | 2020 | 2019 | 2018 |\n' +
+      '|  | $\\$ 120,000$ | $\\$ 80,000$ | $\\$ 36,000$ |\n' +
+      '| Inventory | $\\$ 140,000$ | $\\$ 120,000$ | $\\$ 96,000$ |\n' +
+      '| Total current assets | $\\$ 180,000$ | $\\$ 170,000$ | $\\$ 128,000$ |\n' +
+      '| Non Current assets | $\\$ 440,000$ | $\\$ 370,000$ | $\\$ 260,000$ |\n' +
       '| Plant and equipment (net) |  |  |  |\n' +
-      '| Investments | \\( \\$ 1,000,000 \\) | \\( \\$ 820,000 \\) | \\( \\$ 716,000 \\) |',
+      '| Investments | $\\$ 1,000,000$ | $\\$ 820,000$ | $\\$ 716,000$ |',
     table_markdown_math_as_ascii: '| as at 30 June 2020 (AUD $\'000) |  |  |  |\n' +
       '| :--- | :---: | :---: | :---: |\n' +
       '| Current assets $ <br>  Cash at bank | 2020 | 2019 | 2018 |\n' +
@@ -881,13 +881,13 @@ module.exports = [
     latex: '\\begin{tabular}{|l|c|c|c|}\\hline \\multicolumn{4}{|c|}{ as at 30 June 2020 (AUD $\'000) } \\\\\\hline \\multirow{2}{*}{\\( \\begin{array}{l}\\text { Current assets }$1 \\\\\\text { Cash at bank }\\end{array} \\)} & 2020 & 2019 & 2018 \\\\\\cline { 2 - 4 } Receivables (net) & \\( \\$ 120,000 \\) & \\( \\$ 80,000 \\) & \\( \\$ 36,000 \\) \\\\Inventory & \\( \\$ 140,000 \\) & \\( \\$ 120,000 \\) & \\( \\$ 96,000 \\) \\\\Total current assets & \\( \\$ 180,000 \\) & \\( \\$ 170,000 \\) & \\( \\$ 128,000 \\) \\\\Non Current assets & \\( \\$ 440,000 \\) & \\( \\$ 370,000 \\) & \\( \\$ 260,000 \\) \\\\Plant and equipment (net) & & & \\\\Investments & \\( \\$ 1,000,000 \\) & \\( \\$ 820,000 \\) & \\( \\$ 716,000 \\) \\\\\\hline\\end{tabular}',
     table_markdown:  '| as at 30 June 2020 (AUD $\'000) |  |  |  |\n' +
       '| :--- | :---: | :---: | :---: |\n' +
-      '| \\( \\begin{array}{l}\\text { Current assets }$1 \\\\\\text { Cash at bank }\\end{array} \\) | 2020 | 2019 | 2018 |\n' +
-      '|  | \\( \\$ 120,000 \\) | \\( \\$ 80,000 \\) | \\( \\$ 36,000 \\) |\n' +
-      '| Inventory | \\( \\$ 140,000 \\) | \\( \\$ 120,000 \\) | \\( \\$ 96,000 \\) |\n' +
-      '| Total current assets | \\( \\$ 180,000 \\) | \\( \\$ 170,000 \\) | \\( \\$ 128,000 \\) |\n' +
-      '| Non Current assets | \\( \\$ 440,000 \\) | \\( \\$ 370,000 \\) | \\( \\$ 260,000 \\) |\n' +
+      '| $\\begin{array}{l}\\text { Current assets }$1 \\\\\\text { Cash at bank }\\end{array}$ | 2020 | 2019 | 2018 |\n' +
+      '|  | $\\$ 120,000$ | $\\$ 80,000$ | $\\$ 36,000$ |\n' +
+      '| Inventory | $\\$ 140,000$ | $\\$ 120,000$ | $\\$ 96,000$ |\n' +
+      '| Total current assets | $\\$ 180,000$ | $\\$ 170,000$ | $\\$ 128,000$ |\n' +
+      '| Non Current assets | $\\$ 440,000$ | $\\$ 370,000$ | $\\$ 260,000$ |\n' +
       '| Plant and equipment (net) |  |  |  |\n' +
-      '| Investments | \\( \\$ 1,000,000 \\) | \\( \\$ 820,000 \\) | \\( \\$ 716,000 \\) |',
+      '| Investments | $\\$ 1,000,000$ | $\\$ 820,000$ | $\\$ 716,000$ |',
     table_markdown_math_as_ascii: '| as at 30 June 2020 (AUD $\'000) |  |  |  |\n' +
       '| :--- | :---: | :---: | :---: |\n' +
       '| Current assets $1 <br>  Cash at bank | 2020 | 2019 | 2018 |\n' +
