@@ -47,6 +47,8 @@ const StatePushPatagraphOpenTable = (state, startLine: number, nextLine: number,
   let caption = state.env.caption;
   let currentNumber: number = 0 ;
   token = state.push('paragraph_open', 'div', 1);
+  token.parentType = 'table';
+  token.align = align;
   if (state.md.options.forLatex) {
     token.latex = latex;
   }
@@ -196,6 +198,7 @@ const InlineBlockBeginTable: RuleBlock = (state, startLine) => {
     StatePushCaptionTable(state, type);
   }
   token = state.push('paragraph_close', 'div', -1);
+  token.parentType = 'table';
   token.currentTag = state.env.lastTag ? state.env.lastTag : {};
   if (state.md.options.forLatex && match && match[1]) {
     token.latex = `\\end{${match[1]}}`
@@ -357,6 +360,7 @@ export const BeginTable: RuleBlock = (state, startLine, endLine, silent) => {
     StatePushCaptionTable(state, type);
   }
   token = state.push('paragraph_close', 'div', -1);
+  token.parentType = 'table';
   token.currentTag = state.env.lastTag ? state.env.lastTag : {};
   if (state.md.options.forLatex && match && match[1]) {
     token.latex = `\\end{${match[1]}}`
