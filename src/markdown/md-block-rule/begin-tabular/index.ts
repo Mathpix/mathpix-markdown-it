@@ -120,6 +120,7 @@ const StatePushParagraphOpen = (state, startLine: number, align: string, centerT
   let token: Token;
   token = state.push('paragraph_open', 'div', 1);
   token.attrs = [['class', 'table_tabular ']];
+  token.parentType = 'table_tabular';
   if (align) {
     token.attrs.push(['style', `text-align: ${align}`]);
   } else {
@@ -134,7 +135,9 @@ const StatePushParagraphOpen = (state, startLine: number, align: string, centerT
 };
 
 const StatePushParagraphClose = (state) => {
-  state.push('paragraph_close', 'div', -1);
+  let token: Token;
+  token = state.push('paragraph_close', 'div', -1);
+  token.parentType = 'table_tabular';
 };
 
 export const inlineDecimalParse = (tok: TTokenTabular) => {
@@ -178,6 +181,7 @@ export const StatePushTabulars = (state, cTabular: TTypeContentList, align: stri
     for (let j = 0; j < res.length; j++) {
       let tok:Token = res[j];
       if (res[j].token === 'inline') {
+        tok.block = true;
         if (res[j].content) {
           let children = [];
           state.env.tabulare = state.md.options.outMath.include_tsv

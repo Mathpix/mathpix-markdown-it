@@ -921,6 +921,7 @@ function paragraphDiv(state, startLine/*, endLine*/) {
   if (state.md.options?.forDocx) {
     token.attrSet('style', 'margin-top: 0; margin-bottom: 1em;');
   }
+  token.parentToken = state.env?.parentToken;
 
   token.map = [startLine, state.line];
   token = state.push('inline', '', 0);

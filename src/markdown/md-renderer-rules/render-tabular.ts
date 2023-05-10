@@ -15,7 +15,7 @@ const tokenAttrGet = (token, name) => {
   return token.attrs[index][1]
 };
 
-const renderInlineTokenBlock = (tokens, options, env, slf, isSubTable = false) =>{
+export const renderInlineTokenBlock = (tokens, options, env, slf, isSubTable = false) =>{
   let nextToken,
     result = '',
     needLf = false;
