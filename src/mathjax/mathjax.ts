@@ -2,7 +2,6 @@ import {mathjax} from 'mathjax-full/js/mathjax.js';
 import {TeX} from 'mathjax-full/js/input/tex.js';
 import {MathML} from "mathjax-full/js/input/mathml.js";
 import {SVG} from 'mathjax-full/js/output/svg.js';
-import { AsciiMath } from 'mathjax-full/js/input/asciimath.js';
 import {RegisterHTMLHandler} from 'mathjax-full/js/handlers/html.js';
 import {browserAdaptor} from 'mathjax-full/js/adaptors/browserAdaptor.js';
 import {liteAdaptor} from 'mathjax-full/js/adaptors/liteAdaptor.js';
@@ -38,7 +37,6 @@ class MTeX extends TeX {
 // @ts-ignore
 export const mml = new MathML(mmlConfig);
 export const svg = new SVG(svgConfig);
-export const asciimath = new AsciiMath({});
 
 export class MathJaxConfigure {
   public mTex;
@@ -114,10 +112,6 @@ export class MathJaxConfigure {
     });
     this.docMathML = mathjax.document(this.domNode, {
       InputJax: mml,
-      OutputJax: svg
-    });
-    this.docAsciiMath = mathjax.document(this.domNode, {
-      InputJax: asciimath,
       OutputJax: svg
     });
   };
