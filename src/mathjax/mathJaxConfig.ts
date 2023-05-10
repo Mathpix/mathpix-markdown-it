@@ -23,9 +23,6 @@ const MathJaxConfig = {
         maxMacros: 10000,  //maximum number of macro substitutions per expression //10000
         maxBuffer: 15 * 1024 // maximum size for the internal TeX string (5K) //5 * 1024
     },
-      asciimath: {
-        delimiters: [['<ascii>','</ascii>'], ['`','`']]
-      },
     MathML: {
         parseAs: "html", // or 'xml'
         forceReparse: true //Need to set true. Have bug in MathJax 3.0.1

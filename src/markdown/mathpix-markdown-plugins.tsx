@@ -11,7 +11,6 @@ import {
   mdPluginAnchor,
   mdPluginTableTabular,
   mdPluginList,
-  mdPluginChemistry,
   mdPluginSvgToBase64
 
 } from "./mdPluginConfigured";
@@ -49,7 +48,6 @@ export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
   });
 
   md
-    .use(mdPluginChemistry, smiles)
     .use(mdPluginTableTabular)
     .use(mdPluginList)
     .use(mdPluginMathJax({}))

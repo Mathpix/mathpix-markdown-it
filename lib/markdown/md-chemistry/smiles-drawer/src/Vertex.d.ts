@@ -111,7 +111,7 @@ declare class Vertex {
      * @param {Vertex[]} vertices The array of vertices for the current molecule.
      * @returns {String} The suggested direction of the text.
      */
-    getTextDirection(vertices: any): "left" | "right" | "up" | "down";
+    getTextDirection(vertices: any): "left" | "right" | "down" | "up";
     /**
      * Returns an array of ids of neighbouring vertices.
      *

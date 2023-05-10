@@ -14,9 +14,6 @@ declare const MathJaxConfig: {
         maxMacros: number;
         maxBuffer: number;
     };
-    asciimath: {
-        delimiters: string[][];
-    };
     MathML: {
         parseAs: string;
         forceReparse: boolean;
