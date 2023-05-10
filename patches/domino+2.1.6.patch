@@ -1,0 +1,30 @@
+diff --git a/node_modules/domino/lib/sloppy.js b/node_modules/domino/lib/sloppy.js
+index b5d8950..8daa079 100644
+--- a/node_modules/domino/lib/sloppy.js
++++ b/node_modules/domino/lib/sloppy.js
+@@ -6,16 +6,18 @@
+ /* jshint -W085 */
+ module.exports = {
+   Window_run: function _run(code, file) {
+-    if (file) code += '\n//@ sourceURL=' + file;
+-    with(this) eval(code);
++    // if (file) code += '\n//@ sourceURL=' + file;
++    // with(this) eval(code);
++    console.log('domino patch - skipped window run call')
+   },
+   EventHandlerBuilder_build: function build() {
+     try {
+-      with(this.document.defaultView || Object.create(null))
+-        with(this.document)
+-          with(this.form)
+-            with(this.element)
+-              return eval("(function(event){" + this.body + "})");
++      // with(this.document.defaultView || Object.create(null))
++      //   with(this.document)
++      //     with(this.form)
++      //       with(this.element)
++      //         return eval("(function(event){" + this.body + "})");
++      console.log('domino patch - skipped event handler build call')
+     }
+     catch (err) {
+       return function() { throw err; };

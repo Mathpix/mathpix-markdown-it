@@ -1,0 +1,22 @@
+diff --git a/node_modules/mathpix-markdown-it/lib/mathjax/mathjax.js b/node_modules/mathpix-markdown-it/lib/mathjax/mathjax.js
+index 7c69ce9..4a7021b 100644
+--- a/node_modules/mathpix-markdown-it/lib/mathjax/mathjax.js
++++ b/node_modules/mathpix-markdown-it/lib/mathjax/mathjax.js
+@@ -6,7 +6,7 @@ var mathjax_js_1 = require("mathjax-full/js/mathjax.js");
+ var tex_js_1 = require("mathjax-full/js/input/tex.js");
+ var mathml_js_1 = require("mathjax-full/js/input/mathml.js");
+ var svg_js_1 = require("mathjax-full/js/output/svg.js");
+-var asciimath_js_1 = require("mathjax-full/js/input/asciimath.js");
++// var asciimath_js_1 = require("mathjax-full/js/input/asciimath.js");
+ var html_js_1 = require("mathjax-full/js/handlers/html.js");
+ var browserAdaptor_js_1 = require("mathjax-full/js/adaptors/browserAdaptor.js");
+ var liteAdaptor_js_1 = require("mathjax-full/js/adaptors/liteAdaptor.js");
+@@ -41,7 +41,7 @@ var MTeX = /** @class */ (function (_super) {
+ // @ts-ignore
+ exports.mml = new mathml_js_1.MathML(mmlConfig);
+ exports.svg = new svg_js_1.SVG(svgConfig);
+-exports.asciimath = new asciimath_js_1.AsciiMath({});
++// exports.asciimath = new asciimath_js_1.AsciiMath({});
+ var MathJaxConfigure = /** @class */ (function () {
+     function MathJaxConfigure() {
+         var _this = this;
