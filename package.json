@@ -64,7 +64,6 @@
     "mdurl": "^1.0.1",
     "node-polyfill-webpack-plugin": "^1.1.4",
     "parse-srcset": "^1.0.2",
-    "patch-package": "^7.0.0",
     "postcss": "^7.0.36",
     "punycode": "^2.1.1",
     "react": "^16.7.0",
