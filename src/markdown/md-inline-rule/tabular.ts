@@ -37,7 +37,8 @@ export const inlineTabular = (state, silent) => {
         }
         if (tok.token === 'inline') {
           let children = [];
-          state.env.tabulare = state.md.options.outMath.include_tsv
+          state.env.tabulare = state.md.options.outMath.include_tsv 
+            || state.md.options.outMath.include_csv
             || (state.md.options.outMath.include_table_markdown
               && state.md.options.outMath.table_markdown && state.md.options.outMath.table_markdown.math_as_ascii)
           ;

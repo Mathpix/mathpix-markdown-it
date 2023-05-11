@@ -185,6 +185,7 @@ export const StatePushTabulars = (state, cTabular: TTypeContentList, align: stri
         if (res[j].content) {
           let children = [];
           state.env.tabulare = state.md.options.outMath.include_tsv
+            || state.md.options.outMath.include_csv
             || (state.md.options.outMath.include_table_markdown
               && state.md.options.outMath.table_markdown && state.md.options.outMath.table_markdown.math_as_ascii);
           state.env.subTabular = res[j].type === 'subTabular';
