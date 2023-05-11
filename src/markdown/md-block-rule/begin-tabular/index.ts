@@ -16,7 +16,7 @@ type TTypeContent = {type?: string, content?: string, align?: string}
 type TTypeContentList = Array<TTypeContent>;
 export type TAttrs = string[];
 export type TTokenTabular = {token: string, type: string, tag: string, n: number, content?: string,
-  attrs?: Array<TAttrs>, children?: Token, id?: string, ascii?: string, ascii_tsv?: string, latex?: string};
+  attrs?: Array<TAttrs>, children?: Token, id?: string, ascii?: string, ascii_tsv?: string, ascii_csv?: string, ascii_md?: string, latex?: string};
 
 
 export type TMulti = {mr?: number, mc?: number, attrs: Array<TAttrs>, content?: string, subTable?: Array<TTokenTabular>, latex: string}
@@ -120,6 +120,7 @@ const StatePushParagraphOpen = (state, startLine: number, align: string, centerT
   let token: Token;
   token = state.push('paragraph_open', 'div', 1);
   token.attrs = [['class', 'table_tabular ']];
+  token.parentType = 'table_tabular';
   if (align) {
     token.attrs.push(['style', `text-align: ${align}`]);
   } else {
@@ -134,7 +135,9 @@ const StatePushParagraphOpen = (state, startLine: number, align: string, centerT
 };
 
 const StatePushParagraphClose = (state) => {
-  state.push('paragraph_close', 'div', -1);
+  let token: Token;
+  token = state.push('paragraph_close', 'div', -1);
+  token.parentType = 'table_tabular';
 };
 
 export const inlineDecimalParse = (tok: TTokenTabular) => {
@@ -147,6 +150,8 @@ export const inlineDecimalParse = (tok: TTokenTabular) => {
     block: false,
     ascii: tok.ascii,
     ascii_tsv: tok.ascii_tsv,
+    ascii_csv: tok.ascii_csv,
+    ascii_md: tok.ascii_md,
     latex: tok.ascii
   });
   return tok;
@@ -178,6 +183,7 @@ export const StatePushTabulars = (state, cTabular: TTypeContentList, align: stri
     for (let j = 0; j < res.length; j++) {
       let tok:Token = res[j];
       if (res[j].token === 'inline') {
+        tok.block = true;
         if (res[j].content) {
           let children = [];
           state.env.tabulare = state.md.options.outMath.include_tsv

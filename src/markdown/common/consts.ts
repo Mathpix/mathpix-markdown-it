@@ -96,8 +96,19 @@ export const mathEnvironments = [
 ];
 
 export const tsvSeparatorsDef = {
-  column: '\t', 
-  row: '\n'
+  column: '\t', /** TAB as the field delimiter */
+  row: '\n' /** newline as the record delimiter */
+};
+
+export const csvSeparatorsDef = {
+  column: ',', /** comma as the field delimiter */
+  row: '\n', /** newline as the record delimiter */
+  toQuoteAllFields: false /** to quote all fields whether or not they contain delimiters */
+};
+
+export const mdSeparatorsDef = {
+  column: ' ', /** space as the field delimiter */
+  row: ' <br> ', /** <br> as the record delimiter */
 };
 
 /** 
@@ -153,3 +164,6 @@ export const terminatedRules = {
     terminated: []
   }
 };
+
+
+export const mathTokenTypes = ["display_math", "inline_math", "equation_math_not_number", "equation_math"];

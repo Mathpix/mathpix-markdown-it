@@ -313,6 +313,7 @@ export const BeginTheorem: RuleBlock = (state, startLine, endLine, silent) => {
   SetTokensBlockParse(state, resText, 0, 0, true);
 
   token = state.push('theorem_close', 'div', -1);
+  token.envStyle = envItem.style;
   if (state.md.options.forLatex) {
     token.latex = latexEnd;
   }

@@ -5,6 +5,8 @@ export interface IOuterData {
     mathml_word?: string;
     asciimath?: string;
     asciimath_tsv?: string;
+    asciimath_csv?: string;
+    asciimath_md?: string;
     latex?: string;
     svg?: string;
     speech?: string;
@@ -18,7 +20,7 @@ export declare const MathJax: {
     checkAccessibility: (accessibility?: TAccessibility, nonumbers?: boolean) => void;
     Stylesheet: () => unknown;
     TexConvert: (string: any, options?: any) => IOuterData;
-    TexConvertToAscii: (string: any, options?: any) => any;
+    TexConvertToAscii: (string: any, options?: any) => string;
     /**
      * Typeset a TeX expression and return the SVG tree for it
      *
@@ -30,14 +32,20 @@ export declare const MathJax: {
         labels: {
             [key: string]: Label;
         };
+        ascii: string;
+        ascii_tsv: string;
+        ascii_csv: string;
+        ascii_md: string;
     };
     TypesetSvgAndAscii: (string: any, options?: any) => {
         html: string;
         ascii: string;
-        ascii_tsv: any;
         labels: {
             [key: string]: Label;
         };
+        ascii_tsv: string;
+        ascii_csv: string;
+        ascii_md: string;
     };
     /**
      * Typeset a MathML expression and return the SVG tree for it

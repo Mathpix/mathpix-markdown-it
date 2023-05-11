@@ -11,7 +11,7 @@ import {
   beginTag, endTag,
   canonicalMath
 } from './utils';
-import { openTagMML, closeTagMML, tsvSeparatorsDef } from './common/consts';
+import { openTagMML, closeTagMML, tsvSeparatorsDef, csvSeparatorsDef, mdSeparatorsDef } from './common/consts';
 import { imageWithSize, renderRuleImage } from './md-inline-rule/image';
 import { setCounterSection } from './md-inline-rule/setcounter-section';
 import { renderTheorems } from './md-theorem';
@@ -605,9 +605,16 @@ const convertMathToHtml = (state, token, options) => {
             optionAscii: {
               showStyle: false,
               extraBrackets: true,
-              tableToTsv: envArraysShouldBeFlattenInTSV.includes(token.math_env),
+              tableToTsv: options.outMath?.include_tsv 
+                && envArraysShouldBeFlattenInTSV.includes(token.math_env),
+              tableToCsv: options.outMath?.include_csv 
+                && envArraysShouldBeFlattenInTSV.includes(token.math_env),              
+              tableToMd: options.outMath?.include_table_markdown 
+                && envArraysShouldBeFlattenInTSV.includes(token.math_env),
               isSubTable: token.isSubTable,
-              tsv_separators: {...tsvSeparatorsDef}
+              tsv_separators: {...tsvSeparatorsDef},
+              csv_separators: {...csvSeparatorsDef},
+              md_separators: {...mdSeparatorsDef},
             },
           }),
           mathJax: options.mathJax,
@@ -616,6 +623,8 @@ const convertMathToHtml = (state, token, options) => {
         token.mathEquation = data.html;
         token.ascii = data.ascii;
         token.ascii_tsv = data.ascii_tsv;
+        token.ascii_csv = data.ascii_csv;
+        token.ascii_md = data.ascii_md;
         token.labels = data.labels;
       } else {
         MathJax.Reset(begin_number);
@@ -625,6 +634,10 @@ const convertMathToHtml = (state, token, options) => {
           nonumbers: options.nonumbers
         });
         token.mathEquation = data.html;
+        token.ascii = data.ascii;
+        token.ascii_tsv = data.ascii_tsv;
+        token.ascii_csv = data.ascii_csv;
+        token.ascii_md = data.ascii_md;
         token.labels = data.labels;
       }
     }
@@ -932,6 +945,7 @@ function paragraphDiv(state, startLine/*, endLine*/) {
   if (state.md.options?.forDocx) {
     token.attrSet('style', 'margin-top: 0; margin-bottom: 1em;');
   }
+  token.parentToken = state.env?.parentToken;
 
   token.map = [startLine, state.line];
   token = state.push('inline', '', 0);

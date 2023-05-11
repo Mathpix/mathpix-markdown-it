@@ -15,6 +15,7 @@ export const mathExportTypes = [
   'mathml', 
   'mathmlword', 
   'tsv', 
+  'csv',
   'table-markdown',
   'smiles'
 ];
@@ -28,6 +29,7 @@ export enum eMathType {
   mathml = 'mathml',
   mathmlword = 'mathmlword',
   tsv = 'tsv',
+  csv = 'csv',
   table_markdown = 'table-markdown',
   smiles = 'smiles'
 }
