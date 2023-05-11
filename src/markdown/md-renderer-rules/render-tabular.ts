@@ -2,6 +2,7 @@ import { TsvJoin } from "../common/tsv";
 import { CsvJoin } from "../common/csv";
 import { tableMarkdownJoin, getMdForChild, getMdLink } from "../common/table-markdown";
 import { mathTokenTypes } from "../common/consts";
+import { formatSource } from "../../helpers/parse-mmd-element";
 
 const tokenAttrGet = (token, name) => {
   if (!name) { return ''}
@@ -316,13 +317,13 @@ export const renderTabularInline = (a, token, options, env, slf) => {
     tabular = data.table;
   }
   const tsv = include_tsv && token.tsv
-    ? `<tsv style="display: none">${TsvJoin(token.tsv,options)}</tsv>`
+    ? `<tsv style="display: none">${formatSource(TsvJoin(token.tsv,options), true)}</tsv>`
     : '';
   const tableMd = include_table_markdown && token.tableMd
-    ? `<table-markdown style="display: none">${tableMarkdownJoin(data.tableMd, data.align)}</table-markdown>`
+    ? `<table-markdown style="display: none">${formatSource(tableMarkdownJoin(data.tableMd, data.align), true)}</table-markdown>`
     : '';
   const csv = include_csv && token.csv
-    ? `<csv style="display: none">${CsvJoin(token.csv,options)}</csv>`
+    ? `<csv style="display: none">${formatSource(CsvJoin(token.csv,options), true)}</csv>`
     : '';
   return `<div class="inline-tabular">${tabular}${tsv}${tableMd}${csv}</div>`
 };
