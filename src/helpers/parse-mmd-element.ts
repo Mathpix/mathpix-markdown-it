@@ -15,8 +15,9 @@ export const formatSourceHtmlWord = (text: string, notTrim: boolean = false) => 
     .replace(/&nbsp;/g, '&#xA0;');
 };
 
-export const formatSource = (text: string) => {
-  return text.trim()
+export const formatSource = (text: string, notTrim: boolean = false) => {
+  text = notTrim ? text : text.trim();
+  return text
     .replace(/\u2062/g, '')
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
