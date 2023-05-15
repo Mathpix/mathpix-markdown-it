@@ -25,6 +25,9 @@ export const separateByColumns = (str: string) => {
     index = pos + 1;
     i = pos;
   }
+  if (str.length && str[str.length-1] === '&') {
+    columns.push('');
+  }
   return columns;
 };
 
