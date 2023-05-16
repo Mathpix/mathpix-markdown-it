@@ -6,11 +6,12 @@ export const codeStyles = `
       background: #f8f8fa;
     }
     #preview-content pre code, #setText pre code {
-      font-size: inherit;
+      font-family: 'DM Mono', Inconsolata, monospace;
       display: block;
       color: #333;
       overflow-x: auto;
       font-size: 15px;
+      line-height: 24px;
     }
 
     .hljs-comment,
