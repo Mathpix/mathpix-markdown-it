@@ -3,4 +3,5 @@ export const fontsStyles = `
         @import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700');
         @import url('https://fonts.googleapis.com/css?family=Inconsolata');
         @import url('https://cdn.mathpix.com/fonts/cmu.css');
+        @import url('https://fonts.googleapis.com/css2?family=DM+Mono&display=swap');
 `;

@@ -24,15 +24,15 @@ export const createMathMenuItem = (type, value: string) => {
         break;      
       case eMathType.tsv:
         itemTitle = 'TSV';
-        sourceStr = value;
+        sourceStr = formatSource(value, true);
         break;       
       case eMathType.csv:
         itemTitle = 'CSV';
-        sourceStr = value;
+        sourceStr = formatSource(value, true);
         break;      
       case eMathType.table_markdown:
         itemTitle = 'Markdown';
-        sourceStr = value;
+        sourceStr = formatSource(value, true);
         break;      
       case eMathType.smiles:
         itemTitle = 'Smiles';

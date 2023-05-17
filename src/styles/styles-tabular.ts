@@ -16,7 +16,7 @@ export const tabularStyles = (useColors = true) => `
         padding: 0.1em 0.5em !important;
     }
     #tabular {
-        display: inline !important;
+        display: inline-block !important;
     }
     #tabular td > p {
         margin-bottom: 0;
