@@ -3316,5 +3316,69 @@ break }
         "content": ""
       }
     ]
+  },
+  {
+    mmd: 'Use \\url{} to insert a link.',
+    tokens: [
+      {
+        "type": "paragraph_open",
+        "children": null,
+        "content": "",
+        "positions": {
+          "start": 0,
+          "end": 28
+        },
+        "content_test_str": "Use \\url{} to insert a link."
+      },
+      {
+        "type": "inline",
+        "children": [
+          {
+            "type": "text",
+            "children": null,
+            "content": "Use ",
+            "nextPos": 4,
+            "positions": {
+              "start": 0,
+              "end": 4
+            },
+            "content_test_str": "Use "
+          },
+          {
+            "type": "textUrl",
+            "children": null,
+            "content": "",
+            "nextPos": 10,
+            "positions": {
+              "start": 4,
+              "end": 10
+            },
+            "content_test_str": "\\url{}"
+          },
+          {
+            "type": "text",
+            "children": null,
+            "content": " to insert a link.",
+            "nextPos": 28,
+            "positions": {
+              "start": 10,
+              "end": 28
+            },
+            "content_test_str": " to insert a link."
+          }
+        ],
+        "content": "Use \\url{} to insert a link.",
+        "positions": {
+          "start": 0,
+          "end": 28
+        },
+        "content_test_str": "Use \\url{} to insert a link."
+      },
+      {
+        "type": "paragraph_close",
+        "children": null,
+        "content": ""
+      }
+    ]
   }
 ];

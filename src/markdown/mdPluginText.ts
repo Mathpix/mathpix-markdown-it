@@ -960,7 +960,9 @@ const linkifyURL: RuleInline = (state) => {
   let token;
   const text = state.src.slice(startPos + 1, nextPos - endMarker.length);
   if (!text || text.trim().length === 0) {
-    text.nextPos = nextPos;
+    token         = state.push('textUrl', '', 0);
+    token.content = text;
+    token.nextPos = nextPos;
     state.pos = nextPos;
     return true;
   }
