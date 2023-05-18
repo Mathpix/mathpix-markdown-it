@@ -4,8 +4,8 @@ import { endTag, uid } from '../utils';
 import {
   latexEnvironments,
   mathEnvironments,
-  openTag,
-  openTagDescription,
+  openTagIndices,
+  openTagDescriptionIndices,
   openTagProof,
   reNewTheoremG,
   reNewCommandQedSymbolG,
@@ -23,6 +23,8 @@ import {
   headingSection
 } from "../mdPluginText";
 import { eLabelType } from "../common/labels";
+
+type RegExpMatchArrayWithIndices = RegExpMatchArray & { indices: Array<[number, number]> };
 
 export const newTheoremBlock: RuleBlock = (state, startLine: number, endLine: number, silent) => {
   let nextLine: number = startLine + 1;
@@ -147,9 +149,9 @@ export const BeginTheorem: RuleBlock = (state, startLine, endLine, silent) => {
   let lineText: string = state.src.slice(pos, max);
   let strBefore: string = "";
 
-  let match: RegExpMatchArray = lineText.match(openTagDescription);
+  let match: RegExpMatchArrayWithIndices = lineText.match(openTagDescriptionIndices) as RegExpMatchArrayWithIndices;
   if (!match) {
-    match = lineText.match(openTag);
+    match = lineText.match(openTagIndices) as RegExpMatchArrayWithIndices;
   }
   if (!match) {
     return false;
@@ -164,6 +166,18 @@ export const BeginTheorem: RuleBlock = (state, startLine, endLine, silent) => {
     ? match.groups.description
     : match[2] ? match[2] : '';
   envDescription = envDescription ? envDescription.trim() : '';
+  let namePositions = envName && match.indices?.[1]?.length ? {
+    startLine: startLine,
+    endLine: startLine,
+    bMarks: match.indices?.[1][0],
+    eMarks: match.indices?.[1][1],
+  } : null;  
+  let descriptiontPositions = envDescription && match.indices?.[2]?.length  ? {
+    startLine: startLine,
+    endLine: startLine,
+    bMarks: match.indices?.[2][0],
+    eMarks: match.indices?.[2][1],
+  } : null;
 
   if (!envName) {
     return false;
@@ -191,8 +205,18 @@ export const BeginTheorem: RuleBlock = (state, startLine, endLine, silent) => {
     // }
   }
 
+  let contentPositions = {
+    startLine: startLine,
+    endLine: startLine,
+    bMarks: 0
+  };
   if (match.index + match[0].length < lineText.trim().length) {
-    resText = lineText.slice(match.index + match[0].length)
+    resText = lineText.slice(match.index + match[0].length);
+    contentPositions.startLine = startLine;
+    contentPositions.bMarks = match.index + match[0].length;
+  } else {
+    contentPositions.startLine = nextLine;
+    contentPositions.bMarks = 0;
   }
 
   let latexBegin: string = match[0];
@@ -281,9 +305,19 @@ export const BeginTheorem: RuleBlock = (state, startLine, endLine, silent) => {
     token.latex = envItem.print;
     token.content = "";
     token.children = [];
+    if (namePositions) {
+      token.map = [namePositions.startLine, namePositions.endLine];
+      token.bMarks = namePositions.bMarks;
+      token.eMarks = namePositions.eMarks;
+    }
     token = state.push("inline", "", 0);
     token.content = envItem.print;
     token.children = [];
+    if (namePositions) {
+      token.map = [namePositions.startLine, namePositions.endLine];
+      token.bMarks = namePositions.bMarks;
+      token.eMarks = namePositions.eMarks;
+    }
     token = state.push("theorem_print_close", "", 0);
     token.envNumber = theoremNumber;
     token.envStyle = envItem.style;
@@ -299,9 +333,19 @@ export const BeginTheorem: RuleBlock = (state, startLine, endLine, silent) => {
       token.latex = envDescription;
       token.content = "";
       token.children = [];
+      if (descriptiontPositions) {
+        token.map = [descriptiontPositions.startLine, descriptiontPositions.endLine];
+        token.bMarks = descriptiontPositions.bMarks;
+        token.eMarks = descriptiontPositions.eMarks;
+      }
       token = state.push("inline", "", 0);
       token.content = envDescription;
       token.children = [];
+      if (descriptiontPositions) {
+        token.map = [descriptiontPositions.startLine, descriptiontPositions.endLine];
+        token.bMarks = descriptiontPositions.bMarks;
+        token.eMarks = descriptiontPositions.eMarks;
+      }
       token = state.push("theorem_description_close", "", 0);
       token.envStyle = envItem.style;
       token.envDescription = envDescription;
@@ -310,7 +354,7 @@ export const BeginTheorem: RuleBlock = (state, startLine, endLine, silent) => {
     }
   }
   
-  SetTokensBlockParse(state, resText, 0, 0, true);
+  SetTokensBlockParse(state, resText, 0, 0, true, contentPositions);
 
   token = state.push('theorem_close', 'div', -1);
   token.envStyle = envItem.style;
@@ -359,8 +403,18 @@ export const BeginProof: RuleBlock = (state, startLine, endLine, silent) => {
     // }
   }
 
+  let contentPositions = {
+    startLine: startLine,
+    endLine: startLine,
+    bMarks: 0
+  };
   if (match.index + match[0].length < lineText.trim().length) {
-    resText = lineText.slice(match.index + match[0].length)
+    resText = lineText.slice(match.index + match[0].length);
+    contentPositions.startLine = startLine;
+    contentPositions.bMarks = match.index + match[0].length;
+  } else {
+    contentPositions.startLine = nextLine;
+    contentPositions.bMarks = 0;
   }
 
   let latexBegin: string = match[0];
@@ -466,8 +520,11 @@ export const BeginProof: RuleBlock = (state, startLine, endLine, silent) => {
       }
       token.attrSet('data-display', 'inline');
     }
-    if (startLine && endLine) {
-      token.map = [startLine, endLine];
+    if (contentPositions?.hasOwnProperty('startLine') && child.map) {
+      token.map = [contentPositions.startLine + child.map[0], contentPositions.startLine + child.map[1]];
+      if (j === 1 && child.type === "inline") {
+        token.bMarks = contentPositions.bMarks
+      }
     }
     token.content = child.content;
     token.children = child.children;

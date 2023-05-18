@@ -127,22 +127,6 @@ export const setPositions = (state) => {
           token.content_test = state.src.slice(token.positions.start_content, token.positions.end_content);
         }
         token.content_test_str = state.src.slice(token.positions.start, token.positions.end);
-        
-        /** Skip set positions for theorems */
-        if (token.type === "theorem_open") {
-          i++;
-          while (state.tokens[i]?.type !== "theorem_close" && i < state.tokens.length) {
-            i++;
-          }
-          continue;
-        }        
-        if (token.type === "proof_open") {
-          i++;
-          while (state.tokens[i]?.type !== "proof_close" && i < state.tokens.length) {
-            i++;
-          }
-          continue;
-        }
       }
       /** Ignore set positions for children.
        * Since the content may not match the original string. Line breaks can be removed*/

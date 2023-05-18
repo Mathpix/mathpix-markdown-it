@@ -24,7 +24,9 @@ export const labelTag: RegExp = /\\label\s{0,}\{([^}]*)\}/;
 export const labelTagG: RegExp = /\\label\s{0,}\{([^}]*)\}/g;
 
 export const openTag: RegExp = /\\begin\s{0,}\{(?<name>[^}]*)\}/;
+export const openTagIndices: RegExp = /\\begin\s{0,}\{(?<name>[^}]*)\}/d;
 export const openTagDescription: RegExp = /\\begin\s{0,}\{(?<name>[^}]*)\}\s{0,}\[(?<description>[^\]]*)\]/;
+export const openTagDescriptionIndices: RegExp = /\\begin\s{0,}\{(?<name>[^}]*)\}\s{0,}\[(?<description>[^\]]*)\]/d;
 export const openTagProof: RegExp = /\\begin\s{0,}\{([proof\s]+)\}/;
 
 export const reNewTheoremG: RegExp = /\\newtheorem([^}]*)\s{0,}\{(?<name>[^}]*)\}/;
