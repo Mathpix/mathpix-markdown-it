@@ -1,19 +1,23 @@
 import {MmlVisitor} from 'mathjax-full/js/core/MmlTree/MmlVisitor.js';
 import {MmlNode, TextNode, XMLNode} from 'mathjax-full/js/core/MmlTree/MmlNode.js';
 
-import { handle } from "./handlers";
+import { handle, needFirstSpaceBeforeCurrentNode } from "./handlers";
 import { IAsciiData, AddToAsciiData } from "./common";
 
 export class SerializedAsciiVisitor extends MmlVisitor {
   options = null;
+  resAscii = [];
 
   constructor(options) {
     super();
-    this.options = options
+    this.options = options;
+    this.resAscii = [];
   }
 
   public visitTree(node: MmlNode): IAsciiData {
-    return this.visitNode(node, '');
+    let res = this.visitNode(node, '');
+    this.resAscii.push({kind: node.kind, res: {...res}});
+    return res;
   }
 
   public visitNode(node, ...args: any[]): IAsciiData {
@@ -22,7 +26,12 @@ export class SerializedAsciiVisitor extends MmlVisitor {
     this.setChildInheritedAttribute(node, 'toMd');
     /** return super.visitNode(node, ...args); */
     let handler = this.nodeHandlers.get(node.kind) || this.visitDefault;
-    return handler.call(this, node, ...args);
+    let res = handler.call(this, node, ...args);
+    if (res?.ascii) {
+      this.resAscii.push({kind: node.kind, res: {...res}});
+    }
+    node.serialized = {...res};
+    return res;
   }
   
   public visitTextNode(node: TextNode, space: string): IAsciiData {
@@ -257,7 +266,9 @@ export class SerializedAsciiVisitor extends MmlVisitor {
       ascii_md: '',
     };
     try {
+      let needFirstSpace = needFirstSpaceBeforeCurrentNode(node, this);
       let children: IAsciiData = this.childNodeMml(node, space + '  ', '\n');
+      res = AddToAsciiData(res, [needFirstSpace ? ' ' : '']);
       res = AddToAsciiData(res, [
         children.ascii?.match(/\S/) ? children.ascii : '',
         children.ascii_tsv?.match(/\S/) ? children.ascii_tsv : '',

@@ -3,6 +3,7 @@ import { MmlNode, TextNode, XMLNode } from 'mathjax-full/js/core/MmlTree/MmlNode
 import { IAsciiData } from "./common";
 export declare class SerializedAsciiVisitor extends MmlVisitor {
     options: any;
+    resAscii: any[];
     constructor(options: any);
     visitTree(node: MmlNode): IAsciiData;
     visitNode(node: any, ...args: any[]): IAsciiData;
