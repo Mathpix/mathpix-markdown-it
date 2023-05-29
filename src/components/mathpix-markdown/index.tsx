@@ -18,7 +18,8 @@ class MathpixMarkdown extends React.Component<MathpixMarkdownProps> {
           showPageBreaks = false,
           centerImages = true,
           centerTables = true,
-          enableCodeBlockRuleForLatexCommands = false
+          enableCodeBlockRuleForLatexCommands = false,
+          textDirection = ''
         } = this.props;
         const disableRules = isDisableFancy ? MM.disableFancyArrayDef : this.props.disableRules || [];
         const markdownItOptions: TMarkdownItOptions = {
@@ -51,9 +52,16 @@ class MathpixMarkdown extends React.Component<MathpixMarkdownProps> {
         return (
             <div id='preview' style={{justifyContent: alignMathBlock, padding: '10px', overflowY: 'auto', willChange: 'transform'}}>
                 <div id='container-ruller'></div>
-                <div id='setText' style={{display: display, justifyContent: 'inherit'}}
-                     dangerouslySetInnerHTML={{ __html: MM.convertToHTML(text, markdownItOptions)}}
-                />
+                { textDirection 
+                ?               
+                  <div id='setText' dir={textDirection} style={{display: display, justifyContent: 'inherit'}}
+                                     dangerouslySetInnerHTML={{ __html: MM.convertToHTML(text, markdownItOptions)}}
+                  />
+                :               
+                  <div id='setText' style={{display: display, justifyContent: 'inherit'}}
+                                     dangerouslySetInnerHTML={{ __html: MM.convertToHTML(text, markdownItOptions)}}
+                  />
+                }
             </div>
         );
     }

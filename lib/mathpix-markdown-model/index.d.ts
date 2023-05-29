@@ -36,6 +36,7 @@ export interface optionsMathpixMarkdown {
     centerImages?: boolean;
     centerTables?: boolean;
     enableCodeBlockRuleForLatexCommands?: boolean;
+    textDirection?: string;
 }
 export declare type TMarkdownItOptions = {
     isDisableFancy?: boolean;
@@ -74,6 +75,7 @@ export declare type TMarkdownItOptions = {
     centerImages?: boolean;
     centerTables?: boolean;
     enableCodeBlockRuleForLatexCommands?: boolean;
+    textDirection?: string;
 };
 export declare type TOutputMath = {
     include_mathml?: boolean;

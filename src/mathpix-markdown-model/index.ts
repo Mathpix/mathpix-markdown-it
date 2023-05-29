@@ -51,6 +51,7 @@ export interface optionsMathpixMarkdown {
     centerImages?: boolean;
     centerTables?: boolean;
     enableCodeBlockRuleForLatexCommands?: boolean;
+    textDirection?: string;
 }
 
 export type TMarkdownItOptions = {
@@ -90,6 +91,7 @@ export type TMarkdownItOptions = {
   centerImages?: boolean;
   centerTables?: boolean;
   enableCodeBlockRuleForLatexCommands?: boolean;
+  textDirection?: string;
 }
 
 export type TOutputMath = {
@@ -426,7 +428,8 @@ class MathpixMarkdown_Model {
           showPageBreaks = false,
           centerImages = true,
           centerTables = true,
-          enableCodeBlockRuleForLatexCommands = false
+          enableCodeBlockRuleForLatexCommands = false,
+          textDirection = ''
         }
          = options || {};
 
@@ -476,7 +479,7 @@ class MathpixMarkdown_Model {
         return (
             `<div id='preview' style='justify-content:${alignMathBlock};overflow-y:${overflowY};will-change:transform;'>
                 <div id='container-ruller'></div>
-                <div id='setText' style='display: ${display}; justify-content: inherit;${styleFontSize}${stylePadding}${styleMaxWidth}' >
+                <div id='setText' ${textDirection ? 'dir="' + textDirection + '" ' : ''}style='display: ${display}; justify-content: inherit;${styleFontSize}${stylePadding}${styleMaxWidth}' >
                     ${this.convertToHTML(text, markdownItOptions)}
                 </div>
             </div>`
