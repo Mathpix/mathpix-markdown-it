@@ -52,17 +52,19 @@ export const needFirstSpace = (node, currentText, serialize) => {
 
 export const needFirstSpaceBeforeCurrentNode = (node, serialize) => {
   try {
-    if (isFirstChild(node)) {
-      return false
+    let isOperation = false;
+    if (node.hasOwnProperty('texClass')) {
+      isOperation = node.texClass === TEXCLASS.OP;
     } else {
-      const lastResAscii = serialize.resAscii?.length
-        ? serialize.resAscii[serialize.resAscii.length-1]
-        : null;
-      let lastSymbol = lastResAscii && lastResAscii.res?.ascii?.length
-        ? lastResAscii.res?.ascii[lastResAscii.res.ascii.length - 1]
-        : '';
-      return node.texClass === TEXCLASS.OP && regW.test(lastSymbol);
+      isOperation = node.parent?.texClass === TEXCLASS.OP;
     }
+    const lastResAscii = serialize.resAscii?.length
+      ? serialize.resAscii[serialize.resAscii.length-1]
+      : null;
+    let lastSymbol = lastResAscii && lastResAscii.res?.ascii?.length
+      ? lastResAscii.res?.ascii[lastResAscii.res.ascii.length - 1]
+      : '';
+    return isOperation && regW.test(lastSymbol);
   } catch (e) {
     return false
   }
