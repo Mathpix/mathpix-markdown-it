@@ -21,7 +21,7 @@ module.exports = [
   },
   {
     latex: `W ( R ,\\gamma ) = \\operatorname { Tr } _ { R } \\mathcal { P } { \\exp ( i \\oint _ { \\gamma } \\mathbf { A } _ { \\mu } d x ^ { \\mu } ) } \\equiv \\chi _ { R } ( U _ { \\gamma } )`,
-    ascii:    `W(R,gamma)=Tr_(R)Pexp(ioint_(gamma)A_(mu)dx^(mu))-=chi_(R)(U_(gamma))`,
+    ascii:    `W(R,gamma)=Tr_(R)Pexp(i oint_(gamma)A_(mu)dx^(mu))-=chi_(R)(U_(gamma))`,
     ascii_old: `W(R,gamma)=Tr_(R)P exp(i oint_(gamma)A_(mu)dx^(mu))-=chi_(R)(U_(gamma))`,
   },
   {
