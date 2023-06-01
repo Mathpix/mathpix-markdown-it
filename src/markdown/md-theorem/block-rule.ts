@@ -163,7 +163,6 @@ export const BeginTheorem: RuleBlock = (state, startLine, endLine, silent) => {
   let envDescription = match.groups?.description
     ? match.groups.description
     : match[2] ? match[2] : '';
-  envDescription = envDescription ? envDescription.trim() : '';
   let indexName = envName && match[1] ? lineText.indexOf(match[1]) : -1;
   let namePositions = envName && indexName >= 0 ? {
     startLine: startLine,
