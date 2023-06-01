@@ -4,8 +4,8 @@ import { endTag, uid } from '../utils';
 import {
   latexEnvironments,
   mathEnvironments,
-  openTagIndices,
-  openTagDescriptionIndices,
+  openTag,
+  openTagDescription,  
   openTagProof,
   reNewTheoremG,
   reNewCommandQedSymbolG,
@@ -23,8 +23,6 @@ import {
   headingSection
 } from "../mdPluginText";
 import { eLabelType } from "../common/labels";
-
-type RegExpMatchArrayWithIndices = RegExpMatchArray & { indices: Array<[number, number]> };
 
 export const newTheoremBlock: RuleBlock = (state, startLine: number, endLine: number, silent) => {
   let nextLine: number = startLine + 1;
@@ -149,9 +147,9 @@ export const BeginTheorem: RuleBlock = (state, startLine, endLine, silent) => {
   let lineText: string = state.src.slice(pos, max);
   let strBefore: string = "";
 
-  let match: RegExpMatchArrayWithIndices = lineText.match(openTagDescriptionIndices) as RegExpMatchArrayWithIndices;
+  let match: RegExpMatchArray = lineText.match(openTagDescription);
   if (!match) {
-    match = lineText.match(openTagIndices) as RegExpMatchArrayWithIndices;
+    match = lineText.match(openTag);
   }
   if (!match) {
     return false;
@@ -166,17 +164,19 @@ export const BeginTheorem: RuleBlock = (state, startLine, endLine, silent) => {
     ? match.groups.description
     : match[2] ? match[2] : '';
   envDescription = envDescription ? envDescription.trim() : '';
-  let namePositions = envName && match.indices?.[1]?.length ? {
+  let indexName = envName && match[1] ? lineText.indexOf(match[1]) : -1;
+  let namePositions = envName && indexName >= 0 ? {
     startLine: startLine,
     endLine: startLine,
-    bMarks: match.indices?.[1][0],
-    eMarks: match.indices?.[1][1],
-  } : null;  
-  let descriptiontPositions = envDescription && match.indices?.[2]?.length  ? {
+    bMarks: indexName,
+    eMarks: indexName + match[1].length,
+  } : null;
+  let indexDescriptiont = envDescription && match[2] ? lineText.lastIndexOf(match[2]) : -1;
+  let descriptiontPositions = envDescription && indexDescriptiont >= 0  ? {
     startLine: startLine,
     endLine: startLine,
-    bMarks: match.indices?.[2][0],
-    eMarks: match.indices?.[2][1],
+    bMarks: indexDescriptiont,
+    eMarks: indexDescriptiont + match[2].length,
   } : null;
 
   if (!envName) {
