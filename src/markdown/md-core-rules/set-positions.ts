@@ -1,5 +1,6 @@
 import { highlightMathToken } from "../highlight/highlight-math-token";
 import { sortHighlights, getStyleFromHighlight } from "../highlight/common";
+import { mathTokenTypes } from "../common/consts";
 
 const setChildrenPositions = (state, token, pos, highlights, isBlockquote = false) => {
   if (token.hasOwnProperty('offsetLeft')) {
@@ -76,8 +77,12 @@ const setChildrenPositions = (state, token, pos, highlights, isBlockquote = fals
       );
     }
     if (child.highlights?.length){
-      if (['display_math', 'inline_math', 'equation_math', 'equation_math_not_number'].includes(child.type)) {
-        highlightMathToken(state, child);
+      if (mathTokenTypes.includes(child.type)) {
+        if (child.highlights.find(item => item.include_block)) {
+          child.highlightAll = true;
+        } else {
+          highlightMathToken(state, child);
+        }
       }
     }
 

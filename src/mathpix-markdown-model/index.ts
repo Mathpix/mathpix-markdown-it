@@ -163,7 +163,7 @@ export type THighlight = {
   end: number,
   highlight_color?: string,
   text_color?: string, 
-  font_weight?: string,
+  font_weight?: string, //not used yet
   include_block?: boolean
 };
 
