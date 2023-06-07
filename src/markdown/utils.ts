@@ -499,6 +499,144 @@ export const canonicalMath = (math) => {
   return arr;
 };
 
+export const canonicalMathPositions = (math) => {
+  if (!math || !math.trim()) {
+    return []
+  }
+  let arr = [];
+  let i = 0;
+  let c: string;
+  let n: number;
+
+  let startPos = 0;
+  let isTextBlock = false;
+  let textBlockOpen = 0;
+  let fontControl = '';
+  let braceOpen = 0;
+  let braceOpenFont = 0;
+  while (i < math.length) {
+    if (nextIsSpace(math, i)) {
+      i++;
+    }
+    startPos = i;
+    c = math.charAt(i++);
+    n = c.charCodeAt(0);
+    if (n >= 0xD800 && n < 0xDC00) {
+      c += math.charAt(i++);
+    }
+    /** command */
+    if (/^\\/.test(c)) {
+      const { cs, next } = GetCS(math, i);
+      let content = c + cs;
+      if (isTextBlock && textBlockOpen === 0) {
+        isTextBlock = false;
+      }
+      if (!isTextBlock) {
+        arr.push({
+          content: content,
+          contentSlice: math.slice(startPos, next),
+          type: 'command',
+          positions: {
+            start: startPos,
+            end: next
+          },
+          fontControl: fontControl
+        });
+      }
+      i = next;
+      /** Font control */
+      if (['\\textit', '\\text', '\\textbf', '\\textrm',
+        '\\emph'
+      ].includes(content)) {
+        isTextBlock = true;
+      }
+      /** Font control */
+      if (['\\mit', '\\rm', '\\oldstyle', '\\cal', '\\it', '\\bf', '\\bbFont', '\\scr', '\\frak', '\\sf', '\\tt'].includes(content)) {
+        fontControl = content;
+        braceOpenFont = braceOpen;
+      }
+      continue;
+    }
+    /** numbers */
+    if (/[0-9.,]/.test(c)) {
+      const { cs, next } = getDigit(math, i);
+      if (isTextBlock && textBlockOpen === 0) {
+        isTextBlock = false;
+      }
+      if (!isTextBlock) {
+        arr.push({
+          content: c + cs,
+          contentSlice: math.slice(startPos, next),
+          type: 'numbers',
+          positions: {
+            start: startPos,
+            end: next
+          },
+          fontControl: fontControl
+        });
+      }
+      i = next;
+      continue;
+    }
+    /** letters */
+    if (/[a-z]/i.test(c)) {
+      const { cs, next } = getLetter(math, i);
+      if (isTextBlock && textBlockOpen === 0) {
+        isTextBlock = false;
+      }
+      if (!isTextBlock) {
+        arr.push({
+          content: c + cs,
+          contentSlice: math.slice(startPos, next),
+          type: 'letters',
+          positions: {
+            start: startPos,
+            end: next
+          },
+          fontControl: fontControl
+        });
+      }
+      i = next;
+      continue;
+    }
+    if (c === '{') {
+      braceOpen++
+    }
+    if (c === '}') {
+      if (braceOpen === braceOpenFont) {
+        fontControl = '';
+      }
+      braceOpen--;
+    }
+    if (isTextBlock) {
+      if (c === '{') {
+        textBlockOpen++
+      }
+      if (c === '}') {
+        textBlockOpen--
+      }
+      if (textBlockOpen === 0) {
+        let lastItem = arr[arr.length - 1];
+        lastItem.positions.end = i;
+        lastItem.content = math.slice(lastItem.positions.start, lastItem.positions.end);
+        lastItem.contentSlice = math.slice(lastItem.positions.start, lastItem.positions.end);
+        isTextBlock = false;
+      }
+    } else {
+      arr.push({
+        content: c,
+        contentSlice: math.slice(startPos, startPos + c.length),
+        type: 'other',
+        positions: {
+          start: startPos,
+          end: i
+        },
+        fontControl: fontControl
+      });
+    }
+  }
+  return arr;
+};
 
 export const getSpacesFromLeft = (str: string) => {
   let strTrimLeft = str ? str.trimLeft() : '';

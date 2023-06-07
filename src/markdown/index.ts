@@ -1,9 +1,9 @@
-import { mdPluginCollapsible } from "./mdPluginConfigured";
+import { mdPluginCollapsible, mdSetPositionsAndHighlight } from "./mdPluginConfigured";
 
 import { mathpixMarkdownPlugin } from './mathpix-markdown-plugins';
 
 import { injectRenderRules } from "./rules";
-import {MathpixMarkdownModel as MM, TMarkdownItOptions} from '../mathpix-markdown-model'
+import { MathpixMarkdownModel as MM, TMarkdownItOptions } from '../mathpix-markdown-model';
 
 /** md renderer */
 const mdInit = (options: TMarkdownItOptions) => {
@@ -21,7 +21,8 @@ const mdInit = (options: TMarkdownItOptions) => {
     centerImages = true,
     centerTables = true,
     enableCodeBlockRuleForLatexCommands = false,
-    addPositionsToTokens = false
+    addPositionsToTokens = false,
+    highlights = []
   } = options;
   const mmdOptions = {
     width: width,
@@ -40,7 +41,8 @@ const mdInit = (options: TMarkdownItOptions) => {
     centerImages: centerImages,
     centerTables: centerTables,
     enableCodeBlockRuleForLatexCommands: enableCodeBlockRuleForLatexCommands,
-    addPositionsToTokens: addPositionsToTokens
+    addPositionsToTokens: addPositionsToTokens,
+    highlights: highlights
   };
   let md = require("markdown-it")({
     html: htmlTags,
@@ -72,6 +74,10 @@ const mdInit = (options: TMarkdownItOptions) => {
     } else {
       md.use(require("markdown-it-emoji"))
     }
+  }
+  if (addPositionsToTokens || highlights?.length) {
+    /** SetPositions plugin should be last */
+    md.use(mdSetPositionsAndHighlight, mmdOptions);
   }
   return md;
 };

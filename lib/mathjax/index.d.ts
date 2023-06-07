@@ -14,12 +14,13 @@ export interface IOuterData {
         [key: string]: Label;
     };
 }
+export declare const OuterHTML: (data: any, outMath: any) => string;
 export declare const MathJax: {
     assistiveMml: boolean;
     nonumbers: boolean;
     checkAccessibility: (accessibility?: TAccessibility, nonumbers?: boolean) => void;
     Stylesheet: () => unknown;
-    TexConvert: (string: any, options?: any) => IOuterData;
+    TexConvert: (string: any, options?: any, throwError?: boolean) => IOuterData;
     TexConvertToAscii: (string: any, options?: any) => string;
     /**
      * Typeset a TeX expression and return the SVG tree for it
@@ -27,7 +28,7 @@ export declare const MathJax: {
      * @param string {string}
      * @param options {}
      */
-    Typeset: (string: any, options?: any) => {
+    Typeset: (string: any, options?: any, throwError?: boolean) => {
         html: string;
         labels: {
             [key: string]: Label;
@@ -36,6 +37,20 @@ export declare const MathJax: {
         ascii_tsv: string;
         ascii_csv: string;
         ascii_md: string;
+        data: {
+            mathml?: string;
+            mathml_word?: string;
+            asciimath?: string;
+            asciimath_tsv?: string;
+            asciimath_csv?: string;
+            asciimath_md?: string;
+            latex?: string;
+            svg?: string;
+            speech?: string;
+            labels?: {
+                [key: string]: Label;
+            };
+        };
     };
     TypesetSvgAndAscii: (string: any, options?: any) => {
         html: string;
@@ -46,6 +61,20 @@ export declare const MathJax: {
         ascii_tsv: string;
         ascii_csv: string;
         ascii_md: string;
+        data: {
+            mathml?: string;
+            mathml_word?: string;
+            asciimath?: string;
+            asciimath_tsv?: string;
+            asciimath_csv?: string;
+            asciimath_md?: string;
+            latex?: string;
+            svg?: string;
+            speech?: string;
+            labels?: {
+                [key: string]: Label;
+            };
+        };
     };
     /**
      * Typeset a MathML expression and return the SVG tree for it

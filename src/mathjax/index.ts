@@ -61,7 +61,7 @@ const applySpeechToNode = (adaptor, node, sre): string => {
   return speech;
 };
 
-const OuterData = (adaptor, node, math, outMath, forDocx = false, accessibility?): IOuterData => {
+const OuterData = (adaptor, node, math, outMath, forDocx = false, accessibility?, node_highlight?): IOuterData => {
   const {
     include_mathml = false,
     include_mathml_word = false,
@@ -104,7 +104,9 @@ const OuterData = (adaptor, node, math, outMath, forDocx = false, accessibility?
       : math.inputJax.processStrings ? '' : math.start.node.outerHTML);
   }
   if (include_svg) {
-    res.svg = adaptor.outerHTML(node);
+    res.svg = node_highlight 
+      ? adaptor.outerHTML(node_highlight) 
+      : adaptor.outerHTML(node);
   }
   /** Get information about the current labels. */
   res.labels = math.inputJax.parseOptions?.tags?.labels
@@ -232,7 +234,7 @@ const OuterDataMathMl = (adaptor, node, math, outMath, forDocx = false, accessib
   return res;
 };
 
-const OuterHTML = (data, outMath) => {
+export const OuterHTML = (data, outMath) => {
   const {
     include_mathml = false,
     include_mathml_word = false,
@@ -305,7 +307,7 @@ export const MathJax = {
   Stylesheet: function () {
     return svg.styleSheet(MJ.mDocTeX);
   },
-  TexConvert: function(string, options: any={}): IOuterData {
+  TexConvert: function(string, options: any={}, throwError = false): IOuterData {
     const {display = true, metric = {}, outMath = {}, mathJax = {}, forDocx={}, accessibility = null, nonumbers = false} = options;
     const {em = 16, ex = 8, cwidth = 1200, lwidth = 100000, scale = 1} = metric;
     const {mtextInheritFont = false} = mathJax;
@@ -332,6 +334,9 @@ export const MathJax = {
       const outputJax = MJ.mDocTeX.outputJax as any;
       return OuterData(MJ.adaptor, node, outputJax.math, outMath, forDocx, accessibility);
     } catch (err) {
+      if (throwError) {
+        throw err;
+      }
       console.log('ERROR=>', err);
       if (outMath && outMath.include_svg) {
         const node = MJ.docTeX.convert(string, {
@@ -367,8 +372,8 @@ export const MathJax = {
    * @param string {string}
    * @param options {}
    */
-  Typeset: function(string, options: any={}) {
-    const data = this.TexConvert(string, options);
+  Typeset: function(string, options: any={}, throwError = false) {
+    const data = this.TexConvert(string, options, throwError);
     return {
       html: OuterHTML(data, options.outMath),
       labels: data.labels,
@@ -376,6 +381,7 @@ export const MathJax = {
       ascii_tsv: data?.['asciimath_tsv'],
       ascii_csv: data?.['asciimath_csv'],
       ascii_md: data?.['asciimath_md'],
+      data: {...data}
     }
   },
 
@@ -391,7 +397,8 @@ export const MathJax = {
       labels: data.labels,
       ascii_tsv: data?.['asciimath_tsv'],
       ascii_csv: data?.['asciimath_csv'],
-      ascii_md: data?.['asciimath_md']
+      ascii_md: data?.['asciimath_md'],
+      data: {...data}
     };
   },
   /**

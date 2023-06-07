@@ -3,6 +3,7 @@ import { CsvJoin } from "../common/csv";
 import { tableMarkdownJoin, getMdForChild, getMdLink } from "../common/table-markdown";
 import { mathTokenTypes } from "../common/consts";
 import { formatSource } from "../../helpers/parse-mmd-element";
+import { getStyleFromHighlight } from "../highlight/common";
 
 const tokenAttrGet = (token, name) => {
   if (!name) { return ''}
@@ -16,7 +17,21 @@ const tokenAttrGet = (token, name) => {
   return token.attrs[index][1]
 };
 
-export const renderInlineTokenBlock = (tokens, options, env, slf, isSubTable = false) =>{
+const tokenAttrSet = (token, name, value) => {
+  if (!name) { return }
+  if (!token.attrs) {
+    token.attrs = [];
+    token.attrs.push([name, value]);
+    return;
+  }
+  let index = token.attrs.findIndex(item => item[0] === name);
+  if (index < 0) {
+    token.attrs.push([name, value])
+  }
+  token.attrs[index][1] = value
+};
+
+export const renderInlineTokenBlock = (tokens, options, env, slf, isSubTable = false, highlight = null) =>{
   let nextToken,
     result = '',
     needLf = false;
@@ -93,6 +108,11 @@ export const renderInlineTokenBlock = (tokens, options, env, slf, isSubTable = f
       colspan = colspan ? Number(colspan) : 0 ;
       mr = tokenAttrGet(token, 'rowspan');
       mr = mr ? Number(mr) : 0 ;
+      if (highlight) {
+        let styles = tokenAttrGet(token, 'style');
+        let dataAttrsStyle = getStyleFromHighlight(highlight);
+        tokenAttrSet(token, 'style', dataAttrsStyle + styles);
+      }
     }
     if (token.token === 'td_close') {
       let l = arrRow &&  arrRow.length > 0 ? arrRow.length  : 0;
@@ -308,7 +328,8 @@ export const renderTabularInline = (a, token, options, env, slf) => {
   if (!include_tsv && !include_csv && !include_table_html && !include_table_markdown) {
     return ''
   }
-  const data = renderInlineTokenBlock(token.children, options, env, slf, token.isSubTable);
+  let highlight = token.highlights?.length ? token.highlights[0] : null;
+  const data = renderInlineTokenBlock(token.children, options, env, slf, token.isSubTable, highlight);
   token.tsv = data.tsv;
   token.csv = data.csv;
   token.tableMd = data.tableMd;//tableMarkdownJoin(data.tableMd, data.align);

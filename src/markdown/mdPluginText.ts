@@ -963,6 +963,10 @@ const linkifyURL: RuleInline = (state) => {
     token         = state.push('textUrl', '', 0);
     token.content = text;
     token.nextPos = nextPos;
+    token.inlinePos = {
+      start_content: startPos + 1,
+      end_content: nextPos - endMarker.length
+    };
     state.pos = nextPos;
     return true;
   }
@@ -971,6 +975,10 @@ const linkifyURL: RuleInline = (state) => {
     token         = state.push('textUrl', '', 0);
     token.content = text;
     token.nextPos = nextPos;
+    token.inlinePos = {
+      start_content: startPos + 1,
+      end_content: nextPos - endMarker.length
+    };
     state.pos = nextPos;
     return true;
   }
@@ -995,11 +1003,19 @@ const linkifyURL: RuleInline = (state) => {
       if (pos > lastPos) {
         token         = state.push('textUrl', '', 0);
         token.content = text.slice(lastPos, pos);
+        token.inlinePos = {
+          start_content: lastPos,
+          end_content: pos
+        };
         token.level   = level;
       }
       token         = state.push('textUrl', '', 0);
       lastPos = links[ln].lastIndex;
       token.content = text.slice(pos, lastPos);
+      token.inlinePos = {
+        start_content: lastPos,
+        end_content: pos
+      };
       token.level   = level;
       continue;
     }
@@ -1017,6 +1033,10 @@ const linkifyURL: RuleInline = (state) => {
     if (pos > lastPos) {
       token         = state.push('textUrl', '', 0);
       token.content = text.slice(lastPos, pos);
+      token.inlinePos = {
+        start_content: lastPos,
+        end_content: pos
+      };
       token.level   = level;
     }
 
@@ -1044,6 +1064,10 @@ const linkifyURL: RuleInline = (state) => {
   if (lastPos < text.length) {
     token         = state.push('textUrl', '', 0);
     token.content = text.slice(lastPos);
+    token.inlinePos = {
+      start_content: lastPos,
+      end_content: text.length
+    };
     token.level   = level;
     state.nextPos = nextPos;
   }

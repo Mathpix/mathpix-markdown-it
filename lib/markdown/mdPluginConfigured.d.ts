@@ -25,3 +25,4 @@ export declare const mdPluginList: (md: any, options: any) => void;
 export declare const mdPluginChemistry: (md: any, options: any) => void;
 export declare const mdPluginSvgToBase64: (md: any, options: any) => void;
 export declare const mdPluginCollapsible: (md: any) => void;
+export declare const mdSetPositionsAndHighlight: (md: any, options: any) => void;

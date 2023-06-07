@@ -32,6 +32,8 @@ export declare const reMultiRowWithVPos: RegExp;
 export declare const reMultiRow: RegExp;
 export declare const openTagTabular: RegExp;
 export declare const closeTagTabular: RegExp;
+export declare const HIGHLIGHT_COLOR = "rgba(0, 147, 255, 0.25)";
+export declare const HIGHLIGHT_TEXT_COLOR = "#1e2029";
 export declare const latexEnvironments: string[];
 /** https://docs.mathjax.org/en/v3.0-latest/input/tex/macros/index.html#environments */
 export declare const mathEnvironments: string[];

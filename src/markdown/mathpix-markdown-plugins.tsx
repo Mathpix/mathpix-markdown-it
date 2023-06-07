@@ -29,7 +29,8 @@ export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
     centerImages = true,
     centerTables = true,
     enableCodeBlockRuleForLatexCommands = false,
-    addPositionsToTokens = false
+    addPositionsToTokens = false,
+    highlights = []
   } = options;
   Object.assign(md.options, smiles);
   Object.assign(md.options, {
@@ -47,7 +48,8 @@ export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
     centerImages: centerImages,
     centerTables: centerTables,
     enableCodeBlockRuleForLatexCommands: enableCodeBlockRuleForLatexCommands,
-    addPositionsToTokens: addPositionsToTokens
+    addPositionsToTokens: addPositionsToTokens,
+    highlights: highlights
   });
 
   md
@@ -74,7 +76,7 @@ export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
    *
    * Process input string and push block tokens into `outTokens`
    **/
-  if (addPositionsToTokens) {
+  if (addPositionsToTokens || md.options.highlights?.length) {
     md.block.parse = function (src, md, env, outTokens) {
       var state;
       if (!src) { return; }

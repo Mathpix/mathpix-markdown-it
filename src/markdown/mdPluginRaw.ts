@@ -9,7 +9,8 @@ import {
   getWidthFromDocument,
   findOpenCloseTagsMathEnvironment,
   beginTag, endTag,
-  canonicalMath
+  canonicalMath,
+  canonicalMathPositions
 } from './utils';
 import { openTagMML, closeTagMML, tsvSeparatorsDef, csvSeparatorsDef, mdSeparatorsDef } from './common/consts';
 import { imageWithSize, renderRuleImage } from './md-inline-rule/image';
@@ -38,7 +39,6 @@ import {
 const isSpace = require('markdown-it/lib/common/utils').isSpace;
 import { envArraysShouldBeFlattenInTSV } from '../helpers/consts';
 import { getTerminatedRules } from './common';
-import { setPositions } from './md-core-rules/set-positions';
 
 function MathML(state, silent, pos, endMarker = '', type = "inline_mathML") {
   const markerBegin = RegExp('^</?(math)(?=(\\s|>|$))', 'i');
@@ -302,9 +302,14 @@ function multiMath(state, silent) {
     }
     token.inlinePos = {
       start: state.pos,
-      end: nextPos
+      end: nextPos,
+      start_content: type === "equation_math_not_number" || type === "equation_math" 
+        ? state.pos : startMathPos,
+      end_content: type === "equation_math_not_number" || type === "equation_math" 
+        ? nextPos : endMarkerPos
     };
     token.canonicalized = token.content ? canonicalMath(token.content) : [];
+    token.canonicalizedPositions = token.content ? canonicalMathPositions(token.content) : [];
     if (type !== "reference_note" && !state.md.options.forLatex) {
       /** Perform math to conversion to html and get additional data from MathJax to pass it to render rules */
       convertMathToHtml(state, token, state.md.options);
@@ -475,9 +480,12 @@ function simpleMath(state, silent) {
     }
     token.inlinePos = {
       start: state.pos,
-      end: nextPos
+      end: nextPos,
+      start_content: startMathPos,
+      end_content: endMarkerPos
     };
     token.canonicalized = token.content ? canonicalMath(token.content) : [];
+    token.canonicalizedPositions = token.content ? canonicalMathPositions(token.content) : [];
     /** Perform math to conversion to html and get additional data from MathJax to pass it to render rules */
     if (!state.md.options.forLatex) {
       convertMathToHtml(state, token, state.md.options);
@@ -621,6 +629,7 @@ const convertMathToHtml = (state, token, options) => {
           accessibility: options.accessibility
         });
         token.mathEquation = data.html;
+        token.mathData = data.data;
         token.ascii = data.ascii;
         token.ascii_tsv = data.ascii_tsv;
         token.ascii_csv = data.ascii_csv;
@@ -634,6 +643,7 @@ const convertMathToHtml = (state, token, options) => {
           nonumbers: options.nonumbers
         });
         token.mathEquation = data.html;
+        token.mathData = data.data;
         token.ascii = data.ascii;
         token.ascii_tsv = data.ascii_tsv;
         token.ascii_csv = data.ascii_csv;
@@ -1083,10 +1093,6 @@ export default options => {
     md.inline.ruler.at('image', imageWithSize);
     /** Replace inline core rule */
     md.core.ruler.at('inline', coreInline);
-    /** Set positions to tokens */
-    if (md.options.addPositionsToTokens) {
-      md.core.ruler.push('set_positions', setPositions);
-    }
 
     Object.keys(mapping).forEach(key => {
       md.renderer.rules[key] = (tokens, idx, options, env, slf) => {
