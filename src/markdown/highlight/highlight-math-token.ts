@@ -206,10 +206,18 @@ export const highlightMathToken = (state, token) => {
               continue;
             }
           }
-          let content = token.content.slice(token.canonicalizedPositions[k].positions.start, token.canonicalizedPositions[k].positions.end)
+          let content = token.content.slice(
+            token.canonicalizedPositions[k].positions.start, 
+            token.canonicalizedPositions[k].positions.end);
+          if (token.canonicalizedPositions[k].fontControl) {
+            content = token.canonicalizedPositions[k].fontControl.includeIntoBraces
+              ? '{' + content + '}' :
+              ' ' + content;
+            content = token.canonicalizedPositions[k].fontControl.command + content;
+          }
           mathContent.push({
             positions: token.canonicalizedPositions[k].positions,
-            content: token.canonicalizedPositions[k].fontControl ? token.canonicalizedPositions[k].fontControl + ' ' + content : content,
+            content: content,
             highlight: token.highlights[j]
           })
         }

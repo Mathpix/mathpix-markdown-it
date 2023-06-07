@@ -511,7 +511,7 @@ export const canonicalMathPositions = (math) => {
   let startPos = 0;
   let isTextBlock = false;
   let textBlockOpen = 0;
-  let fontControl = '';
+  let fontControl = null;
   let braceOpen = 0;
   let braceOpenFont = 0;
   while (i < math.length) {
@@ -544,15 +544,18 @@ export const canonicalMathPositions = (math) => {
         });
       }
       i = next;
-      /** Font control */
-      if (['\\textit', '\\text', '\\textbf', '\\textrm',
-        '\\emph'
-      ].includes(content)) {
+      /** Text control */
+      if (['\\text',
+        '\\textsf', '\\textit', '\\textbf', '\\textrm', '\\texttt'].includes(content)) {
         isTextBlock = true;
       }
       /** Font control */
-      if (['\\mit', '\\rm', '\\oldstyle', '\\cal', '\\it', '\\bf', '\\bbFont', '\\scr', '\\frak', '\\sf', '\\tt'].includes(content)) {
-        fontControl = content;
+      if (['\\mit', '\\rm', '\\oldstyle', '\\cal', '\\it', '\\bf', '\\bbFont', '\\scr', '\\frak', '\\sf', '\\tt',
+      '\\Bbb', '\\emph'].includes(content)) {
+        fontControl = {
+          command: content,
+          includeIntoBraces: ['\\Bbb'].includes(content)
+        };
         braceOpenFont = braceOpen;
       }
       continue;
@@ -604,7 +607,7 @@ export const canonicalMathPositions = (math) => {
     }
     if (c === '}') {
       if (braceOpen === braceOpenFont) {
-        fontControl = '';
+        fontControl = null;
       }
       braceOpen--;
     }
