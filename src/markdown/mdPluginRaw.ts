@@ -308,8 +308,14 @@ function multiMath(state, silent) {
       end_content: type === "equation_math_not_number" || type === "equation_math" 
         ? nextPos : endMarkerPos
     };
-    token.canonicalized = token.content ? canonicalMath(token.content) : [];
-    token.canonicalizedPositions = token.content ? canonicalMathPositions(token.content) : [];
+    if (type !== "reference_note") {
+      if (state.md.options.addPositionsToTokens) {
+        token.canonicalized = token.content ? canonicalMath(token.content) : [];
+      }
+      if (state.md.options.highlights?.length) {
+        token.canonicalizedPositions = token.content ? canonicalMathPositions(token.content) : [];
+      }
+    }
     if (type !== "reference_note" && !state.md.options.forLatex) {
       /** Perform math to conversion to html and get additional data from MathJax to pass it to render rules */
       convertMathToHtml(state, token, state.md.options);
@@ -484,8 +490,12 @@ function simpleMath(state, silent) {
       start_content: startMathPos,
       end_content: endMarkerPos
     };
-    token.canonicalized = token.content ? canonicalMath(token.content) : [];
-    token.canonicalizedPositions = token.content ? canonicalMathPositions(token.content) : [];
+    if (state.md.options.addPositionsToTokens) {
+      token.canonicalized = token.content ? canonicalMath(token.content) : [];
+    }
+    if (state.md.options.highlights?.length) {
+      token.canonicalizedPositions = token.content ? canonicalMathPositions(token.content) : [];
+    }
     /** Perform math to conversion to html and get additional data from MathJax to pass it to render rules */
     if (!state.md.options.forLatex) {
       convertMathToHtml(state, token, state.md.options);
