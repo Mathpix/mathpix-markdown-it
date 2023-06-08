@@ -26,7 +26,8 @@ const tokenAttrSet = (token, name, value) => {
   }
   let index = token.attrs.findIndex(item => item[0] === name);
   if (index < 0) {
-    token.attrs.push([name, value])
+    token.attrs.push([name, value]);
+    return;
   }
   token.attrs[index][1] = value
 };
@@ -112,6 +113,7 @@ export const renderInlineTokenBlock = (tokens, options, env, slf, isSubTable = f
         let styles = tokenAttrGet(token, 'style');
         let dataAttrsStyle = getStyleFromHighlight(highlight);
         tokenAttrSet(token, 'style', dataAttrsStyle + styles);
+        tokenAttrSet(token, 'class', 'mmd-highlight');
       }
     }
     if (token.token === 'td_close') {

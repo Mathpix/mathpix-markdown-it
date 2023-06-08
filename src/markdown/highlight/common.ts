@@ -93,7 +93,7 @@ export const highlightText = (token, content = '') => {
     }
     let textStr = '';
     if (token.highlightAll) {
-      textStr += '<span style="' + getStyleFromHighlight(token.highlights[0]) + '">';
+      textStr += '<span class="mmd-highlight" style="' + getStyleFromHighlight(token.highlights[0]) + '">';
       textStr += content ? content : token.content;
       textStr += '</span>';
       return textStr;
@@ -101,7 +101,7 @@ export const highlightText = (token, content = '') => {
     let textStart = 0;
     highlightContent.map(item => {
       textStr += content ? content.slice(textStart, item.positions.start) : token.content.slice(textStart, item.positions.start);
-      textStr += '<span style="' + getStyleFromHighlight(item.highlight) + '">';
+      textStr += '<span class="mmd-highlight" style="' + getStyleFromHighlight(item.highlight) + '">';
       textStr += item.content;
       textStr += '</span>';
       textStart = item.positions.end;
