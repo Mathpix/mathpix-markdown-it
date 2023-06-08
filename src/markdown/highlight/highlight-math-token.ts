@@ -30,6 +30,8 @@ export const convertMathToHtmlWithHighlight = (state, token, options) => {
     return token;
   } catch (e) {
     // console.log('ERROR MathJax =>', e.message, e);
+    console.log('ERROR MathJax =>token=>', token);
+    console.log('ERROR MathJax =>content_highlight=>', token.content_highlight);
     console.error('ERROR MathJax =>', e.message, e);
     token.highlightAll = true;
     return token;
@@ -42,6 +44,9 @@ export const addedHighlightMathjaxFunctions = (token, mathContent) => {
   mathContent.map(item => {
     mathStr += token.content.slice(mathStart, item.positions.start);
     if (item.highlight.hasOwnProperty('text_color') || item.highlight.hasOwnProperty('highlight_color')) {
+      if (item.highlightIncludeIntoBraces) {
+        mathStr += `{`;
+      }
       if (item.highlight?.text_color) {
         mathStr += `\\textcolor{${item.highlight?.text_color}}{`;
       }
@@ -55,12 +60,21 @@ export const addedHighlightMathjaxFunctions = (token, mathContent) => {
       if (item.highlight?.text_color) {
         mathStr += `}`;
       }
+      if (item.highlightIncludeIntoBraces) {
+        mathStr += `}`;
+      }
     } else {
+      if (item.highlightIncludeIntoBraces) {
+        mathStr += `{`;
+      }
       mathStr += `\\textcolor{${HIGHLIGHT_TEXT_COLOR}}{`;
       mathStr += `\\colorbox{${HIGHLIGHT_COLOR}}{$`;
       mathStr += item.content;
       mathStr += '$}';
       mathStr += `}`;
+      if (item.highlightIncludeIntoBraces) {
+        mathStr += `}`;
+      }
     }
     mathStart = item.positions.end;
   });
@@ -94,7 +108,13 @@ export const highlightMathToken = (state, token) => {
         if (startMathPos >= token.canonicalizedPositions[k].positions.start
           && endMathPos <= token.canonicalizedPositions[k].positions.end) {
           /** Highlight all equation */
-          if (['\\hline', '\\begin', '\\end'].includes(token.canonicalizedPositions[k].content)) {
+          if (['\\hline', '\\begin', '\\end', '\\label', '\\tag'].includes(token.canonicalizedPositions[k].content)) {
+            mathContent = [];
+            isBreak = true;
+            break;
+          }          
+          /** Highlight all equation */
+          if (['\\label', '\\tag'].includes(token.canonicalizedPositions[k].parentCommand)) {
             mathContent = [];
             isBreak = true;
             break;
@@ -209,8 +229,11 @@ export const highlightMathToken = (state, token) => {
           let content = token.content.slice(
             token.canonicalizedPositions[k].positions.start, 
             token.canonicalizedPositions[k].positions.end);
+          let highlightIncludeIntoBraces = false;
           if (token.canonicalizedPositions[k].fontControl) {
-            content = token.canonicalizedPositions[k].fontControl.includeIntoBraces
+            let includeIntoBraces = token.canonicalizedPositions[k].fontControl.includeIntoBraces && token.canonicalizedPositions[k].parentCommand;
+            highlightIncludeIntoBraces = !includeIntoBraces && token.canonicalizedPositions[k].fontControl.command === '\\Bbb';
+            content = includeIntoBraces
               ? '{' + content + '}' :
               ' ' + content;
             content = token.canonicalizedPositions[k].fontControl.command + content;
@@ -218,7 +241,8 @@ export const highlightMathToken = (state, token) => {
           mathContent.push({
             positions: token.canonicalizedPositions[k].positions,
             content: content,
-            highlight: token.highlights[j]
+            highlight: token.highlights[j],
+            highlightIncludeIntoBraces: highlightIncludeIntoBraces
           })
         }
       }

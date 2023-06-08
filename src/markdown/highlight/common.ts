@@ -14,7 +14,9 @@ export const filteredHighlightContent = (highlightContent) => {
     if (index === -1) {
       let lastIndex = newArr?.length ? newArr.length - 1 : -1;
       if (lastIndex >= 0 
-        && newArr[lastIndex].positions.end + 1 === highlightContent[i].positions.start) {
+        && newArr[lastIndex].positions.end + 1 === highlightContent[i].positions.start
+        && !newArr[lastIndex].highlightIncludeIntoBraces && !highlightContent[i].highlightIncludeIntoBraces
+      ) {
         newArr[lastIndex].positions.end = highlightContent[i].positions.end;
         newArr[lastIndex].content += highlightContent[i].content;
       } else {
@@ -45,37 +47,39 @@ export const getStyleFromHighlight = (highlight): string => {
   return dataAttrsStyle;
 };
 
-export const highlightText = (token) => {
+export const highlightText = (token, content = '') => {
   if (token.highlights?.length) {
-    token.highlights.sort(sortHighlights);
     let highlightContent = [];
-    for (let i = 0; i < token.highlights.length; i++) {
-      let startPos = token.highlights[i].start;
-      let endPos = token.highlights[i].end ;
-      if (token.positions.hasOwnProperty('start_content')){
-        if (token.positions.start_content > startPos){
-          token.highlightAll = true;
-          break;
+    if (!token.highlightAll) {
+      token.highlights.sort(sortHighlights);
+      for (let i = 0; i < token.highlights.length; i++) {
+        let startPos = token.highlights[i].start;
+        let endPos = token.highlights[i].end ;
+        if (token.positions.hasOwnProperty('start_content')){
+          if (token.positions.start_content > startPos){
+            token.highlightAll = true;
+            break;
+          }
+          startPos -= token.positions.start_content;
+          endPos -= token.positions.start_content;
+        } else {
+          startPos -= token.positions.start;
+          endPos -= token.positions.start;
         }
-        startPos -= token.positions.start_content;
-        endPos -= token.positions.start_content;
-      } else {
-        startPos -= token.positions.start;
-        endPos -= token.positions.start;
+        highlightContent.push({
+          positions: {
+            start: startPos,
+            end: endPos
+          },
+          highlight: token.highlights[i],
+          content: token.content.slice(startPos, endPos)
+        });
       }
-      highlightContent.push({
-        positions: {
-          start: startPos,
-          end: endPos
-        },
-        highlight: token.highlights[i],
-        content: token.content.slice(startPos, endPos)
-      });
     }
     let textStr = '';
     if (token.highlightAll) {
       textStr += '<span style="' + getStyleFromHighlight(token.highlights[0]) + '">';
-      textStr += token.content;
+      textStr += content ? content : token.content;
       textStr += '</span>';
       return textStr;
     }

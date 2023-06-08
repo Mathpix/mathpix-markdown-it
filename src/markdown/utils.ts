@@ -514,6 +514,8 @@ export const canonicalMathPositions = (math) => {
   let fontControl = null;
   let braceOpen = 0;
   let braceOpenFont = 0;
+  let parentCommand = '';
+  let braceOpenParentCommand = 0;
   while (i < math.length) {
     if (nextIsSpace(math, i)) {
       i++;
@@ -526,6 +528,9 @@ export const canonicalMathPositions = (math) => {
     }
     /** command */
     if (/^\\/.test(c)) {
+      if (braceOpen === braceOpenParentCommand) {
+        parentCommand = '';
+      }
       const { cs, next } = GetCS(math, i);
       let content = c + cs;
       if (isTextBlock && textBlockOpen === 0) {
@@ -540,10 +545,14 @@ export const canonicalMathPositions = (math) => {
             start: startPos,
             end: next
           },
-          fontControl: fontControl
+          fontControl: fontControl,
+          parentCommand: parentCommand
         });
       }
       i = next;
+      if (braceOpen === braceOpenFont && fontControl?.command === '\\Bbb') {
+        fontControl = null;
+      }
       /** Text control */
       if (['\\text',
         '\\textsf', '\\textit', '\\textbf', '\\textrm', '\\texttt'].includes(content)) {
@@ -558,10 +567,15 @@ export const canonicalMathPositions = (math) => {
         };
         braceOpenFont = braceOpen;
       }
+      braceOpenParentCommand = braceOpen;
+      parentCommand = content;
       continue;
     }
     /** numbers */
     if (/[0-9.,]/.test(c)) {
+      if (braceOpen === braceOpenParentCommand) {
+        parentCommand = '';
+      }
       const { cs, next } = getDigit(math, i);
       if (isTextBlock && textBlockOpen === 0) {
         isTextBlock = false;
@@ -575,14 +589,21 @@ export const canonicalMathPositions = (math) => {
             start: startPos,
             end: next
           },
-          fontControl: fontControl
+          fontControl: fontControl,
+          parentCommand: parentCommand
         });
       }
       i = next;
+      if (braceOpen === braceOpenFont && fontControl?.command === '\\Bbb') {
+        fontControl = null;
+      }
       continue;
     }
     /** letters */
     if (/[a-z]/i.test(c)) {
+      if (braceOpen === braceOpenParentCommand) {
+        parentCommand = '';
+      }
       const { cs, next } = getLetter(math, i);
       if (isTextBlock && textBlockOpen === 0) {
         isTextBlock = false;
@@ -596,11 +617,23 @@ export const canonicalMathPositions = (math) => {
             start: startPos,
             end: next
           },
-          fontControl: fontControl
+          fontControl: fontControl,
+          parentCommand: parentCommand
         });
       }
       i = next;
+      if (braceOpen === braceOpenFont && fontControl?.command === '\\Bbb') {
+        fontControl = null;
+      }
       continue;
+    }
+    if (c !== '{' && c !== '}') {
+      if (braceOpen === braceOpenParentCommand) {
+        parentCommand = '';
+      }
+      if (braceOpen === braceOpenFont && fontControl?.command === '\\Bbb') {
+        fontControl = null;
+      }
     }
     if (c === '{') {
       braceOpen++
@@ -608,6 +641,10 @@ export const canonicalMathPositions = (math) => {
     if (c === '}') {
       if (braceOpen === braceOpenFont) {
         fontControl = null;
+      }
+      braceOpen--;
+      if (braceOpen === braceOpenParentCommand) {
+        parentCommand = '';
       }
       braceOpen--;
     }
@@ -634,7 +671,8 @@ export const canonicalMathPositions = (math) => {
           start: startPos,
           end: i
         },
-        fontControl: fontControl
+        fontControl: fontControl,
+        parentCommand: parentCommand
       });
     }
   }

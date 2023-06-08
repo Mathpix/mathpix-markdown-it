@@ -39,6 +39,7 @@ import {
 const isSpace = require('markdown-it/lib/common/utils').isSpace;
 import { envArraysShouldBeFlattenInTSV } from '../helpers/consts';
 import { getTerminatedRules } from './common';
+import { highlightText } from "./highlight/common";
 
 function MathML(state, silent, pos, endMarker = '', type = "inline_mathML") {
   const markerBegin = RegExp('^</?(math)(?=(\\s|>|$))', 'i');
@@ -787,6 +788,9 @@ const renderReference = (token, options, env, slf) => {
   if (dataParentheses === "true" &&  reference) {
     reference = '(' + reference + ')'
   }
+  if (token.highlights?.length) {
+    token.highlightAll = reference !== token.content;
+  }
   if (!reference) {
     /** If the label could not be found in the list, then we display the content of this label */
     reference = '[' + token.content + ']';
@@ -795,7 +799,8 @@ const renderReference = (token, options, env, slf) => {
     ? `<div class="math-block">`
     : '';
   html += `<a href="#${id}" style="cursor: pointer; text-decoration: none;" class="clickable-link" value="${id}" data-parentheses="${dataParentheses}">`;
-  html += reference;
+  html += token.highlights?.length 
+    ? highlightText(token, reference) : reference;
   html += '</a>';
   html += token.type === "reference_note_block" ? '</div>' : '';
   return html;
