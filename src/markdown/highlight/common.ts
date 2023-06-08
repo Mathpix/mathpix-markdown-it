@@ -47,6 +47,21 @@ export const getStyleFromHighlight = (highlight): string => {
   return dataAttrsStyle;
 };
 
+export const needToHighlightAll = (token) => {
+  let res = false;
+  for (let i = 0; i < token.highlights.length; i++) {
+    let startPos = token.highlights[i].start;
+    if (token.positions.hasOwnProperty('start_content')){
+      if (token.positions.start_content > startPos){
+        token.highlightAll = true;
+        res = true;
+        break;
+      }
+    }
+  }
+  return res;
+};
+
 export const highlightText = (token, content = '') => {
   if (token.highlights?.length) {
     let highlightContent = [];

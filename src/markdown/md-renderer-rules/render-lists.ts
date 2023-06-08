@@ -1,6 +1,7 @@
 import {PREVIEW_LINE_CLASS, PREVIEW_PARAGRAPH_PREFIX} from "../rules";
 import { GetItemizeLevelTokens, GetEnumerateLevel } from "../md-block-rule/lists/re-level";
 import { renderTabularInline } from "./render-tabular";
+import { needToHighlightAll, highlightText } from "../highlight/common";
 
 var level_itemize = 0;
 var level_enumerate = 0;
@@ -70,6 +71,13 @@ export const render_item_inline = (tokens, index, options, env, slf) => {
     }
     sContent +=  content
   }
+
+  if (token.highlights?.length) {
+    if (needToHighlightAll(token)) {
+      sContent = highlightText(token, sContent);
+    }
+  }
+  
   if (token.parentType !== "itemize" && token.parentType !== "enumerate") {
     return `<li>${sContent}</li>`;
   }
