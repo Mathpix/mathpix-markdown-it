@@ -4,7 +4,8 @@ import {
   renderMathHighlight,
   textHighlight, 
   codeInlineHighlight, 
-  renderTextUrlHighlight
+  renderTextUrlHighlight,
+  captionTableHighlight
 } from "./highlight/render-rule-highlights";
 
 export default (md: MarkdownIt, options) => {
@@ -21,5 +22,6 @@ export default (md: MarkdownIt, options) => {
       = md.renderer.rules.equation_math
       = md.renderer.rules.equation_math_not_number
       = renderMathHighlight;
+    md.renderer.rules.caption_table = captionTableHighlight;
   }
 }

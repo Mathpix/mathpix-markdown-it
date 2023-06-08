@@ -109,3 +109,15 @@ export const renderMathHighlight = (tokens, idx, options, env, slf) => {
   }
   return html;
 };
+
+export const captionTableHighlight = (tokens, idx, options, env, slf) => {
+  const token = tokens[idx];
+  if (token.highlights?.length) {
+    return `<div class=${token.attrGet('class')
+      ? token.attrGet('class')
+      : "caption_table"}>${token.print}${highlightText(token, token.caption)}</div>`
+  }
+  return `<div class=${token.attrGet('class')
+    ? token.attrGet('class')
+    : "caption_table"}>${token.content}</div>`
+};

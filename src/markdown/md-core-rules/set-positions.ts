@@ -155,7 +155,7 @@ export const setPositions = (state) => {
         offsetBlockquote -= token.markup.length;
       }
       /** Set positions for block tokens */
-      if (token.map) {
+      if (token.map && token.map?.length === 2 && token.map[0] >= 0 && token.map[1] >= 0) {
         const line = token.map[0];
         const endLine = token.map[1] > token.map[0] 
           ? token.map[1] - 1 

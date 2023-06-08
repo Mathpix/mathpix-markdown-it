@@ -72,7 +72,7 @@ export const highlightText = (token, content = '') => {
             end: endPos
           },
           highlight: token.highlights[i],
-          content: token.content.slice(startPos, endPos)
+          content: content ? content.slice(startPos, endPos) : token.content.slice(startPos, endPos)
         });
       }
     }
@@ -85,13 +85,13 @@ export const highlightText = (token, content = '') => {
     }
     let textStart = 0;
     highlightContent.map(item => {
-      textStr += token.content.slice(textStart, item.positions.start);
+      textStr += content ? content.slice(textStart, item.positions.start) : token.content.slice(textStart, item.positions.start);
       textStr += '<span style="' + getStyleFromHighlight(item.highlight) + '">';
       textStr += item.content;
       textStr += '</span>';
       textStart = item.positions.end;
     });
-    textStr += token.content.slice(textStart);
+    textStr += content ? content.slice(textStart) : token.content.slice(textStart);
     return textStr;
   } else {
     return token.content;
