@@ -7,6 +7,7 @@ import { uid , getSpacesFromLeft } from "./utils";
 import { ILabel, getLabelByUuidFromLabelsList } from "./common/labels";
 import { textCollapse } from "./md-inline-rule/text-collapse";
 import { newlineToSpace } from "./md-inline-rule/new-line-to-space";
+import { getStyleFromHighlight } from "./highlight/common";
 
 export let sectionCount: number = 0;
 export let subCount: number = 0;
@@ -1113,10 +1114,14 @@ const renderSectionTitle: Renderer = (tokens, index, options, env, slf) => {
     return content;
   }
   const label: ILabel = token.uuid ? getLabelByUuidFromLabelsList(token.uuid) : null;
+  let dataAttrsStyle = token.highlights?.length && token.highlightAll
+    ? getStyleFromHighlight(token.highlights[0])
+    : '';
+  let style = dataAttrsStyle ? ` style="${dataAttrsStyle}"` : '';
   const sectionNumber = token.is_numerable
     ? label 
-      ? `<span id="${label.id}" class="section-number">${token.section}. </span>`
-      : `<span class="section-number">${token.section}. </span>`
+      ? `<span id="${label.id}" class="section-number"${style}>${token.section}. </span>`
+      : `<span class="section-number"${style}>${token.section}. </span>`
     : ``;
   return `${sectionNumber}${content}`
 };
@@ -1128,9 +1133,13 @@ const renderSubsectionTitle: Renderer = (tokens, index, options, env, slf) => {
     return content;
   }
   const label: ILabel = token.uuid ? getLabelByUuidFromLabelsList(token.uuid) : null;
+  let dataAttrsStyle = token.highlights?.length && token.highlightAll
+    ? getStyleFromHighlight(token.highlights[0])
+    : '';
+  let style = dataAttrsStyle ? ` style="${dataAttrsStyle}"` : '';
   return label 
-    ? `<span id="${label.id}" class="section-number">${token.section}.</span><span class="sub_section-number">${token.subsection}.</span> ${content}`
-    : `<span class="section-number">${token.section}.</span><span class="sub_section-number">${token.subsection}.</span> ${content}`;
+    ? `<span id="${label.id}" class="section-number"${style}>${token.section}.</span><span class="sub_section-number"${style}>${token.subsection}.</span> ${content}`
+    : `<span class="section-number"${style}>${token.section}.</span><span class="sub_section-number"${style}>${token.subsection}.</span> ${content}`;
 };
 
 const renderSubSubsectionTitle: Renderer = (tokens, index, options, env, slf) => {
@@ -1140,9 +1149,13 @@ const renderSubSubsectionTitle: Renderer = (tokens, index, options, env, slf) =>
     return content;
   }
   const label: ILabel = token.uuid ? getLabelByUuidFromLabelsList(token.uuid) : null;
+  let dataAttrsStyle = token.highlights?.length && token.highlightAll
+    ? getStyleFromHighlight(token.highlights[0])
+    : '';
+  let style = dataAttrsStyle ? ` style="${dataAttrsStyle}"` : '';
   return label 
-    ? `<span id="${label.id}" class="section-number">${token.section}.</span><span class="sub_section-number">${token.subsection}.${token.subsubsection}.</span> ${content}`
-    : `<span class="section-number">${token.section}.</span><span class="sub_section-number">${token.subsection}.${token.subsubsection}.</span> ${content}`;
+    ? `<span id="${label.id}" class="section-number"${style}>${token.section}.</span><span class="sub_section-number"${style}>${token.subsection}.${token.subsubsection}.</span> ${content}`
+    : `<span class="section-number"${style}>${token.section}.</span><span class="sub_section-number"${style}>${token.subsection}.${token.subsubsection}.</span> ${content}`;
 };
 
 const getAuthorItemToken = (tokens, index, options, env, slf) => {

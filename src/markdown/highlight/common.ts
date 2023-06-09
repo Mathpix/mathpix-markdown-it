@@ -4,6 +4,51 @@ export const sortHighlights = (a, b) => {
   return a.start > b.start ? 1 : -1
 };
 
+export const findPositionsInHighlights = (highlights, positions) => {
+  let res = [];
+  if (!highlights.length) {
+    return res;
+  }
+  for (let i = 0; i < highlights.length; i++) {
+    let item = highlights[i];
+    if (item.start === 0 && item.end === 0) {
+      continue;
+    }
+    if (item.start > positions.end || item.end < positions.start) {
+      continue;
+    }
+    if (item.start >= positions.start) {
+      if (item.end <= positions.end) {
+        res.push(item);
+      } else {
+        res.push({
+          start: item.start,
+          end: positions.end,
+          highlight_color: item.highlight_color,
+          text_color: item.text_color,
+        });
+      }
+    } else {
+      if (item.end <= positions.end) {
+        res.push({
+          start: positions.start,
+          end: item.end,
+          highlight_color: item.highlight_color,
+          text_color: item.text_color,
+        });
+      } else {
+        res.push({
+          start: positions.start,
+          end: positions.end,
+          highlight_color: item.highlight_color,
+          text_color: item.text_color,
+        });
+      }
+    }
+  }
+  return res;
+};
+
 export const filteredHighlightContent = (highlightContent) => {
   let newArr = [];
   for(let i = 0; i < highlightContent.length; i++) {
@@ -57,6 +102,11 @@ export const needToHighlightAll = (token) => {
         res = true;
         break;
       }
+    }
+    if (token.positions.start === token.highlights[i].start && token.positions.end === token.highlights[i].end) {
+      token.highlightAll = true;
+      res = true;
+      break;
     }
   }
   return res;

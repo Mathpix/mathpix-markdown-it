@@ -1,5 +1,10 @@
 import { highlightMathToken } from "../highlight/highlight-math-token";
-import { sortHighlights, getStyleFromHighlight } from "../highlight/common";
+import { 
+  sortHighlights, 
+  findPositionsInHighlights, 
+  getStyleFromHighlight,
+  needToHighlightAll
+} from "../highlight/common";
 import { mathTokenTypes } from "../common/consts";
 
 const setChildrenPositions = (state, token, pos, highlights, isBlockquote = false) => {
@@ -7,6 +12,16 @@ const setChildrenPositions = (state, token, pos, highlights, isBlockquote = fals
     pos += token.offsetLeft;
   }
   let start_content = pos;
+  let hasInlineHtml = token.children.find(item => item.type === "html_inline");
+  if (hasInlineHtml && token.highlights?.length) {
+    token.highlightAll = true;
+    let dataAttrsStyle = getStyleFromHighlight(token.highlights[0]);
+    let style = token.attrGet('style');
+    style = style 
+      ? style + ' ' + dataAttrsStyle 
+      : dataAttrsStyle;
+    token.attrSet('style', style);
+  }
   for (let i = 0; i < token.children.length; i++) {
     let child = token.children[i];
     let childBefore = i - 1 >= 0 ? token.children[i-1] : null;
@@ -17,20 +32,26 @@ const setChildrenPositions = (state, token, pos, highlights, isBlockquote = fals
           start: startPos + 1,
           end: start_content + token.children[i+1].nextPos
         };
-        token.children[i+1].highlights = findPositionsInHighlights(highlights, token.children[i+1].positions);
+        if (!hasInlineHtml) {
+          token.children[i + 1].highlights = findPositionsInHighlights(highlights, token.children[i + 1].positions);
+        }
       } else {
         token.children[i+1].positions = {
           start: startPos + 1,
           end: startPos + 1 + token.children[i+1].content?.length
         };
-        token.children[i+1].highlights = findPositionsInHighlights(highlights, token.children[i+1].positions);
+        if (!hasInlineHtml) {
+          token.children[i + 1].highlights = findPositionsInHighlights(highlights, token.children[i + 1].positions);
+        }
       }
       token.children[i+1].content_test_str = state.src.slice(token.children[i+1].positions.start, token.children[i+1].positions.end);
       child.positions = {
         start: startPos,
         end: start_content + token.children[i+2].nextPos
       };
-      child.highlights = findPositionsInHighlights(highlights, child.positions);
+      if (!hasInlineHtml) {
+        child.highlights = findPositionsInHighlights(highlights, child.positions);
+      }
       if (!token.children[i+1].highlights?.length && child.highlights?.length) {
         child.highlightAll = true;
         let style = child.attrGet('style');
@@ -63,7 +84,9 @@ const setChildrenPositions = (state, token, pos, highlights, isBlockquote = fals
       start: startPos,
       end: pos
     };
-    child.highlights = findPositionsInHighlights(highlights, child.positions);
+    if (!hasInlineHtml) {
+      child.highlights = findPositionsInHighlights(highlights, child.positions);
+    }
     if (child?.inlinePos?.hasOwnProperty('start_content') && child.inlinePos?.hasOwnProperty('end_content')) {
       child.positions.start_content = start_content + child.inlinePos.start_content;
       child.positions.end_content = start_content + child.inlinePos.end_content;
@@ -116,23 +139,6 @@ const setChildrenPositions = (state, token, pos, highlights, isBlockquote = fals
   }
 };
 
-const findPositionsInHighlights = (highlights, positions) => {
-  let res = [];
-  if (!highlights.length) {
-    return res;
-  }
-  for (let i = 0; i < highlights.length; i++) {
-    let item = highlights[i];
-    if (item.start === 0 && item.end === 0) {
-      continue;
-    }
-    if (item.start >= positions.start && item.end <= positions.end) {
-      res.push(item);
-    }
-  }
-  return res;
-};
-
 export const setPositions = (state) => {
   const lines = state.env?.lines ? {...state.env?.lines} : null;
   if (!lines) {
@@ -147,6 +153,7 @@ export const setPositions = (state) => {
   let offsetBlockquote = 0;
   for (let i = 0; i < state.tokens.length; i++) {
     let token = state.tokens[i];
+    let tokenBefore = i -1 >= 0 ? state.tokens[i-1] : null;
     if (token.block) {
       if (token.type === "blockquote_open") {
         offsetBlockquote += token.markup.length;
@@ -186,6 +193,9 @@ export const setPositions = (state) => {
           end: endPos,
         };
         token.highlights = findPositionsInHighlights(highlights, token.positions);
+        if (token.highlights?.length) {
+          needToHighlightAll(token);
+        }
         if (token.hasOwnProperty('bMarksContent')) {
           token.positions.start_content = token.positions.start + token.bMarksContent;
           if (endLine-1 >= 0 ) {
@@ -201,6 +211,23 @@ export const setPositions = (state) => {
         let dataAttrsStyle = '';
         if (token.highlights?.length) {
           token.highlights.sort(sortHighlights);
+          if (token.type === 'fence' 
+            || token.type === 'code_block'
+            || token.type === 'html_block') {
+            let style = token.attrGet('style');
+            style = style ? style : '';
+            token.attrSet('style', getStyleFromHighlight(token.highlights[0]) + style);
+            if (token.type === 'code_block') {
+              let className = token.attrGet('class');
+              className = className 
+                ? className + ' ' + 'mmd-highlight'
+                : 'mmd-highlight';
+              token.attrSet('class', className);
+            }
+          }          
+          if (token.type === 'includegraphics') {
+            token.attrSet('data-mmd-highlight', getStyleFromHighlight(token.highlights[0]));
+          }
           if (token.positions.start_content > token.highlights?.[0].start) {
             if (token.highlights?.[0].highlight_color) {
               dataAttrsStyle += `background-color: ${token.highlights?.[0].highlight_color};`;
@@ -239,6 +266,18 @@ export const setPositions = (state) => {
           ? token.positions.start_content
           : token.positions?.start ? token.positions.start : 0;
         pos += offsetContent;
+        if (token.type === 'inline' && tokenBefore?.type === 'paragraph_open') {
+          let hasInlineHtml = token.children.find(item => item.type === "html_inline");
+          if (hasInlineHtml && token.highlights?.length) {
+            token.highlightAll = true;
+            let dataAttrsStyle = getStyleFromHighlight(token.highlights[0]);
+            let style = tokenBefore.attrGet('style');
+            style = style
+              ? style + ' ' + dataAttrsStyle
+              : dataAttrsStyle;
+            tokenBefore.attrSet('style', style);
+          }
+        }
         const data = setChildrenPositions(state, token, pos, highlights, offsetBlockquote > 0);
         token = data.token;
       }

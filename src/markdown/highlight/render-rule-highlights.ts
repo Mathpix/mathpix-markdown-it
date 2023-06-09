@@ -1,4 +1,4 @@
-import { getStyleFromHighlight, sortHighlights, highlightText } from "./common";
+import { getStyleFromHighlight, sortHighlights, highlightText, needToHighlightAll } from "./common";
 import { OuterHTML } from "../../mathjax";
 const escapeHtml = require('markdown-it/lib/common/utils').escapeHtml;
 import { HIGHLIGHT_COLOR, HIGHLIGHT_TEXT_COLOR } from "../common/consts";
@@ -14,7 +14,12 @@ export const codeInlineHighlight = (tokens, idx, options, env, slf) => {
     token.highlights.sort(sortHighlights);
     let highlightContent = [];
     for (let i = 0; i < token.highlights.length; i++) {
-      let startPos = token.highlights[i].start - token.positions.start - token.markup?.length;
+      if (token.highlights[i].start === token.positions.start && token.highlights[i].end === token.positions.end) {
+        token.highlightAll = true;
+        break;
+      }
+      let startPos = token.highlights[i].start <= token.positions.start 
+        ? 0 : token.highlights[i].start - token.positions.start - token.markup?.length;
       let endPos = token.highlights[i].end - token.positions.start - token.markup?.length;
       highlightContent.push({
         positions: {
@@ -26,6 +31,19 @@ export const codeInlineHighlight = (tokens, idx, options, env, slf) => {
       });
     }
     let textStr = '';
+    if (token.highlightAll) {
+      let style = token.attrGet('style');
+      style = style 
+        ? 'background-color: transparent;' + style 
+        : 'background-color: transparent;';
+      token.attrSet('style', style);
+      textStr += '<span class="mmd-highlight" style="' + getStyleFromHighlight(token.highlights[0]) + '">';
+      textStr += '<code' + slf.renderAttrs(token) + '>';
+      textStr += escapeHtml(token.content);
+      textStr += '</code>';
+      textStr += '</span>';
+      return textStr;
+    }
     let textStart = 0;
     let newArr = [];
     /** Filtered */
@@ -113,6 +131,11 @@ export const renderMathHighlight = (tokens, idx, options, env, slf) => {
 export const captionTableHighlight = (tokens, idx, options, env, slf) => {
   const token = tokens[idx];
   if (token.highlights?.length) {
+    if (needToHighlightAll(token)) {
+      return `<div class=${token.attrGet('class')
+        ? token.attrGet('class')
+        : "caption_table"}>${highlightText(token, token.print + token.caption)}</div>`
+    }
     return `<div class=${token.attrGet('class')
       ? token.attrGet('class')
       : "caption_table"}>${token.print}${highlightText(token, token.caption)}</div>`

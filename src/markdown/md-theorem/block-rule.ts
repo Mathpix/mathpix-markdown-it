@@ -324,6 +324,11 @@ export const BeginTheorem: RuleBlock = (state, startLine, endLine, silent) => {
     token.environment = envName;
     token.content = "";
     token.children = [];
+    if (namePositions) {
+      token.map = [namePositions.startLine, namePositions.endLine];
+      token.bMarks = namePositions.bMarks;
+      token.eMarks = namePositions.eMarks;
+    }
     
     if (envDescription) {
       token = state.push("theorem_description_open", "", 0);
@@ -350,6 +355,11 @@ export const BeginTheorem: RuleBlock = (state, startLine, endLine, silent) => {
       token.envDescription = envDescription;
       token.content = "";
       token.children = [];
+      if (descriptiontPositions) {
+        token.map = [descriptiontPositions.startLine, descriptiontPositions.endLine];
+        token.bMarks = descriptiontPositions.bMarks;
+        token.eMarks = descriptiontPositions.eMarks;
+      }
     }
   }
   
