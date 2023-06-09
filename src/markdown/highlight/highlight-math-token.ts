@@ -44,9 +44,7 @@ export const addedHighlightMathjaxFunctions = (token, mathContent) => {
   mathContent.map(item => {
     mathStr += token.content.slice(mathStart, item.positions.start);
     if (item.highlight.hasOwnProperty('text_color') || item.highlight.hasOwnProperty('highlight_color')) {
-      if (item.highlightIncludeIntoBraces) {
-        mathStr += `{`;
-      }
+      mathStr += `{`;
       if (item.highlight?.text_color) {
         mathStr += `\\textcolor{${item.highlight?.text_color}}{`;
       }
@@ -60,21 +58,15 @@ export const addedHighlightMathjaxFunctions = (token, mathContent) => {
       if (item.highlight?.text_color) {
         mathStr += `}`;
       }
-      if (item.highlightIncludeIntoBraces) {
-        mathStr += `}`;
-      }
+      mathStr += `}`;
     } else {
-      if (item.highlightIncludeIntoBraces) {
-        mathStr += `{`;
-      }
+      mathStr += `{`;
       mathStr += `\\textcolor{${HIGHLIGHT_TEXT_COLOR}}{`;
       mathStr += `\\colorbox{${HIGHLIGHT_COLOR}}{$`;
       mathStr += item.content;
       mathStr += '$}';
       mathStr += `}`;
-      if (item.highlightIncludeIntoBraces) {
-        mathStr += `}`;
-      }
+      mathStr += `}`;
     }
     mathStart = item.positions.end;
   });
@@ -108,13 +100,16 @@ export const highlightMathToken = (state, token) => {
         if (startMathPos >= token.canonicalizedPositions[k].positions.start
           && endMathPos <= token.canonicalizedPositions[k].positions.end) {
           /** Highlight all equation */
-          if (['\\hline', '\\begin', '\\end', '\\label', '\\tag'].includes(token.canonicalizedPositions[k].content)) {
+          if (['\\hline', '\\begin', '\\end', '\\label', '\\tag', '\\frac', 
+            '\\limits', '\\nolimits', 
+            '\\overset', '\\underset', '\\stackrel',
+            '\\left', '\\right'].includes(token.canonicalizedPositions[k].content)) {
             mathContent = [];
             isBreak = true;
             break;
           }          
           /** Highlight all equation */
-          if (['\\label', '\\tag'].includes(token.canonicalizedPositions[k].parentCommand)) {
+          if (['\\label', '\\tag', '\\operatorname'].includes(token.canonicalizedPositions[k].parentCommand)) {
             mathContent = [];
             isBreak = true;
             break;
@@ -130,6 +125,11 @@ export const highlightMathToken = (state, token) => {
             }
           }
 
+          if (nextItem?.content === '\\limits' || nextItem?.content === '\\nolimits') {
+            mathContent = [];
+            isBreak = true;
+            break;
+          }
           /** Highlight part of equation */
           if (nextItem?.content === '{') {
             /** Find close branch */

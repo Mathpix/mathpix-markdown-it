@@ -107,6 +107,9 @@ const setChildrenPositions = (state, token, pos, highlights, isBlockquote = fals
           highlightMathToken(state, child);
         }
       }
+      if (child.type === 'includegraphics') {
+        child.attrSet('data-mmd-highlight', getStyleFromHighlight(token.highlights[0]));
+      }
     }
 
     if (isBlockquote) {
