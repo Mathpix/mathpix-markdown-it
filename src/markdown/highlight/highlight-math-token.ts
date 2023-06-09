@@ -30,9 +30,9 @@ export const convertMathToHtmlWithHighlight = (state, token, options) => {
     return token;
   } catch (e) {
     // console.log('ERROR MathJax =>', e.message, e);
-    console.log('ERROR MathJax =>token=>', token);
+    // console.log('ERROR MathJax =>token=>', token);
     console.log('ERROR MathJax =>content_highlight=>', token.content_highlight);
-    console.error('ERROR MathJax =>', e.message, e);
+    // console.error('ERROR MathJax =>', e.message, e);
     token.highlightAll = true;
     return token;
   }
