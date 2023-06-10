@@ -45,8 +45,14 @@ export const theoremStyle: RuleInline = (state) => {
   const token = state.push("theoremstyle", "", 0);
   token.content = "";
   token.children = [];
+  token.hidden = true;
+  token.inlinePos = {
+    start: state.pos,
+    end: nextPos
+  };
   if (state.md.options.forLatex) {
     token.latex = latex;
+    token.hidden = false;
   }
   state.pos = nextPos;
   return true;
@@ -196,8 +202,14 @@ export const newTheorem: RuleInline = (state) => {
   const token = state.push("newtheorem", "", 0);
   token.content = "";
   token.children = [];
+  token.hidden = true;
+  token.inlinePos = {
+    start: state.pos,
+    end: nextPos
+  };
   if (state.md.options.forLatex) {
     token.latex = content;
+    token.hidden = false;
   }
   state.pos = nextPos;
   return true;
@@ -236,8 +248,14 @@ export const setCounterTheorem: RuleInline = (state) => {
   const token = state.push("theorem_setcounter", "", 0);
   token.content = "";
   token.children = [];
+  token.hidden = true;
+  token.inlinePos = {
+    start: state.pos,
+    end: nextPos
+  };
   if (state.md.options.forLatex) {
     token.latex = content;
+    token.hidden = false;
   }
   state.pos = nextPos;
   return true;
@@ -268,8 +286,14 @@ export const newCommandQedSymbol: RuleInline = (state) => {
   const token = state.push("renewcommand_qedsymbol", "", 0);
   token.content = "";
   token.children = [];
+  token.hidden = true;
+  token.inlinePos = {
+    start: state.pos,
+    end: nextPos
+  };
   if (state.md.options.forLatex) {
     token.latex = latex;
+    token.hidden = false;
   }
   state.pos = nextPos;
   return true;

@@ -1,6 +1,7 @@
 import { MarkdownIt } from 'markdown-it';
 import { theoremEnvironments, getTheoremEnvironmentIndex } from "./helper";
 import { ILabel, getLabelByUuidFromLabelsList } from "../common/labels";
+import {getStyleFromHighlight} from "../highlight/common";
 
 const renderTheoremOpen = (tokens, idx, options, env, slf) => {
   const token = tokens[idx];
@@ -73,6 +74,10 @@ const renderTheoremPrintClose = (tokens, idx, options, env, slf) => {
       ? ' ' + envNumber
       : '';
     htmlPrint += envStyle === "plain" ? '.' : envDescription ? '' : '.';
+    if (token.highlights?.length && token.highlightAll) {
+      let dataAttrsStyle = getStyleFromHighlight(token.highlights[0]);
+      htmlPrint = `<span style="${dataAttrsStyle}">` + htmlPrint + '</span>';
+    }
     htmlPrint += options.forDocx ? `</div>` : `</span>`;
     const htmlSpaceMin = options.forDocx
       ? '<span>&nbsp;</span>'
@@ -126,7 +131,10 @@ const renderProofOpen = (tokens, idx, options, env, slf) => {
   const labelRef = label ? label.id : '';
   const styleTile = "font-style: italic;";
   const styleBody = "font-style: normal; padding: 10px 0;";
-  let htmlTitle = `<span style="${styleTile}">Proof.</span>`;
+  let dataAttrsStyle = token.highlights?.length && token.highlightAll 
+    ? getStyleFromHighlight(token.highlights[0]) 
+    : '';
+  let htmlTitle = `<span style="${styleTile}${dataAttrsStyle}">Proof.</span>`;
   const htmlSpaceMin = options.forDocx 
   ? '<span>&nbsp;</span>'
   : '<span style="margin-right: 10px"></span>';

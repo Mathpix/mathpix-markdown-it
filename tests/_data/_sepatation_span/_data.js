@@ -5,7 +5,7 @@ module.exports = [
       'The tabular environment\n' +
       '}',
     html: '<span class="page-1 scroll-percentage-12 h-0 w-0 overflow-hidden"></span><h1 type="title" class="main-title" id="the-tabular-environment">\n' +
-      'The tabular environment</h1>'
+      'The tabular environment </h1>'
   },
   {
     describe: 'before \\title{}',
@@ -13,7 +13,7 @@ module.exports = [
       'The tabular environment\n' +
       '}',
     html: '<span class="preview-pdf-page-1 w-0 h-0 overflow-auto"></span><span class="page-1 scroll-percentage-12 h-0 w-0 overflow-hidden"></span><h1 type="title" class="main-title" id="the-tabular-environment">\n' +
-      'The tabular environment</h1>'
+      'The tabular environment </h1>'
   },  
   {
     describe: 'before and after \\title{}',
@@ -21,7 +21,7 @@ module.exports = [
       'The tabular environment\n' +
       '}<span class="page-1 scroll-percentage-17 h-0 w-0 overflow-hidden"></span>',
     html: '<span class="preview-pdf-page-1 w-0 h-0 overflow-auto"></span><span class="page-1 scroll-percentage-12 h-0 w-0 overflow-hidden"></span><h1 type="title" class="main-title" id="the-tabular-environment">\n' +
-      'The tabular environment</h1>\n' +
+      'The tabular environment </h1>\n' +
       '<span class="page-1 scroll-percentage-17 h-0 w-0 overflow-hidden"></span>'
   },  
   {

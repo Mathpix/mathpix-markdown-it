@@ -51,6 +51,9 @@ export const reMultiRow: RegExp = /(?:\\multirow\s{0,}\{(?<nrows>[^}]*)\}\s{0,}\
 export const openTagTabular: RegExp = /^\\begin\s{0,}{tabular}\s{0,}\{([^}]*)\}/;
 export const closeTagTabular: RegExp = /^\\end\s{0,}{tabular}/;
 
+export const HIGHLIGHT_COLOR = 'rgba(0, 147, 255, 0.25)';
+export const HIGHLIGHT_TEXT_COLOR = '#1e2029';
+
 export const latexEnvironments = [
   "figure",
   "table",

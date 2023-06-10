@@ -5,6 +5,10 @@ export const codeStyles = `
       display: initial;
       background: #f8f8fa;
     }
+    #preview-content .mmd-highlight code, #setText .mmd-highlight code, 
+    #preview-content pre.mmd-highlight code, #setText pre.mmd-highlight code {
+      background-color: transparent;
+    }
     #preview-content pre code, #setText pre code {
       font-family: 'DM Mono', Inconsolata, monospace;
       display: block;

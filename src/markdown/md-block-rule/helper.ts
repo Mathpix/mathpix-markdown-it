@@ -1,4 +1,4 @@
-export const SetTokensBlockParse = (state, content, startLine?, endLine?, isInline = false) => {
+export const SetTokensBlockParse = (state, content, startLine?, endLine?, isInline = false, contentPositions = null) => {
   let token;
   let children = [];
   state.md.block.parse(content, state.md, state.env, children);
@@ -22,6 +22,12 @@ export const SetTokensBlockParse = (state, content, startLine?, endLine?, isInli
     }
     if (startLine && endLine) {
       token.map = [startLine, endLine];
+    }
+    if (contentPositions?.hasOwnProperty('startLine') && child.map) {
+      token.map = [contentPositions.startLine + child.map[0], contentPositions.startLine + child.map[1]];
+      if (j === 1 && child.type === "inline") {
+        token.bMarks = contentPositions.bMarks
+      }
     }
     token.content = child.content;
     token.children = child.children;

@@ -3,3 +3,4 @@ export const endTag = (arg: string): RegExp  => {
 };
 
 export const includegraphicsTag: RegExp = /\\includegraphics\s{0,}\[?([^}]*)\]?\s{0,}\{([^}]*)\}/;
+export const includegraphicsTagB: RegExp = /^\\includegraphics\s{0,}\[?([^}]*)\]?\s{0,}\{([^}]*)\}/;

@@ -1,6 +1,6 @@
 import { Token } from 'markdown-it';
 import * as parseLinkDestination from 'markdown-it/lib/helpers/parse_link_destination';
-import { includegraphicsTag } from "./utils";
+import { includegraphicsTag, includegraphicsTagB } from "./utils";
 import { normalizeLink } from "../../helpers/normalize-link";
 
 const parseParams = (str: string, align: string=''): {attr: Array<Array<string>>, align: string} |null => {
@@ -74,10 +74,14 @@ export const ParseIncludeGraphics = (str: string, i: number, align: string='') =
     }
 
     const { attrs, latex } = getAttrIncludeGraphics(match, align);
-
+    let inlinePos = {
+      start: posB + match.index,
+      end: posB
+    };
     posB += match.index + match[0].length;
     i = posB;
-    res.push({token: 'includegraphics', tag: 'img', n: 0, attrs: attrs, content: '', pos: posB, latex: latex});
+    inlinePos.end = i;
+    res.push({token: 'includegraphics', tag: 'img', n: 0, attrs: attrs, content: '', pos: posB, latex: latex, inlinePos: inlinePos});
   }
   return res;
 };
@@ -97,6 +101,7 @@ export const StatePushIncludeGraphics = (state, startLine: number, nextLine: num
 
   for (let j = 0; j < res.length; j++) {
     token          = state.push(res[j].token, res[j].tag, res[j].n);
+    token.map = [startLine, nextLine];
     if (res[j].attrs) {
       token.attrs  = [].concat(res[j].attrs);
     }
@@ -106,6 +111,9 @@ export const StatePushIncludeGraphics = (state, startLine: number, nextLine: num
     }
     if (state.md.options.forLatex && res[j].latex) {
       token.latex = res[j].latex;
+    }
+    if (res[j].inlinePos) {
+      token.inlinePos = res[j].inlinePos;
     }
   }
   return true;
@@ -119,7 +127,7 @@ export const InlineIncludeGraphics = (state, silent) => {
 
   let match: RegExpMatchArray = state.src
     .slice(startMathPos)
-    .match(includegraphicsTag);
+    .match(includegraphicsTagB);
   if (!match) {
     return false
   }
@@ -136,6 +144,10 @@ export const InlineIncludeGraphics = (state, silent) => {
     token.content = '';
     if (state.md.options.forLatex) {
       token.latex = latex;
+    }
+    token.inlinePos = {
+      start: match.index,
+      end: match.index + match[0].length
     }
   }
   state.pos = startMathPos + match.index + match[0].length;

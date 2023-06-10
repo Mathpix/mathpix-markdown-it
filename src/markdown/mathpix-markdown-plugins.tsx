@@ -28,7 +28,9 @@ export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
     showPageBreaks = false,
     centerImages = true,
     centerTables = true,
-    enableCodeBlockRuleForLatexCommands = false
+    enableCodeBlockRuleForLatexCommands = false,
+    addPositionsToTokens = false,
+    highlights = []
   } = options;
   Object.assign(md.options, smiles);
   Object.assign(md.options, {
@@ -45,7 +47,9 @@ export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
     showPageBreaks: showPageBreaks,
     centerImages: centerImages,
     centerTables: centerTables,
-    enableCodeBlockRuleForLatexCommands: enableCodeBlockRuleForLatexCommands
+    enableCodeBlockRuleForLatexCommands: enableCodeBlockRuleForLatexCommands,
+    addPositionsToTokens: addPositionsToTokens,
+    highlights: highlights
   });
 
   md
@@ -67,6 +71,124 @@ export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
       ? validateLink 
       : validateLinkEnableFile;
   }
+  /**
+   * ParserBlock.parse(str, md, env, outTokens)
+   *
+   * Process input string and push block tokens into `outTokens`
+   **/
+  if (addPositionsToTokens || md.options.highlights?.length) {
+    md.block.parse = function (src, md, env, outTokens) {
+      var state;
+      if (!src) { return; }
+      state = new this.State(src, md, env, outTokens);
+      if (!env.lines) {
+        /** Copy block state lines */
+        env.lines = {
+          bMarks: [...state.bMarks],
+          eMarks: [...state.eMarks],
+          line: [...state.line],
+          lineMax: [...state.lineMax],
+          sCount: [...state.sCount],
+          tShift: [...state.tShift],
+        }
+      }
+      this.tokenize(state, state.line, state.lineMax);
+    };
+    
+    // Generate tokens for input range
+    md.inline.tokenize = function (state) {
+      var ok, i,
+        rules = this.ruler.getRules(''),
+        len = rules.length,
+        end = state.posMax,
+        maxNesting = state.md.options.maxNesting;
+      while (state.pos < end) {
+        // Try all possible rules.
+        // On success, rule should:
+        //
+        // - update `state.pos`
+        // - update `state.tokens`
+        // - return true
+
+        if (state.level < maxNesting) {
+          for (i = 0; i < len; i++) {
+            ok = rules[i](state, false);
+            if (ok) {
+              if (!state.pending && state.tokens?.length) {
+                let token = state.tokens[state.tokens.length - 1];
+                token.nextPos = state.pos;
+              }
+              break; 
+            }
+          }
+        }
+
+        if (ok) {
+          if (state.pos >= end) { break; }
+          continue;
+        }
+
+        state.pending += state.src[state.pos++];
+      }
+
+      if (state.pending) {
+        state.pushPending();
+      }
+    };
+    
+    
+    /**
+     * ParserInline.parse(str, md, env, outTokens)
+     *
+     * Process input string and push inline tokens into `outTokens`
+     **/
+    md.inline.parse = function (str, md, env, outTokens) {
+      var i, rules, len;
+      var state = new this.State(str, md, env, outTokens);
+      
+      state.pushPending = () => {
+        var token = new state.Token('text', '', 0);
+        token.content = state.pending;
+        token.level = state.pendingLevel;
+        token.nextPos = state.isPendingBeforeLink ? state.pos - 1 : state.pos;
+        state.tokens.push(token);
+        state.pending = '';
+        return token;
+      };
+      
+      state.push = function (type, tag, nesting) {
+        if (state.pending) {
+          if (type === 'link_open' || type === 'sup_open' || type === 'sub_open') {
+            state.isPendingBeforeLink = true;
+            this.pushPending();
+            state.isPendingBeforeLink = false;
+          } else {
+            this.pushPending();
+          }
+        }
+
+        var token = new state.Token(type, tag, nesting);
+
+        if (nesting < 0) state.level--; // closing tag
+        token.level = state.level;
+        if (nesting > 0) state.level++; // opening tag
+        
+        state.pendingLevel = state.level;
+        state.tokens.push(token);
+        return token;
+      };
+      
+      this.tokenize(state);
+
+      rules = this.ruler2.getRules('');
+      len = rules.length;
+
+      for (i = 0; i < len; i++) {
+        rules[i](state);
+      }
+    };
+  }
+
   injectLabelIdToParagraph(md);
 };
 

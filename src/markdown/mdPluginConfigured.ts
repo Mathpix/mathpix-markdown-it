@@ -8,6 +8,7 @@ import listsPlugin from './mdPluginLists';
 import collapsiblePlugin from './mdPluginCollapsible';
 import ChemistryPlugin from './md-chemistry';
 import SvgToBase64Plugin from './md-svg-to-base64';
+import setPositionsAndHighlightPlugin from "./mdSetPositionsAndHighlight";
 
 /**
  * configured custom mathjax plugin
@@ -27,3 +28,4 @@ export const mdPluginChemistry = ChemistryPlugin;
 export const mdPluginSvgToBase64 = SvgToBase64Plugin;
 
 export const mdPluginCollapsible = collapsiblePlugin;
+export const mdSetPositionsAndHighlight = setPositionsAndHighlightPlugin;

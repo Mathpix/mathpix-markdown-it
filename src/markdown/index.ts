@@ -1,9 +1,9 @@
-import { mdPluginCollapsible } from "./mdPluginConfigured";
+import { mdPluginCollapsible, mdSetPositionsAndHighlight } from "./mdPluginConfigured";
 
 import { mathpixMarkdownPlugin } from './mathpix-markdown-plugins';
 
 import { injectRenderRules } from "./rules";
-import {MathpixMarkdownModel as MM, TMarkdownItOptions} from '../mathpix-markdown-model'
+import { MathpixMarkdownModel as MM, TMarkdownItOptions } from '../mathpix-markdown-model';
 
 /** md renderer */
 const mdInit = (options: TMarkdownItOptions) => {
@@ -20,7 +20,9 @@ const mdInit = (options: TMarkdownItOptions) => {
     showPageBreaks = false,
     centerImages = true,
     centerTables = true,
-    enableCodeBlockRuleForLatexCommands = false
+    enableCodeBlockRuleForLatexCommands = false,
+    addPositionsToTokens = false,
+    highlights = []
   } = options;
   const mmdOptions = {
     width: width,
@@ -38,7 +40,9 @@ const mdInit = (options: TMarkdownItOptions) => {
     showPageBreaks: showPageBreaks,
     centerImages: centerImages,
     centerTables: centerTables,
-    enableCodeBlockRuleForLatexCommands: enableCodeBlockRuleForLatexCommands
+    enableCodeBlockRuleForLatexCommands: enableCodeBlockRuleForLatexCommands,
+    addPositionsToTokens: addPositionsToTokens,
+    highlights: highlights
   };
   let md = require("markdown-it")({
     html: htmlTags,
@@ -71,7 +75,10 @@ const mdInit = (options: TMarkdownItOptions) => {
       md.use(require("markdown-it-emoji"))
     }
   }
-
+  if (addPositionsToTokens || highlights?.length) {
+    /** SetPositions plugin should be last */
+    md.use(mdSetPositionsAndHighlight, mmdOptions);
+  }
   return md;
 };
 
