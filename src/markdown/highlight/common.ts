@@ -17,7 +17,7 @@ export const mergingHighlights = (highlights) => {
       : -1;
     if (index === -1) {
       let lastIndex = newArr?.length ? newArr.length - 1 : -1;
-      if (lastIndex >= 0 && newArr[lastIndex].end + 1 >= highlights[i].start) {
+      if (lastIndex >= 0 && newArr[lastIndex].end > highlights[i].start) {
         newArr[lastIndex].end = newArr[lastIndex].end > highlights[i].end 
           ? newArr[lastIndex].end 
           : highlights[i].end;
