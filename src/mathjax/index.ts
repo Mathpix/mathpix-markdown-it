@@ -1,6 +1,7 @@
 import { MathJaxConfigure, svg } from './mathjax';
 
 import { SerializedMmlVisitor as MmlVisitor } from 'mathjax-full/js/core/MmlTree/SerializedMmlVisitor.js';
+import { LiteElement } from "mathjax-full/js/adaptors/lite/Element.js";
 import { SerializedAsciiVisitor as AsciiVisitor } from './serialized-ascii';
 import { MathMLVisitorWord } from './mathml-word';
 import { getSpeech } from '../sre';
@@ -23,7 +24,9 @@ export interface IOuterData {
   speech?: string,
   labels?: {
     [key: string]: Label;
-  }
+  },
+  height?: number,
+  heightAndDepth?: number,
 }
 
 const toMathML = (node => {
@@ -61,7 +64,7 @@ const applySpeechToNode = (adaptor, node, sre): string => {
   return speech;
 };
 
-const OuterData = (adaptor, node, math, outMath, forDocx = false, accessibility?, node_highlight?): IOuterData => {
+const OuterData = (adaptor, node, math, outMath, forDocx = false, accessibility?): IOuterData => {
   const {
     include_mathml = false,
     include_mathml_word = false,
@@ -104,9 +107,31 @@ const OuterData = (adaptor, node, math, outMath, forDocx = false, accessibility?
       : math.inputJax.processStrings ? '' : math.start.node.outerHTML);
   }
   if (include_svg) {
-    res.svg = node_highlight 
-      ? adaptor.outerHTML(node_highlight) 
-      : adaptor.outerHTML(node);
+    res.svg = adaptor.outerHTML(node);
+    if (node) {
+      if (node instanceof LiteElement) {
+        let svgElement: LiteElement = node.children?.length
+            ? node.children.find((item: LiteElement) => item.kind === 'svg') as LiteElement
+            : null;
+        let viewBox = svgElement ? svgElement.attributes?.viewBox : '';
+        let viewBoxArr = viewBox ? viewBox.split(' ') : [];
+        let height = viewBoxArr?.length > 3 ? Math.abs(viewBoxArr[1])/1000 : 0;
+        let heightAndDepth = viewBoxArr?.length > 3 ? Math.abs(viewBoxArr[3])/1000 : 0;
+        res.height = height;
+        res.heightAndDepth = heightAndDepth;
+      } else {
+        if (node instanceof HTMLElement) {
+          let svgElements = node.getElementsByTagName('svg');
+          let svgElement = svgElements ? svgElements[0]: null;
+          let viewBox = svgElement ? svgElement.getAttribute('viewBox') : '';
+          let viewBoxArr = viewBox ? viewBox.split(' ') : [];
+          let height = viewBoxArr?.length > 3 ? Math.abs(Number(viewBoxArr[1]))/1000 : 0;
+          let heightAndDepth = viewBoxArr?.length > 3 ? Math.abs(Number(viewBoxArr[3]))/1000 : 0;
+          res.height = height;
+          res.heightAndDepth = heightAndDepth;
+        }
+      }
+    }
   }
   /** Get information about the current labels. */
   res.labels = math.inputJax.parseOptions?.tags?.labels

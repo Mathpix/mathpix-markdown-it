@@ -18,7 +18,6 @@ describe('Check mmd highlighting:', () => {
   tests.forEach(function(test) {
     const html = MM.markdownToHTML(test.content,
       Object.assign({}, options, { highlights: test.highlights}));
-    
     describe('Render mmd highlighting => ' + test.content, () => {
       it('Checking result html', (done) => {
         html.trim().should.equal(test.html);

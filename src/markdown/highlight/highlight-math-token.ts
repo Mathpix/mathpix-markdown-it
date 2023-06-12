@@ -27,6 +27,8 @@ export const convertMathToHtmlWithHighlight = (state, token, options) => {
       nonumbers: options.nonumbers
     }, true);
     token.mathData.svg = data.data.svg;
+    token.mathData.height = data.data.height;
+    token.mathData.heightAndDepth = data.data.heightAndDepth;
     return token;
   } catch (e) {
     // console.log('ERROR MathJax =>', e.message, e);

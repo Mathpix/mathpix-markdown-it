@@ -13,6 +13,8 @@ export interface IOuterData {
     labels?: {
         [key: string]: Label;
     };
+    height?: number;
+    heightAndDepth?: number;
 }
 export declare const OuterHTML: (data: any, outMath: any) => string;
 export declare const MathJax: {
@@ -50,6 +52,8 @@ export declare const MathJax: {
             labels?: {
                 [key: string]: Label;
             };
+            height?: number;
+            heightAndDepth?: number;
         };
     };
     TypesetSvgAndAscii: (string: any, options?: any) => {
@@ -74,6 +78,8 @@ export declare const MathJax: {
             labels?: {
                 [key: string]: Label;
             };
+            height?: number;
+            heightAndDepth?: number;
         };
     };
     /**
