@@ -1,9 +1,8 @@
 import { highlightMathToken } from "../highlight/highlight-math-token";
-import { 
-  sortHighlights, 
-  findPositionsInHighlights, 
+import {
+  findPositionsInHighlights,
   getStyleFromHighlight,
-  needToHighlightAll
+  needToHighlightAll, mergingHighlights
 } from "../highlight/common";
 import { mathTokenTypes } from "../common/consts";
 
@@ -213,7 +212,7 @@ export const setPositions = (state) => {
         
         let dataAttrsStyle = '';
         if (token.highlights?.length) {
-          token.highlights.sort(sortHighlights);
+          token.highlights = mergingHighlights(token.highlights);
           if (token.type === 'fence' 
             || token.type === 'code_block'
             || token.type === 'html_block') {

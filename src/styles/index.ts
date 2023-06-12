@@ -73,12 +73,11 @@ export const MathpixStyle = (setTextAlignJustify: boolean = false, useColors: bo
     .math-block[data-highlight-text-color] mjx-container[jax="SVG"] > svg {
       color: var(--mmd-highlight-text-color);
     }    
-    
-    .math-inline[data-highlight-color] mjx-container[jax="SVG"] > svg {
+    .math-inline[data-highlight-color] mjx-container[jax="SVG"] {
       background-color: var(--mmd-highlight-color);
     }    
     
-    .math-inline[data-highlight-text-color] mjx-container[jax="SVG"] > svg {
+    .math-inline[data-highlight-text-color] mjx-container[jax="SVG"] {
       color: var(--mmd-highlight-text-color);
     }
     

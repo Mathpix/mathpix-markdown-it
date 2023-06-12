@@ -1,4 +1,9 @@
-import { getStyleFromHighlight, sortHighlights, highlightText, needToHighlightAll } from "./common";
+import { 
+  getStyleFromHighlight, 
+  highlightText, 
+  needToHighlightAll, 
+  mergingHighlights
+} from "./common";
 import { OuterHTML } from "../../mathjax";
 const escapeHtml = require('markdown-it/lib/common/utils').escapeHtml;
 import { HIGHLIGHT_COLOR, HIGHLIGHT_TEXT_COLOR } from "../common/consts";
@@ -11,7 +16,7 @@ export const textHighlight = (tokens, idx, options, env, self) => {
 export const codeInlineHighlight = (tokens, idx, options, env, slf) => {
   const token = tokens[idx];
   if (token.highlights?.length) {
-    token.highlights.sort(sortHighlights);
+    token.highlights = mergingHighlights(token.highlights);
     let highlightContent = [];
     for (let i = 0; i < token.highlights.length; i++) {
       if (token.highlights[i].start === token.positions.start && token.highlights[i].end === token.positions.end) {
@@ -91,24 +96,44 @@ export const renderMathHighlight = (tokens, idx, options, env, slf) => {
   const idLabels = token.idLabels;
   let html = '';
   let dataAttrs = '';
+  let x_height = 0.442; // In MathJax font.params.x_height: 0.442
+  let line_height = 1.0442;
+  let isHeightExceedsLineHeight = token.mathData?.height > line_height;
+  if (!isHeightExceedsLineHeight && token.mathData?.heightAndDepth > line_height 
+    && token.mathData?.heightAndDepth - token.mathData?.height > x_height) {
+    isHeightExceedsLineHeight = true;
+  }
   if (token.highlightAll) {
     let dataAttrsStyle = '';
     if (token.highlights?.length && (
       token.highlights[0].hasOwnProperty('highlight_color')
       || token.highlights[0].hasOwnProperty('text_color'))) {
       if (token.highlights[0].highlight_color) {
-        dataAttrs += ' data-highlight-color="true"';
-        dataAttrsStyle += `--mmd-highlight-color: ${token.highlights[0].highlight_color};`;
+        if (token.type === "inline_math" && !isHeightExceedsLineHeight) {
+          dataAttrsStyle += `background-color: ${token.highlights[0].highlight_color};`;
+        } else {
+          dataAttrs += ' data-highlight-color="true"';
+          dataAttrsStyle += `--mmd-highlight-color: ${token.highlights[0].highlight_color};`;
+        }
       }
       if (token.highlights[0].text_color) {
-        dataAttrs += ' data-highlight-text-color="true"';
-        dataAttrsStyle += `--mmd-highlight-text-color: ${token.highlights[0].text_color};`;
+        if (token.type === "inline_math" && !isHeightExceedsLineHeight) {
+          dataAttrsStyle += `color: ${token.highlights[0].text_color};`;
+        } else {
+          dataAttrs += ' data-highlight-text-color="true"';
+          dataAttrsStyle += `--mmd-highlight-text-color: ${token.highlights[0].text_color};`;
+        }
       }
     } else {
-      dataAttrs += ' data-highlight-color="true"';
-      dataAttrs += ' data-highlight-text-color="true"';
-      dataAttrsStyle += `--mmd-highlight-color: ${HIGHLIGHT_COLOR};`;
-      dataAttrsStyle += `--mmd-highlight-text-color: ${HIGHLIGHT_TEXT_COLOR};`;
+      if (token.type === "inline_math" && !isHeightExceedsLineHeight) {
+        dataAttrsStyle += `background-color: ${HIGHLIGHT_TEXT_COLOR};`;
+        dataAttrsStyle += `color: ${HIGHLIGHT_COLOR};`;
+      } else {
+        dataAttrs += ' data-highlight-color="true"';
+        dataAttrs += ' data-highlight-text-color="true"';
+        dataAttrsStyle += `--mmd-highlight-color: ${HIGHLIGHT_COLOR};`;
+        dataAttrsStyle += `--mmd-highlight-text-color: ${HIGHLIGHT_TEXT_COLOR};`;
+      }
     }
     dataAttrs += ' style="' + dataAttrsStyle + '"';
   }

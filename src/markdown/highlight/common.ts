@@ -4,6 +4,34 @@ export const sortHighlights = (a, b) => {
   return a.start > b.start ? 1 : -1
 };
 
+export const mergingHighlights = (highlights) => {
+  if (!highlights?.length || highlights?.length < 2) {
+    return highlights;
+  }
+  highlights.sort(sortHighlights);
+  let newArr = [];
+  for (let i = 0; i < highlights.length; i++) {
+    let index = newArr?.length
+      ? newArr.findIndex(item => item.start >= highlights[i].start
+        && item.end <= highlights[i].end)
+      : -1;
+    if (index === -1) {
+      let lastIndex = newArr?.length ? newArr.length - 1 : -1;
+      if (lastIndex >= 0 && newArr[lastIndex].end > highlights[i].start) {
+        newArr[lastIndex].end = newArr[lastIndex].end > highlights[i].end 
+          ? newArr[lastIndex].end 
+          : highlights[i].end;
+      } else {
+        newArr.push(highlights[i]);
+      }
+      continue;
+    }
+    newArr.splice(index, 1);
+    newArr.push(highlights[i]);
+  }
+  return newArr;
+};
+
 export const findPositionsInHighlights = (highlights, positions) => {
   let res = [];
   if (!highlights.length) {
@@ -116,7 +144,7 @@ export const highlightText = (token, content = '') => {
   if (token.highlights?.length) {
     let highlightContent = [];
     if (!token.highlightAll) {
-      token.highlights.sort(sortHighlights);
+      token.highlights = mergingHighlights(token.highlights);
       for (let i = 0; i < token.highlights.length; i++) {
         let startPos = token.highlights[i].start;
         let endPos = token.highlights[i].end ;
