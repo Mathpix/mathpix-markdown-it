@@ -1,4 +1,4 @@
-import { sortHighlights, filteredHighlightContent } from "./common";
+import { filteredHighlightContent, mergingHighlights } from "./common";
 import { getWidthFromDocument } from "../utils";
 import { MathJax } from "../../mathjax/";
 import { 
@@ -77,7 +77,7 @@ export const addedHighlightMathjaxFunctions = (token, mathContent) => {
 export const highlightMathToken = (state, token) => {
   try {
     let mathContent = [];
-    token.highlights.sort(sortHighlights);
+    token.highlights = mergingHighlights(token.highlights);
     let isBreak = false;
     for (let j = 0; j < token.highlights?.length; j++) {
       if (isBreak) {

@@ -1,4 +1,9 @@
-import { getStyleFromHighlight, sortHighlights, highlightText, needToHighlightAll } from "./common";
+import { 
+  getStyleFromHighlight, 
+  highlightText, 
+  needToHighlightAll, 
+  mergingHighlights
+} from "./common";
 import { OuterHTML } from "../../mathjax";
 const escapeHtml = require('markdown-it/lib/common/utils').escapeHtml;
 import { HIGHLIGHT_COLOR, HIGHLIGHT_TEXT_COLOR } from "../common/consts";
@@ -11,7 +16,7 @@ export const textHighlight = (tokens, idx, options, env, self) => {
 export const codeInlineHighlight = (tokens, idx, options, env, slf) => {
   const token = tokens[idx];
   if (token.highlights?.length) {
-    token.highlights.sort(sortHighlights);
+    token.highlights = mergingHighlights(token.highlights);
     let highlightContent = [];
     for (let i = 0; i < token.highlights.length; i++) {
       if (token.highlights[i].start === token.positions.start && token.highlights[i].end === token.positions.end) {
