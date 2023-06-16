@@ -11,7 +11,7 @@ module.exports = [
   },
   {
     latex: `1+\\int_{vR}^{v}(\\frac{\\epsilon(bu-F(u)-I))}{(F(u)-W(u)+I)^{2}})\\frac{\\partial W(u)}{\\partial w_{0}}du`,
-    ascii:    `1+int_(vR)^(v)((epsilon(bu-F(u)-I)))/((F(u)-W(u)+I)^(2)))(del W(u))/(delw_(0))du`,
+    ascii:    `1+int_(vR)^(v)((epsilon(bu-F(u)-I)))/((F(u)-W(u)+I)^(2)))(del W(u))/(del w_(0))du`,
     ascii_old: `1+int_(vR)^(v)((epsilon(bu-F(u)-I)))/((F(u)-W(u)+I)^(2)))(del W(u))/(del w_(0))du`
   },
   {
@@ -21,7 +21,7 @@ module.exports = [
   },
   {
     latex: `W ( R ,\\gamma ) = \\operatorname { Tr } _ { R } \\mathcal { P } { \\exp ( i \\oint _ { \\gamma } \\mathbf { A } _ { \\mu } d x ^ { \\mu } ) } \\equiv \\chi _ { R } ( U _ { \\gamma } )`,
-    ascii:    `W(R,gamma)=Tr_(R)Pexp(i oint_(gamma)A_(mu)dx^(mu))-=chi_(R)(U_(gamma))`,
+    ascii:    `W(R,gamma)=Tr_(R)P exp(i oint_(gamma)A_(mu)dx^(mu))-=chi_(R)(U_(gamma))`,
     ascii_old: `W(R,gamma)=Tr_(R)P exp(i oint_(gamma)A_(mu)dx^(mu))-=chi_(R)(U_(gamma))`,
   },
   {

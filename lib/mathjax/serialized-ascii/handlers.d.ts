@@ -1,9 +1,6 @@
 import { MmlNode } from "mathjax-full/js/core/MmlTree/MmlNode";
 import { eSymbolType } from "./helperA";
 import { IAsciiData } from "./common";
-export declare const needFirstSpace: (node: any, currentText: any, serialize: any) => boolean;
-export declare const needFirstSpaceBeforeCurrentNode: (node: any, serialize: any) => boolean;
-export declare const needLastSpace: (node: any, currentText: any) => boolean;
 export declare const getSymbolType: (tag: string, output: string) => "" | eSymbolType;
 export declare const SymbolToAM: (tag: string, output: string, atr?: any, showStyle?: boolean) => any;
 export declare const FindSymbolReplace: (str: string) => string;

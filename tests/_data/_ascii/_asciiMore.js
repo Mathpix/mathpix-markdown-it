@@ -6,7 +6,7 @@ module.exports = [
   },
   {
     latex: `\\begin{aligned}\\left\\langle U_{T_{*}}^{n} 1,1\\right\\rangle &=\\prod_{n \\in \\mathbb{Z}} \\int_{\\mathbb{Z}_{+}} \\sqrt{\\frac{d \\kappa_{k-n}}{d \\kappa_{k}}\\left(y_{k}\\right)} d \\kappa_{k}\\left(y_{k}\\right) \\\\ &=\\prod_{n \\in \\mathbb{Z}}\\left(1-H^{2}\\left(\\kappa_{k-n}, \\kappa_{k}\\right)\\right) \\\\ & \\leq \\prod_{n \\in \\mathbb{Z}}\\left(1-H^{2}\\left(\\kappa_{k-n}, \\kappa_{k}\\right)\\right) \\\\ &=\\prod_{\\frac{n}{3}<k<\\frac{2 n}{3}}^{\\frac{n}{3}<k<\\frac{2 n}{3}} \\\\ &<\\left(1-\\delta^{2}\\right)^{n / 3} \\end{aligned}`,
-    ascii:  `{:[(:U_(T_(**))^(n)1,1:)=prod_(n inZ)int_(Z_(+))sqrt((dkappa_(k-n))/(dkappa_(k))(y_(k)))dkappa_(k)(y_(k))],[=prod_(n inZ)(1-H^(2)(kappa_(k-n),kappa_(k)))],[ <= prod_(n inZ)(1-H^(2)(kappa_(k-n),kappa_(k)))],[=prod_((n)/(3) < k < (2n)/(3))^((n)/(3) < k < (2n)/(3))],[ < (1-delta^(2))^(n//3)]:}`,
+    ascii:  `{:[(:U_(T_(**))^(n)1,1:)=prod_(n in Z)int_(Z_(+))sqrt((d kappa_(k-n))/(d kappa_(k))(y_(k)))d kappa_(k)(y_(k))],[=prod_(n in Z)(1-H^(2)(kappa_(k-n),kappa_(k)))],[ <= prod_(n in Z)(1-H^(2)(kappa_(k-n),kappa_(k)))],[=prod_((n)/(3) < k < (2n)/(3))^((n)/(3) < k < (2n)/(3))],[ < (1-delta^(2))^(n//3)]:}`,
     ascii1: `[(:U_(T_(**))^(n)1,1:),=prod_(n inZ)int_(Z_(+))sqrt(sqrt(((dkappa_(k-n))/(dkappa_(k))(y_(k))))dkappa_(k)(y_(k))],[,=prod_(n inZ)(1-H^(2)(kappa_(k-n),kappa_(k)))],[,<=prod_(n inZ)(1-H^(2)(kappa_(k-n),kappa_(k)))],[,=prod_((n)/(3)<k<(2n)/(3))^((n)/(3)<k<(2n)/(3))],[,<(1-delta^(2))^(n//3)]`,
   },
   {
@@ -36,6 +36,14 @@ module.exports = [
   {
     latex: 'a \\operatorname{m} \\operatorname{o} \\operatorname{d}b',
     ascii: 'a m o d b'
+  },
+  {
+    latex: 'a \\operatorname{m}2 b',
+    ascii: 'a m 2b'
+  },
+  {
+    latex: 'a \\operatorname{m1} b',
+    ascii: 'a m1 b'
   },
   // {
   //   latex: '',

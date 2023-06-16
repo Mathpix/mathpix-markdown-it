@@ -1,22 +1,34 @@
 import {MmlVisitor} from 'mathjax-full/js/core/MmlTree/MmlVisitor.js';
 import {MmlNode, TextNode, XMLNode} from 'mathjax-full/js/core/MmlTree/MmlNode.js';
 
-import { handle, needFirstSpaceBeforeCurrentNode } from "./handlers";
-import { IAsciiData, AddToAsciiData } from "./common";
+import { handle } from "./handlers";
+import {
+  IAsciiData,
+  regLetter,
+  AddToAsciiData,
+  pushToSerializedStack,
+  needFirstSpaceBeforeCurrentNode
+} from "./common";
 
 export class SerializedAsciiVisitor extends MmlVisitor {
   options = null;
-  resAscii = [];
+  isSerializeChildStack = false;
+  serializedStack = [];
+  serializedChildStack = [];
+  notApplyToSerializedStack = false;
 
   constructor(options) {
     super();
     this.options = options;
-    this.resAscii = [];
+    this.isSerializeChildStack = false;
+    this.serializedStack = [];
+    this.serializedChildStack = [];
+    this.notApplyToSerializedStack = false;
   }
 
   public visitTree(node: MmlNode): IAsciiData {
     let res = this.visitNode(node, '');
-    this.resAscii.push({kind: node.kind, res: {...res}});
+    pushToSerializedStack(this, {...res}, node);
     return res;
   }
 
@@ -28,7 +40,7 @@ export class SerializedAsciiVisitor extends MmlVisitor {
     let handler = this.nodeHandlers.get(node.kind) || this.visitDefault;
     let res = handler.call(this, node, ...args);
     if (res?.ascii) {
-      this.resAscii.push({kind: node.kind, res: {...res}});
+      pushToSerializedStack(this, {...res}, node);
     }
     node.serialized = {...res};
     return res;
@@ -42,7 +54,7 @@ export class SerializedAsciiVisitor extends MmlVisitor {
       ascii_md: ''
     };
     try {
-      res = AddToAsciiData(res, [node.getText()]);
+      res = AddToAsciiData(res, [node.getText()], this);
       return res;
     } catch (e) {
       console.error('mml => visitTextNode =>', e);
@@ -58,7 +70,7 @@ export class SerializedAsciiVisitor extends MmlVisitor {
       ascii_md: ''
     };
     try {
-      res = AddToAsciiData(res, [space + node.getSerializedXML()]);
+      res = AddToAsciiData(res, [space + node.getSerializedXML()], this);
       return res;
     } catch (e) {
       console.error('mml => visitXMLNode =>', e);
@@ -151,7 +163,7 @@ export class SerializedAsciiVisitor extends MmlVisitor {
               `((${data.ascii_tsv})/())`,
               `((${data.ascii_csv})/())`,
               `((${data.ascii_md})/())`,
-            ]);
+            ], this);
           } else {
             let mnList = [];
             let i = 1;
@@ -166,23 +178,23 @@ export class SerializedAsciiVisitor extends MmlVisitor {
                 const data: IAsciiData = this.visitNode(node.childNodes[i], space);
                 res = AddToAsciiData(res, [
                   data.ascii, data.ascii_tsv, data.ascii_csv, data.ascii_md
-                ]);
+                ], this);
               }
             }
             const dataDivisor: IAsciiData = this.visitNode(mclose, '');
-            res = AddToAsciiData(res, [`((`]);
-            res = AddToAsciiData(res, [dataDivisor.ascii, dataDivisor.ascii_tsv, dataDivisor.ascii_csv, dataDivisor.ascii_md]);
-            res = AddToAsciiData(res, [`)/(`]);
+            res = AddToAsciiData(res, [`((`], this);
+            res = AddToAsciiData(res, [dataDivisor.ascii, dataDivisor.ascii_tsv, dataDivisor.ascii_csv, dataDivisor.ascii_md], this);
+            res = AddToAsciiData(res, [`)/(`], this);
             mnList.forEach(item => {
               const dataDividend: IAsciiData = this.visitNode(item, '');
-              res = AddToAsciiData(res, [dataDividend.ascii, dataDividend.ascii_tsv, dataDividend.ascii_csv, dataDividend.ascii_md]);
+              res = AddToAsciiData(res, [dataDividend.ascii, dataDividend.ascii_tsv, dataDividend.ascii_csv, dataDividend.ascii_md], this);
             });
-            res = AddToAsciiData(res, [`))`]);
+            res = AddToAsciiData(res, [`))`], this);
 
             if (iclose < node.childNodes.length - 1) {
               for (let i = iclose + 1; i < node.childNodes.length; i++) {
                 const data: IAsciiData = this.visitNode(node.childNodes[i], space);
-                res = AddToAsciiData(res, [data.ascii, data.ascii_tsv, data.ascii_csv, data.ascii_md]);
+                res = AddToAsciiData(res, [data.ascii, data.ascii_tsv, data.ascii_csv, data.ascii_md], this);
               }
             }
           }
@@ -194,9 +206,9 @@ export class SerializedAsciiVisitor extends MmlVisitor {
         ) {
           if (iclose === 0) {
             const data: IAsciiData = this.visitNode(mclose, '');
-            res = AddToAsciiData(res, ['(()/(']);
-            res = AddToAsciiData(res, [data.ascii, data.ascii_tsv, data.ascii_csv, data.ascii_md]);
-            res = AddToAsciiData(res, ['))']);
+            res = AddToAsciiData(res, ['(()/('], this);
+            res = AddToAsciiData(res, [data.ascii, data.ascii_tsv, data.ascii_csv, data.ascii_md], this);
+            res = AddToAsciiData(res, ['))'], this);
           } else {
             let mnList = [];
             let i = 1;
@@ -209,23 +221,23 @@ export class SerializedAsciiVisitor extends MmlVisitor {
             if (iclose - mnList.length > 0) {
               for (let i = 0; i < iclose - mnList.length; i++) {
                 const data: IAsciiData = this.visitNode(node.childNodes[i], space);
-                res = AddToAsciiData(res, [data.ascii, data.ascii_tsv, data.ascii_csv, data.ascii_md]);
+                res = AddToAsciiData(res, [data.ascii, data.ascii_tsv, data.ascii_csv, data.ascii_md], this);
               }
             }
-            res = AddToAsciiData(res, ['((']);
+            res = AddToAsciiData(res, ['(('], this);
             mnList.forEach(item => {
               const data: IAsciiData = this.visitNode(item, '');
-              res = AddToAsciiData(res, [data.ascii, data.ascii_tsv, data.ascii_csv, data.ascii_md]);
+              res = AddToAsciiData(res, [data.ascii, data.ascii_tsv, data.ascii_csv, data.ascii_md], this);
             });
-            res = AddToAsciiData(res, [')/(']);
+            res = AddToAsciiData(res, [')/('], this);
             const data: IAsciiData = this.visitNode(mclose, '');
-            res = AddToAsciiData(res, [data.ascii, data.ascii_tsv, data.ascii_csv, data.ascii_md]);
-            res = AddToAsciiData(res, ['))']);
+            res = AddToAsciiData(res, [data.ascii, data.ascii_tsv, data.ascii_csv, data.ascii_md], this);
+            res = AddToAsciiData(res, ['))'], this);
 
             if (iclose < node.childNodes.length - 1) {
               for (let i = iclose + 1; i < node.childNodes.length; i++) {
                 const data: IAsciiData = this.visitNode(node.childNodes[i], space);
-                res = AddToAsciiData(res, [data.ascii, data.ascii_tsv, data.ascii_csv, data.ascii_md]);
+                res = AddToAsciiData(res, [data.ascii, data.ascii_tsv, data.ascii_csv, data.ascii_md], this);
               }
             }
           }
@@ -240,18 +252,18 @@ export class SerializedAsciiVisitor extends MmlVisitor {
         && node.parent.Parent && node.parent.Parent.kind === 'mtd'
         && node.childNodes.length > 1;
       
-      res = AddToAsciiData(res, [needBranch && hasFunc ? '{:' : '']);
+      res = AddToAsciiData(res, [needBranch && hasFunc ? '{:' : ''], this);
       if (addParens && !group) {
-        res = AddToAsciiData(res, ['(']);
+        res = AddToAsciiData(res, ['('], this);
       }
       for (const child of node.childNodes) {
         const data: IAsciiData = this.visitNode(child, space);
-        res = AddToAsciiData(res, [data.ascii, data.ascii_tsv, data.ascii_csv, data.ascii_md]);
+        res = AddToAsciiData(res, [data.ascii, data.ascii_tsv, data.ascii_csv, data.ascii_md], this);
       }
       if (addParens && !group) {
-        res = AddToAsciiData(res, [')']);
+        res = AddToAsciiData(res, [')'], this);
       }
-      res = AddToAsciiData(res, [needBranch && hasFunc ? ':}' : '']);
+      res = AddToAsciiData(res, [needBranch && hasFunc ? ':}' : ''], this);
       return res;
     } catch (e) {
       return res;
@@ -268,13 +280,16 @@ export class SerializedAsciiVisitor extends MmlVisitor {
     try {
       let needFirstSpace = needFirstSpaceBeforeCurrentNode(node, this);
       let children: IAsciiData = this.childNodeMml(node, space + '  ', '\n');
-      res = AddToAsciiData(res, [needFirstSpace ? ' ' : '']);
+      if (needFirstSpace) {
+        needFirstSpace = children.ascii?.length && regLetter.test(children.ascii[0]);
+      }
+      res = AddToAsciiData(res, [needFirstSpace ? ' ' : ''], this);
       res = AddToAsciiData(res, [
         children.ascii?.match(/\S/) ? children.ascii : '',
         children.ascii_tsv?.match(/\S/) ? children.ascii_tsv : '',
         children.ascii_csv?.match(/\S/) ? children.ascii_csv : '',
         children.ascii_md?.match(/\S/) ? children.ascii_md : '',
-      ]);
+      ], this, node);
       return res;
     } catch (e) {
       console.error('mml => visitTeXAtomNode =>', e);
@@ -296,7 +311,7 @@ export class SerializedAsciiVisitor extends MmlVisitor {
         space + '<annotation' + this.getAttributes(node) + '>' + data.ascii_tsv + '</annotation>',
         space + '<annotation' + this.getAttributes(node) + '>' + data.ascii_csv + '</annotation>',
         space + '<annotation' + this.getAttributes(node) + '>' + data.ascii_md + '</annotation>',
-      ]);
+      ], this, node);
       return res;
     } catch (e) {
       console.error('mml => visitAnnotationNode =>', e);
@@ -337,18 +352,21 @@ export class SerializedAsciiVisitor extends MmlVisitor {
     try {
       if (node.kind === 'mover' && node.childNodes.length > 1 && node.childNodes[0].kind === 'TeXAtom' && node.childNodes[1].kind === 'TeXAtom') {
         const firstChild: any = node.childNodes[0];
+        const secondChild: any = node.childNodes[1];
         firstChild.properties.needBrackets = true;
         const dataFirstChild: IAsciiData = handleCh(firstChild, this);
-        const dataChildNodes: IAsciiData = handleCh(node.childNodes[1], this);
+        const dataChildNodes: IAsciiData = handleCh(secondChild, this);
         
-        res = AddToAsciiData(res, [dataFirstChild.ascii, dataFirstChild.ascii_tsv, dataFirstChild.ascii_csv, dataFirstChild.ascii_md]);
-        res = AddToAsciiData(res, ['^']);
-        res = AddToAsciiData(res, ['(']);
-        res = AddToAsciiData(res, [dataChildNodes.ascii, dataChildNodes.ascii_tsv, dataChildNodes.ascii_csv, dataChildNodes.ascii_md]);
-        res = AddToAsciiData(res, [')']);
+        res = AddToAsciiData(res, [dataFirstChild.ascii, dataFirstChild.ascii_tsv, dataFirstChild.ascii_csv, dataFirstChild.ascii_md], this, 
+          firstChild);
+        res = AddToAsciiData(res, ['^'], this);
+        res = AddToAsciiData(res, ['('], this);
+        res = AddToAsciiData(res, [dataChildNodes.ascii, dataChildNodes.ascii_tsv, dataChildNodes.ascii_csv, dataChildNodes.ascii_md], this,
+          secondChild);
+        res = AddToAsciiData(res, [')'], this);
       } else {
         const data: IAsciiData = handleCh(node, this);
-        res = AddToAsciiData(res, [data.ascii, data.ascii_tsv, data.ascii_csv, data.ascii_md]);
+        res = AddToAsciiData(res, [data.ascii, data.ascii_tsv, data.ascii_csv, data.ascii_md], this, node);
       }
       return res;
     } catch (e) {
