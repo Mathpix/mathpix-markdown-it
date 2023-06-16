@@ -386,3 +386,300 @@ export const findOpenCloseTagsMathEnvironment = (str: string, tagOpen: RegExp, t
     arrClose: arrClose,
   }
 };
+
+
+/**
+ * @return {string} Get and return a control-sequence name
+ */
+const GetCS = (str, i) => {
+  let CS = str.slice(i).match(/^([a-z]+|.) ?/i);
+  if (CS) {
+    i += CS[1].length;
+    return {
+      cs: CS[1],
+      next: i
+    };
+  } else {
+    i++;
+    return {
+      cs: ' ',
+      next: i
+    };
+  }
+};
+
+const getDigit = (str, i) => {
+  let CS = str.slice(i).match(/^([0-9.,]+|) ?/i);
+  if (CS) {
+    i += CS[1].length;
+    return {
+      cs: CS[1],
+      next: i
+    };
+  } else {
+    i++;
+    return {
+      cs: '',
+      next: i
+    };
+  }
+};
+
+const getLetter = (str, i) => {
+  let CS = str.slice(i).match(/^([a-z]+|) ?/i);
+  if (CS) {
+    i += CS[1].length;
+    return {
+      cs: CS[1],
+      next: i
+    };
+  } else {
+    i++;
+    return {
+      cs: '',
+      next: i
+    };
+  }
+};
+
+const nextIsSpace = (str, i) => {
+  return str.charAt(i).match(/\s/);
+};
+
+// const GetNext = (str, i) => {
+//   while (nextIsSpace(str, i)) {
+//     i++;
+//   }
+//   return {
+//     char: str.charAt(i),
+//     next: i
+//   };
+// };
+
+export const canonicalMath = (math) => {
+  if (!math || !math.trim()) {
+    return []
+  }
+  let arr = [];
+  let i = 0;
+  let c: string;
+  let n: number;
+  while (i < math.length) {
+    if (nextIsSpace(math, i)) {
+      i++;
+    }
+    c = math.charAt(i++);
+    n = c.charCodeAt(0);
+    if (n >= 0xD800 && n < 0xDC00) {
+      c += math.charAt(i++);
+    }
+    /** command */ 
+    if (/^\\/.test(c)) {
+      const { cs, next } = GetCS(math, i);
+      i = next;
+      arr.push(c + cs);
+      continue;
+    }
+    /** numbers */
+    if (/[0-9.,]/.test(c)) {
+      const { cs, next } = getDigit(math, i);
+      i = next;
+      arr.push(c + cs);
+      continue;
+    }
+    /** letters */
+    if (/[a-z]/i.test(c)) {
+      const { cs, next } = getLetter(math, i);
+      i = next;
+      arr.push(c + cs);
+      continue;
+    }
+    arr.push(c);
+  }
+  return arr;
+};
+
+export const canonicalMathPositions = (math) => {
+  if (!math || !math.trim()) {
+    return []
+  }
+  let arr = [];
+  let i = 0;
+  let c: string;
+  let n: number;
+
+  let startPos = 0;
+  let isTextBlock = false;
+  let textBlockOpen = 0;
+  let fontControl = null;
+  let braceOpen = 0;
+  let braceOpenFont = 0;
+  let parentCommand = '';
+  let braceOpenParentCommand = 0;
+  while (i < math.length) {
+    if (nextIsSpace(math, i)) {
+      i++;
+    }
+    startPos = i;
+    c = math.charAt(i++);
+    n = c.charCodeAt(0);
+    if (n >= 0xD800 && n < 0xDC00) {
+      c += math.charAt(i++);
+    }
+    /** command */
+    if (/^\\/.test(c)) {
+      if (braceOpen === braceOpenParentCommand) {
+        parentCommand = '';
+      }
+      const { cs, next } = GetCS(math, i);
+      let content = c + cs;
+      if (isTextBlock && textBlockOpen === 0) {
+        isTextBlock = false;
+      }
+      if (!isTextBlock) {
+        arr.push({
+          content: content,
+          contentSlice: math.slice(startPos, next),
+          type: 'command',
+          positions: {
+            start: startPos,
+            end: next
+          },
+          fontControl: fontControl,
+          parentCommand: parentCommand
+        });
+      }
+      i = next;
+      if (braceOpen === braceOpenFont && fontControl?.command === '\\Bbb') {
+        fontControl = null;
+      }
+      /** Text control */
+      if (['\\text',
+        '\\textsf', '\\textit', '\\textbf', '\\textrm', '\\texttt'].includes(content)) {
+        isTextBlock = true;
+      }
+      /** Font control */
+      if (['\\mit', '\\rm', '\\oldstyle', '\\cal', '\\it', '\\bf', '\\bbFont', '\\scr', '\\frak', '\\sf', '\\tt',
+      '\\Bbb', '\\emph'].includes(content)) {
+        fontControl = {
+          command: content,
+          includeIntoBraces: ['\\Bbb'].includes(content)
+        };
+        braceOpenFont = braceOpen;
+      }
+      braceOpenParentCommand = braceOpen;
+      parentCommand = content;
+      continue;
+    }
+    /** numbers */
+    if (/[0-9.,]/.test(c)) {
+      if (braceOpen === braceOpenParentCommand) {
+        parentCommand = '';
+      }
+      const { cs, next } = getDigit(math, i);
+      if (isTextBlock && textBlockOpen === 0) {
+        isTextBlock = false;
+      }
+      if (!isTextBlock) {
+        arr.push({
+          content: c + cs,
+          contentSlice: math.slice(startPos, next),
+          type: 'numbers',
+          positions: {
+            start: startPos,
+            end: next
+          },
+          fontControl: fontControl,
+          parentCommand: parentCommand
+        });
+      }
+      i = next;
+      if (braceOpen === braceOpenFont && fontControl?.command === '\\Bbb') {
+        fontControl = null;
+      }
+      continue;
+    }
+    /** letters */
+    if (/[a-z]/i.test(c)) {
+      if (braceOpen === braceOpenParentCommand) {
+        parentCommand = '';
+      }
+      const { cs, next } = getLetter(math, i);
+      if (isTextBlock && textBlockOpen === 0) {
+        isTextBlock = false;
+      }
+      if (!isTextBlock) {
+        arr.push({
+          content: c + cs,
+          contentSlice: math.slice(startPos, next),
+          type: 'letters',
+          positions: {
+            start: startPos,
+            end: next
+          },
+          fontControl: fontControl,
+          parentCommand: parentCommand
+        });
+      }
+      i = next;
+      if (braceOpen === braceOpenFont && fontControl?.command === '\\Bbb') {
+        fontControl = null;
+      }
+      continue;
+    }
+    if (c !== '{' && c !== '}') {
+      if (braceOpen === braceOpenParentCommand) {
+        parentCommand = '';
+      }
+      if (braceOpen === braceOpenFont && fontControl?.command === '\\Bbb') {
+        fontControl = null;
+      }
+    }
+    if (c === '{') {
+      braceOpen++
+    }
+    if (c === '}') {
+      if (braceOpen === braceOpenFont) {
+        fontControl = null;
+      }
+      braceOpen--;
+      if (braceOpen === braceOpenParentCommand) {
+        parentCommand = '';
+      }
+      braceOpen--;
+    }
+    if (isTextBlock) {
+      if (c === '{') {
+        textBlockOpen++
+      }
+      if (c === '}') {
+        textBlockOpen--
+      }
+      if (textBlockOpen === 0) {
+        let lastItem = arr[arr.length - 1];
+        lastItem.positions.end = i;
+        lastItem.content = math.slice(lastItem.positions.start, lastItem.positions.end);
+        lastItem.contentSlice = math.slice(lastItem.positions.start, lastItem.positions.end);
+        isTextBlock = false;
+      }
+    } else {
+      arr.push({
+        content: c,
+        contentSlice: math.slice(startPos, startPos + c.length),
+        type: 'other',
+        positions: {
+          start: startPos,
+          end: i
+        },
+        fontControl: fontControl,
+        parentCommand: parentCommand
+      });
+    }
+  }
+  return arr;
+};
+
+export const getSpacesFromLeft = (str: string) => {
+  let strTrimLeft = str ? str.trimLeft() : '';
+  return str ? str.length - strTrimLeft.length : 0;
+};

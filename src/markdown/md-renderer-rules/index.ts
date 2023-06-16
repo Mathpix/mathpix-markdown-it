@@ -49,6 +49,8 @@ export const IncludeGraphics = (a, token, slf, width, options) => {
   const alt = '';
 
   styleImg = styleImg ? `style="${styleImg}"` : '';
-  style = style ? `style="${style}"` : '';
+  let data_mmd_highlight = token.attrGet('data-mmd-highlight');
+  data_mmd_highlight = data_mmd_highlight ? data_mmd_highlight : '';
+  style = style ? `style="${style}${data_mmd_highlight}"` : '';
   return `<div class="figure_img" ${style}><${token.tag} ${src} ${alt} ${styleImg}></div>`
 };

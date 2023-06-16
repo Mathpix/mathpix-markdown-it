@@ -13,7 +13,8 @@ import {
   mdPluginTableTabular,
   mdPluginList,
   mdPluginChemistry, 
-  mdPluginCollapsible
+  mdPluginCollapsible,
+  mdSetPositionsAndHighlight
 } from "./markdown/mdPluginConfigured";
 
 import {
@@ -23,7 +24,8 @@ import {
   TOutputMath,
   TOutputMathJax,
   THtmlSanitize,
-  TTocStyle
+  TTocStyle,
+  THighlight
 } from "./mathpix-markdown-model";
 
 import { ISmilesOptions } from './markdown/md-chemistry';
@@ -41,12 +43,14 @@ import { normalizeLink } from './helpers/normalize-link';
 export {
   MathpixLoader, MathpixMarkdown, MathpixMarkdownModel,
   mathpixMarkdownPlugin, mdPluginCollapsible,
+  mdSetPositionsAndHighlight,
   initMathpixMarkdown,
   mdPluginMathJax, mdPluginHighlightCode, mdPluginText, mdPluginTOC, mdPluginAnchor, mdPluginTableTabular, mdPluginList, mdPluginChemistry,
   TMarkdownItOptions, optionsMathpixMarkdown, TOutputMath, TOutputMathJax, THtmlSanitize,
   ISmilesOptions,
   resetTheoremEnvironments,
   TTocStyle,
+  THighlight,
   eLabelType, ILabel, getLabelsList, getLabelByKeyFromLabelsList, clearLabelsList,
   normalizeLink
 };

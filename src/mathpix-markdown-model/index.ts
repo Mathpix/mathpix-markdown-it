@@ -51,6 +51,8 @@ export interface optionsMathpixMarkdown {
     centerImages?: boolean;
     centerTables?: boolean;
     enableCodeBlockRuleForLatexCommands?: boolean;
+    addPositionsToTokens?: boolean;
+    highlights?: Array<THighlight>;
 }
 
 export type TMarkdownItOptions = {
@@ -90,6 +92,8 @@ export type TMarkdownItOptions = {
   centerImages?: boolean;
   centerTables?: boolean;
   enableCodeBlockRuleForLatexCommands?: boolean;
+  addPositionsToTokens?: boolean;
+  highlights?: Array<THighlight>;
 }
 
 export type TOutputMath = {
@@ -152,6 +156,15 @@ export type TTocOptions = {
 export enum TTocStyle {
   summary = 'summary',
   list = 'list'
+};
+
+export type THighlight = {
+  start: number,
+  end: number,
+  highlight_color?: string,
+  text_color?: string, 
+  font_weight?: string, //not used yet
+  include_block?: boolean
 };
 
 export type TAccessibility = {
@@ -426,7 +439,9 @@ class MathpixMarkdown_Model {
           showPageBreaks = false,
           centerImages = true,
           centerTables = true,
-          enableCodeBlockRuleForLatexCommands = false
+          enableCodeBlockRuleForLatexCommands = false,
+          addPositionsToTokens = false,
+          highlights = []
         }
          = options || {};
 
@@ -466,7 +481,9 @@ class MathpixMarkdown_Model {
           showPageBreaks: showPageBreaks,
           centerImages: centerImages,
           centerTables: centerTables,
-          enableCodeBlockRuleForLatexCommands: enableCodeBlockRuleForLatexCommands
+          enableCodeBlockRuleForLatexCommands: enableCodeBlockRuleForLatexCommands,
+          addPositionsToTokens: addPositionsToTokens,
+          highlights: highlights
         };
 
         const styleFontSize = fontSize ? ` font-size: ${options.fontSize}px;` : '';

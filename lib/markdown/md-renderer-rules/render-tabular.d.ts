@@ -1,4 +1,4 @@
-export declare const renderInlineTokenBlock: (tokens: any, options: any, env: any, slf: any, isSubTable?: boolean) => {
+export declare const renderInlineTokenBlock: (tokens: any, options: any, env: any, slf: any, isSubTable?: boolean, highlight?: any) => {
     table: string;
     tsv: string;
     tableMd: string;

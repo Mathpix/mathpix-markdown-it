@@ -8,7 +8,9 @@ import {
   includesMultiMathBeginTag,
   getWidthFromDocument,
   findOpenCloseTagsMathEnvironment,
-  beginTag, endTag
+  beginTag, endTag,
+  canonicalMath,
+  canonicalMathPositions
 } from './utils';
 import { openTagMML, closeTagMML, tsvSeparatorsDef, csvSeparatorsDef, mdSeparatorsDef } from './common/consts';
 import { imageWithSize, renderRuleImage } from './md-inline-rule/image';
@@ -37,6 +39,7 @@ import {
 const isSpace = require('markdown-it/lib/common/utils').isSpace;
 import { envArraysShouldBeFlattenInTSV } from '../helpers/consts';
 import { getTerminatedRules } from './common';
+import { highlightText } from "./highlight/common";
 
 function MathML(state, silent, pos, endMarker = '', type = "inline_mathML") {
   const markerBegin = RegExp('^</?(math)(?=(\\s|>|$))', 'i');
@@ -75,6 +78,10 @@ function MathML(state, silent, pos, endMarker = '', type = "inline_mathML") {
   if (!silent) {
     token = state.push(type, "", 0);
     token.content = content.trim();
+    token.inlinePos = {
+      start: state.pos,
+      end: nextPos
+    };
   }
   /** Perform math to conversion to html and get additional data from MathJax to pass it to render rules */
   convertMathToHtml(state, token, state.md.options);
@@ -294,6 +301,22 @@ function multiMath(state, silent) {
     if (state.md.options.outMath && state.md.options.outMath.include_table_markdown) {
       token.latex = '\\' + match.input;
     }
+    token.inlinePos = {
+      start: state.pos,
+      end: nextPos,
+      start_content: type === "equation_math_not_number" || type === "equation_math" 
+        ? state.pos : startMathPos,
+      end_content: type === "equation_math_not_number" || type === "equation_math" 
+        ? nextPos : endMarkerPos
+    };
+    if (type !== "reference_note") {
+      if (state.md.options.addPositionsToTokens) {
+        token.canonicalized = token.content ? canonicalMath(token.content) : [];
+      }
+      if (state.md.options.highlights?.length) {
+        token.canonicalizedPositions = token.content ? canonicalMathPositions(token.content) : [];
+      }
+    }
     if (type !== "reference_note" && !state.md.options.forLatex) {
       /** Perform math to conversion to html and get additional data from MathJax to pass it to render rules */
       convertMathToHtml(state, token, state.md.options);
@@ -373,6 +396,10 @@ function refs(state, silent) {
     let children = [];
     state.md.inline.parse(token.content.trim(), state.md, state.env, children);
     token.children = children;
+    token.inlinePos = {
+      start: state.pos,
+      end: nextPos
+    };
   }
 
   state.pos = nextPos;
@@ -458,6 +485,18 @@ function simpleMath(state, silent) {
     if (state.md.options.outMath && state.md.options.outMath.include_table_markdown) {
       token.latex = endMarker + token.content + endMarker;
     }
+    token.inlinePos = {
+      start: state.pos,
+      end: nextPos,
+      start_content: startMathPos,
+      end_content: endMarkerPos
+    };
+    if (state.md.options.addPositionsToTokens) {
+      token.canonicalized = token.content ? canonicalMath(token.content) : [];
+    }
+    if (state.md.options.highlights?.length) {
+      token.canonicalizedPositions = token.content ? canonicalMathPositions(token.content) : [];
+    }
     /** Perform math to conversion to html and get additional data from MathJax to pass it to render rules */
     if (!state.md.options.forLatex) {
       convertMathToHtml(state, token, state.md.options);
@@ -536,6 +575,10 @@ function usepackage(state, silent) {
     const token = state.push(type, "geometry", 0);
     token.content = content;
     token.hidden = true;
+    token.inlinePos = {
+      start: state.pos,
+      end: nextPos
+    };
   }
 
   state.pos = nextPos;
@@ -597,6 +640,7 @@ const convertMathToHtml = (state, token, options) => {
           accessibility: options.accessibility
         });
         token.mathEquation = data.html;
+        token.mathData = data.data;
         token.ascii = data.ascii;
         token.ascii_tsv = data.ascii_tsv;
         token.ascii_csv = data.ascii_csv;
@@ -610,6 +654,7 @@ const convertMathToHtml = (state, token, options) => {
           nonumbers: options.nonumbers
         });
         token.mathEquation = data.html;
+        token.mathData = data.data;
         token.ascii = data.ascii;
         token.ascii_tsv = data.ascii_tsv;
         token.ascii_csv = data.ascii_csv;
@@ -743,6 +788,9 @@ const renderReference = (token, options, env, slf) => {
   if (dataParentheses === "true" &&  reference) {
     reference = '(' + reference + ')'
   }
+  if (token.highlights?.length) {
+    token.highlightAll = reference !== token.content;
+  }
   if (!reference) {
     /** If the label could not be found in the list, then we display the content of this label */
     reference = '[' + token.content + ']';
@@ -751,7 +799,8 @@ const renderReference = (token, options, env, slf) => {
     ? `<div class="math-block">`
     : '';
   html += `<a href="#${id}" style="cursor: pointer; text-decoration: none;" class="clickable-link" value="${id}" data-parentheses="${dataParentheses}">`;
-  html += reference;
+  html += token.highlights?.length 
+    ? highlightText(token, reference) : reference;
   html += '</a>';
   html += token.type === "reference_note_block" ? '</div>' : '';
   return html;

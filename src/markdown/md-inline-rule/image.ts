@@ -299,6 +299,10 @@ export const imageWithSize = (state, silent) => {
     token.attrs = attrs;
     token.children = tokens;
     token.content  = content;
+    token.inlinePos = {
+      start: 0,
+      end: pos
+    };
     if (params?.latex) {
       token.latex = params.latex;
     }

@@ -1,6 +1,7 @@
 import { MathJaxConfigure, svg } from './mathjax';
 
 import { SerializedMmlVisitor as MmlVisitor } from 'mathjax-full/js/core/MmlTree/SerializedMmlVisitor.js';
+import { LiteElement } from "mathjax-full/js/adaptors/lite/Element.js";
 import { SerializedAsciiVisitor as AsciiVisitor } from './serialized-ascii';
 import { MathMLVisitorWord } from './mathml-word';
 import { getSpeech } from '../sre';
@@ -23,7 +24,9 @@ export interface IOuterData {
   speech?: string,
   labels?: {
     [key: string]: Label;
-  }
+  },
+  height?: number,
+  heightAndDepth?: number,
 }
 
 const toMathML = (node => {
@@ -105,6 +108,30 @@ const OuterData = (adaptor, node, math, outMath, forDocx = false, accessibility?
   }
   if (include_svg) {
     res.svg = adaptor.outerHTML(node);
+    if (node) {
+      if (node instanceof LiteElement) {
+        let svgElement: LiteElement = node.children?.length
+            ? node.children.find((item: LiteElement) => item.kind === 'svg') as LiteElement
+            : null;
+        let viewBox = svgElement ? svgElement.attributes?.viewBox : '';
+        let viewBoxArr = viewBox ? viewBox.split(' ') : [];
+        let height = viewBoxArr?.length > 3 ? Math.abs(viewBoxArr[1])/1000 : 0;
+        let heightAndDepth = viewBoxArr?.length > 3 ? Math.abs(viewBoxArr[3])/1000 : 0;
+        res.height = height;
+        res.heightAndDepth = heightAndDepth;
+      } else {
+        if (node instanceof HTMLElement) {
+          let svgElements = node.getElementsByTagName('svg');
+          let svgElement = svgElements ? svgElements[0]: null;
+          let viewBox = svgElement ? svgElement.getAttribute('viewBox') : '';
+          let viewBoxArr = viewBox ? viewBox.split(' ') : [];
+          let height = viewBoxArr?.length > 3 ? Math.abs(Number(viewBoxArr[1]))/1000 : 0;
+          let heightAndDepth = viewBoxArr?.length > 3 ? Math.abs(Number(viewBoxArr[3]))/1000 : 0;
+          res.height = height;
+          res.heightAndDepth = heightAndDepth;
+        }
+      }
+    }
   }
   /** Get information about the current labels. */
   res.labels = math.inputJax.parseOptions?.tags?.labels
@@ -232,7 +259,7 @@ const OuterDataMathMl = (adaptor, node, math, outMath, forDocx = false, accessib
   return res;
 };
 
-const OuterHTML = (data, outMath) => {
+export const OuterHTML = (data, outMath) => {
   const {
     include_mathml = false,
     include_mathml_word = false,
@@ -305,7 +332,7 @@ export const MathJax = {
   Stylesheet: function () {
     return svg.styleSheet(MJ.mDocTeX);
   },
-  TexConvert: function(string, options: any={}): IOuterData {
+  TexConvert: function(string, options: any={}, throwError = false): IOuterData {
     const {display = true, metric = {}, outMath = {}, mathJax = {}, forDocx={}, accessibility = null, nonumbers = false} = options;
     const {em = 16, ex = 8, cwidth = 1200, lwidth = 100000, scale = 1} = metric;
     const {mtextInheritFont = false} = mathJax;
@@ -332,6 +359,9 @@ export const MathJax = {
       const outputJax = MJ.mDocTeX.outputJax as any;
       return OuterData(MJ.adaptor, node, outputJax.math, outMath, forDocx, accessibility);
     } catch (err) {
+      if (throwError) {
+        throw err;
+      }
       console.log('ERROR=>', err);
       if (outMath && outMath.include_svg) {
         const node = MJ.docTeX.convert(string, {
@@ -367,8 +397,8 @@ export const MathJax = {
    * @param string {string}
    * @param options {}
    */
-  Typeset: function(string, options: any={}) {
-    const data = this.TexConvert(string, options);
+  Typeset: function(string, options: any={}, throwError = false) {
+    const data = this.TexConvert(string, options, throwError);
     return {
       html: OuterHTML(data, options.outMath),
       labels: data.labels,
@@ -376,6 +406,7 @@ export const MathJax = {
       ascii_tsv: data?.['asciimath_tsv'],
       ascii_csv: data?.['asciimath_csv'],
       ascii_md: data?.['asciimath_md'],
+      data: {...data}
     }
   },
 
@@ -391,7 +422,8 @@ export const MathJax = {
       labels: data.labels,
       ascii_tsv: data?.['asciimath_tsv'],
       ascii_csv: data?.['asciimath_csv'],
-      ascii_md: data?.['asciimath_md']
+      ascii_md: data?.['asciimath_md'],
+      data: {...data}
     };
   },
   /**

@@ -36,6 +36,8 @@ export interface optionsMathpixMarkdown {
     centerImages?: boolean;
     centerTables?: boolean;
     enableCodeBlockRuleForLatexCommands?: boolean;
+    addPositionsToTokens?: boolean;
+    highlights?: Array<THighlight>;
 }
 export declare type TMarkdownItOptions = {
     isDisableFancy?: boolean;
@@ -74,6 +76,8 @@ export declare type TMarkdownItOptions = {
     centerImages?: boolean;
     centerTables?: boolean;
     enableCodeBlockRuleForLatexCommands?: boolean;
+    addPositionsToTokens?: boolean;
+    highlights?: Array<THighlight>;
 };
 export declare type TOutputMath = {
     include_mathml?: boolean;
@@ -130,6 +134,14 @@ export declare enum TTocStyle {
     summary = "summary",
     list = "list"
 }
+export declare type THighlight = {
+    start: number;
+    end: number;
+    highlight_color?: string;
+    text_color?: string;
+    font_weight?: string;
+    include_block?: boolean;
+};
 export declare type TAccessibility = {
     assistiveMml?: boolean;
     sre?: object;

@@ -37,8 +37,14 @@ export const setCounterSection: RuleInline = (state) => {
   const token = state.push("section_setcounter", "", 0);
   token.content = "";
   token.children = [];
+  token.hidden = true;
+  token.inlinePos = {
+    start: state.pos,
+    end: nextPos
+  };
   if (state.md.options.forLatex) {
     token.latex = content;
+    token.hidden = false;
   }
   state.pos = nextPos;
   return true;

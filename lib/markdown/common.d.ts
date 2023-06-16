@@ -23,13 +23,16 @@ export declare const findEndMarker: (str: string, startPos?: number, beginMarker
     res: boolean;
     content?: undefined;
     nextPos?: undefined;
+    endPos?: undefined;
 } | {
     res: boolean;
     content: string;
     nextPos?: undefined;
+    endPos?: undefined;
 } | {
     res: boolean;
     content: string;
     nextPos: number;
+    endPos: number;
 };
 export declare const getTerminatedRules: (rule: string) => any[];

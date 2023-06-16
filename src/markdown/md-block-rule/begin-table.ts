@@ -26,6 +26,7 @@ export const ClearFigureNumbers = () => {
 
 const StatePushCaptionTable = (state, type: string): void => {
   let caption = state.env.caption;
+  let captionPos = state.env.captionPos;
   if (!caption) return;
 
   let token: Token;
@@ -33,9 +34,27 @@ const StatePushCaptionTable = (state, type: string): void => {
   token = state.push('caption_table', '', 0);
   token.attrs = [[`${type}-number`, num], ['class', `caption_${type}`]];
   token.children = [];
+  if (captionPos?.hasOwnProperty('map')) {
+    token.map = captionPos.map;
+  }  
+  if (captionPos?.hasOwnProperty('bMarks')) {
+    token.bMarks = captionPos.bMarks;
+    token.bMarksContent = captionPos.start_content > captionPos.start 
+      ? captionPos.start_content - captionPos.start
+      : captionPos.start_content;
+    token.eMarksContent = token.bMarks + token.bMarksContent + captionPos.end_content - captionPos.start_content;
+  }  
+  if (captionPos?.hasOwnProperty('eMarks')) {
+    token.eMarks = captionPos.eMarks;
+  }
+  token.captionPos = captionPos;
   token.content = state.md?.options?.nonumbers
     ? `${type[0].toUpperCase()}${type.slice(1)}: ` + caption
     : `${type[0].toUpperCase()}${type.slice(1)} ${num}: ` + caption;
+  token.print = state.md?.options?.nonumbers
+    ? `${type[0].toUpperCase()}${type.slice(1)}: `
+    : `${type[0].toUpperCase()}${type.slice(1)} ${num}: `;
+  token.caption = caption;
   if (state.md.options.forLatex) {
     token.latex = caption;
   }
@@ -157,10 +176,18 @@ const InlineBlockBeginTable: RuleBlock = (state, startLine) => {
   const hasAlignTagIncludeGraphicsG = type === TBegin.figure
     ? Boolean(content.match(alignTagIncludeGraphicsG)) : false;
   content = content.replace(alignTagG,'');
+  let captionPos: any = {};
   if (!state.md.options.forLatex) {
     matchE = content.match(captionTag);
     if (matchE) {
       caption = matchE[1];
+      captionPos.start = pos + matchE.index;
+      captionPos.end = captionPos.start + matchE[0].length;
+      captionPos.start_content =  pos + lineText.indexOf(matchE[1]);
+      captionPos.end_content = captionPos.start_content + matchE[1].length;
+      captionPos.map = [startLine, startLine];
+      captionPos.bMarks = matchE.index;
+      captionPos.eMarks = matchE.index + matchE[0].length;
       let matchT: RegExpMatchArray;
       if (type === TBegin.table) {
         matchT = lineText.match(openTagTabular);
@@ -176,6 +203,7 @@ const InlineBlockBeginTable: RuleBlock = (state, startLine) => {
 
   state.parentType = 'paragraph';
   state.env.caption = caption;
+  state.env.captionPos = captionPos;
   state.env.envType = type;
   const contentAlign = align ? align
     : hasAlignTagG ? 'center' : '';
@@ -254,6 +282,17 @@ export const BeginTable: RuleBlock = (state, startLine, endLine, silent) => {
       return true;
     }
   }
+  let captionPos: any = {};
+  let matchCaption = lineText.match(captionTag);
+  if (matchCaption) {
+    captionPos.start = pos + matchCaption.index;
+    captionPos.end = captionPos.start + matchCaption[0].length;
+    captionPos.start_content = pos + lineText.indexOf(matchCaption[1]);
+    captionPos.end_content = captionPos.start_content + matchCaption[1].length;
+    captionPos.map = [startLine, startLine];
+    captionPos.bMarks = matchCaption.index;
+    captionPos.eMarks = captionPos.bMarks + matchCaption[0].length;
+  }
   let align = (state.md.options.centerTables && type === TBegin.table)
     || (state.md.options.centerImages && type === TBegin.figure) ? 'center' : '';
   
@@ -275,7 +314,18 @@ export const BeginTable: RuleBlock = (state, startLine, endLine, silent) => {
     pos = state.bMarks[nextLine] + state.tShift[nextLine];
     max = state.eMarks[nextLine];
     lineText = state.src.slice(pos, max);
-
+    if (!matchCaption) {
+      matchCaption = lineText.match(captionTag);
+      if (matchCaption) {
+        captionPos.start = pos + matchCaption.index;
+        captionPos.end = captionPos.start + matchCaption[0].length;
+        captionPos.start_content =  pos + lineText.indexOf(matchCaption[1]);
+        captionPos.end_content = captionPos.start_content + matchCaption[1].length;
+        captionPos.map = [nextLine, nextLine];
+        captionPos.bMarks = matchCaption.index;
+        captionPos.eMarks = matchCaption.index + matchCaption[0].length;
+      }
+    }
     if (closeTag.test(lineText)) {
       isCloseTagExist = true;
       lineText += '\n';
@@ -333,6 +383,7 @@ export const BeginTable: RuleBlock = (state, startLine, endLine, silent) => {
 
   state.parentType = 'paragraph';
   state.env.caption = caption;
+  state.env.captionPos = captionPos;
   const contentAlign = align ? align
     : hasAlignTagG ? 'center' : '';
   state.env.align = contentAlign;

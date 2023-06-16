@@ -65,6 +65,22 @@ export const MathpixStyle = (setTextAlignJustify: boolean = false, useColors: bo
         margin-top: 1em;
         margin-bottom: 1em;
     }
+    
+    .math-block[data-highlight-color] mjx-container[jax="SVG"] > svg {
+      background-color: var(--mmd-highlight-color);
+    }    
+    
+    .math-block[data-highlight-text-color] mjx-container[jax="SVG"] > svg {
+      color: var(--mmd-highlight-text-color);
+    }    
+    .math-inline[data-highlight-color] mjx-container[jax="SVG"] {
+      background-color: var(--mmd-highlight-color);
+    }    
+    
+    .math-inline[data-highlight-text-color] mjx-container[jax="SVG"] {
+      color: var(--mmd-highlight-text-color);
+    }
+    
     .math-block p {
         flex-shrink: 1;
     }

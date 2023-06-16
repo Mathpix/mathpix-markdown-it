@@ -157,7 +157,7 @@ export const inlineDecimalParse = (tok: TTokenTabular) => {
   return tok;
 };
 
-export const StatePushTabulars = (state, cTabular: TTypeContentList, align: string) => {
+export const StatePushTabulars = (state, cTabular: TTypeContentList, align: string, startLine: number) => {
   let token: Token;
   for (let i = 0; i < cTabular.length; i++) {
     if (cTabular[i].type === 'inline') {
@@ -172,6 +172,8 @@ export const StatePushTabulars = (state, cTabular: TTypeContentList, align: stri
     token = state.push("tabular", "", 0);
     token.content = cTabular[i].content;
     token.children = [];
+    token.map = [startLine, state.line];
+    token.bMarks = 0;
 
     const res: Array<TTokenTabular> | null = ParseTabular(cTabular[i].content, 0, cTabular[i].align, state.md.options);
     if (!res || res.length === 0) {
@@ -231,7 +233,7 @@ export const StatePushTabularBlock = (state, startLine: number, nextLine: number
   }
   state.line = nextLine;
   StatePushParagraphOpen(state, startLine, align, centerTables);
-  StatePushTabulars(state, cTabular, align);
+  StatePushTabulars(state, cTabular, align, startLine);
   StatePushParagraphClose(state);
   return true;
 };

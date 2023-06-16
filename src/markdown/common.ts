@@ -90,7 +90,8 @@ export const findEndMarker = (str: string, startPos: number = 0, beginMarker: st
   return {
     res: true,
     content: content,
-    nextPos: nextPos + endMarker.length
+    nextPos: nextPos + endMarker.length,
+    endPos: nextPos
   };
 };
 
