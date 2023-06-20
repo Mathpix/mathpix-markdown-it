@@ -1,6 +1,8 @@
 import { MarkdownIt, RuleBlock, RuleInline, Renderer, Token } from 'markdown-it';
 const isSpace = require('markdown-it/lib/common/utils').isSpace;
 import { renderTabularInline } from "./md-renderer-rules/render-tabular";
+import { textUnderline } from "./md-inline-rule/underline";
+import { renderUnderlineOpen, renderUnderlineText, renderUnderlineClose } from "./md-renderer-rules/underline";
 import { closeTagSpan, reSpan, reAddContentsLine } from "./common/consts";
 import { findEndMarker, getTerminatedRules } from "./common";
 import { uid , getSpacesFromLeft } from "./utils";
@@ -851,7 +853,11 @@ const textTypes: RuleInline = (state) => {
   if (!type || type === '') {
     return false;
   }
-
+  //skipping spaces in begin
+  for (; startPos < state.src.length; startPos++) {
+    let code = state.src.charCodeAt(startPos);
+    if (!isSpace(code) && code !== 0x0A) { break; }
+  }
   let {res = false, content = '', nextPos = 0, endPos = 0 } = findEndMarker(state.src, startPos);
 
   if ( !res ) {
@@ -1277,6 +1283,10 @@ const mappingTextStyles = {
   texttt: "texttt",
   texttt_open: "texttt_open",
   texttt_close: "texttt_close",
+
+  underline: "underline",
+  underline_open: "underline_open",
+  underline_close: "underline_close",
 };
 
 const mapping = {
@@ -1311,6 +1321,7 @@ export default () => {
     md.inline.ruler.before('textTypes', 'linkifyURL', linkifyURL);
     md.inline.ruler.before('textTypes', 'pageBreaks', pageBreaks);
     md.inline.ruler.before('textTypes', 'doubleSlashToSoftBreak', doubleSlashToSoftBreak);
+    md.inline.ruler.before('textTypes', 'textUnderline', textUnderline);
     md.inline.ruler.before('newline', 'newlineToSpace', newlineToSpace);
     /** ParserInline#ruler2 -> Ruler
      *[[Ruler]] instance. Second ruler used for post-processing **/
@@ -1330,7 +1341,13 @@ export default () => {
           case "textit_open":
             return '<em>';
           case "textit_close":
-            return '</em>';
+            return '</em>';          
+          case "underline":
+            return renderUnderlineText(tokens, idx, options, env, slf);
+          case "underline_open":
+            return renderUnderlineOpen(tokens, idx, options, env, slf);
+          case "underline_close":
+            return renderUnderlineClose(tokens, idx, options, env, slf);
           case "texttt":
             return renderCodeInline(tokens, idx, options, env, slf);
           case "texttt_open":
