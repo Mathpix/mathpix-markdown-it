@@ -9,12 +9,49 @@ export const textUnderline: RuleInline = (state) => {
   }
   const match = state.src
     .slice(++startPos)
-    .match(/^(?:underline)/); // eslint-disable-line
+    .match(/^(?:underline|uline|uuline|uwave|dashuline|dotuline|sout|xout)/); // eslint-disable-line
   if (!match) {
     return false;
   }
   startPos += match[0].length;
   let type: string = 'underline';
+  let currentPadding = 0;
+  switch (match[0]) {
+    case "underline":
+      type = "underline";
+      currentPadding = 3;
+      break;
+    case "uline":
+      type = "underline";
+      currentPadding = 3;
+      break;    
+    case "uuline":
+      type = "uuline";
+      currentPadding = 6;
+      break;
+    case "uwave":
+      type = "uwave";
+      break;    
+    case "dashuline":
+      type = "dashuline";
+      currentPadding = 4;
+      break;    
+    case "dotuline":
+      type = "dotuline";
+      currentPadding = 5;
+      break;    
+    case "sout":
+      type = "sout";
+      break;    
+    case "xout":
+      type = "xout";
+      break;
+    default:
+      break;
+  }
+  if (!type || type === '') {
+    return false;
+  }
   //skipping spaces in begin
   for (; startPos < state.src.length; startPos++) {
     let code = state.src.charCodeAt(startPos);
@@ -26,8 +63,8 @@ export const textUnderline: RuleInline = (state) => {
   }
   let children = [];
   state.md.inline.parse(content.trim(), state.md, state.env, children);
-  let underlineType = 'inline';
   let underlineLevel;
+  let underlinePadding = 0;
   if (children?.find(item => item.type === "underline")) {
     let childLevel = 0;
     children.map(item => {
@@ -40,27 +77,37 @@ export const textUnderline: RuleInline = (state) => {
         }
         if (item.underlineLevel > childLevel) {
           childLevel = item.underlineLevel;
+          underlinePadding = item.underlinePadding ? item.underlinePadding : 0;
         }
       }
     });
     underlineLevel = childLevel + 1;
+    if (underlineLevel >= 2) {
+      underlinePadding += currentPadding;
+    } 
   } else {
     underlineLevel = 1;
+    if (type === 'uuline') {
+      underlinePadding = 3;
+    }
   }
-  let token = state.push(type + '_open', "", 0);
+  let token = state.push('underline_open', "", 0);
   token.inlinePos = {
     start: state.pos,
     end: startPos + 1
   };
   token.nextPos = startPos + 1;
-  token.attrSet('data-underline', underlineLevel);
+  token.attrSet('data-underline-level', underlineLevel);
+  token.attrSet('data-underline-type', type);
   token.underlineLevel = underlineLevel;
   token.isSubUnderline = false;
-  token.underlineType = underlineType;
+  token.underlineType = type;
+  token.underlinePadding = underlinePadding;
 
-  token = state.push(type, "", 0);
+  token = state.push('underline', "", 0);
   if (state.md.options?.forDocx) {
-    token.attrSet('data-underline', underlineLevel);
+    token.attrSet('data-underline-level', underlineLevel);
+    token.attrSet('data-underline-type', type);
   }
   token.content = content;
   token.inlinePos = {
@@ -70,12 +117,14 @@ export const textUnderline: RuleInline = (state) => {
   token.nextPos = endPos;
   token.children = children;
   token.underlineLevel = underlineLevel;
-  token.underlineType = underlineType;
+  token.underlineType = type;
+  token.underlinePadding = underlinePadding;
   
-  token = state.push(type + '_close', "", 0);
+  token = state.push('underline_close', "", 0);
   token.underlineLevel = underlineLevel;
   token.isSubUnderline = false;
-  token.underlineType = underlineType;
+  token.underlineType = type;
+  token.underlinePadding = underlinePadding;
   state.pos = nextPos;
   state.nextPos = nextPos;
   return true;
