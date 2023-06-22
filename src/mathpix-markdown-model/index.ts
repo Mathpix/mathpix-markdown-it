@@ -369,7 +369,6 @@ class MathpixMarkdown_Model {
 
     convertToHTML = (str:string, options: TMarkdownItOptions = {}) => {
       try {
-        console.log("[convertToHTML] test log")
         const startTime = new Date().getTime();
         const  mathString =  this.isCheckFormula ? this.checkFormula(str, this.showTimeLog): str;
         options.lineNumbering = false;

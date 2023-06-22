@@ -58,11 +58,13 @@ export const getSubMath = (str: string, startPos = 0): string => {
       const environment = match[1].trim();
       const openTag: RegExp = beginTag(environment, true);
       const closeTag: RegExp = endTag(environment, true);
-      const data = findOpenCloseTagsMathEnvironment(str.slice(startPos), openTag, closeTag);
-      if (data?.arrClose?.length) {
-        endMarkerPos = startPos + data.arrClose[data.arrClose.length - 1]?.posStart;
+      if (closeTag && openTag) {
+        const data = findOpenCloseTagsMathEnvironment(str.slice(startPos), openTag, closeTag);
+        if (data?.arrClose?.length) {
+          endMarkerPos = startPos + data.arrClose[data.arrClose.length - 1]?.posStart;
+        }
+        endMarker = `\\end{${match[1]}}`;
       }
-      endMarker = `\\end{${match[1]}}`;
     } else if (match[0] === "$$") {
       endMarker = match[0];
     } else if (match[0] === "$") {

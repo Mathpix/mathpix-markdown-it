@@ -1,21 +1,29 @@
 export const endTag = (arg: string, shouldBeFirst = false): RegExp  => {
-  if (arg.indexOf('*') !== -1) {
-    /** The '*' character must be escaped in a regular expression */
-    arg = arg.replace(/\*/, '\\*');
+  try {
+    if (arg.indexOf('*') !== -1) {
+      /** The '*' character must be escaped in a regular expression */
+      arg = arg.replace(/\*/, '\\*');
+    }
+    return shouldBeFirst
+      ? new RegExp('^\\\\end\s{0,}\{(' + arg + ')\}')
+      : new RegExp('\\\\end\s{0,}\{(' + arg + ')\}')
+  } catch (e) {
+    return null;
   }
-  return shouldBeFirst 
-    ? new RegExp('^\\\\end\s{0,}\{(' + arg + ')\}') 
-    : new RegExp('\\\\end\s{0,}\{(' + arg + ')\}')
 };
 
 export const beginTag = (arg: string, shouldBeFirst = false): RegExp  => {
-  if (arg.indexOf('*') !== -1) {
-    /** The '*' character must be escaped in a regular expression */
-    arg = arg.replace(/\*/, '\\*');
+  try {
+    if (arg.indexOf('*') !== -1) {
+      /** The '*' character must be escaped in a regular expression */
+      arg = arg.replace(/\*/, '\\*');
+    }
+    return shouldBeFirst
+      ? new RegExp('^\\\\begin\s{0,}\{(' + arg + ')\}')
+      : new RegExp('\\\\begin\s{0,}\{(' + arg + ')\}')
+  } catch (e) {
+    return null;
   }
-  return shouldBeFirst 
-    ? new RegExp('^\\\\begin\s{0,}\{(' + arg + ')\}') 
-    : new RegExp('\\\\begin\s{0,}\{(' + arg + ')\}')
 };
 
 export const getTextWidth = (): number => {

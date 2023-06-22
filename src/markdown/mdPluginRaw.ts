@@ -247,7 +247,13 @@ function multiMath(state, silent) {
     endMarker = `\\end{${match[1]}}`;
     const environment = match[1].trim();
     const openTag: RegExp = beginTag(environment, true);
+    if (!openTag) {
+      return false;
+    }
     const closeTag: RegExp = endTag(environment, true);
+    if (!closeTag) {
+      return false;
+    }
     const data = findOpenCloseTagsMathEnvironment(state.src.slice(state.pos), openTag, closeTag);
     if (data?.arrClose?.length) {
       endMarkerPos = state.pos + data.arrClose[data.arrClose.length - 1]?.posStart;
