@@ -104,5 +104,11 @@ export const markdownToHtmlPipeline = (content: string, options: TMarkdownItOpti
  * convert a markdown text to html
  */
 export function markdownToHTML(markdown: string, options: TMarkdownItOptions = {}): string {
-  return markdownToHtmlPipeline(markdown, options);
+  try {
+    return markdownToHtmlPipeline(markdown, options);
+  } catch (e) {
+    console.log("ERROR=>[markdownToHTML]=>");
+    console.error(e);
+    return '';
+  }
 }

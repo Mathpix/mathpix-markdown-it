@@ -192,6 +192,9 @@ export const BeginTheorem: RuleBlock = (state, startLine, endLine, silent) => {
 
 
   const closeTag = endTag(envName);
+  if (!closeTag) {
+    return false;
+  }
 
   // let content: string = '';
   let resText: string = '';
@@ -400,6 +403,9 @@ export const BeginProof: RuleBlock = (state, startLine, endLine, silent) => {
   /** Inline content before proof block */
   strBefore = match.index > 0 ? lineText.slice(0, match.index) : '';
   const closeTag = endTag(envName);
+  if (!closeTag) {
+    return false;
+  }
 
   // let content: string = '';
   let resText: string = '';
