@@ -368,15 +368,20 @@ class MathpixMarkdown_Model {
     };
 
     convertToHTML = (str:string, options: TMarkdownItOptions = {}) => {
+      try {
         const startTime = new Date().getTime();
         const  mathString =  this.isCheckFormula ? this.checkFormula(str, this.showTimeLog): str;
         options.lineNumbering = false;
         const html = this.markdownToHTML(mathString, options);
         const endTime = new Date().getTime();
-        if(this.showTimeLog){
-            console.log(`===> setText: ${endTime - startTime}ms`);
+        if (this.showTimeLog){
+          console.log(`===> setText: ${endTime - startTime}ms`);
         }
         return html;
+      } catch (err) {
+        console.error(err);
+        return '';
+      }
     };
 
     getMathjaxStyle = () => {
