@@ -1,25 +1,15 @@
 import { renderTabularInline } from "./render-tabular";
+import { renderInlineContent } from "../mdPluginText";
 
 const htmlUnderlineOpen = (underlineLevel, underlineType = 'underline', underlinePadding = 0): string => {
   if (underlineType === 'uwave') {
-    let html = `<span data-underline="${underlineLevel}" style="`;
+    let html = `<span data-underline-level="${underlineLevel}" `;
+    html += `data-underline-type="${underlineType}" `;
+    html += 'style="';
     html += 'text-decoration: underline; text-decoration-style: wavy;';
     html += '">';
     return html;
-  }  
-  if (underlineType === 'sout') {
-    let html = `<span data-underline="${underlineLevel}" style="`;
-    html += 'text-decoration: line-through; text-decoration-thickness: from-font;';
-    html += '">';
-    return html;
-  }  
-  if (underlineType === 'xout') {
-    let html = `<span data-underline="${underlineLevel}" style="`;
-    html += 'background: repeating-linear-gradient(-60deg, currentcolor, currentcolor, transparent 1px, transparent 6px);';
-    html += '">';
-    return html;
   }
-  
   let cssBackground = "border-bottom: 1px solid;";
   switch (underlineType) {
     case 'dashuline':
@@ -121,4 +111,21 @@ export const renderUnderlineClose = (tokens, idx, options, env, slf) => {
     return html + `<span style="height: ${28 + lineHeight}px; display: inline-block;">&#8203;</span>`;
   }
   return html;
+};
+
+export const renderOutOpen = (tokens, idx, options, env, slf) => {
+  const token = tokens[idx];
+  let html = `<span `;
+  html += `data-out-type="${token.underlineType}" `;
+  html += 'style="';
+  html += token.underlineType === 'xout' 
+    ? 'background: repeating-linear-gradient(-60deg, currentcolor, currentcolor, transparent 1px, transparent 6px);'
+    : 'text-decoration: line-through; text-decoration-thickness: from-font;';
+  html += '">';
+  return html;
+};
+
+export const renderOutText = (tokens, idx, options, env, slf) => {
+  const token = tokens[idx];
+  return renderInlineContent(token, options, env, slf);
 };

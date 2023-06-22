@@ -9,7 +9,7 @@ export const textUnderline: RuleInline = (state) => {
   }
   const match = state.src
     .slice(++startPos)
-    .match(/^(?:underline|uline|uuline|uwave|dashuline|dotuline|sout|xout)/); // eslint-disable-line
+    .match(/^(?:underline|uline|uuline|uwave|dashuline|dotuline)/); // eslint-disable-line
   if (!match) {
     return false;
   }
@@ -39,12 +39,6 @@ export const textUnderline: RuleInline = (state) => {
     case "dotuline":
       type = "dotuline";
       currentPadding = 5;
-      break;    
-    case "sout":
-      type = "sout";
-      break;    
-    case "xout":
-      type = "xout";
       break;
     default:
       break;
@@ -125,6 +119,75 @@ export const textUnderline: RuleInline = (state) => {
   token.isSubUnderline = false;
   token.underlineType = type;
   token.underlinePadding = underlinePadding;
+  state.pos = nextPos;
+  state.nextPos = nextPos;
+  return true;
+};
+
+export const textOut: RuleInline = (state) => {
+  let startPos = state.pos;
+  if (state.src.charCodeAt(startPos) !== 0x5c /* \ */) {
+    return false;
+  }
+  const match = state.src
+    .slice(++startPos)
+    .match(/^(?:sout|xout)/); // eslint-disable-line
+  if (!match) {
+    return false;
+  }
+  startPos += match[0].length;
+  let type: string = 'out';
+  switch (match[0]) {
+    case "sout":
+      type = "sout";
+      break;
+    case "xout":
+      type = "xout";
+      break;
+    default:
+      break;
+  }
+  if (!type || type === '') {
+    return false;
+  }
+  //skipping spaces in begin
+  for (; startPos < state.src.length; startPos++) {
+    let code = state.src.charCodeAt(startPos);
+    if (!isSpace(code) && code !== 0x0A) { break; }
+  }
+  let {res = false, content = '', nextPos = 0, endPos = 0 } = findEndMarker(state.src, startPos);
+  if ( !res ) {
+    return false;
+  }
+
+  let token = state.push('out_open', "", 0);
+  token.inlinePos = {
+    start: state.pos,
+    end: startPos + 1
+  };
+  token.nextPos = startPos + 1;
+  token.attrSet('data-out-type', type);
+  token.underlineType = type;
+
+  token = state.push('out', "", 0);
+  if (state.md.options?.forDocx) {
+    token.attrSet('data-out-type', type);
+  }
+  token.content = content;
+  token.inlinePos = {
+    start: startPos + 1,
+    end: endPos,
+  };
+  token.nextPos = endPos;
+  token.children = [];
+
+  let children = [];
+  state.md.inline.parse(token.content.trim(), state.md, state.env, children);
+  token.children = children;
+  token.underlineType = type;
+
+  token = state.push('out_close', "", 0);
+  token.underlineType = type;
   state.pos = nextPos;
   state.nextPos = nextPos;
   return true;

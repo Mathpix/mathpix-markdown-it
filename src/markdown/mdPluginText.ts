@@ -1,8 +1,14 @@
 import { MarkdownIt, RuleBlock, RuleInline, Renderer, Token } from 'markdown-it';
 const isSpace = require('markdown-it/lib/common/utils').isSpace;
 import { renderTabularInline } from "./md-renderer-rules/render-tabular";
-import { textUnderline } from "./md-inline-rule/underline";
-import { renderUnderlineOpen, renderUnderlineText, renderUnderlineClose } from "./md-renderer-rules/underline";
+import { textUnderline, textOut } from "./md-inline-rule/underline";
+import { 
+  renderUnderlineOpen, 
+  renderUnderlineText, 
+  renderUnderlineClose,
+  renderOutOpen,
+  renderOutText
+} from "./md-renderer-rules/underline";
 import { closeTagSpan, reSpan, reAddContentsLine } from "./common/consts";
 import { findEndMarker, getTerminatedRules } from "./common";
 import { uid , getSpacesFromLeft } from "./utils";
@@ -1286,7 +1292,11 @@ const mappingTextStyles = {
 
   underline: "underline",
   underline_open: "underline_open",
-  underline_close: "underline_close",
+  underline_close: "underline_close",  
+  
+  out: "out",
+  out_open: "out_open",
+  out_close: "out_close",
 };
 
 const mapping = {
@@ -1322,6 +1332,7 @@ export default () => {
     md.inline.ruler.before('textTypes', 'pageBreaks', pageBreaks);
     md.inline.ruler.before('textTypes', 'doubleSlashToSoftBreak', doubleSlashToSoftBreak);
     md.inline.ruler.before('textTypes', 'textUnderline', textUnderline);
+    md.inline.ruler.before('textTypes', 'textOut', textOut);
     md.inline.ruler.before('newline', 'newlineToSpace', newlineToSpace);
     /** ParserInline#ruler2 -> Ruler
      *[[Ruler]] instance. Second ruler used for post-processing **/
@@ -1347,7 +1358,13 @@ export default () => {
           case "underline_open":
             return renderUnderlineOpen(tokens, idx, options, env, slf);
           case "underline_close":
-            return renderUnderlineClose(tokens, idx, options, env, slf);
+            return renderUnderlineClose(tokens, idx, options, env, slf);          
+          case "out":
+            return renderOutText(tokens, idx, options, env, slf);
+          case "out_open":
+            return renderOutOpen(tokens, idx, options, env, slf);
+          case "out_close":
+            return '</span>';
           case "texttt":
             return renderCodeInline(tokens, idx, options, env, slf);
           case "texttt_open":
