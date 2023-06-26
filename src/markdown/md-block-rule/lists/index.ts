@@ -44,6 +44,7 @@ const ListItemsBlock = (state, items) => {
 const ListItems = (state, items, iLevel, eLevel, li, iOpen) => {
   let token;
   const blockStartTag: RegExp = /\\begin{(center|left|right|table|figure|tabular)}/;
+  let padding = 0;
   if (items && items.length > 0) {
     if (items && items.length > 0) {
       items.forEach(item => {
@@ -82,9 +83,20 @@ const ListItems = (state, items, iLevel, eLevel, li, iOpen) => {
             token.attrSet('value', li.value.toString())
             li = null;
           }
-          if (child.marker) {
+          if (child.hasOwnProperty('marker')) {
             token.marker = child.marker;
             token.markerTokens = child.markerTokens;
+            token.isEmptyMarker = child.isEmptyMarker;
+            let paddingChild = 0;
+            for (let i = 0; i < child.markerTokens?.length; i++) {
+              if (child.markerTokens[i].type === 'text') {
+                paddingChild += child.markerTokens[i].content.length;
+              }
+            }
+            if (paddingChild > padding) {
+              padding = paddingChild;
+            }
+            
           }
           token.parentType = state.types && state.types.length > 0 ? state.types[state.types.length - 1] : '';
           token.parentStart = state.startLine;
@@ -126,7 +138,10 @@ const ListItems = (state, items, iLevel, eLevel, li, iOpen) => {
       })
     }
   }
-  return iOpen;
+  return {
+    iOpen: iOpen, 
+    padding: padding
+  };
 };
 
 const setTokenOpenList = (state, startLine, endLine, type, iLevel, eLevel) => {
@@ -414,7 +429,14 @@ export const Lists:RuleBlock = (state, startLine: number, endLine: number, silen
           if (sB.length > 0) {
             items = ItemsAddToPrev(items, sB, nextLine);
           }
-          iOpen = ListItems(state, items, iLevelT, eLevel, li, iOpen);
+          let dataItems = ListItems(state, items, iLevelT, eLevel, li, iOpen);
+          iOpen = dataItems.iOpen;
+          if (!tokenStart.padding || tokenStart.padding < dataItems.padding) {
+            tokenStart.padding = dataItems.padding;
+            if (tokenStart.padding > 3) {
+              tokenStart.attrSet('data-padding-inline-start', (tokenStart.padding * 14).toString())
+            }
+          }
           items = [];
           li = null;
           setTokenCloseList(state, startLine + dStart, nextLine + dStart)
@@ -452,7 +474,14 @@ export const Lists:RuleBlock = (state, startLine: number, endLine: number, silen
         if (sB.length > 0) {
           items = ItemsAddToPrev(items, sB, nextLine);
         }
-        iOpen = ListItems(state, items, iLevelT, eLevel, li, iOpen);
+        let dataItems = ListItems(state, items, iLevelT, eLevel, li, iOpen);
+        iOpen = dataItems.iOpen;
+        if (!tokenStart.padding || tokenStart.padding < dataItems.padding) {
+          tokenStart.padding = dataItems.padding
+          if (tokenStart.padding > 3) {
+            tokenStart.attrSet('data-padding-inline-start', (tokenStart.padding * 14).toString())
+          }
+        }
         items = [];
         li = null;
         setTokenOpenList(state, -1, -1, type, iLevelT, eLevel);

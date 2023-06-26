@@ -37,10 +37,14 @@ export const render_itemize_list_open = (tokens, index, renderer) => {
   }
   level_itemize++;
   list_injectLineNumbers(tokens, index, "itemize");
+  let dataPaddingInlineStart = tokens[index].attrGet('data-padding-inline-start');
+  dataPaddingInlineStart = dataPaddingInlineStart 
+    ? `padding-inline-start: ${dataPaddingInlineStart}px; `
+    : '';
   if (level_itemize > 1) {
     return `<li><ul${renderer.renderAttrs(tokens[index])} style="list-style-type: none">`;
   }
-  return `<ul${renderer.renderAttrs(tokens[index])} style="list-style-type: none">`;
+  return `<ul${renderer.renderAttrs(tokens[index])} style="${dataPaddingInlineStart}list-style-type: none">`;
 };
 
 export const render_enumerate_list_open = (tokens, index, renderer) => {
@@ -51,7 +55,14 @@ export const render_enumerate_list_open = (tokens, index, renderer) => {
   const itLevel = GetEnumerateLevel(tokens[index].enumerateLevel);
   const str = itLevel.length >= level_enumerate ? itLevel[level_enumerate-1] : 'decimal';
   list_injectLineNumbers(tokens, index, `enumerate ${str}`);
-  return `<ol${renderer.renderAttrs(tokens[index])} style=" list-style-type: ${str}">`;
+  let dataPaddingInlineStart = tokens[index].attrGet('data-padding-inline-start');
+  dataPaddingInlineStart = dataPaddingInlineStart
+    ? `padding-inline-start: ${dataPaddingInlineStart}px; `
+    : '';
+  if (level_enumerate > 1) {
+    return `<ol${renderer.renderAttrs(tokens[index])} style=" list-style-type: ${str}">`;
+  }
+  return `<ol${renderer.renderAttrs(tokens[index])} style="${dataPaddingInlineStart} list-style-type: ${str}">`;
 };
 
 export const render_item_inline = (tokens, index, options, env, slf) => {
@@ -81,16 +92,23 @@ export const render_item_inline = (tokens, index, options, env, slf) => {
   if (token.parentType !== "itemize" && token.parentType !== "enumerate") {
     return `<li>${sContent}</li>`;
   }
-
+  if (!sContent) {
+    sContent = '&nbsp';
+  }
   if (token.parentType === "enumerate") {
+    if (token.hasOwnProperty('marker') && token.markerTokens) {
+      list_injectLineNumbers(tokens, index, `li_enumerate not_number`);
+      let span = token.marker && token.markerTokens.length ? slf.renderInline(token.markerTokens, options) : '';
+      return `<li${slf.renderAttrs(token)} style="display: block"><span class="li_level">${span}</span>${sContent}</li>`;
+    }
     list_injectLineNumbers(tokens, index, `li_enumerate`);
     return `<li${slf.renderAttrs(token)}>${sContent}</li>`;
   } else {
     const itemizeLevelTokens = GetItemizeLevelTokens(token.itemizeLevel);
 
-    let span = '.';
-    if (token.marker && token.markerTokens) {
-      span = slf.renderInline(token.markerTokens, options)
+    let span = '';
+    if (token.hasOwnProperty('marker')  && token.markerTokens) {
+      span = token.marker && token.markerTokens.length ? slf.renderInline(token.markerTokens, options) : '';
     } else {
       span = level_itemize > 0 && itemizeLevelTokens.length >= level_itemize
         ? slf.renderInline(itemizeLevelTokens[level_itemize-1], options)
