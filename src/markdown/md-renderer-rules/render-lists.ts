@@ -2,6 +2,7 @@ import {PREVIEW_LINE_CLASS, PREVIEW_PARAGRAPH_PREFIX} from "../rules";
 import { GetItemizeLevelTokens, GetEnumerateLevel } from "../md-block-rule/lists/re-level";
 import { renderTabularInline } from "./render-tabular";
 import { needToHighlightAll, highlightText } from "../highlight/common";
+import convertSvgToBase64 from "../md-svg-to-base64/convert-scv-to-base64";
 
 var level_itemize = 0;
 var level_enumerate = 0;
@@ -65,6 +66,32 @@ export const render_enumerate_list_open = (tokens, index, renderer) => {
   return `<ol${renderer.renderAttrs(tokens[index])} style="${dataPaddingInlineStart} list-style-type: ${str}">`;
 };
 
+const generateHtmlForCustomMarker = (token, options, slf): string => {
+  let htmlMarker = '';
+  if (options.forDocx) {
+    for (let j = 0; j < token.markerTokens.length; j++) {
+      if (token.markerTokens[j].mathEquation) {
+        try {
+          let svg = '';
+          let svgStart = token.markerTokens[j].mathEquation.indexOf('<svg');
+          let svgEnd = token.markerTokens[j].mathEquation.indexOf('</mjx-container>');
+          svg = svgStart >= 0 && svgEnd > 0 ? token.markerTokens[j].mathEquation.slice(svgStart, svgEnd) : '';
+          let resSvg = convertSvgToBase64(svg);
+          htmlMarker += resSvg;
+        } catch (e) {
+          htmlMarker += token.markerTokens[j].mathEquation
+        }
+        continue;
+      }
+      htmlMarker += slf.renderInline([token.markerTokens[j]], options);
+    }
+  } else {
+    htmlMarker = token.marker && token.markerTokens.length
+      ? slf.renderInline(token.markerTokens, options) : '';
+  }
+  return htmlMarker;
+};
+
 export const render_item_inline = (tokens, index, options, env, slf) => {
   const token = tokens[index];
   let sContent = '';
@@ -95,27 +122,29 @@ export const render_item_inline = (tokens, index, options, env, slf) => {
   if (!sContent) {
     sContent = '&nbsp';
   }
+  let dataAttr = '';
+  let htmlMarker = '';
   if (token.parentType === "enumerate") {
     if (token.hasOwnProperty('marker') && token.markerTokens) {
       list_injectLineNumbers(tokens, index, `li_enumerate not_number`);
-      let span = token.marker && token.markerTokens.length ? slf.renderInline(token.markerTokens, options) : '';
-      return `<li${slf.renderAttrs(token)} style="display: block"><span class="li_level">${span}</span>${sContent}</li>`;
+      dataAttr += ' data-custom-marker: "true";';
+      htmlMarker = generateHtmlForCustomMarker (token, options, slf);
+      return `<li${slf.renderAttrs(token)}${dataAttr} style="display: block"><span class="li_level"${dataAttr}>${htmlMarker}</span>${sContent}</li>`;
     }
     list_injectLineNumbers(tokens, index, `li_enumerate`);
     return `<li${slf.renderAttrs(token)}>${sContent}</li>`;
   } else {
     const itemizeLevelTokens = GetItemizeLevelTokens(token.itemizeLevel);
-
-    let span = '';
     if (token.hasOwnProperty('marker')  && token.markerTokens) {
-      span = token.marker && token.markerTokens.length ? slf.renderInline(token.markerTokens, options) : '';
+      dataAttr += ' data-custom-marker: "true";';
+      htmlMarker = generateHtmlForCustomMarker (token, options, slf);
     } else {
-      span = level_itemize > 0 && itemizeLevelTokens.length >= level_itemize
+      htmlMarker = level_itemize > 0 && itemizeLevelTokens.length >= level_itemize
         ? slf.renderInline(itemizeLevelTokens[level_itemize-1], options)
         : '.';
     }
     list_injectLineNumbers(tokens, index, `li_itemize`);
-    return `<li${slf.renderAttrs(token)}><span class="li_level">${span}</span>${sContent}</li>`;
+    return `<li${slf.renderAttrs(token)}${dataAttr}><span class="li_level"${dataAttr}>${htmlMarker}</span>${sContent}</li>`;
   }
 };
 

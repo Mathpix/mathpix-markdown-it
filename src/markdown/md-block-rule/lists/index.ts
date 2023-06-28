@@ -86,7 +86,6 @@ const ListItems = (state, items, iLevel, eLevel, li, iOpen) => {
           if (child.hasOwnProperty('marker')) {
             token.marker = child.marker;
             token.markerTokens = child.markerTokens;
-            token.isEmptyMarker = child.isEmptyMarker;
             let paddingChild = 0;
             for (let i = 0; i < child.markerTokens?.length; i++) {
               if (child.markerTokens[i].type === 'text') {
