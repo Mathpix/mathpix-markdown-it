@@ -127,7 +127,7 @@ export const render_item_inline = (tokens, index, options, env, slf) => {
   if (token.parentType === "enumerate") {
     if (token.hasOwnProperty('marker') && token.markerTokens) {
       list_injectLineNumbers(tokens, index, `li_enumerate not_number`);
-      dataAttr += ' data-custom-marker: "true"';
+      dataAttr += ' data-custom-marker="true"';
       htmlMarker = generateHtmlForCustomMarker (token, options, slf);
       return `<li${slf.renderAttrs(token)}${dataAttr} style="display: block"><span class="li_level"${dataAttr}>${htmlMarker}</span>${sContent}</li>`;
     }
@@ -136,7 +136,7 @@ export const render_item_inline = (tokens, index, options, env, slf) => {
   } else {
     const itemizeLevelTokens = GetItemizeLevelTokens(token.itemizeLevel);
     if (token.hasOwnProperty('marker')  && token.markerTokens) {
-      dataAttr += ' data-custom-marker: "true"';
+      dataAttr += ' data-custom-marker="true"';
       htmlMarker = generateHtmlForCustomMarker (token, options, slf);
     } else {
       htmlMarker = level_itemize > 0 && itemizeLevelTokens.length >= level_itemize
