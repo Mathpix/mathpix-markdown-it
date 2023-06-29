@@ -32,7 +32,7 @@ const list_injectLineNumbers = (tokens, idx, className = '') => {
   }
 };
 
-export const render_itemize_list_open = (tokens, index, renderer) => {
+export const render_itemize_list_open = (tokens, index, options, env, renderer) => {
   if (tokens[index].level === 0) {
     level_itemize = 0
   }
@@ -48,11 +48,12 @@ export const render_itemize_list_open = (tokens, index, renderer) => {
   return `<ul${renderer.renderAttrs(tokens[index])} style="${dataPaddingInlineStart}list-style-type: none">`;
 };
 
-export const render_enumerate_list_open = (tokens, index, renderer) => {
+export const render_enumerate_list_open = (tokens, index, options, env, renderer) => {
   if (tokens[index].level === 0) {
     level_enumerate = 0
   }
   level_enumerate++;
+  let dataAttr = '';
   const itLevel = GetEnumerateLevel(tokens[index].enumerateLevel);
   const str = itLevel.length >= level_enumerate ? itLevel[level_enumerate-1] : 'decimal';
   list_injectLineNumbers(tokens, index, `enumerate ${str}`);
@@ -60,31 +61,40 @@ export const render_enumerate_list_open = (tokens, index, renderer) => {
   dataPaddingInlineStart = dataPaddingInlineStart
     ? `padding-inline-start: ${dataPaddingInlineStart}px; `
     : '';
-  if (level_enumerate > 1) {
-    return `<ol${renderer.renderAttrs(tokens[index])} style=" list-style-type: ${str}">`;
+  if (options.forDocx) {
+    dataAttr = ` data-list-style-type="${str}"`
   }
-  return `<ol${renderer.renderAttrs(tokens[index])} style="${dataPaddingInlineStart} list-style-type: ${str}">`;
+  if (level_enumerate > 1) {
+    return `<ol${renderer.renderAttrs(tokens[index])}${dataAttr} style=" list-style-type: ${str}">`;
+  }
+  return `<ol${renderer.renderAttrs(tokens[index])}${dataAttr} style="${dataPaddingInlineStart} list-style-type: ${str}">`;
+};
+
+const generateHtmlForMarkerTokens = (markerTokens, slf, options): string => {
+  let htmlMarker = '';
+  for (let j = 0; j < markerTokens.length; j++) {
+    if (markerTokens[j].mathEquation) {
+      try {
+        let svg = '';
+        let svgStart = markerTokens[j].mathEquation.indexOf('<svg');
+        let svgEnd = markerTokens[j].mathEquation.indexOf('</mjx-container>');
+        svg = svgStart >= 0 && svgEnd > 0 ? markerTokens[j].mathEquation.slice(svgStart, svgEnd) : '';
+        let resSvg = convertSvgToBase64(svg);
+        htmlMarker += resSvg;
+      } catch (e) {
+        htmlMarker += markerTokens[j].mathEquation
+      }
+      continue;
+    }
+    htmlMarker += slf.renderInline([markerTokens[j]], options);
+  }
+  return htmlMarker;
 };
 
 const generateHtmlForCustomMarker = (token, options, slf): string => {
   let htmlMarker = '';
   if (options.forDocx) {
-    for (let j = 0; j < token.markerTokens.length; j++) {
-      if (token.markerTokens[j].mathEquation) {
-        try {
-          let svg = '';
-          let svgStart = token.markerTokens[j].mathEquation.indexOf('<svg');
-          let svgEnd = token.markerTokens[j].mathEquation.indexOf('</mjx-container>');
-          svg = svgStart >= 0 && svgEnd > 0 ? token.markerTokens[j].mathEquation.slice(svgStart, svgEnd) : '';
-          let resSvg = convertSvgToBase64(svg);
-          htmlMarker += resSvg;
-        } catch (e) {
-          htmlMarker += token.markerTokens[j].mathEquation
-        }
-        continue;
-      }
-      htmlMarker += slf.renderInline([token.markerTokens[j]], options);
-    }
+    htmlMarker = generateHtmlForMarkerTokens(token.markerTokens, slf, options);
   } else {
     htmlMarker = token.marker && token.markerTokens.length
       ? slf.renderInline(token.markerTokens, options) : '';
@@ -139,9 +149,16 @@ export const render_item_inline = (tokens, index, options, env, slf) => {
       dataAttr += ' data-custom-marker="true"';
       htmlMarker = generateHtmlForCustomMarker (token, options, slf);
     } else {
-      htmlMarker = level_itemize > 0 && itemizeLevelTokens.length >= level_itemize
-        ? slf.renderInline(itemizeLevelTokens[level_itemize-1], options)
-        : '.';
+      if (level_itemize > 0 && itemizeLevelTokens.length >= level_itemize) {
+        if (options.forDocx) {
+          dataAttr += ' data-custom-marker="true"';
+          htmlMarker = generateHtmlForMarkerTokens(itemizeLevelTokens[level_itemize-1], options, slf);
+        } else {
+          htmlMarker = slf.renderInline(itemizeLevelTokens[level_itemize-1], options);
+        }
+      } else {
+        htmlMarker = '.';
+      }
     }
     list_injectLineNumbers(tokens, index, `li_itemize`);
     return `<li${slf.renderAttrs(token)}${dataAttr}><span class="li_level"${dataAttr}>${htmlMarker}</span>${sContent}</li>`;
