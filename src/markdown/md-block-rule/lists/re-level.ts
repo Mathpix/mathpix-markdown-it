@@ -70,7 +70,10 @@ export const SetItemizeLevelTokens = (state) => {
     itemizeLevelTokens[i] = children;
   }
   state.md.options = beforeOptions;
-  return [].concat(itemizeLevelTokens)
+  return {
+    tokens: [].concat(itemizeLevelTokens),
+    contents: [].concat(itemizeLevel)
+  }
 };
 
 export const SetItemizeLevelTokensByIndex = (state, index: number) => {
@@ -103,7 +106,10 @@ export const GetItemizeLevelTokens = (data = null) => {
 
 export const GetItemizeLevelTokensByState = (state) => {
   if (itemizeLevelTokens && itemizeLevelTokens.length > 0) {
-    return [].concat(itemizeLevelTokens)
+    return {
+      contents: [].concat(itemizeLevel),
+      tokens: [].concat(itemizeLevelTokens)
+    }
   } else {
     return SetItemizeLevelTokens(state)
   }

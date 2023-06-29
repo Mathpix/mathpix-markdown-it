@@ -16,9 +16,15 @@ export declare const SetDefaultItemizeLevel: () => any[];
 export declare const SetDefaultEnumerateLevel: () => any[];
 export declare const GetItemizeLevel: (data?: any) => any[];
 export declare const GetEnumerateLevel: (data?: any) => any[];
-export declare const SetItemizeLevelTokens: (state: any) => any[];
+export declare const SetItemizeLevelTokens: (state: any) => {
+    tokens: any[];
+    contents: any[];
+};
 export declare const SetItemizeLevelTokensByIndex: (state: any, index: number) => void;
 export declare const GetItemizeLevelTokens: (data?: any) => any[];
-export declare const GetItemizeLevelTokensByState: (state: any) => any[];
+export declare const GetItemizeLevelTokensByState: (state: any) => {
+    tokens: any[];
+    contents: any[];
+};
 export declare const ChangeLevel: (state: any, data: any) => boolean;
 export declare const clearItemizeLevelTokens: () => void;
