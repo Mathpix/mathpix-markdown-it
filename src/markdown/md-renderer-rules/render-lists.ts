@@ -228,7 +228,7 @@ export const render_item_inline = (tokens, index, options, env, slf) => {
       if (level_itemize > 0 && itemizeLevelTokens.length >= level_itemize) {
         if (options.forDocx) {
           // dataAttr += ' data-custom-marker="true"';
-          let data = generateHtmlForMarkerTokens(itemizeLevelTokens[level_itemize-1], options, slf);
+          let data = generateHtmlForMarkerTokens(itemizeLevelTokens[level_itemize-1], slf, options);
           htmlMarker = data.htmlMarker;
           if (data.markerType === 'math') {
             dataAttr += ' data-custom-marker="true"';
