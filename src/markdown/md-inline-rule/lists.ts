@@ -96,7 +96,7 @@ export const listItemInline: RuleInline = (state, silent) => {
 
   match = state.src
     .slice(++startMathPos)
-    .match(bItemTag);
+    .match(bItemTag); ///^(?:item\s{0,}\[([^\]]*)\]|item)/
   if (!match){ return false}
 
   const matchEnd = state.src
@@ -104,7 +104,7 @@ export const listItemInline: RuleInline = (state, silent) => {
     .match(endItem);
   let content = matchEnd && matchEnd.index > 0
     ? state.src.slice(startMathPos + match.index + match[0].length, matchEnd.index+startMathPos + match.index + match[0].length)
-    : state.src.slice(startMathPos + match.index + match[0].length)
+    : state.src.slice(startMathPos + match.index + match[0].length);
   token        = state.push('item_inline', 'li', 0);
   token.parentType = state.parentType;
   token.inlinePos = {
@@ -116,10 +116,20 @@ export const listItemInline: RuleInline = (state, silent) => {
   let children = [];
   state.md.inline.parse(content.trim(), state.md, state.env, children);
   token.children = children;
-  if (match[1]) {
-    token.marker = match[1];
+  if (match[1] !== undefined) {
+    token.marker = match[1] ? match[1].trim() : '';
     let children = [];
+    let beforeOptions = {...state.md.options};
+    if (state.md.options.forDocx) {
+      state.md.options = Object.assign({}, state.md.options, {
+        outMath: {
+          include_svg: true,
+          include_mathml_word: false,
+        }
+      })
+    }
     state.md.inline.parse(match[1], state.md, state.env, children);
+    state.md.options = beforeOptions
     token.markerTokens = children;
   }
   state.pos = startMathPos + match.index + match[0].length + content.length;

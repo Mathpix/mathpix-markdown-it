@@ -27,7 +27,7 @@ export const listsStyles = `
   .itemize > li {
     position: relative;
   }
-  .itemize > li > span.li_level { 
+  .itemize > li > span.li_level, .li_enumerate.not_number > span.li_level { 
     position: absolute;
     right: 100%;
     white-space: nowrap;
@@ -36,5 +36,10 @@ export const listsStyles = `
     justify-content: flex-end;
     padding-right: 10px;
     box-sizing: border-box;
+  }
+  .li_enumerate.not_number {
+    position: relative;
+    display: inline-block;
+    list-style-type: none;
   }
 `;

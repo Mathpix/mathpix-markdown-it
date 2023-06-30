@@ -55,9 +55,9 @@ export default (md: MarkdownIt, options) => {
     md.renderer.rules[key] = (tokens, idx, options, env, slf) => {
       switch (tokens[idx].type) {
         case "itemize_list_open":
-          return render_itemize_list_open(tokens, idx, slf);
+          return render_itemize_list_open(tokens, idx, options, env, slf);
         case "enumerate_list_open":
-          return render_enumerate_list_open(tokens, idx, slf);
+          return render_enumerate_list_open(tokens, idx, options, env, slf);
          case "item_inline":
            return render_item_inline(tokens, idx, options, env, slf);
         case "itemize_list_close":

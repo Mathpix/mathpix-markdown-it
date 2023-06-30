@@ -7,7 +7,7 @@ export const bItemTag: RegExp = /^(?:item\s{0,}\[([^\]]*)\]|item)/;
 const closeTag: RegExp = /\\end\s{0,}\{(itemize|enumerate)\}/;
 export const reNumber: RegExp = /^-?\d+$/;
 
-const setTokenListItemOpenBlock = (state, startLine, endLine, marker, li, iLevel, eLevel) => {
+const setTokenListItemOpenBlock = (state, startLine, endLine, marker, li, iLevel, eLevel, iLevelC) => {
   let token;
   token        = state.push('latex_list_item_open', 'li', 1);
   token.parentType = state.types && state.types.length > 0 ? state.types[state.types.length - 1] : '';
@@ -28,6 +28,7 @@ const setTokenListItemOpenBlock = (state, startLine, endLine, marker, li, iLevel
   token.map = [startLine, endLine ];
   token.prentLevel = state.prentLevel;
   token.itemizeLevel = iLevel;
+  token.itemizeLevelContents = iLevelC;
   token.enumerateLevel = eLevel;
 };
 
@@ -41,9 +42,10 @@ const ListItemsBlock = (state, items) => {
   }
 };
 
-const ListItems = (state, items, iLevel, eLevel, li, iOpen) => {
+const ListItems = (state, items, iLevel, eLevel, li, iOpen, iLevelC) => {
   let token;
   const blockStartTag: RegExp = /\\begin{(center|left|right|table|figure|tabular)}/;
+  let padding = 0;
   if (items && items.length > 0) {
     if (items && items.length > 0) {
       items.forEach(item => {
@@ -55,7 +57,7 @@ const ListItems = (state, items, iLevel, eLevel, li, iOpen) => {
         ) {
           let match = item.content.slice(1).match(bItemTag);
           if (match) {
-            setTokenListItemOpenBlock(state, item.startLine, item.endLine + 1, match[1], li, iLevel, eLevel);
+            setTokenListItemOpenBlock(state, item.startLine, item.endLine + 1, match[1], li, iLevel, eLevel, iLevelC);
             if (li && li.hasOwnProperty('value')) {
               li = null;
             }
@@ -82,9 +84,19 @@ const ListItems = (state, items, iLevel, eLevel, li, iOpen) => {
             token.attrSet('value', li.value.toString())
             li = null;
           }
-          if (child.marker) {
+          if (child.hasOwnProperty('marker')) {
             token.marker = child.marker;
             token.markerTokens = child.markerTokens;
+            let paddingChild = 0;
+            for (let i = 0; i < child.markerTokens?.length; i++) {
+              if (child.markerTokens[i].type === 'text') {
+                paddingChild += child.markerTokens[i].content.length;
+              }
+            }
+            if (paddingChild > padding) {
+              padding = paddingChild;
+            }
+            
           }
           token.parentType = state.types && state.types.length > 0 ? state.types[state.types.length - 1] : '';
           token.parentStart = state.startLine;
@@ -119,6 +131,7 @@ const ListItems = (state, items, iLevel, eLevel, li, iOpen) => {
 
 
           token.itemizeLevel = iLevel;
+          token.itemizeLevelContents = iLevelC;
          // token.itemizeLevelTokens = iLevelTokens;
           token.enumerateLevel = eLevel;
         }
@@ -126,10 +139,13 @@ const ListItems = (state, items, iLevel, eLevel, li, iOpen) => {
       })
     }
   }
-  return iOpen;
+  return {
+    iOpen: iOpen, 
+    padding: padding
+  };
 };
 
-const setTokenOpenList = (state, startLine, endLine, type, iLevel, eLevel) => {
+const setTokenOpenList = (state, startLine, endLine, type, iLevel, eLevel, iLevelC) => {
   let token: Token;
   if (type === TBegin.itemize) {
     token        = state.push('itemize_list_open', 'ul', 1);
@@ -151,6 +167,7 @@ const setTokenOpenList = (state, startLine, endLine, type, iLevel, eLevel) => {
     }
   }
   token.itemizeLevel = iLevel;
+  token.itemizeLevelContents = iLevelC;
   token.enumerateLevel = eLevel;
   token.prentLevel = state.prentLevel;
   if (startLine > -1 && endLine > -1) {
@@ -176,7 +193,7 @@ const setTokenCloseList = (state, startLine, endLine) => {
   state.types.pop()
 };
 
-const ListOpen = (state, startLine, lineText, iLevel, eLevel): {iOpen: number, tokenStart: Token|null, li? } => {
+const ListOpen = (state, startLine, lineText, iLevel, eLevel, iLevelC): {iOpen: number, tokenStart: Token|null, li? } => {
   let token: Token, tokenStart: Token|null = null;
   let iOpen: number = 0;
   let li = null;
@@ -196,7 +213,7 @@ const ListOpen = (state, startLine, lineText, iLevel, eLevel): {iOpen: number, t
     if (!type) {
       return {iOpen: iOpen, tokenStart: tokenStart};
     }
-    tokenStart = setTokenOpenList (state, startLine, startLine+1, type, iLevel, eLevel);
+    tokenStart = setTokenOpenList (state, startLine, startLine+1, type, iLevel, eLevel, iLevelC);
     iOpen++;
 
     if (strAfter && strAfter.trim().length > 0) {
@@ -219,6 +236,7 @@ const ListOpen = (state, startLine, lineText, iLevel, eLevel): {iOpen: number, t
         token.content = child.content;
         token.children = child.children;
         token.itemizeLevel = iLevel;
+        token.itemizeLevelContents = iLevelC;
         token.enumerateLevel = eLevel;
         if (child.type === "enumerate_list_open" || child.type === "itemize_list_open") {
           state.prentLevel++;
@@ -308,7 +326,9 @@ export const ReRenderListsItem:RuleBlock = (state, startLine: number, endLine: n
     return false;
   }
   const eLevel = GetEnumerateLevel();
-  const iLevelT = GetItemizeLevelTokensByState(state);
+  const dataMarkers = GetItemizeLevelTokensByState(state);
+  const iLevelT = dataMarkers.tokens;
+  const iLevelC = dataMarkers.contents;
   for (; nextLine < endLine; nextLine++) {
     pos = state.bMarks[nextLine] + state.tShift[nextLine];
     max = state.eMarks[nextLine];
@@ -318,7 +338,7 @@ export const ReRenderListsItem:RuleBlock = (state, startLine: number, endLine: n
 
   match = content.slice(1).match(bItemTag);
   if (match) {
-    setTokenListItemOpenBlock(state, startLine, nextLine + 1, match[1], null, iLevelT, eLevel);
+    setTokenListItemOpenBlock(state, startLine, nextLine + 1, match[1], null, iLevelT, eLevel, iLevelC);
     SetTokensBlockParse(state, content.slice(match.index + match[0].length + 1).trim())
     state.push('latex_list_item_close', 'li', -1);
   }
@@ -352,10 +372,12 @@ export const Lists:RuleBlock = (state, startLine: number, endLine: number, silen
   }
 
   const eLevel = GetEnumerateLevel();
-  const iLevelT = GetItemizeLevelTokensByState(state);
+  const dataMarkers = GetItemizeLevelTokensByState(state);
+  const iLevelT = dataMarkers.tokens;
+  const iLevelC = dataMarkers.contents;
 
   oldParentType = state.parentType;
-  const data = ListOpen(state, startLine + dStart, lineText, iLevelT, eLevel);
+  const data = ListOpen(state, startLine + dStart, lineText, iLevelT, eLevel, iLevelC);
   let {iOpen = 0, tokenStart = null, li = null} = data;
   if (iOpen === 0) {
     nextLine += 1;
@@ -414,7 +436,14 @@ export const Lists:RuleBlock = (state, startLine: number, endLine: number, silen
           if (sB.length > 0) {
             items = ItemsAddToPrev(items, sB, nextLine);
           }
-          iOpen = ListItems(state, items, iLevelT, eLevel, li, iOpen);
+          let dataItems = ListItems(state, items, iLevelT, eLevel, li, iOpen, iLevelC);
+          iOpen = dataItems.iOpen;
+          if (!tokenStart.padding || tokenStart.padding < dataItems.padding) {
+            tokenStart.padding = dataItems.padding;
+            if (tokenStart.padding > 3) {
+              tokenStart.attrSet('data-padding-inline-start', (tokenStart.padding * 14).toString())
+            }
+          }
           items = [];
           li = null;
           setTokenCloseList(state, startLine + dStart, nextLine + dStart)
@@ -452,10 +481,17 @@ export const Lists:RuleBlock = (state, startLine: number, endLine: number, silen
         if (sB.length > 0) {
           items = ItemsAddToPrev(items, sB, nextLine);
         }
-        iOpen = ListItems(state, items, iLevelT, eLevel, li, iOpen);
+        let dataItems = ListItems(state, items, iLevelT, eLevel, li, iOpen, iLevelC);
+        iOpen = dataItems.iOpen;
+        if (!tokenStart.padding || tokenStart.padding < dataItems.padding) {
+          tokenStart.padding = dataItems.padding
+          if (tokenStart.padding > 3) {
+            tokenStart.attrSet('data-padding-inline-start', (tokenStart.padding * 14).toString())
+          }
+        }
         items = [];
         li = null;
-        setTokenOpenList(state, -1, -1, type, iLevelT, eLevel);
+        setTokenOpenList(state, -1, -1, type, iLevelT, eLevel, iLevelC);
         if (sE.length > 0) {
           items = ItemsAddToPrev(items, sE, nextLine);
         }
