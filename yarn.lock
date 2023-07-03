@@ -1975,7 +1975,7 @@ domhandler@^4.2.0:
   dependencies:
     domelementtype "^2.2.0"
 
-domino@Mathpix/domino:
+"domino@github:https://github.com/Mathpix/domino.git":
   version "2.1.6"
   resolved "https://codeload.github.com/Mathpix/domino/tar.gz/30ec7627c22dbecf0e77141d48c4da629d54b850"
 
