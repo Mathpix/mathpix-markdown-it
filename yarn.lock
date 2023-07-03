@@ -1975,10 +1975,9 @@ domhandler@^4.2.0:
   dependencies:
     domelementtype "^2.2.0"
 
-domino@^2.1.6:
+domino@Mathpix/domino:
   version "2.1.6"
-  resolved "https://registry.yarnpkg.com/domino/-/domino-2.1.6.tgz#fe4ace4310526e5e7b9d12c7de01b7f485a57ffe"
-  integrity sha512-3VdM/SXBZX2omc9JF9nOPCtDaYQ67BGp5CoLpIQlO2KCAPETs8TcDHacF26jXadGbvUteZzRTeos2fhID5+ucQ==
+  resolved "https://codeload.github.com/Mathpix/domino/tar.gz/30ec7627c22dbecf0e77141d48c4da629d54b850"
 
 domutils@^2.0.0:
   version "2.8.0"
