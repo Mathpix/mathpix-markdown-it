@@ -87,5 +87,5 @@ workflows:
     - deploy-feature:
         filters:
           branches:
-            only:
-            - feature
+            ignore:
+            - master
