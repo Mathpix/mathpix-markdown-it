@@ -45,10 +45,6 @@ jobs:
 
     steps:
     - checkout
-    
-    - run:
-        name: Install git
-        command: sudo apt-get update && apt-get install git -y 
 
     - run:
         name: Install node dependencies
