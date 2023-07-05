@@ -39,7 +39,7 @@ export interface optionsMathpixMarkdown {
     addPositionsToTokens?: boolean;
     highlights?: Array<THighlight>;
 }
-export declare type TMarkdownItOptions = {
+export type TMarkdownItOptions = {
     isDisableFancy?: boolean;
     isDisableEmoji?: boolean;
     isDisableEmojiShortcuts?: boolean;
@@ -79,7 +79,7 @@ export declare type TMarkdownItOptions = {
     addPositionsToTokens?: boolean;
     highlights?: Array<THighlight>;
 };
-export declare type TOutputMath = {
+export type TOutputMath = {
     include_mathml?: boolean;
     include_mathml_word?: boolean;
     include_asciimath?: boolean;
@@ -111,22 +111,22 @@ export declare type TOutputMath = {
     };
     not_catch_errors?: boolean;
 };
-export declare type TOutputMathJax = {
+export type TOutputMathJax = {
     mtextInheritFont?: boolean;
     asciiMath?: TAsciiMath;
 };
-export declare type THtmlSanitize = {
+export type THtmlSanitize = {
     disallowedTagsMode?: string;
 } | false;
-export declare type TAsciiMath = {
+export type TAsciiMath = {
     useBacktick?: boolean;
 } | false;
-export declare type THtmlWrapper = {
+export type THtmlWrapper = {
     title?: string;
     includeStyles?: boolean;
     includeFonts?: boolean;
 };
-export declare type TTocOptions = {
+export type TTocOptions = {
     style?: TTocStyle;
     doNotGenerateParentId?: boolean; /** Don't generate unique ParentId for nested blocks. Used to testing */
 };
@@ -134,7 +134,7 @@ export declare enum TTocStyle {
     summary = "summary",
     list = "list"
 }
-export declare type THighlight = {
+export type THighlight = {
     start: number;
     end: number;
     highlight_color?: string;
@@ -142,7 +142,7 @@ export declare type THighlight = {
     font_weight?: string;
     include_block?: boolean;
 };
-export declare type TAccessibility = {
+export type TAccessibility = {
     assistiveMml?: boolean;
     sre?: object;
 };
