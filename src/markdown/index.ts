@@ -3,7 +3,7 @@ import { mdPluginCollapsible, mdSetPositionsAndHighlight } from "./mdPluginConfi
 import { mathpixMarkdownPlugin } from './mathpix-markdown-plugins';
 
 import { injectRenderRules } from "./rules";
-import { MathpixMarkdownModel as MM, TMarkdownItOptions } from '../mathpix-markdown-model';
+import { MathpixMarkdownModel as MM, TMarkdownItOptions, ParserErrors } from '../mathpix-markdown-model';
 
 /** md renderer */
 const mdInit = (options: TMarkdownItOptions) => {
@@ -22,7 +22,8 @@ const mdInit = (options: TMarkdownItOptions) => {
     centerTables = true,
     enableCodeBlockRuleForLatexCommands = false,
     addPositionsToTokens = false,
-    highlights = []
+    highlights = [],
+    parserErrors = ParserErrors.show
   } = options;
   const mmdOptions = {
     width: width,
@@ -42,7 +43,8 @@ const mdInit = (options: TMarkdownItOptions) => {
     centerTables: centerTables,
     enableCodeBlockRuleForLatexCommands: enableCodeBlockRuleForLatexCommands,
     addPositionsToTokens: addPositionsToTokens,
-    highlights: highlights
+    highlights: highlights,
+    parserErrors: parserErrors
   };
   let md = require("markdown-it")({
     html: htmlTags,

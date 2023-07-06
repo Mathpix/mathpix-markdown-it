@@ -38,6 +38,7 @@ export interface optionsMathpixMarkdown {
     enableCodeBlockRuleForLatexCommands?: boolean;
     addPositionsToTokens?: boolean;
     highlights?: Array<THighlight>;
+    parserErrors?: ParserErrors;
 }
 export type TMarkdownItOptions = {
     isDisableFancy?: boolean;
@@ -78,6 +79,7 @@ export type TMarkdownItOptions = {
     enableCodeBlockRuleForLatexCommands?: boolean;
     addPositionsToTokens?: boolean;
     highlights?: Array<THighlight>;
+    parserErrors?: ParserErrors;
 };
 export type TOutputMath = {
     include_mathml?: boolean;
@@ -133,6 +135,11 @@ export type TTocOptions = {
 export declare enum TTocStyle {
     summary = "summary",
     list = "list"
+}
+export declare enum ParserErrors {
+    show = "show",
+    hide = "hide",
+    show_input = "show_input"
 }
 export type THighlight = {
     start: number;

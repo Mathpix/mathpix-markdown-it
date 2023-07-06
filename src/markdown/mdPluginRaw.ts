@@ -1,45 +1,42 @@
-import { MathJax } from "../mathjax/";
-import { inlineTabular } from "./md-inline-rule/tabular";
-import { renderTabularInline } from './md-renderer-rules/render-tabular';
-import { asciiMath, backtickAsAsciiMath, renderAsciiMath } from './md-ascii';
+import {MathJax} from "../mathjax/";
+import {inlineTabular} from "./md-inline-rule/tabular";
+import {renderTabularInline} from './md-renderer-rules/render-tabular';
+import {asciiMath, backtickAsAsciiMath, renderAsciiMath} from './md-ascii';
 import {
-  includesSimpleMathTag,
-  includesMultiMathTag,
-  includesMultiMathBeginTag,
-  getWidthFromDocument,
-  findOpenCloseTagsMathEnvironment,
-  beginTag, endTag,
+  beginTag,
   canonicalMath,
-  canonicalMathPositions
+  canonicalMathPositions,
+  endTag,
+  findOpenCloseTagsMathEnvironment,
+  getWidthFromDocument,
+  includesMultiMathBeginTag,
+  includesMultiMathTag,
+  includesSimpleMathTag
 } from './utils';
-import { openTagMML, closeTagMML, tsvSeparatorsDef, csvSeparatorsDef, mdSeparatorsDef } from './common/consts';
-import { imageWithSize, renderRuleImage } from './md-inline-rule/image';
-import { setCounterSection } from './md-inline-rule/setcounter-section';
-import { renderTheorems } from './md-theorem';
-import { resetTheoremEnvironments } from './md-theorem/helper';
-import { newTheoremBlock } from './md-theorem/block-rule';
-import { 
-  newTheorem, 
-  theoremStyle, 
-  newCommandQedSymbol, 
-  labelLatex, 
+import {closeTagMML, csvSeparatorsDef, mdSeparatorsDef, openTagMML, tsvSeparatorsDef} from './common/consts';
+import {imageWithSize, renderRuleImage} from './md-inline-rule/image';
+import {setCounterSection} from './md-inline-rule/setcounter-section';
+import {renderTheorems} from './md-theorem';
+import {resetTheoremEnvironments} from './md-theorem/helper';
+import {newTheoremBlock} from './md-theorem/block-rule';
+import {
   captionLatex,
   centeringLatex,
-  setCounterTheorem 
+  labelLatex,
+  newCommandQedSymbol,
+  newTheorem,
+  setCounterTheorem,
+  theoremStyle
 } from './md-theorem/inline-rule';
-import { coreInline } from './md-inline-rule/core-inline';
-import { softBreak, hardBreak } from './md-renderer-rules/breaks';
-import { 
-  ILabel,
-  eLabelType,
-  clearLabelsList, 
-  addIntoLabelsList, 
-  getLabelByKeyFromLabelsList 
-} from "./common/labels";
+import {coreInline} from './md-inline-rule/core-inline';
+import {hardBreak, softBreak} from './md-renderer-rules/breaks';
+import {addIntoLabelsList, clearLabelsList, eLabelType, getLabelByKeyFromLabelsList, ILabel} from "./common/labels";
+import {envArraysShouldBeFlattenInTSV} from '../helpers/consts';
+import {getTerminatedRules} from './common';
+import {highlightText} from "./highlight/common";
+import {ParserErrors} from "../mathpix-markdown-model";
+
 const isSpace = require('markdown-it/lib/common/utils').isSpace;
-import { envArraysShouldBeFlattenInTSV } from '../helpers/consts';
-import { getTerminatedRules } from './common';
-import { highlightText } from "./highlight/common";
 
 function MathML(state, silent, pos, endMarker = '', type = "inline_mathML") {
   const markerBegin = RegExp('^</?(math)(?=(\\s|>|$))', 'i');
@@ -307,6 +304,7 @@ function multiMath(state, silent) {
     if (state.md.options.outMath && state.md.options.outMath.include_table_markdown) {
       token.latex = '\\' + match.input;
     }
+    token.inputLatex = state.src.slice(state.pos, nextPos);
     token.inlinePos = {
       start: state.pos,
       end: nextPos,
@@ -480,6 +478,7 @@ function simpleMath(state, silent) {
       "",
       0
     );
+    token.inputLatex = state.src.slice(state.pos, nextPos);
     token.content = state.src.slice(startMathPos, endMarkerPos);
     token.math_env = getMathEnvironment(token.content);
     if (state.env.tabulare) {
@@ -618,7 +617,8 @@ const convertMathToHtml = (state, token, options) => {
         display: true,
         metric: {cwidth: cwidth},
         outMath: options.outMath,
-        accessibility: options.accessibility
+        accessibility: options.accessibility,
+        renderingErrors: options.renderingErrors
       });
     } else {
       if (token.return_asciimath) {
@@ -643,7 +643,8 @@ const convertMathToHtml = (state, token, options) => {
             },
           }),
           mathJax: options.mathJax,
-          accessibility: options.accessibility
+          accessibility: options.accessibility,
+          renderingErrors: options.renderingErrors
         });
         token.mathEquation = data.html;
         token.mathData = data.data;
@@ -657,7 +658,8 @@ const convertMathToHtml = (state, token, options) => {
         const data = MathJax.Typeset(math, {display: isBlock, metric: { cwidth: cwidth },
           outMath: options.outMath, mathJax: options.mathJax, forDocx: options.forDocx,
           accessibility: options.accessibility,
-          nonumbers: options.nonumbers
+          nonumbers: options.nonumbers,
+          renderingErrors: options.renderingErrors
         });
         token.mathEquation = data.html;
         token.mathData = data.data;
@@ -708,6 +710,15 @@ const convertMathToHtml = (state, token, options) => {
 
 const renderMath = (a, token, options) => {
   const mathEquation = token.mathEquation;
+  if (token.mathData?.error && options.parserErrors !== ParserErrors.show) {
+    let html: string = token.type === "inline_math" || token.type === "inline_mathML"
+      ? `<span class="math-inline">`
+      : `<span class="math-block">`;
+    if (options.parserErrors === ParserErrors.show_input) {
+      html += token.inputLatex;
+    }
+    return html + '</span>';
+  }
   const attrNumber = token.attrNumber;
   const idLabels = token.idLabels;
   if (token.type === "equation_math") {

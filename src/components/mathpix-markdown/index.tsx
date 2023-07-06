@@ -1,5 +1,10 @@
 import * as React from 'react';
-import {MathpixMarkdownModel as MM, optionsMathpixMarkdown, TMarkdownItOptions} from '../../mathpix-markdown-model';
+import { 
+  MathpixMarkdownModel as MM, 
+  optionsMathpixMarkdown, 
+  TMarkdownItOptions,
+  ParserErrors
+} from '../../mathpix-markdown-model';
 
 
 export interface MathpixMarkdownProps extends optionsMathpixMarkdown{
@@ -20,7 +25,8 @@ class MathpixMarkdown extends React.Component<MathpixMarkdownProps> {
           centerTables = true,
           enableCodeBlockRuleForLatexCommands = false,
           addPositionsToTokens = false,
-          highlights = []
+          highlights = [],
+          parserErrors = ParserErrors.show
         } = this.props;
         const disableRules = isDisableFancy ? MM.disableFancyArrayDef : this.props.disableRules || [];
         const markdownItOptions: TMarkdownItOptions = {
@@ -48,7 +54,8 @@ class MathpixMarkdown extends React.Component<MathpixMarkdownProps> {
             centerTables: centerTables,
             enableCodeBlockRuleForLatexCommands: enableCodeBlockRuleForLatexCommands,
             addPositionsToTokens: addPositionsToTokens,
-            highlights: highlights
+            highlights: highlights,
+            parserErrors: parserErrors
         };
 
          MM.setOptions(disableRules, isCheckFormula, showTimeLog);
