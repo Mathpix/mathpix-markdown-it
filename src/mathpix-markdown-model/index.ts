@@ -53,6 +53,7 @@ export interface optionsMathpixMarkdown {
     enableCodeBlockRuleForLatexCommands?: boolean;
     addPositionsToTokens?: boolean;
     highlights?: Array<THighlight>;
+    parserErrors?: ParserErrors;
 }
 
 export type TMarkdownItOptions = {
@@ -94,6 +95,7 @@ export type TMarkdownItOptions = {
   enableCodeBlockRuleForLatexCommands?: boolean;
   addPositionsToTokens?: boolean;
   highlights?: Array<THighlight>;
+  parserErrors?: ParserErrors;
 }
 
 export type TOutputMath = {
@@ -156,6 +158,12 @@ export type TTocOptions = {
 export enum TTocStyle {
   summary = 'summary',
   list = 'list'
+};
+
+export enum ParserErrors {
+  show = 'show',
+  hide = 'hide',
+  show_input = 'show_input',
 };
 
 export type THighlight = {
@@ -446,7 +454,8 @@ class MathpixMarkdown_Model {
           centerTables = true,
           enableCodeBlockRuleForLatexCommands = false,
           addPositionsToTokens = false,
-          highlights = []
+          highlights = [],
+          parserErrors = ParserErrors.show
         }
          = options || {};
 
@@ -488,7 +497,8 @@ class MathpixMarkdown_Model {
           centerTables: centerTables,
           enableCodeBlockRuleForLatexCommands: enableCodeBlockRuleForLatexCommands,
           addPositionsToTokens: addPositionsToTokens,
-          highlights: highlights
+          highlights: highlights,
+          parserErrors: parserErrors
         };
 
         const styleFontSize = fontSize ? ` font-size: ${options.fontSize}px;` : '';

@@ -144,7 +144,6 @@ const OuterDataError = (adaptor, node, latex, error, outMath) => {
   const {
     include_latex = false,
     include_svg = true,
-    include_error = false
   } = outMath;
   let res: {
     mathml?: string,
@@ -155,7 +154,7 @@ const OuterDataError = (adaptor, node, latex, error, outMath) => {
     error?: string
   } = {};
 
-  if (include_error && error) {
+  if (error) {
     res.error = error.message
   }
   if (include_latex) {
