@@ -1,4 +1,4 @@
-import * as hljs from 'highlight.js';
+import hljs from 'highlight.js';
 
 const maybe = f => {
   try {
@@ -12,7 +12,7 @@ const maybe = f => {
 const highlight = (code, lang) => {
   if(lang.toLowerCase() === 'latex') lang = 'tex';
   if (!lang) return '';
-  return maybe(() => hljs.highlight(lang, code, true).value) || ''
+  return maybe(() => hljs.highlight(code, {language: lang, ignoreIllegals: true}).value) || ''
 };
 
 // Highlight with given language or automatically.

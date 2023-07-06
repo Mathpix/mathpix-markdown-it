@@ -25,7 +25,8 @@ import {
   TOutputMathJax,
   THtmlSanitize,
   TTocStyle,
-  THighlight
+  THighlight,
+  ParserErrors
 } from "./mathpix-markdown-model";
 
 import { ISmilesOptions } from './markdown/md-chemistry';
@@ -51,6 +52,7 @@ export {
   resetTheoremEnvironments,
   TTocStyle,
   THighlight,
+  ParserErrors,
   eLabelType, ILabel, getLabelsList, getLabelByKeyFromLabelsList, clearLabelsList,
   normalizeLink
 };

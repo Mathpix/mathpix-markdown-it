@@ -12,5 +12,5 @@ export interface ITocData {
     tocList: Array<ITocItem>;
 }
 export declare const clearSlugsTocItems: () => void;
-declare const _default: (md: any, opts: any) => void;
+declare const _default: (md: MarkdownIt, opts: any) => void;
 export default _default;

@@ -15,4 +15,4 @@ export declare const mappingTheorems: {
     theorem_print_close: string;
     theorem_setcounter: string;
 };
-export declare const renderTheorems: (md: any) => void;
+export declare const renderTheorems: (md: MarkdownIt) => void;

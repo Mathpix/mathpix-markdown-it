@@ -1,5 +1,5 @@
 import { MarkdownIt } from 'markdown-it';
-import { MathpixMarkdownModel } from "../mathpix-markdown-model";
+import { MathpixMarkdownModel, ParserErrors } from "../mathpix-markdown-model";
 import { resetTextCounter } from './mdPluginText';
 import { resetTheoremEnvironments } from './md-theorem/helper';
 
@@ -30,7 +30,8 @@ export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
     centerTables = true,
     enableCodeBlockRuleForLatexCommands = false,
     addPositionsToTokens = false,
-    highlights = []
+    highlights = [],
+    parserErrors = ParserErrors.show
   } = options;
   Object.assign(md.options, smiles);
   Object.assign(md.options, {
@@ -49,7 +50,8 @@ export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
     centerTables: centerTables,
     enableCodeBlockRuleForLatexCommands: enableCodeBlockRuleForLatexCommands,
     addPositionsToTokens: addPositionsToTokens,
-    highlights: highlights
+    highlights: highlights,
+    parserErrors: parserErrors
   });
 
   md

@@ -667,6 +667,7 @@ The `MathpixMarkdown` React element accepts the following props:
 | `outMath`        | [TOutputMath](https://github.com/Mathpix/mathpix-markdown-it#toutputmath);*`{}`*         | Sets options to output html                                                                                           |
 | `mathJax`        | [TOutputMathJax](https://github.com/Mathpix/mathpix-markdown-it#toutputmathjax);*`{}`*       | Sets options to output MathJax                                                                                         |
 | `smiles`         | [ISmilesOptions](https://github.com/Mathpix/mathpix-markdown-it#ismilesoptions);*`{}`*        | Sets options to output chemistry equation                                                                              |
+| `parserErrors`   | [ParserErrors](https://github.com/Mathpix/mathpix-markdown-it#parsererrors);*`{}`*        | Sets options to output parser errors for equations and tabular                    |
 
 
 ## MathpixMarkdownModel methods
@@ -714,6 +715,7 @@ The `MathpixMarkdown` React element accepts the following props:
 | `centerTables`   | boolean;*`true`*             | Center align tables by default                                                                                         |
 | `validateLink`   | function;*`null`*            | The function `(url: string) => void` to override md link validator                                                     |
 | `enableCodeBlockRuleForLatexCommands`| boolean;*`false`* | By default, if latex commands are indented (4 spaces / 1 tab) they do not become `Code Blocks`.               |
+| `parserErrors`   | [ParserErrors](https://github.com/Mathpix/mathpix-markdown-it#parsererrors);*`{}`*        | Sets options to output parser errors for equations and tabular                    |
 
 ### optionsMathpixMarkdown
 
@@ -742,6 +744,7 @@ The `MathpixMarkdown` React element accepts the following props:
 | `centerTables`   | boolean;*`true`*             | Center align tables by default                                                                                         |
 | `validateLink`   | function;*`null`*            | The function `(url: string) => void` to override md link validator                                                     |
 | `enableCodeBlockRuleForLatexCommands`| boolean;*`false`* | By default, if latex commands are indented (4 spaces / 1 tab) they do not become `Code Blocks`.               |
+| `parserErrors`   | [ParserErrors](https://github.com/Mathpix/mathpix-markdown-it#parsererrors);*`{}`*        | Sets options to output parser errors for equations and tabular                    |
 
 ### TOutputMath
 
@@ -811,6 +814,14 @@ The `MathpixMarkdown` React element accepts the following props:
 | `sre`                       | object&nbsp;*`null`*        | spe object from library [speech-rule-engine](https://www.npmjs.com/package/speech-rule-engine) for semantic interpretation.                                                                    |
 |                             |                             | If this value is not set then the aria-label for accessibility will not be added to the math at render time.                               |  
 
+
+### ParserErrors enum
+
+|              |                                         |
+|--------------|-----------------------------------------|
+| `show`       | Display errors in resulting html        |
+| `hide`       | Hide errors in resulting html           |
+| `show_input` | Display original latex instead of error | 
 
 `sre` Has different loaders for node and browser.
 
