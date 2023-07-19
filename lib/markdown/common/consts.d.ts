@@ -104,3 +104,7 @@ export declare const terminatedRules: {
     };
 };
 export declare const mathTokenTypes: string[];
+export declare const codeHighlightDef: {
+    auto: boolean;
+    code: boolean;
+};

@@ -170,3 +170,8 @@ export const terminatedRules = {
 
 
 export const mathTokenTypes = ["display_math", "inline_math", "equation_math_not_number", "equation_math"];
+
+export const codeHighlightDef = {
+  auto: false,
+  code: true
+};

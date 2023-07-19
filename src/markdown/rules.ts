@@ -2,6 +2,7 @@ import { sanitize } from './sanitize';
 import { injectInlineStyles } from './inline-styles';
 import {getLabelByUuidFromLabelsList, ILabel} from "./common/labels";
 import { attrSetToBegin } from "./utils";
+import { codeHighlightDef } from "./common/consts";
 
 export const PREVIEW_PARAGRAPH_PREFIX = "preview-paragraph-";
 export const PREVIEW_LINE_CLASS = "preview-line";
@@ -120,7 +121,7 @@ function html_inline_Sanitize (tokens, idx, options) {
     : sanitize(tokens[idx].content, optionsSanitize);
 }
 
-function code_block_injectLineNumbers(tokens, idx, options, env, slf) {
+export function code_block_injectLineNumbers(tokens, idx, options, env, slf) {
     let line, endLine, listLine;
     if (tokens[idx].map && tokens[idx].level === 0) {
         line = options.startLine + tokens[idx].map[0];
@@ -138,9 +139,15 @@ function code_block_injectLineNumbers(tokens, idx, options, env, slf) {
     }
 
     var token = tokens[idx];
+    let { codeHighlight = {}} = options;
+    codeHighlight = Object.assign({}, codeHighlightDef, codeHighlight);
+    const { code = true } = codeHighlight;
+    let highlighted = code && options.highlight
+      ? options.highlight(token.content, '') || escapeHtml(token.content)
+      : escapeHtml(token.content);
     return  '<pre' + slf.renderAttrs(token) + '><code>' +
-        escapeHtml(tokens[idx].content) +
-        '</code></pre>\n';
+      highlighted +
+      '</code></pre>\n';
 }
 
 /** overwrite paragraph_open and close rule to inject line number */
@@ -153,9 +160,12 @@ export function withLineNumbers(renderer) {
       = renderer.renderer.rules.blockquote_open
       = renderer.renderer.rules.dl_open
       = injectLineNumbers;
-    renderer.renderer.rules.code_block
-    //   = renderer.renderer.rules.fence
-      = code_block_injectLineNumbers;
+  let { codeHighlight = {}} = renderer.options;
+  codeHighlight = Object.assign({}, codeHighlightDef, codeHighlight);
+  const { code = true } = codeHighlight;
+  if (!code) {
+    renderer.renderer.rules.code_block = code_block_injectLineNumbers;
+  }
   return renderer;
 }
 

@@ -39,6 +39,7 @@ export interface optionsMathpixMarkdown {
     addPositionsToTokens?: boolean;
     highlights?: Array<THighlight>;
     parserErrors?: ParserErrors;
+    codeHighlight?: CodeHighlight;
 }
 export type TMarkdownItOptions = {
     isDisableFancy?: boolean;
@@ -80,6 +81,7 @@ export type TMarkdownItOptions = {
     addPositionsToTokens?: boolean;
     highlights?: Array<THighlight>;
     parserErrors?: ParserErrors;
+    codeHighlight?: CodeHighlight;
 };
 export type TOutputMath = {
     include_mathml?: boolean;
@@ -131,6 +133,10 @@ export type THtmlWrapper = {
 export type TTocOptions = {
     style?: TTocStyle;
     doNotGenerateParentId?: boolean; /** Don't generate unique ParentId for nested blocks. Used to testing */
+};
+export type CodeHighlight = {
+    auto?: boolean;
+    code?: boolean;
 };
 export declare enum TTocStyle {
     summary = "summary",

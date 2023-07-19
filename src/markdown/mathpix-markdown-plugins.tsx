@@ -31,7 +31,8 @@ export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
     enableCodeBlockRuleForLatexCommands = false,
     addPositionsToTokens = false,
     highlights = [],
-    parserErrors = ParserErrors.show
+    parserErrors = ParserErrors.show,
+    codeHighlight = {}
   } = options;
   Object.assign(md.options, smiles);
   Object.assign(md.options, {
@@ -51,7 +52,8 @@ export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
     enableCodeBlockRuleForLatexCommands: enableCodeBlockRuleForLatexCommands,
     addPositionsToTokens: addPositionsToTokens,
     highlights: highlights,
-    parserErrors: parserErrors
+    parserErrors: parserErrors,
+    codeHighlight: codeHighlight
   });
 
   md
@@ -60,7 +62,7 @@ export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
     .use(mdPluginList)
     .use(mdPluginMathJax({}))
     .use(mdPluginText())
-    .use(mdPluginHighlightCode, { auto: false })
+    .use(mdPluginHighlightCode, codeHighlight)
     .use(mdPluginAnchor)
     .use(mdPluginTOC, {toc: toc});
 

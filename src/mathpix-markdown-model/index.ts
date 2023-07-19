@@ -54,6 +54,7 @@ export interface optionsMathpixMarkdown {
     addPositionsToTokens?: boolean;
     highlights?: Array<THighlight>;
     parserErrors?: ParserErrors;
+    codeHighlight?: CodeHighlight;
 }
 
 export type TMarkdownItOptions = {
@@ -96,6 +97,7 @@ export type TMarkdownItOptions = {
   addPositionsToTokens?: boolean;
   highlights?: Array<THighlight>;
   parserErrors?: ParserErrors;
+  codeHighlight?: CodeHighlight;
 }
 
 export type TOutputMath = {
@@ -153,6 +155,11 @@ export type THtmlWrapper = {
 export type TTocOptions = {
   style?: TTocStyle,
   doNotGenerateParentId?: boolean /** Don't generate unique ParentId for nested blocks. Used to testing */
+};
+
+export type CodeHighlight = {
+  auto?: boolean, //Highlighting with language detection
+  code?: boolean
 };
 
 export enum TTocStyle {
@@ -455,7 +462,8 @@ class MathpixMarkdown_Model {
           enableCodeBlockRuleForLatexCommands = false,
           addPositionsToTokens = false,
           highlights = [],
-          parserErrors = ParserErrors.show
+          parserErrors = ParserErrors.show,
+          codeHighlight = {}
         }
          = options || {};
 
@@ -498,7 +506,8 @@ class MathpixMarkdown_Model {
           enableCodeBlockRuleForLatexCommands: enableCodeBlockRuleForLatexCommands,
           addPositionsToTokens: addPositionsToTokens,
           highlights: highlights,
-          parserErrors: parserErrors
+          parserErrors: parserErrors,
+          codeHighlight: codeHighlight
         };
 
         const styleFontSize = fontSize ? ` font-size: ${options.fontSize}px;` : '';
