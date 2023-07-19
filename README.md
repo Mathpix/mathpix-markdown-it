@@ -668,6 +668,7 @@ The `MathpixMarkdown` React element accepts the following props:
 | `mathJax`        | [TOutputMathJax](https://github.com/Mathpix/mathpix-markdown-it#toutputmathjax);*`{}`*       | Sets options to output MathJax                                                                                         |
 | `smiles`         | [ISmilesOptions](https://github.com/Mathpix/mathpix-markdown-it#ismilesoptions);*`{}`*        | Sets options to output chemistry equation                                                                              |
 | `parserErrors`   | [ParserErrors](https://github.com/Mathpix/mathpix-markdown-it#parsererrors);*`{}`*        | Sets options to output parser errors for equations and tabular                    |
+| `codeHighlight`  | [CodeHighlight](https://github.com/Mathpix/mathpix-markdown-it#codehighlight);*`{}`*      | Sets options to highlight code block                      |
 
 
 ## MathpixMarkdownModel methods
@@ -716,6 +717,7 @@ The `MathpixMarkdown` React element accepts the following props:
 | `validateLink`   | function;*`null`*            | The function `(url: string) => void` to override md link validator                                                     |
 | `enableCodeBlockRuleForLatexCommands`| boolean;*`false`* | By default, if latex commands are indented (4 spaces / 1 tab) they do not become `Code Blocks`.               |
 | `parserErrors`   | [ParserErrors](https://github.com/Mathpix/mathpix-markdown-it#parsererrors);*`{}`*        | Sets options to output parser errors for equations and tabular                    |
+| `codeHighlight`  | [CodeHighlight](https://github.com/Mathpix/mathpix-markdown-it#codehighlight);*`{}`*      | Sets options to highlight code block                      |
 
 ### optionsMathpixMarkdown
 
@@ -745,6 +747,7 @@ The `MathpixMarkdown` React element accepts the following props:
 | `validateLink`   | function;*`null`*            | The function `(url: string) => void` to override md link validator                                                     |
 | `enableCodeBlockRuleForLatexCommands`| boolean;*`false`* | By default, if latex commands are indented (4 spaces / 1 tab) they do not become `Code Blocks`.               |
 | `parserErrors`   | [ParserErrors](https://github.com/Mathpix/mathpix-markdown-it#parsererrors);*`{}`*        | Sets options to output parser errors for equations and tabular                    |
+| `codeHighlight`  | [CodeHighlight](https://github.com/Mathpix/mathpix-markdown-it#codehighlight);*`{}`*      | Sets options to highlight code block                      |
 
 ### TOutputMath
 
@@ -822,6 +825,13 @@ The `MathpixMarkdown` React element accepts the following props:
 | `show`       | Display errors in resulting html        |
 | `hide`       | Hide errors in resulting html           |
 | `show_input` | Display original latex instead of error | 
+
+### CodeHighlight
+
+|              | type&nbsp;*`default`*  |                                                                                                               |
+|--------------|------------------------|---------------------------------------------------------------------------------------------------------------|
+| `auto`       | boolean&nbsp;*`false`* | Highlighting with language detection                                                                          |
+| `code`       | boolean&nbsp;*`true`*  | Add code highlighting for a code block which created by indenting. To auto-detect the language, set auto=true |
 
 `sre` Has different loaders for node and browser.
 
