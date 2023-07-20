@@ -23,7 +23,8 @@ const mdInit = (options: TMarkdownItOptions) => {
     enableCodeBlockRuleForLatexCommands = false,
     addPositionsToTokens = false,
     highlights = [],
-    parserErrors = ParserErrors.show
+    parserErrors = ParserErrors.show,
+    codeHighlight = {}
   } = options;
   const mmdOptions = {
     width: width,
@@ -44,7 +45,8 @@ const mdInit = (options: TMarkdownItOptions) => {
     enableCodeBlockRuleForLatexCommands: enableCodeBlockRuleForLatexCommands,
     addPositionsToTokens: addPositionsToTokens,
     highlights: highlights,
-    parserErrors: parserErrors
+    parserErrors: parserErrors,
+    codeHighlight: codeHighlight
   };
   let md = require("markdown-it")({
     html: htmlTags,

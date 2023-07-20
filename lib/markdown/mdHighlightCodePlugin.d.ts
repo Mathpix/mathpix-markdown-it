@@ -1,8 +1,2 @@
-declare const highlightjs: {
-    (md: any, opts: any): void;
-    defaults: {
-        auto: boolean;
-        code: boolean;
-    };
-};
+declare const highlightjs: (md: any, opts: any) => void;
 export default highlightjs;
