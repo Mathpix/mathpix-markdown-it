@@ -43,7 +43,7 @@ export const coreInline = (state) => {
     }
     if (token.type === 'inline' 
       || ['title', 'section', 'subsection', 'subsubsection', 'addcontentsline',
-        'item_inline'
+        'item_inline', 'caption_table'
       ].includes(token.type)) {
       let envInline = Object.assign({}, {...state.env}, {
         currentTag: currentTag,

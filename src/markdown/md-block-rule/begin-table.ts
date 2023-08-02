@@ -48,9 +48,7 @@ const StatePushCaptionTable = (state, type: string): void => {
     token.eMarks = captionPos.eMarks;
   }
   token.captionPos = captionPos;
-  token.content = state.md?.options?.nonumbers
-    ? `${type[0].toUpperCase()}${type.slice(1)}: ` + caption
-    : `${type[0].toUpperCase()}${type.slice(1)} ${num}: ` + caption;
+  token.content = caption;
   token.print = state.md?.options?.nonumbers
     ? `${type[0].toUpperCase()}${type.slice(1)}: `
     : `${type[0].toUpperCase()}${type.slice(1)} ${num}: `;

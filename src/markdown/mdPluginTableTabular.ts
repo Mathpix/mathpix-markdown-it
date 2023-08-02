@@ -32,8 +32,8 @@ export default (md: MarkdownIt, options) => {
     {alt: getTerminatedRules('BeginProof')});
   md.inline.ruler.before("escape", "InlineIncludeGraphics", InlineIncludeGraphics);
 
-  md.renderer.rules.caption_table = (tokens, idx) => {
-        return CaptionTable(tokens, tokens[idx]);
+  md.renderer.rules.caption_table = (tokens, idx, options, env, slf) => {
+        return CaptionTable(tokens, idx, options, env, slf);
   };
   md.renderer.rules.inline_decimal = (tokens, idx) => {
     return InlineDecimal(tokens, tokens[idx]);
