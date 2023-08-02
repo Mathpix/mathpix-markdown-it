@@ -500,7 +500,7 @@ export const Lists:RuleBlock = (state, startLine: number, endLine: number, silen
 
     } else {
       if (itemTag.test(lineText)) {
-        items = ItemsListPush(items, lineText.trim(), nextLine+dStart, nextLine+dStart)
+        items = ItemsListPush(items, lineText, nextLine+dStart, nextLine+dStart)
       } else {
         items = ItemsAddToPrev(items, lineText, nextLine);
       }

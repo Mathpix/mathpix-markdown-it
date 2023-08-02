@@ -198,10 +198,10 @@ export const render_item_inline = (tokens, index, options, env, slf) => {
       if (tok.type = "tabular_inline") {
         content = renderTabularInline(token.children, tok, options, env, slf)
       } else {
-        content = slf.renderInline(tok.children, options);
+        content = slf.renderInline(tok.children, options, env);
       }
     } else {
-      content = slf.renderInline([tok], options);
+      content = slf.renderInline([tok], options, env);
     }
     sContent +=  content
   }
@@ -266,7 +266,7 @@ export const render_item_inline = (tokens, index, options, env, slf) => {
             dataAttr += ` data-custom-marker-type="${data.markerType}"`;
           }
         } else {
-          htmlMarker = slf.renderInline(itemizeLevelTokens[level_itemize-1], options);
+          htmlMarker = slf.renderInline(itemizeLevelTokens[level_itemize-1], options, env);
         }
       } else {
         htmlMarker = '.';
@@ -291,10 +291,10 @@ export const render_latex_list_item_open = (tokens, index, options, env, slf) =>
 
     let span = '.';
     if (token.marker && token.markerTokens) {
-      span = slf.renderInline(token.markerTokens, options)
+      span = slf.renderInline(token.markerTokens, options, env)
     } else {
       span = level_itemize > 0 && itemizeLevelTokens.length >= level_itemize
-        ? slf.renderInline(itemizeLevelTokens[level_itemize-1], options)
+        ? slf.renderInline(itemizeLevelTokens[level_itemize-1], options, env)
         : '.';
     }
     list_injectLineNumbers(tokens, index, `li_itemize block`);

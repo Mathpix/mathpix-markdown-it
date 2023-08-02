@@ -1,7 +1,8 @@
+import { RuleInline } from 'markdown-it';
 import { MathJax } from "../../mathjax";
 import { getWidthFromDocument } from '../utils';
 
-export const asciiMath = (state, silent) => {
+export const asciiMath: RuleInline = (state, silent) => {
   const notRenderAsciiMath = state.md.options.mathJax
     && Object(state.md.options.mathJax).hasOwnProperty('asciiMath')
     && state.md.options.mathJax.asciiMath === false;
@@ -50,7 +51,7 @@ export const asciiMath = (state, silent) => {
   return true;
 };
 
-export const backtickAsAsciiMath = (state, silent) => {
+export const backtickAsAsciiMath: RuleInline = (state, silent) => {
   const useBacktick = state.md.options.mathJax && state.md.options.mathJax.asciiMath &&  state.md.options.mathJax.asciiMath.useBacktick
   if (!useBacktick) {
     return false;
