@@ -915,6 +915,7 @@ const doubleSlashToSoftBreak: RuleInline = (state) => {
   }
   if (state.env.doubleSlashToSoftBreak) {
     const token = state.push('softbreak', 'br', 0);
+    token.doubleSlashToSoftBreak = true;
     token.inlinePos = {
       start: startPos,
       end: nextPos
