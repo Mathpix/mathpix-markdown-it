@@ -1,0 +1,8 @@
+export declare const render_footnote_anchor_name: (tokens: any, idx: any, options: any, env: any) => string;
+export declare const render_footnote_caption: (tokens: any, idx: any, options: any, env: any, slf: any) => string;
+export declare const render_footnote_ref: (tokens: any, idx: any, options: any, env: any, slf: any) => string;
+export declare const render_footnote_block_open: (tokens: any, idx: any, options: any) => string;
+export declare const render_footnote_block_close: () => string;
+export declare const render_footnote_open: (tokens: any, idx: any, options: any, env: any, slf: any) => string;
+export declare const render_footnote_close: () => string;
+export declare const render_footnote_anchor: (tokens: any, idx: any, options: any, env: any, slf: any) => string;
