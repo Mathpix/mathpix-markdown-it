@@ -175,7 +175,7 @@ export const renderInlineTokenBlock = (tokens, options, env, slf, isSubTable = f
           if (child.type === "tabular_inline" || isSubTable) {
             child.isSubTable = true;
           }
-          content += slf.renderInline([child], options);
+          content += slf.renderInline([child], options, env);
           if (child.ascii) {
             cell += child.ascii_tsv ? child.ascii_tsv : child.ascii;
             cellCsv += child.ascii_csv ? child.ascii_csv : child.ascii;
@@ -207,11 +207,11 @@ export const renderInlineTokenBlock = (tokens, options, env, slf, isSubTable = f
             if (link) {
               cellMd += link;
               if ((j + 1) < token.children.length) {
-                content += slf.renderInline([token.children[j+1]], options);
+                content += slf.renderInline([token.children[j+1]], options, env);
                 j++;
               }
               if ((j + 2) < token.children.length) {
-                content += slf.renderInline([token.children[j+2]], options);
+                content += slf.renderInline([token.children[j+2]], options, env);
                 j++;
               }
               continue;
@@ -269,7 +269,7 @@ export const renderInlineTokenBlock = (tokens, options, env, slf, isSubTable = f
 
         }
       } else {
-        content = slf.renderInline([{type: 'text', content: token.content}], options);
+        content = slf.renderInline([{type: 'text', content: token.content}], options, env);
         cell += content;
         cellCsv += content;
         cellMd += content;

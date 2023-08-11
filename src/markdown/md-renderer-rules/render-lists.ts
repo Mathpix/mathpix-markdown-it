@@ -47,7 +47,7 @@ export const render_itemize_list_open = (tokens, index, options, env, renderer) 
   if (options.forDocx) {
     const itemizeLevelTokens = GetItemizeLevelTokens(tokens[index].itemizeLevel);
     if (level_itemize > 0 && itemizeLevelTokens.length >= level_itemize) {
-      let data = isTextMarkerTokens(itemizeLevelTokens[level_itemize-1], renderer, options);
+      let data = isTextMarkerTokens(itemizeLevelTokens[level_itemize-1], renderer, options, env);
       let itemizeLevel = GetItemizeLevel(tokens[index].itemizeLevelContents);
       if (itemizeLevel.length >= level_itemize) {
         dataAttr += ` data-custom-marker-type="${data.markerType}"`;
@@ -87,7 +87,7 @@ export const render_enumerate_list_open = (tokens, index, options, env, renderer
   return `<ol${renderer.renderAttrs(tokens[index])}${dataAttr} style="${dataPaddingInlineStart} list-style-type: ${str}">`;
 };
 
-const generateHtmlForMarkerTokens = (markerTokens, slf, options): {htmlMarker: string, markerType: string, textContent: string} => {
+const generateHtmlForMarkerTokens = (markerTokens, slf, options, env): {htmlMarker: string, markerType: string, textContent: string} => {
   let htmlMarker = '';
   let markerType = 'text';
   let textContent = '';
@@ -105,7 +105,7 @@ const generateHtmlForMarkerTokens = (markerTokens, slf, options): {htmlMarker: s
         htmlMarker += markerTokens[0].mathEquation
       }
     } else {
-      htmlMarker += slf.renderInline([markerTokens[0]], options);
+      htmlMarker += slf.renderInline([markerTokens[0]], options, env);
     }
     return {
       htmlMarker: htmlMarker,
@@ -130,7 +130,7 @@ const generateHtmlForMarkerTokens = (markerTokens, slf, options): {htmlMarker: s
       }
       continue;
     }
-    let renderdToken = slf.renderInline([markerTokens[j]], options);
+    let renderdToken = slf.renderInline([markerTokens[j]], options, env);
     if (markerType === 'text') {
       textContent += renderdToken
     } else {
@@ -145,7 +145,7 @@ const generateHtmlForMarkerTokens = (markerTokens, slf, options): {htmlMarker: s
   };
 };
 
-const isTextMarkerTokens = (markerTokens, slf, options): {markerType: string, textContent: string} => {
+const isTextMarkerTokens = (markerTokens, slf, options, env): {markerType: string, textContent: string} => {
   let markerType = 'text';
   if (markerTokens.length === 1 && mathTokenTypes.includes(markerTokens[0].type)) {
     markerType = 'math';
@@ -160,7 +160,7 @@ const isTextMarkerTokens = (markerTokens, slf, options): {markerType: string, te
       markerType = 'multi';
       break
     }
-    textContent += slf.renderInline([markerTokens[j]], options);
+    textContent += slf.renderInline([markerTokens[j]], options, env);
   }
   return {
     markerType: markerType,
@@ -168,18 +168,18 @@ const isTextMarkerTokens = (markerTokens, slf, options): {markerType: string, te
   };
 };
 
-const generateHtmlForCustomMarker = (token, options, slf): {htmlMarker: string, markerType: string, textContent: string} => {
+const generateHtmlForCustomMarker = (token, options, slf, env): {htmlMarker: string, markerType: string, textContent: string} => {
   let htmlMarker = '';
   let markerType = 'text';
   let textContent = '';
   if (options.forDocx) {
-    let data = generateHtmlForMarkerTokens(token.markerTokens, slf, options);
+    let data = generateHtmlForMarkerTokens(token.markerTokens, slf, options, env);
     htmlMarker = data.htmlMarker;
     markerType = data.markerType;
     textContent = data.textContent;
   } else {
     htmlMarker = token.marker && token.markerTokens.length
-      ? slf.renderInline(token.markerTokens, options) : '';
+      ? slf.renderInline(token.markerTokens, options, env) : '';
   }
   return {
     htmlMarker: htmlMarker,
@@ -198,10 +198,10 @@ export const render_item_inline = (tokens, index, options, env, slf) => {
       if (tok.type = "tabular_inline") {
         content = renderTabularInline(token.children, tok, options, env, slf)
       } else {
-        content = slf.renderInline(tok.children, options);
+        content = slf.renderInline(tok.children, options, env);
       }
     } else {
-      content = slf.renderInline([tok], options);
+      content = slf.renderInline([tok], options, env);
     }
     sContent +=  content
   }
@@ -224,7 +224,7 @@ export const render_item_inline = (tokens, index, options, env, slf) => {
     if (token.hasOwnProperty('marker') && token.markerTokens) {
       list_injectLineNumbers(tokens, index, `li_enumerate not_number`);
       dataAttr += ' data-custom-marker="true"';
-      let data = generateHtmlForCustomMarker (token, options, slf);
+      let data = generateHtmlForCustomMarker (token, options, slf, env);
       htmlMarker = data.htmlMarker;
       if (options.forDocx) {
         dataAttr += ` data-custom-marker-type="${data.markerType}"`;
@@ -242,7 +242,7 @@ export const render_item_inline = (tokens, index, options, env, slf) => {
     const itemizeLevelTokens = GetItemizeLevelTokens(token.itemizeLevel);
     if (token.hasOwnProperty('marker')  && token.markerTokens) {
       dataAttr += ' data-custom-marker="true"';
-      let data = generateHtmlForCustomMarker (token, options, slf);
+      let data = generateHtmlForCustomMarker (token, options, slf, env);
       htmlMarker = data.htmlMarker;
       if (options.forDocx) {
         dataAttr += ` data-custom-marker-type="${data.markerType}"`;
@@ -255,7 +255,7 @@ export const render_item_inline = (tokens, index, options, env, slf) => {
     } else {
       if (level_itemize > 0 && itemizeLevelTokens.length >= level_itemize) {
         if (options.forDocx) {
-          let data = generateHtmlForMarkerTokens(itemizeLevelTokens[level_itemize-1], slf, options);
+          let data = generateHtmlForMarkerTokens(itemizeLevelTokens[level_itemize-1], slf, options, env);
           htmlMarker = data.htmlMarker;
           if (data.markerType === 'math') {
             let itemizeLevel = GetItemizeLevel(tokens[index].itemizeLevelContents);
@@ -266,7 +266,7 @@ export const render_item_inline = (tokens, index, options, env, slf) => {
             dataAttr += ` data-custom-marker-type="${data.markerType}"`;
           }
         } else {
-          htmlMarker = slf.renderInline(itemizeLevelTokens[level_itemize-1], options);
+          htmlMarker = slf.renderInline(itemizeLevelTokens[level_itemize-1], options, env);
         }
       } else {
         htmlMarker = '.';
@@ -291,10 +291,10 @@ export const render_latex_list_item_open = (tokens, index, options, env, slf) =>
 
     let span = '.';
     if (token.marker && token.markerTokens) {
-      span = slf.renderInline(token.markerTokens, options)
+      span = slf.renderInline(token.markerTokens, options, env)
     } else {
       span = level_itemize > 0 && itemizeLevelTokens.length >= level_itemize
-        ? slf.renderInline(itemizeLevelTokens[level_itemize-1], options)
+        ? slf.renderInline(itemizeLevelTokens[level_itemize-1], options, env)
         : '.';
     }
     list_injectLineNumbers(tokens, index, `li_itemize block`);

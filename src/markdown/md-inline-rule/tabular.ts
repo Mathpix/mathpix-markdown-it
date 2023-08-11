@@ -1,7 +1,8 @@
+import { RuleInline } from 'markdown-it';
 import {parseInlineTabular, TTokenTabular, inlineDecimalParse} from "../md-block-rule/begin-tabular";
 import { ParseTabular } from "../md-block-rule/begin-tabular/parse-tabular";
 
-export const inlineTabular = (state, silent) => {
+export const inlineTabular: RuleInline = (state, silent) => {
   let startMathPos = state.pos;
   if (state.src.charCodeAt(startMathPos) !== 0x5c /* \ */) {
     return false;

@@ -1,3 +1,4 @@
+import { RuleInline } from 'markdown-it';
 import {MathJax} from "../mathjax/";
 import {inlineTabular} from "./md-inline-rule/tabular";
 import {renderTabularInline} from './md-renderer-rules/render-tabular';
@@ -86,7 +87,7 @@ function MathML(state, silent, pos, endMarker = '', type = "inline_mathML") {
   return true;
 }
 
-function inlineMathML(state, silent) {
+const inlineMathML: RuleInline = (state, silent) => {
   let startMathPos = state.pos;
   if (state.src.charCodeAt(startMathPos) !== 0x3C /* < */) {
     return false;
@@ -195,7 +196,7 @@ const getMathEnvironment = (str: string): string => {
   return match && match[1] ? match[1].trim() : '';
 };
 
-function multiMath(state, silent) {
+const multiMath: RuleInline = (state, silent) => {
   let startMathPos = state.pos;
   if (state.src.charCodeAt(startMathPos) !== 0x5c /* \ */) {
     return false;
@@ -341,7 +342,7 @@ export const findEndMarkerPos = (str: string, endMarker: string, i: number): num
   return index;
 };
 
-function refs(state, silent) {
+const refs: RuleInline = (state, silent) => {
   let startMathPos = state.pos;
   if (state.src.charCodeAt(startMathPos) !== 0x5c /* \ */) {
     return false;
@@ -408,9 +409,9 @@ function refs(state, silent) {
 
   state.pos = nextPos;
   return true;
-}
+};
 
-function simpleMath(state, silent) {
+const simpleMath: RuleInline = (state, silent) => {
   let pos, afterStartMarker,
     startMathPos = state.pos;
   let endMarker = "$";
@@ -511,7 +512,7 @@ function simpleMath(state, silent) {
   return true;
 }
 
-function usepackage(state, silent) {
+const usepackage: RuleInline = (state, silent) => {
   const str_usepackage = "usepackage";
   const str_geometry = "geometry";
 
@@ -799,7 +800,7 @@ const renderReference = (token, options, env, slf) => {
   if (label) {
     id = label.id;
     reference = label.tagChildrenTokens?.length 
-      ? slf.renderInline(label.tagChildrenTokens, options)
+      ? slf.renderInline(label.tagChildrenTokens, options, env)
       : label.tag;
   }
   if (dataParentheses === "true" &&  reference) {
