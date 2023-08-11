@@ -33,22 +33,22 @@ export const coreInline = (state) => {
           if (tok.envToInline) {
             envToInline = tok.envToInline;
           }
-          let envInline = Object.assign({}, {...state.env}, {
+          state.env = Object.assign({}, {...state.env}, {
             currentTag: currentTag,
           }, {...envToInline});
-          state.md.inline.parse(tok.content, state.md, envInline, tok.children);
-        } 
+          state.md.inline.parse(tok.content, state.md, state.env, tok.children);
+        }
       }
       continue;
     }
-    if (token.type === 'inline' 
+    if (token.type === 'inline'
       || ['title', 'section', 'subsection', 'subsubsection', 'addcontentsline',
         'item_inline', 'caption_table'
       ].includes(token.type)) {
-      let envInline = Object.assign({}, {...state.env}, {
+      state.env = Object.assign({}, {...state.env}, {
         currentTag: currentTag,
       }, {...envToInline});
-      state.md.inline.parse(token.content, state.md, envInline, token.children);
+      state.md.inline.parse(token.content, state.md, state.env, token.children);
     }
   }
 };
