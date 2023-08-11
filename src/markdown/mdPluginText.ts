@@ -800,7 +800,7 @@ const textAuthor: RuleInline = (state) => {
         let children = [];
         state.env.newlineToSpace = true;
         state.md.inline.parse(item, state.md, state.env, children);
-        state.env.newlineToSpace = true;
+        state.env.newlineToSpace = false;
         newToken.children = children;
 
         tokenAuthorColumn.children.push(newToken);
