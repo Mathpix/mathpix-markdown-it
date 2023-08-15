@@ -1,6 +1,59 @@
+import { Token } from 'markdown-it';
+
+const createFootnotesTokens = (state, refTokens, meta, idx,
+                               itemLabel, itemCount, itemTokens, itemContent) => {
+  let token: Token = new state.Token('footnote_open', '', 1);
+  token.meta = meta;
+  state.tokens.push(token);
+  let tokens = [];
+  let lastParagraph;
+
+  if (itemTokens) {
+    tokens = [];
+
+    token          = new state.Token('paragraph_open', 'p', 1);
+    token.block    = true;
+    tokens.push(token);
+
+    token          = new state.Token('inline', '', 0);
+    token.children = itemTokens;
+    token.content  = itemContent;
+    tokens.push(token);
+
+    token          = new state.Token('paragraph_close', 'p', -1);
+    token.block    = true;
+    tokens.push(token);
+
+  } else if (itemLabel) {
+    tokens = refTokens[':' + itemLabel];
+  }
+
+  if (tokens) state.tokens = state.tokens.concat(tokens);
+  if (state.tokens[state.tokens.length - 1].type === 'paragraph_close') {
+    lastParagraph = state.tokens.pop();
+  } else {
+    lastParagraph = null;
+  }
+
+  let t = itemCount > 0 ? itemCount : 1;
+  for (let j = 0; j < t; j++) {
+    token      = new state.Token('footnote_anchor', '', 0);
+    token.meta = { id: idx, subId: j, label: itemLabel };
+    state.tokens.push(token);
+  }
+
+  if (lastParagraph) {
+    state.tokens.push(lastParagraph);
+  }
+
+  token = new state.Token('footnote_close', '', -1);
+  state.tokens.push(token);
+};
+
+
 // Glue footnote tokens to end of token stream
 export const footnote_tail = (state) => {
-  var i, l, j, t, lastParagraph, list, token, tokens, current, currentLabel,
+  let i, l, list, current, currentLabel,
     insideRef = false,
     refTokens = {};
   if (!state.env.footnotes) { return; }
@@ -17,16 +70,7 @@ export const footnote_tail = (state) => {
       item.lastNumber = lastNumber;
       lastNumber += 1;
     }
-    // /** sort by last number */
-    // state.env.footnotes.list.sort((a,b) => {
-    //   return a.lastNumber > b.lastNumber ? 1 : -1
-    // })
   }
-  
-  // if ()
-
-  
-  /** Filter */
   
   let footnote_block_open = state.tokens.filter((token) => {
     return token.type === 'footnote_block_open'
@@ -54,6 +98,10 @@ export const footnote_tail = (state) => {
       insideRef = false;
       // prepend ':' to avoid conflict with Object.prototype members
       refTokens[':' + currentLabel] = current;
+      if (!state.env.footnotes.refsTokens) {
+        state.env.footnotes.refsTokens = {};
+      }
+      state.env.footnotes.refsTokens[':' + currentLabel] = current;
       return false;
     }
     if (insideRef) { current.push(tok); }
@@ -63,85 +111,87 @@ export const footnote_tail = (state) => {
   if (!state.env.footnotes.list) { return; }
   list = state.env.footnotes.list;
 
-  token = new state.Token('footnote_block_open', '', 1);
+  let token:Token = new state.Token('footnote_block_open', '', 1);
   state.tokens.push(token);
 
   let notIncrementNumber = false;
-  let lastNumber = 0;
+  let incrementNumber = false;
+  let counter_footnote = 0;
+  
+  let createFootnoteOpen = true;
   for (i = 0, l = list.length; i < l; i++) {
-    if (list[i].type === "footnotemark" && !list[i].hasContent) {
-      if (list[i].numbered === undefined) {
-        lastNumber += 1;
+    createFootnoteOpen = true;
+    if (list[i].hasOwnProperty('type')) {
+      switch (list[i].type ) {
+        case 'footnotetext':
+          break;        
+        case 'footnotemark':
+          if (list[i].numbered === undefined) {
+            counter_footnote++;
+          }
+          if (!list[i].hasContent) {
+            if (list[i].numbered === undefined) {
+              incrementNumber = true;
+            }
+            /** If a footnotemark does not have a description, then it is not included in the list of footnotes. */
+            createFootnoteOpen = false;
+          }
+          break;        
+        case 'footnote':
+          if (list[i].numbered === undefined) {
+            counter_footnote++;
+          }
+          if (state.md.options.forLatex) {
+            createFootnoteOpen = false;
+          }
+          break;
       }
-      continue
+    } else {
+      counter_footnote++;
     }
-    token      = new state.Token('footnote_open', '', 1);
-    token.meta = { 
+    list[i].counter_footnote = counter_footnote;
+    if (!createFootnoteOpen) {
+      continue;
+    }
+    let meta = { 
       id: i, 
       label: list[i].label,
       numbered: list[i].numbered,
+      type: list[i].type,
+      counter_footnote: counter_footnote
     };
-    if (!notIncrementNumber && list[i].numbered === undefined && list[i].type !== "footnotetext") {
-      // lastNumber = i + 1;
-      lastNumber += 1;
-    }
     if (list[i].numbered !== undefined || list[i].type === "footnotetext") {
       notIncrementNumber = true
     } else {
       if (notIncrementNumber) {
-        token.meta.numbered = lastNumber + 1;
+        meta.numbered = counter_footnote;
         notIncrementNumber = false;
       }
     }
-    
-    if (list[i].type === "footnotetext" && list[i].numbered === undefined) {
-      token.meta.numbered = list[i].lastNumber;
-      lastNumber = list[i].lastNumber;
-    }
-    state.tokens.push(token);
-
-    if (list[i].tokens) {
-      tokens = [];
-
-      token          = new state.Token('paragraph_open', 'p', 1);
-      token.block    = true;
-      tokens.push(token);
-
-      token          = new state.Token('inline', '', 0);
-      token.children = list[i].tokens;
-      token.content  = list[i].content;
-      tokens.push(token);
-
-      token          = new state.Token('paragraph_close', 'p', -1);
-      token.block    = true;
-      tokens.push(token);
-
-    } else if (list[i].label) {
-      tokens = refTokens[':' + list[i].label];
+    if (list[i].numbered === undefined) {
+      if (list[i].type === "footnote" || list[i].type === "footnotemark") {
+        if (incrementNumber) {
+          meta.numbered = counter_footnote;
+          incrementNumber = false;
+        }
+      }
+      if (list[i].type === "footnotetext") {
+        meta.numbered = counter_footnote;
+      }
     }
 
-    if (tokens) state.tokens = state.tokens.concat(tokens);
-    if (state.tokens[state.tokens.length - 1].type === 'paragraph_close') {
-      lastParagraph = state.tokens.pop();
+    if (list[i].hasOwnProperty('arrContents') && list[i].arrContents.length) {
+      for (let j = 0; j < list[i].arrContents.length; j++) {
+        createFootnotesTokens(state, refTokens, meta, i,
+          list[i].label, list[i].count,
+          list[i].arrContents[j].tokens, list[i].arrContents[j].content);
+      }
     } else {
-      lastParagraph = null;
+      createFootnotesTokens(state, refTokens, meta, i,
+        list[i].label, list[i].count, list[i].tokens, list[i].content);
     }
-
-    t = list[i].count > 0 ? list[i].count : 1;
-    for (j = 0; j < t; j++) {
-      token      = new state.Token('footnote_anchor', '', 0);
-      token.meta = { id: i, subId: j, label: list[i].label };
-      state.tokens.push(token);
-    }
-
-    if (lastParagraph) {
-      state.tokens.push(lastParagraph);
-    }
-
-    token = new state.Token('footnote_close', '', -1);
-    state.tokens.push(token);
   }
-
+  
   token = new state.Token('footnote_block_close', '', -1);
   state.tokens.push(token);
-}
+};

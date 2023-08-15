@@ -14,6 +14,7 @@ import {
   mdPluginList,
   mdPluginChemistry, 
   mdPluginCollapsible,
+  mdLatexFootnotes,
   mdSetPositionsAndHighlight
 } from "./markdown/mdPluginConfigured";
 
@@ -45,6 +46,7 @@ import { normalizeLink } from './helpers/normalize-link';
 export {
   MathpixLoader, MathpixMarkdown, MathpixMarkdownModel,
   mathpixMarkdownPlugin, mdPluginCollapsible,
+  mdLatexFootnotes,
   mdSetPositionsAndHighlight,
   initMathpixMarkdown,
   mdPluginMathJax, mdPluginHighlightCode, mdPluginText, mdPluginTOC, mdPluginAnchor, mdPluginTableTabular, mdPluginList, mdPluginChemistry,

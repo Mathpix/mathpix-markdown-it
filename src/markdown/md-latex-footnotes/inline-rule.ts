@@ -80,10 +80,6 @@ export const latex_footnote: RuleInline = (state, silent) => {
 
   envText = data.content;
   
-  if (!envText || !envText.trim()) {
-    return false;
-  }
-  
   if (silent) {
     state.pos = nextPos;
     return true;
@@ -335,24 +331,32 @@ export const latex_footnotetext: RuleInline = (state, silent) => {
       let numberedList = listFootnoteMark.filter(item => item.numbered === numbered );
       lastItem = numberedList?.length ? numberedList[numberedList.length - 1] : null;
     } else {
-      lastItem = listFootnoteMark?.length ? listFootnoteMark[listFootnoteMark.length - 1] : null;
+      let unNumberedList = listFootnoteMark.filter(item => item.numbered === undefined );
+      lastItem = unNumberedList?.length ? unNumberedList[unNumberedList.length - 1] : null;
     }
   }
+
+  const token      = state.push('footnotetext', '', 0);
+  token.children = tokens;
+  token.content = envText;
+  token.meta = {
+    numbered: numbered,
+  };
   
   if (lastItem) {
     if (lastItem.hasContent) {
-      state.env.footnotes.list[footnoteId] = {
+      state.env.footnotes.list[lastItem.footnoteId].arrContents.push({
         content: envText,
         tokens: tokens,
-        numbered: numbered,
-        type: 'footnotetext',
-        footnoteId: -1,
-        lastNumber: lastNumber
-      };
+      });
     } else {
       state.env.footnotes.list[lastItem.footnoteId].content = envText;
       state.env.footnotes.list[lastItem.footnoteId].tokens = tokens;
       state.env.footnotes.list[lastItem.footnoteId].hasContent = true;
+      state.env.footnotes.list[lastItem.footnoteId].arrContents = [{
+        content: envText,
+        tokens: tokens
+      }];
     }
   } else {
     state.env.footnotes.list[footnoteId] = {

@@ -8,7 +8,8 @@ import {
   render_footnote_close,
   render_footnote_anchor,
   render_footnote_caption,
-  render_footnote_anchor_name
+  render_footnote_anchor_name,
+  render_footnotetext
 } from "./render-rule";
 import {
   latex_footnote,
@@ -38,6 +39,7 @@ export default (md: MarkdownIt, options) => {
   md.renderer.rules.footnote_open = render_footnote_open;
   md.renderer.rules.footnote_close = render_footnote_close;
   md.renderer.rules.footnote_anchor = render_footnote_anchor;
+  md.renderer.rules.footnotetext = render_footnotetext;
 
   // helpers (only used in other rules, no tokens are attached to those)
   md.renderer.rules.footnote_caption = render_footnote_caption;

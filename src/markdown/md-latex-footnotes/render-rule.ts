@@ -90,3 +90,7 @@ export const render_footnote_anchor = (tokens, idx, options, env, slf) => {
   /* ↩ with escape code to prevent display as Apple Emoji on iOS */
   return ' <a href="#fnref' + id + '" class="footnote-backref">\u21a9\uFE0E</a>';
 };
+
+export const render_footnotetext = () => {
+  return ''
+};
