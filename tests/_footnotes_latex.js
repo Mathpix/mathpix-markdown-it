@@ -48,5 +48,16 @@ describe('Check Latex Footnotes:', () => {
       done();
     });
     MM.texReset();
+  });  
+  
+  describe('Check Latex Footnotes with MD Footnotes:', () => {
+    const mmdContent = require('./_data/_footnotes_latex/_mmd/_mmd_04');
+    const htmlContent = require('./_data/_footnotes_latex/_html/_html_04');
+    const html = MM.markdownToHTML(mmdContent, options);
+    it('Checking result html', (done) => {
+      html.trim().should.equal(htmlContent);
+      done();
+    });
+    MM.texReset();
   });
 });
