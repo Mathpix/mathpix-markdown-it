@@ -167,6 +167,7 @@ export const latex_footnotemark: RuleInline = (state, silent) => {
       if (!dataNumbered || !dataNumbered.res) {
         return false; /** can not find end marker */
       }
+      latex += state.src.slice(nextPos, dataNumbered.nextPos);
       numbered = dataNumbered.content;
       if (numbered?.trim() && !reNumber.test(numbered)) {
         return false;
