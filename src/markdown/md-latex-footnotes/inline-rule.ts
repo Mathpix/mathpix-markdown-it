@@ -152,49 +152,48 @@ export const latex_footnotemark: RuleInline = (state, silent) => {
   if (nextPos >= max) {
     return false;
   }
-  // \footnotemark{text} or \footnotemark[number]{text}
-  //              ^^ should be {         ^^ should be [
-  if (state.src.charCodeAt(nextPos) !== 123 /* { */
-    && state.src.charCodeAt(nextPos) !== 0x5B/* [ */) {
-    return false;
-  }
+
   let data = null;
   let numbered = undefined;
-  if (state.src.charCodeAt(nextPos) === 123 /* { */) {
-    latex += state.src[nextPos];
-    data = findEndMarker(state.src, nextPos);
-  } else {
-    data = null;
-    let dataNumbered = findEndMarker(state.src, nextPos, "[", "]");
-    if (!dataNumbered || !dataNumbered.res) {
-      return false; /** can not find end marker */
-    }
-    numbered = dataNumbered.content;
-    if (numbered?.trim() && !reNumber.test(numbered)) {
-      return false;
-    }
-    nextPos = dataNumbered.nextPos;
-    if (nextPos < max) {
-      // \footnotemark[numbered]  {text}
-      //                        ^^ skipping these spaces
-      for (; nextPos < max; nextPos++) {
-        const code = state.src.charCodeAt(nextPos);
-        if (!isSpace(code) && code !== 0x0A) { break; }
-      }
-    }
-    if (nextPos < max && state.src.charCodeAt(nextPos) === 123/* { */) {
-      // \footnotemark[numbered]{text}
-      //                         ^^ get print
+  // \footnotemark{text} or \footnotemark[number]{text}
+  //              ^^ should be {         ^^ should be [
+  if (state.src.charCodeAt(nextPos) === 123 /* { */ || state.src.charCodeAt(nextPos) === 0x5B/* [ */) {
+    if (state.src.charCodeAt(nextPos) === 123 /* { */) {
+      latex += state.src[nextPos];
       data = findEndMarker(state.src, nextPos);
-      if (!data || !data.res) {
+    } else {
+      data = null;
+      let dataNumbered = findEndMarker(state.src, nextPos, "[", "]");
+      if (!dataNumbered || !dataNumbered.res) {
         return false; /** can not find end marker */
       }
+      numbered = dataNumbered.content;
+      if (numbered?.trim() && !reNumber.test(numbered)) {
+        return false;
+      }
+      nextPos = dataNumbered.nextPos;
+      if (nextPos < max) {
+        // \footnotemark[numbered]  {text}
+        //                        ^^ skipping these spaces
+        for (; nextPos < max; nextPos++) {
+          const code = state.src.charCodeAt(nextPos);
+          if (!isSpace(code) && code !== 0x0A) { break; }
+        }
+      }
+      if (nextPos < max && state.src.charCodeAt(nextPos) === 123/* { */) {
+        // \footnotemark[numbered]{text}
+        //                         ^^ get print
+        data = findEndMarker(state.src, nextPos);
+        if (!data || !data.res) {
+          return false; /** can not find end marker */
+        }
+      }
     }
   }
-  if (!data || !data.res) {
-    return false; /** can not find end marker */
-  }
 
+  if (data?.res) {
+    nextPos = data.nextPos;
+  }
   if (silent) {
     state.pos = nextPos;
     return true;
@@ -226,7 +225,6 @@ export const latex_footnotemark: RuleInline = (state, silent) => {
     lastNumber: lastNumber
   };
 
-  nextPos = data.nextPos;
   state.pos = nextPos;
   return true;
 };

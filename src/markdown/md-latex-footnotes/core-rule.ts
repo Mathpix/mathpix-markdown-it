@@ -1,10 +1,11 @@
 import { Token } from 'markdown-it';
 
-const createFootnotesTokens = (state, refTokens, meta, idx,
-                               itemLabel, itemCount, itemTokens, itemContent) => {
+const createFootnotesTokens = (state, stateTokens, refTokens, meta, idx,
+                               itemLabel, itemCount, itemTokens, itemContent): Array<Token> => {
+  // let stateTokens: Array<Token> = [];
   let token: Token = new state.Token('footnote_open', '', 1);
   token.meta = meta;
-  state.tokens.push(token);
+  stateTokens.push(token);
   let tokens = [];
   let lastParagraph;
 
@@ -28,9 +29,11 @@ const createFootnotesTokens = (state, refTokens, meta, idx,
     tokens = refTokens[':' + itemLabel];
   }
 
-  if (tokens) state.tokens = state.tokens.concat(tokens);
-  if (state.tokens[state.tokens.length - 1].type === 'paragraph_close') {
-    lastParagraph = state.tokens.pop();
+  if (tokens) {
+    stateTokens = stateTokens.concat(tokens);
+  }
+  if (stateTokens[stateTokens.length - 1].type === 'paragraph_close') {
+    lastParagraph = stateTokens.pop();
   } else {
     lastParagraph = null;
   }
@@ -39,15 +42,16 @@ const createFootnotesTokens = (state, refTokens, meta, idx,
   for (let j = 0; j < t; j++) {
     token      = new state.Token('footnote_anchor', '', 0);
     token.meta = { id: idx, subId: j, label: itemLabel };
-    state.tokens.push(token);
+    stateTokens.push(token);
   }
 
   if (lastParagraph) {
-    state.tokens.push(lastParagraph);
+    stateTokens.push(lastParagraph);
   }
 
   token = new state.Token('footnote_close', '', -1);
-  state.tokens.push(token);
+  stateTokens.push(token);
+  return stateTokens;
 };
 
 
@@ -96,15 +100,13 @@ export const footnote_tail = (state) => {
 
   if (!state.env.footnotes.list) { return; }
   list = state.env.footnotes.list;
-
-  let token:Token = new state.Token('footnote_block_open', '', 1);
-  state.tokens.push(token);
-
+  
   let notIncrementNumber = false;
   let incrementNumber = false;
   let counter_footnote = 0;
   
   let createFootnoteOpen = true;
+  let stateTokens: Array<Token> = [];
   for (i = 0, l = list.length; i < l; i++) {
     createFootnoteOpen = true;
     if (list[i].hasOwnProperty('type')) {
@@ -168,16 +170,23 @@ export const footnote_tail = (state) => {
 
     if (list[i].hasOwnProperty('arrContents') && list[i].arrContents.length) {
       for (let j = 0; j < list[i].arrContents.length; j++) {
-        createFootnotesTokens(state, refTokens, meta, i,
+        stateTokens = createFootnotesTokens(state, stateTokens, refTokens, meta, i,
           list[i].label, list[i].count,
           list[i].arrContents[j].tokens, list[i].arrContents[j].content);
       }
     } else {
-      createFootnotesTokens(state, refTokens, meta, i,
+      stateTokens = createFootnotesTokens(state, stateTokens, refTokens, meta, i,
         list[i].label, list[i].count, list[i].tokens, list[i].content);
     }
   }
   
-  token = new state.Token('footnote_block_close', '', -1);
-  state.tokens.push(token);
+  if (stateTokens?.length) {
+    let token:Token = new state.Token('footnote_block_open', '', 1);
+    state.tokens.push(token);
+    stateTokens.map(item => {
+      state.tokens.push(item);
+    });
+    token = new state.Token('footnote_block_close', '', -1);
+    state.tokens.push(token);
+  }
 };
