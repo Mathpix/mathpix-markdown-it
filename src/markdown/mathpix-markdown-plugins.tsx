@@ -19,7 +19,7 @@ import { validateLinkEnableFile } from "./mdOptions";
 import { injectLabelIdToParagraph } from "./rules";
 
 export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
-  const {width = 1200,  outMath = {}, smiles = {}, mathJax = {}, renderElement = {}, forDocx = false, forLatex = false,
+  const {width = 1200,  outMath = {}, smiles = {}, mathJax = {}, renderElement = {}, forDocx = false, forLatex = false, forMD = false,
     maxWidth = '',
     enableFileLinks = false, validateLink = null,
     toc = {},
@@ -42,6 +42,7 @@ export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
     renderElement: renderElement,
     forDocx: forDocx,
     forLatex: forLatex,
+    forMD: forMD,
     maxWidth: maxWidth,
     enableFileLinks: enableFileLinks,
     accessibility: accessibility,

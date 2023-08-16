@@ -77,14 +77,14 @@ export const latex_footnote: RuleInline = (state, silent) => {
   if (!data || !data.res) {
     return false; /** can not find end marker */
   }
-
-  envText = data.content;
   
+  nextPos = data.nextPos;
   if (silent) {
     state.pos = nextPos;
     return true;
   }
 
+  envText = data.content;
   if (!state.env.footnotes) { state.env.footnotes = {}; }
   if (!state.env.footnotes.list) { state.env.footnotes.list = []; }
   if (!state.env.footnotes.list_all) { state.env.footnotes.list_all = []; }
@@ -121,7 +121,6 @@ export const latex_footnote: RuleInline = (state, silent) => {
     lastNumber: lastNumber
   };  
 
-  nextPos = data.nextPos;
   state.pos = nextPos;
   return true;
 };
@@ -357,6 +356,8 @@ export const latex_footnotetext: RuleInline = (state, silent) => {
         content: envText,
         tokens: tokens
       }];
+      token.meta.footnoteId = lastItem.footnoteId;
+      token.meta.id = lastItem.footnoteId;
     }
   } else {
     state.env.footnotes.list[footnoteId] = {
@@ -367,6 +368,8 @@ export const latex_footnotetext: RuleInline = (state, silent) => {
       footnoteId: -1,
       lastNumber: lastNumber
     };
+    token.meta.footnoteId = -1;
+    token.meta.id = footnoteId;
   }
   nextPos = data.nextPos;
   state.pos = nextPos;

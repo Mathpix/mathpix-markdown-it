@@ -11,7 +11,7 @@ export const render_footnote_anchor_name = (tokens, idx, options, env/*, slf*/) 
 
 export const render_footnote_caption = (tokens, idx, options, env, slf) => {
   let n = Number(tokens[idx].meta.id + 1).toString();
-  if (tokens[idx].meta.numbered) {
+  if (tokens[idx].meta.numbered !== undefined) {
     n = Number(tokens[idx].meta.numbered).toString()
   } else {
     if (tokens[idx].meta.lastNumber) {
@@ -43,7 +43,9 @@ export const render_footnote_ref = (tokens, idx, options, env, slf) => {
 
   return notFootnoteText 
     ? '<sup class="footnote-ref">' + caption + '</sup>'
-    : '<sup class="footnote-ref"><a href="#fn' + id + '" id="fnref' + refid + '">' + caption + '</a></sup>';
+    : options.forDocx 
+      ? '<a href="#fn' + id + '" id="fnref' + refid + '"><sup class="footnote-ref">' + caption + '</sup></a>'
+      : '<sup class="footnote-ref"><a href="#fn' + id + '" id="fnref' + refid + '">' + caption + '</a></sup>';
 };
 
 export const render_footnote_block_open = (tokens, idx, options) => {
@@ -63,7 +65,7 @@ export const render_footnote_open = (tokens, idx, options, env, slf) => {
     id += ':' + tokens[idx].meta.subId;
   }
 
-  if (tokens[idx].meta.numbered) {
+  if (tokens[idx].meta.numbered !== undefined) {
     return '<li id="fn' + id + '" class="footnote-item" value="' + tokens[idx].meta.numbered + '">';
   }
   return '<li id="fn' + id + '" class="footnote-item">';

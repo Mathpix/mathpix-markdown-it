@@ -71,28 +71,13 @@ export const footnote_tail = (state) => {
       lastNumber += 1;
     }
   }
-  
-  let footnote_block_open = state.tokens.filter((token) => {
-    return token.type === 'footnote_block_open'
-  });
-  
-  if (footnote_block_open?.length) {
-    let footnote_open = state.tokens.filter((token) => {
-      return token.type === 'footnote_open'
-    });
-    for (let i = 0; i < footnote_open.length; i++) {
-      footnote_open[i].meta.numbered =
-        state.env.footnotes.list[footnote_open[i].meta.id].numbered
-    }
-    return;
-  }
 
   state.tokens = state.tokens.filter(function (tok) {
     if (tok.type === 'footnote_reference_open') {
       insideRef = true;
       current = [];
       currentLabel = tok.meta.label;
-      return false;
+      return Boolean(state.md.options?.forMD);
     }
     if (tok.type === 'footnote_reference_close') {
       insideRef = false;
@@ -102,9 +87,10 @@ export const footnote_tail = (state) => {
         state.env.footnotes.refsTokens = {};
       }
       state.env.footnotes.refsTokens[':' + currentLabel] = current;
-      return false;
+      return Boolean(state.md.options?.forMD);
     }
     if (insideRef) { current.push(tok); }
+    if (state.md.options.forMD) return true;
     return !insideRef;
   });
 
@@ -150,7 +136,7 @@ export const footnote_tail = (state) => {
       counter_footnote++;
     }
     list[i].counter_footnote = counter_footnote;
-    if (!createFootnoteOpen) {
+    if (!createFootnoteOpen || state.md.options.forMD) {
       continue;
     }
     let meta = { 
