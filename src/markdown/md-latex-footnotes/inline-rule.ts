@@ -140,14 +140,12 @@ export const latex_footnotemark: RuleInline = (state, silent) => {
   if (!match) {
     return false;
   }
-  let latex = match[0];
   nextPos += match[0].length;
   // \footnotemark {}
   //              ^^ skipping these spaces
   for (; nextPos < max; nextPos++) {
     const code = state.src.charCodeAt(nextPos);
     if (!isSpace(code) && code !== 0x0A) { break; }
-    latex += state.src[nextPos];
   }
   if (nextPos >= max) {
     return false;
@@ -159,7 +157,6 @@ export const latex_footnotemark: RuleInline = (state, silent) => {
   //              ^^ should be {         ^^ should be [
   if (state.src.charCodeAt(nextPos) === 123 /* { */ || state.src.charCodeAt(nextPos) === 0x5B/* [ */) {
     if (state.src.charCodeAt(nextPos) === 123 /* { */) {
-      latex += state.src[nextPos];
       data = findEndMarker(state.src, nextPos);
     } else {
       data = null;
@@ -167,7 +164,6 @@ export const latex_footnotemark: RuleInline = (state, silent) => {
       if (!dataNumbered || !dataNumbered.res) {
         return false; /** can not find end marker */
       }
-      latex += state.src.slice(nextPos, dataNumbered.nextPos);
       numbered = dataNumbered.content;
       if (numbered?.trim() && !reNumber.test(numbered)) {
         return false;
@@ -209,7 +205,7 @@ export const latex_footnotemark: RuleInline = (state, silent) => {
   let lastNumber = listNotNumbered.length;
 
   const token      = state.push('footnote_ref', '', 0);
-  token.latex = latex;
+  token.latex = state.src.slice(startPos, nextPos);
   token.meta = { 
     id: footnoteId,  
     numbered: numbered,
