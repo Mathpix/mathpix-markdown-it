@@ -1,32 +1,35 @@
 import { Token } from 'markdown-it';
 
 const createFootnotesTokens = (state, stateTokens, refTokens, meta, idx,
-                               itemLabel, itemCount, itemTokens, itemContent): Array<Token> => {
-  // let stateTokens: Array<Token> = [];
+                               itemLabel, itemCount, itemTokens, itemContent, isBlock = false): Array<Token> => {
   let token: Token = new state.Token('footnote_open', '', 1);
   token.meta = meta;
   stateTokens.push(token);
   let tokens = [];
   let lastParagraph;
 
-  if (itemTokens) {
-    tokens = [];
+  if (isBlock) {
+    tokens = itemTokens
+  } else {
+    if (itemTokens) {
+      tokens = [];
 
-    token          = new state.Token('paragraph_open', 'p', 1);
-    token.block    = true;
-    tokens.push(token);
+      token          = new state.Token('paragraph_open', 'p', 1);
+      token.block    = true;
+      tokens.push(token);
 
-    token          = new state.Token('inline', '', 0);
-    token.children = itemTokens;
-    token.content  = itemContent;
-    tokens.push(token);
+      token          = new state.Token('inline', '', 0);
+      token.children = itemTokens;
+      token.content  = itemContent;
+      tokens.push(token);
 
-    token          = new state.Token('paragraph_close', 'p', -1);
-    token.block    = true;
-    tokens.push(token);
+      token          = new state.Token('paragraph_close', 'p', -1);
+      token.block    = true;
+      tokens.push(token);
 
-  } else if (itemLabel) {
-    tokens = refTokens[':' + itemLabel];
+    } else if (itemLabel) {
+      tokens = refTokens[':' + itemLabel];
+    }
   }
 
   if (tokens) {
@@ -107,6 +110,7 @@ export const footnote_tail = (state) => {
   
   let createFootnoteOpen = true;
   let stateTokens: Array<Token> = [];
+  debugger
   for (i = 0, l = list.length; i < l; i++) {
     createFootnoteOpen = true;
     if (list[i].hasOwnProperty('type')) {
@@ -167,16 +171,16 @@ export const footnote_tail = (state) => {
         meta.numbered = counter_footnote;
       }
     }
-
+    
     if (list[i].hasOwnProperty('arrContents') && list[i].arrContents.length) {
       for (let j = 0; j < list[i].arrContents.length; j++) {
         stateTokens = createFootnotesTokens(state, stateTokens, refTokens, meta, i,
           list[i].label, list[i].count,
-          list[i].arrContents[j].tokens, list[i].arrContents[j].content);
+          list[i].arrContents[j].tokens, list[i].arrContents[j].content, list[i].isBlock);
       }
     } else {
       stateTokens = createFootnotesTokens(state, stateTokens, refTokens, meta, i,
-        list[i].label, list[i].count, list[i].tokens, list[i].content);
+        list[i].label, list[i].count, list[i].tokens, list[i].content, list[i].isBlock);
     }
   }
   

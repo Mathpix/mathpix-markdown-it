@@ -14,7 +14,7 @@ export const render_footnote_caption = (tokens, idx, options, env, slf) => {
   if (tokens[idx].meta.numbered !== undefined) {
     n = Number(tokens[idx].meta.numbered).toString()
   } else {
-    if (tokens[idx].meta.lastNumber) {
+    if (tokens[idx].meta.hasOwnProperty('lastNumber')) {
       n = Number(tokens[idx].meta.lastNumber + 1).toString()
     } else {
       if (env.footnotes?.list?.length && env.footnotes?.list[tokens[idx].meta.id]?.lastNumber) {

@@ -1,5 +1,9 @@
 import { Token } from 'markdown-it';
 import { inlineDecimalParse } from "../md-block-rule/begin-tabular";
+import {
+  addFootnoteToListForFootnote,
+  addFootnoteToListForFootnotetext 
+} from "../md-latex-footnotes/utils";
 
 /** Top-level inline rule executor 
  * Replace inline core rule
@@ -17,6 +21,44 @@ export const coreInline = (state) => {
   if (!state.env.footnotes) { state.env.footnotes = {}; }
   for (let i = 0; i < tokens.length; i++) {
     token = tokens[i];
+    if (token.type === 'footnote_latex' || token.type === 'footnotetext_latex') {
+      if (token.children?.length) {
+        for (let j = 0; j < token.children?.length; j++) {
+          if (token.children[j].type === 'inline') {
+            state.env = Object.assign({}, {...state.env}, {
+              currentTag: currentTag,
+            }, {...envToInline});
+            state.md.inline.parse(token.children[j].content, state.md, state.env, token.children[j].children);
+          }
+          if (token.children[j].type === 'tabular' && token.children[j].children?.length) {
+            for (let k = 0; k < token.children[j].children.length; k++){
+              let tok = token.children[j].children[k];
+              if (tok.token === "inline_decimal") {
+                tok = inlineDecimalParse(tok);
+                continue;
+              }
+              if (tok.token === "inline") {
+                if (tok.envToInline) {
+                  envToInline = tok.envToInline;
+                }
+                state.env = Object.assign({}, {...state.env}, {
+                  currentTag: currentTag,
+                }, {...envToInline});
+                state.md.inline.parse(tok.content, state.md, state.env, tok.children);
+              }
+            }
+          }
+        }
+      }
+      if (!state.env.footnotes.list) { state.env.footnotes.list = []; }
+      
+      if (token.type === 'footnotetext_latex') {
+        addFootnoteToListForFootnotetext(state, token, token.children, token.content, token.numbered, true);
+        continue;
+      }
+      addFootnoteToListForFootnote(state, token, token.children, token.content, token.numbered, true);
+      continue;
+    }
     if (token.currentTag) {
       currentTag = token.currentTag;
     }    
