@@ -14,6 +14,7 @@ export const addFootnoteToListForFootnote = (state, token, tokens, envText, numb
   };
 
   state.env.footnotes.list[footnoteId] = {
+    id: footnoteId,
     content: envText,
     tokens: tokens,
     numbered: numbered,
@@ -54,6 +55,7 @@ export const addFootnoteToListForFootnotetext = (state, token, tokens, envText, 
         isBlock: isBlock
       });
     } else {
+      state.env.footnotes.list[lastItem.footnoteId].id = lastItem.footnoteId;
       state.env.footnotes.list[lastItem.footnoteId].content = envText;
       state.env.footnotes.list[lastItem.footnoteId].tokens = tokens;
       state.env.footnotes.list[lastItem.footnoteId].hasContent = true;
@@ -68,6 +70,7 @@ export const addFootnoteToListForFootnotetext = (state, token, tokens, envText, 
     }
   } else {
     state.env.footnotes.list[footnoteId] = {
+      id: footnoteId,
       content: envText,
       tokens: tokens,
       numbered: numbered,

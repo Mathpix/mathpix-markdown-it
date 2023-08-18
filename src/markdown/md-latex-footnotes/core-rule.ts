@@ -110,7 +110,6 @@ export const footnote_tail = (state) => {
   
   let createFootnoteOpen = true;
   let stateTokens: Array<Token> = [];
-  debugger
   for (i = 0, l = list.length; i < l; i++) {
     createFootnoteOpen = true;
     if (list[i].hasOwnProperty('type')) {
