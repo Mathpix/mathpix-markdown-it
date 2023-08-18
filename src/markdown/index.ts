@@ -1,4 +1,4 @@
-import { mdPluginCollapsible, mdSetPositionsAndHighlight } from "./mdPluginConfigured";
+import { mdPluginCollapsible, mdSetPositionsAndHighlight, mdLatexFootnotes } from "./mdPluginConfigured";
 
 import { mathpixMarkdownPlugin } from './mathpix-markdown-plugins';
 
@@ -65,6 +65,7 @@ const mdInit = (options: TMarkdownItOptions) => {
   md.use(mathpixMarkdownPlugin, mmdOptions)
     .use(require('markdown-it-multimd-table'), {enableRowspan: true, enableMultilineRows: true})
     .use(require("markdown-it-footnote"))
+    .use(mdLatexFootnotes)
     .use(require("markdown-it-sub"))
     .use(require("markdown-it-sup"))
     .use(require("markdown-it-deflist"))
@@ -97,6 +98,7 @@ export const markdownToHtmlPipeline = (content: string, options: TMarkdownItOpti
   if (MM.disableRules && MM.disableRules.length > 0) {
       md.disable(MM.disableRules);
   }
+  // md.disable('footnote_tail')
   if (options.renderElement && options.renderElement.inLine) {
     return md.renderInline(content);
   } else {
