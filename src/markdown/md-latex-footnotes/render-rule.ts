@@ -30,22 +30,26 @@ export const render_footnote_caption = (tokens, idx, options, env, slf) => {
 };
 
 export const render_footnote_ref = (tokens, idx, options, env, slf) => {
-  let notFootnoteText = env.footnotes?.list?.length > tokens[idx].meta.id
-  && !Boolean(env.footnotes?.list[tokens[idx].meta.id].hasContent) 
-    && env.footnotes?.list[tokens[idx].meta.id].type === "footnotemark";
-  
-  const id      = slf.rules.footnote_anchor_name(tokens, idx, options, env, slf);
-  const caption = slf.rules.footnote_caption(tokens, idx, options, env, slf);
-  let refid   =  id;
-  if (tokens[idx].meta.subId > 0) {
-    refid += ':' + tokens[idx].meta.subId;
-  }
+  try {
+    let notFootnoteText = env.footnotes?.list?.length > tokens[idx].meta.id
+      && !Boolean(env.footnotes?.list[tokens[idx].meta.id].hasContent)
+      && env.footnotes?.list[tokens[idx].meta.id].type === "footnotemark";
 
-  return notFootnoteText 
-    ? '<sup class="footnote-ref">' + caption + '</sup>'
-    : options.forDocx 
-      ? '<a href="#fn' + id + '" id="fnref' + refid + '"><sup class="footnote-ref">' + caption + '</sup></a>'
-      : '<sup class="footnote-ref"><a href="#fn' + id + '" id="fnref' + refid + '">' + caption + '</a></sup>';
+    const id = slf.rules.footnote_anchor_name(tokens, idx, options, env, slf);
+    const caption = slf.rules.footnote_caption(tokens, idx, options, env, slf);
+    let refid = id;
+    if (tokens[idx].meta.subId > 0) {
+      refid += ':' + tokens[idx].meta.subId;
+    }
+
+    return notFootnoteText
+      ? '<sup class="footnote-ref">' + caption + '</sup>'
+      : options.forDocx
+        ? '<a href="#fn' + id + '" id="fnref' + refid + '"><sup class="footnote-ref">' + caption + '</sup></a>'
+        : '<sup class="footnote-ref"><a href="#fn' + id + '" id="fnref' + refid + '">' + caption + '</a></sup>';
+  } catch (e) {
+    return tokens[idx].content;
+  }
 };
 
 export const render_footnote_block_open = (tokens, idx, options) => {
