@@ -1,8 +1,9 @@
 import { Token } from 'markdown-it';
+import { renameToken } from '../utils';
 
 const createFootnotesTokens = (state, stateTokens, refTokens, meta, idx,
                                itemLabel, itemCount, itemTokens, itemContent, isBlock = false): Array<Token> => {
-  let token: Token = new state.Token('footnote_open', '', 1);
+  let token: Token = new state.Token('mmd_footnote_open', '', 1);
   token.meta = meta;
   stateTokens.push(token);
   let tokens = [];
@@ -43,8 +44,14 @@ const createFootnotesTokens = (state, stateTokens, refTokens, meta, idx,
 
   let t = itemCount > 0 ? itemCount : 1;
   for (let j = 0; j < t; j++) {
-    token      = new state.Token('footnote_anchor', '', 0);
+    token      = new state.Token('mmd_footnote_anchor', '', 0);
     token.meta = { id: idx, subId: j, label: itemLabel };
+    let footnote = state.env.footnotes?.list?.length > token.meta.id
+      ? state.env.footnotes?.list[token.meta.id] : null;
+    if (footnote) {
+      token.meta.footnoteId = footnote.footnoteId;
+      token.meta.type = footnote.type;
+    }
     stateTokens.push(token);
   }
 
@@ -52,14 +59,13 @@ const createFootnotesTokens = (state, stateTokens, refTokens, meta, idx,
     stateTokens.push(lastParagraph);
   }
 
-  token = new state.Token('footnote_close', '', -1);
+  token = new state.Token('mmd_footnote_close', '', -1);
   stateTokens.push(token);
   return stateTokens;
 };
 
-
 // Glue footnote tokens to end of token stream
-export const footnote_tail = (state) => {
+export const mmd_footnote_tail = (state) => {
   try {
     let i, l, list, current, currentLabel,
       insideRef = false,
@@ -183,15 +189,20 @@ export const footnote_tail = (state) => {
           list[i].label, list[i].count, list[i].tokens, list[i].content, list[i].isBlock);
       }
     }
-    
+
+    /** Renaming footnote_ref token to mmd_footnote_ref to use mmd rendering rule */
+    renameToken(state.tokens, 'footnote_ref', 'mmd_footnote_ref', state.env);
     if (stateTokens?.length) {
-      let token:Token = new state.Token('footnote_block_open', '', 1);
+      let token:Token = new state.Token('mmd_footnote_block_open', '', 1);
       state.tokens.push(token);
       stateTokens.map(item => {
         state.tokens.push(item);
       });
-      token = new state.Token('footnote_block_close', '', -1);
+      token = new state.Token('mmd_footnote_block_close', '', -1);
       state.tokens.push(token);
+    }
+    if (!(state.md.options?.forMD || state.md.options?.forLatex)) {
+      state.env.footnotes = null;
     }
   } catch (err) {
     console.log("[MMD][footnote_tail] Error=>", err);

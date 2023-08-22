@@ -695,3 +695,49 @@ export const getSpacesFromLeft = (str: string) => {
   let strTrimLeft = str ? str.trimLeft() : '';
   return str ? str.length - strTrimLeft.length : 0;
 };
+
+export const renameToken = (tokens, name: string, newName: string, env) => {
+  if (!tokens?.length) {
+    return;
+  }
+  for (let i = 0; i < tokens?.length; i++) {
+    if (tokens[i].type === name) {
+      tokens[i].type = newName;
+    }
+    if (["mmd_footnote_ref", "footnote_latex"].includes(tokens[i].type)) {
+      if (tokens[i].meta && env.footnotes?.list?.length) {
+        let footnote = env.footnotes?.list?.length > tokens[i].meta.id
+          ? env.footnotes?.list[tokens[i].meta.id] : null;
+        if (footnote) {
+          tokens[i].meta.numbered = footnote.numbered;
+          tokens[i].meta.lastNumber = footnote.lastNumber;
+          tokens[i].meta.counter_footnote = footnote.counter_footnote;
+          tokens[i].meta.hasContent = footnote.hasContent;
+        }
+      }
+    }
+    if (tokens[i]?.children?.length){
+      for (let j = 0; j < tokens[i].children.length; j++) {
+        let child = tokens[i].children[j];
+        if (child.type === name) {
+          child.type = newName;
+        }
+        if (["mmd_footnote_ref", "footnote_latex"].includes(child.type)) {
+          if (child.meta && env.footnotes?.list?.length) {
+            let footnote = env.footnotes?.list?.length > child.meta.id
+              ? env.footnotes?.list[child.meta.id] : null;
+            if (footnote) {
+              child.meta.numbered = footnote.numbered;
+              child.meta.lastNumber = footnote.lastNumber;
+              child.meta.counter_footnote = footnote.counter_footnote;
+              child.meta.hasContent = footnote.hasContent;
+            }
+          }
+        }
+        if (child.children?.length) {
+          renameToken(child.children, name, newName, env);
+        }
+      }
+    }
+  }
+};

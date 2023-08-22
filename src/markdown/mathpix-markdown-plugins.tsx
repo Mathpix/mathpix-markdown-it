@@ -12,7 +12,8 @@ import {
   mdPluginTableTabular,
   mdPluginList,
   mdPluginChemistry,
-  mdPluginSvgToBase64
+  mdPluginSvgToBase64, 
+  mdLatexFootnotes
 
 } from "./mdPluginConfigured";
 import { validateLinkEnableFile } from "./mdOptions";
@@ -63,6 +64,7 @@ export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
     .use(mdPluginList)
     .use(mdPluginMathJax({}))
     .use(mdPluginText())
+    .use(mdLatexFootnotes)
     .use(mdPluginHighlightCode, codeHighlight)
     .use(mdPluginAnchor)
     .use(mdPluginTOC, {toc: toc});
@@ -229,7 +231,7 @@ const setOptionForPreview = (mdOption, mmdOptions) => {
 export const initMathpixMarkdown = (md, callback) => {
   const { parse, renderer } = md;
   const { render } = renderer;
-
+  md.disable(['footnote_tail'], true);
   md.parse = (markdown, env) => {
     resetTheoremEnvironments();
     const mmdOptions = callback();

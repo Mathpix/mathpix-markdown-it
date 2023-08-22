@@ -114,7 +114,7 @@ export const latex_footnote: RuleInline = (state, silent) => {
       tokens
     );
 
-    const token = state.push('footnote_ref', '', 0);
+    const token = state.push('mmd_footnote_ref', '', 0);
     token.latex = latex;
     addFootnoteToListForFootnote(state, token, tokens, envText, numbered);
     state.pos = nextPos;
@@ -214,7 +214,7 @@ export const latex_footnotemark: RuleInline = (state, silent) => {
       (!(item.hasOwnProperty('numbered') && item.numbered !== undefined) && item.type !== "footnotetext"));
     let lastNumber = listNotNumbered.length;
 
-    const token = state.push('footnote_ref', '', 0);
+    const token = state.push('mmd_footnote_ref', '', 0);
     token.latex = state.src.slice(startPos, nextPos);
     token.meta = {
       id: footnoteId,
