@@ -231,7 +231,7 @@ const setOptionForPreview = (mdOption, mmdOptions) => {
 export const initMathpixMarkdown = (md, callback) => {
   const { parse, renderer } = md;
   const { render } = renderer;
-  // md.disable(['footnote_tail'], true);
+
   md.parse = (markdown, env) => {
     resetTheoremEnvironments();
     const mmdOptions = callback();
