@@ -1,8 +1,10 @@
+import { FootnoteItem, FootnoteMeta } from "./interfaces";
+
 export const addFootnoteToListForFootnote = (state, token, tokens, envText, numbered, isBlock = false) => {
   try {
-    let footnoteId = state.env.footnotes.list.length;
+    let footnoteId = state.env.mmd_footnotes.list.length;
 
-    let listNotNumbered = state.env.footnotes.list.filter(item =>
+    let listNotNumbered = state.env.mmd_footnotes.list.filter(item =>
       (!(item.hasOwnProperty('numbered') && item.numbered !== undefined) && item.type !== "footnotetext"));
     let lastNumber = listNotNumbered.length;
 
@@ -11,11 +13,13 @@ export const addFootnoteToListForFootnote = (state, token, tokens, envText, numb
       numbered: numbered,
       type: 'footnote',
       lastNumber: lastNumber,
-      isBlock: isBlock
+      isBlock: isBlock,
+      footnoteId: footnoteId
     };
 
-    state.env.footnotes.list[footnoteId] = {
+    state.env.mmd_footnotes.list[footnoteId] = {
       id: footnoteId,
+      footnoteId: footnoteId,
       content: envText,
       tokens: tokens,
       numbered: numbered,
@@ -30,13 +34,13 @@ export const addFootnoteToListForFootnote = (state, token, tokens, envText, numb
 
 export const addFootnoteToListForFootnotetext = (state, token, tokens, envText, numbered, isBlock = false) => {
   try {
-    let footnoteId = state.env.footnotes.list.length;
-    let listNotNumbered = state.env.footnotes.list.filter(item =>
+    let footnoteId = state.env.mmd_footnotes.list.length;
+    let listNotNumbered = state.env.mmd_footnotes.list.filter(item =>
       (!(item.hasOwnProperty('numbered') && item.numbered !== undefined) && item.type !== "footnotetext"));
     let lastNumber = listNotNumbered.length;
 
-    let listFootnoteMark = state.env.footnotes?.list?.length
-      ? state.env.footnotes.list.filter(item => item.type === 'footnotemark')
+    let listFootnoteMark = state.env.mmd_footnotes?.list?.length
+      ? state.env.mmd_footnotes.list.filter(item => item.type === 'footnotemark')
       : [];
     let lastItem = null;
     if (listFootnoteMark?.length) {
@@ -54,18 +58,18 @@ export const addFootnoteToListForFootnotetext = (state, token, tokens, envText, 
     };
     if (lastItem) {
       if (lastItem.hasContent) {
-        state.env.footnotes.list[lastItem.footnoteId].arrContents.push({
+        state.env.mmd_footnotes.list[lastItem.footnoteId].arrContents.push({
           content: envText,
           tokens: tokens,
           isBlock: isBlock
         });
       } else {
-        state.env.footnotes.list[lastItem.footnoteId].id = lastItem.footnoteId;
-        state.env.footnotes.list[lastItem.footnoteId].content = envText;
-        state.env.footnotes.list[lastItem.footnoteId].tokens = tokens;
-        state.env.footnotes.list[lastItem.footnoteId].hasContent = true;
-        state.env.footnotes.list[lastItem.footnoteId].isBlock = isBlock;
-        state.env.footnotes.list[lastItem.footnoteId].arrContents = [{
+        state.env.mmd_footnotes.list[lastItem.footnoteId].id = lastItem.footnoteId;
+        state.env.mmd_footnotes.list[lastItem.footnoteId].content = envText;
+        state.env.mmd_footnotes.list[lastItem.footnoteId].tokens = tokens;
+        state.env.mmd_footnotes.list[lastItem.footnoteId].hasContent = true;
+        state.env.mmd_footnotes.list[lastItem.footnoteId].isBlock = isBlock;
+        state.env.mmd_footnotes.list[lastItem.footnoteId].arrContents = [{
           content: envText,
           tokens: tokens,
           isBlock: isBlock
@@ -74,7 +78,7 @@ export const addFootnoteToListForFootnotetext = (state, token, tokens, envText, 
         token.meta.id = lastItem.footnoteId;
       }
     } else {
-      state.env.footnotes.list[footnoteId] = {
+      state.env.mmd_footnotes.list[footnoteId] = {
         id: footnoteId,
         content: envText,
         tokens: tokens,
@@ -90,4 +94,15 @@ export const addFootnoteToListForFootnotetext = (state, token, tokens, envText, 
   } catch (err) {
     console.log("[MMD][addFootnoteToListForFootnotetext] Error=>", err);
   }
+};
+
+export const getFootnoteItem = (env, meta: FootnoteMeta): FootnoteItem => {
+  let id = meta.hasOwnProperty('footnoteId')
+      && meta.footnoteId !== undefined
+      && meta.footnoteId !== -1
+    ? meta.footnoteId 
+    : meta.id;
+  return env?.mmd_footnotes?.list?.length > id 
+    ? env.mmd_footnotes.list[id]
+    : null;
 };

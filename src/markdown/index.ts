@@ -97,7 +97,6 @@ export const markdownToHtmlPipeline = (content: string, options: TMarkdownItOpti
   if (MM.disableRules && MM.disableRules.length > 0) {
       md.disable(MM.disableRules);
   }
-  md.disable(['footnote_tail'], true);
   if (options.renderElement && options.renderElement.inLine) {
     return md.renderInline(content);
   } else {

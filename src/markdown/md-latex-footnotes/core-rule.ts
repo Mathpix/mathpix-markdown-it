@@ -1,5 +1,4 @@
 import { Token } from 'markdown-it';
-import { renameToken } from '../utils';
 
 const createFootnotesTokens = (state, stateTokens, refTokens, meta, idx,
                                itemLabel, itemCount, itemTokens, itemContent, isBlock = false): Array<Token> => {
@@ -46,8 +45,8 @@ const createFootnotesTokens = (state, stateTokens, refTokens, meta, idx,
   for (let j = 0; j < t; j++) {
     token      = new state.Token('mmd_footnote_anchor', '', 0);
     token.meta = { id: idx, subId: j, label: itemLabel };
-    let footnote = state.env.footnotes?.list?.length > token.meta.id
-      ? state.env.footnotes?.list[token.meta.id] : null;
+    let footnote = state.env.mmd_footnotes?.list?.length > token.meta.id
+      ? state.env.mmd_footnotes?.list[token.meta.id] : null;
     if (footnote) {
       token.meta.footnoteId = footnote.footnoteId;
       token.meta.type = footnote.type;
@@ -70,11 +69,11 @@ export const mmd_footnote_tail = (state) => {
     let i, l, list, current, currentLabel,
       insideRef = false,
       refTokens = {};
-    if (!state.env.footnotes) { return; }
-    if (state.env.footnotes?.list?.length) {
+    if (!state.env.mmd_footnotes) { return; }
+    if (state.env.mmd_footnotes?.list?.length) {
       let lastNumber = 0;
-      for (let i = 0; i < state.env.footnotes.list.length; i++) {
-        let item = state.env.footnotes.list[i];
+      for (let i = 0; i < state.env.mmd_footnotes.list.length; i++) {
+        let item = state.env.mmd_footnotes.list[i];
         if (item.hasOwnProperty('lastNumber')) {
           lastNumber = item.numbered 
             ? item.lastNumber 
@@ -97,10 +96,10 @@ export const mmd_footnote_tail = (state) => {
         insideRef = false;
         // prepend ':' to avoid conflict with Object.prototype members
         refTokens[':' + currentLabel] = current;
-        if (!state.env.footnotes.refsTokens) {
-          state.env.footnotes.refsTokens = {};
+        if (!state.env.mmd_footnotes.refsTokens) {
+          state.env.mmd_footnotes.refsTokens = {};
         }
-        state.env.footnotes.refsTokens[':' + currentLabel] = current;
+        state.env.mmd_footnotes.refsTokens[':' + currentLabel] = current;
         return Boolean(state.md.options?.forMD);
       }
       if (insideRef) { current.push(tok); }
@@ -108,8 +107,8 @@ export const mmd_footnote_tail = (state) => {
       return !insideRef;
     });
   
-    if (!state.env.footnotes.list) { return; }
-    list = state.env.footnotes.list;
+    if (!state.env.mmd_footnotes.list) { return; }
+    list = state.env.mmd_footnotes.list;
     
     let notIncrementNumber = false;
     let incrementNumber = false;
@@ -190,8 +189,6 @@ export const mmd_footnote_tail = (state) => {
       }
     }
 
-    /** Renaming footnote_ref token to mmd_footnote_ref to use mmd rendering rule */
-    renameToken(state.tokens, 'footnote_ref', 'mmd_footnote_ref', state.env);
     if (stateTokens?.length) {
       let token:Token = new state.Token('mmd_footnote_block_open', '', 1);
       state.tokens.push(token);
@@ -201,9 +198,7 @@ export const mmd_footnote_tail = (state) => {
       token = new state.Token('mmd_footnote_block_close', '', -1);
       state.tokens.push(token);
     }
-    if (!(state.md.options?.forMD || state.md.options?.forLatex)) {
-      state.env.footnotes = null;
-    }
+    state.env.footnotes = null;
   } catch (err) {
     console.log("[MMD][footnote_tail] Error=>", err);
     return;

@@ -17,6 +17,7 @@ import {
   latex_footnotemark,
   latex_footnotetext
 } from "./inline-rule";
+import { grab_footnote_ref } from "./inline-ruler2";
 
 export default (md: MarkdownIt, options) => {
   Object.assign(md.options, options);
@@ -26,6 +27,7 @@ export default (md: MarkdownIt, options) => {
   md.inline.ruler.after("multiMath", "latex_footnote", latex_footnote);
   md.inline.ruler.after("latex_footnote", "latex_footnotemark", latex_footnotemark);
   md.inline.ruler.after("latex_footnotemark", "latex_footnotetext", latex_footnotetext);
+  md.inline.ruler2.push("grab_footnote_ref", grab_footnote_ref);
 
   md.renderer.rules.footnotetext = render_footnotetext;
   md.renderer.rules.footnotetext_latex = render_footnotetext;

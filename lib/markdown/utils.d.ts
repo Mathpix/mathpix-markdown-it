@@ -44,4 +44,3 @@ export declare const findOpenCloseTagsMathEnvironment: (str: string, tagOpen: Re
 export declare const canonicalMath: (math: any) => any[];
 export declare const canonicalMathPositions: (math: any) => any[];
 export declare const getSpacesFromLeft: (str: string) => number;
-export declare const renameToken: (tokens: any, name: string, newName: string, env: any) => void;
