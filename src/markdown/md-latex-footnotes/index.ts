@@ -18,9 +18,11 @@ import {
   latex_footnotetext
 } from "./inline-rule";
 import { grab_footnote_ref } from "./inline-ruler2";
+import { rest_mmd_footnotes_list } from "./utils";
 
 export default (md: MarkdownIt, options) => {
   Object.assign(md.options, options);
+  rest_mmd_footnotes_list();
   md.core.ruler.after('inline', 'mmd_footnote_tail', mmd_footnote_tail);
   md.block.ruler.before('paragraphDiv', 'latex_footnote_block', latex_footnote_block, { alt: [ 'paragraph', 'reference' ] });
   md.block.ruler.after('latex_footnote_block', 'latex_footnotetext_block', latex_footnotetext_block, { alt: [ 'paragraph', 'reference' ] });

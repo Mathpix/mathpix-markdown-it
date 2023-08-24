@@ -1,4 +1,5 @@
 import { Token } from 'markdown-it';
+import { set_mmd_footnotes_list } from './utils';
 
 const createFootnotesTokens = (state, stateTokens, refTokens, meta, idx,
                                itemLabel, itemCount, itemTokens, itemContent, isBlock = false): Array<Token> => {
@@ -199,6 +200,7 @@ export const mmd_footnote_tail = (state) => {
       state.tokens.push(token);
     }
     state.env.footnotes = null;
+    set_mmd_footnotes_list(state.env.mmd_footnotes.list);
   } catch (err) {
     console.log("[MMD][footnote_tail] Error=>", err);
     return;

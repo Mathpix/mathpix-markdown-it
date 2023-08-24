@@ -1,4 +1,5 @@
 import { FootnoteItem, FootnoteMeta } from "./interfaces";
+let mmd_footnotes_list: Array<FootnoteItem> = [];
 
 export const addFootnoteToListForFootnote = (state, token, tokens, envText, numbered, isBlock = false) => {
   try {
@@ -102,7 +103,23 @@ export const getFootnoteItem = (env, meta: FootnoteMeta): FootnoteItem => {
       && meta.footnoteId !== -1
     ? meta.footnoteId 
     : meta.id;
-  return env?.mmd_footnotes?.list?.length > id 
-    ? env.mmd_footnotes.list[id]
-    : null;
+  if (env?.mmd_footnotes?.list?.length) {
+    return env.mmd_footnotes.list.length > id
+      ? env.mmd_footnotes.list[id]
+      : null;
+  }
+  if (mmd_footnotes_list?.length) {
+    return mmd_footnotes_list.length > id
+      ? mmd_footnotes_list[id]
+      : null;
+  }
+  return null;
+};
+
+export const set_mmd_footnotes_list = (list) => {
+  mmd_footnotes_list = [...list];
+};
+
+export const rest_mmd_footnotes_list = () => {
+  mmd_footnotes_list = [];
 };
