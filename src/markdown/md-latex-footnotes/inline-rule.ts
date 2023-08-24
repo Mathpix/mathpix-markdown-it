@@ -97,14 +97,11 @@ export const latex_footnote: RuleInline = (state, silent) => {
     }
 
     envText = data.content;
-    if (!state.env.footnotes) {
-      state.env.footnotes = {};
+    if (!state.env.mmd_footnotes) {
+      state.env.mmd_footnotes = {};
     }
-    if (!state.env.footnotes.list) {
-      state.env.footnotes.list = [];
-    }
-    if (!state.env.footnotes.list_all) {
-      state.env.footnotes.list_all = [];
+    if (!state.env.mmd_footnotes.list) {
+      state.env.mmd_footnotes.list = [];
     }
     let tokens = [];
     state.md.inline.parse(
@@ -114,7 +111,7 @@ export const latex_footnote: RuleInline = (state, silent) => {
       tokens
     );
 
-    const token = state.push('footnote_ref', '', 0);
+    const token = state.push('mmd_footnote_ref', '', 0);
     token.latex = latex;
     addFootnoteToListForFootnote(state, token, tokens, envText, numbered);
     state.pos = nextPos;
@@ -202,19 +199,19 @@ export const latex_footnotemark: RuleInline = (state, silent) => {
       return true;
     }
 
-    if (!state.env.footnotes) {
-      state.env.footnotes = {};
+    if (!state.env.mmd_footnotes) {
+      state.env.mmd_footnotes = {};
     }
-    if (!state.env.footnotes.list) {
-      state.env.footnotes.list = [];
+    if (!state.env.mmd_footnotes.list) {
+      state.env.mmd_footnotes.list = [];
     }
 
-    let footnoteId = state.env.footnotes.list.length;
-    let listNotNumbered = state.env.footnotes.list.filter(item =>
+    let footnoteId = state.env.mmd_footnotes.list.length;
+    let listNotNumbered = state.env.mmd_footnotes.list.filter(item =>
       (!(item.hasOwnProperty('numbered') && item.numbered !== undefined) && item.type !== "footnotetext"));
     let lastNumber = listNotNumbered.length;
 
-    const token = state.push('footnote_ref', '', 0);
+    const token = state.push('mmd_footnote_ref', '', 0);
     token.latex = state.src.slice(startPos, nextPos);
     token.meta = {
       id: footnoteId,
@@ -223,7 +220,7 @@ export const latex_footnotemark: RuleInline = (state, silent) => {
       lastNumber: lastNumber
     };
 
-    state.env.footnotes.list[footnoteId] = {
+    state.env.mmd_footnotes.list[footnoteId] = {
       content: '',
       tokens: [],
       numbered: numbered,
@@ -320,11 +317,11 @@ export const latex_footnotetext: RuleInline = (state, silent) => {
       return true;
     }
 
-    if (!state.env.footnotes) {
-      state.env.footnotes = {};
+    if (!state.env.mmd_footnotes) {
+      state.env.mmd_footnotes = {};
     }
-    if (!state.env.footnotes.list) {
-      state.env.footnotes.list = [];
+    if (!state.env.mmd_footnotes.list) {
+      state.env.mmd_footnotes.list = [];
     }
 
     let tokens = [];

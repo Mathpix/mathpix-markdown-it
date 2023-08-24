@@ -1,1 +1,1 @@
-export declare const footnote_tail: (state: any) => void;
+export declare const mmd_footnote_tail: (state: any) => void;
