@@ -3,6 +3,10 @@ import { MmlNode, TextNode, XMLNode } from 'mathjax-full/js/core/MmlTree/MmlNode
 import { IAsciiData } from "./common";
 export declare class SerializedAsciiVisitor extends MmlVisitor {
     options: any;
+    isSerializeChildStack: boolean;
+    serializedStack: any[];
+    serializedChildStack: any[];
+    notApplyToSerializedStack: boolean;
     constructor(options: any);
     visitTree(node: MmlNode): IAsciiData;
     visitNode(node: any, ...args: any[]): IAsciiData;

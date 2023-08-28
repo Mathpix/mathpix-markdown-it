@@ -15,7 +15,7 @@ module.exports = [
   {
     latex: `\\begin{array} {r}5 x ^ { 2 } - 11 x - 3 \\\\
 + \\quad 7 x ^ { 2 } - 11 x +7 \\\\ \\hline \\end{array}`,
-    ascii: `5x^(2)-11 x-3+7x^(2)-11 x+7`,
+    ascii: `5x^(2)-11x-3+7x^(2)-11x+7`,
   },
   {
     latex: `\\begin{array} { r } 2 \\\\ \\times \\quad 42 \\\\ \\hline \\end{array}`,
@@ -51,7 +51,7 @@ module.exports = [
   },
   {
     latex: `\\begin{array} { r } ( 40 \\times \\frac { 5 } { 18 } ) ^ { 2 } + 2 \\times ( - f \\times 9.81 ) \\\\ \\times 12.2 \\end{array} `,
-    ascii: `(40 xx(5)/(18))^(2)+2xx(-f xx9.81)xx12.2`,
+    ascii: `(40xx(5)/(18))^(2)+2xx(-f xx9.81)xx12.2`,
   },
   {
     latex: `\\begin{array} { r } 208,756 \\\\ + \\quad 91,300 \\end{array}`,
@@ -82,7 +82,7 @@ module.exports = [
   },
   {
     latex: `u _ { B } \\left( c _ { k } \\right) = \\sqrt {\\begin{array}{r} \\left( \\frac { \\partial c _ { k } } { \\partial c _ { w \\mathrm{H}_{2}\\mathrm{O}} } \\right) ^ { 2 } u _ { B } ^ { 2 } \\left( c _ { w \\mathrm{H}_{2}\\mathrm{O}} \\right) + \\left( \\frac { \\partial c _ { k } } { \\partial m _ { 1\\mathrm{H}_{2}\\mathrm{O}} } \\right) ^ { 2 } u _ { B } ^ { 2 } \\left( m _ { 1 \\mathrm{H}_{2}\\mathrm{O}}\\right) + \\left( \\frac { \\partial c _ { k } } { \\partial m _ { 2 \\mathrm{H}_{2}\\mathrm{O} } } \\right) ^ { 2 } u _ { B } ^ { 2 } \\left( m _ { 2 \\mathrm{H}_{2}\\mathrm{O}} \\right) \\\\+\\left(\\frac{\\partial c_{k}}{\\partial T_{k}}\\right)^{2}u^{2}_{B}(T_{k})+\\left(\\frac{\\partial c_{k}}{\\partial T_{1\\mathrm{H}_{2}\\mathrm{O}}}\\right)^{2}u_{B}^{2}(T_{1\\mathrm{H}_{2}\\mathrm{O}})+\\left(\\frac{\\partial c_{k}}{\\partial T_{2\\mathrm{H}_{2}\\mathrm{O}}}\\right)^{2}u_{B}^{2}(T_{2\\mathrm{H}_{2}\\mathrm{O}})\\end{array}}`,
-    ascii: `u_(B)(c_(k))=sqrt(((delc_(k))/(delc_(wH_(2)O)))^(2)u_(B)^(2)(c_(wH_(2)O))+((delc_(k))/(delm_(1H_(2)O)))^(2)u_(B)^(2)(m_(1H_(2)O))+((delc_(k))/(delm_(2H_(2)O)))^(2)u_(B)^(2)(m_(2H_(2)O))+((delc_(k))/(delT_(k)))^(2)u_(B)^(2)(T_(k))+((delc_(k))/(delT_(1H_(2)O)))^(2)u_(B)^(2)(T_(1H_(2)O))+((delc_(k))/(delT_(2H_(2)O)))^(2)u_(B)^(2)(T_(2H_(2)O)))`,
+    ascii: `u_(B)(c_(k))=sqrt(((del c_(k))/(del c_(wH_(2)O)))^(2)u_(B)^(2)(c_(wH_(2)O))+((del c_(k))/(del m_(1H_(2)O)))^(2)u_(B)^(2)(m_(1H_(2)O))+((del c_(k))/(del m_(2H_(2)O)))^(2)u_(B)^(2)(m_(2H_(2)O))+((del c_(k))/(del T_(k)))^(2)u_(B)^(2)(T_(k))+((del c_(k))/(del T_(1H_(2)O)))^(2)u_(B)^(2)(T_(1H_(2)O))+((del c_(k))/(del T_(2H_(2)O)))^(2)u_(B)^(2)(T_(2H_(2)O)))`,
   },
   {
     latex: `\\begin{array}{r}
@@ -159,7 +159,7 @@ module.exports = [
   },
   {
     latex: `\\begin{array}{r} S _ { i } = \\left\\{ b \\in \\{ 0,1 \\} ^ { * } : \\exists \\text { some } c \\in B \\text{ s.t. } cb \\in S_{i-1}\\right\\}\\\\ \\cup \\{b \\in \\{0,1\\}^{*}: \\exists \\text{ some } c \\in S_{i-1} \\text{ s.t. } cb \\in B \\}\\end{array}`,
-    ascii: `{:[S_(i)={b in{0,1}^(**):EE" some "c in B" s.t. "cb inS_(i-1)}],[uu{b in{0","1}^(**):EE" some "c inS_(i-1)" s.t. "cb in B}]:}`,
+    ascii: `{:[S_(i)={b in{0,1}^(**):EE" some "c in B" s.t. "cb in S_(i-1)}],[uu{b in{0","1}^(**):EE" some "c in S_(i-1)" s.t. "cb in B}]:}`,
   },
   {
     latex: `\\begin{array} { r } \\therefore 2 x < 10 \\\\ \\therefore x < 5 \\end{array}`,
@@ -167,7 +167,7 @@ module.exports = [
   },
   {
     latex: `\\left.\\begin{array} { r } { \\frac { 6 } { x } + \\frac { 16} { y } = 6} \\\\ { - \\frac { 6} { x } - \\frac { 4} { y } = - 4} \\\\\\hline\\end{array} \\right. `,
-    ascii: `{:[(6)/(x)+(16 )/(y)=6],[-(6)/(x)-(4)/(y)=-4]:}`,
+    ascii: `{:[(6)/(x)+(16)/(y)=6],[-(6)/(x)-(4)/(y)=-4]:}`,
   },
   {
     latex: `\\begin{array}{r} 9 \\longdiv { 19 } \\\\18\\\\\\hline1\\end{array}`,

@@ -81,13 +81,13 @@ module.exports = [
       '80 <= A < 100\t6\n' +
       '100 <= A < 120\t5\n' +
       '120 <= A < 140\t3\n' +
-      '110 < {:[-16 n],[1]:}\t',
+      '110 < {:[-16n],[1]:}\t',
     csv: 'Area (sq. ft),Number of Bedrooms\n' +
       '60 <= A < 80,4\n' +
       '80 <= A < 100,6\n' +
       '100 <= A < 120,5\n' +
       '120 <= A < 140,3\n' +
-      '"110 < {:[-16 n],[1]:}",',
+      '"110 < {:[-16n],[1]:}",',
     table_markdown: '| Area (sq. ft) | Number of Bedrooms |\n' +
       '| :---: | :---: |\n' +
       '| $60 \\leq A<80$ | 4 |\n' +
@@ -100,7 +100,7 @@ module.exports = [
       { type: 'asciimath', value: '80 <= A < 100' },
       { type: 'asciimath', value: '100 <= A < 120' },
       { type: 'asciimath', value: '120 <= A < 140' },
-      { type: 'asciimath', value: '110 < {:[-16 n],[1]:}' }
+      { type: 'asciimath', value: '110 < {:[-16n],[1]:}' }
     ]
   },
   {
