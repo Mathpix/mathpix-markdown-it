@@ -8,6 +8,8 @@ export interface optionsMathpixMarkdown {
     isDisableFancy?: boolean;
     isDisableEmoji?: boolean;
     isDisableEmojiShortcuts?: boolean;
+    isDisableRefs?: boolean;
+    isDisableFootnotes?: boolean;
     disableRules?: string[];
     fontSize?: number;
     padding?: number;
@@ -46,6 +48,8 @@ export type TMarkdownItOptions = {
     isDisableFancy?: boolean;
     isDisableEmoji?: boolean;
     isDisableEmojiShortcuts?: boolean;
+    isDisableRefs?: boolean;
+    isDisableFootnotes?: boolean;
     disableRules?: string[];
     htmlTags?: boolean;
     breaks?: boolean;
