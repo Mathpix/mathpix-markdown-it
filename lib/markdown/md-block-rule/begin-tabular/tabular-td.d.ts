@@ -1,12 +1,12 @@
 import { TAttrs, TTokenTabular } from './index';
 import { TDecimal } from "./common";
-declare type TLines = {
+type TLines = {
     left?: string;
     right?: string;
     bottom?: string;
     top?: string;
 };
-declare type TAligns = {
+type TAligns = {
     h?: string;
     v?: string;
     w?: string;

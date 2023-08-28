@@ -1,21 +1,29 @@
 export const endTag = (arg: string, shouldBeFirst = false): RegExp  => {
-  if (arg.indexOf('*') !== -1) {
-    /** The '*' character must be escaped in a regular expression */
-    arg = arg.replace(/\*/, '\\*');
+  try {
+    if (arg.indexOf('*') !== -1) {
+      /** The '*' character must be escaped in a regular expression */
+      arg = arg.replace(/\*/, '\\*');
+    }
+    return shouldBeFirst
+      ? new RegExp('^\\\\end\s{0,}\{(' + arg + ')\}')
+      : new RegExp('\\\\end\s{0,}\{(' + arg + ')\}')
+  } catch (e) {
+    return null;
   }
-  return shouldBeFirst 
-    ? new RegExp('^\\\\end\s{0,}\{(' + arg + ')\}') 
-    : new RegExp('\\\\end\s{0,}\{(' + arg + ')\}')
 };
 
 export const beginTag = (arg: string, shouldBeFirst = false): RegExp  => {
-  if (arg.indexOf('*') !== -1) {
-    /** The '*' character must be escaped in a regular expression */
-    arg = arg.replace(/\*/, '\\*');
+  try {
+    if (arg.indexOf('*') !== -1) {
+      /** The '*' character must be escaped in a regular expression */
+      arg = arg.replace(/\*/, '\\*');
+    }
+    return shouldBeFirst
+      ? new RegExp('^\\\\begin\s{0,}\{(' + arg + ')\}')
+      : new RegExp('\\\\begin\s{0,}\{(' + arg + ')\}')
+  } catch (e) {
+    return null;
   }
-  return shouldBeFirst 
-    ? new RegExp('^\\\\begin\s{0,}\{(' + arg + ')\}') 
-    : new RegExp('\\\\begin\s{0,}\{(' + arg + ')\}')
 };
 
 export const getTextWidth = (): number => {
@@ -94,32 +102,36 @@ export const includesSimpleMathTag = (str: string, tag = '$$') => {
 
 export const includesMultiMathBeginTag = (str, tag): RegExp | null => {
   let result: RegExp | null = null;
-  if (!tag.test(str)) {
-    return result;
-  }
-  let match;
-  for (let i = 0; i < str.length; i++) {
-    result = null;
-    const str1 = i < str.length ? str.slice(i) : '';
-    match = str1 ? str1.match(tag) : null;
-    if (!match) {
-      break;
+  try {
+    if (!tag.test(str)) {
+      return result;
     }
-    if (isNotBackticked(str, match[0])) {
+    let match;
+    for (let i = 0; i < str.length; i++) {
       result = null;
-      if (match[0] === "\\[" || match[0] === "\[") {
-        result = /\\\]/;
-      } else if (match[0] === "\\(" || match[0] === "\(") {
-        result = /\\\)/;
-      } else if (match[1]) {
-        result = new RegExp(`\end{${match[1]}}`);
+      const str1 = i < str.length ? str.slice(i) : '';
+      match = str1 ? str1.match(tag) : null;
+      if (!match) {
+        break;
       }
-      break;
-    } else {
-      i += match.index + match[0].length - 1;
+      if (isNotBackticked(str, match[0])) {
+        result = null;
+        if (match[0] === "\\[" || match[0] === "\[") {
+          result = /\\\]/;
+        } else if (match[0] === "\\(" || match[0] === "\(") {
+          result = /\\\)/;
+        } else if (match[1]) {
+          result = new RegExp(`\end{${match[1]}}`);
+        }
+        break;
+      } else {
+        i += match.index + match[0].length - 1;
+      }
     }
+    return result;
+  } catch (e) {
+    return null;
   }
-  return result;
 };
 
 export const includesMultiMathTag = (str, tag): boolean => {

@@ -3,7 +3,7 @@ import { mdPluginCollapsible, mdSetPositionsAndHighlight } from "./mdPluginConfi
 import { mathpixMarkdownPlugin } from './mathpix-markdown-plugins';
 
 import { injectRenderRules } from "./rules";
-import { MathpixMarkdownModel as MM, TMarkdownItOptions } from '../mathpix-markdown-model';
+import { MathpixMarkdownModel as MM, TMarkdownItOptions, ParserErrors } from '../mathpix-markdown-model';
 
 /** md renderer */
 const mdInit = (options: TMarkdownItOptions) => {
@@ -22,7 +22,9 @@ const mdInit = (options: TMarkdownItOptions) => {
     centerTables = true,
     enableCodeBlockRuleForLatexCommands = false,
     addPositionsToTokens = false,
-    highlights = []
+    highlights = [],
+    parserErrors = ParserErrors.show,
+    codeHighlight = {}
   } = options;
   const mmdOptions = {
     width: width,
@@ -42,7 +44,9 @@ const mdInit = (options: TMarkdownItOptions) => {
     centerTables: centerTables,
     enableCodeBlockRuleForLatexCommands: enableCodeBlockRuleForLatexCommands,
     addPositionsToTokens: addPositionsToTokens,
-    highlights: highlights
+    highlights: highlights,
+    parserErrors: parserErrors,
+    codeHighlight: codeHighlight
   };
   let md = require("markdown-it")({
     html: htmlTags,
@@ -104,5 +108,11 @@ export const markdownToHtmlPipeline = (content: string, options: TMarkdownItOpti
  * convert a markdown text to html
  */
 export function markdownToHTML(markdown: string, options: TMarkdownItOptions = {}): string {
-  return markdownToHtmlPipeline(markdown, options);
+  try {
+    return markdownToHtmlPipeline(markdown, options);
+  } catch (e) {
+    console.log("ERROR=>[markdownToHTML]=>");
+    console.error(e);
+    return '';
+  }
 }

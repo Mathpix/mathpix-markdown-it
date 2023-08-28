@@ -184,27 +184,20 @@ export const StatePushTabulars = (state, cTabular: TTypeContentList, align: stri
       let tok:Token = res[j];
       if (res[j].token === 'inline') {
         tok.block = true;
+        tok.envToInline = {};
         if (res[j].content) {
-          let children = [];
           state.env.tabulare = state.md.options.outMath.include_tsv
             || state.md.options.outMath.include_csv
             || (state.md.options.outMath.include_table_markdown
               && state.md.options.outMath.table_markdown && state.md.options.outMath.table_markdown.math_as_ascii);
           state.env.subTabular = res[j].type === 'subTabular';
-          state.md.inline.parse(tok.content, state.md, state.env, children);
+          tok.envToInline = {...state.env};
           state.env.tabulare = false;
-          if (children.length > 0) {
-            tok.content  = '';
-            tok.children = children;
-          } else {
-            tok.content  = res[j].content;
-            tok.children = [];
-          }
+          tok.content  = res[j].content;
+          tok.children = [];
         }
       } else {
-          if (res[j].token === 'inline_decimal') {
-            tok = inlineDecimalParse(tok);
-          } else {
+          if (res[j].token !== 'inline_decimal') {
             tok.content  = res[j].content;
             tok.children = [];
           }
@@ -247,6 +240,7 @@ export const BeginTabular: RuleBlock = (state, startLine: number, endLine: numbe
   if (lineText.charCodeAt(0) !== 0x5c /* \ */) {
     return false;
   }
+  let isCloseTagExist = false;
   let dataTags = findOpenCloseTags(lineText, openTagTabular, closeTagTabular);
   let pending = dataTags?.pending ? dataTags.pending : '';
   if (!dataTags?.arrOpen?.length) {
@@ -256,6 +250,7 @@ export const BeginTabular: RuleBlock = (state, startLine: number, endLine: numbe
   let resString: string = lineText;
   if (dataTags?.arrClose?.length) {
     iOpen -= dataTags.arrClose.length;
+    isCloseTagExist = true;
   }
   /** For validation mode we can terminate immediately */
   if (silent) {
@@ -263,6 +258,9 @@ export const BeginTabular: RuleBlock = (state, startLine: number, endLine: numbe
   }
   for (; nextLine <= endLine; nextLine++) {
     dataTags = null;
+    if (state.isEmpty(nextLine)) { 
+      break 
+    }
     if (lineText === '') {
       if (iOpen === 0) {
         break;
@@ -285,6 +283,7 @@ export const BeginTabular: RuleBlock = (state, startLine: number, endLine: numbe
       }      
       if (dataTags?.arrClose?.length) {
         iOpen -= dataTags.arrClose.length;
+        isCloseTagExist = true;
       }
     } else {
       lineText += '\n';
@@ -297,6 +296,9 @@ export const BeginTabular: RuleBlock = (state, startLine: number, endLine: numbe
 
     // quirk for blockquotes, this line should already be checked by that rule
     if (state.sCount[nextLine] < 0) { continue; }
+  }
+  if (!isCloseTagExist) {
+    return false;
   }
   if (state.md.options.centerTables) {
     return StatePushTabularBlock(state, startLine, nextLine, resString, 'center', true);

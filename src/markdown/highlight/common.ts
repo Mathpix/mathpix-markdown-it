@@ -105,13 +105,17 @@ export const filteredHighlightContent = (highlightContent) => {
 
 export const getStyleFromHighlight = (highlight): string => {
   let dataAttrsStyle = '';
-  if (highlight.hasOwnProperty('highlight_color')
-    || highlight.hasOwnProperty('text_color')) {
+  if ((highlight.hasOwnProperty('highlight_color') && highlight.highlight_color !== undefined)
+    || (highlight.hasOwnProperty('text_color') && highlight.text_color !== undefined)) {
     if (highlight.highlight_color) {
       dataAttrsStyle += `background-color: ${highlight.highlight_color};`;
+    } else {
+      dataAttrsStyle += `background-color: ${HIGHLIGHT_COLOR};`;
     }
     if (highlight.text_color) {
       dataAttrsStyle += `color: ${highlight.text_color};`;
+    } else {
+      dataAttrsStyle += `color: ${HIGHLIGHT_TEXT_COLOR};`;
     }
   } else {
     dataAttrsStyle += `background-color: ${HIGHLIGHT_COLOR};`;

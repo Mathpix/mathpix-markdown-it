@@ -1,4 +1,5 @@
 import { Token } from 'markdown-it';
+import { ParserErrors } from "../../mathpix-markdown-model";
 
 export type TParseError = Array<string>;
 export type TParseErrorList = Array<TParseError>;
@@ -28,12 +29,19 @@ const StatePushDivError = (state, startLine: number, nextLine: number, content: 
   state.line = nextLine;
   token = state.push('paragraph_open', 'div', 1);
 
-  token.attrs = [['class', 'math-error ']];
+  if (state.md.options.parserErrors === ParserErrors.show) {
+    token.attrs = [['class', 'math-error ']];
+  }
+  if (state.md.options.parserErrors === ParserErrors.hide) {
+    token.attrSet('style', 'display: none')
+  }
   token.map = [startLine, state.line];
 
   token = state.push('inline', '', 0);
   token.children = [];
-  token.content = title + ParseError.concat('\n');
+  if (state.md.options.parserErrors === ParserErrors.show){
+    token.content = title + ParseError.concat('\n');
+  }
   token = state.push('text', '', 0);
   token.children = [];
   token.content = content;

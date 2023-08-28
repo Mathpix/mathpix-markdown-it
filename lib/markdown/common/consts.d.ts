@@ -32,6 +32,14 @@ export declare const reMultiRowWithVPos: RegExp;
 export declare const reMultiRow: RegExp;
 export declare const openTagTabular: RegExp;
 export declare const closeTagTabular: RegExp;
+export declare const reFootNote: RegExp;
+export declare const reOpenTagFootnote: RegExp;
+export declare const reOpenTagFootnoteNumbered: RegExp;
+export declare const reOpenTagFootnotetext: RegExp;
+export declare const reOpenTagFootnotetextNumbered: RegExp;
+export declare const reFootNoteMark: RegExp;
+export declare const reFootNoteText: RegExp;
+export declare const reNumber: RegExp;
 export declare const HIGHLIGHT_COLOR = "rgba(0, 147, 255, 0.25)";
 export declare const HIGHLIGHT_TEXT_COLOR = "#1e2029";
 export declare const latexEnvironments: string[];
@@ -104,3 +112,7 @@ export declare const terminatedRules: {
     };
 };
 export declare const mathTokenTypes: string[];
+export declare const codeHighlightDef: {
+    auto: boolean;
+    code: boolean;
+};

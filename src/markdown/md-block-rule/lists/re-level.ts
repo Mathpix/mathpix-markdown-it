@@ -55,18 +55,41 @@ export const GetEnumerateLevel = (data = null) => {
 
 //SetItemizeLevelTokens
 export const SetItemizeLevelTokens = (state) => {
+  let beforeOptions = {...state.md.options};
+  if (state.md.options.forDocx) {
+    state.md.options = Object.assign({}, state.md.options, {
+      outMath: {
+        include_svg: true,
+        include_mathml_word: false,
+      }
+    })
+  }
   for (let i = 0; i < itemizeLevel.length; i++) {
     let children = [];
     state.md.inline.parse(itemizeLevel[i], state.md, state.env, children);
-    itemizeLevelTokens[i] = children
+    itemizeLevelTokens[i] = children;
   }
-  return [].concat(itemizeLevelTokens)
+  state.md.options = beforeOptions;
+  return {
+    tokens: [].concat(itemizeLevelTokens),
+    contents: [].concat(itemizeLevel)
+  }
 };
 
 export const SetItemizeLevelTokensByIndex = (state, index: number) => {
+  let beforeOptions = {...state.md.options};
+  if (state.md.options.forDocx) {
+    state.md.options = Object.assign({}, state.md.options, {
+      outMath: {
+        include_svg: true,
+        include_mathml_word: false,
+      }
+    })
+  }
   let children = [];
   state.md.inline.parse(itemizeLevel[index], state.md, state.env, children);
-  itemizeLevelTokens[index] = children
+  itemizeLevelTokens[index] = children;
+  state.md.options = beforeOptions;
 };
 
 export const GetItemizeLevelTokens = (data = null) => {
@@ -83,7 +106,10 @@ export const GetItemizeLevelTokens = (data = null) => {
 
 export const GetItemizeLevelTokensByState = (state) => {
   if (itemizeLevelTokens && itemizeLevelTokens.length > 0) {
-    return [].concat(itemizeLevelTokens)
+    return {
+      contents: [].concat(itemizeLevel),
+      tokens: [].concat(itemizeLevelTokens)
+    }
   } else {
     return SetItemizeLevelTokens(state)
   }

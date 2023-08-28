@@ -4,7 +4,7 @@ jobs:
     working_directory: ~/app
 
     docker:
-    - image: circleci/node:14
+    - image: circleci/node:16
 
     steps:
     - checkout
@@ -41,7 +41,7 @@ jobs:
     working_directory: ~/app
 
     docker:
-    - image: circleci/node:14
+    - image: circleci/node:16
 
     steps:
     - checkout
@@ -87,5 +87,5 @@ workflows:
     - deploy-feature:
         filters:
           branches:
-            only:
-            - feature
+            ignore:
+            - master

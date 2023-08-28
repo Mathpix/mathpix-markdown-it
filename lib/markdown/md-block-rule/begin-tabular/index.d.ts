@@ -2,14 +2,14 @@ import { RuleBlock, Token } from 'markdown-it';
 export declare const openTag: RegExp;
 export declare const openTagG: RegExp;
 export declare const closeTag: RegExp;
-declare type TTypeContent = {
+type TTypeContent = {
     type?: string;
     content?: string;
     align?: string;
 };
-declare type TTypeContentList = Array<TTypeContent>;
-export declare type TAttrs = string[];
-export declare type TTokenTabular = {
+type TTypeContentList = Array<TTypeContent>;
+export type TAttrs = string[];
+export type TTokenTabular = {
     token: string;
     type: string;
     tag: string;
@@ -24,7 +24,7 @@ export declare type TTokenTabular = {
     ascii_md?: string;
     latex?: string;
 };
-export declare type TMulti = {
+export type TMulti = {
     mr?: number;
     mc?: number;
     attrs: Array<TAttrs>;

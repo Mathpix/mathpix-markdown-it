@@ -106,14 +106,21 @@ export const renderMathHighlight = (tokens, idx, options, env, slf) => {
   if (token.highlightAll) {
     let dataAttrsStyle = '';
     if (token.highlights?.length && (
-      token.highlights[0].hasOwnProperty('highlight_color')
-      || token.highlights[0].hasOwnProperty('text_color'))) {
+      (token.highlights[0].hasOwnProperty('highlight_color') && token.highlights[0].highlight_color !== undefined)
+      || (token.highlights[0].hasOwnProperty('text_color') && token.highlights[0].text_color !== undefined))) {
       if (token.highlights[0].highlight_color) {
         if (token.type === "inline_math" && !isHeightExceedsLineHeight) {
           dataAttrsStyle += `background-color: ${token.highlights[0].highlight_color};`;
         } else {
           dataAttrs += ' data-highlight-color="true"';
           dataAttrsStyle += `--mmd-highlight-color: ${token.highlights[0].highlight_color};`;
+        }
+      } else {
+        if (token.type === "inline_math" && !isHeightExceedsLineHeight) {
+          dataAttrsStyle += `background-color: ${HIGHLIGHT_COLOR};`;
+        } else {
+          dataAttrs += ' data-highlight-color="true"';
+          dataAttrsStyle += `--mmd-highlight-color: ${HIGHLIGHT_COLOR};`;
         }
       }
       if (token.highlights[0].text_color) {
@@ -123,11 +130,18 @@ export const renderMathHighlight = (tokens, idx, options, env, slf) => {
           dataAttrs += ' data-highlight-text-color="true"';
           dataAttrsStyle += `--mmd-highlight-text-color: ${token.highlights[0].text_color};`;
         }
+      } else {
+        if (token.type === "inline_math" && !isHeightExceedsLineHeight) {
+          dataAttrsStyle += `color: ${HIGHLIGHT_TEXT_COLOR};`;
+        } else {
+          dataAttrs += ' data-highlight-text-color="true"';
+          dataAttrsStyle += `--mmd-highlight-text-color: ${HIGHLIGHT_TEXT_COLOR};`;
+        }
       }
     } else {
       if (token.type === "inline_math" && !isHeightExceedsLineHeight) {
-        dataAttrsStyle += `background-color: ${HIGHLIGHT_TEXT_COLOR};`;
-        dataAttrsStyle += `color: ${HIGHLIGHT_COLOR};`;
+        dataAttrsStyle += `background-color: ${HIGHLIGHT_COLOR};`;
+        dataAttrsStyle += `color: ${HIGHLIGHT_TEXT_COLOR};`;
       } else {
         dataAttrs += ' data-highlight-color="true"';
         dataAttrs += ' data-highlight-text-color="true"';
@@ -157,15 +171,38 @@ export const captionTableHighlight = (tokens, idx, options, env, slf) => {
   const token = tokens[idx];
   if (token.highlights?.length) {
     if (needToHighlightAll(token)) {
-      return `<div class=${token.attrGet('class')
+      let htmlPrint = token.print ? token.print : '';
+      if (token.children?.length) {
+        for (let i = 0; i < token.children.length; i++) {
+          token.children[i].highlights = [];
+          token.children[i].highlightAll = false;
+        }
+      }
+      let htmlCaption = token.children?.length
+        ? slf.renderInline(token.children, options, env)
+        : token.content;
+      let html = `<div class=${token.attrGet('class')
         ? token.attrGet('class')
-        : "caption_table"}>${highlightText(token, token.print + token.caption)}</div>`
+        : "caption_table"}>`;
+      html += '<span class="mmd-highlight" style="' + getStyleFromHighlight(token.highlights[0]) + '">';
+      html += htmlPrint;
+      html += htmlCaption;
+      html += '</span>';
+      html += '</div>';
+      return html;
     }
+    let htmlCaption = token.children?.length
+      ? slf.renderInline(token.children, options, env)
+      : token.content;
     return `<div class=${token.attrGet('class')
       ? token.attrGet('class')
-      : "caption_table"}>${token.print}${highlightText(token, token.caption)}</div>`
+      : "caption_table"}>${token.print}${htmlCaption}</div>`
   }
+  let htmlPrint = token.print ? token.print : '';
+  let htmlCaption = token.children?.length
+    ? slf.renderInline(token.children, options, env)
+    : token.content;
   return `<div class=${token.attrGet('class')
     ? token.attrGet('class')
-    : "caption_table"}>${token.content}</div>`
+    : "caption_table"}>${htmlPrint}${htmlCaption}</div>`
 };

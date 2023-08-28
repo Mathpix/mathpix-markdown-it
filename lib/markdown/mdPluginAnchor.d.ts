@@ -1,5 +1,5 @@
 declare const anchor: {
-    (md: any, opts: any): void;
+    (md: MarkdownIt, opts: any): void;
     defaults: {
         level: number;
     };
