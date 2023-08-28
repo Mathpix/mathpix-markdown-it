@@ -1,4 +1,9 @@
 import { Token } from 'markdown-it';
+import { inlineDecimalParse } from "../md-block-rule/begin-tabular";
+import {
+  addFootnoteToListForFootnote,
+  addFootnoteToListForFootnotetext 
+} from "../md-latex-footnotes/utils";
 
 /** Top-level inline rule executor 
  * Replace inline core rule
@@ -11,18 +16,87 @@ export const coreInline = (state) => {
   const tokens: Token[] = state.tokens;
   let token: Token;
   let currentTag = {};
+  let envToInline = {};
   // Parse inlines
+  if (!state.env.footnotes) { state.env.footnotes = {}; }
+  state.env.mmd_footnotes = {...state.env.footnotes};
+  
+  if (!state.env.mmd_footnotes.list) { state.env.mmd_footnotes.list = []}
   for (let i = 0; i < tokens.length; i++) {
     token = tokens[i];
+    if (token.type === 'footnote_latex' || token.type === 'footnotetext_latex') {
+      if (token.children?.length) {
+        for (let j = 0; j < token.children?.length; j++) {
+          if (token.children[j].type === 'inline') {
+            state.env = Object.assign({}, {...state.env}, {
+              currentTag: currentTag,
+            }, {...envToInline});
+            state.md.inline.parse(token.children[j].content, state.md, state.env, token.children[j].children);
+          }
+          if (token.children[j].type === 'tabular' && token.children[j].children?.length) {
+            for (let k = 0; k < token.children[j].children.length; k++){
+              let tok = token.children[j].children[k];
+              if (tok.token === "inline_decimal") {
+                tok = inlineDecimalParse(tok);
+                continue;
+              }
+              if (tok.token === "inline") {
+                if (tok.envToInline) {
+                  envToInline = tok.envToInline;
+                }
+                state.env = Object.assign({}, {...state.env}, {
+                  currentTag: currentTag,
+                }, {...envToInline});
+                state.md.inline.parse(tok.content, state.md, state.env, tok.children);
+              }
+            }
+          }
+        }
+      }
+      if (!state.env.footnotes.list) { state.env.footnotes.list = []; }
+      if (!state.env.mmd_footnotes.list) { state.env.mmd_footnotes.list = []; }
+      
+      if (token.type === 'footnotetext_latex') {
+        addFootnoteToListForFootnotetext(state, token, token.children, token.content, token.numbered, true);
+        continue;
+      }
+      addFootnoteToListForFootnote(state, token, token.children, token.content, token.numbered, true);
+      continue;
+    }
     if (token.currentTag) {
       currentTag = token.currentTag;
+    }    
+    if (token.envToInline) {
+      envToInline = token.envToInline;
     }
-    if (token.type === 'inline') {
-      state.md.inline.parse(token.content, state.md,
-        Object.assign({}, {...state.env}, {
-          currentTag: currentTag,
-        }), token.children
-      );
+    if(token.type === 'tabular' && token.children?.length) {
+      for (let j = 0; j < token.children.length; j++){
+        let tok = token.children[j];
+        if (tok.token === "inline_decimal") {
+          tok = inlineDecimalParse(tok);
+          continue;
+        }
+        if (tok.token === "inline") {
+          if (tok.envToInline) {
+            envToInline = tok.envToInline;
+          }
+          state.env = Object.assign({}, {...state.env}, {
+            currentTag: currentTag,
+          }, {...envToInline});
+          state.md.inline.parse(tok.content, state.md, state.env, tok.children);
+        } 
+      }
+      continue;
+    }
+    if (token.type === 'inline' 
+      || ['title', 'section', 'subsection', 'subsubsection', 'addcontentsline',
+        'item_inline', 'caption_table'
+      ].includes(token.type)) {
+      state.env = Object.assign({}, {...state.env}, {
+        currentTag: currentTag,
+      }, {...envToInline});
+      state.md.inline.parse(token.content, state.md, state.env, token.children);
     }
   }
+  state.env.footnotes = null;
 };

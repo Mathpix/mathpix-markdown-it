@@ -1,1 +1,2 @@
-export declare const inlineTabular: (state: any, silent: any) => boolean;
+import { RuleInline } from 'markdown-it';
+export declare const inlineTabular: RuleInline;

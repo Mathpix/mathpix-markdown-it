@@ -82,6 +82,27 @@ proceed from there and at some point you will arrive to a contradiction.
 
 ![](doc/images/theorems_and_proofs.png)
 
+- [Latex footnotes](doc/latex-footnotes.md)
+
+```text
+Footnote marker without text. Auto increment counter to 1 \footnotemark{} should be 1.
+
+Footnote marker with text. Auto increment counter to 2 \footnotemark{} be 2. \footnotetext{text should be 2}
+
+Auto increment counter to 3 \footnote{text  should be 3}
+
+Auto increment counter to 4 \footnote{text  should be 4}
+
+Footnote marker without text. Auto increment counter to 5 \footnotemark{} should be 5.
+
+Footnote marker with text. Auto increment counter to 6 \footnotemark{} should be 6. \footnotetext{text should be 6}
+
+Auto increment counter to 7 \footnote{text  should be 7}
+
+Auto increment counter to 8 \footnote{text  should be 8}
+```
+
+![](doc/images/latex-footnotes/latex-footnotes_01.png)
 
 # What is mathpix-markdown-it? 
 

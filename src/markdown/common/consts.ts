@@ -51,6 +51,15 @@ export const reMultiRow: RegExp = /(?:\\multirow\s{0,}\{(?<nrows>[^}]*)\}\s{0,}\
 export const openTagTabular: RegExp = /^\\begin\s{0,}{tabular}\s{0,}\{([^}]*)\}/;
 export const closeTagTabular: RegExp = /^\\end\s{0,}{tabular}/;
 
+export const reFootNote: RegExp = /^\\footnote/;
+export const reOpenTagFootnote: RegExp = /\\footnote\s{0,}\[\s{0,}\]\s{0,}{|\\footnote\s{0,}\[-?\d+\]\s{0,}{|\\footnote\s{0,}{/;
+export const reOpenTagFootnoteNumbered: RegExp = /\\footnote\s{0,}\[(?<number>-?\d+)\]\s{0,}{/;
+export const reOpenTagFootnotetext: RegExp = /\\footnotetext\s{0,}\[\s{0,}\]\s{0,}{|\\footnotetext\s{0,}\[-?\d+\]\s{0,}{|\\footnotetext\s{0,}{/;
+export const reOpenTagFootnotetextNumbered: RegExp = /\\footnotetext\s{0,}\[(?<number>-?\d+)\]\s{0,}{/;
+export const reFootNoteMark: RegExp = /^\\footnotemark/;
+export const reFootNoteText: RegExp = /^\\footnotetext/;
+export const reNumber = /^-?\d+$/;
+
 export const HIGHLIGHT_COLOR = 'rgba(0, 147, 255, 0.25)';
 export const HIGHLIGHT_TEXT_COLOR = '#1e2029';
 

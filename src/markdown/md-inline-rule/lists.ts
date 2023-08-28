@@ -113,9 +113,9 @@ export const listItemInline: RuleInline = (state, silent) => {
   token.inlinePos.start_content += getSpacesFromLeft(content);
   token.inlinePos.end_content = token.inlinePos.start_content + content.length;
   
-  let children = [];
-  state.md.inline.parse(content.trim(), state.md, state.env, children);
-  token.children = children;
+  token.content = content.trim();
+  token.children = [];
+  
   if (match[1] !== undefined) {
     token.marker = match[1] ? match[1].trim() : '';
     let children = [];
