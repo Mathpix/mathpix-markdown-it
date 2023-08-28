@@ -143,6 +143,9 @@ export const needFirstSpaceBeforeLetter = (node, currentText, serialize) => {
     if (lastResAscii.texClass === TEXCLASS.OP && regW.test(currentText[0])) {
       return true;
     }
+    if (lastResAscii.kind === 'TeXAtom' && lastResAscii.texClass !== TEXCLASS.OP) {
+      return false
+    }
     if (regLetter.test(lastSymbol)) {
       return currentText?.length && regLetter.test(currentText[0]) 
         && (currentText?.length > 1 || lastResAscii.ascii?.trim()?.length > 1)
