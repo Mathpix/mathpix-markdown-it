@@ -30,6 +30,7 @@ import {
   theoremStyle
 } from './md-theorem/inline-rule';
 import {coreInline} from './md-inline-rule/core-inline';
+import {refsInline, refInsideMathDelimiter} from './md-inline-rule/refs';
 import {hardBreak, softBreak} from './md-renderer-rules/breaks';
 import {addIntoLabelsList, clearLabelsList, eLabelType, getLabelByKeyFromLabelsList, ILabel} from "./common/labels";
 import {envArraysShouldBeFlattenInTSV} from '../helpers/consts';
@@ -203,7 +204,7 @@ const multiMath: RuleInline = (state, silent) => {
   }
   const match = state.src
     .slice(++startMathPos)
-    .match(/^(?:\\\[|\[|\\\(|\(|begin\{([^}]*)\}|eqref\{([^}]*)\}|ref\{([^}]*)\})/); // eslint-disable-line
+    .match(/^(?:\\\[|\[|\\\(|\(|begin\{([^}]*)\})/); // eslint-disable-line
   if (!match) {
     return false;
   }
@@ -213,7 +214,6 @@ const multiMath: RuleInline = (state, silent) => {
 
   startMathPos += match[0].length;
   let type, endMarker, includeMarkers; // eslint-disable-line
-  let addParentheses = false;
   let math_env = '';
   let endMarkerPos = -1;
   if (match[0] === "\\[") {
@@ -228,13 +228,6 @@ const multiMath: RuleInline = (state, silent) => {
   } else if (match[0] === "\(") {
     type = "inline_math";
     endMarker = "\\)";
-  } else if (match[0].includes("eqref")) {
-    type = "reference_note";
-    addParentheses = true; /** add parentheses so that instead of printing a plain number as 5, it will print (5). */
-    endMarker = "";
-  } else if (match[0].includes("ref")) {
-    type = "reference_note";
-    endMarker = "";
   } else if (match[1] && match[1] !== 'abstract') {
     math_env = match[1].trim();
     if (match[1].indexOf('*') > 0) {
@@ -289,12 +282,6 @@ const multiMath: RuleInline = (state, silent) => {
     if (includeMarkers) {
       token.content = state.src.slice(state.pos, nextPos);
       token.math_env = math_env;
-    } else if (type === "reference_note") {
-      if (state.md.options.forLatex) {
-        token.markup = match[0];
-      }
-      token.content = match ? match[2] || match[3] : "";
-      token.attrSet("data-parentheses", addParentheses.toString());
     } else {
       token.content = state.src.slice(startMathPos, endMarkerPos);
       token.math_env = getMathEnvironment(token.content);
@@ -314,15 +301,13 @@ const multiMath: RuleInline = (state, silent) => {
       end_content: type === "equation_math_not_number" || type === "equation_math" 
         ? nextPos : endMarkerPos
     };
-    if (type !== "reference_note") {
-      if (state.md.options.addPositionsToTokens) {
-        token.canonicalized = token.content ? canonicalMath(token.content) : [];
-      }
-      if (state.md.options.highlights?.length) {
-        token.canonicalizedPositions = token.content ? canonicalMathPositions(token.content) : [];
-      }
+    if (state.md.options.addPositionsToTokens) {
+      token.canonicalized = token.content ? canonicalMath(token.content) : [];
     }
-    if (type !== "reference_note" && !state.md.options.forLatex) {
+    if (state.md.options.highlights?.length) {
+      token.canonicalizedPositions = token.content ? canonicalMathPositions(token.content) : [];
+    }
+    if (!state.md.options.forLatex) {
       /** Perform math to conversion to html and get additional data from MathJax to pass it to render rules */
       convertMathToHtml(state, token, state.md.options);
     }
@@ -340,75 +325,6 @@ export const findEndMarkerPos = (str: string, endMarker: string, i: number): num
     }
   }
   return index;
-};
-
-const refs: RuleInline = (state, silent) => {
-  let startMathPos = state.pos;
-  if (state.src.charCodeAt(startMathPos) !== 0x5c /* \ */) {
-    return false;
-  }
-  const match = state.src
-    .slice(++startMathPos)
-    .match(/^(?:\\\[|\[|\\\(|\(|$|$$)/); // eslint-disable-line
-  if (!match) {
-    return false;
-  }
-  startMathPos += match[0].length;
-  let type, endMarker; // eslint-disable-line
-  if (match[0] === "\\[") {
-    type = "display_math";
-    endMarker = "\\\\]";
-  } else if (match[0] === "\[") {
-    type = "display_math";
-    endMarker = "\\]";
-  } else if (match[0] === "$$") {
-    type = "display_math";
-    endMarker = "$$";
-  } else if (match[0] === "\\(") {
-    type = "inline_math";
-    endMarker = "\\\\)";
-  } else if (match[0] === "\(") {
-    type = "inline_math";
-    endMarker = "\\)";
-  } else if (match[0] === "$") {
-    type = "inline_math";
-    endMarker = "$";
-  }
-
-  const endMarkerPos = state.src.indexOf(endMarker, startMathPos);
-  if (endMarkerPos === -1) {
-    return false;
-  }
-
-  const nextPos = endMarkerPos + endMarker.length;
-
-  const matchRef = state.src.slice(startMathPos + 1, endMarkerPos)
-    .match(/^(?:ref\{([^}]*)\})/);
-
-  if (!matchRef) {
-    return false;
-  }
-
-  if (!silent) {
-    if (type === "display_math") {
-      type = "reference_note_block";
-    } else {
-      type = "reference_note";
-    }
-
-    const token = state.push(type, "", 0);
-    token.content = matchRef ? matchRef[1] : "";
-    let children = [];
-    state.md.inline.parse(token.content.trim(), state.md, state.env, children);
-    token.children = children;
-    token.inlinePos = {
-      start: state.pos,
-      end: nextPos
-    };
-  }
-
-  state.pos = nextPos;
-  return true;
 };
 
 const simpleMath: RuleInline = (state, silent) => {
@@ -1108,8 +1024,8 @@ export default options => {
     md.block.ruler.before("html_block", "mathMLBlock", mathMLBlock,
       {alt: getTerminatedRules("mathMLBlock")});
     md.inline.ruler.before("html_inline", "mathML", inlineMathML);
-    md.inline.ruler.before("escape", "refs", refs);
     md.inline.ruler.before("escape", "multiMath", multiMath);
+    md.inline.ruler.before("multiMath", "refsInline", refsInline);
     md.inline.ruler.before("multiMath", "inlineTabular", inlineTabular);
     md.inline.ruler.before("multiMath", "labelLatex", labelLatex);
     md.inline.ruler.before("multiMath", "captionLatex", captionLatex);
@@ -1120,6 +1036,7 @@ export default options => {
     md.inline.ruler.before("setCounterTheorem", "setCounterSection", setCounterSection); /** Parse \setcounter{section} */
     md.inline.ruler.before("renewcommand_inline", "newCommandQedSymbol", newCommandQedSymbol); /** Parse \\renewcommand\qedsymbol{$\blacksquare$} */
     md.inline.ruler.push("simpleMath", simpleMath);
+    md.inline.ruler.before("multiMath", "refs", refInsideMathDelimiter);
     md.inline.ruler.before("multiMath", "asciiMath", asciiMath);
     md.inline.ruler.before("asciiMath", "backtickAsAsciiMath", backtickAsAsciiMath);
     /** Replace image inline rule */
