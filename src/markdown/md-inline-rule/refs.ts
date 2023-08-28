@@ -21,28 +21,26 @@ export const refsInline: RuleInline = (state, silent) => {
     return false;
   }
   const nextPos = endMarkerPos + endMarker.length;
-  if (silent) {
-    return true;
+  if (!silent) {
+    const token = state.push(type, "", 0);
+    if (state.env.subTabular) {
+      token.isSubTable = true;
+    }
+    if (state.md.options.forLatex) {
+      token.markup = match[0];
+    }
+    token.content = match?.groups
+      ? match.groups.eqref || match.groups.ref
+      : "";
+    token.attrSet("data-parentheses", addParentheses.toString());
+    token.inputLatex = state.src.slice(state.pos, nextPos);
+    token.inlinePos = {
+      start: state.pos,
+      end: nextPos,
+      start_content: startMathPos,
+      end_content: endMarkerPos
+    };
   }
-
-  const token = state.push(type, "", 0);
-  if (state.env.subTabular) {
-    token.isSubTable = true;
-  }
-  if (state.md.options.forLatex) {
-    token.markup = match[0];
-  }
-  token.content = match?.groups 
-    ? match.groups.eqref || match.groups.ref 
-    : "";
-  token.attrSet("data-parentheses", addParentheses.toString());
-  token.inputLatex = state.src.slice(state.pos, nextPos);
-  token.inlinePos = {
-    start: state.pos,
-    end: nextPos,
-    start_content: startMathPos,
-    end_content: endMarkerPos
-  };
   state.pos = nextPos;
   return true;
 };
@@ -109,25 +107,23 @@ export const refInsideMathDelimiter: RuleInline = (state, silent) => {
     return false;
   }
   
-  if (silent) {
-    return true;
-  }
+  if (!silent) {
+    if (type === "display_math") {
+      type = "reference_note_block";
+    } else {
+      type = "reference_note";
+    }
 
-  if (type === "display_math") {
-    type = "reference_note_block";
-  } else {
-    type = "reference_note";
+    const token = state.push(type, "", 0);
+    token.content = matchRef ? matchRef[1] : "";
+    let children = [];
+    state.md.inline.parse(token.content.trim(), state.md, state.env, children);
+    token.children = children;
+    token.inlinePos = {
+      start: state.pos,
+      end: nextPos
+    }; 
   }
-
-  const token = state.push(type, "", 0);
-  token.content = matchRef ? matchRef[1] : "";
-  let children = [];
-  state.md.inline.parse(token.content.trim(), state.md, state.env, children);
-  token.children = children;
-  token.inlinePos = {
-    start: state.pos,
-    end: nextPos
-  };
 
   state.pos = nextPos;
   return true;
