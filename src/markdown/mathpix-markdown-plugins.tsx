@@ -1,7 +1,8 @@
 import { MarkdownIt } from 'markdown-it';
-import { MathpixMarkdownModel } from "../mathpix-markdown-model";
+import { MathpixMarkdownModel, ParserErrors } from "../mathpix-markdown-model";
 import { resetTextCounter } from './mdPluginText';
 import { resetTheoremEnvironments } from './md-theorem/helper';
+import { rest_mmd_footnotes_list } from './md-latex-footnotes/utils';
 
 import {
   mdPluginMathJax,
@@ -12,14 +13,15 @@ import {
   mdPluginTableTabular,
   mdPluginList,
   mdPluginChemistry,
-  mdPluginSvgToBase64
+  mdPluginSvgToBase64, 
+  mdLatexFootnotes
 
 } from "./mdPluginConfigured";
 import { validateLinkEnableFile } from "./mdOptions";
 import { injectLabelIdToParagraph } from "./rules";
 
 export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
-  const {width = 1200,  outMath = {}, smiles = {}, mathJax = {}, renderElement = {}, forDocx = false, forLatex = false,
+  const {width = 1200,  outMath = {}, smiles = {}, mathJax = {}, renderElement = {}, forDocx = false, forLatex = false, forMD = false,
     maxWidth = '',
     enableFileLinks = false, validateLink = null,
     toc = {},
@@ -30,7 +32,9 @@ export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
     centerTables = true,
     enableCodeBlockRuleForLatexCommands = false,
     addPositionsToTokens = false,
-    highlights = []
+    highlights = [],
+    parserErrors = ParserErrors.show,
+    codeHighlight = {}
   } = options;
   Object.assign(md.options, smiles);
   Object.assign(md.options, {
@@ -40,6 +44,7 @@ export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
     renderElement: renderElement,
     forDocx: forDocx,
     forLatex: forLatex,
+    forMD: forMD,
     maxWidth: maxWidth,
     enableFileLinks: enableFileLinks,
     accessibility: accessibility,
@@ -49,7 +54,9 @@ export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
     centerTables: centerTables,
     enableCodeBlockRuleForLatexCommands: enableCodeBlockRuleForLatexCommands,
     addPositionsToTokens: addPositionsToTokens,
-    highlights: highlights
+    highlights: highlights,
+    parserErrors: parserErrors,
+    codeHighlight: codeHighlight
   });
 
   md
@@ -58,7 +65,8 @@ export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
     .use(mdPluginList)
     .use(mdPluginMathJax({}))
     .use(mdPluginText())
-    .use(mdPluginHighlightCode, { auto: false })
+    .use(mdLatexFootnotes)
+    .use(mdPluginHighlightCode, codeHighlight)
     .use(mdPluginAnchor)
     .use(mdPluginTOC, {toc: toc});
 
@@ -227,6 +235,7 @@ export const initMathpixMarkdown = (md, callback) => {
 
   md.parse = (markdown, env) => {
     resetTheoremEnvironments();
+    rest_mmd_footnotes_list();
     const mmdOptions = callback();
     setOptionForPreview(md.options, mmdOptions);
     return parse.call(md, markdown, env)

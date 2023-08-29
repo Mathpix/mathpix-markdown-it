@@ -14,6 +14,7 @@ import {
   mdPluginList,
   mdPluginChemistry, 
   mdPluginCollapsible,
+  mdLatexFootnotes,
   mdSetPositionsAndHighlight
 } from "./markdown/mdPluginConfigured";
 
@@ -25,11 +26,15 @@ import {
   TOutputMathJax,
   THtmlSanitize,
   TTocStyle,
-  THighlight
+  THighlight,
+  ParserErrors,
+  CodeHighlight
 } from "./mathpix-markdown-model";
 
 import { ISmilesOptions } from './markdown/md-chemistry';
 import { resetTheoremEnvironments } from './markdown/md-theorem/helper';
+import { rest_mmd_footnotes_list } from './markdown/md-latex-footnotes/utils';
+import { FootnoteItem } from './markdown/md-latex-footnotes/interfaces';
 import { 
   eLabelType, 
   ILabel, 
@@ -43,14 +48,18 @@ import { normalizeLink } from './helpers/normalize-link';
 export {
   MathpixLoader, MathpixMarkdown, MathpixMarkdownModel,
   mathpixMarkdownPlugin, mdPluginCollapsible,
+  mdLatexFootnotes,
   mdSetPositionsAndHighlight,
   initMathpixMarkdown,
   mdPluginMathJax, mdPluginHighlightCode, mdPluginText, mdPluginTOC, mdPluginAnchor, mdPluginTableTabular, mdPluginList, mdPluginChemistry,
   TMarkdownItOptions, optionsMathpixMarkdown, TOutputMath, TOutputMathJax, THtmlSanitize,
   ISmilesOptions,
   resetTheoremEnvironments,
+  rest_mmd_footnotes_list, FootnoteItem,
   TTocStyle,
   THighlight,
+  CodeHighlight,
+  ParserErrors,
   eLabelType, ILabel, getLabelsList, getLabelByKeyFromLabelsList, clearLabelsList,
   normalizeLink
 };

@@ -1,12 +1,13 @@
-export declare type TParselines = {
+export type TParselines = {
     cLines: Array<Array<string>>;
     cSpaces: Array<Array<string>>;
     sLines: Array<string>;
 };
 export declare const getContent: (content: string, onlyOne?: boolean) => string;
 export declare const getColumnLines: (str: string, numCol?: number) => Array<string>;
-export declare const getColumnAlign: (align: string) => string[] | [];
-export declare type TAlignData = {
+export declare const getColumnAlign: (align: string) => string[] | [
+];
+export type TAlignData = {
     cAlign: Array<string>;
     vAlign: Array<string>;
     cWidth: Array<string>;
@@ -16,7 +17,7 @@ export declare const getParams: (str: string, i: number) => {
     align: string;
     index: number;
 };
-export declare type TDecimal = {
+export type TDecimal = {
     l: number;
     r: number;
 };

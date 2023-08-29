@@ -5,6 +5,18 @@ const MathpixMarkdownModel = require('../lib/mathpix-markdown-model/index').Math
 
 let  text = "$x^y$";
 
+text = "2:53\n" +
+  "\\title{ Preparation $x$ of Papers for IEEE Sponsored Conferences \\& Symposia [^*] }\n" +
+  "\n" +
+  "\n" +
+  "\\author{\n" +
+  "Albert Author [^1] and Bernard D. Researcher [^2]\n" +
+  "}\n" +
+  "\n" +
+  "[^1]: Albert Author is with Faculty of Electrical Engineering, Mathematics and Computer Science, University of Twente, 7500 AE Enschede, The Netherlands albert. author a papercept. net\n" +
+  "[^2]: Bernard D. Researcheris with the Department of Electrical Engineering, Wright State University, Dayton, OH 45435, USA b.d.researcherdieee.org\n" +
+  "[^*]:This work was not supported by any organization"
+
 const { loadSreAsync } = require('../lib/sre/sre-node');
 
 ( async() => {

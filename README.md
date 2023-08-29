@@ -82,6 +82,27 @@ proceed from there and at some point you will arrive to a contradiction.
 
 ![](doc/images/theorems_and_proofs.png)
 
+- [Latex footnotes](doc/latex-footnotes.md)
+
+```text
+Footnote marker without text. Auto increment counter to 1 \footnotemark{} should be 1.
+
+Footnote marker with text. Auto increment counter to 2 \footnotemark{} be 2. \footnotetext{text should be 2}
+
+Auto increment counter to 3 \footnote{text  should be 3}
+
+Auto increment counter to 4 \footnote{text  should be 4}
+
+Footnote marker without text. Auto increment counter to 5 \footnotemark{} should be 5.
+
+Footnote marker with text. Auto increment counter to 6 \footnotemark{} should be 6. \footnotetext{text should be 6}
+
+Auto increment counter to 7 \footnote{text  should be 7}
+
+Auto increment counter to 8 \footnote{text  should be 8}
+```
+
+![](doc/images/latex-footnotes/latex-footnotes_01.png)
 
 # What is mathpix-markdown-it? 
 
@@ -667,6 +688,8 @@ The `MathpixMarkdown` React element accepts the following props:
 | `outMath`        | [TOutputMath](https://github.com/Mathpix/mathpix-markdown-it#toutputmath);*`{}`*         | Sets options to output html                                                                                           |
 | `mathJax`        | [TOutputMathJax](https://github.com/Mathpix/mathpix-markdown-it#toutputmathjax);*`{}`*       | Sets options to output MathJax                                                                                         |
 | `smiles`         | [ISmilesOptions](https://github.com/Mathpix/mathpix-markdown-it#ismilesoptions);*`{}`*        | Sets options to output chemistry equation                                                                              |
+| `parserErrors`   | [ParserErrors](https://github.com/Mathpix/mathpix-markdown-it#parsererrors);*`{}`*        | Sets options to output parser errors for equations and tabular                    |
+| `codeHighlight`  | [CodeHighlight](https://github.com/Mathpix/mathpix-markdown-it#codehighlight);*`{}`*      | Sets options to highlight code block                      |
 
 
 ## MathpixMarkdownModel methods
@@ -714,6 +737,8 @@ The `MathpixMarkdown` React element accepts the following props:
 | `centerTables`   | boolean;*`true`*             | Center align tables by default                                                                                         |
 | `validateLink`   | function;*`null`*            | The function `(url: string) => void` to override md link validator                                                     |
 | `enableCodeBlockRuleForLatexCommands`| boolean;*`false`* | By default, if latex commands are indented (4 spaces / 1 tab) they do not become `Code Blocks`.               |
+| `parserErrors`   | [ParserErrors](https://github.com/Mathpix/mathpix-markdown-it#parsererrors);*`{}`*        | Sets options to output parser errors for equations and tabular                    |
+| `codeHighlight`  | [CodeHighlight](https://github.com/Mathpix/mathpix-markdown-it#codehighlight);*`{}`*      | Sets options to highlight code block                      |
 
 ### optionsMathpixMarkdown
 
@@ -742,6 +767,8 @@ The `MathpixMarkdown` React element accepts the following props:
 | `centerTables`   | boolean;*`true`*             | Center align tables by default                                                                                         |
 | `validateLink`   | function;*`null`*            | The function `(url: string) => void` to override md link validator                                                     |
 | `enableCodeBlockRuleForLatexCommands`| boolean;*`false`* | By default, if latex commands are indented (4 spaces / 1 tab) they do not become `Code Blocks`.               |
+| `parserErrors`   | [ParserErrors](https://github.com/Mathpix/mathpix-markdown-it#parsererrors);*`{}`*        | Sets options to output parser errors for equations and tabular                    |
+| `codeHighlight`  | [CodeHighlight](https://github.com/Mathpix/mathpix-markdown-it#codehighlight);*`{}`*      | Sets options to highlight code block                      |
 
 ### TOutputMath
 
@@ -811,6 +838,21 @@ The `MathpixMarkdown` React element accepts the following props:
 | `sre`                       | object&nbsp;*`null`*        | spe object from library [speech-rule-engine](https://www.npmjs.com/package/speech-rule-engine) for semantic interpretation.                                                                    |
 |                             |                             | If this value is not set then the aria-label for accessibility will not be added to the math at render time.                               |  
 
+
+### ParserErrors enum
+
+|              |                                         |
+|--------------|-----------------------------------------|
+| `show`       | Display errors in resulting html        |
+| `hide`       | Hide errors in resulting html           |
+| `show_input` | Display original latex instead of error | 
+
+### CodeHighlight
+
+|              | type&nbsp;*`default`*  |                                                                                                               |
+|--------------|------------------------|---------------------------------------------------------------------------------------------------------------|
+| `auto`       | boolean&nbsp;*`false`* | Highlighting with language detection                                                                          |
+| `code`       | boolean&nbsp;*`true`*  | Add code highlighting for a code block which created by indenting. To auto-detect the language, set auto=true |
 
 `sre` Has different loaders for node and browser.
 

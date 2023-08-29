@@ -23,6 +23,8 @@ export interface optionsMathpixMarkdown {
     isDisableFancy?: boolean;
     isDisableEmoji?: boolean;
     isDisableEmojiShortcuts?: boolean;
+    isDisableRefs?: boolean;
+    isDisableFootnotes?: boolean;
     disableRules?: string[];
     fontSize?: number;
     padding?: number;
@@ -42,6 +44,7 @@ export interface optionsMathpixMarkdown {
     smiles?: ISmilesOptions;
     forDocx?: boolean;
     forLatex?: boolean;
+    forMD?: boolean;
     openLinkInNewWindow?: boolean;
     maxWidth?: string;
     toc?: TTocOptions;
@@ -53,12 +56,16 @@ export interface optionsMathpixMarkdown {
     enableCodeBlockRuleForLatexCommands?: boolean;
     addPositionsToTokens?: boolean;
     highlights?: Array<THighlight>;
+    parserErrors?: ParserErrors;
+    codeHighlight?: CodeHighlight;
 }
 
 export type TMarkdownItOptions = {
   isDisableFancy?: boolean;
   isDisableEmoji?: boolean;
   isDisableEmojiShortcuts?: boolean;
+  isDisableRefs?: boolean,
+  isDisableFootnotes?: boolean,
   disableRules?: string[];
   htmlTags?: boolean,
   breaks?: boolean,
@@ -82,6 +89,7 @@ export type TMarkdownItOptions = {
   smiles?: ISmilesOptions;
   forDocx?: boolean;
   forLatex?: boolean;
+  forMD?: boolean;
   openLinkInNewWindow?: boolean;
   maxWidth?: string;
   htmlWrapper?: THtmlWrapper | boolean;
@@ -94,6 +102,8 @@ export type TMarkdownItOptions = {
   enableCodeBlockRuleForLatexCommands?: boolean;
   addPositionsToTokens?: boolean;
   highlights?: Array<THighlight>;
+  parserErrors?: ParserErrors;
+  codeHighlight?: CodeHighlight;
 }
 
 export type TOutputMath = {
@@ -153,9 +163,20 @@ export type TTocOptions = {
   doNotGenerateParentId?: boolean /** Don't generate unique ParentId for nested blocks. Used to testing */
 };
 
+export type CodeHighlight = {
+  auto?: boolean, //Highlighting with language detection
+  code?: boolean
+};
+
 export enum TTocStyle {
   summary = 'summary',
   list = 'list'
+};
+
+export enum ParserErrors {
+  show = 'show',
+  hide = 'hide',
+  show_input = 'show_input',
 };
 
 export type THighlight = {
@@ -368,15 +389,20 @@ class MathpixMarkdown_Model {
     };
 
     convertToHTML = (str:string, options: TMarkdownItOptions = {}) => {
+      try {
         const startTime = new Date().getTime();
         const  mathString =  this.isCheckFormula ? this.checkFormula(str, this.showTimeLog): str;
         options.lineNumbering = false;
         const html = this.markdownToHTML(mathString, options);
         const endTime = new Date().getTime();
-        if(this.showTimeLog){
-            console.log(`===> setText: ${endTime - startTime}ms`);
+        if (this.showTimeLog){
+          console.log(`===> setText: ${endTime - startTime}ms`);
         }
         return html;
+      } catch (err) {
+        console.error(err);
+        return '';
+      }
     };
 
     getMathjaxStyle = () => {
@@ -428,7 +454,8 @@ class MathpixMarkdown_Model {
 
     render = ( text: string, options?: optionsMathpixMarkdown ):string => {
         const { alignMathBlock='center', display='block', isCheckFormula=false, showTimeLog=false,
-          isDisableFancy=false, isDisableEmoji=false, isDisableEmojiShortcuts=false, fontSize=null, padding=null, htmlTags=false, width=0, showToc = false,
+          isDisableFancy=false, isDisableEmoji=false, isDisableEmojiShortcuts=false, isDisableRefs=false, isDisableFootnotes=false,
+          fontSize=null, padding=null, htmlTags=false, width=0, showToc = false,
           overflowY='unset', breaks = true, typographer = true, linkify = true, xhtmlOut = false,
           outMath = {}, mathJax = {}, htmlSanitize = {}, smiles = {}, openLinkInNewWindow = true,
           maxWidth='',
@@ -441,7 +468,9 @@ class MathpixMarkdown_Model {
           centerTables = true,
           enableCodeBlockRuleForLatexCommands = false,
           addPositionsToTokens = false,
-          highlights = []
+          highlights = [],
+          parserErrors = ParserErrors.show,
+          codeHighlight = {}
         }
          = options || {};
 
@@ -460,6 +489,8 @@ class MathpixMarkdown_Model {
           isDisableFancy: isDisableFancy,
           isDisableEmoji: isDisableEmoji,
           isDisableEmojiShortcuts: isDisableEmojiShortcuts,
+          isDisableRefs: isDisableRefs,
+          isDisableFootnotes: isDisableFootnotes,
           disableRules: disableRules,
           htmlTags: htmlTags,
           xhtmlOut: xhtmlOut,
@@ -483,7 +514,9 @@ class MathpixMarkdown_Model {
           centerTables: centerTables,
           enableCodeBlockRuleForLatexCommands: enableCodeBlockRuleForLatexCommands,
           addPositionsToTokens: addPositionsToTokens,
-          highlights: highlights
+          highlights: highlights,
+          parserErrors: parserErrors,
+          codeHighlight: codeHighlight
         };
 
         const styleFontSize = fontSize ? ` font-size: ${options.fontSize}px;` : '';

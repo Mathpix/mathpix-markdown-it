@@ -1,6 +1,6 @@
 {
   "name": "mathpix-markdown-it",
-  "version": "1.2.1",
+  "version": "1.2.11",
   "description": "Mathpix-markdown-it is an open source implementation of the mathpix-markdown spec written in Typescript. It relies on the following open source libraries: MathJax v3 (to render math with SVGs), markdown-it (for standard Markdown parsing)",
   "keywords": [
     "MathJax",
@@ -46,8 +46,8 @@
     "chai": "^4.2.0",
     "copy-to-clipboard": "^3.3.1",
     "deepmerge": "^4.2.2",
-    "domino": "^2.1.6",
-    "highlight.js": "^10.4.1",
+    "domino": "https://github.com/Mathpix/domino.git",
+    "highlight.js": "^11.8.0",
     "htmlparser2": "^4.1.0",
     "is-plain-object": "^5.0.0",
     "js-yaml": "^4.1.0",
@@ -70,24 +70,24 @@
     "react-dom": "^16.7.0",
     "react-emotion": "^10.0.0",
     "speech-rule-engine": "^4.0.2",
-    "tslib": "^1.10.0"
+    "tslib": "^2.6.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.4.0",
-    "@babel/plugin-transform-runtime": "^7.17.0",
-    "@babel/preset-env": "^7.4.5",
-    "babel-loader": "^8.1.0",
+    "@babel/core": "^7.22.6",
+    "@babel/plugin-transform-runtime": "^7.22.6",
+    "@babel/preset-env": "^7.22.6",
+    "babel-loader": "^9.1.2",
     "copy-webpack-plugin": "^10.2.4",
     "css-loader": "^6.6.0",
-    "jsdom": "^19.0.0",
-    "loader-utils": "^3.2.0",
+    "jsdom": "^22.1.0",
+    "loader-utils": "^3.2.1",
     "mini-css-extract-plugin": "^2.5.3",
     "mocha": "^9.2.0",
     "style-loader": "^3.3.1",
-    "terser-webpack-plugin": "^5.3.1",
-    "ts-loader": "^9.2.6",
-    "typescript": "^3.2.4",
-    "webpack": "^5.68.0",
+    "terser-webpack-plugin": "^5.3.7",
+    "ts-loader": "^9.4.4",
+    "typescript": "4.9.5",
+    "webpack": "^5.76.0",
     "webpack-cli": "^4.9.2"
   }
 }

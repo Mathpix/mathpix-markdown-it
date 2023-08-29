@@ -1,4 +1,7 @@
-import * as hljs from 'highlight.js';
+import hljs from 'highlight.js';
+const escapeHtml = require('markdown-it/lib/common/utils').escapeHtml;
+import { PREVIEW_LINE_CLASS, PREVIEW_PARAGRAPH_PREFIX, code_block_injectLineNumbers } from "./rules";
+import { codeHighlightDef } from "./common/consts";
 
 const maybe = f => {
   try {
@@ -6,42 +9,89 @@ const maybe = f => {
   } catch (e) {
     return false
   }
-}
+};
 
 // Highlight with given language.
 const highlight = (code, lang) => {
-  if(lang.toLowerCase() === 'latex') lang = 'tex';
+  // Looks up a language by name or alias.
+  // Returns the language object if found, undefined otherwise.
+  let langObj = hljs.getLanguage(lang);
+  if (langObj === undefined) {
+    return '';
+  }
+  if (lang.toLowerCase() === 'latex') lang = 'tex';
   if (!lang) return '';
-  return maybe(() => hljs.highlight(lang, code, true).value) || ''
+  return maybe(() => hljs.highlight(code, {language: lang, ignoreIllegals: true}).value) || ''
 };
 
 // Highlight with given language or automatically.
-const highlightAuto = (code, lang) => (
-  lang
+const highlightAuto = (code, lang) => {
+  // Looks up a language by name or alias.
+  // Returns the language object if found, undefined otherwise.
+  let langObj = hljs.getLanguage(lang);
+  return lang && langObj !== undefined
     ? highlight(code, lang)
     : maybe(() => hljs.highlightAuto(code).value) || ''
-);
+};
 
 // Wrap a render function to add `hljs` class to code blocks.
-const wrap = render => (...args) => (
-  render.apply(render, args)
-      .replace('<code class="', '<code class="hljs ')
-      .replace('<code>', '<code class="hljs">')
-)
+// const wrap = render => (...args) => {
+const wrapFence = render => (tokens, idx, options, env, slf) => {
+  let html = render.apply(render, [tokens, idx, options, env, slf]);
+  html = html
+    .replace('<code class="', '<code class="hljs ')
+    .replace('<code>', '<code class="hljs">')
+  
+  if (options?.lineNumbering) {
+    let line, endLine, listLine;
+    if (tokens[idx].map && tokens[idx].level === 0) {
+      line = options.startLine + tokens[idx].map[0];
+      endLine = options.startLine + tokens[idx].map[1];
+      listLine = [];
+      for (let i = line; i < endLine; i++) {
+        listLine.push(i);
+      }
+      tokens[idx].attrJoin("class", PREVIEW_PARAGRAPH_PREFIX + String(line)
+        + ' ' + PREVIEW_LINE_CLASS + ' ' + listLine.join(' '));
+      tokens[idx].attrJoin("data_line_start", `${String(line)}`);
+      tokens[idx].attrJoin("data_line_end", `${String(endLine-1)}`);
+      tokens[idx].attrJoin("data_line", `${String([line, endLine])}`);
+      tokens[idx].attrJoin("count_line", `${String(endLine-line)}`);
+      html = html.replace('<pre>', '<pre' + slf.renderAttrs(tokens[idx]) + '>')
+    }
+  }
+  return html;
+};
+
+const highlight_code_block = (tokens, idx, options, env, slf) => {
+  let token = tokens[idx];
+  let { codeHighlight = {}} = options;
+  codeHighlight = Object.assign({}, codeHighlightDef, codeHighlight);
+  const { code = true } = codeHighlight;
+  let highlighted = code && options.highlight
+    ? options.highlight(token.content, '') || escapeHtml(token.content)
+    : escapeHtml(token.content);
+  return  '<pre' + slf.renderAttrs(token) + '><code>' +
+    highlighted +
+    '</code></pre>\n';
+};
+
+const wrap = render => (tokens, idx, options, env, slf) => (
+  render.apply(render, [tokens, idx, options, env, slf])
+    .replace('<code class="', '<code class="hljs ')
+    .replace('<code>', '<code class="hljs">')
+);
 
 const highlightjs = (md, opts) => {
-  opts = Object.assign({}, highlightjs.defaults, opts)
-  md.options.highlight = opts.auto ? highlightAuto : highlight
-  md.renderer.rules.fence = wrap(md.renderer.rules.fence)
+  opts = Object.assign({}, codeHighlightDef, opts);
+  md.options.highlight = opts.auto ? highlightAuto : highlight;
+  md.renderer.rules.fence = wrapFence(md.renderer.rules.fence)
 
   if (opts.code) {
-    md.renderer.rules.code_block = wrap(md.renderer.rules.code_block)
+    md.renderer.rules.code_block = md.options?.lineNumbering 
+      ? wrap(code_block_injectLineNumbers) 
+      : wrap(highlight_code_block)
   }
-}
-
-highlightjs.defaults = {
-  auto: true,
-  code: true
 }
 
 export default highlightjs;

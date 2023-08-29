@@ -1,4 +1,4 @@
-declare type TSubMath = {
+type TSubMath = {
     id: string;
     content: string;
 };

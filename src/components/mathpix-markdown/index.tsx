@@ -1,5 +1,10 @@
 import * as React from 'react';
-import {MathpixMarkdownModel as MM, optionsMathpixMarkdown, TMarkdownItOptions} from '../../mathpix-markdown-model';
+import { 
+  MathpixMarkdownModel as MM, 
+  optionsMathpixMarkdown, 
+  TMarkdownItOptions,
+  ParserErrors
+} from '../../mathpix-markdown-model';
 
 
 export interface MathpixMarkdownProps extends optionsMathpixMarkdown{
@@ -9,7 +14,7 @@ export interface MathpixMarkdownProps extends optionsMathpixMarkdown{
 class MathpixMarkdown extends React.Component<MathpixMarkdownProps> {
     render() {
         const { text, alignMathBlock='center', display='block', isCheckFormula=false, showTimeLog=false,isDisableFancy=false,
-          isDisableEmoji = false, isDisableEmojiShortcuts = false,
+          isDisableEmoji = false, isDisableEmojiShortcuts = false, isDisableRefs = false, isDisableFootnotes = false,
           htmlTags=false, width=0, breaks=true, typographer=false, linkify=false, xhtmlOut=false,
           outMath={}, mathJax={}, htmlSanitize = {}, smiles = {}, openLinkInNewWindow = true,
           enableFileLinks = false, validateLink = null,
@@ -20,13 +25,17 @@ class MathpixMarkdown extends React.Component<MathpixMarkdownProps> {
           centerTables = true,
           enableCodeBlockRuleForLatexCommands = false,
           addPositionsToTokens = false,
-          highlights = []
+          highlights = [],
+          parserErrors = ParserErrors.show,
+          codeHighlight = {}
         } = this.props;
         const disableRules = isDisableFancy ? MM.disableFancyArrayDef : this.props.disableRules || [];
         const markdownItOptions: TMarkdownItOptions = {
             isDisableFancy: isDisableFancy,
             isDisableEmoji: isDisableEmoji,
             isDisableEmojiShortcuts: isDisableEmojiShortcuts,
+            isDisableRefs: isDisableRefs,
+            isDisableFootnotes: isDisableFootnotes,
             disableRules: disableRules,
             htmlTags: htmlTags,
             xhtmlOut: xhtmlOut,
@@ -48,7 +57,9 @@ class MathpixMarkdown extends React.Component<MathpixMarkdownProps> {
             centerTables: centerTables,
             enableCodeBlockRuleForLatexCommands: enableCodeBlockRuleForLatexCommands,
             addPositionsToTokens: addPositionsToTokens,
-            highlights: highlights
+            highlights: highlights,
+            parserErrors: parserErrors,
+            codeHighlight: codeHighlight
         };
 
          MM.setOptions(disableRules, isCheckFormula, showTimeLog);

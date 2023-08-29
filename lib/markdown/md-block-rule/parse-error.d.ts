@@ -1,5 +1,5 @@
-export declare type TParseError = Array<string>;
-export declare type TParseErrorList = Array<TParseError>;
+export type TParseError = Array<string>;
+export type TParseErrorList = Array<TParseError>;
 export declare var ParseErrorList: TParseErrorList;
 export declare var ParseError: TParseError;
 export declare const pushError: (messages: string) => void;

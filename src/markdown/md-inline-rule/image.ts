@@ -1,3 +1,4 @@
+import { RuleInline } from 'markdown-it';
 const isSpace = require('markdown-it/lib/common/utils').isSpace;
 const normalizeReference = require('markdown-it/lib/common/utils').normalizeReference;
 const percentageRegex = /([\d.]+)%/i;
@@ -104,7 +105,7 @@ const parseImageParams = (str: string, align: string=''): IParseImageParams| nul
  *   ![image](<src> "title"){width="20px",height="20px"}
  *   ![image](<src> "title"){width="20px",height="20px",right}
  * */
-export const imageWithSize = (state, silent) => {
+export const imageWithSize: RuleInline = (state, silent) => {
   var
     attrs,
     code,

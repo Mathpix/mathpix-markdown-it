@@ -3,7 +3,7 @@ import { mdPluginCollapsible, mdSetPositionsAndHighlight } from "./mdPluginConfi
 import { mathpixMarkdownPlugin } from './mathpix-markdown-plugins';
 
 import { injectRenderRules } from "./rules";
-import { MathpixMarkdownModel as MM, TMarkdownItOptions } from '../mathpix-markdown-model';
+import { MathpixMarkdownModel as MM, TMarkdownItOptions, ParserErrors } from '../mathpix-markdown-model';
 
 /** md renderer */
 const mdInit = (options: TMarkdownItOptions) => {
@@ -12,6 +12,8 @@ const mdInit = (options: TMarkdownItOptions) => {
           lineNumbering = false, startLine = 0, htmlSanitize = true, smiles = {}, forDocx = false, openLinkInNewWindow =  true,
     isDisableEmoji=false,
     isDisableEmojiShortcuts=false,
+    isDisableRefs = false,
+    isDisableFootnotes = false,
     maxWidth = '',
     enableFileLinks = false, validateLink = null,
     toc = {},
@@ -22,7 +24,9 @@ const mdInit = (options: TMarkdownItOptions) => {
     centerTables = true,
     enableCodeBlockRuleForLatexCommands = false,
     addPositionsToTokens = false,
-    highlights = []
+    highlights = [],
+    parserErrors = ParserErrors.show,
+    codeHighlight = {}
   } = options;
   const mmdOptions = {
     width: width,
@@ -42,7 +46,9 @@ const mdInit = (options: TMarkdownItOptions) => {
     centerTables: centerTables,
     enableCodeBlockRuleForLatexCommands: enableCodeBlockRuleForLatexCommands,
     addPositionsToTokens: addPositionsToTokens,
-    highlights: highlights
+    highlights: highlights,
+    parserErrors: parserErrors,
+    codeHighlight: codeHighlight
   };
   let md = require("markdown-it")({
     html: htmlTags,
@@ -75,6 +81,24 @@ const mdInit = (options: TMarkdownItOptions) => {
       md.use(require("markdown-it-emoji"))
     }
   }
+  if (isDisableRefs) {
+    md.disable(['refs', 'refsInline'])
+  }  
+  if (isDisableFootnotes) {
+    md.disable([
+      'mmd_footnote_tail',
+      'latex_footnote_block',
+      'latex_footnotetext_block',
+      'latex_footnote',
+      'latex_footnotemark',
+      'latex_footnotetext',
+      'grab_footnote_ref',
+      'footnote_tail',
+      'footnote_def',
+      'footnote_inline',
+      'footnote_ref'
+    ])
+  }
   if (addPositionsToTokens || highlights?.length) {
     /** SetPositions plugin should be last */
     md.use(mdSetPositionsAndHighlight, mmdOptions);
@@ -104,5 +128,11 @@ export const markdownToHtmlPipeline = (content: string, options: TMarkdownItOpti
  * convert a markdown text to html
  */
 export function markdownToHTML(markdown: string, options: TMarkdownItOptions = {}): string {
-  return markdownToHtmlPipeline(markdown, options);
+  try {
+    return markdownToHtmlPipeline(markdown, options);
+  } catch (e) {
+    console.log("ERROR=>[markdownToHTML]=>");
+    console.error(e);
+    return '';
+  }
 }

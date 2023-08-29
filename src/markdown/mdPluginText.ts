@@ -216,9 +216,7 @@ const addContentsLineBlock: RuleBlock = (state, startLine: number, endLine: numb
   if (state.md.options.forLatex) {
     token.latex = resString;
   }
-  let children = [];
-  state.md.inline.parse(token.content.trim(), state.md, state.env, children);
-  token.children = children;
+  token.children = [];
 
   token = state.push('addcontentsline_close', 'div', -1);
   token.envLevel = level;
@@ -403,12 +401,10 @@ export const headingSection: RuleBlock = (state, startLine: number, endLine: num
   token.bMarksContent = bMarks + bMarksContent + beginMarker.length;
   token.eMarksContent = token.eMarks;
   token.eMarks += 1;
-
-  let children = [];
-  state.env.doubleSlashToSoftBreak = true; /** for // - should be new line */
-  state.md.inline.parse(token.content, state.md, state.env, children);
-  state.env.doubleSlashToSoftBreak = false;
-  token.children = children;
+  token.envToInline = {
+    doubleSlashToSoftBreak: true /** for // - should be new line */
+  };
+  token.children = [];
 
   if (type === "section" && !isUnNumbered) {
     sectionCount = sectionCount ? sectionCount + 1 : 1;
@@ -812,7 +808,7 @@ const textAuthor: RuleInline = (state) => {
         let children = [];
         state.env.newlineToSpace = true;
         state.md.inline.parse(item, state.md, state.env, children);
-        state.env.newlineToSpace = true;
+        state.env.newlineToSpace = false;
         newToken.children = children;
 
         tokenAuthorColumn.children.push(newToken);
@@ -931,6 +927,7 @@ const doubleSlashToSoftBreak: RuleInline = (state) => {
   }
   if (state.env.doubleSlashToSoftBreak) {
     const token = state.push('softbreak', 'br', 0);
+    token.doubleSlashToSoftBreak = true;
     token.inlinePos = {
       start: startPos,
       end: nextPos
@@ -1194,7 +1191,7 @@ const getAuthorColumnToken = (tokens, index, options, env, slf) => {
     : '';
 
   const content: string = token.children && token.children.length
-    ? slf.renderInline(token.children, options)
+    ? slf.renderInline(token.children, options, env)
     : renderInlineContent(token, options, env, slf);
 
   if (attrStyle) {
@@ -1213,7 +1210,7 @@ const renderAuthorToken: Renderer = (tokens, index, options, env, slf) => {
     : '';
 
   const res: string = token.children && token.children.length
-    ? slf.renderInline(token.children, options)
+    ? slf.renderInline(token.children, options, env)
     : renderInlineContent(token, options, env, slf);
 
   if (divStyle) {
