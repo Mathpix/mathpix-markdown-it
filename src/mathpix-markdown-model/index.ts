@@ -58,6 +58,7 @@ export interface optionsMathpixMarkdown {
     highlights?: Array<THighlight>;
     parserErrors?: ParserErrors;
     codeHighlight?: CodeHighlight;
+    addSeparateTagIntoResultHtml?: TAddSeparateTagIntoResultHtml;
 }
 
 export type TMarkdownItOptions = {
@@ -104,6 +105,7 @@ export type TMarkdownItOptions = {
   highlights?: Array<THighlight>;
   parserErrors?: ParserErrors;
   codeHighlight?: CodeHighlight;
+  addSeparateTagIntoResultHtml?: TAddSeparateTagIntoResultHtml;
 }
 
 export type TOutputMath = {
@@ -191,6 +193,10 @@ export type THighlight = {
 export type TAccessibility = {
   assistiveMml?: boolean, //true to enable assitive MathML
   sre?: object
+};
+
+export type TAddSeparateTagIntoResultHtml = {
+  countHtmlElements?: number
 };
 
 class MathpixMarkdown_Model {
@@ -470,7 +476,8 @@ class MathpixMarkdown_Model {
           addPositionsToTokens = false,
           highlights = [],
           parserErrors = ParserErrors.show,
-          codeHighlight = {}
+          codeHighlight = {},
+          addSeparateTagIntoResultHtml = {}
         }
          = options || {};
 
@@ -516,7 +523,8 @@ class MathpixMarkdown_Model {
           addPositionsToTokens: addPositionsToTokens,
           highlights: highlights,
           parserErrors: parserErrors,
-          codeHighlight: codeHighlight
+          codeHighlight: codeHighlight,
+          addSeparateTagIntoResultHtml: addSeparateTagIntoResultHtml
         };
 
         const styleFontSize = fontSize ? ` font-size: ${options.fontSize}px;` : '';
