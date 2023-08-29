@@ -14,7 +14,7 @@ export interface MathpixMarkdownProps extends optionsMathpixMarkdown{
 class MathpixMarkdown extends React.Component<MathpixMarkdownProps> {
     render() {
         const { text, alignMathBlock='center', display='block', isCheckFormula=false, showTimeLog=false,isDisableFancy=false,
-          isDisableEmoji = false, isDisableEmojiShortcuts = false,
+          isDisableEmoji = false, isDisableEmojiShortcuts = false, isDisableRefs = false, isDisableFootnotes = false,
           htmlTags=false, width=0, breaks=true, typographer=false, linkify=false, xhtmlOut=false,
           outMath={}, mathJax={}, htmlSanitize = {}, smiles = {}, openLinkInNewWindow = true,
           enableFileLinks = false, validateLink = null,
@@ -34,6 +34,8 @@ class MathpixMarkdown extends React.Component<MathpixMarkdownProps> {
             isDisableFancy: isDisableFancy,
             isDisableEmoji: isDisableEmoji,
             isDisableEmojiShortcuts: isDisableEmojiShortcuts,
+            isDisableRefs: isDisableRefs,
+            isDisableFootnotes: isDisableFootnotes,
             disableRules: disableRules,
             htmlTags: htmlTags,
             xhtmlOut: xhtmlOut,
