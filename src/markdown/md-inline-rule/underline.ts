@@ -97,6 +97,7 @@ export const textUnderline: RuleInline = (state) => {
   token.isSubUnderline = false;
   token.underlineType = type;
   token.underlinePadding = underlinePadding;
+  token.latex = match[0];
 
   token = state.push('underline', "", 0);
   if (state.md.options?.forDocx) {
@@ -168,6 +169,7 @@ export const textOut: RuleInline = (state) => {
   token.nextPos = startPos + 1;
   token.attrSet('data-out-type', type);
   token.underlineType = type;
+  token.latex = match[0];
 
   token = state.push('out', "", 0);
   if (state.md.options?.forDocx) {
