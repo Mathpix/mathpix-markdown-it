@@ -321,6 +321,17 @@ export const MathpixStyle = (setTextAlignJustify: boolean = false, useColors: bo
     #preview-content .text-url a:hover, #setText .text-url a:hover {
       ${useColors ? 'color: #0B93ff;' : ''}
     }
+    
+    mark {
+      background-color: #feffe6;
+    }
+    
+    span[data-underline-type] mark {
+      background: inherit;
+      background-color: #feffe6;
+      padding-top: 0;
+      padding-bottom: 0;
+    }
 `};
 
 export const PreviewStyle = `

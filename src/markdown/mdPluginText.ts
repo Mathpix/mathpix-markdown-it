@@ -1,6 +1,14 @@
 import { MarkdownIt, RuleBlock, RuleInline, Renderer, Token } from 'markdown-it';
 const isSpace = require('markdown-it/lib/common/utils').isSpace;
 import { renderTabularInline } from "./md-renderer-rules/render-tabular";
+import { textUnderline, textOut } from "./md-inline-rule/underline";
+import { 
+  renderUnderlineOpen, 
+  renderUnderlineText, 
+  renderUnderlineClose,
+  renderOutOpen,
+  renderOutText
+} from "./md-renderer-rules/underline";
 import { closeTagSpan, reSpan, reAddContentsLine } from "./common/consts";
 import { findEndMarker, getTerminatedRules } from "./common";
 import { uid , getSpacesFromLeft } from "./utils";
@@ -824,7 +832,7 @@ const textTypes: RuleInline = (state) => {
   }
   const match = state.src
     .slice(++startPos)
-    .match(/^(?:textit|textbf|texttt)/); // eslint-disable-line
+    .match(/^(?:textit|textbf|texttt|text)/); // eslint-disable-line
 
   if (!match) {
     return false;
@@ -839,6 +847,9 @@ const textTypes: RuleInline = (state) => {
       break;
     case "texttt":
       type = "texttt";
+      break;    
+    case "text":
+      type = "text_latex";
       break;
     default:
       break;
@@ -847,7 +858,11 @@ const textTypes: RuleInline = (state) => {
   if (!type || type === '') {
     return false;
   }
-
+  //skipping spaces in begin
+  for (; startPos < state.src.length; startPos++) {
+    let code = state.src.charCodeAt(startPos);
+    if (!isSpace(code) && code !== 0x0A) { break; }
+  }
   let {res = false, content = '', nextPos = 0, endPos = 0 } = findEndMarker(state.src, startPos);
 
   if ( !res ) {
@@ -1226,6 +1241,13 @@ const renderItalicText = (tokens, idx, options, env, slf) => {
   return content;
 };
 
+const renderTextLatex = (tokens, idx, options, env, slf) => {
+  const token = tokens[idx];
+  const content = renderInlineContent(token, options, env, slf);
+
+  return content;
+};
+
 const renderCodeInlineOpen = (tokens, idx, options, env, slf) => {
   const token = tokens[idx];
   return  '<code' + slf.renderAttrs(token) + '>';
@@ -1274,6 +1296,18 @@ const mappingTextStyles = {
   texttt: "texttt",
   texttt_open: "texttt_open",
   texttt_close: "texttt_close",
+
+  text_latex: "TextLatex",
+  text_latex_open: "TextLatexOpen",
+  text_latex_close: "TextLatexClose",
+
+  underline: "underline",
+  underline_open: "underline_open",
+  underline_close: "underline_close",  
+  
+  out: "out",
+  out_open: "out_open",
+  out_close: "out_close",
 };
 
 const mapping = {
@@ -1308,6 +1342,8 @@ export default () => {
     md.inline.ruler.before('textTypes', 'linkifyURL', linkifyURL);
     md.inline.ruler.before('textTypes', 'pageBreaks', pageBreaks);
     md.inline.ruler.before('textTypes', 'doubleSlashToSoftBreak', doubleSlashToSoftBreak);
+    md.inline.ruler.before('textTypes', 'textUnderline', textUnderline);
+    md.inline.ruler.before('textTypes', 'textOut', textOut);
     md.inline.ruler.before('newline', 'newlineToSpace', newlineToSpace);
     /** ParserInline#ruler2 -> Ruler
      *[[Ruler]] instance. Second ruler used for post-processing **/
@@ -1328,6 +1364,23 @@ export default () => {
             return '<em>';
           case "textit_close":
             return '</em>';
+          case "text_latex_open":
+          case "text_latex_close":
+            return '';
+          case "text_latex":
+            return renderTextLatex(tokens, idx, options, env, slf);
+          case "underline":
+            return renderUnderlineText(tokens, idx, options, env, slf);
+          case "underline_open":
+            return renderUnderlineOpen(tokens, idx, options, env, slf);
+          case "underline_close":
+            return renderUnderlineClose(tokens, idx, options, env, slf);          
+          case "out":
+            return renderOutText(tokens, idx, options, env, slf);
+          case "out_open":
+            return renderOutOpen(tokens, idx, options, env, slf);
+          case "out_close":
+            return '</span>';
           case "texttt":
             return renderCodeInline(tokens, idx, options, env, slf);
           case "texttt_open":
