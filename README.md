@@ -104,6 +104,8 @@ Auto increment counter to 8 \footnote{text  should be 8}
 
 ![](doc/images/latex-footnotes/latex-footnotes_01.png)
 
+- [Latex underline](doc/latex-underline.md)
+
 # What is mathpix-markdown-it? 
 
 **mathpix-markdown-it** is an open source implementation of the mathpix-markdown spec written in Typescript.
