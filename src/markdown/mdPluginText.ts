@@ -832,7 +832,7 @@ const textTypes: RuleInline = (state) => {
   }
   const match = state.src
     .slice(++startPos)
-    .match(/^(?:textit|textbf|texttt)/); // eslint-disable-line
+    .match(/^(?:textit|textbf|texttt|text)/); // eslint-disable-line
 
   if (!match) {
     return false;
@@ -847,6 +847,9 @@ const textTypes: RuleInline = (state) => {
       break;
     case "texttt":
       type = "texttt";
+      break;    
+    case "text":
+      type = "text_latex";
       break;
     default:
       break;
@@ -1238,6 +1241,13 @@ const renderItalicText = (tokens, idx, options, env, slf) => {
   return content;
 };
 
+const renderTextLatex = (tokens, idx, options, env, slf) => {
+  const token = tokens[idx];
+  const content = renderInlineContent(token, options, env, slf);
+
+  return content;
+};
+
 const renderCodeInlineOpen = (tokens, idx, options, env, slf) => {
   const token = tokens[idx];
   return  '<code' + slf.renderAttrs(token) + '>';
@@ -1286,6 +1296,10 @@ const mappingTextStyles = {
   texttt: "texttt",
   texttt_open: "texttt_open",
   texttt_close: "texttt_close",
+
+  text_latex: "TextLatex",
+  text_latex_open: "TextLatexOpen",
+  text_latex_close: "TextLatexClose",
 
   underline: "underline",
   underline_open: "underline_open",
@@ -1349,7 +1363,12 @@ export default () => {
           case "textit_open":
             return '<em>';
           case "textit_close":
-            return '</em>';          
+            return '</em>';
+          case "text_latex_open":
+          case "text_latex_close":
+            return '';
+          case "text_latex":
+            return renderTextLatex(tokens, idx, options, env, slf);
           case "underline":
             return renderUnderlineText(tokens, idx, options, env, slf);
           case "underline_open":
