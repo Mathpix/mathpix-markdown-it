@@ -39,7 +39,7 @@ describe('Check Latex Footnotes:', () => {
     MM.texReset();
   });
   
-  describe('Check Latex Footnotes with MD Footnotes:', () => {
+  describe('Check Latex Footnotes with MD Footnotes (_mmd_03):', () => {
     const mmdContent = require('./_data/_footnotes_latex/_mmd/_mmd_03');
     const htmlContent = require('./_data/_footnotes_latex/_html/_html_03');
     const html = MM.markdownToHTML(mmdContent, options);
@@ -50,7 +50,7 @@ describe('Check Latex Footnotes:', () => {
     MM.texReset();
   });  
   
-  describe('Check Latex Footnotes with MD Footnotes:', () => {
+  describe('Check Latex Footnotes with MD Footnotes (_mmd_05):', () => {
     const mmdContent = require('./_data/_footnotes_latex/_mmd/_mmd_04');
     const htmlContent = require('./_data/_footnotes_latex/_html/_html_04');
     const html = MM.markdownToHTML(mmdContent, options);
@@ -61,7 +61,7 @@ describe('Check Latex Footnotes:', () => {
     MM.texReset();
   });  
   
-  describe('Check Latex Footnotes with MD Footnotes:', () => {
+  describe('Check Latex Footnotes with MD Footnotes (_mmd_05):', () => {
     const mmdContent = require('./_data/_footnotes_latex/_mmd/_mmd_05');
     const htmlContent = require('./_data/_footnotes_latex/_html/_html_05');
     const html = MM.markdownToHTML(mmdContent, options);
@@ -71,7 +71,7 @@ describe('Check Latex Footnotes:', () => {
     });
     MM.texReset();
   });  
-  describe('Check Latex Footnotes with MD Footnotes:', () => {
+  describe('Check Latex Footnotes with MD Footnotes (_mmd_08):', () => {
     const mmdContent = require('./_data/_footnotes_latex/_mmd/_mmd_08');
     const htmlContent = require('./_data/_footnotes_latex/_html/_html_08');
     const html = MM.markdownToHTML(mmdContent, options);
@@ -81,7 +81,7 @@ describe('Check Latex Footnotes:', () => {
     });
     MM.texReset();
   });  
-  describe('Check Latex Footnotes with MD Footnotes:', () => {
+  describe('Check Latex Footnotes with MD Footnotes (_mmd_09):', () => {
     const mmdContent = require('./_data/_footnotes_latex/_mmd/_mmd_09');
     const htmlContent = require('./_data/_footnotes_latex/_html/_html_09');
     const html = MM.markdownToHTML(mmdContent, options);
@@ -91,7 +91,7 @@ describe('Check Latex Footnotes:', () => {
     });
     MM.texReset();
   });  
-  describe('Check Latex Footnotes with MD Footnotes:', () => {
+  describe('Check Latex Footnotes with MD Footnotes (_mmd_10):', () => {
     const mmdContent = require('./_data/_footnotes_latex/_mmd/_mmd_10');
     const htmlContent = require('./_data/_footnotes_latex/_html/_html_10');
     const html = MM.markdownToHTML(mmdContent, options);

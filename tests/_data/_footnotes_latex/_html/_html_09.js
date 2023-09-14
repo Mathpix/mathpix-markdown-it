@@ -1,9 +1,6 @@
-module.exports = "<div><sup class=\"footnote-ref\"><a href=\"#fn1\" id=\"fnref1\">[2]</a></sup> text before <sup class=\"footnote-ref\"><a href=\"#fn2\" id=\"fnref2\">[5]</a></sup> text after<br>\n" +
-  "</div>\n" +
-  "<div>text before  text after<br>\n" +
-  "</div>\n" +
-  "<div>text <sup class=\"footnote-ref\"><a href=\"#fn4\" id=\"fnref4\">[1]</a></sup> before  text after<br>\n" +
-  "</div>\n" +
+module.exports = "<div><sup class=\"footnote-ref\"><a href=\"#fn1\" id=\"fnref1\">[2]</a></sup> text before <sup class=\"footnote-ref\"><a href=\"#fn2\" id=\"fnref2\">[5]</a></sup> text after </div>\n" +
+  "<div>text before  text after</div>\n" +
+  "<div>text <sup class=\"footnote-ref\"><a href=\"#fn4\" id=\"fnref4\">[1]</a></sup> before  text after</div>\n" +
   "<div>Footnote with table <sup class=\"footnote-ref\"><a href=\"#fn5\" id=\"fnref5\">[2]</a></sup> text after</div>\n" +
   "<hr class=\"footnotes-sep\">\n" +
   "<section class=\"footnotes\" style=\"margin-bottom: 1em;\">\n" +

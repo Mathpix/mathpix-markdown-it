@@ -1,10 +1,6 @@
 module.exports = "<div>inline footnote <sup class=\"footnote-ref\"><a href=\"#fn1\" id=\"fnref1\">[1]</a></sup></div>\n" +
-  "<div>Footnote with block math <sup class=\"footnote-ref\"><a href=\"#fn2\" id=\"fnref2\">[2]</a></sup> n123<br>\n" +
-  "</div>\n" +
-  "<div>\n" +
-  "<sup class=\"footnote-ref\"><a href=\"#fn3\" id=\"fnref3\">[3]</a></sup><br>\n" +
-  "</div>\n" +
-  "<div>Footnote with block math <sup class=\"footnote-ref\"><a href=\"#fn4\" id=\"fnref4\">[4]</a></sup> next</div>\n" +
+  "<div>Footnote with block math <sup class=\"footnote-ref\"><a href=\"#fn2\" id=\"fnref2\">[2]</a></sup> n123</div>\n" +
+  "<sup class=\"footnote-ref\"><a href=\"#fn3\" id=\"fnref3\">[3]</a></sup><div>Footnote with block math <sup class=\"footnote-ref\"><a href=\"#fn4\" id=\"fnref4\">[4]</a></sup> next</div>\n" +
   "<hr class=\"footnotes-sep\">\n" +
   "<section class=\"footnotes\" style=\"margin-bottom: 1em;\">\n" +
   "<ol class=\"footnotes-list\" style=\"margin-bottom: 0;\">\n" +
