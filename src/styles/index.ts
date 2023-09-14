@@ -332,6 +332,10 @@ export const MathpixStyle = (setTextAlignJustify: boolean = false, useColors: bo
       padding-top: 0;
       padding-bottom: 0;
     }
+    
+    #setText .footnotes-list li > div, #preview-content .footnotes-list li > div {
+      margin-bottom: 1em;
+    }
 `};
 
 export const PreviewStyle = `

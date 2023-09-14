@@ -44,10 +44,17 @@ export const latex_footnote_block: RuleBlock = (state, startLine, endLine, silen
     }
 
     let hasEnd = false;
+    let nextLineContent = nextLine;
     for (; nextLine <= endLine; nextLine++) {
       pos = state.bMarks[nextLine];
       max = state.eMarks[nextLine];
       lineText = state.src.slice(pos, max);
+      let nextLineText = nextLine + 1 <= endLine
+        ?  state.src.slice(state.bMarks[nextLine + 1], state.eMarks[nextLine + 1])
+        : '';
+      if (hasEnd && (!nextLineText || !nextLineText.trim())) {
+        break;
+      }
       if (hasEnd && (!lineText || !lineText.trim())) {
         break;
       } 
@@ -56,6 +63,7 @@ export const latex_footnote_block: RuleBlock = (state, startLine, endLine, silen
       data = findEndMarker(content, -1, '{', '}', true);
       if (data.res) {
         hasEnd = true;
+        nextLineContent = nextLine;
       }
     }
     if (!data || !data.res) {
@@ -67,12 +75,20 @@ export const latex_footnote_block: RuleBlock = (state, startLine, endLine, silen
     }
     content = data.content;
     state.line = nextLine + 1;
-    token = state.push('paragraph_open', 'div', 1);
-    token.map = [startLine, state.line];
+    max = state.eMarks[nextLine];
+    if (startFootnote > 0 || max > startPos + startContent + data.nextPos) {
+      token = state.push('paragraph_open', 'div', 1);
+      token.map = [startLine, state.line];
+    }
 
     if (startFootnote > 0) {
       token = state.push('inline', '', 0);
+      token.map = [startLine, startLine];
       token.content = state.src.slice(startPos, startPos + startFootnote);
+      token.bMarks = 0;
+      token.eMarks = token.bMarks + token.content.length;
+      token.bMarksContent = token.bMarks;
+      token.eMarksContent = token.eMarks;
       token.children = [];
     }
     token = state.push('footnote_latex', '', 0);
@@ -81,13 +97,15 @@ export const latex_footnote_block: RuleBlock = (state, startLine, endLine, silen
     state.md.block.parse(content, state.md, state.env, children);
     token.children = children;
 
-    max = state.eMarks[nextLine];
     if (max > startPos + startContent + data.nextPos) {
       token = state.push('inline', '', 0);
+      token.map = [nextLineContent, nextLine + 1];
       token.content = state.src.slice(startPos + startContent + data.nextPos, max);
       token.children = [];
     }
-    token = state.push('paragraph_close', 'div', -1);
+    if (startFootnote > 0 || max > startPos + startContent + data.nextPos) {
+      token = state.push('paragraph_close', 'div', -1);
+    }
     return true
   } catch (e) {
     return false;
@@ -114,7 +132,8 @@ export const latex_footnotetext_block: RuleBlock = (state, startLine, endLine, s
       return false;
     }
 
-    let matchNumbered = dataTags.arrOpen[dataTags.arrOpen.length - 1].content
+    let openTag = dataTags.arrOpen[dataTags.arrOpen.length - 1].content;
+    let matchNumbered = openTag
       .match(reOpenTagFootnotetextNumbered);
     if (matchNumbered) {
       numbered = matchNumbered.groups.number;
@@ -129,10 +148,17 @@ export const latex_footnotetext_block: RuleBlock = (state, startLine, endLine, s
       return false;
     }
     let hasEnd = false;
+    let nextLineContent = nextLine;
     for (; nextLine <= endLine; nextLine++) {
       pos = state.bMarks[nextLine];
       max = state.eMarks[nextLine];
       lineText = state.src.slice(pos, max);
+      let nextLineText = nextLine + 1 <= endLine 
+        ?  state.src.slice(state.bMarks[nextLine + 1], state.eMarks[nextLine + 1])
+        : '';
+      if (hasEnd && (!nextLineText || !nextLineText.trim())) {
+        break;
+      }
       if (hasEnd && (!lineText || !lineText.trim())) {
         break;
       }
@@ -141,6 +167,7 @@ export const latex_footnotetext_block: RuleBlock = (state, startLine, endLine, s
       data = findEndMarker(content, -1, '{', '}', true);
       if (data.res) {
         hasEnd = true;
+        nextLineContent = nextLine;
       }
     }
     if (!data || !data.res) {
@@ -152,27 +179,39 @@ export const latex_footnotetext_block: RuleBlock = (state, startLine, endLine, s
     }
     content = data.content;
     state.line = nextLine + 1;
-    token = state.push('paragraph_open', 'div', 1);
-    token.map = [startLine, state.line];
-
+    max = state.eMarks[nextLine];
+    if (startFootnote > 0 || max > startPos + startContent + data.nextPos) {
+      token = state.push('paragraph_open', 'div', 1);
+      token.map = [startLine, state.line];
+    }
     if (startFootnote > 0) {
       token = state.push('inline', '', 0);
+      token.map = [startLine, startLine];
       token.content = state.src.slice(startPos, startPos + startFootnote);
+      token.bMarks = 0;
+      token.eMarks = token.bMarks + token.content.length;
+      token.bMarksContent = token.bMarks;
+      token.eMarksContent = token.eMarks;
       token.children = [];
     }
-    token = state.push('footnotetext_latex', '', 0);
+    token = openTag.indexOf('blfootnotetext') !== -1
+      ? state.push('blfootnotetext_latex', '', 0)
+      : state.push('footnotetext_latex', '', 0)
+    ;
     token.numbered = numbered;
     let children = [];
     state.md.block.parse(content, state.md, state.env, children);
     token.children = children;
 
-    max = state.eMarks[nextLine];
     if (max > startPos + startContent + data.nextPos) {
       token = state.push('inline', '', 0);
+      token.map = [nextLineContent, nextLine + 1];
       token.content = state.src.slice(startPos + startContent + data.nextPos, max);
       token.children = [];
     }
-    token = state.push('paragraph_close', 'div', -1);
+    if (startFootnote > 0 || max > startPos + startContent + data.nextPos) {
+      token = state.push('paragraph_close', 'div', -1);
+    }
     return true
   } catch (e) {
     return false;

@@ -61,15 +61,28 @@ export const render_footnote_ref = (tokens, idx, options, env, slf) => {
 
 export const render_footnote_block_open = (tokens, idx, options) => {
   return (options.xhtmlOut ? '<hr class="footnotes-sep" />\n' : '<hr class="footnotes-sep">\n') +
-    '<section class="footnotes">\n' +
-    '<ol class="footnotes-list">\n';
+    '<section class="footnotes" style="margin-bottom: 1em;">\n';
 };
 
 export const render_footnote_block_close = () => {
-  return '</ol>\n</section>\n';
+  return '</section>\n';
+};
+
+export const render_footnote_list_open = (tokens, idx, options) => {
+  if (tokens[idx].meta?.type === 'blfootnotetext') {
+    return '<ol class="footnotes-list" style="padding-left: 20px; margin-bottom: 0;">\n';
+  }
+  return '<ol class="footnotes-list" style="margin-bottom: 0;">\n';
+};
+
+export const render_footnote_list_close = () => {
+  return '</ol>\n';
 };
 
 export const render_footnote_open = (tokens, idx, options, env, slf) => {
+  if (tokens[idx].meta.type === "blfootnotetext") {
+    return '<li class="footnote-item" style="list-style-type: none;">'
+  }
   let id = slf.rules.mmd_footnote_anchor_name(tokens, idx, options, env, slf);
 
   if (tokens[idx].meta.subId > 0) {
@@ -88,8 +101,8 @@ export const render_footnote_close = () => {
 
 export const render_footnote_anchor = (tokens, idx, options, env, slf) => {
   let footnote: FootnoteItem = getFootnoteItem(env, tokens[idx].meta);
-  let notFootnoteMarker = tokens[idx].meta.type === "footnotetext"
-    && Boolean(footnote?.footnoteId === -1);
+  let notFootnoteMarker = (tokens[idx].meta.type === "footnotetext"
+    && Boolean(footnote?.footnoteId === -1)) || tokens[idx].meta.type === "blfootnotetext";
   if (notFootnoteMarker) {
     return '';
   }

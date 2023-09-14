@@ -6,9 +6,9 @@ module.exports = "<div><sup class=\"footnote-ref\"><a href=\"#fn1\" id=\"fnref1\
   "</div>\n" +
   "<div>Footnote with table <sup class=\"footnote-ref\"><a href=\"#fn5\" id=\"fnref5\">[2]</a></sup> text after</div>\n" +
   "<hr class=\"footnotes-sep\">\n" +
-  "<section class=\"footnotes\">\n" +
-  "<ol class=\"footnotes-list\">\n" +
-  "<li id=\"fn1\" class=\"footnote-item\" value=\"2\"><p>text <a href=\"#fnref1\" class=\"footnote-backref\">↩︎</a></p>\n" +
+  "<section class=\"footnotes\" style=\"margin-bottom: 1em;\">\n" +
+  "<ol class=\"footnotes-list\" style=\"margin-bottom: 0;\">\n" +
+  "<li id=\"fn1\" class=\"footnote-item\" value=\"2\"><div>text <a href=\"#fnref1\" class=\"footnote-backref\">↩︎</a></div>\n" +
   "</li>\n" +
   "<li id=\"fn2\" class=\"footnote-item\" value=\"5\"><div>Footnote with block math:1</div>\n" +
   "<div><span class=\"math-block \">\n" +

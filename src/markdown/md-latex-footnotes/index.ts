@@ -3,7 +3,9 @@ import { mmd_footnote_tail } from "./core-rule";
 import {
   render_footnote_ref,
   render_footnote_block_open,
-  render_footnote_block_close,
+  render_footnote_block_close,  
+  render_footnote_list_open,
+  render_footnote_list_close,
   render_footnote_open,
   render_footnote_close,
   render_footnote_anchor,
@@ -32,12 +34,16 @@ export default (md: MarkdownIt, options) => {
   md.inline.ruler2.push("grab_footnote_ref", grab_footnote_ref);
 
   md.renderer.rules.footnotetext = render_footnotetext;
-  md.renderer.rules.footnotetext_latex = render_footnotetext;
+  md.renderer.rules.footnotetext_latex 
+    = md.renderer.rules.blfootnotetext_latex 
+    = render_footnotetext;
   md.renderer.rules.footnote_latex = render_footnote_ref;
   
   md.renderer.rules.mmd_footnote_ref = render_footnote_ref;
   md.renderer.rules.mmd_footnote_block_open = render_footnote_block_open;
-  md.renderer.rules.mmd_footnote_block_close = render_footnote_block_close;
+  md.renderer.rules.mmd_footnote_block_close = render_footnote_block_close;  
+  md.renderer.rules.mmd_footnote_list_open = render_footnote_list_open;
+  md.renderer.rules.mmd_footnote_list_close = render_footnote_list_close;
   md.renderer.rules.mmd_footnote_open = render_footnote_open;
   md.renderer.rules.mmd_footnote_close = render_footnote_close;
   md.renderer.rules.mmd_footnote_anchor = render_footnote_anchor;

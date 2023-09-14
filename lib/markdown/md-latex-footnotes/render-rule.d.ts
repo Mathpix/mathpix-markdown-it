@@ -3,6 +3,8 @@ export declare const render_footnote_caption: (tokens: any, idx: any, options: a
 export declare const render_footnote_ref: (tokens: any, idx: any, options: any, env: any, slf: any) => any;
 export declare const render_footnote_block_open: (tokens: any, idx: any, options: any) => string;
 export declare const render_footnote_block_close: () => string;
+export declare const render_footnote_list_open: (tokens: any, idx: any, options: any) => "<ol class=\"footnotes-list\" style=\"padding-left: 20px; margin-bottom: 0;\">\n" | "<ol class=\"footnotes-list\" style=\"margin-bottom: 0;\">\n";
+export declare const render_footnote_list_close: () => string;
 export declare const render_footnote_open: (tokens: any, idx: any, options: any, env: any, slf: any) => string;
 export declare const render_footnote_close: () => string;
 export declare const render_footnote_anchor: (tokens: any, idx: any, options: any, env: any, slf: any) => string;

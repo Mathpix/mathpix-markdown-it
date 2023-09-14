@@ -22,7 +22,7 @@ function injectLineNumbers(tokens, idx, options, env, slf) {
       attrSetToBegin(tokens[idx].attrs, 'id', label.id);
     }
   }
-  if (tokens[idx].map && tokens[idx].level === 0) {
+  if (tokens[idx].map && tokens[idx].level === 0 && !tokens[idx].notInjectLineNumber) {
     line = options.startLine + tokens[idx].map[0];
     endLine = options.startLine + tokens[idx].map[1];
     listLine = [];
