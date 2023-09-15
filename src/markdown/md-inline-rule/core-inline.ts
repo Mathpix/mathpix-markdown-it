@@ -31,7 +31,11 @@ export const coreInline = (state) => {
           if (token.children[j].type === "paragraph_open") {
             token.children[j].notInjectLineNumber = true;
           }
-          if (token.children[j].type === 'inline') {
+          if (token.children[j].type === 'inline'
+            || ['title', 'section', 'subsection', 'subsubsection', 'addcontentsline',
+              'item_inline', 'caption_table'
+            ].includes(token.children[j].type)
+          ) {
             state.env = Object.assign({}, {...state.env}, {
               currentTag: currentTag,
             }, {...envToInline});
