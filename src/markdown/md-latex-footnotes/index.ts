@@ -33,7 +33,9 @@ export default (md: MarkdownIt, options) => {
   md.inline.ruler.after("latex_footnotemark", "latex_footnotetext", latex_footnotetext);
   md.inline.ruler2.push("grab_footnote_ref", grab_footnote_ref);
 
-  md.renderer.rules.footnotetext = render_footnotetext;
+  md.renderer.rules.footnotetext 
+    = md.renderer.rules.blfootnotetext 
+    = render_footnotetext;
   md.renderer.rules.footnotetext_latex 
     = md.renderer.rules.blfootnotetext_latex 
     = render_footnotetext;

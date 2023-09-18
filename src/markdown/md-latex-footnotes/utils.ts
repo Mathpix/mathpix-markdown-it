@@ -6,7 +6,8 @@ export const addFootnoteToListForFootnote = (state, token, tokens, envText, numb
     let footnoteId = state.env.mmd_footnotes.list.length;
 
     let listNotNumbered = state.env.mmd_footnotes.list.filter(item =>
-      (!(item.hasOwnProperty('numbered') && item.numbered !== undefined) && item.type !== "footnotetext"));
+      (!(item.hasOwnProperty('numbered') && item.numbered !== undefined) 
+        && item.type !== "footnotetext" && item.type !== "blfootnotetext"));
     let lastNumber = listNotNumbered.length;
 
     token.meta = {
@@ -15,7 +16,8 @@ export const addFootnoteToListForFootnote = (state, token, tokens, envText, numb
       type: 'footnote',
       lastNumber: lastNumber,
       isBlock: isBlock,
-      footnoteId: footnoteId
+      footnoteId: footnoteId,
+      nonumbers: false
     };
 
     state.env.mmd_footnotes.list[footnoteId] = {
@@ -26,7 +28,8 @@ export const addFootnoteToListForFootnote = (state, token, tokens, envText, numb
       numbered: numbered,
       type: 'footnote',
       lastNumber: lastNumber,
-      isBlock: isBlock
+      isBlock: isBlock,
+      nonumbers: false
     };
   } catch (err) {
     console.log("[MMD][addFootnoteToListForFootnote] Error=>", err);
@@ -37,7 +40,8 @@ export const addFootnoteToListForFootnotetext = (state, token, tokens, envText, 
   try {
     let footnoteId = state.env.mmd_footnotes.list.length;
     let listNotNumbered = state.env.mmd_footnotes.list.filter(item =>
-      (!(item.hasOwnProperty('numbered') && item.numbered !== undefined) && item.type !== "footnotetext"));
+      (!(item.hasOwnProperty('numbered') && item.numbered !== undefined) 
+        && item.type !== "footnotetext" && item.type !== "blfootnotetext"));
     let lastNumber = listNotNumbered.length;
 
     let listFootnoteMark = state.env.mmd_footnotes?.list?.length
@@ -53,9 +57,11 @@ export const addFootnoteToListForFootnotetext = (state, token, tokens, envText, 
         lastItem = unNumberedList?.length ? unNumberedList[unNumberedList.length - 1] : null;
       }
     }
+    let nonumbers = !Boolean(state.md?.options?.footnotetext?.autonumbers);
     token.meta = {
       numbered: numbered,
-      isBlock: isBlock
+      isBlock: isBlock,
+      nonumbers: nonumbers
     };
     if (lastItem) {
       if (lastItem.hasContent) {
@@ -70,10 +76,12 @@ export const addFootnoteToListForFootnotetext = (state, token, tokens, envText, 
         state.env.mmd_footnotes.list[lastItem.footnoteId].tokens = tokens;
         state.env.mmd_footnotes.list[lastItem.footnoteId].hasContent = true;
         state.env.mmd_footnotes.list[lastItem.footnoteId].isBlock = isBlock;
+        state.env.mmd_footnotes.list[lastItem.footnoteId].nonumbers = nonumbers;
         state.env.mmd_footnotes.list[lastItem.footnoteId].arrContents = [{
           content: envText,
           tokens: tokens,
-          isBlock: isBlock
+          isBlock: isBlock,
+          nonumbers: nonumbers
         }];
         token.meta.footnoteId = lastItem.footnoteId;
         token.meta.id = lastItem.footnoteId;
@@ -87,7 +95,8 @@ export const addFootnoteToListForFootnotetext = (state, token, tokens, envText, 
         type: 'footnotetext',
         footnoteId: -1,
         lastNumber: lastNumber,
-        isBlock: isBlock
+        isBlock: isBlock,
+        nonumbers: nonumbers
       };
       token.meta.footnoteId = -1;
       token.meta.id = footnoteId;
@@ -105,7 +114,8 @@ export const addFootnoteToListForBlFootnotetext = (state, token, tokens, envText
         && item.type !== "footnotetext" && item.type !== "blfootnotetext"));
     let lastNumber = listNotNumbered.length;
     token.meta = {
-      isBlock: isBlock
+      isBlock: isBlock,
+      nonumbers: true
     };
     state.env.mmd_footnotes.list[footnoteId] = {
       id: footnoteId,
@@ -114,7 +124,8 @@ export const addFootnoteToListForBlFootnotetext = (state, token, tokens, envText
       type: 'blfootnotetext',
       footnoteId: -1,
       lastNumber: lastNumber,
-      isBlock: isBlock
+      isBlock: isBlock,
+      nonumbers: true
     };
     token.meta.footnoteId = -1;
     token.meta.id = footnoteId;

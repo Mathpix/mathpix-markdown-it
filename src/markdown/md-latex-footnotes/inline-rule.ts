@@ -208,7 +208,8 @@ export const latex_footnotemark: RuleInline = (state, silent) => {
 
     let footnoteId = state.env.mmd_footnotes.list.length;
     let listNotNumbered = state.env.mmd_footnotes.list.filter(item =>
-      (!(item.hasOwnProperty('numbered') && item.numbered !== undefined) && item.type !== "footnotetext"));
+      (!(item.hasOwnProperty('numbered') && item.numbered !== undefined) 
+        && item.type !== "footnotetext" && item.type !== "blfootnotetext"));
     let lastNumber = listNotNumbered.length;
 
     const token = state.push('mmd_footnote_ref', '', 0);
@@ -251,6 +252,7 @@ export const latex_footnotetext: RuleInline = (state, silent) => {
     if (!match) {
       return false;
     }
+    let openTag = match[0];
     nextPos += match[0].length;
     // \footnotetext {}
     //              ^^ skipping these spaces
@@ -331,7 +333,9 @@ export const latex_footnotetext: RuleInline = (state, silent) => {
       state.env,
       tokens
     );
-    const token = state.push('footnotetext', '', 0);
+    const token = openTag.indexOf('blfootnotetext') === -1 
+      ? state.push('footnotetext', '', 0) 
+      : state.push('blfootnotetext', '', 0);
     token.children = tokens;
     token.content = envText;
     addFootnoteToListForFootnotetext(state, token, tokens, envText, numbered);

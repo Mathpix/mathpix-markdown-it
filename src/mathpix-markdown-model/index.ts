@@ -58,6 +58,7 @@ export interface optionsMathpixMarkdown {
     highlights?: Array<THighlight>;
     parserErrors?: ParserErrors;
     codeHighlight?: CodeHighlight;
+    footnotetext?: Footnotetext;
 }
 
 export type TMarkdownItOptions = {
@@ -104,6 +105,7 @@ export type TMarkdownItOptions = {
   highlights?: Array<THighlight>;
   parserErrors?: ParserErrors;
   codeHighlight?: CodeHighlight;
+  footnotetext?: Footnotetext;
 }
 
 export type TOutputMath = {
@@ -192,6 +194,10 @@ export type TAccessibility = {
   assistiveMml?: boolean, //true to enable assitive MathML
   sre?: object
 };
+
+export type Footnotetext = {
+  autonumbers?: boolean
+}
 
 class MathpixMarkdown_Model {
     public disableFancyArrayDef = ['replacements', 'list', 'usepackage', 'toc'];
@@ -470,7 +476,8 @@ class MathpixMarkdown_Model {
           addPositionsToTokens = false,
           highlights = [],
           parserErrors = ParserErrors.show,
-          codeHighlight = {}
+          codeHighlight = {},
+          footnotetext = {}
         }
          = options || {};
 
@@ -516,7 +523,8 @@ class MathpixMarkdown_Model {
           addPositionsToTokens: addPositionsToTokens,
           highlights: highlights,
           parserErrors: parserErrors,
-          codeHighlight: codeHighlight
+          codeHighlight: codeHighlight,
+          footnotetext: footnotetext
         };
 
         const styleFontSize = fontSize ? ` font-size: ${options.fontSize}px;` : '';

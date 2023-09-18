@@ -87,13 +87,8 @@ export const latex_footnote_block: RuleBlock = (state, startLine, endLine, silen
     let inlineContentBefore = startFootnote > 0
       ? state.src.slice(startPos, startPos + startFootnote)
       : '';
-    let needToCreateParagraph = (inlineContentBefore?.length && inlineContentBefore?.trim()?.length)
-      || (inlineContentAfter?.length && inlineContentAfter?.trim()?.length);
-    
-    if (needToCreateParagraph) {
-      token = state.push('paragraph_open', 'div', 1);
-      token.map = [startLine, state.line];
-    }
+    token = state.push('paragraph_open', 'div', 1);
+    token.map = [startLine, state.line];
 
     if (inlineContentBefore?.length && inlineContentBefore?.trim()?.length) {
       token = state.push('inline', '', 0);
@@ -117,9 +112,7 @@ export const latex_footnote_block: RuleBlock = (state, startLine, endLine, silen
       token.content = inlineContentAfter;
       token.children = [];
     }
-    if (needToCreateParagraph) {
-      token = state.push('paragraph_close', 'div', -1);
-    }
+    token = state.push('paragraph_close', 'div', -1);
     return true
   } catch (e) {
     return false;
@@ -221,10 +214,10 @@ export const latex_footnotetext_block: RuleBlock = (state, startLine, endLine, s
       token.eMarksContent = token.eMarks;
       token.children = [];
     }
-    token = openTag.indexOf('blfootnotetext') !== -1
-      ? state.push('blfootnotetext_latex', '', 0)
-      : state.push('footnotetext_latex', '', 0)
-    ;
+    
+    token = openTag.indexOf('blfootnotetext') === -1 
+      ? state.push('footnotetext_latex', '', 0)
+      : state.push('blfootnotetext_latex', '', 0);
     token.numbered = numbered;
     let children = [];
     state.md.block.parse(content, state.md, state.env, children);
