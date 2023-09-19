@@ -332,6 +332,10 @@ export const MathpixStyle = (setTextAlignJustify: boolean = false, useColors: bo
       padding-top: 0;
       padding-bottom: 0;
     }
+    
+    #preview-content section.footnotes, #setText section.footnotes {
+      font-size: 85%;
+    }
 `};
 
 export const PreviewStyle = `

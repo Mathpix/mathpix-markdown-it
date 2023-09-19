@@ -226,6 +226,9 @@ export const mmd_footnote_tail = (state) => {
                 token = new state.Token('mmd_footnote_list_open', '', 1);
                 token.meta = item.meta;
                 state.tokens.push(token);
+                if (item.meta.numbered === undefined) {
+                  item.meta.numbered = item.meta.counter_footnote;
+                }
               }
             }
           }

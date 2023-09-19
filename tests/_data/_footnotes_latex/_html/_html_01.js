@@ -13,7 +13,7 @@ const htmlContent = "<div>Footnote marker without text. Auto increment counter t
   "</li>\n" +
   "</ol>\n" +
   "<ol class=\"footnotes-list\" style=\"margin-bottom: 0;\">\n" +
-  "<li id=\"fn3\" class=\"footnote-item\"><div>text  should be 3 <a href=\"#fnref3\" class=\"footnote-backref\">↩︎</a></div>\n" +
+  "<li id=\"fn3\" class=\"footnote-item\" value=\"3\"><div>text  should be 3 <a href=\"#fnref3\" class=\"footnote-backref\">↩︎</a></div>\n" +
   "</li>\n" +
   "<li id=\"fn4\" class=\"footnote-item\"><div>text  should be 4 <a href=\"#fnref4\" class=\"footnote-backref\">↩︎</a></div>\n" +
   "</li>\n" +
@@ -23,7 +23,7 @@ const htmlContent = "<div>Footnote marker without text. Auto increment counter t
   "</li>\n" +
   "</ol>\n" +
   "<ol class=\"footnotes-list\" style=\"margin-bottom: 0;\">\n" +
-  "<li id=\"fn7\" class=\"footnote-item\"><div>text  should be 7 <a href=\"#fnref7\" class=\"footnote-backref\">↩︎</a></div>\n" +
+  "<li id=\"fn7\" class=\"footnote-item\" value=\"7\"><div>text  should be 7 <a href=\"#fnref7\" class=\"footnote-backref\">↩︎</a></div>\n" +
   "</li>\n" +
   "<li id=\"fn8\" class=\"footnote-item\"><div>text  should be 8 <a href=\"#fnref8\" class=\"footnote-backref\">↩︎</a></div>\n" +
   "</li>\n" +
