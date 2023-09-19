@@ -21,7 +21,7 @@ describe('Check \\ref and \\eqref:', () => {
   tests.forEach((test, index) => {
     const mmdOptions = Object.assign({}, options, test.options);
     if (test.html_autonumbers) {
-      const html_autonumbers = MM.markdownToHTML(test.mmd, Object.assign({}, mmdOptions, {footnotetext: {autonumbers: true}}));
+      const html_autonumbers = MM.markdownToHTML(test.mmd, Object.assign({}, mmdOptions, {footnotes: {footnotetext: {autonumbers: true}}}));
       const labelsList = getLabelsList();
       describe('Options => ' + JSON.stringify(test.options), () => {
         it('Checking result html. (' + index + ') with options: {footnotetext: {autonumbers: true}}', (done) => {

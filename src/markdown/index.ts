@@ -27,7 +27,7 @@ const mdInit = (options: TMarkdownItOptions) => {
     highlights = [],
     parserErrors = ParserErrors.show,
     codeHighlight = {},
-    footnotetext = {}
+    footnotes = {}
   } = options;
   const mmdOptions = {
     width: width,
@@ -50,7 +50,7 @@ const mdInit = (options: TMarkdownItOptions) => {
     highlights: highlights,
     parserErrors: parserErrors,
     codeHighlight: codeHighlight,
-    footnotetext: footnotetext
+    footnotes: footnotes
   };
   let md = require("markdown-it")({
     html: htmlTags,

@@ -58,7 +58,7 @@ export interface optionsMathpixMarkdown {
     highlights?: Array<THighlight>;
     parserErrors?: ParserErrors;
     codeHighlight?: CodeHighlight;
-    footnotetext?: Footnotetext;
+    footnotes?: Footnotes;
 }
 
 export type TMarkdownItOptions = {
@@ -105,7 +105,7 @@ export type TMarkdownItOptions = {
   highlights?: Array<THighlight>;
   parserErrors?: ParserErrors;
   codeHighlight?: CodeHighlight;
-  footnotetext?: Footnotetext;
+  footnotes?: Footnotes;
 }
 
 export type TOutputMath = {
@@ -197,6 +197,11 @@ export type TAccessibility = {
 
 export type Footnotetext = {
   autonumbers?: boolean
+}
+
+export type Footnotes = {
+  footnotetext?: Footnotetext;
+  fontSize?: string;
 }
 
 class MathpixMarkdown_Model {
@@ -477,7 +482,7 @@ class MathpixMarkdown_Model {
           highlights = [],
           parserErrors = ParserErrors.show,
           codeHighlight = {},
-          footnotetext = {}
+          footnotes = {}
         }
          = options || {};
 
@@ -524,7 +529,7 @@ class MathpixMarkdown_Model {
           highlights: highlights,
           parserErrors: parserErrors,
           codeHighlight: codeHighlight,
-          footnotetext: footnotetext
+          footnotes: footnotes
         };
 
         const styleFontSize = fontSize ? ` font-size: ${options.fontSize}px;` : '';

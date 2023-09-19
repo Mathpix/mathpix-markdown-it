@@ -43,7 +43,7 @@ export interface optionsMathpixMarkdown {
     highlights?: Array<THighlight>;
     parserErrors?: ParserErrors;
     codeHighlight?: CodeHighlight;
-    footnotetext?: Footnotetext;
+    footnotes?: Footnotes;
 }
 export type TMarkdownItOptions = {
     isDisableFancy?: boolean;
@@ -89,7 +89,7 @@ export type TMarkdownItOptions = {
     highlights?: Array<THighlight>;
     parserErrors?: ParserErrors;
     codeHighlight?: CodeHighlight;
-    footnotetext?: Footnotetext;
+    footnotes?: Footnotes;
 };
 export type TOutputMath = {
     include_mathml?: boolean;
@@ -169,6 +169,10 @@ export type TAccessibility = {
 };
 export type Footnotetext = {
     autonumbers?: boolean;
+};
+export type Footnotes = {
+    footnotetext?: Footnotetext;
+    fontSize?: string;
 };
 declare class MathpixMarkdown_Model {
     disableFancyArrayDef: string[];

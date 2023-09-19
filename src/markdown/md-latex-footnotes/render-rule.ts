@@ -60,8 +60,14 @@ export const render_footnote_ref = (tokens, idx, options, env, slf) => {
 };
 
 export const render_footnote_block_open = (tokens, idx, options) => {
-  return (options.xhtmlOut ? '<hr class="footnotes-sep" />\n' : '<hr class="footnotes-sep">\n') +
-    '<section class="footnotes" style="margin-bottom: 1em; font-size: 85%">\n';
+  let cssFontSize = options?.footnotes?.fontSize 
+    ? ' font-size: ' + options?.footnotes?.fontSize + ';'
+    : '';
+  let html = (options.xhtmlOut ? '<hr class="footnotes-sep" />\n' : '<hr class="footnotes-sep">\n');
+  html += '<section class="footnotes" style="margin-bottom: 1em;';
+  html += cssFontSize;
+  html += '">\n';
+  return html;
 };
 
 export const render_footnote_block_close = () => {

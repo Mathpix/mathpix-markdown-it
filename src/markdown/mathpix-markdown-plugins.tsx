@@ -35,7 +35,7 @@ export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
     highlights = [],
     parserErrors = ParserErrors.show,
     codeHighlight = {},
-    footnotetext = {}
+    footnotes = {}
   } = options;
   Object.assign(md.options, smiles);
   Object.assign(md.options, {
@@ -58,7 +58,7 @@ export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
     highlights: highlights,
     parserErrors: parserErrors,
     codeHighlight: codeHighlight,
-    footnotetext: footnotetext
+    footnotes: footnotes
   });
 
   md

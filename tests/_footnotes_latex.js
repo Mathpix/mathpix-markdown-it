@@ -20,7 +20,7 @@ describe('Check Latex Footnotes:', () => {
   describe('Check footnotes counter (_mmd_01):', () => {
     const mmdContent = require('./_data/_footnotes_latex/_mmd/_mmd_01');
     const { htmlContent, htmlContent_autonumbers } = require('./_data/_footnotes_latex/_html/_html_01');
-    const html_autonumbers = MM.markdownToHTML(mmdContent, Object.assign({}, options, {footnotetext: {autonumbers: true}}));
+    const html_autonumbers = MM.markdownToHTML(mmdContent, Object.assign({}, options, {footnotes: {footnotetext: {autonumbers: true}}}));
     it('Checking result html with options: {footnotetext: {autonumbers: true}}', (done) => {
       html_autonumbers.trim().should.equal(htmlContent_autonumbers);
       done();
@@ -37,7 +37,7 @@ describe('Check Latex Footnotes:', () => {
   describe('Check: \\footnotestext to one \\footnotemark (_mmd_02):', () => {
     const mmdContent = require('./_data/_footnotes_latex/_mmd/_mmd_02');
     const { htmlContent, htmlContent_autonumbers }  = require('./_data/_footnotes_latex/_html/_html_02');
-    const html_autonumbers = MM.markdownToHTML(mmdContent, Object.assign({}, options, {footnotetext: {autonumbers: true}}));
+    const html_autonumbers = MM.markdownToHTML(mmdContent, Object.assign({}, options, {footnotes: {footnotetext: {autonumbers: true}}}));
     it('Checking result html with options: {footnotetext: {autonumbers: true}}', (done) => {
       html_autonumbers.trim().should.equal(htmlContent_autonumbers);
       done();
@@ -65,7 +65,7 @@ describe('Check Latex Footnotes:', () => {
   describe('Check Latex Footnotes with MD Footnotes (_mmd_04):', () => {
     const mmdContent = require('./_data/_footnotes_latex/_mmd/_mmd_04');
     const { htmlContent, htmlContent_autonumbers } = require('./_data/_footnotes_latex/_html/_html_04');
-    const html_autonumbers = MM.markdownToHTML(mmdContent, Object.assign({}, options, {footnotetext: {autonumbers: true}}));
+    const html_autonumbers = MM.markdownToHTML(mmdContent, Object.assign({}, options, {footnotes: {footnotetext: {autonumbers: true}}}));
     it('Checking result html with options: {footnotetext: {autonumbers: true}}', (done) => {
       html_autonumbers.trim().should.equal(htmlContent_autonumbers);
       done();
@@ -102,7 +102,7 @@ describe('Check Latex Footnotes:', () => {
   describe('Check Latex Footnotes with MD Footnotes (_mmd_09):', () => {
     const mmdContent = require('./_data/_footnotes_latex/_mmd/_mmd_09');
     const { htmlContent, htmlContent_autonumbers } = require('./_data/_footnotes_latex/_html/_html_09');
-    const html_autonumbers = MM.markdownToHTML(mmdContent, Object.assign({}, options, {footnotetext: {autonumbers: true}}));
+    const html_autonumbers = MM.markdownToHTML(mmdContent, Object.assign({}, options, {footnotes: {footnotetext: {autonumbers: true}}}));
     it('Checking result html with options: {footnotetext: {autonumbers: true}}', (done) => {
       html_autonumbers.trim().should.equal(htmlContent_autonumbers);
       done();
