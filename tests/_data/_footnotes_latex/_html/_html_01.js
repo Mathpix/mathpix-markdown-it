@@ -7,7 +7,7 @@ const htmlContent = "<div>Footnote marker without text. Auto increment counter t
   "<div>Auto increment counter to 7 <sup class=\"footnote-ref\"><a href=\"#fn7\" id=\"fnref7\">[7]</a></sup></div>\n" +
   "<div>Auto increment counter to 8 <sup class=\"footnote-ref\"><a href=\"#fn8\" id=\"fnref8\">[8]</a></sup></div>\n" +
   "<hr class=\"footnotes-sep\">\n" +
-  "<section class=\"footnotes\" style=\"margin-bottom: 1em;\">\n" +
+  "<section class=\"footnotes\" style=\"margin-bottom: 1em; font-size: 85%\">\n" +
   "<ol class=\"footnotes-list\" style=\"padding-left: 20px; margin-bottom: 0;\">\n" +
   "<li id=\"fn2\" class=\"footnote-item\" style=\"list-style-type: none;\"><div>text should be 2 <a href=\"#fnref2\" class=\"footnote-backref\">↩︎</a></div>\n" +
   "</li>\n" +
@@ -39,7 +39,7 @@ const htmlContent_autonumbers = "<div>Footnote marker without text. Auto increme
   "<div>Auto increment counter to 7 <sup class=\"footnote-ref\"><a href=\"#fn7\" id=\"fnref7\">[7]</a></sup></div>\n" +
   "<div>Auto increment counter to 8 <sup class=\"footnote-ref\"><a href=\"#fn8\" id=\"fnref8\">[8]</a></sup></div>\n" +
   "<hr class=\"footnotes-sep\">\n" +
-  "<section class=\"footnotes\" style=\"margin-bottom: 1em;\">\n" +
+  "<section class=\"footnotes\" style=\"margin-bottom: 1em; font-size: 85%\">\n" +
   "<ol class=\"footnotes-list\" style=\"margin-bottom: 0;\">\n" +
   "<li id=\"fn2\" class=\"footnote-item\" value=\"2\"><div>text should be 2 <a href=\"#fnref2\" class=\"footnote-backref\">↩︎</a></div>\n" +
   "</li>\n" +

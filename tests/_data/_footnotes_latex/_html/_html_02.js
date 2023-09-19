@@ -7,7 +7,7 @@ const htmlContent_autonumbers = "<div>Automatically-generated footnote marker 1 
   "<div></div>\n" +
   "<div></div>\n" +
   "<hr class=\"footnotes-sep\">\n" +
-  "<section class=\"footnotes\" style=\"margin-bottom: 1em;\">\n" +
+  "<section class=\"footnotes\" style=\"margin-bottom: 1em; font-size: 85%\">\n" +
   "<ol class=\"footnotes-list\" style=\"margin-bottom: 0;\">\n" +
   "<li id=\"fn1\" class=\"footnote-item\"><div>First footnote should be 1 <a href=\"#fnref1\" class=\"footnote-backref\">↩︎</a></div>\n" +
   "</li>\n" +
@@ -35,7 +35,7 @@ const htmlContent = "<div>Automatically-generated footnote marker 1 <sup class=\
   "<div></div>\n" +
   "<div></div>\n" +
   "<hr class=\"footnotes-sep\">\n" +
-  "<section class=\"footnotes\" style=\"margin-bottom: 1em;\">\n" +
+  "<section class=\"footnotes\" style=\"margin-bottom: 1em; font-size: 85%\">\n" +
   "<ol class=\"footnotes-list\" style=\"margin-bottom: 0;\">\n" +
   "<li id=\"fn1\" class=\"footnote-item\"><div>First footnote should be 1 <a href=\"#fnref1\" class=\"footnote-backref\">↩︎</a></div>\n" +
   "</li>\n" +

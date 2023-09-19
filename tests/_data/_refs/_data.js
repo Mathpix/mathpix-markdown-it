@@ -39,7 +39,7 @@ module.exports = [
       '<div><sup class="footnote-ref"><a href="#fn2" id="fnref2">[2]</a></sup></div>\n' +
       '<div><sup class="footnote-ref"><a href="#fn3" id="fnref3">[3]</a></sup> </div>\n' +
       '<hr class="footnotes-sep">\n' +
-      '<section class="footnotes" style="margin-bottom: 1em;">\n' +
+      '<section class="footnotes" style="margin-bottom: 1em; font-size: 85%">\n' +
       '<ol class="footnotes-list" style="margin-bottom: 0;">\n' +
       '<li id="fn1" class="footnote-item"><div>Footnote <a href="#fnref1" class="footnote-backref">↩︎</a></div>\n' +
       '</li>\n' +
@@ -64,7 +64,7 @@ module.exports = [
       '<div><sup class="footnote-ref"><a href="#fn2" id="fnref2">[2]</a></sup></div>\n' +
       '<div><sup class="footnote-ref"><a href="#fn3" id="fnref3">[3]</a></sup> </div>\n' +
       '<hr class="footnotes-sep">\n' +
-      '<section class="footnotes" style="margin-bottom: 1em;">\n' +
+      '<section class="footnotes" style="margin-bottom: 1em; font-size: 85%">\n' +
       '<ol class="footnotes-list" style="margin-bottom: 0;">\n' +
       '<li id="fn1" class="footnote-item"><div>Footnote <a href="#fnref1" class="footnote-backref">↩︎</a></div>\n' +
       '</li>\n' +
@@ -122,7 +122,7 @@ module.exports = [
       '<div><sup class="footnote-ref"><a href="#fn2" id="fnref2">[2]</a></sup></div>\n' +
       '<div><sup class="footnote-ref"><a href="#fn3" id="fnref3">[3]</a></sup> </div>\n' +
       '<hr class="footnotes-sep">\n' +
-      '<section class="footnotes" style="margin-bottom: 1em;">\n' +
+      '<section class="footnotes" style="margin-bottom: 1em; font-size: 85%">\n' +
       '<ol class="footnotes-list" style="margin-bottom: 0;">\n' +
       '<li id="fn1" class="footnote-item"><div>Footnote <a href="#fnref1" class="footnote-backref">↩︎</a></div>\n' +
       '</li>\n' +
@@ -147,7 +147,7 @@ module.exports = [
       '<div><sup class="footnote-ref"><a href="#fn2" id="fnref2">[2]</a></sup></div>\n' +
       '<div><sup class="footnote-ref"><a href="#fn3" id="fnref3">[3]</a></sup> </div>\n' +
       '<hr class="footnotes-sep">\n' +
-      '<section class="footnotes" style="margin-bottom: 1em;">\n' +
+      '<section class="footnotes" style="margin-bottom: 1em; font-size: 85%">\n' +
       '<ol class="footnotes-list" style="margin-bottom: 0;">\n' +
       '<li id="fn1" class="footnote-item"><div>Footnote <a href="#fnref1" class="footnote-backref">↩︎</a></div>\n' +
       '</li>\n' +

@@ -18,7 +18,7 @@ module.exports = "<div><sup class=\"footnote-ref\"><a href=\"#fn1\" id=\"fnref1\
   "<p style=\"text-indent: 1em;\"><sup class=\"footnote-ref\"><a href=\"#fn3\" id=\"fnref3:4\">[2:4]</a></sup> footnote  This is the abstract to my paper. You are going to learn a lot in this paper, just you wait. I am going to tell you about all the different LaTeX and Markdown syntax you can use in Snip.</p>\n" +
   "</div>\n" +
   "<hr class=\"footnotes-sep\">\n" +
-  "<section class=\"footnotes\" style=\"margin-bottom: 1em;\">\n" +
+  "<section class=\"footnotes\" style=\"margin-bottom: 1em; font-size: 85%\">\n" +
   "<ol class=\"footnotes-list\" style=\"margin-bottom: 0;\">\n" +
   "<li id=\"fn1\" class=\"footnote-item\" value=\"5\"><div>should be 5 <a href=\"#fnref1\" class=\"footnote-backref\">↩︎</a></div>\n" +
   "</li>\n" +

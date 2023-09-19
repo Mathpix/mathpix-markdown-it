@@ -9,7 +9,7 @@ module.exports = "<div>MD footnote marker <sup class=\"footnote-ref\"><a href=\"
   "<div>Without text <sup class=\"footnote-ref\"><a href=\"#fn10\" id=\"fnref10\">[6]</a></sup> should be 6</div>\n" +
   "<div><sup class=\"footnote-ref\"><a href=\"#fn11\" id=\"fnref11\">[7]</a></sup> MD footnote <sup class=\"footnote-ref\"><a href=\"#fn11\" id=\"fnref11:1\">[7:1]</a></sup></div>\n" +
   "<hr class=\"footnotes-sep\">\n" +
-  "<section class=\"footnotes\" style=\"margin-bottom: 1em;\">\n" +
+  "<section class=\"footnotes\" style=\"margin-bottom: 1em; font-size: 85%\">\n" +
   "<ol class=\"footnotes-list\" style=\"margin-bottom: 0;\">\n" +
   "<li id=\"fn1\" class=\"footnote-item\"><div>MD footnote text should be 1 <a href=\"#fnref1\" class=\"footnote-backref\">↩︎</a></div>\n" +
   "</li>\n" +

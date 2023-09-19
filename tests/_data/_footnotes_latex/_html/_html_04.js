@@ -7,7 +7,7 @@ const htmlContent_autonumbers = '<div>Some text1 </div>\n' +
   '<div>Some text6 \\footnotetext[3]text</div>\n' +
   '<div>Some text6 \\footnotetext text</div>\n' +
   '<hr class="footnotes-sep">\n' +
-  '<section class="footnotes" style="margin-bottom: 1em;">\n' +
+  '<section class="footnotes" style="margin-bottom: 1em; font-size: 85%">\n' +
   '<ol class="footnotes-list" style="margin-bottom: 0;">\n' +
   '<li id="fn1" class="footnote-item" value="0"><div>Footnote 1</div>\n' +
   '</li>\n' +
@@ -33,7 +33,7 @@ const htmlContent = '<div>Some text1 </div>\n' +
   '<div>Some text6 \\footnotetext[3]text</div>\n' +
   '<div>Some text6 \\footnotetext text</div>\n' +
   '<hr class="footnotes-sep">\n' +
-  '<section class="footnotes" style="margin-bottom: 1em;">\n' +
+  '<section class="footnotes" style="margin-bottom: 1em; font-size: 85%">\n' +
   '<ol class="footnotes-list" style="padding-left: 20px; margin-bottom: 0;">\n' +
   '<li id="fn1" class="footnote-item" style="list-style-type: none;"><div>Footnote 1</div>\n' +
   '</li>\n' +
