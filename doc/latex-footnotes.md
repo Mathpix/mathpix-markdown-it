@@ -45,6 +45,8 @@ Both commands take an optional argument enclosed in square brackets (`[...]`):
 
 The `\footnotemark` and `\footnotetext` commands are often used together to construct footnotes in tables, or other locations, where the standard `\footnote` command does not work, or is not the best/optimal solution.
 
+By default, `\footnotetext{}` will have the number hidden.
+
 ```tex
 I'm writing to test the `\footnotemark` and `\footnotetext` commands. 
 You can insert a footnote marker using the `\footnotemark`\footnotemark{}
@@ -56,5 +58,17 @@ footnote\footnotetext{Specifically, I'd write comments in this one.}.
 ```
 
 This example produces the following output:
+
+![](images/latex-footnotes/latex-footnotes_04.png)
+
+To display numbering for `\footnotetext{}` set the parameter:
+
+```js
+  footnotes: {
+    footnotetext: {
+      autonumbers: true
+    },
+  }
+```
 
 ![](images/latex-footnotes/latex-footnotes_03.png)

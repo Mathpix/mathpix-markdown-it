@@ -85,24 +85,12 @@ proceed from there and at some point you will arrive to a contradiction.
 - [Latex footnotes](doc/latex-footnotes.md)
 
 ```text
-Footnote marker without text. Auto increment counter to 1 \footnotemark{} should be 1.
+I'm writing to demonstrate use of automatically-generated footnote markers\footnote{Automatically generated footnote markers work fine!} and footnotes which use a marker value provided to the command\footnote[42]{...is that the answer to everything?}. 
 
-Footnote marker with text. Auto increment counter to 2 \footnotemark{} be 2. \footnotetext{text should be 2}
-
-Auto increment counter to 3 \footnote{text  should be 3}
-
-Auto increment counter to 4 \footnote{text  should be 4}
-
-Footnote marker without text. Auto increment counter to 5 \footnotemark{} should be 5.
-
-Footnote marker with text. Auto increment counter to 6 \footnotemark{} should be 6. \footnotetext{text should be 6}
-
-Auto increment counter to 7 \footnote{text  should be 7}
-
-Auto increment counter to 8 \footnote{text  should be 8}
+Now, I will use another automatically-generated footnote marker\footnote{Now, footnote markers are 1, 42, but then back to 2? That will be confusing if the automatically-generated number also reaches 42!}.
 ```
 
-![](doc/images/latex-footnotes/latex-footnotes_01.png)
+![](doc/images/latex-footnotes/latex-footnotes_02.png)
 
 - [Latex underline](doc/latex-underline.md)
 
