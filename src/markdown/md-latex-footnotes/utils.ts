@@ -57,7 +57,8 @@ export const addFootnoteToListForFootnotetext = (state, token, tokens, envText, 
         lastItem = unNumberedList?.length ? unNumberedList[unNumberedList.length - 1] : null;
       }
     }
-    let nonumbers = !Boolean(state.md?.options?.footnotes?.footnotetext?.autonumbers);
+    let nonumbers = !Boolean(state.md?.options?.footnotes?.footnotetext?.autonumbers) 
+      && numbered === undefined;
     token.meta = {
       numbered: numbered,
       isBlock: isBlock,

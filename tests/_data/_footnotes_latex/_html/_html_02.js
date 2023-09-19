@@ -51,7 +51,9 @@ const htmlContent = "<div>Automatically-generated footnote marker 1 <sup class=\
   "</li>\n" +
   "<li id=\"fn6\" class=\"footnote-item\" style=\"list-style-type: none;\"><div>Text of last footnote marker <a href=\"#fnref6\" class=\"footnote-backref\">↩︎</a></div>\n" +
   "</li>\n" +
-  "<li id=\"fn7\" class=\"footnote-item\" style=\"list-style-type: none;\"><div>Text of footnote with marker 20 <a href=\"#fnref7\" class=\"footnote-backref\">↩︎</a></div>\n" +
+  "</ol>\n" +
+  "<ol class=\"footnotes-list\" style=\"margin-bottom: 0;\">\n" +
+  "<li id=\"fn7\" class=\"footnote-item\" value=\"20\"><div>Text of footnote with marker 20 <a href=\"#fnref7\" class=\"footnote-backref\">↩︎</a></div>\n" +
   "</li>\n" +
   "</ol>\n" +
   "</section>";
