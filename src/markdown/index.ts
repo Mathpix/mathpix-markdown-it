@@ -26,7 +26,8 @@ const mdInit = (options: TMarkdownItOptions) => {
     addPositionsToTokens = false,
     highlights = [],
     parserErrors = ParserErrors.show,
-    codeHighlight = {}
+    codeHighlight = {},
+    footnotes = {}
   } = options;
   const mmdOptions = {
     width: width,
@@ -48,7 +49,8 @@ const mdInit = (options: TMarkdownItOptions) => {
     addPositionsToTokens: addPositionsToTokens,
     highlights: highlights,
     parserErrors: parserErrors,
-    codeHighlight: codeHighlight
+    codeHighlight: codeHighlight,
+    footnotes: footnotes
   };
   let md = require("markdown-it")({
     html: htmlTags,

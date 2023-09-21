@@ -5,6 +5,9 @@ const createFootnotesTokens = (state, stateTokens, refTokens, meta, idx,
                                itemLabel, itemCount, itemTokens, itemContent, isBlock = false): Array<Token> => {
   let token: Token = new state.Token('mmd_footnote_open', '', 1);
   token.meta = meta;
+  let footnote = state.env.mmd_footnotes?.list?.length > token.meta.id
+    ? state.env.mmd_footnotes?.list[token.meta.id] : null;
+  token.meta.nonumbers = footnote.nonumbers;
   stateTokens.push(token);
   let tokens = [];
   let lastParagraph;
@@ -202,8 +205,11 @@ export const mmd_footnote_tail = (state) => {
             token = new state.Token('mmd_footnote_list_open', '', 1);
             token.meta = item.meta;
             state.tokens.push(token);
+            if (item.meta.nonumbers) {
+              isNotMarkerList = true;
+            }
           } else {
-            if (item.meta.type === 'blfootnotetext') {
+            if (item.meta.nonumbers) {
               if (!isNotMarkerList) {
                 isNotMarkerList = true;
                 token = new state.Token('mmd_footnote_list_close', '', -1);
@@ -220,6 +226,9 @@ export const mmd_footnote_tail = (state) => {
                 token = new state.Token('mmd_footnote_list_open', '', 1);
                 token.meta = item.meta;
                 state.tokens.push(token);
+                if (item.meta.numbered === undefined) {
+                  item.meta.numbered = item.meta.counter_footnote;
+                }
               }
             }
           }

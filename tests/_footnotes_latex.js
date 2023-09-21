@@ -17,7 +17,7 @@ global.DOMParser = jsdom.window.DOMParser;
 
 
 describe('Check Latex Footnotes:', () => {
-  describe('Check footnotes counter:', () => {
+  describe('Check footnotes counter (_mmd_01):', () => {
     const mmdContent = require('./_data/_footnotes_latex/_mmd/_mmd_01');
     const htmlContent = require('./_data/_footnotes_latex/_html/_html_01');
     const html = MM.markdownToHTML(mmdContent, options);
@@ -28,7 +28,7 @@ describe('Check Latex Footnotes:', () => {
     MM.texReset();
   });
 
-  describe('Check: \\footnotestext to one \\footnotemark:', () => {
+  describe('Check: \\footnotestext to one \\footnotemark (_mmd_02):', () => {
     const mmdContent = require('./_data/_footnotes_latex/_mmd/_mmd_02');
     const htmlContent = require('./_data/_footnotes_latex/_html/_html_02');
     const html = MM.markdownToHTML(mmdContent, options);
@@ -50,7 +50,7 @@ describe('Check Latex Footnotes:', () => {
     MM.texReset();
   });  
   
-  describe('Check Latex Footnotes with MD Footnotes (_mmd_05):', () => {
+  describe('Check Latex Footnotes with MD Footnotes (_mmd_04):', () => {
     const mmdContent = require('./_data/_footnotes_latex/_mmd/_mmd_04');
     const htmlContent = require('./_data/_footnotes_latex/_html/_html_04');
     const html = MM.markdownToHTML(mmdContent, options);

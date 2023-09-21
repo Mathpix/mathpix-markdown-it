@@ -20,6 +20,21 @@ describe('Check \\ref and \\eqref:', () => {
   const tests = require('./_data/_refs/_data');
   tests.forEach((test, index) => {
     const mmdOptions = Object.assign({}, options, test.options);
+    if (test.html_autonumbers) {
+      const html_autonumbers = MM.markdownToHTML(test.mmd, Object.assign({}, mmdOptions, {footnotes: {footnotetext: {autonumbers: true}}}));
+      const labelsList = getLabelsList();
+      describe('Options => ' + JSON.stringify(test.options), () => {
+        it('Checking result html. (' + index + ') with options: {footnotetext: {autonumbers: true}}', (done) => {
+          html_autonumbers.trim().should.equal(test.html_autonumbers);
+          done();
+        });
+        it('Checking labelsList with options: {footnotetext: {autonumbers: true}}', (done) => {
+          JSON.stringify(labelsList).should.equal(JSON.stringify(test.labels));
+          done();
+        });
+      });
+      MM.texReset();
+    }
     const html = MM.markdownToHTML(test.mmd, mmdOptions);
     const labelsList = getLabelsList();
     describe('Options => ' + JSON.stringify(test.options), () => {
