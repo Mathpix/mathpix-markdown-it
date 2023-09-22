@@ -60,7 +60,7 @@ OC(=O)c1cc(Cl)cs1
 
 - [theorems and proofs](doc/theorems.md)
 
-```text
+```tex
 \newtheorem{theorem}{Theorem}
 \newtheorem{lemma}[theorem]{Lemma}
 
@@ -84,7 +84,7 @@ proceed from there and at some point you will arrive to a contradiction.
 
 - [Latex footnotes](doc/latex-footnotes.md)
 
-```text
+```tex
 Footnote marker without text. Auto increment counter to 1 \footnotemark{} should be 1.
 
 Footnote marker with text. Auto increment counter to 2 \footnotemark{} be 2. \footnotetext{text should be 2}
@@ -105,6 +105,24 @@ Auto increment counter to 8 \footnote{text  should be 8}
 ![](doc/images/latex-footnotes/latex-footnotes_01.png)
 
 - [Latex underline](doc/latex-underline.md)
+
+```tex
+Underline text: \underline{Underlined text!}
+Underline text: \uline{Underlined text!}
+
+Double underline text: \underline{\underline{Double underlined text!}}
+Double underline text: \uuline{Double underlined text!}
+
+Wavy underlined text: \uwave{This text is underlined with a wavy line!}
+
+Dashed underline text: \dashuline{Dashed Underline}
+Dotted underline text: \dotuline{Dotted Underline}
+
+Strikethrough text: \sout{Text with a horizontal line through its center!}
+Struck with Hatching text: \xout{Text with hatching pattern!}
+```
+
+![](doc/images/latex-underline/latex-underline_07.png)
 
 # What is mathpix-markdown-it? 
 
