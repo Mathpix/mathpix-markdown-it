@@ -9,7 +9,8 @@ import {
 } from "../common/consts";
 import { 
   addFootnoteToListForFootnote,
-  addFootnoteToListForFootnotetext 
+  addFootnoteToListForFootnotetext,
+  addFootnoteToListForBlFootnotetext
 } from "./utils";
 
 export const latex_footnote: RuleInline = (state, silent) => {
@@ -338,7 +339,11 @@ export const latex_footnotetext: RuleInline = (state, silent) => {
       : state.push('blfootnotetext', '', 0);
     token.children = tokens;
     token.content = envText;
-    addFootnoteToListForFootnotetext(state, token, tokens, envText, numbered);
+    if (openTag.indexOf('blfootnotetext') === -1 ) {
+      addFootnoteToListForFootnotetext(state, token, tokens, envText, numbered);
+    } else {
+      addFootnoteToListForBlFootnotetext(state, token, tokens, envText);
+    }
     nextPos = data.nextPos;
     state.pos = nextPos;
     return true;

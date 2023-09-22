@@ -100,5 +100,25 @@ describe('Check Latex Footnotes:', () => {
       done();
     });
     MM.texReset();
+  });  
+  describe('Check Latex Footnotes with only \\footnotetext{} (_mmd_11):', () => {
+    const mmdContent = require('./_data/_footnotes_latex/_mmd/_mmd_11');
+    const htmlContent = require('./_data/_footnotes_latex/_html/_html_11');
+    const html = MM.markdownToHTML(mmdContent, options);
+    it('Checking result html', (done) => {
+      html.trim().should.equal(htmlContent);
+      done();
+    });
+    MM.texReset();
+  });  
+  describe('Check Latex Footnotes \\blfootnotetext{} (_mmd_12):', () => {
+    const mmdContent = require('./_data/_footnotes_latex/_mmd/_mmd_12');
+    const htmlContent = require('./_data/_footnotes_latex/_html/_html_12');
+    const html = MM.markdownToHTML(mmdContent, options);
+    it('Checking result html', (done) => {
+      html.trim().should.equal(htmlContent);
+      done();
+    });
+    MM.texReset();
   });
 });

@@ -182,6 +182,9 @@ export const mmd_footnote_tail = (state) => {
         }
       }
       
+      if (list[i].type === 'footnotemark') {
+        continue
+      }
       if (list[i].hasOwnProperty('arrContents') && list[i].arrContents.length) {
         for (let j = 0; j < list[i].arrContents.length; j++) {
           stateTokens = createFootnotesTokens(state, stateTokens, refTokens, meta, i,

@@ -42,9 +42,14 @@ export const render_footnote_ref = (tokens, idx, options, env, slf) => {
     let footnote: FootnoteItem = getFootnoteItem(env, tokens[idx].meta);
     let notFootnoteText = tokens[idx].meta.type === "footnotemark" 
       && !Boolean(footnote?.hasContent);
-    const id = slf.rules.mmd_footnote_anchor_name(tokens, idx, options, env, slf);
+    let id: string = slf.rules.mmd_footnote_anchor_name(tokens, idx, options, env, slf);
+    if (tokens[idx].meta.type === "footnotemark" && footnote?.hasOwnProperty('textId')) {
+      id = (footnote.textId + 1).toString()
+    } else {
+      id = slf.rules.mmd_footnote_anchor_name(tokens, idx, options, env, slf);
+    }
+    let refid = slf.rules.mmd_footnote_anchor_name(tokens, idx, options, env, slf);
     const caption = slf.rules.mmd_footnote_caption(tokens, idx, options, env, slf);
-    let refid = id;
     if (tokens[idx].meta.subId > 0) {
       refid += ':' + tokens[idx].meta.subId;
     }
@@ -108,11 +113,16 @@ export const render_footnote_anchor = (tokens, idx, options, env, slf) => {
   let footnote: FootnoteItem = getFootnoteItem(env, tokens[idx].meta);
   let notFootnoteMarker = (tokens[idx].meta.type === "footnotetext"
     && Boolean(footnote?.footnoteId === -1)) || tokens[idx].meta.type === "blfootnotetext";
+  let id: string = '';
   if (notFootnoteMarker) {
-    return '';
+    if (footnote?.hasOwnProperty('markerId')) {
+      id = (footnote.markerId + 1).toString();
+    } else {
+      return '';
+    }
+  } else {
+    id = slf.rules.mmd_footnote_anchor_name(tokens, idx, options, env, slf);
   }
-  
-  let id = slf.rules.mmd_footnote_anchor_name(tokens, idx, options, env, slf);
 
   if (tokens[idx].meta.subId > 0) {
     id += ':' + tokens[idx].meta.subId;
