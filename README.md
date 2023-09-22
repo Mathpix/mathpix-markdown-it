@@ -60,7 +60,7 @@ OC(=O)c1cc(Cl)cs1
 
 - [theorems and proofs](doc/theorems.md)
 
-```text
+```tex
 \newtheorem{theorem}{Theorem}
 \newtheorem{lemma}[theorem]{Lemma}
 
@@ -84,7 +84,7 @@ proceed from there and at some point you will arrive to a contradiction.
 
 - [Latex footnotes](doc/latex-footnotes.md)
 
-```text
+```tex
 Footnote marker without text. Auto increment counter to 1 \footnotemark{} should be 1.
 
 Footnote marker with text. Auto increment counter to 2 \footnotemark{} be 2. \footnotetext{text should be 2}
@@ -105,6 +105,24 @@ Auto increment counter to 8 \footnote{text  should be 8}
 ![](doc/images/latex-footnotes/latex-footnotes_01.png)
 
 - [Latex underline](doc/latex-underline.md)
+
+```tex
+Underline text: \underline{Underlined text!}
+Underline text: \uline{Underlined text!}
+
+Double underline text: \underline{\underline{Double underlined text!}}
+Double underline text: \uuline{Double underlined text!}
+
+Wavy underlined text: \uwave{This text is underlined with a wavy line!}
+
+Dashed underline text: \dashuline{Dashed Underline}
+Dotted underline text: \dotuline{Dotted Underline}
+
+Strikethrough text: \sout{Text with a horizontal line through its center!}
+Struck with Hatching text: \xout{Text with hatching pattern!}
+```
+
+![](doc/images/latex-underline/latex-underline_07.png)
 
 # What is mathpix-markdown-it? 
 
@@ -692,6 +710,7 @@ The `MathpixMarkdown` React element accepts the following props:
 | `smiles`         | [ISmilesOptions](https://github.com/Mathpix/mathpix-markdown-it#ismilesoptions);*`{}`*        | Sets options to output chemistry equation                                                                              |
 | `parserErrors`   | [ParserErrors](https://github.com/Mathpix/mathpix-markdown-it#parsererrors);*`{}`*        | Sets options to output parser errors for equations and tabular                    |
 | `codeHighlight`  | [CodeHighlight](https://github.com/Mathpix/mathpix-markdown-it#codehighlight);*`{}`*      | Sets options to highlight code block                      |
+| `footnotes`      | [Footnotes](https://github.com/Mathpix/mathpix-markdown-it#footnotes);*`{}`*              | Sets options to footnotes                                 |
 
 
 ## MathpixMarkdownModel methods
@@ -741,6 +760,7 @@ The `MathpixMarkdown` React element accepts the following props:
 | `enableCodeBlockRuleForLatexCommands`| boolean;*`false`* | By default, if latex commands are indented (4 spaces / 1 tab) they do not become `Code Blocks`.               |
 | `parserErrors`   | [ParserErrors](https://github.com/Mathpix/mathpix-markdown-it#parsererrors);*`{}`*        | Sets options to output parser errors for equations and tabular                    |
 | `codeHighlight`  | [CodeHighlight](https://github.com/Mathpix/mathpix-markdown-it#codehighlight);*`{}`*      | Sets options to highlight code block                      |
+| `footnotes`      | [Footnotes](https://github.com/Mathpix/mathpix-markdown-it#footnotes);*`{}`*              | Sets options to footnotes                                 |
 
 ### optionsMathpixMarkdown
 
@@ -771,6 +791,7 @@ The `MathpixMarkdown` React element accepts the following props:
 | `enableCodeBlockRuleForLatexCommands`| boolean;*`false`* | By default, if latex commands are indented (4 spaces / 1 tab) they do not become `Code Blocks`.               |
 | `parserErrors`   | [ParserErrors](https://github.com/Mathpix/mathpix-markdown-it#parsererrors);*`{}`*        | Sets options to output parser errors for equations and tabular                    |
 | `codeHighlight`  | [CodeHighlight](https://github.com/Mathpix/mathpix-markdown-it#codehighlight);*`{}`*      | Sets options to highlight code block                      |
+| `footnotes`      | [Footnotes](https://github.com/Mathpix/mathpix-markdown-it#footnotes);*`{}`*              | Sets options to footnotes                                 |
 
 ### TOutputMath
 
@@ -831,16 +852,6 @@ The `MathpixMarkdown` React element accepts the following props:
 | `includeStyles`             | boolean&nbsp;*`false`*      | Includes mathpix-markdown styles                                                                                                            |
 | `includeFonts`              | boolean&nbsp;*`false`*      | Includes mathpix-markdown fonts                                                                                                             |
 
-
-### TAccessibility
-
-|                             | type&nbsp;*`default`*       | description
-|-----------------------------|-----------------------------|--------------------------------------------------------------------------------------------------------------------------------------------|
-| `assistiveMml`              | boolean&nbsp;*`false`*      | Should Assistive MathML be enabled to math (mjx-container).                                                                                |
-| `sre`                       | object&nbsp;*`null`*        | spe object from library [speech-rule-engine](https://www.npmjs.com/package/speech-rule-engine) for semantic interpretation.                                                                    |
-|                             |                             | If this value is not set then the aria-label for accessibility will not be added to the math at render time.                               |  
-
-
 ### ParserErrors enum
 
 |              |                                         |
@@ -856,8 +867,21 @@ The `MathpixMarkdown` React element accepts the following props:
 | `auto`       | boolean&nbsp;*`false`* | Highlighting with language detection                                                                          |
 | `code`       | boolean&nbsp;*`true`*  | Add code highlighting for a code block which created by indenting. To auto-detect the language, set auto=true |
 
-`sre` Has different loaders for node and browser.
+### Footnotes
 
+|                | type&nbsp;*`default`*       |                                           |
+|----------------|-----------------------------|-------------------------------------------|
+| `fontSize`     | string&nbsp;*`unset`*       | Ability to change font size for footnotes |
+
+### TAccessibility
+
+|                             | type&nbsp;*`default`*       | description
+|-----------------------------|-----------------------------|--------------------------------------------------------------------------------------------------------------------------------------------|
+| `assistiveMml`              | boolean&nbsp;*`false`*      | Should Assistive MathML be enabled to math (mjx-container).                                                                                |
+| `sre`                       | object&nbsp;*`null`*        | spe object from library [speech-rule-engine](https://www.npmjs.com/package/speech-rule-engine) for semantic interpretation.                                                                    |
+|                             |                             | If this value is not set then the aria-label for accessibility will not be added to the math at render time.                               |  
+
+`sre` Has different loaders for node and browser.
 1. For **Browser libraries**, synchronous loading is used.
 ```js
 import { loadSre } from "mathpix-markdown-it/lib/sre/sre-browser";

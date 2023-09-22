@@ -2,7 +2,8 @@ import { Token } from 'markdown-it';
 import { inlineDecimalParse } from "../md-block-rule/begin-tabular";
 import {
   addFootnoteToListForFootnote,
-  addFootnoteToListForFootnotetext 
+  addFootnoteToListForFootnotetext,
+  addFootnoteToListForBlFootnotetext
 } from "../md-latex-footnotes/utils";
 
 /** Top-level inline rule executor 
@@ -24,10 +25,17 @@ export const coreInline = (state) => {
   if (!state.env.mmd_footnotes.list) { state.env.mmd_footnotes.list = []}
   for (let i = 0; i < tokens.length; i++) {
     token = tokens[i];
-    if (token.type === 'footnote_latex' || token.type === 'footnotetext_latex') {
+    if (token.type === 'footnote_latex' || token.type === 'footnotetext_latex' || token.type === 'blfootnotetext_latex') {
       if (token.children?.length) {
         for (let j = 0; j < token.children?.length; j++) {
-          if (token.children[j].type === 'inline') {
+          if (token.children[j].type === "paragraph_open") {
+            token.children[j].notInjectLineNumber = true;
+          }
+          if (token.children[j].type === 'inline'
+            || ['title', 'section', 'subsection', 'subsubsection', 'addcontentsline',
+              'item_inline', 'caption_table'
+            ].includes(token.children[j].type)
+          ) {
             state.env = Object.assign({}, {...state.env}, {
               currentTag: currentTag,
             }, {...envToInline});
@@ -58,6 +66,10 @@ export const coreInline = (state) => {
       
       if (token.type === 'footnotetext_latex') {
         addFootnoteToListForFootnotetext(state, token, token.children, token.content, token.numbered, true);
+        continue;
+      }      
+      if (token.type === 'blfootnotetext_latex') {
+        addFootnoteToListForBlFootnotetext(state, token, token.children, token.content, true);
         continue;
       }
       addFootnoteToListForFootnote(state, token, token.children, token.content, token.numbered, true);

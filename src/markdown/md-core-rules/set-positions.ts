@@ -176,10 +176,14 @@ export const setPositions = (state) => {
 
         if (token.hasOwnProperty('bMarks')) {
           startPos += token.bMarks;
-          if (token.eMarks && endLine -1 >= 0
-          ) {
-            endPos = lines.eMarks[endLine-1] + token.eMarks;
-            endPos += endLine - token.map[0] === 0 ? 1 : 0;
+          if (token.eMarks) {
+            if (endLine -1 >= 0) {
+              endPos = lines.eMarks[endLine-1] + token.eMarks;
+              endPos += endLine - token.map[0] === 0 ? 1 : 0;
+            }
+            if (endLine === 0) {
+              endPos = token.eMarks;
+            }
           }
         } else {
           if (token.type === "inline") {

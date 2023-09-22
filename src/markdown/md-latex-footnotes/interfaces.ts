@@ -11,7 +11,9 @@ export interface FootnoteItem {
   lastNumber?: number,
   isBlock?: boolean,
   counter_footnote?: number,
-  hasContent?: boolean
+  hasContent?: boolean,
+  markerId?: number,
+  textId?: number
 }
 
 export interface FootnoteMeta {

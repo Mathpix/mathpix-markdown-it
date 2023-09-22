@@ -62,8 +62,8 @@ module.exports = '<div>First <sup class="footnote-ref"><a href="#fn1" id="fnref1
   '<div class="table" number="1" style="text-align: center">\n' +
   '<div class="figure_img" style="text-align: center; "><img src=https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Cappuccino_at_Sightglass_Coffee.jpg/1599px-Cappuccino_at_Sightglass_Coffee.jpg  style="width: 600px; "></div><div class=caption_figure>Figure 1: The caption is at the bottom <sup class="footnote-ref"><a href="#fn9" id="fnref9">[9]</a></sup>.</div></div>\n' +
   '<hr class="footnotes-sep">\n' +
-  '<section class="footnotes">\n' +
-  '<ol class="footnotes-list">\n' +
+  '<section class="footnotes" style="margin-bottom: 1em;">\n' +
+  '<ol class="footnotes-list" style="margin-bottom: 0;">\n' +
   '<li id="fn1" class="footnote-item"><div>First footnote <a href="#fnref1" class="footnote-backref">↩︎</a> <a href="#fnref1:1" class="footnote-backref">↩︎</a> <a href="#fnref1:2" class="footnote-backref">↩︎</a> <a href="#fnref1:3" class="footnote-backref">↩︎</a> <a href="#fnref1:4" class="footnote-backref">↩︎</a></div>\n' +
   '</li>\n' +
   '<li id="fn2" class="footnote-item"><div>Footnote to title <a href="#fnref2" class="footnote-backref">↩︎</a></div>\n' +

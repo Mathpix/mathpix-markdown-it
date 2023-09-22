@@ -6,7 +6,8 @@ export const addFootnoteToListForFootnote = (state, token, tokens, envText, numb
     let footnoteId = state.env.mmd_footnotes.list.length;
 
     let listNotNumbered = state.env.mmd_footnotes.list.filter(item =>
-      (!(item.hasOwnProperty('numbered') && item.numbered !== undefined) && item.type !== "footnotetext"));
+      (!(item.hasOwnProperty('numbered') && item.numbered !== undefined) 
+        && item.type !== "footnotetext" && item.type !== "blfootnotetext"));
     let lastNumber = listNotNumbered.length;
 
     token.meta = {
@@ -15,7 +16,8 @@ export const addFootnoteToListForFootnote = (state, token, tokens, envText, numb
       type: 'footnote',
       lastNumber: lastNumber,
       isBlock: isBlock,
-      footnoteId: footnoteId
+      footnoteId: footnoteId,
+      nonumbers: false
     };
 
     state.env.mmd_footnotes.list[footnoteId] = {
@@ -26,7 +28,8 @@ export const addFootnoteToListForFootnote = (state, token, tokens, envText, numb
       numbered: numbered,
       type: 'footnote',
       lastNumber: lastNumber,
-      isBlock: isBlock
+      isBlock: isBlock,
+      nonumbers: false
     };
   } catch (err) {
     console.log("[MMD][addFootnoteToListForFootnote] Error=>", err);
@@ -37,7 +40,8 @@ export const addFootnoteToListForFootnotetext = (state, token, tokens, envText, 
   try {
     let footnoteId = state.env.mmd_footnotes.list.length;
     let listNotNumbered = state.env.mmd_footnotes.list.filter(item =>
-      (!(item.hasOwnProperty('numbered') && item.numbered !== undefined) && item.type !== "footnotetext"));
+      (!(item.hasOwnProperty('numbered') && item.numbered !== undefined) 
+        && item.type !== "footnotetext" && item.type !== "blfootnotetext"));
     let lastNumber = listNotNumbered.length;
 
     let listFootnoteMark = state.env.mmd_footnotes?.list?.length
@@ -53,30 +57,47 @@ export const addFootnoteToListForFootnotetext = (state, token, tokens, envText, 
         lastItem = unNumberedList?.length ? unNumberedList[unNumberedList.length - 1] : null;
       }
     }
+    let nonumbers = lastNumber === 0 && numbered === undefined;
     token.meta = {
       numbered: numbered,
-      isBlock: isBlock
+      isBlock: isBlock,
+      nonumbers: nonumbers
     };
     if (lastItem) {
       if (lastItem.hasContent) {
-        state.env.mmd_footnotes.list[lastItem.footnoteId].arrContents.push({
+        state.env.mmd_footnotes.list[footnoteId] = {
+          id: footnoteId,
           content: envText,
           tokens: tokens,
-          isBlock: isBlock
-        });
+          numbered: numbered,
+          type: 'footnotetext',
+          footnoteId: -1,
+          lastNumber: lastNumber,
+          isBlock: isBlock,
+          nonumbers: nonumbers,
+        };
+        token.meta.footnoteId = -1;
+        token.meta.id = footnoteId;
       } else {
-        state.env.mmd_footnotes.list[lastItem.footnoteId].id = lastItem.footnoteId;
-        state.env.mmd_footnotes.list[lastItem.footnoteId].content = envText;
-        state.env.mmd_footnotes.list[lastItem.footnoteId].tokens = tokens;
-        state.env.mmd_footnotes.list[lastItem.footnoteId].hasContent = true;
-        state.env.mmd_footnotes.list[lastItem.footnoteId].isBlock = isBlock;
-        state.env.mmd_footnotes.list[lastItem.footnoteId].arrContents = [{
+        state.env.mmd_footnotes.list[footnoteId] = {
+          id: footnoteId,
           content: envText,
           tokens: tokens,
-          isBlock: isBlock
-        }];
-        token.meta.footnoteId = lastItem.footnoteId;
-        token.meta.id = lastItem.footnoteId;
+          numbered: numbered,
+          type: 'footnotetext',
+          footnoteId: -1,
+          lastNumber: lastNumber,
+          isBlock: isBlock,
+          nonumbers: nonumbers,
+          markerId: lastItem.footnoteId
+        };
+        token.meta.footnoteId = -1;
+        token.meta.id = footnoteId;
+        token.meta.markerId = lastItem.footnoteId;
+        
+        
+        state.env.mmd_footnotes.list[lastItem.footnoteId].textId = footnoteId;
+        state.env.mmd_footnotes.list[lastItem.footnoteId].hasContent = true;
       }
     } else {
       state.env.mmd_footnotes.list[footnoteId] = {
@@ -87,13 +108,42 @@ export const addFootnoteToListForFootnotetext = (state, token, tokens, envText, 
         type: 'footnotetext',
         footnoteId: -1,
         lastNumber: lastNumber,
-        isBlock: isBlock
+        isBlock: isBlock,
+        nonumbers: nonumbers
       };
       token.meta.footnoteId = -1;
       token.meta.id = footnoteId;
     }
   } catch (err) {
     console.log("[MMD][addFootnoteToListForFootnotetext] Error=>", err);
+  }
+};
+
+export const addFootnoteToListForBlFootnotetext = (state, token, tokens, envText, isBlock = false) => {
+  try {
+    let footnoteId = state.env.mmd_footnotes.list.length;
+    let listNotNumbered = state.env.mmd_footnotes.list.filter(item =>
+      (!(item.hasOwnProperty('numbered') && item.numbered !== undefined) 
+        && item.type !== "footnotetext" && item.type !== "blfootnotetext"));
+    let lastNumber = listNotNumbered.length;
+    token.meta = {
+      isBlock: isBlock,
+      nonumbers: true
+    };
+    state.env.mmd_footnotes.list[footnoteId] = {
+      id: footnoteId,
+      content: envText,
+      tokens: tokens,
+      type: 'blfootnotetext',
+      footnoteId: -1,
+      lastNumber: lastNumber,
+      isBlock: isBlock,
+      nonumbers: true
+    };
+    token.meta.footnoteId = -1;
+    token.meta.id = footnoteId;
+  } catch (err) {
+    console.log("[MMD][addFootnoteToListForBlFootnotetext] Error=>", err);
   }
 };
 

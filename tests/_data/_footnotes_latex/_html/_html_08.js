@@ -1,14 +1,12 @@
 module.exports = "<div>inline footnote <sup class=\"footnote-ref\"><a href=\"#fn1\" id=\"fnref1\">[1]</a></sup></div>\n" +
-  "<div>Footnote with block math <sup class=\"footnote-ref\"><a href=\"#fn2\" id=\"fnref2\">[2]</a></sup> n123<br>\n" +
-  "</div>\n" +
+  "<div>Footnote with block math <sup class=\"footnote-ref\"><a href=\"#fn2\" id=\"fnref2\">[2]</a></sup> n123</div>\n" +
   "<div>\n" +
-  "<sup class=\"footnote-ref\"><a href=\"#fn3\" id=\"fnref3\">[3]</a></sup><br>\n" +
-  "</div>\n" +
+  "<sup class=\"footnote-ref\"><a href=\"#fn3\" id=\"fnref3\">[3]</a></sup></div>\n" +
   "<div>Footnote with block math <sup class=\"footnote-ref\"><a href=\"#fn4\" id=\"fnref4\">[4]</a></sup> next</div>\n" +
   "<hr class=\"footnotes-sep\">\n" +
-  "<section class=\"footnotes\">\n" +
-  "<ol class=\"footnotes-list\">\n" +
-  "<li id=\"fn1\" class=\"footnote-item\"><p>inline <a href=\"#fnref1\" class=\"footnote-backref\">↩︎</a></p>\n" +
+  "<section class=\"footnotes\" style=\"margin-bottom: 1em;\">\n" +
+  "<ol class=\"footnotes-list\" style=\"margin-bottom: 0;\">\n" +
+  "<li id=\"fn1\" class=\"footnote-item\"><div>inline <a href=\"#fnref1\" class=\"footnote-backref\">↩︎</a></div>\n" +
   "</li>\n" +
   "<li id=\"fn2\" class=\"footnote-item\"><div>Footnote with block math:</div>\n" +
   "<div><span class=\"math-block \">\n" +

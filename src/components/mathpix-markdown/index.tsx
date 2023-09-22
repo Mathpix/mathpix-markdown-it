@@ -27,7 +27,8 @@ class MathpixMarkdown extends React.Component<MathpixMarkdownProps> {
           addPositionsToTokens = false,
           highlights = [],
           parserErrors = ParserErrors.show,
-          codeHighlight = {}
+          codeHighlight = {},
+          footnotes = {}
         } = this.props;
         const disableRules = isDisableFancy ? MM.disableFancyArrayDef : this.props.disableRules || [];
         const markdownItOptions: TMarkdownItOptions = {
@@ -59,7 +60,8 @@ class MathpixMarkdown extends React.Component<MathpixMarkdownProps> {
             addPositionsToTokens: addPositionsToTokens,
             highlights: highlights,
             parserErrors: parserErrors,
-            codeHighlight: codeHighlight
+            codeHighlight: codeHighlight,
+            footnotes: footnotes
         };
 
          MM.setOptions(disableRules, isCheckFormula, showTimeLog);

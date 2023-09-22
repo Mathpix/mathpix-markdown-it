@@ -37,15 +37,15 @@ module.exports = [
       '<div>Label to section <a href="#" style="cursor: pointer; text-decoration: none;" class="clickable-link" value="" data-parentheses="true">[sec:2]</a></div>\n' +
       '<div><sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup> Footnote</div>\n' +
       '<div><sup class="footnote-ref"><a href="#fn2" id="fnref2">[2]</a></sup></div>\n' +
-      '<div><sup class="footnote-ref"><a href="#fn3" id="fnref3">[3]</a></sup> </div>\n' +
+      '<div><sup class="footnote-ref"><a href="#fn4" id="fnref3">[3]</a></sup> </div>\n' +
       '<hr class="footnotes-sep">\n' +
-      '<section class="footnotes">\n' +
-      '<ol class="footnotes-list">\n' +
+      '<section class="footnotes" style="margin-bottom: 1em;">\n' +
+      '<ol class="footnotes-list" style="margin-bottom: 0;">\n' +
       '<li id="fn1" class="footnote-item"><div>Footnote <a href="#fnref1" class="footnote-backref">↩︎</a></div>\n' +
       '</li>\n' +
-      '<li id="fn2" class="footnote-item"><p>text footnote <a href="#fnref2" class="footnote-backref">↩︎</a></p>\n' +
+      '<li id="fn2" class="footnote-item"><div>text footnote <a href="#fnref2" class="footnote-backref">↩︎</a></div>\n' +
       '</li>\n' +
-      '<li id="fn3" class="footnote-item"><p>text footnote <a href="#fnref3" class="footnote-backref">↩︎</a></p>\n' +
+      '<li id="fn4" class="footnote-item" value="3"><div>text footnote <a href="#fnref3" class="footnote-backref">↩︎</a></div>\n' +
       '</li>\n' +
       '</ol>\n' +
       '</section>',
@@ -93,15 +93,15 @@ module.exports = [
       '<div>Label to section \\eqref{sec:2}</div>\n' +
       '<div><sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup> Footnote</div>\n' +
       '<div><sup class="footnote-ref"><a href="#fn2" id="fnref2">[2]</a></sup></div>\n' +
-      '<div><sup class="footnote-ref"><a href="#fn3" id="fnref3">[3]</a></sup> </div>\n' +
+      '<div><sup class="footnote-ref"><a href="#fn4" id="fnref3">[3]</a></sup> </div>\n' +
       '<hr class="footnotes-sep">\n' +
-      '<section class="footnotes">\n' +
-      '<ol class="footnotes-list">\n' +
+      '<section class="footnotes" style="margin-bottom: 1em;">\n' +
+      '<ol class="footnotes-list" style="margin-bottom: 0;">\n' +
       '<li id="fn1" class="footnote-item"><div>Footnote <a href="#fnref1" class="footnote-backref">↩︎</a></div>\n' +
       '</li>\n' +
-      '<li id="fn2" class="footnote-item"><p>text footnote <a href="#fnref2" class="footnote-backref">↩︎</a></p>\n' +
+      '<li id="fn2" class="footnote-item"><div>text footnote <a href="#fnref2" class="footnote-backref">↩︎</a></div>\n' +
       '</li>\n' +
-      '<li id="fn3" class="footnote-item"><p>text footnote <a href="#fnref3" class="footnote-backref">↩︎</a></p>\n' +
+      '<li id="fn4" class="footnote-item" value="3"><div>text footnote <a href="#fnref3" class="footnote-backref">↩︎</a></div>\n' +
       '</li>\n' +
       '</ol>\n' +
       '</section>',

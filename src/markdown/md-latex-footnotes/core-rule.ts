@@ -5,6 +5,9 @@ const createFootnotesTokens = (state, stateTokens, refTokens, meta, idx,
                                itemLabel, itemCount, itemTokens, itemContent, isBlock = false): Array<Token> => {
   let token: Token = new state.Token('mmd_footnote_open', '', 1);
   token.meta = meta;
+  let footnote = state.env.mmd_footnotes?.list?.length > token.meta.id
+    ? state.env.mmd_footnotes?.list[token.meta.id] : null;
+  token.meta.nonumbers = footnote.nonumbers;
   stateTokens.push(token);
   let tokens = [];
   let lastParagraph;
@@ -15,7 +18,7 @@ const createFootnotesTokens = (state, stateTokens, refTokens, meta, idx,
     if (itemTokens) {
       tokens = [];
 
-      token          = new state.Token('paragraph_open', 'p', 1);
+      token          = new state.Token('paragraph_open', 'div', 1);
       token.block    = true;
       tokens.push(token);
 
@@ -24,7 +27,7 @@ const createFootnotesTokens = (state, stateTokens, refTokens, meta, idx,
       token.content  = itemContent;
       tokens.push(token);
 
-      token          = new state.Token('paragraph_close', 'p', -1);
+      token          = new state.Token('paragraph_close', 'div', -1);
       token.block    = true;
       tokens.push(token);
 
@@ -122,6 +125,7 @@ export const mmd_footnote_tail = (state) => {
       if (list[i].hasOwnProperty('type')) {
         switch (list[i].type ) {
           case 'footnotetext':
+          case 'blfootnotetext':
             break;        
           case 'footnotemark':
             if (list[i].numbered === undefined) {
@@ -158,7 +162,7 @@ export const mmd_footnote_tail = (state) => {
         type: list[i].type,
         counter_footnote: counter_footnote
       };
-      if (list[i].numbered !== undefined || list[i].type === "footnotetext") {
+      if (list[i].numbered !== undefined || list[i].type === "footnotetext" || list[i].type === "blfootnotetext") {
         notIncrementNumber = true
       } else {
         if (notIncrementNumber) {
@@ -173,11 +177,14 @@ export const mmd_footnote_tail = (state) => {
             incrementNumber = false;
           }
         }
-        if (list[i].type === "footnotetext") {
+        if (list[i].type === "footnotetext" || list[i].type === "blfootnotetext") {
           meta.numbered = counter_footnote;
         }
       }
       
+      if (list[i].type === 'footnotemark') {
+        continue
+      }
       if (list[i].hasOwnProperty('arrContents') && list[i].arrContents.length) {
         for (let j = 0; j < list[i].arrContents.length; j++) {
           stateTokens = createFootnotesTokens(state, stateTokens, refTokens, meta, i,
@@ -193,9 +200,46 @@ export const mmd_footnote_tail = (state) => {
     if (stateTokens?.length) {
       let token:Token = new state.Token('mmd_footnote_block_open', '', 1);
       state.tokens.push(token);
-      stateTokens.map(item => {
+      let isNotMarkerList = false;
+      for (let i = 0; i < stateTokens.length; i++) {
+        let item = stateTokens[i];
+        if (item.type === "mmd_footnote_open") {
+          if (i === 0) {
+            token = new state.Token('mmd_footnote_list_open', '', 1);
+            token.meta = item.meta;
+            state.tokens.push(token);
+            if (item.meta.nonumbers) {
+              isNotMarkerList = true;
+            }
+          } else {
+            if (item.meta.nonumbers) {
+              if (!isNotMarkerList) {
+                isNotMarkerList = true;
+                token = new state.Token('mmd_footnote_list_close', '', -1);
+                state.tokens.push(token);
+                token = new state.Token('mmd_footnote_list_open', '', 1);
+                token.meta = item.meta;
+                state.tokens.push(token);
+              }
+            } else {
+              if (isNotMarkerList) {
+                isNotMarkerList = false;
+                token = new state.Token('mmd_footnote_list_close', '', -1);
+                state.tokens.push(token);
+                token = new state.Token('mmd_footnote_list_open', '', 1);
+                token.meta = item.meta;
+                state.tokens.push(token);
+                if (item.meta.numbered === undefined) {
+                  item.meta.numbered = item.meta.counter_footnote;
+                }
+              }
+            }
+          }
+        }
         state.tokens.push(item);
-      });
+      }
+      token = new state.Token('mmd_footnote_list_close', '', -1);
+      state.tokens.push(token);      
       token = new state.Token('mmd_footnote_block_close', '', -1);
       state.tokens.push(token);
     }

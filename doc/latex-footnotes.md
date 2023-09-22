@@ -58,3 +58,18 @@ footnote\footnotetext{Specifically, I'd write comments in this one.}.
 This example produces the following output:
 
 ![](images/latex-footnotes/latex-footnotes_03.png)
+
+
+## Example: using `\blfootnotetext`
+
+The `\blfootnotemark` command allows to add footnotes without a marker
+
+```tex
+The footnote \footnote{Footnote with marker}
+
+\blfootnotetext{Footnote without marker}
+```
+
+This example produces the following output:
+
+![](images/latex-footnotes/latex-footnotes_04.png)

@@ -42,9 +42,14 @@ export const render_footnote_ref = (tokens, idx, options, env, slf) => {
     let footnote: FootnoteItem = getFootnoteItem(env, tokens[idx].meta);
     let notFootnoteText = tokens[idx].meta.type === "footnotemark" 
       && !Boolean(footnote?.hasContent);
-    const id = slf.rules.mmd_footnote_anchor_name(tokens, idx, options, env, slf);
+    let id: string = slf.rules.mmd_footnote_anchor_name(tokens, idx, options, env, slf);
+    if (tokens[idx].meta.type === "footnotemark" && footnote?.hasOwnProperty('textId')) {
+      id = (footnote.textId + 1).toString()
+    } else {
+      id = slf.rules.mmd_footnote_anchor_name(tokens, idx, options, env, slf);
+    }
+    let refid = slf.rules.mmd_footnote_anchor_name(tokens, idx, options, env, slf);
     const caption = slf.rules.mmd_footnote_caption(tokens, idx, options, env, slf);
-    let refid = id;
     if (tokens[idx].meta.subId > 0) {
       refid += ':' + tokens[idx].meta.subId;
     }
@@ -60,13 +65,29 @@ export const render_footnote_ref = (tokens, idx, options, env, slf) => {
 };
 
 export const render_footnote_block_open = (tokens, idx, options) => {
-  return (options.xhtmlOut ? '<hr class="footnotes-sep" />\n' : '<hr class="footnotes-sep">\n') +
-    '<section class="footnotes">\n' +
-    '<ol class="footnotes-list">\n';
+  let cssFontSize = options?.footnotes?.fontSize 
+    ? ' font-size: ' + options?.footnotes?.fontSize + ';'
+    : '';
+  let html = (options.xhtmlOut ? '<hr class="footnotes-sep" />\n' : '<hr class="footnotes-sep">\n');
+  html += '<section class="footnotes" style="margin-bottom: 1em;';
+  html += cssFontSize;
+  html += '">\n';
+  return html;
 };
 
 export const render_footnote_block_close = () => {
-  return '</ol>\n</section>\n';
+  return '</section>\n';
+};
+
+export const render_footnote_list_open = (tokens, idx, options) => {
+  if (tokens[idx].meta?.nonumbers) {
+    return '<ol class="footnotes-list" style="padding-left: 20px; margin-bottom: 0;">\n';
+  }
+  return '<ol class="footnotes-list" style="margin-bottom: 0;">\n';
+};
+
+export const render_footnote_list_close = () => {
+  return '</ol>\n';
 };
 
 export const render_footnote_open = (tokens, idx, options, env, slf) => {
@@ -75,7 +96,9 @@ export const render_footnote_open = (tokens, idx, options, env, slf) => {
   if (tokens[idx].meta.subId > 0) {
     id += ':' + tokens[idx].meta.subId;
   }
-
+  if (tokens[idx].meta.nonumbers) {
+    return '<li id="fn' + id + '" class="footnote-item" style="list-style-type: none;">'
+  }
   if (tokens[idx].meta.numbered !== undefined) {
     return '<li id="fn' + id + '" class="footnote-item" value="' + tokens[idx].meta.numbered + '">';
   }
@@ -88,13 +111,18 @@ export const render_footnote_close = () => {
 
 export const render_footnote_anchor = (tokens, idx, options, env, slf) => {
   let footnote: FootnoteItem = getFootnoteItem(env, tokens[idx].meta);
-  let notFootnoteMarker = tokens[idx].meta.type === "footnotetext"
-    && Boolean(footnote?.footnoteId === -1);
+  let notFootnoteMarker = (tokens[idx].meta.type === "footnotetext"
+    && Boolean(footnote?.footnoteId === -1)) || tokens[idx].meta.type === "blfootnotetext";
+  let id: string = '';
   if (notFootnoteMarker) {
-    return '';
+    if (footnote?.hasOwnProperty('markerId')) {
+      id = (footnote.markerId + 1).toString();
+    } else {
+      return '';
+    }
+  } else {
+    id = slf.rules.mmd_footnote_anchor_name(tokens, idx, options, env, slf);
   }
-  
-  let id = slf.rules.mmd_footnote_anchor_name(tokens, idx, options, env, slf);
 
   if (tokens[idx].meta.subId > 0) {
     id += ':' + tokens[idx].meta.subId;
