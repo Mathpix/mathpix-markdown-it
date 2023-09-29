@@ -11,10 +11,12 @@ export const grab_footnote_ref = (state) => {
         token.hidden = true;
         if (!state.tokens[k-1].hidden) {
           state.tokens[k-1].hidden = true;
+          state.tokens[k-1].showSpace = true;
         }
       }
       if (token.type === 'softbreak' && state.tokens[k-1].type === 'footnotetext') {
         token.hidden = true;
+        token.showSpace = true;
         if (!state.tokens[k-1].hidden) {
           state.tokens[k-1].hidden = true;
         }

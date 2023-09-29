@@ -2,6 +2,12 @@ export declare const tocRegexp: RegExp;
 export declare const isSpace: (code: any) => boolean;
 export declare const slugify: (s: string) => string;
 export declare const uniqueSlug: (slug: string, slugs: any) => string;
+export interface InlineCodeItem {
+    marker: string;
+    posStart: number;
+    posEnd: number;
+    content: string;
+}
 /** The function finds the position of the end marker in the specified string
  * and returns that position and the content between the start and end markers.
  *

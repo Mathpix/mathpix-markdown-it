@@ -28,7 +28,7 @@ export declare const findBackTick: (posStart: number, str: string, pending?: str
     pending: string;
     content?: undefined;
 };
-export declare const findOpenCloseTags: (str: string, tagOpen: any, tagClose: any, pendingBackTick?: string) => {
+export declare const findOpenCloseTags: (str: string, tagOpen: any, tagClose: any, pendingBackTick?: string, noBreakBackTick?: boolean) => {
     arrOpen: any[];
     arrClose: any[];
     pending: string;
