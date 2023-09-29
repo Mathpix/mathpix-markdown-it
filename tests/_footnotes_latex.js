@@ -135,3 +135,16 @@ describe('Check block \\footnotetext:', () => {
     MM.texReset();
   });
 });
+
+describe('Check block \\footnote:', () => {
+  const tests = require('./_data/_footnotes_latex/_data-footnote');
+  tests.forEach((test, index) => {
+    const mmdOptions = Object.assign({}, options, options);
+    const html = MM.markdownToHTML(test.mmd, mmdOptions);
+    it('Checking result html. (' + index + ')', (done) => {
+      html.trim().should.equal(test.html);
+      done();
+    });
+    MM.texReset();
+  });
+});

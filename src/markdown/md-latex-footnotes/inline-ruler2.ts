@@ -14,12 +14,24 @@ export const grab_footnote_ref = (state) => {
           state.tokens[k-1].showSpace = true;
         }
       }
-      if (token.type === 'softbreak' && state.tokens[k-1].type === 'footnotetext') {
+      if (token.type === 'softbreak' && (state.tokens[k-1].type === 'footnotetext')) {
         token.hidden = true;
         token.showSpace = true;
         if (!state.tokens[k-1].hidden) {
           state.tokens[k-1].hidden = true;
         }
+      }
+      if ((token.type === "mmd_footnote_ref" && token.meta?.type === 'footnote') 
+        && state.tokens[k-1].type === 'softbreak') {
+        if (!state.tokens[k-1].hidden) {
+          state.tokens[k-1].hidden = true;
+          state.tokens[k-1].showSpace = true;
+        }
+      }
+      if (token.type === 'softbreak' 
+        && (state.tokens[k-1].type === "mmd_footnote_ref" && state.tokens[k-1].meta?.type === 'footnote')) {
+        token.hidden = true;
+        token.showSpace = true;
       }
     }
     if (token.type === "footnote_ref") {

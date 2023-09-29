@@ -1,5 +1,4 @@
-module.exports = "<div><sup class=\"footnote-ref\"><a href=\"#fn1\" id=\"fnref1\">[5]</a></sup><br>\n" +
-  "<sup class=\"footnote-ref\"><a href=\"#fn2\" id=\"fnref2\">[1]</a></sup></div>\n" +
+module.exports = "<div><sup class=\"footnote-ref\"><a href=\"#fn1\" id=\"fnref1\">[5]</a></sup> <sup class=\"footnote-ref\"><a href=\"#fn2\" id=\"fnref2\">[1]</a></sup></div>\n" +
   "<h1 type=\"title\" class=\"main-title\" id=\"title\">\n" +
   "Title<sup class=\"footnote-ref\"><a href=\"#fn3\" id=\"fnref3\">[2]</a></sup></h1>\n" +
   "<div><div class=\"author\">\n" +

@@ -20,15 +20,43 @@ export const latex_footnote_block: RuleBlock = (state, startLine, endLine, silen
     let startPos = pos;
     let numbered;
     lineText = state.src.slice(pos, max);
-
+    let fullContent = lineText;
+    let hasOpenTag = false;
+    let pending = '';
+    let terminate = false;
     if (!reOpenTagFootnote.test(lineText)) {
-      return false;
+      // jump line-by-line until empty one or EOF
+      for (; nextLine < endLine; nextLine++) {
+        if (fence(state, nextLine, endLine, true)) {
+          terminate = true;
+        }
+        if (terminate) { break; }
+        if (state.isEmpty(nextLine)) {
+          break
+        }
+        pos = state.bMarks[nextLine];
+        max = state.eMarks[nextLine];
+        lineText = state.src.slice(pos, max);
+        if (!lineText || !lineText.trim()) {
+          break;
+        }
+        fullContent += fullContent ? '\n' : '';
+        fullContent += lineText;
+        if (reOpenTagFootnote.test(fullContent)) {
+          hasOpenTag = true;
+          nextLine += 1;
+          break;
+        }
+      }
+      if (!hasOpenTag || nextLine > endLine) {
+        return false;
+      }
     }
-    let dataTags = findOpenCloseTags(lineText, reOpenTagFootnote, '}');
+    let dataTags = findOpenCloseTags(fullContent, reOpenTagFootnote, '}', '', true);
     if (!dataTags?.arrOpen?.length) {
       return false;
     }
-
+    pending = dataTags.pending;
     let matchNumbered = dataTags.arrOpen[dataTags.arrOpen.length - 1].content
       .match(reOpenTagFootnoteNumbered);
     if (matchNumbered) {
@@ -36,8 +64,8 @@ export const latex_footnote_block: RuleBlock = (state, startLine, endLine, silen
     }
     let startFootnote = dataTags.arrOpen[dataTags.arrOpen.length - 1].posStart;
     let startContent = dataTags.arrOpen[dataTags.arrOpen.length - 1].posEnd;
-    
-    let content = lineText.slice(startContent);
+
+    let content = fullContent.slice(startContent);
 
     let data = findEndMarker(content, -1, '{', '}', true);
     if (data?.res) {
@@ -48,6 +76,10 @@ export const latex_footnote_block: RuleBlock = (state, startLine, endLine, silen
     let nextLineContent = nextLine;
     let inlineContentAfter = '';
     for (; nextLine <= endLine; nextLine++) {
+      if (fence(state, nextLine, endLine, true)) {
+        terminate = true;
+      }
+      if (terminate) { break; }
       pos = state.bMarks[nextLine];
       max = state.eMarks[nextLine];
       lineText = state.src.slice(pos, max);
@@ -69,6 +101,17 @@ export const latex_footnote_block: RuleBlock = (state, startLine, endLine, silen
       }
       content += '\n';
       content += lineText;
+      fullContent += '\n';
+      fullContent += lineText;
+      if (!lineText || !lineText.trim()) {
+        pending = '';
+      }
+      if (pending) {
+        dataTags = findOpenCloseTags(fullContent, reOpenTagFootnotetext, '}');
+        if (!dataTags?.arrOpen?.length) {
+          break;
+        }
+      }
       data = findEndMarker(content, -1, '{', '}', true);
       if (data.res) {
         hasEnd = true;
@@ -99,6 +142,7 @@ export const latex_footnote_block: RuleBlock = (state, startLine, endLine, silen
       token.eMarks = token.bMarks + token.content.length;
       token.bMarksContent = token.bMarks;
       token.eMarksContent = token.eMarks;
+      token.lastBreakToSpace = true;
       token.children = [];
     }
     token = state.push('footnote_latex', '', 0);
@@ -111,11 +155,13 @@ export const latex_footnote_block: RuleBlock = (state, startLine, endLine, silen
       token = state.push('inline', '', 0);
       token.map = [nextLineContent, nextLine + 1];
       token.content = inlineContentAfter;
+      token.firstBreakToSpace = true;
       token.children = [];
     }
     token = state.push('paragraph_close', 'div', -1);
     return true
   } catch (e) {
+    console.log("[ERROR]=>[latex_footnote_block]=>", e)
     return false;
   }
 };
