@@ -64,7 +64,7 @@
     "mdurl": "^1.0.1",
     "node-polyfill-webpack-plugin": "^1.1.4",
     "parse-srcset": "^1.0.2",
-    "postcss": "^7.0.36",
+    "postcss": "^8.4.31",
     "punycode": "^2.1.1",
     "react": "^16.7.0",
     "react-dom": "^16.7.0",
