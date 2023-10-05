@@ -4,6 +4,7 @@
 [![Build Status](https://img.shields.io/circleci/build/gh/Mathpix/mathpix-markdown-it/master.svg?style=flat)](https://circleci.com/gh/Mathpix/mathpix-markdown-it/tree/master)
 [![GitHub](https://img.shields.io/github/license/mathpix/mathpix-markdown-it)](https://github.com/Mathpix/mathpix-markdown-it/blob/master/LICENSE)
 
+
 # What is Mathpix Markdown? 
 
 [mathpix-markdown](https://mathpix.com/docs/mathpix-markdown/overview) is a superset of Markdown that adds helpful syntax for the STEM community, such as advanced equation, table, and chemistry support. Wherever possible, we borrow syntax from LaTeX. In other cases (such as chemistry) we invent new syntax that is backward compatible with Markdown.
