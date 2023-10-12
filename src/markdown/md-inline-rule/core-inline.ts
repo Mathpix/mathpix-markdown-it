@@ -5,6 +5,7 @@ import {
   addFootnoteToListForFootnotetext,
   addFootnoteToListForBlFootnotetext
 } from "../md-latex-footnotes/utils";
+import { addAttributesToParentToken } from "../utils";
 
 /** Top-level inline rule executor 
  * Replace inline core rule
@@ -40,6 +41,9 @@ export const coreInline = (state) => {
               currentTag: currentTag,
             }, {...envToInline});
             state.md.inline.parse(token.children[j].content, state.md, state.env, token.children[j].children);
+            if (i > 0) {
+              addAttributesToParentToken(tokens[i-1], token);
+            }
           }
           if (token.children[j].type === 'tabular' && token.children[j].children?.length) {
             for (let k = 0; k < token.children[j].children.length; k++){
@@ -56,6 +60,9 @@ export const coreInline = (state) => {
                   currentTag: currentTag,
                 }, {...envToInline});
                 state.md.inline.parse(tok.content, state.md, state.env, tok.children);
+                if (j > 0 && token.children[j-1].type === 'td_open') {
+                  addAttributesToParentToken(token.children[j-1], tok);
+                }
               }
             }
           }
@@ -96,6 +103,9 @@ export const coreInline = (state) => {
             currentTag: currentTag,
           }, {...envToInline});
           state.md.inline.parse(tok.content, state.md, state.env, tok.children);
+          if (j > 0 && token.children[j-1].type === 'td_open') {
+              addAttributesToParentToken(token.children[j-1], tok);
+          }
         } 
       }
       continue;
@@ -108,6 +118,9 @@ export const coreInline = (state) => {
         currentTag: currentTag,
       }, {...envToInline});
       state.md.inline.parse(token.content, state.md, state.env, token.children);
+      if (i > 0) {
+        addAttributesToParentToken(tokens[i-1], token);
+      }
     }
   }
   state.env.footnotes = null;

@@ -332,6 +332,24 @@ export const MathpixStyle = (setTextAlignJustify: boolean = false, useColors: bo
       padding-top: 0;
       padding-bottom: 0;
     }
+    
+    *[data-has-dotfill] {
+      position: relative;
+      overflow: hidden;
+    }
+    
+    *[data-has-dotfill] .dotfill::after {
+      position: absolute;
+      padding-left: .25ch;
+      content: " . . . . . . . . . . . . . . . . . . . "
+          ". . . . . . . . . . . . . . . . . . . . . . . "
+          ". . . . . . . . . . . . . . . . . . . . . . . "
+          ". . . . . . . . . . . . . . . . . . . . . . . "
+          ". . . . . . . . . . . . . . . . . . . . . . . "
+          ". . . . . . . . . . . . . . . . . . . . . . . "
+          ". . . . . . . . . . . . . . . . . . . . . . . ";
+      text-align: right;
+    }
 `};
 
 export const PreviewStyle = `
