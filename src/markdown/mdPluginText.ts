@@ -919,6 +919,28 @@ const pageBreaks: RuleInline = (state) => {
   return true;
 };
 
+const dotfill: RuleInline = (state) => {
+  let startPos = state.pos;
+  if (state.src.charCodeAt(startPos) !== 0x5c /* \ */) {
+    return false;
+  }
+  const match = state.src
+    .slice(++startPos)
+    .match(/^(?:dotfill)/); // eslint-disable-line
+  if (!match) {
+    return false;
+  }
+  const nextPos = startPos + match[0].length;
+  const token = state.push("dotfill", "", 0);
+  token.content = '';
+  if (state.md.options.forLatex) {
+    token.latex = '\\' + match[0];
+  }
+  token.children = [];
+  state.pos = nextPos;
+  return true;
+};
+
 const doubleSlashToSoftBreak: RuleInline = (state) => {
   let startPos = state.pos;
   if (state.src.charCodeAt(startPos) !== 0x5c /* \ */) {
@@ -1257,6 +1279,10 @@ const renderCodeInlineClose = () => {
   return  '</code>';
 };
 
+const renderDotFill = () => {
+  return '&nbsp;<span class="dotfill" aria-hidden="true"></span>'
+};
+
 const renderCodeInline = (tokens, idx, options, env, slf) => {
   const token = tokens[idx];
   // return escapeHtml(token.content);
@@ -1308,6 +1334,7 @@ const mappingTextStyles = {
   out: "out",
   out_open: "out_open",
   out_close: "out_close",
+  dotfill: "dotfill"
 };
 
 const mapping = {
@@ -1345,6 +1372,7 @@ export default () => {
     md.inline.ruler.before('textTypes', 'textUnderline', textUnderline);
     md.inline.ruler.before('textTypes', 'textOut', textOut);
     md.inline.ruler.before('newline', 'newlineToSpace', newlineToSpace);
+    md.inline.ruler.before('textTypes', 'dotfill', dotfill);
     /** ParserInline#ruler2 -> Ruler
      *[[Ruler]] instance. Second ruler used for post-processing **/
     md.inline.ruler2.at('text_collapse', textCollapse);
@@ -1386,7 +1414,9 @@ export default () => {
           case "texttt_open":
             return renderCodeInlineOpen(tokens, idx, options, env, slf);
           case "texttt_close":
-            return renderCodeInlineClose();
+            return renderCodeInlineClose();          
+          case "dotfill":
+            return renderDotFill();
           default:
             return '';
         }

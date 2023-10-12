@@ -308,5 +308,203 @@ t1 & t2
 </tbody>
 </table>
 </div></div>`
-  }
+  },
+  {
+    latex: '\\begin{tabular}{p{0.1\\textwidth}p{0.8\\textwidth}}\n' +
+      '\\hline\n' +
+      'First column&Second column\\\\\n' +
+      '\\hline\n' +
+      'abcd&Lorem ipsum dolor sit amet, consectetuer adipiscing elit.\n' +
+      'Etiam lobortis facilisis sem. Nullam nec mi et neque phare-\n' +
+      'tra sollicitudin. Praesent imperdiet mi nec ante. Donec ul-\n' +
+      'lamcorper, felis non sodales commodo, lectus velit ultrices\n' +
+      'augue, a dignissim nibh lectus placerat pede. Vivamus nunc\n' +
+      'nunc, molestie ut, ultricies vel, semper in, velit. Ut porttitor.\n' +
+      'Praesent in sapien. Lorem ipsum dolor sit amet, consectetuer\n' +
+      'adipiscing elit. Duis fringilla tristique neque. Sed interdum\n' +
+      'libero ut metus. Pellentesque placerat. Nam rutrum augue a\n' +
+      'leo. Morbi sed elit sit amet ante lobortis sollicitudin. Prae-\n' +
+      'sent blandit blandit mauris. Praesent lectus tellus, aliquet\n' +
+      'aliquam, luctus a, egestas a, turpis. Mauris lacinia lorem sit\n' +
+      'amet ipsum. Nunc quis urna dictum turpis accumsan sem-\n' +
+      'per.\n' +
+      'efgh ijkl\n' +
+      '1\n' +
+      '\\\\\n' +
+      'efgh&ijkl\\\\\n' +
+      '\\hline\n' +
+      '\\end{tabular}',
+    svg: '<div class="table_tabular " style="text-align: center">\n' +
+      '<div class="inline-tabular"><table id="tabular">\n' +
+      '<tbody>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left: none !important; border-right: none !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: 120px; vertical-align: top; ">First column</td>\n' +
+      '<td style="text-align: left; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: 960px; vertical-align: top; ">Second column</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left: none !important; border-right: none !important; border-bottom: none !important; border-top: none !important; width: 120px; vertical-align: top; ">abcd</td>\n' +
+      '<td style="text-align: left; border-bottom: none !important; border-top: none !important; width: 960px; vertical-align: top; ">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Etiam lobortis facilisis sem. Nullam nec mi et neque phare- tra sollicitudin. Praesent imperdiet mi nec ante. Donec ul- lamcorper, felis non sodales commodo, lectus velit ultrices augue, a dignissim nibh lectus placerat pede. Vivamus nunc nunc, molestie ut, ultricies vel, semper in, velit. Ut porttitor. Praesent in sapien. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Duis fringilla tristique neque. Sed interdum libero ut metus. Pellentesque placerat. Nam rutrum augue a leo. Morbi sed elit sit amet ante lobortis sollicitudin. Prae- sent blandit blandit mauris. Praesent lectus tellus, aliquet aliquam, luctus a, egestas a, turpis. Mauris lacinia lorem sit amet ipsum. Nunc quis urna dictum turpis accumsan sem- per. efgh ijkl 1</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left: none !important; border-right: none !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: 120px; vertical-align: top; ">efgh</td>\n' +
+      '<td style="text-align: left; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: 960px; vertical-align: top; ">ijkl</td>\n' +
+      '</tr>\n' +
+      '</tbody>\n' +
+      '</table>\n' +
+      '</div></div>'
+  },
+  {
+    latex: '\\begin{tabular}{m{0.1\\textwidth}m{0.8\\textwidth}}\n' +
+      '\\hline\n' +
+      'First column&Second column\\\\\n' +
+      '\\hline\n' +
+      'abcd&Lorem ipsum dolor sit amet, consectetuer adipiscing elit.\n' +
+      'Etiam lobortis facilisis sem. Nullam nec mi et neque phare-\n' +
+      'tra sollicitudin. Praesent imperdiet mi nec ante. Donec ul-\n' +
+      'lamcorper, felis non sodales commodo, lectus velit ultrices\n' +
+      'augue, a dignissim nibh lectus placerat pede. Vivamus nunc\n' +
+      'nunc, molestie ut, ultricies vel, semper in, velit. Ut porttitor.\n' +
+      'Praesent in sapien. Lorem ipsum dolor sit amet, consectetuer\n' +
+      'adipiscing elit. Duis fringilla tristique neque. Sed interdum\n' +
+      'libero ut metus. Pellentesque placerat. Nam rutrum augue a\n' +
+      'leo. Morbi sed elit sit amet ante lobortis sollicitudin. Prae-\n' +
+      'sent blandit blandit mauris. Praesent lectus tellus, aliquet\n' +
+      'aliquam, luctus a, egestas a, turpis. Mauris lacinia lorem sit\n' +
+      'amet ipsum. Nunc quis urna dictum turpis accumsan sem-\n' +
+      'per.\n' +
+      'efgh ijkl\n' +
+      '1\n' +
+      '\\\\\n' +
+      'efgh&ijkl\\\\\n' +
+      '\\hline\n' +
+      '\\end{tabular}',
+    svg: '<div class="table_tabular " style="text-align: center">\n' +
+      '<div class="inline-tabular"><table id="tabular">\n' +
+      '<tbody>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left: none !important; border-right: none !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: 120px; vertical-align: middle; ">First column</td>\n' +
+      '<td style="text-align: left; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: 960px; vertical-align: middle; ">Second column</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left: none !important; border-right: none !important; border-bottom: none !important; border-top: none !important; width: 120px; vertical-align: middle; ">abcd</td>\n' +
+      '<td style="text-align: left; border-bottom: none !important; border-top: none !important; width: 960px; vertical-align: middle; ">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Etiam lobortis facilisis sem. Nullam nec mi et neque phare- tra sollicitudin. Praesent imperdiet mi nec ante. Donec ul- lamcorper, felis non sodales commodo, lectus velit ultrices augue, a dignissim nibh lectus placerat pede. Vivamus nunc nunc, molestie ut, ultricies vel, semper in, velit. Ut porttitor. Praesent in sapien. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Duis fringilla tristique neque. Sed interdum libero ut metus. Pellentesque placerat. Nam rutrum augue a leo. Morbi sed elit sit amet ante lobortis sollicitudin. Prae- sent blandit blandit mauris. Praesent lectus tellus, aliquet aliquam, luctus a, egestas a, turpis. Mauris lacinia lorem sit amet ipsum. Nunc quis urna dictum turpis accumsan sem- per. efgh ijkl 1</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left: none !important; border-right: none !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: 120px; vertical-align: middle; ">efgh</td>\n' +
+      '<td style="text-align: left; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: 960px; vertical-align: middle; ">ijkl</td>\n' +
+      '</tr>\n' +
+      '</tbody>\n' +
+      '</table>\n' +
+      '</div></div>'
+  },
+  {
+    latex: '\\begin{tabular}{b{0.1\\textwidth}b{0.8\\textwidth}}\n' +
+      '\\hline\n' +
+      'First column&Second column\\\\\n' +
+      '\\hline\n' +
+      'abcd&Lorem ipsum dolor sit amet, consectetuer adipiscing elit.\n' +
+      'Etiam lobortis facilisis sem. Nullam nec mi et neque phare-\n' +
+      'tra sollicitudin. Praesent imperdiet mi nec ante. Donec ul-\n' +
+      'lamcorper, felis non sodales commodo, lectus velit ultrices\n' +
+      'augue, a dignissim nibh lectus placerat pede. Vivamus nunc\n' +
+      'nunc, molestie ut, ultricies vel, semper in, velit. Ut porttitor.\n' +
+      'Praesent in sapien. Lorem ipsum dolor sit amet, consectetuer\n' +
+      'adipiscing elit. Duis fringilla tristique neque. Sed interdum\n' +
+      'libero ut metus. Pellentesque placerat. Nam rutrum augue a\n' +
+      'leo. Morbi sed elit sit amet ante lobortis sollicitudin. Prae-\n' +
+      'sent blandit blandit mauris. Praesent lectus tellus, aliquet\n' +
+      'aliquam, luctus a, egestas a, turpis. Mauris lacinia lorem sit\n' +
+      'amet ipsum. Nunc quis urna dictum turpis accumsan sem-\n' +
+      'per.\n' +
+      'efgh ijkl\n' +
+      '1\n' +
+      '\\\\\n' +
+      'efgh&ijkl\\\\\n' +
+      '\\hline\n' +
+      '\\end{tabular}',
+    svg: '<div class="table_tabular " style="text-align: center">\n' +
+      '<div class="inline-tabular"><table id="tabular">\n' +
+      '<tbody>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left: none !important; border-right: none !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: 120px; vertical-align: bottom; ">First column</td>\n' +
+      '<td style="text-align: left; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: 960px; vertical-align: bottom; ">Second column</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left: none !important; border-right: none !important; border-bottom: none !important; border-top: none !important; width: 120px; vertical-align: bottom; ">abcd</td>\n' +
+      '<td style="text-align: left; border-bottom: none !important; border-top: none !important; width: 960px; vertical-align: bottom; ">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Etiam lobortis facilisis sem. Nullam nec mi et neque phare- tra sollicitudin. Praesent imperdiet mi nec ante. Donec ul- lamcorper, felis non sodales commodo, lectus velit ultrices augue, a dignissim nibh lectus placerat pede. Vivamus nunc nunc, molestie ut, ultricies vel, semper in, velit. Ut porttitor. Praesent in sapien. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Duis fringilla tristique neque. Sed interdum libero ut metus. Pellentesque placerat. Nam rutrum augue a leo. Morbi sed elit sit amet ante lobortis sollicitudin. Prae- sent blandit blandit mauris. Praesent lectus tellus, aliquet aliquam, luctus a, egestas a, turpis. Mauris lacinia lorem sit amet ipsum. Nunc quis urna dictum turpis accumsan sem- per. efgh ijkl 1</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left: none !important; border-right: none !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: 120px; vertical-align: bottom; ">efgh</td>\n' +
+      '<td style="text-align: left; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: 960px; vertical-align: bottom; ">ijkl</td>\n' +
+      '</tr>\n' +
+      '</tbody>\n' +
+      '</table>\n' +
+      '</div></div>'
+  },
+  {
+    latex: '\\begin{tabular}{p{0.95\\textwidth}b{0.05\\textwidth}}\n' +
+      '\\multicolumn{2}{c}{Table of contents part I}\\\\\n' +
+      'Summary Summary Summary Summary Summary Summary Summary Summary Summary \\dotfill & 21\\\\\n' +
+      '$\\quad$ Key concepts \\dotfill & 2500\\\\\n' +
+      '$\\quad\\quad$ Detail \\dotfill & 27 \\\\\n' +
+      'References \\dotfill & 31 \\\\\n' +
+      '\\multicolumn{2}{c}{Table of contents psrt II} \\\\\n' +
+      'Summary Summary Summary Summary Summary Summary Summary Summary Summary \\dotfill & 21\\\\\n' +
+      '$\\quad$ Key concepts \\dotfill & 2500\\\\\n' +
+      '$\\quad\\quad$ Detail \\dotfill & 27 \\\\\n' +
+      'References \\dotfill & 31 \\\\\n' +
+      '\\end{tabular}',
+    svg: '<div class="table_tabular " style="text-align: center">\n' +
+      '<div class="inline-tabular"><table id="tabular">\n' +
+      '<tbody>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: center; border-left: none !important; border-bottom: none !important; border-top: none !important; border-top: none !important; border-bottom: none !important; " colspan="2">Table of contents part I</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left: none !important; border-right: none !important; border-bottom: none !important; border-top: none !important; width: 1140px; vertical-align: top; " data-has-dotfill="true">Summary Summary Summary Summary Summary Summary Summary Summary Summary &nbsp;<span class="dotfill" aria-hidden="true"></span></td>\n' +
+      '<td style="text-align: left; border-bottom: none !important; border-top: none !important; width: 60px; vertical-align: bottom; ">21</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left: none !important; border-right: none !important; border-bottom: none !important; border-top: none !important; width: 1140px; vertical-align: top; " data-has-dotfill="true"><span class="math-inline ">\n' +
+      '<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: 0" xmlns="http://www.w3.org/2000/svg" width="2.262ex" height="0" role="img" focusable="false" viewBox="0 0 1000 0"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><g data-mml-node="math"><g data-mml-node="mstyle"><g data-mml-node="mspace"></g></g></g></g></svg></mjx-container></span> Key concepts &nbsp;<span class="dotfill" aria-hidden="true"></span></td>\n' +
+      '<td style="text-align: left; border-bottom: none !important; border-top: none !important; width: 60px; vertical-align: bottom; ">2500</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left: none !important; border-right: none !important; border-bottom: none !important; border-top: none !important; width: 1140px; vertical-align: top; " data-has-dotfill="true"><span class="math-inline ">\n' +
+      '<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: 0" xmlns="http://www.w3.org/2000/svg" width="4.525ex" height="0" role="img" focusable="false" viewBox="0 0 2000 0"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><g data-mml-node="math"><g data-mml-node="mstyle"><g data-mml-node="mspace"></g></g><g data-mml-node="mstyle" transform="translate(1000, 0)"><g data-mml-node="mspace"></g></g></g></g></svg></mjx-container></span> Detail &nbsp;<span class="dotfill" aria-hidden="true"></span></td>\n' +
+      '<td style="text-align: left; border-bottom: none !important; border-top: none !important; width: 60px; vertical-align: bottom; ">27</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left: none !important; border-right: none !important; border-bottom: none !important; border-top: none !important; width: 1140px; vertical-align: top; " data-has-dotfill="true">References &nbsp;<span class="dotfill" aria-hidden="true"></span></td>\n' +
+      '<td style="text-align: left; border-bottom: none !important; border-top: none !important; width: 60px; vertical-align: bottom; ">31</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: center; border-left: none !important; border-bottom: none !important; border-top: none !important; border-bottom: none !important; " colspan="2">Table of contents psrt II</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left: none !important; border-right: none !important; border-bottom: none !important; border-top: none !important; width: 1140px; vertical-align: top; " data-has-dotfill="true">Summary Summary Summary Summary Summary Summary Summary Summary Summary &nbsp;<span class="dotfill" aria-hidden="true"></span></td>\n' +
+      '<td style="text-align: left; border-bottom: none !important; border-top: none !important; width: 60px; vertical-align: bottom; ">21</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left: none !important; border-right: none !important; border-bottom: none !important; border-top: none !important; width: 1140px; vertical-align: top; " data-has-dotfill="true"><span class="math-inline ">\n' +
+      '<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: 0" xmlns="http://www.w3.org/2000/svg" width="2.262ex" height="0" role="img" focusable="false" viewBox="0 0 1000 0"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><g data-mml-node="math"><g data-mml-node="mstyle"><g data-mml-node="mspace"></g></g></g></g></svg></mjx-container></span> Key concepts &nbsp;<span class="dotfill" aria-hidden="true"></span></td>\n' +
+      '<td style="text-align: left; border-bottom: none !important; border-top: none !important; width: 60px; vertical-align: bottom; ">2500</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left: none !important; border-right: none !important; border-bottom: none !important; border-top: none !important; width: 1140px; vertical-align: top; " data-has-dotfill="true"><span class="math-inline ">\n' +
+      '<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: 0" xmlns="http://www.w3.org/2000/svg" width="4.525ex" height="0" role="img" focusable="false" viewBox="0 0 2000 0"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><g data-mml-node="math"><g data-mml-node="mstyle"><g data-mml-node="mspace"></g></g><g data-mml-node="mstyle" transform="translate(1000, 0)"><g data-mml-node="mspace"></g></g></g></g></svg></mjx-container></span> Detail &nbsp;<span class="dotfill" aria-hidden="true"></span></td>\n' +
+      '<td style="text-align: left; border-bottom: none !important; border-top: none !important; width: 60px; vertical-align: bottom; ">27</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left: none !important; border-right: none !important; border-bottom: none !important; border-top: none !important; width: 1140px; vertical-align: top; " data-has-dotfill="true">References &nbsp;<span class="dotfill" aria-hidden="true"></span></td>\n' +
+      '<td style="text-align: left; border-bottom: none !important; border-top: none !important; width: 60px; vertical-align: bottom; ">31</td>\n' +
+      '</tr>\n' +
+      '</tbody>\n' +
+      '</table>\n' +
+      '</div></div>'
+  },
+  // {
+  //   latex: '',
+  //   svg: ''
+  // }
 ];

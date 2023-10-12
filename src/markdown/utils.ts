@@ -1,3 +1,5 @@
+import { Token } from 'markdown-it';
+
 export const endTag = (arg: string, shouldBeFirst = false): RegExp  => {
   try {
     if (arg.indexOf('*') !== -1) {
@@ -37,6 +39,26 @@ export const getWidthFromDocument = (cwidth = 1200) => {
     return el_container ? el_container.offsetWidth : 1200;
   } catch (e) {
     return cwidth;
+  }
+};
+
+export const getLatexTextWidth = (strWidth: string, cWidth = 1200): string => {
+  let res: string = '';
+  try {
+    const reTextWidthTag: RegExp = /\\textwidth/;
+    let match = strWidth.match(reTextWidthTag);
+    if (!match) {
+      return res;
+    }
+    cWidth = getWidthFromDocument(cWidth);
+    let sWidth: string = strWidth.slice(0, match.index);
+    sWidth = sWidth ? sWidth.trim() : '';
+    let dWidth: number = parseFloat(sWidth);
+    dWidth = !dWidth ? 1 : dWidth;
+    res = `width: ${dWidth * cWidth}px; `;
+    return res;
+  } catch (e) {
+    return res;
   }
 };
 
@@ -696,4 +718,46 @@ export const canonicalMathPositions = (math) => {
 export const getSpacesFromLeft = (str: string) => {
   let strTrimLeft = str ? str.trimLeft() : '';
   return str ? str.length - strTrimLeft.length : 0;
+};
+
+/** add additional attributes to the parent token */
+export const addAttributesToParentTokenByType = (
+  parentToken: Token, 
+  token: Token,
+  tokenType: string,
+  attrs: string[],
+  reTagFind: RegExp = null
+  ) => {
+  try {
+    if (!token.content || !token?.children.length) {
+      return;
+    }
+    if (reTagFind && !reTagFind.test(token.content)) {
+      return;
+    }
+    if (token.children.find(item => item.type === tokenType)) {
+      if (parentToken.attrs?.length) {
+        parentToken.attrs.push(attrs)
+      } else {
+        parentToken.attrs = [attrs];
+      }
+    }
+  } catch (e) {
+    console.log("[MMD]=>[addAttributesToParentTokenByType]=>ERROR=>", e);
+  }
+};
+
+export const addAttributesToParentToken = (
+  parentToken: Token,
+  token: Token,
+) => {
+  try {
+    if (!token.content || !token?.children.length) {
+      return;
+    }
+    addAttributesToParentTokenByType(parentToken, token,
+      "dotfill", ['data-has-dotfill', 'true'], /\\dotfill/);
+  } catch (e) {
+    console.log("[MMD]=>[addAttributesToParentToken]=>ERROR=>", e);
+  }
 };

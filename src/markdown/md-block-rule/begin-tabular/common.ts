@@ -133,7 +133,7 @@ export const getVerticallyColumnAlign = (align: string, numCol: number): TAlignD
     if (aV.indexOf(align[j]) >= 0) {
       switch (align[j]) {
         case 'm':
-          hAlign.push('center');
+          hAlign.push('left');
           vAlign.push('middle');
           break;
         case 'p':
@@ -141,7 +141,7 @@ export const getVerticallyColumnAlign = (align: string, numCol: number): TAlignD
           vAlign.push('top');
           break;
         case 'b':
-          hAlign.push('center');
+          hAlign.push('left');
           vAlign.push('bottom');
           break;
       }

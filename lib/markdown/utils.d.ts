@@ -2,6 +2,7 @@ export declare const endTag: (arg: string, shouldBeFirst?: boolean) => RegExp;
 export declare const beginTag: (arg: string, shouldBeFirst?: boolean) => RegExp;
 export declare const getTextWidth: () => number;
 export declare const getWidthFromDocument: (cwidth?: number) => number;
+export declare const getLatexTextWidth: (strWidth: string, cWidth?: number) => string;
 export declare const isNotBackticked: (str: string, tag: string) => boolean;
 export declare const includesSimpleMathTag: (str: string, tag?: string) => boolean;
 export declare const includesMultiMathBeginTag: (str: any, tag: any) => RegExp | null;
@@ -44,3 +45,6 @@ export declare const findOpenCloseTagsMathEnvironment: (str: string, tagOpen: Re
 export declare const canonicalMath: (math: any) => any[];
 export declare const canonicalMathPositions: (math: any) => any[];
 export declare const getSpacesFromLeft: (str: string) => number;
+/** add additional attributes to the parent token */
+export declare const addAttributesToParentTokenByType: (parentToken: Token, token: Token, tokenType: string, attrs: string[], reTagFind?: RegExp) => void;
+export declare const addAttributesToParentToken: (parentToken: Token, token: Token) => void;

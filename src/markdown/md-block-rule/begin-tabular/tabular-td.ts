@@ -1,5 +1,6 @@
 import { TAttrs, TTokenTabular } from './index';
-import {TDecimal} from "./common";
+import { TDecimal } from "./common";
+import { getLatexTextWidth } from "../../utils";
 
 type TLines = {left?: string, right?: string, bottom?: string, top?: string};
 type TAligns = {h?: string, v?: string, w?: string};
@@ -60,7 +61,13 @@ export const setColumnLines = (aligns: TAligns| null, lines: TLines): string[] =
   const textAlign: string = `text-align: ${h 
     ? h ==='decimal' ? 'center' : h
     : 'center'}; `;
-  const width: string = w ? `width: ${w}; ` : '';
+  let width: string = '';
+  if (w) {
+    width = getLatexTextWidth(w, 1200);
+    if (!width) {
+      width = `width: ${w}; `
+    }
+  }
   const vAlign: string = v ? `vertical-align: ${v}; ` : '';
   return [ 'style', textAlign + borderLeft + borderRight + borderBottom + borderTop + width + vAlign];
 };
