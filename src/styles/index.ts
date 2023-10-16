@@ -41,6 +41,10 @@ export const MathpixStyle = (setTextAlignJustify: boolean = false, useColors: bo
     #setText table {
       margin-bottom: 1em;
     }
+    
+    #preview-content .sub-table table, #setText .sub-table table {
+      margin-bottom: 0;
+    }
 
     mjx-container {
       text-indent: 0;
