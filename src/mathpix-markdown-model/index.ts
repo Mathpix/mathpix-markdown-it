@@ -448,7 +448,7 @@ class MathpixMarkdown_Model {
       let style: string = ContainerStyle(useColors);
       style += this.getMathjaxStyle();
       style += MathpixStyle(false, useColors, '', scaleEquation = true );
-      // style += codeStyles;
+      style += codeStyles;
       style += tabularStyles(useColors);
       style += listsStyles;
       return style;
