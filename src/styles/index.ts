@@ -122,6 +122,9 @@ export const MathpixStyle = (setTextAlignJustify: boolean = false, useColors: bo
     }
     #preview-content pre code, #setText pre code{
         padding: 1rem;
+        display: block;
+        overflow-x: auto;
+        line-height: 24px;
     }
     .empty {
         text-align: center;
