@@ -124,7 +124,6 @@ export const MathpixStyle = (setTextAlignJustify: boolean = false, useColors: bo
         padding: 1rem;
         display: block;
         overflow-x: auto;
-        font-size: 15px;
         line-height: 24px;
     }
     .empty {

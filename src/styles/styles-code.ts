@@ -12,6 +12,7 @@ export const codeStyles = `
     #preview-content pre code, #setText pre code {
       font-family: 'DM Mono', Inconsolata, monospace;
       color: #333;
+      font-size: 15px;
     }
 
     .hljs-comment,
