@@ -11,11 +11,7 @@ export const codeStyles = `
     }
     #preview-content pre code, #setText pre code {
       font-family: 'DM Mono', Inconsolata, monospace;
-      display: block;
       color: #333;
-      overflow-x: auto;
-      font-size: 15px;
-      line-height: 24px;
     }
 
     .hljs-comment,
