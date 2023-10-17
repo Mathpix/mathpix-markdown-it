@@ -335,6 +335,8 @@ export const renderTabularInline = (a, token, options, env, slf) => {
   token.tsv = data.tsv;
   token.csv = data.csv;
   token.tableMd = data.tableMd;//tableMarkdownJoin(data.tableMd, data.align);
+  let className = 'inline-tabular';
+  className += token.isSubTable ? ' sub-table' : '';
 
   if (include_table_html) {
     tabular = data.table;
@@ -348,5 +350,5 @@ export const renderTabularInline = (a, token, options, env, slf) => {
   const csv = include_csv && token.csv
     ? `<csv style="display: none">${formatSource(CsvJoin(token.csv,options), true)}</csv>`
     : '';
-  return `<div class="inline-tabular">${tabular}${tsv}${tableMd}${csv}</div>`
+  return `<div class="${className}">${tabular}${tsv}${tableMd}${csv}</div>`
 };
