@@ -307,7 +307,7 @@ export const findBackTick = (posStart: number, str: string, pending = '') => {
   }
 };
 
-export const findOpenCloseTags = (str: string, tagOpen, tagClose, pendingBackTick = '') => {
+export const findOpenCloseTags = (str: string, tagOpen, tagClose, pendingBackTick = '', noBreakBackTick = false) => {
   let max = str.length;
   let arrOpen = [];
   let arrClose = [];
@@ -333,9 +333,11 @@ export const findOpenCloseTags = (str: string, tagOpen, tagClose, pendingBackTic
       if (data) {
         if (data.pending) {
           pending = data.pending;
-          break;
+          if (!noBreakBackTick) {
+            break;
+          }
         }
-        pos = data.posEnd;
+        pos = noBreakBackTick ? data.posEnd - 1 : data.posEnd;
         continue;
       }
     }

@@ -1,4 +1,5 @@
 import { terminatedRules } from './common/consts';
+import { findBackTick } from "./utils";
 
 const hasProp = Object.prototype.hasOwnProperty;
 
@@ -23,6 +24,60 @@ export const uniqueSlug = (slug: string, slugs) => {
     return uniq;
 };
 
+export interface InlineCodeItem {
+  marker: string,
+  posStart: number,
+  posEnd: number,
+  content: string
+}
+
+const getInlineCodeListFromString = (str): Array<InlineCodeItem> => {
+  let inlineCodeList: Array<InlineCodeItem> = [];
+  if (!str || !str.trim()) {
+    return inlineCodeList;
+  }
+  if (str.indexOf('`') === -1) {
+    return inlineCodeList;
+  }
+  try {
+    let pos = 0;
+    let beforeCharCode: number = 0;
+    let arrLines = str.split('\n\n');
+    if (arrLines?.length) {
+      for (let i = 0; i < arrLines.length; i++) {
+        pos += i > 0 ? 2 : 0;
+        let line = arrLines[i];
+        if (!line || !line.trim() || line.indexOf('`') === -1) {
+          pos += line?.length ? line.length : 0;
+          continue;
+        }
+        for (let j = 0; j < line.length; j++) {
+          const ch = line.charCodeAt(j);
+          if (ch === 0x60/* ` */ && beforeCharCode !== 0x5c /* \ */) {
+            const data = findBackTick(j, line);
+            if (data.pending) {
+              break;
+            }
+            inlineCodeList.push({
+              marker: data.marker,
+              posStart: pos + j,
+              posEnd: pos + data.posEnd,
+              content: str.slice(pos + j, pos + data.posEnd)
+            });
+            j = data.posEnd - 1;
+          }
+          beforeCharCode = ch;
+        }
+        pos += line?.length ? line.length : 0;
+      }
+    }
+    return inlineCodeList;
+  } catch (err) {
+    console.log("[MMD]=>ERROR=>[getInlineCodeListFromString]=>", err);
+    return inlineCodeList;
+  }
+};
+
 /** The function finds the position of the end marker in the specified string 
  * and returns that position and the content between the start and end markers.
  * 
@@ -43,34 +98,38 @@ export const uniqueSlug = (slug: string, slugs) => {
 export const findEndMarker = (str: string, startPos: number = 0, beginMarker: string = "{", endMarker: string = "}", onlyEnd = false) => {
   let content: string = '';
   let nextPos: number = 0;
+  if (!str || !str.trim()) {
+    return { res: false }
+  }
   if (str[startPos] !== beginMarker && !onlyEnd) {
     return { res: false }
   }
   let openBrackets = 1;
-  let openCode = 0;
   let beforeCharCode: number = 0;
+  let inlineCodeList: Array<InlineCodeItem> = getInlineCodeListFromString(str);
   for (let i = startPos + 1; i < str.length; i++) {
     const chr = str[i];
     nextPos = i;
-    /** Inline code opening/closing marker (and it's not shielded '\`' )
-     * beginMarker and endMarker will be ignored if they are inline code. */  
-    if (chr === '`' && beforeCharCode !== 0x5c /* \ */) {
-      if (openCode > 0) {
-        openCode--;
-      } else {
-        openCode++;
-      }
-    }
     /** Found beginMarker and it is not inline code. (and it's not shielded '\{' )
-     * We increase the counter of open tags <openBrackets> and continue the search */  
-    if (chr === beginMarker && openCode === 0 && beforeCharCode !== 0x5c /* \ */) {
+     * We increase the counter of open tags <openBrackets> and continue the search */
+    if (chr === beginMarker && beforeCharCode !== 0x5c /* \ */) {
       content += chr;
-      openBrackets++;
+      let isCode = inlineCodeList?.length 
+        ? inlineCodeList.find(item => item.posStart <= i && item.posEnd >= i)
+        : null;
+      if (!isCode) {
+        openBrackets++;
+      }
       continue;
     }
     /** Found endMarker and it is not inline code (and it's not shielded '\}' ) */
-    if (chr === endMarker && openCode === 0 && beforeCharCode !== 0x5c /* \ */) {
-      openBrackets--;
+    if (chr === endMarker && beforeCharCode !== 0x5c /* \ */) {
+      let isCode = inlineCodeList?.length  
+        ? inlineCodeList.find(item => item.posStart <= i && item.posEnd >= i)
+        : null;
+      if (!isCode) {
+        openBrackets--;
+      }
       if (openBrackets > 0) {
         /** Continue searching if not all open tags <openBrackets> have been closed */
         content += chr;
@@ -94,7 +153,6 @@ export const findEndMarker = (str: string, startPos: number = 0, beginMarker: st
     endPos: nextPos
   };
 };
-
 
 export const getTerminatedRules = (rule: string) => {
   if (terminatedRules.hasOwnProperty(rule)) {

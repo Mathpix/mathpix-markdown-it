@@ -118,8 +118,18 @@ export const coreInline = (state) => {
         currentTag: currentTag,
       }, {...envToInline});
       state.md.inline.parse(token.content, state.md, state.env, token.children);
-      if (i > 0) {
-        addAttributesToParentToken(tokens[i-1], token);
+      if (token.type === 'inline' && token.children?.length) {
+        if (token.lastBreakToSpace && token.children[token.children.length-1].type === 'softbreak') {
+          token.children[token.children.length-1].hidden = true;
+          token.children[token.children.length-1].showSpace = true;
+        }        
+        if (token.firstBreakToSpace && token.children[0].type === 'softbreak') {
+          token.children[0].hidden = true;
+          token.children[0].showSpace = true;
+        }
+        if (i > 0) {
+          addAttributesToParentToken(tokens[i-1], token);
+        }
       }
     }
   }
