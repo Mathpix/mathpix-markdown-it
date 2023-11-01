@@ -354,6 +354,9 @@ export const findOpenCloseTags = (str: string, tagOpen, tagClose, pendingBackTic
         });
         pos = posEnd
       } else {
+        if (!tagClose) {
+          continue;
+        }
         match = str
           .slice(pos)
           .match(tagClose);

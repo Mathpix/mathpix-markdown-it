@@ -1,8 +1,10 @@
 import { Token, RuleBlock } from 'markdown-it';
 import { 
-  reOpenTagFootnote, 
+  reOpenTagFootnote,
+  reOpenTagFootnoteG,
   reOpenTagFootnoteNumbered,
   reOpenTagFootnotetext,
+  reOpenTagFootnotetextG,
   reOpenTagFootnotetextNumbered
 } from "../common/consts";
 import { findEndMarker } from "../common";
@@ -24,7 +26,7 @@ export const latex_footnote_block: RuleBlock = (state, startLine, endLine, silen
     let hasOpenTag = false;
     let pending = '';
     let terminate = false;
-    if (!reOpenTagFootnote.test(lineText)) {
+    if (!reOpenTagFootnoteG.test(lineText)) {
       // jump line-by-line until empty one or EOF
       for (; nextLine < endLine; nextLine++) {
         if (fence(state, nextLine, endLine, true)) {
@@ -42,7 +44,7 @@ export const latex_footnote_block: RuleBlock = (state, startLine, endLine, silen
         }
         fullContent += fullContent ? '\n' : '';
         fullContent += lineText;
-        if (reOpenTagFootnote.test(fullContent)) {
+        if (reOpenTagFootnoteG.test(fullContent)) {
           hasOpenTag = true;
           nextLine += 1;
           break;
@@ -52,7 +54,7 @@ export const latex_footnote_block: RuleBlock = (state, startLine, endLine, silen
         return false;
       }
     }
-    let dataTags = findOpenCloseTags(fullContent, reOpenTagFootnote, '}', '', true);
+    let dataTags = findOpenCloseTags(fullContent, reOpenTagFootnote, '', '', true);
     if (!dataTags?.arrOpen?.length) {
       return false;
     }
@@ -75,6 +77,8 @@ export const latex_footnote_block: RuleBlock = (state, startLine, endLine, silen
     let hasEnd = false;
     let nextLineContent = nextLine;
     let inlineContentAfter = '';
+    let openBrackets = 0;
+    let contentLength = 0;
     for (; nextLine <= endLine; nextLine++) {
       if (fence(state, nextLine, endLine, true)) {
         terminate = true;
@@ -90,7 +94,7 @@ export const latex_footnote_block: RuleBlock = (state, startLine, endLine, silen
         if (!inlineContentAfter?.length) {
           nextLineContent = nextLine;
         }
-        inlineContentAfter += inlineContentAfter?.length ? '\n' : '';
+        inlineContentAfter += '\n';
         inlineContentAfter += lineText;
         let nextLineText = nextLine + 1 <= endLine
           ?  state.src.slice(state.bMarks[nextLine + 1], state.eMarks[nextLine + 1])
@@ -98,26 +102,36 @@ export const latex_footnote_block: RuleBlock = (state, startLine, endLine, silen
         if (!nextLineText || !nextLineText.trim()) {
           break
         }
+        continue;
       }
-      content += '\n';
-      content += lineText;
       fullContent += '\n';
       fullContent += lineText;
       if (!lineText || !lineText.trim()) {
         pending = '';
       }
       if (pending) {
-        dataTags = findOpenCloseTags(fullContent, reOpenTagFootnotetext, '}');
+        dataTags = findOpenCloseTags(fullContent, reOpenTagFootnotetext, '');
         if (!dataTags?.arrOpen?.length) {
           break;
         }
       }
-      data = findEndMarker(content, -1, '{', '}', true);
+      data = findEndMarker(lineText, -1, '{', '}', true, openBrackets);
       if (data.res) {
         hasEnd = true;
         nextLineContent = nextLine;
-        inlineContentAfter = state.src.slice(startPos + startContent + data.nextPos, state.eMarks[nextLine]);
+        inlineContentAfter = state.src.slice(startPos + startContent + contentLength + 1 + data.nextPos, state.eMarks[nextLine]);
+        content += '\n';
+        content += data.content;
+        openBrackets = 0;
+        continue;
+      } else {
+        if (data.openBrackets) {
+          openBrackets = data.openBrackets;
+        }
       }
+      content += '\n';
+      content += lineText;
+      contentLength = content ? content.length : 0;
     }
     if (!data || !data.res) {
       return false;
@@ -126,7 +140,6 @@ export const latex_footnote_block: RuleBlock = (state, startLine, endLine, silen
     if (silent) {
       return true;
     }
-    content = data.content;
     state.line = nextLine + 1;
     let inlineContentBefore = startFootnote > 0
       ? state.src.slice(startPos, startPos + startFootnote)
@@ -181,7 +194,7 @@ export const latex_footnotetext_block: RuleBlock = (state, startLine, endLine, s
     let hasOpenTag = false;
     let pending = '';
     let terminate = false;
-    if (!reOpenTagFootnotetext.test(lineText)) {
+    if (!reOpenTagFootnotetextG.test(lineText)) {
       // jump line-by-line until empty one or EOF
       for (; nextLine < endLine; nextLine++) {
         if (fence(state, nextLine, endLine, true)) {
@@ -199,7 +212,7 @@ export const latex_footnotetext_block: RuleBlock = (state, startLine, endLine, s
         }
         fullContent += fullContent ? '\n' : '';
         fullContent += lineText;
-        if (reOpenTagFootnotetext.test(fullContent)) {
+        if (reOpenTagFootnotetextG.test(fullContent)) {
           hasOpenTag = true;
           nextLine += 1;
           break;
@@ -209,7 +222,7 @@ export const latex_footnotetext_block: RuleBlock = (state, startLine, endLine, s
         return false;
       }
     }
-    let dataTags = findOpenCloseTags(fullContent, reOpenTagFootnotetext, '}', '', true);
+    let dataTags = findOpenCloseTags(fullContent, reOpenTagFootnotetext, '', '', true);
     if (!dataTags?.arrOpen?.length) {
       return false;
     }
@@ -232,6 +245,8 @@ export const latex_footnotetext_block: RuleBlock = (state, startLine, endLine, s
     let hasEnd = false;
     let nextLineContent = nextLine;
     let inlineContentAfter = '';
+    let openBrackets = 0;
+    let contentLength = 0;
     for (; nextLine <= endLine; nextLine++) {
       if (fence(state, nextLine, endLine, true)) {
         terminate = true;
@@ -247,7 +262,7 @@ export const latex_footnotetext_block: RuleBlock = (state, startLine, endLine, s
         if (!inlineContentAfter?.length) {
           nextLineContent = nextLine;
         }
-        inlineContentAfter += inlineContentAfter?.length ? '\n' : '';
+        inlineContentAfter += '\n';
         inlineContentAfter += lineText;
         let nextLineText = nextLine + 1 <= endLine
           ?  state.src.slice(state.bMarks[nextLine + 1], state.eMarks[nextLine + 1])
@@ -255,26 +270,36 @@ export const latex_footnotetext_block: RuleBlock = (state, startLine, endLine, s
         if (!nextLineText || !nextLineText.trim()) {
           break
         }
+        continue;
       }
-      content += '\n';
-      content += lineText;
       fullContent += '\n';
       fullContent += lineText;
       if (!lineText || !lineText.trim()) {
         pending = '';
       }
       if (pending) {
-        dataTags = findOpenCloseTags(fullContent, reOpenTagFootnotetext, '}');
+        dataTags = findOpenCloseTags(fullContent, reOpenTagFootnotetext, '');
         if (!dataTags?.arrOpen?.length) {
           break;
         }
       }
-      data = findEndMarker(content, -1, '{', '}', true);
+      data = findEndMarker(lineText, -1, '{', '}', true, openBrackets);
       if (data.res) {
         hasEnd = true;
         nextLineContent = nextLine;
-        inlineContentAfter = state.src.slice(startPos + startContent + data.nextPos, state.eMarks[nextLine]);
+        inlineContentAfter = state.src.slice(startPos + startContent + contentLength + 1 + data.nextPos, state.eMarks[nextLine]);
+        content += '\n';
+        content += data.content;
+        openBrackets = 0;
+        continue;
+      } else {
+        if (data.openBrackets) {
+          openBrackets = data.openBrackets;
+        }
       }
+      content += '\n';
+      content += lineText;
+      contentLength = content ? content.length : 0;
     }
     if (!data || !data.res) {
       return false;
@@ -283,7 +308,6 @@ export const latex_footnotetext_block: RuleBlock = (state, startLine, endLine, s
     if (silent) {
       return true;
     }
-    content = data.content;
     state.line = nextLine + 1;
     let inlineContentBefore = startFootnote > 0 
       ? state.src.slice(startPos, startPos + startFootnote) 

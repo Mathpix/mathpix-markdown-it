@@ -25,14 +25,16 @@ export interface InlineCodeItem {
  *     content?: string, - Contains content between start and end markers
  *     nextPos?: number - Contains the position of the end marker in the string
  * */
-export declare const findEndMarker: (str: string, startPos?: number, beginMarker?: string, endMarker?: string, onlyEnd?: boolean) => {
+export declare const findEndMarker: (str: string, startPos?: number, beginMarker?: string, endMarker?: string, onlyEnd?: boolean, openBracketsBefore?: number) => {
     res: boolean;
     content?: undefined;
+    openBrackets?: undefined;
     nextPos?: undefined;
     endPos?: undefined;
 } | {
     res: boolean;
     content: string;
+    openBrackets: number;
     nextPos?: undefined;
     endPos?: undefined;
 } | {
@@ -40,5 +42,6 @@ export declare const findEndMarker: (str: string, startPos?: number, beginMarker
     content: string;
     nextPos: number;
     endPos: number;
+    openBrackets?: undefined;
 };
 export declare const getTerminatedRules: (rule: string) => any[];
