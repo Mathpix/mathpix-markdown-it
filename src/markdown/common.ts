@@ -95,7 +95,7 @@ const getInlineCodeListFromString = (str): Array<InlineCodeItem> => {
  *     content?: string, - Contains content between start and end markers
  *     nextPos?: number - Contains the position of the end marker in the string
  * */
-export const findEndMarker = (str: string, startPos: number = 0, beginMarker: string = "{", endMarker: string = "}", onlyEnd = false) => {
+export const findEndMarker = (str: string, startPos: number = 0, beginMarker: string = "{", endMarker: string = "}", onlyEnd = false, openBracketsBefore = 0) => {
   let content: string = '';
   let nextPos: number = 0;
   if (!str || !str.trim()) {
@@ -104,7 +104,7 @@ export const findEndMarker = (str: string, startPos: number = 0, beginMarker: st
   if (str[startPos] !== beginMarker && !onlyEnd) {
     return { res: false }
   }
-  let openBrackets = 1;
+  let openBrackets = openBracketsBefore ? openBracketsBefore : 1;
   let beforeCharCode: number = 0;
   let inlineCodeList: Array<InlineCodeItem> = getInlineCodeListFromString(str);
   for (let i = startPos + 1; i < str.length; i++) {
@@ -143,7 +143,8 @@ export const findEndMarker = (str: string, startPos: number = 0, beginMarker: st
   if (openBrackets > 0) {
     return {
       res: false,
-      content: content
+      content: content,
+      openBrackets: openBrackets
     }
   }
   return {

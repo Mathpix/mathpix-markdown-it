@@ -52,9 +52,11 @@ export const openTagTabular: RegExp = /^\\begin\s{0,}{tabular}\s{0,}\{([^}]*)\}/
 export const closeTagTabular: RegExp = /^\\end\s{0,}{tabular}/;
 
 export const reFootNote: RegExp = /^\\footnote/;
-export const reOpenTagFootnote: RegExp = /\\footnote\s{0,}\[\s{0,}\]\s{0,}{|\\footnote\s{0,}\[-?\d+\]\s{0,}{|\\footnote\s{0,}{/;
+export const reOpenTagFootnote: RegExp = /^\\footnote\s{0,}\[\s{0,}\]\s{0,}{|^\\footnote\s{0,}\[-?\d+\]\s{0,}{|^\\footnote\s{0,}{/;
+export const reOpenTagFootnoteG: RegExp = /\\footnote\s{0,}\[\s{0,}\]\s{0,}{|\\footnote\s{0,}\[-?\d+\]\s{0,}{|\\footnote\s{0,}{/;
 export const reOpenTagFootnoteNumbered: RegExp = /\\footnote\s{0,}\[(?<number>-?\d+)\]\s{0,}{/;
-export const reOpenTagFootnotetext: RegExp = /\\footnotetext\s{0,}\[\s{0,}\]\s{0,}{|\\footnotetext\s{0,}\[-?\d+\]\s{0,}{|\\footnotetext\s{0,}{|\\blfootnotetext\s{0,}{/;
+export const reOpenTagFootnotetext: RegExp = /^\\footnotetext\s{0,}\[\s{0,}\]\s{0,}{|^\\footnotetext\s{0,}\[-?\d+\]\s{0,}{|^\\footnotetext\s{0,}{|^\\blfootnotetext\s{0,}{/;
+export const reOpenTagFootnotetextG: RegExp = /\\footnotetext\s{0,}\[\s{0,}\]\s{0,}{|\\footnotetext\s{0,}\[-?\d+\]\s{0,}{|\\footnotetext\s{0,}{|\\blfootnotetext\s{0,}{/;
 export const reOpenTagFootnotetextNumbered: RegExp = /\\footnotetext\s{0,}\[(?<number>-?\d+)\]\s{0,}{/;
 export const reFootNoteMark: RegExp = /^\\footnotemark/;
 export const reFootNoteText: RegExp = /^\\footnotetext|\\blfootnotetext/;
