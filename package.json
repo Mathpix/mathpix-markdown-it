@@ -41,8 +41,8 @@
   "dependencies": {
     "@babel/runtime": "^7.17.2",
     "@types/node": "^11.11.7",
-    "@types/react": "^17.0.0",
-    "@types/react-dom": "^17.0.0",
+    "@types/react": "^18.2.35",
+    "@types/react-dom": "^18.2.14",
     "chai": "^4.2.0",
     "copy-to-clipboard": "^3.3.1",
     "deepmerge": "^4.2.2",
@@ -66,8 +66,8 @@
     "parse-srcset": "^1.0.2",
     "postcss": "^7.0.36",
     "punycode": "^2.1.1",
-    "react": "^16.7.0",
-    "react-dom": "^16.7.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "react-emotion": "^10.0.0",
     "speech-rule-engine": "^4.0.2",
     "tslib": "^2.6.0"
