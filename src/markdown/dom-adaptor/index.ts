@@ -1,4 +1,4 @@
-import * as domino from 'domino';
+import * as domino from '@mathpix/domino';
 
 export interface Global {
   document: Document;

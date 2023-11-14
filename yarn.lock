@@ -1068,6 +1068,11 @@
     "@jridgewell/resolve-uri" "^3.0.3"
     "@jridgewell/sourcemap-codec" "^1.4.10"
 
+"@mathpix/domino@2.1.8":
+  version "2.1.8"
+  resolved "https://registry.yarnpkg.com/@mathpix/domino/-/domino-2.1.8.tgz#0380158e06330abeb0f2bfe19101292aa7edf168"
+  integrity sha512-FL9s/q/9Civ8p2qWv1+ke0ztR+qblO2x/YYsKpDOlMcejlnHU8ErTH+gfiJK4B365IuVVUzHXsZpL3Hog3+BYw==
+
 "@nicolo-ribaudo/semver-v6@^6.3.3":
   version "6.3.3"
   resolved "https://registry.yarnpkg.com/@nicolo-ribaudo/semver-v6/-/semver-v6-6.3.3.tgz#ea6d23ade78a325f7a52750aab1526b02b628c29"
@@ -2078,10 +2083,6 @@ domhandler@^4.2.0:
   integrity sha512-GrwoxYN+uWlzO8uhUXRl0P+kHE4GtVPfYzVLcUxPL7KNdHKj66vvlhiweIHqYYXWlw+T8iLMp42Lm67ghw4WMQ==
   dependencies:
     domelementtype "^2.2.0"
-
-"domino@https://github.com/Mathpix/domino.git":
-  version "2.1.6"
-  resolved "https://github.com/Mathpix/domino.git#30ec7627c22dbecf0e77141d48c4da629d54b850"
 
 domutils@^2.0.0:
   version "2.8.0"
