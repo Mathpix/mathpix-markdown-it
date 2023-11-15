@@ -44,6 +44,7 @@ export interface optionsMathpixMarkdown {
     parserErrors?: ParserErrors;
     codeHighlight?: CodeHighlight;
     footnotes?: Footnotes;
+    copyToClipboard?: boolean;
 }
 export type TMarkdownItOptions = {
     isDisableFancy?: boolean;
@@ -90,6 +91,7 @@ export type TMarkdownItOptions = {
     parserErrors?: ParserErrors;
     codeHighlight?: CodeHighlight;
     footnotes?: Footnotes;
+    copyToClipboard?: boolean;
 };
 export type TOutputMath = {
     include_mathml?: boolean;

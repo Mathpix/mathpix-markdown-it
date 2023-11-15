@@ -14,6 +14,7 @@ import { generateHtmlPage } from './html-page';
 import { getMaxWidthStyle } from '../styles/halpers';
 import { parseMarkdownByElement } from '../helpers/parse-mmd-element';
 import { menuStyle } from '../contex-menu/styles';
+import { clipboardCopyStyles } from '../copy-to-clipboard/clipboard-copy-styles';
 
 export interface optionsMathpixMarkdown {
     alignMathBlock?: Property.TextAlign;
@@ -59,6 +60,7 @@ export interface optionsMathpixMarkdown {
     parserErrors?: ParserErrors;
     codeHighlight?: CodeHighlight;
     footnotes?: Footnotes;
+    copyToClipboard?: boolean;
 }
 
 export type TMarkdownItOptions = {
@@ -106,6 +108,7 @@ export type TMarkdownItOptions = {
   parserErrors?: ParserErrors;
   codeHighlight?: CodeHighlight;
   footnotes?: Footnotes;
+  copyToClipboard?: boolean;
 }
 
 export type TOutputMath = {
@@ -384,7 +387,9 @@ class MathpixMarkdown_Model {
                   + tabularStyles() 
                   + listsStyles 
                   + TocStyle("toc")
-                  + menuStyle();
+                  + menuStyle()
+                  + clipboardCopyStyles()
+                ;
                 document.head.appendChild(style);
             }
             return true;
@@ -428,7 +433,8 @@ class MathpixMarkdown_Model {
         + codeStyles 
         + tabularStyles() 
         + listsStyles
-        + menuStyle();
+        + menuStyle()
+        + clipboardCopyStyles();
       return style;
     };
 
@@ -440,8 +446,8 @@ class MathpixMarkdown_Model {
       }
       
       return showToc 
-          ? style + PreviewStyle + TocStyle(tocContainerName) + menuStyle()
-          : style + PreviewStyle + menuStyle();
+          ? style + PreviewStyle + TocStyle(tocContainerName) + menuStyle() + clipboardCopyStyles()
+          : style + PreviewStyle + menuStyle() + clipboardCopyStyles();
     };
 
     getMathpixMarkdownStyles = ( useColors: boolean = true, scaleEquation = true ) => {
@@ -477,7 +483,8 @@ class MathpixMarkdown_Model {
           highlights = [],
           parserErrors = ParserErrors.show,
           codeHighlight = {},
-          footnotes = {}
+          footnotes = {},
+          copyToClipboard = false
         }
          = options || {};
 
@@ -524,7 +531,8 @@ class MathpixMarkdown_Model {
           highlights: highlights,
           parserErrors: parserErrors,
           codeHighlight: codeHighlight,
-          footnotes: footnotes
+          footnotes: footnotes,
+          copyToClipboard: copyToClipboard
         };
 
         const styleFontSize = fontSize ? ` font-size: ${options.fontSize}px;` : '';

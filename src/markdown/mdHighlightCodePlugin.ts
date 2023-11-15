@@ -2,6 +2,7 @@ import hljs from 'highlight.js';
 const escapeHtml = require('markdown-it/lib/common/utils').escapeHtml;
 import { PREVIEW_LINE_CLASS, PREVIEW_PARAGRAPH_PREFIX, code_block_injectLineNumbers } from "./rules";
 import { codeHighlightDef } from "./common/consts";
+import { clipboardCopyElement } from "../copy-to-clipboard/clipboard-copy-element";
 
 const maybe = f => {
   try {
@@ -57,8 +58,19 @@ const wrapFence = render => (tokens, idx, options, env, slf) => {
       tokens[idx].attrJoin("data_line_end", `${String(endLine-1)}`);
       tokens[idx].attrJoin("data_line", `${String([line, endLine])}`);
       tokens[idx].attrJoin("count_line", `${String(endLine-line)}`);
-      html = html.replace('<pre>', '<pre' + slf.renderAttrs(tokens[idx]) + '>')
+      if (options.copyToClipboard) {
+        tokens[idx].attrJoin("style", `overflow: auto; position: relative;`);
+        let htmlClipboardCopy = clipboardCopyElement(tokens[idx].content);
+        html = '<div ' + slf.renderAttrs(tokens[idx]) + '>' + html + htmlClipboardCopy + '</div>';
+      } else {
+        html = html.replace('<pre>', '<pre' + slf.renderAttrs(tokens[idx]) + '>')
+      }
     }
+  }
+  if (options.copyToClipboard) {
+    tokens[idx].attrJoin("style", `overflow: auto; position: relative;`);
+    let htmlClipboardCopy = clipboardCopyElement(tokens[idx].content);
+    html = '<div ' + slf.renderAttrs(tokens[idx]) + '>' + html + htmlClipboardCopy + '</div>';
   }
   return html;
 };
