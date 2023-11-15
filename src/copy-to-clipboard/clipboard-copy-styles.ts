@@ -1,10 +1,7 @@
 export const clipboardCopyStyles = () => `
 .ClipboardButton {
-  -webkit-appearance: button;
-  -moz-appearance: button;
   padding: 0;
   margin: 0.5rem;
-  
   display: inline-block;
   cursor: pointer;
   color: rgb(36, 41, 47);

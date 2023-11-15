@@ -51,8 +51,8 @@ const showCopy = (button) => {
   if (!copyIcon || !checkIcon)
     return;
   button.setAttribute('aria-label', 'Copy');
-  button.classList.remove('mmd-tooltipped');
-  button.classList.remove('mmd-tooltipped-w');
+  // button.classList.remove('mmd-tooltipped');
+  // button.classList.remove('mmd-tooltipped-w');
   showSVG(copyIcon);
   hideSVG(checkIcon);
 };
@@ -63,8 +63,8 @@ const showCheck = (button) => {
   if (!copyIcon || !checkIcon)
     return;
   button.setAttribute('aria-label', 'Copied');
-  button.classList.add('mmd-tooltipped');
-  button.classList.add('mmd-tooltipped-w');
+  // button.classList.add('mmd-tooltipped');
+  // button.classList.add('mmd-tooltipped-w');
   hideSVG(copyIcon);
   showSVG(checkIcon);
 };
