@@ -1,4 +1,4 @@
-import { Token } from 'markdown-it';
+import { markdownit, Token } from 'markdown-it';
 export interface ITocItem {
     level: number;
     link: string;
@@ -12,5 +12,5 @@ export interface ITocData {
     tocList: Array<ITocItem>;
 }
 export declare const clearSlugsTocItems: () => void;
-declare const _default: (md: markdownit, opts: any) => void;
+declare const _default: (md: markdownit | any, opts: any) => void;
 export default _default;

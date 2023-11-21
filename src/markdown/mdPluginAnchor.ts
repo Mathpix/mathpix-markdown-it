@@ -10,7 +10,7 @@ const types: string[] = [
   'subsubsection',
 ]
 
-const anchor = (md: markdownit, opts) => {
+const anchor = (md: markdownit | any, opts) => {
   opts = Object.assign({}, anchor.defaults, opts);
 
   md.core.ruler.push('anchor', state => {

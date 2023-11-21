@@ -1,3 +1,4 @@
+import { markdownit } from 'markdown-it';
 import { ISmilesOptionsDef } from "./smiles-drawer/src/Drawer";
 export interface ISmilesOptions extends ISmilesOptionsDef {
     theme?: string;
@@ -11,5 +12,5 @@ export interface ISmilesOptions extends ISmilesOptionsDef {
     useCurrentColor?: boolean;
     supportSvg1?: boolean;
 }
-declare const _default: (md: markdownit, options: any) => void;
+declare const _default: (md: markdownit | any, options: any) => void;
 export default _default;

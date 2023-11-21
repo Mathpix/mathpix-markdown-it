@@ -5,19 +5,19 @@ export declare const mdPluginMathJax: (options: any) => (md: any) => void;
 /**
  * configured custom tag plugin
  */
-export declare const mdPluginText: () => (md: markdownit) => void;
+export declare const mdPluginText: () => (md: any) => void;
 export declare const mdPluginHighlightCode: (md: any, opts: any) => void;
-export declare const mdPluginTOC: (md: markdownit, opts: any) => void;
+export declare const mdPluginTOC: (md: any, opts: any) => void;
 export declare const mdPluginAnchor: {
-    (md: markdownit, opts: any): void;
+    (md: any, opts: any): void;
     defaults: {
         level: number;
     };
 };
-export declare const mdPluginTableTabular: (md: markdownit, options: any) => void;
-export declare const mdPluginList: (md: markdownit, options: any) => void;
-export declare const mdPluginChemistry: (md: markdownit, options: any) => void;
-export declare const mdPluginSvgToBase64: (md: markdownit, options: any) => void;
+export declare const mdPluginTableTabular: (md: any, options: any) => void;
+export declare const mdPluginList: (md: any, options: any) => void;
+export declare const mdPluginChemistry: (md: any, options: any) => void;
+export declare const mdPluginSvgToBase64: (md: any, options: any) => void;
 export declare const mdPluginCollapsible: (md: any) => void;
-export declare const mdSetPositionsAndHighlight: (md: markdownit, options: any) => void;
-export declare const mdLatexFootnotes: (md: markdownit, options: any) => void;
+export declare const mdSetPositionsAndHighlight: (md: any, options: any) => void;
+export declare const mdLatexFootnotes: (md: any, options: any) => void;

@@ -20,7 +20,7 @@ import {
 import { validateLinkEnableFile } from "./mdOptions";
 import { injectLabelIdToParagraph } from "./rules";
 
-export const mathpixMarkdownPlugin = (md: markdownit, options) => {
+export const mathpixMarkdownPlugin = (md: markdownit | any, options) => {
   const {width = 1200,  outMath = {}, smiles = {}, mathJax = {}, renderElement = {}, forDocx = false, forLatex = false, forMD = false,
     maxWidth = '',
     enableFileLinks = false, validateLink = null,

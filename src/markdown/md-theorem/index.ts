@@ -163,7 +163,7 @@ export const mappingTheorems = {
   theorem_setcounter: "theorem_setcounter",
 };
 
-export const renderTheorems = (md: markdownit) => {
+export const renderTheorems = (md: markdownit | any) => {
   Object.keys(mappingTheorems).forEach(key => {
     md.renderer.rules[key] = (tokens, idx, options, env = {}, slf) => {
       switch (tokens[idx].type) {

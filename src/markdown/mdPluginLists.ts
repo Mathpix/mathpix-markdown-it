@@ -31,7 +31,7 @@ const mapping = {
   setcounter: "setcounter"
 };
 
-export default (md: markdownit, options) => {
+export default (md: markdownit | any, options) => {
   Object.assign(md.options, options);
 
   SetDefaultItemizeLevel();

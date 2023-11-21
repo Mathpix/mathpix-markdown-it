@@ -58,7 +58,7 @@ const svgToBase64Block: RuleBlock = (state, startLine, endLine, silent) => {
   token.map = [startLine, nextLine];
   return true;
 };
-export default (md: markdownit, options) => {
+export default (md: markdownit | any, options) => {
   Object.assign(md.options, options);
 
   md.block.ruler.before('html_block', 'svgToBase64Block', svgToBase64Block, {

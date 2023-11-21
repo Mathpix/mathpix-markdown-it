@@ -1351,7 +1351,7 @@ const mapping = {
 };
 
 export default () => {
-  return (md: markdownit) => {
+  return (md: markdownit  | any) => {
     resetCounter();
     md.block.ruler.before("heading", "headingSection", headingSection, 
       {alt: getTerminatedRules('headingSection')});

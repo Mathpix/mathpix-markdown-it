@@ -3,7 +3,7 @@ import { isSpace } from './common';
 import { resetCounter } from './mdPluginText';
 import {openTag as openTagTabular, closeTag as closeTagTabular} from "./md-block-rule/begin-tabular";
 
-export default (md: markdownit) => {
+export default (md: markdownit  | any) => {
   md.core.ruler.after('normalize', 'separateForBlock', state => {
     resetCounter();
     const pickTag: RegExp = /\\(?:title\{([^}]*)\}|section\{([^}]*)\}|subsection\{([^}]*)\})/;

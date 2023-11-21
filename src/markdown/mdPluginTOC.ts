@@ -266,7 +266,7 @@ const mapping = {
   toc_body: "toc_body",
 };
 
-export default (md: markdownit, opts) => {
+export default (md: markdownit  | any, opts) => {
   clearSlugsTocItems();
   Object.assign(md.options, defaults, opts);
   // Catch all the tokens for iteration later

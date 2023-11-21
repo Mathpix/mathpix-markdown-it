@@ -1,3 +1,4 @@
+import { markdownit } from 'markdown-it';
 export declare const mappingTheorems: {
     newtheorem: string;
     theoremstyle: string;
@@ -15,4 +16,4 @@ export declare const mappingTheorems: {
     theorem_print_close: string;
     theorem_setcounter: string;
 };
-export declare const renderTheorems: (md: markdownit) => void;
+export declare const renderTheorems: (md: markdownit | any) => void;

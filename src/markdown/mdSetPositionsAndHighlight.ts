@@ -8,7 +8,7 @@ import {
   captionTableHighlight
 } from "./highlight/render-rule-highlights";
 
-export default (md: markdownit, options) => {
+export default (md: markdownit | any, options) => {
   Object.assign(md.options, options);
   /** Set positions to tokens */
   md.core.ruler.push('set_positions', setPositions);

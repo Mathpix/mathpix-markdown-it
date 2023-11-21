@@ -11,7 +11,7 @@ import {ClearParseError} from "./md-block-rule/parse-error";
 import { BeginTheorem, BeginProof } from "./md-theorem/block-rule";
 import { getTerminatedRules } from "./common";
 
-export default (md: markdownit, options) => {
+export default (md: markdownit  | any, options) => {
   ClearTableNumbers();
   ClearFigureNumbers();
   ClearSubTableLists();

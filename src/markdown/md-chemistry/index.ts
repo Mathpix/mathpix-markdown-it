@@ -245,7 +245,7 @@ const renderSmilesDrawerInline = (tokens, idx, options, env, slf) => {
     : `<div class="smiles-inline" style="display: inline-block">${outputSmiles}${resSvg}</div>`;
 };
 
-export default (md: markdownit, options) => {
+export default (md: markdownit | any, options) => {
   Object.assign(md.options, options);
 
   md.block.ruler.before('fence', 'smilesDrawerBlock', smilesDrawerBlock, {
