@@ -1,4 +1,4 @@
-import { MarkdownIt } from 'markdown-it';
+import { markdownit } from 'markdown-it';
 import { MathpixMarkdownModel, ParserErrors } from "../mathpix-markdown-model";
 import { resetTextCounter } from './mdPluginText';
 import { resetTheoremEnvironments } from './md-theorem/helper';
@@ -20,7 +20,7 @@ import {
 import { validateLinkEnableFile } from "./mdOptions";
 import { injectLabelIdToParagraph } from "./rules";
 
-export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
+export const mathpixMarkdownPlugin = (md: markdownit, options) => {
   const {width = 1200,  outMath = {}, smiles = {}, mathJax = {}, renderElement = {}, forDocx = false, forLatex = false, forMD = false,
     maxWidth = '',
     enableFileLinks = false, validateLink = null,

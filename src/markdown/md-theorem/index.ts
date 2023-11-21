@@ -1,4 +1,4 @@
-import { MarkdownIt } from 'markdown-it';
+import { markdownit } from 'markdown-it';
 import { theoremEnvironments, getTheoremEnvironmentIndex } from "./helper";
 import { ILabel, getLabelByUuidFromLabelsList } from "../common/labels";
 import {getStyleFromHighlight} from "../highlight/common";
@@ -163,7 +163,7 @@ export const mappingTheorems = {
   theorem_setcounter: "theorem_setcounter",
 };
 
-export const renderTheorems = (md: MarkdownIt) => {
+export const renderTheorems = (md: markdownit) => {
   Object.keys(mappingTheorems).forEach(key => {
     md.renderer.rules[key] = (tokens, idx, options, env = {}, slf) => {
       switch (tokens[idx].type) {

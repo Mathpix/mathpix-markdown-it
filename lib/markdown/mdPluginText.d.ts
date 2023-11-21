@@ -7,5 +7,5 @@ export declare const resetTextCounter: RuleInline;
 export declare const setTextCounterSection: (envName: string, num: number) => void;
 export declare const headingSection: RuleBlock;
 export declare const renderInlineContent: (token: any, options: any, env: any, slf: any) => any;
-declare const _default: () => (md: MarkdownIt) => void;
+declare const _default: () => (md: markdownit) => void;
 export default _default;

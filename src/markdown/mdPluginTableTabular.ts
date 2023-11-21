@@ -1,4 +1,4 @@
-import { MarkdownIt } from 'markdown-it';
+import { markdownit } from 'markdown-it';
 
 import { BeginTabular} from './md-block-rule/begin-tabular';
 import { BeginAlign } from './md-block-rule/begin-align';
@@ -11,7 +11,7 @@ import {ClearParseError} from "./md-block-rule/parse-error";
 import { BeginTheorem, BeginProof } from "./md-theorem/block-rule";
 import { getTerminatedRules } from "./common";
 
-export default (md: MarkdownIt, options) => {
+export default (md: markdownit, options) => {
   ClearTableNumbers();
   ClearFigureNumbers();
   ClearSubTableLists();

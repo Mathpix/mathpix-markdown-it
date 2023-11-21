@@ -1,4 +1,4 @@
-import { MarkdownIt, RuleBlock } from 'markdown-it';
+import { markdownit, RuleBlock } from 'markdown-it';
 import convertSvgToBase64 from "./convert-scv-to-base64";
 
 const HTML_SEQUENCES = [
@@ -58,7 +58,7 @@ const svgToBase64Block: RuleBlock = (state, startLine, endLine, silent) => {
   token.map = [startLine, nextLine];
   return true;
 };
-export default (md: MarkdownIt, options) => {
+export default (md: markdownit, options) => {
   Object.assign(md.options, options);
 
   md.block.ruler.before('html_block', 'svgToBase64Block', svgToBase64Block, {

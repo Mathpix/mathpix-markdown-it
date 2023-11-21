@@ -1,4 +1,4 @@
-import { MarkdownIt, Token, TokenList } from 'markdown-it';
+import { markdownit, Token, TokenList } from 'markdown-it';
 import { slugify, uniqueSlug } from './common';
 
 const isLevelSelectedNumber = selection => level => level >= selection;
@@ -10,7 +10,7 @@ const types: string[] = [
   'subsubsection',
 ]
 
-const anchor = (md: MarkdownIt, opts) => {
+const anchor = (md: markdownit, opts) => {
   opts = Object.assign({}, anchor.defaults, opts);
 
   md.core.ruler.push('anchor', state => {

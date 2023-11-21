@@ -1,4 +1,4 @@
-import { MarkdownIt } from 'markdown-it';
+import { markdownit } from 'markdown-it';
 import { Lists, ReRenderListsItem } from './md-block-rule/lists';
 import {
   SetDefaultItemizeLevel,
@@ -31,7 +31,7 @@ const mapping = {
   setcounter: "setcounter"
 };
 
-export default (md: MarkdownIt, options) => {
+export default (md: markdownit, options) => {
   Object.assign(md.options, options);
 
   SetDefaultItemizeLevel();

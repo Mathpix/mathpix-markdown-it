@@ -1,4 +1,4 @@
-import { MarkdownIt, RuleBlock, RuleInline, Renderer, Token } from 'markdown-it';
+import { markdownit, RuleBlock, RuleInline, Renderer, Token } from 'markdown-it';
 const isSpace = require('markdown-it/lib/common/utils').isSpace;
 import { renderTabularInline } from "./md-renderer-rules/render-tabular";
 import { textUnderline, textOut } from "./md-inline-rule/underline";
@@ -1351,7 +1351,7 @@ const mapping = {
 };
 
 export default () => {
-  return (md: MarkdownIt) => {
+  return (md: markdownit) => {
     resetCounter();
     md.block.ruler.before("heading", "headingSection", headingSection, 
       {alt: getTerminatedRules('headingSection')});

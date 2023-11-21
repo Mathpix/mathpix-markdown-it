@@ -1,4 +1,4 @@
-import { MarkdownIt, RuleBlock, RuleInline } from 'markdown-it';
+import { markdownit, RuleBlock, RuleInline } from 'markdown-it';
 import { ChemistryDrawer } from './chemistry-drawer';
 import { ISmilesOptionsDef } from "./smiles-drawer/src/Drawer";
 import { PREVIEW_LINE_CLASS, PREVIEW_PARAGRAPH_PREFIX } from "../rules";
@@ -245,7 +245,7 @@ const renderSmilesDrawerInline = (tokens, idx, options, env, slf) => {
     : `<div class="smiles-inline" style="display: inline-block">${outputSmiles}${resSvg}</div>`;
 };
 
-export default (md: MarkdownIt, options) => {
+export default (md: markdownit, options) => {
   Object.assign(md.options, options);
 
   md.block.ruler.before('fence', 'smilesDrawerBlock', smilesDrawerBlock, {

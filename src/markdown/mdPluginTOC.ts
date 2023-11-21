@@ -1,4 +1,4 @@
-import { MarkdownIt, RuleInline, Token, TokenList, Renderer } from 'markdown-it';
+import { markdownit, RuleInline, Token, TokenList, Renderer } from 'markdown-it';
 import { slugify, tocRegexp, uniqueSlug } from './common';
 import { TTocStyle } from '../mathpix-markdown-model';
 import { uid } from './utils';
@@ -266,7 +266,7 @@ const mapping = {
   toc_body: "toc_body",
 };
 
-export default (md: MarkdownIt, opts) => {
+export default (md: markdownit, opts) => {
   clearSlugsTocItems();
   Object.assign(md.options, defaults, opts);
   // Catch all the tokens for iteration later

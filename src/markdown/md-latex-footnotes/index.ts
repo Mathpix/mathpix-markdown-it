@@ -1,4 +1,4 @@
-import { MarkdownIt } from 'markdown-it';
+import { markdownit } from 'markdown-it';
 import { mmd_footnote_tail } from "./core-rule";
 import {
   render_footnote_ref,
@@ -22,7 +22,7 @@ import {
 import { grab_footnote_ref } from "./inline-ruler2";
 import { rest_mmd_footnotes_list } from "./utils";
 
-export default (md: MarkdownIt, options) => {
+export default (md: markdownit, options) => {
   Object.assign(md.options, options);
   rest_mmd_footnotes_list();
   md.core.ruler.after('inline', 'mmd_footnote_tail', mmd_footnote_tail);

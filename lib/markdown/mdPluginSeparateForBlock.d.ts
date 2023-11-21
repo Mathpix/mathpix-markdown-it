@@ -1,2 +1,2 @@
-declare const _default: (md: MarkdownIt) => void;
+declare const _default: (md: markdownit) => void;
 export default _default;

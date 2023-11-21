@@ -1,4 +1,4 @@
-import { MarkdownIt } from 'markdown-it';
+import { markdownit } from 'markdown-it';
 import { setPositions } from "./md-core-rules/set-positions";
 import {
   renderMathHighlight,
@@ -8,7 +8,7 @@ import {
   captionTableHighlight
 } from "./highlight/render-rule-highlights";
 
-export default (md: MarkdownIt, options) => {
+export default (md: markdownit, options) => {
   Object.assign(md.options, options);
   /** Set positions to tokens */
   md.core.ruler.push('set_positions', setPositions);
