@@ -1,5 +1,16 @@
+diff --git a/node_modules/mathjax-full/js/input/asciimath/mathjax2/input/AsciiMath.js b/node_modules/mathjax-full/js/input/asciimath/mathjax2/input/AsciiMath.js
+index 92faee6..01c7814 100644
+--- a/node_modules/mathjax-full/js/input/asciimath/mathjax2/input/AsciiMath.js
++++ b/node_modules/mathjax-full/js/input/asciimath/mathjax2/input/AsciiMath.js
+@@ -1,3 +1,6 @@
++if (typeof global.MathJax === 'undefined') {
++  global.MathJax = {};
++}
+ MathJax = Object.assign(global.MathJax || {}, require("../legacy/MathJax.js").MathJax);
+ 
+ MathJax.Ajax.Preloading(
 diff --git a/node_modules/mathjax-full/js/input/asciimath/mathjax2/legacy/MathJax.js b/node_modules/mathjax-full/js/input/asciimath/mathjax2/legacy/MathJax.js
-index 903ede2..71e17d0 100644
+index 903ede2..b43d392 100644
 --- a/node_modules/mathjax-full/js/input/asciimath/mathjax2/legacy/MathJax.js
 +++ b/node_modules/mathjax-full/js/input/asciimath/mathjax2/legacy/MathJax.js
 @@ -19,7 +19,7 @@ exports.MathJax = MathJax;
@@ -7,12 +18,16 @@ index 903ede2..71e17d0 100644
    };
    var CONSTRUCTOR = function () {
 -    return function () {return arguments.callee.Init.call(this,arguments)};
-+    return function f1() {return f1.Init.call(this,arguments)};
++    return function aaa() {return aaa.Init.call(this,Object.assign(arguments,{call:aaa}))};
    };
  
    BASE.Object = OBJECT({
-@@ -40,7 +40,7 @@ exports.MathJax = MathJax;
-     Init: function (args) {
+@@ -37,10 +37,10 @@ exports.MathJax = MathJax;
+       return obj;
+     },
+ 
+-    Init: function (args) {
++    Init: function fnInit(args) {
        var obj = this;
        if (args.length === 1 && args[0] === PROTO) {return obj}
 -      if (!(obj instanceof args.callee)) {obj = new args.callee(PROTO)}
@@ -38,8 +53,19 @@ index 903ede2..71e17d0 100644
      for (var id in CALLBACK.prototype) {
        if (CALLBACK.prototype.hasOwnProperty(id)) {
          if (typeof(data[id]) !== 'undefined') {cb[id] = data[id]}
+diff --git a/node_modules/mathjax-full/ts/input/asciimath/mathjax2/input/AsciiMath.js b/node_modules/mathjax-full/ts/input/asciimath/mathjax2/input/AsciiMath.js
+index 92faee6..01c7814 100644
+--- a/node_modules/mathjax-full/ts/input/asciimath/mathjax2/input/AsciiMath.js
++++ b/node_modules/mathjax-full/ts/input/asciimath/mathjax2/input/AsciiMath.js
+@@ -1,3 +1,6 @@
++if (typeof global.MathJax === 'undefined') {
++  global.MathJax = {};
++}
+ MathJax = Object.assign(global.MathJax || {}, require("../legacy/MathJax.js").MathJax);
+ 
+ MathJax.Ajax.Preloading(
 diff --git a/node_modules/mathjax-full/ts/input/asciimath/mathjax2/legacy/MathJax.js b/node_modules/mathjax-full/ts/input/asciimath/mathjax2/legacy/MathJax.js
-index 903ede2..71e17d0 100644
+index 903ede2..05681a1 100644
 --- a/node_modules/mathjax-full/ts/input/asciimath/mathjax2/legacy/MathJax.js
 +++ b/node_modules/mathjax-full/ts/input/asciimath/mathjax2/legacy/MathJax.js
 @@ -19,7 +19,7 @@ exports.MathJax = MathJax;
@@ -47,21 +73,34 @@ index 903ede2..71e17d0 100644
    };
    var CONSTRUCTOR = function () {
 -    return function () {return arguments.callee.Init.call(this,arguments)};
-+    return function f1() {return f1.Init.call(this,arguments)};
++    return function aaa() {return aaa.Init.call(this,Object.assign(arguments,{call:aaa}))};
    };
  
    BASE.Object = OBJECT({
-@@ -40,7 +40,7 @@ exports.MathJax = MathJax;
-     Init: function (args) {
+@@ -37,10 +37,10 @@ exports.MathJax = MathJax;
+       return obj;
+     },
+ 
+-    Init: function (args) {
++    Init: function fnInit(args) {
        var obj = this;
        if (args.length === 1 && args[0] === PROTO) {return obj}
 -      if (!(obj instanceof args.callee)) {obj = new args.callee(PROTO)}
 +      if (!(obj instanceof args.call)) {obj = new args.call(PROTO)}
        return obj.Init.apply(obj,args) || obj;
      },
-     
+ 
+@@ -50,7 +50,7 @@ exports.MathJax = MathJax;
+         for (id in def) {if (def.hasOwnProperty(id)) {this.protoFunction(id,def[id])}}
+         // MSIE doesn't list toString even if it is not native so handle it separately
+         if (def.toString !== this.prototype.toString && def.toString !== {}.toString)
+-          {this.protoFunction('toString',def.toString)}
++        {this.protoFunction('toString',def.toString)}
+       }
+       if (classdef != null) {
+         for (id in classdef) {if (classdef.hasOwnProperty(id)) {this[id] = classdef[id]}}
 @@ -65,7 +65,7 @@ exports.MathJax = MathJax;
-   
+ 
      prototype: {
        Init: function () {},
 -      SUPER: function (fn) {return fn.callee.SUPER},
@@ -69,7 +108,28 @@ index 903ede2..71e17d0 100644
        can: function (method) {return typeof(this[method]) === "function"},
        has: function (property) {return typeof(this[property]) !== "undefined"},
        isa: function (obj) {return (obj instanceof Object) && (this instanceof obj)}
-@@ -177,7 +177,7 @@ exports.MathJax = MathJax;
+@@ -86,14 +86,14 @@ exports.MathJax = MathJax;
+       constructor: function (def) {return this.SimpleSUPER.define(def)},
+ 
+       define: function (src) {
+-	var dst = {};
+-	if (src != null) {
++        var dst = {};
++        if (src != null) {
+           for (var id in src) {if (src.hasOwnProperty(id)) {dst[id] = this.wrap(id,src[id])}}
+-	  // MSIE doesn't list toString even if it is not native so handle it separately
++          // MSIE doesn't list toString even if it is not native so handle it separately
+           if (src.toString !== this.prototype.toString && src.toString !== {}.toString)
+-            {dst.toString = this.wrap('toString',src.toString)}
+-	}
+-	return dst;
++          {dst.toString = this.wrap('toString',src.toString)}
++        }
++        return dst;
+       },
+ 
+       wrap: function (id,f) {
+@@ -177,11 +177,11 @@ exports.MathJax = MathJax;
    //  Create a callback from an associative array
    //
    var CALLBACK = function (data) {
@@ -78,3 +138,343 @@ index 903ede2..71e17d0 100644
      for (var id in CALLBACK.prototype) {
        if (CALLBACK.prototype.hasOwnProperty(id)) {
          if (typeof(data[id]) !== 'undefined') {cb[id] = data[id]}
+-                                         else {cb[id] = CALLBACK.prototype[id]}
++        else {cb[id] = CALLBACK.prototype[id]}
+       }
+     }
+     cb.toString = CALLBACK.prototype.toString;
+@@ -249,8 +249,8 @@ exports.MathJax = MathJax;
+   var USING = function (args,i) {
+     if (arguments.length > 1) {
+       if (arguments.length === 2 && !(typeof arguments[0] === 'function') &&
+-          arguments[0] instanceof Object && typeof arguments[1] === 'number')
+-            {args = [].slice.call(args,i)}
++        arguments[0] instanceof Object && typeof arguments[1] === 'number')
++      {args = [].slice.call(args,i)}
+       else {args = [].slice.call(arguments,0)}
+     }
+     if (args instanceof Array && args.length === 1) {args = args[0]}
+@@ -259,7 +259,7 @@ exports.MathJax = MathJax;
+       return CALLBACK({hook: args});
+     } else if (args instanceof Array) {
+       if (typeof(args[0]) === 'string' && args[1] instanceof Object &&
+-                 typeof args[1][args[0]] === 'function') {
++        typeof args[1][args[0]] === 'function') {
+         return CALLBACK({hook: args[1][args[0]], object: args[1], data: args.slice(2)});
+       } else if (typeof args[0] === 'function') {
+         return CALLBACK({hook: args[0], data: args.slice(1)});
+@@ -311,7 +311,7 @@ exports.MathJax = MathJax;
+       callback.execute = WAITEXECUTE;
+       callback.signal = signals;
+     } else if (signals.length === 1) {callback.signal.push(signals[0])}
+-      else {callback.signal = callback.signal.concat(signals)}
++    else {callback.signal = callback.signal.concat(signals)}
+   };
+ 
+   //
+@@ -324,7 +324,7 @@ exports.MathJax = MathJax;
+     callback = USING(callback);
+     callback.pending = 0;
+     for (var i = 1, m = arguments.length; i < m; i++)
+-      {if (arguments[i]) {WAITFOR(arguments[i],callback)}}
++    {if (arguments[i]) {WAITFOR(arguments[i],callback)}}
+     if (callback.pending === 0) {
+       var result = callback();
+       if (ISCALLBACK(result)) {callback = result}
+@@ -362,7 +362,7 @@ exports.MathJax = MathJax;
+       for (var i = 0, m = this.hooks.length; i < m; i++) {
+         if (this.hooks[i] === hook) {
+           if (this.running) {this.remove.push(i)}
+-            else {this.hooks.splice(i,1)}
++          else {this.hooks.splice(i,1)}
+           return;
+         }
+       }
+@@ -434,7 +434,7 @@ exports.MathJax = MathJax;
+       for (var i = 0, m = arguments.length; i < m; i++) {
+         callback = USING(arguments[i]);
+         if (callback === arguments[i] && !callback.called)
+-          {callback = USING(["wait",this,callback])}
++        {callback = USING(["wait",this,callback])}
+         this.queue.push(callback);
+       }
+       if (!this.running && !this.pending) {this.Process()}
+@@ -546,7 +546,7 @@ exports.MathJax = MathJax;
+       if (!this.hooks[msg]) {this.hooks[msg] = HOOKS(true)}
+       this.hooks[msg].Add(callback,priority);
+       for (var i = 0, m = this.posted.length; i < m; i++)
+-        {if (this.posted[i] == msg) {callback.reset(); callback(this.posted[i])}}
++      {if (this.posted[i] == msg) {callback.reset(); callback(this.posted[i])}}
+       callback.msg = msg; // keep track so we can remove it
+       return callback;
+     },
+@@ -593,7 +593,7 @@ exports.MathJax = MathJax;
+   if (!BASE) {BASE = window[BASENAME] = {}}
+ 
+   var isSafari2 = (navigator.vendor === "Apple Computer, Inc." &&
+-                   typeof navigator.vendorSub === "undefined");
++    typeof navigator.vendorSub === "undefined");
+   var sheets = 0; // used by Safari2
+ 
+   //
+@@ -601,15 +601,15 @@ exports.MathJax = MathJax;
+   //  
+   var HEAD = function (head) {
+     return null;
+-/*
+-    if (document.styleSheets && document.styleSheets.length > sheets)
+-      {sheets = document.styleSheets.length}
+-    if (!head) {
+-      head = document.head || ((document.getElementsByTagName("head"))[0]);
+-      if (!head) {head = document.body}
+-    }
+-    return head;
+-*/
++    /*
++        if (document.styleSheets && document.styleSheets.length > sheets)
++          {sheets = document.styleSheets.length}
++        if (!head) {
++          head = document.head || ((document.getElementsByTagName("head"))[0]);
++          if (!head) {head = document.body}
++        }
++        return head;
++    */
+   };
+ 
+   //
+@@ -647,7 +647,7 @@ exports.MathJax = MathJax;
+     fileURL: function (file) {
+       var match = file.match(/^\[([-._a-z0-9]+)\]/i);
+       if (match && match[1] in PATH)
+-        {file = (PATH[match[1]]||this.config.root) + file.substr(match[1].length+2)}
++      {file = (PATH[match[1]]||this.config.root) + file.substr(match[1].length+2)}
+       return file;
+     },
+     //
+@@ -659,7 +659,7 @@ exports.MathJax = MathJax;
+       else {
+         for (var id in PATH) {if (PATH.hasOwnProperty(id) && PATH[id]) {
+           if (url.substr(0,PATH[id].length) === PATH[id])
+-            {url = "["+id+"]"+url.substr(PATH[id].length); break}
++          {url = "["+id+"]"+url.substr(PATH[id].length); break}
+         }}
+       }
+       return url;
+@@ -682,7 +682,7 @@ exports.MathJax = MathJax;
+       callback = BASE.Callback(callback); var type;
+       if (file instanceof Object) {
+         for (var i in file)
+-          {if (file.hasOwnProperty(i)) {type = i.toUpperCase(); file = file[i]}}
++        {if (file.hasOwnProperty(i)) {type = i.toUpperCase(); file = file[i]}}
+       } else {type = file.split(/\./).pop().toUpperCase()}
+       file = this.fileURL(file);
+       // FIXME: check that URL is OK
+@@ -703,7 +703,7 @@ exports.MathJax = MathJax;
+       callback = BASE.Callback(callback); var type;
+       if (file instanceof Object) {
+         for (var i in file)
+-          {if (file.hasOwnProperty(i)) {type = i.toUpperCase(); file = file[i]}}
++        {if (file.hasOwnProperty(i)) {type = i.toUpperCase(); file = file[i]}}
+       } else {type = file.split(/\./).pop().toUpperCase()}
+       file = this.fileURL(file);
+       if (this.loading[file]) {
+@@ -711,7 +711,7 @@ exports.MathJax = MathJax;
+       } else {
+         this.head = HEAD(this.head);
+         if (this.loader[type]) {this.loader[type].call(this,file,callback)}
+-          else {throw Error("Can't load files of type "+type)}
++        else {throw Error("Can't load files of type "+type)}
+       }
+       return callback;
+     },
+@@ -723,10 +723,10 @@ exports.MathJax = MathJax;
+     LoadHook: function (file,callback,priority) {
+       callback = BASE.Callback(callback);
+       if (file instanceof Object)
+-        {for (var i in file) {if (file.hasOwnProperty(i)) {file = file[i]}}}
++      {for (var i in file) {if (file.hasOwnProperty(i)) {file = file[i]}}}
+       file = this.fileURL(file);
+       if (this.loaded[file]) {callback(this.loaded[file])}
+-        else {this.addHook(file,callback,priority)}
++      else {this.addHook(file,callback,priority)}
+       return callback;
+     },
+     addHook: function (file,callback,priority) {
+@@ -762,17 +762,17 @@ exports.MathJax = MathJax;
+       JS: function (file,callback) {
+         var name = this.fileName(file);
+         var timeout = BASE.Callback(["loadTimeout",this,file]);
+-	this.loading[file] = {
+-	  callback: callback,
+-	  timeout: setTimeout(timeout,this.timeout),
+-	  status: this.STATUS.OK,
+-	  script: null
+-	};
+-	//
+-	// Add this to the structure above after it is created to prevent recursion
+-	//  when loading the initial localization file (before loading messsage is available)
+-	//
+-	this.loading[file].message = BASE.Message.File(name);
++        this.loading[file] = {
++          callback: callback,
++          timeout: setTimeout(timeout,this.timeout),
++          status: this.STATUS.OK,
++          script: null
++        };
++        //
++        // Add this to the structure above after it is created to prevent recursion
++        //  when loading the initial localization file (before loading messsage is available)
++        //
++        this.loading[file].message = BASE.Message.File(name);
+         if (window.System) {
+           window.System.import(file).catch(timeout);
+         } else {
+@@ -809,7 +809,7 @@ exports.MathJax = MathJax;
+       create: function (callback,node) {
+         callback = BASE.Callback(callback);
+         if (node.nodeName === "STYLE" && node.styleSheet &&
+-            typeof(node.styleSheet.cssText) !== 'undefined') {
++          typeof(node.styleSheet.cssText) !== 'undefined') {
+           callback(this.STATUS.OK); // MSIE processes style immediately, but doesn't set its styleSheet!
+         } else if (window.chrome && node.nodeName === "LINK") {
+           callback(this.STATUS.OK); // Chrome doesn't give access to cssRules for stylesheet in
+@@ -858,9 +858,9 @@ exports.MathJax = MathJax;
+       checkSafari2: function (check,length,callback) {
+         if (check.time(callback)) return;
+         if (document.styleSheets.length > length &&
+-            document.styleSheets[length].cssRules &&
+-            document.styleSheets[length].cssRules.length)
+-          {callback(check.STATUS.OK)} else {setTimeout(check,check.delay)}
++          document.styleSheets[length].cssRules &&
++          document.styleSheets[length].cssRules.length)
++        {callback(check.STATUS.OK)} else {setTimeout(check,check.delay)}
+       },
+       //
+       //  Look for the stylesheets rules and check when they are defined
+@@ -899,10 +899,10 @@ exports.MathJax = MathJax;
+       if (loading && !loading.preloaded) {
+         BASE.Message.Clear(loading.message);
+         if (loading.timeout) clearTimeout(loading.timeout);
+-	if (loading.script) {
+-	  if (SCRIPTS.length === 0) {setTimeout(REMOVESCRIPTS,0)}
+-	  SCRIPTS.push(loading.script);
+-	}
++        if (loading.script) {
++          if (SCRIPTS.length === 0) {setTimeout(REMOVESCRIPTS,0)}
++          SCRIPTS.push(loading.script);
++        }
+         this.loaded[file] = loading.status; delete this.loading[file];
+         this.addHook(file,loading.callback);
+       } else {
+@@ -977,7 +977,7 @@ exports.MathJax = MathJax;
+           style = [];
+           for (var name in styles[id]) {if (styles[id].hasOwnProperty(name)) {
+             if (styles[id][name] != null)
+-              {style[style.length] = name + ': ' + styles[id][name]}
++            {style[style.length] = name + ': ' + styles[id][name]}
+           }}
+           string += id +" {"+style.join('; ')+"}\n";
+         }
+@@ -1011,7 +1011,7 @@ MathJax.HTML = {
+       if (def.hasOwnProperty("style")) {
+         var style = def.style; def.style = {};
+         for (id in style) {if (style.hasOwnProperty(id))
+-          {def.style[id.replace(/-([a-z])/g,this.ucMatch)] = style[id]}}
++        {def.style[id.replace(/-([a-z])/g,this.ucMatch)] = style[id]}}
+       }
+       MathJax.Hub.Insert(obj,def);
+       for (id in def) {
+@@ -1339,7 +1339,7 @@ MathJax.Localization = {
+       if (localeData.domains && domain in localeData.domains) {
+         var domainData = localeData.domains[domain];
+         if (domainData.strings && id in domainData.strings)
+-          {phrase = domainData.strings[id]}
++        {phrase = domainData.strings[id]}
+       }
+     }
+     //
+@@ -1362,8 +1362,8 @@ MathJax.Localization = {
+     //
+     if (!file.match(/^([a-z]+:|\[MathJax\])/)) {
+       var dir = (this.strings[this.locale].directory  ||
+-                 this.directory + "/" + this.locale ||
+-                 "[MathJax]/localization/" + this.locale);
++        this.directory + "/" + this.locale ||
++        "[MathJax]/localization/" + this.locale);
+       file = dir + "/" + file;
+     }
+     //
+@@ -1606,7 +1606,7 @@ MathJax.Hub = {
+     },
+ 
+     errorSettings: {
+-       // localized HTML snippet structure for message to use
++      // localized HTML snippet structure for message to use
+       message: ["[",["MathProcessingError","Math Processing Error"],"]"],
+       style: {color: "#CC0000", "font-style":"italic"}  // style for message
+     },
+@@ -1687,7 +1687,7 @@ MathJax.Hub = {
+     for (var id in src) {if (src.hasOwnProperty(id)) {
+       // allow for concatenation of arrays?
+       if (typeof src[id] === 'object' && !(src[id] instanceof Array) &&
+-         (typeof dst[id] === 'object' || typeof dst[id] === 'function')) {
++        (typeof dst[id] === 'object' || typeof dst[id] === 'function')) {
+         this.Insert(dst[id],src[id]);
+       } else {
+         dst[id] = src[id];
+@@ -1698,9 +1698,9 @@ MathJax.Hub = {
+ 
+   // Old browsers (e.g. Internet Explorer <= 8) do not support trim().
+   SplitList: ("trim" in String.prototype ?
+-              function (list) {return list.trim().split(/\s+/)} :
+-              function (list) {return list.replace(/^\s+/,'').
+-                                           replace(/\s+$/,'').split(/\s+/)})
++    function (list) {return list.trim().split(/\s+/)} :
++    function (list) {return list.replace(/^\s+/,'').
++    replace(/\s+$/,'').split(/\s+/)})
+ };
+ 
+ //
+@@ -1742,11 +1742,11 @@ MathJax.Ajax.config.root = MathJax.Hub.config.root;
+       if (def != null) {
+         for (var id in def) {if (def.hasOwnProperty(id)) {
+           if (typeof def[id] === "function")
+-            {cObject.protoFunction(id,def[id])} else {ndef[id] = def[id]}
++          {cObject.protoFunction(id,def[id])} else {ndef[id] = def[id]}
+         }}
+         // MSIE doesn't list toString even if it is not native so handle it separately
+         if (def.toString !== cObject.prototype.toString && def.toString !== {}.toString)
+-          {cObject.protoFunction('toString',def.toString)}
++        {cObject.protoFunction('toString',def.toString)}
+       }
+       HUB.Insert(cObject.prototype,ndef);
+       cObject.Augment(null,cdef);
+@@ -1828,8 +1828,8 @@ MathJax.Ajax.config.root = MathJax.Hub.config.root;
+       if (!jax[mimetype]) {jax[mimetype] = []}
+       //  If the output jax is earlier in the original configuration list, put it first here
+       if (jax[mimetype].length && (this.id === HUB.config.menuSettings.renderer ||
+-            (jax.order[this.id]||0) < (jax.order[jax[mimetype][0].id]||0)))
+-        {jax[mimetype].unshift(this)} else {jax[mimetype].push(this)}
++        (jax.order[this.id]||0) < (jax.order[jax[mimetype][0].id]||0)))
++      {jax[mimetype].unshift(this)} else {jax[mimetype].push(this)}
+     },
+     Remove: function (jax) {}
+   },{
+@@ -1892,7 +1892,7 @@ MathJax.Ajax.config.root = MathJax.Hub.config.root;
+       } else {
+         jax = script.MathJax.elementJax = this;
+         if (script.id) {this.inputID = script.id}
+-          else {script.id = this.inputID = BASE.ElementJax.GetID(); this.newID = 1}
++        else {script.id = this.inputID = BASE.ElementJax.GetID(); this.newID = 1}
+       }
+       jax.originalText = BASE.HTML.getScript(script);
+       jax.inputJax = inputJax;
+@@ -1913,7 +1913,7 @@ MathJax.Ajax.config.root = MathJax.Hub.config.root;
+       for (id in jax) {
+         if (!jax.hasOwnProperty(id)) continue;
+         if (typeof(this[id]) === 'undefined' || (this[id] !== jax[id] && id !== 'inputID'))
+-          {this[id] = jax[id]}
++        {this[id] = jax[id]}
+       }
+     }
+   },{
