@@ -15,6 +15,7 @@
 /examples/react-app/use-parseMarkdownByHTML-method/node_modules
 /examples/react-app/use-parseMarkdownByHTML-method/package-lock.json
 /examples/react-app/use-parseMarkdownByHTML-method/yarn.lock
-package-lock.json
+examples/react-app/use-toc/package-lock.json
+yarn.lock
 /.idea
 .DS_Store

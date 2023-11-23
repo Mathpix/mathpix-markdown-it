@@ -942,5 +942,5 @@ $ npm run build
 # Testing
 
 ```shell
-$ npm test
+$ npm run test
 ```

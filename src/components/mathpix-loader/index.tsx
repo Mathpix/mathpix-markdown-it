@@ -2,6 +2,7 @@ import * as React from "react";
 import {MathpixMarkdownModel as MM} from '../../mathpix-markdown-model'
 
 export interface PMathpixLoader {
+  children: React.ReactNode;
   notScrolling?: boolean;
   textAlignJustify?: boolean;
 }

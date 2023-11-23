@@ -32,10 +32,10 @@
   "author": "Mathpix",
   "main": "lib/index.js",
   "scripts": {
-    "compile": "npx tsc",
-    "compile:dev": "npx tsc --watch",
-    "build": "npx tsc && webpack --mode=production --config webpack.config.js",
-    "dev": "npx tsc &&  webpack --mode=development --config webpack.dev.js --watch",
+    "compile": "tsc",
+    "compile:dev": "tsc --watch",
+    "build": "tsc && webpack --mode=production --config webpack.config.js",
+    "dev": "tsc &&  webpack --mode=development --config webpack.dev.js --watch",
     "test": "mocha tests/*.js --exit"
   },
   "dependencies": {

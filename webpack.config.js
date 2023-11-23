@@ -6,7 +6,9 @@ const NodePolyfillPlugin = require("node-polyfill-webpack-plugin");
 const config = {
   // TODO: Add common Configuration
   optimization: {
-    minimizer: [new TerserPlugin()],
+    minimizer: [new TerserPlugin({
+      extractComments: false
+    })],
   },
   resolve: {
     extensions: [".tsx", ".ts", ".js"],
