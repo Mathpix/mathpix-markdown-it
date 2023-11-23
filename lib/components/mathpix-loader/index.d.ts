@@ -1,5 +1,6 @@
 import * as React from "react";
 export interface PMathpixLoader {
+    children: React.ReactNode;
     notScrolling?: boolean;
     textAlignJustify?: boolean;
 }
@@ -9,6 +10,6 @@ declare class MathpixLoader extends React.Component<PMathpixLoader> {
         isReadyToTypeSet: boolean;
     };
     componentDidMount(): void;
-    render(): JSX.Element;
+    render(): React.JSX.Element;
 }
 export default MathpixLoader;

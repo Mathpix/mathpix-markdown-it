@@ -761,6 +761,7 @@ The `MathpixMarkdown` React element accepts the following props:
 | `parserErrors`   | [ParserErrors](https://github.com/Mathpix/mathpix-markdown-it#parsererrors);*`{}`*        | Sets options to output parser errors for equations and tabular                    |
 | `codeHighlight`  | [CodeHighlight](https://github.com/Mathpix/mathpix-markdown-it#codehighlight);*`{}`*      | Sets options to highlight code block                      |
 | `footnotes`      | [Footnotes](https://github.com/Mathpix/mathpix-markdown-it#footnotes);*`{}`*              | Sets options to footnotes                                 |
+| `copyToClipboard` | boolean;*`false`*            | Added copy to clipboard button for code chunks. To handle events, import the function addListenerCopyToClipdoardEvents() from "mathpix-markdown-it/lib/copy-to-clipboard";|
 
 ### optionsMathpixMarkdown
 
@@ -792,6 +793,7 @@ The `MathpixMarkdown` React element accepts the following props:
 | `parserErrors`   | [ParserErrors](https://github.com/Mathpix/mathpix-markdown-it#parsererrors);*`{}`*        | Sets options to output parser errors for equations and tabular                    |
 | `codeHighlight`  | [CodeHighlight](https://github.com/Mathpix/mathpix-markdown-it#codehighlight);*`{}`*      | Sets options to highlight code block                      |
 | `footnotes`      | [Footnotes](https://github.com/Mathpix/mathpix-markdown-it#footnotes);*`{}`*              | Sets options to footnotes                                 |
+| `copyToClipboard` | boolean;*`false`*            | Added copy to clipboard button for code chunks. To handle events, import the function addListenerCopyToClipdoardEvents() from "mathpix-markdown-it/lib/copy-to-clipboard";|
 
 ### TOutputMath
 
@@ -942,5 +944,5 @@ $ npm run build
 # Testing
 
 ```shell
-$ npm test
+$ npm run test
 ```
