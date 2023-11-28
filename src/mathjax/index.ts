@@ -336,10 +336,7 @@ export const MathJax = {
     const {em = 16, ex = 8, cwidth = 1200, lwidth = 100000, scale = 1} = metric;
     const {mtextInheritFont = false} = mathJax;
     this.checkAccessibility(accessibility, nonumbers);
-    
-    if (mtextInheritFont) {
-      MJ.mDocTeX.outputJax.options.mtextInheritFont = true;
-    }
+    MJ.mDocTeX.outputJax.options.mtextInheritFont = mtextInheritFont;
     try {
       /** Here we use different package settings.
        * In order to flatten arrays in asccimath for TSV/CSV we add an extra attribute to the internal mml tree.
