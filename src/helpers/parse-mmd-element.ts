@@ -32,8 +32,12 @@ export const formatSourceMML = (text: string) => {
 };
 
 export const parseMmdElement = (math_el, res = []) => {
-  if (!math_el || !math_el.children || !math_el.children.length) return res;
-  
+  if (!math_el) return res;
+  if (math_el.tagName === 'MOL') {
+    res.push({type: "mol", value: math_el.innerHTML});
+    return res;
+  }
+  if (!math_el.children || !math_el.children.length) return res;
   for (let j = 0; j < math_el.children.length; j++) {
     const child = math_el.children[j];
 
@@ -71,7 +75,7 @@ export const parseMarkdownByElement = (el: HTMLElement | Document, include_sub_m
 
   const math_el = include_sub_math
     ? el.querySelectorAll('.math-inline, .math-block, .table_tabular, .inline-tabular, .smiles, .smiles-inline')
-    : el.querySelectorAll('div > .math-inline, div > .math-block, .table_tabular, div > .inline-tabular, div > .smiles, div > .smiles-inline');
+    : el.querySelectorAll('div > .math-inline, div > .math-block, .table_tabular, div > .inline-tabular, div > .smiles, div > .smiles-inline, pre > mol');
   if (!math_el) return null;
 
   for (let i = 0; i < math_el.length; i++) {

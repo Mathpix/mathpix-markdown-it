@@ -42,7 +42,13 @@ const wrapFence = render => (tokens, idx, options, env, slf) => {
   html = html
     .replace('<code class="', '<code class="hljs ')
     .replace('<code>', '<code class="hljs">')
-  
+  let htmlMol: string = '';
+  if (tokens[idx].info === "mol" && options?.outMath?.include_mol) {
+    htmlMol = '<mol style="display: none">' + tokens[idx].content + '</mol>';
+    html = html
+        .replace('</pre>', htmlMol + '</pre>')
+  }
+
   if (options?.lineNumbering) {
     let line, endLine, listLine;
     if (tokens[idx].map && tokens[idx].level === 0) {
