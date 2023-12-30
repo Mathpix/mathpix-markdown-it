@@ -61,6 +61,7 @@ export const reOpenTagFootnotetextNumbered: RegExp = /\\footnotetext\s{0,}\[(?<n
 export const reFootNoteMark: RegExp = /^\\footnotemark/;
 export const reFootNoteText: RegExp = /^\\footnotetext|\\blfootnotetext/;
 export const reNumber = /^-?\d+$/;
+export const svgRegex: RegExp = /^<svg\b[^>]*>[\s\S]*<\/svg>$/;
 
 export const HIGHLIGHT_COLOR = 'rgba(0, 147, 255, 0.25)';
 export const HIGHLIGHT_TEXT_COLOR = '#1e2029';

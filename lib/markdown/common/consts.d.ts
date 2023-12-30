@@ -42,6 +42,7 @@ export declare const reOpenTagFootnotetextNumbered: RegExp;
 export declare const reFootNoteMark: RegExp;
 export declare const reFootNoteText: RegExp;
 export declare const reNumber: RegExp;
+export declare const svgRegex: RegExp;
 export declare const HIGHLIGHT_COLOR = "rgba(0, 147, 255, 0.25)";
 export declare const HIGHLIGHT_TEXT_COLOR = "#1e2029";
 export declare const latexEnvironments: string[];
