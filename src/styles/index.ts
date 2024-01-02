@@ -357,6 +357,10 @@ export const MathpixStyle = (setTextAlignJustify: boolean = false, useColors: bo
           ". . . . . . . . . . . . . . . . . . . . . . . ";
       text-align: right;
     }
+    
+   .smiles {
+     text-align: center;
+   }
 `};
 
 export const PreviewStyle = `

@@ -2,7 +2,7 @@ import { sanitize } from './sanitize';
 import { injectInlineStyles } from './inline-styles';
 import {getLabelByUuidFromLabelsList, ILabel} from "./common/labels";
 import { attrSetToBegin } from "./utils";
-import { codeHighlightDef } from "./common/consts";
+import { codeHighlightDef, svgRegex } from "./common/consts";
 
 export const PREVIEW_PARAGRAPH_PREFIX = "preview-paragraph-";
 export const PREVIEW_LINE_CLASS = "preview-line";
@@ -14,6 +14,9 @@ const escapeHtml = require('markdown-it/lib/common/utils').escapeHtml;
 /** inspired from https://github.com/markdown-it/markdown-it.github.io/blob/master/index.js#L9929 */
 function injectLineNumbers(tokens, idx, options, env, slf) {
   let line, endLine, listLine;
+  if (tokens[idx+1]?.content && svgRegex.test(tokens[idx+1].content)) {
+    tokens[idx].attrJoin('style', 'text-align: center;')
+  }
   if (tokens[idx].uuid) {
     const label: ILabel = getLabelByUuidFromLabelsList(tokens[idx].uuid);
     if (label) {
@@ -41,6 +44,9 @@ function injectLineNumbers(tokens, idx, options, env, slf) {
 }
 
 function injectLabelIdToParagraphOPen(tokens, idx, options, env, slf) {
+  if (tokens[idx+1]?.content && svgRegex.test(tokens[idx+1].content)) {
+    tokens[idx].attrJoin('style', 'text-align: center;')
+  }
   if (tokens[idx].uuid) {
     const label: ILabel = getLabelByUuidFromLabelsList(tokens[idx].uuid);
     if (label) {
