@@ -14,7 +14,7 @@ const escapeHtml = require('markdown-it/lib/common/utils').escapeHtml;
 /** inspired from https://github.com/markdown-it/markdown-it.github.io/blob/master/index.js#L9929 */
 function injectLineNumbers(tokens, idx, options, env, slf) {
   let line, endLine, listLine;
-  if (tokens[idx+1]?.content && svgRegex.test(tokens[idx+1].content)) {
+  if (options?.html && tokens[idx+1]?.content && svgRegex.test(tokens[idx+1].content)) {
     tokens[idx].attrJoin('style', 'text-align: center;')
   }
   if (tokens[idx].uuid) {
@@ -44,7 +44,7 @@ function injectLineNumbers(tokens, idx, options, env, slf) {
 }
 
 function injectLabelIdToParagraphOPen(tokens, idx, options, env, slf) {
-  if (tokens[idx+1]?.content && svgRegex.test(tokens[idx+1].content)) {
+  if (options?.html && tokens[idx+1]?.content && svgRegex.test(tokens[idx+1].content)) {
     tokens[idx].attrJoin('style', 'text-align: center;')
   }
   if (tokens[idx].uuid) {
@@ -70,6 +70,9 @@ function html_block_injectLineNumbers(tokens, idx, options, env, slf) {
   const { htmlSanitize = {}, enableFileLinks } = options;
   let line, endLine, listLine;
 
+  if (tokens[idx]?.content && svgRegex.test(tokens[idx].content.trim())) {
+    tokens[idx].attrJoin('style', 'text-align: center;')
+  }
   if (htmlSanitize !== false) {
     if (tokens[idx] && tokens[idx].content) {
       const optionsSanitize = {
@@ -108,7 +111,24 @@ function html_block_Sanitize (tokens, idx, options, env, slf) {
   const optionsSanitize = {
     enableFileLinks: enableFileLinks
   };
+  if (tokens[idx]?.content && svgRegex.test(tokens[idx].content.trim())) {
+    return '<div style="text-align: center;">'
+        + sanitize(tokens[idx].content, Object.assign({}, optionsSanitize, htmlSanitize))
+        + '</div>\n';
+  }
   return sanitize(tokens[idx].content, Object.assign({}, optionsSanitize, htmlSanitize));
+}
+
+function html_block_injectStyleForSvg (tokens, idx, options, env, slf) {
+  if (!tokens[idx].content) {
+    return '';
+  }
+  if (tokens[idx]?.content && svgRegex.test(tokens[idx].content.trim())) {
+    return  '<div style="text-align: center;">'
+        + tokens[idx].content
+        + '</div>\n';
+  }
+  return tokens[idx].content;
 }
 
 function html_inline_Sanitize (tokens, idx, options) {
@@ -199,9 +219,13 @@ export const injectRenderRules = (renderer) => {
     }
   } else {
     injectLabelIdToParagraph(renderer);
-    if (html && htmlSanitize !== false) {
-      renderer.renderer.rules.html_block = html_block_Sanitize;
-      renderer.renderer.rules.html_inline  = html_inline_Sanitize;
+    if (html) {
+      if (htmlSanitize !== false) {
+        renderer.renderer.rules.html_block = html_block_Sanitize;
+        renderer.renderer.rules.html_inline  = html_inline_Sanitize;
+      } else {
+        renderer.renderer.rules.html_block = html_block_injectStyleForSvg;
+      }
     }
   }
   return renderer;
