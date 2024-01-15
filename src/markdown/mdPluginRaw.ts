@@ -37,6 +37,7 @@ import {envArraysShouldBeFlattenInTSV} from '../helpers/consts';
 import {getTerminatedRules} from './common';
 import {highlightText} from "./highlight/common";
 import {ParserErrors} from "../mathpix-markdown-model";
+import {svg_block} from "./md-block-rule/svg_block";
 
 const isSpace = require('markdown-it/lib/common/utils').isSpace;
 
@@ -1014,6 +1015,8 @@ export default options => {
       /** TODO: check it in vscode */
       clearLabelsList(); /** Clean up the global list of all labels */
     }
+    md.block.ruler.before('html_block', 'svg_block', svg_block,
+        {alt: getTerminatedRules("svg_block")});
     md.block.ruler.before("paragraph", "paragraphDiv", paragraphDiv);
     if (!md.options.enableCodeBlockRuleForLatexCommands) {
       md.block.ruler.at("code", codeBlock);

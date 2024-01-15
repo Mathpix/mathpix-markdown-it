@@ -177,6 +177,9 @@ export const terminatedRules = {
   },
   "paragraphDiv": {
     terminated: []
+  },
+  "svg_block": {
+    terminated: ['paragraph']
   }
 };
 

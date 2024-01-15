@@ -113,6 +113,9 @@ export declare const terminatedRules: {
     paragraphDiv: {
         terminated: any[];
     };
+    svg_block: {
+        terminated: string[];
+    };
 };
 export declare const mathTokenTypes: string[];
 export declare const codeHighlightDef: {
