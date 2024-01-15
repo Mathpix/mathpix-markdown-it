@@ -33,7 +33,7 @@ export const formatSourceMML = (text: string) => {
 
 export const parseMmdElement = (math_el, res = []) => {
   if (!math_el) return res;
-  if (math_el.tagName?.toUpperCase() === 'MOL' || math_el.tagName?.toUpperCase() === 'SMILES' || math_el.tagName?.toUpperCase() === 'SVG') {
+  if (math_el.tagName?.toUpperCase() === 'MOL' || math_el.tagName?.toUpperCase() === 'SMILES') {
     res.push({
       type: math_el.tagName.toLowerCase(),
       value: math_el.innerHTML
@@ -76,8 +76,8 @@ export const parseMarkdownByElement = (el: HTMLElement | Document, include_sub_m
   let res = [];
   if (!el) return null;
   const math_el = include_sub_math
-    ? el.querySelectorAll('.math-inline, .math-block, .table_tabular, .inline-tabular, .smiles, .smiles-inline, svg > mol, svg > smiles, svg')
-    : el.querySelectorAll('div > .math-inline, div > .math-block, .table_tabular, div > .inline-tabular, div > .smiles, div > .smiles-inline, pre > mol, div > svg, svg > mol, svg > smiles');
+    ? el.querySelectorAll('.math-inline, .math-block, .table_tabular, .inline-tabular, .smiles, .smiles-inline, svg > mol, svg > smiles')
+    : el.querySelectorAll('div > .math-inline, div > .math-block, .table_tabular, div > .inline-tabular, div > .smiles, div > .smiles-inline, pre > mol, svg > mol, svg > smiles');
 if (!math_el) return null;
 
   for (let i = 0; i < math_el.length; i++) {
