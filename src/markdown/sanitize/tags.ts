@@ -43,7 +43,9 @@ export const svgTags = [
   'view',
   'vkern',
   'mol',
-  'smiles'
+  'smiles',
+  'molecule',
+  'inchi'
 ];
 
 
