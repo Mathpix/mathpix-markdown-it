@@ -33,8 +33,11 @@ export const formatSourceMML = (text: string) => {
 
 export const parseMmdElement = (math_el, res = []) => {
   if (!math_el) return res;
-  if (math_el.tagName === 'MOL') {
-    res.push({type: "mol", value: math_el.innerHTML});
+  if (['SMILES', 'MOL', 'INCHI'].includes(math_el.tagName?.toUpperCase())) {
+    res.push({
+      type: math_el.tagName.toLowerCase(),
+      value: math_el.innerHTML
+    });
     return res;
   }
   if (!math_el.children || !math_el.children.length) return res;
@@ -72,10 +75,10 @@ export const parseMmdElement = (math_el, res = []) => {
 export const parseMarkdownByElement = (el: HTMLElement | Document, include_sub_math: boolean = true) => {
   let res = [];
   if (!el) return null;
-
+  let querySelectorChem: string = 'pre > mol, svg > metadata > molecule > mol, svg > metadata > molecule > smiles, svg > metadata > molecule > inchi';
   const math_el = include_sub_math
-    ? el.querySelectorAll('.math-inline, .math-block, .table_tabular, .inline-tabular, .smiles, .smiles-inline')
-    : el.querySelectorAll('div > .math-inline, div > .math-block, .table_tabular, div > .inline-tabular, div > .smiles, div > .smiles-inline, pre > mol');
+    ? el.querySelectorAll('.math-inline, .math-block, .table_tabular, .inline-tabular, .smiles, .smiles-inline' + ', ' + querySelectorChem)
+    : el.querySelectorAll('div > .math-inline, div > .math-block, .table_tabular, div > .inline-tabular, div > .smiles, div > .smiles-inline' + ', ' + querySelectorChem);
   if (!math_el) return null;
 
   for (let i = 0; i < math_el.length; i++) {
