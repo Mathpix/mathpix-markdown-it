@@ -87,25 +87,25 @@ function sanitizeHtml(html, options, _recursing) {
   let result = '';
   // Used for hot swapping the result variable with an empty string in order to "capture" the text written to it.
   let tempResult = '';
-
-  function Frame(this: any, tag, attribs) {
+  function Frame(this: any, tag, attribs, allowChildTags = false) {
     const that = this;
     this.tag = tag;
     this.attribs = attribs || {};
     this.tagPosition = result.length;
     this.text = ''; // Node inner text
     this.mediaChildren = [];
+    this.allowChildTags = allowChildTags;
 
     this.updateParentNodeText = function() {
       if (stack.length) {
-        const parentFrame = stack[stack.length - 1];
+        const parentFrame = stack[stack.length - 1]?.frame;
         parentFrame.text += that.text;
       }
     };
 
     this.updateParentNodeMediaChildren = function() {
       if (stack.length && mediaTags.includes(this.tag)) {
-        const parentFrame = stack[stack.length - 1];
+        const parentFrame = stack[stack.length - 1]?.frame;
         parentFrame.mediaChildren.push(this.tag);
       }
     };
@@ -221,8 +221,17 @@ function sanitizeHtml(html, options, _recursing) {
         skipTextDepth++;
         return;
       }
-      const frame = new Frame(name, attribs);
-      stack.push(frame);
+      let parentFrame = stack.length ?  stack[stack.length - 1]?.frame : null;
+      //Allow all tags inside metadata for svg
+      const allowChildTags = (parentFrame?.tag === 'svg' && name === 'metadata') || parentFrame?.allowChildTags;
+      const isVulnerableTag = vulnerableTags?.indexOf(name) !== -1
+      if (allowChildTags && !isVulnerableTag) {
+        if (options.allowedTags && options.allowedTags.indexOf(name) === -1) {
+          options.allowedTags.push(name);
+        }
+      }
+      const frame = new Frame(name, attribs, allowChildTags && !isVulnerableTag);
+      stack.push({frame: frame, parentFrame: parentFrame});
 
       let skip = false;
       const hasText = !!frame.text;
@@ -498,7 +507,7 @@ function sanitizeHtml(html, options, _recursing) {
       if (skipText) {
         return;
       }
-      const lastFrame = stack[stack.length - 1];
+      const lastFrame = stack[stack.length - 1]?.frame;
       let tag;
 
       if (lastFrame) {
@@ -522,7 +531,7 @@ function sanitizeHtml(html, options, _recursing) {
         }
       }
       if (stack.length) {
-        const frame = stack[stack.length - 1];
+        const frame = stack[stack.length - 1]?.frame;
         frame.text += text;
       }
     },
@@ -537,7 +546,7 @@ function sanitizeHtml(html, options, _recursing) {
         }
       }
 
-      const frame = stack.pop();
+      const frame = stack.pop()?.frame;
       if (!frame) {
         // Do not crash on bad markup
         return;
