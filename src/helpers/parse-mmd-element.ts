@@ -33,11 +33,15 @@ export const formatSourceMML = (text: string) => {
 
 export const parseMmdElement = (math_el, res = []) => {
   if (!math_el) return res;
-  if (['SMILES', 'MOL', 'INCHI'].includes(math_el.tagName?.toUpperCase())) {
-    res.push({
-      type: math_el.tagName.toLowerCase(),
-      value: math_el.innerHTML
-    });
+  if (['MOLECULE', 'CHARTDATA'].includes(math_el.tagName?.toUpperCase())) {
+    if (math_el.children?.length) {
+      for (let i = 0; i < math_el.children.length; i++) {
+        res.push({
+          type: math_el.children[i].tagName.toLowerCase(),
+          value: formatSourceHtml(math_el.children[i].innerHTML)
+        });
+      }
+    }
     return res;
   }
   if (!math_el.children || !math_el.children.length) return res;
@@ -75,10 +79,17 @@ export const parseMmdElement = (math_el, res = []) => {
 export const parseMarkdownByElement = (el: HTMLElement | Document, include_sub_math: boolean = true) => {
   let res = [];
   if (!el) return null;
-  let querySelectorChem: string = 'pre > mol, svg > metadata > molecule > mol, svg > metadata > molecule > smiles, svg > metadata > molecule > inchi';
+  let querySelectorChem: string = 'pre > mol, svg > metadata > molecule';
+  let querySelectorChart: string = 'svg > metadata > chartdata';
   const math_el = include_sub_math
-    ? el.querySelectorAll('.math-inline, .math-block, .table_tabular, .inline-tabular, .smiles, .smiles-inline' + ', ' + querySelectorChem)
-    : el.querySelectorAll('div > .math-inline, div > .math-block, .table_tabular, div > .inline-tabular, div > .smiles, div > .smiles-inline' + ', ' + querySelectorChem);
+    ? el.querySelectorAll('.math-inline, .math-block, .table_tabular, .inline-tabular, .smiles, .smiles-inline'
+          + ', ' + querySelectorChem
+          + ', ' + querySelectorChart
+      )
+    : el.querySelectorAll('div > .math-inline, div > .math-block, .table_tabular, div > .inline-tabular, div > .smiles, div > .smiles-inline'
+          + ', ' + querySelectorChem
+          + ', ' + querySelectorChart
+      );
   if (!math_el) return null;
 
   for (let i = 0; i < math_el.length; i++) {
