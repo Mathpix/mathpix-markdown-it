@@ -62,6 +62,11 @@ export const reFootNoteMark: RegExp = /^\\footnotemark/;
 export const reFootNoteText: RegExp = /^\\footnotetext|\\blfootnotetext/;
 export const reNumber = /^-?\d+$/;
 export const svgRegex: RegExp = /^<svg\b[^>]*>[\s\S]*<\/svg>$/;
+export const uuidPattern: string = '(f[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})';
+export const doubleAngleBracketUuidPattern: RegExp = new RegExp(`<<(?:${uuidPattern})>>`, "g");
+export const singleAngleBracketPattern: RegExp = new RegExp(`<(?:${uuidPattern})>`, "g");
+export const doubleCurlyBracketUuidPattern: RegExp = new RegExp(`\\{\\{(?:${uuidPattern})\\}\\}`, "g");
+export const singleCurlyBracketPattern: RegExp = new RegExp(`\\{(?:${uuidPattern})\\}`, "g");
 
 export const HIGHLIGHT_COLOR = 'rgba(0, 147, 255, 0.25)';
 export const HIGHLIGHT_TEXT_COLOR = '#1e2029';

@@ -11,7 +11,7 @@ type TTypeContentList = Array<TTypeContent>;
 export type TAttrs = string[];
 export type TTokenTabular = {
     token: string;
-    type: string;
+    type?: string;
     tag: string;
     n: number;
     content?: string;
@@ -23,6 +23,7 @@ export type TTokenTabular = {
     ascii_csv?: string;
     ascii_md?: string;
     latex?: string;
+    parents?: Array<string>;
 };
 export type TMulti = {
     mr?: number;

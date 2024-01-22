@@ -1,5 +1,5 @@
 import { mathTablePush, getMathTableContent } from './sub-math';
-
+import { generateUniqueId } from "./common";
 
 export const codeInlineContent = (res, type: string = 'inline') => {
   res
@@ -18,7 +18,7 @@ const getSubCodeBlock = (str: string): string  => {
   if (match) {
     const end = str.indexOf('```', match.index + 3);
     if (end > -1) {
-      const id: string = `f${(+new Date +  (Math.random()*100000).toFixed()).toString()}`;
+      const id: string = generateUniqueId();
       mathTablePush({id: id, content: str.slice(match.index, end + 3)});
       str = str.slice(0, match.index) + `{${id}}` + str.slice( end + 3)
       str = getSubCodeBlock(str)
@@ -45,7 +45,7 @@ export const getSubCode = (str: string): string => {
         c += str[ii]
       } else {
         c += str[ii]
-        const id: string = `f${(+new Date +  (Math.random()*100000).toFixed()).toString()}`;
+        const id: string = generateUniqueId();
         mathTablePush({id: id, content: c})
         str2 += `{${id}}`;
         c = ''
