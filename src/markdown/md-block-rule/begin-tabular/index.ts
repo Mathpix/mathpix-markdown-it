@@ -15,8 +15,22 @@ const closeTagG: RegExp = /(?:\\end\s{0,}{tabular})/g;
 type TTypeContent = {type?: string, content?: string, align?: string}
 type TTypeContentList = Array<TTypeContent>;
 export type TAttrs = string[];
-export type TTokenTabular = {token: string, type: string, tag: string, n: number, content?: string,
-  attrs?: Array<TAttrs>, children?: Token, id?: string, ascii?: string, ascii_tsv?: string, ascii_csv?: string, ascii_md?: string, latex?: string};
+export type TTokenTabular = {
+  token: string,
+  type: string,
+  tag: string,
+  n: number,
+  content?: string,
+  attrs?: Array<TAttrs>,
+  children?: Token,
+  id?: string,
+  ascii?: string,
+  ascii_tsv?: string,
+  ascii_csv?: string,
+  ascii_md?: string,
+  latex?: string,
+  parents?: Array<string>
+};
 
 
 export type TMulti = {mr?: number, mc?: number, attrs: Array<TAttrs>, content?: string, subTable?: Array<TTokenTabular>, latex: string}
@@ -220,15 +234,21 @@ export const StatePushDiv = (state, startLine: number, nextLine: number, content
 };
 
 export const StatePushTabularBlock = (state, startLine: number, nextLine: number, content: string, align: string, centerTables = false): boolean => {
-  const cTabular = parseInlineTabular(content);
-  if (!cTabular || cTabular.length === 0) {
-    return CheckParseError(state, startLine, nextLine, content)
+  try {
+    const cTabular: TTypeContentList = parseInlineTabular(content);
+    if (!cTabular || cTabular.length === 0) {
+      return CheckParseError(state, startLine, nextLine, content)
+    }
+    state.line = nextLine;
+    StatePushParagraphOpen(state, startLine, align, centerTables);
+    StatePushTabulars(state, cTabular, align, startLine);
+    StatePushParagraphClose(state);
+    return true;
+  } catch (err) {
+    console.log("[MMD]=>[StatePushTabularBlock]=>ERROR=>", err);
+    console.log("[MMD]=>[StatePushTabularBlock]=>ERROR=>content=>", content);
+    return false;
   }
-  state.line = nextLine;
-  StatePushParagraphOpen(state, startLine, align, centerTables);
-  StatePushTabulars(state, cTabular, align, startLine);
-  StatePushParagraphClose(state);
-  return true;
 };
 
 export const BeginTabular: RuleBlock = (state, startLine: number, endLine: number, silent) => {

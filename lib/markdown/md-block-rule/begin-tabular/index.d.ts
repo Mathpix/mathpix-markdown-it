@@ -23,6 +23,7 @@ export type TTokenTabular = {
     ascii_csv?: string;
     ascii_md?: string;
     latex?: string;
+    parents?: Array<string>;
 };
 export type TMulti = {
     mr?: number;

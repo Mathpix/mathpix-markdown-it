@@ -52,7 +52,7 @@ export const pushSubTabular = (
 };
 
 export const getSubTabular = (sub: string, i: number, isCell: boolean = true, forLatex = false): Array<TTokenTabular> | null => {
-  let res: Array<TTokenTabular>| any = [];
+  let res: Array<TTokenTabular> = [];
   let lastIndex: number = 0;
   sub = sub.trim();
   if (isCell) {sub = getContent(sub, true)}
@@ -85,7 +85,13 @@ export const getSubTabular = (sub: string, i: number, isCell: boolean = true, fo
       }
       const st = strB + subTabular[index].content + strE;
       if (forLatex) {
-        res.push({token: 'inline', tag: '', n: 0, content: st,  id: subTabular[index].id})
+        res.push({
+          token: 'inline',
+          type: 'subTabular',
+          tag: '',
+          n: 0,
+          content: st,
+          id: subTabular[index].id})
       } else {
         res.push({
           token: 'inline',
