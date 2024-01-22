@@ -17,7 +17,7 @@ type TTypeContentList = Array<TTypeContent>;
 export type TAttrs = string[];
 export type TTokenTabular = {
   token: string,
-  type: string,
+  type?: string,
   tag: string,
   n: number,
   content?: string,

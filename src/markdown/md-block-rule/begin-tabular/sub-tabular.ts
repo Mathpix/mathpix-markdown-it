@@ -87,7 +87,6 @@ export const getSubTabular = (sub: string, i: number, isCell: boolean = true, fo
       if (forLatex) {
         res.push({
           token: 'inline',
-          type: 'subTabular',
           tag: '',
           n: 0,
           content: st,
