@@ -1,4 +1,5 @@
 import {separateByColumns} from "./parse-tabular";
+import { v4 as uuidv4 } from 'uuid';
 
 export type TParselines = {cLines: Array<Array<string>>, cSpaces: Array<Array<string>>, sLines: Array<string>}
 const lineSpaceTag: RegExp = /\[(.*?)\]\s{0,}\\hline|\[(.*?)\]\s{0,}\\hhline|\[(.*?)\]\s{0,}\\hdashline|\[(.*?)\]\s{0,}\\cline\s{0,}\{([^}]*)\}|\\hline|\\hhline|\\hdashline|\\cline\s{0,}\{([^}]*)\}|^\[(.*?)\]/g;
@@ -13,6 +14,13 @@ export const getContent = (content: string, onlyOne: boolean = false): string =>
   return content;
 };
 
+export const generateUniqueId = (onlyUuid = false): string => {
+  if (onlyUuid) {
+    return uuidv4();
+  } else {
+    return `f${uuidv4()}`
+  }
+}
 
 export const getColumnLines = (str: string, numCol: number = 0): Array<string> => {
   str = str

@@ -1,6 +1,7 @@
-import { getContent } from './common';
+import { generateUniqueId, getContent } from './common';
 import {findEndMarkerPos} from "../../mdPluginRaw";
 import { beginTag, endTag, findOpenCloseTagsMathEnvironment } from "../../utils";
+import { doubleCurlyBracketUuidPattern, singleCurlyBracketPattern } from "../../common/consts";
 
 type TSubMath = {id: string, content: string}
 var mathTable: Array<TSubMath> = [];
@@ -16,8 +17,8 @@ export const mathTablePush = (item: TSubMath) => {
 export const getMathTableContent = (sub: string, i: number): string => {
   let resContent: string = sub;
   sub = sub.trim();
-  let cellM: Array<string> =  sub.slice(i).match(/(?:\{\{([\w]*)\}\})/g);
-  cellM =  cellM ? cellM : sub.slice(i).match(/(?:\{([\w]*)\})/g);
+  let cellM: Array<string> =  sub.slice(i).match(doubleCurlyBracketUuidPattern);
+  cellM =  cellM ? cellM : sub.slice(i).match(singleCurlyBracketPattern);
   if (!cellM) {
     return '';
   }
@@ -111,7 +112,7 @@ export const getSubMath = (str: string, startPos = 0): string => {
 
     const content: string = str.slice(beginMarkerPos, nextPos);
 
-    const id: string = `f${(+new Date +  (Math.random()*100000).toFixed()).toString()}`;
+    const id: string = generateUniqueId();
     mathTable.push({id: id, content: content});
     str = str.slice(0, startPos) + str.slice(startPos, beginMarkerPos) + `{${id}}` + str.slice(endMarkerPos + endMarker.length);
     str = getSubMath(str, startPos);

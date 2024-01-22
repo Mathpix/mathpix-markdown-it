@@ -296,22 +296,22 @@ export const ParseTabular = (str: string, i: number, align: string='', options =
     if (posBegin >= 0) {
       let params = getParams(str, posBegin + '\\begin{tabular}'.length);
       if (params) {
-        const subT = str.slice(posBegin, posEnd+ '\\end{tabular}'.length);
-        str = pushSubTabular(str, subT, posBegin, posEnd, i);
+        const subT: string = str.slice(posBegin, posEnd+ '\\end{tabular}'.length);
+        str = pushSubTabular(str, subT, [], posBegin, posEnd, i);
         res = ParseTabular(str, 0, align, options);
       } else {
         let match = str
           .slice(posBegin)
           .match(/(?:\\begin{tabular}\s{0,}\{([^}]*)\})/);
 
-        const subT = str.slice(posBegin, posEnd + '\\end{tabular}'.length);
-        str = pushSubTabular(str, subT, posBegin + match.index, posEnd, i);
+        const subT: string = str.slice(posBegin, posEnd + '\\end{tabular}'.length);
+        str = pushSubTabular(str, subT, [], posBegin + match.index, posEnd, i);
         res = ParseTabular(str, 0, align, options);
       }
     } else {
-      const subT = str.slice(i, posEnd);
+      const subT: string = str.slice(i, posEnd);
       const subRes: Array<TTokenTabular> = setTokensTabular(subT, align, options);
-      str = pushSubTabular(str, subRes, 0, posEnd);
+      str = pushSubTabular(str, subT, subRes, 0, posEnd);
       res = ParseTabular(str, 0, align, options);
     }
   } else {

@@ -4,6 +4,7 @@ export type TParselines = {
     sLines: Array<string>;
 };
 export declare const getContent: (content: string, onlyOne?: boolean) => string;
+export declare const generateUniqueId: (onlyUuid?: boolean) => string;
 export declare const getColumnLines: (str: string, numCol?: number) => Array<string>;
 export declare const getColumnAlign: (align: string) => string[] | [
 ];

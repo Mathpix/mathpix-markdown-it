@@ -1,6 +1,6 @@
 {
   "name": "mathpix-markdown-it",
-  "version": "1.2.26",
+  "version": "1.2.27",
   "description": "Mathpix-markdown-it is an open source implementation of the mathpix-markdown spec written in Typescript. It relies on the following open source libraries: MathJax v3 (to render math with SVGs), markdown-it (for standard Markdown parsing)",
   "keywords": [
     "MathJax",
@@ -70,12 +70,14 @@
     "react-dom": "^16.7.0",
     "react-emotion": "^10.0.0",
     "speech-rule-engine": "^4.0.2",
-    "tslib": "^2.6.0"
+    "tslib": "^2.6.0",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.22.6",
     "@babel/plugin-transform-runtime": "^7.22.6",
     "@babel/preset-env": "^7.22.6",
+    "@types/uuid": "^9.0.7",
     "babel-loader": "^9.1.2",
     "copy-webpack-plugin": "^10.2.4",
     "css-loader": "^6.6.0",
