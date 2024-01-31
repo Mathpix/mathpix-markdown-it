@@ -1,6 +1,7 @@
 import { RuleInline } from 'markdown-it';
 const isSpace = require('markdown-it/lib/common/utils').isSpace;
 const normalizeReference = require('markdown-it/lib/common/utils').normalizeReference;
+import { parseLinkDestination } from '../../helpers/parze_link_destination';
 const percentageRegex = /([\d.]+)%/i;
 const sizeRegex = /([\d.]+)(px|pt|em|cm|mm|in)/i;
 
@@ -123,6 +124,7 @@ export const imageWithSize: RuleInline = (state, silent) => {
     href = '',
     oldPos = state.pos,
     max = state.posMax;
+  let pathOrigin: string = '';
   let attrsStyles = [];
   let params: IParseImageParams = null;
 
@@ -153,9 +155,14 @@ export const imageWithSize: RuleInline = (state, silent) => {
     // [link](  <href>  "title"  )
     //          ^^^^^^ parsing link destination
     start = pos;
-    res = state.md.helpers.parseLinkDestination(state.src, pos, state.posMax);
+    if (state.md.options?.enableFileLinks) {
+      res = parseLinkDestination(state.src, pos, state.posMax);
+    } else {
+      res = state.md.helpers.parseLinkDestination(state.src, pos, state.posMax);
+    }
     if (res.ok) {
       href = state.md.normalizeLink(res.str);
+      pathOrigin = res.str;
       if (state.md.validateLink(href)) {
         pos = res.pos;
       } else {
@@ -168,7 +175,7 @@ export const imageWithSize: RuleInline = (state, silent) => {
     start = pos;
     for (; pos < max; pos++) {
       code = state.src.charCodeAt(pos);
-      if (!isSpace(code) && code !== 0x0A) { break; }
+      if (!isSpace(code) && code !== 0x0A /* \n */) { break; }
     }
 
     // [link](  <href>  "title"  )
@@ -290,6 +297,9 @@ export const imageWithSize: RuleInline = (state, silent) => {
 
     token          = state.push('image', 'img', 0);
     attrs = [ [ 'src', href ], [ 'alt', '' ] ];
+    if (state.md.options?.enableFileLinks && pathOrigin) {
+      attrs.push(['data-origin-src', pathOrigin])
+    }
     if (attrsStyles?.length) {
       attrs = attrs.concat(attrsStyles);
     } else {
