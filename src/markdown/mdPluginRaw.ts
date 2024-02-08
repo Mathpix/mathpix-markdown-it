@@ -784,7 +784,6 @@ function paragraphDiv(state, startLine/*, endLine*/) {
 
   const pickTag: RegExp = /^\\(?:title|section|subsection)/;
   const listStartTag: RegExp = /\\begin{(enumerate|itemize)}/;
-
   let content, terminate, i, l, token, oldParentType, lineText, mml,
     nextLine = startLine + 1,
     terminatorRules = state.md.block.ruler.getRules('paragraph'),
@@ -811,6 +810,7 @@ function paragraphDiv(state, startLine/*, endLine*/) {
   let listOpen = false;
   let isMath = false;
   let mathEndTag: RegExp | null = null;
+  let terminatedLine: number = -1;
   // jump line-by-line until empty one or EOF
   for (; nextLine < endLine; nextLine++) {
     if (!isMathOpen && !isMath && mathStartTag.test(lineText) //&& !pickStartTag.test(lineText)
@@ -852,10 +852,6 @@ function paragraphDiv(state, startLine/*, endLine*/) {
       listOpen = true;
     }
 
-    if (includesSimpleMathTag(lineText)) {
-      isMathOpen = !isMathOpen
-    }
-
     if (mml) {
       if (closeTagMML.test(lineText)) { mml = false; }
     } else {
@@ -864,8 +860,12 @@ function paragraphDiv(state, startLine/*, endLine*/) {
       }
       if (state.isEmpty(nextLine)
         || pickStartTag.test(lineText) || pickEndTag.test(prewLineText)
-        || (!isMath && !openedAuthorBlock && (pickMathStartTag.test(lineText) || pickMathEndTag.test(prewLineText)))) {
+        || (!isMath && !openedAuthorBlock && !isMathOpen
+              && (pickMathStartTag.test(lineText) || pickMathEndTag.test(prewLineText)))) {
         break;
+      }
+      if (includesSimpleMathTag(lineText)) {
+        isMathOpen = !isMathOpen
       }
 
       if (listStartTag.test(lineText) && (prewLineText.indexOf('\\item') === -1 || !listOpen)) {
@@ -885,18 +885,30 @@ function paragraphDiv(state, startLine/*, endLine*/) {
 
     // quirk for blockquotes, this line should already be checked by that rule
     if (state.sCount[nextLine] < 0) { continue; }
-
-    if (!isMath && !isMathOpen) {
-      // Some tags can terminate paragraph without empty line.
-      terminate = false;
-      for (i = 0, l = terminatorRules.length; i < l; i++) {
-        if (terminatorRules[i](state, nextLine, endLine, true)) {
+    // Some tags can terminate paragraph without empty line.
+    terminate = false;
+    for (i = 0, l = terminatorRules.length; i < l; i++) {
+      if (terminatorRules[i](state, nextLine, endLine, true)) {
+        if (terminatedLine === -1) {
+          terminatedLine = nextLine;
           terminate = true;
           break;
         }
       }
+    }
+    if (!isMath && !isMathOpen) {
       if (terminate) { break; }
     }
+  }
+
+  if (isMath && mathEndTag && mathEndTag.test(lineText)) {
+    if (includesMultiMathTag(lineText, mathEndTag)) {
+      isMath = false
+    }
+  }
+
+  if (isMath && terminatedLine !== -1) {
+    nextLine = terminatedLine
   }
   content = state.getLines(startLine, nextLine, state.blkIndent, false).trim();
 

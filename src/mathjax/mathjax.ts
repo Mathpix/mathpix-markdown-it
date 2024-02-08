@@ -1,5 +1,6 @@
 import {mathjax} from 'mathjax-full/js/mathjax.js';
 import {TeX} from 'mathjax-full/js/input/tex.js';
+import {AbstractTags, TagInfo} from 'mathjax-full/js/input/tex/Tags.js';
 import {MathML} from "mathjax-full/js/input/mathml.js";
 import {SVG} from 'mathjax-full/js/output/svg.js';
 import { AsciiMath } from 'mathjax-full/js/input/asciimath.js';
@@ -19,6 +20,21 @@ import {BaseConfiguration} from 'mathjax-full/js/input/tex/base/BaseConfiguratio
 BaseConfiguration.handler.macro.push('wasysym-mathchar0mo');
 //wasysym-macros
 BaseConfiguration.handler.macro.push('wasysym-macros');
+
+/** Strange bug with using \tag. In MathJax 3.0.1 https://github.com/mathjax/MathJax/issues/2643#issuecomment-800576687
+ * The tag information was not being reset when the equation was being re-rendered.
+ * That left an extra tagging information object on the stack, and that ended up being the initial state for the next equation (instead of a blank one)
+ *
+ * It was fixed in MathJax 3.1 -
+ * We can opt out of this when upgrading to version 3.1 and higher */
+const startEquation = AbstractTags.prototype.startEquation;
+AbstractTags.prototype.startEquation = function (math) {
+  this['history'] = [];
+  this['stack'] = [];
+  this.clearTag();
+  this.currentTag = new TagInfo('', undefined, undefined);
+  startEquation.call(this, math);
+}
 
 const texConfig = Object.assign({}, MathJaxConfig.TeX || {});
 /** for TSV/CSV, add the array package, which will add an additional name attribute that points to the environment */
