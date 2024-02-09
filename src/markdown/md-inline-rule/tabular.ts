@@ -14,10 +14,13 @@ export const inlineTabular: RuleInline = (state, silent) => {
     return false;
   }
   const endMarker= '\\end{tabular}';
-  const endMarkerPos = state.src.lastIndexOf(endMarker);
+  let endMarkerPos = state.src
+          .slice(startMathPos)
+          .lastIndexOf(endMarker);
   if (endMarkerPos === -1) {
     return false;
   }
+  endMarkerPos += startMathPos;
   const nextPos = endMarkerPos + endMarker.length;
   if (!silent) {
     const token = state.push("tabular_inline", "", 0);

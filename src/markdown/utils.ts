@@ -143,7 +143,7 @@ export const includesMultiMathBeginTag = (str, tag): RegExp | null => {
         } else if (match[0] === "\\(" || match[0] === "\(") {
           result = /\\\)/;
         } else if (match[1]) {
-          result = new RegExp(`\end{${match[1]}}`);
+          result = endTag(match[1])
         }
         break;
       } else {
