@@ -14,7 +14,7 @@ class App extends React.Component {
     }
   }
   render() {
-    const html = MM.render(data);
+    const html = MM.render(data, {htmlTags: true});
     return (
       <div className="App">
         <div className="content" dangerouslySetInnerHTML={{__html: html}}></div>

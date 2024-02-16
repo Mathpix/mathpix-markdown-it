@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { MathpixMarkdown, MathpixLoader, MathpixLoaderAccessibility } from 'mathpix-markdown-it';
+import { MathpixMarkdown, MathpixLoader } from 'mathpix-markdown-it';
 import {
   addListenerContextMenuEvents,
   removeListenerContextMenuEvents,

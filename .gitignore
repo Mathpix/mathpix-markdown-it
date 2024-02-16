@@ -16,6 +16,10 @@
 /examples/react-app/use-parseMarkdownByHTML-method/package-lock.json
 /examples/react-app/use-parseMarkdownByHTML-method/yarn.lock
 examples/react-app/use-toc/package-lock.json
+examples/nextJS/node_modules
+examples/nextJS/pnpm-lock.yaml
+examples/nextJS/package-lock.json
+examples/nextJS/.next
 yarn.lock
 /.idea
 .DS_Store

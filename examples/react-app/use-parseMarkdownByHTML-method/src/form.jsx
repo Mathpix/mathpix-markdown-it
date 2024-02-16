@@ -132,7 +132,7 @@ class ConvertForm extends React.Component {
         <div className="formats">
           {this.state.formats && this.state.formats.length > 0 &&
             this.state.formats.map((item, index) => {
-              return <div className="item">
+              return <div className="item" key={index}>
                 <div>{item.type}</div>
                 <code>{item.value}</code>
               </div>
