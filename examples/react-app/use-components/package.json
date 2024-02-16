@@ -7,9 +7,9 @@
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
     "mathpix-markdown-it": "../../../../mathpix-markdown-it",
-    "react": "^16.12.0",
-    "react-dom": "^16.12.0",
-    "react-scripts": "^5.0.0"
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-scripts": "^5.0.1"
   },
   "scripts": {
     "start": "react-scripts start",

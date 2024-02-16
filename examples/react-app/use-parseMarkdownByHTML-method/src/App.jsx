@@ -3,7 +3,6 @@ import './style.css';
 import {MathpixMarkdownModel as MM} from "mathpix-markdown-it";
 import ConvertForm from "./form";
 
-
 class App extends React.Component {
   componentDidMount() {
     const isLoad = MM.loadMathJax();
