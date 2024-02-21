@@ -1,7 +1,7 @@
 import { MmlNode, TEXCLASS } from "mathjax-full/js/core/MmlTree/MmlNode";
-import { AMsymbols, eSymbolType } from "./helperA";
+import {AMsymbols, eSymbolType, regExpIsFunction} from "./helperA";
 import { envArraysShouldBeFlattenInTSV } from "../../helpers/consts";
-import { IAsciiData, AddToAsciiData } from "./common";
+import {IAsciiData, AddToAsciiData, getFunctionNameFromAscii} from "./common";
 
 const regW: RegExp = /^\w/;
 
@@ -508,12 +508,43 @@ const mrow = () => {
       let mmlContent_tsv = '';
       let mmlContent_csv = '';
       let mmlContent_md = '';
+
+      let beforeAscii: string = '';
+      let childBefore = null;
+      let parenthesisOpen: boolean = false;
       for (let i = 0; i < node.childNodes.length; i++) {
         const data: IAsciiData = serialize.visitNode(node.childNodes[i], '');
+        if (parenthesisOpen) {
+          let text: string = getFunctionNameFromAscii(data.ascii, node.childNodes[i]);
+          if (!text || regExpIsFunction.test(text)) {
+            mmlContent += ')';
+            mmlContent_tsv += ')';
+            mmlContent_csv += ')';
+            mmlContent_md += ')';
+            parenthesisOpen = false;
+          }
+        }
+        if (node.childNodes[i].kind === "mfrac" && beforeAscii?.trim()) {
+          if (regExpIsFunction.test(beforeAscii.trim()) || (childBefore?.kind === 'mo' && childBefore?.texClass === -1)) {
+            mmlContent += '(';
+            mmlContent_tsv += '(';
+            mmlContent_csv += '(';
+            mmlContent_md += '(';
+            parenthesisOpen = true;
+          }
+        }
         mmlContent += data.ascii;
         mmlContent_tsv += data.ascii_tsv;
         mmlContent_csv += data.ascii_csv;
         mmlContent_md += data.ascii_md;
+        beforeAscii = mmlContent;
+        childBefore = node.childNodes[i];
+      }
+      if (parenthesisOpen) {
+        mmlContent += ')';
+        mmlContent_tsv += ')';
+        mmlContent_csv += ')';
+        mmlContent_md += ')';
       }
       const isVerticalMath = node.attributes.get('isVerticalMath');
       let open = isTexClass7 && needBranchOpen && !isVerticalMath ? '{:' : '';

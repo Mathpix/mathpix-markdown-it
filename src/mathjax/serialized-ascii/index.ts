@@ -2,7 +2,8 @@ import {MmlVisitor} from 'mathjax-full/js/core/MmlTree/MmlVisitor.js';
 import {MmlNode, TextNode, XMLNode} from 'mathjax-full/js/core/MmlTree/MmlNode.js';
 
 import { handle } from "./handlers";
-import { IAsciiData, AddToAsciiData } from "./common";
+import {IAsciiData, AddToAsciiData, getFunctionNameFromAscii} from "./common";
+import { regExpIsFunction } from "./helperA";
 
 export class SerializedAsciiVisitor extends MmlVisitor {
   options = null;
@@ -235,9 +236,31 @@ export class SerializedAsciiVisitor extends MmlVisitor {
       if (addParens && !group) {
         res = AddToAsciiData(res, ['(']);
       }
-      for (const child of node.childNodes) {
+      let beforeAscii: string = '';
+      let childBefore = null;
+      let parenthesisOpen: boolean = false;
+      for (let j = 0; j < node.childNodes.length; j++) {
+        let child: any = node.childNodes[j];
         const data: IAsciiData = this.visitNode(child, space);
+        if (parenthesisOpen) {
+          let text: string = getFunctionNameFromAscii(data.ascii, child);
+          if (!text || regExpIsFunction.test(text)) {
+            res = AddToAsciiData(res, [')']);
+            parenthesisOpen = false;
+          }
+        }
+        if (child?.kind === "mfrac" && beforeAscii?.trim()) {
+          if (regExpIsFunction.test(beforeAscii.trim()) || (childBefore?.kind === 'mo' && childBefore?.texClass === -1)) {
+            res = AddToAsciiData(res, ['(']);
+            parenthesisOpen = true;
+          }
+        }
         res = AddToAsciiData(res, [data.ascii, data.ascii_tsv, data.ascii_csv, data.ascii_md]);
+        beforeAscii = res.ascii;
+        childBefore = child;
+      }
+      if (parenthesisOpen) {
+        res = AddToAsciiData(res, [')']);
       }
       if (addParens && !group) {
         res = AddToAsciiData(res, [')']);

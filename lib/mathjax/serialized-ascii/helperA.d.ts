@@ -171,3 +171,5 @@ export declare const AMsymbols: ({
     func?: undefined;
     rewriteleftright?: undefined;
 })[];
+export declare const getFunctions: () => Array<string>;
+export declare const regExpIsFunction: RegExp;

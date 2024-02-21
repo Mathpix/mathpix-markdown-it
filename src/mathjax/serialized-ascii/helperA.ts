@@ -311,3 +311,15 @@ export const AMsymbols = [
   {input:"fr",  tag:"mstyle", atname:"mathvariant", atval:"fraktur", output:"fr", tex:null, ttype:UNARY, codes:AMfrk},
   {input:"mathfrak",  tag:"mstyle", atname:"mathvariant", atval:"fraktur", output:"mathfrak", tex:null, ttype:UNARY, codes:AMfrk}
 ];
+
+export const getFunctions = (): Array<string> => {
+  const symbols = AMsymbols.filter(item => item.func);
+  let arr = [];
+  for (let i = 0; i < symbols?.length; i++) {
+    arr.push(symbols[i].input);
+  }
+  return arr
+}
+
+const listOfFunctions: Array<string> = getFunctions();
+export const regExpIsFunction: RegExp = new RegExp('(?:' + listOfFunctions.join('|') + ')$');

@@ -466,6 +466,7 @@ function sanitizeHtml(html, options, _recursing) {
             }
             if (a === 'style') {
               try {
+                debugger
                 const abstractSyntaxTree = postcssParse(name + ' {' + value + '}');
                 const filteredAST = filterCss(abstractSyntaxTree, options.allowedStyles);
 
@@ -476,6 +477,7 @@ function sanitizeHtml(html, options, _recursing) {
                   return;
                 }
               } catch (e) {
+                throw e
                 delete frame.attribs[a];
                 return;
               }
