@@ -1,5 +1,6 @@
 //Require the dev-dependencies
 let chai = require('chai');
+const tests = require("./_data/_ascii/_ascii_vertical_math");
 let should = chai.should();
 let MathJax = require('../lib/mathjax/index.js').MathJax;
 
@@ -146,7 +147,22 @@ describe('Latex to ascii:', () => {
       }
     });
   });
-  
+
+  describe('Testing any function with a fractional argument:', () => {
+    const tests = require('./_data/_ascii/_ascii_frac');
+    tests.forEach(function(test) {
+      if (test.latex) {
+        it('Latex =>' + test.latex, function(done) {
+          const data = MathJax.TexConvert(test.latex, options);
+          console.log('    LATEX         =>', test.latex);
+          console.log('    ASCIIMATH     =>', test.ascii);
+          data.should.have.property('asciimath', test.ascii);
+          notIncludeSymbols(data.asciimath);
+          done();
+        });
+      }
+    });
+  });
   
   // {
   //   latex: `\\left.\\begin{array}{l}{\\text{foo}} \\\\ { \\theta + C }\\end{array} \\right.`,

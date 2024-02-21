@@ -19,3 +19,28 @@ export const AddToAsciiData = (data: IAsciiData, arr: Array<string>): IAsciiData
   data.ascii_md += arr[0];
   return data;
 };
+
+export const getFunctionNameFromAscii = (ascii: string, node): string => {
+  if (!ascii?.trim()) {
+    return '';
+  }
+  ascii = ascii.trim();
+  let text: string = '';
+  switch (node.kind) {
+    case 'mi':
+      text = ascii;
+      break;
+    case 'msub':
+    case 'msubsup': {
+      let match: RegExpMatchArray = ascii.match(/^.*?(?=_)/);
+      text = match[0].trim();
+      break;
+    }
+    case 'msup': {
+      let match: RegExpMatchArray = ascii.trim()?.match(/^.*?(?=\^)/);
+      text = match[0].trim();
+      break;
+    }
+  }
+  return text;
+}
