@@ -10,6 +10,6 @@ declare class MathpixLoader extends React.Component<PMathpixLoader> {
         isReadyToTypeSet: boolean;
     };
     componentDidMount(): void;
-    render(): React.JSX.Element;
+    render(): JSX.Element;
 }
 export default MathpixLoader;

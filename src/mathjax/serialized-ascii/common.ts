@@ -44,3 +44,16 @@ export const getFunctionNameFromAscii = (ascii: string, node): string => {
   }
   return text;
 }
+
+export const hasOnlyOneMoNode = (node): boolean => {
+  if (node?.kind === 'mo') {
+    return node.childNodes?.length === 1
+  }
+  if (node.kind === 'inferredMrow' && node?.childNodes?.length === 1) {
+    return hasOnlyOneMoNode(node.childNodes[0])
+  }
+  if (node.kind === 'TeXAtom' && node?.childNodes?.length === 1) {
+    return hasOnlyOneMoNode(node.childNodes[0])
+  }
+  return false;
+}

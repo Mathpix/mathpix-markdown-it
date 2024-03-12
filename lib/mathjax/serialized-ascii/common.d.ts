@@ -6,3 +6,4 @@ export interface IAsciiData {
 }
 export declare const AddToAsciiData: (data: IAsciiData, arr: Array<string>) => IAsciiData;
 export declare const getFunctionNameFromAscii: (ascii: string, node: any) => string;
+export declare const hasOnlyOneMoNode: (node: any) => boolean;

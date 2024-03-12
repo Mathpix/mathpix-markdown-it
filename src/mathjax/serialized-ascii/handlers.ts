@@ -1,7 +1,7 @@
 import { MmlNode, TEXCLASS } from "mathjax-full/js/core/MmlTree/MmlNode";
 import {AMsymbols, eSymbolType, regExpIsFunction} from "./helperA";
 import { envArraysShouldBeFlattenInTSV } from "../../helpers/consts";
-import {IAsciiData, AddToAsciiData, getFunctionNameFromAscii} from "./common";
+import {IAsciiData, AddToAsciiData, getFunctionNameFromAscii, hasOnlyOneMoNode} from "./common";
 
 const regW: RegExp = /^\w/;
 
@@ -852,6 +852,8 @@ const msup = () =>  {
     try {
       const firstChild = node.childNodes[0] ? node.childNodes[0] : null;
       const secondChild = node.childNodes[1] ? node.childNodes[1] : null;
+      let flattenSup: boolean = hasOnlyOneMoNode(secondChild);
+      secondChild.attributes.setInherited('flattenSup', flattenSup);
       const dataFirstChild: IAsciiData = firstChild ? serialize.visitNode(firstChild, '') : null;
       const dataSecondChild: IAsciiData = secondChild ? serialize.visitNode(secondChild, '') : null;
       res = AddToAsciiData(res, [
@@ -861,6 +863,10 @@ const msup = () =>  {
         dataFirstChild ? dataFirstChild.ascii_md : ''
       ]);
       res = AddToAsciiData(res, ['^']);
+      const ignoreBrackets = node.attributes.get('ignoreBrackets');
+      if (ignoreBrackets && !dataSecondChild.ascii) {
+        return res;
+      }
       res = AddToAsciiData(res, [serialize.options.extraBrackets ? '(' : '']);
       res = AddToAsciiData(res, [
         dataSecondChild ? dataSecondChild.ascii : '',
@@ -1143,6 +1149,11 @@ const mo = () => {
     };
     try {
       const value = getChildrenText(node);
+      const flattenSup = node.attributes.get('flattenSup');
+      if (flattenSup && value === '\u2227' /*wedge*/) {
+        node.Parent.attributes.setInherited('ignoreBrackets', true);
+        return res;
+      }
       if (value === '\u2061') {
         return res;
       }
