@@ -21,6 +21,7 @@ export class SerializedAsciiVisitor extends MmlVisitor {
     this.setChildInheritedAttribute(node, 'toTsv');
     this.setChildInheritedAttribute(node, 'toCsv');
     this.setChildInheritedAttribute(node, 'toMd');
+    this.setChildInheritedAttribute(node, 'flattenSup');
     /** return super.visitNode(node, ...args); */
     let handler = this.nodeHandlers.get(node.kind) || this.visitDefault;
     return handler.call(this, node, ...args);

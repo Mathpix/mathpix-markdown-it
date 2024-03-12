@@ -163,6 +163,22 @@ describe('Latex to ascii:', () => {
       }
     });
   });
+
+  describe('Testing any sup with wedge:', () => {
+    const tests = require('./_data/_ascii/_ascii_sup_with_wedge');
+    tests.forEach(function(test) {
+      if (test.latex) {
+        it('Latex =>' + test.latex, function(done) {
+          const data = MathJax.TexConvert(test.latex, options);
+          console.log('    LATEX         =>', test.latex);
+          console.log('    ASCIIMATH     =>', test.ascii);
+          data.should.have.property('asciimath', test.ascii);
+          notIncludeSymbols(data.asciimath);
+          done();
+        });
+      }
+    });
+  });
   
   // {
   //   latex: `\\left.\\begin{array}{l}{\\text{foo}} \\\\ { \\theta + C }\\end{array} \\right.`,
