@@ -6,7 +6,6 @@ import {
 
 import {
   mdPluginMathJax,
-  mdPluginHighlightCode,
   mdPluginText,
   mdPluginTOC,
   mdPluginAnchor,
@@ -41,7 +40,7 @@ export {
   MathpixLoader, MathpixMarkdown, MathpixMarkdownModel,
   mathpixMarkdownPlugin, mdPluginCollapsible,
   initMathpixMarkdown,
-  mdPluginMathJax, mdPluginHighlightCode, mdPluginText, mdPluginTOC, mdPluginAnchor, mdPluginTableTabular, mdPluginList,
+  mdPluginMathJax, mdPluginText, mdPluginTOC, mdPluginAnchor, mdPluginTableTabular, mdPluginList,
   TMarkdownItOptions, optionsMathpixMarkdown, TOutputMath, TOutputMathJax, THtmlSanitize,
   ISmilesOptions,
   resetTheoremEnvironments,

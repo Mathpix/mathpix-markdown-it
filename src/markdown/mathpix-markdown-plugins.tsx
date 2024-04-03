@@ -5,7 +5,6 @@ import { resetTheoremEnvironments } from './md-theorem/helper';
 
 import {
   mdPluginMathJax,
-  mdPluginHighlightCode,
   mdPluginText,
   mdPluginTOC,
   mdPluginAnchor,
@@ -52,7 +51,8 @@ export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
     .use(mdPluginList)
     .use(mdPluginMathJax({}))
     .use(mdPluginText())
-    .use(mdPluginHighlightCode, { auto: false })
+    // this package is almost 500 kb for syntax highlighting which we really don't use
+    // .use(mdPluginHighlightCode, { auto: false })
     .use(mdPluginAnchor)
     .use(mdPluginTOC, {toc: toc});
 

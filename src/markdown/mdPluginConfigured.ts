@@ -1,6 +1,6 @@
 import MathJaxPlugin from "./mdPluginRaw";
 import TextPlugin from './mdPluginText';
-import highlightPlugin from './mdHighlightCodePlugin';
+// import highlightPlugin from './mdHighlightCodePlugin';
 import tocPlugin from './mdPluginTOC';
 import anchorPlugin from './mdPluginAnchor';
 import tableTabularPlugin from './mdPluginTableTabular';
@@ -17,7 +17,8 @@ export const mdPluginMathJax = MathJaxPlugin;
  * configured custom tag plugin
  */
 export const mdPluginText = TextPlugin;
-export const mdPluginHighlightCode = highlightPlugin;
+// large 500 kb import for unused sytax highlighting
+// export const mdPluginHighlightCode = highlightPlugin;
 export const mdPluginTOC = tocPlugin;
 export const mdPluginAnchor = anchorPlugin;
 export const mdPluginTableTabular = tableTabularPlugin;

@@ -46,7 +46,6 @@
     "chai": "^4.2.0",
     "copy-to-clipboard": "^3.3.1",
     "deepmerge": "^4.2.2",
-    "highlight.js": "^10.4.1",
     "htmlparser2": "^4.1.0",
     "is-plain-object": "^5.0.0",
     "js-yaml": "^4.1.0",
