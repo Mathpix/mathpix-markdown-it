@@ -36,7 +36,8 @@
     "compile:dev": "npx tsc --watch",
     "build": "npx tsc && webpack --mode=production --config webpack.config.js",
     "dev": "npx tsc &&  webpack --mode=development --config webpack.dev.js --watch",
-    "test": "mocha tests/*.js --exit"
+    "test": "mocha tests/*.js --exit",
+    "postinstall": "patch-package"
   },
   "dependencies": {
     "@babel/runtime": "^7.17.2",
@@ -82,6 +83,7 @@
     "loader-utils": "^3.2.0",
     "mini-css-extract-plugin": "^2.5.3",
     "mocha": "^9.2.0",
+    "patch-package": "^8.0.0",
     "style-loader": "^3.3.1",
     "terser-webpack-plugin": "^5.3.1",
     "ts-loader": "^9.2.6",
