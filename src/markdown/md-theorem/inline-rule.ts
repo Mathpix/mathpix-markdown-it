@@ -24,7 +24,7 @@ import { ILabel, addIntoLabelsList } from "../common/labels";
  *   {plain} - boldface title, italicized body. Commonly used in theorems, lemmas, corollaries, propositions and conjectures.
  *   {remark} - italicized title, Roman body. Commonly used in remarks, notes, annotations, claims, cases, acknowledgments and conclusions.
  * */
-export const theoremStyle: RuleInline = (state) => {
+export const theoremStyle: RuleInline = (state, silent) => {
   let startPos = state.pos;
   if (state.src.charCodeAt(startPos) !== 0x5c /* \ */) {
     return false;
@@ -41,18 +41,20 @@ export const theoremStyle: RuleInline = (state) => {
   latex = match[0];
   content = match[1];
   nextPos += match[0].length;
-  state.env.theoremstyle = content;
-  const token = state.push("theoremstyle", "", 0);
-  token.content = "";
-  token.children = [];
-  token.hidden = true;
-  token.inlinePos = {
-    start: state.pos,
-    end: nextPos
-  };
-  if (state.md.options.forLatex) {
-    token.latex = latex;
-    token.hidden = false;
+  if (!silent) {
+    state.env.theoremstyle = content;
+    const token = state.push("theoremstyle", "", 0);
+    token.content = "";
+    token.children = [];
+    token.hidden = true;
+    token.inlinePos = {
+      start: state.pos,
+      end: nextPos
+    };
+    if (state.md.options.forLatex) {
+      token.latex = latex;
+      token.hidden = false;
+    }
   }
   state.pos = nextPos;
   return true;
@@ -64,7 +66,7 @@ export const theoremStyle: RuleInline = (state) => {
  *   {print} is the word to be shown in the document
  *   [numbered] - is the sectional unit based on which the environments is to be numbered (this is optional
  * */
-export const newTheorem: RuleInline = (state) => {
+export const newTheorem: RuleInline = (state, silent) => {
   let startPos = state.pos;
   if (state.src.charCodeAt(startPos) !== 0x5c /* \ */) {
     return false;
@@ -182,40 +184,42 @@ export const newTheorem: RuleInline = (state) => {
     }
   }
   content = state.src.slice(startPos, nextPos);
-  
-  addTheoremEnvironment({
-    name: envName,
-    print: envPrint,
-    counter: 0,
-    isNumbered: isNumbered,
-    counterName: numbered,
-    parents: [],
-    useCounter: useCounter,
-    style: state.env?.theoremstyle ? state.env?.theoremstyle : defTheoremStyle
-  });
-  if (isNumbered) {
-    addEnvironmentsCounter({
-      environment: envName,
-      counter: 0
+
+  if (!silent) {
+    addTheoremEnvironment({
+      name: envName,
+      print: envPrint,
+      counter: 0,
+      isNumbered: isNumbered,
+      counterName: numbered,
+      parents: [],
+      useCounter: useCounter,
+      style: state.env?.theoremstyle ? state.env?.theoremstyle : defTheoremStyle
     });
-  }
-  const token = state.push("newtheorem", "", 0);
-  token.content = "";
-  token.children = [];
-  token.hidden = true;
-  token.inlinePos = {
-    start: state.pos,
-    end: nextPos
-  };
-  if (state.md.options.forLatex) {
-    token.latex = content;
-    token.hidden = false;
+    if (isNumbered) {
+      addEnvironmentsCounter({
+        environment: envName,
+        counter: 0
+      });
+    }
+    const token = state.push("newtheorem", "", 0);
+    token.content = "";
+    token.children = [];
+    token.hidden = true;
+    token.inlinePos = {
+      start: state.pos,
+      end: nextPos
+    };
+    if (state.md.options.forLatex) {
+      token.latex = content;
+      token.hidden = false;
+    }
   }
   state.pos = nextPos;
   return true;
 };
 
-export const setCounterTheorem: RuleInline = (state) => {
+export const setCounterTheorem: RuleInline = (state, silent) => {
   let startPos = state.pos;
   if (state.src.charCodeAt(startPos) !== 0x5c /* \ */) {
     return false;
@@ -233,29 +237,31 @@ export const setCounterTheorem: RuleInline = (state) => {
   }
   content = match[0];
   nextPos += match[0].length;
-  envName = match.groups?.name ? match.groups.name : match[1];
-  if (!envName) {
-    return false;
-  }
-  numStr = match.groups?.number ? match.groups.number : match[2];
-  numStr = numStr ? numStr.trim() : '';
-  const num = numStr && reNumber.test(numStr)
-    ? Number(match[2].trim()) : 0;
-  const res: boolean = setCounterTheoremEnvironment(envName, num);
-  if (!res) {
-    return false;
-  }
-  const token = state.push("theorem_setcounter", "", 0);
-  token.content = "";
-  token.children = [];
-  token.hidden = true;
-  token.inlinePos = {
-    start: state.pos,
-    end: nextPos
-  };
-  if (state.md.options.forLatex) {
-    token.latex = content;
-    token.hidden = false;
+  if (!silent) {
+    envName = match.groups?.name ? match.groups.name : match[1];
+    if (!envName) {
+      return false;
+    }
+    numStr = match.groups?.number ? match.groups.number : match[2];
+    numStr = numStr ? numStr.trim() : '';
+    const num = numStr && reNumber.test(numStr)
+      ? Number(match[2].trim()) : 0;
+    const res: boolean = setCounterTheoremEnvironment(envName, num);
+    if (!res) {
+      return false;
+    }
+    const token = state.push("theorem_setcounter", "", 0);
+    token.content = "";
+    token.children = [];
+    token.hidden = true;
+    token.inlinePos = {
+      start: state.pos,
+      end: nextPos
+    };
+    if (state.md.options.forLatex) {
+      token.latex = content;
+      token.hidden = false;
+    }
   }
   state.pos = nextPos;
   return true;
@@ -265,7 +271,7 @@ export const setCounterTheorem: RuleInline = (state) => {
  * \renewcommand\qedsymbol{$\blacksquare$}
  * \renewcommand\qedsymbol{QED}
  */
-export const newCommandQedSymbol: RuleInline = (state) => {
+export const newCommandQedSymbol: RuleInline = (state, silent) => {
   let startPos = state.pos;
   if (state.src.charCodeAt(startPos) !== 0x5c /* \ */) {
     return false;
@@ -282,24 +288,26 @@ export const newCommandQedSymbol: RuleInline = (state) => {
   latex = match[0];
   content = match[1];
   nextPos += match[0].length;
-  state.env.qedsymbol = content;
-  const token = state.push("renewcommand_qedsymbol", "", 0);
-  token.content = "";
-  token.children = [];
-  token.hidden = true;
-  token.inlinePos = {
-    start: state.pos,
-    end: nextPos
-  };
-  if (state.md.options.forLatex) {
-    token.latex = latex;
-    token.hidden = false;
+  if (!silent) {
+    state.env.qedsymbol = content;
+    const token = state.push("renewcommand_qedsymbol", "", 0);
+    token.content = "";
+    token.children = [];
+    token.hidden = true;
+    token.inlinePos = {
+      start: state.pos,
+      end: nextPos
+    };
+    if (state.md.options.forLatex) {
+      token.latex = latex;
+      token.hidden = false;
+    }
   }
   state.pos = nextPos;
   return true;
 };
 
-export const labelLatex: RuleInline = (state, md, env) => {
+export const labelLatex: RuleInline = (state, silent) => {
   let startPos = state.pos;
   if (state.src.charCodeAt(startPos) !== 0x5c /* \ */) {
     return false;
@@ -313,30 +321,33 @@ export const labelLatex: RuleInline = (state, md, env) => {
   }
   let labelKey = match[1];
   let label: ILabel = null;
-  /** Add a reference to the theorem to the global labelsList */
-  if (state.env.currentTag) {
-    label = {
-      key: labelKey,
-      id: encodeURIComponent(labelKey),
-      tag: state.env.currentTag.number,
-      type: state.env.currentTag.type,
-      tokenUuidInParentBlock: state.env.currentTag.tokenUuidInParentBlock
-    };
-    addIntoLabelsList(label);
-  }
-  const latex = match[0];
   nextPos += match[0].length;
-  const token = state.push("label", "", 0);
-  token.content = labelKey;
-  token.children = [];
-  token.latex = latex;
-  token.currentTag = state.env?.currentTag ? {...state.env.currentTag} : {};
-  token.hidden = true; /** Ignore this element when rendering to HTML */
+
+  if (!silent) {
+    /** Add a reference to the theorem to the global labelsList */
+    if (state.env.currentTag) {
+      label = {
+        key: labelKey,
+        id: encodeURIComponent(labelKey),
+        tag: state.env.currentTag.number,
+        type: state.env.currentTag.type,
+        tokenUuidInParentBlock: state.env.currentTag.tokenUuidInParentBlock
+      };
+      addIntoLabelsList(label);
+    }
+    const latex = match[0];
+    const token = state.push("label", "", 0);
+    token.content = labelKey;
+    token.children = [];
+    token.latex = latex;
+    token.currentTag = state.env?.currentTag ? {...state.env.currentTag} : {};
+    token.hidden = true; /** Ignore this element when rendering to HTML */
+  }
   state.pos = nextPos;
   return true;
 };
 
-export const captionLatex: RuleInline = (state, md, env) => {
+export const captionLatex: RuleInline = (state, silent) => {
   const captionTag: RegExp = /^\\caption\s{0,}\{([^}]*)\}/;
   let startPos = state.pos;
   if (state.src.charCodeAt(startPos) !== 0x5c /* \ */) {
@@ -351,17 +362,19 @@ export const captionLatex: RuleInline = (state, md, env) => {
   }
   const latex = match[0];
   nextPos += match[0].length;
-  const token = state.push("caption", "", 0);
-  token.content = match[1]
-  token.children = [];
-  token.latex = latex;
-  token.currentTag = state.env?.currentTag ? {...state.env.currentTag} : {};
-  token.hidden = true; /** Ignore this element when rendering to HTML */
+  if (!silent) {
+    const token = state.push("caption", "", 0);
+    token.content = match[1]
+    token.children = [];
+    token.latex = latex;
+    token.currentTag = state.env?.currentTag ? {...state.env.currentTag} : {};
+    token.hidden = true; /** Ignore this element when rendering to HTML */
+  }
   state.pos = nextPos;
   return true;
 };
 
-export const centeringLatex: RuleInline = (state, md, env) => {
+export const centeringLatex: RuleInline = (state, silent) => {
   const alignTagG: RegExp = /^\\centering/;
   let startPos = state.pos;
   if (state.src.charCodeAt(startPos) !== 0x5c /* \ */) {
@@ -376,12 +389,14 @@ export const centeringLatex: RuleInline = (state, md, env) => {
   }
   const latex = match[0];
   nextPos += match[0].length;
-  const token = state.push("centering", "", 0);
-  token.content = '';
-  token.children = [];
-  token.latex = latex;
-  token.currentTag = state.env?.currentTag ? {...state.env.currentTag} : {};
-  token.hidden = true; /** Ignore this element when rendering to HTML */
+  if (!silent) {
+    const token = state.push("centering", "", 0);
+    token.content = '';
+    token.children = [];
+    token.latex = latex;
+    token.currentTag = state.env?.currentTag ? {...state.env.currentTag} : {};
+    token.hidden = true; /** Ignore this element when rendering to HTML */
+  }
   state.pos = nextPos;
   return true;
 };

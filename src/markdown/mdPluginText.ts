@@ -737,7 +737,7 @@ const pageBreaksBlock: RuleBlock = (state, startLine: number, endLine, silent) =
   return true;
 };
 
-const textAuthor: RuleInline = (state) => {
+const textAuthor: RuleInline = (state, silent) => {
   let startPos = state.pos;
 
   if (state.src.charCodeAt(startPos) !== 0x5c /* \ */) {
@@ -762,60 +762,62 @@ const textAuthor: RuleInline = (state) => {
   const type = "author";
   const arrtStyle = 'text-align: center; margin: 0 auto; display: flex; justify-content: center; flex-wrap: wrap;';
 
-  const token = state.push(type, "", 0);
-  if (state.md.options?.forDocx && arrtStyle) {
-    token.attrSet('style', arrtStyle);
-  }
-  token.content = content;
-  token.children = [];
-  token.inlinePos = {
-    start: state.pos,
-    end: nextPos,
-    start_content: startPos + 1,
-    end_content: nextPos - 1,
-  };
-
-  const columns = content.split('\\and');
-  let pos = 0;
-  for (let i = 0; i < columns.length; i++) {
-    let column = columns[i]
-      ? columns[i].trim()
-      : '';
-
-    const tokenAuthorColumn: Token = {};
-    tokenAuthorColumn.type = 'author_column';
-    tokenAuthorColumn.content = column;
-    tokenAuthorColumn.children = [];
-    
-    pos = pos + columns[i].length;
-    pos += i < columns.length - 1 ? '\\and'.length : 0;
-    tokenAuthorColumn.nextPos = pos;
-
-    let colArr = columns[i].split('\\\\');
-    let posCol = 0;
-    if (colArr && colArr.length) {
-      for ( let j = 0; j < colArr.length; j++ ) {
-        let item = colArr[j] ? colArr[j].trim() : '';
-
-        const newToken: Token = {};
-        newToken.type = 'author_item';
-        newToken.content = item;
-        newToken.offsetLeft = colArr[j].trim()?.length ? getSpacesFromLeft(colArr[j]) : 0;
-        posCol = posCol + colArr[j].length;
-        posCol += j < colArr.length - 1 ? '\\\\'.length : 0;
-        newToken.nextPos = posCol;
-        
-        let children = [];
-        state.env.newlineToSpace = true;
-        state.md.inline.parse(item, state.md, state.env, children);
-        state.env.newlineToSpace = false;
-        newToken.children = children;
-
-        tokenAuthorColumn.children.push(newToken);
-      }
+  if (!silent) {
+    const token = state.push(type, "", 0);
+    if (state.md.options?.forDocx && arrtStyle) {
+      token.attrSet('style', arrtStyle);
     }
+    token.content = content;
+    token.children = [];
+    token.inlinePos = {
+      start: state.pos,
+      end: nextPos,
+      start_content: startPos + 1,
+      end_content: nextPos - 1,
+    };
 
-    token.children.push(tokenAuthorColumn)
+    const columns = content.split('\\and');
+    let pos = 0;
+    for (let i = 0; i < columns.length; i++) {
+      let column = columns[i]
+        ? columns[i].trim()
+        : '';
+
+      const tokenAuthorColumn: Token = {};
+      tokenAuthorColumn.type = 'author_column';
+      tokenAuthorColumn.content = column;
+      tokenAuthorColumn.children = [];
+
+      pos = pos + columns[i].length;
+      pos += i < columns.length - 1 ? '\\and'.length : 0;
+      tokenAuthorColumn.nextPos = pos;
+
+      let colArr = columns[i].split('\\\\');
+      let posCol = 0;
+      if (colArr && colArr.length) {
+        for ( let j = 0; j < colArr.length; j++ ) {
+          let item = colArr[j] ? colArr[j].trim() : '';
+
+          const newToken: Token = {};
+          newToken.type = 'author_item';
+          newToken.content = item;
+          newToken.offsetLeft = colArr[j].trim()?.length ? getSpacesFromLeft(colArr[j]) : 0;
+          posCol = posCol + colArr[j].length;
+          posCol += j < colArr.length - 1 ? '\\\\'.length : 0;
+          newToken.nextPos = posCol;
+
+          let children = [];
+          state.env.newlineToSpace = true;
+          state.md.inline.parse(item, state.md, state.env, children);
+          state.env.newlineToSpace = false;
+          newToken.children = children;
+
+          tokenAuthorColumn.children.push(newToken);
+        }
+      }
+
+      token.children.push(tokenAuthorColumn)
+    }
   }
 
   state.pos = nextPos;
@@ -899,7 +901,7 @@ const textTypes: RuleInline = (state, silent) => {
   return true;
 };
 
-const pageBreaks: RuleInline = (state) => {
+const pageBreaks: RuleInline = (state, silent) => {
   let startPos = state.pos;
   if (state.src.charCodeAt(startPos) !== 0x5c /* \ */) {
     return false;
@@ -911,17 +913,19 @@ const pageBreaks: RuleInline = (state) => {
     return false;
   }
   const nextPos = startPos + match[0].length;
-  const token = state.push("pagebreak", "", 0);
-  token.content = '';
-  if (state.md.options.forLatex) {
-    token.latex = '\\' + match[0];
-  } 
-  token.children = [];
+  if (!silent) {
+    const token = state.push("pagebreak", "", 0);
+    token.content = '';
+    if (state.md.options.forLatex) {
+      token.latex = '\\' + match[0];
+    }
+    token.children = [];
+  }
   state.pos = nextPos;
   return true;
 };
 
-const dotfill: RuleInline = (state) => {
+const dotfill: RuleInline = (state, silent) => {
   let startPos = state.pos;
   if (state.src.charCodeAt(startPos) !== 0x5c /* \ */) {
     return false;
@@ -933,17 +937,19 @@ const dotfill: RuleInline = (state) => {
     return false;
   }
   const nextPos = startPos + match[0].length;
-  const token = state.push("dotfill", "", 0);
-  token.content = '';
-  if (state.md.options.forLatex) {
-    token.latex = '\\' + match[0];
+  if (!silent) {
+    const token = state.push("dotfill", "", 0);
+    token.content = '';
+    if (state.md.options.forLatex) {
+      token.latex = '\\' + match[0];
+    }
+    token.children = [];
   }
-  token.children = [];
   state.pos = nextPos;
   return true;
 };
 
-const doubleSlashToSoftBreak: RuleInline = (state) => {
+const doubleSlashToSoftBreak: RuleInline = (state, silent) => {
   let startPos = state.pos;
   if (state.src.charCodeAt(startPos) !== 0x5c /* \ */) {
     return false;
@@ -953,12 +959,14 @@ const doubleSlashToSoftBreak: RuleInline = (state) => {
     return false;
   }
   if (state.env.doubleSlashToSoftBreak) {
-    const token = state.push('softbreak', 'br', 0);
-    token.doubleSlashToSoftBreak = true;
-    token.inlinePos = {
-      start: startPos,
-      end: nextPos
-    };
+    if (!silent) {
+      const token = state.push('softbreak', 'br', 0);
+      token.doubleSlashToSoftBreak = true;
+      token.inlinePos = {
+        start: startPos,
+        end: nextPos
+      };
+    }
     state.pos = nextPos + 1;
     return true;
   } else {
@@ -966,7 +974,7 @@ const doubleSlashToSoftBreak: RuleInline = (state) => {
   }
 };
 
-const linkifyURL: RuleInline = (state) => {
+const linkifyURL: RuleInline = (state, silent) => {
   const urlTag: RegExp = /(?:(www|http:|https:)+[^\s]+[\w])/;
   let startPos = state.pos;
   let

@@ -138,7 +138,7 @@ const smilesDrawerBlock: RuleBlock = (state, startLine: number, endLine: number,
   return true;
 };
 
-const smilesDrawerInline: RuleInline = (state) => {
+const smilesDrawerInline: RuleInline = (state, silent) => {
   let startPos = state.pos;
   let beginMarker: RegExp = reOpenTagSmiles;
   let endMarker: string = '</smiles>';
@@ -164,13 +164,13 @@ const smilesDrawerInline: RuleInline = (state) => {
 
   if (endPos === -1) { return false; }
   const nextPos = endPos + endMarker.length;
-  let content = state.src.slice(startPos, endPos);
-  content = content.trim();
-  content = content.replace(/\s+/g, '');
-
-  const token = state.push('smiles_inline', "", 0);
-
-  token.content = content.trim();
+  if (!silent) {
+    let content = state.src.slice(startPos, endPos);
+    content = content.trim();
+    content = content.replace(/\s+/g, '');
+    const token = state.push('smiles_inline', "", 0);
+    token.content = content.trim();
+  }
   state.pos = nextPos;
 
   return true;
