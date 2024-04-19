@@ -822,7 +822,7 @@ const textAuthor: RuleInline = (state) => {
   return true;
 };
 
-const textTypes: RuleInline = (state) => {
+const textTypes: RuleInline = (state, silent) => {
   let startPos = state.pos;
   let type: string = '';
   let arrtStyle: string = '';
@@ -869,29 +869,31 @@ const textTypes: RuleInline = (state) => {
     return false;
   }
 
-  let token = state.push(type + '_open', "", 0);
-  token.inlinePos = {
-    start: state.pos,
-    end: startPos + 1
-  };
-  token.nextPos = startPos + 1;
-  token = state.push(type, "", 0);
-  if (state.md.options?.forDocx && arrtStyle) {
-    token.attrSet('style', arrtStyle);
+  if (!silent) {
+    let token = state.push(type + '_open', "", 0);
+    token.inlinePos = {
+      start: state.pos,
+      end: startPos + 1
+    };
+    token.nextPos = startPos + 1;
+    token = state.push(type, "", 0);
+    if (state.md.options?.forDocx && arrtStyle) {
+      token.attrSet('style', arrtStyle);
+    }
+    token.content = content;
+    token.inlinePos = {
+      start: startPos + 1,
+      end: endPos,
+    };
+    token.nextPos = endPos;
+    token.children = [];
+
+    let children = [];
+    state.md.inline.parse(token.content.trim(), state.md, state.env, children);
+    token.children = children;
+
+    state.push(type + '_close', "", 0);
   }
-  token.content = content;
-  token.inlinePos = {
-    start: startPos + 1,
-    end: endPos,
-  };
-  token.nextPos = endPos;
-  token.children = [];
-
-  let children = [];
-  state.md.inline.parse(token.content.trim(), state.md, state.env, children);
-  token.children = children;
-
-  state.push(type + '_close', "", 0);
   state.pos = nextPos;
   state.nextPos = nextPos;
   return true;
