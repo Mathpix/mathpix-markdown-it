@@ -10,7 +10,8 @@ const options = {
   typographer: false,
   smiles: {
     fontSize: 18.7,
-    theme: 'light'
+    theme: 'light',
+    isTesting: true,
   }
 };
 
