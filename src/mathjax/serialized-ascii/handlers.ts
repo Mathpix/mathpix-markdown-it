@@ -268,6 +268,12 @@ const mtable = () => {
     let mml_csv = '';
     let mml_md = '';
     try {
+      if (node.Parent?.isKind('mrow')) {
+        node.Parent.attributes.setInherited('isTable', true)
+      }
+      if (node.Parent?.isKind('menclose') && node.Parent?.Parent?.isKind('mrow'))  {
+        node.Parent.Parent.attributes.setInherited('isTable', true)
+      }
       /** MathJax: <mrow> came from \left...\right
        *   so treat as subexpression (TeX class INNER). */
       const isSubExpression = node.parent?.texClass === TEXCLASS.INNER;
@@ -547,8 +553,9 @@ const mrow = () => {
         mmlContent_md += ')';
       }
       const isVerticalMath = node.attributes.get('isVerticalMath');
-      let open = isTexClass7 && needBranchOpen && !isVerticalMath ? '{:' : '';
-      let close = isTexClass7 && needBranchClose && !isVerticalMath ? ':}' : '';
+      const isTable = node.attributes.get('isTable');
+      let open = isTexClass7 && needBranchOpen && !isVerticalMath && isTable ? '{:' : '';
+      let close = isTexClass7 && needBranchClose && !isVerticalMath && isTable ? ':}' : '';
       return {
         ascii: open + mmlContent + close,
         ascii_tsv: open + mmlContent_tsv + close,
