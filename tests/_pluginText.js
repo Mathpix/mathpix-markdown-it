@@ -12,7 +12,8 @@ const options = {
     fontSize: 18.7,
     theme: 'light',
     isTesting: true,
-  }
+  },
+  copyToClipboard: true
 };
 
 
