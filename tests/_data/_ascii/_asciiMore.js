@@ -12,5 +12,13 @@ module.exports = [
   {
     latex: '\\frac{\\sqrt[4]{32 z^{6} y^{3}}}{\\sqrt[4]{2 z^{2} y^{11}}}',
     ascii: '(root(4)(32z^(6)y^(3)))/(root(4)(2z^(2)y^(11)))'
+  },
+  {
+    latex: 'G=\\left\\{a+b \\sqrt{2} \\mid a, b \\in \\mathbb{Q}\\right.',
+    ascii: 'G={a+bsqrt2∣a,b inQ'
+  },
+  {
+    latex: '\\left.2 b^2=1\\right\\}',
+    ascii: '2b^(2)=1}'
   }
 ];
