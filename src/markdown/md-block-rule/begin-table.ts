@@ -4,6 +4,7 @@ import { StatePushIncludeGraphics } from '../md-inline-rule/includegraphics';
 import { openTag as openTagAlign, SeparateInlineBlocksBeginAlign } from './begin-align';
 import { endTag, uid } from '../utils';
 import {includegraphicsTag} from '../md-inline-rule/utils';
+import { findEndMarker, removeCaptionsFromTableAndFigure } from "../common";
 
 var couterTables = 0;
 var couterFigures = 0;
@@ -11,6 +12,7 @@ export const openTag: RegExp = /\\begin\s{0,}\{(table|figure)\}/;
 export const openTagH: RegExp = /\\begin\s{0,}\{(table|figure)\}\s{0,}\[(H|\!H|H\!|h|\!h|h\!|t|\!t|b|\!b|p|\!p)\]/;
 const captionTag: RegExp = /\\caption\s{0,}\{([^}]*)\}/;
 const captionTagG: RegExp = /\s{0,}\\caption\s{0,}\{([^}]*)\}\s{0,}/g;
+const captionTagBegin: RegExp = /\\caption\s{0,}\{/;
 const alignTagG: RegExp = /\\centering/g;
 const alignTagIncludeGraphicsG: RegExp = /\\includegraphics\[((.*)(center|left|right))\]\s{0,}\{([^{}]*)\}/g;
 
@@ -314,14 +316,28 @@ export const BeginTable: RuleBlock = (state, startLine, endLine, silent) => {
     lineText = state.src.slice(pos, max);
     if (!matchCaption) {
       matchCaption = lineText.match(captionTag);
-      if (matchCaption) {
-        captionPos.start = pos + matchCaption.index;
-        captionPos.end = captionPos.start + matchCaption[0].length;
-        captionPos.start_content =  pos + lineText.indexOf(matchCaption[1]);
-        captionPos.end_content = captionPos.start_content + matchCaption[1].length;
-        captionPos.map = [nextLine, nextLine];
-        captionPos.bMarks = matchCaption.index;
-        captionPos.eMarks = matchCaption.index + matchCaption[0].length;
+      let matchCaptionB = lineText.match(captionTagBegin);
+      if (matchCaptionB) {
+        let { res = false, nextPos = 0 } = findEndMarker(lineText, matchCaptionB.index + matchCaptionB[0].length - 1);
+        if (res) {
+          captionPos.start = pos + matchCaptionB.index;
+          captionPos.end = pos + nextPos;
+          captionPos.start_content =  pos + matchCaptionB.index + matchCaptionB[0].length;
+          captionPos.end_content = pos + nextPos - 1;
+          captionPos.map = [nextLine, nextLine];
+          captionPos.bMarks = matchCaptionB.index;
+          captionPos.eMarks = matchCaptionB.index + nextPos;
+        }
+      } else {
+        if (matchCaption) {
+          captionPos.start = pos + matchCaption.index;
+          captionPos.end = captionPos.start + matchCaption[0].length;
+          captionPos.start_content =  pos + lineText.indexOf(matchCaption[1]);
+          captionPos.end_content = captionPos.start_content + matchCaption[1].length;
+          captionPos.map = [nextLine, nextLine];
+          captionPos.bMarks = matchCaption.index;
+          captionPos.eMarks = matchCaption.index + matchCaption[0].length;
+        }
       }
     }
     if (closeTag.test(lineText)) {
@@ -364,18 +380,43 @@ export const BeginTable: RuleBlock = (state, startLine, endLine, silent) => {
   
   if (!state.md.options.forLatex) {
     matchE = content.match(captionTag);
-    if (matchE) {
-      caption = matchE[1];
-      let matchT: RegExpMatchArray;
-      if (type === TBegin.table) {
-        matchT = content.match(openTagTabular);
-      } else {
-        matchT = content.match(includegraphicsTag);
+    let matchCaptionB = content.match(captionTagBegin);
+    if (matchCaptionB) {
+      let data = findEndMarker(content, matchCaptionB.index + matchCaptionB[0].length - 1);
+      if (data.res) {
+        caption = data.content;
+        let matchT: RegExpMatchArray;
+        if (type === TBegin.table) {
+          matchT = content.match(openTagTabular);
+        } else {
+          matchT = content.match(includegraphicsTag);
+        }
+        if (matchT && matchCaptionB.index < matchT.index) {
+          captionFirst = true;
+        }
+
+        while (captionTagBegin.test(content)) {
+          const contentData = removeCaptionsFromTableAndFigure(content);
+          content = contentData.content;
+          if (contentData.isNotCaption) {
+            break;
+          }
+        }
       }
-      if (matchT && matchE.index < matchT.index) {
-        captionFirst = true;
+    } else {
+      if (matchE) {
+        caption = matchE[1];
+        let matchT: RegExpMatchArray;
+        if (type === TBegin.table) {
+          matchT = content.match(openTagTabular);
+        } else {
+          matchT = content.match(includegraphicsTag);
+        }
+        if (matchT && matchE.index < matchT.index) {
+          captionFirst = true;
+        }
+        content = content.replace(captionTagG, '')
       }
-      content = content.replace(captionTagG, '')
     }
   }
 
