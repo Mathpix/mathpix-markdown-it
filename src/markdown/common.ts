@@ -161,3 +161,42 @@ export const getTerminatedRules = (rule: string) => {
   }
   return [];
 };
+
+export const removeCaptionsFromTableAndFigure = (content: string) => {
+  const captionTagBegin: RegExp = /\\caption\s{0,}\{/;
+  let matchCaptionB = content.match(captionTagBegin);
+  if (!matchCaptionB) {
+    return {
+      content: content,
+      isNotCaption: true
+    };
+  }
+  let data = findEndMarker(content, matchCaptionB.index + matchCaptionB[0].length - 1);
+  if (!data.res) {
+    return {
+      content: content,
+      isNotCaption: true
+    };
+  }
+  let startCaption = matchCaptionB.index > 0 ? matchCaptionB.index - 1 : matchCaptionB.index;
+  while (startCaption > 0) {
+    const beforeStartMarker = content.charCodeAt(startCaption);
+    if (!(beforeStartMarker  === 0x20 /* space */ || beforeStartMarker  === 0x09 /* \t */ || beforeStartMarker  === 0x0a /* \n */)) {
+      startCaption += 1;
+      break;
+    }
+    startCaption--;
+  }
+  let endCaption = data.nextPos;
+  while (endCaption < content.length) {
+    const afterEndMarker = content.charCodeAt(endCaption);
+    if (!(afterEndMarker  === 0x20 /* space */ || afterEndMarker  === 0x09 /* \t */ || afterEndMarker  === 0x0a /* \n */)) {
+      break;
+    }
+    endCaption++;
+  }
+  return {
+    content: content.slice(0, startCaption) + content.slice(endCaption),
+    isNotCaption: false
+  };
+}

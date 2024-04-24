@@ -45,3 +45,7 @@ export declare const findEndMarker: (str: string, startPos?: number, beginMarker
     openBrackets?: undefined;
 };
 export declare const getTerminatedRules: (rule: string) => any[];
+export declare const removeCaptionsFromTableAndFigure: (content: string) => {
+    content: string;
+    isNotCaption: boolean;
+};

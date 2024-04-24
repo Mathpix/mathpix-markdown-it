@@ -7,7 +7,7 @@ import { setTextCounterSection } from "../mdPluginText";
  * Sets count for `section` to contain the value number.
  * *Note:* number can be positive or negative.
  * */
-export const setCounterSection: RuleInline = (state) => {
+export const setCounterSection: RuleInline = (state, silent) => {
   let startPos = state.pos;
   if (state.src.charCodeAt(startPos) !== 0x5c /* \ */) {
     return false;
@@ -25,26 +25,28 @@ export const setCounterSection: RuleInline = (state) => {
   }
   content = match[0];
   nextPos += match[0].length;
-  envName = match.groups?.name ? match.groups.name : match[1];
-  if (!envName || !["section", "subsection", "subsubsection"].includes(envName)) {
-    return false;
-  }
-  numStr = match.groups?.number ? match.groups.number : match[2];
-  numStr = numStr ? numStr.trim() : '';
-  const num = numStr && reNumber.test(numStr)
-    ? Number(match[2].trim()) : 0;
-  setTextCounterSection(envName, num);
-  const token = state.push("section_setcounter", "", 0);
-  token.content = "";
-  token.children = [];
-  token.hidden = true;
-  token.inlinePos = {
-    start: state.pos,
-    end: nextPos
-  };
-  if (state.md.options.forLatex) {
-    token.latex = content;
-    token.hidden = false;
+  if (!silent) {
+    envName = match.groups?.name ? match.groups.name : match[1];
+    if (!envName || !["section", "subsection", "subsubsection"].includes(envName)) {
+      return false;
+    }
+    numStr = match.groups?.number ? match.groups.number : match[2];
+    numStr = numStr ? numStr.trim() : '';
+    const num = numStr && reNumber.test(numStr)
+      ? Number(match[2].trim()) : 0;
+    setTextCounterSection(envName, num);
+    const token = state.push("section_setcounter", "", 0);
+    token.content = "";
+    token.children = [];
+    token.hidden = true;
+    token.inlinePos = {
+      start: state.pos,
+      end: nextPos
+    };
+    if (state.md.options.forLatex) {
+      token.latex = content;
+      token.hidden = false;
+    }
   }
   state.pos = nextPos;
   return true;
