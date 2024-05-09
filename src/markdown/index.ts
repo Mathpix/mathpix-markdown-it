@@ -1,4 +1,8 @@
-import { mdPluginCollapsible, mdSetPositionsAndHighlight } from "./mdPluginConfigured";
+import {
+  mdPluginCollapsible,
+  mdSetPositionsAndHighlight,
+  mdDisableRulesForRendering
+} from "./mdPluginConfigured";
 
 import { mathpixMarkdownPlugin } from './mathpix-markdown-plugins';
 
@@ -29,6 +33,7 @@ const mdInit = (options: TMarkdownItOptions) => {
     codeHighlight = {},
     footnotes = {},
     copyToClipboard = false,
+    renderOptions = null
   } = options;
   const mmdOptions = {
     width: width,
@@ -52,7 +57,8 @@ const mdInit = (options: TMarkdownItOptions) => {
     parserErrors: parserErrors,
     codeHighlight: codeHighlight,
     footnotes: footnotes,
-    copyToClipboard: copyToClipboard
+    copyToClipboard: copyToClipboard,
+    renderOptions: renderOptions
   };
   let md = require("markdown-it")({
     html: htmlTags,
@@ -106,6 +112,9 @@ const mdInit = (options: TMarkdownItOptions) => {
   if (addPositionsToTokens || highlights?.length) {
     /** SetPositions plugin should be last */
     md.use(mdSetPositionsAndHighlight, mmdOptions);
+  }
+  if (renderOptions?.disableMarkdown) {
+    md.use(mdDisableRulesForRendering, options.renderOptions)
   }
   return md;
 };

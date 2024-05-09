@@ -45,6 +45,7 @@ export interface optionsMathpixMarkdown {
     codeHighlight?: CodeHighlight;
     footnotes?: Footnotes;
     copyToClipboard?: boolean;
+    renderOptions?: RenderOptions;
 }
 export type TMarkdownItOptions = {
     isDisableFancy?: boolean;
@@ -92,6 +93,7 @@ export type TMarkdownItOptions = {
     codeHighlight?: CodeHighlight;
     footnotes?: Footnotes;
     copyToClipboard?: boolean;
+    renderOptions?: RenderOptions;
 };
 export type TOutputMath = {
     include_mathml?: boolean;
@@ -148,6 +150,12 @@ export type TTocOptions = {
 export type CodeHighlight = {
     auto?: boolean;
     code?: boolean;
+};
+export type RenderOptions = {
+    isCode?: boolean;
+    isText?: boolean;
+    disableMarkdown?: boolean;
+    disableHTML?: boolean;
 };
 export declare enum TTocStyle {
     summary = "summary",

@@ -21,3 +21,4 @@ export declare const mdPluginSvgToBase64: (md: MarkdownIt, options: any) => void
 export declare const mdPluginCollapsible: (md: any) => void;
 export declare const mdSetPositionsAndHighlight: (md: MarkdownIt, options: any) => void;
 export declare const mdLatexFootnotes: (md: MarkdownIt, options: any) => void;
+export declare const mdDisableRulesForRendering: (md: MarkdownIt, renderOptions: import("../mathpix-markdown-model").RenderOptions) => void;
