@@ -144,7 +144,7 @@ export const applyFootnoteRulesToDisableRules = (md, disableRules: string[]): st
 
 export const getListToDisableByOptions = (md: MarkdownIt, options): string[] => {
   const { renderOptions = null, isDisableRefs = false, isDisableFootnotes = false } = options;
-  let disableRules: string[];
+  let disableRules: string[] = [];
   if (renderOptions) {
     disableRules = getListRulesToDisable(md, renderOptions);
   }
