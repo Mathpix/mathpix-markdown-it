@@ -176,11 +176,22 @@ export type CodeHighlight = {
   code?: boolean
 };
 
+export type DisableRulesGroup = {
+  markdown?: boolean,
+  latex?: boolean,
+  chem?: boolean,
+  html?: boolean,
+  asciiMath?: boolean,
+  math?: boolean,
+  simpleMath?: boolean, //$...$, $$...$$
+  mathML?: boolean
+};
+
 export type RenderOptions = {
-  isCode?: boolean;
-  isText?: boolean;
-  disableMarkdown?: boolean;
-  disableHTML?: boolean;
+  textOnly?: boolean; //Everything will be rendered as text
+  codeOnly?: boolean; //Only block code is allowed to be rendered, everything else will be rendered as text
+  textWithMathAndLatex?: boolean; //Only math and latex are allowed to be rendered, everything else will be rendered as text
+  disableRulesGroup?: DisableRulesGroup;
 }
 
 export enum TTocStyle {

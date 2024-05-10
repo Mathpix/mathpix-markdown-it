@@ -151,11 +151,21 @@ export type CodeHighlight = {
     auto?: boolean;
     code?: boolean;
 };
+export type DisableRulesGroup = {
+    markdown?: boolean;
+    latex?: boolean;
+    chem?: boolean;
+    html?: boolean;
+    asciiMath?: boolean;
+    math?: boolean;
+    simpleMath?: boolean;
+    mathML?: boolean;
+};
 export type RenderOptions = {
-    isCode?: boolean;
-    isText?: boolean;
-    disableMarkdown?: boolean;
-    disableHTML?: boolean;
+    textOnly?: boolean;
+    codeOnly?: boolean;
+    textWithMathAndLatex?: boolean;
+    disableRulesGroup?: DisableRulesGroup;
 };
 export declare enum TTocStyle {
     summary = "summary",

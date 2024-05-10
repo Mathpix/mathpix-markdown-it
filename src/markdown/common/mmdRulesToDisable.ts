@@ -1,0 +1,159 @@
+import { MarkdownIt, Core, ParserBlock, ParserInline, Ruler } from 'markdown-it';
+import { RenderOptions } from "../../mathpix-markdown-model";
+import { eMmdRuleType, eRule, IMmdRule, mmdRuleList } from "./mmdRules";
+
+const findRule = (md, rule: IMmdRule): boolean => {
+  const mdBlock: ParserBlock = md.block;
+  const mdInline: ParserInline = md.inline;
+  const mdCore: Core = md.core;
+  const blockRuler: Ruler = mdBlock.ruler;
+  const inlineRuler: Ruler = mdInline.ruler;
+  const inlineRuler2: Ruler = mdInline.ruler2;
+  const coreRuler: Ruler = mdCore.ruler;
+  switch (rule.rule) {
+    case eRule.block:
+      return blockRuler.__find__(rule.name) >= 0;
+    case eRule.inline:
+      return inlineRuler.__find__(rule.name) >= 0;
+    case eRule.inline2:
+      return inlineRuler2.__find__(rule.name) >= 0;
+    case eRule.core:
+      return coreRuler.__find__(rule.name) >= 0;
+    default:
+      return false
+  }
+}
+
+const getDisableRuleTypes = (renderOptions: RenderOptions): eMmdRuleType[] => {
+  const {
+    disableRulesGroup = null,
+    codeOnly = false,
+    textOnly = false,
+    textWithMathAndLatex = false
+  } = renderOptions;
+  let disableRuleTypes: eMmdRuleType[] = [];
+  if (textOnly || codeOnly) {
+    disableRuleTypes = [
+      eMmdRuleType.markdown,
+      eMmdRuleType.latex,
+      eMmdRuleType.chem,
+      eMmdRuleType.html,
+      eMmdRuleType.asciiMath,
+      eMmdRuleType.math,
+      eMmdRuleType.simpleMath,
+      eMmdRuleType.mathML
+    ];
+    return disableRuleTypes;
+  }
+  if (textWithMathAndLatex) {
+    disableRuleTypes = [
+      eMmdRuleType.markdown,
+      eMmdRuleType.chem,
+      eMmdRuleType.html,
+      eMmdRuleType.asciiMath,
+      eMmdRuleType.mathML
+    ];
+  }
+  if (disableRulesGroup) {
+    if (disableRulesGroup.markdown && disableRuleTypes.indexOf(eMmdRuleType.markdown) === -1) {
+      disableRuleTypes.push(eMmdRuleType.markdown);
+    }
+    if (disableRulesGroup.latex && disableRuleTypes.indexOf(eMmdRuleType.latex) === -1) {
+      disableRuleTypes.push(eMmdRuleType.latex);
+    }
+    if (disableRulesGroup.chem && disableRuleTypes.indexOf(eMmdRuleType.chem) === -1) {
+      disableRuleTypes.push(eMmdRuleType.chem);
+    }
+    if (disableRulesGroup.html && disableRuleTypes.indexOf(eMmdRuleType.html) === -1) {
+      disableRuleTypes.push(eMmdRuleType.html);
+    }
+    if (disableRulesGroup.asciiMath && disableRuleTypes.indexOf(eMmdRuleType.asciiMath) === -1) {
+      disableRuleTypes.push(eMmdRuleType.asciiMath);
+    }
+    if (disableRulesGroup.math && disableRuleTypes.indexOf(eMmdRuleType.math) === -1) {
+      disableRuleTypes.push(eMmdRuleType.math);
+      disableRuleTypes.push(eMmdRuleType.simpleMath);
+    }
+    if (disableRulesGroup.simpleMath && disableRuleTypes.indexOf(eMmdRuleType.simpleMath) === -1) {
+      disableRuleTypes.push(eMmdRuleType.simpleMath);
+    }
+    if (disableRulesGroup.mathML && disableRuleTypes.indexOf(eMmdRuleType.mathML) === -1) {
+      disableRuleTypes.push(eMmdRuleType.mathML);
+    }
+  }
+  return disableRuleTypes;
+}
+export const getListRulesToDisable = (md, renderOptions: RenderOptions): string[] => {
+  const rules: string[] = [];
+  const { codeOnly = false, textOnly = false } = renderOptions;
+  const disableRuleTypes = getDisableRuleTypes(renderOptions);
+  if (!disableRuleTypes?.length) {
+    return rules;
+  }
+  for (let i: number = 0; i < mmdRuleList.length; i++) {
+    const rule: IMmdRule = mmdRuleList[i];
+    if (!findRule(md, rule)) {
+      continue;
+    }
+    if (disableRuleTypes.includes(rule.type)){
+      if (codeOnly && !textOnly && rule.name === "fence") {
+        continue;
+      }
+      rules.push(rule.name);
+    }
+  }
+  return rules;
+}
+
+const getMmdRuleByName = (name: string): IMmdRule => {
+  return mmdRuleList?.find((item: IMmdRule) => item.name === name);
+}
+
+export const applyRulesToDisableRules = (md, rules: string[], disableRules: string[]): string[] => {
+  for (let i: number = 0; i < rules.length; i++) {
+    let rule: IMmdRule = getMmdRuleByName(rules[i]);
+    if (rule && findRule(md, rule)) {
+      if (disableRules.indexOf(rule.name) === -1) {
+        disableRules.push(rule.name)
+      }
+    }
+  }
+  return disableRules;
+}
+export const applyRefRulesToDisableRules = (md, disableRules: string[]): string[] => {
+  const refRules: string[] = ['refs', 'refsInline'];
+  return applyRulesToDisableRules(md, refRules, disableRules);
+}
+
+export const applyFootnoteRulesToDisableRules = (md, disableRules: string[]): string[] => {
+  const footnoteRules: string[] = [
+    'mmd_footnote_tail',
+    'latex_footnote_block',
+    'latex_footnotetext_block',
+    'latex_footnote',
+    'latex_footnotemark',
+    'latex_footnotetext',
+    'grab_footnote_ref',
+    'footnote_tail',
+    'footnote_def',
+    'footnote_inline',
+    'footnote_ref'
+  ];
+  return applyRulesToDisableRules(md, footnoteRules, disableRules);
+}
+
+export const getListToDisableByOptions = (md: MarkdownIt, options): string[] => {
+  const { renderOptions = null, isDisableRefs = false, isDisableFootnotes = false } = options;
+  let disableRules: string[];
+  if (renderOptions) {
+    disableRules = getListRulesToDisable(md, renderOptions);
+  }
+  if (isDisableRefs) {
+    disableRules = applyRefRulesToDisableRules(md, disableRules);
+  }
+  if (isDisableFootnotes) {
+    disableRules = applyFootnoteRulesToDisableRules(md, disableRules);
+  }
+  return disableRules;
+}
+

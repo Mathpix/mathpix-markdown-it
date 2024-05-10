@@ -10,7 +10,6 @@ import ChemistryPlugin from './md-chemistry';
 import SvgToBase64Plugin from './md-svg-to-base64';
 import setPositionsAndHighlightPlugin from "./mdSetPositionsAndHighlight";
 import setMdLatexFootnotesPlugin from "./md-latex-footnotes";
-import disableRulesForRendering from "./mdDisableRulesForRendering";
 
 /**
  * configured custom mathjax plugin
@@ -32,4 +31,3 @@ export const mdPluginSvgToBase64 = SvgToBase64Plugin;
 export const mdPluginCollapsible = collapsiblePlugin;
 export const mdSetPositionsAndHighlight = setPositionsAndHighlightPlugin;
 export const mdLatexFootnotes = setMdLatexFootnotesPlugin;
-export const mdDisableRulesForRendering = disableRulesForRendering;
