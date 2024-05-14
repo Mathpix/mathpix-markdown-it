@@ -1,3 +1,5 @@
+import { RenderOptions } from "../../mathpix-markdown-model";
+
 const attr_name = '[a-zA-Z_:][a-zA-Z0-9:._-]*';
 const unquoted = '[^"\'=<>`\\x00-\\x20]+';
 const single_quoted = "'[^']*'";
@@ -195,3 +197,9 @@ export const codeHighlightDef = {
   auto: false,
   code: true
 };
+
+export const renderOptionsDef: RenderOptions = {
+  enable_markdown: true,
+  enable_latex: true,
+  enable_markdown_mmd_extensions: true
+}

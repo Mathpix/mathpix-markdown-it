@@ -188,9 +188,9 @@ export type DisableRulesGroup = {
 };
 
 export type RenderOptions = {
-  textOnly?: boolean; //Everything will be rendered as text
-  codeOnly?: boolean; //Only block code is allowed to be rendered, everything else will be rendered as text
-  textWithMathAndLatex?: boolean; //Only math and latex are allowed to be rendered, everything else will be rendered as text
+  enable_markdown?: boolean,
+  enable_latex?: boolean,
+  enable_markdown_mmd_extensions?: boolean,
   disableRulesGroup?: DisableRulesGroup;
 }
 

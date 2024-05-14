@@ -19,9 +19,9 @@ const textModeObj = {
   "textquotedblright": "\u201D",//”
   "textcopyright": "\u00A9",//©
   "textquoteleft": "\u2018",//‘
+  "textdaggerdbl": "\u2021",//‡
   "textdagger": "\u2020",//†
   "textquoteright": "\u2019",//’
-  "textdaggerdbl": "\u2021",//‡
   "textregistered": "\u00AE",//©
   "textdollar": "\u0024",//$
   "textsection": "\u00A7",//§

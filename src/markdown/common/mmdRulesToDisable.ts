@@ -1,6 +1,7 @@
 import { MarkdownIt, Core, ParserBlock, ParserInline, Ruler } from 'markdown-it';
 import { RenderOptions } from "../../mathpix-markdown-model";
 import { eMmdRuleType, eRule, IMmdRule, mmdRuleList } from "./mmdRules";
+import { renderOptionsDef } from "./consts";
 
 const findRule = (md, rule: IMmdRule): boolean => {
   const mdBlock: ParserBlock = md.block;
@@ -27,32 +28,31 @@ const findRule = (md, rule: IMmdRule): boolean => {
 const getDisableRuleTypes = (renderOptions: RenderOptions): eMmdRuleType[] => {
   const {
     disableRulesGroup = null,
-    codeOnly = false,
-    textOnly = false,
-    textWithMathAndLatex = false
+    enable_markdown= true,
+    enable_latex = true,
+    enable_markdown_mmd_extensions = true,
   } = renderOptions;
   let disableRuleTypes: eMmdRuleType[] = [];
-  if (textOnly || codeOnly) {
+  if (!enable_markdown) {
     disableRuleTypes = [
       eMmdRuleType.markdown,
-      eMmdRuleType.latex,
       eMmdRuleType.chem,
       eMmdRuleType.html,
       eMmdRuleType.asciiMath,
-      eMmdRuleType.math,
-      eMmdRuleType.simpleMath,
       eMmdRuleType.mathML
     ];
-    return disableRuleTypes;
+  } else {
+    if (!enable_markdown_mmd_extensions) {
+      disableRuleTypes = [
+        eMmdRuleType.chem,
+        eMmdRuleType.asciiMath,
+        eMmdRuleType.mathML
+      ]
+    }
   }
-  if (textWithMathAndLatex) {
-    disableRuleTypes = [
-      eMmdRuleType.markdown,
-      eMmdRuleType.chem,
-      eMmdRuleType.html,
-      eMmdRuleType.asciiMath,
-      eMmdRuleType.mathML
-    ];
+  if (!enable_latex) {
+    disableRuleTypes.push(eMmdRuleType.latex);
+    disableRuleTypes.push(eMmdRuleType.math);
   }
   if (disableRulesGroup) {
     if (disableRulesGroup.markdown && disableRuleTypes.indexOf(eMmdRuleType.markdown) === -1) {
@@ -85,8 +85,7 @@ const getDisableRuleTypes = (renderOptions: RenderOptions): eMmdRuleType[] => {
 }
 export const getListRulesToDisable = (md, renderOptions: RenderOptions): string[] => {
   const rules: string[] = [];
-  const { codeOnly = false, textOnly = false } = renderOptions;
-  const disableRuleTypes = getDisableRuleTypes(renderOptions);
+  const disableRuleTypes: eMmdRuleType[] = getDisableRuleTypes(renderOptions);
   if (!disableRuleTypes?.length) {
     return rules;
   }
@@ -96,9 +95,6 @@ export const getListRulesToDisable = (md, renderOptions: RenderOptions): string[
       continue;
     }
     if (disableRuleTypes.includes(rule.type)){
-      if (codeOnly && !textOnly && rule.name === "fence") {
-        continue;
-      }
       rules.push(rule.name);
     }
   }
@@ -143,7 +139,8 @@ export const applyFootnoteRulesToDisableRules = (md, disableRules: string[]): st
 }
 
 export const getListToDisableByOptions = (md: MarkdownIt, options): string[] => {
-  const { renderOptions = null, isDisableRefs = false, isDisableFootnotes = false } = options;
+  let { renderOptions = null, isDisableRefs = false, isDisableFootnotes = false } = options;
+  renderOptions = Object.assign({}, renderOptionsDef, renderOptions);
   let disableRules: string[] = [];
   if (renderOptions) {
     disableRules = getListRulesToDisable(md, renderOptions);

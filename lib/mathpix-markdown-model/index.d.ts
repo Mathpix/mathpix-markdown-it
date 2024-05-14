@@ -162,9 +162,9 @@ export type DisableRulesGroup = {
     mathML?: boolean;
 };
 export type RenderOptions = {
-    textOnly?: boolean;
-    codeOnly?: boolean;
-    textWithMathAndLatex?: boolean;
+    enable_markdown?: boolean;
+    enable_latex?: boolean;
+    enable_markdown_mmd_extensions?: boolean;
     disableRulesGroup?: DisableRulesGroup;
 };
 export declare enum TTocStyle {
