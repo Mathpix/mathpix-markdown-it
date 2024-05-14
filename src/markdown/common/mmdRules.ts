@@ -337,7 +337,7 @@ export const mmdRuleList: IMmdRule[] = [
   },
   {
     name: "linkifyURL",
-    type: eMmdRuleType.markdown,
+    type: eMmdRuleType.latex,
     rule: eRule.inline
   },
   {

@@ -25,7 +25,7 @@ const findRule = (md, rule: IMmdRule): boolean => {
   }
 }
 
-const getDisableRuleTypes = (renderOptions: RenderOptions): eMmdRuleType[] => {
+export const getDisableRuleTypes = (renderOptions: RenderOptions): eMmdRuleType[] => {
   const {
     disableRulesGroup = null,
     enable_markdown= true,
@@ -53,6 +53,7 @@ const getDisableRuleTypes = (renderOptions: RenderOptions): eMmdRuleType[] => {
   if (!enable_latex) {
     disableRuleTypes.push(eMmdRuleType.latex);
     disableRuleTypes.push(eMmdRuleType.math);
+    disableRuleTypes.push(eMmdRuleType.simpleMath);
   }
   if (disableRulesGroup) {
     if (disableRulesGroup.markdown && disableRuleTypes.indexOf(eMmdRuleType.markdown) === -1) {
