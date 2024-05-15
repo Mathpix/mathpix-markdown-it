@@ -4,6 +4,7 @@ import { mathpixMarkdownPlugin } from './mathpix-markdown-plugins';
 
 import { injectRenderRules } from "./rules";
 import { MathpixMarkdownModel as MM, TMarkdownItOptions, ParserErrors } from '../mathpix-markdown-model';
+import { applyRulesToDisableRules, getListToDisableByOptions } from "./common/mmdRulesToDisable";
 
 /** md renderer */
 const mdInit = (options: TMarkdownItOptions) => {
@@ -12,8 +13,6 @@ const mdInit = (options: TMarkdownItOptions) => {
           lineNumbering = false, startLine = 0, htmlSanitize = true, smiles = {}, forDocx = false, openLinkInNewWindow =  true,
     isDisableEmoji=false,
     isDisableEmojiShortcuts=false,
-    isDisableRefs = false,
-    isDisableFootnotes = false,
     maxWidth = '',
     enableFileLinks = false, validateLink = null,
     toc = {},
@@ -29,6 +28,7 @@ const mdInit = (options: TMarkdownItOptions) => {
     codeHighlight = {},
     footnotes = {},
     copyToClipboard = false,
+    renderOptions = null
   } = options;
   const mmdOptions = {
     width: width,
@@ -52,7 +52,8 @@ const mdInit = (options: TMarkdownItOptions) => {
     parserErrors: parserErrors,
     codeHighlight: codeHighlight,
     footnotes: footnotes,
-    copyToClipboard: copyToClipboard
+    copyToClipboard: copyToClipboard,
+    renderOptions: renderOptions
   };
   let md = require("markdown-it")({
     html: htmlTags,
@@ -85,27 +86,13 @@ const mdInit = (options: TMarkdownItOptions) => {
       md.use(require("markdown-it-emoji"))
     }
   }
-  if (isDisableRefs) {
-    md.disable(['refs', 'refsInline'])
-  }  
-  if (isDisableFootnotes) {
-    md.disable([
-      'mmd_footnote_tail',
-      'latex_footnote_block',
-      'latex_footnotetext_block',
-      'latex_footnote',
-      'latex_footnotemark',
-      'latex_footnotetext',
-      'grab_footnote_ref',
-      'footnote_tail',
-      'footnote_def',
-      'footnote_inline',
-      'footnote_ref'
-    ])
-  }
   if (addPositionsToTokens || highlights?.length) {
     /** SetPositions plugin should be last */
     md.use(mdSetPositionsAndHighlight, mmdOptions);
+  }
+  const disableRules: string[] = getListToDisableByOptions(md, options);
+  if (disableRules?.length) {
+    md.disable(disableRules, true);
   }
   return md;
 };
@@ -119,7 +106,8 @@ export const markdownToHtmlPipeline = (content: string, options: TMarkdownItOpti
   md = injectRenderRules(md);
 
   if (MM.disableRules && MM.disableRules.length > 0) {
-      md.disable(MM.disableRules);
+    const disableRules: string[] = applyRulesToDisableRules(md, MM.disableRules, []);
+    md.disable(disableRules, true);
   }
   if (options.renderElement && options.renderElement.inLine) {
     return md.renderInline(content);

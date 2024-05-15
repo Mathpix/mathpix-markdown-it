@@ -51,9 +51,12 @@ export const refInsideMathDelimiter: RuleInline = (state, silent) => {
     && state.src.charCodeAt(startMathPos) !== 0x24 /* $ */) {
     return false;
   }
+  const reMathDelimiters: RegExp = state.md.options?.renderOptions?.disableRules?.simpleMath
+    ? /^(?:\\\[|\[|\\\(|\()/
+    : /^(?:\\\[|\[|\\\(|\(|\$\$|\$)/;
   const match = state.src
     .slice(startMathPos)
-    .match(/^(?:\\\[|\[|\\\(|\(|\$\$|\$)/); // eslint-disable-line
+    .match(reMathDelimiters); // eslint-disable-line
   if (!match) {
     return false;
   }

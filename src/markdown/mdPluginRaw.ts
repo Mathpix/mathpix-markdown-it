@@ -38,6 +38,8 @@ import {getTerminatedRules} from './common';
 import {highlightText} from "./highlight/common";
 import {ParserErrors} from "../mathpix-markdown-model";
 import {svg_block} from "./md-block-rule/svg_block";
+import {eMmdRuleType} from "./common/mmdRules";
+import {getDisableRuleTypes} from "./common/mmdRulesToDisable";
 
 const isSpace = require('markdown-it/lib/common/utils').isSpace;
 
@@ -1056,8 +1058,13 @@ export default options => {
     md.inline.ruler.before("asciiMath", "backtickAsAsciiMath", backtickAsAsciiMath);
     /** Replace image inline rule */
     md.inline.ruler.at('image', imageWithSize);
+    const disableRuleTypes: eMmdRuleType[] = md.options.renderOptions
+      ? getDisableRuleTypes(md.options.renderOptions)
+      : [];
     /** Replace inline core rule */
-    md.core.ruler.at('inline', coreInline);
+    if (!disableRuleTypes.includes(eMmdRuleType.latex)) {
+      md.core.ruler.at('inline', coreInline);
+    }
 
     Object.keys(mapping).forEach(key => {
       md.renderer.rules[key] = (tokens, idx, options, env, slf) => {

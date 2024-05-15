@@ -29,7 +29,8 @@ import {
   THighlight,
   ParserErrors,
   CodeHighlight,
-  Footnotes
+  Footnotes,
+  RenderOptions
 } from "./mathpix-markdown-model";
 
 import { ISmilesOptions } from './markdown/md-chemistry';
@@ -63,6 +64,7 @@ export {
   ParserErrors,
   Footnotes,
   eLabelType, ILabel, getLabelsList, getLabelByKeyFromLabelsList, clearLabelsList,
-  normalizeLink
+  normalizeLink,
+  RenderOptions
 };
 

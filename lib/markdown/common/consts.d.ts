@@ -1,3 +1,4 @@
+import { RenderOptions } from "../../mathpix-markdown-model";
 export declare const attr_value: string;
 export declare const attribute: string;
 export declare const openTagMML: RegExp;
@@ -127,3 +128,4 @@ export declare const codeHighlightDef: {
     auto: boolean;
     code: boolean;
 };
+export declare const renderOptionsDef: RenderOptions;

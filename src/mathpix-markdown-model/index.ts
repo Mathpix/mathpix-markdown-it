@@ -61,6 +61,7 @@ export interface optionsMathpixMarkdown {
     codeHighlight?: CodeHighlight;
     footnotes?: Footnotes;
     copyToClipboard?: boolean;
+    renderOptions?: RenderOptions
 }
 
 export type TMarkdownItOptions = {
@@ -109,6 +110,7 @@ export type TMarkdownItOptions = {
   codeHighlight?: CodeHighlight;
   footnotes?: Footnotes;
   copyToClipboard?: boolean;
+  renderOptions?: RenderOptions
 }
 
 export type TOutputMath = {
@@ -173,6 +175,12 @@ export type CodeHighlight = {
   auto?: boolean, //Highlighting with language detection
   code?: boolean
 };
+
+export type RenderOptions = {
+  enable_markdown?: boolean,
+  enable_latex?: boolean,
+  enable_markdown_mmd_extensions?: boolean
+}
 
 export enum TTocStyle {
   summary = 'summary',
@@ -485,7 +493,8 @@ class MathpixMarkdown_Model {
           parserErrors = ParserErrors.show,
           codeHighlight = {},
           footnotes = {},
-          copyToClipboard = false
+          copyToClipboard = false,
+          renderOptions = null
         }
          = options || {};
 
@@ -533,7 +542,8 @@ class MathpixMarkdown_Model {
           parserErrors: parserErrors,
           codeHighlight: codeHighlight,
           footnotes: footnotes,
-          copyToClipboard: copyToClipboard
+          copyToClipboard: copyToClipboard,
+          renderOptions: renderOptions
         };
 
         const styleFontSize = fontSize ? ` font-size: ${options.fontSize}px;` : '';

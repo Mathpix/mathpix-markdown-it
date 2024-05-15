@@ -78,7 +78,7 @@ export const latex_footnote_block: RuleBlock = (state, startLine, endLine, silen
     let nextLineContent = nextLine;
     let inlineContentAfter = '';
     let openBrackets = 0;
-    let contentLength = 0;
+    let contentLength = content.length;
     for (; nextLine <= endLine; nextLine++) {
       if (fence(state, nextLine, endLine, true)) {
         terminate = true;
@@ -246,7 +246,7 @@ export const latex_footnotetext_block: RuleBlock = (state, startLine, endLine, s
     let nextLineContent = nextLine;
     let inlineContentAfter = '';
     let openBrackets = 0;
-    let contentLength = 0;
+    let contentLength = content.length;
     for (; nextLine <= endLine; nextLine++) {
       if (fence(state, nextLine, endLine, true)) {
         terminate = true;

@@ -762,6 +762,7 @@ The `MathpixMarkdown` React element accepts the following props:
 | `codeHighlight`  | [CodeHighlight](https://github.com/Mathpix/mathpix-markdown-it#codehighlight);*`{}`*      | Sets options to highlight code block                      |
 | `footnotes`      | [Footnotes](https://github.com/Mathpix/mathpix-markdown-it#footnotes);*`{}`*              | Sets options to footnotes                                 |
 | `copyToClipboard` | boolean;*`false`*            | Added copy to clipboard button for code chunks. To handle events, import the function addListenerCopyToClipdoardEvents() from "mathpix-markdown-it/lib/copy-to-clipboard";|
+| `renderOptions`  | [RenderOptions](https://github.com/Mathpix/mathpix-markdown-it#renderoptions);*`{}`*   | Sets options to enable render rules                          |
 
 ### optionsMathpixMarkdown
 
@@ -794,6 +795,7 @@ The `MathpixMarkdown` React element accepts the following props:
 | `codeHighlight`  | [CodeHighlight](https://github.com/Mathpix/mathpix-markdown-it#codehighlight);*`{}`*      | Sets options to highlight code block                      |
 | `footnotes`      | [Footnotes](https://github.com/Mathpix/mathpix-markdown-it#footnotes);*`{}`*              | Sets options to footnotes                                 |
 | `copyToClipboard` | boolean;*`false`*            | Added copy to clipboard button for code chunks. To handle events, import the function addListenerCopyToClipdoardEvents() from "mathpix-markdown-it/lib/copy-to-clipboard";|
+| `renderOptions`  | [RenderOptions](https://github.com/Mathpix/mathpix-markdown-it#renderoptions);*`{}`*   | Sets options to enable render rules                             |
 
 ### TOutputMath
 
@@ -874,6 +876,14 @@ The `MathpixMarkdown` React element accepts the following props:
 |                | type&nbsp;*`default`*       |                                           |
 |----------------|-----------------------------|-------------------------------------------|
 | `fontSize`     | string&nbsp;*`unset`*       | Ability to change font size for footnotes |
+
+### RenderOptions
+
+|                                   | type&nbsp;*`default`*                                                                          |                                                                                                                                                              |
+|-----------------------------------|------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `enable_markdown`                 | boolean&nbsp;*`true`*                                                                          | Enable markdown rules. If it is set to `false`, then all markdown rules will be disabled. This also disables the rules for `enable_markdown_mmd_extensions`. |
+| `enable_latex`                    | boolean&nbsp;*`true`*                                                                          | Enable latex rules. If it is set to `false`, then all latex and math rules will be disabled.                                                                 |
+| `enable_markdown_mmd_extensions`  | boolean&nbsp;*`true`*                                                                          | Enable markdown mmd extensions rules: `smiles`, `asciiMath`, `mathML`. If it is set to `false` then these rules will be disabled.                            |
 
 ### TAccessibility
 
