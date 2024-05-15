@@ -879,25 +879,23 @@ The `MathpixMarkdown` React element accepts the following props:
 
 ### RenderOptions
 
-|                | type&nbsp;*`default`*                                                                          |                                        |
-|----------------|------------------------------------------------------------------------------------------------|----------------------------------------|
-| `enable_markdown`     | boolean&nbsp;*`true`*                                                                          | Enable markdown rules                  |
-| `enable_latex`     | boolean&nbsp;*`true`*                                                                          | Enable latex rules                     |
-| `enable_markdown_mmd_extensions`     | boolean&nbsp;*`true`*                                                                          | Enable markdown mmd extensions rules: `<smiles>...</smiles>`, `<ascii>...</ascii>`, `mathML` |
-| `disableRulesGroup`     | [DisableRulesGroup](https://github.com/Mathpix/mathpix-markdown-it#disablerulesgroup);*`null`* | Groups of rules that should be excluded from rendering |
+|                                   | type&nbsp;*`default`*                                                                          |                                                                                                                                                              |
+|-----------------------------------|------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `enable_markdown`                 | boolean&nbsp;*`true`*                                                                          | Enable markdown rules. If it is set to `false`, then all markdown rules will be disabled. This also disables the rules for `enable_markdown_mmd_extensions`. |
+| `enable_latex`                    | boolean&nbsp;*`true`*                                                                          | Enable latex rules. If it is set to `false`, then all latex and math rules will be disabled.                                                                 |
+| `enable_markdown_mmd_extensions`  | boolean&nbsp;*`true`*                                                                          | Enable markdown mmd extensions rules: `<smiles>...</smiles>`, `<ascii>...</ascii>`, `mathML`. If it is set to `false` then these rules will be disabled.     |
+| `disableRulesGroup`               | [DisableRulesGroup](https://github.com/Mathpix/mathpix-markdown-it#disablerulesgroup);*`null`* | Groups of rules that should be excluded from rendering (this api is subject to change).                                                                      |
 
 ### DisableRulesGroup
 
-|              | type&nbsp;*`default`*   |                                                       |
-|--------------|-------------------------|-------------------------------------------------------|
-| `markdown`   | boolean&nbsp;*`false`*  | Disable markdown rules                                |
-| `latex`      | boolean&nbsp;*`false`*  | Disable latex rules                                   |
-| `chem`       | boolean&nbsp;*`false`*  | Disable chem rules: `<smiles>...</smiles>`            |
-| `html`       | boolean&nbsp;*`false`*  | Disable html rules                                    |
-| `asciiMath`  | boolean&nbsp;*`false`*  | Disable asciiMath rules `<ascii>...</ascii>`          |
-| `math`       | boolean&nbsp;*`false`*  | Disable math rules `$...$, $$...$$, \(...\), \[...\]` |
-| `simpleMath` | boolean&nbsp;*`false`*  | Disable simpleMath rules `$...$, $$...$$`             |
-| `mathML`     | boolean&nbsp;*`false`*  | Disable mathML rules `mathML`                         |
+|              | type&nbsp;*`default`*   |                                                                                                                                                                                                |
+|--------------|-------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `chem`       | boolean&nbsp;*`false`*  | Disable chem rules: `<smiles>...</smiles>`. If should be to disable only rules for chem. And neither `enable_markdown` nor `enable_markdown_mmd_extensions` are set to `false`.                |
+| `html`       | boolean&nbsp;*`false`*  | Disable html rules. If should be to disable only rules for html. And `enable_markdown` is not set to `false`.                                                                                  |
+| `asciiMath`  | boolean&nbsp;*`false`*  | Disable asciiMath rules `<ascii>...</ascii>`. If should be to disable only rules for asciiMath. And neither `enable_markdown` nor `enable_markdown_mmd_extensions` are set to `false`.         |
+| `math`       | boolean&nbsp;*`false`*  | Disable math rules `$...$, $$...$$, \(...\), \[...\]`. If should be to disable only the rules for math. This will also disable rules for simpleMath. And `enable_latex` is not set to `false`. |
+| `simpleMath` | boolean&nbsp;*`false`*  | Disable simpleMath rules `$...$, $$...$$`. If should be to disable only rules for simpleMath. And `enable_latex` is not set to `false`.                                                        |
+| `mathML`     | boolean&nbsp;*`false`*  | Disable mathML rules `mathML`. If should be to disable only rules for mathML. And neither `enable_markdown` nor `enable_markdown_mmd_extensions` are set to `false`.                           |
 
 ### TAccessibility
 
