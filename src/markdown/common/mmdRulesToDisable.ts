@@ -56,12 +56,6 @@ export const getDisableRuleTypes = (renderOptions: RenderOptions): eMmdRuleType[
     disableRuleTypes.push(eMmdRuleType.simpleMath);
   }
   if (disableRulesGroup) {
-    if (disableRulesGroup.markdown && disableRuleTypes.indexOf(eMmdRuleType.markdown) === -1) {
-      disableRuleTypes.push(eMmdRuleType.markdown);
-    }
-    if (disableRulesGroup.latex && disableRuleTypes.indexOf(eMmdRuleType.latex) === -1) {
-      disableRuleTypes.push(eMmdRuleType.latex);
-    }
     if (disableRulesGroup.chem && disableRuleTypes.indexOf(eMmdRuleType.chem) === -1) {
       disableRuleTypes.push(eMmdRuleType.chem);
     }

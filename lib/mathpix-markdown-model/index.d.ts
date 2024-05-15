@@ -152,8 +152,6 @@ export type CodeHighlight = {
     code?: boolean;
 };
 export type DisableRulesGroup = {
-    markdown?: boolean;
-    latex?: boolean;
     chem?: boolean;
     html?: boolean;
     asciiMath?: boolean;
