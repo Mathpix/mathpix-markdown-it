@@ -27,7 +27,6 @@ const findRule = (md, rule: IMmdRule): boolean => {
 
 export const getDisableRuleTypes = (renderOptions: RenderOptions): eMmdRuleType[] => {
   const {
-    disableRulesGroup = null,
     enable_markdown= true,
     enable_latex = true,
     enable_markdown_mmd_extensions = true,
@@ -54,27 +53,6 @@ export const getDisableRuleTypes = (renderOptions: RenderOptions): eMmdRuleType[
     disableRuleTypes.push(eMmdRuleType.latex);
     disableRuleTypes.push(eMmdRuleType.math);
     disableRuleTypes.push(eMmdRuleType.simpleMath);
-  }
-  if (disableRulesGroup) {
-    if (disableRulesGroup.chem && disableRuleTypes.indexOf(eMmdRuleType.chem) === -1) {
-      disableRuleTypes.push(eMmdRuleType.chem);
-    }
-    if (disableRulesGroup.html && disableRuleTypes.indexOf(eMmdRuleType.html) === -1) {
-      disableRuleTypes.push(eMmdRuleType.html);
-    }
-    if (disableRulesGroup.asciiMath && disableRuleTypes.indexOf(eMmdRuleType.asciiMath) === -1) {
-      disableRuleTypes.push(eMmdRuleType.asciiMath);
-    }
-    if (disableRulesGroup.math && disableRuleTypes.indexOf(eMmdRuleType.math) === -1) {
-      disableRuleTypes.push(eMmdRuleType.math);
-      disableRuleTypes.push(eMmdRuleType.simpleMath);
-    }
-    if (disableRulesGroup.simpleMath && disableRuleTypes.indexOf(eMmdRuleType.simpleMath) === -1) {
-      disableRuleTypes.push(eMmdRuleType.simpleMath);
-    }
-    if (disableRulesGroup.mathML && disableRuleTypes.indexOf(eMmdRuleType.mathML) === -1) {
-      disableRuleTypes.push(eMmdRuleType.mathML);
-    }
   }
   return disableRuleTypes;
 }
