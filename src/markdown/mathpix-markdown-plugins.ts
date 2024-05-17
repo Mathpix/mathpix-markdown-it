@@ -19,6 +19,8 @@ import {
 } from "./mdPluginConfigured";
 import { validateLinkEnableFile } from "./mdOptions";
 import { injectLabelIdToParagraph } from "./rules";
+import { eMmdRuleType } from "./common/mmdRules";
+import { getDisableRuleTypes } from "./common/mmdRulesToDisable";
 
 export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
   const {width = 1200,  outMath = {}, smiles = {}, mathJax = {}, renderElement = {}, forDocx = false, forLatex = false, forMD = false,
@@ -210,8 +212,8 @@ export const setBaseOptionsMd = (baseOption, mmdOptions) => {
   const {
     htmlTags = false, xhtmlOut = false, breaks = true, typographer = true, linkify = true, openLinkInNewWindow = true
   } = mmdOptions;
-
-  baseOption.html = htmlTags;
+  const disableRuleTypes: eMmdRuleType[] = mmdOptions?.renderOptions ? getDisableRuleTypes(mmdOptions.renderOptions) : [];
+  baseOption.html = htmlTags && !disableRuleTypes.includes(eMmdRuleType.html);
   baseOption.xhtmlOut = xhtmlOut;
   baseOption.breaks = breaks;
   baseOption.langPrefix = "language-";

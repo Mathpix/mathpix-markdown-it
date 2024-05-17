@@ -220,8 +220,8 @@ export const mmdRuleList: IMmdRule[] = [
     rule: eRule.inline
   },
   {
-    name: "newline",
-    type: eMmdRuleType.latex,
+    name: "newline", //Split to lines
+    type: eMmdRuleType.common,
     rule: eRule.inline
   },
   {
@@ -316,7 +316,6 @@ export const mmdRuleList: IMmdRule[] = [
   },
   {
     name: "refs",
-    // type: eMmdRuleType.latex //refInsideMathDelimiter
     type: eMmdRuleType.math,
     rule: eRule.inline
   },

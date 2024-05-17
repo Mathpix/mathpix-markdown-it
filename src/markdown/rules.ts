@@ -3,6 +3,8 @@ import { injectInlineStyles } from './inline-styles';
 import {getLabelByUuidFromLabelsList, ILabel} from "./common/labels";
 import { attrSetToBegin } from "./utils";
 import { codeHighlightDef, svgRegex } from "./common/consts";
+import { eMmdRuleType } from "./common/mmdRules";
+import { getDisableRuleTypes } from "./common/mmdRulesToDisable";
 
 export const PREVIEW_PARAGRAPH_PREFIX = "preview-paragraph-";
 export const PREVIEW_LINE_CLASS = "preview-line";
@@ -14,7 +16,10 @@ const escapeHtml = require('markdown-it/lib/common/utils').escapeHtml;
 /** inspired from https://github.com/markdown-it/markdown-it.github.io/blob/master/index.js#L9929 */
 function injectLineNumbers(tokens, idx, options, env, slf) {
   let line, endLine, listLine;
-  if (options?.html && tokens[idx+1]?.content && svgRegex.test(tokens[idx+1].content)) {
+  const disableRuleTypes: eMmdRuleType[] = options?.renderOptions ? getDisableRuleTypes(options.renderOptions) : [];
+  if (options?.html
+    && !disableRuleTypes.includes(eMmdRuleType.html)
+    && tokens[idx+1]?.content && svgRegex.test(tokens[idx+1].content)) {
     tokens[idx].attrJoin('style', 'text-align: center;')
   }
   if (tokens[idx].uuid) {
@@ -44,7 +49,10 @@ function injectLineNumbers(tokens, idx, options, env, slf) {
 }
 
 function injectLabelIdToParagraphOPen(tokens, idx, options, env, slf) {
-  if (options?.html && tokens[idx+1]?.content && svgRegex.test(tokens[idx+1].content)) {
+  const disableRuleTypes: eMmdRuleType[] = options?.renderOptions ? getDisableRuleTypes(options.renderOptions) : [];
+  if (options?.html
+    && !disableRuleTypes.includes(eMmdRuleType.html)
+    && tokens[idx+1]?.content && svgRegex.test(tokens[idx+1].content)) {
     tokens[idx].attrJoin('style', 'text-align: center;')
   }
   if (tokens[idx].uuid) {
@@ -202,7 +210,8 @@ export function injectLabelIdToParagraph(renderer) {
 }
 
 export const injectRenderRules = (renderer) => {
-  const { lineNumbering = false, htmlSanitize = {}, html = false, forDocx = false, centerTables = true } = renderer.options;
+  const { lineNumbering = false, htmlSanitize = {}, html = false, forDocx = false, centerTables = true, renderOptions = null } = renderer.options;
+  const disableRuleTypes: eMmdRuleType[] = renderOptions ? getDisableRuleTypes(renderOptions) : [];
   if (centerTables) {
     renderer.renderer.rules.table_open = injectCenterTables;
   }
@@ -211,7 +220,7 @@ export const injectRenderRules = (renderer) => {
   }
   if (lineNumbering) {
     withLineNumbers(renderer);
-    if (html) {
+    if (html && !disableRuleTypes.includes(eMmdRuleType.html)) {
       renderer.renderer.rules.html_block = html_block_injectLineNumbers;
       if (htmlSanitize !== false) {
         renderer.renderer.rules.html_inline  = html_inline_Sanitize;
@@ -219,7 +228,7 @@ export const injectRenderRules = (renderer) => {
     }
   } else {
     injectLabelIdToParagraph(renderer);
-    if (html) {
+    if (html && !disableRuleTypes.includes(eMmdRuleType.html)) {
       if (htmlSanitize !== false) {
         renderer.renderer.rules.html_block = html_block_Sanitize;
         renderer.renderer.rules.html_inline  = html_inline_Sanitize;

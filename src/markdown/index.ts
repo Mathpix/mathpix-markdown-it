@@ -4,7 +4,8 @@ import { mathpixMarkdownPlugin } from './mathpix-markdown-plugins';
 
 import { injectRenderRules } from "./rules";
 import { MathpixMarkdownModel as MM, TMarkdownItOptions, ParserErrors } from '../mathpix-markdown-model';
-import { applyRulesToDisableRules, getListToDisableByOptions } from "./common/mmdRulesToDisable";
+import { applyRulesToDisableRules, getDisableRuleTypes, getListToDisableByOptions } from "./common/mmdRulesToDisable";
+import { eMmdRuleType } from "./common/mmdRules";
 
 /** md renderer */
 const mdInit = (options: TMarkdownItOptions) => {
@@ -55,8 +56,9 @@ const mdInit = (options: TMarkdownItOptions) => {
     copyToClipboard: copyToClipboard,
     renderOptions: renderOptions
   };
+  const disableRuleTypes: eMmdRuleType[] = renderOptions ? getDisableRuleTypes(renderOptions) : [];
   let md = require("markdown-it")({
-    html: htmlTags,
+    html: htmlTags && !disableRuleTypes.includes(eMmdRuleType.html),
     xhtmlOut: xhtmlOut,
     breaks: breaks,
     langPrefix: "language-",

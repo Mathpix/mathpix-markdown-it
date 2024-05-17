@@ -116,7 +116,7 @@ module.exports = "<h2>Using Markdown in Snip</h2>\n" +
   "</tr>\n" +
   "</tbody>\n" +
   "</table>\n" +
-  "<div>There must be at least 3 dashes separating each header cell.\n" +
+  "<div>There must be at least 3 dashes separating each header cell.<br>\n" +
   "The outer pipes (|) are optional, and you don’t need to make the raw Markdown line up prettily:</div>\n" +
   "<table align=\"center\">\n" +
   "<thead>\n" +
@@ -142,8 +142,8 @@ module.exports = "<h2>Using Markdown in Snip</h2>\n" +
   "<h3>Links and images</h3>\n" +
   "<div><a href=\"http://mathpix.com/\" target=\"_blank\" rel=\"noopener\" style=\"word-break: break-word\">This is a link to the Mathpix website</a></div>\n" +
   "<div><figure style=\"text-align: center\"><img src=\"https://cdn.mathpix.com/snip/images/0Y13pkOem1h2kqhOPAB98mtSCL5FQlQPtot1obxd-R8.original.fullsize.png\" alt=\"Feynman Lecture 1\" data-align=\"center\"></figure></div>\n" +
-  "<div>Include text in quotes for a tooltip (hover over the image to see):\n" +
-  "<img src=\"https://cdn.mathpix.com/snip/images/XDfl14ZxchxGUuOHzRSN7FcqMmLxknDndIo18jsMfk0.original.fullsize.png\" alt=\"Feynman Lecture 2\" title=\"Michelson-Morley experiment\"></div>\n" +
+  "<div>Include text in quotes for a tooltip (hover over the image to see):<br>\n" +
+  "<figure style=\"text-align: center\"><img src=\"https://cdn.mathpix.com/snip/images/XDfl14ZxchxGUuOHzRSN7FcqMmLxknDndIo18jsMfk0.original.fullsize.png\" alt=\"Feynman Lecture 2\" data-align=\"center\" title=\"Michelson-Morley experiment\"></figure></div>\n" +
   "<h3>Footnotes</h3>\n" +
   "<div>You can write footnotes either by writing out “first”, “second”, “third”, etc:</div>\n" +
   "<div>Footnote 1 link<sup class=\"footnote-ref\"><a href=\"#fn1\" id=\"fnref1\">[1]</a></sup>.</div>\n" +
@@ -174,8 +174,8 @@ module.exports = "<h2>Using Markdown in Snip</h2>\n" +
   "<div>\\title{Title}</div>\n" +
   "<div>\\author{Author}</div>\n" +
   "<div>\\author{Author\\can also be\\multiline}</div>\n" +
-  "<div>\\begin{abstract}\n" +
-  "This is the abstract to my paper. You are going to learn a lot in this paper, just you wait. I am going to tell you about all the different LaTeX and Markdown syntax you can use in Snip. \n" +
+  "<div>\\begin{abstract}<br>\n" +
+  "This is the abstract to my paper. You are going to learn a lot in this paper, just you wait. I am going to tell you about all the different LaTeX and Markdown syntax you can use in Snip.<br>\n" +
   "\\end{abstract}</div>\n" +
   "<div>\\section{My great section}</div>\n" +
   "<div>\\subsection{My really great subsection}</div>\n" +
@@ -204,183 +204,183 @@ module.exports = "<h2>Using Markdown in Snip</h2>\n" +
   "<div>\\clearpage</div>\n" +
   "<div>\\newpage</div>\n" +
   "<div>Inline math $\\vec { F } = m \\vec { a }$ and this (ax^2 + bx + c = 0)</div>\n" +
-  "<div>$$\n" +
-  "x = \\frac { - b \\pm \\sqrt { b ^ { 2 } - 4 a c } } { 2 a }\n" +
+  "<div>$$<br>\n" +
+  "x = \\frac { - b \\pm \\sqrt { b ^ { 2 } - 4 a c } } { 2 a }<br>\n" +
   "$$</div>\n" +
-  "<div>[\n" +
-  "y = \\frac { \\sum _ { i } w _ { i } y _ { i } } { \\sum _ { i } w _ { i } } , i = 1,2 \\ldots k\n" +
+  "<div>[<br>\n" +
+  "y = \\frac { \\sum _ { i } w _ { i } y _ { i } } { \\sum _ { i } w _ { i } } , i = 1,2 \\ldots k<br>\n" +
   "]</div>\n" +
-  "<div>\\begin{equation*}\n" +
-  "l ( \\theta ) = \\sum _ { i = 1 } ^ { m } \\log p ( x , \\theta )\n" +
+  "<div>\\begin{equation*}<br>\n" +
+  "l ( \\theta ) = \\sum _ { i = 1 } ^ { m } \\log p ( x , \\theta )<br>\n" +
   "\\end{equation*}</div>\n" +
-  "<div>\\begin{align*}\n" +
-  "t _ { 1 } + t _ { 2 } = \\frac { ( 2 L / c ) \\sqrt { 1 - u ^ { 2 } / c ^ { 2 } } } { 1 - u ^ { 2 } / c ^ { 2 } } = \\frac { 2 L / c } { \\sqrt { 1 - u ^ { 2 } / c ^ { 2 } } }\n" +
+  "<div>\\begin{align*}<br>\n" +
+  "t _ { 1 } + t _ { 2 } = \\frac { ( 2 L / c ) \\sqrt { 1 - u ^ { 2 } / c ^ { 2 } } } { 1 - u ^ { 2 } / c ^ { 2 } } = \\frac { 2 L / c } { \\sqrt { 1 - u ^ { 2 } / c ^ { 2 } } }<br>\n" +
   "\\end{align*}</div>\n" +
-  "<div>\\begin{equation}\n" +
-  "m = \\frac { m _ { 0 } } { \\sqrt { 1 - v ^ { 2 } / c ^ { 2 } } }\n" +
+  "<div>\\begin{equation}<br>\n" +
+  "m = \\frac { m _ { 0 } } { \\sqrt { 1 - v ^ { 2 } / c ^ { 2 } } }<br>\n" +
   "\\end{equation}</div>\n" +
-  "<div>\\begin{align}\n" +
-  "^{|\\alpha|} \\sqrt{x^{\\alpha}} \\leq(x \\bullet \\alpha) /|\\alpha|\n" +
+  "<div>\\begin{align}<br>\n" +
+  "^{|\\alpha|} \\sqrt{x^{\\alpha}} \\leq(x \\bullet \\alpha) /|\\alpha|<br>\n" +
   "\\end{align}</div>\n" +
-  "<div>In equation \\eqref{eq:1}, we find the value of an\n" +
+  "<div>In equation \\eqref{eq:1}, we find the value of an<br>\n" +
   "interesting integral:</div>\n" +
-  "<div>\\begin{equation}\n" +
-  "  \\int_0^\\infty \\frac{x<sup>3}{e</sup>x-1},dx = \\frac{\\pi^4}{15}\n" +
-  "  \\label{eq:1}\n" +
+  "<div>\\begin{equation}<br>\n" +
+  "\\int_0^\\infty \\frac{x<sup>3}{e</sup>x-1},dx = \\frac{\\pi^4}{15}<br>\n" +
+  "\\label{eq:1}<br>\n" +
   "\\end{equation}</div>\n" +
-  "<div>\\begin{equation}\n" +
-  "  | x + y | \\geq | | x | | - | y | |\n" +
-  "  \\label{eq:2}\n" +
+  "<div>\\begin{equation}<br>\n" +
+  "| x + y | \\geq | | x | | - | y | |<br>\n" +
+  "\\label{eq:2}<br>\n" +
   "\\end{equation}</div>\n" +
-  "<div>$$\n" +
-  "\\frac{x\\left(x^{2 n}-x^{-2 n}\\right)}{x^{2 n}+x^{-2 n}}\n" +
-  "\\tag{1.1}\n" +
+  "<div>$$<br>\n" +
+  "\\frac{x\\left(x^{2 n}-x^{-2 n}\\right)}{x^{2 n}+x^{-2 n}}<br>\n" +
+  "\\tag{1.1}<br>\n" +
   "$$</div>\n" +
-  "<div>\\begin{equation}\n" +
-  "\\max <em>{\\theta} \\mathbb{E}</em>{\\mathbf{z} \\sim \\mathcal{Z}<em>{T}}\\left[\\sum</em>{t=1}^{T} \\log p_{\\theta}\\left(x_{z_{t}} | \\mathbf{x}<em>{\\mathbf{z}</em>{&lt;t}}\\right)\\right]\n" +
-  "\\tag{1.2}\n" +
+  "<div>\\begin{equation}<br>\n" +
+  "\\max <em>{\\theta} \\mathbb{E}</em>{\\mathbf{z} \\sim \\mathcal{Z}<em>{T}}\\left[\\sum</em>{t=1}^{T} \\log p_{\\theta}\\left(x_{z_{t}} | \\mathbf{x}<em>{\\mathbf{z}</em>{&lt;t}}\\right)\\right]<br>\n" +
+  "\\tag{1.2}<br>\n" +
   "\\end{equation}</div>\n" +
-  "<div>Look at the Equation \\ref{eq:2} \n" +
+  "<div>Look at the Equation \\ref{eq:2}<br>\n" +
   "Ref in math mode $\\ref{eq:2}$</div>\n" +
-  "<div>\\begin{split}\n" +
-  "a&amp; =b+c-d\\\n" +
-  "&amp; \\quad +e-f\\\n" +
-  "&amp; =g+h\\\n" +
-  "&amp; =i\n" +
+  "<div>\\begin{split}<br>\n" +
+  "a&amp; =b+c-d\\<br>\n" +
+  "&amp; \\quad +e-f\\<br>\n" +
+  "&amp; =g+h\\<br>\n" +
+  "&amp; =i<br>\n" +
   "\\end{split}</div>\n" +
-  "<div>\\begin{gather}\n" +
-  "a_1=b_1+c_1\\\n" +
-  "a_2=b_2+c_2-d_2+e_2\n" +
+  "<div>\\begin{gather}<br>\n" +
+  "a_1=b_1+c_1\\<br>\n" +
+  "a_2=b_2+c_2-d_2+e_2<br>\n" +
   "\\end{gather}</div>\n" +
-  "<div>\\begin{gather*}\n" +
-  "a_1=b_1+c_1\\\n" +
-  "a_2=b_2+c_2-d_2+e_2\n" +
+  "<div>\\begin{gather*}<br>\n" +
+  "a_1=b_1+c_1\\<br>\n" +
+  "a_2=b_2+c_2-d_2+e_2<br>\n" +
   "\\end{gather*}</div>\n" +
   "<div>Use <code>\\url{}</code> to insert a \\url{link}.</div>\n" +
-  "<div>\\begin{table}[h!]\n" +
+  "<div>\\begin{table}[h!]<br>\n" +
   "\\centering</div>\n" +
-  "<div>\\begin{tabular}{||c c c c||}\n" +
-  "\\hline\n" +
-  "Col1 &amp; Col2 &amp; Col2 &amp; Col3 \\ [0.5ex]\n" +
-  "\\hline\\hline\n" +
-  "1 &amp; 6 &amp; 87837 &amp; 787 \\\n" +
-  "2 &amp; 7 &amp; 78 &amp; 5415 \\\n" +
-  "3 &amp; 545 &amp; 778 &amp; 7507 \\\n" +
-  "4 &amp; 545 &amp; 18744 &amp; 7560 \\\n" +
-  "5 &amp; 88 &amp; 788 &amp; 6344 \\ [1ex]\n" +
-  "\\hline\n" +
+  "<div>\\begin{tabular}{||c c c c||}<br>\n" +
+  "\\hline<br>\n" +
+  "Col1 &amp; Col2 &amp; Col2 &amp; Col3 \\ [0.5ex]<br>\n" +
+  "\\hline\\hline<br>\n" +
+  "1 &amp; 6 &amp; 87837 &amp; 787 \\<br>\n" +
+  "2 &amp; 7 &amp; 78 &amp; 5415 \\<br>\n" +
+  "3 &amp; 545 &amp; 778 &amp; 7507 \\<br>\n" +
+  "4 &amp; 545 &amp; 18744 &amp; 7560 \\<br>\n" +
+  "5 &amp; 88 &amp; 788 &amp; 6344 \\ [1ex]<br>\n" +
+  "\\hline<br>\n" +
   "\\end{tabular}</div>\n" +
   "<div>\\end{table}</div>\n" +
   "<div>The table \\ref{table:1} is an example of referenced \\LaTeX elements.</div>\n" +
-  "<div>\\begin{table}[h!]\n" +
+  "<div>\\begin{table}[h!]<br>\n" +
   "\\centering</div>\n" +
-  "<div>\\begin{tabular}{||c c c c||}\n" +
-  "\\hline\n" +
-  "Col1 &amp; Col2 &amp; Col2 &amp; Col3 \\ [0.5ex]\n" +
-  "\\hline\\hline\n" +
-  "1 &amp; 6 &amp; 87837 &amp; 787 \\\n" +
-  "2 &amp; 7 &amp; 78 &amp; 5415 \\\n" +
-  "3 &amp; 545 &amp; 778 &amp; 7507 \\\n" +
-  "4 &amp; 545 &amp; 18744 &amp; 7560 \\\n" +
-  "5 &amp; 88 &amp; 788 &amp; 6344 \\ [1ex]\n" +
-  "\\hline\n" +
+  "<div>\\begin{tabular}{||c c c c||}<br>\n" +
+  "\\hline<br>\n" +
+  "Col1 &amp; Col2 &amp; Col2 &amp; Col3 \\ [0.5ex]<br>\n" +
+  "\\hline\\hline<br>\n" +
+  "1 &amp; 6 &amp; 87837 &amp; 787 \\<br>\n" +
+  "2 &amp; 7 &amp; 78 &amp; 5415 \\<br>\n" +
+  "3 &amp; 545 &amp; 778 &amp; 7507 \\<br>\n" +
+  "4 &amp; 545 &amp; 18744 &amp; 7560 \\<br>\n" +
+  "5 &amp; 88 &amp; 788 &amp; 6344 \\ [1ex]<br>\n" +
+  "\\hline<br>\n" +
   "\\end{tabular}</div>\n" +
-  "<div>\\caption{Table to test captions and labels}\n" +
-  "\\label{table:1}\n" +
+  "<div>\\caption{Table to test captions and labels}<br>\n" +
+  "\\label{table:1}<br>\n" +
   "\\end{table}</div>\n" +
   "<div>The figure \\ref{fig:figure1}</div>\n" +
-  "<div>\\begin{figure}\n" +
-  "\\includegraphics[width=350px, height=70px, right]{<a href=\"https://cdn.mathpix.com/snip/images/-HM3WXo8kgdk8VtayBtn1_pJlgq9Cb7qV4JtM47Hgn0.original.fullsize.png\" target=\"_blank\" rel=\"noopener\" style=\"word-break: break-all\">https://cdn.mathpix.com/snip/images/-HM3WXo8kgdk8VtayBtn1_pJlgq9Cb7qV4JtM47Hgn0.original.fullsize.png</a>}\n" +
-  "\\caption{Equation}\n" +
-  "\\label{fig:figure1}\n" +
+  "<div>\\begin{figure}<br>\n" +
+  "\\includegraphics[width=350px, height=70px, right]{<a href=\"https://cdn.mathpix.com/snip/images/-HM3WXo8kgdk8VtayBtn1_pJlgq9Cb7qV4JtM47Hgn0.original.fullsize.png\" target=\"_blank\" rel=\"noopener\" style=\"word-break: break-all\">https://cdn.mathpix.com/snip/images/-HM3WXo8kgdk8VtayBtn1_pJlgq9Cb7qV4JtM47Hgn0.original.fullsize.png</a>}<br>\n" +
+  "\\caption{Equation}<br>\n" +
+  "\\label{fig:figure1}<br>\n" +
   "\\end{figure}</div>\n" +
-  "<div>\\begin{itemize}\n" +
-  "  \\item  Default item label for entry one\n" +
-  "  \\item  Default item label for entry two\n" +
-  "  \\item[$\\square$]  Custom item label for entry three\n" +
+  "<div>\\begin{itemize}<br>\n" +
+  "\\item  Default item label for entry one<br>\n" +
+  "\\item  Default item label for entry two<br>\n" +
+  "\\item[$\\square$]  Custom item label for entry three<br>\n" +
   "\\end{itemize}</div>\n" +
   "<div>\\renewcommand{\\labelenumii}{\\Roman{enumii}}</div>\n" +
-  "<div>\\begin{enumerate}\n" +
-  "   \\item First level item\n" +
-  "   \\item First level item\n" +
-  "   \\begin{enumerate}\n" +
-  "     \\setcounter{enumii}{4}\n" +
-  "     \\item Second level item\n" +
-  "     \\item Second level item\n" +
-  "       \\begin{enumerate}\n" +
-  "       \\item Third level item\n" +
-  "       \\item Third level item\n" +
-  "         \\begin{enumerate}\n" +
-  "         \\item Fourth level item\n" +
-  "         \\item Fourth level item\n" +
-  "       \\end{enumerate}\n" +
-  "     \\end{enumerate}\n" +
-  "   \\end{enumerate}\n" +
-  " \\end{enumerate}</div>\n" +
-  "<div>\\newtheorem{theorem}{Theorem}\n" +
-  "\\newtheorem{theorem}{Theorem}[section]\n" +
+  "<div>\\begin{enumerate}<br>\n" +
+  "\\item First level item<br>\n" +
+  "\\item First level item<br>\n" +
+  "\\begin{enumerate}<br>\n" +
+  "\\setcounter{enumii}{4}<br>\n" +
+  "\\item Second level item<br>\n" +
+  "\\item Second level item<br>\n" +
+  "\\begin{enumerate}<br>\n" +
+  "\\item Third level item<br>\n" +
+  "\\item Third level item<br>\n" +
+  "\\begin{enumerate}<br>\n" +
+  "\\item Fourth level item<br>\n" +
+  "\\item Fourth level item<br>\n" +
+  "\\end{enumerate}<br>\n" +
+  "\\end{enumerate}<br>\n" +
+  "\\end{enumerate}<br>\n" +
+  "\\end{enumerate}</div>\n" +
+  "<div>\\newtheorem{theorem}{Theorem}<br>\n" +
+  "\\newtheorem{theorem}{Theorem}[section]<br>\n" +
   "\\newtheorem{lemma}[theorem]{Lemma}</div>\n" +
   "<div>\\section{Introduction}</div>\n" +
   "<div>Theorems can easily be defined:</div>\n" +
-  "<div>\\begin{theorem}\n" +
-  "Let (f) be a function whose derivative exists in every point, then (f) \n" +
-  "is a continuous function.\n" +
+  "<div>\\begin{theorem}<br>\n" +
+  "Let (f) be a function whose derivative exists in every point, then (f)<br>\n" +
+  "is a continuous function.<br>\n" +
   "\\end{theorem}</div>\n" +
   "<div>\\setcounter{theorem}{0}</div>\n" +
-  "<div>\\begin{theorem}\n" +
-  "Let (f) be a function whose derivative exists in every point, then (f) \n" +
-  "is a continuous function.\n" +
+  "<div>\\begin{theorem}<br>\n" +
+  "Let (f) be a function whose derivative exists in every point, then (f)<br>\n" +
+  "is a continuous function.<br>\n" +
   "\\end{theorem}</div>\n" +
   "<div>\\setcounter{theorem}{-3}</div>\n" +
-  "<div>\\begin{theorem}\n" +
-  "Let (f) be a function whose derivative exists in every point, then (f) \n" +
-  "is a continuous function.\n" +
+  "<div>\\begin{theorem}<br>\n" +
+  "Let (f) be a function whose derivative exists in every point, then (f)<br>\n" +
+  "is a continuous function.<br>\n" +
   "\\end{theorem}</div>\n" +
   "<div>\\section{Introduction}</div>\n" +
-  "<div>\\begin{lemma}\n" +
-  "Given two line segments whose lengths are (a) and (b) respectively there \n" +
-  "is a real number (r) such that (b=ra).\n" +
+  "<div>\\begin{lemma}<br>\n" +
+  "Given two line segments whose lengths are (a) and (b) respectively there<br>\n" +
+  "is a real number (r) such that (b=ra).<br>\n" +
   "\\end{lemma}</div>\n" +
   "<div>\\renewcommand\\qedsymbol{$\\blacksquare$}</div>\n" +
-  "<div>\\begin{proof}\n" +
-  "To prove it by contradiction try and assume that the statement is false,\n" +
-  "proceed from there and at some point you will arrive to a contradiction.\n" +
+  "<div>\\begin{proof}<br>\n" +
+  "To prove it by contradiction try and assume that the statement is false,<br>\n" +
+  "proceed from there and at some point you will arrive to a contradiction.<br>\n" +
   "\\end{proof}</div>\n" +
   "<div>\\renewcommand\\qedsymbol{QED}</div>\n" +
-  "<div>\\begin{proof}\n" +
-  "To prove it by contradiction try and assume that the statement is false,\n" +
-  "proceed from there and at some point you will arrive to a contradiction.\n" +
+  "<div>\\begin{proof}<br>\n" +
+  "To prove it by contradiction try and assume that the statement is false,<br>\n" +
+  "proceed from there and at some point you will arrive to a contradiction.<br>\n" +
   "\\end{proof}</div>\n" +
   "<div>Automatically-generated footnote marker 1 \\footnote{First footnote should be 1}.</div>\n" +
   "<div>Footnote marker set to 11 \\footnote[11]{First footnote should be 11}.</div>\n" +
   "<div>Automatically-generated footnote marker 2 \\footnote{First footnote should be 2}.</div>\n" +
   "<div>Automatically-generated footnote marker 3 \\footnotemark{} \\footnotetext{Text of footnote with marker 3.}</div>\n" +
   "<div>Automatically-generated footnote markers 4 \\footnotemark{}, 5\\footnotemark{}</div>\n" +
-  "<div>Marker set to 20 \\footnotemark[20]{} \\footnotetext{Text of last footnote marker}\n" +
-  "\\footnotetext[20]{Text of footnote with marker 20}\n" +
+  "<div>Marker set to 20 \\footnotemark[20]{} \\footnotetext{Text of last footnote marker}<br>\n" +
+  "\\footnotetext[20]{Text of footnote with marker 20}<br>\n" +
   "\\footnotetext{Text of last footnote marker}</div>\n" +
-  "<div>\\footnotetext[20]{Text of footnote with marker 20}\n" +
-  "\\footnote{First footnote should be 1}.\n" +
-  "\\footnotetext{Text of last footnote marker}\n" +
+  "<div>\\footnotetext[20]{Text of footnote with marker 20}<br>\n" +
+  "\\footnote{First footnote should be 1}.<br>\n" +
+  "\\footnotetext{Text of last footnote marker}<br>\n" +
   "\\footnotetext{Text of last footnote marker}</div>\n" +
   "<div>\\footnotetext[20]{Text of footnote with marker 20}</div>\n" +
-  "<div>\\blfootnotetext{\n" +
-  "({ }^{0}) Compared to V1, this draft includes better baselines, experiments on GLUE, and more on adapter latency.\n" +
+  "<div>\\blfootnotetext{<br>\n" +
+  "({ }^{0}) Compared to V1, this draft includes better baselines, experiments on GLUE, and more on adapter latency.<br>\n" +
   "}</div>\n" +
-  "<div>\\footnotetext{\n" +
-  "({ }^{0}) Compared to V1, this draft includes better baselines, experiments on GLUE, and more on adapter latency.\n" +
+  "<div>\\footnotetext{<br>\n" +
+  "({ }^{0}) Compared to V1, this draft includes better baselines, experiments on GLUE, and more on adapter latency.<br>\n" +
   "}</div>\n" +
-  "<div>\\footnotetext{\n" +
-  "({ }^{1}) While GPT-3 175B achieves non-trivial performance with few-shot learning, fine-tuning boosts its performance significantly as shown in Appendix A\n" +
+  "<div>\\footnotetext{<br>\n" +
+  "({ }^{1}) While GPT-3 175B achieves non-trivial performance with few-shot learning, fine-tuning boosts its performance significantly as shown in Appendix A<br>\n" +
   "}</div>\n" +
-  "<div>\\footnotetext[]{ While GPT-3 175B achieves non-trivial performance with few-shot learning, fine-tuning boosts its performance significantly as shown in Appendix A\n" +
+  "<div>\\footnotetext[]{ While GPT-3 175B achieves non-trivial performance with few-shot learning, fine-tuning boosts its performance significantly as shown in Appendix A<br>\n" +
   "}</div>\n" +
-  "<div>\\footnotetext[0]{ While GPT-3 175B achieves non-trivial performance with few-shot learning, fine-tuning boosts its performance significantly as shown in Appendix A\n" +
+  "<div>\\footnotetext[0]{ While GPT-3 175B achieves non-trivial performance with few-shot learning, fine-tuning boosts its performance significantly as shown in Appendix A<br>\n" +
   "}</div>\n" +
   "<div>\\footnote{}</div>\n" +
-  "<div>\\footnotetext[]{ While GPT-3 175B achieves non-trivial performance with few-shot learning, fine-tuning boosts its performance significantly as shown in Appendix A\n" +
+  "<div>\\footnotetext[]{ While GPT-3 175B achieves non-trivial performance with few-shot learning, fine-tuning boosts its performance significantly as shown in Appendix A<br>\n" +
   "}</div>\n" +
-  "<div>\\footnotetext[0]{ While GPT-3 175B achieves non-trivial performance with few-shot learning, fine-tuning boosts its performance significantly as shown in Appendix A\n" +
+  "<div>\\footnotetext[0]{ While GPT-3 175B achieves non-trivial performance with few-shot learning, fine-tuning boosts its performance significantly as shown in Appendix A<br>\n" +
   "}</div>\n" +
   "<div><div class=\"smiles-inline\" style=\"display: inline-block\"><svg id=\"smiles-\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 249 177.4424529586994\" style=\"width: 248.9026083639194px; overflow: visible;\"><defs><linearGradient id=\"line-0\" gradientUnits=\"userSpaceOnUse\" x1=\"164.62123528560298\" y1=\"156.7387911520632\" x2=\"167.91388187853403\" y2=\"125.41135144796257\"><stop stop-color=\"#222\" offset=\"20%\"></stop><stop stop-color=\"#222\" offset=\"100%\"></stop></linearGradient><linearGradient id=\"line-1\" gradientUnits=\"userSpaceOnUse\" x1=\"158.98229613886485\" y1=\"156.1461147653356\" x2=\"162.27494273179593\" y2=\"124.81867506123498\"><stop stop-color=\"#222\" offset=\"20%\"></stop><stop stop-color=\"#222\" offset=\"100%\"></stop></linearGradient><linearGradient id=\"line-2\" gradientUnits=\"userSpaceOnUse\" x1=\"165.09441230516498\" y1=\"125.11501325459878\" x2=\"192.3742125243748\" y2=\"109.36501325459878\"><stop stop-color=\"#222\" offset=\"20%\"></stop><stop stop-color=\"#222\" offset=\"100%\"></stop></linearGradient><linearGradient id=\"line-3\" gradientUnits=\"userSpaceOnUse\" x1=\"141.68535030262706\" y1=\"104.03739915429476\" x2=\"165.09441230516498\" y2=\"125.11501325459878\"><stop stop-color=\"#222\" offset=\"20%\"></stop><stop stop-color=\"#222\" offset=\"100%\"></stop></linearGradient><linearGradient id=\"line-4\" gradientUnits=\"userSpaceOnUse\" x1=\"185.82499426361537\" y1=\"78.55336383148389\" x2=\"192.3742125243748\" y2=\"109.36501325459878\"><stop stop-color=\"#222\" offset=\"20%\"></stop><stop stop-color=\"#222\" offset=\"100%\"></stop></linearGradient><linearGradient id=\"line-5\" gradientUnits=\"userSpaceOnUse\" x1=\"110.35791059852644\" y1=\"107.33004574722585\" x2=\"141.68535030262706\" y2=\"104.03739915429476\"><stop stop-color=\"#222\" offset=\"20%\"></stop><stop stop-color=\"#222\" offset=\"100%\"></stop></linearGradient><linearGradient id=\"line-6\" gradientUnits=\"userSpaceOnUse\" x1=\"141.68535030262706\" y1=\"104.03739915429476\" x2=\"154.49755455951475\" y2=\"75.26071723855281\"><stop stop-color=\"#222\" offset=\"20%\"></stop><stop stop-color=\"#222\" offset=\"100%\"></stop></linearGradient><linearGradient id=\"line-7\" gradientUnits=\"userSpaceOnUse\" x1=\"187.93180984384378\" y1=\"80.45034910051126\" x2=\"209.0094239441478\" y2=\"57.04128709797333\"><stop stop-color=\"#222\" offset=\"20%\"></stop><stop stop-color=\"#222\" offset=\"100%\"></stop></linearGradient><linearGradient id=\"line-8\" gradientUnits=\"userSpaceOnUse\" x1=\"183.71817868338695\" y1=\"76.65637856245654\" x2=\"204.79579278369098\" y2=\"53.24731655991861\"><stop stop-color=\"#222\" offset=\"20%\"></stop><stop stop-color=\"#222\" offset=\"100%\"></stop></linearGradient><linearGradient id=\"line-9\" gradientUnits=\"userSpaceOnUse\" x1=\"154.49755455951475\" y1=\"75.26071723855281\" x2=\"185.82499426361537\" y2=\"78.55336383148389\"><stop stop-color=\"#222\" offset=\"20%\"></stop><stop stop-color=\"#222\" offset=\"100%\"></stop></linearGradient><linearGradient id=\"line-10\" gradientUnits=\"userSpaceOnUse\" x1=\"91.84267515131353\" y1=\"81.84601042441501\" x2=\"110.35791059852644\" y2=\"107.33004574722585\"><stop stop-color=\"#222\" offset=\"20%\"></stop><stop stop-color=\"#222\" offset=\"100%\"></stop></linearGradient><linearGradient id=\"line-11\" gradientUnits=\"userSpaceOnUse\" x1=\"94.95580496922197\" y1=\"134.9536292798479\" x2=\"107.76800922610967\" y2=\"106.17694736410596\"><stop stop-color=\"#222\" offset=\"20%\"></stop><stop stop-color=\"#222\" offset=\"100%\"></stop></linearGradient><linearGradient id=\"line-12\" gradientUnits=\"userSpaceOnUse\" x1=\"100.13560771405552\" y1=\"137.25982604608765\" x2=\"112.94781197094322\" y2=\"108.48314413034574\"><stop stop-color=\"#222\" offset=\"20%\"></stop><stop stop-color=\"#222\" offset=\"100%\"></stop></linearGradient><linearGradient id=\"line-13\" gradientUnits=\"userSpaceOnUse\" x1=\"135.9823191123018\" y1=\"49.77668191574196\" x2=\"154.49755455951475\" y2=\"75.26071723855281\"><stop stop-color=\"#222\" offset=\"20%\"></stop><stop stop-color=\"#222\" offset=\"100%\"></stop></linearGradient><linearGradient id=\"line-14\" gradientUnits=\"userSpaceOnUse\" x1=\"60.51523544721293\" y1=\"85.13865701734613\" x2=\"91.84267515131353\" y2=\"81.84601042441501\"><stop stop-color=\"#222\" offset=\"20%\"></stop><stop stop-color=\"#222\" offset=\"100%\"></stop></linearGradient><linearGradient id=\"line-15\" gradientUnits=\"userSpaceOnUse\" x1=\"91.84267515131353\" y1=\"81.84601042441501\" x2=\"104.65487940820121\" y2=\"53.06932850867308\"><stop stop-color=\"#222\" offset=\"20%\"></stop><stop stop-color=\"#222\" offset=\"100%\"></stop></linearGradient><linearGradient id=\"line-16\" gradientUnits=\"userSpaceOnUse\" x1=\"138.57222048471857\" y1=\"50.92978029886185\" x2=\"151.38442474160624\" y2=\"22.15309838311989\"><stop stop-color=\"#222\" offset=\"20%\"></stop><stop stop-color=\"#222\" offset=\"100%\"></stop></linearGradient><linearGradient id=\"line-17\" gradientUnits=\"userSpaceOnUse\" x1=\"133.39241773988505\" y1=\"48.62358353262207\" x2=\"146.2046219967727\" y2=\"19.84690161688011\"><stop stop-color=\"#222\" offset=\"20%\"></stop><stop stop-color=\"#222\" offset=\"100%\"></stop></linearGradient><linearGradient id=\"line-18\" gradientUnits=\"userSpaceOnUse\" x1=\"104.65487940820121\" y1=\"53.06932850867308\" x2=\"135.9823191123018\" y2=\"49.77668191574196\"><stop stop-color=\"#222\" offset=\"20%\"></stop><stop stop-color=\"#222\" offset=\"100%\"></stop></linearGradient><linearGradient id=\"line-19\" gradientUnits=\"userSpaceOnUse\" x1=\"42\" y1=\"59.654621694535294\" x2=\"60.51523544721293\" y2=\"85.13865701734613\"><stop stop-color=\"#222\" offset=\"20%\"></stop><stop stop-color=\"#222\" offset=\"100%\"></stop></linearGradient><linearGradient id=\"line-20\" gradientUnits=\"userSpaceOnUse\" x1=\"86.13964396098828\" y1=\"27.58529318586224\" x2=\"104.65487940820121\" y2=\"53.06932850867308\"><stop stop-color=\"#222\" offset=\"20%\"></stop><stop stop-color=\"#222\" offset=\"100%\"></stop></linearGradient><linearGradient id=\"line-21\" gradientUnits=\"userSpaceOnUse\" x1=\"48.14071806410013\" y1=\"59.80256731709443\" x2=\"59.03109168245466\" y2=\"35.34238768871379\"><stop stop-color=\"#222\" offset=\"20%\"></stop><stop stop-color=\"#222\" offset=\"100%\"></stop></linearGradient><linearGradient id=\"line-22\" gradientUnits=\"userSpaceOnUse\" x1=\"42\" y1=\"59.654621694535294\" x2=\"54.81220425688768\" y2=\"30.877939778793362\"><stop stop-color=\"#222\" offset=\"20%\"></stop><stop stop-color=\"#222\" offset=\"100%\"></stop></linearGradient><linearGradient id=\"line-23\" gradientUnits=\"userSpaceOnUse\" x1=\"54.81220425688768\" y1=\"30.877939778793362\" x2=\"86.13964396098828\" y2=\"27.58529318586224\"><stop stop-color=\"#222\" offset=\"20%\"></stop><stop stop-color=\"#222\" offset=\"100%\"></stop></linearGradient></defs><mask id=\"text-mask\"><rect x=\"0\" y=\"0\" width=\"100%\" height=\"100%\" fill=\"white\"></rect><circle cx=\"161.80176571223393\" cy=\"156.4424529586994\" r=\"6.5625\" fill=\"black\"></circle><circle cx=\"192.3742125243748\" cy=\"109.36501325459878\" r=\"6.5625\" fill=\"black\"></circle><circle cx=\"206.9026083639194\" cy=\"55.14430182894597\" r=\"6.5625\" fill=\"black\"></circle><circle cx=\"148.79452336918945\" cy=\"21\" r=\"6.5625\" fill=\"black\"></circle><circle cx=\"97.54570634163875\" cy=\"136.10672766296778\" r=\"6.5625\" fill=\"black\"></circle></mask><style>\n" +
   "                .element {\n" +

@@ -15,6 +15,8 @@ import { getMaxWidthStyle } from '../styles/halpers';
 import { parseMarkdownByElement } from '../helpers/parse-mmd-element';
 import { menuStyle } from '../contex-menu/styles';
 import { clipboardCopyStyles } from '../copy-to-clipboard/clipboard-copy-styles';
+import { eMmdRuleType } from "../markdown/common/mmdRules";
+import { getDisableRuleTypes } from "../markdown/common/mmdRulesToDisable";
 
 export interface optionsMathpixMarkdown {
     alignMathBlock?: Property.TextAlign;
@@ -508,7 +510,7 @@ class MathpixMarkdown_Model {
         } else {
           disableRules.push('toc');
         }
-
+        const disableRuleTypes: eMmdRuleType[] = renderOptions ? getDisableRuleTypes(renderOptions) : [];
         const markdownItOptions: TMarkdownItOptions = {
           isDisableFancy: isDisableFancy,
           isDisableEmoji: isDisableEmoji,
@@ -516,7 +518,7 @@ class MathpixMarkdown_Model {
           isDisableRefs: isDisableRefs,
           isDisableFootnotes: isDisableFootnotes,
           disableRules: disableRules,
-          htmlTags: htmlTags,
+          htmlTags: htmlTags && !disableRuleTypes.includes(eMmdRuleType.html),
           xhtmlOut: xhtmlOut,
           breaks: breaks,
           typographer: typographer,
