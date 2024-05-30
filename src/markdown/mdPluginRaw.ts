@@ -40,7 +40,7 @@ import {ParserErrors} from "../mathpix-markdown-model";
 import {svg_block} from "./md-block-rule/svg_block";
 import {eMmdRuleType} from "./common/mmdRules";
 import {getDisableRuleTypes} from "./common/mmdRulesToDisable";
-
+import { fenceBlock } from "./md-block-rule/mmd-fence";
 const isSpace = require('markdown-it/lib/common/utils').isSpace;
 
 function MathML(state, silent, pos, endMarker = '', type = "inline_mathML") {
@@ -1034,6 +1034,9 @@ export default options => {
     md.block.ruler.before("paragraph", "paragraphDiv", paragraphDiv);
     if (!md.options.enableCodeBlockRuleForLatexCommands) {
       md.block.ruler.at("code", codeBlock);
+    }
+    if (md.options.previewUuid) {
+      md.block.ruler.at("fence", fenceBlock);
     }
     md.block.ruler.before("ReNewCommand", "newTheoremBlock", newTheoremBlock, 
       {alt: getTerminatedRules("newTheoremBlock")});

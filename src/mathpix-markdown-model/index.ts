@@ -63,7 +63,8 @@ export interface optionsMathpixMarkdown {
     codeHighlight?: CodeHighlight;
     footnotes?: Footnotes;
     copyToClipboard?: boolean;
-    renderOptions?: RenderOptions
+    renderOptions?: RenderOptions;
+    previewUuid?: string;
 }
 
 export type TMarkdownItOptions = {
@@ -112,7 +113,8 @@ export type TMarkdownItOptions = {
   codeHighlight?: CodeHighlight;
   footnotes?: Footnotes;
   copyToClipboard?: boolean;
-  renderOptions?: RenderOptions
+  renderOptions?: RenderOptions;
+  previewUuid?: string
 }
 
 export type TOutputMath = {
@@ -496,7 +498,8 @@ class MathpixMarkdown_Model {
           codeHighlight = {},
           footnotes = {},
           copyToClipboard = false,
-          renderOptions = null
+          renderOptions = null,
+          previewUuid = ''
         }
          = options || {};
 
@@ -545,7 +548,8 @@ class MathpixMarkdown_Model {
           codeHighlight: codeHighlight,
           footnotes: footnotes,
           copyToClipboard: copyToClipboard,
-          renderOptions: renderOptions
+          renderOptions: renderOptions,
+          previewUuid: previewUuid
         };
 
         const styleFontSize = fontSize ? ` font-size: ${options.fontSize}px;` : '';

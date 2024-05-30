@@ -29,7 +29,8 @@ const mdInit = (options: TMarkdownItOptions) => {
     codeHighlight = {},
     footnotes = {},
     copyToClipboard = false,
-    renderOptions = null
+    renderOptions = null,
+    previewUuid = ""
   } = options;
   const mmdOptions = {
     width: width,
@@ -54,7 +55,8 @@ const mdInit = (options: TMarkdownItOptions) => {
     codeHighlight: codeHighlight,
     footnotes: footnotes,
     copyToClipboard: copyToClipboard,
-    renderOptions: renderOptions
+    renderOptions: renderOptions,
+    previewUuid: previewUuid
   };
   const disableRuleTypes: eMmdRuleType[] = renderOptions ? getDisableRuleTypes(renderOptions) : [];
   let md = require("markdown-it")({

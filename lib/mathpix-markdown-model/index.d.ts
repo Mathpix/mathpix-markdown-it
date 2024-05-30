@@ -46,6 +46,7 @@ export interface optionsMathpixMarkdown {
     footnotes?: Footnotes;
     copyToClipboard?: boolean;
     renderOptions?: RenderOptions;
+    previewUuid?: string;
 }
 export type TMarkdownItOptions = {
     isDisableFancy?: boolean;
@@ -94,6 +95,7 @@ export type TMarkdownItOptions = {
     footnotes?: Footnotes;
     copyToClipboard?: boolean;
     renderOptions?: RenderOptions;
+    previewUuid?: string;
 };
 export type TOutputMath = {
     include_mathml?: boolean;

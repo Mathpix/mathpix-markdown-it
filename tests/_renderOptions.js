@@ -131,8 +131,6 @@ describe("Check renderOptions:", () => {
         enable_markdown_mmd_extensions: false
       }
     }));
-    console.log("[html]=>");
-    console.log(html);
     it('Checking result html', (done) => {
       html.trim().should.equal(htmlContent);
       done();
