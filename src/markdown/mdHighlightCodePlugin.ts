@@ -3,6 +3,7 @@ const escapeHtml = require('markdown-it/lib/common/utils').escapeHtml;
 import { PREVIEW_LINE_CLASS, PREVIEW_PARAGRAPH_PREFIX, code_block_injectLineNumbers } from "./rules";
 import { codeHighlightDef } from "./common/consts";
 import { clipboardCopyElement } from "../copy-to-clipboard/clipboard-copy-element";
+import { getHtmlSeparatingSpanContainer } from "./common/separating-span";
 
 const maybe = f => {
   try {
@@ -73,10 +74,19 @@ const wrapFence = render => (tokens, idx, options, env, slf) => {
       }
     }
   }
-  if (options.copyToClipboard) {
+  if (options.copyToClipboard || options.previewUuid) {
     tokens[idx].attrJoin("style", `overflow: auto; position: relative;`);
-    let htmlClipboardCopy = clipboardCopyElement(tokens[idx].content);
-    html = '<div ' + slf.renderAttrs(tokens[idx]) + '>' + html + htmlClipboardCopy + '</div>';
+    let htmlClipboardCopy: string = options.copyToClipboard
+      ? clipboardCopyElement(tokens[idx].content)
+      : "";
+    let htmlSeparatingSpan: string = options.previewUuid && tokens[idx].contentSpan
+      ? getHtmlSeparatingSpanContainer(tokens[idx].contentSpan)
+      : "";
+    html = '<div ' + slf.renderAttrs(tokens[idx]) + '>'
+      + html
+      + htmlSeparatingSpan
+      + htmlClipboardCopy
+      + '</div>';
   }
   return html;
 };

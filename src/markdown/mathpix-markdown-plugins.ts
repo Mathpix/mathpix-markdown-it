@@ -39,7 +39,8 @@ export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
     codeHighlight = {},
     footnotes = {},
     copyToClipboard = false,
-    renderOptions = null
+    renderOptions = null,
+    previewUuid = ""
   } = options;
   Object.assign(md.options, smiles);
   Object.assign(md.options, {
@@ -64,7 +65,8 @@ export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
     codeHighlight: codeHighlight,
     footnotes: footnotes,
     copyToClipboard: copyToClipboard,
-    renderOptions: renderOptions
+    renderOptions: renderOptions,
+    previewUuid: previewUuid
   });
 
   md

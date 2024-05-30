@@ -32,7 +32,8 @@ class MathpixMarkdown extends React.Component<MathpixMarkdownProps> {
           codeHighlight = {},
           footnotes = {},
           copyToClipboard = false,
-          renderOptions = null
+          renderOptions = null,
+          previewUuid = ""
         } = this.props;
         const disableRules = isDisableFancy ? MM.disableFancyArrayDef : this.props.disableRules || [];
         const disableRuleTypes: eMmdRuleType[] = renderOptions ? getDisableRuleTypes(renderOptions) : [];
@@ -68,7 +69,8 @@ class MathpixMarkdown extends React.Component<MathpixMarkdownProps> {
             codeHighlight: codeHighlight,
             footnotes: footnotes,
             copyToClipboard: copyToClipboard,
-            renderOptions: renderOptions
+            renderOptions: renderOptions,
+            previewUuid: previewUuid
         };
 
          MM.setOptions(disableRules, isCheckFormula, showTimeLog);
