@@ -1,8 +1,8 @@
 import {
   markerBeginTagSpan,
   markerCloseTagSpan,
-  reSpan,
-  reSpanG
+  reSeparatingSpan,
+  reSeparatingSpanG,
 } from "./consts";
 
 export interface ISeparatingSpan {
@@ -48,7 +48,7 @@ export const getSeparatingSpanFromString = (
       nextPos++;
     }
     const content: string = str.slice(pos, nextPos);
-    const match: RegExpMatchArray = content.match(reSpan);
+    const match: RegExpMatchArray = content.match(reSeparatingSpan);
     if (!match || match.length < 3) {
       return res
     }
@@ -79,7 +79,7 @@ export const getContentAndSeparatingSpanFromLine = (
   try {
     const max: number = line?.length;
     while (pos < max) {
-      const match: RegExpMatchArray = line.slice(pos).match(reSpanG);
+      const match: RegExpMatchArray = line.slice(pos).match(reSeparatingSpanG);
       if (match) {
         const className: string = match.groups?.className;
         if (className?.includes(`preview-uuid-${previewUuid}`)) {
@@ -115,7 +115,7 @@ export const removeSeparatingSpanFromContent = (
     const arrSpan: string[] = [];
 
     for (const line of lines) {
-      if (!reSpanG.test(line)) {
+      if (!reSeparatingSpanG.test(line)) {
         arrContent.push(line);
         arrSpan.push('');
         continue;

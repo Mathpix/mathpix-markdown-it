@@ -21,6 +21,8 @@ export const markerBeginTagSpan: RegExp = /^<\/?(span)(?=(\s|>|$))/i;
 export const markerCloseTagSpan: RegExp = /<\/span\s*>/i;
 export const reSpan: RegExp = /^<(span\s*(?:class="(?<className>[^>]*)")\s*([^>]*))>(.*)<\/span\>/;
 export const reSpanG: RegExp = /<(span\s*(?:class="(?<className>[^>]*)")\s*([^>]*))>(.*)<\/span\>/;
+export const reSeparatingSpan: RegExp = /^<(span\s*(?:class="(?<className>[^>]*)")\s*([^>]*))>(\s*)<\/span\>/;
+export const reSeparatingSpanG: RegExp = /<(span\s*(?:class="(?<className>[^>]*)")\s*([^>]*))>(\s*)<\/span\>/;
 const close_tag_span = '<\\/span*\\s*>';
 export const closeTagSpan = new RegExp('(?:' + close_tag_span + ')');
 

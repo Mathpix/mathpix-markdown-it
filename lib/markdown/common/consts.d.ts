@@ -9,6 +9,8 @@ export declare const markerBeginTagSpan: RegExp;
 export declare const markerCloseTagSpan: RegExp;
 export declare const reSpan: RegExp;
 export declare const reSpanG: RegExp;
+export declare const reSeparatingSpan: RegExp;
+export declare const reSeparatingSpanG: RegExp;
 export declare const closeTagSpan: RegExp;
 export declare const labelTag: RegExp;
 export declare const labelTagG: RegExp;
