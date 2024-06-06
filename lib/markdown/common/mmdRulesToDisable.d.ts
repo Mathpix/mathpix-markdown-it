@@ -6,3 +6,4 @@ export declare const applyRulesToDisableRules: (md: any, rules: string[], disabl
 export declare const applyRefRulesToDisableRules: (md: any, disableRules: string[]) => string[];
 export declare const applyFootnoteRulesToDisableRules: (md: any, disableRules: string[]) => string[];
 export declare const getListToDisableByOptions: (md: MarkdownIt, options: any) => string[];
+export declare const mergeDisableRulesWithDisableFancy: (isDisableFancy: boolean, disableRules: string[]) => string[];

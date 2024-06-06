@@ -134,3 +134,4 @@ export declare const codeHighlightDef: {
     code: boolean;
 };
 export declare const renderOptionsDef: RenderOptions;
+export declare const fancyRulesDef: string[];

@@ -16,7 +16,8 @@ import { parseMarkdownByElement } from '../helpers/parse-mmd-element';
 import { menuStyle } from '../contex-menu/styles';
 import { clipboardCopyStyles } from '../copy-to-clipboard/clipboard-copy-styles';
 import { eMmdRuleType } from "../markdown/common/mmdRules";
-import { getDisableRuleTypes } from "../markdown/common/mmdRulesToDisable";
+import { getDisableRuleTypes, mergeDisableRulesWithDisableFancy } from "../markdown/common/mmdRulesToDisable";
+import { fancyRulesDef } from "../markdown/common/consts";
 
 export interface optionsMathpixMarkdown {
     alignMathBlock?: Property.TextAlign;
@@ -216,7 +217,7 @@ export type Footnotes = {
 }
 
 class MathpixMarkdown_Model {
-    public disableFancyArrayDef = ['replacements', 'list', 'usepackage', 'toc'];
+    public disableFancyArrayDef: string[] = fancyRulesDef;
     public disableRules: string[];
     public isCheckFormula?: boolean;
     public showTimeLog?: boolean;
@@ -244,7 +245,7 @@ class MathpixMarkdown_Model {
 
   markdownToHTML = (markdown: string, options: TMarkdownItOptions = {}):string => {
     const { lineNumbering = false, isDisableFancy = false,  htmlWrapper = false } = options;
-    const disableRules = isDisableFancy ? this.disableFancyArrayDef : options ? options.disableRules || [] : [];
+    const disableRules: string[] = mergeDisableRulesWithDisableFancy(isDisableFancy, options?.disableRules);
     this.setOptions(disableRules);
     let html = markdownHTML(markdown, options);
     if (!lineNumbering) {
@@ -503,7 +504,7 @@ class MathpixMarkdown_Model {
         }
          = options || {};
 
-        const disableRules = isDisableFancy ? this.disableFancyArrayDef : options ? options.disableRules || [] : [];
+        const disableRules: string[] = mergeDisableRulesWithDisableFancy(isDisableFancy, options?.disableRules);
 
         if (showToc) {
           const index = disableRules.indexOf('toc');
@@ -570,7 +571,7 @@ class MathpixMarkdown_Model {
     try {
       MathJax.Reset();
       const { isDisableFancy = false } = options;
-      const disableRules = isDisableFancy ? this.disableFancyArrayDef : options ? options.disableRules || [] : [];
+      const disableRules: string[] = mergeDisableRulesWithDisableFancy(isDisableFancy, options?.disableRules);
       this.setOptions(disableRules);
 
       const { metadata, content, error = ''} = yamlParser(mmd, isAddYamlToHtml);

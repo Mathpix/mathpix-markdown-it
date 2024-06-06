@@ -206,4 +206,6 @@ export const renderOptionsDef: RenderOptions = {
   enable_markdown: true,
   enable_latex: true,
   enable_markdown_mmd_extensions: true
-}
+};
+
+export const fancyRulesDef = ['replacements', 'list', 'usepackage', 'toc'];

@@ -690,27 +690,27 @@ The `MathpixMarkdown` React element accepts the following props:
 
 ### MathpixMarkdown props
 
-| prop             | type&nbsp;*`default`*        |  description                                                                                                           |
-|------------------|------------------------------|------------------------------------------------------------------------------------------------------------------------|
-| `text`           | sting                        | string that will be converted                                                                                          |
-| `alignMathBlock` | string&nbsp;*`center`*       | aligns `math-block`  by this params                                                                                    |
-| `display`        | string&nbsp;*`block`*        | `block` - the whole space, `inline-block` - renders in its actual size                                                 |
-| `showTimeLog`    | boolean&nbsp;*`false`*       | shows execution time in console                                                                                        |
-| `isDisableFancy` | boolean&nbsp;*`false`*       | `true` - disables processing of special characters (Example: `+ item`, `- item` )                                      |
-| `disableRules`   | array of strings&nbsp;*`[]`* | You can pass a list of rules for markdown rendering that should be disabled but only if `isDisableFancy` is not `true`.|
-|                  |                              | Example:  `disableRules = ['replacements'] ` will disable fancy characters processing.                                 |
-| `htmlTags`       | boolean;*`false`*            | Enables HTML tags in source                                                                                            |
-| `xhtmlOut`       | boolean;*`false`*            | Uses `/` to close single tags (`<br />`)                                                                               |
-| `breaks`         | boolean;*`true`*             | Converts `\n` in paragraphs into `<br>`                                                                                |
-| `typographer`    | boolean;*`false`*            | Enables some language-neutral replacement + quotes beautification (Example: `(c) (C) (r) (R) (tm) (TM) (p) (P) +-`)    |
-| `linkify`        | boolean;*`false`*            | Autoconverts URL-like text to links                                                                                    |
-| `width`          | number;*`1200`*              | Sets text container width                                                                                              |
-| `outMath`        | [TOutputMath](https://github.com/Mathpix/mathpix-markdown-it#toutputmath);*`{}`*         | Sets options to output html                                                                                           |
-| `mathJax`        | [TOutputMathJax](https://github.com/Mathpix/mathpix-markdown-it#toutputmathjax);*`{}`*       | Sets options to output MathJax                                                                                         |
-| `smiles`         | [ISmilesOptions](https://github.com/Mathpix/mathpix-markdown-it#ismilesoptions);*`{}`*        | Sets options to output chemistry equation                                                                              |
-| `parserErrors`   | [ParserErrors](https://github.com/Mathpix/mathpix-markdown-it#parsererrors);*`{}`*        | Sets options to output parser errors for equations and tabular                    |
-| `codeHighlight`  | [CodeHighlight](https://github.com/Mathpix/mathpix-markdown-it#codehighlight);*`{}`*      | Sets options to highlight code block                      |
-| `footnotes`      | [Footnotes](https://github.com/Mathpix/mathpix-markdown-it#footnotes);*`{}`*              | Sets options to footnotes                                 |
+| prop             | type&nbsp;*`default`*                                                                  | description                                                                                                         |
+|------------------|----------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------|
+| `text`           | sting                                                                                  | string that will be converted                                                                                       |
+| `alignMathBlock` | string&nbsp;*`center`*                                                                 | aligns `math-block`  by this params                                                                                 |
+| `display`        | string&nbsp;*`block`*                                                                  | `block` - the whole space, `inline-block` - renders in its actual size                                              |
+| `showTimeLog`    | boolean&nbsp;*`false`*                                                                 | shows execution time in console                                                                                     |
+| `isDisableFancy` | boolean&nbsp;*`false`*                                                                 | `true` - disables processing of special characters (Example: `+ item`, `- item` )                                   |
+| `disableRules`   | array of strings&nbsp;*`[]`*                                                           | You can pass a list of rules for markdown rendering that should be disabled.                                        |
+|                  |                                                                                        | Example:  `disableRules = ['replacements'] ` will disable fancy characters processing.                              |
+| `htmlTags`       | boolean;*`false`*                                                                      | Enables HTML tags in source                                                                                         |
+| `xhtmlOut`       | boolean;*`false`*                                                                      | Uses `/` to close single tags (`<br />`)                                                                            |
+| `breaks`         | boolean;*`true`*                                                                       | Converts `\n` in paragraphs into `<br>`                                                                             |
+| `typographer`    | boolean;*`false`*                                                                      | Enables some language-neutral replacement + quotes beautification (Example: `(c) (C) (r) (R) (tm) (TM) (p) (P) +-`) |
+| `linkify`        | boolean;*`false`*                                                                      | Autoconverts URL-like text to links                                                                                 |
+| `width`          | number;*`1200`*                                                                        | Sets text container width                                                                                           |
+| `outMath`        | [TOutputMath](https://github.com/Mathpix/mathpix-markdown-it#toutputmath);*`{}`*       | Sets options to output html                                                                                         |
+| `mathJax`        | [TOutputMathJax](https://github.com/Mathpix/mathpix-markdown-it#toutputmathjax);*`{}`* | Sets options to output MathJax                                                                                      |
+| `smiles`         | [ISmilesOptions](https://github.com/Mathpix/mathpix-markdown-it#ismilesoptions);*`{}`* | Sets options to output chemistry equation                                                                           |
+| `parserErrors`   | [ParserErrors](https://github.com/Mathpix/mathpix-markdown-it#parsererrors);*`{}`*     | Sets options to output parser errors for equations and tabular                                                      |
+| `codeHighlight`  | [CodeHighlight](https://github.com/Mathpix/mathpix-markdown-it#codehighlight);*`{}`*   | Sets options to highlight code block                                                                                |
+| `footnotes`      | [Footnotes](https://github.com/Mathpix/mathpix-markdown-it#footnotes);*`{}`*           | Sets options to footnotes                                                                                           |
 
 
 ## MathpixMarkdownModel methods
@@ -733,69 +733,69 @@ The `MathpixMarkdown` React element accepts the following props:
 
 ### TMarkdownItOptions
 
-|                  | type&nbsp;*`default`*        |  description                                                                                                           |
-|------------------|------------------------------|------------------------------------------------------------------------------------------------------------------------|
-| `isDisableFancy` | boolean&nbsp;*`false`*       | `true` - disables processing of special characters (Example: `+ item`, `- item` )                                      |
-| `disableRules`   | array of strings&nbsp;*`[]`* | You can pass a list of rules for markdown rendering that should be disabled but only if `isDisableFancy` is not `true`.|
-|                  |                              | Example:  `disableRules = ['replacements'] ` will disable fancy characters processing.                                 |
-| `htmlTags`       | boolean;*`false`*            | Enables HTML tags in source                                                                                            |
-| `xhtmlOut`       | boolean;*`false`*            | Uses `/` to close single tags (`<br />`)                                                                               |
-| `breaks`         | boolean;*`true`*             | Converts `\n` in paragraphs into `<br>`                                                                                |
-| `typographer`    | boolean;*`true`*             | Enables some language-neutral replacement + quotes beautification  (Example: `(c) (C) (r) (R) (tm) (TM) (p) (P) +-`)   |
-| `linkify`        | boolean;*`true`*             | Autoconverts URL-like text to links                                                                                    |
-| `width`          | number;*`1200`*              | Sets text container width                                                                                              |
-| `lineNumbering`  | boolean;*`false`*            | Sets line numbers. Recommended for synchronization with a text editor.                                                 |
-| `outMath`        | [TOutputMath](https://github.com/Mathpix/mathpix-markdown-it#toutputmath);*`{}`*           | Sets options to output html                                                                                            |
-| `mathJax`        | [TOutputMathJax](https://github.com/Mathpix/mathpix-markdown-it#toutputmathjax);*`{}`*       | Sets options to output MathJax                                                                                         |
-| `htmlSanitize`   | [THtmlSanitize](https://github.com/Mathpix/mathpix-markdown-it#thtmlsanitize);*`{}`*         | Sets html output options (if `htmlTags=true`). Cleans up user html input.                                              | 
-|                  |                              | Removes script tags and stuff. Removes broken and malicious html. Set to `false` to disable                            |
-| `smiles`         | [ISmilesOptions](https://github.com/Mathpix/mathpix-markdown-it#ismilesoptions);*`{}`*        | Sets options to output chemistry equation                                                                              |
-| `htmlWrapper`    | [THtmlWrapper](https://github.com/Mathpix/mathpix-markdown-it#thtmlwrapper);*`{}`*          | Sets options for output full html page                                                                                 |
-| `accessibility`  | [TAccessibility](https://github.com/Mathpix/mathpix-markdown-it#taccessibility);*`{}`*        | Sets options to accessibility                                                                                          |
-| `nonumbers`      | boolean;*`false`*            | Sets options to prevent equations, tables, figure from being numbered                                                  |
-| `showPageBreaks` | boolean;*`false`*            | Hidden tags will be shown in html like page break                                                                      |
-| `centerImages`   | boolean;*`true`*             | Center align images by default                                                                                         |
-| `centerTables`   | boolean;*`true`*             | Center align tables by default                                                                                         |
-| `validateLink`   | function;*`null`*            | The function `(url: string) => void` to override md link validator                                                     |
-| `enableCodeBlockRuleForLatexCommands`| boolean;*`false`* | By default, if latex commands are indented (4 spaces / 1 tab) they do not become `Code Blocks`.               |
-| `parserErrors`   | [ParserErrors](https://github.com/Mathpix/mathpix-markdown-it#parsererrors);*`{}`*        | Sets options to output parser errors for equations and tabular                    |
-| `codeHighlight`  | [CodeHighlight](https://github.com/Mathpix/mathpix-markdown-it#codehighlight);*`{}`*      | Sets options to highlight code block                      |
-| `footnotes`      | [Footnotes](https://github.com/Mathpix/mathpix-markdown-it#footnotes);*`{}`*              | Sets options to footnotes                                 |
-| `copyToClipboard` | boolean;*`false`*            | Added copy to clipboard button for code chunks. To handle events, import the function addListenerCopyToClipdoardEvents() from "mathpix-markdown-it/lib/copy-to-clipboard";|
-| `renderOptions`  | [RenderOptions](https://github.com/Mathpix/mathpix-markdown-it#renderoptions);*`{}`*   | Sets options to enable render rules                          |
+|                  | type&nbsp;*`default`*        | description                                                                                                                                                                |
+|------------------|------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `isDisableFancy` | boolean&nbsp;*`false`*       | `true` - disables processing of special characters (Example: `+ item`, `- item` )                                                                                          |
+| `disableRules`   | array of strings&nbsp;*`[]`* | You can pass a list of rules for markdown rendering that should be disabled.                                                                                               |
+|                  |                              | Example:  `disableRules = ['replacements'] ` will disable fancy characters processing.                                                                                     |
+| `htmlTags`       | boolean;*`false`*            | Enables HTML tags in source                                                                                                                                                |
+| `xhtmlOut`       | boolean;*`false`*            | Uses `/` to close single tags (`<br />`)                                                                                                                                   |
+| `breaks`         | boolean;*`true`*             | Converts `\n` in paragraphs into `<br>`                                                                                                                                    |
+| `typographer`    | boolean;*`true`*             | Enables some language-neutral replacement + quotes beautification  (Example: `(c) (C) (r) (R) (tm) (TM) (p) (P) +-`)                                                       |
+| `linkify`        | boolean;*`true`*             | Autoconverts URL-like text to links                                                                                                                                        |
+| `width`          | number;*`1200`*              | Sets text container width                                                                                                                                                  |
+| `lineNumbering`  | boolean;*`false`*            | Sets line numbers. Recommended for synchronization with a text editor.                                                                                                     |
+| `outMath`        | [TOutputMath](https://github.com/Mathpix/mathpix-markdown-it#toutputmath);*`{}`*           | Sets options to output html                                                                                                                                                |
+| `mathJax`        | [TOutputMathJax](https://github.com/Mathpix/mathpix-markdown-it#toutputmathjax);*`{}`*       | Sets options to output MathJax                                                                                                                                             |
+| `htmlSanitize`   | [THtmlSanitize](https://github.com/Mathpix/mathpix-markdown-it#thtmlsanitize);*`{}`*         | Sets html output options (if `htmlTags=true`). Cleans up user html input.                                                                                                  | 
+|                  |                              | Removes script tags and stuff. Removes broken and malicious html. Set to `false` to disable                                                                                |
+| `smiles`         | [ISmilesOptions](https://github.com/Mathpix/mathpix-markdown-it#ismilesoptions);*`{}`*        | Sets options to output chemistry equation                                                                                                                                  |
+| `htmlWrapper`    | [THtmlWrapper](https://github.com/Mathpix/mathpix-markdown-it#thtmlwrapper);*`{}`*          | Sets options for output full html page                                                                                                                                     |
+| `accessibility`  | [TAccessibility](https://github.com/Mathpix/mathpix-markdown-it#taccessibility);*`{}`*        | Sets options to accessibility                                                                                                                                              |
+| `nonumbers`      | boolean;*`false`*            | Sets options to prevent equations, tables, figure from being numbered                                                                                                      |
+| `showPageBreaks` | boolean;*`false`*            | Hidden tags will be shown in html like page break                                                                                                                          |
+| `centerImages`   | boolean;*`true`*             | Center align images by default                                                                                                                                             |
+| `centerTables`   | boolean;*`true`*             | Center align tables by default                                                                                                                                             |
+| `validateLink`   | function;*`null`*            | The function `(url: string) => void` to override md link validator                                                                                                         |
+| `enableCodeBlockRuleForLatexCommands`| boolean;*`false`* | By default, if latex commands are indented (4 spaces / 1 tab) they do not become `Code Blocks`.                                                                            |
+| `parserErrors`   | [ParserErrors](https://github.com/Mathpix/mathpix-markdown-it#parsererrors);*`{}`*        | Sets options to output parser errors for equations and tabular                                                                                                             |
+| `codeHighlight`  | [CodeHighlight](https://github.com/Mathpix/mathpix-markdown-it#codehighlight);*`{}`*      | Sets options to highlight code block                                                                                                                                       |
+| `footnotes`      | [Footnotes](https://github.com/Mathpix/mathpix-markdown-it#footnotes);*`{}`*              | Sets options to footnotes                                                                                                                                                  |
+| `copyToClipboard` | boolean;*`false`*            | Added copy to clipboard button for code chunks. To handle events, import the function addListenerCopyToClipdoardEvents() from "mathpix-markdown-it/lib/copy-to-clipboard"; |
+| `renderOptions`  | [RenderOptions](https://github.com/Mathpix/mathpix-markdown-it#renderoptions);*`{}`*   | Sets options to enable render rules                                                                                                                                        |
 
 ### optionsMathpixMarkdown
 
-|                  | type&nbsp;*`default`*        |  description                                                                                                           |
-|------------------|------------------------------|------------------------------------------------------------------------------------------------------------------------|
-| `alignMathBlock` | string&nbsp;*`center`*       | aligns `math-block`                                                                                                    |
-| `display`        | string&nbsp;*`block`*        | `block` - the whole space, `inline-block` - renders in its actual size                                                 |
-| `showTimeLog`    | boolean&nbsp;*`false`*       | shows execution time in console                                                                                        |
-| `isDisableFancy` | boolean&nbsp;*`false`*       | `true` - disables processing of special characters (Example: `+ item`, `- item` )                                      |
-| `disableRules`   | array of strings&nbsp;*`[]`* | You can pass a list of rules for markdown rendering that should be disabled but only if `isDisableFancy` is not `true`.|
-|                  |                              | Example:  `disableRules = ['replacements'] ` will disable fancy characters processing.                                 |
-| `htmlTags`       | boolean;*`false`*            | Enables HTML tags in source                                                                                            |
-| `xhtmlOut`       | boolean;*`false`*            | Uses `/` to close single tags (`<br />`)                                                                               |
-| `breaks`         | boolean;*`true`*             | Converts `\n` in paragraphs into `<br>`                                                                                |
-| `typographer`    | boolean;*`true`*             | Enables some language-neutral replacement + quotes beautification (Example: `(c) (C) (r) (R) (tm) (TM) (p) (P) +-`)    |
-| `linkify`        | boolean;*`true`*             | Autoconverts URL-like text to links                                                                                    |
-| `width`          | number;*`1200`*              | Sets text container width                                                                                              |
-| `outMath`        | [TOutputMath](https://github.com/Mathpix/mathpix-markdown-it#toutputmath);*`{}`*           | Sets options to output html                                                                                            |
-| `mathJax`        | [TOutputMathJax](https://github.com/Mathpix/mathpix-markdown-it#toutputmathjax);*`{}`*        | Sets options to output MathJax                                                                                         |
-| `htmlSanitize`   | [THtmlSanitize](https://github.com/Mathpix/mathpix-markdown-it#thtmlsanitize);*`{}`*         | Sets html output options (if `htmlTags=true`). Cleans up user html input.                                              | 
-|                  |                              | Removes script tags and stuff. Removes broken and malicious html. Set to `false` to disable                            |
-| `smiles`         | [ISmilesOptions](https://github.com/Mathpix/mathpix-markdown-it#ismilesoptions);*`{}`*        | Sets options to output chemistry equation                                                                              |
-| `nonumbers`      | boolean;*`false`*            | Sets options to prevent equations, tables, figure from being numbered                                                  |
-| `showPageBreaks` | boolean;*`false`*            | Hidden tags will be shown in html like page break                                                                      |
-| `centerImages`   | boolean;*`true`*             | Center align images by default                                                                                         |
-| `centerTables`   | boolean;*`true`*             | Center align tables by default                                                                                         |
-| `validateLink`   | function;*`null`*            | The function `(url: string) => void` to override md link validator                                                     |
-| `enableCodeBlockRuleForLatexCommands`| boolean;*`false`* | By default, if latex commands are indented (4 spaces / 1 tab) they do not become `Code Blocks`.               |
-| `parserErrors`   | [ParserErrors](https://github.com/Mathpix/mathpix-markdown-it#parsererrors);*`{}`*        | Sets options to output parser errors for equations and tabular                    |
-| `codeHighlight`  | [CodeHighlight](https://github.com/Mathpix/mathpix-markdown-it#codehighlight);*`{}`*      | Sets options to highlight code block                      |
-| `footnotes`      | [Footnotes](https://github.com/Mathpix/mathpix-markdown-it#footnotes);*`{}`*              | Sets options to footnotes                                 |
-| `copyToClipboard` | boolean;*`false`*            | Added copy to clipboard button for code chunks. To handle events, import the function addListenerCopyToClipdoardEvents() from "mathpix-markdown-it/lib/copy-to-clipboard";|
-| `renderOptions`  | [RenderOptions](https://github.com/Mathpix/mathpix-markdown-it#renderoptions);*`{}`*   | Sets options to enable render rules                             |
+|                  | type&nbsp;*`default`*        | description                                                                                                                                                                |
+|------------------|------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `alignMathBlock` | string&nbsp;*`center`*       | aligns `math-block`                                                                                                                                                        |
+| `display`        | string&nbsp;*`block`*        | `block` - the whole space, `inline-block` - renders in its actual size                                                                                                     |
+| `showTimeLog`    | boolean&nbsp;*`false`*       | shows execution time in console                                                                                                                                            |
+| `isDisableFancy` | boolean&nbsp;*`false`*       | `true` - disables processing of special characters (Example: `+ item`, `- item` )                                                                                          |
+| `disableRules`   | array of strings&nbsp;*`[]`* | You can pass a list of rules for markdown rendering that should be disabled.                                                                                               |
+|                  |                              | Example:  `disableRules = ['replacements'] ` will disable fancy characters processing.                                                                                     |
+| `htmlTags`       | boolean;*`false`*            | Enables HTML tags in source                                                                                                                                                |
+| `xhtmlOut`       | boolean;*`false`*            | Uses `/` to close single tags (`<br />`)                                                                                                                                   |
+| `breaks`         | boolean;*`true`*             | Converts `\n` in paragraphs into `<br>`                                                                                                                                    |
+| `typographer`    | boolean;*`true`*             | Enables some language-neutral replacement + quotes beautification (Example: `(c) (C) (r) (R) (tm) (TM) (p) (P) +-`)                                                        |
+| `linkify`        | boolean;*`true`*             | Autoconverts URL-like text to links                                                                                                                                        |
+| `width`          | number;*`1200`*              | Sets text container width                                                                                                                                                  |
+| `outMath`        | [TOutputMath](https://github.com/Mathpix/mathpix-markdown-it#toutputmath);*`{}`*           | Sets options to output html                                                                                                                                                |
+| `mathJax`        | [TOutputMathJax](https://github.com/Mathpix/mathpix-markdown-it#toutputmathjax);*`{}`*        | Sets options to output MathJax                                                                                                                                             |
+| `htmlSanitize`   | [THtmlSanitize](https://github.com/Mathpix/mathpix-markdown-it#thtmlsanitize);*`{}`*         | Sets html output options (if `htmlTags=true`). Cleans up user html input.                                                                                                  | 
+|                  |                              | Removes script tags and stuff. Removes broken and malicious html. Set to `false` to disable                                                                                |
+| `smiles`         | [ISmilesOptions](https://github.com/Mathpix/mathpix-markdown-it#ismilesoptions);*`{}`*        | Sets options to output chemistry equation                                                                                                                                  |
+| `nonumbers`      | boolean;*`false`*            | Sets options to prevent equations, tables, figure from being numbered                                                                                                      |
+| `showPageBreaks` | boolean;*`false`*            | Hidden tags will be shown in html like page break                                                                                                                          |
+| `centerImages`   | boolean;*`true`*             | Center align images by default                                                                                                                                             |
+| `centerTables`   | boolean;*`true`*             | Center align tables by default                                                                                                                                             |
+| `validateLink`   | function;*`null`*            | The function `(url: string) => void` to override md link validator                                                                                                         |
+| `enableCodeBlockRuleForLatexCommands`| boolean;*`false`* | By default, if latex commands are indented (4 spaces / 1 tab) they do not become `Code Blocks`.                                                                            |
+| `parserErrors`   | [ParserErrors](https://github.com/Mathpix/mathpix-markdown-it#parsererrors);*`{}`*        | Sets options to output parser errors for equations and tabular                                                                                                             |
+| `codeHighlight`  | [CodeHighlight](https://github.com/Mathpix/mathpix-markdown-it#codehighlight);*`{}`*      | Sets options to highlight code block                                                                                                                                       |
+| `footnotes`      | [Footnotes](https://github.com/Mathpix/mathpix-markdown-it#footnotes);*`{}`*              | Sets options to footnotes                                                                                                                                                  |
+| `copyToClipboard` | boolean;*`false`*            | Added copy to clipboard button for code chunks. To handle events, import the function addListenerCopyToClipdoardEvents() from "mathpix-markdown-it/lib/copy-to-clipboard"; |
+| `renderOptions`  | [RenderOptions](https://github.com/Mathpix/mathpix-markdown-it#renderoptions);*`{}`*   | Sets options to enable render rules                                                                                                                                        |
 
 ### TOutputMath
 

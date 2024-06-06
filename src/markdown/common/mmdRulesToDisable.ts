@@ -1,7 +1,7 @@
 import { MarkdownIt, Core, ParserBlock, ParserInline, Ruler } from 'markdown-it';
 import { RenderOptions } from "../../mathpix-markdown-model";
 import { eMmdRuleType, eRule, IMmdRule, mmdRuleList } from "./mmdRules";
-import { renderOptionsDef } from "./consts";
+import {fancyRulesDef, renderOptionsDef} from "./consts";
 
 const findRule = (md, rule: IMmdRule): boolean => {
   const mdBlock: ParserBlock = md.block;
@@ -127,3 +127,22 @@ export const getListToDisableByOptions = (md: MarkdownIt, options): string[] => 
   return disableRules;
 }
 
+export const mergeDisableRulesWithDisableFancy = (
+  isDisableFancy: boolean,
+  disableRules: string[]
+): string[] => {
+  const res: string[] = isDisableFancy ? fancyRulesDef : [];
+  try {
+    if (Array.isArray(disableRules)) {
+      disableRules.forEach((rule: string) => {
+        if (!res.includes(rule)) {
+          res.push(rule);
+        }
+      });
+    }
+    return res;
+  } catch (err) {
+    console.error(err);
+    return res;
+  }
+}

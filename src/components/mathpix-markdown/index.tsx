@@ -6,7 +6,7 @@ import {
   ParserErrors
 } from '../../mathpix-markdown-model';
 import { eMmdRuleType } from "../../markdown/common/mmdRules";
-import { getDisableRuleTypes } from "../../markdown/common/mmdRulesToDisable";
+import { getDisableRuleTypes, mergeDisableRulesWithDisableFancy } from "../../markdown/common/mmdRulesToDisable";
 
 
 export interface MathpixMarkdownProps extends optionsMathpixMarkdown{
@@ -35,7 +35,7 @@ class MathpixMarkdown extends React.Component<MathpixMarkdownProps> {
           renderOptions = null,
           previewUuid = ""
         } = this.props;
-        const disableRules = isDisableFancy ? MM.disableFancyArrayDef : this.props.disableRules || [];
+        const disableRules: string[] = mergeDisableRulesWithDisableFancy(isDisableFancy, this.props.disableRules);
         const disableRuleTypes: eMmdRuleType[] = renderOptions ? getDisableRuleTypes(renderOptions) : [];
         const markdownItOptions: TMarkdownItOptions = {
             isDisableFancy: isDisableFancy,
