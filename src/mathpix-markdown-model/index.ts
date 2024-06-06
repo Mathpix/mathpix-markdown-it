@@ -216,7 +216,7 @@ export type Footnotes = {
 }
 
 class MathpixMarkdown_Model {
-    public disableFancyArrayDef = ['replacements', 'list', 'usepackage', 'toc'];
+    public disableFancyArrayDef = ['replacements', 'list', 'usepackage', 'toc', 'backticks'];
     public disableRules: string[];
     public isCheckFormula?: boolean;
     public showTimeLog?: boolean;
