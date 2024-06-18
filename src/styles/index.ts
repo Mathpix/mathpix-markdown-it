@@ -361,6 +361,11 @@ export const MathpixStyle = (setTextAlignJustify: boolean = false, useColors: bo
    .smiles {
      text-align: center;
    }
+
+   div.svg-container {
+      display: flex;
+      justify-content: center;
+   }
 `};
 
 export const PreviewStyle = `
