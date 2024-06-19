@@ -362,7 +362,7 @@ export const MathpixStyle = (setTextAlignJustify: boolean = false, useColors: bo
      text-align: center;
    }
 
-   div.svg-container {
+   div.svg-container, #setText > div.svg-container {
       display: flex;
       justify-content: center;
    }
