@@ -17,10 +17,11 @@ const escapeHtml = require('markdown-it/lib/common/utils').escapeHtml;
 function injectLineNumbers(tokens, idx, options, env, slf) {
   let line, endLine, listLine;
   const disableRuleTypes: eMmdRuleType[] = options?.renderOptions ? getDisableRuleTypes(options.renderOptions) : [];
+  let className: string = "";
   if (options?.html
     && !disableRuleTypes.includes(eMmdRuleType.html)
     && tokens[idx+1]?.content && svgRegex.test(tokens[idx+1].content)) {
-    tokens[idx].attrJoin('style', 'text-align: center;')
+    className = "svg-container";
   }
   if (tokens[idx].uuid) {
     const label: ILabel = getLabelByUuidFromLabelsList(tokens[idx].uuid);
@@ -37,31 +38,39 @@ function injectLineNumbers(tokens, idx, options, env, slf) {
     for (let i = line; i < endLine; i++) {
         listLine.push(i);
     }
-    tokens[idx].attrJoin("class", PREVIEW_PARAGRAPH_PREFIX + String(line)
-        + ' ' + PREVIEW_LINE_CLASS + ' ' + listLine.join(' '));
+    className += className ? " " : "";
+    className += PREVIEW_PARAGRAPH_PREFIX + String(line)
+      + ' ' + PREVIEW_LINE_CLASS + ' ' + listLine.join(' ');
     tokens[idx].attrJoin("data_line_start", `${String(line)}`);
     tokens[idx].attrJoin("data_line_end", `${String(endLine-1)}`);
     tokens[idx].attrJoin("data_line", `${String([line, endLine])}`);
     tokens[idx].attrJoin("count_line", `${String(endLine-line)}`);
-
+  }
+  if (className) {
+    tokens[idx].attrJoin("class", className);
   }
   return slf.renderToken(tokens, idx, options, env, slf);
 }
 
 function injectLabelIdToParagraphOPen(tokens, idx, options, env, slf) {
   const disableRuleTypes: eMmdRuleType[] = options?.renderOptions ? getDisableRuleTypes(options.renderOptions) : [];
+  let className = "";
   if (options?.html
     && !disableRuleTypes.includes(eMmdRuleType.html)
     && tokens[idx+1]?.content && svgRegex.test(tokens[idx+1].content)) {
-    tokens[idx].attrJoin('style', 'text-align: center;')
+    className = "svg-container";
   }
   if (tokens[idx].uuid) {
     const label: ILabel = getLabelByUuidFromLabelsList(tokens[idx].uuid);
     if (label) {
+      className += className ? " " : "";
+      className += `${label.type} ` + label.id;
       attrSetToBegin(tokens[idx].attrs, 'number', label.tag);
-      attrSetToBegin(tokens[idx].attrs, 'class', `${label.type} ` + label.id);
       attrSetToBegin(tokens[idx].attrs, 'id', label.id);
     }
+  }
+  if (className) {
+    attrSetToBegin(tokens[idx].attrs, 'class', className);
   }
   return slf.renderToken(tokens, idx, options, env, slf);
 }
@@ -77,9 +86,9 @@ function injectCenterTables(tokens, idx, options, env, slf) {
 function html_block_injectLineNumbers(tokens, idx, options, env, slf) {
   const { htmlSanitize = {}, enableFileLinks } = options;
   let line, endLine, listLine;
-
+  let className: string = "";
   if (tokens[idx]?.content && svgRegex.test(tokens[idx].content.trim())) {
-    tokens[idx].attrJoin('style', 'text-align: center;')
+    className = "svg-container";
   }
   if (htmlSanitize !== false) {
     if (tokens[idx] && tokens[idx].content) {
@@ -97,14 +106,17 @@ function html_block_injectLineNumbers(tokens, idx, options, env, slf) {
     for (let i = line; i < endLine; i++) {
       listLine.push(i);
     }
-    tokens[idx].attrJoin("class", PREVIEW_PARAGRAPH_PREFIX + String(line)
-        + ' ' + PREVIEW_LINE_CLASS + ' ' + listLine.join(' '));
+    className += className ? " " : "";
+    className += PREVIEW_PARAGRAPH_PREFIX + String(line)
+      + ' ' + PREVIEW_LINE_CLASS + ' ' + listLine.join(' ');
     tokens[idx].attrJoin("data_line_start", `${String(line)}`);
     tokens[idx].attrJoin("data_line_end", `${String(endLine-1)}`);
     tokens[idx].attrJoin("data_line", `${String([line, endLine])}`);
     tokens[idx].attrJoin("count_line", `${String(endLine-line)}`);
   }
-
+  if (className) {
+    tokens[idx].attrJoin("class", className);
+  }
   var token = tokens[idx];
   return  '<div' + slf.renderAttrs(token) + '>' +
     tokens[idx].content +
@@ -120,7 +132,7 @@ function html_block_Sanitize (tokens, idx, options, env, slf) {
     enableFileLinks: enableFileLinks
   };
   if (tokens[idx]?.content && svgRegex.test(tokens[idx].content.trim())) {
-    return '<div style="text-align: center;">'
+    return '<div class="svg-container">'
         + sanitize(tokens[idx].content, Object.assign({}, optionsSanitize, htmlSanitize))
         + '</div>\n';
   }
@@ -132,7 +144,7 @@ function html_block_injectStyleForSvg (tokens, idx, options, env, slf) {
     return '';
   }
   if (tokens[idx]?.content && svgRegex.test(tokens[idx].content.trim())) {
-    return  '<div style="text-align: center;">'
+    return  '<div class="svg-container">'
         + tokens[idx].content
         + '</div>\n';
   }

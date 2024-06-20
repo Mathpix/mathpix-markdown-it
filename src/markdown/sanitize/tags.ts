@@ -14,6 +14,7 @@ export const svgTags = [
   'desc',
   'ellipse',
   'filter',
+  'foreignobject',
   'font',
   'g',
   'glyph',
