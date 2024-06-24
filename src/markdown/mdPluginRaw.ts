@@ -254,7 +254,9 @@ const multiMath: RuleInline = (state, silent) => {
     }
     includeMarkers = true;
   }
-
+  if (!endMarker) {
+    return false;
+  }
   endMarkerPos = endMarkerPos !== -1 
     ? endMarkerPos 
     : state.src.indexOf(endMarker, startMathPos);
