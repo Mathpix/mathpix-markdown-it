@@ -3,9 +3,10 @@ import { mdPluginCollapsible, mdSetPositionsAndHighlight } from "./mdPluginConfi
 import { mathpixMarkdownPlugin } from './mathpix-markdown-plugins';
 
 import { injectRenderRules } from "./rules";
-import { MathpixMarkdownModel as MM, TMarkdownItOptions, ParserErrors } from '../mathpix-markdown-model';
+import { MathpixMarkdownModel as MM, TMarkdownItOptions, ParserErrors, TextDirection } from '../mathpix-markdown-model';
 import { applyRulesToDisableRules, getDisableRuleTypes, getListToDisableByOptions } from "./common/mmdRulesToDisable";
 import { eMmdRuleType } from "./common/mmdRules";
+import { injectTextDirection } from "./common/injectTextDirection";
 
 /** md renderer */
 const mdInit = (options: TMarkdownItOptions) => {
@@ -30,7 +31,8 @@ const mdInit = (options: TMarkdownItOptions) => {
     footnotes = {},
     copyToClipboard = false,
     renderOptions = null,
-    previewUuid = ""
+    previewUuid = "",
+    textDirection = TextDirection.unset
   } = options;
   const mmdOptions = {
     width: width,
@@ -56,7 +58,8 @@ const mdInit = (options: TMarkdownItOptions) => {
     footnotes: footnotes,
     copyToClipboard: copyToClipboard,
     renderOptions: renderOptions,
-    previewUuid: previewUuid
+    previewUuid: previewUuid,
+    textDirection: textDirection
   };
   const disableRuleTypes: eMmdRuleType[] = renderOptions ? getDisableRuleTypes(renderOptions) : [];
   let md = require("markdown-it")({
@@ -116,6 +119,10 @@ export const markdownToHtmlPipeline = (content: string, options: TMarkdownItOpti
   if (options.renderElement && options.renderElement.inLine) {
     return md.renderInline(content);
   } else {
+    const { textDirection = TextDirection.unset } = options;
+    if (textDirection !== TextDirection.unset) {
+      injectTextDirection(md, textDirection);
+    }
     return md.render(content);
   }
 };

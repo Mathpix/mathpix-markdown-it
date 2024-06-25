@@ -569,8 +569,8 @@ t1 & t2
       '</tbody>\n' +
       '</table>\n' +
       '</div></div>\n' +
-      '<div class=caption_table>Table 1: Table <strong>to test captions and</strong> labels</div></div>\n' +
+      '<div table-number="1" class="caption_table">Table 1: Table <strong>to test captions and</strong> labels</div></div>\n' +
       '<div class="table" number="1" style="text-align: center">\n' +
-      '<div class=caption_figure>Figure 1: The <em>caption is at the</em> top.</div><div class="figure_img" style="text-align: center; "><img src=https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Cappuccino_at_Sightglass_Coffee.jpg/1599px-Cappuccino_at_Sightglass_Coffee.jpg  style="width: 600px; "></div></div>'
+      '<div figure-number="1" class="caption_figure">Figure 1: The <em>caption is at the</em> top.</div><div class="figure_img" style="text-align: center; "><img src=https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Cappuccino_at_Sightglass_Coffee.jpg/1599px-Cappuccino_at_Sightglass_Coffee.jpg  style="width: 600px; "></div></div>'
   }
 ];

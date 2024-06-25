@@ -65,6 +65,7 @@ export interface optionsMathpixMarkdown {
     copyToClipboard?: boolean;
     renderOptions?: RenderOptions;
     previewUuid?: string;
+    textDirection?: TextDirection;
 }
 
 export type TMarkdownItOptions = {
@@ -114,7 +115,8 @@ export type TMarkdownItOptions = {
   footnotes?: Footnotes;
   copyToClipboard?: boolean;
   renderOptions?: RenderOptions;
-  previewUuid?: string
+  previewUuid?: string;
+  textDirection?: TextDirection;
 }
 
 export type TOutputMath = {
@@ -184,6 +186,13 @@ export type RenderOptions = {
   enable_markdown?: boolean,
   enable_latex?: boolean,
   enable_markdown_mmd_extensions?: boolean
+}
+
+export enum TextDirection {
+  ltr = 'ltr',
+  rtl = 'rtl',
+  auto = 'auto',
+  unset = 'unset'
 }
 
 export enum TTocStyle {
@@ -499,7 +508,8 @@ class MathpixMarkdown_Model {
           footnotes = {},
           copyToClipboard = false,
           renderOptions = null,
-          previewUuid = ''
+          previewUuid = '',
+          textDirection = TextDirection.unset
         }
          = options || {};
 
@@ -549,7 +559,8 @@ class MathpixMarkdown_Model {
           footnotes: footnotes,
           copyToClipboard: copyToClipboard,
           renderOptions: renderOptions,
-          previewUuid: previewUuid
+          previewUuid: previewUuid,
+          textDirection: textDirection
         };
 
         const styleFontSize = fontSize ? ` font-size: ${options.fontSize}px;` : '';

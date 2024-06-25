@@ -47,6 +47,7 @@ export interface optionsMathpixMarkdown {
     copyToClipboard?: boolean;
     renderOptions?: RenderOptions;
     previewUuid?: string;
+    textDirection?: TextDirection;
 }
 export type TMarkdownItOptions = {
     isDisableFancy?: boolean;
@@ -96,6 +97,7 @@ export type TMarkdownItOptions = {
     copyToClipboard?: boolean;
     renderOptions?: RenderOptions;
     previewUuid?: string;
+    textDirection?: TextDirection;
 };
 export type TOutputMath = {
     include_mathml?: boolean;
@@ -158,6 +160,12 @@ export type RenderOptions = {
     enable_latex?: boolean;
     enable_markdown_mmd_extensions?: boolean;
 };
+export declare enum TextDirection {
+    ltr = "ltr",
+    rtl = "rtl",
+    auto = "auto",
+    unset = "unset"
+}
 export declare enum TTocStyle {
     summary = "summary",
     list = "list"
