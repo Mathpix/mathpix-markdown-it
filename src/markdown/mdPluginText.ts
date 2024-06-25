@@ -481,7 +481,7 @@ const abstractBlock: RuleBlock = (state, startLine, endLine, silent) => {
   let pos: number = state.bMarks[startLine] + state.tShift[startLine];
   let max: number = state.eMarks[startLine];
   let nextLine: number = startLine + 1;
-  const terminatorRules = state.md.block.ruler.getRules('paragraph');
+  const terminatorRules = state.md.block.ruler.getRules('abstract');
   let lineText: string = state.src.slice(pos, max);
   let isCloseTagExist = false;
   let arrContent = [];
