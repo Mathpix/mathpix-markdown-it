@@ -7,7 +7,7 @@ module.exports = [
       '    <mrow>\n' +
       '      <mo data-mjx-texclass="OP" movablelimits="true">lim</mo>\n' +
       '    </mrow>\n' +
-      '    <mrow>\n' +
+      '    <mrow data-mjx-texclass="ORD">\n' +
       '      <mi>x</mi>\n' +
       '      <mo stretchy="false">→</mo>\n' +
       '      <mn>0</mn>\n' +
@@ -16,7 +16,7 @@ module.exports = [
       '  <mrow>\n' +
       '    <mo> </mo>\n' +
       '  </mrow>\n' +
-      '  <mrow>\n' +
+      '  <mrow data-mjx-texclass="ORD">\n' +
       '    <msup>\n' +
       '      <mi>x</mi>\n' +
       '      <mn>2</mn>\n' +
@@ -28,7 +28,7 @@ module.exports = [
   {
     latex_input: '\\[ \\begin{aligned} E ( \\hat { a } ) = E ( 2 \\bar { x } ) & = 2 E ( \\bar { x } ) \\\\ & = 2 \\left( \\frac {a} { 2 } \\right) \\\\ & = a \\end{aligned} \\]',
     mathmlword: '<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">\n' +
-      '  <mtable displaystyle="true" columnalign="right left right left right left right left right left right left" columnspacing="0em 2em 0em 2em 0em 2em 0em 2em 0em 2em 0em" rowspacing="3pt">\n' +
+      '  <mtable displaystyle="true" columnalign="right left" columnspacing="0em" rowspacing="3pt">\n' +
       '    <mtr>\n' +
       '      <mtd>\n' +
       '        <mrow>\n' +
@@ -36,7 +36,7 @@ module.exports = [
       '            <maligngroup/>\n' +
       '            <mi>E</mi>\n' +
       '            <mo stretchy="false">(</mo>\n' +
-      '            <mrow>\n' +
+      '            <mrow data-mjx-texclass="ORD">\n' +
       '              <mover accent="true" accentunder="false">\n' +
       '                <mrow>\n' +
       '                  <mi>a</mi>\n' +
@@ -49,7 +49,7 @@ module.exports = [
       '            <mi>E</mi>\n' +
       '            <mo stretchy="false">(</mo>\n' +
       '            <mn>2</mn>\n' +
-      '            <mrow>\n' +
+      '            <mrow data-mjx-texclass="ORD">\n' +
       '              <mover accent="true" accentunder="false">\n' +
       '                <mrow>\n' +
       '                  <mi>x</mi>\n' +
@@ -66,7 +66,7 @@ module.exports = [
       '            <mn>2</mn>\n' +
       '            <mi>E</mi>\n' +
       '            <mo stretchy="false">(</mo>\n' +
-      '            <mrow>\n' +
+      '            <mrow data-mjx-texclass="ORD">\n' +
       '              <mover accent="true" accentunder="false">\n' +
       '                <mrow>\n' +
       '                  <mi>x</mi>\n' +
@@ -126,7 +126,7 @@ module.exports = [
     mathmlword: '<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">\n' +
       '  <mfenced open="" close="" separators="|">\n' +
       '    <mrow>\n' +
-      '      <mtable displaystyle="true" columnalign="right left right left right left right left right left right left" columnspacing="0em 2em 0em 2em 0em 2em 0em 2em 0em 2em 0em" rowspacing="3pt">\n' +
+      '      <mtable displaystyle="true" columnalign="right left right left" columnspacing="0em 2em 0em" rowspacing="3pt">\n' +
       '        <mtr>\n' +
       '          <mtd>\n' +
       '            <mrow>\n' +
@@ -161,7 +161,7 @@ module.exports = [
       '                <mo>−</mo>\n' +
       '                <msup>\n' +
       '                  <mi>J</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>3</mn>\n' +
       '                  </mrow>\n' +
       '                </msup>\n' +
@@ -169,7 +169,7 @@ module.exports = [
       '                <mi>ν</mi>\n' +
       '                <msup>\n' +
       '                  <mi>S</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>0</mn>\n' +
       '                  </mrow>\n' +
       '                </msup>\n' +
@@ -194,7 +194,7 @@ module.exports = [
       '                <maligngroup/>\n' +
       '                <msup>\n' +
       '                  <mi>B</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>7</mn>\n' +
       '                  </mrow>\n' +
       '                </msup>\n' +
@@ -215,7 +215,7 @@ module.exports = [
       '                    <mo stretchy="false">(</mo>\n' +
       '                    <msup>\n' +
       '                      <mi>J</mi>\n' +
-      '                      <mrow>\n' +
+      '                      <mrow data-mjx-texclass="ORD">\n' +
       '                        <mn>3</mn>\n' +
       '                      </mrow>\n' +
       '                    </msup>\n' +
@@ -223,7 +223,7 @@ module.exports = [
       '                    <mi>ν</mi>\n' +
       '                    <msup>\n' +
       '                      <mi>S</mi>\n' +
-      '                      <mrow>\n' +
+      '                      <mrow data-mjx-texclass="ORD">\n' +
       '                        <mn>7</mn>\n' +
       '                      </mrow>\n' +
       '                    </msup>\n' +
@@ -252,7 +252,7 @@ module.exports = [
   {
     latex_input: '\\[ \\begin{aligned} x _ { 0 } & = ( A _ { 1 } {}^ { * } A _ { 1 } ) ^ { - 1 } A _ { 1 }{} ^ { * } y \\\\ & = \\left( \\begin{array} { ll } \\frac{1}{10} & \\frac{1}{10} \\\\ \\frac { 1 } { 10 } & \\frac { 7 } { 20 } \\end{array} \\right) \\left( \\begin{array} { c c c c } - 3 & - 2 & 0 & 1 \\\\ 1 & 1 & 1 & 1 \\end{array} \\right) \\left( \\begin{array} { l } 9 \\\\ 6 \\\\ 2 \\\\ 1 \\end{array} \\right) \\\\ & = \\left( \\begin{array} { c } - 2 \\\\ \\frac { 5 } { 2 } \\end{array} \\right) \\end{aligned} \\]',
     mathmlword: '<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">\n' +
-      '  <mtable displaystyle="true" columnalign="right left right left right left right left right left right left" columnspacing="0em 2em 0em 2em 0em 2em 0em 2em 0em 2em 0em" rowspacing="3pt">\n' +
+      '  <mtable displaystyle="true" columnalign="right left" columnspacing="0em" rowspacing="3pt">\n' +
       '    <mtr>\n' +
       '      <mtd>\n' +
       '        <mrow>\n' +
@@ -260,7 +260,7 @@ module.exports = [
       '            <maligngroup/>\n' +
       '            <msub>\n' +
       '              <mi>x</mi>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mn>0</mn>\n' +
       '              </mrow>\n' +
       '            </msub>\n' +
@@ -272,38 +272,38 @@ module.exports = [
       '            <mo stretchy="false">(</mo>\n' +
       '            <msub>\n' +
       '              <mi>A</mi>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mn>1</mn>\n' +
       '              </mrow>\n' +
       '            </msub>\n' +
       '            <msup>\n' +
-      '              <mrow></mrow>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD"></mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mo>∗</mo>\n' +
       '              </mrow>\n' +
       '            </msup>\n' +
       '            <msub>\n' +
       '              <mi>A</mi>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mn>1</mn>\n' +
       '              </mrow>\n' +
       '            </msub>\n' +
       '            <msup>\n' +
       '              <mo stretchy="false">)</mo>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mo>−</mo>\n' +
       '                <mn>1</mn>\n' +
       '              </mrow>\n' +
       '            </msup>\n' +
       '            <msub>\n' +
       '              <mi>A</mi>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mn>1</mn>\n' +
       '              </mrow>\n' +
       '            </msub>\n' +
       '            <msup>\n' +
-      '              <mrow></mrow>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD"></mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mo>∗</mo>\n' +
       '              </mrow>\n' +
       '            </msup>\n' +
@@ -463,7 +463,7 @@ module.exports = [
   {
     latex_input: '\\[ \\begin{aligned} \\int \\underbrace { x } _ { u } \\underbrace { \\cos x d x } _ { d v } & = \\underbrace { x } _ { u } \\underbrace { \\sin x } _ { v } - \\int \\underbrace { \\sin x } _ { v } \\underbrace { d x } _ { d u } \\\\ & = x \\sin x - ( - \\cos x ) + C = x \\sin x + \\cos x + C \\blacktriangleleft \\end{aligned} \\]',
     mathmlword: '<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">\n' +
-      '  <mtable displaystyle="true" columnalign="right left right left right left right left right left right left" columnspacing="0em 2em 0em 2em 0em 2em 0em 2em 0em 2em 0em" rowspacing="3pt">\n' +
+      '  <mtable displaystyle="true" columnalign="right left" columnspacing="0em" rowspacing="3pt">\n' +
       '    <mtr>\n' +
       '      <mtd>\n' +
       '        <mrow>\n' +
@@ -479,7 +479,7 @@ module.exports = [
       '                  <mo>⏟</mo>\n' +
       '                </munder>\n' +
       '              </mrow>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mi>u</mi>\n' +
       '              </mrow>\n' +
       '            </munder>\n' +
@@ -496,7 +496,7 @@ module.exports = [
       '                  <mo>⏟</mo>\n' +
       '                </munder>\n' +
       '              </mrow>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mi>d</mi>\n' +
       '                <mi>v</mi>\n' +
       '              </mrow>\n' +
@@ -515,7 +515,7 @@ module.exports = [
       '                  <mo>⏟</mo>\n' +
       '                </munder>\n' +
       '              </mrow>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mi>u</mi>\n' +
       '              </mrow>\n' +
       '            </munder>\n' +
@@ -530,7 +530,7 @@ module.exports = [
       '                  <mo>⏟</mo>\n' +
       '                </munder>\n' +
       '              </mrow>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mi>v</mi>\n' +
       '              </mrow>\n' +
       '            </munder>\n' +
@@ -547,7 +547,7 @@ module.exports = [
       '                  <mo>⏟</mo>\n' +
       '                </munder>\n' +
       '              </mrow>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mi>v</mi>\n' +
       '              </mrow>\n' +
       '            </munder>\n' +
@@ -561,7 +561,7 @@ module.exports = [
       '                  <mo>⏟</mo>\n' +
       '                </munder>\n' +
       '              </mrow>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mi>d</mi>\n' +
       '                <mi>u</mi>\n' +
       '              </mrow>\n' +
@@ -616,7 +616,7 @@ module.exports = [
   {
     latex_input: '\\[ \\begin{aligned} \\mu = \\int _ { - \\infty } ^ { \\infty } x f ( x ) d x & = \\int _ { 3 } ^ { 5 } x ( 0.075 x + 0.2 ) d x = \\int _ { 3 } ^ { 5 } \\left( 0.075 x ^ { 2 } + 0.2 x \\right) d x = \\frac { 0.75 x ^ { 3 } } { 3 } + \\left. \\frac { 0.2 x ^ { 2 } } { 2 } \\right| _ { 3 } ^ { 5 } \\\\ = & 3.125 + 2.5 - 0.675 - 0.9 = 4.05 \\end{aligned} \\]',
     mathmlword: '<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">\n' +
-      '  <mtable displaystyle="true" columnalign="right left right left right left right left right left right left" columnspacing="0em 2em 0em 2em 0em 2em 0em 2em 0em 2em 0em" rowspacing="3pt">\n' +
+      '  <mtable displaystyle="true" columnalign="right left" columnspacing="0em" rowspacing="3pt">\n' +
       '    <mtr>\n' +
       '      <mtd>\n' +
       '        <mrow>\n' +
@@ -628,11 +628,11 @@ module.exports = [
       '              <mrow>\n' +
       '                <mo data-mjx-texclass="OP">∫</mo>\n' +
       '              </mrow>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mo>−</mo>\n' +
       '                <mi mathvariant="normal">∞</mi>\n' +
       '              </mrow>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mi mathvariant="normal">∞</mi>\n' +
       '              </mrow>\n' +
       '            </msubsup>\n' +
@@ -655,10 +655,10 @@ module.exports = [
       '              <mrow>\n' +
       '                <mo data-mjx-texclass="OP">∫</mo>\n' +
       '              </mrow>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mn>3</mn>\n' +
       '              </mrow>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mn>5</mn>\n' +
       '              </mrow>\n' +
       '            </msubsup>\n' +
@@ -679,10 +679,10 @@ module.exports = [
       '              <mrow>\n' +
       '                <mo data-mjx-texclass="OP">∫</mo>\n' +
       '              </mrow>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mn>3</mn>\n' +
       '              </mrow>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mn>5</mn>\n' +
       '              </mrow>\n' +
       '            </msubsup>\n' +
@@ -694,7 +694,7 @@ module.exports = [
       '                <mn>0.075</mn>            \n' +
       '                <msup>\n' +
       '                  <mi>x</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>2</mn>\n' +
       '                  </mrow>\n' +
       '                </msup>            \n' +
@@ -711,7 +711,7 @@ module.exports = [
       '                <mn>0.75</mn>\n' +
       '                <msup>\n' +
       '                  <mi>x</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>3</mn>\n' +
       '                  </mrow>\n' +
       '                </msup>\n' +
@@ -728,7 +728,7 @@ module.exports = [
       '                        <mn>0.2</mn>\n' +
       '                        <msup>\n' +
       '                          <mi>x</mi>\n' +
-      '                          <mrow>\n' +
+      '                          <mrow data-mjx-texclass="ORD">\n' +
       '                            <mn>2</mn>\n' +
       '                          </mrow>\n' +
       '                        </msup>\n' +
@@ -738,10 +738,10 @@ module.exports = [
       '                  </mrow>                \n' +
       '                </mfenced>              \n' +
       '              </mrow>              \n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mn>3</mn>\n' +
       '              </mrow>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mn>5</mn>\n' +
       '              </mrow>\n' +
       '            </msubsup>\n' +
@@ -787,12 +787,12 @@ module.exports = [
       '          <mrow>\n' +
       '            <mo data-mjx-texclass="OP">∑</mo>\n' +
       '          </mrow>\n' +
-      '          <mrow>\n' +
+      '          <mrow data-mjx-texclass="ORD">\n' +
       '            <mi>i</mi>\n' +
       '            <mo>=</mo>\n' +
       '            <mn>1</mn>\n' +
       '          </mrow>\n' +
-      '          <mrow>\n' +
+      '          <mrow data-mjx-texclass="ORD">\n' +
       '            <mi>n</mi>\n' +
       '          </mrow>\n' +
       '        </munderover>\n' +
@@ -803,22 +803,22 @@ module.exports = [
       '          <mrow>\n' +
       '            <mi>x</mi>\n' +
       '          </mrow>\n' +
-      '          <mrow>\n' +
+      '          <mrow data-mjx-texclass="ORD">\n' +
       '            <mi>i</mi>\n' +
       '          </mrow>\n' +
-      '          <mrow>\n' +
-      '            <mi data-mjx-alternate="1" mathvariant="normal">′</mi>\n' +
+      '          <mrow data-mjx-texclass="ORD">\n' +
+      '            <mi data-mjx-alternate="1">′</mi>\n' +
       '          </mrow>\n' +
       '        </msubsup>    \n' +
       '        <msub>\n' +
       '          <mi>x</mi>\n' +
-      '          <mrow>\n' +
+      '          <mrow data-mjx-texclass="ORD">\n' +
       '            <mi>i</mi>\n' +
       '          </mrow>\n' +
       '        </msub>    \n' +
       '      </mrow>    \n' +
       '    </mfenced>\n' +
-      '    <mrow>\n' +
+      '    <mrow data-mjx-texclass="ORD">\n' +
       '      <mo>−</mo>\n' +
       '      <mn>1</mn>\n' +
       '    </mrow>\n' +
@@ -831,7 +831,7 @@ module.exports = [
       '\\ddot{x}=\\epsilon\\left(1-x^{2}\\right) \\dot{x}-x\n' +
       '$$',
     mathmlword: '<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">\n' +
-      '  <mrow>\n' +
+      '  <mrow data-mjx-texclass="ORD">\n' +
       '    <mover accent="true" accentunder="false">\n' +
       '      <mrow>\n' +
       '        <mi>x</mi>\n' +
@@ -847,13 +847,13 @@ module.exports = [
       '      <mo>−</mo>  \n' +
       '      <msup>\n' +
       '        <mi>x</mi>\n' +
-      '        <mrow>\n' +
+      '        <mrow data-mjx-texclass="ORD">\n' +
       '          <mn>2</mn>\n' +
       '        </mrow>\n' +
       '      </msup>  \n' +
       '    </mrow>  \n' +
       '  </mfenced>\n' +
-      '  <mrow>\n' +
+      '  <mrow data-mjx-texclass="ORD">\n' +
       '    <mover accent="true" accentunder="false">\n' +
       '      <mrow>\n' +
       '        <mi>x</mi>\n' +
@@ -890,7 +890,7 @@ module.exports = [
       '        <mo>⏟</mo>\n' +
       '      </munder>\n' +
       '    </mrow>\n' +
-      '    <mrow>\n' +
+      '    <mrow data-mjx-texclass="ORD">\n' +
       '      <mi>L</mi>\n' +
       '      <mo stretchy="false">(</mo>\n' +
       '      <mi>G</mi>\n' +
@@ -918,7 +918,7 @@ module.exports = [
       '          <mrow>\n' +
       '            <mo data-mjx-texclass="OP">∑</mo>\n' +
       '          </mrow>\n' +
-      '          <mrow>\n' +
+      '          <mrow data-mjx-texclass="ORD">\n' +
       '            <mi>c</mi>\n' +
       '          </mrow>\n' +
       '        </munder>\n' +
@@ -927,7 +927,7 @@ module.exports = [
       '        </mrow>\n' +
       '        <msup>\n' +
       '          <mi>s</mi>\n' +
-      '          <mrow>\n' +
+      '          <mrow data-mjx-texclass="ORD">\n' +
       '            <mi>c</mi>\n' +
       '          </mrow>\n' +
       '        </msup>\n' +
@@ -935,7 +935,7 @@ module.exports = [
       '          <mrow>\n' +
       '            <msup>\n' +
       '              <mi>I</mi>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mo>∗</mo>\n' +
       '                <mi>c</mi>\n' +
       '              </mrow>\n' +
@@ -959,8 +959,8 @@ module.exports = [
     mathmlword: '<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">\n' +
       '  <msub>\n' +
       '    <mi>g</mi>\n' +
-      '    <mrow>\n' +
-      '      <mrow>\n' +
+      '    <mrow data-mjx-texclass="ORD">\n' +
+      '      <mrow data-mjx-texclass="ORD">\n' +
       '        <mi mathvariant="normal">H</mi>\n' +
       '      </mrow>\n' +
       '      <mo>∗</mo>\n' +
@@ -970,11 +970,9 @@ module.exports = [
       '    <mrow>\n' +
       '      <msub>\n' +
       '        <mi>T</mi>\n' +
-      '        <mrow>\n' +
-      '          <mrow>\n' +
-      '            <mi mathvariant="normal">P</mi>\n' +
-      '            <mi mathvariant="normal">B</mi>\n' +
-      '            <mi mathvariant="normal">H</mi>\n' +
+      '        <mrow data-mjx-texclass="ORD">\n' +
+      '          <mrow data-mjx-texclass="ORD">\n' +
+      '            <mi data-mjx-auto-op="false">PBH</mi>\n' +
       '          </mrow>\n' +
       '        </mrow>\n' +
       '      </msub>  \n' +
@@ -993,40 +991,34 @@ module.exports = [
       '              <mrow>\n' +
       '                <msub>\n' +
       '                  <mi>T</mi>\n' +
-      '                  <mrow>\n' +
-      '                    <mrow>\n' +
-      '                      <mi mathvariant="normal">P</mi>\n' +
-      '                      <mi mathvariant="normal">B</mi>\n' +
-      '                      <mi mathvariant="normal">H</mi>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
+      '                    <mrow data-mjx-texclass="ORD">\n' +
+      '                      <mi data-mjx-auto-op="false">PBH</mi>\n' +
       '                    </mrow>\n' +
       '                  </mrow>\n' +
       '                </msub>            \n' +
       '                <mo>≫</mo>            \n' +
       '                <mn>100</mn>            \n' +
-      '                <mrow>\n' +
-      '                  <mi mathvariant="normal">G</mi>\n' +
-      '                  <mi mathvariant="normal">e</mi>\n' +
-      '                  <mi mathvariant="normal">V</mi>\n' +
+      '                <mrow data-mjx-texclass="ORD">\n' +
+      '                  <mi data-mjx-auto-op="false">GeV</mi>\n' +
       '                </mrow>            \n' +
       '                <mo stretchy="false">→</mo>            \n' +
       '                <msub>\n' +
       '                  <mi>M</mi>\n' +
-      '                  <mrow>\n' +
-      '                    <mrow>\n' +
-      '                      <mi mathvariant="normal">P</mi>\n' +
-      '                      <mi mathvariant="normal">B</mi>\n' +
-      '                      <mi mathvariant="normal">H</mi>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
+      '                    <mrow data-mjx-texclass="ORD">\n' +
+      '                      <mi data-mjx-auto-op="false">PBH</mi>\n' +
       '                    </mrow>\n' +
       '                  </mrow>\n' +
       '                </msub>            \n' +
       '                <mo>≪</mo>            \n' +
       '                <msup>\n' +
       '                  <mn>10</mn>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>11</mn>\n' +
       '                  </mrow>\n' +
       '                </msup>            \n' +
-      '                <mrow>\n' +
+      '                <mrow data-mjx-texclass="ORD">\n' +
       '                  <mi mathvariant="normal">g</mi>\n' +
       '                </mrow>            \n' +
       '              </mrow>            \n' +
@@ -1042,40 +1034,34 @@ module.exports = [
       '              <mrow>\n' +
       '                <msub>\n' +
       '                  <mi>T</mi>\n' +
-      '                  <mrow>\n' +
-      '                    <mrow>\n' +
-      '                      <mi mathvariant="normal">P</mi>\n' +
-      '                      <mi mathvariant="normal">B</mi>\n' +
-      '                      <mi mathvariant="normal">H</mi>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
+      '                    <mrow data-mjx-texclass="ORD">\n' +
+      '                      <mi data-mjx-auto-op="false">PBH</mi>\n' +
       '                    </mrow>\n' +
       '                  </mrow>\n' +
       '                </msub>            \n' +
       '                <mo>≪</mo>            \n' +
       '                <mn>1</mn>            \n' +
-      '                <mrow>\n' +
-      '                  <mi mathvariant="normal">M</mi>\n' +
-      '                  <mi mathvariant="normal">e</mi>\n' +
-      '                  <mi mathvariant="normal">V</mi>\n' +
+      '                <mrow data-mjx-texclass="ORD">\n' +
+      '                  <mi data-mjx-auto-op="false">MeV</mi>\n' +
       '                </mrow>            \n' +
       '                <mo stretchy="false">→</mo>            \n' +
       '                <msub>\n' +
       '                  <mi>M</mi>\n' +
-      '                  <mrow>\n' +
-      '                    <mrow>\n' +
-      '                      <mi mathvariant="normal">P</mi>\n' +
-      '                      <mi mathvariant="normal">B</mi>\n' +
-      '                      <mi mathvariant="normal">H</mi>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
+      '                    <mrow data-mjx-texclass="ORD">\n' +
+      '                      <mi data-mjx-auto-op="false">PBH</mi>\n' +
       '                    </mrow>\n' +
       '                  </mrow>\n' +
       '                </msub>            \n' +
       '                <mo>≫</mo>            \n' +
       '                <msup>\n' +
       '                  <mn>10</mn>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>16</mn>\n' +
       '                  </mrow>\n' +
       '                </msup>            \n' +
-      '                <mrow>\n' +
+      '                <mrow data-mjx-texclass="ORD">\n' +
       '                  <mi mathvariant="normal">g</mi>\n' +
       '                </mrow>            \n' +
       '              </mrow>            \n' +
@@ -1104,7 +1090,7 @@ module.exports = [
       '            <mrow>\n' +
       '                <maligngroup/>\n' +
       '                <malignmark/>\n' +
-      '                <mrow>\n' +
+      '                <mrow data-mjx-texclass="ORD">\n' +
       '                  <mover accent="true" accentunder="false">\n' +
       '                    <mrow>\n' +
       '                      <mi>x</mi>\n' +
@@ -1122,7 +1108,7 @@ module.exports = [
       '            <mrow>\n' +
       '                <maligngroup/>\n' +
       '                <malignmark/>\n' +
-      '                <mrow>\n' +
+      '                <mrow data-mjx-texclass="ORD">\n' +
       '                  <mover accent="true" accentunder="false">\n' +
       '                    <mrow>\n' +
       '                      <mi>y</mi>\n' +
@@ -1141,7 +1127,7 @@ module.exports = [
       '                    <mo>−</mo>                \n' +
       '                    <msup>\n' +
       '                      <mi>x</mi>\n' +
-      '                      <mrow>\n' +
+      '                      <mrow data-mjx-texclass="ORD">\n' +
       '                        <mn>2</mn>\n' +
       '                      </mrow>\n' +
       '                    </msup>                \n' +
@@ -1165,7 +1151,7 @@ module.exports = [
       'C_{1} &=-2 \\Omega_{b}^{\\mathrm{ETA}}+5 \\Omega_{b}^{\\mathrm{EXP}}-3 \\Omega_{b}^{\\mathrm{H}}+2 \\Omega_{b}^{\\mathrm{R}}+2 \\Omega_{c}\n' +
       '\\end{aligned}',
     mathmlword: '<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">\n' +
-      '  <mtable displaystyle="true" columnalign="right left right left right left right left right left right left" columnspacing="0em 2em 0em 2em 0em 2em 0em 2em 0em 2em 0em" rowspacing="3pt">\n' +
+      '  <mtable displaystyle="true" columnalign="right left" columnspacing="0em" rowspacing="3pt">\n' +
       '    <mtr>\n' +
       '      <mtd>\n' +
       '        <mrow>\n' +
@@ -1173,7 +1159,7 @@ module.exports = [
       '            <maligngroup/>\n' +
       '            <msub>\n' +
       '              <mi>R</mi>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mi>ν</mi>\n' +
       '              </mrow>\n' +
       '            </msub>\n' +
@@ -1185,21 +1171,21 @@ module.exports = [
       '            <mfrac>\n' +
       '              <msub>\n' +
       '                <mi mathvariant="normal">Ω</mi>\n' +
-      '                <mrow>\n' +
+      '                <mrow data-mjx-texclass="ORD">\n' +
       '                  <mi>ν</mi>\n' +
       '                </mrow>\n' +
       '              </msub>\n' +
       '              <mrow>\n' +
       '                <msub>\n' +
       '                  <mi mathvariant="normal">Ω</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mi>ν</mi>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
       '                <mo>+</mo>\n' +
       '                <msub>\n' +
       '                  <mi mathvariant="normal">Ω</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mi>γ</mi>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
@@ -1224,7 +1210,7 @@ module.exports = [
       '              <mrow>\n' +
       '                <msub>\n' +
       '                  <mi>H</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>0</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
@@ -1234,21 +1220,19 @@ module.exports = [
       '                      <mrow>\n' +
       '                        <mi mathvariant="normal">Ω</mi>\n' +
       '                      </mrow>\n' +
-      '                      <mrow>\n' +
+      '                      <mrow data-mjx-texclass="ORD">\n' +
       '                        <mi>b</mi>\n' +
       '                      </mrow>\n' +
-      '                      <mrow>\n' +
-      '                        <mrow>\n' +
-      '                          <mi mathvariant="normal">E</mi>\n' +
-      '                          <mi mathvariant="normal">X</mi>\n' +
-      '                          <mi mathvariant="normal">P</mi>\n' +
+      '                      <mrow data-mjx-texclass="ORD">\n' +
+      '                        <mrow data-mjx-texclass="ORD">\n' +
+      '                          <mi data-mjx-auto-op="false">EXP</mi>\n' +
       '                        </mrow>\n' +
       '                      </mrow>\n' +
       '                    </msubsup>                \n' +
       '                    <mo>+</mo>                \n' +
       '                    <msub>\n' +
       '                      <mi mathvariant="normal">Ω</mi>\n' +
-      '                      <mrow>\n' +
+      '                      <mrow data-mjx-texclass="ORD">\n' +
       '                        <mi>c</mi>\n' +
       '                      </mrow>\n' +
       '                    </msub>                \n' +
@@ -1258,14 +1242,14 @@ module.exports = [
       '              <msqrt>\n' +
       '                <msub>\n' +
       '                  <mi mathvariant="normal">Ω</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mi>γ</mi>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
       '                <mo>+</mo>\n' +
       '                <msub>\n' +
       '                  <mi mathvariant="normal">Ω</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mi>ν</mi>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
@@ -1282,7 +1266,7 @@ module.exports = [
       '            <maligngroup/>\n' +
       '            <msub>\n' +
       '              <mi>C</mi>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mn>0</mn>\n' +
       '              </mrow>\n' +
       '            </msub>\n' +
@@ -1296,14 +1280,12 @@ module.exports = [
       '              <mrow>\n' +
       '                <mi mathvariant="normal">Ω</mi>\n' +
       '              </mrow>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mi>b</mi>\n' +
       '              </mrow>\n' +
-      '              <mrow>\n' +
-      '                <mrow>\n' +
-      '                  <mi mathvariant="normal">E</mi>\n' +
-      '                  <mi mathvariant="normal">T</mi>\n' +
-      '                  <mi mathvariant="normal">A</mi>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
+      '                <mrow data-mjx-texclass="ORD">\n' +
+      '                  <mi data-mjx-auto-op="false">ETA</mi>\n' +
       '                </mrow>\n' +
       '              </mrow>\n' +
       '            </msubsup>\n' +
@@ -1313,14 +1295,12 @@ module.exports = [
       '              <mrow>\n' +
       '                <mi mathvariant="normal">Ω</mi>\n' +
       '              </mrow>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mi>b</mi>\n' +
       '              </mrow>\n' +
-      '              <mrow>\n' +
-      '                <mrow>\n' +
-      '                  <mi mathvariant="normal">E</mi>\n' +
-      '                  <mi mathvariant="normal">X</mi>\n' +
-      '                  <mi mathvariant="normal">P</mi>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
+      '                <mrow data-mjx-texclass="ORD">\n' +
+      '                  <mi data-mjx-auto-op="false">EXP</mi>\n' +
       '                </mrow>\n' +
       '              </mrow>\n' +
       '            </msubsup>\n' +
@@ -1330,11 +1310,11 @@ module.exports = [
       '              <mrow>\n' +
       '                <mi mathvariant="normal">Ω</mi>\n' +
       '              </mrow>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mi>b</mi>\n' +
       '              </mrow>\n' +
-      '              <mrow>\n' +
-      '                <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
+      '                <mrow data-mjx-texclass="ORD">\n' +
       '                  <mi mathvariant="normal">H</mi>\n' +
       '                </mrow>\n' +
       '              </mrow>\n' +
@@ -1345,11 +1325,11 @@ module.exports = [
       '              <mrow>\n' +
       '                <mi mathvariant="normal">Ω</mi>\n' +
       '              </mrow>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mi>b</mi>\n' +
       '              </mrow>\n' +
-      '              <mrow>\n' +
-      '                <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
+      '                <mrow data-mjx-texclass="ORD">\n' +
       '                  <mi mathvariant="normal">R</mi>\n' +
       '                </mrow>\n' +
       '              </mrow>\n' +
@@ -1358,7 +1338,7 @@ module.exports = [
       '            <mn>2</mn>\n' +
       '            <msub>\n' +
       '              <mi mathvariant="normal">Ω</mi>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mi>c</mi>\n' +
       '              </mrow>\n' +
       '            </msub>\n' +
@@ -1373,7 +1353,7 @@ module.exports = [
       '            <maligngroup/>\n' +
       '            <msub>\n' +
       '              <mi>C</mi>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mn>1</mn>\n' +
       '              </mrow>\n' +
       '            </msub>\n' +
@@ -1388,14 +1368,12 @@ module.exports = [
       '              <mrow>\n' +
       '                <mi mathvariant="normal">Ω</mi>\n' +
       '              </mrow>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mi>b</mi>\n' +
       '              </mrow>\n' +
-      '              <mrow>\n' +
-      '                <mrow>\n' +
-      '                  <mi mathvariant="normal">E</mi>\n' +
-      '                  <mi mathvariant="normal">T</mi>\n' +
-      '                  <mi mathvariant="normal">A</mi>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
+      '                <mrow data-mjx-texclass="ORD">\n' +
+      '                  <mi data-mjx-auto-op="false">ETA</mi>\n' +
       '                </mrow>\n' +
       '              </mrow>\n' +
       '            </msubsup>\n' +
@@ -1405,14 +1383,12 @@ module.exports = [
       '              <mrow>\n' +
       '                <mi mathvariant="normal">Ω</mi>\n' +
       '              </mrow>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mi>b</mi>\n' +
       '              </mrow>\n' +
-      '              <mrow>\n' +
-      '                <mrow>\n' +
-      '                  <mi mathvariant="normal">E</mi>\n' +
-      '                  <mi mathvariant="normal">X</mi>\n' +
-      '                  <mi mathvariant="normal">P</mi>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
+      '                <mrow data-mjx-texclass="ORD">\n' +
+      '                  <mi data-mjx-auto-op="false">EXP</mi>\n' +
       '                </mrow>\n' +
       '              </mrow>\n' +
       '            </msubsup>\n' +
@@ -1422,11 +1398,11 @@ module.exports = [
       '              <mrow>\n' +
       '                <mi mathvariant="normal">Ω</mi>\n' +
       '              </mrow>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mi>b</mi>\n' +
       '              </mrow>\n' +
-      '              <mrow>\n' +
-      '                <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
+      '                <mrow data-mjx-texclass="ORD">\n' +
       '                  <mi mathvariant="normal">H</mi>\n' +
       '                </mrow>\n' +
       '              </mrow>\n' +
@@ -1437,11 +1413,11 @@ module.exports = [
       '              <mrow>\n' +
       '                <mi mathvariant="normal">Ω</mi>\n' +
       '              </mrow>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mi>b</mi>\n' +
       '              </mrow>\n' +
-      '              <mrow>\n' +
-      '                <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
+      '                <mrow data-mjx-texclass="ORD">\n' +
       '                  <mi mathvariant="normal">R</mi>\n' +
       '                </mrow>\n' +
       '              </mrow>\n' +
@@ -1450,7 +1426,7 @@ module.exports = [
       '            <mn>2</mn>\n' +
       '            <msub>\n' +
       '              <mi mathvariant="normal">Ω</mi>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mi>c</mi>\n' +
       '              </mrow>\n' +
       '            </msub>\n' +
@@ -1465,7 +1441,7 @@ module.exports = [
   {
     latex_input: '\\[ \\begin{aligned} f ( n + 3 ) & = ( n + 3 ) ^ { 2 } \\\\ & = n ^ { 2 } + 4 n + 3 \\end{aligned} \\]',
     mathmlword: '<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">\n' +
-      '  <mtable displaystyle="true" columnalign="right left right left right left right left right left right left" columnspacing="0em 2em 0em 2em 0em 2em 0em 2em 0em 2em 0em" rowspacing="3pt">\n' +
+      '  <mtable displaystyle="true" columnalign="right left" columnspacing="0em" rowspacing="3pt">\n' +
       '    <mtr>\n' +
       '      <mtd>\n' +
       '        <mrow>\n' +
@@ -1488,7 +1464,7 @@ module.exports = [
       '            <mn>3</mn>\n' +
       '            <msup>\n' +
       '              <mo stretchy="false">)</mo>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mn>2</mn>\n' +
       '              </mrow>\n' +
       '            </msup>\n' +
@@ -1508,7 +1484,7 @@ module.exports = [
       '            <mo>=</mo>\n' +
       '            <msup>\n' +
       '              <mi>n</mi>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mn>2</mn>\n' +
       '              </mrow>\n' +
       '            </msup>\n' +
@@ -1528,7 +1504,7 @@ module.exports = [
   {
     latex_input: '\\( \\begin{aligned} \\text { Ta có } V T & = \\sin ^ { 6 } \\alpha + \\cos ^ { 6 } \\alpha + 3 \\sin ^ { 2 } \\alpha \\cos ^ { 2 } \\alpha \\\\ & = \\left( \\sin ^ { 2 } \\alpha + \\cos ^ { 2 } \\alpha \\right) \\left( \\sin ^ { 4 } \\alpha - \\sin ^ { 2 } \\alpha \\cos ^ { 2 } \\alpha + \\cos ^ { 4 } \\alpha \\right) + 3 \\sin ^ { 2 } \\alpha \\cos ^ { 2 } \\alpha \\\\ & = \\sin ^ { 4 } \\alpha - \\sin ^ { 2 } \\alpha \\cos ^ { 2 } \\alpha + \\cos ^ { 4 } \\alpha + 3 \\sin ^ { 2 } \\alpha \\cos ^ { 2 } \\alpha \\\\ & = \\sin ^ { 4 } \\alpha + 2 \\sin ^ { 2 } \\alpha \\cos ^ { 2 } \\alpha + \\cos ^ { 4 } \\alpha \\\\ & = \\left( \\sin ^ { 2 } \\alpha + \\cos ^ { 2 } \\alpha \\right) ^ { 2 } = 1 \\text { (điều phải chứng minh).} \\end{aligned} \\)',
     mathmlword: '<math xmlns="http://www.w3.org/1998/Math/MathML">\n' +
-      '  <mtable displaystyle="true" columnalign="right left right left right left right left right left right left" columnspacing="0em 2em 0em 2em 0em 2em 0em 2em 0em 2em 0em" rowspacing="3pt">\n' +
+      '  <mtable displaystyle="true" columnalign="right left" columnspacing="0em" rowspacing="3pt">\n' +
       '    <mtr>\n' +
       '      <mtd>\n' +
       '        <mrow>\n' +
@@ -1544,7 +1520,7 @@ module.exports = [
       '            <mo>=</mo>\n' +
       '            <msup>\n' +
       '              <mi>sin</mi>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mn>6</mn>\n' +
       '              </mrow>\n' +
       '            </msup>\n' +
@@ -1553,7 +1529,7 @@ module.exports = [
       '            <mo>+</mo>\n' +
       '            <msup>\n' +
       '              <mi>cos</mi>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mn>6</mn>\n' +
       '              </mrow>\n' +
       '            </msup>\n' +
@@ -1563,7 +1539,7 @@ module.exports = [
       '            <mn>3</mn>\n' +
       '            <msup>\n' +
       '              <mi>sin</mi>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mn>2</mn>\n' +
       '              </mrow>\n' +
       '            </msup>\n' +
@@ -1571,7 +1547,7 @@ module.exports = [
       '            <mi>α</mi>\n' +
       '            <msup>\n' +
       '              <mi>cos</mi>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mn>2</mn>\n' +
       '              </mrow>\n' +
       '            </msup>\n' +
@@ -1595,7 +1571,7 @@ module.exports = [
       '              <mrow>\n' +
       '                <msup>\n' +
       '                  <mi>sin</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>2</mn>\n' +
       '                  </mrow>\n' +
       '                </msup>            \n' +
@@ -1604,7 +1580,7 @@ module.exports = [
       '                <mo>+</mo>            \n' +
       '                <msup>\n' +
       '                  <mi>cos</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>2</mn>\n' +
       '                  </mrow>\n' +
       '                </msup>            \n' +
@@ -1616,7 +1592,7 @@ module.exports = [
       '              <mrow>\n' +
       '                <msup>\n' +
       '                  <mi>sin</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>4</mn>\n' +
       '                  </mrow>\n' +
       '                </msup>            \n' +
@@ -1625,7 +1601,7 @@ module.exports = [
       '                <mo>−</mo>            \n' +
       '                <msup>\n' +
       '                  <mi>sin</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>2</mn>\n' +
       '                  </mrow>\n' +
       '                </msup>            \n' +
@@ -1633,7 +1609,7 @@ module.exports = [
       '                <mi>α</mi>            \n' +
       '                <msup>\n' +
       '                  <mi>cos</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>2</mn>\n' +
       '                  </mrow>\n' +
       '                </msup>            \n' +
@@ -1642,7 +1618,7 @@ module.exports = [
       '                <mo>+</mo>            \n' +
       '                <msup>\n' +
       '                  <mi>cos</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>4</mn>\n' +
       '                  </mrow>\n' +
       '                </msup>            \n' +
@@ -1654,7 +1630,7 @@ module.exports = [
       '            <mn>3</mn>\n' +
       '            <msup>\n' +
       '              <mi>sin</mi>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mn>2</mn>\n' +
       '              </mrow>\n' +
       '            </msup>\n' +
@@ -1662,7 +1638,7 @@ module.exports = [
       '            <mi>α</mi>\n' +
       '            <msup>\n' +
       '              <mi>cos</mi>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mn>2</mn>\n' +
       '              </mrow>\n' +
       '            </msup>\n' +
@@ -1684,7 +1660,7 @@ module.exports = [
       '            <mo>=</mo>\n' +
       '            <msup>\n' +
       '              <mi>sin</mi>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mn>4</mn>\n' +
       '              </mrow>\n' +
       '            </msup>\n' +
@@ -1693,7 +1669,7 @@ module.exports = [
       '            <mo>−</mo>\n' +
       '            <msup>\n' +
       '              <mi>sin</mi>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mn>2</mn>\n' +
       '              </mrow>\n' +
       '            </msup>\n' +
@@ -1701,7 +1677,7 @@ module.exports = [
       '            <mi>α</mi>\n' +
       '            <msup>\n' +
       '              <mi>cos</mi>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mn>2</mn>\n' +
       '              </mrow>\n' +
       '            </msup>\n' +
@@ -1710,7 +1686,7 @@ module.exports = [
       '            <mo>+</mo>\n' +
       '            <msup>\n' +
       '              <mi>cos</mi>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mn>4</mn>\n' +
       '              </mrow>\n' +
       '            </msup>\n' +
@@ -1720,7 +1696,7 @@ module.exports = [
       '            <mn>3</mn>\n' +
       '            <msup>\n' +
       '              <mi>sin</mi>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mn>2</mn>\n' +
       '              </mrow>\n' +
       '            </msup>\n' +
@@ -1728,7 +1704,7 @@ module.exports = [
       '            <mi>α</mi>\n' +
       '            <msup>\n' +
       '              <mi>cos</mi>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mn>2</mn>\n' +
       '              </mrow>\n' +
       '            </msup>\n' +
@@ -1750,7 +1726,7 @@ module.exports = [
       '            <mo>=</mo>\n' +
       '            <msup>\n' +
       '              <mi>sin</mi>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mn>4</mn>\n' +
       '              </mrow>\n' +
       '            </msup>\n' +
@@ -1760,7 +1736,7 @@ module.exports = [
       '            <mn>2</mn>\n' +
       '            <msup>\n' +
       '              <mi>sin</mi>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mn>2</mn>\n' +
       '              </mrow>\n' +
       '            </msup>\n' +
@@ -1768,7 +1744,7 @@ module.exports = [
       '            <mi>α</mi>\n' +
       '            <msup>\n' +
       '              <mi>cos</mi>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mn>2</mn>\n' +
       '              </mrow>\n' +
       '            </msup>\n' +
@@ -1777,7 +1753,7 @@ module.exports = [
       '            <mo>+</mo>\n' +
       '            <msup>\n' +
       '              <mi>cos</mi>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mn>4</mn>\n' +
       '              </mrow>\n' +
       '            </msup>\n' +
@@ -1802,7 +1778,7 @@ module.exports = [
       '                <mrow>\n' +
       '                  <msup>\n' +
       '                    <mi>sin</mi>\n' +
-      '                    <mrow>\n' +
+      '                    <mrow data-mjx-texclass="ORD">\n' +
       '                      <mn>2</mn>\n' +
       '                    </mrow>\n' +
       '                  </msup>              \n' +
@@ -1811,7 +1787,7 @@ module.exports = [
       '                  <mo>+</mo>              \n' +
       '                  <msup>\n' +
       '                    <mi>cos</mi>\n' +
-      '                    <mrow>\n' +
+      '                    <mrow data-mjx-texclass="ORD">\n' +
       '                      <mn>2</mn>\n' +
       '                    </mrow>\n' +
       '                  </msup>              \n' +
@@ -1819,7 +1795,7 @@ module.exports = [
       '                  <mi>α</mi>              \n' +
       '                </mrow>              \n' +
       '              </mfenced>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mn>2</mn>\n' +
       '              </mrow>\n' +
       '            </msup>\n' +
@@ -1837,7 +1813,7 @@ module.exports = [
   {
     latex_input: '\\[\\begin{aligned} A_{2}A_{1} & = \\left[\\begin{array}{ccc} \\sec \\varphi & - \\tan \\varphi & 0 \\\\ 0&1&0 \\\\ 0&0&1 \\end{array}\\right] \\left[\\begin{array}{ccc} 1&0&0 \\\\ \\sin \\varphi & \\cos \\varphi & 0\\\\ 0&0&1 \\end{array}\\right] \\\\ &= \\left[\\begin{array}{ccc} \\sec\\varphi -\\tan \\varphi \\sin\\varphi & -\\tan \\varphi \\cos\\varphi & 0 \\\\ \\sin\\varphi&\\cos \\varphi&0 \\\\ 0&0&1 \\end{array}\\right] \\\\ &= \\left[\\begin{array}{ccc} \\cos\\varphi & - \\sin\\varphi & 0 \\\\ \\sin\\varphi&\\cos\\varphi&0 \\\\ 0&0&1 \\end{array}\\right] \\end{aligned}\\]',
     mathmlword: '<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">\n' +
-      '  <mtable displaystyle="true" columnalign="right left right left right left right left right left right left" columnspacing="0em 2em 0em 2em 0em 2em 0em 2em 0em 2em 0em" rowspacing="3pt">\n' +
+      '  <mtable displaystyle="true" columnalign="right left" columnspacing="0em" rowspacing="3pt">\n' +
       '    <mtr>\n' +
       '      <mtd>\n' +
       '        <mrow>\n' +
@@ -1845,13 +1821,13 @@ module.exports = [
       '            <maligngroup/>\n' +
       '            <msub>\n' +
       '              <mi>A</mi>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mn>2</mn>\n' +
       '              </mrow>\n' +
       '            </msub>\n' +
       '            <msub>\n' +
       '              <mi>A</mi>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mn>1</mn>\n' +
       '              </mrow>\n' +
       '            </msub>\n' +
@@ -2092,7 +2068,7 @@ module.exports = [
   {
     latex_input: '\\[ \\begin{aligned} A A ^ { * } & = \\left( \\begin{array} { c c c c } 1 & 1 & 1 & - 1 \\\\ 2 & - 1 & 0 & 1 \\end{array} \\right) \\left( \\begin{array} { c c } 1 & 2 \\\\ 1 & - 1 \\\\ 1 & 0 \\\\ - 1 & 1 \\end{array} \\right) \\\\ & = \\left( \\begin{array} { ll } 4 & 0 \\\\ 0 & 6 \\end{array} \\right) \\end{aligned} \\]',
     mathmlword: '<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">\n' +
-      '  <mtable displaystyle="true" columnalign="right left right left right left right left right left right left" columnspacing="0em 2em 0em 2em 0em 2em 0em 2em 0em 2em 0em" rowspacing="3pt">\n' +
+      '  <mtable displaystyle="true" columnalign="right left" columnspacing="0em" rowspacing="3pt">\n' +
       '    <mtr>\n' +
       '      <mtd>\n' +
       '        <mrow>\n' +
@@ -2101,7 +2077,7 @@ module.exports = [
       '            <mi>A</mi>\n' +
       '            <msup>\n' +
       '              <mi>A</mi>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mo>∗</mo>\n' +
       '              </mrow>\n' +
       '            </msup>\n' +
@@ -2233,13 +2209,13 @@ module.exports = [
   {
     latex_input: '\\[ \\begin{aligned} \\mathbf { Y }& \\triangleq \\left[ \\begin{array} { c } Y [ 0 ] \\\\ Y [ 1 ] \\\\ \\vdots \\\\ Y [ N - 1 ] \\end{array} \\right] = \\left[ \\begin{array} { c c c c } X [ 0 ] & 0 & \\cdots & 0 \\\\ 0 & X [ 1 ] & & \\vdots \\\\ \\vdots & & \\ddots & 0 \\\\ 0 & \\cdots & 0 & X [ N - 1 ] \\end{array} \\right] \\left[ \\begin{array} { c } H [ 0 ] \\\\ H [ 1 ] \\\\ \\vdots \\\\ H [ N - 1 ] \\end{array} \\right] + \\left[ \\begin{array} { c } Z [ 0 ] \\\\ Z [ 1 ] \\\\ \\vdots \\\\ Z [ N - 1 ] \\end{array} \\right] \\\\ &= \\mathbf{XH} + \\mathbf{Z} \\end{aligned} \\]',
     mathmlword: '<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">\n' +
-      '  <mtable displaystyle="true" columnalign="right left right left right left right left right left right left" columnspacing="0em 2em 0em 2em 0em 2em 0em 2em 0em 2em 0em" rowspacing="3pt">\n' +
+      '  <mtable displaystyle="true" columnalign="right left" columnspacing="0em" rowspacing="3pt">\n' +
       '    <mtr>\n' +
       '      <mtd>\n' +
       '        <mrow>\n' +
       '          <mrow>\n' +
       '            <maligngroup/>\n' +
-      '            <mrow>\n' +
+      '            <mrow data-mjx-texclass="ORD">\n' +
       '              <mi mathvariant="bold">Y</mi>\n' +
       '            </mrow>\n' +
       '          </mrow>\n' +
@@ -2268,7 +2244,7 @@ module.exports = [
       '                  </mtr>\n' +
       '                  <mtr>\n' +
       '                    <mtd>\n' +
-      '                      <mrow>\n' +
+      '                      <mrow data-mjx-texclass="ORD">\n' +
       '                        <mo>⋮</mo>\n' +
       '                      </mrow>\n' +
       '                    </mtd>\n' +
@@ -2319,14 +2295,14 @@ module.exports = [
       '                    </mtd>\n' +
       '                    <mtd></mtd>\n' +
       '                    <mtd>\n' +
-      '                      <mrow>\n' +
+      '                      <mrow data-mjx-texclass="ORD">\n' +
       '                        <mo>⋮</mo>\n' +
       '                      </mrow>\n' +
       '                    </mtd>\n' +
       '                  </mtr>\n' +
       '                  <mtr>\n' +
       '                    <mtd>\n' +
-      '                      <mrow>\n' +
+      '                      <mrow data-mjx-texclass="ORD">\n' +
       '                        <mo>⋮</mo>\n' +
       '                      </mrow>\n' +
       '                    </mtd>\n' +
@@ -2381,7 +2357,7 @@ module.exports = [
       '                  </mtr>\n' +
       '                  <mtr>\n' +
       '                    <mtd>\n' +
-      '                      <mrow>\n' +
+      '                      <mrow data-mjx-texclass="ORD">\n' +
       '                        <mo>⋮</mo>\n' +
       '                      </mrow>\n' +
       '                    </mtd>\n' +
@@ -2421,7 +2397,7 @@ module.exports = [
       '                  </mtr>\n' +
       '                  <mtr>\n' +
       '                    <mtd>\n' +
-      '                      <mrow>\n' +
+      '                      <mrow data-mjx-texclass="ORD">\n' +
       '                        <mo>⋮</mo>\n' +
       '                      </mrow>\n' +
       '                    </mtd>\n' +
@@ -2453,12 +2429,11 @@ module.exports = [
       '            <maligngroup/>\n' +
       '            <mi></mi>\n' +
       '            <mo>=</mo>\n' +
-      '            <mrow>\n' +
-      '              <mi mathvariant="bold">X</mi>\n' +
-      '              <mi mathvariant="bold">H</mi>\n' +
+      '            <mrow data-mjx-texclass="ORD">\n' +
+      '              <mi mathvariant="bold">XH</mi>\n' +
       '            </mrow>\n' +
       '            <mo>+</mo>\n' +
-      '            <mrow>\n' +
+      '            <mrow data-mjx-texclass="ORD">\n' +
       '              <mi mathvariant="bold">Z</mi>\n' +
       '            </mrow>\n' +
       '          </mrow>\n' +
@@ -2472,7 +2447,7 @@ module.exports = [
   {
     latex_input: '\\(\\begin{aligned}|A \\not \\supset B \\not \\supset C \\not \\supset D| &=|A|+|B|+|C|+|D|-\\\\ &-|A \\not \\supset B|-|A \\not \\supset C|-|A \\not \\supset D|-|B \\not \\supset C|-|B \\not \\supset D|-|C \\not \\supset D|+\\\\ &+|A \\not \\supset B \\not \\supset C|+|A \\not \\supset B \\not \\supset D|+|A \\not \\supset C \\not \\supset D|+|B \\not \\supset C \\not \\supset D|-\\\\ &-|A \\not \\supset B \\not \\supset C \\not \\supset D| \\end{aligned}\\)',
     mathmlword: '<math xmlns="http://www.w3.org/1998/Math/MathML">\n' +
-      '  <mtable displaystyle="true" columnalign="right left right left right left right left right left right left" columnspacing="0em 2em 0em 2em 0em 2em 0em 2em 0em 2em 0em" rowspacing="3pt">\n' +
+      '  <mtable displaystyle="true" columnalign="right left" columnspacing="0em" rowspacing="3pt">\n' +
       '    <mtr>\n' +
       '      <mtd>\n' +
       '        <mrow>\n' +
@@ -2492,35 +2467,35 @@ module.exports = [
       '            <maligngroup/>\n' +
       '            <mi></mi>\n' +
       '            <mo>=</mo>\n' +
-      '            <mrow>\n' +
+      '            <mrow data-mjx-texclass="ORD">\n' +
       '              <mo stretchy="false">|</mo>\n' +
       '            </mrow>\n' +
       '            <mi>A</mi>\n' +
-      '            <mrow>\n' +
+      '            <mrow data-mjx-texclass="ORD">\n' +
       '              <mo stretchy="false">|</mo>\n' +
       '            </mrow>\n' +
       '            <mo>+</mo>\n' +
-      '            <mrow>\n' +
+      '            <mrow data-mjx-texclass="ORD">\n' +
       '              <mo stretchy="false">|</mo>\n' +
       '            </mrow>\n' +
       '            <mi>B</mi>\n' +
-      '            <mrow>\n' +
+      '            <mrow data-mjx-texclass="ORD">\n' +
       '              <mo stretchy="false">|</mo>\n' +
       '            </mrow>\n' +
       '            <mo>+</mo>\n' +
-      '            <mrow>\n' +
+      '            <mrow data-mjx-texclass="ORD">\n' +
       '              <mo stretchy="false">|</mo>\n' +
       '            </mrow>\n' +
       '            <mi>C</mi>\n' +
-      '            <mrow>\n' +
+      '            <mrow data-mjx-texclass="ORD">\n' +
       '              <mo stretchy="false">|</mo>\n' +
       '            </mrow>\n' +
       '            <mo>+</mo>\n' +
-      '            <mrow>\n' +
+      '            <mrow data-mjx-texclass="ORD">\n' +
       '              <mo stretchy="false">|</mo>\n' +
       '            </mrow>\n' +
       '            <mi>D</mi>\n' +
-      '            <mrow>\n' +
+      '            <mrow data-mjx-texclass="ORD">\n' +
       '              <mo stretchy="false">|</mo>\n' +
       '            </mrow>\n' +
       '            <mo>−</mo>\n' +
@@ -2538,63 +2513,63 @@ module.exports = [
       '            <maligngroup/>\n' +
       '            <mi></mi>\n' +
       '            <mo>−</mo>\n' +
-      '            <mrow>\n' +
+      '            <mrow data-mjx-texclass="ORD">\n' +
       '              <mo stretchy="false">|</mo>\n' +
       '            </mrow>\n' +
       '            <mi>A</mi>\n' +
       '            <mo>⊅</mo>\n' +
       '            <mi>B</mi>\n' +
-      '            <mrow>\n' +
+      '            <mrow data-mjx-texclass="ORD">\n' +
       '              <mo stretchy="false">|</mo>\n' +
       '            </mrow>\n' +
       '            <mo>−</mo>\n' +
-      '            <mrow>\n' +
+      '            <mrow data-mjx-texclass="ORD">\n' +
       '              <mo stretchy="false">|</mo>\n' +
       '            </mrow>\n' +
       '            <mi>A</mi>\n' +
       '            <mo>⊅</mo>\n' +
       '            <mi>C</mi>\n' +
-      '            <mrow>\n' +
+      '            <mrow data-mjx-texclass="ORD">\n' +
       '              <mo stretchy="false">|</mo>\n' +
       '            </mrow>\n' +
       '            <mo>−</mo>\n' +
-      '            <mrow>\n' +
+      '            <mrow data-mjx-texclass="ORD">\n' +
       '              <mo stretchy="false">|</mo>\n' +
       '            </mrow>\n' +
       '            <mi>A</mi>\n' +
       '            <mo>⊅</mo>\n' +
       '            <mi>D</mi>\n' +
-      '            <mrow>\n' +
+      '            <mrow data-mjx-texclass="ORD">\n' +
       '              <mo stretchy="false">|</mo>\n' +
       '            </mrow>\n' +
       '            <mo>−</mo>\n' +
-      '            <mrow>\n' +
+      '            <mrow data-mjx-texclass="ORD">\n' +
       '              <mo stretchy="false">|</mo>\n' +
       '            </mrow>\n' +
       '            <mi>B</mi>\n' +
       '            <mo>⊅</mo>\n' +
       '            <mi>C</mi>\n' +
-      '            <mrow>\n' +
+      '            <mrow data-mjx-texclass="ORD">\n' +
       '              <mo stretchy="false">|</mo>\n' +
       '            </mrow>\n' +
       '            <mo>−</mo>\n' +
-      '            <mrow>\n' +
+      '            <mrow data-mjx-texclass="ORD">\n' +
       '              <mo stretchy="false">|</mo>\n' +
       '            </mrow>\n' +
       '            <mi>B</mi>\n' +
       '            <mo>⊅</mo>\n' +
       '            <mi>D</mi>\n' +
-      '            <mrow>\n' +
+      '            <mrow data-mjx-texclass="ORD">\n' +
       '              <mo stretchy="false">|</mo>\n' +
       '            </mrow>\n' +
       '            <mo>−</mo>\n' +
-      '            <mrow>\n' +
+      '            <mrow data-mjx-texclass="ORD">\n' +
       '              <mo stretchy="false">|</mo>\n' +
       '            </mrow>\n' +
       '            <mi>C</mi>\n' +
       '            <mo>⊅</mo>\n' +
       '            <mi>D</mi>\n' +
-      '            <mrow>\n' +
+      '            <mrow data-mjx-texclass="ORD">\n' +
       '              <mo stretchy="false">|</mo>\n' +
       '            </mrow>\n' +
       '            <mo>+</mo>\n' +
@@ -2612,7 +2587,7 @@ module.exports = [
       '            <maligngroup/>\n' +
       '            <mi></mi>\n' +
       '            <mo>+</mo>\n' +
-      '            <mrow>\n' +
+      '            <mrow data-mjx-texclass="ORD">\n' +
       '              <mo stretchy="false">|</mo>\n' +
       '            </mrow>\n' +
       '            <mi>A</mi>\n' +
@@ -2620,11 +2595,11 @@ module.exports = [
       '            <mi>B</mi>\n' +
       '            <mo>⊅</mo>\n' +
       '            <mi>C</mi>\n' +
-      '            <mrow>\n' +
+      '            <mrow data-mjx-texclass="ORD">\n' +
       '              <mo stretchy="false">|</mo>\n' +
       '            </mrow>\n' +
       '            <mo>+</mo>\n' +
-      '            <mrow>\n' +
+      '            <mrow data-mjx-texclass="ORD">\n' +
       '              <mo stretchy="false">|</mo>\n' +
       '            </mrow>\n' +
       '            <mi>A</mi>\n' +
@@ -2632,11 +2607,11 @@ module.exports = [
       '            <mi>B</mi>\n' +
       '            <mo>⊅</mo>\n' +
       '            <mi>D</mi>\n' +
-      '            <mrow>\n' +
+      '            <mrow data-mjx-texclass="ORD">\n' +
       '              <mo stretchy="false">|</mo>\n' +
       '            </mrow>\n' +
       '            <mo>+</mo>\n' +
-      '            <mrow>\n' +
+      '            <mrow data-mjx-texclass="ORD">\n' +
       '              <mo stretchy="false">|</mo>\n' +
       '            </mrow>\n' +
       '            <mi>A</mi>\n' +
@@ -2644,11 +2619,11 @@ module.exports = [
       '            <mi>C</mi>\n' +
       '            <mo>⊅</mo>\n' +
       '            <mi>D</mi>\n' +
-      '            <mrow>\n' +
+      '            <mrow data-mjx-texclass="ORD">\n' +
       '              <mo stretchy="false">|</mo>\n' +
       '            </mrow>\n' +
       '            <mo>+</mo>\n' +
-      '            <mrow>\n' +
+      '            <mrow data-mjx-texclass="ORD">\n' +
       '              <mo stretchy="false">|</mo>\n' +
       '            </mrow>\n' +
       '            <mi>B</mi>\n' +
@@ -2656,7 +2631,7 @@ module.exports = [
       '            <mi>C</mi>\n' +
       '            <mo>⊅</mo>\n' +
       '            <mi>D</mi>\n' +
-      '            <mrow>\n' +
+      '            <mrow data-mjx-texclass="ORD">\n' +
       '              <mo stretchy="false">|</mo>\n' +
       '            </mrow>\n' +
       '            <mo>−</mo>\n' +
@@ -2674,7 +2649,7 @@ module.exports = [
       '            <maligngroup/>\n' +
       '            <mi></mi>\n' +
       '            <mo>−</mo>\n' +
-      '            <mrow>\n' +
+      '            <mrow data-mjx-texclass="ORD">\n' +
       '              <mo stretchy="false">|</mo>\n' +
       '            </mrow>\n' +
       '            <mi>A</mi>\n' +
@@ -2696,7 +2671,7 @@ module.exports = [
   {
     latex_input: '\\[ \\begin{aligned}\\{ \\lim _ { M } \\widetilde { Z } _ { M } = 0 \\}& \\Longleftrightarrow \\left\\{ Z _ { n } \\text { est une suite de Cauchy} \\right\\} \\\\& \\Longleftrightarrow \\left\\{ Z _ { n } \\text { est une suite convergente} \\right\\} \\\\& \\Longleftrightarrow \\{ \\sum _ { n } U _ { n } \\text { est une série convergente } \\}\\end{aligned} \\]',
     mathmlword: '<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">\n' +
-      '  <mtable displaystyle="true" columnalign="right left right left right left right left right left right left" columnspacing="0em 2em 0em 2em 0em 2em 0em 2em 0em 2em 0em" rowspacing="3pt">\n' +
+      '  <mtable displaystyle="true" columnalign="right left" columnspacing="0em" rowspacing="3pt">\n' +
       '    <mtr>\n' +
       '      <mtd>\n' +
       '        <mrow>\n' +
@@ -2707,7 +2682,7 @@ module.exports = [
       '              <mrow>\n' +
       '                <mo data-mjx-texclass="OP" movablelimits="true">lim</mo>\n' +
       '              </mrow>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mi>M</mi>\n' +
       '              </mrow>\n' +
       '            </munder>\n' +
@@ -2715,7 +2690,7 @@ module.exports = [
       '              <mo> </mo>\n' +
       '            </mrow>\n' +
       '            <msub>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mover accent="true" accentunder="false">\n' +
       '                  <mrow>\n' +
       '                    <mi>Z</mi>\n' +
@@ -2723,7 +2698,7 @@ module.exports = [
       '                  <mo>~</mo>\n' +
       '                </mover>\n' +
       '              </mrow>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mi>M</mi>\n' +
       '              </mrow>\n' +
       '            </msub>\n' +
@@ -2739,7 +2714,7 @@ module.exports = [
       '              <mrow>\n' +
       '                <msub>\n' +
       '                  <mi>Z</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mi>n</mi>\n' +
       '                  </mrow>\n' +
       '                </msub>            \n' +
@@ -2764,7 +2739,7 @@ module.exports = [
       '              <mrow>\n' +
       '                <msub>\n' +
       '                  <mi>Z</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mi>n</mi>\n' +
       '                  </mrow>\n' +
       '                </msub>            \n' +
@@ -2790,7 +2765,7 @@ module.exports = [
       '              <mrow>\n' +
       '                <mo data-mjx-texclass="OP">∑</mo>\n' +
       '              </mrow>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mi>n</mi>\n' +
       '              </mrow>\n' +
       '            </munder>\n' +
@@ -2799,7 +2774,7 @@ module.exports = [
       '            </mrow>\n' +
       '            <msub>\n' +
       '              <mi>U</mi>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mi>n</mi>\n' +
       '              </mrow>\n' +
       '            </msub>\n' +
@@ -2818,11 +2793,12 @@ module.exports = [
     mathmlword: '<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">\n' +
       '  <mfenced open="" close="" separators="|">\n' +
       '    <mrow>\n' +
-      '      <mtable displaystyle="true" columnalign="right left right left right left right left right left right left" columnspacing="0em 2em 0em 2em 0em 2em 0em 2em 0em 2em 0em" rowspacing="3pt">\n' +
+      '      <mtable displaystyle="true" columnalign="right" columnspacing="" rowspacing="3pt">\n' +
       '        <mtr>\n' +
       '          <mtd>\n' +
       '            <mrow>\n' +
       '                <maligngroup/>\n' +
+      '                <malignmark/>\n' +
       '                <munder accent="true" accentunder="false">\n' +
       '                  <mrow data-mjx-texclass="OP">\n' +
       '                    <munder accent="true" accentunder="false">\n' +
@@ -2833,12 +2809,12 @@ module.exports = [
       '                              <mrow>\n' +
       '                                <mo data-mjx-texclass="OP">∑</mo>\n' +
       '                              </mrow>\n' +
-      '                              <mrow>\n' +
+      '                              <mrow data-mjx-texclass="ORD">\n' +
       '                                <mi>j</mi>\n' +
       '                                <mo>=</mo>\n' +
       '                                <mn>1</mn>\n' +
       '                              </mrow>\n' +
-      '                              <mrow>\n' +
+      '                              <mrow data-mjx-texclass="ORD">\n' +
       '                                <mi>z</mi>\n' +
       '                              </mrow>\n' +
       '                            </munderover>\n' +
@@ -2851,22 +2827,22 @@ module.exports = [
       '                      <mo>⏟</mo>\n' +
       '                    </munder>\n' +
       '                  </mrow>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mi>g</mi>\n' +
       '                    <msub>\n' +
       '                      <mi>μ</mi>\n' +
-      '                      <mrow>\n' +
+      '                      <mrow data-mjx-texclass="ORD">\n' +
       '                        <mn>0</mn>\n' +
       '                      </mrow>\n' +
       '                    </msub>\n' +
       '                    <msub>\n' +
       '                      <mi>μ</mi>\n' +
-      '                      <mrow>\n' +
+      '                      <mrow data-mjx-texclass="ORD">\n' +
       '                        <mi>B</mi>\n' +
       '                      </mrow>\n' +
       '                    </msub>\n' +
       '                    <msub>\n' +
-      '                      <mrow>\n' +
+      '                      <mrow data-mjx-texclass="ORD">\n' +
       '                        <mover accent="true" accentunder="false">\n' +
       '                          <mrow>\n' +
       '                            <mi>H</mi>\n' +
@@ -2874,10 +2850,9 @@ module.exports = [
       '                          <mo stretchy="false">→</mo>\n' +
       '                        </mover>\n' +
       '                      </mrow>\n' +
-      '                      <mrow>\n' +
-      '                        <mrow>\n' +
-      '                          <mi mathvariant="normal">M</mi>\n' +
-      '                          <mi mathvariant="normal">F</mi>\n' +
+      '                      <mrow data-mjx-texclass="ORD">\n' +
+      '                        <mrow data-mjx-texclass="ORD">\n' +
+      '                          <mi data-mjx-auto-op="false">MF</mi>\n' +
       '                        </mrow>\n' +
       '                      </mrow>\n' +
       '                    </msub>\n' +
@@ -2897,7 +2872,7 @@ module.exports = [
     mathmlword: '<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">\n' +
       '  <mfenced open="" close="" separators="|">\n' +
       '    <mrow>\n' +
-      '      <mtable displaystyle="true" columnalign="right left right left right left right left right left right left" columnspacing="0em 2em 0em 2em 0em 2em 0em 2em 0em 2em 0em" rowspacing="3pt">\n' +
+      '      <mtable displaystyle="true" columnalign="right left" columnspacing="0em" rowspacing="3pt">\n' +
       '        <mtr>\n' +
       '          <mtd>\n' +
       '            <mrow>\n' +
@@ -2908,7 +2883,7 @@ module.exports = [
       '                  <mrow>\n' +
       '                    <mo data-mjx-texclass="OP">∑</mo>\n' +
       '                  </mrow>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mi>i</mi>\n' +
       '                    <mo>≠</mo>\n' +
       '                    <mi>j</mi>\n' +
@@ -2918,16 +2893,16 @@ module.exports = [
       '                  <mo> </mo>\n' +
       '                </mrow>\n' +
       '                <msub>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mi data-mjx-variant="-tex-calligraphic" mathvariant="script">J</mi>\n' +
       '                  </mrow>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mi>i</mi>\n' +
       '                    <mi>j</mi>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
       '                <msub>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mover accent="true" accentunder="false">\n' +
       '                      <mrow>\n' +
       '                        <mi>S</mi>\n' +
@@ -2935,13 +2910,13 @@ module.exports = [
       '                      <mo stretchy="false">^</mo>\n' +
       '                    </mover>\n' +
       '                  </mrow>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mi>i</mi>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
       '                <mo>⋅</mo>\n' +
       '                <msub>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mover accent="true" accentunder="false">\n' +
       '                      <mrow>\n' +
       '                        <mi>S</mi>\n' +
@@ -2949,7 +2924,7 @@ module.exports = [
       '                      <mo stretchy="false">^</mo>\n' +
       '                    </mover>\n' +
       '                  </mrow>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mi>j</mi>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
@@ -2963,7 +2938,7 @@ module.exports = [
       '                  <mrow>\n' +
       '                    <mo data-mjx-texclass="OP">∑</mo>\n' +
       '                  </mrow>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mi>i</mi>\n' +
       '                    <mo>≠</mo>\n' +
       '                    <mi>j</mi>\n' +
@@ -2973,10 +2948,10 @@ module.exports = [
       '                  <mo> </mo>\n' +
       '                </mrow>\n' +
       '                <msub>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mi data-mjx-variant="-tex-calligraphic" mathvariant="script">J</mi>\n' +
       '                  </mrow>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mi>i</mi>\n' +
       '                    <mi>j</mi>\n' +
       '                  </mrow>\n' +
@@ -2984,7 +2959,7 @@ module.exports = [
       '                <mo stretchy="false">[</mo>\n' +
       '                <mo fence="false" stretchy="false">⟨</mo>\n' +
       '                <msub>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mover accent="true" accentunder="false">\n' +
       '                      <mrow>\n' +
       '                        <mi>S</mi>\n' +
@@ -2992,7 +2967,7 @@ module.exports = [
       '                      <mo stretchy="false">→</mo>\n' +
       '                    </mover>\n' +
       '                  </mrow>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mi>i</mi>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
@@ -3000,7 +2975,7 @@ module.exports = [
       '                <mo>+</mo>\n' +
       '                <mo stretchy="false">(</mo>\n' +
       '                <msub>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mover accent="true" accentunder="false">\n' +
       '                      <mrow>\n' +
       '                        <mi>S</mi>\n' +
@@ -3008,14 +2983,14 @@ module.exports = [
       '                      <mo stretchy="false">→</mo>\n' +
       '                    </mover>\n' +
       '                  </mrow>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mi>i</mi>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
       '                <mo>−</mo>\n' +
       '                <mo fence="false" stretchy="false">⟨</mo>\n' +
       '                <msub>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mover accent="true" accentunder="false">\n' +
       '                      <mrow>\n' +
       '                        <mi>S</mi>\n' +
@@ -3023,7 +2998,7 @@ module.exports = [
       '                      <mo stretchy="false">→</mo>\n' +
       '                    </mover>\n' +
       '                  </mrow>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mi>i</mi>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
@@ -3033,7 +3008,7 @@ module.exports = [
       '                <mo stretchy="false">[</mo>\n' +
       '                <mo fence="false" stretchy="false">⟨</mo>\n' +
       '                <msub>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mover accent="true" accentunder="false">\n' +
       '                      <mrow>\n' +
       '                        <mi>S</mi>\n' +
@@ -3041,7 +3016,7 @@ module.exports = [
       '                      <mo stretchy="false">→</mo>\n' +
       '                    </mover>\n' +
       '                  </mrow>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mi>j</mi>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
@@ -3049,7 +3024,7 @@ module.exports = [
       '                <mo>+</mo>\n' +
       '                <mo stretchy="false">(</mo>\n' +
       '                <msub>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mover accent="true" accentunder="false">\n' +
       '                      <mrow>\n' +
       '                        <mi>S</mi>\n' +
@@ -3057,14 +3032,14 @@ module.exports = [
       '                      <mo stretchy="false">→</mo>\n' +
       '                    </mover>\n' +
       '                  </mrow>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mi>j</mi>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
       '                <mo>−</mo>\n' +
       '                <mo fence="false" stretchy="false">⟨</mo>\n' +
       '                <msub>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mover accent="true" accentunder="false">\n' +
       '                      <mrow>\n' +
       '                        <mi>S</mi>\n' +
@@ -3072,7 +3047,7 @@ module.exports = [
       '                      <mo stretchy="false">→</mo>\n' +
       '                    </mover>\n' +
       '                  </mrow>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mi>j</mi>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
@@ -3098,7 +3073,7 @@ module.exports = [
       '                  <mrow>\n' +
       '                    <mo data-mjx-texclass="OP">∑</mo>\n' +
       '                  </mrow>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mi>i</mi>\n' +
       '                    <mo>≠</mo>\n' +
       '                    <mi>j</mi>\n' +
@@ -3108,17 +3083,17 @@ module.exports = [
       '                  <mo> </mo>\n' +
       '                </mrow>\n' +
       '                <msub>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mi data-mjx-variant="-tex-calligraphic" mathvariant="script">J</mi>\n' +
       '                  </mrow>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mi>i</mi>\n' +
       '                    <mi>j</mi>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
       '                <mo fence="false" stretchy="false">⟨</mo>\n' +
       '                <msub>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mover accent="true" accentunder="false">\n' +
       '                      <mrow>\n' +
       '                        <mi>S</mi>\n' +
@@ -3126,14 +3101,14 @@ module.exports = [
       '                      <mo stretchy="false">→</mo>\n' +
       '                    </mover>\n' +
       '                  </mrow>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mi>i</mi>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
       '                <mo fence="false" stretchy="false">⟩</mo>\n' +
       '                <mo fence="false" stretchy="false">⟨</mo>\n' +
       '                <msub>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mover accent="true" accentunder="false">\n' +
       '                      <mrow>\n' +
       '                        <mi>S</mi>\n' +
@@ -3141,7 +3116,7 @@ module.exports = [
       '                      <mo stretchy="false">→</mo>\n' +
       '                    </mover>\n' +
       '                  </mrow>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mi>j</mi>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
@@ -3151,7 +3126,7 @@ module.exports = [
       '                  <mrow>\n' +
       '                    <mo data-mjx-texclass="OP">∑</mo>\n' +
       '                  </mrow>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mi>i</mi>\n' +
       '                  </mrow>\n' +
       '                </munder>\n' +
@@ -3159,7 +3134,7 @@ module.exports = [
       '                  <mo> </mo>\n' +
       '                </mrow>\n' +
       '                <msub>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mover accent="true" accentunder="false">\n' +
       '                      <mrow>\n' +
       '                        <mi>S</mi>\n' +
@@ -3167,7 +3142,7 @@ module.exports = [
       '                      <mo stretchy="false">→</mo>\n' +
       '                    </mover>\n' +
       '                  </mrow>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mi>i</mi>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
@@ -3182,12 +3157,12 @@ module.exports = [
       '                              <mrow>\n' +
       '                                <mo data-mjx-texclass="OP">∑</mo>\n' +
       '                              </mrow>\n' +
-      '                              <mrow>\n' +
+      '                              <mrow data-mjx-texclass="ORD">\n' +
       '                                <mi>j</mi>\n' +
       '                                <mo>=</mo>\n' +
       '                                <mn>1</mn>\n' +
       '                              </mrow>\n' +
-      '                              <mrow>\n' +
+      '                              <mrow data-mjx-texclass="ORD">\n' +
       '                                <mi>z</mi>\n' +
       '                              </mrow>\n' +
       '                            </munderover>\n' +
@@ -3195,17 +3170,17 @@ module.exports = [
       '                              <mo> </mo>\n' +
       '                            </mrow>                        \n' +
       '                            <msub>\n' +
-      '                              <mrow>\n' +
+      '                              <mrow data-mjx-texclass="ORD">\n' +
       '                                <mi data-mjx-variant="-tex-calligraphic" mathvariant="script">J</mi>\n' +
       '                              </mrow>\n' +
-      '                              <mrow>\n' +
+      '                              <mrow data-mjx-texclass="ORD">\n' +
       '                                <mi>i</mi>\n' +
       '                                <mi>j</mi>\n' +
       '                              </mrow>\n' +
       '                            </msub>                        \n' +
       '                            <mo fence="false" stretchy="false">⟨</mo>                        \n' +
       '                            <msub>\n' +
-      '                              <mrow>\n' +
+      '                              <mrow data-mjx-texclass="ORD">\n' +
       '                                <mover accent="true" accentunder="false">\n' +
       '                                  <mrow>\n' +
       '                                    <mi>S</mi>\n' +
@@ -3213,7 +3188,7 @@ module.exports = [
       '                                  <mo stretchy="false">→</mo>\n' +
       '                                </mover>\n' +
       '                              </mrow>\n' +
-      '                              <mrow>\n' +
+      '                              <mrow data-mjx-texclass="ORD">\n' +
       '                                <mi>j</mi>\n' +
       '                              </mrow>\n' +
       '                            </msub>                        \n' +
@@ -3224,22 +3199,22 @@ module.exports = [
       '                      <mo>⏟</mo>\n' +
       '                    </munder>\n' +
       '                  </mrow>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mi>g</mi>\n' +
       '                    <msub>\n' +
       '                      <mi>μ</mi>\n' +
-      '                      <mrow>\n' +
+      '                      <mrow data-mjx-texclass="ORD">\n' +
       '                        <mn>0</mn>\n' +
       '                      </mrow>\n' +
       '                    </msub>\n' +
       '                    <msub>\n' +
       '                      <mi>μ</mi>\n' +
-      '                      <mrow>\n' +
+      '                      <mrow data-mjx-texclass="ORD">\n' +
       '                        <mi>B</mi>\n' +
       '                      </mrow>\n' +
       '                    </msub>\n' +
       '                    <msub>\n' +
-      '                      <mrow>\n' +
+      '                      <mrow data-mjx-texclass="ORD">\n' +
       '                        <mover accent="true" accentunder="false">\n' +
       '                          <mrow>\n' +
       '                            <mi>H</mi>\n' +
@@ -3247,10 +3222,9 @@ module.exports = [
       '                          <mo stretchy="false">→</mo>\n' +
       '                        </mover>\n' +
       '                      </mrow>\n' +
-      '                      <mrow>\n' +
-      '                        <mrow>\n' +
-      '                          <mi mathvariant="normal">M</mi>\n' +
-      '                          <mi mathvariant="normal">F</mi>\n' +
+      '                      <mrow data-mjx-texclass="ORD">\n' +
+      '                        <mrow data-mjx-texclass="ORD">\n' +
+      '                          <mi data-mjx-auto-op="false">MF</mi>\n' +
       '                        </mrow>\n' +
       '                      </mrow>\n' +
       '                    </msub>\n' +
@@ -3289,7 +3263,7 @@ module.exports = [
       '+& \\underbrace { \\left( \\begin{array} { c } 0 \\\\ u _ { 1 } ^ { ( i - 1 ) } \\sin ( x _ { 5 } ^ { ( i - 1 ) } ) x _ { 5 } ^ { ( i - 1 ) } \\\\ 0 \\\\ - u _ { 1 } ^ { ( i - 1 ) } \\cos( x _ { 5 } ^ { ( i - 1 ) } ) x _ { 5 } ^ { ( i - 1 ) } \\\\ 0 \\\\ 0 \\end{array} \\right) } _ { C ^ { ( i ) } }\n' +
       '\\end{aligned}\\]',
     mathmlword: '<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">\n' +
-      '  <mtable displaystyle="true" columnalign="right left right left right left right left right left right left" columnspacing="0em 2em 0em 2em 0em 2em 0em 2em 0em 2em 0em" rowspacing="3pt">\n' +
+      '  <mtable displaystyle="true" columnalign="right left" columnspacing="0em" rowspacing="3pt">\n' +
       '    <mtr>\n' +
       '      <mtd>\n' +
       '        <mrow>\n' +
@@ -3346,10 +3320,10 @@ module.exports = [
       '                                <mrow>\n' +
       '                                  <mi>u</mi>\n' +
       '                                </mrow>\n' +
-      '                                <mrow>\n' +
+      '                                <mrow data-mjx-texclass="ORD">\n' +
       '                                  <mn>1</mn>\n' +
       '                                </mrow>\n' +
-      '                                <mrow>\n' +
+      '                                <mrow data-mjx-texclass="ORD">\n' +
       '                                  <mo stretchy="false">(</mo>\n' +
       '                                  <mi>i</mi>\n' +
       '                                  <mo>−</mo>\n' +
@@ -3364,10 +3338,10 @@ module.exports = [
       '                                <mrow>\n' +
       '                                  <mi>x</mi>\n' +
       '                                </mrow>\n' +
-      '                                <mrow>\n' +
+      '                                <mrow data-mjx-texclass="ORD">\n' +
       '                                  <mn>5</mn>\n' +
       '                                </mrow>\n' +
-      '                                <mrow>\n' +
+      '                                <mrow data-mjx-texclass="ORD">\n' +
       '                                  <mo stretchy="false">(</mo>\n' +
       '                                  <mi>i</mi>\n' +
       '                                  <mo>−</mo>\n' +
@@ -3420,10 +3394,10 @@ module.exports = [
       '                                <mrow>\n' +
       '                                  <mi>u</mi>\n' +
       '                                </mrow>\n' +
-      '                                <mrow>\n' +
+      '                                <mrow data-mjx-texclass="ORD">\n' +
       '                                  <mn>1</mn>\n' +
       '                                </mrow>\n' +
-      '                                <mrow>\n' +
+      '                                <mrow data-mjx-texclass="ORD">\n' +
       '                                  <mo stretchy="false">(</mo>\n' +
       '                                  <mi>i</mi>\n' +
       '                                  <mo>−</mo>\n' +
@@ -3438,10 +3412,10 @@ module.exports = [
       '                                <mrow>\n' +
       '                                  <mi>x</mi>\n' +
       '                                </mrow>\n' +
-      '                                <mrow>\n' +
+      '                                <mrow data-mjx-texclass="ORD">\n' +
       '                                  <mn>5</mn>\n' +
       '                                </mrow>\n' +
-      '                                <mrow>\n' +
+      '                                <mrow data-mjx-texclass="ORD">\n' +
       '                                  <mo stretchy="false">(</mo>\n' +
       '                                  <mi>i</mi>\n' +
       '                                  <mo>−</mo>\n' +
@@ -3502,10 +3476,10 @@ module.exports = [
       '                  <mo>⏟</mo>\n' +
       '                </munder>\n' +
       '              </mrow>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <msup>\n' +
       '                  <mi>A</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mo stretchy="false">(</mo>\n' +
       '                    <mi>i</mi>\n' +
       '                    <mo stretchy="false">)</mo>\n' +
@@ -3515,7 +3489,7 @@ module.exports = [
       '            </munder>\n' +
       '            <msup>\n' +
       '              <mi>x</mi>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mo stretchy="false">(</mo>\n' +
       '                <mi>i</mi>\n' +
       '                <mo stretchy="false">)</mo>\n' +
@@ -3547,7 +3521,7 @@ module.exports = [
       '                                  <mi>x</mi>\n' +
       '                                </mrow>\n' +
       '                                <mn>5</mn>\n' +
-      '                                <mrow>\n' +
+      '                                <mrow data-mjx-texclass="ORD">\n' +
       '                                  <mo stretchy="false">(</mo>\n' +
       '                                  <mi>i</mi>\n' +
       '                                  <mo>−</mo>\n' +
@@ -3578,10 +3552,10 @@ module.exports = [
       '                                <mrow>\n' +
       '                                  <mi>x</mi>\n' +
       '                                </mrow>\n' +
-      '                                <mrow>\n' +
+      '                                <mrow data-mjx-texclass="ORD">\n' +
       '                                  <mn>5</mn>\n' +
       '                                </mrow>\n' +
-      '                                <mrow>\n' +
+      '                                <mrow data-mjx-texclass="ORD">\n' +
       '                                  <mo stretchy="false">(</mo>\n' +
       '                                  <mi>i</mi>\n' +
       '                                  <mo>−</mo>\n' +
@@ -3618,10 +3592,10 @@ module.exports = [
       '                  <mo>⏟</mo>\n' +
       '                </munder>\n' +
       '              </mrow>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <msup>\n' +
       '                  <mi>B</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mo stretchy="false">(</mo>\n' +
       '                    <mi>i</mi>\n' +
       '                    <mo stretchy="false">)</mo>\n' +
@@ -3631,7 +3605,7 @@ module.exports = [
       '            </munder>\n' +
       '            <msup>\n' +
       '              <mi>u</mi>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mo stretchy="false">(</mo>\n' +
       '                <mi>i</mi>\n' +
       '                <mo stretchy="false">)</mo>\n' +
@@ -3668,10 +3642,10 @@ module.exports = [
       '                                <mrow>\n' +
       '                                  <mi>u</mi>\n' +
       '                                </mrow>\n' +
-      '                                <mrow>\n' +
+      '                                <mrow data-mjx-texclass="ORD">\n' +
       '                                  <mn>1</mn>\n' +
       '                                </mrow>\n' +
-      '                                <mrow>\n' +
+      '                                <mrow data-mjx-texclass="ORD">\n' +
       '                                  <mo stretchy="false">(</mo>\n' +
       '                                  <mi>i</mi>\n' +
       '                                  <mo>−</mo>\n' +
@@ -3686,10 +3660,10 @@ module.exports = [
       '                                <mrow>\n' +
       '                                  <mi>x</mi>\n' +
       '                                </mrow>\n' +
-      '                                <mrow>\n' +
+      '                                <mrow data-mjx-texclass="ORD">\n' +
       '                                  <mn>5</mn>\n' +
       '                                </mrow>\n' +
-      '                                <mrow>\n' +
+      '                                <mrow data-mjx-texclass="ORD">\n' +
       '                                  <mo stretchy="false">(</mo>\n' +
       '                                  <mi>i</mi>\n' +
       '                                  <mo>−</mo>\n' +
@@ -3702,10 +3676,10 @@ module.exports = [
       '                                <mrow>\n' +
       '                                  <mi>x</mi>\n' +
       '                                </mrow>\n' +
-      '                                <mrow>\n' +
+      '                                <mrow data-mjx-texclass="ORD">\n' +
       '                                  <mn>5</mn>\n' +
       '                                </mrow>\n' +
-      '                                <mrow>\n' +
+      '                                <mrow data-mjx-texclass="ORD">\n' +
       '                                  <mo stretchy="false">(</mo>\n' +
       '                                  <mi>i</mi>\n' +
       '                                  <mo>−</mo>\n' +
@@ -3727,10 +3701,10 @@ module.exports = [
       '                                <mrow>\n' +
       '                                  <mi>u</mi>\n' +
       '                                </mrow>\n' +
-      '                                <mrow>\n' +
+      '                                <mrow data-mjx-texclass="ORD">\n' +
       '                                  <mn>1</mn>\n' +
       '                                </mrow>\n' +
-      '                                <mrow>\n' +
+      '                                <mrow data-mjx-texclass="ORD">\n' +
       '                                  <mo stretchy="false">(</mo>\n' +
       '                                  <mi>i</mi>\n' +
       '                                  <mo>−</mo>\n' +
@@ -3745,10 +3719,10 @@ module.exports = [
       '                                <mrow>\n' +
       '                                  <mi>x</mi>\n' +
       '                                </mrow>\n' +
-      '                                <mrow>\n' +
+      '                                <mrow data-mjx-texclass="ORD">\n' +
       '                                  <mn>5</mn>\n' +
       '                                </mrow>\n' +
-      '                                <mrow>\n' +
+      '                                <mrow data-mjx-texclass="ORD">\n' +
       '                                  <mo stretchy="false">(</mo>\n' +
       '                                  <mi>i</mi>\n' +
       '                                  <mo>−</mo>\n' +
@@ -3761,10 +3735,10 @@ module.exports = [
       '                                <mrow>\n' +
       '                                  <mi>x</mi>\n' +
       '                                </mrow>\n' +
-      '                                <mrow>\n' +
+      '                                <mrow data-mjx-texclass="ORD">\n' +
       '                                  <mn>5</mn>\n' +
       '                                </mrow>\n' +
-      '                                <mrow>\n' +
+      '                                <mrow data-mjx-texclass="ORD">\n' +
       '                                  <mo stretchy="false">(</mo>\n' +
       '                                  <mi>i</mi>\n' +
       '                                  <mo>−</mo>\n' +
@@ -3791,10 +3765,10 @@ module.exports = [
       '                  <mo>⏟</mo>\n' +
       '                </munder>\n' +
       '              </mrow>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <msup>\n' +
       '                  <mi>C</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mo stretchy="false">(</mo>\n' +
       '                    <mi>i</mi>\n' +
       '                    <mo stretchy="false">)</mo>\n' +
@@ -3813,7 +3787,7 @@ module.exports = [
   {
     latex_input: '\\[ \\begin{aligned} \\frac { 1 } { \\sigma ^ { 2 } } \\sum _ { i , j , k , l } \\Delta _ { i j k l } \\tilde { X } _ { i } \\tilde { X } _ { j } X _ { k } X _ { l } & = \\underbrace { \\left( 1 - \\tau _ { \\text {div } } - \\tau _ { \\text {conv } } \\right) } _ { A } \\sum _ { i } \\tilde { X } _ { i } \\tilde { X } _ { i } \\sum _ { k } X _ { k } X _ { k } \\\\ & + \\underbrace { \\left( \\tau _ { \\text {rec } } - 2 \\tau _ { \\text {chain } } \\right) } _ { B } \\left( \\sum _ { i } \\tilde { X } _ { i } X _ { i } \\right) ^ { 2 } \\\\ & + \\tau _ { \\text {div } } \\left( \\sum _ { i } \\tilde { X } _ { i } \\right) ^ { 2 } \\sum _ { k } X _ { k } X _ { k } \\\\ & + \\tau _ { \\text {conv } } \\sum _ { i } \\tilde { X } _ { i } \\tilde { X } _ { i } \\left( \\sum _ { k } X _ { k } \\right) ^ { 2 } \\\\ & + 2 \\tau _ { \\text {chain } } \\sum _ { i } \\tilde { X } _ { i } X _ { i } \\left( \\sum _ { j } \\tilde { X } _ { j } \\right) \\left( \\sum _ { k } X _ { k } \\right) \\end{aligned} \\]',
     mathmlword: '<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">\n' +
-      '  <mtable displaystyle="true" columnalign="right left right left right left right left right left right left" columnspacing="0em 2em 0em 2em 0em 2em 0em 2em 0em 2em 0em" rowspacing="3pt">\n' +
+      '  <mtable displaystyle="true" columnalign="right left" columnspacing="0em" rowspacing="3pt">\n' +
       '    <mtr>\n' +
       '      <mtd>\n' +
       '        <mrow>\n' +
@@ -3823,7 +3797,7 @@ module.exports = [
       '              <mn>1</mn>\n' +
       '              <msup>\n' +
       '                <mi>σ</mi>\n' +
-      '                <mrow>\n' +
+      '                <mrow data-mjx-texclass="ORD">\n' +
       '                  <mn>2</mn>\n' +
       '                </mrow>\n' +
       '              </msup>\n' +
@@ -3832,7 +3806,7 @@ module.exports = [
       '              <mrow>\n' +
       '                <mo data-mjx-texclass="OP">∑</mo>\n' +
       '              </mrow>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mi>i</mi>\n' +
       '                <mo>,</mo>\n' +
       '                <mi>j</mi>\n' +
@@ -3847,7 +3821,7 @@ module.exports = [
       '            </mrow>\n' +
       '            <msub>\n' +
       '              <mi mathvariant="normal">Δ</mi>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mi>i</mi>\n' +
       '                <mi>j</mi>\n' +
       '                <mi>k</mi>\n' +
@@ -3855,7 +3829,7 @@ module.exports = [
       '              </mrow>\n' +
       '            </msub>\n' +
       '            <msub>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mover accent="true" accentunder="false">\n' +
       '                  <mrow>\n' +
       '                    <mi>X</mi>\n' +
@@ -3863,12 +3837,12 @@ module.exports = [
       '                  <mo stretchy="false">~</mo>\n' +
       '                </mover>\n' +
       '              </mrow>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mi>i</mi>\n' +
       '              </mrow>\n' +
       '            </msub>\n' +
       '            <msub>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mover accent="true" accentunder="false">\n' +
       '                  <mrow>\n' +
       '                    <mi>X</mi>\n' +
@@ -3876,19 +3850,19 @@ module.exports = [
       '                  <mo stretchy="false">~</mo>\n' +
       '                </mover>\n' +
       '              </mrow>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mi>j</mi>\n' +
       '              </mrow>\n' +
       '            </msub>\n' +
       '            <msub>\n' +
       '              <mi>X</mi>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mi>k</mi>\n' +
       '              </mrow>\n' +
       '            </msub>\n' +
       '            <msub>\n' +
       '              <mi>X</mi>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mi>l</mi>\n' +
       '              </mrow>\n' +
       '            </msub>\n' +
@@ -3907,14 +3881,14 @@ module.exports = [
       '                        <mo>−</mo>                    \n' +
       '                        <msub>\n' +
       '                          <mi>τ</mi>\n' +
-      '                          <mrow>\n' +
+      '                          <mrow data-mjx-texclass="ORD">\n' +
       '                            <mtext>div&#xA0;</mtext>\n' +
       '                          </mrow>\n' +
       '                        </msub>                    \n' +
       '                        <mo>−</mo>                    \n' +
       '                        <msub>\n' +
       '                          <mi>τ</mi>\n' +
-      '                          <mrow>\n' +
+      '                          <mrow data-mjx-texclass="ORD">\n' +
       '                            <mtext>conv&#xA0;</mtext>\n' +
       '                          </mrow>\n' +
       '                        </msub>                    \n' +
@@ -3924,7 +3898,7 @@ module.exports = [
       '                  <mo>⏟</mo>\n' +
       '                </munder>\n' +
       '              </mrow>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mi>A</mi>\n' +
       '              </mrow>\n' +
       '            </munder>\n' +
@@ -3932,7 +3906,7 @@ module.exports = [
       '              <mrow>\n' +
       '                <mo data-mjx-texclass="OP">∑</mo>\n' +
       '              </mrow>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mi>i</mi>\n' +
       '              </mrow>\n' +
       '            </munder>\n' +
@@ -3940,7 +3914,7 @@ module.exports = [
       '              <mo> </mo>\n' +
       '            </mrow>\n' +
       '            <msub>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mover accent="true" accentunder="false">\n' +
       '                  <mrow>\n' +
       '                    <mi>X</mi>\n' +
@@ -3948,12 +3922,12 @@ module.exports = [
       '                  <mo stretchy="false">~</mo>\n' +
       '                </mover>\n' +
       '              </mrow>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mi>i</mi>\n' +
       '              </mrow>\n' +
       '            </msub>\n' +
       '            <msub>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mover accent="true" accentunder="false">\n' +
       '                  <mrow>\n' +
       '                    <mi>X</mi>\n' +
@@ -3961,7 +3935,7 @@ module.exports = [
       '                  <mo stretchy="false">~</mo>\n' +
       '                </mover>\n' +
       '              </mrow>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mi>i</mi>\n' +
       '              </mrow>\n' +
       '            </msub>\n' +
@@ -3969,7 +3943,7 @@ module.exports = [
       '              <mrow>\n' +
       '                <mo data-mjx-texclass="OP">∑</mo>\n' +
       '              </mrow>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mi>k</mi>\n' +
       '              </mrow>\n' +
       '            </munder>\n' +
@@ -3978,13 +3952,13 @@ module.exports = [
       '            </mrow>\n' +
       '            <msub>\n' +
       '              <mi>X</mi>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mi>k</mi>\n' +
       '              </mrow>\n' +
       '            </msub>\n' +
       '            <msub>\n' +
       '              <mi>X</mi>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mi>k</mi>\n' +
       '              </mrow>\n' +
       '            </msub>\n' +
@@ -4010,7 +3984,7 @@ module.exports = [
       '                      <mrow>\n' +
       '                        <msub>\n' +
       '                          <mi>τ</mi>\n' +
-      '                          <mrow>\n' +
+      '                          <mrow data-mjx-texclass="ORD">\n' +
       '                            <mtext>rec&#xA0;</mtext>\n' +
       '                          </mrow>\n' +
       '                        </msub>                    \n' +
@@ -4018,7 +3992,7 @@ module.exports = [
       '                        <mn>2</mn>                    \n' +
       '                        <msub>\n' +
       '                          <mi>τ</mi>\n' +
-      '                          <mrow>\n' +
+      '                          <mrow data-mjx-texclass="ORD">\n' +
       '                            <mtext>chain&#xA0;</mtext>\n' +
       '                          </mrow>\n' +
       '                        </msub>                    \n' +
@@ -4028,7 +4002,7 @@ module.exports = [
       '                  <mo>⏟</mo>\n' +
       '                </munder>\n' +
       '              </mrow>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mi>B</mi>\n' +
       '              </mrow>\n' +
       '            </munder>\n' +
@@ -4039,7 +4013,7 @@ module.exports = [
       '                    <mrow>\n' +
       '                      <mo data-mjx-texclass="OP">∑</mo>\n' +
       '                    </mrow>\n' +
-      '                    <mrow>\n' +
+      '                    <mrow data-mjx-texclass="ORD">\n' +
       '                      <mi>i</mi>\n' +
       '                    </mrow>\n' +
       '                  </munder>\n' +
@@ -4047,7 +4021,7 @@ module.exports = [
       '                    <mo> </mo>\n' +
       '                  </mrow>              \n' +
       '                  <msub>\n' +
-      '                    <mrow>\n' +
+      '                    <mrow data-mjx-texclass="ORD">\n' +
       '                      <mover accent="true" accentunder="false">\n' +
       '                        <mrow>\n' +
       '                          <mi>X</mi>\n' +
@@ -4055,19 +4029,19 @@ module.exports = [
       '                        <mo stretchy="false">~</mo>\n' +
       '                      </mover>\n' +
       '                    </mrow>\n' +
-      '                    <mrow>\n' +
+      '                    <mrow data-mjx-texclass="ORD">\n' +
       '                      <mi>i</mi>\n' +
       '                    </mrow>\n' +
       '                  </msub>              \n' +
       '                  <msub>\n' +
       '                    <mi>X</mi>\n' +
-      '                    <mrow>\n' +
+      '                    <mrow data-mjx-texclass="ORD">\n' +
       '                      <mi>i</mi>\n' +
       '                    </mrow>\n' +
       '                  </msub>              \n' +
       '                </mrow>              \n' +
       '              </mfenced>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mn>2</mn>\n' +
       '              </mrow>\n' +
       '            </msup>\n' +
@@ -4087,7 +4061,7 @@ module.exports = [
       '            <mo>+</mo>\n' +
       '            <msub>\n' +
       '              <mi>τ</mi>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mtext>div&#xA0;</mtext>\n' +
       '              </mrow>\n' +
       '            </msub>\n' +
@@ -4098,7 +4072,7 @@ module.exports = [
       '                    <mrow>\n' +
       '                      <mo data-mjx-texclass="OP">∑</mo>\n' +
       '                    </mrow>\n' +
-      '                    <mrow>\n' +
+      '                    <mrow data-mjx-texclass="ORD">\n' +
       '                      <mi>i</mi>\n' +
       '                    </mrow>\n' +
       '                  </munder>\n' +
@@ -4106,7 +4080,7 @@ module.exports = [
       '                    <mo> </mo>\n' +
       '                  </mrow>              \n' +
       '                  <msub>\n' +
-      '                    <mrow>\n' +
+      '                    <mrow data-mjx-texclass="ORD">\n' +
       '                      <mover accent="true" accentunder="false">\n' +
       '                        <mrow>\n' +
       '                          <mi>X</mi>\n' +
@@ -4114,13 +4088,13 @@ module.exports = [
       '                        <mo stretchy="false">~</mo>\n' +
       '                      </mover>\n' +
       '                    </mrow>\n' +
-      '                    <mrow>\n' +
+      '                    <mrow data-mjx-texclass="ORD">\n' +
       '                      <mi>i</mi>\n' +
       '                    </mrow>\n' +
       '                  </msub>              \n' +
       '                </mrow>              \n' +
       '              </mfenced>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mn>2</mn>\n' +
       '              </mrow>\n' +
       '            </msup>\n' +
@@ -4128,7 +4102,7 @@ module.exports = [
       '              <mrow>\n' +
       '                <mo data-mjx-texclass="OP">∑</mo>\n' +
       '              </mrow>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mi>k</mi>\n' +
       '              </mrow>\n' +
       '            </munder>\n' +
@@ -4137,13 +4111,13 @@ module.exports = [
       '            </mrow>\n' +
       '            <msub>\n' +
       '              <mi>X</mi>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mi>k</mi>\n' +
       '              </mrow>\n' +
       '            </msub>\n' +
       '            <msub>\n' +
       '              <mi>X</mi>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mi>k</mi>\n' +
       '              </mrow>\n' +
       '            </msub>\n' +
@@ -4163,7 +4137,7 @@ module.exports = [
       '            <mo>+</mo>\n' +
       '            <msub>\n' +
       '              <mi>τ</mi>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mtext>conv&#xA0;</mtext>\n' +
       '              </mrow>\n' +
       '            </msub>\n' +
@@ -4171,7 +4145,7 @@ module.exports = [
       '              <mrow>\n' +
       '                <mo data-mjx-texclass="OP">∑</mo>\n' +
       '              </mrow>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mi>i</mi>\n' +
       '              </mrow>\n' +
       '            </munder>\n' +
@@ -4179,7 +4153,7 @@ module.exports = [
       '              <mo> </mo>\n' +
       '            </mrow>\n' +
       '            <msub>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mover accent="true" accentunder="false">\n' +
       '                  <mrow>\n' +
       '                    <mi>X</mi>\n' +
@@ -4187,12 +4161,12 @@ module.exports = [
       '                  <mo stretchy="false">~</mo>\n' +
       '                </mover>\n' +
       '              </mrow>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mi>i</mi>\n' +
       '              </mrow>\n' +
       '            </msub>\n' +
       '            <msub>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mover accent="true" accentunder="false">\n' +
       '                  <mrow>\n' +
       '                    <mi>X</mi>\n' +
@@ -4200,7 +4174,7 @@ module.exports = [
       '                  <mo stretchy="false">~</mo>\n' +
       '                </mover>\n' +
       '              </mrow>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mi>i</mi>\n' +
       '              </mrow>\n' +
       '            </msub>\n' +
@@ -4211,7 +4185,7 @@ module.exports = [
       '                    <mrow>\n' +
       '                      <mo data-mjx-texclass="OP">∑</mo>\n' +
       '                    </mrow>\n' +
-      '                    <mrow>\n' +
+      '                    <mrow data-mjx-texclass="ORD">\n' +
       '                      <mi>k</mi>\n' +
       '                    </mrow>\n' +
       '                  </munder>\n' +
@@ -4220,13 +4194,13 @@ module.exports = [
       '                  </mrow>              \n' +
       '                  <msub>\n' +
       '                    <mi>X</mi>\n' +
-      '                    <mrow>\n' +
+      '                    <mrow data-mjx-texclass="ORD">\n' +
       '                      <mi>k</mi>\n' +
       '                    </mrow>\n' +
       '                  </msub>              \n' +
       '                </mrow>              \n' +
       '              </mfenced>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mn>2</mn>\n' +
       '              </mrow>\n' +
       '            </msup>\n' +
@@ -4247,7 +4221,7 @@ module.exports = [
       '            <mn>2</mn>\n' +
       '            <msub>\n' +
       '              <mi>τ</mi>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mtext>chain&#xA0;</mtext>\n' +
       '              </mrow>\n' +
       '            </msub>\n' +
@@ -4255,7 +4229,7 @@ module.exports = [
       '              <mrow>\n' +
       '                <mo data-mjx-texclass="OP">∑</mo>\n' +
       '              </mrow>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mi>i</mi>\n' +
       '              </mrow>\n' +
       '            </munder>\n' +
@@ -4263,7 +4237,7 @@ module.exports = [
       '              <mo> </mo>\n' +
       '            </mrow>\n' +
       '            <msub>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mover accent="true" accentunder="false">\n' +
       '                  <mrow>\n' +
       '                    <mi>X</mi>\n' +
@@ -4271,13 +4245,13 @@ module.exports = [
       '                  <mo stretchy="false">~</mo>\n' +
       '                </mover>\n' +
       '              </mrow>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mi>i</mi>\n' +
       '              </mrow>\n' +
       '            </msub>\n' +
       '            <msub>\n' +
       '              <mi>X</mi>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mi>i</mi>\n' +
       '              </mrow>\n' +
       '            </msub>\n' +
@@ -4287,7 +4261,7 @@ module.exports = [
       '                  <mrow>\n' +
       '                    <mo data-mjx-texclass="OP">∑</mo>\n' +
       '                  </mrow>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mi>j</mi>\n' +
       '                  </mrow>\n' +
       '                </munder>\n' +
@@ -4295,7 +4269,7 @@ module.exports = [
       '                  <mo> </mo>\n' +
       '                </mrow>            \n' +
       '                <msub>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mover accent="true" accentunder="false">\n' +
       '                      <mrow>\n' +
       '                        <mi>X</mi>\n' +
@@ -4303,7 +4277,7 @@ module.exports = [
       '                      <mo stretchy="false">~</mo>\n' +
       '                    </mover>\n' +
       '                  </mrow>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mi>j</mi>\n' +
       '                  </mrow>\n' +
       '                </msub>            \n' +
@@ -4315,7 +4289,7 @@ module.exports = [
       '                  <mrow>\n' +
       '                    <mo data-mjx-texclass="OP">∑</mo>\n' +
       '                  </mrow>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mi>k</mi>\n' +
       '                  </mrow>\n' +
       '                </munder>\n' +
@@ -4324,7 +4298,7 @@ module.exports = [
       '                </mrow>            \n' +
       '                <msub>\n' +
       '                  <mi>X</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mi>k</mi>\n' +
       '                  </mrow>\n' +
       '                </msub>            \n' +
@@ -4350,7 +4324,7 @@ module.exports = [
       '          <mtd>\n' +
       '            <msub>\n' +
       '              <mi>a</mi>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mn>11</mn>\n' +
       '              </mrow>\n' +
       '            </msub>\n' +
@@ -4369,7 +4343,7 @@ module.exports = [
       '          <mtd>\n' +
       '            <msub>\n' +
       '              <mi>a</mi>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mn>22</mn>\n' +
       '              </mrow>\n' +
       '            </msub>\n' +
@@ -4388,7 +4362,7 @@ module.exports = [
       '          <mtd>\n' +
       '            <msub>\n' +
       '              <mi>a</mi>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mn>33</mn>\n' +
       '              </mrow>\n' +
       '            </msub>\n' +
@@ -4405,7 +4379,7 @@ module.exports = [
     mathmlword: '<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">\n' +
       '  <mo stretchy="false">|</mo>\n' +
       '  <mi>x</mi>\n' +
-      '  <mrow>\n' +
+      '  <mrow data-mjx-texclass="ORD">\n' +
       '    <mo stretchy="false">|</mo>\n' +
       '  </mrow>\n' +
       '  <mo>=</mo>\n' +
@@ -4498,7 +4472,7 @@ module.exports = [
       '                <malignmark/>\n' +
       '                <msup>\n' +
       '                  <mi>x</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>2</mn>\n' +
       '                  </mrow>\n' +
       '                </msup>\n' +
@@ -4506,7 +4480,7 @@ module.exports = [
       '                <mn>2</mn>\n' +
       '                <msup>\n' +
       '                  <mi>y</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>2</mn>\n' +
       '                  </mrow>\n' +
       '                </msup>\n' +
@@ -4533,14 +4507,14 @@ module.exports = [
       '                <mn>2</mn>\n' +
       '                <msup>\n' +
       '                  <mi>x</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>2</mn>\n' +
       '                  </mrow>\n' +
       '                </msup>\n' +
       '                <mo>−</mo>\n' +
       '                <msup>\n' +
       '                  <mi>y</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>2</mn>\n' +
       '                  </mrow>\n' +
       '                </msup>\n' +
@@ -4573,7 +4547,7 @@ module.exports = [
       '          <mtd>\n' +
       '            <msup>\n' +
       '              <mi>x</mi>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mn>2</mn>\n' +
       '              </mrow>\n' +
       '            </msup>\n' +
@@ -4720,7 +4694,7 @@ module.exports = [
       '                <mi>y</mi>\n' +
       '                <mo>−</mo>\n' +
       '                <mn>3</mn>\n' +
-      '                <mrow>\n' +
+      '                <mrow data-mjx-texclass="ORD">\n' +
       '                  <mo stretchy="false">|</mo>\n' +
       '                </mrow>\n' +
       '                <mo>,</mo>\n' +
@@ -4740,7 +4714,7 @@ module.exports = [
   {
     latex_input: '\\[ \\begin{aligned} y \\circ x & = (y \\circ x) \\circ e \\curvearrowright (G2) \\\\ & = (y \\circ x) \\circ (y \\circ z) \\curvearrowright (G1) \\\\ & = y \\circ (e \\circ z) \\curvearrowleft (1) \\\\ & = e \\curvearrowleft (2) \\end{aligned} \\]',
     mathmlword: '<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">\n' +
-      '  <mtable displaystyle="true" columnalign="right left right left right left right left right left right left" columnspacing="0em 2em 0em 2em 0em 2em 0em 2em 0em 2em 0em" rowspacing="3pt">\n' +
+      '  <mtable displaystyle="true" columnalign="right left" columnspacing="0em" rowspacing="3pt">\n' +
       '    <mtr>\n' +
       '      <mtd>\n' +
       '        <mrow>\n' +
@@ -4851,7 +4825,7 @@ module.exports = [
   {
     latex_input: '\\[ \\begin{aligned} c ( x , t ) & = \\frac { e ^ { - x ^ { 2 } / 4 D t } } { 2 \\pi \\sqrt { D t } } \\int _ { - \\infty + i x / 2 \\sqrt { D t } } ^ { \\infty + i x / 2 \\sqrt { D t } } e ^ { - s ^ { 2 } } d s \\\\ & = \\frac { e ^ { - x ^ { 2} / 4 D t } } { 2 \\pi \\sqrt { D t } } \\underbrace { \\int _ { - \\infty } ^ { \\infty } e ^ { - s ^ { 2 } } d s } _ { \\sqrt { \\pi } } = \\frac { e ^ { - x ^ { 2} / 4 D t } } { \\sqrt { 4 \\pi D t } } .\\end{aligned} \\]',
     mathmlword: '<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">\n' +
-      '  <mtable displaystyle="true" columnalign="right left right left right left right left right left right left" columnspacing="0em 2em 0em 2em 0em 2em 0em 2em 0em 2em 0em" rowspacing="3pt">\n' +
+      '  <mtable displaystyle="true" columnalign="right left" columnspacing="0em" rowspacing="3pt">\n' +
       '    <mtr>\n' +
       '      <mtd>\n' +
       '        <mrow>\n' +
@@ -4871,15 +4845,15 @@ module.exports = [
       '            <mfrac>\n' +
       '              <msup>\n' +
       '                <mi>e</mi>\n' +
-      '                <mrow>\n' +
+      '                <mrow data-mjx-texclass="ORD">\n' +
       '                  <mo>−</mo>\n' +
       '                  <msup>\n' +
       '                    <mi>x</mi>\n' +
-      '                    <mrow>\n' +
+      '                    <mrow data-mjx-texclass="ORD">\n' +
       '                      <mn>2</mn>\n' +
       '                    </mrow>\n' +
       '                  </msup>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mo>/</mo>\n' +
       '                  </mrow>\n' +
       '                  <mn>4</mn>\n' +
@@ -4900,13 +4874,13 @@ module.exports = [
       '              <mrow>\n' +
       '                <mo data-mjx-texclass="OP">∫</mo>\n' +
       '              </mrow>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mo>−</mo>\n' +
       '                <mi mathvariant="normal">∞</mi>\n' +
       '                <mo>+</mo>\n' +
       '                <mi>i</mi>\n' +
       '                <mi>x</mi>\n' +
-      '                <mrow>\n' +
+      '                <mrow data-mjx-texclass="ORD">\n' +
       '                  <mo>/</mo>\n' +
       '                </mrow>\n' +
       '                <mn>2</mn>\n' +
@@ -4915,12 +4889,12 @@ module.exports = [
       '                  <mi>t</mi>\n' +
       '                </msqrt>\n' +
       '              </mrow>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mi mathvariant="normal">∞</mi>\n' +
       '                <mo>+</mo>\n' +
       '                <mi>i</mi>\n' +
       '                <mi>x</mi>\n' +
-      '                <mrow>\n' +
+      '                <mrow data-mjx-texclass="ORD">\n' +
       '                  <mo>/</mo>\n' +
       '                </mrow>\n' +
       '                <mn>2</mn>\n' +
@@ -4935,11 +4909,11 @@ module.exports = [
       '            </mrow>\n' +
       '            <msup>\n' +
       '              <mi>e</mi>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <mo>−</mo>\n' +
       '                <msup>\n' +
       '                  <mi>s</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>2</mn>\n' +
       '                  </mrow>\n' +
       '                </msup>\n' +
@@ -4964,15 +4938,15 @@ module.exports = [
       '            <mfrac>\n' +
       '              <msup>\n' +
       '                <mi>e</mi>\n' +
-      '                <mrow>\n' +
+      '                <mrow data-mjx-texclass="ORD">\n' +
       '                  <mo>−</mo>\n' +
       '                  <msup>\n' +
       '                    <mi>x</mi>\n' +
-      '                    <mrow>\n' +
+      '                    <mrow data-mjx-texclass="ORD">\n' +
       '                      <mn>2</mn>\n' +
       '                    </mrow>\n' +
       '                  </msup>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mo>/</mo>\n' +
       '                  </mrow>\n' +
       '                  <mn>4</mn>\n' +
@@ -4997,11 +4971,11 @@ module.exports = [
       '                      <mrow>\n' +
       '                        <mo data-mjx-texclass="OP">∫</mo>\n' +
       '                      </mrow>\n' +
-      '                      <mrow>\n' +
+      '                      <mrow data-mjx-texclass="ORD">\n' +
       '                        <mo>−</mo>\n' +
       '                        <mi mathvariant="normal">∞</mi>\n' +
       '                      </mrow>\n' +
-      '                      <mrow>\n' +
+      '                      <mrow data-mjx-texclass="ORD">\n' +
       '                        <mi mathvariant="normal">∞</mi>\n' +
       '                      </mrow>\n' +
       '                    </msubsup>\n' +
@@ -5010,11 +4984,11 @@ module.exports = [
       '                    </mrow>\n' +
       '                    <msup>\n' +
       '                      <mi>e</mi>\n' +
-      '                      <mrow>\n' +
+      '                      <mrow data-mjx-texclass="ORD">\n' +
       '                        <mo>−</mo>\n' +
       '                        <msup>\n' +
       '                          <mi>s</mi>\n' +
-      '                          <mrow>\n' +
+      '                          <mrow data-mjx-texclass="ORD">\n' +
       '                            <mn>2</mn>\n' +
       '                          </mrow>\n' +
       '                        </msup>\n' +
@@ -5026,7 +5000,7 @@ module.exports = [
       '                  <mo>⏟</mo>\n' +
       '                </munder>\n' +
       '              </mrow>\n' +
-      '              <mrow>\n' +
+      '              <mrow data-mjx-texclass="ORD">\n' +
       '                <msqrt>\n' +
       '                  <mi>π</mi>\n' +
       '                </msqrt>\n' +
@@ -5036,15 +5010,15 @@ module.exports = [
       '            <mfrac>\n' +
       '              <msup>\n' +
       '                <mi>e</mi>\n' +
-      '                <mrow>\n' +
+      '                <mrow data-mjx-texclass="ORD">\n' +
       '                  <mo>−</mo>\n' +
       '                  <msup>\n' +
       '                    <mi>x</mi>\n' +
-      '                    <mrow>\n' +
+      '                    <mrow data-mjx-texclass="ORD">\n' +
       '                      <mn>2</mn>\n' +
       '                    </mrow>\n' +
       '                  </msup>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mo>/</mo>\n' +
       '                  </mrow>\n' +
       '                  <mn>4</mn>\n' +
@@ -5253,7 +5227,7 @@ module.exports = [
       '              <mrow>\n' +
       '                <msub>\n' +
       '                  <mi>x</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>1</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
@@ -5264,7 +5238,7 @@ module.exports = [
       '              <mrow>\n' +
       '                <msub>\n' +
       '                  <mi>x</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>2</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
@@ -5275,7 +5249,7 @@ module.exports = [
       '              <mrow>\n' +
       '                <msub>\n' +
       '                  <mi>x</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>3</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
@@ -5297,7 +5271,7 @@ module.exports = [
       '                <malignmark/>\n' +
       '                <msub>\n' +
       '                  <mi>w</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>1</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
@@ -5311,7 +5285,7 @@ module.exports = [
       '                <malignmark/>\n' +
       '                <msub>\n' +
       '                  <mi>w</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>2</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
@@ -5325,7 +5299,7 @@ module.exports = [
       '                <malignmark/>\n' +
       '                <msub>\n' +
       '                  <mi>w</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>3</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
@@ -5346,39 +5320,39 @@ module.exports = [
       '                <malignmark/>\n' +
       '                <msub>\n' +
       '                  <mi>x</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>1</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
       '                <msub>\n' +
       '                  <mi>w</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>1</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
       '                <mo>+</mo>\n' +
       '                <msub>\n' +
       '                  <mi>x</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>2</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
       '                <msub>\n' +
       '                  <mi>w</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>2</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
       '                <mo>+</mo>\n' +
       '                <msub>\n' +
       '                  <mi>x</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>3</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
       '                <msub>\n' +
       '                  <mi>w</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>3</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
@@ -5423,7 +5397,7 @@ module.exports = [
       '              <mrow>\n' +
       '                <msub>\n' +
       '                  <mi>x</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>11</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
@@ -5434,7 +5408,7 @@ module.exports = [
       '              <mrow>\n' +
       '                <msub>\n' +
       '                  <mi>x</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>12</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
@@ -5445,7 +5419,7 @@ module.exports = [
       '              <mrow>\n' +
       '                <msub>\n' +
       '                  <mi>x</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>13</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
@@ -5461,7 +5435,7 @@ module.exports = [
       '              <mrow>\n' +
       '                <msub>\n' +
       '                  <mi>x</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>21</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
@@ -5472,7 +5446,7 @@ module.exports = [
       '              <mrow>\n' +
       '                <msub>\n' +
       '                  <mi>x</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>22</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
@@ -5483,7 +5457,7 @@ module.exports = [
       '              <mrow>\n' +
       '                <msub>\n' +
       '                  <mi>x</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>23</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
@@ -5499,7 +5473,7 @@ module.exports = [
       '              <mrow>\n' +
       '                <msub>\n' +
       '                  <mi>x</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>31</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
@@ -5510,7 +5484,7 @@ module.exports = [
       '              <mrow>\n' +
       '                <msub>\n' +
       '                  <mi>x</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>32</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
@@ -5521,7 +5495,7 @@ module.exports = [
       '              <mrow>\n' +
       '                <msub>\n' +
       '                  <mi>x</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>33</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
@@ -5537,7 +5511,7 @@ module.exports = [
       '              <mrow>\n' +
       '                <msub>\n' +
       '                  <mi>x</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>41</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
@@ -5548,7 +5522,7 @@ module.exports = [
       '              <mrow>\n' +
       '                <msub>\n' +
       '                  <mi>x</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>42</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
@@ -5559,7 +5533,7 @@ module.exports = [
       '              <mrow>\n' +
       '                <msub>\n' +
       '                  <mi>x</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>43</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
@@ -5575,7 +5549,7 @@ module.exports = [
       '              <mrow>\n' +
       '                <msub>\n' +
       '                  <mi>x</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>51</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
@@ -5586,7 +5560,7 @@ module.exports = [
       '              <mrow>\n' +
       '                <msub>\n' +
       '                  <mi>x</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>52</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
@@ -5597,7 +5571,7 @@ module.exports = [
       '              <mrow>\n' +
       '                <msub>\n' +
       '                  <mi>x</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>53</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
@@ -5619,7 +5593,7 @@ module.exports = [
       '                <malignmark/>\n' +
       '                <msub>\n' +
       '                  <mi>w</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>1</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
@@ -5633,7 +5607,7 @@ module.exports = [
       '                <malignmark/>\n' +
       '                <msub>\n' +
       '                  <mi>w</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>2</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
@@ -5647,7 +5621,7 @@ module.exports = [
       '                <malignmark/>\n' +
       '                <msub>\n' +
       '                  <mi>w</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>3</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
@@ -5668,39 +5642,39 @@ module.exports = [
       '                <malignmark/>\n' +
       '                <msub>\n' +
       '                  <mi>x</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>11</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
       '                <msub>\n' +
       '                  <mi>w</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>1</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
       '                <mo>+</mo>\n' +
       '                <msub>\n' +
       '                  <mi>x</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>12</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
       '                <msub>\n' +
       '                  <mi>w</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>2</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
       '                <mo>+</mo>\n' +
       '                <msub>\n' +
       '                  <mi>x</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>13</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
       '                <msub>\n' +
       '                  <mi>w</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>3</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
@@ -5714,39 +5688,39 @@ module.exports = [
       '                <malignmark/>\n' +
       '                <msub>\n' +
       '                  <mi>x</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>21</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
       '                <msub>\n' +
       '                  <mi>w</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>1</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
       '                <mo>+</mo>\n' +
       '                <msub>\n' +
       '                  <mi>x</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>22</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
       '                <msub>\n' +
       '                  <mi>w</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>2</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
       '                <mo>+</mo>\n' +
       '                <msub>\n' +
       '                  <mi>x</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>23</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
       '                <msub>\n' +
       '                  <mi>w</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>3</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
@@ -5760,39 +5734,39 @@ module.exports = [
       '                <malignmark/>\n' +
       '                <msub>\n' +
       '                  <mi>x</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>31</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
       '                <msub>\n' +
       '                  <mi>w</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>1</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
       '                <mo>+</mo>\n' +
       '                <msub>\n' +
       '                  <mi>x</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>32</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
       '                <msub>\n' +
       '                  <mi>w</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>2</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
       '                <mo>+</mo>\n' +
       '                <msub>\n' +
       '                  <mi>x</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>33</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
       '                <msub>\n' +
       '                  <mi>w</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>3</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
@@ -5806,39 +5780,39 @@ module.exports = [
       '                <malignmark/>\n' +
       '                <msub>\n' +
       '                  <mi>x</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>41</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
       '                <msub>\n' +
       '                  <mi>w</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>1</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
       '                <mo>+</mo>\n' +
       '                <msub>\n' +
       '                  <mi>x</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>42</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
       '                <msub>\n' +
       '                  <mi>w</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>2</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
       '                <mo>+</mo>\n' +
       '                <msub>\n' +
       '                  <mi>x</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>43</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
       '                <msub>\n' +
       '                  <mi>w</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>3</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
@@ -5852,39 +5826,39 @@ module.exports = [
       '                <malignmark/>\n' +
       '                <msub>\n' +
       '                  <mi>x</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>51</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
       '                <msub>\n' +
       '                  <mi>w</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>1</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
       '                <mo>+</mo>\n' +
       '                <msub>\n' +
       '                  <mi>x</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>52</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
       '                <msub>\n' +
       '                  <mi>w</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>2</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
       '                <mo>+</mo>\n' +
       '                <msub>\n' +
       '                  <mi>x</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>53</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
       '                <msub>\n' +
       '                  <mi>w</mi>\n' +
-      '                  <mrow>\n' +
+      '                  <mrow data-mjx-texclass="ORD">\n' +
       '                    <mn>3</mn>\n' +
       '                  </mrow>\n' +
       '                </msub>\n' +
