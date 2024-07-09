@@ -130,19 +130,12 @@ export class MathMLVisitorWord<N, T, D> extends SerializedMmlVisitor {
       return this.convertToFenced(node, space)
     }
 
-    if (node.kind === 'mo' && node.Parent?.kind === 'mover') {
-      let stretchy = node.attributes?.attributes?.stretchy;
-      if (stretchy) {
-        let text = node.childNodes[0]?.kind === 'text' && node.childNodes[0].text;
-        if (text === "\u2015") {
-          text = "\u00AF";
-          return space + '<mo>' + text + '</mo>';
-        }
-      }
-    }
-
     if (this.options.forDocx) {
       if (node.kind === 'mo') {
+        let stretchy = node.attributes?.attributes?.stretchy;
+        if (stretchy) {
+          node.attributes.attributes.stretchy = true;
+        }
         if (node.properties && node.properties.hasOwnProperty('movablelimits')
           && node.properties['movesupsub'] === true
           && node.properties['texprimestyle'] === true
@@ -153,6 +146,17 @@ export class MathMLVisitorWord<N, T, D> extends SerializedMmlVisitor {
             node.attributes.attributes.movablelimits = false;
           } else {
             node.attributes.attributes = {movablelimits: false};
+          }
+        }
+      }
+    } else {
+      if (node.kind === 'mo' && node.Parent?.kind === 'mover') {
+        let stretchy = node.attributes?.attributes?.stretchy;
+        if (stretchy) {
+          let text = node.childNodes[0]?.kind === 'text' && node.childNodes[0].text;
+          if (text === "\u2015") {
+            text = "\u00AF";
+            return space + '<mo>' + text + '</mo>';
           }
         }
       }
