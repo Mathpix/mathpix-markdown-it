@@ -67,7 +67,7 @@ export const needFirstSpace = (node) => {
   }
 };
 
-const needLastSpace = (node) => {
+const needLastSpace = (node, isFunction = false) => {
   let haveSpace: boolean = false;
   try {
     if (node.parent.kind === "msubsup") {
@@ -85,8 +85,11 @@ const needLastSpace = (node) => {
       if (next.kind === 'TeXAtom' && next.properties?.texClass === TEXCLASS.OP) {
         return true;
       }
-
-      if(next.kind === 'mi' || next.kind === 'mo') {
+      if (isFunction && next.kind === 'mfrac') {
+        //For a function and a fractional argument, parentheses are added around the argument and this does not require adding a space after the function
+        return false;
+      }
+      if (next.kind === 'mi' || next.kind === 'mo') {
         const text = next.childNodes[0] ? next.childNodes[0].text : '';
         if (next.childNodes[0] && next.childNodes[0].kind === 'text' && next.childNodes[0].text === '\u2061') {
           return true
@@ -1169,7 +1172,7 @@ const mi = () => {
         }
         res = AddToAsciiData(res, [needFirstSpace(node) ? ' ' : '']);
         res = AddToAsciiData(res, [abs]);
-        const hasLastSpace = needLastSpace(node);
+        const hasLastSpace = needLastSpace(node, isFunction);
         node.attributes.setInherited('hasLastSpace', hasLastSpace);
         res = AddToAsciiData(res, [hasLastSpace ? ' ' : '']);
       } else {
