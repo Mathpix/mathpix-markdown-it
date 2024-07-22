@@ -366,6 +366,27 @@ export const MathpixStyle = (setTextAlignJustify: boolean = false, useColors: bo
       display: flex;
       justify-content: center;
    }
+   
+   @supports (-webkit-appearance: none) {
+    mjx-container[jax="SVG"] > svg path {
+      vector-effect: non-scaling-stroke;
+      stroke-width: 0;
+    }
+  }
+
+  @media not all and (-webkit-min-device-pixel-ratio: 0) {
+    mjx-container[jax="SVG"] > svg path {
+      vector-effect: non-scaling-stroke;
+      stroke-width: 0;
+    }
+  }
+  
+  @media screen and (-webkit-min-device-pixel-ratio:0) {
+    mjx-container[jax="SVG"] > svg path {
+      vector-effect: non-scaling-stroke;
+      stroke-width: 0;
+    }
+  }
 `};
 
 export const PreviewStyle = `
