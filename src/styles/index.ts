@@ -113,6 +113,7 @@ export const MathpixStyle = (setTextAlignJustify: boolean = false, useColors: bo
     #preview-content pre, #setText pre {
         border: none;
         padding: 0;
+        margin-top: 0;
         overflow: auto;
         font-size: 85%;
         line-height: 1.45;
@@ -367,21 +368,7 @@ export const MathpixStyle = (setTextAlignJustify: boolean = false, useColors: bo
       justify-content: center;
    }
    
-   @supports (-webkit-appearance: none) {
-    mjx-container[jax="SVG"] > svg path {
-      vector-effect: non-scaling-stroke;
-      stroke-width: 0;
-    }
-  }
-
-  @media not all and (-webkit-min-device-pixel-ratio: 0) {
-    mjx-container[jax="SVG"] > svg path {
-      vector-effect: non-scaling-stroke;
-      stroke-width: 0;
-    }
-  }
-  
-  @media screen and (-webkit-min-device-pixel-ratio:0) {
+  @supports (hanging-punctuation: first) and (font: -apple-system-body) and (-webkit-appearance: none) {
     mjx-container[jax="SVG"] > svg path {
       vector-effect: non-scaling-stroke;
       stroke-width: 0;
