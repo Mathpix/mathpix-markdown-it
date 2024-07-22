@@ -333,7 +333,7 @@ export const MathJax = {
   },
   TexConvert: function(string, options: any={}, throwError = false): IOuterData {
     const {display = true, metric = {}, outMath = {}, mathJax = {}, forDocx={}, accessibility = null, nonumbers = false} = options;
-    const {em = 16, ex = 8, cwidth = 1200, lwidth = 100000, scale = 1} = metric;
+    const {em = 16, ex = 8, cwidth = 1200, lwidth = 100000, scale = 2} = metric;
     const {mtextInheritFont = false} = mathJax;
     this.checkAccessibility(accessibility, nonumbers);
     MJ.mDocTeX.outputJax.options.mtextInheritFont = mtextInheritFont;
