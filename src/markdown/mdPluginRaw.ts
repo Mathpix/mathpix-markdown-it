@@ -256,7 +256,7 @@ const multiMath: RuleInline = (state, silent) => {
   }
 
   if (!endMarker) {
-    return false
+    return false;
   }
 
   endMarkerPos = endMarkerPos !== -1 
