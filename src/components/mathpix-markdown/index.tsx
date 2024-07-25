@@ -1,9 +1,9 @@
 import * as React from 'react';
-import { 
-  MathpixMarkdownModel as MM, 
-  optionsMathpixMarkdown, 
+import {
+  MathpixMarkdownModel as MM,
+  optionsMathpixMarkdown,
   TMarkdownItOptions,
-  ParserErrors
+  ParserErrors, TextDirection
 } from '../../mathpix-markdown-model';
 import { eMmdRuleType } from "../../markdown/common/mmdRules";
 import { getDisableRuleTypes } from "../../markdown/common/mmdRulesToDisable";
@@ -33,7 +33,8 @@ class MathpixMarkdown extends React.Component<MathpixMarkdownProps> {
           footnotes = {},
           copyToClipboard = false,
           renderOptions = null,
-          previewUuid = ""
+          previewUuid = "",
+          textDirection = TextDirection.unset
         } = this.props;
         const disableRules = isDisableFancy ? MM.disableFancyArrayDef : this.props.disableRules || [];
         const disableRuleTypes: eMmdRuleType[] = renderOptions ? getDisableRuleTypes(renderOptions) : [];
@@ -70,7 +71,8 @@ class MathpixMarkdown extends React.Component<MathpixMarkdownProps> {
             footnotes: footnotes,
             copyToClipboard: copyToClipboard,
             renderOptions: renderOptions,
-            previewUuid: previewUuid
+            previewUuid: previewUuid,
+            textDirection: textDirection
         };
 
          MM.setOptions(disableRules, isCheckFormula, showTimeLog);

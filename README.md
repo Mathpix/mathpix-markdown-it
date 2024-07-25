@@ -763,6 +763,7 @@ The `MathpixMarkdown` React element accepts the following props:
 | `footnotes`      | [Footnotes](https://github.com/Mathpix/mathpix-markdown-it#footnotes);*`{}`*              | Sets options to footnotes                                 |
 | `copyToClipboard` | boolean;*`false`*            | Added copy to clipboard button for code chunks. To handle events, import the function addListenerCopyToClipdoardEvents() from "mathpix-markdown-it/lib/copy-to-clipboard";|
 | `renderOptions`  | [RenderOptions](https://github.com/Mathpix/mathpix-markdown-it#renderoptions);*`{}`*   | Sets options to enable render rules                          |
+| `textDirection`  | [TextDirection](https://github.com/Mathpix/mathpix-markdown-it#textdirection);*`{}`*   | Sets options to add the *dir* global attribute is an enumerated attribute that indicates the directionality of the element's text. |
 
 ### optionsMathpixMarkdown
 
@@ -796,6 +797,7 @@ The `MathpixMarkdown` React element accepts the following props:
 | `footnotes`      | [Footnotes](https://github.com/Mathpix/mathpix-markdown-it#footnotes);*`{}`*              | Sets options to footnotes                                 |
 | `copyToClipboard` | boolean;*`false`*            | Added copy to clipboard button for code chunks. To handle events, import the function addListenerCopyToClipdoardEvents() from "mathpix-markdown-it/lib/copy-to-clipboard";|
 | `renderOptions`  | [RenderOptions](https://github.com/Mathpix/mathpix-markdown-it#renderoptions);*`{}`*   | Sets options to enable render rules                             |
+| `textDirection`  | [TextDirection](https://github.com/Mathpix/mathpix-markdown-it#textdirection);*`{}`*   | Sets options to add the **dir** global attribute is an enumerated attribute that indicates the directionality of the element's text. |
 
 ### TOutputMath
 
@@ -884,6 +886,16 @@ The `MathpixMarkdown` React element accepts the following props:
 | `enable_markdown`                 | boolean&nbsp;*`true`*                                                                          | Enable markdown rules. If it is set to `false`, then all markdown rules will be disabled. This also disables the rules for `enable_markdown_mmd_extensions`. |
 | `enable_latex`                    | boolean&nbsp;*`true`*                                                                          | Enable latex rules. If it is set to `false`, then all latex and math rules will be disabled.                                                                 |
 | `enable_markdown_mmd_extensions`  | boolean&nbsp;*`true`*                                                                          | Enable markdown mmd extensions rules: `smiles`, `asciiMath`, `mathML`. If it is set to `false` then these rules will be disabled.                            |
+
+### TextDirection enum
+
+|         |                                         |
+|---------|-----------------------------------------|
+| `ltr`   | which means left to right and is to be used for languages that are written from the left to the right (like English); |
+| `rtl`   | which means right to left and is to be used for languages that are written from the right to the left (like Arabic);  |
+| `auto`  | which lets the user agent decide. It uses a basic algorithm as it parses the characters inside the element until it finds a character with a strong directionality, then applies that directionality to the whole element. |
+| `unset` | Used by default. The **dir** attribute will not be added |
+
 
 ### TAccessibility
 

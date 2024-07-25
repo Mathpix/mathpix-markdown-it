@@ -16,6 +16,7 @@ import { ILabel, getLabelByUuidFromLabelsList } from "./common/labels";
 import { textCollapse } from "./md-inline-rule/text-collapse";
 import { newlineToSpace } from "./md-inline-rule/new-line-to-space";
 import { getStyleFromHighlight } from "./highlight/common";
+import  * as TokenCls from 'markdown-it/lib/token';
 
 export let sectionCount: number = 0;
 export let subCount: number = 0;
@@ -782,9 +783,7 @@ const textAuthor: RuleInline = (state, silent) => {
       let column = columns[i]
         ? columns[i].trim()
         : '';
-
-      const tokenAuthorColumn: Token = {};
-      tokenAuthorColumn.type = 'author_column';
+      const tokenAuthorColumn: Token = new TokenCls('author_column', '', 0);
       tokenAuthorColumn.content = column;
       tokenAuthorColumn.children = [];
 
@@ -797,9 +796,7 @@ const textAuthor: RuleInline = (state, silent) => {
       if (colArr && colArr.length) {
         for ( let j = 0; j < colArr.length; j++ ) {
           let item = colArr[j] ? colArr[j].trim() : '';
-
-          const newToken: Token = {};
-          newToken.type = 'author_item';
+          const newToken: Token = new TokenCls('author_item', '', 0);
           newToken.content = item;
           newToken.offsetLeft = colArr[j].trim()?.length ? getSpacesFromLeft(colArr[j]) : 0;
           posCol = posCol + colArr[j].length;
@@ -1219,44 +1216,26 @@ const getAuthorItemToken = (tokens, index, options, env, slf) => {
 };
 
 const getAuthorColumnToken = (tokens, index, options, env, slf) => {
-  let res = '';
   const token = tokens[index];
-  let attrStyle = options.forDocx
-    ? 'min-width: 30%; max-width: 50%; padding: 0 7px;'
-    : '';
-
+  if (options.forDocx) {
+    token.attrSet("style", "min-width: 30%; max-width: 50%; padding: 0 7px;");
+  }
   const content: string = token.children && token.children.length
     ? slf.renderInline(token.children, options, env)
     : renderInlineContent(token, options, env, slf);
 
-  if (attrStyle) {
-    res += `<p style="${attrStyle}">${content}</p>`
-  } else {
-    res += `<p>${content}</p>`
-  }
-
-  return res;
+  return '<p' + slf.renderAttrs(token) + '>' + content + '</p>';
 };
 
 const renderAuthorToken: Renderer = (tokens, index, options, env, slf) => {
   const token = tokens[index];
-  let divStyle: string = options.forDocx
-    ? token.attrGet('style')
-    : '';
-
+  token.attrSet("class", "author");
   const res: string = token.children && token.children.length
     ? slf.renderInline(token.children, options, env)
     : renderInlineContent(token, options, env, slf);
-
-  if (divStyle) {
-    return `<div class="author" style="${divStyle}">
+  return `<div${slf.renderAttrs(token)}>
           ${res}
         </div>`;
-  } else {
-    return `<div class="author">
-          ${res}
-        </div>`;
-  }
 };
 
 const renderBoldText = (tokens, idx, options, env, slf) => {
