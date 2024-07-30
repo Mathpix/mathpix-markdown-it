@@ -360,16 +360,6 @@ export const MathJax = {
         throw err;
       }
       formatMathJaxError(err, string, 'TexConvert');
-      // if (err.message) {
-      //   console.error(`[TexConvert] ERROR=>(${err.message}) in Latex: ${string}`);
-      //   console.log('ERROR=>', err);
-      //   console.log('[TexConvert] ERROR=>', JSON.stringify({
-      //     message: err.message,
-      //     latex: string
-      //   }, null, 2))
-      // } else {
-      //   console.log('ERROR=>', err);
-      // }
       if (outMath && outMath.include_svg) {
         const node = MJ.docTeX.convert(string, {
           display, em, ex, containerWidth: cwidth, lineWidth: lwidth, scale,
