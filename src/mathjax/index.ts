@@ -9,6 +9,7 @@ import { TAccessibility } from "../mathpix-markdown-model";
 import { formatSource, formatSourceMML } from "../helpers/parse-mmd-element";
 import { Label } from 'mathjax-full/js/input/tex/Tags.js';
 import { IAsciiData } from "./serialized-ascii/common";
+import { formatMathJaxError } from "../helpers/utils";
 
 const MJ = new MathJaxConfigure();
 
@@ -358,7 +359,17 @@ export const MathJax = {
       if (throwError) {
         throw err;
       }
-      console.log('ERROR=>', err);
+      formatMathJaxError(err, string, 'TexConvert');
+      // if (err.message) {
+      //   console.error(`[TexConvert] ERROR=>(${err.message}) in Latex: ${string}`);
+      //   console.log('ERROR=>', err);
+      //   console.log('[TexConvert] ERROR=>', JSON.stringify({
+      //     message: err.message,
+      //     latex: string
+      //   }, null, 2))
+      // } else {
+      //   console.log('ERROR=>', err);
+      // }
       if (outMath && outMath.include_svg) {
         const node = MJ.docTeX.convert(string, {
           display, em, ex, containerWidth: cwidth, lineWidth: lwidth, scale,

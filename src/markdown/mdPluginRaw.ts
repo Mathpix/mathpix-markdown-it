@@ -41,6 +41,7 @@ import {svg_block} from "./md-block-rule/svg_block";
 import {eMmdRuleType} from "./common/mmdRules";
 import {getDisableRuleTypes} from "./common/mmdRulesToDisable";
 import { fenceBlock } from "./md-block-rule/mmd-fence";
+import {formatMathJaxError} from "../helpers/utils";
 const isSpace = require('markdown-it/lib/common/utils').isSpace;
 
 function MathML(state, silent, pos, endMarker = '', type = "inline_mathML") {
@@ -621,7 +622,8 @@ const convertMathToHtml = (state, token, options) => {
       : begin_number.toString() + ',' + number.toString();
     return token;
   } catch (e) {
-    console.error('ERROR MathJax =>', e.message, e);
+    console.error('ERROR [convertMathToHtml] MathJax =>', e.message, e);
+    formatMathJaxError(e, math, 'convertMathToHtml');
     token.error = {
       message: e.message,
       error: e
