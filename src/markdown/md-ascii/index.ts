@@ -1,6 +1,7 @@
 import { RuleInline } from 'markdown-it';
 import { MathJax } from "../../mathjax";
 import { getWidthFromDocument } from '../utils';
+import {formatMathJaxError} from "../../helpers/utils";
 
 export const asciiMath: RuleInline = (state, silent) => {
   const notRenderAsciiMath = state.md.options.mathJax
@@ -115,7 +116,8 @@ export const renderAsciiMath = (tokens, idx, options) => {
       accessibility: options.accessibility
     });
   } catch (e) {
-    console.error('ERROR MathJax =>', e.message, e);
+    console.error('ERROR [renderAsciiMath] MathJax =>', e.message, e);
+    formatMathJaxError(e, math, 'renderAsciiMath');
     if (options.outMath && options.outMath.not_catch_errors) {
       throw ({
         message: e.message,
