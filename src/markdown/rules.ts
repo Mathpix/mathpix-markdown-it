@@ -41,13 +41,15 @@ function injectLineNumbers(tokens, idx, options, env, slf) {
     className += className ? " " : "";
     className += PREVIEW_PARAGRAPH_PREFIX + String(line)
       + ' ' + PREVIEW_LINE_CLASS + ' ' + listLine.join(' ');
+    tokens[idx].attrJoin("class", className);
     tokens[idx].attrJoin("data_line_start", `${String(line)}`);
     tokens[idx].attrJoin("data_line_end", `${String(endLine-1)}`);
     tokens[idx].attrJoin("data_line", `${String([line, endLine])}`);
     tokens[idx].attrJoin("count_line", `${String(endLine-line)}`);
-  }
-  if (className) {
-    tokens[idx].attrJoin("class", className);
+  } else {
+    if (className) {
+      tokens[idx].attrJoin("class", className);
+    }
   }
   return slf.renderToken(tokens, idx, options, env, slf);
 }
@@ -109,13 +111,15 @@ function html_block_injectLineNumbers(tokens, idx, options, env, slf) {
     className += className ? " " : "";
     className += PREVIEW_PARAGRAPH_PREFIX + String(line)
       + ' ' + PREVIEW_LINE_CLASS + ' ' + listLine.join(' ');
+    tokens[idx].attrJoin("class", className);
     tokens[idx].attrJoin("data_line_start", `${String(line)}`);
     tokens[idx].attrJoin("data_line_end", `${String(endLine-1)}`);
     tokens[idx].attrJoin("data_line", `${String([line, endLine])}`);
     tokens[idx].attrJoin("count_line", `${String(endLine-line)}`);
-  }
-  if (className) {
-    tokens[idx].attrJoin("class", className);
+  } else {
+    if (className) {
+      tokens[idx].attrJoin("class", className);
+    }
   }
   var token = tokens[idx];
   return  '<div' + slf.renderAttrs(token) + '>' +

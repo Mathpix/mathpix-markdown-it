@@ -1,7 +1,7 @@
 import {MmlVisitor} from 'mathjax-full/js/core/MmlTree/MmlVisitor.js';
 import {MmlNode, TextNode, XMLNode} from 'mathjax-full/js/core/MmlTree/MmlNode.js';
 
-import { handle } from "./handlers";
+import { handle, needLastSpaceAfterTeXAtom, needFirstSpaceBeforeTeXAtom } from "./handlers";
 import {IAsciiData, AddToAsciiData, getFunctionNameFromAscii} from "./common";
 import { regExpIsFunction } from "./helperA";
 
@@ -131,7 +131,10 @@ export class SerializedAsciiVisitor extends MmlVisitor {
       if (iclose > -1) {
         const mclose: any = node.childNodes[iclose];
         const atr = this.getAttributes(mclose);
-        const isFrame = mclose.attributes.get('isFrame');
+        let isFrame = mclose.attributes.get('isFrame');
+        if (mclose.childNodes[0]?.childNodes[0]?.kind === 'mtable') {
+          isFrame = true;
+        }
         const atrDef = this.getAttributesDefaults(mclose);
         /** \longdiv */
         if ((!atr.notation && atrDef.notation === "longdiv") ||
@@ -251,7 +254,8 @@ export class SerializedAsciiVisitor extends MmlVisitor {
           }
         }
         if (child?.kind === "mfrac" && beforeAscii?.trim()) {
-          if (regExpIsFunction.test(beforeAscii.trim()) || (childBefore?.kind === 'mo' && childBefore?.texClass === -1)) {
+          const isFunction = childBefore.attributes.get('isFunction');
+          if (isFunction || regExpIsFunction.test(beforeAscii.trim()) || (childBefore?.kind === 'mo' && childBefore?.texClass === -1)) {
             res = AddToAsciiData(res, ['(']);
             parenthesisOpen = true;
           }
@@ -282,12 +286,18 @@ export class SerializedAsciiVisitor extends MmlVisitor {
     };
     try {
       let children: IAsciiData = this.childNodeMml(node, space + '  ', '\n');
+      if (needFirstSpaceBeforeTeXAtom(node)) {
+        res = AddToAsciiData(res, [' ']);
+      }
       res = AddToAsciiData(res, [
         children.ascii?.match(/\S/) ? children.ascii : '',
         children.ascii_tsv?.match(/\S/) ? children.ascii_tsv : '',
         children.ascii_csv?.match(/\S/) ? children.ascii_csv : '',
         children.ascii_md?.match(/\S/) ? children.ascii_md : '',
       ]);
+      if (needLastSpaceAfterTeXAtom(node)) {
+        res = AddToAsciiData(res, [' ']);
+      }
       return res;
     } catch (e) {
       console.error('mml => visitTeXAtomNode =>', e);

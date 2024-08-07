@@ -35,7 +35,7 @@ export class MathMLVisitorWord<N, T, D> extends SerializedMmlVisitor {
     let space5 = space4 + '  ';
 
     // [aligned, align*, align]: 'rlrlrlrlrlrl', - Align all in left side
-    if (columnalign === "right left right left right left right left right left right left") {
+    if (columnalign.includes("right left")){
       mml += space + '<mtr>';
       if (node.childNodes.length > 1) {
         mml += nl + space2 + '<mtd>';
@@ -130,6 +130,17 @@ export class MathMLVisitorWord<N, T, D> extends SerializedMmlVisitor {
       return this.convertToFenced(node, space)
     }
 
+    if (node.kind === 'mo' && node.Parent?.kind === 'mover') {
+      let stretchy = node.attributes?.attributes?.stretchy;
+      if (stretchy) {
+        let text = node.childNodes[0]?.kind === 'text' && node.childNodes[0].text;
+        if (text === "\u2015") {
+          text = "\u00AF";
+          return space + '<mo>' + text + '</mo>';
+        }
+      }
+    }
+
     if (this.options.forDocx) {
       if (node.kind === 'mo') {
         if (node.properties && node.properties.hasOwnProperty('movablelimits')
@@ -176,7 +187,18 @@ export class MathMLVisitorWord<N, T, D> extends SerializedMmlVisitor {
 
   public visitMunderoverNode(node: any, space: string) {
     if (node.kind === "munder" || node.kind === "mover") {
-      node.attributes.attributes.accent = true;
+      let neddToAddAccent = true;
+      const over = node.over <= node.childNodes?.length ? node.childNodes[node.over] : null;
+      if (over?.kind === 'mo') {
+        let textNode: any = over.childNodes[0];
+        let stretchy = over.attributes?.attributes?.stretchy;
+        if (stretchy && (textNode.text === "―" || textNode.text === "¯")) {
+          neddToAddAccent = false;
+        }
+      }
+      if (neddToAddAccent) {
+        node.attributes.attributes.accent = true;
+      }
       node.attributes.attributes.accentunder = false;
     }
 
@@ -200,6 +222,14 @@ export class MathMLVisitorWord<N, T, D> extends SerializedMmlVisitor {
   }
 
   protected visitMunderNode(node: MmlMunder, space: string) {
+    const secondChild = node.childNodes[1] ? node.childNodes[1] : null;
+    if (secondChild && secondChild.kind === 'mo'
+      && secondChild.childNodes?.length === 1 && secondChild.childNodes[0].kind === 'text') {
+      let textNode: any = secondChild.childNodes[0];
+      if (textNode.text === "―") {
+        textNode.text = "_";
+      }
+    }
     return this.visitMunderoverNode(node, space);
   }
 

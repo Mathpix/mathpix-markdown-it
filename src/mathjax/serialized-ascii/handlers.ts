@@ -13,13 +13,48 @@ const isLastChild = (node) => {
   return node.parent && node.parent.childNodes && node.parent.childNodes[node.parent.childNodes.length -1] === node
 };
 
-const needFirstSpace = (node) => {
+export const needFirstSpaceBeforeTeXAtom = (node) => {
+  if (isFirstChild(node)) {
+    return false;
+  }
+  if (node.kind === 'TeXAtom' && node.properties?.texClass === TEXCLASS.OP) {
+    const index = node.parent.childNodes.findIndex(item => item === node);
+    const prev = node.parent.childNodes[index-1];
+    if (prev.kind !== 'mi') {
+      return false;
+    }
+    return true;
+  }
+  return false;
+};
+
+export const needLastSpaceAfterTeXAtom = (node) => {
+  if (isLastChild(node)) {
+    return false;
+  }
+  if (node.kind === 'TeXAtom' && node.properties?.texClass === TEXCLASS.OP) {
+    const index = node.parent.childNodes.findIndex(item => item === node);
+    let next = node.parent.childNodes[index+1];
+    if (next.kind !== 'mi' && next.kind !== 'msub') {
+      return false;
+    }
+    return true;
+  }
+  return false;
+};
+
+
+export const needFirstSpace = (node) => {
   try {
     if (isFirstChild(node)) {
       return false
     } else {
       const index = node.parent.childNodes.findIndex(item => item === node);
       const prev = node.parent.childNodes[index-1];
+      const hasLastSpace = prev.attributes.get('hasLastSpace');
+      if (hasLastSpace) {
+        return false;
+      }
       if(prev.kind === 'mi' || prev.kind === 'mo') {
         const text = prev.childNodes[0] ? prev.childNodes[0].text : '';
         return regW.test(text[0])
@@ -32,7 +67,7 @@ const needFirstSpace = (node) => {
   }
 };
 
-const needLastSpace = (node) => {
+const needLastSpace = (node, isFunction = false) => {
   let haveSpace: boolean = false;
   try {
     if (node.parent.kind === "msubsup") {
@@ -47,8 +82,14 @@ const needLastSpace = (node) => {
         next = node.parent.childNodes[index+2];
         haveSpace = true;
       }
-
-      if(next.kind === 'mi' || next.kind === 'mo') {
+      if (next.kind === 'TeXAtom' && next.properties?.texClass === TEXCLASS.OP) {
+        return true;
+      }
+      if (isFunction && next.kind === 'mfrac') {
+        //For a function and a fractional argument, parentheses are added around the argument and this does not require adding a space after the function
+        return false;
+      }
+      if (next.kind === 'mi' || next.kind === 'mo') {
         const text = next.childNodes[0] ? next.childNodes[0].text : '';
         if (next.childNodes[0] && next.childNodes[0].kind === 'text' && next.childNodes[0].text === '\u2061') {
           return true
@@ -270,7 +311,7 @@ const mtable = () => {
     try {
       /** MathJax: <mrow> came from \left...\right
        *   so treat as subexpression (TeX class INNER). */
-      const isSubExpression = node.parent?.texClass === TEXCLASS.INNER;
+      const isSubExpression = node.prevClass=== TEXCLASS.INNER;
       const parentIsMenclose = node.Parent?.kind === 'menclose';
       const countRow = node.childNodes.length;
       const toTsv = serialize.options.tableToTsv && !serialize.options.isSubTable
@@ -1125,9 +1166,15 @@ const mi = () => {
         : null;
       let abs = SymbolToAM(node.kind, value, atr);
       if (abs && abs.length > 1 && regW.test(abs[0])) {
+        const isFunction = regExpIsFunction.test(abs.trim());
+        if (isFunction) {
+          node.Parent.attributes.setInherited('isFunction', isFunction);
+        }
         res = AddToAsciiData(res, [needFirstSpace(node) ? ' ' : '']);
         res = AddToAsciiData(res, [abs]);
-        res = AddToAsciiData(res, [needLastSpace(node) ? ' ' : '']);
+        const hasLastSpace = needLastSpace(node, isFunction);
+        node.attributes.setInherited('hasLastSpace', hasLastSpace);
+        res = AddToAsciiData(res, [hasLastSpace ? ' ' : '']);
       } else {
         res = AddToAsciiData(res, [abs]);
       }
@@ -1162,9 +1209,14 @@ const mo = () => {
       if (abs && abs.length > 1) {
         res = AddToAsciiData(res, [regW.test(abs[0]) && needFirstSpace(node) ? ' ' : '']);
         res = AddToAsciiData(res, [abs]);
-        res = AddToAsciiData(res, [regW.test(abs[abs.length-1]) && needLastSpace(node) ? ' ' : '']);
+        const hasLastSpace = regW.test(abs[abs.length-1]) && needLastSpace(node);
+        node.attributes.setInherited('hasLastSpace', hasLastSpace);
+        res = AddToAsciiData(res, [hasLastSpace ? ' ' : '']);
       } else {
-        if (abs === ',' && node.Parent.kind === 'mtd') {
+        if (abs === "―" && node.Parent.kind === "munder") {
+          abs = "_";
+        }
+        if (abs === ',' && (node.Parent.kind === 'mtd' || (node.Parent.kind === 'TeXAtom' && node.Parent.Parent.kind === 'mtd'))) {
           /** For tsv/csv:
            * Omit the " in nested arrays */
           res = AddToAsciiData(res, [
@@ -1216,13 +1268,21 @@ const mspace = (handlerApi) => {
       if (atr && atr.width === "2em") {
         res = AddToAsciiData(res, [node.parent.parent && needFirstSpace(node.parent.parent) ? ' ' : '']);
         res = AddToAsciiData(res, ['qquad']);
-        res = AddToAsciiData(res, [node.parent.parent && needLastSpace(node.parent.parent) ? ' ' : '']);
+        if (node.parent?.parent) {
+          const hasLastSpace = needLastSpace(node.parent.parent);
+          node.parent.parent.attributes.setInherited('hasLastSpace', hasLastSpace);
+          res = AddToAsciiData(res, [hasLastSpace ? ' ' : '']);
+        }
         return res;
       }
       if (atr && atr.width === "1em") {
         res = AddToAsciiData(res, [node.parent.parent && needFirstSpace(node.parent.parent) ? ' ' : '']);
         res = AddToAsciiData(res, ['quad']);
-        res = AddToAsciiData(res, [node.parent.parent && needLastSpace(node.parent.parent) ? ' ' : '']);
+        if (node.parent?.parent) {
+          const hasLastSpace = needLastSpace(node.parent.parent);
+          node.parent.parent.attributes.setInherited('hasLastSpace', hasLastSpace);
+          res = AddToAsciiData(res, [hasLastSpace ? ' ' : '']);
+        }
         return res;
       }
       const data: IAsciiData = handlerApi.handleAll(node, serialize);
