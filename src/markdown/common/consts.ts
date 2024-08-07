@@ -103,6 +103,8 @@ export const mathEnvironments = [
   "Bmatrix",
   "bmatrix",
   "cases",
+  "numcases",
+  "subnumcases",
   "eqnarray",
   "eqnarray*",
   "equation",

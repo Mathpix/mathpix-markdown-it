@@ -68,6 +68,7 @@ export declare const allowedAttributes: {
     th: string[];
     thead: string[];
     tr: string[];
+    u: any[];
     ul: string[];
     var: any[];
 };
@@ -129,6 +130,7 @@ export declare const generateAllowedTagsAndAttrs: (addHtmlTags?: boolean) => {
         th: string[];
         thead: string[];
         tr: string[];
+        u: any[];
         ul: string[];
         var: any[];
     };
