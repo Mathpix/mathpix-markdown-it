@@ -536,13 +536,15 @@ const convertMathToHtml = (state, token, options) => {
     }
 
     if (token.type === 'display_mathML' || token.type === 'inline_mathML') {
-      token.mathEquation = MathJax.TypesetMathML(math, {
+      const data = MathJax.TypesetMathML(math, {
         display: true,
         metric: {cwidth: cwidth},
         outMath: options.outMath,
         accessibility: options.accessibility,
         renderingErrors: options.renderingErrors
       });
+      token.mathEquation = data.html;
+      token.mathData = data.data;
     } else {
       if (token.return_asciimath) {
         MathJax.Reset(begin_number);
@@ -634,10 +636,12 @@ const convertMathToHtml = (state, token, options) => {
 
 const renderMath = (a, token, options) => {
   const mathEquation = token.mathEquation;
+  const width = token?.mathData?.width;
+  const dataAttr = width === 'full' ? ' data-width="full"' : '';
   if (token.mathData?.error && options.parserErrors !== ParserErrors.show) {
     let html: string = token.type === "inline_math" || token.type === "inline_mathML"
       ? `<span class="math-inline">`
-      : `<span class="math-block">`;
+      : `<span class="math-block"${dataAttr}>`;
     if (options.parserErrors === ParserErrors.show_input) {
       html += token.inputLatex;
     }
@@ -647,16 +651,16 @@ const renderMath = (a, token, options) => {
   const idLabels = token.idLabels;
   if (token.type === "equation_math") {
     return idLabels 
-      ? `<span id="${idLabels}" class="math-block equation-number id=${idLabels}" number="${attrNumber}">${mathEquation}</span>`
-      : `<span  class="math-block equation-number " number="${attrNumber}">${mathEquation}</span>`
+      ? `<span id="${idLabels}" class="math-block equation-number id=${idLabels}" number="${attrNumber}"${dataAttr}>${mathEquation}</span>`
+      : `<span  class="math-block equation-number " number="${attrNumber}"${dataAttr}>${mathEquation}</span>`
   } else {
     return token.type === "inline_math" || token.type === "inline_mathML"
       ? idLabels
         ? `<span id="${idLabels}" class="math-inline id=${idLabels}">${mathEquation}</span>`
         : `<span class="math-inline ${idLabels}">${mathEquation}</span>`
       : idLabels
-        ? `<span id="${idLabels}" class="math-block id=${idLabels}">${mathEquation}</span>`
-        : `<span class="math-block ${idLabels}">${mathEquation}</span>`;
+        ? `<span id="${idLabels}" class="math-block id=${idLabels}"${dataAttr}>${mathEquation}</span>`
+        : `<span class="math-block ${idLabels}"${dataAttr}>${mathEquation}</span>`;
   }
 };
 

@@ -15,6 +15,7 @@ export interface IOuterData {
     };
     height?: number;
     heightAndDepth?: number;
+    width?: string;
 }
 export declare const OuterHTML: (data: any, outMath: any) => string;
 export declare const MathJax: {
@@ -54,6 +55,7 @@ export declare const MathJax: {
             };
             height?: number;
             heightAndDepth?: number;
+            width?: string;
         };
     };
     TypesetSvgAndAscii: (string: any, options?: any) => {
@@ -80,6 +82,7 @@ export declare const MathJax: {
             };
             height?: number;
             heightAndDepth?: number;
+            width?: string;
         };
     };
     /**
@@ -88,7 +91,18 @@ export declare const MathJax: {
      * @param string {string}
      * @param options {}
      */
-    TypesetMathML: (string: any, options?: any) => string;
+    TypesetMathML: (string: any, options?: any) => {
+        html: string;
+        data: {
+            mathml?: string;
+            mathml_word?: string;
+            asciimath?: string;
+            latex?: string;
+            svg?: string;
+            speech?: string;
+            width?: string;
+        };
+    };
     AsciiMathToSvg: (string: any, options?: any) => string;
     Reset: (n?: number) => void;
     GetLastEquationNumber: () => any;
