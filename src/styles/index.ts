@@ -110,8 +110,6 @@ export const MathpixStyle = (setTextAlignJustify: boolean = false, useColors: bo
         color: red;
     }
 
-    // ${scaleEquation ? '#preview-content svg, #setText svg { min-width: initial !important;}' : ''}
-
     #preview-content img, #setText img {
         max-width: 100%;
     }
