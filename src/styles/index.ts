@@ -77,6 +77,7 @@ export const MathpixStyle = (setTextAlignJustify: boolean = false, useColors: bo
         page-break-inside: avoid;
         margin-top: 1em;
         margin-bottom: 1em;
+        display: block;
     }
     
     .math-block[data-width="full"] {
