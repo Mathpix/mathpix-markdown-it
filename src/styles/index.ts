@@ -61,15 +61,14 @@ export const MathpixStyle = (setTextAlignJustify: boolean = false, useColors: bo
         display: inline-block !important;
         page-break-inside: avoid;
         max-width: 100%;
+        padding: 0;
+        line-height: 0;
     }
     .math-inline mjx-container mjx-assistive-mml {
       max-width: 100%;
     }
     mjx-container {
       overflow-x: auto;
-    }
-    .math-inline {
-      vertical-align: middle;
     }
     .math-block {
         align-items: center;
