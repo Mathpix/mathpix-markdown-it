@@ -223,7 +223,7 @@ function sanitizeHtml(html, options, _recursing) {
       }
       let parentFrame = stack.length ?  stack[stack.length - 1]?.frame : null;
       //Allow all tags inside metadata for svg
-      const allowChildTags = (parentFrame?.tag === 'svg' && name === 'metadata') || parentFrame?.allowChildTags;
+      const allowChildTags = (parentFrame?.tag === 'svg' && (name === 'metadata' || name === 'mjx-container')) || parentFrame?.allowChildTags;
       const isVulnerableTag = vulnerableTags?.indexOf(name) !== -1
       if (allowChildTags && !isVulnerableTag) {
         if (options.allowedTags && options.allowedTags.indexOf(name) === -1) {

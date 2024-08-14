@@ -28,6 +28,7 @@ export interface IOuterData {
   },
   height?: number,
   heightAndDepth?: number,
+  width?: string;
 }
 
 const toMathML = (node => {
@@ -65,6 +66,23 @@ const applySpeechToNode = (adaptor, node, sre): string => {
   return speech;
 };
 
+const getWidthFromNode = (node): string => {
+  try {
+    if (node instanceof LiteElement) {
+      return node?.attributes?.hasOwnProperty('width')
+        ? node.attributes['width']
+        : '';
+    }
+    if (node instanceof HTMLElement) {
+      return node?.hasAttribute('width')
+        ?  node?.getAttribute('width')
+        : '';
+    }
+    return '';
+  } catch (e) {
+   return '';
+  }
+}
 const OuterData = (adaptor, node, math, outMath, forDocx = false, accessibility?): IOuterData => {
   const {
     include_mathml = false,
@@ -111,6 +129,7 @@ const OuterData = (adaptor, node, math, outMath, forDocx = false, accessibility?
     res.svg = adaptor.outerHTML(node);
     if (node) {
       if (node instanceof LiteElement) {
+        let width: string = getWidthFromNode(node);
         let svgElement: LiteElement = node.children?.length
             ? node.children.find((item: LiteElement) => item.kind === 'svg') as LiteElement
             : null;
@@ -120,8 +139,10 @@ const OuterData = (adaptor, node, math, outMath, forDocx = false, accessibility?
         let heightAndDepth = viewBoxArr?.length > 3 ? Math.abs(viewBoxArr[3])/1000 : 0;
         res.height = height;
         res.heightAndDepth = heightAndDepth;
+        res.width = width;
       } else {
         if (node instanceof HTMLElement) {
+          let width: string = getWidthFromNode(node);
           let svgElements = node.getElementsByTagName('svg');
           let svgElement = svgElements ? svgElements[0]: null;
           let viewBox = svgElement ? svgElement.getAttribute('viewBox') : '';
@@ -130,6 +151,7 @@ const OuterData = (adaptor, node, math, outMath, forDocx = false, accessibility?
           let heightAndDepth = viewBoxArr?.length > 3 ? Math.abs(Number(viewBoxArr[3]))/1000 : 0;
           res.height = height;
           res.heightAndDepth = heightAndDepth;
+          res.width = width;
         }
       }
     }
@@ -229,7 +251,8 @@ const OuterDataMathMl = (adaptor, node, math, outMath, forDocx = false, accessib
     asciimath?: string,
     latex?: string,
     svg?: string,
-    speech?: string
+    speech?: string,
+    width?: string
   } = {};
 
   if (accessibility && accessibility.sre) {
@@ -253,7 +276,8 @@ const OuterDataMathMl = (adaptor, node, math, outMath, forDocx = false, accessib
   }
 
   if (include_svg) {
-    res.svg = adaptor.outerHTML(node)
+    res.svg = adaptor.outerHTML(node);
+    res.width = getWidthFromNode(node);
   }
 
   return res;
@@ -438,7 +462,10 @@ export const MathJax = {
     const node = MJ.docMathML.convert(string, {display: display, em: em, ex: ex, containerWidth: cwidth, lineWidth: lwidth, scale: scale});
     const outputJax = MJ.docMathML.outputJax as any;
     const outerDataMathMl = OuterDataMathMl(MJ.adaptor, node, outputJax.math, outMath, forDocx, accessibility);
-    return OuterHTML(outerDataMathMl, options.outMath);
+    return {
+      html: OuterHTML(outerDataMathMl, options.outMath),
+      data: {...outerDataMathMl}
+    };
   },
 
   AsciiMathToSvg: function(string, options: any={}) {

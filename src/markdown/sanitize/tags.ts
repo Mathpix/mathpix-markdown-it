@@ -25,6 +25,7 @@ export const svgTags = [
   'lineargradient',
   'marker',
   'mask',
+  'mjx-container',
   'metadata',
   'mpath',
   'path',

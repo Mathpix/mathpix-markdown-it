@@ -92,6 +92,8 @@ export const renderMathHighlight = (tokens, idx, options, env, slf) => {
   const mathEquation = token.hasOwnProperty('mathData')
     ? OuterHTML(token.mathData, options.outMath)
     : token.mathEquation;
+  const width = token?.mathData?.width;
+  const dataWidthAttr = width === 'full' ? ' data-width="full"' : '';
   const attrNumber = token.attrNumber;
   const idLabels = token.idLabels;
   let html = '';
@@ -153,16 +155,16 @@ export const renderMathHighlight = (tokens, idx, options, env, slf) => {
   }
   if (token.type === "equation_math") {
     html = idLabels
-      ? `<span id="${idLabels}" class="math-block equation-number id=${idLabels}" number="${attrNumber}"${dataAttrs}>${mathEquation}</span>`
-      : `<span  class="math-block equation-number " number="${attrNumber}"${dataAttrs}>${mathEquation}</span>`
+      ? `<span id="${idLabels}" class="math-block equation-number id=${idLabels}" number="${attrNumber}"${dataAttrs}${dataWidthAttr}>${mathEquation}</span>`
+      : `<span  class="math-block equation-number " number="${attrNumber}"${dataAttrs}${dataWidthAttr}>${mathEquation}</span>`
   } else {
     html = token.type === "inline_math" || token.type === "inline_mathML"
       ? idLabels
         ? `<span id="${idLabels}" class="math-inline id=${idLabels}"${dataAttrs}>${mathEquation}</span>`
         : `<span class="math-inline ${idLabels}"${dataAttrs}>${mathEquation}</span>`
       : idLabels
-        ? `<span id="${idLabels}" class="math-block id=${idLabels}"${dataAttrs}>${mathEquation}</span>`
-        : `<span class="math-block ${idLabels}"${dataAttrs}>${mathEquation}</span>`;
+        ? `<span id="${idLabels}" class="math-block id=${idLabels}"${dataAttrs}${dataWidthAttr}>${mathEquation}</span>`
+        : `<span class="math-block ${idLabels}"${dataAttrs}${dataWidthAttr}>${mathEquation}</span>`;
   }
   return html;
 };
