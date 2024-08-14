@@ -44,6 +44,7 @@ export declare const allowedAttributes: {
     figcaption: any[];
     kbd: any[];
     li: string[];
+    'mjx-container': string[];
     meta: string[];
     nl: any[];
     ol: string[];
@@ -106,6 +107,7 @@ export declare const generateAllowedTagsAndAttrs: (addHtmlTags?: boolean) => {
         figcaption: any[];
         kbd: any[];
         li: string[];
+        'mjx-container': string[];
         meta: string[];
         nl: any[];
         ol: string[];

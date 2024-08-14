@@ -23,7 +23,7 @@ export const allowedTags = [
  **/
 
 export const allowedAttributes =  {
-  '*':        ['accesskey', 'class', 'contenteditable', 'contextmenu', 'dir',
+  '*':        ['accesskey', 'class', 'contenteditable', 'contextmenu', 'dir', 'display',
                'hidden', 'id', 'lang', 'spellcheck', 'style', 'tabindex', 'title'],
   a:          ['href', 'name', 'target', 'aria-hidden', 'rel'],
   abbr:       ['title'],
@@ -55,6 +55,7 @@ export const allowedAttributes =  {
   figcaption: [],
   kbd:        [],
   li:         ['type', 'value'],
+  'mjx-container': ['jax'],
   meta:       ['name', 'content'],
   nl:         [],
   ol:         ['type', 'reversed', 'start'],
