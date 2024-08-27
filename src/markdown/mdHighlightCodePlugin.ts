@@ -72,6 +72,7 @@ const wrapFence = render => (tokens, idx, options, env, slf) => {
       } else {
         html = html.replace('<pre>', '<pre' + slf.renderAttrs(tokens[idx]) + '>')
       }
+      return html;
     }
   }
   if (options.copyToClipboard || options.previewUuid) {
