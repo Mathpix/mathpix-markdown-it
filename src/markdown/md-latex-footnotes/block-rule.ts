@@ -1,4 +1,4 @@
-import { Token, RuleBlock } from 'markdown-it';
+import { Token, RuleBlock, Ruler } from 'markdown-it';
 import { 
   reOpenTagFootnote,
   reOpenTagFootnoteG,
@@ -10,6 +10,27 @@ import {
 import { findEndMarker } from "../common";
 import { findOpenCloseTags } from "../utils";
 import * as fence from 'markdown-it/lib/rules_block/fence.js'
+
+const getTerminatorRulesForFootnotes = (ruler: Ruler) => {
+  const rules = ruler.__rules__;
+  let arr: string[] = [
+    "table", "smilesDrawerBlock", "collapsible", "fence", "blockquote", "hr",
+    "list", "footnote_def", "heading", "svg_block", "html_block", "pageBreaksBlock", "deflist",
+    "BeginTable", "BeginAlign", "BeginTabular", "BeginProof",
+    "BeginTheorem", "headingSection", "mathMLBlock", "pageBreaksBlock",
+    "abstractBlock"
+  ];
+  let res = [];
+  if (rules?.length) {
+    for (let i = 0; i < rules.length; i++) {
+      let rule = rules[i];
+      if (rule.enabled && arr.includes(rule.name)) {
+        res.push(rule.fn);
+      }
+    }
+  }
+  return res;
+}
 
 export const latex_footnote_block: RuleBlock = (state, startLine, endLine, silent) => {
   try {
@@ -194,13 +215,19 @@ export const latex_footnotetext_block: RuleBlock = (state, startLine, endLine, s
     let hasOpenTag = false;
     let pending = '';
     let terminate = false;
+    const terminatorRules = getTerminatorRulesForFootnotes(state.md.block.ruler);
     if (!reOpenTagFootnotetextG.test(lineText)) {
       // jump line-by-line until empty one or EOF
       for (; nextLine < endLine; nextLine++) {
-        if (fence(state, nextLine, endLine, true)) {
-          terminate = true;
+        for (let i = 0; i < terminatorRules.length; i++) {
+          if (terminatorRules[i](state, nextLine, endLine, true)) {
+            terminate = true;
+            break;
+          }
         }
-        if (terminate) { break; }
+        if (terminate) {
+          break;
+        }
         if (state.isEmpty(nextLine)) {
           break
         }
@@ -247,16 +274,26 @@ export const latex_footnotetext_block: RuleBlock = (state, startLine, endLine, s
     let inlineContentAfter = '';
     let openBrackets = 0;
     let contentLength = content.length;
+    let terminatedLine: number = -1;
+
     for (; nextLine <= endLine; nextLine++) {
-      if (fence(state, nextLine, endLine, true)) {
-        terminate = true;
-      }
-      if (terminate) { break; }
       pos = state.bMarks[nextLine];
       max = state.eMarks[nextLine];
       lineText = state.src.slice(pos, max);
       if (hasEnd) {
+        for (let i = 0; i < terminatorRules.length; i++) {
+          if (terminatorRules[i](state, nextLine, endLine, true)) {
+            terminatedLine = nextLine;
+            terminate = true;
+            break;
+          }
+        }
+        if (terminate) {
+          break;
+        }
+
         if (!lineText || !lineText.trim()) {
+          terminatedLine = nextLine;
           break;
         }
         if (!inlineContentAfter?.length) {
@@ -308,11 +345,12 @@ export const latex_footnotetext_block: RuleBlock = (state, startLine, endLine, s
     if (silent) {
       return true;
     }
-    state.line = nextLine + 1;
-    let inlineContentBefore = startFootnote > 0 
-      ? state.src.slice(startPos, startPos + startFootnote) 
-      : '';
-    let needToCreateParagraph = (inlineContentBefore?.length && inlineContentBefore?.trim()?.length) 
+
+    state.line = terminatedLine !== -1
+      ? nextLine
+      : nextLine + 1;
+    let inlineContentBefore = startFootnote > 0 ? state.src.slice(startPos, startPos + startFootnote) : '';
+    let needToCreateParagraph = (inlineContentBefore?.length && inlineContentBefore?.trim()?.length)
       || (inlineContentAfter?.length && inlineContentAfter?.trim()?.length);
     if (needToCreateParagraph) {
       token = state.push('paragraph_open', 'div', 1);

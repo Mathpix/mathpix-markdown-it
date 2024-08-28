@@ -76,9 +76,19 @@ export const MathpixStyle = (setTextAlignJustify: boolean = false, useColors: bo
         display: block; /* mjx-container has block */
     }
     
+    .math-inline {
+      display: inline-flex; /* mjx-container has inline-block. To prevent displacement during use overflow-x: auto;*/
+      max-width: 100%;
+    }
+    
     .math-block[data-width="full"] {
       overflow-x: auto;
       display: flex; /* mjx-container has flex */
+    }
+    
+    svg .math-inline {
+      display: initial;
+      max-width: initial;
     }
     
     svg .math-inline mjx-container {
