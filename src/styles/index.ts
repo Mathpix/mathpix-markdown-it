@@ -48,6 +48,8 @@ export const MathpixStyle = (setTextAlignJustify: boolean = false, useColors: bo
 
     mjx-container {
       text-indent: 0;
+      overflow-y: hidden;
+      overflow-x: auto;
       padding-top: 1px;
       padding-bottom: 1px;
       ${maxWidth ? 'max-width:' + maxWidth + ';' : ''}
@@ -59,7 +61,7 @@ export const MathpixStyle = (setTextAlignJustify: boolean = false, useColors: bo
     .math-inline mjx-container {
         display: inline-block !important;
         page-break-inside: avoid;
-        overflow: visible;
+        max-width: 100%;
         padding: 0;
         line-height: 0;
     }
@@ -73,20 +75,27 @@ export const MathpixStyle = (setTextAlignJustify: boolean = false, useColors: bo
         margin: 0;
         display: block; /* mjx-container has block */
     }
-    .math-block mjx-container {
-      overflow-y: hidden;
-      overflow-x: auto;
+    
+    .math-inline {
+      display: inline-flex; /* mjx-container has inline-block. To prevent displacement during use overflow-x: auto;*/
+      max-width: 100%;
     }
+    
     .math-block[data-width="full"] {
       overflow-x: auto;
       display: flex; /* mjx-container has flex */
+    }
+    
+    svg .math-inline {
+      display: initial;
+      max-width: initial;
     }
     
     svg .math-inline mjx-container {
       max-width: initial;
     }
     
-    svg mjx-container, svg .math-block mjx-container {
+    svg mjx-container {
       overflow: visible;
     }
     
