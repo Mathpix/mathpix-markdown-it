@@ -86,7 +86,7 @@ export const MathpixStyle = (setTextAlignJustify: boolean = false, useColors: bo
       max-width: initial;
     }
     
-    svg mjx-container {
+    svg mjx-container, svg .math-block mjx-container {
       overflow: visible;
     }
     
