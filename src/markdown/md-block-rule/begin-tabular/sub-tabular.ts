@@ -55,8 +55,7 @@ export const getSubTabular = (sub: string, i: number, isCell: boolean = true, fo
   let res: Array<TTokenTabular> = [];
   let lastIndex: number = 0;
   sub = sub.trim();
-  if (isCell) {sub = getContent(sub, true)}
-
+  if (isCell) {sub = getContent(sub)}
   const index: number = subTabular.findIndex(item => item.id === sub);
   if (index >= 0 && subTabular[index].parsed?.length) {
     res = res.concat(subTabular[index].parsed);
