@@ -1,4 +1,4 @@
-import { HTML_SEQUENCES } from "../common/html-re";
+import {HTML_SEQUENCES, selfClosingTags} from "../common/html-re";
 
 export const mmdHtmlBlock = (state, startLine, endLine, silent) => {
   var i, nextLine, token, lineText,
@@ -38,7 +38,8 @@ export const mmdHtmlBlock = (state, startLine, endLine, silent) => {
     return false;
   }
   nextLine = startLine + 1;
-  if (match?.length > 2 && (match[2] === '/>' || match[2] === "/")) {
+  if ((match?.length > 2 && (match[2] === '/>' || match[2] === "/"))
+    || selfClosingTags.includes(match[1])) {
     if (silent) {
       // true if this sequence can be a terminator, false otherwise
       return HTML_SEQUENCES[i][2];

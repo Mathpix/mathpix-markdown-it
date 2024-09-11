@@ -10,8 +10,11 @@ export const mmdHtmlInline2 = (state) => {
 
   // Helper function to hide soft breaks before a token
   const hideSoftBreakBefore = (tokens, index) => {
-    if (index > 0 && tokens[index - 1].type === 'softbreak') {
+    const tokenBefore = index > 0 ? tokens[index - 1] : null;
+    const tokenBefore2 = index > 1 ? tokens[index - 2] : null;
+    if (tokenBefore?.type === 'softbreak' && tokenBefore2?.type === 'html_inline') {
       tokens[index - 1].hidden = true;
+      tokens[index - 1].showLineBreak = true;
     }
   };
 
@@ -50,6 +53,7 @@ export const mmdHtmlInline2 = (state) => {
         const lastOpenTag = stack[stack.length - 1].tag;
 
         if (lastOpenTag === closeTag || selfClosingTags.includes(lastOpenTag)) {
+          // stack.pop();
           const pStack = stack.pop();
           hideSoftBreakBefore(state.tokens, pStack.idx);
           hideSoftBreakBefore(state.tokens, i);
