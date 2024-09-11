@@ -1,67 +1,79 @@
 import { HTML_OPEN_TAG_RE, HTML_CLOSE_TAG_RE, selfClosingTags } from "../common/html-re";
+
 export const mmdHtmlInline2 = (state) => {
   if (!state.tokens?.length) {
     return;
-  };
+  }
 
   const stack = [];
   const closeStack = [];
 
-  for (let i = 0; i < state.tokens?.length; i++) {
-    let token = state.tokens[i];
+  // Helper function to hide soft breaks before a token
+  const hideSoftBreakBefore = (tokens, index) => {
+    if (index > 0 && tokens[index - 1].type === 'softbreak') {
+      tokens[index - 1].hidden = true;
+    }
+  };
+
+  for (let i = 0; i < state.tokens.length; i++) {
+    const token = state.tokens[i];
+
     if (token.type === 'html_inline') {
       const matchOpen = token.content.match(HTML_OPEN_TAG_RE);
+
       if (matchOpen) {
-        let tag = matchOpen.length > 1 ? matchOpen[1] : '';
-        let isClose = matchOpen.length > 2 && matchOpen[2] === '/';
+        const tag = matchOpen[1] || '';
+        const isClose = matchOpen[2] === '/';
+
         if (tag && !selfClosingTags.includes(tag) && !isClose && !token.isSvg) {
           stack.push({
             token: token,
             content: token.content,
-            tag: matchOpen[1]
+            tag: tag,
+            idx: i,
           });
         }
         continue;
       }
+
       const matchClose = token.content.match(HTML_CLOSE_TAG_RE);
+
       if (matchClose) {
+        const closeTag = matchClose[1];
+
         if (stack.length === 0) {
-          console.log(`Mismatched closing tag: </${matchClose[1]}>`);
-          closeStack.push({
-            token: token,
-            content: token.content,
-            tag: matchClose[1]
-          });
+          console.log(`Mismatched closing tag: </${closeTag}>`);
+          closeStack.push({ token: token, content: token.content, tag: closeTag });
           continue;
         }
-        const beforeTag = stack.length ? stack[stack.length - 1].tag : '';
-        if (beforeTag === matchClose[1]) {
-          stack.pop();
+
+        const lastOpenTag = stack[stack.length - 1].tag;
+
+        if (lastOpenTag === closeTag || selfClosingTags.includes(lastOpenTag)) {
+          const pStack = stack.pop();
+          hideSoftBreakBefore(state.tokens, pStack.idx);
+          hideSoftBreakBefore(state.tokens, i);
           continue;
         }
-        if (selfClosingTags.includes(beforeTag)) {
-          stack.pop();
-          continue;
-        }
-        console.log(`Mismatched closing tag: </${matchClose[1]}>`);
-        closeStack.push({
-          token: token,
-          content: token.content,
-          tag: matchClose[1]
-        });
+
+        console.log(`Mismatched closing tag: </${closeTag}>`);
+        closeStack.push({ token: token, content: token.content, tag: closeTag });
       }
     }
   }
-  if (stack?.length) {
-    for (let i = 0; i < stack.length; i++) {
-      let token = stack[i].token;
-      token.type = 'text';
+
+  // Convert unmatched opening and closing tags to text type
+  const convertToTextType = (tokens) => {
+    for (const item of tokens) {
+      item.token.type = 'text';
     }
+  };
+
+  if (stack.length) {
+    convertToTextType(stack);
   }
-  if (closeStack?.length) {
-    for (let i = 0; i < closeStack.length; i++) {
-      let token = closeStack[i].token;
-      token.type = 'text';
-    }
+
+  if (closeStack.length) {
+    convertToTextType(closeStack);
   }
-}
+};
