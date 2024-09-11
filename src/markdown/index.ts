@@ -9,7 +9,7 @@ import { eMmdRuleType } from "./common/mmdRules";
 
 /** md renderer */
 const mdInit = (options: TMarkdownItOptions) => {
-  const {htmlTags = false, xhtmlOut = false, width = 1200, breaks = true, typographer = true, linkify = true,
+  const {htmlTags = false, htmlDisableTagMatching = false, xhtmlOut = false, width = 1200, breaks = true, typographer = true, linkify = true,
           outMath = {}, mathJax = {}, renderElement = {},
           lineNumbering = false, startLine = 0, htmlSanitize = true, smiles = {}, forDocx = false, openLinkInNewWindow =  true,
     isDisableEmoji=false,
@@ -61,6 +61,7 @@ const mdInit = (options: TMarkdownItOptions) => {
   const disableRuleTypes: eMmdRuleType[] = renderOptions ? getDisableRuleTypes(renderOptions) : [];
   let md = require("markdown-it")({
     html: htmlTags && !disableRuleTypes.includes(eMmdRuleType.html),
+    htmlDisableTagMatching: htmlDisableTagMatching,
     xhtmlOut: xhtmlOut,
     breaks: breaks,
     langPrefix: "language-",

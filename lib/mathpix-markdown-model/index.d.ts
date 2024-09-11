@@ -14,6 +14,7 @@ export interface optionsMathpixMarkdown {
     fontSize?: number;
     padding?: number;
     htmlTags?: boolean;
+    htmlDisableTagMatching?: boolean;
     breaks?: boolean;
     typographer?: boolean;
     linkify?: boolean;
@@ -56,6 +57,7 @@ export type TMarkdownItOptions = {
     isDisableFootnotes?: boolean;
     disableRules?: string[];
     htmlTags?: boolean;
+    htmlDisableTagMatching?: boolean;
     breaks?: boolean;
     typographer?: boolean;
     linkify?: boolean;

@@ -17,7 +17,7 @@ class MathpixMarkdown extends React.Component<MathpixMarkdownProps> {
     render() {
         const { text, alignMathBlock='center', display='block', isCheckFormula=false, showTimeLog=false,isDisableFancy=false,
           isDisableEmoji = false, isDisableEmojiShortcuts = false, isDisableRefs = false, isDisableFootnotes = false,
-          htmlTags=false, width=0, breaks=true, typographer=false, linkify=false, xhtmlOut=false,
+          htmlTags=false, htmlDisableTagMatching=false, width=0, breaks=true, typographer=false, linkify=false, xhtmlOut=false,
           outMath={}, mathJax={}, htmlSanitize = {}, smiles = {}, openLinkInNewWindow = true,
           enableFileLinks = false, validateLink = null,
           accessibility = null,
@@ -45,6 +45,7 @@ class MathpixMarkdown extends React.Component<MathpixMarkdownProps> {
             isDisableFootnotes: isDisableFootnotes,
             disableRules: disableRules,
             htmlTags: htmlTags && !disableRuleTypes.includes(eMmdRuleType.html),
+            htmlDisableTagMatching: htmlDisableTagMatching,
             xhtmlOut: xhtmlOut,
             breaks: breaks,
             typographer: typographer,

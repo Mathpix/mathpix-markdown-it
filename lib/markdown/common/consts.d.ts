@@ -49,6 +49,7 @@ export declare const reFootNoteMark: RegExp;
 export declare const reFootNoteText: RegExp;
 export declare const reNumber: RegExp;
 export declare const svgRegex: RegExp;
+export declare const svgInlineRegex: RegExp;
 export declare const uuidPattern: string;
 export declare const doubleAngleBracketUuidPattern: RegExp;
 export declare const singleAngleBracketPattern: RegExp;

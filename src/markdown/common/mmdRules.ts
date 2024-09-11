@@ -480,6 +480,11 @@ export const mmdRuleList: IMmdRule[] = [
     rule: eRule.inline
   },
   {
+    name: "svg_inline",
+    type: eMmdRuleType.html,
+    rule: eRule.inline
+  },
+  {
     name: "entity",
     description: "Process html entity - &#123;, &#xAF;, &quot;, ...",
     type: eMmdRuleType.markdown,
@@ -534,6 +539,11 @@ export const mmdRuleList: IMmdRule[] = [
   {
     name: "grab_footnote_ref",
     type: eMmdRuleType.latex,
+    rule: eRule.inline2
+  },
+  {
+    name: "html_inline2",
+    type: eMmdRuleType.html,
     rule: eRule.inline2
   },
   //Core rules

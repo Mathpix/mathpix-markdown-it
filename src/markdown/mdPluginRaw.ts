@@ -42,6 +42,9 @@ import {eMmdRuleType} from "./common/mmdRules";
 import {getDisableRuleTypes} from "./common/mmdRulesToDisable";
 import { fenceBlock } from "./md-block-rule/mmd-fence";
 import {formatMathJaxError} from "../helpers/utils";
+import { mmdHtmlBlock } from "./md-block-rule/mmd-html-block";
+import { mmdHtmlInline2 } from "./md-inline-rule2/mmd-html_inline2";
+import { svg_inline } from "./md-inline-rule/svg_inline";
 const isSpace = require('markdown-it/lib/common/utils').isSpace;
 
 function MathML(state, silent, pos, endMarker = '', type = "inline_mathML") {
@@ -1037,6 +1040,9 @@ export default options => {
       /** TODO: check it in vscode */
       clearLabelsList(); /** Clean up the global list of all labels */
     }
+    if (!md.options.htmlDisableTagMatching) {
+      md.block.ruler.at("html_block", mmdHtmlBlock);
+    }
     md.block.ruler.before('html_block', 'svg_block', svg_block,
         {alt: getTerminatedRules("svg_block")});
     md.block.ruler.before("paragraph", "paragraphDiv", paragraphDiv);
@@ -1052,6 +1058,7 @@ export default options => {
     md.block.ruler.before("html_block", "mathMLBlock", mathMLBlock,
       {alt: getTerminatedRules("mathMLBlock")});
     md.inline.ruler.before("html_inline", "mathML", inlineMathML);
+    md.inline.ruler.before("html_inline", "svg_inline", svg_inline);
     md.inline.ruler.before("escape", "multiMath", multiMath);
     md.inline.ruler.before("multiMath", "refsInline", refsInline);
     md.inline.ruler.before("multiMath", "inlineTabular", inlineTabular);
@@ -1069,6 +1076,9 @@ export default options => {
     md.inline.ruler.before("asciiMath", "backtickAsAsciiMath", backtickAsAsciiMath);
     /** Replace image inline rule */
     md.inline.ruler.at('image', imageWithSize);
+    if (!md.options.htmlDisableTagMatching) {
+      md.inline.ruler2.push('html_inline2', mmdHtmlInline2);
+    }
     const disableRuleTypes: eMmdRuleType[] = md.options.renderOptions
       ? getDisableRuleTypes(md.options.renderOptions)
       : [];
