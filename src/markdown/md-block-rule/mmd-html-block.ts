@@ -1,9 +1,9 @@
 import { HTML_SEQUENCES } from "../common/html-re";
+
 export const mmdHtmlBlock = (state, startLine, endLine, silent) => {
   var i, nextLine, token, lineText,
     pos = state.bMarks[startLine] + state.tShift[startLine],
     max = state.eMarks[startLine];
-  debugger
 
   // if it's indented more than 3 spaces, it should be a code block
   if (state.sCount[startLine] - state.blkIndent >= 4) {
@@ -51,6 +51,10 @@ export const mmdHtmlBlock = (state, startLine, endLine, silent) => {
     return true;
   }
 
+  let openTagNext: any = HTML_SEQUENCES[i][1]
+    ? HTML_SEQUENCES[i][0]
+    : new RegExp('^(?:<' + match[1] + '\\s*>)');
+
   // If we are here - we detected HTML block.
   // Let's roll down till block end.
   let closeTag: any = HTML_SEQUENCES[i][1]
@@ -59,9 +63,9 @@ export const mmdHtmlBlock = (state, startLine, endLine, silent) => {
   if (!closeTag) {
     return false;
   }
-
   /* TODO: Check nested tags */
   let hasCloseTag = false;
+  let openTagCount = 1;
   if (!closeTag.test(lineText)) {
     for (; nextLine < endLine; nextLine++) {
       if (state.sCount[nextLine] < state.blkIndent) {
@@ -70,10 +74,17 @@ export const mmdHtmlBlock = (state, startLine, endLine, silent) => {
       pos = state.bMarks[nextLine] + state.tShift[nextLine];
       max = state.eMarks[nextLine];
       lineText = state.src.slice(pos, max);
+      if (openTagNext.test(lineText)) {
+        openTagCount++;
+        continue;
+      }
       if (closeTag.test(lineText)) {
         if (lineText.length !== 0) { nextLine++; }
-        hasCloseTag = true;
-        break;
+        openTagCount--;
+        if (openTagCount === 0) {
+          hasCloseTag = true;
+          break;
+        }
       }
     }
   }

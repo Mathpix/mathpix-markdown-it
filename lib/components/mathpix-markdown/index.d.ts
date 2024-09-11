@@ -4,6 +4,6 @@ export interface MathpixMarkdownProps extends optionsMathpixMarkdown {
     text: string;
 }
 declare class MathpixMarkdown extends React.Component<MathpixMarkdownProps> {
-    render(): React.JSX.Element;
+    render(): JSX.Element;
 }
 export default MathpixMarkdown;
