@@ -163,7 +163,7 @@ function html_inline_Sanitize (tokens, idx, options) {
   const hasNotCloseTag = tokens[idx].content.indexOf('/>') === -1;
 
   const optionsSanitize = {
-    skipCloseTag: hasNotCloseTag && !tokens[idx].isSvg,
+    skipCloseTag: hasNotCloseTag && !tokens[idx].isFullHtmlTagContent,
     enableFileLinks: enableFileLinks
   };
   return  htmlSanitize && Object.keys(htmlSanitize).length > 0

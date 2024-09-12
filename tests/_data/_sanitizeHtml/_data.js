@@ -69,13 +69,13 @@ module.exports = [
   {
     html:     `<textarea>Nifty</textarea><p>Paragraph</p>`,
     dirty:    `<div><textarea>Nifty</textarea><p>Paragraph</p></div>`,
-    discard:  `<div>Nifty<p>Paragraph</p></div>`,
+    discard:  `<div><p>Paragraph</p></div>`,
     sanitize: '<div>&lt;textarea&gt;Nifty&lt;/textarea&gt;<p>Paragraph</p></div>'
   },
   {
     html:     `<select><option>one</option><option>two</option></select><p>Paragraph</p>`,
     dirty:    `<div><select><option>one</option><option>two</option></select><p>Paragraph</p></div>`,
-    discard:  `<div>onetwo<p>Paragraph</p></div>`,
+    discard:  `<div><p>Paragraph</p></div>`,
     sanitize: '<div>&lt;select&gt;&lt;option&gt;one&lt;/option&gt;&lt;option&gt;two&lt;/option&gt;&lt;/select&gt;<p>Paragraph</p></div>'
   },
   {
@@ -99,7 +99,7 @@ module.exports = [
   {
     html:     `<textarea>Nifty</textarea><p>Paragraph</p>`,
     dirty:    `<div><textarea>Nifty</textarea><p>Paragraph</p></div>`,
-    discard:  `<div>Nifty<p>Paragraph</p></div>`,
+    discard:  `<div><p>Paragraph</p></div>`,
     sanitize: '<div>&lt;textarea&gt;Nifty&lt;/textarea&gt;<p>Paragraph</p></div>'
   },
   {
@@ -251,7 +251,7 @@ module.exports = [
    {
       html:     '!<textarea>&lt;/textarea&gt;&lt;svg/onload=prompt`xs`&gt;</textarea>!',
       dirty:    `<div>!<textarea>&lt;/textarea&gt;&lt;svg/onload=prompt<code>xs</code>&gt;</textarea>!</div>`,
-      discard:  `<div>!&lt;/textarea&gt;&lt;svg/onload=prompt<code>xs</code>&gt;!</div>`,
+      discard:  `<div>!!</div>`,
       sanitize: '<div>!&lt;textarea&gt;&lt;/textarea&gt;&lt;svg/onload=prompt<code>xs</code>&gt;&lt;/textarea&gt;!</div>'
    },
    {

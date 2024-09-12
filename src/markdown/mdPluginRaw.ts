@@ -44,7 +44,7 @@ import { fenceBlock } from "./md-block-rule/mmd-fence";
 import {formatMathJaxError} from "../helpers/utils";
 import { mmdHtmlBlock } from "./md-block-rule/mmd-html-block";
 import { mmdHtmlInline2 } from "./md-inline-rule2/mmd-html_inline2";
-import { svg_inline } from "./md-inline-rule/svg_inline";
+import { html_inline_full_tag } from "./md-inline-rule/html_inline_full_tag";
 const isSpace = require('markdown-it/lib/common/utils').isSpace;
 
 function MathML(state, silent, pos, endMarker = '', type = "inline_mathML") {
@@ -1041,7 +1041,7 @@ export default options => {
       clearLabelsList(); /** Clean up the global list of all labels */
     }
     if (!md.options.htmlDisableTagMatching) {
-      md.block.ruler.at("html_block", mmdHtmlBlock);
+      md.block.ruler.at("html_block", mmdHtmlBlock, {alt: ['paragraph', 'reference', 'blockquote']});
     }
     md.block.ruler.before('html_block', 'svg_block', svg_block,
         {alt: getTerminatedRules("svg_block")});
@@ -1058,7 +1058,7 @@ export default options => {
     md.block.ruler.before("html_block", "mathMLBlock", mathMLBlock,
       {alt: getTerminatedRules("mathMLBlock")});
     md.inline.ruler.before("html_inline", "mathML", inlineMathML);
-    md.inline.ruler.before("html_inline", "svg_inline", svg_inline);
+    md.inline.ruler.before("html_inline", "html_inline_full_tag", html_inline_full_tag);
     md.inline.ruler.before("escape", "multiMath", multiMath);
     md.inline.ruler.before("multiMath", "refsInline", refsInline);
     md.inline.ruler.before("multiMath", "inlineTabular", inlineTabular);

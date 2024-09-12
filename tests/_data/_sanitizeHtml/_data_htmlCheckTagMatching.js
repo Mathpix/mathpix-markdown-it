@@ -43,10 +43,10 @@ module.exports = [
     sanitize: '<div>&lt;blue&gt;&lt;red&gt;&lt;green&gt;Cheese&lt;/green&gt;&lt;/red&gt;&lt;/blue&gt;</div>'
   },
   {
-    html:     `<img src="foo.jpg"><p>Whee</p><p>Again</p><p>Wow<b>cool</b></p>`,
-    dirty:    `<div><img src="foo.jpg"><p>Whee</p><p>Again</p><p>Wow<b>cool</b></p></div>`,
-    discard:  `<div><img src="foo.jpg" /><p>Whee</p><p>Again</p><p>Wow<b>cool</b></p></div>`,
-    sanitize: '<div><img src="foo.jpg" /><p>Whee</p><p>Again</p><p>Wow<b>cool</b></p></div>'
+    html:     `<img src="foo.jpg"><p>Whee<p>Again<p>Wow<b>cool</b>`,
+    dirty:    `<div><img src="foo.jpg">&lt;p&gt;Whee&lt;p&gt;Again&lt;p&gt;Wow<b>cool</b></div>`,
+    discard:  `<div><img src="foo.jpg" />&lt;p&gt;Whee&lt;p&gt;Again&lt;p&gt;Wow<b>cool</b></div>`,
+    sanitize: '<div><img src="foo.jpg" />&lt;p&gt;Whee&lt;p&gt;Again&lt;p&gt;Wow<b>cool</b></div>'
   },
   {
     html:     `<a href="http://google.com">google</a><a href="https://google.com">https google</a><a href="ftp://example.com">ftp</a><a href="mailto:test@test.com">mailto</a><a href="/relative.html">relative</a><a href="javascript:alert(0)">javascript</a>`,
@@ -57,31 +57,31 @@ module.exports = [
   {
     html:     `<script>alert("ruhroh!");</script><p>Paragraph</p>`,
     dirty:    `<div><script>alert(“ruhroh!”);</script><p>Paragraph</p></div>`,
-    discard:  `<div>alert(“ruhroh!”);<p>Paragraph</p></div>`,
+    discard:  `<div><p>Paragraph</p></div>`,
     sanitize: '<div>&lt;script&gt;alert(“ruhroh!”);&lt;/script&gt;<p>Paragraph</p></div>'
   },
   {
     html:     `<style>.foo { color: blue; }</style><p>Paragraph</p>`,
     dirty:    `<div><style>.foo { color: blue; }</style><p>Paragraph</p></div>`,
-    discard:  `<div>.foo { color: blue; }<p>Paragraph</p></div>`,
+    discard:  `<div><p>Paragraph</p></div>`,
     sanitize: '<div>&lt;style&gt;.foo { color: blue; }&lt;/style&gt;<p>Paragraph</p></div>'
   },
   {
     html:     `<textarea>Nifty</textarea><p>Paragraph</p>`,
     dirty:    `<div><textarea>Nifty</textarea><p>Paragraph</p></div>`,
-    discard:  `<div>Nifty<p>Paragraph</p></div>`,
+    discard:  `<div><p>Paragraph</p></div>`,
     sanitize: '<div>&lt;textarea&gt;Nifty&lt;/textarea&gt;<p>Paragraph</p></div>'
   },
   {
     html:     `<select><option>one</option><option>two</option></select><p>Paragraph</p>`,
     dirty:    `<div><select><option>one</option><option>two</option></select><p>Paragraph</p></div>`,
-    discard:  `<div>onetwo<p>Paragraph</p></div>`,
+    discard:  `<div><p>Paragraph</p></div>`,
     sanitize: '<div>&lt;select&gt;&lt;option&gt;one&lt;/option&gt;&lt;option&gt;two&lt;/option&gt;&lt;/select&gt;<p>Paragraph</p></div>'
   },
   {
     html:     `<p>Paragraph<textarea>Nifty</textarea></p>`,
     dirty:    `<div><p>Paragraph<textarea>Nifty</textarea></p></div>`,
-    discard:  `<div><p>ParagraphNifty</p></div>`,
+    discard:  `<div><p>Paragraph</p></div>`,
     sanitize: '<div><p>Paragraph&lt;textarea&gt;Nifty&lt;/textarea&gt;</p></div>'
   },
   {
@@ -99,7 +99,7 @@ module.exports = [
   {
     html:     `<textarea>Nifty</textarea><p>Paragraph</p>`,
     dirty:    `<div><textarea>Nifty</textarea><p>Paragraph</p></div>`,
-    discard:  `<div>Nifty<p>Paragraph</p></div>`,
+    discard:  `<div><p>Paragraph</p></div>`,
     sanitize: '<div>&lt;textarea&gt;Nifty&lt;/textarea&gt;<p>Paragraph</p></div>'
   },
   {
@@ -227,20 +227,20 @@ module.exports = [
   {
     html:     '<div>"normal text"</div><script>"this is code"</script>',
     dirty:    `<div><div>“normal text”</div><script>“this is code”</script></div>`,
-    discard:  `<div><div>“normal text”</div>“this is code”</div>`,
+    discard:  `<div><div>“normal text”</div></div>`,
     sanitize: '<div><div>“normal text”</div>&lt;script&gt;“this is code”&lt;/script&gt;</div>'
   },
   {
     html:     '<div>"normal text"</div><style>body { background-image: url("image.test"); }</style>',
     dirty:    `<div><div>&quot;normal text&quot;</div><style>body { background-image: url(“image.test”); }</style></div>`,
-    discard:  `<div><div>&quot;normal text&quot;</div>body { background-image: url(“image.test”); }</div>`,
+    discard:  `<div><div>“normal text”</div></div>`,
     sanitize: '<div><div>&quot;normal text&quot;</div>&lt;style&gt;body { background-image: url(“image.test”); }&lt;/style&gt;</div>'
   },
   {
-    html:     '<script>\nalert("&quot;This is cool but just ironically so I quoted it&quot;")\n</script>',
-    dirty:    `<script>\nalert("&quot;This is cool but just ironically so I quoted it&quot;")\n</script>`,
-    discard:  ``,
-    sanitize: '&lt;script&gt;\nalert("&amp;quot;This is cool but just ironically so I quoted it&amp;quot;")\n&lt;/script&gt;'
+    html:     '<script>alert("&quot;This is cool but just ironically so I quoted it&quot;")</script>',
+    dirty:    `<div><script>alert(&quot;“This is cool but just ironically so I quoted it”&quot;)</script></div>`,
+    discard:  `<div></div>`,
+    sanitize: '<div>&lt;script&gt;alert(&quot;“This is cool but just ironically so I quoted it”&quot;)&lt;/script&gt;</div>'
   },
   {
     html:     '<Archer><Sterling>I am</Sterling></Archer>',
@@ -251,7 +251,7 @@ module.exports = [
   {
     html:     '!<textarea>&lt;/textarea&gt;&lt;svg/onload=prompt`xs`&gt;</textarea>!',
     dirty:    `<div>!<textarea>&lt;/textarea&gt;&lt;svg/onload=prompt<code>xs</code>&gt;</textarea>!</div>`,
-    discard:  `<div>!&lt;/textarea&gt;&lt;svg/onload=prompt<code>xs</code>&gt;!</div>`,
+    discard:  `<div>!!</div>`,
     sanitize: '<div>!&lt;textarea&gt;&lt;/textarea&gt;&lt;svg/onload=prompt<code>xs</code>&gt;&lt;/textarea&gt;!</div>'
   },
   {
@@ -293,7 +293,7 @@ module.exports = [
   {
     html:     '<img src="fallback.jpg" srcset="foo.jpg 100w, bar.jpg 200w" />',
     dirty:    `<img src="fallback.jpg" srcset="foo.jpg 100w, bar.jpg 200w" />`,
-    discard:  `<img src="fallback.jpg" />`,
+    discard: `<img src="fallback.jpg" />`,
     sanitize: '<img src="fallback.jpg" />'
   },
   {

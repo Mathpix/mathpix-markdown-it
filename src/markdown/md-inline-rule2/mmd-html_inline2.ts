@@ -28,7 +28,7 @@ export const mmdHtmlInline2 = (state) => {
         const tag = matchOpen[1] || '';
         const isClose = matchOpen[2] === '/';
 
-        if (tag && !selfClosingTags.includes(tag) && !isClose && !token.isSvg) {
+        if (tag && !selfClosingTags.includes(tag) && !isClose && !token.isFullHtmlTagContent) {
           stack.push({
             token: token,
             content: token.content,

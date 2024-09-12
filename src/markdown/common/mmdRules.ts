@@ -480,7 +480,7 @@ export const mmdRuleList: IMmdRule[] = [
     rule: eRule.inline
   },
   {
-    name: "svg_inline",
+    name: "html_inline_full_tag",
     type: eMmdRuleType.html,
     rule: eRule.inline
   },
