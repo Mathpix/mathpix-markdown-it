@@ -1,5 +1,4 @@
 import { RuleInline } from 'markdown-it';
-import {MathJax} from "../mathjax/";
 import {inlineTabular} from "./md-inline-rule/tabular";
 import {renderTabularInline} from './md-renderer-rules/render-tabular';
 import {asciiMath, backtickAsAsciiMath, renderAsciiMath} from './md-ascii';
@@ -9,12 +8,11 @@ import {
   canonicalMathPositions,
   endTag,
   findOpenCloseTagsMathEnvironment,
-  getWidthFromDocument,
   includesMultiMathBeginTag,
   includesMultiMathTag,
   includesSimpleMathTag
 } from './utils';
-import {closeTagMML, csvSeparatorsDef, mdSeparatorsDef, openTagMML, tsvSeparatorsDef} from './common/consts';
+import { openTagMML } from './common/consts';
 import {imageWithSize, renderRuleImage} from './md-inline-rule/image';
 import {setCounterSection} from './md-inline-rule/setcounter-section';
 import {renderTheorems} from './md-theorem';
@@ -32,154 +30,21 @@ import {
 import {coreInline} from './md-inline-rule/core-inline';
 import {refsInline, refInsideMathDelimiter} from './md-inline-rule/refs';
 import {hardBreak, softBreak} from './md-renderer-rules/breaks';
-import {addIntoLabelsList, clearLabelsList, eLabelType, getLabelByKeyFromLabelsList, ILabel} from "./common/labels";
-import {envArraysShouldBeFlattenInTSV} from '../helpers/consts';
+import { clearLabelsList, getLabelByKeyFromLabelsList, ILabel } from "./common/labels";
 import {getTerminatedRules} from './common';
+import { convertMathToHtml } from "./common/convert-math-to-html";
 import {highlightText} from "./highlight/common";
 import {ParserErrors} from "../mathpix-markdown-model";
 import {svg_block} from "./md-block-rule/svg_block";
 import {eMmdRuleType} from "./common/mmdRules";
 import {getDisableRuleTypes} from "./common/mmdRulesToDisable";
 import { fenceBlock } from "./md-block-rule/mmd-fence";
-import {formatMathJaxError} from "../helpers/utils";
 import { mmdHtmlBlock } from "./md-block-rule/mmd-html-block";
+import { mathMLBlock } from "./md-block-rule/mathml-block";
+import { inlineMathML } from "./md-inline-rule/mathml-inline";
 import { mmdHtmlInline2 } from "./md-inline-rule2/mmd-html_inline2";
 import { html_inline_full_tag } from "./md-inline-rule/html_inline_full_tag";
 const isSpace = require('markdown-it/lib/common/utils').isSpace;
-
-function MathML(state, silent, pos, endMarker = '', type = "inline_mathML") {
-  const markerBegin = RegExp('^</?(math)(?=(\\s|>|$))', 'i');
-  let startMathPos = pos;
-  let beginMathPos = pos;
-  let endMathMlPos, endMarkerPos, nextPos, token, content, match;
-  const endMathMl = "</math>";
-
-  if (!markerBegin.test(state.src.slice(startMathPos))) { return false; }
-  if (state.src.slice(startMathPos, state.src.indexOf('>', startMathPos)).indexOf('block') > -1) {
-    type = "display_mathML"
-  }
-
-  match = state.src
-    .slice(++startMathPos)
-    .match(/^(?:math)/);
-
-  if (!match) {
-    return false;
-  }
-
-  startMathPos += match[0].length;
-
-  endMathMlPos = state.src.indexOf(endMathMl, startMathPos);
-  if (endMathMlPos === -1) { return false; }
-
-  if (endMarker && endMarker !== '') {
-    endMarkerPos = state.src.indexOf(endMarker, endMathMlPos);
-    nextPos = endMarkerPos + endMarker.length;
-    content = state.src.slice(beginMathPos, endMarkerPos);
-  } else {
-    nextPos = endMathMlPos + endMathMl.length;
-    content = state.src.slice(beginMathPos, endMathMlPos);
-  }
-
-  if (!silent) {
-    token = state.push(type, "", 0);
-    token.content = content.trim();
-    token.inlinePos = {
-      start: state.pos,
-      end: nextPos
-    };
-  }
-  /** Perform math to conversion to html and get additional data from MathJax to pass it to render rules */
-  convertMathToHtml(state, token, state.md.options);
-  state.pos = nextPos;
-  return true;
-}
-
-const inlineMathML: RuleInline = (state, silent) => {
-  let startMathPos = state.pos;
-  if (state.src.charCodeAt(startMathPos) !== 0x3C /* < */) {
-    return false;
-  }
-
-  return MathML(state, silent, startMathPos);
-}
-
-// BLOCK
-
-function mathMLBlock(state, startLine, endLine, silent) {
-  const markerBegin = RegExp('^</?(math)(?=(\\s|>|$))', 'i');
-  let content, terminate, i, l, token, oldParentType, lineText, mml,
-    nextLine = startLine + 1,
-    terminatorRules = [].concat(state.md.block.ruler.getRules('paragraph'), 
-      state.md.block.ruler.getRules('mathMLBlock')),
-    pos = state.bMarks[startLine] + state.tShift[startLine],
-    max = state.eMarks[startLine];
-
-  oldParentType = state.parentType;
-  state.parentType = 'paragraph';
-
-  if (!state.md.options.html) { return false; }
-  if (state.src.charCodeAt(pos) !== 0x3C/* < */) { return false; }
-
-  lineText = state.src.slice(pos, max);
-  mml = openTagMML.test(lineText);
-
-  if (!markerBegin.test(lineText)) { return false; }
-  /** For validation mode we can terminate immediately */
-  if (silent) {
-    return true;
-  }
-
-  // jump line-by-line until empty one or EOF
-  for (; nextLine < endLine; nextLine++) {
-    pos = state.bMarks[nextLine] + state.tShift[nextLine];
-    max = state.eMarks[nextLine];
-    lineText = state.src.slice(pos, max);
-
-    if (mml) {
-      if (closeTagMML.test(lineText)) { mml = false; }
-
-    } else {
-      if (state.isEmpty(nextLine)) { break }
-    }
-
-    if (openTagMML.test(lineText)) { mml = true }
-
-    // this would be a code block normally, but after paragraph
-    // it's considered a lazy continuation regardless of what's there
-    if (state.sCount[nextLine] - state.blkIndent > 3) { continue; }
-
-    // quirk for blockquotes, this line should already be checked by that rule
-    if (state.sCount[nextLine] < 0) { continue; }
-
-    // Some tags can terminate paragraph without empty line.
-    terminate = false;
-    for (i = 0, l = terminatorRules.length; i < l; i++) {
-      if (terminatorRules[i](state, nextLine, endLine, true)) {
-        terminate = true;
-        break;
-      }
-    }
-    if (terminate) { break; }
-  }
-
-  content = state.getLines(startLine, nextLine, state.blkIndent, false).trim();
-
-  state.line = nextLine;
-
-  token = state.push('paragraph_open', 'div', 1);
-  token.map = [startLine, state.line];
-
-  token = state.push('inline', '', 0);
-  token.content = content;
-  token.map = [startLine, state.line];
-  token.children = [];
-
-  token = state.push('paragraph_close', 'div', -1);
-
-  state.parentType = oldParentType;
-  return true;
-};
 
 const getMathEnvironment = (str: string): string => {
   str = str.trim();
@@ -268,13 +133,6 @@ const multiMath: RuleInline = (state, silent) => {
     return false;
   }
   const nextPos = endMarkerPos + endMarker.length;
-
-  if (state.src.slice(startMathPos, endMarkerPos).trim().indexOf('<math') === 0) {
-    if (MathML(state, silent, state.src.indexOf('<math', startMathPos), endMarker, type === 'inline_math' ? "inline_mathML" : "display_mathML")) {
-      return true
-    }
-  }
-
 
   if (!silent) {
     const token = state.push(type, "", 0);
@@ -389,12 +247,6 @@ const simpleMath: RuleInline = (state, silent) => {
     const suffix = state.src.charCodeAt(nextPos);
     if (suffix >= 0x30 && suffix < 0x3a) {
       return false;
-    }
-  }
-
-  if (state.src.slice(startMathPos, endMarkerPos).trim().indexOf('<math') === 0) {
-    if (MathML(state, silent, state.src.indexOf('<math', startMathPos), endMarker, endMarker.length === 1 ? "inline_mathML" : "display_mathML")) {
-      return true
     }
   }
 
@@ -524,118 +376,6 @@ function extend(options, defaults) {
     return result;
   }, options);
 }
-
-/** Perform math to conversion to html and get additional data from MathJax to pass it to render rules */
-const convertMathToHtml = (state, token, options) => {
-  const math = token.content;
-  let isBlock = token.type !== 'inline_math';
-  const begin_number = MathJax.GetLastEquationNumber() + 1;
-  try {
-    let cwidth = 1200;
-    if (options && options.width && options.width > 0) {
-      cwidth = options.width;
-    } else {
-      cwidth = getWidthFromDocument(cwidth);
-    }
-
-    if (token.type === 'display_mathML' || token.type === 'inline_mathML') {
-      const data = MathJax.TypesetMathML(math, {
-        display: true,
-        metric: {cwidth: cwidth},
-        outMath: options.outMath,
-        accessibility: options.accessibility,
-        renderingErrors: options.renderingErrors
-      });
-      token.mathEquation = data.html;
-      token.mathData = data.data;
-    } else {
-      if (token.return_asciimath) {
-        MathJax.Reset(begin_number);
-        const data = MathJax.TypesetSvgAndAscii(math, {
-          display: isBlock,
-          metric: {cwidth: cwidth},
-          outMath: Object.assign({}, options.outMath, {
-            optionAscii: {
-              showStyle: false,
-              extraBrackets: true,
-              tableToTsv: options.outMath?.include_tsv 
-                && envArraysShouldBeFlattenInTSV.includes(token.math_env),
-              tableToCsv: options.outMath?.include_csv 
-                && envArraysShouldBeFlattenInTSV.includes(token.math_env),              
-              tableToMd: options.outMath?.include_table_markdown 
-                && envArraysShouldBeFlattenInTSV.includes(token.math_env),
-              isSubTable: token.isSubTable,
-              tsv_separators: {...tsvSeparatorsDef},
-              csv_separators: {...csvSeparatorsDef},
-              md_separators: {...mdSeparatorsDef},
-            },
-          }),
-          mathJax: options.mathJax,
-          accessibility: options.accessibility,
-          renderingErrors: options.renderingErrors
-        });
-        token.mathEquation = data.html;
-        token.mathData = data.data;
-        token.ascii = data.ascii;
-        token.ascii_tsv = data.ascii_tsv;
-        token.ascii_csv = data.ascii_csv;
-        token.ascii_md = data.ascii_md;
-        token.labels = data.labels;
-      } else {
-        MathJax.Reset(begin_number);
-        const data = MathJax.Typeset(math, {display: isBlock, metric: { cwidth: cwidth },
-          outMath: options.outMath, mathJax: options.mathJax, forDocx: options.forDocx,
-          accessibility: options.accessibility,
-          nonumbers: options.nonumbers,
-          renderingErrors: options.renderingErrors
-        });
-        token.mathEquation = data.html;
-        token.mathData = data.data;
-        token.ascii = data.ascii;
-        token.ascii_tsv = data.ascii_tsv;
-        token.ascii_csv = data.ascii_csv;
-        token.ascii_md = data.ascii_md;
-        token.labels = data.labels;
-      }
-    }
-    
-    const number = MathJax.GetLastEquationNumber();
-    let idLabels = '';
-    if (token.labels) {
-      /** generate parenID - needs to multiple labels */
-      let labelsKeys = token.labels ? Object.keys(token.labels) : [];
-      idLabels = labelsKeys?.length ? encodeURIComponent(labelsKeys.join('_')) : '';
-      for (const key in token.labels) {
-        const tagContent = token.labels[key].tag;
-        const tagChildrenTokens = [];
-        state.md.inline.parse(tagContent, state.md, state.env, tagChildrenTokens);
-        addIntoLabelsList({
-          key: key,
-          id: idLabels,
-          tag: tagContent,
-          tagId: token.labels[key].id,
-          tagChildrenTokens: tagChildrenTokens,
-          type: eLabelType.equation
-        });
-      }
-    }
-    token.idLabels = idLabels;
-    token.number= number;
-    token.begin_number= begin_number;
-    token.attrNumber = begin_number >= number
-      ? number.toString()
-      : begin_number.toString() + ',' + number.toString();
-    return token;
-  } catch (e) {
-    console.error('ERROR [convertMathToHtml] MathJax =>', e.message, e);
-    formatMathJaxError(e, math, 'convertMathToHtml');
-    token.error = {
-      message: e.message,
-      error: e
-    };
-    return token;
-  }
-};
 
 const renderMath = (a, token, options) => {
   const mathEquation = token.mathEquation;
@@ -783,12 +523,9 @@ const getCoutOpenCloseBranches = (str: string, beginMarker: string = '{', endMar
 };
 
 function paragraphDiv(state, startLine/*, endLine*/) {
- // resetCounter();
   let isMathOpen = false;
   let openedAuthorBlock = false;
   let openBrackets = 0;
-  // const pickStartTag: RegExp = /\\begin{(abstract|equation|equation\*|center|left|right|table|figure|tabular)}|\\\[/;
-  // const pickEndTag: RegExp = /\\end{(abstract|equation|equation\*|center|left|right|table|figure|tabular)}|\\\]/;
   const pickStartTag: RegExp = /\\begin{(abstract|center|left|right|table|figure|tabular)}/;
   const pickEndTag: RegExp = /\\end{(abstract|center|left|right|table|figure|tabular)}/;
   const pickMathStartTag: RegExp = /\\begin{(equation|equation\*)}|\\\[/;
@@ -797,19 +534,16 @@ function paragraphDiv(state, startLine/*, endLine*/) {
 
   const pickTag: RegExp = /^\\(?:title|section|subsection)/;
   const listStartTag: RegExp = /\\begin{(enumerate|itemize)}/;
-  let content, terminate, i, l, token, oldParentType, lineText, mml,
+  let content, terminate, i, l, token, oldParentType, lineText, //mml,
     nextLine = startLine + 1,
     terminatorRules = state.md.block.ruler.getRules('paragraph'),
     endLine = state.lineMax,
     pos = state.bMarks[startLine] + state.tShift[startLine],
     max = state.eMarks[startLine];
 
-
-
   oldParentType = state.parentType;
   state.parentType = 'paragraph';
   lineText = state.src.slice(pos, max);
-  mml = openTagMML.test(lineText);
 
   if (lineText === '\\maketitle') {
     state.line = nextLine++;
@@ -865,32 +599,26 @@ function paragraphDiv(state, startLine/*, endLine*/) {
       listOpen = true;
     }
 
-    if (mml) {
-      if (closeTagMML.test(lineText)) { mml = false; }
-    } else {
-      if (pickTag.test(prewLineText) || pickTag.test(lineText)) {
-        break;
-      }
-      if (state.isEmpty(nextLine)
-        || pickStartTag.test(lineText) || pickEndTag.test(prewLineText)
-        || (!isMath && !openedAuthorBlock && !isMathOpen
-              && (pickMathStartTag.test(lineText) || pickMathEndTag.test(prewLineText)))) {
-        break;
-      }
-      if (includesSimpleMathTag(lineText)) {
-        isMathOpen = !isMathOpen
-      }
-
-      if (listStartTag.test(lineText) && (prewLineText.indexOf('\\item') === -1 || !listOpen)) {
-        break;
-      }
-
-      if (includesSimpleMathTag(lineText) && isMathOpen || includesSimpleMathTag(prewLineText) && !isMathOpen) {
-        break;
-      }
+    if (pickTag.test(prewLineText) || pickTag.test(lineText)) {
+      break;
+    }
+    if (state.isEmpty(nextLine)
+      || pickStartTag.test(lineText) || pickEndTag.test(prewLineText)
+      || (!isMath && !openedAuthorBlock && !isMathOpen
+        && (pickMathStartTag.test(lineText) || pickMathEndTag.test(prewLineText)))) {
+      break;
+    }
+    if (includesSimpleMathTag(lineText)) {
+      isMathOpen = !isMathOpen
     }
 
-    if (openTagMML.test(lineText)) { mml = true }
+    if (listStartTag.test(lineText) && (prewLineText.indexOf('\\item') === -1 || !listOpen)) {
+      break;
+    }
+
+    if (includesSimpleMathTag(lineText) && isMathOpen || includesSimpleMathTag(prewLineText) && !isMathOpen) {
+      break;
+    }
 
     // this would be a code block normally, but after paragraph
     // it's considered a lazy continuation regardless of what's there

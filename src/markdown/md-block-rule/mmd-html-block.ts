@@ -1,6 +1,7 @@
+import { RuleBlock } from "markdown-it";
 import {HTML_SEQUENCES, selfClosingTags} from "../common/html-re";
 
-export const mmdHtmlBlock = (state, startLine, endLine, silent) => {
+export const mmdHtmlBlock: RuleBlock = (state, startLine, endLine, silent): boolean => {
   var i, nextLine, token, lineText,
     pos = state.bMarks[startLine] + state.tShift[startLine],
     max = state.eMarks[startLine];
@@ -9,14 +10,10 @@ export const mmdHtmlBlock = (state, startLine, endLine, silent) => {
   if (state.sCount[startLine] - state.blkIndent >= 4) {
     return false;
   }
-  if (!state.md.options.html) {
-    return false;
-  }
-  if (state.md.options.htmlDisableTagMatching) {
-    return false;
-  }
-
-  if (state.src.charCodeAt(pos) !== 0x3C/* < */) {
+  if (!state.md.options.html ||
+    state.md.options.htmlDisableTagMatching ||
+    state.src.charCodeAt(pos) !== 0x3C/* < */
+  ) {
     return false;
   }
 

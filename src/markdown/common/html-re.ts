@@ -28,10 +28,11 @@ export const HTML_CLOSE_TAG_RE = new RegExp('^(?:' + close_tag + ')');
 
 export const HTML_OPEN_TAG = new RegExp('^(?:' + open_tag + ')');
 
+export type type_HTML_SEQUENCES = [RegExp, RegExp | string, boolean];
 // An array of opening and corresponding closing sequences for html tags,
 // last argument defines whether it can terminate a paragraph or not
 //
-export const HTML_SEQUENCES = [
+export const HTML_SEQUENCES: type_HTML_SEQUENCES[] = [
   [ /^<(script)(?=(\s|>|$))/i, /<\/(script)>/i, true ],
   [ /^<(pre)(?=(\s|>|$))/i, /<\/(pre)>/i, true ],
   [ /^<(style)(?=(\s|>|$))/i, /<\/(style)>/i, true ],
