@@ -25,7 +25,7 @@ export const mmdHtmlInline2 = (state) => {
       const matchOpen = token.content.match(HTML_OPEN_TAG_RE);
 
       if (matchOpen) {
-        const tag = matchOpen[1] || '';
+        const tag = matchOpen[1] ? matchOpen[1].toLowerCase() : '';
         const isClose = matchOpen[2] === '/';
 
         if (tag && !selfClosingTags.includes(tag) && !isClose && !token.isFullHtmlTagContent) {
@@ -42,7 +42,7 @@ export const mmdHtmlInline2 = (state) => {
       const matchClose = token.content.match(HTML_CLOSE_TAG_RE);
 
       if (matchClose) {
-        const closeTag = matchClose[1];
+        const closeTag = matchClose[1] ? matchClose[1].toLowerCase() : '';
 
         if (stack.length === 0) {
           console.log(`Mismatched closing tag: </${closeTag}>`);
