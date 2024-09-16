@@ -21,8 +21,7 @@ export const sanitize = (html: string, options = {}) => {
     if (!closeTag) {
       return '';
     }
-
-    return  config.allowedTags.indexOf(closeTag) !== -1
+    return config.allowedTags.indexOf(closeTag.toLowerCase()) !== -1
         ? html
         : config.disallowedTagsMode === 'recursiveEscape'
           ? escapeHtml(html, true)

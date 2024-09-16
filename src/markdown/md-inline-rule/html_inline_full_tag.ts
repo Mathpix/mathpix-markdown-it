@@ -1,13 +1,13 @@
 import { RuleInline } from 'markdown-it';
 import { extractFullHtmlTagContent } from "../common/html-re";
 
-const svgInlineRegex = /^<(svg)\b[^>]*>[\s\S]*<\/svg>/;
-const preInlineRegex = /^<(pre)\b[^>]*>[\s\S]*<\/pre>/;
-const codeInlineRegex = /^<(code)\b[^>]*>[\s\S]*<\/code>/;
-const scriptInlineRegex = /^<(script)\b[^>]*>[\s\S]*<\/script>/;
-const styleInlineRegex = /^<(style)\b[^>]*>[\s\S]*<\/style>/;
-const textareaInlineRegex = /^<(textarea)\b[^>]*>[\s\S]*<\/textarea>/;
-const optionInlineRegex = /^<(option)\b[^>]*>[\s\S]*<\/option>/;
+const svgInlineRegex: RegExp = /^<(svg)\b[^>]*>[\s\S]*<\/svg>/i;
+const preInlineRegex: RegExp = /^<(pre)\b[^>]*>[\s\S]*<\/pre>/i;
+const codeInlineRegex: RegExp  = /^<(code)\b[^>]*>[\s\S]*<\/code>/i;
+const scriptInlineRegex: RegExp = /^<(script)\b[^>]*>[\s\S]*<\/script>/i;
+const styleInlineRegex: RegExp  = /^<(style)\b[^>]*>[\s\S]*<\/style>/i;
+const textareaInlineRegex: RegExp  = /^<(textarea)\b[^>]*>[\s\S]*<\/textarea>/i;
+const optionInlineRegex: RegExp  = /^<(option)\b[^>]*>[\s\S]*<\/option>/i;
 
 
 // Helper function to match regex against state source
@@ -41,7 +41,10 @@ export const html_inline_full_tag: RuleInline = (state, silent) => {
       return false;
     }
 
-    const tag: string = match[1];
+    const tag: string = match[1] ? match[1].toLowerCase() : '';
+    if (!tag) {
+      return false;
+    }
     const matchedTagContent = extractFullHtmlTagContent(src.slice(pos), tag);
     if (!matchedTagContent?.length) {
       return false;

@@ -72,8 +72,8 @@ export const extractFullHtmlTagContent = (html: string, tag: string): string[] =
     let match: RegExpExecArray | null;
 
     while ((match = regex.exec(html)) !== null) {
-      const isOpeningTag: boolean = match[0].startsWith(`<${tag}`);
-      const isClosingTag: boolean = match[0].startsWith(`</${tag}>`);
+      const isOpeningTag: boolean = match[0]?.toLowerCase().startsWith(`<${tag}`);
+      const isClosingTag: boolean = match[0]?.toLowerCase().startsWith(`</${tag}>`);
 
       if (isOpeningTag) {
         // Found an opening <tag> tag
