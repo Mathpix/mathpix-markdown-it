@@ -8,7 +8,11 @@ export const softBreak = (tokens, idx, options /*, env */) => {
     return '';
   }
   if (tokens[idx].hidden) {
-    return tokens[idx].showSpace ? ' ' : '';
+    return tokens[idx].showSpace
+      ? ' '
+      : tokens[idx].showLineBreak
+        ? '\n'
+        : '';
   }
   return options.breaks ? (options.xhtmlOut ? '<br />\n' : '<br>\n') : '\n';
 };

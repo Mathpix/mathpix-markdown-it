@@ -13,6 +13,11 @@ import 'mathjax-full/js/input/tex/AllPackages.js';
 import './helpers/array/ArrayConfiguration';
 import {AssistiveMmlHandler} from'mathjax-full/js/a11y/assistive-mml.js';
 
+//Fix MathJax error https://github.com/mathjax/MathJax/issues/3033#issuecomment-1511374166
+import { Configuration } from "mathjax-full/js/input/tex/Configuration";
+import { Other } from "./fix-unicode";
+Configuration.create('fix-unicode', {fallback: {character: Other}});
+
 import MathJaxConfig from './mathJaxConfig';
 require("./my-BaseMappings");
 

@@ -32,6 +32,7 @@ export interface optionsMathpixMarkdown {
     fontSize?: number;
     padding?: number;
     htmlTags?: boolean; // Enable HTML tags in source
+    htmlDisableTagMatching?: boolean; //  Allows to turn off the validation that checks for matching opening and closing HTML tags
     breaks?: boolean,
     typographer?: boolean,
     linkify?: boolean,
@@ -75,6 +76,7 @@ export type TMarkdownItOptions = {
   isDisableFootnotes?: boolean,
   disableRules?: string[];
   htmlTags?: boolean,
+  htmlDisableTagMatching?: boolean; //  Allows to turn off the validation that checks for matching opening and closing HTML tags
   breaks?: boolean,
   typographer?: boolean,
   linkify?: boolean,
@@ -480,7 +482,7 @@ class MathpixMarkdown_Model {
     render = ( text: string, options?: optionsMathpixMarkdown ):string => {
         const { alignMathBlock='center', display='block', isCheckFormula=false, showTimeLog=false,
           isDisableFancy=false, isDisableEmoji=false, isDisableEmojiShortcuts=false, isDisableRefs=false, isDisableFootnotes=false,
-          fontSize=null, padding=null, htmlTags=false, width=0, showToc = false,
+          fontSize=null, padding=null, htmlTags=false, htmlDisableTagMatching = false, width=0, showToc = false,
           overflowY='unset', breaks = true, typographer = true, linkify = true, xhtmlOut = false,
           outMath = {}, mathJax = {}, htmlSanitize = {}, smiles = {}, openLinkInNewWindow = true,
           maxWidth='',
@@ -522,6 +524,7 @@ class MathpixMarkdown_Model {
           isDisableFootnotes: isDisableFootnotes,
           disableRules: disableRules,
           htmlTags: htmlTags && !disableRuleTypes.includes(eMmdRuleType.html),
+          htmlDisableTagMatching: htmlDisableTagMatching,
           xhtmlOut: xhtmlOut,
           breaks: breaks,
           typographer: typographer,

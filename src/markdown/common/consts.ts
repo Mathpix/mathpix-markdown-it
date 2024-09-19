@@ -8,11 +8,13 @@ const double_quoted = '"[^"]*"';
 export const attr_value = '(?:' + unquoted + '|' + single_quoted + '|' + double_quoted + ')';
 export const attribute = '(?:\\s+' + attr_name + '(?:\\s*=\\s*' + attr_value + ')?)';
 
-const open_tag_mml = '<(math)' + attribute + '*\\s*\\/?>';
-const close_tag_mml = '<\\/math*\\s*>';
-
+const open_tag_mml = '^<(math)' + attribute + '*\\s*\\/?>';
+const close_tag_mml = '^<\\/math*\\s*>';
 export const openTagMML = new RegExp('(?:' + open_tag_mml + ')');
 export const closeTagMML = new RegExp('(?:' + close_tag_mml + ')');
+export const validMathMLRegex: RegExp = /<math\b[^>]*>(\s*<(m.*?\b[^>]*>[\s\S]*?<\/m.*?>)\s*)+<\/math>/i;
+export const mathMLInlineRegex: RegExp = /^<(math\b[^>]*)>[\s\S]*<\/math>/;
+
 
 export const open_tag_smiles = '^<(smiles)' + attribute + '*\\s*\\/?>';
 
@@ -68,6 +70,7 @@ export const reFootNoteMark: RegExp = /^\\footnotemark/;
 export const reFootNoteText: RegExp = /^\\footnotetext|\\blfootnotetext/;
 export const reNumber = /^-?\d+$/;
 export const svgRegex: RegExp = /^<svg\b[^>]*>[\s\S]*<\/svg>$/;
+export const svgInlineRegex: RegExp = /^<svg\b[^>]*>[\s\S]*<\/svg>/;
 export const uuidPattern: string = '(f[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})';
 export const doubleAngleBracketUuidPattern: RegExp = new RegExp(`<<(?:${uuidPattern})>>`, "g");
 export const singleAngleBracketPattern: RegExp = new RegExp(`<(?:${uuidPattern})>`, "g");
@@ -180,7 +183,7 @@ export const terminatedRules = {
     terminated: ["newTheoremBlock"]
   },
   "mathMLBlock": {
-    terminated: ['newTheoremBlock']
+    terminated: ['paragraph', 'newTheoremBlock']
   },
   "abstractBlock": {
     terminated: []
