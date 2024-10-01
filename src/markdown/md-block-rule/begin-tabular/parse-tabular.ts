@@ -140,13 +140,18 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}): A
           if (mc && mc > 1) {
             let d = ic - mc + 1;
             if (MR[d] && MR[d] > 0) {
-              for (let k = 0; k < mc; k++) {
+              let maxK = mc;
+              for (let k = 0; k < maxK; k++) {
                 MR[d+k] = MR[d+k] > 0 ? MR[d+k] - 1 : 0;
                 if (MR[d+k] > 0) {
                   mc -= 1;
                 }
               }
               if (mc < 1) {
+                if (forLatex && multi.latex) {
+                  res.push({token:'td_skip', type:'td_skip', tag: 'td', n: -1,
+                    latex: multi.latex});
+                }
                 continue
               }
             } else {
@@ -235,23 +240,24 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}): A
           continue
         }
 
-
-        const parseSub = getSubTabular(cells[j], 0, true, forLatex);
-        if (parseSub && parseSub.length > 0) {
-          res = res.concat(AddTdSubTable(parseSub,
-            {h: cAlign[ic], v: vAlign[ic], w: cWidth[ic]},
-             {left: cLeft, right: cRight, bottom: CellsHLines[i+1] ? CellsHLines[i+1][ic] : 'none',
-               top: i === 0 ? CellsHLines[i] ? CellsHLines[i][ic] : 'none' : ''}
-            ));
-          continue;
-        }
-
         const parseMath = getMathTableContent(cells[j], 0);
-        let content = '';
-        if (parseMath) {
-          content = parseMath
-        } else {
-          content = getContent(cells[j])
+        let content = parseMath || getContent(cells[j]);
+
+        const handleSubTable = (subTableContent) => {
+          return AddTdSubTable(subTableContent,
+            { h: cAlign[ic], v: vAlign[ic], w: cWidth[ic] },
+            {
+              left: cLeft,
+              right: cRight,
+              bottom: CellsHLines[i + 1] ? CellsHLines[i + 1][ic] : 'none',
+              top: i === 0 ? (CellsHLines[i] ? CellsHLines[i][ic] : 'none') : ''
+            }
+          );
+        }
+        const parseSub = getSubTabular(content, 0, true, forLatex);
+        if (parseSub && parseSub.length > 0) {
+          res = res.concat(handleSubTable(parseSub));
+          continue;
         }
         const data = AddTd(content,
           {h: cAlign[ic], v: vAlign[ic], w: cWidth[ic]},

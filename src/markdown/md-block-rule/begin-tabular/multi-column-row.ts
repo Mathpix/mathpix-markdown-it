@@ -37,28 +37,16 @@ export const getCurrentMC = (cells: string[], i: number): number => {
 
 export const getMultiColumnMultiRow = (str: string, params: {lLines: string, align: string, rLines: string}, forLatex = false): TMulti | null => {
   let attrs: Array<TAttrs> = [];
-  let content: string = '';
   let mr: number = 0;
   let mc: number = 0;
+  let vpos: string = '', nrows: string = '', width: string = '';
 
   str = str.trim();
   let matchMC: RegExpMatchArray = str
     .match(/(?:\\multicolumn\s{0,}\{([^}]*)\}\s{0,}\{([^}]*)\})/);
   if (matchMC) {
-    mc = Number(matchMC[1]);
-    const align = matchMC[2];
-    const cLines: Array<string> = getColumnLines(align);
-    const cAlign: Array<string> = getColumnAlign(align);
-    const cLeft: string = cLines && cLines[0] ? cLines[0] : '';
-    const cRight: string = cLines && cLines[1] ? cLines[1] : '';
-
-    attrs.push(setColumnLines({h: cAlign ? cAlign[0] : ''}, {left: cLeft,  right: cRight}));
-    attrs.push(['colspan', mc.toString()]);
-
     str = str.slice(0, matchMC.index) + str.slice(matchMC.index + matchMC[0].length);
   }
-
-  let vpos = '', nrows = '', width = '';
   let matchMR: RegExpMatchArray = str
     .match(reMultiRowWithVPos);
   if (matchMR) {
@@ -72,10 +60,26 @@ export const getMultiColumnMultiRow = (str: string, params: {lLines: string, ali
       width = matchMR.groups?.width ? matchMR.groups.width : matchMR[2];
     }
   }
+  vpos = vpos ? vpos.trim() : '';
+
+  if (matchMC) {
+    mc = Number(matchMC[1]);
+    const align = matchMC[2];
+    const cLines: Array<string> = getColumnLines(align);
+    const cAlign: Array<string> = getColumnAlign(align);
+    const cLeft: string = cLines && cLines[0] ? cLines[0] : '';
+    const cRight: string = cLines && cLines[1] ? cLines[1] : '';
+
+    attrs.push(setColumnLines({
+      h: cAlign ? cAlign[0] : '',
+      v: vpos === 't' ? 'top' : vpos === 'b' ? 'bottom' : '',
+    }, {left: cLeft,  right: cRight}));
+    attrs.push(['colspan', mc.toString()]);
+  }
+
   if (matchMR) {
     mr = Number(nrows);
     let w: string = width || '';
-    vpos = vpos ? vpos.trim() : '';
     if (!matchMC) {
       attrs.push(setColumnLines(
         {
@@ -107,17 +111,26 @@ export const getMultiColumnMultiRow = (str: string, params: {lLines: string, ali
       ? `{${matchMR[0].trim()}}`
       : matchMR[0].trim();
   }
-  const parseSub: Array<TTokenTabular>  = getSubTabular(str, 0, true, forLatex);
+  const parseMath: string = getMathTableContent(str, 0);
+  let content: string = parseMath || getContent(str);
+  const parseSub: Array<TTokenTabular>  = getSubTabular(content, 0, true, forLatex);
   if (parseSub) {
     return {mr: mr, mc: mc, attrs: attrs, content: '', subTable: parseSub, latex: latex}
   }
 
-  const parseMath: string = getMathTableContent(str, 0);
 
-  if (parseMath && parseMath.length > 0) {
-    content = parseMath;
-  } else {
-    content = getContent(str)
-  }
+
+  // const parseSub: Array<TTokenTabular>  = getSubTabular(str, 0, true, forLatex);
+  // if (parseSub) {
+  //   return {mr: mr, mc: mc, attrs: attrs, content: '', subTable: parseSub, latex: latex}
+  // }
+  //
+  // const parseMath: string = getMathTableContent(str, 0);
+  //
+  // if (parseMath && parseMath.length > 0) {
+  //   content = parseMath;
+  // } else {
+  //   content = getContent(str)
+  // }
   return {mr: mr, mc: mc, attrs: attrs, content: content, subTable: null, latex: latex}
 };
