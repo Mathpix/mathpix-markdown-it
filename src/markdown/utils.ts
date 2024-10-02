@@ -367,7 +367,7 @@ export const findOpenCloseTags = (str: string, tagOpen, tagClose, pendingBackTic
             content: match[0],
             posEnd: posEnd
           });
-          pos = posEnd
+          pos = posEnd < max ? posEnd -1 : posEnd;
         }
       }
     }
