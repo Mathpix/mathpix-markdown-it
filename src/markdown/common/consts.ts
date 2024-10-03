@@ -156,7 +156,7 @@ export const terminatedRules = {
     terminated: ["newTheoremBlock"]
   },
   "BeginTabular": {
-    terminated: ["newTheoremBlock"]
+    terminated: ['paragraph', "newTheoremBlock"]
   },
   "BeginProof": {
     terminated: ["newTheoremBlock"]

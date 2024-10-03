@@ -272,10 +272,7 @@ export const BeginTabular: RuleBlock = (state, startLine: number, endLine: numbe
     iOpen -= dataTags.arrClose.length;
     isCloseTagExist = true;
   }
-  /** For validation mode we can terminate immediately */
-  if (silent) {
-    return true;
-  }
+
   for (; nextLine <= endLine; nextLine++) {
     dataTags = null;
     if (state.isEmpty(nextLine)) { 
@@ -320,6 +317,12 @@ export const BeginTabular: RuleBlock = (state, startLine: number, endLine: numbe
   if (!isCloseTagExist) {
     return false;
   }
+
+  /** For validation mode we can terminate immediately */
+  if (silent) {
+    return true;
+  }
+
   if (state.md.options.centerTables) {
     return StatePushTabularBlock(state, startLine, nextLine, resString, 'center', true);
   } else {
