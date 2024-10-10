@@ -1,6 +1,6 @@
 import { MarkdownIt } from 'markdown-it';
 import { MathpixMarkdownModel, ParserErrors } from "../mathpix-markdown-model";
-import { resetSizeCounter, resetTextCounter } from './mdPluginText';
+import { resetTextCounter } from './mdPluginText';
 import { resetTheoremEnvironments } from './md-theorem/helper';
 import { rest_mmd_footnotes_list } from './md-latex-footnotes/utils';
 
@@ -246,7 +246,6 @@ export const initMathpixMarkdown = (md, callback) => {
   md.parse = (markdown, env) => {
     resetTheoremEnvironments();
     rest_mmd_footnotes_list();
-    resetSizeCounter();
     const mmdOptions = callback();
     setOptionForPreview(md.options, mmdOptions);
     return parse.call(md, markdown, env)
