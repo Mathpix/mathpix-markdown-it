@@ -2,8 +2,14 @@ import { RuleBlock, RuleInline } from 'markdown-it';
 export declare let sectionCount: number;
 export declare let subCount: number;
 export declare let subSubCount: number;
+export declare let size: {
+    heightEx: number;
+    widthEx: number;
+};
 export declare const resetCounter: RuleInline;
 export declare const resetTextCounter: RuleInline;
+export declare const resetSizeCounter: () => void;
+export declare const setSizeCounter: (widthEx: number, heightEx: number) => void;
 export declare const setTextCounterSection: (envName: string, num: number) => void;
 export declare const headingSection: RuleBlock;
 export declare const renderInlineContent: (token: any, options: any, env: any, slf: any) => any;

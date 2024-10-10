@@ -17,6 +17,7 @@ import { menuStyle } from '../contex-menu/styles';
 import { clipboardCopyStyles } from '../copy-to-clipboard/clipboard-copy-styles';
 import { eMmdRuleType } from "../markdown/common/mmdRules";
 import { getDisableRuleTypes } from "../markdown/common/mmdRulesToDisable";
+import { size } from "../markdown/mdPluginText";
 
 export interface optionsMathpixMarkdown {
     alignMathBlock?: Property.TextAlign;
@@ -243,6 +244,14 @@ class MathpixMarkdown_Model {
   };
   
   parseMarkdownByElement = parseMarkdownByElement;
+
+  markdownToHTMLWithSize = (markdown: string, options: TMarkdownItOptions = {}) => {
+    let html = this.markdownToHTML(markdown, options);
+    return {
+      html: html,
+      size: size
+    }
+  }
 
   markdownToHTML = (markdown: string, options: TMarkdownItOptions = {}):string => {
     const { lineNumbering = false, isDisableFancy = false,  htmlWrapper = false } = options;

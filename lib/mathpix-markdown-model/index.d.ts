@@ -196,6 +196,13 @@ declare class MathpixMarkdown_Model {
     getMaxWidthStyle: (maxWidth?: string, isHideScroll?: boolean) => string;
     parseMarkdownByHTML: (html: string, include_sub_math?: boolean) => any[];
     parseMarkdownByElement: (el: Document | HTMLElement, include_sub_math?: boolean) => any[];
+    markdownToHTMLWithSize: (markdown: string, options?: TMarkdownItOptions) => {
+        html: string;
+        size: {
+            heightEx: number;
+            widthEx: number;
+        };
+    };
     markdownToHTML: (markdown: string, options?: TMarkdownItOptions) => string;
     showTocInContainer: (html: string, containerName?: string) => void;
     getTocContainerHTML: (html: string, onlyContent?: boolean) => string;

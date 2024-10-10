@@ -22,6 +22,10 @@ export let subCount: number = 0;
 export let subSubCount: number = 0;
 let isNewSect: boolean = false;
 let isNewSubSection: boolean = false;
+export let size = {
+  heightEx: 0,
+  widthEx: 0
+}
 
 export const resetCounter: RuleInline = () => {
   resetTextCounter();
@@ -32,6 +36,18 @@ export const resetTextCounter: RuleInline = () => {
   subCount = 0;
   subSubCount = 0;
 };
+
+export const resetSizeCounter = () => {
+  size = {
+    heightEx: 0,
+    widthEx: 0
+  }
+}
+
+export const setSizeCounter = (widthEx: number, heightEx: number) => {
+  size.widthEx += widthEx;
+  size.heightEx += heightEx;
+}
 
 export const setTextCounterSection = (envName: string, num: number) => {
   switch (envName) {
