@@ -16,6 +16,7 @@ import { ILabel, getLabelByUuidFromLabelsList } from "./common/labels";
 import { textCollapse } from "./md-inline-rule/text-collapse";
 import { newlineToSpace } from "./md-inline-rule/new-line-to-space";
 import { getStyleFromHighlight } from "./highlight/common";
+import {ParserErrors} from "../mathpix-markdown-model";
 
 export let sectionCount: number = 0;
 export let subCount: number = 0;
@@ -1322,7 +1323,10 @@ const renderPageBreaks = (tokens, idx, options, env = {}, slf) => {
 
 const renderTextError = (tokens, idx, options, env = {}, slf): string => {
   const token = tokens[idx];
-  const style: string = 'color: red; background-color: yellow;';
+  let style: string = 'color: red; background-color: yellow;';
+  if (options.parserErrors === ParserErrors.hide) {
+    style += ' display: none;'
+  }
   return `<span style="${style}">${token.content}</span>`;
 };
 
