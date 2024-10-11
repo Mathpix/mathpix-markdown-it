@@ -4,6 +4,8 @@ import { AsciiMath } from 'mathjax-full/js/input/asciimath.js';
 import 'mathjax-full/js/input/tex/AllPackages.js';
 /** Load configuration for additional package array */
 import './helpers/array/ArrayConfiguration';
+/** Load configuration for additional package icon */
+import './helpers/icon/IconConfiguration';
 export declare const mml: MathML<unknown, unknown, unknown>;
 export declare const svg: SVG<unknown, unknown, unknown>;
 export declare const asciimath: AsciiMath<unknown, unknown, unknown>;

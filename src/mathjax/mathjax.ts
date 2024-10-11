@@ -11,6 +11,9 @@ import {liteAdaptor} from 'mathjax-full/js/adaptors/liteAdaptor.js';
 import 'mathjax-full/js/input/tex/AllPackages.js';
 /** Load configuration for additional package array */
 import './helpers/array/ArrayConfiguration';
+/** Load configuration for additional package icon */
+import './helpers/icon/IconConfiguration';
+
 import {AssistiveMmlHandler} from'mathjax-full/js/a11y/assistive-mml.js';
 
 //Fix MathJax error https://github.com/mathjax/MathJax/issues/3033#issuecomment-1511374166
