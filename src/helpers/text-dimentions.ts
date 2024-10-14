@@ -9,13 +9,18 @@ export class FontMetrics {
   }
 
   loadFont() {
-    // Convert Base64 string to a buffer
-    const fontBuffer = Buffer.from(base64AriaFont, 'base64');
-    // Load the font only once
-    // const fontBuffer = fs.readFileSync(this.fontPath);
-    this.font = opentype.parse(fontBuffer.buffer);
+    if (typeof Buffer !== 'undefined') {
+      // Convert Base64 string to a buffer
+      const fontBuffer = Buffer.from(base64AriaFont, 'base64');
+      // Load the font only once
+      // const fontBuffer = fs.readFileSync(this.fontPath);
+      this.font = opentype.parse(fontBuffer.buffer);
+    }
   }
   getWidth(text, fontSize) {
+    if (!this.font) {
+      return 0;
+    }
     let totalWidth = 0;
 
     for (let char of text) {
@@ -31,6 +36,9 @@ export class FontMetrics {
   }
 
   getWidthInEx(text, fontSize) {
+    if (!this.font) {
+      return 0;
+    }
     const widthX = this.getWidth('x', fontSize);
     const widthText = this.getWidth(text, fontSize);
 
