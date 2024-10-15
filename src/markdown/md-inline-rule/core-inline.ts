@@ -7,7 +7,7 @@ import {
 } from "../md-latex-footnotes/utils";
 import { addAttributesToParentToken } from "../utils";
 import { setSizeCounter } from "../mdPluginText";
-import { FontMetrics } from "../../helpers/text-dimentions";
+import { getTextWidthByTokens } from "../common/textWidthByTokens";
 
 /** Top-level inline rule executor 
  * Replace inline core rule
@@ -25,7 +25,7 @@ export const coreInline = (state) => {
   if (!state.env.footnotes) { state.env.footnotes = {}; }
   state.env.mmd_footnotes = {...state.env.footnotes};
 
-  const fontMetrics = new FontMetrics();
+  // const fontMetrics = new FontMetrics();
   
   if (!state.env.mmd_footnotes.list) { state.env.mmd_footnotes.list = []}
   for (let i = 0; i < tokens.length; i++) {
@@ -125,24 +125,12 @@ export const coreInline = (state) => {
       let widthEx = 0;
       let heightEx = 0;
       if (token.type === 'inline' && token.children?.length) {
-        for (let k = 0; k < token.children?.length; k++) {
-          if (token.children[k].type === 'text') {
-            // let width = fontMetrics.getWidth(token.children[k].content, 16);
-            let widthTextEx = fontMetrics.getWidthInEx(token.children[k].content, 16);
-            if (widthTextEx) {
-              widthEx += widthTextEx;
-            }
-          }
-          if (token.children[k].widthEx) {
-            widthEx += token.children[k].widthEx;
-          }
-          if (token.children[k].heightEx && heightEx < token.children[k].heightEx) {
-            heightEx = token.children[k].heightEx;
-          }
+        let data = getTextWidthByTokens(token.children, 'normal', widthEx, heightEx);
+        if (data) {
+          token.widthEx = data.widthEx;
+          token.heightEx = data.heightEx;
+          setSizeCounter(data.widthEx, data.heightEx);
         }
-        token.widthEx = widthEx;
-        token.heightEx = heightEx;
-        setSizeCounter(widthEx, heightEx);
       }
       if (token.type === 'inline' && token.children?.length) {
         if (token.lastBreakToSpace && token.children[token.children.length-1].type === 'softbreak') {

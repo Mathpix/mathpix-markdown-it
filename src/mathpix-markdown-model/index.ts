@@ -18,6 +18,7 @@ import { clipboardCopyStyles } from '../copy-to-clipboard/clipboard-copy-styles'
 import { eMmdRuleType } from "../markdown/common/mmdRules";
 import { getDisableRuleTypes } from "../markdown/common/mmdRulesToDisable";
 import {resetSizeCounter, size} from "../markdown/mdPluginText";
+import {fontMetrics, IFonts} from "../helpers/text-dimentions";
 
 export interface optionsMathpixMarkdown {
     alignMathBlock?: Property.TextAlign;
@@ -245,8 +246,12 @@ class MathpixMarkdown_Model {
   
   parseMarkdownByElement = parseMarkdownByElement;
 
-  markdownToHTMLWithSize = (markdown: string, options: TMarkdownItOptions = {}) => {
+  markdownToHTMLWithSize = (markdown: string, options: TMarkdownItOptions = {}, fonts: IFonts = null) => {
     resetSizeCounter();
+    if (fonts) {
+      fontMetrics.loadFont(fonts);
+    }
+
     let html = this.markdownToHTML(markdown, options);
     return {
       html: html,

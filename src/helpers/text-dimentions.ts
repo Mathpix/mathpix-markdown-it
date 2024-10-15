@@ -1,49 +1,53 @@
 const opentype = require('opentype.js');
-import { base64AriaFont } from "./ariaBase64";
 
+export interface IFonts {
+  normal: ArrayBuffer,
+  bold?: ArrayBuffer,
+}
 export class FontMetrics {
   font = null;
+  fontBold = null;
   constructor() {
     this.font = null;
-    this.loadFont();
+    this.fontBold = null;
   }
 
-  loadFont() {
-    if (typeof Buffer !== 'undefined') {
-      // Convert Base64 string to a buffer
-      const fontBuffer = Buffer.from(base64AriaFont, 'base64');
-      // Load the font only once
-      // const fontBuffer = fs.readFileSync(this.fontPath);
-      this.font = opentype.parse(fontBuffer.buffer);
+  loadFont(fonts: IFonts) {
+    if (fonts.normal) {
+      this.font = opentype.parse(fonts.normal);
+      if (fonts.bold) {
+        this.fontBold = opentype.parse(fonts.bold);
+      }
     }
   }
-  getWidth(text, fontSize) {
+  getWidth(text, fontSize, fontType = 'normal') {
     if (!this.font) {
       return 0;
     }
     let totalWidth = 0;
 
+    let isBold = this.fontBold && fontType === 'bold';
     for (let char of text) {
-      const glyph = this.font.charToGlyph(char);
+      const glyph = isBold ? this.fontBold.charToGlyph(char) : this.font.charToGlyph(char);
       const advanceWidth = glyph.advanceWidth;
 
+      let unitsPerEm = isBold ? this.fontBold.unitsPerEm : this.font.unitsPerEm
       // Convert the width from font units to pixels
-      const pixelWidth = (advanceWidth / this.font.unitsPerEm) * fontSize;
+      const pixelWidth = (advanceWidth / unitsPerEm) * fontSize;
       totalWidth += pixelWidth;
     }
-
     return totalWidth;
   }
 
-  getWidthInEx(text, fontSize) {
+  getWidthInEx(text, fontSize, fontType = 'normal') {
     if (!this.font) {
       return 0;
     }
     const widthX = this.getWidth('x', fontSize);
-    const widthText = this.getWidth(text, fontSize);
-
+    const widthText = this.getWidth(text, fontSize, fontType);
     // Calculate width in ex
     return widthText / widthX;
   }
 }
 
+export const fontMetrics = new FontMetrics();
