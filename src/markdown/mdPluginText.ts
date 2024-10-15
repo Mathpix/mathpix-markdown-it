@@ -16,6 +16,7 @@ import { ILabel, getLabelByUuidFromLabelsList } from "./common/labels";
 import { textCollapse } from "./md-inline-rule/text-collapse";
 import { newlineToSpace } from "./md-inline-rule/new-line-to-space";
 import { getStyleFromHighlight } from "./highlight/common";
+import {ParserErrors} from "../mathpix-markdown-model";
 
 export let sectionCount: number = 0;
 export let subCount: number = 0;
@@ -1320,6 +1321,21 @@ const renderPageBreaks = (tokens, idx, options, env = {}, slf) => {
   return '';
 };
 
+const renderTextError = (tokens, idx, options, env = {}, slf): string => {
+  const token = tokens[idx];
+  let style: string = 'color: red; background-color: yellow;';
+  if (options.parserErrors === ParserErrors.hide) {
+    style += ' display: none;'
+  }
+  return `<span style="${style}">${token.content}</span>`;
+};
+
+const renderTextIcon = (tokens, idx, options, env = {}, slf): string => {
+  const token = tokens[idx];
+  const attrs: string = slf.renderAttrs(token);
+  return `<span ${attrs}>${token.content}</span>`;
+};
+
 const mappingTextStyles = {
   textbf: "TextBold",
   textbf_open: "TextBoldOpen",
@@ -1344,7 +1360,9 @@ const mappingTextStyles = {
   out: "out",
   out_open: "out_open",
   out_close: "out_close",
-  dotfill: "dotfill"
+  dotfill: "dotfill",
+  text_icon: "text_icon",
+  text_error: "text_error"
 };
 
 const mapping = {
@@ -1427,6 +1445,10 @@ export default () => {
             return renderCodeInlineClose();          
           case "dotfill":
             return renderDotFill();
+          case "text_icon":
+            return renderTextIcon(tokens, idx, options, env, slf);
+          case "text_error":
+            return renderTextError(tokens, idx, options, env, slf);
           default:
             return '';
         }

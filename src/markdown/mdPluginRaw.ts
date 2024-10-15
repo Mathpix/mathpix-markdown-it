@@ -44,6 +44,7 @@ import { mathMLBlock } from "./md-block-rule/mathml-block";
 import { inlineMathML } from "./md-inline-rule/mathml-inline";
 import { mmdHtmlInline2 } from "./md-inline-rule2/mmd-html_inline2";
 import { html_inline_full_tag } from "./md-inline-rule/html_inline_full_tag";
+import { inlineMmdIcon } from "./md-inline-rule/mmd-icon";
 const isSpace = require('markdown-it/lib/common/utils').isSpace;
 
 const getMathEnvironment = (str: string): string => {
@@ -799,6 +800,7 @@ export default options => {
     md.inline.ruler.before("setCounterTheorem", "setCounterSection", setCounterSection); /** Parse \setcounter{section} */
     md.inline.ruler.before("renewcommand_inline", "newCommandQedSymbol", newCommandQedSymbol); /** Parse \\renewcommand\qedsymbol{$\blacksquare$} */
     md.inline.ruler.push("simpleMath", simpleMath);
+    md.inline.ruler.before("escape", "inlineMmdIcon", inlineMmdIcon);
     md.inline.ruler.before("multiMath", "refs", refInsideMathDelimiter);
     md.inline.ruler.before("multiMath", "asciiMath", asciiMath);
     md.inline.ruler.before("asciiMath", "backtickAsAsciiMath", backtickAsAsciiMath);
