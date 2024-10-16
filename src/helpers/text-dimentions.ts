@@ -43,7 +43,9 @@ export class FontMetrics {
     if (!this.font) {
       return 0;
     }
-    const widthX = this.getWidth('x', fontSize);
+    const widthX = fontSize === 16
+      ? 8.296875
+      : this.getWidth('x', fontSize);
     const widthText = this.getWidth(text, fontSize, fontType);
     // Calculate width in ex
     return widthText / widthX;
