@@ -1,5 +1,7 @@
 import { Property } from 'csstype';
 import { ISmilesOptions } from '../markdown/md-chemistry';
+import { IFontMetricsOptions } from "../markdown/common/text-dimentions";
+import { size, ISize } from "../markdown/common/counters";
 export interface optionsMathpixMarkdown {
     alignMathBlock?: Property.TextAlign;
     display?: Property.Display;
@@ -98,6 +100,7 @@ export type TMarkdownItOptions = {
     copyToClipboard?: boolean;
     renderOptions?: RenderOptions;
     previewUuid?: string;
+    enableSizeCalculation?: boolean;
 };
 export type TOutputMath = {
     include_mathml?: boolean;
@@ -196,6 +199,10 @@ declare class MathpixMarkdown_Model {
     getMaxWidthStyle: (maxWidth?: string, isHideScroll?: boolean) => string;
     parseMarkdownByHTML: (html: string, include_sub_math?: boolean) => any[];
     parseMarkdownByElement: (el: Document | HTMLElement, include_sub_math?: boolean) => any[];
+    markdownToHTMLWithSize: (markdown: string, options?: TMarkdownItOptions, fontMetricsOptions?: IFontMetricsOptions) => {
+        html: string;
+        size: ISize;
+    };
     markdownToHTML: (markdown: string, options?: TMarkdownItOptions) => string;
     showTocInContainer: (html: string, containerName?: string) => void;
     getTocContainerHTML: (html: string, onlyContent?: boolean) => string;

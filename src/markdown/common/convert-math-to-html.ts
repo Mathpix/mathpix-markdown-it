@@ -28,6 +28,8 @@ export const convertMathToHtml = (state, token, options) => {
       });
       token.mathEquation = data.html;
       token.mathData = data.data;
+      token.widthEx = token.mathData.widthEx;
+      token.heightEx = token.mathData.heightEx;
     } else {
       if (token.return_asciimath) {
         MathJax.Reset(begin_number);
@@ -61,6 +63,8 @@ export const convertMathToHtml = (state, token, options) => {
         token.ascii_csv = data.ascii_csv;
         token.ascii_md = data.ascii_md;
         token.labels = data.labels;
+        token.widthEx = token.mathData.widthEx;
+        token.heightEx = token.mathData.heightEx;
       } else {
         MathJax.Reset(begin_number);
         const data = MathJax.Typeset(math, {display: isBlock, metric: { cwidth: cwidth },
@@ -76,6 +80,8 @@ export const convertMathToHtml = (state, token, options) => {
         token.ascii_csv = data.ascii_csv;
         token.ascii_md = data.ascii_md;
         token.labels = data.labels;
+        token.widthEx = token.mathData.widthEx;
+        token.heightEx = token.mathData.heightEx;
       }
     }
 

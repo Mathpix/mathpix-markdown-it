@@ -16,6 +16,8 @@ export interface IOuterData {
     height?: number;
     heightAndDepth?: number;
     width?: string;
+    widthEx?: number;
+    heightEx?: number;
 }
 export declare const OuterHTML: (data: any, outMath: any) => string;
 export declare const MathJax: {
@@ -56,6 +58,8 @@ export declare const MathJax: {
             height?: number;
             heightAndDepth?: number;
             width?: string;
+            widthEx?: number;
+            heightEx?: number;
         };
     };
     TypesetSvgAndAscii: (string: any, options?: any) => {
@@ -83,6 +87,8 @@ export declare const MathJax: {
             height?: number;
             heightAndDepth?: number;
             width?: string;
+            widthEx?: number;
+            heightEx?: number;
         };
     };
     /**

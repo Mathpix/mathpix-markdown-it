@@ -97,6 +97,7 @@ export const MathpixStyle = (setTextAlignJustify: boolean = false, useColors: bo
     
     svg mjx-container {
       overflow: visible;
+      padding: 0;
     }
     
     svg math-block[data-width="full"] {

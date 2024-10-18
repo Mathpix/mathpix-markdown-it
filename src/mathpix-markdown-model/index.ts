@@ -17,6 +17,8 @@ import { menuStyle } from '../contex-menu/styles';
 import { clipboardCopyStyles } from '../copy-to-clipboard/clipboard-copy-styles';
 import { eMmdRuleType } from "../markdown/common/mmdRules";
 import { getDisableRuleTypes } from "../markdown/common/mmdRulesToDisable";
+import { fontMetrics, IFontMetricsOptions } from "../markdown/common/text-dimentions";
+import { resetSizeCounter, size, ISize } from "../markdown/common/counters";
 
 export interface optionsMathpixMarkdown {
     alignMathBlock?: Property.TextAlign;
@@ -116,7 +118,8 @@ export type TMarkdownItOptions = {
   footnotes?: Footnotes;
   copyToClipboard?: boolean;
   renderOptions?: RenderOptions;
-  previewUuid?: string
+  previewUuid?: string;
+  enableSizeCalculation?: boolean;
 }
 
 export type TOutputMath = {
@@ -243,6 +246,23 @@ class MathpixMarkdown_Model {
   };
   
   parseMarkdownByElement = parseMarkdownByElement;
+
+  markdownToHTMLWithSize = (
+    markdown: string,
+    options: TMarkdownItOptions = {},
+    fontMetricsOptions: IFontMetricsOptions = null
+  ): {html: string, size: ISize} => {
+    resetSizeCounter();
+    if (fontMetricsOptions) {
+      fontMetrics.loadFont(fontMetricsOptions);
+    }
+    options.enableSizeCalculation = true;
+    let html: string = this.markdownToHTML(markdown, options);
+    return {
+      html: html,
+      size: size
+    }
+  }
 
   markdownToHTML = (markdown: string, options: TMarkdownItOptions = {}):string => {
     const { lineNumbering = false, isDisableFancy = false,  htmlWrapper = false } = options;
