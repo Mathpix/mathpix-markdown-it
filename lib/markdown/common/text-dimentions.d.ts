@@ -4,6 +4,7 @@ export interface IFontMetricsOptions {
     fontBold?: ArrayBuffer;
     fontSize?: number;
     ex?: number;
+    fontWeight?: eFontType;
 }
 export declare enum eFontType {
     normal = "normal",
@@ -14,6 +15,7 @@ export declare class FontMetrics {
     fontBold: Font;
     fontSize: number;
     ex: number;
+    fontWeight: eFontType;
     constructor();
     loadFont(options: IFontMetricsOptions): void;
     isFontLoaded(): boolean;

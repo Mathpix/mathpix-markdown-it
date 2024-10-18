@@ -6,7 +6,8 @@ export interface IFontMetricsOptions {
   font: ArrayBuffer,
   fontBold?: ArrayBuffer,
   fontSize?: number,
-  ex?: number
+  ex?: number,
+  fontWeight?: eFontType
 }
 
 export enum eFontType {
@@ -19,6 +20,7 @@ export class FontMetrics {
   fontBold: Font = null;
   fontSize: number = fonSizeDef;
   ex: number = exDef;
+  fontWeight: eFontType = eFontType.normal;
 
   constructor() {}
 
@@ -33,6 +35,9 @@ export class FontMetrics {
     }
     this.fontSize = options.fontSize ?? fonSizeDef;
     this.ex = options.ex ?? exDef;
+    if (options.fontWeight === eFontType.bold) {
+      this.fontWeight = eFontType.bold
+    }
   }
 
   isFontLoaded(): boolean {
@@ -43,7 +48,8 @@ export class FontMetrics {
   }
 
   private getGlyph(char: string, fontType: eFontType = eFontType.normal): Glyph {
-    const isBold = this.fontBold && fontType === eFontType.bold;
+    const isBold = this.fontBold
+      && (fontType === eFontType.bold || this.fontWeight === eFontType.bold);
     return isBold
       ? this.fontBold.charToGlyph(char)
       : this.font.charToGlyph(char);
@@ -59,7 +65,8 @@ export class FontMetrics {
     }
     try {
       let totalWidth: number = 0;
-      const isBold: boolean = this.fontBold && fontType === eFontType.bold;
+      const isBold: boolean = this.fontBold
+        && (fontType === eFontType.bold || this.fontWeight === eFontType.bold);
       const font: Font = isBold ? this.fontBold : this.font;
       const unitsPerEm: number = font.unitsPerEm;
 
