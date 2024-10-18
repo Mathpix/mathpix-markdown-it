@@ -133,3 +133,9 @@ export function markdownToHTML(markdown: string, options: TMarkdownItOptions = {
     return '';
   }
 }
+
+export const applyMathpixMarkdownPlugins = (options: TMarkdownItOptions = {}) => {
+  let md = mdInit(options);
+  md = injectRenderRules(md);
+  return md;
+}

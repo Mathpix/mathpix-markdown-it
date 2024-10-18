@@ -3,6 +3,7 @@ import MathpixMarkdown from './components/mathpix-markdown';
 import {
   mathpixMarkdownPlugin,
   initMathpixMarkdown } from './markdown/mathpix-markdown-plugins';
+import { applyMathpixMarkdownPlugins } from './markdown';
 
 import {
   mdPluginMathJax,
@@ -65,6 +66,7 @@ export {
   Footnotes,
   eLabelType, ILabel, getLabelsList, getLabelByKeyFromLabelsList, clearLabelsList,
   normalizeLink,
-  RenderOptions
+  RenderOptions,
+  applyMathpixMarkdownPlugins
 };
 
