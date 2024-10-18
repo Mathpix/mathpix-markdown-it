@@ -6,6 +6,8 @@ import {
   addFootnoteToListForBlFootnotetext
 } from "../md-latex-footnotes/utils";
 import { addAttributesToParentToken } from "../utils";
+import { setSizeCounter } from "../common/counters";
+import { getTextWidthByTokens, ISizeEx } from "../common/textWidthByTokens";
 
 /** Top-level inline rule executor 
  * Replace inline core rule
@@ -118,6 +120,16 @@ export const coreInline = (state) => {
         currentTag: currentTag,
       }, {...envToInline});
       state.md.inline.parse(token.content, state.md, state.env, token.children);
+      if (state.md.options?.enableSizeCalculation) {
+        if (token.type === 'inline' && token.children?.length) {
+          let data: ISizeEx = getTextWidthByTokens(token.children);
+          if (data) {
+            token.widthEx = data.widthEx;
+            token.heightEx = data.heightEx;
+            setSizeCounter(data.widthEx, data.heightEx);
+          }
+        }
+      }
       if (token.type === 'inline' && token.children?.length) {
         if (token.lastBreakToSpace && token.children[token.children.length-1].type === 'softbreak') {
           token.children[token.children.length-1].hidden = true;

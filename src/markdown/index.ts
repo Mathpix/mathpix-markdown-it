@@ -30,7 +30,8 @@ const mdInit = (options: TMarkdownItOptions) => {
     footnotes = {},
     copyToClipboard = false,
     renderOptions = null,
-    previewUuid = ""
+    previewUuid = "",
+    enableSizeCalculation = false
   } = options;
   const mmdOptions = {
     width: width,
@@ -56,7 +57,8 @@ const mdInit = (options: TMarkdownItOptions) => {
     footnotes: footnotes,
     copyToClipboard: copyToClipboard,
     renderOptions: renderOptions,
-    previewUuid: previewUuid
+    previewUuid: previewUuid,
+    enableSizeCalculation: enableSizeCalculation
   };
   const disableRuleTypes: eMmdRuleType[] = renderOptions ? getDisableRuleTypes(renderOptions) : [];
   let md = require("markdown-it")({

@@ -29,6 +29,8 @@ export interface IOuterData {
   height?: number,
   heightAndDepth?: number,
   width?: string;
+  widthEx?: number;
+  heightEx?: number;
 }
 
 const toMathML = (node => {
@@ -140,6 +142,12 @@ const OuterData = (adaptor, node, math, outMath, forDocx = false, accessibility?
         res.height = height;
         res.heightAndDepth = heightAndDepth;
         res.width = width;
+        let widthEx = svgElement?.attributes.width;
+        widthEx = widthEx ? widthEx.replace(/ex/g, '') : '';
+        let heightEx = svgElement?.attributes.height;
+        heightEx = heightEx ? heightEx.replace(/ex/g, '') : '';
+        res.widthEx = Number(widthEx);
+        res.heightEx = Number(heightEx);
       } else {
         if (node instanceof HTMLElement) {
           let width: string = getWidthFromNode(node);
