@@ -1,6 +1,7 @@
 import MathpixLoader from './components/mathpix-loader';
 import MathpixMarkdown from './components/mathpix-markdown';
 import { mathpixMarkdownPlugin, initMathpixMarkdown } from './markdown/mathpix-markdown-plugins';
+import { applyMathpixMarkdownPlugins } from './markdown';
 import { mdPluginMathJax, mdPluginHighlightCode, mdPluginText, mdPluginTOC, mdPluginAnchor, mdPluginTableTabular, mdPluginList, mdPluginChemistry, mdPluginCollapsible, mdLatexFootnotes, mdSetPositionsAndHighlight } from "./markdown/mdPluginConfigured";
 import { MathpixMarkdownModel, TMarkdownItOptions, optionsMathpixMarkdown, TOutputMath, TOutputMathJax, THtmlSanitize, TTocStyle, THighlight, ParserErrors, CodeHighlight, Footnotes, RenderOptions } from "./mathpix-markdown-model";
 import { ISmilesOptions } from './markdown/md-chemistry';
@@ -9,4 +10,4 @@ import { rest_mmd_footnotes_list } from './markdown/md-latex-footnotes/utils';
 import { FootnoteItem } from './markdown/md-latex-footnotes/interfaces';
 import { eLabelType, ILabel, getLabelsList, getLabelByKeyFromLabelsList, clearLabelsList } from "./markdown/common/labels";
 import { normalizeLink } from './helpers/normalize-link';
-export { MathpixLoader, MathpixMarkdown, MathpixMarkdownModel, mathpixMarkdownPlugin, mdPluginCollapsible, mdLatexFootnotes, mdSetPositionsAndHighlight, initMathpixMarkdown, mdPluginMathJax, mdPluginHighlightCode, mdPluginText, mdPluginTOC, mdPluginAnchor, mdPluginTableTabular, mdPluginList, mdPluginChemistry, TMarkdownItOptions, optionsMathpixMarkdown, TOutputMath, TOutputMathJax, THtmlSanitize, ISmilesOptions, resetTheoremEnvironments, rest_mmd_footnotes_list, FootnoteItem, TTocStyle, THighlight, CodeHighlight, ParserErrors, Footnotes, eLabelType, ILabel, getLabelsList, getLabelByKeyFromLabelsList, clearLabelsList, normalizeLink, RenderOptions };
+export { MathpixLoader, MathpixMarkdown, MathpixMarkdownModel, mathpixMarkdownPlugin, mdPluginCollapsible, mdLatexFootnotes, mdSetPositionsAndHighlight, initMathpixMarkdown, mdPluginMathJax, mdPluginHighlightCode, mdPluginText, mdPluginTOC, mdPluginAnchor, mdPluginTableTabular, mdPluginList, mdPluginChemistry, TMarkdownItOptions, optionsMathpixMarkdown, TOutputMath, TOutputMathJax, THtmlSanitize, ISmilesOptions, resetTheoremEnvironments, rest_mmd_footnotes_list, FootnoteItem, TTocStyle, THighlight, CodeHighlight, ParserErrors, Footnotes, eLabelType, ILabel, getLabelsList, getLabelByKeyFromLabelsList, clearLabelsList, normalizeLink, RenderOptions, applyMathpixMarkdownPlugins };

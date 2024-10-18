@@ -5,3 +5,4 @@ export declare const markdownToHtmlPipeline: (content: string, options?: TMarkdo
  * convert a markdown text to html
  */
 export declare function markdownToHTML(markdown: string, options?: TMarkdownItOptions): string;
+export declare const applyMathpixMarkdownPlugins: (options?: TMarkdownItOptions) => any;
