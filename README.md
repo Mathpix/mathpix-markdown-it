@@ -695,7 +695,7 @@ The `applyMathpixMarkdownPlugins` function initializes a `markdown-it` instance 
 import { applyMathpixMarkdownPlugins } from 'mathpix-markdown-it';
 
 const md = applyMathpixMarkdownPlugins({
-  htmlTags: true,  // Example option for Markdown -it
+  htmlTags: true,  // Example option for markdown-it
 });
 
 // We use a configured instance for Parsing Markdown
