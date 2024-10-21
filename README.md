@@ -677,6 +677,38 @@ import {
 <img width="370" alt="Screen Shot 2022-05-03 at 17 21 50" src="https://user-images.githubusercontent.com/32493105/166471623-fd3f6a5b-84e4-4d43-afcd-0384e83eb2df.png">
 
 
+## mathpix-markdown-it setup and advanced capabilities
+
+The `applyMathpixMarkdownPlugins` function initializes a `markdown-it` instance and applies a set of plugins, including `mathpix-markdown-it` and other extensions to enhance Markdown functionality, such as tables, footnotes, subscript and superscript symbols, and more.
+
+### Parameters:
+
+ - `options` (TMarkdownItOptions): An options object for configuring the `markdown-it` instance. This object may contain settings that are passed to `markdown-it` and the plugins being used. By default, an empty object is passed.
+
+### Return Value:
+
+  - The function returns a configured `markdown-it` instance with the applied plugins and custom rendering rules.
+
+### Usage Example:
+
+```js
+import { applyMathpixMarkdownPlugins } from 'mathpix-markdown-it';
+
+const md = applyMathpixMarkdownPlugins({
+  htmlTags: true,  // Example option for markdown-it
+});
+
+// We use a configured instance for Parsing Markdown
+const renderedHtml = md.render('Your **Markdown** text with \\textbf{mathpix-markdown-it} support!');
+console.log(renderedHtml);
+```
+
+renderedHtml:
+```html
+<div>Your <strong>Markdown</strong> text with <strong>mathpix-markdown-it</strong> support!</div>
+```
+
+
 # Documentation
 
 ## React components

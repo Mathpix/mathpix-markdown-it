@@ -1,3 +1,4 @@
+import { MarkdownIt } from 'markdown-it';
 import { mdPluginCollapsible, mdSetPositionsAndHighlight } from "./mdPluginConfigured";
 
 import { mathpixMarkdownPlugin } from './mathpix-markdown-plugins';
@@ -8,7 +9,7 @@ import { applyRulesToDisableRules, getDisableRuleTypes, getListToDisableByOption
 import { eMmdRuleType } from "./common/mmdRules";
 
 /** md renderer */
-const mdInit = (options: TMarkdownItOptions) => {
+const mdInit = (options: TMarkdownItOptions): MarkdownIt => {
   const {htmlTags = false, htmlDisableTagMatching = false, xhtmlOut = false, width = 1200, breaks = true, typographer = true, linkify = true,
           outMath = {}, mathJax = {}, renderElement = {},
           lineNumbering = false, startLine = 0, htmlSanitize = true, smiles = {}, forDocx = false, openLinkInNewWindow =  true,
@@ -59,7 +60,7 @@ const mdInit = (options: TMarkdownItOptions) => {
     previewUuid: previewUuid
   };
   const disableRuleTypes: eMmdRuleType[] = renderOptions ? getDisableRuleTypes(renderOptions) : [];
-  let md = require("markdown-it")({
+  let md: MarkdownIt = require("markdown-it")({
     html: htmlTags && !disableRuleTypes.includes(eMmdRuleType.html),
     htmlDisableTagMatching: htmlDisableTagMatching,
     xhtmlOut: xhtmlOut,
@@ -104,8 +105,8 @@ const mdInit = (options: TMarkdownItOptions) => {
 
 /** String transformtion pipeline */
 // @ts-ignore
-export const markdownToHtmlPipeline = (content: string, options: TMarkdownItOptions = {}) => {
-  let md = mdInit(options);
+export const markdownToHtmlPipeline = (content: string, options: TMarkdownItOptions = {}): string => {
+  let md: MarkdownIt = mdInit(options);
 
   // inject rules override
   md = injectRenderRules(md);
@@ -132,4 +133,10 @@ export function markdownToHTML(markdown: string, options: TMarkdownItOptions = {
     console.error(e);
     return '';
   }
+}
+
+export const applyMathpixMarkdownPlugins = (options: TMarkdownItOptions = {}): MarkdownIt => {
+  let md: MarkdownIt = mdInit(options);
+  md = injectRenderRules(md);
+  return md;
 }
