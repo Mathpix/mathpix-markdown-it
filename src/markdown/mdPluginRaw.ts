@@ -779,7 +779,9 @@ export default options => {
       md.block.ruler.at("code", codeBlock);
     }
     if (md.options.previewUuid) {
-      md.block.ruler.at("fence", fenceBlock);
+      md.block.ruler.at("fence", fenceBlock,
+        {alt: getTerminatedRules("fence")}
+      );
     }
     md.block.ruler.before("ReNewCommand", "newTheoremBlock", newTheoremBlock, 
       {alt: getTerminatedRules("newTheoremBlock")});
