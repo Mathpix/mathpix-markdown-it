@@ -24,7 +24,6 @@ IconMethods.Icon = function(parser: TexParser, name: string) {
     } else {
       let textNode = parser.create('text', icon.symbol);
       let math = parser.create('node', 'mtext', [], {}, textNode);
-      debugger
       let def = {
         height: '+0.1em',
         depth: '+0.1em',

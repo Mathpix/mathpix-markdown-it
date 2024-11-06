@@ -46,3 +46,17 @@ describe('Check separation span for code block', () => {
     });
   })
 });
+
+describe('Check separation span for code block. Should be TerminatedRules', () => {
+  const tests = require('./_data/_sepatation_span/_data_fence_tr');
+
+  tests.forEach(function(test){
+    const html = MM.markdownToHTML(test.mmd, test.options);
+    describe('Should be ' + test.describe, () => {
+      it('Checking result html', (done) => {
+        html.trim().should.equal(test.html);
+        done();
+      });
+    });
+  })
+});

@@ -196,6 +196,9 @@ export const terminatedRules = {
   },
   "svg_block": {
     terminated: ['paragraph']
+  },
+  "fence": {
+    terminated: [ 'paragraph', 'reference', 'blockquote', 'list' ]
   }
 };
 
