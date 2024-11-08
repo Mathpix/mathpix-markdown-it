@@ -40,7 +40,8 @@ export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
     footnotes = {},
     copyToClipboard = false,
     renderOptions = null,
-    previewUuid = ""
+    previewUuid = "",
+    enableSizeCalculation = false
   } = options;
   Object.assign(md.options, smiles);
   Object.assign(md.options, {
@@ -66,7 +67,8 @@ export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
     footnotes: footnotes,
     copyToClipboard: copyToClipboard,
     renderOptions: renderOptions,
-    previewUuid: previewUuid
+    previewUuid: previewUuid,
+    enableSizeCalculation: enableSizeCalculation
   });
 
   md
