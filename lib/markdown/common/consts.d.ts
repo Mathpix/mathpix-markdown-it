@@ -130,6 +130,9 @@ export declare const terminatedRules: {
     svg_block: {
         terminated: string[];
     };
+    fence: {
+        terminated: string[];
+    };
 };
 export declare const mathTokenTypes: string[];
 export declare const codeHighlightDef: {
