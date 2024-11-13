@@ -572,5 +572,204 @@ t1 & t2
       '<div class=caption_table>Table 1: Table <strong>to test captions and</strong> labels</div></div>\n' +
       '<div class="table" number="1" style="text-align: center">\n' +
       '<div class=caption_figure>Figure 1: The <em>caption is at the</em> top.</div><div class="figure_img" style="text-align: center; "><img src=https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Cappuccino_at_Sightglass_Coffee.jpg/1599px-Cappuccino_at_Sightglass_Coffee.jpg  style="width: 600px; "></div></div>'
+  },
+  {
+    latex: 'В таблиці 3.2 представлені паспортні характеристики двигуна КД -5Д.\n' +
+      '\n' +
+      'Таблиця 3.2 - Паспортні характеристики крокової двигуна\n' +
+      '\\begin{tabular}{|c|c|}\n' +
+      '\\hline Характеристики & Показники \\\\\n' +
+      '\\hline Напруга живлення, В & 24,48 \\\\\n' +
+      '\\hline Максимальний струм фази, А & 3 \\\\\n' +
+      '\\hline Статична похибка спрацювання кроку,\n' +
+      'ХВ & 27 \\\\\n' +
+      '\\hline Номінальний момент, H * м & 0,1 \\\\\n' +
+      '\\hline Максимальна частота спрацювання кроків в номінальному режимі, Гц & 16000 \\\\\n' +
+      '\\hline Режим роботи & Довготривалий \\\\\n' +
+      '\\hline Одиничний крок КД, градус & 1,5 \\\\\n' +
+      '\\hline Одиничний крок при використанні драйвера типу DQ356M, градус & 0,03 \\\\\n' +
+      '\\hline Номінальний момент інерції\n' +
+      'навантаження, кг * м2 & 4*10-6 \\\\\n' +
+      '\\hline Номінальна прийомистість, крок/с & 2000 \\\\\n' +
+      '\\hline Момент інерції ротора, кг * м2 & 7*10-6 \\\\\n' +
+      '\\hline $$\n' +
+      '\\begin{array}{llll}\n' +
+      '\\hline \\text { Опір } & \\text { фазной } & \\text { обмотки } & \\text { постійному } \\\\\n' +
+      '\\text { струму, Ом }\n' +
+      '\\end{array}\n' +
+      '$$ & 10,1 \\\\\n' +
+      '\\hline Індуктивність фазной обмотки, мГн & 16+-4 \\\\\n' +
+      '\\hline Максимально допустиме значення струму в фазових обмотках при імпульсному форсуванню, А & 7 \\\\\n' +
+      '\\hline ```\n' +
+      'Граничне підвищення температури\n' +
+      'обмоток, *C\n' +
+      '``` & +170 \\\\\n' +
+      '\\hline\n' +
+      '\\end{tabular}\n' +
+      '\\begin{tabular}{|l|l|}\n' +
+      '\\hline \\begin{tabular}{l} \n' +
+      'Граничне підвищення \\\\\n' +
+      'температури корпусу, С\n' +
+      '\\end{tabular} & +130 \\\\\n' +
+      '\\hline Момент інерції навантаження, кг * м2 & $4 * 10-6$ \\\\\n' +
+      '\\hline Характеристики & Показники \\\\\n' +
+      '\\hline \\begin{tabular}{l} \n' +
+      'Максимальний момент при частоті \\\\\n' +
+      'задаючих імпульсів 2000 Гц і інерції \\\\\n' +
+      'навантаження Јн $=2 * 10-6$, кг * м2\n' +
+      '\\end{tabular} \\\\\n' +
+      '\\hline \\begin{tabular}{l} \n' +
+      'Максимальний момент при частоті \\\\\n' +
+      'задаючого імпульсу 2000 Гц і інерції \\\\\n' +
+      'навантаження Јн $=8 * 10-6$, кг * м2\n' +
+      '\\end{tabular} \\\\\n' +
+      '\\hline\n' +
+      '\\end{tabular}\n' +
+      '\n' +
+      'В установці застосовуються шестифазні двигуни КД-5д. Шість обмоток двигуна з\'єднуються в трифазне включення (в зірку або трикутник). В цьому випадку можна використовувати кілька типів драйверів: KND BD3H, DQ356M, DM-356M.\n' +
+      '![](https://cdn.mathpix.com/cropped/2024_11_13_be340561fdfe81237b2fg-53.jpg?height=526&width=666&top_left_y=1633&top_left_x=841)\n' +
+      '\n' +
+      'Рисунок 3.4 - Драйвер типу KND BD3H',
+    svg: '<div>В таблиці 3.2 представлені паспортні характеристики двигуна КД -5Д.</div>\n' +
+      '<div>Таблиця 3.2 - Паспортні характеристики крокової двигуна</div>\n' +
+      '<div class="table_tabular " style="text-align: center">\n' +
+      '<div class="inline-tabular"><table id="tabular">\n' +
+      '<tbody>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: center; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; ">Характеристики</td>\n' +
+      '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; ">Показники</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: center; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">Напруга живлення, В</td>\n' +
+      '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">24,48</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: center; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">Максимальний струм фази, А</td>\n' +
+      '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">3</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: center; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">Статична похибка спрацювання кроку, ХВ</td>\n' +
+      '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">27</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: center; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">Номінальний момент, H * м</td>\n' +
+      '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">0,1</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: center; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">Максимальна частота спрацювання кроків в номінальному режимі, Гц</td>\n' +
+      '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">16000</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: center; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">Режим роботи</td>\n' +
+      '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">Довготривалий</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: center; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">Одиничний крок КД, градус</td>\n' +
+      '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">1,5</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: center; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">Одиничний крок при використанні драйвера типу DQ356M, градус</td>\n' +
+      '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">0,03</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: center; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">Номінальний момент інерції навантаження, кг * м2</td>\n' +
+      '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">4*10-6</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: center; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">Номінальна прийомистість, крок/с</td>\n' +
+      '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">2000</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: center; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">Момент інерції ротора, кг * м2</td>\n' +
+      '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">7*10-6</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: center; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; "><span class="math-block ">\n' +
+      '<mjx-container class="MathJax" jax="SVG" display="true"><svg style="vertical-align: -2.637ex;" xmlns="http://www.w3.org/2000/svg" width="56.398ex" height="7.009ex" role="img" focusable="false" viewBox="0 -1932.5 24928 3098"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="menclose"><g><g data-mml-node="mtable"><g data-mml-node="mtr" transform="translate(0,700)"><g data-mml-node="mtd" transform="translate(400,0)"><g data-mml-node="mtext"><path data-c="A0" d=""></path><text data-variant="normal" transform="translate(250,0) scale(1,-1)" font-size="884px" font-family="serif">О</text><text data-variant="normal" transform="translate(850,0) scale(1,-1)" font-size="884px" font-family="serif">п</text><text data-variant="normal" transform="translate(1450,0) scale(1,-1)" font-size="884px" font-family="serif">і</text><text data-variant="normal" transform="translate(2050,0) scale(1,-1)" font-size="884px" font-family="serif">р</text><path data-c="A0" d="" transform="translate(2650,0)"></path></g></g><g data-mml-node="mtd" transform="translate(7228,0)"><g data-mml-node="mtext"><path data-c="A0" d=""></path><text data-variant="normal" transform="translate(250,0) scale(1,-1)" font-size="884px" font-family="serif">ф</text><text data-variant="normal" transform="translate(850,0) scale(1,-1)" font-size="884px" font-family="serif">а</text><text data-variant="normal" transform="translate(1450,0) scale(1,-1)" font-size="884px" font-family="serif">з</text><text data-variant="normal" transform="translate(2050,0) scale(1,-1)" font-size="884px" font-family="serif">н</text><text data-variant="normal" transform="translate(2650,0) scale(1,-1)" font-size="884px" font-family="serif">о</text><text data-variant="normal" transform="translate(3250,0) scale(1,-1)" font-size="884px" font-family="serif">й</text><path data-c="A0" d="" transform="translate(3850,0)"></path></g></g><g data-mml-node="mtd" transform="translate(12328,0)"><g data-mml-node="mtext"><path data-c="A0" d=""></path><text data-variant="normal" transform="translate(250,0) scale(1,-1)" font-size="884px" font-family="serif">о</text><text data-variant="normal" transform="translate(850,0) scale(1,-1)" font-size="884px" font-family="serif">б</text><text data-variant="normal" transform="translate(1450,0) scale(1,-1)" font-size="884px" font-family="serif">м</text><text data-variant="normal" transform="translate(2050,0) scale(1,-1)" font-size="884px" font-family="serif">о</text><text data-variant="normal" transform="translate(2650,0) scale(1,-1)" font-size="884px" font-family="serif">т</text><text data-variant="normal" transform="translate(3250,0) scale(1,-1)" font-size="884px" font-family="serif">к</text><text data-variant="normal" transform="translate(3850,0) scale(1,-1)" font-size="884px" font-family="serif">и</text><path data-c="A0" d="" transform="translate(4450,0)"></path></g></g><g data-mml-node="mtd" transform="translate(18028,0)"><g data-mml-node="mtext"><path data-c="A0" d=""></path><text data-variant="normal" transform="translate(250,0) scale(1,-1)" font-size="884px" font-family="serif">п</text><text data-variant="normal" transform="translate(850,0) scale(1,-1)" font-size="884px" font-family="serif">о</text><text data-variant="normal" transform="translate(1450,0) scale(1,-1)" font-size="884px" font-family="serif">с</text><text data-variant="normal" transform="translate(2050,0) scale(1,-1)" font-size="884px" font-family="serif">т</text><text data-variant="normal" transform="translate(2650,0) scale(1,-1)" font-size="884px" font-family="serif">і</text><text data-variant="normal" transform="translate(3250,0) scale(1,-1)" font-size="884px" font-family="serif">й</text><text data-variant="normal" transform="translate(3850,0) scale(1,-1)" font-size="884px" font-family="serif">н</text><text data-variant="normal" transform="translate(4450,0) scale(1,-1)" font-size="884px" font-family="serif">о</text><text data-variant="normal" transform="translate(5050,0) scale(1,-1)" font-size="884px" font-family="serif">м</text><text data-variant="normal" transform="translate(5650,0) scale(1,-1)" font-size="884px" font-family="serif">у</text><path data-c="A0" d="" transform="translate(6250,0)"></path></g></g></g><g data-mml-node="mtr" transform="translate(0,-700)"><g data-mml-node="mtd" transform="translate(400,0)"><g data-mml-node="mtext"><path data-c="A0" d=""></path><text data-variant="normal" transform="translate(250,0) scale(1,-1)" font-size="884px" font-family="serif">с</text><text data-variant="normal" transform="translate(850,0) scale(1,-1)" font-size="884px" font-family="serif">т</text><text data-variant="normal" transform="translate(1450,0) scale(1,-1)" font-size="884px" font-family="serif">р</text><text data-variant="normal" transform="translate(2050,0) scale(1,-1)" font-size="884px" font-family="serif">у</text><text data-variant="normal" transform="translate(2650,0) scale(1,-1)" font-size="884px" font-family="serif">м</text><text data-variant="normal" transform="translate(3250,0) scale(1,-1)" font-size="884px" font-family="serif">у</text><path data-c="2C" d="M78 35T78 60T94 103T137 121Q165 121 187 96T210 8Q210 -27 201 -60T180 -117T154 -158T130 -185T117 -194Q113 -194 104 -185T95 -172Q95 -168 106 -156T131 -126T157 -76T173 -3V9L172 8Q170 7 167 6T161 3T152 1T140 0Q113 0 96 17Z" transform="translate(3850,0)"></path><path data-c="20" d="" transform="translate(4128,0)"></path><text data-variant="normal" transform="translate(4378,0) scale(1,-1)" font-size="884px" font-family="serif">О</text><text data-variant="normal" transform="translate(4978,0) scale(1,-1)" font-size="884px" font-family="serif">м</text><path data-c="A0" d="" transform="translate(5578,0)"></path></g></g></g></g></g><line x1="0" y1="1899" x2="24928" y2="1899" stroke-width="67"></line></g></g></g></svg></mjx-container></span></td>\n' +
+      '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">10,1</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: center; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">Індуктивність фазной обмотки, мГн</td>\n' +
+      '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">16+-4</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: center; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">Максимально допустиме значення струму в фазових обмотках при імпульсному форсуванню, А</td>\n' +
+      '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">7</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: center; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; "><code>Граничне підвищення температури обмоток, *C</code></td>\n' +
+      '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">+170</td>\n' +
+      '</tr>\n' +
+      '</tbody>\n' +
+      '</table>\n' +
+      '</div></div>\n' +
+      '<div class="table_tabular " style="text-align: center">\n' +
+      '<div class="inline-tabular"><table id="tabular">\n' +
+      '<tbody>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; "><div class="inline-tabular sub-table"><table id="tabular">\n' +
+      '<tbody>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">Граничне підвищення</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">температури корпусу, С</td>\n' +
+      '</tr>\n' +
+      '</tbody>\n' +
+      '</table>\n' +
+      '</div></td>\n' +
+      '<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; ">+130</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">Момент інерції навантаження, кг * м2</td>\n' +
+      '<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; "><span class="math-inline ">\n' +
+      '<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.186ex;" xmlns="http://www.w3.org/2000/svg" width="9.427ex" height="1.717ex" role="img" focusable="false" viewBox="0 -677 4166.9 759"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mn"><path data-c="34" d="M462 0Q444 3 333 3Q217 3 199 0H190V46H221Q241 46 248 46T265 48T279 53T286 61Q287 63 287 115V165H28V211L179 442Q332 674 334 675Q336 677 355 677H373L379 671V211H471V165H379V114Q379 73 379 66T385 54Q393 47 442 46H471V0H462ZM293 211V545L74 212L183 211H293Z"></path></g><g data-mml-node="mo" transform="translate(722.2,0)"><path data-c="2217" d="M229 286Q216 420 216 436Q216 454 240 464Q241 464 245 464T251 465Q263 464 273 456T283 436Q283 419 277 356T270 286L328 328Q384 369 389 372T399 375Q412 375 423 365T435 338Q435 325 425 315Q420 312 357 282T289 250L355 219L425 184Q434 175 434 161Q434 146 425 136T401 125Q393 125 383 131T328 171L270 213Q283 79 283 63Q283 53 276 44T250 35Q231 35 224 44T216 63Q216 80 222 143T229 213L171 171Q115 130 110 127Q106 124 100 124Q87 124 76 134T64 161Q64 166 64 169T67 175T72 181T81 188T94 195T113 204T138 215T170 230T210 250L74 315Q65 324 65 338Q65 353 74 363T98 374Q106 374 116 368T171 328L229 286Z"></path></g><g data-mml-node="mn" transform="translate(1444.4,0)"><path data-c="31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path><path data-c="30" d="M96 585Q152 666 249 666Q297 666 345 640T423 548Q460 465 460 320Q460 165 417 83Q397 41 362 16T301 -15T250 -22Q224 -22 198 -16T137 16T82 83Q39 165 39 320Q39 494 96 585ZM321 597Q291 629 250 629Q208 629 178 597Q153 571 145 525T137 333Q137 175 145 125T181 46Q209 16 250 16Q290 16 318 46Q347 76 354 130T362 333Q362 478 354 524T321 597Z" transform="translate(500,0)"></path></g><g data-mml-node="mo" transform="translate(2666.7,0)"><path data-c="2212" d="M84 237T84 250T98 270H679Q694 262 694 250T679 230H98Q84 237 84 250Z"></path></g><g data-mml-node="mn" transform="translate(3666.9,0)"><path data-c="36" d="M42 313Q42 476 123 571T303 666Q372 666 402 630T432 550Q432 525 418 510T379 495Q356 495 341 509T326 548Q326 592 373 601Q351 623 311 626Q240 626 194 566Q147 500 147 364L148 360Q153 366 156 373Q197 433 263 433H267Q313 433 348 414Q372 400 396 374T435 317Q456 268 456 210V192Q456 169 451 149Q440 90 387 34T253 -22Q225 -22 199 -14T143 16T92 75T56 172T42 313ZM257 397Q227 397 205 380T171 335T154 278T148 216Q148 133 160 97T198 39Q222 21 251 21Q302 21 329 59Q342 77 347 104T352 209Q352 289 347 316T329 361Q302 397 257 397Z"></path></g></g></g></svg></mjx-container></span></td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">Характеристики</td>\n' +
+      '<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">Показники</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; "><div class="inline-tabular sub-table"><table id="tabular">\n' +
+      '<tbody>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">Максимальний момент при частоті</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">задаючих імпульсів 2000 Гц і інерції</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">навантаження Јн <span class="math-inline ">\n' +
+      '<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.186ex;" xmlns="http://www.w3.org/2000/svg" width="11.816ex" height="1.692ex" role="img" focusable="false" viewBox="0 -666 5222.7 748"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mo"><path data-c="3D" d="M56 347Q56 360 70 367H707Q722 359 722 347Q722 336 708 328L390 327H72Q56 332 56 347ZM56 153Q56 168 72 173H708Q722 163 722 153Q722 140 707 133H70Q56 140 56 153Z"></path></g><g data-mml-node="mn" transform="translate(1055.8,0)"><path data-c="32" d="M109 429Q82 429 66 447T50 491Q50 562 103 614T235 666Q326 666 387 610T449 465Q449 422 429 383T381 315T301 241Q265 210 201 149L142 93L218 92Q375 92 385 97Q392 99 409 186V189H449V186Q448 183 436 95T421 3V0H50V19V31Q50 38 56 46T86 81Q115 113 136 137Q145 147 170 174T204 211T233 244T261 278T284 308T305 340T320 369T333 401T340 431T343 464Q343 527 309 573T212 619Q179 619 154 602T119 569T109 550Q109 549 114 549Q132 549 151 535T170 489Q170 464 154 447T109 429Z"></path></g><g data-mml-node="mo" transform="translate(1778,0)"><path data-c="2217" d="M229 286Q216 420 216 436Q216 454 240 464Q241 464 245 464T251 465Q263 464 273 456T283 436Q283 419 277 356T270 286L328 328Q384 369 389 372T399 375Q412 375 423 365T435 338Q435 325 425 315Q420 312 357 282T289 250L355 219L425 184Q434 175 434 161Q434 146 425 136T401 125Q393 125 383 131T328 171L270 213Q283 79 283 63Q283 53 276 44T250 35Q231 35 224 44T216 63Q216 80 222 143T229 213L171 171Q115 130 110 127Q106 124 100 124Q87 124 76 134T64 161Q64 166 64 169T67 175T72 181T81 188T94 195T113 204T138 215T170 230T210 250L74 315Q65 324 65 338Q65 353 74 363T98 374Q106 374 116 368T171 328L229 286Z"></path></g><g data-mml-node="mn" transform="translate(2500.2,0)"><path data-c="31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path><path data-c="30" d="M96 585Q152 666 249 666Q297 666 345 640T423 548Q460 465 460 320Q460 165 417 83Q397 41 362 16T301 -15T250 -22Q224 -22 198 -16T137 16T82 83Q39 165 39 320Q39 494 96 585ZM321 597Q291 629 250 629Q208 629 178 597Q153 571 145 525T137 333Q137 175 145 125T181 46Q209 16 250 16Q290 16 318 46Q347 76 354 130T362 333Q362 478 354 524T321 597Z" transform="translate(500,0)"></path></g><g data-mml-node="mo" transform="translate(3722.4,0)"><path data-c="2212" d="M84 237T84 250T98 270H679Q694 262 694 250T679 230H98Q84 237 84 250Z"></path></g><g data-mml-node="mn" transform="translate(4722.7,0)"><path data-c="36" d="M42 313Q42 476 123 571T303 666Q372 666 402 630T432 550Q432 525 418 510T379 495Q356 495 341 509T326 548Q326 592 373 601Q351 623 311 626Q240 626 194 566Q147 500 147 364L148 360Q153 366 156 373Q197 433 263 433H267Q313 433 348 414Q372 400 396 374T435 317Q456 268 456 210V192Q456 169 451 149Q440 90 387 34T253 -22Q225 -22 199 -14T143 16T92 75T56 172T42 313ZM257 397Q227 397 205 380T171 335T154 278T148 216Q148 133 160 97T198 39Q222 21 251 21Q302 21 329 59Q342 77 347 104T352 209Q352 289 347 316T329 361Q302 397 257 397Z"></path></g></g></g></svg></mjx-container></span>, кг * м2</td>\n' +
+      '</tr>\n' +
+      '</tbody>\n' +
+      '</table>\n' +
+      '</div></td>\n' +
+      '<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; " class="_empty"></td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; "><div class="inline-tabular sub-table"><table id="tabular">\n' +
+      '<tbody>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">Максимальний момент при частоті</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">задаючого імпульсу 2000 Гц і інерції</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">навантаження Јн <span class="math-inline ">\n' +
+      '<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.186ex;" xmlns="http://www.w3.org/2000/svg" width="11.816ex" height="1.692ex" role="img" focusable="false" viewBox="0 -666 5222.7 748"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mo"><path data-c="3D" d="M56 347Q56 360 70 367H707Q722 359 722 347Q722 336 708 328L390 327H72Q56 332 56 347ZM56 153Q56 168 72 173H708Q722 163 722 153Q722 140 707 133H70Q56 140 56 153Z"></path></g><g data-mml-node="mn" transform="translate(1055.8,0)"><path data-c="38" d="M70 417T70 494T124 618T248 666Q319 666 374 624T429 515Q429 485 418 459T392 417T361 389T335 371T324 363L338 354Q352 344 366 334T382 323Q457 264 457 174Q457 95 399 37T249 -22Q159 -22 101 29T43 155Q43 263 172 335L154 348Q133 361 127 368Q70 417 70 494ZM286 386L292 390Q298 394 301 396T311 403T323 413T334 425T345 438T355 454T364 471T369 491T371 513Q371 556 342 586T275 624Q268 625 242 625Q201 625 165 599T128 534Q128 511 141 492T167 463T217 431Q224 426 228 424L286 386ZM250 21Q308 21 350 55T392 137Q392 154 387 169T375 194T353 216T330 234T301 253T274 270Q260 279 244 289T218 306L210 311Q204 311 181 294T133 239T107 157Q107 98 150 60T250 21Z"></path></g><g data-mml-node="mo" transform="translate(1778,0)"><path data-c="2217" d="M229 286Q216 420 216 436Q216 454 240 464Q241 464 245 464T251 465Q263 464 273 456T283 436Q283 419 277 356T270 286L328 328Q384 369 389 372T399 375Q412 375 423 365T435 338Q435 325 425 315Q420 312 357 282T289 250L355 219L425 184Q434 175 434 161Q434 146 425 136T401 125Q393 125 383 131T328 171L270 213Q283 79 283 63Q283 53 276 44T250 35Q231 35 224 44T216 63Q216 80 222 143T229 213L171 171Q115 130 110 127Q106 124 100 124Q87 124 76 134T64 161Q64 166 64 169T67 175T72 181T81 188T94 195T113 204T138 215T170 230T210 250L74 315Q65 324 65 338Q65 353 74 363T98 374Q106 374 116 368T171 328L229 286Z"></path></g><g data-mml-node="mn" transform="translate(2500.2,0)"><path data-c="31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path><path data-c="30" d="M96 585Q152 666 249 666Q297 666 345 640T423 548Q460 465 460 320Q460 165 417 83Q397 41 362 16T301 -15T250 -22Q224 -22 198 -16T137 16T82 83Q39 165 39 320Q39 494 96 585ZM321 597Q291 629 250 629Q208 629 178 597Q153 571 145 525T137 333Q137 175 145 125T181 46Q209 16 250 16Q290 16 318 46Q347 76 354 130T362 333Q362 478 354 524T321 597Z" transform="translate(500,0)"></path></g><g data-mml-node="mo" transform="translate(3722.4,0)"><path data-c="2212" d="M84 237T84 250T98 270H679Q694 262 694 250T679 230H98Q84 237 84 250Z"></path></g><g data-mml-node="mn" transform="translate(4722.7,0)"><path data-c="36" d="M42 313Q42 476 123 571T303 666Q372 666 402 630T432 550Q432 525 418 510T379 495Q356 495 341 509T326 548Q326 592 373 601Q351 623 311 626Q240 626 194 566Q147 500 147 364L148 360Q153 366 156 373Q197 433 263 433H267Q313 433 348 414Q372 400 396 374T435 317Q456 268 456 210V192Q456 169 451 149Q440 90 387 34T253 -22Q225 -22 199 -14T143 16T92 75T56 172T42 313ZM257 397Q227 397 205 380T171 335T154 278T148 216Q148 133 160 97T198 39Q222 21 251 21Q302 21 329 59Q342 77 347 104T352 209Q352 289 347 316T329 361Q302 397 257 397Z"></path></g></g></g></svg></mjx-container></span>, кг * м2</td>\n' +
+      '</tr>\n' +
+      '</tbody>\n' +
+      '</table>\n' +
+      '</div></td>\n' +
+      '<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; " class="_empty"></td>\n' +
+      '</tr>\n' +
+      '</tbody>\n' +
+      '</table>\n' +
+      '</div></div>\n' +
+      '<div>В установці застосовуються шестифазні двигуни КД-5д. Шість обмоток двигуна з’єднуються в трифазне включення (в зірку або трикутник). В цьому випадку можна використовувати кілька типів драйверів: KND BD3H, DQ356M, DM-356M.<br>\n' +
+      '<figure style="text-align: center"><img src="https://cdn.mathpix.com/cropped/2024_11_13_be340561fdfe81237b2fg-53.jpg?height=526&amp;width=666&amp;top_left_y=1633&amp;top_left_x=841" alt="" data-align="center"></figure></div>\n' +
+      '<div>Рисунок 3.4 - Драйвер типу KND BD3H</div>'
   }
 ];
