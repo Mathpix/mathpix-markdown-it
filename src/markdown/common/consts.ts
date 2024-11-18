@@ -77,6 +77,30 @@ export const singleAngleBracketPattern: RegExp = new RegExp(`<(?:${uuidPattern})
 export const doubleCurlyBracketUuidPattern: RegExp = new RegExp(`\\{\\{(?:${uuidPattern})\\}\\}`, "g");
 export const singleCurlyBracketPattern: RegExp = new RegExp(`\\{(?:${uuidPattern})\\}`, "g");
 
+export const RE_TAG_WITH_HLINE: RegExp = /\[(.*?)\]\s{0,}\\hline/;
+export const RE_TAG_WITH_HHLINE: RegExp = /\[(.*?)\]\s{0,}\\hhline/;
+export const RE_TAG_WITH_HDASHLINE: RegExp = /\[(.*?)\]\s{0,}\\hdashline/;
+export const RE_TAG_WITH_CLINE: RegExp = /\[(.*?)\]\s{0,}\\cline\s{0,}\{([^}]*)\}/;
+export const RE_HLINE: RegExp = /\\hline/;
+export const RE_HHLINE: RegExp = /\\hhline/;
+export const RE_HDASHLINE: RegExp = /\\hdashline/;
+export const RE_CLINE: RegExp = /\\cline\s{0,}\{([^}]*)\}/;
+export const RE_DIMENSIONAL_UNIT_TAG: RegExp = /\[(\d+(?:\.\d+)?(?:ex|pt|em|px|cm|mm|in))\]?/;
+export const lineSpaceTag: RegExp = new RegExp(
+  [
+    RE_TAG_WITH_HLINE.source,
+    RE_TAG_WITH_HHLINE.source,
+    RE_TAG_WITH_HDASHLINE.source,
+    RE_TAG_WITH_CLINE.source,
+    RE_HLINE.source,
+    RE_HHLINE.source,
+    RE_HDASHLINE.source,
+    RE_CLINE.source,
+    RE_DIMENSIONAL_UNIT_TAG.source
+  ].join("|"),
+  "g"
+);
+
 export const HIGHLIGHT_COLOR = 'rgba(0, 147, 255, 0.25)';
 export const HIGHLIGHT_TEXT_COLOR = '#1e2029';
 

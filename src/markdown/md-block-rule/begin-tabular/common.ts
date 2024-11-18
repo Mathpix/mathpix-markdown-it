@@ -1,8 +1,8 @@
 import {separateByColumns} from "./parse-tabular";
 import { v4 as uuidv4 } from 'uuid';
+import { lineSpaceTag, RE_TAG_WITH_CLINE, RE_CLINE } from "../../common/consts";
 
 export type TParselines = {cLines: Array<Array<string>>, cSpaces: Array<Array<string>>, sLines: Array<string>}
-const lineSpaceTag: RegExp = /\[(.*?)\]\s{0,}\\hline|\[(.*?)\]\s{0,}\\hhline|\[(.*?)\]\s{0,}\\hdashline|\[(.*?)\]\s{0,}\\cline\s{0,}\{([^}]*)\}|\\hline|\\hhline|\\hdashline|\\cline\s{0,}\{([^}]*)\}|^\[(.*?)\]/g;
 
 export const getContent = (content: string, onlyOne: boolean = false): string => {
   if(!content) { return content}
@@ -231,8 +231,6 @@ export const getCellsAll = (rows: string[]): string[]  => {
 export const getRowLines = (rows: string[], numCol: number): TParselines => {
   const res: Array<Array<string>> = [];
   const resSpace: Array<Array<string>> = [];
-  const clineTag: RegExp = /\\cline\s{0,}\{([^}]*)\}/;
-  const clineSpaceTag: RegExp = /\[(.*?)\]\s{0,}\\cline\s{0,}\{([^}]*)\}/;
   const sLines = [];
   for (let i = 0; i < rows.length; i++) {
     let matchR = rows[i].split('\n').join('').trim().match(lineSpaceTag);
@@ -244,7 +242,8 @@ export const getRowLines = (rows: string[], numCol: number): TParselines => {
     }
     sLines.push(matchR.join(''));
     let str = matchR.join(' ');
-    if (!clineTag.test(str)) {
+    debugger
+    if (!RE_CLINE.test(str)) {
       let mS = str.match(/\[(.*?)\]/);
       if (mS && mS[1]) {
         resSpace[i] = new Array(numCol).fill(mS[1]);
@@ -260,7 +259,7 @@ export const getRowLines = (rows: string[], numCol: number): TParselines => {
     res[i] = new Array(numCol).fill('none');
     resSpace[i] = new Array(numCol).fill('none');
     for (let j=0; j< matchR.length; j++) {
-      let matchCS = matchR[j].match(clineSpaceTag);
+      let matchCS = matchR[j].match(RE_TAG_WITH_CLINE);
       if (matchCS) {
         if (matchCS[2]) {
           let ic = matchCS[2].trim().replace(/[^\d-]/g, '').split('-');
@@ -274,7 +273,7 @@ export const getRowLines = (rows: string[], numCol: number): TParselines => {
           }
         }
       } else {
-        let matchC = matchR[j].match(clineTag);
+        let matchC = matchR[j].match(RE_CLINE);
         if (matchC && matchC[1]) {
           let ic = matchC[1].trim().replace(/[^\d-]/g, '').split('-');
           ic[0] = (Number(ic[0]) > 0 ? Number(ic[0])-1 : 0).toString();

@@ -322,7 +322,7 @@ export const findOpenCloseTags = (str: string, tagOpen, tagClose, pendingBackTic
         pending: pendingBackTick
       }
     }
-    posStart = index + 1;
+    posStart = index + pendingBackTick.length;
     pendingBackTick = '';
   }
 
