@@ -771,5 +771,103 @@ t1 & t2
       '<div>В установці застосовуються шестифазні двигуни КД-5д. Шість обмоток двигуна з’єднуються в трифазне включення (в зірку або трикутник). В цьому випадку можна використовувати кілька типів драйверів: KND BD3H, DQ356M, DM-356M.<br>\n' +
       '<figure style="text-align: center"><img src="https://cdn.mathpix.com/cropped/2024_11_13_be340561fdfe81237b2fg-53.jpg?height=526&amp;width=666&amp;top_left_y=1633&amp;top_left_x=841" alt="" data-align="center"></figure></div>\n' +
       '<div>Рисунок 3.4 - Драйвер типу KND BD3H</div>'
+  },
+  {
+    latex: '\\begin{tabular}{l}\n' +
+      'A \\\\\n' +
+      '[B]\n' +
+      '\\end{tabular}',
+    svg: '<div class="table_tabular " style="text-align: center">\n' +
+      '<div class="inline-tabular"><table id="tabular">\n' +
+      '<tbody>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">A</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">[B]</td>\n' +
+      '</tr>\n' +
+      '</tbody>\n' +
+      '</table>\n' +
+      '</div></div>'
+  },
+  {
+    latex: '\\begin{tabular}{l}\n' +
+      'A \\\\ \\hline\n' +
+      '[B]\n' +
+      '\\end{tabular}',
+    svg: '<div class="table_tabular " style="text-align: center">\n' +
+      '<div class="inline-tabular"><table id="tabular">\n' +
+      '<tbody>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left: none !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">A</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">[B]</td>\n' +
+      '</tr>\n' +
+      '</tbody>\n' +
+      '</table>\n' +
+      '</div></div>'
+  },
+  {
+    latex: '\\begin{table}[h!]\n' +
+      '\\begin{left}\n' +
+      ' \\begin{tabular}{||c c c c||} \n' +
+      ' \\hline\n' +
+      ' Col1 & Col2 & Col2 & Col3 \\\\ [0.2ex] \n' +
+      ' \\hline\\hline\n' +
+      ' 1 & 6 & 87837 & 787 \\\\ [5ex] \\hline\n' +
+      ' 2 & 7 & 78 & 5415 \\\\\n' +
+      ' 3 & 545 & 778 & 7507 \\\\[5ex] \n' +
+      ' 4 & 545 & 18744 & 7560 \\\\\n' +
+      ' 5 & 88 & 788 & 6344 \\\\ [5ex] \n' +
+      ' \\hline\n' +
+      ' \\end{tabular}\n' +
+      ' \\end{left}\n' +
+      '\\end{table}',
+    svg: '<div class="table " style="text-align: center">\n' +
+      '<div class="table_tabular " style="text-align: left">\n' +
+      '<div class="inline-tabular"><table id="tabular">\n' +
+      '<tbody>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: center; border-left-style: double !important; border-left-width: 3px !important; border-right: none !important; border-bottom-style: double !important; border-bottom-width: 3px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; padding-bottom: 0.2ex !important;">Col1</td>\n' +
+      '<td style="text-align: center; border-right: none !important; border-bottom-style: double !important; border-bottom-width: 3px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; padding-bottom: 0.2ex !important;">Col2</td>\n' +
+      '<td style="text-align: center; border-right: none !important; border-bottom-style: double !important; border-bottom-width: 3px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; padding-bottom: 0.2ex !important;">Col2</td>\n' +
+      '<td style="text-align: center; border-right-style: double !important; border-right-width: 3px !important; border-bottom-style: double !important; border-bottom-width: 3px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; padding-bottom: 0.2ex !important;">Col3</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: center; border-left-style: double !important; border-left-width: 3px !important; border-right: none !important; border-bottom-style: double !important; border-bottom-width: 3px !important; border-top: none !important; width: auto; vertical-align: middle; padding-bottom: 5ex !important;">1</td>\n' +
+      '<td style="text-align: center; border-right: none !important; border-bottom-style: double !important; border-bottom-width: 3px !important; border-top: none !important; width: auto; vertical-align: middle; padding-bottom: 5ex !important;">6</td>\n' +
+      '<td style="text-align: center; border-right: none !important; border-bottom-style: double !important; border-bottom-width: 3px !important; border-top: none !important; width: auto; vertical-align: middle; padding-bottom: 5ex !important;">87837</td>\n' +
+      '<td style="text-align: center; border-right-style: double !important; border-right-width: 3px !important; border-bottom-style: double !important; border-bottom-width: 3px !important; border-top: none !important; width: auto; vertical-align: middle; padding-bottom: 5ex !important;">787</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: center; border-left-style: double !important; border-left-width: 3px !important; border-right: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">2</td>\n' +
+      '<td style="text-align: center; border-right: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">7</td>\n' +
+      '<td style="text-align: center; border-right: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">78</td>\n' +
+      '<td style="text-align: center; border-right-style: double !important; border-right-width: 3px !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">5415</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: center; border-left-style: double !important; border-left-width: 3px !important; border-right: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; padding-bottom: 5ex !important;">3</td>\n' +
+      '<td style="text-align: center; border-right: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; padding-bottom: 5ex !important;">545</td>\n' +
+      '<td style="text-align: center; border-right: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; padding-bottom: 5ex !important;">778</td>\n' +
+      '<td style="text-align: center; border-right-style: double !important; border-right-width: 3px !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; padding-bottom: 5ex !important;">7507</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: center; border-left-style: double !important; border-left-width: 3px !important; border-right: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">4</td>\n' +
+      '<td style="text-align: center; border-right: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">545</td>\n' +
+      '<td style="text-align: center; border-right: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">18744</td>\n' +
+      '<td style="text-align: center; border-right-style: double !important; border-right-width: 3px !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">7560</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: center; border-left-style: double !important; border-left-width: 3px !important; border-right: none !important; border-bottom-style: double !important; border-bottom-width: 3px !important; border-top: none !important; width: auto; vertical-align: middle; padding-bottom: 5ex !important;">5</td>\n' +
+      '<td style="text-align: center; border-right: none !important; border-bottom-style: double !important; border-bottom-width: 3px !important; border-top: none !important; width: auto; vertical-align: middle; padding-bottom: 5ex !important;">88</td>\n' +
+      '<td style="text-align: center; border-right: none !important; border-bottom-style: double !important; border-bottom-width: 3px !important; border-top: none !important; width: auto; vertical-align: middle; padding-bottom: 5ex !important;">788</td>\n' +
+      '<td style="text-align: center; border-right-style: double !important; border-right-width: 3px !important; border-bottom-style: double !important; border-bottom-width: 3px !important; border-top: none !important; width: auto; vertical-align: middle; padding-bottom: 5ex !important;">6344</td>\n' +
+      '</tr>\n' +
+      '</tbody>\n' +
+      '</table>\n' +
+      '</div></div>\n' +
+      '<div></div>\n' +
+      '</div>'
   }
 ];
