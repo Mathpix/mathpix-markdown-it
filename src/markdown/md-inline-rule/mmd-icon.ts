@@ -1,5 +1,5 @@
 import { RuleInline, Token } from "markdown-it";
-import { findIcon, findSquaredIcon, IUnicodeIcon } from "../../helpers/icons";
+import { findIcon } from "../../helpers/icons";
 
 export const inlineMmdIcon: RuleInline = (state, silent): boolean => {
   try {
@@ -25,28 +25,39 @@ export const inlineMmdIcon: RuleInline = (state, silent): boolean => {
       return true;
     }
 
-    let icon: IUnicodeIcon = findIcon(iconName);
+    let { icon = null, name = '', color = '', isSquared = false } = findIcon(iconName);
+    if (!name) {
+      token = state.push('text', '', 0);
+      token.content = '';
+      token.latex = match[0];
+      state.pos = pos + match.index + match[0].length;
+      return true;
+    }
     if (!icon) {
-      icon = findSquaredIcon(iconName);
-      if (!icon) {
-        token = state.push('text_error', '', 0);
-        token.content = `The icon name "${iconName}" can't be found.`;
-        state.pos = pos + match.index + match[0].length;
-        return true;
-      } else {
-        token = state.push('text_icon', '', 0);
-        token.attrSet('style', `border: 1px solid; width: 1em; height: 1em; display: inline-block; text-align: center; line-height: 1em;`);
-        token.content = icon.symbol;
-        token.latex = match[0];
-        state.pos = pos + match.index + match[0].length;
-        return true
+      token = state.push('text_error', '', 0);
+      token.content = `The icon name "${iconName}" can't be found.`;
+      state.pos = pos + match.index + match[0].length;
+      return true;
+    }
+    if (isSquared) {
+      token = state.push('text_icon', '', 0);
+      token.attrJoin('style', `border: 1px solid; width: 1em; height: 1em; display: inline-block; text-align: center; line-height: 1em;`);
+      if (color) {
+        token.attrJoin('style', `color: ${color};`)
       }
+      token.content = icon.symbol;
+      token.latex = match[0];
+      state.pos = pos + match.index + match[0].length;
+      return true
     }
 
     token = state.push('text_icon', '', 0);
     token.content = icon.symbol;
+    if (color) {
+      token.attrJoin('style', `color: ${color};`)
+    }
     if (icon.name?.indexOf('fa_') !== -1) {
-      token.attrSet('style','vertical-align: middle;')
+      token.attrJoin('style','vertical-align: middle;')
     }
     token.latex = match[0];
     state.pos = pos + match.index + match[0].length;
