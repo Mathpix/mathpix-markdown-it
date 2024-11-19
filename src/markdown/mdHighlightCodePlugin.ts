@@ -14,24 +14,28 @@ const maybe = f => {
 };
 
 // Highlight with given language.
-const highlight = (code, lang) => {
+const highlight = (code: string, lang: string, originalHighlight?) => {
   // Looks up a language by name or alias.
   // Returns the language object if found, undefined otherwise.
   let langObj = hljs.getLanguage(lang);
   if (langObj === undefined) {
-    return '';
+    return typeof originalHighlight === 'function' ? originalHighlight(code, lang) : '';
   }
-  if (lang.toLowerCase() === 'latex') lang = 'tex';
   if (!lang) return '';
+  if (lang.toLowerCase() === 'latex') lang = 'tex';
   return maybe(() => hljs.highlight(code, {language: lang, ignoreIllegals: true}).value) || ''
 };
 
 // Highlight with given language or automatically.
-const highlightAuto = (code, lang) => {
+const highlightAuto = (code: string, lang: string, originalHighlight?) => {
   // Looks up a language by name or alias.
   // Returns the language object if found, undefined otherwise.
   let langObj = hljs.getLanguage(lang);
-  return lang && langObj !== undefined
+  if (langObj === undefined) {
+    return typeof originalHighlight === 'function' ? originalHighlight(code, lang) : '';
+  }
+  if (lang.toLowerCase() === 'latex') lang = 'tex';
+  return lang
     ? highlight(code, lang)
     : maybe(() => hljs.highlightAuto(code).value) || ''
 };
@@ -113,7 +117,11 @@ const wrap = render => (tokens, idx, options, env, slf) => (
 
 const highlightjs = (md, opts) => {
   opts = Object.assign({}, codeHighlightDef, opts);
-  md.options.highlight = opts.auto ? highlightAuto : highlight;
+  const originalHighlight = md.options.highlight;
+  md.options.highlight = (code: string, lang: string) => opts.auto
+    ? highlightAuto(code, lang, originalHighlight)
+    : highlight(code, lang, originalHighlight);
+
   md.renderer.rules.fence = wrapFence(md.renderer.rules.fence)
 
   if (opts.code) {

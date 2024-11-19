@@ -154,7 +154,7 @@ CountPath	" CountPath measures the number of unique
 Information	" Fan-In measures information flow, which 
  represents the number of inputs a function uses. 
  Flow "
-. The more inputs from external sources the	
+[16]. The more inputs from external sources the	
 Calling	" In-Degree measures the number of functions that 
  call the function corresponding to the node [17]. 
  The more dependent upon a peace of code, the 
@@ -188,7 +188,7 @@ Number of	" It measures the number of functions that needed
       'Information,"Fan-In measures information flow, which \n' +
       ' represents the number of inputs a function uses. \n' +
       ' Flow"\n' +
-      '. The more inputs from external sources the,\n' +
+      '[16]. The more inputs from external sources the,\n' +
       'Calling,"In-Degree measures the number of functions that \n' +
       ' call the function corresponding to the node [17]. \n' +
       ' The more dependent upon a peace of code, the \n' +
