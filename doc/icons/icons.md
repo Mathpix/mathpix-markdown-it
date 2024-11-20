@@ -7,4 +7,4 @@
 
 ## Color icons
 
-- [Color icons]()https://htmlpreview.github.io/?https://github.com/Mathpix/mathpix-markdown-it/blob/dev/olga/add-cancel-package/doc/icons/color-icons.html)
+- [Color icons](https://htmlpreview.github.io/?https://github.com/Mathpix/mathpix-markdown-it/blob/dev/olga/add-cancel-package/doc/icons/color-icons.html)
