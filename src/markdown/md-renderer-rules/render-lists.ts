@@ -4,6 +4,7 @@ import { renderTabularInline } from "./render-tabular";
 import { needToHighlightAll, highlightText } from "../highlight/common";
 import convertSvgToBase64 from "../md-svg-to-base64/convert-scv-to-base64";
 import { mathTokenTypes } from "../common/consts";
+import { isMathInText } from "../utils";
 
 var level_itemize = 0;
 var level_enumerate = 0;
@@ -201,6 +202,9 @@ export const render_item_inline = (tokens, index, options, env, slf) => {
         content = slf.renderInline(tok.children, options, env);
       }
     } else {
+      if (isMathInText(token.children, i, options)) {
+        tok.attrSet('data-math-in-text', "true");
+      }
       content = slf.renderInline([tok], options, env);
     }
     sContent +=  content

@@ -1,8 +1,9 @@
-import { RuleInline } from 'markdown-it';
+import { RuleInline, Token } from 'markdown-it';
 import {inlineTabular} from "./md-inline-rule/tabular";
 import {renderTabularInline} from './md-renderer-rules/render-tabular';
 import {asciiMath, backtickAsAsciiMath, renderAsciiMath} from './md-ascii';
 import {
+  applyAttrToMathml,
   beginTag,
   canonicalMath,
   canonicalMathPositions,
@@ -10,7 +11,8 @@ import {
   findOpenCloseTagsMathEnvironment,
   includesMultiMathBeginTag,
   includesMultiMathTag,
-  includesSimpleMathTag
+  includesSimpleMathTag,
+  isMathInText
 } from './utils';
 import { openTagMML } from './common/consts';
 import {imageWithSize, renderRuleImage} from './md-inline-rule/image';
@@ -378,13 +380,20 @@ function extend(options, defaults) {
   }, options);
 }
 
-const renderMath = (a, token, options) => {
-  const mathEquation = token.mathEquation;
+const renderMath = (tokens: Token[], idx, options) => {
+  const token: Token = tokens[idx];
+  let dataAttrMathInText = '';
+  if (isMathInText(tokens, idx, options)) {
+    dataAttrMathInText = ' data-math-in-text="true"'
+  }
+  const mathEquation = dataAttrMathInText
+    ? applyAttrToMathml(token.mathEquation, dataAttrMathInText, options)
+    : token.mathEquation;
   const width = token?.mathData?.width;
   const dataAttr = width === 'full' ? ' data-width="full"' : '';
   if (token.mathData?.error && options.parserErrors !== ParserErrors.show) {
     let html: string = token.type === "inline_math" || token.type === "inline_mathML"
-      ? `<span class="math-inline">`
+      ? `<span class="math-inline"${dataAttrMathInText}>`
       : `<span class="math-block"${dataAttr}>`;
     if (options.parserErrors === ParserErrors.show_input) {
       html += token.inputLatex;
@@ -400,8 +409,8 @@ const renderMath = (a, token, options) => {
   } else {
     return token.type === "inline_math" || token.type === "inline_mathML"
       ? idLabels
-        ? `<span id="${idLabels}" class="math-inline id=${idLabels}">${mathEquation}</span>`
-        : `<span class="math-inline ${idLabels}">${mathEquation}</span>`
+        ? `<span id="${idLabels}" class="math-inline id=${idLabels}"${dataAttrMathInText}>${mathEquation}</span>`
+        : `<span class="math-inline ${idLabels}"${dataAttrMathInText}>${mathEquation}</span>`
       : idLabels
         ? `<span id="${idLabels}" class="math-block id=${idLabels}"${dataAttr}>${mathEquation}</span>`
         : `<span class="math-block ${idLabels}"${dataAttr}>${mathEquation}</span>`;
@@ -837,7 +846,7 @@ export default options => {
           case "ascii_math":
             return renderAsciiMath(tokens, idx, options);
           default:
-            return renderMath(tokens, tokens[idx], options);
+            return renderMath(tokens, idx, options);
         }
       }
     });

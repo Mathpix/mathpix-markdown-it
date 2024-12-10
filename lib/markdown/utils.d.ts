@@ -1,3 +1,4 @@
+import { Token } from 'markdown-it';
 export declare const endTag: (arg: string, shouldBeFirst?: boolean) => RegExp;
 export declare const beginTag: (arg: string, shouldBeFirst?: boolean) => RegExp;
 export declare const getTextWidth: () => number;
@@ -48,3 +49,6 @@ export declare const getSpacesFromLeft: (str: string) => number;
 /** add additional attributes to the parent token */
 export declare const addAttributesToParentTokenByType: (parentToken: Token, token: Token, tokenType: string, attrs: string[], reTagFind?: RegExp) => void;
 export declare const addAttributesToParentToken: (parentToken: Token, token: Token) => void;
+export declare const isMathInText: (tokens: Token[], idx: number, options: any) => boolean;
+export declare const applyAttrToMathml: (mathEquation: string, attr: string, options: any) => string;
+export declare const applyAttrToInlineMath: (tokens: Token[], attrName: string, attrVal: string) => void;

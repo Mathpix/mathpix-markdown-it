@@ -1,4 +1,5 @@
 import { Token } from 'markdown-it';
+import { OPENING_STYLE_TOKENS, CLOSING_STYLE_TOKENS, INLINE_ELEMENT_TOKENS } from "./common/consts";
 
 export const endTag = (arg: string, shouldBeFirst = false): RegExp  => {
   try {
@@ -764,3 +765,53 @@ export const addAttributesToParentToken = (
     console.log("[MMD]=>[addAttributesToParentToken]=>ERROR=>", e);
   }
 };
+
+export const isMathInText = (tokens: Token[], idx: number, options): boolean => {
+  try {
+    if (!options.forDocx || idx < 0 || idx >= tokens.length) {
+      return false;
+    }
+    let token: Token = tokens[idx];
+    if (!["inline_math", "inline_mathML"].includes(token.type)){
+      return false;
+    }
+    if (token.attrGet("data-math-in-text")) {
+      return true;
+    }
+    for (let i = idx + 1; i < tokens.length; i++) {
+      let nextToken = tokens[i];
+      if (CLOSING_STYLE_TOKENS.includes(nextToken.type)) {
+        continue;
+      }
+      if (OPENING_STYLE_TOKENS.includes(nextToken.type) || INLINE_ELEMENT_TOKENS.includes(nextToken.type)) {
+        return true;
+      }
+      break;
+    }
+    return false;
+  } catch (e) {
+    return false;
+  }
+}
+
+export const applyAttrToMathml = (mathEquation: string, attr: string, options) => {
+  try {
+    if (!options.forDocx || !attr) {
+      return mathEquation;
+    }
+    return mathEquation
+      .replace(/<mathmlword(\s|>)/g, `<mathmlword ${attr}$1`)
+      .replace(/<mathml(\s|>)/g, `<mathml ${attr}$1`);
+
+  } catch (e) {
+    return mathEquation
+  }
+}
+
+export const applyAttrToInlineMath = (tokens: Token[], attrName: string, attrVal: string) => {
+  tokens.forEach((token: Token) => {
+    if (["inline_math", "inline_mathML"].includes(token.type)) {
+      token.attrSet(attrName, attrVal);
+    }
+  })
+}
