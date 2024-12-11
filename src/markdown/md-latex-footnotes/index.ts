@@ -26,7 +26,7 @@ export default (md: MarkdownIt, options) => {
   Object.assign(md.options, options);
   rest_mmd_footnotes_list();
   md.core.ruler.after('inline', 'mmd_footnote_tail', mmd_footnote_tail);
-  md.block.ruler.before('paragraphDiv', 'latex_footnote_block', latex_footnote_block);
+  md.block.ruler.before('lheading', 'latex_footnote_block', latex_footnote_block);
   md.block.ruler.after('latex_footnote_block', 'latex_footnotetext_block', latex_footnotetext_block);
   md.inline.ruler.after("multiMath", "latex_footnote", latex_footnote);
   md.inline.ruler.after("latex_footnote", "latex_footnotemark", latex_footnotemark);

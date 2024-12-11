@@ -371,10 +371,38 @@ Title <br>
     latex: '\\textsterling 10000',
     html: `<div>£ 10000</div>`
   },
-  // {
-  //   latex: '',
-  //   html: ``
-  // },
+  {
+    latex: '\\begin{abstract}\n' +
+      '-\n' +
+      'This is the abstract to my paper. You are going to learn a lot in this paper, just you wait. I am going to tell you about all the different LaTeX and Markdown syntax you can use in Snip. \n' +
+      '\\end{abstract}\n' +
+      '\n' +
+      '\\footnotetext{\n' +
+      '-\n' +
+      'Markdown lheading rule must not be violated footnotetext\n' +
+      '}\n' +
+      '\n' +
+      '\\pagebreak\n' +
+      '-\n',
+    html: `<div class="abstract" style="width: 80%; margin: 0 auto; margin-bottom: 1em; font-size: .9em;">
+<h4 id="abstract_head" class="abstract_head" style="text-align: center;">
+Abstract</h4>
+<p style="text-indent: 1em;">- This is the abstract to my paper. You are going to learn a lot in this paper, just you wait. I am going to tell you about all the different LaTeX and Markdown syntax you can use in Snip.</p>
+</div>
+<ul>
+<li></li>
+</ul>
+<hr class="footnotes-sep">
+<section class="footnotes" style="margin-bottom: 1em;">
+<ol class="footnotes-list" style="padding-left: 20px; margin-bottom: 0;">
+<li id="fn1" class="footnote-item" style="list-style-type: none;"><ul>
+<li></li>
+</ul>
+<div>Markdown lheading rule must not be violated footnotetext</div>
+</li>
+</ol>
+</section>`
+  },
   // {
   //   latex: '',
   //   html: ``

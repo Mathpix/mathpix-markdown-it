@@ -1390,9 +1390,9 @@ export default () => {
       {alt: getTerminatedRules('addContentsLineBlock')});
     md.block.ruler.before("headingSection", "separatingSpan", separatingSpan,
       {alt: getTerminatedRules('separatingSpan')});
-    md.block.ruler.before("paragraphDiv", "abstractBlock", abstractBlock,
+    md.block.ruler.before("lheading", "abstractBlock", abstractBlock,
       {alt: getTerminatedRules('abstractBlock')});
-    md.block.ruler.before("paragraphDiv", "pageBreaksBlock", pageBreaksBlock,
+    md.block.ruler.before("lheading", "pageBreaksBlock", pageBreaksBlock,
       {alt: getTerminatedRules('pageBreaksBlock')});
 
     md.inline.ruler.before("multiMath", "textTypes", textTypes);
