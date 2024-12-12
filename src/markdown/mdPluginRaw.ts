@@ -382,18 +382,15 @@ function extend(options, defaults) {
 
 const renderMath = (tokens: Token[], idx, options) => {
   const token: Token = tokens[idx];
-  let dataAttrMathInText = '';
-  if (isMathInText(tokens, idx, options)) {
-    dataAttrMathInText = ' data-math-in-text="true"'
+  let mathEquation = token.mathEquation;
+  if (options.forDocx && isMathInText(tokens, idx, options)) {
+    mathEquation = applyAttrToMathml(mathEquation, 'data-math-in-text="true"', options);
   }
-  const mathEquation = dataAttrMathInText
-    ? applyAttrToMathml(token.mathEquation, dataAttrMathInText, options)
-    : token.mathEquation;
   const width = token?.mathData?.width;
   const dataAttr = width === 'full' ? ' data-width="full"' : '';
   if (token.mathData?.error && options.parserErrors !== ParserErrors.show) {
     let html: string = token.type === "inline_math" || token.type === "inline_mathML"
-      ? `<span class="math-inline"${dataAttrMathInText}>`
+      ? `<span class="math-inline">`
       : `<span class="math-block"${dataAttr}>`;
     if (options.parserErrors === ParserErrors.show_input) {
       html += token.inputLatex;
@@ -409,8 +406,8 @@ const renderMath = (tokens: Token[], idx, options) => {
   } else {
     return token.type === "inline_math" || token.type === "inline_mathML"
       ? idLabels
-        ? `<span id="${idLabels}" class="math-inline id=${idLabels}"${dataAttrMathInText}>${mathEquation}</span>`
-        : `<span class="math-inline ${idLabels}"${dataAttrMathInText}>${mathEquation}</span>`
+        ? `<span id="${idLabels}" class="math-inline id=${idLabels}">${mathEquation}</span>`
+        : `<span class="math-inline ${idLabels}">${mathEquation}</span>`
       : idLabels
         ? `<span id="${idLabels}" class="math-block id=${idLabels}"${dataAttr}>${mathEquation}</span>`
         : `<span class="math-block ${idLabels}"${dataAttr}>${mathEquation}</span>`;

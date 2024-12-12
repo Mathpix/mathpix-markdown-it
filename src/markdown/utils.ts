@@ -778,6 +778,10 @@ export const isMathInText = (tokens: Token[], idx: number, options): boolean => 
     if (token.attrGet("data-math-in-text")) {
       return true;
     }
+    let tokenBefore = (idx > 0) ? tokens[idx - 1] : null;
+    if (tokenBefore?.type && INLINE_ELEMENT_TOKENS.includes(tokenBefore.type)) {
+      return true;
+    }
     for (let i = idx + 1; i < tokens.length; i++) {
       let nextToken = tokens[i];
       if (CLOSING_STYLE_TOKENS.includes(nextToken.type)) {
@@ -789,7 +793,8 @@ export const isMathInText = (tokens: Token[], idx: number, options): boolean => 
       break;
     }
     return false;
-  } catch (e) {
+  } catch (err) {
+    console.log("[MMD][isMathInText]=>[ERROR]=>", err)
     return false;
   }
 }
