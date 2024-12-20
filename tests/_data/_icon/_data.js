@@ -5,7 +5,7 @@ module.exports = [
   },
   {
     mmd: "$\\icon{star}$",
-    html: "<div><span class=\"math-inline \">\n" +
+    html: "<div><span class=\"math-inline \" data-overflow=\"visible\">\n" +
       "<mjx-container class=\"MathJax\" jax=\"SVG\"><svg style=\"vertical-align: -0.452ex;\" xmlns=\"http://www.w3.org/2000/svg\" width=\"1.845ex\" height=\"2.149ex\" role=\"img\" focusable=\"false\" viewBox=\"0 -750 815.5 950\"><g stroke=\"currentColor\" fill=\"currentColor\" stroke-width=\"0\" transform=\"scale(1,-1)\"><g data-mml-node=\"math\"><g data-mml-node=\"mpadded\"><g data-mml-node=\"mtext\"><text data-variant=\"normal\" transform=\"scale(1,-1)\" font-size=\"884px\" font-family=\"serif\">☆</text></g></g></g></g></svg></mjx-container></span></div>"
   },
   {
@@ -14,7 +14,7 @@ module.exports = [
   },
   {
     mmd: "$\\icon{white_star}$",
-    html: "<div><span class=\"math-inline \">\n" +
+    html: "<div><span class=\"math-inline \" data-overflow=\"visible\">\n" +
       "<mjx-container class=\"MathJax\" jax=\"SVG\"><svg style=\"vertical-align: -0.452ex;\" xmlns=\"http://www.w3.org/2000/svg\" width=\"1.845ex\" height=\"2.149ex\" role=\"img\" focusable=\"false\" viewBox=\"0 -750 815.5 950\"><g stroke=\"currentColor\" fill=\"currentColor\" stroke-width=\"0\" transform=\"scale(1,-1)\"><g data-mml-node=\"math\"><g data-mml-node=\"mpadded\"><g data-mml-node=\"mtext\"><text data-variant=\"normal\" transform=\"scale(1,-1)\" font-size=\"884px\" font-family=\"serif\">☆</text></g></g></g></g></svg></mjx-container></span></div>"
   },
   {
@@ -23,7 +23,7 @@ module.exports = [
   },
   {
     mmd: "$\\icon{circled_one}$",
-    html: "<div><span class=\"math-inline \">\n" +
+    html: "<div><span class=\"math-inline \" data-overflow=\"visible\">\n" +
       "<mjx-container class=\"MathJax\" jax=\"SVG\"><svg style=\"vertical-align: -0.452ex;\" xmlns=\"http://www.w3.org/2000/svg\" width=\"1.943ex\" height=\"2.149ex\" role=\"img\" focusable=\"false\" viewBox=\"0 -750 858.6 950\"><g stroke=\"currentColor\" fill=\"currentColor\" stroke-width=\"0\" transform=\"scale(1,-1)\"><g data-mml-node=\"math\"><g data-mml-node=\"mpadded\"><g data-mml-node=\"mtext\"><text data-variant=\"normal\" transform=\"scale(1,-1)\" font-size=\"884px\" font-family=\"serif\">①</text></g></g></g></g></svg></mjx-container></span></div>"
   },
   {
@@ -76,10 +76,10 @@ module.exports = [
   },
   {
     mmd: "$\\icon{circled_one}$ $\\icon{red_circled_one}$ $\\icon{circled_one red}$ $\\icon{circled_one color=red}$",
-    html: "<div><span class=\"math-inline \">\n" +
-      "<mjx-container class=\"MathJax\" jax=\"SVG\"><svg style=\"vertical-align: -0.452ex;\" xmlns=\"http://www.w3.org/2000/svg\" width=\"1.943ex\" height=\"2.149ex\" role=\"img\" focusable=\"false\" viewBox=\"0 -750 858.6 950\"><g stroke=\"currentColor\" fill=\"currentColor\" stroke-width=\"0\" transform=\"scale(1,-1)\"><g data-mml-node=\"math\"><g data-mml-node=\"mpadded\"><g data-mml-node=\"mtext\"><text data-variant=\"normal\" transform=\"scale(1,-1)\" font-size=\"884px\" font-family=\"serif\">①</text></g></g></g></g></svg></mjx-container></span> <span class=\"math-inline \">\n" +
-      "<mjx-container class=\"MathJax\" jax=\"SVG\"><svg style=\"vertical-align: -0.452ex;\" xmlns=\"http://www.w3.org/2000/svg\" width=\"1.943ex\" height=\"2.149ex\" role=\"img\" focusable=\"false\" viewBox=\"0 -750 858.6 950\"><g stroke=\"currentColor\" fill=\"currentColor\" stroke-width=\"0\" transform=\"scale(1,-1)\"><g data-mml-node=\"math\"><g data-mml-node=\"mpadded\" fill=\"red\" stroke=\"red\"><g data-mml-node=\"mtext\"><text data-variant=\"normal\" transform=\"scale(1,-1)\" font-size=\"884px\" font-family=\"serif\">①</text></g></g></g></g></svg></mjx-container></span> <span class=\"math-inline \">\n" +
-      "<mjx-container class=\"MathJax\" jax=\"SVG\"><svg style=\"vertical-align: -0.452ex;\" xmlns=\"http://www.w3.org/2000/svg\" width=\"1.943ex\" height=\"2.149ex\" role=\"img\" focusable=\"false\" viewBox=\"0 -750 858.6 950\"><g stroke=\"currentColor\" fill=\"currentColor\" stroke-width=\"0\" transform=\"scale(1,-1)\"><g data-mml-node=\"math\"><g data-mml-node=\"mpadded\" fill=\"red\" stroke=\"red\"><g data-mml-node=\"mtext\"><text data-variant=\"normal\" transform=\"scale(1,-1)\" font-size=\"884px\" font-family=\"serif\">①</text></g></g></g></g></svg></mjx-container></span> <span class=\"math-inline \">\n" +
+    html: "<div><span class=\"math-inline \" data-overflow=\"visible\">\n" +
+      "<mjx-container class=\"MathJax\" jax=\"SVG\"><svg style=\"vertical-align: -0.452ex;\" xmlns=\"http://www.w3.org/2000/svg\" width=\"1.943ex\" height=\"2.149ex\" role=\"img\" focusable=\"false\" viewBox=\"0 -750 858.6 950\"><g stroke=\"currentColor\" fill=\"currentColor\" stroke-width=\"0\" transform=\"scale(1,-1)\"><g data-mml-node=\"math\"><g data-mml-node=\"mpadded\"><g data-mml-node=\"mtext\"><text data-variant=\"normal\" transform=\"scale(1,-1)\" font-size=\"884px\" font-family=\"serif\">①</text></g></g></g></g></svg></mjx-container></span> <span class=\"math-inline \" data-overflow=\"visible\">\n" +
+      "<mjx-container class=\"MathJax\" jax=\"SVG\"><svg style=\"vertical-align: -0.452ex;\" xmlns=\"http://www.w3.org/2000/svg\" width=\"1.943ex\" height=\"2.149ex\" role=\"img\" focusable=\"false\" viewBox=\"0 -750 858.6 950\"><g stroke=\"currentColor\" fill=\"currentColor\" stroke-width=\"0\" transform=\"scale(1,-1)\"><g data-mml-node=\"math\"><g data-mml-node=\"mpadded\" fill=\"red\" stroke=\"red\"><g data-mml-node=\"mtext\"><text data-variant=\"normal\" transform=\"scale(1,-1)\" font-size=\"884px\" font-family=\"serif\">①</text></g></g></g></g></svg></mjx-container></span> <span class=\"math-inline \" data-overflow=\"visible\">\n" +
+      "<mjx-container class=\"MathJax\" jax=\"SVG\"><svg style=\"vertical-align: -0.452ex;\" xmlns=\"http://www.w3.org/2000/svg\" width=\"1.943ex\" height=\"2.149ex\" role=\"img\" focusable=\"false\" viewBox=\"0 -750 858.6 950\"><g stroke=\"currentColor\" fill=\"currentColor\" stroke-width=\"0\" transform=\"scale(1,-1)\"><g data-mml-node=\"math\"><g data-mml-node=\"mpadded\" fill=\"red\" stroke=\"red\"><g data-mml-node=\"mtext\"><text data-variant=\"normal\" transform=\"scale(1,-1)\" font-size=\"884px\" font-family=\"serif\">①</text></g></g></g></g></svg></mjx-container></span> <span class=\"math-inline \" data-overflow=\"visible\">\n" +
       "<mjx-container class=\"MathJax\" jax=\"SVG\"><svg style=\"vertical-align: -0.452ex;\" xmlns=\"http://www.w3.org/2000/svg\" width=\"1.943ex\" height=\"2.149ex\" role=\"img\" focusable=\"false\" viewBox=\"0 -750 858.6 950\"><g stroke=\"currentColor\" fill=\"currentColor\" stroke-width=\"0\" transform=\"scale(1,-1)\"><g data-mml-node=\"math\"><g data-mml-node=\"mpadded\" fill=\"red\" stroke=\"red\"><g data-mml-node=\"mtext\"><text data-variant=\"normal\" transform=\"scale(1,-1)\" font-size=\"884px\" font-family=\"serif\">①</text></g></g></g></g></svg></mjx-container></span></div>"
   },
   {

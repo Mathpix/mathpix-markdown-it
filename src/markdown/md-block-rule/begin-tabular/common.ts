@@ -242,7 +242,6 @@ export const getRowLines = (rows: string[], numCol: number): TParselines => {
     }
     sLines.push(matchR.join(''));
     let str = matchR.join(' ');
-    debugger
     if (!RE_CLINE.test(str)) {
       let mS = str.match(/\[(.*?)\]/);
       if (mS && mS[1]) {

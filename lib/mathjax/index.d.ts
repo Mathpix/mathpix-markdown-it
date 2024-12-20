@@ -103,10 +103,20 @@ export declare const MathJax: {
             mathml?: string;
             mathml_word?: string;
             asciimath?: string;
+            asciimath_tsv?: string;
+            asciimath_csv?: string;
+            asciimath_md?: string;
             latex?: string;
             svg?: string;
             speech?: string;
+            labels?: {
+                [key: string]: Label;
+            };
+            height?: number;
+            heightAndDepth?: number;
             width?: string;
+            widthEx?: number;
+            heightEx?: number;
         };
     };
     AsciiMathToSvg: (string: any, options?: any) => string;

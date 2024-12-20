@@ -10,6 +10,7 @@ import { formatSource, formatSourceMML } from "../helpers/parse-mmd-element";
 import { Label } from 'mathjax-full/js/input/tex/Tags.js';
 import { IAsciiData } from "./serialized-ascii/common";
 import { formatMathJaxError } from "../helpers/utils";
+import { getMathDimensions, IMathDimensions } from "./utils";
 
 const MJ = new MathJaxConfigure();
 
@@ -68,23 +69,6 @@ const applySpeechToNode = (adaptor, node, sre): string => {
   return speech;
 };
 
-const getWidthFromNode = (node): string => {
-  try {
-    if (node instanceof LiteElement) {
-      return node?.attributes?.hasOwnProperty('width')
-        ? node.attributes['width']
-        : '';
-    }
-    if (node instanceof HTMLElement) {
-      return node?.hasAttribute('width')
-        ?  node?.getAttribute('width')
-        : '';
-    }
-    return '';
-  } catch (e) {
-   return '';
-  }
-}
 const OuterData = (adaptor, node, math, outMath, forDocx = false, accessibility?): IOuterData => {
   const {
     include_mathml = false,
@@ -130,37 +114,18 @@ const OuterData = (adaptor, node, math, outMath, forDocx = false, accessibility?
   if (include_svg) {
     res.svg = adaptor.outerHTML(node);
     if (node) {
-      if (node instanceof LiteElement) {
-        let width: string = getWidthFromNode(node);
-        let svgElement: LiteElement = node.children?.length
-            ? node.children.find((item: LiteElement) => item.kind === 'svg') as LiteElement
+      const mathDimensions: IMathDimensions =
+        node instanceof LiteElement
+          ? getMathDimensions(node)
+          : node instanceof HTMLElement
+            ? getMathDimensions(node)
             : null;
-        let viewBox = svgElement ? svgElement.attributes?.viewBox : '';
-        let viewBoxArr = viewBox ? viewBox.split(' ') : [];
-        let height = viewBoxArr?.length > 3 ? Math.abs(viewBoxArr[1])/1000 : 0;
-        let heightAndDepth = viewBoxArr?.length > 3 ? Math.abs(viewBoxArr[3])/1000 : 0;
-        res.height = height;
-        res.heightAndDepth = heightAndDepth;
-        res.width = width;
-        let widthEx = svgElement?.attributes.width;
-        widthEx = widthEx ? widthEx.replace(/ex/g, '') : '';
-        let heightEx = svgElement?.attributes.height;
-        heightEx = heightEx ? heightEx.replace(/ex/g, '') : '';
-        res.widthEx = Number(widthEx);
-        res.heightEx = Number(heightEx);
-      } else {
-        if (node instanceof HTMLElement) {
-          let width: string = getWidthFromNode(node);
-          let svgElements = node.getElementsByTagName('svg');
-          let svgElement = svgElements ? svgElements[0]: null;
-          let viewBox = svgElement ? svgElement.getAttribute('viewBox') : '';
-          let viewBoxArr = viewBox ? viewBox.split(' ') : [];
-          let height = viewBoxArr?.length > 3 ? Math.abs(Number(viewBoxArr[1]))/1000 : 0;
-          let heightAndDepth = viewBoxArr?.length > 3 ? Math.abs(Number(viewBoxArr[3]))/1000 : 0;
-          res.height = height;
-          res.heightAndDepth = heightAndDepth;
-          res.width = width;
-        }
+      if (mathDimensions) {
+        res.width = mathDimensions.containerWidth;
+        res.widthEx = mathDimensions.widthEx;
+        res.heightEx = mathDimensions.heightEx;
+        res.height = mathDimensions.viewBoxHeight;
+        res.heightAndDepth = mathDimensions.viewBoxHeightAndDepth;
       }
     }
   }
@@ -253,15 +218,7 @@ const OuterDataMathMl = (adaptor, node, math, outMath, forDocx = false, accessib
       extraBrackets: true
     }
   } = outMath;
-  let res: {
-    mathml?: string,
-    mathml_word?: string,
-    asciimath?: string,
-    latex?: string,
-    svg?: string,
-    speech?: string,
-    width?: string
-  } = {};
+  let res: IOuterData = {};
 
   if (accessibility && accessibility.sre) {
     const speech = applySpeechToNode(adaptor, node, accessibility.sre);
@@ -285,9 +242,22 @@ const OuterDataMathMl = (adaptor, node, math, outMath, forDocx = false, accessib
 
   if (include_svg) {
     res.svg = adaptor.outerHTML(node);
-    res.width = getWidthFromNode(node);
+    if (node) {
+      const mathDimensions: IMathDimensions =
+        node instanceof LiteElement
+          ? getMathDimensions(node)
+          : node instanceof HTMLElement
+            ? getMathDimensions(node)
+            : null;
+      if (mathDimensions) {
+        res.width = mathDimensions.containerWidth;
+        res.widthEx = mathDimensions.widthEx;
+        res.heightEx = mathDimensions.heightEx;
+        res.height = mathDimensions.viewBoxHeight;
+        res.heightAndDepth = mathDimensions.viewBoxHeightAndDepth;
+      }
+    }
   }
-
   return res;
 };
 
@@ -443,7 +413,7 @@ export const MathJax = {
     const { outMath = {} } = options;
     const { include_asciimath = false } = outMath;
     options.outMath.include_asciimath = true;
-    const data = this.TexConvert(string, options);
+    const data: IOuterData = this.TexConvert(string, options);
     options.outMath.include_asciimath = include_asciimath;
     return {
       html: OuterHTML(data, outMath), 
@@ -469,7 +439,7 @@ export const MathJax = {
     this.checkAccessibility(accessibility);
     const node = MJ.docMathML.convert(string, {display: display, em: em, ex: ex, containerWidth: cwidth, lineWidth: lwidth, scale: scale});
     const outputJax = MJ.docMathML.outputJax as any;
-    const outerDataMathMl = OuterDataMathMl(MJ.adaptor, node, outputJax.math, outMath, forDocx, accessibility);
+    const outerDataMathMl: IOuterData = OuterDataMathMl(MJ.adaptor, node, outputJax.math, outMath, forDocx, accessibility);
     return {
       html: OuterHTML(outerDataMathMl, options.outMath),
       data: {...outerDataMathMl}

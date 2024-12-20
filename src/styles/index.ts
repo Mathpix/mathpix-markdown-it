@@ -65,6 +65,9 @@ export const MathpixStyle = (setTextAlignJustify: boolean = false, useColors: bo
         padding: 0;
         line-height: 0;
     }
+    .math-inline[data-overflow="visible"] mjx-container {
+      overflow: visible;
+    }
     .math-inline mjx-container mjx-assistive-mml {
       max-width: 100%;
     }
