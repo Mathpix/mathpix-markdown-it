@@ -315,6 +315,11 @@ export const BeginTheorem: RuleBlock = (state, startLine, endLine, silent) => {
     token = state.push("inline", "", 0);
     token.content = envItem.print;
     token.children = [];
+    if (state.md.options.forDocx) {
+      token.meta = {
+        isMathInText: true
+      }
+    }
     if (namePositions) {
       token.map = [namePositions.startLine, namePositions.endLine];
       token.bMarks = namePositions.bMarks;
@@ -348,6 +353,11 @@ export const BeginTheorem: RuleBlock = (state, startLine, endLine, silent) => {
       token = state.push("inline", "", 0);
       token.content = envDescription;
       token.children = [];
+      if (state.md.options.forDocx) {
+        token.meta = {
+          isMathInText: true
+        }
+      }
       if (descriptiontPositions) {
         token.map = [descriptiontPositions.startLine, descriptiontPositions.endLine];
         token.bMarks = descriptiontPositions.bMarks;

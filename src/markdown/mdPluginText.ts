@@ -11,7 +11,7 @@ import {
 } from "./md-renderer-rules/underline";
 import { closeTagSpan, reSpan, reAddContentsLine } from "./common/consts";
 import { findEndMarker, getTerminatedRules } from "./common";
-import { uid , getSpacesFromLeft } from "./utils";
+import { uid , getSpacesFromLeft, isMathInText } from "./utils";
 import { ILabel, getLabelByUuidFromLabelsList } from "./common/labels";
 import { textCollapse } from "./md-inline-rule/text-collapse";
 import { newlineToSpace } from "./md-inline-rule/new-line-to-space";
@@ -1142,6 +1142,9 @@ export const renderInlineContent = (token, options, env, slf) => {
           content = slf.renderInline(tok.children, options, env);
         }
       } else {
+        if (isMathInText(token.children, i, options)) {
+          tok.attrSet('data-math-in-text', "true");
+        }
         content = slf.renderInline([tok], options, env);
       }
       sContent +=  content
@@ -1387,9 +1390,9 @@ export default () => {
       {alt: getTerminatedRules('addContentsLineBlock')});
     md.block.ruler.before("headingSection", "separatingSpan", separatingSpan,
       {alt: getTerminatedRules('separatingSpan')});
-    md.block.ruler.before("paragraphDiv", "abstractBlock", abstractBlock,
+    md.block.ruler.before("lheading", "abstractBlock", abstractBlock,
       {alt: getTerminatedRules('abstractBlock')});
-    md.block.ruler.before("paragraphDiv", "pageBreaksBlock", pageBreaksBlock,
+    md.block.ruler.before("lheading", "pageBreaksBlock", pageBreaksBlock,
       {alt: getTerminatedRules('pageBreaksBlock')});
 
     md.inline.ruler.before("multiMath", "textTypes", textTypes);

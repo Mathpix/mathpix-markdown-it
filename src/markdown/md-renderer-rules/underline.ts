@@ -1,5 +1,6 @@
 import { renderTabularInline } from "./render-tabular";
 import { renderInlineContent } from "../mdPluginText";
+import { isMathInText } from "../utils";
 
 const htmlUnderlineOpen = (underlineLevel, underlineType = 'underline', underlinePadding = 0): string => {
   if (underlineType === 'uwave') {
@@ -69,6 +70,9 @@ export const renderUnderlineText = (tokens, idx, options, env, slf) => {
       const tok = token.children[i];
       if (tok.type === 'underline') {
         tok.underlineParentLevel = token.underlineParentLevel;
+        if (isMathInText(token.children, i, options)) {
+          tok.attrSet('data-math-in-text', "true");
+        }
         content = slf.renderInline([tok], options, env);
       } else {
         if (tok.children && tok.children.length > 1) {
@@ -78,6 +82,9 @@ export const renderUnderlineText = (tokens, idx, options, env, slf) => {
             content = slf.renderInline(tok.children, options, env);
           }
         } else {
+          if (isMathInText(token.children, i, options)) {
+            tok.attrSet('data-math-in-text', "true");
+          }
           content = slf.renderInline([tok], options, env);
         }
       }

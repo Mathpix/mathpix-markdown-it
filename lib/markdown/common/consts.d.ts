@@ -150,3 +150,6 @@ export declare const codeHighlightDef: {
     code: boolean;
 };
 export declare const renderOptionsDef: RenderOptions;
+export declare const OPENING_STYLE_TOKENS: string[];
+export declare const CLOSING_STYLE_TOKENS: string[];
+export declare const INLINE_ELEMENT_TOKENS: string[];

@@ -239,3 +239,18 @@ export const renderOptionsDef: RenderOptions = {
   enable_latex: true,
   enable_markdown_mmd_extensions: true
 }
+
+export const OPENING_STYLE_TOKENS  = [
+  "strong_open", "em_open", "s_open", "mark_open", "underline_open", "out_open", "text_latex_open",
+  "textbf_open", "texttt_open", "textit_open"
+];
+
+export const CLOSING_STYLE_TOKENS = [
+  "strong_close", "em_close", "s_close", "mark_close", "underline_close", "out_close", "text_latex_close",
+  "textbf_close", "texttt_close", "textit_close"
+];
+
+export const INLINE_ELEMENT_TOKENS = [
+  "text", "inline_math", "inline_mathML", "code_inline", "smiles_inline", "link_open", "label", "dotfill",
+  "textbf", "texttt", "textit", "text_latex", "url"
+];

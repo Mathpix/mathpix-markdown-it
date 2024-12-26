@@ -5,7 +5,7 @@ import {
   addFootnoteToListForFootnotetext,
   addFootnoteToListForBlFootnotetext
 } from "../md-latex-footnotes/utils";
-import { addAttributesToParentToken } from "../utils";
+import { addAttributesToParentToken, applyAttrToInlineMath } from "../utils";
 import { setSizeCounter } from "../common/counters";
 import { getTextWidthByTokens, ISizeEx } from "../common/textWidthByTokens";
 
@@ -43,6 +43,9 @@ export const coreInline = (state) => {
               currentTag: currentTag,
             }, {...envToInline});
             state.md.inline.parse(token.children[j].content, state.md, state.env, token.children[j].children);
+            if (token.children[j].meta?.isMathInText && token.children[j].children?.length) {
+              applyAttrToInlineMath(token.children[j], "data-math-in-text", "true");
+            }
             if (i > 0) {
               addAttributesToParentToken(tokens[i-1], token);
             }
@@ -120,6 +123,9 @@ export const coreInline = (state) => {
         currentTag: currentTag,
       }, {...envToInline});
       state.md.inline.parse(token.content, state.md, state.env, token.children);
+      if (token.meta?.isMathInText && token.children?.length) {
+        applyAttrToInlineMath(token.children, "data-math-in-text", "true");
+      }
       if (state.md.options?.enableSizeCalculation) {
         if (token.type === 'inline' && token.children?.length) {
           let data: ISizeEx = getTextWidthByTokens(token.children);
