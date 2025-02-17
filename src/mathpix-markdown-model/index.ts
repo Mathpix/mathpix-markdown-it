@@ -218,6 +218,7 @@ export type TAccessibility = {
 
 export type Footnotes = {
   fontSize?: string;
+  compact_refs?: boolean;
 }
 
 class MathpixMarkdown_Model {
