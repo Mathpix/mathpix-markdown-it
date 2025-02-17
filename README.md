@@ -876,9 +876,10 @@ The `MathpixMarkdown` React element accepts the following props:
 
 ### Footnotes
 
-|                | type&nbsp;*`default`*       |                                           |
-|----------------|-----------------------------|-------------------------------------------|
-| `fontSize`     | string&nbsp;*`unset`*       | Ability to change font size for footnotes |
+|                | type&nbsp;*`default`*       |                                                                                                    |
+|----------------|-----------------------------|----------------------------------------------------------------------------------------------------|
+| `fontSize`     | string&nbsp;*`unset`*       | Ability to change font size for footnotes section                                                  |
+| `compact_refs` | boolean&nbsp;*`unset`*      | Renders footnote references in a compact format, avoiding repeated numbering for the same footnote |
 
 ### RenderOptions
 

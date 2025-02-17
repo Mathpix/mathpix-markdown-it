@@ -30,7 +30,7 @@ export const render_footnote_caption = (tokens, idx, options, env, slf) => {
       }
     }
   }
-  if (tokens[idx].meta.subId > 0) {
+  if (!options?.footnotes?.compact_refs && tokens[idx].meta.subId > 0) {
     n += ':' + tokens[idx].meta.subId;
   }
 
