@@ -7,4 +7,8 @@
 
 ## Color icons
 
-- [Color icons](https://htmlpreview.github.io/?https://github.com/Mathpix/mathpix-markdown-it/blob/dev/olga/add-cancel-package/doc/icons/color-icons.html)
+- [Color icons](https://htmlpreview.github.io/?https://github.com/Mathpix/mathpix-markdown-it/blob/dev/olga/13534-Request-to-add-some-icons-v1/doc/icons/color-icons.html)
+
+## Table of icons
+
+- [Table of icons](https://htmlpreview.github.io/?https://github.com/Mathpix/mathpix-markdown-it/blob/dev/olga/13534-Request-to-add-some-icons-v1/doc/icons/table-of-icons.html)
