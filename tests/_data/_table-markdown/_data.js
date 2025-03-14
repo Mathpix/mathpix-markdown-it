@@ -822,13 +822,13 @@ module.exports = [
     table_markdown:  '| *Value \\| 1* | **Value 2** | `Value 3` | *Value \\| 4* |\n' +
       '| :--- | --- | ---: | :--- |\n' +
       '| $\\alpha$ | $\\beta$ | $\\gamma$ | $\\delta$ |\n' +
-      '| ~~1 \\| g~~ | `1110.1 \\| 4` | a | e |\n' +
+      '| ~~1 \\| g~~ | `1110.1 | 4` | a | e |\n' +
       '| ==2 \\| f== | 10.1 | b | f |\n' +
       '| 3 | 23.113231 | c | g |',
     table_markdown_math_as_ascii: '| *Value \\| 1* | **Value 2** | `Value 3` | *Value \\| 4* |\n' +
       '| :--- | --- | ---: | :--- |\n' +
       '| alpha | beta | gamma | delta |\n' +
-      '| ~~1 \\| g~~ | `1110.1 \\| 4` | a | e |\n' +
+      '| ~~1 \\| g~~ | `1110.1 | 4` | a | e |\n' +
       '| ==2 \\| f== | 10.1 | b | f |\n' +
       '| 3 | 23.113231 | c | g |'
   },

@@ -49,6 +49,8 @@ export declare const reOpenTagFootnotetextG: RegExp;
 export declare const reOpenTagFootnotetextNumbered: RegExp;
 export declare const reFootNoteMark: RegExp;
 export declare const reFootNoteText: RegExp;
+export declare const reDiagboxG: RegExp;
+export declare const reDiagbox: RegExp;
 export declare const reNumber: RegExp;
 export declare const svgRegex: RegExp;
 export declare const svgInlineRegex: RegExp;
