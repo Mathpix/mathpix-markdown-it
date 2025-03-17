@@ -79,7 +79,7 @@ export const inlineDiagbox: RuleInline = (state: StateInline, silent: boolean): 
 
     const token: Token = isSW ? state.push('slashbox', '', 0) : state.push('backslashbox', '', 0);
     token.attrJoin('class', `diagonal-cell`);
-    token.attrJoin('style', 'grid-template-columns: repeat(2, 1fr);');
+    token.attrJoin('style', 'grid-template-columns: repeat(2, 1fr); padding: 0;');
     token.content = '';
     token.latex = match[0];
     token.children = [];
@@ -91,22 +91,22 @@ export const inlineDiagbox: RuleInline = (state: StateInline, silent: boolean): 
 
     if (isSW) {
       tokenLeft.attrJoin('class', `diagonal-cell-topLeft`);
-      let styleTopLeft: string[] = ['grid-row-start: 1;', 'grid-column-start: 1;', 'text-align: left;'];
+      let styleTopLeft: string[] = ['grid-row-start: 1;', 'grid-column-start: 1;', 'text-align: left; white-space: nowrap;'];
       tokenLeft.attrJoin('style', styleTopLeft.join(' '));
       token.children.push(tokenLeft);
 
       tokenRight.attrJoin('class', `diagonal-cell-bottomRight`);
-      let styleBottomRight: string[] = ['grid-row-start: 2;', 'grid-column-start: 2;', 'text-align: right;'];
+      let styleBottomRight: string[] = ['grid-row-start: 2;', 'grid-column-start: 2;', 'text-align: right; white-space: nowrap;'];
       tokenRight.attrJoin('style', styleBottomRight.join(' '));
       token.children.push(tokenRight);
     } else {
       tokenRight.attrJoin('class', `diagonal-cell-topRight`);
-      let styleTopRight: string[] = ['grid-row-start: 1;', 'grid-column-start: 2;', 'text-align: right;'];
+      let styleTopRight: string[] = ['grid-row-start: 1;', 'grid-column-start: 2;', 'text-align: right; white-space: nowrap;'];
       tokenRight.attrJoin('style', styleTopRight.join(' '));
       token.children.push(tokenRight);
 
       tokenLeft.attrJoin('class', `diagonal-cell-bottomLeft`);
-      let styleBottomLeft: string[] = ['grid-row-start: 2;', 'grid-column-start: 1;', 'text-align: left;'];
+      let styleBottomLeft: string[] = ['grid-row-start: 2;', 'grid-column-start: 1;', 'text-align: left; white-space: nowrap;'];
       tokenLeft.attrJoin('style', styleBottomLeft.join(' '));
       token.children.push(tokenLeft);
     }
