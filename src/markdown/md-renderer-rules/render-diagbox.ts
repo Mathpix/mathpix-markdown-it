@@ -24,7 +24,7 @@ export const renderDiagbox = (
 ): string => {
   const token: Token = tokens[idx];
   const styles: string[] = token.meta?.isBlock
-    ? ['display: grid;']
+    ? ['display: grid; height: 100%;']
     : ['display: inline-grid;',
       'background-size: 100% 100%;',
       `background-image: linear-gradient(to bottom ${token.type === 'backslashbox' ? 'left' : 'right'}, transparent calc(50% - 0.5px), black 50%, black 50%, transparent calc(50% + 0.5px));`

@@ -4,9 +4,11 @@ import { lineSpaceTag, RE_TAG_WITH_CLINE, RE_CLINE } from "../../common/consts";
 
 export type TParselines = {cLines: Array<Array<string>>, cSpaces: Array<Array<string>>, sLines: Array<string>}
 
-export const getContent = (content: string, onlyOne: boolean = false): string => {
+export const getContent = (content: string, onlyOne: boolean = false, skipTrim: boolean = false): string => {
   if(!content) { return content}
-  content = content.trim();
+  if (!skipTrim) {
+    content = content.trim();
+  }
   if (content[0] === '{' && content[content.length-1] === '}') {
     content  =  content.slice(1, content.length-1);
     if (!onlyOne) {content = getContent(content);}

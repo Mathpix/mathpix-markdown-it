@@ -24,7 +24,7 @@ const parseAttributes = (str: string): Record<string, string | true> => {
 const processContent = (content: string): string => {
   try {
     const parseMath: string = getMathTableContent(content, 0);
-    const processedContent: string = parseMath || getContent(content);
+    const processedContent: string = parseMath || getContent(content, false, true);
     const data: TTokenTabular[] = getSubTabular(processedContent, 0, true);
     if (data && data.length) {
       return data.map(item => item.content).join('');
@@ -74,6 +74,8 @@ export const inlineDiagbox: RuleInline = (state: StateInline, silent: boolean): 
     let [right, endIndex] = extractNextBraceContent(str, newIndex);
     left = getSubMath(left);
     right = getSubMath(right);
+    left = left.split('\n').join('').trim();
+    right = right.split('\n').join('').trim();
     left = left.split('\\\\').join('\n');
     right = right.split('\\\\').join('\n');
 
@@ -90,23 +92,23 @@ export const inlineDiagbox: RuleInline = (state: StateInline, silent: boolean): 
     let tokenRight: Token = createDiagboxItemToken(state, rightContent);
 
     if (isSW) {
-      tokenLeft.attrJoin('class', `diagonal-cell-topLeft`);
-      let styleTopLeft: string[] = ['grid-row-start: 1;', 'grid-column-start: 1;', 'text-align: left; white-space: nowrap;'];
+      tokenLeft.attrJoin('class', `cell-item diagonal-cell-topLeft`);
+      let styleTopLeft: string[] = ['grid-row-start: 1;', 'grid-column-start: 1;', 'text-align: left; white-space: nowrap; min-height: 1.5em;'];
       tokenLeft.attrJoin('style', styleTopLeft.join(' '));
       token.children.push(tokenLeft);
 
-      tokenRight.attrJoin('class', `diagonal-cell-bottomRight`);
-      let styleBottomRight: string[] = ['grid-row-start: 2;', 'grid-column-start: 2;', 'text-align: right; white-space: nowrap;'];
+      tokenRight.attrJoin('class', `cell-item diagonal-cell-bottomRight`);
+      let styleBottomRight: string[] = ['grid-row-start: 2;', 'grid-column-start: 2;', 'text-align: right; white-space: nowrap; min-height: 1.5em; margin-top: auto;'];
       tokenRight.attrJoin('style', styleBottomRight.join(' '));
       token.children.push(tokenRight);
     } else {
-      tokenRight.attrJoin('class', `diagonal-cell-topRight`);
-      let styleTopRight: string[] = ['grid-row-start: 1;', 'grid-column-start: 2;', 'text-align: right; white-space: nowrap;'];
+      tokenRight.attrJoin('class', `cell-item diagonal-cell-topRight`);
+      let styleTopRight: string[] = ['grid-row-start: 1;', 'grid-column-start: 2;', 'text-align: right; white-space: nowrap; min-height: 1.5em;'];
       tokenRight.attrJoin('style', styleTopRight.join(' '));
       token.children.push(tokenRight);
 
-      tokenLeft.attrJoin('class', `diagonal-cell-bottomLeft`);
-      let styleBottomLeft: string[] = ['grid-row-start: 2;', 'grid-column-start: 1;', 'text-align: left; white-space: nowrap;'];
+      tokenLeft.attrJoin('class', `cell-item diagonal-cell-bottomLeft`);
+      let styleBottomLeft: string[] = ['grid-row-start: 2;', 'grid-column-start: 1;', 'text-align: left; white-space: nowrap; min-height: 1.5em; margin-top: auto;'];
       tokenLeft.attrJoin('style', styleBottomLeft.join(' '));
       token.children.push(tokenLeft);
     }
