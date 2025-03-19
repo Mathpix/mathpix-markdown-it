@@ -72,8 +72,8 @@ export const inlineDiagbox: RuleInline = (state: StateInline, silent: boolean): 
 
     let [left, newIndex] = extractNextBraceContent(str, index + match[0].length);
     let [right, endIndex] = extractNextBraceContent(str, newIndex);
-    left = getSubMath(left);
-    right = getSubMath(right);
+    left = left ? getSubMath(left) : '';
+    right = right ? getSubMath(right) : '';
     left = left.split('\n').join('').trim();
     right = right.split('\n').join('').trim();
     left = left.split('\\\\').join('\n');
@@ -114,6 +114,7 @@ export const inlineDiagbox: RuleInline = (state: StateInline, silent: boolean): 
     }
 
     state.pos += endIndex;
+    console.log("[TEST]=>state=>", state)
     return true;
   } catch (err) {
     console.error("[ERROR]=>[inlineDiagbox]=>", err);

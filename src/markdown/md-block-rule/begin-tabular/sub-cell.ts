@@ -11,7 +11,6 @@ export const getSubDiagbox = (str: string): string => {
     const { index } = match;
     const [left, newIndex] = extractNextBraceContent(str, index + match[0].length);
     const [right, endIndex] = extractNextBraceContent(str, newIndex);
-    if (!left || !right) continue;
     const fullMatch = `${match[0]}{${left}}{${right}}`;
     let id = diagboxTable.get(fullMatch);
     if (!id) {
@@ -28,6 +27,10 @@ export const getSubDiagbox = (str: string): string => {
 
 export const extractNextBraceContent = (str: string, startIndex: number): [string, number] => {
   let depth = 0, content = '', i = startIndex;
+  let firstChar = str[startIndex];
+  if (firstChar !== '{') {
+    return ['', startIndex];
+  }
   while (i < str.length) {
     const char = str[i];
     if (char === '{' && depth++ === 0) { i++; continue; }
