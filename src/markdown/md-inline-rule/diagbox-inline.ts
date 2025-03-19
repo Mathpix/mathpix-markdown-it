@@ -114,7 +114,6 @@ export const inlineDiagbox: RuleInline = (state: StateInline, silent: boolean): 
     }
 
     state.pos += endIndex;
-    console.log("[TEST]=>state=>", state)
     return true;
   } catch (err) {
     console.error("[ERROR]=>[inlineDiagbox]=>", err);
