@@ -86,7 +86,7 @@ export const parseMarkdownByElement = (el: HTMLElement | Document, include_sub_m
           + ', ' + querySelectorChem
           + ', ' + querySelectorChart
       )
-    : el.querySelectorAll('div > .math-inline, div > .math-block, .table_tabular, div > .inline-tabular, div > .smiles, div > .smiles-inline'
+    : el.querySelectorAll('div:not(.cell-item) > .math-inline, div:not(.cell-item) > .math-block, .table_tabular, div:not(.cell-item) > .inline-tabular, div:not(.cell-item) > .smiles, div:not(.cell-item) > .smiles-inline'
           + ', ' + querySelectorChem
           + ', ' + querySelectorChart
       );

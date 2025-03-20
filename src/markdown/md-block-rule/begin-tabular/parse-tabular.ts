@@ -6,6 +6,7 @@ import {getContent, getRowLines,getCellsAll, getDecimal, TDecimal,
 import { getMathTableContent, getSubMath } from './sub-math';
 import { getSubTabular, pushSubTabular } from './sub-tabular';
 import { getMultiColumnMultiRow, getCurrentMC, getMC } from './multi-column-row';
+import { getSubDiagbox } from "./sub-cell";
 
 export const separateByColumns = (str: string) => {
   const columns = [];
@@ -46,6 +47,7 @@ const getNumCol = (cells: string[]): number => {
 
 const getRows = (str: string): string[] => {
   str = getSubMath(str);
+  str = getSubDiagbox(str);
   return str.split('\\\\');
 };
 

@@ -1,6 +1,7 @@
 import {TTokenTabular} from "./index";
 import { generateUniqueId, getContent } from "./common";
 import { doubleAngleBracketUuidPattern, singleAngleBracketPattern } from "../../common/consts";
+import { findInDiagboxTable } from "./sub-cell";
 
 type TSubTabular = {
   id: string,
@@ -100,6 +101,26 @@ export const getSubTabular = (sub: string, i: number, isCell: boolean = true, fo
           id: subTabular[index].id,
           parents: subTabular[index].parents,
           type: 'subTabular'
+        })
+      }
+    } else {
+      let subContent = findInDiagboxTable(t);
+      const iB: number = sub.indexOf(cellM[j]);
+      const strB: string = sub.slice(0, iB).trim();
+      lastIndex = iB + cellM[j].length;
+
+      sub = sub.slice(lastIndex)
+      let strE: string = '';
+      if (j === cellM.length - 1) {
+        strE = sub;
+      }
+      const st = strB + subContent + strE;
+      if (subContent) {
+        res.push({
+          token: 'inline',
+          tag: '',
+          n: 0,
+          content: st
         })
       }
     }

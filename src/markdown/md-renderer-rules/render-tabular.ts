@@ -1,9 +1,9 @@
 import { TsvJoin } from "../common/tsv";
 import { CsvJoin } from "../common/csv";
-import { tableMarkdownJoin, getMdForChild, getMdLink } from "../common/table-markdown";
-import { mathTokenTypes } from "../common/consts";
+import { tableMarkdownJoin } from "../common/table-markdown";
 import { formatSource } from "../../helpers/parse-mmd-element";
 import { getStyleFromHighlight } from "../highlight/common";
+import { renderTableCellContent } from "../common/render-table-cell-content";
 
 const tokenAttrGet = (token, name) => {
   if (!name) { return ''}
@@ -102,6 +102,22 @@ export const renderInlineTokenBlock = (tokens, options, env, slf, isSubTable = f
 
     }
     if (token.token === 'td_open') {
+      let nextToken = tokens[idx+1];
+      let nextToken2 = tokens[idx+2];
+      if (
+        nextToken2?.token === 'td_close' &&
+        nextToken?.children?.length === 1 &&
+        ['slashbox', 'backslashbox'].includes(nextToken.children[0].type)
+      ) {
+        const diagBoxToken = nextToken.children[0];
+        diagBoxToken.meta = { ...diagBoxToken.meta, isBlock: true };
+        const dir = diagBoxToken.type === 'backslashbox' ? 'left' : 'right';
+        let styles = tokenAttrGet(token, 'style');
+        styles += 'background-size: 100% 100%;';
+        styles += 'vertical-align: middle;';
+        styles += `background-image: linear-gradient(to bottom ${dir}, transparent calc(50% - 0.5px), black 50%, black 50%, transparent calc(50% + 0.5px));`;
+        tokenAttrSet(token, 'style', styles);
+      }
       cell = '';
       cellCsv = '';
       cellMd = '';
@@ -169,105 +185,11 @@ export const renderInlineTokenBlock = (tokens, options, env, slf, isSubTable = f
     if (token.token === 'inline') {
       let content: string = '';
       if (token.children) {
-
-        for (let j = 0; j < token.children.length; j++) {
-          const child = token.children[j];
-          if (child.type === "tabular_inline" || isSubTable) {
-            child.isSubTable = true;
-          }
-          content += slf.renderInline([child], options, env);
-          if (child.ascii) {
-            cell += child.ascii_tsv ? child.ascii_tsv : child.ascii;
-            cellCsv += child.ascii_csv ? child.ascii_csv : child.ascii;
-          } else {
-            if (token.type === 'subTabular') {
-              if (token.parents?.length) {
-                cell += child.tsv ? child.tsv.join(',') : child.content;
-                cellCsv += child.csv ? child.csv.join(',') : child.content;
-              } else {
-                cell += child.tsv 
-                  ? '"' + TsvJoin(child.tsv, options) + '"' 
-                  : child.content;
-                cellCsv += child.csv 
-                  ? CsvJoin(child.csv, options, true)
-                  : child.content;
-              }
-            } else {
-              cell += child.tsv ? child.tsv.join(',') : child.content;
-              cellCsv += child.csv ? child.csv.join(',') : child.content;
-            }
-          }
-
-
-          if (child.type === 'link_open') {
-            cell += child.attrGet('href');
-            cellCsv += child.attrGet('href');
-            let link = getMdLink(child, token, j);
-            link = link.replace(/\|/, '\\|');
-            if (link) {
-              cellMd += link;
-              if ((j + 1) < token.children.length) {
-                content += slf.renderInline([token.children[j+1]], options, env);
-                j++;
-              }
-              if ((j + 2) < token.children.length) {
-                content += slf.renderInline([token.children[j+2]], options, env);
-                j++;
-              }
-              continue;
-            }
-          }
-
-          if (child.type === 'text') {
-            let text = child.content;
-            text = text.replace(/\|/, '\\|');
-            cellMd += text;
-            continue;
-          }
-
-          cellMd += getMdForChild(child);
-          if (child.latex) {
-            if (options.outMath && options.outMath.table_markdown && options.outMath.table_markdown.math_as_ascii) {
-              if (child.ascii) {
-                cellMd += child.ascii_md ? child.ascii_md : child.ascii;
-                continue;
-              }
-            }
-            const begin_math_inline_delimiters = options.outMath?.table_markdown?.math_inline_delimiters?.length > 1 
-              ? options.outMath?.table_markdown?.math_inline_delimiters[0] : '$';            
-            const end_math_inline_delimiters = options.outMath?.table_markdown?.math_inline_delimiters?.length > 1 
-              ? options.outMath?.table_markdown?.math_inline_delimiters[1] : '$';
-            let mdContent = mathTokenTypes.includes(child.type)
-              ? begin_math_inline_delimiters + child.content?.trim() + end_math_inline_delimiters
-              : child.latex;
-            cellMd += mdContent                
-              .replace(/\|/g, '\\|')
-              .replace(/\n/g, ' ');
-          } else {
-            if (child.type === 'image' || child.type === 'includegraphics') {
-              const src = child.attrGet('src');
-              cell += src;
-              cellCsv += src;
-              let img = `![${child.attrGet('alt')}](${src})`;
-              img = img.replace(/\|/, '\\|');
-              cellMd += img;
-            } else {
-              let subTable = child.content.replace(/\|/, '\\|');
-              if (child.tableMd && child.tableMd.length) {
-                subTable = child.tableMd.map(item => (item.join(' '))).join(' <br> ');
-              }
-              cellMd += subTable;
-            }
-          }
-          if (child.tag === 'code') {
-            cellMd += child.markup;
-            continue;
-          }
-          if (child.type === 'smiles_inline') {
-            cellMd += '</smiles>';
-          }
-
-        }
+        const data = renderTableCellContent(token, true, options, env, slf)
+        content += data.content;
+        cell += data.tsv;
+        cellCsv += data.csv;
+        cellMd += data.tableMd;
       } else {
         content = slf.renderInline([{type: 'text', content: token.content}], options, env);
         cell += content;

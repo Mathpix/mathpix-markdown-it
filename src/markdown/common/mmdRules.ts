@@ -395,6 +395,11 @@ export const mmdRuleList: IMmdRule[] = [
     rule: eRule.inline
   },
   {
+    name: "inlineDiagbox",
+    type: eMmdRuleType.latex,
+    rule: eRule.inline
+  },
+  {
     name: "escape",
     description: "\\!\"#$%&\'()*+,./:;<=>?@[]^_`{|}~-",
     type: eMmdRuleType.markdown,
