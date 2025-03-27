@@ -31,7 +31,7 @@ export interface InlineCodeItem {
   content: string
 }
 
-const getInlineCodeListFromString = (str): Array<InlineCodeItem> => {
+export const getInlineCodeListFromString = (str): Array<InlineCodeItem> => {
   let inlineCodeList: Array<InlineCodeItem> = [];
   if (!str || !str.trim()) {
     return inlineCodeList;

@@ -1,5 +1,6 @@
 import { generateUniqueId } from "./common";
 import { reDiagboxG } from "../../common/consts";
+import { InlineCodeItem, getInlineCodeListFromString } from "../../common";
 
 const diagboxTable = new Map<string, string>();
 
@@ -31,11 +32,19 @@ export const extractNextBraceContent = (str: string, startIndex: number): [strin
   if (firstChar !== '{') {
     return ['', startIndex];
   }
+  let beforeCharCode: number = 0;
+  let inlineCodeList: Array<InlineCodeItem> = getInlineCodeListFromString(str);
   while (i < str.length) {
     const char = str[i];
-    if (char === '{' && depth++ === 0) { i++; continue; }
-    if (char === '}' && --depth === 0) return [content, i + 1];
+    let isCode = inlineCodeList?.length
+      ? inlineCodeList.find(item => item.posStart <= i && item.posEnd >= i)
+      : null;
+    if (beforeCharCode !== 0x5c /* \ */ && !isCode) {
+      if (char === '{' && depth++ === 0) { i++; continue; }
+      if (char === '}' && --depth === 0) return [content, i + 1];
+    }
     content += char;
+    beforeCharCode = str.charCodeAt(i);
     i++;
   }
   return ['', startIndex];
