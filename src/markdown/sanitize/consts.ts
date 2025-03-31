@@ -7,7 +7,7 @@ import { svgAttrs, htmlAttrs } from "./attrs";
  **/
 
 export const allowedTags = [
-  'dd', 'del', 'details', 'div', 'dl', 'dt', 'h1', 'h2', 'iframe',
+  'dd', 'del', 'details', 'div', 'dl', 'dt', 'h1', 'h2',
   'img', 'input', 'ins', 'figure', 'figcaption', 'kbd', 'meta', 'path', 'pre', 'q', 'rp', 'rt', 'ruby',
   's', 'samp', 'span', 'strike', 'sub', 'summary', 'sup', 'svg', 'tfoot', 'var'
 ];
