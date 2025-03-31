@@ -1,3 +1,4 @@
+const sanitizeHtml = require("../../../lib/markdown/sanitize/sanitize-html");
 module.exports = [
   {
     html:     '<div><p>Hello <b>there</b></p></div>',
@@ -343,55 +344,268 @@ module.exports = [
     html:     '<iframe src="https://www.youtube.com/embed/c2IlcS7AHxM"></iframe>',
     dirty:    `<div><iframe src="https://www.youtube.com/embed/c2IlcS7AHxM"></iframe></div>`,
     discard:  `<div><iframe src="https://www.youtube.com/embed/c2IlcS7AHxM"></iframe></div>`,
-    sanitize: `<div><iframe src="https://www.youtube.com/embed/c2IlcS7AHxM"></iframe></div>`
+    discardOptions: {
+      htmlSanitize: {
+        allowedTags: [ 'p', 'iframe', 'a', 'img', 'i' ],
+        allowedAttributes: {
+          iframe: [ 'src', 'href' ],
+          a: [ 'src', 'href' ],
+          img: [ 'src' ]
+        },
+        allowedIframeHostnames: [ 'www.youtube.com', 'player.vimeo.com' ]
+      }
+    },
+    sanitize: `<div><iframe src="https://www.youtube.com/embed/c2IlcS7AHxM"></iframe></div>`,
+    sanitizeOptions: {
+      htmlSanitize: {
+        disallowedTagsMode: 'recursiveEscape',
+        allowedTags: [ 'p', 'iframe', 'a', 'img', 'i' ],
+        allowedAttributes: {
+          iframe: [ 'src', 'href' ],
+          a: [ 'src', 'href' ],
+          img: [ 'src' ]
+        },
+        allowedIframeHostnames: [ 'www.youtube.com', 'player.vimeo.com' ]
+      }
+    },
   },
   {
     html:     '<iframe src="https://www.embed.vevo.com/USUV71704255"></iframe>',
     dirty:    `<div><iframe src="https://www.embed.vevo.com/USUV71704255"></iframe></div>`,
-    discard:  `<div><iframe src="https://www.embed.vevo.com/USUV71704255"></iframe></div>`,
-    sanitize: '<div><iframe src="https://www.embed.vevo.com/USUV71704255"></iframe></div>'
+    discard:  `<div><iframe></iframe></div>`,
+    discardOptions: {
+      htmlSanitize: {
+        allowedTags: [ 'p', 'iframe', 'a', 'img', 'i' ],
+        allowedAttributes: {
+          iframe: [ 'src', 'href' ],
+          a: [ 'src', 'href' ],
+          img: [ 'src' ]
+        },
+        allowedIframeHostnames: [ 'www.youtube.com', 'player.vimeo.com' ]
+      }
+    },
+    sanitize: '<div><iframe></iframe></div>',
+    sanitizeOptions: {
+      htmlSanitize: {
+        disallowedTagsMode: 'recursiveEscape',
+        allowedTags: [ 'p', 'iframe', 'a', 'img', 'i' ],
+        allowedAttributes: {
+          iframe: [ 'src', 'href' ],
+          a: [ 'src', 'href' ],
+          img: [ 'src' ]
+        },
+        allowedIframeHostnames: [ 'www.youtube.com', 'player.vimeo.com' ]
+      }
+    },
   },
   {
     html:     '<iframe src="https://www.foo.us02web.zoom.us/embed/c2IlcS7AHxM"></iframe>',
     dirty:    `<div><iframe src="https://www.foo.us02web.zoom.us/embed/c2IlcS7AHxM"></iframe></div>`,
     discard:  `<div><iframe src="https://www.foo.us02web.zoom.us/embed/c2IlcS7AHxM"></iframe></div>`,
-    sanitize: '<div><iframe src="https://www.foo.us02web.zoom.us/embed/c2IlcS7AHxM"></iframe></div>'
+    discardOptions: {
+      htmlSanitize: {
+        allowedTags: [ 'p', 'iframe', 'a', 'img', 'i' ],
+        allowedAttributes: {
+          iframe: [ 'src', 'href' ],
+          a: [ 'src', 'href' ],
+          img: [ 'src' ]
+        },
+        allowedIframeDomains: [ 'zoom.us' ]
+      }
+    },
+    sanitize: '<div><iframe src="https://www.foo.us02web.zoom.us/embed/c2IlcS7AHxM"></iframe></div>',
+    sanitizeOptions: {
+      htmlSanitize: {
+        disallowedTagsMode: 'recursiveEscape',
+        allowedTags: [ 'p', 'iframe', 'a', 'img', 'i' ],
+        allowedAttributes: {
+          iframe: [ 'src', 'href' ],
+          a: [ 'src', 'href' ],
+          img: [ 'src' ]
+        },
+        allowedIframeDomains: [ 'zoom.us' ]
+      }
+    },
   },
   {
     html:     '<iframe src="https://zoom.us/embed/c2IlcS7AHxM"></iframe>',
     dirty:    `<div><iframe src="https://zoom.us/embed/c2IlcS7AHxM"></iframe></div>`,
     discard:  `<div><iframe src="https://zoom.us/embed/c2IlcS7AHxM"></iframe></div>`,
-    sanitize: '<div><iframe src="https://zoom.us/embed/c2IlcS7AHxM"></iframe></div>'
+    discardOptions: {
+      htmlSanitize: {
+        allowedTags: [ 'p', 'iframe', 'a', 'img', 'i' ],
+        allowedAttributes: {
+          iframe: [ 'src', 'href' ],
+          a: [ 'src', 'href' ],
+          img: [ 'src' ]
+        },
+        allowedIframeDomains: [ 'zoom.us' ]
+      }
+    },
+    sanitize: '<div><iframe src="https://zoom.us/embed/c2IlcS7AHxM"></iframe></div>',
+    sanitizeOptions: {
+      htmlSanitize: {
+        disallowedTagsMode: 'recursiveEscape',
+        allowedTags: [ 'p', 'iframe', 'a', 'img', 'i' ],
+        allowedAttributes: {
+          iframe: [ 'src', 'href' ],
+          a: [ 'src', 'href' ],
+          img: [ 'src' ]
+        },
+        allowedIframeDomains: [ 'zoom.us' ]
+      }
+    },
   },
   {
     html:     '<iframe src="https://www.prefix.us02web.zoom.us/embed/c2IlcS7AHxM"></iframe>',
     dirty:    `<div><iframe src="https://www.prefix.us02web.zoom.us/embed/c2IlcS7AHxM"></iframe></div>`,
-    discard:  `<div><iframe src="https://www.prefix.us02web.zoom.us/embed/c2IlcS7AHxM"></iframe></div>`,
-    sanitize: '<div><iframe src="https://www.prefix.us02web.zoom.us/embed/c2IlcS7AHxM"></iframe></div>'
+    discard:  `<div><iframe></iframe></div>`,
+    discardOptions: {
+      htmlSanitize: {
+        allowedTags: [ 'p', 'iframe', 'a', 'img', 'i' ],
+        allowedAttributes: {
+          iframe: [ 'src', 'href' ],
+          a: [ 'src', 'href' ],
+          img: [ 'src' ]
+        },
+        allowedIframeDomains: [ 'vimeo.com' ]
+      }
+    },
+    sanitize: '<div><iframe></iframe></div>',
+    sanitizeOptions: {
+      htmlSanitize: {
+        disallowedTagsMode: 'recursiveEscape',
+        allowedTags: [ 'p', 'iframe', 'a', 'img', 'i' ],
+        allowedAttributes: {
+          iframe: [ 'src', 'href' ],
+          a: [ 'src', 'href' ],
+          img: [ 'src' ]
+        },
+        allowedIframeDomains: [ 'vimeo.com' ]
+      }
+    },
   },
   {
     html:     '<iframe src="/foo"></iframe>',
     dirty:    `<div><iframe src="/foo"></iframe></div>`,
     discard:  `<div><iframe src="/foo"></iframe></div>`,
-    sanitize: '<div><iframe src="/foo"></iframe></div>'
+    discardOptions: {
+      htmlSanitize: {
+        allowedTags: [ 'p', 'iframe', 'a', 'img', 'i' ],
+        allowedAttributes: {
+          iframe: [ 'src', 'href' ],
+          a: [ 'src', 'href' ],
+          img: [ 'src' ]
+        }
+      }
+    },
+    sanitize: '<div><iframe src="/foo"></iframe></div>',
+    sanitizeOptions: {
+      htmlSanitize: {
+        disallowedTagsMode: 'recursiveEscape',
+        allowedTags: [ 'p', 'iframe', 'a', 'img', 'i' ],
+        allowedAttributes: {
+          iframe: [ 'src', 'href' ],
+          a: [ 'src', 'href' ],
+          img: [ 'src' ]
+        }
+      }
+    },
   },
   {
     html:     '<iframe src="/foo"></iframe><iframe src="https://www.youtube.com/embed/c2IlcS7AHxM"></iframe>',
     dirty:    `<div><iframe src="/foo"></iframe><iframe src="https://www.youtube.com/embed/c2IlcS7AHxM"></iframe></div>`,
-    discard:  `<div><iframe src="/foo"></iframe><iframe src="https://www.youtube.com/embed/c2IlcS7AHxM"></iframe></div>`,
-    sanitize: '<div><iframe src="/foo"></iframe><iframe src="https://www.youtube.com/embed/c2IlcS7AHxM"></iframe></div>'
+    discard:  `<div><iframe></iframe><iframe src="https://www.youtube.com/embed/c2IlcS7AHxM"></iframe></div>`,
+    discardOptions: {
+      htmlSanitize: {
+        allowedTags: [ 'p', 'iframe', 'a', 'img', 'i' ],
+        allowedAttributes: {
+          iframe: [ 'src', 'href' ],
+          a: [ 'src', 'href' ],
+          img: [ 'src' ]
+        },
+        allowedIframeHostnames: [ 'www.youtube.com' ]
+      }
+    },
+    sanitize: '<div><iframe></iframe><iframe src="https://www.youtube.com/embed/c2IlcS7AHxM"></iframe></div>',
+    sanitizeOptions: {
+      htmlSanitize: {
+        disallowedTagsMode: 'recursiveEscape',
+        allowedTags: [ 'p', 'iframe', 'a', 'img', 'i' ],
+        allowedAttributes: {
+          iframe: [ 'src', 'href' ],
+          a: [ 'src', 'href' ],
+          img: [ 'src' ]
+        },
+        allowedIframeHostnames: [ 'www.youtube.com' ]
+      }
+    },
   },
   {
     html:     '<iframe src="//www.youtube.com/embed/c2IlcS7AHxM"></iframe>',
     dirty:    `<div><iframe src="//www.youtube.com/embed/c2IlcS7AHxM"></iframe></div>`,
     discard:  `<div><iframe src="//www.youtube.com/embed/c2IlcS7AHxM"></iframe></div>`,
-    sanitize: '<div><iframe src="//www.youtube.com/embed/c2IlcS7AHxM"></iframe></div>'
+    discardOptions: {
+      htmlSanitize: {
+        allowedTags: [ 'p', 'iframe', 'a', 'img', 'i' ],
+        allowedAttributes: {
+          iframe: [ 'src', 'href' ],
+          a: [ 'src', 'href' ],
+          img: [ 'src' ]
+        },
+        allowedIframeHostnames: [ 'www.youtube.com', 'player.vimeo.com' ]
+      }
+    },
+    sanitize: '<div><iframe src="//www.youtube.com/embed/c2IlcS7AHxM"></iframe></div>',
+    sanitizeOptions: {
+      htmlSanitize: {
+        disallowedTagsMode: 'recursiveEscape',
+        allowedTags: [ 'p', 'iframe', 'a', 'img', 'i' ],
+        allowedAttributes: {
+          iframe: [ 'src', 'href' ],
+          a: [ 'src', 'href' ],
+          img: [ 'src' ]
+        },
+        allowedIframeHostnames: [ 'www.youtube.com', 'player.vimeo.com' ]
+      }
+    },
   },
   {
     html:     '<iframe name=\"IFRAME\" allowfullscreen=\"true\" sandbox=\"allow-forms allow-modals allow-orientation-lock allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation allow-same-origin allow-scripts allow-top-navigation\"></iframe>',
     dirty:    `<div><iframe name="IFRAME" allowfullscreen="true" sandbox="allow-forms allow-modals allow-orientation-lock allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation allow-same-origin allow-scripts allow-top-navigation"></iframe></div>`,
-    discard:  `<div><iframe allowfullscreen="true"></iframe></div>`,
-    sanitize: `<div><iframe allowfullscreen="true"></iframe></div>`
+    discard:  `<div><iframe allowfullscreen="true" sandbox="allow-popups allow-same-origin allow-scripts"></iframe></div>`,
+    discardOptions: {
+      htmlSanitize: {
+        allowedTags: sanitizeHtml.defaults.allowedTags.concat([ 'iframe' ]),
+        allowedAttributes: {
+          iframe: [
+            {
+              name: 'sandbox',
+              multiple: true,
+              values: [ 'allow-popups', 'allow-same-origin', 'allow-scripts' ]
+            },
+            'allowfullscreen'
+          ]
+        }
+      }
+    },
+    sanitize: `<div><iframe allowfullscreen="true" sandbox="allow-popups allow-same-origin allow-scripts"></iframe></div>`,
+    sanitizeOptions: {
+      htmlSanitize: {
+        disallowedTagsMode: 'recursiveEscape',
+        allowedTags: sanitizeHtml.defaults.allowedTags.concat([ 'iframe' ]),
+        allowedAttributes: {
+          iframe: [
+            {
+              name: 'sandbox',
+              multiple: true,
+              values: [ 'allow-popups', 'allow-same-origin', 'allow-scripts' ]
+            },
+            'allowfullscreen'
+          ]
+        }
+      }
+    },
   },
   {
     html:     '<q cite=\"http://www.google.com\">HTTP</q><q cite=\"https://www.google.com\">HTTPS</q><q cite=\"mailto://www.google.com\">MAILTO</q><q cite=\"tel://www.google.com\">TEL</q><q cite=\"ftp://www.google.com\">FTP</q><q cite=\"data://www.google.com\">DATA</q><q cite=\"ldap://www.google.com\">LDAP</q><q cite=\"acrobat://www.google.com\">ACROBAT</q><q cite=\"vbscript://www.google.com\">VBSCRIPT</q><q cite=\"file://www.google.com\">FILE</q><q cite=\"rlogin://www.google.com\">RLOGIN</q><q cite=\"webcal://www.google.com\">WEBCAL</q><q cite=\"javascript://www.google.com\">JAVASCRIPT</q><q cite=\"mms://www.google.com\">MMS</q>',

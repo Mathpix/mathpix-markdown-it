@@ -8,6 +8,7 @@ export interface InlineCodeItem {
     posEnd: number;
     content: string;
 }
+export declare const getInlineCodeListFromString: (str: any) => Array<InlineCodeItem>;
 /** The function finds the position of the end marker in the specified string
  * and returns that position and the content between the start and end markers.
  *

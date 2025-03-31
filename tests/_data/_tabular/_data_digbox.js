@@ -970,6 +970,123 @@ module.exports = [
       '</tbody>\n' +
       '</table>'
   },
+  {
+    latex: '\\begin{tabular}{|c|c|c|c|}\n' +
+      '\\hline \\backslashbox{Sit \\} }{Receive} & Ready & Return & Five \\\\\n' +
+      '\\hline 28.2 & 92.12 & ago & 12 \\\\\n' +
+      '\\hline\n' +
+      '\\end{tabular}',
+    tsv: 'Receive,Sit }\tReady\tReturn\tFive\n' +
+      '28.2\t92.12\tago\t12',
+    csv: '"Receive,Sit }",Ready,Return,Five\n' +
+      '28.2,92.12,ago,12',
+    markdown: '| Receive <br> Sit } | Ready | Return | Five |\n' +
+      '| :---: | :---: | :---: | :---: |\n' +
+      '| 28.2 | 92.12 | ago | 12 |',
+    html: '<table id="tabular">\n' +
+      '<tbody>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: center; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; background-size: 100% 100%;vertical-align: middle;background-image: linear-gradient(to bottom left, transparent calc(50% - 0.5px), black 50%, black 50%, transparent calc(50% + 0.5px));"><div class="diagonal-cell" style="grid-template-columns: repeat(2, 1fr); padding: 0; display: grid; height: 100%; grid-auto-rows: 1fr; min-width: max-content;"><div class="cell-item diagonal-cell-topRight" style="grid-row-start: 1; grid-column-start: 2; text-align: right; white-space: nowrap; min-height: 1.5em;">Receive</div><div class="cell-item diagonal-cell-bottomLeft" style="grid-row-start: 2; grid-column-start: 1; text-align: left; white-space: nowrap; min-height: 1.5em; margin-top: auto;">Sit }</div></div></td>\n' +
+      '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; ">Ready</td>\n' +
+      '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; ">Return</td>\n' +
+      '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; ">Five</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: center; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">28.2</td>\n' +
+      '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">92.12</td>\n' +
+      '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">ago</td>\n' +
+      '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">12</td>\n' +
+      '</tr>\n' +
+      '</tbody>\n' +
+      '</table>'
+  },
+  {
+    latex: '\\begin{tabular}{|c|}\n' +
+      '\\hline \\backslashbox{Left \\} }{Right}\\\\\n' +
+      '\\hline\n' +
+      '\\end{tabular}',
+    tsv: 'Right,Left }',
+    csv: '"Right,Left }"',
+    markdown: '| Right <br> Left } |\n' +
+      '| :---: |',
+    html: '<table id="tabular">\n' +
+      '<tbody>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: center; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; background-size: 100% 100%;vertical-align: middle;background-image: linear-gradient(to bottom left, transparent calc(50% - 0.5px), black 50%, black 50%, transparent calc(50% + 0.5px));"><div class="diagonal-cell" style="grid-template-columns: repeat(2, 1fr); padding: 0; display: grid; height: 100%; grid-auto-rows: 1fr; min-width: max-content;"><div class="cell-item diagonal-cell-topRight" style="grid-row-start: 1; grid-column-start: 2; text-align: right; white-space: nowrap; min-height: 1.5em;">Right</div><div class="cell-item diagonal-cell-bottomLeft" style="grid-row-start: 2; grid-column-start: 1; text-align: left; white-space: nowrap; min-height: 1.5em; margin-top: auto;">Left }</div></div></td>\n' +
+      '</tr>\n' +
+      '</tbody>\n' +
+      '</table>'
+  },
+  {
+    latex: '\\begin{tabular}{|c|}\n' +
+      '\\hline \\backslashbox{Left \\} \\{ \\} }{Right} \\\\\n' +
+      '\\hline\n' +
+      '\\end{tabular}',
+    tsv: 'Right,Left } { }',
+    csv: '"Right,Left } { }"',
+    markdown: '| Right <br> Left } { } |\n' +
+      '| :---: |',
+    html: '<table id="tabular">\n' +
+      '<tbody>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: center; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; background-size: 100% 100%;vertical-align: middle;background-image: linear-gradient(to bottom left, transparent calc(50% - 0.5px), black 50%, black 50%, transparent calc(50% + 0.5px));"><div class="diagonal-cell" style="grid-template-columns: repeat(2, 1fr); padding: 0; display: grid; height: 100%; grid-auto-rows: 1fr; min-width: max-content;"><div class="cell-item diagonal-cell-topRight" style="grid-row-start: 1; grid-column-start: 2; text-align: right; white-space: nowrap; min-height: 1.5em;">Right</div><div class="cell-item diagonal-cell-bottomLeft" style="grid-row-start: 2; grid-column-start: 1; text-align: left; white-space: nowrap; min-height: 1.5em; margin-top: auto;">Left } { }</div></div></td>\n' +
+      '</tr>\n' +
+      '</tbody>\n' +
+      '</table>'
+  },
+  {
+    latex: '\\begin{tabular}{|c|}\n' +
+      '\\hline \\backslashbox{Left $\\}$ }{Right} \\\\\n' +
+      '\\hline\n' +
+      '\\end{tabular}',
+    tsv: 'Right,Left }',
+    csv: '"Right,Left }"',
+    markdown: '| Right <br> Left $\\}$ |\n' +
+      '| :---: |',
+    html: '<table id="tabular">\n' +
+      '<tbody>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: center; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; background-size: 100% 100%;vertical-align: middle;background-image: linear-gradient(to bottom left, transparent calc(50% - 0.5px), black 50%, black 50%, transparent calc(50% + 0.5px));"><div class="diagonal-cell" style="grid-template-columns: repeat(2, 1fr); padding: 0; display: grid; height: 100%; grid-auto-rows: 1fr; min-width: max-content;"><div class="cell-item diagonal-cell-topRight" style="grid-row-start: 1; grid-column-start: 2; text-align: right; white-space: nowrap; min-height: 1.5em;">Right</div><div class="cell-item diagonal-cell-bottomLeft" style="grid-row-start: 2; grid-column-start: 1; text-align: left; white-space: nowrap; min-height: 1.5em; margin-top: auto;">Left <span class="math-inline " data-overflow="visible">\n' +
+      '<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.566ex;" xmlns="http://www.w3.org/2000/svg" width="1.131ex" height="2.262ex" role="img" focusable="false" viewBox="0 -750 500 1000"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mo"><path data-c="7D" d="M65 731Q65 745 68 747T88 750Q171 750 216 725T279 670Q288 649 289 635T291 501Q292 362 293 357Q306 312 345 291T417 269Q428 269 431 266T434 250T431 234T417 231Q380 231 345 210T298 157Q293 143 292 121T291 -28V-79Q291 -134 285 -156T256 -198Q202 -250 89 -250Q71 -250 68 -247T65 -230Q65 -224 65 -223T66 -218T69 -214T77 -213Q91 -213 108 -210T146 -200T183 -177T207 -139Q208 -134 209 3L210 139Q223 196 280 230Q315 247 330 250Q305 257 280 270Q225 304 212 352L210 362L209 498Q208 635 207 640Q195 680 154 696T77 713Q68 713 67 716T65 731Z"></path></g></g></g></svg></mjx-container></span></div></div></td>\n' +
+      '</tr>\n' +
+      '</tbody>\n' +
+      '</table>'
+  },
+  {
+    latex: '\\begin{tabular}{|c|}\n' +
+      '\\hline \\backslashbox{Left $\\text{\\}}$ }{Right} \\\\\n' +
+      '\\hline\n' +
+      '\\end{tabular}',
+    tsv: 'Right,Left "}"',
+    csv: '"Right,Left }"',
+    markdown: '| Right <br> Left $\\text{\\}}$ |\n' +
+      '| :---: |',
+    html: '<table id="tabular">\n' +
+      '<tbody>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: center; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; background-size: 100% 100%;vertical-align: middle;background-image: linear-gradient(to bottom left, transparent calc(50% - 0.5px), black 50%, black 50%, transparent calc(50% + 0.5px));"><div class="diagonal-cell" style="grid-template-columns: repeat(2, 1fr); padding: 0; display: grid; height: 100%; grid-auto-rows: 1fr; min-width: max-content;"><div class="cell-item diagonal-cell-topRight" style="grid-row-start: 1; grid-column-start: 2; text-align: right; white-space: nowrap; min-height: 1.5em;">Right</div><div class="cell-item diagonal-cell-bottomLeft" style="grid-row-start: 2; grid-column-start: 1; text-align: left; white-space: nowrap; min-height: 1.5em; margin-top: auto;">Left <span class="math-inline " data-overflow="visible">\n' +
+      '<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.566ex;" xmlns="http://www.w3.org/2000/svg" width="1.131ex" height="2.262ex" role="img" focusable="false" viewBox="0 -750 500 1000"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mtext"><path data-c="7D" d="M65 731Q65 745 68 747T88 750Q171 750 216 725T279 670Q288 649 289 635T291 501Q292 362 293 357Q306 312 345 291T417 269Q428 269 431 266T434 250T431 234T417 231Q380 231 345 210T298 157Q293 143 292 121T291 -28V-79Q291 -134 285 -156T256 -198Q202 -250 89 -250Q71 -250 68 -247T65 -230Q65 -224 65 -223T66 -218T69 -214T77 -213Q91 -213 108 -210T146 -200T183 -177T207 -139Q208 -134 209 3L210 139Q223 196 280 230Q315 247 330 250Q305 257 280 270Q225 304 212 352L210 362L209 498Q208 635 207 640Q195 680 154 696T77 713Q68 713 67 716T65 731Z"></path></g></g></g></svg></mjx-container></span></div></div></td>\n' +
+      '</tr>\n' +
+      '</tbody>\n' +
+      '</table>'
+  },
+  {
+    latex: '\\begin{tabular}{|c|}\n' +
+      '\\hline \\backslashbox{Left `}{` }{Right} \\\\\n' +
+      '\\hline\n' +
+      '\\end{tabular}',
+    tsv: 'Right,Left }{',
+    csv: '"Right,Left }{"',
+    markdown: '| Right <br> Left `}{` |\n' +
+      '| :---: |',
+    html: '<table id="tabular">\n' +
+      '<tbody>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: center; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; background-size: 100% 100%;vertical-align: middle;background-image: linear-gradient(to bottom left, transparent calc(50% - 0.5px), black 50%, black 50%, transparent calc(50% + 0.5px));"><div class="diagonal-cell" style="grid-template-columns: repeat(2, 1fr); padding: 0; display: grid; height: 100%; grid-auto-rows: 1fr; min-width: max-content;"><div class="cell-item diagonal-cell-topRight" style="grid-row-start: 1; grid-column-start: 2; text-align: right; white-space: nowrap; min-height: 1.5em;">Right</div><div class="cell-item diagonal-cell-bottomLeft" style="grid-row-start: 2; grid-column-start: 1; text-align: left; white-space: nowrap; min-height: 1.5em; margin-top: auto;">Left <code>}{</code></div></div></td>\n' +
+      '</tr>\n' +
+      '</tbody>\n' +
+      '</table>'
+  },
   // {
   //   latex: '',
   //   tsv: '',

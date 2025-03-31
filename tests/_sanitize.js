@@ -12,15 +12,17 @@ global.document = jsdom.window.document;
 global.DOMParser = jsdom.window.DOMParser;
 
 describe('Check SanitizeHtml for markdownToHTML. [disallowedTagsMode = recursiveEscape, htmlDisableTagMatching = true]', () => {
-  const options = {
+  const optionsDef = {
     width: 800,
-    htmlDisableTagMatching: true
+    htmlDisableTagMatching: true,
+    htmlTags: true
   };
   const tests = require('./_data/_sanitizeHtml/_data');
 
-  options.htmlTags = true;
-
   tests.forEach(function(test) {
+    let options = test.discardOptions
+      ? { ...optionsDef, ...test.discardOptions }
+      : {...optionsDef};
     const sanitizeHtml = MM.markdownToHTML(test.html, options);
 
     describe('Should be sanitize Html [disallowedTagsMode = discard] => ' + test.html, () => {
@@ -31,12 +33,10 @@ describe('Check SanitizeHtml for markdownToHTML. [disallowedTagsMode = recursive
     });
   });
 
-  options.htmlTags = true;
-  options.htmlSanitize = {
-    disallowedTagsMode: 'recursiveEscape'
-  };
-
   tests.forEach(function(test) {
+    let options = test.sanitizeOptions
+      ? { ...optionsDef, ...test.sanitizeOptions }
+      : {...optionsDef, htmlSanitize: {disallowedTagsMode: 'recursiveEscape'}};
     const sanitizeHtml = MM.markdownToHTML(test.html, options);
 
     describe('Should be sanitize Html [disallowedTagsMode = recursiveEscape] => ' + test.html, () => {
@@ -47,10 +47,8 @@ describe('Check SanitizeHtml for markdownToHTML. [disallowedTagsMode = recursive
     });
   });
 
-  options.htmlTags = true;
-  options.htmlSanitize = false;
-
   tests.forEach(function(test) {
+    let options = {...optionsDef, htmlSanitize: false};
     const sanitizeHtml = MM.markdownToHTML(test.html, options);
     describe('Should be dirty Html => ' + test.html, () => {
       it('Checking result html', (done) => {
@@ -63,14 +61,16 @@ describe('Check SanitizeHtml for markdownToHTML. [disallowedTagsMode = recursive
 
 
 describe('Check SanitizeHtml for markdownToHTML. [disallowedTagsMode = recursiveEscape, htmlDisableTagMatching = false]', () => {
-  const options = {
+  const optionsDef = {
     width: 800,
+    htmlTags: true
   };
   const tests = require('./_data/_sanitizeHtml/_data_htmlCheckTagMatching');
 
-  options.htmlTags = true;
-
   tests.forEach(function(test) {
+    let options = test.discardOptions
+      ? { ...optionsDef, ...test.discardOptions }
+      : {...optionsDef};
     const sanitizeHtml = MM.markdownToHTML(test.html, options);
 
     describe('Should be sanitize Html [disallowedTagsMode = discard] => ' + test.html, () => {
@@ -81,12 +81,10 @@ describe('Check SanitizeHtml for markdownToHTML. [disallowedTagsMode = recursive
     });
   });
 
-  options.htmlTags = true;
-  options.htmlSanitize = {
-    disallowedTagsMode: 'recursiveEscape'
-  };
-
   tests.forEach(function(test) {
+    let options = test.sanitizeOptions
+      ? { ...optionsDef, ...test.sanitizeOptions }
+      : {...optionsDef, htmlSanitize: {disallowedTagsMode: 'recursiveEscape'}};
     const sanitizeHtml = MM.markdownToHTML(test.html, options);
 
     describe('Should be sanitize Html [disallowedTagsMode = recursiveEscape] => ' + test.html, () => {
@@ -97,10 +95,8 @@ describe('Check SanitizeHtml for markdownToHTML. [disallowedTagsMode = recursive
     });
   });
 
-  options.htmlTags = true;
-  options.htmlSanitize = false;
-
   tests.forEach(function(test) {
+    let options = {...optionsDef, htmlSanitize: false};
     const sanitizeHtml = MM.markdownToHTML(test.html, options);
     describe('Should be dirty Html => ' + test.html, () => {
       it('Checking result html', (done) => {

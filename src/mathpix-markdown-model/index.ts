@@ -162,7 +162,17 @@ export type TOutputMathJax = {
 }
 
 export type THtmlSanitize = {
-  disallowedTagsMode?: string
+  disallowedTagsMode?: string,
+  allowedTags?: Array<string>,
+  allowedAttributes?: Record<string, string[]>,
+  allowedIframeHostnames?: Array<string>,
+  selfClosing?: Array<string>,
+  allowedSchemes?: Array<string>,
+  allowedSchemesByTag?: Record<string, string[]>,
+  allowedSchemesAppliedToAttributes?: Array<string>,
+  allowProtocolRelative?: boolean,
+  enforceHtmlBoundary?: boolean,
+  skipCloseTag?: boolean
 } | false;
 
 export type TAsciiMath = {

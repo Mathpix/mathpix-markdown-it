@@ -831,12 +831,46 @@ The `MathpixMarkdown` React element accepts the following props:
 
 ### THtmlSanitize
 
-|                      | type&nbsp;*`default`*        |  description                                                                                                       |
-|----------------------|------------------------------|--------------------------------------------------------------------------------------------------------------------|
-| `disallowedTagsMode` | discard&nbsp;*`false`*       | `discard` (the default) - disallowed tags are discarded.                                                           |
-|                      |                              | `escape` - the disallowed tags are escaped rather than discarded. Any text or subtags is handled normally.         |
-|                      |                              | `recursiveEscape` - the disallowed tags are escaped rather than discarded, and the same treatment is applied       |
-|                      |                              | to all subtags, whether otherwise allowed or not.                                                                  |
+|                                     | type&nbsp;*`default`*      |  description                                                                                                            |
+|-------------------------------------|----------------------------|-------------------------------------------------------------------------------------------------------------------------|
+| `disallowedTagsMode`                | `string`&nbsp;*`discard`*  | `discard` (the default) - disallowed tags are discarded.                                                                |
+|                                     |                            | `escape` - the disallowed tags are escaped rather than discarded. Any text or subtags is handled normally.              |
+|                                     |                            | `recursiveEscape` - the disallowed tags are escaped rather than discarded, and the same treatment is applied            |
+|                                     |                            | to all subtags, whether otherwise allowed or not.                                                                       |
+| `allowedTags`                       | `Array<string>`            | List of allowed HTML tags. See [default options](https://github.com/Mathpix/mathpix-markdown-it#thtmlsanitize-default-options). |
+| `allowedAttributes`                 | `Record<string, string[]>` | Defines allowed attributes for specific tags. Example: `{ a: ['href', 'name', 'target'], img: ['src'] }`.               |
+| `allowedIframeHostnames`            | `Array<string>`            | List of allowed hostnames for `<iframe>` sources. Helps prevent embedding unsafe content.                               |
+| `selfClosing`                       | `Array<string>`            | List of self-closing tags such as `img`, `br`, `hr`, `area`, `base`, `basefont`, `input`, `link`, `meta`.               |
+| `allowedSchemes`                    | `Array<string>` (default: `["http", "https", "ftp", "mailto"]`) | Defines the allowed URL schemes for links, images, and other elements.             |
+| `allowedSchemesByTag`               | `Record<string, string[]>` | Defines allowed schemes per tag. Example: `{ a: ['http', 'https'], img: ['data'] }`.                                    |
+| `allowedSchemesAppliedToAttributes` | `Array<string>`            | Defines which attributes should have their values checked against `allowedSchemes`. Default: `['href', 'src', 'cite']`. |
+| `allowProtocolRelative`             | `boolean`&nbsp;*`true`*    | If `true`, allows protocol-relative URLs (e.g., `//example.com`).                                                       |
+| `enforceHtmlBoundary`               | `boolean`&nbsp;*`false`*   | If `true`, ensures that sanitized output is enclosed within valid HTML boundaries.                                      |
+| `skipCloseTag`                      | `boolean`&nbsp;*`false`*   | If `true`, skips closing tags in the output.                                                                            |
+
+### HtmlSanitize default options
+
+```js
+  allowedTags: ['h3', 'h4', 'h5', 'h6', 'blockquote', 'p', 'a', 'ul', 'ol',
+    'nl', 'li', 'b', 'i', 'strong', 'em', 'strike', 'abbr', 'code', 'hr', 'br', 'div',
+    'table', 'thead', 'caption', 'tbody', 'tr', 'th', 'td', 'pre', 'u'],
+  disallowedTagsMode: 'discard',
+  allowedAttributes: {
+    a: [ 'href', 'name', 'target' ],
+    // We don't currently allow img itself by default, but
+    // these attributes would make sense if we did.
+    img: [ 'src' ]
+  },
+  // Lots of these won't come up by default because we don't allow them
+  selfClosing: [ 'img', 'br', 'hr', 'area', 'base', 'basefont', 'input', 'link', 'meta' ],
+  // URL schemes we permit
+  allowedSchemes: ['http', 'https', 'ftp', 'mailto'],
+  allowedSchemesByTag: {},
+  allowedSchemesAppliedToAttributes: [ 'href', 'src', 'cite' ],
+  allowProtocolRelative: true,
+  enforceHtmlBoundary: false,
+  skipCloseTag: false
+```
 
 
 ### ISmilesOptions
