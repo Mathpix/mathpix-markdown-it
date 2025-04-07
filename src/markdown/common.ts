@@ -200,3 +200,16 @@ export const removeCaptionsFromTableAndFigure = (content: string) => {
     isNotCaption: false
   };
 }
+
+export const checkTagOutsideInlineCode = (text: string, regex: RegExp): boolean => {
+  const match = text.match(regex);
+  if (!match) return false;
+
+  const inlineCodeList: InlineCodeItem[] = getInlineCodeListFromString(text);
+  const matchIndex = match.index ?? -1;
+
+  if (!inlineCodeList.length) return true;
+
+  const isInsideCode = inlineCodeList.some(item => item.posStart <= matchIndex && item.posEnd >= matchIndex);
+  return !isInsideCode;
+};
