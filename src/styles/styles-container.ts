@@ -87,7 +87,7 @@ export const ContainerStyle = (useColors = true) => `
     outline: 0;
   }
   a[disabled] {
-    ${useColors ? 'color: rgba(0, 0, 0, 0.25)' : ''}
+    ${useColors ? 'color: rgba(0, 0, 0, 0.25);' : ''}
     cursor: not-allowed;
     pointer-events: none;
   }
@@ -115,7 +115,7 @@ export const ContainerStyle = (useColors = true) => `
   caption {
     padding-top: 0.75em;
     padding-bottom: 0.3em;
-    ${useColors ? 'color: rgba(0, 0, 0, 0.45)' : ''}
+    ${useColors ? 'color: rgba(0, 0, 0, 0.45);' : ''}
     text-align: left;
     caption-side: bottom;
   }

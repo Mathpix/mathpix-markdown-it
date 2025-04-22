@@ -537,7 +537,6 @@ function paragraphDiv(state, startLine/*, endLine*/) {
   let isMathOpen = false;
   let openedAuthorBlock = false;
   let openBrackets = 0;
-  debugger
   const pickStartTag: RegExp = /\\begin{(abstract|center|left|right|table|figure|tabular)}/;
   const pickEndTag: RegExp = /\\end{(abstract|center|left|right|table|figure|tabular)}/;
   const pickMathStartTag: RegExp = /\\begin{(equation|equation\*)}|\\\[/;
