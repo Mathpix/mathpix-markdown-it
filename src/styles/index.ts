@@ -1,3 +1,5 @@
+import { HIGHLIGHT_COLOR, HIGHLIGHT_TEXT_COLOR } from "../markdown/common/consts";
+
 export const resetBodyStyles = `
   body {
     margin: 0;
@@ -107,6 +109,11 @@ export const MathpixStyle = (setTextAlignJustify: boolean = false, useColors: bo
       overflow: visible;
     }
     
+    .math-block,.math-inline {
+      --mmd-highlight-color: ${HIGHLIGHT_COLOR};
+      --mmd-highlight-text-color: ${HIGHLIGHT_TEXT_COLOR};
+    }
+
     .math-block[data-highlight-color] mjx-container[jax="SVG"] > svg {
       background-color: var(--mmd-highlight-color);
     }    

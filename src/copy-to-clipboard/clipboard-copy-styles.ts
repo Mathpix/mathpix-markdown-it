@@ -8,13 +8,13 @@ export const clipboardCopyStyles = () => `
   background: rgb(246, 248, 250);
   border-radius: 6px;
   border: 1px solid rgba(31, 35, 40, 0.15);
-  box-shadow: rgba(31, 35, 40, 0.04) 0 1px 0 0, rgba(255, 255, 255, 0.25) 0 1 0 0 inset;
+  box-shadow: rgba(31, 35, 40, 0.04) 0 1px 0 0, rgba(255, 255, 255, 0.25) 0 1px 0 0 inset;
   position: relative;
 }
 
 .ClipboardButton:hover {
   background-color: rgb(243, 244, 246);
-  border-color rgba(31, 35, 40, 0.15);
+  border-color: rgba(31, 35, 40, 0.15);
   transition-duration: .1s;
 }
 
@@ -51,7 +51,7 @@ export const clipboardCopyStyles = () => `
   bottom: 50%;
   left: -7px;
   margin-top: -6px;
-  border-left-color: rgb(36, 41, 47)
+  border-left-color: rgb(36, 41, 47);
 }
 
 .mmd-tooltipped::before {
@@ -60,7 +60,7 @@ export const clipboardCopyStyles = () => `
   display: none;
   width: 0;
   height: 0;
-  color: rgb(36, 41, 47)
+  color: rgb(36, 41, 47);
   pointer-events: none;
   content: "";
   border: 6px solid transparent;

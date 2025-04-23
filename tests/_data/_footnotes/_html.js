@@ -1,7 +1,7 @@
 const htmlContent = '<div>First <sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup></div>\n' +
   '<div id="table%3A4" class="table table%3A4" number="1" style="text-align: center">\n' +
   '<div class="table_tabular " style="text-align: center">\n' +
-  '<div class="inline-tabular"><table id="tabular">\n' +
+  '<div class="inline-tabular"><table class="tabular">\n' +
   '<tbody>\n' +
   '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
   '<td style="text-align: center; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: double !important; border-right-width: 3px !important; border-bottom-style: double !important; border-bottom-width: 3px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; " class="_empty"></td>\n' +
@@ -10,7 +10,7 @@ const htmlContent = '<div>First <sup class="footnote-ref"><a href="#fn1" id="fnr
   '</tr>\n' +
   '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
   '<td style="text-align: center; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: double !important; border-right-width: 3px !important; border-bottom-style: double !important; border-bottom-width: 3px !important; border-top: none !important; width: auto; vertical-align: middle; ">Foo</td>\n' +
-  '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: double !important; border-bottom-width: 3px !important; border-top: none !important; width: auto; vertical-align: middle; "><div class="inline-tabular sub-table"><table id="tabular">\n' +
+  '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: double !important; border-bottom-width: 3px !important; border-top: none !important; width: auto; vertical-align: middle; "><div class="inline-tabular sub-table"><table class="tabular">\n' +
   '<tbody>\n' +
   '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
   '<td style="text-align: center; border-left: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">1<sup class="footnote-ref"><a href="#fn1" id="fnref1:2">[1:2]</a></sup></td>\n' +
@@ -21,7 +21,7 @@ const htmlContent = '<div>First <sup class="footnote-ref"><a href="#fn1" id="fnr
   '</tbody>\n' +
   '</table>\n' +
   '</div></td>\n' +
-  '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: double !important; border-bottom-width: 3px !important; border-top: none !important; width: auto; vertical-align: middle; "><div class="inline-tabular sub-table"><table id="tabular">\n' +
+  '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: double !important; border-bottom-width: 3px !important; border-top: none !important; width: auto; vertical-align: middle; "><div class="inline-tabular sub-table"><table class="tabular">\n' +
   '<tbody>\n' +
   '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
   '<td style="text-align: center; border-left: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">2</td>\n' +
@@ -88,7 +88,7 @@ const htmlContent = '<div>First <sup class="footnote-ref"><a href="#fn1" id="fnr
 const htmlContentFootnote_compact_refs = '<div>First <sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup></div>\n' +
   '<div id="table%3A4" class="table table%3A4" number="1" style="text-align: center">\n' +
   '<div class="table_tabular " style="text-align: center">\n' +
-  '<div class="inline-tabular"><table id="tabular">\n' +
+  '<div class="inline-tabular"><table class="tabular">\n' +
   '<tbody>\n' +
   '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
   '<td style="text-align: center; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: double !important; border-right-width: 3px !important; border-bottom-style: double !important; border-bottom-width: 3px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; " class="_empty"></td>\n' +
@@ -97,7 +97,7 @@ const htmlContentFootnote_compact_refs = '<div>First <sup class="footnote-ref"><
   '</tr>\n' +
   '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
   '<td style="text-align: center; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: double !important; border-right-width: 3px !important; border-bottom-style: double !important; border-bottom-width: 3px !important; border-top: none !important; width: auto; vertical-align: middle; ">Foo</td>\n' +
-  '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: double !important; border-bottom-width: 3px !important; border-top: none !important; width: auto; vertical-align: middle; "><div class="inline-tabular sub-table"><table id="tabular">\n' +
+  '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: double !important; border-bottom-width: 3px !important; border-top: none !important; width: auto; vertical-align: middle; "><div class="inline-tabular sub-table"><table class="tabular">\n' +
   '<tbody>\n' +
   '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
   '<td style="text-align: center; border-left: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">1<sup class="footnote-ref"><a href="#fn1" id="fnref1:2">[1]</a></sup></td>\n' +
@@ -108,7 +108,7 @@ const htmlContentFootnote_compact_refs = '<div>First <sup class="footnote-ref"><
   '</tbody>\n' +
   '</table>\n' +
   '</div></td>\n' +
-  '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: double !important; border-bottom-width: 3px !important; border-top: none !important; width: auto; vertical-align: middle; "><div class="inline-tabular sub-table"><table id="tabular">\n' +
+  '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: double !important; border-bottom-width: 3px !important; border-top: none !important; width: auto; vertical-align: middle; "><div class="inline-tabular sub-table"><table class="tabular">\n' +
   '<tbody>\n' +
   '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
   '<td style="text-align: center; border-left: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">2</td>\n' +

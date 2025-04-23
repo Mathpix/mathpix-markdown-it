@@ -190,7 +190,7 @@ module.exports = "<div>## Using Markdown in Snip</div>\n" +
   "<div>Use `<a href=\"#\" class=\"text-url\"></a>` to insert a <a href=\"#\" class=\"text-url\">link</a>.</div>\n" +
   "<div class=\"table \" style=\"text-align: center\">\n" +
   "<div class=\"table_tabular \" style=\"text-align: center\">\n" +
-  "<div class=\"inline-tabular\"><table id=\"tabular\">\n" +
+  "<div class=\"inline-tabular\"><table class=\"tabular\">\n" +
   "<tbody>\n" +
   "<tr style=\"border-top: none !important; border-bottom: none !important;\">\n" +
   "<td style=\"text-align: center; border-left-style: double !important; border-left-width: 3px !important; border-right: none !important; border-bottom-style: double !important; border-bottom-width: 3px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; padding-bottom: 0.5ex !important;\">Col1</td>\n" +
@@ -235,7 +235,7 @@ module.exports = "<div>## Using Markdown in Snip</div>\n" +
   "<div>The table <a href=\"#table%3A1\" style=\"cursor: pointer; text-decoration: none;\" class=\"clickable-link\" value=\"table%3A1\" data-parentheses=\"false\">1</a> is an example of referenced \\LaTeX elements.</div>\n" +
   "<div id=\"table%3A1\" class=\"table table%3A1\" number=\"1\" style=\"text-align: center\">\n" +
   "<div class=\"table_tabular \" style=\"text-align: center\">\n" +
-  "<div class=\"inline-tabular\"><table id=\"tabular\">\n" +
+  "<div class=\"inline-tabular\"><table class=\"tabular\">\n" +
   "<tbody>\n" +
   "<tr style=\"border-top: none !important; border-bottom: none !important;\">\n" +
   "<td style=\"text-align: center; border-left-style: double !important; border-left-width: 3px !important; border-right: none !important; border-bottom-style: double !important; border-bottom-width: 3px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; padding-bottom: 0.5ex !important;\">Col1</td>\n" +

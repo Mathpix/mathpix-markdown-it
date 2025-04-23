@@ -40,7 +40,7 @@ module.exports = [
       '\\end{table}',
     html:  `<div id="table%3A1" class="table table%3A1" number="1" style="text-align: center">
 <div class="table_tabular " style="text-align: center">
-<div class="inline-tabular"><table id="tabular">
+<div class="inline-tabular"><table class="tabular">
 <tbody>
 <tr style="border-top: none !important; border-bottom: none !important;">
 <td style="text-align: center; border-left-style: double !important; border-left-width: 3px !important; border-right: none !important; border-bottom-style: double !important; border-bottom-width: 3px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; padding-bottom: 0.5ex !important;">Col1</td>

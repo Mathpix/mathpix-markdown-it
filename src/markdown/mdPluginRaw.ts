@@ -33,7 +33,7 @@ import {coreInline} from './md-inline-rule/core-inline';
 import {refsInline, refInsideMathDelimiter} from './md-inline-rule/refs';
 import {hardBreak, softBreak} from './md-renderer-rules/breaks';
 import { clearLabelsList, getLabelByKeyFromLabelsList, ILabel } from "./common/labels";
-import {getTerminatedRules} from './common';
+import { getTerminatedRules, checkTagOutsideInlineCode } from './common';
 import { convertMathToHtml } from "./common/convert-math-to-html";
 import {highlightText} from "./highlight/common";
 import {ParserErrors} from "../mathpix-markdown-model";
@@ -613,11 +613,20 @@ function paragraphDiv(state, startLine/*, endLine*/) {
     if (pickTag.test(prewLineText) || pickTag.test(lineText)) {
       break;
     }
-    if (state.isEmpty(nextLine)
-      || pickStartTag.test(lineText) || pickEndTag.test(prewLineText)
-      || (!isMath && !openedAuthorBlock && !isMathOpen
-        && (pickMathStartTag.test(lineText) || pickMathEndTag.test(prewLineText)))) {
+    if (state.isEmpty(nextLine)) {
       break;
+    }
+    if (pickStartTag.test(lineText) || pickEndTag.test(prewLineText)) {
+      break;
+    }
+    if (!isMath && !openedAuthorBlock && !isMathOpen
+      && (pickMathStartTag.test(lineText) || pickMathEndTag.test(prewLineText))) {
+      const shouldBreak =
+        (pickMathStartTag.test(lineText) && checkTagOutsideInlineCode(lineText, pickMathStartTag)) ||
+        (pickMathEndTag.test(prewLineText) && checkTagOutsideInlineCode(prewLineText, pickMathEndTag));
+      if (shouldBreak) {
+        break;
+      }
     }
     if (includesSimpleMathTag(lineText)) {
       isMathOpen = !isMathOpen
