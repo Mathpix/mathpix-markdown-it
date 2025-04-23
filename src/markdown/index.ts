@@ -11,7 +11,9 @@ import { eMmdRuleType } from "./common/mmdRules";
 const mdInit = (options: TMarkdownItOptions) => {
   const {htmlTags = false, htmlDisableTagMatching = false, xhtmlOut = false, width = 1200, breaks = true, typographer = true, linkify = true,
           outMath = {}, mathJax = {}, renderElement = {},
-          lineNumbering = false, startLine = 0, htmlSanitize = true, smiles = {}, forDocx = false, openLinkInNewWindow =  true,
+          lineNumbering = false, startLine = 0, htmlSanitize = true, smiles = {},
+    forDocx = false, forPptx = false,
+    openLinkInNewWindow =  true,
     isDisableEmoji=false,
     isDisableEmojiShortcuts=false,
     maxWidth = '',
@@ -40,6 +42,7 @@ const mdInit = (options: TMarkdownItOptions) => {
     renderElement: renderElement,
     smiles: smiles,
     forDocx: forDocx,
+    forPptx: forPptx,
     maxWidth: maxWidth,
     enableFileLinks: enableFileLinks,
     validateLink: validateLink,

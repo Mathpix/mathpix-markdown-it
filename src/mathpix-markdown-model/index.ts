@@ -51,6 +51,7 @@ export interface optionsMathpixMarkdown {
     forDocx?: boolean;
     forLatex?: boolean;
     forMD?: boolean;
+    forPptx?: boolean;
     openLinkInNewWindow?: boolean;
     maxWidth?: string;
     toc?: TTocOptions;
@@ -101,6 +102,7 @@ export type TMarkdownItOptions = {
   forDocx?: boolean;
   forLatex?: boolean;
   forMD?: boolean;
+  forPptx?: boolean;
   openLinkInNewWindow?: boolean;
   maxWidth?: string;
   htmlWrapper?: THtmlWrapper | boolean;

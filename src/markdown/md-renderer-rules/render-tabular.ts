@@ -4,6 +4,7 @@ import { tableMarkdownJoin } from "../common/table-markdown";
 import { formatSource } from "../../helpers/parse-mmd-element";
 import { getStyleFromHighlight } from "../highlight/common";
 import { renderTableCellContent } from "../common/render-table-cell-content";
+import { addStyle } from "../md-block-rule/begin-tabular/tabular-td";
 
 const tokenAttrGet = (token, name) => {
   if (!name) { return ''}
@@ -199,8 +200,20 @@ export const renderInlineTokenBlock = (tokens, options, env, slf, isSubTable = f
       result += content;
       continue;
     }
+    let tokenTag = token.tag;
+    if (options?.forPptx && isSubTable) {
+      if (['table', "tbody", "tr", 'td'].includes(token.tag)) {
+        tokenTag = 'div';
+      }
+      if (token.type === 'td_open') {
+        if (tokens[idx-1]?.type === 'td_close') {
+          result += '<span>&nbsp;</span>'
+        }
+        token.attrs = addStyle(token.attrs, 'display: inline');
+      }
+    }
     // Add token name, e.g. `<img`
-    result += (token.n === -1 ? '</' : '<') + token.tag;
+    result += (token.n === -1 ? '</' : '<') + tokenTag;
 
     // Encode attributes, e.g. `<img src="foo"`
     result += slf.renderAttrs(token);
