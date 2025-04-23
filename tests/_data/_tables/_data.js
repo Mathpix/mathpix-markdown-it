@@ -65,7 +65,7 @@ module.exports = [
   7 & 8 & 9 \\\\
 \\end{tabular}`,
     html: `<div class="table_tabular " style="text-align: center">
-<div class="inline-tabular"><table id="tabular">
+<div class="inline-tabular"><table class="tabular">
 <tbody>
 <tr style="border-top: none !important; border-bottom: none !important;">
 <td style="text-align: left; border-left: none !important; border-right: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">1</td>
@@ -86,7 +86,7 @@ module.exports = [
 </table>
 </div></div>`,
     html_notCenterTables: `<div class="table_tabular ">
-<div class="inline-tabular"><table id="tabular">
+<div class="inline-tabular"><table class="tabular">
 <tbody>
 <tr style="border-top: none !important; border-bottom: none !important;">
 <td style="text-align: left; border-left: none !important; border-right: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">1</td>
@@ -119,7 +119,7 @@ module.exports = [
 \\end{left}`,
     html: `<div class="center" style="text-align: left">
 <div class="table_tabular " style="text-align: left">
-<div class="inline-tabular"><table id="tabular">
+<div class="inline-tabular"><table class="tabular">
 <tbody>
 <tr style="border-top: none !important; border-bottom: none !important;">
 <td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; ">1</td>
@@ -142,7 +142,7 @@ module.exports = [
 </div>`,
     html_notCenterTables: `<div class="center" style="text-align: left">
 <div class="table_tabular " style="text-align: left">
-<div class="inline-tabular"><table id="tabular">
+<div class="inline-tabular"><table class="tabular">
 <tbody>
 <tr style="border-top: none !important; border-bottom: none !important;">
 <td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; ">1</td>
@@ -176,7 +176,7 @@ one-to-one & Book & Tutor \\\\
 \\cline{2-3}
 \\end{tabular}`,
     html: `<div class="table_tabular " style="text-align: center">
-<div class="inline-tabular"><table id="tabular">
+<div class="inline-tabular"><table class="tabular">
 <tbody>
 <tr style="border-top: none !important; border-bottom: none !important;">
 <td style="text-align: right; border-left: none !important; border-bottom: none !important; border-top: none !important; border-top: none !important; border-bottom: none !important; " colspan="1"></td>
@@ -197,7 +197,7 @@ one-to-one & Book & Tutor \\\\
 </table>
 </div></div>`,
     html_notCenterTables: `<div class="table_tabular ">
-<div class="inline-tabular"><table id="tabular">
+<div class="inline-tabular"><table class="tabular">
 <tbody>
 <tr style="border-top: none !important; border-bottom: none !important;">
 <td style="text-align: right; border-left: none !important; border-bottom: none !important; border-top: none !important; border-top: none !important; border-bottom: none !important; " colspan="1"></td>
@@ -235,7 +235,7 @@ Col1 & Col2 & Col2 & Col3 \\\\ [0.5ex]
 \\end{table}`,
     html: `<div class="table " style="text-align: center">
 <div class="table_tabular " style="text-align: center">
-<div class="inline-tabular"><table id="tabular">
+<div class="inline-tabular"><table class="tabular">
 <tbody>
 <tr style="border-top: none !important; border-bottom: none !important;">
 <td style="text-align: center; border-left-style: double !important; border-left-width: 3px !important; border-right: none !important; border-bottom-style: double !important; border-bottom-width: 3px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; padding-bottom: 0.5ex !important;">Col1</td>
@@ -279,7 +279,7 @@ Col1 & Col2 & Col2 & Col3 \\\\ [0.5ex]
 </div>`,
     html_notCenterTables: `<div class="table " style="text-align: center">
 <div class="table_tabular " style="text-align: center">
-<div class="inline-tabular"><table id="tabular">
+<div class="inline-tabular"><table class="tabular">
 <tbody>
 <tr style="border-top: none !important; border-bottom: none !important;">
 <td style="text-align: center; border-left-style: double !important; border-left-width: 3px !important; border-right: none !important; border-bottom-style: double !important; border-bottom-width: 3px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; padding-bottom: 0.5ex !important;">Col1</td>

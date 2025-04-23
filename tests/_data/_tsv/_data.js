@@ -6,7 +6,7 @@ module.exports = [
       '  7 & 8 & 9 \\\\\n' +
       '\\end{tabular}',
     tsv: '1\t2\t3\n4\t5\t6\n7\t8\t9',
-    html: '<table id="tabular">\n' +
+    html: '<table class="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
       '<td style="text-align: left; border-left: none !important; border-right: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">1</td>\n' +
@@ -33,7 +33,7 @@ module.exports = [
       '  7 & 8 & 9 \\\\\n' +
       '\\end{tabular}',
     tsv: '1\t2\t3\n4\t5\t6\n7\t8\t9',
-    html: '<table id="tabular">\n' +
+    html: '<table class="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
       '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">1</td>\n' +
@@ -62,7 +62,7 @@ module.exports = [
       '  \\hline  \n' +
       '\\end{tabular}',
     tsv: '1\t2\t3\n4\t5\t6\n7\t8\t9',
-    html: '<table id="tabular">\n' +
+    html: '<table class="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
       '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom: none !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; ">1</td>\n' +
@@ -93,7 +93,7 @@ module.exports = [
       '  \\end{tabular}\n' +
       '\\end{center}',
     tsv: '1\t2\t3\n4\t5\t6\n7\t8\t9',
-    html: '<table id="tabular">\n' +
+    html: '<table class="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
       '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; ">1</td>\n' +
@@ -124,7 +124,7 @@ module.exports = [
       '  \\end{tabular}\n' +
       '\\end{left}',
     tsv: '1\t2\t3\n4\t5\t6\n7\t8\t9',
-    html: '<table id="tabular">\n' +
+    html: '<table class="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
       '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; ">1</td>\n' +
@@ -157,7 +157,7 @@ module.exports = [
       '1\t1110.1\ta\te\n' +
       '2\t10.1\tb\tf\n' +
       '3\t23.113231\tc\tg',
-    html: '<table id="tabular">\n' +
+    html: '<table class="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
       '<td style="text-align: left; border-left: none !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; "><strong>Value 1</strong></td>\n' +
@@ -216,7 +216,7 @@ module.exports = [
       'Monday\t11C\t22C\tA clear day with lots of sunshine. However, the strong breeze will bring down the temperatures.\n' +
       'Tuesday\t9C\t19C\tCloudy with rain, across many northern regions. Clear spells across most of Scotland and Northern Ireland, but rain reaching the far northwest.\n' +
       'Wednesday\t10C\t21C\tRain will still linger for the morning. Conditions will improve by early afternoon and continue throughout the evening.',
-    html: '<table id="tabular">\n' +
+    html: '<table class="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
       '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; ">Day</td>\n' +
@@ -265,7 +265,7 @@ module.exports = [
       'Monday\t11C\t22C\tA clear day with lots of sunshine.   However, the strong breeze will bring down the temperatures.\n' +
       'Tuesday\t9C\t19C\tCloudy with rain, across many northern regions. Clear spells across most of Scotland and Northern Ireland, but rain reaching the far northwest.\n' +
       'Wednesday\t10C\t21C\tRain will still linger for the morning. Conditions will improve by early afternoon and continue throughout the evening.',
-    html: '<table id="tabular">\n' +
+    html: '<table class="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
       '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; ">Day</td>\n' +
@@ -324,7 +324,7 @@ module.exports = [
       'FW\tJamie McMaster\n' +
       'ST\tAlan Smith\n' +
       'ST\tMark Viduka',
-    html: '<table id="tabular">\n' +
+    html: '<table class="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
       '<td style="text-align: center; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom: none !important; border-top: none !important; border-top-style: solid !important; border-top-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; " colspan="2">Team sheet</td>\n' +
@@ -427,7 +427,7 @@ module.exports = [
       '\t540\t2\t3\t1\t0\t\n' +
       'Powers\tgcd\t2\t2\t0\t0\tmin\n' +
       '\tlcm\t3\t3\t1\t1\tmax',
-    html: '<table id="tabular">\n' +
+    html: '<table class="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
       '<td style="text-align: center; border-left: none !important; border-right: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; " class="_empty"></td>\n' +
@@ -495,7 +495,7 @@ module.exports = [
     tsv: '\tnoninteractive\tinteractive\n' +
       'massively multiple\tLibrary\tUniversity\n' +
       'one-to-one\tBook\tTutor',
-    html: '<table id="tabular">\n' +
+    html: '<table class="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
       '<td style="text-align: right; border-left: none !important; border-bottom: none !important; border-top: none !important; border-top: none !important; border-bottom: none !important; " colspan="1"></td>\n' +
@@ -536,7 +536,7 @@ module.exports = [
       '3\t545\t778\t7507\n' +
       '4\t545\t18744\t7560\n' +
       '5\t88\t788\t6344',
-    html: '<table id="tabular">\n' +
+    html: '<table class="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
       '<td style="text-align: center; border-left-style: double !important; border-left-width: 3px !important; border-right: none !important; border-bottom-style: double !important; border-bottom-width: 3px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; padding-bottom: 0.5ex !important;">Col1</td>\n' +
@@ -599,7 +599,7 @@ module.exports = [
       '3\t545\t778\t7507\n' +
       '4\t545\t18744\t7560\n' +
       '5\t88\t788\t6344',
-    html: '<table id="tabular">\n' +
+    html: '<table class="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
       '<td style="text-align: center; border-left-style: double !important; border-left-width: 3px !important; border-right: none !important; border-bottom-style: double !important; border-bottom-width: 3px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; padding-bottom: 0.5ex !important;">Col1</td>\n' +
@@ -665,7 +665,7 @@ module.exports = [
       '3\t545\t778\t7507\n' +
       '4\t545\t18744\t7560\n' +
       '5\t88\t788\t6344',
-    html: '<table id="tabular">\n' +
+    html: '<table class="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
       '<td style="text-align: center; border-left-style: double !important; border-left-width: 3px !important; border-right: none !important; border-bottom-style: double !important; border-bottom-width: 3px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; padding-bottom: 0.5ex !important;">Col1</td>\n' +
@@ -740,7 +740,7 @@ module.exports = [
       '23\n' +
       '16\n' +
       '42"',
-    html_not_tsv: '<table id="tabular">\n' +
+    html_not_tsv: '<table class="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
       '<td style="text-align: center; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: double !important; border-right-width: 3px !important; border-bottom-style: double !important; border-bottom-width: 3px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; " class="_empty"></td>\n' +
@@ -749,7 +749,7 @@ module.exports = [
       '</tr>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
       '<td style="text-align: center; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: double !important; border-right-width: 3px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">Foo</td>\n' +
-      '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; "><div class="inline-tabular sub-table"><table id="tabular">\n' +
+      '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; "><div class="inline-tabular sub-table"><table class="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
       '<td style="text-align: center; border-left: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">1</td>\n' +
@@ -766,7 +766,7 @@ module.exports = [
       '</tbody>\n' +
       '</table>\n' +
       '</div></td>\n' +
-      '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; "><div class="inline-tabular sub-table"><table id="tabular">\n' +
+      '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; "><div class="inline-tabular sub-table"><table class="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
       '<td style="text-align: center; border-left: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">2</td>\n' +
@@ -786,7 +786,7 @@ module.exports = [
       '</tr>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
       '<td style="text-align: center; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: double !important; border-right-width: 3px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">Bar</td>\n' +
-      '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; "><div class="inline-tabular sub-table"><table id="tabular">\n' +
+      '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; "><div class="inline-tabular sub-table"><table class="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
       '<td style="text-align: center; border-left: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">1</td>\n' +
@@ -803,7 +803,7 @@ module.exports = [
       '</tbody>\n' +
       '</table>\n' +
       '</div></td>\n' +
-      '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; "><div class="inline-tabular sub-table"><table id="tabular">\n' +
+      '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; "><div class="inline-tabular sub-table"><table class="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
       '<td style="text-align: center; border-left: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">31</td>\n' +
@@ -823,7 +823,7 @@ module.exports = [
       '</tr>\n' +
       '</tbody>\n' +
       '</table>',
-    html: '<table id="tabular">\n' +
+    html: '<table class="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
       '<td style="text-align: center; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: double !important; border-right-width: 3px !important; border-bottom-style: double !important; border-bottom-width: 3px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; " class="_empty"></td>\n' +
@@ -832,7 +832,7 @@ module.exports = [
       '</tr>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
       '<td style="text-align: center; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: double !important; border-right-width: 3px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">Foo</td>\n' +
-      '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; "><div class="inline-tabular sub-table"><table id="tabular">\n' +
+      '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; "><div class="inline-tabular sub-table"><table class="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
       '<td style="text-align: center; border-left: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">1</td>\n' +
@@ -852,7 +852,7 @@ module.exports = [
       '2\n' +
       '3\n' +
       '4</tsv></div></td>\n' +
-      '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; "><div class="inline-tabular sub-table"><table id="tabular">\n' +
+      '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; "><div class="inline-tabular sub-table"><table class="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
       '<td style="text-align: center; border-left: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">2</td>\n' +
@@ -875,7 +875,7 @@ module.exports = [
       '</tr>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
       '<td style="text-align: center; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: double !important; border-right-width: 3px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">Bar</td>\n' +
-      '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; "><div class="inline-tabular sub-table"><table id="tabular">\n' +
+      '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; "><div class="inline-tabular sub-table"><table class="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
       '<td style="text-align: center; border-left: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">1</td>\n' +
@@ -895,7 +895,7 @@ module.exports = [
       '2\n' +
       '3\n' +
       '4</tsv></div></td>\n' +
-      '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; "><div class="inline-tabular sub-table"><table id="tabular">\n' +
+      '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; "><div class="inline-tabular sub-table"><table class="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
       '<td style="text-align: center; border-left: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">31</td>\n' +
@@ -934,7 +934,7 @@ module.exports = [
       '\\label{table:5}\n' +
       '\\end{table}',
     tsv:  'My cells2\t\t\nMultiple rows\tcell2\tcell3\n\tcell5\tcell6\n\tcell8\tcell9',
-    html: '<table id="tabular">\n' +
+    html: '<table class="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
       '<td style="text-align: center; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom: none !important; border-top: none !important; border-top: none !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; " colspan="3">My cells2</td>\n' +
@@ -967,7 +967,7 @@ module.exports = [
       '\\label{table:7}\n' +
       '\\end{table}',
     tsv: 'formula (grad^(2)A)/(A)=-k^(2)\tcell2\tcell3',
-    html: '<table id="tabular">\n' +
+    html: '<table class="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
       '<td style="text-align: center; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: double !important; border-top-width: 3px !important; width: auto; vertical-align: middle; ">formula <span class="math-inline ">\n' +
@@ -989,7 +989,7 @@ module.exports = [
       '\\end{tabular}\n' +
       '\\end{table}',
     tsv: '1\tDay\t\t\n1\t\t\t4\n1\t2\t3\t4',
-    html: '<table id="tabular">\n' +
+    html: '<table class="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
       '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: dashed !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; ">1</td>\n' +
@@ -1023,7 +1023,7 @@ module.exports = [
       'Table \\ref{table:4} is an example.',
     tsv:  "alms's\teconomizes\t\t\t\trecondition\tbailing\tasymptotically\n" +
       'fiddle\tkitchenettes\t\t\t\t\tmisstates\t',
-    html: '<table id="tabular">\n' +
+    html: '<table class="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
       '<td style="text-align: center; border-left-style: double !important; border-left-width: 3px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: double !important; border-top-width: 3px !important; width: auto; vertical-align: middle; ">alms\'s</td>\n' +
@@ -1051,7 +1051,7 @@ module.exports = [
       'f_Manual\tc_Manual\n' +
       'Shift out of Park\tGear in Park\n' +
       'f_Speed\tc_Speed',
-    html: '<table id="tabular">\n' +
+    html: '<table class="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
       '<td style="text-align: center; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: double !important; border-bottom-width: 3px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; ">Feature</td>\n' +
@@ -1098,7 +1098,7 @@ module.exports = [
     tsv: 'Plan 1\tPlan 2\n' +
       'Employee pays $100\tEmployee pays $200\n' +
       'Plan pays 70% of the rest\tPlan pays 80% of the rest',
-    html: '<table id="tabular">\n' +
+    html: '<table class="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
       '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: double !important; border-top-width: 3px !important; width: auto; vertical-align: middle; ">Plan 1</td>\n' +
@@ -1125,7 +1125,7 @@ module.exports = [
     tsv: 'Plan 1\tPlan 2\n' +
       'Employee pays $100\tEmployee pays $200\n' +
       'Plan pays 70% of the rest\tPlan pays 80% of the rest',
-    html: '<table id="tabular">\n' +
+    html: '<table class="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
       '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: double !important; border-top-width: 3px !important; width: auto; vertical-align: middle; ">Plan 1</td>\n' +
@@ -1152,7 +1152,7 @@ module.exports = [
     tsv: 'Plan 1\tPlan 2\n' +
       'Employee pays $100\tEmployee pays $200\n' +
       'Plan pays 70% of the rest\tPlan pays 80% of the rest',
-    html: '<table id="tabular">\n' +
+    html: '<table class="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
       '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: double !important; border-top-width: 3px !important; width: auto; vertical-align: middle; ">Plan 1</td>\n' +
@@ -1179,7 +1179,7 @@ module.exports = [
     tsv: 'Plan 1\tPlan 2\n' +
       'Employee pays $100\tEmployee pays $200\n' +
       'Plan pays 70% of the rest\tPlan pays 80% of the rest',
-    html: '<table id="tabular">\n' +
+    html: '<table class="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
       '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: double !important; border-top-width: 3px !important; width: auto; vertical-align: middle; ">Plan 1</td>\n' +
@@ -1206,7 +1206,7 @@ module.exports = [
     tsv: 'Plan 1\tPlan 2\n' +
       'Employee pays $100\tEmployee pays$200\n' +
       'Plan pays 70% of the rest\tPlan pays 80% of the rest',
-    html: '<table id="tabular">\n' +
+    html: '<table class="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
       '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: double !important; border-top-width: 3px !important; width: auto; vertical-align: middle; ">Plan 1</td>\n' +
@@ -1233,7 +1233,7 @@ module.exports = [
     tsv: 'Plan 1\tPlan 2\n' +
       'Employee pays $ 100\tEmployee pays$ 200\n' +
       'Plan pays 70% of the rest\tPlan pays 80% of the rest',
-    html: '<table id="tabular">\n' +
+    html: '<table class="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
       '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: double !important; border-top-width: 3px !important; width: auto; vertical-align: middle; ">Plan 1</td>\n' +

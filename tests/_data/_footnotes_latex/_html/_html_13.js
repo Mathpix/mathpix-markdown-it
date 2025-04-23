@@ -7,7 +7,7 @@ module.exports = '<div class="abstract" style="width: 80%; margin: 0 auto; margi
   '<span class="section-number">1. </span>Section</h2>\n' +
   '<div class="table " style="text-align: center">\n' +
   '<div class="table_tabular " style="text-align: center">\n' +
-  '<div class="inline-tabular"><table id="tabular">\n' +
+  '<div class="inline-tabular"><table class="tabular">\n' +
   '<tbody>\n' +
   '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
   '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: dashed !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; ">1</td>\n' +

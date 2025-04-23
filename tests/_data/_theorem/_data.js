@@ -675,7 +675,7 @@ a continuous function.</div>
       '</div>\n' +
       '<div class="table " style="text-align: center">\n' +
       '<div class="table_tabular " style="text-align: center">\n' +
-      '<div class="inline-tabular"><table id="tabular">\n' +
+      '<div class="inline-tabular"><table class="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
       '<td style="text-align: center; border-left-style: double !important; border-left-width: 3px !important; border-right: none !important; border-bottom-style: double !important; border-bottom-width: 3px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; padding-bottom: 0.5ex !important;">Col1</td>\n' +
@@ -721,7 +721,7 @@ a continuous function.</div>
       '</div>\n' +
       '<div class="center" style="text-align: right">\n' +
       '<div class="table_tabular " style="text-align: right">\n' +
-      '<div class="inline-tabular"><table id="tabular">\n' +
+      '<div class="inline-tabular"><table class="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
       '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom: none !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; ">1</td>\n' +
@@ -745,7 +745,7 @@ a continuous function.</div>
       '<div style="margin-top: 0; margin-bottom: 1rem;">Should be new paragraph after <code>\\newtheorem{thm}{Theorem}[section]</code> and before tabular. Tabular should be centering.<br>\n' +
       '</div>\n' +
       '<div class="table_tabular " style="text-align: center">\n' +
-      '<div class="inline-tabular"><table id="tabular">\n' +
+      '<div class="inline-tabular"><table class="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
       '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom: none !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; ">1</td>\n' +

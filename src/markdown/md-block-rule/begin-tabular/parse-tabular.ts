@@ -68,7 +68,7 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}): A
   const { forLatex = false, outMath = {} } = options;
 
   res.push({token:'table_open', type:'table_open', tag: 'table', n: 1,
-    attrs: [[ 'id', 'tabular' ]],
+    attrs: [[ 'class', 'tabular' ]],
     latex: forLatex
       ? align
       : outMath.include_table_markdown

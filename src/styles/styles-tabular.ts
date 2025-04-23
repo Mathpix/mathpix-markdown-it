@@ -4,33 +4,33 @@ export const tabularStyles = (useColors = true) => `
         padding: 6px 13px;
     }
       
-    #tabular tr, #tabular tr {
+    .tabular tr, .tabular tr {
         border-top: none !important;
         border-bottom: none !important;
     }
-    #tabular td, #tabular td {
+    .tabular td, .tabular td {
         border-style: none !important;
         ${useColors ? 'background-color: #fff;' : 'background-color: transparent;'}
         ${useColors ? 'border-color: #000 !important;' : 'border-color: currentColor !important;'}
         word-break: keep-all;
         padding: 0.1em 0.5em !important;
     }
-    #tabular {
+    .tabular {
         display: inline-table !important;
-        height: 100%;
+        height: fit-content;
     }
-    #tabular td > p {
+    .tabular td > p {
         margin-bottom: 0;
         margin-top: 0;
     }
-    #tabular td._empty {
+    .tabular td._empty {
       height: 1.3em;
     }
-    #tabular td .f {
+    .tabular td .f {
       opacity: 0;
     }
     
-    html[data-theme="dark"] #tabular tr, html[data-theme="dark"] #tabular td {
+    html[data-theme="dark"] .tabular tr, html[data-theme="dark"] .tabular td {
       ${useColors ? 'background-color: #202226;' : 'background-color: transparent;'}
       ${useColors ? 'border-color: #fff !important;' : 'border-color: currentColor !important;'}
     }  
