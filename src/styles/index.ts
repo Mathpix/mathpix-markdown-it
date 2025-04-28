@@ -6,7 +6,13 @@ export const resetBodyStyles = `
     line-height: normal;
   }
 `;
-export const MathpixStyle = (setTextAlignJustify: boolean = false, useColors: boolean = true, maxWidth: string = '', scaleEquation = true ) => {
+export const MathpixStyle = (
+  setTextAlignJustify: boolean = false,
+  useColors: boolean = true,
+  maxWidth: string = '',
+  scaleEquation = true,
+  isPptx = false
+) => {
   return `
     #setText > div {
         justify-content: inherit;
@@ -18,9 +24,7 @@ export const MathpixStyle = (setTextAlignJustify: boolean = false, useColors: bo
     
     ${maxWidth ? '#setText > blockquote, h1, h2, h3, h4, h5, h6 { overflow-x: auto; }' : ''}
     
-    #setText div:last-child {
-        margin-bottom: 0 !important;
-    }
+    ${!isPptx ? '#setText div:last-child {\n        margin-bottom: 0 !important;\n    }' : ''}
 
     #setText > br, #preview-content br {
         line-height: 1.2;

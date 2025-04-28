@@ -675,7 +675,7 @@ function paragraphDiv(state, startLine/*, endLine*/) {
 
   state.line = nextLine;
   token = state.push('paragraph_open', 'div', 1);
-  if (state.md.options?.forDocx) {
+  if (state.md.options?.forDocx && !state.md.options?.forPptx) {
     token.attrSet('style', 'margin-top: 0; margin-bottom: 1em;');
   }
   token.parentToken = state.env?.parentToken;

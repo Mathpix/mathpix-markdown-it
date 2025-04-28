@@ -1,5 +1,5 @@
 import {checkFormula} from './check-formula';
-import {markdownToHTML as markdownHTML} from "../markdown";
+import {markdownToHTML as markdownHTML, markdownToHTMLSegments} from "../markdown";
 import {MathpixStyle, PreviewStyle, TocStyle, resetBodyStyles} from "../styles";
 import { ContainerStyle } from "../styles/styles-container";
 import { codeStyles } from "../styles/styles-code";
@@ -277,6 +277,13 @@ class MathpixMarkdown_Model {
     }
   }
 
+  markdownToHTMLSegments = (markdown: string, options: TMarkdownItOptions = {}): Array<{id: number, html: string}> => {
+    const { isDisableFancy = false } = options;
+    const disableRules = isDisableFancy ? this.disableFancyArrayDef : options ? options.disableRules || [] : [];
+    this.setOptions(disableRules);
+    return markdownToHTMLSegments(markdown, options);
+  }
+
   markdownToHTML = (markdown: string, options: TMarkdownItOptions = {}):string => {
     const { lineNumbering = false, isDisableFancy = false,  htmlWrapper = false } = options;
     const disableRules = isDisableFancy ? this.disableFancyArrayDef : options ? options.disableRules || [] : [];
@@ -486,8 +493,8 @@ class MathpixMarkdown_Model {
       return style;
     };
 
-    getMathpixStyle = (stylePreview: boolean = false, showToc: boolean = false, tocContainerName: string = 'toc', scaleEquation = true ) => {
-      let style: string = ContainerStyle() + this.getMathjaxStyle() + MathpixStyle(false, true, '', scaleEquation) + codeStyles + tabularStyles() + listsStyles;
+    getMathpixStyle = (stylePreview: boolean = false, showToc: boolean = false, tocContainerName: string = 'toc', scaleEquation = true, isPptx = false ) => {
+      let style: string = ContainerStyle() + this.getMathjaxStyle() + MathpixStyle(false, true, '', scaleEquation, isPptx) + codeStyles + tabularStyles() + listsStyles;
       if (showToc) {}
       if (!stylePreview) {
         return style;
