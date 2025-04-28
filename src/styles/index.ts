@@ -205,19 +205,16 @@ export const MathpixStyle = (
     #setText table tr:nth-child(2n), #preview-content table tr:nth-child(2n) {
         ${useColors ? 'background-color: #f6f8fa;' : ''}
     }
-
-    
-    #setText .main-title, #setText .author, #preview-content .main-title, #preview-content .author  {
-        text-align: center;
-        margin: 0 auto;
-    }
     
     #preview-content .main-title, #setText .main-title {
+        text-align: center;
         line-height: 1.2;
-        margin-bottom: 1em;
+        margin: 0 auto 1em auto;
     }
 
     #preview-content .author, #setText .author  {
+        text-align: center;
+        margin: 0 auto;
         display: flex;
         justify-content: center;
         flex-wrap: wrap;
