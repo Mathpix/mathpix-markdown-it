@@ -272,7 +272,7 @@ export const headingSection: RuleBlock = (state, startLine: number, endLine: num
       level = 1;
       type = "title";
       className = "main-title";
-      attrStyle = 'text-align: center; margin: 0 auto; line-height: 1.2; margin-bottom: 1em;';
+      attrStyle = 'text-align: center; margin: 0 auto 1em auto; line-height: 1.2;';
       break;
     case "section":
       level = 2;
