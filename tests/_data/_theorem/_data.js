@@ -775,7 +775,7 @@ a continuous function.</div>
       'Bitcoin: A Peer-to-Peer Electronic Cash System</h1>\n' +
       '<div style="margin-top: 0; margin-bottom: 1rem;">Should be abstract block:<br>\n' +
       '</div>\n' +
-      '<div class="abstract" style="width: 80%; margin: 0 auto; margin-bottom: 1em; font-size: .9em;">\n' +
+      '<div class="abstract" style="width: 80%; margin: 0 auto 1em auto; font-size: .9em;">\n' +
       '<h4 id="abstract_head" class="abstract_head" style="text-align: center;">\n' +
       'Abstract</h4>\n' +
       '<p style="text-indent: 1em;">A purely peer-to-peer version of electronic cash would allow online payments to be sent directly from one party to another without going through a financial institution. Digital signatures provide part of the solution, but the main benefits are lost if a trusted third party is still required to prevent double-spending.</p>\n' +

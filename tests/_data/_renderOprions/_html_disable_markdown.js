@@ -120,7 +120,7 @@ module.exports = "<div>## Using Markdown in Snip</div>\n" +
   "<div><div class=\"author\">\n" +
   "          <p><span>Author</span><span>can also be</span><span>multiline</span></p>\n" +
   "        </div></div>\n" +
-  "<div class=\"abstract\" style=\"width: 80%; margin: 0 auto; margin-bottom: 1em; font-size: .9em;\">\n" +
+  "<div class=\"abstract\" style=\"width: 80%; margin: 0 auto 1em auto; font-size: .9em;\">\n" +
   "<h4 id=\"abstract_head\" class=\"abstract_head\" style=\"text-align: center;\">\n" +
   "Abstract</h4>\n" +
   "<p style=\"text-indent: 1em;\">This is the abstract to my paper. You are going to learn a lot in this paper, just you wait. I am going to tell you about all the different LaTeX and Markdown syntax you can use in Snip.</p>\n" +
