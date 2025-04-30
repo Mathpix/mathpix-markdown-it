@@ -201,7 +201,7 @@ const renderSmilesDrawerBlock = (tokens, idx, options, env, slf) => {
     ? injectLineNumbersSmiles(tokens, idx, options, env, slf)
     : '';
   const outputSmiles = include_smiles
-    ? '<smiles style="display: none">' + token.content.trim() + '</smiles>'
+    ? '<smiles style="display: none;">' + token.content.trim() + '</smiles>'
     : '';
 
   const maxWidth = options.maxWidth ? ` max-width: ${options.maxWidth}; overflow-x: auto;` : '';
@@ -236,7 +236,7 @@ const renderSmilesDrawerInline = (tokens, idx, options, env, slf) => {
   }
 
   const outputSmiles = include_smiles
-    ? '<smiles style="display: none">' + token.content.trim() + '</smiles>'
+    ? '<smiles style="display: none;">' + token.content.trim() + '</smiles>'
     : '';
 
   const maxWidth = options.maxWidth ? ` max-width: ${options.maxWidth}; overflow-x: auto;` : '';

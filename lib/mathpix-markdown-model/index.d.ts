@@ -216,10 +216,13 @@ declare class MathpixMarkdown_Model {
         html: string;
         size: ISize;
     };
-    markdownToHTMLSegments: (markdown: string, options?: TMarkdownItOptions) => Array<{
-        id: number;
-        html: string;
-    }>;
+    markdownToHTMLSegments: (markdown: string, options?: TMarkdownItOptions) => {
+        content: string;
+        map: [
+            number,
+            number
+        ][];
+    };
     markdownToHTML: (markdown: string, options?: TMarkdownItOptions) => string;
     showTocInContainer: (html: string, containerName?: string) => void;
     getTocContainerHTML: (html: string, onlyContent?: boolean) => string;

@@ -277,13 +277,13 @@ export const renderTabularInline = (a, token, options, env, slf) => {
     tabular = data.table;
   }
   const tsv = include_tsv && token.tsv
-    ? `<tsv style="display: none">${formatSource(TsvJoin(token.tsv,options), true)}</tsv>`
+    ? `<tsv style="display: none;">${formatSource(TsvJoin(token.tsv,options), true)}</tsv>`
     : '';
   const tableMd = include_table_markdown && token.tableMd
-    ? `<table-markdown style="display: none">${formatSource(tableMarkdownJoin(data.tableMd, data.align), true)}</table-markdown>`
+    ? `<table-markdown style="display: none;">${formatSource(tableMarkdownJoin(data.tableMd, data.align), true)}</table-markdown>`
     : '';
   const csv = include_csv && token.csv
-    ? `<csv style="display: none">${formatSource(CsvJoin(token.csv,options), true)}</csv>`
+    ? `<csv style="display: none;">${formatSource(CsvJoin(token.csv,options), true)}</csv>`
     : '';
   return `<div class="${className}">${tabular}${tsv}${tableMd}${csv}</div>`
 };

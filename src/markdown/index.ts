@@ -107,7 +107,7 @@ const mdInit = (options: TMarkdownItOptions) => {
   return md;
 };
 
-export const markdownToHtmlPipelineSegments = (content: string, options: TMarkdownItOptions = {}): Array<{id: number, html: string}> => {
+export const markdownToHtmlPipelineSegments = (content: string, options: TMarkdownItOptions = {}): {content: string, map: [number, number][]} => {
   let md = mdInit(options);
   // inject rules override
   md = injectRenderRules(md);
@@ -117,16 +117,16 @@ export const markdownToHtmlPipelineSegments = (content: string, options: TMarkdo
     md.disable(disableRules, true);
   }
 
-  md.renderer.render = function (tokens, options, env) {
-    const result = [];
+  md.renderer.render = function (tokens, options, env): {content: string, map: [number, number][]} {
+    let content: string = '';
+    const map: [number, number][] = [];
     let line: string = '';
     let waitTag: string = '';
     let waitLevel: number = 0;
-    let blockId: number = 0;
 
     for (let i = 0; i < tokens.length; i++) {
       const token = tokens[i];
-      let rendered = '';
+      let rendered: string = '';
       if (token.type === 'inline') {
         rendered = this.renderInline(tokens[i].children, options, env);
       } else if (typeof this.rules[token.type] !== 'undefined') {
@@ -138,15 +138,16 @@ export const markdownToHtmlPipelineSegments = (content: string, options: TMarkdo
       if (waitTag) {
         if (token.type === waitTag && waitLevel === token.level) {
           line += rendered;
-          // result.push(line);
-          result.push({ id: blockId++, html: line });
+          const start: number = content.length;
+          content += line;
+          map.push([start, content.length]);
           line = '';
           waitTag = '';
           waitLevel = 0;
           continue;
         }
         line += rendered;
-        continue
+        continue;
       }
 
       if (token.type.includes('_open')) {
@@ -158,16 +159,25 @@ export const markdownToHtmlPipelineSegments = (content: string, options: TMarkdo
 
       if (['hr', 'html_block', 'fence', 'code_block'].includes(token.type)) {
         if (line) {
-          result.push({ id: blockId++, html: line });
+          const start: number = content.length;
+          content += line;
+          map.push([start, content.length]);
+          line = '';
         }
-        result.push({ id: blockId++, html: rendered });
-        line = '';
+        const start: number = content.length;
+        content += rendered;
+        map.push([start, content.length]);
         continue;
       }
       line += rendered;
     }
-    if (line) result.push({ id: blockId++, html: line });
-    return result;
+
+    if (line) {
+      const start: number = content.length;
+      content += line;
+      map.push([start, content.length]);
+    }
+    return { content, map };
   };
 
   return md.render(content);
@@ -192,13 +202,13 @@ export const markdownToHtmlPipeline = (content: string, options: TMarkdownItOpti
   }
 };
 
-export function markdownToHTMLSegments(markdown: string, options: TMarkdownItOptions = {}): Array<{id: number, html: string}>{
+export function markdownToHTMLSegments(markdown: string, options: TMarkdownItOptions = {}): {content: string, map: [number, number][]}{
   try {
     return markdownToHtmlPipelineSegments(markdown, options);
   } catch (e) {
     console.log("ERROR=>[markdownToHTMLSegments]=>");
     console.error(e);
-    return [];
+    return null;
   }
 }
 

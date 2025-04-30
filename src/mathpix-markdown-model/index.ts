@@ -277,7 +277,7 @@ class MathpixMarkdown_Model {
     }
   }
 
-  markdownToHTMLSegments = (markdown: string, options: TMarkdownItOptions = {}): Array<{id: number, html: string}> => {
+  markdownToHTMLSegments = (markdown: string, options: TMarkdownItOptions = {}): {content: string, map: [number, number][]} => {
     const { isDisableFancy = false } = options;
     const disableRules = isDisableFancy ? this.disableFancyArrayDef : options ? options.disableRules || [] : [];
     this.setOptions(disableRules);

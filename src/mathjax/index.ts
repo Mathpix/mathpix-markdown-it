@@ -261,7 +261,7 @@ const OuterDataMathMl = (adaptor, node, math, outMath, forDocx = false, accessib
   return res;
 };
 
-export const OuterHTML = (data, outMath) => {
+export const OuterHTML = (data, outMath, forPptx: boolean = false) => {
   const {
     include_mathml = false,
     include_mathml_word = false,
@@ -273,10 +273,14 @@ export const OuterHTML = (data, outMath) => {
   } = outMath;
   let outHTML = '';
   if (include_mathml && data.mathml) {
-    outHTML +=  '<mathml style="display: none">' + formatSourceMML(data.mathml) + '</mathml>';
+    outHTML +=  '<mathml style="display: none;">' + formatSourceMML(data.mathml) + '</mathml>';
   }
   if (include_mathml_word && data.mathml_word) {
-    outHTML +=  '<mathmlword style="display: none">' + data.mathml_word + '</mathmlword>';
+    if (forPptx) {
+      outHTML +=  '<mathmlword>' + data.mathml_word + '</mathmlword>';
+    } else {
+      outHTML +=  '<mathmlword style="display: none;">' + data.mathml_word + '</mathmlword>';
+    }
   }
   if (include_asciimath && data.asciimath) {
     if (!outHTML) { outHTML += '\n'}
@@ -284,15 +288,15 @@ export const OuterHTML = (data, outMath) => {
   }
   if (include_latex && data.latex) {
     if (!outHTML) { outHTML += '\n'}
-    outHTML += '<latex style="display: none">' + formatSource(data.latex) + '</latex>';
+    outHTML += '<latex style="display: none;">' + formatSource(data.latex) + '</latex>';
   }    
   if (include_speech && data.speech) {
     if (!outHTML) { outHTML += '\n'}
-    outHTML += '<speech style="display: none">' + formatSource(data.speech) + '</speech>';
+    outHTML += '<speech style="display: none;">' + formatSource(data.speech) + '</speech>';
   }  
   if (include_error && data.error) {
     if (!outHTML) { outHTML += '\n'}
-    outHTML += '<error style="display: none">' + formatSource(data.error) + '</error>';
+    outHTML += '<error style="display: none;">' + formatSource(data.error) + '</error>';
   }
 
   if (include_svg && data.svg) {
@@ -399,7 +403,7 @@ export const MathJax = {
   Typeset: function(string, options: any={}, throwError = false) {
     const data = this.TexConvert(string, options, throwError);
     return {
-      html: OuterHTML(data, options.outMath),
+      html: OuterHTML(data, options.outMath, options.forPptx),
       labels: data.labels,
       ascii: data.asciimath,
       ascii_tsv: data?.['asciimath_tsv'],
