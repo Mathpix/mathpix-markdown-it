@@ -118,6 +118,7 @@ export type TOutputMath = {
     include_mol?: boolean;
     include_speech?: boolean;
     include_error?: boolean;
+    include_chtml?: boolean;
     tsv_separators?: {
         column?: string;
         row?: string;
@@ -231,7 +232,7 @@ declare class MathpixMarkdown_Model {
     scrollPage: (parent: any, offsetTarget: any) => void;
     loadMathJax: (notScrolling?: boolean, setTextAlignJustify?: boolean, isResetBodyStyles?: boolean, maxWidth?: string, scaleEquation?: boolean) => boolean;
     convertToHTML: (str: string, options?: TMarkdownItOptions) => string;
-    getMathjaxStyle: () => any;
+    getMathjaxStyle: () => string;
     getMathpixStyleOnly: (scaleEquation?: boolean) => string;
     getMathpixStyle: (stylePreview?: boolean, showToc?: boolean, tocContainerName?: string, scaleEquation?: boolean, isPptx?: boolean) => string;
     getMathpixMarkdownStyles: (useColors?: boolean, scaleEquation?: boolean) => string;

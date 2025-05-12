@@ -138,6 +138,7 @@ export type TOutputMath = {
   include_mol?: boolean,
   include_speech?: boolean,
   include_error?: boolean,
+  include_chtml?: boolean,
   tsv_separators?: {
     column?: string,
     row?: string,
@@ -474,9 +475,17 @@ class MathpixMarkdown_Model {
     getMathjaxStyle = () => {
       try {
         const MathJaxStyle: any = MathJax.Stylesheet();
-        return MathJaxStyle.children[0] && MathJaxStyle.children[0].value
+        let mathJaxStyleSvg = MathJaxStyle.children[0] && MathJaxStyle.children[0].value
           ? MathJaxStyle.children[0].value
           : MathJaxStyle.innerHTML;
+        const MathJaxStyleCHTML: any = MathJax.StylesheetCHTML();
+        let mathJaxStyleChtml = MathJaxStyleCHTML.children[0] && MathJaxStyleCHTML.children[0].value
+          ? MathJaxStyleCHTML.children[0].value
+          : MathJaxStyleCHTML.innerHTML;
+        return mathJaxStyleSvg + '\n\n' + mathJaxStyleChtml;
+        // return MathJaxStyle.children[0] && MathJaxStyle.children[0].value
+        //   ? MathJaxStyle.children[0].value
+        //   : MathJaxStyle.innerHTML;
       } catch (e) {
         return '';
       }
@@ -494,7 +503,9 @@ class MathpixMarkdown_Model {
     };
 
     getMathpixStyle = (stylePreview: boolean = false, showToc: boolean = false, tocContainerName: string = 'toc', scaleEquation = true, isPptx = false ) => {
-      let style: string = ContainerStyle() + this.getMathjaxStyle() + MathpixStyle(false, true, '', scaleEquation, isPptx) + codeStyles + tabularStyles() + listsStyles;
+      let mathjaxStyle = this.getMathjaxStyle();
+      console.log("[TEST]=>mathjaxStyle=>", mathjaxStyle)
+      let style: string = ContainerStyle() + mathjaxStyle + MathpixStyle(false, true, '', scaleEquation, isPptx) + codeStyles + tabularStyles() + listsStyles;
       if (showToc) {}
       if (!stylePreview) {
         return style;

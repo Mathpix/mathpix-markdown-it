@@ -1,4 +1,4 @@
-import { MathJaxConfigure, svg } from './mathjax';
+import { MathJaxConfigure, svg, chtml } from './mathjax';
 
 import { SerializedMmlVisitor as MmlVisitor } from 'mathjax-full/js/core/MmlTree/SerializedMmlVisitor.js';
 import { LiteElement } from "mathjax-full/js/adaptors/lite/Element.js";
@@ -23,6 +23,7 @@ export interface IOuterData {
   asciimath_md?: string,
   latex?: string,
   svg?: string,
+  chtml?: string,
   speech?: string,
   labels?: {
     [key: string]: Label;
@@ -77,6 +78,7 @@ const OuterData = (adaptor, node, math, outMath, forDocx = false, accessibility?
     include_latex = false,
     include_svg = true,
     include_speech = false,
+    include_chtml = false,
     optionAscii = {
       showStyle: false,
       extraBrackets: true,
@@ -128,6 +130,9 @@ const OuterData = (adaptor, node, math, outMath, forDocx = false, accessibility?
         res.heightAndDepth = mathDimensions.viewBoxHeightAndDepth;
       }
     }
+  }
+  if (include_chtml) {
+    res.chtml = adaptor.outerHTML(node);
   }
   /** Get information about the current labels. */
   res.labels = math.inputJax.parseOptions?.tags?.labels
@@ -269,7 +274,8 @@ export const OuterHTML = (data, outMath, forPptx: boolean = false) => {
     include_latex = false,
     include_svg = true,
     include_error = false,
-    include_speech = false
+    include_speech = false,
+    include_chtml = false
   } = outMath;
   let outHTML = '';
   if (include_mathml && data.mathml) {
@@ -302,6 +308,11 @@ export const OuterHTML = (data, outMath, forPptx: boolean = false) => {
   if (include_svg && data.svg) {
     if (!outHTML) { outHTML += '\n'}
     outHTML += data.svg;
+  }
+
+  if (include_chtml && data.chtml) {
+    if (!outHTML) { outHTML += '\n'}
+    outHTML += data.chtml;
   }
 
   return outHTML;
@@ -338,6 +349,10 @@ export const MathJax = {
   Stylesheet: function () {
     return svg.styleSheet(MJ.mDocTeX);
   },
+
+  StylesheetCHTML: function () {
+    return chtml.styleSheet(MJ.mDocTeXCHTML);
+  },
   TexConvert: function(string, options: any={}, throwError = false): IOuterData {
     const {display = true, metric = {}, outMath = {}, mathJax = {}, forDocx={}, accessibility = null, nonumbers = false} = options;
     const {em = 16, ex = 8, cwidth = 1200, lwidth = 100000, scale = 1} = metric;
@@ -345,6 +360,24 @@ export const MathJax = {
     this.checkAccessibility(accessibility, nonumbers);
     MJ.mDocTeX.outputJax.options.mtextInheritFont = mtextInheritFont;
     try {
+      if (outMath?.include_chtml) {
+        /** Here we use different package settings.
+         * In order to flatten arrays in asccimath for TSV/CSV we add an extra attribute to the internal mml tree.
+         * So for \begin{array} we add a name attribute that points to the environment */
+        const node = options?.outMath?.optionAscii?.tableToTsv || options?.outMath?.optionAscii?.tableToCsv || options?.outMath?.optionAscii?.tableToMd
+          ? MJ.docTeXTSV.convert(string, {
+            display: display,
+            em: em,
+            ex: ex,
+            containerWidth: cwidth, lineWidth: lwidth, scale: scale})
+          : MJ.mDocTeXCHTML.convert(string, {
+            display: display,
+            em: em,
+            ex: ex,
+            containerWidth: cwidth, lineWidth: lwidth, scale: scale});
+        const outputJax = MJ.mDocTeXCHTML.outputJax as any;
+        return OuterData(MJ.adaptor, node, outputJax.math, outMath, forDocx, accessibility);
+      }
       /** Here we use different package settings.
        * In order to flatten arrays in asccimath for TSV/CSV we add an extra attribute to the internal mml tree.
        * So for \begin{array} we add a name attribute that points to the environment */

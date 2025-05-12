@@ -9,6 +9,7 @@ export interface IOuterData {
     asciimath_md?: string;
     latex?: string;
     svg?: string;
+    chtml?: string;
     speech?: string;
     labels?: {
         [key: string]: Label;
@@ -25,6 +26,7 @@ export declare const MathJax: {
     nonumbers: boolean;
     checkAccessibility: (accessibility?: TAccessibility, nonumbers?: boolean) => void;
     Stylesheet: () => unknown;
+    StylesheetCHTML: () => unknown;
     TexConvert: (string: any, options?: any, throwError?: boolean) => IOuterData;
     TexConvertToAscii: (string: any, options?: any) => string;
     /**
@@ -51,6 +53,7 @@ export declare const MathJax: {
             asciimath_md?: string;
             latex?: string;
             svg?: string;
+            chtml?: string;
             speech?: string;
             labels?: {
                 [key: string]: Label;
@@ -80,6 +83,7 @@ export declare const MathJax: {
             asciimath_md?: string;
             latex?: string;
             svg?: string;
+            chtml?: string;
             speech?: string;
             labels?: {
                 [key: string]: Label;
@@ -108,6 +112,7 @@ export declare const MathJax: {
             asciimath_md?: string;
             latex?: string;
             svg?: string;
+            chtml?: string;
             speech?: string;
             labels?: {
                 [key: string]: Label;

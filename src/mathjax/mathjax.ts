@@ -3,6 +3,7 @@ import {TeX} from 'mathjax-full/js/input/tex.js';
 import {AbstractTags, TagInfo} from 'mathjax-full/js/input/tex/Tags.js';
 import {MathML} from "mathjax-full/js/input/mathml.js";
 import {SVG} from 'mathjax-full/js/output/svg.js';
+import {CHTML} from 'mathjax-full/js/output/chtml.js';
 import { AsciiMath } from 'mathjax-full/js/input/asciimath.js';
 import {RegisterHTMLHandler} from 'mathjax-full/js/handlers/html.js';
 import {browserAdaptor} from 'mathjax-full/js/adaptors/browserAdaptor.js';
@@ -51,6 +52,7 @@ const texTSVConfig = Object.assign({}, texConfig,  {
 });
 const mmlConfig = Object.assign({}, MathJaxConfig.MathML || {});
 const svgConfig = Object.assign({}, MathJaxConfig.SVG || {});
+const chtmlConfig = Object.assign({}, MathJaxConfig.CHTML || {});
 
 // @ts-ignore
 class MTeX extends TeX {
@@ -62,6 +64,7 @@ class MTeX extends TeX {
 // @ts-ignore
 export const mml = new MathML(mmlConfig);
 export const svg = new SVG(svgConfig);
+export const chtml = new CHTML(chtmlConfig);
 export const asciimath = new AsciiMath({});
 
 export class MathJaxConfigure {
@@ -74,8 +77,10 @@ export class MathJaxConfigure {
   public handler;
 
   public docTeX;
+  public docTeXCHTML;
   public docTeXTSV;
   public mDocTeX;
+  public mDocTeXCHTML;
   public docMathML;
   public docAsciiMath;
   
@@ -127,7 +132,11 @@ export class MathJaxConfigure {
     this.docTeX = mathjax.document(this.domNode, {
       InputJax: this.tex,
       OutputJax: svg
-    });    
+    });
+    this.docTeXCHTML = mathjax.document(this.domNode, {
+      InputJax: this.tex,
+      OutputJax: chtml,
+    });
     this.docTeXTSV = mathjax.document(this.domNode, {
       InputJax: this.texTSV,
       OutputJax: svg
@@ -135,6 +144,10 @@ export class MathJaxConfigure {
     this.mDocTeX= mathjax.document(this.domNode, {
       InputJax: this.mTex,
       OutputJax: svg
+    });
+    this.mDocTeXCHTML= mathjax.document(this.domNode, {
+      InputJax: this.mTex,
+      OutputJax: chtml,
     });
     this.docMathML = mathjax.document(this.domNode, {
       InputJax: mml,
