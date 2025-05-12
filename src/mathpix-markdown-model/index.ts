@@ -504,7 +504,6 @@ class MathpixMarkdown_Model {
 
     getMathpixStyle = (stylePreview: boolean = false, showToc: boolean = false, tocContainerName: string = 'toc', scaleEquation = true, isPptx = false ) => {
       let mathjaxStyle = this.getMathjaxStyle();
-      console.log("[TEST]=>mathjaxStyle=>", mathjaxStyle)
       let style: string = ContainerStyle() + mathjaxStyle + MathpixStyle(false, true, '', scaleEquation, isPptx) + codeStyles + tabularStyles() + listsStyles;
       if (showToc) {}
       if (!stylePreview) {
