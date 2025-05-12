@@ -49,6 +49,7 @@ export const renderInlineTokenBlock = (tokens, options, env, slf, isSubTable = f
   let cellMd= '';
   let align = '';
   let colspan = 0, rowspan = [], mr = 0;
+  let numCol = 0;
 
   for (let idx = 0; idx < tokens.length; idx++) {
     let token = tokens[idx];
@@ -201,20 +202,41 @@ export const renderInlineTokenBlock = (tokens, options, env, slf, isSubTable = f
       continue;
     }
     let tokenTag = token.tag;
-    if (options?.forPptx && isSubTable) {
-      if (['table', "tbody", "tr", 'td'].includes(token.tag)) {
-        tokenTag = 'div';
-      }
-      if (token.type === 'td_open') {
-        if (tokens[idx-1]?.type === 'td_close') {
-          result += '<span>&nbsp;</span>'
+    let sizerTr = '';
+    if (options?.forPptx) {
+      if (isSubTable) {
+        if (['table', "tbody", "tr", 'td'].includes(token.tag)) {
+          tokenTag = 'div';
         }
-        token.attrs = addStyle(token.attrs, 'display: inline');
+        if (token.type === 'td_open') {
+          if (tokens[idx-1]?.type === 'td_close') {
+            result += '<span>&nbsp;</span>'
+          }
+          token.attrs = addStyle(token.attrs, 'display: inline');
+        }
+      } else {
+        if (token.tag === 'tbody') {
+          numCol = tokenAttrGet(token, 'data_num_col');
+          numCol = numCol ? Number(numCol) : 0 ;
+          if (numCol) {
+            sizerTr += '<tr class="tr-sizer">';
+            for (let i = 0; i < numCol; i++) {
+              sizerTr += '<td class="td_empty">sizer</td>';
+            }
+            sizerTr += '</tr>';
+          }
+        }
       }
     }
     // Add token name, e.g. `<img`
     result += (token.n === -1 ? '</' : '<') + tokenTag;
 
+    if (options?.forPptx && token.token === 'td_open' && tokens[idx+1]?.token === 'td_close') {
+      let className = tokenAttrGet(token, 'class');
+      className += className ? ' ' : '';
+      className += 'td_empty';
+      tokenAttrSet(token, 'class', className);
+    }
     // Encode attributes, e.g. `<img src="foo"`
     result += slf.renderAttrs(token);
 
@@ -244,6 +266,14 @@ export const renderInlineTokenBlock = (tokens, options, env, slf, isSubTable = f
     }
 
     result += needLf ? '>\n' : '>';
+    if (options?.forPptx) {
+      if (sizerTr) {
+        result += sizerTr;
+      }
+      if (token.token === 'td_open' && tokens[idx+1]?.token === 'td_close') {
+        result += 'sizer'
+      }
+    }
   }
   return {
     table: result, 

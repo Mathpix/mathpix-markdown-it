@@ -273,14 +273,14 @@ export const OuterHTML = (data, outMath, forPptx: boolean = false) => {
   } = outMath;
   let outHTML = '';
   if (include_mathml && data.mathml) {
-    outHTML +=  '<mathml style="display: none;">' + formatSourceMML(data.mathml) + '</mathml>';
+    if (forPptx) {
+      outHTML += '<mathml>' + formatSourceMML(data.mathml) + '</mathml>';
+    } else {
+      outHTML += '<mathml style="display: none;">' + formatSourceMML(data.mathml) + '</mathml>';
+    }
   }
   if (include_mathml_word && data.mathml_word) {
-    if (forPptx) {
-      outHTML +=  '<mathmlword>' + data.mathml_word + '</mathmlword>';
-    } else {
-      outHTML +=  '<mathmlword style="display: none;">' + data.mathml_word + '</mathmlword>';
-    }
+    outHTML +=  '<mathmlword style="display: none;">' + data.mathml_word + '</mathmlword>';
   }
   if (include_asciimath && data.asciimath) {
     if (!outHTML) { outHTML += '\n'}

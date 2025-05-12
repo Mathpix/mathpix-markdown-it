@@ -142,6 +142,9 @@ export declare const terminatedRules: {
     svg_block: {
         terminated: string[];
     };
+    image_with_size_block: {
+        terminated: string[];
+    };
     fence: {
         terminated: string[];
     };

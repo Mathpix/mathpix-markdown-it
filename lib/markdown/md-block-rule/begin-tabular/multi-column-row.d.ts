@@ -5,4 +5,4 @@ export declare const getMultiColumnMultiRow: (str: string, params: {
     lLines: string;
     align: string;
     rLines: string;
-}, forLatex?: boolean) => TMulti | null;
+}, forLatex?: boolean, forPptx?: boolean) => TMulti | null;

@@ -15,7 +15,8 @@ import {
   isMathInText
 } from './utils';
 import { openTagMML } from './common/consts';
-import {imageWithSize, renderRuleImage} from './md-inline-rule/image';
+import { imageWithSize, renderRuleImage } from './md-inline-rule/image';
+import { imageWithSizeBlock, renderRuleImageBlock } from './md-block-rule/image-block';
 import {setCounterSection} from './md-inline-rule/setcounter-section';
 import {renderTheorems} from './md-theorem';
 import {resetTheoremEnvironments} from './md-theorem/helper';
@@ -796,6 +797,10 @@ export default options => {
     }
     md.block.ruler.before('html_block', 'svg_block', svg_block,
         {alt: getTerminatedRules("svg_block")});
+    if (options?.forPptx) {
+      md.block.ruler.after("fence", 'image_with_size_block', imageWithSizeBlock,
+        {alt: getTerminatedRules("image_with_size_block")});
+    }
     md.block.ruler.before("paragraph", "paragraphDiv", paragraphDiv);
     if (!md.options.enableCodeBlockRuleForLatexCommands) {
       md.block.ruler.at("code", codeBlock);
@@ -877,6 +882,7 @@ export default options => {
     md.renderer.rules.softbreak = softBreak;    
     md.renderer.rules.hardbreak = hardBreak;
     md.renderer.rules.image = (tokens, idx, options, env, slf) => renderRuleImage(tokens, idx, options, env, slf);
+    md.renderer.rules.image_block = (tokens, idx, options, env, slf) => renderRuleImageBlock(tokens, idx, options, env, slf);
     renderTheorems(md);
   };
 };
