@@ -221,7 +221,7 @@ export const renderInlineTokenBlock = (tokens, options, env, slf, isSubTable = f
           if (numCol) {
             sizerTr += '<tr class="tr-sizer">';
             for (let i = 0; i < numCol; i++) {
-              sizerTr += '<td class="td_empty">sizer</td>';
+              sizerTr += '<td class="td_empty">x</td>';
             }
             sizerTr += '</tr>';
           }
@@ -271,7 +271,7 @@ export const renderInlineTokenBlock = (tokens, options, env, slf, isSubTable = f
         result += sizerTr;
       }
       if (token.token === 'td_open' && tokens[idx+1]?.token === 'td_close') {
-        result += 'sizer'
+        result += 'x'
       }
     }
   }
