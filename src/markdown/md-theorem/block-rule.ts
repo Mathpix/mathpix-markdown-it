@@ -301,6 +301,12 @@ export const BeginTheorem: RuleBlock = (state, startLine, endLine, silent) => {
     token.latex = latexBegin;
   }
 
+  if (state.md.options.forPptx) {
+    token = state.push('paragraph_open', 'div', 1);
+    token.attrSet('class','theorem_block_split');
+    token.attrSet('style', `margin-top: 0; margin-bottom: 1em;`);
+  }
+
   if (!state.md.options.forLatex) {
     token = state.push("theorem_print_open", "", 0);
     token.envStyle = envItem.style;
@@ -376,7 +382,7 @@ export const BeginTheorem: RuleBlock = (state, startLine, endLine, silent) => {
     }
   }
   
-  SetTokensBlockParse(state, resText, 0, 0, true, contentPositions);
+  SetTokensBlockParse(state, resText, 0, 0, true, contentPositions, state.md.options?.forPptx);
 
   token = state.push('theorem_close', 'div', -1);
   token.envStyle = envItem.style;
@@ -510,11 +516,22 @@ export const BeginProof: RuleBlock = (state, startLine, endLine, silent) => {
     token.latex = latexBegin;
   }
 
+  if (state.md.options.forPptx) {
+    token = state.push('paragraph_open', 'div', 1);
+    token.attrSet('class','theorem_block_split');
+    token.attrSet('style', `margin-top: 0; margin-bottom: 1em;`);
+  }
+
+  token = state.push("proof_print", "", 0);
+  token.content = "";
+  token.children = [];
+
   const contentQED = state.env.qedsymbol ? state.env.qedsymbol : defQED;
   
   let children = [];
   state.md.block.parse(resText, state.md, state.env, children);
 
+  let isFirst = true;
   for (let j = 0; j < children.length; j++) {
     const child = children[j];
     
@@ -538,10 +555,10 @@ export const BeginProof: RuleBlock = (state, startLine, endLine, silent) => {
         if (style) {
           token.attrSet('style', `display: inline; ` + style);
         } else {
-          token.attrs.push(['style', `display: inline`]);
+          token.attrs.push(['style', `display: inline;`]);
         }
       } else {
-        token.attrSet('style', `display: inline`);
+        token.attrSet('style', `display: inline;`);
       }
       token.attrSet('data-display', 'inline');
     }
@@ -553,6 +570,10 @@ export const BeginProof: RuleBlock = (state, startLine, endLine, silent) => {
     }
     token.content = child.content;
     token.children = child.children;
+    if (state.md.options.forPptx && isFirst && token.type === "paragraph_close") {
+      token = state.push('paragraph_close', 'div', -1);
+      isFirst = false;
+    }
   }
   
   token = state.push('proof_close', 'div', -1);
