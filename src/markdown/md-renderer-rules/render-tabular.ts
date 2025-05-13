@@ -207,6 +207,7 @@ export const renderInlineTokenBlock = (tokens, options, env, slf, isSubTable = f
       if (isSubTable) {
         if (['table', "tbody", "tr", 'td'].includes(token.tag)) {
           tokenTag = 'div';
+          tokenAttrSet(token, 'style', '');
         }
         if (token.type === 'td_open') {
           if (tokens[idx-1]?.type === 'td_close') {
