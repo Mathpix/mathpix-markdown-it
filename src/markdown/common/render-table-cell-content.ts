@@ -8,13 +8,19 @@ export const renderTableCellContent = (token, isSubTable: boolean, options, env,
   let tsvCell = '';
   let csvCell = '';
   let mdCell = '';
+  let smoothedCell = '';
   try {
     for (let j = 0; j < token.children.length; j++) {
       const child = token.children[j];
       if (child.type === "tabular_inline" || isSubTable) {
         child.isSubTable = true;
       }
-      content += slf.renderInline([child], options, env);
+      let rendered = slf.renderInline([child], options, env);
+      const smoothedRendered = child.tableSmoothed?.length > 0
+        ? child.tableSmoothed.map(item => typeof item === 'string' ? item : item.join(' ')).join(' <br> ')
+        : rendered;
+      smoothedCell += smoothedRendered;
+      content += options.forPptx ? smoothedRendered : rendered;
 
       const ascii = child.ascii_tsv || child.ascii;
       const csvAscii = child.ascii_csv || child.ascii;
@@ -119,14 +125,16 @@ export const renderTableCellContent = (token, isSubTable: boolean, options, env,
       content,
       tsv: tsvCell,
       csv: csvCell,
-      tableMd: mdCell
+      tableMd: mdCell,
+      tableSmoothed: smoothedCell
     };
   } catch (e) {
     return {
       content,
       tsv: tsvCell,
       csv: csvCell,
-      tableMd: mdCell
+      tableMd: mdCell,
+      tableSmoothed: smoothedCell
     };
   }
 };
