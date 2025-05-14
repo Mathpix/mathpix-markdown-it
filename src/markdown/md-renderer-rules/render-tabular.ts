@@ -213,7 +213,7 @@ export const renderInlineTokenBlock = (tokens, options, env, slf, isSubTable = f
           if (tokens[idx-1]?.type === 'td_close') {
             result += '<span>&nbsp;</span>'
           }
-          token.attrs = addStyle(token.attrs, 'display: inline');
+          token.attrs = addStyle(token.attrs, 'display: inline;');
         }
       } else {
         if (token.tag === 'tbody') {
