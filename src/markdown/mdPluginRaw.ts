@@ -393,29 +393,34 @@ const renderMath = (tokens: Token[], idx, options) => {
   const widthEx = token?.mathData?.widthEx;
   const dataAttr = width === 'full' ? ' data-width="full"' : '';
   const dataAttrInline: string = widthEx < 2 ? ' data-overflow="visible"' : '';
+  const className = token.type === "inline_math" || token.type === "inline_mathML"
+    ? "math-inline"
+    : "math-block";
   if (token.mathData?.error && options.parserErrors !== ParserErrors.show) {
     let html: string = token.type === "inline_math" || token.type === "inline_mathML"
-      ? `<span class="math-inline"${dataAttrInline}>`
-      : `<span class="math-block"${dataAttr}>`;
+      ? `<span class=${className}${dataAttrInline}>`
+      : options.forPptx ? `<div class=${className}${dataAttr}>` : `<span class=${className}${dataAttr}>`;
     if (options.parserErrors === ParserErrors.show_input) {
       html += token.inputLatex;
     }
-    return html + '</span>';
+    html += options.forPptx && className === "math-block" ? '</div>' : '</span>';
+    return html;
   }
   const attrNumber = token.attrNumber;
   const idLabels = token.idLabels;
+  let blockTag = options.forPptx ? 'div' : 'span';
   if (token.type === "equation_math") {
     return idLabels 
-      ? `<span id="${idLabels}" class="math-block equation-number id=${idLabels}" number="${attrNumber}"${dataAttr}>${mathEquation}</span>`
-      : `<span  class="math-block equation-number " number="${attrNumber}"${dataAttr}>${mathEquation}</span>`
+      ? `<${blockTag} id="${idLabels}" class="math-block equation-number id=${idLabels}" number="${attrNumber}"${dataAttr}>${mathEquation}</${blockTag}>`
+      : `<${blockTag}  class="math-block equation-number " number="${attrNumber}"${dataAttr}>${mathEquation}</${blockTag}>`
   } else {
     return token.type === "inline_math" || token.type === "inline_mathML"
       ? idLabels
         ? `<span id="${idLabels}" class="math-inline id=${idLabels}"${dataAttrInline}>${mathEquation}</span>`
         : `<span class="math-inline ${idLabels}"${dataAttrInline}>${mathEquation}</span>`
       : idLabels
-        ? `<span id="${idLabels}" class="math-block id=${idLabels}"${dataAttr}>${mathEquation}</span>`
-        : `<span class="math-block ${idLabels}"${dataAttr}>${mathEquation}</span>`;
+        ? `<${blockTag} id="${idLabels}" class="math-block id=${idLabels}"${dataAttr}>${mathEquation}</${blockTag}>`
+        : `<${blockTag} class="math-block ${idLabels}"${dataAttr}>${mathEquation}</${blockTag}>`;
   }
 };
 
