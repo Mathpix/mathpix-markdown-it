@@ -131,7 +131,7 @@ export declare const terminatedRules: {
         terminated: string[];
     };
     abstractBlock: {
-        terminated: any[];
+        terminated: string[];
     };
     pageBreaksBlock: {
         terminated: string[];

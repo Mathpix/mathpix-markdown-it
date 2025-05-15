@@ -212,7 +212,7 @@ export const terminatedRules = {
     terminated: ['paragraph', 'newTheoremBlock']
   },
   "abstractBlock": {
-    terminated: []
+    terminated: ['paragraph']
   },
   "pageBreaksBlock": {
     terminated: ['paragraph']

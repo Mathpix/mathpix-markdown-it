@@ -154,10 +154,6 @@ export const BeginTheorem: RuleBlock = (state, startLine, endLine, silent) => {
   if (!match) {
     return false;
   }
-  /** For validation mode we can terminate immediately */
-  if (silent) {
-    return true;
-  }
   let envName = match.groups?.name ? match.groups.name : match[1];
   envName = envName ? envName.trim() : '';
   let envDescription = match.groups?.description
@@ -254,6 +250,11 @@ export const BeginTheorem: RuleBlock = (state, startLine, endLine, silent) => {
 
   if (!isCloseTagExist) {
     return false;
+  }
+
+  /** For validation mode we can terminate immediately */
+  if (silent) {
+    return true;
   }
   
   let matchE: RegExpMatchArray = lineText.match(closeTag);
