@@ -1,7 +1,6 @@
 export const SetTokensBlockParse = (state, content, startLine?, endLine?, isInline = false, contentPositions = null, forPptx = false) => {
   let token;
   let children = [];
-  debugger
   state.md.block.parse(content, state.md, state.env, children);
 
   let isFirst = true;
