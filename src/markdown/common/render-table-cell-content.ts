@@ -16,8 +16,10 @@ export const renderTableCellContent = (token, isSubTable: boolean, options, env,
         child.isSubTable = true;
       }
       let rendered = slf.renderInline([child], options, env);
-      const smoothedRendered = child.tableSmoothed?.length > 0
-        ? child.tableSmoothed.map(item => typeof item === 'string' ? item : item.join(' ')).join(' <br> ')
+      const smoothedRendered = Array.isArray(child.tableSmoothed)
+        ? child.tableSmoothed?.length > 0
+          ? child.tableSmoothed.map(item => typeof item === 'string' ? item : item.join(' ')).join(' <br> ')
+          : ''
         : rendered;
       smoothedCell += smoothedRendered;
       content += options.forPptx ? smoothedRendered : rendered;
