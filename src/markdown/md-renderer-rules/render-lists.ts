@@ -206,6 +206,9 @@ export const render_item_inline = (tokens, index, options, env, slf) => {
         tok.attrSet('data-math-in-text', "true");
       }
       content = slf.renderInline([tok], options, env);
+      if (options?.forPptx && i === 0 && ['equation_math', 'equation_math_not_number', 'display_math'].includes(tok.type)) {
+        content = '<span>&nbsp</span>' + content;
+      }
     }
     sContent +=  content
   }

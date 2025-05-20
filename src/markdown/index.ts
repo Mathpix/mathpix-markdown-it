@@ -121,38 +121,50 @@ export const markdownToHtmlPipelineSegments = (content: string, options: TMarkdo
     let content: string = '';
     const map: [number, number][] = [];
     let line: string = '';
-    let waitTag: string = '';
-    let waitLevel: number = 0;
+    let pendingCloseTag: string = '';
+    let pendingLevel: number = 0;
+
+    const isFirstBlockMathInList = (current: any, prev: any, next: any) => {
+      if (current.type !== 'paragraph_open' || prev?.type !== 'list_item_open') return false;
+      const firstChildType = next?.type === 'inline' ? next.children?.[0]?.type : null;
+      return ['equation_math', 'equation_math_not_number', 'display_math'].includes(firstChildType);
+    };
 
     for (let i = 0; i < tokens.length; i++) {
       const token = tokens[i];
+      const prevToken = tokens[i - 1];
+      const nextToken = tokens[i + 1];
+
       let rendered: string = '';
       if (token.type === 'inline') {
-        rendered = this.renderInline(tokens[i].children, options, env);
+        rendered = this.renderInline(token.children, options, env);
       } else if (typeof this.rules[token.type] !== 'undefined') {
-        rendered = this.rules[tokens[i].type](tokens, i, options, env, this);
+        rendered = this.rules[token.type](tokens, i, options, env, this);
+        if (isFirstBlockMathInList(token, prevToken, nextToken)) {
+          rendered = '<span>&nbsp</span>';
+        }
       } else {
         rendered = this.renderToken(tokens, i, options, env);
       }
 
-      if (waitTag) {
-        if (token.type === waitTag && waitLevel === token.level) {
+      if (pendingCloseTag) {
+        if (token.type === pendingCloseTag && pendingLevel === token.level) {
           line += rendered;
           const start: number = content.length;
           content += line;
           map.push([start, content.length]);
           line = '';
-          waitTag = '';
-          waitLevel = 0;
+          pendingCloseTag = '';
+          pendingLevel = 0;
           continue;
         }
         line += rendered;
         continue;
       }
 
-      if (token.type.includes('_open')) {
-        waitTag = token.type.replace('open', 'close');
-        waitLevel = token.level;
+      if (token.type.endsWith('_open')) {
+        pendingCloseTag = token.type.replace('open', 'close');
+        pendingLevel = token.level;
         line += rendered;
         continue;
       }
