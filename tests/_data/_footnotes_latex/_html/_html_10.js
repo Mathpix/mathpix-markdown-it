@@ -11,7 +11,7 @@ module.exports = "<div><sup class=\"footnote-ref\"><a href=\"#fn1\" id=\"fnref1\
   "          <p><span>First<sup class=\"footnote-ref\"><a href=\"#fn3\" id=\"fnref3:2\">[2:2]</a></sup>Last</span><span>Department</span><span>school</span><span>email@edu</span></p><p><span>First Last<sup class=\"footnote-ref\"><a href=\"#fn3\" id=\"fnref3:3\">[2:3]</a></sup></span><span>...</span></p>\n" +
   "        </div></div>\n" +
   "<div><sup class=\"footnote-ref\"><a href=\"#fn4\" id=\"fnref4\">[3]</a></sup></div>\n" +
-  "<div class=\"abstract\" style=\"width: 80%; margin: 0 auto; margin-bottom: 1em; font-size: .9em;\">\n" +
+  "<div class=\"abstract\" style=\"width: 80%; margin: 0 auto 1em auto; font-size: .9em;\">\n" +
   "<h4 id=\"abstract_head\" class=\"abstract_head\" style=\"text-align: center;\">\n" +
   "Abstract</h4>\n" +
   "<p style=\"text-indent: 1em;\"><sup class=\"footnote-ref\"><a href=\"#fn3\" id=\"fnref3:4\">[2:4]</a></sup> footnote  This is the abstract to my paper. You are going to learn a lot in this paper, just you wait. I am going to tell you about all the different LaTeX and Markdown syntax you can use in Snip.</p>\n" +

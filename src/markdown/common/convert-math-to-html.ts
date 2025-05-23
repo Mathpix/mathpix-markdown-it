@@ -68,7 +68,9 @@ export const convertMathToHtml = (state, token, options) => {
       } else {
         MathJax.Reset(begin_number);
         const data = MathJax.Typeset(math, {display: isBlock, metric: { cwidth: cwidth },
-          outMath: options.outMath, mathJax: options.mathJax, forDocx: options.forDocx,
+          outMath: options.outMath, mathJax: options.mathJax,
+          forDocx: options.forDocx,
+          forPptx: options.forPptx,
           accessibility: options.accessibility,
           nonumbers: options.nonumbers,
           renderingErrors: options.renderingErrors

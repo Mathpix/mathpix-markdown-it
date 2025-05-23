@@ -33,6 +33,7 @@ export interface optionsMathpixMarkdown {
     forDocx?: boolean;
     forLatex?: boolean;
     forMD?: boolean;
+    forPptx?: boolean;
     openLinkInNewWindow?: boolean;
     maxWidth?: string;
     toc?: TTocOptions;
@@ -82,6 +83,7 @@ export type TMarkdownItOptions = {
     forDocx?: boolean;
     forLatex?: boolean;
     forMD?: boolean;
+    forPptx?: boolean;
     openLinkInNewWindow?: boolean;
     maxWidth?: string;
     htmlWrapper?: THtmlWrapper | boolean;
@@ -214,6 +216,13 @@ declare class MathpixMarkdown_Model {
         html: string;
         size: ISize;
     };
+    markdownToHTMLSegments: (markdown: string, options?: TMarkdownItOptions) => {
+        content: string;
+        map: [
+            number,
+            number
+        ][];
+    };
     markdownToHTML: (markdown: string, options?: TMarkdownItOptions) => string;
     showTocInContainer: (html: string, containerName?: string) => void;
     getTocContainerHTML: (html: string, onlyContent?: boolean) => string;
@@ -224,7 +233,7 @@ declare class MathpixMarkdown_Model {
     convertToHTML: (str: string, options?: TMarkdownItOptions) => string;
     getMathjaxStyle: () => any;
     getMathpixStyleOnly: (scaleEquation?: boolean) => string;
-    getMathpixStyle: (stylePreview?: boolean, showToc?: boolean, tocContainerName?: string, scaleEquation?: boolean) => string;
+    getMathpixStyle: (stylePreview?: boolean, showToc?: boolean, tocContainerName?: string, scaleEquation?: boolean, isPptx?: boolean) => string;
     getMathpixMarkdownStyles: (useColors?: boolean, scaleEquation?: boolean) => string;
     getMathpixFontsStyle: () => string;
     render: (text: string, options?: optionsMathpixMarkdown) => string;

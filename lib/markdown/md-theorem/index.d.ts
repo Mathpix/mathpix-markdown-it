@@ -5,6 +5,7 @@ export declare const mappingTheorems: {
     theorem_close: string;
     proof_open: string;
     proof_close: string;
+    proof_print: string;
     qedsymbol: string;
     qedsymbol_open: string;
     qedsymbol_close: string;

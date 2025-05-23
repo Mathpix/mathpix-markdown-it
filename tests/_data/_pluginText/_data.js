@@ -3,7 +3,7 @@ module.exports = [
     latex: '\\begin{abstract} \n' +
       'Some text\n' +
       '\\end{abstract}',
-    svg: '<div class="abstract" style="width: 80%; margin: 0 auto; margin-bottom: 1em; font-size: .9em;">\n' +
+    svg: '<div class="abstract" style="width: 80%; margin: 0 auto 1em auto; font-size: .9em;">\n' +
       '<h4 id="abstract_head" class="abstract_head" style="text-align: center;">\n' +
       'Abstract</h4>\n' +
       '<p style="text-indent: 1em;">Some text</p>\n' +
@@ -17,7 +17,7 @@ module.exports = [
       '\n' +
       'Some text\n' +
       '\\end{abstract}',
-    svg: '<div class="abstract" style="width: 80%; margin: 0 auto; margin-bottom: 1em; font-size: .9em;">\n' +
+    svg: '<div class="abstract" style="width: 80%; margin: 0 auto 1em auto; font-size: .9em;">\n' +
       '<h4 id="abstract_head" class="abstract_head" style="text-align: center;">\n' +
       'Abstract</h4>\n' +
       '<p style="text-indent: 1em;">Some text</p>\n' +
@@ -101,12 +101,12 @@ module.exports = [
       '<span class="section-number">6. </span>Introduction</h2>\n' +
       '<div>Unnumbered theorem-like environments are also possible.</div>\n' +
       '<div class="theorem_block">\n' +
-      '<div class="theorem" style="font-style: normal; padding: 10px 0;"><span style="font-style: italic;" class="theorem-title">Remark.</span><span style="margin-right: 16px"></span><div style="display: inline" data-display="inline">This statement is true, I guess.</div>\n' +
+      '<div class="theorem" style="font-style: normal; padding: 10px 0;"><span style="font-style: italic;" class="theorem-title">Remark.</span><span style="margin-right: 16px"></span><div style="display: inline;" data-display="inline">This statement is true, I guess.</div>\n' +
       '</div></div>\n' +
       '<div style="margin-top: 0; margin-bottom: 1rem;">[</div>\n' +
       '<div class="proof_block">\n' +
-      '<div id="proof" class="proof" style="font-style: normal; padding: 10px 0;"><span style="font-style: italic;">Proof.</span><span style="margin-right: 10px"></span><div style="display: inline" data-display="inline">[To prove it by contradiction try and assume that the statement is false,<br>\n' +
-      'proceed from there and at some point you will arrive to a contradiction.<span style="float: right">QED</span></div>\n' +
+      '<div id="proof" class="proof" style="font-style: normal; padding: 10px 0;"><span style="font-style: italic;">Proof.</span><span style="margin-right: 10px"></span><div style="display: inline;" data-display="inline">[To prove it by contradiction try and assume that the statement is false,<br>\n' +
+      'proceed from there and at some point you will arrive to a contradiction.<span style="float: right;">QED</span></div>\n' +
       '</div></div>\n' +
       '<div>[<a href="#proof" style="cursor: pointer; text-decoration: none;" class="clickable-link" value="proof" data-parentheses="false">1</a></div>'
   },

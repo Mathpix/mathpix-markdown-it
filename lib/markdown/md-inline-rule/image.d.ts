@@ -1,4 +1,10 @@
 import { RuleInline } from 'markdown-it';
+export interface IParseImageParams {
+    attr: Array<Array<string>>;
+    align: string;
+    latex: string;
+}
+export declare const parseImageParams: (str: string, align?: string) => IParseImageParams | null;
 /** Process ![image](<src> "title")
  * Replace image inline rule:
  * Process:

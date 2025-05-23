@@ -35,7 +35,7 @@ export const getCurrentMC = (cells: string[], i: number): number => {
   return res;
 };
 
-export const getMultiColumnMultiRow = (str: string, params: {lLines: string, align: string, rLines: string}, forLatex = false): TMulti | null => {
+export const getMultiColumnMultiRow = (str: string, params: {lLines: string, align: string, rLines: string}, forLatex = false, forPptx = false): TMulti | null => {
   let attrs: Array<TAttrs> = [];
   let mr: number = 0;
   let mc: number = 0;
@@ -74,7 +74,9 @@ export const getMultiColumnMultiRow = (str: string, params: {lLines: string, ali
       h: cAlign ? cAlign[0] : '',
       v: vpos === 't' ? 'top' : vpos === 'b' ? 'bottom' : '',
     }, {left: cLeft,  right: cRight}));
-    attrs.push(['colspan', mc.toString()]);
+    if (!forPptx || mc > 1) {
+      attrs.push(['colspan', mc.toString()]);
+    }
   }
 
   if (matchMR) {
@@ -89,7 +91,9 @@ export const getMultiColumnMultiRow = (str: string, params: {lLines: string, ali
         {left: params.lLines,  right: params.rLines}))
     }
     if (mr > 0) {
-      attrs.push(['rowspan', mr.toString()]);
+      if (!forPptx || mr > 1) {
+        attrs.push(['rowspan', mr.toString()]);
+      }
     }
 
     w = w.trim().replace('*', 'auto');

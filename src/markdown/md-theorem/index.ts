@@ -129,21 +129,29 @@ const renderProofOpen = (tokens, idx, options, env, slf) => {
   const token = tokens[idx];
   const label: ILabel = token.uuid ? getLabelByUuidFromLabelsList(token.uuid) : null;
   const labelRef = label ? label.id : '';
-  const styleTile = "font-style: italic;";
   const styleBody = "font-style: normal; padding: 10px 0;";
-  let dataAttrsStyle = token.highlights?.length && token.highlightAll 
-    ? getStyleFromHighlight(token.highlights[0]) 
+  if (token.highlights?.length && token.highlightAll && tokens[idx+1]?.type === 'proof_print') {
+    tokens[idx+1].highlights = token.highlights;
+    tokens[idx+1].highlightAll = token.highlightAll;
+  }
+  return labelRef
+    ? `<div id="${labelRef}" class="proof" style="${styleBody}">`
+    : `<div class="proof" style="${styleBody}">`;
+};
+
+const renderProofPrint = (tokens, idx, options, env, slf) => {
+  const token = tokens[idx];
+  const styleTile = "font-style: italic;";
+  let dataAttrsStyle = token.highlights?.length && token.highlightAll
+    ? getStyleFromHighlight(token.highlights[0])
     : '';
   let htmlTitle = `<span style="${styleTile}${dataAttrsStyle}">Proof.</span>`;
-  const htmlSpaceMin = options.forDocx 
-  ? '<span>&nbsp;</span>'
-  : '<span style="margin-right: 10px"></span>';
+  const htmlSpaceMin = options.forDocx
+    ? '<span>&nbsp;</span>'
+    : '<span style="margin-right: 10px"></span>';
   htmlTitle += htmlSpaceMin;
-
-  return labelRef
-    ? `<div id="${labelRef}" class="proof" style="${styleBody}">` + htmlTitle
-    : `<div class="proof" style="${styleBody}">` + htmlTitle;
-};
+  return htmlTitle;
+}
 
 export const mappingTheorems = {
   newtheorem: "newtheorem",
@@ -152,6 +160,7 @@ export const mappingTheorems = {
   theorem_close: "theorem_close",
   proof_open: "proof_open",
   proof_close: "proof_close",
+  proof_print: "proof_print",
   qedsymbol: "qedsymbol",
   qedsymbol_open: "qedsymbol_open",
   qedsymbol_close: "qedsymbol_close",
@@ -176,11 +185,13 @@ export const renderTheorems = (md: MarkdownIt) => {
           return renderTheoremOpen(tokens, idx, options, env, slf);         
         case "proof_open":
           return renderProofOpen(tokens, idx, options, env, slf);
+        case "proof_print":
+          return renderProofPrint(tokens, idx, options, env, slf);
         case "theorem_close":
         case "proof_close":
           return "</div>";        
         case "qedsymbol_open":
-          return `<span style="float: right">`;        
+          return `<span style="float: right;">`;
         case "qedsymbol_close":
           return "</span>";
         case "theorem_print_open":

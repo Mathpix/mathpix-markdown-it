@@ -15,7 +15,8 @@ import {
   isMathInText
 } from './utils';
 import { openTagMML } from './common/consts';
-import {imageWithSize, renderRuleImage} from './md-inline-rule/image';
+import { imageWithSize, renderRuleImage } from './md-inline-rule/image';
+import { imageWithSizeBlock, renderRuleImageBlock } from './md-block-rule/image-block';
 import {setCounterSection} from './md-inline-rule/setcounter-section';
 import {renderTheorems} from './md-theorem';
 import {resetTheoremEnvironments} from './md-theorem/helper';
@@ -392,29 +393,34 @@ const renderMath = (tokens: Token[], idx, options) => {
   const widthEx = token?.mathData?.widthEx;
   const dataAttr = width === 'full' ? ' data-width="full"' : '';
   const dataAttrInline: string = widthEx < 2 ? ' data-overflow="visible"' : '';
+  const className = token.type === "inline_math" || token.type === "inline_mathML"
+    ? "math-inline"
+    : "math-block";
   if (token.mathData?.error && options.parserErrors !== ParserErrors.show) {
     let html: string = token.type === "inline_math" || token.type === "inline_mathML"
-      ? `<span class="math-inline"${dataAttrInline}>`
-      : `<span class="math-block"${dataAttr}>`;
+      ? `<span class=${className}${dataAttrInline}>`
+      : options.forPptx ? `<div class=${className}${dataAttr}>` : `<span class=${className}${dataAttr}>`;
     if (options.parserErrors === ParserErrors.show_input) {
       html += token.inputLatex;
     }
-    return html + '</span>';
+    html += options.forPptx && className === "math-block" ? '</div>' : '</span>';
+    return html;
   }
   const attrNumber = token.attrNumber;
   const idLabels = token.idLabels;
+  let blockTag = options.forPptx ? 'div' : 'span';
   if (token.type === "equation_math") {
     return idLabels 
-      ? `<span id="${idLabels}" class="math-block equation-number id=${idLabels}" number="${attrNumber}"${dataAttr}>${mathEquation}</span>`
-      : `<span  class="math-block equation-number " number="${attrNumber}"${dataAttr}>${mathEquation}</span>`
+      ? `<${blockTag} id="${idLabels}" class="math-block equation-number id=${idLabels}" number="${attrNumber}"${dataAttr}>${mathEquation}</${blockTag}>`
+      : `<${blockTag}  class="math-block equation-number " number="${attrNumber}"${dataAttr}>${mathEquation}</${blockTag}>`
   } else {
     return token.type === "inline_math" || token.type === "inline_mathML"
       ? idLabels
         ? `<span id="${idLabels}" class="math-inline id=${idLabels}"${dataAttrInline}>${mathEquation}</span>`
         : `<span class="math-inline ${idLabels}"${dataAttrInline}>${mathEquation}</span>`
       : idLabels
-        ? `<span id="${idLabels}" class="math-block id=${idLabels}"${dataAttr}>${mathEquation}</span>`
-        : `<span class="math-block ${idLabels}"${dataAttr}>${mathEquation}</span>`;
+        ? `<${blockTag} id="${idLabels}" class="math-block id=${idLabels}"${dataAttr}>${mathEquation}</${blockTag}>`
+        : `<${blockTag} class="math-block ${idLabels}"${dataAttr}>${mathEquation}</${blockTag}>`;
   }
 };
 
@@ -675,7 +681,7 @@ function paragraphDiv(state, startLine/*, endLine*/) {
 
   state.line = nextLine;
   token = state.push('paragraph_open', 'div', 1);
-  if (state.md.options?.forDocx) {
+  if (state.md.options?.forDocx && !state.md.options?.forPptx) {
     token.attrSet('style', 'margin-top: 0; margin-bottom: 1em;');
   }
   token.parentToken = state.env?.parentToken;
@@ -796,6 +802,10 @@ export default options => {
     }
     md.block.ruler.before('html_block', 'svg_block', svg_block,
         {alt: getTerminatedRules("svg_block")});
+    if (options?.forPptx) {
+      md.block.ruler.after("fence", 'image_with_size_block', imageWithSizeBlock,
+        {alt: getTerminatedRules("image_with_size_block")});
+    }
     md.block.ruler.before("paragraph", "paragraphDiv", paragraphDiv);
     if (!md.options.enableCodeBlockRuleForLatexCommands) {
       md.block.ruler.at("code", codeBlock);
@@ -877,6 +887,7 @@ export default options => {
     md.renderer.rules.softbreak = softBreak;    
     md.renderer.rules.hardbreak = hardBreak;
     md.renderer.rules.image = (tokens, idx, options, env, slf) => renderRuleImage(tokens, idx, options, env, slf);
+    md.renderer.rules.image_block = (tokens, idx, options, env, slf) => renderRuleImageBlock(tokens, idx, options, env, slf);
     renderTheorems(md);
   };
 };

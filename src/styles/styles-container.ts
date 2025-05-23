@@ -6,9 +6,6 @@ export const ContainerStyle = (useColors = true) => `
   *, *::before,*::after {
     box-sizing: border-box;
   }
-  @-ms-viewport {
-    width: device-width;
-  }
   body {
     margin: 0;
     ${useColors ? 'color: #1E2029;' : ''}

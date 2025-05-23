@@ -260,10 +260,10 @@ module.exports = [
       '</tr>\n' +
       '</tbody>\n' +
       '</table>\n' +
-      '<tsv style="display: none">Control\n' +
-      '37^(@)</tsv><table-markdown style="display: none">| Control |\n' +
+      '<tsv style="display: none;">Control\n' +
+      '37^(@)</tsv><table-markdown style="display: none;">| Control |\n' +
       '| :---: |\n' +
-      '| $37^{\\circ}$ |</table-markdown><csv style="display: none">Control\n' +
+      '| $37^{\\circ}$ |</table-markdown><csv style="display: none;">Control\n' +
       '37^(@)</csv></div></td>\n' +
       '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; "><div class="inline-tabular sub-table"><table class="tabular">\n' +
       '<tbody>\n' +
@@ -276,10 +276,10 @@ module.exports = [
       '</tr>\n' +
       '</tbody>\n' +
       '</table>\n' +
-      '<tsv style="display: none">40^(@)\n' +
-      '(meantS.D.M.)</tsv><table-markdown style="display: none">| $40^{\\circ}$ |\n' +
+      '<tsv style="display: none;">40^(@)\n' +
+      '(meantS.D.M.)</tsv><table-markdown style="display: none;">| $40^{\\circ}$ |\n' +
       '| :---: |\n' +
-      '| (meantS.D.M.) |</table-markdown><csv style="display: none">40^(@)\n' +
+      '| (meantS.D.M.) |</table-markdown><csv style="display: none;">40^(@)\n' +
       '(meantS.D.M.)</csv></div></td>\n' +
       '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; "><div class="inline-tabular sub-table"><table class="tabular">\n' +
       '<tbody>\n' +
@@ -292,10 +292,10 @@ module.exports = [
       '</tr>\n' +
       '</tbody>\n' +
       '</table>\n' +
-      '<tsv style="display: none">45^(@)\n' +
-      '(mean S.D.M.)</tsv><table-markdown style="display: none">| $45^{\\circ}$ |\n' +
+      '<tsv style="display: none;">45^(@)\n' +
+      '(mean S.D.M.)</tsv><table-markdown style="display: none;">| $45^{\\circ}$ |\n' +
       '| :---: |\n' +
-      '| (mean S.D.M.) |</table-markdown><csv style="display: none">45^(@)\n' +
+      '| (mean S.D.M.) |</table-markdown><csv style="display: none;">45^(@)\n' +
       '(mean S.D.M.)</csv></div></td>\n' +
       '</tr>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
@@ -391,10 +391,10 @@ module.exports = [
       '</tr>\n' +
       '</tbody>\n' +
       '</table>\n' +
-      '<tsv style="display: none">fragmentation\n' +
-      '(highly damaged)</tsv><table-markdown style="display: none">| fragmentation |\n' +
+      '<tsv style="display: none;">fragmentation\n' +
+      '(highly damaged)</tsv><table-markdown style="display: none;">| fragmentation |\n' +
       '| :--- |\n' +
-      '| (highly damaged) |</table-markdown><csv style="display: none">fragmentation\n' +
+      '| (highly damaged) |</table-markdown><csv style="display: none;">fragmentation\n' +
       '(highly damaged)</csv></div></td>\n' +
       '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">0.0</td>\n' +
       '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">0.0</td>\n' +
@@ -455,10 +455,10 @@ module.exports = [
       '</tr>\n' +
       '</tbody>\n' +
       '</table>\n' +
-      '<tsv style="display: none">\tY\n' +
-      'X\t</tsv><table-markdown style="display: none">|  | Y |\n' +
+      '<tsv style="display: none;">\tY\n' +
+      'X\t</tsv><table-markdown style="display: none;">|  | Y |\n' +
       '| :--- | ---: |\n' +
-      '| X |  |</table-markdown><csv style="display: none">,Y\n' +
+      '| X |  |</table-markdown><csv style="display: none;">,Y\n' +
       'X,</csv></div></td>\n' +
       '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; ">Ingenieur</td>\n' +
       '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; "><div class="inline-tabular sub-table"><table class="tabular">\n' +
@@ -471,10 +471,10 @@ module.exports = [
       '</tr>\n' +
       '</tbody>\n' +
       '</table>\n' +
-      '<tsv style="display: none">Betriebswir\n' +
-      't</tsv><table-markdown style="display: none">| Betriebswir |\n' +
+      '<tsv style="display: none;">Betriebswir\n' +
+      't</tsv><table-markdown style="display: none;">| Betriebswir |\n' +
       '| :---: |\n' +
-      '| t |</table-markdown><csv style="display: none">Betriebswir\n' +
+      '| t |</table-markdown><csv style="display: none;">Betriebswir\n' +
       't</csv></div></td>\n' +
       '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; ">Volkswirt</td>\n' +
       '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; "><span class="math-inline " data-overflow="visible">\n' +
@@ -498,10 +498,10 @@ module.exports = [
       '</tr>\n' +
       '</tbody>\n' +
       '</table>\n' +
-      '<tsv style="display: none">nicht\n' +
-      'geeignet</tsv><table-markdown style="display: none">| nicht |\n' +
+      '<tsv style="display: none;">nicht\n' +
+      'geeignet</tsv><table-markdown style="display: none;">| nicht |\n' +
       '| :---: |\n' +
-      '| geeignet |</table-markdown><csv style="display: none">nicht\n' +
+      '| geeignet |</table-markdown><csv style="display: none;">nicht\n' +
       'geeignet</csv></div></td>\n' +
       '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; background-size: 100% 100%;vertical-align: middle;background-image: linear-gradient(to bottom right, transparent calc(50% - 0.5px), black 50%, black 50%, transparent calc(50% + 0.5px));"><div class="diagonal-cell" style="grid-template-columns: repeat(2, 1fr); padding: 0; display: grid; height: 100%; grid-auto-rows: 1fr; min-width: max-content;"><div class="cell-item diagonal-cell-topLeft" style="grid-row-start: 1; grid-column-start: 1; text-align: left; white-space: nowrap; min-height: 1.5em;">5</div><div class="cell-item diagonal-cell-bottomRight" style="grid-row-start: 2; grid-column-start: 2; text-align: right; white-space: nowrap; min-height: 1.5em; margin-top: auto;">10</div></div></td>\n' +
       '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; background-size: 100% 100%;vertical-align: middle;background-image: linear-gradient(to bottom right, transparent calc(50% - 0.5px), black 50%, black 50%, transparent calc(50% + 0.5px));"><div class="diagonal-cell" style="grid-template-columns: repeat(2, 1fr); padding: 0; display: grid; height: 100%; grid-auto-rows: 1fr; min-width: max-content;"><div class="cell-item diagonal-cell-topLeft" style="grid-row-start: 1; grid-column-start: 1; text-align: left; white-space: nowrap; min-height: 1.5em;">5</div><div class="cell-item diagonal-cell-bottomRight" style="grid-row-start: 2; grid-column-start: 2; text-align: right; white-space: nowrap; min-height: 1.5em; margin-top: auto;">20</div></div></td>\n' +
@@ -616,10 +616,10 @@ module.exports = [
       '</tr>\n' +
       '</tbody>\n' +
       '</table>\n' +
-      '<tsv style="display: none">Second\n' +
-      'column</tsv><table-markdown style="display: none">| Second |\n' +
+      '<tsv style="display: none;">Second\n' +
+      'column</tsv><table-markdown style="display: none;">| Second |\n' +
       '| :---: |\n' +
-      '| column |</table-markdown><csv style="display: none">Second\n' +
+      '| column |</table-markdown><csv style="display: none;">Second\n' +
       'column</csv></div></td>\n' +
       '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; "><div class="inline-tabular sub-table"><table class="tabular">\n' +
       '<tbody>\n' +
@@ -631,10 +631,10 @@ module.exports = [
       '</tr>\n' +
       '</tbody>\n' +
       '</table>\n' +
-      '<tsv style="display: none">Third\n' +
-      'column</tsv><table-markdown style="display: none">| Third |\n' +
+      '<tsv style="display: none;">Third\n' +
+      'column</tsv><table-markdown style="display: none;">| Third |\n' +
       '| :---: |\n' +
-      '| column |</table-markdown><csv style="display: none">Third\n' +
+      '| column |</table-markdown><csv style="display: none;">Third\n' +
       'column</csv></div></td>\n' +
       '</tr>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
@@ -866,10 +866,10 @@ module.exports = [
       '</tr>\n' +
       '</tbody>\n' +
       '</table>\n' +
-      '<tsv style="display: none">Help define human-like\n' +
-      'quantitatively</tsv><table-markdown style="display: none">| Help define human-like |\n' +
+      '<tsv style="display: none;">Help define human-like\n' +
+      'quantitatively</tsv><table-markdown style="display: none;">| Help define human-like |\n' +
       '| :---: |\n' +
-      '| quantitatively |</table-markdown><csv style="display: none">Help define human-like\n' +
+      '| quantitatively |</table-markdown><csv style="display: none;">Help define human-like\n' +
       'quantitatively</csv></div></td>\n' +
       '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; "><div class="inline-tabular sub-table"><table class="tabular">\n' +
       '<tbody>\n' +
@@ -881,10 +881,10 @@ module.exports = [
       '</tr>\n' +
       '</tbody>\n' +
       '</table>\n' +
-      '<tsv style="display: none">Generate\n' +
-      'controlling orders</tsv><table-markdown style="display: none">| Generate |\n' +
+      '<tsv style="display: none;">Generate\n' +
+      'controlling orders</tsv><table-markdown style="display: none;">| Generate |\n' +
       '| :---: |\n' +
-      '| controlling orders |</table-markdown><csv style="display: none">Generate\n' +
+      '| controlling orders |</table-markdown><csv style="display: none;">Generate\n' +
       'controlling orders</csv></div></td>\n' +
       '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; "><div class="inline-tabular sub-table"><table class="tabular">\n' +
       '<tbody>\n' +
@@ -896,10 +896,10 @@ module.exports = [
       '</tr>\n' +
       '</tbody>\n' +
       '</table>\n' +
-      '<tsv style="display: none">Be human-like\n' +
-      'statistically</tsv><table-markdown style="display: none">| Be human-like |\n' +
+      '<tsv style="display: none;">Be human-like\n' +
+      'statistically</tsv><table-markdown style="display: none;">| Be human-like |\n' +
       '| :---: |\n' +
-      '| statistically |</table-markdown><csv style="display: none">Be human-like\n' +
+      '| statistically |</table-markdown><csv style="display: none;">Be human-like\n' +
       'statistically</csv></div></td>\n' +
       '<td style="text-align: center; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; "><div class="inline-tabular sub-table"><table class="tabular">\n' +
       '<tbody>\n' +
@@ -911,10 +911,10 @@ module.exports = [
       '</tr>\n' +
       '</tbody>\n' +
       '</table>\n' +
-      '<tsv style="display: none">Be applicable in\n' +
-      'wide scenarios</tsv><table-markdown style="display: none">| Be applicable in |\n' +
+      '<tsv style="display: none;">Be applicable in\n' +
+      'wide scenarios</tsv><table-markdown style="display: none;">| Be applicable in |\n' +
       '| :---: |\n' +
-      '| wide scenarios |</table-markdown><csv style="display: none">Be applicable in\n' +
+      '| wide scenarios |</table-markdown><csv style="display: none;">Be applicable in\n' +
       'wide scenarios</csv></div></td>\n' +
       '</tr>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +

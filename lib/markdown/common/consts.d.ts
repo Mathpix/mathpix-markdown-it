@@ -131,7 +131,7 @@ export declare const terminatedRules: {
         terminated: string[];
     };
     abstractBlock: {
-        terminated: any[];
+        terminated: string[];
     };
     pageBreaksBlock: {
         terminated: string[];
@@ -140,6 +140,9 @@ export declare const terminatedRules: {
         terminated: any[];
     };
     svg_block: {
+        terminated: string[];
+    };
+    image_with_size_block: {
         terminated: string[];
     };
     fence: {

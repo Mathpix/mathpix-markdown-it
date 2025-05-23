@@ -19,7 +19,7 @@ export interface IOuterData {
     widthEx?: number;
     heightEx?: number;
 }
-export declare const OuterHTML: (data: any, outMath: any) => string;
+export declare const OuterHTML: (data: any, outMath: any, forPptx?: boolean) => string;
 export declare const MathJax: {
     assistiveMml: boolean;
     nonumbers: boolean;

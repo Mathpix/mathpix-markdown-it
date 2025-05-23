@@ -384,7 +384,7 @@ Title <br>
       '\n' +
       '\\pagebreak\n' +
       '-\n',
-    html: `<div class="abstract" style="width: 80%; margin: 0 auto; margin-bottom: 1em; font-size: .9em;">
+    html: `<div class="abstract" style="width: 80%; margin: 0 auto 1em auto; font-size: .9em;">
 <h4 id="abstract_head" class="abstract_head" style="text-align: center;">
 Abstract</h4>
 <p style="text-indent: 1em;">- This is the abstract to my paper. You are going to learn a lot in this paper, just you wait. I am going to tell you about all the different LaTeX and Markdown syntax you can use in Snip.</p>

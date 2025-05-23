@@ -18,7 +18,8 @@ const getTerminatorRulesForFootnotes = (ruler: Ruler) => {
     "list", "footnote_def", "heading", "svg_block", "html_block", "pageBreaksBlock", "deflist",
     "BeginTable", "BeginAlign", "BeginTabular", "BeginProof",
     "BeginTheorem", "headingSection", "mathMLBlock", "pageBreaksBlock",
-    "abstractBlock"
+    "abstractBlock",
+    "image_with_size_block"
   ];
   let res = [];
   if (rules?.length) {

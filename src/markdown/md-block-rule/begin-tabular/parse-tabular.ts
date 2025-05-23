@@ -75,8 +75,11 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}): A
         ? cAlign.join('|')
         : ''
   });
-  res.push({token:'tbody_open', type:'tbody_open', tag: 'tbody', n: 1});
-
+  if (options?.forPptx) {
+    res.push({token:'tbody_open', type:'tbody_open', tag: 'tbody', n: 1, attrs: [['data_num_col', numCol.toString()]]});
+  } else {
+    res.push({token:'tbody_open', type:'tbody_open', tag: 'tbody', n: 1});
+  }
 
   let MR: Array<number> = new Array(numCol).fill(0);
   for (let i = 0; i < rows.length; i++) {
@@ -87,6 +90,10 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}): A
           latex: forLatex && data && data.sLines && data.sLines.length > i ? data.sLines[i] : ''
         });
         for (let k = 0; k < numCol; k++) {
+          if (options?.forPptx && MR[k] && MR[k] > 0) {
+            MR[k] = MR[k] > 0 ? MR[k] - 1 : 0;
+            continue;
+          }
           let cRight = k === numCol-1 ?  cLines[cLines.length-1] :cLines[k+1];
           let cLeft = k === 0 ? cLines[0] : '';
           const data = AddTd('', {h: cAlign[k], v: vAlign[k], w: cWidth[k]},
@@ -134,7 +141,7 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}): A
 
 
       if (cells[j] && cells[j].trim().length > 0) {
-        const multi = getMultiColumnMultiRow(cells[j], {lLines: cLines[ic], align: cAlign[ic], rLines: cRight}, forLatex);
+        const multi = getMultiColumnMultiRow(cells[j], {lLines: cLines[ic], align: cAlign[ic], rLines: cRight}, forLatex, options?.forPptx);
         if (multi) {
           let mr = multi.mr > rows.length ? rows.length : multi.mr;
           let mc = multi.mc > numCol ? numCol : multi.mc;

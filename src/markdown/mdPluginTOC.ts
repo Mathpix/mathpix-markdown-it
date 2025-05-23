@@ -61,7 +61,7 @@ const tocHide: RuleInline = (state, silent) => {
 };
 
 const renderTocOpen: Renderer = () => {
-  return `<div class="table-of-contents" style="display: none">`;
+  return `<div class="table-of-contents" style="display: none;">`;
 };
 
 const renderTocClose: Renderer = () => {

@@ -84,6 +84,11 @@ const StatePushPatagraphOpenTable = (state, startLine: number, nextLine: number,
     token.attrs = [['class', 'table'],
       ['number', currentNumber.toString()]];
   }
+  if (state.md.options?.forPptx) {
+    if (type === TBegin.table || type === TBegin.figure) {
+      token.attrJoin("class", `latex-${type}`);
+    }
+  }
   state.env.number = currentNumber;
   state.env.type = type;
   token.uuid = uid();

@@ -1,8 +1,9 @@
-export const SetTokensBlockParse = (state, content, startLine?, endLine?, isInline = false, contentPositions = null) => {
+export const SetTokensBlockParse = (state, content, startLine?, endLine?, isInline = false, contentPositions = null, forPptx = false) => {
   let token;
   let children = [];
   state.md.block.parse(content, state.md, state.env, children);
 
+  let isFirst = true;
   for (let j = 0; j < children.length; j++) {
     const child = children[j];
     token = state.push(child.type, child.tag, child.nesting);
@@ -13,10 +14,10 @@ export const SetTokensBlockParse = (state, content, startLine?, endLine?, isInli
         if (style) {
           token.attrSet('style', `display: inline; ` + style);
         } else {
-          token.attrs.push(['style', `display: inline`]);
+          token.attrs.push(['style', `display: inline;`]);
         }
       } else {
-        token.attrSet('style', `display: inline`);
+        token.attrSet('style', `display: inline;`);
       }
       token.attrSet('data-display', 'inline');
     }
@@ -31,5 +32,10 @@ export const SetTokensBlockParse = (state, content, startLine?, endLine?, isInli
     }
     token.content = child.content;
     token.children = child.children;
+
+    if (forPptx && isInline && isFirst && token.type === "paragraph_close") {
+      token = state.push('paragraph_close', 'div', -1);
+      isFirst = false;
+    }
   }
 };
