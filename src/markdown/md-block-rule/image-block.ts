@@ -1,5 +1,7 @@
 import { RuleBlock, StateBlock } from 'markdown-it';
 import { IParseImageParams, parseImageParams } from "../md-inline-rule/image";
+const imageMarkdownRegex: RegExp = /^!\[([^\]]*)\]\(([^)]+)\)(\s*\{([^}]+)\})?/;
+const linkAndTitleRegex: RegExp = /^([^" ]+)\s+"(.+)"$/;
 
 export const imageWithSizeBlock: RuleBlock = (state: StateBlock, startLine, endLine, silent) => {
   const pos = state.bMarks[startLine] + state.tShift[startLine];
@@ -9,7 +11,7 @@ export const imageWithSizeBlock: RuleBlock = (state: StateBlock, startLine, endL
   if (state.src.charCodeAt(pos + 1) !== 0x5B /* [ */) return false;
 
   const line = state.src.slice(pos, max);
-  const match = line.match(/^!\[([^\]]*)\]\(([^)]+)\)(\s*\{([^}]+)\})?/);
+  const match = line.match(imageMarkdownRegex);
 
   if (!match) return false;
 
@@ -18,7 +20,7 @@ export const imageWithSizeBlock: RuleBlock = (state: StateBlock, startLine, endL
   const [, alt, linkAndTitle, , paramStr] = match;
 
   let href = '', title = '';
-  const titleMatch = linkAndTitle.match(/^([^" ]+)\s+"(.+)"$/);
+  const titleMatch = linkAndTitle.match(linkAndTitleRegex);
   if (titleMatch) {
     href = titleMatch[1];
     title = titleMatch[2];
