@@ -1,4 +1,4 @@
 import { ISmilesOptions } from './index';
 export declare const ChemistryDrawer: {
-    drawSvgSync: (content: string, id: string, options?: ISmilesOptions) => string;
+    drawSvgSync: (content: string, id: string, options?: ISmilesOptions, injectSizeAttributes?: boolean) => string;
 };

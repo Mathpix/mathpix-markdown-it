@@ -74,7 +74,7 @@ module.exports = [
       '<div>[<div class="author">\n' +
       '          <p><span>Author[^1]</span></p>\n' +
       '        </div></div>\n' +
-      '<div>[<div class="smiles-inline" style="display: inline-block"><svg id="smiles-" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 112 56.099999999999994" style="width: 112.19999999999999px; overflow: visible;"><defs></defs><mask id="text-mask"><rect x="0" y="0" width="100%" height="100%" fill="white"></rect><circle cx="56.099999999999994" cy="28.049999999999997" r="10.518749999999999" fill="black"></circle></mask><style>\n' +
+      '<div>[<div class="smiles-inline" style="display: inline-block;"><svg id="smiles-" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 112 56.099999999999994" style="width: 112.19999999999999px; overflow: visible;"><defs></defs><mask id="text-mask"><rect x="0" y="0" width="100%" height="100%" fill="white"></rect><circle cx="56.099999999999994" cy="28.049999999999997" r="10.518749999999999" fill="black"></circle></mask><style>\n' +
       '                .element {\n' +
       '                    font: 18.7px Helvetica, Arial, sans-serif;\n' +
       '                    alignment-baseline: \'middle\';\n' +

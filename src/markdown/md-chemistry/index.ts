@@ -188,7 +188,7 @@ const renderSmilesDrawerBlock = (tokens, idx, options, env, slf) => {
     : '';
 
   let resSvg = include_svg || options.forDocx
-    ? ChemistryDrawer.drawSvgSync(token.content.trim(), id, options)
+    ? ChemistryDrawer.drawSvgSync(token.content.trim(), id, options, options.forPptx)
     : '';
 
 
@@ -227,7 +227,7 @@ const renderSmilesDrawerInline = (tokens, idx, options, env, slf) => {
     : '';
 
   let resSvg = include_svg || options.forDocx
-    ? ChemistryDrawer.drawSvgSync(token.content.trim(), id, options)
+    ? ChemistryDrawer.drawSvgSync(token.content.trim(), id, options, options.forPptx)
     : '';
 
   if ( resSvg && (options.forDocx || options.forLatex ) ) {
@@ -242,7 +242,7 @@ const renderSmilesDrawerInline = (tokens, idx, options, env, slf) => {
   const maxWidth = options.maxWidth ? ` max-width: ${options.maxWidth}; overflow-x: auto;` : '';
   return maxWidth
     ? `<div class="smiles-inline" style="display: inline-block;${maxWidth}">${outputSmiles}${resSvg}</div>`
-    : `<div class="smiles-inline" style="display: inline-block">${outputSmiles}${resSvg}</div>`;
+    : `<div class="smiles-inline" style="display: inline-block;">${outputSmiles}${resSvg}</div>`;
 };
 
 export default (md: MarkdownIt, options) => {
