@@ -28,7 +28,7 @@ module.exports = [
     describe: 'before \\begin{abstract}',
     mmd: '<span class="page-3 scroll-percentage-11 h-0 w-0 overflow-hidden"></span>\\begin{abstract}Text\n' +
       '\\end{abstract}',
-    html: '<span class="page-3 scroll-percentage-11 h-0 w-0 overflow-hidden"></span><div class="abstract" style="width: 80%; margin: 0 auto; margin-bottom: 1em; font-size: .9em;">\n' +
+    html: '<span class="page-3 scroll-percentage-11 h-0 w-0 overflow-hidden"></span><div class="abstract" style="width: 80%; margin: 0 auto 1em auto; font-size: .9em;">\n' +
       '<h4 id="abstract_head" class="abstract_head" style="text-align: center;">\n' +
       'Abstract</h4>\n' +
       '<p style="text-indent: 1em;">Text</p>\n' +
@@ -39,7 +39,7 @@ module.exports = [
     mmd: '\\begin{abstract}<span class="page-3 scroll-percentage-11 h-0 w-0 overflow-hidden"></span>\n' +
       'Text\n' +
       '\\end{abstract}',
-    html: '<div class="abstract" style="width: 80%; margin: 0 auto; margin-bottom: 1em; font-size: .9em;">\n' +
+    html: '<div class="abstract" style="width: 80%; margin: 0 auto 1em auto; font-size: .9em;">\n' +
       '<h4 id="abstract_head" class="abstract_head" style="text-align: center;">\n' +
       'Abstract</h4>\n' +
       '<p style="text-indent: 1em;"><span class="page-3 scroll-percentage-11 h-0 w-0 overflow-hidden"></span>Text</p>\n' +
@@ -51,7 +51,7 @@ module.exports = [
     mmd: '<span class="page-3 scroll-percentage-11 h-0 w-0 overflow-hidden"></span>\\begin{abstract}<span class="page-3 scroll-percentage-11 h-0 w-0 overflow-hidden"></span>\n' +
       'This is the abstract to my paper. You are going to learn a lot in this paper, just you<span class="page-3 scroll-percentage-12 h-0 w-0 overflow-hidden"></span> wait. I am going to tell you about all the different LaTeX and Markdown syntax you<span class="page-3 scroll-percentage-14 h-0 w-0 overflow-hidden"></span> can use in Snip.\n' +
       '\\end{abstract}<span class="page-3 scroll-percentage-19 h-0 w-0 overflow-hidden"></span>',
-    html: '<span class="page-3 scroll-percentage-11 h-0 w-0 overflow-hidden"></span><div class="abstract" style="width: 80%; margin: 0 auto; margin-bottom: 1em; font-size: .9em;">\n' +
+    html: '<span class="page-3 scroll-percentage-11 h-0 w-0 overflow-hidden"></span><div class="abstract" style="width: 80%; margin: 0 auto 1em auto; font-size: .9em;">\n' +
       '<h4 id="abstract_head" class="abstract_head" style="text-align: center;">\n' +
       'Abstract</h4>\n' +
       '<p style="text-indent: 1em;"><span class="page-3 scroll-percentage-11 h-0 w-0 overflow-hidden"></span>This is the abstract to my paper. You are going to learn a lot in this paper, just you<span class="page-3 scroll-percentage-12 h-0 w-0 overflow-hidden"></span> wait. I am going to tell you about all the different LaTeX and Markdown syntax you<span class="page-3 scroll-percentage-14 h-0 w-0 overflow-hidden"></span> can use in Snip.</p>\n' +

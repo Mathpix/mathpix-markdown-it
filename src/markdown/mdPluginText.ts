@@ -272,7 +272,7 @@ export const headingSection: RuleBlock = (state, startLine: number, endLine: num
       level = 1;
       type = "title";
       className = "main-title";
-      attrStyle = 'text-align: center; margin: 0 auto; line-height: 1.2; margin-bottom: 1em;';
+      attrStyle = 'text-align: center; margin: 0 auto 1em auto; line-height: 1.2;';
       break;
     case "section":
       level = 2;
@@ -634,7 +634,7 @@ const abstractBlock: RuleBlock = (state, startLine, endLine, silent) => {
   token = state.push('paragraph_open', 'div', 1);
   token.map = [startLine, nextLine];
   token.attrSet('class', 'abstract');
-  token.attrSet('style', 'width: 80%; margin: 0 auto; margin-bottom: 1em; font-size: .9em;');
+  token.attrSet('style', 'width: 80%; margin: 0 auto 1em auto; font-size: .9em;');
   token.mmd_type = 'abstract';
 
   token = state.push('heading_open', 'h4', 1);

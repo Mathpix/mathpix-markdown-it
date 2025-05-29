@@ -848,7 +848,7 @@ module.exports = [
       '</tr>\n' +
       '</tbody>\n' +
       '</table>\n' +
-      '<tsv style="display: none">1\n' +
+      '<tsv style="display: none;">1\n' +
       '2\n' +
       '3\n' +
       '4</tsv></div></td>\n' +
@@ -868,7 +868,7 @@ module.exports = [
       '</tr>\n' +
       '</tbody>\n' +
       '</table>\n' +
-      '<tsv style="display: none">2\n' +
+      '<tsv style="display: none;">2\n' +
       '5\n' +
       '9\n' +
       '8</tsv></div></td>\n' +
@@ -891,7 +891,7 @@ module.exports = [
       '</tr>\n' +
       '</tbody>\n' +
       '</table>\n' +
-      '<tsv style="display: none">1\n' +
+      '<tsv style="display: none;">1\n' +
       '2\n' +
       '3\n' +
       '4</tsv></div></td>\n' +
@@ -911,7 +911,7 @@ module.exports = [
       '</tr>\n' +
       '</tbody>\n' +
       '</table>\n' +
-      '<tsv style="display: none">31\n' +
+      '<tsv style="display: none;">31\n' +
       '23\n' +
       '16\n' +
       '42</tsv></div></td>\n' +

@@ -33,7 +33,7 @@ const StatePushDivError = (state, startLine: number, nextLine: number, content: 
     token.attrs = [['class', 'math-error ']];
   }
   if (state.md.options.parserErrors === ParserErrors.hide) {
-    token.attrSet('style', 'display: none')
+    token.attrSet('style', 'display: none;')
   }
   token.map = [startLine, state.line];
 

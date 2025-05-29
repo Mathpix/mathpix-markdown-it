@@ -212,7 +212,7 @@ export const terminatedRules = {
     terminated: ['paragraph', 'newTheoremBlock']
   },
   "abstractBlock": {
-    terminated: []
+    terminated: ['paragraph']
   },
   "pageBreaksBlock": {
     terminated: ['paragraph']
@@ -221,6 +221,9 @@ export const terminatedRules = {
     terminated: []
   },
   "svg_block": {
+    terminated: ['paragraph']
+  },
+  "image_with_size_block": {
     terminated: ['paragraph']
   },
   "fence": {

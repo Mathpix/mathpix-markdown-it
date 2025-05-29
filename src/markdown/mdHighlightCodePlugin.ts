@@ -49,7 +49,7 @@ const wrapFence = render => (tokens, idx, options, env, slf) => {
     .replace('<code>', '<code class="hljs">')
   let htmlMol: string = '';
   if (tokens[idx].info === "mol" && options?.outMath?.include_mol) {
-    htmlMol = '<mol style="display: none">' + tokens[idx].content + '</mol>';
+    htmlMol = '<mol style="display: none;">' + tokens[idx].content + '</mol>';
     html = html
         .replace('</pre>', htmlMol + '</pre>')
   }

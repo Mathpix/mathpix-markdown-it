@@ -5,7 +5,7 @@ import { parseLinkDestination } from '../../helpers/parze_link_destination';
 const percentageRegex = /([\d.]+)%/i;
 const sizeRegex = /([\d.]+)(px|pt|em|cm|mm|in)/i;
 
-interface IParseImageParams {
+export interface IParseImageParams {
   attr: Array<Array<string>>, 
   align: string,
   latex: string
@@ -31,7 +31,7 @@ const getSizeValue = (strVal: string, latexLength: string = '\\textwidth'): {lat
   }
 };
 
-const parseImageParams = (str: string, align: string=''): IParseImageParams| null => {
+export const parseImageParams = (str: string, align: string=''): IParseImageParams| null => {
   if (!str) { 
     return null;
   }

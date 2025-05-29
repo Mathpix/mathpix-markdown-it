@@ -6,7 +6,7 @@ import { setFontSize, setDisableColors, setThemesByDefault, getScale } from './c
 
 export const ChemistryDrawer = {
   drawSvgSync: function(content: string, id: string,
-                        options: ISmilesOptions = {}): string {
+                        options: ISmilesOptions = {}, injectSizeAttributes = false): string {
     initDocument();
     const { theme = 'light', stretch, fontSize = 14,
       disableColors = true, autoScale, useCurrentColor = true
@@ -43,10 +43,18 @@ export const ChemistryDrawer = {
       const svg = svgDrawer.draw(tree, output_svg, theme, false);
 
       if (!stretch && svgDrawer.svgWrapper?.drawingWidth) {
-        svg.style.width = `${svgDrawer.svgWrapper?.drawingWidth * scale}px`;
+        let width = svgDrawer.svgWrapper?.drawingWidth * scale;
+        svg.style.width = `${width}px`;
+        if (injectSizeAttributes) {
+          svg.setAttribute('width', width);
+        }
       }
       if (!stretch && !options.isTesting && svgDrawer.svgWrapper?.drawingHeight) {
-        svg.style.height = `${svgDrawer.svgWrapper?.drawingHeight * scale}px`;
+        let height = svgDrawer.svgWrapper?.drawingHeight * scale;
+        svg.style.height = `${height}px`;
+        if (injectSizeAttributes) {
+          svg.setAttribute('height', height);
+        }
       }
       svg.style.overflow = 'visible';
 

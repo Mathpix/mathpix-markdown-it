@@ -40,14 +40,18 @@ export const renderInlineTokenBlock = (tokens, options, env, slf, isSubTable = f
   let arrTsv = [];
   let arrCsv = [];
   let arrMd = [];
+  let arrSmoothed = [];
   let arrRow = [];
   let arrRowCsv = [];
   let arrRowMd = [];
+  let arrRowSmoothed = [];
   let cell = '';
   let cellCsv = '';
   let cellMd= '';
+  let cellSmoothed= '';
   let align = '';
   let colspan = 0, rowspan = [], mr = 0;
+  let numCol = 0;
 
   for (let idx = 0; idx < tokens.length; idx++) {
     let token = tokens[idx];
@@ -62,9 +66,11 @@ export const renderInlineTokenBlock = (tokens, options, env, slf, isSubTable = f
       arrTsv = [];
       arrCsv = [];
       arrMd = [];
+      arrSmoothed = [];
       arrRow = [];
       arrRowCsv = [];
       arrRowMd = [];
+      arrRowSmoothed = [];
       if (!align) {
         align = token.latex;
       }
@@ -74,11 +80,13 @@ export const renderInlineTokenBlock = (tokens, options, env, slf, isSubTable = f
       arrRow = [];
       arrRowCsv = [];
       arrRowMd = [];
+      arrRowSmoothed = [];
     }
     if (token.token === 'tr_close') {
       arrTsv.push(arrRow);
       arrCsv.push(arrRowCsv);
       arrMd.push(arrRowMd);
+      arrSmoothed.push(arrRowSmoothed);
       const l = arrRow &&  arrRow.length > 0 ? arrRow.length  : 0;
       const l2 = rowspan &&  rowspan.length > 0 ? rowspan.length  : 0;
       if (l < l2) {
@@ -89,11 +97,13 @@ export const renderInlineTokenBlock = (tokens, options, env, slf, isSubTable = f
                 arrRow.push('');
                 arrRowCsv.push('');
                 arrRowMd.push('');
+                arrRowSmoothed.push('');
               }
             } else {
               arrRow.push('');
               arrRowCsv.push('');
               arrRowMd.push('');
+              arrRowSmoothed.push('');
             }
             rowspan[k][0] -= 1;
           }
@@ -121,6 +131,7 @@ export const renderInlineTokenBlock = (tokens, options, env, slf, isSubTable = f
       cell = '';
       cellCsv = '';
       cellMd = '';
+      cellSmoothed = '';
       colspan = tokenAttrGet(token, 'colspan');
       colspan = colspan ? Number(colspan) : 0 ;
       mr = tokenAttrGet(token, 'rowspan');
@@ -143,11 +154,13 @@ export const renderInlineTokenBlock = (tokens, options, env, slf, isSubTable = f
                 arrRow.push('');
                 arrRowCsv.push('');
                 arrRowMd.push('');
+                arrRowSmoothed.push('');
               }
             } else {
               arrRow.push('');
               arrRowCsv.push('');
               arrRowMd.push('');
+              arrRowSmoothed.push('');
             }
             if (rowspan[k] && rowspan[k][0]) {
               rowspan[k][0] -= 1;
@@ -165,15 +178,18 @@ export const renderInlineTokenBlock = (tokens, options, env, slf, isSubTable = f
         arrRow.push(cell);
         arrRowCsv.push(cellCsv);
         arrRowMd.push(cellMd);
+        arrRowSmoothed.push(cellSmoothed);
       } else {
         arrRow.push(cell);
         arrRowCsv.push(cellCsv);
         arrRowMd.push(cellMd);
+        arrRowSmoothed.push(cellSmoothed);
         if (colspan && colspan > 1) {
           for (let i = 0; i < colspan-1; i++) {
             arrRow.push('');
             arrRowCsv.push('');
             arrRowMd.push('');
+            arrRowSmoothed.push('');
           }
         }
         if (mr && mr > 1) {
@@ -190,18 +206,41 @@ export const renderInlineTokenBlock = (tokens, options, env, slf, isSubTable = f
         cell += data.tsv;
         cellCsv += data.csv;
         cellMd += data.tableMd;
+        cellSmoothed += data.tableSmoothed;
       } else {
         content = slf.renderInline([{type: 'text', content: token.content}], options, env);
         cell += content;
         cellCsv += content;
         cellMd += content;
+        cellSmoothed += content;
       }
       result += content;
       continue;
     }
+    let tokenTag = token.tag;
+    let sizerTr = '';
+    if (options?.forPptx) {
+      if (token.tag === 'tbody') {
+        numCol = tokenAttrGet(token, 'data_num_col');
+        numCol = numCol ? Number(numCol) : 0 ;
+        if (numCol) {
+          sizerTr += '<tr class="tr-sizer">';
+          for (let i = 0; i < numCol; i++) {
+            sizerTr += '<td class="td_empty">x</td>';
+          }
+          sizerTr += '</tr>';
+        }
+      }
+    }
     // Add token name, e.g. `<img`
-    result += (token.n === -1 ? '</' : '<') + token.tag;
+    result += (token.n === -1 ? '</' : '<') + tokenTag;
 
+    if (options?.forPptx && token.token === 'td_open' && tokens[idx+1]?.token === 'td_close') {
+      let className = tokenAttrGet(token, 'class');
+      className += className ? ' ' : '';
+      className += 'td_empty';
+      tokenAttrSet(token, 'class', className);
+    }
     // Encode attributes, e.g. `<img src="foo"`
     result += slf.renderAttrs(token);
 
@@ -231,12 +270,21 @@ export const renderInlineTokenBlock = (tokens, options, env, slf, isSubTable = f
     }
 
     result += needLf ? '>\n' : '>';
+    if (options?.forPptx) {
+      if (sizerTr) {
+        result += sizerTr;
+      }
+      if (token.token === 'td_open' && tokens[idx+1]?.token === 'td_close') {
+        result += 'x'
+      }
+    }
   }
   return {
     table: result, 
     tsv:  arrTsv, 
     csv:  arrCsv,
     tableMd: arrMd, 
+    tableSmoothed: arrSmoothed,
     align: align
   };
 };
@@ -257,6 +305,7 @@ export const renderTabularInline = (a, token, options, env, slf) => {
   token.tsv = data.tsv;
   token.csv = data.csv;
   token.tableMd = data.tableMd;//tableMarkdownJoin(data.tableMd, data.align);
+  token.tableSmoothed = data.tableSmoothed;
   let className = 'inline-tabular';
   className += token.isSubTable ? ' sub-table' : '';
 
@@ -264,13 +313,13 @@ export const renderTabularInline = (a, token, options, env, slf) => {
     tabular = data.table;
   }
   const tsv = include_tsv && token.tsv
-    ? `<tsv style="display: none">${formatSource(TsvJoin(token.tsv,options), true)}</tsv>`
+    ? `<tsv style="display: none;">${formatSource(TsvJoin(token.tsv,options), true)}</tsv>`
     : '';
   const tableMd = include_table_markdown && token.tableMd
-    ? `<table-markdown style="display: none">${formatSource(tableMarkdownJoin(data.tableMd, data.align), true)}</table-markdown>`
+    ? `<table-markdown style="display: none;">${formatSource(tableMarkdownJoin(data.tableMd, data.align), true)}</table-markdown>`
     : '';
   const csv = include_csv && token.csv
-    ? `<csv style="display: none">${formatSource(CsvJoin(token.csv,options), true)}</csv>`
+    ? `<csv style="display: none;">${formatSource(CsvJoin(token.csv,options), true)}</csv>`
     : '';
   return `<div class="${className}">${tabular}${tsv}${tableMd}${csv}</div>`
 };
