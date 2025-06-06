@@ -90,6 +90,6 @@ module.exports = [
       '\\includegraphics[width=0.5\\textwidth]{https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Cappuccino_at_Sightglass_Coffee.jpg/1599px-Cappuccino_at_Sightglass_Coffee.jpg}\n' +
       '\\end{figure}',
     html:  `<div class="table" number="1" style="text-align: center">
-<div class=caption_figure>Figure: The caption is at the top.</div><div class="figure_img" style="text-align: center; "><img src=https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Cappuccino_at_Sightglass_Coffee.jpg/1599px-Cappuccino_at_Sightglass_Coffee.jpg  style="width: 600px; "></div></div>`
+<div class=caption_figure>Figure: The caption is at the top.</div><div class="figure_img" style="text-align: center; "><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Cappuccino_at_Sightglass_Coffee.jpg/1599px-Cappuccino_at_Sightglass_Coffee.jpg"  style="width: 600px; "></div></div>`
   },
 ];

@@ -50,7 +50,7 @@ export const IncludeGraphics = (a, token, slf, width, options) => {
     styleImg  += `max-width: ${0.5 * textWidth}px; `;
   }
 
-  const src = token.attrGet('src') ? `src=${token.attrGet('src')}` : '';
+  const src = token.attrGet('src') ? `src="${token.attrGet('src')}"` : '';
   const alt = '';
 
   styleImg = styleImg ? `style="${styleImg}"` : '';

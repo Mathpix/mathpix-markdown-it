@@ -127,6 +127,7 @@ export const imageWithSize: RuleInline = (state, silent) => {
   let pathOrigin: string = '';
   let attrsStyles = [];
   let params: IParseImageParams = null;
+  let meta = {};
 
   if (state.src.charCodeAt(state.pos) !== 0x21/* ! */) { return false; }
   if (state.src.charCodeAt(state.pos + 1) !== 0x5B/* [ */) { return false; }
@@ -236,6 +237,9 @@ export const imageWithSize: RuleInline = (state, silent) => {
       pos = oldPosParam;
     } else {
       if (strParams?.trim()) {
+        meta = {
+          paramsContent: strParams
+        };
         strParams = strParams
           .replace('{', '')
           .replace('}', '');
@@ -314,6 +318,7 @@ export const imageWithSize: RuleInline = (state, silent) => {
       start: 0,
       end: pos
     };
+    token.meta = meta;
     if (params?.latex) {
       token.latex = params.latex;
     }
