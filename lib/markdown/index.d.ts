@@ -1,4 +1,6 @@
 import { TMarkdownItOptions } from '../mathpix-markdown-model';
+/** md renderer */
+export declare const mdInit: (options: TMarkdownItOptions) => any;
 /**
  * Converts Markdown content to segmented HTML with position mapping.
  *

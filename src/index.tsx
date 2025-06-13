@@ -46,6 +46,7 @@ import {
 } from "./markdown/common/labels";
 
 import { normalizeLink } from './helpers/normalize-link';
+import { mdInit } from './markdown';
 
 export {
   MathpixLoader, MathpixMarkdown, MathpixMarkdownModel,
@@ -65,6 +66,7 @@ export {
   Footnotes,
   eLabelType, ILabel, getLabelsList, getLabelByKeyFromLabelsList, clearLabelsList,
   normalizeLink,
-  RenderOptions
+  RenderOptions,
+  mdInit
 };
 

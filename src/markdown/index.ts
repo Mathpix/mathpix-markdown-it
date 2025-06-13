@@ -8,7 +8,7 @@ import { applyRulesToDisableRules, getDisableRuleTypes, getListToDisableByOption
 import { eMmdRuleType } from "./common/mmdRules";
 
 /** md renderer */
-const mdInit = (options: TMarkdownItOptions) => {
+export const mdInit = (options: TMarkdownItOptions) => {
   const {htmlTags = false, htmlDisableTagMatching = false, xhtmlOut = false, width = 1200, breaks = true, typographer = true, linkify = true,
           outMath = {}, mathJax = {}, renderElement = {},
           lineNumbering = false, startLine = 0, htmlSanitize = true, smiles = {},
