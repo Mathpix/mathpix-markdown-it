@@ -102,6 +102,7 @@ export const lineSpaceTag: RegExp = new RegExp(
   ].join("|"),
   "g"
 );
+export const RE_CAPTION_SETUP_TAG_BEGIN: RegExp = /\\captionsetup\s{0,}\{/;
 
 export const HIGHLIGHT_COLOR = 'rgba(0, 147, 255, 0.25)';
 export const HIGHLIGHT_TEXT_COLOR = '#1e2029';

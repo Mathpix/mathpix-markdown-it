@@ -1,4 +1,4 @@
-import { terminatedRules } from './common/consts';
+import { RE_CAPTION_SETUP_TAG_BEGIN, terminatedRules } from './common/consts';
 import { findBackTick } from "./utils";
 
 const hasProp = Object.prototype.hasOwnProperty;
@@ -199,6 +199,64 @@ export const removeCaptionsFromTableAndFigure = (content: string) => {
     content: content.slice(0, startCaption) + content.slice(endCaption),
     isNotCaption: false
   };
+}
+
+const parseCaptionSetupArgs = (argStr: string): Record<string, string> => {
+  const args: Record<string, string> = {};
+  const parts = argStr.split(',').map(p => p.trim());
+  for (const part of parts) {
+    const [key, value] = part.split('=').map(s => s.trim());
+    if (key && value) {
+      args[key] = value;
+    }
+  }
+  return args;
+}
+
+export const removeCaptionsSetupFromTableAndFigure = (content: string) => {
+  let isLabelFormatEmpty: boolean = false;
+  try {
+    let matchCaption = content.match(RE_CAPTION_SETUP_TAG_BEGIN);
+    if (!matchCaption) {
+      return { content, isLabelFormatEmpty };
+    }
+    let data = findEndMarker(content, matchCaption.index + matchCaption[0].length - 1);
+    if (!data.res) {
+      return { content, isLabelFormatEmpty };
+    }
+    if (data.content) {
+      const argsObj: Record<string, string> = parseCaptionSetupArgs(data.content);
+      if (argsObj.labelformat === 'empty') {
+        isLabelFormatEmpty = true;
+      }
+    }
+    let start: number = matchCaption.index > 0 ? matchCaption.index - 1 : matchCaption.index;
+    while (start > 0) {
+      const beforeStartMarker = content.charCodeAt(start);
+      if (!(beforeStartMarker  === 0x20 /* space */ || beforeStartMarker  === 0x09 /* \t */ || beforeStartMarker  === 0x0a /* \n */)) {
+        start += 1;
+        break;
+      }
+      start--;
+    }
+    let end: number = data.nextPos;
+    while (end < content.length) {
+      const afterEndMarker = content.charCodeAt(end);
+      if (!(afterEndMarker  === 0x20 /* space */ || afterEndMarker  === 0x09 /* \t */ || afterEndMarker  === 0x0a /* \n */)) {
+        break;
+      }
+      end++;
+    }
+    return {
+      content: content.slice(0, start) + content.slice(end),
+      isLabelFormatEmpty
+    };
+  } catch (err) {
+    return {
+      content,
+      isLabelFormatEmpty
+    }
+  }
 }
 
 export const checkTagOutsideInlineCode = (text: string, regex: RegExp): boolean => {

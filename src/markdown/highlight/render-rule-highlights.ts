@@ -171,9 +171,10 @@ export const renderMathHighlight = (tokens, idx, options, env, slf) => {
 
 export const captionTableHighlight = (tokens, idx, options, env, slf) => {
   const token = tokens[idx];
+  const className = token.attrGet('class') || 'caption_table';
+  const printText = token.print ?? '';
   if (token.highlights?.length) {
     if (needToHighlightAll(token)) {
-      let htmlPrint = token.print ? token.print : '';
       if (token.children?.length) {
         for (let i = 0; i < token.children.length; i++) {
           token.children[i].highlights = [];
@@ -183,11 +184,9 @@ export const captionTableHighlight = (tokens, idx, options, env, slf) => {
       let htmlCaption = token.children?.length
         ? slf.renderInline(token.children, options, env)
         : token.content;
-      let html = `<div class=${token.attrGet('class')
-        ? token.attrGet('class')
-        : "caption_table"}>`;
+      let html = `<div class="${className}">`;
       html += '<span class="mmd-highlight" style="' + getStyleFromHighlight(token.highlights[0]) + '">';
-      html += htmlPrint;
+      html += printText;
       html += htmlCaption;
       html += '</span>';
       html += '</div>';
@@ -196,15 +195,10 @@ export const captionTableHighlight = (tokens, idx, options, env, slf) => {
     let htmlCaption = token.children?.length
       ? slf.renderInline(token.children, options, env)
       : token.content;
-    return `<div class=${token.attrGet('class')
-      ? token.attrGet('class')
-      : "caption_table"}>${token.print}${htmlCaption}</div>`
+    return `<div class="${className}">${token.print}${htmlCaption}</div>`
   }
-  let htmlPrint = token.print ? token.print : '';
   let htmlCaption = token.children?.length
     ? slf.renderInline(token.children, options, env)
     : token.content;
-  return `<div class=${token.attrGet('class')
-    ? token.attrGet('class')
-    : "caption_table"}>${htmlPrint}${htmlCaption}</div>`
+  return `<div class="${className}">${printText}${htmlCaption}</div>`
 };

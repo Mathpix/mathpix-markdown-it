@@ -112,7 +112,7 @@ module.exports = "<div><sup class=\"footnote-ref\"><a href=\"#fn1\" id=\"fnref1\
   "</tbody>\n" +
   "</table>\n" +
   "</div></div>\n" +
-  "<div class=caption_table>Table 1: this is the table!</div></div>\n" +
+  "<div class=\"caption_table\">Table 1: this is the table!</div></div>\n" +
   "<div class=\"table_tabular \" style=\"text-align: center\">\n" +
   "<div class=\"inline-tabular\"><table class=\"tabular\">\n" +
   "<tbody>\n" +

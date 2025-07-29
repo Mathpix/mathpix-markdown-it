@@ -4,7 +4,7 @@ import { StatePushIncludeGraphics } from '../md-inline-rule/includegraphics';
 import { openTag as openTagAlign, SeparateInlineBlocksBeginAlign } from './begin-align';
 import { endTag, uid } from '../utils';
 import {includegraphicsTag} from '../md-inline-rule/utils';
-import { findEndMarker, removeCaptionsFromTableAndFigure } from "../common";
+import { findEndMarker, removeCaptionsFromTableAndFigure, removeCaptionsSetupFromTableAndFigure } from "../common";
 
 var couterTables = 0;
 var couterFigures = 0;
@@ -29,6 +29,7 @@ export const ClearFigureNumbers = () => {
 const StatePushCaptionTable = (state, type: string): void => {
   let caption = state.env.caption;
   let captionPos = state.env.captionPos;
+  let isLabelFormatEmpty = state.env.captionIsLabelFormatEmpty;
   if (!caption) return;
 
   let token: Token;
@@ -51,9 +52,14 @@ const StatePushCaptionTable = (state, type: string): void => {
   }
   token.captionPos = captionPos;
   token.content = caption;
-  token.print = state.md?.options?.nonumbers
-    ? `${type[0].toUpperCase()}${type.slice(1)}: `
-    : `${type[0].toUpperCase()}${type.slice(1)} ${num}: `;
+  if (isLabelFormatEmpty) {
+    token.print = '';
+  } else {
+    const capitalizedType: string = `${type[0].toUpperCase()}${type.slice(1)}`;
+    token.print = state.md?.options?.nonumbers
+      ? `${capitalizedType}: `
+      : `${capitalizedType} ${num}: `;
+  }
   token.caption = caption;
   if (state.md.options.forLatex) {
     token.latex = caption;
@@ -204,8 +210,10 @@ const InlineBlockBeginTable: RuleBlock = (state, startLine) => {
       }
       content = content.replace(captionTagG, '')
     }
+    const contentSetupData = removeCaptionsSetupFromTableAndFigure(content);
+    content = contentSetupData.content;
+    state.env.captionIsLabelFormatEmpty = contentSetupData.isLabelFormatEmpty;
   }
-
   state.parentType = 'paragraph';
   state.env.caption = caption;
   state.env.captionPos = captionPos;
@@ -423,6 +431,9 @@ export const BeginTable: RuleBlock = (state, startLine, endLine, silent) => {
         content = content.replace(captionTagG, '')
       }
     }
+    const contentSetupData = removeCaptionsSetupFromTableAndFigure(content);
+    content = contentSetupData.content;
+    state.env.captionIsLabelFormatEmpty = contentSetupData.isLabelFormatEmpty;
   }
 
   state.parentType = 'paragraph';

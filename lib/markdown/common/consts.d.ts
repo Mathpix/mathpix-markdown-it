@@ -69,6 +69,7 @@ export declare const RE_HDASHLINE: RegExp;
 export declare const RE_CLINE: RegExp;
 export declare const RE_DIMENSIONAL_UNIT_TAG: RegExp;
 export declare const lineSpaceTag: RegExp;
+export declare const RE_CAPTION_SETUP_TAG_BEGIN: RegExp;
 export declare const HIGHLIGHT_COLOR = "rgba(0, 147, 255, 0.25)";
 export declare const HIGHLIGHT_TEXT_COLOR = "#1e2029";
 export declare const latexEnvironments: string[];
