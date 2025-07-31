@@ -104,8 +104,10 @@ const StatePushPatagraphOpenTable = (state, startLine: number, nextLine: number,
     tokenUuidInParentBlock: token.uuid
   };
   
-  if (align && state.env.captionIsSingleLineCheck) {
-    token.attrs.push(['style', `text-align: ${align}`]);
+  if (align) {
+    if (state.env.captionIsSingleLineCheck) {
+      token.attrs.push(['style', `text-align: ${align}`]);
+    }
     if (!hasAlignTagG && state.md.options.forLatex) {
       if (type === TBegin.table && state.md.options.centerTables) {
         token.attrSet('data-type', 'table');
