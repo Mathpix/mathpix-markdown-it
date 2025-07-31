@@ -290,6 +290,11 @@ export const mmdRuleList: IMmdRule[] = [
     rule: eRule.inline
   },
   {
+    name: "captionSetupLatex",
+    type: eMmdRuleType.latex,
+    rule: eRule.inline
+  },
+  {
     name: "centeringLatex",
     type: eMmdRuleType.latex,
     rule: eRule.inline
