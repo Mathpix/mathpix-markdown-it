@@ -53,5 +53,6 @@ export declare const removeCaptionsFromTableAndFigure: (content: string) => {
 export declare const removeCaptionsSetupFromTableAndFigure: (content: string) => {
     content: string;
     isLabelFormatEmpty: boolean;
+    isSingleLineCheck: boolean;
 };
 export declare const checkTagOutsideInlineCode: (text: string, regex: RegExp) => boolean;

@@ -215,19 +215,23 @@ const parseCaptionSetupArgs = (argStr: string): Record<string, string> => {
 
 export const removeCaptionsSetupFromTableAndFigure = (content: string) => {
   let isLabelFormatEmpty: boolean = false;
+  let isSingleLineCheck: boolean = false;
   try {
     let matchCaption = content.match(RE_CAPTION_SETUP_TAG_BEGIN);
     if (!matchCaption) {
-      return { content, isLabelFormatEmpty };
+      return { content, isLabelFormatEmpty, isSingleLineCheck };
     }
     let data = findEndMarker(content, matchCaption.index + matchCaption[0].length - 1);
     if (!data.res) {
-      return { content, isLabelFormatEmpty };
+      return { content, isLabelFormatEmpty, isSingleLineCheck };
     }
     if (data.content) {
       const argsObj: Record<string, string> = parseCaptionSetupArgs(data.content);
       if (argsObj.labelformat === 'empty') {
         isLabelFormatEmpty = true;
+      }
+      if (['true', 'yes', 'on' ].includes(argsObj.singlelinecheck)) {
+        isSingleLineCheck = true;
       }
     }
     let start: number = matchCaption.index > 0 ? matchCaption.index - 1 : matchCaption.index;
@@ -249,12 +253,14 @@ export const removeCaptionsSetupFromTableAndFigure = (content: string) => {
     }
     return {
       content: content.slice(0, start) + content.slice(end),
-      isLabelFormatEmpty
+      isLabelFormatEmpty,
+      isSingleLineCheck
     };
   } catch (err) {
     return {
       content,
-      isLabelFormatEmpty
+      isLabelFormatEmpty,
+      isSingleLineCheck
     }
   }
 }

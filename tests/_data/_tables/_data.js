@@ -233,7 +233,7 @@ Col1 & Col2 & Col2 & Col3 \\\\ [0.5ex]
 \\hline
 \\end{tabular}
 \\end{table}`,
-    html: `<div class="table " style="text-align: center">
+    html: `<div class="table ">
 <div class="table_tabular " style="text-align: center">
 <div class="inline-tabular"><table class="tabular">
 <tbody>
@@ -277,7 +277,7 @@ Col1 & Col2 & Col2 & Col3 \\\\ [0.5ex]
 </table>
 </div></div>
 </div>`,
-    html_notCenterTables: `<div class="table " style="text-align: center">
+    html_notCenterTables: `<div class="table ">
 <div class="table_tabular " style="text-align: center">
 <div class="inline-tabular"><table class="tabular">
 <tbody>

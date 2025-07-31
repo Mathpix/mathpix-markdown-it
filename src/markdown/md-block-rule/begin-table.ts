@@ -104,7 +104,7 @@ const StatePushPatagraphOpenTable = (state, startLine: number, nextLine: number,
     tokenUuidInParentBlock: token.uuid
   };
   
-  if (align) {
+  if (align && state.env.captionIsSingleLineCheck) {
     token.attrs.push(['style', `text-align: ${align}`]);
     if (!hasAlignTagG && state.md.options.forLatex) {
       if (type === TBegin.table && state.md.options.centerTables) {
@@ -213,6 +213,7 @@ const InlineBlockBeginTable: RuleBlock = (state, startLine) => {
     const contentSetupData = removeCaptionsSetupFromTableAndFigure(content);
     content = contentSetupData.content;
     state.env.captionIsLabelFormatEmpty = contentSetupData.isLabelFormatEmpty;
+    state.env.captionIsSingleLineCheck = contentSetupData.isSingleLineCheck;
   }
   state.parentType = 'paragraph';
   state.env.caption = caption;
@@ -434,6 +435,7 @@ export const BeginTable: RuleBlock = (state, startLine, endLine, silent) => {
     const contentSetupData = removeCaptionsSetupFromTableAndFigure(content);
     content = contentSetupData.content;
     state.env.captionIsLabelFormatEmpty = contentSetupData.isLabelFormatEmpty;
+    state.env.captionIsSingleLineCheck = contentSetupData.isSingleLineCheck;
   }
 
   state.parentType = 'paragraph';

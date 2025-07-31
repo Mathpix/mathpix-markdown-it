@@ -38,7 +38,7 @@ module.exports = [
       '\\caption{Table to test captions and labels}\n' +
       '\\label{table:1}\n' +
       '\\end{table}',
-    html:  `<div id="table%3A1" class="table table%3A1" number="1" style="text-align: center">
+    html:  `<div id="table%3A1" class="table table%3A1" number="1">
 <div class="table_tabular " style="text-align: center">
 <div class="inline-tabular"><table class="tabular">
 <tbody>
@@ -89,7 +89,7 @@ module.exports = [
       '\\centering\n' +
       '\\includegraphics[width=0.5\\textwidth]{https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Cappuccino_at_Sightglass_Coffee.jpg/1599px-Cappuccino_at_Sightglass_Coffee.jpg}\n' +
       '\\end{figure}',
-    html:  `<div class="table" number="1" style="text-align: center">
+    html:  `<div class="table" number="1">
 <div class="caption_figure">Figure: The caption is at the top.</div><div class="figure_img" style="text-align: center; "><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Cappuccino_at_Sightglass_Coffee.jpg/1599px-Cappuccino_at_Sightglass_Coffee.jpg"  style="width: 600px; "></div></div>`
   },
 ];
