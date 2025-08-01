@@ -1,5 +1,9 @@
-import { RE_CAPTION_SETUP_TAG_BEGIN, terminatedRules } from './common/consts';
 import { findBackTick } from "./utils";
+import {
+  RE_CAPTION_SETUP_TAG_BEGIN,
+  RE_CAPTION_TAG_BEGIN,
+  terminatedRules
+} from './common/consts';
 
 const hasProp = Object.prototype.hasOwnProperty;
 
@@ -163,8 +167,7 @@ export const getTerminatedRules = (rule: string) => {
 };
 
 export const removeCaptionsFromTableAndFigure = (content: string) => {
-  const captionTagBegin: RegExp = /\\caption\s{0,}\{/;
-  let matchCaptionB = content.match(captionTagBegin);
+  let matchCaptionB = content.match(RE_CAPTION_TAG_BEGIN);
   if (!matchCaptionB) {
     return {
       content: content,

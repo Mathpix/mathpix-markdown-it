@@ -1,21 +1,23 @@
 import { RuleBlock, Token } from 'markdown-it';
 import { openTag as openTagTabular, StatePushTabularBlock, StatePushDiv } from './begin-tabular';
 import { StatePushIncludeGraphics } from '../md-inline-rule/includegraphics';
-import { openTag as openTagAlign, SeparateInlineBlocksBeginAlign } from './begin-align';
+import { getAlignByAlignEnvBlock, SeparateInlineBlocksBeginAlign } from './begin-align';
 import { endTag, uid } from '../utils';
-import {includegraphicsTag} from '../md-inline-rule/utils';
+import { includegraphicsTag } from '../md-inline-rule/utils';
 import { findEndMarker, removeCaptionsFromTableAndFigure, removeCaptionsSetupFromTableAndFigure } from "../common";
+import {
+  RE_ALIGN_CENTERING_GLOBAL,
+  RE_BEGIN_ALIGN_ENV,
+  RE_BEGIN_FIGURE_OR_TABLE_ENV,
+  RE_BEGIN_TABLE_OR_FIGURE_WITH_PLACEMENT,
+  RE_CAPTION_TAG,
+  RE_CAPTION_TAG_BEGIN,
+  RE_CAPTION_TAG_GLOBAL,
+  RE_INCLUDEGRAPHICS_WITH_ALIGNMENT_GLOBAL
+} from "../common/consts";
 
 var couterTables = 0;
 var couterFigures = 0;
-export const openTag: RegExp = /\\begin\s{0,}\{(table|figure)\}/;
-export const openTagH: RegExp = /\\begin\s{0,}\{(table|figure)\}\s{0,}\[(H|\!H|H\!|h|\!h|h\!|t|\!t|b|\!b|p|\!p)\]/;
-const captionTag: RegExp = /\\caption\s{0,}\{([^}]*)\}/;
-const captionTagG: RegExp = /\s{0,}\\caption\s{0,}\{([^}]*)\}\s{0,}/g;
-const captionTagBegin: RegExp = /\\caption\s{0,}\{/;
-const alignTagG: RegExp = /\\centering/g;
-const alignTagIncludeGraphicsG: RegExp = /\\includegraphics\[((.*)(center|left|right))\]\s{0,}\{([^{}]*)\}/g;
-
 enum TBegin {table = 'table', figure = 'figure'};
 
 export const ClearTableNumbers = () => {
@@ -111,11 +113,11 @@ const StatePushPatagraphOpenTable = (state, startLine: number, nextLine: number,
     if (!hasAlignTagG && state.md.options.forLatex) {
       if (type === TBegin.table && state.md.options.centerTables) {
         token.attrSet('data-type', 'table');
-        token.attrSet('data-align', align);
+        token.attrSet('data-align', state.env.alignEnvBlock || align);
       }
       if (type === TBegin.figure && state.md.options.centerImages) {
         token.attrSet('data-type', 'figure');
-        token.attrSet('data-align', align);
+        token.attrSet('data-align', state.env.alignEnvBlock || align);
       }
     }
   }
@@ -136,9 +138,9 @@ const StatePushContent = (state, startLine: number, nextLine: number, content: s
 };
 
 const StatePushTableContent = (state, startLine: number, nextLine: number, content: string, align: string, type: string) => {
-  if (openTagAlign.test(content)) {
+  if (RE_BEGIN_ALIGN_ENV.test(content)) {
     const matchT = content.match(openTagTabular);
-    const matchA = content.match(openTagAlign);
+    const matchA = content.match(RE_BEGIN_ALIGN_ENV);
     if (matchT && matchT.index < matchA.index) {
       StatePushContent(state, startLine, nextLine, content, align, type);
       return;
@@ -164,9 +166,9 @@ const InlineBlockBeginTable: RuleBlock = (state, startLine) => {
   let lineText: string = state.src.slice(pos, max);
   let token;
 
-  let match: RegExpMatchArray = lineText.match(openTagH);
+  let match: RegExpMatchArray = lineText.match(RE_BEGIN_TABLE_OR_FIGURE_WITH_PLACEMENT);
   if (!match) {
-    match = lineText.match(openTag);
+    match = lineText.match(RE_BEGIN_FIGURE_OR_TABLE_ENV);
   }
   if (!match) {
     return false;
@@ -185,13 +187,13 @@ const InlineBlockBeginTable: RuleBlock = (state, startLine) => {
     || (state.md.options.centerImages && type === TBegin.figure)
       ? 'center' : '';
   let content = lineText.slice(match.index + match[0].length, matchE.index);
-  let hasAlignTagG = alignTagG.test(content);
+  let hasAlignTagG = RE_ALIGN_CENTERING_GLOBAL.test(content);
   const hasAlignTagIncludeGraphicsG = type === TBegin.figure
-    ? Boolean(content.match(alignTagIncludeGraphicsG)) : false;
-  content = content.replace(alignTagG,'');
+    ? Boolean(content.match(RE_INCLUDEGRAPHICS_WITH_ALIGNMENT_GLOBAL)) : false;
+  content = content.replace(RE_ALIGN_CENTERING_GLOBAL,'');
   let captionPos: any = {};
   if (!state.md.options.forLatex) {
-    matchE = content.match(captionTag);
+    matchE = content.match(RE_CAPTION_TAG);
     if (matchE) {
       caption = matchE[1];
       captionPos.start = pos + matchE.index;
@@ -210,7 +212,7 @@ const InlineBlockBeginTable: RuleBlock = (state, startLine) => {
       if (matchT && matchE.index < matchT.index) {
         captionFirst = true;
       }
-      content = content.replace(captionTagG, '')
+      content = content.replace(RE_CAPTION_TAG_GLOBAL, '')
     }
     const contentSetupData = removeCaptionsSetupFromTableAndFigure(content);
     content = contentSetupData.content;
@@ -224,6 +226,7 @@ const InlineBlockBeginTable: RuleBlock = (state, startLine) => {
   const contentAlign = align ? align
     : hasAlignTagG ? 'center' : '';
   state.env.align = contentAlign;
+  state.env.alignEnvBlock = getAlignByAlignEnvBlock(content);
   let latex = match[1] === 'figure' || match[1] === 'table'
     ? `\\begin{${match[1]}}[h]`
     : match[0];
@@ -250,11 +253,11 @@ const InlineBlockBeginTable: RuleBlock = (state, startLine) => {
   if (!hasAlignTagG && !hasAlignTagIncludeGraphicsG && state.md.options.forLatex) {
     if (type === TBegin.table && state.md.options.centerTables) {
       token.attrSet('data-type', 'table');
-      token.attrSet('data-align', align);
+      token.attrSet('data-align', state.env.alignEnvBlock || align);
     }
     if (type === TBegin.figure && state.md.options.centerImages) {
       token.attrSet('data-type', 'figure');
-      token.attrSet('data-align', align);
+      token.attrSet('data-align', state.env.alignEnvBlock || align);
     }
   }
   state.line = startLine+1;
@@ -277,9 +280,9 @@ export const BeginTable: RuleBlock = (state, startLine, endLine, silent) => {
   let resText: string = '';
   let isCloseTagExist = false;
   let startTabular = 0;
-  let match:RegExpMatchArray = lineText.match(openTagH);
+  let match:RegExpMatchArray = lineText.match(RE_BEGIN_TABLE_OR_FIGURE_WITH_PLACEMENT);
   if (!match) {
-    match = lineText.match(openTag);
+    match = lineText.match(RE_BEGIN_FIGURE_OR_TABLE_ENV);
   }
   if (!match) {
     return false;
@@ -299,7 +302,7 @@ export const BeginTable: RuleBlock = (state, startLine, endLine, silent) => {
     }
   }
   let captionPos: any = {};
-  let matchCaption = lineText.match(captionTag);
+  let matchCaption = lineText.match(RE_CAPTION_TAG);
   if (matchCaption) {
     captionPos.start = pos + matchCaption.index;
     captionPos.end = captionPos.start + matchCaption[0].length;
@@ -331,8 +334,8 @@ export const BeginTable: RuleBlock = (state, startLine, endLine, silent) => {
     max = state.eMarks[nextLine];
     lineText = state.src.slice(pos, max);
     if (!matchCaption) {
-      matchCaption = lineText.match(captionTag);
-      let matchCaptionB = lineText.match(captionTagBegin);
+      matchCaption = lineText.match(RE_CAPTION_TAG);
+      let matchCaptionB = lineText.match(RE_CAPTION_TAG_BEGIN);
       if (matchCaptionB) {
         let { res = false, nextPos = 0 } = findEndMarker(lineText, matchCaptionB.index + matchCaptionB[0].length - 1);
         if (res) {
@@ -386,17 +389,17 @@ export const BeginTable: RuleBlock = (state, startLine, endLine, silent) => {
     resText += lineText.slice(0, matchE.index);
     pE = matchE.index
   }
-  let matchAlignTagG = resText.match(alignTagG);
+  let matchAlignTagG = resText.match(RE_ALIGN_CENTERING_GLOBAL);
   const hasAlignTagG = Boolean(matchAlignTagG);
   content = state.md.options.forLatex 
     ? resText 
-    : resText.replace(alignTagG,'');
+    : resText.replace(RE_ALIGN_CENTERING_GLOBAL,'');
   const hasAlignTagIncludeGraphicsG = type === TBegin.figure 
-    ? Boolean(content.match(alignTagIncludeGraphicsG)) : false;
+    ? Boolean(content.match(RE_INCLUDEGRAPHICS_WITH_ALIGNMENT_GLOBAL)) : false;
   
   if (!state.md.options.forLatex) {
-    matchE = content.match(captionTag);
-    let matchCaptionB = content.match(captionTagBegin);
+    matchE = content.match(RE_CAPTION_TAG);
+    let matchCaptionB = content.match(RE_CAPTION_TAG_BEGIN);
     if (matchCaptionB) {
       let data = findEndMarker(content, matchCaptionB.index + matchCaptionB[0].length - 1);
       if (data.res) {
@@ -411,7 +414,7 @@ export const BeginTable: RuleBlock = (state, startLine, endLine, silent) => {
           captionFirst = true;
         }
 
-        while (captionTagBegin.test(content)) {
+        while (RE_CAPTION_TAG_BEGIN.test(content)) {
           const contentData = removeCaptionsFromTableAndFigure(content);
           content = contentData.content;
           if (contentData.isNotCaption) {
@@ -431,7 +434,7 @@ export const BeginTable: RuleBlock = (state, startLine, endLine, silent) => {
         if (matchT && matchE.index < matchT.index) {
           captionFirst = true;
         }
-        content = content.replace(captionTagG, '')
+        content = content.replace(RE_CAPTION_TAG_GLOBAL, '')
       }
     }
     const contentSetupData = removeCaptionsSetupFromTableAndFigure(content);
@@ -446,6 +449,7 @@ export const BeginTable: RuleBlock = (state, startLine, endLine, silent) => {
   const contentAlign = align ? align
     : hasAlignTagG ? 'center' : '';
   state.env.align = contentAlign;
+  state.env.alignEnvBlock = getAlignByAlignEnvBlock(content);
   let latex = match[1] === 'figure' || match[1] === 'table'
     ? `\\begin{${match[1]}}[h]`
     : match[0];
@@ -478,11 +482,11 @@ export const BeginTable: RuleBlock = (state, startLine, endLine, silent) => {
   if (!hasAlignTagG && !hasAlignTagIncludeGraphicsG && state.md.options.forLatex) {
     if (type === TBegin.table && state.md.options.centerTables) {
       token.attrSet('data-type', 'table');
-      token.attrSet('data-align', align);
+      token.attrSet('data-align', state.env.alignEnvBlock || align);
     }
     if (type === TBegin.figure && state.md.options.centerImages) {
       token.attrSet('data-type', 'figure');
-      token.attrSet('data-align', align);
+      token.attrSet('data-align', state.env.alignEnvBlock || align);
     }
   }
   state.line = nextLine;
