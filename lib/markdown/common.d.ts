@@ -50,4 +50,9 @@ export declare const removeCaptionsFromTableAndFigure: (content: string) => {
     content: string;
     isNotCaption: boolean;
 };
+export declare const removeCaptionsSetupFromTableAndFigure: (content: string) => {
+    content: string;
+    isLabelFormatEmpty: boolean;
+    isSingleLineCheck: boolean;
+};
 export declare const checkTagOutsideInlineCode: (text: string, regex: RegExp) => boolean;

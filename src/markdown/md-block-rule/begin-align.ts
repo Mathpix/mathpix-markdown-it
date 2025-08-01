@@ -1,14 +1,13 @@
 import { RuleBlock, Token } from 'markdown-it';
-import {StatePushDiv, StatePushTabularBlock} from "./begin-tabular";
+import { StatePushDiv, StatePushTabularBlock } from "./begin-tabular";
 import { StatePushIncludeGraphics } from "../md-inline-rule/includegraphics";
+import { RE_ALIGN_ENV_BLOCK, RE_BEGIN_ALIGN_ENV } from "../common/consts";
 
-export const openTag: RegExp = /\\begin\s{0,}\{(center|left|right)\}/;
-const openCloseTag: RegExp = /\\begin\s{0,}\{(center|left|right)\}\s{0,}([\s\S]*?)\s{0,}\\end\s{0,}\{(center|left|right)\}/;
 const endTag = (arg:string='center'): RegExp  => { return new RegExp('\\end\s{0,}\{(' + arg + ')\}')};
 
 export const SeparateInlineBlocksBeginAlign = (state, startLine: number, nextLine: number, content: string, align: string): any[] => {
   let res = [];
-  const match = content.match(openCloseTag);
+  const match = content.match(RE_ALIGN_ENV_BLOCK);
   if (match) {
     if (match.index > 0) {
       res.push({content: content.slice(0, match.index), align: align});
@@ -22,6 +21,14 @@ export const SeparateInlineBlocksBeginAlign = (state, startLine: number, nextLin
   return res;
 };
 
+export const getAlignByAlignEnvBlock = (content: string) => {
+  if (typeof content !== 'string' || !RE_BEGIN_ALIGN_ENV.test(content)) {
+    return '';
+  }
+  const match = content.match(RE_ALIGN_ENV_BLOCK);
+  return match?.[1] ?? '';
+}
+
 
 const InlineBlockBeginAlign: RuleBlock = (state, startLine) => {
   let token: Token;
@@ -32,7 +39,7 @@ const InlineBlockBeginAlign: RuleBlock = (state, startLine) => {
   let lineText: string = state.src.slice(pos, max);
 
 
-  const match: RegExpMatchArray = lineText.match(openTag);
+  const match: RegExpMatchArray = lineText.match(RE_BEGIN_ALIGN_ENV);
   if (!match) {
     return false;
   }
@@ -103,7 +110,7 @@ export const BeginAlign: RuleBlock = (state, startLine, endLine, silent) => {
 
   let isCloseTagExist = false;
 
-  const match: RegExpMatchArray = lineText.match(openTag);
+  const match: RegExpMatchArray = lineText.match(RE_BEGIN_ALIGN_ENV);
   if (!match) {
     return false;
   }

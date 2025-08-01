@@ -526,7 +526,7 @@ t1 & t2
       '\\centering\n' +
       '\\includegraphics[width=0.5\\textwidth]{https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Cappuccino_at_Sightglass_Coffee.jpg/1599px-Cappuccino_at_Sightglass_Coffee.jpg}\n' +
       '\\end{figure}',
-    svg: '<div id="table%3A1" class="table table%3A1" number="1" style="text-align: center">\n' +
+    svg: '<div id="table%3A1" class="table table%3A1" number="1">\n' +
       '<div class="table_tabular " style="text-align: center">\n' +
       '<div class="inline-tabular"><table class="tabular">\n' +
       '<tbody>\n' +
@@ -569,9 +569,9 @@ t1 & t2
       '</tbody>\n' +
       '</table>\n' +
       '</div></div>\n' +
-      '<div class=caption_table>Table 1: Table <strong>to test captions and</strong> labels</div></div>\n' +
-      '<div class="table" number="1" style="text-align: center">\n' +
-      '<div class=caption_figure>Figure 1: The <em>caption is at the</em> top.</div><div class="figure_img" style="text-align: center; "><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Cappuccino_at_Sightglass_Coffee.jpg/1599px-Cappuccino_at_Sightglass_Coffee.jpg"  style="width: 600px; "></div></div>'
+      '<div class=\"caption_table\">Table 1: Table <strong>to test captions and</strong> labels</div></div>\n' +
+      '<div class="table" number="1">\n' +
+      '<div class="caption_figure">Figure 1: The <em>caption is at the</em> top.</div><div class="figure_img" style="text-align: center; "><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Cappuccino_at_Sightglass_Coffee.jpg/1599px-Cappuccino_at_Sightglass_Coffee.jpg"  style="width: 600px; "></div></div>'
   },
   {
     latex: 'В таблиці 3.2 представлені паспортні характеристики двигуна КД -5Д.\n' +
@@ -824,7 +824,7 @@ t1 & t2
       ' \\end{tabular}\n' +
       ' \\end{left}\n' +
       '\\end{table}',
-    svg: '<div class="table " style="text-align: center">\n' +
+    svg: '<div class="table ">\n' +
       '<div class="table_tabular " style="text-align: left">\n' +
       '<div class="inline-tabular"><table class="tabular">\n' +
       '<tbody>\n' +

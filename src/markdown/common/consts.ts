@@ -102,6 +102,17 @@ export const lineSpaceTag: RegExp = new RegExp(
   ].join("|"),
   "g"
 );
+export const RE_CAPTION_SETUP_TAG_BEGIN: RegExp = /\\captionsetup\s{0,}\{/;
+export const RE_CAPTION_SETUP: RegExp = /^\\captionsetup\s{0,}\{([^}]*)\}/;
+export const RE_BEGIN_ALIGN_ENV: RegExp = /\\begin\s{0,}\{(center|left|right)\}/;
+export const RE_ALIGN_ENV_BLOCK: RegExp = /\\begin\s{0,}\{(center|left|right)\}\s{0,}([\s\S]*?)\s{0,}\\end\s{0,}\{(center|left|right)\}/;
+export const RE_BEGIN_FIGURE_OR_TABLE_ENV: RegExp = /\\begin\s{0,}\{(table|figure)\}/;
+export const RE_BEGIN_TABLE_OR_FIGURE_WITH_PLACEMENT: RegExp = /\\begin\s{0,}\{(table|figure)\}\s{0,}\[(H|\!H|H\!|h|\!h|h\!|t|\!t|b|\!b|p|\!p)\]/;
+export const RE_CAPTION_TAG: RegExp = /\\caption\s{0,}\{([^}]*)\}/;
+export const RE_CAPTION_TAG_GLOBAL: RegExp = /\s{0,}\\caption\s{0,}\{([^}]*)\}\s{0,}/g;
+export const RE_CAPTION_TAG_BEGIN: RegExp = /\\caption\s{0,}\{/;
+export const RE_ALIGN_CENTERING_GLOBAL: RegExp = /\\centering/g;
+export const RE_INCLUDEGRAPHICS_WITH_ALIGNMENT_GLOBAL: RegExp = /\\includegraphics\[((.*)(center|left|right))\]\s{0,}\{([^{}]*)\}/g;
 
 export const HIGHLIGHT_COLOR = 'rgba(0, 147, 255, 0.25)';
 export const HIGHLIGHT_TEXT_COLOR = '#1e2029';

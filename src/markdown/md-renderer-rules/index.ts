@@ -3,13 +3,12 @@ import { getTextWidth } from "../utils";
 
 export const CaptionTable: Renderer = (tokens, idx, options, env, slf) => {
   let token = tokens[idx];
-  let htmlPrint = token.print ? token.print : '';
+  const className = token.attrGet('class') || 'caption_table';
+  const printText = token.print ?? '';
   let htmlCaption = token.children?.length 
     ? slf.renderInline(token.children, options, env)
     : token.content;
-  return `<div class=${token.attrGet('class')
-    ? token.attrGet('class')
-    : "caption_table"}>${htmlPrint}${htmlCaption}</div>`
+  return `<div class="${className}">${printText}${htmlCaption}</div>`
 };
 
 export const InlineDecimal = (a, token) => {

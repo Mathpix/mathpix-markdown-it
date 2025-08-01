@@ -23,6 +23,7 @@ import {resetTheoremEnvironments} from './md-theorem/helper';
 import {newTheoremBlock} from './md-theorem/block-rule';
 import {
   captionLatex,
+  captionSetupLatex,
   centeringLatex,
   labelLatex,
   newCommandQedSymbol,
@@ -827,6 +828,7 @@ export default options => {
     md.inline.ruler.before("multiMath", "inlineTabular", inlineTabular);
     md.inline.ruler.before("multiMath", "labelLatex", labelLatex);
     md.inline.ruler.before("multiMath", "captionLatex", captionLatex);
+    md.inline.ruler.before("multiMath", "captionSetupLatex", captionSetupLatex);
     md.inline.ruler.before("multiMath", "centeringLatex", centeringLatex);
     md.inline.ruler.before("multiMath", "theoremStyle", theoremStyle); /** Parse \theoremstyle */
     md.inline.ruler.before("multiMath", "newTheorem", newTheorem); /** Parse \newtheorem */
