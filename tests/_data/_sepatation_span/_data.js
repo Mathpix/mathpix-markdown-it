@@ -90,7 +90,7 @@ module.exports = [
       '3000 & 4 & 540 \\\\\n' +
       '$\\vdots$ & $\\vdots$ & $\\vdots$\n' +
       '\\end{tabular}<span class="page-3 scroll-percentage-43 h-0 w-0 overflow-hidden"></span>',
-    html: '<div class="table_tabular " style="text-align: center">\n' +
+    html: '<div class="table_tabular" style="text-align: center">\n' +
       '<div class="inline-tabular"><table class="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +

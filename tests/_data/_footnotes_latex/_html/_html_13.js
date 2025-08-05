@@ -5,8 +5,8 @@ module.exports = '<div class="abstract" style="width: 80%; margin: 0 auto 1em au
   '</div>\n' +
   '<h2 type="section" class="section-title" id="section">\n' +
   '<span class="section-number">1. </span>Section</h2>\n' +
-  '<div class="table ">\n' +
-  '<div class="table_tabular " style="text-align: center">\n' +
+  '<div class="table">\n' +
+  '<div class="table_tabular" style="text-align: center">\n' +
   '<div class="inline-tabular"><table class="tabular">\n' +
   '<tbody>\n' +
   '<tr style="border-top: none !important; border-bottom: none !important;">\n' +

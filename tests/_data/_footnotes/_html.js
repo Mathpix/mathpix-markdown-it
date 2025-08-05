@@ -1,6 +1,6 @@
 const htmlContent = '<div>First <sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup></div>\n' +
   '<div id="table%3A4" class="table table%3A4" number="1">\n' +
-  '<div class="table_tabular " style="text-align: center">\n' +
+  '<div class="table_tabular" style="text-align: center">\n' +
   '<div class="inline-tabular"><table class="tabular">\n' +
   '<tbody>\n' +
   '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
@@ -87,7 +87,7 @@ const htmlContent = '<div>First <sup class="footnote-ref"><a href="#fn1" id="fnr
 
 const htmlContentFootnote_compact_refs = '<div>First <sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup></div>\n' +
   '<div id="table%3A4" class="table table%3A4" number="1">\n' +
-  '<div class="table_tabular " style="text-align: center">\n' +
+  '<div class="table_tabular" style="text-align: center">\n' +
   '<div class="inline-tabular"><table class="tabular">\n' +
   '<tbody>\n' +
   '<tr style="border-top: none !important; border-bottom: none !important;">\n' +

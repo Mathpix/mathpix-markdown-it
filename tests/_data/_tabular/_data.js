@@ -8,7 +8,7 @@ module.exports = [
       '\\end{tabular}\n' +
       'a. \\( i \\) Cuál es el número de carros total esperado que entran a la autopista en este punto durante el periodo? [Sugerencia: Sea \\( \\left.X_{i}=\\text { el número de la carretera } i .\\right] \\)',
     svg:  `<div>tabla</div>
-<div class="table_tabular " style="text-align: center">
+<div class="table_tabular" style="text-align: center">
 <div class="inline-tabular"><table class="tabular">
 <tbody>
 <tr style="border-top: none !important; border-bottom: none !important;">
@@ -47,7 +47,7 @@ module.exports = [
       'a. \\( i \\) Cuál es el número de carros total esperado que entran a la autopista en este punto durante el periodo? [Sugerencia: Sea \\( \\left.X_{i}=\\text { el número de la carretera } i .\\right] \\)\n' +
       'b. ¿Cuál es la varianza del número total de carros que entran? \\( j \\) Ha hecho suposiciones sobre la relación entre los números de carros en las diferentes carreteras?',
     svg: `<div>Tres carreteras diferentes entroncan en una autopista particular. Suponga que durante un tiempo fijo, el número de carros que llegan por cada carretera a la autopista es una variable aleatoria, con valor esperado y desviación estándar como se dan en la tabla</div>
-<div class="table_tabular " style="text-align: center">
+<div class="table_tabular" style="text-align: center">
 <div class="inline-tabular"><table class="tabular">
 <tbody>
 <tr style="border-top: none !important; border-bottom: none !important;">
@@ -97,7 +97,7 @@ b. ¿Cuál es la varianza del número total de carros que entran? <span class="m
     svg: `<div>Exercice <span class="math-inline ">
 <mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.025ex;" xmlns="http://www.w3.org/2000/svg" width="4.721ex" height="1.912ex" role="img" focusable="false" viewBox="0 -833.9 2086.7 844.9"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="msup"><g data-mml-node="mi"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="TeXAtom" transform="translate(633,363) scale(0.707)" data-mjx-texclass="ORD"><g data-mml-node="mo"><path data-c="2212" d="M84 237T84 250T98 270H679Q694 262 694 250T679 230H98Q84 237 84 250Z"></path></g><g data-mml-node="mn" transform="translate(778,0)"><path data-c="31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path></g></g></g><g data-mml-node="mn" transform="translate(1586.7,0)"><path data-c="31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path></g></g></g></svg></mjx-container></span><br>
 De:</div>
-<div class="table_tabular " style="text-align: center">
+<div class="table_tabular" style="text-align: center">
 <div class="inline-tabular"><table class="tabular">
 <tbody>
 <tr style="border-top: none !important; border-bottom: none !important;">
@@ -123,7 +123,7 @@ De:</div>
 <div>Exercice <span class="math-inline ">
 <mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.025ex;" xmlns="http://www.w3.org/2000/svg" width="3.476ex" height="1.556ex" role="img" focusable="false" viewBox="0 -677 1536.6 688"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="msup"><g data-mml-node="mi"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="TeXAtom" transform="translate(633,363) scale(0.707)" data-mjx-texclass="ORD"><g data-mml-node="mo"><path data-c="2218" d="M55 251Q55 328 112 386T249 444T386 388T444 249Q444 171 388 113T250 55Q170 55 113 112T55 251ZM245 403Q188 403 142 361T96 250Q96 183 141 140T250 96Q284 96 313 109T354 135T375 160Q403 197 403 250Q403 313 360 358T245 403Z"></path></g></g></g><g data-mml-node="mn" transform="translate(1036.6,0)"><path data-c="32" d="M109 429Q82 429 66 447T50 491Q50 562 103 614T235 666Q326 666 387 610T449 465Q449 422 429 383T381 315T301 241Q265 210 201 149L142 93L218 92Q375 92 385 97Q392 99 409 186V189H449V186Q448 183 436 95T421 3V0H50V19V31Q50 38 56 46T86 81Q115 113 136 137Q145 147 170 174T204 211T233 244T261 278T284 308T305 340T320 369T333 401T340 431T343 464Q343 527 309 573T212 619Q179 619 154 602T119 569T109 550Q109 549 114 549Q132 549 151 535T170 489Q170 464 154 447T109 429Z"></path></g></g></g></svg></mjx-container></span><br>
 La variable nbt est une chaine de caracteres car la fonction strO per-</div>
-<div class="table_tabular " style="text-align: center">
+<div class="table_tabular" style="text-align: center">
 <div class="inline-tabular"><table class="tabular">
 <tbody>
 <tr style="border-top: none !important; border-bottom: none !important;">
@@ -151,7 +151,7 @@ col1 & col2 & col3 \\\\\\hline
 & cell5 & cell6 \\\\ \\hline
 & cell8 & cell9 \\\\ \\hline
 \\end{tabular}`,
-    svg: `<div class="table_tabular " style="text-align: center">
+    svg: `<div class="table_tabular" style="text-align: center">
 <div class="inline-tabular"><table class="tabular">
 <tbody>
 <tr style="border-top: none !important; border-bottom: none !important;">
@@ -183,7 +183,7 @@ col1 & col2 & col3 \\\\\\hline
 & cell5 & cell6 \\\\ \\hline
 & cell8 & cell9 \\\\ \\hline
 \\end{tabular}`,
-    svg: `<div class="table_tabular " style="text-align: center">
+    svg: `<div class="table_tabular" style="text-align: center">
 <div class="inline-tabular"><table class="tabular">
 <tbody>
 <tr style="border-top: none !important; border-bottom: none !important;">
@@ -213,7 +213,7 @@ col1 & col2 & col3 \\\\\\hline
 \\\\ \\hline 
 t1 & t2
 \\\\ \\hline \\end{tabular}`,
-    svg: `<div class="table_tabular " style="text-align: center">
+    svg: `<div class="table_tabular" style="text-align: center">
 <div class="inline-tabular"><table class="tabular">
 <tbody>
 <tr style="border-top: none !important; border-bottom: none !important;">
@@ -233,7 +233,7 @@ t1 & t2
 \\\\ \\hline 
 t1 & t2
 \\\\ \\hline \\end{tabular}`,
-    svg: `<div class="table_tabular " style="text-align: center">
+    svg: `<div class="table_tabular" style="text-align: center">
 <div class="inline-tabular"><table class="tabular">
 <tbody>
 <tr style="border-top: none !important; border-bottom: none !important;">
@@ -264,7 +264,7 @@ t1 & t2
 25 \\mathrm{~mL} \\text { solution from flask } \\mathrm{D}\\end{array}$ & & & \\\\
 \\hline
 \\end{tabular}`,
-    svg: `<div class="table_tabular " style="text-align: center">
+    svg: `<div class="table_tabular" style="text-align: center">
 <div class="inline-tabular"><table class="tabular">
 <tbody>
 <tr style="border-top: none !important; border-bottom: none !important;">
@@ -334,7 +334,7 @@ t1 & t2
       'efgh&ijkl\\\\\n' +
       '\\hline\n' +
       '\\end{tabular}',
-    svg: '<div class="table_tabular " style="text-align: center">\n' +
+    svg: '<div class="table_tabular" style="text-align: center">\n' +
       '<div class="inline-tabular"><table class="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
@@ -378,7 +378,7 @@ t1 & t2
       'efgh&ijkl\\\\\n' +
       '\\hline\n' +
       '\\end{tabular}',
-    svg: '<div class="table_tabular " style="text-align: center">\n' +
+    svg: '<div class="table_tabular" style="text-align: center">\n' +
       '<div class="inline-tabular"><table class="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
@@ -422,7 +422,7 @@ t1 & t2
       'efgh&ijkl\\\\\n' +
       '\\hline\n' +
       '\\end{tabular}',
-    svg: '<div class="table_tabular " style="text-align: center">\n' +
+    svg: '<div class="table_tabular" style="text-align: center">\n' +
       '<div class="inline-tabular"><table class="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
@@ -454,7 +454,7 @@ t1 & t2
       '$\\quad\\quad$ Detail \\dotfill & 27 \\\\\n' +
       'References \\dotfill & 31 \\\\\n' +
       '\\end{tabular}',
-    svg: '<div class="table_tabular " style="text-align: center">\n' +
+    svg: '<div class="table_tabular" style="text-align: center">\n' +
       '<div class="inline-tabular"><table class="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
@@ -527,7 +527,7 @@ t1 & t2
       '\\includegraphics[width=0.5\\textwidth]{https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Cappuccino_at_Sightglass_Coffee.jpg/1599px-Cappuccino_at_Sightglass_Coffee.jpg}\n' +
       '\\end{figure}',
     svg: '<div id="table%3A1" class="table table%3A1" number="1">\n' +
-      '<div class="table_tabular " style="text-align: center">\n' +
+      '<div class="table_tabular" style="text-align: center">\n' +
       '<div class="inline-tabular"><table class="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
@@ -632,7 +632,7 @@ t1 & t2
       'Рисунок 3.4 - Драйвер типу KND BD3H',
     svg: '<div>В таблиці 3.2 представлені паспортні характеристики двигуна КД -5Д.</div>\n' +
       '<div>Таблиця 3.2 - Паспортні характеристики крокової двигуна</div>\n' +
-      '<div class="table_tabular " style="text-align: center">\n' +
+      '<div class="table_tabular" style="text-align: center">\n' +
       '<div class="inline-tabular"><table class="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
@@ -703,7 +703,7 @@ t1 & t2
       '</tbody>\n' +
       '</table>\n' +
       '</div></div>\n' +
-      '<div class="table_tabular " style="text-align: center">\n' +
+      '<div class="table_tabular" style="text-align: center">\n' +
       '<div class="inline-tabular"><table class="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
@@ -777,7 +777,7 @@ t1 & t2
       'A \\\\\n' +
       '[B]\n' +
       '\\end{tabular}',
-    svg: '<div class="table_tabular " style="text-align: center">\n' +
+    svg: '<div class="table_tabular" style="text-align: center">\n' +
       '<div class="inline-tabular"><table class="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
@@ -795,7 +795,7 @@ t1 & t2
       'A \\\\ \\hline\n' +
       '[B]\n' +
       '\\end{tabular}',
-    svg: '<div class="table_tabular " style="text-align: center">\n' +
+    svg: '<div class="table_tabular" style="text-align: center">\n' +
       '<div class="inline-tabular"><table class="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
@@ -824,8 +824,8 @@ t1 & t2
       ' \\end{tabular}\n' +
       ' \\end{left}\n' +
       '\\end{table}',
-    svg: '<div class="table ">\n' +
-      '<div class="table_tabular " style="text-align: left">\n' +
+    svg: '<div class="table">\n' +
+      '<div class="table_tabular" style="text-align: left">\n' +
       '<div class="inline-tabular"><table class="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +

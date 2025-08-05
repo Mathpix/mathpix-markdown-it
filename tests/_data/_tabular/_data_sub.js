@@ -1,7 +1,7 @@
 module.exports = [
   {
     latex: '\\begin{tabular} { l }  \\( \\qquad \\)  \\begin{tabular} { | l | l | l | l | l | l | l | l | l | } \\hline \\end{tabular} \\\\ \\hline 4 \\end{tabular}',
-    svg: '<div class="table_tabular " style="text-align: center">\n' +
+    svg: '<div class="table_tabular" style="text-align: center">\n' +
       '<div class="inline-tabular"><table class="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
@@ -41,7 +41,7 @@ module.exports = [
       '  2 &  & Another Text \\\\\n' +
       '  \\hline\n' +
       '\\end{tabular}',
-    svg: '<div class="table_tabular " style="text-align: center">\n' +
+    svg: '<div class="table_tabular" style="text-align: center">\n' +
       '<div class="inline-tabular"><table class="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
@@ -106,7 +106,7 @@ module.exports = [
       '  2 &  & Another Text \\\\\n' +
       '  \\hline\n' +
       '\\end{tabular}',
-    svg: '<div class="table_tabular " style="text-align: center">\n' +
+    svg: '<div class="table_tabular" style="text-align: center">\n' +
       '<div class="inline-tabular"><table class="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
@@ -155,7 +155,7 @@ module.exports = [
       '  \\begin{array}{|c|}\\hline C\\\\\\hline C\\\\\\hline \\end{array} \\begin{tabular}{|c|c|}\\hline A & B \\\\\\hline C & D \\\\\\hline \\end{tabular} & 3 & Another Text \\\\\n' +
       '  \\hline\n' +
       '\\end{tabular}\n',
-    svg: '<div class="table_tabular " style="text-align: center">\n' +
+    svg: '<div class="table_tabular" style="text-align: center">\n' +
       '<div class="inline-tabular"><table class="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
@@ -230,7 +230,7 @@ module.exports = [
       '\\multicolumn{3}{|c|}{}& cell24& col25& col26 \\\\\\hline\n' +
       'col11 & col12 & col13& col14 & col15& col16 \\\\\\hline\n' +
       '\\end{tabular}',
-    svg: '<div class="table_tabular " style="text-align: center">\n' +
+    svg: '<div class="table_tabular" style="text-align: center">\n' +
       '<div class="inline-tabular"><table class="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
@@ -313,7 +313,7 @@ module.exports = [
       '\\hline & \\\\\n' +
       '\\hline\n' +
       '\\end{tabular}',
-    svg: '<div class="table_tabular " style="text-align: center">\n' +
+    svg: '<div class="table_tabular" style="text-align: center">\n' +
       '<div class="inline-tabular"><table class="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
@@ -359,7 +359,7 @@ module.exports = [
       '\\multicolumn{1}{|c|}{4} & 5 & 6 \\\\\n' +
       '\\hline\n' +
       '\\end{tabular}',
-    svg: '<div class="table_tabular " style="text-align: center">\n' +
+    svg: '<div class="table_tabular" style="text-align: center">\n' +
       '<div class="inline-tabular"><table class="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
@@ -457,7 +457,7 @@ module.exports = [
       '\\hline & & & Rocky-sandy & 2 & 1 & 0 & 3 \\\\\n' +
       '\\hline\n' +
       '\\end{tabular}',
-    svg: '<div class="table_tabular " style="text-align: center">\n' +
+    svg: '<div class="table_tabular" style="text-align: center">\n' +
       '<div class="inline-tabular"><table class="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
@@ -934,7 +934,7 @@ module.exports = [
       '\\end{tabular}',
     svg: '<div>|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||<br>\n' +
       'NV01-W9C8-D7V7-292V</div>\n' +
-      '<div class="table_tabular " style="text-align: center">\n' +
+      '<div class="table_tabular" style="text-align: center">\n' +
       '<div class="inline-tabular"><table class="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +

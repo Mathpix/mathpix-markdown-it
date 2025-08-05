@@ -133,7 +133,7 @@ export const parseInlineTabular = (str: string): TTypeContentList | null => {
 const StatePushParagraphOpen = (state, startLine: number, align: string, centerTables = false) => {
   let token: Token;
   token = state.push('paragraph_open', 'div', 1);
-  token.attrs = [['class', 'table_tabular ']];
+  token.attrJoin("class", "table_tabular");
   token.parentType = 'table_tabular';
   if (align) {
     token.attrs.push(['style', `text-align: ${align}`]);

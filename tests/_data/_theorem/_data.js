@@ -673,8 +673,8 @@ a continuous function.</div>
       '<mjx-container class="MathJax" jax="SVG" display="true"><svg style="vertical-align: -0.025ex;" xmlns="http://www.w3.org/2000/svg" width="1.294ex" height="1.025ex" role="img" focusable="false" viewBox="0 -442 572 453"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D465" d="M52 289Q59 331 106 386T222 442Q257 442 286 424T329 379Q371 442 430 442Q467 442 494 420T522 361Q522 332 508 314T481 292T458 288Q439 288 427 299T415 328Q415 374 465 391Q454 404 425 404Q412 404 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145Q504 144 502 134Q486 77 440 33T333 -11Q263 -11 227 52Q186 -10 133 -10H127Q78 -10 57 16T35 71Q35 103 54 123T99 143Q142 143 142 101Q142 81 130 66T107 46T94 41L91 40Q91 39 97 36T113 29T132 26Q168 26 194 71Q203 87 217 139T245 247T261 313Q266 340 266 352Q266 380 251 392T217 404Q177 404 142 372T93 290Q91 281 88 280T72 278H58Q52 284 52 289Z"></path></g></g></g></svg></mjx-container></span></div>\n' +
       '<div style="margin-top: 0; margin-bottom: 1rem;">Should be new paragraph after <code>\\newtheorem{thm}{Theorem}[section]</code> and before table<br>\n' +
       '</div>\n' +
-      '<div class="table ">\n' +
-      '<div class="table_tabular " style="text-align: center">\n' +
+      '<div class="table">\n' +
+      '<div class="table_tabular" style="text-align: center">\n' +
       '<div class="inline-tabular"><table class="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
@@ -720,7 +720,7 @@ a continuous function.</div>
       '<div style="margin-top: 0; margin-bottom: 1rem;">Should be new paragraph after <code>\\newtheorem{thm}{Theorem}[section]</code> and before table<br>\n' +
       '</div>\n' +
       '<div class="center" style="text-align: right">\n' +
-      '<div class="table_tabular " style="text-align: right">\n' +
+      '<div class="table_tabular" style="text-align: right">\n' +
       '<div class="inline-tabular"><table class="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
@@ -744,7 +744,7 @@ a continuous function.</div>
       '</div>\n' +
       '<div style="margin-top: 0; margin-bottom: 1rem;">Should be new paragraph after <code>\\newtheorem{thm}{Theorem}[section]</code> and before tabular. Tabular should be centering.<br>\n' +
       '</div>\n' +
-      '<div class="table_tabular " style="text-align: center">\n' +
+      '<div class="table_tabular" style="text-align: center">\n' +
       '<div class="inline-tabular"><table class="tabular">\n' +
       '<tbody>\n' +
       '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
