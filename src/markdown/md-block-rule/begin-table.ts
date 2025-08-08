@@ -80,7 +80,7 @@ const StatePushPatagraphOpenTable = (state, startLine: number, nextLine: number,
     token.latex = latex;
   }
   if (!caption) {
-    token.attrs = [['class', 'table ']];
+    token.attrJoin("class", "table");
   } else {
     if (type === TBegin.table) {
       couterTables += 1;
@@ -89,8 +89,8 @@ const StatePushPatagraphOpenTable = (state, startLine: number, nextLine: number,
       couterFigures += 1;
       currentNumber = couterFigures;
     }
-    token.attrs = [['class', 'table'],
-      ['number', currentNumber.toString()]];
+    token.attrJoin("class", "table");
+    token.attrJoin("number", currentNumber.toString());
   }
   if (state.md.options?.forPptx) {
     if (type === TBegin.table || type === TBegin.figure) {

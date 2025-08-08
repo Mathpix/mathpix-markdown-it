@@ -39,7 +39,7 @@ module.exports = [
       '\\label{table:1}\n' +
       '\\end{table}',
     html:  `<div id="table%3A1" class="table table%3A1" number="1">
-<div class="table_tabular " style="text-align: center">
+<div class="table_tabular" style="text-align: center">
 <div class="inline-tabular"><table class="tabular">
 <tbody>
 <tr style="border-top: none !important; border-bottom: none !important;">

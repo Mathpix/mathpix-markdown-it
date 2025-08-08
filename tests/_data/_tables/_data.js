@@ -64,7 +64,7 @@ module.exports = [
   4 & 5 & 6 \\\\
   7 & 8 & 9 \\\\
 \\end{tabular}`,
-    html: `<div class="table_tabular " style="text-align: center">
+    html: `<div class="table_tabular" style="text-align: center">
 <div class="inline-tabular"><table class="tabular">
 <tbody>
 <tr style="border-top: none !important; border-bottom: none !important;">
@@ -85,7 +85,7 @@ module.exports = [
 </tbody>
 </table>
 </div></div>`,
-    html_notCenterTables: `<div class="table_tabular ">
+    html_notCenterTables: `<div class="table_tabular">
 <div class="inline-tabular"><table class="tabular">
 <tbody>
 <tr style="border-top: none !important; border-bottom: none !important;">
@@ -118,7 +118,7 @@ module.exports = [
   \\end{tabular}
 \\end{left}`,
     html: `<div class="center" style="text-align: left">
-<div class="table_tabular " style="text-align: left">
+<div class="table_tabular" style="text-align: left">
 <div class="inline-tabular"><table class="tabular">
 <tbody>
 <tr style="border-top: none !important; border-bottom: none !important;">
@@ -141,7 +141,7 @@ module.exports = [
 </div></div>
 </div>`,
     html_notCenterTables: `<div class="center" style="text-align: left">
-<div class="table_tabular " style="text-align: left">
+<div class="table_tabular" style="text-align: left">
 <div class="inline-tabular"><table class="tabular">
 <tbody>
 <tr style="border-top: none !important; border-bottom: none !important;">
@@ -175,7 +175,7 @@ massively multiple & Library & University \\\\
 one-to-one & Book & Tutor \\\\
 \\cline{2-3}
 \\end{tabular}`,
-    html: `<div class="table_tabular " style="text-align: center">
+    html: `<div class="table_tabular" style="text-align: center">
 <div class="inline-tabular"><table class="tabular">
 <tbody>
 <tr style="border-top: none !important; border-bottom: none !important;">
@@ -196,7 +196,7 @@ one-to-one & Book & Tutor \\\\
 </tbody>
 </table>
 </div></div>`,
-    html_notCenterTables: `<div class="table_tabular ">
+    html_notCenterTables: `<div class="table_tabular">
 <div class="inline-tabular"><table class="tabular">
 <tbody>
 <tr style="border-top: none !important; border-bottom: none !important;">
@@ -233,8 +233,8 @@ Col1 & Col2 & Col2 & Col3 \\\\ [0.5ex]
 \\hline
 \\end{tabular}
 \\end{table}`,
-    html: `<div class="table ">
-<div class="table_tabular " style="text-align: center">
+    html: `<div class="table">
+<div class="table_tabular" style="text-align: center">
 <div class="inline-tabular"><table class="tabular">
 <tbody>
 <tr style="border-top: none !important; border-bottom: none !important;">
@@ -277,8 +277,8 @@ Col1 & Col2 & Col2 & Col3 \\\\ [0.5ex]
 </table>
 </div></div>
 </div>`,
-    html_notCenterTables: `<div class="table ">
-<div class="table_tabular " style="text-align: center">
+    html_notCenterTables: `<div class="table">
+<div class="table_tabular" style="text-align: center">
 <div class="inline-tabular"><table class="tabular">
 <tbody>
 <tr style="border-top: none !important; border-bottom: none !important;">
