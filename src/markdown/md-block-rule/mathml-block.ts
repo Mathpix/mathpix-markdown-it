@@ -1,6 +1,6 @@
 import { RuleBlock, Token } from "markdown-it";
 import { closeTagMML, openTagMML } from "../common/consts";
-import { validMathMLRegex } from "../common/consts";
+import { validateMathMLShallow, ValidationResult } from "../common/validate-mathML";
 
 export const mathMLBlock: RuleBlock = (state, startLine, endLine, silent): boolean => {
   try {
@@ -45,8 +45,10 @@ export const mathMLBlock: RuleBlock = (state, startLine, endLine, silent): boole
 
     // Get the content between the matched lines
     const content: string = state.getLines(startLine, nextLine, state.blkIndent, false);
-    // Validate content with MathML regex
-    if (!validMathMLRegex.test(content)) return false;
+    let validationMathML: ValidationResult = validateMathMLShallow(content);
+    if (!validationMathML.ok) {
+      return false;
+    }
 
     // If in validation mode, return true
     if (silent) return true;
