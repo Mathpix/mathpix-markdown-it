@@ -9,7 +9,7 @@ export const attr_value = '(?:' + unquoted + '|' + single_quoted + '|' + double_
 export const attribute = '(?:\\s+' + attr_name + '(?:\\s*=\\s*' + attr_value + ')?)';
 
 const open_tag_mml = '^<(math)' + attribute + '*\\s*\\/?>';
-const close_tag_mml = '^<\\/math*\\s*>';
+const close_tag_mml = '<\\/math\\s*>';
 export const openTagMML = new RegExp('(?:' + open_tag_mml + ')');
 export const closeTagMML = new RegExp('(?:' + close_tag_mml + ')');
 export const mathMLInlineRegex: RegExp = /^<(math\b[^>]*)>[\s\S]*<\/math>/;
