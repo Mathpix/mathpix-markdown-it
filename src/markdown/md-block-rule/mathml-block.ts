@@ -70,28 +70,22 @@ export const mathMLBlock: RuleBlock = (state, startLine, endLine, silent): boole
 
     let nextLine = startLine + 1;
     let hasCloseTag = false;
-    if (closeTagMML.test(lineText)) {
-      hasCloseTag = true;
-      nextLine = startLine + 1; // the entire content is on the first line
-    } else {
-      const terminatorRules = collectTerminatorRules(state.md as MarkdownIt, mathMLBlock);
-      // Iterate through lines until the closing tag or end of file
-      while (nextLine < endLine) {
-        pos = state.bMarks[nextLine] + state.tShift[nextLine];
-        max = state.eMarks[nextLine];
-        // Check for terminator rules
-        if (terminatorRules.some(rule => rule(state, nextLine, endLine, true))) break;
+    const terminatorRules = collectTerminatorRules(state.md as MarkdownIt, mathMLBlock);
+    // Iterate through lines until the closing tag or end of file
+    while (nextLine < endLine) {
+      pos = state.bMarks[nextLine] + state.tShift[nextLine];
+      max = state.eMarks[nextLine];
+      // Check for terminator rules
+      if (terminatorRules.some(rule => rule(state, nextLine, endLine, true))) break;
 
-        lineText = state.src.slice(pos, max);
-        // Check for closing tag
-        if (closeTagMML.test(lineText)) {
-          nextLine++;
-          hasCloseTag = true;
-          break;
-        }
-
+      lineText = state.src.slice(pos, max);
+      // Check for closing tag
+      if (closeTagMML.test(lineText)) {
         nextLine++;
+        hasCloseTag = true;
+        break;
       }
+      nextLine++;
     }
 
     // If there is no closing tag, return false
