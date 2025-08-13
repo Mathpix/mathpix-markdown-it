@@ -5,7 +5,6 @@ let MM = require('../lib/mathpix-markdown-model/index').MathpixMarkdownModel;
 
 
 const { JSDOM } = require("jsdom");
-const tests = require("./_data/_sanitizeHtml/_data");
 const jsdom = new JSDOM();
 global.window = jsdom.window;
 global.document = jsdom.window.document;
@@ -23,8 +22,6 @@ describe('Check html tags.', () => {
       {
       htmlTags: true
     }));
-    // console.log("[html]=>");
-    // console.log(html);
     describe('Should be html with the validation that checks for matching opening and closing HTML tags => ' + test.mmd, () => {
       it('Checking result html', (done) => {
         html.trim().should.equal(test.html);
@@ -57,6 +54,27 @@ describe('Check html tags.', () => {
     describe('Should be disable html rendering => ' + test.mmd, () => {
       it('Checking result html', (done) => {
         htmlTagsDisable.trim().should.equal(test.htmlTagsDisable);
+        done();
+      });
+    });
+  });
+});
+
+describe('Check validate MathML.', () => {
+  const options = {
+    width: 800,
+  };
+  const tests = require('./_data/_html-tag-matching/_data-validate-mathML');
+
+  tests.forEach(function(test) {
+    const html = MM.markdownToHTML(test.mmd, Object.assign(
+      {}, {...options},
+      {
+      htmlTags: true
+    }));
+    describe('Should be html with the validation that checks for matching opening and closing HTML tags => ' + test.mmd, () => {
+      it('Checking result html', (done) => {
+        html.trim().should.equal(test.html);
         done();
       });
     });

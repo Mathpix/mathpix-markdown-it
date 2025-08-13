@@ -1,6 +1,8 @@
 import { RuleInline, Token } from "markdown-it";
 import { convertMathToHtml } from "../common/convert-math-to-html";
-import { validMathMLRegex, mathMLInlineRegex } from "../common/consts";
+import { mathMLInlineRegex } from "../common/consts";
+import { validateMathMLShallow, ValidationResult } from "../common/validate-mathML";
+
 
 export const inlineMathML: RuleInline = (state, silent) => {
   try {
@@ -13,11 +15,13 @@ export const inlineMathML: RuleInline = (state, silent) => {
 
     // Attempt to match the MathML inline pattern
     const match = src.slice(pos).match(mathMLInlineRegex);
-
-    if (!match || !validMathMLRegex.test(match[0])) {
+    if (!match) {
       return false;
     }
-
+    let validationMathML: ValidationResult = validateMathMLShallow(match[0]);
+    if (!validationMathML.ok) {
+      return false;
+    }
     // Determine the type of MathML (inline or display)
     let type:string = match[1]?.indexOf('block') !== -1 ? "display_mathML" : "inline_mathML";
 

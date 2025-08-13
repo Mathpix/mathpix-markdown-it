@@ -12,7 +12,6 @@ const open_tag_mml = '^<(math)' + attribute + '*\\s*\\/?>';
 const close_tag_mml = '^<\\/math*\\s*>';
 export const openTagMML = new RegExp('(?:' + open_tag_mml + ')');
 export const closeTagMML = new RegExp('(?:' + close_tag_mml + ')');
-export const validMathMLRegex: RegExp = /<math\b[^>]*>(\s*<(m.*?\b[^>]*>[\s\S]*?<\/m.*?>)\s*)+<\/math>/i;
 export const mathMLInlineRegex: RegExp = /^<(math\b[^>]*)>[\s\S]*<\/math>/;
 
 

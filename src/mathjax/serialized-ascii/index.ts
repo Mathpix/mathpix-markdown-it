@@ -330,8 +330,8 @@ export class SerializedAsciiVisitor extends MmlVisitor {
   /** Apply inherited attribute to all children */
   setChildInheritedAttribute = (node, attrName: string) => {
     try {
-      const inherited = node.attributes.getAllInherited();
-      if (!inherited.hasOwnProperty(attrName) || !node.childNodes || !node.childNodes.length) {
+      const inherited = node?.attributes ? node?.attributes?.getAllInherited() : null;
+      if (!inherited || !inherited.hasOwnProperty(attrName) || !node.childNodes || !node.childNodes.length) {
         return
       }
       for (const child of node.childNodes) {
