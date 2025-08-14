@@ -7,7 +7,9 @@ module.exports = [
       '\\caption{The caption is at the bottom.}\n' +
       '\\end{figure}',
     html: '<div class="table" number="1">\n' +
-      '<div class="figure_img" style="text-align: center;"><img src="https://cdn.mathpix.com/snip/images/5r2cqa-4r9p1M77cjQmHKZbv19W-kCnuJ4Jya24Xh1k.original.fullsize.png" alt="" style="width: 600px;"/></div><div class="caption_figure">The caption is at the bottom.</div></div>'
+      '<div class="figure_img" style="text-align: center;"><img src="https://cdn.mathpix.com/snip/images/5r2cqa-4r9p1M77cjQmHKZbv19W-kCnuJ4Jya24Xh1k.original.fullsize.png" alt="" style="width: 600px;"/></div><div class="caption_figure">The caption is at the bottom.</div></div>',
+    html_width0: '<div class="table" number="1">\n' +
+      '<div class="figure_img" style="text-align: center;"><img src="https://cdn.mathpix.com/snip/images/5r2cqa-4r9p1M77cjQmHKZbv19W-kCnuJ4Jya24Xh1k.original.fullsize.png" alt="" style="width: 50%;"/></div><div class="caption_figure">The caption is at the bottom.</div></div>'
   },
   {
     latex: '\\begin{table}\n' +

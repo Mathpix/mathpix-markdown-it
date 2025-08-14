@@ -20,6 +20,15 @@ describe('Check tables and figures with captions:', () => {
         done();
       });
     });
+    if (test.html_width0) {
+      const html = MM.markdownToHTML(test.latex, {width: 0});
+      describe('Latex => ' + test.latex, () => {
+        it('Checking result html', (done) => {
+          html.trim().should.equal(test.html_width0);
+          done();
+        });
+      });
+    }
   });
   MM.texReset();
 });
