@@ -90,7 +90,7 @@ const separatingSpan: RuleBlock = (state, startLine: number, endLine: number, si
     return false
   }
   
-  state.tShift[startLine] += content.length;
+  state.bMarks[startLine] += content.length;
   const token: Token = state.push('inline', '', 0);
   token.content = content;
   token.children = [];
