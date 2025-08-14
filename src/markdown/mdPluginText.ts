@@ -50,7 +50,7 @@ export const setTextCounterSection = (envName: string, num: number) => {
 
 const separatingSpan: RuleBlock = (state, startLine: number, endLine: number, silent) => {
   let lineText: string,
-    pos: number = state.bMarks[startLine],
+    pos: number = state.bMarks[startLine] + state.tShift[startLine],
     max: number = state.eMarks[startLine];
 
   const markerBegin = RegExp('^</?(span)(?=(\\s|>|$))', 'i');
@@ -94,7 +94,7 @@ const separatingSpan: RuleBlock = (state, startLine: number, endLine: number, si
   const token: Token = state.push('inline', '', 0);
   token.content = content;
   token.children = [];
-  state.pos = nextPos;
+  // state.pos = nextPos;
   return true;
 };
 
