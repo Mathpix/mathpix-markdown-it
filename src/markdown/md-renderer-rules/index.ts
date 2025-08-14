@@ -21,7 +21,6 @@ export const InlineDecimal = (a, token) => {
 
 export const IncludeGraphics = (tokens, idx, options, env, slf): string => {
   const token: Token = tokens[idx];
-  const containerWidthPx = options?.width || 0;
   const RAW_WIDTH = token.attrGet('width') || '';
   const RAW_HEIGHT = token.attrGet('height') || '';
   const SRC = token.attrGet('src') || '';
@@ -50,24 +49,15 @@ export const IncludeGraphics = (tokens, idx, options, env, slf): string => {
 
   if (twMatch) {
     const factor: number = Math.max(0, parseFloat(twMatch[1] ?? '1')) || 1;
-    if (containerWidthPx && Number.isFinite(containerWidthPx)) {
-      const px: number = Math.round(factor * containerWidthPx);
-      imgStyles.push(`width: ${px}px;`);
-    } else {
-      const pct: number = Math.min(100, factor * 100);
-      imgStyles.push(`width: ${pct}%;`);
-    }
+    const pct: number = Math.min(100, factor * 100);
+    imgStyles.push(`width: ${pct}%;`);
   } else if (RAW_WIDTH) {
     // Any other units (“300px”, “12cm”, “40%”, “10em”) — we give as is
     imgStyles.push(`width: ${RAW_WIDTH};`);
   } else {
     // Width not specified
     /** max-width - prevent small images from being stretched */
-    if (containerWidthPx && Number.isFinite(containerWidthPx)) {
-      imgStyles.push(`max-width: ${Math.round(containerWidthPx * 0.5)}px;`);
-    } else {
-      imgStyles.push('max-width: 50%;');
-    }
+    imgStyles.push('max-width: 50%;');
   }
 
   const divStyleAttr: string = wrapperStyles.length ? ` style="${wrapperStyles.join(' ')}"` : '';

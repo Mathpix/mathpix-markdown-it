@@ -60,7 +60,7 @@ const htmlContent = '<div>First <sup class="footnote-ref"><a href="#fn1" id="fnr
   '<div class="theorem" style="font-style: normal; padding: 10px 0;"><span style="font-weight: bold; font-style: normal;" class="theorem-title">Definition 1.1.</span><span style="margin-right: 16px"></span><div style="display: inline;" data-display="inline">Here is a new definition <sup class="footnote-ref"><a href="#fn8" id="fnref8">[8]</a></sup></div>\n' +
   '</div></div>\n' +
   '<div class="table" number="1">\n' +
-  '<div class="figure_img" style="text-align: center;"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Cappuccino_at_Sightglass_Coffee.jpg/1599px-Cappuccino_at_Sightglass_Coffee.jpg" alt="" style="width: 600px;"/></div><div class="caption_figure">Figure 1: The caption is at the bottom <sup class="footnote-ref"><a href="#fn9" id="fnref9">[9]</a></sup>.</div></div>\n' +
+  '<div class="figure_img" style="text-align: center;"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Cappuccino_at_Sightglass_Coffee.jpg/1599px-Cappuccino_at_Sightglass_Coffee.jpg" alt="" style="width: 50%;"/></div><div class="caption_figure">Figure 1: The caption is at the bottom <sup class="footnote-ref"><a href="#fn9" id="fnref9">[9]</a></sup>.</div></div>\n' +
   '<hr class="footnotes-sep">\n' +
   '<section class="footnotes" style="margin-bottom: 1em;">\n' +
   '<ol class="footnotes-list" style="margin-bottom: 0;">\n' +
@@ -147,7 +147,7 @@ const htmlContentFootnote_compact_refs = '<div>First <sup class="footnote-ref"><
   '<div class="theorem" style="font-style: normal; padding: 10px 0;"><span style="font-weight: bold; font-style: normal;" class="theorem-title">Definition 1.1.</span><span style="margin-right: 16px"></span><div style="display: inline;" data-display="inline">Here is a new definition <sup class="footnote-ref"><a href="#fn8" id="fnref8">[8]</a></sup></div>\n' +
   '</div></div>\n' +
   '<div class="table" number="1">\n' +
-  '<div class="figure_img" style="text-align: center;"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Cappuccino_at_Sightglass_Coffee.jpg/1599px-Cappuccino_at_Sightglass_Coffee.jpg" alt="" style="width: 600px;"/></div><div class="caption_figure">Figure 1: The caption is at the bottom <sup class="footnote-ref"><a href="#fn9" id="fnref9">[9]</a></sup>.</div></div>\n' +
+  '<div class="figure_img" style="text-align: center;"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Cappuccino_at_Sightglass_Coffee.jpg/1599px-Cappuccino_at_Sightglass_Coffee.jpg" alt="" style="width: 50%;"/></div><div class="caption_figure">Figure 1: The caption is at the bottom <sup class="footnote-ref"><a href="#fn9" id="fnref9">[9]</a></sup>.</div></div>\n' +
   '<hr class="footnotes-sep">\n' +
   '<section class="footnotes" style="margin-bottom: 1em;">\n' +
   '<ol class="footnotes-list" style="margin-bottom: 0;">\n' +
