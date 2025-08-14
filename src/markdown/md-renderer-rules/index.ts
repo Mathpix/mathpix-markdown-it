@@ -1,5 +1,5 @@
-import { Renderer } from 'markdown-it';
-import { getTextWidth } from "../utils";
+import { Renderer, Token } from 'markdown-it';
+import { TEXTWIDTH_RE } from '../common/consts';
 
 export const CaptionTable: Renderer = (tokens, idx, options, env, slf) => {
   let token = tokens[idx];
@@ -19,42 +19,61 @@ export const InlineDecimal = (a, token) => {
   return `<span class="f">${arr[0]}</span><span class="decimal_left">${arr[1]?arr[1]:''}</span><span class="f">.${arr[2]?arr[2]:''}</span>`;
 };
 
-export const IncludeGraphics = (a, token, slf, width, options) => {
-  const textWidthTag: RegExp = /\\textwidth|\\linewidth/;
-  let align = token.attrGet('align');
-  if (!align && options.centerImages) {
-    align = 'center';
+export const IncludeGraphics = (tokens, idx, options, env, slf): string => {
+  const token: Token = tokens[idx];
+  const containerWidthPx = options?.width || 0;
+  const RAW_WIDTH = token.attrGet('width') || '';
+  const RAW_HEIGHT = token.attrGet('height') || '';
+  const SRC = token.attrGet('src') || '';
+  const ALT = token.attrGet('alt') || '';
+  const HILITE = token.attrGet('data-mmd-highlight') || '';
+  const TAG = token.tag || 'img';
+
+  // wrapper styles (centering, highlighting)
+  const wrapperStyles: string[] = [];
+  const align = token.attrGet('align') || (options?.centerImages ? 'center' : '');
+  if (align) wrapperStyles.push(`text-align: ${align};`);
+  if (HILITE) wrapperStyles.push(HILITE);
+
+  // ---- image styles ----
+  const imgStyles: string[] = [];
+
+  // height
+  if (RAW_HEIGHT) {
+    imgStyles.push(`height: ${RAW_HEIGHT};`);
   }
-  let style = align ? `text-align: ${align}; ` : '';
-  const h = token.attrGet('height');
-  let styleImg = h ? `height: ${h}; ` : '';
-  let w = token.attrGet('width');
-  if (w) {
-    if (textWidthTag.test(w)) {
-      const match = w.match(textWidthTag);
-      if (match) {
-        const textWidth = width ? width : getTextWidth();
-        let dWidth = w.slice(0, match.index).trim();
-        dWidth = parseFloat(dWidth);
-        dWidth = !dWidth ? 1 : dWidth;
-        styleImg  += `width: ${dWidth * textWidth}px; `;
-      }
+
+  // width
+  // Support: 0.75\textwidth, \textwidth, 1\linewidth, etc.
+  // Grab the factor (can be empty), then \textwidth|\linewidth
+  const twMatch = RAW_WIDTH.match(TEXTWIDTH_RE);
+
+  if (twMatch) {
+    const factor: number = Math.max(0, parseFloat(twMatch[1] ?? '1')) || 1;
+    if (containerWidthPx && Number.isFinite(containerWidthPx)) {
+      const px: number = Math.round(factor * containerWidthPx);
+      imgStyles.push(`width: ${px}px;`);
     } else {
-      styleImg  += `width: ${w}; `;
+      const pct: number = Math.min(100, factor * 100);
+      imgStyles.push(`width: ${pct}%;`);
+    }
+  } else if (RAW_WIDTH) {
+    // Any other units (“300px”, “12cm”, “40%”, “10em”) — we give as is
+    imgStyles.push(`width: ${RAW_WIDTH};`);
+  } else {
+    // Width not specified
+    /** max-width - prevent small images from being stretched */
+    if (containerWidthPx && Number.isFinite(containerWidthPx)) {
+      imgStyles.push(`max-width: ${Math.round(containerWidthPx * 0.5)}px;`);
+    } else {
+      imgStyles.push('max-width: 50%;');
     }
   }
-  if (!styleImg) {
-    const textWidth = width ? width : getTextWidth();
-    /** max-width - prevent small images from being stretched */
-    styleImg  += `max-width: ${0.5 * textWidth}px; `;
-  }
 
-  const src = token.attrGet('src') ? `src="${token.attrGet('src')}"` : '';
-  const alt = '';
+  const divStyleAttr: string = wrapperStyles.length ? ` style="${wrapperStyles.join(' ')}"` : '';
+  const imgStyleAttr: string = imgStyles.length ? ` style="${imgStyles.join(' ')}"` : '';
+  const srcAttr: string = SRC ? ` src="${SRC}"` : '';
+  const altAttr: string = ` alt="${ALT.replace(/"/g, '&quot;')}"`;
 
-  styleImg = styleImg ? `style="${styleImg}"` : '';
-  let data_mmd_highlight = token.attrGet('data-mmd-highlight');
-  data_mmd_highlight = data_mmd_highlight ? data_mmd_highlight : '';
-  style = style ? `style="${style}${data_mmd_highlight}"` : '';
-  return `<div class="figure_img" ${style}><${token.tag} ${src} ${alt} ${styleImg}></div>`
+  return `<div class="figure_img"${divStyleAttr}><${TAG}${srcAttr}${altAttr}${imgStyleAttr}${TAG === 'img' ? '/' : ''}>${TAG === 'img' ? '' : '</' + TAG + '>'}</div>`;
 };

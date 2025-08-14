@@ -18,7 +18,6 @@ export default (md: MarkdownIt, options) => {
   ClearSubMathLists();
   ClearParseError();
   Object.assign(md.options, options);
-  const width = md.options.width;
 
   md.block.ruler.after("fence", "BeginTabular", BeginTabular, 
     Object.assign({}, md.options, {alt: getTerminatedRules('BeginTabular')}));
@@ -39,7 +38,7 @@ export default (md: MarkdownIt, options) => {
     return InlineDecimal(tokens, tokens[idx]);
   };
   md.renderer.rules.includegraphics = (tokens, idx, options, env, slf) => {
-    return IncludeGraphics(tokens, tokens[idx], slf, width, options);
+    return IncludeGraphics(tokens, idx, options, env, slf);
   }
 
 }

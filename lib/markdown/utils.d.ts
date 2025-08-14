@@ -1,7 +1,6 @@
 import { Token } from 'markdown-it';
 export declare const endTag: (arg: string, shouldBeFirst?: boolean) => RegExp;
 export declare const beginTag: (arg: string, shouldBeFirst?: boolean) => RegExp;
-export declare const getTextWidth: () => number;
 export declare const getWidthFromDocument: (cwidth?: number) => number;
 export declare const getLatexTextWidth: (strWidth: string, cWidth?: number) => string;
 export declare const isNotBackticked: (str: string, tag: string) => boolean;
