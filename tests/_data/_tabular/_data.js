@@ -571,7 +571,7 @@ t1 & t2
       '</div></div>\n' +
       '<div class=\"caption_table\">Table 1: Table <strong>to test captions and</strong> labels</div></div>\n' +
       '<div class="table" number="1">\n' +
-      '<div class="caption_figure">Figure 1: The <em>caption is at the</em> top.</div><div class="figure_img" style="text-align: center; "><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Cappuccino_at_Sightglass_Coffee.jpg/1599px-Cappuccino_at_Sightglass_Coffee.jpg"  style="width: 600px; "></div></div>'
+      '<div class="caption_figure">Figure 1: The <em>caption is at the</em> top.</div><div class="figure_img" style="text-align: center;"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Cappuccino_at_Sightglass_Coffee.jpg/1599px-Cappuccino_at_Sightglass_Coffee.jpg" alt="" style="width: 50%;"/></div></div>'
   },
   {
     latex: 'В таблиці 3.2 представлені паспортні характеристики двигуна КД -5Д.\n' +

@@ -53,25 +53,25 @@ test2</div>`
   },
   {
     latex: `\\includegraphics{https://cdn.mathpix.com/snip/images/CJ2UE_bWzpjLlxKUaO9o69DgpbCy8d-E8_uBe2-IORY.original.fullsize.png}`,
-    html: `<div><div class="figure_img" style="text-align: center; "><img src="https://cdn.mathpix.com/snip/images/CJ2UE_bWzpjLlxKUaO9o69DgpbCy8d-E8_uBe2-IORY.original.fullsize.png"  style="max-width: 600px; "></div></div>`,
-    html_notCenterImages: `<div><div class="figure_img" ><img src="https://cdn.mathpix.com/snip/images/CJ2UE_bWzpjLlxKUaO9o69DgpbCy8d-E8_uBe2-IORY.original.fullsize.png"  style="max-width: 600px; "></div></div>`
+    html: `<div><div class="figure_img" style="text-align: center;"><img src="https://cdn.mathpix.com/snip/images/CJ2UE_bWzpjLlxKUaO9o69DgpbCy8d-E8_uBe2-IORY.original.fullsize.png" alt="" style="max-width: 50%;"/></div></div>`,
+    html_notCenterImages: `<div><div class="figure_img"><img src="https://cdn.mathpix.com/snip/images/CJ2UE_bWzpjLlxKUaO9o69DgpbCy8d-E8_uBe2-IORY.original.fullsize.png" alt="" style="max-width: 50%;"/></div></div>`
   },  
   {
     latex: `\\begin{figure}
 \\includegraphics{https://cdn.mathpix.com/snip/images/HRFXh5gVJum_M8klzVz9Z8pDweI_-Ebsswicb88jXZE.original.fullsize.png}
 \\end{figure}`,
     html: `<div class="table">
-<div class="figure_img" style="text-align: center; "><img src="https://cdn.mathpix.com/snip/images/HRFXh5gVJum_M8klzVz9Z8pDweI_-Ebsswicb88jXZE.original.fullsize.png"  style="max-width: 600px; "></div></div>`,
+<div class="figure_img" style="text-align: center;"><img src="https://cdn.mathpix.com/snip/images/HRFXh5gVJum_M8klzVz9Z8pDweI_-Ebsswicb88jXZE.original.fullsize.png" alt="" style="max-width: 50%;"/></div></div>`,
     html_notCenterImages: `<div class="table">
-<div class="figure_img" ><img src="https://cdn.mathpix.com/snip/images/HRFXh5gVJum_M8klzVz9Z8pDweI_-Ebsswicb88jXZE.original.fullsize.png"  style="max-width: 600px; "></div></div>`
+<div class="figure_img"><img src="https://cdn.mathpix.com/snip/images/HRFXh5gVJum_M8klzVz9Z8pDweI_-Ebsswicb88jXZE.original.fullsize.png" alt="" style="max-width: 50%;"/></div></div>`
   },  
   {
     latex: `\\begin{figure}[h]
 \\includegraphics[width=0.5\\textwidth, right]{https://cdn.mathpix.com/snip/images/MJT22mwBq-bwqrOYwhrUrVKxO3Xcu4vyHSabfbG8my8.original.fullsize.png}
 \\end{figure}`,
     html: `<div class="table">
-<div class="figure_img" style="text-align: right; "><img src="https://cdn.mathpix.com/snip/images/MJT22mwBq-bwqrOYwhrUrVKxO3Xcu4vyHSabfbG8my8.original.fullsize.png"  style="width: 600px; "></div></div>`,
+<div class="figure_img" style="text-align: right;"><img src="https://cdn.mathpix.com/snip/images/MJT22mwBq-bwqrOYwhrUrVKxO3Xcu4vyHSabfbG8my8.original.fullsize.png" alt="" style="width: 50%;"/></div></div>`,
     html_notCenterImages: `<div class="table">
-<div class="figure_img" style="text-align: right; "><img src="https://cdn.mathpix.com/snip/images/MJT22mwBq-bwqrOYwhrUrVKxO3Xcu4vyHSabfbG8my8.original.fullsize.png"  style="width: 600px; "></div></div>`
+<div class="figure_img" style="text-align: right;"><img src="https://cdn.mathpix.com/snip/images/MJT22mwBq-bwqrOYwhrUrVKxO3Xcu4vyHSabfbG8my8.original.fullsize.png" alt="" style="width: 50%;"/></div></div>`
   },
 ];

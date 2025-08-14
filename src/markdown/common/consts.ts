@@ -115,7 +115,7 @@ export const RE_INCLUDEGRAPHICS_WITH_ALIGNMENT_GLOBAL: RegExp = /\\includegraphi
 
 export const HIGHLIGHT_COLOR = 'rgba(0, 147, 255, 0.25)';
 export const HIGHLIGHT_TEXT_COLOR = '#1e2029';
-
+export const TEXTWIDTH_RE = /^\s*(\d*\.?\d+)?\s*\\(?:textwidth|linewidth)\b/;
 export const latexEnvironments = [
   "figure",
   "table",

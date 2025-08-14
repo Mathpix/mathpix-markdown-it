@@ -29,11 +29,6 @@ export const beginTag = (arg: string, shouldBeFirst = false): RegExp  => {
   }
 };
 
-export const getTextWidth = (): number => {
-  const el_container = document ? document.getElementById('container-ruller') : null;
-  return el_container ? el_container.offsetWidth : 800;
-};
-
 export const getWidthFromDocument = (cwidth = 1200) => {
   try {
     const el_container = document.getElementById('container-ruller');
