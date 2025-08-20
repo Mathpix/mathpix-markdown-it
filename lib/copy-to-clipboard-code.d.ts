@@ -1,7 +1,7 @@
 declare global {
     interface Window {
-        addListenerCopyToClipdoardEvents: Function;
-        removeListenerCopyToClipdoardEvents: Function;
+        addListenerCopyToClipboardEvents: Function;
+        removeListenerCopyToClipboardEvents: Function;
     }
 }
-export declare const exportMethods: () => void;
+export declare const exposeClipboardToWindow: () => void;

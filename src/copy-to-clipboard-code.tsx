@@ -1,18 +1,20 @@
 import {
-  addListenerCopyToClipdoardEvents,
-  removeListenerCopyToClipdoardEvents
+  addListenerCopyToClipboardEvents,
+  removeListenerCopyToClipboardEvents
 } from './copy-to-clipboard';
 
 declare global {
   interface Window {
-    addListenerCopyToClipdoardEvents: Function,
-    removeListenerCopyToClipdoardEvents: Function
+    addListenerCopyToClipboardEvents: Function,
+    removeListenerCopyToClipboardEvents: Function
   }
 }
 
-export const exportMethods = () => {
-  window.addListenerCopyToClipdoardEvents = addListenerCopyToClipdoardEvents;
-  window.removeListenerCopyToClipdoardEvents = removeListenerCopyToClipdoardEvents;
+export const exposeClipboardToWindow = () => {
+  if (typeof window !== 'undefined') {
+    window.addListenerCopyToClipboardEvents = addListenerCopyToClipboardEvents;
+    window.removeListenerCopyToClipboardEvents = removeListenerCopyToClipboardEvents;
+  }
 };
 
-exportMethods();
+exposeClipboardToWindow();

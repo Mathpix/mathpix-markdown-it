@@ -8,8 +8,10 @@ declare global {
 }
 
 export const exportMethods = () => {
-  window.addListenerContextMenuEvents = addListenerContextMenuEvents;
-  window.removeListenerContextMenuEvents = removeListenerContextMenuEvents;
+  if (typeof window !== 'undefined') {
+    window.addListenerContextMenuEvents = addListenerContextMenuEvents;
+    window.removeListenerContextMenuEvents = removeListenerContextMenuEvents;
+  }
 };
 
 exportMethods();
