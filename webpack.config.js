@@ -147,5 +147,50 @@ const contextMenuConfig = Object.assign({}, config,{
   ],
 });
 
+const copyToClipboardCodeConfig = Object.assign({}, config,{
+  name: "copy-to-clipboard-code",
+  entry: {
+    main: [
+      // '@babel/polyfill',
+      path.join(__dirname, './src/copy-to-clipboard-code.tsx'),
+    ]
+  },
+  output: {
+    path: path.resolve(__dirname, './es5/'),
+    filename: 'copy-to-clipboard-code.js',
+  },
+  module: {
+    rules: [
+      {
+        test: /\.tsx?$/,
+        include: path.resolve(__dirname, 'src'),
+        exclude: /(node_modules|bower_components|lib)/,
+        loader: 'ts-loader',
+      },
+      {
+        test: /\.js?$/,
+        include: path.resolve(__dirname, 'src'),
+        exclude: /(node_modules|bower_components)/,
+        use: {
+          loader: 'babel-loader',
+        }
+      },
+      {
+        test: /\.css$/,
+        exclude: /node_modules/,
+        use: [
+          MiniCssExtractPlugin.loader,
+          "css-loader"
+        ]
+      }
+    ]
+  },
+  plugins: [
+    new NodePolyfillPlugin({
+      excludeAliases: ["console"]
+    })
+  ],
+});
+
 // Return Array of Configurations
-module.exports = [ indexConfig, bundleConfig, contextMenuConfig ];
+module.exports = [ indexConfig, bundleConfig, contextMenuConfig, copyToClipboardCodeConfig ];

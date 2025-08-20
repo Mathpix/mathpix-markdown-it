@@ -51,8 +51,6 @@ const showCopy = (button) => {
   if (!copyIcon || !checkIcon)
     return;
   button.setAttribute('aria-label', 'Copy');
-  // button.classList.remove('mmd-tooltipped');
-  // button.classList.remove('mmd-tooltipped-w');
   showSVG(copyIcon);
   hideSVG(checkIcon);
 };
@@ -63,8 +61,6 @@ const showCheck = (button) => {
   if (!copyIcon || !checkIcon)
     return;
   button.setAttribute('aria-label', 'Copied');
-  // button.classList.add('mmd-tooltipped');
-  // button.classList.add('mmd-tooltipped-w');
   hideSVG(copyIcon);
   showSVG(checkIcon);
 };
@@ -78,26 +74,12 @@ const handleClipboardCopy = (event) => {
   }, CLIPBOARD_COPY_TIMER_DURATION)
 };
 
-export const focused = (event: FocusEvent) => {
-  // console.log("[MMD]=>focused=>event=>", event);
-  // console.log("[MMD]=>focused=>event.currentTarget=>", event.currentTarget);
-};
-
-export const blurred = () => {
-  // console.log("[MMD]=>blurred=>event=>", event);
-  // console.log("[MMD]=>blurred=>event.currentTarget=>", event.currentTarget);
-};
-
-export const addListenerCopyToClipdoardEvents = () => {
+export const addListenerCopyToClipboardEvents = () => {
   document.addEventListener('click', clicked);
-  document.addEventListener('focus', focused);
-  document.addEventListener('blur', blurred);
   document.addEventListener('clipboard-copy', handleClipboardCopy);
 };
 
-export const removeListenerCopyToClipdoardEvents = () => {
+export const removeListenerCopyToClipboardEvents = () => {
   document.removeEventListener('click', clicked);
-  document.removeEventListener('focus', focused);
-  document.removeEventListener('blur', blurred);
   document.removeEventListener('clipboard-copy', handleClipboardCopy)
 };
