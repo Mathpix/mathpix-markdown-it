@@ -18,13 +18,7 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="57.74998163509571" y="71.68885863515925" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="47.25" y="49.65904781297524" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>O</tspan></text><text x="42" y="44.40904781297524" class="debug" fill="#ff0000" style="
+            "></text><text x="47.25" y="49.65904781297524" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: rtl; unicode-bidi: bidi-override;"><tspan>O</tspan></text><text x="42" y="44.40904781297524" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="63.07762985939926" y="21" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -45,13 +39,7 @@ module.exports = [
                 .sub {
                     font: 8.4px Helvetica, Arial, sans-serif;
                 }
-            </style><g mask="url(#text-mask)"><line x1="65.40906200253792" y1="88.63926352341893" x2="92.68886222174774" y2="72.88926352341892" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-0')"></line><line x1="42" y1="67.56164942311491" x2="65.40906200253792" y2="88.63926352341893" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-1')"></line><line x1="96.687859599601" y1="68.22682572523621" x2="122.15239782340375" y2="76.50075574962543" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-2')"></line><line x1="92.68886222174774" y1="72.88926352341892" x2="122.6471424850451" y2="82.62329884622976" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-3')"></line><line x1="86.13964396098831" y1="42.077614100304054" x2="92.68886222174774" y2="72.88926352341892" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-4')"></line><line x1="48.14071806410013" y1="67.70959504567405" x2="59.03109168245467" y2="43.2494154172934" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-5')"></line><line x1="42" y1="67.56164942311491" x2="54.81220425688771" y2="38.78496750737297" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-6')"></line><line x1="122.6471424850451" y1="82.62329884622976" x2="146.056204487583" y2="61.54568474592571" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-7')"></line><line x1="91.68929414923338" y1="44.71042420323807" x2="111.5869968513906" y2="26.794452217979632" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-8')"></line><line x1="86.13964396098831" y1="42.077614100304054" x2="109.54870596352622" y2="21.000000000000004" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-9')"></line><line x1="54.81220425688771" y1="38.78496750737297" x2="86.13964396098831" y2="42.077614100304054" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-10')"></line><line x1="134.45208070021982" y1="34.223768316481156" x2="140.01891622186537" y2="60.413670326128795" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-11')"></line><line x1="139.50698622682356" y1="30.734035322810836" x2="146.056204487583" y2="61.54568474592571" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-12')"></line><line x1="109.54870596352622" y1="21.000000000000004" x2="139.50698622682356" y2="30.734035322810836" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-13')"></line></g><g><text x="65.40906200253792" y="80.76426352341893" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="65.40906200253792" y="88.63926352341893" class="debug" fill="#ff0000" style="
+            </style><g mask="url(#text-mask)"><line x1="65.40906200253792" y1="88.63926352341893" x2="92.68886222174774" y2="72.88926352341892" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-0')"></line><line x1="42" y1="67.56164942311491" x2="65.40906200253792" y2="88.63926352341893" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-1')"></line><line x1="96.687859599601" y1="68.22682572523621" x2="122.15239782340375" y2="76.50075574962543" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-2')"></line><line x1="92.68886222174774" y1="72.88926352341892" x2="122.6471424850451" y2="82.62329884622976" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-3')"></line><line x1="86.13964396098831" y1="42.077614100304054" x2="92.68886222174774" y2="72.88926352341892" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-4')"></line><line x1="48.14071806410013" y1="67.70959504567405" x2="59.03109168245467" y2="43.2494154172934" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-5')"></line><line x1="42" y1="67.56164942311491" x2="54.81220425688771" y2="38.78496750737297" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-6')"></line><line x1="122.6471424850451" y1="82.62329884622976" x2="146.056204487583" y2="61.54568474592571" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-7')"></line><line x1="91.68929414923338" y1="44.71042420323807" x2="111.5869968513906" y2="26.794452217979632" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-8')"></line><line x1="86.13964396098831" y1="42.077614100304054" x2="109.54870596352622" y2="21.000000000000004" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-9')"></line><line x1="54.81220425688771" y1="38.78496750737297" x2="86.13964396098831" y2="42.077614100304054" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-10')"></line><line x1="134.45208070021982" y1="34.223768316481156" x2="140.01891622186537" y2="60.413670326128795" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-11')"></line><line x1="139.50698622682356" y1="30.734035322810836" x2="146.056204487583" y2="61.54568474592571" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-12')"></line><line x1="109.54870596352622" y1="21.000000000000004" x2="139.50698622682356" y2="30.734035322810836" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-13')"></line></g><g><text x="65.40906200253792" y="80.76426352341893" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: ltr;"><tspan>O</tspan></text><text x="65.40906200253792" y="88.63926352341893" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="92.68886222174774" y="72.88926352341892" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -102,13 +90,7 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="42" y="52.500033998342765" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="60.51524688453281" y="70.1090610114504" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="60.51524688453281" y="77.9840610114504" class="debug" fill="#ff0000" style="
+            "></text><text x="60.51524688453281" y="70.1090610114504" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: ltr;"><tspan>O</tspan></text><text x="60.51524688453281" y="77.9840610114504" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text></g></svg></div></div>
  `
@@ -127,13 +109,7 @@ module.exports = [
                 .sub {
                     font: 8.4px Helvetica, Arial, sans-serif;
                 }
-            </style><g mask="url(#text-mask)"><line x1="130.36502047441311" y1="71.68886102622079" x2="146.11501435277913" y2="44.40905727268486" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-0')"></line><line x1="125.03739499944228" y1="21" x2="146.11501435277913" y2="44.40905727268486" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-1')"></line><line x1="103.04310144098412" y1="60.08474336994248" x2="129.23300469983846" y2="65.65157301452928" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-2')"></line><line x1="99.5533695816433" y1="65.1396496796481" x2="130.36502047441311" y2="71.68886102622079" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-3')"></line><line x1="100.72516481542738" y1="38.03109713816091" x2="125.185341999989" y2="27.14071803090072" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-4')"></line><line x1="96.26071595878153" y1="33.812210714423756" x2="125.03739499944228" y2="21" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-5')"></line><line x1="74.06933841368343" y1="83.65489084552141" x2="99.5533695816433" y2="65.1396496796481" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-6')"></line><line x1="96.26071595878153" y1="33.812210714423756" x2="99.5533695816433" y2="65.1396496796481" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-7')"></line><line x1="67.48403116795984" y1="21.00001291507276" x2="96.26071595878153" y2="33.812210714423756" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-8')"></line><line x1="49.757100586056595" y1="66.62380461877385" x2="74.21728265825499" y2="77.5141727482222" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-9')"></line><line x1="45.29265362286179" y1="70.84269304617041" x2="74.06933841368343" y2="83.65489084552141" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-10')"></line><line x1="47.244045747454194" y1="42.713736603738376" x2="68.90547224022006" y2="26.975781612746033" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-11')"></line><line x1="42" y1="39.51525408094611" x2="67.48403116795984" y2="21.00001291507276" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-12')"></line><line x1="42" y1="39.51525408094611" x2="45.29265362286179" y2="70.84269304617041" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-13')"></line></g><g><text x="142.17751435277913" y="49.65905727268486" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="146.11501435277913" y="44.40905727268486" class="debug" fill="#ff0000" style="
+            </style><g mask="url(#text-mask)"><line x1="130.36502047441311" y1="71.68886102622079" x2="146.11501435277913" y2="44.40905727268486" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-0')"></line><line x1="125.03739499944228" y1="21" x2="146.11501435277913" y2="44.40905727268486" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-1')"></line><line x1="103.04310144098412" y1="60.08474336994248" x2="129.23300469983846" y2="65.65157301452928" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-2')"></line><line x1="99.5533695816433" y1="65.1396496796481" x2="130.36502047441311" y2="71.68886102622079" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-3')"></line><line x1="100.72516481542738" y1="38.03109713816091" x2="125.185341999989" y2="27.14071803090072" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-4')"></line><line x1="96.26071595878153" y1="33.812210714423756" x2="125.03739499944228" y2="21" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-5')"></line><line x1="74.06933841368343" y1="83.65489084552141" x2="99.5533695816433" y2="65.1396496796481" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-6')"></line><line x1="96.26071595878153" y1="33.812210714423756" x2="99.5533695816433" y2="65.1396496796481" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-7')"></line><line x1="67.48403116795984" y1="21.00001291507276" x2="96.26071595878153" y2="33.812210714423756" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-8')"></line><line x1="49.757100586056595" y1="66.62380461877385" x2="74.21728265825499" y2="77.5141727482222" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-9')"></line><line x1="45.29265362286179" y1="70.84269304617041" x2="74.06933841368343" y2="83.65489084552141" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-10')"></line><line x1="47.244045747454194" y1="42.713736603738376" x2="68.90547224022006" y2="26.975781612746033" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-11')"></line><line x1="42" y1="39.51525408094611" x2="67.48403116795984" y2="21.00001291507276" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-12')"></line><line x1="42" y1="39.51525408094611" x2="45.29265362286179" y2="70.84269304617041" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-13')"></line></g><g><text x="142.17751435277913" y="49.65905727268486" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>O</tspan></text><text x="146.11501435277913" y="44.40905727268486" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="130.36502047441311" y="71.68886102622079" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -168,13 +144,7 @@ module.exports = [
                 .sub {
                     font: 8.4px Helvetica, Arial, sans-serif;
                 }
-            </style><g mask="url(#text-mask)"><line x1="88.56163546717076" y1="65.13966111696095" x2="91.85430314989338" y2="33.812223629493936" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-0')"></line><line x1="63.07762985939926" y1="21" x2="91.85430314989338" y2="33.812223629493936" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-1')"></line><line x1="58.882000119225644" y1="65.65157113152085" x2="85.07190587648944" y2="60.08475324105232" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-2')"></line><line x1="57.74998163509571" y1="71.68885863515925" x2="88.56163546717076" y2="65.13966111696095" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-3')"></line><line x1="47.794450845790486" y1="46.44734260169396" x2="65.71043622627985" y2="26.54965196066501" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-4')"></line><line x1="42" y1="44.40904781297524" x2="63.07762985939926" y2="21" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-5')"></line><line x1="42" y1="44.40904781297524" x2="57.74998163509571" y2="71.68885863515925" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-6')"></line></g><g><text x="87.91680314989338" y="39.062223629493936" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>N</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="91.85430314989338" y="33.812223629493936" class="debug" fill="#ff0000" style="
+            </style><g mask="url(#text-mask)"><line x1="88.56163546717076" y1="65.13966111696095" x2="91.85430314989338" y2="33.812223629493936" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-0')"></line><line x1="63.07762985939926" y1="21" x2="91.85430314989338" y2="33.812223629493936" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-1')"></line><line x1="58.882000119225644" y1="65.65157113152085" x2="85.07190587648944" y2="60.08475324105232" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-2')"></line><line x1="57.74998163509571" y1="71.68885863515925" x2="88.56163546717076" y2="65.13966111696095" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-3')"></line><line x1="47.794450845790486" y1="46.44734260169396" x2="65.71043622627985" y2="26.54965196066501" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-4')"></line><line x1="42" y1="44.40904781297524" x2="63.07762985939926" y2="21" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-5')"></line><line x1="42" y1="44.40904781297524" x2="57.74998163509571" y2="71.68885863515925" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-6')"></line></g><g><text x="87.91680314989338" y="39.062223629493936" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>N</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="91.85430314989338" y="33.812223629493936" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="88.56163546717076" y="65.13966111696095" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -201,13 +171,7 @@ module.exports = [
                 .sub {
                     font: 8.4px Helvetica, Arial, sans-serif;
                 }
-            </style><g mask="url(#text-mask)"><line x1="88.56163546717076" y1="65.13966111696095" x2="91.85430314989338" y2="33.812223629493936" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-0')"></line><line x1="63.07762985939926" y1="21" x2="91.85430314989338" y2="33.812223629493936" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-1')"></line><line x1="58.882000119225644" y1="65.65157113152085" x2="85.07190587648944" y2="60.08475324105232" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-2')"></line><line x1="57.74998163509571" y1="71.68885863515925" x2="88.56163546717076" y2="65.13966111696095" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-3')"></line><line x1="47.794450845790486" y1="46.44734260169396" x2="65.71043622627985" y2="26.54965196066501" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-4')"></line><line x1="42" y1="44.40904781297524" x2="63.07762985939926" y2="21" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-5')"></line><line x1="42" y1="44.40904781297524" x2="57.74998163509571" y2="71.68885863515925" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-6')"></line></g><g><text x="87.91680314989338" y="39.062223629493936" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>N</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="91.85430314989338" y="33.812223629493936" class="debug" fill="#ff0000" style="
+            </style><g mask="url(#text-mask)"><line x1="88.56163546717076" y1="65.13966111696095" x2="91.85430314989338" y2="33.812223629493936" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-0')"></line><line x1="63.07762985939926" y1="21" x2="91.85430314989338" y2="33.812223629493936" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-1')"></line><line x1="58.882000119225644" y1="65.65157113152085" x2="85.07190587648944" y2="60.08475324105232" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-2')"></line><line x1="57.74998163509571" y1="71.68885863515925" x2="88.56163546717076" y2="65.13966111696095" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-3')"></line><line x1="47.794450845790486" y1="46.44734260169396" x2="65.71043622627985" y2="26.54965196066501" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-4')"></line><line x1="42" y1="44.40904781297524" x2="63.07762985939926" y2="21" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-5')"></line><line x1="42" y1="44.40904781297524" x2="57.74998163509571" y2="71.68885863515925" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-6')"></line></g><g><text x="87.91680314989338" y="39.062223629493936" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>N</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="91.85430314989338" y="33.812223629493936" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="88.56163546717076" y="65.13966111696095" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -242,13 +206,7 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="145.03313028619556" y="52.50006799667918" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="126.51791771363361" y="34.89101605447726" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>N</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="126.51791771363361" y="27.016016054477262" class="debug" fill="#ff0000" style="
+            "></text><text x="126.51791771363361" y="34.89101605447726" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: rtl; unicode-bidi: bidi-override;"><tspan>N</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="126.51791771363361" y="27.016016054477262" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="69.27978608189167" y="83.99999999997465" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -289,13 +247,7 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="42" y="42.0776351124289" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="54.81223008702804" y="62.97930552783751" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: ltr;
-            "><tspan>N</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="54.81223008702804" y="70.85430552783751" class="debug" fill="#ff0000" style="
+            "></text><text x="54.81223008702804" y="62.97930552783751" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: ltr;"><tspan>N</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="54.81223008702804" y="70.85430552783751" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="86.13966683561405" y="67.56163081518469" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -330,13 +282,7 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="60.51522400988927" y="27.015990365833837" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="47.25" y="57.750033998342765" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>N</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="42" y="52.500033998342765" class="debug" fill="#ff0000" style="
+            "></text><text x="47.25" y="57.750033998342765" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: rtl; unicode-bidi: bidi-override;"><tspan>N</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="42" y="52.500033998342765" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="60.51524688453281" y="77.9840610114504" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -363,13 +309,7 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="57.74998163509571" y="71.68885863515925" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="47.25" y="49.65904781297524" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>S</tspan></text><text x="42" y="44.40904781297524" class="debug" fill="#ff0000" style="
+            "></text><text x="47.25" y="49.65904781297524" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: rtl; unicode-bidi: bidi-override;"><tspan>S</tspan></text><text x="42" y="44.40904781297524" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="63.07762985939926" y="21" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -390,13 +330,7 @@ module.exports = [
                 .sub {
                     font: 8.4px Helvetica, Arial, sans-serif;
                 }
-            </style><g mask="url(#text-mask)"><line x1="65.40906200253792" y1="88.63926352341893" x2="92.68886222174774" y2="72.88926352341892" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-0')"></line><line x1="42" y1="67.56164942311491" x2="65.40906200253792" y2="88.63926352341893" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-1')"></line><line x1="96.687859599601" y1="68.22682572523621" x2="122.15239782340375" y2="76.50075574962543" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-2')"></line><line x1="92.68886222174774" y1="72.88926352341892" x2="122.6471424850451" y2="82.62329884622976" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-3')"></line><line x1="86.13964396098831" y1="42.077614100304054" x2="92.68886222174774" y2="72.88926352341892" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-4')"></line><line x1="48.14071806410013" y1="67.70959504567405" x2="59.03109168245467" y2="43.2494154172934" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-5')"></line><line x1="42" y1="67.56164942311491" x2="54.81220425688771" y2="38.78496750737297" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-6')"></line><line x1="122.6471424850451" y1="82.62329884622976" x2="146.056204487583" y2="61.54568474592571" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-7')"></line><line x1="91.68929414923338" y1="44.71042420323807" x2="111.5869968513906" y2="26.794452217979632" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-8')"></line><line x1="86.13964396098831" y1="42.077614100304054" x2="109.54870596352622" y2="21.000000000000004" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-9')"></line><line x1="54.81220425688771" y1="38.78496750737297" x2="86.13964396098831" y2="42.077614100304054" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-10')"></line><line x1="134.45208070021982" y1="34.223768316481156" x2="140.01891622186537" y2="60.413670326128795" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-11')"></line><line x1="139.50698622682356" y1="30.734035322810836" x2="146.056204487583" y2="61.54568474592571" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-12')"></line><line x1="109.54870596352622" y1="21.000000000000004" x2="139.50698622682356" y2="30.734035322810836" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-13')"></line></g><g><text x="65.40906200253792" y="80.76426352341893" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: ltr;
-            "><tspan>S</tspan></text><text x="65.40906200253792" y="88.63926352341893" class="debug" fill="#ff0000" style="
+            </style><g mask="url(#text-mask)"><line x1="65.40906200253792" y1="88.63926352341893" x2="92.68886222174774" y2="72.88926352341892" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-0')"></line><line x1="42" y1="67.56164942311491" x2="65.40906200253792" y2="88.63926352341893" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-1')"></line><line x1="96.687859599601" y1="68.22682572523621" x2="122.15239782340375" y2="76.50075574962543" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-2')"></line><line x1="92.68886222174774" y1="72.88926352341892" x2="122.6471424850451" y2="82.62329884622976" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-3')"></line><line x1="86.13964396098831" y1="42.077614100304054" x2="92.68886222174774" y2="72.88926352341892" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-4')"></line><line x1="48.14071806410013" y1="67.70959504567405" x2="59.03109168245467" y2="43.2494154172934" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-5')"></line><line x1="42" y1="67.56164942311491" x2="54.81220425688771" y2="38.78496750737297" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-6')"></line><line x1="122.6471424850451" y1="82.62329884622976" x2="146.056204487583" y2="61.54568474592571" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-7')"></line><line x1="91.68929414923338" y1="44.71042420323807" x2="111.5869968513906" y2="26.794452217979632" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-8')"></line><line x1="86.13964396098831" y1="42.077614100304054" x2="109.54870596352622" y2="21.000000000000004" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-9')"></line><line x1="54.81220425688771" y1="38.78496750737297" x2="86.13964396098831" y2="42.077614100304054" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-10')"></line><line x1="134.45208070021982" y1="34.223768316481156" x2="140.01891622186537" y2="60.413670326128795" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-11')"></line><line x1="139.50698622682356" y1="30.734035322810836" x2="146.056204487583" y2="61.54568474592571" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-12')"></line><line x1="109.54870596352622" y1="21.000000000000004" x2="139.50698622682356" y2="30.734035322810836" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-13')"></line></g><g><text x="65.40906200253792" y="80.76426352341893" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: ltr;"><tspan>S</tspan></text><text x="65.40906200253792" y="88.63926352341893" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="92.68886222174774" y="72.88926352341892" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -431,13 +365,7 @@ module.exports = [
                 .sub {
                     font: 8.4px Helvetica, Arial, sans-serif;
                 }
-            </style><g mask="url(#text-mask)"><line x1="130.36502047441311" y1="71.68886102622079" x2="146.11501435277913" y2="44.40905727268486" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-0')"></line><line x1="125.03739499944228" y1="21" x2="146.11501435277913" y2="44.40905727268486" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-1')"></line><line x1="103.04310144098412" y1="60.08474336994248" x2="129.23300469983846" y2="65.65157301452928" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-2')"></line><line x1="99.5533695816433" y1="65.1396496796481" x2="130.36502047441311" y2="71.68886102622079" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-3')"></line><line x1="100.72516481542738" y1="38.03109713816091" x2="125.185341999989" y2="27.14071803090072" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-4')"></line><line x1="96.26071595878153" y1="33.812210714423756" x2="125.03739499944228" y2="21" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-5')"></line><line x1="74.06933841368343" y1="83.65489084552141" x2="99.5533695816433" y2="65.1396496796481" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-6')"></line><line x1="96.26071595878153" y1="33.812210714423756" x2="99.5533695816433" y2="65.1396496796481" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-7')"></line><line x1="67.48403116795984" y1="21.00001291507276" x2="96.26071595878153" y2="33.812210714423756" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-8')"></line><line x1="49.757100586056595" y1="66.62380461877385" x2="74.21728265825499" y2="77.5141727482222" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-9')"></line><line x1="45.29265362286179" y1="70.84269304617041" x2="74.06933841368343" y2="83.65489084552141" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-10')"></line><line x1="47.244045747454194" y1="42.713736603738376" x2="68.90547224022006" y2="26.975781612746033" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-11')"></line><line x1="42" y1="39.51525408094611" x2="67.48403116795984" y2="21.00001291507276" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-12')"></line><line x1="42" y1="39.51525408094611" x2="45.29265362286179" y2="70.84269304617041" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-13')"></line></g><g><text x="142.17751435277913" y="49.65905727268486" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>S</tspan></text><text x="146.11501435277913" y="44.40905727268486" class="debug" fill="#ff0000" style="
+            </style><g mask="url(#text-mask)"><line x1="130.36502047441311" y1="71.68886102622079" x2="146.11501435277913" y2="44.40905727268486" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-0')"></line><line x1="125.03739499944228" y1="21" x2="146.11501435277913" y2="44.40905727268486" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-1')"></line><line x1="103.04310144098412" y1="60.08474336994248" x2="129.23300469983846" y2="65.65157301452928" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-2')"></line><line x1="99.5533695816433" y1="65.1396496796481" x2="130.36502047441311" y2="71.68886102622079" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-3')"></line><line x1="100.72516481542738" y1="38.03109713816091" x2="125.185341999989" y2="27.14071803090072" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-4')"></line><line x1="96.26071595878153" y1="33.812210714423756" x2="125.03739499944228" y2="21" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-5')"></line><line x1="74.06933841368343" y1="83.65489084552141" x2="99.5533695816433" y2="65.1396496796481" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-6')"></line><line x1="96.26071595878153" y1="33.812210714423756" x2="99.5533695816433" y2="65.1396496796481" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-7')"></line><line x1="67.48403116795984" y1="21.00001291507276" x2="96.26071595878153" y2="33.812210714423756" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-8')"></line><line x1="49.757100586056595" y1="66.62380461877385" x2="74.21728265825499" y2="77.5141727482222" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-9')"></line><line x1="45.29265362286179" y1="70.84269304617041" x2="74.06933841368343" y2="83.65489084552141" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-10')"></line><line x1="47.244045747454194" y1="42.713736603738376" x2="68.90547224022006" y2="26.975781612746033" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-11')"></line><line x1="42" y1="39.51525408094611" x2="67.48403116795984" y2="21.00001291507276" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-12')"></line><line x1="42" y1="39.51525408094611" x2="45.29265362286179" y2="70.84269304617041" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-13')"></line></g><g><text x="142.17751435277913" y="49.65905727268486" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>S</tspan></text><text x="146.11501435277913" y="44.40905727268486" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="130.36502047441311" y="71.68886102622079" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -476,23 +404,11 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="88.56163546717076" y="65.13966111696095" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="57.74998163509571" y="63.81385863515925" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: ltr;
-            "><tspan>N</tspan></text><text x="57.74998163509571" y="71.68885863515925" class="debug" fill="#ff0000" style="
+            "></text><text x="57.74998163509571" y="63.81385863515925" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: ltr;"><tspan>N</tspan></text><text x="57.74998163509571" y="71.68885863515925" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="42" y="44.40904781297524" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="63.07762985939926" y="28.875" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>N</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="63.07762985939926" y="21" class="debug" fill="#ff0000" style="
+            "></text><text x="63.07762985939926" y="28.875" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: rtl; unicode-bidi: bidi-override;"><tspan>N</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="63.07762985939926" y="21" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text></g></svg></div></div>
  `
@@ -642,13 +558,7 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="151.11919380818296" y="52.49999999999922" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="129.08939712330064" y="73.5000061216324" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>O<tspan baseline-shift="super" class="sub">+</tspan></tspan></text><text x="123.83939712330064" y="68.2500061216324" class="debug" fill="#ff0000" style="
+            "></text><text x="129.08939712330064" y="73.5000061216324" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: rtl; unicode-bidi: bidi-override;"><tspan>O<tspan baseline-shift="super" class="sub">+</tspan></tspan></text><text x="123.83939712330064" y="68.2500061216324" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="178.3989975617189" y="68.24999387836523" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -656,37 +566,13 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="205.67880838390843" y="115.49998775673045" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="151.1192079454902" y="107.62499999999763" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="151.1192079454902" y="115.49999999999763" class="debug" fill="#ff0000" style="
+            "></text><text x="151.1192079454902" y="107.62499999999763" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: ltr;"><tspan>O</tspan></text><text x="151.1192079454902" y="115.49999999999763" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="123.83940419195424" y="107.62500612163163" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>V<tspan baseline-shift="super" class="sub"></tspan></tspan></text><text x="123.83940419195424" y="99.75000612163163" class="debug" fill="#ff0000" style="
+            "></text><text x="123.83940419195424" y="107.62500612163163" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: rtl; unicode-bidi: bidi-override;"><tspan>V<tspan baseline-shift="super" class="sub"></tspan></tspan></text><text x="123.83940419195424" y="99.75000612163163" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="132.74258776265617" y="133.14138836938224" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>O<tspan baseline-shift="super" class="sub">+</tspan></tspan></text><text x="137.99258776265617" y="127.89138836938224" class="debug" fill="#ff0000" style="
+            "></text><text x="132.74258776265617" y="133.14138836938224" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>O<tspan baseline-shift="super" class="sub">+</tspan></tspan></text><text x="137.99258776265617" y="127.89138836938224" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="96.55960043841826" y="91.87501224326563" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>O</tspan></text><text x="96.55960043841826" y="84.00001224326563" class="debug" fill="#ff0000" style="
+            "></text><text x="96.55960043841826" y="91.87501224326563" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: rtl; unicode-bidi: bidi-override;"><tspan>O</tspan></text><text x="96.55960043841826" y="84.00001224326563" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="69.27980375353596" y="99.75001836489886" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -698,13 +584,7 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="96.55962164437919" y="178.50001224326326" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="119.90191126060787" y="136.50000612163083" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>O<tspan baseline-shift="super" class="sub">+</tspan></tspan></text><text x="123.83941126060787" y="131.25000612163083" class="debug" fill="#ff0000" style="
+            "></text><text x="119.90191126060787" y="136.50000612163083" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>O<tspan baseline-shift="super" class="sub">+</tspan></tspan></text><text x="123.83941126060787" y="131.25000612163083" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text></g></svg></div></div>
  `

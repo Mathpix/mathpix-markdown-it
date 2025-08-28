@@ -16,13 +16,7 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="215.36131030131992" y="94.01490606286123" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="205.6272413650699" y="71.93163672125316" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>O</tspan></text><text x="205.6272413650699" y="64.05663672125316" class="debug" fill="#ff0000" style="
+            "></text><text x="205.6272413650699" y="71.93163672125316" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: rtl; unicode-bidi: bidi-override;"><tspan>O</tspan></text><text x="205.6272413650699" y="64.05663672125316" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="174.8155845936958" y="57.5074530314306" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -32,13 +26,7 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="113.19227105094764" y="44.4090856517855" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="81.69227105096749" y="52.28412099505345" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>O</tspan></text><text x="81.69227105096749" y="44.40912099505345" class="debug" fill="#ff0000" style="
+            "></text><text x="81.69227105096749" y="52.28412099505345" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: rtl; unicode-bidi: bidi-override;"><tspan>O</tspan></text><text x="81.69227105096749" y="44.40912099505345" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="71.95826934160806" y="74.36741218000236" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -48,21 +36,9 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="97.44236078192243" y="124.38261903387938" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="75.41253966571699" y="145.38258283916582" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>O</tspan></text><text x="70.16253966571699" y="140.13258283916582" class="debug" fill="#ff0000" style="
+            "></text><text x="75.41253966571699" y="145.38258283916582" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: rtl; unicode-bidi: bidi-override;"><tspan>O</tspan></text><text x="70.16253966571699" y="140.13258283916582" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="120.78471724124587" y="145.38252162274352" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="124.72221724124587" y="140.13252162274352" class="debug" fill="#ff0000" style="
+            "></text><text x="120.78471724124587" y="145.38252162274352" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>O</tspan></text><text x="124.72221724124587" y="140.13252162274352" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="124.72225258451378" y="171.6325216227237" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -89,13 +65,7 @@ module.exports = [
                 }
             </style><g mask="url(#text-mask)"><line x1="420.4896754031713" y1="157.39910005714432" x2="451.98967540315857" y2="157.39912833175862" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-0')"></line><line x1="404.7396998897119" y1="130.11928570063833" x2="420.4896754031713" y2="157.39910005714432" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-1')"></line><line x1="401.01059023146104" y1="125.23829733692145" x2="414.3981110450097" y2="102.05047916731348" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-2')"></line><line x1="404.7396998897119" y1="130.11928570063833" x2="420.4897243762399" y2="102.83949961874663" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-3')"></line><line x1="373.23969988972465" y1="130.11925742602398" x2="404.7396998897119" y2="130.11928570063833" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-4')"></line><line x1="404.7397488627805" y1="75.55968526224063" x2="420.4897243762399" y2="102.83949961874663" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-5')"></line><line x1="363.5813391239459" y1="102.05043355383333" x2="376.96881831038627" y2="125.23827575686335" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-6')"></line><line x1="357.48972437626526" y1="102.83944306951804" x2="373.23969988972465" y2="130.11925742602398" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-7')"></line><line x1="375.6022437733616" y1="81.22965910822018" x2="402.37724377335087" y2="81.22968314164228" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-8')"></line><line x1="373.23974886279314" y1="75.55965698762634" x2="404.7397488627805" y2="75.55968526224063" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-9')"></line><line x1="325.9897243762779" y1="102.83941479490363" x2="357.48972437626526" y2="102.83944306951804" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-10')"></line><line x1="357.48972437626526" y1="102.83944306951804" x2="373.23974886279314" y2="75.55965698762634" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-11')"></line><line x1="357.48977334933375" y1="48.27984263112032" x2="373.23974886279314" y2="75.55965698762634" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-12')"></line><line x1="316.3313636104991" y1="74.77059092271298" x2="329.7188427969395" y2="97.958433125743" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-13')"></line><line x1="310.2397488628185" y1="75.5596004383977" x2="325.9897243762779" y2="102.83941479490363" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-14')"></line><line x1="325.9897733493465" y1="48.279814356505966" x2="357.48977334933375" y2="48.27984263112032" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-15')"></line><line x1="310.2397488628185" y1="75.5596004383977" x2="325.9897733493465" y2="48.279814356505966" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-16')"></line><line x1="278.7397488628312" y1="75.55957216378334" x2="310.2397488628185" y2="75.5596004383977" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-17')"></line><line x1="312.6949811279726" y1="19.582502203788664" x2="328.444956641432" y2="46.86231656029463" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-18')"></line><line x1="307.7846145438016" y1="22.417497796211336" x2="323.53459005726097" y2="49.6973121527173" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-19')"></line><line x1="257.02601154850913" y1="95.79954296649487" x2="272.76398112208074" y2="74.13812706860546" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-20')"></line><line x1="260.2244905409823" y1="101.04359086718262" x2="278.7397488628312" y2="75.55957216378334" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-21')"></line><line x1="260.22453629026927" y1="50.075520221581485" x2="278.7397488628312" y2="75.55957216378334" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-22')"></line><line x1="230.26621901503339" y1="91.30952865361951" x2="260.2244905409823" y2="101.04359086718262" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-23')"></line><line x1="230.26624728964768" y1="59.80952865363221" x2="260.22453629026927" y2="50.075520221581485" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-24')"></line><line x1="235.93622113562722" y1="88.94703374305107" x2="235.93624516904933" y2="62.17203374306183" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-25')"></line><line x1="230.26621901503339" y1="91.30952865361951" x2="230.26624728964768" y2="59.80952865363221" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-26')"></line><line x1="204.78216707283153" y1="109.82474122618152" x2="230.26621901503339" y2="91.30952865361951" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-27')"></line><line x1="199.3901737795958" y1="112.76697075082797" x2="202.1888994818216" y2="139.39529701147944" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-28')"></line><line x1="204.78216707283153" y1="109.82474122618152" x2="208.07478554603833" y2="141.15218388577148" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-29')"></line><line x1="176.00549665742287" y1="97.01251113915356" x2="204.78216707283153" y2="109.82474122618152" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-30')"></line><line x1="182.5907336038364" y1="159.66739645833349" x2="208.07478554603833" y2="141.15218388577148" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-31')"></line><line x1="155.7654868739473" y1="118.72621211836969" x2="177.4269310248189" y2="102.98828143169209" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-32')"></line><line x1="150.521444715221" y1="115.52772371171551" x2="176.00549665742287" y2="97.01251113915356" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-33')"></line><line x1="158.27851488524848" y1="142.6362829530591" x2="182.73868473834582" y2="153.5266785270328" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-34')"></line><line x1="153.8140631884278" y1="146.85516637130553" x2="182.5907336038364" y2="159.66739645833349" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-35')"></line><line x1="150.521444715221" y1="115.52772371171551" x2="153.8140631884278" y2="146.85516637130553" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-36')"></line><line x1="128.33001124622595" y1="165.37037894386748" x2="153.8140631884278" y2="146.85516637130553" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-37')"></line><line x1="99.55334083081729" y1="152.55814885683952" x2="128.33001124622595" y2="165.37037894386748" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-38')"></line><line x1="72.64785452121944" y1="165.09759113686295" x2="94.30929867209099" y2="149.35966045018534" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-39')"></line><line x1="74.06928888861549" y1="171.07336142940147" x2="99.55334083081729" y2="152.55814885683952" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-40')"></line><line x1="96.26072235761049" y1="121.2307061972495" x2="99.55334083081729" y2="152.55814885683952" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-41')"></line><line x1="45.29261847320677" y1="158.26113134237352" x2="74.06928888861549" y2="171.07336142940147" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-42')"></line><line x1="67.33610080769242" y1="114.55919404152223" x2="91.79627066078982" y2="125.44958961549594" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-43')"></line><line x1="67.48405194220183" y1="108.41847611022155" x2="96.26072235761049" y2="121.2307061972495" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-44')"></line><line x1="47.88588606421669" y1="128.6905755570756" x2="50.68461176644246" y2="155.31890181772707" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-45')"></line><line x1="42" y1="126.93368868278355" x2="45.29261847320677" y2="158.26113134237352" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-46')"></line><line x1="42" y1="126.93368868278355" x2="67.48405194220183" y2="108.41847611022155" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-47')"></line></g><g><text x="451.98967540315857" y="157.39912833175862" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="420.4896754031713" y="149.52410005714432" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="420.4896754031713" y="157.39910005714432" class="debug" fill="#ff0000" style="
+            "></text><text x="420.4896754031713" y="149.52410005714432" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: ltr;"><tspan>O</tspan></text><text x="420.4896754031713" y="157.39910005714432" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="404.7396998897119" y="130.11928570063833" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -105,23 +75,11 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="373.23974886279314" y="75.55965698762634" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="357.48977334933375" y="56.15484263112032" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>O</tspan></text><text x="357.48977334933375" y="48.27984263112032" class="debug" fill="#ff0000" style="
+            "></text><text x="357.48977334933375" y="56.15484263112032" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: rtl; unicode-bidi: bidi-override;"><tspan>O</tspan></text><text x="357.48977334933375" y="48.27984263112032" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="325.9897733493465" y="48.279814356505966" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="304.9897978358871" y="26.25" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="310.2397978358871" y="21" class="debug" fill="#ff0000" style="
+            "></text><text x="304.9897978358871" y="26.25" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>O</tspan></text><text x="310.2397978358871" y="21" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="310.2397488628185" y="75.5596004383977" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -133,25 +91,13 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="278.7397488628312" y="75.55957216378334" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="260.2244905409823" y="93.16859086718262" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: ltr;
-            "><tspan>N</tspan></text><text x="260.2244905409823" y="101.04359086718262" class="debug" fill="#ff0000" style="
+            "></text><text x="260.2244905409823" y="93.16859086718262" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: ltr;"><tspan>N</tspan></text><text x="260.2244905409823" y="101.04359086718262" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="230.26621901503339" y="91.30952865361951" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="230.26624728964768" y="59.80952865363221" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="260.22453629026927" y="57.950520221581485" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>S</tspan></text><text x="260.22453629026927" y="50.075520221581485" class="debug" fill="#ff0000" style="
+            "></text><text x="260.22453629026927" y="57.950520221581485" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: rtl; unicode-bidi: bidi-override;"><tspan>S</tspan></text><text x="260.22453629026927" y="50.075520221581485" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="204.78216707283153" y="109.82474122618152" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -161,13 +107,7 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="153.8140631884278" y="146.85516637130553" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="128.33001124622595" y="157.49537894386748" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="128.33001124622595" y="165.37037894386748" class="debug" fill="#ff0000" style="
+            "></text><text x="128.33001124622595" y="157.49537894386748" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: ltr;"><tspan>O</tspan></text><text x="128.33001124622595" y="165.37037894386748" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="99.55334083081729" y="152.55814885683952" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -208,13 +148,7 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="473.7713819257142" y="99.75017194069858" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="446.4915711035302" y="107.62515357579429" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="446.4915711035302" y="115.50015357579429" class="debug" fill="#ff0000" style="
+            "></text><text x="446.4915711035302" y="107.62515357579429" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: ltr;"><tspan>O</tspan></text><text x="446.4915711035302" y="115.50015357579429" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="419.2117814873069" y="99.7501352108971" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -224,33 +158,15 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="364.6522022548604" y="68.25009848110278" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="337.3724126386371" y="60.37508011620565" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>O</tspan></text><text x="337.3724126386371" y="52.50008011620565" class="debug" fill="#ff0000" style="
+            "></text><text x="337.3724126386371" y="60.37508011620565" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: rtl; unicode-bidi: bidi-override;"><tspan>O</tspan></text><text x="337.3724126386371" y="52.50008011620565" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="310.0926018164531" y="68.25006175130136" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="288.0628122002299" y="57.75004338640423" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>O</tspan></text><text x="282.8128122002299" y="52.50004338640423" class="debug" fill="#ff0000" style="
+            "></text><text x="288.0628122002299" y="57.75004338640423" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: rtl; unicode-bidi: bidi-override;"><tspan>O</tspan></text><text x="282.8128122002299" y="52.50004338640423" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="310.0925806104924" y="99.75006175129425" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="282.8127697883084" y="123.37504338638996" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>N</tspan></text><text x="282.8127697883084" y="115.50004338638996" class="debug" fill="#ff0000" style="
+            "></text><text x="282.8127697883084" y="123.37504338638996" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: rtl; unicode-bidi: bidi-override;"><tspan>N</tspan></text><text x="282.8127697883084" y="115.50004338638996" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="282.8127485823477" y="147.00004338638286" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -266,35 +182,17 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="255.53298017208513" y="99.75002502149289" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="250.28307851535303" y="73.50002502164637" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="255.53307851535303" y="68.25002502164637" class="debug" fill="#ff0000" style="
+            "></text><text x="250.28307851535303" y="73.50002502164637" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>O</tspan></text><text x="255.53307851535303" y="68.25002502164637" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="228.25320791859153" y="115.50007345943493" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="200.97341830236826" y="107.6250550945378" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>N</tspan></text><text x="200.97341830236826" y="99.7500550945378" class="debug" fill="#ff0000" style="
+            "></text><text x="200.97341830236826" y="107.6250550945378" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: rtl; unicode-bidi: bidi-override;"><tspan>N</tspan></text><text x="200.97341830236826" y="99.7500550945378" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="173.69360748018426" y="115.50003672963356" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="146.41381786396093" y="99.75001836473643" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="151.66383906992164" y="73.5000183647436" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>N</tspan></text><text x="146.41383906992164" y="68.2500183647436" class="debug" fill="#ff0000" style="
+            "></text><text x="151.66383906992164" y="73.5000183647436" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: rtl; unicode-bidi: bidi-override;"><tspan>N</tspan></text><text x="146.41383906992164" y="68.2500183647436" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="173.69364989210567" y="52.50003672964783" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -302,13 +200,7 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="119.13404945369835" y="52.499999999846466" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="113.88414779696619" y="26.25" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="119.13414779696619" y="21" class="debug" fill="#ff0000" style="
+            "></text><text x="113.88414779696619" y="26.25" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>O</tspan></text><text x="119.13414779696619" y="21" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="91.85427720020476" y="68.25004843778856" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -318,13 +210,7 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="42" y="78.84699470462539" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="63.07757253518005" y="63.31289527674858" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>O</tspan></text><text x="63.07757253518005" y="55.43789527674858" class="debug" fill="#ff0000" style="
+            "></text><text x="63.07757253518005" y="63.31289527674858" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: rtl; unicode-bidi: bidi-override;"><tspan>O</tspan></text><text x="63.07757253518005" y="55.43789527674858" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text></g></svg></div></div>
  `
