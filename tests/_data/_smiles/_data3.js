@@ -14,13 +14,7 @@ module.exports = [
                 }
             </style><g mask="url(#text-mask)"><line x1="255.6325819981181" y1="111.63912026328774" x2="287.13258199811486" y2="111.63910612598059" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-0')"></line><line x1="239.88259424138678" y1="138.91892755114839" x2="255.6325819981181" y2="111.63912026328774" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-1')"></line><line x1="236.15348239253206" y1="143.7999142412277" x2="249.54099279930784" y2="166.98773841919817" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-2')"></line><line x1="239.88259424138678" y1="138.91892755114839" x2="255.6326064846524" y2="166.19872070170186" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-3')"></line><line x1="208.3825942413899" y1="138.91894168845556" x2="239.88259424138678" y2="138.91892755114839" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-4')"></line><line x1="239.88261872792114" y1="193.4785279895625" x2="255.6326064846524" y2="166.19872070170186" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-5')"></line><line x1="198.7242208782285" y1="166.9877612259383" x2="212.11171047145" y2="143.79992503125672" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-6')"></line><line x1="192.63260648465874" y1="166.1987489763162" x2="208.3825942413899" y2="138.91894168845556" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-7')"></line><line x1="192.63258199812432" y1="111.63914853790214" x2="208.3825942413899" y2="138.91894168845556" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-8')"></line><line x1="210.74511618320872" y1="187.80854106657222" x2="237.52011618320608" y2="187.8085290498611" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-9')"></line><line x1="208.38261872792427" y1="193.47854212686968" x2="239.88261872792114" y2="193.4785279895625" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-10')"></line><line x1="192.63260648465874" y1="166.1987489763162" x2="208.38261872792427" y2="193.47854212686968" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-11')"></line><line x1="161.1325819981275" y1="111.63916267520938" x2="192.63258199812432" y2="111.63914853790214" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-12')"></line><line x1="192.63263097119307" y1="220.75834941473036" x2="208.38261872792427" y2="193.47854212686968" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-13')"></line><line x1="158.4545802379367" y1="80.12542707353222" x2="163.92451175697425" y2="111.146868838496" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-14')"></line><line x1="152.8707207202432" y1="81.11001474695897" x2="158.34065223928076" y2="112.13145651192275" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-15')"></line><line x1="145.3825942413963" y1="138.91896996307005" x2="161.1325819981275" y2="111.63916267520938" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-16')"></line><line x1="113.88259424139947" y1="138.91898410037726" x2="145.3825942413963" y2="138.91896996307005" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-17')"></line><line x1="92.1688841784003" y1="159.15898413866802" x2="107.90682458680617" y2="137.49754705103538" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-18')"></line><line x1="95.36737023151022" y1="164.40302773288624" x2="113.88259424139947" y2="138.91898410037726" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-19')"></line><line x1="95.36734735686665" y1="113.43495708726968" x2="113.88259424139947" y2="138.91898410037726" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-20')"></line><line x1="65.40908559954772" y1="154.66900585545451" x2="95.36737023151022" y2="164.40302773288624" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-21')"></line><line x1="90.31244026405938" y1="109.94522636225852" x2="95.87926403158716" y2="83.75532185419877" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-22')"></line><line x1="95.36734735686665" y1="113.43495708726968" x2="101.91655178925225" y2="82.62330472484643" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-23')"></line><line x1="65.40907146224052" y1="123.1690058554577" x2="95.36734735686665" y2="113.43495708726968" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-24')"></line><line x1="65.40907146224052" y1="123.1690058554577" x2="65.40908559954772" y2="154.66900585545451" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-25')"></line><line x1="101.91655178925225" y1="82.62330472484643" x2="131.8748276838784" y2="72.88925595665839" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-26')"></line><line x1="78.50748032701173" y1="61.545701130611235" x2="101.91655178925225" y2="82.62330472484643" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-27')"></line><line x1="47.549649006630375" y1="99.45858966758685" x2="67.4473597495348" y2="117.37455272268677" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-28')"></line><line x1="42" y1="102.0914022612225" x2="65.40907146224052" y2="123.1690058554577" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-29')"></line><line x1="126.81992059107115" y1="69.39952523164723" x2="132.3867443585989" y2="43.209620723587506" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-30')"></line><line x1="131.8748276838784" y1="72.88925595665839" x2="138.42403211626402" y2="42.07760359423517" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-31')"></line><line x1="52.54820390275643" y1="75.94218590221789" x2="78.01273841318863" y2="67.66824444925803" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-32')"></line><line x1="48.54920443238562" y1="71.27974989879928" x2="78.50748032701173" y2="61.545701130611235" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-33')"></line><line x1="78.50748032701173" y1="61.545701130611235" x2="85.05668475939734" y2="30.734048768188018" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-34')"></line><line x1="42" y1="102.0914022612225" x2="48.54920443238562" y2="71.27974989879928" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-35')"></line><line x1="115.01496065402347" y1="21" x2="138.42403211626402" y2="42.07760359423517" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-36')"></line><line x1="89.05568422976815" y1="35.39648477160662" x2="114.52021874020035" y2="27.12254331864679" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-37')"></line><line x1="85.05668475939734" y1="30.734048768188018" x2="115.01496065402347" y2="21" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-38')"></line></g><g><text x="287.13258199811486" y="111.63910612598059" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="255.6325819981181" y="119.51412026328774" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>O</tspan></text><text x="255.6325819981181" y="111.63912026328774" class="debug" fill="#ff0000" style="
+            "></text><text x="255.6325819981181" y="119.51412026328774" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: rtl; unicode-bidi: bidi-override;"><tspan>O</tspan></text><text x="255.6325819981181" y="111.63912026328774" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="239.88259424138678" y="138.91892755114839" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -36,23 +30,11 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="208.3825942413899" y="138.91894168845556" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="192.63258199812432" y="119.51414853790214" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>N</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="192.63258199812432" y="111.63914853790214" class="debug" fill="#ff0000" style="
+            "></text><text x="192.63258199812432" y="119.51414853790214" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: rtl; unicode-bidi: bidi-override;"><tspan>N</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="192.63258199812432" y="111.63914853790214" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="161.1325819981275" y="111.63916267520938" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="150.41265047908996" y="85.8677209102456" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="155.66265047908996" y="80.6177209102456" class="debug" fill="#ff0000" style="
+            "></text><text x="150.41265047908996" y="85.8677209102456" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>O</tspan></text><text x="155.66265047908996" y="80.6177209102456" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="145.3825942413963" y="138.91896996307005" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -60,13 +42,7 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="95.36737023151022" y="164.40302773288624" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="70.65908559954772" y="159.91900585545451" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>O</tspan></text><text x="65.40908559954772" y="154.66900585545451" class="debug" fill="#ff0000" style="
+            "></text><text x="70.65908559954772" y="159.91900585545451" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: rtl; unicode-bidi: bidi-override;"><tspan>O</tspan></text><text x="65.40908559954772" y="154.66900585545451" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="65.40907146224052" y="123.1690058554577" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -129,13 +105,7 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="123.83932643674838" y="162.74990817542172" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="101.8095368205251" y="152.2498898105246" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>O</tspan></text><text x="96.5595368205251" y="146.9998898105246" class="debug" fill="#ff0000" style="
+            "></text><text x="101.8095368205251" y="152.2498898105246" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: rtl; unicode-bidi: bidi-override;"><tspan>O</tspan></text><text x="96.5595368205251" y="146.9998898105246" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="96.55955802648583" y="115.49988981053173" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -145,23 +115,11 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="42" y="52.4998530807446" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="96.5596004384073" y="60.374889810545994" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>O</tspan></text><text x="96.5596004384073" y="52.499889810545994" class="debug" fill="#ff0000" style="
+            "></text><text x="96.5596004384073" y="60.374889810545994" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: rtl; unicode-bidi: bidi-override;"><tspan>O</tspan></text><text x="96.5596004384073" y="52.499889810545994" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="123.83939005463056" y="68.2499081754431" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="147.18170087681455" y="57.74992654034733" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="151.11920087681455" y="52.49992654034733" class="debug" fill="#ff0000" style="
+            "></text><text x="147.18170087681455" y="57.74992654034733" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>O</tspan></text><text x="151.11920087681455" y="52.49992654034733" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="123.83936884866985" y="99.74990817543599" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -171,23 +129,11 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="151.1190736410502" y="241.49992654030459" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="174.4614056691949" y="199.49994490521598" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="178.3989056691949" y="194.24994490521598" class="debug" fill="#ff0000" style="
+            "></text><text x="174.4614056691949" y="199.49994490521598" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>O</tspan></text><text x="178.3989056691949" y="194.24994490521598" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="178.39892687515567" y="162.74994490522315" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="201.74123769733967" y="152.24996327012744" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="205.67873769733967" y="146.99996327012744" class="debug" fill="#ff0000" style="
+            "></text><text x="201.74123769733967" y="152.24996327012744" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>O</tspan></text><text x="205.67873769733967" y="146.99996327012744" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text></g></svg></div></div>
  `
@@ -208,13 +154,7 @@ module.exports = [
                 }
             </style><g mask="url(#text-mask)"><line x1="287.51821257581315" y1="68.25012855429438" x2="287.5182337817739" y2="36.75012855430151" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-0')"></line><line x1="260.2384017536291" y1="84.00011018939006" x2="287.51821257581315" y2="68.25012855429438" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-1')"></line><line x1="254.56838213811665" y1="113.13760637231047" x2="254.5684001631833" y2="86.36260637231658" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-2')"></line><line x1="260.2383805476683" y1="115.5001101893829" x2="260.2384017536291" y2="84.00011018939006" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-3')"></line><line x1="232.95861213740585" y1="68.25009182449287" x2="260.2384017536291" y2="84.00011018939006" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-4')"></line><line x1="232.95856972548432" y1="131.2500918244786" x2="260.2383805476683" y2="115.5001101893829" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-5')"></line><line x1="210.55978382120287" y1="87.72919078494954" x2="233.74762302005928" y2="74.34170639511817" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-6')"></line><line x1="205.67880131522185" y1="84.0000734595886" x2="232.95861213740585" y2="68.25009182449287" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-7')"></line><line x1="210.55976763615928" y1="111.77096270602854" x2="233.74758880994904" y2="125.15847831619112" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-8')"></line><line x1="205.67878010926108" y1="115.50007345958144" x2="232.95856972548432" y2="131.2500918244786" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-9')"></line><line x1="205.67878010926108" y1="115.50007345958144" x2="205.67880131522185" y2="84.0000734595886" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-10')"></line><line x1="178.39896928707708" y1="131.25005509467718" x2="205.67878010926108" y2="115.50007345958144" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-11')"></line><line x1="151.11917967085378" y1="115.50003672978002" x2="178.39896928707708" y2="131.25005509467718" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-12')"></line><line x1="123.05035796601634" y1="125.15840379425049" x2="146.23819716487276" y2="111.77091940441909" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-13')"></line><line x1="123.83936884866976" y1="131.25001836487576" x2="151.11917967085378" y2="115.50003672978002" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-14')"></line><line x1="151.11917967085378" y1="115.50003672978002" x2="151.11920087681455" y2="84.00003672978713" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-15')"></line><line x1="96.55957923244651" y1="115.49999999997857" x2="123.83936884866976" y2="131.25001836487576" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-16')"></line><line x1="123.05039217612652" y1="74.34163187317748" x2="146.2382133499163" y2="87.72914748334003" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-17')"></line><line x1="123.83941126059126" y1="68.25001836489" x2="151.11920087681455" y2="84.00003672978713" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-18')"></line><line x1="69.27976841026249" y1="131.24998163507428" x2="96.55957923244651" y2="115.49999999997857" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-19')"></line><line x1="102.22958082289227" y1="113.13750381705205" x2="102.22959884795893" y2="86.36250381705815" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-20')"></line><line x1="96.55957923244651" y1="115.49999999997857" x2="96.55960043840727" y2="83.99999999998573" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-21')"></line><line x1="123.83941126059126" y1="68.25001836489" x2="123.839432466552" y2="36.75001836489713" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-22')"></line><line x1="96.55960043840727" y1="83.99999999998573" x2="123.83941126059126" y2="68.25001836489" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-23')"></line><line x1="69.27981082218399" y1="68.2499816350886" x2="96.55960043840727" y2="83.99999999998573" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-24')"></line><line x1="96.55964285032874" y1="21" x2="123.839432466552" y2="36.75001836489713" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-25')"></line><line x1="40.58250165284139" y1="81.54478029618775" x2="67.86231247502538" y2="65.79479866109205" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-26')"></line><line x1="43.41749834715861" y1="86.45514624418087" x2="70.6973091693426" y2="70.70516460908516" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-27')"></line><line x1="69.27981082218399" y1="68.2499816350886" x2="69.27983202814472" y2="36.74998163509571" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-28')"></line><line x1="69.27983202814472" y1="36.74998163509571" x2="96.55964285032874" y2="21" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-29')"></line></g><g><text x="287.5182337817739" y="36.75012855430151" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="283.58071257581315" y="73.50012855429438" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="287.51821257581315" y="68.25012855429438" class="debug" fill="#ff0000" style="
+            "></text><text x="283.58071257581315" y="73.50012855429438" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>O</tspan></text><text x="287.51821257581315" y="68.25012855429438" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="260.2384017536291" y="84.00011018939006" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -224,23 +164,11 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="205.67878010926108" y="115.50007345958144" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="178.39896928707708" y="123.37505509467718" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: ltr;
-            "><tspan>N</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="178.39896928707708" y="131.25005509467718" class="debug" fill="#ff0000" style="
+            "></text><text x="178.39896928707708" y="123.37505509467718" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: ltr;"><tspan>N</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="178.39896928707708" y="131.25005509467718" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="151.11917967085378" y="115.50003672978002" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="123.83936884866976" y="123.37501836487576" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: ltr;
-            "><tspan>N</tspan></text><text x="123.83936884866976" y="131.25001836487576" class="debug" fill="#ff0000" style="
+            "></text><text x="123.83936884866976" y="123.37501836487576" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: ltr;"><tspan>N</tspan></text><text x="123.83936884866976" y="131.25001836487576" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="96.55957923244651" y="115.49999999997857" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -250,13 +178,7 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="69.27981082218399" y="68.2499816350886" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="47.25" y="89.24996327018431" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>O</tspan></text><text x="42" y="83.99996327018431" class="debug" fill="#ff0000" style="
+            "></text><text x="47.25" y="89.24996327018431" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: rtl; unicode-bidi: bidi-override;"><tspan>O</tspan></text><text x="42" y="83.99996327018431" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="69.27983202814472" y="36.74998163509571" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -266,13 +188,7 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="123.83941126059126" y="68.25001836489" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="147.18170087681455" y="89.25003672978713" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>N</tspan></text><text x="151.11920087681455" y="84.00003672978713" class="debug" fill="#ff0000" style="
+            "></text><text x="147.18170087681455" y="89.25003672978713" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>N</tspan></text><text x="151.11920087681455" y="84.00003672978713" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="205.67880131522185" y="84.0000734595886" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -299,21 +215,9 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="379.06838332791887" y="94.6555847557579" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="410.39582303201945" y="105.82323134868898" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>N</tspan></text><text x="410.39582303201945" y="97.94823134868898" class="debug" fill="#ff0000" style="
+            "></text><text x="410.39582303201945" y="105.82323134868898" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: rtl; unicode-bidi: bidi-override;"><tspan>N</tspan></text><text x="410.39582303201945" y="97.94823134868898" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="413.0075412927789" y="134.00988077180386" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>N</tspan></text><text x="416.9450412927789" y="128.75988077180386" class="debug" fill="#ff0000" style="
+            "></text><text x="413.0075412927789" y="134.00988077180386" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>N</tspan></text><text x="416.9450412927789" y="128.75988077180386" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="445.7217232085208" y="141.57208502869156" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -325,33 +229,15 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="322.6323253910286" y="158.75816684800122" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="291.304885686928" y="147.59052025507017" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: ltr;
-            "><tspan>S</tspan></text><text x="291.304885686928" y="155.46552025507017" class="debug" fill="#ff0000" style="
+            "></text><text x="291.304885686928" y="147.59052025507017" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: ltr;"><tspan>S</tspan></text><text x="291.304885686928" y="155.46552025507017" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="284.75566742616854" y="124.65387083195529" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="255.9789855104266" y="119.71666657506762" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>N</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="255.9789855104266" y="111.84166657506762" class="debug" fill="#ff0000" style="
+            "></text><text x="255.9789855104266" y="119.71666657506762" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: rtl; unicode-bidi: bidi-override;"><tspan>N</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="255.9789855104266" y="111.84166657506762" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="230.49495018761579" y="130.35690202228054" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="228.5375967805469" y="166.93434172638115" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="233.7875967805469" y="161.68434172638115" class="debug" fill="#ff0000" style="
+            "></text><text x="228.5375967805469" y="166.93434172638115" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>O</tspan></text><text x="233.7875967805469" y="161.68434172638115" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="201.71826827187385" y="117.54469776539287" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -359,33 +245,15 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="147.45755103332107" y="123.24772895571815" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="149.41490444038993" y="97.17028925161755" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>N</tspan></text><text x="144.16490444038993" y="91.92028925161755" class="debug" fill="#ff0000" style="
+            "></text><text x="149.41490444038993" y="97.17028925161755" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: rtl; unicode-bidi: bidi-override;"><tspan>N</tspan></text><text x="144.16490444038993" y="91.92028925161755" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="169.64893976320073" y="73.40505380440459" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="178.19158635613172" y="47.327614100303975" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>N</tspan></text><text x="172.94158635613172" y="42.077614100303975" class="debug" fill="#ff0000" style="
+            "></text><text x="178.19158635613172" y="47.327614100303975" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: rtl; unicode-bidi: bidi-override;"><tspan>N</tspan></text><text x="172.94158635613172" y="42.077614100303975" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="149.53252435359374" y="21" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="203.75323577924658" y="43.40339583954446" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>N</tspan></text><text x="203.75323577924658" y="35.52839583954446" class="debug" fill="#ff0000" style="
+            "></text><text x="203.75323577924658" y="43.40339583954446" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: rtl; unicode-bidi: bidi-override;"><tspan>N</tspan></text><text x="203.75323577924658" y="35.52839583954446" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="219.50323577924667" y="62.80819605875422" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -399,21 +267,9 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="147.45755103332112" y="191.77819985014395" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="92.01523544721294" y="175.12199972574197" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: ltr;
-            "><tspan>N</tspan></text><text x="92.01523544721294" y="182.99699972574197" class="debug" fill="#ff0000" style="
+            "></text><text x="92.01523544721294" y="175.12199972574197" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: ltr;"><tspan>N</tspan></text><text x="92.01523544721294" y="182.99699972574197" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="78.75" y="162.76296440293115" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>N</tspan></text><text x="73.5" y="157.51296440293115" class="debug" fill="#ff0000" style="
+            "></text><text x="78.75" y="162.76296440293115" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: rtl; unicode-bidi: bidi-override;"><tspan>N</tspan></text><text x="73.5" y="157.51296440293115" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="42" y="157.51296440293117" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -421,13 +277,7 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="82.281200124402" y="102.07064881682297" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="312.03546764537833" y="116.77887083195526" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>N</tspan></text><text x="312.03546764537833" y="108.90387083195526" class="debug" fill="#ff0000" style="
+            "></text><text x="312.03546764537833" y="116.77887083195526" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: rtl; unicode-bidi: bidi-override;"><tspan>N</tspan></text><text x="312.03546764537833" y="108.90387083195526" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text></g></svg></div></div>
  `
@@ -446,13 +296,7 @@ module.exports = [
                 .sub {
                     font: 8.4px Helvetica, Arial, sans-serif;
                 }
-            </style><g mask="url(#text-mask)"><line x1="357.3426705230674" y1="68.25005509454513" x2="384.6224813452514" y2="52.500073459449425" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-0')"></line><line x1="351.672650907555" y1="97.3875512774656" x2="351.6726689326216" y2="70.61255127747165" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-1')"></line><line x1="357.34264931710663" y1="99.75005509453797" x2="357.3426705230674" y2="68.25005509454513" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-2')"></line><line x1="330.0628809068441" y1="52.500036729647945" x2="357.3426705230674" y2="68.25005509454513" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-3')"></line><line x1="330.06283849492263" y1="115.50003672963368" x2="357.34264931710663" y2="99.75005509453797" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-4')"></line><line x1="307.6640525906411" y1="71.97913569010461" x2="330.85189178949753" y2="58.59165130027321" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-5')"></line><line x1="302.7830700846601" y1="68.25001836474365" x2="330.0628809068441" y2="52.500036729647945" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-6')"></line><line x1="307.6640364055976" y1="96.02090761118359" x2="330.85185757938734" y2="109.4084232213462" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-7')"></line><line x1="302.78304887869933" y1="99.75001836473649" x2="330.06283849492263" y2="115.50003672963368" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-8')"></line><line x1="302.78304887869933" y1="99.75001836473649" x2="302.7830700846601" y2="68.25001836474365" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-9')"></line><line x1="275.50328046843686" y1="52.49999999984652" x2="302.7830700846601" y2="68.25001836474365" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-10')"></line><line x1="278.338280468423" y1="52.50000885074064" x2="278.338378811691" y2="21.00000885089412" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-11')"></line><line x1="272.6682804684507" y1="52.499991148952404" x2="272.66837881171864" y2="20.99999114910588" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-12')"></line><line x1="248.22350821494322" y1="68.25004843778856" x2="275.50328046843686" y2="52.49999999984652" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-13')"></line><line x1="248.22350821494322" y1="68.25004843778856" x2="248.22356414628965" y2="99.75004843773888" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-14')"></line><line x1="220.9436800301032" y1="52.50009687578023" x2="248.22350821494322" y2="68.25004843778856" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-15')"></line><line x1="220.94379189279604" y1="115.50009687568092" x2="248.22356414628965" y2="99.75004843773888" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-16')"></line><line x1="193.66390777660962" y1="68.25014531372227" x2="220.9436800301032" y2="52.50009687578023" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-17')"></line><line x1="193.66396370795604" y1="99.75014531367259" x2="220.94379189279604" y2="115.50009687568092" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-18')"></line><line x1="193.66390777660962" y1="68.25014531372227" x2="193.66396370795604" y2="99.75014531367259" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-19')"></line><line x1="166.38419145446244" y1="115.50019375161463" x2="193.66396370795604" y2="99.75014531367259" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-20')"></line><line x1="139.1043632696224" y1="99.75024218960635" x2="166.38419145446244" y2="115.50019375161463" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-21')"></line><line x1="110.32770410325392" y1="112.56249754230134" x2="139.1043632696224" y2="99.75024218960635" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-22')"></line><line x1="135.81166105174782" y1="68.42280833197282" x2="139.1043632696224" y2="99.75024218960635" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-23')"></line><line x1="101.0054910569509" y1="142.78473387450117" x2="107.55465460858768" y2="111.97307282265405" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-24')"></line><line x1="106.55159004628338" y1="143.96358331379577" x2="113.10075359792016" y2="113.15192226194864" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-25')"></line><line x1="89.25004843789245" y1="89.15347296517609" x2="110.32770410325392" y2="112.56249754230134" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-26')"></line><line x1="104.99999999990072" y1="61.873644780336065" x2="135.81166105174782" y2="68.42280833197282" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-27')"></line><line x1="137.70865006163035" y1="70.52962054391406" x2="161.1176746387556" y2="49.45196487855253" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-28')"></line><line x1="133.9146720418653" y1="66.31599612003157" x2="157.32369661899054" y2="45.23834045467004" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-29')"></line><line x1="60.11253837029599" y1="83.48352470168055" x2="86.88753837025381" y2="83.48347716003605" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-30')"></line><line x1="57.75004843794208" y1="89.15352889652257" x2="89.25004843789245" y2="89.15347296517609" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-31')"></line><line x1="89.25004843789245" y1="89.15347296517609" x2="104.99999999990072" y2="61.873644780336065" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-32')"></line><line x1="85.52084618917543" y1="39.47486416468405" x2="98.90838736142622" y2="62.66267058015359" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-33')"></line><line x1="89.24995156195862" y1="34.59387252684246" x2="104.99999999990072" y2="61.873644780336065" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-34')"></line><line x1="42" y1="61.87375664302897" x2="57.75004843794208" y2="89.15352889652257" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-35')"></line><line x1="57.7499515620083" y1="34.59392845818894" x2="89.24995156195862" y2="34.59387252684246" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-36')"></line><line x1="48.09161544042183" y1="62.66276081032743" x2="61.47907426812888" y2="39.47490685321344" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-37')"></line><line x1="42" y1="61.87375664302897" x2="57.7499515620083" y2="34.59392845818894" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-38')"></line></g><g><text x="380.6849813452514" y="57.750073459449425" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan style="
+            </style><g mask="url(#text-mask)"><line x1="357.3426705230674" y1="68.25005509454513" x2="384.6224813452514" y2="52.500073459449425" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-0')"></line><line x1="351.672650907555" y1="97.3875512774656" x2="351.6726689326216" y2="70.61255127747165" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-1')"></line><line x1="357.34264931710663" y1="99.75005509453797" x2="357.3426705230674" y2="68.25005509454513" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-2')"></line><line x1="330.0628809068441" y1="52.500036729647945" x2="357.3426705230674" y2="68.25005509454513" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-3')"></line><line x1="330.06283849492263" y1="115.50003672963368" x2="357.34264931710663" y2="99.75005509453797" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-4')"></line><line x1="307.6640525906411" y1="71.97913569010461" x2="330.85189178949753" y2="58.59165130027321" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-5')"></line><line x1="302.7830700846601" y1="68.25001836474365" x2="330.0628809068441" y2="52.500036729647945" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-6')"></line><line x1="307.6640364055976" y1="96.02090761118359" x2="330.85185757938734" y2="109.4084232213462" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-7')"></line><line x1="302.78304887869933" y1="99.75001836473649" x2="330.06283849492263" y2="115.50003672963368" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-8')"></line><line x1="302.78304887869933" y1="99.75001836473649" x2="302.7830700846601" y2="68.25001836474365" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-9')"></line><line x1="275.50328046843686" y1="52.49999999984652" x2="302.7830700846601" y2="68.25001836474365" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-10')"></line><line x1="278.338280468423" y1="52.50000885074064" x2="278.338378811691" y2="21.00000885089412" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-11')"></line><line x1="272.6682804684507" y1="52.499991148952404" x2="272.66837881171864" y2="20.99999114910588" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-12')"></line><line x1="248.22350821494322" y1="68.25004843778856" x2="275.50328046843686" y2="52.49999999984652" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-13')"></line><line x1="248.22350821494322" y1="68.25004843778856" x2="248.22356414628965" y2="99.75004843773888" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-14')"></line><line x1="220.9436800301032" y1="52.50009687578023" x2="248.22350821494322" y2="68.25004843778856" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-15')"></line><line x1="220.94379189279604" y1="115.50009687568092" x2="248.22356414628965" y2="99.75004843773888" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-16')"></line><line x1="193.66390777660962" y1="68.25014531372227" x2="220.9436800301032" y2="52.50009687578023" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-17')"></line><line x1="193.66396370795604" y1="99.75014531367259" x2="220.94379189279604" y2="115.50009687568092" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-18')"></line><line x1="193.66390777660962" y1="68.25014531372227" x2="193.66396370795604" y2="99.75014531367259" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-19')"></line><line x1="166.38419145446244" y1="115.50019375161463" x2="193.66396370795604" y2="99.75014531367259" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-20')"></line><line x1="139.1043632696224" y1="99.75024218960635" x2="166.38419145446244" y2="115.50019375161463" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-21')"></line><line x1="110.32770410325392" y1="112.56249754230134" x2="139.1043632696224" y2="99.75024218960635" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-22')"></line><line x1="135.81166105174782" y1="68.42280833197282" x2="139.1043632696224" y2="99.75024218960635" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-23')"></line><line x1="101.0054910569509" y1="142.78473387450117" x2="107.55465460858768" y2="111.97307282265405" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-24')"></line><line x1="106.55159004628338" y1="143.96358331379577" x2="113.10075359792016" y2="113.15192226194864" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-25')"></line><line x1="89.25004843789245" y1="89.15347296517609" x2="110.32770410325392" y2="112.56249754230134" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-26')"></line><line x1="104.99999999990072" y1="61.873644780336065" x2="135.81166105174782" y2="68.42280833197282" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-27')"></line><line x1="137.70865006163035" y1="70.52962054391406" x2="161.1176746387556" y2="49.45196487855253" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-28')"></line><line x1="133.9146720418653" y1="66.31599612003157" x2="157.32369661899054" y2="45.23834045467004" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-29')"></line><line x1="60.11253837029599" y1="83.48352470168055" x2="86.88753837025381" y2="83.48347716003605" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-30')"></line><line x1="57.75004843794208" y1="89.15352889652257" x2="89.25004843789245" y2="89.15347296517609" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-31')"></line><line x1="89.25004843789245" y1="89.15347296517609" x2="104.99999999990072" y2="61.873644780336065" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-32')"></line><line x1="85.52084618917543" y1="39.47486416468405" x2="98.90838736142622" y2="62.66267058015359" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-33')"></line><line x1="89.24995156195862" y1="34.59387252684246" x2="104.99999999990072" y2="61.873644780336065" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-34')"></line><line x1="42" y1="61.87375664302897" x2="57.75004843794208" y2="89.15352889652257" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-35')"></line><line x1="57.7499515620083" y1="34.59392845818894" x2="89.24995156195862" y2="34.59387252684246" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-36')"></line><line x1="48.09161544042183" y1="62.66276081032743" x2="61.47907426812888" y2="39.47490685321344" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-37')"></line><line x1="42" y1="61.87375664302897" x2="57.7499515620083" y2="34.59392845818894" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-38')"></line></g><g><text x="380.6849813452514" y="57.750073459449425" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan style="
                 unicode-bidi: plaintext;
                 writing-mode: lr-tb;
                 letter-spacing: normal;
@@ -473,53 +317,23 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="275.50328046843686" y="52.49999999984652" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="270.2533788117048" y="26.25" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="275.5033788117048" y="21" class="debug" fill="#ff0000" style="
+            "></text><text x="270.2533788117048" y="26.25" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>O</tspan></text><text x="275.5033788117048" y="21" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="253.47350821494322" y="73.50004843778856" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>N</tspan></text><text x="248.22350821494322" y="68.25004843778856" class="debug" fill="#ff0000" style="
+            "></text><text x="253.47350821494322" y="73.50004843778856" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: rtl; unicode-bidi: bidi-override;"><tspan>N</tspan></text><text x="248.22350821494322" y="68.25004843778856" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="248.22356414628965" y="99.75004843773888" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="220.94379189279604" y="115.50009687568092" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="193.66396370795604" y="107.62514531367259" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>N</tspan></text><text x="193.66396370795604" y="99.75014531367259" class="debug" fill="#ff0000" style="
+            "></text><text x="193.66396370795604" y="107.62514531367259" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: rtl; unicode-bidi: bidi-override;"><tspan>N</tspan></text><text x="193.66396370795604" y="99.75014531367259" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="166.38419145446244" y="115.50019375161463" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="135.1668632696224" y="105.00024218960635" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>N</tspan></text><text x="139.1043632696224" y="99.75024218960635" class="debug" fill="#ff0000" style="
+            "></text><text x="135.1668632696224" y="105.00024218960635" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>N</tspan></text><text x="139.1043632696224" y="99.75024218960635" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="110.32770410325392" y="112.56249754230134" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="98.52854055161714" y="148.62415859414847" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="103.77854055161714" y="143.37415859414847" class="debug" fill="#ff0000" style="
+            "></text><text x="98.52854055161714" y="148.62415859414847" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>O</tspan></text><text x="103.77854055161714" y="143.37415859414847" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="89.25004843789245" y="89.15347296517609" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -535,13 +349,7 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="135.81166105174782" y="68.42280833197282" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="155.28318562887307" y="52.595152666611284" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="159.22068562887307" y="47.345152666611284" class="debug" fill="#ff0000" style="
+            "></text><text x="155.28318562887307" y="52.595152666611284" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>O</tspan></text><text x="159.22068562887307" y="47.345152666611284" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="193.66390777660962" y="68.25014531372227" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -564,51 +372,21 @@ module.exports = [
                 .sub {
                     font: 8.4px Helvetica, Arial, sans-serif;
                 }
-            </style><g mask="url(#text-mask)"><line x1="171.67869773023912" y1="154.9457628793772" x2="187.42869773023912" y2="127.66596266016741" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-0')"></line><line x1="166.76833369078136" y1="152.1107628793772" x2="182.51833369078136" y2="124.8309626601674" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-1')"></line><line x1="184.97351571051024" y1="126.2484626601674" x2="216.47351571051024" y2="126.2484626601674" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-2')"></line><line x1="169.22351571051024" y1="98.96866244095759" x2="184.97351571051024" y2="126.2484626601674" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-3')"></line><line x1="216.47351571051024" y1="126.2484626601674" x2="232.22351571051024" y2="153.52826287937722" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-4')"></line><line x1="140.08601571051025" y1="93.29866244095759" x2="166.86101571051023" y2="93.29866244095759" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-5')"></line><line x1="137.72351571051024" y1="98.96866244095759" x2="169.22351571051024" y2="98.96866244095759" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-6')"></line><line x1="169.22351571051024" y1="98.96866244095759" x2="184.97351571051024" y2="71.68886222174773" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-7')"></line><line x1="232.22351571051024" y1="153.52826287937722" x2="263.5509554146108" y2="156.8209094723083" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-8')"></line><line x1="225.55202951772267" y1="182.4528904176783" x2="236.44240313607722" y2="157.99271078929766" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-9')"></line><line x1="219.41131145362255" y1="182.30494479511918" x2="232.22351571051024" y2="153.52826287937722" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-10')"></line><line x1="121.97351571051024" y1="71.68886222174777" x2="137.72351571051024" y2="98.96866244095759" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-11')"></line><line x1="184.97351571051024" y1="71.68886222174773" x2="215.78516513362513" y2="65.13964396098827" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-12')"></line><line x1="165.49440167105246" y1="49.29004701897868" x2="178.88190167105247" y2="72.477877205307" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-13')"></line><line x1="169.2235157105102" y1="44.40906200253794" x2="184.97351571051024" y2="71.68886222174773" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-14')"></line><line x1="258.4960498880071" y1="160.31064246597862" x2="264.06288540965267" y2="186.50054447562627" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-15')"></line><line x1="263.5509554146108" y1="156.8209094723083" x2="270.1001736753703" y2="187.6325588954232" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-16')"></line><line x1="219.41131145362255" y1="182.30494479511918" x2="242.82037345616047" y2="203.3825588954232" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-17')"></line><line x1="128.065129749968" y1="72.47787720530702" x2="141.452629749968" y2="49.29004701897868" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-18')"></line><line x1="121.97351571051024" y1="71.68886222174777" x2="137.72351571051024" y2="44.40906200253795" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-19')"></line><line x1="90.47351571051024" y1="71.68886222174777" x2="121.97351571051024" y2="71.68886222174777" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-20')"></line><line x1="210.39317448135685" y1="62.19740959645313" x2="213.1919240853482" y2="35.569085847967614" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-21')"></line><line x1="215.78516513362513" y1="65.13964396098827" x2="219.07781172655615" y2="33.812204256887654" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-22')"></line><line x1="215.78516513362513" y1="65.13964396098827" x2="239.19422713616308" y2="86.21725806129226" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-23')"></line><line x1="137.72351571051024" y1="44.40906200253795" x2="169.2235157105102" y2="44.40906200253794" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-24')"></line><line x1="169.2235157105102" y1="44.40906200253794" x2="190.30112981081422" y2="21" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-25')"></line><line x1="242.82037345616047" y1="203.3825588954232" x2="270.1001736753703" y2="187.6325588954232" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-26')"></line><line x1="68.75979656373232" y1="91.92885251484947" x2="84.49774669386332" y2="70.26742249046025" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-27')"></line><line x1="71.95828026329733" y1="97.17289754455861" x2="90.47351571051024" y2="71.68886222174777" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-28')"></line><line x1="71.95828026329733" y1="46.204826898936915" x2="90.47351571051024" y2="71.68886222174777" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-29')"></line><line x1="190.30112981081422" y1="21" x2="219.07781172655615" y2="33.812204256887654" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-30')"></line><line x1="243.19322451401635" y1="90.87969585947495" x2="268.6577627378191" y2="82.60576583508568" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-31')"></line><line x1="239.19422713616308" y1="86.21725806129226" x2="269.15250739946043" y2="76.48322273848135" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-32')"></line><line x1="232.64500887540373" y1="117.02890748440717" x2="239.19422713616308" y2="86.21725806129226" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-33')"></line><line x1="42" y1="87.43886222174777" x2="71.95828026329733" y2="97.17289754455861" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-34')"></line><line x1="42" y1="55.93886222174777" x2="71.95828026329733" y2="46.204826898936915" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-35')"></line><line x1="269.15250739946043" y1="76.48322273848135" x2="292.5615694019984" y2="97.56083683878533" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-36')"></line><line x1="238.1946590636488" y1="114.39609738147314" x2="258.09236176580606" y2="132.31206936673152" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-37')"></line><line x1="232.64500887540373" y1="117.02890748440717" x2="256.05407087794174" y2="138.10652158471115" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-38')"></line><line x1="47.66999999999999" y1="58.301362221747766" x2="47.66999999999999" y2="85.07636222174777" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-39')"></line><line x1="42" y1="55.93886222174777" x2="42" y2="87.43886222174777" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-40')"></line><line x1="280.9574456146353" y1="124.88275326822993" x2="286.52428113628076" y2="98.69285125858227" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-41')"></line><line x1="286.01235114123904" y1="128.37248626190024" x2="292.5615694019984" y2="97.56083683878533" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-42')"></line><line x1="256.05407087794174" y1="138.10652158471115" x2="286.01235114123904" y2="128.37248626190024" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-43')"></line></g><g><text x="163.97351571051024" y="158.77826287937722" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="169.22351571051024" y="153.52826287937722" class="debug" fill="#ff0000" style="
+            </style><g mask="url(#text-mask)"><line x1="171.67869773023912" y1="154.9457628793772" x2="187.42869773023912" y2="127.66596266016741" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-0')"></line><line x1="166.76833369078136" y1="152.1107628793772" x2="182.51833369078136" y2="124.8309626601674" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-1')"></line><line x1="184.97351571051024" y1="126.2484626601674" x2="216.47351571051024" y2="126.2484626601674" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-2')"></line><line x1="169.22351571051024" y1="98.96866244095759" x2="184.97351571051024" y2="126.2484626601674" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-3')"></line><line x1="216.47351571051024" y1="126.2484626601674" x2="232.22351571051024" y2="153.52826287937722" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-4')"></line><line x1="140.08601571051025" y1="93.29866244095759" x2="166.86101571051023" y2="93.29866244095759" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-5')"></line><line x1="137.72351571051024" y1="98.96866244095759" x2="169.22351571051024" y2="98.96866244095759" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-6')"></line><line x1="169.22351571051024" y1="98.96866244095759" x2="184.97351571051024" y2="71.68886222174773" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-7')"></line><line x1="232.22351571051024" y1="153.52826287937722" x2="263.5509554146108" y2="156.8209094723083" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-8')"></line><line x1="225.55202951772267" y1="182.4528904176783" x2="236.44240313607722" y2="157.99271078929766" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-9')"></line><line x1="219.41131145362255" y1="182.30494479511918" x2="232.22351571051024" y2="153.52826287937722" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-10')"></line><line x1="121.97351571051024" y1="71.68886222174777" x2="137.72351571051024" y2="98.96866244095759" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-11')"></line><line x1="184.97351571051024" y1="71.68886222174773" x2="215.78516513362513" y2="65.13964396098827" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-12')"></line><line x1="165.49440167105246" y1="49.29004701897868" x2="178.88190167105247" y2="72.477877205307" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-13')"></line><line x1="169.2235157105102" y1="44.40906200253794" x2="184.97351571051024" y2="71.68886222174773" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-14')"></line><line x1="258.4960498880071" y1="160.31064246597862" x2="264.06288540965267" y2="186.50054447562627" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-15')"></line><line x1="263.5509554146108" y1="156.8209094723083" x2="270.1001736753703" y2="187.6325588954232" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-16')"></line><line x1="219.41131145362255" y1="182.30494479511918" x2="242.82037345616047" y2="203.3825588954232" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-17')"></line><line x1="128.065129749968" y1="72.47787720530702" x2="141.452629749968" y2="49.29004701897868" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-18')"></line><line x1="121.97351571051024" y1="71.68886222174777" x2="137.72351571051024" y2="44.40906200253795" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-19')"></line><line x1="90.47351571051024" y1="71.68886222174777" x2="121.97351571051024" y2="71.68886222174777" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-20')"></line><line x1="210.39317448135685" y1="62.19740959645313" x2="213.1919240853482" y2="35.569085847967614" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-21')"></line><line x1="215.78516513362513" y1="65.13964396098827" x2="219.07781172655615" y2="33.812204256887654" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-22')"></line><line x1="215.78516513362513" y1="65.13964396098827" x2="239.19422713616308" y2="86.21725806129226" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-23')"></line><line x1="137.72351571051024" y1="44.40906200253795" x2="169.2235157105102" y2="44.40906200253794" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-24')"></line><line x1="169.2235157105102" y1="44.40906200253794" x2="190.30112981081422" y2="21" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-25')"></line><line x1="242.82037345616047" y1="203.3825588954232" x2="270.1001736753703" y2="187.6325588954232" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-26')"></line><line x1="68.75979656373232" y1="91.92885251484947" x2="84.49774669386332" y2="70.26742249046025" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-27')"></line><line x1="71.95828026329733" y1="97.17289754455861" x2="90.47351571051024" y2="71.68886222174777" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-28')"></line><line x1="71.95828026329733" y1="46.204826898936915" x2="90.47351571051024" y2="71.68886222174777" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-29')"></line><line x1="190.30112981081422" y1="21" x2="219.07781172655615" y2="33.812204256887654" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-30')"></line><line x1="243.19322451401635" y1="90.87969585947495" x2="268.6577627378191" y2="82.60576583508568" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-31')"></line><line x1="239.19422713616308" y1="86.21725806129226" x2="269.15250739946043" y2="76.48322273848135" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-32')"></line><line x1="232.64500887540373" y1="117.02890748440717" x2="239.19422713616308" y2="86.21725806129226" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-33')"></line><line x1="42" y1="87.43886222174777" x2="71.95828026329733" y2="97.17289754455861" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-34')"></line><line x1="42" y1="55.93886222174777" x2="71.95828026329733" y2="46.204826898936915" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-35')"></line><line x1="269.15250739946043" y1="76.48322273848135" x2="292.5615694019984" y2="97.56083683878533" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-36')"></line><line x1="238.1946590636488" y1="114.39609738147314" x2="258.09236176580606" y2="132.31206936673152" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-37')"></line><line x1="232.64500887540373" y1="117.02890748440717" x2="256.05407087794174" y2="138.10652158471115" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-38')"></line><line x1="47.66999999999999" y1="58.301362221747766" x2="47.66999999999999" y2="85.07636222174777" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-39')"></line><line x1="42" y1="55.93886222174777" x2="42" y2="87.43886222174777" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-40')"></line><line x1="280.9574456146353" y1="124.88275326822993" x2="286.52428113628076" y2="98.69285125858227" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-41')"></line><line x1="286.01235114123904" y1="128.37248626190024" x2="292.5615694019984" y2="97.56083683878533" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-42')"></line><line x1="256.05407087794174" y1="138.10652158471115" x2="286.01235114123904" y2="128.37248626190024" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-43')"></line></g><g><text x="163.97351571051024" y="158.77826287937722" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>O</tspan></text><text x="169.22351571051024" y="153.52826287937722" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="184.97351571051024" y="126.2484626601674" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="216.47351571051024" y="134.1234626601674" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>N</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="216.47351571051024" y="126.2484626601674" class="debug" fill="#ff0000" style="
+            "></text><text x="216.47351571051024" y="134.1234626601674" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: rtl; unicode-bidi: bidi-override;"><tspan>N</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="216.47351571051024" y="126.2484626601674" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="232.22351571051024" y="153.52826287937722" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="263.5509554146108" y="164.6959094723083" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>N</tspan></text><text x="263.5509554146108" y="156.8209094723083" class="debug" fill="#ff0000" style="
+            "></text><text x="263.5509554146108" y="164.6959094723083" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: rtl; unicode-bidi: bidi-override;"><tspan>N</tspan></text><text x="263.5509554146108" y="156.8209094723083" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="270.1001736753703" y="187.6325588954232" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="242.82037345616047" y="195.5075588954232" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: ltr;
-            "><tspan>N</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="242.82037345616047" y="203.3825588954232" class="debug" fill="#ff0000" style="
+            "></text><text x="242.82037345616047" y="195.5075588954232" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: ltr;"><tspan>N</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="242.82037345616047" y="203.3825588954232" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="224.66131145362255" y="187.55494479511918" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>N</tspan></text><text x="219.41131145362255" y="182.30494479511918" class="debug" fill="#ff0000" style="
+            "></text><text x="224.66131145362255" y="187.55494479511918" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: rtl; unicode-bidi: bidi-override;"><tspan>N</tspan></text><text x="219.41131145362255" y="182.30494479511918" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="169.22351571051024" y="98.96866244095759" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -616,31 +394,13 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="121.97351571051024" y="71.68886222174777" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="137.72351571051024" y="52.28406200253795" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>N</tspan></text><text x="137.72351571051024" y="44.40906200253795" class="debug" fill="#ff0000" style="
+            "></text><text x="137.72351571051024" y="52.28406200253795" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: rtl; unicode-bidi: bidi-override;"><tspan>N</tspan></text><text x="137.72351571051024" y="44.40906200253795" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="169.2235157105102" y="44.40906200253794" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="190.30112981081422" y="28.875" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>O</tspan></text><text x="190.30112981081422" y="21" class="debug" fill="#ff0000" style="
+            "></text><text x="190.30112981081422" y="28.875" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: rtl; unicode-bidi: bidi-override;"><tspan>O</tspan></text><text x="190.30112981081422" y="21" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="215.14031172655615" y="39.062204256887654" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>N</tspan></text><text x="219.07781172655615" y="33.812204256887654" class="debug" fill="#ff0000" style="
+            "></text><text x="215.14031172655615" y="39.062204256887654" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>N</tspan></text><text x="219.07781172655615" y="33.812204256887654" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="215.78516513362513" y="65.13964396098827" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -666,13 +426,7 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="42" y="55.93886222174777" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="71.95828026329733" y="54.079826898936915" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>S</tspan></text><text x="71.95828026329733" y="46.204826898936915" class="debug" fill="#ff0000" style="
+            "></text><text x="71.95828026329733" y="54.079826898936915" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: rtl; unicode-bidi: bidi-override;"><tspan>S</tspan></text><text x="71.95828026329733" y="46.204826898936915" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text></g></svg></div></div>
  `
@@ -691,13 +445,7 @@ module.exports = [
                 .sub {
                     font: 8.4px Helvetica, Arial, sans-serif;
                 }
-            </style><g mask="url(#text-mask)"><line x1="284.62671306354486" y1="155.79767374599916" x2="316.1267130635321" y2="155.79770202061354" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-0')"></line><line x1="265.147578918766" y1="178.1964714641739" x2="278.5350997323148" y2="155.008653294566" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-1')"></line><line x1="268.87668857701686" y1="183.0774598278908" x2="284.62671306354486" y2="155.79767374599916" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-2')"></line><line x1="268.87673755008547" y1="128.51785938949314" x2="284.62671306354486" y2="155.79767374599916" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-3')"></line><line x1="237.37668857702948" y1="183.07743155327648" x2="268.87668857701686" y2="183.0774598278908" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-4')"></line><line x1="239.73923246066659" y1="134.18783323547262" x2="266.5142324606558" y2="134.1878572688948" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-5')"></line><line x1="237.37673755009814" y1="128.51783111487882" x2="268.87673755008547" y2="128.51785938949314" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-6')"></line><line x1="227.71832781125073" y1="155.00860768108575" x2="241.1058069976911" y2="178.19644988411585" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-7')"></line><line x1="221.6267130635702" y1="155.7976171967705" x2="237.37668857702948" y2="183.07743155327648" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-8')"></line><line x1="221.6267130635702" y1="155.7976171967705" x2="237.37673755009814" y2="128.51783111487882" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-9')"></line><line x1="190.12671306358288" y1="155.79758892215614" x2="221.6267130635702" y2="155.7976171967705" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-10')"></line><line x1="174.3767375501235" y1="128.51777456565017" x2="190.12671306358288" y2="155.79758892215614" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-11')"></line><line x1="176.83191829749376" y1="129.93527676943768" x2="192.5819427840217" y2="102.65549068754602" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-12')"></line><line x1="171.92155680275323" y1="127.10027236186265" x2="187.67158128928116" y2="99.82048627997099" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-13')"></line><line x1="142.87673755013617" y1="128.51774629103582" x2="174.3767375501235" y2="128.51777456565017" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-14')"></line><line x1="123.3976034053573" y1="150.91654400921055" x2="136.78512421890605" y2="127.72872583960267" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-15')"></line><line x1="127.12671306360824" y1="155.7975323729275" x2="142.87673755013617" y2="128.51774629103582" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-16')"></line><line x1="127.12676203667684" y1="101.23793193452981" x2="142.87673755013617" y2="128.51774629103582" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-17')"></line><line x1="95.62671306362091" y1="155.79750409831314" x2="127.12671306360824" y2="155.7975323729275" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-18')"></line><line x1="127.12676203667684" y1="101.23793193452981" x2="136.86082425023994" y2="71.27966040858092" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-19')"></line><line x1="97.98925694725796" y1="106.90790578050928" x2="124.76425694724719" y2="106.90792981393145" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-20')"></line><line x1="95.62676203668951" y1="101.23790365991549" x2="127.12676203667684" y2="101.23793193452981" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-21')"></line><line x1="85.96835229784207" y1="127.72868022612242" x2="99.35583148428253" y2="150.9165224291525" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-22')"></line><line x1="79.87673755016155" y1="128.51768974180715" x2="95.62671306362091" y2="155.79750409831314" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-23')"></line><line x1="79.87668857709295" y1="183.07729018020478" x2="95.62671306362091" y2="155.79750409831314" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-24')"></line><line x1="109.95536045166278" y1="58.740169827482504" x2="131.6167763495522" y2="74.47813940105411" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-25')"></line><line x1="111.37680554684067" y1="52.76440208673196" x2="136.86082425023994" y2="71.27966040858092" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-26')"></line><line x1="136.86082425023994" y1="71.27966040858092" x2="166.81911325086156" y2="61.54565197653022" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-27')"></line><line x1="79.87673755016155" y1="128.51768974180715" x2="95.62676203668951" y2="101.23790365991549" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-28')"></line><line x1="85.89275360463878" y1="71.27961465929386" x2="95.62676203668951" y2="101.23790365991549" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-29')"></line><line x1="75.65779714420887" y1="187.54173430322135" x2="86.54814880693536" y2="212.00192370686563" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-30')"></line><line x1="79.87668857709295" y1="183.07729018020478" x2="92.68886700383001" y2="211.85398359625685" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-31')"></line><line x1="48.54924591750296" y1="186.3699086534115" x2="79.87668857709295" y2="183.07729018020478" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-32')"></line><line x1="85.89275360463878" y1="71.27961465929386" x2="111.37680554684067" y2="52.76440208673196" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-33')"></line><line x1="172.85640253268065" y1="60.413642975844795" x2="178.4232615625582" y2="34.22374596303719" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-34')"></line><line x1="166.81911325086156" y1="61.54565197653022" x2="173.36835916836458" y2="30.734008432050672" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-35')"></line><line x1="166.81911325086156" y1="61.54565197653022" x2="190.22815633398022" y2="82.62328708895919" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-36')"></line><line x1="69.27978608189164" y1="232.93157668441904" x2="92.68886700383001" y2="211.85398359625685" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-37')"></line><line x1="42" y1="217.18155219789108" x2="48.54924591750296" y2="186.3699086534115" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-38')"></line><line x1="173.36835916836458" y1="30.734008432050672" x2="203.3266481689862" y2="21" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-39')"></line><line x1="190.72290649125773" y1="76.5007444364435" x2="216.18745214178608" y2="68.2268372692004" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-40')"></line><line x1="190.22815633398022" y1="82.62328708895919" x2="220.18644533460184" y2="72.88927865690849" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-41')"></line><line x1="46.88098836371691" y1="213.45244253964017" x2="70.06880653332482" y2="226.83996335318895" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-42')"></line><line x1="42" y1="217.18155219789108" x2="69.27978608189164" y2="232.93157668441904" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-43')"></line><line x1="201.28835207998287" y1="26.79445038839352" x2="221.18603870063367" y2="44.71044023395807" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-44')"></line><line x1="203.3266481689862" y1="21" x2="226.7356912521048" y2="42.07763511242888" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-45')"></line><line x1="220.18644533460184" y1="72.88927865690849" x2="226.7356912521048" y2="42.07763511242888" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-46')"></line></g><g><text x="312.1892130635321" y="161.04770202061354" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan style="
+            </style><g mask="url(#text-mask)"><line x1="284.62671306354486" y1="155.79767374599916" x2="316.1267130635321" y2="155.79770202061354" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-0')"></line><line x1="265.147578918766" y1="178.1964714641739" x2="278.5350997323148" y2="155.008653294566" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-1')"></line><line x1="268.87668857701686" y1="183.0774598278908" x2="284.62671306354486" y2="155.79767374599916" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-2')"></line><line x1="268.87673755008547" y1="128.51785938949314" x2="284.62671306354486" y2="155.79767374599916" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-3')"></line><line x1="237.37668857702948" y1="183.07743155327648" x2="268.87668857701686" y2="183.0774598278908" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-4')"></line><line x1="239.73923246066659" y1="134.18783323547262" x2="266.5142324606558" y2="134.1878572688948" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-5')"></line><line x1="237.37673755009814" y1="128.51783111487882" x2="268.87673755008547" y2="128.51785938949314" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-6')"></line><line x1="227.71832781125073" y1="155.00860768108575" x2="241.1058069976911" y2="178.19644988411585" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-7')"></line><line x1="221.6267130635702" y1="155.7976171967705" x2="237.37668857702948" y2="183.07743155327648" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-8')"></line><line x1="221.6267130635702" y1="155.7976171967705" x2="237.37673755009814" y2="128.51783111487882" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-9')"></line><line x1="190.12671306358288" y1="155.79758892215614" x2="221.6267130635702" y2="155.7976171967705" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-10')"></line><line x1="174.3767375501235" y1="128.51777456565017" x2="190.12671306358288" y2="155.79758892215614" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-11')"></line><line x1="176.83191829749376" y1="129.93527676943768" x2="192.5819427840217" y2="102.65549068754602" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-12')"></line><line x1="171.92155680275323" y1="127.10027236186265" x2="187.67158128928116" y2="99.82048627997099" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-13')"></line><line x1="142.87673755013617" y1="128.51774629103582" x2="174.3767375501235" y2="128.51777456565017" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-14')"></line><line x1="123.3976034053573" y1="150.91654400921055" x2="136.78512421890605" y2="127.72872583960267" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-15')"></line><line x1="127.12671306360824" y1="155.7975323729275" x2="142.87673755013617" y2="128.51774629103582" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-16')"></line><line x1="127.12676203667684" y1="101.23793193452981" x2="142.87673755013617" y2="128.51774629103582" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-17')"></line><line x1="95.62671306362091" y1="155.79750409831314" x2="127.12671306360824" y2="155.7975323729275" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-18')"></line><line x1="127.12676203667684" y1="101.23793193452981" x2="136.86082425023994" y2="71.27966040858092" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-19')"></line><line x1="97.98925694725796" y1="106.90790578050928" x2="124.76425694724719" y2="106.90792981393145" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-20')"></line><line x1="95.62676203668951" y1="101.23790365991549" x2="127.12676203667684" y2="101.23793193452981" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-21')"></line><line x1="85.96835229784207" y1="127.72868022612242" x2="99.35583148428253" y2="150.9165224291525" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-22')"></line><line x1="79.87673755016155" y1="128.51768974180715" x2="95.62671306362091" y2="155.79750409831314" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-23')"></line><line x1="79.87668857709295" y1="183.07729018020478" x2="95.62671306362091" y2="155.79750409831314" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-24')"></line><line x1="109.95536045166278" y1="58.740169827482504" x2="131.6167763495522" y2="74.47813940105411" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-25')"></line><line x1="111.37680554684067" y1="52.76440208673196" x2="136.86082425023994" y2="71.27966040858092" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-26')"></line><line x1="136.86082425023994" y1="71.27966040858092" x2="166.81911325086156" y2="61.54565197653022" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-27')"></line><line x1="79.87673755016155" y1="128.51768974180715" x2="95.62676203668951" y2="101.23790365991549" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-28')"></line><line x1="85.89275360463878" y1="71.27961465929386" x2="95.62676203668951" y2="101.23790365991549" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-29')"></line><line x1="75.65779714420887" y1="187.54173430322135" x2="86.54814880693536" y2="212.00192370686563" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-30')"></line><line x1="79.87668857709295" y1="183.07729018020478" x2="92.68886700383001" y2="211.85398359625685" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-31')"></line><line x1="48.54924591750296" y1="186.3699086534115" x2="79.87668857709295" y2="183.07729018020478" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-32')"></line><line x1="85.89275360463878" y1="71.27961465929386" x2="111.37680554684067" y2="52.76440208673196" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-33')"></line><line x1="172.85640253268065" y1="60.413642975844795" x2="178.4232615625582" y2="34.22374596303719" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-34')"></line><line x1="166.81911325086156" y1="61.54565197653022" x2="173.36835916836458" y2="30.734008432050672" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-35')"></line><line x1="166.81911325086156" y1="61.54565197653022" x2="190.22815633398022" y2="82.62328708895919" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-36')"></line><line x1="69.27978608189164" y1="232.93157668441904" x2="92.68886700383001" y2="211.85398359625685" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-37')"></line><line x1="42" y1="217.18155219789108" x2="48.54924591750296" y2="186.3699086534115" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-38')"></line><line x1="173.36835916836458" y1="30.734008432050672" x2="203.3266481689862" y2="21" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-39')"></line><line x1="190.72290649125773" y1="76.5007444364435" x2="216.18745214178608" y2="68.2268372692004" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-40')"></line><line x1="190.22815633398022" y1="82.62328708895919" x2="220.18644533460184" y2="72.88927865690849" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-41')"></line><line x1="46.88098836371691" y1="213.45244253964017" x2="70.06880653332482" y2="226.83996335318895" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-42')"></line><line x1="42" y1="217.18155219789108" x2="69.27978608189164" y2="232.93157668441904" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-43')"></line><line x1="201.28835207998287" y1="26.79445038839352" x2="221.18603870063367" y2="44.71044023395807" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-44')"></line><line x1="203.3266481689862" y1="21" x2="226.7356912521048" y2="42.07763511242888" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-45')"></line><line x1="220.18644533460184" y1="72.88927865690849" x2="226.7356912521048" y2="42.07763511242888" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-46')"></line></g><g><text x="312.1892130635321" y="161.04770202061354" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan style="
                 unicode-bidi: plaintext;
                 writing-mode: lr-tb;
                 letter-spacing: normal;
@@ -712,23 +460,11 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="221.6267130635702" y="155.7976171967705" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="190.12671306358288" y="147.92258892215614" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: ltr;
-            "><tspan>N</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="190.12671306358288" y="155.79758892215614" class="debug" fill="#ff0000" style="
+            "></text><text x="190.12671306358288" y="147.92258892215614" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: ltr;"><tspan>N</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="190.12671306358288" y="155.79758892215614" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="174.3767375501235" y="128.51777456565017" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="184.87676203665143" y="106.4879884837585" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="190.12676203665143" y="101.2379884837585" class="debug" fill="#ff0000" style="
+            "></text><text x="184.87676203665143" y="106.4879884837585" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>O</tspan></text><text x="190.12676203665143" y="101.2379884837585" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="142.87673755013617" y="128.51774629103582" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -736,31 +472,13 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="95.62671306362091" y="155.79750409831314" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="85.12673755016155" y="133.76768974180715" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>N</tspan></text><text x="79.87673755016155" y="128.51768974180715" class="debug" fill="#ff0000" style="
+            "></text><text x="85.12673755016155" y="133.76768974180715" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: rtl; unicode-bidi: bidi-override;"><tspan>N</tspan></text><text x="79.87673755016155" y="128.51768974180715" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="95.62676203668951" y="101.23790365991549" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="91.14275360463878" y="76.52961465929386" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>O</tspan></text><text x="85.89275360463878" y="71.27961465929386" class="debug" fill="#ff0000" style="
+            "></text><text x="91.14275360463878" y="76.52961465929386" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: rtl; unicode-bidi: bidi-override;"><tspan>O</tspan></text><text x="85.89275360463878" y="71.27961465929386" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="111.37680554684067" y="60.63940208673196" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>N</tspan></text><text x="111.37680554684067" y="52.76440208673196" class="debug" fill="#ff0000" style="
+            "></text><text x="111.37680554684067" y="60.63940208673196" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: rtl; unicode-bidi: bidi-override;"><tspan>N</tspan></text><text x="111.37680554684067" y="52.76440208673196" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="136.86082425023994" y="71.27966040858092" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -786,21 +504,9 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="42" y="217.18155219789108" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="48.54924591750296" y="194.2449086534115" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>O</tspan></text><text x="48.54924591750296" y="186.3699086534115" class="debug" fill="#ff0000" style="
+            "></text><text x="48.54924591750296" y="194.2449086534115" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: rtl; unicode-bidi: bidi-override;"><tspan>O</tspan></text><text x="48.54924591750296" y="186.3699086534115" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="237.37673755009814" y="136.39283111487882" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>N</tspan></text><text x="237.37673755009814" y="128.51783111487882" class="debug" fill="#ff0000" style="
+            "></text><text x="237.37673755009814" y="136.39283111487882" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: rtl; unicode-bidi: bidi-override;"><tspan>N</tspan></text><text x="237.37673755009814" y="128.51783111487882" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="268.87673755008547" y="128.51785938949314" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -831,13 +537,7 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="241.51918996172134" y="52.49998775673201" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="219.48938620818538" y="73.49998163509801" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>O</tspan></text><text x="214.23938620818538" y="68.24998163509801" class="debug" fill="#ff0000" style="
+            "></text><text x="219.48938620818538" y="73.49998163509801" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: rtl; unicode-bidi: bidi-override;"><tspan>O</tspan></text><text x="214.23938620818538" y="68.24998163509801" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="214.2393791395318" y="99.74998163509721" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -853,33 +553,15 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="159.67977870111346" y="99.74996939183015" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="128.4624749475776" y="120.74996327019622" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>N</tspan></text><text x="132.3999749475776" y="115.49996327019622" class="debug" fill="#ff0000" style="
+            "></text><text x="128.4624749475776" y="120.74996327019622" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>N</tspan></text><text x="132.3999749475776" y="115.49996327019622" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="129.10732132471588" y="146.82740223542055" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="148.57887859740077" y="173.15502158875734" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="152.51637859740077" y="167.90502158875734" class="debug" fill="#ff0000" style="
+            "></text><text x="148.57887859740077" y="173.15502158875734" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>O</tspan></text><text x="152.51637859740077" y="167.90502158875734" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="98.29567043194606" y="153.37661358199333" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="80.23345971752235" y="187.40329262265413" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="85.48345971752235" y="182.15329262265413" class="debug" fill="#ff0000" style="
+            "></text><text x="80.23345971752235" y="187.40329262265413" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>O</tspan></text><text x="85.48345971752235" y="182.15329262265413" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="82.54567655357998" y="126.09680982845742" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -910,13 +592,7 @@ module.exports = [
                 .sub {
                     font: 8.4px Helvetica, Arial, sans-serif;
                 }
-            </style><g mask="url(#text-mask)"><line x1="291.16030681251755" y1="43.04372661779114" x2="306.91030681251755" y2="70.32352683700097" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-0')"></line><line x1="309.2728068125175" y1="75.99352683700097" x2="336.04780681251754" y2="75.99352683700097" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-1')"></line><line x1="306.91030681251755" y1="70.32352683700097" x2="338.41030681251755" y2="70.32352683700097" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-2')"></line><line x1="291.16030681251755" y1="97.60332705621083" x2="306.91030681251755" y2="70.32352683700097" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-3')"></line><line x1="338.41030681251755" y1="70.32352683700097" x2="354.16030681251755" y2="97.60332705621077" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-4')"></line><line x1="297.25192085197534" y1="96.81431207265156" x2="310.63942085197533" y2="120.00214225897987" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-5')"></line><line x1="291.16030681251755" y1="97.60332705621083" x2="306.91030681251755" y2="124.88312727542062" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-6')"></line><line x1="259.66030681251755" y1="97.60332705621089" x2="291.16030681251755" y2="97.60332705621083" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-7')"></line><line x1="334.6811927730598" y1="120.00214225897987" x2="348.06869277305975" y2="96.81431207265152" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-8')"></line><line x1="338.41030681251755" y1="124.8831272754206" x2="354.16030681251755" y2="97.60332705621077" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-9')"></line><line x1="306.91030681251755" y1="124.88312727542062" x2="338.41030681251755" y2="124.8831272754206" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-10')"></line><line x1="241.1450713653047" y1="123.08736237902176" x2="259.66030681251755" y2="97.60332705621089" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-11')"></line><line x1="241.14507136530457" y1="72.11929173340008" x2="259.66030681251755" y2="97.60332705621089" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-12')"></line><line x1="238.44882614160792" y1="123.96342555807473" x2="248.1828614644188" y2="153.92170582137203" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-13')"></line><line x1="243.84131658900145" y1="122.21129919996878" x2="253.57535191181233" y2="152.16957946326607" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-14')"></line><line x1="211.18679110200733" y1="113.35332705621097" x2="241.1450713653047" y2="123.08736237902176" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-15')"></line><line x1="211.18679110200728" y1="81.85332705621097" x2="241.14507136530457" y2="72.11929173340008" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-16')"></line><line x1="243.84131658900134" y1="72.99535491245304" x2="253.57535191181213" y2="43.037074649155684" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-17')"></line><line x1="238.4488261416078" y1="71.2432285543471" x2="248.1828614644186" y2="41.284948291049744" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-18')"></line><line x1="183.11797589923827" y1="123.01171301675326" x2="206.3058060855666" y2="109.62421301675322" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-19')"></line><line x1="183.90699088279754" y1="129.10332705621101" x2="211.18679110200733" y2="113.35332705621097" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-20')"></line><line x1="211.18679110200728" y1="81.85332705621097" x2="211.18679110200733" y2="113.35332705621097" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-21')"></line><line x1="183.11797589923816" y1="72.19494109566878" x2="206.30580608556653" y2="85.58244109566874" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-22')"></line><line x1="183.9069908827974" y1="66.10332705621101" x2="211.18679110200728" y2="81.85332705621097" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-23')"></line><line x1="156.6271906635877" y1="113.35332705621109" x2="183.90699088279754" y2="129.10332705621101" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-24')"></line><line x1="156.6271906635876" y1="81.85332705621109" x2="183.9069908827974" y2="66.10332705621101" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-25')"></line><line x1="134.3533270562115" y1="135.62719066358738" x2="156.6271906635877" y2="113.35332705621109" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-26')"></line><line x1="150.95719066358762" y1="84.2158270562111" x2="150.9571906635877" y2="110.9908270562111" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-27')"></line><line x1="156.6271906635876" y1="81.85332705621109" x2="156.6271906635877" y2="113.35332705621109" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-28')"></line><line x1="134.35332705621133" y1="59.57946344883488" x2="156.6271906635876" y2="81.85332705621109" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-29')"></line><line x1="102.8533270562115" y1="135.62719066358744" x2="134.3533270562115" y2="135.62719066358738" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-30')"></line><line x1="102.85332705621133" y1="59.57946344883496" x2="134.35332705621133" y2="59.57946344883488" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-31')"></line><line x1="89.83518769447784" y1="162.3043504413539" x2="96.76506762709778" y2="136.44168644246412" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-32')"></line><line x1="94.70052713548213" y1="166.05385419169312" x2="102.8533270562115" y2="135.62719066358744" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-33')"></line><line x1="80.57946344883521" y1="113.35332705621127" x2="102.8533270562115" y2="135.62719066358744" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-34')"></line><line x1="89.83518769447753" y1="32.90230367106853" x2="96.76506762709761" y2="58.764967669958345" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-35')"></line><line x1="94.70052713548182" y1="29.152799920729294" x2="102.85332705621133" y2="59.57946344883496" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-36')"></line><line x1="80.57946344883513" y1="81.85332705621126" x2="102.85332705621133" y2="59.57946344883496" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-37')"></line><line x1="64.27386360737651" y1="174.2066541124226" x2="94.70052713548213" y2="166.05385419169312" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-38')"></line><line x1="53.90230367106875" y1="126.37146641794504" x2="79.7649676699586" y2="119.44158648532499" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-39')"></line><line x1="50.152799920729535" y1="121.50612697694073" x2="80.57946344883521" y2="113.35332705621127" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-40')"></line><line x1="80.57946344883513" y1="81.85332705621126" x2="80.57946344883521" y2="113.35332705621127" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-41')"></line><line x1="64.27386360737614" y1="20.999999999999993" x2="94.70052713548182" y2="29.152799920729294" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-42')"></line><line x1="53.90230367106864" y1="68.83518769447761" x2="79.76496766995848" y2="75.76506762709754" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-43')"></line><line x1="50.15279992072945" y1="73.70052713548193" x2="80.57946344883513" y2="81.85332705621126" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-44')"></line><line x1="47.67983521988117" y1="149.59403482627187" x2="66.61261928615099" y2="168.52681889254166" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-45')"></line><line x1="42.00000000000023" y1="151.9327905050464" x2="64.27386360737651" y2="174.2066541124226" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-46')"></line><line x1="42.00000000000023" y1="151.9327905050464" x2="50.152799920729535" y2="121.50612697694073" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-47')"></line><line x1="47.679835219880914" y1="45.612619286150796" x2="66.61261928615068" y2="26.67983521988093" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-48')"></line><line x1="41.99999999999997" y1="43.27386360737631" x2="64.27386360737614" y2="20.999999999999993" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-49')"></line><line x1="41.99999999999997" y1="43.27386360737631" x2="50.15279992072945" y2="73.70052713548193" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-50')"></line></g><g><text x="285.91030681251755" y="48.29372661779114" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>O</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="291.16030681251755" y="43.04372661779114" class="debug" fill="#ff0000" style="
+            </style><g mask="url(#text-mask)"><line x1="291.16030681251755" y1="43.04372661779114" x2="306.91030681251755" y2="70.32352683700097" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-0')"></line><line x1="309.2728068125175" y1="75.99352683700097" x2="336.04780681251754" y2="75.99352683700097" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-1')"></line><line x1="306.91030681251755" y1="70.32352683700097" x2="338.41030681251755" y2="70.32352683700097" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-2')"></line><line x1="291.16030681251755" y1="97.60332705621083" x2="306.91030681251755" y2="70.32352683700097" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-3')"></line><line x1="338.41030681251755" y1="70.32352683700097" x2="354.16030681251755" y2="97.60332705621077" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-4')"></line><line x1="297.25192085197534" y1="96.81431207265156" x2="310.63942085197533" y2="120.00214225897987" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-5')"></line><line x1="291.16030681251755" y1="97.60332705621083" x2="306.91030681251755" y2="124.88312727542062" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-6')"></line><line x1="259.66030681251755" y1="97.60332705621089" x2="291.16030681251755" y2="97.60332705621083" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-7')"></line><line x1="334.6811927730598" y1="120.00214225897987" x2="348.06869277305975" y2="96.81431207265152" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-8')"></line><line x1="338.41030681251755" y1="124.8831272754206" x2="354.16030681251755" y2="97.60332705621077" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-9')"></line><line x1="306.91030681251755" y1="124.88312727542062" x2="338.41030681251755" y2="124.8831272754206" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-10')"></line><line x1="241.1450713653047" y1="123.08736237902176" x2="259.66030681251755" y2="97.60332705621089" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-11')"></line><line x1="241.14507136530457" y1="72.11929173340008" x2="259.66030681251755" y2="97.60332705621089" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-12')"></line><line x1="238.44882614160792" y1="123.96342555807473" x2="248.1828614644188" y2="153.92170582137203" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-13')"></line><line x1="243.84131658900145" y1="122.21129919996878" x2="253.57535191181233" y2="152.16957946326607" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-14')"></line><line x1="211.18679110200733" y1="113.35332705621097" x2="241.1450713653047" y2="123.08736237902176" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-15')"></line><line x1="211.18679110200728" y1="81.85332705621097" x2="241.14507136530457" y2="72.11929173340008" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-16')"></line><line x1="243.84131658900134" y1="72.99535491245304" x2="253.57535191181213" y2="43.037074649155684" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-17')"></line><line x1="238.4488261416078" y1="71.2432285543471" x2="248.1828614644186" y2="41.284948291049744" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-18')"></line><line x1="183.11797589923827" y1="123.01171301675326" x2="206.3058060855666" y2="109.62421301675322" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-19')"></line><line x1="183.90699088279754" y1="129.10332705621101" x2="211.18679110200733" y2="113.35332705621097" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-20')"></line><line x1="211.18679110200728" y1="81.85332705621097" x2="211.18679110200733" y2="113.35332705621097" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-21')"></line><line x1="183.11797589923816" y1="72.19494109566878" x2="206.30580608556653" y2="85.58244109566874" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-22')"></line><line x1="183.9069908827974" y1="66.10332705621101" x2="211.18679110200728" y2="81.85332705621097" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-23')"></line><line x1="156.6271906635877" y1="113.35332705621109" x2="183.90699088279754" y2="129.10332705621101" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-24')"></line><line x1="156.6271906635876" y1="81.85332705621109" x2="183.9069908827974" y2="66.10332705621101" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-25')"></line><line x1="134.3533270562115" y1="135.62719066358738" x2="156.6271906635877" y2="113.35332705621109" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-26')"></line><line x1="150.95719066358762" y1="84.2158270562111" x2="150.9571906635877" y2="110.9908270562111" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-27')"></line><line x1="156.6271906635876" y1="81.85332705621109" x2="156.6271906635877" y2="113.35332705621109" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-28')"></line><line x1="134.35332705621133" y1="59.57946344883488" x2="156.6271906635876" y2="81.85332705621109" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-29')"></line><line x1="102.8533270562115" y1="135.62719066358744" x2="134.3533270562115" y2="135.62719066358738" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-30')"></line><line x1="102.85332705621133" y1="59.57946344883496" x2="134.35332705621133" y2="59.57946344883488" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-31')"></line><line x1="89.83518769447784" y1="162.3043504413539" x2="96.76506762709778" y2="136.44168644246412" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-32')"></line><line x1="94.70052713548213" y1="166.05385419169312" x2="102.8533270562115" y2="135.62719066358744" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-33')"></line><line x1="80.57946344883521" y1="113.35332705621127" x2="102.8533270562115" y2="135.62719066358744" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-34')"></line><line x1="89.83518769447753" y1="32.90230367106853" x2="96.76506762709761" y2="58.764967669958345" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-35')"></line><line x1="94.70052713548182" y1="29.152799920729294" x2="102.85332705621133" y2="59.57946344883496" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-36')"></line><line x1="80.57946344883513" y1="81.85332705621126" x2="102.85332705621133" y2="59.57946344883496" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-37')"></line><line x1="64.27386360737651" y1="174.2066541124226" x2="94.70052713548213" y2="166.05385419169312" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-38')"></line><line x1="53.90230367106875" y1="126.37146641794504" x2="79.7649676699586" y2="119.44158648532499" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-39')"></line><line x1="50.152799920729535" y1="121.50612697694073" x2="80.57946344883521" y2="113.35332705621127" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-40')"></line><line x1="80.57946344883513" y1="81.85332705621126" x2="80.57946344883521" y2="113.35332705621127" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-41')"></line><line x1="64.27386360737614" y1="20.999999999999993" x2="94.70052713548182" y2="29.152799920729294" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-42')"></line><line x1="53.90230367106864" y1="68.83518769447761" x2="79.76496766995848" y2="75.76506762709754" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-43')"></line><line x1="50.15279992072945" y1="73.70052713548193" x2="80.57946344883513" y2="81.85332705621126" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-44')"></line><line x1="47.67983521988117" y1="149.59403482627187" x2="66.61261928615099" y2="168.52681889254166" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-45')"></line><line x1="42.00000000000023" y1="151.9327905050464" x2="64.27386360737651" y2="174.2066541124226" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-46')"></line><line x1="42.00000000000023" y1="151.9327905050464" x2="50.152799920729535" y2="121.50612697694073" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-47')"></line><line x1="47.679835219880914" y1="45.612619286150796" x2="66.61261928615068" y2="26.67983521988093" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-48')"></line><line x1="41.99999999999997" y1="43.27386360737631" x2="64.27386360737614" y2="20.999999999999993" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-49')"></line><line x1="41.99999999999997" y1="43.27386360737631" x2="50.15279992072945" y2="73.70052713548193" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-50')"></line></g><g><text x="285.91030681251755" y="48.29372661779114" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>O</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="291.16030681251755" y="43.04372661779114" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="306.91030681251755" y="70.32352683700097" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -930,23 +606,11 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="291.16030681251755" y="97.60332705621083" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="255.72280681251755" y="102.85332705621089" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>N</tspan></text><text x="259.66030681251755" y="97.60332705621089" class="debug" fill="#ff0000" style="
+            "></text><text x="255.72280681251755" y="102.85332705621089" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>N</tspan></text><text x="259.66030681251755" y="97.60332705621089" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="241.1450713653047" y="123.08736237902176" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="245.62910668811557" y="158.29564264231908" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="250.87910668811557" y="153.04564264231908" class="debug" fill="#ff0000" style="
+            "></text><text x="245.62910668811557" y="158.29564264231908" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>O</tspan></text><text x="250.87910668811557" y="153.04564264231908" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="211.18679110200733" y="113.35332705621097" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -954,13 +618,7 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="156.6271906635877" y="113.35332705621109" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="134.3533270562115" y="127.75219066358738" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="134.3533270562115" y="135.62719066358738" class="debug" fill="#ff0000" style="
+            "></text><text x="134.3533270562115" y="127.75219066358738" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: ltr;"><tspan>O</tspan></text><text x="134.3533270562115" y="135.62719066358738" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="102.8533270562115" y="135.62719066358744" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -986,13 +644,7 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="102.85332705621133" y="59.57946344883496" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="134.35332705621133" y="67.45446344883487" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>O</tspan></text><text x="134.35332705621133" y="59.57946344883488" class="debug" fill="#ff0000" style="
+            "></text><text x="134.35332705621133" y="67.45446344883487" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: rtl; unicode-bidi: bidi-override;"><tspan>O</tspan></text><text x="134.35332705621133" y="59.57946344883488" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="156.6271906635876" y="81.85332705621109" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -1002,13 +654,7 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="241.14507136530457" y="72.11929173340008" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="245.62910668811537" y="47.41101147010271" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="250.87910668811537" y="42.16101147010271" class="debug" fill="#ff0000" style="
+            "></text><text x="245.62910668811537" y="47.41101147010271" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>O</tspan></text><text x="250.87910668811537" y="42.16101147010271" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text></g></svg></div></div>
  `
@@ -1041,33 +687,15 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="254.9883211372341" y="99.85135484558154" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="202.41070178389808" y="84.31730464155028" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>S</tspan></text><text x="202.41070178389808" y="76.44230464155028" class="debug" fill="#ff0000" style="
+            "></text><text x="202.41070178389808" y="84.31730464155028" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: rtl; unicode-bidi: bidi-override;"><tspan>S</tspan></text><text x="202.41070178389808" y="76.44230464155028" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="173.63402274323732" y="89.25451535597404" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="140.91983795241566" y="81.69231755662304" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>N</tspan></text><text x="144.85733795241566" y="76.44231755662304" class="debug" fill="#ff0000" style="
+            "></text><text x="140.91983795241566" y="81.69231755662304" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>N</tspan></text><text x="144.85733795241566" y="76.44231755662304" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="135.12329590691596" y="46.48403947766056" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="148.38852563546752" y="26.25" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="153.63852563546752" y="21" class="debug" fill="#ff0000" style="
+            "></text><text x="148.38852563546752" y="26.25" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>O</tspan></text><text x="153.63852563546752" y="21" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="103.62329590691675" y="46.484046546314175" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -1083,23 +711,11 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="119.37330678445579" y="94.95755872249639" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="127.91596040731758" y="131.5349976877207" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>N</tspan></text><text x="122.66596040731758" y="126.28499768772069" class="debug" fill="#ff0000" style="
+            "></text><text x="127.91596040731758" y="131.5349976877207" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: rtl; unicode-bidi: bidi-override;"><tspan>N</tspan></text><text x="122.66596040731758" y="126.28499768772069" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="151.44264519813925" y="139.0971954870717" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="149.48529882100098" y="175.674634452296" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="154.73529882100098" y="170.424634452296" class="debug" fill="#ff0000" style="
+            "></text><text x="149.48529882100098" y="175.674634452296" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>O</tspan></text><text x="154.73529882100098" y="170.424634452296" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="176.9266763660991" y="120.58195432119837" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -1120,33 +736,15 @@ module.exports = [
                 .sub {
                     font: 8.4px Helvetica, Arial, sans-serif;
                 }
-            </style><g mask="url(#text-mask)"><line x1="142.03325647746934" y1="62.7035382653732" x2="154.8454284466671" y2="91.48023455649916" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-0')"></line><line x1="147.21306180987202" y1="60.39734731091761" x2="160.0252337790698" y2="89.17404360204357" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-1')"></line><line x1="141.68530050471048" y1="117.60692162683007" x2="157.43533111286845" y2="90.32713907927136" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-2')"></line><line x1="157.43533111286845" y1="90.32713907927136" x2="188.24697318768537" y2="96.87639191095938" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-3')"></line><line x1="141.68530050471048" y1="117.60692162683007" x2="162.76288833983457" y2="141.01600727861552" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-4')"></line><line x1="110.35785710625211" y1="120.89953307010528" x2="141.68530050471048" y2="117.60692162683007" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-5')"></line><line x1="193.49101462866528" y1="100.07488149438548" x2="215.15246231115472" y2="84.33695566857314" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-6')"></line><line x1="188.24697318768537" y1="96.87639191095938" x2="213.73102928473176" y2="78.36118505706253" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-7')"></line><line x1="188.24697318768537" y1="96.87639191095938" x2="191.53958463096055" y2="128.20383530941774" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-8')"></line><line x1="153.44058772141304" y1="171.2382165985805" x2="159.98984055310106" y2="140.42657452376363" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-9')"></line><line x1="158.98668329488007" y1="172.41708210828432" x2="165.5359361265681" y2="141.60544003346746" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-10')"></line><line x1="162.76288833983457" y1="141.01600727861552" x2="191.53958463096055" y2="128.20383530941774" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-11')"></line><line x1="93.32673814527485" y1="145.21174796688172" x2="104.2171392081521" y2="120.75158055760834" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-12')"></line><line x1="97.54562056169061" y1="149.67620061042692" x2="110.35785710625211" y2="120.89953307010528" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-13')"></line><line x1="91.84265025235524" y1="95.4154769730588" x2="110.35785710625211" y2="120.89953307010528" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-14')"></line><line x1="213.73102928473176" y1="78.36118505706253" x2="242.50769682505344" y2="91.17342160162401" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-15')"></line><line x1="196.0040372745057" y1="123.98495289300196" x2="220.46420468377917" y2="134.87535395587918" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-16')"></line><line x1="191.53958463096055" y1="128.20383530941774" x2="220.31625217128223" y2="141.0160718539792" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-17')"></line><line x1="66.21817716323224" y1="152.96881205370215" x2="97.54562056169061" y2="149.67620061042692" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-18')"></line><line x1="87.62376783593947" y1="90.9510243295136" x2="98.5141688988167" y2="66.49085692024016" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-19')"></line><line x1="91.84265025235524" y1="95.4154769730588" x2="104.65488679691674" y2="66.6388094327371" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-20')"></line><line x1="60.51520685389687" y1="98.70808841633401" x2="91.84265025235524" y2="95.4154769730588" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-21')"></line><line x1="242.50769682505344" y1="91.17342160162401" x2="262.3313166099888" y2="66.69334605798402" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-22')"></line><line x1="248.39358249502155" y1="92.93030979671884" x2="251.1923022218056" y2="119.55863668540844" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-23')"></line><line x1="242.50769682505344" y1="91.17342160162401" x2="245.80030826832873" y2="122.50086500008238" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-24')"></line><line x1="220.31625217128223" y1="141.0160718539792" x2="245.80030826832873" y2="122.50086500008238" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-25')"></line><line x1="53.678740920845996" y1="126.06332293023276" x2="69.41666674665834" y2="147.72477061272224" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-26')"></line><line x1="47.70297030933537" y1="127.48475595665572" x2="66.21817716323224" y2="152.96881205370215" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-27')"></line><line x1="86.13967994301984" y1="41.15475333569066" x2="104.65488679691674" y2="66.6388094327371" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-28')"></line><line x1="47.70297030933537" y1="127.48475595665572" x2="60.51520685389687" y2="98.70808841633401" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-29')"></line><line x1="47.975770611510626" y1="71.80259929286463" x2="63.713696437322966" y2="93.4640469753541" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-30')"></line><line x1="42" y1="73.22403231928757" x2="60.51520685389687" y2="98.70808841633401" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-31')"></line><line x1="262.3313166099888" y1="66.69334605798402" x2="293.6587600084472" y2="63.40073461470878" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-32')"></line><line x1="245.80030826832873" y1="122.50086500008238" x2="270.2803838119687" y2="142.32448478501772" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-33')"></line><line x1="57.75446485923544" y1="49.839358732442776" x2="84.38279174792501" y2="47.040639005658804" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-34')"></line><line x1="54.8122365445615" y1="44.447364778965905" x2="86.13967994301984" y2="41.15475333569066" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-35')"></line><line x1="42" y1="73.22403231928757" x2="54.8122365445615" y2="44.447364778965905" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-36')"></line><line x1="299.6285309461824" y1="61.954311024963715" x2="303.8170934195455" y2="35.508960405114976" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-37')"></line><line x1="293.6587600084472" y1="63.40073461470878" x2="298.5864805653449" y2="32.28855741488674" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-38')"></line><line x1="293.6587600084472" y1="63.40073461470878" x2="318.13883555208724" y2="83.2243543996441" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-39')"></line><line x1="270.2803838119687" y1="142.32448478501772" x2="301.6078272104271" y2="139.03187334174248" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-40')"></line><line x1="298.5864805653449" y1="32.28855741488674" x2="327.9942766658828" y2="21" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-41')"></line><line x1="318.13883555208724" y1="83.2243543996441" x2="321.4314469953624" y2="114.5517977981025" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-42')"></line><line x1="318.31247992494787" y1="77.08430929543078" x2="343.309106610405" y2="67.48903549277706" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-43')"></line><line x1="318.13883555208724" y1="83.2243543996441" x2="347.546631652625" y2="71.93579698475736" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-44')"></line><line x1="307.7478723146404" y1="139.20551771460322" x2="317.34314611729417" y2="164.20214440006038" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-45')"></line><line x1="301.6078272104271" y1="139.03187334174248" x2="312.8963846253139" y2="168.43966944228032" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-46')"></line><line x1="301.6078272104271" y1="139.03187334174248" x2="321.4314469953624" y2="114.5517977981025" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-47')"></line><line x1="326.26203077036735" y1="26.893185081725335" x2="347.07009498246134" y2="43.74326189892034" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-48')"></line><line x1="327.9942766658828" y1="21" x2="352.47435220952275" y2="40.82361978493529" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-49')"></line><line x1="322.8778705851074" y1="120.52156873583782" x2="349.3232212049561" y2="124.71013120920092" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-50')"></line><line x1="321.4314469953624" y1="114.5517977981025" x2="352.5436241951844" y2="119.47951835500028" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-51')"></line><line x1="347.546631652625" y1="71.93579698475736" x2="352.47435220952275" y2="40.82361978493529" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-52')"></line><line x1="312.8963846253139" y1="168.43966944228032" x2="344.00856182513587" y2="173.36738999917804" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-53')"></line><line x1="352.5436241951844" y1="119.47951835500028" x2="363.8321816100712" y2="148.88731445553805" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-54')"></line><line x1="341.08891971115077" y1="167.9631327721167" x2="357.9389965283458" y2="147.1550685600227" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-55')"></line><line x1="344.00856182513587" y1="173.36738999917804" x2="363.8321816100712" y2="148.88731445553805" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-56')"></line></g><g><text x="139.37315914367068" y="66.8004427881454" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="144.62315914367068" y="61.5504427881454" class="debug" fill="#ff0000" style="
+            </style><g mask="url(#text-mask)"><line x1="142.03325647746934" y1="62.7035382653732" x2="154.8454284466671" y2="91.48023455649916" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-0')"></line><line x1="147.21306180987202" y1="60.39734731091761" x2="160.0252337790698" y2="89.17404360204357" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-1')"></line><line x1="141.68530050471048" y1="117.60692162683007" x2="157.43533111286845" y2="90.32713907927136" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-2')"></line><line x1="157.43533111286845" y1="90.32713907927136" x2="188.24697318768537" y2="96.87639191095938" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-3')"></line><line x1="141.68530050471048" y1="117.60692162683007" x2="162.76288833983457" y2="141.01600727861552" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-4')"></line><line x1="110.35785710625211" y1="120.89953307010528" x2="141.68530050471048" y2="117.60692162683007" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-5')"></line><line x1="193.49101462866528" y1="100.07488149438548" x2="215.15246231115472" y2="84.33695566857314" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-6')"></line><line x1="188.24697318768537" y1="96.87639191095938" x2="213.73102928473176" y2="78.36118505706253" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-7')"></line><line x1="188.24697318768537" y1="96.87639191095938" x2="191.53958463096055" y2="128.20383530941774" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-8')"></line><line x1="153.44058772141304" y1="171.2382165985805" x2="159.98984055310106" y2="140.42657452376363" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-9')"></line><line x1="158.98668329488007" y1="172.41708210828432" x2="165.5359361265681" y2="141.60544003346746" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-10')"></line><line x1="162.76288833983457" y1="141.01600727861552" x2="191.53958463096055" y2="128.20383530941774" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-11')"></line><line x1="93.32673814527485" y1="145.21174796688172" x2="104.2171392081521" y2="120.75158055760834" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-12')"></line><line x1="97.54562056169061" y1="149.67620061042692" x2="110.35785710625211" y2="120.89953307010528" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-13')"></line><line x1="91.84265025235524" y1="95.4154769730588" x2="110.35785710625211" y2="120.89953307010528" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-14')"></line><line x1="213.73102928473176" y1="78.36118505706253" x2="242.50769682505344" y2="91.17342160162401" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-15')"></line><line x1="196.0040372745057" y1="123.98495289300196" x2="220.46420468377917" y2="134.87535395587918" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-16')"></line><line x1="191.53958463096055" y1="128.20383530941774" x2="220.31625217128223" y2="141.0160718539792" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-17')"></line><line x1="66.21817716323224" y1="152.96881205370215" x2="97.54562056169061" y2="149.67620061042692" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-18')"></line><line x1="87.62376783593947" y1="90.9510243295136" x2="98.5141688988167" y2="66.49085692024016" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-19')"></line><line x1="91.84265025235524" y1="95.4154769730588" x2="104.65488679691674" y2="66.6388094327371" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-20')"></line><line x1="60.51520685389687" y1="98.70808841633401" x2="91.84265025235524" y2="95.4154769730588" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-21')"></line><line x1="242.50769682505344" y1="91.17342160162401" x2="262.3313166099888" y2="66.69334605798402" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-22')"></line><line x1="248.39358249502155" y1="92.93030979671884" x2="251.1923022218056" y2="119.55863668540844" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-23')"></line><line x1="242.50769682505344" y1="91.17342160162401" x2="245.80030826832873" y2="122.50086500008238" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-24')"></line><line x1="220.31625217128223" y1="141.0160718539792" x2="245.80030826832873" y2="122.50086500008238" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-25')"></line><line x1="53.678740920845996" y1="126.06332293023276" x2="69.41666674665834" y2="147.72477061272224" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-26')"></line><line x1="47.70297030933537" y1="127.48475595665572" x2="66.21817716323224" y2="152.96881205370215" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-27')"></line><line x1="86.13967994301984" y1="41.15475333569066" x2="104.65488679691674" y2="66.6388094327371" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-28')"></line><line x1="47.70297030933537" y1="127.48475595665572" x2="60.51520685389687" y2="98.70808841633401" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-29')"></line><line x1="47.975770611510626" y1="71.80259929286463" x2="63.713696437322966" y2="93.4640469753541" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-30')"></line><line x1="42" y1="73.22403231928757" x2="60.51520685389687" y2="98.70808841633401" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-31')"></line><line x1="262.3313166099888" y1="66.69334605798402" x2="293.6587600084472" y2="63.40073461470878" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-32')"></line><line x1="245.80030826832873" y1="122.50086500008238" x2="270.2803838119687" y2="142.32448478501772" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-33')"></line><line x1="57.75446485923544" y1="49.839358732442776" x2="84.38279174792501" y2="47.040639005658804" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-34')"></line><line x1="54.8122365445615" y1="44.447364778965905" x2="86.13967994301984" y2="41.15475333569066" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-35')"></line><line x1="42" y1="73.22403231928757" x2="54.8122365445615" y2="44.447364778965905" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-36')"></line><line x1="299.6285309461824" y1="61.954311024963715" x2="303.8170934195455" y2="35.508960405114976" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-37')"></line><line x1="293.6587600084472" y1="63.40073461470878" x2="298.5864805653449" y2="32.28855741488674" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-38')"></line><line x1="293.6587600084472" y1="63.40073461470878" x2="318.13883555208724" y2="83.2243543996441" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-39')"></line><line x1="270.2803838119687" y1="142.32448478501772" x2="301.6078272104271" y2="139.03187334174248" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-40')"></line><line x1="298.5864805653449" y1="32.28855741488674" x2="327.9942766658828" y2="21" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-41')"></line><line x1="318.13883555208724" y1="83.2243543996441" x2="321.4314469953624" y2="114.5517977981025" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-42')"></line><line x1="318.31247992494787" y1="77.08430929543078" x2="343.309106610405" y2="67.48903549277706" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-43')"></line><line x1="318.13883555208724" y1="83.2243543996441" x2="347.546631652625" y2="71.93579698475736" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-44')"></line><line x1="307.7478723146404" y1="139.20551771460322" x2="317.34314611729417" y2="164.20214440006038" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-45')"></line><line x1="301.6078272104271" y1="139.03187334174248" x2="312.8963846253139" y2="168.43966944228032" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-46')"></line><line x1="301.6078272104271" y1="139.03187334174248" x2="321.4314469953624" y2="114.5517977981025" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-47')"></line><line x1="326.26203077036735" y1="26.893185081725335" x2="347.07009498246134" y2="43.74326189892034" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-48')"></line><line x1="327.9942766658828" y1="21" x2="352.47435220952275" y2="40.82361978493529" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-49')"></line><line x1="322.8778705851074" y1="120.52156873583782" x2="349.3232212049561" y2="124.71013120920092" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-50')"></line><line x1="321.4314469953624" y1="114.5517977981025" x2="352.5436241951844" y2="119.47951835500028" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-51')"></line><line x1="347.546631652625" y1="71.93579698475736" x2="352.47435220952275" y2="40.82361978493529" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-52')"></line><line x1="312.8963846253139" y1="168.43966944228032" x2="344.00856182513587" y2="173.36738999917804" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-53')"></line><line x1="352.5436241951844" y1="119.47951835500028" x2="363.8321816100712" y2="148.88731445553805" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-54')"></line><line x1="341.08891971115077" y1="167.9631327721167" x2="357.9389965283458" y2="147.1550685600227" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-55')"></line><line x1="344.00856182513587" y1="173.36738999917804" x2="363.8321816100712" y2="148.88731445553805" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-56')"></line></g><g><text x="139.37315914367068" y="66.8004427881454" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>O</tspan></text><text x="144.62315914367068" y="61.5504427881454" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="157.43533111286845" y="90.32713907927136" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="146.93530050471048" y="122.85692162683007" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>N</tspan></text><text x="141.68530050471048" y="117.60692162683007" class="debug" fill="#ff0000" style="
+            "></text><text x="146.93530050471048" y="122.85692162683007" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: rtl; unicode-bidi: bidi-override;"><tspan>N</tspan></text><text x="141.68530050471048" y="117.60692162683007" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="162.76288833983457" y="141.01600727861552" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="150.96363550814655" y="177.07764935343238" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="156.21363550814655" y="171.82764935343238" class="debug" fill="#ff0000" style="
+            "></text><text x="150.96363550814655" y="177.07764935343238" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>O</tspan></text><text x="156.21363550814655" y="171.82764935343238" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="191.53958463096055" y="128.20383530941774" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -1154,13 +752,7 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="245.80030826832873" y="122.50086500008238" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="270.2803838119687" y="134.44948478501772" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="270.2803838119687" y="142.32448478501772" class="debug" fill="#ff0000" style="
+            "></text><text x="270.2803838119687" y="134.44948478501772" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: ltr;"><tspan>O</tspan></text><text x="270.2803838119687" y="142.32448478501772" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="301.6078272104271" y="139.03187334174248" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -1186,13 +778,7 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="293.6587600084472" y="63.40073461470878" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="262.3313166099888" y="74.56834605798402" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>O</tspan></text><text x="262.3313166099888" y="66.69334605798402" class="debug" fill="#ff0000" style="
+            "></text><text x="262.3313166099888" y="74.56834605798402" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: rtl; unicode-bidi: bidi-override;"><tspan>O</tspan></text><text x="262.3313166099888" y="66.69334605798402" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="242.50769682505344" y="91.17342160162401" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -1239,23 +825,11 @@ module.exports = [
                 }
             </style><g mask="url(#text-mask)"><line x1="286.8383117583441" y1="101.41764013990243" x2="317.649953833161" y2="107.9668929715904" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-0')"></line><line x1="265.76072871708266" y1="124.82673010809063" x2="286.8383117583441" y2="101.41764013990243" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-1')"></line><line x1="263.06448036514627" y1="125.70278365935347" x2="272.7984087125112" y2="155.66109868086903" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-2')"></line><line x1="268.45697706901905" y1="123.95067655682779" x2="278.190905416384" y2="153.90899157834335" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-3')"></line><line x1="234.94908664226574" y1="118.27747727640269" x2="265.76072871708266" y2="124.82673010809063" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-4')"></line><line x1="220.5526426478175" y1="92.31817823800965" x2="228.82654410077294" y2="117.78272574521621" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-5')"></line><line x1="225.21508493290634" y1="88.31918609145379" x2="234.94908664226574" y2="118.27747727640269" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-6')"></line><line x1="213.87144627680834" y1="141.6865156296636" x2="234.94908664226574" y2="118.27747727640269" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-7')"></line><line x1="194.40344285808936" y1="81.76993325976579" x2="225.21508493290634" y2="88.31918609145379" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-8')"></line><line x1="213.87144627680834" y1="141.6865156296636" x2="217.16405772008358" y2="173.013959028122" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-9')"></line><line x1="186.5495428673065" y1="130.08236118688515" x2="212.7394386309009" y2="135.64922609381998" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-10')"></line><line x1="183.05980420199143" y1="135.1372627979756" x2="213.87144627680834" y2="141.6865156296636" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-11')"></line><line x1="179.12025242362824" y1="107.21726900231445" x2="197.03624673426702" y2="87.31958640204269" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-12')"></line><line x1="173.32580249263202" y1="105.1789716130267" x2="194.40344285808936" y2="81.76993325976579" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-13')"></line><line x1="184.6694411487299" y1="51.8116420748169" x2="194.40344285808936" y2="81.76993325976579" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-14')"></line><line x1="188.23942269633648" y1="179.68541276722726" x2="212.69961454379353" y2="168.79506659340916" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-15')"></line><line x1="188.3873614289576" y1="185.82613099731975" x2="217.16405772008358" y2="173.013959028122" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-16')"></line><line x1="217.16405772008358" y1="173.013959028122" x2="244.4438402676422" y2="188.76398963627997" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-17')"></line><line x1="173.32580249263202" y1="105.1789716130267" x2="183.05980420199143" y2="135.1372627979756" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-18')"></line><line x1="167.30977359383348" y1="162.4170453455343" x2="183.05980420199143" y2="135.1372627979756" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-19')"></line><line x1="161.26040279546902" y1="30.734001709359518" x2="184.6694411487299" y2="51.8116420748169" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-20')"></line><line x1="184.6694411487299" y1="51.8116420748169" x2="191.21869398041787" y2="21" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-21')"></line><line x1="167.30977359383348" y1="162.4170453455343" x2="188.3873614289576" y2="185.82613099731975" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-22')"></line><line x1="135.98233019537514" y1="165.7096567888095" x2="167.30977359383348" y2="162.4170453455343" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-23')"></line><line x1="161.26040279546902" y1="30.734001709359518" x2="191.21869398041787" y2="21" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-24')"></line><line x1="118.95121123439782" y1="190.02187168558595" x2="129.84161229727516" y2="165.56170427631255" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-25')"></line><line x1="123.17009365081361" y1="194.48632432913115" x2="135.98233019537514" y2="165.7096567888095" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-26')"></line><line x1="117.46712334147821" y1="140.22560069176305" x2="135.98233019537514" y2="165.7096567888095" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-27')"></line><line x1="91.84265025235524" y1="197.77893577240638" x2="123.17009365081361" y2="194.48632432913115" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-28')"></line><line x1="89.08190825769378" y1="148.9102060885151" x2="115.71023514638341" y2="146.11148636173118" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-29')"></line><line x1="86.13967994301987" y1="143.51821213503825" x2="117.46712334147821" y2="140.22560069176305" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-30')"></line><line x1="79.303214009969" y1="170.87344664893698" x2="95.04113983578134" y2="192.53489433142647" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-31')"></line><line x1="73.32744339845837" y1="172.29487967535994" x2="91.84265025235524" y2="197.77893577240638" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-32')"></line><line x1="73.32744339845837" y1="172.29487967535994" x2="86.13967994301987" y2="143.51821213503825" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-33')"></line><line x1="42" y1="175.58749111863517" x2="73.32744339845837" y2="172.29487967535994" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-34')"></line></g><g><text x="317.649953833161" y="107.9668929715904" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="286.8383117583441" y="109.29264013990243" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>O</tspan></text><text x="286.8383117583441" y="101.41764013990243" class="debug" fill="#ff0000" style="
+            "></text><text x="286.8383117583441" y="109.29264013990243" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: rtl; unicode-bidi: bidi-override;"><tspan>O</tspan></text><text x="286.8383117583441" y="101.41764013990243" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="265.76072871708266" y="124.82673010809063" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="270.2446570644476" y="160.0350451296062" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="275.4946570644476" y="154.7850451296062" class="debug" fill="#ff0000" style="
+            "></text><text x="270.2446570644476" y="160.0350451296062" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>O</tspan></text><text x="275.4946570644476" y="154.7850451296062" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="234.94908664226574" y="118.27747727640269" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -1263,31 +837,13 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="194.40344285808936" y="81.76993325976579" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="178.57580249263202" y="110.4289716130267" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>N</tspan></text><text x="173.32580249263202" y="105.1789716130267" class="debug" fill="#ff0000" style="
+            "></text><text x="178.57580249263202" y="110.4289716130267" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: rtl; unicode-bidi: bidi-override;"><tspan>N</tspan></text><text x="173.32580249263202" y="105.1789716130267" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="183.05980420199143" y="135.1372627979756" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="172.55977359383348" y="167.6670453455343" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>N</tspan></text><text x="167.30977359383348" y="162.4170453455343" class="debug" fill="#ff0000" style="
+            "></text><text x="172.55977359383348" y="167.6670453455343" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: rtl; unicode-bidi: bidi-override;"><tspan>N</tspan></text><text x="167.30977359383348" y="162.4170453455343" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="188.3873614289576" y="177.95113099731975" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: ltr;
-            "><tspan>N</tspan></text><text x="188.3873614289576" y="185.82613099731975" class="debug" fill="#ff0000" style="
+            "></text><text x="188.3873614289576" y="177.95113099731975" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: ltr;"><tspan>N</tspan></text><text x="188.3873614289576" y="185.82613099731975" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="217.16405772008358" y="173.013959028122" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -1303,13 +859,7 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="73.32744339845837" y="172.29487967535994" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="47.25" y="180.83749111863517" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>F</tspan></text><text x="42" y="175.58749111863517" class="debug" fill="#ff0000" style="
+            "></text><text x="47.25" y="180.83749111863517" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: rtl; unicode-bidi: bidi-override;"><tspan>F</tspan></text><text x="42" y="175.58749111863517" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="86.13967994301987" y="143.51821213503825" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -1340,13 +890,7 @@ module.exports = [
                 }
             </style><g mask="url(#text-mask)"><line x1="209.42040972419053" y1="21" x2="219.15449824085758" y2="50.958262979513535" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-0')"></line><line x1="219.15449824085758" y1="50.958262979513535" x2="249.96612721710719" y2="57.50757743447255" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-1')"></line><line x1="198.07686838145835" y1="74.36731079248881" x2="219.15449824085758" y2="50.958262979513535" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-2')"></line><line x1="198.07686838145835" y1="74.36731079248881" x2="207.81095689812537" y2="104.32557377200236" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-3')"></line><line x1="186.73332703872615" y1="127.73462158497762" x2="207.81095689812537" y2="104.32557377200236" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-4')"></line><line x1="186.73332703872615" y1="127.73462158497762" x2="196.4674155553932" y2="157.69288456449115" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-5')"></line><line x1="195.87797725444688" y1="160.4659311723536" x2="226.6896062306965" y2="167.01524562731262" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-6')"></line><line x1="197.0568538563395" y1="154.9198379566287" x2="227.86848283258914" y2="161.46915241158771" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-7')"></line><line x1="175.389785695994" y1="181.10193237746645" x2="196.4674155553932" y2="157.69288456449115" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-8')"></line><line x1="145.71015103731665" y1="180.58998240194305" x2="171.90004929933627" y2="186.15683555476298" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-9')"></line><line x1="144.57814068185326" y1="174.5526933741489" x2="175.389785695994" y2="181.10193237746645" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-10')"></line><line x1="175.389785695994" y1="181.10193237746645" x2="185.1238008507355" y2="211.06021919375925" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-11')"></line><line x1="123.500510822454" y1="197.96174118712415" x2="144.57814068185326" y2="174.5526933741489" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-12')"></line><line x1="185.1238008507355" y1="211.06021919375925" x2="213.9004741412296" y2="223.8724428232532" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-13')"></line><line x1="161.41336462445562" y1="228.9196150460695" x2="179.32935000494504" y2="209.02192440504052" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-14')"></line><line x1="164.04617099133623" y1="234.4692670067345" x2="185.1238008507355" y2="211.06021919375925" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-15')"></line><line x1="129.62305358599232" y1="198.45648997049264" x2="137.8969664675226" y2="223.9210337643415" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-16')"></line><line x1="123.500510822454" y1="197.96174118712415" x2="133.2345259771955" y2="227.92002800341695" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-17')"></line><line x1="92.68886580831324" y1="191.41250218380662" x2="123.500510822454" y2="197.96174118712415" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-18')"></line><line x1="205.2158177869671" y1="252.2576423162701" x2="208.01458531728133" y2="225.62932045192318" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-19')"></line><line x1="210.60780645850699" y1="255.1998803107202" x2="213.9004741412296" y2="223.8724428232532" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-20')"></line><line x1="213.9004741412296" y1="223.8724428232532" x2="241.18028496341364" y2="208.12246118815753" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-21')"></line><line x1="133.2345259771955" y1="227.92002800341695" x2="164.04617099133623" y2="234.4692670067345" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-22')"></line><line x1="164.04617099133623" y1="234.4692670067345" x2="179.7961526264319" y2="261.74907782891853" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-23')"></line><line x1="67.24150262921415" y1="206.69564693483977" x2="87.13921739249062" y2="188.77968834482039" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-24')"></line><line x1="69.27978961622328" y1="212.49010052500591" x2="92.68886580831324" y2="191.41250218380662" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-25')"></line><line x1="79.87668092403754" y1="162.63581164282994" x2="92.68886580831324" y2="191.41250218380662" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-26')"></line><line x1="179.7961526264319" y1="261.74907782891853" x2="210.60780645850699" y2="255.1998803107202" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-27')"></line><line x1="246.8502865538594" y1="205.759965005231" x2="246.85030457892606" y2="178.9849650052371" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-28')"></line><line x1="241.18028496341364" y1="208.12246118815753" x2="241.1803061693744" y2="176.62246118816466" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-29')"></line><line x1="241.18028496341364" y1="208.12246118815753" x2="268.46007457963697" y2="223.8724795530547" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-30')"></line><line x1="42" y1="196.74008216010878" x2="69.27978961622328" y2="212.49010052500591" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-31')"></line><line x1="48.54923900331754" y1="165.92843714596805" x2="79.87668092403754" y2="162.63581164282994" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-32')"></line><line x1="241.1803061693744" y1="176.62246118816466" x2="268.46011699155844" y2="160.87247955306896" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-33')"></line><line x1="267.67106369698354" y1="217.7808649824294" x2="290.85890289583995" y2="204.39338059259805" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-34')"></line><line x1="268.46007457963697" y1="223.8724795530547" x2="295.73988540182097" y2="208.12249791795898" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-35')"></line><line x1="48.03728902779415" y1="195.6080718046454" x2="53.604142180614055" y2="169.41817354262577" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-36')"></line><line x1="42" y1="196.74008216010878" x2="48.54923900331754" y2="165.92843714596805" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-37')"></line><line x1="267.6710979070937" y1="166.96409306135644" x2="290.8589190808834" y2="180.35160867151902" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-38')"></line><line x1="268.46011699155844" y1="160.87247955306896" x2="295.7399066077817" y2="176.62249791796611" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-39')"></line><line x1="295.73988540182097" y1="208.12249791795898" x2="295.7399066077817" y2="176.62249791796611" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-40')"></line></g><g><text x="209.42040972419053" y="21" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="219.15449824085758" y="58.833262979513535" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>N</tspan></text><text x="219.15449824085758" y="50.958262979513535" class="debug" fill="#ff0000" style="
+            "></text><text x="219.15449824085758" y="58.833262979513535" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: rtl; unicode-bidi: bidi-override;"><tspan>N</tspan></text><text x="219.15449824085758" y="50.958262979513535" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="249.96612721710719" y="57.50757743447255" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -1354,23 +898,11 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="207.81095689812537" y="104.32557377200236" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="191.98332703872615" y="132.98462158497762" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>N</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="186.73332703872615" y="127.73462158497762" class="debug" fill="#ff0000" style="
+            "></text><text x="191.98332703872615" y="132.98462158497762" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: rtl; unicode-bidi: bidi-override;"><tspan>N</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="186.73332703872615" y="127.73462158497762" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="196.4674155553932" y="157.69288456449115" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="223.34154453164282" y="169.49219901945017" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="227.27904453164282" y="164.24219901945017" class="debug" fill="#ff0000" style="
+            "></text><text x="223.34154453164282" y="169.49219901945017" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>O</tspan></text><text x="227.27904453164282" y="164.24219901945017" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="175.389785695994" y="181.10193237746645" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -1378,31 +910,13 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="123.500510822454" y="197.96174118712415" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="133.2345259771955" y="220.04502800341695" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: ltr;
-            "><tspan>N</tspan></text><text x="133.2345259771955" y="227.92002800341695" class="debug" fill="#ff0000" style="
+            "></text><text x="133.2345259771955" y="220.04502800341695" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: ltr;"><tspan>N</tspan></text><text x="133.2345259771955" y="227.92002800341695" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="164.04617099133623" y="234.4692670067345" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="179.7961526264319" y="253.87407782891853" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="179.7961526264319" y="261.74907782891853" class="debug" fill="#ff0000" style="
+            "></text><text x="179.7961526264319" y="253.87407782891853" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: ltr;"><tspan>O</tspan></text><text x="179.7961526264319" y="261.74907782891853" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="206.67030645850699" y="260.44988031072023" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>N</tspan></text><text x="210.60780645850699" y="255.1998803107202" class="debug" fill="#ff0000" style="
+            "></text><text x="206.67030645850699" y="260.44988031072023" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>N</tspan></text><text x="210.60780645850699" y="255.1998803107202" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="213.9004741412296" y="223.8724428232532" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -1428,13 +942,7 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="48.54923900331754" y="165.92843714596805" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="79.87668092403754" y="170.51081164282994" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>O</tspan></text><text x="79.87668092403754" y="162.63581164282994" class="debug" fill="#ff0000" style="
+            "></text><text x="79.87668092403754" y="170.51081164282994" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: rtl; unicode-bidi: bidi-override;"><tspan>O</tspan></text><text x="79.87668092403754" y="162.63581164282994" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text></g></svg></div></div>
  `
@@ -1455,13 +963,7 @@ module.exports = [
                 }
             </style><g mask="url(#text-mask)"><line x1="260.2383664102732" y1="165.3544065588621" x2="287.51818430109984" y2="149.60443716703995" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-0')"></line><line x1="232.95858386271453" y1="149.60437595070414" x2="260.2383664102732" y2="165.3544065588621" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-1')"></line><line x1="204.88975782317192" y1="159.26273041779086" x2="228.07760303037452" y2="145.875256434742" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-2')"></line><line x1="205.6787659718879" y1="165.35434534252633" x2="232.95858386271453" y2="149.60437595070414" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-3')"></line><line x1="232.95858386271453" y1="149.60437595070414" x2="232.95861920598247" y2="118.10437595072393" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-4')"></line><line x1="178.3989834243293" y1="149.60431473436836" x2="205.6787659718879" y2="165.35434534252633" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-5')"></line><line x1="204.88981484002227" y1="108.44595849673837" x2="228.07763000544713" y2="121.83348451367266" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-6')"></line><line x1="205.6788366584238" y1="102.35434534256596" x2="232.95861920598247" y2="118.10437595072393" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-7')"></line><line x1="184.06898607507082" y1="147.24182109615808" x2="184.0690161168485" y2="120.46682109617494" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-8')"></line><line x1="178.3989834243293" y1="149.60431473436836" x2="178.39901876759717" y2="118.1043147343882" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-9')"></line><line x1="178.39901876759717" y1="118.1043147343882" x2="205.6788366584238" y2="102.35434534256596" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-10')"></line><line x1="151.1192362200385" y1="102.35428412623025" x2="178.39901876759717" y2="118.1043147343882" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-11')"></line><line x1="123.83941832921187" y1="118.10425351805247" x2="151.1192362200385" y2="102.35428412623025" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-12')"></line><line x1="151.1192362200385" y1="102.35428412623025" x2="151.11927156330637" y2="70.85428412625006" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-13')"></line><line x1="123.83938298594398" y1="149.60425351803264" x2="123.83941832921187" y2="118.10425351805247" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-14')"></line><line x1="101.44062498218852" y1="98.62511434694581" x2="124.62844014761339" y2="112.01264036388007" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-15')"></line><line x1="96.55963578165318" y1="102.35422290989453" x2="123.83941832921187" y2="118.10425351805247" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-16')"></line><line x1="151.11927156330637" y1="70.85428412625006" x2="174.52835721509183" y2="49.776696291125944" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-17')"></line><line x1="123.83948901574769" y1="55.10425351809212" x2="151.11927156330637" y2="70.85428412625006" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-18')"></line><line x1="95.14203529362274" y1="162.89896902555768" x2="122.42189175294624" y2="147.14906643669354" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-19')"></line><line x1="97.97701775961829" y1="167.8093431882359" x2="125.25687421894173" y2="152.05944059937175" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-20')"></line><line x1="123.83938298594398" y1="149.60425351803264" x2="151.1192041021494" y2="165.35421732331906" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-21')"></line><line x1="96.55963578165318" y1="102.35422290989453" x2="96.5596711249211" y2="70.85422290991434" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-22')"></line><line x1="69.27981789082659" y1="118.10419230171678" x2="96.55963578165318" y2="102.35422290989453" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-23')"></line><line x1="157.49729281118118" y1="25.46444317629005" x2="168.38763898499934" y2="49.9246350237471" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-24')"></line><line x1="161.71618524589405" y1="21" x2="174.52835721509183" y2="49.776696291125944" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-25')"></line><line x1="96.5596711249211" y1="70.85422290991434" x2="123.83948901574769" y2="55.10425351809212" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-26')"></line><line x1="129.87677855159131" y1="53.9722458721847" x2="135.44364345852614" y2="27.782350108590347" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-27')"></line><line x1="123.83948901574769" y1="55.10425351809212" x2="130.3887418474357" y2="24.292611443275234" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-28')"></line><line x1="156.00019406635533" y1="169.08332488670754" x2="179.18800649019659" y2="155.69579412122457" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-29')"></line><line x1="151.1192041021494" y1="165.35421732331906" x2="178.3989834243156" y2="149.6041811286332" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-30')"></line><line x1="151.1192041021494" y1="165.35421732331906" x2="151.11924589618872" y2="196.85421732329135" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-31')"></line><line x1="42" y1="133.85416169353903" x2="69.27981789082659" y2="118.10419230171678" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-32')"></line><line x1="53.529848499004345" y1="90.82437441089021" x2="69.27981789082659" y2="118.10419230171678" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-33')"></line><line x1="69.27981789082659" y1="118.10419230171678" x2="85.02978728264881" y2="145.38401019254337" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-34')"></line><line x1="130.3887418474357" y1="24.292611443275234" x2="161.71618524589405" y2="21" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-35')"></line><line x1="178.3989834243156" y1="149.6041811286332" x2="205.678804540521" y2="165.35414493391963" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-36')"></line><line x1="156.0002259648557" y1="193.12509680777086" x2="179.18807391363026" y2="206.5125660422643" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-37')"></line><line x1="151.11924589618872" y1="196.85421732329135" x2="178.39906701239414" y2="212.60418112857778" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-38')"></line><line x1="200.00880767507897" y1="167.7166524568446" x2="200.00884320001234" y2="194.49165245682104" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-39')"></line><line x1="205.678804540521" y1="165.35414493391963" x2="205.67884633456032" y2="196.8541449338919" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-40')"></line><line x1="178.39906701239414" y1="212.60418112857778" x2="205.67884633456032" y2="196.8541449338919" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-41')"></line><line x1="205.67884633456032" y1="196.8541449338919" x2="232.95866745076574" y2="212.60410873917826" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-42')"></line></g><g><text x="287.51818430109984" y="149.60443716703995" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="260.2383664102732" y="157.4794065588621" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="260.2383664102732" y="165.3544065588621" class="debug" fill="#ff0000" style="
+            "></text><text x="260.2383664102732" y="157.4794065588621" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: ltr;"><tspan>O</tspan></text><text x="260.2383664102732" y="165.3544065588621" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="232.95858386271453" y="149.60437595070414" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -1481,13 +983,7 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="123.83938298594398" y="149.60425351803264" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="101.80952652662052" y="170.6041561068968" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>O</tspan></text><text x="96.55952652662052" y="165.3541561068968" class="debug" fill="#ff0000" style="
+            "></text><text x="101.80952652662052" y="170.6041561068968" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: rtl; unicode-bidi: bidi-override;"><tspan>O</tspan></text><text x="96.55952652662052" y="165.3541561068968" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="151.1192041021494" y="165.35421732331906" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -1497,13 +993,7 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="205.67884633456032" y="196.8541449338919" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="229.02116745076574" y="217.85410873917826" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan style="
+            "></text><text x="229.02116745076574" y="217.85410873917826" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan style="
                 unicode-bidi: plaintext;
                 writing-mode: lr-tb;
                 letter-spacing: normal;
@@ -1516,67 +1006,25 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="96.55963578165318" y="102.35422290989453" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="101.8096711249211" y="76.10422290991434" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>N</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="96.5596711249211" y="70.85422290991434" class="debug" fill="#ff0000" style="
+            "></text><text x="101.8096711249211" y="76.10422290991434" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: rtl; unicode-bidi: bidi-override;"><tspan>N</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="96.5596711249211" y="70.85422290991434" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="123.83948901574769" y="55.10425351809212" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="130.3887418474357" y="32.167611443275234" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>N</tspan></text><text x="130.3887418474357" y="24.292611443275234" class="debug" fill="#ff0000" style="
+            "></text><text x="130.3887418474357" y="32.167611443275234" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: rtl; unicode-bidi: bidi-override;"><tspan>N</tspan></text><text x="130.3887418474357" y="24.292611443275234" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="161.71618524589405" y="21" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="170.59085721509183" y="55.026696291125944" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>N</tspan></text><text x="174.52835721509183" y="49.776696291125944" class="debug" fill="#ff0000" style="
+            "></text><text x="170.59085721509183" y="55.026696291125944" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>N</tspan></text><text x="174.52835721509183" y="49.776696291125944" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="151.11927156330637" y="62.979284126250064" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: ltr;
-            "><tspan>N</tspan></text><text x="151.11927156330637" y="70.85428412625006" class="debug" fill="#ff0000" style="
+            "></text><text x="151.11927156330637" y="62.979284126250064" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: ltr;"><tspan>N</tspan></text><text x="151.11927156330637" y="70.85428412625006" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="69.27981789082659" y="118.10419230171678" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="47.25" y="139.10416169353903" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>F</tspan></text><text x="42" y="133.85416169353903" class="debug" fill="#ff0000" style="
+            "></text><text x="47.25" y="139.10416169353903" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: rtl; unicode-bidi: bidi-override;"><tspan>F</tspan></text><text x="42" y="133.85416169353903" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="48.279848499004345" y="96.07437441089021" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>F</tspan></text><text x="53.529848499004345" y="90.82437441089021" class="debug" fill="#ff0000" style="
+            "></text><text x="48.279848499004345" y="96.07437441089021" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>F</tspan></text><text x="53.529848499004345" y="90.82437441089021" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="79.77978728264881" y="150.63401019254337" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>F</tspan></text><text x="85.02978728264881" y="145.38401019254337" class="debug" fill="#ff0000" style="
+            "></text><text x="79.77978728264881" y="150.63401019254337" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>F</tspan></text><text x="85.02978728264881" y="145.38401019254337" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text></g></svg></div></div>
  `
@@ -1595,23 +1043,11 @@ module.exports = [
                 .sub {
                     font: 8.4px Helvetica, Arial, sans-serif;
                 }
-            </style><g mask="url(#text-mask)"><line x1="249.5975304144626" y1="160.58602733592792" x2="256.14674867522194" y2="129.77437791281304" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-0')"></line><line x1="244.0514335183019" y1="159.40716804899122" x2="250.60065177906128" y2="128.59551862587634" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-1')"></line><line x1="253.37370022714163" y1="129.1849482693447" x2="283.3319804904389" y2="119.4509129465338" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-2')"></line><line x1="229.96463822460368" y1="108.10733416904066" x2="253.37370022714163" y2="129.1849482693447" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-3')"></line><line x1="278.2770749638352" y1="115.96117995286349" x2="283.8439104854807" y2="89.77127794321585" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-4')"></line><line x1="283.3319804904389" y1="119.4509129465338" x2="289.8811987511983" y2="88.63926352341892" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-5')"></line><line x1="198.6371985205031" y1="111.39998076197179" x2="229.96463822460368" y2="108.10733416904066" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-6')"></line><line x1="236.0019264903213" y1="106.97531974924374" x2="241.5687620119668" y2="80.7854177395961" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-7')"></line><line x1="229.96463822460368" y1="108.10733416904066" x2="236.51385648536308" y2="77.2956847459258" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-8')"></line><line x1="289.8811987511983" y1="88.63926352341892" x2="317.1609989704082" y2="72.88926352341892" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-9')"></line><line x1="266.47213674866043" y1="67.5616494231149" x2="289.8811987511983" y2="88.63926352341892" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-10')"></line><line x1="180.1219630732902" y1="136.88401608478267" x2="198.6371985205031" y2="111.39998076197179" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-11')"></line><line x1="181.6061068380484" y1="87.08774675615032" x2="192.49648045640296" y2="111.54792638453094" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-12')"></line><line x1="185.82499426361534" y1="82.62329884622989" x2="198.6371985205031" y2="111.39998076197179" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-13')"></line><line x1="236.51385648536308" y1="77.2956847459258" x2="266.47213674866043" y2="67.5616494231149" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-14')"></line><line x1="209.23405626615323" y1="61.54568474592581" x2="236.51385648536308" y2="77.2956847459258" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-15')"></line><line x1="321.1599963482614" y1="68.22682572523621" x2="346.6245345720642" y2="76.50075574962543" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-16')"></line><line x1="317.1609989704082" y1="72.88926352341892" x2="347.1192792337055" y2="82.62329884622974" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-17')"></line><line x1="310.6117807096487" y1="42.07761410030405" x2="317.1609989704082" y2="72.88926352341892" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-18')"></line><line x1="266.47213674866043" y1="67.5616494231149" x2="279.28434100554813" y2="38.78496750737296" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-19')"></line><line x1="148.79452336918962" y1="133.59136949185165" x2="180.1219630732902" y2="136.88401608478267" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-20')"></line><line x1="185.82499426361534" y1="82.62329884622989" x2="209.23405626615323" y2="61.54568474592581" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-21')"></line><line x1="154.4975545595147" y1="79.33065225329887" x2="185.82499426361534" y2="82.62329884622989" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-22')"></line><line x1="347.1192792337055" y1="82.62329884622974" x2="370.5283412362434" y2="61.5456847459257" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-23')"></line><line x1="316.16143089789375" y1="44.71042420323807" x2="336.05913360005104" y2="26.794452217979632" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-24')"></line><line x1="310.6117807096487" y1="42.07761410030405" x2="334.02084271218666" y2="21" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-25')"></line><line x1="279.28434100554813" y1="38.78496750737296" x2="310.6117807096487" y2="42.07761410030405" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-26')"></line><line x1="135.98231911230184" y1="104.81468757610975" x2="148.79452336918962" y2="133.59136949185165" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-27')"></line><line x1="135.98231911230184" y1="104.81468757610975" x2="154.4975545595147" y2="79.33065225329887" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-28')"></line><line x1="358.92421744888026" y1="34.22376831648114" x2="364.4910529705258" y2="60.41367032612878" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-29')"></line><line x1="363.97912297548396" y1="30.734035322810826" x2="370.5283412362434" y2="61.5456847459257" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-30')"></line><line x1="334.02084271218666" y1="21" x2="363.97912297548396" y2="30.734035322810826" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-31')"></line><line x1="104.65487940820123" y1="101.52204098317873" x2="135.98231911230184" y2="104.81468757610975" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-32')"></line><line x1="82.94116026142339" y1="121.76203127628048" x2="98.6791103915543" y2="100.10060125189122" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-33')"></line><line x1="86.1396439609884" y1="127.00607630598961" x2="104.65487940820123" y2="101.52204098317873" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-34')"></line><line x1="91.84267515131344" y1="72.7453590674368" x2="104.65487940820123" y2="101.52204098317873" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-35')"></line><line x1="54.81220425688775" y1="123.71342971305859" x2="86.1396439609884" y2="127.00607630598961" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-36')"></line><line x1="62.27211703829278" y1="75.33860011571375" x2="88.90044078677832" y2="78.13734971970509" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-37')"></line><line x1="60.51523544721283" y1="69.4527124745058" x2="91.84267515131344" y2="72.7453590674368" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-38')"></line><line x1="48.14071806410013" y1="94.78880217475754" x2="59.03109168245473" y2="119.24898180313815" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-39')"></line><line x1="42" y1="94.93674779731668" x2="54.81220425688775" y2="123.71342971305859" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-40')"></line><line x1="42" y1="94.93674779731668" x2="60.51523544721283" y2="69.4527124745058" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-41')"></line></g><g><text x="241.57448196638225" y="165.24659769245957" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="246.82448196638225" y="159.99659769245957" class="debug" fill="#ff0000" style="
+            </style><g mask="url(#text-mask)"><line x1="249.5975304144626" y1="160.58602733592792" x2="256.14674867522194" y2="129.77437791281304" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-0')"></line><line x1="244.0514335183019" y1="159.40716804899122" x2="250.60065177906128" y2="128.59551862587634" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-1')"></line><line x1="253.37370022714163" y1="129.1849482693447" x2="283.3319804904389" y2="119.4509129465338" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-2')"></line><line x1="229.96463822460368" y1="108.10733416904066" x2="253.37370022714163" y2="129.1849482693447" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-3')"></line><line x1="278.2770749638352" y1="115.96117995286349" x2="283.8439104854807" y2="89.77127794321585" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-4')"></line><line x1="283.3319804904389" y1="119.4509129465338" x2="289.8811987511983" y2="88.63926352341892" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-5')"></line><line x1="198.6371985205031" y1="111.39998076197179" x2="229.96463822460368" y2="108.10733416904066" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-6')"></line><line x1="236.0019264903213" y1="106.97531974924374" x2="241.5687620119668" y2="80.7854177395961" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-7')"></line><line x1="229.96463822460368" y1="108.10733416904066" x2="236.51385648536308" y2="77.2956847459258" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-8')"></line><line x1="289.8811987511983" y1="88.63926352341892" x2="317.1609989704082" y2="72.88926352341892" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-9')"></line><line x1="266.47213674866043" y1="67.5616494231149" x2="289.8811987511983" y2="88.63926352341892" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-10')"></line><line x1="180.1219630732902" y1="136.88401608478267" x2="198.6371985205031" y2="111.39998076197179" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-11')"></line><line x1="181.6061068380484" y1="87.08774675615032" x2="192.49648045640296" y2="111.54792638453094" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-12')"></line><line x1="185.82499426361534" y1="82.62329884622989" x2="198.6371985205031" y2="111.39998076197179" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-13')"></line><line x1="236.51385648536308" y1="77.2956847459258" x2="266.47213674866043" y2="67.5616494231149" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-14')"></line><line x1="209.23405626615323" y1="61.54568474592581" x2="236.51385648536308" y2="77.2956847459258" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-15')"></line><line x1="321.1599963482614" y1="68.22682572523621" x2="346.6245345720642" y2="76.50075574962543" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-16')"></line><line x1="317.1609989704082" y1="72.88926352341892" x2="347.1192792337055" y2="82.62329884622974" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-17')"></line><line x1="310.6117807096487" y1="42.07761410030405" x2="317.1609989704082" y2="72.88926352341892" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-18')"></line><line x1="266.47213674866043" y1="67.5616494231149" x2="279.28434100554813" y2="38.78496750737296" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-19')"></line><line x1="148.79452336918962" y1="133.59136949185165" x2="180.1219630732902" y2="136.88401608478267" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-20')"></line><line x1="185.82499426361534" y1="82.62329884622989" x2="209.23405626615323" y2="61.54568474592581" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-21')"></line><line x1="154.4975545595147" y1="79.33065225329887" x2="185.82499426361534" y2="82.62329884622989" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-22')"></line><line x1="347.1192792337055" y1="82.62329884622974" x2="370.5283412362434" y2="61.5456847459257" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-23')"></line><line x1="316.16143089789375" y1="44.71042420323807" x2="336.05913360005104" y2="26.794452217979632" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-24')"></line><line x1="310.6117807096487" y1="42.07761410030405" x2="334.02084271218666" y2="21" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-25')"></line><line x1="279.28434100554813" y1="38.78496750737296" x2="310.6117807096487" y2="42.07761410030405" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-26')"></line><line x1="135.98231911230184" y1="104.81468757610975" x2="148.79452336918962" y2="133.59136949185165" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-27')"></line><line x1="135.98231911230184" y1="104.81468757610975" x2="154.4975545595147" y2="79.33065225329887" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-28')"></line><line x1="358.92421744888026" y1="34.22376831648114" x2="364.4910529705258" y2="60.41367032612878" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-29')"></line><line x1="363.97912297548396" y1="30.734035322810826" x2="370.5283412362434" y2="61.5456847459257" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-30')"></line><line x1="334.02084271218666" y1="21" x2="363.97912297548396" y2="30.734035322810826" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-31')"></line><line x1="104.65487940820123" y1="101.52204098317873" x2="135.98231911230184" y2="104.81468757610975" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-32')"></line><line x1="82.94116026142339" y1="121.76203127628048" x2="98.6791103915543" y2="100.10060125189122" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-33')"></line><line x1="86.1396439609884" y1="127.00607630598961" x2="104.65487940820123" y2="101.52204098317873" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-34')"></line><line x1="91.84267515131344" y1="72.7453590674368" x2="104.65487940820123" y2="101.52204098317873" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-35')"></line><line x1="54.81220425688775" y1="123.71342971305859" x2="86.1396439609884" y2="127.00607630598961" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-36')"></line><line x1="62.27211703829278" y1="75.33860011571375" x2="88.90044078677832" y2="78.13734971970509" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-37')"></line><line x1="60.51523544721283" y1="69.4527124745058" x2="91.84267515131344" y2="72.7453590674368" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-38')"></line><line x1="48.14071806410013" y1="94.78880217475754" x2="59.03109168245473" y2="119.24898180313815" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-39')"></line><line x1="42" y1="94.93674779731668" x2="54.81220425688775" y2="123.71342971305859" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-40')"></line><line x1="42" y1="94.93674779731668" x2="60.51523544721283" y2="69.4527124745058" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-41')"></line></g><g><text x="241.57448196638225" y="165.24659769245957" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>O</tspan></text><text x="246.82448196638225" y="159.99659769245957" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="253.37370022714163" y="129.1849482693447" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="279.3944804904389" y="124.7009129465338" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>N</tspan></text><text x="283.3319804904389" y="119.4509129465338" class="debug" fill="#ff0000" style="
+            "></text><text x="279.3944804904389" y="124.7009129465338" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>N</tspan></text><text x="283.3319804904389" y="119.4509129465338" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="289.8811987511983" y="88.63926352341892" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -1629,23 +1065,11 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="279.28434100554813" y="38.78496750737296" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="271.72213674866043" y="72.8116494231149" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>N</tspan></text><text x="266.47213674866043" y="67.5616494231149" class="debug" fill="#ff0000" style="
+            "></text><text x="271.72213674866043" y="72.8116494231149" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: rtl; unicode-bidi: bidi-override;"><tspan>N</tspan></text><text x="266.47213674866043" y="67.5616494231149" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="236.51385648536308" y="77.2956847459258" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="209.23405626615323" y="69.42068474592581" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>S</tspan></text><text x="209.23405626615323" y="61.54568474592581" class="debug" fill="#ff0000" style="
+            "></text><text x="209.23405626615323" y="69.42068474592581" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: rtl; unicode-bidi: bidi-override;"><tspan>S</tspan></text><text x="209.23405626615323" y="61.54568474592581" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="185.82499426361534" y="82.62329884622989" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -1694,13 +1118,7 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="286.43034110997615" y="158.41237260746112" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="286.43033404132257" y="197.78737260746033" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>N</tspan></text><text x="286.43033404132257" y="189.91237260746033" class="debug" fill="#ff0000" style="
+            "></text><text x="286.43033404132257" y="197.78737260746033" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: rtl; unicode-bidi: bidi-override;"><tspan>N</tspan></text><text x="286.43033404132257" y="189.91237260746033" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="311.91436520928244" y="208.42761377333363" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -1708,21 +1126,9 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="348.4218728318589" y="167.8819372197537" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="330.262815559174" y="152.05431786641685" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>O</tspan></text><text x="325.012815559174" y="146.80431786641685" class="debug" fill="#ff0000" style="
+            "></text><text x="330.262815559174" y="152.05431786641685" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: rtl; unicode-bidi: bidi-override;"><tspan>O</tspan></text><text x="325.012815559174" y="146.80431786641685" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="374.4426552794896" y="163.39790861963215" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>N</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="378.3801552794896" y="158.14790861963215" class="debug" fill="#ff0000" style="
+            "></text><text x="374.4426552794896" y="163.39790861963215" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>N</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="378.3801552794896" y="158.14790861963215" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="384.9293804544353" y="127.33626066617374" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -1736,51 +1142,21 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="414.88766290206604" y="117.60223206605214" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="302.1803231637828" y="230.51089185229614" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: ltr;
-            "><tspan>N</tspan></text><text x="302.1803231637828" y="238.38589185229614" class="debug" fill="#ff0000" style="
+            "></text><text x="302.1803231637828" y="230.51089185229614" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: ltr;"><tspan>N</tspan></text><text x="302.1803231637828" y="238.38589185229614" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="270.68032316378356" y="230.51088478364255" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: ltr;
-            "><tspan>N</tspan></text><text x="270.68032316378356" y="238.38588478364255" class="debug" fill="#ff0000" style="
+            "></text><text x="270.68032316378356" y="230.51088478364255" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: ltr;"><tspan>N</tspan></text><text x="270.68032316378356" y="238.38588478364255" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="260.94629456366204" y="208.4276023360119" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="236.23801648469953" y="203.94356029051227" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>S</tspan></text><text x="230.98801648469953" y="198.69356029051227" class="debug" fill="#ff0000" style="
+            "></text><text x="236.23801648469953" y="203.94356029051227" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: rtl; unicode-bidi: bidi-override;"><tspan>S</tspan></text><text x="230.98801648469953" y="198.69356029051227" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="224.4388051381268" y="167.88190939774245" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="194.4805270591643" y="158.14786735224283" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="176.32146032677457" y="184.47547619951303" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>O</tspan></text><text x="171.07146032677457" y="179.22547619951303" class="debug" fill="#ff0000" style="
+            "></text><text x="176.32146032677457" y="184.47547619951303" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: rtl; unicode-bidi: bidi-override;"><tspan>O</tspan></text><text x="171.07146032677457" y="179.22547619951303" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="183.99381571259153" y="132.586216459473" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>N</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="187.93131571259153" y="127.336216459473" class="debug" fill="#ff0000" style="
+            "></text><text x="183.99381571259153" y="132.586216459473" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>N</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="187.93131571259153" y="127.336216459473" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="157.97303763362902" y="117.60217441397342" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -1790,33 +1166,15 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="98.056481475704" y="98.13409032297423" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="76.0266847908216" y="87.63408420134112" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>N</tspan></text><text x="70.7766847908216" y="82.38408420134112" class="debug" fill="#ff0000" style="
+            "></text><text x="76.0266847908216" y="87.63408420134112" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: rtl; unicode-bidi: bidi-override;"><tspan>N</tspan></text><text x="70.7766847908216" y="82.38408420134112" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="42" y="95.1962820006922" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="77.32590996576735" y="51.57243624788274" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="50.998301118497125" y="33.413369515493" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="56.248301118497125" y="28.163369515493002" class="debug" fill="#ff0000" style="
+            "></text><text x="50.998301118497125" y="33.413369515493" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>O</tspan></text><text x="56.248301118497125" y="28.163369515493002" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="108.65335040874265" y="56.154796684882385" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>N</tspan></text><text x="108.65335040874265" y="48.279796684882385" class="debug" fill="#ff0000" style="
+            "></text><text x="108.65335040874265" y="56.154796684882385" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: rtl; unicode-bidi: bidi-override;"><tspan>N</tspan></text><text x="108.65335040874265" y="48.279796684882385" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="124.40335653037573" y="21" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -1843,13 +1201,7 @@ module.exports = [
                 }
             </style><g mask="url(#text-mask)"><line x1="63.177065513210756" y1="186.4590781435008" x2="81.69230667908406" y2="160.97504697554092" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-0')"></line><line x1="81.69230667908406" y1="160.97504697554092" x2="113.19230667908326" y2="160.9750540441945" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-1')"></line><line x1="71.95827807896251" y1="131.01676452791025" x2="81.69230667908406" y2="160.97504697554092" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-2')"></line><line x1="118.98675935445868" y1="158.9367644566151" x2="136.90272687463835" y2="178.83447117914642" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-3')"></line><line x1="113.19230667908326" y1="160.9750540441945" x2="134.26991552635346" y2="184.38412077658427" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-4')"></line><line x1="113.19230667908326" y1="160.9750540441945" x2="122.92634872458291" y2="131.016775965232" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-5')"></line><line x1="71.95827807896251" y1="131.01676452791025" x2="97.44231755662305" y2="112.5015347993587" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-6')"></line><line x1="42.87606378409497" y1="118.58647745530399" x2="72.83434186305747" y2="128.32051950080364" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-7')"></line><line x1="41.12393621590503" y1="123.97896750951725" x2="71.08221429486754" y2="133.7130095550169" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-8')"></line><line x1="134.26991552635346" y1="184.38412077658427" x2="165.08156641912328" y2="177.83490943001158" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-9')"></line><line x1="126.41608058392373" y1="136.07168227493761" x2="152.60598384277807" y2="130.5048526303508" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-10')"></line><line x1="122.92634872458291" y1="131.016775965232" x2="153.73799961735273" y2="124.46756461865928" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-11')"></line><line x1="97.44231755662305" y1="112.5015347993587" x2="122.92634872458291" y2="131.016775965232" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-12')"></line><line x1="97.44231755662305" y1="112.5015347993587" x2="97.44232462527665" y2="81.00153479935949" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-13')"></line><line x1="160.4191295183225" y1="173.83591100589945" x2="168.69306525699716" y2="148.3713746387813" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-14')"></line><line x1="165.08156641912328" y1="177.83490943001158" x2="174.8156084646229" y2="147.87663135104904" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-15')"></line><line x1="153.73799961735273" y1="124.46756461865928" x2="174.8156084646229" y2="147.87663135104904" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-16')"></line><line x1="174.8156084646229" y1="147.87663135104904" x2="205.62725935739272" y2="141.32742000447632" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-17')"></line><line x1="205.62725935739272" y1="141.32742000447632" x2="215.36130140289237" y2="111.36914192551384" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-18')"></line><line x1="196.39050856153727" y1="86.06309039686971" x2="217.46811740880744" y2="109.47215712925953" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-19')"></line><line x1="192.17687654970712" y1="89.85705998937834" x2="213.2544853969773" y2="113.26612672176816" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-20')"></line><line x1="215.36130140289237" y1="111.36914192551384" x2="246.17295229566216" y2="104.81993057894107" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-21')"></line><line x1="246.17295229566216" y1="104.81993057894107" x2="255.9069943411618" y2="74.86165249997859" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-22')"></line><line x1="255.9069943411618" y1="74.86165249997859" x2="286.7186452339316" y2="68.31244115340584" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-23')"></line><line x1="292.8593632648323" y1="68.46038815395255" x2="303.7497423720925" y2="44.0002109693909" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-24')"></line><line x1="286.7186452339316" y1="68.31244115340584" x2="299.53085594835534" y2="39.53576211274507" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-25')"></line><line x1="286.7186452339316" y1="68.31244115340584" x2="310.1277025066165" y2="89.39006050674269" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-26')"></line><line x1="299.53085594835534" y1="39.53576211274507" x2="330.8582949135797" y2="42.82841573560682" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-27')"></line><line x1="310.1277025066165" y1="89.39006050674269" x2="337.40750626015245" y2="73.64006662837662" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-28')"></line><line x1="306.8350488837548" y1="120.71749947196702" x2="310.1277025066165" y2="89.39006050674269" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-29')"></line><line x1="325.80338860387405" y1="46.31814759494765" x2="331.3702182484609" y2="72.50805085380198" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-30')"></line><line x1="330.8582949135797" y1="42.82841573560682" x2="337.40750626015245" y2="73.64006662837662" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-31')"></line><line x1="337.40750626015245" y1="73.64006662837662" x2="366.1841853008132" y2="86.45227734280036" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-32')"></line><line x1="278.0583640929331" y1="133.52969727131804" x2="306.8350488837548" y2="120.71749947196702" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-33')"></line><line x1="366.1841853008132" y1="86.45227734280036" x2="391.6682247784737" y2="67.93704761424874" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-34')"></line><line x1="269.3737204780456" y1="161.91490066203545" x2="272.1724760574781" y2="135.28657754159477" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-35')"></line><line x1="274.7657104700713" y1="164.85713623654237" x2="278.0583640929331" y2="133.52969727131804" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-36')"></line><line x1="391.6682247784737" y1="67.93704761424874" x2="420.44490381913454" y2="80.74925832867245" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-37')"></line><line x1="417.62543417926673" y1="81.04559588934247" x2="420.918073742267" y2="112.37303633231774" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-38')"></line><line x1="423.26437345900234" y1="80.45292076800243" x2="426.5570130220026" y2="111.7803612109777" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-39')"></line><line x1="420.44490381913454" y1="80.74925832867245" x2="445.92894329679496" y2="62.23402860012083" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-40')"></line><line x1="451.5989438269438" y1="59.871529872478526" x2="451.5989498352993" y2="33.09652987247923" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-41')"></line><line x1="445.92894329679496" y1="62.23402860012083" x2="445.9289503654485" y2="30.734028600121654" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-42')"></line><line x1="445.92894329679496" y1="62.23402860012083" x2="475.8872213757575" y2="71.9680706456204" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-43')"></line><line x1="445.9289503654485" y1="30.734028600121654" x2="475.8872328130791" y2="21" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-44')"></line><line x1="475.8872213757575" y1="71.9680706456204" x2="494.40246254163077" y2="46.48403947766047" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-45')"></line><line x1="472.6887479367416" y1="26.244044311963833" x2="488.4266932060105" y2="47.90547786797523" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-46')"></line><line x1="475.8872328130791" y1="21" x2="494.40246254163077" y2="46.48403947766047" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-47')"></line></g><g><text x="63.177065513210756" y="186.4590781435008" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="81.69230667908406" y="153.10004697554092" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: ltr;
-            "><tspan>N</tspan></text><text x="81.69230667908406" y="160.97504697554092" class="debug" fill="#ff0000" style="
+            "></text><text x="81.69230667908406" y="153.10004697554092" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: ltr;"><tspan>N</tspan></text><text x="81.69230667908406" y="160.97504697554092" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="113.19230667908326" y="160.9750540441945" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -1859,73 +1211,31 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="174.8156084646229" y="147.87663135104904" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="205.62725935739272" y="133.45242000447632" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: ltr;
-            "><tspan>N</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="205.62725935739272" y="141.32742000447632" class="debug" fill="#ff0000" style="
+            "></text><text x="205.62725935739272" y="133.45242000447632" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: ltr;"><tspan>N</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="205.62725935739272" y="141.32742000447632" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="215.36130140289237" y="111.36914192551384" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="189.0336925556222" y="93.21007519312403" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="194.2836925556222" y="87.96007519312403" class="debug" fill="#ff0000" style="
+            "></text><text x="189.0336925556222" y="93.21007519312403" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>O</tspan></text><text x="194.2836925556222" y="87.96007519312403" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="246.17295229566216" y="104.81993057894107" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="255.9069943411618" y="82.73665249997859" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>S</tspan></text><text x="255.9069943411618" y="74.86165249997859" class="debug" fill="#ff0000" style="
+            "></text><text x="255.9069943411618" y="82.73665249997859" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: rtl; unicode-bidi: bidi-override;"><tspan>S</tspan></text><text x="255.9069943411618" y="74.86165249997859" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="286.7186452339316" y="68.31244115340584" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="299.53085594835534" y="47.41076211274507" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>N</tspan></text><text x="299.53085594835534" y="39.53576211274507" class="debug" fill="#ff0000" style="
+            "></text><text x="299.53085594835534" y="47.41076211274507" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: rtl; unicode-bidi: bidi-override;"><tspan>N</tspan></text><text x="299.53085594835534" y="39.53576211274507" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="330.8582949135797" y="50.70341573560682" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>N</tspan></text><text x="330.8582949135797" y="42.82841573560682" class="debug" fill="#ff0000" style="
+            "></text><text x="330.8582949135797" y="50.70341573560682" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: rtl; unicode-bidi: bidi-override;"><tspan>N</tspan></text><text x="330.8582949135797" y="42.82841573560682" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="337.40750626015245" y="73.64006662837662" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="366.1841853008132" y="86.45227734280036" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="391.6682247784737" y="75.81204761424874" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>N</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="391.6682247784737" y="67.93704761424874" class="debug" fill="#ff0000" style="
+            "></text><text x="391.6682247784737" y="75.81204761424874" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: rtl; unicode-bidi: bidi-override;"><tspan>N</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="391.6682247784737" y="67.93704761424874" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="420.44490381913454" y="80.74925832867245" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="418.4875433821348" y="117.32669877164773" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="423.7375433821348" y="112.07669877164773" class="debug" fill="#ff0000" style="
+            "></text><text x="418.4875433821348" y="117.32669877164773" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>O</tspan></text><text x="423.7375433821348" y="112.07669877164773" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="445.92894329679496" y="62.23402860012083" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -1935,21 +1245,9 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="494.40246254163077" y="46.48403947766047" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="475.8872213757575" y="64.0930706456204" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="475.8872213757575" y="71.9680706456204" class="debug" fill="#ff0000" style="
+            "></text><text x="475.8872213757575" y="64.0930706456204" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: ltr;"><tspan>O</tspan></text><text x="475.8872213757575" y="71.9680706456204" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="310.1277025066165" y="81.51506050674269" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: ltr;
-            "><tspan>N</tspan></text><text x="310.1277025066165" y="89.39006050674269" class="debug" fill="#ff0000" style="
+            "></text><text x="310.1277025066165" y="81.51506050674269" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: ltr;"><tspan>N</tspan></text><text x="310.1277025066165" y="89.39006050674269" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="306.8350488837548" y="120.71749947196702" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -1961,25 +1259,13 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="122.92634872458291" y="131.016775965232" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="97.44231755662305" y="120.3765347993587" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>N</tspan></text><text x="97.44231755662305" y="112.5015347993587" class="debug" fill="#ff0000" style="
+            "></text><text x="97.44231755662305" y="120.3765347993587" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: rtl; unicode-bidi: bidi-override;"><tspan>N</tspan></text><text x="97.44231755662305" y="112.5015347993587" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="97.44232462527665" y="81.00153479935949" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="71.95827807896251" y="131.01676452791025" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="47.25" y="126.53272248241063" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>O</tspan></text><text x="42" y="121.28272248241063" class="debug" fill="#ff0000" style="
+            "></text><text x="47.25" y="126.53272248241063" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: rtl; unicode-bidi: bidi-override;"><tspan>O</tspan></text><text x="42" y="121.28272248241063" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text></g></svg></div></div>
  `
@@ -2010,13 +1296,7 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="202.8445511046329" y="150.30824643994828" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="190.0323662203572" y="113.65655589897162" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: ltr;
-            "><tspan>N</tspan></text><text x="190.0323662203572" y="121.53155589897162" class="debug" fill="#ff0000" style="
+            "></text><text x="190.0323662203572" y="113.65655589897162" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: ltr;"><tspan>N</tspan></text><text x="190.0323662203572" y="121.53155589897162" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="159.22072120621644" y="114.98231689565404" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -2034,13 +1314,7 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="205.78238458525436" y="94.25176628274835" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="233.17232650597433" y="96.20914077961027" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="237.10982650597433" y="90.95914077961027" class="debug" fill="#ff0000" style="
+            "></text><text x="233.17232650597433" y="96.20914077961027" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>O</tspan></text><text x="237.10982650597433" y="90.95914077961027" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="135.81164501412647" y="136.0599152368533" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -2058,13 +1332,7 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="166.38403892752717" y="214.63737552246334" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="110.32757997628788" y="172.32454204184899" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: ltr;
-            "><tspan>N</tspan></text><text x="110.32757997628788" y="180.19954204184899" class="debug" fill="#ff0000" style="
+            "></text><text x="110.32757997628788" y="172.32454204184899" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: ltr;"><tspan>N</tspan></text><text x="110.32757997628788" y="180.19954204184899" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="103.77834097297037" y="211.01118705598975" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -2080,13 +1348,7 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="104.99999999998573" y="129.51067623353578" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="255.24961845149917" y="138.06686630969568" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>O</tspan></text><text x="255.24961845149917" y="130.19186630969568" class="debug" fill="#ff0000" style="
+            "></text><text x="255.24961845149917" y="138.06686630969568" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: rtl; unicode-bidi: bidi-override;"><tspan>O</tspan></text><text x="255.24961845149917" y="130.19186630969568" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text></g></svg></div></div>
  `
@@ -2105,13 +1367,7 @@ module.exports = [
                 .sub {
                     font: 8.4px Helvetica, Arial, sans-serif;
                 }
-            </style><g mask="url(#text-mask)"><line x1="345.8873449556488" y1="172.66407182582213" x2="377.3873449556362" y2="172.66410010043654" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-0')"></line><line x1="326.40821081086995" y1="195.0628695439969" x2="339.79573162441864" y2="171.875051374389" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-1')"></line><line x1="330.13732046912094" y1="199.94385790771378" x2="345.8873449556488" y2="172.66407182582213" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-2')"></line><line x1="330.13736944218954" y1="145.38425746931608" x2="345.8873449556488" y2="172.66407182582213" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-3')"></line><line x1="298.63732046913356" y1="199.94382963309943" x2="330.13732046912094" y2="199.94385790771378" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-4')"></line><line x1="300.9998643527706" y1="151.05423131529562" x2="327.7748643527599" y2="151.05425534871773" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-5')"></line><line x1="298.63736944220216" y1="145.3842291947018" x2="330.13736944218954" y2="145.38425746931608" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-6')"></line><line x1="288.9789597033548" y1="171.87500576090872" x2="302.3664388897952" y2="195.0628479639388" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-7')"></line><line x1="282.8873449556743" y1="172.66401527659343" x2="298.63732046913356" y2="199.94382963309943" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-8')"></line><line x1="282.8873449556743" y1="172.66401527659343" x2="298.63736944220216" y2="145.3842291947018" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-9')"></line><line x1="251.38734495568693" y1="172.66398700197914" x2="282.8873449556743" y2="172.66401527659343" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-10')"></line><line x1="235.63736944222754" y1="145.38417264547314" x2="251.38734495568693" y2="172.66398700197914" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-11')"></line><line x1="238.0925501895978" y1="146.80167484926068" x2="253.84257467612574" y2="119.52188876736898" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-12')"></line><line x1="233.18218869485727" y1="143.9666704416856" x2="248.9322131813852" y2="116.68688435979394" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-13')"></line><line x1="204.1373694422402" y1="145.3841443708588" x2="235.63736944222754" y2="145.38417264547314" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-14')"></line><line x1="188.38739392878088" y1="118.1043300143528" x2="204.1373694422402" y2="145.3841443708588" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-15')"></line><line x1="157.05995718019486" y1="114.8116553017" x2="188.38739392878088" y2="118.1043300143528" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-16')"></line><line x1="188.38739392878088" y1="118.1043300143528" x2="201.1996240158089" y2="89.32765959894417" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-17')"></line><line x1="150.5107665761843" y1="83.99999999997465" x2="157.05995718019486" y2="114.8116553017" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-18')"></line><line x1="135.98232206776598" y1="138.2206983848186" x2="157.05995718019486" y2="114.8116553017" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-19')"></line><line x1="177.7905809326903" y1="68.25002448651526" x2="201.1996240158089" y2="89.32765959894417" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-20')"></line><line x1="201.78905117016987" y1="92.10070857609944" x2="232.60070647189517" y2="85.55151797208882" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-21')"></line><line x1="200.61019686144792" y1="86.5546106217889" x2="231.4218521631732" y2="80.00542001777828" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-22')"></line><line x1="128.11196885800948" y1="64.52086585519581" x2="151.29978702761744" y2="77.90838666874455" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-23')"></line><line x1="123.2309804942926" y1="68.24997551344671" x2="150.5107665761843" y2="83.99999999997465" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-24')"></line><line x1="150.5107665761843" y1="83.99999999997465" x2="177.7905809326903" y2="68.25002448651526" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-25')"></line><line x1="130.9274134087562" y1="141.71042684116992" x2="136.4942254221652" y2="167.9003338476365" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-26')"></line><line x1="135.98232206776598" y1="138.2206983848186" x2="142.53151267177654" y2="169.032353686544" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-27')"></line><line x1="104.65488531917995" y1="134.9280236721658" x2="135.98232206776598" y2="138.2206983848186" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-28')"></line><line x1="172.12058305328864" y1="65.88751939708564" x2="172.1206070867107" y2="39.112519397096435" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-29')"></line><line x1="177.7905809326903" y1="68.25002448651526" x2="177.79060920730453" y2="36.75002448652796" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-30')"></line><line x1="123.2309804942926" y1="68.24997551344671" x2="123.23100876890689" y2="36.74997551345939" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-31')"></line><line x1="115.25169831527052" y1="184.7823292000033" x2="142.53151267177654" y2="169.032353686544" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-32')"></line><line x1="82.94118433996377" y1="114.68801388869016" x2="98.67911502664145" y2="136.34945803956185" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-33')"></line><line x1="86.13967274661798" y1="109.44397172996386" x2="104.65488531917995" y2="134.9280236721658" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-34')"></line><line x1="91.84265523215191" y1="163.7046940875744" x2="104.65488531917995" y2="134.9280236721658" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-35')"></line><line x1="150.51082312541288" y1="21" x2="177.79060920730453" y2="36.75002448652796" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-36')"></line><line x1="128.11199043806755" y1="40.47909393412101" x2="151.2998326410976" y2="27.091614747680524" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-37')"></line><line x1="123.23100876890689" y1="36.74997551345939" x2="150.51082312541288" y2="21" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-38')"></line><line x1="91.84265523215191" y1="163.7046940875744" x2="115.25169831527052" y2="184.7823292000033" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-39')"></line><line x1="54.81223008702801" y1="112.7365902031706" x2="86.13967274661798" y2="109.44397172996386" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-40')"></line><line x1="62.27209944685396" y1="161.11142649656443" x2="88.90042570750546" y2="158.3127007943387" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-41')"></line><line x1="60.51521257256192" y1="166.99731256078115" x2="91.84265523215191" y2="163.7046940875744" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-42')"></line><line x1="48.14071793130066" y1="141.66121175308865" x2="59.031113505274476" y2="117.20104189999131" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-43')"></line><line x1="42" y1="141.51326061857924" x2="54.81223008702801" y2="112.7365902031706" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-44')"></line><line x1="42" y1="141.51326061857924" x2="60.51521257256192" y2="166.99731256078115" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-45')"></line></g><g><text x="373.4498449556362" y="177.91410010043654" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>F</tspan></text><text x="377.3873449556362" y="172.66410010043654" class="debug" fill="#ff0000" style="
+            </style><g mask="url(#text-mask)"><line x1="345.8873449556488" y1="172.66407182582213" x2="377.3873449556362" y2="172.66410010043654" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-0')"></line><line x1="326.40821081086995" y1="195.0628695439969" x2="339.79573162441864" y2="171.875051374389" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-1')"></line><line x1="330.13732046912094" y1="199.94385790771378" x2="345.8873449556488" y2="172.66407182582213" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-2')"></line><line x1="330.13736944218954" y1="145.38425746931608" x2="345.8873449556488" y2="172.66407182582213" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-3')"></line><line x1="298.63732046913356" y1="199.94382963309943" x2="330.13732046912094" y2="199.94385790771378" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-4')"></line><line x1="300.9998643527706" y1="151.05423131529562" x2="327.7748643527599" y2="151.05425534871773" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-5')"></line><line x1="298.63736944220216" y1="145.3842291947018" x2="330.13736944218954" y2="145.38425746931608" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-6')"></line><line x1="288.9789597033548" y1="171.87500576090872" x2="302.3664388897952" y2="195.0628479639388" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-7')"></line><line x1="282.8873449556743" y1="172.66401527659343" x2="298.63732046913356" y2="199.94382963309943" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-8')"></line><line x1="282.8873449556743" y1="172.66401527659343" x2="298.63736944220216" y2="145.3842291947018" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-9')"></line><line x1="251.38734495568693" y1="172.66398700197914" x2="282.8873449556743" y2="172.66401527659343" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-10')"></line><line x1="235.63736944222754" y1="145.38417264547314" x2="251.38734495568693" y2="172.66398700197914" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-11')"></line><line x1="238.0925501895978" y1="146.80167484926068" x2="253.84257467612574" y2="119.52188876736898" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-12')"></line><line x1="233.18218869485727" y1="143.9666704416856" x2="248.9322131813852" y2="116.68688435979394" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-13')"></line><line x1="204.1373694422402" y1="145.3841443708588" x2="235.63736944222754" y2="145.38417264547314" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-14')"></line><line x1="188.38739392878088" y1="118.1043300143528" x2="204.1373694422402" y2="145.3841443708588" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-15')"></line><line x1="157.05995718019486" y1="114.8116553017" x2="188.38739392878088" y2="118.1043300143528" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-16')"></line><line x1="188.38739392878088" y1="118.1043300143528" x2="201.1996240158089" y2="89.32765959894417" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-17')"></line><line x1="150.5107665761843" y1="83.99999999997465" x2="157.05995718019486" y2="114.8116553017" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-18')"></line><line x1="135.98232206776598" y1="138.2206983848186" x2="157.05995718019486" y2="114.8116553017" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-19')"></line><line x1="177.7905809326903" y1="68.25002448651526" x2="201.1996240158089" y2="89.32765959894417" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-20')"></line><line x1="201.78905117016987" y1="92.10070857609944" x2="232.60070647189517" y2="85.55151797208882" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-21')"></line><line x1="200.61019686144792" y1="86.5546106217889" x2="231.4218521631732" y2="80.00542001777828" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-22')"></line><line x1="128.11196885800948" y1="64.52086585519581" x2="151.29978702761744" y2="77.90838666874455" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-23')"></line><line x1="123.2309804942926" y1="68.24997551344671" x2="150.5107665761843" y2="83.99999999997465" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-24')"></line><line x1="150.5107665761843" y1="83.99999999997465" x2="177.7905809326903" y2="68.25002448651526" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-25')"></line><line x1="130.9274134087562" y1="141.71042684116992" x2="136.4942254221652" y2="167.9003338476365" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-26')"></line><line x1="135.98232206776598" y1="138.2206983848186" x2="142.53151267177654" y2="169.032353686544" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-27')"></line><line x1="104.65488531917995" y1="134.9280236721658" x2="135.98232206776598" y2="138.2206983848186" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-28')"></line><line x1="172.12058305328864" y1="65.88751939708564" x2="172.1206070867107" y2="39.112519397096435" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-29')"></line><line x1="177.7905809326903" y1="68.25002448651526" x2="177.79060920730453" y2="36.75002448652796" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-30')"></line><line x1="123.2309804942926" y1="68.24997551344671" x2="123.23100876890689" y2="36.74997551345939" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-31')"></line><line x1="115.25169831527052" y1="184.7823292000033" x2="142.53151267177654" y2="169.032353686544" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-32')"></line><line x1="82.94118433996377" y1="114.68801388869016" x2="98.67911502664145" y2="136.34945803956185" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-33')"></line><line x1="86.13967274661798" y1="109.44397172996386" x2="104.65488531917995" y2="134.9280236721658" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-34')"></line><line x1="91.84265523215191" y1="163.7046940875744" x2="104.65488531917995" y2="134.9280236721658" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-35')"></line><line x1="150.51082312541288" y1="21" x2="177.79060920730453" y2="36.75002448652796" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-36')"></line><line x1="128.11199043806755" y1="40.47909393412101" x2="151.2998326410976" y2="27.091614747680524" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-37')"></line><line x1="123.23100876890689" y1="36.74997551345939" x2="150.51082312541288" y2="21" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-38')"></line><line x1="91.84265523215191" y1="163.7046940875744" x2="115.25169831527052" y2="184.7823292000033" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-39')"></line><line x1="54.81223008702801" y1="112.7365902031706" x2="86.13967274661798" y2="109.44397172996386" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-40')"></line><line x1="62.27209944685396" y1="161.11142649656443" x2="88.90042570750546" y2="158.3127007943387" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-41')"></line><line x1="60.51521257256192" y1="166.99731256078115" x2="91.84265523215191" y2="163.7046940875744" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-42')"></line><line x1="48.14071793130066" y1="141.66121175308865" x2="59.031113505274476" y2="117.20104189999131" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-43')"></line><line x1="42" y1="141.51326061857924" x2="54.81223008702801" y2="112.7365902031706" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-44')"></line><line x1="42" y1="141.51326061857924" x2="60.51521257256192" y2="166.99731256078115" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-45')"></line></g><g><text x="373.4498449556362" y="177.91410010043654" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>F</tspan></text><text x="377.3873449556362" y="172.66410010043654" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="345.8873449556488" y="172.66407182582213" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -2121,33 +1377,15 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="282.8873449556743" y="172.66401527659343" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="251.38734495568693" y="164.78898700197914" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: ltr;
-            "><tspan>N</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="251.38734495568693" y="172.66398700197914" class="debug" fill="#ff0000" style="
+            "></text><text x="251.38734495568693" y="164.78898700197914" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: ltr;"><tspan>N</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="251.38734495568693" y="172.66398700197914" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="235.63736944222754" y="145.38417264547314" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="246.13739392875547" y="123.35438656358144" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="251.38739392875547" y="118.10438656358144" class="debug" fill="#ff0000" style="
+            "></text><text x="246.13739392875547" y="123.35438656358144" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>O</tspan></text><text x="251.38739392875547" y="118.10438656358144" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="204.1373694422402" y="145.3841443708588" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="188.38739392878088" y="110.2293300143528" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: ltr;
-            "><tspan>N</tspan></text><text x="188.38739392878088" y="118.1043300143528" class="debug" fill="#ff0000" style="
+            "></text><text x="188.38739392878088" y="110.2293300143528" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: ltr;"><tspan>N</tspan></text><text x="188.38739392878088" y="118.1043300143528" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="157.05995718019486" y="114.8116553017" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -2165,25 +1403,13 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="201.1996240158089" y="89.32765959894417" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="228.0737793175342" y="88.02846899493355" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="232.0112793175342" y="82.77846899493355" class="debug" fill="#ff0000" style="
+            "></text><text x="228.0737793175342" y="88.02846899493355" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>O</tspan></text><text x="232.0112793175342" y="82.77846899493355" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="135.98232206776598" y="138.2206983848186" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="142.53151267177654" y="169.032353686544" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="115.25169831527052" y="176.9073292000033" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: ltr;
-            "><tspan>N</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="115.25169831527052" y="184.7823292000033" class="debug" fill="#ff0000" style="
+            "></text><text x="115.25169831527052" y="176.9073292000033" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: ltr;"><tspan>N</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="115.25169831527052" y="184.7823292000033" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="91.84265523215191" y="163.7046940875744" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -2230,41 +1456,17 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="325.98965740873143" y="102.83940065762948" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="310.23965740873143" y="122.2442008768393" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: ltr;
-            "><tspan>N</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="310.23965740873143" y="130.1192008768393" class="debug" fill="#ff0000" style="
+            "></text><text x="310.23965740873143" y="122.2442008768393" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: ltr;"><tspan>N</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="310.23965740873143" y="130.1192008768393" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="278.73965740873143" y="130.1192008768393" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="260.22442196151854" y="147.72823619965015" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: ltr;
-            "><tspan>N</tspan></text><text x="260.22442196151854" y="155.60323619965015" class="debug" fill="#ff0000" style="
+            "></text><text x="260.22442196151854" y="147.72823619965015" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: ltr;"><tspan>N</tspan></text><text x="260.22442196151854" y="155.60323619965015" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="235.51614169822122" y="151.1192008768393" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>N</tspan></text><text x="230.26614169822122" y="145.8692008768393" class="debug" fill="#ff0000" style="
+            "></text><text x="235.51614169822122" y="151.1192008768393" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: rtl; unicode-bidi: bidi-override;"><tspan>N</tspan></text><text x="230.26614169822122" y="145.8692008768393" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="230.26614169822122" y="114.3692008768393" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="260.22442196151854" y="112.51016555402845" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>S</tspan></text><text x="260.22442196151854" y="104.63516555402845" class="debug" fill="#ff0000" style="
+            "></text><text x="260.22442196151854" y="112.51016555402845" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: rtl; unicode-bidi: bidi-override;"><tspan>S</tspan></text><text x="260.22442196151854" y="104.63516555402845" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="204.78210637541036" y="95.85396542962638" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -2282,47 +1484,17 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="153.81403572978869" y="58.82349453520058" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="182.59071764553062" y="53.88629027831287" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>O</tspan></text><text x="182.59071764553062" y="46.01129027831287" class="debug" fill="#ff0000" style="
+            "></text><text x="182.59071764553062" y="53.88629027831287" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: rtl; unicode-bidi: bidi-override;"><tspan>O</tspan></text><text x="182.59071764553062" y="46.01129027831287" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="208.07475296834144" y="64.52652572552574" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="232.91393488408337" y="56.964321468638005" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="236.85143488408337" y="51.714321468638005" class="debug" fill="#ff0000" style="
+            "></text><text x="232.91393488408337" y="56.964321468638005" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>O</tspan></text><text x="236.85143488408337" y="51.714321468638005" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="72.73398998256289" y="102.51010730586373" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>N<tspan baseline-shift="super" class="sub">+</tspan></tspan></text><text x="67.48398998256289" y="97.26010730586373" class="debug" fill="#ff0000" style="
+            "></text><text x="72.73398998256289" y="102.51010730586373" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: rtl; unicode-bidi: bidi-override;"><tspan>N<tspan baseline-shift="super" class="sub">+</tspan></tspan></text><text x="67.48398998256289" y="97.26010730586373" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="58.941420104382615" y="133.8375550729146" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>O<tspan baseline-shift="super" class="sub">-</tspan></tspan></text><text x="64.19142010438262" y="128.5875550729146" class="debug" fill="#ff0000" style="
+            "></text><text x="58.941420104382615" y="133.8375550729146" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>O<tspan baseline-shift="super" class="sub">-</tspan></tspan></text><text x="64.19142010438262" y="128.5875550729146" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="47.25" y="83.99480945331395" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>O</tspan></text><text x="42" y="78.74480945331395" class="debug" fill="#ff0000" style="
+            "></text><text x="47.25" y="83.99480945331395" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: rtl; unicode-bidi: bidi-override;"><tspan>O</tspan></text><text x="42" y="78.74480945331395" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="310.23965740873143" y="75.5596004384197" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -2347,55 +1519,19 @@ module.exports = [
                 }
             </style><g mask="url(#text-mask)"><line x1="183.74996327018422" y1="48.27980728786068" x2="199.49995102691548" y2="21" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-0')"></line><line x1="182.33246437207842" y1="50.73498994376814" x2="209.6122716599391" y2="66.48497770049937" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-1')"></line><line x1="185.16746216829003" y1="45.82462463195321" x2="212.4472694561507" y2="61.57461238868444" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-2')"></line><line x1="157.8876548804294" y1="30.074636875221955" x2="185.16746216829006" y2="45.82462463195321" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-3')"></line><line x1="155.05265708421774" y1="34.98500218703688" x2="182.3324643720784" y2="50.73498994376814" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-4')"></line><line x1="167.999975513453" y1="75.55961457572135" x2="183.74996327018422" y2="48.27980728786068" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-5')"></line><line x1="167.999975513453" y1="75.55961457572135" x2="183.74998775671855" y2="102.83940772627483" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-6')"></line><line x1="167.9999999999873" y1="130.11921501413548" x2="183.74998775671855" y2="102.83940772627483" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-7')"></line><line x1="183.74998775671855" y1="102.83940772627483" x2="215.2499877567154" y2="102.83939358896765" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-8')"></line><line x1="167.9999999999873" y1="130.11921501413548" x2="183.7500122432529" y2="157.39900816468895" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-9')"></line><line x1="136.49999999999048" y1="130.11922915144262" x2="167.9999999999873" y2="130.11921501413548" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-10')"></line><line x1="215.2499877567154" y1="102.83939358896765" x2="230.99999999998096" y2="130.11918673952113" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-11')"></line><line x1="217.70517041262286" y1="104.25689248707346" x2="233.4551581693541" y2="76.97708519921275" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-12')"></line><line x1="212.79480510080793" y1="101.42189469086185" x2="228.54479285753916" y2="74.14208740300114" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-13')"></line><line x1="183.7500122432529" y1="157.39900816468895" x2="215.25001224324973" y2="157.39899402738178" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-14')"></line><line x1="117.02089601319912" y1="152.51805309650206" x2="130.40838560642072" y2="129.33021690182053" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-15')"></line><line x1="120.75001224325919" y1="157.39903643930325" x2="136.49999999999048" y2="130.11922915144262" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-16')"></line><line x1="120.7499877567249" y1="102.8394360008891" x2="136.49999999999048" y2="130.11922915144262" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-17')"></line><line x1="233.362502544696" y1="135.7891856792225" x2="260.13750254469335" y2="135.7891736625114" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-18')"></line><line x1="230.99999999998096" y1="130.11918673952113" x2="262.49999999997783" y2="130.11917260221392" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-19')"></line><line x1="215.25001224324973" y1="157.39899402738178" x2="230.99999999998096" y2="130.11918673952113" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-20')"></line><line x1="221.34162592859428" y1="156.6099763098855" x2="234.72913633537001" y2="179.79780048785597" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-21')"></line><line x1="215.25001224324973" y1="157.39899402738178" x2="231.00002448651531" y2="184.67878717793528" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-22')"></line><line x1="89.25001224326238" y1="157.39905057661042" x2="120.75001224325919" y2="157.39903643930325" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-23')"></line><line x1="91.61249030144313" y1="108.50944907789764" x2="118.38749030144044" y2="108.50943706118656" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-24')"></line><line x1="89.24998775672809" y1="102.83945013819627" x2="120.7499877567249" y2="102.8394360008891" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-25')"></line><line x1="262.49999999997783" y1="130.11917260221392" x2="278.25001224324336" y2="157.39896575276742" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-26')"></line><line x1="231.00002448651531" y1="184.67878717793528" x2="262.50002448651213" y2="184.67877304062807" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-27')"></line><line x1="79.59161368534137" y1="129.33023970856067" x2="92.97912409211708" y2="152.5180638865311" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-28')"></line><line x1="73.49999999999683" y1="130.11925742605695" x2="89.25001224326238" y2="157.39905057661042" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-29')"></line><line x1="73.49999999999683" y1="130.11925742605695" x2="89.24998775672809" y2="102.83945013819627" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-30')"></line><line x1="258.77090825645206" y1="179.7977896978269" x2="272.1583978496736" y2="156.60995350314533" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-31')"></line><line x1="262.50002448651213" y1="184.67877304062807" x2="278.25001224324336" y2="157.39896575276742" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-32')"></line><line x1="42" y1="130.1192715633641" x2="73.49999999999683" y2="130.11925742605695" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-33')"></line></g><g><text x="199.49995102691548" y="21" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="188.99996327018422" y="53.52980728786068" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>S</tspan></text><text x="183.74996327018422" y="48.27980728786068" class="debug" fill="#ff0000" style="
+            "></text><text x="188.99996327018422" y="53.52980728786068" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: rtl; unicode-bidi: bidi-override;"><tspan>S</tspan></text><text x="183.74996327018422" y="48.27980728786068" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="207.0922705580449" y="69.2797950445919" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="211.0297705580449" y="64.0297950445919" class="debug" fill="#ff0000" style="
+            "></text><text x="207.0922705580449" y="69.2797950445919" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>O</tspan></text><text x="211.0297705580449" y="64.0297950445919" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="161.72015598232358" y="37.77981953112942" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>O</tspan></text><text x="156.47015598232358" y="32.52981953112942" class="debug" fill="#ff0000" style="
+            "></text><text x="161.72015598232358" y="37.77981953112942" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: rtl; unicode-bidi: bidi-override;"><tspan>O</tspan></text><text x="156.47015598232358" y="32.52981953112942" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="173.249975513453" y="80.80961457572135" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>N</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="167.999975513453" y="75.55961457572135" class="debug" fill="#ff0000" style="
+            "></text><text x="173.249975513453" y="80.80961457572135" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: rtl; unicode-bidi: bidi-override;"><tspan>N</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="167.999975513453" y="75.55961457572135" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="183.74998775671855" y="94.96440772627483" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: ltr;
-            "><tspan>N</tspan></text><text x="183.74998775671855" y="102.83940772627483" class="debug" fill="#ff0000" style="
+            "></text><text x="183.74998775671855" y="94.96440772627483" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: ltr;"><tspan>N</tspan></text><text x="183.74998775671855" y="102.83940772627483" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="167.9999999999873" y="130.11921501413548" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="183.7500122432529" y="149.52400816468895" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: ltr;
-            "><tspan>N</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="183.7500122432529" y="157.39900816468895" class="debug" fill="#ff0000" style="
+            "></text><text x="183.7500122432529" y="149.52400816468895" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: ltr;"><tspan>N</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="183.7500122432529" y="157.39900816468895" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="215.25001224324973" y="157.39899402738178" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -2411,13 +1547,7 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="215.2499877567154" y="102.83939358896765" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="225.74997551344663" y="80.80958630110695" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="230.99997551344663" y="75.55958630110695" class="debug" fill="#ff0000" style="
+            "></text><text x="225.74997551344663" y="80.80958630110695" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>O</tspan></text><text x="230.99997551344663" y="75.55958630110695" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="136.49999999999048" y="130.11922915144262" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -2427,13 +1557,7 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="73.49999999999683" y="130.11925742605695" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="47.25" y="135.3692715633641" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>O</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="42" y="130.1192715633641" class="debug" fill="#ff0000" style="
+            "></text><text x="47.25" y="135.3692715633641" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: rtl; unicode-bidi: bidi-override;"><tspan>O</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="42" y="130.1192715633641" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="89.24998775672809" y="102.83945013819627" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -2458,13 +1582,7 @@ module.exports = [
                 }
             </style><g mask="url(#text-mask)"><line x1="236.7763101069047" y1="156.79046584975902" x2="268.1037520276247" y2="160.08309135289704" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-0')"></line><line x1="221.02629174200754" y1="129.51067623353578" x2="236.7763101069047" y2="156.79046584975902" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-1')"></line><line x1="215.69871176570544" y1="180.199542041849" x2="236.7763101069047" y2="156.79046584975902" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-2')"></line><line x1="193.7043831245245" y1="141.11481841414988" x2="219.89428138654415" y2="135.54796526132992" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-3')"></line><line x1="190.21464672786678" y1="136.05991523685336" x2="221.02629174200754" y2="129.51067623353578" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-4')"></line><line x1="210.3067230941656" y1="183.1417800362991" x2="213.10549062447987" y2="209.77010190064607" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-5')"></line><line x1="215.69871176570544" y1="180.199542041849" x2="218.99137944842812" y2="211.52697952931604" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-6')"></line><line x1="186.92202122472875" y1="167.38735715757335" x2="215.69871176570544" y2="180.199542041849" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-7')"></line><line x1="166.8055705357768" y1="114.9823168956541" x2="190.21464672786678" y2="136.05991523685336" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-8')"></line><line x1="186.92202122472875" y1="167.38735715757335" x2="190.21464672786678" y2="136.05991523685336" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-9')"></line><line x1="193.50735659017406" y1="230.0422321325074" x2="218.99137944842812" y2="211.52697952931604" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-10')"></line><line x1="166.68204554941818" y1="189.1010899300111" x2="188.34346497893415" y2="173.36312521729843" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-11')"></line><line x1="161.4379983664747" y1="185.90260976076473" x2="186.92202122472875" y2="167.38735715757335" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-12')"></line><line x1="135.99392552163604" y1="121.5315558989717" x2="166.8055705357768" y2="114.9823168956541" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-13')"></line><line x1="166.8055705357768" y1="114.9823168956541" x2="170.09819603891484" y2="83.6548749749341" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-14')"></line><line x1="169.1951111189402" y1="213.0111568171766" x2="193.65529807877041" y2="223.9015139688109" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-15')"></line><line x1="164.73066604919734" y1="217.23004724823176" x2="193.50735659017406" y2="230.0422321325074" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-16')"></line><line x1="161.4379983664747" y1="185.90260976076473" x2="164.73066604919734" y2="217.23004724823176" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-17')"></line><line x1="123.1817406373604" y1="150.30824643994842" x2="135.99392552163604" y2="121.5315558989717" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-18')"></line><line x1="120.24390715673889" y1="94.25176628274846" x2="135.99392552163604" y2="121.5315558989717" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-19')"></line><line x1="168.67675228470944" y1="77.67910691520902" x2="190.3381717142254" y2="61.941142202496366" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-20')"></line><line x1="170.09819603891484" y1="83.6548749749341" x2="195.5822188971689" y2="65.13962237174275" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-21')"></line><line x1="141.32150549793812" y1="70.84269009065844" x2="170.09819603891484" y2="83.6548749749341" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-22')"></line><line x1="91.85430314989338" y1="153.60091412267104" x2="123.1817406373604" y2="150.30824643994842" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-23')"></line><line x1="89.2128015313013" y1="88.13967100674563" x2="120.54024345202131" y2="91.43229650988366" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-24')"></line><line x1="88.62012894073646" y1="93.77861055247524" x2="119.94757086145646" y2="97.07123605561327" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-25')"></line><line x1="120.24390715673889" y1="94.25176628274846" x2="141.32150549793812" y2="70.84269009065844" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-26')"></line><line x1="192.28955121444625" y1="33.812184884275695" x2="195.5822188971689" y2="65.13962237174275" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-27')"></line><line x1="143.91472663916372" y1="41.27213023186138" x2="146.71349416947797" y2="67.90045209620834" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-28')"></line><line x1="138.02883781521547" y1="39.51525260319141" x2="141.32150549793812" y2="70.84269009065844" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-29')"></line><line x1="72.37520418943674" y1="175.99974243887402" x2="85.76268857926806" y2="152.8119032400176" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-30')"></line><line x1="76.10432151479768" y1="180.88072494485505" x2="91.85430314989338" y2="153.60091412267104" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-31')"></line><line x1="70.7766732904941" y1="130.1918663096958" x2="91.85430314989338" y2="153.60091412267104" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-32')"></line><line x1="163.36491918487314" y1="27.140718163696476" x2="187.82510614470337" y2="38.03107531533081" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-33')"></line><line x1="163.51286067346953" y1="21" x2="192.28955121444625" y2="33.812184884275695" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-34')"></line><line x1="138.02883781521547" y1="39.51525260319141" x2="163.51286067346953" y2="21" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-35')"></line><line x1="45.29266768272262" y1="174.33152742665678" x2="76.10432151479768" y2="180.88072494485505" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-36')"></line><line x1="42" y1="143.00408993918975" x2="70.7766732904941" y2="130.1918663096958" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-37')"></line><line x1="47.885888823948264" y1="144.76096756785972" x2="50.68465635426249" y2="171.38928943220668" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-38')"></line><line x1="42" y1="143.00408993918975" x2="45.29266768272262" y2="174.33152742665678" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-39')"></line></g><g><text x="268.1037520276247" y="160.08309135289704" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="232.8388101069047" y="162.04046584975902" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>N</tspan></text><text x="236.7763101069047" y="156.79046584975902" class="debug" fill="#ff0000" style="
+            "></text><text x="232.8388101069047" y="162.04046584975902" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>N</tspan></text><text x="236.7763101069047" y="156.79046584975902" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="221.02629174200754" y="129.51067623353578" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -2472,13 +1590,7 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="166.8055705357768" y="114.9823168956541" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="135.99392552163604" y="113.6565558989717" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: ltr;
-            "><tspan>N</tspan></text><text x="135.99392552163604" y="121.5315558989717" class="debug" fill="#ff0000" style="
+            "></text><text x="135.99392552163604" y="113.6565558989717" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: ltr;"><tspan>N</tspan></text><text x="135.99392552163604" y="121.5315558989717" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="123.1817406373604" y="150.30824643994842" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -2490,23 +1602,11 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="42" y="143.00408993918975" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="70.7766732904941" y="138.0668663096958" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>O</tspan></text><text x="70.7766732904941" y="130.1918663096958" class="debug" fill="#ff0000" style="
+            "></text><text x="70.7766732904941" y="138.0668663096958" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: rtl; unicode-bidi: bidi-override;"><tspan>O</tspan></text><text x="70.7766732904941" y="130.1918663096958" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="120.24390715673889" y="94.25176628274846" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="94.16646523601887" y="96.20914077961044" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>O</tspan></text><text x="88.91646523601887" y="90.95914077961044" class="debug" fill="#ff0000" style="
+            "></text><text x="94.16646523601887" y="96.20914077961044" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: rtl; unicode-bidi: bidi-override;"><tspan>O</tspan></text><text x="88.91646523601887" y="90.95914077961044" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="141.32150549793812" y="70.84269009065844" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -2551,13 +1651,7 @@ module.exports = [
                 }
             </style><g mask="url(#text-mask)"><line x1="314.79789293673025" y1="178.50017806238026" x2="342.07771082755687" y2="162.7502086705581" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-0')"></line><line x1="287.5181103891715" y1="162.75014745422231" x2="314.79789293673025" y2="178.50017806238026" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-1')"></line><line x1="259.44928434962895" y1="172.40850192130898" x2="282.6371295568315" y2="159.0210279382602" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-2')"></line><line x1="260.23829249834495" y1="178.50011684604448" x2="287.5181103891715" y2="162.75014745422231" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-3')"></line><line x1="287.5181103891715" y1="162.75014745422231" x2="287.5181457324395" y2="131.25014745424207" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-4')"></line><line x1="232.95850995078627" y1="162.75008623788653" x2="260.23829249834495" y2="178.50011684604448" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-5')"></line><line x1="259.44934136647925" y1="121.59173000025658" x2="282.63715653190417" y2="134.9792560171908" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-6')"></line><line x1="260.23836318488077" y1="115.50011684608415" x2="287.5181457324395" y2="131.25014745424207" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-7')"></line><line x1="238.6285126015278" y1="160.38759259967622" x2="238.62854264330548" y2="133.6125925996931" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-8')"></line><line x1="232.95850995078627" y1="162.75008623788653" x2="232.95854529405415" y2="131.25008623790637" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-9')"></line><line x1="232.95854529405415" y1="131.25008623790637" x2="260.23836318488077" y2="115.50011684608415" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-10')"></line><line x1="260.23836318488077" y1="115.50011684608415" x2="260.2383985281487" y2="84.00011684610396" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-11')"></line><line x1="205.67876274649552" y1="115.5000556297484" x2="232.95854529405415" y2="131.25008623790637" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-12')"></line><line x1="232.95861598059003" y1="68.250086237946" x2="260.2383985281487" y2="84.00011684610396" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-13')"></line><line x1="208.51376274647743" y1="115.50006575300014" x2="208.51387522705244" y2="84.00006575320097" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-14')"></line><line x1="202.84376274651362" y1="115.50004550649666" x2="202.84387522708863" y2="84.00004550669749" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-15')"></line><line x1="178.39898342432934" y1="131.25009182443426" x2="205.67876274649552" y2="115.5000556297484" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-16')"></line><line x1="151.1192008767706" y1="115.50006121627632" x2="178.39898342432934" y2="131.25009182443426" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-17')"></line><line x1="123.05037483722799" y1="125.15841568336307" x2="146.2382200444306" y2="111.77094170031418" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-18')"></line><line x1="123.83938298594398" y1="131.25003060809854" x2="151.1192008767706" y2="115.50006121627632" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-19')"></line><line x1="151.1192008767706" y1="115.50006121627632" x2="151.11923622003854" y2="84.00006121629613" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-20')"></line><line x1="96.5596004383853" y1="115.49999999994057" x2="123.83938298594398" y2="131.25003060809854" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-21')"></line><line x1="123.8394536724798" y1="68.25003060813816" x2="151.11923622003854" y2="84.00006121629613" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-22')"></line><line x1="152.53673346530258" y1="86.45524482647053" x2="179.81655135612914" y2="70.70527543464829" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-23')"></line><line x1="149.7017389747745" y1="81.54487760612173" x2="176.98155686560108" y2="65.79490821429948" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-24')"></line><line x1="68.49077439884269" y1="125.15835446702735" x2="91.67861960604532" y2="111.77088048397846" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-25')"></line><line x1="69.27978254755871" y1="131.2499693917628" x2="96.5596004383853" y2="115.49999999994057" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-26')"></line><line x1="96.5596004383853" y1="115.49999999994057" x2="96.55963578165324" y2="83.99999999996041" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-27')"></line><line x1="96.55963578165324" y1="83.99999999996041" x2="123.8394536724798" y2="68.25003060813816" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-28')"></line><line x1="42" y1="115.49993878360485" x2="69.27978254755871" y2="131.2499693917628" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-29')"></line><line x1="68.49083141569298" y1="74.34158254597483" x2="91.6786465811179" y2="87.72910856290912" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-30')"></line><line x1="69.2798532340945" y1="68.24996939180244" x2="96.55963578165324" y2="83.99999999996041" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-31')"></line><line x1="47.67000265074154" y1="113.13744514539457" x2="47.67003269251924" y2="86.36244514541141" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-32')"></line><line x1="42" y1="115.49993878360485" x2="42.00003534326791" y2="83.99993878362469" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-33')"></line><line x1="42.00003534326791" y1="83.99993878362469" x2="69.2798532340945" y2="68.24996939180244" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-34')"></line><line x1="69.2798532340945" y1="68.24996939180244" x2="69.27988857736236" y2="36.749969391822276" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-35')"></line><line x1="69.27988857736236" y1="36.749969391822276" x2="96.55970646818895" y2="21" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-36')"></line></g><g><text x="342.07771082755687" y="162.7502086705581" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="314.79789293673025" y="170.62517806238026" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="314.79789293673025" y="178.50017806238026" class="debug" fill="#ff0000" style="
+            "></text><text x="314.79789293673025" y="170.62517806238026" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: ltr;"><tspan>O</tspan></text><text x="314.79789293673025" y="178.50017806238026" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="287.5181103891715" y="162.75014745422231" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -2569,13 +1663,7 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="205.67876274649552" y="115.5000556297484" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="200.42887522707053" y="89.25005562994923" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="205.67887522707053" y="84.00005562994923" class="debug" fill="#ff0000" style="
+            "></text><text x="200.42887522707053" y="89.25005562994923" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>O</tspan></text><text x="205.67887522707053" y="84.00005562994923" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="178.39898342432934" y="131.25009182443426" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -2593,45 +1681,21 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="69.2798532340945" y="68.24996939180244" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="74.52988857736236" y="41.999969391822276" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>O</tspan></text><text x="69.27988857736236" y="36.749969391822276" class="debug" fill="#ff0000" style="
+            "></text><text x="74.52988857736236" y="41.999969391822276" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: rtl; unicode-bidi: bidi-override;"><tspan>O</tspan></text><text x="69.27988857736236" y="36.749969391822276" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="96.55970646818895" y="21" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="96.55963578165324" y="83.99999999996041" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="123.8394536724798" y="76.12503060813816" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>O</tspan></text><text x="123.8394536724798" y="68.25003060813816" class="debug" fill="#ff0000" style="
+            "></text><text x="123.8394536724798" y="76.12503060813816" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: rtl; unicode-bidi: bidi-override;"><tspan>O</tspan></text><text x="123.8394536724798" y="68.25003060813816" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="151.11923622003854" y="84.00006121629613" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="174.4615541108651" y="73.50009182447388" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="178.3990541108651" y="68.25009182447388" class="debug" fill="#ff0000" style="
+            "></text><text x="174.4615541108651" y="73.50009182447388" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>O</tspan></text><text x="178.3990541108651" y="68.25009182447388" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="260.23836318488077" y="115.50011684608415" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="256.3008985281487" y="89.25011684610396" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="260.2383985281487" y="84.00011684610396" class="debug" fill="#ff0000" style="
+            "></text><text x="256.3008985281487" y="89.25011684610396" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>O</tspan></text><text x="260.2383985281487" y="84.00011684610396" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="232.95861598059003" y="68.250086237946" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -2656,25 +1720,13 @@ module.exports = [
                 }
             </style><g mask="url(#text-mask)"><line x1="246.7500244864518" y1="75.55977008608363" x2="278.2500244864391" y2="75.55979836069801" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-0')"></line><line x1="230.99999999992386" y1="102.83955616797527" x2="246.7500244864518" y2="75.55977008608363" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-1')"></line><line x1="231.0000489729924" y1="48.27995572957761" x2="246.7500244864518" y2="75.55977008608363" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-2')"></line><line x1="199.49999999993648" y1="102.83952789336095" x2="230.99999999992386" y2="102.83955616797527" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-3')"></line><line x1="199.50004897300514" y1="48.279927454963314" x2="231.0000489729924" y2="48.27995572957761" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-4')"></line><line x1="183.75002448647714" y1="75.55971353685496" x2="199.49999999993648" y2="102.83952789336095" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-5')"></line><line x1="183.75002448647714" y1="75.55971353685496" x2="199.50004897300514" y2="48.279927454963314" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-6')"></line><line x1="152.25002448648988" y1="75.55968526224063" x2="183.75002448647714" y2="75.55971353685496" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-7')"></line><line x1="132.770890341711" y1="97.9584829804154" x2="146.15841115525978" y2="74.77066481080746" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-8')"></line><line x1="136.49999999996191" y1="102.8394713441323" x2="152.25002448648988" y2="75.55968526224063" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-9')"></line><line x1="136.5000489730305" y1="48.27987090573461" x2="152.25002448648988" y2="75.55968526224063" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-10')"></line><line x1="104.99999999997462" y1="102.83944306951796" x2="136.49999999996191" y2="102.8394713441323" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-11')"></line><line x1="107.36254388361164" y1="53.949844751714096" x2="134.13754388360087" y2="53.94986878513626" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-12')"></line><line x1="105.00004897304316" y1="48.27984263112032" x2="136.5000489730305" y2="48.27987090573461" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-13')"></line><line x1="95.34163923419575" y1="74.77061919732722" x2="108.72911842063624" y2="97.9584614003573" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-14')"></line><line x1="89.25002448651523" y1="75.55962871301196" x2="104.99999999997462" y2="102.83944306951796" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-15')"></line><line x1="89.2500734595838" y1="21.000028274614323" x2="105.00004897304316" y2="48.27984263112032" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-16')"></line><line x1="89.25002448651523" y1="75.55962871301196" x2="105.00004897304316" y2="48.27984263112032" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-17')"></line><line x1="57.75002448652792" y1="75.55960043839767" x2="89.25002448651523" y2="75.55962871301196" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-18')"></line><line x1="57.750073459596464" y1="21" x2="89.2500734595838" y2="21.000028274614323" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-19')"></line><line x1="39.54481925262975" y1="101.42188431650186" x2="55.29484373915767" y2="74.14209823461016" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-20')"></line><line x1="44.45518074737025" y1="104.25688872407687" x2="60.20520523389817" y2="76.97710264218517" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-21')"></line><line x1="42.00004897306853" y1="48.27978608189167" x2="57.75002448652792" y2="75.55960043839767" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-22')"></line><line x1="42.00004897306853" y1="48.27978608189167" x2="57.750073459596464" y2="21" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-23')"></line></g><g><text x="278.2500244864391" y="75.55979836069801" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="246.7500244864518" y="83.43477008608363" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>N</tspan></text><text x="246.7500244864518" y="75.55977008608363" class="debug" fill="#ff0000" style="
+            "></text><text x="246.7500244864518" y="83.43477008608363" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: rtl; unicode-bidi: bidi-override;"><tspan>N</tspan></text><text x="246.7500244864518" y="75.55977008608363" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="230.99999999992386" y="102.83955616797527" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="199.49999999993648" y="102.83952789336095" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="183.75002448647714" y="83.43471353685496" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>N</tspan></text><text x="183.75002448647714" y="75.55971353685496" class="debug" fill="#ff0000" style="
+            "></text><text x="183.75002448647714" y="83.43471353685496" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: rtl; unicode-bidi: bidi-override;"><tspan>N</tspan></text><text x="183.75002448647714" y="75.55971353685496" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="199.50004897300514" y="48.279927454963314" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -2682,13 +1734,7 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="152.25002448648988" y="75.55968526224063" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="136.49999999996191" y="94.9644713441323" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: ltr;
-            "><tspan>N</tspan></text><text x="136.49999999996191" y="102.8394713441323" class="debug" fill="#ff0000" style="
+            "></text><text x="136.49999999996191" y="94.9644713441323" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: ltr;"><tspan>N</tspan></text><text x="136.49999999996191" y="102.8394713441323" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="104.99999999997462" y="102.83944306951796" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -2696,13 +1742,7 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="57.75002448652792" y="75.55960043839767" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="36.75" y="108.08938652028937" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="42" y="102.83938652028937" class="debug" fill="#ff0000" style="
+            "></text><text x="36.75" y="108.08938652028937" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>O</tspan></text><text x="42" y="102.83938652028937" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="42.00004897306853" y="48.27978608189167" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -2712,13 +1752,7 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="105.00004897304316" y="48.27984263112032" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="136.5000489730305" y="56.15487090573461" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>N</tspan></text><text x="136.5000489730305" y="48.27987090573461" class="debug" fill="#ff0000" style="
+            "></text><text x="136.5000489730305" y="56.15487090573461" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: rtl; unicode-bidi: bidi-override;"><tspan>N</tspan></text><text x="136.5000489730305" y="48.27987090573461" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text></g></svg></div></div>
  `
@@ -2747,23 +1781,11 @@ module.exports = [
                 }
             </style><g mask="url(#text-mask)"><line x1="228.4794160337037" y1="47.1968604234048" x2="249.55705639916116" y2="23.787822070143918" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-0')"></line><line x1="228.4794160337037" y1="47.1968604234048" x2="238.2134911049994" y2="77.15512777160738" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-1')"></line><line x1="237.62405155950037" y1="79.92817411492764" x2="268.4356775963922" y2="86.47750239824994" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-2')"></line><line x1="238.80293065049844" y1="74.38208142828712" x2="269.6145566873903" y2="80.93140971160942" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-3')"></line><line x1="217.13585073954195" y1="100.5641661248683" x2="238.2134911049994" y2="77.15512777160738" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-4')"></line><line x1="187.45621631063247" y1="100.0522028290239" x2="213.64611207422686" y2="105.61906773595872" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-5')"></line><line x1="186.32420866472503" y1="94.01491329318027" x2="217.13585073954195" y2="100.5641661248683" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-6')"></line><line x1="217.13585073954195" y1="100.5641661248683" x2="226.86985244890147" y2="130.52245730981713" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-7')"></line><line x1="165.24656829926764" y1="117.42395164644118" x2="186.32420866472503" y2="94.01491329318027" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-8')"></line><line x1="176.59020695536557" y1="64.0566221082314" x2="186.32420866472503" y2="94.01491329318027" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-9')"></line><line x1="205.792212083444" y1="153.93149566307812" x2="226.86985244890147" y2="130.52245730981713" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-10')"></line><line x1="134.43492622445072" y1="110.87469881475316" x2="165.24656829926764" y2="117.42395164644118" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-11')"></line><line x1="165.24656829926764" y1="117.42395164644118" x2="174.98057000862704" y2="147.3822428313901" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-12')"></line><line x1="178.697015761803" y1="65.95361490028883" x2="199.77471345132992" y2="42.544628162095506" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-13')"></line><line x1="174.48339814892816" y1="62.15962931617396" x2="195.5610958384551" y2="38.75064257798067" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-14')"></line><line x1="145.77854884280842" y1="57.50744472821698" x2="176.59020695536557" y2="64.0566221082314" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-15')"></line><line x1="200.40021812996716" y1="156.87372397775204" x2="203.1989378567511" y2="183.50205086644166" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-16')"></line><line x1="205.792212083444" y1="153.93149566307812" x2="209.0848235267192" y2="185.25893906153647" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-17')"></line><line x1="174.98057000862704" y1="147.3822428313901" x2="205.792212083444" y2="153.93149566307812" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-18')"></line><line x1="110.7244819828156" y1="128.73408402573716" x2="128.64047629345444" y2="108.83640142546538" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-19')"></line><line x1="113.35728585899327" y1="134.28373716801406" x2="134.43492622445072" y2="110.87469881475316" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-20')"></line><line x1="124.7009245150912" y1="80.91640762980423" x2="134.43492622445072" y2="110.87469881475316" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-21')"></line><line x1="159.23053940046913" y1="174.66202537894878" x2="174.98057000862704" y2="147.3822428313901" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-22')"></line><line x1="122.06814833536771" y1="75.36688800136393" x2="139.98409392043993" y2="55.46916152840403" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-23')"></line><line x1="124.70096580154697" y1="80.91653469640512" x2="145.77854884280842" y2="57.50744472821698" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-24')"></line><line x1="136.04447377151274" y1="27.5491773800144" x2="145.77854884280842" y2="57.50744472821698" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-25')"></line><line x1="180.30812723559322" y1="198.07111103073424" x2="209.0848235267192" y2="185.25893906153647" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-26')"></line><line x1="82.54564378417638" y1="127.73448433632605" x2="113.35728585899327" y2="134.28373716801406" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-27')"></line><line x1="95.02129008618175" y1="80.40444433395986" x2="121.21118584977609" y2="85.97130924089466" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-28')"></line><line x1="93.88928244027434" y1="74.36715479811623" x2="124.7009245150912" y2="80.91640762980423" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-29')"></line><line x1="165.02499390542482" y1="172.62374099251036" x2="182.94094356528026" y2="192.521463796528" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-30')"></line><line x1="159.23053940046913" y1="174.66202537894878" x2="180.30812723559322" y2="198.07111103073424" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-31')"></line><line x1="93.88930768898982" y1="74.36735731639074" x2="124.70096580154697" y2="80.91653469640512" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-32')"></line><line x1="106.36483808899482" y1="27.037286763761358" x2="132.55474748466835" y2="32.604087536773605" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-33')"></line><line x1="105.23281565895562" y1="21" x2="136.04447377151274" y2="27.5491773800144" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-34')"></line><line x1="78.93418461630966" y1="98.27094468256361" x2="87.20808606926522" y2="123.7354921897702" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-35')"></line><line x1="72.81164207481692" y1="97.77619315137714" x2="82.54564378417638" y2="127.73448433632605" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-36')"></line><line x1="72.81164207481692" y1="97.77619315137714" x2="93.88928244027434" y2="74.36715479811623" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-37')"></line><line x1="90.27777637071779" y1="44.903826506470125" x2="98.5517401813191" y2="70.36835375244233" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-38')"></line><line x1="84.15523261769414" y1="44.409089968188155" x2="93.88930768898982" y2="74.36735731639074" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-39')"></line><line x1="84.15523261769414" y1="44.409089968188155" x2="105.23281565895562" y2="21" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-40')"></line><line x1="42" y1="91.22694031968912" x2="72.81164207481692" y2="97.77619315137714" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-41')"></line></g><g><text x="249.55705639916116" y="23.787822070143918" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="233.7294160337037" y="52.4468604234048" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>O</tspan></text><text x="228.4794160337037" y="47.1968604234048" class="debug" fill="#ff0000" style="
+            "></text><text x="233.7294160337037" y="52.4468604234048" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: rtl; unicode-bidi: bidi-override;"><tspan>O</tspan></text><text x="228.4794160337037" y="47.1968604234048" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="238.2134911049994" y="77.15512777160738" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="265.0876171418913" y="88.95445605492968" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="269.0251171418913" y="83.70445605492968" class="debug" fill="#ff0000" style="
+            "></text><text x="265.0876171418913" y="88.95445605492968" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>O</tspan></text><text x="269.0251171418913" y="83.70445605492968" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="217.13585073954195" y="100.5641661248683" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -2785,57 +1807,21 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="124.7009245150912" y="80.91640762980423" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="180.23057000862704" y="152.6322428313901" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>N</tspan></text><text x="174.98057000862704" y="147.3822428313901" class="debug" fill="#ff0000" style="
+            "></text><text x="180.23057000862704" y="152.6322428313901" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: rtl; unicode-bidi: bidi-override;"><tspan>N</tspan></text><text x="174.98057000862704" y="147.3822428313901" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="164.48053940046913" y="179.91202537894878" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>N</tspan></text><text x="159.23053940046913" y="174.66202537894878" class="debug" fill="#ff0000" style="
+            "></text><text x="164.48053940046913" y="179.91202537894878" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: rtl; unicode-bidi: bidi-override;"><tspan>N</tspan></text><text x="159.23053940046913" y="174.66202537894878" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="180.30812723559322" y="190.19611103073424" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: ltr;
-            "><tspan>N</tspan></text><text x="180.30812723559322" y="198.07111103073424" class="debug" fill="#ff0000" style="
+            "></text><text x="180.30812723559322" y="190.19611103073424" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: ltr;"><tspan>N</tspan></text><text x="180.30812723559322" y="198.07111103073424" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="205.1473235267192" y="190.50893906153647" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>N</tspan></text><text x="209.0848235267192" y="185.25893906153647" class="debug" fill="#ff0000" style="
+            "></text><text x="205.1473235267192" y="190.50893906153647" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>N</tspan></text><text x="209.0848235267192" y="185.25893906153647" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="205.792212083444" y="153.93149566307812" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="222.93235244890147" y="135.77245730981713" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>N</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="226.86985244890147" y="130.52245730981713" class="debug" fill="#ff0000" style="
+            "></text><text x="222.93235244890147" y="135.77245730981713" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>N</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="226.86985244890147" y="130.52245730981713" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="176.59020695536557" y="64.0566221082314" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="192.4179046448925" y="45.89763537003809" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="197.6679046448925" y="40.64763537003809" class="debug" fill="#ff0000" style="
+            "></text><text x="192.4179046448925" y="45.89763537003809" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>O</tspan></text><text x="197.6679046448925" y="40.64763537003809" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="145.77854884280842" y="57.50744472821698" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -2870,13 +1856,7 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="323.85632049148506" y="213.80862335107292" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="323.2114530245543" y="187.73118216922444" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>N</tspan></text><text x="327.1489530245543" y="182.48118216922444" class="debug" fill="#ff0000" style="
+            "></text><text x="323.2114530245543" y="187.73118216922444" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>N</tspan></text><text x="327.1489530245543" y="182.48118216922444" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="355.92562919013244" y="169.66896499726528" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -2886,13 +1866,7 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="304.9575419251146" y="132.63851697748674" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="275.53599829260565" y="119.37329296759748" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>N</tspan></text><text x="279.47349829260565" y="114.12329296759748" class="debug" fill="#ff0000" style="
+            "></text><text x="275.53599829260565" y="119.37329296759748" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>N</tspan></text><text x="279.47349829260565" y="114.12329296759748" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="279.4734841552984" y="82.62329296760063" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -2906,13 +1880,7 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="249.51519952333592" y="72.8892710901689" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="236.24997551344666" y="103.62331472267783" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>N</tspan></text><text x="230.99997551344666" y="98.37331472267783" class="debug" fill="#ff0000" style="
+            "></text><text x="236.24997551344666" y="103.62331472267783" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: rtl; unicode-bidi: bidi-override;"><tspan>N</tspan></text><text x="230.99997551344666" y="98.37331472267783" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="199.49997551344984" y="98.37332885998501" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -2920,13 +1888,7 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="152.24998775672174" y="125.65315028515283" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="136.49999999999048" y="145.05795757301348" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="136.49999999999048" y="152.93295757301348" class="debug" fill="#ff0000" style="
+            "></text><text x="136.49999999999048" y="145.05795757301348" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: ltr;"><tspan>O</tspan></text><text x="136.49999999999048" y="152.93295757301348" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="104.99999999999366" y="152.93297171032066" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -2942,13 +1904,7 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="249.51522239797947" y="123.85734173578544" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="234.5312005205477" y="159.06562636774794" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>N</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="239.7812005205477" y="153.81562636774794" class="debug" fill="#ff0000" style="
+            "></text><text x="234.5312005205477" y="159.06562636774794" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>N</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="239.7812005205477" y="153.81562636774794" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text></g></svg></div></div>
  `
@@ -2967,35 +1923,17 @@ module.exports = [
                 .sub {
                     font: 8.4px Helvetica, Arial, sans-serif;
                 }
-            </style><g mask="url(#text-mask)"><line x1="139.2919304216356" y1="129.62685424993643" x2="144.76182017308227" y2="160.64830337964372" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-0')"></line><line x1="133.70806957828827" y1="130.61143440519683" x2="139.17795932973493" y2="161.63288353490412" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-1')"></line><line x1="136.49999999996194" y1="130.11914432756663" x2="152.25002448648988" y2="102.83935824567499" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-2')"></line><line x1="104.99999999997462" y1="130.1191160529523" x2="136.49999999996194" y2="130.11914432756663" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-3')"></line><line x1="152.25002448648988" y1="102.83935824567499" x2="183.75002448647717" y2="102.83938652028931" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-4')"></line><line x1="85.52086585519578" y1="152.51791377112704" x2="98.90838666874453" y2="129.33009560151913" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-5')"></line><line x1="89.24997551344669" y1="157.39890213484395" x2="104.99999999997462" y2="130.1191160529523" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-6')"></line><line x1="89.25002448651523" y1="102.83930169644628" x2="104.99999999997462" y2="130.1191160529523" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-7')"></line><line x1="189.8416392341577" y1="102.0503770046046" x2="203.22911842059813" y2="125.23821920763467" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-8')"></line><line x1="183.75002448647717" y1="102.83938652028931" x2="199.4999999999365" y2="130.1192008767953" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-9')"></line><line x1="183.75002448647717" y1="102.83938652028931" x2="199.5000489730051" y2="75.55960043839767" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-10')"></line><line x1="57.74997551345936" y1="157.3988738602296" x2="89.24997551344669" y2="157.39890213484395" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-11')"></line><line x1="60.112519397096435" y1="108.50927554242574" x2="86.88751939708561" y2="108.50929957584793" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-12')"></line><line x1="57.75002448652796" y1="102.83927342183196" x2="89.25002448651523" y2="102.83930169644628" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-13')"></line><line x1="199.4999999999365" y1="130.1192008767953" x2="230.9999999999239" y2="130.11922915140963" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-14')"></line><line x1="183.74997551340857" y1="157.39898695868695" x2="199.4999999999365" y2="130.1192008767953" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-15')"></line><line x1="189.8416882072263" y1="47.49077656620696" x2="203.22916739366673" y2="70.67861876923703" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-16')"></line><line x1="183.75007345954577" y1="48.27978608189167" x2="199.5000489730051" y2="75.55960043839767" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-17')"></line><line x1="199.5000489730051" y1="75.55960043839767" x2="231.00004897299243" y2="75.55962871301196" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-18')"></line><line x1="48.091614747680524" y1="129.33004998803892" x2="61.47909393412098" y2="152.51789219106894" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-19')"></line><line x1="42" y1="130.11905950372366" x2="57.74997551345936" y2="157.3988738602296" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-20')"></line><line x1="42" y1="130.11905950372366" x2="57.75002448652796" y2="102.83927342183196" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-21')"></line><line x1="230.9999999999239" y1="130.11922915140963" x2="246.74997551338328" y2="157.3990435079156" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-22')"></line><line x1="230.9999999999239" y1="130.11922915140963" x2="246.75002448645182" y2="102.83944306951796" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-23')"></line><line x1="153.18000371442724" y1="165.5084905938972" x2="182.78035732201818" y2="154.73495513400377" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-24')"></line><line x1="155.11924009720803" y1="170.83655424326358" x2="184.71959370479897" y2="160.06301878337013" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-25')"></line><line x1="183.74997551340857" y1="157.39898695868695" x2="199.50001782972288" y2="184.67876274651755" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-26')"></line><line x1="183.75007345954577" y1="48.27978608189167" x2="199.50009794607368" y2="21" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-27')"></line><line x1="231.00004897299243" y1="75.55962871301196" x2="246.75002448645182" y2="102.83944306951796" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-28')"></line><line x1="227.27093931474153" y1="70.67864034929505" x2="240.65846012829024" y2="47.490822179687115" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-29')"></line><line x1="231.00004897299243" y1="75.55962871301196" x2="246.75007345952037" y2="48.27984263112029" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-30')"></line><line x1="246.74997551338328" y1="157.3990435079156" x2="278.2499755133706" y2="157.3990717825299" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-31')"></line><line x1="248.57232541054742" y1="105.01118070147083" x2="272.7027435433572" y2="84.76339265596422" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-32')"></line><line x1="244.92772356235622" y1="100.66770543756508" x2="269.058141695166" y2="80.41991739205847" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-33')"></line><line x1="244.9277196636262" y1="105.01117743004792" x2="269.0581014472925" y2="125.25900879477695" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-34')"></line><line x1="248.57232930927745" y1="100.66770870898799" x2="272.70271109294373" y2="120.91554007371701" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-35')"></line><line x1="201.86252662500476" y1="190.34875908180877" x2="228.63752662497254" y2="190.3487175485199" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-36')"></line><line x1="199.50001782972288" y1="184.67876274651755" x2="231.000017829685" y2="184.6787138838247" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-37')"></line><line x1="183.7500601460751" y1="211.958587397041" x2="199.50001782972288" y2="184.67876274651755" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-38')"></line><line x1="201.86259285664215" y1="26.670002120593793" x2="228.6375928566314" y2="26.670026154015957" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-39')"></line><line x1="199.50009794607368" y1="21" x2="231.000097946061" y2="21.000028274614323" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-40')"></line><line x1="231.000097946061" y1="21.000028274614323" x2="246.75007345952037" y2="48.27984263112029" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-41')"></line><line x1="284.3415888446007" y1="158.18809223396303" x2="297.7291096581494" y2="135.00027406435507" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-42')"></line><line x1="278.2499755133706" y1="157.3990717825299" x2="293.9999999998985" y2="130.1192857006382" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-43')"></line><line x1="278.2499755133706" y1="157.3990717825299" x2="293.99995102683005" y2="184.67888613903588" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-44')"></line><line x1="231.000017829685" y1="184.6787138838247" x2="246.75006014599933" y2="211.95848967165531" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-45')"></line><line x1="189.84167296160817" y1="211.16956296419167" x2="203.22920893047538" y2="234.35737238384766" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-46')"></line><line x1="183.7500601460751" y1="211.958587397041" x2="199.50010246238946" y2="239.23836318487153" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-47')"></line><line x1="293.9999999998985" y1="130.1192857006382" x2="325.49999999988574" y2="130.11931397525245" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-48')"></line><line x1="284.3415398715323" y1="212.74769267236073" x2="297.729060685081" y2="189.55987450275276" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-49')"></line><line x1="278.24992654030217" y1="211.95867222092758" x2="293.99995102683005" y2="184.67888613903588" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-50')"></line><line x1="293.99995102683005" y1="184.67888613903588" x2="325.49995102681737" y2="184.67891441365006" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-51')"></line><line x1="227.2709808515309" y1="234.3573350903329" x2="240.6584448826315" y2="211.16948413738797" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-52')"></line><line x1="231.00010246235152" y1="239.23831432217875" x2="246.75006014599933" y2="211.95848967165531" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-53')"></line><line x1="199.50010246238946" y1="239.23836318487153" x2="231.00010246235152" y2="239.23831432217875" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-54')"></line><line x1="321.7708815792241" y1="135.0002956444131" x2="335.15836076566467" y2="158.18813784744316" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-55')"></line><line x1="325.49999999988574" y1="130.11931397525245" x2="341.2499755133452" y2="157.3991283317584" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-56')"></line><line x1="278.24992654030217" y1="211.95867222092758" x2="293.9999020537617" y2="239.23848657743358" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-57')"></line><line x1="325.49995102681737" y1="184.67891441365006" x2="341.2499755133452" y2="157.3991283317584" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-58')"></line><line x1="321.77083260615575" y1="189.5598960828107" x2="335.15831179259624" y2="212.74773828584077" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-59')"></line><line x1="325.49995102681737" y1="184.67891441365006" x2="341.24992654027676" y2="211.95872877015606" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-60')"></line><line x1="341.2499755133452" y1="157.3991283317584" x2="372.7499755133325" y2="157.39915660637266" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-61')"></line><line x1="296.36240714319126" y1="233.56848869803187" x2="323.13740714318044" y2="233.56851273145398" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-62')"></line><line x1="293.9999020537617" y1="239.23848657743358" x2="325.49990205374894" y2="239.23851485204776" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-63')"></line><line x1="325.49990205374894" y1="239.23851485204776" x2="341.24992654027676" y2="211.95872877015606" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-64')"></line><line x1="372.7499755133325" y1="157.39915660637266" x2="388.4999999998604" y2="130.11937052448096" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-65')"></line><line x1="375.2052077784864" y1="101.4220583717636" x2="390.9551832919459" y2="128.7018727282696" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-66')"></line><line x1="370.2948411943154" y1="104.25705396418633" x2="386.0448167077749" y2="131.53686832069232" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-67')"></line><line x1="388.4999999998604" y1="130.11937052448096" x2="419.99999999984766" y2="130.11939879909514" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-68')"></line><line x1="426.0916133310778" y1="130.90841925052828" x2="439.4791341446265" y2="107.72060108092029" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-69')"></line><line x1="419.99999999984766" y1="130.11939879909514" x2="435.7500244863756" y2="102.83961271720341" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-70')"></line><line x1="419.99999999984766" y1="130.11939879909514" x2="435.74997551330716" y2="157.39921315560107" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-71')"></line><line x1="435.7500244863756" y1="102.83961271720341" x2="467.2500244863628" y2="102.83964099181762" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-72')"></line><line x1="438.11248060273675" y1="151.72921527619943" x2="464.88748060272593" y2="151.72923930962148" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-73')"></line><line x1="435.74997551330716" y1="157.39921315560107" x2="467.24997551329443" y2="157.39924143021526" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-74')"></line><line x1="463.5209060657012" y1="107.72062266097828" x2="476.90838525214184" y2="130.90846486400832" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-75')"></line><line x1="467.2500244863628" y1="102.83964099181762" x2="482.99999999982236" y2="130.11945534832353" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-76')"></line><line x1="467.24997551329443" y1="157.39924143021526" x2="482.99999999982236" y2="130.11945534832353" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-77')"></line></g><g><text x="136.7198897514086" y="166.39059345727392" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="141.9698897514086" y="161.14059345727392" class="debug" fill="#ff0000" style="
+            </style><g mask="url(#text-mask)"><line x1="139.2919304216356" y1="129.62685424993643" x2="144.76182017308227" y2="160.64830337964372" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-0')"></line><line x1="133.70806957828827" y1="130.61143440519683" x2="139.17795932973493" y2="161.63288353490412" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-1')"></line><line x1="136.49999999996194" y1="130.11914432756663" x2="152.25002448648988" y2="102.83935824567499" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-2')"></line><line x1="104.99999999997462" y1="130.1191160529523" x2="136.49999999996194" y2="130.11914432756663" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-3')"></line><line x1="152.25002448648988" y1="102.83935824567499" x2="183.75002448647717" y2="102.83938652028931" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-4')"></line><line x1="85.52086585519578" y1="152.51791377112704" x2="98.90838666874453" y2="129.33009560151913" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-5')"></line><line x1="89.24997551344669" y1="157.39890213484395" x2="104.99999999997462" y2="130.1191160529523" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-6')"></line><line x1="89.25002448651523" y1="102.83930169644628" x2="104.99999999997462" y2="130.1191160529523" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-7')"></line><line x1="189.8416392341577" y1="102.0503770046046" x2="203.22911842059813" y2="125.23821920763467" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-8')"></line><line x1="183.75002448647717" y1="102.83938652028931" x2="199.4999999999365" y2="130.1192008767953" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-9')"></line><line x1="183.75002448647717" y1="102.83938652028931" x2="199.5000489730051" y2="75.55960043839767" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-10')"></line><line x1="57.74997551345936" y1="157.3988738602296" x2="89.24997551344669" y2="157.39890213484395" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-11')"></line><line x1="60.112519397096435" y1="108.50927554242574" x2="86.88751939708561" y2="108.50929957584793" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-12')"></line><line x1="57.75002448652796" y1="102.83927342183196" x2="89.25002448651523" y2="102.83930169644628" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-13')"></line><line x1="199.4999999999365" y1="130.1192008767953" x2="230.9999999999239" y2="130.11922915140963" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-14')"></line><line x1="183.74997551340857" y1="157.39898695868695" x2="199.4999999999365" y2="130.1192008767953" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-15')"></line><line x1="189.8416882072263" y1="47.49077656620696" x2="203.22916739366673" y2="70.67861876923703" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-16')"></line><line x1="183.75007345954577" y1="48.27978608189167" x2="199.5000489730051" y2="75.55960043839767" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-17')"></line><line x1="199.5000489730051" y1="75.55960043839767" x2="231.00004897299243" y2="75.55962871301196" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-18')"></line><line x1="48.091614747680524" y1="129.33004998803892" x2="61.47909393412098" y2="152.51789219106894" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-19')"></line><line x1="42" y1="130.11905950372366" x2="57.74997551345936" y2="157.3988738602296" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-20')"></line><line x1="42" y1="130.11905950372366" x2="57.75002448652796" y2="102.83927342183196" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-21')"></line><line x1="230.9999999999239" y1="130.11922915140963" x2="246.74997551338328" y2="157.3990435079156" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-22')"></line><line x1="230.9999999999239" y1="130.11922915140963" x2="246.75002448645182" y2="102.83944306951796" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-23')"></line><line x1="153.18000371442724" y1="165.5084905938972" x2="182.78035732201818" y2="154.73495513400377" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-24')"></line><line x1="155.11924009720803" y1="170.83655424326358" x2="184.71959370479897" y2="160.06301878337013" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-25')"></line><line x1="183.74997551340857" y1="157.39898695868695" x2="199.50001782972288" y2="184.67876274651755" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-26')"></line><line x1="183.75007345954577" y1="48.27978608189167" x2="199.50009794607368" y2="21" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-27')"></line><line x1="231.00004897299243" y1="75.55962871301196" x2="246.75002448645182" y2="102.83944306951796" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-28')"></line><line x1="227.27093931474153" y1="70.67864034929505" x2="240.65846012829024" y2="47.490822179687115" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-29')"></line><line x1="231.00004897299243" y1="75.55962871301196" x2="246.75007345952037" y2="48.27984263112029" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-30')"></line><line x1="246.74997551338328" y1="157.3990435079156" x2="278.2499755133706" y2="157.3990717825299" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-31')"></line><line x1="248.57232541054742" y1="105.01118070147083" x2="272.7027435433572" y2="84.76339265596422" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-32')"></line><line x1="244.92772356235622" y1="100.66770543756508" x2="269.058141695166" y2="80.41991739205847" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-33')"></line><line x1="244.9277196636262" y1="105.01117743004792" x2="269.0581014472925" y2="125.25900879477695" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-34')"></line><line x1="248.57232930927745" y1="100.66770870898799" x2="272.70271109294373" y2="120.91554007371701" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-35')"></line><line x1="201.86252662500476" y1="190.34875908180877" x2="228.63752662497254" y2="190.3487175485199" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-36')"></line><line x1="199.50001782972288" y1="184.67876274651755" x2="231.000017829685" y2="184.6787138838247" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-37')"></line><line x1="183.7500601460751" y1="211.958587397041" x2="199.50001782972288" y2="184.67876274651755" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-38')"></line><line x1="201.86259285664215" y1="26.670002120593793" x2="228.6375928566314" y2="26.670026154015957" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-39')"></line><line x1="199.50009794607368" y1="21" x2="231.000097946061" y2="21.000028274614323" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-40')"></line><line x1="231.000097946061" y1="21.000028274614323" x2="246.75007345952037" y2="48.27984263112029" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-41')"></line><line x1="284.3415888446007" y1="158.18809223396303" x2="297.7291096581494" y2="135.00027406435507" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-42')"></line><line x1="278.2499755133706" y1="157.3990717825299" x2="293.9999999998985" y2="130.1192857006382" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-43')"></line><line x1="278.2499755133706" y1="157.3990717825299" x2="293.99995102683005" y2="184.67888613903588" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-44')"></line><line x1="231.000017829685" y1="184.6787138838247" x2="246.75006014599933" y2="211.95848967165531" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-45')"></line><line x1="189.84167296160817" y1="211.16956296419167" x2="203.22920893047538" y2="234.35737238384766" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-46')"></line><line x1="183.7500601460751" y1="211.958587397041" x2="199.50010246238946" y2="239.23836318487153" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-47')"></line><line x1="293.9999999998985" y1="130.1192857006382" x2="325.49999999988574" y2="130.11931397525245" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-48')"></line><line x1="284.3415398715323" y1="212.74769267236073" x2="297.729060685081" y2="189.55987450275276" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-49')"></line><line x1="278.24992654030217" y1="211.95867222092758" x2="293.99995102683005" y2="184.67888613903588" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-50')"></line><line x1="293.99995102683005" y1="184.67888613903588" x2="325.49995102681737" y2="184.67891441365006" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-51')"></line><line x1="227.2709808515309" y1="234.3573350903329" x2="240.6584448826315" y2="211.16948413738797" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-52')"></line><line x1="231.00010246235152" y1="239.23831432217875" x2="246.75006014599933" y2="211.95848967165531" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-53')"></line><line x1="199.50010246238946" y1="239.23836318487153" x2="231.00010246235152" y2="239.23831432217875" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-54')"></line><line x1="321.7708815792241" y1="135.0002956444131" x2="335.15836076566467" y2="158.18813784744316" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-55')"></line><line x1="325.49999999988574" y1="130.11931397525245" x2="341.2499755133452" y2="157.3991283317584" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-56')"></line><line x1="278.24992654030217" y1="211.95867222092758" x2="293.9999020537617" y2="239.23848657743358" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-57')"></line><line x1="325.49995102681737" y1="184.67891441365006" x2="341.2499755133452" y2="157.3991283317584" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-58')"></line><line x1="321.77083260615575" y1="189.5598960828107" x2="335.15831179259624" y2="212.74773828584077" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-59')"></line><line x1="325.49995102681737" y1="184.67891441365006" x2="341.24992654027676" y2="211.95872877015606" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-60')"></line><line x1="341.2499755133452" y1="157.3991283317584" x2="372.7499755133325" y2="157.39915660637266" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-61')"></line><line x1="296.36240714319126" y1="233.56848869803187" x2="323.13740714318044" y2="233.56851273145398" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-62')"></line><line x1="293.9999020537617" y1="239.23848657743358" x2="325.49990205374894" y2="239.23851485204776" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-63')"></line><line x1="325.49990205374894" y1="239.23851485204776" x2="341.24992654027676" y2="211.95872877015606" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-64')"></line><line x1="372.7499755133325" y1="157.39915660637266" x2="388.4999999998604" y2="130.11937052448096" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-65')"></line><line x1="375.2052077784864" y1="101.4220583717636" x2="390.9551832919459" y2="128.7018727282696" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-66')"></line><line x1="370.2948411943154" y1="104.25705396418633" x2="386.0448167077749" y2="131.53686832069232" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-67')"></line><line x1="388.4999999998604" y1="130.11937052448096" x2="419.99999999984766" y2="130.11939879909514" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-68')"></line><line x1="426.0916133310778" y1="130.90841925052828" x2="439.4791341446265" y2="107.72060108092029" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-69')"></line><line x1="419.99999999984766" y1="130.11939879909514" x2="435.7500244863756" y2="102.83961271720341" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-70')"></line><line x1="419.99999999984766" y1="130.11939879909514" x2="435.74997551330716" y2="157.39921315560107" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-71')"></line><line x1="435.7500244863756" y1="102.83961271720341" x2="467.2500244863628" y2="102.83964099181762" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-72')"></line><line x1="438.11248060273675" y1="151.72921527619943" x2="464.88748060272593" y2="151.72923930962148" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-73')"></line><line x1="435.74997551330716" y1="157.39921315560107" x2="467.24997551329443" y2="157.39924143021526" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-74')"></line><line x1="463.5209060657012" y1="107.72062266097828" x2="476.90838525214184" y2="130.90846486400832" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-75')"></line><line x1="467.2500244863628" y1="102.83964099181762" x2="482.99999999982236" y2="130.11945534832353" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-76')"></line><line x1="467.24997551329443" y1="157.39924143021526" x2="482.99999999982236" y2="130.11945534832353" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-77')"></line></g><g><text x="136.7198897514086" y="166.39059345727392" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>O</tspan></text><text x="141.9698897514086" y="161.14059345727392" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="136.49999999996194" y="130.11914432756663" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="152.25002448648988" y="110.71435824567499" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>O</tspan></text><text x="152.25002448648988" y="102.83935824567499" class="debug" fill="#ff0000" style="
+            "></text><text x="152.25002448648988" y="110.71435824567499" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: rtl; unicode-bidi: bidi-override;"><tspan>O</tspan></text><text x="152.25002448648988" y="102.83935824567499" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="183.75002448647717" y="102.83938652028931" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="199.4999999999365" y="130.1192008767953" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="236.2499999999239" y="135.36922915140963" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>N</tspan></text><text x="230.9999999999239" y="130.11922915140963" class="debug" fill="#ff0000" style="
+            "></text><text x="236.2499999999239" y="135.36922915140963" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: rtl; unicode-bidi: bidi-override;"><tspan>N</tspan></text><text x="230.9999999999239" y="130.11922915140963" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="246.74997551338328" y="157.3990435079156" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -3007,23 +1945,11 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="341.2499755133452" y="157.3991283317584" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="372.7499755133325" y="149.52415660637266" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="372.7499755133325" y="157.39915660637266" class="debug" fill="#ff0000" style="
+            "></text><text x="372.7499755133325" y="149.52415660637266" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: ltr;"><tspan>O</tspan></text><text x="372.7499755133325" y="157.39915660637266" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="388.4999999998604" y="130.11937052448096" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="367.5000244864009" y="108.08955616797496" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="372.7500244864009" y="102.83955616797496" class="debug" fill="#ff0000" style="
+            "></text><text x="367.5000244864009" y="108.08955616797496" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>O</tspan></text><text x="372.7500244864009" y="102.83955616797496" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="419.99999999984766" y="130.11939879909514" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -3039,13 +1965,7 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="325.49995102681737" y="184.67891441365006" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="337.31242654027676" y="217.20872877015606" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>N</tspan></text><text x="341.24992654027676" y="211.95872877015606" class="debug" fill="#ff0000" style="
+            "></text><text x="337.31242654027676" y="217.20872877015606" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>N</tspan></text><text x="341.24992654027676" y="211.95872877015606" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="325.49990205374894" y="239.23851485204776" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -3055,29 +1975,11 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="293.99995102683005" y="184.67888613903588" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="252.00002448645182" y="108.08944306951796" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>S</tspan></text><text x="246.75002448645182" y="102.83944306951796" class="debug" fill="#ff0000" style="
+            "></text><text x="252.00002448645182" y="108.08944306951796" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: rtl; unicode-bidi: bidi-override;"><tspan>S</tspan></text><text x="246.75002448645182" y="102.83944306951796" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="266.9429426192616" y="87.84165502401135" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="270.8804426192616" y="82.59165502401135" class="debug" fill="#ff0000" style="
+            "></text><text x="266.9429426192616" y="87.84165502401135" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>O</tspan></text><text x="270.8804426192616" y="82.59165502401135" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="266.9429062701181" y="128.33727443424698" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="270.8804062701181" y="123.08727443424698" class="debug" fill="#ff0000" style="
+            "></text><text x="266.9429062701181" y="128.33727443424698" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>O</tspan></text><text x="270.8804062701181" y="123.08727443424698" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="231.00004897299243" y="75.55962871301196" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -3093,13 +1995,7 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="183.74997551340857" y="157.39898695868695" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="159.39962190581764" y="173.42252241858037" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>O</tspan></text><text x="154.14962190581764" y="168.17252241858037" class="debug" fill="#ff0000" style="
+            "></text><text x="159.39962190581764" y="173.42252241858037" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: rtl; unicode-bidi: bidi-override;"><tspan>O</tspan></text><text x="154.14962190581764" y="168.17252241858037" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="199.50001782972288" y="184.67876274651755" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -3144,13 +2040,7 @@ module.exports = [
                 }
             </style><g mask="url(#text-mask)"><line x1="287.51821257581315" y1="68.25012855429438" x2="287.5182337817739" y2="36.75012855430151" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-0')"></line><line x1="260.2384017536291" y1="84.00011018939006" x2="287.51821257581315" y2="68.25012855429438" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-1')"></line><line x1="254.56838213811665" y1="113.13760637231047" x2="254.5684001631833" y2="86.36260637231658" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-2')"></line><line x1="260.2383805476683" y1="115.5001101893829" x2="260.2384017536291" y2="84.00011018939006" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-3')"></line><line x1="232.95861213740585" y1="68.25009182449287" x2="260.2384017536291" y2="84.00011018939006" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-4')"></line><line x1="232.95856972548432" y1="131.2500918244786" x2="260.2383805476683" y2="115.5001101893829" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-5')"></line><line x1="210.55978382120287" y1="87.72919078494954" x2="233.74762302005928" y2="74.34170639511817" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-6')"></line><line x1="205.67880131522185" y1="84.0000734595886" x2="232.95861213740585" y2="68.25009182449287" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-7')"></line><line x1="210.55976763615928" y1="111.77096270602854" x2="233.74758880994904" y2="125.15847831619112" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-8')"></line><line x1="205.67878010926108" y1="115.50007345958144" x2="232.95856972548432" y2="131.2500918244786" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-9')"></line><line x1="205.67878010926108" y1="115.50007345958144" x2="205.67880131522185" y2="84.0000734595886" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-10')"></line><line x1="178.39896928707708" y1="131.25005509467718" x2="205.67878010926108" y2="115.50007345958144" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-11')"></line><line x1="151.11917967085378" y1="115.50003672978002" x2="178.39896928707708" y2="131.25005509467718" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-12')"></line><line x1="123.05035796601634" y1="125.15840379425049" x2="146.23819716487276" y2="111.77091940441909" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-13')"></line><line x1="123.83936884866976" y1="131.25001836487576" x2="151.11917967085378" y2="115.50003672978002" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-14')"></line><line x1="151.11917967085378" y1="115.50003672978002" x2="151.11920087681455" y2="84.00003672978713" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-15')"></line><line x1="96.55957923244651" y1="115.49999999997857" x2="123.83936884866976" y2="131.25001836487576" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-16')"></line><line x1="123.05039217612652" y1="74.34163187317748" x2="146.2382133499163" y2="87.72914748334003" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-17')"></line><line x1="123.83941126059126" y1="68.25001836489" x2="151.11920087681455" y2="84.00003672978713" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-18')"></line><line x1="69.27976841026249" y1="131.24998163507428" x2="96.55957923244651" y2="115.49999999997857" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-19')"></line><line x1="102.22958082289227" y1="113.13750381705205" x2="102.22959884795893" y2="86.36250381705815" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-20')"></line><line x1="96.55957923244651" y1="115.49999999997857" x2="96.55960043840727" y2="83.99999999998573" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-21')"></line><line x1="123.83941126059126" y1="68.25001836489" x2="123.839432466552" y2="36.75001836489713" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-22')"></line><line x1="96.55960043840727" y1="83.99999999998573" x2="123.83941126059126" y2="68.25001836489" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-23')"></line><line x1="69.27981082218399" y1="68.2499816350886" x2="96.55960043840727" y2="83.99999999998573" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-24')"></line><line x1="96.55964285032874" y1="21" x2="123.839432466552" y2="36.75001836489713" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-25')"></line><line x1="40.58250165284139" y1="81.54478029618775" x2="67.86231247502538" y2="65.79479866109205" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-26')"></line><line x1="43.41749834715861" y1="86.45514624418087" x2="70.6973091693426" y2="70.70516460908516" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-27')"></line><line x1="69.27981082218399" y1="68.2499816350886" x2="69.27983202814472" y2="36.74998163509571" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-28')"></line><line x1="69.27983202814472" y1="36.74998163509571" x2="96.55964285032874" y2="21" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-29')"></line></g><g><text x="287.5182337817739" y="36.75012855430151" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="283.58071257581315" y="73.50012855429438" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="287.51821257581315" y="68.25012855429438" class="debug" fill="#ff0000" style="
+            "></text><text x="283.58071257581315" y="73.50012855429438" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>O</tspan></text><text x="287.51821257581315" y="68.25012855429438" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="260.2384017536291" y="84.00011018939006" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -3160,23 +2050,11 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="205.67878010926108" y="115.50007345958144" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="178.39896928707708" y="123.37505509467718" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: ltr;
-            "><tspan>N</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="178.39896928707708" y="131.25005509467718" class="debug" fill="#ff0000" style="
+            "></text><text x="178.39896928707708" y="123.37505509467718" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: ltr;"><tspan>N</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="178.39896928707708" y="131.25005509467718" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="151.11917967085378" y="115.50003672978002" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="123.83936884866976" y="123.37501836487576" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: ltr;
-            "><tspan>N</tspan></text><text x="123.83936884866976" y="131.25001836487576" class="debug" fill="#ff0000" style="
+            "></text><text x="123.83936884866976" y="123.37501836487576" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: ltr;"><tspan>N</tspan></text><text x="123.83936884866976" y="131.25001836487576" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="96.55957923244651" y="115.49999999997857" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -3186,13 +2064,7 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="69.27981082218399" y="68.2499816350886" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="47.25" y="89.24996327018431" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>O</tspan></text><text x="42" y="83.99996327018431" class="debug" fill="#ff0000" style="
+            "></text><text x="47.25" y="89.24996327018431" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: rtl; unicode-bidi: bidi-override;"><tspan>O</tspan></text><text x="42" y="83.99996327018431" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="69.27983202814472" y="36.74998163509571" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -3202,13 +2074,7 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="123.83941126059126" y="68.25001836489" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="147.18170087681455" y="89.25003672978713" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>N</tspan></text><text x="151.11920087681455" y="84.00003672978713" class="debug" fill="#ff0000" style="
+            "></text><text x="147.18170087681455" y="89.25003672978713" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>N</tspan></text><text x="151.11920087681455" y="84.00003672978713" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="205.67880131522185" y="84.0000734595886" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -3231,23 +2097,11 @@ module.exports = [
                 .sub {
                     font: 8.4px Helvetica, Arial, sans-serif;
                 }
-            </style><g mask="url(#text-mask)"><line x1="240.2485063400009" y1="120.74015935019402" x2="271.06017914894585" y2="127.28926758830696" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-0')"></line><line x1="217.06404811737528" y1="142.25220532270274" x2="238.14169327668472" y2="118.84317128585617" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-1')"></line><line x1="221.2776742440076" y1="146.04618145137843" x2="242.35531940331705" y2="122.63714741453187" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-2')"></line><line x1="230.5144374037508" y1="90.78189000858599" x2="240.2485063400009" y2="120.74015935019402" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-3')"></line><line x1="227.88162107406376" y1="85.23224277437974" x2="245.79757073391917" y2="65.33451997036208" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-4')"></line><line x1="230.5144374037508" y1="90.78189000858599" x2="251.59202523887487" y2="67.3728043568005" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-5')"></line><line x1="199.70278063237666" y1="84.23270631876345" x2="230.5144374037508" y2="90.78189000858599" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-6')"></line><line x1="241.85795630262484" y1="37.41453501519243" x2="251.59202523887487" y2="67.3728043568005" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-7')"></line><line x1="174.21876608383357" y1="102.7479703592691" x2="199.70278063237666" y2="84.23270631876345" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-8')"></line><line x1="196.0912553478349" y1="54.76917476925101" x2="204.36521394364738" y2="80.23370370961786" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-9')"></line><line x1="189.9687116961267" y1="54.2744369771554" x2="199.70278063237666" y2="84.23270631876345" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-10')"></line><line x1="212.1783207249358" y1="36.902638320953926" x2="238.36822898060373" y2="42.46944445730308" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-11')"></line><line x1="211.04629953125075" y1="30.865351325369904" x2="241.85795630262484" y2="37.41453501519243" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-12')"></line><line x1="148.73470998678712" y1="84.23276350537226" x2="174.21876608383357" y2="102.7479703592691" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-13')"></line><line x1="171.38376608383535" y1="102.74797354016322" x2="171.38380142710324" y2="134.2479735401434" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-14')"></line><line x1="177.0537660838318" y1="102.74796717837499" x2="177.05380142709967" y2="134.24796717835517" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-15')"></line><line x1="189.9687116961267" y1="54.2744369771554" x2="211.04629953125075" y2="30.865351325369904" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-16')"></line><line x1="158.46871169614653" y1="54.27447232042334" x2="189.9687116961267" y2="54.2744369771554" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-17')"></line><line x1="148.73470998678712" y1="84.23276350537226" x2="158.46871169614653" y2="54.27447232042334" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-18')"></line><line x1="118.77644064517906" y1="93.96683244162226" x2="148.73470998678712" y2="84.23276350537226" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-19')"></line><line x1="95.36735499339355" y1="72.88924460649817" x2="118.77644064517906" y2="93.96683244162226" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-20')"></line><line x1="65.9038234438811" y1="76.50076989103997" x2="91.36835238424794" y2="68.22681129522746" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-21')"></line><line x1="65.40908565178549" y1="82.62331354274816" x2="95.36735499339355" y2="72.88924460649817" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-22')"></line><line x1="95.36735499339355" y1="72.88924460649817" x2="101.91653868321609" y2="42.077587835124035" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-23')"></line><line x1="58.85990196196295" y1="113.43497031412225" x2="65.40908565178549" y2="82.62331354274816" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-24')"></line><line x1="42" y1="61.545725707624115" x2="65.40908565178549" y2="82.62331354274816" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-25')"></line><line x1="76.46916864499215" y1="26.7944545049557" x2="96.36689144900984" y2="44.71040416481112" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-26')"></line><line x1="78.50745303143057" y1="21" x2="101.91653868321609" y2="42.077587835124035" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-27')"></line><line x1="101.91653868321609" y1="42.077587835124035" x2="131.8748080248241" y2="32.34351889887395" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-28')"></line><line x1="48.037286995584026" y1="60.41370451393911" x2="53.60409313193318" y2="34.22379625827116" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-29')"></line><line x1="42" y1="61.545725707624115" x2="48.54918368982254" y2="30.734068936250043" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-30')"></line><line x1="48.54918368982254" y1="30.734068936250043" x2="78.50745303143057" y2="21" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-31')"></line></g><g><text x="267.12267914894585" y="132.53926758830696" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>O</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="271.06017914894585" y="127.28926758830696" class="debug" fill="#ff0000" style="
+            </style><g mask="url(#text-mask)"><line x1="240.2485063400009" y1="120.74015935019402" x2="271.06017914894585" y2="127.28926758830696" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-0')"></line><line x1="217.06404811737528" y1="142.25220532270274" x2="238.14169327668472" y2="118.84317128585617" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-1')"></line><line x1="221.2776742440076" y1="146.04618145137843" x2="242.35531940331705" y2="122.63714741453187" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-2')"></line><line x1="230.5144374037508" y1="90.78189000858599" x2="240.2485063400009" y2="120.74015935019402" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-3')"></line><line x1="227.88162107406376" y1="85.23224277437974" x2="245.79757073391917" y2="65.33451997036208" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-4')"></line><line x1="230.5144374037508" y1="90.78189000858599" x2="251.59202523887487" y2="67.3728043568005" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-5')"></line><line x1="199.70278063237666" y1="84.23270631876345" x2="230.5144374037508" y2="90.78189000858599" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-6')"></line><line x1="241.85795630262484" y1="37.41453501519243" x2="251.59202523887487" y2="67.3728043568005" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-7')"></line><line x1="174.21876608383357" y1="102.7479703592691" x2="199.70278063237666" y2="84.23270631876345" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-8')"></line><line x1="196.0912553478349" y1="54.76917476925101" x2="204.36521394364738" y2="80.23370370961786" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-9')"></line><line x1="189.9687116961267" y1="54.2744369771554" x2="199.70278063237666" y2="84.23270631876345" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-10')"></line><line x1="212.1783207249358" y1="36.902638320953926" x2="238.36822898060373" y2="42.46944445730308" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-11')"></line><line x1="211.04629953125075" y1="30.865351325369904" x2="241.85795630262484" y2="37.41453501519243" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-12')"></line><line x1="148.73470998678712" y1="84.23276350537226" x2="174.21876608383357" y2="102.7479703592691" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-13')"></line><line x1="171.38376608383535" y1="102.74797354016322" x2="171.38380142710324" y2="134.2479735401434" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-14')"></line><line x1="177.0537660838318" y1="102.74796717837499" x2="177.05380142709967" y2="134.24796717835517" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-15')"></line><line x1="189.9687116961267" y1="54.2744369771554" x2="211.04629953125075" y2="30.865351325369904" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-16')"></line><line x1="158.46871169614653" y1="54.27447232042334" x2="189.9687116961267" y2="54.2744369771554" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-17')"></line><line x1="148.73470998678712" y1="84.23276350537226" x2="158.46871169614653" y2="54.27447232042334" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-18')"></line><line x1="118.77644064517906" y1="93.96683244162226" x2="148.73470998678712" y2="84.23276350537226" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-19')"></line><line x1="95.36735499339355" y1="72.88924460649817" x2="118.77644064517906" y2="93.96683244162226" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-20')"></line><line x1="65.9038234438811" y1="76.50076989103997" x2="91.36835238424794" y2="68.22681129522746" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-21')"></line><line x1="65.40908565178549" y1="82.62331354274816" x2="95.36735499339355" y2="72.88924460649817" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-22')"></line><line x1="95.36735499339355" y1="72.88924460649817" x2="101.91653868321609" y2="42.077587835124035" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-23')"></line><line x1="58.85990196196295" y1="113.43497031412225" x2="65.40908565178549" y2="82.62331354274816" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-24')"></line><line x1="42" y1="61.545725707624115" x2="65.40908565178549" y2="82.62331354274816" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-25')"></line><line x1="76.46916864499215" y1="26.7944545049557" x2="96.36689144900984" y2="44.71040416481112" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-26')"></line><line x1="78.50745303143057" y1="21" x2="101.91653868321609" y2="42.077587835124035" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-27')"></line><line x1="101.91653868321609" y1="42.077587835124035" x2="131.8748080248241" y2="32.34351889887395" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-28')"></line><line x1="48.037286995584026" y1="60.41370451393911" x2="53.60409313193318" y2="34.22379625827116" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-29')"></line><line x1="42" y1="61.545725707624115" x2="48.54918368982254" y2="30.734068936250043" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-30')"></line><line x1="48.54918368982254" y1="30.734068936250043" x2="78.50745303143057" y2="21" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-31')"></line></g><g><text x="267.12267914894585" y="132.53926758830696" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>O</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="271.06017914894585" y="127.28926758830696" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="240.2485063400009" y="120.74015935019402" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="213.92086118069145" y="149.39919338704058" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="219.17086118069145" y="144.14919338704058" class="debug" fill="#ff0000" style="
+            "></text><text x="213.92086118069145" y="149.39919338704058" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>O</tspan></text><text x="219.17086118069145" y="144.14919338704058" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="230.5144374037508" y="90.78189000858599" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -3261,13 +2115,7 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="158.46871169614653" y="54.27447232042334" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="153.98470998678712" y="89.48276350537226" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>N</tspan></text><text x="148.73470998678712" y="84.23276350537226" class="debug" fill="#ff0000" style="
+            "></text><text x="153.98470998678712" y="89.48276350537226" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: rtl; unicode-bidi: bidi-override;"><tspan>N</tspan></text><text x="148.73470998678712" y="84.23276350537226" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="118.77644064517906" y="93.96683244162226" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -3275,13 +2123,7 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="65.40908565178549" y="82.62331354274816" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="53.60990196196295" y="118.68497031412225" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>F</tspan></text><text x="58.85990196196295" y="113.43497031412225" class="debug" fill="#ff0000" style="
+            "></text><text x="53.60990196196295" y="118.68497031412225" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>F</tspan></text><text x="58.85990196196295" y="113.43497031412225" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="42" y="61.545725707624115" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -3291,13 +2133,7 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="101.91653868321609" y="42.077587835124035" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="127.93730802482409" y="37.59351889887395" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan style="
+            "></text><text x="127.93730802482409" y="37.59351889887395" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan style="
                 unicode-bidi: plaintext;
                 writing-mode: lr-tb;
                 letter-spacing: normal;
@@ -3306,13 +2142,7 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="174.21876608383357" y="102.7479703592691" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="168.96880142710145" y="139.49797035924928" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="174.21880142710145" y="134.24797035924928" class="debug" fill="#ff0000" style="
+            "></text><text x="168.96880142710145" y="139.49797035924928" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>O</tspan></text><text x="174.21880142710145" y="134.24797035924928" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="199.70278063237666" y="84.23270631876345" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -3333,25 +2163,13 @@ module.exports = [
                 .sub {
                     font: 8.4px Helvetica, Arial, sans-serif;
                 }
-            </style><g mask="url(#text-mask)"><line x1="254.5724633962868" y1="139.11096289453954" x2="270.32260924506403" y2="166.3906789073987" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-0')"></line><line x1="249.66211451397217" y1="141.94598914731947" x2="265.4122603627494" y2="169.22570516017862" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-1')"></line><line x1="252.11728895512948" y1="140.5284760209295" x2="267.86720990892866" y2="113.24863016452704" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-2')"></line><line x1="220.6172889551327" y1="140.52849015823668" x2="252.11728895512948" y2="140.5284760209295" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-3')"></line><line x1="254.5724493232846" y1="84.55130335573864" x2="270.32239476365265" y2="111.83113507489392" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-4')"></line><line x1="249.66207961383665" y1="87.38629353500488" x2="265.4120250542047" y2="114.66612525416016" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-5')"></line><line x1="267.86720990892866" y1="113.24863016452704" x2="299.3672099089255" y2="113.2486160272199" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-6')"></line><line x1="198.90357889213348" y1="160.76849019652735" x2="214.6415193005394" y2="139.10705310889477" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-7')"></line><line x1="202.1020649452434" y1="166.0125337907456" x2="220.6172889551327" y2="140.52849015823668" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-8')"></line><line x1="202.1020420705999" y1="115.04446314512904" x2="220.6172889551327" y2="140.52849015823668" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-9')"></line><line x1="305.45882430249526" y1="114.03762827684196" x2="318.8463138957168" y2="90.8497920821604" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-10')"></line><line x1="299.3672099089255" y1="113.2486160272199" x2="315.1171976656567" y2="85.96880873935925" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-11')"></line><line x1="299.3672099089255" y1="113.2486160272199" x2="315.1172221521911" y2="140.5284091777734" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-12')"></line><line x1="172.1437803132809" y1="156.27851191331382" x2="202.1020649452434" y2="166.0125337907456" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-13')"></line><line x1="197.04713497779267" y1="111.55473242011789" x2="202.61395874532047" y2="85.36482791205816" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-14')"></line><line x1="202.1020420705999" y1="115.04446314512904" x2="208.6512465029856" y2="84.23281078270583" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-15')"></line><line x1="172.14376617597375" y1="124.778511913317" x2="202.1020420705999" y2="115.04446314512904" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-16')"></line><line x1="315.1171976656567" y1="85.96880873935925" x2="346.6171976656536" y2="85.96879460205207" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-17')"></line><line x1="317.47971960747554" y1="134.85840811747593" x2="344.2547196074729" y2="134.85839610076482" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-18')"></line><line x1="315.1172221521911" y1="140.5284091777734" x2="346.61722215218794" y2="140.5283950404662" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-19')"></line><line x1="172.14376617597375" y1="124.778511913317" x2="172.1437803132809" y2="156.27851191331382" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-20')"></line><line x1="185.24217504074508" y1="63.15520718847057" x2="208.6512465029856" y2="84.23281078270583" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-21')"></line><line x1="154.28434372036364" y1="101.06809572544611" x2="174.18205446326806" y2="118.98405878054606" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-22')"></line><line x1="148.73469471373326" y1="103.70090831908175" x2="172.14376617597375" y2="124.778511913317" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-23')"></line><line x1="342.8880858167989" y1="90.84978129213138" x2="356.27559622357455" y2="114.03760547010185" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-24')"></line><line x1="346.6171976656536" y1="85.96879460205207" x2="362.3672099089191" y2="113.24858775260554" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-25')"></line><line x1="346.61722215218794" y1="140.5283950404662" x2="362.3672099089191" y2="113.24858775260554" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-26')"></line><line x1="159.28289861648975" y1="77.55169196007714" x2="184.74743312692195" y2="69.27775050711736" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-27')"></line><line x1="155.28389914611893" y1="72.88925595665853" x2="185.24217504074508" y2="63.15520718847057" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-28')"></line><line x1="118.7764188191071" y1="113.43495708726971" x2="148.73469471373326" y2="103.70090831908175" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-29')"></line><line x1="148.73469471373326" y1="103.70090831908175" x2="155.28389914611893" y2="72.88925595665853" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-30')"></line><line x1="131.8748276838784" y1="51.811652362423274" x2="155.28389914611893" y2="72.88925595665853" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-31')"></line><line x1="109.45416567410338" y1="143.6571810507782" x2="116.00337010648902" y2="112.84552868835499" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-32')"></line><line x1="115.00026309933956" y1="144.83603784860765" x2="121.5494675317252" y2="114.02438548618443" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-33')"></line><line x1="95.36734735686662" y1="92.35735349303448" x2="118.7764188191071" y2="113.43495708726971" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-34')"></line><line x1="101.91655178925228" y1="61.54570113061129" x2="131.8748276838784" y2="51.811652362423274" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-35')"></line><line x1="134.64787639649649" y1="52.401080761337994" x2="141.19708082888206" y2="21.58942839891472" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-36')"></line><line x1="129.10177897126033" y1="51.222223963508554" x2="135.65098340364588" y2="20.41057160108528" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-37')"></line><line x1="65.90381337606362" y1="95.96885894257568" x2="91.36834788649583" y2="87.69491748961588" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-38')"></line><line x1="65.40907146224049" y1="102.09140226122247" x2="95.36734735686662" y2="92.35735349303448" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-39')"></line><line x1="95.36734735686662" y1="92.35735349303448" x2="101.91655178925228" y2="61.54570113061129" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-40')"></line><line x1="76.46919203971747" y1="46.262550669147004" x2="96.36690278262189" y2="64.17851372424693" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-41')"></line><line x1="78.50748032701178" y1="40.468097536376035" x2="101.91655178925228" y2="61.54570113061129" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-42')"></line><line x1="42" y1="81.01379866698724" x2="65.40907146224049" y2="102.09140226122247" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-43')"></line><line x1="48.54920443238565" y1="50.20214630456405" x2="78.50748032701178" y2="40.468097536376035" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-44')"></line><line x1="48.0372877576651" y1="79.88178153763491" x2="53.604111525192906" y2="53.69187702957521" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-45')"></line><line x1="42" y1="81.01379866698724" x2="48.54920443238565" y2="50.20214630456405" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-46')"></line></g><g><text x="262.6174348039067" y="173.05819203378866" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="267.8674348039067" y="167.80819203378866" class="debug" fill="#ff0000" style="
+            </style><g mask="url(#text-mask)"><line x1="254.5724633962868" y1="139.11096289453954" x2="270.32260924506403" y2="166.3906789073987" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-0')"></line><line x1="249.66211451397217" y1="141.94598914731947" x2="265.4122603627494" y2="169.22570516017862" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-1')"></line><line x1="252.11728895512948" y1="140.5284760209295" x2="267.86720990892866" y2="113.24863016452704" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-2')"></line><line x1="220.6172889551327" y1="140.52849015823668" x2="252.11728895512948" y2="140.5284760209295" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-3')"></line><line x1="254.5724493232846" y1="84.55130335573864" x2="270.32239476365265" y2="111.83113507489392" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-4')"></line><line x1="249.66207961383665" y1="87.38629353500488" x2="265.4120250542047" y2="114.66612525416016" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-5')"></line><line x1="267.86720990892866" y1="113.24863016452704" x2="299.3672099089255" y2="113.2486160272199" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-6')"></line><line x1="198.90357889213348" y1="160.76849019652735" x2="214.6415193005394" y2="139.10705310889477" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-7')"></line><line x1="202.1020649452434" y1="166.0125337907456" x2="220.6172889551327" y2="140.52849015823668" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-8')"></line><line x1="202.1020420705999" y1="115.04446314512904" x2="220.6172889551327" y2="140.52849015823668" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-9')"></line><line x1="305.45882430249526" y1="114.03762827684196" x2="318.8463138957168" y2="90.8497920821604" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-10')"></line><line x1="299.3672099089255" y1="113.2486160272199" x2="315.1171976656567" y2="85.96880873935925" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-11')"></line><line x1="299.3672099089255" y1="113.2486160272199" x2="315.1172221521911" y2="140.5284091777734" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-12')"></line><line x1="172.1437803132809" y1="156.27851191331382" x2="202.1020649452434" y2="166.0125337907456" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-13')"></line><line x1="197.04713497779267" y1="111.55473242011789" x2="202.61395874532047" y2="85.36482791205816" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-14')"></line><line x1="202.1020420705999" y1="115.04446314512904" x2="208.6512465029856" y2="84.23281078270583" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-15')"></line><line x1="172.14376617597375" y1="124.778511913317" x2="202.1020420705999" y2="115.04446314512904" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-16')"></line><line x1="315.1171976656567" y1="85.96880873935925" x2="346.6171976656536" y2="85.96879460205207" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-17')"></line><line x1="317.47971960747554" y1="134.85840811747593" x2="344.2547196074729" y2="134.85839610076482" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-18')"></line><line x1="315.1172221521911" y1="140.5284091777734" x2="346.61722215218794" y2="140.5283950404662" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-19')"></line><line x1="172.14376617597375" y1="124.778511913317" x2="172.1437803132809" y2="156.27851191331382" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-20')"></line><line x1="185.24217504074508" y1="63.15520718847057" x2="208.6512465029856" y2="84.23281078270583" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-21')"></line><line x1="154.28434372036364" y1="101.06809572544611" x2="174.18205446326806" y2="118.98405878054606" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-22')"></line><line x1="148.73469471373326" y1="103.70090831908175" x2="172.14376617597375" y2="124.778511913317" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-23')"></line><line x1="342.8880858167989" y1="90.84978129213138" x2="356.27559622357455" y2="114.03760547010185" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-24')"></line><line x1="346.6171976656536" y1="85.96879460205207" x2="362.3672099089191" y2="113.24858775260554" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-25')"></line><line x1="346.61722215218794" y1="140.5283950404662" x2="362.3672099089191" y2="113.24858775260554" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-26')"></line><line x1="159.28289861648975" y1="77.55169196007714" x2="184.74743312692195" y2="69.27775050711736" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-27')"></line><line x1="155.28389914611893" y1="72.88925595665853" x2="185.24217504074508" y2="63.15520718847057" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-28')"></line><line x1="118.7764188191071" y1="113.43495708726971" x2="148.73469471373326" y2="103.70090831908175" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-29')"></line><line x1="148.73469471373326" y1="103.70090831908175" x2="155.28389914611893" y2="72.88925595665853" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-30')"></line><line x1="131.8748276838784" y1="51.811652362423274" x2="155.28389914611893" y2="72.88925595665853" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-31')"></line><line x1="109.45416567410338" y1="143.6571810507782" x2="116.00337010648902" y2="112.84552868835499" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-32')"></line><line x1="115.00026309933956" y1="144.83603784860765" x2="121.5494675317252" y2="114.02438548618443" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-33')"></line><line x1="95.36734735686662" y1="92.35735349303448" x2="118.7764188191071" y2="113.43495708726971" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-34')"></line><line x1="101.91655178925228" y1="61.54570113061129" x2="131.8748276838784" y2="51.811652362423274" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-35')"></line><line x1="134.64787639649649" y1="52.401080761337994" x2="141.19708082888206" y2="21.58942839891472" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-36')"></line><line x1="129.10177897126033" y1="51.222223963508554" x2="135.65098340364588" y2="20.41057160108528" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-37')"></line><line x1="65.90381337606362" y1="95.96885894257568" x2="91.36834788649583" y2="87.69491748961588" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-38')"></line><line x1="65.40907146224049" y1="102.09140226122247" x2="95.36734735686662" y2="92.35735349303448" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-39')"></line><line x1="95.36734735686662" y1="92.35735349303448" x2="101.91655178925228" y2="61.54570113061129" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-40')"></line><line x1="76.46919203971747" y1="46.262550669147004" x2="96.36690278262189" y2="64.17851372424693" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-41')"></line><line x1="78.50748032701178" y1="40.468097536376035" x2="101.91655178925228" y2="61.54570113061129" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-42')"></line><line x1="42" y1="81.01379866698724" x2="65.40907146224049" y2="102.09140226122247" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-43')"></line><line x1="48.54920443238565" y1="50.20214630456405" x2="78.50748032701178" y2="40.468097536376035" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-44')"></line><line x1="48.0372877576651" y1="79.88178153763491" x2="53.604111525192906" y2="53.69187702957521" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-45')"></line><line x1="42" y1="81.01379866698724" x2="48.54920443238565" y2="50.20214630456405" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-46')"></line></g><g><text x="262.6174348039067" y="173.05819203378866" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>O</tspan></text><text x="267.8674348039067" y="167.80819203378866" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="252.11728895512948" y="140.5284760209295" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="267.86720990892866" y="113.24863016452704" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="246.86726446856062" y="91.21879844537176" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="252.11726446856062" y="85.96879844537176" class="debug" fill="#ff0000" style="
+            "></text><text x="246.86726446856062" y="91.21879844537176" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>O</tspan></text><text x="252.11726446856062" y="85.96879844537176" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="299.3672099089255" y="113.2486160272199" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -3367,21 +2185,9 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="220.6172889551327" y="140.52849015823668" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="202.1020649452434" y="158.1375337907456" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: ltr;
-            "><tspan>N</tspan></text><text x="202.1020649452434" y="166.0125337907456" class="debug" fill="#ff0000" style="
+            "></text><text x="202.1020649452434" y="158.1375337907456" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: ltr;"><tspan>N</tspan></text><text x="202.1020649452434" y="166.0125337907456" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="177.3937803132809" y="161.52851191331382" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>N</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="172.1437803132809" y="156.27851191331382" class="debug" fill="#ff0000" style="
+            "></text><text x="177.3937803132809" y="161.52851191331382" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: rtl; unicode-bidi: bidi-override;"><tspan>N</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="172.1437803132809" y="156.27851191331382" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="172.14376617597375" y="124.778511913317" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -3389,13 +2195,7 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="118.7764188191071" y="113.43495708726971" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="106.97721438672147" y="149.49660944969293" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="112.22721438672147" y="144.24660944969293" class="debug" fill="#ff0000" style="
+            "></text><text x="106.97721438672147" y="149.49660944969293" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>O</tspan></text><text x="112.22721438672147" y="144.24660944969293" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="95.36734735686662" y="92.35735349303448" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -3411,13 +2211,7 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="131.8748276838784" y="51.811652362423274" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="133.17403211626396" y="26.25" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="138.42403211626396" y="21" class="debug" fill="#ff0000" style="
+            "></text><text x="133.17403211626396" y="26.25" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>O</tspan></text><text x="138.42403211626396" y="21" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="155.28389914611893" y="72.88925595665853" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -3443,87 +2237,33 @@ module.exports = [
                 .sub {
                     font: 8.4px Helvetica, Arial, sans-serif;
                 }
-            </style><g mask="url(#text-mask)"><line x1="209.23820226004725" y1="92.57528584789782" x2="238.01484705093813" y2="79.76299820755455" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-0')"></line><line x1="203.12602403155634" y1="123.60637513434021" x2="206.41873327936023" y2="92.27894201559546" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-1')"></line><line x1="208.76496199293038" y1="124.19906279894492" x2="212.05767124073427" y2="92.87162968020016" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-2')"></line><line x1="183.7541586275383" y1="74.06006183800855" x2="209.23820226004725" y2="92.57528584789782" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-3')"></line><line x1="183.7541444902311" y1="42.560061838011706" x2="183.7541586275383" y2="74.06006183800855" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-4')"></line><line x1="154.2906246467353" y1="77.67156728754972" x2="179.7551591571675" y2="69.39762583458995" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-5')"></line><line x1="153.79588273291216" y1="83.79411060619653" x2="183.7541586275383" y2="74.06006183800855" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-6')"></line><line x1="154.2906072677281" y1="38.9485828351406" x2="179.7551492048962" y2="47.22250143095758" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-7')"></line><line x1="153.7958598582686" y1="32.826039960579976" x2="183.7541444902311" y2="42.560061838011706" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-8')"></line><line x1="135.28063584837935" y1="58.310083593088905" x2="153.79588273291216" y2="83.79411060619653" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-9')"></line><line x1="145.41573572540182" y1="114.15894447915746" x2="153.79588273291216" y2="83.79411060619653" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-10')"></line><line x1="135.28063584837935" y1="58.310083593088905" x2="153.7958598582686" y2="32.826039960579976" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-11')"></line><line x1="103.81235361806321" y1="56.89685556011969" x2="135.28063584837935" y2="58.310083593088905" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-12')"></line><line x1="116.45061644634964" y1="126.53924597590138" x2="145.41573572540182" y2="114.15894447915746" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-13')"></line><line x1="89.02914440518879" y1="31.155846807190315" x2="97.68309435527391" y2="56.493758624493324" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-14')"></line><line x1="93.6312360297278" y1="27.087547539763207" x2="103.81235361806321" y2="56.89685556011969" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-15')"></line><line x1="83.087294397367" y1="80.61861604071292" x2="103.81235361806321" y2="56.89685556011969" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-16')"></line><line x1="105.669046569281" y1="154.19608160899372" x2="110.44989560391639" y2="127.85136472860144" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-17')"></line><line x1="110.826088170308" y1="157.53303054106877" x2="116.45061644634964" y2="126.53924597590138" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-18')"></line><line x1="88.71185049363834" y1="111.61239555725297" x2="116.45061644634964" y2="126.53924597590138" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-19')"></line><line x1="62.725059220696195" y1="21" x2="93.6312360297278" y2="27.087547539763207" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-20')"></line><line x1="83.087294397367" y1="80.61861604071292" x2="88.71185049363834" y2="111.61239555725297" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-21')"></line><line x1="55.594839406170145" y1="69.42452274080625" x2="81.86508969384701" y2="74.59893814960499" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-22')"></line><line x1="52.1811175883354" y1="74.5310685009497" x2="83.087294397367" y2="80.61861604071292" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-23')"></line><line x1="79.61117257231811" y1="161.7613924236857" x2="110.826088170308" y2="157.53303054106877" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-24')"></line><line x1="110.826088170308" y1="157.53303054106877" x2="132.59457183176505" y2="180.30105898186434" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-25')"></line><line x1="65.94382205284273" y1="133.38087921871005" x2="88.71185049363834" y2="111.61239555725297" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-26')"></line><line x1="47.824296328059" y1="46.67313910427407" x2="65.44059666565076" y2="26.5096426957698" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-27')"></line><line x1="42" y1="44.72176048059325" x2="62.725059220696195" y2="21" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-28')"></line><line x1="42" y1="44.72176048059325" x2="52.1811175883354" y2="74.5310685009497" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-29')"></line><line x1="72.07736571869901" y1="133.04929461557765" x2="83.69461366025305" y2="157.17273083980695" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-30')"></line><line x1="65.94382205284273" y1="133.38087921871005" x2="79.61117257231811" y2="161.7613924236857" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-31')"></line><line x1="132.59457183176505" y1="180.30105898186434" x2="163.19648639844186" y2="172.83293841147892" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-32')"></line><line x1="121.0398038767581" y1="209.7420943323058" x2="129.8733271120197" y2="179.5060418906908" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-33')"></line><line x1="126.48229331624881" y1="211.3321285146529" x2="135.3158165515104" y2="181.0960760730379" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-34')"></line></g><g><text x="234.07734705093813" y="85.01299820755455" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>N</tspan><tspan style="unicode-bidi: plaintext;">H<tspan baseline-shift="sub" class="sub">2</tspan></tspan></text><text x="238.01484705093813" y="79.76299820755455" class="debug" fill="#ff0000" style="
+            </style><g mask="url(#text-mask)"><line x1="209.23820226004725" y1="92.57528584789782" x2="238.01484705093813" y2="79.76299820755455" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-0')"></line><line x1="203.12602403155634" y1="123.60637513434021" x2="206.41873327936023" y2="92.27894201559546" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-1')"></line><line x1="208.76496199293038" y1="124.19906279894492" x2="212.05767124073427" y2="92.87162968020016" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-2')"></line><line x1="183.7541586275383" y1="74.06006183800855" x2="209.23820226004725" y2="92.57528584789782" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-3')"></line><line x1="183.7541444902311" y1="42.560061838011706" x2="183.7541586275383" y2="74.06006183800855" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-4')"></line><line x1="154.2906246467353" y1="77.67156728754972" x2="179.7551591571675" y2="69.39762583458995" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-5')"></line><line x1="153.79588273291216" y1="83.79411060619653" x2="183.7541586275383" y2="74.06006183800855" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-6')"></line><line x1="154.2906072677281" y1="38.9485828351406" x2="179.7551492048962" y2="47.22250143095758" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-7')"></line><line x1="153.7958598582686" y1="32.826039960579976" x2="183.7541444902311" y2="42.560061838011706" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-8')"></line><line x1="135.28063584837935" y1="58.310083593088905" x2="153.79588273291216" y2="83.79411060619653" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-9')"></line><line x1="145.41573572540182" y1="114.15894447915746" x2="153.79588273291216" y2="83.79411060619653" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-10')"></line><line x1="135.28063584837935" y1="58.310083593088905" x2="153.7958598582686" y2="32.826039960579976" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-11')"></line><line x1="103.81235361806321" y1="56.89685556011969" x2="135.28063584837935" y2="58.310083593088905" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-12')"></line><line x1="116.45061644634964" y1="126.53924597590138" x2="145.41573572540182" y2="114.15894447915746" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-13')"></line><line x1="89.02914440518879" y1="31.155846807190315" x2="97.68309435527391" y2="56.493758624493324" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-14')"></line><line x1="93.6312360297278" y1="27.087547539763207" x2="103.81235361806321" y2="56.89685556011969" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-15')"></line><line x1="83.087294397367" y1="80.61861604071292" x2="103.81235361806321" y2="56.89685556011969" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-16')"></line><line x1="105.669046569281" y1="154.19608160899372" x2="110.44989560391639" y2="127.85136472860144" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-17')"></line><line x1="110.826088170308" y1="157.53303054106877" x2="116.45061644634964" y2="126.53924597590138" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-18')"></line><line x1="88.71185049363834" y1="111.61239555725297" x2="116.45061644634964" y2="126.53924597590138" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-19')"></line><line x1="62.725059220696195" y1="21" x2="93.6312360297278" y2="27.087547539763207" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-20')"></line><line x1="83.087294397367" y1="80.61861604071292" x2="88.71185049363834" y2="111.61239555725297" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-21')"></line><line x1="55.594839406170145" y1="69.42452274080625" x2="81.86508969384701" y2="74.59893814960499" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-22')"></line><line x1="52.1811175883354" y1="74.5310685009497" x2="83.087294397367" y2="80.61861604071292" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-23')"></line><line x1="79.61117257231811" y1="161.7613924236857" x2="110.826088170308" y2="157.53303054106877" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-24')"></line><line x1="110.826088170308" y1="157.53303054106877" x2="132.59457183176505" y2="180.30105898186434" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-25')"></line><line x1="65.94382205284273" y1="133.38087921871005" x2="88.71185049363834" y2="111.61239555725297" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-26')"></line><line x1="47.824296328059" y1="46.67313910427407" x2="65.44059666565076" y2="26.5096426957698" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-27')"></line><line x1="42" y1="44.72176048059325" x2="62.725059220696195" y2="21" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-28')"></line><line x1="42" y1="44.72176048059325" x2="52.1811175883354" y2="74.5310685009497" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-29')"></line><line x1="72.07736571869901" y1="133.04929461557765" x2="83.69461366025305" y2="157.17273083980695" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-30')"></line><line x1="65.94382205284273" y1="133.38087921871005" x2="79.61117257231811" y2="161.7613924236857" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-31')"></line><line x1="132.59457183176505" y1="180.30105898186434" x2="163.19648639844186" y2="172.83293841147892" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-32')"></line><line x1="121.0398038767581" y1="209.7420943323058" x2="129.8733271120197" y2="179.5060418906908" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-33')"></line><line x1="126.48229331624881" y1="211.3321285146529" x2="135.3158165515104" y2="181.0960760730379" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-34')"></line></g><g><text x="234.07734705093813" y="85.01299820755455" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>N</tspan><tspan style="unicode-bidi: plaintext;">H<tspan baseline-shift="sub" class="sub">2</tspan></tspan></text><text x="238.01484705093813" y="79.76299820755455" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="209.23820226004725" y="92.57528584789782" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="200.69549301224336" y="129.15271896664257" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="205.94549301224336" y="123.90271896664257" class="debug" fill="#ff0000" style="
+            "></text><text x="200.69549301224336" y="129.15271896664257" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>O</tspan></text><text x="205.94549301224336" y="123.90271896664257" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="183.7541586275383" y="74.06006183800855" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="179.8166444902311" y="47.810061838011706" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>N</tspan></text><text x="183.7541444902311" y="42.560061838011706" class="debug" fill="#ff0000" style="
+            "></text><text x="179.8166444902311" y="47.810061838011706" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>N</tspan></text><text x="183.7541444902311" y="42.560061838011706" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="153.7958598582686" y="40.701039960579976" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>N</tspan></text><text x="153.7958598582686" y="32.826039960579976" class="debug" fill="#ff0000" style="
+            "></text><text x="153.7958598582686" y="40.701039960579976" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: rtl; unicode-bidi: bidi-override;"><tspan>N</tspan></text><text x="153.7958598582686" y="32.826039960579976" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="140.53063584837935" y="63.560083593088905" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>N</tspan></text><text x="135.28063584837935" y="58.310083593088905" class="debug" fill="#ff0000" style="
+            "></text><text x="140.53063584837935" y="63.560083593088905" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: rtl; unicode-bidi: bidi-override;"><tspan>N</tspan></text><text x="135.28063584837935" y="58.310083593088905" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="153.79588273291216" y="83.79411060619653" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="141.47823572540182" y="119.40894447915746" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>S</tspan></text><text x="145.41573572540182" y="114.15894447915746" class="debug" fill="#ff0000" style="
+            "></text><text x="141.47823572540182" y="119.40894447915746" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>S</tspan></text><text x="145.41573572540182" y="114.15894447915746" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="116.45061644634964" y="126.53924597590138" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="110.826088170308" y="157.53303054106877" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="79.61117257231811" y="153.8863924236857" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: ltr;
-            "><tspan>N</tspan></text><text x="79.61117257231811" y="161.7613924236857" class="debug" fill="#ff0000" style="
+            "></text><text x="79.61117257231811" y="153.8863924236857" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: ltr;"><tspan>N</tspan></text><text x="79.61117257231811" y="161.7613924236857" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="71.19382205284273" y="138.63087921871005" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>N</tspan></text><text x="65.94382205284273" y="133.38087921871005" class="debug" fill="#ff0000" style="
+            "></text><text x="71.19382205284273" y="138.63087921871005" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: rtl; unicode-bidi: bidi-override;"><tspan>N</tspan></text><text x="65.94382205284273" y="133.38087921871005" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="88.71185049363834" y="119.48739555725297" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>N</tspan></text><text x="88.71185049363834" y="111.61239555725297" class="debug" fill="#ff0000" style="
+            "></text><text x="88.71185049363834" y="119.48739555725297" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: rtl; unicode-bidi: bidi-override;"><tspan>N</tspan></text><text x="88.71185049363834" y="111.61239555725297" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="83.087294397367" y="80.61861604071292" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -3539,21 +2279,9 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="132.59457183176505" y="180.30105898186434" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="159.25898639844186" y="178.08293841147892" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>O</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="163.19648639844186" y="172.83293841147892" class="debug" fill="#ff0000" style="
+            "></text><text x="159.25898639844186" y="178.08293841147892" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>O</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="163.19648639844186" y="172.83293841147892" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="118.51104859650346" y="215.78711142347936" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="123.76104859650346" y="210.53711142347936" class="debug" fill="#ff0000" style="
+            "></text><text x="118.51104859650346" y="215.78711142347936" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>O</tspan></text><text x="123.76104859650346" y="210.53711142347936" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text></g></svg></div></div>
  `
@@ -3574,13 +2302,7 @@ module.exports = [
                 }
             </style><g mask="url(#text-mask)"><line x1="287.51821257581315" y1="68.25012855429438" x2="287.5182337817739" y2="36.75012855430151" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-0')"></line><line x1="260.2384017536291" y1="84.00011018939006" x2="287.51821257581315" y2="68.25012855429438" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-1')"></line><line x1="254.56838213811665" y1="113.13760637231047" x2="254.5684001631833" y2="86.36260637231658" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-2')"></line><line x1="260.2383805476683" y1="115.5001101893829" x2="260.2384017536291" y2="84.00011018939006" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-3')"></line><line x1="232.95861213740585" y1="68.25009182449287" x2="260.2384017536291" y2="84.00011018939006" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-4')"></line><line x1="232.95856972548432" y1="131.2500918244786" x2="260.2383805476683" y2="115.5001101893829" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-5')"></line><line x1="210.55978382120287" y1="87.72919078494954" x2="233.74762302005928" y2="74.34170639511817" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-6')"></line><line x1="205.67880131522185" y1="84.0000734595886" x2="232.95861213740585" y2="68.25009182449287" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-7')"></line><line x1="210.55976763615928" y1="111.77096270602854" x2="233.74758880994904" y2="125.15847831619112" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-8')"></line><line x1="205.67878010926108" y1="115.50007345958144" x2="232.95856972548432" y2="131.2500918244786" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-9')"></line><line x1="205.67878010926108" y1="115.50007345958144" x2="205.67880131522185" y2="84.0000734595886" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-10')"></line><line x1="178.39896928707708" y1="131.25005509467718" x2="205.67878010926108" y2="115.50007345958144" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-11')"></line><line x1="151.11917967085378" y1="115.50003672978002" x2="178.39896928707708" y2="131.25005509467718" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-12')"></line><line x1="123.05035796601634" y1="125.15840379425049" x2="146.23819716487276" y2="111.77091940441909" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-13')"></line><line x1="123.83936884866976" y1="131.25001836487576" x2="151.11917967085378" y2="115.50003672978002" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-14')"></line><line x1="151.11917967085378" y1="115.50003672978002" x2="151.11920087681455" y2="84.00003672978713" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-15')"></line><line x1="96.55957923244651" y1="115.49999999997857" x2="123.83936884866976" y2="131.25001836487576" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-16')"></line><line x1="123.05039217612652" y1="74.34163187317748" x2="146.2382133499163" y2="87.72914748334003" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-17')"></line><line x1="123.83941126059126" y1="68.25001836489" x2="151.11920087681455" y2="84.00003672978713" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-18')"></line><line x1="69.27976841026249" y1="131.24998163507428" x2="96.55957923244651" y2="115.49999999997857" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-19')"></line><line x1="102.22958082289227" y1="113.13750381705205" x2="102.22959884795893" y2="86.36250381705815" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-20')"></line><line x1="96.55957923244651" y1="115.49999999997857" x2="96.55960043840727" y2="83.99999999998573" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-21')"></line><line x1="123.83941126059126" y1="68.25001836489" x2="123.839432466552" y2="36.75001836489713" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-22')"></line><line x1="96.55960043840727" y1="83.99999999998573" x2="123.83941126059126" y2="68.25001836489" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-23')"></line><line x1="69.27981082218399" y1="68.2499816350886" x2="96.55960043840727" y2="83.99999999998573" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-24')"></line><line x1="96.55964285032874" y1="21" x2="123.839432466552" y2="36.75001836489713" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-25')"></line><line x1="40.58250165284139" y1="81.54478029618775" x2="67.86231247502538" y2="65.79479866109205" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-26')"></line><line x1="43.41749834715861" y1="86.45514624418087" x2="70.6973091693426" y2="70.70516460908516" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-27')"></line><line x1="69.27981082218399" y1="68.2499816350886" x2="69.27983202814472" y2="36.74998163509571" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-28')"></line><line x1="69.27983202814472" y1="36.74998163509571" x2="96.55964285032874" y2="21" style="stroke-linecap:round;stroke-dasharray:none;stroke-width:1.26" stroke="url('#line-29')"></line></g><g><text x="287.5182337817739" y="36.75012855430151" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="283.58071257581315" y="73.50012855429438" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>O</tspan></text><text x="287.51821257581315" y="68.25012855429438" class="debug" fill="#ff0000" style="
+            "></text><text x="283.58071257581315" y="73.50012855429438" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>O</tspan></text><text x="287.51821257581315" y="68.25012855429438" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="260.2384017536291" y="84.00011018939006" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -3590,23 +2312,11 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="205.67878010926108" y="115.50007345958144" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="178.39896928707708" y="123.37505509467718" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: ltr;
-            "><tspan>N</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="178.39896928707708" y="131.25005509467718" class="debug" fill="#ff0000" style="
+            "></text><text x="178.39896928707708" y="123.37505509467718" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: ltr;"><tspan>N</tspan><tspan style="unicode-bidi: plaintext;">H</tspan></text><text x="178.39896928707708" y="131.25005509467718" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="151.11917967085378" y="115.50003672978002" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="123.83936884866976" y="123.37501836487576" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: -1px;
-                direction: ltr;
-            "><tspan>N</tspan></text><text x="123.83936884866976" y="131.25001836487576" class="debug" fill="#ff0000" style="
+            "></text><text x="123.83936884866976" y="123.37501836487576" class="element" fill="#222" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: ltr;"><tspan>N</tspan></text><text x="123.83936884866976" y="131.25001836487576" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="96.55957923244651" y="115.49999999997857" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -3616,13 +2326,7 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="69.27981082218399" y="68.2499816350886" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="47.25" y="89.24996327018431" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: rtl; unicode-bidi: bidi-override;
-            "><tspan>O</tspan></text><text x="42" y="83.99996327018431" class="debug" fill="#ff0000" style="
+            "></text><text x="47.25" y="89.24996327018431" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: rtl; unicode-bidi: bidi-override;"><tspan>O</tspan></text><text x="42" y="83.99996327018431" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="69.27983202814472" y="36.74998163509571" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
@@ -3632,13 +2336,7 @@ module.exports = [
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="123.83941126059126" y="68.25001836489" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
-            "></text><text x="147.18170087681455" y="89.25003672978713" class="element" fill="#222" style="
-                text-anchor: start;
-                writing-mode: horizontal-tb;
-                text-orientation: mixed;
-                letter-spacing: normal;
-                direction: ltr;
-            "><tspan>N</tspan></text><text x="151.11920087681455" y="84.00003672978713" class="debug" fill="#ff0000" style="
+            "></text><text x="147.18170087681455" y="89.25003672978713" class="element" fill="#222" style="text-anchor: start; writing-mode: horizontal-tb; text-orientation: mixed; letter-spacing: normal; direction: ltr;"><tspan>N</tspan></text><text x="151.11920087681455" y="84.00003672978713" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;
             "></text><text x="205.67880131522185" y="84.0000734595886" class="debug" fill="#ff0000" style="
                 font: 5px Droid Sans, sans-serif;

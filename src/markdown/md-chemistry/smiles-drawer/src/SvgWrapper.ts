@@ -512,7 +512,7 @@ class SvgWrapper {
       writingModeOld = this.opts.supportSvg1
         ? 'tb'
         : '';
-      textOrientationOld = 'glyph-orientation-vertical: 0;'; // Need for Arora
+      textOrientationOld = 'glyph-orientation-vertical: 0;'; // Need for Arora and Safari
       letterSpacing = '-1px';
     }
 
@@ -554,26 +554,18 @@ class SvgWrapper {
     textElem.setAttributeNS(null, 'y', pos.y + yShift);
     textElem.setAttributeNS(null, 'class', elementClassName);
     textElem.setAttributeNS(null, 'fill', this.themeManager.getColor(elementName));
-    if (this.opts.supportSvg1
-      && (writingModeOld || textOrientationOld)) {
-      textElem.setAttributeNS(null, 'style', `
-                  text-anchor: start;
-                  writing-mode: ${writingModeOld};
-                  ${textOrientationOld ? textOrientationOld : ''}
-                  writing-mode: ${writingMode};
-                  text-orientation: ${textOrientation};
-                  letter-spacing: ${letterSpacing};
-                  ${textDirection}
-              `);
-    } else {
-      textElem.setAttributeNS(null, 'style', `
-                text-anchor: start;
-                writing-mode: ${writingMode};
-                text-orientation: ${textOrientation};
-                letter-spacing: ${letterSpacing};
-                ${textDirection}
-            `);
+    let style = ['text-anchor: start;'];
+    if (this.opts.supportSvg1 && writingModeOld) {
+      style.push(`writing-mode: ${writingModeOld};`);
     }
+    if (textOrientationOld) {
+      style.push(textOrientationOld);
+    }
+    style.push(`writing-mode: ${writingMode};`);
+    style.push(`text-orientation: ${textOrientation};`);
+    style.push(`letter-spacing: ${letterSpacing};`);
+    style.push(textDirection);
+    textElem.setAttributeNS(null, 'style', style.join(' '));
 
     let textNode = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
     // special case for element names that are 2 letters

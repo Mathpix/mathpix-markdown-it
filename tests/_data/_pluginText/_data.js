@@ -82,13 +82,7 @@ module.exports = [
       '                .sub {\n' +
       '                    font: 11.219999999999999px Helvetica, Arial, sans-serif;\n' +
       '                }\n' +
-      '            </style><g mask="url(#text-mask)"></g><g><text x="56.099999999999994" y="17.53125" class="element" fill="currentColor" style="\n' +
-      '                text-anchor: start;\n' +
-      '                writing-mode: vertical-rl;\n' +
-      '                text-orientation: upright;\n' +
-      '                letter-spacing: -1px;\n' +
-      '                direction: ltr;\n' +
-      '            "><tspan>C</tspan><tspan style="unicode-bidi: plaintext;">H<tspan baseline-shift="sub" class="sub">4</tspan></tspan></text><text x="56.099999999999994" y="28.049999999999997" class="debug" fill="#ff0000" style="\n' +
+      '            </style><g mask="url(#text-mask)"></g><g><text x="56.099999999999994" y="17.53125" class="element" fill="currentColor" style="text-anchor: start; glyph-orientation-vertical: 0; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -1px; direction: ltr;"><tspan>C</tspan><tspan style="unicode-bidi: plaintext;">H<tspan baseline-shift="sub" class="sub">4</tspan></tspan></text><text x="56.099999999999994" y="28.049999999999997" class="debug" fill="#ff0000" style="\n' +
       '                font: 5px Droid Sans, sans-serif;\n' +
       '            "></text></g></svg></div></div>\n' +
       '<div style="margin-top: 0; margin-bottom: 1rem;">[</div>\n' +
