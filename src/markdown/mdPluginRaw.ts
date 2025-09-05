@@ -544,6 +544,13 @@ function paragraphDiv(state, startLine/*, endLine*/) {
   let isMathOpen = false;
   let openedAuthorBlock = false;
   let openBrackets = 0;
+
+  let svgDepth = 0;
+  const reSvgOpen  = /<svg[\s>]/i;
+  const reSvgClose = /<\/svg>/i;
+  const count = (re: RegExp, s: string) => (s.match(new RegExp(re.source, 'gi')) || []).length;
+  let emptyInsideSvgStreak = 0;
+
   const pickStartTag: RegExp = /\\begin{(abstract|center|left|right|table|figure|tabular)}/;
   const pickEndTag: RegExp = /\\end{(abstract|center|left|right|table|figure|tabular)}/;
   const pickMathStartTag: RegExp = /\\begin{(equation|equation\*)}|\\\[/;
@@ -572,6 +579,8 @@ function paragraphDiv(state, startLine/*, endLine*/) {
     isMathOpen = true;
   }
 
+  svgDepth += count(reSvgOpen, lineText) - count(reSvgClose, lineText);
+
   let listOpen = false;
   let isMath = false;
   let mathEndTag: RegExp | null = null;
@@ -594,6 +603,8 @@ function paragraphDiv(state, startLine/*, endLine*/) {
     const prewMax = state.eMarks[nextLine - 1];
     let prewLineText = state.src.slice(prewPos, prewMax);
 
+    svgDepth += count(reSvgOpen, prewLineText) - count(reSvgClose, prewLineText);
+
     if (openedAuthorBlock
       && (prewLineText.indexOf('}') !== -1 || prewLineText.indexOf('{') !== -1)) {
       openBrackets += getCoutOpenCloseBranches(prewLineText);
@@ -613,6 +624,10 @@ function paragraphDiv(state, startLine/*, endLine*/) {
     max = state.eMarks[nextLine];
     lineText = state.src.slice(pos, max);
 
+    if (!state.isEmpty(nextLine) || svgDepth === 0) {
+      emptyInsideSvgStreak = 0;
+    }
+
     if (listStartTag.test(prewLineText)) {
       listOpen = true;
     }
@@ -621,8 +636,14 @@ function paragraphDiv(state, startLine/*, endLine*/) {
       break;
     }
     if (state.isEmpty(nextLine)) {
-      break;
+      if (svgDepth > 0) {
+        emptyInsideSvgStreak += 1;
+        if (emptyInsideSvgStreak > 1) break;
+      } else {
+        break;
+      }
     }
+
     if (pickStartTag.test(lineText) || pickEndTag.test(prewLineText)) {
       break;
     }
@@ -664,7 +685,7 @@ function paragraphDiv(state, startLine/*, endLine*/) {
         }
       }
     }
-    if (!isMath && !isMathOpen) {
+    if (!isMath && !isMathOpen && svgDepth === 0) {
       if (terminate) { break; }
     }
   }
