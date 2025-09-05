@@ -13,7 +13,7 @@ Here are the key benefits over plain Markdown:
 - better support for tables, via the LaTeX tabular syntax, which allows for complex, nested tables often seen in scientific publications
 - advanced figure referencing via LaTeX syntax
 - support for abstracts, author lists, and linkable sections; these are a fact of life for academic publications
-- support for chemistry diagrams represented with SMILES markup, compatible with popular chemistry tools like Chemdraw
+- support for chemistry diagrams represented with SMILES markup, compatible with popular chemistry tools like ChemDraw
 
 ![Editing an MMD file in VS Code](assets/mmd-vscode.png)
 
