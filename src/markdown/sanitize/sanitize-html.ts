@@ -1,4 +1,5 @@
-const htmlparser = require('htmlparser2');
+// const htmlparser = require('htmlparser2');
+const { Parser } = require('htmlparser2/lib/Parser');
 const escapeStringRegexp = require('escape-string-regexp');
 const { isPlainObject } = require('is-plain-object');
 const deepmerge = require('deepmerge');
@@ -209,7 +210,7 @@ function sanitizeHtml(html, options, _recursing) {
 
   initializeState();
 
-  const parser = new htmlparser.Parser({
+  const parser = new Parser({
     onopentag: function(name, attribs) {
       // If `enforceHtmlBoundary` is `true` and this has found the opening
       // `html` tag, reset the state.

@@ -1,4 +1,4 @@
-declare const htmlparser: any;
+declare const Parser: any;
 declare const escapeStringRegexp: any;
 declare const isPlainObject: any;
 declare const deepmerge: any;
