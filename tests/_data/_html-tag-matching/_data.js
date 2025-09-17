@@ -301,7 +301,7 @@ module.exports = [
       '```\n',
     html: '<div>Forms require <strong>backend processing</strong> to handle submitted data - the HTML form itself only defines the user interface for data collection.<sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup><br>\n' +
       '<span style="display:none"><sup class="footnote-ref"><a href="#fn2" id="fnref2">[2]</a></sup><sup class="footnote-ref"><a href="#fn3" id="fnref3">[3]</a></sup><sup class="footnote-ref"><a href="#fn4" id="fnref4">[4]</a></sup><sup class="footnote-ref"><a href="#fn5" id="fnref5">[5]</a></sup><sup class="footnote-ref"><a href="#fn6" id="fnref6">[6]</a></sup><sup class="footnote-ref"><a href="#fn7" id="fnref7">[7]</a></sup><sup class="footnote-ref"><a href="#fn8" id="fnref8">[8]</a></sup><sup class="footnote-ref"><a href="#fn9" id="fnref9">[9]</a></sup></span></div>\n' +
-      '<div style="text-align:center">⁂</div>\n' +
+      '<div><div style="text-align:center">⁂</div></div>\n' +
       '<hr>\n' +
       '<h3 id="html%3A">HTML:</h3>\n' +
       '<pre><code class="hljs language-html"><span class="hljs-meta">&lt;!DOCTYPE <span class="hljs-keyword">html</span>&gt;</span>\n' +

@@ -116,7 +116,7 @@ export const mmdHtmlBlock: RuleBlock = (state, startLine, endLine, silent): bool
   }
 
   // pair <tag>…</tag> on one line → let it process the inline rule
-  if (RX.CLOSE_ONELINE.test(lineText) && netDepthDelta(lineText, RX) <= 0) {
+  if (RX.CLOSE_ANY.test(lineText) && netDepthDelta(lineText, RX) <= 0) {
     return false;
   }
 
