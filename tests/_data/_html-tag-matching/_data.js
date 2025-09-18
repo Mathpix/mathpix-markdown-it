@@ -238,4 +238,270 @@ module.exports = [
       '<h2 type="section" data-unnumbered="true" class="section-title" id="(12)-brevet-de-inven%C8%9Bie-de-scurt%C4%83-durat%C4%83">\n' +
       '(12) BREVET DE INVENȚIE DE SCURTĂ DURATĂ</h2>'
   },
+  {
+    mmd: 'Forms require **backend processing** to handle submitted data - the HTML form itself only defines the user interface for data collection.[^1_6]\n' +
+      '<span style="display:none">[^1_11][^1_12][^1_13][^1_14][^1_4][^1_5][^1_7][^1_9]</span>\n' +
+      '\n' +
+      '<div style="text-align: center">⁂</div>\n' +
+      '\n' +
+      '[^1_1]: https://www.freecodecamp.org/news/what-is-html-definition-and-meaning/\n' +
+      '[^1_2]: https://www.geeksforgeeks.org/html/what-is-html/\n' +
+      '[^1_3]: https://www.w3schools.com/html/html_intro.asp\n' +
+      '[^1_4]: https://en.wikipedia.org/wiki/HTML\n' +
+      '[^1_5]: https://www.sciencenewstoday.org/what-is-html-understanding-the-backbone-of-the-web\n' +
+      '[^1_6]: https://www.simplilearn.com/tutorials/html-tutorial/html-form-tag\n' +
+      '[^1_7]: https://www.codecademy.com/resources/blog/what-is-html\n' +
+      '[^1_8]: https://www.tutorialspoint.com/html/html_form_tag.htm\n' +
+      '[^1_9]: https://elementor.com/blog/what-is-html-a-beginners-guide/\n' +
+      '[^1_10]: https://www.w3schools.com/tags/tag_form.asp\n' +
+      '[^1_11]: https://www.geeksforgeeks.org/html/html-form-tag/\n' +
+      '[^1_12]: https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/form\n' +
+      '[^1_13]: https://www.zoho.com/forms/html-form-builder/what-is.html\n' +
+      '[^1_14]: https://www.programiz.com/html/form-elements\n' +
+      '\n' +
+      '---\n' +
+      '\n' +
+      '### HTML:\n' +
+      '```html\n' +
+      '<!DOCTYPE html>\n' +
+      '<html>\n' +
+      '<head>\n' +
+      '    <title>HTML Media Example</title>\n' +
+      '    <style>\n' +
+      '        body {\n' +
+      '            font-family: Arial, sans-serif;\n' +
+      '            margin: 20px;\n' +
+      '        }\n' +
+      '        .media-container {\n' +
+      '            margin: 20px 0;\n' +
+      '        }\n' +
+      '    </style>\n' +
+      '</head>\n' +
+      '<body>\n' +
+      '    <h1>HTML Media Elements</h1>\n' +
+      '    <div class="media-container">\n' +
+      '        <h2>Audio Player</h2>\n' +
+      '        <audio controls>\n' +
+      '            <source src="sample-audio.mp3" type="audio/mpeg">\n' +
+      '            <source src="sample-audio.ogg" type="audio/ogg">\n' +
+      '            Your browser does not support the audio element.\n' +
+      '        </audio>\n' +
+      '    </div>\n' +
+      '        </div>\n' +
+      '    <div class="media-container">\n' +
+      '        <h2>Video Player</h2>\n' +
+      '        <video width="400" height="300" controls poster="video-thumbnail.jpg">\n' +
+      '            <source src="sample-video.mp4" type="video/mp4">\n' +
+      '            <source src="sample-video.ogg" type="video/ogg">\n' +
+      '            Your browser does not support the video tag.\n' +
+      '        </video>\n' +
+      '    </div>\n' +
+      '    </body>\n' +
+      '</html>\n' +
+      '```\n',
+    html: '<div>Forms require <strong>backend processing</strong> to handle submitted data - the HTML form itself only defines the user interface for data collection.<sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup><br>\n' +
+      '<span style="display:none"><sup class="footnote-ref"><a href="#fn2" id="fnref2">[2]</a></sup><sup class="footnote-ref"><a href="#fn3" id="fnref3">[3]</a></sup><sup class="footnote-ref"><a href="#fn4" id="fnref4">[4]</a></sup><sup class="footnote-ref"><a href="#fn5" id="fnref5">[5]</a></sup><sup class="footnote-ref"><a href="#fn6" id="fnref6">[6]</a></sup><sup class="footnote-ref"><a href="#fn7" id="fnref7">[7]</a></sup><sup class="footnote-ref"><a href="#fn8" id="fnref8">[8]</a></sup><sup class="footnote-ref"><a href="#fn9" id="fnref9">[9]</a></sup></span></div>\n' +
+      '<div><div style="text-align:center">⁂</div></div>\n' +
+      '<hr>\n' +
+      '<h3 id="html%3A">HTML:</h3>\n' +
+      '<pre><code class="hljs language-html"><span class="hljs-meta">&lt;!DOCTYPE <span class="hljs-keyword">html</span>&gt;</span>\n' +
+      '<span class="hljs-tag">&lt;<span class="hljs-name">html</span>&gt;</span>\n' +
+      '<span class="hljs-tag">&lt;<span class="hljs-name">head</span>&gt;</span>\n' +
+      '    <span class="hljs-tag">&lt;<span class="hljs-name">title</span>&gt;</span>HTML Media Example<span class="hljs-tag">&lt;/<span class="hljs-name">title</span>&gt;</span>\n' +
+      '    <span class="hljs-tag">&lt;<span class="hljs-name">style</span>&gt;</span><span class="language-css">\n' +
+      '        <span class="hljs-selector-tag">body</span> {\n' +
+      '            <span class="hljs-attribute">font-family</span>: Arial, sans-serif;\n' +
+      '            <span class="hljs-attribute">margin</span>: <span class="hljs-number">20px</span>;\n' +
+      '        }\n' +
+      '        <span class="hljs-selector-class">.media-container</span> {\n' +
+      '            <span class="hljs-attribute">margin</span>: <span class="hljs-number">20px</span> <span class="hljs-number">0</span>;\n' +
+      '        }\n' +
+      '    </span><span class="hljs-tag">&lt;/<span class="hljs-name">style</span>&gt;</span>\n' +
+      '<span class="hljs-tag">&lt;/<span class="hljs-name">head</span>&gt;</span>\n' +
+      '<span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span>\n' +
+      '    <span class="hljs-tag">&lt;<span class="hljs-name">h1</span>&gt;</span>HTML Media Elements<span class="hljs-tag">&lt;/<span class="hljs-name">h1</span>&gt;</span>\n' +
+      '    <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-container&quot;</span>&gt;</span>\n' +
+      '        <span class="hljs-tag">&lt;<span class="hljs-name">h2</span>&gt;</span>Audio Player<span class="hljs-tag">&lt;/<span class="hljs-name">h2</span>&gt;</span>\n' +
+      '        <span class="hljs-tag">&lt;<span class="hljs-name">audio</span> <span class="hljs-attr">controls</span>&gt;</span>\n' +
+      '            <span class="hljs-tag">&lt;<span class="hljs-name">source</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;sample-audio.mp3&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;audio/mpeg&quot;</span>&gt;</span>\n' +
+      '            <span class="hljs-tag">&lt;<span class="hljs-name">source</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;sample-audio.ogg&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;audio/ogg&quot;</span>&gt;</span>\n' +
+      '            Your browser does not support the audio element.\n' +
+      '        <span class="hljs-tag">&lt;/<span class="hljs-name">audio</span>&gt;</span>\n' +
+      '    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>\n' +
+      '        <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>\n' +
+      '    <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-container&quot;</span>&gt;</span>\n' +
+      '        <span class="hljs-tag">&lt;<span class="hljs-name">h2</span>&gt;</span>Video Player<span class="hljs-tag">&lt;/<span class="hljs-name">h2</span>&gt;</span>\n' +
+      '        <span class="hljs-tag">&lt;<span class="hljs-name">video</span> <span class="hljs-attr">width</span>=<span class="hljs-string">&quot;400&quot;</span> <span class="hljs-attr">height</span>=<span class="hljs-string">&quot;300&quot;</span> <span class="hljs-attr">controls</span> <span class="hljs-attr">poster</span>=<span class="hljs-string">&quot;video-thumbnail.jpg&quot;</span>&gt;</span>\n' +
+      '            <span class="hljs-tag">&lt;<span class="hljs-name">source</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;sample-video.mp4&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;video/mp4&quot;</span>&gt;</span>\n' +
+      '            <span class="hljs-tag">&lt;<span class="hljs-name">source</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;sample-video.ogg&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;video/ogg&quot;</span>&gt;</span>\n' +
+      '            Your browser does not support the video tag.\n' +
+      '        <span class="hljs-tag">&lt;/<span class="hljs-name">video</span>&gt;</span>\n' +
+      '    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>\n' +
+      '    <span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span>\n' +
+      '<span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span>\n' +
+      '</code></pre>\n' +
+      '<hr class="footnotes-sep">\n' +
+      '<section class="footnotes" style="margin-bottom: 1em;">\n' +
+      '<ol class="footnotes-list" style="margin-bottom: 0;">\n' +
+      '<li id="fn1" class="footnote-item"><div><a href="https://www.simplilearn.com/tutorials/html-tutorial/html-form-tag" target="_blank" rel="noopener" style="word-break: break-all">https://www.simplilearn.com/tutorials/html-tutorial/html-form-tag</a> <a href="#fnref1" class="footnote-backref">↩︎</a></div>\n' +
+      '</li>\n' +
+      '<li id="fn2" class="footnote-item"><div><a href="https://www.geeksforgeeks.org/html/html-form-tag/" target="_blank" rel="noopener" style="word-break: break-all">https://www.geeksforgeeks.org/html/html-form-tag/</a> <a href="#fnref2" class="footnote-backref">↩︎</a></div>\n' +
+      '</li>\n' +
+      '<li id="fn3" class="footnote-item"><div><a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/form" target="_blank" rel="noopener" style="word-break: break-all">https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/form</a> <a href="#fnref3" class="footnote-backref">↩︎</a></div>\n' +
+      '</li>\n' +
+      '<li id="fn4" class="footnote-item"><div><a href="https://www.zoho.com/forms/html-form-builder/what-is.html" target="_blank" rel="noopener" style="word-break: break-all">https://www.zoho.com/forms/html-form-builder/what-is.html</a> <a href="#fnref4" class="footnote-backref">↩︎</a></div>\n' +
+      '</li>\n' +
+      '<li id="fn5" class="footnote-item"><div><a href="https://www.programiz.com/html/form-elements" target="_blank" rel="noopener" style="word-break: break-all">https://www.programiz.com/html/form-elements</a> <a href="#fnref5" class="footnote-backref">↩︎</a></div>\n' +
+      '</li>\n' +
+      '<li id="fn6" class="footnote-item"><div><a href="https://en.wikipedia.org/wiki/HTML" target="_blank" rel="noopener" style="display: inline-block">https://en.wikipedia.org/wiki/HTML</a> <a href="#fnref6" class="footnote-backref">↩︎</a></div>\n' +
+      '</li>\n' +
+      '<li id="fn7" class="footnote-item"><div><a href="https://www.sciencenewstoday.org/what-is-html-understanding-the-backbone-of-the-web" target="_blank" rel="noopener" style="word-break: break-all">https://www.sciencenewstoday.org/what-is-html-understanding-the-backbone-of-the-web</a> <a href="#fnref7" class="footnote-backref">↩︎</a></div>\n' +
+      '</li>\n' +
+      '<li id="fn8" class="footnote-item"><div><a href="https://www.codecademy.com/resources/blog/what-is-html" target="_blank" rel="noopener" style="word-break: break-all">https://www.codecademy.com/resources/blog/what-is-html</a> <a href="#fnref8" class="footnote-backref">↩︎</a></div>\n' +
+      '</li>\n' +
+      '<li id="fn9" class="footnote-item"><div><a href="https://elementor.com/blog/what-is-html-a-beginners-guide/" target="_blank" rel="noopener" style="word-break: break-all">https://elementor.com/blog/what-is-html-a-beginners-guide/</a> <a href="#fnref9" class="footnote-backref">↩︎</a></div>\n' +
+      '</li>\n' +
+      '</ol>\n' +
+      '</section>',
+    htmlDisableTagMatching: '<div>Forms require <strong>backend processing</strong> to handle submitted data - the HTML form itself only defines the user interface for data collection.<sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup><br>\n' +
+      '<span style="display:none"><sup class="footnote-ref"><a href="#fn2" id="fnref2">[2]</a></sup><sup class="footnote-ref"><a href="#fn3" id="fnref3">[3]</a></sup><sup class="footnote-ref"><a href="#fn4" id="fnref4">[4]</a></sup><sup class="footnote-ref"><a href="#fn5" id="fnref5">[5]</a></sup><sup class="footnote-ref"><a href="#fn6" id="fnref6">[6]</a></sup><sup class="footnote-ref"><a href="#fn7" id="fnref7">[7]</a></sup><sup class="footnote-ref"><a href="#fn8" id="fnref8">[8]</a></sup><sup class="footnote-ref"><a href="#fn9" id="fnref9">[9]</a></sup></span></div>\n' +
+      '<div style="text-align:center">⁂</div>\n' +
+      '<hr>\n' +
+      '<h3 id="html%3A">HTML:</h3>\n' +
+      '<pre><code class="hljs language-html"><span class="hljs-meta">&lt;!DOCTYPE <span class="hljs-keyword">html</span>&gt;</span>\n' +
+      '<span class="hljs-tag">&lt;<span class="hljs-name">html</span>&gt;</span>\n' +
+      '<span class="hljs-tag">&lt;<span class="hljs-name">head</span>&gt;</span>\n' +
+      '    <span class="hljs-tag">&lt;<span class="hljs-name">title</span>&gt;</span>HTML Media Example<span class="hljs-tag">&lt;/<span class="hljs-name">title</span>&gt;</span>\n' +
+      '    <span class="hljs-tag">&lt;<span class="hljs-name">style</span>&gt;</span><span class="language-css">\n' +
+      '        <span class="hljs-selector-tag">body</span> {\n' +
+      '            <span class="hljs-attribute">font-family</span>: Arial, sans-serif;\n' +
+      '            <span class="hljs-attribute">margin</span>: <span class="hljs-number">20px</span>;\n' +
+      '        }\n' +
+      '        <span class="hljs-selector-class">.media-container</span> {\n' +
+      '            <span class="hljs-attribute">margin</span>: <span class="hljs-number">20px</span> <span class="hljs-number">0</span>;\n' +
+      '        }\n' +
+      '    </span><span class="hljs-tag">&lt;/<span class="hljs-name">style</span>&gt;</span>\n' +
+      '<span class="hljs-tag">&lt;/<span class="hljs-name">head</span>&gt;</span>\n' +
+      '<span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span>\n' +
+      '    <span class="hljs-tag">&lt;<span class="hljs-name">h1</span>&gt;</span>HTML Media Elements<span class="hljs-tag">&lt;/<span class="hljs-name">h1</span>&gt;</span>\n' +
+      '    <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-container&quot;</span>&gt;</span>\n' +
+      '        <span class="hljs-tag">&lt;<span class="hljs-name">h2</span>&gt;</span>Audio Player<span class="hljs-tag">&lt;/<span class="hljs-name">h2</span>&gt;</span>\n' +
+      '        <span class="hljs-tag">&lt;<span class="hljs-name">audio</span> <span class="hljs-attr">controls</span>&gt;</span>\n' +
+      '            <span class="hljs-tag">&lt;<span class="hljs-name">source</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;sample-audio.mp3&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;audio/mpeg&quot;</span>&gt;</span>\n' +
+      '            <span class="hljs-tag">&lt;<span class="hljs-name">source</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;sample-audio.ogg&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;audio/ogg&quot;</span>&gt;</span>\n' +
+      '            Your browser does not support the audio element.\n' +
+      '        <span class="hljs-tag">&lt;/<span class="hljs-name">audio</span>&gt;</span>\n' +
+      '    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>\n' +
+      '        <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>\n' +
+      '    <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-container&quot;</span>&gt;</span>\n' +
+      '        <span class="hljs-tag">&lt;<span class="hljs-name">h2</span>&gt;</span>Video Player<span class="hljs-tag">&lt;/<span class="hljs-name">h2</span>&gt;</span>\n' +
+      '        <span class="hljs-tag">&lt;<span class="hljs-name">video</span> <span class="hljs-attr">width</span>=<span class="hljs-string">&quot;400&quot;</span> <span class="hljs-attr">height</span>=<span class="hljs-string">&quot;300&quot;</span> <span class="hljs-attr">controls</span> <span class="hljs-attr">poster</span>=<span class="hljs-string">&quot;video-thumbnail.jpg&quot;</span>&gt;</span>\n' +
+      '            <span class="hljs-tag">&lt;<span class="hljs-name">source</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;sample-video.mp4&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;video/mp4&quot;</span>&gt;</span>\n' +
+      '            <span class="hljs-tag">&lt;<span class="hljs-name">source</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;sample-video.ogg&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;video/ogg&quot;</span>&gt;</span>\n' +
+      '            Your browser does not support the video tag.\n' +
+      '        <span class="hljs-tag">&lt;/<span class="hljs-name">video</span>&gt;</span>\n' +
+      '    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>\n' +
+      '    <span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span>\n' +
+      '<span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span>\n' +
+      '</code></pre>\n' +
+      '<hr class="footnotes-sep">\n' +
+      '<section class="footnotes" style="margin-bottom: 1em;">\n' +
+      '<ol class="footnotes-list" style="margin-bottom: 0;">\n' +
+      '<li id="fn1" class="footnote-item"><div><a href="https://www.simplilearn.com/tutorials/html-tutorial/html-form-tag" target="_blank" rel="noopener" style="word-break: break-all">https://www.simplilearn.com/tutorials/html-tutorial/html-form-tag</a> <a href="#fnref1" class="footnote-backref">↩︎</a></div>\n' +
+      '</li>\n' +
+      '<li id="fn2" class="footnote-item"><div><a href="https://www.geeksforgeeks.org/html/html-form-tag/" target="_blank" rel="noopener" style="word-break: break-all">https://www.geeksforgeeks.org/html/html-form-tag/</a> <a href="#fnref2" class="footnote-backref">↩︎</a></div>\n' +
+      '</li>\n' +
+      '<li id="fn3" class="footnote-item"><div><a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/form" target="_blank" rel="noopener" style="word-break: break-all">https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/form</a> <a href="#fnref3" class="footnote-backref">↩︎</a></div>\n' +
+      '</li>\n' +
+      '<li id="fn4" class="footnote-item"><div><a href="https://www.zoho.com/forms/html-form-builder/what-is.html" target="_blank" rel="noopener" style="word-break: break-all">https://www.zoho.com/forms/html-form-builder/what-is.html</a> <a href="#fnref4" class="footnote-backref">↩︎</a></div>\n' +
+      '</li>\n' +
+      '<li id="fn5" class="footnote-item"><div><a href="https://www.programiz.com/html/form-elements" target="_blank" rel="noopener" style="word-break: break-all">https://www.programiz.com/html/form-elements</a> <a href="#fnref5" class="footnote-backref">↩︎</a></div>\n' +
+      '</li>\n' +
+      '<li id="fn6" class="footnote-item"><div><a href="https://en.wikipedia.org/wiki/HTML" target="_blank" rel="noopener" style="display: inline-block">https://en.wikipedia.org/wiki/HTML</a> <a href="#fnref6" class="footnote-backref">↩︎</a></div>\n' +
+      '</li>\n' +
+      '<li id="fn7" class="footnote-item"><div><a href="https://www.sciencenewstoday.org/what-is-html-understanding-the-backbone-of-the-web" target="_blank" rel="noopener" style="word-break: break-all">https://www.sciencenewstoday.org/what-is-html-understanding-the-backbone-of-the-web</a> <a href="#fnref7" class="footnote-backref">↩︎</a></div>\n' +
+      '</li>\n' +
+      '<li id="fn8" class="footnote-item"><div><a href="https://www.codecademy.com/resources/blog/what-is-html" target="_blank" rel="noopener" style="word-break: break-all">https://www.codecademy.com/resources/blog/what-is-html</a> <a href="#fnref8" class="footnote-backref">↩︎</a></div>\n' +
+      '</li>\n' +
+      '<li id="fn9" class="footnote-item"><div><a href="https://elementor.com/blog/what-is-html-a-beginners-guide/" target="_blank" rel="noopener" style="word-break: break-all">https://elementor.com/blog/what-is-html-a-beginners-guide/</a> <a href="#fnref9" class="footnote-backref">↩︎</a></div>\n' +
+      '</li>\n' +
+      '</ol>\n' +
+      '</section>',
+    htmlTagsDisable: '<div>Forms require <strong>backend processing</strong> to handle submitted data - the HTML form itself only defines the user interface for data collection.<sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup><br>\n' +
+      '&lt;span style=“display:none”&gt;<sup class="footnote-ref"><a href="#fn2" id="fnref2">[2]</a></sup><sup class="footnote-ref"><a href="#fn3" id="fnref3">[3]</a></sup><sup class="footnote-ref"><a href="#fn4" id="fnref4">[4]</a></sup><sup class="footnote-ref"><a href="#fn5" id="fnref5">[5]</a></sup><sup class="footnote-ref"><a href="#fn6" id="fnref6">[6]</a></sup><sup class="footnote-ref"><a href="#fn7" id="fnref7">[7]</a></sup><sup class="footnote-ref"><a href="#fn8" id="fnref8">[8]</a></sup><sup class="footnote-ref"><a href="#fn9" id="fnref9">[9]</a></sup>&lt;/span&gt;</div>\n' +
+      '<div>&lt;div style=“text-align: center”&gt;⁂&lt;/div&gt;</div>\n' +
+      '<hr>\n' +
+      '<h3 id="html%3A">HTML:</h3>\n' +
+      '<pre><code class="hljs language-html"><span class="hljs-meta">&lt;!DOCTYPE <span class="hljs-keyword">html</span>&gt;</span>\n' +
+      '<span class="hljs-tag">&lt;<span class="hljs-name">html</span>&gt;</span>\n' +
+      '<span class="hljs-tag">&lt;<span class="hljs-name">head</span>&gt;</span>\n' +
+      '    <span class="hljs-tag">&lt;<span class="hljs-name">title</span>&gt;</span>HTML Media Example<span class="hljs-tag">&lt;/<span class="hljs-name">title</span>&gt;</span>\n' +
+      '    <span class="hljs-tag">&lt;<span class="hljs-name">style</span>&gt;</span><span class="language-css">\n' +
+      '        <span class="hljs-selector-tag">body</span> {\n' +
+      '            <span class="hljs-attribute">font-family</span>: Arial, sans-serif;\n' +
+      '            <span class="hljs-attribute">margin</span>: <span class="hljs-number">20px</span>;\n' +
+      '        }\n' +
+      '        <span class="hljs-selector-class">.media-container</span> {\n' +
+      '            <span class="hljs-attribute">margin</span>: <span class="hljs-number">20px</span> <span class="hljs-number">0</span>;\n' +
+      '        }\n' +
+      '    </span><span class="hljs-tag">&lt;/<span class="hljs-name">style</span>&gt;</span>\n' +
+      '<span class="hljs-tag">&lt;/<span class="hljs-name">head</span>&gt;</span>\n' +
+      '<span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span>\n' +
+      '    <span class="hljs-tag">&lt;<span class="hljs-name">h1</span>&gt;</span>HTML Media Elements<span class="hljs-tag">&lt;/<span class="hljs-name">h1</span>&gt;</span>\n' +
+      '    <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-container&quot;</span>&gt;</span>\n' +
+      '        <span class="hljs-tag">&lt;<span class="hljs-name">h2</span>&gt;</span>Audio Player<span class="hljs-tag">&lt;/<span class="hljs-name">h2</span>&gt;</span>\n' +
+      '        <span class="hljs-tag">&lt;<span class="hljs-name">audio</span> <span class="hljs-attr">controls</span>&gt;</span>\n' +
+      '            <span class="hljs-tag">&lt;<span class="hljs-name">source</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;sample-audio.mp3&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;audio/mpeg&quot;</span>&gt;</span>\n' +
+      '            <span class="hljs-tag">&lt;<span class="hljs-name">source</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;sample-audio.ogg&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;audio/ogg&quot;</span>&gt;</span>\n' +
+      '            Your browser does not support the audio element.\n' +
+      '        <span class="hljs-tag">&lt;/<span class="hljs-name">audio</span>&gt;</span>\n' +
+      '    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>\n' +
+      '        <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>\n' +
+      '    <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;media-container&quot;</span>&gt;</span>\n' +
+      '        <span class="hljs-tag">&lt;<span class="hljs-name">h2</span>&gt;</span>Video Player<span class="hljs-tag">&lt;/<span class="hljs-name">h2</span>&gt;</span>\n' +
+      '        <span class="hljs-tag">&lt;<span class="hljs-name">video</span> <span class="hljs-attr">width</span>=<span class="hljs-string">&quot;400&quot;</span> <span class="hljs-attr">height</span>=<span class="hljs-string">&quot;300&quot;</span> <span class="hljs-attr">controls</span> <span class="hljs-attr">poster</span>=<span class="hljs-string">&quot;video-thumbnail.jpg&quot;</span>&gt;</span>\n' +
+      '            <span class="hljs-tag">&lt;<span class="hljs-name">source</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;sample-video.mp4&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;video/mp4&quot;</span>&gt;</span>\n' +
+      '            <span class="hljs-tag">&lt;<span class="hljs-name">source</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;sample-video.ogg&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;video/ogg&quot;</span>&gt;</span>\n' +
+      '            Your browser does not support the video tag.\n' +
+      '        <span class="hljs-tag">&lt;/<span class="hljs-name">video</span>&gt;</span>\n' +
+      '    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>\n' +
+      '    <span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span>\n' +
+      '<span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span>\n' +
+      '</code></pre>\n' +
+      '<hr class="footnotes-sep">\n' +
+      '<section class="footnotes" style="margin-bottom: 1em;">\n' +
+      '<ol class="footnotes-list" style="margin-bottom: 0;">\n' +
+      '<li id="fn1" class="footnote-item"><div><a href="https://www.simplilearn.com/tutorials/html-tutorial/html-form-tag" target="_blank" rel="noopener" style="word-break: break-all">https://www.simplilearn.com/tutorials/html-tutorial/html-form-tag</a> <a href="#fnref1" class="footnote-backref">↩︎</a></div>\n' +
+      '</li>\n' +
+      '<li id="fn2" class="footnote-item"><div><a href="https://www.geeksforgeeks.org/html/html-form-tag/" target="_blank" rel="noopener" style="word-break: break-all">https://www.geeksforgeeks.org/html/html-form-tag/</a> <a href="#fnref2" class="footnote-backref">↩︎</a></div>\n' +
+      '</li>\n' +
+      '<li id="fn3" class="footnote-item"><div><a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/form" target="_blank" rel="noopener" style="word-break: break-all">https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/form</a> <a href="#fnref3" class="footnote-backref">↩︎</a></div>\n' +
+      '</li>\n' +
+      '<li id="fn4" class="footnote-item"><div><a href="https://www.zoho.com/forms/html-form-builder/what-is.html" target="_blank" rel="noopener" style="word-break: break-all">https://www.zoho.com/forms/html-form-builder/what-is.html</a> <a href="#fnref4" class="footnote-backref">↩︎</a></div>\n' +
+      '</li>\n' +
+      '<li id="fn5" class="footnote-item"><div><a href="https://www.programiz.com/html/form-elements" target="_blank" rel="noopener" style="word-break: break-all">https://www.programiz.com/html/form-elements</a> <a href="#fnref5" class="footnote-backref">↩︎</a></div>\n' +
+      '</li>\n' +
+      '<li id="fn6" class="footnote-item"><div><a href="https://en.wikipedia.org/wiki/HTML" target="_blank" rel="noopener" style="display: inline-block">https://en.wikipedia.org/wiki/HTML</a> <a href="#fnref6" class="footnote-backref">↩︎</a></div>\n' +
+      '</li>\n' +
+      '<li id="fn7" class="footnote-item"><div><a href="https://www.sciencenewstoday.org/what-is-html-understanding-the-backbone-of-the-web" target="_blank" rel="noopener" style="word-break: break-all">https://www.sciencenewstoday.org/what-is-html-understanding-the-backbone-of-the-web</a> <a href="#fnref7" class="footnote-backref">↩︎</a></div>\n' +
+      '</li>\n' +
+      '<li id="fn8" class="footnote-item"><div><a href="https://www.codecademy.com/resources/blog/what-is-html" target="_blank" rel="noopener" style="word-break: break-all">https://www.codecademy.com/resources/blog/what-is-html</a> <a href="#fnref8" class="footnote-backref">↩︎</a></div>\n' +
+      '</li>\n' +
+      '<li id="fn9" class="footnote-item"><div><a href="https://elementor.com/blog/what-is-html-a-beginners-guide/" target="_blank" rel="noopener" style="word-break: break-all">https://elementor.com/blog/what-is-html-a-beginners-guide/</a> <a href="#fnref9" class="footnote-backref">↩︎</a></div>\n' +
+      '</li>\n' +
+      '</ol>\n' +
+      '</section>'
+  },
+  // {
+  //   mmd: '',
+  //   html: '',
+  //   htmlDisableTagMatching: '',
+  //   htmlTagsDisable: ''
+  // },
+  // {
+  //   mmd: '',
+  //   html: '',
+  //   htmlDisableTagMatching: '',
+  //   htmlTagsDisable: ''
+  // }
 ]
