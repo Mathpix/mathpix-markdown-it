@@ -18,6 +18,7 @@ export interface IOuterData {
   mathml?: string,
   mathml_word?: string,
   asciimath?: string,
+  linermath?: string,
   asciimath_tsv?: string,
   asciimath_csv?: string,
   asciimath_md?: string,
@@ -51,6 +52,7 @@ const toAsciiML = ((node, optionAscii): IAsciiData => {
   let data: IAsciiData = visitorA.visitTree(node);
   return {
     ascii: data?.ascii ? data.ascii.trim() : data.ascii,
+    liner: data?.liner ? data.liner.trim() : data.liner,
     ascii_tsv: data?.ascii_tsv ? data.ascii_tsv.trim() : data.ascii_tsv,
     ascii_csv: data?.ascii_csv ? data.ascii_csv.trim() : data.ascii_csv,
     ascii_md: data?.ascii_md ? data.ascii_md.trim() : data.ascii_md,
@@ -75,6 +77,7 @@ const OuterData = (adaptor, node, math, outMath, forDocx = false, accessibility?
     include_mathml_word = false,
     include_asciimath = false,
     include_latex = false,
+    include_linear = false,
     include_svg = true,
     include_speech = false,
     optionAscii = {
@@ -98,9 +101,10 @@ const OuterData = (adaptor, node, math, outMath, forDocx = false, accessibility?
   if (include_mathml_word) {
     res.mathml_word = toMathMLWord(math.root, {forDocx: forDocx});
   }
-  if (include_asciimath || optionAscii?.tableToCsv || optionAscii?.tableToTsv || optionAscii?.tableToMd) {
+  if (include_asciimath || optionAscii?.tableToCsv || optionAscii?.tableToTsv || optionAscii?.tableToMd || include_linear) {
     const dataAscii: IAsciiData = toAsciiML(math.root, optionAscii);
     res.asciimath = dataAscii.ascii;
+    res.linermath = dataAscii.liner;
     res.asciimath_tsv = dataAscii.ascii_tsv;
     res.asciimath_csv = dataAscii.ascii_csv;
     res.asciimath_md = dataAscii.ascii_md;
@@ -236,8 +240,9 @@ const OuterDataMathMl = (adaptor, node, math, outMath, forDocx = false, accessib
   }
 
   if (include_asciimath) {
-    const data: IAsciiData = toAsciiML(math.root, optionAscii);
-    res.asciimath = data.ascii;
+    const dataAscii: IAsciiData = toAsciiML(math.root, optionAscii);
+    res.asciimath = dataAscii.ascii;
+    res.linermath = dataAscii.liner;
   }
 
   if (include_svg) {
@@ -391,8 +396,8 @@ export const MathJax = {
         showStyle: false,
         extraBrackets: true
       }} = outMath;
-    const data: IAsciiData = toAsciiML(outputJax.math.root, optionAscii);
-    return data.ascii;
+    const dataAscii: IAsciiData = toAsciiML(outputJax.math.root, optionAscii);
+    return dataAscii.ascii;
   },
   /**
    * Typeset a TeX expression and return the SVG tree for it
@@ -406,6 +411,7 @@ export const MathJax = {
       html: OuterHTML(data, options.outMath, options.forPptx),
       labels: data.labels,
       ascii: data.asciimath,
+      liner: data.linermath,
       ascii_tsv: data?.['asciimath_tsv'],
       ascii_csv: data?.['asciimath_csv'],
       ascii_md: data?.['asciimath_md'],
@@ -422,6 +428,7 @@ export const MathJax = {
     return {
       html: OuterHTML(data, outMath), 
       ascii: data.asciimath,
+      liner: data.linermath,
       labels: data.labels,
       ascii_tsv: data?.['asciimath_tsv'],
       ascii_csv: data?.['asciimath_csv'],
