@@ -22,6 +22,7 @@ export interface IOuterData {
   asciimath_tsv?: string,
   asciimath_csv?: string,
   asciimath_md?: string,
+  liner_tsv?: string,
   latex?: string,
   svg?: string,
   speech?: string,
@@ -52,10 +53,11 @@ const toAsciiML = ((node, optionAscii): IAsciiData => {
   let data: IAsciiData = visitorA.visitTree(node);
   return {
     ascii: data?.ascii ? data.ascii.trim() : data.ascii,
-    liner: data?.liner ? data.liner.trim() : data.liner,
+    liner: data.liner,
     ascii_tsv: data?.ascii_tsv ? data.ascii_tsv.trim() : data.ascii_tsv,
     ascii_csv: data?.ascii_csv ? data.ascii_csv.trim() : data.ascii_csv,
     ascii_md: data?.ascii_md ? data.ascii_md.trim() : data.ascii_md,
+    liner_tsv: data?.liner_tsv
   }
 });
 
@@ -108,6 +110,7 @@ const OuterData = (adaptor, node, math, outMath, forDocx = false, accessibility?
     res.asciimath_tsv = dataAscii.ascii_tsv;
     res.asciimath_csv = dataAscii.ascii_csv;
     res.asciimath_md = dataAscii.ascii_md;
+    res.liner_tsv = dataAscii.liner_tsv;
   }
   
   if (include_latex) {

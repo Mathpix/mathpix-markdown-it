@@ -64,7 +64,7 @@ module.exports = [
   {
     latex: `\\begin{array} { r } ( 40 \\times \\frac { 5 } { 18 } ) ^ { 2 } + 2 \\times ( - f \\times 9.81 ) \\\\ \\times 12.2 \\end{array} `,
     ascii: `(40 xx(5)/(18))^(2)+2xx(-f xx9.81)xx12.2`,
-    liner: `(40 ×5/(18))^2+2×(−f ×9.81)×12.2`,
+    liner: `(40 ×5/(18))^2+2×(−f×9.81)×12.2`,
   },
   {
     latex: `\\begin{array} { r } 208,756 \\\\ + \\quad 91,300 \\end{array}`,
@@ -77,7 +77,7 @@ module.exports = [
 \\left. \\begin{array} { r } { 7500 } \\\\ { + 225000 } \\\\ \\hline 23.43 7 5\\end{array}\\right. 
 \\end{array}`,
     ascii: `{:[3.75xx6.25=1875],[7500+225000=23.4375]:}`,
-    liner: `3.75×6.25=1875 \n7500+225000=23.4375`,
+    liner: `3.75×6.25=1875\n7500+225000=23.4375`,
   },
   {
     latex: `\\begin{array} { r } 3 \\frac { 1 } { 6 } \\\\ + 2 \\frac { 1 } { 3 } \\\\ \\hline \\end{array}`,
@@ -150,83 +150,83 @@ module.exports = [
   {
     latex: `\\left. \\begin{array} { r } { 4 + 3 = } \\\\ { 4 + - 3 = } \\\\ { - 4 + - 3 = } \\end{array} \\right.`,
     ascii: `{:[4+3=],[4+-3=],[-4+-3=]:}`,
-    liner: `4+3= \n4+−3= \n−4+−3=`,
+    liner: `4+3=\n4+−3=\n−4+−3=`,
   },
   {
     latex: `\\left.\\begin{array} { r } 4x - y = - 5 \\\\ - 2x + 2y - 3z = 19 \\end{array} \\right.`,
     ascii: `{:[4x-y=-5],[-2x+2y-3z=19]:}`,
-    liner: `4x−y=−5 \n−2x+2y−3z=19`,
+    liner: `4x−y=−5\n−2x+2y−3z=19`,
   },
   {
     latex: `\\left. \\begin{array} { r } { + 2 x + 2 y = 8 } \\\\ { 2 x + y = 5 } \\end{array} \\right. `,
     ascii: `{:[+2x+2y=8],[2x+y=5]:}`,
-    liner: `+2x+2y=8 \n2x+y=5`,
+    liner: `+2x+2y=8\n2x+y=5`,
   },
   {
     latex: `\\left(\\begin{array}{c}10 \\\\ 1\\end{array}\\right)`,
     ascii: `([10],[1])`,
-    liner: `(10 \n1)`,
+    liner: `(10\n1)`,
   },
   {
     latex: `\\left.\\begin{array} { r } { \\mathcal { R } ( \\mathbf { x } ) = \\mathbf { x } } \\\\ { \\frac { d \\mathcal { R } } { d \\mathbf { x } } = - \\mathbf { I } } \\end{array} \\right.`,
     ascii: `{:[R(x)=x],[(dR)/(dx)=-I]:}`,
-    liner: `R(x)=x \n(dR)/(dx)=−I`,
+    liner: `R(x)=x\n(dR)/(dx)=−I`,
   },
   {
     latex: `\\begin{array}{r} 10= 4.50 \\\\ 2= 0.90 \\end{array}`,
     ascii: `{:[10=4.50],[2=0.90]:}`,
-    liner: `10=4.50 \n2=0.90`,
+    liner: `10=4.50\n2=0.90`,
   },
   {
     latex: `\\left.\\begin{array} { r } { - x - 3y = 6} \\\\ { x + 3y = 6} \\end{array} \\right.`,
     ascii: `{:[-x-3y=6],[x+3y=6]:}`,
-    liner: `−x−3y=6 \nx+3y=6`,
+    liner: `−x−3y=6\nx+3y=6`,
   },
   {
     latex: `\\begin{array}{r} \\left[ \\begin{array} { ll } - 6 & - 2 \\\\ - 3 & - 4 \\end{array} \\right]^{-1} =\\left[ \\begin{array} { c } - 2 \\\\ 5 \\end{array} \\right] \\\\ (1,-2)\\end{array}`,
     ascii: `{:[[[-6,-2],[-3,-4]]^(-1)=[[-2],[5]]],[(1","-2)]:}`,
-    liner: `[−6 −2 \n−3 −4]^(−1)=[−2 \n5] \n(1,−2)`,
+    liner: `[−6 −2\n−3 −4]^(−1)=[−2\n5]\n(1,−2)`,
   },
   {
     latex: `\\begin{array}{r} x + 2 y \\geq 2 \\\\ x - y \\leq 0 \\end{array}`,
     ascii: `{:[x+2y >= 2],[x-y <= 0]:}`,
-    liner: `x+2y≥2 \nx−y≤0`,
+    liner: `x+2y≥2\nx−y≤0`,
   },
   {
     latex: `\\begin{array}{r} S _ { i } = \\left\\{ b \\in \\{ 0,1 \\} ^ { * } : \\exists \\text { some } c \\in B \\text{ s.t. } cb \\in S_{i-1}\\right\\}\\\\ \\cup \\{b \\in \\{0,1\\}^{*}: \\exists \\text{ some } c \\in S_{i-1} \\text{ s.t. } cb \\in B \\}\\end{array}`,
     ascii: `{:[S_(i)={b in{0,1}^(**):EE" some "c in B" s.t. "cb inS_(i-1)}],[uu{b in{0","1}^(**):EE" some "c inS_(i-1)" s.t. "cb in B}]:}`,
-    liner: 'S_i={b ∈{0,1}^∗:∃ some c ∈B s.t. cb ∈S_(i−1)} \n' +
-      '∪{b ∈{0,1}^∗:∃ some c ∈S_(i−1) s.t. cb ∈B}',
+    liner: 'S_i={b∈{0,1}^∗:∃ some c∈B s.t. cb∈S_(i−1)}\n' +
+      '∪{b∈{0,1}^∗:∃ some c∈S_(i−1) s.t. cb∈B}',
   },
   {
     latex: `\\begin{array} { r } \\therefore 2 x < 10 \\\\ \\therefore x < 5 \\end{array}`,
     ascii: `{:[:.2x < 10],[:.x < 5]:}`,
-    liner: `∴2x<10 \n∴x<5`,
+    liner: `∴2x<10\n∴x<5`,
   },
   {
     latex: `\\left.\\begin{array} { r } { \\frac { 6 } { x } + \\frac { 16} { y } = 6} \\\\ { - \\frac { 6} { x } - \\frac { 4} { y } = - 4} \\\\\\hline\\end{array} \\right. `,
     ascii: `{:[(6)/(x)+(16 )/(y)=6],[-(6)/(x)-(4)/(y)=-4]:}`,
-    liner: `6/x+(16 )/y=6 \n−6/x−4/y=−4`,
+    liner: `6/x+(16 )/y=6\n−6/x−4/y=−4`,
   },
   {
     latex: `\\begin{array}{r} 9 \\longdiv { 19 } \\\\18\\\\\\hline1\\end{array}`,
     ascii: `{:[((19)/(9))],[18],[1]:}`,
-    liner: `((19)/(9)) \n18 \n1`,
+    liner: `((19)/(9))\n18\n1`,
   },
   {
     latex: `\\left.\\begin{array} { r } 4x - y > - 5 \\\\ - 2x + 2y - 3z < 19 \\end{array} \\right.`,
     ascii: `{:[4x-y > -5],[-2x+2y-3z < 19]:}`,
-    liner: `4x−y>−5 \n−2x+2y−3z<19`,
+    liner: `4x−y>−5\n−2x+2y−3z<19`,
   },
   {
     latex: `\\begin{array}{r}-11.644\\\\(2.807)\\end{array}`,
     ascii: `{:[-11.644],[(2.807)]:}`,
-    liner: `−11.644 \n(2.807)`,
+    liner: `−11.644\n(2.807)`,
   },
   {
     latex: `\\begin{array}{r}y _ { i } \\geqslant \\theta \\\\ -y _ { i } \\leqslant 0\\\\\\in R \\end{array}`,
     ascii: `{:[y_(i) >= theta],[-y_(i) <= 0],[in R]:}`,
-    liner: `y_i⩾θ \n−y_i⩽0 \n∈R`,
+    liner: `y_i⩾θ\n−y_i⩽0\n∈R`,
   },
   {
     latex: ``,
@@ -237,7 +237,7 @@ module.exports = [
   {
     latex: `\\begin{array}{r} 3 \\lcm{657 \\quad 1314} \\\\ \\square \\lcm{219 \\quad 438} \\\\ 73 \\lcm{73 \\quad 146} \\\\\\square \\quad \\square \\end{array}`,
     ascii: `{:[((3)/(657quad1314))],[((◻)/(219quad438))],[((73)/(73quad146))],[◻quad◻]:}`,
-    liner: `((3)/(657 1314)) \n((◻)/(219 438)) \n((73)/(73 146)) \n◻ ◻`,
+    liner: `((3)/(657 1314))\n((◻)/(219 438))\n((73)/(73 146))\n◻ ◻`,
   },
   {
     latex: ``,

@@ -4,7 +4,7 @@ import {MmlNode, TextNode, XMLNode} from 'mathjax-full/js/core/MmlTree/MmlNode.j
 import { handle, needLastSpaceAfterTeXAtom, needFirstSpaceBeforeTeXAtom } from "./handlers";
 import { IAsciiData, AddToAsciiData, getFunctionNameFromAscii, initAsciiData } from "./common";
 import { regExpIsFunction } from "./helperA";
-import { needsParensForFollowingDivision, needBrackets } from "./halperLiner";
+import { needsParensForFollowingDivision, needBrackets } from "./helperLiner";
 
 export class SerializedAsciiVisitor extends MmlVisitor {
   options = null;
@@ -136,6 +136,7 @@ export class SerializedAsciiVisitor extends MmlVisitor {
                 ascii_tsv: `((${data.ascii_tsv})/())`,
                 ascii_csv: `((${data.ascii_csv})/())`,
                 ascii_md: `((${data.ascii_md})/())`,
+                liner_tsv: `((${data.liner_tsv})/())`,
             });
           } else {
             let mnList = [];
@@ -154,7 +155,8 @@ export class SerializedAsciiVisitor extends MmlVisitor {
                   liner: data.liner,
                   ascii_tsv: data.ascii_tsv,
                   ascii_csv: data.ascii_csv,
-                  ascii_md: data.ascii_md
+                  ascii_md: data.ascii_md,
+                  liner_tsv: data.liner_tsv,
                 });
               }
             }
@@ -165,7 +167,8 @@ export class SerializedAsciiVisitor extends MmlVisitor {
               liner: dataDivisor.liner,
               ascii_tsv: dataDivisor.ascii_tsv,
               ascii_csv: dataDivisor.ascii_csv,
-              ascii_md: dataDivisor.ascii_md
+              ascii_md: dataDivisor.ascii_md,
+              liner_tsv: dataDivisor.liner_tsv,
             });
             res = AddToAsciiData(res, {ascii: `)/(`, liner: `)/(`});
             mnList.forEach(item => {
@@ -175,7 +178,8 @@ export class SerializedAsciiVisitor extends MmlVisitor {
                 liner: dataDividend.liner,
                 ascii_tsv: dataDividend.ascii_tsv,
                 ascii_csv: dataDividend.ascii_csv,
-                ascii_md: dataDividend.ascii_md
+                ascii_md: dataDividend.ascii_md,
+                liner_tsv: dataDividend.liner_tsv,
               });
             });
             res = AddToAsciiData(res, {ascii: `))`, liner: `))`});
@@ -188,7 +192,8 @@ export class SerializedAsciiVisitor extends MmlVisitor {
                   liner: data.liner,
                   ascii_tsv: data.ascii_tsv,
                   ascii_csv: data.ascii_csv,
-                  ascii_md: data.ascii_md
+                  ascii_md: data.ascii_md,
+                  liner_tsv: data.liner_tsv,
                 });
               }
             }
@@ -336,6 +341,7 @@ export class SerializedAsciiVisitor extends MmlVisitor {
         ascii_tsv: children.ascii_tsv?.match(/\S/) ? children.ascii_tsv : '',
         ascii_csv: children.ascii_csv?.match(/\S/) ? children.ascii_csv : '',
         ascii_md: children.ascii_md?.match(/\S/) ? children.ascii_md : '',
+        liner_tsv: children.liner_tsv?.match(/\S/) ? children.liner_tsv : '',
       });
       if (needLastSpaceAfterTeXAtom(node)) {
         res = AddToAsciiData(res, {ascii: ' ', liner: ' '});
@@ -357,6 +363,7 @@ export class SerializedAsciiVisitor extends MmlVisitor {
         ascii_tsv: space +'<annotation' + this.getAttributes(node) + '>' + data.ascii_tsv + '</annotation>',
         ascii_csv: space +'<annotation' + this.getAttributes(node) + '>' + data.ascii_csv + '</annotation>',
         ascii_md: space +'<annotation' + this.getAttributes(node) + '>' + data.ascii_md + '</annotation>',
+        liner_tsv: space +'<annotation' + this.getAttributes(node) + '>' + data.liner_tsv + '</annotation>',
       });
       return res;
     } catch (e) {

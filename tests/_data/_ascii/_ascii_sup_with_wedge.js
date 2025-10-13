@@ -17,7 +17,7 @@ module.exports = [
   {
     latex: '\\wedge(p \\vee q u r) \\wedge(p \\vee \\neg q v \\neg r)',
     ascii: '^^(p vv qur)^^(p vv not qv not r)',
-    liner: '∧(p ∨qur)∧(p ∨¬ qv ¬ r)',
+    liner: '∧(p∨qur)∧(p∨¬ qv ¬ r)',
   },
   {
     latex: 'p(x)=-3 x(x+2)^{\\wedge} 3(x+4)',

@@ -8,13 +8,13 @@ module.exports = [
   {
     latex: `\\left\\{\\begin{array}{r}{a}\\\\{-b}\\\\{\\times c}\\\\\\hline\\end{array}\\right\\}`,
     ascii:     `{[a],[-b],[xx c]}`,
-    liner:     `{a \n−b \n×c}`,
+    liner:     `{a\n−b\n×c}`,
     ascii_old: `{[a],[-b],[times c]}`
   },
   {
     latex: `x \\times \\frac{1}{2}y|_{a}^{b}`,
     ascii:     `x xx(1)/(2)y|_(a)^(b)`,
-    liner:     `x ×(1/2)y|_a^b`,
+    liner:     `x×(1/2)y|_a^b`,
     ascii_old: `x times(1)/(2)y|_(a)^(b)`
   },
 //different

@@ -9,3 +9,9 @@ export const TsvJoin = (tsv, options): string => {
   return tsv.map(row => row.join(column)).join(row)
 };
 
+export const linerTsvJoin = (tsv): string => {
+  if (!tsv || tsv.length === 0 ) {
+    return '';
+  }
+  return tsv.map(row => Array.isArray(row) ? row.join(' ') : row).join('\n');
+};

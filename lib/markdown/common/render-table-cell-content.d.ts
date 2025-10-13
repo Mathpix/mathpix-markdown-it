@@ -4,4 +4,5 @@ export declare const renderTableCellContent: (token: any, isSubTable: boolean, o
     csv: string;
     tableMd: string;
     tableSmoothed: string;
+    liner_tsv: string;
 };

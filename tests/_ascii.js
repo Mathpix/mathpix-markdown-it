@@ -200,6 +200,24 @@ describe('Latex to ascii:', () => {
       }
     });
   });
+
+  describe('Testing liner:', () => {
+    const tests = require('./_data/_ascii/_ascii_liner');
+    tests.forEach(function(test) {
+      if (test.latex) {
+        it('Latex =>' + test.latex, function(done) {
+          const data = MathJax.TexConvert(test.latex, options);
+          console.log('    LATEX         =>', test.latex);
+          console.log('    ASCIIMATH     =>', test.ascii);
+          console.log('    LINER         =>', test.liner);
+          data.should.have.property('asciimath', test.ascii);
+          notIncludeSymbols(data.asciimath);
+          data.should.have.property('linermath', test.liner);
+          done();
+        });
+      }
+    });
+  });
   
   // {
   //   latex: `\\left.\\begin{array}{l}{\\text{foo}} \\\\ { \\theta + C }\\end{array} \\right.`,

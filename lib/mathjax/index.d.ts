@@ -8,6 +8,7 @@ export interface IOuterData {
     asciimath_tsv?: string;
     asciimath_csv?: string;
     asciimath_md?: string;
+    liner_tsv?: string;
     latex?: string;
     svg?: string;
     speech?: string;
@@ -52,6 +53,7 @@ export declare const MathJax: {
             asciimath_tsv?: string;
             asciimath_csv?: string;
             asciimath_md?: string;
+            liner_tsv?: string;
             latex?: string;
             svg?: string;
             speech?: string;
@@ -83,6 +85,7 @@ export declare const MathJax: {
             asciimath_tsv?: string;
             asciimath_csv?: string;
             asciimath_md?: string;
+            liner_tsv?: string;
             latex?: string;
             svg?: string;
             speech?: string;
@@ -112,6 +115,7 @@ export declare const MathJax: {
             asciimath_tsv?: string;
             asciimath_csv?: string;
             asciimath_md?: string;
+            liner_tsv?: string;
             latex?: string;
             svg?: string;
             speech?: string;

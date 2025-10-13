@@ -3,7 +3,8 @@ export interface IAsciiData {
   liner: string,
   ascii_tsv?: string,
   ascii_csv?: string,
-  ascii_md?: string
+  ascii_md?: string,
+  liner_tsv?: string
 }
 
 export const initAsciiData = (): IAsciiData => {
@@ -13,6 +14,7 @@ export const initAsciiData = (): IAsciiData => {
     ascii_tsv: '',
     ascii_csv: '',
     ascii_md: '',
+    liner_tsv: ''
   }
 }
 
@@ -33,6 +35,9 @@ export const AddToAsciiData = (
   dataOutput.ascii_md += dataInput.hasOwnProperty('ascii_md')
     ? dataInput.ascii_md
     : dataInput.ascii;
+  dataOutput.liner_tsv += dataInput.hasOwnProperty('liner_tsv')
+    ? dataInput.liner_tsv
+    : dataInput.liner;
   return dataOutput;
 };
 

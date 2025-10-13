@@ -10,3 +10,4 @@ export declare const findAmSymbolsToLiner: (input: string) => string;
 export declare const findRootSymbol: (val: number) => string;
 export declare const needsParensForFollowingDivision: (s: string) => boolean;
 export declare const needBrackets: (serialize: any, node: any, isFunction?: boolean) => boolean;
+export declare const isWrappedWithParens: (s: string) => boolean;

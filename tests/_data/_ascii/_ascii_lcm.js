@@ -174,6 +174,6 @@ module.exports = [
   {
     latex: `\\begin{array} { c } 3 \\frac { 1 } { 6 }  \\\\ 3 \\\\\\hline \\end{array}`,
     ascii: `[3(1)/(6)],[3]`,
-    liner: `3(1/6) \n3`,
+    liner: `3(1/6)\n3`,
   }
 ];

@@ -1,4 +1,4 @@
-import { TsvJoin } from "./tsv";
+import { linerTsvJoin, TsvJoin } from "./tsv";
 import { CsvJoin } from "./csv";
 import { getMdForChild, getMdLink } from "./table-markdown";
 import { mathTokenTypes } from "./consts";
@@ -9,6 +9,7 @@ export const renderTableCellContent = (token, isSubTable: boolean, options, env,
   let csvCell = '';
   let mdCell = '';
   let smoothedCell = '';
+  let linerCell = '';
   try {
     for (let j = 0; j < token.children.length; j++) {
       const child = token.children[j];
@@ -26,22 +27,30 @@ export const renderTableCellContent = (token, isSubTable: boolean, options, env,
 
       const ascii = child.ascii_tsv || child.ascii;
       const csvAscii = child.ascii_csv || child.ascii;
+      const liner_tsv = child.liner_tsv || child.liner;
       const tsvData = child.tsv ? child.tsv.join(',') : child.content;
       const csvData = child.csv ? child.csv.join(',') : child.content;
+      const linerTsvData = child.liner_tsv?.length > 0
+        ? child.liner_tsv.map(item => typeof item === 'string' ? item : item.join(' ')).join('\n')
+        : child.content;
       if (ascii) {
         tsvCell += ascii;
         csvCell += csvAscii;
+        linerCell += liner_tsv;
       } else if (token.type === 'subTabular') {
         if (token.parents?.length) {
           tsvCell += tsvData;
           csvCell += csvData;
+          linerCell += linerTsvData;
         } else {
           tsvCell += child.tsv ? `"${TsvJoin(child.tsv, options)}"` : child.content;
           csvCell += child.csv ? CsvJoin(child.csv, options, true) : child.content;
+          linerCell += child.liner_tsv ? linerTsvJoin(child.liner_tsv) : child.content;
         }
       } else {
         tsvCell += tsvData;
         csvCell += csvData;
+        linerCell += linerTsvData;
       }
 
       switch (child.type) {
@@ -49,6 +58,7 @@ export const renderTableCellContent = (token, isSubTable: boolean, options, env,
           const href = child.attrGet('href');
           tsvCell += href;
           csvCell += href;
+          linerCell += href;
           let link = getMdLink(child, token, j)
             .replace(/\|/g, '\\|');
           if (link) {
@@ -71,12 +81,14 @@ export const renderTableCellContent = (token, isSubTable: boolean, options, env,
           tsvCell += ' ';
           csvCell += ' ';
           mdCell += ' ';
+          linerCell += '\n';
           continue;
         case 'image':
         case 'includegraphics': {
           const src = child.attrGet('src');
           tsvCell += src;
           csvCell += src;
+          linerCell += src;
           mdCell += `![${child.attrGet('alt')}](${src})`.replace(/\|/g, '\\|');
           continue;
         }
@@ -128,7 +140,8 @@ export const renderTableCellContent = (token, isSubTable: boolean, options, env,
       tsv: tsvCell,
       csv: csvCell,
       tableMd: mdCell,
-      tableSmoothed: smoothedCell
+      tableSmoothed: smoothedCell,
+      liner_tsv: linerCell
     };
   } catch (e) {
     return {
@@ -136,7 +149,8 @@ export const renderTableCellContent = (token, isSubTable: boolean, options, env,
       tsv: tsvCell,
       csv: csvCell,
       tableMd: mdCell,
-      tableSmoothed: smoothedCell
+      tableSmoothed: smoothedCell,
+      liner_tsv: linerCell
     };
   }
 };

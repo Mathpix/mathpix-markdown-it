@@ -5,6 +5,7 @@ export declare const renderInlineTokenBlock: (tokens: any, options: any, env: an
     align: string;
     csv?: undefined;
     tableSmoothed?: undefined;
+    liner_tsv?: undefined;
 } | {
     table: string;
     tsv: any[];
@@ -12,5 +13,6 @@ export declare const renderInlineTokenBlock: (tokens: any, options: any, env: an
     tableMd: any[];
     tableSmoothed: any[];
     align: string;
+    liner_tsv: any[];
 };
 export declare const renderTabularInline: (a: any, token: any, options: any, env: any, slf: any) => string;
