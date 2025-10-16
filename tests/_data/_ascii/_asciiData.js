@@ -86,7 +86,7 @@ module.exports = [
   {
     latex: `T _ { x } \\left( \\theta _ { r } \\right) = \\left[ \\begin{array} { l l l l } { 1} & { 0} & { 0} & { 0} \\\\ { 0} & { \\operatorname { c o s } \\theta _ { r } } & { \\operatorname { s i n } \\theta _ { r } } & { 0} \\\\ { 0} & { - \\operatorname { s i n } \\theta _ { r } } & { \\operatorname { c o s } \\theta _ { r } } & { 0} \\\\ { 0} & { 0} & { 0} & { 1} \\end{array} \\right]`,
     ascii: `T_(x)(theta_(r))=[[1,0,0,0],[0,{:cos theta_(r):},{:sin theta_(r):},0],[0,{:-sin theta_(r):},{:cos theta_(r):},0],[0,0,0,1]]`,
-    liner: `T_x(θ_r)=[1 0 0 0\n0 cos θ_r sin θ_r 0\n0 −sin θ_r cos θ_r 0\n0 0 0 1]`,
+    liner: `T_x(θ_r)=[[1,0,0,0],[0,cos θ_r,sin θ_r,0],[0,−sin θ_r,cos θ_r,0],[0,0,0,1]]`,
     ascii_old: `T_(x)(theta_(r))=[[1,0,0,0],[0,cos theta_(r),sin theta_(r),0],[0,-sin theta_(r),cos theta_(r),0],[0,0,0,1]]`
   },
   {
@@ -350,7 +350,7 @@ module.exports = [
   {
     latex: `k : [ \\left( \\begin{array} { l } { x } \\\\ { y } \\\\ { z } \\end{array} \\right) - \\left( \\begin{array} { c } { 4 } \\\\ { 8 } \\\\ { - 2 } \\end{array} \\right) ] ^ { 2 } = 5 ^ { 2 }`,
     ascii:     `k:[([x],[y],[z])-([4],[8],[-2])]^(2)=5^(2)`,
-    liner:     `k:[(x\ny\nz)−(4\n8\n−2)]^2=5^2`,
+    liner:     `k:[([x],[y],[z])−([4],[8],[−2])]^2=5^2`,
     ascii_old: `k:[([x],[y],[z])-([4],[8],[-2])]^(2)=5^(2)`
   },
   {
@@ -416,7 +416,7 @@ module.exports = [
   {
     latex: `\\left\\{\\begin{array}{rl}{x+y}&{=3}\\\\{y} & {=x^{2}-8x+15}\\end{array}\\right\\}`,
     ascii:     `{[x+y,=3],[y,=x^(2)-8x+15]}`,
-    liner:     `{x+y =3\ny =x^2−8x+15}`,
+    liner:     `{[x+y,=3],[y,=x^2−8x+15]}`,
     ascii_old: `{[x+y,=3],[y,=x^(2)-8x+15]}`
   },
   {
@@ -470,13 +470,13 @@ module.exports = [
   {
     latex: `\\left(\\begin{array}{rl}{x+y}&{=3}\\\\{y} & {=x^{2}-8x+15}\\end{array}\\right)`,
     ascii:     `([x+y,=3],[y,=x^(2)-8x+15])`,
-    liner:     `(x+y =3\ny =x^2−8x+15)`,
+    liner:     `([x+y,=3],[y,=x^2−8x+15])`,
     ascii_old: `([x+y,=3],[y,=x^(2)-8x+15])`
   },
   {
     latex: `\\left[\\begin{array}{rl}{x+y}&{=3}\\\\{y} & {=x^{2}-8x+15}\\end{array}\\right]`,
     ascii:     `[[x+y,=3],[y,=x^(2)-8x+15]]`,
-    liner:     `[x+y =3\ny =x^2−8x+15]`,
+    liner:     `[[x+y,=3],[y,=x^2−8x+15]]`,
     ascii_old: `[[x+y,=3],[y,=x^(2)-8x+15]]`
   },
   {

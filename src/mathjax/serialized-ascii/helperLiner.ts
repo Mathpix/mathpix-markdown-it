@@ -4,6 +4,7 @@ import { regExpIsFunction } from "./helperA";
 
 const RE_NEED_PARENS_BEFORE_FRACTION = /([\p{L}\p{N}]|[)\]}]|[!′″‴%°])$/u;
 const RE_NEED_PARENS_AFTER_FRACTION = /^([\p{L}\p{N}]|[\(\[\{]|[!′″‴%°])/u;
+const RE_UNICODE_WHITESPACE = /\p{White_Space}/gu;
 
 export const amSymbolsToLiner = [
   { input: "\u005E", output: "\u0302"}, //hat
@@ -82,3 +83,13 @@ export const isWrappedWithParens = (s: string): boolean => {
   }
   return depth === 0;
 };
+
+export const hasAnyWhitespace = (str: string): boolean => {
+  return str
+    .replace(RE_UNICODE_WHITESPACE, '')
+    .length !== str.length;
+}
+
+export const replaceUnicodeWhitespace = (str: string): string => {
+  return str.replace(RE_UNICODE_WHITESPACE, ' ');
+}

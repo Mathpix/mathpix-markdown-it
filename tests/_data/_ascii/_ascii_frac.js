@@ -52,17 +52,17 @@ module.exports = [
   {
     latex: '\\sum_{n=1}^{\\infty} n ! \\sin \\frac{n}{2^{n}}',
     ascii: 'sum_(n=1)^(oo)n!sin((n)/(2^(n)))',
-    liner: '∑_(n=1)^(∞)n!sin(n/(2^n))',
+    liner: '∑_(n=1)^∞n!sin(n/(2^n))',
   },
   {
     latex: '10 \\cos ^{2} \\frac{\\alpha}{2}-5 \\cos \\alpha+3',
     ascii: '10cos^(2)((alpha)/(2))-5cos alpha+3',
-    liner: '10cos^2(α/2)−5cos α+3',
+    liner: '10cos^2(α/2)−5cosα+3',
   },
   {
     latex: '\\left(1-\\cos \\pi x-\\sin \\frac{\\pi x}{2}\\right) \\sqrt{5-x^{2}}=0',
     ascii: '(1-cos pi x-sin((pi x)/(2)))sqrt(5-x^(2))=0',
-    liner: '(1−cos π x−sin((π x)/2))√(5−x^2)=0',
+    liner: '(1−cosπ x−sin((π x)/2))√(5−x^2)=0',
   },
   {
     latex: '\\log \\frac{x}{y^{5}}',

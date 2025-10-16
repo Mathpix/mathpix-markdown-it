@@ -165,7 +165,7 @@ module.exports = [
   {
     latex: `\\left(\\begin{array}{c}10 \\\\ 1\\end{array}\\right)`,
     ascii: `([10],[1])`,
-    liner: `(10\n1)`,
+    liner: `([10],[1])`,
   },
   {
     latex: `\\left.\\begin{array} { r } { \\mathcal { R } ( \\mathbf { x } ) = \\mathbf { x } } \\\\ { \\frac { d \\mathcal { R } } { d \\mathbf { x } } = - \\mathbf { I } } \\end{array} \\right.`,
@@ -185,7 +185,7 @@ module.exports = [
   {
     latex: `\\begin{array}{r} \\left[ \\begin{array} { ll } - 6 & - 2 \\\\ - 3 & - 4 \\end{array} \\right]^{-1} =\\left[ \\begin{array} { c } - 2 \\\\ 5 \\end{array} \\right] \\\\ (1,-2)\\end{array}`,
     ascii: `{:[[[-6,-2],[-3,-4]]^(-1)=[[-2],[5]]],[(1","-2)]:}`,
-    liner: `[−6 −2\n−3 −4]^(−1)=[−2\n5]\n(1,−2)`,
+    liner: `[[−6,−2],[−3,−4]]^(−1)=[[−2],[5]]\n(1,−2)`,
   },
   {
     latex: `\\begin{array}{r} x + 2 y \\geq 2 \\\\ x - y \\leq 0 \\end{array}`,

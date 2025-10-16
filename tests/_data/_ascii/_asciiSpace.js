@@ -21,7 +21,7 @@ module.exports = [
   {
     latex: `\\bigoplus\\bigcup\\bigcap\\geqq\\leqq\\longrightarrow\\top\\longleftrightarrow\\Longrightarrow\\longrightarrow\\longleftarrow\\Longleftarrow\\Longleftrightarrow\\longmapsto\\widetilde{x}\\widehat{x}`,
     ascii:    `bigoplus uuu nnn >=   <=  longrightarrow TT longleftrightarrow Longrightarrow longrightarrow longleftarrow Longleftarrow Longleftrightarrow longmapsto widetilde(x) widehat(x)`,
-    liner:    `⨁⋃⋂≧ ≦ ⟶⊤ ⟷ ⟹ ⟶ ⟵ ⟸ ⟺ ⟼x̂x̂`,
+    liner:    `⨁⋃⋂≧≦⟶⊤⟷⟹⟶⟵⟸⟺⟼x̂x̂`,
     ascii_old: `bigoplus uuu nnn>=<=longrightarrow TT longleftrightarrow Longrightarrow longrightarrow longleftarrow Longleftarrow Longleftrightarrow longmapsto widetilde x widehat x`,
   },
   {
