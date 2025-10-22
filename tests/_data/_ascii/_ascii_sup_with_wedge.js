@@ -67,7 +67,7 @@ module.exports = [
   {
     latex: 'g(x)=38(0.561)^{5 x}',
     ascii: 'g(x)=38(0.561)^(5x)',
-    liner: 'g(x)=38(0.561)^(5x)',
+    liner: 'g(x)=38(0.561)⁵ˣ',
   },
   {
     latex: 'f(t)=10^{*}(1.24)^{\\wedge}(\\mathrm{t} / 4)',

@@ -53,7 +53,7 @@ module.exports = [
   {
     latex: `2 x + 3 \\lcm { 8 x ^ { 3 } - 4 x + 3 9 }`,
     ascii: `((2x+3)/(8x^(3)-4x+39))`,
-    liner: `((2x+3)/(8x^3−4x+39))`,
+    liner: `((2x+3)/(8x³−4x+39))`,
   },
   {
     latex: `3 \\lcm { 3 4 5 }`,
@@ -68,7 +68,7 @@ module.exports = [
   {
     latex: `x + 2\\lcm { 2x ^ { 3} - x - 11}`,
     ascii: `((x+2)/(2x^(3)-x-11))`,
-    liner: `((x+2)/(2x^3−x−11))`,
+    liner: `((x+2)/(2x³−x−11))`,
   },
   {
     latex: `3 \\lcm { 6 3 }`,
@@ -138,12 +138,12 @@ module.exports = [
   {
     latex: `x ^ { 2} + x -1 \\lcm { x ^ { 5} + x ^ { 4} - 2x ^ { 3} + 0+ x + 1 }`,
     ascii: `((x^(2)+x-1)/(x^(5)+x^(4)-2x^(3)+0+x+1))`,
-    liner: `((x^2+x−1)/(x^5+x^4−2x^3+0+x+1))`,
+    liner: `((x²+x−1)/(x⁵+x⁴−2x³+0+x+1))`,
   },
   {
     latex: `3x + 2\\lcm { 6x ^ { 2} - 5x + 4}`,
     ascii: `((3x+2)/(6x^(2)-5x+4))`,
-    liner: `((3x+2)/(6x^2−5x+4))`,
+    liner: `((3x+2)/(6x²−5x+4))`,
   },
   {
     latex: `4 1 \\lcm { 2 3 0 }`,
@@ -158,17 +158,17 @@ module.exports = [
   {
     latex: `x - \\frac { 3 } { 4 } \\lcm { 8 x ^ { 3 } - 18 x ^ { 2 } - 11 x + 15 }`,
     ascii: `((x-(3)/(4))/(8x^(3)-18x^(2)-11 x+15))`,
-    liner: `((x−3/4)/(8x^3−18x^2−11 x+15))`,
+    liner: `((x−3/4)/(8x³−18x²−11 x+15))`,
   },
   {
     latex: `x ^ { 2 } + 1 4 x + 4 9 g + {x ^ { 2 } + 1 4 x + 4 9 \\lcm { x ^ { 2 } + 1 4 x }}`,
     ascii: `x^(2)+14x+49g+((x^(2)+14x+49)/(x^(2)+14x))`,
-    liner: `x^2+14x+49g+((x^2+14x+49)/(x^2+14x))`,
+    liner: `x²+14x+49g+((x²+14x+49)/(x²+14x))`,
   },
   {
     latex: `g + {x ^ { 2 } + 1 4 x + 4 9 \\lcm { x ^ { 2 } + 1 4 x }}`,
     ascii: `g+((x^(2)+14x+49)/(x^(2)+14x))`,
-    liner: `g+((x^2+14x+49)/(x^2+14x))`,
+    liner: `g+((x²+14x+49)/(x²+14x))`,
   },
   /** Here mclose has a notation: 'bottom' attribute, but this should not be converted to lcm */
   {

@@ -14,7 +14,7 @@ module.exports = [
   {
     latex: `x^2 + 2`,
     ascii:     `x^(2)+2`,
-    liner:     `x^2+2`,
+    liner:     `x²+2`,
     ascii_old: `x^(2)+2`
   },
   {
@@ -68,13 +68,13 @@ module.exports = [
   {
     latex: `\\begin{array}{lll}\\operatorname{s i n}&x&y\\\\(x^2)&x&y\\end{array}`,
     ascii:     `{:[sin,x,y],[(x^(2)),x,y]:}`,
-    liner:     `sin x y\n(x^2) x y`,
+    liner:     `sin x y\n(x²) x y`,
     ascii_old: `[sin,x,y],[(x^(2)),x,y]`
   },
   {
     latex: `\\left.\\begin{array}{lll}\\operatorname{s i n}&x&y\\\\(x^2)&x&y\\end{array}\\right.`,
     ascii:     `{:[sin,x,y],[(x^(2)),x,y]:}`,
-    liner:     `sin x y\n(x^2) x y`,
+    liner:     `sin x y\n(x²) x y`,
     ascii_old: `{:[sin,x,y],[(x^(2)),x,y]:}`
   },
   {
@@ -86,7 +86,7 @@ module.exports = [
   {
     latex: `T _ { x } \\left( \\theta _ { r } \\right) = \\left[ \\begin{array} { l l l l } { 1} & { 0} & { 0} & { 0} \\\\ { 0} & { \\operatorname { c o s } \\theta _ { r } } & { \\operatorname { s i n } \\theta _ { r } } & { 0} \\\\ { 0} & { - \\operatorname { s i n } \\theta _ { r } } & { \\operatorname { c o s } \\theta _ { r } } & { 0} \\\\ { 0} & { 0} & { 0} & { 1} \\end{array} \\right]`,
     ascii: `T_(x)(theta_(r))=[[1,0,0,0],[0,{:cos theta_(r):},{:sin theta_(r):},0],[0,{:-sin theta_(r):},{:cos theta_(r):},0],[0,0,0,1]]`,
-    liner: `T_x(θ_r)=[[1,0,0,0],[0,cos θ_r,sin θ_r,0],[0,−sin θ_r,cos θ_r,0],[0,0,0,1]]`,
+    liner: `Tₓ(θᵣ)=[[1,0,0,0],[0,cos θᵣ,sin θᵣ,0],[0,−sin θᵣ,cos θᵣ,0],[0,0,0,1]]`,
     ascii_old: `T_(x)(theta_(r))=[[1,0,0,0],[0,cos theta_(r),sin theta_(r),0],[0,-sin theta_(r),cos theta_(r),0],[0,0,0,1]]`
   },
   {
@@ -158,13 +158,13 @@ module.exports = [
   {
     latex: `f ( x ) = \\left\\{ \\begin{array} { l l } { x ^ { 2} + 1,} & { x > 1} \\\\ { 1,} & { x = 1} \\\\ { x + 1,} & { x < 1} \\end{array} \\right.`,
     ascii:     `f(x)={[x^(2)+1",",x > 1],[1",",x=1],[x+1",",x < 1]:}`,
-    liner:     `f(x)={x^2+1, x>1\n1, x=1\nx+1, x<1`,
+    liner:     `f(x)={x²+1, x>1\n1, x=1\nx+1, x<1`,
     ascii_old: `f(x)={[x^(2)+1,,x>1],[1,,x=1],[x+1,,x<1]:}`
   },
   {
     latex: `f(x)= \\left\\{ \\begin{array} {ll} { x e ^ {2x} } & { \\text{ si } } & { x < 0} \\\\ { \\frac { \\operatorname { ln } ( x + 1) } { x + 1} } & { \\text{ si } } & { x \\geq 0} \\end{array} \\right.`,
     ascii: `f(x)={[xe^(2x)," si ",x < 0],[(ln(x+1))/(x+1)," si ",x >= 0]:}`,
-    liner: `f(x)={xe^(2x)  si  x<0\n(ln(x+1))/(x+1)  si  x≥0`,
+    liner: `f(x)={xe²ˣ  si  x<0\n(ln(x+1))/(x+1)  si  x≥0`,
     ascii_old: `f(x)={[xe^(2x)," si ",x<0],[(ln(x+1))/(x+1)," si ",x>=0]:}`
   },
   {
@@ -176,7 +176,7 @@ module.exports = [
   {
     latex: `f ( x ) = \\left\\{ \\begin{array} { l l } { 2 x + 5 } & { \\text { khi } x < - 1 } \\\\ { x ^ { 2 } + 2 } & { \\text { khi } x \\geq - 1 } \\end{array} \\right.`,
     ascii:     `f(x)={[2x+5," khi "x < -1],[x^(2)+2," khi "x >= -1]:}`,
-    liner:     `f(x)={2x+5  khi x<−1\nx^2+2  khi x≥−1`,
+    liner:     `f(x)={2x+5  khi x<−1\nx²+2  khi x≥−1`,
     ascii_old: `f(x)={[2x+5," khi "x<-1],[x^(2)+2," khi "x>=-1]:}`
   },
   {
@@ -188,7 +188,7 @@ module.exports = [
   {
     latex: `y = x ^ { 2} ,y = x ^ { 2} + \\operatorname{sin} ( x ^ { 3} )`,
     ascii: `y=x^(2),y=x^(2)+sin(x^(3))`,
-    liner: `y=x^2,y=x^2+sin(x^3)`,
+    liner: `y=x²,y=x²+sin(x³)`,
     ascii_old: `y=x^(2),y=x^(2)+sin(x^(3))`
   },
   {
@@ -206,7 +206,7 @@ module.exports = [
   {
     latex: `(x^2 + 1)`,
     ascii:     `(x^(2)+1)`,
-    liner:     `(x^2+1)`,
+    liner:     `(x²+1)`,
     ascii_old: `(x^(2)+1)`
   },
   {
@@ -260,19 +260,19 @@ module.exports = [
   {
     latex: `(x^2 + (2x + 1))`,
     ascii:     `(x^(2)+(2x+1))`,
-    liner:     `(x^2+(2x+1))`,
+    liner:     `(x²+(2x+1))`,
     ascii_old: `(x^(2)+(2x+1))`
   },
   {
     latex: `(x^2) + (2x + 1) + (y^2)`,
     ascii:     `(x^(2))+(2x+1)+(y^(2))`,
-    liner:     `(x^2)+(2x+1)+(y^2)`,
+    liner:     `(x²)+(2x+1)+(y²)`,
     ascii_old: `(x^(2))+(2x+1)+(y^(2))`
   },
   {
     latex: `(1 + (x^2 + 2x))`,
     ascii:     `(1+(x^(2)+2x))`,
-    liner:     `(1+(x^2+2x))`,
+    liner:     `(1+(x²+2x))`,
     ascii_old: `(1+(x^(2)+2x))`
   },
   {
@@ -290,7 +290,7 @@ module.exports = [
   {
     latex: `(1+\\frac{3+(x^2))}{2})`,
     ascii:     `(1+(3+(x^(2))))/(2))`,
-    liner:     `(1+(3+(x^2)))/2)`,
+    liner:     `(1+(3+(x²)))/2)`,
     ascii_old: `(1+(3+(x^(2))))/(2))`
   },
   {
@@ -302,14 +302,14 @@ module.exports = [
   {
     latex: `a | x y ^ 3 | ( b | c ^ 3 )`,
     ascii:     `a|xy^(3)|(b|c^(3))`,
-    liner:     `a|xy^3|(b|c^3)`,
+    liner:     `a|xy³|(b|c³)`,
     ascii_old: `a|xy^(3)|(b|c^(3))`
   },
   {
     latex: `a | _ b ^ c + a | ^ b _ c + a | _ b + a | ^ c`,
     ascii:     `a|_(b)^(c)+a|_(c)^(b)+a|_(b)+a|^(c)`,
-    liner:     `a|_b^c+a|_c^b+a|_b+a|^c`,
-    ascii_old: `a|_(b)^(c)+a|_(c)^(b)+a|_(b)+a|^(c)`
+    liner:     `a|_bᶜ+a|_cᵇ+a|_b+a|ᶜ`,
+    ascii_old: `a|_(b)^(c)+a|_(c)^(b)+a|_(b)+a|ᶜ`
   },
   {
     latex: `a | _ { \\operatorname{s i n} ( \\pi ) }`,
@@ -320,7 +320,7 @@ module.exports = [
   {
     latex: `a _ {k} | _ { I _ { m } } = : u _ { k } ^ { m } \\in V,`,
     ascii:     `a_(k)|_(I_(m))=:u_(k)^(m)in V,`,
-    liner:     `a_k|_(I_m)=:u_k^m∈V,`,
+    liner:     `aₖ|_(Iₘ)=:uₖᵐ∈V,`,
     ascii_old: `a_(k)|_(I_(m))=:u_(k)^(m)in V,`
   },
   {
@@ -332,37 +332,37 @@ module.exports = [
   {
     latex: `f ( a | b ) = x | _ { x _ 0 } ^ { x _ 1 }`,
     ascii:     `f(a|b)=x|_(x_(0))^(x_(1))`,
-    liner:     `f(a|b)=x|_(x_0)^(x_1)`,
+    liner:     `f(a|b)=x|_(x₀)^(x₁)`,
     ascii_old: `f(a|b)=x|_(x_(0))^(x_(1))`
   },
   {
     latex: `a \\| x y ^ 3 \\| ( b | c ^ 3 )`,
     ascii:     `a||xy^(3)||(b|c^(3))`,
-    liner:     `a‖xy^3‖(b|c^3)`,
+    liner:     `a‖xy³‖(b|c³)`,
     ascii_old: `a|xy^(3)|(b|c^(3))`
   },
   {
     latex: `\\begin{aligned}{(x^2)}\\end{aligned}`,
     ascii:     `{:(x^(2)):}`,
-    liner:     `(x^2)`,
+    liner:     `(x²)`,
     ascii_old: `[(x^(2))]`
   },
   {
     latex: `k : [ \\left( \\begin{array} { l } { x } \\\\ { y } \\\\ { z } \\end{array} \\right) - \\left( \\begin{array} { c } { 4 } \\\\ { 8 } \\\\ { - 2 } \\end{array} \\right) ] ^ { 2 } = 5 ^ { 2 }`,
     ascii:     `k:[([x],[y],[z])-([4],[8],[-2])]^(2)=5^(2)`,
-    liner:     `k:[([x],[y],[z])−([4],[8],[−2])]^2=5^2`,
+    liner:     `k:[([x],[y],[z])−([4],[8],[−2])]²=5²`,
     ascii_old: `k:[([x],[y],[z])-([4],[8],[-2])]^(2)=5^(2)`
   },
   {
     latex: `d s ^ { 2} = ( d X ^ { 0} ) ^ { 2} - R ( X ^ { 0} ) ^ { 2} \\sum _ { i = 1} ^ { D - 1} ( d X ^ { i } ) ^ { 2}`,
     ascii:     `ds^(2)=(dX^(0))^(2)-R(X^(0))^(2)sum_(i=1)^(D-1)(dX^(i))^(2)`,
-    liner:     `ds^2=(dX^0)^2−R(X^0)^2∑_(i=1)^(D−1)(dX^i)^2`,
+    liner:     `ds²=(dX⁰)²−R(X⁰)²∑_(i=1)^(D−1)(dXⁱ)²`,
     ascii_old: `ds^(2)=(dX^(0))^(2)-R(X^(0))^(2)sum_(i=1)^(D-1)(dX^(i))^(2)`
   },
   {
     latex: `\\Delta ( W _ { 1} ) ^ { i t } J ( W _ { 2} ) \\Delta ( W _ { 1} ) ^ { - i t } = J ( l ( W _ { 1} ,t ) W _ { 2} )`,
     ascii:     `Delta(W_(1))^(it)J(W_(2))Delta(W_(1))^(-it)=J(l(W_(1),t)W_(2))`,
-    liner:     `Δ(W_1)^(it)J(W_2)Δ(W_1)^(−it)=J(l(W_1,t)W_2)`,
+    liner:     `Δ(W₁)ⁱᵗJ(W₂)Δ(W₁)⁻ⁱᵗ=J(l(W₁,t)W₂)`,
     ascii_old: `Delta(W_(1))^(it)J(W_(2))Delta(W_(1))^(-it)=J(l(W_(1),t)W_(2))`
   },
   {
@@ -398,31 +398,31 @@ module.exports = [
   {
     latex: `\\left.\\begin{array}{rl}{(x^\\mathbb{2})}&{\\mathcal{=}y^2}\\end{array}\\right.`,
     ascii:     `{:[(x^(2)),=y^(2)]:}`,
-    liner:     `(x^2) =y^2`,
+    liner:     `(x²) =y²`,
     ascii_old: `{:[(x^(2)),=y^(2)]:}`
   },
   {
     latex: `\\begin{aligned}{(x^\\mathbb{2})}&{\\mathcal{=}y^2}\\end{aligned}`,
     ascii:     `{:(x^(2))=y^(2):}`,
-    liner:     `(x^2)=y^2`,
+    liner:     `(x²)=y²`,
     ascii_old: `[(x^(2)),=y^(2)]`
   },
   {
     latex: `\\left. \\begin{array} { r l } { x + y } & { = 3 } \\\\ { y } & { = x ^ { 2 } - 8 x + 15 } \\end{array} \\right.`,
     ascii:     `{:[x+y,=3],[y,=x^(2)-8x+15]:}`,
-    liner:     `x+y =3\ny =x^2−8x+15`,
+    liner:     `x+y =3\ny =x²−8x+15`,
     ascii_old: `{:[x+y,=3],[y,=x^(2)-8x+15]:}`
   },
   {
     latex: `\\left\\{\\begin{array}{rl}{x+y}&{=3}\\\\{y} & {=x^{2}-8x+15}\\end{array}\\right\\}`,
     ascii:     `{[x+y,=3],[y,=x^(2)-8x+15]}`,
-    liner:     `{[x+y,=3],[y,=x^2−8x+15]}`,
+    liner:     `{[x+y,=3],[y,=x²−8x+15]}`,
     ascii_old: `{[x+y,=3],[y,=x^(2)-8x+15]}`
   },
   {
     latex: `\\left.\\begin{array}{l}\\text{above }\\\\x^2\\\\\\text{ below}\\end{array}\\right.`,
     ascii: `{:["above "],[x^(2)],[" below"]:}`,
-    liner: `above \nx^2\n below`,
+    liner: `above \nx²\n below`,
     ascii_old: `{:["above "],[x^(2)],[" below"]:}`
   },
   {
@@ -452,7 +452,7 @@ module.exports = [
   {
     latex: `{(}x^2{)}`,
     ascii:     `(x^(2))`,
-    liner:     `(x^2)`,
+    liner:     `(x²)`,
     ascii_old: `(x^(2))`
   },
   {
@@ -470,19 +470,19 @@ module.exports = [
   {
     latex: `\\left(\\begin{array}{rl}{x+y}&{=3}\\\\{y} & {=x^{2}-8x+15}\\end{array}\\right)`,
     ascii:     `([x+y,=3],[y,=x^(2)-8x+15])`,
-    liner:     `([x+y,=3],[y,=x^2−8x+15])`,
+    liner:     `([x+y,=3],[y,=x²−8x+15])`,
     ascii_old: `([x+y,=3],[y,=x^(2)-8x+15])`
   },
   {
     latex: `\\left[\\begin{array}{rl}{x+y}&{=3}\\\\{y} & {=x^{2}-8x+15}\\end{array}\\right]`,
     ascii:     `[[x+y,=3],[y,=x^(2)-8x+15]]`,
-    liner:     `[[x+y,=3],[y,=x^2−8x+15]]`,
+    liner:     `[[x+y,=3],[y,=x²−8x+15]]`,
     ascii_old: `[[x+y,=3],[y,=x^(2)-8x+15]]`
   },
   {
     latex: `\\begin{array}{l}{\\text{2}^{5}2^{2}+[(b}\\end{array}`,
     ascii:     `{:"2"^(5)2^(2)+[(b:}`,
-    liner:     `2^52^2+[(b`,
+    liner:     `2⁵2²+[(b`,
     ascii_old: `["2"^(5)2^(2)+[(b]`
   },
   {
@@ -494,7 +494,7 @@ module.exports = [
   {
     latex: `\\text { foo } - 4 ^ { \\text { superscript } } \\text { bar }`,
     ascii: `" foo "-4^(" superscript ")" bar "`,
-    liner: ` foo −4^( superscript ) bar `,
+    liner: ` foo −4ˢᵘᵖᵉʳˢᶜʳⁱᵖᵗ bar `,
     ascii_old: `" foo "-4^(" superscript ")" bar "`
   },
   {
@@ -565,7 +565,7 @@ module.exports = [
   {
     latex: `x ^ 2`,
     ascii:     `x^(2)`,
-    liner:     `x^2`,
+    liner:     `x²`,
     ascii_old: `x^(2)`
   },
   {
@@ -577,7 +577,7 @@ module.exports = [
   {
     latex: `10^3`,
     ascii:     `10^(3)`,
-    liner:     `10^3`,
+    liner:     `10³`,
     ascii_old: `10^(3)`
   },
   {
@@ -589,7 +589,7 @@ module.exports = [
   {
     latex: `\\int_a^b`,
     ascii:     `int_(a)^(b)`,
-    liner:     `∫_a^b`,
+    liner:     `∫ₐᵇ`,
     ascii_old: `int_(a)^(b)`
   },
   {
@@ -631,7 +631,7 @@ module.exports = [
   {
     latex: `\\lim_{x\\rightarrow 0}{x^2}`,
     ascii:     `lim_(x rarr0)x^(2)`,
-    liner:     `lim_(x→0)x^2`,
+    liner:     `lim_(x→0)x²`,
     ascii_old: `lim_(x rarr0)x^(2)`
   },
   {
@@ -660,7 +660,7 @@ module.exports = [
   {
     latex: 't=\\sqrt{\\frac{(2) 42}{9.8} \\mathrm{~m} / \\mathrm{s}^{2}}',
     ascii: `t=sqrt(((2)42)/(9.8)m//s^(2))`,
-    liner: `t=√((((2)42)/(9.8))m/s^2)`,
+    liner: `t=√((((2)42)/(9.8))m/s²)`,
   },
   {
     latex: '200 \\mathrm{~V}',

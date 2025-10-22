@@ -19,7 +19,7 @@ module.exports = [
     latex: `\\begin{array} {r}5 x ^ { 2 } - 11 x - 3 \\\\
 + \\quad 7 x ^ { 2 } - 11 x +7 \\\\ \\hline \\end{array}`,
     ascii: `5x^(2)-11 x-3+7x^(2)-11 x+7`,
-    liner: `5x^2−11 x−3+7x^2−11 x+7`,
+    liner: `5x²−11 x−3+7x²−11 x+7`,
   },
   {
     latex: `\\begin{array} { r } 2 \\\\ \\times \\quad 42 \\\\ \\hline \\end{array}`,
@@ -64,7 +64,7 @@ module.exports = [
   {
     latex: `\\begin{array} { r } ( 40 \\times \\frac { 5 } { 18 } ) ^ { 2 } + 2 \\times ( - f \\times 9.81 ) \\\\ \\times 12.2 \\end{array} `,
     ascii: `(40 xx(5)/(18))^(2)+2xx(-f xx9.81)xx12.2`,
-    liner: `(40 ×5/(18))^2+2×(−f×9.81)×12.2`,
+    liner: `(40 ×5/(18))²+2×(−f×9.81)×12.2`,
   },
   {
     latex: `\\begin{array} { r } 208,756 \\\\ + \\quad 91,300 \\end{array}`,
@@ -102,7 +102,7 @@ module.exports = [
   {
     latex: `u _ { B } \\left( c _ { k } \\right) = \\sqrt {\\begin{array}{r} \\left( \\frac { \\partial c _ { k } } { \\partial c _ { w \\mathrm{H}_{2}\\mathrm{O}} } \\right) ^ { 2 } u _ { B } ^ { 2 } \\left( c _ { w \\mathrm{H}_{2}\\mathrm{O}} \\right) + \\left( \\frac { \\partial c _ { k } } { \\partial m _ { 1\\mathrm{H}_{2}\\mathrm{O}} } \\right) ^ { 2 } u _ { B } ^ { 2 } \\left( m _ { 1 \\mathrm{H}_{2}\\mathrm{O}}\\right) + \\left( \\frac { \\partial c _ { k } } { \\partial m _ { 2 \\mathrm{H}_{2}\\mathrm{O} } } \\right) ^ { 2 } u _ { B } ^ { 2 } \\left( m _ { 2 \\mathrm{H}_{2}\\mathrm{O}} \\right) \\\\+\\left(\\frac{\\partial c_{k}}{\\partial T_{k}}\\right)^{2}u^{2}_{B}(T_{k})+\\left(\\frac{\\partial c_{k}}{\\partial T_{1\\mathrm{H}_{2}\\mathrm{O}}}\\right)^{2}u_{B}^{2}(T_{1\\mathrm{H}_{2}\\mathrm{O}})+\\left(\\frac{\\partial c_{k}}{\\partial T_{2\\mathrm{H}_{2}\\mathrm{O}}}\\right)^{2}u_{B}^{2}(T_{2\\mathrm{H}_{2}\\mathrm{O}})\\end{array}}`,
     ascii: `u_(B)(c_(k))=sqrt(((delc_(k))/(delc_(wH_(2)O)))^(2)u_(B)^(2)(c_(wH_(2)O))+((delc_(k))/(delm_(1H_(2)O)))^(2)u_(B)^(2)(m_(1H_(2)O))+((delc_(k))/(delm_(2H_(2)O)))^(2)u_(B)^(2)(m_(2H_(2)O))+((delc_(k))/(delT_(k)))^(2)u_(B)^(2)(T_(k))+((delc_(k))/(delT_(1H_(2)O)))^(2)u_(B)^(2)(T_(1H_(2)O))+((delc_(k))/(delT_(2H_(2)O)))^(2)u_(B)^(2)(T_(2H_(2)O)))`,
-    liner: 'u_B(c_k)=√(((∂c_k)/(∂c_(wH_2O)))^2u_B^2(c_(wH_2O))+((∂c_k)/(∂m_(1H_2O)))^2u_B^2(m_(1H_2O))+((∂c_k)/(∂m_(2H_2O)))^2u_B^2(m_(2H_2O))+((∂c_k)/(∂T_k))^2u_B^2(T_k)+((∂c_k)/(∂T_(1H_2O)))^2u_B^2(T_(1H_2O))+((∂c_k)/(∂T_(2H_2O)))^2u_B^2(T_(2H_2O)))',
+    liner: 'u_B(cₖ)=√(((∂cₖ)/(∂c_(wH₂O)))²u_B²(c_(wH₂O))+((∂cₖ)/(∂m_(1H₂O)))²u_B²(m_(1H₂O))+((∂cₖ)/(∂m_(2H₂O)))²u_B²(m_(2H₂O))+((∂cₖ)/(∂Tₖ))²u_B²(Tₖ)+((∂cₖ)/(∂T_(1H₂O)))²u_B²(T_(1H₂O))+((∂cₖ)/(∂T_(2H₂O)))²u_B²(T_(2H₂O)))',
   },
   {
     latex: `\\begin{array}{r}
@@ -185,7 +185,7 @@ module.exports = [
   {
     latex: `\\begin{array}{r} \\left[ \\begin{array} { ll } - 6 & - 2 \\\\ - 3 & - 4 \\end{array} \\right]^{-1} =\\left[ \\begin{array} { c } - 2 \\\\ 5 \\end{array} \\right] \\\\ (1,-2)\\end{array}`,
     ascii: `{:[[[-6,-2],[-3,-4]]^(-1)=[[-2],[5]]],[(1","-2)]:}`,
-    liner: `[[−6,−2],[−3,−4]]^(−1)=[[−2],[5]]\n(1,−2)`,
+    liner: `[[−6,−2],[−3,−4]]⁻¹=[[−2],[5]]\n(1,−2)`,
   },
   {
     latex: `\\begin{array}{r} x + 2 y \\geq 2 \\\\ x - y \\leq 0 \\end{array}`,
@@ -195,8 +195,8 @@ module.exports = [
   {
     latex: `\\begin{array}{r} S _ { i } = \\left\\{ b \\in \\{ 0,1 \\} ^ { * } : \\exists \\text { some } c \\in B \\text{ s.t. } cb \\in S_{i-1}\\right\\}\\\\ \\cup \\{b \\in \\{0,1\\}^{*}: \\exists \\text{ some } c \\in S_{i-1} \\text{ s.t. } cb \\in B \\}\\end{array}`,
     ascii: `{:[S_(i)={b in{0,1}^(**):EE" some "c in B" s.t. "cb inS_(i-1)}],[uu{b in{0","1}^(**):EE" some "c inS_(i-1)" s.t. "cb in B}]:}`,
-    liner: 'S_i={b∈{0,1}^∗:∃ some c∈B s.t. cb∈S_(i−1)}\n' +
-      '∪{b∈{0,1}^∗:∃ some c∈S_(i−1) s.t. cb∈B}',
+    liner: 'Sᵢ={b∈{0,1}^∗:∃ some c∈B s.t. cb∈Sᵢ₋₁}\n' +
+      '∪{b∈{0,1}^∗:∃ some c∈Sᵢ₋₁ s.t. cb∈B}',
   },
   {
     latex: `\\begin{array} { r } \\therefore 2 x < 10 \\\\ \\therefore x < 5 \\end{array}`,
@@ -226,7 +226,7 @@ module.exports = [
   {
     latex: `\\begin{array}{r}y _ { i } \\geqslant \\theta \\\\ -y _ { i } \\leqslant 0\\\\\\in R \\end{array}`,
     ascii: `{:[y_(i) >= theta],[-y_(i) <= 0],[in R]:}`,
-    liner: `y_i⩾θ\n−y_i⩽0\n∈R`,
+    liner: `yᵢ⩾θ\n−yᵢ⩽0\n∈R`,
   },
   {
     latex: ``,

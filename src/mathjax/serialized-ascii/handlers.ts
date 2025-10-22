@@ -9,7 +9,9 @@ import {
   needBrackets,
   isWrappedWithParens,
   hasAnyWhitespace,
-  replaceUnicodeWhitespace
+  replaceUnicodeWhitespace,
+  replaceScripts,
+  formatLinerFromAscii
 } from "./helperLiner";
 import { isFirstChild, isLastChild } from "./node-utils";
 
@@ -778,10 +780,7 @@ const mover = (handlerApi) => {
         const t = dataSecondChild.ascii;
         const data = FindSymbolToAM('mover', t, getAttributes(secondChild));
         if (data.ascii) {
-          let liner = findAmSymbolsToLiner(data.liner);
-          if (liner) {
-            liner = dataFirstChild?.liner?.trim() + liner
-          }
+          let liner = formatLinerFromAscii(data.ascii, dataFirstChild?.liner);
           res = AddToAsciiData(res, { ascii: ' ', liner: '' });
           res = AddToAsciiData(res, {
             ascii: data.ascii,
@@ -789,7 +788,7 @@ const mover = (handlerApi) => {
           });
           res = AddToAsciiData(res, {
             ascii: '(',
-            liner: dataFirstChild?.liner?.trim()?.length > 1  ? '(' : '',
+            liner: !liner && dataFirstChild?.liner?.trim()?.length > 1  ? '(' : '',
           });
           res = AddToAsciiData(res, {
             ascii: dataFirstChild? dataFirstChild.ascii ? dataFirstChild.ascii.trim() : dataFirstChild.ascii : '',
@@ -801,25 +800,29 @@ const mover = (handlerApi) => {
           });
           res = AddToAsciiData(res, {
             ascii: ')',
-            liner: dataFirstChild?.liner?.trim()?.length > 1  ? ')' : ''
+            liner: !liner && dataFirstChild?.liner?.trim()?.length > 1  ? ')' : ''
           });
         } else {
+          let liner = formatLinerFromAscii(data.liner, dataFirstChild?.liner, 'mover');
           res = AddToAsciiData(res, {
             ascii: dataFirstChild ? dataFirstChild.ascii : '',
-            liner: dataFirstChild ? dataFirstChild.liner : '',
+            liner: !liner && dataFirstChild ? dataFirstChild.liner : '',
             ascii_tsv: dataFirstChild ? dataFirstChild.ascii_tsv : '',
             ascii_csv: dataFirstChild ? dataFirstChild.ascii_csv : '',
             ascii_md: dataFirstChild ? dataFirstChild.ascii_md : '',
             liner_tsv: dataFirstChild ? dataFirstChild.liner_tsv : '',
           });
-          res = AddToAsciiData(res, {ascii: '^', liner: '^'});
+          res = AddToAsciiData(res, {
+            ascii: '^',
+            liner: liner ? liner : '^'
+          });
           res = AddToAsciiData(res, {
             ascii: serialize.options.extraBrackets ? '(' : '',
-            liner: dataSecondChild?.liner?.length ? '(' : '',
+            liner: !liner && dataSecondChild?.liner?.length ? '(' : '',
           });
           res = AddToAsciiData(res, {
             ascii: dataSecondChild ? dataSecondChild.ascii : '',
-            liner: dataSecondChild ? dataSecondChild.liner : '',
+            liner: !liner && dataSecondChild ? dataSecondChild.liner : '',
             ascii_tsv: dataSecondChild ? dataSecondChild.ascii_tsv : '',
             ascii_csv: dataSecondChild ? dataSecondChild.ascii_csv : '',
             ascii_md: dataSecondChild ? dataSecondChild.ascii_md : '',
@@ -827,12 +830,27 @@ const mover = (handlerApi) => {
           });
           res = AddToAsciiData(res, {
             ascii: serialize.options.extraBrackets ? ')' : '',
-            liner: dataSecondChild?.liner?.length ? ')' : '',
+            liner: !liner && dataSecondChild?.liner?.length ? ')' : '',
           });
         }
       } else {
         const data: IAsciiData = handlerApi.handleAll(node, serialize);
-        res = AddToAsciiData(res, data);
+        let liner = '';
+        if (dataFirstChild?.liner?.length && dataSecondChild.liner?.length) {
+          liner += dataFirstChild.liner?.length > 1 ? `(${dataFirstChild.liner})` : dataFirstChild.liner;
+          let linerData = dataSecondChild.liner.length === 1 ? findAmSymbolsToLiner(dataSecondChild.liner) : null;
+          if (linerData) {
+            liner += dataFirstChild.liner.length > 1 ? linerData.outputComplex : linerData.output;
+          } else {
+            liner += '^';
+            liner += dataSecondChild.liner?.length > 1 ? `(${dataSecondChild.liner})` : dataSecondChild.liner;
+          }
+        }
+        if (liner) {
+          res = AddToAsciiData(res, {...data, liner: liner});
+        } else {
+          res = AddToAsciiData(res, data);
+        }
       }
       return res;
     } catch (e) {
@@ -854,25 +872,34 @@ const munder = (handlerApi) => {
         const t = dataSecondChild.ascii;
         const data = FindSymbolToAM(node.kind, t);
         if (data.ascii) {
+          let liner = formatLinerFromAscii(data.ascii, dataFirstChild?.liner);
           res = AddToAsciiData(res, {
             ascii: data.ascii + '(',
-            liner: data.liner + '('
+            liner: liner ? liner : data.liner + '('
           });
           res = AddToAsciiData(res, {
             ascii: dataFirstChild ? dataFirstChild.ascii : '',
-            liner: dataFirstChild ? dataFirstChild.liner : '',
+            liner: !liner && dataFirstChild ? dataFirstChild.liner : '',
             ascii_tsv: dataFirstChild ? dataFirstChild.ascii_tsv : '',
             ascii_csv: dataFirstChild ? dataFirstChild.ascii_csv : '',
             ascii_md: dataFirstChild ? dataFirstChild.ascii_md : '',
             liner_tsv: dataFirstChild ? dataFirstChild.liner_tsv : '',
           });
           res = AddToAsciiData(res, {
-            ascii: data.ascii + ')',
-            liner: data.liner + ')'
+            ascii: ')',
+            liner: !liner ? ')' : ''
           });
         } else {
           const data: IAsciiData = handlerApi.handleAll(node, serialize);
-          res = AddToAsciiData(res, data);
+          let liner = '';
+          if (dataFirstChild?.liner?.length && dataSecondChild.liner?.length) {
+            liner = formatLinerFromAscii(dataSecondChild.liner, dataFirstChild.liner);
+          }
+          if (liner) {
+            res = AddToAsciiData(res, {...data, liner: liner});
+          } else {
+            res = AddToAsciiData(res, data);
+          }
         }
       } else {
         res = AddToAsciiData(res, {
@@ -996,15 +1023,19 @@ const msub = () => {
         ascii_md: dataFirstChild ? dataFirstChild.ascii_md : '',
         liner_tsv: dataFirstChild ? dataFirstChild.liner_tsv : '',
       });
-      res = AddToAsciiData(res, {ascii: '_', liner: '_'});
-      const linerNeedsParens = dataSecondChild?.liner?.length > 1 && !isWrappedWithParens(dataSecondChild.liner);
+      let liner = replaceScripts(dataSecondChild?.liner, 'sub');
+      res = AddToAsciiData(res, {
+        ascii: '_',
+        liner: liner ? liner : '_'
+      });
+      const linerNeedsParens = !liner && dataSecondChild?.liner?.length > 1 && !isWrappedWithParens(dataSecondChild.liner);
       res = AddToAsciiData(res, {
         ascii: serialize.options.extraBrackets ? '(' : '',
         liner: linerNeedsParens ? '(' : '',
       });
       res = AddToAsciiData(res, {
         ascii: dataSecondChild ? dataSecondChild.ascii : '',
-        liner: dataSecondChild ? dataSecondChild.liner : '',
+        liner: !liner && dataSecondChild ? dataSecondChild.liner : '',
         ascii_tsv: dataSecondChild ? dataSecondChild.ascii_tsv : '',
         ascii_csv: dataSecondChild ? dataSecondChild.ascii_csv : '',
         ascii_md: dataSecondChild ? dataSecondChild.ascii_md : '',
@@ -1040,19 +1071,34 @@ const msup = () =>  {
         ascii_md: dataFirstChild ? dataFirstChild.ascii_md : '',
         liner_tsv: dataFirstChild ? dataFirstChild.liner_tsv : '',
       });
-      res = AddToAsciiData(res, {ascii: '^', liner: '^'});
+      let linerData = dataSecondChild?.liner?.length === 1
+        ? findAmSymbolsToLiner(dataSecondChild.liner, 'msup')
+        : null;
+      let liner = linerData ? linerData.output : '';
       const ignoreBrackets = node.attributes.get('ignoreBrackets');
       if (ignoreBrackets && !dataSecondChild.ascii) {
+        res = AddToAsciiData(res, {
+          ascii: '^',
+          liner: liner ? liner : '^'
+        });
         return res;
       }
-      const linerNeedsParens = dataSecondChild?.liner?.length > 1 && !isWrappedWithParens(dataSecondChild.liner);
+      if (!liner) {
+        liner = replaceScripts(dataSecondChild?.liner);
+      }
+      const linerNeedsParens = !liner && dataSecondChild?.liner?.length > 1 && !isWrappedWithParens(dataSecondChild.liner);
+      res = AddToAsciiData(res, {
+        ascii: '^',
+        liner: liner ? liner : '^'
+      });
+
       res = AddToAsciiData(res, {
         ascii: serialize.options.extraBrackets ? '(' : '',
         liner: linerNeedsParens ? '(' : '',
       });
       res = AddToAsciiData(res, {
         ascii: dataSecondChild ? dataSecondChild.ascii : '',
-        liner: dataSecondChild ? dataSecondChild.liner : '',
+        liner: !liner && dataSecondChild ? dataSecondChild.liner : '',
         ascii_tsv: dataSecondChild ? dataSecondChild.ascii_tsv : '',
         ascii_csv: dataSecondChild ? dataSecondChild.ascii_csv : '',
         ascii_md: dataSecondChild ? dataSecondChild.ascii_md : '',
@@ -1097,15 +1143,19 @@ const msubsup = () => {
         ascii: '',
         liner: linerNeedsParens ? ')' : ''
       });
-      res = AddToAsciiData(res, {ascii: '_', liner: '_'});
-      linerNeedsParens = dataSecondChild?.liner?.length > 1 && !isWrappedWithParens(dataSecondChild.liner);
+      let liner = replaceScripts(dataSecondChild?.liner, 'sub');
+      res = AddToAsciiData(res, {
+        ascii: '_',
+        liner: liner ? liner : '_'
+      });
+      linerNeedsParens = !liner && dataSecondChild?.liner?.length > 1 && !isWrappedWithParens(dataSecondChild.liner);
       res = AddToAsciiData(res, {
         ascii: '(',
         liner: linerNeedsParens ? '(' : ''
       });
       res = AddToAsciiData(res, {
         ascii: dataSecondChild ? dataSecondChild.ascii : '',
-        liner: dataSecondChild ? dataSecondChild.liner : '',
+        liner: !liner && dataSecondChild ? dataSecondChild.liner : '',
         ascii_tsv: dataSecondChild ? dataSecondChild.ascii_tsv : '',
         ascii_csv: dataSecondChild ? dataSecondChild.ascii_csv : '',
         ascii_md: dataSecondChild ? dataSecondChild.ascii_md : '',
@@ -1115,15 +1165,19 @@ const msubsup = () => {
         ascii: ')',
         liner: linerNeedsParens ? ')' : ''
       });
-      res = AddToAsciiData(res, {ascii: '^', liner: '^'});
-      linerNeedsParens = dataThirdChild?.liner?.length > 1 && !isWrappedWithParens(dataThirdChild.liner);
+      liner = replaceScripts(dataThirdChild?.liner);
+      res = AddToAsciiData(res, {
+        ascii: '^',
+        liner: liner ? liner : '^'
+      });
+      linerNeedsParens =  !liner && dataThirdChild?.liner?.length > 1 && !isWrappedWithParens(dataThirdChild.liner);
       res = AddToAsciiData(res, {
         ascii: '(',
         liner: linerNeedsParens ? '(' : ''
       });
       res = AddToAsciiData(res, {
         ascii: dataThirdChild ? dataThirdChild.ascii : '',
-        liner: dataThirdChild ? dataThirdChild.liner : '',
+        liner:  !liner && dataThirdChild ? dataThirdChild.liner : '',
         ascii_tsv: dataThirdChild ? dataThirdChild.ascii_tsv : '',
         ascii_csv: dataThirdChild ? dataThirdChild.ascii_csv : '',
         ascii_md: dataThirdChild ? dataThirdChild.ascii_md : '',
@@ -1175,9 +1229,7 @@ const mroot = () => {
       const secondChild = node.childNodes[1] ? node.childNodes[1] : null;
       const dataSecondChild: IAsciiData = secondChild ? serialize.visitNode(secondChild, '') : null;
       const dataFirstChild: IAsciiData = firstChild ? serialize.visitNode(firstChild, '') : null;
-      let liner: string = /^\s*[234]\s*$/.test(dataSecondChild.liner)
-        ? findRootSymbol(Number(dataSecondChild.liner))
-        : '';
+      let liner: string = findRootSymbol(dataSecondChild?.liner);
       res = AddToAsciiData(res, {
         ascii: 'root',
         liner: liner ? liner : 'root'

@@ -8,20 +8,20 @@ module.exports = [
   {
     latex: `\\left. \\begin{array} { r l } { \\hat { V } _ { L } } & { = \\sum _ { \\mathbf { m } , \\mathbf { n } } \\sum _ { l , m _ { l } } v _ { l } ( k _ { m ^ { 2 } } , k _ { n ^ { 2 } } ) Y _ { l m _ { l } } ^ { * } ( \\hat { \\mathbf { m } } ) Y _ { l m _ { l } } ( \\hat { \\mathbf { n } } ) | \\mathbf { m } \\rangle \\langle \\mathbf { n } | } \\\\ { } & { = \\sum _ { m ^ { 2 } , n ^ { 2 } } \\sum _ { l } v _ { l } ( k _ { m ^ { 2 } } , k _ { n ^ { 2 } } ) \\sum _ { m _ { l } } ( \\sum _ { \\mathbf { m } } Y _ { l m _ { l } } ^ { * } ( \\hat { \\mathbf { m } } ) | \\mathbf { m } \\rangle ) ( \\sum _ { \\hat { \\mathbf { n } } } Y _ { l m _ { l } } ( \\hat { \\mathbf { n } } ) \\langle \\mathbf { n } | ) } \\end{array} \\right.`,
     ascii:    `{:[ hat(V)_(L),{:=sum_(m,n)sum_(l,m_(l))v_(l)(k_(m^(2))","k_(n^(2)))Y_(lm_(l))^(**)( hat(m))Y_(lm_(l))( hat(n))|m:)(:n|:}],[,{:=sum_(m^(2),n^(2))sum_(l)v_(l)(k_(m^(2))","k_(n^(2)))sum_(m_(l))(sum_(m)Y_(lm_(l))^(**)( hat(m))|m:))(sum_( hat(n))Y_(lm_(l))( hat(n))(:n|):}]:}`,
-    liner:    'V̂_L =∑_(m,n)∑_(l,m_l)v_l(k_(m^2),k_(n^2))Y_(lm_l)^∗(m̂)Y_(lm_l)(n̂)|m⟩⟨n|\n' +
-      ' =∑_(m^2,n^2)∑_(l)v_l(k_(m^2),k_(n^2))∑_(m_l)(∑_(m)Y_(lm_l)^∗(m̂)|m⟩)(∑_(n̂)Y_(lm_l)(n̂)⟨n|)',
+    liner:    'V̂_L =∑_(m,n)∑_(l,mₗ)vₗ(k_(m²),k_(n²))Y_(lmₗ)^∗(m̂)Y_(lmₗ)(n̂)|m⟩⟨n|\n' +
+      ' =∑_(m²,n²)∑_(l)vₗ(k_(m²),k_(n²))∑_(mₗ)(∑_(m)Y_(lmₗ)^∗(m̂)|m⟩)(∑_(n̂)Y_(lmₗ)(n̂)⟨n|)',
     ascii_old: `{:[hat V_(L),=sum_(m,n)sum_(l,m_(l))v_(l)(k_(m^(2)),k_(n^(2)))Y_(lm_(l))^(*)(hat m)Y_(lm_(l))(hat n)|m:)(:n|],[,=sum_(m^(2),n^(2))sum_(l)v_(l)(k_(m^(2)),k_(n^(2)))sum_(m_(l))(sum_(m)Y_(lm_(l))^(*)(hat m)|m:))(sum_(hat n)Y_(lm_(l))(hat n)(:n|)]:}`,
   },
   {
     latex: `1+\\int_{vR}^{v}(\\frac{\\epsilon(bu-F(u)-I))}{(F(u)-W(u)+I)^{2}})\\frac{\\partial W(u)}{\\partial w_{0}}du`,
     ascii:    `1+int_(vR)^(v)((epsilon(bu-F(u)-I)))/((F(u)-W(u)+I)^(2)))(del W(u))/(delw_(0))du`,
-    liner:    `1+∫_(vR)^v((ϵ(bu−F(u)−I)))/((F(u)−W(u)+I)^2))((∂ W(u))/(∂w_0))du`,
+    liner:    `1+∫_(vR)ᵛ((ϵ(bu−F(u)−I)))/((F(u)−W(u)+I)²))((∂ W(u))/(∂w₀))du`,
     ascii_old: `1+int_(vR)^(v)((epsilon(bu-F(u)-I)))/((F(u)-W(u)+I)^(2)))(del W(u))/(del w_(0))du`
   },
   {
     latex: `\\bigoplus\\bigcup\\bigcap\\geqq\\leqq\\longrightarrow\\top\\longleftrightarrow\\Longrightarrow\\longrightarrow\\longleftarrow\\Longleftarrow\\Longleftrightarrow\\longmapsto\\widetilde{x}\\widehat{x}`,
     ascii:    `bigoplus uuu nnn >=   <=  longrightarrow TT longleftrightarrow Longrightarrow longrightarrow longleftarrow Longleftarrow Longleftrightarrow longmapsto widetilde(x) widehat(x)`,
-    liner:    `⨁⋃⋂≧≦⟶⊤⟷⟹⟶⟵⟸⟺⟼x̂x̂`,
+    liner:    `⨁⋃⋂≧≦⟶⊤⟷⟹⟶⟵⟸⟺⟼x̃x̂`,
     ascii_old: `bigoplus uuu nnn>=<=longrightarrow TT longleftrightarrow Longrightarrow longrightarrow longleftarrow Longleftarrow Longleftrightarrow longmapsto widetilde x widehat x`,
   },
   {
@@ -33,7 +33,7 @@ module.exports = [
   {
     latex: `1 6 \\int _ { 0 } ^ { 3 } [ \\frac { 1 } { 2 } \\theta + \\frac { 1 } { 4 } \\operatorname { s i n } ( 2 \\theta ) + \\operatorname { c o s } ( \\theta ) - \\frac { 1 } { 3 } \\operatorname { c o s } ^ { 3 } ( \\theta ) ] | _ { 0 } ^ { 2 \\pi } d z`,
     ascii:    `16int_(0)^(3)[(1)/(2)theta+(1)/(4)sin(2theta)+cos(theta)-(1)/(3)cos^(3)(theta)]|_(0)^(2pi)dz`,
-    liner:    `16∫_0^3[(1/2)θ+(1/4)sin(2θ)+cos(θ)−(1/3)cos^3(θ)]|_0^(2π)dz`,
+    liner:    `16∫₀³[(1/2)θ+(1/4)sin(2θ)+cos(θ)−(1/3)cos³(θ)]|₀^(2π)dz`,
     ascii_old: `16int_(0)^(3)[(1)/(2)theta+(1)/(4)sin(2 theta)+cos(theta)-(1)/(3)cos^(3)(theta)]|_(0)^(2 pi)dz`,
   },
   {
@@ -51,13 +51,13 @@ module.exports = [
   {
     latex: `\\vec{ab}`,
     ascii: `vec(ab)`,
-    liner: `(ab⃗)`,
+    liner: `(ab) ⃗`,
     ascii_old: `vec ab`
   },
   {
     latex: `\\vec{ab_1}`,
     ascii: `vec(ab_(1))`,
-    liner: `(ab_1⃗)`,
+    liner: `(ab₁) ⃗`,
     ascii_old: `vec ab_(1)`
   },
   {
@@ -69,13 +69,13 @@ module.exports = [
   {
     latex: `\\text { Supposons que } u _ { 0 } \\in ] 0 , 1 [ \\text { . }`,
     ascii:    `" Supposons que "u_(0)in]0,1[" . "`,
-    liner:    ` Supposons que u_0∈]0,1[ . `,
+    liner:    ` Supposons que u₀∈]0,1[ . `,
     ascii_old: `" Supposons que "u_(0)in]0,1[" ."`
   },
   {
     latex: `\\begin{array}{rlrl}{-i x_{+} \\cdot \\tilde{\\sigma} \\tau_{+}} & {=2 \\overline{\\theta}_{b} p_{+}} & {} & {p \\prec 0} \\\\ {2 \\theta^{a} \\tau_{+}} & {=\\delta_{b}^{a} p_{+}} & {} & {p \\succ 0}\\end{array}`,
     ascii:    `{:[{:-ix_(+)* tilde(sigma)tau_(+):},{:=2 bar(theta)_(b)p_(+):},,p-<0],[{:2theta^(a)tau_(+):},{:=delta_(b)^(a)p_(+):},,p>-0]:}`,
-    liner:    `−ix_+⋅σ̂τ_+ =2θ̄_bp_+  p≺0\n2θ^aτ_+ =δ_b^ap_+  p≻0`,
+    liner:    `−ix₊⋅σ̃τ₊ =2θ̄_bp₊  p≺0\n2θᵃτ₊ =δ_bᵃp₊  p≻0`,
     ascii_old: `[-ix_(+)*tilde sigma tau_(+),=2bar(theta)_(b)p_(+),,p-<0],[2 theta^(a)tau_(+),=delta_(b)^(a)p_(+),,p>-0]`,
   },
   {
@@ -103,7 +103,7 @@ module.exports = [
   {
     latex: `\\overline{xyz}`,
     ascii: `bar(xyz)`,
-    liner: `(xyz̄)`,
+    liner: `(xyz)¯`,
     ascii_old: `bar(xyz)`,
   },
 ];

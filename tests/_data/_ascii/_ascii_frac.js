@@ -17,32 +17,32 @@ module.exports = [
   {
     latex: 'y=3 \\sin \\frac{1}{2} \\theta _3',
     ascii: 'y=3sin((1)/(2)theta_(3))',
-    liner: 'y=3sin((1/2)θ_3)',
+    liner: 'y=3sin((1/2)θ₃)',
   },
   {
     latex: 'y=3 \\sin \\frac{1}{2} \\sin _3',
     ascii: 'y=3sin((1)/(2))sin_(3)',
-    liner: 'y=3sin(1/2)sin_3',
+    liner: 'y=3sin(1/2)sin₃',
   },
   {
     latex: 'y=3 \\sin \\frac{1}{2} \\theta ^3s',
     ascii: 'y=3sin((1)/(2)theta^(3)s)',
-    liner: 'y=3sin((1/2)θ^3s)',
+    liner: 'y=3sin((1/2)θ³s)',
   },
   {
     latex: 'y=3 \\sin \\frac{1}{2} \\theta _3^5s',
     ascii: 'y=3sin((1)/(2)theta_(3)^(5)s)',
-    liner: 'y=3sin((1/2)θ_3^5s)',
+    liner: 'y=3sin((1/2)θ₃⁵s)',
   },
   {
     latex: 'y=3 \\sin \\frac{1}{2} \\theta ^3_5s',
     ascii: 'y=3sin((1)/(2)theta_(5)^(3)s)',
-    liner: 'y=3sin((1/2)θ_5^3s)',
+    liner: 'y=3sin((1/2)θ₅³s)',
   },
   {
     latex: 'z=\\ln \\frac{v}{\\sqrt{x^{2}+}}',
     ascii: 'z=ln((v)/(sqrt(x^(2)+)))',
-    liner: 'z=ln(v/(√(x^2+)))',
+    liner: 'z=ln(v/(√(x²+)))',
   },
   {
     latex: 'z=\\ln \\sin \\frac{x+}{r}',
@@ -52,27 +52,27 @@ module.exports = [
   {
     latex: '\\sum_{n=1}^{\\infty} n ! \\sin \\frac{n}{2^{n}}',
     ascii: 'sum_(n=1)^(oo)n!sin((n)/(2^(n)))',
-    liner: '∑_(n=1)^∞n!sin(n/(2^n))',
+    liner: '∑_(n=1)^∞n!sin(n/(2ⁿ))',
   },
   {
     latex: '10 \\cos ^{2} \\frac{\\alpha}{2}-5 \\cos \\alpha+3',
     ascii: '10cos^(2)((alpha)/(2))-5cos alpha+3',
-    liner: '10cos^2(α/2)−5cosα+3',
+    liner: '10cos²(α/2)−5cosα+3',
   },
   {
     latex: '\\left(1-\\cos \\pi x-\\sin \\frac{\\pi x}{2}\\right) \\sqrt{5-x^{2}}=0',
     ascii: '(1-cos pi x-sin((pi x)/(2)))sqrt(5-x^(2))=0',
-    liner: '(1−cosπ x−sin((π x)/2))√(5−x^2)=0',
+    liner: '(1−cosπ x−sin((π x)/2))√(5−x²)=0',
   },
   {
     latex: '\\log \\frac{x}{y^{5}}',
     ascii: 'log((x)/(y^(5)))',
-    liner: 'log(x/(y^5))',
+    liner: 'log(x/(y⁵))',
   },
   {
     latex: '\\rho=\\cos ^{2} \\frac{\\varphi}{2}',
     ascii: 'rho=cos^(2)((varphi)/(2))',
-    liner: 'ρ=cos^2(φ/2)',
+    liner: 'ρ=cos²(φ/2)',
   },
   {
     latex: '\\csc \\frac{\\pi}{2} ?',
@@ -82,7 +82,7 @@ module.exports = [
   {
     latex: '\\sin \\left(2 \\tan ^{-1} \\frac{12}{5}\\right)',
     ascii: 'sin(2tan^(-1)((12)/(5)))',
-    liner: 'sin(2tan^(−1)((12)/5))',
+    liner: 'sin(2tan⁻¹((12)/5))',
   },
   {
     latex: 'y=3 \\sin \\frac{1}{4} x-5',
@@ -97,7 +97,7 @@ module.exports = [
   {
     latex: '\\sin ^{-1}\\left(\\sin \\frac{4 \\pi}{3}\\right)',
     ascii: 'sin^(-1)(sin((4pi)/(3)))',
-    liner: 'sin^(−1)(sin((4π)/3))',
+    liner: 'sin⁻¹(sin((4π)/3))',
   },
   {
     latex: '\\boldsymbol{\\operatorname { s i n }} \\frac{7 \\pi}{6} \\cos 2 \\pi-\\cos \\frac{7 \\pi}{6} \\sin \\frac{3 \\pi}{2}',
@@ -107,7 +107,7 @@ module.exports = [
   {
     latex: '\\cos \\left(\\sin ^{-1} \\frac{8}{x}\\right)',
     ascii: 'cos(sin^(-1)((8)/(x)))',
-    liner: 'cos(sin^(−1)(8/x))',
+    liner: 'cos(sin⁻¹(8/x))',
   },
   {
     latex: 'y=-\\sin \\frac{1}{2} x-7',
@@ -117,7 +117,7 @@ module.exports = [
   {
     latex: '\\sin \\left(\\tan ^{-1} \\frac{x}{\\sqrt{3}}\\right)',
     ascii: 'sin(tan^(-1)((x)/(sqrt3)))',
-    liner: 'sin(tan^(−1)(x/(√3)))',
+    liner: 'sin(tan⁻¹(x/(√3)))',
   },
   {
     latex: '\\sin \\frac{\\pi}{2} \\cos \\frac{7 \\pi}{12}+\\cos \\frac{\\pi}{2} \\sin \\frac{7 \\pi}{12}',
@@ -182,27 +182,27 @@ module.exports = [
   {
     latex: 'y=3 \\sin \\frac{1}{2} \\theta _3',
     ascii: 'y=3sin((1)/(2)theta_(3))',
-    liner: 'y=3sin((1/2)θ_3)',
+    liner: 'y=3sin((1/2)θ₃)',
   },
   {
     latex: 'y=3 \\sin \\frac{1}{2} \\sin _3',
     ascii: 'y=3sin((1)/(2))sin_(3)',
-    liner: 'y=3sin(1/2)sin_3',
+    liner: 'y=3sin(1/2)sin₃',
   },
   {
     latex: 'y=3 \\sin \\frac{1}{2} \\theta ^3s',
     ascii: 'y=3sin((1)/(2)theta^(3)s)',
-    liner: 'y=3sin((1/2)θ^3s)',
+    liner: 'y=3sin((1/2)θ³s)',
   },
   {
     latex: 'y=3 \\sin \\frac{1}{2} \\theta _3^5s',
     ascii: 'y=3sin((1)/(2)theta_(3)^(5)s)',
-    liner: 'y=3sin((1/2)θ_3^5s)',
+    liner: 'y=3sin((1/2)θ₃⁵s)',
   },
   {
     latex: 'y=3 \\sin \\frac{1}{2} \\theta ^3_5s',
     ascii: 'y=3sin((1)/(2)theta_(5)^(3)s)',
-    liner: 'y=3sin((1/2)θ_5^3s)',
+    liner: 'y=3sin((1/2)θ₅³s)',
   },
   {
     latex: '\\sin \\frac{4}{3\\sin \\frac{4}{3}}',
@@ -212,7 +212,7 @@ module.exports = [
   {
     latex: '\\sin \\frac{n}{6}+2 \\cos n+\\operatorname{ctg}^{2} \\frac{n}{6} 23 \\cdot \\frac{1}{2}+2',
     ascii: 'sin((n)/(6))+2cos n+ctg^(2)((n)/(6))23*(1)/(2)+2',
-    liner: 'sin(n/6)+2cos n+ctg^2((n/6))23⋅1/2+2',
+    liner: 'sin(n/6)+2cos n+ctg²((n/6))23⋅1/2+2',
   },
   {
     latex: '\\sin \\frac{4}{3\\sin \\frac{4}{3}x}',
@@ -222,7 +222,7 @@ module.exports = [
   {
     latex: '\\sin \\frac{4}{3\\sin \\frac{4}{3}x_3}',
     ascii: 'sin((4)/(3sin((4)/(3)x_(3))))',
-    liner: 'sin(4/(3sin(4/3x_3)))',
+    liner: 'sin(4/(3sin(4/3x₃)))',
   },
   {
     latex: '',

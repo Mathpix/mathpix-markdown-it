@@ -14,7 +14,7 @@ module.exports = [
   {
     latex: `x \\times \\frac{1}{2}y|_{a}^{b}`,
     ascii:     `x xx(1)/(2)y|_(a)^(b)`,
-    liner:     `x×(1/2)y|_a^b`,
+    liner:     `x×(1/2)y|ₐᵇ`,
     ascii_old: `x times(1)/(2)y|_(a)^(b)`
   },
 //different
