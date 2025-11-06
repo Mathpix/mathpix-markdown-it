@@ -1,173 +1,173 @@
 module.exports = [
   {
     latex: `1 2 \\longdiv { 24 }`,
-    ascii:     `((24)/(12))`,
-    linear:     `((24)/(12))`,
-    ascii_old: `((24)/(12))`
+    asciimath:     `((24)/(12))`,
+    linearmath:     `((24)/(12))`,
+    asciimath_old: `((24)/(12))`
   },
   {
     latex: `1 2 \\longdiv { 24 }56`,
-    ascii: `((24)/(12))56`,
-    linear: `((24)/(12))56`,
-    ascii_old: `---`
+    asciimath: `((24)/(12))56`,
+    linearmath: `((24)/(12))56`,
+    asciimath_old: `---`
   },
   {
     latex: `4 \\enclose{longdiv}{500}`,
-    ascii: `((500)/(4))`,
-    linear: `((500)/(4))`,
-    ascii_old: `---`
+    asciimath: `((500)/(4))`,
+    linearmath: `((500)/(4))`,
+    asciimath_old: `---`
   },
   {
     latex: `2\\enclose{longdiv,}{12}{6}`,
-    ascii: `((12)/(2))6`,
-    linear: `((12)/(2))6`,
-    ascii_old: `---`
+    asciimath: `((12)/(2))6`,
+    linearmath: `((12)/(2))6`,
+    asciimath_old: `---`
   },
   {
     latex: `\\longdiv{52}`,
-    ascii: `((52)/())`,
-    linear: `((52)/())`,
-    ascii_old: `---`
+    asciimath: `((52)/())`,
+    linearmath: `((52)/())`,
+    asciimath_old: `---`
   },
   {
     latex: `12 \\sin{14} \\longdiv { 24 }`,
-    ascii: `((24)/(12 sin 14))`,
-    linear: `((24)/(12 sin 14))`,
-    ascii_old: `---`
+    asciimath: `((24)/(12 sin 14))`,
+    linearmath: `((24)/(12 sin 14))`,
+    asciimath_old: `---`
   },
   {
     latex: `37\\longdiv { 5}`,
-    ascii: `((5)/(37))`,
-    linear: `((5)/(37))`,
+    asciimath: `((5)/(37))`,
+    linearmath: `((5)/(37))`,
   },
   {
     latex: `0.05\\longdiv { 341.5}`,
-    ascii: `((341.5)/(0.05))`,
-    linear: `((341.5)/(0.05))`,
+    asciimath: `((341.5)/(0.05))`,
+    linearmath: `((341.5)/(0.05))`,
   },
   {
     latex: `6 \\longdiv { 84 }`,
-    ascii: `((84)/(6))`,
-    linear: `((84)/(6))`,
+    asciimath: `((84)/(6))`,
+    linearmath: `((84)/(6))`,
   },
   {
     latex: `2 x + 3 \\longdiv { 8 x ^ { 3 } - 4 x + 3 9 }`,
-    ascii: `((8x^(3)-4x+39)/(2x+3))`,
-    linear: `((8x³−4x+39)/(2x+3))`,
+    asciimath: `((8x^(3)-4x+39)/(2x+3))`,
+    linearmath: `((8x³−4x+39)/(2x+3))`,
   },
   {
     latex: `3 \\longdiv { 3 4 5 }`,
-    ascii: `((345)/(3))`,
-    linear: `((345)/(3))`,
+    asciimath: `((345)/(3))`,
+    linearmath: `((345)/(3))`,
   },
   {
     latex: `5 \\longdiv { 90 }`,
-    ascii: `((90)/(5))`,
-    linear: `((90)/(5))`,
+    asciimath: `((90)/(5))`,
+    linearmath: `((90)/(5))`,
   },
   {
     latex: `x + 2\\longdiv { 2x ^ { 3} - x - 11}`,
-    ascii: `((2x^(3)-x-11)/(x+2))`,
-    linear: `((2x³−x−11)/(x+2))`,
+    asciimath: `((2x^(3)-x-11)/(x+2))`,
+    linearmath: `((2x³−x−11)/(x+2))`,
   },
   {
     latex: `3 \\longdiv { 6 3 }`,
-    ascii: `((63)/(3))`,
-    linear: `((63)/(3))`,
+    asciimath: `((63)/(3))`,
+    linearmath: `((63)/(3))`,
   },
   {
     latex: `2 4 \\longdiv { 3 0 }`,
-    ascii: `((30)/(24))`,
-    linear: `((30)/(24))`,
+    asciimath: `((30)/(24))`,
+    linearmath: `((30)/(24))`,
   },
   {
     latex: `11 \\longdiv{11.111}`,
-    ascii: `((11.111)/(11))`,
-    linear: `((11.111)/(11))`,
+    asciimath: `((11.111)/(11))`,
+    linearmath: `((11.111)/(11))`,
   },
   {
     latex: `2 \\longdiv { 1 2 0 }`,
-    ascii: `((120)/(2))`,
-    linear: `((120)/(2))`,
+    asciimath: `((120)/(2))`,
+    linearmath: `((120)/(2))`,
   },
   {
     latex: `4 \\longdiv { 5 6 }`,
-    ascii: `((56)/(4))`,
-    linear: `((56)/(4))`,
+    asciimath: `((56)/(4))`,
+    linearmath: `((56)/(4))`,
   },
   {
     latex: `2 1 \\longdiv { 2 0 5 }`,
-    ascii: `((205)/(21))`,
-    linear: `((205)/(21))`,
+    asciimath: `((205)/(21))`,
+    linearmath: `((205)/(21))`,
   },
   {
     latex: `4 \\longdiv { 43 }`,
-    ascii: `((43)/(4))`,
-    linear: `((43)/(4))`,
+    asciimath: `((43)/(4))`,
+    linearmath: `((43)/(4))`,
   },
   {
     latex: `3 4 \\longdiv { 3 3 1 }`,
-    ascii: `((331)/(34))`,
-    linear: `((331)/(34))`,
+    asciimath: `((331)/(34))`,
+    linearmath: `((331)/(34))`,
   },
   {
     latex: `5 6 \\longdiv {3 0 0 0 0}`,
-    ascii: `((30000)/(56))`,
-    linear: `((30000)/(56))`,
+    asciimath: `((30000)/(56))`,
+    linearmath: `((30000)/(56))`,
   },
   {
     latex: `2 \\longdiv { 4 4 6 }`,
-    ascii: `((446)/(2))`,
-    linear: `((446)/(2))`,
+    asciimath: `((446)/(2))`,
+    linearmath: `((446)/(2))`,
   },
   {
     latex: `6 \\longdiv { 6 7 2 }`,
-    ascii: `((672)/(6))`,
-    linear: `((672)/(6))`,
+    asciimath: `((672)/(6))`,
+    linearmath: `((672)/(6))`,
   },
   {
     latex: `9 \\longdiv { 9 9 }`,
-    ascii: `((99)/(9))`,
-    linear: `((99)/(9))`,
+    asciimath: `((99)/(9))`,
+    linearmath: `((99)/(9))`,
   },
   {
     latex: `2 8 \\longdiv { 3 4 6 }`,
-    ascii: `((346)/(28))`,
-    linear: `((346)/(28))`,
+    asciimath: `((346)/(28))`,
+    linearmath: `((346)/(28))`,
   },
   {
     latex: `x ^ { 2} + x -1 \\longdiv { x ^ { 5} + x ^ { 4} - 2x ^ { 3} + 0+ x + 1 }`,
-    ascii: `((x^(5)+x^(4)-2x^(3)+0+x+1)/(x^(2)+x-1))`,
-    linear: `((x⁵+x⁴−2x³+0+x+1)/(x²+x−1))`,
+    asciimath: `((x^(5)+x^(4)-2x^(3)+0+x+1)/(x^(2)+x-1))`,
+    linearmath: `((x⁵+x⁴−2x³+0+x+1)/(x²+x−1))`,
   },
   {
     latex: `3x + 2\\longdiv { 6x ^ { 2} - 5x + 4}`,
-    ascii: `((6x^(2)-5x+4)/(3x+2))`,
-    linear: `((6x²−5x+4)/(3x+2))`,
+    asciimath: `((6x^(2)-5x+4)/(3x+2))`,
+    linearmath: `((6x²−5x+4)/(3x+2))`,
   },
   {
     latex: `4 1 \\longdiv { 2 3 0 }`,
-    ascii: `((230)/(41))`,
-    linear: `((230)/(41))`,
+    asciimath: `((230)/(41))`,
+    linearmath: `((230)/(41))`,
   },
   {
     latex: `12\\longdiv { 144}`,
-    ascii: `((144)/(12))`,
-    linear: `((144)/(12))`,
+    asciimath: `((144)/(12))`,
+    linearmath: `((144)/(12))`,
   },
   {
     latex: `x - \\frac { 3 } { 4 } \\longdiv { 8 x ^ { 3 } - 18 x ^ { 2 } - 11 x + 15 }`,
-    ascii: `((8x^(3)-18x^(2)-11 x+15)/(x-(3)/(4)))`,
-    linear: `((8x³−18x²−11 x+15)/(x−3/4))`,
+    asciimath: `((8x^(3)-18x^(2)-11 x+15)/(x-(3)/(4)))`,
+    linearmath: `((8x³−18x²−11 x+15)/(x−3/4))`,
   },
   {
     latex: `x ^ { 2 } + 1 4 x + 4 9 g + {x ^ { 2 } + 1 4 x + 4 9 \\longdiv { x ^ { 2 } + 1 4 x }}`,
-    ascii: `x^(2)+14x+49g+((x^(2)+14x)/(x^(2)+14x+49))`,
-    linear: `x²+14x+49g+((x²+14x)/(x²+14x+49))`,
+    asciimath: `x^(2)+14x+49g+((x^(2)+14x)/(x^(2)+14x+49))`,
+    linearmath: `x²+14x+49g+((x²+14x)/(x²+14x+49))`,
   },
   {
     latex: `g + {x ^ { 2 } + 1 4 x + 4 9 \\longdiv { x ^ { 2 } + 1 4 x }}`,
-    ascii: `g+((x^(2)+14x)/(x^(2)+14x+49))`,
-    linear: `g+((x²+14x)/(x²+14x+49))`,
+    asciimath: `g+((x^(2)+14x)/(x^(2)+14x+49))`,
+    linearmath: `g+((x²+14x)/(x²+14x+49))`,
   }
 ];

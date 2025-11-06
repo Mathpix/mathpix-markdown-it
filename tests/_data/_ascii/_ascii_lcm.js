@@ -1,179 +1,179 @@
 module.exports = [
   {
     latex: `1 2 \\lcm { 24 }`,
-    ascii:     `((12)/(24))`,
-    linear:     `((12)/(24))`,
-    ascii_old: `((24)/(12))`
+    asciimath:     `((12)/(24))`,
+    linearmath:     `((12)/(24))`,
+    asciimath_old: `((24)/(12))`
   },
   {
     latex: `1 2 \\lcm { 24 }56`,
-    ascii: `((12)/(24))56`,
-    linear: `((12)/(24))56`,
-    ascii_old: `---`
+    asciimath: `((12)/(24))56`,
+    linearmath: `((12)/(24))56`,
+    asciimath_old: `---`
   },
   {
     latex: `4 \\enclose{bottom}{\\smash{)}{500}\\:}`,
-    ascii: `((4)/(500))`,
-    linear: `((4)/(500))`,
-    ascii_old: `---`
+    asciimath: `((4)/(500))`,
+    linearmath: `((4)/(500))`,
+    asciimath_old: `---`
   },
   {
     latex: `2\\enclose{bottom}{\\smash{)}{12}\\:}{6}`,
-    ascii: `((2)/(12))6`,
-    linear: `((2)/(12))6`,
-    ascii_old: `---`
+    asciimath: `((2)/(12))6`,
+    linearmath: `((2)/(12))6`,
+    asciimath_old: `---`
   },
   {
     latex: `\\lcm{52}`,
-    ascii: `(()/(52))`,
-    linear: `(()/(52))`,
-    ascii_old: `---`
+    asciimath: `(()/(52))`,
+    linearmath: `(()/(52))`,
+    asciimath_old: `---`
   },
   {
     latex: `12 \\sin{14} \\lcm { 24 }`,
-    ascii: `((12 sin 14)/(24))`,
-    linear: `((12 sin 14)/(24))`,
-    ascii_old: `---`
+    asciimath: `((12 sin 14)/(24))`,
+    linearmath: `((12 sin 14)/(24))`,
+    asciimath_old: `---`
   },
   {
     latex: `37\\lcm { 5}`,
-    ascii: `((37)/(5))`,
-    linear: `((37)/(5))`,
+    asciimath: `((37)/(5))`,
+    linearmath: `((37)/(5))`,
   },
   {
     latex: `0.05\\lcm { 341.5}`,
-    ascii: `((0.05)/(341.5))`,
-    linear: `((0.05)/(341.5))`,
+    asciimath: `((0.05)/(341.5))`,
+    linearmath: `((0.05)/(341.5))`,
   },
   {
     latex: `6 \\lcm { 84 }`,
-    ascii: `((6)/(84))`,
-    linear: `((6)/(84))`,
+    asciimath: `((6)/(84))`,
+    linearmath: `((6)/(84))`,
   },
   {
     latex: `2 x + 3 \\lcm { 8 x ^ { 3 } - 4 x + 3 9 }`,
-    ascii: `((2x+3)/(8x^(3)-4x+39))`,
-    linear: `((2x+3)/(8x³−4x+39))`,
+    asciimath: `((2x+3)/(8x^(3)-4x+39))`,
+    linearmath: `((2x+3)/(8x³−4x+39))`,
   },
   {
     latex: `3 \\lcm { 3 4 5 }`,
-    ascii: `((3)/(345))`,
-    linear: `((3)/(345))`,
+    asciimath: `((3)/(345))`,
+    linearmath: `((3)/(345))`,
   },
   {
     latex: `5 \\lcm { 90 }`,
-    ascii: `((5)/(90))`,
-    linear: `((5)/(90))`,
+    asciimath: `((5)/(90))`,
+    linearmath: `((5)/(90))`,
   },
   {
     latex: `x + 2\\lcm { 2x ^ { 3} - x - 11}`,
-    ascii: `((x+2)/(2x^(3)-x-11))`,
-    linear: `((x+2)/(2x³−x−11))`,
+    asciimath: `((x+2)/(2x^(3)-x-11))`,
+    linearmath: `((x+2)/(2x³−x−11))`,
   },
   {
     latex: `3 \\lcm { 6 3 }`,
-    ascii: `((3)/(63))`,
-    linear: `((3)/(63))`,
+    asciimath: `((3)/(63))`,
+    linearmath: `((3)/(63))`,
   },
   {
     latex: `2 4 \\lcm { 3 0 }`,
-    ascii: `((24)/(30))`,
-    linear: `((24)/(30))`,
+    asciimath: `((24)/(30))`,
+    linearmath: `((24)/(30))`,
   },
   {
     latex: `11 \\lcm{11.111}`,
-    ascii: `((11)/(11.111))`,
-    linear: `((11)/(11.111))`,
+    asciimath: `((11)/(11.111))`,
+    linearmath: `((11)/(11.111))`,
   },
   {
     latex: `2 \\lcm { 1 2 0 }`,
-    ascii: `((2)/(120))`,
-    linear: `((2)/(120))`,
+    asciimath: `((2)/(120))`,
+    linearmath: `((2)/(120))`,
   },
   {
     latex: `4 \\lcm { 5 6 }`,
-    ascii: `((4)/(56))`,
-    linear: `((4)/(56))`,
+    asciimath: `((4)/(56))`,
+    linearmath: `((4)/(56))`,
   },
   {
     latex: `2 1 \\lcm { 2 0 5 }`,
-    ascii: `((21)/(205))`,
-    linear: `((21)/(205))`,
+    asciimath: `((21)/(205))`,
+    linearmath: `((21)/(205))`,
   },
   {
     latex: `4 \\lcm { 43 }`,
-    ascii: `((4)/(43))`,
-    linear: `((4)/(43))`,
+    asciimath: `((4)/(43))`,
+    linearmath: `((4)/(43))`,
   },
   {
     latex: `3 4 \\lcm { 3 3 1 }`,
-    ascii: `((34)/(331))`,
-    linear: `((34)/(331))`,
+    asciimath: `((34)/(331))`,
+    linearmath: `((34)/(331))`,
   },
   {
     latex: `5 6 \\lcm {3 0 0 0 0}`,
-    ascii: `((56)/(30000))`,
-    linear: `((56)/(30000))`,
+    asciimath: `((56)/(30000))`,
+    linearmath: `((56)/(30000))`,
   },
   {
     latex: `2 \\lcm { 4 4 6 }`,
-    ascii: `((2)/(446))`,
-    linear: `((2)/(446))`,
+    asciimath: `((2)/(446))`,
+    linearmath: `((2)/(446))`,
   },
   {
     latex: `6 \\lcm { 6 7 2 }`,
-    ascii: `((6)/(672))`,
-    linear: `((6)/(672))`,
+    asciimath: `((6)/(672))`,
+    linearmath: `((6)/(672))`,
   },
   {
     latex: `9 \\lcm { 9 9 }`,
-    ascii: `((9)/(99))`,
-    linear: `((9)/(99))`,
+    asciimath: `((9)/(99))`,
+    linearmath: `((9)/(99))`,
   },
   {
     latex: `2 8 \\lcm { 3 4 6 }`,
-    ascii: `((28)/(346))`,
-    linear: `((28)/(346))`,
+    asciimath: `((28)/(346))`,
+    linearmath: `((28)/(346))`,
   },
   {
     latex: `x ^ { 2} + x -1 \\lcm { x ^ { 5} + x ^ { 4} - 2x ^ { 3} + 0+ x + 1 }`,
-    ascii: `((x^(2)+x-1)/(x^(5)+x^(4)-2x^(3)+0+x+1))`,
-    linear: `((x²+x−1)/(x⁵+x⁴−2x³+0+x+1))`,
+    asciimath: `((x^(2)+x-1)/(x^(5)+x^(4)-2x^(3)+0+x+1))`,
+    linearmath: `((x²+x−1)/(x⁵+x⁴−2x³+0+x+1))`,
   },
   {
     latex: `3x + 2\\lcm { 6x ^ { 2} - 5x + 4}`,
-    ascii: `((3x+2)/(6x^(2)-5x+4))`,
-    linear: `((3x+2)/(6x²−5x+4))`,
+    asciimath: `((3x+2)/(6x^(2)-5x+4))`,
+    linearmath: `((3x+2)/(6x²−5x+4))`,
   },
   {
     latex: `4 1 \\lcm { 2 3 0 }`,
-    ascii: `((41)/(230))`,
-    linear: `((41)/(230))`,
+    asciimath: `((41)/(230))`,
+    linearmath: `((41)/(230))`,
   },
   {
     latex: `12\\lcm { 144}`,
-    ascii: `((12)/(144))`,
-    linear: `((12)/(144))`,
+    asciimath: `((12)/(144))`,
+    linearmath: `((12)/(144))`,
   },
   {
     latex: `x - \\frac { 3 } { 4 } \\lcm { 8 x ^ { 3 } - 18 x ^ { 2 } - 11 x + 15 }`,
-    ascii: `((x-(3)/(4))/(8x^(3)-18x^(2)-11 x+15))`,
-    linear: `((x−3/4)/(8x³−18x²−11 x+15))`,
+    asciimath: `((x-(3)/(4))/(8x^(3)-18x^(2)-11 x+15))`,
+    linearmath: `((x−3/4)/(8x³−18x²−11 x+15))`,
   },
   {
     latex: `x ^ { 2 } + 1 4 x + 4 9 g + {x ^ { 2 } + 1 4 x + 4 9 \\lcm { x ^ { 2 } + 1 4 x }}`,
-    ascii: `x^(2)+14x+49g+((x^(2)+14x+49)/(x^(2)+14x))`,
-    linear: `x²+14x+49g+((x²+14x+49)/(x²+14x))`,
+    asciimath: `x^(2)+14x+49g+((x^(2)+14x+49)/(x^(2)+14x))`,
+    linearmath: `x²+14x+49g+((x²+14x+49)/(x²+14x))`,
   },
   {
     latex: `g + {x ^ { 2 } + 1 4 x + 4 9 \\lcm { x ^ { 2 } + 1 4 x }}`,
-    ascii: `g+((x^(2)+14x+49)/(x^(2)+14x))`,
-    linear: `g+((x²+14x+49)/(x²+14x))`,
+    asciimath: `g+((x^(2)+14x+49)/(x^(2)+14x))`,
+    linearmath: `g+((x²+14x+49)/(x²+14x))`,
   },
   /** Here mclose has a notation: 'bottom' attribute, but this should not be converted to lcm */
   {
     latex: `\\begin{array} { c } 3 \\frac { 1 } { 6 }  \\\\ 3 \\\\\\hline \\end{array}`,
-    ascii: `[3(1)/(6)],[3]`,
-    linear: `3(1/6)\n3`,
+    asciimath: `[3(1)/(6)],[3]`,
+    linearmath: `3(1/6)\n3`,
   }
 ];

@@ -1,117 +1,117 @@
 module.exports = [
   {
     latex: `a = b + c`,
-    ascii:     `a=b+c`,
-    linear:     `a=b+c`,
-    ascii_old: `a=b+c`
+    asciimath:     `a=b+c`,
+    linearmath:     `a=b+c`,
+    asciimath_old: `a=b+c`
   },
   {
-    ascii: `*`,
-    linear: `⋅`,
+    asciimath: `*`,
+    linearmath: `⋅`,
     latex: `\\cdot`
   },
   {
-    ascii: `**`,
-    linear: `∗`,
+    asciimath: `**`,
+    linearmath: `∗`,
     latex: `\\ast`
   },
   {
-    ascii: `***`,
-    linear: `⋆`,
+    asciimath: `***`,
+    linearmath: `⋆`,
     latex: `\\star`
   },
   {
-    ascii: `\\\\`,
-    linear: `∖`,
+    asciimath: `\\\\`,
+    linearmath: `∖`,
     latex: `\\backslash`
   },
   {
-    ascii: `\\\\`,
-    linear: '∖',
+    asciimath: `\\\\`,
+    linearmath: '∖',
     latex: `\\setminus`
   },
   {
-    ascii: `xx`,
-    linear: `×`,
+    asciimath: `xx`,
+    linearmath: `×`,
     latex: `\\times`
   },
   {
-    ascii: `-:`,
-    linear: `÷`,
+    asciimath: `-:`,
+    linearmath: `÷`,
     latex: `\\div`
   },
   {
-    ascii:  `|><`,
-    linear:  `⋉`,
+    asciimath:  `|><`,
+    linearmath:  `⋉`,
     latex:  `\\ltimes`
   },
   {
-    ascii:  `><|`,
-    linear:  `⋊`,
+    asciimath:  `><|`,
+    linearmath:  `⋊`,
     latex:  `\\rtimes`
   },
   {
-    ascii:  `|><|`,
-    linear:  `⋈`,
+    asciimath:  `|><|`,
+    linearmath:  `⋈`,
     latex:  `\\bowtie`
   },
   {
-    ascii:  `@`,
-    linear:  `∘`,
+    asciimath:  `@`,
+    linearmath:  `∘`,
     latex:  `\\circ`
   },
   {
-    ascii:  `o+`,
-    linear:  `⊕`,
+    asciimath:  `o+`,
+    linearmath:  `⊕`,
     latex:  `\\oplus`
   },
   {
-    ascii:  `ox`,
-    linear:  `⊗`,
+    asciimath:  `ox`,
+    linearmath:  `⊗`,
     latex:  `\\otimes`
   },
   {
-    ascii:  `o.`,
-    linear:  `⊙`,
+    asciimath:  `o.`,
+    linearmath:  `⊙`,
     latex:  `\\odot`
   },
   {
-    ascii:  `^^`,
-    linear:  `∧`,
+    asciimath:  `^^`,
+    linearmath:  `∧`,
     latex:  `\\wedge`
   },
   // {
-  //   ascii:  `^^^`,
+  //   asciimath:  `^^^`,
   //   latex:  `\\bidwedge`
   // },
   {
-    ascii:  `vv`,
-    linear:  `∨`,
+    asciimath:  `vv`,
+    linearmath:  `∨`,
     latex:  `\\vee`
   },
   {
-    ascii:  `vvv`,
-    linear:  `⋁`,
+    asciimath:  `vvv`,
+    linearmath:  `⋁`,
     latex:  `\\bigvee`
   },
   {
-    ascii:  `nn`,
-    linear:  `∩`,
+    asciimath:  `nn`,
+    linearmath:  `∩`,
     latex:  `\\cap`
   },
   {
-    ascii:  `nnn`,
-    linear:  `⋂`,
+    asciimath:  `nnn`,
+    linearmath:  `⋂`,
     latex:  `\\bigcap`
   },
   {
-    ascii:  `uu`,
-    linear:  `∪`,
+    asciimath:  `uu`,
+    linearmath:  `∪`,
     latex:  `\\cup`
   },
   {
-    ascii:  `uuu`,
-    linear:  `⋃`,
+    asciimath:  `uuu`,
+    linearmath:  `⋃`,
     latex:  `\\bigcup`
   },
 ];
