@@ -13,6 +13,7 @@ export declare const mmdClassesForContextMenu: string[];
 export declare enum eMathType {
     latex = "latex",
     asciimath = "asciimath",
+    linearmath = "linearmath",
     mathml = "mathml",
     mathmlword = "mathmlword",
     tsv = "tsv",

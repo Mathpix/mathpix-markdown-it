@@ -110,7 +110,7 @@ export type TOutputMath = {
     include_asciimath?: boolean;
     include_latex?: boolean;
     include_svg?: boolean;
-    include_linear?: boolean;
+    include_linearmath?: boolean;
     include_table_html?: boolean;
     include_tsv?: boolean;
     include_csv?: boolean;

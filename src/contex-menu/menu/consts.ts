@@ -11,7 +11,8 @@ export const maxWidthMenu = 320;
 
 export const mathExportTypes = [
   'latex', 
-  'asciimath', 
+  'asciimath',
+  'linearmath',
   'mathml', 
   'mathmlword', 
   'tsv', 
@@ -26,6 +27,7 @@ export const mmdClassesForContextMenu = ['inline-tabular', 'MathJax', 'smiles', 
 export enum eMathType {
   latex = 'latex',
   asciimath = 'asciimath',
+  linearmath = 'linearmath',
   mathml = 'mathml',
   mathmlword = 'mathmlword',
   tsv = 'tsv',

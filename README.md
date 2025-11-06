@@ -807,6 +807,7 @@ The `MathpixMarkdown` React element accepts the following props:
 | `include_mathml`         | boolean&nbsp;*`false`*       | outputs mathml `<mathml style="display: none"><math>...</math></mathml>`                                          |
 | `include_mathml_word`    | boolean&nbsp;*`false`*       | outputs mathml_word `<mathmlword style="display: none"><math>...</math></mathmlword>`                             |
 | `include_asciimath`      | boolean&nbsp;*`false`*       | outputs asciimath `<asciimath style="display: none">...</asciimath>`                                              |
+| `include_linearmath`     | boolean&nbsp;*`false`*       | outputs linearmath `<linearmath style="display: none">...</linearmath>`                                            |
 | `include_latex`          | boolean&nbsp;*`true`*        | outputs latex `<latex style="display: none">...</latex>`                                                          |
 | `include_svg`            | boolean&nbsp;*`true`*        | outputs svg `<svg>...</svg>`                                                                                      |
 | `include_tsv`            | boolean&nbsp;*`false`*       | outputs tsv `<tsv style="display: none">...</tsv>`                                                                |

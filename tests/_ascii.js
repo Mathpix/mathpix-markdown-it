@@ -6,7 +6,7 @@ let MathJax = require('../lib/mathjax/index.js').MathJax;
 
 const options = {outMath: {
     include_asciimath: true,
-    include_linear: true,
+    include_linearmath: true,
     include_mathml: false,
     include_latex: false,
     include_svg: false

@@ -77,7 +77,7 @@ const OuterData = (adaptor, node, math, outMath, forDocx = false, accessibility?
     include_mathml_word = false,
     include_asciimath = false,
     include_latex = false,
-    include_linear = false,
+    include_linearmath = false,
     include_svg = true,
     include_speech = false,
     optionAscii = {
@@ -101,13 +101,17 @@ const OuterData = (adaptor, node, math, outMath, forDocx = false, accessibility?
   if (include_mathml_word) {
     res.mathml_word = toMathMLWord(math.root, {forDocx: forDocx});
   }
-  if (include_asciimath || optionAscii?.tableToCsv || optionAscii?.tableToTsv || optionAscii?.tableToMd || include_linear) {
+  if (include_asciimath || optionAscii?.tableToCsv || optionAscii?.tableToTsv || optionAscii?.tableToMd || include_linearmath) {
     const dataAscii: IAsciiData = toAsciiML(math.root, optionAscii);
-    res.asciimath = dataAscii.ascii;
-    res.linearmath = dataAscii.linear;
-    res.asciimath_tsv = dataAscii.ascii_tsv;
-    res.asciimath_csv = dataAscii.ascii_csv;
-    res.asciimath_md = dataAscii.ascii_md;
+    if (include_asciimath || optionAscii?.tableToCsv || optionAscii?.tableToTsv || optionAscii?.tableToMd) {
+      res.asciimath = dataAscii.ascii;
+      res.asciimath_tsv = dataAscii.ascii_tsv;
+      res.asciimath_csv = dataAscii.ascii_csv;
+      res.asciimath_md = dataAscii.ascii_md;
+    }
+    if (include_linearmath) {
+      res.linearmath = dataAscii.linear;
+    }
   }
   
   if (include_latex) {
@@ -217,7 +221,7 @@ const OuterDataMathMl = (adaptor, node, math, outMath, forDocx = false, accessib
     include_asciimath = false,
     include_svg = true,
     include_speech = false,
-    include_linear = false,
+    include_linearmath = false,
     optionAscii = {
       showStyle: false,
       extraBrackets: true
@@ -240,10 +244,14 @@ const OuterDataMathMl = (adaptor, node, math, outMath, forDocx = false, accessib
     res.mathml_word = toMathMLWord(math.root, {forDocx: forDocx});
   }
 
-  if (include_asciimath || include_linear) {
+  if (include_asciimath || include_linearmath) {
     const dataAscii: IAsciiData = toAsciiML(math.root, optionAscii);
-    res.asciimath = dataAscii.ascii;
-    res.linearmath = dataAscii.linear;
+    if (include_asciimath) {
+      res.asciimath = dataAscii.ascii;
+    }
+    if (include_linearmath) {
+      res.linearmath = dataAscii.linear;
+    }
   }
 
   if (include_svg) {
@@ -272,6 +280,7 @@ export const OuterHTML = (data, outMath, forPptx: boolean = false) => {
     include_mathml = false,
     include_mathml_word = false,
     include_asciimath = false,
+    include_linearmath = false,
     include_latex = false,
     include_svg = true,
     include_error = false,
@@ -291,6 +300,10 @@ export const OuterHTML = (data, outMath, forPptx: boolean = false) => {
   if (include_asciimath && data.asciimath) {
     if (!outHTML) { outHTML += '\n'}
     outHTML +=  '<asciimath style="display: none;">' + formatSource(data.asciimath) + '</asciimath>';
+  }
+  if (include_linearmath && data.linearmath) {
+    if (!outHTML) { outHTML += '\n'}
+    outHTML +=  '<linearmath style="display: none;">' + formatSource(data.linearmath) + '</linearmath>';
   }
   if (include_latex && data.latex) {
     if (!outHTML) { outHTML += '\n'}
