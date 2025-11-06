@@ -4,11 +4,10 @@ export interface IOuterData {
     mathml?: string;
     mathml_word?: string;
     asciimath?: string;
-    linermath?: string;
+    linearmath?: string;
     asciimath_tsv?: string;
     asciimath_csv?: string;
     asciimath_md?: string;
-    liner_tsv?: string;
     latex?: string;
     svg?: string;
     speech?: string;
@@ -41,7 +40,7 @@ export declare const MathJax: {
             [key: string]: Label;
         };
         ascii: string;
-        liner: string;
+        linear: string;
         ascii_tsv: string;
         ascii_csv: string;
         ascii_md: string;
@@ -49,11 +48,10 @@ export declare const MathJax: {
             mathml?: string;
             mathml_word?: string;
             asciimath?: string;
-            linermath?: string;
+            linearmath?: string;
             asciimath_tsv?: string;
             asciimath_csv?: string;
             asciimath_md?: string;
-            liner_tsv?: string;
             latex?: string;
             svg?: string;
             speech?: string;
@@ -70,7 +68,7 @@ export declare const MathJax: {
     TypesetSvgAndAscii: (string: any, options?: any) => {
         html: string;
         ascii: string;
-        liner: string;
+        linear: string;
         labels: {
             [key: string]: Label;
         };
@@ -81,11 +79,10 @@ export declare const MathJax: {
             mathml?: string;
             mathml_word?: string;
             asciimath?: string;
-            linermath?: string;
+            linearmath?: string;
             asciimath_tsv?: string;
             asciimath_csv?: string;
             asciimath_md?: string;
-            liner_tsv?: string;
             latex?: string;
             svg?: string;
             speech?: string;
@@ -111,11 +108,10 @@ export declare const MathJax: {
             mathml?: string;
             mathml_word?: string;
             asciimath?: string;
-            linermath?: string;
+            linearmath?: string;
             asciimath_tsv?: string;
             asciimath_csv?: string;
             asciimath_md?: string;
-            liner_tsv?: string;
             latex?: string;
             svg?: string;
             speech?: string;

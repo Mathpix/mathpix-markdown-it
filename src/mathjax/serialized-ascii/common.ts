@@ -1,20 +1,18 @@
 export interface IAsciiData {
   ascii: string,
-  liner: string,
+  linear: string,
   ascii_tsv?: string,
   ascii_csv?: string,
-  ascii_md?: string,
-  liner_tsv?: string
+  ascii_md?: string
 }
 
 export const initAsciiData = (): IAsciiData => {
   return {
     ascii: '',
-    liner: '',
+    linear: '',
     ascii_tsv: '',
     ascii_csv: '',
-    ascii_md: '',
-    liner_tsv: ''
+    ascii_md: ''
   }
 }
 
@@ -23,8 +21,8 @@ export const AddToAsciiData = (
   dataInput: IAsciiData
 ): IAsciiData => {
   dataOutput.ascii += dataInput.ascii;
-  dataOutput.liner += dataInput.hasOwnProperty('liner')
-    ? dataInput.liner
+  dataOutput.linear += dataInput.hasOwnProperty('linear')
+    ? dataInput.linear
     : dataInput.ascii;
   dataOutput.ascii_tsv += dataInput.hasOwnProperty('ascii_tsv')
       ? dataInput.ascii_tsv
@@ -35,9 +33,6 @@ export const AddToAsciiData = (
   dataOutput.ascii_md += dataInput.hasOwnProperty('ascii_md')
     ? dataInput.ascii_md
     : dataInput.ascii;
-  dataOutput.liner_tsv += dataInput.hasOwnProperty('liner_tsv')
-    ? dataInput.liner_tsv
-    : dataInput.liner;
   return dataOutput;
 };
 

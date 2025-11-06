@@ -10,8 +10,8 @@ export const renderDiagBoxItem = (
 ): string => {
   const token: Token = tokens[idx];
   const attrs = slf.renderAttrs(token);
-  const { content, tsv, csv, tableMd, liner_tsv } = renderTableCellContent(token, true, options, env, slf);
-  Object.assign(token, { tsv, csv, tableMd, liner_tsv });
+  const { content, tsv, csv, tableMd } = renderTableCellContent(token, true, options, env, slf);
+  Object.assign(token, { tsv, csv, tableMd });
   return `<div ${attrs}>${content}</div>`;
 };
 
@@ -33,7 +33,7 @@ export const renderDiagbox = (
   token.attrJoin('style', styles.join(' '));
   const attrs = slf.renderAttrs(token);
   const res = slf.renderInline(token.children ?? [], options, env);
-  const dataKeys = ["tsv", "csv", "tableMd", "liner_tsv"] as const;
+  const dataKeys = ["tsv", "csv", "tableMd"] as const;
   for (const key of dataKeys) {
     token[key] = token.children?.map(child => child[key]) ?? [];
   }

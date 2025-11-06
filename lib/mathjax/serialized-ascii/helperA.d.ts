@@ -17,7 +17,7 @@ export declare const AMsymbols: ({
     stretchy?: undefined;
     func?: undefined;
     rewriteleftright?: undefined;
-    output_liner?: undefined;
+    output_linear?: undefined;
     atname?: undefined;
     atval?: undefined;
     codes?: undefined;
@@ -33,7 +33,7 @@ export declare const AMsymbols: ({
     stretchy?: undefined;
     func?: undefined;
     rewriteleftright?: undefined;
-    output_liner?: undefined;
+    output_linear?: undefined;
     atname?: undefined;
     atval?: undefined;
     codes?: undefined;
@@ -49,7 +49,7 @@ export declare const AMsymbols: ({
     stretchy?: undefined;
     func?: undefined;
     rewriteleftright?: undefined;
-    output_liner?: undefined;
+    output_linear?: undefined;
     atname?: undefined;
     atval?: undefined;
     codes?: undefined;
@@ -65,7 +65,7 @@ export declare const AMsymbols: ({
     invisible?: undefined;
     func?: undefined;
     rewriteleftright?: undefined;
-    output_liner?: undefined;
+    output_linear?: undefined;
     atname?: undefined;
     atval?: undefined;
     codes?: undefined;
@@ -81,7 +81,7 @@ export declare const AMsymbols: ({
     acc?: undefined;
     stretchy?: undefined;
     rewriteleftright?: undefined;
-    output_liner?: undefined;
+    output_linear?: undefined;
     atname?: undefined;
     atval?: undefined;
     codes?: undefined;
@@ -97,7 +97,7 @@ export declare const AMsymbols: ({
     acc?: undefined;
     stretchy?: undefined;
     func?: undefined;
-    output_liner?: undefined;
+    output_linear?: undefined;
     atname?: undefined;
     atval?: undefined;
     codes?: undefined;
@@ -113,7 +113,7 @@ export declare const AMsymbols: ({
     invisible?: undefined;
     func?: undefined;
     rewriteleftright?: undefined;
-    output_liner?: undefined;
+    output_linear?: undefined;
     atname?: undefined;
     atval?: undefined;
     codes?: undefined;
@@ -129,7 +129,7 @@ export declare const AMsymbols: ({
     stretchy?: undefined;
     func?: undefined;
     rewriteleftright?: undefined;
-    output_liner?: undefined;
+    output_linear?: undefined;
     atname?: undefined;
     atval?: undefined;
     codes?: undefined;
@@ -137,7 +137,7 @@ export declare const AMsymbols: ({
     input: string;
     tag: string;
     output: string;
-    output_liner: string;
+    output_linear: string;
     tex: string;
     ttype: number;
     symbolType?: undefined;
@@ -161,7 +161,7 @@ export declare const AMsymbols: ({
     stretchy?: undefined;
     func?: undefined;
     rewriteleftright?: undefined;
-    output_liner?: undefined;
+    output_linear?: undefined;
     atname?: undefined;
     atval?: undefined;
     codes?: undefined;
@@ -179,7 +179,7 @@ export declare const AMsymbols: ({
     stretchy?: undefined;
     func?: undefined;
     rewriteleftright?: undefined;
-    output_liner?: undefined;
+    output_linear?: undefined;
     codes?: undefined;
 } | {
     input: string;
@@ -196,7 +196,7 @@ export declare const AMsymbols: ({
     stretchy?: undefined;
     func?: undefined;
     rewriteleftright?: undefined;
-    output_liner?: undefined;
+    output_linear?: undefined;
 })[];
 export declare const getFunctions: () => Array<string>;
 export declare const regExpIsFunction: RegExp;
@@ -212,7 +212,7 @@ export declare const findAmSymbolByTag: (tag: string, output: string) => {
     stretchy?: undefined;
     func?: undefined;
     rewriteleftright?: undefined;
-    output_liner?: undefined;
+    output_linear?: undefined;
     atname?: undefined;
     atval?: undefined;
     codes?: undefined;
@@ -228,7 +228,7 @@ export declare const findAmSymbolByTag: (tag: string, output: string) => {
     stretchy?: undefined;
     func?: undefined;
     rewriteleftright?: undefined;
-    output_liner?: undefined;
+    output_linear?: undefined;
     atname?: undefined;
     atval?: undefined;
     codes?: undefined;
@@ -244,7 +244,7 @@ export declare const findAmSymbolByTag: (tag: string, output: string) => {
     stretchy?: undefined;
     func?: undefined;
     rewriteleftright?: undefined;
-    output_liner?: undefined;
+    output_linear?: undefined;
     atname?: undefined;
     atval?: undefined;
     codes?: undefined;
@@ -260,7 +260,7 @@ export declare const findAmSymbolByTag: (tag: string, output: string) => {
     invisible?: undefined;
     func?: undefined;
     rewriteleftright?: undefined;
-    output_liner?: undefined;
+    output_linear?: undefined;
     atname?: undefined;
     atval?: undefined;
     codes?: undefined;
@@ -276,7 +276,7 @@ export declare const findAmSymbolByTag: (tag: string, output: string) => {
     acc?: undefined;
     stretchy?: undefined;
     rewriteleftright?: undefined;
-    output_liner?: undefined;
+    output_linear?: undefined;
     atname?: undefined;
     atval?: undefined;
     codes?: undefined;
@@ -292,7 +292,7 @@ export declare const findAmSymbolByTag: (tag: string, output: string) => {
     acc?: undefined;
     stretchy?: undefined;
     func?: undefined;
-    output_liner?: undefined;
+    output_linear?: undefined;
     atname?: undefined;
     atval?: undefined;
     codes?: undefined;
@@ -308,7 +308,7 @@ export declare const findAmSymbolByTag: (tag: string, output: string) => {
     invisible?: undefined;
     func?: undefined;
     rewriteleftright?: undefined;
-    output_liner?: undefined;
+    output_linear?: undefined;
     atname?: undefined;
     atval?: undefined;
     codes?: undefined;
@@ -324,7 +324,7 @@ export declare const findAmSymbolByTag: (tag: string, output: string) => {
     stretchy?: undefined;
     func?: undefined;
     rewriteleftright?: undefined;
-    output_liner?: undefined;
+    output_linear?: undefined;
     atname?: undefined;
     atval?: undefined;
     codes?: undefined;
@@ -332,7 +332,7 @@ export declare const findAmSymbolByTag: (tag: string, output: string) => {
     input: string;
     tag: string;
     output: string;
-    output_liner: string;
+    output_linear: string;
     tex: string;
     ttype: number;
     symbolType?: undefined;
@@ -356,7 +356,7 @@ export declare const findAmSymbolByTag: (tag: string, output: string) => {
     stretchy?: undefined;
     func?: undefined;
     rewriteleftright?: undefined;
-    output_liner?: undefined;
+    output_linear?: undefined;
     atname?: undefined;
     atval?: undefined;
     codes?: undefined;
@@ -374,7 +374,7 @@ export declare const findAmSymbolByTag: (tag: string, output: string) => {
     stretchy?: undefined;
     func?: undefined;
     rewriteleftright?: undefined;
-    output_liner?: undefined;
+    output_linear?: undefined;
     codes?: undefined;
 } | {
     input: string;
@@ -391,7 +391,7 @@ export declare const findAmSymbolByTag: (tag: string, output: string) => {
     stretchy?: undefined;
     func?: undefined;
     rewriteleftright?: undefined;
-    output_liner?: undefined;
+    output_linear?: undefined;
 };
 export declare const findAmSymbolByTagStretchy: (tag: string, output: string) => {
     input: string;
@@ -405,7 +405,7 @@ export declare const findAmSymbolByTagStretchy: (tag: string, output: string) =>
     stretchy?: undefined;
     func?: undefined;
     rewriteleftright?: undefined;
-    output_liner?: undefined;
+    output_linear?: undefined;
     atname?: undefined;
     atval?: undefined;
     codes?: undefined;
@@ -421,7 +421,7 @@ export declare const findAmSymbolByTagStretchy: (tag: string, output: string) =>
     stretchy?: undefined;
     func?: undefined;
     rewriteleftright?: undefined;
-    output_liner?: undefined;
+    output_linear?: undefined;
     atname?: undefined;
     atval?: undefined;
     codes?: undefined;
@@ -437,7 +437,7 @@ export declare const findAmSymbolByTagStretchy: (tag: string, output: string) =>
     stretchy?: undefined;
     func?: undefined;
     rewriteleftright?: undefined;
-    output_liner?: undefined;
+    output_linear?: undefined;
     atname?: undefined;
     atval?: undefined;
     codes?: undefined;
@@ -453,7 +453,7 @@ export declare const findAmSymbolByTagStretchy: (tag: string, output: string) =>
     invisible?: undefined;
     func?: undefined;
     rewriteleftright?: undefined;
-    output_liner?: undefined;
+    output_linear?: undefined;
     atname?: undefined;
     atval?: undefined;
     codes?: undefined;
@@ -469,7 +469,7 @@ export declare const findAmSymbolByTagStretchy: (tag: string, output: string) =>
     acc?: undefined;
     stretchy?: undefined;
     rewriteleftright?: undefined;
-    output_liner?: undefined;
+    output_linear?: undefined;
     atname?: undefined;
     atval?: undefined;
     codes?: undefined;
@@ -485,7 +485,7 @@ export declare const findAmSymbolByTagStretchy: (tag: string, output: string) =>
     acc?: undefined;
     stretchy?: undefined;
     func?: undefined;
-    output_liner?: undefined;
+    output_linear?: undefined;
     atname?: undefined;
     atval?: undefined;
     codes?: undefined;
@@ -501,7 +501,7 @@ export declare const findAmSymbolByTagStretchy: (tag: string, output: string) =>
     invisible?: undefined;
     func?: undefined;
     rewriteleftright?: undefined;
-    output_liner?: undefined;
+    output_linear?: undefined;
     atname?: undefined;
     atval?: undefined;
     codes?: undefined;
@@ -517,7 +517,7 @@ export declare const findAmSymbolByTagStretchy: (tag: string, output: string) =>
     stretchy?: undefined;
     func?: undefined;
     rewriteleftright?: undefined;
-    output_liner?: undefined;
+    output_linear?: undefined;
     atname?: undefined;
     atval?: undefined;
     codes?: undefined;
@@ -525,7 +525,7 @@ export declare const findAmSymbolByTagStretchy: (tag: string, output: string) =>
     input: string;
     tag: string;
     output: string;
-    output_liner: string;
+    output_linear: string;
     tex: string;
     ttype: number;
     symbolType?: undefined;
@@ -549,7 +549,7 @@ export declare const findAmSymbolByTagStretchy: (tag: string, output: string) =>
     stretchy?: undefined;
     func?: undefined;
     rewriteleftright?: undefined;
-    output_liner?: undefined;
+    output_linear?: undefined;
     atname?: undefined;
     atval?: undefined;
     codes?: undefined;
@@ -567,7 +567,7 @@ export declare const findAmSymbolByTagStretchy: (tag: string, output: string) =>
     stretchy?: undefined;
     func?: undefined;
     rewriteleftright?: undefined;
-    output_liner?: undefined;
+    output_linear?: undefined;
     codes?: undefined;
 } | {
     input: string;
@@ -584,5 +584,5 @@ export declare const findAmSymbolByTagStretchy: (tag: string, output: string) =>
     stretchy?: undefined;
     func?: undefined;
     rewriteleftright?: undefined;
-    output_liner?: undefined;
+    output_linear?: undefined;
 };

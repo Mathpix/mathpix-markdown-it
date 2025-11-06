@@ -6,7 +6,7 @@ let MathJax = require('../lib/mathjax/index.js').MathJax;
 
 const options = {outMath: {
     include_asciimath: true,
-    include_liner: true,
+    include_linear: true,
     include_mathml: false,
     include_latex: false,
     include_svg: false
@@ -34,9 +34,9 @@ describe('Latex to ascii:', () => {
         console.log('    LATEX         =>', test.latex);
         console.log('    ASCIIMATH     =>', test.ascii);
         console.log('    ASCIIMATH_OLD =>', test.ascii_old);
-        console.log('    LINER         =>', test.liner);
+        console.log('    linear         =>', test.linear);
         data.should.have.property('asciimath', test.ascii);
-        data.should.have.property('linermath', test.liner);
+        data.should.have.property('linearmath', test.linear);
         notIncludeSymbols(data.asciimath);
         done();
       });
@@ -50,12 +50,12 @@ describe('Latex to ascii:', () => {
         const data = MathJax.TexConvert(test.latex, options);
         console.log('    LATEX         =>', test.latex);
         console.log('    ASCIIMATH     =>', test.ascii);
-        console.log('    LINER         =>', test.liner);
+        console.log('    linear         =>', test.linear);
         if (test.ascii_old) {
           console.log('    ASCIIMATH_OLD =>', test.ascii_old);
         }
         data.should.have.property('asciimath', test.ascii);
-        data.should.have.property('linermath', test.liner);
+        data.should.have.property('linearmath', test.linear);
         notIncludeSymbols(data.asciimath);
         done();
       });
@@ -69,12 +69,12 @@ describe('Latex to ascii:', () => {
         const data = MathJax.TexConvert(test.latex, options);
         console.log('    LATEX         =>', test.latex);
         console.log('    ASCIIMATH     =>', test.ascii);
-        console.log('    LINER         =>', test.liner);
+        console.log('    linear         =>', test.linear);
         if (test.ascii_old) {
           console.log('    ASCIIMATH_OLD =>', test.ascii_old);
         }
         data.should.have.property('asciimath', test.ascii);
-        data.should.have.property('linermath', test.liner);
+        data.should.have.property('linearmath', test.linear);
         notIncludeSymbols(data.asciimath);
         done();
       });
@@ -89,9 +89,9 @@ describe('Latex to ascii:', () => {
         console.log('    LATEX         =>', test.latex);
         console.log('    ASCIIMATH     =>', test.ascii);
         console.log('    ASCIIMATH_OLD =>', test.ascii_old);
-        console.log('    LINER         =>', test.liner);
+        console.log('    linear         =>', test.linear);
         data.should.have.property('asciimath', test.ascii);
-        data.should.have.property('linermath', test.liner);
+        data.should.have.property('linearmath', test.linear);
         notIncludeSymbols(data.asciimath);
         done();
       });
@@ -106,9 +106,9 @@ describe('Latex to ascii:', () => {
         console.log('    LATEX         =>', test.latex);
         console.log('    ASCIIMATH     =>', test.ascii);
         console.log('    ASCIIMATH_OLD =>', test.ascii_old);
-        console.log('    LINER         =>', test.liner);
+        console.log('    linear         =>', test.linear);
         data.should.have.property('asciimath', test.ascii);
-        data.should.have.property('linermath', test.liner);
+        data.should.have.property('linearmath', test.linear);
         notIncludeSymbols(data.asciimath);
         done();
       });
@@ -122,9 +122,9 @@ describe('Latex to ascii:', () => {
         const data = MathJax.TexConvert(test.latex, options);
         console.log('    LATEX         =>', test.latex);
         console.log('    ASCIIMATH     =>', test.ascii);
-        console.log('    LINER         =>', test.liner);
+        console.log('    linear         =>', test.linear);
         data.should.have.property('asciimath', test.ascii);
-        data.should.have.property('linermath', test.liner);
+        data.should.have.property('linearmath', test.linear);
         notIncludeSymbols(data.asciimath);
         done();
       });
@@ -138,9 +138,9 @@ describe('Latex to ascii:', () => {
         const data = MathJax.TexConvert(test.latex, options);
         console.log('    LATEX         =>', test.latex);
         console.log('    ASCIIMATH     =>', test.ascii);
-        console.log('    LINER         =>', test.liner);
+        console.log('    linear         =>', test.linear);
         data.should.have.property('asciimath', test.ascii);
-        data.should.have.property('linermath', test.liner);
+        data.should.have.property('linearmath', test.linear);
         notIncludeSymbols(data.asciimath);
         done();
       });
@@ -155,9 +155,9 @@ describe('Latex to ascii:', () => {
           const data = MathJax.TexConvert(test.latex, options);
           console.log('    LATEX         =>', test.latex);
           console.log('    ASCIIMATH     =>', test.ascii);
-          console.log('    LINER         =>', test.liner);
+          console.log('    linear         =>', test.linear);
           data.should.have.property('asciimath', test.ascii);
-          data.should.have.property('linermath', test.liner);
+          data.should.have.property('linearmath', test.linear);
           notIncludeSymbols(data.asciimath);
           done();
         });
@@ -173,9 +173,9 @@ describe('Latex to ascii:', () => {
           const data = MathJax.TexConvert(test.latex, options);
           console.log('    LATEX         =>', test.latex);
           console.log('    ASCIIMATH     =>', test.ascii);
-          console.log('    LINER         =>', test.liner);
+          console.log('    linear         =>', test.linear);
           data.should.have.property('asciimath', test.ascii);
-          data.should.have.property('linermath', test.liner);
+          data.should.have.property('linearmath', test.linear);
           notIncludeSymbols(data.asciimath);
           done();
         });
@@ -191,17 +191,17 @@ describe('Latex to ascii:', () => {
           const data = MathJax.TexConvert(test.latex, options);
           console.log('    LATEX         =>', test.latex);
           console.log('    ASCIIMATH     =>', test.ascii);
-          console.log('    LINER         =>', test.liner);
+          console.log('    linear         =>', test.linear);
           data.should.have.property('asciimath', test.ascii);
           notIncludeSymbols(data.asciimath);
-          data.should.have.property('linermath', test.liner);
+          data.should.have.property('linearmath', test.linear);
           done();
         });
       }
     });
   });
 
-  describe('Testing liner:', () => {
+  describe('Testing linear:', () => {
     const tests = require('./_data/_ascii/_ascii_liner');
     tests.forEach(function(test) {
       if (test.latex) {
@@ -209,10 +209,10 @@ describe('Latex to ascii:', () => {
           const data = MathJax.TexConvert(test.latex, options);
           console.log('    LATEX         =>', test.latex);
           console.log('    ASCIIMATH     =>', test.ascii);
-          console.log('    LINER         =>', test.liner);
+          console.log('    linear         =>', test.linear);
           data.should.have.property('asciimath', test.ascii);
           notIncludeSymbols(data.asciimath);
-          data.should.have.property('linermath', test.liner);
+          data.should.have.property('linearmath', test.linear);
           done();
         });
       }

@@ -2,82 +2,82 @@ module.exports = [
   {
     latex: `a = b + c`,
     ascii:     `a=b+c`,
-    liner:     `a=b+c`,
+    linear:     `a=b+c`,
     ascii_old: `a=b+c`
   },
   {
     ascii: `*`,
-    liner: `⋅`,
+    linear: `⋅`,
     latex: `\\cdot`
   },
   {
     ascii: `**`,
-    liner: `∗`,
+    linear: `∗`,
     latex: `\\ast`
   },
   {
     ascii: `***`,
-    liner: `⋆`,
+    linear: `⋆`,
     latex: `\\star`
   },
   {
     ascii: `\\\\`,
-    liner: `∖`,
+    linear: `∖`,
     latex: `\\backslash`
   },
   {
     ascii: `\\\\`,
-    liner: '∖',
+    linear: '∖',
     latex: `\\setminus`
   },
   {
     ascii: `xx`,
-    liner: `×`,
+    linear: `×`,
     latex: `\\times`
   },
   {
     ascii: `-:`,
-    liner: `÷`,
+    linear: `÷`,
     latex: `\\div`
   },
   {
     ascii:  `|><`,
-    liner:  `⋉`,
+    linear:  `⋉`,
     latex:  `\\ltimes`
   },
   {
     ascii:  `><|`,
-    liner:  `⋊`,
+    linear:  `⋊`,
     latex:  `\\rtimes`
   },
   {
     ascii:  `|><|`,
-    liner:  `⋈`,
+    linear:  `⋈`,
     latex:  `\\bowtie`
   },
   {
     ascii:  `@`,
-    liner:  `∘`,
+    linear:  `∘`,
     latex:  `\\circ`
   },
   {
     ascii:  `o+`,
-    liner:  `⊕`,
+    linear:  `⊕`,
     latex:  `\\oplus`
   },
   {
     ascii:  `ox`,
-    liner:  `⊗`,
+    linear:  `⊗`,
     latex:  `\\otimes`
   },
   {
     ascii:  `o.`,
-    liner:  `⊙`,
+    linear:  `⊙`,
     latex:  `\\odot`
   },
   {
     ascii:  `^^`,
-    liner:  `∧`,
+    linear:  `∧`,
     latex:  `\\wedge`
   },
   // {
@@ -86,32 +86,32 @@ module.exports = [
   // },
   {
     ascii:  `vv`,
-    liner:  `∨`,
+    linear:  `∨`,
     latex:  `\\vee`
   },
   {
     ascii:  `vvv`,
-    liner:  `⋁`,
+    linear:  `⋁`,
     latex:  `\\bigvee`
   },
   {
     ascii:  `nn`,
-    liner:  `∩`,
+    linear:  `∩`,
     latex:  `\\cap`
   },
   {
     ascii:  `nnn`,
-    liner:  `⋂`,
+    linear:  `⋂`,
     latex:  `\\bigcap`
   },
   {
     ascii:  `uu`,
-    liner:  `∪`,
+    linear:  `∪`,
     latex:  `\\cup`
   },
   {
     ascii:  `uuu`,
-    liner:  `⋃`,
+    linear:  `⋃`,
     latex:  `\\bigcup`
   },
 ];

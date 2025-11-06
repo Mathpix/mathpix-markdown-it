@@ -59,7 +59,7 @@ export const convertMathToHtml = (state, token, options) => {
         token.mathEquation = data.html;
         token.mathData = data.data;
         token.ascii = data.ascii;
-        token.liner = data.liner;
+        token.linear = data.linear;
         token.ascii_tsv = data.ascii_tsv;
         token.ascii_csv = data.ascii_csv;
         token.ascii_md = data.ascii_md;
@@ -79,7 +79,7 @@ export const convertMathToHtml = (state, token, options) => {
         token.mathEquation = data.html;
         token.mathData = data.data;
         token.ascii = data.ascii;
-        token.liner = data.liner;
+        token.linear = data.linear;
         token.ascii_tsv = data.ascii_tsv;
         token.ascii_csv = data.ascii_csv;
         token.ascii_md = data.ascii_md;
