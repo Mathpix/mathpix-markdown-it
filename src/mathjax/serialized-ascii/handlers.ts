@@ -1,17 +1,21 @@
 import { MmlNode, TEXCLASS } from "mathjax-full/js/core/MmlTree/MmlNode";
-import {AMsymbols, eSymbolType, regExpIsFunction} from "./helperA";
+import { AMsymbols, eSymbolType, findAmSymbolByTag, findAmSymbolByTagStretchy, regExpIsFunction } from "./helperA";
 import { envArraysShouldBeFlattenInTSV } from "../../helpers/consts";
-import {IAsciiData, AddToAsciiData, getFunctionNameFromAscii, hasOnlyOneMoNode} from "./common";
+import { IAsciiData, AddToAsciiData, getFunctionNameFromAscii, hasOnlyOneMoNode, initAsciiData } from "./common";
+import {
+  findAmSymbolsToLinear,
+  findRootSymbol,
+  needsParensForFollowingDivision,
+  needBrackets,
+  isWrappedWithParens,
+  hasAnyWhitespace,
+  replaceUnicodeWhitespace,
+  replaceScripts,
+  formatLinearFromAscii
+} from "./helperLinear";
+import { isFirstChild, isLastChild } from "./node-utils";
 
 const regW: RegExp = /^\w/;
-
-const isFirstChild = (node) => {
-  return node.parent && node.parent.childNodes[0] && node.parent.childNodes[0] === node
-};
-
-const isLastChild = (node) => {
-  return node.parent && node.parent.childNodes && node.parent.childNodes[node.parent.childNodes.length -1] === node
-};
 
 export const needFirstSpaceBeforeTeXAtom = (node) => {
   if (isFirstChild(node)) {
@@ -44,7 +48,7 @@ export const needLastSpaceAfterTeXAtom = (node) => {
 };
 
 
-export const needFirstSpace = (node) => {
+export const needFirstSpace = (node, isLinear = false) => {
   try {
     if (isFirstChild(node)) {
       return false
@@ -55,7 +59,7 @@ export const needFirstSpace = (node) => {
       if (hasLastSpace) {
         return false;
       }
-      if(prev.kind === 'mi' || prev.kind === 'mo') {
+      if(prev.kind === 'mi' || (prev.kind === 'mo' && !isLinear)) {
         const text = prev.childNodes[0] ? prev.childNodes[0].text : '';
         return regW.test(text[0])
       } else {
@@ -67,7 +71,7 @@ export const needFirstSpace = (node) => {
   }
 };
 
-const needLastSpace = (node, isFunction = false) => {
+const needLastSpace = (node, isFunction = false, isLinear = false) => {
   let haveSpace: boolean = false;
   try {
     if (node.parent.kind === "msubsup") {
@@ -94,8 +98,8 @@ const needLastSpace = (node, isFunction = false) => {
         if (next.childNodes[0] && next.childNodes[0].kind === 'text' && next.childNodes[0].text === '\u2061') {
           return true
         }
-        const abs = SymbolToAM(next.kind, text);
-        return regW.test(abs)
+        const data = SymbolToAM(next.kind, text);
+        return isLinear ? regW.test(data.linear) : regW.test(data.ascii)
       } else {
         if (next.kind === 'mrow') {
           return false
@@ -125,68 +129,71 @@ export const SymbolToAM = (tag: string, output: string, atr = null, showStyle = 
       }
     }
     if (tags && tags.input) {
-      return tags.input + '(' + output + ')';
+      return {
+        ascii: tags.input + '(' + output + ')',
+        linear: tags.output + '(' + output + ')'
+      };
     }
   }
   if (!tags) {
-    tags = AMsymbols.find(item => {
-      if (tag === 'mo' || tag === 'mi') {
-        return (item.tag === 'mo' || item.tag === 'mi') && item.output === output
-      } else {
-        return item.tag === tag && item.output === output
-      }
-    });
+    tags = findAmSymbolByTag(tag, output);
   }
 
   //need split
   if (!tags && atr && atrsNames.length > 0 && Object.getOwnPropertyNames(atr)&& atr.stretchy === false) {
     const sp = output.split('');
-    let res = ''
+    let res = '';
+    let res_linear = '';
     for (let i = 0; i < sp.length; i++) {
-      let tags = AMsymbols.find(item => {
-        if (tag === 'mo' || tag === 'mi') {
-          return (item.tag === 'mo' || item.tag === 'mi') && item.output === sp[i]
-        } else {
-          return item.tag === tag && item.output === sp[i]
-        }
-      });
+      let tags = findAmSymbolByTag(tag, sp[i]);
       res += i > 0 ? ' ' : '';
+      res_linear += i > 0 ? ' ' : '';
       res += tags && tags.input ? tags.input : sp[i];
+      res_linear += tags && tags.output
+        ? tags.output_linear
+          ? tags.output_linear
+          : tags.output
+        : sp[i];
     }
-    return res;
+    return {
+      ascii: res,
+      linear: res_linear ? res_linear.split(' ').join('') : ''
+    };
   }
-
-  return tags ? tags.input : output
-
+  return {
+    ascii: tags ? tags.input : output,
+    linear: tags
+      ? tags.output_linear
+        ? tags.output_linear
+        : tags.output
+      : output
+  };
 };
 
 export const FindSymbolReplace = (str: string) => {
   return str.replace(/\u00A0/g, ' ')
 };
 
-export const FindSymbolToAM = (tag: string, output: string, atr = null): string => {
+export const FindSymbolToAM = (tag: string, output: string, atr = null): {
+  ascii: string,
+  linear: string
+} => {
   output = output.split(' ').join('');
   let tags = null;
   if (atr && atr.stretchy) {
-    tags = AMsymbols.find(item => {
-      if (tag === 'mo' || tag === 'mi') {
-        return (item.tag === 'mo' || item.tag === 'mi') && item.output === output && item.stretchy
-      } else {
-        return item.tag === tag && item.output === output && item.stretchy
-      }
-    });
+    tags = findAmSymbolByTagStretchy(tag, output);
   }
   if (!tags) {
-    tags = AMsymbols.find(item =>
-    {
-      if (tag === 'mo' || tag === 'mi') {
-        return (item.tag === 'mo' || item.tag === 'mi') && item.output === output
-      } else {
-        return item.tag === tag && item.output === output
-      }
-    });
+    tags = findAmSymbolByTag(tag, output);
   }
-  return tags ? tags.input : '';
+  return {
+    ascii: tags ? tags.input : '',
+    linear: tags
+      ? tags.output_linear
+        ? tags.output_linear
+        : tags.output
+      : output
+  }
 };
 
 const getChildrenText = (node): string => {
@@ -211,12 +218,7 @@ export const getAttributes = (node: MmlNode) =>{
 
 const menclose = (handlerApi) => {
   return (node, serialize): IAsciiData => {
-    let res: IAsciiData = {
-      ascii: '',
-      ascii_tsv: '',
-      ascii_csv: '',
-      ascii_md: '',
-    };
+    let res: IAsciiData = initAsciiData();
     try {
       const atr = getAttributes(node);
       let isLeft = false;
@@ -225,13 +227,19 @@ const menclose = (handlerApi) => {
         isLeft = atr.notation.toString().indexOf('left') > -1;
         isRight = atr.notation.toString().indexOf('right') > -1;
       }
-      res = AddToAsciiData(res, [isLeft ? '[' : '']);
+      res = AddToAsciiData(res, {
+        ascii: isLeft ? '[' : '',
+        linear: ''
+      });
       const data: IAsciiData = handlerApi.handleAll(node, serialize);
-      res = AddToAsciiData(res, [data.ascii, data.ascii_tsv, data.ascii_csv, data.ascii_md]);
+      res = AddToAsciiData(res, data);
       if (atr && atr.lcm) {
-        res = AddToAsciiData(res, ['']);
+        res = AddToAsciiData(res, { ascii: '', linear: '' });
       }
-      res = AddToAsciiData(res, [isRight ? ']' : '']);
+      res = AddToAsciiData(res, {
+        ascii: isRight ? ']' : '',
+        linear: ''
+      });
       return res;
     } catch (e) {
       console.error('mml => menclose =>', e);
@@ -254,9 +262,15 @@ const getDataForVerticalMath = (serialize, node, rowNumber) => {
     collChildrenCanBeVerticalMath: true,
     startedFromMathOperation: false,
     mmlCollVerticalMath: '',
+    mmlCollVerticalMath_linear: '',
     mathOperation: ''
   };
+  let parenthesisLinearOpen: boolean = false;
   for (let k = 0; k < mtdNode.childNodes.length; k++) {
+    if (parenthesisLinearOpen) {
+      res.mmlCollVerticalMath_linear += ')';
+      parenthesisLinearOpen = false;
+    }
     const child = mtdNode.childNodes[k];
     /** The element is wrapped in curly braces:
      *  e.g. {\times 1}*/
@@ -272,10 +286,18 @@ const getDataForVerticalMath = (serialize, node, rowNumber) => {
         res.mathOperation = data.mathOperation;
       }
       res.mmlCollVerticalMath += data.mmlCollVerticalMath;
+      res.mmlCollVerticalMath_linear += data.mmlCollVerticalMath_linear;
       continue;
     }
     const data: IAsciiData = serialize.visitNode(child, '');
     const text = getChildrenText(child);
+    if (child?.kind === "mfrac"
+      && (res.mmlCollVerticalMath_linear?.trim() && needsParensForFollowingDivision(res.mmlCollVerticalMath_linear)
+      || needBrackets(serialize, child))
+    ) {
+      res.mmlCollVerticalMath_linear += '(';
+      parenthesisLinearOpen = true;
+    }
     if (child.kind === 'mo') {
       const symbolType = getSymbolType('mo', text);
       if (symbolType === eSymbolType.logical 
@@ -297,7 +319,11 @@ const getDataForVerticalMath = (serialize, node, rowNumber) => {
         }
       }
       res.mmlCollVerticalMath += data.ascii === '","' ? ',' : data.ascii;
+      res.mmlCollVerticalMath_linear += data.linear === '","' ? ',' : data.linear;
     }
+  }
+  if (parenthesisLinearOpen) {
+    res.mmlCollVerticalMath_linear += ')';
   }
   return res;
 };
@@ -324,19 +350,23 @@ const mtable = () => {
       node.attributes.setInherited('toCsv', toCsv);  
       node.attributes.setInherited('toMd', toMd);  
       const columnAlign = node.attributes.get('columnalign');
+      const columnAlignArr = columnAlign ? columnAlign.split(' ') : [];
       const arrRowLines = node.attributes.isSet('rowlines') ? node.attributes.get('rowlines').split(' ') : [];
       const envName = node.attributes.get('name');
       /** Check if a table is enclosed in brackets */
       const isHasBranchOpen = node.parent && node.parent.kind === 'mrow' && node.parent.properties?.hasOwnProperty('open');
       const isHasBranchClose = node.parent && node.parent.kind === 'mrow' && node.parent.properties?.hasOwnProperty('close');
+      const branchOpen = !!isHasBranchOpen && node.parent.properties['open'];
+      const branchClose = !!isHasBranchClose && node.parent.properties['close'];
       const thereAreBracketsIn_parent = (isHasBranchOpen && node.parent.properties['open'])
         || (isHasBranchClose && node.parent.properties['close']);
       const thereAreBracketsIn_Parent = parentIsMenclose && node.Parent.Parent?.isKind('mrow') 
         && ((node.Parent.Parent.properties?.hasOwnProperty('open') && node.Parent.Parent.properties['open'])
           || (node.Parent.Parent.properties?.hasOwnProperty('close') && node.Parent.Parent.properties['close']));
       /** It is a matrix or system of equations with brackets */
-      const isMatrixOrSystemOfEquations = thereAreBracketsIn_parent || thereAreBracketsIn_Parent;
-      const itShouldBeFlatten = envArraysShouldBeFlattenInTSV.includes(envName) 
+      const isMatrixOrSystemOfEquations: boolean = !!thereAreBracketsIn_parent || !!thereAreBracketsIn_Parent;
+      const isMatrix: boolean = (!!thereAreBracketsIn_parent || !!thereAreBracketsIn_Parent) && !!branchOpen && !!branchClose;
+      const itShouldBeFlatten = envArraysShouldBeFlattenInTSV.includes(envName)
         && !isHasBranchOpen && !isHasBranchClose && !parentIsMenclose;
       /** Vertical math:
        * \begin{array}{r} and it should not be a matrix and not a system of equations */
@@ -350,10 +380,12 @@ const mtable = () => {
         mtrNode.attributes.setInherited('toMd', toMd);
         mtrNode.attributes.setInherited('itShouldBeFlatten', itShouldBeFlatten);
         let mmlRow = '';
+        let mmlRow_linear = '';
         let mmlRow_tsv = '';
         let mmlRow_csv = '';
         let mmlRow_md = '';
         let mmlRowVerticalMath = '';
+        let mmlRowVerticalMath_linear = '';
         let mathOperation = '';
         const countColl = mtrNode.childNodes?.length;
         /** It's EqnArray or AmsEqnArray or AlignAt.
@@ -361,19 +393,28 @@ const mtable = () => {
         const isEqnArrayRow = mtrNode.attributes.get('displaystyle');
         
         for (let j = 0; j < countColl; j++) {
-          if (j > 0 && !isEqnArrayRow) {
-            mmlRow += ',';
-            mmlRow_tsv += toTsv ? serialize.options.tsv_separators?.column || '\t' : itShouldBeFlatten ? ', ' : ',';
-            mmlRow_csv += toCsv ? serialize.options.csv_separators?.column || ',' : itShouldBeFlatten ? ', ' : ',';
-            mmlRow_md += toMd ? serialize.options.md_separators?.column || ' ' : itShouldBeFlatten ? ', ' : ',';
+          if (j > 0) {
+            if (!isEqnArrayRow) {
+              mmlRow += ',';
+              mmlRow_linear += isMatrix ? ',' : ' ';
+              mmlRow_tsv += toTsv ? serialize.options.tsv_separators?.column || '\t' : itShouldBeFlatten ? ', ' : ',';
+              mmlRow_csv += toCsv ? serialize.options.csv_separators?.column || ',' : itShouldBeFlatten ? ', ' : ',';
+              mmlRow_md += toMd ? serialize.options.md_separators?.column || ' ' : itShouldBeFlatten ? ', ' : ',';
+            } else {
+              if (columnAlignArr?.length && columnAlignArr[j-1] === 'left' && columnAlignArr[j] === 'right') {
+                mmlRow_linear += isMatrix ? ',' : ' ';
+              }
+            }
           }
           let mtdNode = mtrNode.childNodes[j];
-          let { ascii = '', ascii_tsv = '', ascii_csv = '', ascii_md = '' }: IAsciiData = serialize.visitNode(mtdNode, '');
+          let { ascii = '', linear = '', ascii_tsv = '', ascii_csv = '', ascii_md = '' }: IAsciiData = serialize.visitNode(mtdNode, '');
           
           let mmlCollVerticalMath = '';
+          let mmlCollVerticalMath_linear = '';
           if (isVerticalMath) {
             const dataColl = getDataForVerticalMath(serialize, mtdNode, i);
             mmlCollVerticalMath = dataColl.mmlCollVerticalMath;
+            mmlCollVerticalMath_linear = dataColl.mmlCollVerticalMath_linear;
             if (dataColl.startedFromMathOperation) {
               startedFromMathOperation = true;
               mathOperation = dataColl.mathOperation;
@@ -383,26 +424,31 @@ const mtable = () => {
             }
           }
           mmlRow += ascii;
+          mmlRow_linear += linear;
           mmlRow_tsv += !toTsv && itShouldBeFlatten ? ascii_tsv.trimEnd() : ascii_tsv;
           mmlRow_csv += !toCsv && itShouldBeFlatten ? ascii_csv.trimEnd() : ascii_csv;
           mmlRow_md += !toMd && itShouldBeFlatten ? ascii_md.trimEnd() : ascii_md;
           mmlRowVerticalMath += mmlCollVerticalMath;
+          mmlRowVerticalMath_linear += mmlCollVerticalMath_linear;
         }
 
         /** For vertical math, if the horizontal line is in front of the answer, then replace it with an equals sign */
         if (isVerticalMath && 
           arrRowLines?.length && arrRowLines?.length > i && arrRowLines[i] !== 'none') {
           mmlRowVerticalMath += '=';
+          mmlRowVerticalMath_linear += '=';
         }
         /** It's EqnArray or AmsEqnArray or AlignAt.
          *  eqnarray*, align, align*, split, gather, gather*, aligned, gathered, alignat, alignat*, alignedat */
         const isEqnArray = mtrNode.attributes?.get('displaystyle');
         arrRows.push({
           mmlRow: mmlRow,
+          mmlRow_linear: mmlRow_linear,
           mmlRow_tsv: mmlRow_tsv,
           mmlRow_csv: mmlRow_csv,
           mmlRow_md: mmlRow_md,
           mmlRowVerticalMath: mmlRowVerticalMath,
+          mmlRowVerticalMath_linear: mmlRowVerticalMath_linear,
           mathOperation: mathOperation,
           encloseToSquareBrackets: countRow > 1 || isSubExpression || (countColl > 1 && !isEqnArray),
           toTsv: toTsv,
@@ -427,33 +473,45 @@ const mtable = () => {
           }
           if (mathOperation && i > 0) {
             arrRows[i].mmlRowVerticalMath = mathOperation + arrRows[i].mmlRowVerticalMath;
+            arrRows[i].mmlRowVerticalMath_linear = mathOperation + arrRows[i].mmlRowVerticalMath_linear;
           }
         }
       }
       let mmlTableContent = '';
+      let mmlTableContent_linear = '';
       let mmlTableContent_tsv = '';
       let mmlTableContent_csv = '';
       let mmlTableContent_md = '';
       for (let i = 0; i < arrRows.length; i++) {
         if (i > 0 && !isVerticalMath) {
-          mmlTableContent += ',';          
+          mmlTableContent += ',';
           mmlTableContent_tsv += toTsv
             ? serialize.options.tsv_separators?.row || '\n'
-            : itShouldBeFlatten ? ', ' : ',';          
-          mmlTableContent_csv += toCsv 
+            : itShouldBeFlatten ? ', ' : ',';
+          mmlTableContent_csv += toCsv
               ? serialize.options.csv_separators?.row || '\n'
               : itShouldBeFlatten ? ', ' : ',';          
           mmlTableContent_md += toMd 
               ? serialize.options.md_separators?.row || ' <br> '
               : itShouldBeFlatten ? ', ' : ',';
+          if (isMatrix) {
+            mmlTableContent_linear += ',';
+          }
         }
         let mmlRow = isVerticalMath ? arrRows[i].mmlRowVerticalMath : arrRows[i].mmlRow;
+        let mmlRow_linear = isVerticalMath ? arrRows[i].mmlRowVerticalMath_linear : arrRows[i].mmlRow_linear;
         let mmlRow_tsv = isVerticalMath ? arrRows[i].mmlRowVerticalMath : arrRows[i].mmlRow_tsv;
         let mmlRow_csv = isVerticalMath ? arrRows[i].mmlRowVerticalMath : arrRows[i].mmlRow_csv;
         let mmlRow_md = isVerticalMath ? arrRows[i].mmlRowVerticalMath : arrRows[i].mmlRow_md;
         mmlTableContent += arrRows[i].encloseToSquareBrackets && !isVerticalMath
             ? '[' + mmlRow + ']'
-            : mmlRow;        
+            : mmlRow;
+        if (arrRows[i].encloseToSquareBrackets && !isVerticalMath && isMatrix) {
+          mmlTableContent_linear += '[' + mmlRow_linear + ']'
+        } else {
+          mmlTableContent_linear += mmlTableContent_linear && !isVerticalMath ? '\n' : '';
+          mmlTableContent_linear += mmlRow_linear;
+        }
         mmlTableContent_tsv += arrRows[i].encloseToSquareBrackets
           && !arrRows[i].itShouldBeFlatten && !arrRows[i].toTsv && !isVerticalMath
             ? '[' + mmlRow_tsv + ']'
@@ -520,17 +578,19 @@ const mtable = () => {
       }
       return {
         ascii: mml,
+        linear: mmlTableContent_linear,
         ascii_tsv: mml_tsv,
         ascii_csv: mml_csv,
-        ascii_md: mml_md,
+        ascii_md: mml_md
       }
     } catch (e) {
       console.error('mml => mtable =>', e);
       return {
         ascii: mml,
+        linear: mml,
         ascii_tsv: mml_tsv,
         ascii_csv: mml_csv,
-        ascii_md: mml_md,
+        ascii_md: mml_md
       }
     }
   }
@@ -546,6 +606,7 @@ const mrow = () => {
       const needBranchClose = node.properties
         && node.properties.hasOwnProperty('close') &&  node.properties.close === '';
       let mmlContent = '';
+      let mmlContent_linear = '';
       let mmlContent_tsv = '';
       let mmlContent_csv = '';
       let mmlContent_md = '';
@@ -559,6 +620,7 @@ const mrow = () => {
           let text: string = getFunctionNameFromAscii(data.ascii, node.childNodes[i]);
           if (!text || regExpIsFunction.test(text)) {
             mmlContent += ')';
+            mmlContent_linear += ')';
             mmlContent_tsv += ')';
             mmlContent_csv += ')';
             mmlContent_md += ')';
@@ -568,6 +630,7 @@ const mrow = () => {
         if (node.childNodes[i].kind === "mfrac" && beforeAscii?.trim()) {
           if (regExpIsFunction.test(beforeAscii.trim()) || (childBefore?.kind === 'mo' && childBefore?.texClass === -1)) {
             mmlContent += '(';
+            mmlContent_linear += '(';
             mmlContent_tsv += '(';
             mmlContent_csv += '(';
             mmlContent_md += '(';
@@ -575,6 +638,7 @@ const mrow = () => {
           }
         }
         mmlContent += data.ascii;
+        mmlContent_linear += data.linear;
         mmlContent_tsv += data.ascii_tsv;
         mmlContent_csv += data.ascii_csv;
         mmlContent_md += data.ascii_md;
@@ -583,6 +647,7 @@ const mrow = () => {
       }
       if (parenthesisOpen) {
         mmlContent += ')';
+        mmlContent_linear += ')';
         mmlContent_tsv += ')';
         mmlContent_csv += ')';
         mmlContent_md += ')';
@@ -592,30 +657,21 @@ const mrow = () => {
       let close = isTexClass7 && needBranchClose && !isVerticalMath ? ':}' : '';
       return {
         ascii: open + mmlContent + close,
+        linear: mmlContent_linear,
         ascii_tsv: open + mmlContent_tsv + close,
         ascii_csv: open + mmlContent_csv + close,
         ascii_md: open + mmlContent_md + close,
       }
     } catch (e) {
       console.error('mml => mrow =>', e);
-      return {
-        ascii: '',
-        ascii_tsv: '',
-        ascii_csv: '',
-        ascii_md: '',
-      }
+      return initAsciiData();
     }
   }
 };
 
 const mtr = () => {
   return (node, serialize): IAsciiData => {
-    let res: IAsciiData = {
-      ascii: '',
-      ascii_tsv: '',
-      ascii_csv: '',
-      ascii_md: '',
-    };
+    let res: IAsciiData = initAsciiData();
     try {
       /** It's EqnArray or AmsEqnArray or AlignAt.
        *  eqnarray*, align, align*, split, gather, gather*, aligned, gathered, alignat, alignat*, alignedat */
@@ -626,20 +682,22 @@ const mtr = () => {
       const itShouldBeFlatten = node.attributes.get('itShouldBeFlatten');
       for (let i = 0; i < node.childNodes.length; i++) {
         if (i > 0 && !isEqnArray) {
-          res = AddToAsciiData(res, [
-            ',',
-            toTsv ? serialize.options.tsv_separators?.column || '\t' : itShouldBeFlatten ? ', ' : ',',
-            toCsv ? serialize.options.csv_separators?.column || ',' : itShouldBeFlatten ? ', ' : ',',
-            toMd ? serialize.options.md_separators?.column || ' ' : itShouldBeFlatten ? ', ' : ',',
-          ]);
+          res = AddToAsciiData(res, {
+            ascii: ',',
+            linear: ' ',
+            ascii_tsv: toTsv ? serialize.options.tsv_separators?.column || '\t' : itShouldBeFlatten ? ', ' : ',',
+            ascii_csv: toCsv ? serialize.options.csv_separators?.column || ',' : itShouldBeFlatten ? ', ' : ',',
+            ascii_md: toMd ? serialize.options.md_separators?.column || ' ' : itShouldBeFlatten ? ', ' : ','
+          });
         }
-        let {ascii = '', ascii_tsv = '', ascii_csv = '', ascii_md = ''}: IAsciiData = serialize.visitNode(node.childNodes[i], '');
-        res = AddToAsciiData(res, [
-          ascii, 
-          !toTsv && itShouldBeFlatten ? ascii_tsv?.trimEnd() : ascii_tsv,
-          !toCsv && itShouldBeFlatten ? ascii_csv?.trimEnd() : ascii_csv,
-          !toMd && itShouldBeFlatten ? ascii_md?.trimEnd() : ascii_md,
-        ]);
+        let {ascii = '', linear = '', ascii_tsv = '', ascii_csv = '', ascii_md = ''}: IAsciiData = serialize.visitNode(node.childNodes[i], '');
+        res = AddToAsciiData(res, {
+          ascii: ascii,
+          linear: linear,
+          ascii_tsv: !toTsv && itShouldBeFlatten ? ascii_tsv?.trimEnd() : ascii_tsv,
+          ascii_csv: !toCsv && itShouldBeFlatten ? ascii_csv?.trimEnd() : ascii_csv,
+          ascii_md: !toMd && itShouldBeFlatten ? ascii_md?.trimEnd() : ascii_md
+      });
       }
       return res;
     } catch (e) {
@@ -651,12 +709,7 @@ const mtr = () => {
 
 const mpadded = (handlerApi) => {
   return (node, serialize): IAsciiData => {
-    let res: IAsciiData = {
-      ascii: '',
-      ascii_tsv: '',
-      ascii_csv: '',
-      ascii_md: ''
-    };
+    let res: IAsciiData = initAsciiData();
     try {
       const mmlAdd: IAsciiData = handlerApi.handleAll(node, serialize);
       if (node.Parent && node.Parent.kind === "menclose") {
@@ -670,19 +723,21 @@ const mpadded = (handlerApi) => {
       /** For tsv/csv:
        * Omit the " in nested arrays
        * */
-      res = AddToAsciiData(res, [
-        '"', 
-        serialize.options.tableToTsv ? '' : '"', 
-        '',
-        ''
-      ]);
-      res = AddToAsciiData(res, [mmlAdd.ascii, mmlAdd.ascii_tsv, mmlAdd.ascii_csv, mmlAdd.ascii_md]);
-      res = AddToAsciiData(res, [
-        '"', 
-        serialize.options.tableToTsv ? '' : '"', 
-        '',
-        ''
-      ]);
+      res = AddToAsciiData(res, {
+        ascii: '"',
+        linear: '',
+        ascii_tsv: serialize.options.tableToTsv ? '' : '"',
+        ascii_csv: '',
+        ascii_md: ''
+      });
+      res = AddToAsciiData(res, mmlAdd);
+      res = AddToAsciiData(res, {
+        ascii: '"',
+        linear: '',
+        ascii_tsv: serialize.options.tableToTsv ? '' : '"',
+        ascii_csv: '',
+        ascii_md: ''
+      });
       return res;
     } catch (e) {
       console.error('mml => mpadded =>', e);
@@ -693,12 +748,7 @@ const mpadded = (handlerApi) => {
 
 const mover = (handlerApi) => {
   return (node, serialize): IAsciiData => {
-    let res: IAsciiData = {
-      ascii: '',
-      ascii_tsv: '',
-      ascii_csv: '',
-      ascii_md: ''
-    };
+    let res: IAsciiData = initAsciiData();
     try {
       const firstChild = node.childNodes[0] ? node.childNodes[0] : '';
       const secondChild = node.childNodes[1] ? node.childNodes[1] : '';
@@ -706,36 +756,76 @@ const mover = (handlerApi) => {
       const dataSecondChild: IAsciiData = secondChild ? serialize.visitNode(secondChild, '') : null;
       if (secondChild && secondChild.kind === 'mo') {
         const t = dataSecondChild.ascii;
-        const asc = FindSymbolToAM('mover', t, getAttributes(secondChild));
-        if (asc) {
-          res = AddToAsciiData(res, [' ' +asc + '(']);
-          res = AddToAsciiData(res, [
-            dataFirstChild ? dataFirstChild.ascii ? dataFirstChild.ascii.trim() : dataFirstChild.ascii : '',
-            dataFirstChild ? dataFirstChild.ascii_tsv ? dataFirstChild.ascii_tsv.trim() : dataFirstChild.ascii_tsv : '',
-            dataFirstChild ? dataFirstChild.ascii_csv ? dataFirstChild.ascii_csv.trim() : dataFirstChild.ascii_csv : '',
-            dataFirstChild ? dataFirstChild.ascii_md ? dataFirstChild.ascii_md.trim() : dataFirstChild.ascii_md : '',
-          ]);
-          res = AddToAsciiData(res, [')']);
+        const data = FindSymbolToAM('mover', t, getAttributes(secondChild));
+        if (data.ascii) {
+          let linear = formatLinearFromAscii(data.ascii, dataFirstChild?.linear);
+          res = AddToAsciiData(res, { ascii: ' ', linear: '' });
+          res = AddToAsciiData(res, {
+            ascii: data.ascii,
+            linear: linear ? '' : data.linear,
+          });
+          res = AddToAsciiData(res, {
+            ascii: '(',
+            linear: !linear && dataFirstChild?.linear?.trim()?.length > 1  ? '(' : '',
+          });
+          res = AddToAsciiData(res, {
+            ascii: dataFirstChild? dataFirstChild.ascii ? dataFirstChild.ascii.trim() : dataFirstChild.ascii : '',
+            linear: linear ? linear : dataFirstChild ? dataFirstChild.linear ? dataFirstChild.linear.trim() : dataFirstChild.linear : '',
+            ascii_tsv: dataFirstChild ? dataFirstChild.ascii_tsv ? dataFirstChild.ascii_tsv.trim() : dataFirstChild.ascii_tsv : '',
+            ascii_csv: dataFirstChild ? dataFirstChild.ascii_csv ? dataFirstChild.ascii_csv.trim() : dataFirstChild.ascii_csv : '',
+            ascii_md: dataFirstChild ? dataFirstChild.ascii_md ? dataFirstChild.ascii_md.trim() : dataFirstChild.ascii_md : ''
+          });
+          res = AddToAsciiData(res, {
+            ascii: ')',
+            linear: !linear && dataFirstChild?.linear?.trim()?.length > 1  ? ')' : ''
+          });
         } else {
-          res = AddToAsciiData(res, [
-            dataFirstChild ? dataFirstChild.ascii : '',
-            dataFirstChild ? dataFirstChild.ascii_tsv : '',
-            dataFirstChild ? dataFirstChild.ascii_csv : '',
-            dataFirstChild ? dataFirstChild.ascii_md : ''
-          ]);
-          res = AddToAsciiData(res, ['^']);
-          res = AddToAsciiData(res, [serialize.options.extraBrackets ? '(' : '']);
-          res = AddToAsciiData(res, [
-            dataSecondChild ? dataSecondChild.ascii : '',
-            dataSecondChild ? dataSecondChild.ascii_tsv : '',
-            dataSecondChild ? dataSecondChild.ascii_csv : '',
-            dataSecondChild ? dataSecondChild.ascii_md : ''
-          ]);
-          res = AddToAsciiData(res, [serialize.options.extraBrackets ? ')' : '']);
+          let linear = formatLinearFromAscii(data.linear, dataFirstChild?.linear, 'mover');
+          res = AddToAsciiData(res, {
+            ascii: dataFirstChild ? dataFirstChild.ascii : '',
+            linear: !linear && dataFirstChild ? dataFirstChild.linear : '',
+            ascii_tsv: dataFirstChild ? dataFirstChild.ascii_tsv : '',
+            ascii_csv: dataFirstChild ? dataFirstChild.ascii_csv : '',
+            ascii_md: dataFirstChild ? dataFirstChild.ascii_md : ''
+          });
+          res = AddToAsciiData(res, {
+            ascii: '^',
+            linear: linear ? linear : '^'
+          });
+          res = AddToAsciiData(res, {
+            ascii: serialize.options.extraBrackets ? '(' : '',
+            linear: !linear && dataSecondChild?.linear?.length ? '(' : '',
+          });
+          res = AddToAsciiData(res, {
+            ascii: dataSecondChild ? dataSecondChild.ascii : '',
+            linear: !linear && dataSecondChild ? dataSecondChild.linear : '',
+            ascii_tsv: dataSecondChild ? dataSecondChild.ascii_tsv : '',
+            ascii_csv: dataSecondChild ? dataSecondChild.ascii_csv : '',
+            ascii_md: dataSecondChild ? dataSecondChild.ascii_md : ''
+          });
+          res = AddToAsciiData(res, {
+            ascii: serialize.options.extraBrackets ? ')' : '',
+            linear: !linear && dataSecondChild?.linear?.length ? ')' : '',
+          });
         }
       } else {
         const data: IAsciiData = handlerApi.handleAll(node, serialize);
-        res = AddToAsciiData(res, [data.ascii, data.ascii_tsv, data.ascii_csv, data.ascii_md]);
+        let linear = '';
+        if (dataFirstChild?.linear?.length && dataSecondChild.linear?.length) {
+          linear += dataFirstChild.linear?.length > 1 ? `(${dataFirstChild.linear})` : dataFirstChild.linear;
+          let linearData = dataSecondChild.linear.length === 1 ? findAmSymbolsToLinear(dataSecondChild.linear) : null;
+          if (linearData) {
+            linear += dataFirstChild.linear.length > 1 ? linearData.outputComplex : linearData.output;
+          } else {
+            linear += '^';
+            linear += dataSecondChild.linear?.length > 1 ? `(${dataSecondChild.linear})` : dataSecondChild.linear;
+          }
+        }
+        if (linear) {
+          res = AddToAsciiData(res, {...data, linear: linear});
+        } else {
+          res = AddToAsciiData(res, data);
+        }
       }
       return res;
     } catch (e) {
@@ -747,12 +837,7 @@ const mover = (handlerApi) => {
 
 const munder = (handlerApi) => {
   return (node, serialize): IAsciiData => {
-    let res: IAsciiData = {
-      ascii: '',
-      ascii_tsv: '',
-      ascii_csv: '',
-      ascii_md: ''
-    };
+    let res: IAsciiData = initAsciiData();
     try {
       const firstChild = node.childNodes[0] ? node.childNodes[0] : null;
       const secondChild = node.childNodes[1] ? node.childNodes[1] : null;
@@ -760,36 +845,60 @@ const munder = (handlerApi) => {
       const dataSecondChild: IAsciiData = secondChild ? serialize.visitNode(secondChild, '') : null;
       if (secondChild && secondChild.kind === 'mo') {
         const t = dataSecondChild.ascii;
-        const asc = FindSymbolToAM(node.kind, t);
-        if (asc) {
-          res = AddToAsciiData(res, [asc + '(']);
-          res = AddToAsciiData(res, [
-            dataFirstChild ? dataFirstChild.ascii : '',
-            dataFirstChild ? dataFirstChild.ascii_tsv : '',
-            dataFirstChild ? dataFirstChild.ascii_csv : '',
-            dataFirstChild ? dataFirstChild.ascii_md : ''
-          ]);
-          res = AddToAsciiData(res, [asc + ')']);
+        const data = FindSymbolToAM(node.kind, t);
+        if (data.ascii) {
+          let linear = formatLinearFromAscii(data.ascii, dataFirstChild?.linear);
+          res = AddToAsciiData(res, {
+            ascii: data.ascii + '(',
+            linear: linear ? linear : data.linear + '('
+          });
+          res = AddToAsciiData(res, {
+            ascii: dataFirstChild ? dataFirstChild.ascii : '',
+            linear: !linear && dataFirstChild ? dataFirstChild.linear : '',
+            ascii_tsv: dataFirstChild ? dataFirstChild.ascii_tsv : '',
+            ascii_csv: dataFirstChild ? dataFirstChild.ascii_csv : '',
+            ascii_md: dataFirstChild ? dataFirstChild.ascii_md : ''
+          });
+          res = AddToAsciiData(res, {
+            ascii: ')',
+            linear: !linear ? ')' : ''
+          });
         } else {
           const data: IAsciiData = handlerApi.handleAll(node, serialize);
-          res = AddToAsciiData(res, [data.ascii, data.ascii_tsv, data.ascii_csv, data.ascii_md]);
+          let linear = '';
+          if (dataFirstChild?.linear?.length && dataSecondChild.linear?.length) {
+            linear = formatLinearFromAscii(dataSecondChild.linear, dataFirstChild.linear);
+          }
+          if (linear) {
+            res = AddToAsciiData(res, {...data, linear: linear});
+          } else {
+            res = AddToAsciiData(res, data);
+          }
         }
       } else {
-        res = AddToAsciiData(res, [
-          dataFirstChild ? dataFirstChild.ascii : '',
-          dataFirstChild ? dataFirstChild.ascii_tsv : '',
-          dataFirstChild ? dataFirstChild.ascii_csv : '',
-          dataFirstChild ? dataFirstChild.ascii_md : ''
-        ]);
-        res = AddToAsciiData(res, ['_']);
-        res = AddToAsciiData(res, [serialize.options.extraBrackets ? '(' : '']);
-        res = AddToAsciiData(res, [
-          dataSecondChild ? dataSecondChild.ascii : '',
-          dataSecondChild ? dataSecondChild.ascii_tsv : '',
-          dataSecondChild ? dataSecondChild.ascii_csv : '',
-          dataSecondChild ? dataSecondChild.ascii_md : ''
-        ]);
-        res = AddToAsciiData(res, [serialize.options.extraBrackets ? ')' : '']);
+        res = AddToAsciiData(res, {
+          ascii: dataFirstChild ? dataFirstChild.ascii : '',
+          linear: dataFirstChild ? dataFirstChild.linear : '',
+          ascii_tsv: dataFirstChild ? dataFirstChild.ascii_tsv : '',
+          ascii_csv: dataFirstChild ? dataFirstChild.ascii_csv : '',
+          ascii_md: dataFirstChild ? dataFirstChild.ascii_md : ''
+        });
+        res = AddToAsciiData(res, {ascii: '_', linear: '_'});
+        res = AddToAsciiData(res, {
+          ascii: serialize.options.extraBrackets ? '(' : '',
+          linear: serialize.options.extraBrackets ? '(' : '',
+        });
+        res = AddToAsciiData(res, {
+          ascii: dataSecondChild ? dataSecondChild.ascii : '',
+          linear: dataSecondChild ? dataSecondChild.linear : '',
+          ascii_tsv: dataSecondChild ? dataSecondChild.ascii_tsv : '',
+          ascii_csv: dataSecondChild ? dataSecondChild.ascii_csv : '',
+          ascii_md: dataSecondChild ? dataSecondChild.ascii_md : ''
+        });
+        res = AddToAsciiData(res, {
+          ascii: serialize.options.extraBrackets ? ')' : '',
+          linear: serialize.options.extraBrackets ? ')' : '',
+        });
       }
       return res;
     } catch (e) {
@@ -801,12 +910,7 @@ const munder = (handlerApi) => {
 
 const munderover = () => {
   return (node, serialize): IAsciiData => {
-    let res: IAsciiData = {
-      ascii: '',
-      ascii_tsv: '',
-      ascii_csv: '',
-      ascii_md: ''
-    };
+    let res: IAsciiData = initAsciiData();
     try {
       const firstChild = node.childNodes[0] ? node.childNodes[0] : null;
       const secondChild = node.childNodes[1] ? node.childNodes[1] : null;
@@ -814,30 +918,56 @@ const munderover = () => {
       const dataFirstChild: IAsciiData = firstChild ? serialize.visitNode(firstChild, '') : null;
       const dataSecondChild: IAsciiData = secondChild ? serialize.visitNode(secondChild, '') : null;
       const dataThirdChild: IAsciiData = thirdChild ? serialize.visitNode(thirdChild, '') : null;
-      res = AddToAsciiData(res, [
-        dataFirstChild.ascii ? dataFirstChild.ascii : '',
-        dataFirstChild.ascii_tsv ? dataFirstChild.ascii_tsv : '',
-        dataFirstChild.ascii_csv ? dataFirstChild.ascii_csv : '',
-        dataFirstChild.ascii_md ? dataFirstChild.ascii_md : ''
-      ]);      
-      res = AddToAsciiData(res, ['_']);
-      res = AddToAsciiData(res, [serialize.options.extraBrackets ? '(' : '']);
-      res = AddToAsciiData(res, [
-        dataSecondChild.ascii ? dataSecondChild.ascii : '',
-        dataSecondChild.ascii_tsv ? dataSecondChild.ascii_tsv : '',
-        dataSecondChild.ascii_csv ? dataSecondChild.ascii_csv : '',
-        dataSecondChild.ascii_md ? dataSecondChild.ascii_md : ''
-      ]);
-      res = AddToAsciiData(res, [serialize.options.extraBrackets ? ')' : '']);
-      res = AddToAsciiData(res, ['^']);
-      res = AddToAsciiData(res, [serialize.options.extraBrackets ? '(' : '']);
-      res = AddToAsciiData(res, [
-        dataThirdChild.ascii ? dataThirdChild.ascii : '',
-        dataThirdChild.ascii_tsv ? dataThirdChild.ascii_tsv : '',
-        dataThirdChild.ascii_csv ? dataThirdChild.ascii_csv : '',
-        dataThirdChild.ascii_md ? dataThirdChild.ascii_md : ''
-      ]);
-      res = AddToAsciiData(res, [serialize.options.extraBrackets ? ')' : '']);
+      let linearNeedsParens = dataFirstChild?.linear && hasAnyWhitespace(dataFirstChild.linear);
+      res = AddToAsciiData(res, {
+        ascii: '',
+        linear: linearNeedsParens ? '(' : ''
+      });
+      res = AddToAsciiData(res, {
+        ascii: dataFirstChild.ascii ? dataFirstChild.ascii : '',
+        linear: dataFirstChild.linear ? replaceUnicodeWhitespace(dataFirstChild.linear) : '',
+        ascii_tsv: dataFirstChild.ascii_tsv ? dataFirstChild.ascii_tsv : '',
+        ascii_csv: dataFirstChild.ascii_csv ? dataFirstChild.ascii_csv : '',
+        ascii_md: dataFirstChild.ascii_md ? dataFirstChild.ascii_md : ''
+      });
+      res = AddToAsciiData(res, {
+        ascii: '',
+        linear: linearNeedsParens ? ')' : ''
+      });
+      res = AddToAsciiData(res, {ascii: '_', linear: '_'});
+      linearNeedsParens = dataSecondChild?.linear?.length > 1 && !isWrappedWithParens(dataSecondChild.linear);
+      res = AddToAsciiData(res, {
+        ascii: serialize.options.extraBrackets ? '(' : '',
+        linear: linearNeedsParens ? '(' : '',
+      });
+      res = AddToAsciiData(res, {
+        ascii: dataSecondChild.ascii ? dataSecondChild.ascii : '',
+        linear: dataSecondChild.linear ? dataSecondChild.linear : '',
+        ascii_tsv: dataSecondChild.ascii_tsv ? dataSecondChild.ascii_tsv : '',
+        ascii_csv: dataSecondChild.ascii_csv ? dataSecondChild.ascii_csv : '',
+        ascii_md: dataSecondChild.ascii_md ? dataSecondChild.ascii_md : ''
+      });
+      res = AddToAsciiData(res, {
+        ascii: serialize.options.extraBrackets ? ')' : '',
+        linear: linearNeedsParens? ')' : '',
+      });
+      res = AddToAsciiData(res, {ascii: '^', linear: '^'});
+      linearNeedsParens = dataThirdChild?.linear?.length > 1 && !isWrappedWithParens(dataThirdChild.linear);
+      res = AddToAsciiData(res, {
+        ascii: serialize.options.extraBrackets ? '(' : '',
+        linear: linearNeedsParens ? '(' : '',
+      });
+      res = AddToAsciiData(res, {
+        ascii: dataThirdChild.ascii ? dataThirdChild.ascii : '',
+        linear: dataThirdChild.linear ? dataThirdChild.linear : '',
+        ascii_tsv: dataThirdChild.ascii_tsv ? dataThirdChild.ascii_tsv : '',
+        ascii_csv: dataThirdChild.ascii_csv ? dataThirdChild.ascii_csv : '',
+        ascii_md: dataThirdChild.ascii_md ? dataThirdChild.ascii_md : ''
+      });
+      res = AddToAsciiData(res, {
+        ascii: serialize.options.extraBrackets ? ')' : '',
+        linear: linearNeedsParens ? ')' : '',
+      });
       return res;
     } catch (e) {
       console.error('mml => munderover =>', e);
@@ -848,32 +978,40 @@ const munderover = () => {
 
 const msub = () => {
   return (node, serialize): IAsciiData => {
-    let res: IAsciiData = {
-      ascii: '',
-      ascii_tsv: '',
-      ascii_csv: '',
-      ascii_md: ''
-    };
+    let res: IAsciiData = initAsciiData();
     try {
       const firstChild = node.childNodes[0] ? node.childNodes[0] : null;
       const secondChild = node.childNodes[1] ? node.childNodes[1] : null;
       const dataFirstChild: IAsciiData = firstChild ? serialize.visitNode(firstChild, '') : null;
       const dataSecondChild: IAsciiData = secondChild ? serialize.visitNode(secondChild, '') : null;
-      res = AddToAsciiData(res, [
-        dataFirstChild ? dataFirstChild.ascii : '',
-        dataFirstChild ? dataFirstChild.ascii_tsv : '',
-        dataFirstChild ? dataFirstChild.ascii_csv : '',
-        dataFirstChild ? dataFirstChild.ascii_md : ''
-      ]);
-      res = AddToAsciiData(res, ['_']);
-      res = AddToAsciiData(res, [serialize.options.extraBrackets ? '(' : '']);
-      res = AddToAsciiData(res, [
-        dataSecondChild ? dataSecondChild.ascii : '',
-        dataSecondChild ? dataSecondChild.ascii_tsv : '',
-        dataSecondChild ? dataSecondChild.ascii_csv : '',
-        dataSecondChild ? dataSecondChild.ascii_md : ''
-      ]);
-      res = AddToAsciiData(res, [serialize.options.extraBrackets ? ')' : '']);
+      res = AddToAsciiData(res, {
+        ascii: dataFirstChild ? dataFirstChild.ascii : '',
+        linear: dataFirstChild ? dataFirstChild.linear : '',
+        ascii_tsv: dataFirstChild ? dataFirstChild.ascii_tsv : '',
+        ascii_csv: dataFirstChild ? dataFirstChild.ascii_csv : '',
+        ascii_md: dataFirstChild ? dataFirstChild.ascii_md : ''
+      });
+      let linear = replaceScripts(dataSecondChild?.linear, 'sub');
+      res = AddToAsciiData(res, {
+        ascii: '_',
+        linear: linear ? linear : '_'
+      });
+      const linearNeedsParens = !linear && dataSecondChild?.linear?.length > 1 && !isWrappedWithParens(dataSecondChild.linear);
+      res = AddToAsciiData(res, {
+        ascii: serialize.options.extraBrackets ? '(' : '',
+        linear: linearNeedsParens ? '(' : '',
+      });
+      res = AddToAsciiData(res, {
+        ascii: dataSecondChild ? dataSecondChild.ascii : '',
+        linear: !linear && dataSecondChild ? dataSecondChild.linear : '',
+        ascii_tsv: dataSecondChild ? dataSecondChild.ascii_tsv : '',
+        ascii_csv: dataSecondChild ? dataSecondChild.ascii_csv : '',
+        ascii_md: dataSecondChild ? dataSecondChild.ascii_md : ''
+      });
+      res = AddToAsciiData(res, {
+        ascii: serialize.options.extraBrackets ? ')' : '',
+        linear: linearNeedsParens ? ')' : '',
+      });
       return res;
     } catch (e) {
       console.error('mml => msub =>', e);
@@ -884,12 +1022,7 @@ const msub = () => {
 
 const msup = () =>  {
   return (node, serialize): IAsciiData => {
-    let res : IAsciiData = {
-      ascii: '',
-      ascii_tsv: '',
-      ascii_csv: '',
-      ascii_md: ''
-    };
+    let res : IAsciiData = initAsciiData();
     try {
       const firstChild = node.childNodes[0] ? node.childNodes[0] : null;
       const secondChild = node.childNodes[1] ? node.childNodes[1] : null;
@@ -897,25 +1030,49 @@ const msup = () =>  {
       secondChild.attributes.setInherited('flattenSup', flattenSup);
       const dataFirstChild: IAsciiData = firstChild ? serialize.visitNode(firstChild, '') : null;
       const dataSecondChild: IAsciiData = secondChild ? serialize.visitNode(secondChild, '') : null;
-      res = AddToAsciiData(res, [
-        dataFirstChild ? dataFirstChild.ascii : '',
-        dataFirstChild ? dataFirstChild.ascii_tsv : '',
-        dataFirstChild ? dataFirstChild.ascii_csv : '',
-        dataFirstChild ? dataFirstChild.ascii_md : ''
-      ]);
-      res = AddToAsciiData(res, ['^']);
+      res = AddToAsciiData(res, {
+        ascii: dataFirstChild ? dataFirstChild.ascii : '',
+        linear: dataFirstChild ? dataFirstChild.linear : '',
+        ascii_tsv: dataFirstChild ? dataFirstChild.ascii_tsv : '',
+        ascii_csv: dataFirstChild ? dataFirstChild.ascii_csv : '',
+        ascii_md: dataFirstChild ? dataFirstChild.ascii_md : ''
+      });
+      let linearData = dataSecondChild?.linear?.length === 1
+        ? findAmSymbolsToLinear(dataSecondChild.linear, 'msup')
+        : null;
+      let linear = linearData ? linearData.output : '';
       const ignoreBrackets = node.attributes.get('ignoreBrackets');
       if (ignoreBrackets && !dataSecondChild.ascii) {
+        res = AddToAsciiData(res, {
+          ascii: '^',
+          linear: linear ? linear : '^'
+        });
         return res;
       }
-      res = AddToAsciiData(res, [serialize.options.extraBrackets ? '(' : '']);
-      res = AddToAsciiData(res, [
-        dataSecondChild ? dataSecondChild.ascii : '',
-        dataSecondChild ? dataSecondChild.ascii_tsv : '',
-        dataSecondChild ? dataSecondChild.ascii_csv : '',
-        dataSecondChild ? dataSecondChild.ascii_md : ''
-      ]);
-      res = AddToAsciiData(res, [serialize.options.extraBrackets ? ')' : '']);
+      if (!linear) {
+        linear = replaceScripts(dataSecondChild?.linear);
+      }
+      const linearNeedsParens = !linear && dataSecondChild?.linear?.length > 1 && !isWrappedWithParens(dataSecondChild.linear);
+      res = AddToAsciiData(res, {
+        ascii: '^',
+        linear: linear ? linear : '^'
+      });
+
+      res = AddToAsciiData(res, {
+        ascii: serialize.options.extraBrackets ? '(' : '',
+        linear: linearNeedsParens ? '(' : '',
+      });
+      res = AddToAsciiData(res, {
+        ascii: dataSecondChild ? dataSecondChild.ascii : '',
+        linear: !linear && dataSecondChild ? dataSecondChild.linear : '',
+        ascii_tsv: dataSecondChild ? dataSecondChild.ascii_tsv : '',
+        ascii_csv: dataSecondChild ? dataSecondChild.ascii_csv : '',
+        ascii_md: dataSecondChild ? dataSecondChild.ascii_md : ''
+      });
+      res = AddToAsciiData(res, {
+        ascii: serialize.options.extraBrackets ? ')' : '',
+        linear: linearNeedsParens ? ')' : '',
+      });
       return res;
     } catch (e) {
       console.error('mml => msup =>', e);
@@ -926,12 +1083,7 @@ const msup = () =>  {
 
 const msubsup = () => {
   return (node, serialize): IAsciiData => {
-    let res: IAsciiData = {
-      ascii: '',
-      ascii_tsv: '',
-      ascii_csv: '',
-      ascii_md: ''
-    };
+    let res: IAsciiData = initAsciiData();
     try {
       const firstChild = node.childNodes[0] ? node.childNodes[0] : null;
       const secondChild = node.childNodes[1] ? node.childNodes[1] : null;
@@ -939,30 +1091,64 @@ const msubsup = () => {
       const dataFirstChild: IAsciiData = firstChild ? serialize.visitNode(firstChild, '') : null;
       const dataSecondChild: IAsciiData = secondChild ? serialize.visitNode(secondChild, '') : null;
       const dataThirdChild: IAsciiData = thirdChild ? serialize.visitNode(thirdChild, '') : null;
-      res = AddToAsciiData(res, [
-        dataFirstChild ? dataFirstChild.ascii : '',
-        dataFirstChild ? dataFirstChild.ascii_tsv : '',
-        dataFirstChild ? dataFirstChild.ascii_csv : '',
-        dataFirstChild ? dataFirstChild.ascii_md : ''
-      ]);
-      res = AddToAsciiData(res, ['_']);
-      res = AddToAsciiData(res, ['(']);
-      res = AddToAsciiData(res, [
-        dataSecondChild ? dataSecondChild.ascii : '',
-        dataSecondChild ? dataSecondChild.ascii_tsv : '',
-        dataSecondChild ? dataSecondChild.ascii_csv : '',
-        dataSecondChild ? dataSecondChild.ascii_md : ''
-      ]);
-      res = AddToAsciiData(res, [')']);
-      res = AddToAsciiData(res, ['^']);
-      res = AddToAsciiData(res, ['(']);
-      res = AddToAsciiData(res, [
-        dataThirdChild ? dataThirdChild.ascii : '',
-        dataThirdChild ? dataThirdChild.ascii_tsv : '',
-        dataThirdChild ? dataThirdChild.ascii_csv : '',
-        dataThirdChild ? dataThirdChild.ascii_md : ''
-      ]);
-      res = AddToAsciiData(res, [')']);
+      let linearNeedsParens = dataFirstChild?.linear && hasAnyWhitespace(dataFirstChild.linear);
+      res = AddToAsciiData(res, {
+        ascii: '',
+        linear: linearNeedsParens ? '(' : ''
+      });
+      res = AddToAsciiData(res, {
+        ascii: dataFirstChild ? dataFirstChild.ascii : '',
+        linear: dataFirstChild?.linear ? replaceUnicodeWhitespace(dataFirstChild.linear) : '',
+        ascii_tsv: dataFirstChild ? dataFirstChild.ascii_tsv : '',
+        ascii_csv: dataFirstChild ? dataFirstChild.ascii_csv : '',
+        ascii_md: dataFirstChild ? dataFirstChild.ascii_md : ''
+      });
+      res = AddToAsciiData(res, {
+        ascii: '',
+        linear: linearNeedsParens ? ')' : ''
+      });
+      let linear = replaceScripts(dataSecondChild?.linear, 'sub');
+      res = AddToAsciiData(res, {
+        ascii: '_',
+        linear: linear ? linear : '_'
+      });
+      linearNeedsParens = !linear && dataSecondChild?.linear?.length > 1 && !isWrappedWithParens(dataSecondChild.linear);
+      res = AddToAsciiData(res, {
+        ascii: '(',
+        linear: linearNeedsParens ? '(' : ''
+      });
+      res = AddToAsciiData(res, {
+        ascii: dataSecondChild ? dataSecondChild.ascii : '',
+        linear: !linear && dataSecondChild ? dataSecondChild.linear : '',
+        ascii_tsv: dataSecondChild ? dataSecondChild.ascii_tsv : '',
+        ascii_csv: dataSecondChild ? dataSecondChild.ascii_csv : '',
+        ascii_md: dataSecondChild ? dataSecondChild.ascii_md : ''
+      });
+      res = AddToAsciiData(res, {
+        ascii: ')',
+        linear: linearNeedsParens ? ')' : ''
+      });
+      linear = replaceScripts(dataThirdChild?.linear);
+      res = AddToAsciiData(res, {
+        ascii: '^',
+        linear: linear ? linear : '^'
+      });
+      linearNeedsParens =  !linear && dataThirdChild?.linear?.length > 1 && !isWrappedWithParens(dataThirdChild.linear);
+      res = AddToAsciiData(res, {
+        ascii: '(',
+        linear: linearNeedsParens ? '(' : ''
+      });
+      res = AddToAsciiData(res, {
+        ascii: dataThirdChild ? dataThirdChild.ascii : '',
+        linear:  !linear && dataThirdChild ? dataThirdChild.linear : '',
+        ascii_tsv: dataThirdChild ? dataThirdChild.ascii_tsv : '',
+        ascii_csv: dataThirdChild ? dataThirdChild.ascii_csv : '',
+        ascii_md: dataThirdChild ? dataThirdChild.ascii_md : ''
+      });
+      res = AddToAsciiData(res, {
+        ascii: ')',
+        linear: linearNeedsParens ? ')' : ''
+      });
       return res;
     } catch (e) {
       console.error('mml => msubsup =>', e);
@@ -973,22 +1159,21 @@ const msubsup = () => {
 
 const msqrt = () => {
   return (node, serialize): IAsciiData => {
-    let res: IAsciiData = {
-      ascii: '',
-      ascii_tsv: '',
-      ascii_csv: '',
-      ascii_md: ''
-    };
+    let res: IAsciiData = initAsciiData();
     try {
       const firstChild = node.childNodes[0] ? node.childNodes[0] : null;
       const dataFirstChild: IAsciiData = firstChild ? serialize.visitNode(firstChild, '') : null;
-      res = AddToAsciiData(res, ['sqrt']);
-      res = AddToAsciiData(res, [
-        dataFirstChild ? dataFirstChild.ascii : '',
-        dataFirstChild ? dataFirstChild.ascii_tsv : '',
-        dataFirstChild ? dataFirstChild.ascii_csv : '',
-        dataFirstChild ? dataFirstChild.ascii_md : ''
-      ]);
+      res = AddToAsciiData(res, {
+        ascii: 'sqrt',
+        linear: '√'
+      });
+      res = AddToAsciiData(res, {
+        ascii: dataFirstChild ? dataFirstChild.ascii : '',
+        linear: dataFirstChild ? dataFirstChild.linear : '',
+        ascii_tsv: dataFirstChild ? dataFirstChild.ascii_tsv : '',
+        ascii_csv: dataFirstChild ? dataFirstChild.ascii_csv : '',
+        ascii_md: dataFirstChild ? dataFirstChild.ascii_md : ''
+      });
       return res;
     } catch (e) {
       console.error('mml => msqrt =>', e);
@@ -999,34 +1184,47 @@ const msqrt = () => {
 
 const mroot = () => {
   return (node, serialize): IAsciiData => {
-    let res : IAsciiData = {
-      ascii: '',
-      ascii_tsv: '',
-      ascii_csv: '',
-      ascii_md: ''
-    };
+    let res : IAsciiData = initAsciiData();
     try {
       const firstChild = node.childNodes[0] ? node.childNodes[0] : null;
       const secondChild = node.childNodes[1] ? node.childNodes[1] : null;
       const dataSecondChild: IAsciiData = secondChild ? serialize.visitNode(secondChild, '') : null;
       const dataFirstChild: IAsciiData = firstChild ? serialize.visitNode(firstChild, '') : null;
-      res = AddToAsciiData(res, ['root']);
-      res = AddToAsciiData(res, [secondChild ? '(' : '']);
-      res = AddToAsciiData(res, [
-        dataSecondChild ? dataSecondChild.ascii : '',
-        dataSecondChild ? dataSecondChild.ascii_tsv : '',
-        dataSecondChild ? dataSecondChild.ascii_csv : '',
-        dataSecondChild ? dataSecondChild.ascii_md : ''
-      ]);
-      res = AddToAsciiData(res, [secondChild ? ')' : '']);
-      res = AddToAsciiData(res, [firstChild ? '(' : '']);
-      res = AddToAsciiData(res, [
-        dataFirstChild ? dataFirstChild.ascii : '',
-        dataFirstChild ? dataFirstChild.ascii_tsv : '',
-        dataFirstChild ? dataFirstChild.ascii_csv : '',
-        dataFirstChild ? dataFirstChild.ascii_md : ''
-      ]);
-      res = AddToAsciiData(res, [firstChild ? ')' : '']);
+      let linear: string = findRootSymbol(dataSecondChild?.linear);
+      res = AddToAsciiData(res, {
+        ascii: 'root',
+        linear: linear ? linear : 'root'
+      });
+      res = AddToAsciiData(res, {
+        ascii: secondChild ? '(' : '',
+        linear: linear ? '' : secondChild ? '(' : '',
+      });
+      res = AddToAsciiData(res, {
+        ascii: dataSecondChild ? dataSecondChild.ascii : '',
+        linear: linear ? '' : dataSecondChild ? dataSecondChild.linear : '',
+        ascii_tsv: dataSecondChild ? dataSecondChild.ascii_tsv : '',
+        ascii_csv: dataSecondChild ? dataSecondChild.ascii_csv : '',
+        ascii_md: dataSecondChild ? dataSecondChild.ascii_md : ''
+      });
+      res = AddToAsciiData(res, {
+        ascii: secondChild ? ')' : '',
+        linear: linear ? '' : secondChild ? ')' : '',
+      });
+      res = AddToAsciiData(res, {
+        ascii: firstChild ? '(' : '',
+        linear: dataFirstChild.linear?.length > 1 ? '(' : '',
+      });
+      res = AddToAsciiData(res, {
+        ascii: dataFirstChild ? dataFirstChild.ascii : '',
+        linear: dataFirstChild ? dataFirstChild.linear : '',
+        ascii_tsv: dataFirstChild ? dataFirstChild.ascii_tsv : '',
+        ascii_csv: dataFirstChild ? dataFirstChild.ascii_csv : '',
+        ascii_md: dataFirstChild ? dataFirstChild.ascii_md : ''
+      });
+      res = AddToAsciiData(res, {
+        ascii: firstChild ? ')' : '',
+        linear: dataFirstChild.linear?.length > 1 ? ')' : '',
+      });
       return res;
     } catch (e) {
       console.error('mml => mroot =>', e);
@@ -1037,52 +1235,63 @@ const mroot = () => {
 
 const mfrac = () => {
   return (node, serialize): IAsciiData => {
-    let res: IAsciiData = {
-      ascii: '',
-      ascii_tsv: '',
-      ascii_csv: '',
-      ascii_md: ''
-    };
+    let res: IAsciiData = initAsciiData();
     try {
       const firstChild = node.childNodes[0] ? node.childNodes[0] : null;
       const secondChild = node.childNodes[1] ? node.childNodes[1] : null;
       const dataFirstChild: IAsciiData = firstChild ? serialize.visitNode(firstChild, '') : null;
       const dataSecondChild: IAsciiData = secondChild ? serialize.visitNode(secondChild, '') : null;
       if ((firstChild && firstChild.kind === "mrow" && firstChild.childNodes.length > 1) || serialize.options.extraBrackets) {
-        res = AddToAsciiData(res, ['(']);     
-        res = AddToAsciiData(res, [
-          dataFirstChild ? dataFirstChild.ascii : '',
-          dataFirstChild ? dataFirstChild.ascii_tsv : '',
-          dataFirstChild ? dataFirstChild.ascii_csv : '',
-          dataFirstChild ? dataFirstChild.ascii_md : ''
-        ]);     
-        res = AddToAsciiData(res, [')']);
+        res = AddToAsciiData(res, {
+          ascii: '(',
+          linear: dataFirstChild.linear?.length > 1 ? '(' : ''
+        });
+        res = AddToAsciiData(res, {
+          ascii: dataFirstChild ? dataFirstChild.ascii : '',
+          linear: dataFirstChild ? dataFirstChild.linear : '',
+          ascii_tsv: dataFirstChild ? dataFirstChild.ascii_tsv : '',
+          ascii_csv: dataFirstChild ? dataFirstChild.ascii_csv : '',
+          ascii_md: dataFirstChild ? dataFirstChild.ascii_md : ''
+        });
+        res = AddToAsciiData(res, {
+          ascii: ')',
+          linear: dataFirstChild.linear?.length > 1 ? ')' : ''
+        });
       } else {
-        res = AddToAsciiData(res, [
-          dataFirstChild ? dataFirstChild.ascii : '',
-          dataFirstChild ? dataFirstChild.ascii_tsv : '',
-          dataFirstChild ? dataFirstChild.ascii_csv : '',
-          dataFirstChild ? dataFirstChild.ascii_md : ''
-        ]);
+        res = AddToAsciiData(res, {
+          ascii: dataFirstChild ? dataFirstChild.ascii : '',
+          linear: dataFirstChild ? dataFirstChild.linear : '',
+          ascii_tsv: dataFirstChild ? dataFirstChild.ascii_tsv : '',
+          ascii_csv: dataFirstChild ? dataFirstChild.ascii_csv : '',
+          ascii_md: dataFirstChild ? dataFirstChild.ascii_md : ''
+        });
       }
-      res = AddToAsciiData(res, ['/']);
+      res = AddToAsciiData(res, {ascii: '/', linear: '/'});
 
       if ((secondChild && secondChild.kind === "mrow" && secondChild.childNodes.length > 1)|| serialize.options.extraBrackets) {
-        res = AddToAsciiData(res, ['(']);
-        res = AddToAsciiData(res, [
-          dataSecondChild ? dataSecondChild.ascii : '',
-          dataSecondChild ? dataSecondChild.ascii_tsv : '',
-          dataSecondChild ? dataSecondChild.ascii_csv : '',
-          dataSecondChild ? dataSecondChild.ascii_md : ''
-        ]);
-        res = AddToAsciiData(res, [')']);
+        res = AddToAsciiData(res, {
+          ascii: '(',
+          linear: dataSecondChild.linear?.length > 1 ? '(' : ''
+        });
+        res = AddToAsciiData(res, {
+          ascii: dataSecondChild ? dataSecondChild.ascii : '',
+          linear: dataSecondChild ? dataSecondChild.linear : '',
+          ascii_tsv: dataSecondChild ? dataSecondChild.ascii_tsv : '',
+          ascii_csv: dataSecondChild ? dataSecondChild.ascii_csv : '',
+          ascii_md: dataSecondChild ? dataSecondChild.ascii_md : ''
+        });
+        res = AddToAsciiData(res, {
+          ascii: ')',
+          linear: dataSecondChild.linear?.length > 1 ? ')' : ''
+        });
       } else {
-        res = AddToAsciiData(res, [
-          dataSecondChild ? dataSecondChild.ascii : '',
-          dataSecondChild ? dataSecondChild.ascii_tsv : '',
-          dataSecondChild ? dataSecondChild.ascii_csv : '',
-          dataSecondChild ? dataSecondChild.ascii_md : ''
-        ]);
+        res = AddToAsciiData(res, {
+          ascii: dataSecondChild ? dataSecondChild.ascii : '',
+          linear: dataSecondChild ? dataSecondChild.linear : '',
+          ascii_tsv: dataSecondChild ? dataSecondChild.ascii_tsv : '',
+          ascii_csv: dataSecondChild ? dataSecondChild.ascii_csv : '',
+          ascii_md: dataSecondChild ? dataSecondChild.ascii_md : ''
+        });
       }
       return res;
     } catch (e) {
@@ -1094,49 +1303,49 @@ const mfrac = () => {
 
 const mtext = () => {
   return (node, serialize): IAsciiData => {
-    let res: IAsciiData = {
-      ascii: '',
-      ascii_tsv: '',
-      ascii_csv: '',
-      ascii_md: ''
-    };
+    let res: IAsciiData = initAsciiData();
     try {
       if (!node.childNodes || node.childNodes.length === 0 ) {
         return res;
       }
       const firstChild: any = node.childNodes[0];
       let value = FindSymbolReplace(firstChild.text);
-      const asc = FindSymbolToAM(node.kind, value);
-      if (asc) {
-        res = AddToAsciiData(res, [asc]);
+      const data = FindSymbolToAM(node.kind, value);
+      if (data.ascii) {
+        res = AddToAsciiData(res, {
+          ascii: data.ascii,
+          linear: data.linear
+        });
         return res;
       }
       const toTsv = node.attributes.get('toTsv');
       const toCsv = node.attributes.get('toCsv');
       const toMd = node.attributes.get('toMd');
       if (value[0] === '(' || toTsv || toCsv || toMd) {
-        res = AddToAsciiData(res, [
-          value[0] === '(' ? value.replace(/"/g, '') : value,
-          toTsv ? value.replace(/"/g, '') : value,
-          toCsv ? value.replace(/"/g, '') : value,
-          value
-        ]);
+        res = AddToAsciiData(res, {
+          ascii: value[0] === '(' ? value.replace(/"/g, '') : value,
+          linear: value[0] === '(' ? value.replace(/"/g, '') : value,
+          ascii_tsv: toTsv ? value.replace(/"/g, '') : value,
+          ascii_csv: toCsv ? value.replace(/"/g, '') : value,
+          ascii_md: value
+        });
       } else {
         if ( !value || ( value && !value.trim())) {
-          res = AddToAsciiData(res, ['']);
+          res = AddToAsciiData(res, {ascii: '', linear: ''});
         } else {
           /** For tsv/csv: 
            * Omit the " in nested arrays */
-          res = AddToAsciiData(res, [
-            '"' + value + '"',
-            serialize.options.tableToTsv
+          res = AddToAsciiData(res, {
+            ascii: '"' +value + '"',
+            linear: value,
+            ascii_tsv: serialize.options.tableToTsv
               ? value.replace(/"/g, '')
               : '"' + value + '"',
-            serialize.options.tableToCsv
+            ascii_csv: serialize.options.tableToCsv
               ? value.replace(/"/g, '')
               : value,
-            value
-          ]);
+            ascii_md: value
+          });
         }
       }
       return res;
@@ -1149,12 +1358,7 @@ const mtext = () => {
 
 const mi = () => {
   return (node, serialize): IAsciiData => {
-    let res: IAsciiData = {
-      ascii: '',
-      ascii_tsv: '',
-      ascii_csv: '',
-      ascii_md: ''
-    };
+    let res: IAsciiData = initAsciiData();
     try {
       if (!node.childNodes || node.childNodes.length === 0) {
         return res;
@@ -1164,19 +1368,32 @@ const mi = () => {
       const atr = serialize.options.showStyle
         ? getAttributes(node)
         : null;
-      let abs = SymbolToAM(node.kind, value, atr);
-      if (abs && abs.length > 1 && regW.test(abs[0])) {
-        const isFunction = regExpIsFunction.test(abs.trim());
+      let data = SymbolToAM(node.kind, value, atr);
+      if (data.ascii && data.ascii.length > 1 && regW.test(data.ascii[0])) {
+        const isFunction = regExpIsFunction.test(data.ascii.trim());
         if (isFunction) {
           node.Parent.attributes.setInherited('isFunction', isFunction);
         }
-        res = AddToAsciiData(res, [needFirstSpace(node) ? ' ' : '']);
-        res = AddToAsciiData(res, [abs]);
+        res = AddToAsciiData(res, {
+          ascii: needFirstSpace(node) ? ' ' : '',
+          linear: needFirstSpace(node, true) ? ' ' : ''
+        });
+        res = AddToAsciiData(res, {
+          ascii: data.ascii,
+          linear: data.linear || data.ascii
+        });
         const hasLastSpace = needLastSpace(node, isFunction);
+        const hasLastSpaceLinear = needLastSpace(node, isFunction, true);
         node.attributes.setInherited('hasLastSpace', hasLastSpace);
-        res = AddToAsciiData(res, [hasLastSpace ? ' ' : '']);
+        res = AddToAsciiData(res, {
+          ascii: hasLastSpace ? ' ' : '',
+          linear: hasLastSpaceLinear ? ' ' : ''
+        });
       } else {
-        res = AddToAsciiData(res, [abs]);
+        res = AddToAsciiData(res, {
+          ascii: data.ascii,
+          linear: data.linear || data.ascii
+        });
       }
       return res;
     } catch (e) {
@@ -1188,12 +1405,7 @@ const mi = () => {
 
 const mo = () => {
   return (node, serialize): IAsciiData => {
-    let res: IAsciiData = {
-      ascii: '',
-      ascii_tsv: '',
-      ascii_csv: '',
-      ascii_md: ''
-    };
+    let res: IAsciiData = initAsciiData();
     try {
       const value = getChildrenText(node);
       const flattenSup = node.attributes.get('flattenSup');
@@ -1205,33 +1417,46 @@ const mo = () => {
         return res;
       }
       const atr = getAttributes(node);
-      let abs = SymbolToAM(node.kind, value, atr, serialize.options.showStyle);
-      if (abs && abs.length > 1) {
-        res = AddToAsciiData(res, [regW.test(abs[0]) && needFirstSpace(node) ? ' ' : '']);
-        res = AddToAsciiData(res, [abs]);
-        const hasLastSpace = regW.test(abs[abs.length-1]) && needLastSpace(node);
+      let data = SymbolToAM(node.kind, value, atr, serialize.options.showStyle);
+      if (data.ascii && data.ascii.length > 1) {
+        res = AddToAsciiData(res, {
+          ascii: regW.test(data.ascii[0]) && needFirstSpace(node) ? ' ' : '',
+          linear: regW.test(data.linear[0]) && needFirstSpace(node) ? ' ' : ''
+        });
+        res = AddToAsciiData(res, {
+          ascii: data.ascii,
+          linear: data.linear || data.ascii
+        });
+        const isNeedLastSpace = needLastSpace(node);
+        const hasLastSpace = regW.test(data.ascii[data.ascii.length-1]) && isNeedLastSpace;
+        const hasLastSpaceLinear = regW.test(data.linear[data.linear.length-1]) && isNeedLastSpace;
         node.attributes.setInherited('hasLastSpace', hasLastSpace);
-        res = AddToAsciiData(res, [hasLastSpace ? ' ' : '']);
+        res = AddToAsciiData(res, {
+          ascii: hasLastSpace ? ' ' : '',
+          linear: hasLastSpaceLinear ? ' ' : ''
+        });
       } else {
-        if (abs === "―" && node.Parent.kind === "munder") {
-          abs = "_";
+        if (data.ascii === "―" && node.Parent.kind === "munder") {
+          data.ascii = "_";
         }
-        if (abs === ',' && (node.Parent.kind === 'mtd' || (node.Parent.kind === 'TeXAtom' && node.Parent.Parent.kind === 'mtd'))) {
+        if (data.ascii === ',' && (node.Parent.kind === 'mtd' || (node.Parent.kind === 'TeXAtom' && node.Parent.Parent.kind === 'mtd'))) {
           /** For tsv/csv:
            * Omit the " in nested arrays */
-          res = AddToAsciiData(res, [
-            '"' + abs + '"',
-            `${serialize.options.tableToTsv ? abs : '"' + abs + '"'}`,
-            abs,
-            abs
-          ]);
+          res = AddToAsciiData(res, {
+            ascii: '"' + data.ascii + '"',
+            linear: data.linear,
+            ascii_tsv: `${serialize.options.tableToTsv ? data.ascii : '"' + data.ascii + '"'}`,
+            ascii_csv: data.ascii,
+            ascii_md: data.ascii
+        });
         } else {
-          res = AddToAsciiData(res, [
-            abs,
-            abs === '"' ? '' : abs,
-            abs === '"' ? '' : abs,
-            abs
-          ]);
+          res = AddToAsciiData(res, {
+            ascii: data.ascii,
+            linear: data.linear,
+            ascii_tsv: data.ascii === '"' ? '' : data.ascii,
+            ascii_csv: data.ascii === '"' ? '' : data.ascii,
+            ascii_md: data.ascii
+        });
         }
       }
       
@@ -1239,12 +1464,7 @@ const mo = () => {
         const atr = getAttributes(node.Parent.Parent);
         if ( atr.notation && atr.notation.toString().indexOf("bottom") !== -1) {
           node.Parent.Parent.attributes.attributes.lcm = true;
-          return {
-            ascii: '',
-            ascii_tsv: '',
-            ascii_csv: '',
-            ascii_md: ''
-          }
+          return initAsciiData();
         }
       }
       return res;
@@ -1257,36 +1477,43 @@ const mo = () => {
 
 const mspace = (handlerApi) => {
   return (node, serialize): IAsciiData => {
-    let res: IAsciiData = {
-      ascii: '',
-      ascii_tsv: '',
-      ascii_csv: '',
-      ascii_md: ''
-    };
+    let res: IAsciiData = initAsciiData();
     try {
       const atr = getAttributes(node);
       if (atr && atr.width === "2em") {
-        res = AddToAsciiData(res, [node.parent.parent && needFirstSpace(node.parent.parent) ? ' ' : '']);
-        res = AddToAsciiData(res, ['qquad']);
+        res = AddToAsciiData(res, {
+          ascii: node.parent.parent && needFirstSpace(node.parent.parent) ? ' ' : '',
+          linear: node.parent.parent && needFirstSpace(node.parent.parent) ? ' ' : ''
+        });
+        res = AddToAsciiData(res, {ascii: 'qquad', linear: '  '});
         if (node.parent?.parent) {
           const hasLastSpace = needLastSpace(node.parent.parent);
           node.parent.parent.attributes.setInherited('hasLastSpace', hasLastSpace);
-          res = AddToAsciiData(res, [hasLastSpace ? ' ' : '']);
+          res = AddToAsciiData(res, {
+            ascii: hasLastSpace ? ' ' : '',
+            linear: hasLastSpace ? ' ' : ''
+          });
         }
         return res;
       }
       if (atr && atr.width === "1em") {
-        res = AddToAsciiData(res, [node.parent.parent && needFirstSpace(node.parent.parent) ? ' ' : '']);
-        res = AddToAsciiData(res, ['quad']);
+        res = AddToAsciiData(res, {
+          ascii: node.parent.parent && needFirstSpace(node.parent.parent) ? ' ' : '',
+          linear: node.parent.parent && needFirstSpace(node.parent.parent) ? ' ' : ''
+        });
+        res = AddToAsciiData(res, {ascii: 'quad', linear: ' '});
         if (node.parent?.parent) {
           const hasLastSpace = needLastSpace(node.parent.parent);
           node.parent.parent.attributes.setInherited('hasLastSpace', hasLastSpace);
-          res = AddToAsciiData(res, [hasLastSpace ? ' ' : '']);
+          res = AddToAsciiData(res, {
+            ascii: hasLastSpace ? ' ' : '',
+            linear: hasLastSpace ? ' ' : ''
+          });
         }
         return res;
       }
       const data: IAsciiData = handlerApi.handleAll(node, serialize);
-      res = AddToAsciiData(res, [data.ascii, data.ascii_tsv, data.ascii_csv, data.ascii_md]);
+      res = AddToAsciiData(res, data);
       return res;
     } catch (e) {
       console.error('mml => mspace =>', e);
@@ -1297,21 +1524,20 @@ const mspace = (handlerApi) => {
 
 export const handle = (node, serialize): IAsciiData => {
   const handler = handlers[node.kind] || defHandle;
-  return handler(node, serialize)
+  let res: IAsciiData = handler(node, serialize);
+  node.currentData = res;
+  return res
 };
 
 const handleAll = (node, serialize): IAsciiData => {
-  let res: IAsciiData = {
-    ascii: '',
-    ascii_tsv: '',
-    ascii_csv: '',
-    ascii_md: ''
-  };
+  let res: IAsciiData = initAsciiData();
   try {
     for (const child of node.childNodes) {
       const data: IAsciiData = serialize.visitNode(child, '');
-      res = AddToAsciiData(res, [data.ascii, data.ascii_tsv, data.ascii_csv, data.ascii_md]);
+      res = AddToAsciiData(res, data);
+      child.currentData = res;
     }
+    node.currentData = res;
     return res;
   } catch (e) {
     console.error('mml => handleAll =>', e);

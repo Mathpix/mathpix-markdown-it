@@ -8,4 +8,3 @@ export const TsvJoin = (tsv, options): string => {
   }
   return tsv.map(row => row.join(column)).join(row)
 };
-

@@ -1,23 +1,39 @@
 export interface IAsciiData {
   ascii: string,
-  ascii_tsv: string,
-  ascii_csv: string,
-  ascii_md: string,
+  linear: string,
+  ascii_tsv?: string,
+  ascii_csv?: string,
+  ascii_md?: string
 }
 
-export const AddToAsciiData = (data: IAsciiData, arr: Array<string>): IAsciiData => {
-  if (arr?.length > 3) {
-    data.ascii += arr[0];
-    data.ascii_tsv += arr[1];
-    data.ascii_csv += arr[2];
-    data.ascii_md += arr[3];
-    return data;
+export const initAsciiData = (): IAsciiData => {
+  return {
+    ascii: '',
+    linear: '',
+    ascii_tsv: '',
+    ascii_csv: '',
+    ascii_md: ''
   }
-  data.ascii += arr[0];
-  data.ascii_tsv += arr[0];
-  data.ascii_csv += arr[0];
-  data.ascii_md += arr[0];
-  return data;
+}
+
+export const AddToAsciiData = (
+  dataOutput: IAsciiData,
+  dataInput: IAsciiData
+): IAsciiData => {
+  dataOutput.ascii += dataInput.ascii;
+  dataOutput.linear += dataInput.hasOwnProperty('linear')
+    ? dataInput.linear
+    : dataInput.ascii;
+  dataOutput.ascii_tsv += dataInput.hasOwnProperty('ascii_tsv')
+      ? dataInput.ascii_tsv
+      : dataInput.ascii;
+  dataOutput.ascii_csv += dataInput.hasOwnProperty('ascii_csv')
+    ? dataInput.ascii_csv
+    : dataInput.ascii;
+  dataOutput.ascii_md += dataInput.hasOwnProperty('ascii_md')
+    ? dataInput.ascii_md
+    : dataInput.ascii;
+  return dataOutput;
 };
 
 export const getFunctionNameFromAscii = (ascii: string, node): string => {

@@ -128,7 +128,7 @@ export const renderTableCellContent = (token, isSubTable: boolean, options, env,
       tsv: tsvCell,
       csv: csvCell,
       tableMd: mdCell,
-      tableSmoothed: smoothedCell
+      tableSmoothed: smoothedCell,
     };
   } catch (e) {
     return {
@@ -136,7 +136,7 @@ export const renderTableCellContent = (token, isSubTable: boolean, options, env,
       tsv: tsvCell,
       csv: csvCell,
       tableMd: mdCell,
-      tableSmoothed: smoothedCell
+      tableSmoothed: smoothedCell,
     };
   }
 };

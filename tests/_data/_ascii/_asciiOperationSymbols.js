@@ -1,95 +1,117 @@
 module.exports = [
   {
     latex: `a = b + c`,
-    ascii:     `a=b+c`,
-    ascii_old: `a=b+c`
+    asciimath:     `a=b+c`,
+    linearmath:     `a=b+c`,
+    asciimath_old: `a=b+c`
   },
   {
-    ascii: `*`,
+    asciimath: `*`,
+    linearmath: `⋅`,
     latex: `\\cdot`
   },
   {
-    ascii: `**`,
+    asciimath: `**`,
+    linearmath: `∗`,
     latex: `\\ast`
   },
   {
-    ascii: `***`,
+    asciimath: `***`,
+    linearmath: `⋆`,
     latex: `\\star`
   },
   {
-    ascii: `\\\\`,
+    asciimath: `\\\\`,
+    linearmath: `∖`,
     latex: `\\backslash`
   },
   {
-    ascii: `\\\\`,
+    asciimath: `\\\\`,
+    linearmath: '∖',
     latex: `\\setminus`
   },
   {
-    ascii: `xx`,
+    asciimath: `xx`,
+    linearmath: `×`,
     latex: `\\times`
   },
   {
-    ascii: `-:`,
+    asciimath: `-:`,
+    linearmath: `÷`,
     latex: `\\div`
   },
   {
-    ascii:  `|><`,
+    asciimath:  `|><`,
+    linearmath:  `⋉`,
     latex:  `\\ltimes`
   },
   {
-    ascii:  `><|`,
+    asciimath:  `><|`,
+    linearmath:  `⋊`,
     latex:  `\\rtimes`
   },
   {
-    ascii:  `|><|`,
+    asciimath:  `|><|`,
+    linearmath:  `⋈`,
     latex:  `\\bowtie`
   },
   {
-    ascii:  `@`,
+    asciimath:  `@`,
+    linearmath:  `∘`,
     latex:  `\\circ`
   },
   {
-    ascii:  `o+`,
+    asciimath:  `o+`,
+    linearmath:  `⊕`,
     latex:  `\\oplus`
   },
   {
-    ascii:  `ox`,
+    asciimath:  `ox`,
+    linearmath:  `⊗`,
     latex:  `\\otimes`
   },
   {
-    ascii:  `o.`,
+    asciimath:  `o.`,
+    linearmath:  `⊙`,
     latex:  `\\odot`
   },
   {
-    ascii:  `^^`,
+    asciimath:  `^^`,
+    linearmath:  `∧`,
     latex:  `\\wedge`
   },
   // {
-  //   ascii:  `^^^`,
+  //   asciimath:  `^^^`,
   //   latex:  `\\bidwedge`
   // },
   {
-    ascii:  `vv`,
+    asciimath:  `vv`,
+    linearmath:  `∨`,
     latex:  `\\vee`
   },
   {
-    ascii:  `vvv`,
+    asciimath:  `vvv`,
+    linearmath:  `⋁`,
     latex:  `\\bigvee`
   },
   {
-    ascii:  `nn`,
+    asciimath:  `nn`,
+    linearmath:  `∩`,
     latex:  `\\cap`
   },
   {
-    ascii:  `nnn`,
+    asciimath:  `nnn`,
+    linearmath:  `⋂`,
     latex:  `\\bigcap`
   },
   {
-    ascii:  `uu`,
+    asciimath:  `uu`,
+    linearmath:  `∪`,
     latex:  `\\cup`
   },
   {
-    ascii:  `uuu`,
+    asciimath:  `uuu`,
+    linearmath:  `⋃`,
     latex:  `\\bigcup`
   },
 ];

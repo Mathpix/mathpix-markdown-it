@@ -287,7 +287,8 @@ export const AMsymbols = [
   {input:"bar", tag:"mover", output:"―", tex:"overline", ttype:UNARY, acc:true},
   {input:"bar", tag:"mover", output:"macr", tex:"bar", ttype:CONST},
   {input:"vec", tag:"mover", output:"\u2192", tex:null, ttype:UNARY, acc:true},
-  {input:"vec", tag:"mover", output:"rarr", tex:"vec", ttype:CONST},
+  {input:"vec", tag:"mover", output:"rarr", output_linear: "\u2192", tex:"vec", ttype:CONST},
+  {input:"", tag:"mover", output:"larr", output_linear: "\u2190", tex:"overleftarrow", ttype:CONST},
   {input:"dot", tag:"mover", output:".",      tex:null, ttype:UNARY, acc:true},
   {input:"ddot", tag:"mover", output:"..",    tex:null, ttype:UNARY, acc:true},
   {input:"ul", tag:"munder", output:"\u0332", tex:"underline", ttype:UNARY, acc:true},
@@ -325,3 +326,23 @@ export const getFunctions = (): Array<string> => {
 
 const listOfFunctions: Array<string> = getFunctions();
 export const regExpIsFunction: RegExp = new RegExp('(?:' + listOfFunctions.join('|') + ')$');
+
+export const findAmSymbolByTag = (tag: string, output: string) => {
+  return AMsymbols.find(item => {
+    if (tag === 'mo' || tag === 'mi') {
+      return (item.tag === 'mo' || item.tag === 'mi') && item.output === output
+    } else {
+      return item.tag === tag && item.output === output
+    }
+  });
+}
+
+export const findAmSymbolByTagStretchy = (tag: string, output: string) => {
+  return AMsymbols.find(item => {
+    if (tag === 'mo' || tag === 'mi') {
+      return (item.tag === 'mo' || item.tag === 'mi') && item.output === output && item.stretchy
+    } else {
+      return item.tag === tag && item.output === output && item.stretchy
+    }
+  });
+}

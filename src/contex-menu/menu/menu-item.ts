@@ -14,6 +14,10 @@ export const createMathMenuItem = (type, value: string) => {
         itemTitle = 'Asciimath';
         sourceStr = formatSource(value);
         break;
+      case eMathType.linearmath:
+        itemTitle = 'Linearmath';
+        sourceStr = formatSource(value);
+        break;
       case eMathType.mathml:
         itemTitle = 'Mathml';
         sourceStr = formatSourceMML(value);

@@ -74,7 +74,6 @@ export const renderInlineTokenBlock = (tokens, options, env, slf, isSubTable = f
       if (!align) {
         align = token.latex;
       }
-
     }
     if (token.token === 'tr_open') {
       arrRow = [];
@@ -169,10 +168,7 @@ export const renderInlineTokenBlock = (tokens, options, env, slf, isSubTable = f
             break
           }
         }
-
-
       }
-
       l = arrRow &&  arrRow.length > 0 ? arrRow.length  : 0;
       if (!mr && rowspan[l] && rowspan[l][0] > 0) {
         arrRow.push(cell);
@@ -201,7 +197,7 @@ export const renderInlineTokenBlock = (tokens, options, env, slf, isSubTable = f
     if (token.token === 'inline') {
       let content: string = '';
       if (token.children) {
-        const data = renderTableCellContent(token, true, options, env, slf)
+        const data = renderTableCellContent(token, true, options, env, slf);
         content += data.content;
         cell += data.tsv;
         cellCsv += data.csv;
