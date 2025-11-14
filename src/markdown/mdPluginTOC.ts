@@ -197,14 +197,16 @@ const getTocList = (pos: number, tokens: TokenList, options, levelSub = -1, env,
     let level: number = token.envLevel 
       ? token.envLevel 
       : token.tag && parseInt(token.tag.substr(1, 1));
-    if ((token.type !== 'heading_close' && token.type !== 'addcontentsline_close') 
+    const isHeadingClose = token.type === 'heading_close';
+    const shouldExcludeUnnumbered = options?.toc?.excludeUnnumberedFromTOC && token.type === 'addcontentsline_close';
+    if ((!isHeadingClose && !shouldExcludeUnnumbered)
       || options.includeLevel.indexOf(level) == -1 || !types.includes(heading.type)) {
       i++;
       continue;
     }
     let heading_id: string = '';
     /** Unnumbered sections will not go into the table of contents */
-    if (token.type === 'heading_close' && token.isUnNumbered) {
+    if (options?.toc?.excludeUnnumberedFromTOC && isHeadingClose && token.isUnNumbered) {
       i++;
       continue;
     }
