@@ -190,7 +190,8 @@ export type THtmlWrapper = {
 
 export type TTocOptions = {
   style?: TTocStyle,
-  doNotGenerateParentId?: boolean /** Don't generate unique ParentId for nested blocks. Used to testing */
+  doNotGenerateParentId?: boolean, /** Don't generate unique ParentId for nested blocks. Used to testing */
+  excludeUnnumberedFromTOC?: boolean
 };
 
 export type CodeHighlight = {
