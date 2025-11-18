@@ -5,21 +5,7 @@ import { getMathTableContent, getSubMath } from "../md-block-rule/begin-tabular/
 import { getContent } from "../md-block-rule/begin-tabular/common";
 import { reDiagbox } from "../common/consts";
 import { TTokenTabular } from "../md-block-rule/begin-tabular";
-
-const parseAttributes = (str: string): Record<string, string | true> => {
-  const result: Record<string, string | true> = {};
-  try {
-    str.split(",").forEach(pair => {
-      const [key, value] = pair.split("=").map(s => s.trim());
-      result[key] = value || true;
-    });
-
-    return result;
-  } catch (err) {
-    console.error("[ERROR]=>[parseAttributes]=>", err);
-    return result;
-  }
-}
+import { parseAttributes } from '../common/parse-attribures';
 
 const processContent = (content: string): string => {
   try {
