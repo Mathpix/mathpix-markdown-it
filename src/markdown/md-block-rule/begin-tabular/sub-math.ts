@@ -1,7 +1,12 @@
 import { generateUniqueId, getContent } from './common';
 import {findEndMarkerPos} from "../../mdPluginRaw";
 import { beginTag, endTag, findOpenCloseTagsMathEnvironment } from "../../utils";
-import { doubleCurlyBracketUuidPattern, singleCurlyBracketPattern } from "../../common/consts";
+import { addExtractedCodeBlock } from "./sub-code";
+import {
+  CODE_ENVS,
+  doubleCurlyBracketUuidPattern,
+  singleCurlyBracketPattern
+} from "../../common/consts";
 
 type TSubMath = {id: string, content: string}
 var mathTable: Array<TSubMath> = [];
@@ -113,8 +118,14 @@ export const getSubMath = (str: string, startPos = 0): string => {
     const content: string = str.slice(beginMarkerPos, nextPos);
 
     const id: string = generateUniqueId();
-    mathTable.push({id: id, content: content});
-    str = str.slice(0, startPos) + str.slice(startPos, beginMarkerPos) + `{${id}}` + str.slice(endMarkerPos + endMarker.length);
+    const isCodeEnv: boolean = match[1] && CODE_ENVS.has(match[1]);
+    if (isCodeEnv) {
+      addExtractedCodeBlock({ id, content });
+    } else {
+      mathTable.push({ id, content });
+    }
+    const placeholder = isCodeEnv ? `<<${id}>>` : `{${id}}`;
+    str = str.slice(0, startPos) + str.slice(startPos, beginMarkerPos) + placeholder + str.slice(endMarkerPos + endMarker.length);
     str = getSubMath(str, startPos);
   }
   return str;

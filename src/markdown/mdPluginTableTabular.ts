@@ -10,6 +10,7 @@ import { ClearSubMathLists } from "./md-block-rule/begin-tabular/sub-math";
 import {ClearParseError} from "./md-block-rule/parse-error";
 import { BeginTheorem, BeginProof } from "./md-theorem/block-rule";
 import { getTerminatedRules } from "./common";
+import { ClearExtractedCodeBlocks } from "./md-block-rule/begin-tabular/sub-code";
 
 export default (md: MarkdownIt, options) => {
   ClearTableNumbers();
@@ -17,6 +18,7 @@ export default (md: MarkdownIt, options) => {
   ClearSubTableLists();
   ClearSubMathLists();
   ClearParseError();
+  ClearExtractedCodeBlocks();
   Object.assign(md.options, options);
 
   md.block.ruler.after("fence", "BeginTabular", BeginTabular, 

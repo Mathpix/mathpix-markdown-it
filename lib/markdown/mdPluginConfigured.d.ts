@@ -1,3 +1,4 @@
+import pluginLatexCodeEnvs from "./md-latex-lstlisting-env";
 /**
  * configured custom mathjax plugin
  */
@@ -21,3 +22,4 @@ export declare const mdPluginSvgToBase64: (md: MarkdownIt, options: any) => void
 export declare const mdPluginCollapsible: (md: any) => void;
 export declare const mdSetPositionsAndHighlight: (md: MarkdownIt, options: any) => void;
 export declare const mdLatexFootnotes: (md: MarkdownIt, options: any) => void;
+export declare const mdPluginLatexCodeEnvs: typeof pluginLatexCodeEnvs;

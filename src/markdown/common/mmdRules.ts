@@ -208,6 +208,11 @@ export const mmdRuleList: IMmdRule[] = [
     type: eMmdRuleType.common,
     rule: eRule.block
   },
+  {
+    name: "latex_lstlisting_env_block",
+    type: eMmdRuleType.latex,
+    rule: eRule.block
+  },
   //Inline rules
   {
     name: "text",
@@ -513,6 +518,11 @@ export const mmdRuleList: IMmdRule[] = [
   {
     name: "tocHide",
     type: eMmdRuleType.markdown,
+    rule: eRule.inline
+  },
+  {
+    name: "latex_lstlisting_env_inline",
+    type: eMmdRuleType.latex,
     rule: eRule.inline
   },
   //Inline ruler post process

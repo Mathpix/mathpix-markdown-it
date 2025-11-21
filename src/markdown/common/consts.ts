@@ -112,6 +112,26 @@ export const RE_CAPTION_TAG_GLOBAL: RegExp = /\s{0,}\\caption\s{0,}\{([^}]*)\}\s
 export const RE_CAPTION_TAG_BEGIN: RegExp = /\\caption\s{0,}\{/;
 export const RE_ALIGN_CENTERING_GLOBAL: RegExp = /\\centering/g;
 export const RE_INCLUDEGRAPHICS_WITH_ALIGNMENT_GLOBAL: RegExp = /\\includegraphics\[((.*)(center|left|right))\]\s{0,}\{([^{}]*)\}/g;
+export const CODE_ENVS = new Set(['lstlisting']);
+export const BEGIN_LST_FAST_RE: RegExp = /^\\begin\{lstlisting\}/;
+export const END_LST_RE = /^\\end\{lstlisting\}\s*$/;
+export const BEGIN_LST_RE = /^\\begin\{lstlisting\}(?:\[(.*?)\])?\s*$/;
+/** Horizontal spaces (no CR/LF) + at most one newline (CRLF or LF), optional */
+const HSPACE_PLUS_ONE_NL_OPT = String.raw`(?:[^\S\r\n]*\r?\n)?`;
+/** Full begin line: \begin{lstlisting}[...]( +hspace +≤1 NL ) */
+export const BEGIN_LST_WITH_TRAIL_WS_NL_RE = new RegExp(
+  String.raw`^\\begin\{lstlisting\}(?:\[(.*?)\])?` + HSPACE_PLUS_ONE_NL_OPT
+);
+
+export const LST_HLJS_LANGUAGES = {
+  'c++': 'cpp',
+  assembler: 'x86asm',
+  caml: 'ocaml',
+  csh: 'shell',
+  inform: 'inform7',
+  ksh: 'shell',
+  sh: 'shell',
+}
 
 export const HIGHLIGHT_COLOR = 'rgba(0, 147, 255, 0.25)';
 export const HIGHLIGHT_TEXT_COLOR = '#1e2029';
@@ -127,7 +147,9 @@ export const latexEnvironments = [
   "center",
   "left",
   "right",
-  "abstract"
+  "abstract",
+  // Code
+  "lstlisting"
 ];
 
 /** https://docs.mathjax.org/en/v3.0-latest/input/tex/macros/index.html#environments */

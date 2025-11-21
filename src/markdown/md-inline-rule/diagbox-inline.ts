@@ -5,30 +5,18 @@ import { getMathTableContent, getSubMath } from "../md-block-rule/begin-tabular/
 import { getContent } from "../md-block-rule/begin-tabular/common";
 import { reDiagbox } from "../common/consts";
 import { TTokenTabular } from "../md-block-rule/begin-tabular";
-
-const parseAttributes = (str: string): Record<string, string | true> => {
-  const result: Record<string, string | true> = {};
-  try {
-    str.split(",").forEach(pair => {
-      const [key, value] = pair.split("=").map(s => s.trim());
-      result[key] = value || true;
-    });
-
-    return result;
-  } catch (err) {
-    console.error("[ERROR]=>[parseAttributes]=>", err);
-    return result;
-  }
-}
+import { parseAttributes } from '../common/parse-attribures';
+import { getExtractedCodeBlockContent } from "../md-block-rule/begin-tabular/sub-code";
 
 const processContent = (content: string): string => {
   try {
     const parseMath: string = getMathTableContent(content, 0);
-    const processedContent: string = parseMath || getContent(content, false, true);
+    let processedContent: string = parseMath || getContent(content, false, true);
     const data: TTokenTabular[] = getSubTabular(processedContent, 0, true);
     if (data && data.length) {
       return data.map(item => item.content).join('');
     } else {
+      processedContent = getExtractedCodeBlockContent(processedContent, 0);
       return processedContent;
     }
   } catch (err) {

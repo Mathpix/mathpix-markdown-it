@@ -4,6 +4,7 @@ import {getSubTabular} from "./sub-tabular";
 import {getMathTableContent} from "./sub-math";
 import {getContent, getColumnAlign, getColumnLines} from "./common";
 import { reMultiRowWithVPos, reMultiRow } from "../../common/consts";
+import { getExtractedCodeBlockContent } from "./sub-code";
 
 export const getMC = (cell: string): number => {
   cell = cell.trim();
@@ -118,8 +119,9 @@ export const getMultiColumnMultiRow = (str: string, params: {lLines: string, ali
   const parseMath: string = getMathTableContent(str, 0);
   let content: string = parseMath || getContent(str);
   const parseSub: Array<TTokenTabular>  = getSubTabular(content, 0, true, forLatex);
-  if (parseSub) {
+  if (parseSub?.length) {
     return {mr: mr, mc: mc, attrs: attrs, content: '', subTable: parseSub, latex: latex}
   }
+  content = getExtractedCodeBlockContent(content, 0);
   return {mr: mr, mc: mc, attrs: attrs, content: content, subTable: null, latex: latex}
 };

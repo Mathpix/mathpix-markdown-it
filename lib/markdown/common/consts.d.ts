@@ -79,6 +79,21 @@ export declare const RE_CAPTION_TAG_GLOBAL: RegExp;
 export declare const RE_CAPTION_TAG_BEGIN: RegExp;
 export declare const RE_ALIGN_CENTERING_GLOBAL: RegExp;
 export declare const RE_INCLUDEGRAPHICS_WITH_ALIGNMENT_GLOBAL: RegExp;
+export declare const CODE_ENVS: Set<string>;
+export declare const BEGIN_LST_FAST_RE: RegExp;
+export declare const END_LST_RE: RegExp;
+export declare const BEGIN_LST_RE: RegExp;
+/** Full begin line: \begin{lstlisting}[...]( +hspace +≤1 NL ) */
+export declare const BEGIN_LST_WITH_TRAIL_WS_NL_RE: RegExp;
+export declare const LST_HLJS_LANGUAGES: {
+    'c++': string;
+    assembler: string;
+    caml: string;
+    csh: string;
+    inform: string;
+    ksh: string;
+    sh: string;
+};
 export declare const HIGHLIGHT_COLOR = "rgba(0, 147, 255, 0.25)";
 export declare const HIGHLIGHT_TEXT_COLOR = "#1e2029";
 export declare const TEXTWIDTH_RE: RegExp;
