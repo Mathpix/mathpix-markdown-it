@@ -521,11 +521,6 @@ export const mmdRuleList: IMmdRule[] = [
     rule: eRule.inline
   },
   {
-    name: "fence_inline",
-    type: eMmdRuleType.markdown,
-    rule: eRule.inline
-  },
-  {
     name: "latex_lstlisting_env_inline",
     type: eMmdRuleType.latex,
     rule: eRule.inline

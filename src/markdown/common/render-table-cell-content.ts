@@ -93,6 +93,12 @@ export const renderTableCellContent = (token, isSubTable: boolean, options, env,
           mdCell += child.content.replace(/\|/g, '\\|');
           mdCell += '</smiles>';
           continue;
+        case "latex_lstlisting_env": {
+          let mdContent = child.content.split('\n').join('<br>');
+          mdContent = mdContent.replace(/\|/g, '&#124')
+          mdCell += `<pre><code>${mdContent}</code></pre>`;
+          continue;
+        }
       }
 
       if (child.tableMd?.length) {

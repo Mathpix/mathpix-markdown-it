@@ -9,12 +9,17 @@ export const CsvJoin = (csv, options, isSub?): string => {
   if (!csv || csv.length === 0 ) {
     return ''
   }
+  if (typeof csv === "string") {
+    return csv;
+  }
   if (isSub) {
-    return csv.map(row => row.join(column)).join(row)
+    return csv.map(row => Array.isArray(row) ? row.join(column) : row).join(row)
   } else {
     return csv.map(row => {
-      row = row.map(cell => escapesCsvField(cell, options));
-      return row.join(column)
+      row = Array.isArray(row)
+        ? row.map(cell => escapesCsvField(cell, options))
+        : escapesCsvField(row, options);
+      return Array.isArray(row) ? row.join(column) : row
     }).join(row)
   }
 };

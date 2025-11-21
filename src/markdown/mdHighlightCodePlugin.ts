@@ -5,6 +5,13 @@ import { codeHighlightDef } from "./common/consts";
 import { clipboardCopyElement } from "../copy-to-clipboard/clipboard-copy-element";
 import { getHtmlSeparatingSpanContainer } from "./common/separating-span";
 
+// Match the first <code ...> opening tag and capture its attributes part.
+const CODE_TAG_RE = /<code([^>]*)>/;
+// Match a class attribute: class="..." | class='...' | class=bare
+const CLASS_ATTR_RE = /\sclass=("([^"]*)"|'([^']*)'|([^\s"'>]+))/;
+// Check if "hljs" is already present as a separate class name.
+const HLJS_CLASS_RE = /\bhljs\b/;
+
 const maybe = f => {
   try {
     return f()
@@ -40,13 +47,40 @@ const highlightAuto = (code: string, lang: string, originalHighlight?) => {
     : maybe(() => hljs.highlightAuto(code).value) || ''
 };
 
+/**
+ * Ensures that the first <code> tag in the HTML string contains the "hljs" class.
+ *
+ * - If <code> already has a class attribute → prepend "hljs" unless it is already present.
+ * - If <code> has no class attribute → inject class="hljs" while preserving all other attributes.
+ * - Works with cases like:
+ *     <code>, <code class="...">, <code style="...">, <code class="..." style="...">
+ *
+ * @param html - The HTML string containing a <code> element.
+ * @returns Modified HTML string with "hljs" injected into the first <code> tag.
+ */
+const addHljsClass = (html: string): string => {
+  return html.replace(CODE_TAG_RE, (match, attrs) => {
+    const classMatch = attrs.match(CLASS_ATTR_RE);
+    if (classMatch) {
+      const full = classMatch[0];
+      const value = classMatch[2] || classMatch[3] || classMatch[4] || '';
+      if (HLJS_CLASS_RE.test(value)) {
+        return match;
+      }
+      const newValue = value ? `hljs ${value}` : 'hljs';
+      const newClassAttr = ` class="${newValue}"`;
+      const newAttrs = attrs.replace(full, newClassAttr);
+      return `<code${newAttrs}>`;
+    }
+    return `<code class="hljs"${attrs}>`;
+  });
+}
+
 // Wrap a render function to add `hljs` class to code blocks.
 // const wrap = render => (...args) => {
 const wrapFence = render => (tokens, idx, options, env, slf) => {
   let html = render.apply(render, [tokens, idx, options, env, slf]);
-  html = html
-    .replace('<code class="', '<code class="hljs ')
-    .replace('<code>', '<code class="hljs">')
+  html = addHljsClass(html);
   let htmlMol: string = '';
   if (tokens[idx].info === "mol" && options?.outMath?.include_mol) {
     htmlMol = '<mol style="display: none;">' + tokens[idx].content + '</mol>';
@@ -100,10 +134,7 @@ const wrapFence = render => (tokens, idx, options, env, slf) => {
 // const wrap = render => (...args) => {
 const wrapLatexCodeEnv = render => (tokens, idx, options, env, slf) => {
   let html = render.apply(render, [tokens, idx, options, env, slf]);
-  html = html
-    .replace('<code class="', '<code class="hljs ')
-    .replace('<code>', '<code class="hljs">')
-
+  html = addHljsClass(html);
   if (options?.lineNumbering) {
     let line, endLine, listLine;
     if (tokens[idx].map && tokens[idx].level === 0) {
