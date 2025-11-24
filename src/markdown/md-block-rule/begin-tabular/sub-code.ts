@@ -1,5 +1,6 @@
 import { generateUniqueId, getContent } from "./common";
 import { getMathTableContent, mathTablePush } from "./sub-math";
+import { getInlineCodeListFromString, InlineCodeItem } from "../../common";
 import {
   BEGIN_LST_RE,
   doubleAngleBracketUuidPattern, END_LST_RE,
@@ -235,34 +236,41 @@ const getSubCodeBlock = (input: string): string => {
   return result;
 };
 
-export const getSubCode = (str: string): string => {
-  let c = '';
-  let str2 = '';
-  str = getSubCodeBlock(str);
-
-
-  for (let ii = 0; ii< str.length; ii++) {
-    if (str.charCodeAt(ii) === 0x60) {
-      if (str.charCodeAt(ii+1) === 0x60) {
-        ii += 1;
-      }
-      if (c.length === 0) {
-        c += str[ii]
-      } else {
-        c += str[ii]
-        const id: string = generateUniqueId();
-        mathTablePush({id: id, content: c})
-        str2 += `{${id}}`;
-        c = ''
-      }
-    }
-    if (c && str.charCodeAt(ii) !== 0x60) {
-      c += str[ii]
-    }
-    if (c.length === 0 && str.charCodeAt(ii) !== 0x60) {
-      str2 += str[ii];
-    }
+/**
+ * Replaces all inline code spans in the given string with `{id}` placeholders
+ * and stores the original code in an external table via `mathTablePush`.
+ *
+ * Flow:
+ *  1. First hides fenced/LaTeX code blocks via `getSubCodeBlock`.
+ *  2. Then finds inline code spans (e.g. `...` or ``...``) with
+ *     `getInlineCodeListFromString`.
+ *  3. For each span: generates an id, pushes `{ id, content }` to math table,
+ *     and replaces the span in the text with `{id}`.
+ *
+ * @param input - Original source string.
+ * @returns String where inline code is replaced by `{id}` placeholders.
+ */
+export const getSubCode = (input: string): string => {
+  const withBlocksHidden = getSubCodeBlock(input);
+  const inlineCodes: InlineCodeItem[] = getInlineCodeListFromString(withBlocksHidden);
+  if (!inlineCodes || inlineCodes.length === 0) {
+    return withBlocksHidden;
   }
-  str2 += c;
-  return str2;
+  inlineCodes.sort((a: InlineCodeItem, b: InlineCodeItem) => a.posStart - b.posStart);
+  let result: string = '';
+  let cursor: number = 0;
+  for (const item of inlineCodes) {
+    if (cursor < item.posStart) {
+      result += withBlocksHidden.slice(cursor, item.posStart);
+    }
+    const codeContent = item.content;
+    const id: string = generateUniqueId();
+    mathTablePush({ id, content: codeContent });
+    result += `{${id}}`;
+    cursor = item.posEnd;
+  }
+  if (cursor < withBlocksHidden.length) {
+    result += withBlocksHidden.slice(cursor);
+  }
+  return result;
 };

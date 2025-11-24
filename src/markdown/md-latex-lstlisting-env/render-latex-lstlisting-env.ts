@@ -29,7 +29,7 @@ const renderCodeWithMathHighlighted = (
   token: Token,
   md: MarkdownIt,
   langName: string,
-  options = {},
+  options: any = {},
   env = {}
 ): string => {
   const children = token.children ?? [];
@@ -51,7 +51,14 @@ const renderCodeWithMathHighlighted = (
         partsTsv.push(raw);
         partsCsv.push(raw);
       } else {
-        partsHtml.push(md.renderer.renderInline([child], options, env));
+        let mathHtml: string = md.renderer.renderInline([child], options, env);
+        if (options?.forDocx && mathHtml) {
+          mathHtml = mathHtml
+            .split(/\r?\n/)
+            .map(line => line.trim())
+            .join('');
+        }
+        partsHtml.push(mathHtml);
         partsTsv.push(child.ascii_tsv ?? child.ascii ?? '');
         partsCsv.push(child.ascii_csv ?? child.ascii ?? '');
       }
