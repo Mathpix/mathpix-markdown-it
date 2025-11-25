@@ -1,5 +1,10 @@
 import { Token } from 'markdown-it';
-import { OPENING_STYLE_TOKENS, CLOSING_STYLE_TOKENS, INLINE_ELEMENT_TOKENS } from "./common/consts";
+import {
+  OPENING_STYLE_TOKENS,
+  CLOSING_STYLE_TOKENS,
+  INLINE_ELEMENT_TOKENS,
+  SIMPLE_MATH_DELIM_RE
+} from "./common/consts";
 
 export const endTag = (arg: string, shouldBeFirst = false): RegExp  => {
   try {
@@ -116,6 +121,21 @@ export const isNotBackticked = (str: string, tag: string): boolean => {
 
 export const includesSimpleMathTag = (str: string, tag = '$$') => {
   return str.includes(tag) && isNotBackticked(str, tag);
+};
+
+/**
+ * Returns true if the string contains an odd number of unescaped `$$` delimiters
+ * (i.e. the line toggles the display-math open/close state).
+ */
+export const hasOddSimpleMathTag = (str: string, tag = '$$'): boolean => {
+  if (!includesSimpleMathTag(str, tag)) return false;
+  // Use a fresh RegExp instance to avoid shared lastIndex state.
+  const re: RegExp = new RegExp(SIMPLE_MATH_DELIM_RE);
+  let count: number = 0;
+  while (re.exec(str) !== null) {
+    count++;
+  }
+  return count % 2 === 1;
 };
 
 export const includesMultiMathBeginTag = (str, tag): RegExp | null => {
