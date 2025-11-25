@@ -107,29 +107,37 @@ export const makeLatexLstlistingEnvRendererWithMd = (md: MarkdownIt) => {
     if (highlighted.indexOf('<pre') === 0) {
       return highlighted + '\n';
     }
-    const style: string = ' style="text-align: left;"';
+    const styleValue: string = 'text-align: left;';
     // If language exists, inject class gently, without modifying original token.
     // May be, one day we will add .clone() for token and simplify this part, but
     // now we prefer to keep things local.
+    const classes: string[] = ['lstlisting-code'];
     if (langName) {
-      let tmpToken: Token;
-      let tmpAttrs = [];
-      let i = token.attrIndex('class');
-      tmpAttrs = token.attrs ? token.attrs.slice() : [];
-      if (i < 0) {
-        tmpAttrs.push([ 'class', options.langPrefix + langName ]);
-      } else {
-        tmpAttrs[i][1] += ' ' + options.langPrefix + langName;
-      }
-      // Fake token just to render attributes
-      tmpToken = {
-        attrs: tmpAttrs
-      };
-      return  '<pre><code' + slf.renderAttrs(tmpToken) + style + '>'
-        + highlighted
-        + '</code></pre>\n';
+      classes.push(options.langPrefix + langName);
     }
-    return  '<pre><code' + slf.renderAttrs(token) + style + '>'
+    const attrs = token.attrs ? token.attrs.map(([k, v]) => [k, v]) : [];
+    // handle `class` attribute
+    const classIndex = token.attrIndex('class');
+    const className = classes.join(' ');
+    if (classIndex < 0) {
+      attrs.push(['class', className]);
+    } else {
+      attrs[classIndex][1] += ' ' + className;
+    }
+    // handle `style` attribute (if provided as value)
+    if (styleValue) {
+      const styleIndex = token.attrIndex('style');
+      if (styleIndex < 0) {
+        attrs.push(['style', styleValue]);
+      } else {
+        attrs[styleIndex][1] += '; ' + styleValue;
+      }
+    }
+    // Fake token just to render attributes
+    const fakeToken: Pick<Token, 'attrs'> = { attrs };
+    return  '<pre><code'
+      + slf.renderAttrs(fakeToken)
+      + '>'
       + highlighted
       + '</code></pre>\n';
   };

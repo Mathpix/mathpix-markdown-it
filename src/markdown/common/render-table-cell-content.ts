@@ -2,6 +2,7 @@ import { TsvJoin } from "./tsv";
 import { CsvJoin } from "./csv";
 import { getMdForChild, getMdLink } from "./table-markdown";
 import { mathTokenTypes } from "./consts";
+const escapeHtml = require('markdown-it/lib/common/utils').escapeHtml;
 
 export const renderTableCellContent = (token, isSubTable: boolean, options, env, slf) => {
   let content: string = '';
@@ -94,8 +95,9 @@ export const renderTableCellContent = (token, isSubTable: boolean, options, env,
           mdCell += '</smiles>';
           continue;
         case "latex_lstlisting_env": {
-          let mdContent = child.content.split('\n').join('<br>');
-          mdContent = mdContent.replace(/\|/g, '&#124')
+          let escape = escapeHtml(child.content);
+          let mdContent = escape.split('\n').join('<br>');
+          mdContent = mdContent.replace(/\|/g, '&#124');
           mdCell += `<pre><code>${mdContent}</code></pre>`;
           continue;
         }
