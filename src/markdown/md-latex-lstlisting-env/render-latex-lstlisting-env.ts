@@ -140,7 +140,7 @@ export const makeLatexLstlistingEnvRendererWithMd = (md: MarkdownIt) => {
     }
     // Fake token just to render attributes
     const fakeToken: Pick<Token, 'attrs'> = { attrs };
-    return  '<pre><code'
+    return  '<pre class="lstlisting"><code'
       + slf.renderAttrs(fakeToken)
       + '>'
       + highlighted
