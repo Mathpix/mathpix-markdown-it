@@ -1,5 +1,6 @@
 import { MarkdownIt, Token, Renderer } from "markdown-it";
 const escapeHtml = require('markdown-it/lib/common/utils').escapeHtml;
+const NEWLINE_RE: RegExp = /\r?\n/g;
 
 /**
  * Render a code token (block or inline) with optional syntax highlighting and math-aware children.
@@ -72,11 +73,15 @@ const renderCodeWithMathHighlighted = (
     partsTsv.push(raw);
     partsCsv.push(raw);
   }
-  const tsv: string = partsTsv.join('').replace(/\r?\n/g, ' ');
-  const csv: string = partsCsv.join('').replace(/\r?\n/g, ' ');
+  const tsv: string = partsTsv.join('').replace(NEWLINE_RE, ' ');
+  const csv: string = partsCsv.join('').replace(NEWLINE_RE, ' ');
   token.tsv = [tsv];
   token.csv = [csv];
-  return partsHtml.join('');
+  const html = partsHtml.join('');
+  if (options.forPptx) {
+    return html.replace(NEWLINE_RE, '<br><span class="br-break"></span>');
+  }
+  return html;
 };
 
 /**
