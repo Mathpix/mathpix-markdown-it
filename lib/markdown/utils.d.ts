@@ -5,6 +5,11 @@ export declare const getWidthFromDocument: (cwidth?: number) => number;
 export declare const getLatexTextWidth: (strWidth: string, cWidth?: number) => string;
 export declare const isNotBackticked: (str: string, tag: string) => boolean;
 export declare const includesSimpleMathTag: (str: string, tag?: string) => boolean;
+/**
+ * Returns true if the string contains an odd number of unescaped `$$` delimiters
+ * (i.e. the line toggles the display-math open/close state).
+ */
+export declare const hasOddSimpleMathTag: (str: string, tag?: string) => boolean;
 export declare const includesMultiMathBeginTag: (str: any, tag: any) => RegExp | null;
 export declare const includesMultiMathTag: (str: any, tag: any) => boolean;
 export declare const arraysCompare: (a1: any, a2: any) => any;

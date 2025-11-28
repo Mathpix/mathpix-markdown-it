@@ -12,7 +12,8 @@ import {
   includesMultiMathBeginTag,
   includesMultiMathTag,
   includesSimpleMathTag,
-  isMathInText
+  isMathInText,
+  hasOddSimpleMathTag
 } from './utils';
 import { latexEnvironments, openTagMML } from './common/consts';
 import { imageWithSize, renderRuleImage } from './md-inline-rule/image';
@@ -568,10 +569,6 @@ function paragraphDiv(state, startLine/*, endLine*/) {
     return true;
   }
 
-  if (includesSimpleMathTag(lineText)) {
-    isMathOpen = true;
-  }
-
   let listOpen = false;
   let isMath = false;
   let mathEndTag: RegExp | null = null;
@@ -593,6 +590,17 @@ function paragraphDiv(state, startLine/*, endLine*/) {
     const prewPos = state.bMarks[nextLine - 1] + state.tShift[nextLine - 1];
     const prewMax = state.eMarks[nextLine - 1];
     let prewLineText = state.src.slice(prewPos, prewMax);
+    // Update isMathOpen based on the previous line (prewLineText)
+    const prevTogglesMath: boolean = hasOddSimpleMathTag(prewLineText);
+    if (prevTogglesMath) {
+      const wasMathOpen = isMathOpen;
+      isMathOpen = !isMathOpen;
+      // If we were inside $$ and just closed it, end the paragraph
+      // The current nextLine points to the line after the closing $$.
+      if (wasMathOpen && !isMathOpen) {
+        break;
+      }
+    }
 
     if (openedAuthorBlock
       && (prewLineText.indexOf('}') !== -1 || prewLineText.indexOf('{') !== -1)) {
@@ -635,15 +643,16 @@ function paragraphDiv(state, startLine/*, endLine*/) {
         break;
       }
     }
-    if (includesSimpleMathTag(lineText)) {
-      isMathOpen = !isMathOpen
-    }
 
     if (listStartTag.test(lineText) && (prewLineText.indexOf('\\item') === -1 || !listOpen)) {
       break;
     }
 
-    if (includesSimpleMathTag(lineText) && isMathOpen || includesSimpleMathTag(prewLineText) && !isMathOpen) {
+    // End paragraph when a $$ block starts on this line
+    // or when the previous line contained a self-contained $$...$$ block.
+    const startsDisplayMath: boolean = includesSimpleMathTag(lineText);
+    const prevIsSingleLineDisplayMath: boolean = includesSimpleMathTag(prewLineText) && !prevTogglesMath;
+    if (!isMathOpen && (startsDisplayMath || prevIsSingleLineDisplayMath)) {
       break;
     }
 

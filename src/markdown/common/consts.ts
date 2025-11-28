@@ -136,6 +136,9 @@ export const LST_HLJS_LANGUAGES = {
 export const HIGHLIGHT_COLOR = 'rgba(0, 147, 255, 0.25)';
 export const HIGHLIGHT_TEXT_COLOR = '#1e2029';
 export const TEXTWIDTH_RE = /^\s*(\d*\.?\d+)?\s*\\(?:textwidth|linewidth)\b/;
+// Matches unescaped `$$` delimiters (e.g. "$$...$$"), not inside backticks.
+// Group 1 ensures the $$ is either at the start or not preceded by a backslash.
+export const SIMPLE_MATH_DELIM_RE: RegExp = /(^|[^\\])\$\$(?!\$)/g;
 export const latexEnvironments = [
   "figure",
   "table",
