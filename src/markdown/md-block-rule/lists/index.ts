@@ -1,5 +1,5 @@
 import { RuleBlock, Token } from 'markdown-it';
-import {SetItemizeLevelTokens, GetItemizeLevelTokensByState, GetEnumerateLevel} from "./re-level";
+import { SetItemizeLevelTokens, GetItemizeLevelTokensByState, GetEnumerateLevel } from "./re-level";
 import { SetTokensBlockParse } from"../helper";
 export enum TBegin {itemize = 'itemize', enumerate = 'enumerate'};
 const openTag: RegExp = /\\begin\s{0,}\{(itemize|enumerate)\}/;
@@ -8,11 +8,12 @@ const closeTag: RegExp = /\\end\s{0,}\{(itemize|enumerate)\}/;
 export const reNumber: RegExp = /^-?\d+$/;
 
 const setTokenListItemOpenBlock = (state, startLine, endLine, marker, li, iLevel, eLevel, iLevelC) => {
-  let token;
-  token        = state.push('latex_list_item_open', 'li', 1);
-  token.parentType = state.types && state.types.length > 0 ? state.types[state.types.length - 1] : '';
-  if (marker) {
-    token.marker = marker;
+  let token: Token = state.push('latex_list_item_open', 'li', 1);
+  token.parentType = state.types?.length > 0
+    ? state.types[state.types.length - 1]
+    : '';
+  if (marker !== undefined) {
+    token.marker = marker ? marker.trim() : '';
     let chMarker = [];
     state.md.inline.parse(marker, state.md, state.env, chMarker);
     token.markerTokens = chMarker;
@@ -22,7 +23,9 @@ const setTokenListItemOpenBlock = (state, startLine, endLine, marker, li, iLevel
     token.attrSet('value', li.value.toString())
     li = null;
   }
-  token.parentType = state.types && state.types.length > 0 ? state.types[state.types.length - 1] : '';
+  token.parentType = state.types?.length > 0
+    ? state.types[state.types.length - 1]
+    : '';
   token.parentStart = state.startLine;
 
   token.map = [startLine, endLine ];
@@ -33,13 +36,18 @@ const setTokenListItemOpenBlock = (state, startLine, endLine, marker, li, iLevel
 };
 
 const ListItemsBlock = (state, items) => {
-  if (items && items.length > 0) {
-    if (items && items.length > 0) {
-      items.forEach(item => {
-        SetTokensBlockParse(state, item.content.trim(), item.startLine, item.endLine + 1)
-      })
-    }
+  if (!items || items.length === 0) {
+    return;
   }
+  items.forEach(item => {
+    const rawContent: string = item?.content ?? '';
+    const itemContent: string = rawContent.trim();
+    SetTokensBlockParse(state, itemContent, {
+      startLine: item.startLine,
+      endLine: item.endLine + 1,
+      disableBlockRules: true
+    });
+  })
 };
 
 const ListItems = (state, items, iLevel, eLevel, li, iOpen, iLevelC) => {
@@ -61,9 +69,9 @@ const ListItems = (state, items, iLevel, eLevel, li, iOpen, iLevelC) => {
             if (li && li.hasOwnProperty('value')) {
               li = null;
             }
-
-            SetTokensBlockParse(state, item.content.slice(match.index + match[0].length + 1).trim())
-
+            const rawContent: string = item?.content?.slice(match.index + match[0].length + 1) ?? '';
+            const itemContent: string = rawContent.trim();
+            SetTokensBlockParse(state, itemContent, {disableBlockRules: true});
             token = state.push('latex_list_item_close', 'li', -1);
             return
           }
@@ -339,7 +347,9 @@ export const ReRenderListsItem:RuleBlock = (state, startLine: number, endLine: n
   match = content.slice(1).match(bItemTag);
   if (match) {
     setTokenListItemOpenBlock(state, startLine, nextLine + 1, match[1], null, iLevelT, eLevel, iLevelC);
-    SetTokensBlockParse(state, content.slice(match.index + match[0].length + 1).trim())
+    const rawContent: string = content?.slice(match.index + match[0].length + 1) ?? '';
+    const itemContent: string = rawContent.trim();
+    SetTokensBlockParse(state, itemContent, {disableBlockRules: true});
     state.push('latex_list_item_close', 'li', -1);
   }
   state.line = nextLine;

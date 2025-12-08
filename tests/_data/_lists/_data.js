@@ -207,6 +207,260 @@ module.exports = [
       '  \\item Test\n' +
       '\\end{enumerate}',
     html: `<ol class="enumerate decimal preview-paragraph-0 preview-line 0 1 2" data_line_start="0" data_line_end="2" data_line="0,3" count_line="3" style=" list-style-type: decimal"><li value="0" class="li_enumerate preview-paragraph-1 preview-line 1" data_line_start="1" data_line_end="1" data_line="1,2" count_line="1" data_parent_line_start="0">Test</li></ol>`
+  },
+  {
+    latex: '\\begin{itemize}\n' +
+      '\\item[] - testing 1\n' +
+      '\n' +
+      '\\item[] - \\textbf{ \\textit{How did this financial product perform compared with the reference benchmark?}}\n' +
+      '\\begin{center}\n' +
+      '\n' +
+      '\\begin{tabular}{|l|l|l|}\n' +
+      '\\hline \\textbf{Share Class} & \\textbf{Fund Performance } & \\textbf{Reference} \\\\\n' +
+      '\\hline USD Accumulating & 23.87 & 23.75 \\\\\n' +
+      '\\hline USD Distributing & 23.87 & 23.75 \\\\\n' +
+      '\\hline\n' +
+      '\\end{tabular}\n' +
+      '\\end{center}\n' +
+      '\n' +
+      '\\item[] - testing 2\n' +
+      '\\end{itemize}',
+    html: '<ul class="itemize preview-paragraph-0 preview-line 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15" data_line_start="0" data_line_end="15" data_line="0,16" count_line="16" style="list-style-type: none"><li class="li_itemize preview-paragraph-1 preview-line 1 2" data_line_start="1" data_line_end="2" data_line="1,3" count_line="2" data_parent_line_start="0" data-custom-marker="true"><span class="li_level" data-custom-marker="true"></span>- testing 1</li><li class="li_itemize block preview-paragraph-3 preview-line 3 4 5 6 7 8 9 10 11 12 13" data_line_start="3" data_line_end="13" data_line="3,14" count_line="11" data_parent_line_start="0" data-custom-marker="true"><span class="li_level" data-custom-marker="true"></span><div>- <strong><em>How did this financial product perform compared with the reference benchmark?</em></strong></div>\n' +
+      '<div class="center" style="text-align: center">\n' +
+      '<div class="table_tabular" style="text-align: center">\n' +
+      '<div class="inline-tabular"><table class="tabular">\n' +
+      '<tbody>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; "><strong>Share Class</strong></td>\n' +
+      '<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; "><strong>Fund Performance</strong></td>\n' +
+      '<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; "><strong>Reference</strong></td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">USD Accumulating</td>\n' +
+      '<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">23.87</td>\n' +
+      '<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">23.75</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">USD Distributing</td>\n' +
+      '<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">23.87</td>\n' +
+      '<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">23.75</td>\n' +
+      '</tr>\n' +
+      '</tbody>\n' +
+      '</table>\n' +
+      '</div></div>\n' +
+      '</div>\n' +
+      '</li><li class="li_itemize preview-paragraph-14 preview-line 14" data_line_start="14" data_line_end="14" data_line="14,15" count_line="1" data_parent_line_start="0" data-custom-marker="true"><span class="li_level" data-custom-marker="true"></span>- testing 2</li></ul>'
+  },
+  {
+    latex: '\\begin{itemize}\n' +
+      '\\item[] - testing 1\n' +
+      '\n' +
+      '\\item[] > \\textbf{ \\textit{How did this financial product perform compared with the reference benchmark?}}\n' +
+      '\\begin{center}\n' +
+      '\n' +
+      '\\begin{tabular}{|l|l|l|}\n' +
+      '\\hline \\textbf{Share Class} & \\textbf{Fund Performance } & \\textbf{Reference} \\\\\n' +
+      '\\hline USD Accumulating & 23.87 & 23.75 \\\\\n' +
+      '\\hline USD Distributing & 23.87 & 23.75 \\\\\n' +
+      '\\hline\n' +
+      '\\end{tabular}\n' +
+      '\\end{center}\n' +
+      '\n' +
+      '\\item[] - testing 2\n' +
+      '\\end{itemize}',
+    html: '<ul class="itemize preview-paragraph-0 preview-line 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15" data_line_start="0" data_line_end="15" data_line="0,16" count_line="16" style="list-style-type: none"><li class="li_itemize preview-paragraph-1 preview-line 1 2" data_line_start="1" data_line_end="2" data_line="1,3" count_line="2" data_parent_line_start="0" data-custom-marker="true"><span class="li_level" data-custom-marker="true"></span>- testing 1</li><li class="li_itemize block preview-paragraph-3 preview-line 3 4 5 6 7 8 9 10 11 12 13" data_line_start="3" data_line_end="13" data_line="3,14" count_line="11" data_parent_line_start="0" data-custom-marker="true"><span class="li_level" data-custom-marker="true"></span><div>&gt; <strong><em>How did this financial product perform compared with the reference benchmark?</em></strong></div>\n' +
+      '<div class="center" style="text-align: center">\n' +
+      '<div class="table_tabular" style="text-align: center">\n' +
+      '<div class="inline-tabular"><table class="tabular">\n' +
+      '<tbody>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; "><strong>Share Class</strong></td>\n' +
+      '<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; "><strong>Fund Performance</strong></td>\n' +
+      '<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; "><strong>Reference</strong></td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">USD Accumulating</td>\n' +
+      '<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">23.87</td>\n' +
+      '<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">23.75</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">USD Distributing</td>\n' +
+      '<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">23.87</td>\n' +
+      '<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">23.75</td>\n' +
+      '</tr>\n' +
+      '</tbody>\n' +
+      '</table>\n' +
+      '</div></div>\n' +
+      '</div>\n' +
+      '</li><li class="li_itemize preview-paragraph-14 preview-line 14" data_line_start="14" data_line_end="14" data_line="14,15" count_line="1" data_parent_line_start="0" data-custom-marker="true"><span class="li_level" data-custom-marker="true"></span>- testing 2</li></ul>'
+  },
+  {
+    latex: '\\begin{itemize}\n' +
+      '\\item[] - testing 1\n' +
+      '\n' +
+      '\\item[] # \\textbf{ \\textit{How did this financial product perform compared with the reference benchmark?}}\n' +
+      '\\begin{center}\n' +
+      '\n' +
+      '\\begin{tabular}{|l|l|l|}\n' +
+      '\\hline \\textbf{Share Class} & \\textbf{Fund Performance } & \\textbf{Reference} \\\\\n' +
+      '\\hline USD Accumulating & 23.87 & 23.75 \\\\\n' +
+      '\\hline USD Distributing & 23.87 & 23.75 \\\\\n' +
+      '\\hline\n' +
+      '\\end{tabular}\n' +
+      '\\end{center}\n' +
+      '\n' +
+      '\\item[] - testing 2\n' +
+      '\\end{itemize}',
+    html: '<ul class="itemize preview-paragraph-0 preview-line 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15" data_line_start="0" data_line_end="15" data_line="0,16" count_line="16" style="list-style-type: none"><li class="li_itemize preview-paragraph-1 preview-line 1 2" data_line_start="1" data_line_end="2" data_line="1,3" count_line="2" data_parent_line_start="0" data-custom-marker="true"><span class="li_level" data-custom-marker="true"></span>- testing 1</li><li class="li_itemize block preview-paragraph-3 preview-line 3 4 5 6 7 8 9 10 11 12 13" data_line_start="3" data_line_end="13" data_line="3,14" count_line="11" data_parent_line_start="0" data-custom-marker="true"><span class="li_level" data-custom-marker="true"></span><div># <strong><em>How did this financial product perform compared with the reference benchmark?</em></strong></div>\n' +
+      '<div class="center" style="text-align: center">\n' +
+      '<div class="table_tabular" style="text-align: center">\n' +
+      '<div class="inline-tabular"><table class="tabular">\n' +
+      '<tbody>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; "><strong>Share Class</strong></td>\n' +
+      '<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; "><strong>Fund Performance</strong></td>\n' +
+      '<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; "><strong>Reference</strong></td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">USD Accumulating</td>\n' +
+      '<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">23.87</td>\n' +
+      '<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">23.75</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">USD Distributing</td>\n' +
+      '<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">23.87</td>\n' +
+      '<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">23.75</td>\n' +
+      '</tr>\n' +
+      '</tbody>\n' +
+      '</table>\n' +
+      '</div></div>\n' +
+      '</div>\n' +
+      '</li><li class="li_itemize preview-paragraph-14 preview-line 14" data_line_start="14" data_line_end="14" data_line="14,15" count_line="1" data_parent_line_start="0" data-custom-marker="true"><span class="li_level" data-custom-marker="true"></span>- testing 2</li></ul>'
+  },
+  {
+    latex: '\\begin{itemize}\n' +
+      '\\item[] - testing 1\n' +
+      '\n' +
+      '\\item[] ~~~ \\textbf{ \\textit{How did this financial product perform compared with the reference benchmark?}}\n' +
+      '\\begin{center}\n' +
+      '\n' +
+      '\\begin{tabular}{|l|l|l|}\n' +
+      '\\hline \\textbf{Share Class} & \\textbf{Fund Performance } & \\textbf{Reference} \\\\\n' +
+      '\\hline USD Accumulating & 23.87 & 23.75 \\\\\n' +
+      '\\hline USD Distributing & 23.87 & 23.75 \\\\\n' +
+      '\\hline\n' +
+      '\\end{tabular}\n' +
+      '\\end{center}\n' +
+      '\n' +
+      '\\item[] - testing 2\n' +
+      '\\end{itemize}',
+    html: '<ul class="itemize preview-paragraph-0 preview-line 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15" data_line_start="0" data_line_end="15" data_line="0,16" count_line="16" style="list-style-type: none"><li class="li_itemize preview-paragraph-1 preview-line 1 2" data_line_start="1" data_line_end="2" data_line="1,3" count_line="2" data_parent_line_start="0" data-custom-marker="true"><span class="li_level" data-custom-marker="true"></span>- testing 1</li><li class="li_itemize block preview-paragraph-3 preview-line 3 4 5 6 7 8 9 10 11 12 13" data_line_start="3" data_line_end="13" data_line="3,14" count_line="11" data_parent_line_start="0" data-custom-marker="true"><span class="li_level" data-custom-marker="true"></span><div>~~~ <strong><em>How did this financial product perform compared with the reference benchmark?</em></strong></div>\n' +
+      '<div class="center" style="text-align: center">\n' +
+      '<div class="table_tabular" style="text-align: center">\n' +
+      '<div class="inline-tabular"><table class="tabular">\n' +
+      '<tbody>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; "><strong>Share Class</strong></td>\n' +
+      '<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; "><strong>Fund Performance</strong></td>\n' +
+      '<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; "><strong>Reference</strong></td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">USD Accumulating</td>\n' +
+      '<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">23.87</td>\n' +
+      '<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">23.75</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">USD Distributing</td>\n' +
+      '<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">23.87</td>\n' +
+      '<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">23.75</td>\n' +
+      '</tr>\n' +
+      '</tbody>\n' +
+      '</table>\n' +
+      '</div></div>\n' +
+      '</div>\n' +
+      '</li><li class="li_itemize preview-paragraph-14 preview-line 14" data_line_start="14" data_line_end="14" data_line="14,15" count_line="1" data_parent_line_start="0" data-custom-marker="true"><span class="li_level" data-custom-marker="true"></span>- testing 2</li></ul>'
+  },
+  {
+    latex: '\\begin{itemize}\n' +
+      '\\item[] - testing 1\n' +
+      '\n' +
+      '\\item[] 1. \\textbf{ \\textit{How did this financial product perform compared with the reference benchmark?}}\n' +
+      '\\begin{center}\n' +
+      '\n' +
+      '\\begin{tabular}{|l|l|l|}\n' +
+      '\\hline \\textbf{Share Class} & \\textbf{Fund Performance } & \\textbf{Reference} \\\\\n' +
+      '\\hline USD Accumulating & 23.87 & 23.75 \\\\\n' +
+      '\\hline USD Distributing & 23.87 & 23.75 \\\\\n' +
+      '\\hline\n' +
+      '\\end{tabular}\n' +
+      '\\end{center}\n' +
+      '\n' +
+      '\\item[] - testing 2\n' +
+      '\\end{itemize}',
+    html: '<ul class="itemize preview-paragraph-0 preview-line 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15" data_line_start="0" data_line_end="15" data_line="0,16" count_line="16" style="list-style-type: none"><li class="li_itemize preview-paragraph-1 preview-line 1 2" data_line_start="1" data_line_end="2" data_line="1,3" count_line="2" data_parent_line_start="0" data-custom-marker="true"><span class="li_level" data-custom-marker="true"></span>- testing 1</li><li class="li_itemize block preview-paragraph-3 preview-line 3 4 5 6 7 8 9 10 11 12 13" data_line_start="3" data_line_end="13" data_line="3,14" count_line="11" data_parent_line_start="0" data-custom-marker="true"><span class="li_level" data-custom-marker="true"></span><div>1. <strong><em>How did this financial product perform compared with the reference benchmark?</em></strong></div>\n' +
+      '<div class="center" style="text-align: center">\n' +
+      '<div class="table_tabular" style="text-align: center">\n' +
+      '<div class="inline-tabular"><table class="tabular">\n' +
+      '<tbody>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; "><strong>Share Class</strong></td>\n' +
+      '<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; "><strong>Fund Performance</strong></td>\n' +
+      '<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; "><strong>Reference</strong></td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">USD Accumulating</td>\n' +
+      '<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">23.87</td>\n' +
+      '<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">23.75</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">USD Distributing</td>\n' +
+      '<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">23.87</td>\n' +
+      '<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">23.75</td>\n' +
+      '</tr>\n' +
+      '</tbody>\n' +
+      '</table>\n' +
+      '</div></div>\n' +
+      '</div>\n' +
+      '</li><li class="li_itemize preview-paragraph-14 preview-line 14" data_line_start="14" data_line_end="14" data_line="14,15" count_line="1" data_parent_line_start="0" data-custom-marker="true"><span class="li_level" data-custom-marker="true"></span>- testing 2</li></ul>'
+  },
+  {
+    latex: '\\begin{enumerate}\n' +
+      '\\item[] - testing 1\n' +
+      '\n' +
+      '\\item[] - \\textbf{ \\textit{How did this financial product perform compared with the reference benchmark?}}\n' +
+      '\\begin{center}\n' +
+      '\n' +
+      '\\begin{tabular}{|l|l|l|}\n' +
+      '\\hline \\textbf{Share Class} & \\textbf{Fund Performance } & \\textbf{Reference} \\\\\n' +
+      '\\hline USD Accumulating & 23.87 & 23.75 \\\\\n' +
+      '\\hline USD Distributing & 23.87 & 23.75 \\\\\n' +
+      '\\hline\n' +
+      '\\end{tabular}\n' +
+      '\\end{center}',
+    html: '<ol class="enumerate decimal preview-paragraph-0 preview-line 0 1 2 3 4 5 6 7 8 9 10 11 12" data_line_start="0" data_line_end="12" data_line="0,13" count_line="13" style=" list-style-type: decimal"><div><li></li></div>\n' +
+      '<div><li></li></div>\n' +
+      '<div class="center" style="text-align: center">\n' +
+      '<div class="table_tabular" style="text-align: center">\n' +
+      '<div class="inline-tabular"><table class="tabular">\n' +
+      '<tbody>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; "><strong>Share Class</strong></td>\n' +
+      '<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; "><strong>Fund Performance</strong></td>\n' +
+      '<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; "><strong>Reference</strong></td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">USD Accumulating</td>\n' +
+      '<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">23.87</td>\n' +
+      '<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">23.75</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">USD Distributing</td>\n' +
+      '<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">23.87</td>\n' +
+      '<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">23.75</td>\n' +
+      '</tr>\n' +
+      '</tbody>\n' +
+      '</table>\n' +
+      '</div></div>\n' +
+      '</div>'
   }
-
 ];

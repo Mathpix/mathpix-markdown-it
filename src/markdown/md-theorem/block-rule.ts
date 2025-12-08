@@ -383,7 +383,13 @@ export const BeginTheorem: RuleBlock = (state, startLine, endLine, silent) => {
     }
   }
   
-  SetTokensBlockParse(state, resText, 0, 0, true, contentPositions, state.md.options?.forPptx);
+  SetTokensBlockParse(state, resText, {
+    startLine: 0,
+    endLine: 0,
+    isInline: true,
+    contentPositions,
+    forPptx: state.md.options?.forPptx
+  });
 
   token = state.push('theorem_close', 'div', -1);
   token.envStyle = envItem.style;

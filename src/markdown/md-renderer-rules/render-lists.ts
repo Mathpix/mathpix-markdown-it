@@ -9,6 +9,12 @@ import { isMathInText } from "../utils";
 var level_itemize = 0;
 var level_enumerate = 0;
 
+type MarkerInfo = {
+  htmlMarker: string;
+  dataAttr: string;
+};
+
+type ListItemRenderMode = 'open' | 'full';
 
 const list_injectLineNumbers = (tokens, idx, className = '') => {
   let line, endLine, listLine;
@@ -189,6 +195,117 @@ const generateHtmlForCustomMarker = (token, options, slf, env): {htmlMarker: str
   };
 };
 
+/**
+ * Builds HTML marker information for list items that define a custom marker.
+ *
+ * Extracts the rendered marker (HTML) and assembles the corresponding
+ * `data-*` attributes used for HTML and DOCX export.
+ */
+const buildCustomMarkerInfo = (token, options, slf, env): MarkerInfo => {
+  let dataAttrs: string[] = ['data-custom-marker="true"'];
+  const data = generateHtmlForCustomMarker(token, options, slf, env);
+  let htmlMarker = data.htmlMarker;
+  if (options.forDocx) {
+    dataAttrs.push(`data-custom-marker-type="${data.markerType}"`);
+    const content = data.markerType === 'text'
+      ? data.textContent
+      : token.marker;
+    dataAttrs.push(`data-custom-marker-content="${encodeURI(content)}"`);
+  }
+  const dataAttr: string = dataAttrs.length ? ' ' + dataAttrs.join(' ') : '';
+  return { htmlMarker, dataAttr };
+}
+
+/**
+ * Builds marker information for LaTeX-style itemize list items.
+ *
+ * If the token defines a custom marker, delegates to `buildCustomMarkerInfo`.
+ * Otherwise, derives the marker from the itemize level tokens and, when
+ * exporting to DOCX, attaches appropriate `data-*` attributes (including
+ * math markers and their raw LaTeX content).
+ */
+const buildItemizeMarkerInfo = (token, options, env, slf, level_itemize: number): MarkerInfo => {
+  const itemizeLevelTokens = GetItemizeLevelTokens(token.itemizeLevel);
+  let dataAttr: string = '';
+  let htmlMarker: string = '.';
+  if (token.hasOwnProperty('marker') && token.markerTokens) {
+    return buildCustomMarkerInfo(token, options, slf, env);
+  }
+  if (level_itemize > 0 && itemizeLevelTokens.length >= level_itemize) {
+    if (options.forDocx) {
+      const data = generateHtmlForMarkerTokens(itemizeLevelTokens[level_itemize - 1], slf, options, env);
+      htmlMarker = data.htmlMarker;
+      if (data.markerType === 'math') {
+        const itemizeLevel = GetItemizeLevel(token.itemizeLevelContents);
+        if (itemizeLevel.length >= level_itemize) {
+          dataAttr += ` data-custom-marker-content="${encodeURI(itemizeLevel[level_itemize - 1])}"`;
+        }
+        dataAttr += ' data-custom-marker="true"';
+        dataAttr += ` data-custom-marker-type="${data.markerType}"`;
+      }
+    } else {
+      htmlMarker = slf.renderInline(itemizeLevelTokens[level_itemize - 1], options, env);
+    }
+  }
+  return { htmlMarker, dataAttr };
+}
+
+/**
+ * Renders the core HTML for a LaTeX-style list item (`<li>`), handling both
+ * `enumerate` and `itemize` environments.
+ *
+ * Applies custom markers, DOCX-related `data-*` attributes, and line number
+ * injection, and can either return an "open" `<li>...` prefix (no content)
+ * or a fully closed `<li>...</li>` element depending on the mode.
+ */
+const renderLatexListItemCore = (tokens, index, options, env, slf, sContent: string | null, mode: ListItemRenderMode): string => {
+  const token = tokens[index];
+  // if not a latex list at all
+  if (token.parentType !== 'itemize' && token.parentType !== 'enumerate') {
+    return mode === 'open' ? '<li>' : `<li>${sContent}</li>`;
+  }
+  let dataAttr: string = '';
+  let htmlMarker: string = '';
+  const isEnumerate: boolean = token.parentType === 'enumerate';
+  // ENUMERATE
+  if (isEnumerate) {
+    const hasCustomMarker = token.hasOwnProperty('marker') && token.markerTokens;
+    if (hasCustomMarker) {
+      // line numbers
+      list_injectLineNumbers(tokens, index, 'li_enumerate not_number');
+      const markerInfo: MarkerInfo = buildCustomMarkerInfo(token, options, slf, env);
+      dataAttr += markerInfo.dataAttr;
+      htmlMarker = markerInfo.htmlMarker;
+      const prefix: string = `<li${slf.renderAttrs(token)}${dataAttr} style="display: block">` +
+        `<span class="li_level"${dataAttr}>${htmlMarker}</span>`;
+      if (mode === 'open') {
+        return prefix;
+      }
+      return `${prefix}${sContent}</li>`;
+    }
+    // regular numbered element
+    list_injectLineNumbers(tokens, index, mode === 'open' ? 'li_enumerate block' : 'li_enumerate');
+    const prefix = `<li${slf.renderAttrs(token)}>`;
+    if (mode === 'open') {
+      return prefix;
+    }
+    return `${prefix}${sContent}</li>`;
+  }
+  // ITEMIZE
+  const { htmlMarker: itemizeMarker, dataAttr: itemizeDataAttr } =
+    buildItemizeMarkerInfo(token, options, env, slf, level_itemize);
+  htmlMarker = itemizeMarker;
+  dataAttr += itemizeDataAttr || '';
+  list_injectLineNumbers(tokens, index, mode === 'open' ? 'li_itemize block' : 'li_itemize');
+  const prefix =
+    `<li${slf.renderAttrs(token)}${dataAttr}>` +
+    `<span class="li_level"${dataAttr}>${htmlMarker}</span>`;
+  if (mode === 'open') {
+    return prefix;
+  }
+  return `${prefix}${sContent}</li>`;
+}
+
 export const render_item_inline = (tokens, index, options, env, slf) => {
   const token = tokens[index];
   let sContent = '';
@@ -225,88 +342,11 @@ export const render_item_inline = (tokens, index, options, env, slf) => {
   if (!sContent) {
     sContent = '&nbsp';
   }
-  let dataAttr = '';
-  let htmlMarker = '';
-  if (token.parentType === "enumerate") {
-    if (token.hasOwnProperty('marker') && token.markerTokens) {
-      list_injectLineNumbers(tokens, index, `li_enumerate not_number`);
-      dataAttr += ' data-custom-marker="true"';
-      let data = generateHtmlForCustomMarker (token, options, slf, env);
-      htmlMarker = data.htmlMarker;
-      if (options.forDocx) {
-        dataAttr += ` data-custom-marker-type="${data.markerType}"`;
-        if (data.markerType === 'text') {
-          dataAttr += ` data-custom-marker-content="${encodeURI(data.textContent)}"`;
-        } else {
-          dataAttr += ` data-custom-marker-content="${encodeURI(token.marker)}"`;
-        }
-      }
-      return `<li${slf.renderAttrs(token)}${dataAttr} style="display: block"><span class="li_level"${dataAttr}>${htmlMarker}</span>${sContent}</li>`;
-    }
-    list_injectLineNumbers(tokens, index, `li_enumerate`);
-    return `<li${slf.renderAttrs(token)}>${sContent}</li>`;
-  } else {
-    const itemizeLevelTokens = GetItemizeLevelTokens(token.itemizeLevel);
-    if (token.hasOwnProperty('marker')  && token.markerTokens) {
-      dataAttr += ' data-custom-marker="true"';
-      let data = generateHtmlForCustomMarker (token, options, slf, env);
-      htmlMarker = data.htmlMarker;
-      if (options.forDocx) {
-        dataAttr += ` data-custom-marker-type="${data.markerType}"`;
-        if (data.markerType === 'text') {
-          dataAttr += ` data-custom-marker-content="${encodeURI(data.textContent)}"`;
-        } else {
-          dataAttr += ` data-custom-marker-content="${encodeURI(token.marker)}"`;
-        }
-      }
-    } else {
-      if (level_itemize > 0 && itemizeLevelTokens.length >= level_itemize) {
-        if (options.forDocx) {
-          let data = generateHtmlForMarkerTokens(itemizeLevelTokens[level_itemize-1], slf, options, env);
-          htmlMarker = data.htmlMarker;
-          if (data.markerType === 'math') {
-            let itemizeLevel = GetItemizeLevel(tokens[index].itemizeLevelContents);
-            if (itemizeLevel.length >= level_itemize) {
-              dataAttr += ` data-custom-marker-content="${encodeURI(itemizeLevel[level_itemize-1])}"`;
-            }
-            dataAttr += ' data-custom-marker="true"';
-            dataAttr += ` data-custom-marker-type="${data.markerType}"`;
-          }
-        } else {
-          htmlMarker = slf.renderInline(itemizeLevelTokens[level_itemize-1], options, env);
-        }
-      } else {
-        htmlMarker = '.';
-      }
-    }
-    list_injectLineNumbers(tokens, index, `li_itemize`);
-    return `<li${slf.renderAttrs(token)}${dataAttr}><span class="li_level"${dataAttr}>${htmlMarker}</span>${sContent}</li>`;
-  }
+  return renderLatexListItemCore(tokens, index, options, env, slf, sContent, 'full');
 };
 
 export const render_latex_list_item_open = (tokens, index, options, env, slf) => {
-  const token = tokens[index];
-  if (token.parentType !== "itemize" && token.parentType !== "enumerate") {
-    return `<li>`;
-  }
-
-  if (token.parentType === "enumerate") {
-    list_injectLineNumbers(tokens, index, `li_enumerate block`);
-    return `<li${slf.renderAttrs(token)}>`;
-  } else {
-    const itemizeLevelTokens = GetItemizeLevelTokens(token.itemizeLevel);
-
-    let span = '.';
-    if (token.marker && token.markerTokens) {
-      span = slf.renderInline(token.markerTokens, options, env)
-    } else {
-      span = level_itemize > 0 && itemizeLevelTokens.length >= level_itemize
-        ? slf.renderInline(itemizeLevelTokens[level_itemize-1], options, env)
-        : '.';
-    }
-    list_injectLineNumbers(tokens, index, `li_itemize block`);
-    return `<li${slf.renderAttrs(token)}><span class="li_level">${span}</span>`;
-  }
+  return renderLatexListItemCore(tokens, index, options, env, slf, null, 'open');
 };
 
 export const render_latex_list_item_close = () => {
