@@ -436,9 +436,11 @@ module.exports = [
       '\\hline USD Distributing & 23.87 & 23.75 \\\\\n' +
       '\\hline\n' +
       '\\end{tabular}\n' +
-      '\\end{center}',
-    html: '<ol class="enumerate decimal preview-paragraph-0 preview-line 0 1 2 3 4 5 6 7 8 9 10 11 12" data_line_start="0" data_line_end="12" data_line="0,13" count_line="13" style=" list-style-type: decimal"><div><li></li></div>\n' +
-      '<div><li></li></div>\n' +
+      '\\end{center}\n' +
+      '\n' +
+      '\\item[] - testing 2\n' +
+      '\\end{enumerate}',
+    html: '<ol class="enumerate decimal preview-paragraph-0 preview-line 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15" data_line_start="0" data_line_end="15" data_line="0,16" count_line="16" style=" list-style-type: decimal"><li class="li_enumerate not_number preview-paragraph-1 preview-line 1 2" data_line_start="1" data_line_end="2" data_line="1,3" count_line="2" data_parent_line_start="0" data-custom-marker="true" style="display: block"><span class="li_level" data-custom-marker="true"></span>- testing 1</li><li class="li_enumerate not_number preview-paragraph-3 preview-line 3 4 5 6 7 8 9 10 11 12 13" data_line_start="3" data_line_end="13" data_line="3,14" count_line="11" data_parent_line_start="0" data-custom-marker="true" style="display: block"><span class="li_level" data-custom-marker="true"></span><div>- <strong><em>How did this financial product perform compared with the reference benchmark?</em></strong></div>\n' +
       '<div class="center" style="text-align: center">\n' +
       '<div class="table_tabular" style="text-align: center">\n' +
       '<div class="inline-tabular"><table class="tabular">\n' +
@@ -461,6 +463,7 @@ module.exports = [
       '</tbody>\n' +
       '</table>\n' +
       '</div></div>\n' +
-      '</div>'
+      '</div>\n' +
+      '</li><li class="li_enumerate not_number preview-paragraph-14 preview-line 14" data_line_start="14" data_line_end="14" data_line="14,15" count_line="1" data_parent_line_start="0" data-custom-marker="true" style="display: block"><span class="li_level" data-custom-marker="true"></span>- testing 2</li></ol>'
   }
 ];
