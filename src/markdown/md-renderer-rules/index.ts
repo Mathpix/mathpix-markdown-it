@@ -22,6 +22,7 @@ export const InlineDecimal = (a, token) => {
 export const IncludeGraphics = (tokens, idx, options, env, slf): string => {
   const token: Token = tokens[idx];
   const RAW_WIDTH = token.attrGet('width') || '';
+  const RAW_MAX_WIDTH = token.attrGet('max width') || '';
   const RAW_HEIGHT = token.attrGet('height') || '';
   const SRC = token.attrGet('src') || '';
   const ALT = token.attrGet('alt') || '';
@@ -42,6 +43,7 @@ export const IncludeGraphics = (tokens, idx, options, env, slf): string => {
     imgStyles.push(`height: ${RAW_HEIGHT};`);
   }
 
+  let widthIsSet: boolean = false;
   // width
   // Support: 0.75\textwidth, \textwidth, 1\linewidth, etc.
   // Grab the factor (can be empty), then \textwidth|\linewidth
@@ -51,10 +53,28 @@ export const IncludeGraphics = (tokens, idx, options, env, slf): string => {
     const factor: number = Math.max(0, parseFloat(twMatch[1] ?? '1')) || 1;
     const pct: number = Math.min(100, factor * 100);
     imgStyles.push(`width: ${pct}%;`);
+    widthIsSet = true;
   } else if (RAW_WIDTH) {
     // Any other units (“300px”, “12cm”, “40%”, “10em”) — we give as is
     imgStyles.push(`width: ${RAW_WIDTH};`);
-  } else {
+    widthIsSet = true;
+  }
+  // max width
+  // Support: 0.75\textwidth, \textwidth, 1\linewidth, etc.
+  // Grab the factor (can be empty), then \textwidth|\linewidth
+  const twMaxMatch = RAW_MAX_WIDTH.match(TEXTWIDTH_RE);
+
+  if (twMaxMatch) {
+    const factor: number = Math.max(0, parseFloat(twMaxMatch[1] ?? '1')) || 1;
+    const pct: number = Math.min(100, factor * 100);
+    imgStyles.push(`max-width: ${pct}%;`);
+    widthIsSet = true;
+  } else if (RAW_MAX_WIDTH) {
+    // Any other units (“300px”, “12cm”, “40%”, “10em”) — we give as is
+    imgStyles.push(`max-width: ${RAW_MAX_WIDTH};`);
+    widthIsSet = true;
+  }
+  if (!widthIsSet) {
     // Width not specified
     /** max-width - prevent small images from being stretched */
     imgStyles.push('max-width: 50%;');
