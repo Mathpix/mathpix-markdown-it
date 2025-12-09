@@ -342,9 +342,12 @@ export const renderRuleImage = (tokens, idx, options, env, slf) => {
   // should be placed on proper position for tests.
   //
   // Replace content with actual value
-
-  token.attrs[token.attrIndex('alt')][1] =
-    slf.renderInlineAsText(token.children, options, env);
+  let renderInline = slf.renderInlineAsText(token.children, options, env);
+  if (!renderInline && token.content) {
+    const tokenText = {type: 'text', content: token.content};
+    renderInline = slf.renderInlineAsText([tokenText], options, env);
+  }
+  token.attrs[token.attrIndex('alt')][1] = renderInline;
 
   const canBeBlock = tokens.length === 1 
     || (tokenBeforeType === 'softbreak' && !tokenAfterType)
