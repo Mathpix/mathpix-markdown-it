@@ -119,7 +119,6 @@ export const imageWithSize: RuleInline = (state, silent) => {
     res,
     title,
     token,
-    tokens,
     start,
     href = '',
     oldPos = state.pos,
@@ -290,17 +289,9 @@ export const imageWithSize: RuleInline = (state, silent) => {
   // so all that's left to do is to call tokenizer.
   //
   if (!silent) {
-    content = state.src.slice(labelStart, labelEnd);
-
-    state.md.inline.parse(
-      content,
-      state.md,
-      state.env,
-      tokens = []
-    );
-
+    content = state.src.slice(labelStart, labelEnd) || '';
     token          = state.push('image', 'img', 0);
-    attrs = [ [ 'src', href ], [ 'alt', '' ] ];
+    attrs = [ [ 'src', href ], [ 'alt', content ] ];
     if (state.md.options?.enableFileLinks && pathOrigin) {
       attrs.push(['data-origin-src', pathOrigin])
     }
@@ -312,7 +303,7 @@ export const imageWithSize: RuleInline = (state, silent) => {
       }
     }
     token.attrs = attrs;
-    token.children = tokens;
+    token.children = [];
     token.content  = content;
     token.inlinePos = {
       start: 0,
@@ -342,12 +333,15 @@ export const renderRuleImage = (tokens, idx, options, env, slf) => {
   // should be placed on proper position for tests.
   //
   // Replace content with actual value
-  let renderInline = slf.renderInlineAsText(token.children, options, env);
-  if (!renderInline && token.content) {
-    const tokenText = {type: 'text', content: token.content};
-    renderInline = slf.renderInlineAsText([tokenText], options, env);
+  const altIndex = token.attrIndex('alt');
+  const content = token.content || '';
+  if (altIndex < 0) {
+    token.attrs.push(['alt', content]);
+  } else {
+    if (!token.attrs[altIndex][1]) {
+      token.attrs[altIndex][1] = content;
+    }
   }
-  token.attrs[token.attrIndex('alt')][1] = renderInline;
 
   const canBeBlock = tokens.length === 1 
     || (tokenBeforeType === 'softbreak' && !tokenAfterType)

@@ -1,4 +1,5 @@
 import { Renderer, Token } from 'markdown-it';
+const escapeHtml = require('markdown-it/lib/common/utils').escapeHtml;
 import { TEXTWIDTH_RE } from '../common/consts';
 
 export const CaptionTable: Renderer = (tokens, idx, options, env, slf) => {
@@ -83,7 +84,7 @@ export const IncludeGraphics = (tokens, idx, options, env, slf): string => {
   const divStyleAttr: string = wrapperStyles.length ? ` style="${wrapperStyles.join(' ')}"` : '';
   const imgStyleAttr: string = imgStyles.length ? ` style="${imgStyles.join(' ')}"` : '';
   const srcAttr: string = SRC ? ` src="${SRC}"` : '';
-  const altAttr: string = ` alt="${ALT.replace(/"/g, '&quot;')}"`;
+  const altAttr: string = ` alt="${escapeHtml(ALT)}"`;
 
   return `<div class="figure_img"${divStyleAttr}><${TAG}${srcAttr}${altAttr}${imgStyleAttr}${TAG === 'img' ? '/' : ''}>${TAG === 'img' ? '' : '</' + TAG + '>'}</div>`;
 };
