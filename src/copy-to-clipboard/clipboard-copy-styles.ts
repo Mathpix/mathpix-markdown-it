@@ -18,6 +18,20 @@ export const clipboardCopyStyles = () => `
   transition-duration: .1s;
 }
 
+td .mmd-clipboard-copy-container {
+  line-height: 0;
+}
+
+td .ClipboardButton {
+    margin: 1px;
+    line-height: 0;
+}
+
+td .ClipboardButton .mmd-clipboard-icon {
+    margin: 1px !important;
+    transform: scale(0.6);
+}
+
 .mmd-clipboard-icon {
   fill: currentColor;
   vertical-align: text-bottom;

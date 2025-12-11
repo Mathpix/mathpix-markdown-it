@@ -9,4 +9,4 @@
  * - Each attribute may be "key=value" or just "key" (interpreted as `true`).
  * - Whitespace around keys/values is trimmed.
  */
-export declare const parseAttributes: (str: string) => Record<string, string | true>;
+export declare const parseAttributes: (str: string) => Record<string, string | boolean>;

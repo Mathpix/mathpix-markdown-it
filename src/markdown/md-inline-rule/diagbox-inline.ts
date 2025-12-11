@@ -53,7 +53,7 @@ export const inlineDiagbox: RuleInline = (state: StateInline, silent: boolean): 
     if (match[1] === 'slashbox') {
       isSW = true;
     }
-    const attributes: Record<string, string | true> = parseAttributes(options);
+    const attributes: Record<string, string | boolean> = parseAttributes(options);
     if (attributes?.dir === 'SW' || attributes?.dir === 'NE') {
       isSW = true;
     }

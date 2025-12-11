@@ -21,7 +21,7 @@ export declare const getExtractedCodeBlockContent: (inputStr: string, i: number)
 /**
  * Post-process inline code-like items in an array of results:
  * for items of the given `type` replace their content using
- * `getMathTableContent`.
+ * `getExtractedCodeBlockContent`.
  */
 export declare const codeInlineContent: (res: any, type?: string) => any;
 /**
