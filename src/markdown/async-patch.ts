@@ -142,6 +142,8 @@ export function applyAsyncPatch() {
     const sliceMs = opts.sliceMs || 30;
     const rules = this.ruler.getRules('');
     const len = rules.length;
+    const maxNesting = state.md.options.maxNesting;
+    const end = state.posMax;
 
     return new Promise<void>((resolve, reject) => {
       function step() {
@@ -149,20 +151,29 @@ export function applyAsyncPatch() {
         try {
           // This is the same logic as in sync tokenize,
           // just wrapped in "until we go beyond sliceMs"
-          while (state.pos < state.posMax && (Date.now() - start) < sliceMs) {
+          while (state.pos < end && (Date.now() - start) < sliceMs) {
             var i, ok = false;
             // copy of the body from ParserInline.prototype.tokenize:
-            // - iterate over the rules
-            // - each rule moves state.pos / creates tokens
-            for (i = 0; i < len; i++) {
-              ok = rules[i](state, false);
-              if (ok) break;
+            // Try all possible rules.
+            // On success, rule should:
+            //
+            // - update `state.pos`
+            // - update `state.tokens`
+            // - return true
+            if (state.level < maxNesting) {
+              for (i = 0; i < len; i++) {
+                ok = rules[i](state, false);
+                if (ok) { break; }
+              }
             }
-
-            if (!ok) {
-              // safety, so as not to get stuck
-              state.pending += state.src[state.pos++];
+            if (ok) {
+              if (state.pos >= end) { break; }
+              continue;
             }
+            state.pending += state.src[state.pos++];
+          }
+          if (state.pending) {
+            state.pushPending();
           }
         } catch (e) {
           return reject(e);
