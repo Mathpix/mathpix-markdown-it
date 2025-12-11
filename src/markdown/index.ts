@@ -6,9 +6,10 @@ import { injectRenderRules } from "./rules";
 import { MathpixMarkdownModel as MM, TMarkdownItOptions, ParserErrors } from '../mathpix-markdown-model';
 import { applyRulesToDisableRules, getDisableRuleTypes, getListToDisableByOptions } from "./common/mmdRulesToDisable";
 import { eMmdRuleType } from "./common/mmdRules";
+import { applyAsyncPatch } from './async-patch';
 
 /** md renderer */
-const mdInit = (options: TMarkdownItOptions) => {
+const mdInit = (options: TMarkdownItOptions, asyncParsing = false) => {
   const {htmlTags = false, htmlDisableTagMatching = false, xhtmlOut = false, width = 1200, breaks = true, typographer = true, linkify = true,
           outMath = {}, mathJax = {}, renderElement = {},
           lineNumbering = false, startLine = 0, htmlSanitize = true, smiles = {},
@@ -35,6 +36,11 @@ const mdInit = (options: TMarkdownItOptions) => {
     previewUuid = "",
     enableSizeCalculation = false
   } = options;
+
+  if (asyncParsing) {
+    applyAsyncPatch();
+  }
+
   const mmdOptions = {
     width: width,
     outMath: outMath,
@@ -61,7 +67,8 @@ const mdInit = (options: TMarkdownItOptions) => {
     copyToClipboard: copyToClipboard,
     renderOptions: renderOptions,
     previewUuid: previewUuid,
-    enableSizeCalculation: enableSizeCalculation
+    enableSizeCalculation: enableSizeCalculation,
+    asyncParsing: asyncParsing
   };
   const disableRuleTypes: eMmdRuleType[] = renderOptions ? getDisableRuleTypes(renderOptions) : [];
   let md = require("markdown-it")({
@@ -249,6 +256,27 @@ export function markdownToHTMLSegments(markdown: string, options: TMarkdownItOpt
 export function markdownToHTML(markdown: string, options: TMarkdownItOptions = {}): string {
   try {
     return markdownToHtmlPipeline(markdown, options);
+  } catch (e) {
+    console.log("ERROR=>[markdownToHTML]=>");
+    console.error(e);
+    return '';
+  }
+}
+
+export const markdownToHtmlPipelineAsync = async (content: string, options: TMarkdownItOptions = {}) => {
+  let md = mdInit(options, true);
+  // inject rules override
+  md = injectRenderRules(md);
+  if (MM.disableRules && MM.disableRules.length > 0) {
+    const disableRules: string[] = applyRulesToDisableRules(md, MM.disableRules, []);
+    md.disable(disableRules, true);
+  }
+  return await md.renderAsync(content, {}, {});
+};
+
+export const markdownToHTMLAsync = async (markdown: string, options: TMarkdownItOptions = {}) => {
+  try {
+    return await markdownToHtmlPipelineAsync(markdown, options);
   } catch (e) {
     console.log("ERROR=>[markdownToHTML]=>");
     console.error(e);

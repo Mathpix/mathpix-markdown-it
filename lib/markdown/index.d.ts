@@ -35,3 +35,5 @@ export declare function markdownToHTMLSegments(markdown: string, options?: TMark
  * convert a markdown text to html
  */
 export declare function markdownToHTML(markdown: string, options?: TMarkdownItOptions): string;
+export declare const markdownToHtmlPipelineAsync: (content: string, options?: TMarkdownItOptions) => Promise<any>;
+export declare const markdownToHTMLAsync: (markdown: string, options?: TMarkdownItOptions) => Promise<any>;

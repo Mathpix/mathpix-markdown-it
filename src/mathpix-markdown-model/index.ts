@@ -1,5 +1,7 @@
 import {checkFormula} from './check-formula';
-import {markdownToHTML as markdownHTML, markdownToHTMLSegments} from "../markdown";
+import {markdownToHTML as markdownHTML,
+  markdownToHTMLAsync,
+  markdownToHTMLSegments} from "../markdown";
 import {MathpixStyle, PreviewStyle, TocStyle, resetBodyStyles} from "../styles";
 import { ContainerStyle } from "../styles/styles-container";
 import { codeStyles } from "../styles/styles-code";
@@ -69,6 +71,7 @@ export interface optionsMathpixMarkdown {
     copyToClipboard?: boolean;
     renderOptions?: RenderOptions;
     previewUuid?: string;
+    asyncParsing?: boolean;
 }
 
 export type TMarkdownItOptions = {
@@ -122,6 +125,7 @@ export type TMarkdownItOptions = {
   renderOptions?: RenderOptions;
   previewUuid?: string;
   enableSizeCalculation?: boolean;
+  asyncParsing?: boolean;
 }
 
 export type TOutputMath = {
@@ -291,6 +295,40 @@ class MathpixMarkdown_Model {
     const disableRules = isDisableFancy ? this.disableFancyArrayDef : options ? options.disableRules || [] : [];
     this.setOptions(disableRules);
     let html = markdownHTML(markdown, options);
+    if (!lineNumbering) {
+      MathJax.Reset();
+      // if (html.indexOf('clickable-link') !== -1) {
+      //   html = this.checkEquationNumber(html);
+      // }
+    }
+
+    if (!htmlWrapper) {
+      return html;
+    }
+
+    if (typeof htmlWrapper !== "boolean") {
+      const title = htmlWrapper.title
+        ? htmlWrapper.title
+        : '';
+
+      const styles = htmlWrapper.includeStyles
+        ? `<style>${this.getMathpixStyle(true)}</style>`
+        : '';
+      const fonts = htmlWrapper.includeFonts
+        ? '<link rel="stylesheet" href="https://cdn.mathpix.com/fonts/cmu.css"/>'
+        : '';
+      return generateHtmlPage(title, html, styles, fonts);
+    }
+
+    return generateHtmlPage('Title', html, '', '');
+  };
+
+  markdownToHTMLAsync = async (markdown: string, options: TMarkdownItOptions = {}) => {
+    debugger
+    const { lineNumbering = false, isDisableFancy = false,  htmlWrapper = false } = options;
+    const disableRules = isDisableFancy ? this.disableFancyArrayDef : options ? options.disableRules || [] : [];
+    this.setOptions(disableRules);
+    let html = await markdownToHTMLAsync(markdown, options);
     if (!lineNumbering) {
       MathJax.Reset();
       // if (html.indexOf('clickable-link') !== -1) {
@@ -543,7 +581,8 @@ class MathpixMarkdown_Model {
           footnotes = {},
           copyToClipboard = false,
           renderOptions = null,
-          previewUuid = ''
+          previewUuid = '',
+          asyncParsing = false
         }
          = options || {};
 
@@ -594,7 +633,8 @@ class MathpixMarkdown_Model {
           footnotes: footnotes,
           copyToClipboard: copyToClipboard,
           renderOptions: renderOptions,
-          previewUuid: previewUuid
+          previewUuid: previewUuid,
+          asyncParsing: asyncParsing
         };
 
         const styleFontSize = fontSize ? ` font-size: ${options.fontSize}px;` : '';
