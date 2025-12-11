@@ -23,13 +23,13 @@ td .mmd-clipboard-copy-container {
 }
 
 td .ClipboardButton {
-    margin: 1px;
-    line-height: 0;
+  margin: 1px;
+  line-height: 0;
 }
 
 td .ClipboardButton .mmd-clipboard-icon {
-    margin: 1px !important;
-    transform: scale(0.6);
+  margin: 1px !important;
+  transform: scale(0.6);
 }
 
 .mmd-clipboard-icon {
