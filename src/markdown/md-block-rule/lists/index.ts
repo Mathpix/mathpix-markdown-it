@@ -1,6 +1,7 @@
 import { RuleBlock, Token } from 'markdown-it';
 import {SetItemizeLevelTokens, GetItemizeLevelTokensByState, GetEnumerateLevel} from "./re-level";
 import { SetTokensBlockParse } from"../helper";
+import { BEGIN_LST_INLINE_RE, END_LST_INLINE_RE } from "../../common/consts";
 export enum TBegin {itemize = 'itemize', enumerate = 'enumerate'};
 const openTag: RegExp = /\\begin\s{0,}\{(itemize|enumerate)\}/;
 export const bItemTag: RegExp = /^(?:item\s{0,}\[([^\]]*)\]|item)/;
@@ -346,6 +347,82 @@ export const ReRenderListsItem:RuleBlock = (state, startLine: number, endLine: n
   return true
 };
 
+interface LstEndResult {
+  handled: boolean;             // true, если был найден end и обработан
+  envDepth: number;
+  items: any[];
+  lineText: string;             // остаток строки ПОСЛЕ \end{...} (если он есть)
+}
+
+const handleLstBeginInline = (
+  lineText: string,
+  envDepth: number,
+  items: any[],
+  nextLine: number,
+  dStart: number,
+  itemTag: RegExp
+): LstEndResult => {
+  // If already inside lstlisting, do nothing.
+  if (envDepth > 0) {
+    return { handled: false, envDepth, items, lineText };
+  }
+  const mb: RegExpMatchArray = BEGIN_LST_INLINE_RE.exec(lineText);
+  if (!mb) {
+    return { handled: false, envDepth, items, lineText };
+  }
+  const beginIndex: number = mb.index;
+  // Is there text BEFORE \begin{lstlisting} ?
+  const before: string = lineText.slice(0, beginIndex).trimEnd();
+  const afterBegin: string = lineText.slice(beginIndex); // start from \begin...
+  // If there was something before begin, it was regular text/part of \item:
+  if (before.length > 0) {
+    if (itemTag.test(before)) {
+      items = ItemsListPush(items, before, nextLine + dStart, nextLine + dStart);
+    } else {
+      items = ItemsAddToPrev(items, before, nextLine);
+    }
+  }
+  envDepth = 1; //entered lstlisting
+  items = ItemsAddToPrev(items, afterBegin, nextLine);//The part from \begin{lstlisting} to the end of the line is considered a code string.
+  return { handled: true, envDepth, items, lineText };
+}
+
+const handleLstEndInline = (
+  lineText: string,
+  envDepth: number,
+  items: any[],
+  nextLine: number,
+  state
+): LstEndResult => {
+  // If we are not inside lstlisting, we exit
+  if (envDepth === 0) {
+    return { handled: false, envDepth, items, lineText };
+  }
+  const me: RegExpMatchArray = END_LST_INLINE_RE.exec(lineText);
+  if (!me) {
+    // There is no end of environment - just add the line as is
+    lineText = state.src.slice(state.bMarks[nextLine], state.eMarks[nextLine]); // It is important to take into account the leading whitespace characters.
+    items = ItemsAddToPrev(items, lineText, nextLine);
+    return { handled: true, envDepth, items, lineText };
+  }
+  // There is an end of environment in this line
+  const endIndex: number = me.index;
+  const endToken: string = lineText.slice(endIndex, endIndex + me[0].length);
+  const beforeEnd: string = lineText.slice(0, endIndex);
+  const afterEnd: string = lineText.slice(endIndex + me[0].length);
+  // Everything up to \end{...} is a continuation of the code
+  if (beforeEnd.length > 0) {
+    items = ItemsAddToPrev(items, beforeEnd + '\n' + endToken, nextLine);
+  } else {
+    items = ItemsAddToPrev(items, endToken, nextLine);
+  }
+  envDepth = 0; // Exit lstlisting
+  if (!afterEnd?.trim()?.length) {
+    return { handled: true, envDepth, items, lineText: '' };
+  }
+  return { handled: false, envDepth, items, lineText: afterEnd };
+}
+
 export const Lists:RuleBlock = (state, startLine: number, endLine: number, silent) => {
   const openTag: RegExp = /\\begin\s{0,}\{(itemize|enumerate)\}/;
   const itemTag: RegExp = /\\item/;
@@ -392,10 +469,31 @@ export const Lists:RuleBlock = (state, startLine: number, endLine: number, silen
   let items = [];
 
   let haveClose = false;
+  let envDepth: number = 0; // >0 — we are in the code environment
   for (; nextLine < endLine; nextLine++) {
     pos = state.bMarks[nextLine] + state.tShift[nextLine];
     max = state.eMarks[nextLine];
     lineText = state.src.slice(pos, max);
+    // 1) If you are NOT currently inside lstlisting, first search for \begin{lstlisting}
+    if (envDepth === 0) {
+      const beginRes: LstEndResult = handleLstBeginInline(lineText, envDepth, items, nextLine, dStart, itemTag);
+      envDepth = beginRes.envDepth;
+      if (beginRes.handled) {
+        continue; // this line is already fully processed
+      }
+      lineText = beginRes.lineText;
+    }
+    // 2) If we are inside lstlisting, we search for \end{lstlisting}
+    if (envDepth > 0) {
+      const endRes: LstEndResult = handleLstEndInline(lineText, envDepth, items, nextLine, state);
+      envDepth = endRes.envDepth;
+      items = endRes.items;
+      if (endRes.handled) {
+        continue;
+      }
+      lineText = endRes.lineText;
+    }
+
     if (setcounterTag.test(lineText)) {
       match = lineText.match(setcounterTag);
       if (match && state.md.options && state.md.options.forLatex) {

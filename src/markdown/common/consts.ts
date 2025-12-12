@@ -116,6 +116,8 @@ export const CODE_ENVS = new Set(['lstlisting']);
 export const BEGIN_LST_FAST_RE: RegExp = /^\\begin\{lstlisting\}/;
 export const END_LST_RE = /^\\end\{lstlisting\}\s*$/;
 export const BEGIN_LST_RE = /^\\begin\{lstlisting\}(?:\[(.*?)\])?\s*$/;
+export const BEGIN_LST_INLINE_RE = /\\begin\{lstlisting\}(?:\[(.*?)\])?/;
+export const END_LST_INLINE_RE   = /\\end\{lstlisting\}/;
 /** Horizontal spaces (no CR/LF) + at most one newline (CRLF or LF), optional */
 const HSPACE_PLUS_ONE_NL_OPT = String.raw`(?:[^\S\r\n]*\r?\n)?`;
 /** Full begin line: \begin{lstlisting}[...]( +hspace +≤1 NL ) */

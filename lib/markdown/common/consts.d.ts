@@ -83,6 +83,8 @@ export declare const CODE_ENVS: Set<string>;
 export declare const BEGIN_LST_FAST_RE: RegExp;
 export declare const END_LST_RE: RegExp;
 export declare const BEGIN_LST_RE: RegExp;
+export declare const BEGIN_LST_INLINE_RE: RegExp;
+export declare const END_LST_INLINE_RE: RegExp;
 /** Full begin line: \begin{lstlisting}[...]( +hspace +≤1 NL ) */
 export declare const BEGIN_LST_WITH_TRAIL_WS_NL_RE: RegExp;
 export declare const LST_HLJS_LANGUAGES: {
