@@ -44,7 +44,7 @@ const ListItemsBlock = (state, items) => {
 
 const ListItems = (state, items, iLevel, eLevel, li, iOpen, iLevelC) => {
   let token;
-  const blockStartTag: RegExp = /\\begin{(center|left|right|table|figure|tabular)}/;
+  const blockStartTag: RegExp = /\\begin{(center|left|right|table|figure|tabular|lstlisting)}/;
   let padding = 0;
   if (items && items.length > 0) {
     if (items && items.length > 0) {
