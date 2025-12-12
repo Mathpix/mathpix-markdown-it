@@ -98,6 +98,7 @@ export declare const HIGHLIGHT_COLOR = "rgba(0, 147, 255, 0.25)";
 export declare const HIGHLIGHT_TEXT_COLOR = "#1e2029";
 export declare const TEXTWIDTH_RE: RegExp;
 export declare const SIMPLE_MATH_DELIM_RE: RegExp;
+export declare const RE_EMPTY_TEXT: RegExp;
 export declare const latexEnvironments: string[];
 /** https://docs.mathjax.org/en/v3.0-latest/input/tex/macros/index.html#environments */
 export declare const mathEnvironments: string[];

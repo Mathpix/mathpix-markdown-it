@@ -139,6 +139,7 @@ export const TEXTWIDTH_RE = /^\s*(\d*\.?\d+)?\s*\\(?:textwidth|linewidth)\b/;
 // Matches unescaped `$$` delimiters (e.g. "$$...$$"), not inside backticks.
 // Group 1 ensures the $$ is either at the start or not preceded by a backslash.
 export const SIMPLE_MATH_DELIM_RE: RegExp = /(^|[^\\])\$\$(?!\$)/g;
+export const RE_EMPTY_TEXT = /^[\s\u00a0]*$/;
 export const latexEnvironments = [
   "figure",
   "table",
