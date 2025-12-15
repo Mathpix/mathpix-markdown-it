@@ -51,6 +51,7 @@ export interface optionsMathpixMarkdown {
     copyToClipboard?: boolean;
     renderOptions?: RenderOptions;
     previewUuid?: string;
+    asyncParsing?: boolean;
 }
 export type TMarkdownItOptions = {
     isDisableFancy?: boolean;
@@ -103,6 +104,7 @@ export type TMarkdownItOptions = {
     renderOptions?: RenderOptions;
     previewUuid?: string;
     enableSizeCalculation?: boolean;
+    asyncParsing?: boolean;
 };
 export type TOutputMath = {
     include_mathml?: boolean;
@@ -225,7 +227,15 @@ declare class MathpixMarkdown_Model {
             number
         ][];
     };
+    markdownToHTMLSegmentsAsync: (markdown: string, options?: TMarkdownItOptions) => Promise<{
+        content: string;
+        map: [
+            number,
+            number
+        ][];
+    }>;
     markdownToHTML: (markdown: string, options?: TMarkdownItOptions) => string;
+    markdownToHTMLAsync: (markdown: string, options?: TMarkdownItOptions) => Promise<any>;
     showTocInContainer: (html: string, containerName?: string) => void;
     getTocContainerHTML: (html: string, onlyContent?: boolean) => string;
     checkEquationNumber: (html: string) => string;

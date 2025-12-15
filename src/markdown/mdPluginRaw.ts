@@ -32,7 +32,8 @@ import {
   setCounterTheorem,
   theoremStyle
 } from './md-theorem/inline-rule';
-import {coreInline} from './md-inline-rule/core-inline';
+import { coreInline } from './md-inline-rule/core-inline';
+import { coreInlineAsync } from './md-inline-rule/core-inline-async';
 import {refsInline, refInsideMathDelimiter} from './md-inline-rule/refs';
 import {hardBreak, softBreak} from './md-renderer-rules/breaks';
 import { clearLabelsList, getLabelByKeyFromLabelsList, ILabel } from "./common/labels";
@@ -860,7 +861,11 @@ export default options => {
       : [];
     /** Replace inline core rule */
     if (!disableRuleTypes.includes(eMmdRuleType.latex)) {
-      md.core.ruler.at('inline', coreInline);
+      const rule: any = (state) => coreInline(state);
+      if (md.options.asyncParsing) {
+        rule.async = coreInlineAsync;
+      }
+      md.core.ruler.at('inline', rule);
     }
 
     Object.keys(mapping).forEach(key => {
