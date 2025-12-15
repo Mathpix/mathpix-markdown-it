@@ -13,23 +13,42 @@ global.DOMParser = jsdom.window.DOMParser;
 
 
 describe('Check Footnotes:', () => {
-  const html = MM.markdownToHTML(mmdContent);
-  it('Checking result html', (done) => {
+  it('(sync) Checking result html', () => {
+    const html = MM.markdownToHTML(mmdContent);
     html.trim().should.equal(htmlContent);
-    done();
+    MM.texReset();
   });
-  MM.texReset();
+  it('(async) Checking result html', async () => {
+    const html = await MM.markdownToHTMLAsync(mmdContent);
+    html.trim().should.equal(htmlContent);
+    MM.texReset();
+  });
+  it('(async segments) Checking result html', async () => {
+    let { content } = await MM.markdownToHTMLSegmentsAsync(mmdContent);
+    content.trim().should.equal(htmlContent);
+    MM.texReset();
+  });
 });
 
 describe('Check Footnotes with compact_refs option set to true:', () => {
-  const html = MM.markdownToHTML(mmdContent, {
+  const options = {
     footnotes: {
       compact_refs: true
     }
-  });
-  it('Checking result html', (done) => {
+  };
+  it('(sync) Checking result html', () => {
+    const html = MM.markdownToHTML(mmdContent, options);
     html.trim().should.equal(htmlContentFootnote_compact_refs);
-    done();
+    MM.texReset();
   });
-  MM.texReset();
+  it('(async) Checking result html', async () => {
+    const html = await MM.markdownToHTMLAsync(mmdContent, options);
+    html.trim().should.equal(htmlContentFootnote_compact_refs);
+    MM.texReset();
+  });
+  it('(async segments) Checking result html', async () => {
+    let { content } = await MM.markdownToHTMLSegmentsAsync(mmdContent, options);
+    content.trim().should.equal(htmlContentFootnote_compact_refs);
+    MM.texReset();
+  });
 });

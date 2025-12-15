@@ -24,7 +24,7 @@ describe('Check tables and figures with captions:', () => {
         let html = await MM.markdownToHTMLAsync(test.latex);
         html.trim().should.equal(test.html);
       });
-      it('(async  segments) Checking result html', async () => {
+      it('(async segments) Checking result html', async () => {
         MM.texReset();
         let { content } = await MM.markdownToHTMLSegmentsAsync(test.latex);
         content.trim().should.equal(test.html);
