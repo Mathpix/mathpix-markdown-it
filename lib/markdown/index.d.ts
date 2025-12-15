@@ -25,12 +25,48 @@ export declare const markdownToHtmlPipelineSegments: (content: string, options?:
         number
     ][];
 };
+/**
+ * Asynchronously converts Markdown content into segmented HTML with position mapping.
+ *
+ * This async version mirrors `markdownToHtmlPipelineSegments`, but uses the async
+ * markdown-it pipeline (core/block/inline `parseAsync`) to avoid long event-loop
+ * blocking on large documents. It installs the same segmented HTML renderer and
+ * returns both the concatenated HTML string and a mapping array describing the
+ * start/end indices of each segment.
+ *
+ * Segmentation logic is identical to the synchronous version: HTML is grouped
+ * into logical chunks based on markdown token structure, including special
+ * handling for block math inside lists.
+ *
+ * @param {string} content - The Markdown input to convert.
+ * @param {TMarkdownItOptions} [options={}] - Parser configuration options.
+ * @param {{ sliceMs?: number }} [parseOpts] - Time-slicing options used by the async parser.
+ * @returns {Promise<{ content: string; map: [number, number][] }>} Resolves with:
+ *   - content: the combined HTML output string,
+ *   - map: an array of [start, end] offsets for each HTML segment.
+ */
+export declare const markdownToHtmlPipelineSegmentsAsync: (content: string, options?: TMarkdownItOptions, parseOpts?: {
+    sliceMs?: number;
+}) => Promise<{
+    content: string;
+    map: [
+        number,
+        number
+    ][];
+}>;
 /** String transformtion pipeline */
 export declare const markdownToHtmlPipeline: (content: string, options?: TMarkdownItOptions) => any;
 export declare function markdownToHTMLSegments(markdown: string, options?: TMarkdownItOptions): {
     content: string;
     map: [number, number][];
 };
+export declare const markdownToHTMLSegmentsAsync: (markdown: string, options?: TMarkdownItOptions) => Promise<{
+    content: string;
+    map: [
+        number,
+        number
+    ][];
+}>;
 /**
  * convert a markdown text to html
  */

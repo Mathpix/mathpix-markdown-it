@@ -1,7 +1,9 @@
 import {checkFormula} from './check-formula';
 import {markdownToHTML as markdownHTML,
   markdownToHTMLAsync,
-  markdownToHTMLSegments} from "../markdown";
+  markdownToHTMLSegments,
+  markdownToHTMLSegmentsAsync,
+} from "../markdown";
 import {MathpixStyle, PreviewStyle, TocStyle, resetBodyStyles} from "../styles";
 import { ContainerStyle } from "../styles/styles-container";
 import { codeStyles } from "../styles/styles-code";
@@ -290,6 +292,13 @@ class MathpixMarkdown_Model {
     return markdownToHTMLSegments(markdown, options);
   }
 
+  markdownToHTMLSegmentsAsync = async (markdown: string, options: TMarkdownItOptions = {}): Promise<{ content: string; map: [number, number][] }> => {
+    const { isDisableFancy = false } = options;
+    const disableRules = isDisableFancy ? this.disableFancyArrayDef : options ? options.disableRules || [] : [];
+    this.setOptions(disableRules);
+    return await markdownToHTMLSegmentsAsync(markdown, options);
+  }
+
   markdownToHTML = (markdown: string, options: TMarkdownItOptions = {}):string => {
     const { lineNumbering = false, isDisableFancy = false,  htmlWrapper = false } = options;
     const disableRules = isDisableFancy ? this.disableFancyArrayDef : options ? options.disableRules || [] : [];
@@ -324,7 +333,6 @@ class MathpixMarkdown_Model {
   };
 
   markdownToHTMLAsync = async (markdown: string, options: TMarkdownItOptions = {}) => {
-    debugger
     const { lineNumbering = false, isDisableFancy = false,  htmlWrapper = false } = options;
     const disableRules = isDisableFancy ? this.disableFancyArrayDef : options ? options.disableRules || [] : [];
     this.setOptions(disableRules);

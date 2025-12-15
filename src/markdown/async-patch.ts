@@ -24,7 +24,7 @@ export function applyAsyncPatch() {
 
         const rule = rules[i++];
         const name = self.ruler.getRulesNames
-          ? self.ruler.getRulesNames('')[i - 1]  // если сделаешь такой helper
+          ? self.ruler.getRulesNames('')[i - 1]
           : rule.name || 'core_rule_' + (i - 1);
 
         const start = Date.now();
@@ -34,7 +34,7 @@ export function applyAsyncPatch() {
             .then(() => {
               const dur = Date.now() - start;
               if (dur > 200) {
-                console.log('[MMD][SLOW][coreRule] async ', name, 'took', dur, 'ms');
+                console.log('[MMD][SLOW][coreRule] async "', name, '" took', dur, 'ms');
               }
               setImmediate(nextRule);
             })
@@ -44,7 +44,7 @@ export function applyAsyncPatch() {
             rule(state);
             const dur = Date.now() - start;
             if (dur > 200) {
-              console.log('[MMD][SLOW][coreRule]', name, 'took', dur, 'ms');
+              console.log('[MMD][SLOW][coreRule] "', name, '" took', dur, 'ms');
             }
           } catch (e) {
             return reject(e);
@@ -93,7 +93,7 @@ export function applyAsyncPatch() {
               const rDur = Date.now() - rStart;
 
               if (rDur > 200) {
-                console.log('[MMD][SLOW][blockRule]', ruleFn.name || ('rule_' + i), 'took', rDur, 'ms at line', line);
+                console.log('[MMD][SLOW][blockRule] "', ruleFn.name || ('rule_' + i), '" took', rDur, 'ms at line', line);
               }
               if (ok) break;
             }

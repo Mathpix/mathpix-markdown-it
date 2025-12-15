@@ -13,11 +13,21 @@ global.DOMParser = jsdom.window.DOMParser;
 
 describe('Check tables and figures with captions:', () => {
   tests.forEach(function(test) {
-    const html = MM.markdownToHTML(test.latex);
     describe('Latex => ' + test.latex, () => {
-      it('Checking result html', (done) => {
+      it('(sync) Checking result html', () => {
+        MM.texReset();
+        const html = MM.markdownToHTML(test.latex);
         html.trim().should.equal(test.html);
-        done();
+      });
+      it('(async) Checking result html', async () => {
+        MM.texReset();
+        let html = await MM.markdownToHTMLAsync(test.latex);
+        html.trim().should.equal(test.html);
+      });
+      it('(async  segments) Checking result html', async () => {
+        MM.texReset();
+        let { content } = await MM.markdownToHTMLSegmentsAsync(test.latex);
+        content.trim().should.equal(test.html);
       });
     });
   });

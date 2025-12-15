@@ -227,6 +227,13 @@ declare class MathpixMarkdown_Model {
             number
         ][];
     };
+    markdownToHTMLSegmentsAsync: (markdown: string, options?: TMarkdownItOptions) => Promise<{
+        content: string;
+        map: [
+            number,
+            number
+        ][];
+    }>;
     markdownToHTML: (markdown: string, options?: TMarkdownItOptions) => string;
     markdownToHTMLAsync: (markdown: string, options?: TMarkdownItOptions) => Promise<any>;
     showTocInContainer: (html: string, containerName?: string) => void;
