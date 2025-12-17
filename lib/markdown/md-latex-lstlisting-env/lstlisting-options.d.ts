@@ -1,3 +1,5 @@
+import type StateBlock from 'markdown-it/lib/rules_block/state_block';
+import type StateInline from 'markdown-it/lib/rules_inline/state_inline';
 export type ParsedLstLanguage = {
     /** Base language name, e.g. "Ada" or "Assembler". */
     name: string;
@@ -16,4 +18,4 @@ export type ParsedLstLanguage = {
  *
  * This function mutates the given token in-place.
  */
-export declare const applyLstListingOptionsToToken: (token: any, content: string, opts: string | null | undefined, state: any) => void;
+export declare const applyLstListingOptionsToToken: (token: Token, content: string, opts: string | null | undefined, state: StateInline | StateBlock) => void;

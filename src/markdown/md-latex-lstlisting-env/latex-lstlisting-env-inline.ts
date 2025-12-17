@@ -32,10 +32,8 @@ const findEndOfLstlisting = (src: string, from: number): number => {
 const parseBeginLstlistingAt = (src: string, pos: number): { opts: string; after: number } | null => {
   const tail: string = src.slice(pos);
   if (!BEGIN_LST_FAST_RE.test(tail)) return null;
-
   const match: RegExpMatchArray = tail.match(BEGIN_LST_WITH_TRAIL_WS_NL_RE);
   if (!match) return null;
-
   const opts = (match[1] || '').trim();
   return { opts, after: pos + match[0].length };
 }
@@ -49,26 +47,20 @@ const parseBeginLstlistingAt = (src: string, pos: number): { opts: string; after
 export const latexLstlistingEnvInlineRule = (state: StateInline, silent: boolean): boolean => {
   const { src } = state;
   const pos = state.pos;
-
   // must start with '\' and literally '\begin{...}' here
   if (src.charCodeAt(pos) !== 0x5c /* \ */) return false;
   if (!src.startsWith('\\begin{', pos)) return false;
-
   const begin = parseBeginLstlistingAt(src, pos);
   if (!begin) return false;
-
   // find \end{lstlisting}
   const endBegin = begin.after;
   const endPos = findEndOfLstlisting(src, endBegin);
   if (endPos === -1) return false;
-
   const endTagLen = '\\end{lstlisting}'.length;
   const endTagEnd = endPos + endTagLen;
-
   if (!silent) {
     const raw = src.slice(endBegin, endPos);
     const content = normalizeContentByEndPosition(raw, src, endPos);
-
     const token: Token = state.push('latex_lstlisting_env', 'pre', 0);
     token.block = false;                // remain in the inline flow
     token.content = content;
@@ -77,7 +69,6 @@ export const latexLstlistingEnvInlineRule = (state: StateInline, silent: boolean
       applyLstListingOptionsToToken(token, content, begin.opts, state);
     }
   }
-
   state.pos = endTagEnd; // advance cursor past the end tag
   return true;
 };

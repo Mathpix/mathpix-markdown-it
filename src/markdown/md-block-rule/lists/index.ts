@@ -347,13 +347,43 @@ export const ReRenderListsItem:RuleBlock = (state, startLine: number, endLine: n
   return true
 };
 
+/**
+ * Result of handling a potential inline `\begin{lstlisting}` occurrence.
+ *
+ * @property handled  Whether the current line was handled (matched a begin).
+ * @property envDepth Updated lstlisting environment depth after handling.
+ * @property items    Aggregated items list (possibly updated).
+ * @property lineText The (unchanged) original line text.
+ */
 interface LstEndResult {
-  handled: boolean;             // true, если был найден end и обработан
+  handled: boolean;
   envDepth: number;
   items: any[];
-  lineText: string;             // остаток строки ПОСЛЕ \end{...} (если он есть)
+  lineText: string;
 }
 
+/**
+ * Try to handle an inline `\begin{lstlisting}` on the given line.
+ *
+ * Behavior:
+ * - If already inside a lstlisting environment (`envDepth > 0`), does nothing.
+ * - If a `\begin{lstlisting}` is found:
+ *   - Text before the begin is appended either as a new list item (when it matches `itemTag`)
+ *     or concatenated to the previous item.
+ *   - Sets `envDepth` to 1 (entered lstlisting).
+ *   - Appends the substring starting at `\begin{lstlisting}` to the end of the line
+ *     as code content in the current item.
+ *
+ * The function does not mutate inputs; it returns the updated state.
+ *
+ * @param lineText The full text of the current line.
+ * @param envDepth Current lstlisting nesting depth.
+ * @param items    Collected items so far (list builder state).
+ * @param nextLine The current (next) line index used for item position metadata.
+ * @param dStart   Document start line offset to compute absolute positions.
+ * @param itemTag  RegExp to detect list item prefixes (e.g., `^\s*\\item`).
+ * @returns Updated handling result with flags, depth, items, and original line text.
+ */
 const handleLstBeginInline = (
   lineText: string,
   envDepth: number,
@@ -387,6 +417,28 @@ const handleLstBeginInline = (
   return { handled: true, envDepth, items, lineText };
 }
 
+/**
+ * Try to handle an inline `\end{lstlisting}` on the current line.
+ *
+ * Behavior:
+ * - If not inside an lstlisting environment (`envDepth === 0`), does nothing.
+ * - If no end marker is found on this line, appends the full line (with original leading whitespace)
+ *   to the current item and reports `handled: true` (still inside the env).
+ * - If an end marker is present:
+ *   - Appends everything up to `\end{...}` (plus the end token itself) to the current item.
+ *   - Resets `envDepth` to 0 (leaves lstlisting).
+ *   - If there is trailing text after the end token, returns it in `lineText` so the caller
+ *     can continue processing the remainder of the line; otherwise returns an empty `lineText`.
+ *
+ * The function does not mutate inputs; it returns the updated state.
+ *
+ * @param lineText Current line text (may contain `\end{lstlisting}`).
+ * @param envDepth Current lstlisting nesting depth (0 if outside).
+ * @param items    Accumulated items list (list builder state).
+ * @param nextLine Line index used for item position metadata.
+ * @param state    Markdown-It state (used to read the original line with indentation).
+ * @returns Updated result with flags, depth, items, and remaining line text (if any).
+ */
 const handleLstEndInline = (
   lineText: string,
   envDepth: number,

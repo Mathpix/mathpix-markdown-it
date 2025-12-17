@@ -1,6 +1,9 @@
+import type StateBlock from 'markdown-it/lib/rules_block/state_block';
+import type StateInline from 'markdown-it/lib/rules_inline/state_inline';
+import type Token from 'markdown-it/lib/token';
 import { parseAttributes } from '../common/parse-attribures';
 import { parseMathEscapeInline } from './parse-math-escape-inline';
-import {LST_HLJS_LANGUAGES} from "../common/consts";
+import { LST_HLJS_LANGUAGES } from "../common/consts";
 
 export type ParsedLstLanguage = {
   /** Base language name, e.g. "Ada" or "Assembler". */
@@ -32,33 +35,28 @@ const parseLstLanguage = (raw: string | null | undefined): ParsedLstLanguage => 
   if (!raw) {
     return { name: '', dialect: null, hlName: '' };
   }
-
   // 1. Trim whitespace
-  let s = raw.trim();
+  let s: string = raw.trim();
   if (!s) {
     return { name: '', dialect: null, hlName: '' };
   }
-
   // 2. Strip surrounding quotes, if present
-  const firstChar = s[0];
-  const lastChar = s[s.length - 1];
+  const firstChar: string = s[0];
+  const lastChar: string = s[s.length - 1];
   if (
     (firstChar === '"' && lastChar === '"') ||
     (firstChar === "'" && lastChar === "'")
   ) {
     s = s.slice(1, -1).trim();
   }
-
   // 3. Strip single outer curly braces { ... }, if present
   if (s.startsWith('{') && s.endsWith('}')) {
     s = s.slice(1, -1).trim();
   }
-
   let dialect: string | null = null;
   let name: string;
-
   if (s.startsWith('[')) {
-    const closing = s.indexOf(']');
+    const closing: number = s.indexOf(']');
     if (closing > 0) {
       dialect = s.slice(1, closing).trim();   // e.g. "2005"
       name = s.slice(closing + 1).trim();     // e.g. "Ada"
@@ -69,7 +67,6 @@ const parseLstLanguage = (raw: string | null | undefined): ParsedLstLanguage => 
   } else {
     name = s;
   }
-
   const hlName = name ? (LST_HLJS_LANGUAGES[name.toLowerCase()] ?? name) : '';
   return { name, dialect, hlName };
 }
@@ -86,25 +83,21 @@ const parseLstLanguage = (raw: string | null | undefined): ParsedLstLanguage => 
  * This function mutates the given token in-place.
  */
 export const applyLstListingOptionsToToken = (
-  token: any,               // markdown-it Token (can be typed explicitly)
+  token: Token,
   content: string,
   opts: string | null | undefined,
-  state: any                // markdown-it state (StateInline/StateBlock)
+  state: StateInline | StateBlock
 ): void => {
   if (!opts) return;
-
   const attributes = parseAttributes(opts) ?? {};
-
-  const languageValue: string =
-    typeof attributes.language === 'string' ? attributes.language : null;
-
+  const languageValue: string = typeof attributes.language === 'string'
+    ? attributes.language
+    : null;
   const parsedLanguage: ParsedLstLanguage = languageValue
     ? parseLstLanguage(languageValue)
     : null;
-
   const meta = token.meta ?? (token.meta = {});
   meta.language = parsedLanguage;
-
   if (attributes.mathescape) {
     // parse only math inside the code (no links/emphasis)
     token.children = parseMathEscapeInline(state.md, content, state.env);

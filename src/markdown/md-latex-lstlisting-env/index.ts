@@ -1,4 +1,5 @@
-import { MarkdownIt } from 'markdown-it';
+import MarkdownIt from 'markdown-it';
+import type Ruler from 'markdown-it/lib/ruler';
 import { latexLstlistingEnvBlockRule } from "./latex-lstlisting-env-block";
 import { latexLstlistingEnvInlineRule } from "./latex-lstlisting-env-inline";
 import { makeLatexLstlistingEnvRendererWithMd } from "./render-latex-lstlisting-env";
@@ -11,9 +12,11 @@ import { makeLatexLstlistingEnvRendererWithMd } from "./render-latex-lstlisting-
  * - Installs a custom renderer for `latex_lstlisting_env` tokens.
  */
 export default function pluginLatexCodeEnvs(md: MarkdownIt) {
-  md.block.ruler.before('fence', 'latex_lstlisting_env_block', latexLstlistingEnvBlockRule, {
+  const blockRuler: Ruler = md.block.ruler;
+  blockRuler.before('fence', 'latex_lstlisting_env_block', latexLstlistingEnvBlockRule, {
     alt: ['paragraph', 'reference', 'blockquote', 'list']
   });
-  md.inline.ruler.before('escape', 'latex_lstlisting_env_inline', latexLstlistingEnvInlineRule);
+  const inlineRuler: Ruler = md.inline.ruler;
+  inlineRuler.before('escape', 'latex_lstlisting_env_inline', latexLstlistingEnvInlineRule);
   md.renderer.rules.latex_lstlisting_env = makeLatexLstlistingEnvRendererWithMd(md);
 }

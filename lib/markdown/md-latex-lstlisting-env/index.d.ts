@@ -1,4 +1,4 @@
-import { MarkdownIt } from 'markdown-it';
+import MarkdownIt from 'markdown-it';
 /**
  * Markdown-It plugin that adds support for LaTeX `lstlisting`-like code environments.
  *
