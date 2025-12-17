@@ -124,6 +124,20 @@ Struck with Hatching text: \xout{Text with hatching pattern!}
 
 ![](doc/images/latex-underline/latex-underline_07.png)
 
+- [Latex lstlisting env](doc/latex-lstlisting-env.md)
+
+```tex
+\begin{lstlisting}[language=C, mathescape]
+/* the following code computes $\displaystyle\sum_{i=1}^{n}i$ */
+
+for (i = 1; i <= limit; i++) {
+  sum += i;
+}
+\end{lstlisting}
+```
+
+![](doc/images/latex-lstlisting-env/latex-lstlisting-env-01.png)
+
 # What is mathpix-markdown-it? 
 
 **mathpix-markdown-it** is an open source implementation of the mathpix-markdown spec written in Typescript.

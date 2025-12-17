@@ -7,7 +7,14 @@ export const SetTokensBlockParse = (state, content, startLine?, endLine?, isInli
   for (let j = 0; j < children.length; j++) {
     const child = children[j];
     token = state.push(child.type, child.tag, child.nesting);
-    token.attrs = child.attrs;
+    token = Object.assign(token, {
+      attrs: child.attrs,
+      content: child.content,
+      children: child.children,
+      info: child.info,
+      markup: child.markup,
+      meta: child.meta,
+    })
     if (isInline && j === 0 && token.type === "paragraph_open") {
       if (token.attrs) {
         const style = token.attrGet('style');
@@ -30,8 +37,6 @@ export const SetTokensBlockParse = (state, content, startLine?, endLine?, isInli
         token.bMarks = contentPositions.bMarks
       }
     }
-    token.content = child.content;
-    token.children = child.children;
 
     if (forPptx && isInline && isFirst && token.type === "paragraph_close") {
       token = state.push('paragraph_close', 'div', -1);

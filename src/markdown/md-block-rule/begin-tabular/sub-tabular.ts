@@ -2,6 +2,7 @@ import {TTokenTabular} from "./index";
 import { generateUniqueId, getContent } from "./common";
 import { doubleAngleBracketUuidPattern, singleAngleBracketPattern } from "../../common/consts";
 import { findInDiagboxTable } from "./sub-cell";
+import { getExtractedCodeBlockContent } from "./sub-code";
 
 type TSubTabular = {
   id: string,
@@ -55,6 +56,7 @@ export const pushSubTabular = (
 export const getSubTabular = (sub: string, i: number, isCell: boolean = true, forLatex = false): Array<TTokenTabular> | null => {
   let res: Array<TTokenTabular> = [];
   let lastIndex: number = 0;
+  sub = getExtractedCodeBlockContent(sub, 0);
   sub = sub.trim();
   if (isCell) {sub = getContent(sub)}
 

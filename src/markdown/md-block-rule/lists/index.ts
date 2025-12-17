@@ -1,6 +1,7 @@
 import { RuleBlock, Token } from 'markdown-it';
 import {SetItemizeLevelTokens, GetItemizeLevelTokensByState, GetEnumerateLevel} from "./re-level";
 import { SetTokensBlockParse } from"../helper";
+import { BEGIN_LST_INLINE_RE, END_LST_INLINE_RE } from "../../common/consts";
 export enum TBegin {itemize = 'itemize', enumerate = 'enumerate'};
 const openTag: RegExp = /\\begin\s{0,}\{(itemize|enumerate)\}/;
 export const bItemTag: RegExp = /^(?:item\s{0,}\[([^\]]*)\]|item)/;
@@ -44,7 +45,7 @@ const ListItemsBlock = (state, items) => {
 
 const ListItems = (state, items, iLevel, eLevel, li, iOpen, iLevelC) => {
   let token;
-  const blockStartTag: RegExp = /\\begin{(center|left|right|table|figure|tabular)}/;
+  const blockStartTag: RegExp = /\\begin{(center|left|right|table|figure|tabular|lstlisting)}/;
   let padding = 0;
   if (items && items.length > 0) {
     if (items && items.length > 0) {
@@ -346,6 +347,134 @@ export const ReRenderListsItem:RuleBlock = (state, startLine: number, endLine: n
   return true
 };
 
+/**
+ * Result of handling a potential inline `\begin{lstlisting}` occurrence.
+ *
+ * @property handled  Whether the current line was handled (matched a begin).
+ * @property envDepth Updated lstlisting environment depth after handling.
+ * @property items    Aggregated items list (possibly updated).
+ * @property lineText The (unchanged) original line text.
+ */
+interface LstEndResult {
+  handled: boolean;
+  envDepth: number;
+  items: any[];
+  lineText: string;
+}
+
+/**
+ * Try to handle an inline `\begin{lstlisting}` on the given line.
+ *
+ * Behavior:
+ * - If already inside a lstlisting environment (`envDepth > 0`), does nothing.
+ * - If a `\begin{lstlisting}` is found:
+ *   - Text before the begin is appended either as a new list item (when it matches `itemTag`)
+ *     or concatenated to the previous item.
+ *   - Sets `envDepth` to 1 (entered lstlisting).
+ *   - Appends the substring starting at `\begin{lstlisting}` to the end of the line
+ *     as code content in the current item.
+ *
+ * The function does not mutate inputs; it returns the updated state.
+ *
+ * @param lineText The full text of the current line.
+ * @param envDepth Current lstlisting nesting depth.
+ * @param items    Collected items so far (list builder state).
+ * @param nextLine The current (next) line index used for item position metadata.
+ * @param dStart   Document start line offset to compute absolute positions.
+ * @param itemTag  RegExp to detect list item prefixes (e.g., `^\s*\\item`).
+ * @returns Updated handling result with flags, depth, items, and original line text.
+ */
+const handleLstBeginInline = (
+  lineText: string,
+  envDepth: number,
+  items: any[],
+  nextLine: number,
+  dStart: number,
+  itemTag: RegExp
+): LstEndResult => {
+  // If already inside lstlisting, do nothing.
+  if (envDepth > 0) {
+    return { handled: false, envDepth, items, lineText };
+  }
+  const mb: RegExpMatchArray = BEGIN_LST_INLINE_RE.exec(lineText);
+  if (!mb) {
+    return { handled: false, envDepth, items, lineText };
+  }
+  const beginIndex: number = mb.index;
+  // Is there text BEFORE \begin{lstlisting} ?
+  const before: string = lineText.slice(0, beginIndex).trimEnd();
+  const afterBegin: string = lineText.slice(beginIndex); // start from \begin...
+  // If there was something before begin, it was regular text/part of \item:
+  if (before.length > 0) {
+    if (itemTag.test(before)) {
+      items = ItemsListPush(items, before, nextLine + dStart, nextLine + dStart);
+    } else {
+      items = ItemsAddToPrev(items, before, nextLine);
+    }
+  }
+  envDepth = 1; //entered lstlisting
+  items = ItemsAddToPrev(items, afterBegin, nextLine);//The part from \begin{lstlisting} to the end of the line is considered a code string.
+  return { handled: true, envDepth, items, lineText };
+}
+
+/**
+ * Try to handle an inline `\end{lstlisting}` on the current line.
+ *
+ * Behavior:
+ * - If not inside an lstlisting environment (`envDepth === 0`), does nothing.
+ * - If no end marker is found on this line, appends the full line (with original leading whitespace)
+ *   to the current item and reports `handled: true` (still inside the env).
+ * - If an end marker is present:
+ *   - Appends everything up to `\end{...}` (plus the end token itself) to the current item.
+ *   - Resets `envDepth` to 0 (leaves lstlisting).
+ *   - If there is trailing text after the end token, returns it in `lineText` so the caller
+ *     can continue processing the remainder of the line; otherwise returns an empty `lineText`.
+ *
+ * The function does not mutate inputs; it returns the updated state.
+ *
+ * @param lineText Current line text (may contain `\end{lstlisting}`).
+ * @param envDepth Current lstlisting nesting depth (0 if outside).
+ * @param items    Accumulated items list (list builder state).
+ * @param nextLine Line index used for item position metadata.
+ * @param state    Markdown-It state (used to read the original line with indentation).
+ * @returns Updated result with flags, depth, items, and remaining line text (if any).
+ */
+const handleLstEndInline = (
+  lineText: string,
+  envDepth: number,
+  items: any[],
+  nextLine: number,
+  state
+): LstEndResult => {
+  // If we are not inside lstlisting, we exit
+  if (envDepth === 0) {
+    return { handled: false, envDepth, items, lineText };
+  }
+  const me: RegExpMatchArray = END_LST_INLINE_RE.exec(lineText);
+  if (!me) {
+    // There is no end of environment - just add the line as is
+    lineText = state.src.slice(state.bMarks[nextLine], state.eMarks[nextLine]); // It is important to take into account the leading whitespace characters.
+    items = ItemsAddToPrev(items, lineText, nextLine);
+    return { handled: true, envDepth, items, lineText };
+  }
+  // There is an end of environment in this line
+  const endIndex: number = me.index;
+  const endToken: string = lineText.slice(endIndex, endIndex + me[0].length);
+  const beforeEnd: string = lineText.slice(0, endIndex);
+  const afterEnd: string = lineText.slice(endIndex + me[0].length);
+  // Everything up to \end{...} is a continuation of the code
+  if (beforeEnd.length > 0) {
+    items = ItemsAddToPrev(items, beforeEnd + '\n' + endToken, nextLine);
+  } else {
+    items = ItemsAddToPrev(items, endToken, nextLine);
+  }
+  envDepth = 0; // Exit lstlisting
+  if (!afterEnd?.trim()?.length) {
+    return { handled: true, envDepth, items, lineText: '' };
+  }
+  return { handled: false, envDepth, items, lineText: afterEnd };
+}
+
 export const Lists:RuleBlock = (state, startLine: number, endLine: number, silent) => {
   const openTag: RegExp = /\\begin\s{0,}\{(itemize|enumerate)\}/;
   const itemTag: RegExp = /\\item/;
@@ -392,10 +521,31 @@ export const Lists:RuleBlock = (state, startLine: number, endLine: number, silen
   let items = [];
 
   let haveClose = false;
+  let envDepth: number = 0; // >0 — we are in the code environment
   for (; nextLine < endLine; nextLine++) {
     pos = state.bMarks[nextLine] + state.tShift[nextLine];
     max = state.eMarks[nextLine];
     lineText = state.src.slice(pos, max);
+    // 1) If you are NOT currently inside lstlisting, first search for \begin{lstlisting}
+    if (envDepth === 0) {
+      const beginRes: LstEndResult = handleLstBeginInline(lineText, envDepth, items, nextLine, dStart, itemTag);
+      envDepth = beginRes.envDepth;
+      if (beginRes.handled) {
+        continue; // this line is already fully processed
+      }
+      lineText = beginRes.lineText;
+    }
+    // 2) If we are inside lstlisting, we search for \end{lstlisting}
+    if (envDepth > 0) {
+      const endRes: LstEndResult = handleLstEndInline(lineText, envDepth, items, nextLine, state);
+      envDepth = endRes.envDepth;
+      items = endRes.items;
+      if (endRes.handled) {
+        continue;
+      }
+      lineText = endRes.lineText;
+    }
+
     if (setcounterTag.test(lineText)) {
       match = lineText.match(setcounterTag);
       if (match && state.md.options && state.md.options.forLatex) {

@@ -5,7 +5,12 @@ import { getParams } from './common';
 import {StatePushIncludeGraphics} from "../../md-inline-rule/includegraphics";
 import { getSubCode, codeInlineContent } from "./sub-code";
 import { findOpenCloseTags } from "../../utils";
-import { openTagTabular, closeTagTabular } from "../../common/consts";
+import {
+  openTagTabular,
+  closeTagTabular,
+  BEGIN_LST_RE,
+  END_LST_RE
+} from "../../common/consts";
 
 export const openTag: RegExp = /(?:\\begin\s{0,}{tabular}\s{0,}\{([^}]*)\})/;
 export const openTagG: RegExp = /(?:\\begin\s{0,}{tabular}\s{0,}\{([^}]*)\})/g;
@@ -272,12 +277,9 @@ export const BeginTabular: RuleBlock = (state, startLine: number, endLine: numbe
     iOpen -= dataTags.arrClose.length;
     isCloseTagExist = true;
   }
-
+  let envDepth = 0; // >0 — we are in the code environment
   for (; nextLine <= endLine; nextLine++) {
     dataTags = null;
-    if (state.isEmpty(nextLine)) { 
-      break 
-    }
     if (lineText === '') {
       if (iOpen === 0) {
         break;
@@ -291,6 +293,21 @@ export const BeginTabular: RuleBlock = (state, startLine: number, endLine: numbe
     pos = state.bMarks[nextLine] + state.tShift[nextLine];
     max = state.eMarks[nextLine];
     lineText = state.src.slice(pos, max);
+
+    let mb: RegExpMatchArray = lineText.match(BEGIN_LST_RE);
+    if (mb) {
+      envDepth++;
+    } else {
+      const me: RegExpMatchArray = lineText.match(END_LST_RE);
+      if (me && envDepth > 0) envDepth--;
+    }
+    if (state.isEmpty(nextLine)) {
+      if (envDepth > 0) {            // inside the code - just add and continue
+        resString += '\n';
+        continue;
+      }
+      break;
+    }
 
     if (iOpen > 0) {
       dataTags = findOpenCloseTags(lineText, openTagTabular, closeTagTabular, pending);
@@ -308,7 +325,7 @@ export const BeginTabular: RuleBlock = (state, startLine: number, endLine: numbe
       //if (state.isEmpty(nextLine)) { break }
     }
 
-    resString += '\n' + lineText;
+    resString += '\n' + state.src.slice(state.bMarks[nextLine], state.eMarks[nextLine]);
     if (state.sCount[nextLine] - state.blkIndent > 3) { continue; }
 
     // quirk for blockquotes, this line should already be checked by that rule

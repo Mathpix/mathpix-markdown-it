@@ -2,6 +2,7 @@ import { findBackTick } from "./utils";
 import {
   RE_CAPTION_SETUP_TAG_BEGIN,
   RE_CAPTION_TAG_BEGIN,
+  RE_EMPTY_TEXT,
   terminatedRules
 } from './common/consts';
 
@@ -18,6 +19,7 @@ export const isSpace = (code) => {
     return false;
 }
 
+export const isWhitespace = (s: string) => s == null || RE_EMPTY_TEXT.test(s);
 export const slugify = (s: string) => encodeURIComponent(String(s).trim().toLowerCase().replace(/\s+/g, '-'));
 
 export const uniqueSlug = (slug: string, slugs) => {
