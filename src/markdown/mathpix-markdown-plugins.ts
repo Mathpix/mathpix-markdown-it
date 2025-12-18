@@ -14,8 +14,8 @@ import {
   mdPluginList,
   mdPluginChemistry,
   mdPluginSvgToBase64, 
-  mdLatexFootnotes
-
+  mdLatexFootnotes,
+  mdPluginLatexCodeEnvs
 } from "./mdPluginConfigured";
 import { validateLinkEnableFile } from "./mdOptions";
 import { injectLabelIdToParagraph } from "./rules";
@@ -76,6 +76,7 @@ export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
   md
     .use(mdPluginChemistry, smiles)
     .use(mdPluginTableTabular)
+    .use(mdPluginLatexCodeEnvs)
     .use(mdPluginList)
     .use(mdPluginMathJax({}))
     .use(mdPluginText())

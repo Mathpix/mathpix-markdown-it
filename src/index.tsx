@@ -15,7 +15,8 @@ import {
   mdPluginChemistry, 
   mdPluginCollapsible,
   mdLatexFootnotes,
-  mdSetPositionsAndHighlight
+  mdSetPositionsAndHighlight,
+  mdPluginLatexCodeEnvs
 } from "./markdown/mdPluginConfigured";
 
 import {
@@ -53,7 +54,7 @@ export {
   mdLatexFootnotes,
   mdSetPositionsAndHighlight,
   initMathpixMarkdown,
-  mdPluginMathJax, mdPluginHighlightCode, mdPluginText, mdPluginTOC, mdPluginAnchor, mdPluginTableTabular, mdPluginList, mdPluginChemistry,
+  mdPluginMathJax, mdPluginHighlightCode, mdPluginText, mdPluginTOC, mdPluginAnchor, mdPluginTableTabular, mdPluginLatexCodeEnvs, mdPluginList, mdPluginChemistry,
   TMarkdownItOptions, optionsMathpixMarkdown, TOutputMath, TOutputMathJax, THtmlSanitize,
   ISmilesOptions,
   resetTheoremEnvironments,

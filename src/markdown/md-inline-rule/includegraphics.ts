@@ -3,28 +3,81 @@ import * as parseLinkDestination from 'markdown-it/lib/helpers/parse_link_destin
 import { includegraphicsTag, includegraphicsTagB } from "./utils";
 import { normalizeLink } from "../../helpers/normalize-link";
 
-const parseParams = (str: string, align: string=''): {attr: Array<Array<string>>, align: string} |null => {
-  if(!str) { return null}
-  let params = [];
+const parseParams = (str: string, align: string = ''): { attr: Array<[string, string]>, align: string } | null => {
+  if (!str || !str.trim()) return null;
+  const res: Array<[string, string]> = [];
   let style: string = '';
-  const res = [];
-  str = str.replace(/ /g, '');
-  if (str) {
-    params = str.split(',')
-  }
-  for (let i = 0; i < params.length; i++) {
-    const param = params[i].split('=');
-    if ( ['left', 'right', 'center'].indexOf(param[0]) >= 0) {
-      align = param[0];
+  let alt: string = '';
+  // 1. Split the parameters by commas, taking into account the depth of the curly braces
+  const parts: string[] = [];
+  let buf: string = '';
+  let depth: number = 0;
+  for (let i = 0; i < str.length; i++) {
+    const ch: string = str[i];
+    if (ch === '{') {
+      depth++;
+      buf += ch;
+    } else if (ch === '}') {
+      depth = Math.max(0, depth - 1);
+      buf += ch;
+    } else if (ch === ',' && depth === 0) {
+      if (buf.trim()) parts.push(buf.trim());
+      buf = '';
+    } else {
+      buf += ch;
     }
-    switch (param[0]) {
+  }
+  if (buf.trim()) {
+    parts.push(buf.trim());
+  }
+  // 2. For each parameter, look for the first '=' outside the brackets
+  for (const part of parts) {
+    let key: string = '';
+    let value: string = '';
+    depth = 0;
+    let eqIndex: number = -1;
+    for (let i = 0; i < part.length; i++) {
+      const ch: string = part[i];
+      if (ch === '{') {
+        depth++;
+      } else if (ch === '}') {
+        depth = Math.max(0, depth - 1);
+      } else if (ch === '=' && depth === 0) {
+        eqIndex = i;
+        break;
+      }
+    }
+    if (eqIndex === -1) {
+      // Parameter without '=' can be interpreted as a flag (e.g. align)
+      key = part.trim();
+      value = '';
+    } else {
+      key = part.slice(0, eqIndex).trim();
+      value = part.slice(eqIndex + 1).trim();
+    }
+    // remove outer { } around value:
+    if (value.startsWith('{') && value.endsWith('}')) {
+      value = value.slice(1, -1);
+    }
+    if (['left', 'right', 'center'].includes(key)) {
+      align = key;
+    }
+    switch (key) {
       case 'width':
-        style += `${param[0]}: ${param[1]};`;
-        res.push(['width', param[1]]);
+        style += `width: ${value};`;
+        res.push(['width', value]);
+        break;
+      case 'max width':
+        style += `max-width: ${value};`;
+        res.push(['max width', value]);
         break;
       case 'height':
-        style += `${param[0]}: ${param[1]};`;
-        res.push(['height', param[1]]);
+        style += `height: ${value};`;
+        res.push(['height', value]);
+        break;
+      case 'alt':
+        res.push(['alt', value]);
+        alt = value;
         break;
       default:
         break;
@@ -33,8 +86,11 @@ const parseParams = (str: string, align: string=''): {attr: Array<Array<string>>
   if (align) {
     res.push(['align', align]);
   }
+  if (!alt) {
+    res.push(['alt', '']);
+  }
   res.push(['style', style]);
-  return style ? {attr: res,  align: align}: null;
+  return { attr: res, align };
 };
 
 const getAttrIncludeGraphics = (match: RegExpMatchArray, align: string) =>  {
@@ -47,7 +103,7 @@ const getAttrIncludeGraphics = (match: RegExpMatchArray, align: string) =>  {
   const params = match[1] ? match[1].replace(/\]|\[/g, ''): '';
 
   const styles: {attr:Array<Array<string>>, align:string} = parseParams(params, align);
-  let attrs = [[ 'src', href ], [ 'alt', '' ]];
+  let attrs = [[ 'src', href ]];
   if (styles) {
     attrs = attrs.concat(styles.attr);
   }

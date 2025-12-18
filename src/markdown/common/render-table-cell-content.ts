@@ -2,6 +2,8 @@ import { TsvJoin } from "./tsv";
 import { CsvJoin } from "./csv";
 import { getMdForChild, getMdLink } from "./table-markdown";
 import { mathTokenTypes } from "./consts";
+import { isWhitespace } from "../common";
+const escapeHtml = require('markdown-it/lib/common/utils').escapeHtml;
 
 export const renderTableCellContent = (token, isSubTable: boolean, options, env, slf) => {
   let content: string = '';
@@ -14,6 +16,15 @@ export const renderTableCellContent = (token, isSubTable: boolean, options, env,
       const child = token.children[j];
       if (child.type === "tabular_inline" || isSubTable) {
         child.isSubTable = true;
+      }
+      if ((options.forDocx || options.forPptx) &&
+        child.type === 'text' && isWhitespace(child.content)) {
+        const prev = token.children[j - 1];
+        const next = token.children[j + 1];
+        if (prev?.type === 'latex_lstlisting_env' && next?.type === 'latex_lstlisting_env') {
+          content += slf.renderInline([{type: 'softbreak', tag: 'br', nesting: 0}], options, env);
+          continue;
+        }
       }
       let rendered = slf.renderInline([child], options, env);
       const smoothedRendered = Array.isArray(child.tableSmoothed)
@@ -93,6 +104,13 @@ export const renderTableCellContent = (token, isSubTable: boolean, options, env,
           mdCell += child.content.replace(/\|/g, '\\|');
           mdCell += '</smiles>';
           continue;
+        case "latex_lstlisting_env": {
+          let escape = escapeHtml(child.content);
+          let mdContent = escape.split('\n').join('<br>');
+          mdContent = mdContent.replace(/\|/g, '&#124');
+          mdCell += `<pre><code>${mdContent}</code></pre>`;
+          continue;
+        }
       }
 
       if (child.tableMd?.length) {

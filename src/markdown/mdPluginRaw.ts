@@ -15,7 +15,7 @@ import {
   isMathInText,
   hasOddSimpleMathTag
 } from './utils';
-import { openTagMML } from './common/consts';
+import { latexEnvironments, openTagMML } from './common/consts';
 import { imageWithSize, renderRuleImage } from './md-inline-rule/image';
 import { imageWithSizeBlock, renderRuleImageBlock } from './md-block-rule/image-block';
 import {setCounterSection} from './md-inline-rule/setcounter-section';
@@ -77,7 +77,7 @@ const getMathEnvironment = (str: string): string => {
   return match && match[1] ? match[1].trim() : '';
 };
 
-const multiMath: RuleInline = (state, silent) => {
+export const multiMath: RuleInline = (state, silent) => {
   let startMathPos = state.pos;
   if (state.src.charCodeAt(startMathPos) !== 0x5c /* \ */) {
     return false;
@@ -88,7 +88,7 @@ const multiMath: RuleInline = (state, silent) => {
   if (!match) {
     return false;
   }
-  if (match[1] && (match[1] === 'itemize' || match[1] === 'enumerate')) {
+  if (match[1] && (latexEnvironments.includes(match[1]))) {
     return false;
   }
 
@@ -202,7 +202,7 @@ export const findEndMarkerPos = (str: string, endMarker: string, i: number): num
   return index;
 };
 
-const simpleMath: RuleInline = (state, silent) => {
+export const simpleMath: RuleInline = (state, silent) => {
   let pos, afterStartMarker,
     startMathPos = state.pos;
   let endMarker = "$";
