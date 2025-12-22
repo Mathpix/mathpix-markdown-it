@@ -87,6 +87,34 @@ export declare const BEGIN_LST_INLINE_RE: RegExp;
 export declare const END_LST_INLINE_RE: RegExp;
 /** Full begin line: \begin{lstlisting}[...]( +hspace +≤1 NL ) */
 export declare const BEGIN_LST_WITH_TRAIL_WS_NL_RE: RegExp;
+/** Matches \begin{itemize} or \begin{enumerate} */
+export declare const BEGIN_LIST_ENV_RE: RegExp;
+export declare const BEGIN_LIST_ENV_INLINE_RE: RegExp;
+/** Matches \end{itemize} or \end{enumerate} */
+export declare const END_LIST_ENV_INLINE_RE: RegExp;
+export declare const END_LIST_ENV_RE: RegExp;
+/** Matches \item or \item[optional] */
+export declare const LATEX_ITEM_COMMAND_RE: RegExp;
+export declare const LATEX_ITEM_COMMAND_INLINE_RE: RegExp;
+export declare const LATEX_LIST_BOUNDARY_INLINE_RE: RegExp;
+/** Matches \begin{center}, \begin{left}, \begin{right}, \begin{table}, \begin{figure}, \begin{tabular}, \begin{lstlisting} */
+export declare const LATEX_BLOCK_ENV_OPEN_RE: RegExp;
+/**
+ * Enumerate environment detection: \alph, \roman, \arabic, etc.
+ */
+export declare const LATEX_ENUM_STYLE_RE: RegExp;
+/**
+ * Extracts enumeration style keyword: alph, Roman, arabic...
+ */
+export declare const LATEX_ENUM_STYLE_KEY_RE: RegExp;
+/** List of LaTeX enumerate level command names */
+export declare const ENUM_LEVEL_COMMANDS: readonly ["labelenumi", "labelenumii", "labelenumiii", "labelenumiv"];
+/** List of LaTeX itemize level command names */
+export declare const ITEM_LEVEL_COMMANDS: readonly ["labelitemi", "labelitemii", "labelitemiii", "labelitemiv"];
+/**
+ * Mapping LaTeX enumeration style → CSS list-style-type
+ */
+export declare const ENUM_STYLES: Record<string, string>;
 export declare const LST_HLJS_LANGUAGES: {
     'c++': string;
     assembler: string;

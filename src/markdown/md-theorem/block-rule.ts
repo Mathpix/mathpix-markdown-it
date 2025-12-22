@@ -69,6 +69,10 @@ export const newTheoremBlock: RuleBlock = (state, startLine: number, endLine: nu
   ) {
     return false;
   }
+  const match: RegExpMatchArray = content.match(reSetCounterG);
+  if (match && match[1] && ['enumi', 'enumii', 'enumiii', 'enumiv'].includes(match[1])) {
+    return false;
+  }
   /** For validation mode we can terminate immediately */
   if (silent) {
     return true;

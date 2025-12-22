@@ -52,10 +52,73 @@ const htmlContent = '<div>First <sup class="footnote-ref"><a href="#fn1" id="fnr
   '<span class="section-number">1.</span><span class="sub_section-number">1.1.</span>  Subsubsection <br>\n' +
   'multiline <sup class="footnote-ref"><a href="#fn5" id="fnref5">[5]</a></sup> </h4>\n' +
   '<div>Change the <sup class="footnote-ref"><a href="#fn6" id="fnref6">[6]</a></sup> labels using <code>\\item[label text]</code> in an <code>itemize</code> environment</div>\n' +
-  '<ul data-padding-inline-start="56" class="itemize preview-paragraph-28 preview-line 28 29 30 31 32 33 34 35 36" data_line_start="28" data_line_end="36" data_line="28,37" count_line="9" style="padding-inline-start: 56px; list-style-type: none"><li class="li_itemize preview-paragraph-29 preview-line 29" data_line_start="29" data_line_end="29" data_line="29,30" count_line="1" data_parent_line_start="28"><span class="li_level">•</span>This is my first point</li><li class="li_itemize preview-paragraph-30 preview-line 30" data_line_start="30" data_line_end="30" data_line="30,31" count_line="1" data_parent_line_start="28"><span class="li_level">•</span>Another point I want to make</li><li class="li_itemize preview-paragraph-31 preview-line 31" data_line_start="31" data_line_end="31" data_line="31,32" count_line="1" data_parent_line_start="28" data-custom-marker="true"><span class="li_level" data-custom-marker="true">!</span>A point to exclaim something!</li><li class="li_itemize preview-paragraph-32 preview-line 32" data_line_start="32" data_line_end="32" data_line="32,33" count_line="1" data_parent_line_start="28" data-custom-marker="true"><span class="li_level" data-custom-marker="true"><span class="math-inline " data-overflow="visible">\n' +
-  '<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: 0;" xmlns="http://www.w3.org/2000/svg" width="1.76ex" height="1.559ex" role="img" focusable="false" viewBox="0 -689 778 689"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="25FC" d="M71 0Q59 4 55 16V346L56 676Q64 686 70 689H709Q719 681 722 674V15Q719 10 709 1L390 0H71Z"></path></g></g></g></svg></mjx-container></span></span>Make the point fair <sup class="footnote-ref"><a href="#fn6" id="fnref6:1">[6:1]</a></sup> and square.</li><li class="li_itemize preview-paragraph-33 preview-line 33" data_line_start="33" data_line_end="33" data_line="33,34" count_line="1" data_parent_line_start="28" data-custom-marker="true"><span class="li_level" data-custom-marker="true">NOTE</span>This entry has no bullet</li><li class="li_itemize preview-paragraph-34 preview-line 34" data_line_start="34" data_line_end="34" data_line="34,35" count_line="1" data_parent_line_start="28" data-custom-marker="true"><span class="li_level" data-custom-marker="true"></span>A blank label?</li><li class="li_itemize preview-paragraph-35 preview-line 35" data_line_start="35" data_line_end="35" data_line="35,36" count_line="1" data_parent_line_start="28"><span class="li_level">•</span>Another point I want to make</li></ul><div><sup class="footnote-ref"><a href="#fn7" id="fnref7">[7]</a></sup>Change the labels using <code>\\item[label text]</code> in an <code>enumerate</code> environment</div>\n' +
-  '<ol data-padding-inline-start="56" class="enumerate decimal preview-paragraph-39 preview-line 39 40 41 42 43 44 45 46 47" data_line_start="39" data_line_end="47" data_line="39,48" count_line="9" style="padding-inline-start: 56px;  list-style-type: decimal"><li class="li_enumerate preview-paragraph-40 preview-line 40" data_line_start="40" data_line_end="40" data_line="40,41" count_line="1" data_parent_line_start="39">This is my first point</li><li class="li_enumerate preview-paragraph-41 preview-line 41" data_line_start="41" data_line_end="41" data_line="41,42" count_line="1" data_parent_line_start="39">Another point I want to make</li><li class="li_enumerate not_number preview-paragraph-42 preview-line 42" data_line_start="42" data_line_end="42" data_line="42,43" count_line="1" data_parent_line_start="39" data-custom-marker="true" style="display: block"><span class="li_level" data-custom-marker="true">!</span>A point to exclaim something!</li><li class="li_enumerate not_number preview-paragraph-43 preview-line 43" data_line_start="43" data_line_end="43" data_line="43,44" count_line="1" data_parent_line_start="39" data-custom-marker="true" style="display: block"><span class="li_level" data-custom-marker="true"><span class="math-inline " data-overflow="visible">\n' +
-  '<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: 0;" xmlns="http://www.w3.org/2000/svg" width="1.76ex" height="1.559ex" role="img" focusable="false" viewBox="0 -689 778 689"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="25FB" d="M71 0Q59 4 55 16V346L56 676Q64 686 70 689H709Q719 681 722 674V15Q719 10 709 1L390 0H71ZM682 40V649H95V40H682Z"></path></g></g></g></svg></mjx-container></span></span>Make the point fair and square.</li><li class="li_enumerate not_number preview-paragraph-44 preview-line 44" data_line_start="44" data_line_end="44" data_line="44,45" count_line="1" data_parent_line_start="39" data-custom-marker="true" style="display: block"><span class="li_level" data-custom-marker="true">NOTE</span>This entry has no bullet <sup class="footnote-ref"><a href="#fn7" id="fnref7:1">[7:1]</a></sup></li><li class="li_enumerate not_number preview-paragraph-45 preview-line 45" data_line_start="45" data_line_end="45" data_line="45,46" count_line="1" data_parent_line_start="39" data-custom-marker="true" style="display: block"><span class="li_level" data-custom-marker="true"></span>A blank label?</li><li class="li_enumerate preview-paragraph-46 preview-line 46" data_line_start="46" data_line_end="46" data_line="46,47" count_line="1" data_parent_line_start="39">Another point I want to make</li></ol><div style="margin-top: 0; margin-bottom: 0;"></div>\n' +
+  '<ul data-padding-inline-start="56" class="itemize" style="padding-inline-start: 56px; list-style-type: none">' +
+    '<li class="li_itemize">' +
+      '<span class="li_level">•</span>' +
+      'This is my first point' +
+    '</li>' +
+    '<li class="li_itemize">' +
+      '<span class="li_level">•</span>' +
+      'Another point I want to make' +
+    '</li>' +
+    '<li class="li_itemize" data-custom-marker="true">' +
+      '<span class="li_level" data-custom-marker="true">!</span>' +
+      'A point to exclaim something!' +
+    '</li>' +
+    '<li class="li_itemize" data-custom-marker="true">' +
+      '<span class="li_level" data-custom-marker="true">' +
+        '<span class="math-inline " data-overflow="visible">\n' +
+          '<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: 0;" xmlns="http://www.w3.org/2000/svg" width="1.76ex" height="1.559ex" role="img" focusable="false" viewBox="0 -689 778 689"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="25FC" d="M71 0Q59 4 55 16V346L56 676Q64 686 70 689H709Q719 681 722 674V15Q719 10 709 1L390 0H71Z"></path></g></g></g></svg></mjx-container>' +
+        '</span>' +
+      '</span>' +
+      'Make the point fair <sup class="footnote-ref"><a href="#fn6" id="fnref6:1">[6:1]</a></sup> and square.' +
+    '</li>' +
+    '<li class="li_itemize" data-custom-marker="true">' +
+      '<span class="li_level" data-custom-marker="true">NOTE</span>' +
+      'This entry has no bullet' +
+    '</li>' +
+    '<li class="li_itemize" data-custom-marker="true">' +
+      '<span class="li_level" data-custom-marker="true"></span>' +
+      'A blank label?' +
+    '</li>' +
+    '<li class="li_itemize">' +
+      '<span class="li_level">•</span>' +
+      'Another point I want to make' +
+    '</li>' +
+  '</ul>' +
+  '<div><sup class="footnote-ref"><a href="#fn7" id="fnref7">[7]</a></sup>Change the labels using <code>\\item[label text]</code> in an <code>enumerate</code> environment</div>\n' +
+  '<ol data-padding-inline-start="56" class="enumerate decimal" style="padding-inline-start: 56px; list-style-type: decimal">' +
+    '<li class="li_enumerate">' +
+      'This is my first point' +
+    '</li>' +
+    '<li class="li_enumerate">' +
+      'Another point I want to make' +
+    '</li>' +
+    '<li class="li_enumerate not_number" data-custom-marker="true" style="display: block">' +
+      '<span class="li_level" data-custom-marker="true">!</span>' +
+      'A point to exclaim something!' +
+    '</li>' +
+    '<li class="li_enumerate not_number" data-custom-marker="true" style="display: block">' +
+      '<span class="li_level" data-custom-marker="true">' +
+        '<span class="math-inline " data-overflow="visible">\n' +
+          '<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: 0;" xmlns="http://www.w3.org/2000/svg" width="1.76ex" height="1.559ex" role="img" focusable="false" viewBox="0 -689 778 689"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="25FB" d="M71 0Q59 4 55 16V346L56 676Q64 686 70 689H709Q719 681 722 674V15Q719 10 709 1L390 0H71ZM682 40V649H95V40H682Z"></path></g></g></g></svg></mjx-container>' +
+        '</span>' +
+      '</span>' +
+      'Make the point fair and square.' +
+    '</li>' +
+    '<li class="li_enumerate not_number" data-custom-marker="true" style="display: block">' +
+      '<span class="li_level" data-custom-marker="true">NOTE</span>' +
+      'This entry has no bullet <sup class="footnote-ref"><a href="#fn7" id="fnref7:1">[7:1]</a></sup>' +
+    '</li>' +
+    '<li class="li_enumerate not_number" data-custom-marker="true" style="display: block">' +
+      '<span class="li_level" data-custom-marker="true"></span>' +
+      'A blank label?' +
+    '</li>' +
+    '<li class="li_enumerate">' +
+      'Another point I want to make' +
+    '</li>' +
+  '</ol>' +
+  '<div style="margin-top: 0; margin-bottom: 0;"></div>\n' +
   '<div class="theorem_block">\n' +
   '<div class="theorem" style="font-style: normal; padding: 10px 0;"><span style="font-weight: bold; font-style: normal;" class="theorem-title">Definition 1.1.</span><span style="margin-right: 16px"></span><div style="display: inline;" data-display="inline">Here is a new definition <sup class="footnote-ref"><a href="#fn8" id="fnref8">[8]</a></sup></div>\n' +
   '</div></div>\n' +
@@ -139,10 +202,73 @@ const htmlContentFootnote_compact_refs = '<div>First <sup class="footnote-ref"><
   '<span class="section-number">1.</span><span class="sub_section-number">1.1.</span>  Subsubsection <br>\n' +
   'multiline <sup class="footnote-ref"><a href="#fn5" id="fnref5">[5]</a></sup> </h4>\n' +
   '<div>Change the <sup class="footnote-ref"><a href="#fn6" id="fnref6">[6]</a></sup> labels using <code>\\item[label text]</code> in an <code>itemize</code> environment</div>\n' +
-  '<ul data-padding-inline-start="56" class="itemize preview-paragraph-28 preview-line 28 29 30 31 32 33 34 35 36" data_line_start="28" data_line_end="36" data_line="28,37" count_line="9" style="padding-inline-start: 56px; list-style-type: none"><li class="li_itemize preview-paragraph-29 preview-line 29" data_line_start="29" data_line_end="29" data_line="29,30" count_line="1" data_parent_line_start="28"><span class="li_level">•</span>This is my first point</li><li class="li_itemize preview-paragraph-30 preview-line 30" data_line_start="30" data_line_end="30" data_line="30,31" count_line="1" data_parent_line_start="28"><span class="li_level">•</span>Another point I want to make</li><li class="li_itemize preview-paragraph-31 preview-line 31" data_line_start="31" data_line_end="31" data_line="31,32" count_line="1" data_parent_line_start="28" data-custom-marker="true"><span class="li_level" data-custom-marker="true">!</span>A point to exclaim something!</li><li class="li_itemize preview-paragraph-32 preview-line 32" data_line_start="32" data_line_end="32" data_line="32,33" count_line="1" data_parent_line_start="28" data-custom-marker="true"><span class="li_level" data-custom-marker="true"><span class="math-inline " data-overflow="visible">\n' +
-  '<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: 0;" xmlns="http://www.w3.org/2000/svg" width="1.76ex" height="1.559ex" role="img" focusable="false" viewBox="0 -689 778 689"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="25FC" d="M71 0Q59 4 55 16V346L56 676Q64 686 70 689H709Q719 681 722 674V15Q719 10 709 1L390 0H71Z"></path></g></g></g></svg></mjx-container></span></span>Make the point fair <sup class="footnote-ref"><a href="#fn6" id="fnref6:1">[6]</a></sup> and square.</li><li class="li_itemize preview-paragraph-33 preview-line 33" data_line_start="33" data_line_end="33" data_line="33,34" count_line="1" data_parent_line_start="28" data-custom-marker="true"><span class="li_level" data-custom-marker="true">NOTE</span>This entry has no bullet</li><li class="li_itemize preview-paragraph-34 preview-line 34" data_line_start="34" data_line_end="34" data_line="34,35" count_line="1" data_parent_line_start="28" data-custom-marker="true"><span class="li_level" data-custom-marker="true"></span>A blank label?</li><li class="li_itemize preview-paragraph-35 preview-line 35" data_line_start="35" data_line_end="35" data_line="35,36" count_line="1" data_parent_line_start="28"><span class="li_level">•</span>Another point I want to make</li></ul><div><sup class="footnote-ref"><a href="#fn7" id="fnref7">[7]</a></sup>Change the labels using <code>\\item[label text]</code> in an <code>enumerate</code> environment</div>\n' +
-  '<ol data-padding-inline-start="56" class="enumerate decimal preview-paragraph-39 preview-line 39 40 41 42 43 44 45 46 47" data_line_start="39" data_line_end="47" data_line="39,48" count_line="9" style="padding-inline-start: 56px;  list-style-type: decimal"><li class="li_enumerate preview-paragraph-40 preview-line 40" data_line_start="40" data_line_end="40" data_line="40,41" count_line="1" data_parent_line_start="39">This is my first point</li><li class="li_enumerate preview-paragraph-41 preview-line 41" data_line_start="41" data_line_end="41" data_line="41,42" count_line="1" data_parent_line_start="39">Another point I want to make</li><li class="li_enumerate not_number preview-paragraph-42 preview-line 42" data_line_start="42" data_line_end="42" data_line="42,43" count_line="1" data_parent_line_start="39" data-custom-marker="true" style="display: block"><span class="li_level" data-custom-marker="true">!</span>A point to exclaim something!</li><li class="li_enumerate not_number preview-paragraph-43 preview-line 43" data_line_start="43" data_line_end="43" data_line="43,44" count_line="1" data_parent_line_start="39" data-custom-marker="true" style="display: block"><span class="li_level" data-custom-marker="true"><span class="math-inline " data-overflow="visible">\n' +
-  '<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: 0;" xmlns="http://www.w3.org/2000/svg" width="1.76ex" height="1.559ex" role="img" focusable="false" viewBox="0 -689 778 689"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="25FB" d="M71 0Q59 4 55 16V346L56 676Q64 686 70 689H709Q719 681 722 674V15Q719 10 709 1L390 0H71ZM682 40V649H95V40H682Z"></path></g></g></g></svg></mjx-container></span></span>Make the point fair and square.</li><li class="li_enumerate not_number preview-paragraph-44 preview-line 44" data_line_start="44" data_line_end="44" data_line="44,45" count_line="1" data_parent_line_start="39" data-custom-marker="true" style="display: block"><span class="li_level" data-custom-marker="true">NOTE</span>This entry has no bullet <sup class="footnote-ref"><a href="#fn7" id="fnref7:1">[7]</a></sup></li><li class="li_enumerate not_number preview-paragraph-45 preview-line 45" data_line_start="45" data_line_end="45" data_line="45,46" count_line="1" data_parent_line_start="39" data-custom-marker="true" style="display: block"><span class="li_level" data-custom-marker="true"></span>A blank label?</li><li class="li_enumerate preview-paragraph-46 preview-line 46" data_line_start="46" data_line_end="46" data_line="46,47" count_line="1" data_parent_line_start="39">Another point I want to make</li></ol><div style="margin-top: 0; margin-bottom: 0;"></div>\n' +
+  '<ul data-padding-inline-start="56" class="itemize" style="padding-inline-start: 56px; list-style-type: none">' +
+    '<li class="li_itemize">' +
+      '<span class="li_level">•</span>' +
+      'This is my first point' +
+    '</li>' +
+    '<li class="li_itemize">' +
+      '<span class="li_level">•</span>' +
+      'Another point I want to make' +
+    '</li>' +
+    '<li class="li_itemize" data-custom-marker="true">' +
+      '<span class="li_level" data-custom-marker="true">!</span>' +
+      'A point to exclaim something!' +
+    '</li>' +
+    '<li class="li_itemize" data-custom-marker="true">' +
+      '<span class="li_level" data-custom-marker="true">' +
+        '<span class="math-inline " data-overflow="visible">\n' +
+          '<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: 0;" xmlns="http://www.w3.org/2000/svg" width="1.76ex" height="1.559ex" role="img" focusable="false" viewBox="0 -689 778 689"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="25FC" d="M71 0Q59 4 55 16V346L56 676Q64 686 70 689H709Q719 681 722 674V15Q719 10 709 1L390 0H71Z"></path></g></g></g></svg></mjx-container>' +
+        '</span>' +
+      '</span>' +
+      'Make the point fair <sup class="footnote-ref"><a href="#fn6" id="fnref6:1">[6]</a></sup> and square.' +
+    '</li>' +
+    '<li class="li_itemize" data-custom-marker="true">' +
+      '<span class="li_level" data-custom-marker="true">NOTE</span>' +
+      'This entry has no bullet' +
+    '</li>' +
+    '<li class="li_itemize" data-custom-marker="true">' +
+      '<span class="li_level" data-custom-marker="true"></span>' +
+      'A blank label?' +
+    '</li>' +
+    '<li class="li_itemize">' +
+      '<span class="li_level">•</span>' +
+      'Another point I want to make' +
+    '</li>' +
+  '</ul>' +
+  '<div><sup class="footnote-ref"><a href="#fn7" id="fnref7">[7]</a></sup>Change the labels using <code>\\item[label text]</code> in an <code>enumerate</code> environment</div>\n' +
+  '<ol data-padding-inline-start="56" class="enumerate decimal" style="padding-inline-start: 56px; list-style-type: decimal">' +
+    '<li class="li_enumerate">' +
+      'This is my first point' +
+    '</li>' +
+    '<li class="li_enumerate">' +
+      'Another point I want to make' +
+    '</li>' +
+    '<li class="li_enumerate not_number" data-custom-marker="true" style="display: block">' +
+      '<span class="li_level" data-custom-marker="true">!</span>' +
+      'A point to exclaim something!' +
+    '</li>' +
+    '<li class="li_enumerate not_number" data-custom-marker="true" style="display: block">' +
+      '<span class="li_level" data-custom-marker="true">' +
+        '<span class="math-inline " data-overflow="visible">\n' +
+          '<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: 0;" xmlns="http://www.w3.org/2000/svg" width="1.76ex" height="1.559ex" role="img" focusable="false" viewBox="0 -689 778 689"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="25FB" d="M71 0Q59 4 55 16V346L56 676Q64 686 70 689H709Q719 681 722 674V15Q719 10 709 1L390 0H71ZM682 40V649H95V40H682Z"></path></g></g></g></svg></mjx-container>' +
+        '</span>' +
+      '</span>' +
+      'Make the point fair and square.' +
+    '</li>' +
+    '<li class="li_enumerate not_number" data-custom-marker="true" style="display: block">' +
+      '<span class="li_level" data-custom-marker="true">NOTE</span>' +
+      'This entry has no bullet <sup class="footnote-ref"><a href="#fn7" id="fnref7:1">[7]</a></sup>' +
+    '</li>' +
+    '<li class="li_enumerate not_number" data-custom-marker="true" style="display: block">' +
+      '<span class="li_level" data-custom-marker="true"></span>' +
+      'A blank label?' +
+    '</li>' +
+    '<li class="li_enumerate">' +
+      'Another point I want to make' +
+    '</li>' +
+  '</ol>' +
+  '<div style="margin-top: 0; margin-bottom: 0;"></div>\n' +
   '<div class="theorem_block">\n' +
   '<div class="theorem" style="font-style: normal; padding: 10px 0;"><span style="font-weight: bold; font-style: normal;" class="theorem-title">Definition 1.1.</span><span style="margin-right: 16px"></span><div style="display: inline;" data-display="inline">Here is a new definition <sup class="footnote-ref"><a href="#fn8" id="fnref8">[8]</a></sup></div>\n' +
   '</div></div>\n' +

@@ -340,8 +340,58 @@ module.exports = "<h2 id=\"using-markdown-in-snip\">Using Markdown in Snip</h2>\
   "<div>The figure <a href=\"#fig%3Afigure1\" style=\"cursor: pointer; text-decoration: none;\" class=\"clickable-link\" value=\"fig%3Afigure1\" data-parentheses=\"false\">1</a></div>\n" +
   "<div id=\"fig%3Afigure1\" class=\"figure fig%3Afigure1\" number=\"1\">\n" +
   "<div class=\"figure_img\" style=\"text-align: right;\"><img src=\"https://cdn.mathpix.com/snip/images/-HM3WXo8kgdk8VtayBtn1_pJlgq9Cb7qV4JtM47Hgn0.original.fullsize.png\" alt=\"\" style=\"height: 70px; width: 350px;\"/></div><div class=\"caption_figure\">Figure 1: Equation</div></div>\n" +
-  "<ul class=\"itemize preview-paragraph-366 preview-line 366 367 368 369 370\" data_line_start=\"366\" data_line_end=\"370\" data_line=\"366,371\" count_line=\"5\" style=\"list-style-type: none\"><li class=\"li_itemize preview-paragraph-367 preview-line 367\" data_line_start=\"367\" data_line_end=\"367\" data_line=\"367,368\" count_line=\"1\" data_parent_line_start=\"366\"><span class=\"li_level\">•</span>Default item label for entry one</li><li class=\"li_itemize preview-paragraph-368 preview-line 368\" data_line_start=\"368\" data_line_end=\"368\" data_line=\"368,369\" count_line=\"1\" data_parent_line_start=\"366\"><span class=\"li_level\">•</span>Default item label for entry two</li><li class=\"li_itemize preview-paragraph-369 preview-line 369\" data_line_start=\"369\" data_line_end=\"369\" data_line=\"369,370\" count_line=\"1\" data_parent_line_start=\"366\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\"><span class=\"math-inline \" data-overflow=\"visible\">\n" +
-  "<mjx-container class=\"MathJax\" jax=\"SVG\"><svg style=\"vertical-align: 0;\" xmlns=\"http://www.w3.org/2000/svg\" width=\"1.76ex\" height=\"1.559ex\" role=\"img\" focusable=\"false\" viewBox=\"0 -689 778 689\"><g stroke=\"currentColor\" fill=\"currentColor\" stroke-width=\"0\" transform=\"scale(1,-1)\"><g data-mml-node=\"math\"><g data-mml-node=\"mi\"><path data-c=\"25FB\" d=\"M71 0Q59 4 55 16V346L56 676Q64 686 70 689H709Q719 681 722 674V15Q719 10 709 1L390 0H71ZM682 40V649H95V40H682Z\"></path></g></g></g></svg></mjx-container></span></span>Custom item label for entry three</li></ul><ol class=\"enumerate decimal preview-paragraph-373 preview-line 373 374 375 376 377 378 379 380 381 382 383 384 385 386 387 388 389\" data_line_start=\"373\" data_line_end=\"389\" data_line=\"373,390\" count_line=\"17\" style=\" list-style-type: decimal\"><li class=\"li_enumerate preview-paragraph-374 preview-line 374\" data_line_start=\"374\" data_line_end=\"374\" data_line=\"374,375\" count_line=\"1\" data_parent_line_start=\"373\">First level item</li><li class=\"li_enumerate preview-paragraph-375 preview-line 375\" data_line_start=\"375\" data_line_end=\"375\" data_line=\"375,376\" count_line=\"1\" data_parent_line_start=\"373\">First level item</li><ol class=\"enumerate upper-roman\" style=\" list-style-type: upper-roman\"><li value=\"5\" class=\"li_enumerate preview-paragraph-378 preview-line 378\" data_line_start=\"378\" data_line_end=\"378\" data_line=\"378,379\" count_line=\"1\" data_parent_line_start=\"373\">Second level item</li><li class=\"li_enumerate preview-paragraph-379 preview-line 379\" data_line_start=\"379\" data_line_end=\"379\" data_line=\"379,380\" count_line=\"1\" data_parent_line_start=\"373\">Second level item</li><ol class=\"enumerate lower-roman\" style=\" list-style-type: lower-roman\"><li class=\"li_enumerate preview-paragraph-381 preview-line 381\" data_line_start=\"381\" data_line_end=\"381\" data_line=\"381,382\" count_line=\"1\" data_parent_line_start=\"373\">Third level item</li><li class=\"li_enumerate preview-paragraph-382 preview-line 382\" data_line_start=\"382\" data_line_end=\"382\" data_line=\"382,383\" count_line=\"1\" data_parent_line_start=\"373\">Third level item</li><ol class=\"enumerate upper-alpha\" style=\" list-style-type: upper-alpha\"><li class=\"li_enumerate preview-paragraph-384 preview-line 384\" data_line_start=\"384\" data_line_end=\"384\" data_line=\"384,385\" count_line=\"1\" data_parent_line_start=\"373\">Fourth level item</li><li class=\"li_enumerate preview-paragraph-385 preview-line 385\" data_line_start=\"385\" data_line_end=\"385\" data_line=\"385,386\" count_line=\"1\" data_parent_line_start=\"373\">Fourth level item</li></ol></ol></ol></ol><div style=\"margin-top: 0; margin-bottom: 0;\"></div>\n" +
+  "<ul class=\"itemize\" style=\"list-style-type: none\">" +
+    "<li class=\"li_itemize\">" +
+      "<span class=\"li_level\">•</span>" +
+      "Default item label for entry one" +
+    "</li>" +
+    "<li class=\"li_itemize\">" +
+      "<span class=\"li_level\">•</span>" +
+      "Default item label for entry two" +
+    "</li>" +
+      "<li class=\"li_itemize\" data-custom-marker=\"true\">" +
+      "<span class=\"li_level\" data-custom-marker=\"true\">" +
+        "<span class=\"math-inline \" data-overflow=\"visible\">\n" +
+          "<mjx-container class=\"MathJax\" jax=\"SVG\"><svg style=\"vertical-align: 0;\" xmlns=\"http://www.w3.org/2000/svg\" width=\"1.76ex\" height=\"1.559ex\" role=\"img\" focusable=\"false\" viewBox=\"0 -689 778 689\"><g stroke=\"currentColor\" fill=\"currentColor\" stroke-width=\"0\" transform=\"scale(1,-1)\"><g data-mml-node=\"math\"><g data-mml-node=\"mi\"><path data-c=\"25FB\" d=\"M71 0Q59 4 55 16V346L56 676Q64 686 70 689H709Q719 681 722 674V15Q719 10 709 1L390 0H71ZM682 40V649H95V40H682Z\"></path></g></g></g></svg></mjx-container>" +
+        "</span>" +
+      "</span>" +
+      "Custom item label for entry three" +
+    "</li>" +
+  "</ul>" +
+  "" +
+  "<ol class=\"enumerate decimal\" style=\"list-style-type: decimal\">" +
+    "<li class=\"li_enumerate\">" +
+      "First level item" +
+    "</li>" +
+    "<li class=\"li_enumerate\">" +
+      "First level item" +
+      "<ol class=\"enumerate upper-roman\" style=\"list-style-type: upper-roman\">" +
+        "<li value=\"5\" class=\"li_enumerate\">" +
+          "Second level item" +
+        "</li>" +
+        "<li class=\"li_enumerate\">" +
+          "Second level item" +
+          "<ol class=\"enumerate lower-roman\" style=\"list-style-type: lower-roman\">" +
+            "<li class=\"li_enumerate\">" +
+              "Third level item" +
+            "</li>" +
+            "<li class=\"li_enumerate\">" +
+              "Third level item" +
+              "<ol class=\"enumerate upper-alpha\" style=\"list-style-type: upper-alpha\">" +
+                "<li class=\"li_enumerate\">" +
+                  "Fourth level item" +
+                "</li>" +
+                "<li class=\"li_enumerate\">" +
+                  "Fourth level item" +
+                "</li>" +
+              "</ol>" +
+            "</li>" +
+          "</ol>" +
+        "</li>" +
+      "</ol>" +
+    "</li>" +
+  "</ol>" +
+  "<div style=\"margin-top: 0; margin-bottom: 0;\"></div>\n" +
   "<h2 type=\"section\" class=\"section-title\" id=\"introduction\">\n" +
   "<span class=\"section-number\">2. </span>Introduction</h2>\n" +
   "<div>Theorems can easily be defined:</div>\n" +

@@ -153,10 +153,24 @@ module.exports = "<div><sup class=\"footnote-ref\"><a href=\"#fn1\" id=\"fnref1\
   "</tbody>\n" +
   "</table>\n" +
   "</div></div>\n" +
-  "<ul class=\"itemize preview-paragraph-32 preview-line 32 33 34 35 36 37\" data_line_start=\"32\" data_line_end=\"37\" data_line=\"32,38\" count_line=\"6\" style=\"list-style-type: none\"><li class=\"li_itemize block preview-paragraph-33 preview-line 33\" data_line_start=\"33\" data_line_end=\"33\" data_line=\"33,34\" count_line=\"1\" data_parent_line_start=\"32\"><span class=\"li_level\">•</span><div>Level 1 is <code>\\textbullet</code> (•),</div>\n" +
-  "</li><li class=\"li_itemize block preview-paragraph-34 preview-line 34\" data_line_start=\"34\" data_line_end=\"34\" data_line=\"34,35\" count_line=\"1\" data_parent_line_start=\"32\"><span class=\"li_level\">•</span><div>Level 2 is <code>\\textendash</code> (–) ,</div>\n" +
-  "</li><li class=\"li_itemize block preview-paragraph-35 preview-line 35\" data_line_start=\"35\" data_line_end=\"35\" data_line=\"35,36\" count_line=\"1\" data_parent_line_start=\"32\"><span class=\"li_level\">•</span><div>Level 3 is <code>\\textasteriskcentered</code> (*)</div>\n" +
-  "</li><li class=\"li_itemize block preview-paragraph-36 preview-line 36\" data_line_start=\"36\" data_line_end=\"36\" data_line=\"36,37\" count_line=\"1\" data_parent_line_start=\"32\"><span class=\"li_level\">•</span><div>Level 4 is <code>\\textperiodcentered</code> (·).</div>\n" +
-  "</li></ul> <a href=\"#fnref6\" class=\"footnote-backref\">↩︎</a></li>\n" +
+  "<ul class=\"itemize\" style=\"list-style-type: none\">" +
+    "<li class=\"li_itemize block\">" +
+      "<span class=\"li_level\">•</span>" +
+      "<div>Level 1 is <code>\\textbullet</code> (•),</div>\n" +
+    "</li>" +
+    "<li class=\"li_itemize block\">" +
+      "<span class=\"li_level\">•</span>" +
+      "<div>Level 2 is <code>\\textendash</code> (–) ,</div>\n" +
+    "</li>" +
+    "<li class=\"li_itemize block\">" +
+      "<span class=\"li_level\">•</span>" +
+      "<div>Level 3 is <code>\\textasteriskcentered</code> (*)</div>\n" +
+    "</li>" +
+    "<li class=\"li_itemize block\">" +
+      "<span class=\"li_level\">•</span>" +
+      "<div>Level 4 is <code>\\textperiodcentered</code> (·).</div>\n" +
+    "</li>" +
+  "</ul> <a href=\"#fnref6\" class=\"footnote-backref\">↩︎</a>" +
+  "</li>\n" +
   "</ol>\n" +
   "</section>";

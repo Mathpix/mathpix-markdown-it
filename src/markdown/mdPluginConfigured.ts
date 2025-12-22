@@ -4,7 +4,7 @@ import highlightPlugin from './mdHighlightCodePlugin';
 import tocPlugin from './mdPluginTOC';
 import anchorPlugin from './mdPluginAnchor';
 import tableTabularPlugin from './mdPluginTableTabular';
-import listsPlugin from './mdPluginLists';
+import pluginLatexListsEnv from './md-latex-lists-env';
 import collapsiblePlugin from './mdPluginCollapsible';
 import ChemistryPlugin from './md-chemistry';
 import SvgToBase64Plugin from './md-svg-to-base64';
@@ -25,7 +25,7 @@ export const mdPluginHighlightCode = highlightPlugin;
 export const mdPluginTOC = tocPlugin;
 export const mdPluginAnchor = anchorPlugin;
 export const mdPluginTableTabular = tableTabularPlugin;
-export const mdPluginList = listsPlugin;
+export const mdPluginList = pluginLatexListsEnv;
 export const mdPluginChemistry = ChemistryPlugin;
 export const mdPluginSvgToBase64 = SvgToBase64Plugin;
 

@@ -26,6 +26,7 @@ export const listsStyles = `
   
   .itemize > li {
     position: relative;
+    min-height: 1.4em;
   }
   .itemize > li > span.li_level, .li_enumerate.not_number > span.li_level { 
     position: absolute;
@@ -41,5 +42,6 @@ export const listsStyles = `
     position: relative;
     display: inline-block;
     list-style-type: none;
+    min-height: 1.4em;
   }
 `;

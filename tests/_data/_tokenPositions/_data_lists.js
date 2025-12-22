@@ -55,7 +55,23 @@ module.exports = [
         "content_test_str": "\\begin{itemize}\n  \\item One entry in the list\n  \\item Another entry in the list\n\\end{itemize}"
       },
       {
-        "type": "item_inline",
+        "type": "latex_list_item_open",
+        "children": null,
+        "content": "",
+        "parentType": "itemize",
+        "inlinePos": {
+          "start_content": 6,
+          "end_content": 28
+        },
+        "itemizeLevelContents": [
+          "\\textbullet",
+          "\\textendash",
+          "\\textasteriskcentered",
+          "\\textperiodcentered"
+        ]
+      },
+      {
+        "type": "inline",
         "children": [
           {
             "type": "text",
@@ -78,7 +94,36 @@ module.exports = [
         "content_test_str": "One entry in the list"
       },
       {
-        "type": "item_inline",
+        "type": "latex_list_item_close",
+        "children": null,
+        "content": "",
+        "nextPos": 27,
+        "parentType": "itemize",
+        "itemizeLevelContents": [
+          "\\textbullet",
+          "\\textendash",
+          "\\textasteriskcentered",
+          "\\textperiodcentered"
+        ]
+      },
+      {
+        "type": "latex_list_item_open",
+        "children": null,
+        "content": "",
+        "parentType": "itemize",
+        "inlinePos": {
+          "start_content": 6,
+          "end_content": 32
+        },
+        "itemizeLevelContents": [
+          "\\textbullet",
+          "\\textendash",
+          "\\textasteriskcentered",
+          "\\textperiodcentered"
+        ]
+      },
+      {
+        "type": "inline",
         "children": [
           {
             "type": "text",
@@ -99,6 +144,19 @@ module.exports = [
           "end": 110
         },
         "content_test_str": "Another entry in the list"
+      },
+      {
+        "type": "latex_list_item_close",
+        "children": null,
+        "content": "",
+        "nextPos": 31,
+        "parentType": "itemize",
+        "itemizeLevelContents": [
+          "\\textbullet",
+          "\\textendash",
+          "\\textasteriskcentered",
+          "\\textperiodcentered"
+        ]
       },
       {
         "type": "itemize_list_close",
@@ -335,7 +393,23 @@ module.exports = [
         "content_test_str": "\\begin{enumerate}\n  \\item The labels consist of sequential numbers.\n  \\item The numbers start at 1 with every call to the enumerate environment.\n\\end{enumerate}"
       },
       {
-        "type": "item_inline",
+        "type": "latex_list_item_open",
+        "children": null,
+        "content": "",
+        "parentType": "enumerate",
+        "inlinePos": {
+          "start_content": 6,
+          "end_content": 48
+        },
+        "itemizeLevelContents": [
+          "\\textbullet",
+          "\\textendash",
+          "\\textasteriskcentered",
+          "\\textperiodcentered"
+        ]
+      },
+      {
+        "type": "inline",
         "children": [
           {
             "type": "text",
@@ -358,7 +432,36 @@ module.exports = [
         "content_test_str": "The labels consist of sequential numbers."
       },
       {
-        "type": "item_inline",
+        "type": "latex_list_item_close",
+        "children": null,
+        "content": "",
+        "nextPos": 47,
+        "parentType": "enumerate",
+        "itemizeLevelContents": [
+          "\\textbullet",
+          "\\textendash",
+          "\\textasteriskcentered",
+          "\\textperiodcentered"
+        ]
+      },
+      {
+        "type": "latex_list_item_open",
+        "children": null,
+        "content": "",
+        "parentType": "enumerate",
+        "inlinePos": {
+          "start_content": 6,
+          "end_content": 75
+        },
+        "itemizeLevelContents": [
+          "\\textbullet",
+          "\\textendash",
+          "\\textasteriskcentered",
+          "\\textperiodcentered"
+        ]
+      },
+      {
+        "type": "inline",
         "children": [
           {
             "type": "text",
@@ -379,6 +482,19 @@ module.exports = [
           "end": 144
         },
         "content_test_str": "The numbers start at 1 with every call to the enumerate environment."
+      },
+      {
+        "type": "latex_list_item_close",
+        "children": null,
+        "content": "",
+        "nextPos": 74,
+        "parentType": "enumerate",
+        "itemizeLevelContents": [
+          "\\textbullet",
+          "\\textendash",
+          "\\textasteriskcentered",
+          "\\textperiodcentered"
+        ]
       },
       {
         "type": "enumerate_list_close",
