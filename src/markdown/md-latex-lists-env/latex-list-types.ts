@@ -49,3 +49,10 @@ export interface LstEndResult {
 export const isListType = (value: string): value is ListType =>{
   return Object.values(ListType).includes(value as ListType);
 }
+
+export interface CustomMarkerHtmlResult {
+  htmlMarker: string;
+  markerType: string;
+  textContent: string;
+  isMarkerEmpty: boolean;
+}

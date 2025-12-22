@@ -77,8 +77,8 @@ const htmlContent = '<div>First <sup class="footnote-ref"><a href="#fn1" id="fnr
       '<span class="li_level" data-custom-marker="true">NOTE</span>' +
       'This entry has no bullet' +
     '</li>' +
-    '<li class="li_itemize" data-custom-marker="true">' +
-      '<span class="li_level" data-custom-marker="true"></span>' +
+    '<li class="li_itemize" data-custom-marker="true" data-marker-empty="true">' +
+      '<span class="li_level" data-custom-marker="true" data-marker-empty="true"></span>' +
       'A blank label?' +
     '</li>' +
     '<li class="li_itemize">' +
@@ -110,8 +110,8 @@ const htmlContent = '<div>First <sup class="footnote-ref"><a href="#fn1" id="fnr
       '<span class="li_level" data-custom-marker="true">NOTE</span>' +
       'This entry has no bullet <sup class="footnote-ref"><a href="#fn7" id="fnref7:1">[7:1]</a></sup>' +
     '</li>' +
-    '<li class="li_enumerate not_number" data-custom-marker="true" style="display: block">' +
-      '<span class="li_level" data-custom-marker="true"></span>' +
+    '<li class="li_enumerate not_number" data-custom-marker="true" data-marker-empty="true" style="display: block">' +
+      '<span class="li_level" data-custom-marker="true" data-marker-empty="true"></span>' +
       'A blank label?' +
     '</li>' +
     '<li class="li_enumerate">' +
@@ -227,8 +227,8 @@ const htmlContentFootnote_compact_refs = '<div>First <sup class="footnote-ref"><
       '<span class="li_level" data-custom-marker="true">NOTE</span>' +
       'This entry has no bullet' +
     '</li>' +
-    '<li class="li_itemize" data-custom-marker="true">' +
-      '<span class="li_level" data-custom-marker="true"></span>' +
+    '<li class="li_itemize" data-custom-marker="true" data-marker-empty="true">' +
+      '<span class="li_level" data-custom-marker="true" data-marker-empty="true"></span>' +
       'A blank label?' +
     '</li>' +
     '<li class="li_itemize">' +
@@ -260,8 +260,8 @@ const htmlContentFootnote_compact_refs = '<div>First <sup class="footnote-ref"><
       '<span class="li_level" data-custom-marker="true">NOTE</span>' +
       'This entry has no bullet <sup class="footnote-ref"><a href="#fn7" id="fnref7:1">[7]</a></sup>' +
     '</li>' +
-    '<li class="li_enumerate not_number" data-custom-marker="true" style="display: block">' +
-      '<span class="li_level" data-custom-marker="true"></span>' +
+    '<li class="li_enumerate not_number" data-custom-marker="true" data-marker-empty="true" style="display: block">' +
+      '<span class="li_level" data-custom-marker="true" data-marker-empty="true"></span>' +
       'A blank label?' +
     '</li>' +
     '<li class="li_enumerate">' +

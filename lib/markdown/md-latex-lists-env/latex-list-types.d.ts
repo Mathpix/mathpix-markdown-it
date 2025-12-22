@@ -44,3 +44,9 @@ export interface LstEndResult {
     lineText: string;
 }
 export declare const isListType: (value: string) => value is ListType;
+export interface CustomMarkerHtmlResult {
+    htmlMarker: string;
+    markerType: string;
+    textContent: string;
+    isMarkerEmpty: boolean;
+}

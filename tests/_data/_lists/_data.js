@@ -527,12 +527,12 @@ module.exports = [
       '\\end{itemize}',
     html:
       '<ul class="itemize" style="list-style-type: none">' +
-        '<li class="li_itemize" data-custom-marker="true">' +
-          '<span class="li_level" data-custom-marker="true"></span>' +
+        '<li class="li_itemize" data-custom-marker="true" data-marker-empty="true">' +
+          '<span class="li_level" data-custom-marker="true" data-marker-empty="true"></span>' +
           '- testing 1' +
         '</li>' +
-        '<li class="li_itemize block" data-custom-marker="true">' +
-          '<span class="li_level" data-custom-marker="true"></span>' +
+        '<li class="li_itemize block" data-custom-marker="true" data-marker-empty="true">' +
+          '<span class="li_level" data-custom-marker="true" data-marker-empty="true"></span>' +
           '<div>' +
           '- <strong><em>How did this financial product perform compared with the reference benchmark?</em></strong>' +
           '</div>\n' +
@@ -562,8 +562,8 @@ module.exports = [
             '</div>\n' +
           '</div>\n' +
         '</li>' +
-        '<li class="li_itemize" data-custom-marker="true">' +
-          '<span class="li_level" data-custom-marker="true"></span>' +
+        '<li class="li_itemize" data-custom-marker="true" data-marker-empty="true">' +
+          '<span class="li_level" data-custom-marker="true" data-marker-empty="true"></span>' +
           '- testing 2' +
         '</li>' +
       '</ul>'
@@ -587,12 +587,12 @@ module.exports = [
       '\\end{itemize}',
     html:
       '<ul class="itemize" style="list-style-type: none">' +
-        '<li class="li_itemize" data-custom-marker="true">' +
-          '<span class="li_level" data-custom-marker="true"></span>' +
+        '<li class="li_itemize" data-custom-marker="true" data-marker-empty="true">' +
+          '<span class="li_level" data-custom-marker="true" data-marker-empty="true"></span>' +
           '- testing 1' +
         '</li>' +
-        '<li class="li_itemize block" data-custom-marker="true">' +
-          '<span class="li_level" data-custom-marker="true"></span>' +
+        '<li class="li_itemize block" data-custom-marker="true" data-marker-empty="true">' +
+          '<span class="li_level" data-custom-marker="true" data-marker-empty="true"></span>' +
           '<div>&gt; <strong><em>How did this financial product perform compared with the reference benchmark?</em></strong></div>\n' +
           '<div class="center" style="text-align: center">\n' +
             '<div class="table_tabular" style="text-align: center">\n' +
@@ -620,8 +620,8 @@ module.exports = [
             '</div>\n' +
           '</div>\n' +
         '</li>' +
-        '<li class="li_itemize" data-custom-marker="true">' +
-          '<span class="li_level" data-custom-marker="true"></span>' +
+        '<li class="li_itemize" data-custom-marker="true" data-marker-empty="true">' +
+          '<span class="li_level" data-custom-marker="true" data-marker-empty="true"></span>' +
           '- testing 2' +
         '</li>' +
       '</ul>'
@@ -645,12 +645,12 @@ module.exports = [
       '\\end{itemize}',
     html:
       '<ul class="itemize" style="list-style-type: none">' +
-        '<li class="li_itemize" data-custom-marker="true">' +
-          '<span class="li_level" data-custom-marker="true"></span>' +
+        '<li class="li_itemize" data-custom-marker="true" data-marker-empty="true">' +
+          '<span class="li_level" data-custom-marker="true" data-marker-empty="true"></span>' +
           '- testing 1' +
         '</li>' +
-        '<li class="li_itemize block" data-custom-marker="true">' +
-          '<span class="li_level" data-custom-marker="true"></span>' +
+        '<li class="li_itemize block" data-custom-marker="true" data-marker-empty="true">' +
+          '<span class="li_level" data-custom-marker="true" data-marker-empty="true"></span>' +
           '<div># <strong><em>How did this financial product perform compared with the reference benchmark?</em></strong></div>\n' +
           '<div class="center" style="text-align: center">\n' +
             '<div class="table_tabular" style="text-align: center">\n' +
@@ -678,8 +678,8 @@ module.exports = [
             '</div>\n' +
           '</div>\n' +
         '</li>' +
-        '<li class="li_itemize" data-custom-marker="true">' +
-          '<span class="li_level" data-custom-marker="true"></span>' +
+        '<li class="li_itemize" data-custom-marker="true" data-marker-empty="true">' +
+          '<span class="li_level" data-custom-marker="true" data-marker-empty="true"></span>' +
           '- testing 2' +
         '</li>' +
       '</ul>'
@@ -703,12 +703,12 @@ module.exports = [
       '\\end{itemize}',
     html:
       '<ul class="itemize" style="list-style-type: none">' +
-        '<li class="li_itemize" data-custom-marker="true">' +
-          '<span class="li_level" data-custom-marker="true"></span>' +
+        '<li class="li_itemize" data-custom-marker="true" data-marker-empty="true">' +
+          '<span class="li_level" data-custom-marker="true" data-marker-empty="true"></span>' +
           '- testing 1' +
         '</li>' +
-        '<li class="li_itemize block" data-custom-marker="true">' +
-          '<span class="li_level" data-custom-marker="true"></span>' +
+        '<li class="li_itemize block" data-custom-marker="true" data-marker-empty="true">' +
+          '<span class="li_level" data-custom-marker="true" data-marker-empty="true"></span>' +
           '<div>~~~ <strong><em>How did this financial product perform compared with the reference benchmark?</em></strong></div>\n' +
           '<div class="center" style="text-align: center">\n' +
             '<div class="table_tabular" style="text-align: center">\n' +
@@ -736,8 +736,8 @@ module.exports = [
             '</div>\n' +
           '</div>\n' +
         '</li>' +
-        '<li class="li_itemize" data-custom-marker="true">' +
-          '<span class="li_level" data-custom-marker="true"></span>' +
+        '<li class="li_itemize" data-custom-marker="true" data-marker-empty="true">' +
+          '<span class="li_level" data-custom-marker="true" data-marker-empty="true"></span>' +
           '- testing 2' +
         '</li>' +
       '</ul>'
@@ -761,12 +761,12 @@ module.exports = [
       '\\end{itemize}',
     html:
       '<ul class="itemize" style="list-style-type: none">' +
-        '<li class="li_itemize" data-custom-marker="true">' +
-          '<span class="li_level" data-custom-marker="true"></span>' +
+        '<li class="li_itemize" data-custom-marker="true" data-marker-empty="true">' +
+          '<span class="li_level" data-custom-marker="true" data-marker-empty="true"></span>' +
           '- testing 1' +
         '</li>' +
-        '<li class="li_itemize block" data-custom-marker="true">' +
-          '<span class="li_level" data-custom-marker="true"></span>' +
+        '<li class="li_itemize block" data-custom-marker="true" data-marker-empty="true">' +
+          '<span class="li_level" data-custom-marker="true" data-marker-empty="true"></span>' +
           '<div>1. <strong><em>How did this financial product perform compared with the reference benchmark?</em></strong></div>\n' +
           '<div class="center" style="text-align: center">\n' +
             '<div class="table_tabular" style="text-align: center">\n' +
@@ -794,8 +794,8 @@ module.exports = [
             '</div>\n' +
           '</div>\n' +
         '</li>' +
-        '<li class="li_itemize" data-custom-marker="true">' +
-          '<span class="li_level" data-custom-marker="true"></span>' +
+        '<li class="li_itemize" data-custom-marker="true" data-marker-empty="true">' +
+          '<span class="li_level" data-custom-marker="true" data-marker-empty="true"></span>' +
           '- testing 2' +
         '</li>' +
       '</ul>'
@@ -819,12 +819,12 @@ module.exports = [
       '\\end{enumerate}',
     html:
       '<ol class="enumerate decimal" style="list-style-type: decimal">' +
-        '<li class="li_enumerate not_number" data-custom-marker="true" style="display: block">' +
-          '<span class="li_level" data-custom-marker="true"></span>' +
+        '<li class="li_enumerate not_number" data-custom-marker="true" data-marker-empty="true" style="display: block">' +
+          '<span class="li_level" data-custom-marker="true" data-marker-empty="true"></span>' +
           '- testing 1' +
         '</li>' +
-        '<li class="li_enumerate not_number" data-custom-marker="true" style="display: block">' +
-          '<span class="li_level" data-custom-marker="true"></span>' +
+        '<li class="li_enumerate not_number" data-custom-marker="true" data-marker-empty="true" style="display: block">' +
+          '<span class="li_level" data-custom-marker="true" data-marker-empty="true"></span>' +
           '<div>- <strong><em>How did this financial product perform compared with the reference benchmark?</em></strong></div>\n' +
           '<div class="center" style="text-align: center">\n' +
             '<div class="table_tabular" style="text-align: center">\n' +
@@ -852,8 +852,8 @@ module.exports = [
             '</div>\n' +
           '</div>\n' +
         '</li>' +
-        '<li class="li_enumerate not_number" data-custom-marker="true" style="display: block">' +
-          '<span class="li_level" data-custom-marker="true"></span>' +
+        '<li class="li_enumerate not_number" data-custom-marker="true" data-marker-empty="true" style="display: block">' +
+          '<span class="li_level" data-custom-marker="true" data-marker-empty="true"></span>' +
           '- testing 2' +
         '</li>' +
       '</ol>'
@@ -871,24 +871,24 @@ module.exports = [
       '\\end{itemize}',
     html:
       '<ul class="itemize" style="list-style-type: none">' +
-        '<li>' +
+        '<li class="li_itemize" data-custom-marker="true" data-marker-empty="true">' +
           '<ul class="itemize" style="list-style-type: none">' +
-            '<li>' +
+            '<li class="li_itemize" data-custom-marker="true" data-marker-empty="true">' +
               '<ul class="itemize" style="list-style-type: none">' +
-                '<li class="li_itemize" data-custom-marker="true">' +
-                  '<span class="li_level" data-custom-marker="true"></span>' +
+                '<li class="li_itemize" data-custom-marker="true" data-marker-empty="true">' +
+                  '<span class="li_level" data-custom-marker="true" data-marker-empty="true"></span>' +
                   '- Purpose: to test cause and effect relationships (condition x causes outcome y)' +
                 '</li>' +
-                '<li class="li_itemize" data-custom-marker="true">' +
-                  '<span class="li_level" data-custom-marker="true"></span>' +
+                '<li class="li_itemize" data-custom-marker="true" data-marker-empty="true">' +
+                  '<span class="li_level" data-custom-marker="true" data-marker-empty="true"></span>' +
                   '- Tested through experiments (include independent and dependent variables)' +
                 '</li>' +
-                '<li class="li_itemize" data-custom-marker="true">' +
-                  '<span class="li_level" data-custom-marker="true"></span>' +
+                '<li class="li_itemize" data-custom-marker="true" data-marker-empty="true">' +
+                  '<span class="li_level" data-custom-marker="true" data-marker-empty="true"></span>' +
                   '- Goal: to determine how changes in x cause changes in y' +
                 '</li>' +
-                '<li class="li_itemize" data-custom-marker="true">' +
-                  '<span class="li_level" data-custom-marker="true"></span>' +
+                '<li class="li_itemize" data-custom-marker="true" data-marker-empty="true">' +
+                  '<span class="li_level" data-custom-marker="true" data-marker-empty="true"></span>' +
                   '- Must contain a control group (ex. people who are not hungry, a tip jar that has not been salted/already filled)' +
                 '</li>' +
               '</ul>' +
@@ -908,16 +908,16 @@ module.exports = [
       '\\end{enumerate}',
     html:
       '<ol class="enumerate decimal" style="list-style-type: decimal">' +
-        '<li class="li_enumerate not_number" data-custom-marker="true" style="display: block">' +
+        '<li class="li_enumerate not_number" data-custom-marker="true" data-marker-empty="true" style="display: block">' +
           '<ul class="itemize" style="list-style-type: none">' +
-            '<li>' +
+            '<li class="li_itemize" data-custom-marker="true" data-marker-empty="true">' +
               '<ul class="itemize" style="list-style-type: none">' +
-                '<li class="li_itemize" data-custom-marker="true">' +
-                  '<span class="li_level" data-custom-marker="true"></span>' +
+                '<li class="li_itemize" data-custom-marker="true" data-marker-empty="true">' +
+                  '<span class="li_level" data-custom-marker="true" data-marker-empty="true"></span>' +
                   '- Item 1' +
                 '</li>' +
-                '<li class="li_itemize" data-custom-marker="true">' +
-                  '<span class="li_level" data-custom-marker="true"></span>' +
+                '<li class="li_itemize" data-custom-marker="true" data-marker-empty="true">' +
+                  '<span class="li_level" data-custom-marker="true" data-marker-empty="true"></span>' +
                   '- Item 2' +
                 '</li>' +
               '</ul>' +
@@ -937,16 +937,16 @@ module.exports = [
       '\\end{itemize}',
     html:
       '<ul class="itemize" style="list-style-type: none">' +
-        '<li>' +
+        '<li class="li_itemize" data-custom-marker="true" data-marker-empty="true">' +
           '<ol class="enumerate decimal" style="list-style-type: decimal">' +
-            '<li class="li_enumerate not_number" data-custom-marker="true" style="display: block">' +
+            '<li class="li_enumerate not_number" data-custom-marker="true" data-marker-empty="true" style="display: block">' +
               '<ol class="enumerate lower-alpha" style="list-style-type: lower-alpha">' +
-                '<li class="li_enumerate not_number" data-custom-marker="true" style="display: block">' +
-                  '<span class="li_level" data-custom-marker="true"></span>' +
+                '<li class="li_enumerate not_number" data-custom-marker="true" data-marker-empty="true" style="display: block">' +
+                  '<span class="li_level" data-custom-marker="true" data-marker-empty="true"></span>' +
                   '- Item 1' +
                 '</li>' +
-                '<li class="li_enumerate not_number" data-custom-marker="true" style="display: block">' +
-                  '<span class="li_level" data-custom-marker="true"></span>' +
+                '<li class="li_enumerate not_number" data-custom-marker="true" data-marker-empty="true" style="display: block">' +
+                  '<span class="li_level" data-custom-marker="true" data-marker-empty="true"></span>' +
                   '- Item 2' +
                 '</li>' +
               '</ol>' +
@@ -972,8 +972,8 @@ module.exports = [
       '\\end{itemize}',
     html:
       '<ul class="itemize" style="list-style-type: none">' +
-        '<li class="li_itemize" data-custom-marker="true">' +
-          '<span class="li_level" data-custom-marker="true"></span>' +
+        '<li class="li_itemize" data-custom-marker="true" data-marker-empty="true">' +
+          '<span class="li_level" data-custom-marker="true" data-marker-empty="true"></span>' +
           '1. The toggle bit for some process <span class="math-inline " data-overflow="visible">\n' +
           '<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.439ex;" xmlns="http://www.w3.org/2000/svg" width="1.041ex" height="1.439ex" role="img" focusable="false" viewBox="0 -442 460 636"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D45E" d="M33 157Q33 258 109 349T280 441Q340 441 372 389Q373 390 377 395T388 406T404 418Q438 442 450 442Q454 442 457 439T460 434Q460 425 391 149Q320 -135 320 -139Q320 -147 365 -148H390Q396 -156 396 -157T393 -175Q389 -188 383 -194H370Q339 -192 262 -192Q234 -192 211 -192T174 -192T157 -193Q143 -193 143 -185Q143 -182 145 -170Q149 -154 152 -151T172 -148Q220 -148 230 -141Q238 -136 258 -53T279 32Q279 33 272 29Q224 -10 172 -10Q117 -10 75 30T33 157ZM352 326Q329 405 277 405Q242 405 210 374T160 293Q131 214 119 129Q119 126 119 118T118 106Q118 61 136 44T179 26Q233 26 290 98L298 109L352 326Z"></path></g></g></g></svg></mjx-container></span>' +
           ' is unchanged between the two snapshots taken by <span class="math-inline " data-overflow="visible">\n' +
@@ -983,31 +983,38 @@ module.exports = [
           '<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.439ex;" xmlns="http://www.w3.org/2000/svg" width="1.041ex" height="1.439ex" role="img" focusable="false" viewBox="0 -442 460 636"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D45E" d="M33 157Q33 258 109 349T280 441Q340 441 372 389Q373 390 377 395T388 406T404 418Q438 442 450 442Q454 442 457 439T460 434Q460 425 391 149Q320 -135 320 -139Q320 -147 365 -148H390Q396 -156 396 -157T393 -175Q389 -188 383 -194H370Q339 -192 262 -192Q234 -192 211 -192T174 -192T157 -193Q143 -193 143 -185Q143 -182 145 -170Q149 -154 152 -151T172 -148Q220 -148 230 -141Q238 -136 258 -53T279 32Q279 33 272 29Q224 -10 172 -10Q117 -10 75 30T33 157ZM352 326Q329 405 277 405Q242 405 210 374T160 293Q131 214 119 129Q119 126 119 118T118 106Q118 61 136 44T179 26Q233 26 290 98L298 109L352 326Z"></path></g></g></g></svg></mjx-container></span>, which means we don’t see any change in <span class="math-inline " data-overflow="visible">\n' +
           '<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.439ex;" xmlns="http://www.w3.org/2000/svg" width="1.041ex" height="1.439ex" role="img" focusable="false" viewBox="0 -442 460 636"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D45E" d="M33 157Q33 258 109 349T280 441Q340 441 372 389Q373 390 377 395T388 406T404 418Q438 442 450 442Q454 442 457 439T460 434Q460 425 391 149Q320 -135 320 -139Q320 -147 365 -148H390Q396 -156 396 -157T393 -175Q389 -188 383 -194H370Q339 -192 262 -192Q234 -192 211 -192T174 -192T157 -193Q143 -193 143 -185Q143 -182 145 -170Q149 -154 152 -151T172 -148Q220 -148 230 -141Q238 -136 258 -53T279 32Q279 33 272 29Q224 -10 172 -10Q117 -10 75 30T33 157ZM352 326Q329 405 277 405Q242 405 210 374T160 293Q131 214 119 129Q119 126 119 118T118 106Q118 61 136 44T179 26Q233 26 290 98L298 109L352 326Z"></path></g></g></g></svg></mjx-container></span>’s segment, which is good, because there wasn’t any. If this even number is 2 or more, then we observe that each of these events precedes the following one:' +
           '<ul class="itemize" style="list-style-type: none">' +
-            '<li class="li_itemize" data-custom-marker="true"><span class="li_level" data-custom-marker="true"></span>' +
+            '<li class="li_itemize" data-custom-marker="true" data-marker-empty="true">' +
+              '<span class="li_level" data-custom-marker="true" data-marker-empty="true"></span>' +
               '- <span class="math-inline " data-overflow="visible">\n' +
               '<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.439ex;" xmlns="http://www.w3.org/2000/svg" width="1.138ex" height="1.439ex" role="img" focusable="false" viewBox="0 -442 503 636"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D45D" d="M23 287Q24 290 25 295T30 317T40 348T55 381T75 411T101 433T134 442Q209 442 230 378L240 387Q302 442 358 442Q423 442 460 395T497 281Q497 173 421 82T249 -10Q227 -10 210 -4Q199 1 187 11T168 28L161 36Q160 35 139 -51T118 -138Q118 -144 126 -145T163 -148H188Q194 -155 194 -157T191 -175Q188 -187 185 -190T172 -194Q170 -194 161 -194T127 -193T65 -192Q-5 -192 -24 -194H-32Q-39 -187 -39 -183Q-37 -156 -26 -148H-6Q28 -147 33 -136Q36 -130 94 103T155 350Q156 355 156 364Q156 405 131 405Q109 405 94 377T71 316T59 280Q57 278 43 278H29Q23 284 23 287ZM178 102Q200 26 252 26Q282 26 310 49T356 107Q374 141 392 215T411 325V331Q411 405 350 405Q339 405 328 402T306 393T286 380T269 365T254 350T243 336T235 326L232 322Q232 321 229 308T218 264T204 212Q178 106 178 102Z"></path></g></g></g></svg></mjx-container></span>’s call to tryHandshake.' +
             '</li>' +
-            '<li class="li_itemize" data-custom-marker="true"><span class="li_level" data-custom-marker="true"></span>' +
+            '<li class="li_itemize" data-custom-marker="true" data-marker-empty="true">' +
+              '<span class="li_level" data-custom-marker="true" data-marker-empty="true"></span>' +
               '- <span class="math-inline " data-overflow="visible">\n' +
               '<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.439ex;" xmlns="http://www.w3.org/2000/svg" width="1.138ex" height="1.439ex" role="img" focusable="false" viewBox="0 -442 503 636"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D45D" d="M23 287Q24 290 25 295T30 317T40 348T55 381T75 411T101 433T134 442Q209 442 230 378L240 387Q302 442 358 442Q423 442 460 395T497 281Q497 173 421 82T249 -10Q227 -10 210 -4Q199 1 187 11T168 28L161 36Q160 35 139 -51T118 -138Q118 -144 126 -145T163 -148H188Q194 -155 194 -157T191 -175Q188 -187 185 -190T172 -194Q170 -194 161 -194T127 -193T65 -192Q-5 -192 -24 -194H-32Q-39 -187 -39 -183Q-37 -156 -26 -148H-6Q28 -147 33 -136Q36 -130 94 103T155 350Q156 355 156 364Q156 405 131 405Q109 405 94 377T71 316T59 280Q57 278 43 278H29Q23 284 23 287ZM178 102Q200 26 252 26Q282 26 310 49T356 107Q374 141 392 215T411 325V331Q411 405 350 405Q339 405 328 402T306 393T286 380T269 365T254 350T243 336T235 326L232 322Q232 321 229 308T218 264T204 212Q178 106 178 102Z"></path></g></g></g></svg></mjx-container></span>’s first read.' +
             '</li>' +
-            '<li class="li_itemize" data-custom-marker="true"><span class="li_level" data-custom-marker="true"></span>' +
+            '<li class="li_itemize" data-custom-marker="true" data-marker-empty="true">' +
+              '<span class="li_level" data-custom-marker="true" data-marker-empty="true"></span>' +
               '- <span class="math-inline " data-overflow="visible">\n' +
               '<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.439ex;" xmlns="http://www.w3.org/2000/svg" width="1.041ex" height="1.439ex" role="img" focusable="false" viewBox="0 -442 460 636"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D45E" d="M33 157Q33 258 109 349T280 441Q340 441 372 389Q373 390 377 395T388 406T404 418Q438 442 450 442Q454 442 457 439T460 434Q460 425 391 149Q320 -135 320 -139Q320 -147 365 -148H390Q396 -156 396 -157T393 -175Q389 -188 383 -194H370Q339 -192 262 -192Q234 -192 211 -192T174 -192T157 -193Q143 -193 143 -185Q143 -182 145 -170Q149 -154 152 -151T172 -148Q220 -148 230 -141Q238 -136 258 -53T279 32Q279 33 272 29Q224 -10 172 -10Q117 -10 75 30T33 157ZM352 326Q329 405 277 405Q242 405 210 374T160 293Q131 214 119 129Q119 126 119 118T118 106Q118 61 136 44T179 26Q233 26 290 98L298 109L352 326Z"></path></g></g></g></svg></mjx-container></span>’s first write.' +
             '</li>' +
-            '<li class="li_itemize" data-custom-marker="true"><span class="li_level" data-custom-marker="true"></span>' +
+            '<li class="li_itemize" data-custom-marker="true" data-marker-empty="true">' +
+              '<span class="li_level" data-custom-marker="true" data-marker-empty="true"></span>' +
               '- <span class="math-inline " data-overflow="visible">\n' +
               '<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.439ex;" xmlns="http://www.w3.org/2000/svg" width="1.041ex" height="1.439ex" role="img" focusable="false" viewBox="0 -442 460 636"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D45E" d="M33 157Q33 258 109 349T280 441Q340 441 372 389Q373 390 377 395T388 406T404 418Q438 442 450 442Q454 442 457 439T460 434Q460 425 391 149Q320 -135 320 -139Q320 -147 365 -148H390Q396 -156 396 -157T393 -175Q389 -188 383 -194H370Q339 -192 262 -192Q234 -192 211 -192T174 -192T157 -193Q143 -193 143 -185Q143 -182 145 -170Q149 -154 152 -151T172 -148Q220 -148 230 -141Q238 -136 258 -53T279 32Q279 33 272 29Q224 -10 172 -10Q117 -10 75 30T33 157ZM352 326Q329 405 277 405Q242 405 210 374T160 293Q131 214 119 129Q119 126 119 118T118 106Q118 61 136 44T179 26Q233 26 290 98L298 109L352 326Z"></path></g></g></g></svg></mjx-container></span>’s call to tryHandshake at the start of its second scan.' +
             '</li>' +
-              '<li class="li_itemize" data-custom-marker="true"><span class="li_level" data-custom-marker="true"></span>' +
+              '<li class="li_itemize" data-custom-marker="true" data-marker-empty="true">' +
+              '<span class="li_level" data-custom-marker="true" data-marker-empty="true"></span>' +
               '- <span class="math-inline " data-overflow="visible">\n' +
             '<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.439ex;" xmlns="http://www.w3.org/2000/svg" width="1.041ex" height="1.439ex" role="img" focusable="false" viewBox="0 -442 460 636"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D45E" d="M33 157Q33 258 109 349T280 441Q340 441 372 389Q373 390 377 395T388 406T404 418Q438 442 450 442Q454 442 457 439T460 434Q460 425 391 149Q320 -135 320 -139Q320 -147 365 -148H390Q396 -156 396 -157T393 -175Q389 -188 383 -194H370Q339 -192 262 -192Q234 -192 211 -192T174 -192T157 -193Q143 -193 143 -185Q143 -182 145 -170Q149 -154 152 -151T172 -148Q220 -148 230 -141Q238 -136 258 -53T279 32Q279 33 272 29Q224 -10 172 -10Q117 -10 75 30T33 157ZM352 326Q329 405 277 405Q242 405 210 374T160 293Q131 214 119 129Q119 126 119 118T118 106Q118 61 136 44T179 26Q233 26 290 98L298 109L352 326Z"></path></g></g></g></svg></mjx-container></span>’s second write.' +
             '</li>' +
-            '<li class="li_itemize" data-custom-marker="true"><span class="li_level" data-custom-marker="true"></span>' +
+            '<li class="li_itemize" data-custom-marker="true" data-marker-empty="true">' +
+              '<span class="li_level" data-custom-marker="true" data-marker-empty="true"></span>' +
               '- <span class="math-inline " data-overflow="visible">\n' +
               '<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.439ex;" xmlns="http://www.w3.org/2000/svg" width="1.138ex" height="1.439ex" role="img" focusable="false" viewBox="0 -442 503 636"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D45D" d="M23 287Q24 290 25 295T30 317T40 348T55 381T75 411T101 433T134 442Q209 442 230 378L240 387Q302 442 358 442Q423 442 460 395T497 281Q497 173 421 82T249 -10Q227 -10 210 -4Q199 1 187 11T168 28L161 36Q160 35 139 -51T118 -138Q118 -144 126 -145T163 -148H188Q194 -155 194 -157T191 -175Q188 -187 185 -190T172 -194Q170 -194 161 -194T127 -193T65 -192Q-5 -192 -24 -194H-32Q-39 -187 -39 -183Q-37 -156 -26 -148H-6Q28 -147 33 -136Q36 -130 94 103T155 350Q156 355 156 364Q156 405 131 405Q109 405 94 377T71 316T59 280Q57 278 43 278H29Q23 284 23 287ZM178 102Q200 26 252 26Q282 26 310 49T356 107Q374 141 392 215T411 325V331Q411 405 350 405Q339 405 328 402T306 393T286 380T269 365T254 350T243 336T235 326L232 322Q232 321 229 308T218 264T204 212Q178 106 178 102Z"></path></g></g></g></svg></mjx-container></span>’s second read.' +
             '</li>' +
-            '<li class="li_itemize" data-custom-marker="true"><span class="li_level" data-custom-marker="true"></span>' +
+            '<li class="li_itemize" data-custom-marker="true" data-marker-empty="true">' +
+              '<span class="li_level" data-custom-marker="true" data-marker-empty="true"></span>' +
               '- <span class="math-inline " data-overflow="visible">\n' +
               '<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.439ex;" xmlns="http://www.w3.org/2000/svg" width="1.138ex" height="1.439ex" role="img" focusable="false" viewBox="0 -442 503 636"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D45D" d="M23 287Q24 290 25 295T30 317T40 348T55 381T75 411T101 433T134 442Q209 442 230 378L240 387Q302 442 358 442Q423 442 460 395T497 281Q497 173 421 82T249 -10Q227 -10 210 -4Q199 1 187 11T168 28L161 36Q160 35 139 -51T118 -138Q118 -144 126 -145T163 -148H188Q194 -155 194 -157T191 -175Q188 -187 185 -190T172 -194Q170 -194 161 -194T127 -193T65 -192Q-5 -192 -24 -194H-32Q-39 -187 -39 -183Q-37 -156 -26 -148H-6Q28 -147 33 -136Q36 -130 94 103T155 350Q156 355 156 364Q156 405 131 405Q109 405 94 377T71 316T59 280Q57 278 43 278H29Q23 284 23 287ZM178 102Q200 26 252 26Q282 26 310 49T356 107Q374 141 392 215T411 325V331Q411 405 350 405Q339 405 328 402T306 393T286 380T269 365T254 350T243 336T235 326L232 322Q232 321 229 308T218 264T204 212Q178 106 178 102Z"></path></g></g></g></svg></mjx-container></span>’s call to checkHandshake.' +
             '</li>' +
@@ -1018,7 +1025,8 @@ module.exports = [
           '<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.439ex;" xmlns="http://www.w3.org/2000/svg" width="1.138ex" height="1.439ex" role="img" focusable="false" viewBox="0 -442 503 636"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D45D" d="M23 287Q24 290 25 295T30 317T40 348T55 381T75 411T101 433T134 442Q209 442 230 378L240 387Q302 442 358 442Q423 442 460 395T497 281Q497 173 421 82T249 -10Q227 -10 210 -4Q199 1 187 11T168 28L161 36Q160 35 139 -51T118 -138Q118 -144 126 -145T163 -148H188Q194 -155 194 -157T191 -175Q188 -187 185 -190T172 -194Q170 -194 161 -194T127 -193T65 -192Q-5 -192 -24 -194H-32Q-39 -187 -39 -183Q-37 -156 -26 -148H-6Q28 -147 33 -136Q36 -130 94 103T155 350Q156 355 156 364Q156 405 131 405Q109 405 94 377T71 316T59 280Q57 278 43 278H29Q23 284 23 287ZM178 102Q200 26 252 26Q282 26 310 49T356 107Q374 141 392 215T411 325V331Q411 405 350 405Q339 405 328 402T306 393T286 380T269 365T254 350T243 336T235 326L232 322Q232 321 229 308T218 264T204 212Q178 106 178 102Z"></path></g></g></g></svg></mjx-container></span> correctly sees that <span class="math-inline " data-overflow="visible">\n' +
           '<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.439ex;" xmlns="http://www.w3.org/2000/svg" width="1.041ex" height="1.439ex" role="img" focusable="false" viewBox="0 -442 460 636"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D45E" d="M33 157Q33 258 109 349T280 441Q340 441 372 389Q373 390 377 395T388 406T404 418Q438 442 450 442Q454 442 457 439T460 434Q460 425 391 149Q320 -135 320 -139Q320 -147 365 -148H390Q396 -156 396 -157T393 -175Q389 -188 383 -194H370Q339 -192 262 -192Q234 -192 211 -192T174 -192T157 -193Q143 -193 143 -185Q143 -182 145 -170Q149 -154 152 -151T172 -148Q220 -148 230 -141Q238 -136 258 -53T279 32Q279 33 272 29Q224 -10 172 -10Q117 -10 75 30T33 157ZM352 326Q329 405 277 405Q242 405 210 374T160 293Q131 214 119 129Q119 126 119 118T118 106Q118 61 136 44T179 26Q233 26 290 98L298 109L352 326Z"></path></g></g></g></svg></mjx-container></span> has updated its segment.' +
         '</li>' +
-        '<li class="li_itemize" data-custom-marker="true"><span class="li_level" data-custom-marker="true"></span>' +
+        '<li class="li_itemize" data-custom-marker="true" data-marker-empty="true">' +
+          '<span class="li_level" data-custom-marker="true" data-marker-empty="true"></span>' +
           '2. The toggle bit for <span class="math-inline " data-overflow="visible">\n' +
           '<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.439ex;" xmlns="http://www.w3.org/2000/svg" width="1.041ex" height="1.439ex" role="img" focusable="false" viewBox="0 -442 460 636"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D45E" d="M33 157Q33 258 109 349T280 441Q340 441 372 389Q373 390 377 395T388 406T404 418Q438 442 450 442Q454 442 457 439T460 434Q460 425 391 149Q320 -135 320 -139Q320 -147 365 -148H390Q396 -156 396 -157T393 -175Q389 -188 383 -194H370Q339 -192 262 -192Q234 -192 211 -192T174 -192T157 -193Q143 -193 143 -185Q143 -182 145 -170Q149 -154 152 -151T172 -148Q220 -148 230 -141Q238 -136 258 -53T279 32Q279 33 272 29Q224 -10 172 -10Q117 -10 75 30T33 157ZM352 326Q329 405 277 405Q242 405 210 374T160 293Q131 214 119 129Q119 126 119 118T118 106Q118 61 136 44T179 26Q233 26 290 98L298 109L352 326Z"></path></g></g></g></svg></mjx-container></span> has changed. Then <span class="math-inline " data-overflow="visible">\n' +
           '<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.439ex;" xmlns="http://www.w3.org/2000/svg" width="1.041ex" height="1.439ex" role="img" focusable="false" viewBox="0 -442 460 636"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D45E" d="M33 157Q33 258 109 349T280 441Q340 441 372 389Q373 390 377 395T388 406T404 418Q438 442 450 442Q454 442 457 439T460 434Q460 425 391 149Q320 -135 320 -139Q320 -147 365 -148H390Q396 -156 396 -157T393 -175Q389 -188 383 -194H370Q339 -192 262 -192Q234 -192 211 -192T174 -192T157 -193Q143 -193 143 -185Q143 -182 145 -170Q149 -154 152 -151T172 -148Q220 -148 230 -141Q238 -136 258 -53T279 32Q279 33 272 29Q224 -10 172 -10Q117 -10 75 30T33 157ZM352 326Q329 405 277 405Q242 405 210 374T160 293Q131 214 119 129Q119 126 119 118T118 106Q118 61 136 44T179 26Q233 26 290 98L298 109L352 326Z"></path></g></g></g></svg></mjx-container></span> did an odd number of updates (i.e., at least one), and <span class="math-inline " data-overflow="visible">\n' +
@@ -1037,12 +1045,12 @@ module.exports = [
       '\\end{itemize}',
     html:
       '<ul class="itemize" style="list-style-type: none">' +
-        '<li class="li_itemize" data-custom-marker="true">' +
-          '<span class="li_level" data-custom-marker="true"></span>' +
+        '<li class="li_itemize" data-custom-marker="true" data-marker-empty="true">' +
+          '<span class="li_level" data-custom-marker="true" data-marker-empty="true"></span>' +
           '○ <strong>Nominal GDP:</strong> Measured using <strong>current year</strong> prices.' +
         '</li>' +
-        '<li class="li_itemize block" data-custom-marker="true">' +
-          '<span class="li_level" data-custom-marker="true"></span>' +
+        '<li class="li_itemize block" data-custom-marker="true" data-marker-empty="true">' +
+          '<span class="li_level" data-custom-marker="true" data-marker-empty="true"></span>' +
           '<div>○ Real GDP: Measured using base year prices; adjusted for inflation. It is the true measure of economic growth.</div>\n' +
           '<pre>' +
             '<code class="hljs">$$\\text{Real GDP} = \\frac{\\text{Nominal GDP}}{\\text{GDP Deflator}} \\times 100$$\n' +

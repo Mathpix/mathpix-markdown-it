@@ -44,4 +44,8 @@ export const listsStyles = `
     list-style-type: none;
     min-height: 1.4em;
   }
+  .itemize > li.li_itemize[data-marker-empty="true"],
+  .enumerate > li.li_enumerate[data-marker-empty="true"] {
+    margin-inline-start: -18px;
+  }
 `;

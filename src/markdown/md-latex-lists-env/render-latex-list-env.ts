@@ -8,6 +8,7 @@ import { needToHighlightAll, highlightText } from "../highlight/common";
 import convertSvgToBase64 from "../md-svg-to-base64/convert-scv-to-base64";
 import { mathTokenTypes } from "../common/consts";
 import { isMathInText } from "../utils";
+import {CustomMarkerHtmlResult} from "./latex-list-types";
 
 var level_itemize = 0;
 var level_enumerate = 0;
@@ -109,10 +110,10 @@ export const render_itemize_list_open: Renderer.RenderRule = (
     : `${paddingInlineStyle}list-style-type: none`;
   const ulOpen: string = `<ul${attrs} style="${style}">`;
   if (prevToken?.type === 'itemize_list_open') {
-    return `<li>${ulOpen}`;
+    return `<li class="li_itemize" data-custom-marker="true" data-marker-empty="true">${ulOpen}`;
   }
   if (prevToken?.type === 'enumerate_list_open') {
-    return `<li class="li_enumerate not_number" data-custom-marker="true" style="display: block">${ulOpen}`;
+    return `<li class="li_enumerate not_number" data-custom-marker="true" data-marker-empty="true" style="display: block">${ulOpen}`;
   }
   return ulOpen;
 };
@@ -173,10 +174,10 @@ export const render_enumerate_list_open: Renderer.RenderRule = (
     : `${paddingInlineStyle}list-style-type: ${currentStyle}`;
   const olOpen: string = `<ol${attrs} style="${style}">`;
   if (prevToken?.type === 'itemize_list_open') {
-    return `<li>${olOpen}`;
+    return `<li class="li_itemize" data-custom-marker="true" data-marker-empty="true">${olOpen}`;
   }
   if (prevToken?.type === 'enumerate_list_open') {
-    return `<li class="li_enumerate not_number" data-custom-marker="true" style="display: block">${olOpen}`;
+    return `<li class="li_enumerate not_number" data-custom-marker="true" data-marker-empty="true" style="display: block">${olOpen}`;
   }
   return olOpen;
 };
@@ -262,24 +263,70 @@ const isTextMarkerTokens = (markerTokens, slf, options, env): {markerType: strin
   };
 };
 
-const generateHtmlForCustomMarker = (token, options, slf, env): {htmlMarker: string, markerType: string, textContent: string} => {
-  let htmlMarker = '';
-  let markerType = 'text';
-  let textContent = '';
-  if (options.forDocx) {
-    let data = generateHtmlForMarkerTokens(token.markerTokens, slf, options, env);
-    htmlMarker = data.htmlMarker;
-    markerType = data.markerType;
-    textContent = data.textContent;
-  } else {
-    htmlMarker = token.marker && token.markerTokens.length
-      ? slf.renderInline(token.markerTokens, options, env) : '';
+/**
+ * Builds HTML for a custom \item[...] marker and reports whether the marker is empty.
+ * "Empty" means: marker is present but contains only whitespace / no visible content.
+ */
+const generateHtmlForCustomMarker = (
+  token: Token,
+  options,
+  slf: Renderer,
+  env
+): CustomMarkerHtmlResult => {
+  const rawMarker: string | undefined = (token as any).marker;
+  const markerTokens: Token[] = (token as any).markerTokens ?? [];
+  // Marker is considered "present" only if \item[...] was used.
+  const markerProvided: boolean = Object.prototype.hasOwnProperty.call(token, "marker");
+  // Fast path: if we have raw marker string, use it to detect empty marker reliably.
+  const hasNonEmptyMarker: boolean = markerProvided
+    ? Boolean(rawMarker && rawMarker.trim().length > 0)
+    : false;
+  if (!markerProvided) {
+    return { htmlMarker: "", markerType: "text", textContent: "", isMarkerEmpty: false };
   }
+  if (options.forDocx) {
+    const data = generateHtmlForMarkerTokens(markerTokens, slf, options, env);
+    // Fallback empty check: if raw marker is missing, use extracted textContent
+    const isEmpty = rawMarker != null
+      ? rawMarker.trim().length === 0
+      : (data.textContent ?? "").trim().length === 0;
+    return {
+      htmlMarker: data.htmlMarker ?? "",
+      markerType: data.markerType ?? "text",
+      textContent: data.textContent ?? "",
+      isMarkerEmpty: isEmpty,
+    };
+  }
+  // Non-DOCX path: render inline marker tokens if marker is non-empty.
+  const htmlMarker = hasNonEmptyMarker
+    ? slf.renderInline(markerTokens, options, env)
+    : "";
   return {
-    htmlMarker: htmlMarker,
-    markerType: markerType,
-    textContent: textContent
+    htmlMarker,
+    markerType: "text",
+    textContent: "",
+    isMarkerEmpty: !hasNonEmptyMarker,
   };
+
+  // let htmlMarker = '';
+  // let markerType = 'text';
+  // let textContent = '';
+  // const hasNonEmptyMarker = token.hasOwnProperty('marker') && token.markerTokens?.length > 0;
+  // if (options.forDocx) {
+  //   let data = generateHtmlForMarkerTokens(token.markerTokens, slf, options, env);
+  //   htmlMarker = data.htmlMarker;
+  //   markerType = data.markerType;
+  //   textContent = data.textContent;
+  // } else {
+  //   htmlMarker = hasNonEmptyMarker
+  //     ? slf.renderInline(token.markerTokens, options, env) : '';
+  // }
+  // return {
+  //   htmlMarker: htmlMarker,
+  //   markerType: markerType,
+  //   textContent: textContent,
+  //   isMarkerEmpty: !hasNonEmptyMarker
+  // };
 };
 
 /**
@@ -290,7 +337,10 @@ const generateHtmlForCustomMarker = (token, options, slf, env): {htmlMarker: str
  */
 const buildCustomMarkerInfo = (token, options, slf, env): MarkerInfo => {
   let dataAttrs: string[] = ['data-custom-marker="true"'];
-  const data = generateHtmlForCustomMarker(token, options, slf, env);
+  const data: CustomMarkerHtmlResult = generateHtmlForCustomMarker(token, options, slf, env);
+  if (data?.isMarkerEmpty) {
+    dataAttrs.push('data-marker-empty="true"');
+  }
   let htmlMarker = data.htmlMarker;
   if (options.forDocx) {
     dataAttrs.push(`data-custom-marker-type="${data.markerType}"`);
