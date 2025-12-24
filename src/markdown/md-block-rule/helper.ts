@@ -1,3 +1,5 @@
+import type Token from 'markdown-it/lib/token';
+
 type SetTokensBlockParseOptions = {
   startLine?: number;
   endLine?: number;
@@ -58,7 +60,6 @@ export const SetTokensBlockParse = (state, content: string, options: SetTokensBl
     forPptx = false,
     disableBlockRules = false,
   } = options;
-  let token;
   let children = [];
   // When block rules are disabled, neutralize leading markdown block markers
   // on the first line so markdown-it does not treat them as real block syntax.
@@ -92,15 +93,9 @@ export const SetTokensBlockParse = (state, content: string, options: SetTokensBl
   let isFirst = true;
   for (let j = 0; j < children.length; j++) {
     const child = children[j];
-    token = state.push(child.type, child.tag, child.nesting);
-    token = Object.assign(token, {
-      attrs: child.attrs,
-      content: child.content,
-      children: child.children,
-      info: child.info,
-      markup: child.markup,
-      meta: child.meta,
-    })
+    // Push token to state
+    state.tokens.push(child);
+    const token: Token = child;
     if (isInline && j === 0 && token.type === "paragraph_open") {
       if (token.attrs) {
         const style = token.attrGet('style');
