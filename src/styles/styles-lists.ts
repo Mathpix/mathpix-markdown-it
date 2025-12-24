@@ -60,4 +60,8 @@ export const listsStyles = `
   .enumerate > li.li_enumerate.block[data-marker-empty="true"] > div:first-of-type * {
     text-indent: 0;
   }
+  .itemize > li > span.li_level .math-inline,
+  .enumerate > li > span.li_level .math-inline {
+    display: inline-block;
+  }
 `;
