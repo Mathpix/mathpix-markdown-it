@@ -1,5 +1,5 @@
 import { RuleBlock } from 'markdown-it';
-import { ChangeLevel } from "./lists/re-level";
+import { ChangeLevel } from "../md-latex-lists-env/re-level";
 const reTag: RegExp = /\\renewcommand/;
 const reTagG: RegExp = /\\renewcommand/g;
 

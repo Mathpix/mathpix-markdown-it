@@ -1,6 +1,5 @@
 import { RuleInline } from 'markdown-it';
-import { reSetCounter } from "../common/consts";
-import { reNumber } from "../md-block-rule/lists";
+import { reSetCounter, reNumber } from "../common/consts";
 import { setTextCounterSection } from "../mdPluginText";
 
 /** `\setcounter{section}{number}` 

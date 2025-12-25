@@ -1,3 +1,4 @@
+import pluginLatexListsEnv from './md-latex-lists-env';
 import pluginLatexCodeEnvs from "./md-latex-lstlisting-env";
 /**
  * configured custom mathjax plugin
@@ -16,7 +17,7 @@ export declare const mdPluginAnchor: {
     };
 };
 export declare const mdPluginTableTabular: (md: MarkdownIt, options: any) => void;
-export declare const mdPluginList: (md: MarkdownIt, options: any) => void;
+export declare const mdPluginList: typeof pluginLatexListsEnv;
 export declare const mdPluginChemistry: (md: MarkdownIt, options: any) => void;
 export declare const mdPluginSvgToBase64: (md: MarkdownIt, options: any) => void;
 export declare const mdPluginCollapsible: (md: any) => void;

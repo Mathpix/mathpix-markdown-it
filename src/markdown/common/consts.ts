@@ -124,6 +124,53 @@ const HSPACE_PLUS_ONE_NL_OPT = String.raw`(?:[^\S\r\n]*\r?\n)?`;
 export const BEGIN_LST_WITH_TRAIL_WS_NL_RE = new RegExp(
   String.raw`^\\begin\{lstlisting\}(?:\[(.*?)\])?` + HSPACE_PLUS_ONE_NL_OPT
 );
+/** Matches \begin{itemize} or \begin{enumerate} */
+export const BEGIN_LIST_ENV_RE: RegExp = /^\\begin\s*\{(itemize|enumerate)\}/;
+export const BEGIN_LIST_ENV_INLINE_RE: RegExp = /\\begin\s*\{(itemize|enumerate)\}/;
+/** Matches \end{itemize} or \end{enumerate} */
+export const END_LIST_ENV_INLINE_RE: RegExp = /\\end\s*\{(itemize|enumerate)\}/;
+export const END_LIST_ENV_RE: RegExp = /^\\end\s*\{(itemize|enumerate)\}/;
+/** Matches \item or \item[optional] */
+export const LATEX_ITEM_COMMAND_RE: RegExp = /^(?:\\item\s*\[([^\]]*)\]|\\item)/;
+export const LATEX_ITEM_COMMAND_INLINE_RE: RegExp = /(?:item\s*\[([^\]]*)\]|item)/;
+export const LATEX_LIST_BOUNDARY_INLINE_RE: RegExp = /\\begin\s*\{(itemize|enumerate)\}|\\end\s*\{(itemize|enumerate)\}|\\item/;
+/** Matches \begin{center}, \begin{left}, \begin{right}, \begin{table}, \begin{figure}, \begin{tabular}, \begin{lstlisting} */
+export const LATEX_BLOCK_ENV_OPEN_RE: RegExp =
+  /\\begin{(center|left|right|table|figure|tabular|lstlisting)}/;
+/**
+ * Enumerate environment detection: \alph, \roman, \arabic, etc.
+ */
+export const LATEX_ENUM_STYLE_RE: RegExp =
+  /(?:\\alph|\\Alph|\\arabic|\\roman|\\Roman)\s*\{(enumi|enumii|enumiii|enumiv)\}/;
+/**
+ * Extracts enumeration style keyword: alph, Roman, arabic...
+ */
+export const LATEX_ENUM_STYLE_KEY_RE: RegExp =
+  /^(?:alph|Alph|arabic|roman|Roman)/;
+/** List of LaTeX enumerate level command names */
+export const ENUM_LEVEL_COMMANDS = [
+  "labelenumi",
+  "labelenumii",
+  "labelenumiii",
+  "labelenumiv",
+] as const;
+/** List of LaTeX itemize level command names */
+export const ITEM_LEVEL_COMMANDS = [
+  "labelitemi",
+  "labelitemii",
+  "labelitemiii",
+  "labelitemiv",
+] as const;
+/**
+ * Mapping LaTeX enumeration style → CSS list-style-type
+ */
+export const ENUM_STYLES: Record<string, string> = {
+  alph: "lower-alpha",
+  Alph: "upper-alpha",
+  arabic: "decimal",
+  roman: "lower-roman",
+  Roman: "upper-roman",
+};
 
 export const LST_HLJS_LANGUAGES = {
   'c++': 'cpp',

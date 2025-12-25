@@ -17,6 +17,7 @@ import { textCollapse } from "./md-inline-rule/text-collapse";
 import { newlineToSpace } from "./md-inline-rule/new-line-to-space";
 import { getStyleFromHighlight } from "./highlight/common";
 import {ParserErrors} from "../mathpix-markdown-model";
+import { textMode } from "./md-inline-rule/text-mode";
 
 export let sectionCount: number = 0;
 export let subCount: number = 0;
@@ -1404,6 +1405,7 @@ export default () => {
     md.inline.ruler.before('textTypes', 'textOut', textOut);
     md.inline.ruler.before('newline', 'newlineToSpace', newlineToSpace);
     md.inline.ruler.before('textTypes', 'dotfill', dotfill);
+    md.inline.ruler.before('textTypes', 'textMode', textMode);
     /** ParserInline#ruler2 -> Ruler
      *[[Ruler]] instance. Second ruler used for post-processing **/
     md.inline.ruler2.at('text_collapse', textCollapse);

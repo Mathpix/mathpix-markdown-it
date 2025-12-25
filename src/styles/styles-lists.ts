@@ -26,6 +26,7 @@ export const listsStyles = `
   
   .itemize > li {
     position: relative;
+    min-height: 1.4em;
   }
   .itemize > li > span.li_level, .li_enumerate.not_number > span.li_level { 
     position: absolute;
@@ -41,5 +42,26 @@ export const listsStyles = `
     position: relative;
     display: inline-block;
     list-style-type: none;
+    min-height: 1.4em;
+  }
+  .itemize > li.li_itemize[data-marker-empty="true"]:not(.block),
+  .enumerate > li.li_enumerate[data-marker-empty="true"]:not(.block) {
+    text-indent: -20px;
+  }
+  .itemize > li.li_itemize.block[data-marker-empty="true"] > div:first-of-type,
+  .enumerate > li.li_enumerate.block[data-marker-empty="true"] > div:first-of-type {
+    text-indent: -20px;
+  }
+  .itemize > li.li_itemize.block[data-marker-empty="true"] > div:not(:first-of-type),
+  .enumerate > li.li_enumerate.block[data-marker-empty="true"] > div:not(:first-of-type) {
+    text-indent: 0;
+  }
+  .itemize > li.li_itemize.block[data-marker-empty="true"] > div:first-of-type *,
+  .enumerate > li.li_enumerate.block[data-marker-empty="true"] > div:first-of-type * {
+    text-indent: 0;
+  }
+  .itemize > li > span.li_level .math-inline,
+  .enumerate > li > span.li_level .math-inline {
+    display: inline-block;
   }
 `;

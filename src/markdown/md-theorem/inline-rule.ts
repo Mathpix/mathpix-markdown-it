@@ -6,14 +6,15 @@ import {
   reTheoremStyle,
   defTheoremStyle,
   reNewCommandQedSymbol,
-  reSetCounter, RE_CAPTION_SETUP
+  reSetCounter,
+  RE_CAPTION_SETUP,
+  reNumber
 } from "../common/consts";
 import {
   addTheoremEnvironment,
   setCounterTheoremEnvironment,
   addEnvironmentsCounter
 } from "./helper";
-import {reNumber} from "../md-block-rule/lists";
 import { findEndMarker } from "../common";
 import { ILabel, addIntoLabelsList } from "../common/labels";
 
