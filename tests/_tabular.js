@@ -18,10 +18,10 @@ global.DOMParser = jsdom.window.DOMParser;
 describe('Check Mathjax:', () => {
   const tests = require('./_data/_tabular/_data');
   tests.forEach(function(test) {
-    const html = MM.markdownToHTML(test.latex, options);
+    const html = MM.markdownToHTML(test.latex, {});
     describe('Latex => ' + test.latex, () => {
       it('Checking result html', (done) => {
-        html.trim().should.equal(test.svg);
+        html.trim().should.equal(test.html);
         done();
       });
     });

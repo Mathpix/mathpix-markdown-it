@@ -7,28 +7,38 @@ import { getMathTableContent, getSubMath } from './sub-math';
 import { getSubTabular, pushSubTabular } from './sub-tabular';
 import { getMultiColumnMultiRow, getCurrentMC, getMC } from './multi-column-row';
 import { getSubDiagbox } from "./sub-cell";
+import { isEscapedAt } from "../../utils";
 
-export const separateByColumns = (str: string) => {
-  const columns = [];
-  let index = 0;
+/**
+ * Splits a tabular row into columns by unescaped '&' characters.
+ * Escaped '\&' is treated as a literal '&' and does not split columns.
+ */
+export const separateByColumns = (str: string): string[] => {
+  // Fast path: no column separators at all
+  if (str.indexOf('&') === -1) {
+    return [str];
+  }
+  const columns: string[] = [];
+  let index: number = 0;
 
   for (let i = 0; i < str.length; i++) {
-    let pos = str.indexOf('&', i);
+    let pos: number = str.indexOf('&', i);
+    // No more separators found
     if (pos === -1) {
-      columns.push(str.slice(index));
-      break
+      break;
     }
-    if (pos > 0 && str.charCodeAt(pos-1) === 92) {
+    // Skip escaped '&' (e.g. '\&')
+    if (isEscapedAt(str, pos)) {
       i = pos;
       continue;
     }
+    // Unescaped '&' splits the column
     columns.push(str.slice(index, pos));
     index = pos + 1;
     i = pos;
   }
-  if (str.length && str[str.length-1] === '&') {
-    columns.push('');
-  }
+  // Always push the remaining tail (may be empty if string ends with '&')
+  columns.push(str.slice(index));
   return columns;
 };
 
@@ -54,6 +64,7 @@ const getRows = (str: string): string[] => {
 const setTokensTabular = (str: string, align: string = '', options: any = {}): Array<TTokenTabular>|null => {
   let res: Array<TTokenTabular> = [];
   const rows: string[] = getRows(str);
+  debugger
 
   let cellsAll: string[] = getCellsAll(rows);
   const numCol: number = getNumCol(cellsAll);

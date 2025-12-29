@@ -56,3 +56,10 @@ export declare const addAttributesToParentToken: (parentToken: Token, token: Tok
 export declare const isMathInText: (tokens: Token[], idx: number, options: any) => boolean;
 export declare const applyAttrToMathml: (mathEquation: string, attr: string, options: any) => string;
 export declare const applyAttrToInlineMath: (tokens: Token[], attrName: string, attrVal: string) => void;
+/**
+ * Returns true if the character at `pos` is escaped by an odd number of backslashes directly before it.
+ * Example:
+ *   "\&"  -> '&' is escaped  (true)
+ *   "\\&" -> '&' is NOT escaped (false), because there are 2 slashes
+ */
+export declare const isEscapedAt: (str: string, pos: number) => boolean;
