@@ -64,7 +64,6 @@ const getRows = (str: string): string[] => {
 const setTokensTabular = (str: string, align: string = '', options: any = {}): Array<TTokenTabular>|null => {
   let res: Array<TTokenTabular> = [];
   const rows: string[] = getRows(str);
-  debugger
 
   let cellsAll: string[] = getCellsAll(rows);
   const numCol: number = getNumCol(cellsAll);
