@@ -835,3 +835,17 @@ export const applyAttrToInlineMath = (tokens: Token[], attrName: string, attrVal
     }
   })
 }
+
+/**
+ * Returns true if the character at `pos` is escaped by an odd number of backslashes directly before it.
+ * Example:
+ *   "\&"  -> '&' is escaped  (true)
+ *   "\\&" -> '&' is NOT escaped (false), because there are 2 slashes
+ */
+export const isEscapedAt = (str: string, pos: number): boolean => {
+  let slashCount: number = 0;
+  for (let i = pos - 1; i >= 0 && str.charCodeAt(i) === 92 /* \ */; i--) {
+    slashCount++;
+  }
+  return (slashCount % 2) === 1;
+};
