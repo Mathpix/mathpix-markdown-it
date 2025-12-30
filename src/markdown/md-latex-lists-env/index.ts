@@ -12,7 +12,8 @@ import {
   listCloseInline,
   listBeginInline,
   listItemInline,
-  listSetCounterInline
+  listSetCounterInline,
+  latexListEnvInline
 } from "./latex-list-env-inline"
 import { reNewCommandInLine } from "../md-inline-rule/renewcommand";
 import {
@@ -25,6 +26,7 @@ import {
   render_latex_list_item_close
 } from "./render-latex-list-env";
 import { resetListState } from "./list-state";
+import { getTerminatedRules } from "../common";
 
 /**
  * Markdown-it plugin that adds full LaTeX-style list environment support:
@@ -48,11 +50,14 @@ export default function pluginLatexListsEnv (md: MarkdownIt, options): void {
   clearItemizeLevelTokens();
   const blockRuler: Ruler = md.block.ruler;
   const inlineRuler: Ruler = md.inline.ruler;
-  blockRuler.after("list", "Lists", Lists, md.options);
+  blockRuler.after("list", "Lists", Lists, {alt: getTerminatedRules("Lists")});
   blockRuler.before("Lists", "ReNewCommand", ReNewCommand);
-  inlineRuler.before('escape', 'list_begin_inline', listBeginInline);
-  inlineRuler.before('list_begin_inline', 'renewcommand_inline', reNewCommandInLine);
-  inlineRuler.after('list_begin_inline', 'list_setcounter_inline', listSetCounterInline);
+  // 1) Aggregator: full list env (nested) — highest priority
+  inlineRuler.before('escape', 'latex_list_env_inline', latexListEnvInline);
+  // 2) Legacy rules (optional fallback for partial parsing)
+  inlineRuler.after('latex_list_env_inline', 'list_begin_inline', listBeginInline);
+  inlineRuler.before('latex_list_env_inline', 'renewcommand_inline', reNewCommandInLine);
+  inlineRuler.after('latex_list_env_inline', 'list_setcounter_inline', listSetCounterInline);
   inlineRuler.after('list_begin_inline', 'list_item_inline', listItemInline);
   inlineRuler.after('list_item_inline', 'list_close_inline', listCloseInline);
   const listRenderers: Record<string, Renderer.RenderRule> = {

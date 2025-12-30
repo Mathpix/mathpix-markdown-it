@@ -3,7 +3,7 @@ import {findEndMarkerPos} from "../../mdPluginRaw";
 import { beginTag, endTag, findOpenCloseTagsMathEnvironment } from "../../utils";
 import { addExtractedCodeBlock } from "./sub-code";
 import {
-  CODE_ENVS,
+  LATEX_BLOCK_ENV,
   doubleCurlyBracketUuidPattern,
   singleCurlyBracketPattern
 } from "../../common/consts";
@@ -118,7 +118,7 @@ export const getSubMath = (str: string, startPos = 0): string => {
     const content: string = str.slice(beginMarkerPos, nextPos);
 
     const id: string = generateUniqueId();
-    const isCodeEnv: boolean = match[1] && CODE_ENVS.has(match[1]);
+    const isCodeEnv: boolean = match[1] && LATEX_BLOCK_ENV.has(match[1]);
     if (isCodeEnv) {
       addExtractedCodeBlock({ id, content });
     } else {

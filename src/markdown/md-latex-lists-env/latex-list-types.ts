@@ -1,4 +1,5 @@
 import type Token from 'markdown-it/lib/token';
+import type StateBlock from 'markdown-it/lib/rules_block/state_block';
 
 export enum ListType {
   itemize = "itemize",
@@ -35,13 +36,13 @@ export interface ListOpenResult {
  * Result of handling a potential inline `\begin{lstlisting}` occurrence.
  *
  * @property handled  Whether the current line was handled (matched a begin).
- * @property envDepth Updated lstlisting environment depth after handling.
+ * @property stack Updated lstlisting/tabular environment depth after handling.
  * @property items    Aggregated items list (possibly updated).
  * @property lineText The (unchanged) original line text.
  */
 export interface LstEndResult {
   handled: boolean;
-  envDepth: number;
+  stack: OpaqueStack;
   items: any[];
   lineText: string;
 }
@@ -56,3 +57,64 @@ export interface CustomMarkerHtmlResult {
   textContent: string;
   isMarkerEmpty: boolean;
 }
+
+/**
+ * Minimal "BlockState-like" contract used by list environment parser.
+ * This allows reusing the same core logic for:
+ * - real markdown-it StateBlock (block rule)
+ * - synthetic block state (inline rule wrapper)
+ */
+export type StateBlockLike = Pick<
+  StateBlock,
+  | 'md'
+  | 'src'
+  | 'env'
+  | 'bMarks'
+  | 'eMarks'
+  | 'tShift'
+  | 'line'
+  | 'startLine'
+  | 'parentType'
+  | 'level'
+  | 'prentLevel'
+  | 'push'
+>;
+
+/** Token push signature used by markdown-it. */
+export type PushFn<TTok extends Token = Token> = (
+  type: string,
+  tag: string,
+  nesting: number
+) => TTok;
+
+/**
+ * A lightweight buffered version of markdown-it StateBlock.
+ * It shares most fields via prototype inheritance but isolates:
+ * - tokens (local buffer)
+ * - env (shallow-cloned)
+ * - push() (writes into the local buffer)
+ */
+export type BufferedBlockState = StateBlock & {
+  tokens: Token[];
+  push: PushFn<Token>;
+};
+
+/** Result for a fully matched LaTeX list environment. */
+export type EnvMatch = {
+  type: ListType;
+  start: number; // absolute position in original inline src
+  end: number;   // absolute position in original inline src
+  raw: string;   // raw env substring including begin/end
+};
+
+
+export type ParseListEnvResult = {
+  ok: boolean;
+  tokens: Token[];
+  /** Optional diagnostics for debugging/telemetry. */
+  error?: string;
+};
+
+export type OpaqueEnvType = "lstlisting" | "tabular";
+export type OpaqueStack = OpaqueEnvType[];
+

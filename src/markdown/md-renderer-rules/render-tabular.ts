@@ -194,7 +194,7 @@ export const renderInlineTokenBlock = (tokens, options, env, slf, isSubTable = f
       }
       colspan = 0;
     }
-    if (token.token === 'inline') {
+    if (token.token === 'inline' || token.type === 'inline') {
       let content: string = '';
       if (token.children) {
         const data = renderTableCellContent(token, true, options, env, slf);
@@ -211,6 +211,29 @@ export const renderInlineTokenBlock = (tokens, options, env, slf, isSubTable = f
         cellSmoothed += content;
       }
       result += content;
+      continue;
+    }
+
+    const tableTokens = [
+      'table_open', 'table_close',
+      'tbody_open', 'tbody_close',
+      'tr_open', 'tr_close',
+      'td_open', 'td_close'
+    ];
+
+    if (!tableTokens.includes(token.token) && !tableTokens.includes(token.type)) {
+      if (token?.type === 'tabular') {
+        const data = renderInlineTokenBlock(token.children, options, env, slf, token.isSubTable, highlight);
+        result += data.table;
+        continue;
+      }
+      if (token?.children?.length > 0) {
+        const data = renderTableCellContent(token, true, options, env, slf);
+        result += data.content;
+      } else {
+        let rendered = slf.renderInline([token], options, env);
+        result += rendered;
+      }
       continue;
     }
     let tokenTag = token.tag;

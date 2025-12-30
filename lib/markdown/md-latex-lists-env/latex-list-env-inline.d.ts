@@ -1,4 +1,18 @@
 import { RuleInline } from 'markdown-it';
+import { EnvMatch } from "./latex-list-types";
+/**
+ * Finds the first complete list environment starting at `startPos`.
+ * - Tracks nested itemize/enumerate via `listStack`
+ * - Treats lstlisting/tabular as opaque (skips their content)
+ * - Skips Markdown backtick code spans so `\begin/\end` inside code does not interfere
+ */
+export declare const findFirstCompleteListEnv: (src: string, startPos: number) => EnvMatch | null;
+/**
+ * Inline rule: recognizes a complete `\begin{itemize|enumerate}...\end{...}` sequence at the current
+ * cursor, parses it with the block list parser, then injects the resulting tokens into the inline stream.
+ * Any token.inlinePos produced by the block parser is shifted to absolute offsets in `state.src`.
+ */
+export declare const latexListEnvInline: RuleInline;
 /**
  * Inline rule that parses LaTeX list environment closing commands:
  *

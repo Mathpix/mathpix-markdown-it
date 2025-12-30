@@ -9,7 +9,8 @@ import {
   openTagTabular,
   closeTagTabular,
   BEGIN_LST_RE,
-  END_LST_RE
+  END_LST_RE,
+  BEGIN_LIST_ENV_INLINE_RE
 } from "../../common/consts";
 
 export const openTag: RegExp = /(?:\\begin\s{0,}{tabular}\s{0,}\{([^}]*)\})/;
@@ -210,6 +211,16 @@ export const StatePushTabulars = (state, cTabular: TTypeContentList, align: stri
             || (state.md.options.outMath.include_table_markdown
               && state.md.options.outMath.table_markdown && state.md.options.outMath.table_markdown.math_as_ascii);
           state.env.subTabular = res[j].type === 'subTabular';
+          if (BEGIN_LIST_ENV_INLINE_RE.test(res[j].content)) {
+            let children = [];
+            state.md.block.parse(res[j].content, state.md, state.env, children);
+            if (children?.length) {
+              for (const child of children) {
+                token.children.push(child);
+              }
+            }
+            continue;
+          }
           tok.envToInline = {...state.env};
           state.env.tabulare = false;
           tok.content  = res[j].content;
@@ -263,6 +274,9 @@ export const BeginTabular: RuleBlock = (state, startLine: number, endLine: numbe
 
   let lineText: string = state.src.slice(pos, max);
   if (lineText.charCodeAt(0) !== 0x5c /* \ */) {
+    return false;
+  }
+  if (!openTagTabular.test(lineText)) {
     return false;
   }
   let isCloseTagExist = false;

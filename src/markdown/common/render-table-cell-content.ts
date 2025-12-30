@@ -17,6 +17,18 @@ export const renderTableCellContent = (token, isSubTable: boolean, options, env,
       if (child.type === "tabular_inline" || isSubTable) {
         child.isSubTable = true;
       }
+      if (child.token === 'inline' || child.type === 'inline') {
+        const data = renderTableCellContent(child, true, options, env, slf);
+        if (data) {
+          content += data.content;
+          tsvCell += data.tsv;
+          csvCell += data.csv;
+          csvCell += data.csv;
+          mdCell += data.tableMd;
+          smoothedCell += data.tableSmoothed;
+        }
+        continue;
+      }
       if ((options.forDocx || options.forPptx) &&
         child.type === 'text' && isWhitespace(child.content)) {
         const prev = token.children[j - 1];
@@ -43,7 +55,7 @@ export const renderTableCellContent = (token, isSubTable: boolean, options, env,
         tsvCell += ascii;
         csvCell += csvAscii;
       } else if (token.type === 'subTabular') {
-        if (token.parents?.length) {
+        if (token.parents?.length || ["backslashbox", "slashbox"].includes(child.type)) {
           tsvCell += tsvData;
           csvCell += csvData;
         } else {
@@ -138,7 +150,7 @@ export const renderTableCellContent = (token, isSubTable: boolean, options, env,
           .replace(/\|/g, '\\|')
           .replace(/\n/g, ' ');
       } else {
-        mdCell += child.content.replace(/\|/g, '\\|');
+        mdCell += child?.content ? child.content.replace(/\|/g, '\\|') : '';
       }
     }
     return {

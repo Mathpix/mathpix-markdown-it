@@ -79,12 +79,14 @@ export declare const RE_CAPTION_TAG_GLOBAL: RegExp;
 export declare const RE_CAPTION_TAG_BEGIN: RegExp;
 export declare const RE_ALIGN_CENTERING_GLOBAL: RegExp;
 export declare const RE_INCLUDEGRAPHICS_WITH_ALIGNMENT_GLOBAL: RegExp;
-export declare const CODE_ENVS: Set<string>;
+export declare const LATEX_BLOCK_ENV: Set<string>;
 export declare const BEGIN_LST_FAST_RE: RegExp;
 export declare const END_LST_RE: RegExp;
 export declare const BEGIN_LST_RE: RegExp;
 export declare const BEGIN_LST_INLINE_RE: RegExp;
+export declare const BEGIN_TABULAR_INLINE_RE: RegExp;
 export declare const END_LST_INLINE_RE: RegExp;
+export declare const END_TABULAR_INLINE_RE: RegExp;
 /** Full begin line: \begin{lstlisting}[...]( +hspace +≤1 NL ) */
 export declare const BEGIN_LST_WITH_TRAIL_WS_NL_RE: RegExp;
 /** Matches \begin{itemize} or \begin{enumerate} */
@@ -174,7 +176,7 @@ export declare const terminatedRules: {
         terminated: any[];
     };
     Lists: {
-        terminated: any[];
+        terminated: string[];
     };
     separatingSpan: {
         terminated: any[];
