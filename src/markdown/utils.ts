@@ -3,7 +3,8 @@ import {
   OPENING_STYLE_TOKENS,
   CLOSING_STYLE_TOKENS,
   INLINE_ELEMENT_TOKENS,
-  SIMPLE_MATH_DELIM_RE
+  SIMPLE_MATH_DELIM_RE,
+  latexEnvironments
 } from "./common/consts";
 
 export const endTag = (arg: string, shouldBeFirst = false): RegExp  => {
@@ -159,6 +160,9 @@ export const includesMultiMathBeginTag = (str, tag): RegExp | null => {
         } else if (match[0] === "\\(" || match[0] === "\(") {
           result = /\\\)/;
         } else if (match[1]) {
+          if (latexEnvironments.includes(match[1])) {
+            return null;
+          }
           result = endTag(match[1])
         }
         break;
@@ -848,4 +852,127 @@ export const isEscapedAt = (str: string, pos: number): boolean => {
     slashCount++;
   }
   return (slashCount % 2) === 1;
+};
+
+type ITagMatch = {
+  posStart: number;
+  posEnd: number;
+  content: string;
+};
+
+type ITagBlock = {
+  open: ITagMatch;
+  close: ITagMatch;
+  content: string;
+  contentPosStart: number;
+  contentPosEnd: number;
+  level: number;
+};
+
+export const findFirstTagContentWithNesting = (
+  str: string,
+  tagOpen: RegExp,
+  tagClose: RegExp,
+  pendingBackTick = '',
+  noBreakBackTick = false
+) => {
+  const max = str.length;
+  const stack: { open: ITagMatch; level: number }[] = [];
+  let pending = '';
+  let posStart = 0;
+  if (pendingBackTick) {
+    const index = str.indexOf(pendingBackTick);
+    if (index === -1) {
+      return { block: null, pending: pendingBackTick };
+    }
+    posStart = index + pendingBackTick.length;
+    pendingBackTick = '';
+  }
+
+  for (let pos = posStart; pos < max; pos++) {
+    const ch = str.charCodeAt(pos);
+    // --- backticks handling ---
+    if (ch === 0x60 /* ` */) {
+      const data = findBackTick(pos, str, pendingBackTick);
+      if (data) {
+        if (data.pending) {
+          pending = data.pending;
+          if (!noBreakBackTick) break;
+        }
+        pos = noBreakBackTick ? data.posEnd - 1 : data.posEnd;
+        continue;
+      }
+    }
+    if (ch !== 0x5c /* \ */) continue;
+    // --- try open ---
+    const openMatch = str.slice(pos).match(tagOpen);
+    if (openMatch && openMatch.index === 0) {
+      const content = openMatch[0];
+      const open: ITagMatch = {
+        posStart: pos,
+        posEnd: pos + content.length,
+        content
+      };
+      stack.push({
+        open,
+        level: stack.length
+      });
+      pos = open.posEnd - 1;
+      continue;
+    }
+    // --- try close ---
+    const closeMatch = tagClose ? str.slice(pos).match(tagClose) : null;
+    if (closeMatch && closeMatch.index === 0) {
+      const content = closeMatch[0];
+      const close: ITagMatch = {
+        posStart: pos,
+        posEnd: pos + content.length,
+        content
+      };
+      const top = stack.pop();
+      if (top) {
+        const contentPosStart = top.open.posEnd;
+        const contentPosEnd = close.posStart;
+        const block: ITagBlock = {
+          open: top.open,
+          close,
+          content: str.slice(contentPosStart, contentPosEnd),
+          contentPosStart,
+          contentPosEnd,
+          level: top.level
+        };
+        // If closed the outermost block, return it immediately and stop searching.
+        if (top.level === 0) {
+          return { block, pending: '' };
+        }
+      }
+      pos = close.posEnd - 1;
+    }
+  }
+  return { block: null, pending };
+};
+
+
+/**
+ * Skips Markdown code spans starting at `pos`.
+ * Handles escaped backticks: \` does not start a code span (unless the backslash itself is escaped).
+ */
+export const skipBackticks = (src: string, pos: number): number => {
+  if (src.charCodeAt(pos) !== 0x60 /* ` */) {
+    return pos;
+  }
+  if (isEscapedAt(src, pos)) {
+    return pos;
+  }
+  let tickCount: number = 0;
+  while (pos + tickCount < src.length && src.charCodeAt(pos + tickCount) === 0x60) {
+    tickCount++;
+  }
+  const open: string = "`".repeat(tickCount);
+  const start: number = pos + tickCount;
+  const end: number = src.indexOf(open, start);
+  if (end === -1) {
+    return src.length;
+  }
+  return end + tickCount;
 };

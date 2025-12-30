@@ -323,11 +323,11 @@ module.exports = [
               'Second Level' +
               '<ul class="itemize" style="list-style-type: none">' +
                 '<li class="li_itemize">' +
-                  '<span class="li_level">.</span>' +
+                  '<span class="li_level">∗</span>' +
                   'Third Level' +
                   '<ul class="itemize" style="list-style-type: none">' +
                     '<li class="li_itemize">' +
-                      '<span class="li_level">.</span>' +
+                      '<span class="li_level">·</span>' +
                       'Fourth Level' +
                     '</li>' +
                   '</ul>' +
@@ -362,7 +362,8 @@ module.exports = [
       '</ul>'
   },
   {
-    latex: '\\begin{itemize}\\item One entry in the list\\item Another entry in the list\\end{itemize}\\renewcommand\\labelitemi{\\textquestiondown}\n' +
+    latex: '\\begin{itemize}\\item One entry in the list\\item Another entry in the list\\end{itemize}\n' +
+      '\\renewcommand\\labelitemi{\\textquestiondown}\n' +
       ' \\renewcommand\\labelitemii{$\\square$}\n' +
       '\n' +
       ' \\begin{itemize}\n' +

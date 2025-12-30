@@ -55,6 +55,7 @@ export const pushSubTabular = (
 
 export const getSubTabular = (sub: string, i: number, isCell: boolean = true, forLatex = false): Array<TTokenTabular> | null => {
   let res: Array<TTokenTabular> = [];
+  let contentFragments: string[] = [];
   let lastIndex: number = 0;
   sub = getExtractedCodeBlockContent(sub, 0);
   sub = sub.trim();
@@ -71,12 +72,13 @@ export const getSubTabular = (sub: string, i: number, isCell: boolean = true, fo
   if (!cellM) {
     return null;
   }
-
+  let parents = null;
   for (let j=0; j < cellM.length; j++) {
     let t = cellM[j].replace(/</g, '').replace(/>/g, '');
     if (!t) { continue }
     const index = subTabular.findIndex(item => item.id === t);
     if (index >= 0) {
+      parents = subTabular[index].parents;
       const iB: number = sub.indexOf(cellM[j]);
       const strB: string = sub.slice(0, iB).trim();
       lastIndex = iB + cellM[j].length;
@@ -87,6 +89,7 @@ export const getSubTabular = (sub: string, i: number, isCell: boolean = true, fo
          strE = sub;
       }
       const st = strB + subTabular[index].content + strE;
+      contentFragments.push(st);
       if (forLatex) {
         res.push({
           token: 'inline',
@@ -125,7 +128,15 @@ export const getSubTabular = (sub: string, i: number, isCell: boolean = true, fo
           content: st
         })
       }
+      contentFragments.push(st);
     }
   }
-  return res;
+  return [{
+    token: 'inline',
+    tag: '',
+    n: 0,
+    content: contentFragments.join(''),
+    type: 'subTabular',
+    parents,
+  }]
 };

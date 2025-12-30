@@ -545,14 +545,14 @@ function paragraphDiv(state, startLine/*, endLine*/) {
   let isMathOpen = false;
   let openedAuthorBlock = false;
   let openBrackets = 0;
-  const pickStartTag: RegExp = /\\begin{(abstract|center|left|right|table|figure|tabular)}/;
-  const pickEndTag: RegExp = /\\end{(abstract|center|left|right|table|figure|tabular)}/;
+  const pickStartTag: RegExp = /^\\begin{(abstract|center|left|right|table|figure|tabular)}/;
+  const pickEndTag: RegExp = /^\\end{(abstract|center|left|right|table|figure|tabular)}/;
   const pickMathStartTag: RegExp = /\\begin{(equation|equation\*)}|\\\[/;
   const pickMathEndTag: RegExp = /\\end{(equation|equation\*)}|\\\]/;
   const mathStartTag: RegExp = /\\begin{([^}]*)}|\\\[|\\\(/;
 
   const pickTag: RegExp = /^\\(?:title|section|subsection)/;
-  const listStartTag: RegExp = /\\begin{(enumerate|itemize)}/;
+  const listStartTag: RegExp = /^\\begin{(enumerate|itemize)}/;
   let content, terminate, i, l, token, oldParentType, lineText, //mml,
     nextLine = startLine + 1,
     terminatorRules = state.md.block.ruler.getRules('paragraph'),
