@@ -311,7 +311,6 @@ export const ListsInternal = (
   if (!haveClose) {
     // Strict mode: do not emit partial tokens (important for inline env wrapper).
     // No explicit \end{itemize}/\end{enumerate} found — flush remaining items
-    console.log("NOT CLOSE TAG.");
     return false;
   }
 
