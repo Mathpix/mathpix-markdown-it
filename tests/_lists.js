@@ -10,6 +10,7 @@ const options = {
 
 
 const { JSDOM } = require("jsdom");
+const tests = require("./_data/_lists/_data");
 const jsdom = new JSDOM();
 global.window = jsdom.window;
 global.document = jsdom.window.document;
@@ -26,5 +27,18 @@ describe('Check Lists:', () => {
         done();
       });
      });
+  });
+});
+
+describe('Check Lists inside tabular:', () => {
+  const tests = require('./_data/_lists/_data_lists_inside_tabular');
+  tests.forEach(function(test) {
+    const html = MM.markdownToHTML(test.mmd, options);
+    describe('Latex => ' + test.mmd, () => {
+      it('Checking result html', (done) => {
+        html.should.equal(test.html);
+        done();
+      });
+    });
   });
 });
