@@ -136,7 +136,7 @@ export const getSubTabular = (sub: string, i: number, isCell: boolean = true, fo
     tag: '',
     n: 0,
     content: contentFragments.join(''),
-    type: 'subTabular',
+    type: forLatex ? 'inline' : 'subTabular',
     parents,
   }]
 };
