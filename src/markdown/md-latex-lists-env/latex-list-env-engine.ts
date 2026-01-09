@@ -153,12 +153,26 @@ export const flushTokensToInline = (
   tokens: any[],
   baseOffset: number
 ) => {
-  for (const srcToken of tokens) {
-    const tok = inlineState.push(srcToken.type, srcToken.tag, srcToken.nesting);
+  const pushCloned = (sourceToken: Token) => {
+    const newToken = inlineState.push(sourceToken.type, sourceToken.tag, sourceToken.nesting);
     // Copy fields safely
-    safeAssignToken(tok, srcToken);
+    safeAssignToken(newToken, sourceToken);
     // Fix positions
-    shiftTokenAbsolutePositions(tok, baseOffset);
+    shiftTokenAbsolutePositions(newToken, baseOffset);
+  };
+  for (const srcToken of tokens) {
+    if (srcToken?.type === 'inline') {
+      if (!srcToken.content) {
+        continue;
+      }
+      const children: Token[] = [];
+      inlineState.md.inline.parse(srcToken.content, inlineState.md, inlineState.env, children);
+      for (const child of children) {
+        pushCloned(child);
+      }
+      continue;
+    }
+    pushCloned(srcToken);
   }
 };
 

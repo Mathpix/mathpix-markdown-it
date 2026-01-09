@@ -210,19 +210,24 @@ export const StatePushTabulars = (state, cTabular: TTypeContentList, align: stri
             || state.md.options.outMath.include_csv
             || (state.md.options.outMath.include_table_markdown
               && state.md.options.outMath.table_markdown && state.md.options.outMath.table_markdown.math_as_ascii);
+          const envSubTabular: boolean = !!state.env.subTabular;
           state.env.subTabular = res[j].type === 'subTabular';
           if (BEGIN_LIST_ENV_INLINE_RE.test(res[j].content)) {
             let children = [];
+            const envIsInline: boolean = !!state.env?.isInline;
+            state.env.isInline = true;
             state.md.block.parse(res[j].content, state.md, state.env, children);
             if (children?.length) {
               for (const child of children) {
                 token.children.push(child);
               }
             }
+            state.env.envIsInline = envIsInline;
             continue;
           }
           tok.envToInline = {...state.env};
           state.env.tabulare = false;
+          state.env.subTabular = envSubTabular;
           tok.content  = res[j].content;
           tok.children = [];
         }
@@ -354,7 +359,8 @@ export const BeginTabular: RuleBlock = (state, startLine: number, endLine: numbe
     return true;
   }
 
-  if (state.md.options.centerTables) {
+  const envIsInline: boolean = !!state.env.isInline;
+  if (state.md.options.centerTables && !envIsInline) {
     return StatePushTabularBlock(state, startLine, nextLine, resString, 'center', true);
   } else {
     return StatePushTabularBlock(state, startLine, nextLine, resString, '');

@@ -1,6 +1,6 @@
 import {TTokenTabular} from "./index";
 import { generateUniqueId, getContent } from "./common";
-import { doubleAngleBracketUuidPattern, singleAngleBracketPattern } from "../../common/consts";
+import { BEGIN_LIST_ENV_INLINE_RE, doubleAngleBracketUuidPattern, singleAngleBracketPattern } from "../../common/consts";
 import { findInDiagboxTable } from "./sub-cell";
 import { getExtractedCodeBlockContent } from "./sub-code";
 
@@ -80,7 +80,13 @@ export const getSubTabular = (sub: string, i: number, isCell: boolean = true, fo
     if (index >= 0) {
       parents = subTabular[index].parents;
       const iB: number = sub.indexOf(cellM[j]);
-      const strB: string = sub.slice(0, iB).trim();
+      let strB: string = '';
+      if (iB > 0) {
+        strB = sub.slice(0, iB);
+      }
+      if (!BEGIN_LIST_ENV_INLINE_RE.test(subTabular[index].content) || strB.trim() === '') {
+        strB = strB.trim();
+      }
       lastIndex = iB + cellM[j].length;
 
       sub = sub.slice(lastIndex)

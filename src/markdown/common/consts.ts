@@ -73,10 +73,12 @@ export const reNumber = /^-?\d+$/;
 export const svgRegex: RegExp = /^<svg\b[^>]*>[\s\S]*<\/svg>$/;
 export const svgInlineRegex: RegExp = /^<svg\b[^>]*>[\s\S]*<\/svg>/;
 export const uuidPattern: string = '(f[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})';
+export const uuidPatternNoCapture: string = 'f[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}';
 export const doubleAngleBracketUuidPattern: RegExp = new RegExp(`<<(?:${uuidPattern})>>`, "g");
 export const singleAngleBracketPattern: RegExp = new RegExp(`<(?:${uuidPattern})>`, "g");
 export const doubleCurlyBracketUuidPattern: RegExp = new RegExp(`\\{\\{(?:${uuidPattern})\\}\\}`, "g");
 export const singleCurlyBracketPattern: RegExp = new RegExp(`\\{(?:${uuidPattern})\\}`, "g");
+export const preserveNewlineUnlessDoubleAngleUuidRegex: RegExp = new RegExp(String.raw`\r?\n(?!\s*<<(?:${uuidPatternNoCapture})>>)` , "g");
 
 export const RE_TAG_WITH_HLINE: RegExp = /\[(.*?)\]\s{0,}\\hline/;
 export const RE_TAG_WITH_HHLINE: RegExp = /\[(.*?)\]\s{0,}\\hhline/;

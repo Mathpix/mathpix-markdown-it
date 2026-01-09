@@ -93,7 +93,11 @@ export const renderTableCellContent = (token, isSubTable: boolean, options, env,
         case 'softbreak':
           tsvCell += ' ';
           csvCell += ' ';
-          mdCell += ' ';
+          const prev = token.children[j - 1];
+          const next = token.children[j + 1];
+          mdCell += prev?.type === 'latex_lstlisting_env' && next?.type === 'latex_lstlisting_env'
+            ? ''
+            : ' ';
           continue;
         case 'image':
         case 'includegraphics': {
