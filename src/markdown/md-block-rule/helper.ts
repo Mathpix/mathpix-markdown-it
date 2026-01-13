@@ -62,6 +62,7 @@ export const SetTokensBlockParse = (state, content: string, options: SetTokensBl
   } = options;
   let children = [];
   const envIsInline: boolean = !!state.env.isInline;
+  const envSubTabular: boolean = !!state.env.subTabular;
   state.env.isInline = disableBlockRules;
   // When block rules are disabled, neutralize leading markdown block markers
   // on the first line so markdown-it does not treat them as real block syntax.
@@ -93,6 +94,7 @@ export const SetTokensBlockParse = (state, content: string, options: SetTokensBl
     state.md.block.parse(safeContent, state.md, state.env, children);
   }
   state.env.isInline = envIsInline;
+  state.env.subTabular = envSubTabular;
   let isFirst = true;
   for (let j = 0; j < children.length; j++) {
     const child = children[j];

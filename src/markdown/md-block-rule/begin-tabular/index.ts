@@ -35,11 +35,21 @@ export type TTokenTabular = {
   ascii_csv?: string,
   ascii_md?: string,
   latex?: string,
-  parents?: Array<string>
+  parents?: Array<string>,
+  isSubTabular?: boolean,
+  meta?: any
 };
 
 
-export type TMulti = {mr?: number, mc?: number, attrs: Array<TAttrs>, content?: string, subTable?: Array<TTokenTabular>, latex: string}
+export type TMulti = {
+  mr?: number,
+  mc?: number,
+  attrs: Array<TAttrs>,
+  content?: string,
+  subTable?: Array<TTokenTabular>,
+  latex: string,
+  multi?: any
+}
 
 const addContentToList = (str: string): TTypeContentList => {
   let res: TTypeContentList = [];
@@ -195,7 +205,7 @@ export const StatePushTabulars = (state, cTabular: TTypeContentList, align: stri
     token.map = [startLine, state.line];
     token.bMarks = 0;
 
-    const res: Array<TTokenTabular> | null = ParseTabular(cTabular[i].content, 0, cTabular[i].align, state.md.options);
+    const res: Array<TTokenTabular> | null = ParseTabular(cTabular[i].content, 0, cTabular[i].align, state.md.options, state.env.subTabular);
     if (!res || res.length === 0) {
       continue;
     }
@@ -211,7 +221,7 @@ export const StatePushTabulars = (state, cTabular: TTypeContentList, align: stri
             || (state.md.options.outMath.include_table_markdown
               && state.md.options.outMath.table_markdown && state.md.options.outMath.table_markdown.math_as_ascii);
           const envSubTabular: boolean = !!state.env.subTabular;
-          state.env.subTabular = res[j].type === 'subTabular';
+          state.env.subTabular = res[j].type === 'subTabular' || res[j].isSubTabular;
           if (BEGIN_LIST_ENV_INLINE_RE.test(res[j].content)) {
             let children = [];
             const envIsInline: boolean = !!state.env?.isInline;
