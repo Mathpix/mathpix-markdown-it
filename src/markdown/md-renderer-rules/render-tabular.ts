@@ -3,7 +3,85 @@ import { CsvJoin } from "../common/csv";
 import { tableMarkdownJoin } from "../common/table-markdown";
 import { formatSource } from "../../helpers/parse-mmd-element";
 import { getStyleFromHighlight } from "../highlight/common";
-import { renderTableCellContent } from "../common/render-table-cell-content";
+import {
+  renderTableCellContent,
+  RenderTableCellContentResult
+} from "../common/render-table-cell-content";
+import { getItemizePlainMarker } from "../md-latex-lists-env/re-level";
+
+const TABLE_TOKENS = new Set([
+  'table_open','table_close','tbody_open','tbody_close','tr_open','tr_close','td_open','td_close',
+]);
+
+/**
+ * Appends a text chunk to the last line of a string array.
+ * If the array is empty, a new line is created.
+ */
+const appendToLastLine = (lines: string[], chunk: string): void => {
+  if (!chunk) {
+    return;
+  }
+  if (lines.length === 0) {
+    lines.push(chunk);
+    return;
+  }
+  lines[lines.length - 1] += chunk;
+};
+
+/**
+ * Ensures there is an empty last line in the lines array.
+ * If the current last line contains non-whitespace characters, appends a new empty line.
+ *
+ * @param lines - Array of lines representing a multi-line cell value.
+ */
+const ensureTrailingEmptyLine = (lines: string[]): void => {
+  if (!lines.length) {
+    lines.push('');
+    return;
+  }
+  if (lines[lines.length - 1].trim()) {
+    lines.push('');
+  }
+};
+
+/**
+ * Formats TSV cell content from an array of lines.
+ *
+ * Behavior:
+ * - Joins all lines using '\n' by default.
+ * - If the resulting text contains a double quote (`"`), falls back to joining lines with spaces
+ *   to avoid broken TSV/Excel output.
+ * - If `isSubTable` is true, returns the joined text without quoting.
+ * - Otherwise, wraps the value in double quotes only when it contains newlines or tabs.
+ * @param lines - Cell content split into lines.
+ * @param isSubTable - Whether the cell belongs to a nested table context.
+ * @returns TSV-ready string for a single table cell.
+ */
+const formatTsvCell = (lines: string[], isSubTable: boolean): string => {
+  const text: string = (lines ?? []).join('\n');
+  if (text.includes('"')) {
+    return (lines ?? []).join(' ');
+  }
+  if (isSubTable) {
+    return text;
+  }
+  // Quote if TSV contains characters that should be protected in spreadsheets/parsers.
+  const needsQuoting: boolean = /[\n\t]/.test(text);
+  if (!needsQuoting) {
+    return text;
+  }
+  return `"${text}"`;
+};
+
+/**
+ * Formats CSV cell content from an array of lines by joining them with newline characters.
+ *
+ * @param lines - Cell content split into lines.
+ * @returns CSV-ready string for a single table cell.
+ */
+const formatCsvCell = (lines: string[]): string => {
+  return(lines ?? []).join('\n');
+};
 
 const tokenAttrGet = (token, name) => {
   if (!name) { return ''}
@@ -32,7 +110,224 @@ const tokenAttrSet = (token, name, value) => {
   token.attrs[index][1] = value
 };
 
-export const renderInlineTokenBlock = (tokens, options, env, slf, isSubTable = false, highlight = null) =>{
+type CellAccumulators = {
+  result: string;
+  cellMd: string;
+  cellSmoothed: string;
+  cellTsvLines: string[];
+  cellCsvLines: string[];
+};
+
+type RenderCtx = {
+  tokens: any[];
+  idx: number;
+  options: any;
+  env: any;
+  slf: any;
+  highlight?: any;
+};
+
+/**
+ * Renders a non-table token into the current table-cell accumulators.
+ *
+ * Handles three cases:
+ * - `tabular` blocks via `renderInlineTokenBlock` (nested LaTeX tables).
+ * - Composite tokens (with children) via `renderTableCellContent` (recursive cell rendering).
+ * - Leaf tokens via `slf.renderInline`, plus list-specific Markdown stitching
+ *   (handled by `handleListTokensForCellMarkdown`).
+ *
+ * @param token - Token to render (expected to be outside the core table token set).
+ * @param ctx - Rendering context (renderer/options/env and additional state used by helpers).
+ * @param acc - Mutable accumulators for the current cell (HTML/text, TSV/CSV, Markdown, smoothed).
+ */
+const renderNonTableTokenIntoCell = (
+  token: any,
+  ctx: RenderCtx,
+  acc: CellAccumulators
+): void => {
+  const { options, env, slf, highlight } = ctx;
+  if (token?.type === 'tabular') {
+    const data = renderInlineTokenBlock(token.children, options, env, slf, true, highlight);
+    acc.result += data.table;
+    if (Array.isArray(data.tableMd) && data.tableMd.length) {
+      if (acc.cellMd?.trim()) {
+        acc.cellMd += '<br>';
+      }
+      acc.cellMd += data.tableMd.map(item => (typeof item === 'string' ? item : item.join(' '))).join(' <br> ');
+    }
+    if (data.tsv) {
+      ensureTrailingEmptyLine(acc.cellTsvLines);
+      appendToLastLine(acc.cellTsvLines, TsvJoin(data.tsv, options));
+    }
+    if (data.csv) {
+      ensureTrailingEmptyLine(acc.cellCsvLines);
+      appendToLastLine(acc.cellCsvLines, CsvJoin(data.csv, options, true));
+    }
+    return;
+  }
+  if (token?.children?.length) {
+    const cellRender: RenderTableCellContentResult = renderTableCellContent(token, true, options, env, slf);
+    acc.result += cellRender.content;
+    appendToLastLine(acc.cellTsvLines, cellRender.tsv);
+    appendToLastLine(acc.cellCsvLines, cellRender.csv);
+    acc.cellMd += cellRender.tableMd;
+    acc.cellSmoothed += cellRender.tableSmoothed;
+    return;
+  }
+  // Leaf token
+  acc.result += slf.renderInline([token], options, env);
+  // List-related markdown stitching inside table cells
+  handleListTokensForCellMarkdown(token, ctx, acc);
+};
+
+/**
+ * Applies Markdown/TSV/CSV "stitching" rules for LaTeX list tokens when rendering table cells.
+ * This handler does not render the list content itself; it only injects separators (e.g. <br>),
+ * indentation, and list markers so that list structure is preserved inside a single table cell.
+ *
+ * @param token - Current token being processed.
+ * @param ctx - Render context containing the token stream, current index, and renderer dependencies.
+ * @param acc - Mutable accumulators for the current cell (md/tsv/csv/smoothed).
+ */
+const handleListTokensForCellMarkdown = (
+  token: any,
+  ctx: RenderCtx,
+  acc: CellAccumulators
+): void => {
+  const { tokens, idx, options, env, slf } = ctx;
+  const prevToken = idx > 0 ? tokens[idx - 1] : null;
+  const addBr = (): void => {
+    acc.cellMd += '<br>';
+  };
+  if (token?.type && ["itemize_list_open", "enumerate_list_open"].includes(token.type)) {
+    const level = token?.prentLevel ?? 0;
+    const prevType = prevToken?.type;
+    const prevLevel = prevToken?.prentLevel ?? 0;
+    // Add a break after a paragraph boundary.
+    if (prevType === 'paragraph_close') {
+      addBr();
+    }
+    // Add a break before nested lists unless we are right after a list item close.
+    if (prevToken && prevType !== 'latex_list_item_close' && level > 0) {
+      addBr();
+    }
+    // Add a break between top-level lists.
+    const prevIsListClose: boolean = prevType === 'enumerate_list_close' || prevType === 'itemize_list_close';
+    if (prevIsListClose && prevLevel === 0) {
+      addBr();
+    }
+    return;
+  }
+  if (token?.type === "latex_list_item_open") {
+    let mdPrefix = '';
+    let tsvPrefix = '';
+    let csvPrefix = '';
+    // Add a break if a list item starts right after a paragraph.
+    if (prevToken?.type === 'paragraph_close') {
+      mdPrefix += '<br>';
+      acc.cellSmoothed += ' ';
+    }
+    const isEnumerate: boolean = token.parentType === "enumerate";
+    // Ensure list items always start on a fresh TSV/CSV line.
+    ensureTrailingEmptyLine(acc.cellTsvLines);
+    ensureTrailingEmptyLine(acc.cellCsvLines);
+    // Indent nested list items using non-breaking spaces (HTML).
+    const listLevel = isEnumerate ? token.meta?.enumerateLevel : token.meta?.itemizeLevel;
+    for (let i = 1; i < listLevel; i++) {
+      mdPrefix += '&#160;&#160;';
+      tsvPrefix += '  ';
+      csvPrefix += '  ';
+    }
+    let markerMd: string = '';
+    let markerTsv: string = ' ';
+    let markerCsv: string = ' ';
+    // If the token provides a custom marker, use it; otherwise default to bullet markers.
+    if (token.hasOwnProperty('marker')) {
+      if (token.markerTokens?.length === 1) {
+        // Avoid mutating the original token: render marker tokens via a shallow copy.
+        const markerToken = { ...token, children: token.markerTokens };
+        const markerRender: RenderTableCellContentResult = renderTableCellContent(markerToken, true, options, env, slf);
+        markerMd = markerRender.tableMd ?? '';
+        markerTsv += markerRender.tsv ?? '';
+        markerCsv += markerRender.csv ?? '';
+      } else {
+        markerMd = token.marker ?? '';
+        markerTsv += token.marker ?? '';
+        markerCsv += token.marker ?? '';
+      }
+    } else {
+      const itemizeLevel: number = Math.max(1, listLevel ?? 1);
+      const plainMarker: string = getItemizePlainMarker(itemizeLevel);
+      markerMd = plainMarker;
+      markerTsv += plainMarker;
+      markerCsv += plainMarker;
+    }
+    if (markerMd) {
+      mdPrefix += `${markerMd} `;
+    }
+    if (markerTsv) {
+      tsvPrefix += markerTsv + ' ';
+    }
+    if (markerCsv) {
+      csvPrefix += markerCsv + ' ';
+    }
+    acc.cellMd += mdPrefix;
+    appendToLastLine(acc.cellTsvLines, tsvPrefix);
+    appendToLastLine(acc.cellCsvLines, csvPrefix);
+    acc.cellSmoothed += markerMd ? `${markerMd} ` : '';
+    return;
+  }
+  if (token?.type === "latex_list_item_close") {
+    const prevType = prevToken?.type;
+    // Add a break between list items unless the list ends immediately after the item.
+    const shouldBreak: boolean = prevType !== 'itemize_list_close' && prevType !== 'enumerate_list_close';
+    if (shouldBreak) {
+      addBr();
+    }
+    return;
+  }
+  if (token?.type && ["itemize_list_close", "enumerate_list_close"].includes(token.type)) {
+    // No-op: list close is handled by item close logic and surrounding tokens.
+    return;
+  }
+}
+
+type RenderInlineTokenBlockResult = {
+  /** Rendered HTML table markup. */
+  table: string;
+  /** TSV rows: each row is an array of cell strings. */
+  tsv: string[][];
+  /** CSV rows: each row is an array of cell strings. */
+  csv: string[][];
+  /** Markdown rows: each row is an array of cell strings. */
+  tableMd: string[][];
+  /** Smoothed rows: each row is an array of cell strings. */
+  tableSmoothed: string[][];
+  /** LaTeX column spec / alignment string captured from the token stream, if available. */
+  align: string;
+};
+
+/**
+ * Renders a markdown-it token stream representing an HTML table (or LaTeX tabular)
+ * into HTML markup and parallel TSV/CSV/Markdown/"smoothed" table representations.
+ * Also handles nested tabular blocks and list tokens inside table cells.
+ *
+ * @param tokens - Token stream to render.
+ * @param options - Renderer options (pptx/docx/xhtml, etc.).
+ * @param env - Rendering environment.
+ * @param slf - Markdown-it renderer instance.
+ * @param isSubTable - Whether the current table is nested inside another table cell.
+ * @param highlight - Optional highlight metadata applied to table cells.
+ * @returns Rendered table outputs in multiple formats.
+ */
+export const renderInlineTokenBlock = (
+  tokens,
+  options,
+  env,
+  slf,
+  isSubTable = false,
+  highlight = null
+): RenderInlineTokenBlockResult => {
   let nextToken,
     result = '',
     needLf = false;
@@ -45,18 +340,20 @@ export const renderInlineTokenBlock = (tokens, options, env, slf, isSubTable = f
   let arrRowCsv = [];
   let arrRowMd = [];
   let arrRowSmoothed = [];
-  let cell = '';
-  let cellCsv = '';
+  let cellTsvLines: string[] = [''];
+  let cellCsvLines: string[] = [''];
   let cellMd= '';
   let cellSmoothed= '';
   let align = '';
   let colspan = 0, rowspan = [], mr = 0;
   let numCol = 0;
 
+  const ctx: RenderCtx = { tokens, idx: 0, options, env, slf, highlight };
   for (let idx = 0; idx < tokens.length; idx++) {
+    ctx.idx = idx;
     let token = tokens[idx];
     if (token.hidden) {
-      return {table: '', tsv: '', tableMd: '', align: ''};
+      continue;
     }
 
     if ( token.n !== -1 && idx && tokens[idx - 1].hidden) {
@@ -127,8 +424,8 @@ export const renderInlineTokenBlock = (tokens, options, env, slf, isSubTable = f
         styles += `background-image: linear-gradient(to bottom ${dir}, transparent calc(50% - 0.5px), black 50%, black 50%, transparent calc(50% + 0.5px));`;
         tokenAttrSet(token, 'style', styles);
       }
-      cell = '';
-      cellCsv = '';
+      cellTsvLines = [''];
+      cellCsvLines = [''];
       cellMd = '';
       cellSmoothed = '';
       colspan = tokenAttrGet(token, 'colspan');
@@ -171,13 +468,13 @@ export const renderInlineTokenBlock = (tokens, options, env, slf, isSubTable = f
       }
       l = arrRow &&  arrRow.length > 0 ? arrRow.length  : 0;
       if (!mr && rowspan[l] && rowspan[l][0] > 0) {
-        arrRow.push(cell);
-        arrRowCsv.push(cellCsv);
+        arrRow.push(formatTsvCell(cellTsvLines, isSubTable));
+        arrRowCsv.push(formatCsvCell(cellCsvLines));
         arrRowMd.push(cellMd);
         arrRowSmoothed.push(cellSmoothed);
       } else {
-        arrRow.push(cell);
-        arrRowCsv.push(cellCsv);
+        arrRow.push(formatTsvCell(cellTsvLines, isSubTable));
+        arrRowCsv.push(formatCsvCell(cellCsvLines));
         arrRowMd.push(cellMd);
         arrRowSmoothed.push(cellSmoothed);
         if (colspan && colspan > 1) {
@@ -197,43 +494,36 @@ export const renderInlineTokenBlock = (tokens, options, env, slf, isSubTable = f
     if (token.token === 'inline' || token.type === 'inline') {
       let content: string = '';
       if (token.children) {
-        const data = renderTableCellContent(token, true, options, env, slf);
-        content += data.content;
-        cell += data.tsv;
-        cellCsv += data.csv;
-        cellMd += data.tableMd;
-        cellSmoothed += data.tableSmoothed;
+        const cellRender: RenderTableCellContentResult = renderTableCellContent(token, true, options, env, slf);
+        content += cellRender.content;
+        appendToLastLine(cellTsvLines, cellRender.tsv);
+        appendToLastLine(cellCsvLines, cellRender.csv);
+        cellMd += cellRender.tableMd;
+        cellSmoothed += cellRender.tableSmoothed;
       } else {
         content = slf.renderInline([{type: 'text', content: token.content}], options, env);
-        cell += content;
-        cellCsv += content;
+        appendToLastLine(cellTsvLines, content);
+        appendToLastLine(cellCsvLines, content);
         cellMd += content;
         cellSmoothed += content;
       }
       result += content;
       continue;
     }
-
-    const tableTokens = [
-      'table_open', 'table_close',
-      'tbody_open', 'tbody_close',
-      'tr_open', 'tr_close',
-      'td_open', 'td_close'
-    ];
-
-    if (!tableTokens.includes(token.token) && !tableTokens.includes(token.type)) {
-      if (token?.type === 'tabular') {
-        const data = renderInlineTokenBlock(token.children, options, env, slf, token.isSubTable, highlight);
-        result += data.table;
-        continue;
-      }
-      if (token?.children?.length > 0) {
-        const data = renderTableCellContent(token, true, options, env, slf);
-        result += data.content;
-      } else {
-        let rendered = slf.renderInline([token], options, env);
-        result += rendered;
-      }
+    if (!TABLE_TOKENS.has(token.token) && !TABLE_TOKENS.has(token.type)) {
+      const acc: CellAccumulators = {
+        result,
+        cellMd,
+        cellSmoothed,
+        cellTsvLines,
+        cellCsvLines,
+      };
+      renderNonTableTokenIntoCell(token, ctx, acc);
+      result = acc.result;
+      cellMd = acc.cellMd;
+      cellSmoothed = acc.cellSmoothed;
+      cellTsvLines = acc.cellTsvLines;
+      cellCsvLines = acc.cellCsvLines;
       continue;
     }
     let tokenTag = token.tag;

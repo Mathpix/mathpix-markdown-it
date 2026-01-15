@@ -341,7 +341,7 @@ const buildCustomMarkerInfo = (token, options, slf, env): MarkerInfo => {
 const buildItemizeMarkerInfo = (token, options, env, slf, level_itemize: number): MarkerInfo => {
   const itemizeLevelTokens = GetItemizeLevelTokens(token.itemizeLevel);
   let dataAttr: string = '';
-  let htmlMarker: string = '.';
+  let htmlMarker: string = '·';
   if (token.hasOwnProperty('marker') && token.markerTokens) {
     return buildCustomMarkerInfo(token, options, slf, env);
   }
@@ -413,6 +413,7 @@ const renderLatexListItemCore = (
   // ENUMERATE
   if (isEnumerate) {
     const hasCustomMarker = token.hasOwnProperty('marker') && token.markerTokens;
+    token.meta = {...(token.meta ?? {}), enumerateLevel: level_enumerate};
     // Case 1: custom marker (e.g. \item[foo])
     if (hasCustomMarker) {
       const className = 'li_enumerate not_number';
@@ -452,6 +453,7 @@ const renderLatexListItemCore = (
   }
   // ITEMIZE
   const itemizeInfo: MarkerInfo = buildItemizeMarkerInfo(token, options, env, slf, level_itemize);
+  token.meta = {...(token.meta ?? {}), itemizeLevel: level_itemize};
   htmlMarker = itemizeInfo.htmlMarker;
   dataAttr += itemizeInfo.dataAttr || "";
   const className = token.meta?.isBlock

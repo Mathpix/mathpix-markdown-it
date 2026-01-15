@@ -5,7 +5,40 @@ import { mathTokenTypes } from "./consts";
 import { isWhitespace } from "../common";
 const escapeHtml = require('markdown-it/lib/common/utils').escapeHtml;
 
-export const renderTableCellContent = (token, isSubTable: boolean, options, env, slf) => {
+export type RenderTableCellContentResult = {
+  /** Rendered HTML (or text) for the cell, depending on renderer/options. */
+  content: string;
+  /** TSV-safe representation of the cell. */
+  tsv: string;
+  /** CSV-safe representation of the cell. */
+  csv: string;
+  /** Markdown representation of the cell for table output. */
+  tableMd: string;
+  /** "Smoothed" representation used for PPTX/DOCX or other layout-sensitive outputs. */
+  tableSmoothed: string;
+};
+
+/**
+ * Renders a table cell token into multiple parallel representations:
+ * HTML/text (`content`), TSV, CSV, Markdown (`tableMd`), and a "smoothed" variant
+ * used for DOCX/PPTX where line wrapping and block-like inline tokens matter.
+ *
+ * This function is recursive: inline children may contain nested tabular content.
+ *
+ * @param token - Cell token (or inline token) whose children form the cell content.
+ * @param isSubTable - True if the current token is being rendered inside a nested table context.
+ * @param options - Rendering options (DOCX/PPTX/markdown math settings).
+ * @param env - Markdown-it rendering environment.
+ * @param slf - Markdown-it renderer instance (must support renderInline).
+ * @returns Combined render outputs for this cell.
+ */
+export const renderTableCellContent = (
+  token,
+  isSubTable: boolean,
+  options,
+  env,
+  slf
+): RenderTableCellContentResult => {
   let content: string = '';
   let tsvCell = '';
   let csvCell = '';
@@ -18,14 +51,13 @@ export const renderTableCellContent = (token, isSubTable: boolean, options, env,
         child.isSubTable = true;
       }
       if (child.token === 'inline' || child.type === 'inline') {
-        const data = renderTableCellContent(child, true, options, env, slf);
-        if (data) {
-          content += data.content;
-          tsvCell += data.tsv;
-          csvCell += data.csv;
-          csvCell += data.csv;
-          mdCell += data.tableMd;
-          smoothedCell += data.tableSmoothed;
+        const cellRender: RenderTableCellContentResult = renderTableCellContent(child, true, options, env, slf);
+        if (cellRender) {
+          content += cellRender.content;
+          tsvCell += cellRender.tsv;
+          csvCell += cellRender.csv;
+          mdCell += cellRender.tableMd;
+          smoothedCell += cellRender.tableSmoothed;
         }
         continue;
       }
