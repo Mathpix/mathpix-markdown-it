@@ -1,10 +1,6 @@
 import type Token from "markdown-it/lib/token";
 import type StateBlock from 'markdown-it/lib/rules_block/state_block';
 import type StateInline from 'markdown-it/lib/rules_inline/state_inline';
-/** Default LaTeX itemize bullet styles */
-export declare let itemizeLevelDefaults: string[];
-/** Default enumerate styles for CSS list-style-type */
-export declare let enumerateLevelDefaults: string[];
 /** Active itemize levels (mutable state) */
 export declare let itemizeLevel: string[];
 /** Active enumerate levels (mutable state) */

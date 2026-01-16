@@ -842,5 +842,410 @@ module.exports = [
       '            · Level 6\n' +
       '            · Level 6"'
   },
-
+  {
+    latex: '\\begin{tabular}{|l|}\n' +
+      '\\hline\n' +
+      'Enumerate \\\\\n' +
+      '\\hline\n' +
+      '- text\n' +
+      'text\n' +
+      '\\begin{enumerate}\n' +
+      '  \\item Level 1\n' +
+      '  \\item Level 1\n' +
+      '  \\begin{enumerate}\n' +
+      '    \\item Level 2\n' +
+      '    \\item Level 2\n' +
+      '    \\begin{enumerate}\n' +
+      '      \\item Level 3\n' +
+      '      \\item Level 3\n' +
+      '      \\begin{enumerate}\n' +
+      '        \\item Level 4\n' +
+      '        \\item Level 4\n' +
+      '        \\begin{enumerate}\n' +
+      '          \\item Level 5\n' +
+      '          \\item Level 5\n' +
+      '          \\begin{enumerate}\n' +
+      '            \\item Level 6\n' +
+      '            \\item Level 6\n' +
+      '          \\end{enumerate}\n' +
+      '          \\item Level 5\n' +
+      '          \\item Level 5\n' +
+      '        \\end{enumerate}\n' +
+      '        \\item Level 4\n' +
+      '        \\item Level 4\n' +
+      '      \\end{enumerate}\n' +
+      '      \\item Level 3\n' +
+      '      \\item Level 3\n' +
+      '    \\end{enumerate}\n' +
+      '    \\item Level 2\n' +
+      '    \\item Level 2\n' +
+      '  \\end{enumerate}\n' +
+      '  \\item Level 1\n' +
+      '  \\item Level 1\n' +
+      '\\end{enumerate}\n' +
+      '\\\\\n' +
+      '\\hline\n' +
+      '\\end{tabular}',
+    tsv: 'Enumerate\n' +
+      '"- text text\n' +
+      ' 1. Level 1\n' +
+      ' 2. Level 1\n' +
+      '   a. Level 2\n' +
+      '   b. Level 2\n' +
+      '     i. Level 3\n' +
+      '     ii. Level 3\n' +
+      '       A. Level 4\n' +
+      '       B. Level 4\n' +
+      '         1. Level 5\n' +
+      '         2. Level 5\n' +
+      '           1. Level 6\n' +
+      '           2. Level 6\n' +
+      '         3. Level 5\n' +
+      '         4. Level 5\n' +
+      '       C. Level 4\n' +
+      '       D. Level 4\n' +
+      '     iii. Level 3\n' +
+      '     iv. Level 3\n' +
+      '   c. Level 2\n' +
+      '   d. Level 2\n' +
+      ' 3. Level 1\n' +
+      ' 4. Level 1"',
+    markdown: '| Enumerate |\n' +
+      '| :--- |\n' +
+      '| - text text<br>1. Level 1<br>2. Level 1<br>&#160;&#160;a. Level 2<br>&#160;&#160;b. Level 2<br>&#160;&#160;&#160;&#160;i. Level 3<br>&#160;&#160;&#160;&#160;ii. Level 3<br>&#160;&#160;&#160;&#160;&#160;&#160;A. Level 4<br>&#160;&#160;&#160;&#160;&#160;&#160;B. Level 4<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;1. Level 5<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;2. Level 5<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;1. Level 6<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;2. Level 6<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;3. Level 5<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;4. Level 5<br>&#160;&#160;&#160;&#160;&#160;&#160;C. Level 4<br>&#160;&#160;&#160;&#160;&#160;&#160;D. Level 4<br>&#160;&#160;&#160;&#160;iii. Level 3<br>&#160;&#160;&#160;&#160;iv. Level 3<br>&#160;&#160;c. Level 2<br>&#160;&#160;d. Level 2<br>3. Level 1<br>4. Level 1<br> |',
+    csv: 'Enumerate\n' +
+      '"- text text\n' +
+      ' 1. Level 1\n' +
+      ' 2. Level 1\n' +
+      '   a. Level 2\n' +
+      '   b. Level 2\n' +
+      '     i. Level 3\n' +
+      '     ii. Level 3\n' +
+      '       A. Level 4\n' +
+      '       B. Level 4\n' +
+      '         1. Level 5\n' +
+      '         2. Level 5\n' +
+      '           1. Level 6\n' +
+      '           2. Level 6\n' +
+      '         3. Level 5\n' +
+      '         4. Level 5\n' +
+      '       C. Level 4\n' +
+      '       D. Level 4\n' +
+      '     iii. Level 3\n' +
+      '     iv. Level 3\n' +
+      '   c. Level 2\n' +
+      '   d. Level 2\n' +
+      ' 3. Level 1\n' +
+      ' 4. Level 1"'
+  },
+  {
+    latex: '\\begin{tabular}{|l|l|l|}\n' +
+      '\\hline\n' +
+      'Enumerate & with custom markers & without markers \\\\\n' +
+      '\\hline\n' +
+      '- text\n' +
+      'text\n' +
+      '\\begin{enumerate}\n' +
+      '  \\item Level 1\n' +
+      '  \\item Level 1\n' +
+      '  \\begin{enumerate}\n' +
+      '    \\item Level 2\n' +
+      '    \\item Level 2\n' +
+      '    \\begin{enumerate}\n' +
+      '      \\item Level 3\n' +
+      '      \\item Level 3\n' +
+      '      \\begin{enumerate}\n' +
+      '        \\item Level 4\n' +
+      '        \\item Level 4\n' +
+      '        \\begin{enumerate}\n' +
+      '          \\item Level 5\n' +
+      '          \\item Level 5\n' +
+      '          \\begin{enumerate}\n' +
+      '            \\item Level 6\n' +
+      '            \\item Level 6\n' +
+      '          \\end{enumerate}\n' +
+      '          \\item Level 5\n' +
+      '          \\item Level 5\n' +
+      '        \\end{enumerate}\n' +
+      '        \\item Level 4\n' +
+      '        \\item Level 4\n' +
+      '      \\end{enumerate}\n' +
+      '      \\item Level 3\n' +
+      '      \\item Level 3\n' +
+      '    \\end{enumerate}\n' +
+      '    \\item Level 2\n' +
+      '    \\item Level 2\n' +
+      '  \\end{enumerate}\n' +
+      '  \\item Level 1\n' +
+      '  \\item Level 1\n' +
+      '\\end{enumerate}\n' +
+      '&\n' +
+      '- text\n' +
+      'text\n' +
+      '\\begin{enumerate}\n' +
+      '  \\item[1.] Level 1\n' +
+      '  \\item[2.] Level 1\n' +
+      '  \\begin{enumerate}\n' +
+      '    \\item[a.] Level 2\n' +
+      '    \\item[b.] Level 2\n' +
+      '    \\begin{enumerate}\n' +
+      '      \\item[i.] Level 3\n' +
+      '      \\item[ii.] Level 3\n' +
+      '      \\begin{enumerate}\n' +
+      '        \\item[A.] Level 4\n' +
+      '        \\item[B.] Level 4\n' +
+      '        \\begin{enumerate}\n' +
+      '          \\item[1.] Level 5\n' +
+      '          \\item[2.] Level 5\n' +
+      '          \\begin{enumerate}\n' +
+      '            \\item[1.] Level 6\n' +
+      '            \\item[2.] Level 6\n' +
+      '          \\end{enumerate}\n' +
+      '          \\item[3.] Level 5\n' +
+      '          \\item[4.] Level 5\n' +
+      '        \\end{enumerate}\n' +
+      '        \\item[C.] Level 4\n' +
+      '        \\item[D.] Level 4\n' +
+      '      \\end{enumerate}\n' +
+      '      \\item[iii.] Level 3\n' +
+      '      \\item[iv.] Level 3\n' +
+      '    \\end{enumerate}\n' +
+      '    \\item[c.] Level 2\n' +
+      '    \\item[d.] Level 2\n' +
+      '  \\end{enumerate}\n' +
+      '  \\item[3.] Level 1\n' +
+      '  \\item[4.] Level 1\n' +
+      '\\end{enumerate}\n' +
+      '&\n' +
+      '- text\n' +
+      'text\n' +
+      '\\begin{enumerate}\n' +
+      '  \\item[] 1. Level 1\n' +
+      '  \\item[] 2. Level 1\n' +
+      '  \\begin{enumerate}\n' +
+      '    \\item[] a. Level 2\n' +
+      '    \\item[] b. Level 2\n' +
+      '    \\begin{enumerate}\n' +
+      '      \\item[] i. Level 3\n' +
+      '      \\item[] ii. Level 3\n' +
+      '      \\begin{enumerate}\n' +
+      '        \\item[] A. Level 4\n' +
+      '        \\item[] B. Level 4\n' +
+      '        \\begin{enumerate}\n' +
+      '          \\item[] 1. Level 5\n' +
+      '          \\item[] 2. Level 5\n' +
+      '          \\begin{enumerate}\n' +
+      '            \\item[] 1. Level 6\n' +
+      '            \\item[] 2. Level 6\n' +
+      '          \\end{enumerate}\n' +
+      '          \\item[] 3. Level 5\n' +
+      '          \\item[] 4. Level 5\n' +
+      '        \\end{enumerate}\n' +
+      '        \\item[] C. Level 4\n' +
+      '        \\item[] D. Level 4\n' +
+      '      \\end{enumerate}\n' +
+      '      \\item[] iii. Level 3\n' +
+      '      \\item[] iv. Level 3\n' +
+      '    \\end{enumerate}\n' +
+      '    \\item[] c. Level 2\n' +
+      '    \\item[] d. Level 2\n' +
+      '  \\end{enumerate}\n' +
+      '  \\item[] 3. Level 1\n' +
+      '  \\item[] 4. Level 1\n' +
+      '\\end{enumerate}\n' +
+      '\\\\\n' +
+      '\\hline\n' +
+      '\\end{tabular}',
+    tsv: 'Enumerate\twith custom markers\twithout markers\n' +
+      '"- text text\n' +
+      ' 1. Level 1\n' +
+      ' 2. Level 1\n' +
+      '   a. Level 2\n' +
+      '   b. Level 2\n' +
+      '     i. Level 3\n' +
+      '     ii. Level 3\n' +
+      '       A. Level 4\n' +
+      '       B. Level 4\n' +
+      '         1. Level 5\n' +
+      '         2. Level 5\n' +
+      '           1. Level 6\n' +
+      '           2. Level 6\n' +
+      '         3. Level 5\n' +
+      '         4. Level 5\n' +
+      '       C. Level 4\n' +
+      '       D. Level 4\n' +
+      '     iii. Level 3\n' +
+      '     iv. Level 3\n' +
+      '   c. Level 2\n' +
+      '   d. Level 2\n' +
+      ' 3. Level 1\n' +
+      ' 4. Level 1"\t"- text text\n' +
+      ' 1. Level 1\n' +
+      ' 2. Level 1\n' +
+      '   a. Level 2\n' +
+      '   b. Level 2\n' +
+      '     i. Level 3\n' +
+      '     ii. Level 3\n' +
+      '       A. Level 4\n' +
+      '       B. Level 4\n' +
+      '         1. Level 5\n' +
+      '         2. Level 5\n' +
+      '           1. Level 6\n' +
+      '           2. Level 6\n' +
+      '         3. Level 5\n' +
+      '         4. Level 5\n' +
+      '       C. Level 4\n' +
+      '       D. Level 4\n' +
+      '     iii. Level 3\n' +
+      '     iv. Level 3\n' +
+      '   c. Level 2\n' +
+      '   d. Level 2\n' +
+      ' 3. Level 1\n' +
+      ' 4. Level 1"\t"- text text\n' +
+      '  1. Level 1\n' +
+      '  2. Level 1\n' +
+      '    a. Level 2\n' +
+      '    b. Level 2\n' +
+      '      i. Level 3\n' +
+      '      ii. Level 3\n' +
+      '        A. Level 4\n' +
+      '        B. Level 4\n' +
+      '          1. Level 5\n' +
+      '          2. Level 5\n' +
+      '            1. Level 6\n' +
+      '            2. Level 6\n' +
+      '          3. Level 5\n' +
+      '          4. Level 5\n' +
+      '        C. Level 4\n' +
+      '        D. Level 4\n' +
+      '      iii. Level 3\n' +
+      '      iv. Level 3\n' +
+      '    c. Level 2\n' +
+      '    d. Level 2\n' +
+      '  3. Level 1\n' +
+      '  4. Level 1"',
+    markdown: '| Enumerate | with custom markers | without markers |\n' +
+      '| :--- | :--- | :--- |\n' +
+      '| - text text<br>1. Level 1<br>2. Level 1<br>&#160;&#160;a. Level 2<br>&#160;&#160;b. Level 2<br>&#160;&#160;&#160;&#160;i. Level 3<br>&#160;&#160;&#160;&#160;ii. Level 3<br>&#160;&#160;&#160;&#160;&#160;&#160;A. Level 4<br>&#160;&#160;&#160;&#160;&#160;&#160;B. Level 4<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;1. Level 5<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;2. Level 5<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;1. Level 6<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;2. Level 6<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;3. Level 5<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;4. Level 5<br>&#160;&#160;&#160;&#160;&#160;&#160;C. Level 4<br>&#160;&#160;&#160;&#160;&#160;&#160;D. Level 4<br>&#160;&#160;&#160;&#160;iii. Level 3<br>&#160;&#160;&#160;&#160;iv. Level 3<br>&#160;&#160;c. Level 2<br>&#160;&#160;d. Level 2<br>3. Level 1<br>4. Level 1<br> | - text text<br>1. Level 1<br>2. Level 1<br>&#160;&#160;a. Level 2<br>&#160;&#160;b. Level 2<br>&#160;&#160;&#160;&#160;i. Level 3<br>&#160;&#160;&#160;&#160;ii. Level 3<br>&#160;&#160;&#160;&#160;&#160;&#160;A. Level 4<br>&#160;&#160;&#160;&#160;&#160;&#160;B. Level 4<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;1. Level 5<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;2. Level 5<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;1. Level 6<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;2. Level 6<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;3. Level 5<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;4. Level 5<br>&#160;&#160;&#160;&#160;&#160;&#160;C. Level 4<br>&#160;&#160;&#160;&#160;&#160;&#160;D. Level 4<br>&#160;&#160;&#160;&#160;iii. Level 3<br>&#160;&#160;&#160;&#160;iv. Level 3<br>&#160;&#160;c. Level 2<br>&#160;&#160;d. Level 2<br>3. Level 1<br>4. Level 1<br> | - text text<br>1. Level 1<br>2. Level 1<br>&#160;&#160;a. Level 2<br>&#160;&#160;b. Level 2<br>&#160;&#160;&#160;&#160;i. Level 3<br>&#160;&#160;&#160;&#160;ii. Level 3<br>&#160;&#160;&#160;&#160;&#160;&#160;A. Level 4<br>&#160;&#160;&#160;&#160;&#160;&#160;B. Level 4<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;1. Level 5<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;2. Level 5<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;1. Level 6<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;2. Level 6<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;3. Level 5<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;4. Level 5<br>&#160;&#160;&#160;&#160;&#160;&#160;C. Level 4<br>&#160;&#160;&#160;&#160;&#160;&#160;D. Level 4<br>&#160;&#160;&#160;&#160;iii. Level 3<br>&#160;&#160;&#160;&#160;iv. Level 3<br>&#160;&#160;c. Level 2<br>&#160;&#160;d. Level 2<br>3. Level 1<br>4. Level 1<br> |',
+    csv: 'Enumerate,with custom markers,without markers\n' +
+      '"- text text\n' +
+      ' 1. Level 1\n' +
+      ' 2. Level 1\n' +
+      '   a. Level 2\n' +
+      '   b. Level 2\n' +
+      '     i. Level 3\n' +
+      '     ii. Level 3\n' +
+      '       A. Level 4\n' +
+      '       B. Level 4\n' +
+      '         1. Level 5\n' +
+      '         2. Level 5\n' +
+      '           1. Level 6\n' +
+      '           2. Level 6\n' +
+      '         3. Level 5\n' +
+      '         4. Level 5\n' +
+      '       C. Level 4\n' +
+      '       D. Level 4\n' +
+      '     iii. Level 3\n' +
+      '     iv. Level 3\n' +
+      '   c. Level 2\n' +
+      '   d. Level 2\n' +
+      ' 3. Level 1\n' +
+      ' 4. Level 1","- text text\n' +
+      ' 1. Level 1\n' +
+      ' 2. Level 1\n' +
+      '   a. Level 2\n' +
+      '   b. Level 2\n' +
+      '     i. Level 3\n' +
+      '     ii. Level 3\n' +
+      '       A. Level 4\n' +
+      '       B. Level 4\n' +
+      '         1. Level 5\n' +
+      '         2. Level 5\n' +
+      '           1. Level 6\n' +
+      '           2. Level 6\n' +
+      '         3. Level 5\n' +
+      '         4. Level 5\n' +
+      '       C. Level 4\n' +
+      '       D. Level 4\n' +
+      '     iii. Level 3\n' +
+      '     iv. Level 3\n' +
+      '   c. Level 2\n' +
+      '   d. Level 2\n' +
+      ' 3. Level 1\n' +
+      ' 4. Level 1","- text text\n' +
+      '  1. Level 1\n' +
+      '  2. Level 1\n' +
+      '    a. Level 2\n' +
+      '    b. Level 2\n' +
+      '      i. Level 3\n' +
+      '      ii. Level 3\n' +
+      '        A. Level 4\n' +
+      '        B. Level 4\n' +
+      '          1. Level 5\n' +
+      '          2. Level 5\n' +
+      '            1. Level 6\n' +
+      '            2. Level 6\n' +
+      '          3. Level 5\n' +
+      '          4. Level 5\n' +
+      '        C. Level 4\n' +
+      '        D. Level 4\n' +
+      '      iii. Level 3\n' +
+      '      iv. Level 3\n' +
+      '    c. Level 2\n' +
+      '    d. Level 2\n' +
+      '  3. Level 1\n' +
+      '  4. Level 1"'
+  },
+  {
+    latex: '\\begin{tabular}{|l|l}\n' +
+      '\\hline\n' +
+      '\\textbf{THROMBOTIC THROMBOCYTOPENIC PURPURA (TTP)} & \\textbf{THROMBOTIC THROMBOCYTOPENIC PURPURA (TTP)}\n' +
+      '\\\\\\hline\n' +
+      '\\begin{itemize}\n' +
+      '\\item[] \\textbf{1.} Von Willebrand Factor (vWF) is a protein that helps platelets stick together.\n' +
+      '\\item[] \\textbf{2.} Normally an enzyme called ADAMTS13 ‘cuts up’ the vWF. It needs to be ‘cut up’ otherwise is attracts platelets at high rates, forming blood clots even though there is no bleeding.\n' +
+      '\\item[] \\textbf{3.} In TTP there is a lack of the ADAMTS13 enzyme, promoting platelets aggregation.\n' +
+      '\\item[] \\textbf{4.} Results in microthromi that deposit in arterioles and capillaries\n' +
+      '\\item[] \\textbf{5.} Also results in a low platelet count because they are being ‘used up’ forming these mini clots\n' +
+      '\\end{itemize}\n' +
+      '&\n' +
+      '\\begin{itemize}\n' +
+      '\\item[\\textbf{1.}] Von Willebrand Factor (vWF) is a protein that helps platelets stick together.\n' +
+      '\\item[\\textbf{2.}] Normally an enzyme called ADAMTS13 ‘cuts up’ the vWF. It needs to be ‘cut up’ otherwise is attracts platelets at high rates, forming blood clots even though there is no bleeding.\n' +
+      '\\item[\\textbf{3.}] In TTP there is a lack of the ADAMTS13 enzyme, promoting platelets aggregation.\n' +
+      '\\item[\\textbf{4.}] Results in microthromi that deposit in arterioles and capillaries\n' +
+      '\\item[\\textbf{5.}] Also results in a low platelet count because they are being ‘used up’ forming these mini clots\n' +
+      '\\end{itemize}\n' +
+      '\\\\\\hline\n' +
+      '\\end{tabular}',
+    tsv: 'THROMBOTIC THROMBOCYTOPENIC PURPURA (TTP)\tTHROMBOTIC THROMBOCYTOPENIC PURPURA (TTP)\n' +
+      '"  1. Von Willebrand Factor (vWF) is a protein that helps platelets stick together.\n' +
+      '  2. Normally an enzyme called ADAMTS13 ‘cuts up’ the vWF. It needs to be ‘cut up’ otherwise is attracts platelets at high rates, forming blood clots even though there is no bleeding.\n' +
+      '  3. In TTP there is a lack of the ADAMTS13 enzyme, promoting platelets aggregation.\n' +
+      '  4. Results in microthromi that deposit in arterioles and capillaries\n' +
+      '  5. Also results in a low platelet count because they are being ‘used up’ forming these mini clots"\t" 1. Von Willebrand Factor (vWF) is a protein that helps platelets stick together.\n' +
+      ' 2. Normally an enzyme called ADAMTS13 ‘cuts up’ the vWF. It needs to be ‘cut up’ otherwise is attracts platelets at high rates, forming blood clots even though there is no bleeding.\n' +
+      ' 3. In TTP there is a lack of the ADAMTS13 enzyme, promoting platelets aggregation.\n' +
+      ' 4. Results in microthromi that deposit in arterioles and capillaries\n' +
+      ' 5. Also results in a low platelet count because they are being ‘used up’ forming these mini clots"',
+    markdown: '| **THROMBOTIC THROMBOCYTOPENIC PURPURA (TTP)** | **THROMBOTIC THROMBOCYTOPENIC PURPURA (TTP)** |\n' +
+      '| :--- | :--- |\n' +
+      '| **1.** Von Willebrand Factor (vWF) is a protein that helps platelets stick together.<br>**2.** Normally an enzyme called ADAMTS13 ‘cuts up’ the vWF. It needs to be ‘cut up’ otherwise is attracts platelets at high rates, forming blood clots even though there is no bleeding.<br>**3.** In TTP there is a lack of the ADAMTS13 enzyme, promoting platelets aggregation.<br>**4.** Results in microthromi that deposit in arterioles and capillaries<br>**5.** Also results in a low platelet count because they are being ‘used up’ forming these mini clots<br> | **1.** Von Willebrand Factor (vWF) is a protein that helps platelets stick together.<br>**2.** Normally an enzyme called ADAMTS13 ‘cuts up’ the vWF. It needs to be ‘cut up’ otherwise is attracts platelets at high rates, forming blood clots even though there is no bleeding.<br>**3.** In TTP there is a lack of the ADAMTS13 enzyme, promoting platelets aggregation.<br>**4.** Results in microthromi that deposit in arterioles and capillaries<br>**5.** Also results in a low platelet count because they are being ‘used up’ forming these mini clots<br> |',
+    csv: 'THROMBOTIC THROMBOCYTOPENIC PURPURA (TTP),THROMBOTIC THROMBOCYTOPENIC PURPURA (TTP)\n' +
+      '"  1. Von Willebrand Factor (vWF) is a protein that helps platelets stick together.\n' +
+      '  2. Normally an enzyme called ADAMTS13 ‘cuts up’ the vWF. It needs to be ‘cut up’ otherwise is attracts platelets at high rates, forming blood clots even though there is no bleeding.\n' +
+      '  3. In TTP there is a lack of the ADAMTS13 enzyme, promoting platelets aggregation.\n' +
+      '  4. Results in microthromi that deposit in arterioles and capillaries\n' +
+      '  5. Also results in a low platelet count because they are being ‘used up’ forming these mini clots"," 1. Von Willebrand Factor (vWF) is a protein that helps platelets stick together.\n' +
+      ' 2. Normally an enzyme called ADAMTS13 ‘cuts up’ the vWF. It needs to be ‘cut up’ otherwise is attracts platelets at high rates, forming blood clots even though there is no bleeding.\n' +
+      ' 3. In TTP there is a lack of the ADAMTS13 enzyme, promoting platelets aggregation.\n' +
+      ' 4. Results in microthromi that deposit in arterioles and capillaries\n' +
+      ' 5. Also results in a low platelet count because they are being ‘used up’ forming these mini clots"'
+  },
+  // {
+  //   latex: '',
+  //   tsv: '',
+  //   markdown: '',
+  //   csv: ''
+  // }
 ];

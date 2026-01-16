@@ -52,6 +52,12 @@ export const listsStyles = `
   .enumerate > li.li_enumerate.block[data-marker-empty="true"] > div:first-of-type {
     text-indent: -20px;
   }
+  .itemize > li.li_itemize[data-marker-empty="true"] ul li:not([data-marker-empty="true"]),
+  .itemize > li.li_itemize[data-marker-empty="true"] ol li:not([data-marker-empty="true"]),
+  .enumerate > li.li_enumerate[data-marker-empty="true"] ul li:not([data-marker-empty="true"]),
+  .enumerate > li.li_enumerate[data-marker-empty="true"] ol li:not([data-marker-empty="true"]) {
+    text-indent: 0;
+  }
   .itemize > li.li_itemize.block[data-marker-empty="true"] > div:not(:first-of-type),
   .enumerate > li.li_enumerate.block[data-marker-empty="true"] > div:not(:first-of-type) {
     text-indent: 0;

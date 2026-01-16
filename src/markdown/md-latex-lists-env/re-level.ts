@@ -1,28 +1,13 @@
 import type Token from "markdown-it/lib/token";
 import type StateBlock from 'markdown-it/lib/rules_block/state_block';
 import type StateInline from 'markdown-it/lib/rules_inline/state_inline';
-
+import { itemizeLevelDefaults, enumerateLevelDefaults } from "../common/list-markers";
 import {
   ENUM_LEVEL_COMMANDS, ENUM_STYLES, ITEM_LEVEL_COMMANDS,
   LATEX_ENUM_STYLE_KEY_RE,
   LATEX_ENUM_STYLE_RE
 } from "../common/consts";
 
-/** Default LaTeX itemize bullet styles */
-export let itemizeLevelDefaults: string[] = [
-  "\\textbullet", //"•"
-  "\\textendash", //"–"
-  "\\textasteriskcentered", //"∗"
-  "\\textperiodcentered", //"·"
-];
-
-/** Default enumerate styles for CSS list-style-type */
-export let enumerateLevelDefaults: string[] = [
-  "decimal",
-  "lower-alpha",
-  "lower-roman",
-  "upper-alpha",
-];
 
 /** Active itemize levels (mutable state) */
 export let itemizeLevel: string[] = [];

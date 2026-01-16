@@ -7,7 +7,7 @@ import {
   renderTableCellContent,
   RenderTableCellContentResult
 } from "../common/render-table-cell-content";
-import { getItemizePlainMarker } from "../common/list-markers";
+import { getItemizePlainMarker, getEnumeratePlainMarker } from "../common/list-markers";
 
 const TABLE_TOKENS = new Set([
   'table_open','table_close','tbody_open','tbody_close','tr_open','tr_close','td_open','td_close',
@@ -232,7 +232,7 @@ const handleListTokensForCellMarkdown = (
     ensureTrailingEmptyLine(acc.cellTsvLines);
     ensureTrailingEmptyLine(acc.cellCsvLines);
     // Indent nested list items using non-breaking spaces (HTML).
-    const listLevel = isEnumerate ? token.meta?.enumerateLevel : token.meta?.itemizeLevel;
+    const listLevel: number =  Math.max(1, isEnumerate ? token.meta?.enumerateLevel : token.meta?.itemizeLevel);
     for (let i = 1; i < listLevel; i++) {
       mdPrefix += '&#160;&#160;';
       tsvPrefix += '  ';
@@ -243,7 +243,7 @@ const handleListTokensForCellMarkdown = (
     let markerCsv: string = ' ';
     // If the token provides a custom marker, use it; otherwise default to bullet markers.
     if (token.hasOwnProperty('marker')) {
-      if (token.markerTokens?.length === 1) {
+      if (token.markerTokens?.length > 0) {
         // Avoid mutating the original token: render marker tokens via a shallow copy.
         const markerToken = { ...token, children: token.markerTokens };
         const markerRender: RenderTableCellContentResult = renderTableCellContent(markerToken, true, options, env, slf);
@@ -256,8 +256,9 @@ const handleListTokensForCellMarkdown = (
         markerCsv += token.marker ?? '';
       }
     } else {
-      const itemizeLevel: number = Math.max(1, listLevel ?? 1);
-      const plainMarker: string = getItemizePlainMarker(itemizeLevel);
+      const plainMarker: string = isEnumerate
+        ? getEnumeratePlainMarker(Math.max(1, token.meta?.enumerateIndex ?? 1), listLevel)
+        : getItemizePlainMarker(listLevel);
       markerMd = plainMarker;
       markerTsv += plainMarker;
       markerCsv += plainMarker;
