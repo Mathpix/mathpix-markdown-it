@@ -12,6 +12,7 @@ import {
   END_LST_RE,
   BEGIN_LIST_ENV_INLINE_RE
 } from "../../common/consts";
+import { parseBlockIntoTokenChildren } from "../helper";
 
 export const openTag: RegExp = /(?:\\begin\s{0,}{tabular}\s{0,}\{([^}]*)\})/;
 export const openTagG: RegExp = /(?:\\begin\s{0,}{tabular}\s{0,}\{([^}]*)\})/g;
@@ -209,7 +210,8 @@ export const StatePushTabulars = (state, cTabular: TTypeContentList, align: stri
     if (!res || res.length === 0) {
       continue;
     }
-
+    const envSubTabular: boolean = !!state.env.subTabular;
+    const envIsInline: boolean = !!state.env?.isInline;
     for (let j = 0; j < res.length; j++) {
       let tok:Token = res[j];
       if (res[j].token === 'inline') {
@@ -220,19 +222,13 @@ export const StatePushTabulars = (state, cTabular: TTypeContentList, align: stri
             || state.md.options.outMath.include_csv
             || (state.md.options.outMath.include_table_markdown
               && state.md.options.outMath.table_markdown && state.md.options.outMath.table_markdown.math_as_ascii);
-          const envSubTabular: boolean = !!state.env.subTabular;
           state.env.subTabular = res[j].type === 'subTabular' || res[j].isSubTabular;
           if (BEGIN_LIST_ENV_INLINE_RE.test(res[j].content)) {
-            let children = [];
-            const envIsInline: boolean = !!state.env?.isInline;
             state.env.isInline = true;
-            state.md.block.parse(res[j].content, state.md, state.env, children);
-            if (children?.length) {
-              for (const child of children) {
-                token.children.push(child);
-              }
-            }
-            state.env.envIsInline = envIsInline;
+            parseBlockIntoTokenChildren(state, res[j].content, token, {
+              disableBlockRules: true,
+            });
+            state.env.isInline = envIsInline;
             continue;
           }
           tok.envToInline = {...state.env};
@@ -249,9 +245,10 @@ export const StatePushTabulars = (state, cTabular: TTypeContentList, align: stri
       }
       token.children.push(tok)
     }
+    state.env.subTabular = envSubTabular;
+    state.env.isInline = envIsInline;
   }
 };
-
 
 export const StatePushDiv = (state, startLine: number, nextLine: number, content: string) => {
   let token: Token;

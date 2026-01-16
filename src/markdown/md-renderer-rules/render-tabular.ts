@@ -7,7 +7,7 @@ import {
   renderTableCellContent,
   RenderTableCellContentResult
 } from "../common/render-table-cell-content";
-import { getItemizePlainMarker } from "../md-latex-lists-env/re-level";
+import { getItemizePlainMarker } from "../common/list-markers";
 
 const TABLE_TOKENS = new Set([
   'table_open','table_close','tbody_open','tbody_close','tr_open','tr_close','td_open','td_close',

@@ -3,8 +3,6 @@ import type StateBlock from 'markdown-it/lib/rules_block/state_block';
 import type StateInline from 'markdown-it/lib/rules_inline/state_inline';
 /** Default LaTeX itemize bullet styles */
 export declare let itemizeLevelDefaults: string[];
-/** Plain-text fallback markers for itemize levels 1..N (TSV/CSV/MD). */
-export declare const itemizeLevelPlainDefaults: string[];
 /** Default enumerate styles for CSS list-style-type */
 export declare let enumerateLevelDefaults: string[];
 /** Active itemize levels (mutable state) */
@@ -62,11 +60,3 @@ export declare const ChangeLevel: (state: StateBlock | StateInline, data: {
  * Clears stored itemize level token cache.
  */
 export declare const clearItemizeLevelTokens: () => void;
-/**
- * Returns a plain-text list marker for a given itemize nesting level.
- * Ensures the level is at least 1 and clamps it to the available defaults.
- *
- * @param level - Itemize nesting level (1-based).
- * @returns Plain-text marker suitable for TSV/CSV/Markdown export.
- */
-export declare const getItemizePlainMarker: (level: number) => string;

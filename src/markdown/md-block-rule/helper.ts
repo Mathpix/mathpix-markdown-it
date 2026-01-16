@@ -15,6 +15,7 @@ type SetTokensBlockParseOptions = {
 //   - or fenced code block (```... or ~~~...)
 const MD_BLOCK_LEADING_RE: RegExp =
   /^(\s{0,3})(#{1,6}(?=\s|$)|>[\s>]*|(`{3,}|~{3,})[^\n]*)/;
+const defaultRulesToDisable: string[] = ['list'];
 
 /**
  * If the first line looks like a markdown block (heading, quote, fence),
@@ -44,7 +45,6 @@ const escapeLeadingMarkdownBlockLine = (content: string): string => {
   return lines.join('\n');
 }
 
-
 /**
  * Parses a block of content with markdown-it and pushes the resulting
  * block tokens into the current state, with optional control over
@@ -71,11 +71,10 @@ export const SetTokensBlockParse = (state, content: string, options: SetTokensBl
       : content;
   if (disableBlockRules) {
     const blockRuler: any = state.md.block.ruler;
-    const rulesToTouch: string[] = ['list'];
     // 1. Let's remember which of these rules were included
     const rulesToReEnable: string[] = [];
     if (blockRuler.__rules__) {
-      for (const name of rulesToTouch) {
+      for (const name of defaultRulesToDisable) {
         const rule = blockRuler.__rules__.find((r) => r.name === name);
         if (rule && rule.enabled) {
           rulesToReEnable.push(name);
@@ -129,4 +128,66 @@ export const SetTokensBlockParse = (state, content: string, options: SetTokensBl
       isFirst = false;
     }
   }
+};
+
+type ParseIntoTokenChildrenOptions = {
+  /** If true, temporarily disables selected markdown-it block rules (e.g. lists). */
+  disableBlockRules?: boolean;
+};
+
+/**
+ * Parses a markdown fragment into block tokens and appends them to `token.children`.
+ * Optionally disables a predefined set of markdown-it block rules (see `defaultRulesToDisable`)
+ * and neutralizes leading block markers on the first line to prevent accidental block parsing.
+ * @param state - markdown-it parsing state.
+ * @param content - Markdown fragment to parse.
+ * @param token - Target token that will receive parsed children.
+ * @param opts - Parsing options.
+ * @returns Parsed child tokens (also appended to `token.children`).
+ */
+export const parseBlockIntoTokenChildren = (
+  state: any,
+  content: string,
+  token: Token,
+  opts: ParseIntoTokenChildrenOptions = {}
+): any[] => {
+  const { disableBlockRules = false } = opts;
+  const children: any[] = [];
+  // When block rules are disabled, neutralize leading markdown block markers on first line.
+  const safeContent: string = disableBlockRules
+    ? escapeLeadingMarkdownBlockLine(content)
+    : content;
+  if (disableBlockRules) {
+    const blockRuler: any = state.md?.block?.ruler;
+    // 1. Let's remember which of these rules were included
+    const rulesToReEnable: string[] = [];
+    try {
+      if (blockRuler?.__rules__) {
+        for (const name of defaultRulesToDisable) {
+          const rule = blockRuler.__rules__.find((r) => r.name === name);
+          if (rule?.enabled) {
+            rulesToReEnable.push(name);
+          }
+        }
+      }
+      // 2. Temporarily disable only those that were actually enabled.
+      if (rulesToReEnable.length) {
+        blockRuler?.disable(rulesToReEnable, true);
+      }
+      state.md.block.parse(safeContent, state.md, state.env, children);
+    } finally {
+      if (rulesToReEnable.length) {
+        blockRuler?.enable(rulesToReEnable, true);
+      }
+    }
+  } else {
+    state.md.block.parse(safeContent, state.md, state.env, children);
+  }
+  if (!token.children) {
+    token.children = [];
+  }
+  if (children.length) {
+    token.children.push(...children);
+  }
+  return children;
 };
