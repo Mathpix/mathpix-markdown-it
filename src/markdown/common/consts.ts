@@ -141,6 +141,7 @@ export const LATEX_LIST_BOUNDARY_INLINE_RE: RegExp = /\\begin\s*\{(itemize|enume
 /** Matches \begin{center}, \begin{left}, \begin{right}, \begin{table}, \begin{figure}, \begin{tabular}, \begin{lstlisting} */
 export const LATEX_BLOCK_ENV_OPEN_RE: RegExp =
   /\\begin{(center|left|right|table|figure|tabular|lstlisting)}/;
+export const BLOCK_LATEX_RE: RegExp = /\\begin\{(tabular|itemize|enumerate|lstlisting)\}/;
 /**
  * Enumerate environment detection: \alph, \roman, \arabic, etc.
  */

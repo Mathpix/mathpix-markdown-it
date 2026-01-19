@@ -30,7 +30,7 @@ import {
 /**
  * Detects \begin{lstlisting} or \begin{tabular} on a line and enters an opaque env.
  * - Uses `stack` to track nesting (tabular can nest, lstlisting cannot).
- * - Text before \begin is added as normal list content.
+ * - Text before \begin (including prefixes like \hline or & when nesting inside tabular) is preserved and added as normal list content.
  * - From \begin... to end of line is appended as raw/opaque text.
  *
  * @returns Updated { handled, stack, items, lineText }.
@@ -56,10 +56,15 @@ const handleLstBeginInline = (
   // If we are inside tabular, allow only nested tabular
   if (top === "tabular") {
     if (!mbTab) return { handled: false, stack, items, lineText };
+    // keep the prefix before \begin{tabular} (e.g. "\hline " or " & ")
+    const prefix: string = lineText.slice(0, mbTab.index);
+    const beginAndRest: string = lineText.slice(mbTab.index);
     // open nested tabular
     stack = [...stack, "tabular"];
-    // you may still want to append the begin token text to items:
-    items = ItemsAddToPrev(items, lineText.slice(mbTab.index), nextLine);
+    if (prefix.length > 0) {
+      items = ItemsAddToPrev(items, prefix, nextLine);
+    }
+    items = ItemsAddToPrev(items, beginAndRest, nextLine);
     return { handled: true, stack, items, lineText };
   }
   // If stack is empty:
@@ -69,11 +74,10 @@ const handleLstBeginInline = (
     mbLst && mbTab
       ? (mbLst.index <= mbTab.index ? mbLst : mbTab)
       : (mbLst || mbTab)!;
-
   const openedType: OpaqueEnvType =
     mb === mbLst ? "lstlisting" : "tabular";
   const beginIndex: number = mb.index;
-  const before: string = lineText.slice(0, beginIndex).trimEnd();
+  const before: string = lineText.slice(0, beginIndex);
   const afterBegin: string = lineText.slice(beginIndex);
   if (before.length > 0) {
     if (itemTag.test(before)) {
@@ -122,7 +126,8 @@ const handleLstEndInline = (
   const afterEnd: string = lineText.slice(endIndex + me[0].length);
   // Append code continuation
   if (beforeEnd.length > 0) {
-    items = ItemsAddToPrev(items, beforeEnd + "\n" + endToken, nextLine);
+    const glue = top === "lstlisting" ? "\n" : "";
+    items = ItemsAddToPrev(items, beforeEnd + glue + endToken, nextLine);
   } else {
     items = ItemsAddToPrev(items, endToken, nextLine);
   }
@@ -135,6 +140,118 @@ const handleLstEndInline = (
   // return remainder to be parsed normally
   return { handled: false, stack, items, lineText: afterEnd };
 }
+
+type OpaqueProcessResult = {
+  consumedLine: boolean;
+  lineText: string;
+  stack: OpaqueStack;
+  items: ParsedListItem[];
+};
+
+/**
+ * Processes "opaque" inline environments inside list parsing (currently: tabular, lstlisting).
+ *
+ * The function may:
+ * - fully consume the current source line (appending it to `items` as raw text), OR
+ * - close an opaque env and return a remaining tail to be parsed again on the same line
+ *   (e.g. `\end{tabular} & \begin{tabular}{l}`).
+ *
+ * Uses a guard to prevent infinite loops on malformed input.
+ */
+const processOpaqueLine = (
+  params: {
+    lineText: string;
+    stack: OpaqueStack;
+    items: ParsedListItem[];
+    nextLine: number;
+    state: StateBlockLike;
+    renderStart: number;
+  }
+): OpaqueProcessResult => {
+  let { lineText, stack, items, nextLine, state, renderStart } = params;
+  let guard: number = 0;
+  while (guard++ < 50) {
+    const top: OpaqueEnvType = stack[stack.length - 1];
+    if (top) {
+      // -------- inside opaque --------
+      if (top === "tabular") {
+        END_TABULAR_INLINE_RE.lastIndex = 0;
+        BEGIN_TABULAR_INLINE_RE.lastIndex = 0;
+        const me: RegExpExecArray = END_TABULAR_INLINE_RE.exec(lineText);
+        const mb: RegExpExecArray = BEGIN_TABULAR_INLINE_RE.exec(lineText);
+        // close if end exists before begin (or begin missing)
+        if (me && (!mb || me.index <= mb.index)) {
+          const endRes: LstEndResult = handleLstEndInline(lineText, stack, items, nextLine, state);
+          stack = endRes.stack;
+          items = endRes.items;
+          if (endRes.handled) {
+            return { consumedLine: true, lineText, stack, items };
+          }
+          // got tail → keep parsing same line
+          lineText = endRes.lineText;
+          continue;
+        }
+        // otherwise if begin exists, open nested tabular
+        if (mb) {
+          const beginRes: LstEndResult = handleLstBeginInline(
+            lineText,
+            stack,
+            items,
+            nextLine,
+            renderStart,
+            LATEX_ITEM_COMMAND_INLINE_RE
+          );
+          stack = beginRes.stack;
+          items = beginRes.items;
+          if (beginRes.handled) {
+            return { consumedLine: true, lineText, stack, items };
+          }
+          lineText = beginRes.lineText;
+          continue;
+        }
+        // plain opaque line inside tabular:
+        // preserve indentation unless this is a tail
+        const rawLine = state.src.slice(state.bMarks[nextLine], state.eMarks[nextLine]);
+        const rawLineNoIndent = state.src.slice(
+          state.bMarks[nextLine] + state.tShift[nextLine],
+          state.eMarks[nextLine]
+        );
+        const toAppend = (lineText !== rawLineNoIndent) ? lineText : rawLine;
+        items = ItemsAddToPrev(items, toAppend, nextLine);
+        return { consumedLine: true, lineText, stack, items };
+      }
+      // other opaque (lstlisting): only try to end
+      const endRes: LstEndResult = handleLstEndInline(lineText, stack, items, nextLine, state);
+      stack = endRes.stack;
+      items = endRes.items;
+      if (endRes.handled) {
+        return { consumedLine: true, lineText, stack, items };
+      }
+      lineText = endRes.lineText;
+      continue;
+    }
+    // not inside opaque: try to begin
+    const beginRes: LstEndResult = handleLstBeginInline(
+      lineText,
+      stack,
+      items,
+      nextLine,
+      renderStart,
+      LATEX_ITEM_COMMAND_INLINE_RE
+    );
+    stack = beginRes.stack;
+    items = beginRes.items;
+    if (beginRes.handled) {
+      return { consumedLine: true, lineText, stack, items };
+    }
+    lineText = beginRes.lineText;
+    return { consumedLine: false, lineText, stack, items };
+  }
+  // safety: if guard exceeded, treat as consumed to avoid infinite loop
+  items = ItemsAddToPrev(items, lineText, nextLine);
+  return { consumedLine: true, lineText, stack, items };
+};
+
 
 /**
  * Parse a LaTeX list environment starting at `startLine` and emit tokens into `state`.
@@ -183,27 +300,20 @@ export const ListsInternal = (
     pos = state.bMarks[nextLine] + state.tShift[nextLine];
     max = state.eMarks[nextLine];
     lineText = state.src.slice(pos, max);
-    // 1) If we are NOT inside an opaque env, or we are inside a tabular (which may nest),
-    //    try to detect an inline \begin{lstlisting}/\begin{tabular} on this line.
-    if (opaqueStack.length === 0 || opaqueStack[opaqueStack.length - 1] === "tabular") {
-      const beginRes: LstEndResult = handleLstBeginInline(lineText, opaqueStack, items, nextLine, renderStart, LATEX_ITEM_COMMAND_INLINE_RE);
-      opaqueStack = beginRes.stack;
-      if (beginRes.handled) {
-        continue; // the begin marker (and any preceding text) was handled; move to next line
-      }
-      lineText = beginRes.lineText;
-    }
-    // 2) If we are inside an opaque env (lstlisting/tabular), try to detect its matching \end{...}.
-    //    - If no end marker is found, the whole line is treated as opaque content.
-    //    - If an end marker is found, return the remaining tail (if any) for normal parsing.
-    if (opaqueStack.length > 0) {
-      const endRes: LstEndResult = handleLstEndInline(lineText, opaqueStack, items, nextLine, state);
-      opaqueStack = endRes.stack;
-      items = endRes.items;
-      if (endRes.handled) {
-        continue; // the line was consumed as opaque content (still inside, or ended with no tail)
-      }
-      lineText = endRes.lineText;
+    // Handle opaque envs; may consume the line or return a tail to re-parse.
+    const opaqueRes: OpaqueProcessResult = processOpaqueLine({
+      lineText,
+      stack: opaqueStack,
+      items,
+      nextLine,
+      state,
+      renderStart
+    });
+    opaqueStack = opaqueRes.stack;
+    items = opaqueRes.items;
+    lineText = opaqueRes.lineText;
+    if (opaqueRes.consumedLine) {
+      continue;
     }
     // Handle \setcounter lines
     if (reSetCounter.test(lineText)) {

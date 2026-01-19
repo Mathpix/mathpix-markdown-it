@@ -313,10 +313,11 @@ module.exports = [
       ' □ item 2,\n' +
       ' □ item 3."\t" • item 1;\n' +
       ' • item 2,\n' +
-      ' • item 3."\t1test',
+      ' • item 3."\t"1\n' +
+      ' • test"',
     markdown: '| cell1 | cell2 | cell3 | cell4 |\n' +
       '| :--- | :--- | :--- | :--- |\n' +
-      '| item 1;<br>item 2,<br>item 3.<br> | □ item 1;<br>□ item 2,<br>□ item 3.<br> | • item 1;<br>• item 2,<br>• item 3.<br> | 1test |',
+      '| item 1;<br>item 2,<br>item 3.<br> | □ item 1;<br>□ item 2,<br>□ item 3.<br> | • item 1;<br>• item 2,<br>• item 3.<br> | 1<br>• test<br> |',
     csv: 'cell1,cell2,cell3,cell4\n' +
       '"  item 1;\n' +
       '  item 2,\n' +
@@ -324,7 +325,8 @@ module.exports = [
       ' □ item 2,\n' +
       ' □ item 3."," • item 1;\n' +
       ' • item 2,\n' +
-      ' • item 3.",1test'
+      ' • item 3.","1\n' +
+      ' • test"'
   },
   {
     latex: '\\begin{tabular}{|l|l|l|l|}\n' +
@@ -358,10 +360,11 @@ module.exports = [
       ' □ item 2,\n' +
       ' □ item 3."\t" • item 1;\n' +
       ' • item 2,\n' +
-      ' • item 3."\t1test',
+      ' • item 3."\t"1\n' +
+      ' • test"',
     markdown: '| cell1 | cell2 | cell3 | cell4 |\n' +
       '| :--- | :--- | :--- | :--- |\n' +
-      '| item 1;<br>item 2,<br>item 3.<br> | □ item 1;<br>□ item 2,<br>□ item 3.<br> | • item 1;<br>• item 2,<br>• item 3.<br> | 1test |',
+      '| item 1;<br>item 2,<br>item 3.<br> | □ item 1;<br>□ item 2,<br>□ item 3.<br> | • item 1;<br>• item 2,<br>• item 3.<br> | 1<br>• test<br> |',
     csv: 'cell1,cell2,cell3,cell4\n' +
       '"  item 1;\n' +
       '  item 2,\n' +
@@ -369,7 +372,8 @@ module.exports = [
       ' □ item 2,\n' +
       ' □ item 3."," • item 1;\n' +
       ' • item 2,\n' +
-      ' • item 3.",1test'
+      ' • item 3.","1\n' +
+      ' • test"'
   },
   {
     latex: '\\begin{tabular}{|l|l|}\n' +

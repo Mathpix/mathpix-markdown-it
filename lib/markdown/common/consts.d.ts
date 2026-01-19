@@ -103,6 +103,7 @@ export declare const LATEX_ITEM_COMMAND_INLINE_RE: RegExp;
 export declare const LATEX_LIST_BOUNDARY_INLINE_RE: RegExp;
 /** Matches \begin{center}, \begin{left}, \begin{right}, \begin{table}, \begin{figure}, \begin{tabular}, \begin{lstlisting} */
 export declare const LATEX_BLOCK_ENV_OPEN_RE: RegExp;
+export declare const BLOCK_LATEX_RE: RegExp;
 /**
  * Enumerate environment detection: \alph, \roman, \arabic, etc.
  */

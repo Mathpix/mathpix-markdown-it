@@ -1,6 +1,11 @@
-import { generateUniqueId, getContent } from "./common";
+import { generateUniqueId } from "./common";
 import { getInlineCodeListFromString, InlineCodeItem } from "../../common";
-import { doubleAngleBracketUuidPattern, singleAngleBracketPattern } from "../../common/consts";
+import {
+  findPlaceholders,
+  placeholderToId,
+  getInlineContextAroundSpan,
+  wrapWithNewlinesIfInline
+} from "./placeholder-utils";
 const CODE_FENCE = '```';
 const CODE_FENCE_RE = /```/;
 
@@ -22,32 +27,39 @@ export const addExtractedCodeBlock = (item: TExtractedCodeBlock) => {
 }
 
 /**
- * Replace placeholder markers (e.g. <<uuid>> or <uuid>) in a string
- * with the corresponding extracted code block content.
- *
- * Returns the updated string with placeholders resolved and post-processed
- * by `getContent`.
+ * Replace placeholder markers (<<id>> / <id>) with extracted code block content.
+ * Newline-wrapping is applied ONLY when injected content contains BEGIN_LIST_ENV_INLINE_RE.
+ * Note: does NOT call getContent; callers should normalize once at the end.
  */
 export const getExtractedCodeBlockContent = (inputStr: string, i: number): string => {
-  let sub: string = inputStr;
-  let resContent: string = sub;
-  sub = sub.trim();
-  let cellM: Array<string> =  sub.slice(i).match(doubleAngleBracketUuidPattern);
-  cellM =  cellM ? cellM : sub.slice(i).match(singleAngleBracketPattern);
+  let resContent: string = inputStr;
+  const cellM: RegExpMatchArray = findPlaceholders(resContent, i);
   if (!cellM) {
     return inputStr;
   }
   for (let j = 0; j < cellM.length; j++) {
-    let content: string = cellM[j].replace(/</g, '').replace(/>/g, '');
-    const index: number = extractedCodeBlocks.findIndex(item => item.id === content);
-    if (index >= 0) {
-      let iB: number = resContent.indexOf(cellM[j]);
-      let codeContent = extractedCodeBlocks[index].content;
-      codeContent = getExtractedCodeBlockContent(codeContent, 0);
-      resContent = resContent.slice(0, iB) + codeContent + resContent.slice(iB + cellM[j].length);
+    const placeholder: string = cellM[j];
+    const id: string = placeholderToId(placeholder);
+    if (!id) {
+      continue;
     }
+    const index: number = extractedCodeBlocks.findIndex((item) => item.id === id);
+    if (index < 0) {
+      continue;
+    }
+    const start: number = resContent.indexOf(placeholder);
+    if (start === -1) {
+      continue;
+    }
+    const original: string = extractedCodeBlocks[index].content ?? "";
+    const end: number = start + placeholder.length;
+    // expand nested placeholders first
+    let injected: string = getExtractedCodeBlockContent(original, 0);
+    // decide wrapping based on inline neighbors
+    const { beforeNonSpace, afterNonSpace } = getInlineContextAroundSpan(resContent, start, end);
+    injected = wrapWithNewlinesIfInline(injected, beforeNonSpace, afterNonSpace);
+    resContent = resContent.slice(0, start) + injected + resContent.slice(end);
   }
-  resContent = getContent(resContent);
   return resContent;
 };
 

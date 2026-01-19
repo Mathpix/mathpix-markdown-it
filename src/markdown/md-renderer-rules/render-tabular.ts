@@ -146,7 +146,7 @@ const renderNonTableTokenIntoCell = (
   acc: CellAccumulators
 ): void => {
   const { options, env, slf, highlight } = ctx;
-  if (token?.type === 'tabular') {
+  if (token?.type === 'tabular' || token?.type === 'tabular_inline') {
     const data = renderInlineTokenBlock(token.children, options, env, slf, true, highlight);
     acc.result += data.table;
     if (Array.isArray(data.tableMd) && data.tableMd.length) {
