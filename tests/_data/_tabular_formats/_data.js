@@ -1246,6 +1246,48 @@ module.exports = [
       ' 4. Results in microthromi that deposit in arterioles and capillaries\n' +
       ' 5. Also results in a low platelet count because they are being ‘used up’ forming these mini clots"'
   },
+  {
+    latex: '\\begin{tabular}{l}\n' +
+      'Underlined \\\\\n' +
+      '\\begin{itemize}\n' +
+      '\\item[-] \\textbf{Bold text} \n' +
+      '\\item[-]\\textit{Italic text}\n' +
+      '\\item[-]\\underline{Underlined text}\n' +
+      '\\item[-]\\underline{\\underline{Double underlined text!}}\n' +
+      '\\item[-]\\uuline{Double underlined text!}\n' +
+      '\\item[-]\\uwave{This text is underlined with a wavy line!}\n' +
+      '\\item[-]\\sout{Text with a horizontal line through its center!}\n' +
+      '\\item[-]\\xout{Text with hatching pattern!}\n' +
+      '\\item[-]\\dashuline{Dashed Underline}\n' +
+      '\\item[-]\\dotuline{Dotted Underline}\n' +
+      '\\end{itemize}\n' +
+      '\\end{tabular}',
+    tsv: 'Underlined\n' +
+      '" - Bold text\n' +
+      ' - Italic text\n' +
+      ' - Underlined text\n' +
+      ' - Double underlined text!\n' +
+      ' - Double underlined text!\n' +
+      ' - This text is underlined with a wavy line!\n' +
+      ' - Text with a horizontal line through its center!\n' +
+      ' - Text with hatching pattern!\n' +
+      ' - Dashed Underline\n' +
+      ' - Dotted Underline"',
+    markdown: '| Underlined |\n' +
+      '| :--- |\n' +
+      '| - **Bold text**<br>- *Italic text*<br>- Underlined text<br>- Double underlined text!<br>- Double underlined text!<br>- This text is underlined with a wavy line!<br>- Text with a horizontal line through its center!<br>- Text with hatching pattern!<br>- Dashed Underline<br>- Dotted Underline<br> |',
+    csv: 'Underlined\n' +
+      '" - Bold text\n' +
+      ' - Italic text\n' +
+      ' - Underlined text\n' +
+      ' - Double underlined text!\n' +
+      ' - Double underlined text!\n' +
+      ' - This text is underlined with a wavy line!\n' +
+      ' - Text with a horizontal line through its center!\n' +
+      ' - Text with hatching pattern!\n' +
+      ' - Dashed Underline\n' +
+      ' - Dotted Underline"'
+  },
   // {
   //   latex: '',
   //   tsv: '',

@@ -50,7 +50,8 @@ export const renderTableCellContent = (
       if (child.type === "tabular_inline" || isSubTable) {
         child.isSubTable = true;
       }
-      if (child.token === 'inline' || child.type === 'inline') {
+      let childType = child.token || child.type;
+      if (childType && ['inline', 'underline', 'out'].includes(childType)) {
         const cellRender: RenderTableCellContentResult = renderTableCellContent(child, true, options, env, slf);
         if (cellRender) {
           content += cellRender.content;
@@ -159,6 +160,11 @@ export const renderTableCellContent = (
           mdCell += `<pre><code>${mdContent}</code></pre>`;
           continue;
         }
+        case 'underline_open':
+        case 'underline_close':
+        case 'out_open':
+        case 'out_close':
+          continue;
       }
 
       if (child.tableMd?.length) {
