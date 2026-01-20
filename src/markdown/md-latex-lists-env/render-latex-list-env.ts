@@ -467,7 +467,6 @@ const renderLatexListItemCore = (
   // ENUMERATE
   if (isEnumerate) {
     const hasCustomMarker = token.hasOwnProperty('marker') && token.markerTokens;
-    debugger
     const enumerateLevel: number = Math.max(1, token.meta?.enumerateLevel ?? level_enumerate ?? 1);
     const enumerateIndex: number = nextEnumerateIndex(enumerateLevel);
     token.meta = { ...(token.meta ?? {}), enumerateLevel, enumerateIndex };

@@ -888,7 +888,6 @@ export const findFirstTagContentWithNesting = (
     posStart = index + pendingBackTick.length;
     pendingBackTick = '';
   }
-
   for (let pos = posStart; pos < max; pos++) {
     const ch = str.charCodeAt(pos);
     // --- backticks handling ---
@@ -951,7 +950,6 @@ export const findFirstTagContentWithNesting = (
   }
   return { block: null, pending };
 };
-
 
 /**
  * Skips Markdown code spans starting at `pos`.

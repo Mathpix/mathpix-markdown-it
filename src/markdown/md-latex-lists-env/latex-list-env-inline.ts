@@ -133,22 +133,29 @@ export const latexListEnvInline: RuleInline = (
 ): boolean => {
   const startPos: number = state.pos;
   // Must start with '\'
-  if (state.src.charCodeAt(startPos) !== 0x5c /* '\' */) return false;
-
+  if (state.src.charCodeAt(startPos) !== 0x5c /* '\' */) {
+    return false;
+  }
   const begin = state.src.slice(startPos).match(BEGIN_LIST_ENV_RE);
-  if (!begin || begin.index !== 0) return false;
-
+  if (!begin || begin.index !== 0) {
+    return false;
+  }
   const type: string = (begin[1] ?? "").trim();
-  if (!type || !isListType(type)) return false;
-
+  if (!type || !isListType(type)) {
+    return false;
+  }
   const env: EnvMatch | null = findFirstCompleteListEnv(state.src, startPos);
-  if (!env) return false;
-
-  if (silent) return true;
+  if (!env) {
+    return false;
+  }
+  if (silent) {
+    return true;
+  }
   // Parse raw env using block logic
   const parsed: ParseListEnvResult = parseListEnvRawToTokens(state.md, env.raw, state.env);
-  if (!parsed.ok) return false;
-
+  if (!parsed.ok) {
+    return false;
+  }
   // Flush tokens into inline stream and shift inlinePos by absolute start offset
   flushTokensToInline(state, parsed.tokens, env.start);
   // Advance position

@@ -7,8 +7,9 @@ import { BufferedBlockState, PushFn } from "./latex-list-types";
 
 /** Shallow clone but shift known position fields by baseOffset */
 export const shiftTokenAbsolutePositions = (tok: any, baseOffset: number) => {
-  if (!baseOffset) return tok;
-
+  if (!baseOffset) {
+    return tok;
+  }
   // inlinePos is the important one in your lists
   if (tok.inlinePos && typeof tok.inlinePos === "object") {
     if (typeof tok.inlinePos.start_content === "number")
@@ -20,24 +21,18 @@ export const shiftTokenAbsolutePositions = (tok: any, baseOffset: number) => {
     if (typeof tok.inlinePos.end === "number")
       tok.inlinePos.end += baseOffset;
   }
-
-  // Optional: shift token.map if you store absolute line mapping somewhere (rare in inline)
-  // if (tok.map && Array.isArray(tok.map)) { ... }
-
   // Shift markerTokens too (if they have inlinePos)
   if (tok.markerTokens && Array.isArray(tok.markerTokens)) {
     for (const child of tok.markerTokens) {
       shiftTokenAbsolutePositions(child, baseOffset);
     }
   }
-
   // Shift children if some later pipeline attaches them (rare here, but safe)
   if (tok.children && Array.isArray(tok.children)) {
     for (const child of tok.children) {
       shiftTokenAbsolutePositions(child, baseOffset);
     }
   }
-
   return tok;
 };
 
@@ -53,7 +48,6 @@ export const shiftTokenAbsolutePositions = (tok: any, baseOffset: number) => {
 export const buildBlockStateFromRaw = (md: any, raw: string, baseEnv: any) => {
   const normalized: string = raw.replace(/\r\n/g, "\n");
   const lines: string[] = normalized.split("\n");
-
   const st: any = {
     md,
     src: normalized,
@@ -69,8 +63,7 @@ export const buildBlockStateFromRaw = (md: any, raw: string, baseEnv: any) => {
     level: 0,
     prentLevel: 0,
   };
-
-  let offset = 0;
+  let offset: number = 0;
   for (let i = 0; i < lines.length; i++) {
     st.bMarks[i] = offset;
     st.tShift[i] = 0;
@@ -79,20 +72,16 @@ export const buildBlockStateFromRaw = (md: any, raw: string, baseEnv: any) => {
     // Only add '\n' between lines (not after last line)
     if (i !== lines.length - 1) offset += 1;
   }
-
   st.push = (type: string, tag: string, nesting: number) => {
     // const tok = new (Token as any)(type, tag, nesting);
     const tok = new TokenCtor(type, tag, nesting);
     tok.block = true;
     tok.level = st.level;
-
     if (nesting === 1) st.level++;
     if (nesting === -1) st.level--;
-
     st.tokens.push(tok);
     return tok;
   };
-
   return st;
 };
 
@@ -106,30 +95,23 @@ export const buildBlockStateFromRaw = (md: any, raw: string, baseEnv: any) => {
 export const createBufferedState = (state: StateBlock): BufferedBlockState => {
   // prototype-inherit all read-only properties (bMarks, eMarks, src, etc.)
   const tempState = Object.create(state) as BufferedBlockState;
-  // isolate tokens + env
   tempState.tokens = [];
-  // tempState.env = { ...(state.env || {}) };
-
-  // IMPORTANT: start from current level, and advance/decrease with nesting
   tempState.level = state.level;
-
   tempState.push = ((type: string, tag: string, nesting: number) => {
-    // const tok = new (Token as any)(type, tag, nesting);
     const tok = new TokenCtor(type, tag, nesting);
     tok.block = true;
     tok.level = tempState.level;
-
-    // Maintain level changes the same way markdown-it does
-    if (nesting === 1) tempState.level++;
-    if (nesting === -1) tempState.level--;
-
+    if (nesting === 1) {
+      tempState.level++;
+    }
+    if (nesting === -1) {
+      tempState.level--;
+    }
     tempState.tokens.push(tok);
     return tok;
   }) as PushFn<Token>;
-
   return tempState;
 };
-
 
 /**
  * Run ListsInternal on raw env and return produced tokens.
@@ -141,7 +123,7 @@ export const parseListEnvRawToTokens = (
   baseEnv: any
 ): { ok: boolean; tokens: any[]; state: any } => {
   const blockState = buildBlockStateFromRaw(md, raw, baseEnv);
-  const ok = ListsInternal(blockState, 0, blockState.lineMax);
+  const ok: boolean = ListsInternal(blockState, 0, blockState.lineMax);
   return { ok, tokens: blockState.tokens, state: blockState };
 };
 
@@ -196,11 +178,9 @@ export const flushBufferedTokens = (state: StateBlock, buffered: Token[]): void 
  */
 export const safeAssignToken = (target: any, src: any) => {
   const SKIP = new Set(["type", "tag", "nesting", "level", "block"]);
-
   for (const key of Object.keys(src)) {
     if (SKIP.has(key)) continue;
     target[key] = src[key];
   }
-
   return target;
 };
