@@ -1288,6 +1288,25 @@ module.exports = [
       ' - Dashed Underline\n' +
       ' - Dotted Underline"'
   },
+  {
+    latex: '\\begin{tabular}{|l|l|}\n' +
+      '\\hline REPLACING PARTS / OPERATION & NECESSARY OPERATION \\\\\n' +
+      '\\hline VSC actuator (Skid Control ECU) & \\begin{itemize}\n' +
+      '\\item[] - 2. Deceleration sensor zero point calibration.\\\\\n' +
+      '\\item[] - 3. Perform initialization of steering angle sensor.\n' +
+      '\\end{itemize} \\\\\n' +
+      '\\hline\n' +
+      '\\end{tabular}',
+    tsv: 'REPLACING PARTS / OPERATION\tNECESSARY OPERATION\n' +
+      'VSC actuator (Skid Control ECU)\t"  - 2. Deceleration sensor zero point calibration.\\\n' +
+      '  - 3. Perform initialization of steering angle sensor."',
+    markdown: '| REPLACING PARTS / OPERATION | NECESSARY OPERATION |\n' +
+      '| :--- | :--- |\n' +
+      '| VSC actuator (Skid Control ECU) | - 2. Deceleration sensor zero point calibration.\\ <br>- 3. Perform initialization of steering angle sensor.<br> |',
+    csv: 'REPLACING PARTS / OPERATION,NECESSARY OPERATION\n' +
+      'VSC actuator (Skid Control ECU),"  - 2. Deceleration sensor zero point calibration.\\\n' +
+      '  - 3. Perform initialization of steering angle sensor."'
+  },
   // {
   //   latex: '',
   //   tsv: '',

@@ -151,7 +151,9 @@ const renderNonTableTokenIntoCell = (
     acc.result += data.table;
     if (Array.isArray(data.tableMd) && data.tableMd.length) {
       if (acc.cellMd?.trim()) {
+        console.log("1[TEST]=>acc.cellMd=>", acc.cellMd)
         acc.cellMd += '<br>';
+        console.log("2[TEST]=>acc.cellMd=>", acc.cellMd)
       }
       acc.cellMd += data.tableMd.map(item => (typeof item === 'string' ? item : item.join(' '))).join(' <br> ');
     }
@@ -197,6 +199,14 @@ const handleListTokensForCellMarkdown = (
   const { tokens, idx, options, env, slf } = ctx;
   const prevToken = idx > 0 ? tokens[idx - 1] : null;
   const addBr = (): void => {
+    // Find last non-space character
+    const s: string = acc.cellMd;
+    let k: number = s.length - 1;
+    while (k >= 0 && (s[k] === " " || s[k] === "\t")) k--;
+    // If the last significant char is a backslash, separate it from the HTML tag.
+    if (k >= 0 && s[k] === "\\") {
+      acc.cellMd += " ";
+    }
     acc.cellMd += '<br>';
   };
   if (token?.type && ["itemize_list_open", "enumerate_list_open"].includes(token.type)) {
