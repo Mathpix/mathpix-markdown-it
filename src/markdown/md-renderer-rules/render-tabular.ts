@@ -151,9 +151,7 @@ const renderNonTableTokenIntoCell = (
     acc.result += data.table;
     if (Array.isArray(data.tableMd) && data.tableMd.length) {
       if (acc.cellMd?.trim()) {
-        console.log("1[TEST]=>acc.cellMd=>", acc.cellMd)
         acc.cellMd += '<br>';
-        console.log("2[TEST]=>acc.cellMd=>", acc.cellMd)
       }
       acc.cellMd += data.tableMd.map(item => (typeof item === 'string' ? item : item.join(' '))).join(' <br> ');
     }
