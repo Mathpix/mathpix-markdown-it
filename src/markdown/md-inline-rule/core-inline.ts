@@ -104,7 +104,6 @@ export const coreInline = (state) => {
   // Parse inlines
   if (!state.env.footnotes) { state.env.footnotes = {}; }
   state.env.mmd_footnotes = {...state.env.footnotes};
-
   if (!state.env.mmd_footnotes.list) { state.env.mmd_footnotes.list = []}
   for (let i = 0; i < tokens.length; i++) {
     token = tokens[i];
@@ -121,7 +120,6 @@ export const coreInline = (state) => {
       }
       if (!state.env.footnotes.list) { state.env.footnotes.list = []; }
       if (!state.env.mmd_footnotes.list) { state.env.mmd_footnotes.list = []; }
-
       if (token.type === 'footnotetext_latex') {
         addFootnoteToListForFootnotetext(state, token, token.children, token.content, token.numbered, true);
         continue;
