@@ -12,6 +12,12 @@ import {CustomMarkerHtmlResult} from "./latex-list-types";
 
 var level_itemize = 0;
 var level_enumerate = 0;
+type ListState = {
+  enumerateCounters: number[]; // index = level-1
+};
+const listState: ListState = {
+  enumerateCounters: [],
+};
 
 type MarkerInfo = {
   htmlMarker: string;
@@ -19,6 +25,52 @@ type MarkerInfo = {
 };
 
 type ListItemRenderMode = 'open' | 'full';
+
+/**
+ * Resets enumerate counters at the given nesting level.
+ * Ensures the counters array is large enough, truncates deeper levels,
+ * and sets the counter for `level` to zero (start of a new list at that level).
+ *
+ * @param level - Enumerate nesting level (1-based).
+ */
+const resetEnumerateCountersFromLevel = (level: number): void => {
+  const safeLevel: number = Math.max(1, level);
+  const counters: number[] = listState.enumerateCounters;
+  while (counters.length < safeLevel) {
+    counters.push(0);
+  }
+  // Drop counters for deeper levels when a new list starts at this level.
+  counters.length = safeLevel;
+  counters[safeLevel - 1] = 0;
+};
+
+/**
+ * Increments and returns the next enumerate index for the given nesting level.
+ * Ensures the counters array is large enough and truncates deeper levels
+ * (so returning to a higher level resets deeper numbering).
+ *
+ * @param level - Enumerate nesting level (1-based).
+ * @returns The next 1-based item index for this enumerate level.
+ */
+const nextEnumerateIndex = (level: number): number => {
+  const safeLevel: number = Math.max(1, level);
+  const counters: number[] = listState.enumerateCounters;
+  while (counters.length < safeLevel) {
+    counters.push(0);
+  }
+  // Drop deeper levels when we emit an item at this level.
+  counters.length = safeLevel;
+  counters[safeLevel - 1] = (counters[safeLevel - 1] ?? 0) + 1;
+  return counters[safeLevel - 1];
+};
+
+/**
+ * Clears all enumerate counters for all nesting levels.
+ * Useful when starting a fresh top-level enumerate list.
+ */
+const resetAllEnumerateCounters = (): void => {
+  listState.enumerateCounters.length = 0;
+};
 
 const list_injectLineNumbers = (tokens, idx, className = '') => {
   let line, endLine, listLine;
@@ -69,7 +121,7 @@ export const render_itemize_list_open: Renderer.RenderRule = (
 ): string => {
   const token: Token = tokens[idx];
   // Reset nesting level for top-level lists
-  if (token.level === 0) {
+  if ((token as any).isTopLevelList) {
     level_itemize = 0;
   }
   const prevToken: Token | undefined = tokens[idx - 1];
@@ -140,11 +192,13 @@ export const render_enumerate_list_open: Renderer.RenderRule = (
 ): string => {
   const token: Token = tokens[idx];
   // Reset nesting level for top-level enumerate lists
-  if (token.level === 0) {
+  if ((token as any).isTopLevelList) {
     level_enumerate = 0;
+    resetAllEnumerateCounters();
   }
   const prevToken: Token | undefined = tokens[idx - 1];
   level_enumerate++;
+  resetEnumerateCountersFromLevel(level_enumerate);
   let dataAttr = '';
   // Determine current enumerate style (e.g. decimal, lower-alpha, ...)
   const enumerateLevels: string[] = GetEnumerateLevel((token as any).enumerateLevel);
@@ -344,7 +398,7 @@ const buildCustomMarkerInfo = (token, options, slf, env): MarkerInfo => {
 const buildItemizeMarkerInfo = (token, options, env, slf, level_itemize: number): MarkerInfo => {
   const itemizeLevelTokens = GetItemizeLevelTokens(token.itemizeLevel);
   let dataAttr: string = '';
-  let htmlMarker: string = '.';
+  let htmlMarker: string = '·';
   if (token.hasOwnProperty('marker') && token.markerTokens) {
     return buildCustomMarkerInfo(token, options, slf, env);
   }
@@ -416,6 +470,9 @@ const renderLatexListItemCore = (
   // ENUMERATE
   if (isEnumerate) {
     const hasCustomMarker = token.hasOwnProperty('marker') && token.markerTokens;
+    const enumerateLevel: number = Math.max(1, token.meta?.enumerateLevel ?? level_enumerate ?? 1);
+    const enumerateIndex: number = nextEnumerateIndex(enumerateLevel);
+    token.meta = { ...(token.meta ?? {}), enumerateLevel, enumerateIndex };
     // Case 1: custom marker (e.g. \item[foo])
     if (hasCustomMarker) {
       const className = 'li_enumerate not_number';
@@ -455,6 +512,7 @@ const renderLatexListItemCore = (
   }
   // ITEMIZE
   const itemizeInfo: MarkerInfo = buildItemizeMarkerInfo(token, options, env, slf, level_itemize);
+  token.meta = {...(token.meta ?? {}), itemizeLevel: level_itemize};
   htmlMarker = itemizeInfo.htmlMarker;
   dataAttr += itemizeInfo.dataAttr || "";
   const className = token.meta?.isBlock

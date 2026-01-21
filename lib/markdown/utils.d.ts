@@ -63,3 +63,26 @@ export declare const applyAttrToInlineMath: (tokens: Token[], attrName: string, 
  *   "\\&" -> '&' is NOT escaped (false), because there are 2 slashes
  */
 export declare const isEscapedAt: (str: string, pos: number) => boolean;
+type ITagMatch = {
+    posStart: number;
+    posEnd: number;
+    content: string;
+};
+type ITagBlock = {
+    open: ITagMatch;
+    close: ITagMatch;
+    content: string;
+    contentPosStart: number;
+    contentPosEnd: number;
+    level: number;
+};
+export declare const findFirstTagContentWithNesting: (str: string, tagOpen: RegExp, tagClose: RegExp, pendingBackTick?: string, noBreakBackTick?: boolean) => {
+    block: ITagBlock;
+    pending: string;
+};
+/**
+ * Skips Markdown code spans starting at `pos`.
+ * Handles escaped backticks: \` does not start a code span (unless the backslash itself is escaped).
+ */
+export declare const skipBackticks: (src: string, pos: number) => number;
+export {};

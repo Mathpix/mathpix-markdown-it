@@ -2,20 +2,25 @@ import type StateBlock from 'markdown-it/lib/rules_block/state_block';
 import type Token from 'markdown-it/lib/token';
 import type { RuleBlock } from 'markdown-it/lib/parser_block';
 import { setTokenOpenList, setTokenCloseList, ListOpen } from "./latex-list-tokens";
-import { ListItemsBlock, ItemsListPush, ItemsAddToPrev, finalizeListItems, splitInlineListEnv } from "./latex-list-items";
+import { ItemsListPush, ItemsAddToPrev, finalizeListItems, splitInlineListEnv } from "./latex-list-items";
 import { GetItemizeLevelTokensByState, GetEnumerateLevel, ItemizeLevelTokenResult } from "./re-level";
 import {
   ListType,
   ParsedListItem,
   ListOpenResult,
   LstEndResult,
-  isListType
+  isListType,
+  StateBlockLike,
+  OpaqueStack, OpaqueEnvType
 } from "./latex-list-types";
 import { parseSetCounterNumber } from "./latex-list-common";
+import { flushBufferedTokens, createBufferedState } from "./latex-list-env-engine";
 import {
   BEGIN_LIST_ENV_INLINE_RE,
   BEGIN_LST_INLINE_RE,
+  BEGIN_TABULAR_INLINE_RE,
   END_LST_INLINE_RE,
+  END_TABULAR_INLINE_RE,
   BEGIN_LIST_ENV_RE,
   END_LIST_ENV_INLINE_RE,
   LATEX_ITEM_COMMAND_INLINE_RE,
@@ -23,48 +28,57 @@ import {
 } from "../common/consts";
 
 /**
- * Try to handle an inline `\begin{lstlisting}` on the given line.
+ * Detects \begin{lstlisting} or \begin{tabular} on a line and enters an opaque env.
+ * - Uses `stack` to track nesting (tabular can nest, lstlisting cannot).
+ * - Text before \begin (including prefixes like \hline or & when nesting inside tabular) is preserved and added as normal list content.
+ * - From \begin... to end of line is appended as raw/opaque text.
  *
- * Behavior:
- * - If already inside a lstlisting environment (`envDepth > 0`), does nothing.
- * - If a `\begin{lstlisting}` is found:
- *   - Text before the begin is appended either as a new list item (when it matches `itemTag`)
- *     or concatenated to the previous item.
- *   - Sets `envDepth` to 1 (entered lstlisting).
- *   - Appends the substring starting at `\begin{lstlisting}` to the end of the line
- *     as code content in the current item.
- *
- * The function does not mutate inputs; it returns the updated state.
- *
- * @param lineText The full text of the current line.
- * @param envDepth Current lstlisting nesting depth.
- * @param items    Collected items so far (list builder state).
- * @param nextLine The current (next) line index used for item position metadata.
- * @param dStart   Document start line offset to compute absolute positions.
- * @param itemTag  RegExp to detect list item prefixes (e.g., `^\s*\\item`).
- * @returns Updated handling result with flags, depth, items, and original line text.
+ * @returns Updated { handled, stack, items, lineText }.
  */
 const handleLstBeginInline = (
   lineText: string,
-  envDepth: number,
+  stack: OpaqueStack,
   items: any[],
   nextLine: number,
   dStart: number,
   itemTag: RegExp
 ): LstEndResult => {
-  // If already inside lstlisting, do nothing.
-  if (envDepth > 0) {
-    return { handled: false, envDepth, items, lineText };
+  const top: OpaqueEnvType = stack[stack.length - 1];
+  // If we are inside lstlisting, ignore any begin markers.
+  if (top === "lstlisting") {
+    return { handled: false, stack, items, lineText };
   }
-  const mb: RegExpMatchArray = BEGIN_LST_INLINE_RE.exec(lineText);
-  if (!mb) {
-    return { handled: false, envDepth, items, lineText };
+  // Reset regex lastIndex (important if /g/)
+  BEGIN_LST_INLINE_RE.lastIndex = 0;
+  BEGIN_TABULAR_INLINE_RE.lastIndex = 0;
+  const mbLst: RegExpExecArray = BEGIN_LST_INLINE_RE.exec(lineText);
+  const mbTab: RegExpExecArray = BEGIN_TABULAR_INLINE_RE.exec(lineText);
+  // If we are inside tabular, allow only nested tabular
+  if (top === "tabular") {
+    if (!mbTab) return { handled: false, stack, items, lineText };
+    // keep the prefix before \begin{tabular} (e.g. "\hline " or " & ")
+    const prefix: string = lineText.slice(0, mbTab.index);
+    const beginAndRest: string = lineText.slice(mbTab.index);
+    // open nested tabular
+    stack = [...stack, "tabular"];
+    if (prefix.length > 0) {
+      items = ItemsAddToPrev(items, prefix, nextLine);
+    }
+    items = ItemsAddToPrev(items, beginAndRest, nextLine);
+    return { handled: true, stack, items, lineText };
   }
+  // If stack is empty:
+  if (!mbLst && !mbTab) return { handled: false, stack, items, lineText };
+  // Choose earliest begin if both exist
+  const mb: RegExpMatchArray =
+    mbLst && mbTab
+      ? (mbLst.index <= mbTab.index ? mbLst : mbTab)
+      : (mbLst || mbTab)!;
+  const openedType: OpaqueEnvType =
+    mb === mbLst ? "lstlisting" : "tabular";
   const beginIndex: number = mb.index;
-  // Is there text BEFORE \begin{lstlisting} ?
-  const before: string = lineText.slice(0, beginIndex).trimEnd();
-  const afterBegin: string = lineText.slice(beginIndex); // start from \begin...
-  // If there was something before begin, it was regular text/part of \item:
+  const before: string = lineText.slice(0, beginIndex);
+  const afterBegin: string = lineText.slice(beginIndex);
   if (before.length > 0) {
     if (itemTag.test(before)) {
       items = ItemsListPush(items, before, nextLine + dStart, nextLine + dStart);
@@ -72,105 +86,190 @@ const handleLstBeginInline = (
       items = ItemsAddToPrev(items, before, nextLine);
     }
   }
-  envDepth = 1; //entered lstlisting
-  items = ItemsAddToPrev(items, afterBegin, nextLine);//The part from \begin{lstlisting} to the end of the line is considered a code string.
-  return { handled: true, envDepth, items, lineText };
+  stack = [...stack, openedType];
+  items = ItemsAddToPrev(items, afterBegin, nextLine);
+  return { handled: true, stack, items, lineText };
 }
 
 /**
- * Try to handle an inline `\end{lstlisting}` on the current line.
+ * Detects \end{...} for the current opaque env (stack top).
+ * - If not found, appends the full raw line (keeps indentation) as opaque text.
+ * - If found, appends up to end marker, pops stack, and returns tail (if any).
  *
- * Behavior:
- * - If not inside an lstlisting environment (`envDepth === 0`), does nothing.
- * - If no end marker is found on this line, appends the full line (with original leading whitespace)
- *   to the current item and reports `handled: true` (still inside the env).
- * - If an end marker is present:
- *   - Appends everything up to `\end{...}` (plus the end token itself) to the current item.
- *   - Resets `envDepth` to 0 (leaves lstlisting).
- *   - If there is trailing text after the end token, returns it in `lineText` so the caller
- *     can continue processing the remainder of the line; otherwise returns an empty `lineText`.
- *
- * The function does not mutate inputs; it returns the updated state.
- *
- * @param lineText Current line text (may contain `\end{lstlisting}`).
- * @param envDepth Current lstlisting nesting depth (0 if outside).
- * @param items    Accumulated items list (list builder state).
- * @param nextLine Line index used for item position metadata.
- * @param state    Markdown-It state (used to read the original line with indentation).
- * @returns Updated result with flags, depth, items, and remaining line text (if any).
+ * @returns Updated { handled, stack, items, lineText }.
  */
 const handleLstEndInline = (
   lineText: string,
-  envDepth: number,
+  stack: OpaqueStack,
   items: any[],
   nextLine: number,
   state
 ): LstEndResult => {
-  // If we are not inside lstlisting, we exit
-  if (envDepth === 0) {
-    return { handled: false, envDepth, items, lineText };
+  const top: OpaqueEnvType = stack[stack.length - 1];
+  if (!top) {
+    return { handled: false, stack, items, lineText };
   }
-  const me: RegExpMatchArray = END_LST_INLINE_RE.exec(lineText);
+  const endRe: RegExp = top === "lstlisting"
+    ? END_LST_INLINE_RE
+    : END_TABULAR_INLINE_RE;
+  endRe.lastIndex = 0;
+  const me: RegExpExecArray = endRe.exec(lineText);
   if (!me) {
-    // There is no end of environment - just add the line as is
-    lineText = state.src.slice(state.bMarks[nextLine], state.eMarks[nextLine]); // It is important to take into account the leading whitespace characters.
-    items = ItemsAddToPrev(items, lineText, nextLine);
-    return { handled: true, envDepth, items, lineText };
+    // still inside opaque env → append raw line with indentation
+    const rawLine = state.src.slice(state.bMarks[nextLine], state.eMarks[nextLine]);
+    items = ItemsAddToPrev(items, rawLine, nextLine);
+    return { handled: true, stack, items, lineText };
   }
-  // There is an end of environment in this line
   const endIndex: number = me.index;
   const endToken: string = lineText.slice(endIndex, endIndex + me[0].length);
   const beforeEnd: string = lineText.slice(0, endIndex);
   const afterEnd: string = lineText.slice(endIndex + me[0].length);
-  // Everything up to \end{...} is a continuation of the code
+  // Append code continuation
   if (beforeEnd.length > 0) {
-    items = ItemsAddToPrev(items, beforeEnd + '\n' + endToken, nextLine);
+    const glue = top === "lstlisting" ? "\n" : "";
+    items = ItemsAddToPrev(items, beforeEnd + glue + endToken, nextLine);
   } else {
     items = ItemsAddToPrev(items, endToken, nextLine);
   }
-  envDepth = 0; // Exit lstlisting
+  // pop matching env
+  stack = stack.slice(0, -1);
+  // If nothing meaningful after end tag, consume line
   if (!afterEnd?.trim()?.length) {
-    return { handled: true, envDepth, items, lineText: '' };
+    return { handled: true, stack, items, lineText: "" };
   }
-  return { handled: false, envDepth, items, lineText: afterEnd };
+  // return remainder to be parsed normally
+  return { handled: false, stack, items, lineText: afterEnd };
 }
 
+type OpaqueProcessResult = {
+  consumedLine: boolean;
+  lineText: string;
+  stack: OpaqueStack;
+  items: ParsedListItem[];
+};
+
 /**
- * Block rule that parses LaTeX list environments:
- *   \begin{itemize} ... \end{itemize}
- *   \begin{enumerate} ... \end{enumerate}
+ * Processes "opaque" inline environments inside list parsing (currently: tabular, lstlisting).
  *
- * It:
- *  - detects list begin/end commands,
- *  - collects and splits \item content into logical items,
- *  - handles \setcounter and nested lists on the same line,
- *  - emits corresponding *_list_open, *_list_close, and list item tokens.
+ * The function may:
+ * - fully consume the current source line (appending it to `items` as raw text), OR
+ * - close an opaque env and return a remaining tail to be parsed again on the same line
+ *   (e.g. `\end{tabular} & \begin{tabular}{l}`).
+ *
+ * Uses a guard to prevent infinite loops on malformed input.
  */
-export const Lists: RuleBlock = (
-  state: StateBlock,
+const processOpaqueLine = (
+  params: {
+    lineText: string;
+    stack: OpaqueStack;
+    items: ParsedListItem[];
+    nextLine: number;
+    state: StateBlockLike;
+    renderStart: number;
+  }
+): OpaqueProcessResult => {
+  let { lineText, stack, items, nextLine, state, renderStart } = params;
+  let guard: number = 0;
+  while (guard++ < 50) {
+    const top: OpaqueEnvType = stack[stack.length - 1];
+    if (top) {
+      // -------- inside opaque --------
+      if (top === "tabular") {
+        END_TABULAR_INLINE_RE.lastIndex = 0;
+        BEGIN_TABULAR_INLINE_RE.lastIndex = 0;
+        const me: RegExpExecArray = END_TABULAR_INLINE_RE.exec(lineText);
+        const mb: RegExpExecArray = BEGIN_TABULAR_INLINE_RE.exec(lineText);
+        // close if end exists before begin (or begin missing)
+        if (me && (!mb || me.index <= mb.index)) {
+          const endRes: LstEndResult = handleLstEndInline(lineText, stack, items, nextLine, state);
+          stack = endRes.stack;
+          items = endRes.items;
+          if (endRes.handled) {
+            return { consumedLine: true, lineText, stack, items };
+          }
+          // got tail → keep parsing same line
+          lineText = endRes.lineText;
+          continue;
+        }
+        // otherwise if begin exists, open nested tabular
+        if (mb) {
+          const beginRes: LstEndResult = handleLstBeginInline(
+            lineText,
+            stack,
+            items,
+            nextLine,
+            renderStart,
+            LATEX_ITEM_COMMAND_INLINE_RE
+          );
+          stack = beginRes.stack;
+          items = beginRes.items;
+          if (beginRes.handled) {
+            return { consumedLine: true, lineText, stack, items };
+          }
+          lineText = beginRes.lineText;
+          continue;
+        }
+        // plain opaque line inside tabular:
+        // preserve indentation unless this is a tail
+        const rawLine = state.src.slice(state.bMarks[nextLine], state.eMarks[nextLine]);
+        const rawLineNoIndent = state.src.slice(
+          state.bMarks[nextLine] + state.tShift[nextLine],
+          state.eMarks[nextLine]
+        );
+        const toAppend = (lineText !== rawLineNoIndent) ? lineText : rawLine;
+        items = ItemsAddToPrev(items, toAppend, nextLine);
+        return { consumedLine: true, lineText, stack, items };
+      }
+      // other opaque (lstlisting): only try to end
+      const endRes: LstEndResult = handleLstEndInline(lineText, stack, items, nextLine, state);
+      stack = endRes.stack;
+      items = endRes.items;
+      if (endRes.handled) {
+        return { consumedLine: true, lineText, stack, items };
+      }
+      lineText = endRes.lineText;
+      continue;
+    }
+    // not inside opaque: try to begin
+    const beginRes: LstEndResult = handleLstBeginInline(
+      lineText,
+      stack,
+      items,
+      nextLine,
+      renderStart,
+      LATEX_ITEM_COMMAND_INLINE_RE
+    );
+    stack = beginRes.stack;
+    items = beginRes.items;
+    if (beginRes.handled) {
+      return { consumedLine: true, lineText, stack, items };
+    }
+    lineText = beginRes.lineText;
+    return { consumedLine: false, lineText, stack, items };
+  }
+  // safety: if guard exceeded, treat as consumed to avoid infinite loop
+  items = ItemsAddToPrev(items, lineText, nextLine);
+  return { consumedLine: true, lineText, stack, items };
+};
+
+
+/**
+ * Parse a LaTeX list environment starting at `startLine` and emit tokens into `state`.
+ *
+ * Notes:
+ * - The function is "strict": it returns false if the matching \end{...} is not found.
+ * - Works with any StateBlock-like object (real block state or synthetic state for inline reuse).
+ *
+ * @returns true if the environment was successfully parsed and closed, otherwise false.
+ */
+export const ListsInternal = (
+  state: StateBlockLike,
   startLine: number,
   endLine: number,
-  silent: boolean
 ): boolean => {
-  let pos = state.bMarks[startLine] + state.tShift[startLine];
-  let max = state.eMarks[startLine];
-  let lineText = state.src.slice(pos, max);
-  // Must start with backslash to be LaTeX command
-  if (lineText.charCodeAt(0) !== 0x5c /* '\' */) {
-    return false;
-  }
-  let match: RegExpMatchArray | null = lineText.match(BEGIN_LIST_ENV_RE);
-  if (!match) {
-    return false;
-  }
-  const typeList: string = match[1].trim();
-  if (!isListType(typeList)) {
-    return false;
-  }
-  // In silent mode: only report that this block can start; do not modify state or emit tokens.
-  if (silent) {
-    return true;
-  }
+  let pos: number = state.bMarks[startLine] + state.tShift[startLine];
+  let max: number = state.eMarks[startLine];
+  let lineText: string = state.src.slice(pos, max);
   const renderStart: number = state.md.options.renderElement && state.md.options.renderElement.startLine
       ? Number(state.md.options.renderElement.startLine)
       : 0;
@@ -196,33 +295,29 @@ export const Lists: RuleBlock = (
   }
   let items: ParsedListItem[] = [];
   let haveClose: boolean = false;
-  let envDepth: number = 0; // >0 — inside lstlisting environment
+  let opaqueStack: OpaqueStack = [];
   for (; nextLine < endLine; nextLine++) {
     pos = state.bMarks[nextLine] + state.tShift[nextLine];
     max = state.eMarks[nextLine];
     lineText = state.src.slice(pos, max);
-    // 1) If you are NOT currently inside lstlisting, first search for \begin{lstlisting}
-    if (envDepth === 0) {
-      const beginRes: LstEndResult = handleLstBeginInline(lineText, envDepth, items, nextLine, renderStart, LATEX_ITEM_COMMAND_INLINE_RE);
-      envDepth = beginRes.envDepth;
-      if (beginRes.handled) {
-        continue; // this line is already fully processed
-      }
-      lineText = beginRes.lineText;
-    }
-    // 2) If inside lstlisting, look for \end{lstlisting}
-    if (envDepth > 0) {
-      const endRes: LstEndResult = handleLstEndInline(lineText, envDepth, items, nextLine, state);
-      envDepth = endRes.envDepth;
-      items = endRes.items;
-      if (endRes.handled) {
-        continue;
-      }
-      lineText = endRes.lineText;
+    // Handle opaque envs; may consume the line or return a tail to re-parse.
+    const opaqueRes: OpaqueProcessResult = processOpaqueLine({
+      lineText,
+      stack: opaqueStack,
+      items,
+      nextLine,
+      state,
+      renderStart
+    });
+    opaqueStack = opaqueRes.stack;
+    items = opaqueRes.items;
+    lineText = opaqueRes.lineText;
+    if (opaqueRes.consumedLine) {
+      continue;
     }
     // Handle \setcounter lines
     if (reSetCounter.test(lineText)) {
-      match = lineText.match(reSetCounter);
+      let match: RegExpMatchArray | null = lineText.match(reSetCounter);
       if (match && state.md.options?.forLatex) {
         const token = state.push("setcounter", "", 0) as any;
         token.latex = match[0].trim();
@@ -324,10 +419,9 @@ export const Lists: RuleBlock = (
   }
 
   if (!haveClose) {
+    // Strict mode: do not emit partial tokens (important for inline env wrapper).
     // No explicit \end{itemize}/\end{enumerate} found — flush remaining items
-    console.log("NOT CLOSE TAG.");
-    ListItemsBlock(state, items);
-    li = null;
+    return false;
   }
 
   state.line = nextLine;
@@ -337,5 +431,58 @@ export const Lists: RuleBlock = (
   if (tokenStart) {
     tokenStart.map![1] = nextLine + renderStart;
   }
+  return true;
+};
+
+/**
+ * Block rule that parses LaTeX list environments:
+ *   \begin{itemize} ... \end{itemize}
+ *   \begin{enumerate} ... \end{enumerate}
+ *
+ * It:
+ *  - detects list begin/end commands,
+ *  - collects and splits \item content into logical items,
+ *  - handles \setcounter and nested lists on the same line,
+ *  - emits corresponding *_list_open, *_list_close, and list item tokens.
+ */
+export const Lists: RuleBlock = (
+  state: StateBlock,
+  startLine: number,
+  endLine: number,
+  silent: boolean
+): boolean => {
+  let pos = state.bMarks[startLine] + state.tShift[startLine];
+  let max = state.eMarks[startLine];
+  let lineText = state.src.slice(pos, max);
+  // Must start with backslash to be LaTeX command
+  if (lineText.charCodeAt(0) !== 0x5c /* '\' */) {
+    return false;
+  }
+  let match: RegExpMatchArray | null = lineText.match(BEGIN_LIST_ENV_RE);
+  if (!match) {
+    return false;
+  }
+  const typeList: string = match[1].trim();
+  if (!isListType(typeList)) {
+    return false;
+  }
+  // Buffer tokens first (do not write into the real state during parsing)
+  const bufferedState = createBufferedState(state);
+  // Run the original logic on bufferedState instead of state
+  const ok: boolean = ListsInternal(bufferedState, startLine, endLine); // we'll define it
+  if (!ok) return false;
+  // In silent mode: only report that this block can start; do not modify state or emit tokens.
+  if (silent) {
+    return true;
+  }
+  // Flush tokens to the real state at the end
+  flushBufferedTokens(state, bufferedState.tokens);
+  // Sync state fields modified by parsing
+  state.line = bufferedState.line;
+  state.startLine = bufferedState.startLine;
+  state.parentType = bufferedState.parentType;
+  state.level = bufferedState.level;
+  state.prentLevel = bufferedState.prentLevel;
+  state.env = bufferedState.env;
   return true;
 };

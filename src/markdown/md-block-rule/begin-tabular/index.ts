@@ -9,8 +9,10 @@ import {
   openTagTabular,
   closeTagTabular,
   BEGIN_LST_RE,
-  END_LST_RE
+  END_LST_RE,
+  BEGIN_LIST_ENV_INLINE_RE
 } from "../../common/consts";
+import { parseBlockIntoTokenChildren } from "../helper";
 
 export const openTag: RegExp = /(?:\\begin\s{0,}{tabular}\s{0,}\{([^}]*)\})/;
 export const openTagG: RegExp = /(?:\\begin\s{0,}{tabular}\s{0,}\{([^}]*)\})/g;
@@ -34,11 +36,21 @@ export type TTokenTabular = {
   ascii_csv?: string,
   ascii_md?: string,
   latex?: string,
-  parents?: Array<string>
+  parents?: Array<string>,
+  isSubTabular?: boolean,
+  meta?: any
 };
 
 
-export type TMulti = {mr?: number, mc?: number, attrs: Array<TAttrs>, content?: string, subTable?: Array<TTokenTabular>, latex: string}
+export type TMulti = {
+  mr?: number,
+  mc?: number,
+  attrs: Array<TAttrs>,
+  content?: string,
+  subTable?: Array<TTokenTabular>,
+  latex: string,
+  multi?: any
+}
 
 const addContentToList = (str: string): TTypeContentList => {
   let res: TTypeContentList = [];
@@ -194,11 +206,12 @@ export const StatePushTabulars = (state, cTabular: TTypeContentList, align: stri
     token.map = [startLine, state.line];
     token.bMarks = 0;
 
-    const res: Array<TTokenTabular> | null = ParseTabular(cTabular[i].content, 0, cTabular[i].align, state.md.options);
+    const res: Array<TTokenTabular> | null = ParseTabular(cTabular[i].content, 0, cTabular[i].align, state.md.options, state.env.subTabular);
     if (!res || res.length === 0) {
       continue;
     }
-
+    const envSubTabular: boolean = !!state.env.subTabular;
+    const envIsInline: boolean = !!state.env?.isInline;
     for (let j = 0; j < res.length; j++) {
       let tok:Token = res[j];
       if (res[j].token === 'inline') {
@@ -209,9 +222,18 @@ export const StatePushTabulars = (state, cTabular: TTypeContentList, align: stri
             || state.md.options.outMath.include_csv
             || (state.md.options.outMath.include_table_markdown
               && state.md.options.outMath.table_markdown && state.md.options.outMath.table_markdown.math_as_ascii);
-          state.env.subTabular = res[j].type === 'subTabular';
+          state.env.subTabular = res[j].type === 'subTabular' || res[j].isSubTabular;
+          if (BEGIN_LIST_ENV_INLINE_RE.test(res[j].content)) {
+            state.env.isInline = true;
+            parseBlockIntoTokenChildren(state, res[j].content, token, {
+              disableBlockRules: true,
+            });
+            state.env.isInline = envIsInline;
+            continue;
+          }
           tok.envToInline = {...state.env};
           state.env.tabulare = false;
+          state.env.subTabular = envSubTabular;
           tok.content  = res[j].content;
           tok.children = [];
         }
@@ -223,9 +245,10 @@ export const StatePushTabulars = (state, cTabular: TTypeContentList, align: stri
       }
       token.children.push(tok)
     }
+    state.env.subTabular = envSubTabular;
+    state.env.isInline = envIsInline;
   }
 };
-
 
 export const StatePushDiv = (state, startLine: number, nextLine: number, content: string) => {
   let token: Token;
@@ -263,6 +286,9 @@ export const BeginTabular: RuleBlock = (state, startLine: number, endLine: numbe
 
   let lineText: string = state.src.slice(pos, max);
   if (lineText.charCodeAt(0) !== 0x5c /* \ */) {
+    return false;
+  }
+  if (!openTagTabular.test(lineText)) {
     return false;
   }
   let isCloseTagExist = false;
@@ -340,7 +366,8 @@ export const BeginTabular: RuleBlock = (state, startLine: number, endLine: numbe
     return true;
   }
 
-  if (state.md.options.centerTables) {
+  const envIsInline: boolean = !!state.env.isInline;
+  if (state.md.options.centerTables && !envIsInline) {
     return StatePushTabularBlock(state, startLine, nextLine, resString, 'center', true);
   } else {
     return StatePushTabularBlock(state, startLine, nextLine, resString, '');

@@ -2,6 +2,7 @@ import { TAttrs, TTokenTabular } from './index';
 import { TDecimal } from "./common";
 import { getLatexTextWidth } from "../../utils";
 import { getExtractedCodeBlockContent } from "./sub-code";
+import { preserveNewlineUnlessDoubleAngleUuidRegex } from "../../common/consts";
 
 type TLines = {left?: string, right?: string, bottom?: string, top?: string};
 type TAligns = {h?: string, v?: string, w?: string};
@@ -101,7 +102,7 @@ export const AddTd = (content: string, aligns: TAligns| null, lines: TLines, spa
   if (!content) {
     attrs.push(['class', '_empty'])
   }
-  content = content.split('\n').join(' ');
+  content = content.replace(preserveNewlineUnlessDoubleAngleUuidRegex, ' ');
   content = getExtractedCodeBlockContent(content, 0);
   res.push({token:'td_open', type:'td_open', tag: 'td', n: 1, attrs: attrs});
   if (content) {

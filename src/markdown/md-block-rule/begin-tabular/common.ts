@@ -96,7 +96,8 @@ export const getColumnAlign = (align: string): string[]|[] => {
 export type TAlignData = {
   cAlign: Array<string>,
   vAlign: Array<string>,
-  cWidth: Array<string>
+  cWidth: Array<string>,
+  colSpec: Array<string>
 }
 
 const arrayFillDef = (arr: Array<string>, str: string, num: number): Array<string> => {
@@ -113,10 +114,13 @@ export const getVerticallyColumnAlign = (align: string, numCol: number): TAlignD
   let hAlign: Array<string> = [];
   let vAlign: Array<string> = [];
   let cWidth: Array<string> = [];
+  let colSpec: Array<string> = [];
   align = align.replace(/ /g, '').trim();
 
   for (let j = 0; j < align.length; j++) {
-    if (aH.indexOf(align[j]) >= 0) {
+    const ch: string = align[j];
+    if (aH.indexOf(ch) >= 0) {
+      colSpec.push(ch);
       switch (align[j]) {
         case 'c':
           hAlign.push('center');
@@ -140,8 +144,10 @@ export const getVerticallyColumnAlign = (align: string, numCol: number): TAlignD
           break;
       }
     }
-    if (aV.indexOf(align[j]) >= 0) {
-      switch (align[j]) {
+    if (aV.indexOf(ch) >= 0) {
+      let spec: string = ch;
+      let width = 'auto';
+      switch (ch) {
         case 'm':
           hAlign.push('left');
           vAlign.push('middle');
@@ -156,18 +162,22 @@ export const getVerticallyColumnAlign = (align: string, numCol: number): TAlignD
           break;
       }
       if (align[j + 1] === '{') {
-        let end = align.indexOf('}', j + 1);
-        const w = align.slice(j + 2, end);
-        cWidth.push(w);
-        j += w.length + 2;
+        const end: number = align.indexOf('}', j + 1);
+        const w: string = end >= 0 ? align.slice(j + 2, end) : '';
+        width = w || 'auto';
+        spec = end >= 0 ? `${ch}{${w}}` : ch;
+        j += (end >= 0 ? (w.length + 2) : 0);
       }
+      colSpec.push(spec);
+      cWidth.push(width);
     }
   }
   hAlign = arrayFillDef(hAlign, 'center', numCol);
   vAlign = arrayFillDef(vAlign, 'middle', numCol);
   cWidth = arrayFillDef(cWidth, 'auto', numCol);
+  colSpec = arrayFillDef(colSpec, 'c', numCol);
 
-  return { cAlign: hAlign, vAlign: vAlign, cWidth: cWidth}
+  return { cAlign: hAlign, vAlign: vAlign, cWidth: cWidth, colSpec}
 };
 
 export const getParams = (str: string, i: number) => {
@@ -291,4 +301,33 @@ export const getRowLines = (rows: string[], numCol: number): TParselines => {
   }
   resSpace[resSpace.length] = new Array(numCol).fill('none');
   return {cLines: res, cSpaces: resSpace, sLines: sLines};
+};
+
+/** Matches "unsafe" single-letter column specs that cannot host block content safely. */
+const UNSAFE_COL_SPEC_RE: RegExp = /^[lcrS]$/;
+
+/**
+ * Returns true if the given column spec is a single-letter "unsafe" spec (l/c/r/S).
+ *
+ * @param spec - Column spec string (e.g. "l", "p{0.3\\textwidth}", "L{...}")
+ */
+const isUnsafeColSpec = (spec: string): boolean => UNSAFE_COL_SPEC_RE.test(spec);
+
+/**
+ * Checks whether any column listed in `colsToFixWidth` uses an unsafe spec in `colSpec`.
+ * Used to decide if tabular column specs must be rewritten to fixed-width paragraph columns.
+ *
+ * @param colsToFixWidth - Column indices that require fixed width (e.g., columns containing lists)
+ * @param colSpec - Original column specs array (e.g., ["l","c","p{...}"])
+ */
+export const shouldRewriteColSpec = (
+  colsToFixWidth: number[] | undefined,
+  colSpec: string[] | undefined
+): boolean => {
+  if (!colsToFixWidth?.length || !colSpec?.length) {
+    return false;
+  }
+  return colsToFixWidth
+    .filter((i) => Number.isInteger(i) && i >= 0 && i < colSpec.length)
+    .some((i) => isUnsafeColSpec(colSpec[i]));
 };

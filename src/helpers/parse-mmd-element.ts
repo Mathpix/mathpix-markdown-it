@@ -77,23 +77,26 @@ export const parseMmdElement = (math_el, res = []) => {
 };
 
 export const parseMarkdownByElement = (el: HTMLElement | Document, include_sub_math: boolean = true) => {
-  let res = [];
   if (!el) return null;
   let querySelectorChem: string = 'pre > mol, svg > metadata > molecule';
   let querySelectorChart: string = 'svg > metadata > chartdata';
-  const math_el = include_sub_math
-    ? el.querySelectorAll('.math-inline, .math-block, .table_tabular, .inline-tabular, .smiles, .smiles-inline'
-          + ', ' + querySelectorChem
-          + ', ' + querySelectorChart
-      )
-    : el.querySelectorAll('div:not(.cell-item) > .math-inline, div:not(.cell-item) > .math-block, .table_tabular, div:not(.cell-item) > .inline-tabular, div:not(.cell-item) > .smiles, div:not(.cell-item) > .smiles-inline'
-          + ', ' + querySelectorChem
-          + ', ' + querySelectorChart
-      );
-  if (!math_el) return null;
-
-  for (let i = 0; i < math_el.length; i++) {
-    res = parseMmdElement(math_el[i], res);
+  const baseSelector = include_sub_math
+    ? '.math-inline, .math-block, .table_tabular, .inline-tabular, .smiles, .smiles-inline'
+    : 'div:not(.cell-item) > .math-inline, div:not(.cell-item) > .math-block, .table_tabular, div:not(.cell-item) > .inline-tabular, div:not(.cell-item) > .smiles, div:not(.cell-item) > .smiles-inline';
+  const nodes = Array.from(
+    el.querySelectorAll(`${baseSelector}, ${querySelectorChem}, ${querySelectorChart}`)
+  );
+  const filtered = nodes.filter((node) => {
+    // Keep table_tabular only if it is not nested inside another table_tabular.
+    if (node.classList?.contains('table_tabular')) {
+      const parentTable = node.parentElement?.closest('.table_tabular');
+      return !parentTable;
+    }
+    return true;
+  });
+  let res: any[] = [];
+  for (const node of filtered) {
+    res = parseMmdElement(node as any, res);
   }
   return res;
 };

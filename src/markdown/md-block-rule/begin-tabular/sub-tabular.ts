@@ -1,8 +1,14 @@
 import {TTokenTabular} from "./index";
 import { generateUniqueId, getContent } from "./common";
-import { doubleAngleBracketUuidPattern, singleAngleBracketPattern } from "../../common/consts";
+import { BEGIN_LIST_ENV_INLINE_RE, doubleAngleBracketUuidPattern, singleAngleBracketPattern } from "../../common/consts";
 import { findInDiagboxTable } from "./sub-cell";
 import { getExtractedCodeBlockContent } from "./sub-code";
+import {
+  wrapWithNewlinesIfInline,
+  findPlaceholders,
+  placeholderToId,
+  getInlineContextAroundSpan
+} from "./placeholder-utils";
 
 type TSubTabular = {
   id: string,
@@ -53,79 +59,93 @@ export const pushSubTabular = (
   }
 };
 
-export const getSubTabular = (sub: string, i: number, isCell: boolean = true, forLatex = false): Array<TTokenTabular> | null => {
-  let res: Array<TTokenTabular> = [];
-  let lastIndex: number = 0;
+/**
+ * Expands <...> / <<...>> placeholders inside a tabular cell by replacing them with cached
+ * sub-tabular content (or diagbox fallback). If injected content contains a list begin
+ * (or other block-ish LaTeX), it may be newline-wrapped to keep downstream block parsing stable.
+ */
+export const getSubTabular = (
+  sub: string,
+  i: number,
+  isCell: boolean = true,
+  forLatex: boolean = false
+): Array<TTokenTabular> | null => {
+  // first expand any extracted code-block placeholders (may add newlines)
   sub = getExtractedCodeBlockContent(sub, 0);
   sub = sub.trim();
-  if (isCell) {sub = getContent(sub)}
-
-  const index: number = subTabular.findIndex(item => item.id === sub);
-  if (index >= 0 && subTabular[index].parsed?.length) {
-    res = res.concat(subTabular[index].parsed);
-    return res;
+  if (isCell) {
+    sub = getContent(sub);
   }
-
-  let cellM =  sub.slice(i).match(doubleAngleBracketUuidPattern);
-  cellM =  cellM ? cellM : sub.slice(i).match(singleAngleBracketPattern);
+  // fast path: exact id matches a cached parsed tabular
+  const directIndex: number = subTabular.findIndex((item: TSubTabular) => item.id === sub);
+  if (directIndex >= 0 && subTabular[directIndex].parsed?.length) {
+    return subTabular[directIndex].parsed!;
+  }
+  // find placeholders
+  const cellM: RegExpMatchArray = findPlaceholders(sub, i);
   if (!cellM) {
     return null;
   }
-
-  for (let j=0; j < cellM.length; j++) {
-    let t = cellM[j].replace(/</g, '').replace(/>/g, '');
-    if (!t) { continue }
-    const index = subTabular.findIndex(item => item.id === t);
-    if (index >= 0) {
-      const iB: number = sub.indexOf(cellM[j]);
-      const strB: string = sub.slice(0, iB).trim();
-      lastIndex = iB + cellM[j].length;
-
-      sub = sub.slice(lastIndex)
-      let strE: string = '';
-      if (j === cellM.length - 1) {
-         strE = sub;
-      }
-      const st = strB + subTabular[index].content + strE;
-      if (forLatex) {
-        res.push({
-          token: 'inline',
-          tag: '',
-          n: 0,
-          content: st,
-          id: subTabular[index].id})
-      } else {
-        res.push({
-          token: 'inline',
-          tag: '',
-          n: 0,
-          content: st,
-          id: subTabular[index].id,
-          parents: subTabular[index].parents,
-          type: 'subTabular'
-        })
+  let parents: any = null;
+  let cursor: number = 0;
+  let contentFragments: string[] = [];
+  for (let j = 0; j < cellM.length; j++) {
+    const placeholder: string = cellM[j];
+    const id: string = placeholderToId(placeholder);
+    if (!id) {
+      continue;
+    }
+    const start: number = sub.indexOf(placeholder, cursor);
+    if (start === -1) {
+      continue;
+    }
+    const end: number = start + placeholder.length;
+    // prefix text between placeholders
+    let prefix: string = sub.slice(cursor, start);
+    // Avoid trimming around list-begin tokens to keep `\begin{itemize}` detectable.
+    const idx: number = subTabular.findIndex((item: TSubTabular) => item.id === id);
+    let isBlockRule: boolean = false;
+    if (idx >= 0) {
+      const content = subTabular[idx].content;
+      isBlockRule = BEGIN_LIST_ENV_INLINE_RE.test(content) || BEGIN_LIST_ENV_INLINE_RE.test(prefix);
+      if (!isBlockRule || prefix.trim() === "") {
+        prefix = prefix.trim();
       }
     } else {
-      let subContent = findInDiagboxTable(t);
-      const iB: number = sub.indexOf(cellM[j]);
-      const strB: string = sub.slice(0, iB).trim();
-      lastIndex = iB + cellM[j].length;
-
-      sub = sub.slice(lastIndex)
-      let strE: string = '';
-      if (j === cellM.length - 1) {
-        strE = sub;
-      }
-      const st = strB + subContent + strE;
-      if (subContent) {
-        res.push({
-          token: 'inline',
-          tag: '',
-          n: 0,
-          content: st
-        })
+      isBlockRule = BEGIN_LIST_ENV_INLINE_RE.test(prefix);
+      if (!isBlockRule || prefix.trim() === "") {
+        prefix = prefix.trim();
       }
     }
+    let injected: string = "";
+    if (idx >= 0) {
+      parents = subTabular[idx].parents;
+      injected = subTabular[idx].content ?? "";
+    } else {
+      injected = findInDiagboxTable(id) ?? "";
+    }
+    // decide wrapping using non-space neighbors around placeholder
+    const { beforeNonSpace, afterNonSpace } = getInlineContextAroundSpan(sub, start, end);
+    // If injected content starts a list env, wrap with newlines so block parsing stays stable
+    if (isBlockRule) {
+      injected = wrapWithNewlinesIfInline(injected, beforeNonSpace, afterNonSpace);
+    }
+    const st: string = prefix + injected;
+    contentFragments.push(st);
+    cursor = end;
   }
-  return res;
+  if (cursor < sub.length) {
+    contentFragments.push(sub.slice(cursor));
+  }
+  return [
+    {
+      token: 'inline',
+      tag: '',
+      n: 0,
+      content: contentFragments.join(''),
+      type: forLatex ? "inline" : "subTabular",
+      parents,
+      isSubTabular: true,
+    },
+  ];
 };

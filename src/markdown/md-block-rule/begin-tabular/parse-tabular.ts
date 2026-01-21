@@ -1,13 +1,15 @@
 import { TTokenTabular } from "./index";
 import {addHLineIntoStyle, AddTd, AddTdSubTable } from "./tabular-td";
-import {getContent, getRowLines,getCellsAll, getDecimal, TDecimal,
-  TAlignData, getVerticallyColumnAlign, getParams, getColumnLines
+import {
+  getContent, getRowLines, getCellsAll, getDecimal, TDecimal,
+  TAlignData, getVerticallyColumnAlign, getParams, getColumnLines, shouldRewriteColSpec
 } from './common';
 import { getMathTableContent, getSubMath } from './sub-math';
 import { getSubTabular, pushSubTabular } from './sub-tabular';
 import { getMultiColumnMultiRow, getCurrentMC, getMC } from './multi-column-row';
 import { getSubDiagbox } from "./sub-cell";
 import { isEscapedAt } from "../../utils";
+import { BEGIN_LIST_ENV_INLINE_RE } from "../../common/consts";
 
 /**
  * Splits a tabular row into columns by unescaped '&' characters.
@@ -61,7 +63,27 @@ const getRows = (str: string): string[] => {
   return str.split('\\\\');
 };
 
-const setTokensTabular = (str: string, align: string = '', options: any = {}): Array<TTokenTabular>|null => {
+/**
+ * Marks a table column as requiring fixed width if the cell content
+ * contains an inline list environment.
+ */
+const markColIfHasList = (
+  colsToFixWidth: number[],
+  colIndex: number,
+  content?: string
+): void => {
+  if (!content) {
+    return;
+  }
+  if (!BEGIN_LIST_ENV_INLINE_RE.test(content)) {
+    return;
+  }
+  if (!colsToFixWidth.includes(colIndex)) {
+    colsToFixWidth.push(colIndex);
+  }
+};
+
+const setTokensTabular = (str: string, align: string = '', options: any = {}, isSubTabular: boolean = false): Array<TTokenTabular>|null => {
   let res: Array<TTokenTabular> = [];
   const rows: string[] = getRows(str);
 
@@ -70,10 +92,11 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}): A
   let data = getRowLines(rows, numCol);
   let CellsHLines: Array<Array<string>> = data.cLines;
   let CellsHLSpaces: Array<Array<string>> = data.cSpaces;
+  let colsToFixWidth: number[] = [];
 
   const dataAlign: TAlignData = getVerticallyColumnAlign(align, numCol);
   const cLines: Array<string> = getColumnLines(align, numCol);
-  const {cAlign, vAlign, cWidth} = dataAlign;
+  const {cAlign, vAlign, cWidth, colSpec} = dataAlign;
   const decimal: Array<TDecimal> = getDecimal(cAlign, cellsAll);
   const { forLatex = false, outMath = {} } = options;
 
@@ -85,6 +108,7 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}): A
         ? cAlign.join('|')
         : ''
   });
+  const tableOpen: TTokenTabular = res[0];
   if (options?.forPptx) {
     res.push({token:'tbody_open', type:'tbody_open', tag: 'tbody', n: 1, attrs: [['data_num_col', numCol.toString()]]});
   } else {
@@ -111,6 +135,7 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}): A
               top: i === 0 ? CellsHLines[i] ? CellsHLines[i][k] : 'none' : ''},
             CellsHLSpaces[i+1][k]
           );
+          markColIfHasList(colsToFixWidth, k, data.content);
           res = res.concat(data.res);
         }
         res.push({token:'tr_close', type:'tr_close', tag: 'tr', n: -1});
@@ -141,6 +166,7 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}): A
               top: i === 0 ? CellsHLines[i] ? CellsHLines[i][k] : 'none' : ''},
             CellsHLSpaces[i+1][k]
           );
+          markColIfHasList(colsToFixWidth, k, data.content);
           res = res.concat(data.res);
         }
         break;
@@ -235,12 +261,44 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}): A
             multi.attrs = addHLineIntoStyle(multi.attrs, CellsHLines[i+1] ? CellsHLines[i+1][ic] : 'none');
           }
 
-          res.push({token:'td_open', type:'td_open', tag: 'td', n: 1, attrs: multi.attrs,
-            latex: forLatex && multi && multi.latex ? multi.latex : ''});
+          const tdOpen: TTokenTabular = {
+            token:'td_open',
+            type:'td_open',
+            tag: 'td',
+            n: 1,
+            attrs: multi.attrs,
+            latex: forLatex && multi && multi.latex ? multi.latex : ''
+          }
+          res.push(tdOpen);
+          if (forLatex) {
+            tdOpen.meta = {
+              multi: multi.multi,
+              colCount: numCol,
+              colSpecs: colSpec,
+              currentColIndex: ic,
+              isSubTabular
+            }
+          }
           if (multi.subTable) {
+            if (multi.subTable.some((item: TTokenTabular) => BEGIN_LIST_ENV_INLINE_RE.test(item.content))) {
+              if (!colsToFixWidth.includes(ic)) {
+                colsToFixWidth.push(ic);
+              }
+              if (forLatex) {
+                tdOpen.meta.forceMultiFixedWidth = true;
+              }
+            }
             res = res.concat(multi.subTable);
           } else {
             if (multi.content) {
+              if (BEGIN_LIST_ENV_INLINE_RE.test(multi.content)) {
+                if (!colsToFixWidth.includes(ic)) {
+                  colsToFixWidth.push(ic);
+                }
+                if (forLatex) {
+                  tdOpen.meta.forceMultiFixedWidth = true;
+                }
+              }
               res.push({token:'inline', type:'inline', tag: '', n: 0, content: multi.content});
             }
           }
@@ -262,8 +320,13 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}): A
         const parseMath = getMathTableContent(cells[j], 0);
         let content = parseMath || getContent(cells[j]);
 
-        const handleSubTable = (subTableContent) => {
-          return AddTdSubTable(subTableContent,
+        const handleSubTable = (subTable: Array<TTokenTabular>) => {
+          if (!colsToFixWidth.includes(ic)) {
+            if (subTable.some((item: TTokenTabular) => BEGIN_LIST_ENV_INLINE_RE.test(item.content))) {
+              colsToFixWidth.push(ic);
+            }
+          }
+          return AddTdSubTable(subTable,
             { h: cAlign[ic], v: vAlign[ic], w: cWidth[ic] },
             {
               left: cLeft,
@@ -284,6 +347,7 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}): A
              top: i === 0 ? CellsHLines[i] ? CellsHLines[i][ic] : 'none' : ''},
             CellsHLSpaces[i+1][ic], decimal[ic]
           );
+        markColIfHasList(colsToFixWidth, ic, data.content);
         res = res.concat(data.res);
       } else {
         MR[ic] = MR[ic] > 0 ? MR[ic] - 1 : 0;
@@ -299,6 +363,7 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}): A
              top: i === 0 ? CellsHLines[i] ? CellsHLines[i][ic] : 'none' : ''},
             CellsHLSpaces[i+1][ic]
           );
+        markColIfHasList(colsToFixWidth, ic, data.content);
         res = res.concat(data.res);
       }
 
@@ -309,10 +374,22 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}): A
     latex: forLatex && data && data.sLines && data.sLines.length ? data.sLines[data.sLines.length-1] : ''
   });
   res.push({token:'table_close', type:'table_close', tag: 'table', n: -1});
+  if (forLatex) {
+    tableOpen.meta = {
+      colsToFixWidth,
+      colSpecs: colSpec,
+      colCount: numCol,
+      isSubTabular,
+      vLineSpec: cLines
+    }
+    if (colsToFixWidth?.length) {
+      tableOpen.meta.shouldRewriteColSpec = shouldRewriteColSpec(colsToFixWidth, colSpec);
+    }
+  }
   return res;
 };
 
-export const ParseTabular = (str: string, i: number, align: string='', options = {}): Array<TTokenTabular> | null => {
+export const ParseTabular = (str: string, i: number, align: string='', options = {}, isSubTabular: boolean = false): Array<TTokenTabular> | null => {
   let res: Array<TTokenTabular> = [];
   let posEnd: number = str.indexOf('\\end{tabular}');
   if (posEnd > 0) {
@@ -323,7 +400,7 @@ export const ParseTabular = (str: string, i: number, align: string='', options =
       if (params) {
         const subT: string = str.slice(posBegin, posEnd+ '\\end{tabular}'.length);
         str = pushSubTabular(str, subT, [], posBegin, posEnd, i);
-        res = ParseTabular(str, 0, align, options);
+        res = ParseTabular(str, 0, align, options, isSubTabular);
       } else {
         let match = str
           .slice(posBegin)
@@ -331,16 +408,16 @@ export const ParseTabular = (str: string, i: number, align: string='', options =
 
         const subT: string = str.slice(posBegin, posEnd + '\\end{tabular}'.length);
         str = pushSubTabular(str, subT, [], posBegin + match.index, posEnd, i);
-        res = ParseTabular(str, 0, align, options);
+        res = ParseTabular(str, 0, align, options, isSubTabular);
       }
     } else {
       const subT: string = str.slice(i, posEnd);
       const subRes: Array<TTokenTabular> = setTokensTabular(subT, align, options);
       str = pushSubTabular(str, subT, subRes, 0, posEnd);
-      res = ParseTabular(str, 0, align, options);
+      res = ParseTabular(str, 0, align, options, isSubTabular);
     }
   } else {
-    res = setTokensTabular(str, align, options);
+    res = setTokensTabular(str, align, options, isSubTabular);
   }
   return res;
 };

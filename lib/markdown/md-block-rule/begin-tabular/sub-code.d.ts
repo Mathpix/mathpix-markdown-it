@@ -11,11 +11,9 @@ export declare const ClearExtractedCodeBlocks: () => void;
  */
 export declare const addExtractedCodeBlock: (item: TExtractedCodeBlock) => void;
 /**
- * Replace placeholder markers (e.g. <<uuid>> or <uuid>) in a string
- * with the corresponding extracted code block content.
- *
- * Returns the updated string with placeholders resolved and post-processed
- * by `getContent`.
+ * Replace placeholder markers (<<id>> / <id>) with extracted code block content.
+ * Newline-wrapping is applied ONLY when injected content contains BEGIN_LIST_ENV_INLINE_RE.
+ * Note: does NOT call getContent; callers should normalize once at the end.
  */
 export declare const getExtractedCodeBlockContent: (inputStr: string, i: number) => string;
 /**

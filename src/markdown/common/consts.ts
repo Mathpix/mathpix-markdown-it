@@ -73,10 +73,12 @@ export const reNumber = /^-?\d+$/;
 export const svgRegex: RegExp = /^<svg\b[^>]*>[\s\S]*<\/svg>$/;
 export const svgInlineRegex: RegExp = /^<svg\b[^>]*>[\s\S]*<\/svg>/;
 export const uuidPattern: string = '(f[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})';
+export const uuidPatternNoCapture: string = 'f[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}';
 export const doubleAngleBracketUuidPattern: RegExp = new RegExp(`<<(?:${uuidPattern})>>`, "g");
 export const singleAngleBracketPattern: RegExp = new RegExp(`<(?:${uuidPattern})>`, "g");
 export const doubleCurlyBracketUuidPattern: RegExp = new RegExp(`\\{\\{(?:${uuidPattern})\\}\\}`, "g");
 export const singleCurlyBracketPattern: RegExp = new RegExp(`\\{(?:${uuidPattern})\\}`, "g");
+export const preserveNewlineUnlessDoubleAngleUuidRegex: RegExp = new RegExp(String.raw`\r?\n(?!\s*<<(?:${uuidPatternNoCapture})>>)` , "g");
 
 export const RE_TAG_WITH_HLINE: RegExp = /\[(.*?)\]\s{0,}\\hline/;
 export const RE_TAG_WITH_HHLINE: RegExp = /\[(.*?)\]\s{0,}\\hhline/;
@@ -112,12 +114,14 @@ export const RE_CAPTION_TAG_GLOBAL: RegExp = /\s{0,}\\caption\s{0,}\{([^}]*)\}\s
 export const RE_CAPTION_TAG_BEGIN: RegExp = /\\caption\s{0,}\{/;
 export const RE_ALIGN_CENTERING_GLOBAL: RegExp = /\\centering/g;
 export const RE_INCLUDEGRAPHICS_WITH_ALIGNMENT_GLOBAL: RegExp = /\\includegraphics\[((.*)(center|left|right))\]\s{0,}\{([^{}]*)\}/g;
-export const CODE_ENVS = new Set(['lstlisting']);
+export const LATEX_BLOCK_ENV = new Set(['lstlisting', 'itemize', 'enumerate']);
 export const BEGIN_LST_FAST_RE: RegExp = /^\\begin\{lstlisting\}/;
 export const END_LST_RE = /^\\end\{lstlisting\}\s*$/;
 export const BEGIN_LST_RE = /^\\begin\{lstlisting\}(?:\[(.*?)\])?\s*$/;
 export const BEGIN_LST_INLINE_RE = /\\begin\{lstlisting\}(?:\[(.*?)\])?/;
+export const BEGIN_TABULAR_INLINE_RE: RegExp = /\\begin\s{0,}{tabular}\s{0,}\{([^}]*)\}/;
 export const END_LST_INLINE_RE   = /\\end\{lstlisting\}/;
+export const END_TABULAR_INLINE_RE: RegExp   = /\\end\{tabular\}/;
 /** Horizontal spaces (no CR/LF) + at most one newline (CRLF or LF), optional */
 const HSPACE_PLUS_ONE_NL_OPT = String.raw`(?:[^\S\r\n]*\r?\n)?`;
 /** Full begin line: \begin{lstlisting}[...]( +hspace +≤1 NL ) */
@@ -137,6 +141,7 @@ export const LATEX_LIST_BOUNDARY_INLINE_RE: RegExp = /\\begin\s*\{(itemize|enume
 /** Matches \begin{center}, \begin{left}, \begin{right}, \begin{table}, \begin{figure}, \begin{tabular}, \begin{lstlisting} */
 export const LATEX_BLOCK_ENV_OPEN_RE: RegExp =
   /\\begin{(center|left|right|table|figure|tabular|lstlisting)}/;
+export const BLOCK_LATEX_RE: RegExp = /\\begin\{(tabular|itemize|enumerate|lstlisting)\}/;
 /**
  * Enumerate environment detection: \alph, \roman, \arabic, etc.
  */
@@ -282,7 +287,7 @@ export const terminatedRules = {
     terminated: []
   },
   "Lists": {
-    terminated: []
+    terminated: ['paragraph']
   },
   "separatingSpan": {
     terminated: []

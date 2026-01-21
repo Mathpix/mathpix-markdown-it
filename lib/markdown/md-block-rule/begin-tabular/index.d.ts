@@ -24,6 +24,8 @@ export type TTokenTabular = {
     ascii_md?: string;
     latex?: string;
     parents?: Array<string>;
+    isSubTabular?: boolean;
+    meta?: any;
 };
 export type TMulti = {
     mr?: number;
@@ -32,6 +34,7 @@ export type TMulti = {
     content?: string;
     subTable?: Array<TTokenTabular>;
     latex: string;
+    multi?: any;
 };
 export declare const parseInlineTabular: (str: string) => TTypeContentList | null;
 export declare const inlineDecimalParse: (tok: TTokenTabular) => TTokenTabular;

@@ -250,6 +250,11 @@ export const mmdRuleList: IMmdRule[] = [
     rule: eRule.inline
   },
   {
+    name: "latex_list_env_inline",
+    type: eMmdRuleType.latex,
+    rule: eRule.inline
+  },
+  {
     name: "list_item_inline",
     type: eMmdRuleType.latex,
     rule: eRule.inline

@@ -1,30 +1,34 @@
 import { RuleInline } from 'markdown-it';
 import {parseInlineTabular, TTokenTabular, inlineDecimalParse} from "../md-block-rule/begin-tabular";
 import { ParseTabular } from "../md-block-rule/begin-tabular/parse-tabular";
+import { findFirstTagContentWithNesting } from "../utils";
+import {
+  BEGIN_TABULAR_INLINE_RE,
+  END_TABULAR_INLINE_RE,
+  openTagTabular
+} from "../common/consts";
 
 export const inlineTabular: RuleInline = (state, silent) => {
   let startMathPos = state.pos;
   if (state.src.charCodeAt(startMathPos) !== 0x5c /* \ */) {
     return false;
   }
-  const match = state.src
-    .slice(++startMathPos)
-    .match(/^(?:begin\s{0,}{tabular})/);
+  const src = state.src.slice(startMathPos);
+  const match = src
+    .match(openTagTabular);
   if (!match) {
     return false;
   }
-  const endMarker= '\\end{tabular}';
-  let endMarkerPos = state.src
-          .slice(startMathPos)
-          .lastIndexOf(endMarker);
-  if (endMarkerPos === -1) {
+  const { block } = findFirstTagContentWithNesting(src, BEGIN_TABULAR_INLINE_RE, END_TABULAR_INLINE_RE);
+  if (!block) {
+    // there is no complete block
     return false;
   }
-  endMarkerPos += startMathPos;
-  const nextPos = endMarkerPos + endMarker.length;
+  const fullBlock: string = src.slice(block.open.posStart, block.close.posEnd);
+  const nextPos = startMathPos + block.close.posEnd;
   if (!silent) {
     const token = state.push("tabular_inline", "", 0);
-    token.content = state.src.slice(startMathPos-1, endMarkerPos + '\\end{tabular}'.length);
+    token.content = fullBlock;
     token.children =[];
     const cTabular =  parseInlineTabular(token.content);
     if (!cTabular) {
@@ -32,7 +36,7 @@ export const inlineTabular: RuleInline = (state, silent) => {
     }
     for (let i = 0; i < cTabular.length; i++) {
       if (cTabular[i].type === 'inline'){continue}
-      const res: Array<TTokenTabular> | null = ParseTabular(cTabular[i].content, 0, cTabular[i].align, state.md.options);
+      const res: Array<TTokenTabular> | null = ParseTabular(cTabular[i].content, 0, cTabular[i].align, state.md.options, state.env.subTabular);
 
       for (let j = 0; j < res.length;  j++) {
         let tok = res[j];

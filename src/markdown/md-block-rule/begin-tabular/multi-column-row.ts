@@ -118,10 +118,15 @@ export const getMultiColumnMultiRow = (str: string, params: {lLines: string, ali
   }
   const parseMath: string = getMathTableContent(str, 0);
   let content: string = parseMath || getContent(str);
+  const mrWidthNormalized: string = (width || '').trim().replace('*', '');
+  const multi = {
+    mc: matchMC ? { span: mc, alignSpec: matchMC[2] } : null,
+    mr: matchMR ? { span: mr, vpos, widthRaw: width || '', width: mrWidthNormalized } : null,
+  };
   const parseSub: Array<TTokenTabular>  = getSubTabular(content, 0, true, forLatex);
   if (parseSub?.length) {
-    return {mr: mr, mc: mc, attrs: attrs, content: '', subTable: parseSub, latex: latex}
+    return {mr: mr, mc: mc, attrs: attrs, content: '', subTable: parseSub, latex: latex, multi}
   }
   content = getExtractedCodeBlockContent(content, 0);
-  return {mr: mr, mc: mc, attrs: attrs, content: content, subTable: null, latex: latex}
+  return {mr: mr, mc: mc, attrs: attrs, content: content, subTable: null, latex: latex, multi}
 };

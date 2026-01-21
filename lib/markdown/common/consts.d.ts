@@ -54,10 +54,12 @@ export declare const reNumber: RegExp;
 export declare const svgRegex: RegExp;
 export declare const svgInlineRegex: RegExp;
 export declare const uuidPattern: string;
+export declare const uuidPatternNoCapture: string;
 export declare const doubleAngleBracketUuidPattern: RegExp;
 export declare const singleAngleBracketPattern: RegExp;
 export declare const doubleCurlyBracketUuidPattern: RegExp;
 export declare const singleCurlyBracketPattern: RegExp;
+export declare const preserveNewlineUnlessDoubleAngleUuidRegex: RegExp;
 export declare const RE_TAG_WITH_HLINE: RegExp;
 export declare const RE_TAG_WITH_HHLINE: RegExp;
 export declare const RE_TAG_WITH_HDASHLINE: RegExp;
@@ -79,12 +81,14 @@ export declare const RE_CAPTION_TAG_GLOBAL: RegExp;
 export declare const RE_CAPTION_TAG_BEGIN: RegExp;
 export declare const RE_ALIGN_CENTERING_GLOBAL: RegExp;
 export declare const RE_INCLUDEGRAPHICS_WITH_ALIGNMENT_GLOBAL: RegExp;
-export declare const CODE_ENVS: Set<string>;
+export declare const LATEX_BLOCK_ENV: Set<string>;
 export declare const BEGIN_LST_FAST_RE: RegExp;
 export declare const END_LST_RE: RegExp;
 export declare const BEGIN_LST_RE: RegExp;
 export declare const BEGIN_LST_INLINE_RE: RegExp;
+export declare const BEGIN_TABULAR_INLINE_RE: RegExp;
 export declare const END_LST_INLINE_RE: RegExp;
+export declare const END_TABULAR_INLINE_RE: RegExp;
 /** Full begin line: \begin{lstlisting}[...]( +hspace +≤1 NL ) */
 export declare const BEGIN_LST_WITH_TRAIL_WS_NL_RE: RegExp;
 /** Matches \begin{itemize} or \begin{enumerate} */
@@ -99,6 +103,7 @@ export declare const LATEX_ITEM_COMMAND_INLINE_RE: RegExp;
 export declare const LATEX_LIST_BOUNDARY_INLINE_RE: RegExp;
 /** Matches \begin{center}, \begin{left}, \begin{right}, \begin{table}, \begin{figure}, \begin{tabular}, \begin{lstlisting} */
 export declare const LATEX_BLOCK_ENV_OPEN_RE: RegExp;
+export declare const BLOCK_LATEX_RE: RegExp;
 /**
  * Enumerate environment detection: \alph, \roman, \arabic, etc.
  */
@@ -174,7 +179,7 @@ export declare const terminatedRules: {
         terminated: any[];
     };
     Lists: {
-        terminated: any[];
+        terminated: string[];
     };
     separatingSpan: {
         terminated: any[];
