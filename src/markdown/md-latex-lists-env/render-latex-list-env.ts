@@ -121,6 +121,9 @@ export const render_itemize_list_open: Renderer.RenderRule = (
 ): string => {
   const token: Token = tokens[idx];
   // Reset nesting level for top-level lists
+  if ((token as any).isTopLevelList) {
+    level_itemize = 0;
+  }
   const prevToken: Token | undefined = tokens[idx - 1];
   level_itemize++;
   let dataAttr = "";
@@ -189,7 +192,7 @@ export const render_enumerate_list_open: Renderer.RenderRule = (
 ): string => {
   const token: Token = tokens[idx];
   // Reset nesting level for top-level enumerate lists
-  if (token.level === 0) {
+  if ((token as any).isTopLevelList) {
     level_enumerate = 0;
     resetAllEnumerateCounters();
   }

@@ -173,6 +173,7 @@ export const ListOpen = (
     state.env.parentType = state.parentType;
     state.env.isBlock = true;
     state.env.prentLevel = state.prentLevel;
+    state.env.inheritedListType = state.parentType;
     state.md.inline.parse(strAfter, state.md, state.env, children);
     // Context shared across child token processing
     const ctx: ListInlineContext = {

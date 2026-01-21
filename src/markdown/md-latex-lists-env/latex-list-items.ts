@@ -70,6 +70,7 @@ export const ListItems = (
     state.env.parentType = state.parentType;
     state.env.isBlock = true;
     state.env.prentLevel = state.prentLevel;
+    state.env.inheritedListType = state.parentType;
     listItem.content = listItem.content.trim();
     // Detect block-level item content
     if (LATEX_BLOCK_ENV_OPEN_RE.test(listItem.content) || (listItem.content.indexOf('`') > -1)) {

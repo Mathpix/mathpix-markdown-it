@@ -32,12 +32,16 @@ export const applyListOpenState = (
   token: Token
 ): void => {
   const isTopLevel: boolean = state.parentType !== "itemize" && state.parentType !== "enumerate";
+  const inheritedListType: string | undefined = (state as any).env?.inheritedListType;
+  const isInheritedListContext: boolean = inheritedListType === "itemize" || inheritedListType === "enumerate";
+  const isTopLevelList: boolean = isTopLevel && !isInheritedListContext;
   state.prentLevel = isTopLevel ? 0 : state.prentLevel + 1;
   state.parentType = listType;
   state.types = state.types?.length
     ? [...state.types, listType]
     : [listType];
   token.prentLevel = state.prentLevel;
+  (token as any).isTopLevelList = isTopLevelList;
   // Register new list depth in internal list-level tracker
   enterListLevel();
 };

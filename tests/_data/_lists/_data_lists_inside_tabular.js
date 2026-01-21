@@ -881,8 +881,64 @@ module.exports = [
       '</table>\n' +
       '</div></div>\n'
   },
-  // {
-  //   mmd: '',
-  //   html: ''
-  // },
+  {
+    mmd: '\\begin{tabular}{l}\n' +
+      '\\begin{enumerate}\n' +
+      '\\item First\n' +
+      '\\item Second\n' +
+      '\\end{enumerate}\n' +
+      '\\end{tabular}\n' +
+      '\n' +
+      '\\begin{tabular}{l}\n' +
+      '\\begin{enumerate}\n' +
+      '\\item Should be 1\n' +
+      '\\item Should be 2\n' +
+      '\\end{enumerate}\n' +
+      '\\end{tabular}',
+    html:
+      '<div class="table_tabular" style="text-align: center">\n' +
+      '<div class="inline-tabular"><table class="tabular">\n' +
+      '<tbody>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">\n' +
+      '<ol class="enumerate decimal" style="list-style-type: decimal"><li class="li_enumerate">First</li><li class="li_enumerate">Second</li></ol></td>\n' +
+      '</tr>\n' +
+      '</tbody>\n' +
+      '</table>\n' +
+      '</div></div>\n' +
+      '<div class="table_tabular" style="text-align: center">\n' +
+      '<div class="inline-tabular"><table class="tabular">\n' +
+      '<tbody>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">\n' +
+      '<ol class="enumerate decimal" style="list-style-type: decimal"><li class="li_enumerate">Should be 1</li><li class="li_enumerate">Should be 2</li></ol></td>\n' +
+      '</tr>\n' +
+      '</tbody>\n' +
+      '</table>\n' +
+      '</div></div>\n'
+  },
+  {
+    mmd: '\\begin{tabular}{l}\n' +
+      'Some text before\n' +
+      '\\begin{itemize}\n' +
+      '\\item item\n' +
+      '\\end{itemize}\n' +
+      'Some text after\n' +
+      '\\end{tabular}',
+    html:
+      '<div class="table_tabular" style="text-align: center">\n' +
+      '<div class="inline-tabular"><table class="tabular">\n' +
+      '<tbody>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">\n' +
+      '<div>\n' +
+      'Some text before</div>\n' +
+      '<ul class="itemize" style="list-style-type: none"><li class="li_itemize"><span class="li_level">•</span>item</li></ul><div>\n' +
+      'Some text after</div>\n' +
+      '</td>\n' +
+      '</tr>\n' +
+      '</tbody>\n' +
+      '</table>\n' +
+      '</div></div>\n'
+  },
 ]

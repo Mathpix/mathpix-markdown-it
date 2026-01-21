@@ -1,5 +1,7 @@
 # January 2026
 
+## [2.0.32] - 21 January 2026
+
 - Tabular:
   - Added support for LaTeX `itemize` and `enumerate` lists inside table cells.
   - Nested lists now render with correct markers per level.
