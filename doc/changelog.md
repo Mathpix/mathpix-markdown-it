@@ -1,5 +1,15 @@
 # January 2026
 
+## [2.0.33] - 27 January 2026
+
+- Tabular:
+  - Fixed rendering of tabular environments following nested tabular placeholders that expand to lists.
+  - Block parsing status is now propagated from nested sub-tabulars to parent cells to preserve line breaks.
+  - Centralized block detection logic into `detectLocalBlock()`.
+
+- Docs:
+  - Added implementation details in `pr-specs/2026-01-nested-tabular-text-prefix-with-lists.md`.
+
 ## [2.0.32] - 21 January 2026
 
 - Tabular:
