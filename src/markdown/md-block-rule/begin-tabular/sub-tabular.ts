@@ -1,6 +1,6 @@
 import {TTokenTabular} from "./index";
-import { generateUniqueId, getContent } from "./common";
-import { BEGIN_LIST_ENV_INLINE_RE, doubleAngleBracketUuidPattern, singleAngleBracketPattern } from "../../common/consts";
+import { generateUniqueId, getContent, detectLocalBlock } from "./common";
+import { doubleAngleBracketUuidPattern, singleAngleBracketPattern, ANGLE_BRACKETS_RE } from "../../common/consts";
 import { findInDiagboxTable } from "./sub-cell";
 import { getExtractedCodeBlockContent } from "./sub-code";
 import {
@@ -14,12 +14,28 @@ type TSubTabular = {
   id: string,
   content: string,
   parsed?: Array<TTokenTabular>,
-  parents?: Array<string>
+  parents?: Array<string>,
+  isBlock?: boolean,
+  children?: Array<string>
 };
 var subTabular: Array<TSubTabular> = [];
 
 export const ClearSubTableLists = (): void => {
   subTabular = [];
+};
+
+/**
+ * Extracts child placeholder IDs from a sub-tabular content string.
+ * Returns a list of raw placeholder IDs without angle brackets.
+ */
+const extractChildIds = (content: string): string[] => {
+  const placeholderMatches: string[] =
+    content.match(doubleAngleBracketUuidPattern) ??
+    content.match(singleAngleBracketPattern) ??
+    [];
+  return placeholderMatches
+    .map(match => match.replace(ANGLE_BRACKETS_RE, ""))
+    .filter(s => s.length > 0);
 };
 
 export const pushSubTabular = (
@@ -31,27 +47,26 @@ export const pushSubTabular = (
     i: number=0,
     level=0
 ): string => {
-  const id = generateUniqueId();
-  if (!subRes?.length) {
-    let match =  subTabularContent.match(doubleAngleBracketUuidPattern);
-    match =  match ? match : subTabularContent.match(singleAngleBracketPattern);
-    if (match) {
-      for (let j = 0; j < match.length; j++) {
-        let idSubTable = match[j].replace(/</g, '').replace(/>/g, '');
-        if (!idSubTable) { continue }
-        const index = subTabular.findIndex(item => item.id === idSubTable);
-        if (index < 0) {
-          continue;
-        }
-        if (subTabular[index].parents) {
-          subTabular[index].parents.push(id)
-        } else {
-          subTabular[index].parents = [id]
-        }
-      }
+  const id: string = generateUniqueId();
+  const childIds: string[] = extractChildIds(subTabularContent);
+  for (const childId of childIds) {
+    const cIdx: number = subTabular.findIndex((item: TSubTabular) => item.id === childId);
+    if (cIdx >= 0) {
+      (subTabular[cIdx].parents ??= []).push(id);
     }
   }
-  subTabular.push({id: id, content: subTabularContent, parsed: subRes});
+  const isBlockLocal: boolean = detectLocalBlock(subTabularContent);
+  const childBlock: boolean = childIds.some(cid => {
+    const cIdx: number = subTabular.findIndex(item => item.id === cid);
+    return cIdx >= 0 ? !!subTabular[cIdx].isBlock : false;
+  });
+  subTabular.push({
+    id,
+    content: subTabularContent,
+    parsed: subRes,
+    children: childIds,
+    isBlock: isBlockLocal || childBlock,
+  });
   if (posBegin > 0) {
     return str.slice(i, posBegin) + `<<${id}>>` + str.slice(posEnd + '\\end{tabular}'.length, str.length);
   }else {
@@ -107,12 +122,12 @@ export const getSubTabular = (
     let isBlockRule: boolean = false;
     if (idx >= 0) {
       const content = subTabular[idx].content;
-      isBlockRule = BEGIN_LIST_ENV_INLINE_RE.test(content) || BEGIN_LIST_ENV_INLINE_RE.test(prefix);
+      isBlockRule = !!subTabular[idx].isBlock || detectLocalBlock(prefix) || detectLocalBlock(content);
       if (!isBlockRule || prefix.trim() === "") {
         prefix = prefix.trim();
       }
     } else {
-      isBlockRule = BEGIN_LIST_ENV_INLINE_RE.test(prefix);
+      isBlockRule = detectLocalBlock(prefix);
       if (!isBlockRule || prefix.trim() === "") {
         prefix = prefix.trim();
       }

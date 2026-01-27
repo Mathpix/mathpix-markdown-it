@@ -2,14 +2,14 @@ import { TTokenTabular } from "./index";
 import {addHLineIntoStyle, AddTd, AddTdSubTable } from "./tabular-td";
 import {
   getContent, getRowLines, getCellsAll, getDecimal, TDecimal,
-  TAlignData, getVerticallyColumnAlign, getParams, getColumnLines, shouldRewriteColSpec
+  TAlignData, getVerticallyColumnAlign, getParams, getColumnLines, shouldRewriteColSpec,
+  detectLocalBlock
 } from './common';
 import { getMathTableContent, getSubMath } from './sub-math';
 import { getSubTabular, pushSubTabular } from './sub-tabular';
 import { getMultiColumnMultiRow, getCurrentMC, getMC } from './multi-column-row';
 import { getSubDiagbox } from "./sub-cell";
 import { isEscapedAt } from "../../utils";
-import { BEGIN_LIST_ENV_INLINE_RE } from "../../common/consts";
 
 /**
  * Splits a tabular row into columns by unescaped '&' characters.
@@ -75,7 +75,7 @@ const markColIfHasList = (
   if (!content) {
     return;
   }
-  if (!BEGIN_LIST_ENV_INLINE_RE.test(content)) {
+  if (!detectLocalBlock(content)) {
     return;
   }
   if (!colsToFixWidth.includes(colIndex)) {
@@ -280,7 +280,7 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}, is
             }
           }
           if (multi.subTable) {
-            if (multi.subTable.some((item: TTokenTabular) => BEGIN_LIST_ENV_INLINE_RE.test(item.content))) {
+            if (multi.subTable.some((item: TTokenTabular) => detectLocalBlock(item.content))) {
               if (!colsToFixWidth.includes(ic)) {
                 colsToFixWidth.push(ic);
               }
@@ -291,7 +291,7 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}, is
             res = res.concat(multi.subTable);
           } else {
             if (multi.content) {
-              if (BEGIN_LIST_ENV_INLINE_RE.test(multi.content)) {
+              if (detectLocalBlock(multi.content)) {
                 if (!colsToFixWidth.includes(ic)) {
                   colsToFixWidth.push(ic);
                 }
@@ -322,7 +322,7 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}, is
 
         const handleSubTable = (subTable: Array<TTokenTabular>) => {
           if (!colsToFixWidth.includes(ic)) {
-            if (subTable.some((item: TTokenTabular) => BEGIN_LIST_ENV_INLINE_RE.test(item.content))) {
+            if (subTable.some((item: TTokenTabular) => detectLocalBlock(item.content))) {
               colsToFixWidth.push(ic);
             }
           }

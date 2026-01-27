@@ -34,3 +34,8 @@ export declare const getRowLines: (rows: string[], numCol: number) => TParseline
  * @param colSpec - Original column specs array (e.g., ["l","c","p{...}"])
  */
 export declare const shouldRewriteColSpec: (colsToFixWidth: number[] | undefined, colSpec: string[] | undefined) => boolean;
+/**
+ * Detects whether the given content starts a block-level LaTeX construct
+ * (e.g. list environments like \begin{itemize}).
+ */
+export declare const detectLocalBlock: (content: string) => boolean;

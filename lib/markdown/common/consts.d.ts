@@ -60,6 +60,7 @@ export declare const singleAngleBracketPattern: RegExp;
 export declare const doubleCurlyBracketUuidPattern: RegExp;
 export declare const singleCurlyBracketPattern: RegExp;
 export declare const preserveNewlineUnlessDoubleAngleUuidRegex: RegExp;
+export declare const ANGLE_BRACKETS_RE: RegExp;
 export declare const RE_TAG_WITH_HLINE: RegExp;
 export declare const RE_TAG_WITH_HHLINE: RegExp;
 export declare const RE_TAG_WITH_HDASHLINE: RegExp;

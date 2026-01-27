@@ -1,6 +1,6 @@
 import {separateByColumns} from "./parse-tabular";
 import { v4 as uuidv4 } from 'uuid';
-import { lineSpaceTag, RE_TAG_WITH_CLINE, RE_CLINE } from "../../common/consts";
+import { lineSpaceTag, RE_TAG_WITH_CLINE, RE_CLINE, BEGIN_LIST_ENV_INLINE_RE } from "../../common/consts";
 
 export type TParselines = {cLines: Array<Array<string>>, cSpaces: Array<Array<string>>, sLines: Array<string>}
 
@@ -330,4 +330,12 @@ export const shouldRewriteColSpec = (
   return colsToFixWidth
     .filter((i) => Number.isInteger(i) && i >= 0 && i < colSpec.length)
     .some((i) => isUnsafeColSpec(colSpec[i]));
+};
+
+/**
+ * Detects whether the given content starts a block-level LaTeX construct
+ * (e.g. list environments like \begin{itemize}).
+ */
+export const detectLocalBlock = (content: string): boolean => {
+  return BEGIN_LIST_ENV_INLINE_RE.test(content);
 };
