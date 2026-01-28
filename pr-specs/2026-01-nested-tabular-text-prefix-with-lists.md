@@ -1,6 +1,6 @@
 # PR: Fix line-break handling for nested tabular placeholders with lists
 
-Status: Active
+Status: Implemented
 Owner: @OlgaRedozubova
 Issue: #17912
 

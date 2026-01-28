@@ -1,6 +1,6 @@
 # PR: Add itemize/enumerate support inside tabular cells
 
-Status: Active
+Status: Implemented
 Owner: @OlgaRedozubova
 Issue: #17328
 
