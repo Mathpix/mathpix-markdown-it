@@ -962,4 +962,118 @@ module.exports = [
       '</table>\n' +
       '</div></div>\n'
   },
+  {
+    mmd: '\\begin{tabular}{|l|}\n' +
+      '\\hline\n' +
+      '\\begin{itemize}\n' +
+      '\\item[] - You may act \\textbf{if the exceptions para} 6.2(a) or (b) \\textbf{apply AND}\n' +
+      '\\item[] - The \\textbf{conditions in para} 6.2(b)(i) - (iii) \\textbf{are ALL met.}\n' +
+      '\\end{itemize} \\\\\n' +
+      '\\textbf{EXCEPTIONS} \n' +
+      '\\begin{tabular}{|l|l|}\n' +
+      '\\hline CFS/CFF 6.2(a)\\textbf{: There} \\textbf{is a} \\textbf{\\textit{"substantial}} \\textbf{\\textit{common}} \\textbf{\\textit{interest".}} & \\begin{tabular}{l}\n' +
+      '\\begin{itemize}\n' +
+      '\\item[] - 6.2(a): You may act when:\n' +
+      '\\begin{itemize}\n' +
+      '\\item[] - Clients have a \\textbf{substantially common interest} in relation to a matter.\n' +
+      '\\end{itemize}\n' +
+      '\\end{itemize}\n' +
+      '\\end{tabular} \\\\\n' +
+      '\\hline CFS/CFF 6.2(b): \\textbf{The} \\textbf{clients are} \\textbf{\\textit{"competing}} \\textbf{\\textit{for the same}} \\textbf{\\textit{objective"}}\\( { }^{\\mathit{2}} \\)\\textbf{.} & \\begin{tabular}{l}\n' +
+      '\\begin{itemize}\n' +
+      '\\item[] - 6.2(b): You may act when:\n' +
+      '\\begin{itemize}\n' +
+      '\\item[] - Two clients are \\textbf{competing for the same "objective".}\n' +
+      '\\end{itemize}\n' +
+      '\\end{itemize}\n' +
+      '\\end{tabular} \\\\\n' +
+      '\\hline\n' +
+      '\\end{tabular}\n' +
+      '\\begin{tabular}{|l|l|}\n' +
+      '\\hline \\textbf{Conditions to} \\textbf{be Met in the} & \\begin{itemize}\n' +
+      '\\item[] - CFS/CFF 6.2(b)(i) - (iii): Where:\n' +
+      '\\begin{itemize}\n' +
+      '\\item[] - There is a "substantial common interest" or\n' +
+      '\\end{itemize}\n' +
+      '\\end{itemize} \\\\\n' +
+      '\\hline\n' +
+      '\\end{tabular} \\\\\n' +
+      '\\hline\n' +
+      '\\end{tabular}',
+    html:
+      '<div class="table_tabular" style="text-align: center">\n' +
+      '<div class="inline-tabular">' +
+      '<table class="tabular">\n' +
+      '<tbody>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom: none !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; ">\n' +
+      '<ul class="itemize" style="list-style-type: none">' +
+      '<li class="li_itemize" data-custom-marker="true" data-marker-empty="true">' +
+      '<span class="li_level" data-custom-marker="true" data-marker-empty="true"></span>' +
+      '- You may act <strong>if the exceptions para</strong> 6.2(a) or (b) <strong>apply AND</strong>' +
+      '</li>' +
+      '<li class="li_itemize" data-custom-marker="true" data-marker-empty="true">' +
+      '<span class="li_level" data-custom-marker="true" data-marker-empty="true"></span>' +
+      '- The <strong>conditions in para</strong> 6.2(b)(i) - (iii) <strong>are ALL met.</strong>' +
+      '</li>' +
+      '</ul>' +
+      '</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">\n' +
+      '<div>\n' +
+      '<strong>EXCEPTIONS</strong></div>\n' +
+      '<div class="table_tabular">\n' +
+      '<table class="tabular">\n' +
+      '<tbody>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; ">CFS/CFF 6.2(a)<strong>: There</strong> <strong>is a</strong> <strong><em>&quot;substantial</em></strong> <strong><em>common</em></strong> <strong><em>interest&quot;.</em></strong></td>\n' +
+      '<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; ">\n' +
+      '<div class="table_tabular">\n' +
+      '<table class="tabular">\n' +
+      '<tbody>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">\n' +
+      '<ul class="itemize" style="list-style-type: none"><li class="li_itemize" data-custom-marker="true" data-marker-empty="true"><span class="li_level" data-custom-marker="true" data-marker-empty="true"></span>- 6.2(a): You may act when:<ul class="itemize" style="list-style-type: none"><li class="li_itemize" data-custom-marker="true" data-marker-empty="true"><span class="li_level" data-custom-marker="true" data-marker-empty="true"></span>- Clients have a <strong>substantially common interest</strong> in relation to a matter.</li></ul></li></ul></td>\n' +
+      '</tr>\n' +
+      '</tbody>\n' +
+      '</table>\n' +
+      '</div>\n' +
+      '</td>\n' +
+      '</tr>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">CFS/CFF 6.2(b): <strong>The</strong> <strong>clients are</strong> <strong><em>&quot;competing</em></strong> <strong><em>for the same</em></strong> <strong><em>objective&quot;</em></strong><span class="math-inline " data-overflow="visible">\n' +
+      '<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: 0;" xmlns="http://www.w3.org/2000/svg" width="1.005ex" height="1.887ex" role="img" focusable="false" viewBox="0 -833.9 444.3 833.9"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="msup"><g data-mml-node="TeXAtom" data-mjx-texclass="ORD"></g><g data-mml-node="TeXAtom" transform="translate(33,363) scale(0.707)" data-mjx-texclass="ORD"><g data-mml-node="TeXAtom" data-mjx-texclass="ORD"><g data-mml-node="mn"><path data-c="32" d="M159 404Q159 433 176 476T222 562T297 635T395 666Q466 666 508 617T551 497Q551 473 545 446Q534 388 482 333Q441 292 355 240T264 184Q216 151 179 101L171 91Q171 90 177 90Q206 90 269 77T366 64Q385 64 390 65Q418 73 441 98T475 156Q479 168 481 170T495 173H518Q524 167 524 166T521 152Q502 86 459 32T353 -22Q315 -22 259 15T172 53Q156 53 143 36T126 1L121 -16Q119 -22 98 -22H82Q76 -16 76 -13T80 5T98 50T132 111T189 178T274 242Q327 273 364 305T420 370T447 427T460 483Q466 514 466 538Q466 586 443 607T389 629Q338 629 293 584T226 487T204 399Q204 390 204 386T209 378T222 373Q258 376 282 422T307 493Q307 506 302 517T297 531Q297 537 308 546T327 551Q329 550 333 543T340 523T344 497Q344 450 306 393T216 336Q186 336 173 355T159 396V404Z"></path></g></g></g></g></g></g></svg></mjx-container></span><strong>.</strong></td>\n' +
+      '<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top: none !important; width: auto; vertical-align: middle; ">\n' +
+      '<div class="table_tabular">\n' +
+      '<table class="tabular">\n' +
+      '<tbody>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">\n' +
+      '<ul class="itemize" style="list-style-type: none"><li class="li_itemize" data-custom-marker="true" data-marker-empty="true"><span class="li_level" data-custom-marker="true" data-marker-empty="true"></span>- 6.2(b): You may act when:<ul class="itemize" style="list-style-type: none"><li class="li_itemize" data-custom-marker="true" data-marker-empty="true"><span class="li_level" data-custom-marker="true" data-marker-empty="true"></span>- Two clients are <strong>competing for the same &quot;objective&quot;.</strong></li></ul></li></ul></td>\n' +
+      '</tr>\n' +
+      '</tbody>\n' +
+      '</table>\n' +
+      '</div>\n' +
+      '</td>\n' +
+      '</tr>\n' +
+      '</tbody>\n' +
+      '</table>\n' +
+      '<table class="tabular">\n' +
+      '<tbody>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; "><strong>Conditions to</strong> <strong>be Met in the</strong></td>\n' +
+      '<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; ">\n' +
+      '<ul class="itemize" style="list-style-type: none"><li class="li_itemize" data-custom-marker="true" data-marker-empty="true"><span class="li_level" data-custom-marker="true" data-marker-empty="true"></span>- CFS/CFF 6.2(b)(i) - (iii): Where:<ul class="itemize" style="list-style-type: none"><li class="li_itemize" data-custom-marker="true" data-marker-empty="true"><span class="li_level" data-custom-marker="true" data-marker-empty="true"></span>- There is a &quot;substantial common interest&quot; or</li></ul></li></ul></td>\n' +
+      '</tr>\n' +
+      '</tbody>\n' +
+      '</table>\n' +
+      '</div>\n' +
+      '</td>\n' +
+      '</tr>\n' +
+      '</tbody>\n' +
+      '</table>\n' +
+      '</div>' +
+      '</div>\n'
+  }
 ]

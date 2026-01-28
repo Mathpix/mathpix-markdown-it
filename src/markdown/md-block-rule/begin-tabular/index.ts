@@ -1,7 +1,7 @@
 import { RuleBlock, Token } from 'markdown-it';
 import { ParseTabular } from './parse-tabular';
 import { pushError, CheckParseError } from '../parse-error';
-import { getParams } from './common';
+import { getParams, detectLocalBlock } from './common';
 import {StatePushIncludeGraphics} from "../../md-inline-rule/includegraphics";
 import { getSubCode, codeInlineContent } from "./sub-code";
 import { findOpenCloseTags } from "../../utils";
@@ -9,8 +9,7 @@ import {
   openTagTabular,
   closeTagTabular,
   BEGIN_LST_RE,
-  END_LST_RE,
-  BEGIN_LIST_ENV_INLINE_RE
+  END_LST_RE
 } from "../../common/consts";
 import { parseBlockIntoTokenChildren } from "../helper";
 
@@ -223,7 +222,7 @@ export const StatePushTabulars = (state, cTabular: TTypeContentList, align: stri
             || (state.md.options.outMath.include_table_markdown
               && state.md.options.outMath.table_markdown && state.md.options.outMath.table_markdown.math_as_ascii);
           state.env.subTabular = res[j].type === 'subTabular' || res[j].isSubTabular;
-          if (BEGIN_LIST_ENV_INLINE_RE.test(res[j].content)) {
+          if (detectLocalBlock(res[j].content)) {
             state.env.isInline = true;
             parseBlockIntoTokenChildren(state, res[j].content, token, {
               disableBlockRules: true,
