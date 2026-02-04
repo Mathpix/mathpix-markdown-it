@@ -1,6 +1,6 @@
 # PR: HTML Math Output Options and Browser Render Script
 
-Status: Active
+Status: Implemented
 Owner: @OlgaRedozubova
 
 ---
