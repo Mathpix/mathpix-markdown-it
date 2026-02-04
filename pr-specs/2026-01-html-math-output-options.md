@@ -16,7 +16,7 @@ The current rendering pipeline already generates hidden MathML and LaTeX in the 
 Additionally, when users export HTML and open it in a browser, they lose the ability to right-click and copy math in different formats (a feature available in Snip preview).
 
 This PR adds:
-1. Options to control which math format is the primary visible output
+1. Options to control which math format is placed in HTML output
 2. A browser bundle (`auto-render.js`) for client-side rendering with Mathpix's MathJax customizations
 
 Note: Context menu functionality already exists as a separate bundle (`es5/context-menu.js`).
@@ -25,7 +25,7 @@ Note: Context menu functionality already exists as a separate bundle (`es5/conte
 
 ## Goal
 
-1. Add options to `TOutputMath` interface to control primary math output format (SVG, MathML, or LaTeX)
+1. Add `output_format` option to `TOutputMath` interface to control which math format is placed in HTML (SVG, MathML, or LaTeX)
 2. Create a browser bundle (`auto-render.js`) for client-side LaTeX/MathML rendering
 
 ---
@@ -92,7 +92,7 @@ Add to `TOutputMath` interface:
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `output_format` | `'svg' \| 'mathml' \| 'latex'` | `'svg'` | Primary visible math format |
+| `output_format` | `'svg' \| 'mathml' \| 'latex'` | `'svg'` | Math format placed in HTML output |
 
 ### Behavior by Format
 
