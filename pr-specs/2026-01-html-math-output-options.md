@@ -8,8 +8,8 @@ Owner: @OlgaRedozubova
 ## Context
 
 Users exporting HTML from Mathpix products (Snip apps, v3/converter API) receive math rendered as SVG images. Many users want alternative formats:
-- **MathML** for accessibility and native browser rendering
-- **LaTeX source** for editing and client-side rendering
+- **MathML** for smaller file size and client-side rendering
+- **LaTeX source** for smaller file size and client-side rendering
 
 The current rendering pipeline already generates hidden MathML and LaTeX in the output, but only SVG is visible. Users cannot access the semantic formats without inspecting the HTML source.
 
@@ -17,23 +17,22 @@ Additionally, when users export HTML and open it in a browser, they lose the abi
 
 This PR adds:
 1. Options to control which math format is the primary visible output
-2. A browser bundle for client-side rendering with Mathpix's MathJax customizations
-3. A context menu for copying math in multiple formats
+2. A browser bundle (`auto-render.js`) for client-side rendering with Mathpix's MathJax customizations
+
+Note: Context menu functionality already exists as a separate bundle (`es5/context-menu.js`).
 
 ---
 
 ## Goal
 
 1. Add options to `TOutputMath` interface to control primary math output format (SVG, MathML, or LaTeX)
-2. Create a browser bundle (`mathpix-render.js`) for client-side LaTeX rendering
-3. Create a context menu component for copying math in multiple formats from exported HTML
+2. Create a browser bundle (`auto-render.js`) for client-side LaTeX/MathML rendering
 
 ---
 
 ## Non-Goals
 
 - Changing default behavior (SVG remains default)
-- Modifying existing `include_*` options behavior
 - Changes to DOCX, PDF, or other format rendering
 - Offline bundling of MathJax (CDN approach for LaTeX option)
 
@@ -93,60 +92,139 @@ Add to `TOutputMath` interface:
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `math_output_format` | `'svg' \| 'mathml' \| 'latex'` | `'svg'` | Primary visible math format |
+| `output_format` | `'svg' \| 'mathml' \| 'latex'` | `'svg'` | Primary visible math format |
 
 ### Behavior by Format
 
-| `math_output_format` | Server Output | Script Required | Offline |
+| `output_format` | Server Output | Script Required | Offline |
 |---------------------|---------------|-----------------|---------|
-| `'svg'` (default) | Pre-rendered SVG | No | Yes |
-| `'mathml'` | Native `<math>` elements | Yes (polyfill + features) | No |
-| `'latex'` | Raw `\( \)` / `\[ \]` delimiters | Yes (rendering) | No |
+| `'svg'` (default) | Pre-rendered SVG with hidden formats | No | Yes |
+| `'mathml'` | Native `<math>` elements only | Yes (rendering + features) | No |
+| `'latex'` | Raw LaTeX with original delimiters | Yes (rendering) | No |
 
 ### Why Script is Needed for MathML
 
 - **Chrome has no native MathML support** - script provides polyfill
 - **Context menu** - script generates hidden formats for copy functionality
-- **Accessibility** - script adds `aria-label`, speech text
+- **Accessibility** - script adds `<mjx-assistive-mml>` and ARIA attributes (see below)
 - **Consistent rendering** - ensures same appearance across browsers
+
+### Accessibility Options
+
+The `accessibility` config controls how math is made accessible to screen readers:
+
+**Option 1: `{ assistive_mml: true, include_speech: true }` - Speech label + Assistive MathML**
+```html
+<mjx-container class="MathJax" jax="SVG" role="math" tabindex="0"
+               aria-label="a x squared plus b x plus c equals 0">
+  <svg>...</svg>
+  <mjx-assistive-mml unselectable="on" display="inline">
+    <math xmlns="http://www.w3.org/1998/Math/MathML">...</math>
+  </mjx-assistive-mml>
+</mjx-container>
+```
+- `aria-label` contains SRE-generated speech text
+- `<mjx-assistive-mml>` exposes MathML to assistive technologies
+
+**Option 2: `{ assistive_mml: true }` - Assistive MathML only (no speech)**
+```html
+<mjx-container class="MathJax" jax="SVG" role="math" tabindex="0"
+               aria-labelledby="mjx-mml-ml89vyqgk858vbmasab-2">
+  <svg aria-hidden="true">...</svg>
+  <mjx-assistive-mml unselectable="on" display="inline" id="mjx-mml-ml89vyqgk858vbmasab-2">
+    <math xmlns="http://www.w3.org/1998/Math/MathML">...</math>
+  </mjx-assistive-mml>
+</mjx-container>
+```
+- `aria-labelledby` references the `<mjx-assistive-mml>` element by ID
+- Screen readers read the MathML directly
+
+**Option 3: No accessibility config - Not accessible**
+```html
+<mjx-container class="MathJax" jax="SVG">
+  <svg xmlns="http://www.w3.org/2000/svg" role="img" focusable="false" viewBox="...">
+    ...
+  </svg>
+</mjx-container>
+```
+- No `role="math"` or `tabindex` on container
+- No `aria-label` or `aria-labelledby`
+- No `<mjx-assistive-mml>` element
+- SVG has `role="img"` and `focusable="false"` but math is not accessible to screen readers
 
 ### Hidden Formats and Context Menu
 
-| `math_output_format` | Hidden Formats Source | Context Menu |
+| `output_format` | Hidden Formats Source | Context Menu |
 |---------------------|----------------------|--------------|
 | `'svg'` | Server-generated via `include_*` options | Reads hidden elements |
-| `'mathml'` | Client-generated by `mathpix-render.js` | Reads hidden elements |
-| `'latex'` | Client-generated by `mathpix-render.js` | Reads hidden elements |
+| `'mathml'` | Client-generated by `auto-render.js` | Reads hidden elements |
+| `'latex'` | Client-generated by `auto-render.js` | Reads hidden elements |
 
-**Important:** For `'mathml'` and `'latex'` formats, the `include_*` options are ignored. The `mathpix-render.js` script generates hidden formats client-side for context menu and accessibility.
+**Important:** When `output_format` is `'mathml'` or `'latex'`, the server outputs ONLY the raw format (minimal HTML, no hidden elements, no SVG). The `auto-render.js` script then transforms this into the full structure:
+1. Renders math to SVG via MathJax (`<mjx-container>`)
+2. Generates all hidden format elements for context menu (`<latex>`, `<mathml>`, `<mathmlword>`, `<asciimath>`, `<speech>` with `style="display: none;"`)
+3. Adds accessibility via `<mjx-assistive-mml>` element inside `<mjx-container>`
+
+The pre-existing `context-menu.js` script provides the right-click copy menu by reading these hidden elements.
 
 ### Output Examples
 
-**SVG output (`math_output_format: 'svg'`, default):**
+**SVG output (`output_format: 'svg'`, default) - Server generates full structure:**
 ```html
 <span class="math-inline">
-  <latex style="display: none">x^2</latex>
+  <latex style="display: none">ax^2 + bx + c = 0</latex>
   <mathml style="display: none"><math>...</math></mathml>
   <mjx-container jax="SVG"><svg>...</svg></mjx-container>
 </span>
 ```
 
-**MathML output (`math_output_format: 'mathml'`):**
+**MathML output (`output_format: 'mathml'`) - Server generates minimal output:**
 ```html
-<!-- Server outputs native MathML -->
 <span class="math-inline">
   <math>...</math>
 </span>
-<!-- mathpix-render.js polyfills Chrome and adds hidden formats for context menu -->
 ```
 
-**LaTeX output (`math_output_format: 'latex'`):**
+**LaTeX output (`output_format: 'latex'`) - Server generates minimal output:**
 ```html
-<!-- Server outputs raw delimiters -->
-<p>The equation \( x^2 \) is inline.</p>
-<p>\[ y = mx + b \]</p>
-<!-- mathpix-render.js renders math and adds hidden formats for context menu -->
+<!-- Original delimiters from MMD content are preserved -->
+<span class="math-inline">$ ax^2 + bx + c = 0 $</span>
+<!-- or -->
+<span class="math-inline">\( ax^2 + bx + c = 0 \)</span>
+<!-- or for display math -->
+<span class="math-block">$$ ax^2 + bx + c = 0 $$</span>
 ```
+
+**After `auto-render.js` processes MathML or LaTeX output - Full structure with all formats:**
+```html
+<span class="math-inline" data-mathpix-typeset="true">
+  <mathml style="display: none;"><math>...</math></mathml>
+  <mathmlword style="display: none;"><math>...</math></mathmlword>
+  <asciimath style="display: none;">ax^(2)+bx+c=0</asciimath>
+  <latex style="display: none;">ax^2 + bx + c = 0</latex>
+  <speech style="display: none;">a x squared plus b x plus c equals 0</speech>
+  <mjx-container class="MathJax" jax="SVG" role="math" tabindex="0"
+                 aria-label="a x squared plus b x plus c equals 0">
+    <svg>...</svg>
+    <mjx-assistive-mml unselectable="on" display="inline">
+      <math xmlns="http://www.w3.org/1998/Math/MathML">...</math>
+    </mjx-assistive-mml>
+  </mjx-container>
+</span>
+```
+
+**Key elements after client-side rendering:**
+| Element | Purpose |
+|---------|---------|
+| `<latex style="display: none;">` | Hidden LaTeX source for context menu copy |
+| `<mathml style="display: none;">` | Hidden MathML for context menu copy |
+| `<mathmlword style="display: none;">` | Hidden Word-compatible MathML for context menu copy |
+| `<asciimath style="display: none;">` | Hidden AsciiMath for context menu copy |
+| `<speech style="display: none;">` | Hidden speech text for context menu copy |
+| `<mjx-container>` | Visible SVG rendering with `role="math"`, `tabindex="0"` |
+| `aria-label` | Speech text (when `include_speech: true`) |
+| `aria-labelledby` | References `<mjx-assistive-mml>` ID (when `assistive_mml: true` only) |
+| `<mjx-assistive-mml>` | Exposes MathML to screen readers (only added when `assistive_mml: true`) |
 
 ---
 
@@ -156,7 +234,7 @@ Add to `TOutputMath` interface:
 
 **File:** `src/mathpix-markdown-model/index.ts`
 
-Add `math_output_format` option to `TOutputMath` interface:
+Add `output_format` option to `TOutputMath` interface:
 - Type: `'svg' | 'mathml' | 'latex'`
 - Default: `'svg'`
 
@@ -167,35 +245,35 @@ Update `optionsMathpixMarkdown` default values.
 **File:** `src/markdown/mdPluginRaw.ts`
 
 Modify `renderMath()` function:
-- Check `math_output_format` option
-- When `'latex'`: return raw LaTeX with appropriate delimiters (`\( \)` for inline, `\[ \]` for display)
+- Check `output_format` option
+- When `'latex'`: return raw LaTeX with original delimiters from the MMD content (preserves `$$`, `$`, `\[\]`, `\(\)`, etc.)
 - When `'svg'` or `'mathml'`: proceed with MathJax rendering
 - Preserve equation numbering context for all formats
 
 **File:** `src/mathjax/index.ts`
 
 Modify `OuterHTML()` function:
-- Check `math_output_format` option
+- Check `output_format` option
 - When `'mathml'`: show MathML as primary, hide SVG container
 - When `'svg'`: show SVG as primary (current behavior)
 - Ensure MathML is unwrapped from `<mathml>` wrapper when it's the primary format
 
 **File:** `src/markdown/common/convert-math-to-html.ts`
 
-- Pass `math_output_format` option through to rendering functions
+- Pass `output_format` option through to rendering functions
 - When `'latex'`: bypass MathJax entirely, return raw delimiters
 
 ### Part 3: Browser Bundle
 
 Create new directory: `src/browser/`
 
-The browser bundle (`mathpix-render.js`) serves different purposes depending on the format:
+The browser bundle (`auto-render.js`) serves different purposes depending on the server output format:
 
 | Format | Script Role |
 |--------|-------------|
-| `'svg'` | Optional - only for context menu if included |
-| `'mathml'` | Required - Chrome polyfill + hidden formats + context menu |
-| `'latex'` | Required - rendering + hidden formats + context menu |
+| `'svg'` | Not needed - already rendered; script skips elements with existing MathJax output |
+| `'mathml'` | Required - renders MathML to SVG with hidden formats for context menu |
+| `'latex'` | Required - renders LaTeX to SVG with hidden formats for context menu |
 
 **File:** `src/browser/auto-render.ts`
 
@@ -204,87 +282,56 @@ Entry point for client-side processing:
 | Export | Description |
 |--------|-------------|
 | `renderMathInElement(element, config)` | Scan and render math in DOM element |
-| `MathpixRender` | Global object with version and methods |
+| `MathpixRender` | Global object exposed on window |
 
-**Configuration options:**
+**Configuration interface (`MathpixRenderConfig`):**
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `delimiters` | `Array<{left, right, display}>` | `$$`, `\[\]`, `\(\)` | Math delimiter pairs |
-| `outputFormat` | `'svg' \| 'mathml'` | `'svg'` | Render output format |
-| `contextMenu` | `boolean` | `true` | Enable context menu |
-| `ignoredTags` | `string[]` | `['script', 'pre', 'code']` | Elements to skip |
-| `ignoredClasses` | `string[]` | `['no-mathpix']` | Classes to skip |
+```typescript
+interface MathpixAccessibilityConfig {
+  /** Expose MathJax assistive MathML for screen readers */
+  assistive_mml?: boolean;
+  /** Add aria-label speech string generated by SRE */
+  include_speech?: boolean;
+}
 
-**Hidden formats options (for context menu):**
-
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `include_latex` | `boolean` | `true` | Generate hidden LaTeX for copy |
-| `include_mathml` | `boolean` | `true` | Generate hidden MathML for copy |
-| `include_asciimath` | `boolean` | `false` | Generate hidden AsciiMath for copy |
-| `include_mathml_word` | `boolean` | `false` | Generate hidden Word MathML for copy |
-
-These options mirror the server-side `include_*` options and control which formats are available in the context menu when the script generates hidden elements client-side.
+interface MathpixRenderConfig {
+  accessibility: MathpixAccessibilityConfig;
+  outMath: TOutputMath;
+  /** Container width used for layout metrics (cwidth) */
+  width?: number;
+}
+```
 
 **Behavior:**
-- On DOMContentLoaded, detect content type (LaTeX delimiters or MathML elements)
-- For LaTeX: scan for delimiters, render using `MathpixMarkdownModel.markdownToHTML()`
-- For MathML: detect browser support, polyfill Chrome if needed
-- Generate hidden format elements (LaTeX, MathML, AsciiMath) for context menu
-- Add accessibility attributes (`aria-label`, speech text)
-- Initialize context menu if enabled
+- On DOMContentLoaded, auto-renders math in `document.body`
+- Searches for `.math-inline` and `.math-block` elements
+- Detects content type: MathML elements or TeX with delimiters (`$$`, `\[\]`, `\(\)`, `$`)
+- Skips already-rendered elements (checks for `data-mathpix-typeset` attribute or MathJax containers)
+- Renders using `MathJax.Typeset()` or `MathJax.TypesetMathML()`
+- Adds accessibility attributes (`aria-label`, `aria-labelledby`, `role="math"`)
+- Marks processed elements with `data-mathpix-typeset="true"`
 
-**File:** `src/browser/context-menu.ts`
-
-Right-click menu for math elements:
-
-| Menu Item | Source | Action |
-|-----------|--------|--------|
-| Copy LaTeX | `<latex>` element | Copy text to clipboard |
-| Copy MathML | `<mathml>` element | Copy text to clipboard |
-| Copy AsciiMath | `<asciimath>` element | Copy text to clipboard |
-| Copy MathML (Word) | `<mathmlword>` element | Copy text to clipboard |
-| Copy as Image | `<svg>` element | Convert to PNG, copy to clipboard |
-
-**Behavior:**
-- Listen for `contextmenu` event on `.math-inline`, `.math-block`, `mjx-container`
-- Show menu only with items for available formats (check if elements exist)
-- Use Clipboard API for copying
-- Show toast notification on success
-
-**File:** `src/browser/styles.css`
-
-Styles for context menu and toast notifications.
+**Note:** Context menu is a separate pre-existing bundle (`es5/context-menu.js`) that can be included independently.
 
 ### Part 4: Build Configuration
 
-**File:** `rollup.browser.config.js` (new)
+**File:** `webpack.config.js`
 
-Rollup config for browser bundle:
+Added `autoRenderConfig` to existing webpack configuration:
 - Input: `src/browser/auto-render.ts`
-- Output: `dist/mathpix-render.js` and `dist/mathpix-render.min.js`
-- Format: IIFE with `MathpixRender` global
-- Include terser for minification
-
-**File:** `package.json`
-
-Add build scripts:
-- `build:browser`: Build browser bundle
-- `build`: Include browser build in main build
-
-Add files to package exports:
-- `dist/mathpix-render.js`
-- `dist/mathpix-render.min.js`
-- `dist/mathpix-render.css`
+- Output: `es5/browser/auto-render.js`
+- Uses existing TypeScript and Babel loaders
+- Includes NodePolyfillPlugin for browser compatibility
 
 ---
 
 ## Distribution
 
 Browser bundle included in npm package, accessible via jsdelivr:
-- `https://cdn.jsdelivr.net/npm/mathpix-markdown-it@{version}/dist/mathpix-render.min.js`
-- `https://cdn.jsdelivr.net/npm/mathpix-markdown-it@{version}/dist/mathpix-render.css`
+- `https://cdn.jsdelivr.net/npm/mathpix-markdown-it@{version}/es5/browser/auto-render.js`
+
+Context menu (pre-existing, separate bundle):
+- `https://cdn.jsdelivr.net/npm/mathpix-markdown-it@{version}/es5/context-menu.js`
 
 This follows the existing pattern for `es5/bundle.js`.
 
@@ -299,10 +346,13 @@ import { MathpixMarkdownModel } from 'mathpix-markdown-it';
 
 const html = MathpixMarkdownModel.markdownToHTML(mmd, {
   outMath: {
-    math_output_format: 'mathml',
-    include_latex: true,  // Keep LaTeX for context menu
+    output_format: 'mathml',
+    // Note: include_* options are ignored for 'mathml' format
+    // Hidden formats are generated client-side by auto-render.js
   }
 });
+// HTML contains only: <span class="math-inline"><math>...</math></span>
+// Include auto-render.js to render SVG and generate hidden formats for context menu
 ```
 
 ### Server-Side: LaTeX Output (for Client Rendering)
@@ -310,11 +360,13 @@ const html = MathpixMarkdownModel.markdownToHTML(mmd, {
 ```typescript
 const html = MathpixMarkdownModel.markdownToHTML(mmd, {
   outMath: {
-    math_output_format: 'latex',
+    output_format: 'latex',
+    // Note: include_* options are ignored for 'latex' format
   }
 });
-// HTML contains raw \( \) and \[ \] delimiters
-// Include mathpix-render.js to render client-side
+// HTML contains only: <span class="math-inline">$ ax^2 + bx + c = 0 $</span>
+// Original delimiters from MMD are preserved ($$, $, \[\], \(\), etc.)
+// Include auto-render.js to render SVG and generate hidden formats for context menu
 ```
 
 ### Client-Side: Auto-Render
@@ -322,26 +374,39 @@ const html = MathpixMarkdownModel.markdownToHTML(mmd, {
 ```html
 <script>
   window.MathpixRenderConfig = {
-    outputFormat: 'svg',
-    contextMenu: true,
-    // Hidden formats for context menu
-    include_latex: true,
-    include_mathml: true,
-    include_asciimath: false,
-    include_mathml_word: false
+    accessibility: {
+      assistive_mml: true,
+      include_speech: true
+    },
+    outMath: {
+      output_format: 'svg',
+      include_svg: true,
+      include_latex: true,
+      include_mathml: true,
+      include_asciimath: true,
+      include_mathml_word: true
+    },
+    width: 1200
   };
 </script>
-<script src="https://cdn.jsdelivr.net/npm/mathpix-markdown-it@latest/dist/mathpix-render.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mathpix-markdown-it@latest/es5/browser/auto-render.js"></script>
+<!-- Optional: include context menu for copy functionality -->
+<script src="https://cdn.jsdelivr.net/npm/mathpix-markdown-it@latest/es5/context-menu.js"></script>
 ```
 
 ### Client-Side: Manual Render
 
 ```javascript
 MathpixRender.renderMathInElement(document.getElementById('content'), {
-  delimiters: [
-    { left: '$$', right: '$$', display: true },
-    { left: '$', right: '$', display: false }
-  ]
+  accessibility: {
+    assistive_mml: true,
+    include_speech: true
+  },
+  outMath: {
+    output_format: 'svg',
+    include_latex: true,
+    include_mathml: true
+  }
 });
 ```
 
@@ -349,13 +414,14 @@ MathpixRender.renderMathInElement(document.getElementById('content'), {
 
 ## Constraints / Invariants
 
-- Default behavior unchanged (`math_output_format: 'svg'`)
-- Existing `include_*` options only apply to `'svg'` format
-- When `math_output_format: 'mathml'` or `'latex'`, `include_*` options are ignored (script handles this)
-- Context menu only shows items for formats present in HTML
-- Browser bundle must work standalone (no external dependencies except DOM)
-- `mathpix-render.js` is required for `'mathml'` (Chrome polyfill) and `'latex'` (rendering)
-- Only `'svg'` format works offline; `'mathml'` and `'latex'` require CDN script
+- Default behavior unchanged (`output_format: 'svg'`)
+- When `output_format: 'svg'`: server generates full structure with hidden formats via `include_*` options
+- When `output_format: 'mathml'` or `'latex'`: server outputs ONLY the raw format (minimal HTML), `include_*` options are ignored
+- When `output_format: 'latex'`: original delimiters from MMD content are preserved
+- Browser bundle (`auto-render.js`) must work standalone (no external dependencies except DOM)
+- `auto-render.js` is **required** for `'mathml'` and `'latex'` formats to render SVG and generate hidden formats
+- `auto-render.js` skips already-rendered elements (detects MathJax containers, `data-mathpix-typeset` attribute)
+- Only `'svg'` format works fully offline; `'mathml'` and `'latex'` require client-side script
 
 ---
 
@@ -363,45 +429,55 @@ MathpixRender.renderMathInElement(document.getElementById('content'), {
 
 ### Unit Tests
 
-- `math_output_format: 'svg'` produces SVG as primary (default behavior)
-- `math_output_format: 'mathml'` produces native MathML elements
-- `math_output_format: 'latex'` outputs raw LaTeX delimiters, no MathJax rendering
-- `include_*` options work with `'svg'` format only
-- `include_*` options ignored when `math_output_format: 'mathml'` or `'latex'`
+- `output_format: 'svg'` produces full structure with SVG and hidden formats (default behavior)
+- `output_format: 'mathml'` produces minimal output with only native MathML element
+- `output_format: 'latex'` produces minimal output with only raw LaTeX delimiters
+- `include_*` options work only with `'svg'` format (ignored for `'mathml'` and `'latex'`)
 - Inline vs display math handled correctly for all formats
 - Equation numbering preserved with all formats
+
+### Browser Bundle Tests (`auto-render.js`)
+
+- Correctly detects MathML elements inside `.math-inline` / `.math-block`
+- Correctly detects LaTeX delimiters (`$$`, `\[\]`, `\(\)`, `$`)
+- Generates all hidden format elements (`<latex>`, `<mathml>`, `<mathmlword>`, `<asciimath>`, `<speech>`)
+- Renders SVG via `<mjx-container>`
+- Accessibility when `{ assistive_mml: true, include_speech: true }`: adds `role="math"`, `tabindex="0"`, `aria-label`, `<mjx-assistive-mml>`
+- Accessibility when `{ assistive_mml: true }` only: adds `role="math"`, `tabindex="0"`, `aria-labelledby`, `<mjx-assistive-mml>` with ID
+- No accessibility when config not set: no `<mjx-assistive-mml>`, no ARIA attributes
+- Marks processed elements with `data-mathpix-typeset="true"`
+- Skips already-rendered elements
 
 ### Integration Tests
 
 - Browser bundle loads without errors
-- Auto-render finds and renders math delimiters
-- Context menu appears on right-click
-- Copy functions work with Clipboard API
-- Ignored tags/classes are skipped
+- Auto-render finds and renders `.math-inline` and `.math-block` elements
+- Already-rendered elements are skipped (detects `data-mathpix-typeset` attribute)
+- MathML input elements are correctly detected and rendered
 
 ### Manual Tests
 
-- Verify rendered output matches Snip preview
-- Test context menu in Chrome, Firefox, Safari
-- Test MathML rendering in Firefox (native) vs Chrome (polyfill needed)
+- Verify rendered output matches expected format
+- Test accessibility with screen readers
+- Test MathML and LaTeX input rendering in browser
 
 ---
 
 ## Done When
 
-- [ ] `math_output_format` option added to `TOutputMath` interface
-- [ ] `renderMath()` handles all three format values (`'svg'`, `'mathml'`, `'latex'`)
-- [ ] `OuterHTML()` shows correct primary format based on option
-- [ ] Browser bundle entry point created (`src/browser/auto-render.ts`)
-- [ ] Context menu implemented (`src/browser/context-menu.ts`)
-- [ ] Rollup config for browser bundle
-- [ ] Build scripts added to package.json
-- [ ] Bundle files included in npm package
+- [x] `output_format` option added to `TOutputMath` interface
+- [x] `renderByFormat()` handles all three format values (`'svg'`, `'mathml'`, `'latex'`)
+- [x] `OuterHTML()` shows correct primary format based on option
+- [x] Browser bundle entry point created (`src/browser/auto-render.ts`)
+- [x] Webpack config for browser bundle added to `webpack.config.js`
+- [x] Bundle files included in npm package (`es5/browser/auto-render.js`)
+- [x] Accessibility improvements (`applyMathJaxA11y`, `aria-labelledby` support)
+- [x] `Status` updated to `Implemented`
 - [ ] Unit tests for new options
-- [ ] Integration tests for browser bundle
 - [ ] README updated with new options and browser bundle usage
 - [ ] Changelog updated
-- [ ] `Status` updated to `Implemented`
+
+Note: Context menu was already implemented separately (`src/context-menu.tsx` → `es5/context-menu.js`)
 
 ---
 
