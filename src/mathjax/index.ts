@@ -11,6 +11,7 @@ import { Label } from 'mathjax-full/js/input/tex/Tags.js';
 import { IAsciiData } from "./serialized-ascii/common";
 import { formatMathJaxError } from "../helpers/utils";
 import { getMathDimensions, IMathDimensions } from "./utils";
+import { uid } from "../markdown/utils";
 
 const MJ = new MathJaxConfigure();
 
@@ -59,16 +60,61 @@ const toAsciiML = ((node, optionAscii): IAsciiData => {
   }
 });
 
-const applySpeechToNode = (adaptor, node, sre): string => {
-  const lastChild = adaptor.lastChild(node);
-  const mmlAssistive = adaptor.innerHTML(lastChild);
-  const speech = getSpeech(sre, mmlAssistive);
-  adaptor.setAttribute(node, 'aria-label', speech);
-  adaptor.setAttribute(node, 'role', 'math');
-  adaptor.setAttribute(node, 'tabindex', '0');
+const normalizeMathJaxA11y = (adaptor, mjxContainer) => {
+  adaptor.setAttribute(mjxContainer, 'role', 'math');
+  adaptor.setAttribute(mjxContainer, 'tabindex', '0');
+  const svg = adaptor.firstChild(mjxContainer);
+  if (svg) {
+    adaptor.setAttribute(svg, 'aria-hidden', 'true');
+  }
+}
 
-  adaptor.setAttribute(lastChild, 'aria-hidden', 'true');
+const makeAssistiveMmlAccessible = (adaptor, mjxContainer) => {
+  const assistive = adaptor.lastChild(mjxContainer);
+  let id = adaptor.getAttribute(assistive, 'id');
+  if (!id) {
+    id = MathJax.nextAssistiveId();
+    adaptor.setAttribute(assistive, 'id', id);
+  }
+  adaptor.setAttribute(mjxContainer, 'aria-labelledby', id);
+  adaptor.removeAttribute(assistive, 'aria-hidden');
+}
+
+const applySpeechToNode = (adaptor, mjxContainer, sre): string => {
+  const assistive = adaptor.lastChild(mjxContainer); // mjx-assistive-mml
+  const assistiveMml = adaptor.innerHTML(assistive);
+  const speech: string = getSpeech(sre, assistiveMml);
+  adaptor.setAttribute(mjxContainer, 'aria-label', speech);
+  adaptor.removeAttribute(assistive, 'aria-hidden');
   return speech;
+};
+
+/**
+ * Applies MathJax accessibility attributes to an mjx-container:
+ * - role="math", tabindex="0"
+ * - hides SVG from AT
+ * - either sets aria-label via SRE speech, or exposes assistive MathML via aria-labelledby
+ */
+const applyMathJaxA11y = (
+  adaptor: any,
+  mjxContainer: any,
+  accessibility?: TAccessibility,
+  includeSpeechOutput = false,
+): { speech?: string } => {
+  if (!accessibility?.sre && !accessibility?.assistiveMml) {
+    return {};
+  }
+  normalizeMathJaxA11y(adaptor, mjxContainer);
+  // Prefer SRE if provided
+  if (accessibility.sre) {
+    const speech: string = applySpeechToNode(adaptor, mjxContainer, accessibility.sre);
+    return includeSpeechOutput && speech ? { speech } : {};
+  }
+  // Otherwise fallback to assistive MathML exposure
+  if (accessibility.assistiveMml) {
+    makeAssistiveMmlAccessible(adaptor, mjxContainer);
+  }
+  return {};
 };
 
 const OuterData = (adaptor, node, math, outMath, forDocx = false, accessibility?): IOuterData => {
@@ -86,12 +132,9 @@ const OuterData = (adaptor, node, math, outMath, forDocx = false, accessibility?
     },
   } = outMath;
   const res: IOuterData = {};
-
-  if (accessibility && accessibility.sre) {
-    const speech = applySpeechToNode(adaptor, node, accessibility.sre);
-    if (include_speech && speech) {
-      res.speech = speech;
-    }
+  const a11y = applyMathJaxA11y(adaptor, node, accessibility, include_speech);
+  if (a11y.speech) {
+    res.speech = a11y.speech;
   }
   
   if (include_mathml) {
@@ -186,12 +229,9 @@ const OuterDataAscii = (adaptor, node, math, outMath, forDocx = false, accessibi
     svg?: string,
     speech?: string
   } = {};
-
-  if (accessibility && accessibility.sre) {
-    const speech = applySpeechToNode(adaptor, node, accessibility.sre);
-    if (include_speech && speech) {
-      res.speech = speech;
-    }
+  const a11y = applyMathJaxA11y(adaptor, node, accessibility, include_speech);
+  if (a11y.speech) {
+    res.speech = a11y.speech;
   }
 
   if (include_mathml) {
@@ -228,12 +268,9 @@ const OuterDataMathMl = (adaptor, node, math, outMath, forDocx = false, accessib
     }
   } = outMath;
   let res: IOuterData = {};
-
-  if (accessibility && accessibility.sre) {
-    const speech = applySpeechToNode(adaptor, node, accessibility.sre);
-    if (include_speech && speech) {
-      res.speech = speech;
-    }
+  const a11y = applyMathJaxA11y(adaptor, node, accessibility, include_speech);
+  if (a11y.speech) {
+    res.speech = a11y.speech;
   }
 
   if (include_mathml) {
@@ -326,10 +363,35 @@ export const OuterHTML = (data, outMath, forPptx: boolean = false) => {
   return outHTML;
 };
 
+const renderByFormat = (data: IOuterData, outMath: any, forPptx = false): string => {
+  switch (outMath?.output_format) {
+    case "latex":
+      return "";
+    case "mathml":
+      return formatSourceMML(data.mathml);
+    default:
+      return OuterHTML(data, outMath, forPptx);
+  }
+}
+
 export const MathJax = {
   assistiveMml: true,
   nonumbers: false,
-  
+  _a11y: {
+    renderKey: uid(),   // любой string
+    counter: 0,
+  },
+
+  beginRender(renderKey?: string) {
+    this._a11y.renderKey = renderKey || uid();
+    this._a11y.counter = 0;
+  },
+
+  nextAssistiveId(prefix = 'mjx-mml-') {
+    this._a11y.counter += 1;
+    return `${prefix}${this._a11y.renderKey}-${this._a11y.counter}`;
+  },
+
   checkAccessibility: function (accessibility: TAccessibility = null, nonumbers = false) {
     if (!this.assistiveMml && accessibility !== null) {
       this.assistiveMml = true;
@@ -422,7 +484,7 @@ export const MathJax = {
   Typeset: function(string, options: any={}, throwError = false) {
     const data = this.TexConvert(string, options, throwError);
     return {
-      html: OuterHTML(data, options.outMath, options.forPptx),
+      html: renderByFormat(data, options.outMath, options.forPptx),
       labels: data.labels,
       ascii: data.asciimath,
       linear: data.linearmath,
@@ -440,7 +502,7 @@ export const MathJax = {
     const data: IOuterData = this.TexConvert(string, options);
     options.outMath.include_asciimath = include_asciimath;
     return {
-      html: OuterHTML(data, outMath), 
+      html: renderByFormat(data, outMath),
       ascii: data.asciimath,
       linear: data.linearmath,
       labels: data.labels,

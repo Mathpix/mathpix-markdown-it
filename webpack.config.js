@@ -192,5 +192,50 @@ const copyToClipboardCodeConfig = Object.assign({}, config,{
   ],
 });
 
+const autoRenderConfig = Object.assign({}, config,{
+  name: "auto-render",
+  entry: {
+    main: [
+      // '@babel/polyfill',
+      path.join(__dirname, './src/browser/auto-render.ts'),
+    ]
+  },
+  output: {
+    path: path.resolve(__dirname, './es5/browser/'),
+    filename: 'auto-render.js',
+  },
+  module: {
+    rules: [
+      {
+        test: /\.ts?$/,
+        include: path.resolve(__dirname, 'src'),
+        exclude: /(node_modules|bower_components|lib)/,
+        loader: 'ts-loader',
+      },
+      {
+        test: /\.js?$/,
+        include: path.resolve(__dirname, 'src'),
+        exclude: /(node_modules|bower_components)/,
+        use: {
+          loader: 'babel-loader',
+        }
+      },
+      {
+        test: /\.css$/,
+        exclude: /node_modules/,
+        use: [
+          MiniCssExtractPlugin.loader,
+          "css-loader"
+        ]
+      }
+    ]
+  },
+  plugins: [
+    new NodePolyfillPlugin({
+      excludeAliases: ["console"]
+    })
+  ],
+});
+
 // Return Array of Configurations
-module.exports = [ indexConfig, bundleConfig, contextMenuConfig, copyToClipboardCodeConfig ];
+module.exports = [ indexConfig, bundleConfig, contextMenuConfig, copyToClipboardCodeConfig, autoRenderConfig ];

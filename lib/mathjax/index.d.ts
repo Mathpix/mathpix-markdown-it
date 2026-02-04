@@ -24,6 +24,12 @@ export declare const OuterHTML: (data: any, outMath: any, forPptx?: boolean) => 
 export declare const MathJax: {
     assistiveMml: boolean;
     nonumbers: boolean;
+    _a11y: {
+        renderKey: string;
+        counter: number;
+    };
+    beginRender(renderKey?: string): void;
+    nextAssistiveId(prefix?: string): string;
     checkAccessibility: (accessibility?: TAccessibility, nonumbers?: boolean) => void;
     Stylesheet: () => unknown;
     TexConvert: (string: any, options?: any, throwError?: boolean) => IOuterData;
