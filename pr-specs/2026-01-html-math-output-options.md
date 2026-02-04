@@ -111,7 +111,9 @@ Add to `TOutputMath` interface:
 
 ### Accessibility Options
 
-The `accessibility` config controls how math is made accessible to screen readers:
+The `accessibility` config for `auto-render.js` controls how math is made accessible to screen readers.
+
+**Note:** This config format is specific to the browser bundle. Server-side rendering uses the pre-existing `TAccessibility` interface with `assistiveMml: boolean` and `sre: object`.
 
 **Option 1: `{ assistive_mml: true, include_speech: true }` - Speech label + Assistive MathML**
 ```html
@@ -284,7 +286,7 @@ Entry point for client-side processing:
 | `renderMathInElement(element, config)` | Scan and render math in DOM element |
 | `MathpixRender` | Global object exposed on window |
 
-**Configuration interface (`MathpixRenderConfig`):**
+**Configuration interface (`MathpixRenderConfig`) for browser bundle:**
 
 ```typescript
 interface MathpixAccessibilityConfig {
@@ -301,6 +303,15 @@ interface MathpixRenderConfig {
   width?: number;
 }
 ```
+
+**Note:** The browser bundle uses a different accessibility interface than the server-side rendering functions:
+
+| Context | Interface | Fields |
+|---------|-----------|--------|
+| Browser (`auto-render.js`) | `MathpixAccessibilityConfig` | `assistive_mml: boolean`, `include_speech: boolean` |
+| Server/Programmatic | `TAccessibility` | `assistiveMml: boolean`, `sre: object` |
+
+For server-side rendering, you pass the SRE object instance directly rather than a boolean flag.
 
 **Behavior:**
 - On DOMContentLoaded, auto-renders math in `document.body`

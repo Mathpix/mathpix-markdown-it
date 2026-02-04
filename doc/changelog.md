@@ -1,3 +1,26 @@
+# February 2026
+
+## [2.0.34] - 4 February 2026
+
+- Math Output Format:
+  - Added `output_format` option to `TOutputMath` to control which math format is placed in HTML output.
+  - `'svg'` (default): Pre-rendered SVG with hidden formats, works offline.
+  - `'mathml'`: Native `<math>` elements only, smaller file size, requires client-side rendering.
+  - `'latex'`: Raw LaTeX with original delimiters, smaller file size, requires client-side rendering.
+
+- Browser Rendering Script (`auto-render.js`):
+  - New browser bundle for client-side math rendering at `es5/browser/auto-render.js`.
+  - Renders MathML or LaTeX content to SVG.
+  - Generates hidden format elements for context menu compatibility.
+  - Configurable accessibility support via `MathpixAccessibilityConfig`:
+    - `assistive_mml`: Add `<mjx-assistive-mml>` for screen readers.
+    - `include_speech`: Add `aria-label` with speech text.
+
+- Docs:
+  - Added implementation details in `pr-specs/2026-01-html-math-output-options.md`.
+
+---
+
 # January 2026
 
 ## [2.0.33] - 27 January 2026
