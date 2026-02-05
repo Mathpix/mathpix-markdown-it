@@ -16,6 +16,9 @@
     - `assistive_mml`: Add `<mjx-assistive-mml>` for screen readers.
     - `include_speech`: Add `aria-label` with speech text.
 
+- Fixes:
+  - Fixed centering issue for equations with numbering inside `.math-block[data-width="full"]`.
+
 - Docs:
   - Added implementation details in `pr-specs/2026-01-html-math-output-options.md`.
 
