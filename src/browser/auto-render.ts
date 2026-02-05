@@ -260,6 +260,21 @@ export const renderMathInElement = async (
         });
       // Replace content with MathJax output.
       setInnerHTML(mathEl, result.html);
+      // Apply width-related attributes (matching server-side rendering behavior).
+      if (result?.data) {
+        const isInline: boolean = mathEl.classList.contains('math-inline');
+        const isBlock: boolean = mathEl.classList.contains('math-block');
+        const width: string = result.data.width;
+        const widthEx: number = result.data.widthEx;
+        // For block math: data-width="full" when the equation is full-width
+        if (isBlock && width === 'full') {
+          mathEl.setAttribute('data-width', 'full');
+        }
+        // For inline math: data-overflow="visible" when the equation is very narrow
+        if (isInline && typeof widthEx === 'number' && widthEx < 2) {
+          mathEl.setAttribute('data-overflow', 'visible');
+        }
+      }
       // Mark as already typeset to avoid re-processing on future passes.
       mathEl.setAttribute('data-mathpix-typeset', 'true');
     } catch (err) {
