@@ -130,6 +130,7 @@ const OuterData = (adaptor, node, math, outMath, forDocx = false, accessibility?
       showStyle: false,
       extraBrackets: true,
     },
+    output_format = 'svg'
   } = outMath;
   const res: IOuterData = {};
   const a11y = applyMathJaxA11y(adaptor, node, accessibility, include_speech);
@@ -137,7 +138,7 @@ const OuterData = (adaptor, node, math, outMath, forDocx = false, accessibility?
     res.speech = a11y.speech;
   }
   
-  if (include_mathml) {
+  if (include_mathml || output_format === 'mathml') {
     res.mathml = toMathML(math.root);
   }
 
@@ -162,7 +163,7 @@ const OuterData = (adaptor, node, math, outMath, forDocx = false, accessibility?
       ? math.math
       : math.inputJax.processStrings ? '' : math.start.node.outerHTML);
   }
-  if (include_svg) {
+  if (include_svg || output_format === 'svg') {
     res.svg = adaptor.outerHTML(node);
     if (node) {
       const mathDimensions: IMathDimensions =
@@ -220,6 +221,7 @@ const OuterDataAscii = (adaptor, node, math, outMath, forDocx = false, accessibi
     include_asciimath = false,
     include_svg = true,
     include_speech = false,
+    output_format = 'svg'
   } = outMath;
   let res: {
     mathml?: string,
@@ -234,7 +236,7 @@ const OuterDataAscii = (adaptor, node, math, outMath, forDocx = false, accessibi
     res.speech = a11y.speech;
   }
 
-  if (include_mathml) {
+  if (include_mathml || output_format === 'mathml') {
     res.mathml = toMathML(math.root);
   }
 
@@ -247,7 +249,7 @@ const OuterDataAscii = (adaptor, node, math, outMath, forDocx = false, accessibi
       ? math.math
       : math.inputJax.processStrings ? '' : math.start.node.outerHTML);
   }
-  if (include_svg) {
+  if (include_svg || output_format === 'svg') {
     res.svg = adaptor.outerHTML(node)
   }
 
@@ -265,7 +267,8 @@ const OuterDataMathMl = (adaptor, node, math, outMath, forDocx = false, accessib
     optionAscii = {
       showStyle: false,
       extraBrackets: true
-    }
+    },
+    output_format = 'svg'
   } = outMath;
   let res: IOuterData = {};
   const a11y = applyMathJaxA11y(adaptor, node, accessibility, include_speech);
@@ -273,7 +276,7 @@ const OuterDataMathMl = (adaptor, node, math, outMath, forDocx = false, accessib
     res.speech = a11y.speech;
   }
 
-  if (include_mathml) {
+  if (include_mathml || output_format === 'mathml') {
     res.mathml = toMathML(math.root);
   }
 
@@ -291,7 +294,7 @@ const OuterDataMathMl = (adaptor, node, math, outMath, forDocx = false, accessib
     }
   }
 
-  if (include_svg) {
+  if (include_svg || output_format === 'svg') {
     res.svg = adaptor.outerHTML(node);
     if (node) {
       const mathDimensions: IMathDimensions =
