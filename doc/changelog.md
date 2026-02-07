@@ -1,3 +1,17 @@
+# February 2026
+
+## [2.0.34] - 7 February 2026
+
+- Table/Figure:
+  - Fixed renderer hang when a `\begin{table}` or `\begin{figure}` has a malformed closing tag (e.g. `\end{table>`).
+  - `BeginTable` no longer consumes content across multiple table/figure environments when the first is unclosed.
+
+- Lists (inline):
+  - Fixed `latexListEnvInline` silent mode to advance `state.pos`, preventing infinite loops in `skipToken` when `\begin{itemize}` or `\begin{enumerate}` appears in inline content.
+
+- Docs:
+  - Added implementation details in `pr-specs/2026-02-fix-stuck-render-malformed-table-close.md`.
+
 # January 2026
 
 ## [2.0.33] - 27 January 2026
