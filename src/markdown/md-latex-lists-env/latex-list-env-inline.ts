@@ -149,6 +149,7 @@ export const latexListEnvInline: RuleInline = (
     return false;
   }
   if (silent) {
+    state.pos = env.end;
     return true;
   }
   // Parse raw env using block logic

@@ -365,6 +365,14 @@ export const BeginTable: RuleBlock = (state, startLine, endLine, silent) => {
       break
       //if (state.isEmpty(nextLine+1)) { break }
     }
+    /** If we encounter a new \begin{table/figure} of the same type before finding
+     *  the closing tag, the current environment was never properly closed.
+     *  Bail out to avoid consuming content from a subsequent environment. */
+    const matchNewBegin = lineText.match(RE_BEGIN_TABLE_OR_FIGURE_WITH_PLACEMENT)
+      || lineText.match(RE_BEGIN_FIGURE_OR_TABLE_ENV);
+    if (matchNewBegin && matchNewBegin[1]?.trim() === type) {
+      break;
+    }
     if (resText && lineText) {
       resText += '\n' + lineText;
     } else {
