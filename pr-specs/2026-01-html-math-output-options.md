@@ -338,10 +338,17 @@ Added `autoRenderConfig` to existing webpack configuration:
 
 ## Distribution
 
-Browser bundle included in npm package, accessible via jsdelivr:
-- `https://cdn.jsdelivr.net/npm/mathpix-markdown-it@{version}/es5/browser/auto-render.js`
+Browser bundles included in npm package, accessible via jsdelivr:
 
-Context menu (pre-existing, separate bundle):
+| Bundle | Path | Purpose |
+|--------|------|---------|
+| `auto-render.js` | `es5/browser/auto-render.js` | Render MathML/LaTeX to SVG (for `output_format: 'mathml'` or `'latex'`) |
+| `add-speech.js` | `es5/browser/add-speech.js` | Add speech to already-rendered SVG (requires `mjx-assistive-mml` present) |
+| `context-menu.js` | `es5/context-menu.js` | Right-click copy menu (pre-existing, separate bundle) |
+
+CDN URLs:
+- `https://cdn.jsdelivr.net/npm/mathpix-markdown-it@{version}/es5/browser/auto-render.js`
+- `https://cdn.jsdelivr.net/npm/mathpix-markdown-it@{version}/es5/browser/add-speech.js`
 - `https://cdn.jsdelivr.net/npm/mathpix-markdown-it@{version}/es5/context-menu.js`
 
 This follows the existing pattern for `es5/bundle.js`.
@@ -421,6 +428,27 @@ MathpixRender.renderMathInElement(document.getElementById('content'), {
 });
 ```
 
+### Client-Side: Add Speech to Already-Rendered SVG
+
+Use `add-speech.js` when math was rendered server-side with `output_format: 'svg'` but without accessibility:
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/mathpix-markdown-it@latest/es5/browser/add-speech.js"></script>
+```
+
+Or manually:
+
+```javascript
+// After add-speech.js loads
+MathpixSpeech.addSpeechToRenderedMath(document.getElementById('content'));
+```
+
+This script:
+- Loads SRE (Speech Rule Engine) dynamically
+- Finds all `mjx-container` elements with `mjx-assistive-mml`
+- Adds `aria-label`, `role="math"`, `tabindex="0"` attributes
+- Creates hidden `<speech>` elements for context menu
+
 ---
 
 ## Constraints / Invariants
@@ -484,9 +512,11 @@ MathpixRender.renderMathInElement(document.getElementById('content'), {
 - [x] Bundle files included in npm package (`es5/browser/auto-render.js`)
 - [x] Accessibility improvements (`applyMathJaxA11y`, `aria-labelledby` support)
 - [x] `Status` updated to `Implemented`
+- [x] Separate `add-speech.js` bundle for adding speech to already-rendered SVG
+- [x] Shared `addSpeechToMathContainer()` function in `src/sre/index.ts`
+- [x] Changelog updated
 - [ ] Unit tests for new options
 - [ ] README updated with new options and browser bundle usage
-- [ ] Changelog updated
 
 Note: Context menu was already implemented separately (`src/context-menu.tsx` → `es5/context-menu.js`)
 

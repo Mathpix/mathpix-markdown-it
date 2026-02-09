@@ -237,5 +237,49 @@ const autoRenderConfig = Object.assign({}, config,{
   ],
 });
 
+const addSpeechConfig = Object.assign({}, config,{
+  name: "add-speech",
+  entry: {
+    main: [
+      path.join(__dirname, './src/browser/add-speech.ts'),
+    ]
+  },
+  output: {
+    path: path.resolve(__dirname, './es5/browser/'),
+    filename: 'add-speech.js',
+  },
+  module: {
+    rules: [
+      {
+        test: /\.ts?$/,
+        include: path.resolve(__dirname, 'src'),
+        exclude: /(node_modules|bower_components|lib)/,
+        loader: 'ts-loader',
+      },
+      {
+        test: /\.js?$/,
+        include: path.resolve(__dirname, 'src'),
+        exclude: /(node_modules|bower_components)/,
+        use: {
+          loader: 'babel-loader',
+        }
+      },
+      {
+        test: /\.css$/,
+        exclude: /node_modules/,
+        use: [
+          MiniCssExtractPlugin.loader,
+          "css-loader"
+        ]
+      }
+    ]
+  },
+  plugins: [
+    new NodePolyfillPlugin({
+      excludeAliases: ["console"]
+    })
+  ],
+});
+
 // Return Array of Configurations
-module.exports = [ indexConfig, bundleConfig, contextMenuConfig, copyToClipboardCodeConfig, autoRenderConfig ];
+module.exports = [ indexConfig, bundleConfig, contextMenuConfig, copyToClipboardCodeConfig, autoRenderConfig, addSpeechConfig ];

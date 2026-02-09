@@ -16,6 +16,13 @@
     - `assistive_mml`: Add `<mjx-assistive-mml>` for screen readers.
     - `include_speech`: Add `aria-label` with speech text.
 
+- Browser Speech Script (`add-speech.js`):
+  - New browser bundle for adding speech to already-rendered SVG at `es5/browser/add-speech.js`.
+  - Use when SVG was rendered with `assistiveMml: true` but without `sre` (speech).
+  - Loads SRE dynamically and adds `aria-label`, `role="math"`, `tabindex` to `mjx-container` elements.
+  - Requires `mjx-assistive-mml` to be present in the rendered output.
+  - Exposes `window.MathpixSpeech.addSpeechToRenderedMath(container?)`.
+
 - Fixes:
   - Fixed centering issue for equations with numbering inside `.math-block[data-width="full"]`.
 

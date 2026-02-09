@@ -325,7 +325,7 @@ if (isBrowser()) {
   }
   /**
    * Global API exposed for integrators (optional usage).
-   * - `renderMathInElement`: manual rendering entry point
+   * - `renderMathInElement`: render MathML/LaTeX content to SVG
    */
   (window as any).MathpixRender = {
     renderMathInElement
