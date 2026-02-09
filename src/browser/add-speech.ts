@@ -33,7 +33,7 @@ export const addSpeechToRenderedMath = async (container?: HTMLElement): Promise<
     const mathContainers: Element[] = Array.from(root.querySelectorAll('mjx-container'));
 
     for (const elMath of mathContainers) {
-      addSpeechToMathContainer(sre, elMath);
+      addSpeechToMathContainer(sre, elMath, document);
     }
   } catch (err) {
     console.error('[addSpeechToRenderedMath] SRE processing error:', err);

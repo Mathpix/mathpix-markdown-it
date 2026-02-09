@@ -13,14 +13,15 @@ export const getSpeech = (sre, mml): string => {
 
 /**
  * Process a single mjx-container element to add speech accessibility.
- * Returns true if speech was added, false otherwise.
  *
  * @param sre - Speech Rule Engine instance
  * @param elMath - The mjx-container element
+ * @param doc - Document object for creating elements (pass `document` in browser)
  */
 export const addSpeechToMathContainer = (
   sre: any,
-  elMath: Element
+  elMath: Element,
+  doc: Document
 ): void => {
   // Skip if already has aria-label
   if (elMath.hasAttribute('aria-label')) return;
@@ -35,7 +36,7 @@ export const addSpeechToMathContainer = (
   elMath.setAttribute('tabindex', '0');
   elMath.removeAttribute('aria-labelledby');
   // Add hidden speech element for context menu
-  const elSpeech = document.createElement('speech');
+  const elSpeech = doc.createElement('speech');
   elSpeech.innerHTML = speech;
   elSpeech.style.display = 'none';
   elMath.parentElement?.appendChild(elSpeech);
@@ -53,7 +54,7 @@ export const addAriaToMathHTML = (sre, html: string) => {
     }
 
     for (let i = 0; i < mathEls.length; i++) {
-      addSpeechToMathContainer(sre, mathEls[i]);
+      addSpeechToMathContainer(sre, mathEls[i], doc);
     }
 
     return doc.body.innerHTML;
