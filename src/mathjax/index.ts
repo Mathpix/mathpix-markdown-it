@@ -379,7 +379,7 @@ const renderByFormat = (data: IOuterData, outMath: any, forPptx = false): string
     case "latex":
       return "";
     case "mathml":
-      return formatSourceMML(data.mathml);
+      return data.mathml ? formatSourceMML(data.mathml) : "";
     default:
       return OuterHTML(data, outMath, forPptx);
   }
@@ -539,7 +539,9 @@ export const MathJax = {
     const outputJax = MJ.docMathML.outputJax as any;
     const outerDataMathMl: IOuterData = OuterDataMathMl(MJ.adaptor, node, outputJax.math, outMath, forDocx, accessibility);
     return {
-      html: OuterHTML(outerDataMathMl, options.outMath),
+      html: outMath?.output_format === 'mathml'
+        ? formatSourceMML(outerDataMathMl.mathml)
+        : OuterHTML(outerDataMathMl, options.outMath),
       data: {...outerDataMathMl}
     };
   },
@@ -554,7 +556,9 @@ export const MathJax = {
     });
     const outputJax = MJ.docAsciiMath.outputJax as any;
     const outerDataAscii = OuterDataAscii(MJ.adaptor, node, outputJax.math, outMath, forDocx, accessibility);
-    return OuterHTML(outerDataAscii, options.outMath);
+    return outMath?.output_format === 'mathml'
+      ? formatSourceMML(outerDataAscii.mathml)
+      : OuterHTML(outerDataAscii, options.outMath);
   },
 
   //

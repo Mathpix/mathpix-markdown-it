@@ -25,7 +25,7 @@ export interface MathpixRenderConfig {
 const defaultConfig: MathpixRenderConfig = {
   accessibility: {
     assistive_mml: true,
-    include_speech: true
+    include_speech: false
   },
   outMath: {
     output_format: "svg",
@@ -34,7 +34,7 @@ const defaultConfig: MathpixRenderConfig = {
     include_latex: true,
     include_mathml: true,
     include_mathml_word: true,
-    include_smiles: true ,
+    include_smiles: true,
     include_speech: true,
     include_table_markdown: true,
     include_tsv: true
@@ -229,8 +229,13 @@ export const renderMathInElement = async (
   container: HTMLElement,
   config?: Partial<MathpixRenderConfig>
 ): Promise<void> => {
-  const cfg: Partial<MathpixRenderConfig> = config ?? {};
-  const outMath: TOutputMath = cfg.outMath ?? {};
+  const cfg: MathpixRenderConfig = {
+    ...defaultConfig,
+    ...config,
+    accessibility: { ...defaultConfig.accessibility, ...config?.accessibility },
+    outMath: { ...defaultConfig.outMath, ...config?.outMath },
+  };
+  const outMath: TOutputMath = cfg.outMath;
   const cwidth: number = cfg.width && cfg.width > 0 ? cfg.width : 1200;
   // Collect candidates (we only typeset nodes that look like "raw math" input).
   const mathNodes = Array.from(
