@@ -23,6 +23,7 @@ describe('Accessibility math:', () => {
       describe('[markdownToHTML] set options {accessibility: { assistiveMml: true}}. ', () => {
         it('Checking result html. Should be includes <mjx-assistive-mml>...</mjx-assistive-mml>:', (done) => {
           const html = MM.markdownToHTML(test.mmd,  {
+            previewUuid: 'test-render',
             accessibility: {
               assistiveMml: true
             }

@@ -94,6 +94,12 @@ export const MathpixStyle = (
       overflow-x: auto;
       display: flex; /* mjx-container has flex */
     }
+
+    .math-block[data-width="full"] mjx-container[jax=SVG][display=true] {
+      display: flex;
+      flex: 1 1;
+      justify-content: center;
+    }
     
     svg .math-inline {
       display: initial;
