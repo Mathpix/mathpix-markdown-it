@@ -163,7 +163,7 @@ const OuterData = (adaptor, node, math, outMath, forDocx = false, accessibility?
       ? math.math
       : math.inputJax.processStrings ? '' : math.start.node.outerHTML);
   }
-  if (include_svg || output_format === 'svg') {
+  if (include_svg) {
     res.svg = adaptor.outerHTML(node);
     if (node) {
       const mathDimensions: IMathDimensions =
@@ -249,7 +249,7 @@ const OuterDataAscii = (adaptor, node, math, outMath, forDocx = false, accessibi
       ? math.math
       : math.inputJax.processStrings ? '' : math.start.node.outerHTML);
   }
-  if (include_svg || output_format === 'svg') {
+  if (include_svg) {
     res.svg = adaptor.outerHTML(node)
   }
 
@@ -294,7 +294,7 @@ const OuterDataMathMl = (adaptor, node, math, outMath, forDocx = false, accessib
     }
   }
 
-  if (include_svg || output_format === 'svg') {
+  if (include_svg) {
     res.svg = adaptor.outerHTML(node);
     if (node) {
       const mathDimensions: IMathDimensions =
@@ -366,6 +366,14 @@ export const OuterHTML = (data, outMath, forPptx: boolean = false) => {
   return outHTML;
 };
 
+/**
+ * Produces the rendered HTML string for a given output_format.
+ *
+ * Note: for "latex", this returns "" because the original LaTeX source is not
+ * available at this level (IOuterData doesn't carry it). The caller
+ * (buildFormatOutputs in convert-math-to-html.ts) replaces this empty string
+ * with the formatted LaTeX source via formatSource(inputLatex).
+ */
 const renderByFormat = (data: IOuterData, outMath: any, forPptx = false): string => {
   switch (outMath?.output_format) {
     case "latex":
@@ -381,7 +389,7 @@ export const MathJax = {
   assistiveMml: true,
   nonumbers: false,
   _a11y: {
-    renderKey: uid(),   // любой string
+    renderKey: uid(),
     counter: 0,
   },
 

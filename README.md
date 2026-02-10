@@ -767,6 +767,49 @@ The script automatically skips elements that have already been rendered.
 **Note:** For server-side rendering accessibility, use the [TAccessibility](#taccessibility) interface with `assistiveMml` and `sre` options instead.
 
 
+## Browser Speech Script (add-speech.js)
+
+Use this script to add speech accessibility to math that was already rendered server-side as SVG with `assistiveMml: true` but without SRE speech. It loads SRE dynamically and adds `aria-label` attributes to existing `mjx-container` elements.
+
+This is useful when you want fast server-side rendering without the SRE dependency, but still want speech accessibility on the client.
+
+### Prerequisites
+
+The rendered HTML must include `<mjx-assistive-mml>` elements (i.e., the server used `accessibility: { assistiveMml: true }`).
+
+### Loading the script
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/mathpix-markdown-it@latest/es5/browser/add-speech.js"></script>
+```
+
+By default, the script automatically processes `document.body` on `DOMContentLoaded`.
+
+### Usage
+
+```js
+// Add speech to all rendered math in a specific container
+window.MathpixSpeech.addSpeechToRenderedMath(document.getElementById('content'));
+```
+
+### Configuration
+
+Set `window.MathpixSpeechConfig` before the script loads to customize behavior:
+
+```js
+window.MathpixSpeechConfig = {
+  container: document.getElementById('math-content') // defaults to document.body
+};
+```
+
+### What it does
+
+For each `mjx-container` element that does not already have an `aria-label`:
+1. Extracts MathML from the `<mjx-assistive-mml>` child element
+2. Generates speech text using SRE (Speech Rule Engine)
+3. Sets `aria-label`, `role="math"`, and `tabindex="0"` on the container
+
+
 # Documentation
 
 ## React components

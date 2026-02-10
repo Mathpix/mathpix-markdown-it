@@ -23,6 +23,9 @@
   - Requires `mjx-assistive-mml` to be present in the rendered output.
   - Exposes `window.MathpixSpeech.addSpeechToRenderedMath(container?)`.
 
+- Accessibility:
+  - `mjx-assistive-mml` is no longer marked with `aria-hidden="true"` when accessibility options are enabled. Previously, the assistive MathML element was hidden from screen readers even when the user explicitly requested accessibility via `assistiveMml: true` or `sre`. Now, if any accessibility option is set, the MathML content is exposed to assistive technology — either via `aria-labelledby` (pointing to the assistive MML) or via `aria-label` (SRE speech text). This affects both server-side rendering (`addAriaToMathHTML`) and the new browser bundles.
+
 - Fixes:
   - Fixed centering issue for equations with numbering inside `.math-block[data-width="full"]`.
 

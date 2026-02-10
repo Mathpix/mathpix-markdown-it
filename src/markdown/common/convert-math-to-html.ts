@@ -4,7 +4,7 @@ import { addIntoLabelsList, eLabelType } from "./labels";
 import { envArraysShouldBeFlattenInTSV } from '../../helpers/consts';
 import { formatMathJaxError } from "../../helpers/utils";
 import { csvSeparatorsDef, mdSeparatorsDef, tsvSeparatorsDef } from './consts';
-import { formatSource } from "../../helpers/parse-mmd-element";
+import { formatSource, formatSourceMML } from "../../helpers/parse-mmd-element";
 
 type TypesetResult = {
   /** Rendered HTML string for this math token (SVG/MathML/LaTeX depending on output_format). */
@@ -116,6 +116,16 @@ const typesetMathForToken = (params: {
       accessibility: options.accessibility,
       renderingErrors: options.renderingErrors,
     });
+    // Respect output_format where conversion is possible:
+    // - 'mathml': return MathML source directly (we have it from the MathJax parse tree).
+    // - 'latex': no MathML→LaTeX converter available; fall back to SVG.
+    // - 'svg' (default): standard SVG rendering.
+    if (outputFormat === 'mathml') {
+      return {
+        html: formatSourceMML(typeset.data?.mathml ?? math),
+        data: null,
+      };
+    }
     return {
       html: typeset.html,
       data: typeset.data,

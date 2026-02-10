@@ -231,6 +231,7 @@ export const renderMathInElement = async (
 ): Promise<void> => {
   const cfg: Partial<MathpixRenderConfig> = config ?? {};
   const outMath: TOutputMath = cfg.outMath ?? {};
+  const cwidth: number = cfg.width && cfg.width > 0 ? cfg.width : 1200;
   // Collect candidates (we only typeset nodes that look like "raw math" input).
   const mathNodes = Array.from(
     container.querySelectorAll<HTMLElement>('.math-inline, .math-block')
@@ -244,7 +245,7 @@ export const renderMathInElement = async (
     const target: TypesetTarget = shouldTypesetNode(mathEl);
     if (!target) continue;
     try {
-      const metric = { cwidth: 1200 };
+      const metric = { cwidth };
       const result = target.kind === 'mathml'
         ? MathJax.TypesetMathML(target.mathml, {
           display: target.display,
