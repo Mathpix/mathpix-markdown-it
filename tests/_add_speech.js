@@ -80,13 +80,13 @@ describe('add-speech (addSpeechToMathContainer):', () => {
       addSpeechToMathContainer(sre, mjx, dom.window.document);
       mjx.hasAttribute('aria-label').should.be.false;
     });
-    it('produces meaningful speech text (not empty)', () => {
+    it('produces meaningful speech text for a fraction', () => {
       const dom = renderAndParse('$\\frac{a}{b}$');
       const mjx = dom.window.document.querySelector('mjx-container');
       addSpeechToMathContainer(sre, mjx, dom.window.document);
       const speech = mjx.getAttribute('aria-label');
-      // Speech should contain actual words describing the fraction
-      speech.length.should.be.above(2);
+      speech.length.should.be.above(10);
+      speech.toLowerCase().should.match(/fraction|over|divided/);
     });
   });
   // ─── addAriaToMathHTML (string-based API) ──────────────────────────
