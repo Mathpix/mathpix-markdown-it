@@ -1,6 +1,6 @@
 # February 2026
 
-## [2.0.35] - 9 February 2026
+## [2.0.36] - 16 February 2026
 
 - Math Output Format:
   - Added `output_format` option to `TOutputMath` to control which math format is placed in HTML output.
@@ -31,6 +31,16 @@
 
 - Docs:
   - Added implementation details in `pr-specs/2026-01-html-math-output-options.md`.
+
+## [2.0.35] - 13 February 2026
+
+- Tabular:
+  - When `forMD` option is set, `renderTableCellContent` now delegates `image`/`includegraphics` rendering to the caller's render rules instead of hardcoding `![alt](src)`.
+  - Added `isTableCell` meta flag on child tokens when `forMD` is set, allowing render rules to escape pipe characters in alt text.
+  - Added null-safety for `attrGet('alt')` in the default image rendering path.
+
+- Docs:
+  - Added implementation details in `pr-specs/2026-02-formd-delegate-image-rendering-in-table-cells.md`.
 
 ## [2.0.34] - 7 February 2026
 

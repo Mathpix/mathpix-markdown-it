@@ -71,6 +71,9 @@ export const renderTableCellContent = (
           continue;
         }
       }
+      if (options?.forMD) {
+        child.meta = { ...(child.meta ?? {}), isTableCell: true };
+      }
       let rendered = slf.renderInline([child], options, env);
       const smoothedRendered = Array.isArray(child.tableSmoothed)
         ? child.tableSmoothed?.length > 0
@@ -137,7 +140,9 @@ export const renderTableCellContent = (
           const src = child.attrGet('src');
           tsvCell += src;
           csvCell += src;
-          mdCell += `![${child.attrGet('alt')}](${src})`.replace(/\|/g, '\\|');
+          mdCell += options?.forMD
+            ? rendered
+            : `![${child.attrGet('alt') ?? ''}](${src})`.replace(/\|/g, '\\|');
           continue;
         }
         case 'code':

@@ -914,9 +914,18 @@ module.exports = [
       '| :--- | :---: |\n' +
       '| 2 | 2 |'
   },  
-  // {
-  //   id: 40,
-  //   latex: '',
-  //   table_markdown:  ''
-  // },
+  {
+    id: 50,
+    latex: '\\begin{tabular}{|l|l|}\n' +
+      '\\hline\n' +
+      '\\textbf{Case} & \\textbf{Image} \\\\\n' +
+      '\\hline\n' +
+      'LaTeX image without options (should be resolved) &\n' +
+      '\\includegraphics{https://mathpix-ocr-examples.s3.amazonaws.com/cases_printed_1.jpg}\\\\\n' +
+      '\\hline\n' +
+      '\\end{tabular}',
+    table_markdown:  '| **Case** | **Image** |\n' +
+      '| :--- | :--- |\n' +
+      '| LaTeX image without options (should be resolved) | ![](https://mathpix-ocr-examples.s3.amazonaws.com/cases_printed_1.jpg) |'
+  },
 ];
