@@ -29,15 +29,7 @@ const defaultConfig: MathpixRenderConfig = {
   },
   outMath: {
     output_format: "svg",
-    include_svg: true,
-    include_asciimath: true,
-    include_latex: true,
-    include_mathml: true,
-    include_mathml_word: true,
-    include_smiles: true,
-    include_speech: true,
-    include_table_markdown: true,
-    include_tsv: true
+    include_svg: true
   },
   width: 1200
 };
