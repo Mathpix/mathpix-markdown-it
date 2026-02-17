@@ -60,7 +60,8 @@ const needSpaceAfter = (node): boolean => {
       return false;
     }
     const parentKind = node.parent && (node.parent as any).kind;
-    if (parentKind === 'msub' || parentKind === 'msup' || parentKind === 'msubsup') {
+    if (parentKind === 'msub' || parentKind === 'msup' || parentKind === 'msubsup'
+      || parentKind === 'munderover' || parentKind === 'munder' || parentKind === 'mover') {
       return false;
     }
     const index = node.parent.childNodes.findIndex(item => item === node);
@@ -376,6 +377,14 @@ const mroot = () => {
   };
 };
 
+// Typst accent shorthand functions that can be called as fn(content).
+// Accents NOT in this set must use the accent(content, symbol) form.
+const TYPST_ACCENT_SHORTHANDS: Set<string> = new Set([
+  'hat', 'tilde', 'acute', 'grave', 'macron', 'overline', 'underline',
+  'breve', 'dot', 'diaer', 'caron', 'arrow',
+  'overbrace', 'underbrace', 'overbracket', 'underbracket',
+]);
+
 // --- MOVER handler: accents and overbrace ---
 const mover = () => {
   return (node, serialize): ITypstData => {
@@ -389,10 +398,14 @@ const mover = () => {
         const accentChar = getChildrenText(secondChild);
         const accentFn = typstAccentMap.get(accentChar);
         if (accentFn) {
-          // Known accent: use Typst accent function
-          res = addToTypstData(res, {
-            typst: accentFn + '(' + dataFirst.typst.trim() + ')'
-          });
+          const content = dataFirst.typst.trim();
+          if (TYPST_ACCENT_SHORTHANDS.has(accentFn)) {
+            // Shorthand accent: fn(content)
+            res = addToTypstData(res, { typst: accentFn + '(' + content + ')' });
+          } else {
+            // Non-shorthand accent: accent(content, symbol)
+            res = addToTypstData(res, { typst: 'accent(' + content + ', ' + accentFn + ')' });
+          }
           return res;
         }
       }
@@ -433,9 +446,12 @@ const munder = () => {
         if (accentFn === 'overline') { accentFn = 'underline'; }
         if (accentFn === 'overbrace') { accentFn = 'underbrace'; }
         if (accentFn) {
-          res = addToTypstData(res, {
-            typst: accentFn + '(' + dataFirst.typst.trim() + ')'
-          });
+          const content = dataFirst.typst.trim();
+          if (TYPST_ACCENT_SHORTHANDS.has(accentFn)) {
+            res = addToTypstData(res, { typst: accentFn + '(' + content + ')' });
+          } else {
+            res = addToTypstData(res, { typst: 'accent(' + content + ', ' + accentFn + ')' });
+          }
           return res;
         }
       }

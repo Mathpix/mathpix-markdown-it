@@ -1,7 +1,31 @@
 import { MmlVisitor } from 'mathjax-full/js/core/MmlTree/MmlVisitor.js';
-import { MmlNode, TextNode, XMLNode } from 'mathjax-full/js/core/MmlTree/MmlNode.js';
+import { MmlNode, TextNode, XMLNode, TEXCLASS } from 'mathjax-full/js/core/MmlTree/MmlNode.js';
 import { handle } from './handlers';
 import { ITypstData, addToTypstData, initTypstData } from './common';
+
+// Extract big delimiter info from a TeXAtom node wrapping a sized mo.
+// The TeXAtom itself may have texClass=0 (ORD); the OPEN/CLOSE class
+// is on the inner inferredMrow or mo node.
+// Returns { delim, size, isOpen } if found, or null.
+const getBigDelimInfo = (node: any): { delim: string, size: string, isOpen: boolean } | null => {
+  try {
+    if (node.kind !== 'TeXAtom') return null;
+    // TeXAtom > inferredMrow > mo(minsize/maxsize)
+    const inferred = node.childNodes?.[0];
+    if (!inferred || !inferred.isInferred) return null;
+    const mo = inferred.childNodes?.[0];
+    if (!mo || mo.kind !== 'mo') return null;
+    const atr = mo.attributes?.getAllAttributes() || {};
+    if (!atr.minsize) return null;
+    // Check if this is OPEN or CLOSE via the mo or inferredMrow texClass
+    const tc = mo.texClass ?? inferred.texClass ?? node.texClass;
+    if (tc !== TEXCLASS.OPEN && tc !== TEXCLASS.CLOSE) return null;
+    const delim = mo.childNodes?.[0]?.text || '';
+    return { delim, size: atr.minsize.toString(), isOpen: tc === TEXCLASS.OPEN };
+  } catch (e) {
+    return null;
+  }
+};
 
 export interface ITypstVisitorOptions {
   [key: string]: any;
@@ -42,18 +66,57 @@ export class SerializedTypstVisitor extends MmlVisitor {
   public visitInferredMrowNode(node: MmlNode, space: string): ITypstData {
     let res: ITypstData = initTypstData();
     try {
-      for (let j = 0; j < node.childNodes.length; j++) {
+      let j = 0;
+      while (j < node.childNodes.length) {
         const child: any = node.childNodes[j];
+        // Detect big delimiter pattern: TeXAtom(OPEN) ... TeXAtom(CLOSE)
+        // with sized mo (from \big, \Big, \bigg, \Bigg)
+        const openInfo = getBigDelimInfo(child);
+        if (openInfo && openInfo.isOpen) {
+          // Find matching CLOSE
+          let closeIdx = -1;
+          for (let k = j + 1; k < node.childNodes.length; k++) {
+            const closeCandidate = getBigDelimInfo(node.childNodes[k]);
+            if (closeCandidate && !closeCandidate.isOpen) {
+              closeIdx = k;
+              break;
+            }
+          }
+          if (closeIdx >= 0) {
+            const closeInfo = getBigDelimInfo(node.childNodes[closeIdx]);
+            // Serialize content between delimiters
+            let content = '';
+            for (let k = j + 1; k < closeIdx; k++) {
+              const innerData: ITypstData = this.visitNode(node.childNodes[k], space);
+              if (content && innerData.typst
+                && /^[\w.]/.test(innerData.typst)
+                && !/[\s({[,]$/.test(content)) {
+                content += ' ';
+              }
+              content += innerData.typst;
+            }
+            const lrContent = openInfo.delim + ' ' + content.trim() + ' ' + (closeInfo?.delim || ')');
+            const lrExpr = 'lr(size: #' + openInfo.size + ', ' + lrContent + ')';
+            // Add spacing before lr if needed
+            if (res.typst && /^[\w.]/.test(lrExpr)
+              && !/[\s({[,]$/.test(res.typst)) {
+              res.typst += ' ';
+            }
+            res = addToTypstData(res, { typst: lrExpr });
+            j = closeIdx + 1;
+            continue;
+          }
+        }
+        // Normal processing
         const data: ITypstData = this.visitNode(child, space);
-        // Insert space between adjacent children when needed for Typst parsing:
-        // if next child starts with a word char/dot, and previous output doesn't
-        // end with whitespace or an opening bracket/comma, add a separator space
+        // Insert space between adjacent children when needed for Typst parsing
         if (res.typst && data.typst
           && /^[\w.]/.test(data.typst)
           && !/[\s({[,]$/.test(res.typst)) {
           res.typst += ' ';
         }
         res = addToTypstData(res, data);
+        j++;
       }
       return res;
     } catch (e) {

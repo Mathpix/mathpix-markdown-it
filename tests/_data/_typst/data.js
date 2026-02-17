@@ -183,6 +183,21 @@ module.exports = [
   // === Boxed ===
   { latex: `\\boxed{x=1}`, typst: `#box(stroke: 0.5pt, inset: 3pt, $x = 1$)` },
 
+  // === Big delimiters ===
+  { latex: `\\big( x \\big)`, typst: `lr(size: #1.2em, ( x ))` },
+  { latex: `\\Big( x \\Big)`, typst: `lr(size: #1.623em, ( x ))` },
+  { latex: `\\bigg( x \\bigg)`, typst: `lr(size: #2.047em, ( x ))` },
+  { latex: `\\Bigg( x \\Bigg)`, typst: `lr(size: #2.470em, ( x ))` },
+
+  // === Non-shorthand accents ===
+  { latex: `\\overleftarrow{AB}`, typst: `accent(A B, arrow.l)` },
+
+  // === Math italic ===
+  { latex: `\\mathit{word}`, typst: `italic(word)` },
+
+  // === Int with limits ===
+  { latex: `\\int\\limits_0^1`, typst: `integral_0^1` },
+
   // === Nested expressions ===
   { latex: `\\frac{\\sum_{i=1}^{n} x_i}{n}`, typst: `frac(sum_(i = 1)^n x_i, n)` },
   { latex: `\\sqrt{\\frac{a}{b}}`, typst: `sqrt(frac(a, b))` },
