@@ -65,7 +65,7 @@ const toAsciiML = ((node, optionAscii): IAsciiData => {
 const toTypstML = ((node, optionTypst?): string => {
   const visitorT = new SerializedTypstVisitor(optionTypst);
   const data: ITypstData = visitorT.visitTree(node);
-  return data?.typst ? data.typst.trim() : '';
+  return data?.typst ? data.typst.trim().replace(/ {2,}/g, ' ') : '';
 });
 
 const applySpeechToNode = (adaptor, node, sre): string => {

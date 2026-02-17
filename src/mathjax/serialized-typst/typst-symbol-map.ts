@@ -71,7 +71,7 @@ const binaryOperators: ReadonlyArray<[string, string]> = [
   ["\u2020", "dagger"],           // †
   ["\u2021", "dagger.double"],    // ‡
   ["\u2210", "product.co"],       // ∐
-  ["\u2212", "minus"],            // −
+  ["\u2212", "-"],                // − (use ASCII minus for natural Typst output)
 ];
 
 // Relation operators: Unicode → Typst symbol name

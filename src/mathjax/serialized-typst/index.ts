@@ -45,6 +45,14 @@ export class SerializedTypstVisitor extends MmlVisitor {
       for (let j = 0; j < node.childNodes.length; j++) {
         const child: any = node.childNodes[j];
         const data: ITypstData = this.visitNode(child, space);
+        // Insert space between adjacent children when needed for Typst parsing:
+        // if next child starts with a word char/dot, and previous output doesn't
+        // end with whitespace or an opening bracket/comma, add a separator space
+        if (res.typst && data.typst
+          && /^[\w.]/.test(data.typst)
+          && !/[\s({[,]$/.test(res.typst)) {
+          res.typst += ' ';
+        }
         res = addToTypstData(res, data);
       }
       return res;

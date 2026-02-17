@@ -42,7 +42,11 @@ const needSpaceBefore = (node): boolean => {
     if (prev.kind === 'mi' || prev.kind === 'mo') {
       const text = (prev.childNodes[0] as any)?.text || '';
       const prevTypst = findTypstSymbol(text);
-      return /\w$/.test(prevTypst);
+      // Any word char or dot at end of previous Typst output needs separation
+      return /[\w.]$/.test(prevTypst);
+    }
+    if (prev.kind === 'mn') {
+      return true;
     }
     return false;
   } catch (e) {
@@ -67,13 +71,30 @@ const needSpaceAfter = (node): boolean => {
     if (next && (next.kind === 'mi' || next.kind === 'mo')) {
       const text = (next.childNodes[0] as any)?.text || '';
       const nextTypst = findTypstSymbol(text);
-      return /^\w/.test(nextTypst);
+      // Any word char or dot at start of next Typst output needs separation
+      return /^[\w.]/.test(nextTypst);
+    }
+    if (next && next.kind === 'mn') {
+      return true;
     }
     return false;
   } catch (e) {
     return false;
   }
 };
+
+// Built-in Typst math function names — these are already rendered upright
+// and should NOT be wrapped in upright()
+const TYPST_MATH_OPERATORS: Set<string> = new Set([
+  'sin', 'cos', 'tan', 'cot', 'sec', 'csc',
+  'arcsin', 'arccos', 'arctan',
+  'sinh', 'cosh', 'tanh', 'coth',
+  'exp', 'log', 'ln', 'lg',
+  'det', 'dim', 'gcd', 'mod',
+  'inf', 'sup', 'lim', 'liminf', 'limsup',
+  'max', 'min', 'arg', 'deg', 'hom', 'ker',
+  'Pr', 'tr',
+]);
 
 // --- MI handler: identifiers ---
 const mi = () => {
@@ -91,10 +112,12 @@ const mi = () => {
       const atr = getAttributes(node);
       const mathvariant: string = atr?.mathvariant || '';
       const isKnownSymbol = typstSymbolMap.has(value);
+      const isKnownOperator = TYPST_MATH_OPERATORS.has(value);
       let typstValue: string = findTypstSymbol(value);
       // Apply font wrapping if mathvariant is set and not the default italic
       // Skip font wrapping for known symbols (e.g. \infty with mathvariant="normal")
-      if (mathvariant && mathvariant !== 'italic' && !isKnownSymbol) {
+      // Skip font wrapping for built-in Typst math operators (sin, cos, log, etc.)
+      if (mathvariant && mathvariant !== 'italic' && !isKnownSymbol && !isKnownOperator) {
         const fontFn = typstFontMap.get(mathvariant);
         if (fontFn) {
           typstValue = fontFn + '(' + typstValue + ')';
@@ -185,6 +208,14 @@ const mtext = () => {
       }
       // Replace non-breaking spaces with regular spaces
       value = value.replace(/\u00A0/g, ' ');
+      // Check if this is a single symbol character with a known Typst mapping
+      if (value.length === 1 && typstSymbolMap.has(value)) {
+        const typstValue = findTypstSymbol(value);
+        const spaceBefore = needSpaceBefore(node) ? ' ' : '';
+        const spaceAfter = needSpaceAfter(node) ? ' ' : '';
+        res = addToTypstData(res, { typst: spaceBefore + typstValue + spaceAfter });
+        return res;
+      }
       // In Typst math, text is wrapped in double quotes
       res = addToTypstData(res, { typst: '"' + value + '"' });
       return res;
@@ -386,7 +417,10 @@ const munder = () => {
       const dataSecond: ITypstData = secondChild ? serialize.visitNode(secondChild, '') : initTypstData();
       if (secondChild && secondChild.kind === 'mo') {
         const accentChar = getChildrenText(secondChild);
-        const accentFn = typstAccentMap.get(accentChar);
+        let accentFn = typstAccentMap.get(accentChar);
+        // Flip over-accents to under-accents when used in munder context
+        if (accentFn === 'overline') { accentFn = 'underline'; }
+        if (accentFn === 'overbrace') { accentFn = 'underbrace'; }
         if (accentFn) {
           res = addToTypstData(res, {
             typst: accentFn + '(' + dataFirst.typst.trim() + ')'
@@ -581,30 +615,92 @@ const mrow = () => {
       // If this mrow wraps a matrix, let mtable handle the delimiters
       const hasTableChild = node.childNodes.some(child => child.kind === 'mtable');
       if (isLeftRight && !hasTableChild) {
-        // Use lr() for auto-sizing delimiters
+        // Serialize inner children, skipping the delimiter mo nodes
+        // (delimiters are reconstructed from the open/close properties)
         let content = '';
         for (let i = 0; i < node.childNodes.length; i++) {
-          const data: ITypstData = serialize.visitNode(node.childNodes[i], '');
+          const child = node.childNodes[i];
+          // Skip opening delimiter mo (first child matching open property)
+          if (i === 0 && child.kind === 'mo') {
+            const moText = getChildrenText(child);
+            if (moText === openDelim || (!moText && !openDelim)) {
+              continue;
+            }
+          }
+          // Skip closing delimiter mo (last child matching close property)
+          if (i === node.childNodes.length - 1 && child.kind === 'mo') {
+            const moText = getChildrenText(child);
+            if (moText === closeDelim || (!moText && !closeDelim)) {
+              continue;
+            }
+          }
+          const data: ITypstData = serialize.visitNode(child, '');
           content += data.typst;
         }
         // Map delimiter characters to Typst
-        let open = openDelim || '';
-        let close = closeDelim || '';
-        // Handle invisible delimiters (empty string from \left. or \right.)
-        if (hasOpen && !openDelim) {
-          open = '#none';
+        let open = openDelim ? mapDelimiter(openDelim) : '';
+        let close = closeDelim ? mapDelimiter(closeDelim) : '';
+        const hasVisibleOpen = !!open;
+        const hasVisibleClose = !!close;
+        if (hasVisibleOpen && hasVisibleClose) {
+          // Both delimiters visible: use lr() for auto-sizing
+          res = addToTypstData(res, { typst: 'lr(' + open + ' ' + content.trim() + ' ' + close + ')' });
+        } else {
+          // One or both delimiters invisible: emit directly without lr()
+          // (lr() requires balanced parens in Typst syntax)
+          const trimmed = content.trim();
+          if (hasVisibleOpen) {
+            res = addToTypstData(res, { typst: open + ' ' + trimmed });
+          } else if (hasVisibleClose) {
+            res = addToTypstData(res, { typst: trimmed + ' ' + close });
+          } else {
+            res = addToTypstData(res, { typst: trimmed });
+          }
         }
-        if (hasClose && !closeDelim) {
-          close = '#none';
+      } else if (isLeftRight && hasTableChild) {
+        // Matrix/cases inside \left...\right: skip delimiter mo children
+        // (the mtable handler uses the parent mrow's open/close properties for delimiters)
+        for (let i = 0; i < node.childNodes.length; i++) {
+          const child = node.childNodes[i];
+          if (i === 0 && child.kind === 'mo') {
+            const moText = getChildrenText(child);
+            if (moText === openDelim || (!moText && !openDelim)) { continue; }
+          }
+          if (i === node.childNodes.length - 1 && child.kind === 'mo') {
+            const moText = getChildrenText(child);
+            if (moText === closeDelim || (!moText && !closeDelim)) { continue; }
+          }
+          const data: ITypstData = serialize.visitNode(child, '');
+          res = addToTypstData(res, data);
         }
-        // Map Unicode delimiters
-        if (open) { open = mapDelimiter(open); }
-        if (close) { close = mapDelimiter(close); }
-        res = addToTypstData(res, { typst: 'lr(' + open + ' ' + content.trim() + ' ' + close + ')' });
       } else {
-        // Regular mrow: just concatenate children
+        // Check for OPEN/CLOSE mrow pattern wrapping a binom
+        // MathJax represents \binom{n}{k} as mrow(ORD) > [mrow(OPEN), mfrac(linethickness=0), mrow(CLOSE)]
+        // Since binom() in Typst already includes parens, skip the delimiter mrows
+        if (node.childNodes.length === 3) {
+          const first = node.childNodes[0];
+          const middle = node.childNodes[1];
+          const last = node.childNodes[2];
+          if (middle.kind === 'mfrac') {
+            const midAtr = getAttributes(middle);
+            if (midAtr && midAtr.linethickness === '0'
+              && first.texClass === TEXCLASS.OPEN
+              && last.texClass === TEXCLASS.CLOSE) {
+              // binom() in Typst already includes parentheses — skip OPEN/CLOSE wrappers
+              const data: ITypstData = serialize.visitNode(middle, '');
+              res = addToTypstData(res, data);
+              return res;
+            }
+          }
+        }
+        // Regular mrow: concatenate children with spacing to prevent merging
         for (let i = 0; i < node.childNodes.length; i++) {
           const data: ITypstData = serialize.visitNode(node.childNodes[i], '');
+          if (res.typst && data.typst
+            && /^[\w.]/.test(data.typst)
+            && !/[\s({[,]$/.test(res.typst)) {
+            res.typst += ' ';
+          }
           res = addToTypstData(res, data);
         }
       }
@@ -667,9 +763,9 @@ const menclose = () => {
       const data: ITypstData = handlerApi.handleAll(node, serialize);
       const content = data.typst.trim();
       if (notation.indexOf('updiagonalstrike') > -1 || notation.indexOf('downdiagonalstrike') > -1) {
-        // \bcancel uses updiagonalstrike, \cancel uses downdiagonalstrike
-        // In Typst: cancel(x) for \cancel, cancel(inverted: true, x) for \bcancel
-        if (notation.indexOf('updiagonalstrike') > -1 && notation.indexOf('downdiagonalstrike') === -1) {
+        // \cancel uses updiagonalstrike (lower-left to upper-right) → Typst cancel() default
+        // \bcancel uses downdiagonalstrike (upper-left to lower-right) → Typst cancel(inverted: true)
+        if (notation.indexOf('downdiagonalstrike') > -1 && notation.indexOf('updiagonalstrike') === -1) {
           res = addToTypstData(res, { typst: 'cancel(inverted: true, ' + content + ')' });
         } else {
           res = addToTypstData(res, { typst: 'cancel(' + content + ')' });
@@ -706,6 +802,41 @@ const handleAll = (node, serialize): ITypstData => {
   }
 };
 
+// --- MSTYLE handler: skip operator-internal spacing, pass through otherwise ---
+const mstyle = () => {
+  return (node, serialize): ITypstData => {
+    let res: ITypstData = initTypstData();
+    try {
+      // MathJax wraps mstyle children in an inferredMrow.
+      // Check if this mstyle only contains mspace nodes
+      const children = node.childNodes || [];
+      if (children.length === 1 && children[0].isInferred) {
+        const innerChildren = children[0].childNodes || [];
+        const hasOnlySpaces = innerChildren.length > 0
+          && innerChildren.every((child) => child.kind === 'mspace');
+        if (hasOnlySpaces) {
+          // Only skip if this is operator-internal spacing (e.g. around \oint)
+          // not explicit user spacing (e.g. \, \quad).
+          // Check if any ancestor (up to 3 levels) has texClass OP.
+          let isOperatorSpacing = false;
+          let p = node.parent;
+          for (let d = 0; d < 10 && p; d++) {
+            if (p.texClass === TEXCLASS.OP) { isOperatorSpacing = true; break; }
+            p = p.parent;
+          }
+          if (isOperatorSpacing) {
+            return res;
+          }
+        }
+      }
+      // Otherwise, process children normally
+      return handlerApi.handleAll(node, serialize);
+    } catch (e) {
+      return res;
+    }
+  };
+};
+
 const handlerApi = {
   handle: handle,
   handleAll: handleAll
@@ -731,4 +862,5 @@ const handlers: { [key: string]: (node, serialize) => ITypstData } = {
   mpadded: mpadded(),
   mroot: mroot(),
   menclose: menclose(),
+  mstyle: mstyle(),
 };
