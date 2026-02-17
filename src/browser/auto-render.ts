@@ -20,6 +20,7 @@ export interface MathpixRenderConfig {
   outMath: TOutputMath;
   /** Container width used for layout metrics (cwidth) */
   width?: number;
+  previewUuid?: string;
 }
 
 const defaultConfig: MathpixRenderConfig = {
@@ -236,7 +237,7 @@ export const renderMathInElement = async (
   // Build accessibility options once per render session (loading SRE can be async/expensive).
   const accessibility: TAccessibility = await buildAccessibilityOptions(cfg.accessibility);
   // Start a new "render session" so a11y ids (aria-labelledby) can be generated consistently.
-  MathJax.beginRender();
+  MathJax.beginRender(cfg?.previewUuid);
   MathJax.Reset();
   for (const mathEl of mathNodes) {
     const target: TypesetTarget = shouldTypesetNode(mathEl);

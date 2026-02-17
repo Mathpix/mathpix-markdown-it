@@ -10,6 +10,7 @@ export interface MathpixRenderConfig {
     outMath: TOutputMath;
     /** Container width used for layout metrics (cwidth) */
     width?: number;
+    previewUuid?: string;
 }
 /**
  * Typeset MathJax math inside a container element.
