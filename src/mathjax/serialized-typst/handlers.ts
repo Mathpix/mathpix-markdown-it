@@ -59,7 +59,8 @@ const needSpaceAfter = (node): boolean => {
     if (isLastChild(node)) {
       return false;
     }
-    if (node.parent && (node.parent as any).kind === 'msubsup') {
+    const parentKind = node.parent && (node.parent as any).kind;
+    if (parentKind === 'msub' || parentKind === 'msup' || parentKind === 'msubsup') {
       return false;
     }
     const index = node.parent.childNodes.findIndex(item => item === node);
@@ -217,7 +218,17 @@ const mtext = () => {
         return res;
       }
       // In Typst math, text is wrapped in double quotes
-      res = addToTypstData(res, { typst: '"' + value + '"' });
+      let textContent = '"' + value + '"';
+      // Apply font wrapping if mathvariant is set (e.g. \textbf, \textit)
+      const atr = getAttributes(node);
+      const mathvariant: string = atr?.mathvariant || '';
+      if (mathvariant && mathvariant !== 'normal') {
+        const fontFn = typstFontMap.get(mathvariant);
+        if (fontFn) {
+          textContent = fontFn + '(' + textContent + ')';
+        }
+      }
+      res = addToTypstData(res, { typst: textContent });
       return res;
     } catch (e) {
       return res;
@@ -234,9 +245,9 @@ const mfrac = () => {
       const secondChild = node.childNodes[1] || null;
       const dataFirst: ITypstData = firstChild ? serialize.visitNode(firstChild, '') : initTypstData();
       const dataSecond: ITypstData = secondChild ? serialize.visitNode(secondChild, '') : initTypstData();
-      // Check for linethickness="0" which indicates \binom
+      // Check for linethickness=0 which indicates \binom (\choose)
       const atr = getAttributes(node);
-      if (atr && atr.linethickness === '0') {
+      if (atr && (atr.linethickness === '0' || atr.linethickness === 0)) {
         res = addToTypstData(res, { typst: 'binom(' + dataFirst.typst.trim() + ', ' + dataSecond.typst.trim() + ')' });
       } else {
         res = addToTypstData(res, { typst: 'frac(' + dataFirst.typst.trim() + ', ' + dataSecond.typst.trim() + ')' });
@@ -563,8 +574,11 @@ const mtable = () => {
       for (let i = 0; i < countRow; i++) {
         const mtrNode = node.childNodes[i];
         const countColl = mtrNode.childNodes?.length || 0;
+        // For mlabeledtr (numbered equation rows), the first child is the
+        // equation number label — skip it so we only emit the math content
+        const startCol = mtrNode.kind === 'mlabeledtr' ? 1 : 0;
         const cells: string[] = [];
-        for (let j = 0; j < countColl; j++) {
+        for (let j = startCol; j < countColl; j++) {
           const mtdNode = mtrNode.childNodes[j];
           const cellData: ITypstData = serialize.visitNode(mtdNode, '');
           cells.push(cellData.typst.trim());
@@ -572,6 +586,9 @@ const mtable = () => {
         if (isEqnArray) {
           // For equation arrays (align, gather, etc.), join cells with spaces
           rows.push(cells.join(' '));
+        } else if (isCases) {
+          // Cases: cells within a row joined with & for alignment
+          rows.push(cells.join(' & '));
         } else {
           rows.push(cells.join(', '));
         }
@@ -683,7 +700,7 @@ const mrow = () => {
           const last = node.childNodes[2];
           if (middle.kind === 'mfrac') {
             const midAtr = getAttributes(middle);
-            if (midAtr && midAtr.linethickness === '0'
+            if (midAtr && (midAtr.linethickness === '0' || midAtr.linethickness === 0)
               && first.texClass === TEXCLASS.OPEN
               && last.texClass === TEXCLASS.CLOSE) {
               // binom() in Typst already includes parentheses — skip OPEN/CLOSE wrappers
@@ -753,6 +770,14 @@ const mpadded = () => {
   };
 };
 
+// --- MPHANTOM handler: invisible content ---
+// Typst math mode has no phantom() equivalent, so drop the content
+const mphantom = () => {
+  return (_node, _serialize): ITypstData => {
+    return initTypstData();
+  };
+};
+
 // --- MENCLOSE handler: cancel, strikethrough ---
 const menclose = () => {
   return (node, serialize): ITypstData => {
@@ -762,11 +787,14 @@ const menclose = () => {
       const notation: string = atr?.notation?.toString() || '';
       const data: ITypstData = handlerApi.handleAll(node, serialize);
       const content = data.typst.trim();
-      if (notation.indexOf('updiagonalstrike') > -1 || notation.indexOf('downdiagonalstrike') > -1) {
+      if (notation.indexOf('box') > -1) {
+        // \boxed → #box with stroke
+        res = addToTypstData(res, { typst: '#box(stroke: 0.5pt, inset: 3pt, $' + content + '$)' });
+      } else if (notation.indexOf('updiagonalstrike') > -1 || notation.indexOf('downdiagonalstrike') > -1) {
         // \cancel uses updiagonalstrike (lower-left to upper-right) → Typst cancel() default
         // \bcancel uses downdiagonalstrike (upper-left to lower-right) → Typst cancel(inverted: true)
         if (notation.indexOf('downdiagonalstrike') > -1 && notation.indexOf('updiagonalstrike') === -1) {
-          res = addToTypstData(res, { typst: 'cancel(inverted: true, ' + content + ')' });
+          res = addToTypstData(res, { typst: 'cancel(inverted: #true, ' + content + ')' });
         } else {
           res = addToTypstData(res, { typst: 'cancel(' + content + ')' });
         }
@@ -829,8 +857,19 @@ const mstyle = () => {
           }
         }
       }
-      // Otherwise, process children normally
-      return handlerApi.handleAll(node, serialize);
+      // Handle mathcolor attribute (\color{red}{x})
+      // Filter out MathJax internal "_inherit_" sentinel value
+      const atr = getAttributes(node);
+      const rawColor: string = atr?.mathcolor || '';
+      const mathcolor: string = rawColor && rawColor !== '_inherit_' ? rawColor : '';
+      const data: ITypstData = handlerApi.handleAll(node, serialize);
+      if (mathcolor && data.typst.trim()) {
+        res = addToTypstData(res, {
+          typst: '#text(fill: ' + mathcolor + ')[' + data.typst.trim() + ']'
+        });
+        return res;
+      }
+      return data;
     } catch (e) {
       return res;
     }
@@ -863,4 +902,5 @@ const handlers: { [key: string]: (node, serialize) => ITypstData } = {
   mroot: mroot(),
   menclose: menclose(),
   mstyle: mstyle(),
+  mphantom: mphantom(),
 };

@@ -108,6 +108,18 @@ const relationOperators: ReadonlyArray<[string, string]> = [
   ["\u22A2", "tack.r"],           // ⊢
   ["\u22A3", "tack.l"],           // ⊣
   ["\u22A8", "tack.r.double"],    // ⊨
+  ["\u2262", "equiv.not"],        // ≢ (\not\equiv)
+  ["\u226E", "lt.not"],           // ≮ (\not<)
+  ["\u226F", "gt.not"],           // ≯ (\not>)
+  ["\u2270", "lt.eq.not"],        // ≰ (\not\leq)
+  ["\u2271", "gt.eq.not"],        // ≱ (\not\geq)
+  ["\u2284", "subset.not"],       // ⊄ (\not\subset)
+  ["\u2285", "supset.not"],       // ⊅ (\not\supset)
+  ["\u2288", "subset.eq.not"],    // ⊈ (\not\subseteq)
+  ["\u2289", "supset.eq.not"],    // ⊉ (\not\supseteq)
+  ["\u2241", "sim.not"],          // ≁ (\not\sim)
+  ["\u2247", "cong.not"],         // ≇ (\not\cong)
+  ["\u2249", "approx.not"],       // ≉ (\not\approx)
 ];
 
 // Arrows: Unicode → Typst symbol name

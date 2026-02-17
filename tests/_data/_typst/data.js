@@ -120,7 +120,7 @@ module.exports = [
   { latex: `\\begin{vmatrix} a & b \\\\ c & d \\end{vmatrix}`, typst: `mat(delim: "|", a, b; c, d)` },
 
   // === Cases ===
-  { latex: `\\begin{cases} x & \\text{if } x > 0 \\\\ -x & \\text{otherwise} \\end{cases}`, typst: `cases(x, "if " x > 0, - x, "otherwise")` },
+  { latex: `\\begin{cases} x & \\text{if } x > 0 \\\\ -x & \\text{otherwise} \\end{cases}`, typst: `cases(x & "if " x > 0, - x & "otherwise")` },
 
   // === Misc symbols ===
   { latex: `\\infty`, typst: `infinity` },
@@ -153,4 +153,38 @@ module.exports = [
   { latex: `e^{i\\pi} + 1 = 0`, typst: `e^(i pi) + 1 = 0` },
   { latex: `\\cancel{x}`, typst: `cancel(x)` },
   { latex: `\\text{if } x > 0`, typst: `"if " x > 0` },
+
+  // === Phantom (dropped — no Typst math equivalent) ===
+  { latex: `\\phantom{x}`, typst: `` },
+
+  // === Cancel variants ===
+  { latex: `\\bcancel{x}`, typst: `cancel(inverted: #true, x)` },
+
+  // === Equation arrays ===
+  { latex: `\\begin{aligned} a &= b \\\\ c &= d \\end{aligned}`, typst: `a = b \\\nc = d` },
+
+  // === Log with subscript ===
+  { latex: `\\log_2 x`, typst: `log_2 x` },
+
+  // === Choose (binom) ===
+  { latex: `a \\choose b`, typst: `binom(a, b)` },
+
+  // === Negated relations ===
+  { latex: `\\not\\equiv`, typst: `equiv.not` },
+  { latex: `\\not\\leq`, typst: `lt.eq.not` },
+  { latex: `\\not\\sim`, typst: `sim.not` },
+
+  // === Text with font variants ===
+  { latex: `\\textbf{bold}`, typst: `bold("bold")` },
+
+  // === Color ===
+  { latex: `\\color{red}{x}`, typst: `#text(fill: red)[x]` },
+
+  // === Boxed ===
+  { latex: `\\boxed{x=1}`, typst: `#box(stroke: 0.5pt, inset: 3pt, $x = 1$)` },
+
+  // === Nested expressions ===
+  { latex: `\\frac{\\sum_{i=1}^{n} x_i}{n}`, typst: `frac(sum_(i = 1)^n x_i, n)` },
+  { latex: `\\sqrt{\\frac{a}{b}}`, typst: `sqrt(frac(a, b))` },
+  { latex: `\\left(\\frac{a}{b}\\right)^2`, typst: `lr(( frac(a, b) ))^2` },
 ];

@@ -11,7 +11,9 @@ describe('Latex to Typst math format:', () => {
       console.log('    TYPST    =>', result);
       console.log('    EXPECTED =>', t.typst);
       result.should.be.a('string');
-      result.length.should.be.greaterThan(0);
+      if (t.typst.length > 0) {
+        result.length.should.be.greaterThan(0);
+      }
       result.should.equal(t.typst);
     });
   });
