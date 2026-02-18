@@ -202,4 +202,10 @@ module.exports = [
   { latex: `\\frac{\\sum_{i=1}^{n} x_i}{n}`, typst: `frac(sum_(i = 1)^n x_i, n)` },
   { latex: `\\sqrt{\\frac{a}{b}}`, typst: `sqrt(frac(a, b))` },
   { latex: `\\left(\\frac{a}{b}\\right)^2`, typst: `lr(( frac(a, b) ))^2` },
+
+  // === Text spacing ===
+  { latex: `x \\text{ and } y`, typst: `x " and " y` },
+
+  // === Thin space preserved ===
+  { latex: `\\iint_D f(x,y) \\, dA`, typst: `integral.double_D f(x,y) thin d A` },
 ];

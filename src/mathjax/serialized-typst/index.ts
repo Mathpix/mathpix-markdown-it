@@ -89,7 +89,7 @@ export class SerializedTypstVisitor extends MmlVisitor {
             for (let k = j + 1; k < closeIdx; k++) {
               const innerData: ITypstData = this.visitNode(node.childNodes[k], space);
               if (content && innerData.typst
-                && /^[\w.]/.test(innerData.typst)
+                && /^[\w."]/.test(innerData.typst)
                 && !/[\s({[,]$/.test(content)) {
                 content += ' ';
               }
@@ -109,9 +109,10 @@ export class SerializedTypstVisitor extends MmlVisitor {
         }
         // Normal processing
         const data: ITypstData = this.visitNode(child, space);
-        // Insert space between adjacent children when needed for Typst parsing
+        // Insert space between adjacent children when needed for Typst parsing:
+        // word chars, dots, and quoted strings all need separation
         if (res.typst && data.typst
-          && /^[\w.]/.test(data.typst)
+          && /^[\w."]/.test(data.typst)
           && !/[\s({[,]$/.test(res.typst)) {
           res.typst += ' ';
         }

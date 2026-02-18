@@ -730,7 +730,7 @@ const mrow = () => {
         for (let i = 0; i < node.childNodes.length; i++) {
           const data: ITypstData = serialize.visitNode(node.childNodes[i], '');
           if (res.typst && data.typst
-            && /^[\w.]/.test(data.typst)
+            && /^[\w."]/.test(data.typst)
             && !/[\s({[,]$/.test(res.typst)) {
             res.typst += ' ';
           }
@@ -861,11 +861,13 @@ const mstyle = () => {
         if (hasOnlySpaces) {
           // Only skip if this is operator-internal spacing (e.g. around \oint)
           // not explicit user spacing (e.g. \, \quad).
-          // Check if any ancestor (up to 3 levels) has texClass OP.
+          // Operator-internal mstyle nodes are nested inside TeXAtom chains;
+          // user spacing sits directly in the top-level inferredMrow.
           let isOperatorSpacing = false;
           let p = node.parent;
           for (let d = 0; d < 10 && p; d++) {
-            if (p.texClass === TEXCLASS.OP) { isOperatorSpacing = true; break; }
+            if (p.kind === 'math') break;
+            if (p.kind === 'TeXAtom') { isOperatorSpacing = true; break; }
             p = p.parent;
           }
           if (isOperatorSpacing) {
