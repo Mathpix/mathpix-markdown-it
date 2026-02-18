@@ -37,9 +37,14 @@ export const addSpeechToMathContainer = (
   elMath.removeAttribute('aria-labelledby');
   // Add hidden speech element for context menu
   const elSpeech = doc.createElement('speech');
-  elSpeech.innerHTML = speech;
+  elSpeech.textContent = speech;
   elSpeech.style.display = 'none';
-  elMath.parentElement?.appendChild(elSpeech);
+  const parent = elMath.parentElement;
+  if (parent) {
+    parent.appendChild(elSpeech);
+  } else {
+    console.warn('[addSpeechToMathContainer] mjx-container has no parentElement — speech element not appended');
+  }
 };
 
 export const addAriaToMathHTML = (sre, html: string) => {

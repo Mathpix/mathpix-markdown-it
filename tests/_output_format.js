@@ -273,5 +273,22 @@ describe('output_format:', () => {
       html.should.include('math-inline');
       done();
     });
+    it('MathML input with output_format: "latex" falls back to SVG (no MathML→LaTeX converter)', (done) => {
+      const mml = '<math xmlns="http://www.w3.org/1998/Math/MathML"><msup><mi>x</mi><mn>2</mn></msup></math>';
+      const html = MM.markdownToHTML(mml, {
+        outMath: { output_format: 'latex' }
+      });
+      // No MathML→LaTeX converter exists, so MathML input falls back to SVG rendering
+      html.should.include('mjx-container');
+      html.should.include('<svg');
+      done();
+    });
+    it('empty math content does not throw', (done) => {
+      const html = MM.markdownToHTML('$$', {
+        outMath: { output_format: 'mathml' }
+      });
+      html.should.not.include('undefined');
+      done();
+    });
   });
 });

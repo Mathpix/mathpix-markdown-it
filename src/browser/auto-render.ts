@@ -1,6 +1,7 @@
 import { MathJax } from "../mathjax";
 import { loadSreAsync } from "../sre/sre-browser";
 import {TAccessibility, TOutputMath} from "../mathpix-markdown-model";
+import { isBrowser } from "./utils";
 
 const RE_TEX_DISPLAY_DOLLARS: RegExp = /^\$\$[\s\S]*\$\$$/;
 const RE_TEX_DISPLAY_BRACKETS: RegExp = /^\\\[[\s\S]*\\\]$/;
@@ -168,17 +169,19 @@ const shouldTypesetNode = (el: HTMLElement): TypesetTarget | null => {
 
 /**
  * Resolves accessibility feature flags from user config.
- * Default behavior: if config is missing, both flags are enabled.
+ * Default behavior: if config is missing or null, both flags are disabled
+ * (accessibility must be explicitly opted-in via config).
+ * Note: in normal usage this is always called with the merged config object
+ * from renderMathInElement, so the null path is a safety fallback.
  */
 const resolveA11yFlags = (a11y: unknown): { assistiveMml: boolean; includeSpeech: boolean } => {
   const cfg = (a11y && typeof a11y === 'object') ? (a11y as any) : null;
   if (!cfg) {
-    return { assistiveMml: true, includeSpeech: true };
+    return { assistiveMml: false, includeSpeech: false };
   }
   return {
-    // `undefined` -> true, only explicit `false` disables the feature
-    assistiveMml: cfg.assistive_mml !== false,
-    includeSpeech: cfg.include_speech !== false,
+    assistiveMml: cfg.assistive_mml === true,
+    includeSpeech: cfg.include_speech === true,
   };
 };
 
@@ -282,13 +285,6 @@ export const renderMathInElement = async (
       console.error('[renderMathInElement] Failed to typeset node:', err, mathEl);
     }
   }
-}
-
-/**
- * Returns true when running in a browser environment (not SSR / Node).
- */
-const isBrowser = (): boolean => {
-  return typeof window !== 'undefined' && typeof document !== 'undefined';
 }
 
 /**

@@ -1,5 +1,6 @@
 import { loadSreAsync } from "../sre/sre-browser";
 import { addSpeechToMathContainer } from "../sre";
+import { isBrowser } from "./utils";
 
 export interface MathpixSpeechConfig {
   /** Container element to process (defaults to document.body) */
@@ -38,13 +39,6 @@ export const addSpeechToRenderedMath = async (container?: HTMLElement): Promise<
   } catch (err) {
     console.error('[addSpeechToRenderedMath] SRE processing error:', err);
   }
-};
-
-/**
- * Returns true when running in a browser environment (not SSR / Node).
- */
-const isBrowser = (): boolean => {
-  return typeof window !== 'undefined' && typeof document !== 'undefined';
 };
 
 /**

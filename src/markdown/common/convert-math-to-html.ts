@@ -1,4 +1,4 @@
-import { MathJax } from "../../mathjax/";
+import { MathJax, IOuterData } from "../../mathjax/";
 import { getWidthFromDocument } from "../utils";
 import { addIntoLabelsList, eLabelType } from "./labels";
 import { envArraysShouldBeFlattenInTSV } from '../../helpers/consts';
@@ -9,8 +9,8 @@ import { formatSource } from "../../helpers/parse-mmd-element";
 type TypesetResult = {
   /** Rendered HTML string for this math token (SVG/MathML/LaTeX depending on output_format). */
   html?: string;
-  /** MathJax metrics/extra data (widthEx/heightEx/etc). */
-  data?: any;
+  /** MathJax metrics/extra data (widthEx/heightEx/etc). Null for 'latex' and 'mathml' output formats. */
+  data?: IOuterData | null;
   ascii?: string;
   linear?: string;
   ascii_tsv?: string;
@@ -96,6 +96,10 @@ const buildFormatOutputs = (params: {
  * - MathML tokens -> TypesetMathML()
  * - tokens requesting Ascii extraction -> TypesetSvgAndAscii()
  * - default -> Typeset()
+ *
+ * Performance note: for 'mathml' and 'latex' output formats, MathJax still runs
+ * the full SVG rendering pipeline internally (the SVG is discarded by renderByFormat).
+ * A future optimization could add a fast path that skips SVG generation for these formats.
  */
 const typesetMathForToken = (params: {
   token: any;

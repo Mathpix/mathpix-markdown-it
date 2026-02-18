@@ -731,8 +731,10 @@ For `output_format: 'mathml'` or `output_format: 'latex'`, use the browser bundl
 
 ```js
 // Render all math elements in a container
-window.renderMathInElement(document.getElementById('content'), {
+window.MathpixRender.renderMathInElement(document.getElementById('content'), {
   outMath: {
+    output_format: 'svg',
+    include_svg: true,
     include_mathml: true,
     include_latex: true,
     include_asciimath: true,
@@ -746,11 +748,11 @@ window.renderMathInElement(document.getElementById('content'), {
 
 ### Configuration options
 
-| Option | Type | Description |
-|--------|------|-------------|
-| `outMath` | `TOutputMath` | Controls which hidden formats to generate (mathml, latex, asciimath, etc.) |
-| `accessibility.assistive_mml` | `boolean` | Add `<mjx-assistive-mml>` element for screen readers |
-| `accessibility.include_speech` | `boolean` | Add `aria-label` with speech text (requires `assistive_mml: true`) |
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `outMath` | `TOutputMath` | `{ output_format: 'svg', include_svg: true }` | Controls which hidden formats to generate. Set `include_mathml`, `include_latex`, `include_asciimath`, etc. to `true` to generate hidden format elements for context menu compatibility. |
+| `accessibility.assistive_mml` | `boolean` | `true` | Add `<mjx-assistive-mml>` element for screen readers |
+| `accessibility.include_speech` | `boolean` | `false` | Add `aria-label` with speech text (requires `assistive_mml: true`) |
 
 ### Accessibility behavior
 

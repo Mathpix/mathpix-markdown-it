@@ -140,4 +140,43 @@ describe('auto-render (renderMathInElement):', () => {
       c.innerHTML.should.include('mjx-assistive-mml');
     });
   });
+  // ─── Edge cases ───────────────────────────────────────────────────
+  describe('edge cases', () => {
+    it('malformed TeX does not crash the entire render pass', async () => {
+      const c = makeContainer(
+        '<span class="math-inline">$\\frac{ {$</span>' +
+        '<span class="math-inline">$x^2$</span>'
+      );
+      await renderNoA11y(c);
+      // Second element should still render even if first fails
+      const rendered = c.querySelectorAll('[data-mathpix-typeset="true"]');
+      rendered.length.should.be.at.least(1);
+    });
+    it('single $ without closing is not rendered as math', async () => {
+      const c = makeContainer('<span class="math-inline">$</span>');
+      await renderNoA11y(c);
+      c.innerHTML.should.not.include('mjx-container');
+    });
+    it('element with multiple <math> children is not treated as pure MathML', async () => {
+      const c = makeContainer(
+        '<span class="math-block">' +
+          '<math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi></math>' +
+          '<math xmlns="http://www.w3.org/1998/Math/MathML"><mi>y</mi></math>' +
+        '</span>'
+      );
+      await renderNoA11y(c);
+      // Two <math> elements means isOnlyMathMLElement returns false;
+      // also not TeX delimiters, so it should be skipped
+      c.innerHTML.should.not.include('data-mathpix-typeset');
+    });
+    it('whitespace-only text alongside <math> is still treated as pure MathML', async () => {
+      const c = makeContainer(
+        '<span class="math-block">  \n  ' +
+          '<math xmlns="http://www.w3.org/1998/Math/MathML"><msup><mi>x</mi><mn>2</mn></msup></math>' +
+        '  </span>'
+      );
+      await renderNoA11y(c);
+      c.innerHTML.should.include('mjx-container');
+    });
+  });
 });
