@@ -39,6 +39,8 @@ module.exports = [
   { latex: `\\vec{x}`, typst: `arrow(x)` },
   { latex: `\\dot{x}`, typst: `dot(x)` },
   { latex: `\\ddot{x}`, typst: `diaer(x)` },
+  { latex: `\\dddot{x}`, typst: `accent(x, dot.triple)` },
+  { latex: `\\ddddot{x}`, typst: `accent(x, dot.quad)` },
   { latex: `\\overline{x}`, typst: `overline(x)` },
   { latex: `\\underline{x}`, typst: `underline(x)` },
   { latex: `\\overbrace{x+y}^{n}`, typst: `overbrace(x + y)^n` },
