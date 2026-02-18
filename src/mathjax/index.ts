@@ -296,6 +296,7 @@ export const OuterHTML = (data, outMath, forPptx: boolean = false) => {
     include_asciimath = false,
     include_linearmath = false,
     include_latex = false,
+    include_typst = false,
     include_svg = true,
     include_error = false,
     include_speech = false
@@ -322,7 +323,11 @@ export const OuterHTML = (data, outMath, forPptx: boolean = false) => {
   if (include_latex && data.latex) {
     if (!outHTML) { outHTML += '\n'}
     outHTML += '<latex style="display: none;">' + formatSource(data.latex) + '</latex>';
-  }    
+  }
+  if (include_typst && data.typstmath) {
+    if (!outHTML) { outHTML += '\n'}
+    outHTML += '<typstmath style="display: none;">' + formatSource(data.typstmath) + '</typstmath>';
+  }
   if (include_speech && data.speech) {
     if (!outHTML) { outHTML += '\n'}
     outHTML += '<speech style="display: none;">' + formatSource(data.speech) + '</speech>';
