@@ -659,6 +659,64 @@ const delimiterToTypst = (delim: string): string => {
   }
 };
 
+// Check if a node subtree (outside mphantom) contains an mo with the given text
+const treeContainsMo = (node, moText: string, skipPhantom = true): boolean => {
+  if (!node) return false;
+  if (skipPhantom && node.kind === 'mphantom') return false;
+  if (node.kind === 'mo') {
+    const text = getChildrenText(node);
+    if (text === moText) return true;
+  }
+  if (node.childNodes) {
+    for (const child of node.childNodes) {
+      if (treeContainsMo(child, moText, skipPhantom)) return true;
+    }
+  }
+  return false;
+};
+
+// Serialize all visible content in a node subtree up to (but not including)
+// the first mo with the given text. Returns the serialized prefix.
+const serializePrefixBeforeMo = (node, serialize, stopMoText: string): string => {
+  // Walk the mtd → inferredMrow → mpadded chain to find the flat math children
+  let flatChildren: any[] = [];
+  const extractFlat = (n) => {
+    if (!n || !n.childNodes) return;
+    if (n.kind === 'mphantom') return;
+    if (n.kind === 'mtd' || n.kind === 'mpadded' || n.kind === 'mstyle' || n.isInferred) {
+      for (const child of n.childNodes) {
+        extractFlat(child);
+      }
+    } else {
+      flatChildren.push(n);
+    }
+  };
+  extractFlat(node);
+  // Serialize children up to the stop mo
+  let result = '';
+  for (const child of flatChildren) {
+    if (child.kind === 'mo' && getChildrenText(child) === stopMoText) {
+      break;
+    }
+    const data: ITypstData = serialize.visitNode(child, '');
+    result += data.typst;
+  }
+  return result.trim();
+};
+
+// Detect numcases/subnumcases pattern:
+// - All rows are mlabeledtr with 4 children (label + prefix + value + condition)
+// - First row's cell[1] contains a visible '{' mo (inside mpadded, outside mphantom)
+const isNumcasesTable = (node): boolean => {
+  if (!node.childNodes || node.childNodes.length === 0) return false;
+  const firstRow = node.childNodes[0];
+  if (firstRow.kind !== 'mlabeledtr') return false;
+  if (firstRow.childNodes.length < 4) return false;
+  // Check that cell[1] (first data column) contains a '{' brace
+  const prefixCell = firstRow.childNodes[1];
+  return treeContainsMo(prefixCell, '{');
+};
+
 // --- MTABLE handler: matrices and equation arrays ---
 const mtable = () => {
   return (node, serialize): ITypstData => {
@@ -672,9 +730,41 @@ const mtable = () => {
       const branchClose = parentMrow?.properties?.hasOwnProperty('close') ? parentMrow.properties['close'] : '';
       // Determine if this is a cases environment
       const isCases = envName === 'cases' || (branchOpen === '{' && branchClose === '');
+      // Detect numcases/subnumcases pattern
+      const isNumcases = isNumcasesTable(node);
       // Determine if this is an equation array (align, gather, split, etc.)
-      const isEqnArray = node.childNodes.length > 0
+      // Skip eqnArray detection for numcases — it should be treated as cases
+      const isEqnArray = !isNumcases && !isCases && node.childNodes.length > 0
         && node.childNodes[0].attributes?.get('displaystyle');
+
+      if (isNumcases) {
+        // numcases/subnumcases: extract prefix from first row's cell[1], then cases(...)
+        const firstRow = node.childNodes[0];
+        const prefixCell = firstRow.childNodes[1]; // cell after label
+        const prefix = serializePrefixBeforeMo(prefixCell, serialize, '{');
+        // Build cases rows from cell[2] (value) and cell[3] (condition) of each row
+        const rows: string[] = [];
+        for (let i = 0; i < countRow; i++) {
+          const mtrNode = node.childNodes[i];
+          const startCol = mtrNode.kind === 'mlabeledtr' ? 2 : 1; // skip label + prefix
+          const cells: string[] = [];
+          for (let j = startCol; j < mtrNode.childNodes.length; j++) {
+            const mtdNode = mtrNode.childNodes[j];
+            const cellData: ITypstData = serialize.visitNode(mtdNode, '');
+            const trimmed = cellData.typst.trim();
+            if (trimmed) cells.push(trimmed);
+          }
+          rows.push(cells.join(' & '));
+        }
+        const casesContent = 'cases(' + rows.join(', ') + ')';
+        if (prefix) {
+          res = addToTypstData(res, { typst: prefix + ' ' + casesContent });
+        } else {
+          res = addToTypstData(res, { typst: casesContent });
+        }
+        return res;
+      }
+
       // Build rows
       const rows: string[] = [];
       for (let i = 0; i < countRow; i++) {

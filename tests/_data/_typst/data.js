@@ -263,4 +263,8 @@ module.exports = [
 
   // === Mathring accent ===
   { latex: `\\mathring{x}`, typst: `circle(x)` },
+
+  // === numcases / subnumcases ===
+  { latex: `\\begin{numcases}{f(x)=} 0 & x < 0 \\\\ x & x \\geq 0 \\end{numcases}`, typst: `f(x) = cases(0 & "x < 0 ", x & "x \\geq 0 ")` },
+  { latex: `\\begin{subnumcases}{|x|=} -x & x < 0 \\\\ x & x \\geq 0 \\end{subnumcases}`, typst: `|x| = cases(- x & "x < 0 ", x & "x \\geq 0 ")` },
 ];
