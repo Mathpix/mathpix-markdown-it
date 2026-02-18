@@ -147,11 +147,13 @@ const mi = () => {
       else if (mathvariant && mathvariant !== 'italic' && !isKnownSymbol && !isKnownOperator) {
         const fontFn = typstFontMap.get(mathvariant);
         if (fontFn) {
+          // Multi-letter text needs quotes in Typst math (e.g. italic("word"), bold("text"))
+          const inner = value.length > 1 ? '"' + value + '"' : typstValue;
           // \mathbf produces mathvariant="bold" which is upright bold in LaTeX
           if (mathvariant === 'bold') {
-            typstValue = 'upright(bold(' + typstValue + '))';
+            typstValue = 'upright(bold(' + inner + '))';
           } else {
-            typstValue = fontFn + '(' + typstValue + ')';
+            typstValue = fontFn + '(' + inner + ')';
           }
         }
       }
@@ -755,8 +757,8 @@ const delimiterToTypst = (delim: string): string => {
     case '{': return '"{"';
     case '}': return '"}"';
     case '|': return '"|"';
-    case '\u2016': return '"||"'; // double vertical bar
-    case '\u2225': return '"||"'; // parallel
+    case '\u2016': return '"\u2016"'; // double vertical bar ‖
+    case '\u2225': return '"\u2016"'; // parallel → ‖
     default: return '"' + delim + '"';
   }
 };

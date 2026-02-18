@@ -78,7 +78,7 @@ const binaryOperators: ReadonlyArray<[string, string]> = [
   ["\u22B3", "gt.tri"],           // ⊳ (rhd / trianglerighteq base)
   ["\u22B4", "lt.tri.eq"],        // ⊴ (unlhd)
   ["\u22B5", "gt.tri.eq"],        // ⊵ (unrhd)
-  ["\u2240", "wr"],               // ≀ (wreath product)
+  ["\u2240", "wreath"],           // ≀ (wreath product)
   ["\u2A3F", "product.co"],       // ⨿ (amalg)
   ["\u22C8", "bowtie"],           // ⋈ (bowtie / Join)
   ["\u22C9", "times.l"],          // ⋉ (ltimes)
@@ -99,8 +99,8 @@ const relationOperators: ReadonlyArray<[string, string]> = [
   ["\u227B", "succ"],             // ≻
   ["\u2AAF", "prec.eq"],          // ⪯
   ["\u2AB0", "succ.eq"],          // ⪰
-  ["\u223C", "sim"],              // ∼
-  ["\u2243", "sim.eq"],           // ≃
+  ["\u223C", "tilde.op"],         // ∼
+  ["\u2243", "tilde.eq"],         // ≃
   ["\u2248", "approx"],           // ≈
   ["\u2245", "cong"],             // ≅
   ["\u2282", "subset"],           // ⊂
@@ -128,7 +128,7 @@ const relationOperators: ReadonlyArray<[string, string]> = [
   ["\u2285", "supset.not"],       // ⊅ (\not\supset)
   ["\u2288", "subset.eq.not"],    // ⊈ (\not\subseteq)
   ["\u2289", "supset.eq.not"],    // ⊉ (\not\supseteq)
-  ["\u2241", "sim.not"],          // ≁ (\not\sim)
+  ["\u2241", "tilde.not"],        // ≁ (\not\sim)
   ["\u2247", "cong.not"],         // ≇ (\not\cong)
   ["\u2249", "approx.not"],       // ≉ (\not\approx)
   ["\u2272", "lt.tilde"],         // ≲ (\lesssim)

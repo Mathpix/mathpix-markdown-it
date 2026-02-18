@@ -78,7 +78,7 @@ module.exports = [
   { latex: `x \\neq y`, typst: `x eq.not y` },
   { latex: `x \\equiv y`, typst: `x equiv y` },
   { latex: `x \\approx y`, typst: `x approx y` },
-  { latex: `x \\sim y`, typst: `x sim y` },
+  { latex: `x \\sim y`, typst: `x tilde.op y` },
   { latex: `x \\propto y`, typst: `x prop y` },
 
   // === Set operators ===
@@ -192,7 +192,7 @@ module.exports = [
   // === Negated relations ===
   { latex: `\\not\\equiv`, typst: `equiv.not` },
   { latex: `\\not\\leq`, typst: `lt.eq.not` },
-  { latex: `\\not\\sim`, typst: `sim.not` },
+  { latex: `\\not\\sim`, typst: `tilde.not` },
 
   // === Text with font variants ===
   { latex: `\\textbf{bold}`, typst: `bold("bold")` },
@@ -213,7 +213,7 @@ module.exports = [
   { latex: `\\overleftarrow{AB}`, typst: `accent(A B, arrow.l)` },
 
   // === Math italic ===
-  { latex: `\\mathit{word}`, typst: `italic(word)` },
+  { latex: `\\mathit{word}`, typst: `italic("word")` },
 
   // === Nested expressions ===
   { latex: `\\frac{\\sum_{i=1}^{n} x_i}{n}`, typst: `frac(sum_(i = 1)^n x_i, n)` },
@@ -251,7 +251,7 @@ module.exports = [
   { latex: `\\underset{n}{=}`, typst: `limits(=)_n` },
 
   // === Vmatrix (double bar delimiter) ===
-  { latex: `\\begin{Vmatrix} a & b \\\\ c & d \\end{Vmatrix}`, typst: `mat(delim: "||", a, b; c, d)` },
+  { latex: `\\begin{Vmatrix} a & b \\\\ c & d \\end{Vmatrix}`, typst: `mat(delim: "‖", a, b; c, d)` },
 
   // === nmid ===
   { latex: `a \\nmid b`, typst: `a divides.not b` },
@@ -276,7 +276,7 @@ module.exports = [
   // === Rare symbols ===
   { latex: `\\rightleftharpoons`, typst: `harpoons.rtlb` },
   { latex: `A \\lhd B`, typst: `A lt.tri B` },
-  { latex: `A \\wr B`, typst: `A wr B` },
+  { latex: `A \\wr B`, typst: `A wreath B` },
 
   // === Multiscripts (attach) ===
   { latex: `\\sideset{_a^b}{_c^d} \\sum`, typst: `attach(sum, tl: b, bl: a, t: d, b: c)` },
