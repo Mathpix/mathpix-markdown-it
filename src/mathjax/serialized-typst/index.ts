@@ -28,6 +28,29 @@ const getBigDelimInfo = (node: any): { delim: string, size: string, isOpen: bool
   }
 };
 
+// Check if a node represents a single pipe `|` character.
+// Handles bare mo(|), mrow wrapping a single mo(|), and inferredMrow in between.
+const isSinglePipeNode = (node: any): boolean => {
+  try {
+    if (!node || !node.childNodes) return false;
+    if (node.kind === 'mo') {
+      return node.childNodes[0]?.text === '|';
+    }
+    if (node.kind === 'mrow' || node.kind === 'TeXAtom') {
+      let children = node.childNodes;
+      if (children.length === 1 && children[0].isInferred) {
+        children = children[0].childNodes;
+      }
+      if (children.length === 1 && children[0].kind === 'mo') {
+        return children[0].childNodes?.[0]?.text === '|';
+      }
+    }
+    return false;
+  } catch (_e) {
+    return false;
+  }
+};
+
 export interface ITypstVisitorOptions {
   [key: string]: any;
 }
@@ -91,7 +114,7 @@ export class SerializedTypstVisitor extends MmlVisitor {
               const innerData: ITypstData = this.visitNode(node.childNodes[k], space);
               if (content && innerData.typst
                 && /^[\w."]/.test(innerData.typst)
-                && !/[\s({[,]$/.test(content)) {
+                && !/[\s({[,|]$/.test(content)) {
                 content += ' ';
               }
               content += innerData.typst;
@@ -102,10 +125,42 @@ export class SerializedTypstVisitor extends MmlVisitor {
             const lrExpr = 'lr(size: #' + openInfo.size + ', ' + lrContent + ')';
             // Add spacing before lr if needed
             if (res.typst && /^[\w.]/.test(lrExpr)
-              && !/[\s({[,]$/.test(res.typst)) {
+              && !/[\s({[,|]$/.test(res.typst)) {
               res.typst += ' ';
             }
             res = addToTypstData(res, { typst: lrExpr });
+            j = closeIdx + 1;
+            continue;
+          }
+        }
+        // Detect |...| pipe pairs (absolute value without \left...\right).
+        // Skip inside TeXAtom groups (e.g. {|\alpha|} in superscripts) where
+        // the content is already grouped by the enclosing script parens.
+        if (isSinglePipeNode(child) && (node as any).parent?.kind !== 'TeXAtom') {
+          let closeIdx = -1;
+          for (let k = j + 1; k < node.childNodes.length; k++) {
+            if (isSinglePipeNode(node.childNodes[k])) {
+              closeIdx = k;
+              break;
+            }
+          }
+          if (closeIdx > j + 1) {
+            let content = '';
+            for (let k = j + 1; k < closeIdx; k++) {
+              const innerData: ITypstData = this.visitNode(node.childNodes[k], space);
+              if (content && innerData.typst
+                && /^[\w."]/.test(innerData.typst)
+                && !/[\s({[,|]$/.test(content)) {
+                content += ' ';
+              }
+              content += innerData.typst;
+            }
+            const pipeExpr = 'lr(| ' + content.trim() + ' |)';
+            if (res.typst && /^[\w."]/.test(pipeExpr)
+              && !/[\s({[,|]$/.test(res.typst)) {
+              res.typst += ' ';
+            }
+            res = addToTypstData(res, { typst: pipeExpr });
             j = closeIdx + 1;
             continue;
           }
@@ -116,7 +171,7 @@ export class SerializedTypstVisitor extends MmlVisitor {
         // word chars, dots, and quoted strings all need separation
         if (res.typst && data.typst
           && /^[\w."]/.test(data.typst)
-          && !/[\s({[,]$/.test(res.typst)) {
+          && !/[\s({[,|]$/.test(res.typst)) {
           res.typst += ' ';
         }
         res = addToTypstData(res, data);

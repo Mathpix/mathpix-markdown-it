@@ -198,7 +198,19 @@ const mo = () => {
       if (typstValue.length > 1 && /^\w/.test(typstValue)) {
         // Multi-char Typst symbol names: "times", "lt.eq", etc.
         const spaceBefore = needSpaceBefore(node) ? ' ' : '';
-        const spaceAfter = needSpaceAfter(node) ? ' ' : '';
+        let spaceAfter = needSpaceAfter(node) ? ' ' : '';
+        // Prevent Typst from interpreting "symbol(" as a function call
+        // (e.g. "lt.eq(x)" would call lt.eq as a function)
+        if (!spaceAfter && !inScript) {
+          try {
+            const idx = node.parent.childNodes.findIndex(item => item === node);
+            const next = node.parent.childNodes[idx + 1];
+            if (next && next.kind === 'mo') {
+              const nt = getChildrenText(next);
+              if (nt === '(' || nt === '[') spaceAfter = ' ';
+            }
+          } catch (_e) { /* ignore */ }
+        }
         res = addToTypstData(res, { typst: spaceBefore + typstValue + spaceAfter });
       } else if (!inScript && SPACED_OPERATORS.has(value)) {
         // Common binary/relational operators: add spaces
@@ -321,8 +333,11 @@ const msup = () => {
       const secondChild = node.childNodes[1] || null;
       const dataFirst: ITypstData = firstChild ? serialize.visitNode(firstChild, '') : initTypstData();
       const dataSecond: ITypstData = secondChild ? serialize.visitNode(secondChild, '') : initTypstData();
+      const base = dataFirst.typst;
       const sup = dataSecond.typst.trim();
-      res = addToTypstData(res, { typst: dataFirst.typst });
+      // Empty base (e.g. LaTeX ^{x} with no preceding base): use empty
+      // upright string as placeholder so Typst has a valid base for ^
+      res = addToTypstData(res, { typst: base.trim() ? base : '""' });
       // Optimize prime symbols to Typst ' shorthand
       const primeShorthand = PRIME_SHORTHANDS.get(sup);
       if (primeShorthand) {
@@ -352,7 +367,8 @@ const msub = () => {
       const dataFirst: ITypstData = firstChild ? serialize.visitNode(firstChild, '') : initTypstData();
       const dataSecond: ITypstData = secondChild ? serialize.visitNode(secondChild, '') : initTypstData();
       const sub = dataSecond.typst.trim();
-      res = addToTypstData(res, { typst: dataFirst.typst });
+      const base = dataFirst.typst;
+      res = addToTypstData(res, { typst: base.trim() ? base : '""' });
       res = addToTypstData(res, { typst: '_' });
       if (needsParens(sub)) {
         res = addToTypstData(res, { typst: '(' + sub + ')' });
@@ -379,7 +395,8 @@ const msubsup = () => {
       const dataThird: ITypstData = thirdChild ? serialize.visitNode(thirdChild, '') : initTypstData();
       const sub = dataSecond.typst.trim();
       const sup = dataThird.typst.trim();
-      res = addToTypstData(res, { typst: dataFirst.typst });
+      const base = dataFirst.typst;
+      res = addToTypstData(res, { typst: base.trim() ? base : '""' });
       res = addToTypstData(res, { typst: '_' });
       if (needsParens(sub)) {
         res = addToTypstData(res, { typst: '(' + sub + ')' });
@@ -1119,7 +1136,7 @@ const mrow = () => {
           const data: ITypstData = serialize.visitNode(node.childNodes[i], '');
           if (res.typst && data.typst
             && /^[\w."]/.test(data.typst)
-            && !/[\s({[,]$/.test(res.typst)) {
+            && !/[\s({[,|]$/.test(res.typst)) {
             res.typst += ' ';
           }
           res = addToTypstData(res, data);

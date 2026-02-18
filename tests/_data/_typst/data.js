@@ -294,6 +294,9 @@ module.exports = [
   { latex: `E = mc^2 \\tag{1}`, typst: `#math.equation(block: true, numbering: n => [(1)], $ E = m c^2 $)` },
   { latex: `\\begin{align} a &= b \\tag{1} \\\\ c &= d \\tag{2} \\end{align}`, typst: `a = b quad #["(1)"] \\\nc = d quad #["(2)"]` },
 
+  // === Empty base superscript, pipes as absolute value, operator before paren ===
+  { latex: `^{|\\alpha|} \\sqrt{x^{\\alpha}} \\leq(x \\bullet \\alpha) /|\\alpha|`, typst: `""^(|alpha|) sqrt(x^(alpha)) lt.eq (x bullet alpha)/ lr(| alpha |)` },
+
   // === numcases / subnumcases ===
   { latex: `\\begin{numcases}{f(x)=} 0 & x < 0 \\\\ x & x \\geq 0 \\end{numcases}`, typst: `f(x) = cases(0 & "x < 0 ", x & "x \\geq 0 ")` },
   { latex: `\\begin{subnumcases}{|x|=} -x & x < 0 \\\\ x & x \\geq 0 \\end{subnumcases}`, typst: `|x| = cases(- x & "x < 0 ", x & "x \\geq 0 ")` },
