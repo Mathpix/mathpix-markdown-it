@@ -301,6 +301,7 @@ interface MathpixRenderConfig {
   outMath: TOutputMath;
   /** Container width used for layout metrics (cwidth) */
   width?: number;
+  previewUuid?: string;
 }
 ```
 
@@ -515,8 +516,8 @@ This script:
 - [x] Separate `add-speech.js` bundle for adding speech to already-rendered SVG
 - [x] Shared `addSpeechToMathContainer()` function in `src/sre/index.ts`
 - [x] Changelog updated
-- [ ] Unit tests for new options
-- [ ] README updated with new options and browser bundle usage
+- [x] Unit tests for new options
+- [x] README updated with new options and browser bundle usage
 
 Note: Context menu was already implemented separately (`src/context-menu.tsx` → `es5/context-menu.js`)
 

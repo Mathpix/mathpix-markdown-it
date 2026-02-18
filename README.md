@@ -1086,7 +1086,7 @@ const { loadSreAsync } = require('mathpix-markdown-it/lib/sre/sre-node');
 
 ```
 
-Then just pass the resulting value to `accessibility.spe`
+Then just pass the resulting value to `accessibility.sre`
 ```js
 accessibility: {
      assistiveMml: true, // assistive-mml will be added to mjx-container
