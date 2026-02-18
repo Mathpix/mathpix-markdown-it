@@ -45,11 +45,11 @@ module.exports = [
   { latex: `\\underbrace{x+y}_{n}`, typst: `underbrace(x + y)_n` },
 
   // === Font commands ===
-  { latex: `\\mathbb{R}`, typst: `bb(R)` },
+  { latex: `\\mathbb{R}`, typst: `RR` },
   { latex: `\\mathcal{L}`, typst: `cal(L)` },
   { latex: `\\mathfrak{g}`, typst: `frak(g)` },
-  { latex: `\\mathbf{v}`, typst: `bold(v)` },
-  { latex: `\\mathrm{d}`, typst: `upright(d)` },
+  { latex: `\\mathbf{v}`, typst: `upright(bold(v))` },
+  { latex: `\\mathrm{d}`, typst: `dif` },
 
   // === Named functions ===
   { latex: `\\sin x`, typst: `sin x` },
@@ -61,7 +61,7 @@ module.exports = [
   { latex: `\\lim_{x \\to 0}`, typst: `lim_(x arrow.r 0)` },
   { latex: `\\max_{x}`, typst: `max_x` },
   { latex: `\\min_{x}`, typst: `min_x` },
-  { latex: `\\operatorname{sech} x`, typst: `upright(sech) x` },
+  { latex: `\\operatorname{sech} x`, typst: `op("sech") x` },
 
   // === Binary operators ===
   { latex: `a \\cdot b`, typst: `a dot.op b` },
@@ -208,4 +208,23 @@ module.exports = [
 
   // === Thin space preserved ===
   { latex: `\\iint_D f(x,y) \\, dA`, typst: `integral.double_D f(x,y) thin d A` },
+
+  // === Operatorname with limits ===
+  { latex: `\\operatorname*{argmax}_{x} f(x)`, typst: `op("argmax", limits: #true)_x f(x)` },
+
+  // === Delimiter optimizations ===
+  { latex: `\\left|x\\right|`, typst: `norm(x)` },
+  { latex: `\\left\\lfloor x\\right\\rfloor`, typst: `floor(x)` },
+  { latex: `\\left\\lceil x\\right\\rceil`, typst: `ceil(x)` },
+
+  // === mathbb doubled-letter shorthand ===
+  { latex: `\\mathbb{Z}`, typst: `ZZ` },
+  { latex: `\\mathbb{N}`, typst: `NN` },
+  { latex: `\\mathbb{C}`, typst: `CC` },
+
+  // === boldsymbol (italic bold, not upright bold) ===
+  { latex: `\\boldsymbol{v}`, typst: `bold(v)` },
+
+  // === aleph ===
+  { latex: `\\aleph`, typst: `alef` },
 ];

@@ -215,7 +215,7 @@ const miscSymbols: ReadonlyArray<[string, string]> = [
   ["\u2220", "angle"],          // ∠
   ["\u25B3", "triangle.t"],     // △
   ["\u2032", "prime"],          // ′
-  ["\u2135", "aleph"],          // ℵ
+  ["\u2135", "alef"],            // ℵ
   ["\u210F", "planck.reduce"],  // ℏ
   ["\u2113", "ell"],            // ℓ
   ["\u211C", "Re"],             // ℜ
@@ -226,7 +226,7 @@ const miscSymbols: ReadonlyArray<[string, string]> = [
   ["\u2235", "because"],        // ∵
   ["\u25A1", "square"],         // □
   ["\u2322", "frown"],          // ⌢
-  ["\u00A0", "space"],          // non-breaking space
+  ["\u00A0", "space.nobreak"],   // non-breaking space
   ["\u2061", ""],               // function application (invisible)
   ["\u2062", ""],               // invisible times
   ["\u2063", ""],               // invisible separator

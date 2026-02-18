@@ -98,6 +98,11 @@ const TYPST_MATH_OPERATORS: Set<string> = new Set([
   'Pr', 'tr',
 ]);
 
+// Single uppercase letters that can use doubled-letter shorthand for \mathbb
+const BB_SHORTHAND_LETTERS: Set<string> = new Set(
+  'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
+);
+
 // --- MI handler: identifiers ---
 const mi = () => {
   return (node, _serialize): ITypstData => {
@@ -116,13 +121,38 @@ const mi = () => {
       const isKnownSymbol = typstSymbolMap.has(value);
       const isKnownOperator = TYPST_MATH_OPERATORS.has(value);
       let typstValue: string = findTypstSymbol(value);
+
+      // \operatorname{name}: texClass=OP, multi-char, not built-in
+      // Note: don't check !mathvariant — MathJax may set a default (e.g. "normal")
+      if (node.texClass === TEXCLASS.OP && value.length > 1 && !isKnownOperator) {
+        const parentKind = node.parent?.kind;
+        const isLimits = parentKind === 'munder' || parentKind === 'mover' || parentKind === 'munderover';
+        if (isLimits) {
+          typstValue = 'op("' + value + '", limits: #true)';
+        } else {
+          typstValue = 'op("' + value + '")';
+        }
+      }
+      // \mathrm{d} → dif (differential operator optimization)
+      else if (mathvariant === 'normal' && value === 'd' && !isKnownSymbol) {
+        typstValue = 'dif';
+      }
+      // \mathbb{R} → RR (doubled letter shorthand for single uppercase)
+      else if (mathvariant === 'double-struck' && value.length === 1 && BB_SHORTHAND_LETTERS.has(value)) {
+        typstValue = value + value;
+      }
       // Apply font wrapping if mathvariant is set and not the default italic
       // Skip font wrapping for known symbols (e.g. \infty with mathvariant="normal")
       // Skip font wrapping for built-in Typst math operators (sin, cos, log, etc.)
-      if (mathvariant && mathvariant !== 'italic' && !isKnownSymbol && !isKnownOperator) {
+      else if (mathvariant && mathvariant !== 'italic' && !isKnownSymbol && !isKnownOperator) {
         const fontFn = typstFontMap.get(mathvariant);
         if (fontFn) {
-          typstValue = fontFn + '(' + typstValue + ')';
+          // \mathbf produces mathvariant="bold" which is upright bold in LaTeX
+          if (mathvariant === 'bold') {
+            typstValue = 'upright(bold(' + typstValue + '))';
+          } else {
+            typstValue = fontFn + '(' + typstValue + ')';
+          }
         }
       }
       // Add spacing around multi-character Typst symbol names
@@ -676,8 +706,20 @@ const mrow = () => {
         const hasVisibleOpen = !!open;
         const hasVisibleClose = !!close;
         if (hasVisibleOpen && hasVisibleClose) {
-          // Both delimiters visible: use lr() for auto-sizing
-          res = addToTypstData(res, { typst: 'lr(' + open + ' ' + content.trim() + ' ' + close + ')' });
+          const trimmedContent = content.trim();
+          // Optimize common delimiter pairs to Typst functions
+          if (openDelim === '|' && closeDelim === '|') {
+            res = addToTypstData(res, { typst: 'norm(' + trimmedContent + ')' });
+          } else if (openDelim === '\u230A' && closeDelim === '\u230B') {
+            // ⌊...⌋ → floor()
+            res = addToTypstData(res, { typst: 'floor(' + trimmedContent + ')' });
+          } else if (openDelim === '\u2308' && closeDelim === '\u2309') {
+            // ⌈...⌉ → ceil()
+            res = addToTypstData(res, { typst: 'ceil(' + trimmedContent + ')' });
+          } else {
+            // General lr() for auto-sizing
+            res = addToTypstData(res, { typst: 'lr(' + open + ' ' + trimmedContent + ' ' + close + ')' });
+          }
         } else {
           // One or both delimiters invisible: emit directly without lr()
           // (lr() requires balanced parens in Typst syntax)
