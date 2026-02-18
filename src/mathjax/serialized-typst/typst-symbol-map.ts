@@ -80,6 +80,9 @@ const binaryOperators: ReadonlyArray<[string, string]> = [
   ["\u22B5", "gt.tri.eq"],        // ⊵ (unrhd)
   ["\u2240", "wr"],               // ≀ (wreath product)
   ["\u2A3F", "product.co"],       // ⨿ (amalg)
+  ["\u22C8", "bowtie"],           // ⋈ (bowtie / Join)
+  ["\u22C9", "times.l"],          // ⋉ (ltimes)
+  ["\u22CA", "times.r"],          // ⋊ (rtimes)
 ];
 
 // Relation operators: Unicode → Typst symbol name
@@ -128,6 +131,14 @@ const relationOperators: ReadonlyArray<[string, string]> = [
   ["\u2241", "sim.not"],          // ≁ (\not\sim)
   ["\u2247", "cong.not"],         // ≇ (\not\cong)
   ["\u2249", "approx.not"],       // ≉ (\not\approx)
+  ["\u2272", "lt.tilde"],         // ≲ (\lesssim)
+  ["\u2273", "gt.tilde"],         // ≳ (\gtrsim)
+  ["\u2250", "eq.dot"],           // ≐ (\doteq)
+  ["\u225C", "eq.delta"],         // ≜ (\triangleq)
+  ["\u227A", "prec"],             // ≺ (\prec)
+  ["\u227B", "succ"],             // ≻ (\succ)
+  ["\u227C", "prec.eq"],          // ≼ (\preceq)
+  ["\u227D", "succ.eq"],          // ≽ (\succeq)
 ];
 
 // Arrows: Unicode → Typst symbol name
@@ -170,6 +181,10 @@ const arrows: ReadonlyArray<[string, string]> = [
   ["\u21C4", "arrows.rr"],            // ⇄ (rightleftarrows — approx)
   ["\u2195", "arrow.t.b"],            // ↕ (updownarrow)
   ["\u21D5", "arrow.t.b.double"],     // ⇕ (Updownarrow)
+  ["\u219A", "arrow.l.not"],          // ↚ (nleftarrow)
+  ["\u219B", "arrow.r.not"],          // ↛ (nrightarrow)
+  ["\u21CD", "arrow.l.double.not"],   // ⇍ (nLeftarrow)
+  ["\u21CF", "arrow.r.double.not"],   // ⇏ (nRightarrow)
 ];
 
 // Large operators: Unicode → Typst symbol name
@@ -247,6 +262,19 @@ const miscSymbols: ReadonlyArray<[string, string]> = [
   ["\u25A1", "square"],         // □
   ["\u25FB", "square"],         // ◻ (white medium square — MathJax variant)
   ["\u25FC", "square.filled"],  // ◼ (black medium square)
+  ["\u2221", "angle.arc"],      // ∡ (measuredangle)
+  ["\u2222", "angle.spheric"],   // ∢ (sphericalangle)
+  ["\u25BD", "triangle.b"],     // ▽ (triangledown)
+  ["\u25CA", "diamond.stroked"],// ◊ (Diamond / lozenge)
+  ["\u2663", "suit.club"],      // ♣
+  ["\u2662", "suit.diamond"],   // ♢
+  ["\u2661", "suit.heart"],     // ♡
+  ["\u2660", "suit.spade"],     // ♠
+  ["\u266F", "sharp"],          // ♯
+  ["\u266D", "flat"],           // ♭
+  ["\u266E", "natural"],        // ♮
+  ["\u00F0", "eth"],            // ð
+  ["\u2127", "ohm.inv"],        // ℧ (mho)
   ["\u2322", "frown"],          // ⌢
   ["\u00A0", "space.nobreak"],   // non-breaking space
   ["\u2061", ""],               // function application (invisible)
