@@ -55,14 +55,14 @@ const binaryOperators: ReadonlyArray<[string, string]> = [
   ["\u2218", "compose"],          // ∘
   ["\u2219", "bullet"],           // ∙
   ["\u2022", "bullet"],           // •
-  ["\u2295", "plus.circle"],      // ⊕
-  ["\u2296", "minus.circle"],     // ⊖
-  ["\u2297", "times.circle"],     // ⊗
-  ["\u2299", "dot.circle"],       // ⊙
+  ["\u2295", "plus.o"],           // ⊕
+  ["\u2296", "minus.o"],          // ⊖
+  ["\u2297", "times.o"],          // ⊗
+  ["\u2299", "dot.o"],       // ⊙
   ["\u222A", "union"],            // ∪
-  ["\u2229", "sect"],             // ∩
+  ["\u2229", "inter"],             // ∩
   ["\u2294", "union.sq"],         // ⊔
-  ["\u2293", "sect.sq"],          // ⊓
+  ["\u2293", "inter.sq"],          // ⊓
   ["\u2228", "or"],               // ∨
   ["\u2227", "and"],              // ∧
   ["\u2216", "without"],          // ∖
@@ -197,20 +197,23 @@ const largeOperators: ReadonlyArray<[string, string]> = [
   ["\u222D", "integral.triple"],    // ∭
   ["\u222E", "integral.cont"],      // ∮
   ["\u22C3", "union.big"],          // ⋃
-  ["\u22C2", "sect.big"],           // ⋂
-  ["\u2A01", "plus.circle.big"],    // ⨁
-  ["\u2A02", "times.circle.big"],   // ⨂
+  ["\u22C2", "inter.big"],           // ⋂
+  ["\u2A01", "plus.o.big"],         // ⨁
+  ["\u2A00", "dot.o.big"],     // ⨀ (bigodot)
+  ["\u2A02", "times.o.big"],        // ⨂
+  ["\u2A04", "union.plus.big"],     // ⨄ (biguplus)
   ["\u2A06", "union.sq.big"],       // ⨆
+  ["\u2A0C", "integral.quad"],      // ⨌ (iiiint)
   ["\u22C1", "or.big"],             // ⋁
   ["\u22C0", "and.big"],            // ⋀
 ];
 
 // Delimiters: Unicode → Typst symbol name
 const delimiters: ReadonlyArray<[string, string]> = [
-  ["\u27E8", "angle.l"],       // ⟨
-  ["\u27E9", "angle.r"],       // ⟩
-  ["\u2329", "angle.l"],       // 〈 (old form)
-  ["\u232A", "angle.r"],       // 〉 (old form)
+  ["\u27E8", "chevron.l"],     // ⟨
+  ["\u27E9", "chevron.r"],     // ⟩
+  ["\u2329", "chevron.l"],     // 〈 (old form)
+  ["\u232A", "chevron.r"],     // 〉 (old form)
   ["\u2308", "ceil.l"],        // ⌈
   ["\u2309", "ceil.r"],        // ⌉
   ["\u230A", "floor.l"],       // ⌊
@@ -235,7 +238,7 @@ const dots: ReadonlyArray<[string, string]> = [
 const miscSymbols: ReadonlyArray<[string, string]> = [
   ["\u221E", "infinity"],       // ∞
   ["\u2207", "nabla"],          // ∇
-  ["\u2202", "diff"],           // ∂
+  ["\u2202", "partial"],        // ∂
   ["\u2200", "forall"],         // ∀
   ["\u2203", "exists"],         // ∃
   ["\u2204", "exists.not"],     // ∄
@@ -250,8 +253,8 @@ const miscSymbols: ReadonlyArray<[string, string]> = [
   ["\u2033", "prime.double"],   // ″
   ["\u2034", "prime.triple"],   // ‴
   ["\u2224", "divides.not"],    // ∤
-  ["\u2135", "alef"],            // ℵ
-  ["\u210F", "planck.reduce"],  // ℏ
+  ["\u2135", "aleph"],           // ℵ
+  ["\u210F", "planck"],         // ℏ
   ["\u2113", "ell"],            // ℓ
   ["\u211C", "Re"],             // ℜ
   ["\u2111", "Im"],             // ℑ

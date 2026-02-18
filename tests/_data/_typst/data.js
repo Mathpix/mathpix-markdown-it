@@ -83,7 +83,7 @@ module.exports = [
 
   // === Set operators ===
   { latex: `A \\cup B`, typst: `A union B` },
-  { latex: `A \\cap B`, typst: `A sect B` },
+  { latex: `A \\cap B`, typst: `A inter B` },
   { latex: `A \\subset B`, typst: `A subset B` },
   { latex: `A \\supset B`, typst: `A supset B` },
   { latex: `A \\subseteq B`, typst: `A subset.eq B` },
@@ -103,16 +103,34 @@ module.exports = [
   // === Large operators ===
   { latex: `\\sum_{i=1}^{n}`, typst: `sum_(i = 1)^n` },
   { latex: `\\prod_{i=1}^{n}`, typst: `product_(i = 1)^n` },
+  { latex: `\\coprod_{i=1}^{n}`, typst: `product.co_(i = 1)^n` },
+  { latex: `\\bigcap_{i=1}^{n}`, typst: `inter.big_(i = 1)^n` },
+  { latex: `\\bigcup_{i=1}^{n}`, typst: `union.big_(i = 1)^n` },
+  { latex: `\\bigodot_{i=1}^{n}`, typst: `dot.o.big_(i = 1)^n` },
+  { latex: `\\bigoplus_{i=1}^{n}`, typst: `plus.o.big_(i = 1)^n` },
+  { latex: `\\bigotimes_{i=1}^{n}`, typst: `times.o.big_(i = 1)^n` },
+  { latex: `\\bigsqcup_{i=1}^{n}`, typst: `union.sq.big_(i = 1)^n` },
+  { latex: `\\biguplus_{i=1}^{n}`, typst: `union.plus.big_(i = 1)^n` },
+  { latex: `\\bigvee_{i=1}^{n}`, typst: `or.big_(i = 1)^n` },
+  { latex: `\\bigwedge_{i=1}^{n}`, typst: `and.big_(i = 1)^n` },
+
+  // === Integrals ===
   { latex: `\\int_0^1`, typst: `integral_0^1` },
   { latex: `\\iint`, typst: `integral.double` },
   { latex: `\\iiint`, typst: `integral.triple` },
+  { latex: `\\iiiint_{i=1}^{n}`, typst: `integral.quad_(i = 1)^n` },
   { latex: `\\oint f`, typst: `integral.cont f` },
+
+  // === Limits placement ===
+  { latex: `\\int\\limits_0^1`, typst: `limits(integral)_0^1` },
+  { latex: `\\iint\\limits_{a}^{b}`, typst: `limits(integral.double)_a^b` },
+  { latex: `\\iiint\\limits_{a}^{b}`, typst: `limits(integral.triple)_a^b` },
 
   // === Delimiters / lr ===
   { latex: `\\left( x \\right)`, typst: `lr(( x ))` },
   { latex: `\\left[ x \\right]`, typst: `lr([ x ])` },
   { latex: `\\left\\{ x \\right\\}`, typst: `lr({ x })` },
-  { latex: `\\left\\langle x \\right\\rangle`, typst: `lr(angle.l x angle.r)` },
+  { latex: `\\left\\langle x \\right\\rangle`, typst: `lr(chevron.l x chevron.r)` },
   { latex: `\\left( x \\right.`, typst: `( x` },
   { latex: `\\left. x \\right)`, typst: `x )` },
 
@@ -127,7 +145,7 @@ module.exports = [
   // === Misc symbols ===
   { latex: `\\infty`, typst: `infinity` },
   { latex: `\\nabla f`, typst: `nabla f` },
-  { latex: `\\partial x`, typst: `diff x` },
+  { latex: `\\partial x`, typst: `partial x` },
   { latex: `\\forall x`, typst: `forall x` },
   { latex: `\\exists x`, typst: `exists x` },
   { latex: `\\emptyset`, typst: `emptyset` },
@@ -146,7 +164,7 @@ module.exports = [
   // === Fractions ===
   { latex: `\\binom{n}{k}`, typst: `binom(n, k)` },
   { latex: `\\frac{x+1}{x-1}`, typst: `frac(x + 1, x - 1)` },
-  { latex: `\\frac{\\partial f}{\\partial x}`, typst: `frac(diff f, diff x)` },
+  { latex: `\\frac{\\partial f}{\\partial x}`, typst: `frac(partial f, partial x)` },
 
   // === Combined expressions ===
   { latex: `\\alpha + \\beta`, typst: `alpha + beta` },
@@ -197,9 +215,6 @@ module.exports = [
   // === Math italic ===
   { latex: `\\mathit{word}`, typst: `italic(word)` },
 
-  // === Int with limits ===
-  { latex: `\\int\\limits_0^1`, typst: `integral_0^1` },
-
   // === Nested expressions ===
   { latex: `\\frac{\\sum_{i=1}^{n} x_i}{n}`, typst: `frac(sum_(i = 1)^n x_i, n)` },
   { latex: `\\sqrt{\\frac{a}{b}}`, typst: `sqrt(frac(a, b))` },
@@ -228,7 +243,7 @@ module.exports = [
   { latex: `\\boldsymbol{v}`, typst: `bold(v)` },
 
   // === aleph ===
-  { latex: `\\aleph`, typst: `alef` },
+  { latex: `\\aleph`, typst: `aleph` },
 
   // === stackrel / overset / underset ===
   { latex: `\\stackrel{f}{\\rightarrow}`, typst: `limits(arrow.r)^f` },
@@ -262,6 +277,10 @@ module.exports = [
   { latex: `\\rightleftharpoons`, typst: `harpoons.rtlb` },
   { latex: `A \\lhd B`, typst: `A lt.tri B` },
   { latex: `A \\wr B`, typst: `A wr B` },
+
+  // === Multiscripts (attach) ===
+  { latex: `\\sideset{_a^b}{_c^d} \\sum`, typst: `attach(sum, tl: b, bl: a, t: d, b: c)` },
+  { latex: `\\sideset{_1^2}{} \\sum`, typst: `attach(sum, tl: 2, bl: 1)` },
 
   // === Mathring accent ===
   { latex: `\\mathring{x}`, typst: `circle(x)` },

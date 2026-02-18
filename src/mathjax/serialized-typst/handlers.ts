@@ -438,11 +438,12 @@ const mroot = () => {
 const TYPST_NATIVE_LIMIT_OPS: Set<string> = new Set([
   // Named function operators
   ...TYPST_MATH_OPERATORS,
-  // Large operators (from symbol map)
-  'sum', 'product', 'integral', 'integral.double', 'integral.triple',
-  'integral.cont', 'integral.surf', 'integral.vol',
-  'product.co', 'union.big', 'sect.big',
-  'plus.circle.big', 'times.circle.big', 'union.sq.big',
+  // Large operators (from symbol map) — excludes integrals since Typst
+  // integrals default to scripts, not limits placement
+  'sum', 'product',
+  'product.co', 'union.big', 'inter.big',
+  'dot.o.big', 'plus.o.big', 'times.o.big',
+  'union.plus.big', 'union.sq.big',
   'or.big', 'and.big',
 ]);
 
@@ -600,6 +601,105 @@ const munderover = () => {
           res = addToTypstData(res, { typst: over });
         }
       }
+      return res;
+    } catch (e) {
+      return res;
+    }
+  };
+};
+
+// --- MMULTISCRIPTS handler: pre/post scripts via attach() ---
+const mmultiscripts = () => {
+  return (node, serialize): ITypstData => {
+    let res: ITypstData = initTypstData();
+    try {
+      if (!node.childNodes || node.childNodes.length === 0) return res;
+
+      // Parse mmultiscripts structure:
+      // child[0] = base
+      // child[1..prescriptsIdx-1] = post-scripts (pairs of sub, sup)
+      // child[prescriptsIdx] = mprescripts
+      // child[prescriptsIdx+1..] = pre-scripts (pairs of sub, sup)
+      const base = node.childNodes[0];
+      const baseData: ITypstData = serialize.visitNode(base, '');
+      const baseTrimmed = baseData.typst.trim();
+
+      let prescriptsIdx = -1;
+      for (let i = 1; i < node.childNodes.length; i++) {
+        if (node.childNodes[i].kind === 'mprescripts') {
+          prescriptsIdx = i;
+          break;
+        }
+      }
+
+      // Collect post-scripts (pairs after base, before mprescripts)
+      const postEnd = prescriptsIdx >= 0 ? prescriptsIdx : node.childNodes.length;
+      let postSub = '';
+      let postSup = '';
+      for (let i = 1; i < postEnd; i += 2) {
+        const subNode = node.childNodes[i];
+        const supNode = node.childNodes[i + 1] || null;
+        if (subNode && subNode.kind !== 'none') {
+          const d: ITypstData = serialize.visitNode(subNode, '');
+          if (d.typst.trim()) postSub = d.typst.trim();
+        }
+        if (supNode && supNode.kind !== 'none') {
+          const d: ITypstData = serialize.visitNode(supNode, '');
+          if (d.typst.trim()) postSup = d.typst.trim();
+        }
+      }
+
+      // Collect pre-scripts (pairs after mprescripts)
+      let preSub = '';
+      let preSup = '';
+      if (prescriptsIdx >= 0) {
+        for (let i = prescriptsIdx + 1; i < node.childNodes.length; i += 2) {
+          const subNode = node.childNodes[i];
+          const supNode = node.childNodes[i + 1] || null;
+          if (subNode && subNode.kind !== 'none') {
+            const d: ITypstData = serialize.visitNode(subNode, '');
+            if (d.typst.trim()) preSub = d.typst.trim();
+          }
+          if (supNode && supNode.kind !== 'none') {
+            const d: ITypstData = serialize.visitNode(supNode, '');
+            if (d.typst.trim()) preSup = d.typst.trim();
+          }
+        }
+      }
+
+      const hasPrescripts = preSub || preSup;
+
+      if (!hasPrescripts) {
+        // No prescripts — use simple base_sub^sup syntax
+        res = addToTypstData(res, { typst: baseTrimmed });
+        if (postSub) {
+          res = addToTypstData(res, { typst: '_' });
+          if (needsParens(postSub)) {
+            res = addToTypstData(res, { typst: '(' + postSub + ')' });
+          } else {
+            res = addToTypstData(res, { typst: postSub });
+          }
+        }
+        if (postSup) {
+          res = addToTypstData(res, { typst: '^' });
+          if (needsParens(postSup)) {
+            res = addToTypstData(res, { typst: '(' + postSup + ')' });
+          } else {
+            res = addToTypstData(res, { typst: postSup });
+          }
+        }
+      } else {
+        // Has prescripts — use attach(base, tl:, bl:, t:, b:)
+        const parts: string[] = [];
+        if (preSup) parts.push('tl: ' + preSup);
+        if (preSub) parts.push('bl: ' + preSub);
+        if (postSup) parts.push('t: ' + postSup);
+        if (postSub) parts.push('b: ' + postSub);
+        res = addToTypstData(res, {
+          typst: 'attach(' + baseTrimmed + ', ' + parts.join(', ') + ')'
+        });
+      }
+
       return res;
     } catch (e) {
       return res;
@@ -1197,6 +1297,7 @@ const handlers: { [key: string]: (node, serialize) => ITypstData } = {
   mover: mover(),
   munder: munder(),
   munderover: munderover(),
+  mmultiscripts: mmultiscripts(),
   mspace: mspace(),
   mtext: mtext(),
   mtable: mtable(),
