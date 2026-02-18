@@ -448,7 +448,7 @@ const TYPST_NATIVE_LIMIT_OPS: Set<string> = new Set([
 // Accents NOT in this set must use the accent(content, symbol) form.
 const TYPST_ACCENT_SHORTHANDS: Set<string> = new Set([
   'hat', 'tilde', 'acute', 'grave', 'macron', 'overline', 'underline',
-  'breve', 'dot', 'diaer', 'caron', 'arrow',
+  'breve', 'dot', 'diaer', 'caron', 'arrow', 'circle',
   'overbrace', 'underbrace', 'overbracket', 'underbracket',
 ]);
 

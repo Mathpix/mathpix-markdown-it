@@ -72,6 +72,14 @@ const binaryOperators: ReadonlyArray<[string, string]> = [
   ["\u2021", "dagger.double"],    // ‡
   ["\u2210", "product.co"],       // ∐
   ["\u2212", "-"],                // − (use ASCII minus for natural Typst output)
+  ["\u25C3", "triangle.stroked.small.l"], // ◃ (triangleleft)
+  ["\u25B9", "triangle.stroked.small.r"], // ▹ (triangleright)
+  ["\u22B2", "lt.tri"],           // ⊲ (lhd / trianglelefteq base)
+  ["\u22B3", "gt.tri"],           // ⊳ (rhd / trianglerighteq base)
+  ["\u22B4", "lt.tri.eq"],        // ⊴ (unlhd)
+  ["\u22B5", "gt.tri.eq"],        // ⊵ (unrhd)
+  ["\u2240", "wr"],               // ≀ (wreath product)
+  ["\u2A3F", "product.co"],       // ⨿ (amalg)
 ];
 
 // Relation operators: Unicode → Typst symbol name
@@ -153,6 +161,13 @@ const arrows: ReadonlyArray<[string, string]> = [
   ["\u21A0", "arrow.r.twohead"],      // ↠
   ["\u21A3", "arrow.r.tail"],         // ↣
   ["\u2916", "arrow.r.twohead.tail"], // ⤖
+  ["\u21CC", "harpoons.rtlb"],        // ⇌ (rightleftharpoons)
+  ["\u21CB", "harpoons.ltrb"],        // ⇋ (leftrightharpoons)
+  ["\u21C1", "harpoon.rb"],           // ⇁ (rightharpoondown)
+  ["\u21BD", "harpoon.lb"],           // ↽ (leftharpoondown)
+  ["\u21BE", "harpoon.rt"],           // ↾ (upharpoonright) — reuse for vertical
+  ["\u21C6", "arrows.ll"],            // ⇆ (leftrightarrows — approx)
+  ["\u21C4", "arrows.rr"],            // ⇄ (rightleftarrows — approx)
 ];
 
 // Large operators: Unicode → Typst symbol name
@@ -265,6 +280,7 @@ export const typstAccentMap: Map<string, string> = new Map<string, string>([
   ["\u02C7", "caron"],        // ˇ (check/caron)
   ["\u00B4", "acute"],        // ´ (acute)
   ["\u0060", "grave"],        // ` (grave)
+  ["\u02DA", "circle"],        // ˚ (mathring)
   ["\u23DE", "overbrace"],    // ⏞ (overbrace)
   ["\u23DF", "underbrace"],   // ⏟ (underbrace)
   ["\u23B4", "overbracket"],  // ⎴ (overbracket)

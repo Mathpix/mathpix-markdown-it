@@ -255,4 +255,12 @@ module.exports = [
 
   // === Literal parens in superscript ===
   { latex: `f^{(n)}(a)`, typst: `f^((n))(a)` },
+
+  // === Rare symbols ===
+  { latex: `\\rightleftharpoons`, typst: `harpoons.rtlb` },
+  { latex: `A \\lhd B`, typst: `A lt.tri B` },
+  { latex: `A \\wr B`, typst: `A wr B` },
+
+  // === Mathring accent ===
+  { latex: `\\mathring{x}`, typst: `circle(x)` },
 ];
