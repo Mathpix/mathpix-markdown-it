@@ -793,18 +793,110 @@ const mtable = () => {
       }
       if (isEqnArray) {
         // Equation arrays: emit rows separated by newlines (\ in Typst math)
-        res = addToTypstData(res, { typst: rows.join(' \\\n') });
+        // Append equation tags from mlabeledtr rows
+        const taggedRows: string[] = [];
+        for (let i = 0; i < countRow; i++) {
+          const mtrNode = node.childNodes[i];
+          let rowText = rows[i];
+          if (mtrNode.kind === 'mlabeledtr' && mtrNode.childNodes.length > 0) {
+            const labelCell = mtrNode.childNodes[0];
+            const labelData: ITypstData = serialize.visitNode(labelCell, '');
+            const labelText = labelData.typst.trim();
+            if (labelText) {
+              rowText += ' quad #[' + labelText + ']';
+            }
+          }
+          taggedRows.push(rowText);
+        }
+        // Single-equation tag: use math.equation with numbering
+        if (countRow === 1 && node.childNodes[0].kind === 'mlabeledtr') {
+          const mtrNode = node.childNodes[0];
+          const labelCell = mtrNode.childNodes[0];
+          const labelData: ITypstData = serialize.visitNode(labelCell, '');
+          const labelText = labelData.typst.trim();
+          // Strip Typst string quotes to get raw text for content block
+          const tagContent = labelText.replace(/^"(.*)"$/, '$1');
+          if (tagContent) {
+            res = addToTypstData(res, {
+              typst: '#math.equation(block: true, numbering: n => [' + tagContent + '], $ ' + rows[0] + ' $)'
+            });
+          } else {
+            res = addToTypstData(res, { typst: rows[0] });
+          }
+        } else {
+          // Multi-row: keep quad #[...] fallback for per-row tags
+          res = addToTypstData(res, { typst: taggedRows.join(' \\\n') });
+        }
       } else if (isCases) {
         // Cases environment
         res = addToTypstData(res, { typst: 'cases(' + rows.join(', ') + ')' });
       } else {
         // Matrix: mat(delim: ..., a, b; c, d)
         let matContent = rows.join('; ');
-        if (branchOpen || branchClose) {
-          const delimStr = branchOpen ? 'delim: ' + delimiterToTypst(branchOpen) + ', ' : '';
-          res = addToTypstData(res, { typst: 'mat(' + delimStr + matContent + ')' });
+
+        // Parse array line attributes for augment parameter
+        const columnlines = node.attributes.isSet('columnlines')
+          ? (node.attributes.get('columnlines') as string).split(' ')
+          : [];
+        const rowlines = node.attributes.isSet('rowlines')
+          ? (node.attributes.get('rowlines') as string).split(' ')
+          : [];
+        const frame = node.attributes.isSet('frame')
+          ? (node.attributes.get('frame') as string)
+          : '';
+
+        const vlinePositions: number[] = [];
+        for (let i = 0; i < columnlines.length; i++) {
+          if (columnlines[i] === 'solid' || columnlines[i] === 'dashed') {
+            vlinePositions.push(i + 1);
+          }
+        }
+        const hlinePositions: number[] = [];
+        for (let i = 0; i < rowlines.length; i++) {
+          if (rowlines[i] === 'solid' || rowlines[i] === 'dashed') {
+            hlinePositions.push(i + 1);
+          }
+        }
+
+        // Build augment string
+        let augmentStr = '';
+        if (hlinePositions.length > 0 || vlinePositions.length > 0) {
+          const parts: string[] = [];
+          if (hlinePositions.length === 1) {
+            parts.push('hline: ' + hlinePositions[0]);
+          } else if (hlinePositions.length > 1) {
+            parts.push('hline: (' + hlinePositions.join(', ') + ')');
+          }
+          if (vlinePositions.length === 1) {
+            parts.push('vline: ' + vlinePositions[0]);
+          } else if (vlinePositions.length > 1) {
+            parts.push('vline: (' + vlinePositions.join(', ') + ')');
+          }
+          augmentStr = 'augment: #(' + parts.join(', ') + '), ';
+        }
+
+        // Build mat() parameters
+        const params: string[] = [];
+        const hasDelimiters = branchOpen || branchClose;
+        if (hasDelimiters) {
+          if (branchOpen) {
+            params.push('delim: ' + delimiterToTypst(branchOpen));
+          }
         } else {
-          res = addToTypstData(res, { typst: 'mat(' + matContent + ')' });
+          // Arrays/matrices without parent delimiters should not have parens
+          params.push('delim: #none');
+        }
+        if (augmentStr) {
+          params.push(augmentStr.slice(0, -2)); // remove trailing ", "
+        }
+
+        const paramStr = params.length > 0 ? params.join(', ') + ', ' : '';
+        const matExpr = 'mat(' + paramStr + matContent + ')';
+
+        if (frame === 'solid') {
+          res = addToTypstData(res, { typst: '#box(stroke: 0.5pt, inset: 3pt, $ ' + matExpr + ' $)' });
+        } else {
+          res = addToTypstData(res, { typst: matExpr });
         }
       }
       return res;

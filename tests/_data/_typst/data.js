@@ -264,6 +264,15 @@ module.exports = [
   // === Mathring accent ===
   { latex: `\\mathring{x}`, typst: `circle(x)` },
 
+  // === Array lines (augment) ===
+  { latex: `\\begin{array}{|c|c|} \\hline a & b \\\\ \\hline c & d \\\\ \\hline \\end{array}`, typst: `#box(stroke: 0.5pt, inset: 3pt, $ mat(delim: #none, augment: #(hline: 1, vline: 1), a, b; c, d) $)` },
+  { latex: `\\begin{array}{c|c} a & b \\\\ c & d \\end{array}`, typst: `mat(delim: #none, augment: #(vline: 1), a, b; c, d)` },
+  { latex: `\\begin{array}{lcr} a & b & c \\end{array}`, typst: `mat(delim: #none, a, b, c)` },
+
+  // === Equation tags ===
+  { latex: `E = mc^2 \\tag{1}`, typst: `#math.equation(block: true, numbering: n => [(1)], $ E = m c^2 $)` },
+  { latex: `\\begin{align} a &= b \\tag{1} \\\\ c &= d \\tag{2} \\end{align}`, typst: `a = b quad #["(1)"] \\\nc = d quad #["(2)"]` },
+
   // === numcases / subnumcases ===
   { latex: `\\begin{numcases}{f(x)=} 0 & x < 0 \\\\ x & x \\geq 0 \\end{numcases}`, typst: `f(x) = cases(0 & "x < 0 ", x & "x \\geq 0 ")` },
   { latex: `\\begin{subnumcases}{|x|=} -x & x < 0 \\\\ x & x \\geq 0 \\end{subnumcases}`, typst: `|x| = cases(- x & "x < 0 ", x & "x \\geq 0 ")` },
