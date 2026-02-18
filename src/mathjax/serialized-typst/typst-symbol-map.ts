@@ -168,6 +168,8 @@ const arrows: ReadonlyArray<[string, string]> = [
   ["\u21BE", "harpoon.rt"],           // ↾ (upharpoonright) — reuse for vertical
   ["\u21C6", "arrows.ll"],            // ⇆ (leftrightarrows — approx)
   ["\u21C4", "arrows.rr"],            // ⇄ (rightleftarrows — approx)
+  ["\u2195", "arrow.t.b"],            // ↕ (updownarrow)
+  ["\u21D5", "arrow.t.b.double"],     // ⇕ (Updownarrow)
 ];
 
 // Large operators: Unicode → Typst symbol name
@@ -243,6 +245,8 @@ const miscSymbols: ReadonlyArray<[string, string]> = [
   ["\u2234", "therefore"],      // ∴
   ["\u2235", "because"],        // ∵
   ["\u25A1", "square"],         // □
+  ["\u25FB", "square"],         // ◻ (white medium square — MathJax variant)
+  ["\u25FC", "square.filled"],  // ◼ (black medium square)
   ["\u2322", "frown"],          // ⌢
   ["\u00A0", "space.nobreak"],   // non-breaking space
   ["\u2061", ""],               // function application (invisible)

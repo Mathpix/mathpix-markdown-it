@@ -441,7 +441,9 @@ const TYPST_NATIVE_LIMIT_OPS: Set<string> = new Set([
   // Large operators (from symbol map)
   'sum', 'product', 'integral', 'integral.double', 'integral.triple',
   'integral.cont', 'integral.surf', 'integral.vol',
-  'coprod', 'union.big', 'sect.big',
+  'product.co', 'union.big', 'sect.big',
+  'plus.circle.big', 'times.circle.big', 'union.sq.big',
+  'or.big', 'and.big',
 ]);
 
 // Typst accent shorthand functions that can be called as fn(content).

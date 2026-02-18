@@ -2,6 +2,7 @@ import { MmlVisitor } from 'mathjax-full/js/core/MmlTree/MmlVisitor.js';
 import { MmlNode, TextNode, XMLNode, TEXCLASS } from 'mathjax-full/js/core/MmlTree/MmlNode.js';
 import { handle } from './handlers';
 import { ITypstData, addToTypstData, initTypstData } from './common';
+import { findTypstSymbol } from './typst-symbol-map';
 
 // Extract big delimiter info from a TeXAtom node wrapping a sized mo.
 // The TeXAtom itself may have texClass=0 (ORD); the OPEN/CLOSE class
@@ -95,7 +96,9 @@ export class SerializedTypstVisitor extends MmlVisitor {
               }
               content += innerData.typst;
             }
-            const lrContent = openInfo.delim + ' ' + content.trim() + ' ' + (closeInfo?.delim || ')');
+            const openDelim = findTypstSymbol(openInfo.delim);
+            const closeDelim = findTypstSymbol(closeInfo?.delim || ')');
+            const lrContent = openDelim + ' ' + content.trim() + ' ' + closeDelim;
             const lrExpr = 'lr(size: #' + openInfo.size + ', ' + lrContent + ')';
             // Add spacing before lr if needed
             if (res.typst && /^[\w.]/.test(lrExpr)
