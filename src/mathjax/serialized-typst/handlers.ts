@@ -201,6 +201,9 @@ const mo = () => {
       } else if (!inScript && SPACED_OPERATORS.has(value)) {
         // Common binary/relational operators: add spaces
         res = addToTypstData(res, { typst: ' ' + typstValue + ' ' });
+      } else if (!inScript && value === ',') {
+        // Commas: add trailing space for readability
+        res = addToTypstData(res, { typst: ', ' });
       } else {
         res = addToTypstData(res, { typst: typstValue });
       }
@@ -290,6 +293,13 @@ const mfrac = () => {
   };
 };
 
+// Prime symbol → Typst ' shorthand mapping
+const PRIME_SHORTHANDS: Map<string, string> = new Map([
+  ['prime', "'"],
+  ['prime.double', "''"],
+  ['prime.triple', "'''"],
+]);
+
 // --- MSUP handler: superscripts ---
 const msup = () => {
   return (node, serialize): ITypstData => {
@@ -301,11 +311,17 @@ const msup = () => {
       const dataSecond: ITypstData = secondChild ? serialize.visitNode(secondChild, '') : initTypstData();
       const sup = dataSecond.typst.trim();
       res = addToTypstData(res, { typst: dataFirst.typst });
-      res = addToTypstData(res, { typst: '^' });
-      if (needsParens(sup)) {
-        res = addToTypstData(res, { typst: '(' + sup + ')' });
+      // Optimize prime symbols to Typst ' shorthand
+      const primeShorthand = PRIME_SHORTHANDS.get(sup);
+      if (primeShorthand) {
+        res = addToTypstData(res, { typst: primeShorthand });
       } else {
-        res = addToTypstData(res, { typst: sup });
+        res = addToTypstData(res, { typst: '^' });
+        if (needsParens(sup)) {
+          res = addToTypstData(res, { typst: '(' + sup + ')' });
+        } else {
+          res = addToTypstData(res, { typst: sup });
+        }
       }
       return res;
     } catch (e) {
@@ -407,6 +423,17 @@ const mroot = () => {
   };
 };
 
+// Typst symbols/functions that natively support limit placement (above/below).
+// These don't need limits() wrapping in mover/munder fallback.
+const TYPST_NATIVE_LIMIT_OPS: Set<string> = new Set([
+  // Named function operators
+  ...TYPST_MATH_OPERATORS,
+  // Large operators (from symbol map)
+  'sum', 'product', 'integral', 'integral.double', 'integral.triple',
+  'integral.cont', 'integral.surf', 'integral.vol',
+  'coprod', 'union.big', 'sect.big',
+]);
+
 // Typst accent shorthand functions that can be called as fn(content).
 // Accents NOT in this set must use the accent(content, symbol) form.
 const TYPST_ACCENT_SHORTHANDS: Set<string> = new Set([
@@ -439,11 +466,21 @@ const mover = () => {
           return res;
         }
       }
-      // Fallback: base^(over) — e.g. for stackrel/overset
+      // Fallback: base^(over) or limits(base)^(over)
+      // Use limits() for symbols that DON'T natively support limit placement.
+      // Skip limits() when:
+      // - Base is a known Typst operator/large operator that already places limits above
+      // - Base output is from an accent/brace function that already accepts ^ labels
       const base = dataFirst.typst.trim();
       const over = dataSecond.typst.trim();
       if (over) {
-        res = addToTypstData(res, { typst: base });
+        const baseIsNativeLimitOp = TYPST_NATIVE_LIMIT_OPS.has(base);
+        const baseIsSpecialFn = /^(overbrace|underbrace|overline|underline|op)\(/.test(base);
+        if (baseIsNativeLimitOp || baseIsSpecialFn) {
+          res = addToTypstData(res, { typst: base });
+        } else {
+          res = addToTypstData(res, { typst: 'limits(' + base + ')' });
+        }
         res = addToTypstData(res, { typst: '^' });
         if (needsParens(over)) {
           res = addToTypstData(res, { typst: '(' + over + ')' });
@@ -485,11 +522,17 @@ const munder = () => {
           return res;
         }
       }
-      // Fallback: base_(under)
+      // Fallback: base_(under) or limits(base)_(under)
       const base = dataFirst.typst.trim();
       const under = dataSecond.typst.trim();
       if (under) {
-        res = addToTypstData(res, { typst: base });
+        const baseIsNativeLimitOp = TYPST_NATIVE_LIMIT_OPS.has(base);
+        const baseIsSpecialFn = /^(overbrace|underbrace|overline|underline|op)\(/.test(base);
+        if (baseIsNativeLimitOp || baseIsSpecialFn) {
+          res = addToTypstData(res, { typst: base });
+        } else {
+          res = addToTypstData(res, { typst: 'limits(' + base + ')' });
+        }
         res = addToTypstData(res, { typst: '_' });
         if (needsParens(under)) {
           res = addToTypstData(res, { typst: '(' + under + ')' });
@@ -593,8 +636,8 @@ const delimiterToTypst = (delim: string): string => {
     case '{': return '"{"';
     case '}': return '"}"';
     case '|': return '"|"';
-    case '\u2016': return '"‖"'; // double vertical bar
-    case '\u2225': return '"‖"'; // parallel
+    case '\u2016': return '"||"'; // double vertical bar
+    case '\u2225': return '"||"'; // parallel
     default: return '"' + delim + '"';
   }
 };

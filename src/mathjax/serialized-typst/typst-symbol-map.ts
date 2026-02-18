@@ -188,7 +188,7 @@ const delimiters: ReadonlyArray<[string, string]> = [
   ["\u231E", "corner.bl"],     // ⌞
   ["\u231F", "corner.br"],     // ⌟
   ["\u2016", "bar.v.double"],  // ‖
-  ["\u2225", "bar.v.double"],  // ∥ (used as norm delimiter)
+  // Note: \u2225 (∥) is NOT duplicated here — it maps to "parallel" in relationOperators
 ];
 
 // Dots: Unicode → Typst symbol name
@@ -215,6 +215,9 @@ const miscSymbols: ReadonlyArray<[string, string]> = [
   ["\u2220", "angle"],          // ∠
   ["\u25B3", "triangle.t"],     // △
   ["\u2032", "prime"],          // ′
+  ["\u2033", "prime.double"],   // ″
+  ["\u2034", "prime.triple"],   // ‴
+  ["\u2224", "divides.not"],    // ∤
   ["\u2135", "alef"],            // ℵ
   ["\u210F", "planck.reduce"],  // ℏ
   ["\u2113", "ell"],            // ℓ

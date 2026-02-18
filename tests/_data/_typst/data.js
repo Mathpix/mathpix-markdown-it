@@ -207,7 +207,7 @@ module.exports = [
   { latex: `x \\text{ and } y`, typst: `x " and " y` },
 
   // === Thin space preserved ===
-  { latex: `\\iint_D f(x,y) \\, dA`, typst: `integral.double_D f(x,y) thin d A` },
+  { latex: `\\iint_D f(x,y) \\, dA`, typst: `integral.double_D f(x, y) thin d A` },
 
   // === Operatorname with limits ===
   { latex: `\\operatorname*{argmax}_{x} f(x)`, typst: `op("argmax", limits: #true)_x f(x)` },
@@ -227,4 +227,22 @@ module.exports = [
 
   // === aleph ===
   { latex: `\\aleph`, typst: `alef` },
+
+  // === stackrel / overset / underset ===
+  { latex: `\\stackrel{f}{\\rightarrow}`, typst: `limits(arrow.r)^f` },
+  { latex: `\\overset{n}{=}`, typst: `limits(=)^n` },
+  { latex: `\\underset{n}{=}`, typst: `limits(=)_n` },
+
+  // === Vmatrix (double bar delimiter) ===
+  { latex: `\\begin{Vmatrix} a & b \\\\ c & d \\end{Vmatrix}`, typst: `mat(delim: "||", a, b; c, d)` },
+
+  // === nmid ===
+  { latex: `a \\nmid b`, typst: `a divides.not b` },
+
+  // === Prime shorthand ===
+  { latex: `f'(x)`, typst: `f'(x)` },
+  { latex: `f''(x)`, typst: `f''(x)` },
+
+  // === Parallel ===
+  { latex: `a \\parallel b`, typst: `a parallel b` },
 ];
