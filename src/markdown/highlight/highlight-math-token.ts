@@ -26,9 +26,11 @@ export const convertMathToHtmlWithHighlight = (state, token, options) => {
       outMath: {}, mathJax: options.mathJax, accessibility: options.accessibility,
       nonumbers: options.nonumbers
     }, true);
-    token.mathData.svg = data.data.svg;
-    token.mathData.height = data.data.height;
-    token.mathData.heightAndDepth = data.data.heightAndDepth;
+    if (token.mathData) {
+      token.mathData.svg = data.data.svg;
+      token.mathData.height = data.data.height;
+      token.mathData.heightAndDepth = data.data.heightAndDepth;
+    }
     return token;
   } catch (e) {
     // console.log('ERROR MathJax =>', e.message, e);

@@ -105,6 +105,7 @@ export type TMarkdownItOptions = {
     enableSizeCalculation?: boolean;
 };
 export type TOutputMath = {
+    output_format?: 'svg' | 'mathml' | 'latex';
     include_mathml?: boolean;
     include_mathml_word?: boolean;
     include_asciimath?: boolean;

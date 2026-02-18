@@ -1,5 +1,37 @@
 # February 2026
 
+## [2.0.36] - 16 February 2026
+
+- Math Output Format:
+  - Added `output_format` option to `TOutputMath` to control which math format is placed in HTML output.
+  - `'svg'` (default): Pre-rendered SVG with hidden formats, works offline.
+  - `'mathml'`: Native `<math>` elements only, smaller file size, requires client-side rendering.
+  - `'latex'`: Raw LaTeX with original delimiters, smaller file size, requires client-side rendering.
+
+- Browser Rendering Script (`auto-render.js`):
+  - New browser bundle for client-side math rendering at `es5/browser/auto-render.js`.
+  - Renders MathML or LaTeX content to SVG.
+  - Generates hidden format elements for context menu compatibility.
+  - Configurable accessibility support via `MathpixAccessibilityConfig`:
+    - `assistive_mml`: Add `<mjx-assistive-mml>` for screen readers.
+    - `include_speech`: Add `aria-label` with speech text.
+
+- Browser Speech Script (`add-speech.js`):
+  - New browser bundle for adding speech to already-rendered SVG at `es5/browser/add-speech.js`.
+  - Use when SVG was rendered with `assistiveMml: true` but without `sre` (speech).
+  - Loads SRE dynamically and adds `aria-label`, `role="math"`, `tabindex` to `mjx-container` elements.
+  - Requires `mjx-assistive-mml` to be present in the rendered output.
+  - Exposes `window.MathpixSpeech.addSpeechToRenderedMath(container?)`.
+
+- Accessibility:
+  - `mjx-assistive-mml` is no longer marked with `aria-hidden="true"` when accessibility options are enabled. Previously, the assistive MathML element was hidden from screen readers even when the user explicitly requested accessibility via `assistiveMml: true` or `sre`. Now, if any accessibility option is set, the MathML content is exposed to assistive technology — either via `aria-labelledby` (pointing to the assistive MML) or via `aria-label` (SRE speech text). This affects both server-side rendering (`addAriaToMathHTML`) and the new browser bundles.
+
+- Fixes:
+  - Fixed centering issue for equations with numbering inside `.math-block[data-width="full"]`.
+
+- Docs:
+  - Added implementation details in `pr-specs/2026-01-html-math-output-options.md`.
+
 ## [2.0.35] - 13 February 2026
 
 - Tabular:

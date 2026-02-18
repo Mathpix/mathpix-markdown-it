@@ -691,6 +691,127 @@ import {
 <img width="370" alt="Screen Shot 2022-05-03 at 17 21 50" src="https://user-images.githubusercontent.com/32493105/166471623-fd3f6a5b-84e4-4d43-afcd-0384e83eb2df.png">
 
 
+## Output Format
+
+The `output_format` option in `TOutputMath` controls which math format is placed in the HTML output. This is useful for optimizing file size or delegating rendering to the client.
+
+| Value | Description |
+|-------|-------------|
+| `'svg'` (default) | Pre-rendered SVG with hidden format elements. Works offline, no client-side rendering needed. |
+| `'mathml'` | Native `<math>` elements only. Smaller file size, requires client-side rendering via `auto-render.js`. |
+| `'latex'` | Raw LaTeX with original delimiters. Smaller file size, requires client-side rendering via `auto-render.js`. |
+
+### Example usage
+
+```js
+const options = {
+  outMath: {
+    output_format: 'mathml', // or 'latex'
+    include_mathml: true,
+    include_latex: true,
+  }
+};
+const html = MathpixMarkdownModel.markdownToHTML('$x^2$', options);
+```
+
+When using `'mathml'` or `'latex'`, the server outputs minimal HTML containing only the raw format. Use the browser rendering script (`auto-render.js`) to transform this into the full structure with SVG and hidden formats.
+
+
+## Browser Rendering Script (auto-render.js)
+
+For `output_format: 'mathml'` or `output_format: 'latex'`, use the browser bundle to render math on the client side.
+
+### Loading the script
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/mathpix-markdown-it@latest/es5/browser/auto-render.js"></script>
+```
+
+### Usage
+
+```js
+// Render all math elements in a container
+window.MathpixRender.renderMathInElement(document.getElementById('content'), {
+  outMath: {
+    output_format: 'svg',
+    include_svg: true,
+    include_mathml: true,
+    include_latex: true,
+    include_asciimath: true,
+  },
+  accessibility: {
+    assistive_mml: true,
+    include_speech: true,
+  }
+});
+```
+
+### Configuration options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `outMath` | `TOutputMath` | `{ output_format: 'svg', include_svg: true }` | Controls which hidden formats to generate. Set `include_mathml`, `include_latex`, `include_asciimath`, etc. to `true` to generate hidden format elements for context menu compatibility. |
+| `accessibility.assistive_mml` | `boolean` | `true` | Add `<mjx-assistive-mml>` element for screen readers |
+| `accessibility.include_speech` | `boolean` | `false` | Add `aria-label` with speech text (requires `assistive_mml: true`) |
+
+### Accessibility behavior
+
+The browser bundle uses a simplified accessibility configuration (different from the server-side [TAccessibility](#taccessibility) interface):
+
+| Configuration | Result |
+|---------------|--------|
+| `{ assistive_mml: true, include_speech: true }` | `aria-label` attribute with speech text + `<mjx-assistive-mml>` element |
+| `{ assistive_mml: true }` | `aria-labelledby` pointing to `<mjx-assistive-mml>` ID |
+| No accessibility config | No accessibility attributes added |
+
+The script automatically skips elements that have already been rendered.
+
+**Note:** For server-side rendering accessibility, use the [TAccessibility](#taccessibility) interface with `assistiveMml` and `sre` options instead.
+
+
+## Browser Speech Script (add-speech.js)
+
+Use this script to add speech accessibility to math that was already rendered server-side as SVG with `assistiveMml: true` but without SRE speech. It loads SRE dynamically and adds `aria-label` attributes to existing `mjx-container` elements.
+
+This is useful when you want fast server-side rendering without the SRE dependency, but still want speech accessibility on the client.
+
+### Prerequisites
+
+The rendered HTML must include `<mjx-assistive-mml>` elements (i.e., the server used `accessibility: { assistiveMml: true }`).
+
+### Loading the script
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/mathpix-markdown-it@latest/es5/browser/add-speech.js"></script>
+```
+
+By default, the script automatically processes `document.body` on `DOMContentLoaded`.
+
+### Usage
+
+```js
+// Add speech to all rendered math in a specific container
+window.MathpixSpeech.addSpeechToRenderedMath(document.getElementById('content'));
+```
+
+### Configuration
+
+Set `window.MathpixSpeechConfig` before the script loads to customize behavior:
+
+```js
+window.MathpixSpeechConfig = {
+  container: document.getElementById('math-content') // defaults to document.body
+};
+```
+
+### What it does
+
+For each `mjx-container` element that does not already have an `aria-label`:
+1. Extracts MathML from the `<mjx-assistive-mml>` child element
+2. Generates speech text using SRE (Speech Rule Engine)
+3. Sets `aria-label`, `role="math"`, and `tabindex="0"` on the container
+
+
 # Documentation
 
 ## React components
@@ -818,6 +939,7 @@ The `MathpixMarkdown` React element accepts the following props:
 
 |                          | type&nbsp;*`default`*        |  description                                                                                                      |
 |--------------------------|------------------------------|-------------------------------------------------------------------------------------------------------------------|
+| `output_format`          | `'svg' \| 'mathml' \| 'latex'`&nbsp;*`'svg'`* | Controls which math format is placed in HTML output. See [Output Format](#output-format) section.    |
 | `include_mathml`         | boolean&nbsp;*`false`*       | outputs mathml `<mathml style="display: none"><math>...</math></mathml>`                                          |
 | `include_mathml_word`    | boolean&nbsp;*`false`*       | outputs mathml_word `<mathmlword style="display: none"><math>...</math></mathmlword>`                             |
 | `include_asciimath`      | boolean&nbsp;*`false`*       | outputs asciimath `<asciimath style="display: none">...</asciimath>`                                              |
@@ -964,7 +1086,7 @@ const { loadSreAsync } = require('mathpix-markdown-it/lib/sre/sre-node');
 
 ```
 
-Then just pass the resulting value to `accessibility.spe`
+Then just pass the resulting value to `accessibility.sre`
 ```js
 accessibility: {
      assistiveMml: true, // assistive-mml will be added to mjx-container

@@ -125,6 +125,7 @@ export type TMarkdownItOptions = {
 }
 
 export type TOutputMath = {
+  output_format?: 'svg' | 'mathml' | 'latex';
   include_mathml?: boolean,
   include_mathml_word?: boolean,
   include_asciimath?: boolean,
@@ -290,6 +291,7 @@ class MathpixMarkdown_Model {
     const { lineNumbering = false, isDisableFancy = false,  htmlWrapper = false } = options;
     const disableRules = isDisableFancy ? this.disableFancyArrayDef : options ? options.disableRules || [] : [];
     this.setOptions(disableRules);
+    MathJax.beginRender(options?.previewUuid);
     let html = markdownHTML(markdown, options);
     if (!lineNumbering) {
       MathJax.Reset();

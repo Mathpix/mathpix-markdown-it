@@ -11,6 +11,42 @@ export const getSpeech = (sre, mml): string => {
   }
 };
 
+/**
+ * Process a single mjx-container element to add speech accessibility.
+ *
+ * @param sre - Speech Rule Engine instance
+ * @param elMath - The mjx-container element
+ * @param doc - Document object for creating elements (pass `document` in browser)
+ */
+export const addSpeechToMathContainer = (
+  sre: any,
+  elMath: Element,
+  doc: Document
+): void => {
+  // Skip if already has aria-label
+  if (elMath.hasAttribute('aria-label')) return;
+  // Find assistive MathML element
+  const elMml = elMath.querySelector('mjx-assistive-mml');
+  if (!elMml) return;
+  const speech: string = getSpeech(sre, elMml.innerHTML);
+  if (!speech) return;
+  // Set accessibility attributes
+  elMath.setAttribute('aria-label', speech);
+  elMath.setAttribute('role', 'math');
+  elMath.setAttribute('tabindex', '0');
+  elMath.removeAttribute('aria-labelledby');
+  // Add hidden speech element for context menu
+  const elSpeech = doc.createElement('speech');
+  elSpeech.textContent = speech;
+  elSpeech.style.display = 'none';
+  const parent = elMath.parentElement;
+  if (parent) {
+    parent.appendChild(elSpeech);
+  } else {
+    console.warn('[addSpeechToMathContainer] mjx-container has no parentElement — speech element not appended');
+  }
+};
+
 export const addAriaToMathHTML = (sre, html: string) => {
   try {
     const doc = new DOMParser().parseFromString(html, "text/html");
@@ -23,29 +59,7 @@ export const addAriaToMathHTML = (sre, html: string) => {
     }
 
     for (let i = 0; i < mathEls.length; i++) {
-      const elMath = mathEls[i];
-      const elMml = elMath 
-        ? elMath.querySelector('mjx-assistive-mml') 
-        : null;
-      
-      if(!elMml) {
-        continue;
-      }
-
-      const speech = getSpeech(sre, elMml.innerHTML);
-      elMml.setAttribute('aria-hidden', "true");
-      if (!speech) {
-        continue;
-      }
-
-      elMath.setAttribute('aria-label', speech);
-      elMath.setAttribute('role', "math");
-      elMath.setAttribute('tabindex', '0');
-      
-      const elSpeech = doc.createElement('speech');
-      elSpeech.innerHTML = speech;
-      elSpeech.style.display = "none";
-      elMath.parentElement.appendChild(elSpeech);
+      addSpeechToMathContainer(sre, mathEls[i], doc);
     }
 
     return doc.body.innerHTML;
