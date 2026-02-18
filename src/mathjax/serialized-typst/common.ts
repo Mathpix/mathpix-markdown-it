@@ -15,10 +15,10 @@ export const addToTypstData = (
 };
 
 export const needsParens = (s: string): boolean => {
+  // In Typst, sub/superscript grouping always uses (): x^(content), x_(content)
+  // Even if the content itself starts/ends with () — those are literal, not grouping.
+  // e.g. f^{(n)} in LaTeX → f^((n)) in Typst (outer = grouping, inner = literal)
   if (s.length <= 1) {
-    return false;
-  }
-  if (/^\(.*\)$/.test(s) || /^\{.*\}$/.test(s) || /^\[.*\]$/.test(s)) {
     return false;
   }
   return true;

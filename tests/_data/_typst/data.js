@@ -245,4 +245,14 @@ module.exports = [
 
   // === Parallel ===
   { latex: `a \\parallel b`, typst: `a parallel b` },
+
+  // === Extensible arrows ===
+  { latex: `\\xrightarrow{f}`, typst: `limits(arrow.r)^f` },
+  { latex: `\\xleftarrow{g}`, typst: `limits(arrow.l)^g` },
+
+  // === mathbb on numbers ===
+  { latex: `\\mathbb{1}`, typst: `bb(1)` },
+
+  // === Literal parens in superscript ===
+  { latex: `f^{(n)}(a)`, typst: `f^((n))(a)` },
 ];

@@ -220,6 +220,16 @@ const mn = () => {
     let res: ITypstData = initTypstData();
     try {
       const value = getChildrenText(node);
+      // Check for font variant (e.g. \mathbb{1})
+      const atr = getAttributes(node);
+      const mathvariant: string = atr?.mathvariant || '';
+      if (mathvariant && mathvariant !== 'normal') {
+        const fontFn = typstFontMap.get(mathvariant);
+        if (fontFn) {
+          res = addToTypstData(res, { typst: fontFn + '(' + value + ')' });
+          return res;
+        }
+      }
       res = addToTypstData(res, { typst: value });
       return res;
     } catch (e) {
@@ -563,8 +573,15 @@ const munderover = () => {
       const base = dataFirst.typst;
       const under = dataSecond.typst.trim();
       const over = dataThird.typst.trim();
-      // Emit: base_(under)^(over)
-      res = addToTypstData(res, { typst: base });
+      // Use limits() for non-operator bases (e.g. extensible arrows)
+      const baseTrimmed = base.trim();
+      const baseIsNativeLimitOp = TYPST_NATIVE_LIMIT_OPS.has(baseTrimmed);
+      const baseIsSpecialFn = /^(overbrace|underbrace|overline|underline|op)\(/.test(baseTrimmed);
+      if (baseIsNativeLimitOp || baseIsSpecialFn) {
+        res = addToTypstData(res, { typst: base });
+      } else {
+        res = addToTypstData(res, { typst: 'limits(' + baseTrimmed + ')' });
+      }
       if (under) {
         res = addToTypstData(res, { typst: '_' });
         if (needsParens(under)) {
