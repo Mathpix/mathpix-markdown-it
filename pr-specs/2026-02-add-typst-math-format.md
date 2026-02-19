@@ -147,7 +147,8 @@ Built-in Typst math operators (`sin`, `cos`, `tan`, `log`, `lim`, etc.) pass thr
 
 | LaTeX | Typst |
 |-------|-------|
-| `E = mc^2 \tag{1}` | `#math.equation(block: true, numbering: n => [(1)], $ E = m c^2 $)` |
+| `\begin{equation} y^2 \end{equation}` (auto) | `#math.equation(block: true, numbering: "(1)", $ y^2 $)` |
+| `E = mc^2 \tag{1.2}` (explicit) | `#math.equation(block: true, numbering: n => [(1.2)], $ E = m c^2 $)` |
 | Multi-row with `\tag` | `row quad #["(tag)"]` per row |
 
 ### Large operators and integrals
@@ -204,6 +205,17 @@ Multi-character Typst symbol names (e.g. `lt.eq`, `gt.eq`, `arrow.r`) must have 
 
 LaTeX allows `^{x}` with no preceding base. The `msup`, `msub`, and `msubsup` handlers detect an empty base and emit `""` as a placeholder, preventing Typst's "unexpected hat" error.
 
+### Auto-numbering vs explicit `\tag`
+
+Typst uses `numbering: "(1)"` for standard sequential numbering, and `numbering: n => [(tag)]` for fixed custom labels. The MathML tree does not distinguish auto-numbered equations (`\begin{equation}`) from explicit `\tag{1}` — both produce identical `mlabeledtr` nodes with `<mtext>(1)</mtext>`.
+
+To solve this, `src/mathjax/mathjax.ts` patches `AbstractTags`:
+- `autoTag()` sets a `_isAutoTag` flag after calling the original method
+- `getTag()` checks the flag and propagates it as `data-tag-auto: true` in the label `mtd` node's properties
+- `startEquation()` resets the flag
+
+The serializer checks `labelCell.properties['data-tag-auto']`: if `true` → `numbering: "(1)"`; otherwise → `numbering: n => [(tag)]`. This correctly handles edge cases like `\tag{1}` inside `equation*`, which is explicit despite looking like an auto-number.
+
 ### Pipe-pair detection
 
 LaTeX `|\alpha|` without `\left...\right` produces unpaired `<mo>|</mo>` nodes in MathML. The `visitInferredMrowNode` method detects matched pipe pairs at the top level and wraps them as `lr(| content |)`, ensuring they form a single grouped expression in Typst (important after `/` for correct fraction denominator binding). Pipe pairs inside `TeXAtom` groups (e.g. superscript `{|\alpha|}`) are left as-is since the enclosing script parens already provide grouping.
@@ -219,7 +231,7 @@ LaTeX `|\alpha|` without `\left...\right` produces unpaired `<mo>|</mo>` nodes i
 ### Output
 
 ```typst
-""^(|alpha|) sqrt(x^(alpha)) lt.eq (x bullet alpha)/ lr(| alpha |)
+""^(|alpha|) sqrt(x^(alpha)) lt.eq (x bullet alpha)\/ lr(| alpha |)
 ```
 
 ## Files Changed
@@ -231,6 +243,7 @@ LaTeX `|\alpha|` without `\left...\right` produces unpaired `<mo>|</mo>` nodes i
 | `src/mathjax/serialized-typst/typst-symbol-map.ts` | **New.** Unicode → Typst symbol mapping (~300 entries), accent map, font map |
 | `src/mathjax/serialized-typst/common.ts` | **New.** Shared types and helpers (`ITypstData`, `needsParens`) |
 | `src/mathjax/serialized-typst/node-utils.ts` | **New.** Tree position utilities |
+| `src/mathjax/mathjax.ts` | Patched `AbstractTags` (`autoTag`, `getTag`, `startEquation`) to mark auto-numbered tags with `data-tag-auto` property |
 | `src/mathjax/index.ts` | Added `include_typst` to `OuterData` and `OuterHTML`; `<typstmath>` HTML tag |
 | `src/mathpix-markdown-model/index.ts` | Added `include_typst?: boolean` to `TOutputMath` |
 | `src/contex-menu/menu/consts.ts` | Added `'typst'` to `mathExportTypes` and `eMathType` enum |
@@ -280,5 +293,6 @@ npx mocha tests/*.js   # All tests pass (Typst + existing)
 - Typst conversion is opt-in via `include_typst: true` — disabled by default
 - Context menu changes are additive (new enum value, new case in switch)
 - DOM parser change adds one tag name to an existing array
+- `AbstractTags` patch in `mathjax.ts` only adds a `data-tag-auto` property to tag nodes — does not alter existing tag behavior or MathML output
 
 **Rollback**: Revert PR or pin to previous version
