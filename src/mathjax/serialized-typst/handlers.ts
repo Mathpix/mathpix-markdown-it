@@ -133,7 +133,7 @@ const mi = () => {
           typstValue = 'op("' + value + '")';
         }
       }
-      // \mathrm{d} → dif (differential operator optimization)
+      // \mathrm{d} → dif (differential operator shorthand, single-char d only)
       else if (mathvariant === 'normal' && value === 'd' && !isKnownSymbol) {
         typstValue = 'dif';
       }
@@ -1191,11 +1191,22 @@ const mpadded = () => {
   };
 };
 
-// --- MPHANTOM handler: invisible content ---
-// Typst math mode has no phantom() equivalent, so drop the content
+// --- MPHANTOM handler: invisible content that preserves space ---
+// Typst's hide() is the equivalent of LaTeX \phantom — renders content
+// invisibly while preserving its dimensions.
 const mphantom = () => {
-  return (_node, _serialize): ITypstData => {
-    return initTypstData();
+  return (node, serialize): ITypstData => {
+    let res: ITypstData = initTypstData();
+    try {
+      const data: ITypstData = handlerApi.handleAll(node, serialize);
+      const content = data.typst.trim();
+      if (content) {
+        res = addToTypstData(res, { typst: '#hide($' + content + '$)' });
+      }
+      return res;
+    } catch (e) {
+      return res;
+    }
   };
 };
 

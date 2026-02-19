@@ -52,6 +52,11 @@ module.exports = [
   { latex: `\\mathfrak{g}`, typst: `frak(g)` },
   { latex: `\\mathbf{v}`, typst: `upright(bold(v))` },
   { latex: `\\mathrm{d}`, typst: `dif` },
+  { latex: `\\mathrm{d}x`, typst: `dif x` },
+  { latex: `\\int \\mathrm{d}x`, typst: `integral dif x` },
+  { latex: `\\mathrm{distance}`, typst: `upright("distance")` },
+  { latex: `\\mathrm{const}`, typst: `upright("const")` },
+  { latex: `\\mathrm{T}`, typst: `upright(T)` },
 
   // === Named functions ===
   { latex: `\\sin x`, typst: `sin x` },
@@ -174,8 +179,17 @@ module.exports = [
   { latex: `\\cancel{x}`, typst: `cancel(x)` },
   { latex: `\\text{if } x > 0`, typst: `"if " x > 0` },
 
-  // === Phantom (dropped — no Typst math equivalent) ===
-  { latex: `\\phantom{x}`, typst: `` },
+  // === Phantom variants (Typst hide preserves dimensions) ===
+  { latex: `\\phantom{x}`, typst: `#hide($x$)` },
+  { latex: `\\hphantom{x}`, typst: `#hide($x$)` },
+  { latex: `\\vphantom{x}`, typst: `#hide($x$)` },
+
+  // === Substack ===
+  { latex: `\\sum_{\\substack{i<n \\\\ j<m}}`, typst: `sum_(mat(delim: #none, i < n; j < m))` },
+
+  // === Mod variants ===
+  { latex: `a \\bmod b`, typst: `a mod b` },
+  { latex: `a \\pmod{b}`, typst: `a quad (mod b)` },
 
   // === Cancel variants ===
   { latex: `\\bcancel{x}`, typst: `cancel(inverted: #true, x)` },
