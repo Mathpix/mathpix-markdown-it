@@ -939,8 +939,14 @@ const mtable = () => {
           // Strip Typst string quotes to get raw text for content block
           const tagContent = labelText.replace(/^"(.*)"$/, '$1');
           if (tagContent) {
+            // Check 'data-tag-auto' property set by the MathJax Tags patch
+            // to distinguish auto-numbered equations from explicit \tag{...}.
+            const isAutoNumber = !!(labelCell as any).properties?.['data-tag-auto'];
+            const numbering = isAutoNumber
+              ? '"(1)"'
+              : 'n => [' + tagContent + ']';
             res = addToTypstData(res, {
-              typst: '#math.equation(block: true, numbering: n => [' + tagContent + '], $ ' + rows[0] + ' $)'
+              typst: '#math.equation(block: true, numbering: ' + numbering + ', $ ' + rows[0] + ' $)'
             });
           } else {
             res = addToTypstData(res, { typst: rows[0] });

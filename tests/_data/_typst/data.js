@@ -315,6 +315,7 @@ module.exports = [
 
   // === Equation tags ===
   { latex: `E = mc^2 \\tag{1}`, typst: `#math.equation(block: true, numbering: n => [(1)], $ E = m c^2 $)` },
+  { latex: `E = mc^2 \\tag{1.2}`, typst: `#math.equation(block: true, numbering: n => [(1.2)], $ E = m c^2 $)` },
   { latex: `\\begin{align} a &= b \\tag{1} \\\\ c &= d \\tag{2} \\end{align}`, typst: `a = b quad #["(1)"] \\\nc = d quad #["(2)"]` },
 
   // === Empty base superscript, pipes as absolute value, operator before paren ===
