@@ -218,6 +218,9 @@ const mo = () => {
       } else if (!inScript && value === ',') {
         // Commas: add trailing space for readability
         res = addToTypstData(res, { typst: ', ' });
+      } else if (value === '/') {
+        // Escape slash: in Typst math, / creates a fraction; \/ is a literal slash
+        res = addToTypstData(res, { typst: '\\/' });
       } else {
         res = addToTypstData(res, { typst: typstValue });
       }

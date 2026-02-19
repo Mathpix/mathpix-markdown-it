@@ -171,6 +171,11 @@ module.exports = [
   { latex: `\\frac{x+1}{x-1}`, typst: `frac(x + 1, x - 1)` },
   { latex: `\\frac{\\partial f}{\\partial x}`, typst: `frac(partial f, partial x)` },
 
+  // === Literal slash (escaped — Typst / creates a fraction) ===
+  { latex: `a/b`, typst: `a\\/ b` },
+  { latex: `1/2`, typst: `1\\/ 2` },
+  { latex: `dy/dx`, typst: `d y\\/ d x` },
+
   // === Combined expressions ===
   { latex: `\\alpha + \\beta`, typst: `alpha + beta` },
   { latex: `\\sum_{i=1}^{n} x_i`, typst: `sum_(i = 1)^n x_i` },
@@ -309,7 +314,7 @@ module.exports = [
   { latex: `\\begin{align} a &= b \\tag{1} \\\\ c &= d \\tag{2} \\end{align}`, typst: `a = b quad #["(1)"] \\\nc = d quad #["(2)"]` },
 
   // === Empty base superscript, pipes as absolute value, operator before paren ===
-  { latex: `^{|\\alpha|} \\sqrt{x^{\\alpha}} \\leq(x \\bullet \\alpha) /|\\alpha|`, typst: `""^(|alpha|) sqrt(x^(alpha)) lt.eq (x bullet alpha)/ lr(| alpha |)` },
+  { latex: `^{|\\alpha|} \\sqrt{x^{\\alpha}} \\leq(x \\bullet \\alpha) /|\\alpha|`, typst: `""^(|alpha|) sqrt(x^(alpha)) lt.eq (x bullet alpha)\\/ lr(| alpha |)` },
 
   // === numcases / subnumcases ===
   { latex: `\\begin{numcases}{f(x)=} 0 & x < 0 \\\\ x & x \\geq 0 \\end{numcases}`, typst: `f(x) = cases(0 & "x < 0 ", x & "x \\geq 0 ")` },

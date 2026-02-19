@@ -70,6 +70,7 @@ All new Typst code lives in `src/mathjax/serialized-typst/`:
 
 | LaTeX | Typst output | Handler |
 |-------|-------------|---------|
+| `a/b` | `a\/ b` | `mo` (escaped — Typst `/` creates a fraction) |
 | `\frac{a}{b}` | `frac(a, b)` | `mfrac` |
 | `x^{2}` | `x^2` | `msup` |
 | `x_{i}` | `x_i` | `msub` |
@@ -190,6 +191,10 @@ Correct Typst output requires careful spacing to prevent token merging and avoid
 ### Token separation
 
 Adjacent word-character tokens must be separated by spaces. The visitor inserts spaces when the accumulated output does not end with a separator (`\s`, `(`, `{`, `[`, `,`, `|`) and the next token starts with a word character, dot, or quote.
+
+### Slash escaping
+
+In LaTeX, `a/b` is a literal slash between tokens. In Typst, `/` creates a fraction (equivalent to `\frac`). The `mo` handler escapes `/` as `\/` to preserve the literal-slash semantics of the LaTeX source.
 
 ### Operator-paren spacing
 
