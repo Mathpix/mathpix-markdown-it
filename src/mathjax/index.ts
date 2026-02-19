@@ -3,6 +3,8 @@ import { MathJaxConfigure, svg } from './mathjax';
 import { SerializedMmlVisitor as MmlVisitor } from 'mathjax-full/js/core/MmlTree/SerializedMmlVisitor.js';
 import { LiteElement } from "mathjax-full/js/adaptors/lite/Element.js";
 import { SerializedAsciiVisitor as AsciiVisitor } from './serialized-ascii';
+import { SerializedTypstVisitor } from './serialized-typst';
+import { ITypstData } from './serialized-typst/common';
 import { MathMLVisitorWord } from './mathml-word';
 import { getSpeech } from '../sre';
 import { TAccessibility } from "../mathpix-markdown-model";
@@ -23,6 +25,7 @@ export interface IOuterData {
   asciimath_tsv?: string,
   asciimath_csv?: string,
   asciimath_md?: string,
+  typstmath?: string,
   latex?: string,
   svg?: string,
   speech?: string,
@@ -68,6 +71,12 @@ const normalizeMathJaxA11y = (adaptor, mjxContainer) => {
     adaptor.setAttribute(svg, 'aria-hidden', 'true');
   }
 }
+
+const toTypstML = ((node, optionTypst?): string => {
+  const visitorT = new SerializedTypstVisitor(optionTypst);
+  const data: ITypstData = visitorT.visitTree(node);
+  return data?.typst ? data.typst.trim().replace(/ {2,}/g, ' ') : '';
+});
 
 const makeAssistiveMmlAccessible = (adaptor, mjxContainer) => {
   const assistive = adaptor.lastChild(mjxContainer);
@@ -124,6 +133,7 @@ const OuterData = (adaptor, node, math, outMath, forDocx = false, accessibility?
     include_asciimath = false,
     include_latex = false,
     include_linearmath = false,
+    include_typst = false,
     include_svg = true,
     include_speech = false,
     optionAscii = {
@@ -157,7 +167,11 @@ const OuterData = (adaptor, node, math, outMath, forDocx = false, accessibility?
       res.linearmath = dataAscii.linear;
     }
   }
-  
+
+  if (include_typst) {
+    res.typstmath = toTypstML(math.root);
+  }
+
   if (include_latex) {
     res.latex = (math.math
       ? math.math
@@ -322,6 +336,7 @@ export const OuterHTML = (data, outMath, forPptx: boolean = false) => {
     include_asciimath = false,
     include_linearmath = false,
     include_latex = false,
+    include_typst = false,
     include_svg = true,
     include_error = false,
     include_speech = false
@@ -348,7 +363,11 @@ export const OuterHTML = (data, outMath, forPptx: boolean = false) => {
   if (include_latex && data.latex) {
     if (!outHTML) { outHTML += '\n'}
     outHTML += '<latex style="display: none;">' + formatSource(data.latex) + '</latex>';
-  }    
+  }
+  if (include_typst && data.typstmath) {
+    if (!outHTML) { outHTML += '\n'}
+    outHTML += '<typstmath style="display: none;">' + formatSource(data.typstmath) + '</typstmath>';
+  }
   if (include_speech && data.speech) {
     if (!outHTML) { outHTML += '\n'}
     outHTML += '<speech style="display: none;">' + formatSource(data.speech) + '</speech>';
@@ -485,6 +504,16 @@ export const MathJax = {
       }} = outMath;
     const dataAscii: IAsciiData = toAsciiML(outputJax.math.root, optionAscii);
     return dataAscii.ascii;
+  },
+  TexConvertToTypst: function(string, options: any={}) {
+    const {display = true, metric = {}, accessibility = null} = options;
+    const {em = 16, ex = 8, cwidth = 1200, lwidth = 100000, scale = 1} = metric;
+    this.checkAccessibility(accessibility);
+    MJ.docTeX.convert(string, {
+      display, em, ex, containerWidth: cwidth, lineWidth: lwidth, scale,
+    });
+    const outputJax = MJ.docTeX.outputJax as any;
+    return toTypstML(outputJax.math.root);
   },
   /**
    * Typeset a TeX expression and return the SVG tree for it
