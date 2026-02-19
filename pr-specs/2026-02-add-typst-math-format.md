@@ -141,7 +141,7 @@ Built-in Typst math operators (`sin`, `cos`, `tan`, `log`, `lim`, etc.) pass thr
 | `\begin{array}{c\|c}` | `mat(delim: #none, augment: #(vline: 1), ...)` |
 | `\begin{aligned}` | Row-separated with `\` |
 | `\begin{cases}` | `cases(...)` |
-| `\begin{numcases}` | `prefix cases(...)` |
+| `\begin{numcases}` | `#grid(...)` with `cases(...)` + numbering column |
 
 ### Equation tags and numbering
 
@@ -164,6 +164,38 @@ Each numbered equation is emitted as an independent `#math.equation(block: true,
 | `\begin{align} a &= b \\ c &= d \nonumber \end{align}` | `#math.equation(...)` + newline + `$ c = d $` |
 | `\begin{align*} a &= b \\ &= d \end{align*}` | `a = b \` + newline + ` = d` (no numbering, single block) |
 | `\begin{equation} \begin{split} a &= b \\ &= c \end{split} \end{equation}` | `#math.equation(block: true, numbering: "(1)", $ a = b \` newline ` = c $)` (single number) |
+
+**numcases / subnumcases environments:**
+
+The `numcases` and `subnumcases` environments (from LaTeX's `cases` package) produce a cases expression where each row has its own equation number. Typst has no direct equivalent, so the serializer emits a `#grid()` layout with two columns: the cases expression on the left and per-row numbering on the right.
+
+Auto-numbered (`\begin{numcases}{f(x)=} 0 & x < 0 \\ x & x \geq 0 \end{numcases}`):
+```typst
+#grid(
+  columns: (1fr, auto),
+  math.equation(block: true, numbering: none, $ f(x) = cases(0 & "x < 0", x & "x ≥ 0") $),
+  grid(
+    row-gutter: 0.65em,
+    context { counter(math.equation).step(); counter(math.equation).display("(1)") },
+    context { counter(math.equation).step(); counter(math.equation).display("(1)") },
+  ),
+)
+```
+
+Explicit tags (`\tag{3.12}` in condition text):
+```typst
+#grid(
+  columns: (1fr, auto),
+  math.equation(block: true, numbering: none, $ f(x) = cases(0 & "x < 0", x & "x ≥ 0") $),
+  grid(
+    row-gutter: 0.65em,
+    [(3.12)],
+    [(3.13)],
+  ),
+)
+```
+
+MathJax does not process `\tag{...}` inside numcases condition text — it appears as literal `\tag{3.12}` in the `mtext` node. The `extractTagFromConditionCell()` helper walks the condition cell's tree to find and extract `\tag{...}` patterns from mtext content. The extracted tags are stripped from the condition text and used as static `[(tag)]` labels in the numbering column.
 
 **Math inside `\tag`:** Tags can contain inline math, e.g. `\tag{$x\sqrt{5}$ 1.3.1}`. MathJax represents this as a mix of `mtext` and math nodes inside the label `mtd`. The `serializeTagContent` helper walks the label tree and emits `mtext` as plain text and math groups as `$typst$`, producing `n => [($x sqrt(5)$ 1.3.1)]`.
 
@@ -271,7 +303,7 @@ LaTeX `|\alpha|` without `\left...\right` produces unpaired `<mo>|</mo>` nodes i
 | `src/mathjax/serialized-typst/common.ts` | **New.** Shared types and helpers (`ITypstData`, `needsParens`) |
 | `src/mathjax/serialized-typst/node-utils.ts` | **New.** Tree position utilities |
 | `src/mathjax/mathjax.ts` | Patched `AbstractTags` (`autoTag`, `getTag`, `startEquation`) to mark auto-numbered tags with `data-tag-auto` property |
-| `src/mathjax/index.ts` | Added `include_typst` to `OuterData` and `OuterHTML`; `<typstmath>` HTML tag |
+| `src/mathjax/index.ts` | Added `include_typst` to `OuterData` and `OuterHTML`; `<typstmath>` HTML tag; fixed `toTypstML` space-collapse regex to preserve line-leading indentation (`/(\S) {2,}/g` instead of `/ {2,}/g`) |
 | `src/mathpix-markdown-model/index.ts` | Added `include_typst?: boolean` to `TOutputMath` |
 | `src/contex-menu/menu/consts.ts` | Added `'typst'` to `mathExportTypes` and `eMathType` enum |
 | `src/contex-menu/menu/menu-item.ts` | Added `case eMathType.typst:` ("Copy Typst") to context menu |
