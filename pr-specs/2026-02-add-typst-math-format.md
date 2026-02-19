@@ -195,7 +195,13 @@ Explicit tags (`\tag{3.12}` in condition text):
 )
 ```
 
-MathJax does not process `\tag{...}` inside numcases condition text — it appears as literal `\tag{3.12}` in the `mtext` node. The `extractTagFromConditionCell()` helper walks the condition cell's tree to find and extract `\tag{...}` patterns from mtext content. The extracted tags are stripped from the condition text and used as static `[(tag)]` labels in the numbering column.
+**Tag detection uses two sources**, depending on where `\tag` appears:
+
+1. **Condition-embedded tags**: When numcases has a `&` separator (`\begin{numcases}{f(x)=} 0 & x < 0 \tag{3.12}`), the `\tag{...}` ends up as literal text in the condition `mtext` node (MathJax does not process it as a tag command). The `extractTagFromConditionCell()` helper walks the condition cell's tree to extract `\tag{...}` patterns from mtext content. Extracted tags are stripped from condition text and used as `[(tag)]` labels.
+
+2. **Label-cell tags**: When numcases has no `&` separator or an empty prefix (`\begin{numcases}{} ... \tag{3.12}`), MathJax processes `\tag` as a real tag and places it in the label `mtd` cell. The serializer checks `data-tag-auto` on the label cell — if `false`, it uses `serializeTagContent()` to extract the tag text and emits `[tagContent]` (the label already includes parentheses from MathJax).
+
+**Empty prefix support**: `isNumcasesTable()` accepts 3+ children per row (not just 4+). With an empty prefix `{}` and no `&` separator, MathML has 3 columns (label + prefix-with-brace + content) instead of 4 (label + prefix + value + condition). The content column iteration (`startCol` to `childNodes.length`) handles both layouts.
 
 **Math inside `\tag`:** Tags can contain inline math, e.g. `\tag{$x\sqrt{5}$ 1.3.1}`. MathJax represents this as a mix of `mtext` and math nodes inside the label `mtd`. The `serializeTagContent` helper walks the label tree and emits `mtext` as plain text and math groups as `$typst$`, producing `n => [($x sqrt(5)$ 1.3.1)]`.
 
