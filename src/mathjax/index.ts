@@ -75,7 +75,7 @@ const normalizeMathJaxA11y = (adaptor, mjxContainer) => {
 const toTypstML = ((node, optionTypst?): string => {
   const visitorT = new SerializedTypstVisitor(optionTypst);
   const data: ITypstData = visitorT.visitTree(node);
-  return data?.typst ? data.typst.trim().replace(/ {2,}/g, ' ') : '';
+  return data?.typst ? data.typst.trim().replace(/(\S) {2,}/g, '$1 ') : '';
 });
 
 const makeAssistiveMmlAccessible = (adaptor, mjxContainer) => {

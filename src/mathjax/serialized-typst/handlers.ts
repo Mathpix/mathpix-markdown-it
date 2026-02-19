@@ -893,6 +893,27 @@ const serializePrefixBeforeMo = (node, serialize, stopMoText: string): string =>
   return result.trim();
 };
 
+// Extract explicit \tag{...} from a condition cell's mtext content.
+// Returns the tag content (e.g. "3.12") or null if no \tag found.
+const extractTagFromConditionCell = (cell: any): string | null => {
+  const walk = (n: any): string | null => {
+    if (!n) return null;
+    if (n.kind === 'mtext') {
+      const text = n.childNodes?.[0]?.text || '';
+      const match = text.match(/\\tag\{([^}]+)\}/);
+      return match ? match[1] : null;
+    }
+    if (n.childNodes) {
+      for (const child of n.childNodes) {
+        const found = walk(child);
+        if (found) return found;
+      }
+    }
+    return null;
+  };
+  return walk(cell);
+};
+
 // Detect numcases/subnumcases pattern:
 // - All rows are mlabeledtr with 4 children (label + prefix + value + condition)
 // - First row's cell[1] contains a visible '{' mo (inside mpadded, outside mphantom)
@@ -927,12 +948,22 @@ const mtable = () => {
         && node.childNodes[0].attributes?.get('displaystyle');
 
       if (isNumcases) {
-        // numcases/subnumcases: extract prefix from first row's cell[1], then cases(...)
+        // numcases/subnumcases: build #grid() with cases + numbering column
         const firstRow = node.childNodes[0];
         const prefixCell = firstRow.childNodes[1]; // cell after label
         const prefix = serializePrefixBeforeMo(prefixCell, serialize, '{');
-        // Build cases rows from cell[2] (value) and cell[3] (condition) of each row
-        const rows: string[] = [];
+
+        // Scan condition cells for explicit \tag{...}
+        const rowTags: (string | null)[] = [];
+        for (let i = 0; i < countRow; i++) {
+          const mtrNode = node.childNodes[i];
+          const condCell = mtrNode.childNodes[mtrNode.childNodes.length - 1];
+          rowTags.push(extractTagFromConditionCell(condCell));
+        }
+        const hasExplicitTags = rowTags.some(t => t !== null);
+
+        // Build case rows from cell[2] (value) and cell[3] (condition)
+        const caseRows: string[] = [];
         for (let i = 0; i < countRow; i++) {
           const mtrNode = node.childNodes[i];
           const startCol = mtrNode.kind === 'mlabeledtr' ? 2 : 1; // skip label + prefix
@@ -940,17 +971,48 @@ const mtable = () => {
           for (let j = startCol; j < mtrNode.childNodes.length; j++) {
             const mtdNode = mtrNode.childNodes[j];
             const cellData: ITypstData = serialize.visitNode(mtdNode, '');
-            const trimmed = cellData.typst.trim();
+            let trimmed = cellData.typst.trim();
+            // Strip \tag{...} from condition column (last column)
+            if (j === mtrNode.childNodes.length - 1 && rowTags[i]) {
+              trimmed = trimmed.replace(/\s*\\tag\{[^}]+\}/g, '');
+              trimmed = trimmed.replace(/\s+"$/g, '"');
+              trimmed = trimmed.trim();
+            }
             if (trimmed) cells.push(trimmed);
           }
-          rows.push(cells.join(' & '));
+          caseRows.push(cells.join(' & '));
         }
-        const casesContent = 'cases(' + rows.join(', ') + ')';
-        if (prefix) {
-          res = addToTypstData(res, { typst: prefix + ' ' + casesContent });
-        } else {
-          res = addToTypstData(res, { typst: casesContent });
+
+        const casesContent = 'cases(' + caseRows.join(', ') + ')';
+        const mathContent = prefix ? prefix + ' ' + casesContent : casesContent;
+
+        // Build tag entries for numbering column
+        const tagEntries: string[] = [];
+        for (let i = 0; i < countRow; i++) {
+          if (hasExplicitTags && rowTags[i]) {
+            tagEntries.push('[(' + rowTags[i] + ')]');
+          } else {
+            tagEntries.push(
+              'context { counter(math.equation).step(); counter(math.equation).display("(1)") }'
+            );
+          }
         }
+
+        // Build grid output
+        const lines: string[] = [
+          '#grid(',
+          '  columns: (1fr, auto),',
+          '  math.equation(block: true, numbering: none, $ ' + mathContent + ' $),',
+          '  grid(',
+          '    row-gutter: 0.65em,',
+        ];
+        for (const entry of tagEntries) {
+          lines.push('    ' + entry + ',');
+        }
+        lines.push('  ),');
+        lines.push(')');
+
+        res = addToTypstData(res, { typst: lines.join('\n') });
         return res;
       }
 

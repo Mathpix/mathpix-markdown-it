@@ -328,7 +328,11 @@ module.exports = [
   // === Empty base superscript, pipes as absolute value, operator before paren ===
   { latex: `^{|\\alpha|} \\sqrt{x^{\\alpha}} \\leq(x \\bullet \\alpha) /|\\alpha|`, typst: `""^(|alpha|) sqrt(x^(alpha)) lt.eq (x bullet alpha)\\/ lr(| alpha |)` },
 
-  // === numcases / subnumcases ===
-  { latex: `\\begin{numcases}{f(x)=} 0 & x < 0 \\\\ x & x \\geq 0 \\end{numcases}`, typst: `f(x) = cases(0 & "x < 0 ", x & "x \\geq 0 ")` },
-  { latex: `\\begin{subnumcases}{|x|=} -x & x < 0 \\\\ x & x \\geq 0 \\end{subnumcases}`, typst: `|x| = cases(- x & "x < 0 ", x & "x \\geq 0 ")` },
+  // === numcases / subnumcases (grid layout with per-row numbering) ===
+  { latex: `\\begin{numcases}{f(x)=} 0 & x < 0 \\\\ x & x \\geq 0 \\end{numcases}`,
+    typst: `#grid(\n  columns: (1fr, auto),\n  math.equation(block: true, numbering: none, $ f(x) = cases(0 & "x < 0 ", x & "x \\geq 0 ") $),\n  grid(\n    row-gutter: 0.65em,\n    context { counter(math.equation).step(); counter(math.equation).display("(1)") },\n    context { counter(math.equation).step(); counter(math.equation).display("(1)") },\n  ),\n)` },
+  { latex: `\\begin{numcases}{f(x)=} 0 & x < 0 \\tag{3.12} \\\\ x & x \\geq 0 \\tag{3.13} \\end{numcases}`,
+    typst: `#grid(\n  columns: (1fr, auto),\n  math.equation(block: true, numbering: none, $ f(x) = cases(0 & "x < 0", x & "x \\geq 0") $),\n  grid(\n    row-gutter: 0.65em,\n    [(3.12)],\n    [(3.13)],\n  ),\n)` },
+  { latex: `\\begin{subnumcases}{|x|=} -x & x < 0 \\\\ x & x \\geq 0 \\end{subnumcases}`,
+    typst: `#grid(\n  columns: (1fr, auto),\n  math.equation(block: true, numbering: none, $ |x| = cases(- x & "x < 0 ", x & "x \\geq 0 ") $),\n  grid(\n    row-gutter: 0.65em,\n    context { counter(math.equation).step(); counter(math.equation).display("(1)") },\n    context { counter(math.equation).step(); counter(math.equation).display("(1)") },\n  ),\n)` },
 ];
