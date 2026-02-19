@@ -1087,8 +1087,9 @@ const mtable = () => {
           // For equation arrays (align, gather, etc.), join cells with spaces
           rows.push(cells.join(' '));
         } else if (isCases) {
-          // Cases: cells within a row joined with & for alignment
-          rows.push(cells.join(' & '));
+          // Cases: escape top-level commas in each cell to prevent them
+          // being parsed as cases() argument separators, then join with &
+          rows.push(cells.map(c => escapeCasesCommas(c)).join(' & '));
         } else {
           rows.push(cells.join(', '));
         }
