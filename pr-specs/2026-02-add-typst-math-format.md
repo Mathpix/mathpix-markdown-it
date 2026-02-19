@@ -205,6 +205,21 @@ Explicit tags (`\tag{3.12}` in condition text):
 
 **Comma escaping in `cases()` rows**: In Typst, commas inside `cases(...)` are row separators. When numcases content contains literal commas (e.g. `n = 1, 2, \ldots, N`), they would be misinterpreted as row breaks. The `escapeCasesCommas()` helper replaces top-level commas (at parenthesis depth 0) with `","` — a Typst text string that renders as a visual comma without acting as a separator. Commas inside nested parentheses/brackets (e.g. `f(t_n, x^n)`) are left untouched. This applies only to single-cell rows (no `&` separator); multi-cell rows use `&` to join cells, and their commas are already protected by the `&` syntax.
 
+Empty prefix with commas and explicit tags (`\begin{numcases}{} \Delta ... f\left(t_n, x^n\right), n=1,2,\ldots,N \tag{3.12} \\ x^0=x_0 \tag{3.13} \end{numcases}`):
+```typst
+#grid(
+  columns: (1fr, auto),
+  math.equation(block: true, numbering: none, $ cases(Delta_q^(alpha) x^n = f lr(( t_n, x^n ))"," n = 1"," 2"," dots"," N, x^0 = x_0) $),
+  grid(
+    row-gutter: 0.65em,
+    [(3.12)],
+    [(3.13)],
+  ),
+)
+```
+
+Note: the comma inside `lr(( t_n, x^n ))` is at depth 2 and preserved as-is, while top-level commas like `),"` and `1","` are escaped. The comma between `N` and `x^0` is the actual `cases()` row separator.
+
 **Math inside `\tag`:** Tags can contain inline math, e.g. `\tag{$x\sqrt{5}$ 1.3.1}`. MathJax represents this as a mix of `mtext` and math nodes inside the label `mtd`. The `serializeTagContent` helper walks the label tree and emits `mtext` as plain text and math groups as `$typst$`, producing `n => [($x sqrt(5)$ 1.3.1)]`.
 
 ### Large operators and integrals
