@@ -203,6 +203,8 @@ Explicit tags (`\tag{3.12}` in condition text):
 
 **Empty prefix support**: `isNumcasesTable()` accepts 3+ children per row (not just 4+). With an empty prefix `{}` and no `&` separator, MathML has 3 columns (label + prefix-with-brace + content) instead of 4 (label + prefix + value + condition). The content column iteration (`startCol` to `childNodes.length`) handles both layouts.
 
+**Comma escaping in `cases()` rows**: In Typst, commas inside `cases(...)` are row separators. When numcases content contains literal commas (e.g. `n = 1, 2, \ldots, N`), they would be misinterpreted as row breaks. The `escapeCasesCommas()` helper replaces top-level commas (at parenthesis depth 0) with `","` — a Typst text string that renders as a visual comma without acting as a separator. Commas inside nested parentheses/brackets (e.g. `f(t_n, x^n)`) are left untouched. This applies only to single-cell rows (no `&` separator); multi-cell rows use `&` to join cells, and their commas are already protected by the `&` syntax.
+
 **Math inside `\tag`:** Tags can contain inline math, e.g. `\tag{$x\sqrt{5}$ 1.3.1}`. MathJax represents this as a mix of `mtext` and math nodes inside the label `mtd`. The `serializeTagContent` helper walks the label tree and emits `mtext` as plain text and math groups as `$typst$`, producing `n => [($x sqrt(5)$ 1.3.1)]`.
 
 ### Large operators and integrals

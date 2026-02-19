@@ -893,6 +893,30 @@ const serializePrefixBeforeMo = (node, serialize, stopMoText: string): string =>
   return result.trim();
 };
 
+// Escape top-level commas in a Typst expression for use inside cases().
+// Replaces commas at parenthesis depth 0 with "," (Typst text string)
+// so they render as commas but aren't parsed as cases() argument separators.
+// Commas inside function calls like lr((...)) are left as-is.
+const escapeCasesCommas = (expr: string): string => {
+  let depth = 0;
+  let result = '';
+  for (let i = 0; i < expr.length; i++) {
+    const ch = expr[i];
+    if (ch === '(' || ch === '[' || ch === '{') {
+      depth++;
+      result += ch;
+    } else if ((ch === ')' || ch === ']' || ch === '}') && depth > 0) {
+      depth--;
+      result += ch;
+    } else if (ch === ',' && depth === 0) {
+      result += '","';
+    } else {
+      result += ch;
+    }
+  }
+  return result;
+};
+
 // Extract explicit \tag{...} from a condition cell's mtext content.
 // Returns the tag content (e.g. "3.12") or null if no \tag found.
 const extractTagFromConditionCell = (cell: any): string | null => {
@@ -1000,7 +1024,13 @@ const mtable = () => {
             }
             if (trimmed) cells.push(trimmed);
           }
-          caseRows.push(cells.join(' & '));
+          if (cells.length === 1) {
+            // Single cell (no & separator): escape top-level commas
+            // to prevent them being parsed as cases() argument separators
+            caseRows.push(escapeCasesCommas(cells[0]));
+          } else {
+            caseRows.push(cells.join(' & '));
+          }
         }
 
         const casesContent = 'cases(' + caseRows.join(', ') + ')';
