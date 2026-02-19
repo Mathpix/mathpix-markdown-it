@@ -203,9 +203,14 @@ Explicit tags (`\tag{3.12}` in condition text):
 
 **Empty prefix support**: `isNumcasesTable()` accepts 3+ children per row (not just 4+). With an empty prefix `{}` and no `&` separator, MathML has 3 columns (label + prefix-with-brace + content) instead of 4 (label + prefix + value + condition). The content column iteration (`startCol` to `childNodes.length`) handles both layouts.
 
-**Comma escaping in `cases()` rows**: In Typst, commas inside `cases(...)` are row separators. When numcases content contains literal commas (e.g. `n = 1, 2, \ldots, N`), they would be misinterpreted as row breaks. The `escapeCasesCommas()` helper replaces top-level commas (at parenthesis depth 0) with `","` — a Typst text string that renders as a visual comma without acting as a separator. Commas inside nested parentheses/brackets (e.g. `f(t_n, x^n)`) are left untouched. This applies only to single-cell rows (no `&` separator); multi-cell rows use `&` to join cells, and their commas are already protected by the `&` syntax.
+**Comma escaping in `cases()` rows**: In Typst, commas inside `cases(...)` are row separators. When cases content contains literal commas (e.g. `x^2 + 1,` or `n = 1, 2, \ldots, N`), they would be misinterpreted as row breaks. The `escapeCasesCommas()` helper replaces top-level commas (at parenthesis depth 0) with `","` — a Typst text string that renders as a visual comma without acting as a separator. Commas inside nested parentheses/brackets (e.g. `f(t_n, x^n)`) are left untouched. This applies to both regular `cases()` (from `\left\{...\begin{array}...\right.`) and numcases environments — every cell is escaped before assembly.
 
-Empty prefix with commas and explicit tags (`\begin{numcases}{} \Delta ... f\left(t_n, x^n\right), n=1,2,\ldots,N \tag{3.12} \\ x^0=x_0 \tag{3.13} \end{numcases}`):
+Regular cases with commas (`f(x) = \left\{ \begin{array}{ll} {x^2+1,} & {x>1} \\ {1,} & {x=1} \\ {x+1,} & {x<1} \end{array} \right.`):
+```typst
+f(x) = cases(x^2 + 1"," & x > 1, 1"," & x = 1, x + 1"," & x < 1)
+```
+
+Empty prefix numcases with commas and explicit tags (`\begin{numcases}{} \Delta ... f\left(t_n, x^n\right), n=1,2,\ldots,N \tag{3.12} \\ x^0=x_0 \tag{3.13} \end{numcases}`):
 ```typst
 #grid(
   columns: (1fr, auto),
