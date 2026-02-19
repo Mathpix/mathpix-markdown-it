@@ -139,6 +139,10 @@ module.exports = [
   { latex: `\\left( x \\right.`, typst: `( x` },
   { latex: `\\left. x \\right)`, typst: `x )` },
 
+  // === Token spacing inside \left...\right delimiters ===
+  { latex: `\\left[\\sum_{t=1}^{T} \\log p_{\\theta}\\right]`, typst: `lr([ sum_(t = 1)^T log p_(theta) ])` },
+  { latex: `\\max _{\\theta} \\mathbb{E}_{\\mathbf{z} \\sim \\mathcal{Z}_{T}}\\left[\\sum_{t=1}^{T} \\log p_{\\theta}\\left(x_{z_{t}} | \\mathbf{x}_{\\mathbf{z}_{<t}}\\right)\\right]`, typst: `max_(theta) EE_(upright(bold(z)) tilde.op cal(Z)_T) lr([ sum_(t = 1)^T log p_(theta) lr(( x_(z_t)|upright(bold(x))_(upright(bold(z))_(< t)) )) ])` },
+
   // === Matrices ===
   { latex: `\\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix}`, typst: `mat(delim: "(", a, b; c, d)` },
   { latex: `\\begin{bmatrix} a & b \\\\ c & d \\end{bmatrix}`, typst: `mat(delim: "[", a, b; c, d)` },

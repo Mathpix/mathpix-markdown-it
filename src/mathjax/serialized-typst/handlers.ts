@@ -1064,6 +1064,12 @@ const mrow = () => {
             }
           }
           const data: ITypstData = serialize.visitNode(child, '');
+          // Insert space between adjacent word-char tokens to prevent merging
+          if (content && data.typst
+            && /^[\w."]/.test(data.typst)
+            && !/[\s({[,|]$/.test(content)) {
+            content += ' ';
+          }
           content += data.typst;
         }
         // Map delimiter characters to Typst
