@@ -335,4 +335,7 @@ module.exports = [
     typst: `#grid(\n  columns: (1fr, auto),\n  math.equation(block: true, numbering: none, $ f(x) = cases(0 & "x < 0", x & "x \\geq 0") $),\n  grid(\n    row-gutter: 0.65em,\n    [(3.12)],\n    [(3.13)],\n  ),\n)` },
   { latex: `\\begin{subnumcases}{|x|=} -x & x < 0 \\\\ x & x \\geq 0 \\end{subnumcases}`,
     typst: `#grid(\n  columns: (1fr, auto),\n  math.equation(block: true, numbering: none, $ |x| = cases(- x & "x < 0 ", x & "x \\geq 0 ") $),\n  grid(\n    row-gutter: 0.65em,\n    context { counter(math.equation).step(); counter(math.equation).display("(1)") },\n    context { counter(math.equation).step(); counter(math.equation).display("(1)") },\n  ),\n)` },
+  // numcases with empty prefix and explicit \tag (processed by MathJax as real tags)
+  { latex: `\\begin{numcases}{} \\Delta_{q}^{\\alpha} x^{n}=f\\left(t_{n}, x^{n}\\right), n=1,2, \\ldots, N \\tag{3.12}\\label{eq:3.12}\\\\ x^{0}=x_{0} \\tag{3.13}\\label{eq3.13} \\end{numcases}`,
+    typst: `#grid(\n  columns: (1fr, auto),\n  math.equation(block: true, numbering: none, $ cases(Delta_q^(alpha) x^n = f lr(( t_n, x^n )), n = 1, 2, dots, N, x^0 = x_0) $),\n  grid(\n    row-gutter: 0.65em,\n    [(3.12)],\n    [(3.13)],\n  ),\n)` },
 ];

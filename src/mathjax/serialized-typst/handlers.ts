@@ -915,13 +915,15 @@ const extractTagFromConditionCell = (cell: any): string | null => {
 };
 
 // Detect numcases/subnumcases pattern:
-// - All rows are mlabeledtr with 4 children (label + prefix + value + condition)
+// - First row is mlabeledtr with 3+ children (label + prefix + content [+ condition])
+//   3 children: empty prefix or no & separator → label + prefix_with_brace + content
+//   4 children: non-empty prefix with & separator → label + prefix + value + condition
 // - First row's cell[1] contains a visible '{' mo (inside mpadded, outside mphantom)
 const isNumcasesTable = (node): boolean => {
   if (!node.childNodes || node.childNodes.length === 0) return false;
   const firstRow = node.childNodes[0];
   if (firstRow.kind !== 'mlabeledtr') return false;
-  if (firstRow.childNodes.length < 4) return false;
+  if (firstRow.childNodes.length < 3) return false;
   // Check that cell[1] (first data column) contains a '{' brace
   const prefixCell = firstRow.childNodes[1];
   return treeContainsMo(prefixCell, '{');
@@ -953,16 +955,34 @@ const mtable = () => {
         const prefixCell = firstRow.childNodes[1]; // cell after label
         const prefix = serializePrefixBeforeMo(prefixCell, serialize, '{');
 
-        // Scan condition cells for explicit \tag{...}
-        const rowTags: (string | null)[] = [];
+        // Determine tag source for each row:
+        // 1. Condition-embedded \tag{...} in mtext (MathJax leaves it as literal text)
+        // 2. Label cell explicit tag (MathJax processed \tag, data-tag-auto is false)
+        // 3. Auto-numbered (data-tag-auto is true)
+        const autoTagEntry = 'context { counter(math.equation).step(); counter(math.equation).display("(1)") }';
+        const rowTagSources: { source: 'condition' | 'label' | 'auto'; content: string }[] = [];
         for (let i = 0; i < countRow; i++) {
           const mtrNode = node.childNodes[i];
+          // Check condition cell for embedded \tag{...} in mtext
           const condCell = mtrNode.childNodes[mtrNode.childNodes.length - 1];
-          rowTags.push(extractTagFromConditionCell(condCell));
+          const condTag = extractTagFromConditionCell(condCell);
+          if (condTag) {
+            rowTagSources.push({ source: 'condition', content: condTag });
+          } else if (mtrNode.kind === 'mlabeledtr' && mtrNode.childNodes.length > 0) {
+            const labelCell = mtrNode.childNodes[0];
+            const isAutoNumber = !!(labelCell as any).properties?.['data-tag-auto'];
+            if (!isAutoNumber) {
+              const tagContent = serializeTagContent(labelCell, serialize);
+              rowTagSources.push({ source: 'label', content: tagContent });
+            } else {
+              rowTagSources.push({ source: 'auto', content: '' });
+            }
+          } else {
+            rowTagSources.push({ source: 'auto', content: '' });
+          }
         }
-        const hasExplicitTags = rowTags.some(t => t !== null);
 
-        // Build case rows from cell[2] (value) and cell[3] (condition)
+        // Build case rows from content columns (after label + prefix)
         const caseRows: string[] = [];
         for (let i = 0; i < countRow; i++) {
           const mtrNode = node.childNodes[i];
@@ -972,8 +992,8 @@ const mtable = () => {
             const mtdNode = mtrNode.childNodes[j];
             const cellData: ITypstData = serialize.visitNode(mtdNode, '');
             let trimmed = cellData.typst.trim();
-            // Strip \tag{...} from condition column (last column)
-            if (j === mtrNode.childNodes.length - 1 && rowTags[i]) {
+            // Strip \tag{...} from condition column if tag was extracted from there
+            if (j === mtrNode.childNodes.length - 1 && rowTagSources[i].source === 'condition') {
               trimmed = trimmed.replace(/\s*\\tag\{[^}]+\}/g, '');
               trimmed = trimmed.replace(/\s+"$/g, '"');
               trimmed = trimmed.trim();
@@ -989,12 +1009,15 @@ const mtable = () => {
         // Build tag entries for numbering column
         const tagEntries: string[] = [];
         for (let i = 0; i < countRow; i++) {
-          if (hasExplicitTags && rowTags[i]) {
-            tagEntries.push('[(' + rowTags[i] + ')]');
+          const info = rowTagSources[i];
+          if (info.source === 'condition') {
+            // Tag extracted from condition mtext — wrap in parens
+            tagEntries.push('[(' + info.content + ')]');
+          } else if (info.source === 'label' && info.content) {
+            // Tag from label cell — already has parens from MathJax
+            tagEntries.push('[' + info.content + ']');
           } else {
-            tagEntries.push(
-              'context { counter(math.equation).step(); counter(math.equation).display("(1)") }'
-            );
+            tagEntries.push(autoTagEntry);
           }
         }
 
