@@ -30,6 +30,71 @@ const defHandle = (node, serialize): ITypstData => {
   return handlerApi.handleAll(node, serialize);
 };
 
+// Serialize a tag label mtd as Typst content for use inside [...].
+// mtext nodes → plain text, math nodes → $typst_math$.
+// For simple tags like "(1.2)", returns "1.2" (stripped parens).
+// For mixed tags like "($x\sqrt{5}$ 1.3.1)", returns "$x sqrt(5)$ 1.3.1".
+const serializeTagContent = (labelCell: any, serialize: any): string => {
+  try {
+    // Walk the children of the label mtd's content.
+    // Simple tag: mtd > mtext("(1.2)")
+    // Mixed tag: mtd > mrow > [mtext("("), mrow(math), mtext(" 1.3.1)")]
+    const parts: string[] = [];
+    const visitChild = (child: any) => {
+      if (!child) return;
+      if (child.kind === 'mtext') {
+        // Text node — emit as plain text
+        const text = child.childNodes?.[0]?.text || '';
+        if (text) {
+          parts.push(text.replace(/\u00A0/g, ' '));
+        }
+      } else if (child.isInferred) {
+        // Inferred mrow — always recurse
+        if (child.childNodes) {
+          for (const c of child.childNodes) {
+            visitChild(c);
+          }
+        }
+      } else if (child.kind === 'mrow' || child.kind === 'TeXAtom') {
+        // Check if this group contains any mtext (mixed content) — recurse
+        // Otherwise it's a pure math group — serialize as one $...$ block
+        const hasMtext = child.childNodes?.some(
+          (c: any) => c && (c.kind === 'mtext' || (c.isInferred && c.childNodes?.some((cc: any) => cc?.kind === 'mtext')))
+        );
+        if (hasMtext) {
+          if (child.childNodes) {
+            for (const c of child.childNodes) {
+              visitChild(c);
+            }
+          }
+        } else {
+          // Pure math group — serialize whole thing
+          const data: ITypstData = serialize.visitNode(child, '');
+          const mathStr = data.typst.trim();
+          if (mathStr) {
+            parts.push('$' + mathStr + '$');
+          }
+        }
+      } else {
+        // Math node — serialize and wrap in $...$
+        const data: ITypstData = serialize.visitNode(child, '');
+        const mathStr = data.typst.trim();
+        if (mathStr) {
+          parts.push('$' + mathStr + '$');
+        }
+      }
+    };
+    if (labelCell.childNodes) {
+      for (const child of labelCell.childNodes) {
+        visitChild(child);
+      }
+    }
+    return parts.join('').trim();
+  } catch (_e) {
+    return '';
+  }
+};
+
 // Spacing helper: check if previous sibling ends with a word character
 // and current node starts with a word character, requiring a space separator
 const needSpaceBefore = (node): boolean => {
@@ -928,9 +993,7 @@ const mtable = () => {
             const rowContent = rows[i];
             if (mtrNode.kind === 'mlabeledtr' && mtrNode.childNodes.length > 0) {
               const labelCell = mtrNode.childNodes[0];
-              const labelData: ITypstData = serialize.visitNode(labelCell, '');
-              const labelText = labelData.typst.trim();
-              const tagContent = labelText.replace(/^"(.*)"$/, '$1');
+              const tagContent = serializeTagContent(labelCell, serialize);
               if (tagContent) {
                 const isAutoNumber = !!(labelCell as any).properties?.['data-tag-auto'];
                 const numbering = isAutoNumber

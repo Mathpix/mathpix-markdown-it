@@ -319,6 +319,7 @@ module.exports = [
   { latex: `\\begin{align} a &= b \\tag{1} \\\\ c &= d \\tag{2} \\end{align}`, typst: `#math.equation(block: true, numbering: n => [(1)], $ a = b $)\n#math.equation(block: true, numbering: n => [(2)], $ c = d $)` },
   { latex: `\\begin{align} x &= 1 \\tag{A} \\\\ y &= 2 \\tag{B} \\end{align}`, typst: `#math.equation(block: true, numbering: n => [(A)], $ x = 1 $)\n#math.equation(block: true, numbering: n => [(B)], $ y = 2 $)` },
   { latex: `\\begin{equation*} S_{20} \\tag{1} \\end{equation*}`, typst: `#math.equation(block: true, numbering: n => [(1)], $ S_(20) $)` },
+  { latex: `\\begin{equation} x^2 \\tag{$x\\sqrt{5}$ 1.3.1} \\end{equation}`, typst: `#math.equation(block: true, numbering: n => [($x sqrt(5)$ 1.3.1)], $ x^2 $)` },
   { latex: `\\begin{equation} \\begin{split} a &= b+c \\\\ &= d \\end{split} \\end{equation}`, typst: `#math.equation(block: true, numbering: "(1)", $ a = b + c \\\n = d $)` },
   { latex: `\\begin{align*} a &= b+c \\\\ &= d \\end{align*}`, typst: `a = b + c \\\n = d` },
   { latex: `\\begin{align} a &= b \\\\ c &= d \\nonumber \\end{align}`, typst: `#math.equation(block: true, numbering: "(1)", $ a = b $)\n$ c = d $` },
