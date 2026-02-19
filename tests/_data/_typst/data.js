@@ -316,7 +316,13 @@ module.exports = [
   // === Equation tags ===
   { latex: `E = mc^2 \\tag{1}`, typst: `#math.equation(block: true, numbering: n => [(1)], $ E = m c^2 $)` },
   { latex: `E = mc^2 \\tag{1.2}`, typst: `#math.equation(block: true, numbering: n => [(1.2)], $ E = m c^2 $)` },
-  { latex: `\\begin{align} a &= b \\tag{1} \\\\ c &= d \\tag{2} \\end{align}`, typst: `a = b quad #["(1)"] \\\nc = d quad #["(2)"]` },
+  { latex: `\\begin{align} a &= b \\tag{1} \\\\ c &= d \\tag{2} \\end{align}`, typst: `#math.equation(block: true, numbering: n => [(1)], $ a = b $)\n#math.equation(block: true, numbering: n => [(2)], $ c = d $)` },
+  { latex: `\\begin{align} x &= 1 \\tag{A} \\\\ y &= 2 \\tag{B} \\end{align}`, typst: `#math.equation(block: true, numbering: n => [(A)], $ x = 1 $)\n#math.equation(block: true, numbering: n => [(B)], $ y = 2 $)` },
+  { latex: `\\begin{equation*} S_{20} \\tag{1} \\end{equation*}`, typst: `#math.equation(block: true, numbering: n => [(1)], $ S_(20) $)` },
+  { latex: `\\begin{equation} \\begin{split} a &= b+c \\\\ &= d \\end{split} \\end{equation}`, typst: `#math.equation(block: true, numbering: "(1)", $ a = b + c \\\n = d $)` },
+  { latex: `\\begin{align*} a &= b+c \\\\ &= d \\end{align*}`, typst: `a = b + c \\\n = d` },
+  { latex: `\\begin{align} a &= b \\\\ c &= d \\nonumber \\end{align}`, typst: `#math.equation(block: true, numbering: "(1)", $ a = b $)\n$ c = d $` },
+  { latex: `\\begin{gather} x = 1 \\\\ y = 2 \\end{gather}`, typst: `#math.equation(block: true, numbering: "(1)", $ x = 1 $)\n#math.equation(block: true, numbering: "(1)", $ y = 2 $)` },
 
   // === Empty base superscript, pipes as absolute value, operator before paren ===
   { latex: `^{|\\alpha|} \\sqrt{x^{\\alpha}} \\leq(x \\bullet \\alpha) /|\\alpha|`, typst: `""^(|alpha|) sqrt(x^(alpha)) lt.eq (x bullet alpha)\\/ lr(| alpha |)` },

@@ -50,8 +50,13 @@ AbstractTags.prototype.startEquation = function (math) {
  *  propagates it as a 'data-tag-auto' property on the mtd label node. */
 const origAutoTag = AbstractTags.prototype.autoTag;
 AbstractTags.prototype.autoTag = function () {
+  const hadTag = this.currentTag.tag != null;
   origAutoTag.call(this);
-  this['_isAutoTag'] = true;
+  // Only mark as auto if autoTag() actually assigned the tag
+  // (i.e. tag was null before — no explicit \tag{...} was set)
+  if (!hadTag && this.currentTag.tag != null) {
+    this['_isAutoTag'] = true;
+  }
 };
 
 const origGetTag = AbstractTags.prototype.getTag;

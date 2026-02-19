@@ -143,13 +143,27 @@ Built-in Typst math operators (`sin`, `cos`, `tan`, `log`, `lim`, etc.) pass thr
 | `\begin{cases}` | `cases(...)` |
 | `\begin{numcases}` | `prefix cases(...)` |
 
-### Equation tags
+### Equation tags and numbering
+
+Each numbered equation is emitted as an independent `#math.equation(block: true, numbering: ..., $ ... $)` block. This avoids `#set math.equation(numbering: ...)` which would affect subsequent equations.
+
+**Single equations:**
 
 | LaTeX | Typst |
 |-------|-------|
 | `\begin{equation} y^2 \end{equation}` (auto) | `#math.equation(block: true, numbering: "(1)", $ y^2 $)` |
 | `E = mc^2 \tag{1.2}` (explicit) | `#math.equation(block: true, numbering: n => [(1.2)], $ E = m c^2 $)` |
-| Multi-row with `\tag` | `row quad #["(tag)"]` per row |
+| `\begin{equation*} S \tag{1} \end{equation*}` | `#math.equation(block: true, numbering: n => [(1)], $ S $)` |
+
+**Multi-row environments** (`align`, `gather`): each row becomes a separate block. Numbered rows use `#math.equation(...)`, unnumbered rows use bare `$ ... $`.
+
+| LaTeX | Typst |
+|-------|-------|
+| `\begin{align} a &= b \\ c &= d \end{align}` (auto) | `#math.equation(block: true, numbering: "(1)", $ a = b $)` + newline + `#math.equation(block: true, numbering: "(1)", $ c = d $)` |
+| `\begin{align} a &= b \tag{A} \\ c &= d \tag{B} \end{align}` | `#math.equation(block: true, numbering: n => [(A)], ...)` per row |
+| `\begin{align} a &= b \\ c &= d \nonumber \end{align}` | `#math.equation(...)` + newline + `$ c = d $` |
+| `\begin{align*} a &= b \\ &= d \end{align*}` | `a = b \` + newline + ` = d` (no numbering, single block) |
+| `\begin{equation} \begin{split} a &= b \\ &= c \end{split} \end{equation}` | `#math.equation(block: true, numbering: "(1)", $ a = b \` newline ` = c $)` (single number) |
 
 ### Large operators and integrals
 

@@ -914,46 +914,42 @@ const mtable = () => {
         }
       }
       if (isEqnArray) {
-        // Equation arrays: emit rows separated by newlines (\ in Typst math)
-        // Append equation tags from mlabeledtr rows
-        const taggedRows: string[] = [];
-        for (let i = 0; i < countRow; i++) {
-          const mtrNode = node.childNodes[i];
-          let rowText = rows[i];
-          if (mtrNode.kind === 'mlabeledtr' && mtrNode.childNodes.length > 0) {
-            const labelCell = mtrNode.childNodes[0];
-            const labelData: ITypstData = serialize.visitNode(labelCell, '');
-            const labelText = labelData.typst.trim();
-            if (labelText) {
-              rowText += ' quad #[' + labelText + ']';
+        // Check if any row has a tag (mlabeledtr)
+        const hasAnyTag = node.childNodes.some(
+          (child: any) => child.kind === 'mlabeledtr'
+        );
+        if (hasAnyTag) {
+          // Emit each row as a separate block equation:
+          // - numbered rows → #math.equation(block: true, numbering: ..., $ ... $)
+          // - unnumbered rows → $ ... $
+          const eqnBlocks: string[] = [];
+          for (let i = 0; i < countRow; i++) {
+            const mtrNode = node.childNodes[i];
+            const rowContent = rows[i];
+            if (mtrNode.kind === 'mlabeledtr' && mtrNode.childNodes.length > 0) {
+              const labelCell = mtrNode.childNodes[0];
+              const labelData: ITypstData = serialize.visitNode(labelCell, '');
+              const labelText = labelData.typst.trim();
+              const tagContent = labelText.replace(/^"(.*)"$/, '$1');
+              if (tagContent) {
+                const isAutoNumber = !!(labelCell as any).properties?.['data-tag-auto'];
+                const numbering = isAutoNumber
+                  ? '"(1)"'
+                  : 'n => [' + tagContent + ']';
+                eqnBlocks.push(
+                  '#math.equation(block: true, numbering: ' + numbering + ', $ ' + rowContent + ' $)'
+                );
+              } else {
+                eqnBlocks.push('$ ' + rowContent + ' $');
+              }
+            } else {
+              eqnBlocks.push('$ ' + rowContent + ' $');
             }
           }
-          taggedRows.push(rowText);
-        }
-        // Single-equation tag: use math.equation with numbering
-        if (countRow === 1 && node.childNodes[0].kind === 'mlabeledtr') {
-          const mtrNode = node.childNodes[0];
-          const labelCell = mtrNode.childNodes[0];
-          const labelData: ITypstData = serialize.visitNode(labelCell, '');
-          const labelText = labelData.typst.trim();
-          // Strip Typst string quotes to get raw text for content block
-          const tagContent = labelText.replace(/^"(.*)"$/, '$1');
-          if (tagContent) {
-            // Check 'data-tag-auto' property set by the MathJax Tags patch
-            // to distinguish auto-numbered equations from explicit \tag{...}.
-            const isAutoNumber = !!(labelCell as any).properties?.['data-tag-auto'];
-            const numbering = isAutoNumber
-              ? '"(1)"'
-              : 'n => [' + tagContent + ']';
-            res = addToTypstData(res, {
-              typst: '#math.equation(block: true, numbering: ' + numbering + ', $ ' + rows[0] + ' $)'
-            });
-          } else {
-            res = addToTypstData(res, { typst: rows[0] });
-          }
+          res = addToTypstData(res, { typst: eqnBlocks.join('\n') });
         } else {
-          // Multi-row: keep quad #[...] fallback for per-row tags
-          res = addToTypstData(res, { typst: taggedRows.join(' \\\n') });
+          // No tags at all (e.g. align*): emit as single block with \ separators
+          res = addToTypstData(res, { typst: rows.join(' \\\n') });
         }
       } else if (isCases) {
         // Cases environment
