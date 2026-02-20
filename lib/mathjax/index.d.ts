@@ -9,6 +9,7 @@ export interface IOuterData {
     asciimath_csv?: string;
     asciimath_md?: string;
     typstmath?: string;
+    typstmath_inline?: string;
     latex?: string;
     svg?: string;
     speech?: string;
@@ -35,7 +36,10 @@ export declare const MathJax: {
     Stylesheet: () => unknown;
     TexConvert: (string: any, options?: any, throwError?: boolean) => IOuterData;
     TexConvertToAscii: (string: any, options?: any) => string;
-    TexConvertToTypst: (string: any, options?: any) => string;
+    TexConvertToTypstData: (string: any, options?: any) => {
+        typstmath: string;
+        typstmath_inline: string;
+    };
     /**
      * Typeset a TeX expression and return the SVG tree for it
      *
@@ -61,6 +65,7 @@ export declare const MathJax: {
             asciimath_csv?: string;
             asciimath_md?: string;
             typstmath?: string;
+            typstmath_inline?: string;
             latex?: string;
             svg?: string;
             speech?: string;
@@ -93,6 +98,7 @@ export declare const MathJax: {
             asciimath_csv?: string;
             asciimath_md?: string;
             typstmath?: string;
+            typstmath_inline?: string;
             latex?: string;
             svg?: string;
             speech?: string;
@@ -123,6 +129,7 @@ export declare const MathJax: {
             asciimath_csv?: string;
             asciimath_md?: string;
             typstmath?: string;
+            typstmath_inline?: string;
             latex?: string;
             svg?: string;
             speech?: string;

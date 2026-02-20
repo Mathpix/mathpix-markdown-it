@@ -1,7 +1,7 @@
 import { MmlVisitor } from 'mathjax-full/js/core/MmlTree/MmlVisitor.js';
 import { MmlNode, TextNode, XMLNode, TEXCLASS } from 'mathjax-full/js/core/MmlTree/MmlNode.js';
 import { handle } from './handlers';
-import { ITypstData, addToTypstData, initTypstData } from './common';
+import { ITypstData, addToTypstData, addSpaceToTypstData, initTypstData } from './common';
 import { findTypstSymbol } from './typst-symbol-map';
 
 // Extract big delimiter info from a TeXAtom node wrapping a sized mo.
@@ -133,7 +133,7 @@ export class SerializedTypstVisitor extends MmlVisitor {
             // Add spacing before lr if needed
             if (res.typst && /^[\w.]/.test(lrExpr)
               && !/[\s({[,|]$/.test(res.typst)) {
-              res.typst += ' ';
+              addSpaceToTypstData(res);
             }
             res = addToTypstData(res, { typst: lrExpr });
             j = closeIdx + 1;
@@ -168,7 +168,7 @@ export class SerializedTypstVisitor extends MmlVisitor {
             const delimExpr = delimPair.typstOpen + content.trim() + delimPair.typstClose;
             if (res.typst && /^[\w."]/.test(delimExpr)
               && !/[\s({[,|]$/.test(res.typst)) {
-              res.typst += ' ';
+              addSpaceToTypstData(res);
             }
             res = addToTypstData(res, { typst: delimExpr });
             j = closeIdx + 1;
@@ -182,7 +182,7 @@ export class SerializedTypstVisitor extends MmlVisitor {
         if (res.typst && data.typst
           && /^[\w."]/.test(data.typst)
           && !/[\s({[,|]$/.test(res.typst)) {
-          res.typst += ' ';
+          addSpaceToTypstData(res);
         }
         res = addToTypstData(res, data);
         j++;

@@ -19,6 +19,7 @@ export declare enum eMathType {
     tsv = "tsv",
     csv = "csv",
     typst = "typst",
+    typst_inline = "typst_inline",
     table_markdown = "table-markdown",
     smiles = "smiles"
 }

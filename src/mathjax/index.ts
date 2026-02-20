@@ -26,6 +26,7 @@ export interface IOuterData {
   asciimath_csv?: string,
   asciimath_md?: string,
   typstmath?: string,
+  typstmath_inline?: string,  // always set when typstmath is set
   latex?: string,
   svg?: string,
   speech?: string,
@@ -72,10 +73,17 @@ const normalizeMathJaxA11y = (adaptor, mjxContainer) => {
   }
 }
 
-const toTypstML = ((node, optionTypst?): string => {
+const normalizeTypstSpaces = (s: string): string =>
+  s ? s.trim().replace(/(\S) {2,}/g, '$1 ') : '';
+
+/** Return both block and inline Typst math from the MathML AST.
+ *  typstmath_inline always present — equals typstmath when no block wrappers are used. */
+const toTypstData = ((node, optionTypst?): { typstmath: string; typstmath_inline: string } => {
   const visitorT = new SerializedTypstVisitor(optionTypst);
   const data: ITypstData = visitorT.visitTree(node);
-  return data?.typst ? data.typst.trim().replace(/(\S) {2,}/g, '$1 ') : '';
+  const typstmath = normalizeTypstSpaces(data?.typst);
+  const typstmath_inline = normalizeTypstSpaces(data?.typst_inline ?? data?.typst);
+  return { typstmath, typstmath_inline };
 });
 
 const makeAssistiveMmlAccessible = (adaptor, mjxContainer) => {
@@ -169,7 +177,9 @@ const OuterData = (adaptor, node, math, outMath, forDocx = false, accessibility?
   }
 
   if (include_typst) {
-    res.typstmath = toTypstML(math.root);
+    const typstData = toTypstData(math.root);
+    res.typstmath = typstData.typstmath;
+    res.typstmath_inline = typstData.typstmath_inline;
   }
 
   if (include_latex) {
@@ -367,6 +377,7 @@ export const OuterHTML = (data, outMath, forPptx: boolean = false) => {
   if (include_typst && data.typstmath) {
     if (!outHTML) { outHTML += '\n'}
     outHTML += '<typstmath style="display: none;">' + formatSource(data.typstmath) + '</typstmath>';
+    outHTML += '<typstmath_inline style="display: none;">' + formatSource(data.typstmath_inline || data.typstmath) + '</typstmath_inline>';
   }
   if (include_speech && data.speech) {
     if (!outHTML) { outHTML += '\n'}
@@ -505,15 +516,16 @@ export const MathJax = {
     const dataAscii: IAsciiData = toAsciiML(outputJax.math.root, optionAscii);
     return dataAscii.ascii;
   },
-  TexConvertToTypst: function(string, options: any={}) {
+  TexConvertToTypstData: function(string, options: any={}) {
     const {display = true, metric = {}, accessibility = null} = options;
     const {em = 16, ex = 8, cwidth = 1200, lwidth = 100000, scale = 1} = metric;
     this.checkAccessibility(accessibility);
+    (MJ.docTeX as any).inputJax?.parseOptions?.tags?.reset();
     MJ.docTeX.convert(string, {
       display, em, ex, containerWidth: cwidth, lineWidth: lwidth, scale,
     });
     const outputJax = MJ.docTeX.outputJax as any;
-    return toTypstML(outputJax.math.root);
+    return toTypstData(outputJax.math.root);
   },
   /**
    * Typeset a TeX expression and return the SVG tree for it

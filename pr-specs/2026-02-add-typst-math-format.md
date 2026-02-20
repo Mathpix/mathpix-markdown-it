@@ -26,7 +26,6 @@ Owner: @OlgaRedozubova
 - Converting non-math Typst markup (text, layout, bibliographies)
 - Handling Typst-specific features that have no LaTeX equivalent
 - Modifying any existing conversion format (MathML, AsciiMath, LaTeX, SVG)
-- API or interface changes beyond adding `include_typst` to `TOutputMath`
 
 ## Architecture
 
@@ -37,10 +36,53 @@ LaTeX string
   → MathJax TeX input jax
   → Internal MathML tree (MmlNode)
   → SerializedTypstVisitor (new)
-  → Typst math string
+  → ITypstData { typst, typst_inline? }
+  → toTypstData() normalization
+  → { typstmath, typstmath_inline }
 ```
 
 The visitor walks the same MathML tree that the existing `SerializedAsciiVisitor` uses. It is invoked when `include_typst: true` is set in `outMath` options.
+
+### Dual output format — block vs inline
+
+The converter always produces **two** Typst representations:
+
+| Field | Description |
+|-------|------------|
+| `typstmath` | Full Typst output, may contain block-level constructs (`#math.equation(...)`, `#grid(...)`, `#box(...)`) |
+| `typstmath_inline` | Inline-safe variant for use inside `$...$` — pure math content without block wrappers |
+
+For most expressions these are identical. They differ for:
+- **Numbered equations** (`\begin{equation}`, `\tag{}`): `typstmath` uses `#math.equation(block: true, numbering: ..., $ ... $)`, `typstmath_inline` contains the raw math
+- **Numcases/subnumcases**: `typstmath` uses `#grid(...)`, `typstmath_inline` contains just `cases(...)`
+- **Boxed expressions** (`\boxed{}`): `typstmath` uses `#box(stroke: 0.5pt, inset: 3pt, $ ... $)`, `typstmath_inline` contains the inner content
+- **Bordered arrays** (array with `frame=solid`): similar to boxed
+
+**Implementation details:**
+
+`ITypstData` carries both fields through the visitor tree:
+```typescript
+interface ITypstData {
+  typst: string;
+  typst_inline?: string;  // undefined = same as typst
+}
+```
+
+- `typst_inline` is `undefined` by default — this signals "identical to `typst`"
+- `addToTypstData()` always propagates `typst_inline`: when the input has no explicit `typst_inline`, it falls back to `typst`
+- `addSpaceToTypstData()` inserts separator spaces into both fields simultaneously
+- Only handlers that produce block wrappers set `typst_inline` explicitly (mtable/frame, menclose/box, numbered equations, grid layouts)
+- `toTypstData()` normalizes the final output, applying `typst_inline ?? typst` fallback
+
+**Examples where formats differ:**
+
+| LaTeX | `typstmath` (block) | `typstmath_inline` |
+|-------|--------------------|--------------------|
+| `\begin{equation} y^2 \end{equation}` | `#math.equation(block: true, numbering: "(1)", $ y^2 $)` | `y^2` |
+| `\boxed{x=1}` | `#box(stroke: 0.5pt, inset: 3pt, $ x = 1 $)` | `x = 1` |
+| `\begin{array}{\|c\|}\hline a \\ \hline\end{array}` | `#box(stroke: 0.5pt, inset: 3pt, $ mat(...) $)` | `mat(...)` |
+
+For most expressions (e.g. `\frac{a}{b}`, `\sum_{i=1}^n x_i`) both fields are identical: `frac(a, b)`, `sum_(i = 1)^n x_i`.
 
 ### Module structure
 
@@ -51,18 +93,19 @@ All new Typst code lives in `src/mathjax/serialized-typst/`:
 | `index.ts` | `SerializedTypstVisitor` class — extends MathJax's `MmlVisitor`, handles root traversal, inferred mrow spacing, big delimiter detection (`\big`, `\Big`, etc.), and bare delimiter-pair grouping (`|...|`, `⌊...⌋`, `⌈...⌉`, `‖...‖`) |
 | `handlers.ts` | Node-type handlers — one function per MathML element (`mi`, `mo`, `mn`, `mfrac`, `msup`, `msub`, `msubsup`, `msqrt`, `mroot`, `mover`, `munder`, `munderover`, `mmultiscripts`, `mrow`, `mtable`, `mtext`, `mspace`, `mpadded`, `mstyle`, `mphantom`, `menclose`) |
 | `typst-symbol-map.ts` | Unicode → Typst symbol name mapping tables (Greek, binary operators, relations, arrows, delimiters, large operators, misc) plus accent map and font map |
-| `common.ts` | `ITypstData` interface, `initTypstData`, `addToTypstData`, `needsParens` helpers |
+| `common.ts` | `ITypstData` interface, `initTypstData`, `addToTypstData`, `addSpaceToTypstData`, `needsParens` helpers |
 | `node-utils.ts` | `isFirstChild` / `isLastChild` tree-position utilities |
 
 ### Integration points
 
 | File | Change |
 |------|--------|
-| `src/mathjax/index.ts` | `OuterData()` calls `toTypstML()` when `include_typst` is set; `OuterHTML()` emits `<typstmath>` hidden tag; `TexConvertToTypst()` public API method (already existed) |
+| `src/mathjax/index.ts` | `OuterData()` calls `toTypstData()` when `include_typst` is set, populating both `typstmath` and `typstmath_inline`; `OuterHTML()` emits `<typstmath>` and `<typstmath_inline>` hidden tags; `TexConvertToTypstData()` public API — returns `{ typstmath, typstmath_inline }` |
 | `src/mathpix-markdown-model/index.ts` | `include_typst?: boolean` added to `TOutputMath` type |
-| `src/contex-menu/menu/consts.ts` | `'typst'` added to `mathExportTypes`; `typst = 'typst'` added to `eMathType` enum |
-| `src/contex-menu/menu/menu-item.ts` | `case eMathType.typst:` added with title `'Copy Typst'` |
-| `src/helpers/parse-mmd-element.ts` | `'TYPSTMATH'` recognized in DOM parser; mapped to type `'typst'` |
+| `src/contex-menu/menu/consts.ts` | `'typst'` and `'typst_inline'` added to `mathExportTypes`; `typst` and `typst_inline` added to `eMathType` enum |
+| `src/contex-menu/menu/menu-item.ts` | `case eMathType.typst:` → title `'Typst'`; `case eMathType.typst_inline:` → title `'Typst (inline)'` |
+| `src/contex-menu/menu/menu-items.ts` | Skips `typst_inline` when its value equals `typst` (no redundant menu entry) |
+| `src/helpers/parse-mmd-element.ts` | `'TYPSTMATH'` and `'TYPSTMATH_INLINE'` recognized in DOM parser; mapped to types `'typst'` and `'typst_inline'` |
 
 ## Supported LaTeX Constructs
 
@@ -253,7 +296,7 @@ Note: the comma inside `lr(( t_n, x^n ))` is at depth 2 and preserved as-is, whi
 |-------|-------|
 | `\cancel{x}` | `cancel(x)` |
 | `\bcancel{x}` | `cancel(inverted: #true, x)` |
-| `\boxed{x=1}` | `#box(stroke: 0.5pt, inset: 3pt, $x = 1$)` |
+| `\boxed{x=1}` | `#box(stroke: 0.5pt, inset: 3pt, $x = 1$)` (block) / `x = 1` (inline) |
 | `\color{red}{x}` | `#text(fill: red)[x]` |
 | `\phantom{x}` | `#hide($x$)` (preserves dimensions) |
 | `\hphantom{x}` | `#hide($x$)` (same — Typst hide preserves full box) |
@@ -337,19 +380,20 @@ This ensures paired delimiters form grouped expressions in Typst (important afte
 
 | File | Change |
 |------|--------|
-| `src/mathjax/serialized-typst/index.ts` | **New.** `SerializedTypstVisitor` class with root traversal, big-delimiter detection, bare delimiter-pair grouping (`|`, `⌊⌋`, `⌈⌉`, `‖`) |
-| `src/mathjax/serialized-typst/handlers.ts` | **New.** 20+ MathML node-type handlers for Typst serialization |
+| `src/mathjax/serialized-typst/index.ts` | **New.** `SerializedTypstVisitor` class with root traversal, big-delimiter detection, bare delimiter-pair grouping (`\|`, `⌊⌋`, `⌈⌉`, `‖`); uses `addSpaceToTypstData` for token separation |
+| `src/mathjax/serialized-typst/handlers.ts` | **New.** 20+ MathML node-type handlers for Typst serialization; handlers for `mtable`/frame and `menclose`/box set separate `typst_inline` without block wrappers |
 | `src/mathjax/serialized-typst/typst-symbol-map.ts` | **New.** Unicode → Typst symbol mapping (~300 entries), accent map, font map |
-| `src/mathjax/serialized-typst/common.ts` | **New.** Shared types and helpers (`ITypstData`, `needsParens`) |
+| `src/mathjax/serialized-typst/common.ts` | **New.** `ITypstData` interface with optional `typst_inline`; `initTypstData`, `addToTypstData` (always propagates `typst_inline` with `typst` fallback), `addSpaceToTypstData`, `needsParens` |
 | `src/mathjax/serialized-typst/node-utils.ts` | **New.** Tree position utilities |
 | `src/mathjax/mathjax.ts` | Patched `AbstractTags` (`autoTag`, `getTag`, `startEquation`) to mark auto-numbered tags with `data-tag-auto` property |
-| `src/mathjax/index.ts` | Added `include_typst` to `OuterData` and `OuterHTML`; `<typstmath>` HTML tag; fixed `toTypstML` space-collapse regex to preserve line-leading indentation (`/(\S) {2,}/g` instead of `/ {2,}/g`) |
-| `src/mathpix-markdown-model/index.ts` | Added `include_typst?: boolean` to `TOutputMath` |
-| `src/contex-menu/menu/consts.ts` | Added `'typst'` to `mathExportTypes` and `eMathType` enum |
-| `src/contex-menu/menu/menu-item.ts` | Added `case eMathType.typst:` ("Copy Typst") to context menu |
-| `src/helpers/parse-mmd-element.ts` | Added `'TYPSTMATH'` to DOM tag parser |
-| `tests/_typst.js` | **New.** Mocha test runner for Typst conversion |
-| `tests/_data/_typst/data.js` | **New.** Test cases covering all supported constructs |
+| `src/mathjax/index.ts` | `toTypstData()` returns `{ typstmath, typstmath_inline }` from the visitor's `ITypstData`; `OuterData()` and `OuterHTML()` populate both fields; `OuterHTML()` emits `<typstmath>` and `<typstmath_inline>` hidden tags; `TexConvertToTypstData()` is the sole public API for Typst (resets MathJax tag state before each conversion); `normalizeTypstSpaces` preserves line-leading indentation (`/(\S) {2,}/g`) |
+| `src/mathpix-markdown-model/index.ts` | Added `include_typst?: boolean` to `TOutputMath`; `typstmath_inline?: string` to `IOuterData` |
+| `src/contex-menu/menu/consts.ts` | Added `'typst'` and `'typst_inline'` to `mathExportTypes`; added both to `eMathType` enum |
+| `src/contex-menu/menu/menu-item.ts` | `case eMathType.typst:` → `'Typst'`; `case eMathType.typst_inline:` → `'Typst (inline)'` |
+| `src/contex-menu/menu/menu-items.ts` | Skips `typst_inline` menu item when its value equals `typst` |
+| `src/helpers/parse-mmd-element.ts` | Added `'TYPSTMATH'` → `'typst'` and `'TYPSTMATH_INLINE'` → `'typst_inline'` to DOM tag parser |
+| `tests/_typst.js` | **New.** Mocha test runner — uses `TexConvertToTypstData`, tests both `typstmath` and `typstmath_inline` in a single loop |
+| `tests/_data/_typst/data.js` | **New.** Test cases covering all supported constructs; each entry has `latex`, `typst`, and `typst_inline` fields |
 
 ## Constraints
 
@@ -357,10 +401,18 @@ This ensures paired delimiters form grouped expressions in Typst (important afte
 - All existing tests must continue to pass
 - Typst output is only generated when `include_typst: true` is set — zero overhead when disabled
 - The visitor is read-only over the MathML tree — no mutations to shared state
+- MathJax tag state (`parseOptions.tags`) must be reset before each `TexConvertToTypstData` call to prevent "Label multiply defined" errors across repeated conversions
 
 ## Testing
 
-Test cases in `tests/_data/_typst/data.js` organized by category:
+Test cases in `tests/_data/_typst/data.js` organized by category. Each test entry has three fields:
+- `latex` — input LaTeX math
+- `typst` — expected block Typst output (`typstmath`)
+- `typst_inline` — expected inline Typst output (`typstmath_inline`)
+
+The test runner (`tests/_typst.js`) uses `TexConvertToTypstData` and validates both outputs in a single test per entry.
+
+**Categories:**
 - Basic operations (fractions, scripts, roots)
 - Greek letters
 - Accents (shorthand and generic forms)
@@ -390,8 +442,9 @@ npx mocha tests/*.js   # All tests pass (Typst + existing)
 **Risk**: Low
 - All new Typst code is isolated in `src/mathjax/serialized-typst/` — no changes to existing conversion logic
 - Typst conversion is opt-in via `include_typst: true` — disabled by default
-- Context menu changes are additive (new enum value, new case in switch)
-- DOM parser change adds one tag name to an existing array
+- Context menu changes are additive (new enum values, new cases in switch); `typst_inline` entry is automatically hidden when it equals `typst`
+- DOM parser change adds two tag names (`TYPSTMATH`, `TYPSTMATH_INLINE`) to an existing array
 - `AbstractTags` patch in `mathjax.ts` only adds a `data-tag-auto` property to tag nodes — does not alter existing tag behavior or MathML output
+- `tags.reset()` in `TexConvertToTypstData` uses optional chaining — safe before first `convert()` call
 
 **Rollback**: Revert PR or pin to previous version

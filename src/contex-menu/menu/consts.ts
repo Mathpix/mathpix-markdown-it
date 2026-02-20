@@ -16,6 +16,7 @@ export const mathExportTypes = [
   'mathml',
   'mathmlword',
   'typst',
+  'typst_inline',
   'tsv',
   'csv',
   'table-markdown',
@@ -34,6 +35,7 @@ export enum eMathType {
   tsv = 'tsv',
   csv = 'csv',
   typst = 'typst',
+  typst_inline = 'typst_inline',
   table_markdown = 'table-markdown',
   smiles = 'smiles'
 }

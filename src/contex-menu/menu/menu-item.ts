@@ -27,7 +27,11 @@ export const createMathMenuItem = (type, value: string) => {
         sourceStr = value;
         break;
       case eMathType.typst:
-        itemTitle = 'Copy Typst';
+        itemTitle = 'Typst';
+        sourceStr = formatSource(value);
+        break;
+      case eMathType.typst_inline:
+        itemTitle = 'Typst (inline)';
         sourceStr = formatSource(value);
         break;
       case eMathType.tsv:

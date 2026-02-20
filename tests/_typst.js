@@ -6,15 +6,20 @@ describe('Latex to Typst math format:', () => {
   const tests = require('./_data/_typst/data');
   tests.forEach(function(t) {
     it('Latex =>' + t.latex, function() {
-      const result = MathJax.TexConvertToTypst(t.latex);
+      const data = MathJax.TexConvertToTypstData(t.latex);
       console.log('    LATEX    =>', t.latex);
-      console.log('    TYPST    =>', result);
+      console.log('    TYPST    =>', data.typstmath);
       console.log('    EXPECTED =>', t.typst);
-      result.should.be.a('string');
+      data.typstmath.should.be.a('string');
       if (t.typst.length > 0) {
-        result.length.should.be.greaterThan(0);
+        data.typstmath.length.should.be.greaterThan(0);
       }
-      result.should.equal(t.typst);
+      data.typstmath.should.equal(t.typst);
+
+      console.log('    TYPST_INLINE    =>', data.typstmath_inline);
+      console.log('    EXPECTED_INLINE =>', t.typst_inline);
+      data.typstmath_inline.should.be.a('string');
+      data.typstmath_inline.should.equal(t.typst_inline);
     });
   });
 });

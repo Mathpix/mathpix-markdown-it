@@ -1,5 +1,5 @@
 import { TEXCLASS } from "mathjax-full/js/core/MmlTree/MmlNode";
-import { ITypstData, initTypstData, addToTypstData, needsParens } from "./common";
+import { ITypstData, initTypstData, addToTypstData, addSpaceToTypstData, needsParens } from "./common";
 import { findTypstSymbol, typstAccentMap, typstFontMap, typstSymbolMap } from "./typst-symbol-map";
 import { isFirstChild, isLastChild } from "./node-utils";
 
@@ -1066,6 +1066,8 @@ const mtable = () => {
         lines.push(')');
 
         res = addToTypstData(res, { typst: lines.join('\n') });
+        // Inline variant: pure math content without #grid wrapper
+        res.typst_inline = mathContent;
         return res;
       }
 
@@ -1126,6 +1128,8 @@ const mtable = () => {
             }
           }
           res = addToTypstData(res, { typst: eqnBlocks.join('\n') });
+          // Inline variant: pure math content without #math.equation wrappers
+          res.typst_inline = rows.join(' \\\n');
         } else {
           // No tags at all (e.g. align*): emit as single block with \ separators
           res = addToTypstData(res, { typst: rows.join(' \\\n') });
@@ -1197,7 +1201,7 @@ const mtable = () => {
         const matExpr = 'mat(' + paramStr + matContent + ')';
 
         if (frame === 'solid') {
-          res = addToTypstData(res, { typst: '#box(stroke: 0.5pt, inset: 3pt, $ ' + matExpr + ' $)' });
+          res = addToTypstData(res, { typst: '#box(stroke: 0.5pt, inset: 3pt, $ ' + matExpr + ' $)', typst_inline: matExpr });
         } else {
           res = addToTypstData(res, { typst: matExpr });
         }
@@ -1327,7 +1331,7 @@ const mrow = () => {
           if (res.typst && data.typst
             && /^[\w."]/.test(data.typst)
             && !/[\s({[,|]$/.test(res.typst)) {
-            res.typst += ' ';
+            addSpaceToTypstData(res);
           }
           res = addToTypstData(res, data);
         }
@@ -1411,7 +1415,7 @@ const menclose = () => {
       const content = data.typst.trim();
       if (notation.indexOf('box') > -1) {
         // \boxed → #box with stroke
-        res = addToTypstData(res, { typst: '#box(stroke: 0.5pt, inset: 3pt, $' + content + '$)' });
+        res = addToTypstData(res, { typst: '#box(stroke: 0.5pt, inset: 3pt, $' + content + '$)', typst_inline: content });
       } else if (notation.indexOf('updiagonalstrike') > -1 || notation.indexOf('downdiagonalstrike') > -1) {
         // \cancel uses updiagonalstrike (lower-left to upper-right) → Typst cancel() default
         // \bcancel uses downdiagonalstrike (upper-left to lower-right) → Typst cancel(inverted: true)
