@@ -257,6 +257,12 @@ module.exports = [
   { latex: `\\left\\lfloor x\\right\\rfloor`, typst: `floor(x)` },
   { latex: `\\left\\lceil x\\right\\rceil`, typst: `ceil(x)` },
 
+  // === Bare delimiters (without \left...\right) ===
+  { latex: `\\lfloor x \\rfloor`, typst: `floor(x)` },
+  { latex: `\\lceil y \\rceil`, typst: `ceil(y)` },
+  { latex: `\\|x\\|`, typst: `norm(x)` },
+  { latex: `\\lfloor x/2 \\rfloor + \\lceil y \\rceil`, typst: `floor(x\\/ 2) + ceil(y)` },
+
   // === mathbb doubled-letter shorthand ===
   { latex: `\\mathbb{Z}`, typst: `ZZ` },
   { latex: `\\mathbb{N}`, typst: `NN` },

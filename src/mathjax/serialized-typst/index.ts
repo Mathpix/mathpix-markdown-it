@@ -28,27 +28,34 @@ const getBigDelimInfo = (node: any): { delim: string, size: string, isOpen: bool
   }
 };
 
-// Check if a node represents a single pipe `|` character.
-// Handles bare mo(|), mrow wrapping a single mo(|), and inferredMrow in between.
-const isSinglePipeNode = (node: any): boolean => {
+// Return the text content of a single-mo node (bare mo, mrow or TeXAtom wrapping one mo).
+// Used to detect delimiter characters like |, ⌊, ⌋, ⌈, ⌉, ‖.
+const getDelimiterChar = (node: any): string | null => {
   try {
-    if (!node || !node.childNodes) return false;
-    if (node.kind === 'mo') {
-      return node.childNodes[0]?.text === '|';
-    }
-    if (node.kind === 'mrow' || node.kind === 'TeXAtom') {
+    let moNode: any = null;
+    if (node?.kind === 'mo') {
+      moNode = node;
+    } else if (node?.kind === 'mrow' || node?.kind === 'TeXAtom') {
       let children = node.childNodes;
-      if (children.length === 1 && children[0].isInferred) {
+      if (children?.length === 1 && children[0].isInferred) {
         children = children[0].childNodes;
       }
-      if (children.length === 1 && children[0].kind === 'mo') {
-        return children[0].childNodes?.[0]?.text === '|';
+      if (children?.length === 1 && children[0].kind === 'mo') {
+        moNode = children[0];
       }
     }
-    return false;
+    return moNode?.childNodes?.[0]?.text || null;
   } catch (_e) {
-    return false;
+    return null;
   }
+};
+
+// Map of opening delimiter char → expected close char + Typst output format.
+const BARE_DELIM_PAIRS: Record<string, { close: string; typstOpen: string; typstClose: string }> = {
+  '|':      { close: '|',      typstOpen: 'lr(| ', typstClose: ' |)' },
+  '\u230A': { close: '\u230B', typstOpen: 'floor(', typstClose: ')' },  // ⌊...⌋
+  '\u2308': { close: '\u2309', typstOpen: 'ceil(',  typstClose: ')' },  // ⌈...⌉
+  '\u2016': { close: '\u2016', typstOpen: 'norm(',  typstClose: ')' },  // ‖...‖
 };
 
 export interface ITypstVisitorOptions {
@@ -133,13 +140,16 @@ export class SerializedTypstVisitor extends MmlVisitor {
             continue;
           }
         }
-        // Detect |...| pipe pairs (absolute value without \left...\right).
-        // Skip inside TeXAtom groups (e.g. {|\alpha|} in superscripts) where
-        // the content is already grouped by the enclosing script parens.
-        if (isSinglePipeNode(child) && (node as any).parent?.kind !== 'TeXAtom') {
+        // Detect paired delimiters without \left...\right:
+        // |...| → lr(| ... |), ⌊...⌋ → floor(...), ⌈...⌉ → ceil(...), ‖...‖ → norm(...)
+        // For symmetric delimiters (|, ‖), skip inside TeXAtom groups
+        // (e.g. {|\alpha|} in superscripts) where content is already grouped.
+        const delimChar = getDelimiterChar(child);
+        const delimPair = delimChar ? BARE_DELIM_PAIRS[delimChar] : null;
+        if (delimPair && !(delimChar === delimPair.close && (node as any).parent?.kind === 'TeXAtom')) {
           let closeIdx = -1;
           for (let k = j + 1; k < node.childNodes.length; k++) {
-            if (isSinglePipeNode(node.childNodes[k])) {
+            if (getDelimiterChar(node.childNodes[k]) === delimPair.close) {
               closeIdx = k;
               break;
             }
@@ -155,12 +165,12 @@ export class SerializedTypstVisitor extends MmlVisitor {
               }
               content += innerData.typst;
             }
-            const pipeExpr = 'lr(| ' + content.trim() + ' |)';
-            if (res.typst && /^[\w."]/.test(pipeExpr)
+            const delimExpr = delimPair.typstOpen + content.trim() + delimPair.typstClose;
+            if (res.typst && /^[\w."]/.test(delimExpr)
               && !/[\s({[,|]$/.test(res.typst)) {
               res.typst += ' ';
             }
-            res = addToTypstData(res, { typst: pipeExpr });
+            res = addToTypstData(res, { typst: delimExpr });
             j = closeIdx + 1;
             continue;
           }
