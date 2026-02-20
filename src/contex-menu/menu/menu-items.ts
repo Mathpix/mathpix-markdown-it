@@ -9,19 +9,27 @@ export const mathMenuItems = (el) => {
     if (!res || !res.length) {
       return items;
     }
-    
+
     for (let i = 0; i < mathExportTypes.length; i++) {
       const resItem = res.find(item => item.type === mathExportTypes[i]);
       if (!resItem) {
         continue;
       }
-      
+
+      // Skip typst_inline when it equals typst (no separate inline variant)
+      if (resItem.type === 'typst_inline') {
+        const typstItem = res.find(item => item.type === 'typst');
+        if (typstItem && typstItem.value === resItem.value) {
+          continue;
+        }
+      }
+
       let item = createMathMenuItem(resItem.type, resItem.value);
       if (item) {
         items.push(item);
       }
     }
-    
+
     return items;
   } catch (err) {
     console.error(err);

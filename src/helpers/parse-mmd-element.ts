@@ -53,7 +53,7 @@ export const parseMmdElement = (math_el, res = []) => {
       continue;
     }
 
-    if (["MATHML", "MATHMLWORD", "ASCIIMATH", "LATEX", "MJX-CONTAINER", "LINEARMATH", "TABLE", "TSV", "CSV", "SMILES", "TABLE-MARKDOWN", "ERROR"].indexOf(child.tagName) !== -1) {
+    if (["MATHML", "MATHMLWORD", "ASCIIMATH", "LATEX", "MJX-CONTAINER", "LINEARMATH", "TYPSTMATH", "TYPSTMATH_INLINE", "TABLE", "TSV", "CSV", "SMILES", "TABLE-MARKDOWN", "ERROR"].indexOf(child.tagName) !== -1) {
       if (child.tagName==="MJX-CONTAINER" || child.tagName==="TABLE") {
         if (child.tagName === "TABLE") {
           res.push({type: "html", value: child.outerHTML});
@@ -61,9 +61,12 @@ export const parseMmdElement = (math_el, res = []) => {
           res.push({type: "svg", value: child.innerHTML});
         }
       } else {
+        const tagType = child.tagName === 'TYPSTMATH' ? 'typst'
+          : child.tagName === 'TYPSTMATH_INLINE' ? 'typst_inline'
+          : child.tagName.toLowerCase();
         res.push({
-          type: child.tagName.toLowerCase(),
-          value: ['LATEX', 'ASCIIMATH', 'LINEARMATH', 'ERROR', 'TSV', 'CSV', 'TABLE-MARKDOWN', 'SMILES'].includes(child.tagName)
+          type: tagType,
+          value: ['LATEX', 'ASCIIMATH', 'LINEARMATH', 'TYPSTMATH', 'TYPSTMATH_INLINE', 'ERROR', 'TSV', 'CSV', 'TABLE-MARKDOWN', 'SMILES'].includes(child.tagName)
             ? formatSourceHtml(child.innerHTML, (child.tagName === 'TSV' || child.tagName === 'CSV' || child.tagName === "TABLE-MARKDOWN"))
             : child.tagName === 'MATHMLWORD'
               ? formatSourceHtmlWord(child.innerHTML)
