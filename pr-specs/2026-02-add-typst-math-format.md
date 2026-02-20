@@ -48,7 +48,7 @@ All new Typst code lives in `src/mathjax/serialized-typst/`:
 
 | File | Purpose |
 |------|---------|
-| `index.ts` | `SerializedTypstVisitor` class — extends MathJax's `MmlVisitor`, handles root traversal, inferred mrow spacing, big delimiter detection (`\big`, `\Big`, etc.), and `\|...\|` pipe-pair grouping |
+| `index.ts` | `SerializedTypstVisitor` class — extends MathJax's `MmlVisitor`, handles root traversal, inferred mrow spacing, big delimiter detection (`\big`, `\Big`, etc.), and bare delimiter-pair grouping (`|...|`, `⌊...⌋`, `⌈...⌉`, `‖...‖`) |
 | `handlers.ts` | Node-type handlers — one function per MathML element (`mi`, `mo`, `mn`, `mfrac`, `msup`, `msub`, `msubsup`, `msqrt`, `mroot`, `mover`, `munder`, `munderover`, `mmultiscripts`, `mrow`, `mtable`, `mtext`, `mspace`, `mpadded`, `mstyle`, `mphantom`, `menclose`) |
 | `typst-symbol-map.ts` | Unicode → Typst symbol name mapping tables (Greek, binary operators, relations, arrows, delimiters, large operators, misc) plus accent map and font map |
 | `common.ts` | `ITypstData` interface, `initTypstData`, `addToTypstData`, `needsParens` helpers |
@@ -129,7 +129,10 @@ Built-in Typst math operators (`sin`, `cos`, `tan`, `log`, `lim`, etc.) pass thr
 | `\left\lceil x \right\rceil` | `ceil(x)` |
 | `\left( x \right.` | `( x` (one-sided) |
 | `\big( x \big)` | `lr(size: #1.2em, ( x ))` |
-| `\|\alpha\|` (without `\left...\right`) | `lr(\| alpha \|)` (pipe-pair detection) |
+| `\|...\|` (without `\left...\right`) | `lr(\| ... \|)` (pipe-pair detection) |
+| `\lfloor x \rfloor` (without `\left...\right`) | `floor(x)` (bare delimiter-pair detection) |
+| `\lceil y \rceil` (without `\left...\right`) | `ceil(y)` (bare delimiter-pair detection) |
+| `\|x\|` (without `\left...\right`) | `norm(x)` (bare delimiter-pair detection) |
 
 ### Matrices and equation arrays
 
@@ -303,9 +306,18 @@ Tag labels are serialized by `serializeTagContent()` in `handlers.ts`, which wal
 
 This handles mixed tags like `\tag{$x\sqrt{5}$ 1.3.1}` where the MathML label contains interleaved `mtext` and math nodes: `<mtext>(</mtext>`, `<mrow><mi>x</mi><msqrt>...</msqrt></mrow>`, `<mtext> 1.3.1)</mtext>` → `($x sqrt(5)$ 1.3.1)`.
 
-### Pipe-pair detection
+### Bare delimiter-pair detection
 
-LaTeX `|\alpha|` without `\left...\right` produces unpaired `<mo>|</mo>` nodes in MathML. The `visitInferredMrowNode` method detects matched pipe pairs at the top level and wraps them as `lr(| content |)`, ensuring they form a single grouped expression in Typst (important after `/` for correct fraction denominator binding). Pipe pairs inside `TeXAtom` groups (e.g. superscript `{|\alpha|}`) are left as-is since the enclosing script parens already provide grouping.
+LaTeX delimiters without `\left...\right` produce unpaired `<mo>` nodes in MathML. The `visitInferredMrowNode` method detects matched delimiter pairs at the top level using a `BARE_DELIM_PAIRS` map and converts them to idiomatic Typst:
+
+| Opening | Closing | Typst output |
+|---------|---------|-------------|
+| `\|` | `\|` | `lr(\| content \|)` |
+| `\lfloor` (⌊) | `\rfloor` (⌋) | `floor(content)` |
+| `\lceil` (⌈) | `\rceil` (⌉) | `ceil(content)` |
+| `\\|` (‖) | `\\|` (‖) | `norm(content)` |
+
+This ensures paired delimiters form grouped expressions in Typst (important after `/` for correct fraction denominator binding). For symmetric delimiters (`|`, `‖`), pairs inside `TeXAtom` groups (e.g. superscript `{|\alpha|}`) are left as-is since the enclosing script parens already provide grouping.
 
 ## Example
 
@@ -325,7 +337,7 @@ LaTeX `|\alpha|` without `\left...\right` produces unpaired `<mo>|</mo>` nodes i
 
 | File | Change |
 |------|--------|
-| `src/mathjax/serialized-typst/index.ts` | **New.** `SerializedTypstVisitor` class with root traversal, big-delimiter detection, pipe-pair grouping |
+| `src/mathjax/serialized-typst/index.ts` | **New.** `SerializedTypstVisitor` class with root traversal, big-delimiter detection, bare delimiter-pair grouping (`|`, `⌊⌋`, `⌈⌉`, `‖`) |
 | `src/mathjax/serialized-typst/handlers.ts` | **New.** 20+ MathML node-type handlers for Typst serialization |
 | `src/mathjax/serialized-typst/typst-symbol-map.ts` | **New.** Unicode → Typst symbol mapping (~300 entries), accent map, font map |
 | `src/mathjax/serialized-typst/common.ts` | **New.** Shared types and helpers (`ITypstData`, `needsParens`) |
