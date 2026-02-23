@@ -198,47 +198,78 @@ Each numbered equation is emitted as an independent `#math.equation(block: true,
 | LaTeX | Typst |
 |-------|-------|
 | `\begin{equation} y^2 \end{equation}` (auto) | `#math.equation(block: true, numbering: "(1)", $ y^2 $)` |
-| `E = mc^2 \tag{1.2}` (explicit) | `#math.equation(block: true, numbering: n => [(1.2)], $ E = m c^2 $)` |
-| `\begin{equation*} S \tag{1} \end{equation*}` | `#math.equation(block: true, numbering: n => [(1)], $ S $)` |
+| `E = mc^2 \tag{1.2}` (explicit) | `#math.equation(block: true, numbering: n => [(1.2)], $ ... $)` + newline + `#counter(math.equation).update(n => n - 1)` |
+| `\begin{equation*} S \tag{1} \end{equation*}` | `#math.equation(block: true, numbering: n => [(1)], $ S $)` + newline + `#counter(math.equation).update(n => n - 1)` |
+
+**Counter rollback for explicit `\tag{}`:** In LaTeX, `\tag{...}` does not increment the equation counter — only auto-numbered equations do. However, Typst's `math.equation` with any `numbering` always steps the counter. To preserve correct numbering, the serializer emits `#counter(math.equation).update(n => n - 1)` after each explicit-tagged equation, undoing the unwanted step.
 
 **Multi-row environments** (`align`, `gather`): each row becomes a separate block. Numbered rows use `#math.equation(...)`, unnumbered rows use bare `$ ... $`.
 
 | LaTeX | Typst |
 |-------|-------|
 | `\begin{align} a &= b \\ c &= d \end{align}` (auto) | `#math.equation(block: true, numbering: "(1)", $ a = b $)` + newline + `#math.equation(block: true, numbering: "(1)", $ c = d $)` |
-| `\begin{align} a &= b \tag{A} \\ c &= d \tag{B} \end{align}` | `#math.equation(block: true, numbering: n => [(A)], ...)` per row |
+| `\begin{align} a &= b \tag{A} \\ c &= d \tag{B} \end{align}` | `#math.equation(block: true, numbering: n => [(A)], ...)` + `#counter(...)` rollback per row |
 | `\begin{align} a &= b \\ c &= d \nonumber \end{align}` | `#math.equation(...)` + newline + `$ c = d $` |
 | `\begin{align*} a &= b \\ &= d \end{align*}` | `a = b \` + newline + ` = d` (no numbering, single block) |
 | `\begin{equation} \begin{split} a &= b \\ &= c \end{split} \end{equation}` | `#math.equation(block: true, numbering: "(1)", $ a = b \` newline ` = c $)` (single number) |
 
+**Labels on equations** (`\label{eq:1}`): When a `\label{}` is present, the serializer emits a Typst label `<key>` after the equation block, and adds `supplement: none` to prevent Typst from prefixing "Equation" when referencing:
+
+| LaTeX | Typst |
+|-------|-------|
+| `\begin{equation} y^2 \label{eq:1} \end{equation}` | `#math.equation(block: true, supplement: none, numbering: "(1)", $ y^2 $) <eq:1>` |
+| `\begin{equation} E=mc^2 \tag{rel} \label{eq:e} \end{equation}` | `#math.equation(block: true, supplement: none, numbering: n => [(rel)], $ ... $) <eq:e>` + counter rollback |
+| `\begin{equation} y^2 \end{equation}` (no label) | `#math.equation(block: true, numbering: "(1)", $ y^2 $)` (no supplement, no label) |
+
+Labels are preserved through MathJax via a `data-label-key` property patched onto tag `mtd` nodes in `AbstractTags.getTag()`. The `getLabelKey()` helper reads this property to determine whether a label should be emitted.
+
 **numcases / subnumcases environments:**
 
-The `numcases` and `subnumcases` environments (from LaTeX's `cases` package) produce a cases expression where each row has its own equation number. Typst has no direct equivalent, so the serializer emits a `#grid()` layout with two columns: the cases expression on the left and per-row numbering on the right.
+The `numcases` and `subnumcases` environments (from LaTeX's `cases` package) produce a cases expression where each row has its own equation number. Typst has no direct equivalent, so the serializer emits a `#grid()` layout with two columns: the cases expression on the left and per-row numbering on the right. The grid uses `align: (left, right + horizon)` for proper vertical alignment.
 
 Auto-numbered (`\begin{numcases}{f(x)=} 0 & x < 0 \\ x & x \geq 0 \end{numcases}`):
 ```typst
 #grid(
   columns: (1fr, auto),
+  align: (left, right + horizon),
   math.equation(block: true, numbering: none, $ f(x) = cases(0 & "x < 0", x & "x ≥ 0") $),
   grid(
     row-gutter: 0.65em,
-    context { counter(math.equation).step(); counter(math.equation).display("(1)") },
-    context { counter(math.equation).step(); counter(math.equation).display("(1)") },
+    { counter(math.equation).step(); context counter(math.equation).display("(1)") },
+    { counter(math.equation).step(); context counter(math.equation).display("(1)") },
   ),
 )
 ```
 
-Explicit tags (`\tag{3.12}` in condition text):
+Note: `counter.step()` is placed **outside** `context` in the document flow (inside a `{ }` code block). The `context` keyword is only used for reading the counter value — calling `step()` inside `context` does not persist.
+
+Explicit tags (`\begin{numcases}{f(x)=} x^2 \tag{A} \\ \sqrt{x} \tag{B} \end{numcases}`):
 ```typst
 #grid(
   columns: (1fr, auto),
-  math.equation(block: true, numbering: none, $ f(x) = cases(0 & "x < 0", x & "x ≥ 0") $),
+  align: (left, right + horizon),
+  math.equation(block: true, numbering: none, $ f(x) = cases(x^2, sqrt(x)) $),
   grid(
     row-gutter: 0.65em,
-    [(3.12)],
-    [(3.13)],
+    [(A)],
+    [(B)],
   ),
 )
+```
+
+**Numcases with labels**: Each numcases row can have its own `\label{}`. Since Typst only allows one label per block, the serializer wraps tag entries in `#figure(kind: "eq-tag", ...)` to make each individually labelable:
+
+Auto-numbered with labels:
+```typst
+{ counter(math.equation).step(); context {
+  let n = numbering("(1)", ..counter(math.equation).get());
+  [#figure(kind: "eq-tag", supplement: none, numbering: _ => n, [#n]) <nc:1>]
+} }
+```
+
+Explicit tag with label:
+```typst
+[#figure(kind: "eq-tag", supplement: none, numbering: n => [(3.12)], [(3.12)]) <eq:3.12>]
 ```
 
 **Tag detection uses two sources**, depending on where `\tag` appears:
@@ -256,15 +287,16 @@ Regular cases with commas (`f(x) = \left\{ \begin{array}{ll} {x^2+1,} & {x>1} \\
 f(x) = cases(x^2 + 1"," & x > 1, 1"," & x = 1, x + 1"," & x < 1)
 ```
 
-Empty prefix numcases with commas and explicit tags (`\begin{numcases}{} \Delta ... f\left(t_n, x^n\right), n=1,2,\ldots,N \tag{3.12} \\ x^0=x_0 \tag{3.13} \end{numcases}`):
+Empty prefix numcases with commas, explicit tags, and labels (`\begin{numcases}{} \Delta ... f\left(t_n, x^n\right), n=1,2,\ldots,N \tag{3.12}\label{eq:3.12} \\ x^0=x_0 \tag{3.13}\label{eq3.13} \end{numcases}`):
 ```typst
 #grid(
   columns: (1fr, auto),
-  math.equation(block: true, numbering: none, $ cases(Delta_q^(alpha) x^n = f lr(( t_n, x^n ))"," n = 1"," 2"," dots"," N, x^0 = x_0) $),
+  align: (left, right + horizon),
+  math.equation(block: true, numbering: none, $ cases(...) $),
   grid(
     row-gutter: 0.65em,
-    [(3.12)],
-    [(3.13)],
+    [#figure(kind: "eq-tag", supplement: none, numbering: n => [(3.12)], [(3.12)]) <eq:3.12>],
+    [#figure(kind: "eq-tag", supplement: none, numbering: n => [(3.13)], [(3.13)]) <eq3.13>],
   ),
 )
 ```
@@ -333,7 +365,7 @@ Typst uses `numbering: "(1)"` for standard sequential numbering, and `numbering:
 
 To solve this, `src/mathjax/mathjax.ts` patches `AbstractTags`:
 - `autoTag()` sets a `_isAutoTag` flag after calling the original method
-- `getTag()` checks the flag and propagates it as `data-tag-auto: true` in the label `mtd` node's properties
+- `getTag()` checks the flag and propagates it as `data-tag-auto: true` in the label `mtd` node's properties; also stores the original `\label{}` key as `data-label-key` when `this.label` is non-empty
 - `startEquation()` resets the flag
 
 The `autoTag()` patch only sets the flag when it actually assigns a tag (i.e. `currentTag.tag` was `null` before the call), so explicit `\tag{...}` inside auto-numbering environments like `align` is correctly detected as explicit.
@@ -385,7 +417,7 @@ This ensures paired delimiters form grouped expressions in Typst (important afte
 | `src/mathjax/serialized-typst/typst-symbol-map.ts` | **New.** Unicode → Typst symbol mapping (~300 entries), accent map, font map |
 | `src/mathjax/serialized-typst/common.ts` | **New.** `ITypstData` interface with optional `typst_inline`; `initTypstData`, `addToTypstData` (always propagates `typst_inline` with `typst` fallback), `addSpaceToTypstData`, `needsParens` |
 | `src/mathjax/serialized-typst/node-utils.ts` | **New.** Tree position utilities |
-| `src/mathjax/mathjax.ts` | Patched `AbstractTags` (`autoTag`, `getTag`, `startEquation`) to mark auto-numbered tags with `data-tag-auto` property |
+| `src/mathjax/mathjax.ts` | Patched `AbstractTags` (`autoTag`, `getTag`, `startEquation`) to mark auto-numbered tags with `data-tag-auto` property and preserve `\label{}` keys as `data-label-key` |
 | `src/mathjax/index.ts` | `toTypstData()` returns `{ typstmath, typstmath_inline }` from the visitor's `ITypstData`; `OuterData()` and `OuterHTML()` populate both fields; `OuterHTML()` emits `<typstmath>` and `<typstmath_inline>` hidden tags; `TexConvertToTypstData()` is the sole public API for Typst (resets MathJax tag state before each conversion); `normalizeTypstSpaces` preserves line-leading indentation (`/(\S) {2,}/g`) |
 | `src/mathpix-markdown-model/index.ts` | Added `include_typst?: boolean` to `TOutputMath`; `typstmath_inline?: string` to `IOuterData` |
 | `src/contex-menu/menu/consts.ts` | Added `'typst'` and `'typst_inline'` to `mathExportTypes`; added both to `eMathType` enum |
@@ -429,6 +461,7 @@ The test runner (`tests/_typst.js`) uses `TexConvertToTypstData` and validates b
 - Phantom variants (phantom, hphantom, vphantom)
 - Substack
 - Mod variants (bmod, pmod)
+- Labels on equations (equation, align, gather, split, tag+label, numcases with labels)
 - Edge cases (empty-base scripts, cancel, color, boxed, primes, pipe grouping)
 
 **Commands:**
@@ -444,7 +477,7 @@ npx mocha tests/*.js   # All tests pass (Typst + existing)
 - Typst conversion is opt-in via `include_typst: true` — disabled by default
 - Context menu changes are additive (new enum values, new cases in switch); `typst_inline` entry is automatically hidden when it equals `typst`
 - DOM parser change adds two tag names (`TYPSTMATH`, `TYPSTMATH_INLINE`) to an existing array
-- `AbstractTags` patch in `mathjax.ts` only adds a `data-tag-auto` property to tag nodes — does not alter existing tag behavior or MathML output
+- `AbstractTags` patch in `mathjax.ts` only adds `data-tag-auto` and `data-label-key` properties to tag nodes — does not alter existing tag behavior or MathML output
 - `tags.reset()` in `TexConvertToTypstData` uses optional chaining — safe before first `convert()` call
 
 **Rollback**: Revert PR or pin to previous version
