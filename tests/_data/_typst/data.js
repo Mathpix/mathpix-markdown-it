@@ -1146,32 +1146,32 @@ module.exports = [
   // === Equation tags ===
   {
     latex: `E = mc^2 \\tag{1}`,
-    typst: `#math.equation(block: true, numbering: n => [(1)], $ E = m c^2 $)`,
+    typst: `#math.equation(block: true, numbering: n => [(1)], $ E = m c^2 $)\n#counter(math.equation).update(n => n - 1)`,
     typst_inline: `E = m c^2`,
   },
   {
     latex: `E = mc^2 \\tag{1.2}`,
-    typst: `#math.equation(block: true, numbering: n => [(1.2)], $ E = m c^2 $)`,
+    typst: `#math.equation(block: true, numbering: n => [(1.2)], $ E = m c^2 $)\n#counter(math.equation).update(n => n - 1)`,
     typst_inline: `E = m c^2`,
   },
   {
     latex: `\\begin{align} a &= b \\tag{1} \\\\ c &= d \\tag{2} \\end{align}`,
-    typst: `#math.equation(block: true, numbering: n => [(1)], $ a = b $)\n#math.equation(block: true, numbering: n => [(2)], $ c = d $)`,
+    typst: `#math.equation(block: true, numbering: n => [(1)], $ a = b $)\n#counter(math.equation).update(n => n - 1)\n#math.equation(block: true, numbering: n => [(2)], $ c = d $)\n#counter(math.equation).update(n => n - 1)`,
     typst_inline: `a = b \\\nc = d`,
   },
   {
     latex: `\\begin{align} x &= 1 \\tag{A} \\\\ y &= 2 \\tag{B} \\end{align}`,
-    typst: `#math.equation(block: true, numbering: n => [(A)], $ x = 1 $)\n#math.equation(block: true, numbering: n => [(B)], $ y = 2 $)`,
+    typst: `#math.equation(block: true, numbering: n => [(A)], $ x = 1 $)\n#counter(math.equation).update(n => n - 1)\n#math.equation(block: true, numbering: n => [(B)], $ y = 2 $)\n#counter(math.equation).update(n => n - 1)`,
     typst_inline: `x = 1 \\\ny = 2`,
   },
   {
     latex: `\\begin{equation*} S_{20} \\tag{1} \\end{equation*}`,
-    typst: `#math.equation(block: true, numbering: n => [(1)], $ S_(20) $)`,
+    typst: `#math.equation(block: true, numbering: n => [(1)], $ S_(20) $)\n#counter(math.equation).update(n => n - 1)`,
     typst_inline: `S_(20)`,
   },
   {
     latex: `\\begin{equation} x^2 \\tag{$x\\sqrt{5}$ 1.3.1} \\end{equation}`,
-    typst: `#math.equation(block: true, numbering: n => [($x sqrt(5)$ 1.3.1)], $ x^2 $)`,
+    typst: `#math.equation(block: true, numbering: n => [($x sqrt(5)$ 1.3.1)], $ x^2 $)\n#counter(math.equation).update(n => n - 1)`,
     typst_inline: `x^2`,
   },
   {
@@ -1221,7 +1221,7 @@ module.exports = [
   // equation with explicit tag + label
   {
     latex: `\\begin{equation} E=mc^2 \\tag{rel} \\label{eq:einstein} \\end{equation}`,
-    typst: `#math.equation(block: true, supplement: none, numbering: n => [(rel)], $ E = m c^2 $) <eq:einstein>`,
+    typst: `#math.equation(block: true, supplement: none, numbering: n => [(rel)], $ E = m c^2 $) <eq:einstein>\n#counter(math.equation).update(n => n - 1)`,
     typst_inline: `E = m c^2`,
   },
   // align: label on first row, \nonumber on second

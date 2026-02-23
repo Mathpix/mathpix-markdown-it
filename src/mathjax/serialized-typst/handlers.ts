@@ -1140,6 +1140,11 @@ const mtable = () => {
                 eqnBlocks.push(
                   '#math.equation(block: true' + supplementPart + ', numbering: ' + numbering + ', $ ' + rowContent + ' $)' + labelSuffix
                 );
+                // Explicit \tag{} does not consume a number in LaTeX, but
+                // math.equation always steps the counter in Typst — undo it.
+                if (!isAutoNumber) {
+                  eqnBlocks.push('#counter(math.equation).update(n => n - 1)');
+                }
               } else {
                 eqnBlocks.push('$ ' + rowContent + ' $');
               }
