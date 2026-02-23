@@ -102,7 +102,7 @@ const relationOperators: ReadonlyArray<[string, string]> = [
   ["\u223C", "tilde.op"],         // ∼
   ["\u2243", "tilde.eq"],         // ≃
   ["\u2248", "approx"],           // ≈
-  ["\u2245", "cong"],             // ≅
+  ["\u2245", "tilde.equiv"],      // ≅
   ["\u2282", "subset"],           // ⊂
   ["\u2283", "supset"],           // ⊃
   ["\u2286", "subset.eq"],        // ⊆
@@ -111,7 +111,7 @@ const relationOperators: ReadonlyArray<[string, string]> = [
   ["\u220B", "in.rev"],           // ∋
   ["\u2209", "in.not"],           // ∉
   ["\u221D", "prop"],             // ∝
-  ["\u2223", "mid"],              // ∣
+  ["\u2223", "divides"],          // ∣
   ["\u2225", "parallel"],         // ∥
   ["\u22A5", "perp"],             // ⊥
   ["\u226A", "lt.double"],        // ≪
@@ -218,10 +218,10 @@ const delimiters: ReadonlyArray<[string, string]> = [
   ["\u2309", "ceil.r"],        // ⌉
   ["\u230A", "floor.l"],       // ⌊
   ["\u230B", "floor.r"],       // ⌋
-  ["\u231C", "corner.tl"],     // ⌜
-  ["\u231D", "corner.tr"],     // ⌝
-  ["\u231E", "corner.bl"],     // ⌞
-  ["\u231F", "corner.br"],     // ⌟
+  ["\u231C", "corner.l.t"],    // ⌜
+  ["\u231D", "corner.r.t"],    // ⌝
+  ["\u231E", "corner.l.b"],    // ⌞
+  ["\u231F", "corner.r.b"],    // ⌟
   ["\u2016", "bar.v.double"],  // ‖
   // Note: \u2225 (∥) is NOT duplicated here — it maps to "parallel" in relationOperators
 ];
@@ -243,7 +243,7 @@ const miscSymbols: ReadonlyArray<[string, string]> = [
   ["\u2203", "exists"],         // ∃
   ["\u2204", "exists.not"],     // ∄
   ["\u2205", "emptyset"],       // ∅
-  ["\u2300", "nothing"],        // ⌀ (varnothing)
+  ["\u2300", "diameter"],        // ⌀ (varnothing)
   ["\u00AC", "not"],            // ¬
   ["\u22A4", "top"],            // ⊤
   ["\u22A5", "bot"],            // ⊥
