@@ -396,6 +396,10 @@ Multi-character Typst symbol names (e.g. `lt.eq`, `gt.eq`, `arrow.r`) must have 
 
 LaTeX allows `^{x}` with no preceding base. The `msup`, `msub`, and `msubsup` handlers detect an empty base and emit `""` as a placeholder, preventing Typst's "unexpected hat" error.
 
+### Empty-content protection
+
+Typst functions require non-empty arguments — `sqrt()`, `frac(,)`, `hat()` etc. produce errors. When LaTeX content is empty (e.g. `\sqrt{}`, `\frac{}{}`, `\hat{}`), handlers use `|| '""'` fallback to emit a Typst empty text string as placeholder. Protected handlers: `msqrt`, `mroot`, `mfrac`/`binom`, `mover` (accents), `munder` (accents), `munderover` (limits base), `mmultiscripts` (attach base), `mn` (font wrapping), `menclose` (cancel/boxed).
+
 ### Auto-numbering vs explicit `\tag`
 
 Typst uses `numbering: "(1)"` for standard sequential numbering, and `numbering: n => [(tag)]` for fixed custom labels. The MathML tree does not distinguish auto-numbered equations (`\begin{equation}`) from explicit `\tag{1}` — both produce identical `mlabeledtr` nodes with `<mtext>(1)</mtext>`.
