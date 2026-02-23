@@ -315,7 +315,8 @@ const mn = () => {
       if (mathvariant && mathvariant !== 'normal') {
         const fontFn = typstFontMap.get(mathvariant);
         if (fontFn) {
-          res = addToTypstData(res, { typst: fontFn + '(' + value + ')' });
+          const content = value || '""';
+          res = addToTypstData(res, { typst: fontFn + '(' + content + ')' });
           return res;
         }
       }
@@ -378,12 +379,14 @@ const mfrac = () => {
       const secondChild = node.childNodes[1] || null;
       const dataFirst: ITypstData = firstChild ? serialize.visitNode(firstChild, '') : initTypstData();
       const dataSecond: ITypstData = secondChild ? serialize.visitNode(secondChild, '') : initTypstData();
+      const num = dataFirst.typst.trim() || '""';
+      const den = dataSecond.typst.trim() || '""';
       // Check for linethickness=0 which indicates \binom (\choose)
       const atr = getAttributes(node);
       if (atr && (atr.linethickness === '0' || atr.linethickness === 0)) {
-        res = addToTypstData(res, { typst: 'binom(' + dataFirst.typst.trim() + ', ' + dataSecond.typst.trim() + ')' });
+        res = addToTypstData(res, { typst: 'binom(' + num + ', ' + den + ')' });
       } else {
-        res = addToTypstData(res, { typst: 'frac(' + dataFirst.typst.trim() + ', ' + dataSecond.typst.trim() + ')' });
+        res = addToTypstData(res, { typst: 'frac(' + num + ', ' + den + ')' });
       }
       return res;
     } catch (e) {
@@ -498,7 +501,8 @@ const msqrt = () => {
     try {
       const firstChild = node.childNodes[0] || null;
       const dataFirst: ITypstData = firstChild ? serialize.visitNode(firstChild, '') : initTypstData();
-      res = addToTypstData(res, { typst: 'sqrt(' + dataFirst.typst.trim() + ')' });
+      const content = dataFirst.typst.trim() || '""';
+      res = addToTypstData(res, { typst: 'sqrt(' + content + ')' });
       return res;
     } catch (e) {
       return res;
@@ -516,9 +520,10 @@ const mroot = () => {
       const index = node.childNodes[1] || null;
       const dataRadicand: ITypstData = radicand ? serialize.visitNode(radicand, '') : initTypstData();
       const dataIndex: ITypstData = index ? serialize.visitNode(index, '') : initTypstData();
+      const radicandContent = dataRadicand.typst.trim() || '""';
       // Typst root: root(index, radicand)
       res = addToTypstData(res, {
-        typst: 'root(' + dataIndex.typst.trim() + ', ' + dataRadicand.typst.trim() + ')'
+        typst: 'root(' + dataIndex.typst.trim() + ', ' + radicandContent + ')'
       });
       return res;
     } catch (e) {
@@ -562,7 +567,7 @@ const mover = () => {
         const accentChar = getChildrenText(secondChild);
         const accentFn = typstAccentMap.get(accentChar);
         if (accentFn) {
-          const content = dataFirst.typst.trim();
+          const content = dataFirst.typst.trim() || '""';
           if (TYPST_ACCENT_SHORTHANDS.has(accentFn)) {
             // Shorthand accent: fn(content)
             res = addToTypstData(res, { typst: accentFn + '(' + content + ')' });
@@ -578,7 +583,7 @@ const mover = () => {
       // Skip limits() when:
       // - Base is a known Typst operator/large operator that already places limits above
       // - Base output is from an accent/brace function that already accepts ^ labels
-      const base = dataFirst.typst.trim();
+      const base = dataFirst.typst.trim() || '""';
       const over = dataSecond.typst.trim();
       if (over) {
         const baseIsNativeLimitOp = TYPST_NATIVE_LIMIT_OPS.has(base);
@@ -620,7 +625,7 @@ const munder = () => {
         if (accentFn === 'overline') { accentFn = 'underline'; }
         if (accentFn === 'overbrace') { accentFn = 'underbrace'; }
         if (accentFn) {
-          const content = dataFirst.typst.trim();
+          const content = dataFirst.typst.trim() || '""';
           if (TYPST_ACCENT_SHORTHANDS.has(accentFn)) {
             res = addToTypstData(res, { typst: accentFn + '(' + content + ')' });
           } else {
@@ -630,7 +635,7 @@ const munder = () => {
         }
       }
       // Fallback: base_(under) or limits(base)_(under)
-      const base = dataFirst.typst.trim();
+      const base = dataFirst.typst.trim() || '""';
       const under = dataSecond.typst.trim();
       if (under) {
         const baseIsNativeLimitOp = TYPST_NATIVE_LIMIT_OPS.has(base);
@@ -671,7 +676,7 @@ const munderover = () => {
       const under = dataSecond.typst.trim();
       const over = dataThird.typst.trim();
       // Use limits() for non-operator bases (e.g. extensible arrows)
-      const baseTrimmed = base.trim();
+      const baseTrimmed = base.trim() || '""';
       const baseIsNativeLimitOp = TYPST_NATIVE_LIMIT_OPS.has(baseTrimmed);
       const baseIsSpecialFn = /^(overbrace|underbrace|overline|underline|op)\(/.test(baseTrimmed);
       if (baseIsNativeLimitOp || baseIsSpecialFn) {
@@ -716,7 +721,7 @@ const mmultiscripts = () => {
       // child[prescriptsIdx+1..] = pre-scripts (pairs of sub, sup)
       const base = node.childNodes[0];
       const baseData: ITypstData = serialize.visitNode(base, '');
-      const baseTrimmed = baseData.typst.trim();
+      const baseTrimmed = baseData.typst.trim() || '""';
 
       let prescriptsIdx = -1;
       for (let i = 1; i < node.childNodes.length; i++) {
@@ -1450,7 +1455,7 @@ const menclose = () => {
       const atr = getAttributes(node);
       const notation: string = atr?.notation?.toString() || '';
       const data: ITypstData = handlerApi.handleAll(node, serialize);
-      const content = data.typst.trim();
+      const content = data.typst.trim() || '""';
       if (notation.indexOf('box') > -1) {
         // \boxed → #box with stroke
         res = addToTypstData(res, { typst: '#box(stroke: 0.5pt, inset: 3pt, $' + content + '$)', typst_inline: content });

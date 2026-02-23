@@ -147,6 +147,20 @@ module.exports = [
   { latex: `\\frown`, typst: `frown`, typst_inline: `frown` },
   { latex: `\\prime`, typst: `prime`, typst_inline: `prime` },
   { latex: `\\bowtie`, typst: `⋈`, typst_inline: `⋈` },
+  // === Empty content handling ===
+  { latex: `\\sqrt{}`, typst: `sqrt("")`, typst_inline: `sqrt("")` },
+  { latex: `\\sqrt[3]{}`, typst: `root(3, "")`, typst_inline: `root(3, "")` },
+  { latex: `\\sqrt[4]{}`, typst: `root(4, "")`, typst_inline: `root(4, "")` },
+  { latex: `\\frac{}{}`, typst: `frac("", "")`, typst_inline: `frac("", "")` },
+  { latex: `\\hat{}`, typst: `hat("")`, typst_inline: `hat("")` },
+  { latex: `\\bar{}`, typst: `macron("")`, typst_inline: `macron("")` },
+  { latex: `\\vec{}`, typst: `arrow("")`, typst_inline: `arrow("")` },
+  { latex: `\\cancel{}`, typst: `cancel("")`, typst_inline: `cancel("")` },
+  { latex: `\\underline{}`, typst: `underline("")`, typst_inline: `underline("")` },
+  { latex: `\\overline{}`, typst: `overline("")`, typst_inline: `overline("")` },
+  // === Empty content: munderover, mmultiscripts, mn with font ===
+  { latex: `\\underset{a}{}`, typst: `limits("")_a`, typst_inline: `limits("")_a` },
+  { latex: `\\overset{b}{}`, typst: `limits("")^b`, typst_inline: `limits("")^b` },
   // === Dollar sign and thousand separators ===
   {
     latex: `\\$ 120,000`,
