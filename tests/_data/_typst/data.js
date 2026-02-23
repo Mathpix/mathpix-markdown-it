@@ -1,4 +1,10 @@
 module.exports = [
+  // === Dollar sign and thousand separators ===
+  {
+    latex: `\\$ 120,000`,
+    typst: `\\$ 120","000`,
+    typst_inline: `\\$ 120","000`,
+  },
   // === Basic operations ===
   {
     latex: `\\frac{a}{b}`,

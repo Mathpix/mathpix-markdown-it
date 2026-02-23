@@ -175,6 +175,25 @@ export class SerializedTypstVisitor extends MmlVisitor {
             continue;
           }
         }
+        // Detect thousand-separator pattern: mn, mo(,), mn(3 digits)
+        // e.g. 120,000 → 120","000 (comma escaped so Typst doesn't treat it as separator)
+        if (child.kind === 'mn' && j + 2 < node.childNodes.length) {
+          const comma = node.childNodes[j + 1];
+          const next = node.childNodes[j + 2];
+          if (comma?.kind === 'mo' && (comma?.childNodes?.[0] as any)?.text === ','
+            && next?.kind === 'mn' && /^\d{3}$/.test((next?.childNodes?.[0] as any)?.text || '')) {
+            const numData: ITypstData = this.visitNode(child, space);
+            if (res.typst && numData.typst
+              && /^[\w."]/.test(numData.typst)
+              && !/[\s({[,|]$/.test(res.typst)) {
+              addSpaceToTypstData(res);
+            }
+            const nextData: ITypstData = this.visitNode(next, space);
+            res = addToTypstData(res, { typst: numData.typst + '","' + nextData.typst });
+            j += 3;
+            continue;
+          }
+        }
         // Normal processing
         const data: ITypstData = this.visitNode(child, space);
         // Insert space between adjacent children when needed for Typst parsing:
