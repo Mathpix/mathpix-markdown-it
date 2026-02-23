@@ -50,7 +50,7 @@ const binaryOperators: ReadonlyArray<[string, string]> = [
   ["\u22C5", "dot.op"],           // ⋅
   ["\u00B1", "plus.minus"],       // ±
   ["\u2213", "minus.plus"],       // ∓
-  ["\u2217", "ast"],              // ∗
+  ["\u2217", "ast.op"],           // ∗
   ["\u22C6", "star"],             // ⋆
   ["\u2218", "compose"],          // ∘
   ["\u2219", "bullet"],           // ∙
@@ -80,7 +80,7 @@ const binaryOperators: ReadonlyArray<[string, string]> = [
   ["\u22B5", "gt.tri.eq"],        // ⊵ (unrhd)
   ["\u2240", "wreath"],           // ≀ (wreath product)
   ["\u2A3F", "product.co"],       // ⨿ (amalg)
-  ["\u22C8", "bowtie"],           // ⋈ (bowtie / Join)
+  ["\u22C8", "⋈"],               // ⋈ (bowtie / Join) — no named Typst symbol
   ["\u22C9", "times.l"],          // ⋉ (ltimes)
   ["\u22CA", "times.r"],          // ⋊ (rtimes)
 ];
@@ -129,11 +129,11 @@ const relationOperators: ReadonlyArray<[string, string]> = [
   ["\u2288", "subset.eq.not"],    // ⊈ (\not\subseteq)
   ["\u2289", "supset.eq.not"],    // ⊉ (\not\supseteq)
   ["\u2241", "tilde.not"],        // ≁ (\not\sim)
-  ["\u2247", "cong.not"],         // ≇ (\not\cong)
+  ["\u2247", "tilde.equiv.not"],  // ≇ (\not\cong)
   ["\u2249", "approx.not"],       // ≉ (\not\approx)
   ["\u2272", "lt.tilde"],         // ≲ (\lesssim)
   ["\u2273", "gt.tilde"],         // ≳ (\gtrsim)
-  ["\u2250", "eq.dot"],           // ≐ (\doteq)
+  ["\u2250", "≐"],               // ≐ (\doteq) — no named Typst symbol
   ["\u225C", "eq.delta"],         // ≜ (\triangleq)
   ["\u227A", "prec"],             // ≺ (\prec)
   ["\u227B", "succ"],             // ≻ (\succ)
@@ -248,7 +248,7 @@ const miscSymbols: ReadonlyArray<[string, string]> = [
   ["\u22A4", "top"],            // ⊤
   ["\u22A5", "bot"],            // ⊥
   ["\u2220", "angle"],          // ∠
-  ["\u25B3", "triangle.t"],     // △
+  ["\u25B3", "triangle.stroked.t"], // △
   ["\u2032", "prime"],          // ′
   ["\u2033", "prime.double"],   // ″
   ["\u2034", "prime.triple"],   // ‴
@@ -262,22 +262,22 @@ const miscSymbols: ReadonlyArray<[string, string]> = [
   ["\u2201", "complement"],     // ∁
   ["\u2234", "therefore"],      // ∴
   ["\u2235", "because"],        // ∵
-  ["\u25A1", "square"],         // □
-  ["\u25FB", "square"],         // ◻ (white medium square — MathJax variant)
+  ["\u25A1", "square.stroked"],  // □
+  ["\u25FB", "square.stroked"],  // ◻ (white medium square — MathJax variant)
   ["\u25FC", "square.filled"],  // ◼ (black medium square)
   ["\u2221", "angle.arc"],      // ∡ (measuredangle)
   ["\u2222", "angle.spheric"],   // ∢ (sphericalangle)
-  ["\u25BD", "triangle.b"],     // ▽ (triangledown)
+  ["\u25BD", "triangle.stroked.b"], // ▽ (triangledown)
   ["\u25CA", "diamond.stroked"],// ◊ (Diamond / lozenge)
-  ["\u2663", "suit.club"],      // ♣
-  ["\u2662", "suit.diamond"],   // ♢
-  ["\u2661", "suit.heart"],     // ♡
-  ["\u2660", "suit.spade"],     // ♠
+  ["\u2663", "suit.club.filled"], // ♣
+  ["\u2662", "suit.diamond.stroked"], // ♢
+  ["\u2661", "suit.heart.stroked"], // ♡
+  ["\u2660", "suit.spade.filled"], // ♠
   ["\u266F", "sharp"],          // ♯
   ["\u266D", "flat"],           // ♭
   ["\u266E", "natural"],        // ♮
-  ["\u00F0", "eth"],            // ð
-  ["\u2127", "ohm.inv"],        // ℧ (mho)
+  ["\u00F0", "ð"],               // ð — no named Typst symbol
+  ["\u2127", "Omega.inv"],      // ℧ (mho)
   ["\u2322", "frown"],          // ⌢
   ["\u00A0", "space.nobreak"],   // non-breaking space
   ["\u2061", ""],               // function application (invisible)
