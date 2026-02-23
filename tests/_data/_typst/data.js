@@ -1,4 +1,10 @@
 module.exports = [
+  // === Symbol fixes ===
+  {
+    latex: `\\wp`,
+    typst: `℘`,
+    typst_inline: `℘`,
+  },
   // === Dollar sign and thousand separators ===
   {
     latex: `\\$ 120,000`,

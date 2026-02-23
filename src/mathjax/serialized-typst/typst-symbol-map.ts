@@ -258,7 +258,7 @@ const miscSymbols: ReadonlyArray<[string, string]> = [
   ["\u2113", "ell"],            // ℓ
   ["\u211C", "Re"],             // ℜ
   ["\u2111", "Im"],             // ℑ
-  ["\u2118", "wp"],             // ℘
+  ["\u2118", "\u2118"],          // ℘ Weierstrass p — output Unicode directly
   ["\u2201", "complement"],     // ∁
   ["\u2234", "therefore"],      // ∴
   ["\u2235", "because"],        // ∵
