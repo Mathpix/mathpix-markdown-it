@@ -30,6 +30,13 @@ const defHandle = (node, serialize): ITypstData => {
   return handlerApi.handleAll(node, serialize);
 };
 
+/** Extract the original \label{} key from an mlabeledtr label cell.
+ *  MathJax stores the id as "mjx-eqn:<label_key>" when useLabelIds is true. */
+const getLabelKey = (labelCell: any): string | null => {
+  const key = labelCell?.properties?.['data-label-key'];
+  return key ? String(key) : null;
+};
+
 // Serialize a tag label mtd as Typst content for use inside [...].
 // mtext nodes → plain text, math nodes → $typst_math$.
 // For simple tags like "(1.2)", returns "1.2" (stripped parens).
@@ -983,26 +990,27 @@ const mtable = () => {
         // 1. Condition-embedded \tag{...} in mtext (MathJax leaves it as literal text)
         // 2. Label cell explicit tag (MathJax processed \tag, data-tag-auto is false)
         // 3. Auto-numbered (data-tag-auto is true)
-        const autoTagEntry = 'context { counter(math.equation).step(); counter(math.equation).display("(1)") }';
-        const rowTagSources: { source: 'condition' | 'label' | 'auto'; content: string }[] = [];
+        const autoTagEntry = '{ counter(math.equation).step(); context counter(math.equation).display("(1)") }';
+        const rowTagSources: { source: 'condition' | 'label' | 'auto'; content: string; labelKey: string | null }[] = [];
         for (let i = 0; i < countRow; i++) {
           const mtrNode = node.childNodes[i];
+          const labelCell = (mtrNode.kind === 'mlabeledtr' && mtrNode.childNodes.length > 0) ? mtrNode.childNodes[0] : null;
+          const labelKey = labelCell ? getLabelKey(labelCell) : null;
           // Check condition cell for embedded \tag{...} in mtext
           const condCell = mtrNode.childNodes[mtrNode.childNodes.length - 1];
           const condTag = extractTagFromConditionCell(condCell);
           if (condTag) {
-            rowTagSources.push({ source: 'condition', content: condTag });
-          } else if (mtrNode.kind === 'mlabeledtr' && mtrNode.childNodes.length > 0) {
-            const labelCell = mtrNode.childNodes[0];
+            rowTagSources.push({ source: 'condition', content: condTag, labelKey });
+          } else if (labelCell) {
             const isAutoNumber = !!(labelCell as any).properties?.['data-tag-auto'];
             if (!isAutoNumber) {
               const tagContent = serializeTagContent(labelCell, serialize);
-              rowTagSources.push({ source: 'label', content: tagContent });
+              rowTagSources.push({ source: 'label', content: tagContent, labelKey });
             } else {
-              rowTagSources.push({ source: 'auto', content: '' });
+              rowTagSources.push({ source: 'auto', content: '', labelKey });
             }
           } else {
-            rowTagSources.push({ source: 'auto', content: '' });
+            rowTagSources.push({ source: 'auto', content: '', labelKey: null });
           }
         }
 
@@ -1040,12 +1048,20 @@ const mtable = () => {
         const tagEntries: string[] = [];
         for (let i = 0; i < countRow; i++) {
           const info = rowTagSources[i];
+          let tagText = '';
           if (info.source === 'condition') {
-            // Tag extracted from condition mtext — wrap in parens
-            tagEntries.push('[(' + info.content + ')]');
+            tagText = '(' + info.content + ')';
           } else if (info.source === 'label' && info.content) {
-            // Tag from label cell — already has parens from MathJax
-            tagEntries.push('[' + info.content + ']');
+            tagText = info.content;
+          }
+          if (tagText && info.labelKey) {
+            // Explicit tag with label — wrap in #figure() so the label is referenceable
+            tagEntries.push('[#figure(kind: "eq-tag", supplement: none, numbering: n => [' + tagText + '], [' + tagText + ']) <' + info.labelKey + '>]');
+          } else if (tagText) {
+            tagEntries.push('[' + tagText + ']');
+          } else if (info.labelKey) {
+            // Auto-numbered with label — step counter outside context, wrap in #figure() for referenceability
+            tagEntries.push('{ counter(math.equation).step(); context { let n = numbering("(1)", ..counter(math.equation).get()); [#figure(kind: "eq-tag", supplement: none, numbering: _ => n, [#n]) <' + info.labelKey + '>] } }');
           } else {
             tagEntries.push(autoTagEntry);
           }
@@ -1055,6 +1071,7 @@ const mtable = () => {
         const lines: string[] = [
           '#grid(',
           '  columns: (1fr, auto),',
+          '  align: (left, right + horizon),',
           '  math.equation(block: true, numbering: none, $ ' + mathContent + ' $),',
           '  grid(',
           '    row-gutter: 0.65em,',
@@ -1117,8 +1134,11 @@ const mtable = () => {
                 const numbering = isAutoNumber
                   ? '"(1)"'
                   : 'n => [' + tagContent + ']';
+                const labelKey = getLabelKey(labelCell);
+                const labelSuffix = labelKey ? ' <' + labelKey + '>' : '';
+                const supplementPart = labelKey ? ', supplement: none' : '';
                 eqnBlocks.push(
-                  '#math.equation(block: true, numbering: ' + numbering + ', $ ' + rowContent + ' $)'
+                  '#math.equation(block: true' + supplementPart + ', numbering: ' + numbering + ', $ ' + rowContent + ' $)' + labelSuffix
                 );
               } else {
                 eqnBlocks.push('$ ' + rowContent + ' $');

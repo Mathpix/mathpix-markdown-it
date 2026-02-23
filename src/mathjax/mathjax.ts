@@ -62,9 +62,13 @@ AbstractTags.prototype.autoTag = function () {
 const origGetTag = AbstractTags.prototype.getTag;
 AbstractTags.prototype.getTag = function (force?: boolean) {
   this['_isAutoTag'] = false;
+  const labelKey = this.label || '';
   const node = origGetTag.call(this, force);
   if (node && this['_isAutoTag']) {
     node.properties['data-tag-auto'] = true;
+  }
+  if (node && labelKey) {
+    node.properties['data-label-key'] = labelKey;
   }
   return node;
 };

@@ -1195,6 +1195,54 @@ module.exports = [
     typst_inline: `x = 1 \\\ny = 2`,
   },
 
+  // === Labels on equations ===
+  {
+    latex: `\\begin{equation} \\int_0^\\infty \\frac{x^3}{e^x-1}\\,dx = \\frac{\\pi^4}{15} \\label{eq:1} \\end{equation}`,
+    typst: `#math.equation(block: true, supplement: none, numbering: "(1)", $ integral_0^(infinity) frac(x^3, e^x - 1) thin d x = frac(pi^4, 15) $) <eq:1>`,
+    typst_inline: `integral_0^(infinity) frac(x^3, e^x - 1) thin d x = frac(pi^4, 15)`,
+  },
+  {
+    latex: `\\begin{align} a &= b \\label{eq:first} \\\\ c &= d \\label{eq:second} \\end{align}`,
+    typst: `#math.equation(block: true, supplement: none, numbering: "(1)", $ a = b $) <eq:first>\n#math.equation(block: true, supplement: none, numbering: "(1)", $ c = d $) <eq:second>`,
+    typst_inline: `a = b \\\nc = d`,
+  },
+  // equation without label — no Typst label emitted
+  {
+    latex: `\\begin{equation} y^2 \\end{equation}`,
+    typst: `#math.equation(block: true, numbering: "(1)", $ y^2 $)`,
+    typst_inline: `y^2`,
+  },
+  // gather: label on first row only
+  {
+    latex: `\\begin{gather} x=1 \\label{eq:x} \\\\ y=2 \\end{gather}`,
+    typst: `#math.equation(block: true, supplement: none, numbering: "(1)", $ x = 1 $) <eq:x>\n#math.equation(block: true, numbering: "(1)", $ y = 2 $)`,
+    typst_inline: `x = 1 \\\ny = 2`,
+  },
+  // equation with explicit tag + label
+  {
+    latex: `\\begin{equation} E=mc^2 \\tag{rel} \\label{eq:einstein} \\end{equation}`,
+    typst: `#math.equation(block: true, supplement: none, numbering: n => [(rel)], $ E = m c^2 $) <eq:einstein>`,
+    typst_inline: `E = m c^2`,
+  },
+  // align: label on first row, \nonumber on second
+  {
+    latex: `\\begin{align} a &= b \\label{eq:a} \\\\ c &= d \\nonumber \\end{align}`,
+    typst: `#math.equation(block: true, supplement: none, numbering: "(1)", $ a = b $) <eq:a>\n$ c = d $`,
+    typst_inline: `a = b \\\nc = d`,
+  },
+  // split inside equation with label
+  {
+    latex: `\\begin{equation} \\begin{split} a &= b+c \\\\ &= d \\end{split} \\label{eq:split} \\end{equation}`,
+    typst: `#math.equation(block: true, supplement: none, numbering: "(1)", $ a = b + c \\\n = d $) <eq:split>`,
+    typst_inline: `a = b + c \\\n = d`,
+  },
+  // numcases auto-numbered with labels
+  {
+    latex: `\\begin{numcases}{f(x)=} 0 & x < 0 \\label{nc:1}\\\\ x & x \\geq 0 \\label{nc:2} \\end{numcases}`,
+    typst: `#grid(\n  columns: (1fr, auto),\n  align: (left, right + horizon),\n  math.equation(block: true, numbering: none, $ f(x) = cases(0 & "x < 0 ", x & "x \\geq 0 ") $),\n  grid(\n    row-gutter: 0.65em,\n    { counter(math.equation).step(); context { let n = numbering("(1)", ..counter(math.equation).get()); [#figure(kind: "eq-tag", supplement: none, numbering: _ => n, [#n]) <nc:1>] } },\n    { counter(math.equation).step(); context { let n = numbering("(1)", ..counter(math.equation).get()); [#figure(kind: "eq-tag", supplement: none, numbering: _ => n, [#n]) <nc:2>] } },\n  ),\n)`,
+    typst_inline: `f(x) = cases(0 & "x < 0 ", x & "x \\geq 0 ")`,
+  },
+
   // === Empty base superscript, pipes as absolute value, operator before paren ===
   {
     latex: `^{|\\alpha|} \\sqrt{x^{\\alpha}} \\leq(x \\bullet \\alpha) /|\\alpha|`,
@@ -1205,17 +1253,17 @@ module.exports = [
   // === numcases / subnumcases (grid layout with per-row numbering) ===
   {
     latex: `\\begin{numcases}{f(x)=} 0 & x < 0 \\\\ x & x \\geq 0 \\end{numcases}`,
-    typst: `#grid(\n  columns: (1fr, auto),\n  math.equation(block: true, numbering: none, $ f(x) = cases(0 & "x < 0 ", x & "x \\geq 0 ") $),\n  grid(\n    row-gutter: 0.65em,\n    context { counter(math.equation).step(); counter(math.equation).display("(1)") },\n    context { counter(math.equation).step(); counter(math.equation).display("(1)") },\n  ),\n)`,
+    typst: `#grid(\n  columns: (1fr, auto),\n  align: (left, right + horizon),\n  math.equation(block: true, numbering: none, $ f(x) = cases(0 & "x < 0 ", x & "x \\geq 0 ") $),\n  grid(\n    row-gutter: 0.65em,\n    { counter(math.equation).step(); context counter(math.equation).display("(1)") },\n    { counter(math.equation).step(); context counter(math.equation).display("(1)") },\n  ),\n)`,
     typst_inline: `f(x) = cases(0 & "x < 0 ", x & "x \\geq 0 ")`,
   },
   {
-    latex: `\\begin{numcases}{f(x)=} 0 & x < 0 \\tag{3.12} \\\\ x & x \\geq 0 \\tag{3.13} \\end{numcases}`,
-    typst: `#grid(\n  columns: (1fr, auto),\n  math.equation(block: true, numbering: none, $ f(x) = cases(0 & "x < 0", x & "x \\geq 0") $),\n  grid(\n    row-gutter: 0.65em,\n    [(3.12)],\n    [(3.13)],\n  ),\n)`,
-    typst_inline: `f(x) = cases(0 & "x < 0", x & "x \\geq 0")`,
+    latex: `\\begin{numcases}{f(x)=} x^2 \\tag{A} \\\\ \\sqrt{x} \\tag{B} \\end{numcases}`,
+    typst: `#grid(\n  columns: (1fr, auto),\n  align: (left, right + horizon),\n  math.equation(block: true, numbering: none, $ f(x) = cases(x^2, sqrt(x)) $),\n  grid(\n    row-gutter: 0.65em,\n    [(A)],\n    [(B)],\n  ),\n)`,
+    typst_inline: `f(x) = cases(x^2, sqrt(x))`,
   },
   {
     latex: `\\begin{subnumcases}{|x|=} -x & x < 0 \\\\ x & x \\geq 0 \\end{subnumcases}`,
-    typst: `#grid(\n  columns: (1fr, auto),\n  math.equation(block: true, numbering: none, $ |x| = cases(- x & "x < 0 ", x & "x \\geq 0 ") $),\n  grid(\n    row-gutter: 0.65em,\n    context { counter(math.equation).step(); counter(math.equation).display("(1)") },\n    context { counter(math.equation).step(); counter(math.equation).display("(1)") },\n  ),\n)`,
+    typst: `#grid(\n  columns: (1fr, auto),\n  align: (left, right + horizon),\n  math.equation(block: true, numbering: none, $ |x| = cases(- x & "x < 0 ", x & "x \\geq 0 ") $),\n  grid(\n    row-gutter: 0.65em,\n    { counter(math.equation).step(); context counter(math.equation).display("(1)") },\n    { counter(math.equation).step(); context counter(math.equation).display("(1)") },\n  ),\n)`,
     typst_inline: `|x| = cases(- x & "x < 0 ", x & "x \\geq 0 ")`,
   },
   // cases via array with commas in cells (commas must be escaped)
@@ -1227,7 +1275,7 @@ module.exports = [
   // numcases with empty prefix and explicit \tag (processed by MathJax as real tags)
   {
     latex: `\\begin{numcases}{} \\Delta_{q}^{\\alpha} x^{n}=f\\left(t_{n}, x^{n}\\right), n=1,2, \\ldots, N \\tag{3.12}\\label{eq:3.12}\\\\ x^{0}=x_{0} \\tag{3.13}\\label{eq3.13} \\end{numcases}`,
-    typst: `#grid(\n  columns: (1fr, auto),\n  math.equation(block: true, numbering: none, $ cases(Delta_q^(alpha) x^n = f lr(( t_n, x^n ))"," n = 1"," 2"," dots"," N, x^0 = x_0) $),\n  grid(\n    row-gutter: 0.65em,\n    [(3.12)],\n    [(3.13)],\n  ),\n)`,
+    typst: `#grid(\n  columns: (1fr, auto),\n  align: (left, right + horizon),\n  math.equation(block: true, numbering: none, $ cases(Delta_q^(alpha) x^n = f lr(( t_n, x^n ))"," n = 1"," 2"," dots"," N, x^0 = x_0) $),\n  grid(\n    row-gutter: 0.65em,\n    [#figure(kind: "eq-tag", supplement: none, numbering: n => [(3.12)], [(3.12)]) <eq:3.12>],\n    [#figure(kind: "eq-tag", supplement: none, numbering: n => [(3.13)], [(3.13)]) <eq3.13>],\n  ),\n)`,
     typst_inline: `cases(Delta_q^(alpha) x^n = f lr(( t_n, x^n ))"," n = 1"," 2"," dots"," N, x^0 = x_0)`,
   },
 ];
