@@ -5,6 +5,11 @@ module.exports = [
     typst: `\\$ 120","000`,
     typst_inline: `\\$ 120","000`,
   },
+  {
+    latex: `\\underline{\\underline{14,320}}`,
+    typst: `underline(underline(14","320))`,
+    typst_inline: `underline(underline(14","320))`,
+  },
   // === Basic operations ===
   {
     latex: `\\frac{a}{b}`,

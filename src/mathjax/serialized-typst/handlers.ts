@@ -1,5 +1,5 @@
 import { TEXCLASS } from "mathjax-full/js/core/MmlTree/MmlNode";
-import { ITypstData, initTypstData, addToTypstData, addSpaceToTypstData, needsParens } from "./common";
+import { ITypstData, initTypstData, addToTypstData, addSpaceToTypstData, needsParens, isThousandSepComma } from "./common";
 import { findTypstSymbol, typstAccentMap, typstFontMap, typstSymbolMap } from "./typst-symbol-map";
 import { isFirstChild, isLastChild } from "./node-utils";
 
@@ -1352,6 +1352,19 @@ const mrow = () => {
         }
         // Regular mrow: concatenate children with spacing to prevent merging
         for (let i = 0; i < node.childNodes.length; i++) {
+          // Thousand-separator: mn, mo(,), mn(3 digits) → merge as 120","000
+          if (isThousandSepComma(node, i)) {
+            const numData: ITypstData = serialize.visitNode(node.childNodes[i], '');
+            if (res.typst && numData.typst
+              && /^[\w."]/.test(numData.typst)
+              && !/[\s({[,|]$/.test(res.typst)) {
+              addSpaceToTypstData(res);
+            }
+            const nextData: ITypstData = serialize.visitNode(node.childNodes[i + 2], '');
+            res = addToTypstData(res, { typst: numData.typst + '","' + nextData.typst });
+            i += 2;
+            continue;
+          }
           const data: ITypstData = serialize.visitNode(node.childNodes[i], '');
           if (res.typst && data.typst
             && /^[\w."]/.test(data.typst)

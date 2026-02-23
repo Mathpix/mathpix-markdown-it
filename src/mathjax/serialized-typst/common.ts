@@ -29,6 +29,22 @@ export const addSpaceToTypstData = (data: ITypstData): void => {
   }
 };
 
+/** Check if child at index i in a node's childNodes starts a thousand-separator
+ *  pattern: mn, mo(,), mn(exactly 3 digits). Returns true if pattern matches. */
+export const isThousandSepComma = (node: any, i: number): boolean => {
+  try {
+    if (i + 2 >= node.childNodes.length) return false;
+    const child = node.childNodes[i];
+    const comma = node.childNodes[i + 1];
+    const next = node.childNodes[i + 2];
+    return child?.kind === 'mn'
+      && comma?.kind === 'mo' && (comma?.childNodes?.[0] as any)?.text === ','
+      && next?.kind === 'mn' && /^\d{3}$/.test((next?.childNodes?.[0] as any)?.text || '');
+  } catch (_e) {
+    return false;
+  }
+};
+
 export const needsParens = (s: string): boolean => {
   // In Typst, sub/superscript grouping always uses (): x^(content), x_(content)
   // Even if the content itself starts/ends with () — those are literal, not grouping.
