@@ -349,9 +349,13 @@ The `typst-symbol-map.ts` file maps ~300 Unicode characters to Typst symbol name
 |---------------------|-------|---------|
 | `ast` | `ast.op` | ∗ |
 | `bowtie` | `⋈` (Unicode) | ⋈ |
+| `cong` | `tilde.equiv` | ≅ |
 | `cong.not` | `tilde.equiv.not` | ≇ |
+| `corner.tl/tr/bl/br` | `corner.l.t/r.t/l.b/r.b` | ⌜⌝⌞⌟ |
 | `eq.dot` | `≐` (Unicode) | ≐ |
 | `eth` | `ð` (Unicode) | ð |
+| `mid` | `divides` | ∣ |
+| `nothing` | `diameter` | ⌀ |
 | `ohm.inv` | `Omega.inv` | ℧ |
 | `square` | `square.stroked` | □ ◻ |
 | `suit.club` | `suit.club.filled` | ♣ |
