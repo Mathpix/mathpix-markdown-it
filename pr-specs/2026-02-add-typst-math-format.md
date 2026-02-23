@@ -93,7 +93,7 @@ All new Typst code lives in `src/mathjax/serialized-typst/`:
 | `index.ts` | `SerializedTypstVisitor` class — extends MathJax's `MmlVisitor`, handles root traversal, inferred mrow spacing, big delimiter detection (`\big`, `\Big`, etc.), and bare delimiter-pair grouping (`|...|`, `⌊...⌋`, `⌈...⌉`, `‖...‖`) |
 | `handlers.ts` | Node-type handlers — one function per MathML element (`mi`, `mo`, `mn`, `mfrac`, `msup`, `msub`, `msubsup`, `msqrt`, `mroot`, `mover`, `munder`, `munderover`, `mmultiscripts`, `mrow`, `mtable`, `mtext`, `mspace`, `mpadded`, `mstyle`, `mphantom`, `menclose`) |
 | `typst-symbol-map.ts` | Unicode → Typst symbol name mapping tables (Greek, binary operators, relations, arrows, delimiters, large operators, misc) plus accent map and font map |
-| `common.ts` | `ITypstData` interface, `initTypstData`, `addToTypstData`, `addSpaceToTypstData`, `needsParens` helpers |
+| `common.ts` | `ITypstData` interface, `initTypstData`, `addToTypstData`, `addSpaceToTypstData`, `needsParens`, `isThousandSepComma` helpers |
 | `node-utils.ts` | `isFirstChild` / `isLastChild` tree-position utilities |
 
 ### Integration points
@@ -354,7 +354,7 @@ In Typst math mode, `$` terminates the formula. LaTeX `\$` produces an `mi` node
 
 ### Thousand-separator commas
 
-Numbers like `120,000` arrive as three MathML nodes: `mn(120)`, `mo(,)`, `mn(000)`. A bare comma in Typst math acts as an argument separator, so `120, 000` would be misinterpreted. The `visitInferredMrowNode` method detects the pattern `mn` + `mo(,)` + `mn(exactly 3 digits)` and merges them into a single token: `120","000`. The `","` is a Typst text literal that renders as a visual comma without separator semantics.
+Numbers like `120,000` arrive as three MathML nodes: `mn(120)`, `mo(,)`, `mn(000)`. A bare comma in Typst math acts as an argument separator, so `120, 000` would be misinterpreted. The `isThousandSepComma()` helper in `common.ts` detects the pattern `mn` + `mo(,)` + `mn(exactly 3 digits)` and is applied in both `visitInferredMrowNode` (top-level) and the `mrow` handler (nested contexts like `\underline{\underline{14,320}}`), merging them into a single token: `14","320`. The `","` is a Typst text literal that renders as a visual comma without separator semantics.
 
 ### Slash escaping
 
