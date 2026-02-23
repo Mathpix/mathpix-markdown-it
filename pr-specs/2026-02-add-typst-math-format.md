@@ -338,6 +338,7 @@ Note: the comma inside `lr(( t_n, x^n ))` is at depth 2 and preserved as-is, whi
 | `a \pmod{b}` | `a quad (mod b)` |
 | `\text{if }` | `"if "` |
 | `f'(x)` | `f'(x)` (prime shorthand) |
+| `\$ 120,000` | `\$ 120","000` (escaped dollar + thousand-separator commas) |
 
 ## Spacing and Grouping Logic
 
@@ -346,6 +347,14 @@ Correct Typst output requires careful spacing to prevent token merging and avoid
 ### Token separation
 
 Adjacent word-character tokens must be separated by spaces. The visitor inserts spaces when the accumulated output does not end with a separator (`\s`, `(`, `{`, `[`, `,`, `|`) and the next token starts with a word character, dot, or quote.
+
+### Dollar sign escaping
+
+In Typst math mode, `$` terminates the formula. LaTeX `\$` produces an `mi` node containing the literal `$` character. The symbol map maps `$` → `\$` so it is escaped in output. Without this, the `mi` handler would wrap it as `upright($)`, which breaks Typst parsing.
+
+### Thousand-separator commas
+
+Numbers like `120,000` arrive as three MathML nodes: `mn(120)`, `mo(,)`, `mn(000)`. A bare comma in Typst math acts as an argument separator, so `120, 000` would be misinterpreted. The `visitInferredMrowNode` method detects the pattern `mn` + `mo(,)` + `mn(exactly 3 digits)` and merges them into a single token: `120","000`. The `","` is a Typst text literal that renders as a visual comma without separator semantics.
 
 ### Slash escaping
 
