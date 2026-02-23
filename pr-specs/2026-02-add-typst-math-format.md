@@ -339,6 +339,30 @@ Note: the comma inside `lr(( t_n, x^n ))` is at depth 2 and preserved as-is, whi
 | `\text{if }` | `"if "` |
 | `f'(x)` | `f'(x)` (prime shorthand) |
 | `\$ 120,000` | `\$ 120","000` (escaped dollar + thousand-separator commas) |
+| `\wp` | `℘` (Unicode output — no named Typst symbol) |
+
+## Symbol Map Validation
+
+The `typst-symbol-map.ts` file maps ~300 Unicode characters to Typst symbol names. All names were validated against the [Typst sym reference](https://typst.app/docs/reference/symbols/sym/). Fixes applied:
+
+| Original (invalid) | Fixed | Symbols |
+|---------------------|-------|---------|
+| `ast` | `ast.op` | ∗ |
+| `bowtie` | `⋈` (Unicode) | ⋈ |
+| `cong.not` | `tilde.equiv.not` | ≇ |
+| `eq.dot` | `≐` (Unicode) | ≐ |
+| `eth` | `ð` (Unicode) | ð |
+| `ohm.inv` | `Omega.inv` | ℧ |
+| `square` | `square.stroked` | □ ◻ |
+| `suit.club` | `suit.club.filled` | ♣ |
+| `suit.diamond` | `suit.diamond.stroked` | ♢ |
+| `suit.heart` | `suit.heart.stroked` | ♡ |
+| `suit.spade` | `suit.spade.filled` | ♠ |
+| `triangle.t` | `triangle.stroked.t` | △ |
+| `triangle.b` | `triangle.stroked.b` | ▽ |
+| `wp` | `℘` (Unicode) | ℘ |
+
+For symbols without a named Typst equivalent (`⋈`, `≐`, `ð`, `℘`), the Unicode character is output directly — Typst accepts Unicode in math mode.
 
 ## Spacing and Grouping Logic
 
