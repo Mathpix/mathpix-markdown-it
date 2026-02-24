@@ -191,6 +191,26 @@ Built-in Typst math operators (`sin`, `cos`, `tan`, `log`, `lim`, etc.) pass thr
 | `\begin{cases}` | `cases(...)` |
 | `\begin{numcases}` | `#grid(...)` with `cases(...)` + numbering column |
 
+**Multiline formatting for 3+ rows:** When a `mat()` or `cases()` expression has 3 or more rows, the output uses multiline format with 2-space indentation for readability. Expressions with 1–2 rows remain single-line.
+
+```
+// 2 rows — single-line
+mat(delim: "(", a, b; c, d)
+cases(x & "if " x > 0, - x & "otherwise")
+
+// 3+ rows — multiline
+mat(delim: "(",
+  a, b;
+  c, d;
+  e, f,
+)
+cases(
+  x + 1 & "if" x > 0,
+  x - 1 & "if" x < 0,
+  0 & "if" x = 0,
+)
+```
+
 **Array column alignment:** `\begin{array}{lcr}` extracts the column spec. When all columns share the same non-center alignment, `align: #left` or `align: #right` is emitted. Mixed or all-center alignments omit the parameter (center is Typst's default).
 
 **Unpaired brackets in cells:** When `[`, `]`, `(`, `)`, `{`, `}` appear in a matrix or cases cell without a matching pair in the same cell (e.g., a bracket spanning across rows), the `replaceUnpairedBrackets()` helper replaces them with Typst symbol names (`bracket.l`, `paren.r`, `brace.l`, etc.) to avoid breaking `mat()`/`cases()` parsing. Paired brackets within the same cell, escaped brackets (`\[`), brackets inside function calls (`frac(...)`), and brackets inside quoted strings (`"..."`) are left unchanged. Applied in all three mtable branches: matrix, cases, and numcases.
@@ -302,7 +322,11 @@ Explicit tag with label:
 
 Regular cases with commas (`f(x) = \left\{ \begin{array}{ll} {x^2+1,} & {x>1} \\ {1,} & {x=1} \\ {x+1,} & {x<1} \end{array} \right.`):
 ```typst
-f(x) = cases(x^2 + 1"," & x > 1, 1"," & x = 1, x + 1"," & x < 1)
+f(x) = cases(
+  x^2 + 1"," & x > 1,
+  1"," & x = 1,
+  x + 1"," & x < 1,
+)
 ```
 
 Empty prefix numcases with commas, explicit tags, and labels (`\begin{numcases}{} \Delta ... f\left(t_n, x^n\right), n=1,2,\ldots,N \tag{3.12}\label{eq:3.12} \\ x^0=x_0 \tag{3.13}\label{eq3.13} \end{numcases}`):
