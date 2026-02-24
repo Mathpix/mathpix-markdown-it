@@ -1046,6 +1046,115 @@ const escapeCasesCommas = (expr: string): string => {
   return result;
 };
 
+const BRACKET_SYMBOL_MAP: Record<string, string> = {
+  '[': 'bracket.l',
+  ']': 'bracket.r',
+  '(': 'paren.l',
+  ')': 'paren.r',
+  '{': 'brace.l',
+  '}': 'brace.r',
+};
+
+// Replace unpaired brackets in a matrix/cases cell with Typst symbol names.
+// Brackets that have a matching open/close pair in the same cell are kept as-is.
+// Escaped brackets (\[), brackets inside quoted strings ("..."), and brackets
+// inside function-call parens (e.g. frac(...)) are ignored.
+const replaceUnpairedBrackets = (expr: string): string => {
+  // Quick exit if no bracket characters present
+  if (!/[\[\](){}]/.test(expr)) return expr;
+
+  type BracketInfo = { char: string; pos: number };
+  const brackets: BracketInfo[] = [];
+
+  for (let i = 0; i < expr.length; i++) {
+    const ch = expr[i];
+    // Skip backslash-escaped characters
+    if (ch === '\\') {
+      i++; // skip next char
+      continue;
+    }
+    // Skip quoted strings
+    if (ch === '"') {
+      i++;
+      while (i < expr.length && expr[i] !== '"') {
+        if (expr[i] === '\\') i++; // skip escaped char in string
+        i++;
+      }
+      continue;
+    }
+    // Check if this is a bracket character
+    if ('[](){}'.includes(ch)) {
+      // Check if ( is a function-call paren (preceded by word char or .)
+      // If so, skip the entire function call content
+      if (ch === '(' && i > 0 && /[\w.]/.test(expr[i - 1])) {
+        let depth = 1;
+        i++;
+        while (i < expr.length && depth > 0) {
+          if (expr[i] === '\\') { i++; }
+          else if (expr[i] === '"') {
+            i++;
+            while (i < expr.length && expr[i] !== '"') {
+              if (expr[i] === '\\') i++;
+              i++;
+            }
+          }
+          else if (expr[i] === '(') depth++;
+          else if (expr[i] === ')') depth--;
+          if (depth > 0) i++;
+        }
+        // i now points to the closing ), skip it
+        continue;
+      }
+      brackets.push({ char: ch, pos: i });
+    }
+  }
+
+  // Pair brackets using stacks for each bracket type
+  const BRACKET_PAIRS: Record<string, string> = { '[': ']', '(': ')', '{': '}' };
+  const unmatched = new Set<number>();
+
+  for (const [open, close] of Object.entries(BRACKET_PAIRS)) {
+    const stack: number[] = [];
+    for (const b of brackets) {
+      if (b.char === open) {
+        stack.push(b.pos);
+      } else if (b.char === close) {
+        if (stack.length > 0) {
+          stack.pop(); // matched
+        } else {
+          unmatched.add(b.pos); // unmatched close
+        }
+      }
+    }
+    // Any remaining in stack are unmatched opens
+    for (const pos of stack) {
+      unmatched.add(pos);
+    }
+  }
+
+  if (unmatched.size === 0) return expr;
+
+  // Replace unmatched brackets with symbol names, adding spaces where needed
+  let result = '';
+  for (let i = 0; i < expr.length; i++) {
+    if (unmatched.has(i)) {
+      const sym = BRACKET_SYMBOL_MAP[expr[i]];
+      // Add space before if preceded by word char or dot
+      if (result.length > 0 && /[\w.]/.test(result[result.length - 1])) {
+        result += ' ';
+      }
+      result += sym;
+      // Add space after if followed by word char
+      if (i + 1 < expr.length && /\w/.test(expr[i + 1])) {
+        result += ' ';
+      }
+    } else {
+      result += expr[i];
+    }
+  }
+  return result;
+};
+
 // Extract explicit \tag{...} from a condition cell's mtext content.
 // Returns the tag content (e.g. "3.12") or null if no \tag found.
 const extractTagFromConditionCell = (cell: any): string | null => {
@@ -1080,6 +1189,20 @@ const isNumcasesTable = (node): boolean => {
   // Check that cell[1] (first data column) contains a '{' brace
   const prefixCell = firstRow.childNodes[1];
   return treeContainsMo(prefixCell, '{');
+};
+
+// Check if a node is inside a non-eqnArray mtable (mat()/cases() function call syntax)
+// where bare ASCII delimiters like [ { ( would break parsing.
+const isInsideNonEqnArrayTable = (node: any): boolean => {
+  let n = node.parent;
+  while (n) {
+    if (n.kind === 'mtable') {
+      const firstRow = n.childNodes?.[0];
+      return !firstRow?.attributes?.get('displaystyle');
+    }
+    n = n.parent;
+  }
+  return false;
 };
 
 // --- MTABLE handler: matrices and equation arrays ---
@@ -1157,9 +1280,9 @@ const mtable = () => {
           if (cells.length === 1) {
             // Single cell (no & separator): escape top-level commas
             // to prevent them being parsed as cases() argument separators
-            caseRows.push(escapeCasesCommas(cells[0]));
+            caseRows.push(escapeCasesCommas(replaceUnpairedBrackets(cells[0])));
           } else {
-            caseRows.push(cells.join(' & '));
+            caseRows.push(cells.map(c => replaceUnpairedBrackets(c)).join(' & '));
           }
         }
 
@@ -1240,9 +1363,9 @@ const mtable = () => {
         } else if (isCases) {
           // Cases: escape top-level commas in each cell to prevent them
           // being parsed as cases() argument separators, then join with &
-          rows.push(cells.map(c => escapeCasesCommas(c)).join(' & '));
+          rows.push(cells.map(c => escapeCasesCommas(replaceUnpairedBrackets(c))).join(' & '));
         } else {
-          rows.push(cells.join(', '));
+          rows.push(cells.map(c => replaceUnpairedBrackets(c)).join(', '));
         }
       }
       if (isEqnArray) {
@@ -1339,6 +1462,14 @@ const mtable = () => {
           augmentStr = 'augment: #(' + parts.join(', ') + '), ';
         }
 
+        // Extract column alignment
+        const columnAlign = node.attributes.get('columnalign') as string;
+        const alignArr = columnAlign ? columnAlign.trim().split(/\s+/) : [];
+        const uniqueAligns = [...new Set(alignArr)];
+        const matAlign = (uniqueAligns.length === 1 && uniqueAligns[0] !== 'center')
+          ? uniqueAligns[0]  // 'left' or 'right'
+          : '';
+
         // Build mat() parameters
         const params: string[] = [];
         const hasDelimiters = branchOpen || branchClose;
@@ -1349,6 +1480,9 @@ const mtable = () => {
         } else {
           // Arrays/matrices without parent delimiters should not have parens
           params.push('delim: #none');
+        }
+        if (matAlign) {
+          params.push('align: #' + matAlign);
         }
         if (augmentStr) {
           params.push(augmentStr.slice(0, -2)); // remove trailing ", "
@@ -1438,12 +1572,28 @@ const mrow = () => {
           // One or both delimiters invisible: emit directly without lr()
           // (lr() requires balanced parens in Typst syntax)
           const trimmed = content.trim();
-          if (hasVisibleOpen) {
-            res = addToTypstData(res, { typst: open + ' ' + trimmed });
-          } else if (hasVisibleClose) {
-            res = addToTypstData(res, { typst: trimmed + ' ' + close });
+          if (isInsideNonEqnArrayTable(node)) {
+            // Inside mat()/cases(): wrap in lr() with escaped delimiters
+            // so that bare ASCII chars don't break function-call syntax
+            // and auto-sizing from \left/\right is preserved.
+            const openEsc = openDelim ? escapeDelimiterForLr(openDelim) : '';
+            const closeEsc = closeDelim ? escapeDelimiterForLr(closeDelim) : '';
+            if (openEsc) {
+              res = addToTypstData(res, { typst: 'lr(' + openEsc + ' ' + trimmed + ')' });
+            } else if (closeEsc) {
+              res = addToTypstData(res, { typst: 'lr(' + trimmed + ' ' + closeEsc + ')' });
+            } else {
+              res = addToTypstData(res, { typst: trimmed });
+            }
           } else {
-            res = addToTypstData(res, { typst: trimmed });
+            // Outside mat(): bare chars are fine in $ ... $ math mode
+            if (hasVisibleOpen) {
+              res = addToTypstData(res, { typst: open + ' ' + trimmed });
+            } else if (hasVisibleClose) {
+              res = addToTypstData(res, { typst: trimmed + ' ' + close });
+            } else {
+              res = addToTypstData(res, { typst: trimmed });
+            }
           }
         }
       } else if (isLeftRight && hasTableChild) {
@@ -1515,6 +1665,25 @@ const mapDelimiter = (delim: string): string => {
   if (mapped) {
     return mapped;
   }
+  return delim;
+};
+
+// Escape ASCII delimiters for use inside lr() within mat()/cases() context.
+// Bare [ { ( break Typst function-call parsing; backslash-escaping makes them
+// literal math delimiters that lr() can auto-size.
+const delimiterEscapeMap: Record<string, string> = {
+  '[': '\\[',
+  ']': '\\]',
+  '(': '\\(',
+  ')': '\\)',
+  '{': '\\{',
+  '}': '\\}',
+};
+
+const escapeDelimiterForLr = (delim: string): string => {
+  if (delimiterEscapeMap[delim]) return delimiterEscapeMap[delim];
+  const mapped = typstSymbolMap.get(delim);
+  if (mapped) return mapped;
   return delim;
 };
 

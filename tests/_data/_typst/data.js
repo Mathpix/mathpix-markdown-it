@@ -822,6 +822,44 @@ module.exports = [
     typst_inline: `x )`,
   },
 
+  // === Spanning delimiters in array — lr() with escaped delims inside mat() ===
+  // Square brackets spanning rows
+  {
+    latex: `\\begin{array}{l} \\left[ x \\right. \\\\ \\left. y \\right] \\end{array}`,
+    typst: `mat(delim: #none, align: #left, lr(\\[ x); lr(y \\]))`,
+    typst_inline: `mat(delim: #none, align: #left, lr(\\[ x); lr(y \\]))`,
+  },
+  // Parentheses spanning rows
+  {
+    latex: `\\begin{array}{l} \\left( a \\right. \\\\ \\left. b \\right) \\end{array}`,
+    typst: `mat(delim: #none, align: #left, lr(\\( a); lr(b \\)))`,
+    typst_inline: `mat(delim: #none, align: #left, lr(\\( a); lr(b \\)))`,
+  },
+  // Curly braces spanning rows
+  {
+    latex: `\\begin{array}{l} \\left\\{ m \\right. \\\\ \\left. n \\right\\} \\end{array}`,
+    typst: `mat(delim: #none, align: #left, lr(\\{ m); lr(n \\}))`,
+    typst_inline: `mat(delim: #none, align: #left, lr(\\{ m); lr(n \\}))`,
+  },
+  // Pipe spanning rows
+  {
+    latex: `\\begin{array}{l} \\left| p \\right. \\\\ \\left. q \\right| \\end{array}`,
+    typst: `mat(delim: #none, align: #left, lr(| p); lr(q |))`,
+    typst_inline: `mat(delim: #none, align: #left, lr(| p); lr(q |))`,
+  },
+  // Mixed: bracket open, paren close
+  {
+    latex: `\\begin{array}{l} \\left[ u \\right. \\\\ \\left. v \\right) \\end{array}`,
+    typst: `mat(delim: #none, align: #left, lr(\\[ u); lr(v \\)))`,
+    typst_inline: `mat(delim: #none, align: #left, lr(\\[ u); lr(v \\)))`,
+  },
+  // Tall content: bracket with fraction
+  {
+    latex: `\\begin{array}{l} \\left[ \\frac{x}{y} \\right. \\\\ \\left. z \\right] \\end{array}`,
+    typst: `mat(delim: #none, align: #left, lr(\\[ frac(x, y)); lr(z \\]))`,
+    typst_inline: `mat(delim: #none, align: #left, lr(\\[ frac(x, y)); lr(z \\]))`,
+  },
+
   // === Token spacing inside \left...\right delimiters ===
   {
     latex: `\\left[\\sum_{t=1}^{T} \\log p_{\\theta}\\right]`,
@@ -1381,6 +1419,38 @@ module.exports = [
     typst_inline: `mat(delim: #none, a, b, c)`,
   },
 
+  // === Column alignment ===
+  // All-left alignment
+  {
+    latex: `\\begin{array}{ll} a & b \\\\ c & d \\end{array}`,
+    typst: `mat(delim: #none, align: #left, a, b; c, d)`,
+    typst_inline: `mat(delim: #none, align: #left, a, b; c, d)`,
+  },
+  // All-right alignment
+  {
+    latex: `\\begin{array}{rr} a & b \\\\ c & d \\end{array}`,
+    typst: `mat(delim: #none, align: #right, a, b; c, d)`,
+    typst_inline: `mat(delim: #none, align: #right, a, b; c, d)`,
+  },
+  // Mixed alignment → no align param (center default)
+  {
+    latex: `\\begin{array}{lr} a & b \\\\ c & d \\end{array}`,
+    typst: `mat(delim: #none, a, b; c, d)`,
+    typst_inline: `mat(delim: #none, a, b; c, d)`,
+  },
+  // All-center → no align param (center default)
+  {
+    latex: `\\begin{array}{cc} a & b \\\\ c & d \\end{array}`,
+    typst: `mat(delim: #none, a, b; c, d)`,
+    typst_inline: `mat(delim: #none, a, b; c, d)`,
+  },
+  // Single column left
+  {
+    latex: `\\begin{array}{l} a \\\\ b \\end{array}`,
+    typst: `mat(delim: #none, align: #left, a; b)`,
+    typst_inline: `mat(delim: #none, align: #left, a; b)`,
+  },
+
   // === Equation tags ===
   {
     latex: `E = mc^2 \\tag{1}`,
@@ -1515,5 +1585,30 @@ module.exports = [
     latex: `\\begin{numcases}{} \\Delta_{q}^{\\alpha} x^{n}=f\\left(t_{n}, x^{n}\\right), n=1,2, \\ldots, N \\tag{3.12}\\label{eq:3.12}\\\\ x^{0}=x_{0} \\tag{3.13}\\label{eq3.13} \\end{numcases}`,
     typst: `#grid(\n  columns: (1fr, auto),\n  align: (left, right + horizon),\n  math.equation(block: true, numbering: none, $ cases(Delta_q^(alpha) x^n = f lr(( t_n, x^n ))"," n = 1"," 2"," dots"," N, x^0 = x_0) $),\n  grid(\n    row-gutter: 0.65em,\n    [#figure(kind: "eq-tag", supplement: none, numbering: n => [(3.12)], [(3.12)]) <eq:3.12>],\n    [#figure(kind: "eq-tag", supplement: none, numbering: n => [(3.13)], [(3.13)]) <eq3.13>],\n  ),\n)`,
     typst_inline: `cases(Delta_q^(alpha) x^n = f lr(( t_n, x^n ))"," n = 1"," 2"," dots"," N, x^0 = x_0)`,
+  },
+  // === Unpaired brackets in matrix cells → Typst symbol names ===
+  // Unpaired [ ] spanning rows → bracket.l / bracket.r
+  {
+    latex: `\\begin{array}{lc} a & [ b + c \\\\ d & + e ] \\end{array}`,
+    typst: `mat(delim: #none, a, bracket.l b + c; d, + e bracket.r)`,
+    typst_inline: `mat(delim: #none, a, bracket.l b + c; d, + e bracket.r)`,
+  },
+  // Unpaired ( ) spanning rows → paren.l / paren.r
+  {
+    latex: `\\begin{array}{lc} a & ( b + c \\\\ d & + e ) \\end{array}`,
+    typst: `mat(delim: #none, a, paren.l b + c; d, + e paren.r)`,
+    typst_inline: `mat(delim: #none, a, paren.l b + c; d, + e paren.r)`,
+  },
+  // Unpaired { } spanning rows → brace.l / brace.r
+  {
+    latex: `\\begin{array}{lc} a & \\{ b + c \\\\ d & + e \\} \\end{array}`,
+    typst: `mat(delim: #none, a, brace.l b + c; d, + e brace.r)`,
+    typst_inline: `mat(delim: #none, a, brace.l b + c; d, + e brace.r)`,
+  },
+  // Paired brackets in same cell → unchanged
+  {
+    latex: `\\begin{array}{c} [a + b] \\end{array}`,
+    typst: `mat(delim: #none, [a + b])`,
+    typst_inline: `mat(delim: #none, [a + b])`,
   },
 ];
