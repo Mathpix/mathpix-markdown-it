@@ -262,17 +262,21 @@ const mo = () => {
         return res;
       }
       const typstValue: string = findTypstSymbol(value);
+      // Map multi-word MathJax operator names to Typst built-in equivalents
+      // (e.g. \limsup → "lim⁠sup" with thin space → "limsup")
+      const normalizedValue = value.replace(/[\u2006\u2005\u2004\u2009\u200A\u00A0]/g, ' ');
+      const mappedOp = MATHJAX_MULTIWORD_OPS.get(normalizedValue);
+      if (mappedOp) {
+        const spaceBefore = needSpaceBefore(node) ? ' ' : '';
+        const spaceAfter = needSpaceAfter(node) ? ' ' : '';
+        res = addToTypstData(res, { typst: spaceBefore + mappedOp + spaceAfter });
+        return res;
+      }
       // Detect custom named operators (e.g. \injlim → "inj lim", \projlim → "proj lim")
+      // Don't add limits: #true here — parent handler (munderover/munder/mover) decides placement
       if (value.length > 1 && /^\w/.test(value) && !typstSymbolMap.has(value) && !TYPST_MATH_OPERATORS.has(value)) {
-        // Normalize thin/non-breaking spaces to regular spaces for clean output
-        const opName = value.replace(/[\u2006\u2005\u2004\u2009\u200A\u00A0]/g, ' ');
-        const parentKind = node.parent?.kind;
-        const isLimits = parentKind === 'munder' || parentKind === 'mover' || parentKind === 'munderover';
-        if (isLimits) {
-          res = addToTypstData(res, { typst: 'op("' + opName + '", limits: #true)' });
-        } else {
-          res = addToTypstData(res, { typst: 'op("' + opName + '")' });
-        }
+        const opName = normalizedValue;
+        res = addToTypstData(res, { typst: 'op("' + opName + '")' });
         return res;
       }
       // Check if this operator is inside sub/sup/munderover — no spacing there
@@ -426,9 +430,14 @@ const msup = () => {
       const dataSecond: ITypstData = secondChild ? serialize.visitNode(secondChild, '') : initTypstData();
       const base = dataFirst.typst;
       const sup = dataSecond.typst.trim();
-      // Empty base (e.g. LaTeX ^{x} with no preceding base): use empty
-      // upright string as placeholder so Typst has a valid base for ^
-      res = addToTypstData(res, { typst: base.trim() ? base : '""' });
+      const baseTrimmed = base.trim();
+      // \nolimits: wrap known limit-type operators in scripts() to force side placement
+      if (baseTrimmed && needsScriptsWrapper(baseTrimmed)) {
+        res = addToTypstData(res, { typst: 'scripts(' + baseTrimmed + ')' });
+      } else {
+        // Empty base (e.g. LaTeX ^{x} with no preceding base): use empty placeholder
+        res = addToTypstData(res, { typst: baseTrimmed ? base : '""' });
+      }
       // Optimize prime symbols to Typst ' shorthand
       const primeShorthand = PRIME_SHORTHANDS.get(sup);
       if (primeShorthand) {
@@ -459,7 +468,13 @@ const msub = () => {
       const dataSecond: ITypstData = secondChild ? serialize.visitNode(secondChild, '') : initTypstData();
       const sub = dataSecond.typst.trim();
       const base = dataFirst.typst;
-      res = addToTypstData(res, { typst: base.trim() ? base : '""' });
+      const baseTrimmed = base.trim();
+      // \nolimits: wrap known limit-type operators in scripts() to force side placement
+      if (baseTrimmed && needsScriptsWrapper(baseTrimmed)) {
+        res = addToTypstData(res, { typst: 'scripts(' + baseTrimmed + ')' });
+      } else {
+        res = addToTypstData(res, { typst: baseTrimmed ? base : '""' });
+      }
       res = addToTypstData(res, { typst: '_' });
       if (needsParens(sub)) {
         res = addToTypstData(res, { typst: '(' + sub + ')' });
@@ -487,7 +502,13 @@ const msubsup = () => {
       const sub = dataSecond.typst.trim();
       const sup = dataThird.typst.trim();
       const base = dataFirst.typst;
-      res = addToTypstData(res, { typst: base.trim() ? base : '""' });
+      const baseTrimmed = base.trim();
+      // \nolimits: wrap known limit-type operators in scripts() to force side placement
+      if (baseTrimmed && needsScriptsWrapper(baseTrimmed)) {
+        res = addToTypstData(res, { typst: 'scripts(' + baseTrimmed + ')' });
+      } else {
+        res = addToTypstData(res, { typst: baseTrimmed ? base : '""' });
+      }
       res = addToTypstData(res, { typst: '_' });
       if (needsParens(sub)) {
         res = addToTypstData(res, { typst: '(' + sub + ')' });
@@ -559,6 +580,70 @@ const TYPST_NATIVE_LIMIT_OPS: Set<string> = new Set([
   'or.big', 'and.big',
 ]);
 
+// Multi-word MathJax operator names → Typst built-in operator names.
+// MathJax uses thin space (U+2006) between words; we normalize before lookup.
+const MATHJAX_MULTIWORD_OPS: Map<string, string> = new Map([
+  ['lim sup', 'limsup'],
+  ['lim inf', 'liminf'],
+]);
+
+// Operators that Typst places below/above in display mode by default.
+// Used to detect \nolimits (when these appear in msubsup/msub/msup instead of munderover).
+const TYPST_DISPLAY_LIMIT_OPS: Set<string> = new Set([
+  // Named function operators with limits placement
+  'lim', 'limsup', 'liminf', 'max', 'min', 'inf', 'sup',
+  'det', 'gcd', 'Pr',
+  // Large operators
+  'sum', 'product', 'product.co',
+  'union.big', 'inter.big',
+  'dot.o.big', 'plus.o.big', 'times.o.big',
+  'union.plus.big', 'union.sq.big',
+  'or.big', 'and.big',
+]);
+
+/** Get movablelimits attribute from a node (typically the base mo of munderover) */
+const getMovablelimits = (node: any): boolean | undefined => {
+  if (!node || node.kind !== 'mo') return undefined;
+  try {
+    const atr = getAttributes(node);
+    return atr?.movablelimits;
+  } catch (e) {
+    return undefined;
+  }
+};
+
+/** Build limit-placement base for munderover/munder/mover handlers.
+ *  Returns the correct Typst base string considering movablelimits. */
+const buildLimitBase = (firstChild: any, baseTrimmed: string, base: string): string => {
+  const movablelimits = getMovablelimits(firstChild);
+  const baseIsCustomOp = /^op\(/.test(baseTrimmed);
+
+  if (movablelimits === true) {
+    // Default placement — operator handles limits automatically in Typst
+    if (baseIsCustomOp) {
+      // Custom op: add limits: #true for auto limit behavior
+      return baseTrimmed.replace(/\)$/, ', limits: #true)');
+    }
+    return base;
+  } else if (movablelimits === false) {
+    // Explicit \limits — force below/above placement
+    return 'limits(' + baseTrimmed + ')';
+  } else {
+    // Non-mo base (mrow, etc.) — use existing logic
+    const baseIsNativeLimitOp = TYPST_NATIVE_LIMIT_OPS.has(baseTrimmed);
+    const baseIsSpecialFn = /^(overbrace|underbrace|overline|underline|op)\(/.test(baseTrimmed);
+    if (baseIsNativeLimitOp || baseIsSpecialFn) {
+      return base;
+    }
+    return 'limits(' + baseTrimmed + ')';
+  }
+};
+
+/** Check if base should use scripts() wrapper (\nolimits in display mode) */
+const needsScriptsWrapper = (baseTrimmed: string): boolean => {
+  return TYPST_DISPLAY_LIMIT_OPS.has(baseTrimmed);
+};
+
 // Typst accent shorthand functions that can be called as fn(content).
 // Accents NOT in this set must use the accent(content, symbol) form.
 const TYPST_ACCENT_SHORTHANDS: Set<string> = new Set([
@@ -591,21 +676,12 @@ const mover = () => {
           return res;
         }
       }
-      // Fallback: base^(over) or limits(base)^(over)
-      // Use limits() for symbols that DON'T natively support limit placement.
-      // Skip limits() when:
-      // - Base is a known Typst operator/large operator that already places limits above
-      // - Base output is from an accent/brace function that already accepts ^ labels
-      const base = dataFirst.typst.trim() || '""';
+      // Fallback: base^(over) — uses movablelimits to decide limits() wrapping
+      const baseTrimmed = dataFirst.typst.trim() || '""';
       const over = dataSecond.typst.trim();
       if (over) {
-        const baseIsNativeLimitOp = TYPST_NATIVE_LIMIT_OPS.has(base);
-        const baseIsSpecialFn = /^(overbrace|underbrace|overline|underline|op)\(/.test(base);
-        if (baseIsNativeLimitOp || baseIsSpecialFn) {
-          res = addToTypstData(res, { typst: base });
-        } else {
-          res = addToTypstData(res, { typst: 'limits(' + base + ')' });
-        }
+        const baseStr = buildLimitBase(firstChild, baseTrimmed, dataFirst.typst);
+        res = addToTypstData(res, { typst: baseStr });
         res = addToTypstData(res, { typst: '^' });
         if (needsParens(over)) {
           res = addToTypstData(res, { typst: '(' + over + ')' });
@@ -613,7 +689,7 @@ const mover = () => {
           res = addToTypstData(res, { typst: over });
         }
       } else {
-        res = addToTypstData(res, { typst: base });
+        res = addToTypstData(res, { typst: baseTrimmed });
       }
       return res;
     } catch (e) {
@@ -647,17 +723,12 @@ const munder = () => {
           return res;
         }
       }
-      // Fallback: base_(under) or limits(base)_(under)
-      const base = dataFirst.typst.trim() || '""';
+      // Fallback: base_(under) — uses movablelimits to decide limits() wrapping
+      const baseTrimmed = dataFirst.typst.trim() || '""';
       const under = dataSecond.typst.trim();
       if (under) {
-        const baseIsNativeLimitOp = TYPST_NATIVE_LIMIT_OPS.has(base);
-        const baseIsSpecialFn = /^(overbrace|underbrace|overline|underline|op)\(/.test(base);
-        if (baseIsNativeLimitOp || baseIsSpecialFn) {
-          res = addToTypstData(res, { typst: base });
-        } else {
-          res = addToTypstData(res, { typst: 'limits(' + base + ')' });
-        }
+        const baseStr = buildLimitBase(firstChild, baseTrimmed, dataFirst.typst);
+        res = addToTypstData(res, { typst: baseStr });
         res = addToTypstData(res, { typst: '_' });
         if (needsParens(under)) {
           res = addToTypstData(res, { typst: '(' + under + ')' });
@@ -665,7 +736,7 @@ const munder = () => {
           res = addToTypstData(res, { typst: under });
         }
       } else {
-        res = addToTypstData(res, { typst: base });
+        res = addToTypstData(res, { typst: baseTrimmed });
       }
       return res;
     } catch (e) {
@@ -685,18 +756,12 @@ const munderover = () => {
       const dataFirst: ITypstData = firstChild ? serialize.visitNode(firstChild, '') : initTypstData();
       const dataSecond: ITypstData = secondChild ? serialize.visitNode(secondChild, '') : initTypstData();
       const dataThird: ITypstData = thirdChild ? serialize.visitNode(thirdChild, '') : initTypstData();
-      const base = dataFirst.typst;
       const under = dataSecond.typst.trim();
       const over = dataThird.typst.trim();
-      // Use limits() for non-operator bases (e.g. extensible arrows)
-      const baseTrimmed = base.trim() || '""';
-      const baseIsNativeLimitOp = TYPST_NATIVE_LIMIT_OPS.has(baseTrimmed);
-      const baseIsSpecialFn = /^(overbrace|underbrace|overline|underline|op)\(/.test(baseTrimmed);
-      if (baseIsNativeLimitOp || baseIsSpecialFn) {
-        res = addToTypstData(res, { typst: base });
-      } else {
-        res = addToTypstData(res, { typst: 'limits(' + baseTrimmed + ')' });
-      }
+      // Use movablelimits to decide between default placement and limits() wrapping
+      const baseTrimmed = dataFirst.typst.trim() || '""';
+      const baseStr = buildLimitBase(firstChild, baseTrimmed, dataFirst.typst);
+      res = addToTypstData(res, { typst: baseStr });
       if (under) {
         res = addToTypstData(res, { typst: '_' });
         if (needsParens(under)) {

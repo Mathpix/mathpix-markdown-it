@@ -163,9 +163,20 @@ module.exports = [
   { latex: `\\overset{b}{}`, typst: `limits("")^b`, typst_inline: `limits("")^b` },
   // === Negative thin space (\!) skipped — not valid in Typst ===
   { latex: `\\idotsint\\limits_{i=1}^{n}`, typst: `limits(integral dots.c integral)_(i = 1)^n`, typst_inline: `limits(integral dots.c integral)_(i = 1)^n` },
-  // === Custom named operators via mo (e.g. \injlim, \projlim) ===
+  // === Limits / nolimits placement ===
+  // Known Typst operators: default, \limits, \nolimits
+  { latex: `\\limsup_{i=1}^n`, typst: `limsup_(i = 1)^n`, typst_inline: `limsup_(i = 1)^n` },
+  { latex: `\\liminf_{i=1}^n`, typst: `liminf_(i = 1)^n`, typst_inline: `liminf_(i = 1)^n` },
+  { latex: `\\limsup\\limits_{i=1}^n`, typst: `limits(limsup)_(i = 1)^n`, typst_inline: `limits(limsup)_(i = 1)^n` },
+  { latex: `\\limsup\\nolimits_{i=1}^n`, typst: `scripts(limsup)_(i = 1)^n`, typst_inline: `scripts(limsup)_(i = 1)^n` },
+  { latex: `\\sum\\nolimits_{i=1}^n`, typst: `scripts(sum)_(i = 1)^n`, typst_inline: `scripts(sum)_(i = 1)^n` },
+  { latex: `\\lim\\limits_{x\\to 0}`, typst: `limits(lim)_(x arrow.r 0)`, typst_inline: `limits(lim)_(x arrow.r 0)` },
+  { latex: `\\lim\\nolimits_{x\\to 0}`, typst: `scripts(lim)_(x arrow.r 0)`, typst_inline: `scripts(lim)_(x arrow.r 0)` },
+  // Custom named operators: default, \limits, \nolimits
   { latex: `\\injlim_{i=1}^n`, typst: `op("inj lim", limits: #true)_(i = 1)^n`, typst_inline: `op("inj lim", limits: #true)_(i = 1)^n` },
   { latex: `\\projlim_{i=1}^n`, typst: `op("proj lim", limits: #true)_(i = 1)^n`, typst_inline: `op("proj lim", limits: #true)_(i = 1)^n` },
+  { latex: `\\projlim\\limits_{i=1}^n`, typst: `limits(op("proj lim"))_(i = 1)^n`, typst_inline: `limits(op("proj lim"))_(i = 1)^n` },
+  { latex: `\\projlim\\nolimits_{i=1}^n`, typst: `op("proj lim")_(i = 1)^n`, typst_inline: `op("proj lim")_(i = 1)^n` },
   // === Dollar sign and thousand separators ===
   {
     latex: `\\$ 120,000`,
