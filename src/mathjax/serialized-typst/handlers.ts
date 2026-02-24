@@ -1193,18 +1193,6 @@ const isNumcasesTable = (node): boolean => {
 
 // Check if a node is inside a non-eqnArray mtable (mat()/cases() function call syntax)
 // where bare ASCII delimiters like [ { ( would break parsing.
-const isInsideNonEqnArrayTable = (node: any): boolean => {
-  let n = node.parent;
-  while (n) {
-    if (n.kind === 'mtable') {
-      const firstRow = n.childNodes?.[0];
-      return !firstRow?.attributes?.get('displaystyle');
-    }
-    n = n.parent;
-  }
-  return false;
-};
-
 // --- MTABLE handler: matrices and equation arrays ---
 const mtable = () => {
   return (node, serialize): ITypstData => {
@@ -1569,31 +1557,18 @@ const mrow = () => {
             res = addToTypstData(res, { typst: 'lr(' + open + ' ' + trimmedContent + ' ' + close + ')' });
           }
         } else {
-          // One or both delimiters invisible: emit directly without lr()
-          // (lr() requires balanced parens in Typst syntax)
+          // One or both delimiters invisible: wrap visible side in lr()
+          // with escaped delimiters so bare ASCII chars don't break parsing
+          // and auto-sizing from \left/\right is preserved.
           const trimmed = content.trim();
-          if (isInsideNonEqnArrayTable(node)) {
-            // Inside mat()/cases(): wrap in lr() with escaped delimiters
-            // so that bare ASCII chars don't break function-call syntax
-            // and auto-sizing from \left/\right is preserved.
-            const openEsc = openDelim ? escapeDelimiterForLr(openDelim) : '';
-            const closeEsc = closeDelim ? escapeDelimiterForLr(closeDelim) : '';
-            if (openEsc) {
-              res = addToTypstData(res, { typst: 'lr(' + openEsc + ' ' + trimmed + ')' });
-            } else if (closeEsc) {
-              res = addToTypstData(res, { typst: 'lr(' + trimmed + ' ' + closeEsc + ')' });
-            } else {
-              res = addToTypstData(res, { typst: trimmed });
-            }
+          const openEsc = openDelim ? escapeDelimiterForLr(openDelim) : '';
+          const closeEsc = closeDelim ? escapeDelimiterForLr(closeDelim) : '';
+          if (openEsc) {
+            res = addToTypstData(res, { typst: 'lr(' + openEsc + ' ' + trimmed + ')' });
+          } else if (closeEsc) {
+            res = addToTypstData(res, { typst: 'lr(' + trimmed + ' ' + closeEsc + ')' });
           } else {
-            // Outside mat(): bare chars are fine in $ ... $ math mode
-            if (hasVisibleOpen) {
-              res = addToTypstData(res, { typst: open + ' ' + trimmed });
-            } else if (hasVisibleClose) {
-              res = addToTypstData(res, { typst: trimmed + ' ' + close });
-            } else {
-              res = addToTypstData(res, { typst: trimmed });
-            }
+            res = addToTypstData(res, { typst: trimmed });
           }
         }
       } else if (isLeftRight && hasTableChild) {

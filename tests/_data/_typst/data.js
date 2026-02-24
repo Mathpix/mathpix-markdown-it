@@ -813,13 +813,25 @@ module.exports = [
   },
   {
     latex: `\\left( x \\right.`,
-    typst: `( x`,
-    typst_inline: `( x`,
+    typst: `lr(\\( x)`,
+    typst_inline: `lr(\\( x)`,
   },
   {
     latex: `\\left. x \\right)`,
-    typst: `x )`,
-    typst_inline: `x )`,
+    typst: `lr(x \\))`,
+    typst_inline: `lr(x \\))`,
+  },
+  // One-sided \left[...\right. in aligned → lr(\[ ...)
+  {
+    latex: `\\begin{aligned} a &= \\left[ b + c \\right. \\\\ &\\left. + d \\right] \\end{aligned}`,
+    typst: `a &= lr(\\[ b + c) \\\n &lr(+ d \\])`,
+    typst_inline: `a &= lr(\\[ b + c) \\\n &lr(+ d \\])`,
+  },
+  // One-sided \left(...\right. in aligned → lr(\( ...)
+  {
+    latex: `\\begin{aligned} a &= \\left( b + c \\right. \\\\ &\\left. + d \\right) \\end{aligned}`,
+    typst: `a &= lr(\\( b + c) \\\n &lr(+ d \\))`,
+    typst_inline: `a &= lr(\\( b + c) \\\n &lr(+ d \\))`,
   },
 
   // === Spanning delimiters in array — lr() with escaped delims inside mat() ===
