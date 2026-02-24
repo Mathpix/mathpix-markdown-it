@@ -160,7 +160,7 @@ Standard arrows (`\rightarrow` → `arrow.r`, `\Leftrightarrow` → `arrow.l.r.d
 
 ### Named functions
 
-Built-in Typst math operators (`sin`, `cos`, `tan`, `log`, `lim`, etc.) pass through directly. Custom operators via `\operatorname{name}` → `op("name")`, with `limits: #true` when used with limits placement.
+Built-in Typst math operators (`sin`, `cos`, `tan`, `log`, `lim`, etc.) pass through directly. Custom operators via `\operatorname{name}` → `op("name")`, with `limits: #true` when used with limits placement. Multi-word operators from `mo` nodes (e.g. `\injlim` → `op("inj lim")`, `\projlim` → `op("proj lim")`) are also detected and wrapped; thin Unicode spaces in operator names are normalized to regular spaces.
 
 ### Delimiters
 
@@ -320,7 +320,7 @@ Note: the comma inside `lr(( t_n, x^n ))` is at depth 2 and preserved as-is, whi
 | `\quad` | `quad` |
 | `\,` | `thin` |
 | `\;` | `med` |
-| `\!` | `negthin` |
+| `\!` | *(skipped — Typst has no `negthin`; LaTeX spacing hack)* |
 
 ### Other constructs
 
