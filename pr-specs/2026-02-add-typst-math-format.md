@@ -90,10 +90,10 @@ All new Typst code lives in `src/mathjax/serialized-typst/`:
 
 | File | Purpose |
 |------|---------|
-| `index.ts` | `SerializedTypstVisitor` class — extends MathJax's `MmlVisitor`, handles root traversal, inferred mrow spacing, big delimiter detection (`\big`, `\Big`, etc.), and bare delimiter-pair grouping (`|...|`, `⌊...⌋`, `⌈...⌉`, `‖...‖`) |
+| `index.ts` | `SerializedTypstVisitor` class — extends MathJax's `MmlVisitor`, handles root traversal, inferred mrow spacing, big delimiter detection (`\big`, `\Big`, etc.), bare delimiter-pair grouping (`|...|`, `⌊...⌋`, `⌈...⌉`, `‖...‖`), `\idotsint` grouping (integral-dots-integral pattern via `SCRIPT_KINDS` constant), and thousand-separator comma detection |
 | `handlers.ts` | Node-type handlers — one function per MathML element (`mi`, `mo`, `mn`, `mfrac`, `msup`, `msub`, `msubsup`, `msqrt`, `mroot`, `mover`, `munder`, `munderover`, `mmultiscripts`, `mrow`, `mtable`, `mtext`, `mspace`, `mpadded`, `mstyle`, `mphantom`, `menclose`) |
 | `typst-symbol-map.ts` | Unicode → Typst symbol name mapping tables (Greek, binary operators, relations, arrows, delimiters, large operators, misc) plus accent map and font map |
-| `common.ts` | `ITypstData` interface, `initTypstData`, `addToTypstData`, `addSpaceToTypstData`, `needsParens`, `isThousandSepComma` helpers |
+| `common.ts` | `ITypstData` interface, `initTypstData`, `addToTypstData`, `addSpaceToTypstData`, `needsParens`, `isThousandSepComma`, `needsTokenSeparator` helpers |
 | `node-utils.ts` | `isFirstChild` / `isLastChild` tree-position utilities |
 
 ### Integration points
@@ -160,22 +160,23 @@ Standard arrows (`\rightarrow` → `arrow.r`, `\Leftrightarrow` → `arrow.l.r.d
 
 ### Named functions
 
-Built-in Typst math operators (`sin`, `cos`, `tan`, `log`, `lim`, etc.) pass through directly. Multi-word operators (`\limsup` → `limsup`, `\liminf` → `liminf`) are mapped from MathJax's thin-space form to Typst built-ins via `MATHJAX_MULTIWORD_OPS`. Custom operators via `\operatorname{name}` → `op("name")`; custom `mo` operators (e.g. `\injlim` → `op("inj lim")`, `\projlim` → `op("proj lim")`) emit bare `op()` without `limits: #true` — the parent handler (`munderover`/`munder`/`mover`) decides placement via `movablelimits`. Thin Unicode spaces in operator names are normalized to regular spaces.
+Built-in Typst math operators (`sin`, `cos`, `tan`, `log`, `lim`, etc.) pass through directly. Multi-word operators (`\limsup` → `limsup`, `\liminf` → `liminf`) are mapped from MathJax's thin-space form to Typst built-ins via `MATHJAX_MULTIWORD_OPS`. Custom operators via `\operatorname{name}` → `op("name")`; custom `mo` operators (e.g. `\injlim` → `op("inj lim")`, `\projlim` → `op("proj lim")`) emit bare `op()` without `limits: #true` — the parent handler (`munderover`/`munder`/`mover`) decides placement via `movablelimits`. Thin Unicode spaces in operator names are normalized to regular spaces. Note: `\varinjlim`/`\injlim` and `\varprojlim`/`\projlim` produce identical MathML and thus identical Typst output.
 
 ### Delimiters
 
 | LaTeX | Typst |
 |-------|-------|
 | `\left( x \right)` | `lr(( x ))` |
+| `\left| x \right|` | `abs(x)` |
 | `\left\| x \right\|` | `norm(x)` |
 | `\left\lfloor x \right\rfloor` | `floor(x)` |
 | `\left\lceil x \right\rceil` | `ceil(x)` |
 | `\left( x \right.` | `( x` (one-sided) |
 | `\big( x \big)` | `lr(size: #1.2em, ( x ))` |
-| `\|...\|` (without `\left...\right`) | `lr(\| ... \|)` (pipe-pair detection) |
+| `|x|` (without `\left...\right`) | `lr(| x |)` (pipe-pair detection) |
 | `\lfloor x \rfloor` (without `\left...\right`) | `floor(x)` (bare delimiter-pair detection) |
 | `\lceil y \rceil` (without `\left...\right`) | `ceil(y)` (bare delimiter-pair detection) |
-| `\|x\|` (without `\left...\right`) | `norm(x)` (bare delimiter-pair detection) |
+| `\|x\|` (‖, without `\left...\right`) | `norm(x)` (bare delimiter-pair detection) |
 
 ### Matrices and equation arrays
 
@@ -309,6 +310,12 @@ Note: the comma inside `lr(( t_n, x^n ))` is at depth 2 and preserved as-is, whi
 
 `\sum` → `sum`, `\prod` → `product`, `\int` → `integral`, `\oint` → `integral.cont`, `\iint` → `integral.double`, etc. Limits placement via `_` and `^` for native operators, `limits()` wrapper for non-native bases.
 
+**`\idotsint` grouping:** The `\idotsint` command (integral-dots-integral) produces three separate MathML nodes: `mo(∫)`, `mo(⋯)`, and a scripted `mo(∫)` (e.g. `msubsup(mo(∫), sub, sup)`). The `visitInferredMrowNode` method detects this pattern using the `SCRIPT_KINDS` constant (`msubsup`, `msub`, `msup`) and groups them into a single `lr(integral dots.c integral)` expression with attached scripts:
+
+| LaTeX | Typst |
+|-------|-------|
+| `\idotsint_{a}^{b}` | `lr(integral dots.c integral)_(a)^(b)` |
+
 ### Limits / nolimits placement
 
 LaTeX supports three limit-placement modes: **default** (operator decides), **`\limits`** (force below/above), and **`\nolimits`** (force side). The serializer detects these via the MathML `movablelimits` attribute on the base `mo` node:
@@ -317,7 +324,7 @@ LaTeX supports three limit-placement modes: **default** (operator decides), **`\
 |-----------------|---------|-------------|
 | `true` | Default placement (operator decides) | `limsup_(i=1)^n` / `op("inj lim", limits: #true)_(i=1)^n` |
 | `false` | Explicit `\limits` | `limits(limsup)_(i=1)^n` / `limits(op("proj lim"))_(i=1)^n` |
-| absent (non-`mo` base) | Inferred from context | Uses `TYPST_NATIVE_LIMIT_OPS` set |
+| absent (non-`mo` base) | Inferred from context | Uses `TYPST_DISPLAY_LIMIT_OPS` set |
 
 For `\nolimits`, MathJax produces `msubsup`/`msub`/`msup` instead of `munderover`/`munder`/`mover`. The `needsScriptsWrapper()` helper detects known display-limit operators (`sum`, `lim`, `limsup`, etc.) in these contexts and wraps them in `scripts()`:
 
@@ -335,8 +342,14 @@ For `\nolimits`, MathJax produces `msubsup`/`msub`/`msup` instead of `munderover
 
 Multi-word operators (`\limsup` → `limsup`, `\liminf` → `liminf`) are mapped via `MATHJAX_MULTIWORD_OPS` from their thin-space-separated MathJax form ("lim⁠sup") to Typst built-ins.
 
+**Trig/function operators with `\limits`:** MathJax produces `mi` (not `mo`) for category-4 operators (`\cos`, `\sin`, `\tan`, etc.), so `movablelimits` is not available on the base. The `munderover`/`munder`/`mover` handler detects these by checking the serialized base against `TYPST_MATH_OPERATORS` and wraps them in `limits()`:
+
+| LaTeX | Typst |
+|-------|-------|
+| `\cos\limits_{x}^{y}` | `limits(cos)_(x)^(y)` |
+| `\sin\limits_{i=1}^{n}` | `limits(sin)_(i = 1)^n` |
+
 **Known limitations:**
-- Category 4 operators (`\cos`, `\sin`, etc.) with `\limits`: MathJax produces `mi` (not `mo`) for the base, so `movablelimits` cannot be detected — `\cos\limits_{i=1}^n` outputs `cos_(i=1)^n` instead of `limits(cos)_(i=1)^n`
 - `\oint\limits` causes a MathJax error ("\\limits is allowed only on operators")
 - `\varliminf`/`\varlimsup` with `\limits`: the accent handler produces `underline(lim)`/`overline(lim)` which bypasses limit-placement wrapping
 
@@ -405,7 +418,7 @@ Correct Typst output requires careful spacing to prevent token merging and avoid
 
 ### Token separation
 
-Adjacent word-character tokens must be separated by spaces. The visitor inserts spaces when the accumulated output does not end with a separator (`\s`, `(`, `{`, `[`, `,`, `|`) and the next token starts with a word character, dot, or quote.
+Adjacent word-character tokens must be separated by spaces. The `needsTokenSeparator(prev, next)` helper in `common.ts` centralizes this check: it returns `true` when `prev` does not end with a separator (`\s`, `(`, `{`, `[`, `,`, `|`) and `next` starts with a word character, dot, or quote. This helper is used in both `visitInferredMrowNode` (index.ts) and the `mrow` handler (handlers.ts), replacing ~12 previously duplicated inline checks.
 
 ### Dollar sign escaping
 
@@ -459,10 +472,10 @@ LaTeX delimiters without `\left...\right` produce unpaired `<mo>` nodes in MathM
 
 | Opening | Closing | Typst output |
 |---------|---------|-------------|
-| `\|` | `\|` | `lr(\| content \|)` |
+| `|` | `|` | `lr(| content |)` |
 | `\lfloor` (⌊) | `\rfloor` (⌋) | `floor(content)` |
 | `\lceil` (⌈) | `\rceil` (⌉) | `ceil(content)` |
-| `\\|` (‖) | `\\|` (‖) | `norm(content)` |
+| `\|` (‖) | `\|` (‖) | `norm(content)` |
 
 This ensures paired delimiters form grouped expressions in Typst (important after `/` for correct fraction denominator binding). For symmetric delimiters (`|`, `‖`), pairs inside `TeXAtom` groups (e.g. superscript `{|\alpha|}`) are left as-is since the enclosing script parens already provide grouping.
 
@@ -484,10 +497,10 @@ This ensures paired delimiters form grouped expressions in Typst (important afte
 
 | File | Change |
 |------|--------|
-| `src/mathjax/serialized-typst/index.ts` | **New.** `SerializedTypstVisitor` class with root traversal, big-delimiter detection, bare delimiter-pair grouping (`\|`, `⌊⌋`, `⌈⌉`, `‖`); uses `addSpaceToTypstData` for token separation |
+| `src/mathjax/serialized-typst/index.ts` | **New.** `SerializedTypstVisitor` class with root traversal, big-delimiter detection, bare delimiter-pair grouping (`|`, `⌊⌋`, `⌈⌉`, `‖`), `\idotsint` grouping via `SCRIPT_KINDS`, thousand-separator comma detection; uses `needsTokenSeparator` for token spacing |
 | `src/mathjax/serialized-typst/handlers.ts` | **New.** 20+ MathML node-type handlers for Typst serialization; handlers for `mtable`/frame and `menclose`/box set separate `typst_inline` without block wrappers |
 | `src/mathjax/serialized-typst/typst-symbol-map.ts` | **New.** Unicode → Typst symbol mapping (~300 entries), accent map, font map |
-| `src/mathjax/serialized-typst/common.ts` | **New.** `ITypstData` interface with optional `typst_inline`; `initTypstData`, `addToTypstData` (always propagates `typst_inline` with `typst` fallback), `addSpaceToTypstData`, `needsParens` |
+| `src/mathjax/serialized-typst/common.ts` | **New.** `ITypstData` interface with optional `typst_inline`; `initTypstData`, `addToTypstData` (always propagates `typst_inline` with `typst` fallback), `addSpaceToTypstData`, `needsParens`, `isThousandSepComma`, `needsTokenSeparator` |
 | `src/mathjax/serialized-typst/node-utils.ts` | **New.** Tree position utilities |
 | `src/mathjax/mathjax.ts` | Patched `AbstractTags` (`autoTag`, `getTag`, `startEquation`) to mark auto-numbered tags with `data-tag-auto` property and preserve `\label{}` keys as `data-label-key` |
 | `src/mathjax/index.ts` | `toTypstData()` returns `{ typstmath, typstmath_inline }` from the visitor's `ITypstData`; `OuterData()` and `OuterHTML()` populate both fields; `OuterHTML()` emits `<typstmath>` and `<typstmath_inline>` hidden tags; `TexConvertToTypstData()` is the sole public API for Typst (resets MathJax tag state before each conversion); `normalizeTypstSpaces` preserves line-leading indentation (`/(\S) {2,}/g`) |
