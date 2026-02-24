@@ -1225,8 +1225,18 @@ const mtable = () => {
           cells.push(cellData.typst.trim());
         }
         if (isEqnArray) {
-          // For equation arrays (align, gather, etc.), join cells with spaces
-          rows.push(cells.join(' '));
+          // Join cells with & alignment markers.
+          // Within each column pair (right-left): &
+          // Between column pairs: &quad for visual spacing.
+          const pairs: string[] = [];
+          for (let k = 0; k < cells.length; k += 2) {
+            if (k + 1 < cells.length) {
+              pairs.push(cells[k] + ' &' + cells[k + 1]);
+            } else {
+              pairs.push(cells[k]);
+            }
+          }
+          rows.push(pairs.join(' &quad '));
         } else if (isCases) {
           // Cases: escape top-level commas in each cell to prevent them
           // being parsed as cases() argument separators, then join with &

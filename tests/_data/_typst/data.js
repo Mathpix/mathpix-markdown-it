@@ -1041,8 +1041,14 @@ module.exports = [
   // === Equation arrays ===
   {
     latex: `\\begin{aligned} a &= b \\\\ c &= d \\end{aligned}`,
-    typst: `a = b \\\nc = d`,
-    typst_inline: `a = b \\\nc = d`,
+    typst: `a &= b \\\nc &= d`,
+    typst_inline: `a &= b \\\nc &= d`,
+  },
+  // Multi-column aligned (4 cells per row → pairs separated by &quad)
+  {
+    latex: `\\begin{aligned} 2x+3 &= 7 & 2x+3-3 &= 7-3 \\\\ 2x &= 4 & \\frac{2x}{2} &= \\frac{4}{2} \\end{aligned}`,
+    typst: `2 x + 3 &= 7 &quad 2 x + 3 - 3 &= 7 - 3 \\\n2 x &= 4 &quad frac(2 x, 2) &= frac(4, 2)`,
+    typst_inline: `2 x + 3 &= 7 &quad 2 x + 3 - 3 &= 7 - 3 \\\n2 x &= 4 &quad frac(2 x, 2) &= frac(4, 2)`,
   },
 
   // === Log with subscript ===
@@ -1388,13 +1394,13 @@ module.exports = [
   },
   {
     latex: `\\begin{align} a &= b \\tag{1} \\\\ c &= d \\tag{2} \\end{align}`,
-    typst: `#math.equation(block: true, numbering: n => [(1)], $ a = b $)\n#counter(math.equation).update(n => n - 1)\n#math.equation(block: true, numbering: n => [(2)], $ c = d $)\n#counter(math.equation).update(n => n - 1)`,
-    typst_inline: `a = b \\\nc = d`,
+    typst: `#math.equation(block: true, numbering: n => [(1)], $ a &= b $)\n#counter(math.equation).update(n => n - 1)\n#math.equation(block: true, numbering: n => [(2)], $ c &= d $)\n#counter(math.equation).update(n => n - 1)`,
+    typst_inline: `a &= b \\\nc &= d`,
   },
   {
     latex: `\\begin{align} x &= 1 \\tag{A} \\\\ y &= 2 \\tag{B} \\end{align}`,
-    typst: `#math.equation(block: true, numbering: n => [(A)], $ x = 1 $)\n#counter(math.equation).update(n => n - 1)\n#math.equation(block: true, numbering: n => [(B)], $ y = 2 $)\n#counter(math.equation).update(n => n - 1)`,
-    typst_inline: `x = 1 \\\ny = 2`,
+    typst: `#math.equation(block: true, numbering: n => [(A)], $ x &= 1 $)\n#counter(math.equation).update(n => n - 1)\n#math.equation(block: true, numbering: n => [(B)], $ y &= 2 $)\n#counter(math.equation).update(n => n - 1)`,
+    typst_inline: `x &= 1 \\\ny &= 2`,
   },
   {
     latex: `\\begin{equation*} S_{20} \\tag{1} \\end{equation*}`,
@@ -1408,18 +1414,18 @@ module.exports = [
   },
   {
     latex: `\\begin{equation} \\begin{split} a &= b+c \\\\ &= d \\end{split} \\end{equation}`,
-    typst: `#math.equation(block: true, numbering: "(1)", $ a = b + c \\\n = d $)`,
-    typst_inline: `a = b + c \\\n = d`,
+    typst: `#math.equation(block: true, numbering: "(1)", $ a &= b + c \\\n &= d $)`,
+    typst_inline: `a &= b + c \\\n &= d`,
   },
   {
     latex: `\\begin{align*} a &= b+c \\\\ &= d \\end{align*}`,
-    typst: `a = b + c \\\n = d`,
-    typst_inline: `a = b + c \\\n = d`,
+    typst: `a &= b + c \\\n &= d`,
+    typst_inline: `a &= b + c \\\n &= d`,
   },
   {
     latex: `\\begin{align} a &= b \\\\ c &= d \\nonumber \\end{align}`,
-    typst: `#math.equation(block: true, numbering: "(1)", $ a = b $)\n$ c = d $`,
-    typst_inline: `a = b \\\nc = d`,
+    typst: `#math.equation(block: true, numbering: "(1)", $ a &= b $)\n$ c &= d $`,
+    typst_inline: `a &= b \\\nc &= d`,
   },
   {
     latex: `\\begin{gather} x = 1 \\\\ y = 2 \\end{gather}`,
@@ -1435,8 +1441,8 @@ module.exports = [
   },
   {
     latex: `\\begin{align} a &= b \\label{eq:first} \\\\ c &= d \\label{eq:second} \\end{align}`,
-    typst: `#math.equation(block: true, supplement: none, numbering: "(1)", $ a = b $) <eq:first>\n#math.equation(block: true, supplement: none, numbering: "(1)", $ c = d $) <eq:second>`,
-    typst_inline: `a = b \\\nc = d`,
+    typst: `#math.equation(block: true, supplement: none, numbering: "(1)", $ a &= b $) <eq:first>\n#math.equation(block: true, supplement: none, numbering: "(1)", $ c &= d $) <eq:second>`,
+    typst_inline: `a &= b \\\nc &= d`,
   },
   // equation without label — no Typst label emitted
   {
@@ -1459,14 +1465,14 @@ module.exports = [
   // align: label on first row, \nonumber on second
   {
     latex: `\\begin{align} a &= b \\label{eq:a} \\\\ c &= d \\nonumber \\end{align}`,
-    typst: `#math.equation(block: true, supplement: none, numbering: "(1)", $ a = b $) <eq:a>\n$ c = d $`,
-    typst_inline: `a = b \\\nc = d`,
+    typst: `#math.equation(block: true, supplement: none, numbering: "(1)", $ a &= b $) <eq:a>\n$ c &= d $`,
+    typst_inline: `a &= b \\\nc &= d`,
   },
   // split inside equation with label
   {
     latex: `\\begin{equation} \\begin{split} a &= b+c \\\\ &= d \\end{split} \\label{eq:split} \\end{equation}`,
-    typst: `#math.equation(block: true, supplement: none, numbering: "(1)", $ a = b + c \\\n = d $) <eq:split>`,
-    typst_inline: `a = b + c \\\n = d`,
+    typst: `#math.equation(block: true, supplement: none, numbering: "(1)", $ a &= b + c \\\n &= d $) <eq:split>`,
+    typst_inline: `a &= b + c \\\n &= d`,
   },
   // numcases auto-numbered with labels
   {
