@@ -186,9 +186,26 @@ Built-in Typst math operators (`sin`, `cos`, `tan`, `log`, `lim`, etc.) pass thr
 | `\begin{bmatrix}` | `mat(delim: "[", ...)` |
 | `\begin{vmatrix}` | `mat(delim: "\|", ...)` |
 | `\begin{array}{c\|c}` | `mat(delim: #none, augment: #(vline: 1), ...)` |
+| `\begin{array}{ll}` | `mat(delim: #none, align: #left, ...)` (uniform non-center alignment) |
 | `\begin{aligned}` | Row-separated with `\` |
 | `\begin{cases}` | `cases(...)` |
 | `\begin{numcases}` | `#grid(...)` with `cases(...)` + numbering column |
+
+**Array column alignment:** `\begin{array}{lcr}` extracts the column spec. When all columns share the same non-center alignment, `align: #left` or `align: #right` is emitted. Mixed or all-center alignments omit the parameter (center is Typst's default).
+
+**Unpaired brackets in cells:** When `[`, `]`, `(`, `)`, `{`, `}` appear in a matrix or cases cell without a matching pair in the same cell (e.g., a bracket spanning across rows), the `replaceUnpairedBrackets()` helper replaces them with Typst symbol names (`bracket.l`, `paren.r`, `brace.l`, etc.) to avoid breaking `mat()`/`cases()` parsing. Paired brackets within the same cell, escaped brackets (`\[`), brackets inside function calls (`frac(...)`), and brackets inside quoted strings (`"..."`) are left unchanged. Applied in all three mtable branches: matrix, cases, and numcases.
+
+```
+LaTeX:  \begin{array}{lc} a & [ b + c \\ d & + e ] \end{array}
+Typst:  mat(delim: #none, a, bracket.l b + c; d, + e bracket.r)
+```
+
+**Spanning `\left...\right` inside `mat()`:** When `\left[...\right.` / `\left...\right]` produce one-sided delimiters inside a matrix, the `isInsideNonEqnArrayTable()` helper detects the mat()/cases() context and wraps the delimiter in `lr()` with backslash-escaping (`\[`, `\(`, `\{`) so bare ASCII chars don't break function-call syntax:
+
+```
+LaTeX:  \begin{array}{l} \left[ x \right. \\ \left. y \right] \end{array}
+Typst:  mat(delim: #none, align: #left, lr(\[ x); lr(y \]))
+```
 
 ### Equation tags and numbering
 
