@@ -160,7 +160,7 @@ Standard arrows (`\rightarrow` → `arrow.r`, `\Leftrightarrow` → `arrow.l.r.d
 
 ### Named functions
 
-Built-in Typst math operators (`sin`, `cos`, `tan`, `log`, `lim`, etc.) pass through directly. Custom operators via `\operatorname{name}` → `op("name")`, with `limits: #true` when used with limits placement. Multi-word operators from `mo` nodes (e.g. `\injlim` → `op("inj lim")`, `\projlim` → `op("proj lim")`) are also detected and wrapped; thin Unicode spaces in operator names are normalized to regular spaces.
+Built-in Typst math operators (`sin`, `cos`, `tan`, `log`, `lim`, etc.) pass through directly. Multi-word operators (`\limsup` → `limsup`, `\liminf` → `liminf`) are mapped from MathJax's thin-space form to Typst built-ins via `MATHJAX_MULTIWORD_OPS`. Custom operators via `\operatorname{name}` → `op("name")`; custom `mo` operators (e.g. `\injlim` → `op("inj lim")`, `\projlim` → `op("proj lim")`) emit bare `op()` without `limits: #true` — the parent handler (`munderover`/`munder`/`mover`) decides placement via `movablelimits`. Thin Unicode spaces in operator names are normalized to regular spaces.
 
 ### Delimiters
 
@@ -308,6 +308,37 @@ Note: the comma inside `lr(( t_n, x^n ))` is at depth 2 and preserved as-is, whi
 ### Large operators and integrals
 
 `\sum` → `sum`, `\prod` → `product`, `\int` → `integral`, `\oint` → `integral.cont`, `\iint` → `integral.double`, etc. Limits placement via `_` and `^` for native operators, `limits()` wrapper for non-native bases.
+
+### Limits / nolimits placement
+
+LaTeX supports three limit-placement modes: **default** (operator decides), **`\limits`** (force below/above), and **`\nolimits`** (force side). The serializer detects these via the MathML `movablelimits` attribute on the base `mo` node:
+
+| `movablelimits` | Meaning | Typst output |
+|-----------------|---------|-------------|
+| `true` | Default placement (operator decides) | `limsup_(i=1)^n` / `op("inj lim", limits: #true)_(i=1)^n` |
+| `false` | Explicit `\limits` | `limits(limsup)_(i=1)^n` / `limits(op("proj lim"))_(i=1)^n` |
+| absent (non-`mo` base) | Inferred from context | Uses `TYPST_NATIVE_LIMIT_OPS` set |
+
+For `\nolimits`, MathJax produces `msubsup`/`msub`/`msup` instead of `munderover`/`munder`/`mover`. The `needsScriptsWrapper()` helper detects known display-limit operators (`sum`, `lim`, `limsup`, etc.) in these contexts and wraps them in `scripts()`:
+
+| LaTeX | Typst |
+|-------|-------|
+| `\sum_{i=1}^n` | `sum_(i = 1)^n` |
+| `\sum\limits_{i=1}^n` | `limits(sum)_(i = 1)^n` |
+| `\sum\nolimits_{i=1}^n` | `scripts(sum)_(i = 1)^n` |
+| `\limsup_{i=1}^n` | `limsup_(i = 1)^n` |
+| `\limsup\limits_{i=1}^n` | `limits(limsup)_(i = 1)^n` |
+| `\limsup\nolimits_{i=1}^n` | `scripts(limsup)_(i = 1)^n` |
+| `\projlim_{i=1}^n` | `op("proj lim", limits: #true)_(i = 1)^n` |
+| `\projlim\limits_{i=1}^n` | `limits(op("proj lim"))_(i = 1)^n` |
+| `\projlim\nolimits_{i=1}^n` | `op("proj lim")_(i = 1)^n` |
+
+Multi-word operators (`\limsup` → `limsup`, `\liminf` → `liminf`) are mapped via `MATHJAX_MULTIWORD_OPS` from their thin-space-separated MathJax form ("lim⁠sup") to Typst built-ins.
+
+**Known limitations:**
+- Category 4 operators (`\cos`, `\sin`, etc.) with `\limits`: MathJax produces `mi` (not `mo`) for the base, so `movablelimits` cannot be detected — `\cos\limits_{i=1}^n` outputs `cos_(i=1)^n` instead of `limits(cos)_(i=1)^n`
+- `\oint\limits` causes a MathJax error ("\\limits is allowed only on operators")
+- `\varliminf`/`\varlimsup` with `\limits`: the accent handler produces `underline(lim)`/`overline(lim)` which bypasses limit-placement wrapping
 
 ### Scripts with prescripts
 
