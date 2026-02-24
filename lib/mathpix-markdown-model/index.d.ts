@@ -222,10 +222,7 @@ declare class MathpixMarkdown_Model {
     };
     markdownToHTMLSegments: (markdown: string, options?: TMarkdownItOptions) => {
         content: string;
-        map: [
-            number,
-            number
-        ][];
+        map: [number, number][];
     };
     markdownToHTML: (markdown: string, options?: TMarkdownItOptions) => string;
     showTocInContainer: (html: string, containerName?: string) => void;

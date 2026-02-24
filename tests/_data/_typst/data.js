@@ -1589,8 +1589,8 @@ module.exports = [
   // cases via array with commas in cells (commas must be escaped)
   {
     latex: `f ( x ) = \\left\\{ \\begin{array} { l l } { x ^ { 2} + 1,} & { x > 1} \\\\ { 1,} & { x = 1} \\\\ { x + 1,} & { x < 1} \\end{array} \\right.`,
-    typst: `f(x) = cases(x^2 + 1"," & x > 1, 1"," & x = 1, x + 1"," & x < 1)`,
-    typst_inline: `f(x) = cases(x^2 + 1"," & x > 1, 1"," & x = 1, x + 1"," & x < 1)`,
+    typst: `f(x) = cases(\n  x^2 + 1"," & x > 1,\n  1"," & x = 1,\n  x + 1"," & x < 1,\n)`,
+    typst_inline: `f(x) = cases(\n  x^2 + 1"," & x > 1,\n  1"," & x = 1,\n  x + 1"," & x < 1,\n)`,
   },
   // numcases with empty prefix and explicit \tag (processed by MathJax as real tags)
   {

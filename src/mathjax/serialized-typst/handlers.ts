@@ -1274,7 +1274,12 @@ const mtable = () => {
           }
         }
 
-        const casesContent = 'cases(' + caseRows.join(', ') + ')';
+        let casesContent: string;
+        if (caseRows.length >= 3) {
+          casesContent = 'cases(\n  ' + caseRows.join(',\n  ') + ',\n)';
+        } else {
+          casesContent = 'cases(' + caseRows.join(', ') + ')';
+        }
         const mathContent = prefix ? prefix + ' ' + casesContent : casesContent;
 
         // Build tag entries for numbering column
@@ -1404,10 +1409,21 @@ const mtable = () => {
         }
       } else if (isCases) {
         // Cases environment
-        res = addToTypstData(res, { typst: 'cases(' + rows.join(', ') + ')' });
+        let casesBody: string;
+        if (rows.length >= 3) {
+          casesBody = 'cases(\n  ' + rows.join(',\n  ') + ',\n)';
+        } else {
+          casesBody = 'cases(' + rows.join(', ') + ')';
+        }
+        res = addToTypstData(res, { typst: casesBody });
       } else {
         // Matrix: mat(delim: ..., a, b; c, d)
-        let matContent = rows.join('; ');
+        let matContent: string;
+        if (rows.length >= 3) {
+          matContent = '\n  ' + rows.join(';\n  ') + ',\n';
+        } else {
+          matContent = rows.join('; ');
+        }
 
         // Parse array line attributes for augment parameter
         const columnlines = node.attributes.isSet('columnlines')
