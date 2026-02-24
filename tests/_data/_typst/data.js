@@ -162,7 +162,9 @@ module.exports = [
   { latex: `\\underset{a}{}`, typst: `limits("")_a`, typst_inline: `limits("")_a` },
   { latex: `\\overset{b}{}`, typst: `limits("")^b`, typst_inline: `limits("")^b` },
   // === Negative thin space (\!) skipped — not valid in Typst ===
+  { latex: `\\idotsint_{i=1}^{n}`, typst: `lr(integral dots.c integral)_(i = 1)^n`, typst_inline: `lr(integral dots.c integral)_(i = 1)^n` },
   { latex: `\\idotsint\\limits_{i=1}^{n}`, typst: `limits(integral dots.c integral)_(i = 1)^n`, typst_inline: `limits(integral dots.c integral)_(i = 1)^n` },
+  { latex: `\\idotsint\\nolimits_{i=1}^{n}`, typst: `lr(integral dots.c integral)_(i = 1)^n`, typst_inline: `lr(integral dots.c integral)_(i = 1)^n` },
   // === Limits / nolimits placement ===
   // Known Typst operators: default, \limits, \nolimits
   { latex: `\\limsup_{i=1}^n`, typst: `limsup_(i = 1)^n`, typst_inline: `limsup_(i = 1)^n` },
@@ -173,10 +175,46 @@ module.exports = [
   { latex: `\\lim\\limits_{x\\to 0}`, typst: `limits(lim)_(x arrow.r 0)`, typst_inline: `limits(lim)_(x arrow.r 0)` },
   { latex: `\\lim\\nolimits_{x\\to 0}`, typst: `scripts(lim)_(x arrow.r 0)`, typst_inline: `scripts(lim)_(x arrow.r 0)` },
   // Custom named operators: default, \limits, \nolimits
-  { latex: `\\injlim_{i=1}^n`, typst: `op("inj lim", limits: #true)_(i = 1)^n`, typst_inline: `op("inj lim", limits: #true)_(i = 1)^n` },
-  { latex: `\\projlim_{i=1}^n`, typst: `op("proj lim", limits: #true)_(i = 1)^n`, typst_inline: `op("proj lim", limits: #true)_(i = 1)^n` },
+  { latex: `\\injlim_{i=1}^n`, typst: `op("inj lim", limits: #true)_(i = 1)^n`, typst_inline: `op("inj lim")_(i = 1)^n` },
+  { latex: `\\projlim_{i=1}^n`, typst: `op("proj lim", limits: #true)_(i = 1)^n`, typst_inline: `op("proj lim")_(i = 1)^n` },
   { latex: `\\projlim\\limits_{i=1}^n`, typst: `limits(op("proj lim"))_(i = 1)^n`, typst_inline: `limits(op("proj lim"))_(i = 1)^n` },
   { latex: `\\projlim\\nolimits_{i=1}^n`, typst: `op("proj lim")_(i = 1)^n`, typst_inline: `op("proj lim")_(i = 1)^n` },
+  // \intop: integral with movablelimits (above/below in display, side in inline)
+  { latex: `\\intop_{i=1}^n`, typst: `limits(integral)_(i = 1)^n`, typst_inline: `integral_(i = 1)^n` },
+  { latex: `\\intop\\limits_{i=1}^n`, typst: `limits(integral)_(i = 1)^n`, typst_inline: `limits(integral)_(i = 1)^n` },
+  { latex: `\\intop\\nolimits_{i=1}^n`, typst: `integral_(i = 1)^n`, typst_inline: `integral_(i = 1)^n` },
+  // \varinjlim / \varprojlim: unified with \injlim / \projlim — same op() with limits: #true
+  { latex: `\\varinjlim_{i=1}^n`, typst: `op("inj lim", limits: #true)_(i = 1)^n`, typst_inline: `op("inj lim")_(i = 1)^n` },
+  { latex: `\\varinjlim\\nolimits_{i=1}^n`, typst: `op("inj lim")_(i = 1)^n`, typst_inline: `op("inj lim")_(i = 1)^n` },
+  { latex: `\\varprojlim_{i=1}^n`, typst: `op("proj lim", limits: #true)_(i = 1)^n`, typst_inline: `op("proj lim")_(i = 1)^n` },
+  // \varliminf / \varlimsup: preserve underline/overline decoration in op(), same limits: #true pattern
+  { latex: `\\varliminf_{i=1}^n`, typst: `op(underline(lim), limits: #true)_(i = 1)^n`, typst_inline: `op(underline(lim))_(i = 1)^n` },
+  { latex: `\\varliminf\\nolimits_{i=1}^n`, typst: `op(underline(lim))_(i = 1)^n`, typst_inline: `op(underline(lim))_(i = 1)^n` },
+  { latex: `\\varlimsup_{i=1}^n`, typst: `op(overline(lim), limits: #true)_(i = 1)^n`, typst_inline: `op(overline(lim))_(i = 1)^n` },
+  { latex: `\\varlimsup\\nolimits_{i=1}^n`, typst: `op(overline(lim))_(i = 1)^n`, typst_inline: `op(overline(lim))_(i = 1)^n` },
+  // Trig/function operators: \limits forces above/below via limits() wrapper
+  { latex: `\\arccos\\limits_{i=1}^n`, typst: `limits(arccos)_(i = 1)^n`, typst_inline: `limits(arccos)_(i = 1)^n` },
+  { latex: `\\arcsin\\limits_{i=1}^n`, typst: `limits(arcsin)_(i = 1)^n`, typst_inline: `limits(arcsin)_(i = 1)^n` },
+  { latex: `\\arctan\\limits_{i=1}^n`, typst: `limits(arctan)_(i = 1)^n`, typst_inline: `limits(arctan)_(i = 1)^n` },
+  { latex: `\\arg\\limits_{i=1}^n`, typst: `limits(arg)_(i = 1)^n`, typst_inline: `limits(arg)_(i = 1)^n` },
+  { latex: `\\cos\\limits_{i=1}^n`, typst: `limits(cos)_(i = 1)^n`, typst_inline: `limits(cos)_(i = 1)^n` },
+  { latex: `\\sin\\limits_{i=1}^n`, typst: `limits(sin)_(i = 1)^n`, typst_inline: `limits(sin)_(i = 1)^n` },
+  { latex: `\\tan\\limits_{i=1}^n`, typst: `limits(tan)_(i = 1)^n`, typst_inline: `limits(tan)_(i = 1)^n` },
+  { latex: `\\sec\\limits_{i=1}^n`, typst: `limits(sec)_(i = 1)^n`, typst_inline: `limits(sec)_(i = 1)^n` },
+  { latex: `\\cot\\limits_{i=1}^n`, typst: `limits(cot)_(i = 1)^n`, typst_inline: `limits(cot)_(i = 1)^n` },
+  { latex: `\\csc\\limits_{i=1}^n`, typst: `limits(csc)_(i = 1)^n`, typst_inline: `limits(csc)_(i = 1)^n` },
+  { latex: `\\cosh\\limits_{i=1}^n`, typst: `limits(cosh)_(i = 1)^n`, typst_inline: `limits(cosh)_(i = 1)^n` },
+  { latex: `\\sinh\\limits_{i=1}^n`, typst: `limits(sinh)_(i = 1)^n`, typst_inline: `limits(sinh)_(i = 1)^n` },
+  { latex: `\\tanh\\limits_{i=1}^n`, typst: `limits(tanh)_(i = 1)^n`, typst_inline: `limits(tanh)_(i = 1)^n` },
+  { latex: `\\coth\\limits_{i=1}^n`, typst: `limits(coth)_(i = 1)^n`, typst_inline: `limits(coth)_(i = 1)^n` },
+  { latex: `\\deg\\limits_{i=1}^n`, typst: `limits(deg)_(i = 1)^n`, typst_inline: `limits(deg)_(i = 1)^n` },
+  { latex: `\\dim\\limits_{i=1}^n`, typst: `limits(dim)_(i = 1)^n`, typst_inline: `limits(dim)_(i = 1)^n` },
+  { latex: `\\exp\\limits_{i=1}^n`, typst: `limits(exp)_(i = 1)^n`, typst_inline: `limits(exp)_(i = 1)^n` },
+  { latex: `\\hom\\limits_{i=1}^n`, typst: `limits(hom)_(i = 1)^n`, typst_inline: `limits(hom)_(i = 1)^n` },
+  { latex: `\\ker\\limits_{i=1}^n`, typst: `limits(ker)_(i = 1)^n`, typst_inline: `limits(ker)_(i = 1)^n` },
+  { latex: `\\lg\\limits_{i=1}^n`, typst: `limits(lg)_(i = 1)^n`, typst_inline: `limits(lg)_(i = 1)^n` },
+  { latex: `\\ln\\limits_{i=1}^n`, typst: `limits(ln)_(i = 1)^n`, typst_inline: `limits(ln)_(i = 1)^n` },
+  { latex: `\\log\\limits_{i=1}^n`, typst: `limits(log)_(i = 1)^n`, typst_inline: `limits(log)_(i = 1)^n` },
   // === Dollar sign and thousand separators ===
   {
     latex: `\\$ 120,000`,
@@ -1136,6 +1174,11 @@ module.exports = [
   // === Delimiter optimizations ===
   {
     latex: `\\left|x\\right|`,
+    typst: `abs(x)`,
+    typst_inline: `abs(x)`,
+  },
+  {
+    latex: `\\left\\|x\\right\\|`,
     typst: `norm(x)`,
     typst_inline: `norm(x)`,
   },

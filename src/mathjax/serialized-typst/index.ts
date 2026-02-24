@@ -1,7 +1,7 @@
 import { MmlVisitor } from 'mathjax-full/js/core/MmlTree/MmlVisitor.js';
 import { MmlNode, TextNode, XMLNode, TEXCLASS } from 'mathjax-full/js/core/MmlTree/MmlNode.js';
 import { handle } from './handlers';
-import { ITypstData, addToTypstData, addSpaceToTypstData, initTypstData, isThousandSepComma } from './common';
+import { ITypstData, addToTypstData, addSpaceToTypstData, initTypstData, isThousandSepComma, needsParens, needsTokenSeparator } from './common';
 import { findTypstSymbol } from './typst-symbol-map';
 
 // Extract big delimiter info from a TeXAtom node wrapping a sized mo.
@@ -49,6 +49,9 @@ const getDelimiterChar = (node: any): string | null => {
     return null;
   }
 };
+
+// Node kinds that carry sub/sup scripts (used in \idotsint pattern detection).
+const SCRIPT_KINDS: Set<string> = new Set(['msubsup', 'msub', 'msup']);
 
 // Map of opening delimiter char → expected close char + Typst output format.
 const BARE_DELIM_PAIRS: Record<string, { close: string; typstOpen: string; typstClose: string }> = {
@@ -119,9 +122,7 @@ export class SerializedTypstVisitor extends MmlVisitor {
             let content = '';
             for (let k = j + 1; k < closeIdx; k++) {
               const innerData: ITypstData = this.visitNode(node.childNodes[k], space);
-              if (content && innerData.typst
-                && /^[\w."]/.test(innerData.typst)
-                && !/[\s({[,|]$/.test(content)) {
+              if (needsTokenSeparator(content, innerData.typst)) {
                 content += ' ';
               }
               content += innerData.typst;
@@ -131,8 +132,7 @@ export class SerializedTypstVisitor extends MmlVisitor {
             const lrContent = openDelim + ' ' + content.trim() + ' ' + closeDelim;
             const lrExpr = 'lr(size: #' + openInfo.size + ', ' + lrContent + ')';
             // Add spacing before lr if needed
-            if (res.typst && /^[\w.]/.test(lrExpr)
-              && !/[\s({[,|]$/.test(res.typst)) {
+            if (needsTokenSeparator(res.typst, lrExpr)) {
               addSpaceToTypstData(res);
             }
             res = addToTypstData(res, { typst: lrExpr });
@@ -158,16 +158,13 @@ export class SerializedTypstVisitor extends MmlVisitor {
             let content = '';
             for (let k = j + 1; k < closeIdx; k++) {
               const innerData: ITypstData = this.visitNode(node.childNodes[k], space);
-              if (content && innerData.typst
-                && /^[\w."]/.test(innerData.typst)
-                && !/[\s({[,|]$/.test(content)) {
+              if (needsTokenSeparator(content, innerData.typst)) {
                 content += ' ';
               }
               content += innerData.typst;
             }
             const delimExpr = delimPair.typstOpen + content.trim() + delimPair.typstClose;
-            if (res.typst && /^[\w."]/.test(delimExpr)
-              && !/[\s({[,|]$/.test(res.typst)) {
+            if (needsTokenSeparator(res.typst, delimExpr)) {
               addSpaceToTypstData(res);
             }
             res = addToTypstData(res, { typst: delimExpr });
@@ -175,13 +172,65 @@ export class SerializedTypstVisitor extends MmlVisitor {
             continue;
           }
         }
+        // Detect \idotsint pattern: mo(∫) mo(⋯) msubsup/msub/msup(mo(∫), ...)
+        // Group as lr(integral dots.c integral)_(sub)^(sup)
+        if (child?.kind === 'mo' && (child?.childNodes?.[0] as any)?.text === '\u222B') {
+          const next1: any = node.childNodes[j + 1];
+          const next2: any = node.childNodes[j + 2];
+          if (next1?.kind === 'mo' && next1?.childNodes?.[0]?.text === '\u22EF' && next2) {
+            const scriptBase = next2.childNodes?.[0];
+            if (SCRIPT_KINDS.has(next2.kind)
+              && scriptBase?.kind === 'mo'
+              && scriptBase?.childNodes?.[0]?.text === '\u222B') {
+              // Serialize the three base parts
+              const part1: ITypstData = this.visitNode(child, space);
+              const part2: ITypstData = this.visitNode(next1, space);
+              const part3 = findTypstSymbol('\u222B'); // integral
+              // Build base: "integral dots.c integral"
+              let baseContent = part1.typst;
+              if (needsTokenSeparator(baseContent, part2.typst)) {
+                baseContent += ' ';
+              }
+              baseContent += part2.typst;
+              if (needsTokenSeparator(baseContent, part3)) {
+                baseContent += ' ';
+              }
+              baseContent += part3;
+              const lrExpr = 'lr(' + baseContent.trim() + ')';
+              // Add spacing before lr if needed
+              if (needsTokenSeparator(res.typst, lrExpr)) {
+                addSpaceToTypstData(res);
+              }
+              res = addToTypstData(res, { typst: lrExpr });
+              // Add scripts from the scripted node (sub at childNodes[1], sup at childNodes[2] for msubsup;
+              // single script at childNodes[1] for msub/msup)
+              const subChild = next2.kind !== 'msup' ? next2.childNodes[1] : null;
+              const supChild = next2.kind === 'msubsup' ? next2.childNodes[2]
+                             : next2.kind === 'msup' ? next2.childNodes[1] : null;
+              if (subChild) {
+                const sub = this.visitNode(subChild, space).typst.trim();
+                if (sub) {
+                  res = addToTypstData(res, { typst: '_' });
+                  res = addToTypstData(res, { typst: needsParens(sub) ? '(' + sub + ')' : sub });
+                }
+              }
+              if (supChild) {
+                const sup = this.visitNode(supChild, space).typst.trim();
+                if (sup) {
+                  res = addToTypstData(res, { typst: '^' });
+                  res = addToTypstData(res, { typst: needsParens(sup) ? '(' + sup + ')' : sup });
+                }
+              }
+              j += 3;
+              continue;
+            }
+          }
+        }
         // Detect thousand-separator pattern: mn, mo(,), mn(3 digits)
         // e.g. 120,000 → 120","000 (comma escaped so Typst doesn't treat it as separator)
         if (isThousandSepComma(node, j)) {
           const numData: ITypstData = this.visitNode(child, space);
-          if (res.typst && numData.typst
-            && /^[\w."]/.test(numData.typst)
-            && !/[\s({[,|]$/.test(res.typst)) {
+          if (needsTokenSeparator(res.typst, numData.typst)) {
             addSpaceToTypstData(res);
           }
           const nextData: ITypstData = this.visitNode(node.childNodes[j + 2], space);
@@ -191,11 +240,7 @@ export class SerializedTypstVisitor extends MmlVisitor {
         }
         // Normal processing
         const data: ITypstData = this.visitNode(child, space);
-        // Insert space between adjacent children when needed for Typst parsing:
-        // word chars, dots, and quoted strings all need separation
-        if (res.typst && data.typst
-          && /^[\w."]/.test(data.typst)
-          && !/[\s({[,|]$/.test(res.typst)) {
+        if (needsTokenSeparator(res.typst, data.typst)) {
           addSpaceToTypstData(res);
         }
         res = addToTypstData(res, data);

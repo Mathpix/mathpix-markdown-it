@@ -45,6 +45,15 @@ export const isThousandSepComma = (node: any, i: number): boolean => {
   }
 };
 
+/** Check if a space separator is needed between two adjacent Typst tokens.
+ *  Returns true when `next` starts with a word/dot/quote character
+ *  and `prev` doesn't end with a natural separator (whitespace, open paren, etc.). */
+export const needsTokenSeparator = (prev: string, next: string): boolean => {
+  return !!prev && !!next
+    && /^[\w."]/.test(next)
+    && !/[\s({[,|]$/.test(prev);
+};
+
 export const needsParens = (s: string): boolean => {
   // In Typst, sub/superscript grouping always uses (): x^(content), x_(content)
   // Even if the content itself starts/ends with () — those are literal, not grouping.
