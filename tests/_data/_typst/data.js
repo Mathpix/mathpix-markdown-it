@@ -161,6 +161,11 @@ module.exports = [
   // === Empty content: munderover, mmultiscripts, mn with font ===
   { latex: `\\underset{a}{}`, typst: `limits("")_a`, typst_inline: `limits("")_a` },
   { latex: `\\overset{b}{}`, typst: `limits("")^b`, typst_inline: `limits("")^b` },
+  // === Negative thin space (\!) skipped — not valid in Typst ===
+  { latex: `\\idotsint\\limits_{i=1}^{n}`, typst: `limits(integral dots.c integral)_(i = 1)^n`, typst_inline: `limits(integral dots.c integral)_(i = 1)^n` },
+  // === Custom named operators via mo (e.g. \injlim, \projlim) ===
+  { latex: `\\injlim_{i=1}^n`, typst: `op("inj lim", limits: #true)_(i = 1)^n`, typst_inline: `op("inj lim", limits: #true)_(i = 1)^n` },
+  { latex: `\\projlim_{i=1}^n`, typst: `op("proj lim", limits: #true)_(i = 1)^n`, typst_inline: `op("proj lim", limits: #true)_(i = 1)^n` },
   // === Dollar sign and thousand separators ===
   {
     latex: `\\$ 120,000`,

@@ -262,6 +262,19 @@ const mo = () => {
         return res;
       }
       const typstValue: string = findTypstSymbol(value);
+      // Detect custom named operators (e.g. \injlim → "inj lim", \projlim → "proj lim")
+      if (value.length > 1 && /^\w/.test(value) && !typstSymbolMap.has(value) && !TYPST_MATH_OPERATORS.has(value)) {
+        // Normalize thin/non-breaking spaces to regular spaces for clean output
+        const opName = value.replace(/[\u2006\u2005\u2004\u2009\u200A\u00A0]/g, ' ');
+        const parentKind = node.parent?.kind;
+        const isLimits = parentKind === 'munder' || parentKind === 'mover' || parentKind === 'munderover';
+        if (isLimits) {
+          res = addToTypstData(res, { typst: 'op("' + opName + '", limits: #true)' });
+        } else {
+          res = addToTypstData(res, { typst: 'op("' + opName + '")' });
+        }
+        return res;
+      }
       // Check if this operator is inside sub/sup/munderover — no spacing there
       const parentKind = node.parent?.kind;
       const inScript = parentKind === 'msub' || parentKind === 'msup'
@@ -828,8 +841,8 @@ const mspace = () => {
         // \, → thinmathspace
         res = addToTypstData(res, { typst: ' thin ' });
       } else if (width === '-0.1667em' || width === '-0.167em') {
-        // \! → negative thin space
-        res = addToTypstData(res, { typst: ' negthin ' });
+        // \! → negative thin space — skip (Typst has no negthin; this is a LaTeX spacing hack)
+        return res;
       } else if (width === '0.2222em' || width === '0.222em') {
         // \: → mediummathspace
         res = addToTypstData(res, { typst: ' med ' });
