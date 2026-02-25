@@ -191,6 +191,14 @@ Built-in Typst math operators (`sin`, `cos`, `tan`, `log`, `lim`, etc.) pass thr
 
 **Separator-safe fallback for shorthand functions:** `abs()`, `norm()`, `floor()`, `ceil()` accept exactly one argument. If the delimited content contains a top-level `,` or `;` (detected by `hasTopLevelSeparators()`), these would be misinterpreted as argument/row separators inside the function call. In such cases, the serializer falls back to `lr()` with explicit delimiter characters (`lr(| ... |)`, `lr(‖ ... ‖)`, `lr(⌊ ... ⌋)`, `lr(⌈ ... ⌉)`), where commas just separate content fragments without breaking semantics. Characters inside nested parentheses/brackets are not counted.
 
+**Semicolon escaping inside `lr()`:** Even after falling back to `lr()`, semicolons remain dangerous — Typst interprets `;` inside any function call as a row separator (like in `mat()`). The `escapeLrSemicolons()` helper replaces top-level `;` with `";"` (Typst text literal) inside all `lr()` calls: shorthand fallbacks, the general `lr()` path, and one-sided delimiter wrapping. Commas are safe in `lr()` since it accepts `..content` (variadic) — they just separate content fragments that get concatenated.
+
+| LaTeX | Typst |
+|-------|-------|
+| `\left\lfloor a ; b \right\rfloor` | `lr(⌊ a";" b ⌋)` |
+| `\left\| a ; b \right\|` | `lr(‖ a";" b ‖)` |
+| `\left( a ; b \right)` | `lr(( a";" b ))` |
+
 ### Matrices and equation arrays
 
 | LaTeX | Typst |
