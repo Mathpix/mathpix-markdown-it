@@ -1911,4 +1911,15 @@ module.exports = [
     typst: `\\√ 123`,
     typst_inline: `\\√ 123`,
   },
+  // === lcm: \enclose{bottom} with \smash{)} prefix — stripped to ")" with no space ===
+  {
+    latex: `1 2 \\lcm{24}`,
+    typst: `1 2 underline(")"24)`,
+    typst_inline: `1 2 underline(")"24)`,
+  },
+  {
+    latex: `\\lcm{x+y}`,
+    typst: `underline(")"x + y)`,
+    typst_inline: `underline(")"x + y)`,
+  },
 ];

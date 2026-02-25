@@ -1156,6 +1156,26 @@ const escapeLrSemicolons = (expr: string): string => {
   return result;
 };
 
+/**
+ * Escape unbalanced closing parentheses in content that will be wrapped
+ * in a function call like `func(content)`, to prevent premature closure.
+ * E.g. content `) 24` becomes `")" 24` so `underline(")" 24)` is valid.
+ */
+const escapeUnbalancedParens = (content: string): string => {
+  let depth = 0;
+  let result = '';
+  for (let i = 0; i < content.length; i++) {
+    const ch = content[i];
+    if (ch === '(') { depth++; result += ch; }
+    else if (ch === ')') {
+      if (depth > 0) { depth--; result += ch; }
+      else { result += '")"'; }
+    }
+    else { result += ch; }
+  }
+  return result;
+};
+
 const BRACKET_SYMBOL_MAP: Record<string, string> = {
   '[': 'bracket.l',
   ']': 'bracket.r',
@@ -1877,19 +1897,25 @@ const menclose = () => {
         res = addToTypstData(res, { typst: 'cancel(' + content + ')' });
       } else if (notation.indexOf('longdiv') > -1) {
         // \longdiv / \enclose{longdiv} → overline(")" content)
-        res = addToTypstData(res, { typst: 'overline(")"' + content + ')' });
+        res = addToTypstData(res, { typst: 'overline(")"' + escapeUnbalancedParens(content) + ')' });
       } else if (notation.indexOf('circle') > -1) {
         // \enclose{circle} → #circle with inset
         res = addToTypstData(res, { typst: '#circle(inset: 3pt, $' + content + '$)', typst_inline: content });
       } else if (notation.indexOf('radical') > -1) {
         // \enclose{radical} → sqrt()
-        res = addToTypstData(res, { typst: 'sqrt(' + content + ')' });
+        res = addToTypstData(res, { typst: 'sqrt(' + escapeUnbalancedParens(content) + ')' });
       } else if (notation.indexOf('top') > -1) {
         // \enclose{top} → overline()
-        res = addToTypstData(res, { typst: 'overline(' + content + ')' });
+        res = addToTypstData(res, { typst: 'overline(' + escapeUnbalancedParens(content) + ')' });
       } else if (notation.indexOf('bottom') > -1) {
         // \enclose{bottom} → underline()
-        res = addToTypstData(res, { typst: 'underline(' + content + ')' });
+        // Detect \smash{)} prefix (used in \lcm macro): strip leading ), trailing spacing, no space
+        if (content.startsWith(')')) {
+          let inner = content.slice(1).trim().replace(/\s+(?:med|thin|thick|quad)$/, '');
+          res = addToTypstData(res, { typst: 'underline(")"' + inner + ')' });
+        } else {
+          res = addToTypstData(res, { typst: 'underline(' + escapeUnbalancedParens(content) + ')' });
+        }
       } else {
         // Unknown notation: pass through content
         res = addToTypstData(res, data);

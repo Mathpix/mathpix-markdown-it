@@ -215,6 +215,8 @@ Built-in Typst math operators (`sin`, `cos`, `tan`, `log`, `lim`, etc.) pass thr
 | `\left\| a ; b \right\|` | `lr(‖ a";" b ‖)` |
 | `\left( a ; b \right)` | `lr(( a";" b ))` |
 
+**Unbalanced parenthesis escaping in `menclose` wrappers:** When serialized child content contains unbalanced `)` characters (e.g. from `\smash{)}` inside `\lcm`), they would prematurely close the wrapping function call (`underline(...)`, `overline(...)`, `sqrt(...)`, etc.). The `escapeUnbalancedParens()` helper tracks parenthesis depth and replaces any `)` at depth 0 with `")"` (Typst string literal). Applied to all `menclose` branches that wrap content: `bottom`, `top`, `radical`, `longdiv`.
+
 ### Matrices and equation arrays
 
 | LaTeX | Typst |
@@ -469,6 +471,7 @@ In Typst, `underbrace` and `overbrace` take annotations as a second argument: `u
 | `\enclose{radical}{x+y}` | `sqrt(x + y)` |
 | `\enclose{top}{x+y}` | `overline(x + y)` |
 | `\enclose{bottom}{x+y}` | `underline(x + y)` |
+| `\lcm{24}` | `underline(")"24)` (macro expands to `\enclose{bottom}{\smash{)}{24}\:}`; leading `)` from `\smash` → `")"`, trailing `med` from `\:` stripped, no space for tight rendering) |
 | `\color{red}{x}` | `#text(fill: red)[x]` |
 | `\phantom{x}` | `#hide($x$)` (preserves dimensions) |
 | `\hphantom{x}` | `#hide($x$)` (same — Typst hide preserves full box) |
