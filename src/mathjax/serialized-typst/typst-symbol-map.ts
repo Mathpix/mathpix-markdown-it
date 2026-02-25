@@ -169,6 +169,7 @@ const arrows: ReadonlyArray<[string, string]> = [
   ["\u2196", "arrow.tl"],             // ↖
   ["\u21C0", "harpoon.rt"],           // ⇀
   ["\u21BC", "harpoon.lt"],           // ↼
+  ["\u219E", "arrow.l.twohead"],      // ↞
   ["\u21A0", "arrow.r.twohead"],      // ↠
   ["\u21A3", "arrow.r.tail"],         // ↣
   ["\u2916", "arrow.r.twohead.tail"], // ⤖

@@ -624,9 +624,48 @@ const getMovablelimits = (node: any): boolean | undefined => {
 
 /** Build limit-placement base for munderover/munder/mover handlers.
  *  Returns ITypstData with potentially different block/inline bases for movablelimits. */
+/**
+ * Symbols that should use stretch() instead of limits() when used as the base
+ * of mover/munder/munderover — extensible arrows, harpoons, and equal sign.
+ * stretch() makes the symbol grow to fit its annotations, matching LaTeX's
+ * \xrightarrow, \xleftarrow, \xlongequal, etc.
+ */
+const STRETCH_BASE_SYMBOLS: Set<string> = new Set([
+  'arrow.r', 'arrow.l', 'arrow.l.r',
+  'arrow.r.twohead', 'arrow.l.twohead',
+  'arrow.r.bar',                       // \xmapsto
+  'arrow.r.hook', 'arrow.l.hook',      // \xhookrightarrow, \xhookleftarrow
+  'arrow.r.double', 'arrow.l.double', 'arrow.l.r.double',
+  'harpoon.rt', 'harpoon.lb',          // \xrightharpoonup, \xleftharpoondown
+  'harpoons.rtlb', 'harpoons.ltrb',    // \xrightleftharpoons, \xleftrightharpoons
+  'arrows.rr',                         // \xtofrom
+  '=',                                 // \xlongequal
+]);
+
 const buildLimitBase = (firstChild: any, baseTrimmed: string, base: string): ITypstData => {
   const movablelimits = getMovablelimits(firstChild);
   const baseIsCustomOp = /^op\(/.test(baseTrimmed);
+  // Extensible arrows/symbols: MathJax sets stretchy=true on the base mo.
+  // Use stretch() for these (e.g. \xrightarrow), limits() for stacking (\stackrel, \overset).
+  let isStretchy = false;
+  if (STRETCH_BASE_SYMBOLS.has(baseTrimmed)) {
+    // Find the inner mo node — MathJax may wrap in mstyle/inferredMrow
+    let moNode = firstChild;
+    for (let i = 0; i < 5 && moNode && moNode.kind !== 'mo'; i++) {
+      if (moNode.childNodes?.length === 1) {
+        moNode = moNode.childNodes[0];
+      } else {
+        break;
+      }
+    }
+    if (moNode?.kind === 'mo') {
+      try {
+        const atr = getAttributes(moNode);
+        isStretchy = atr?.stretchy === true;
+      } catch (e) { /* ignore */ }
+    }
+  }
+  const wrapper = isStretchy ? 'stretch' : 'limits';
 
   if (movablelimits === true) {
     // Default placement — above/below in display, side in inline.
@@ -640,11 +679,11 @@ const buildLimitBase = (firstChild: any, baseTrimmed: string, base: string): ITy
       return { typst: base };
     }
     // Operator doesn't natively place limits above/below (e.g. \intop → integral).
-    // Block: limits() to force above/below; inline: bare operator for side placement.
-    return { typst: 'limits(' + baseTrimmed + ')', typst_inline: base };
+    // Block: limits()/stretch() to force above/below; inline: bare operator for side placement.
+    return { typst: wrapper + '(' + baseTrimmed + ')', typst_inline: base };
   } else if (movablelimits === false) {
     // Explicit \limits — force below/above placement in both modes
-    return { typst: 'limits(' + baseTrimmed + ')' };
+    return { typst: wrapper + '(' + baseTrimmed + ')' };
   } else {
     // Non-mo base (mrow, etc.) — use existing logic
     const baseIsNativeLimitOp = TYPST_DISPLAY_LIMIT_OPS.has(baseTrimmed);
@@ -661,7 +700,7 @@ const buildLimitBase = (firstChild: any, baseTrimmed: string, base: string): ITy
     if (baseIsNativeLimitOp || baseIsSpecialFn) {
       return { typst: base };
     }
-    return { typst: 'limits(' + baseTrimmed + ')' };
+    return { typst: wrapper + '(' + baseTrimmed + ')' };
   }
 };
 

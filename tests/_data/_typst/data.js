@@ -1352,16 +1352,41 @@ module.exports = [
     typst_inline: `a parallel b`,
   },
 
-  // === Extensible arrows ===
+  // === Extensible arrows (stretch) ===
   {
     latex: `\\xrightarrow{f}`,
-    typst: `limits(arrow.r)^f`,
-    typst_inline: `limits(arrow.r)^f`,
+    typst: `stretch(arrow.r)^f`,
+    typst_inline: `stretch(arrow.r)^f`,
   },
   {
     latex: `\\xleftarrow{g}`,
-    typst: `limits(arrow.l)^g`,
-    typst_inline: `limits(arrow.l)^g`,
+    typst: `stretch(arrow.l)^g`,
+    typst_inline: `stretch(arrow.l)^g`,
+  },
+  {
+    latex: `\\xtwoheadrightarrow[du=dx]{u=x+1}`,
+    typst: `stretch(arrow.r.twohead)_(d u = d x)^(u = x + 1)`,
+    typst_inline: `stretch(arrow.r.twohead)_(d u = d x)^(u = x + 1)`,
+  },
+  {
+    latex: `\\xtwoheadleftarrow[du=dx]{u=x+1}`,
+    typst: `stretch(arrow.l.twohead)_(d u = d x)^(u = x + 1)`,
+    typst_inline: `stretch(arrow.l.twohead)_(d u = d x)^(u = x + 1)`,
+  },
+  {
+    latex: `\\xmapsto[du=dx]{u=x+1}`,
+    typst: `stretch(arrow.r.bar)_(d u = d x)^(u = x + 1)`,
+    typst_inline: `stretch(arrow.r.bar)_(d u = d x)^(u = x + 1)`,
+  },
+  {
+    latex: `\\xlongequal[du=dx]{u=x+1}`,
+    typst: `stretch(=)_(d u = d x)^(u = x + 1)`,
+    typst_inline: `stretch(=)_(d u = d x)^(u = x + 1)`,
+  },
+  {
+    latex: `\\xtofrom[du=dx]{u=x+1}`,
+    typst: `stretch(arrows.rr)_(d u = d x)^(u = x + 1)`,
+    typst_inline: `stretch(arrows.rr)_(d u = d x)^(u = x + 1)`,
   },
 
   // === mathbb on numbers ===
