@@ -285,6 +285,8 @@ const miscSymbols: ReadonlyArray<[string, string]> = [
   ["\u2063", ""],               // invisible separator
   ["\u2064", ""],               // invisible plus
   ["$", "\\$"],                 // dollar sign — must be escaped in Typst math mode
+  ["\u0131", "dotless.i"],      // ı (imath)
+  ["\u0237", "dotless.j"],      // ȷ (jmath)
 ];
 
 // Build the combined symbol map

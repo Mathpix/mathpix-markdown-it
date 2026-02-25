@@ -1750,4 +1750,20 @@ module.exports = [
     typst: `underbrace(x, 1)`,
     typst_inline: `underbrace(x, 1)`,
   },
+  // === Dotless i/j (\imath, \jmath) ===
+  {
+    latex: `C_{\\alpha \\imath_{1}}`,
+    typst: `C_(alpha dotless.i_1)`,
+    typst_inline: `C_(alpha dotless.i_1)`,
+  },
+  {
+    latex: `\\jmath`,
+    typst: `dotless.j`,
+    typst_inline: `dotless.j`,
+  },
+  {
+    latex: `\\hat{\\imath}`,
+    typst: `hat(dotless.i)`,
+    typst_inline: `hat(dotless.i)`,
+  },
 ];
