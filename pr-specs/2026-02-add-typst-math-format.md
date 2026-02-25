@@ -135,7 +135,10 @@ Full coverage of lowercase, uppercase, and variant forms. Examples: `\alpha` →
 | `\vec{x}` | `arrow(x)` | Shorthand accent |
 | `\dddot{x}` | `accent(x, dot.triple)` | Generic `accent()` form |
 | `\overleftarrow{AB}` | `accent(A B, arrow.l)` | Generic `accent()` form |
-| `\overbrace{x+y}^{n}` | `overbrace(x + y)^n` | Shorthand + limits |
+| `\overbrace{x+y}^{n}` | `overbrace(x + y, n)` | Annotation as 2nd argument |
+| `\underbrace{x+y}_{n}` | `underbrace(x + y, n)` | Annotation as 2nd argument |
+| `\overbrace{x+y}` | `overbrace(x + y)` | No annotation |
+| `\underbrace{x+y}` | `underbrace(x + y)` | No annotation |
 
 ### Font commands
 
@@ -398,6 +401,17 @@ Multi-word operators (`\limsup` → `limsup`, `\liminf` → `liminf`) are mapped
 **Known limitations:**
 - `\oint\limits` causes a MathJax error ("\\limits is allowed only on operators")
 - `\varliminf`/`\varlimsup` with `\limits`: the accent handler produces `underline(lim)`/`overline(lim)` which bypasses limit-placement wrapping
+
+### Brace annotations (underbrace/overbrace)
+
+In Typst, `underbrace` and `overbrace` take annotations as a second argument: `underbrace(content, annotation)`, not as subscripts/superscripts. MathJax creates nested `munder`/`mover` nodes for `\underbrace{x}_{y}` and `\overbrace{x}^{y}`: the inner node produces `underbrace(x)` / `overbrace(x)`, and the outer node's fallback path would normally add `_(y)` / `^(y)`. The `munder`/`mover` fallback handlers detect when the base matches `underbrace(...)` / `overbrace(...)` / `underbracket(...)` / `overbracket(...)` (via `BRACE_ANNOTATION_RE` regex) and insert the annotation as a second argument instead. The same check exists in `msub`/`msup` as a safety fallback.
+
+| LaTeX | Typst |
+|-------|-------|
+| `\underbrace{x+y}_{n}` | `underbrace(x + y, n)` |
+| `\overbrace{x+y}^{\text{sum}}` | `overbrace(x + y, "sum")` |
+| `\overbrace{\underbrace{a+b}_{2}+c}^{\text{total}}` | `overbrace(underbrace(a + b, 2) + c, "total")` |
+| `\underbrace{1+\cdots+1}_{\frac{n(n+1)}{2}}` | `underbrace(1 + dots.c + 1, frac(n(n + 1), 2))` |
 
 ### Scripts with prescripts
 
