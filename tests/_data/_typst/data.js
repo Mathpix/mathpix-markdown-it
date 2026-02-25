@@ -1664,4 +1664,90 @@ module.exports = [
     typst: `italic(" if ")`,
     typst_inline: `italic(" if ")`,
   },
+  // === underline / overline / underbrace / overbrace ===
+  {
+    latex: `\\underline{a + b + c}`,
+    typst: `underline(a + b + c)`,
+    typst_inline: `underline(a + b + c)`,
+  },
+  {
+    latex: `\\underline{x}`,
+    typst: `underline(x)`,
+    typst_inline: `underline(x)`,
+  },
+  {
+    latex: `\\overline{a + b + c}`,
+    typst: `overline(a + b + c)`,
+    typst_inline: `overline(a + b + c)`,
+  },
+  {
+    latex: `\\overline{z}`,
+    typst: `overline(z)`,
+    typst_inline: `overline(z)`,
+  },
+  {
+    latex: `\\underbrace{a + b + c}`,
+    typst: `underbrace(a + b + c)`,
+    typst_inline: `underbrace(a + b + c)`,
+  },
+  {
+    latex: `\\underbrace{a + b + \\cdots + z}_{26}`,
+    typst: `underbrace(a + b + dots.c + z, 26)`,
+    typst_inline: `underbrace(a + b + dots.c + z, 26)`,
+  },
+  {
+    latex: `\\underbrace{x + x + \\cdots + x}_{n \\text{ times}}`,
+    typst: `underbrace(x + x + dots.c + x, n " times")`,
+    typst_inline: `underbrace(x + x + dots.c + x, n " times")`,
+  },
+  {
+    latex: `\\underbrace{|s_{n}-s|}_{<\\varepsilon}`,
+    typst: `underbrace(|s_n - s|, < epsilon)`,
+    typst_inline: `underbrace(|s_n - s|, < epsilon)`,
+  },
+  {
+    latex: `\\overbrace{a + b + c}`,
+    typst: `overbrace(a + b + c)`,
+    typst_inline: `overbrace(a + b + c)`,
+  },
+  {
+    latex: `\\overbrace{a + b + \\cdots + z}^{26}`,
+    typst: `overbrace(a + b + dots.c + z, 26)`,
+    typst_inline: `overbrace(a + b + dots.c + z, 26)`,
+  },
+  {
+    latex: `\\overbrace{x + y}^{\\text{sum}}`,
+    typst: `overbrace(x + y, "sum")`,
+    typst_inline: `overbrace(x + y, "sum")`,
+  },
+  // Nested: overbrace wrapping underbrace
+  {
+    latex: `\\overbrace{\\underbrace{a+b}_{2} + c}^{\\text{total}}`,
+    typst: `overbrace(underbrace(a + b, 2) + c, "total")`,
+    typst_inline: `overbrace(underbrace(a + b, 2) + c, "total")`,
+  },
+  // Fraction as annotation
+  {
+    latex: `\\underbrace{1 + 1 + \\cdots + 1}_{\\frac{n(n+1)}{2}}`,
+    typst: `underbrace(1 + 1 + dots.c + 1, frac(n(n + 1), 2))`,
+    typst_inline: `underbrace(1 + 1 + dots.c + 1, frac(n(n + 1), 2))`,
+  },
+  // Nested overline + underline
+  {
+    latex: `\\overline{\\underline{x + y}}`,
+    typst: `overline(underline(x + y))`,
+    typst_inline: `overline(underline(x + y))`,
+  },
+  // Empty content with annotation
+  {
+    latex: `\\underbrace{}_{k}`,
+    typst: `underbrace("", k)`,
+    typst_inline: `underbrace("", k)`,
+  },
+  // Simple single-char annotation
+  {
+    latex: `\\underbrace{x}_{1}`,
+    typst: `underbrace(x, 1)`,
+    typst_inline: `underbrace(x, 1)`,
+  },
 ];
