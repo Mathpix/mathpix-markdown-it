@@ -464,6 +464,7 @@ In Typst, `underbrace` and `overbrace` take annotations as a second argument: `u
 | `\cancel{x}` | `cancel(x)` |
 | `\bcancel{x}` | `cancel(inverted: #true, x)` |
 | `\boxed{x=1}` | `#box(stroke: 0.5pt, inset: 3pt, $x = 1$)` (block) / `x = 1` (inline) |
+| `\enclose{circle}{x+y}` | `#circle(inset: 3pt, $x + y$)` (block) / `x + y` (inline) |
 | `\color{red}{x}` | `#text(fill: red)[x]` |
 | `\phantom{x}` | `#hide($x$)` (preserves dimensions) |
 | `\hphantom{x}` | `#hide($x$)` (same — Typst hide preserves full box) |
