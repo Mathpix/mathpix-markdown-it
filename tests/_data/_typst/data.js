@@ -1314,6 +1314,16 @@ module.exports = [
     typst: `bold(v)`,
     typst_inline: `bold(v)`,
   },
+  {
+    latex: `\\boldsymbol{\\alpha}`,
+    typst: `bold(alpha)`,
+    typst_inline: `bold(alpha)`,
+  },
+  {
+    latex: `\\boldsymbol{\\nabla}`,
+    typst: `bold(nabla)`,
+    typst_inline: `bold(nabla)`,
+  },
 
   // === aleph ===
   {
