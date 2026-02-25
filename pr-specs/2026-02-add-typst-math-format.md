@@ -318,7 +318,7 @@ Explicit tag with label:
 
 **Empty prefix support**: `isNumcasesTable()` accepts 3+ children per row (not just 4+). With an empty prefix `{}` and no `&` separator, MathML has 3 columns (label + prefix-with-brace + content) instead of 4 (label + prefix + value + condition). The content column iteration (`startCol` to `childNodes.length`) handles both layouts.
 
-**Comma escaping in `cases()` rows**: In Typst, commas inside `cases(...)` are row separators. When cases content contains literal commas (e.g. `x^2 + 1,` or `n = 1, 2, \ldots, N`), they would be misinterpreted as row breaks. The `escapeCasesCommas()` helper replaces top-level commas (at parenthesis depth 0) with `","` — a Typst text string that renders as a visual comma without acting as a separator. Commas inside nested parentheses/brackets (e.g. `f(t_n, x^n)`) are left untouched. This applies to both regular `cases()` (from `\left\{...\begin{array}...\right.`) and numcases environments — every cell is escaped before assembly.
+**Separator escaping in `cases()` and `mat()` cells**: In Typst, commas are cell separators in both `cases()` and `mat()`, while semicolons are row separators in `mat()`. When cell content contains literal commas or semicolons (e.g. `x^2 + 1,` or `L(u) = 1;`), they would be misinterpreted as structural separators. The `escapeCasesSeparators()` helper replaces top-level commas with `","` and semicolons with `";"` (Typst text strings) at parenthesis depth 0, so they render visually without acting as separators. Characters inside nested parentheses/brackets (e.g. `f(t_n, x^n)`) are left untouched. This applies to all `cases()` rows (regular and numcases, single-cell and multi-cell) and all `mat()` cells.
 
 Regular cases with commas (`f(x) = \left\{ \begin{array}{ll} {x^2+1,} & {x>1} \\ {1,} & {x=1} \\ {x+1,} & {x<1} \end{array} \right.`):
 ```typst
@@ -343,7 +343,13 @@ Empty prefix numcases with commas, explicit tags, and labels (`\begin{numcases}{
 )
 ```
 
-Note: the comma inside `lr(( t_n, x^n ))` is at depth 2 and preserved as-is, while top-level commas like `),"` and `1","` are escaped. The comma between `N` and `x^0` is the actual `cases()` row separator.
+Note: the comma inside `lr(( t_n, x^n ))` is at depth 2 and preserved as-is, while top-level commas like `),"` and `1","` are escaped. The comma between `N` and `x^0` is the actual `cases()` row separator. Semicolons are escaped the same way — e.g. `L(u) = 1;` in a cases cell becomes `L(u) = 1";"`.
+
+Matrix cell escaping example:
+```
+LaTeX:  \begin{pmatrix} a & b; \\ c & d \end{pmatrix}
+Typst:  mat(delim: "(", a, b";"; c, d)
+```
 
 **Math inside `\tag`:** Tags can contain inline math, e.g. `\tag{$x\sqrt{5}$ 1.3.1}`. MathJax represents this as a mix of `mtext` and math nodes inside the label `mtd`. The `serializeTagContent` helper walks the label tree and emits `mtext` as plain text and math groups as `$typst$`, producing `n => [($x sqrt(5)$ 1.3.1)]`.
 
