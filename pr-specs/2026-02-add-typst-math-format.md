@@ -191,23 +191,20 @@ Built-in Typst math operators (`sin`, `cos`, `tan`, `log`, `lim`, etc.) pass thr
 | `\begin{cases}` | `cases(...)` |
 | `\begin{numcases}` | `#grid(...)` with `cases(...)` + numbering column |
 
-**Multiline formatting for 3+ rows:** When a `mat()` or `cases()` expression has 3 or more rows, the output uses multiline format with 2-space indentation for readability. Expressions with 1–2 rows remain single-line.
+**Multiline formatting for 2+ rows:** When a `mat()` or `cases()` expression has 2 or more rows, the output uses multiline format with 2-space indentation for readability. Only single-row expressions remain on one line.
 
 ```
-// 2 rows — single-line
-mat(delim: "(", a, b; c, d)
-cases(x & "if " x > 0, - x & "otherwise")
+// 1 row — single-line
+mat(delim: #none, a, b, c)
 
-// 3+ rows — multiline
+// 2+ rows — multiline
 mat(delim: "(",
   a, b;
-  c, d;
-  e, f,
+  c, d,
 )
 cases(
-  x + 1 & "if" x > 0,
-  x - 1 & "if" x < 0,
-  0 & "if" x = 0,
+  x & "if " x > 0,
+  - x & "otherwise",
 )
 ```
 
