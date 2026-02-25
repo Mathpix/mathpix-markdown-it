@@ -1289,7 +1289,7 @@ const mtable = () => {
         }
 
         let casesContent: string;
-        if (caseRows.length >= 3) {
+        if (caseRows.length >= 2) {
           casesContent = 'cases(\n  ' + caseRows.join(',\n  ') + ',\n)';
         } else {
           casesContent = 'cases(' + caseRows.join(', ') + ')';
@@ -1426,7 +1426,7 @@ const mtable = () => {
       } else if (isCases) {
         // Cases environment
         let casesBody: string;
-        if (rows.length >= 3) {
+        if (rows.length >= 2) {
           casesBody = 'cases(\n  ' + rows.join(',\n  ') + ',\n)';
         } else {
           casesBody = 'cases(' + rows.join(', ') + ')';
@@ -1435,7 +1435,7 @@ const mtable = () => {
       } else {
         // Matrix: mat(delim: ..., a, b; c, d)
         let matContent: string;
-        if (rows.length >= 3) {
+        if (rows.length >= 2) {
           matContent = '\n  ' + rows.join(';\n  ') + ',\n';
         } else {
           matContent = rows.join('; ');

@@ -838,38 +838,38 @@ module.exports = [
   // Square brackets spanning rows
   {
     latex: `\\begin{array}{l} \\left[ x \\right. \\\\ \\left. y \\right] \\end{array}`,
-    typst: `mat(delim: #none, align: #left, lr(\\[ x); lr(y \\]))`,
-    typst_inline: `mat(delim: #none, align: #left, lr(\\[ x); lr(y \\]))`,
+    typst: `mat(delim: #none, align: #left, \n  lr(\\[ x);\n  lr(y \\]),\n)`,
+    typst_inline: `mat(delim: #none, align: #left, \n  lr(\\[ x);\n  lr(y \\]),\n)`,
   },
   // Parentheses spanning rows
   {
     latex: `\\begin{array}{l} \\left( a \\right. \\\\ \\left. b \\right) \\end{array}`,
-    typst: `mat(delim: #none, align: #left, lr(\\( a); lr(b \\)))`,
-    typst_inline: `mat(delim: #none, align: #left, lr(\\( a); lr(b \\)))`,
+    typst: `mat(delim: #none, align: #left, \n  lr(\\( a);\n  lr(b \\)),\n)`,
+    typst_inline: `mat(delim: #none, align: #left, \n  lr(\\( a);\n  lr(b \\)),\n)`,
   },
   // Curly braces spanning rows
   {
     latex: `\\begin{array}{l} \\left\\{ m \\right. \\\\ \\left. n \\right\\} \\end{array}`,
-    typst: `mat(delim: #none, align: #left, lr(\\{ m); lr(n \\}))`,
-    typst_inline: `mat(delim: #none, align: #left, lr(\\{ m); lr(n \\}))`,
+    typst: `mat(delim: #none, align: #left, \n  lr(\\{ m);\n  lr(n \\}),\n)`,
+    typst_inline: `mat(delim: #none, align: #left, \n  lr(\\{ m);\n  lr(n \\}),\n)`,
   },
   // Pipe spanning rows
   {
     latex: `\\begin{array}{l} \\left| p \\right. \\\\ \\left. q \\right| \\end{array}`,
-    typst: `mat(delim: #none, align: #left, lr(| p); lr(q |))`,
-    typst_inline: `mat(delim: #none, align: #left, lr(| p); lr(q |))`,
+    typst: `mat(delim: #none, align: #left, \n  lr(| p);\n  lr(q |),\n)`,
+    typst_inline: `mat(delim: #none, align: #left, \n  lr(| p);\n  lr(q |),\n)`,
   },
   // Mixed: bracket open, paren close
   {
     latex: `\\begin{array}{l} \\left[ u \\right. \\\\ \\left. v \\right) \\end{array}`,
-    typst: `mat(delim: #none, align: #left, lr(\\[ u); lr(v \\)))`,
-    typst_inline: `mat(delim: #none, align: #left, lr(\\[ u); lr(v \\)))`,
+    typst: `mat(delim: #none, align: #left, \n  lr(\\[ u);\n  lr(v \\)),\n)`,
+    typst_inline: `mat(delim: #none, align: #left, \n  lr(\\[ u);\n  lr(v \\)),\n)`,
   },
   // Tall content: bracket with fraction
   {
     latex: `\\begin{array}{l} \\left[ \\frac{x}{y} \\right. \\\\ \\left. z \\right] \\end{array}`,
-    typst: `mat(delim: #none, align: #left, lr(\\[ frac(x, y)); lr(z \\]))`,
-    typst_inline: `mat(delim: #none, align: #left, lr(\\[ frac(x, y)); lr(z \\]))`,
+    typst: `mat(delim: #none, align: #left, \n  lr(\\[ frac(x, y));\n  lr(z \\]),\n)`,
+    typst_inline: `mat(delim: #none, align: #left, \n  lr(\\[ frac(x, y));\n  lr(z \\]),\n)`,
   },
 
   // === Token spacing inside \left...\right delimiters ===
@@ -887,25 +887,25 @@ module.exports = [
   // === Matrices ===
   {
     latex: `\\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix}`,
-    typst: `mat(delim: "(", a, b; c, d)`,
-    typst_inline: `mat(delim: "(", a, b; c, d)`,
+    typst: `mat(delim: "(", \n  a, b;\n  c, d,\n)`,
+    typst_inline: `mat(delim: "(", \n  a, b;\n  c, d,\n)`,
   },
   {
     latex: `\\begin{bmatrix} a & b \\\\ c & d \\end{bmatrix}`,
-    typst: `mat(delim: "[", a, b; c, d)`,
-    typst_inline: `mat(delim: "[", a, b; c, d)`,
+    typst: `mat(delim: "[", \n  a, b;\n  c, d,\n)`,
+    typst_inline: `mat(delim: "[", \n  a, b;\n  c, d,\n)`,
   },
   {
     latex: `\\begin{vmatrix} a & b \\\\ c & d \\end{vmatrix}`,
-    typst: `mat(delim: "|", a, b; c, d)`,
-    typst_inline: `mat(delim: "|", a, b; c, d)`,
+    typst: `mat(delim: "|", \n  a, b;\n  c, d,\n)`,
+    typst_inline: `mat(delim: "|", \n  a, b;\n  c, d,\n)`,
   },
 
   // === Cases ===
   {
     latex: `\\begin{cases} x & \\text{if } x > 0 \\\\ -x & \\text{otherwise} \\end{cases}`,
-    typst: `cases(x & "if " x > 0, - x & "otherwise")`,
-    typst_inline: `cases(x & "if " x > 0, - x & "otherwise")`,
+    typst: `cases(\n  x & "if " x > 0,\n  - x & "otherwise",\n)`,
+    typst_inline: `cases(\n  x & "if " x > 0,\n  - x & "otherwise",\n)`,
   },
 
   // === Misc symbols ===
@@ -1065,8 +1065,8 @@ module.exports = [
   // === Substack ===
   {
     latex: `\\sum_{\\substack{i<n \\\\ j<m}}`,
-    typst: `sum_(mat(delim: #none, i < n; j < m))`,
-    typst_inline: `sum_(mat(delim: #none, i < n; j < m))`,
+    typst: `sum_(mat(delim: #none, \n  i < n;\n  j < m,\n))`,
+    typst_inline: `sum_(mat(delim: #none, \n  i < n;\n  j < m,\n))`,
   },
 
   // === Mod variants ===
@@ -1322,8 +1322,8 @@ module.exports = [
   // === Vmatrix (double bar delimiter) ===
   {
     latex: `\\begin{Vmatrix} a & b \\\\ c & d \\end{Vmatrix}`,
-    typst: `mat(delim: "\u2016", a, b; c, d)`,
-    typst_inline: `mat(delim: "\u2016", a, b; c, d)`,
+    typst: `mat(delim: "\u2016", \n  a, b;\n  c, d,\n)`,
+    typst_inline: `mat(delim: "\u2016", \n  a, b;\n  c, d,\n)`,
   },
 
   // === nmid ===
@@ -1417,13 +1417,13 @@ module.exports = [
   // === Array lines (augment) ===
   {
     latex: `\\begin{array}{|c|c|} \\hline a & b \\\\ \\hline c & d \\\\ \\hline \\end{array}`,
-    typst: `#box(stroke: 0.5pt, inset: 3pt, $ mat(delim: #none, augment: #(hline: 1, vline: 1), a, b; c, d) $)`,
-    typst_inline: `mat(delim: #none, augment: #(hline: 1, vline: 1), a, b; c, d)`,
+    typst: `#box(stroke: 0.5pt, inset: 3pt, $ mat(delim: #none, augment: #(hline: 1, vline: 1), \n  a, b;\n  c, d,\n) $)`,
+    typst_inline: `mat(delim: #none, augment: #(hline: 1, vline: 1), \n  a, b;\n  c, d,\n)`,
   },
   {
     latex: `\\begin{array}{c|c} a & b \\\\ c & d \\end{array}`,
-    typst: `mat(delim: #none, augment: #(vline: 1), a, b; c, d)`,
-    typst_inline: `mat(delim: #none, augment: #(vline: 1), a, b; c, d)`,
+    typst: `mat(delim: #none, augment: #(vline: 1), \n  a, b;\n  c, d,\n)`,
+    typst_inline: `mat(delim: #none, augment: #(vline: 1), \n  a, b;\n  c, d,\n)`,
   },
   {
     latex: `\\begin{array}{lcr} a & b & c \\end{array}`,
@@ -1435,32 +1435,32 @@ module.exports = [
   // All-left alignment
   {
     latex: `\\begin{array}{ll} a & b \\\\ c & d \\end{array}`,
-    typst: `mat(delim: #none, align: #left, a, b; c, d)`,
-    typst_inline: `mat(delim: #none, align: #left, a, b; c, d)`,
+    typst: `mat(delim: #none, align: #left, \n  a, b;\n  c, d,\n)`,
+    typst_inline: `mat(delim: #none, align: #left, \n  a, b;\n  c, d,\n)`,
   },
   // All-right alignment
   {
     latex: `\\begin{array}{rr} a & b \\\\ c & d \\end{array}`,
-    typst: `mat(delim: #none, align: #right, a, b; c, d)`,
-    typst_inline: `mat(delim: #none, align: #right, a, b; c, d)`,
+    typst: `mat(delim: #none, align: #right, \n  a, b;\n  c, d,\n)`,
+    typst_inline: `mat(delim: #none, align: #right, \n  a, b;\n  c, d,\n)`,
   },
   // Mixed alignment → no align param (center default)
   {
     latex: `\\begin{array}{lr} a & b \\\\ c & d \\end{array}`,
-    typst: `mat(delim: #none, a, b; c, d)`,
-    typst_inline: `mat(delim: #none, a, b; c, d)`,
+    typst: `mat(delim: #none, \n  a, b;\n  c, d,\n)`,
+    typst_inline: `mat(delim: #none, \n  a, b;\n  c, d,\n)`,
   },
   // All-center → no align param (center default)
   {
     latex: `\\begin{array}{cc} a & b \\\\ c & d \\end{array}`,
-    typst: `mat(delim: #none, a, b; c, d)`,
-    typst_inline: `mat(delim: #none, a, b; c, d)`,
+    typst: `mat(delim: #none, \n  a, b;\n  c, d,\n)`,
+    typst_inline: `mat(delim: #none, \n  a, b;\n  c, d,\n)`,
   },
   // Single column left
   {
     latex: `\\begin{array}{l} a \\\\ b \\end{array}`,
-    typst: `mat(delim: #none, align: #left, a; b)`,
-    typst_inline: `mat(delim: #none, align: #left, a; b)`,
+    typst: `mat(delim: #none, align: #left, \n  a;\n  b,\n)`,
+    typst_inline: `mat(delim: #none, align: #left, \n  a;\n  b,\n)`,
   },
 
   // === Equation tags ===
@@ -1559,8 +1559,8 @@ module.exports = [
   // numcases auto-numbered with labels
   {
     latex: `\\begin{numcases}{f(x)=} 0 & x < 0 \\label{nc:1}\\\\ x & x \\geq 0 \\label{nc:2} \\end{numcases}`,
-    typst: `#grid(\n  columns: (1fr, auto),\n  align: (left, right + horizon),\n  math.equation(block: true, numbering: none, $ f(x) = cases(0 & "x < 0 ", x & "x \\geq 0 ") $),\n  grid(\n    row-gutter: 0.65em,\n    { counter(math.equation).step(); context { let n = numbering("(1)", ..counter(math.equation).get()); [#figure(kind: "eq-tag", supplement: none, numbering: _ => n, [#n]) <nc:1>] } },\n    { counter(math.equation).step(); context { let n = numbering("(1)", ..counter(math.equation).get()); [#figure(kind: "eq-tag", supplement: none, numbering: _ => n, [#n]) <nc:2>] } },\n  ),\n)`,
-    typst_inline: `f(x) = cases(0 & "x < 0 ", x & "x \\geq 0 ")`,
+    typst: `#grid(\n  columns: (1fr, auto),\n  align: (left, right + horizon),\n  math.equation(block: true, numbering: none, $ f(x) = cases(\n  0 & "x < 0 ",\n  x & "x \\geq 0 ",\n) $),\n  grid(\n    row-gutter: 0.65em,\n    { counter(math.equation).step(); context { let n = numbering("(1)", ..counter(math.equation).get()); [#figure(kind: "eq-tag", supplement: none, numbering: _ => n, [#n]) <nc:1>] } },\n    { counter(math.equation).step(); context { let n = numbering("(1)", ..counter(math.equation).get()); [#figure(kind: "eq-tag", supplement: none, numbering: _ => n, [#n]) <nc:2>] } },\n  ),\n)`,
+    typst_inline: `f(x) = cases(\n  0 & "x < 0 ",\n  x & "x \\geq 0 ",\n)`,
   },
 
   // === Empty base superscript, pipes as absolute value, operator before paren ===
@@ -1573,18 +1573,18 @@ module.exports = [
   // === numcases / subnumcases (grid layout with per-row numbering) ===
   {
     latex: `\\begin{numcases}{f(x)=} 0 & x < 0 \\\\ x & x \\geq 0 \\end{numcases}`,
-    typst: `#grid(\n  columns: (1fr, auto),\n  align: (left, right + horizon),\n  math.equation(block: true, numbering: none, $ f(x) = cases(0 & "x < 0 ", x & "x \\geq 0 ") $),\n  grid(\n    row-gutter: 0.65em,\n    { counter(math.equation).step(); context counter(math.equation).display("(1)") },\n    { counter(math.equation).step(); context counter(math.equation).display("(1)") },\n  ),\n)`,
-    typst_inline: `f(x) = cases(0 & "x < 0 ", x & "x \\geq 0 ")`,
+    typst: `#grid(\n  columns: (1fr, auto),\n  align: (left, right + horizon),\n  math.equation(block: true, numbering: none, $ f(x) = cases(\n  0 & "x < 0 ",\n  x & "x \\geq 0 ",\n) $),\n  grid(\n    row-gutter: 0.65em,\n    { counter(math.equation).step(); context counter(math.equation).display("(1)") },\n    { counter(math.equation).step(); context counter(math.equation).display("(1)") },\n  ),\n)`,
+    typst_inline: `f(x) = cases(\n  0 & "x < 0 ",\n  x & "x \\geq 0 ",\n)`,
   },
   {
     latex: `\\begin{numcases}{f(x)=} x^2 \\tag{A} \\\\ \\sqrt{x} \\tag{B} \\end{numcases}`,
-    typst: `#grid(\n  columns: (1fr, auto),\n  align: (left, right + horizon),\n  math.equation(block: true, numbering: none, $ f(x) = cases(x^2, sqrt(x)) $),\n  grid(\n    row-gutter: 0.65em,\n    [(A)],\n    [(B)],\n  ),\n)`,
-    typst_inline: `f(x) = cases(x^2, sqrt(x))`,
+    typst: `#grid(\n  columns: (1fr, auto),\n  align: (left, right + horizon),\n  math.equation(block: true, numbering: none, $ f(x) = cases(\n  x^2,\n  sqrt(x),\n) $),\n  grid(\n    row-gutter: 0.65em,\n    [(A)],\n    [(B)],\n  ),\n)`,
+    typst_inline: `f(x) = cases(\n  x^2,\n  sqrt(x),\n)`,
   },
   {
     latex: `\\begin{subnumcases}{|x|=} -x & x < 0 \\\\ x & x \\geq 0 \\end{subnumcases}`,
-    typst: `#grid(\n  columns: (1fr, auto),\n  align: (left, right + horizon),\n  math.equation(block: true, numbering: none, $ |x| = cases(- x & "x < 0 ", x & "x \\geq 0 ") $),\n  grid(\n    row-gutter: 0.65em,\n    { counter(math.equation).step(); context counter(math.equation).display("(1)") },\n    { counter(math.equation).step(); context counter(math.equation).display("(1)") },\n  ),\n)`,
-    typst_inline: `|x| = cases(- x & "x < 0 ", x & "x \\geq 0 ")`,
+    typst: `#grid(\n  columns: (1fr, auto),\n  align: (left, right + horizon),\n  math.equation(block: true, numbering: none, $ |x| = cases(\n  - x & "x < 0 ",\n  x & "x \\geq 0 ",\n) $),\n  grid(\n    row-gutter: 0.65em,\n    { counter(math.equation).step(); context counter(math.equation).display("(1)") },\n    { counter(math.equation).step(); context counter(math.equation).display("(1)") },\n  ),\n)`,
+    typst_inline: `|x| = cases(\n  - x & "x < 0 ",\n  x & "x \\geq 0 ",\n)`,
   },
   // cases via array with commas in cells (commas must be escaped)
   {
@@ -1595,33 +1595,33 @@ module.exports = [
   // cases via array with semicolons in cells (semicolons must be escaped)
   {
     latex: `\\left\\{ \\begin{array}{ll} \\sigma (x), & L(u) = 1; \\\\ 1 - \\sigma (x), & L(u) = 0, \\end{array} \\right.`,
-    typst: `cases(sigma(x)"," & L(u) = 1";", 1 - sigma(x)"," & L(u) = 0",")`,
-    typst_inline: `cases(sigma(x)"," & L(u) = 1";", 1 - sigma(x)"," & L(u) = 0",")`,
+    typst: `cases(\n  sigma(x)"," & L(u) = 1";",\n  1 - sigma(x)"," & L(u) = 0",",\n)`,
+    typst_inline: `cases(\n  sigma(x)"," & L(u) = 1";",\n  1 - sigma(x)"," & L(u) = 0",",\n)`,
   },
   // numcases with empty prefix and explicit \tag (processed by MathJax as real tags)
   {
     latex: `\\begin{numcases}{} \\Delta_{q}^{\\alpha} x^{n}=f\\left(t_{n}, x^{n}\\right), n=1,2, \\ldots, N \\tag{3.12}\\label{eq:3.12}\\\\ x^{0}=x_{0} \\tag{3.13}\\label{eq3.13} \\end{numcases}`,
-    typst: `#grid(\n  columns: (1fr, auto),\n  align: (left, right + horizon),\n  math.equation(block: true, numbering: none, $ cases(Delta_q^(alpha) x^n = f lr(( t_n, x^n ))"," n = 1"," 2"," dots"," N, x^0 = x_0) $),\n  grid(\n    row-gutter: 0.65em,\n    [#figure(kind: "eq-tag", supplement: none, numbering: n => [(3.12)], [(3.12)]) <eq:3.12>],\n    [#figure(kind: "eq-tag", supplement: none, numbering: n => [(3.13)], [(3.13)]) <eq3.13>],\n  ),\n)`,
-    typst_inline: `cases(Delta_q^(alpha) x^n = f lr(( t_n, x^n ))"," n = 1"," 2"," dots"," N, x^0 = x_0)`,
+    typst: `#grid(\n  columns: (1fr, auto),\n  align: (left, right + horizon),\n  math.equation(block: true, numbering: none, $ cases(\n  Delta_q^(alpha) x^n = f lr(( t_n, x^n ))"," n = 1"," 2"," dots"," N,\n  x^0 = x_0,\n) $),\n  grid(\n    row-gutter: 0.65em,\n    [#figure(kind: "eq-tag", supplement: none, numbering: n => [(3.12)], [(3.12)]) <eq:3.12>],\n    [#figure(kind: "eq-tag", supplement: none, numbering: n => [(3.13)], [(3.13)]) <eq3.13>],\n  ),\n)`,
+    typst_inline: `cases(\n  Delta_q^(alpha) x^n = f lr(( t_n, x^n ))"," n = 1"," 2"," dots"," N,\n  x^0 = x_0,\n)`,
   },
   // === Unpaired brackets in matrix cells → Typst symbol names ===
   // Unpaired [ ] spanning rows → bracket.l / bracket.r
   {
     latex: `\\begin{array}{lc} a & [ b + c \\\\ d & + e ] \\end{array}`,
-    typst: `mat(delim: #none, a, bracket.l b + c; d, + e bracket.r)`,
-    typst_inline: `mat(delim: #none, a, bracket.l b + c; d, + e bracket.r)`,
+    typst: `mat(delim: #none, \n  a, bracket.l b + c;\n  d, + e bracket.r,\n)`,
+    typst_inline: `mat(delim: #none, \n  a, bracket.l b + c;\n  d, + e bracket.r,\n)`,
   },
   // Unpaired ( ) spanning rows → paren.l / paren.r
   {
     latex: `\\begin{array}{lc} a & ( b + c \\\\ d & + e ) \\end{array}`,
-    typst: `mat(delim: #none, a, paren.l b + c; d, + e paren.r)`,
-    typst_inline: `mat(delim: #none, a, paren.l b + c; d, + e paren.r)`,
+    typst: `mat(delim: #none, \n  a, paren.l b + c;\n  d, + e paren.r,\n)`,
+    typst_inline: `mat(delim: #none, \n  a, paren.l b + c;\n  d, + e paren.r,\n)`,
   },
   // Unpaired { } spanning rows → brace.l / brace.r
   {
     latex: `\\begin{array}{lc} a & \\{ b + c \\\\ d & + e \\} \\end{array}`,
-    typst: `mat(delim: #none, a, brace.l b + c; d, + e brace.r)`,
-    typst_inline: `mat(delim: #none, a, brace.l b + c; d, + e brace.r)`,
+    typst: `mat(delim: #none, \n  a, brace.l b + c;\n  d, + e brace.r,\n)`,
+    typst_inline: `mat(delim: #none, \n  a, brace.l b + c;\n  d, + e brace.r,\n)`,
   },
   // Paired brackets in same cell → unchanged
   {
@@ -1649,13 +1649,13 @@ module.exports = [
   // Semicolon in matrix cell must be escaped to ";"
   {
     latex: `\\begin{pmatrix} a & b; \\\\ c & d \\end{pmatrix}`,
-    typst: `mat(delim: "(", a, b";"; c, d)`,
-    typst_inline: `mat(delim: "(", a, b";"; c, d)`,
+    typst: `mat(delim: "(", \n  a, b";";\n  c, d,\n)`,
+    typst_inline: `mat(delim: "(", \n  a, b";";\n  c, d,\n)`,
   },
   // Comma in matrix cell must be escaped to ","
   {
     latex: `\\begin{pmatrix} a, b & c \\\\ d & e \\end{pmatrix}`,
-    typst: `mat(delim: "(", a"," b, c; d, e)`,
-    typst_inline: `mat(delim: "(", a"," b, c; d, e)`,
+    typst: `mat(delim: "(", \n  a"," b, c;\n  d, e,\n)`,
+    typst_inline: `mat(delim: "(", \n  a"," b, c;\n  d, e,\n)`,
   },
 ];
