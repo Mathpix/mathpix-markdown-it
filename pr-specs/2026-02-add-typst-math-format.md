@@ -582,6 +582,38 @@ Tag labels are serialized by `serializeTagContent()` in `handlers.ts`, which wal
 
 This handles mixed tags like `\tag{$x\sqrt{5}$ 1.3.1}` where the MathML label contains interleaved `mtext` and math nodes: `<mtext>(</mtext>`, `<mrow><mi>x</mi><msqrt>...</msqrt></mrow>`, `<mtext> 1.3.1)</mtext>` → `($x sqrt(5)$ 1.3.1)`.
 
+### Unpaired bracket escaping (pre-serialization tree walk)
+
+LaTeX allows unmatched brackets like `\sigma(\mathrm{nm} ;` where `(` has no closing `)`. In Typst, a bare `(` would be interpreted as a function-call open, causing a parse error. The serializer uses a **pre-serialization DFS tree walk** (`markUnpairedBrackets()`) to detect and escape these.
+
+**How it works:**
+
+1. Before `visitTree()`, `markUnpairedBrackets(root)` walks the entire MathML tree via DFS
+2. Collects all `mo` nodes containing `( ) [ ] { }` (excludes `|` and `‖` — handled separately)
+3. Pairs brackets using a **strict stack**: a closing bracket matches ONLY the top of the stack (no cross-pairing like `({)}`)
+4. Marks unpaired nodes with `node.properties['data-unpaired-bracket'] = 'open' | 'close'`
+5. The `mo` handler checks this property **early** (before symbol-map lookup, spacing, slash escaping) and emits escaped delimiters
+
+**Output format:** Escaped Typst delimiters (`\(`, `\)`, `\[`, `\]`, `\{`, `\}`) — these render as literal bracket glyphs in math mode with proper kerning, without being parsed as function-call or group delimiters.
+
+**No skip conditions:** All bracket `mo` nodes are collected regardless of `fence` attribute or parent mrow type. Fence delimiters from `\left...\right` are collected and pair naturally with each other. The `mrow` handler skips fence `mo` children via `continue`, so any mark on them is harmless.
+
+| LaTeX | Typst | Why |
+|-------|-------|-----|
+| `\sigma(\mathrm{nm} ;` | `sigma \(upright("nm");` | `(` unpaired → `\(` |
+| `\alpha[x+y` | `alpha \[ x + y` | `[` unpaired → `\[` |
+| `f(x+y]` | `f \( x + y \]` | cross-type, both unpaired |
+| `x^{(n}` | `x^(\( n)` | unpaired inside superscript |
+| `(x+y^{(z-k)}` | `\( x + y^((z - k))` | outer `(` unpaired, inner paired |
+| `\frac{(a+b^{(c+d)})}{(e+f}` | `frac((a + b^((c + d))), \( e + f)` | mixed paired/unpaired |
+| `\sigma(x)` | `sigma(x)` | paired — unchanged |
+| `(q/p)^{(z-k)}` | `(q\/ p)^((z - k))` | all paired — unchanged |
+| `\left( x \right)` | `lr(( x ))` | fence delimiters — handled by mrow |
+
+**Integration with `menclose`:** The `\lcm` macro expands to `\enclose{bottom}{\smash{)}{...}\:}`. The `menclose{bottom}` handler detects both `)` and `\)` prefix (since the tree walk may mark the `)` from `\smash` as unpaired) and produces `underline(")"...)` in both cases.
+
+**Coexistence with cell-level escaping:** `replaceUnpairedBrackets()` (string-level) remains for matrix/cases cells. The tree walk handles top-level expressions; cell-level escaping handles brackets split across matrix rows.
+
 ### Bare delimiter-pair detection
 
 LaTeX delimiters without `\left...\right` produce unpaired `<mo>` nodes in MathML. The `visitInferredMrowNode` method detects matched delimiter pairs at the top level using a `BARE_DELIM_PAIRS` map and converts them to idiomatic Typst:
@@ -619,7 +651,7 @@ This ensures paired delimiters form grouped expressions in Typst (important afte
 | `src/mathjax/serialized-typst/common.ts` | **New.** `ITypstData` interface with optional `typst_inline`; `initTypstData`, `addToTypstData` (always propagates `typst_inline` with `typst` fallback), `addSpaceToTypstData`, `needsParens`, `isThousandSepComma`, `needsTokenSeparator` |
 | `src/mathjax/serialized-typst/node-utils.ts` | **New.** Tree position utilities |
 | `src/mathjax/mathjax.ts` | Patched `AbstractTags` (`autoTag`, `getTag`, `startEquation`) to mark auto-numbered tags with `data-tag-auto` property and preserve `\label{}` keys as `data-label-key` |
-| `src/mathjax/index.ts` | `toTypstData()` returns `{ typstmath, typstmath_inline }` from the visitor's `ITypstData`; `OuterData()` and `OuterHTML()` populate both fields; `OuterHTML()` emits `<typstmath>` and `<typstmath_inline>` hidden tags; `TexConvertToTypstData()` is the sole public API for Typst (resets MathJax tag state before each conversion); `normalizeTypstSpaces` preserves line-leading indentation (`/(\S) {2,}/g`) |
+| `src/mathjax/index.ts` | `toTypstData()` calls `markUnpairedBrackets(node)` before `visitTree()` to mark unpaired ASCII brackets; returns `{ typstmath, typstmath_inline }` from the visitor's `ITypstData`; `OuterData()` and `OuterHTML()` populate both fields; `OuterHTML()` emits `<typstmath>` and `<typstmath_inline>` hidden tags; `TexConvertToTypstData()` is the sole public API for Typst (resets MathJax tag state before each conversion); `normalizeTypstSpaces` preserves line-leading indentation (`/(\S) {2,}/g`) |
 | `src/mathpix-markdown-model/index.ts` | Added `include_typst?: boolean` to `TOutputMath`; `typstmath_inline?: string` to `IOuterData` |
 | `src/contex-menu/menu/consts.ts` | Added `'typst'` and `'typst_inline'` to `mathExportTypes`; added both to `eMathType` enum |
 | `src/contex-menu/menu/menu-item.ts` | `case eMathType.typst:` → `'Typst'`; `case eMathType.typst_inline:` → `'Typst (inline)'` |
@@ -633,7 +665,7 @@ This ensures paired delimiters form grouped expressions in Typst (important afte
 - All existing conversion formats (MathML, AsciiMath, LaTeX, SVG) must remain unchanged
 - All existing tests must continue to pass
 - Typst output is only generated when `include_typst: true` is set — zero overhead when disabled
-- The visitor is read-only over the MathML tree — no mutations to shared state
+- The visitor is read-only over the MathML tree — the only mutation is `markUnpairedBrackets()` setting `node.properties['data-unpaired-bracket']` before traversal, which is inert for other serializers (ASCII, MathML) since they never read it
 - MathJax tag state (`parseOptions.tags`) must be reset before each `TexConvertToTypstData` call to prevent "Label multiply defined" errors across repeated conversions
 
 ## Testing
