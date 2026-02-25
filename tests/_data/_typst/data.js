@@ -1658,4 +1658,10 @@ module.exports = [
     typst: `mat(delim: "(", \n  a"," b, c;\n  d, e,\n)`,
     typst_inline: `mat(delim: "(", \n  a"," b, c;\n  d, e,\n)`,
   },
+  // === \textit produces italic() wrapper on mtext ===
+  {
+    latex: `\\textit{ if }`,
+    typst: `italic(" if ")`,
+    typst_inline: `italic(" if ")`,
+  },
 ];

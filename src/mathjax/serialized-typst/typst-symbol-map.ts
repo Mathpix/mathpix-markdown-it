@@ -340,6 +340,7 @@ export const typstFontMap: Map<string, string> = new Map<string, string>([
   ["fraktur", "frak"],
   ["bold-fraktur", "frak"],
   ["normal", "upright"],
+  ["italic", "italic"],
   ["-tex-mathit", "italic"],
   ["sans-serif", "sans"],
   ["bold-sans-serif", "sans"],
