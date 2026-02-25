@@ -1091,6 +1091,18 @@ const escapeCasesSeparators = (expr: string): string => {
   return result;
 };
 
+/** Check whether a Typst expression contains `,` or `;` at parenthesis depth 0. */
+const hasTopLevelSeparators = (expr: string): boolean => {
+  let depth = 0;
+  for (let i = 0; i < expr.length; i++) {
+    const ch = expr[i];
+    if (ch === '(' || ch === '[' || ch === '{') { depth++; }
+    else if ((ch === ')' || ch === ']' || ch === '}') && depth > 0) { depth--; }
+    else if ((ch === ',' || ch === ';') && depth === 0) { return true; }
+  }
+  return false;
+};
+
 const BRACKET_SYMBOL_MAP: Record<string, string> = {
   '[': 'bracket.l',
   ']': 'bracket.r',
@@ -1603,18 +1615,29 @@ const mrow = () => {
         const hasVisibleClose = !!close;
         if (hasVisibleOpen && hasVisibleClose) {
           const trimmedContent = content.trim();
-          // Optimize common delimiter pairs to Typst functions
+          // Optimize common delimiter pairs to Typst shorthand functions,
+          // but fall back to lr() when content has top-level , or ;
+          // (these would be parsed as argument/row separators inside a function call).
+          const hasSep = hasTopLevelSeparators(trimmedContent);
           if (openDelim === '|' && closeDelim === '|') {
-            res = addToTypstData(res, { typst: 'abs(' + trimmedContent + ')' });
+            res = addToTypstData(res, { typst: hasSep
+              ? 'lr(| ' + trimmedContent + ' |)'
+              : 'abs(' + trimmedContent + ')' });
           } else if (openDelim === '\u2016' && closeDelim === '\u2016') {
-            // ‖...‖ → norm()
-            res = addToTypstData(res, { typst: 'norm(' + trimmedContent + ')' });
+            // ‖...‖ → norm() or lr(‖ ... ‖)
+            res = addToTypstData(res, { typst: hasSep
+              ? 'lr(‖ ' + trimmedContent + ' ‖)'
+              : 'norm(' + trimmedContent + ')' });
           } else if (openDelim === '\u230A' && closeDelim === '\u230B') {
-            // ⌊...⌋ → floor()
-            res = addToTypstData(res, { typst: 'floor(' + trimmedContent + ')' });
+            // ⌊...⌋ → floor() or lr(⌊ ... ⌋)
+            res = addToTypstData(res, { typst: hasSep
+              ? 'lr(⌊ ' + trimmedContent + ' ⌋)'
+              : 'floor(' + trimmedContent + ')' });
           } else if (openDelim === '\u2308' && closeDelim === '\u2309') {
-            // ⌈...⌉ → ceil()
-            res = addToTypstData(res, { typst: 'ceil(' + trimmedContent + ')' });
+            // ⌈...⌉ → ceil() or lr(⌈ ... ⌉)
+            res = addToTypstData(res, { typst: hasSep
+              ? 'lr(⌈ ' + trimmedContent + ' ⌉)'
+              : 'ceil(' + trimmedContent + ')' });
           } else {
             // General lr() for auto-sizing
             res = addToTypstData(res, { typst: 'lr(' + open + ' ' + trimmedContent + ' ' + close + ')' });

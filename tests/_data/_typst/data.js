@@ -1766,4 +1766,45 @@ module.exports = [
     typst: `hat(dotless.i)`,
     typst_inline: `hat(dotless.i)`,
   },
+  // === abs/norm/floor/ceil fallback to lr() when content has top-level separators ===
+  {
+    latex: `\\left|C_{\\alpha}, C_{\\alpha \\imath_{1}}, C_{\\alpha i_{2}}\\right|`,
+    typst: `lr(| C_(alpha), C_(alpha dotless.i_1), C_(alpha i_2) |)`,
+    typst_inline: `lr(| C_(alpha), C_(alpha dotless.i_1), C_(alpha i_2) |)`,
+  },
+  {
+    latex: `\\left|x\\right|`,
+    typst: `abs(x)`,
+    typst_inline: `abs(x)`,
+  },
+  {
+    latex: `\\left\\|a, b\\right\\|`,
+    typst: `lr(‖ a, b ‖)`,
+    typst_inline: `lr(‖ a, b ‖)`,
+  },
+  {
+    latex: `\\left\\|x\\right\\|`,
+    typst: `norm(x)`,
+    typst_inline: `norm(x)`,
+  },
+  {
+    latex: `\\left\\lfloor a, b\\right\\rfloor`,
+    typst: `lr(⌊ a, b ⌋)`,
+    typst_inline: `lr(⌊ a, b ⌋)`,
+  },
+  {
+    latex: `\\left\\lfloor x\\right\\rfloor`,
+    typst: `floor(x)`,
+    typst_inline: `floor(x)`,
+  },
+  {
+    latex: `\\left\\lceil a, b\\right\\rceil`,
+    typst: `lr(⌈ a, b ⌉)`,
+    typst_inline: `lr(⌈ a, b ⌉)`,
+  },
+  {
+    latex: `\\left\\lceil x\\right\\rceil`,
+    typst: `ceil(x)`,
+    typst_inline: `ceil(x)`,
+  },
 ];
