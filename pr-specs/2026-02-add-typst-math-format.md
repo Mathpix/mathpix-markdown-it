@@ -149,6 +149,8 @@ Full coverage of lowercase, uppercase, and variant forms. Examples: `\alpha` →
 | `\mathrm{d}` | `dif` (differential operator optimization) |
 | `\mathit{word}` | `italic("word")` |
 | `\boldsymbol{v}` | `bold(v)` (italic bold) |
+| `\textit{ if }` | `italic(" if ")` (via `mtext` with `mathvariant="italic"`) |
+| `\textbf{ if }` | `bold(" if ")` (via `mtext` with `mathvariant="bold"`) |
 
 ### Operators and relations
 
@@ -587,7 +589,7 @@ The test runner (`tests/_typst.js`) uses `TexConvertToTypstData` and validates b
 - Basic operations (fractions, scripts, roots)
 - Greek letters
 - Accents (shorthand and generic forms)
-- Font commands (mathbb, mathcal, mathfrak, mathbf, mathrm, mathit, boldsymbol)
+- Font commands (mathbb, mathcal, mathfrak, mathbf, mathrm, mathit, boldsymbol, textit, textbf)
 - Named functions and operatorname
 - Binary/relational/set operators
 - Arrows and harpoons
