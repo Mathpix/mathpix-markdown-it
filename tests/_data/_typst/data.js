@@ -428,13 +428,13 @@ module.exports = [
   },
   {
     latex: `\\overbrace{x+y}^{n}`,
-    typst: `overbrace(x + y)^n`,
-    typst_inline: `overbrace(x + y)^n`,
+    typst: `overbrace(x + y, n)`,
+    typst_inline: `overbrace(x + y, n)`,
   },
   {
     latex: `\\underbrace{x+y}_{n}`,
-    typst: `underbrace(x + y)_n`,
-    typst_inline: `underbrace(x + y)_n`,
+    typst: `underbrace(x + y, n)`,
+    typst_inline: `underbrace(x + y, n)`,
   },
 
   // === Font commands ===

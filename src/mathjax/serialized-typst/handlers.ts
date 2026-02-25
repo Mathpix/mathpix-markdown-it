@@ -413,6 +413,9 @@ const PRIME_SHORTHANDS: Map<string, string> = new Map([
   ['prime.triple', "'''"],
 ]);
 
+// Regex to detect overbrace/overbracket/underbrace/underbracket as outermost call
+const BRACE_ANNOTATION_RE = /^(overbrace|overbracket|underbrace|underbracket)\((.+)\)$/s;
+
 // --- MSUP handler: superscripts ---
 const msup = () => {
   return (node, serialize): ITypstData => {
@@ -425,6 +428,14 @@ const msup = () => {
       const base = dataFirst.typst;
       const sup = dataSecond.typst.trim();
       const baseTrimmed = base.trim();
+      // overbrace/overbracket annotation: insert as second argument instead of ^
+      if (sup) {
+        const braceMatch = BRACE_ANNOTATION_RE.exec(baseTrimmed);
+        if (braceMatch && (braceMatch[1] === 'overbrace' || braceMatch[1] === 'overbracket')) {
+          res = addToTypstData(res, { typst: braceMatch[1] + '(' + braceMatch[2] + ', ' + sup + ')' });
+          return res;
+        }
+      }
       // \nolimits: wrap known limit-type operators in scripts() to force side placement
       if (baseTrimmed && needsScriptsWrapper(baseTrimmed)) {
         res = addToTypstData(res, { typst: 'scripts(' + baseTrimmed + ')' });
@@ -466,6 +477,14 @@ const msub = () => {
       const sub = dataSecond.typst.trim();
       const base = dataFirst.typst;
       const baseTrimmed = base.trim();
+      // underbrace/underbracket annotation: insert as second argument instead of _
+      if (sub) {
+        const braceMatch = BRACE_ANNOTATION_RE.exec(baseTrimmed);
+        if (braceMatch && (braceMatch[1] === 'underbrace' || braceMatch[1] === 'underbracket')) {
+          res = addToTypstData(res, { typst: braceMatch[1] + '(' + braceMatch[2] + ', ' + sub + ')' });
+          return res;
+        }
+      }
       // \nolimits: wrap known limit-type operators in scripts() to force side placement
       if (baseTrimmed && needsScriptsWrapper(baseTrimmed)) {
         res = addToTypstData(res, { typst: 'scripts(' + baseTrimmed + ')' });
@@ -706,6 +725,12 @@ const mover = () => {
       const baseTrimmed = dataFirst.typst.trim() || '""';
       const over = dataSecond.typst.trim();
       if (over) {
+        // overbrace/overbracket annotation: insert as second argument
+        const braceMatch = BRACE_ANNOTATION_RE.exec(baseTrimmed);
+        if (braceMatch && (braceMatch[1] === 'overbrace' || braceMatch[1] === 'overbracket')) {
+          res = addToTypstData(res, { typst: braceMatch[1] + '(' + braceMatch[2] + ', ' + over + ')' });
+          return res;
+        }
         const baseData = buildLimitBase(firstChild, baseTrimmed, dataFirst.typst);
         res = addToTypstData(res, baseData);
         res = addToTypstData(res, { typst: '^' });
@@ -777,6 +802,12 @@ const munder = () => {
       const baseTrimmed = dataFirst.typst.trim() || '""';
       const under = dataSecond.typst.trim();
       if (under) {
+        // underbrace/underbracket annotation: insert as second argument
+        const braceMatch = BRACE_ANNOTATION_RE.exec(baseTrimmed);
+        if (braceMatch && (braceMatch[1] === 'underbrace' || braceMatch[1] === 'underbracket')) {
+          res = addToTypstData(res, { typst: braceMatch[1] + '(' + braceMatch[2] + ', ' + under + ')' });
+          return res;
+        }
         const baseData = buildLimitBase(firstChild, baseTrimmed, dataFirst.typst);
         res = addToTypstData(res, baseData);
         res = addToTypstData(res, { typst: '_' });
