@@ -120,6 +120,7 @@ All new Typst code lives in `src/mathjax/serialized-typst/`:
 | `x_{i}^{2}` | `x_i^2` | `msubsup` |
 | `\sqrt{x}` | `sqrt(x)` | `msqrt` |
 | `\sqrt[3]{x}` | `root(3, x)` | `mroot` |
+| `\surd` | `\√` | `mo` (escaped — bare `√` triggers Typst sqrt operator) |
 | `\binom{n}{k}` | `binom(n, k)` | `mfrac` (linethickness=0) |
 
 ### Greek letters
