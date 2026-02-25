@@ -1807,4 +1807,20 @@ module.exports = [
     typst: `ceil(x)`,
     typst_inline: `ceil(x)`,
   },
+  // === semicolons escaped inside lr() fallback ===
+  {
+    latex: `\\left|a ; b\\right|`,
+    typst: `lr(| a";" b |)`,
+    typst_inline: `lr(| a";" b |)`,
+  },
+  {
+    latex: `\\left\\lfloor a ; b\\right\\rfloor`,
+    typst: `lr(⌊ a";" b ⌋)`,
+    typst_inline: `lr(⌊ a";" b ⌋)`,
+  },
+  {
+    latex: `\\left( a ; b \\right)`,
+    typst: `lr(( a";" b ))`,
+    typst_inline: `lr(( a";" b ))`,
+  },
 ];

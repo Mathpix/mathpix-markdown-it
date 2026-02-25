@@ -1103,6 +1103,20 @@ const hasTopLevelSeparators = (expr: string): boolean => {
   return false;
 };
 
+/** Escape top-level `;` → `";"` inside lr() content (commas are safe in lr). */
+const escapeLrSemicolons = (expr: string): string => {
+  let depth = 0;
+  let result = '';
+  for (let i = 0; i < expr.length; i++) {
+    const ch = expr[i];
+    if (ch === '(' || ch === '[' || ch === '{') { depth++; result += ch; }
+    else if ((ch === ')' || ch === ']' || ch === '}') && depth > 0) { depth--; result += ch; }
+    else if (ch === ';' && depth === 0) { result += '";"'; }
+    else { result += ch; }
+  }
+  return result;
+};
+
 const BRACKET_SYMBOL_MAP: Record<string, string> = {
   '[': 'bracket.l',
   ']': 'bracket.r',
@@ -1621,26 +1635,26 @@ const mrow = () => {
           const hasSep = hasTopLevelSeparators(trimmedContent);
           if (openDelim === '|' && closeDelim === '|') {
             res = addToTypstData(res, { typst: hasSep
-              ? 'lr(| ' + trimmedContent + ' |)'
+              ? 'lr(| ' + escapeLrSemicolons(trimmedContent) + ' |)'
               : 'abs(' + trimmedContent + ')' });
           } else if (openDelim === '\u2016' && closeDelim === '\u2016') {
             // ‖...‖ → norm() or lr(‖ ... ‖)
             res = addToTypstData(res, { typst: hasSep
-              ? 'lr(‖ ' + trimmedContent + ' ‖)'
+              ? 'lr(‖ ' + escapeLrSemicolons(trimmedContent) + ' ‖)'
               : 'norm(' + trimmedContent + ')' });
           } else if (openDelim === '\u230A' && closeDelim === '\u230B') {
             // ⌊...⌋ → floor() or lr(⌊ ... ⌋)
             res = addToTypstData(res, { typst: hasSep
-              ? 'lr(⌊ ' + trimmedContent + ' ⌋)'
+              ? 'lr(⌊ ' + escapeLrSemicolons(trimmedContent) + ' ⌋)'
               : 'floor(' + trimmedContent + ')' });
           } else if (openDelim === '\u2308' && closeDelim === '\u2309') {
             // ⌈...⌉ → ceil() or lr(⌈ ... ⌉)
             res = addToTypstData(res, { typst: hasSep
-              ? 'lr(⌈ ' + trimmedContent + ' ⌉)'
+              ? 'lr(⌈ ' + escapeLrSemicolons(trimmedContent) + ' ⌉)'
               : 'ceil(' + trimmedContent + ')' });
           } else {
-            // General lr() for auto-sizing
-            res = addToTypstData(res, { typst: 'lr(' + open + ' ' + trimmedContent + ' ' + close + ')' });
+            // General lr() for auto-sizing — escape semicolons
+            res = addToTypstData(res, { typst: 'lr(' + open + ' ' + escapeLrSemicolons(trimmedContent) + ' ' + close + ')' });
           }
         } else {
           // One or both delimiters invisible: wrap visible side in lr()
@@ -1650,9 +1664,9 @@ const mrow = () => {
           const openEsc = openDelim ? escapeDelimiterForLr(openDelim) : '';
           const closeEsc = closeDelim ? escapeDelimiterForLr(closeDelim) : '';
           if (openEsc) {
-            res = addToTypstData(res, { typst: 'lr(' + openEsc + ' ' + trimmed + ')' });
+            res = addToTypstData(res, { typst: 'lr(' + openEsc + ' ' + escapeLrSemicolons(trimmed) + ')' });
           } else if (closeEsc) {
-            res = addToTypstData(res, { typst: 'lr(' + trimmed + ' ' + closeEsc + ')' });
+            res = addToTypstData(res, { typst: 'lr(' + escapeLrSemicolons(trimmed) + ' ' + closeEsc + ')' });
           } else {
             res = addToTypstData(res, { typst: trimmed });
           }
