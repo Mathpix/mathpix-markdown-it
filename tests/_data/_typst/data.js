@@ -1592,6 +1592,12 @@ module.exports = [
     typst: `f(x) = cases(\n  x^2 + 1"," & x > 1,\n  1"," & x = 1,\n  x + 1"," & x < 1,\n)`,
     typst_inline: `f(x) = cases(\n  x^2 + 1"," & x > 1,\n  1"," & x = 1,\n  x + 1"," & x < 1,\n)`,
   },
+  // cases via array with semicolons in cells (semicolons must be escaped)
+  {
+    latex: `\\left\\{ \\begin{array}{ll} \\sigma (x), & L(u) = 1; \\\\ 1 - \\sigma (x), & L(u) = 0, \\end{array} \\right.`,
+    typst: `cases(sigma(x)"," & L(u) = 1";", 1 - sigma(x)"," & L(u) = 0",")`,
+    typst_inline: `cases(sigma(x)"," & L(u) = 1";", 1 - sigma(x)"," & L(u) = 0",")`,
+  },
   // numcases with empty prefix and explicit \tag (processed by MathJax as real tags)
   {
     latex: `\\begin{numcases}{} \\Delta_{q}^{\\alpha} x^{n}=f\\left(t_{n}, x^{n}\\right), n=1,2, \\ldots, N \\tag{3.12}\\label{eq:3.12}\\\\ x^{0}=x_{0} \\tag{3.13}\\label{eq3.13} \\end{numcases}`,

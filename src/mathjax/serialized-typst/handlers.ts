@@ -1033,11 +1033,12 @@ const serializePrefixBeforeMo = (node, serialize, stopMoText: string): string =>
   return result.trim();
 };
 
-// Escape top-level commas in a Typst expression for use inside cases().
-// Replaces commas at parenthesis depth 0 with "," (Typst text string)
-// so they render as commas but aren't parsed as cases() argument separators.
-// Commas inside function calls like lr((...)) are left as-is.
-const escapeCasesCommas = (expr: string): string => {
+// Escape top-level commas and semicolons in a Typst expression for use inside cases().
+// Replaces commas at depth 0 with "," and semicolons at depth 0 with ";"
+// (Typst text strings) so they render visually but aren't parsed as
+// cases()/mat() argument or row separators.
+// Characters inside function calls like lr((...)) are left as-is.
+const escapeCasesSeparators = (expr: string): string => {
   let depth = 0;
   let result = '';
   for (let i = 0; i < expr.length; i++) {
@@ -1050,6 +1051,8 @@ const escapeCasesCommas = (expr: string): string => {
       result += ch;
     } else if (ch === ',' && depth === 0) {
       result += '","';
+    } else if (ch === ';' && depth === 0) {
+      result += '";"';
     } else {
       result += ch;
     }
@@ -1279,7 +1282,7 @@ const mtable = () => {
           if (cells.length === 1) {
             // Single cell (no & separator): escape top-level commas
             // to prevent them being parsed as cases() argument separators
-            caseRows.push(escapeCasesCommas(replaceUnpairedBrackets(cells[0])));
+            caseRows.push(escapeCasesSeparators(replaceUnpairedBrackets(cells[0])));
           } else {
             caseRows.push(cells.map(c => replaceUnpairedBrackets(c)).join(' & '));
           }
@@ -1367,7 +1370,7 @@ const mtable = () => {
         } else if (isCases) {
           // Cases: escape top-level commas in each cell to prevent them
           // being parsed as cases() argument separators, then join with &
-          rows.push(cells.map(c => escapeCasesCommas(replaceUnpairedBrackets(c))).join(' & '));
+          rows.push(cells.map(c => escapeCasesSeparators(replaceUnpairedBrackets(c))).join(' & '));
         } else {
           rows.push(cells.map(c => replaceUnpairedBrackets(c)).join(', '));
         }
