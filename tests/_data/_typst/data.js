@@ -1145,6 +1145,11 @@ module.exports = [
     typst: `#text(fill: red)[x]`,
     typst_inline: `#text(fill: red)[x]`,
   },
+  {
+    latex: `\\color{#D61F06}{60}`,
+    typst: `#text(fill: rgb("#D61F06"))[60]`,
+    typst_inline: `#text(fill: rgb("#D61F06"))[60]`,
+  },
 
   // === Boxed ===
   {

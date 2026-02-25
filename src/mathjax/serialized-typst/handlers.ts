@@ -1982,8 +1982,12 @@ const mstyle = () => {
       const mathcolor: string = rawColor && rawColor !== '_inherit_' ? rawColor : '';
       const data: ITypstData = handlerApi.handleAll(node, serialize);
       if (mathcolor && data.typst.trim()) {
+        // Hex colors (#D61F06) need rgb("...") wrapper; named colors (red) pass through
+        const fillValue = mathcolor.startsWith('#')
+          ? 'rgb("' + mathcolor + '")'
+          : mathcolor;
         res = addToTypstData(res, {
-          typst: '#text(fill: ' + mathcolor + ')[' + data.typst.trim() + ']'
+          typst: '#text(fill: ' + fillValue + ')[' + data.typst.trim() + ']'
         });
         return res;
       }

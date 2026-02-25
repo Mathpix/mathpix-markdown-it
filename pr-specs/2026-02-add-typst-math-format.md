@@ -473,6 +473,7 @@ In Typst, `underbrace` and `overbrace` take annotations as a second argument: `u
 | `\enclose{bottom}{x+y}` | `underline(x + y)` |
 | `\lcm{24}` | `underline(")"24)` (macro expands to `\enclose{bottom}{\smash{)}{24}\:}`; leading `)` from `\smash` → `")"`, trailing `med` from `\:` stripped, no space for tight rendering) |
 | `\color{red}{x}` | `#text(fill: red)[x]` |
+| `\color{#D61F06}{60}` | `#text(fill: rgb("#D61F06"))[60]` (hex colors wrapped in `rgb("...")`) |
 | `\phantom{x}` | `#hide($x$)` (preserves dimensions) |
 | `\hphantom{x}` | `#hide($x$)` (same — Typst hide preserves full box) |
 | `\vphantom{x}` | `#hide($x$)` (same — no separate h/v variant in Typst) |
