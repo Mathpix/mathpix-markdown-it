@@ -1900,4 +1900,15 @@ module.exports = [
     typst: `underline(x + y)`,
     typst_inline: `underline(x + y)`,
   },
+  // === surd (√ escaped to prevent sqrt operator) ===
+  {
+    latex: `\\surd`,
+    typst: `\\√`,
+    typst_inline: `\\√`,
+  },
+  {
+    latex: `\\surd 123`,
+    typst: `\\√ 123`,
+    typst_inline: `\\√ 123`,
+  },
 ];

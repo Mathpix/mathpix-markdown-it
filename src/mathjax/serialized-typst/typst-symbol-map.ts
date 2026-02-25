@@ -237,6 +237,7 @@ const dots: ReadonlyArray<[string, string]> = [
 
 // Miscellaneous symbols: Unicode → Typst symbol name
 const miscSymbols: ReadonlyArray<[string, string]> = [
+  ["\u221A", "\\√"],             // √ (surd — escaped to prevent Typst sqrt operator)
   ["\u221E", "infinity"],       // ∞
   ["\u2207", "nabla"],          // ∇
   ["\u2202", "partial"],        // ∂
