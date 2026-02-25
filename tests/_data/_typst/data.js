@@ -1623,4 +1623,20 @@ module.exports = [
     typst: `mat(delim: #none, [a + b])`,
     typst_inline: `mat(delim: #none, [a + b])`,
   },
+  // === Empty scripts (e.g. m^{} or m_{}) should be dropped ===
+  {
+    latex: `\\frac{m^{}}{\\tau}`,
+    typst: `frac(m, tau)`,
+    typst_inline: `frac(m, tau)`,
+  },
+  {
+    latex: `a_{}^{2}`,
+    typst: `a^2`,
+    typst_inline: `a^2`,
+  },
+  {
+    latex: `x^{}`,
+    typst: `x`,
+    typst_inline: `x`,
+  },
 ];

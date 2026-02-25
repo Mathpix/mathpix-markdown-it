@@ -432,16 +432,19 @@ const msup = () => {
         // Empty base (e.g. LaTeX ^{x} with no preceding base): use empty placeholder
         res = addToTypstData(res, { typst: baseTrimmed ? base : '""' });
       }
-      // Optimize prime symbols to Typst ' shorthand
-      const primeShorthand = PRIME_SHORTHANDS.get(sup);
-      if (primeShorthand) {
-        res = addToTypstData(res, { typst: primeShorthand });
-      } else {
-        res = addToTypstData(res, { typst: '^' });
-        if (needsParens(sup)) {
-          res = addToTypstData(res, { typst: '(' + sup + ')' });
+      // Skip empty superscript (e.g. LaTeX m^{} → just "m")
+      if (sup) {
+        // Optimize prime symbols to Typst ' shorthand
+        const primeShorthand = PRIME_SHORTHANDS.get(sup);
+        if (primeShorthand) {
+          res = addToTypstData(res, { typst: primeShorthand });
         } else {
-          res = addToTypstData(res, { typst: sup });
+          res = addToTypstData(res, { typst: '^' });
+          if (needsParens(sup)) {
+            res = addToTypstData(res, { typst: '(' + sup + ')' });
+          } else {
+            res = addToTypstData(res, { typst: sup });
+          }
         }
       }
       return res;
@@ -469,11 +472,14 @@ const msub = () => {
       } else {
         res = addToTypstData(res, { typst: baseTrimmed ? base : '""' });
       }
-      res = addToTypstData(res, { typst: '_' });
-      if (needsParens(sub)) {
-        res = addToTypstData(res, { typst: '(' + sub + ')' });
-      } else {
-        res = addToTypstData(res, { typst: sub });
+      // Skip empty subscript (e.g. LaTeX m_{} → just "m")
+      if (sub) {
+        res = addToTypstData(res, { typst: '_' });
+        if (needsParens(sub)) {
+          res = addToTypstData(res, { typst: '(' + sub + ')' });
+        } else {
+          res = addToTypstData(res, { typst: sub });
+        }
       }
       return res;
     } catch (e) {
@@ -503,17 +509,22 @@ const msubsup = () => {
       } else {
         res = addToTypstData(res, { typst: baseTrimmed ? base : '""' });
       }
-      res = addToTypstData(res, { typst: '_' });
-      if (needsParens(sub)) {
-        res = addToTypstData(res, { typst: '(' + sub + ')' });
-      } else {
-        res = addToTypstData(res, { typst: sub });
+      // Skip empty subscript/superscript (e.g. LaTeX m_{}^{x} → just "m^x")
+      if (sub) {
+        res = addToTypstData(res, { typst: '_' });
+        if (needsParens(sub)) {
+          res = addToTypstData(res, { typst: '(' + sub + ')' });
+        } else {
+          res = addToTypstData(res, { typst: sub });
+        }
       }
-      res = addToTypstData(res, { typst: '^' });
-      if (needsParens(sup)) {
-        res = addToTypstData(res, { typst: '(' + sup + ')' });
-      } else {
-        res = addToTypstData(res, { typst: sup });
+      if (sup) {
+        res = addToTypstData(res, { typst: '^' });
+        if (needsParens(sup)) {
+          res = addToTypstData(res, { typst: '(' + sup + ')' });
+        } else {
+          res = addToTypstData(res, { typst: sup });
+        }
       }
       return res;
     } catch (e) {
