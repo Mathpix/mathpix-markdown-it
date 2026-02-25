@@ -163,7 +163,22 @@ Spaced binary operators (`+`, `-`, `=`, `<`, `>`), named operators (`\cdot` → 
 
 ### Arrows
 
-Standard arrows (`\rightarrow` → `arrow.r`, `\Leftrightarrow` → `arrow.l.r.double`, `\mapsto` → `arrow.r.bar`), extensible arrows (`\xrightarrow{f}` → `limits(arrow.r)^f`), harpoons (`\rightleftharpoons` → `harpoons.rtlb`).
+Standard arrows (`\rightarrow` → `arrow.r`, `\Leftrightarrow` → `arrow.l.r.double`, `\mapsto` → `arrow.r.bar`), extensible arrows (`\xrightarrow{f}` → `stretch(arrow.r)^f`), harpoons (`\rightleftharpoons` → `harpoons.rtlb`).
+
+**Extensible arrows vs stacking:** LaTeX extensible arrows (`\xrightarrow`, `\xleftarrow`, `\xtwoheadrightarrow`, `\xmapsto`, `\xlongequal`, `\xtofrom`, etc.) stretch the base symbol to fit annotations. Stacking commands (`\stackrel`, `\overset`, `\underset`) place text above/below without stretching. The serializer distinguishes these by checking the `stretchy` attribute on the base `mo` node (MathJax sets `stretchy=true` for extensible arrows). The inner `mo` is found by unwrapping `mstyle`/`inferredMrow` wrappers (up to 5 levels). Only symbols in `STRETCH_BASE_SYMBOLS` (arrows, harpoons, `=`) are eligible.
+
+| LaTeX | Typst | Why |
+|-------|-------|-----|
+| `\xrightarrow[below]{above}` | `stretch(arrow.r)_(below)^(above)` | `stretchy=true` → stretch |
+| `\xleftarrow{g}` | `stretch(arrow.l)^g` | `stretchy=true` → stretch |
+| `\xtwoheadrightarrow[du=dx]{u=x+1}` | `stretch(arrow.r.twohead)_(d u = d x)^(u = x + 1)` | stretch |
+| `\xtwoheadleftarrow[du=dx]{u=x+1}` | `stretch(arrow.l.twohead)_(d u = d x)^(u = x + 1)` | stretch |
+| `\xmapsto[du=dx]{u=x+1}` | `stretch(arrow.r.bar)_(d u = d x)^(u = x + 1)` | stretch |
+| `\xlongequal[du=dx]{u=x+1}` | `stretch(=)_(d u = d x)^(u = x + 1)` | stretch |
+| `\xtofrom[du=dx]{u=x+1}` | `stretch(arrows.rr)_(d u = d x)^(u = x + 1)` | stretch |
+| `\stackrel{f}{\rightarrow}` | `limits(arrow.r)^f` | no `stretchy` → limits |
+| `\overset{n}{=}` | `limits(=)^n` | no `stretchy` → limits |
+| `\underset{n}{=}` | `limits(=)_n` | no `stretchy` → limits |
 
 ### Named functions
 
