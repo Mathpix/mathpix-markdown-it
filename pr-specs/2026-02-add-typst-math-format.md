@@ -126,6 +126,8 @@ All new Typst code lives in `src/mathjax/serialized-typst/`:
 
 Full coverage of lowercase, uppercase, and variant forms. Examples: `\alpha` → `alpha`, `\varepsilon` → `epsilon`, `\vartheta` → `theta.alt`.
 
+**Dotless letters:** `\imath` → `dotless.i`, `\jmath` → `dotless.j`. Commonly used under accents: `\hat{\imath}` → `hat(dotless.i)`.
+
 ### Accents
 
 | LaTeX | Typst | Method |
