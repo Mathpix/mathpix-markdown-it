@@ -1879,4 +1879,10 @@ module.exports = [
     typst: `0.05 overline(")"341.5)`,
     typst_inline: `0.05 overline(")"341.5)`,
   },
+  // === enclose{circle} ===
+  {
+    latex: `\\enclose{circle}{x+y}`,
+    typst: `#circle(inset: 3pt, $x + y$)`,
+    typst_inline: `x + y`,
+  },
 ];

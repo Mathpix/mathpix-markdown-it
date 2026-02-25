@@ -1878,6 +1878,9 @@ const menclose = () => {
       } else if (notation.indexOf('longdiv') > -1) {
         // \longdiv / \enclose{longdiv} → overline(")" content)
         res = addToTypstData(res, { typst: 'overline(")"' + content + ')' });
+      } else if (notation.indexOf('circle') > -1) {
+        // \enclose{circle} → #circle with inset
+        res = addToTypstData(res, { typst: '#circle(inset: 3pt, $' + content + '$)', typst_inline: content });
       } else {
         // Unknown notation: pass through content
         res = addToTypstData(res, data);
