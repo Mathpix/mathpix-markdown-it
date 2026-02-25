@@ -1877,7 +1877,7 @@ const menclose = () => {
         res = addToTypstData(res, { typst: 'cancel(' + content + ')' });
       } else if (notation.indexOf('longdiv') > -1) {
         // \longdiv / \enclose{longdiv} → overline(")" content)
-        res = addToTypstData(res, { typst: 'overline(")" ' + content + ')' });
+        res = addToTypstData(res, { typst: 'overline(")"' + content + ')' });
       } else {
         // Unknown notation: pass through content
         res = addToTypstData(res, data);
