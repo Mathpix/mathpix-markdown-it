@@ -481,6 +481,16 @@ Multi-character Typst symbol names (e.g. `lt.eq`, `gt.eq`, `arrow.r`) must have 
 
 LaTeX allows `^{x}` with no preceding base. The `msup`, `msub`, and `msubsup` handlers detect an empty base and emit `""` as a placeholder, preventing Typst's "unexpected hat" error.
 
+### Empty-exponent scripts
+
+LaTeX allows empty script groups like `m^{}` or `a_{}`, which MathJax preserves as `msup`/`msub`/`msubsup` nodes with empty children. The `msup`, `msub`, and `msubsup` handlers detect empty (after trim) superscript or subscript content and silently skip the script operator, preventing dangling `^` or `_` in Typst output.
+
+| LaTeX | Typst |
+|-------|-------|
+| `\frac{m^{}}{\tau}` | `frac(m, tau)` |
+| `a_{}^{2}` | `a^2` |
+| `x^{}` | `x` |
+
 ### Empty-content protection
 
 Typst functions require non-empty arguments — `sqrt()`, `frac(,)`, `hat()` etc. produce errors. When LaTeX content is empty (e.g. `\sqrt{}`, `\frac{}{}`, `\hat{}`), handlers use `|| '""'` fallback to emit a Typst empty text string as placeholder. Protected handlers: `msqrt`, `mroot`, `mfrac`/`binom`, `mover` (accents), `munder` (accents), `munderover` (limits base), `mmultiscripts` (attach base), `mn` (font wrapping), `menclose` (cancel/boxed).
@@ -588,7 +598,7 @@ The test runner (`tests/_typst.js`) uses `TexConvertToTypstData` and validates b
 - Substack
 - Mod variants (bmod, pmod)
 - Labels on equations (equation, align, gather, split, tag+label, numcases with labels)
-- Edge cases (empty-base scripts, cancel, color, boxed, primes, pipe grouping)
+- Edge cases (empty-base scripts, empty-exponent scripts, cancel, color, boxed, primes, pipe grouping)
 
 **Commands:**
 ```bash
