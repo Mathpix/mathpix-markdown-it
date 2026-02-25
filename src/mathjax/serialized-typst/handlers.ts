@@ -1846,6 +1846,21 @@ const mpadded = () => {
     let res: ITypstData = initTypstData();
     try {
       const data: ITypstData = handlerApi.handleAll(node, serialize);
+      const content = data.typst.trim();
+      // Handle mathbackground attribute (\colorbox{color}{...})
+      const atr = getAttributes(node);
+      const rawBg: string = atr?.mathbackground || '';
+      const mathbg: string = rawBg && rawBg !== '_inherit_' ? rawBg : '';
+      if (mathbg && content) {
+        const fillValue = mathbg.startsWith('#')
+          ? 'rgb("' + mathbg + '")'
+          : mathbg;
+        res = addToTypstData(res, {
+          typst: '#highlight(fill: ' + fillValue + ')[$' + content + '$]',
+          typst_inline: content
+        });
+        return res;
+      }
       res = addToTypstData(res, data);
       return res;
     } catch (e) {

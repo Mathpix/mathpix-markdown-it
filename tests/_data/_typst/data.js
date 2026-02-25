@@ -1150,6 +1150,21 @@ module.exports = [
     typst: `#text(fill: rgb("#D61F06"))[60]`,
     typst_inline: `#text(fill: rgb("#D61F06"))[60]`,
   },
+  {
+    latex: `\\colorbox{yellow}{x+y}`,
+    typst: `#highlight(fill: yellow)[$"x+y"$]`,
+    typst_inline: `"x+y"`,
+  },
+  {
+    latex: `\\colorbox{#D61F06}{abc}`,
+    typst: `#highlight(fill: rgb("#D61F06"))[$"abc"$]`,
+    typst_inline: `"abc"`,
+  },
+  {
+    latex: `\\fcolorbox{red}{yellow}{x}`,
+    typst: `#highlight(fill: yellow)[$"x"$]`,
+    typst_inline: `"x"`,
+  },
 
   // === Boxed ===
   {
