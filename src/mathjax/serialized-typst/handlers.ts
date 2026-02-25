@@ -1220,22 +1220,26 @@ const replaceUnpairedBrackets = (expr: string): string => {
       // If so, skip the entire function call content
       if (ch === '(' && i > 0 && /[\w.]/.test(expr[i - 1])) {
         let depth = 1;
-        i++;
-        while (i < expr.length && depth > 0) {
-          if (expr[i] === '\\') { i++; }
-          else if (expr[i] === '"') {
-            i++;
-            while (i < expr.length && expr[i] !== '"') {
-              if (expr[i] === '\\') i++;
-              i++;
+        let scanPos = i + 1;
+        while (scanPos < expr.length && depth > 0) {
+          if (expr[scanPos] === '\\') { scanPos++; }
+          else if (expr[scanPos] === '"') {
+            scanPos++;
+            while (scanPos < expr.length && expr[scanPos] !== '"') {
+              if (expr[scanPos] === '\\') scanPos++;
+              scanPos++;
             }
           }
-          else if (expr[i] === '(') depth++;
-          else if (expr[i] === ')') depth--;
-          if (depth > 0) i++;
+          else if (expr[scanPos] === '(') depth++;
+          else if (expr[scanPos] === ')') depth--;
+          if (depth > 0) scanPos++;
         }
-        // i now points to the closing ), skip it
-        continue;
+        if (depth === 0) {
+          // Found matching ) — skip the entire function call
+          i = scanPos;
+          continue;
+        }
+        // No matching ) — treat ( as a regular bracket (will be detected as unmatched)
       }
       brackets.push({ char: ch, pos: i });
     }
@@ -1945,6 +1949,8 @@ const menclose = () => {
 };
 
 // --- Handler dispatch ---
+export { replaceUnpairedBrackets };
+
 export const handle = (node, serialize): ITypstData => {
   const handler = handlers[node.kind] || defHandle;
   return handler(node, serialize);

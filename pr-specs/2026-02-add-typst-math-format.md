@@ -595,6 +595,21 @@ LaTeX delimiters without `\left...\right` produce unpaired `<mo>` nodes in MathM
 
 This ensures paired delimiters form grouped expressions in Typst (important after `/` for correct fraction denominator binding). For symmetric delimiters (`|`, `‖`), pairs inside `TeXAtom` groups (e.g. superscript `{|\alpha|}`) are left as-is since the enclosing script parens already provide grouping.
 
+### Unmatched bracket replacement
+
+Typst math requires balanced delimiters — an unmatched `(`, `)`, `[`, `]`, `{`, or `}` causes a compile error. The `replaceUnpairedBrackets()` helper (originally used inside matrix/cases cells) is now applied globally to the final Typst output via `toTypstData()`. It replaces unmatched delimiters with their Typst symbol names:
+
+| Unmatched char | Replacement |
+|----------------|-------------|
+| `(` | `paren.l` |
+| `)` | `paren.r` |
+| `[` | `bracket.l` |
+| `]` | `bracket.r` |
+| `{` | `brace.l` |
+| `}` | `brace.r` |
+
+Parentheses preceded by a word character (e.g. `sigma(`) are only treated as function-call parens if a matching `)` is found; otherwise they fall through to unmatched bracket detection. Example: `\sigma(\mathrm{nm} ;` → `sigma paren.l upright("nm");`.
+
 ## Example
 
 ### Input

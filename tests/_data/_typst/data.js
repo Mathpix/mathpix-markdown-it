@@ -1952,4 +1952,20 @@ module.exports = [
     typst: `underline(")"x + y)`,
     typst_inline: `underline(")"x + y)`,
   },
+  // === Unmatched brackets → Typst symbol names ===
+  {
+    latex: `\\sigma(\\mathrm{nm} ;`,
+    typst: `sigma paren.l upright("nm");`,
+    typst_inline: `sigma paren.l upright("nm");`,
+  },
+  {
+    latex: `(a + b`,
+    typst: `paren.l a + b`,
+    typst_inline: `paren.l a + b`,
+  },
+  {
+    latex: `a) + b`,
+    typst: `a paren.r + b`,
+    typst_inline: `a paren.r + b`,
+  },
 ];

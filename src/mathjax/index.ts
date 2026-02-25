@@ -5,6 +5,7 @@ import { LiteElement } from "mathjax-full/js/adaptors/lite/Element.js";
 import { SerializedAsciiVisitor as AsciiVisitor } from './serialized-ascii';
 import { SerializedTypstVisitor } from './serialized-typst';
 import { ITypstData } from './serialized-typst/common';
+import { replaceUnpairedBrackets } from './serialized-typst/handlers';
 import { MathMLVisitorWord } from './mathml-word';
 import { getSpeech } from '../sre';
 import { TAccessibility } from "../mathpix-markdown-model";
@@ -81,8 +82,8 @@ const normalizeTypstSpaces = (s: string): string =>
 const toTypstData = ((node, optionTypst?): { typstmath: string; typstmath_inline: string } => {
   const visitorT = new SerializedTypstVisitor(optionTypst);
   const data: ITypstData = visitorT.visitTree(node);
-  const typstmath = normalizeTypstSpaces(data?.typst);
-  const typstmath_inline = normalizeTypstSpaces(data?.typst_inline ?? data?.typst);
+  const typstmath = replaceUnpairedBrackets(normalizeTypstSpaces(data?.typst));
+  const typstmath_inline = replaceUnpairedBrackets(normalizeTypstSpaces(data?.typst_inline ?? data?.typst));
   return { typstmath, typstmath_inline };
 });
 
