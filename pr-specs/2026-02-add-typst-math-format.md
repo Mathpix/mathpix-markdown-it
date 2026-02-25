@@ -475,6 +475,8 @@ In Typst, `underbrace` and `overbrace` take annotations as a second argument: `u
 | `f'(x)` | `f'(x)` (prime shorthand) |
 | `\$ 120,000` | `\$ 120","000` (escaped dollar + thousand-separator commas) |
 | `\wp` | `℘` (Unicode output — no named Typst symbol) |
+| `6 \longdiv{84}` | `6 overline(")" 84)` (long division symbol) |
+| `\enclose{longdiv}{500}` | `overline(")" 500)` (same via menclose) |
 
 ## Symbol Map Validation
 
