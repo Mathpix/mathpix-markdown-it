@@ -1848,4 +1848,35 @@ module.exports = [
     typst: `lr(( a";" b ))`,
     typst_inline: `lr(( a";" b ))`,
   },
+  // === longdiv ===
+  {
+    latex: `6 \\longdiv { 84 }`,
+    typst: `6 overline(")" 84)`,
+    typst_inline: `6 overline(")" 84)`,
+  },
+  {
+    latex: `1 2 \\longdiv { 24 }`,
+    typst: `1 2 overline(")" 24)`,
+    typst_inline: `1 2 overline(")" 24)`,
+  },
+  {
+    latex: `\\longdiv{52}`,
+    typst: `overline(")" 52)`,
+    typst_inline: `overline(")" 52)`,
+  },
+  {
+    latex: `4 \\enclose{longdiv}{500}`,
+    typst: `4 overline(")" 500)`,
+    typst_inline: `4 overline(")" 500)`,
+  },
+  {
+    latex: `x + 2\\longdiv { 2x ^ { 3} - x - 11}`,
+    typst: `x + 2 overline(")" 2 x^3 - x - 11)`,
+    typst_inline: `x + 2 overline(")" 2 x^3 - x - 11)`,
+  },
+  {
+    latex: `0.05\\longdiv { 341.5}`,
+    typst: `0.05 overline(")" 341.5)`,
+    typst_inline: `0.05 overline(")" 341.5)`,
+  },
 ];
