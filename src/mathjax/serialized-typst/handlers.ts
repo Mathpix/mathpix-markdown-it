@@ -1881,6 +1881,15 @@ const menclose = () => {
       } else if (notation.indexOf('circle') > -1) {
         // \enclose{circle} → #circle with inset
         res = addToTypstData(res, { typst: '#circle(inset: 3pt, $' + content + '$)', typst_inline: content });
+      } else if (notation.indexOf('radical') > -1) {
+        // \enclose{radical} → sqrt()
+        res = addToTypstData(res, { typst: 'sqrt(' + content + ')' });
+      } else if (notation.indexOf('top') > -1) {
+        // \enclose{top} → overline()
+        res = addToTypstData(res, { typst: 'overline(' + content + ')' });
+      } else if (notation.indexOf('bottom') > -1) {
+        // \enclose{bottom} → underline()
+        res = addToTypstData(res, { typst: 'underline(' + content + ')' });
       } else {
         // Unknown notation: pass through content
         res = addToTypstData(res, data);

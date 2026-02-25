@@ -1885,4 +1885,19 @@ module.exports = [
     typst: `#circle(inset: 3pt, $x + y$)`,
     typst_inline: `x + y`,
   },
+  {
+    latex: `\\enclose{radical}{x+y}`,
+    typst: `sqrt(x + y)`,
+    typst_inline: `sqrt(x + y)`,
+  },
+  {
+    latex: `\\enclose{top}{x+y}`,
+    typst: `overline(x + y)`,
+    typst_inline: `overline(x + y)`,
+  },
+  {
+    latex: `\\enclose{bottom}{x+y}`,
+    typst: `underline(x + y)`,
+    typst_inline: `underline(x + y)`,
+  },
 ];
