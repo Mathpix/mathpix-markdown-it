@@ -19,7 +19,7 @@ Owner: @OlgaRedozubova
 - Implement a complete LaTeX → Typst math converter by traversing MathJax's internal MathML tree
 - Cover all major LaTeX math constructs: arithmetic, Greek letters, accents, fonts, operators, delimiters, matrices, equation arrays, cases, large operators, integrals, scripts, roots, spacing, and more
 - Expose Typst output in the rendering pipeline (`OuterData`, `OuterHTML`) and the right-click context menu
-- Produce idiomatic Typst — use native shorthands (`norm()`, `floor()`, `ceil()`, `RR`, `NN`, prime `'` syntax, `dif`) instead of verbose generic forms where possible
+- Produce idiomatic Typst — use native shorthands (`abs()`, `norm()`, `floor()`, `ceil()`, `RR`, `NN`, prime `'` syntax, `dif`) instead of verbose generic forms where possible, with automatic `lr()` fallback when content has separators
 
 ## Non-Goals
 
@@ -178,12 +178,18 @@ Built-in Typst math operators (`sin`, `cos`, `tan`, `log`, `lim`, etc.) pass thr
 | `\left\| x \right\|` | `norm(x)` |
 | `\left\lfloor x \right\rfloor` | `floor(x)` |
 | `\left\lceil x \right\rceil` | `ceil(x)` |
+| `\left| a, b, c \right|` | `lr(\| a, b, c \|)` (fallback — content has separators) |
+| `\left\| a, b \right\|` | `lr(‖ a, b ‖)` (fallback) |
+| `\left\lfloor a, b \right\rfloor` | `lr(⌊ a, b ⌋)` (fallback) |
+| `\left\lceil a, b \right\rceil` | `lr(⌈ a, b ⌉)` (fallback) |
 | `\left( x \right.` | `( x` (one-sided) |
 | `\big( x \big)` | `lr(size: #1.2em, ( x ))` |
 | `|x|` (without `\left...\right`) | `lr(| x |)` (pipe-pair detection) |
 | `\lfloor x \rfloor` (without `\left...\right`) | `floor(x)` (bare delimiter-pair detection) |
 | `\lceil y \rceil` (without `\left...\right`) | `ceil(y)` (bare delimiter-pair detection) |
 | `\|x\|` (‖, without `\left...\right`) | `norm(x)` (bare delimiter-pair detection) |
+
+**Separator-safe fallback for shorthand functions:** `abs()`, `norm()`, `floor()`, `ceil()` accept exactly one argument. If the delimited content contains a top-level `,` or `;` (detected by `hasTopLevelSeparators()`), these would be misinterpreted as argument/row separators inside the function call. In such cases, the serializer falls back to `lr()` with explicit delimiter characters (`lr(| ... |)`, `lr(‖ ... ‖)`, `lr(⌊ ... ⌋)`, `lr(⌈ ... ⌉)`), where commas just separate content fragments without breaking semantics. Characters inside nested parentheses/brackets are not counted.
 
 ### Matrices and equation arrays
 
