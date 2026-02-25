@@ -1645,4 +1645,17 @@ module.exports = [
     typst: `x`,
     typst_inline: `x`,
   },
+  // === Separator escaping in mat() cells ===
+  // Semicolon in matrix cell must be escaped to ";"
+  {
+    latex: `\\begin{pmatrix} a & b; \\\\ c & d \\end{pmatrix}`,
+    typst: `mat(delim: "(", a, b";"; c, d)`,
+    typst_inline: `mat(delim: "(", a, b";"; c, d)`,
+  },
+  // Comma in matrix cell must be escaped to ","
+  {
+    latex: `\\begin{pmatrix} a, b & c \\\\ d & e \\end{pmatrix}`,
+    typst: `mat(delim: "(", a"," b, c; d, e)`,
+    typst_inline: `mat(delim: "(", a"," b, c; d, e)`,
+  },
 ];

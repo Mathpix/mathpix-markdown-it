@@ -1284,7 +1284,7 @@ const mtable = () => {
             // to prevent them being parsed as cases() argument separators
             caseRows.push(escapeCasesSeparators(replaceUnpairedBrackets(cells[0])));
           } else {
-            caseRows.push(cells.map(c => replaceUnpairedBrackets(c)).join(' & '));
+            caseRows.push(cells.map(c => escapeCasesSeparators(replaceUnpairedBrackets(c))).join(' & '));
           }
         }
 
@@ -1372,7 +1372,9 @@ const mtable = () => {
           // being parsed as cases() argument separators, then join with &
           rows.push(cells.map(c => escapeCasesSeparators(replaceUnpairedBrackets(c))).join(' & '));
         } else {
-          rows.push(cells.map(c => replaceUnpairedBrackets(c)).join(', '));
+          // Matrix: escape top-level commas and semicolons in each cell
+          // to prevent them being parsed as mat() cell/row separators
+          rows.push(cells.map(c => escapeCasesSeparators(replaceUnpairedBrackets(c))).join(', '));
         }
       }
       if (isEqnArray) {
