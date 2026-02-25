@@ -1952,4 +1952,83 @@ module.exports = [
     typst: `underline(")"x + y)`,
     typst_inline: `underline(")"x + y)`,
   },
+  // --- Unpaired bracket escaping (pre-serialization tree walk) ---
+  {
+    latex: `\\sigma(\\mathrm{nm} ;`,
+    typst: `sigma \\(upright("nm");`,
+    typst_inline: `sigma \\(upright("nm");`,
+  },
+  {
+    latex: `\\sigma(x)`,
+    typst: `sigma(x)`,
+    typst_inline: `sigma(x)`,
+  },
+  {
+    latex: `\\alpha(x+y)`,
+    typst: `alpha(x + y)`,
+    typst_inline: `alpha(x + y)`,
+  },
+  {
+    latex: `1 - \\sum _ { k = 0 } ^ { z } \\frac { \\lambda ^ { k } e ^ { - \\lambda } } { k ! } \\left( 1 - ( q / p ) ^ { ( z - k ) } \\right)`,
+    typst: `1 - sum_(k = 0)^z frac(lambda^k e^(- lambda), k!) lr(( 1 - (q\\/ p)^((z - k)) ))`,
+    typst_inline: `1 - sum_(k = 0)^z frac(lambda^k e^(- lambda), k!) lr(( 1 - (q\\/ p)^((z - k)) ))`,
+  },
+  {
+    latex: `(q/p)^{(z-k)}`,
+    typst: `(q\\/ p)^((z - k))`,
+    typst_inline: `(q\\/ p)^((z - k))`,
+  },
+  {
+    latex: `\\begin{aligned}\n\\bar{x}=& \\vec{a}\\left(\\cos \\psi+\\epsilon \\frac{\\partial x_{1}}{\\partial a}+\\epsilon^{2} \\frac{\\partial x_{2}}{\\partial u}+\\cdots\\right)+\\\\\n& \\ddot{\\psi}\\left(-u \\sin \\psi+\\varepsilon \\frac{\\partial x_{1}}{\\partial \\psi}+\\varepsilon^{2} \\frac{\\partial x_{2}}{\\partial \\psi}+\\cdots\\right)-\\\\\n& \\dot{a}^{2}\\left(\\varepsilon \\frac{\\partial^{2} x_{1}}{\\partial a^{2}}+\\varepsilon^{2} \\frac{\\partial^{2}}{\\partial} \\frac{x_{2}}{\\partial^{2}}+\\cdots\\right)+\\\\\n& 2 \\dot{a} \\dot{\\psi}\\left(-\\sin \\psi+\\varepsilon \\frac{d^{2} x_{1}}{\\partial a \\partial \\psi}+e^{2} \\frac{\\partial^{2} x_{2}}{\\partial a \\partial \\psi}+\\cdots\\right)+\\\\\n& \\dot{\\psi}^{2}\\left\\{-a \\cos \\psi+\\varepsilon \\frac{\\partial^{2} x_{1}}{\\partial \\psi^{2}}+\\varepsilon^{2} \\frac{\\partial^{2} x_{2}}{\\partial \\psi^{2}}+\\cdots\\right)\n\\end{aligned}`,
+    typst: `macron(x) = &arrow(a) lr(( cos psi + epsilon.alt frac(partial x_1, partial a) + epsilon.alt^2 frac(partial x_2, partial u) + dots.c )) + \\\n &diaer(psi) lr(( - u sin psi + epsilon frac(partial x_1, partial psi) + epsilon^2 frac(partial x_2, partial psi) + dots.c )) - \\\n &dot(a)^2 lr(( epsilon frac(partial^2 x_1, partial a^2) + epsilon^2 frac(partial^2, partial) frac(x_2, partial^2) + dots.c )) + \\\n &2 dot(a) dot(psi) lr(( - sin psi + epsilon frac(d^2 x_1, partial a partial psi) + e^2 frac(partial^2 x_2, partial a partial psi) + dots.c )) + \\\n &dot(psi)^2 lr({ - a cos psi + epsilon frac(partial^2 x_1, partial psi^2) + epsilon^2 frac(partial^2 x_2, partial psi^2) + dots.c ))`,
+    typst_inline: `macron(x) = &arrow(a) lr(( cos psi + epsilon.alt frac(partial x_1, partial a) + epsilon.alt^2 frac(partial x_2, partial u) + dots.c )) + \\\n &diaer(psi) lr(( - u sin psi + epsilon frac(partial x_1, partial psi) + epsilon^2 frac(partial x_2, partial psi) + dots.c )) - \\\n &dot(a)^2 lr(( epsilon frac(partial^2 x_1, partial a^2) + epsilon^2 frac(partial^2, partial) frac(x_2, partial^2) + dots.c )) + \\\n &2 dot(a) dot(psi) lr(( - sin psi + epsilon frac(d^2 x_1, partial a partial psi) + e^2 frac(partial^2 x_2, partial a partial psi) + dots.c )) + \\\n &dot(psi)^2 lr({ - a cos psi + epsilon frac(partial^2 x_1, partial psi^2) + epsilon^2 frac(partial^2 x_2, partial psi^2) + dots.c ))`,
+  },
+  // unpaired [ bracket
+  {
+    latex: `\\alpha[x+y`,
+    typst: `alpha \\[ x + y`,
+    typst_inline: `alpha \\[ x + y`,
+  },
+  // cross-type unpaired: ( and ]
+  {
+    latex: `f(x+y]`,
+    typst: `f \\( x + y \\]`,
+    typst_inline: `f \\( x + y \\]`,
+  },
+  // paired inside superscript
+  {
+    latex: `x^{(n)}`,
+    typst: `x^((n))`,
+    typst_inline: `x^((n))`,
+  },
+  // unpaired inside superscript
+  {
+    latex: `x^{(n}`,
+    typst: `x^(\\( n)`,
+    typst_inline: `x^(\\( n)`,
+  },
+  // deeply nested, all paired
+  {
+    latex: `(a + b^{(c + d)})`,
+    typst: `(a + b^((c + d)))`,
+    typst_inline: `(a + b^((c + d)))`,
+  },
+  // paired in frac numerator/denominator
+  {
+    latex: `\\frac{(a+b)}{(c+d)}`,
+    typst: `frac((a + b), (c + d))`,
+    typst_inline: `frac((a + b), (c + d))`,
+  },
+  // unpaired outer + paired nested
+  {
+    latex: `(x+y^{(z-k)}`,
+    typst: `\\( x + y^((z - k))`,
+    typst_inline: `\\( x + y^((z - k))`,
+  },
+  // mixed paired/unpaired in frac
+  {
+    latex: `\\frac{(a+b^{(c+d)})}{(e+f}`,
+    typst: `frac((a + b^((c + d))), \\( e + f)`,
+    typst_inline: `frac((a + b^((c + d))), \\( e + f)`,
+  },
 ];

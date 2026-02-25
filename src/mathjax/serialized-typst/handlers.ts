@@ -253,6 +253,14 @@ const mo = () => {
     let res: ITypstData = initTypstData();
     try {
       const value = getChildrenText(node);
+      // EARLY: unpaired bracket → emit escaped delimiter
+      const unpairedDir = node.properties?.['data-unpaired-bracket'];
+      if (unpairedDir && UNPAIRED_BRACKET_TYPST[value]) {
+        const spaceBefore = needSpaceBefore(node) ? ' ' : '';
+        const spaceAfter = needSpaceAfter(node) ? ' ' : '';
+        res = addToTypstData(res, { typst: spaceBefore + UNPAIRED_BRACKET_TYPST[value] + spaceAfter });
+        return res;
+      }
       // Skip invisible operators
       if (INVISIBLE_CHARS.has(value)) {
         return res;
@@ -1287,6 +1295,73 @@ const replaceUnpairedBrackets = (expr: string): string => {
   return result;
 };
 
+// --- Pre-serialization tree walk: mark unpaired ASCII brackets ---
+const OPEN_BRACKETS: Record<string, string> = {
+  '(': ')', '[': ']', '{': '}',
+};
+const CLOSE_BRACKETS: Record<string, string> = {
+  ')': '(', ']': '[', '}': '{',
+};
+// Typst escaped-delimiter output for unpaired brackets (math-mode safe)
+const UNPAIRED_BRACKET_TYPST: Record<string, string> = {
+  '(': '\\(', ')': '\\)', '[': '\\[', ']': '\\]', '{': '\\{', '}': '\\}',
+};
+
+export const markUnpairedBrackets = (root: any): void => {
+  const bracketNodes: { node: any; char: string }[] = [];
+
+  // DFS — always recurse into childNodes (even for mo)
+  const walk = (node: any): void => {
+    if (!node) return;
+    if (node.kind === 'mo') {
+      const text = getChildrenText(node);
+      if (text && (OPEN_BRACKETS[text] || CLOSE_BRACKETS[text])) {
+        // Collect all bracket mo nodes — no skip conditions.
+        // Fence delimiters (\left...\right) are skipped by the mrow handler
+        // (via `continue`) so any unpaired mark on them is harmless.
+        bracketNodes.push({ node, char: text });
+      }
+    }
+    if (node.childNodes) {
+      for (const child of node.childNodes) {
+        walk(child);
+      }
+    }
+  };
+
+  walk(root);
+
+  // STRICT stack pairing: closing bracket matches ONLY the top of the stack
+  const stack: number[] = [];
+  const paired = new Set<number>();
+
+  for (let i = 0; i < bracketNodes.length; i++) {
+    const ch = bracketNodes[i].char;
+    if (OPEN_BRACKETS[ch]) {
+      stack.push(i);
+    } else if (CLOSE_BRACKETS[ch]) {
+      if (stack.length > 0) {
+        const topIdx = stack[stack.length - 1];
+        if (bracketNodes[topIdx].char === CLOSE_BRACKETS[ch]) {
+          paired.add(topIdx);
+          paired.add(i);
+          stack.pop();
+        }
+        // Top doesn't match → do NOT search deeper, leave both unpaired
+      }
+    }
+  }
+
+  // Mark unpaired nodes with direction metadata
+  for (let i = 0; i < bracketNodes.length; i++) {
+    if (!paired.has(i)) {
+      const ch = bracketNodes[i].char;
+      bracketNodes[i].node.properties['data-unpaired-bracket'] =
+        OPEN_BRACKETS[ch] ? 'open' : 'close';
+    }
+  }
+};
+
 // Extract explicit \tag{...} from a condition cell's mtext content.
 // Returns the tag content (e.g. "3.12") or null if no \tag found.
 const extractTagFromConditionCell = (cell: any): string | null => {
@@ -1926,9 +2001,10 @@ const menclose = () => {
         res = addToTypstData(res, { typst: 'overline(' + escapeUnbalancedParens(content) + ')' });
       } else if (notation.indexOf('bottom') > -1) {
         // \enclose{bottom} → underline()
-        // Detect \smash{)} prefix (used in \lcm macro): strip leading ), trailing spacing, no space
-        if (content.startsWith(')')) {
-          let inner = content.slice(1).trim().replace(/\s+(?:med|thin|thick|quad)$/, '');
+        // Detect \smash{)} prefix (used in \lcm macro): strip leading ) or \), trailing spacing, no space
+        if (content.startsWith(')') || content.startsWith('\\)')) {
+          const skip = content.startsWith('\\)') ? 2 : 1;
+          let inner = content.slice(skip).trim().replace(/\s+(?:med|thin|thick|quad)$/, '');
           res = addToTypstData(res, { typst: 'underline(")"' + inner + ')' });
         } else {
           res = addToTypstData(res, { typst: 'underline(' + escapeUnbalancedParens(content) + ')' });
