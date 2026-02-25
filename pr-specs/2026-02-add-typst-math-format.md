@@ -155,6 +155,7 @@ Full coverage of lowercase, uppercase, and variant forms. Examples: `\alpha` →
 | `\mathrm{d}` | `dif` (differential operator optimization) |
 | `\mathit{word}` | `italic("word")` |
 | `\boldsymbol{v}` | `bold(v)` (italic bold) |
+| `\boldsymbol{\alpha}` | `bold(alpha)` (bold Greek — `mathvariant="bold-italic"` applied to known symbols) |
 | `\textit{ if }` | `italic(" if ")` (via `mtext` with `mathvariant="italic"`) |
 | `\textbf{ if }` | `bold(" if ")` (via `mtext` with `mathvariant="bold"`) |
 
