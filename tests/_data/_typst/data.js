@@ -2200,4 +2200,21 @@ module.exports = [
     typst: `overline(g(x, y) + h(a, b))`,
     typst_inline: `overline(g(x, y) + h(a, b))`,
   },
+
+  // === mhchem: phantom alignment boxes stripped inside sub/superscripts ===
+  {
+    latex: `\\ce{H2O}`,
+    typst: `upright(H)""_2 upright(O)`,
+    typst_inline: `upright(H)""_2 upright(O)`,
+  },
+  {
+    latex: `\\ce{^{A}_{z}X}`,
+    typst: `""_z^(upright(A)) upright(X)`,
+    typst_inline: `""_z^(upright(A)) upright(X)`,
+  },
+  {
+    latex: `\\ce{CO2}`,
+    typst: `upright("CO")""_2`,
+    typst_inline: `upright("CO")""_2`,
+  },
 ];

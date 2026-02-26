@@ -449,6 +449,10 @@ const msup = () => {
           return res;
         }
       }
+      // All parts empty (e.g. mhchem phantom alignment msup) → skip entirely
+      if (!baseTrimmed && !sup) {
+        return res;
+      }
       // \nolimits: wrap known limit-type operators in scripts() to force side placement
       if (baseTrimmed && needsScriptsWrapper(baseTrimmed)) {
         res = addToTypstData(res, { typst: 'scripts(' + escapeContentSeparators(baseTrimmed) + ')' });
@@ -499,6 +503,10 @@ const msub = () => {
           return res;
         }
       }
+      // All parts empty (e.g. mhchem phantom alignment msub) → skip entirely
+      if (!baseTrimmed && !sub) {
+        return res;
+      }
       // \nolimits: wrap known limit-type operators in scripts() to force side placement
       if (baseTrimmed && needsScriptsWrapper(baseTrimmed)) {
         res = addToTypstData(res, { typst: 'scripts(' + escapeContentSeparators(baseTrimmed) + ')' });
@@ -536,6 +544,10 @@ const msubsup = () => {
       const sup = dataThird.typst.trim();
       const base = dataFirst.typst;
       const baseTrimmed = base.trim();
+      // All parts empty (e.g. mhchem phantom alignment msubsup) → skip entirely
+      if (!baseTrimmed && !sub && !sup) {
+        return res;
+      }
       // \nolimits: wrap known limit-type operators in scripts() to force side placement
       if (baseTrimmed && needsScriptsWrapper(baseTrimmed)) {
         res = addToTypstData(res, { typst: 'scripts(' + baseTrimmed + ')' });
@@ -1957,15 +1969,47 @@ const mtr = () => {
   };
 };
 
+/** Check if a node subtree contains an mphantom (shallow — up to 5 levels). */
+const hasPhantomChild = (node: any): boolean => {
+  const check = (n: any, depth: number): boolean => {
+    if (!n || depth > 5) return false;
+    if (n.kind === 'mphantom') return true;
+    if (n.childNodes) {
+      for (const c of n.childNodes) {
+        if (check(c, depth + 1)) return true;
+      }
+    }
+    return false;
+  };
+  return check(node, 0);
+};
+
+/** Check if node has an msub/msup/msubsup/mmultiscripts ancestor (mhchem alignment pattern). */
+const hasScriptAncestor = (node: any): boolean => {
+  let cur = node?.parent;
+  while (cur) {
+    const k = cur.kind;
+    if (k === 'msub' || k === 'msup' || k === 'msubsup' || k === 'mmultiscripts') return true;
+    cur = cur.parent;
+  }
+  return false;
+};
+
 // --- MPADDED handler: strip padding, emit content ---
 const mpadded = () => {
   return (node, serialize): ITypstData => {
     let res: ITypstData = initTypstData();
     try {
+      const atr = getAttributes(node);
+      // mhchem alignment phantom: mpadded width=0 or height=0 containing mphantom
+      // inside msub/msup/msubsup — zero-size alignment box, emit empty string.
+      // Only skip inside script ancestors; standalone \hphantom/\vphantom must still produce #hide().
+      if ((atr?.width === 0 || atr?.height === 0) && hasPhantomChild(node) && hasScriptAncestor(node)) {
+        return res;
+      }
       const data: ITypstData = handlerApi.handleAll(node, serialize);
       const content = data.typst.trim();
       // Handle mathbackground attribute (\colorbox{color}{...})
-      const atr = getAttributes(node);
       const rawBg: string = atr?.mathbackground || '';
       const mathbg: string = rawBg && rawBg !== '_inherit_' ? rawBg : '';
       if (mathbg && content) {

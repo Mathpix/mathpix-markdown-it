@@ -49,8 +49,10 @@ export const isThousandSepComma = (node: any, i: number): boolean => {
  *  Returns true when `next` starts with a word/dot/quote character
  *  and `prev` doesn't end with a natural separator (whitespace, open paren, etc.). */
 export const needsTokenSeparator = (prev: string, next: string): boolean => {
-  return !!prev && !!next
-    && /^[\w."\u0080-\uFFFF]/.test(next)
+  if (!prev || !next) return false;
+  // No space before phantom subscript/superscript base (""_ or ""^)
+  if (/^""[_^]/.test(next)) return false;
+  return /^[\w."\u0080-\uFFFF]/.test(next)
     && !/[\s({[,|]$/.test(prev);
 };
 
