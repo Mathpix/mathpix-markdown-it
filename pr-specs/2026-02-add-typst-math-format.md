@@ -501,6 +501,9 @@ In Typst, `underbrace` and `overbrace` take annotations as a second argument: `u
 | `\phantom{x}` | `#hide($x$)` (preserves dimensions) |
 | `\hphantom{x}` | `#hide($x$)` (same — Typst hide preserves full box) |
 | `\vphantom{x}` | `#hide($x$)` (same — no separate h/v variant in Typst) |
+| `\ce{H2O}` | `upright(H)""_2 upright(O)` (mhchem — phantom alignment boxes stripped) |
+| `\ce{^{A}_{z}X}` | `""_z^(upright(A)) upright(X)` (mhchem isotope notation) |
+| `\ce{CO2}` | `upright("CO")""_2` (mhchem multi-char element) |
 | `\substack{i<n \\ j<m}` | `mat(delim: #none, i < n; j < m)` (via mtable) |
 | `a \bmod b` | `a mod b` |
 | `a \pmod{b}` | `a quad (mod b)` |
@@ -593,6 +596,29 @@ LaTeX allows empty script groups like `m^{}` or `a_{}`, which MathJax preserves 
 ### Empty-content protection
 
 Typst functions require non-empty arguments — `sqrt()`, `frac(,)`, `hat()` etc. produce errors. When LaTeX content is empty (e.g. `\sqrt{}`, `\frac{}{}`, `\hat{}`), handlers use `|| '""'` fallback to emit a Typst empty text string as placeholder. Protected handlers: `msqrt`, `mroot`, `mfrac`/`binom`, `mover` (accents), `munder` (accents), `munderover` (limits base), `mmultiscripts` (attach base), `mn` (font wrapping), `menclose` (cancel/boxed).
+
+### mhchem phantom alignment stripping
+
+The `mhchem` package produces zero-size `mpadded` boxes containing `mphantom` for sub/superscript alignment in chemical formulas. For example, `\ce{H2O}` generates `<mpadded width="0"><mphantom><mi>A</mi></mphantom></mpadded>` inside `msub` — an invisible box used only for vertical alignment. Without handling, these produce `#hide($A$)` clutter in Typst output.
+
+The `mpadded` handler strips these phantom alignment boxes using three checks:
+1. **`hasPhantomChild(node)`** — shallow DFS (up to 5 levels) checks if the subtree contains an `mphantom` node
+2. **`hasScriptAncestor(node)`** — walks the parent chain looking for `msub`/`msup`/`msubsup`/`mmultiscripts` — only phantoms inside script structures are alignment artifacts
+3. **`(atr.width === 0 || atr.height === 0)`** — zero-size dimension confirms the box is invisible
+
+When all three conditions are met, the `mpadded` handler returns empty output. Standalone `\hphantom{x}`/`\vphantom{x}` (which also use `mpadded` + `mphantom`) are preserved because they have no script ancestor.
+
+**Empty script elision:** The `msub`, `msup`, and `msubsup` handlers detect when both the base and all script parts are empty (e.g. a fully-phantom alignment `msubsup` in mhchem) and skip the node entirely, preventing orphaned `""` placeholders.
+
+**Phantom-base token separation:** The `needsTokenSeparator()` helper suppresses space before `""_` and `""^` patterns (phantom subscript/superscript bases), so `upright("CO")""_2` renders without a gap.
+
+| LaTeX | Typst |
+|-------|-------|
+| `\ce{H2O}` | `upright(H)""_2 upright(O)` |
+| `\ce{CO2}` | `upright("CO")""_2` |
+| `\ce{^{A}_{z}X}` | `""_z^(upright(A)) upright(X)` |
+| `\hphantom{x}` | `#hide($x$)` (standalone — no script ancestor) |
+| `\vphantom{x}` | `#hide($x$)` (standalone — no script ancestor) |
 
 ### Auto-numbering vs explicit `\tag`
 
@@ -729,6 +755,7 @@ The test runner (`tests/_typst.js`) uses `TexConvertToTypstData` and validates b
 - Substack
 - Mod variants (bmod, pmod)
 - Labels on equations (equation, align, gather, split, tag+label, numcases with labels)
+- mhchem (chemical formulas — phantom alignment stripping, isotope notation)
 - Edge cases (empty-base scripts, empty-exponent scripts, cancel, color, boxed, primes, pipe grouping)
 
 **Commands:**
