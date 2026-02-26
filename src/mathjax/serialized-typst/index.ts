@@ -269,16 +269,23 @@ export class SerializedTypstVisitor extends MmlVisitor {
             }
           }
         }
-        // Detect thousand-separator pattern: mn, mo(,), mn(3 digits)
-        // e.g. 120,000 → 120","000 (comma escaped so Typst doesn't treat it as separator)
+        // Detect thousand-separator chain: mn, mo(,), mn(3 digits), ...
+        // e.g. 1,000,000 → 1","000","000 (commas escaped so Typst doesn't treat them as separators)
+        // Also handles Indian numbering: 41,70,000 → 41","70","000
         if (isThousandSepComma(node, j)) {
           const numData: ITypstData = this.visitNode(child, space);
           if (needsTokenSeparator(res.typst, numData.typst)) {
             addSpaceToTypstData(res);
           }
-          const nextData: ITypstData = this.visitNode(node.childNodes[j + 2], space);
-          res = addToTypstData(res, { typst: numData.typst + '","' + nextData.typst });
-          j += 3;
+          let chainTypst = numData.typst;
+          let k = j;
+          while (isThousandSepComma(node, k)) {
+            const nextData: ITypstData = this.visitNode(node.childNodes[k + 2], space);
+            chainTypst += '","' + nextData.typst;
+            k += 2;
+          }
+          res = addToTypstData(res, { typst: chainTypst });
+          j = k + 1;
           continue;
         }
         // Normal processing

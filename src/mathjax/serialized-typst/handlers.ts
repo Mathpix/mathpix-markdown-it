@@ -338,7 +338,7 @@ const mn = () => {
       if (mathvariant && mathvariant !== 'normal') {
         const fontFn = typstFontMap.get(mathvariant);
         if (fontFn) {
-          const content = value || '""';
+          const content = escapeContentSeparators(value) || '""';
           res = addToTypstData(res, { typst: fontFn + '(' + content + ')' });
           return res;
         }
@@ -403,8 +403,8 @@ const mfrac = () => {
       const secondChild = node.childNodes[1] || null;
       const dataFirst: ITypstData = firstChild ? serialize.visitNode(firstChild, '') : initTypstData();
       const dataSecond: ITypstData = secondChild ? serialize.visitNode(secondChild, '') : initTypstData();
-      const num = dataFirst.typst.trim() || '""';
-      const den = dataSecond.typst.trim() || '""';
+      const num = escapeContentSeparators(dataFirst.typst.trim()) || '""';
+      const den = escapeContentSeparators(dataSecond.typst.trim()) || '""';
       // Check for linethickness=0 which indicates \binom (\choose)
       const atr = getAttributes(node);
       if (atr && (atr.linethickness === '0' || atr.linethickness === 0)) {
@@ -551,7 +551,7 @@ const msubsup = () => {
       }
       // \nolimits: wrap known limit-type operators in scripts() to force side placement
       if (baseTrimmed && needsScriptsWrapper(baseTrimmed)) {
-        res = addToTypstData(res, { typst: 'scripts(' + baseTrimmed + ')' });
+        res = addToTypstData(res, { typst: 'scripts(' + escapeContentSeparators(baseTrimmed) + ')' });
       } else {
         res = addToTypstData(res, { typst: baseTrimmed ? base : '""' });
       }
@@ -1137,28 +1137,44 @@ const serializePrefixBeforeMo = (node, serialize, stopMoText: string): string =>
 // (Typst text strings) so they render visually but aren't parsed as
 // cases()/mat() argument separators, row separators, or named-argument syntax.
 // Characters inside function calls like lr((...)) are left as-is.
-/** Check if the separator at position i is already escaped as "X" (surrounded by quotes). */
-const isAlreadyEscaped = (expr: string, i: number): boolean => {
-  return i > 0 && i + 1 < expr.length && expr[i - 1] === '"' && expr[i + 1] === '"';
-};
 
 /** Escape , and ; at parenthesis depth 0 in content placed inside any Typst function call.
  *  Prevents commas/semicolons from being parsed as argument/row separators.
- *  Skips already-escaped separators ("," / ";") to avoid double-escaping. */
+ *  Skips content inside "..." strings and escaped brackets like \[ \] \( \) \{ \}. */
 const escapeContentSeparators = (expr: string): string => {
   let depth = 0;
   let result = '';
   for (let i = 0; i < expr.length; i++) {
     const ch = expr[i];
+    // Skip quoted strings: copy "..." verbatim (commas inside are safe)
+    if (ch === '"') {
+      let j = i + 1;
+      while (j < expr.length) {
+        if (expr[j] === '\\') { j += 2; continue; }
+        if (expr[j] === '"') break;
+        j++;
+      }
+      if (j < expr.length) {
+        result += expr.slice(i, j + 1);
+        i = j;
+        continue;
+      }
+    }
+    // Skip escaped brackets: \( \) \[ \] \{ \} are literal glyphs, not depth changes
+    if (ch === '\\' && i + 1 < expr.length && '()[]{}' .includes(expr[i + 1])) {
+      result += ch + expr[i + 1];
+      i++;
+      continue;
+    }
     if (ch === '(' || ch === '[' || ch === '{') {
       depth++;
       result += ch;
     } else if ((ch === ')' || ch === ']' || ch === '}') && depth > 0) {
       depth--;
       result += ch;
-    } else if (ch === ',' && depth === 0 && !isAlreadyEscaped(expr, i)) {
+    } else if (ch === ',' && depth === 0) {
       result += '","';
-    } else if (ch === ';' && depth === 0 && !isAlreadyEscaped(expr, i)) {
+    } else if (ch === ';' && depth === 0) {
       result += '";"';
     } else {
       result += ch;
@@ -1168,23 +1184,43 @@ const escapeContentSeparators = (expr: string): string => {
 };
 
 /** Escape , ; and : at depth 0 — for mat()/cases() cells where : is also a named-argument marker.
- *  Skips already-escaped separators to avoid double-escaping. */
+ *  Skips content inside "..." strings to avoid double-escaping. */
 const escapeCasesSeparators = (expr: string): string => {
   let depth = 0;
   let result = '';
   for (let i = 0; i < expr.length; i++) {
     const ch = expr[i];
+    // Skip quoted strings: copy "..." verbatim (commas inside are safe)
+    if (ch === '"') {
+      let j = i + 1;
+      while (j < expr.length) {
+        if (expr[j] === '\\') { j += 2; continue; }
+        if (expr[j] === '"') break;
+        j++;
+      }
+      if (j < expr.length) {
+        result += expr.slice(i, j + 1);
+        i = j;
+        continue;
+      }
+    }
+    // Skip escaped brackets: \( \) \[ \] \{ \} are literal glyphs, not depth changes
+    if (ch === '\\' && i + 1 < expr.length && '()[]{}' .includes(expr[i + 1])) {
+      result += ch + expr[i + 1];
+      i++;
+      continue;
+    }
     if (ch === '(' || ch === '[' || ch === '{') {
       depth++;
       result += ch;
     } else if ((ch === ')' || ch === ']' || ch === '}') && depth > 0) {
       depth--;
       result += ch;
-    } else if (ch === ',' && depth === 0 && !isAlreadyEscaped(expr, i)) {
+    } else if (ch === ',' && depth === 0) {
       result += '","';
-    } else if (ch === ';' && depth === 0 && !isAlreadyEscaped(expr, i)) {
+    } else if (ch === ';' && depth === 0) {
       result += '";"';
-    } else if (ch === ':' && depth === 0 && !isAlreadyEscaped(expr, i)) {
+    } else if (ch === ':' && depth === 0) {
       result += '":"';
     } else {
       result += ch;
@@ -1193,11 +1229,22 @@ const escapeCasesSeparators = (expr: string): string => {
   return result;
 };
 
-/** Check whether a Typst expression contains `,` or `;` at parenthesis depth 0. */
+/** Check whether a Typst expression contains `,` or `;` at parenthesis depth 0.
+ *  Skips content inside "..." strings (handles escaped quotes). */
 const hasTopLevelSeparators = (expr: string): boolean => {
   let depth = 0;
   for (let i = 0; i < expr.length; i++) {
     const ch = expr[i];
+    if (ch === '"') {
+      let j = i + 1;
+      while (j < expr.length) {
+        if (expr[j] === '\\') { j += 2; continue; }
+        if (expr[j] === '"') break;
+        j++;
+      }
+      if (j < expr.length) { i = j; continue; }
+    }
+    if (ch === '\\' && i + 1 < expr.length && '()[]{}' .includes(expr[i + 1])) { i++; continue; }
     if (ch === '(' || ch === '[' || ch === '{') { depth++; }
     else if ((ch === ')' || ch === ']' || ch === '}') && depth > 0) { depth--; }
     else if ((ch === ',' || ch === ';') && depth === 0) { return true; }
@@ -1205,12 +1252,29 @@ const hasTopLevelSeparators = (expr: string): boolean => {
   return false;
 };
 
-/** Escape top-level `;` → `";"` inside lr() content (commas are safe in lr). */
+/** Escape top-level `;` → `";"` inside lr() content (commas are safe in lr).
+ *  Skips content inside "..." strings (handles escaped quotes). */
 const escapeLrSemicolons = (expr: string): string => {
   let depth = 0;
   let result = '';
   for (let i = 0; i < expr.length; i++) {
     const ch = expr[i];
+    if (ch === '"') {
+      let j = i + 1;
+      while (j < expr.length) {
+        if (expr[j] === '\\') { j += 2; continue; }
+        if (expr[j] === '"') break;
+        j++;
+      }
+      if (j < expr.length) {
+        result += expr.slice(i, j + 1);
+        i = j;
+        continue;
+      }
+    }
+    if (ch === '\\' && i + 1 < expr.length && '()[]{}' .includes(expr[i + 1])) {
+      result += ch + expr[i + 1]; i++; continue;
+    }
     if (ch === '(' || ch === '[' || ch === '{') { depth++; result += ch; }
     else if ((ch === ')' || ch === ']' || ch === '}') && depth > 0) { depth--; result += ch; }
     else if (ch === ';' && depth === 0) { result += '";"'; }
@@ -1229,6 +1293,24 @@ const escapeUnbalancedParens = (content: string): string => {
   let result = '';
   for (let i = 0; i < content.length; i++) {
     const ch = content[i];
+    // Skip quoted strings: copy "..." verbatim (parens inside are safe)
+    if (ch === '"') {
+      let j = i + 1;
+      while (j < content.length) {
+        if (content[j] === '\\') { j += 2; continue; }
+        if (content[j] === '"') break;
+        j++;
+      }
+      if (j < content.length) {
+        result += content.slice(i, j + 1);
+        i = j;
+        continue;
+      }
+    }
+    // Skip escaped parens: \( \) are literal glyphs, not depth changes
+    if (ch === '\\' && i + 1 < content.length && (content[i + 1] === '(' || content[i + 1] === ')')) {
+      result += ch + content[i + 1]; i++; continue;
+    }
     if (ch === '(') { depth++; result += ch; }
     else if (ch === ')') {
       if (depth > 0) { depth--; result += ch; }
@@ -1912,15 +1994,21 @@ const mrow = () => {
         }
         // Regular mrow: concatenate children with spacing to prevent merging
         for (let i = 0; i < node.childNodes.length; i++) {
-          // Thousand-separator: mn, mo(,), mn(3 digits) → merge as 120","000
+          // Thousand-separator chain: mn","mn","mn... (handles 41,70,000 and 1,000,000)
           if (isThousandSepComma(node, i)) {
             const numData: ITypstData = serialize.visitNode(node.childNodes[i], '');
             if (needsTokenSeparator(res.typst, numData.typst)) {
               addSpaceToTypstData(res);
             }
-            const nextData: ITypstData = serialize.visitNode(node.childNodes[i + 2], '');
-            res = addToTypstData(res, { typst: numData.typst + '","' + nextData.typst });
-            i += 2;
+            let chainTypst = numData.typst;
+            let j = i;
+            while (isThousandSepComma(node, j)) {
+              const nextData: ITypstData = serialize.visitNode(node.childNodes[j + 2], '');
+              chainTypst += '","' + nextData.typst;
+              j += 2;
+            }
+            res = addToTypstData(res, { typst: chainTypst });
+            i = j;
             continue;
           }
           const data: ITypstData = serialize.visitNode(node.childNodes[i], '');

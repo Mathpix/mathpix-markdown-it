@@ -9,7 +9,8 @@ export declare const addToTypstData: (dataOutput: ITypstData, dataInput: ITypstD
 /** Add a separator space to both typst and typst_inline fields. */
 export declare const addSpaceToTypstData: (data: ITypstData) => void;
 /** Check if child at index i in a node's childNodes starts a thousand-separator
- *  pattern: mn, mo(,), mn(exactly 3 digits). Returns true if pattern matches. */
+ *  pattern: mn, mo(,), mn(3 digits). Also handles Indian numbering (2-digit groups
+ *  like 41,70,000) by accepting 2-digit groups when the chain ends with a 3-digit group. */
 export declare const isThousandSepComma: (node: any, i: number) => boolean;
 /** Check if a space separator is needed between two adjacent Typst tokens.
  *  Returns true when `next` starts with a word/dot/quote character

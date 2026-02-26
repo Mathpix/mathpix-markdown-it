@@ -226,6 +226,101 @@ module.exports = [
     typst: `underline(underline(14","320))`,
     typst_inline: `underline(underline(14","320))`,
   },
+  {
+    latex: `1,000,000`,
+    typst: `1","000","000`,
+    typst_inline: `1","000","000`,
+  },
+  {
+    latex: `\\frac{1,234,567}{89}`,
+    typst: `frac(1","234","567, 89)`,
+    typst_inline: `frac(1","234","567, 89)`,
+  },
+  {
+    latex: `\\frac{41,70,000}{7}`,
+    typst: `frac(41","70","000, 7)`,
+    typst_inline: `frac(41","70","000, 7)`,
+  },
+  {
+    latex: `\\frac{a,b,c}{d}`,
+    typst: `frac(a"," b"," c, d)`,
+    typst_inline: `frac(a"," b"," c, d)`,
+  },
+  {
+    latex: `=\\frac{41,70,000,1,2,3,4,5}{7}=595714.28`,
+    typst: `= frac(41","70","000"," 1"," 2"," 3"," 4"," 5, 7) = 595714.28`,
+    typst_inline: `= frac(41","70","000"," 1"," 2"," 3"," 4"," 5, 7) = 595714.28`,
+  },
+  {
+    latex: `=\\frac{2,\\text{41,70,000,1,2,3,4,5}}{7}=595714.28`,
+    typst: `= frac(2"," "41,70,000,1,2,3,4,5", 7) = 595714.28`,
+    typst_inline: `= frac(2"," "41,70,000,1,2,3,4,5", 7) = 595714.28`,
+  },
+  {
+    latex: `=\\frac{2,\\text{ a "41,70,000",1,2,3,4,5}}{7}=595714.28`,
+    typst: `= frac(2"," " a \\"41,70,000\\",1,2,3,4,5", 7) = 595714.28`,
+    typst_inline: `= frac(2"," " a \\"41,70,000\\",1,2,3,4,5", 7) = 595714.28`,
+  },
+  {
+    latex: `=\\frac{2,\\text{ a "41,70,000,1,2,3,4,5}}{7}=595714.28`,
+    typst: `= frac(2"," " a \\"41,70,000,1,2,3,4,5", 7) = 595714.28`,
+    typst_inline: `= frac(2"," " a \\"41,70,000,1,2,3,4,5", 7) = 595714.28`,
+  },
+  {
+    latex: `\\left(\\text{a;b}\\right)`,
+    typst: `lr(( "a;b" ))`,
+    typst_inline: `lr(( "a;b" ))`,
+  },
+  {
+    latex: `\\cancel{\\text{a)b}}`,
+    typst: `cancel("a)b")`,
+    typst_inline: `cancel("a)b")`,
+  },
+  {
+    latex: `\\left(x ; \\text{a;b} ; y\\right)`,
+    typst: `lr(( x";" "a;b"";" y ))`,
+    typst_inline: `lr(( x";" "a;b"";" y ))`,
+  },
+  {
+    latex: `\\frac{a,b}{c,d}`,
+    typst: `frac(a"," b, c"," d)`,
+    typst_inline: `frac(a"," b, c"," d)`,
+  },
+  {
+    latex: `\\frac{1;2}{3}`,
+    typst: `frac(1";" 2, 3)`,
+    typst_inline: `frac(1";" 2, 3)`,
+  },
+  {
+    latex: `\\frac{f(a,b)}{c}`,
+    typst: `frac(f(a, b), c)`,
+    typst_inline: `frac(f(a, b), c)`,
+  },
+  {
+    latex: `\\frac{1,000}{2,000}`,
+    typst: `frac(1","000, 2","000)`,
+    typst_inline: `frac(1","000, 2","000)`,
+  },
+  {
+    latex: `\\operatorname{ASFR}_{[x, x+\\delta)}=\\frac{\\text { number of births to women of age }[x, x+\\delta)}{\\text { number of person-years lived by women of age }[x, x+\\delta)} .`,
+    typst: `op("ASFR")_(\\[ x, x + delta \\)) = frac(" number of births to women of age "\\[ x"," x + delta \\), " number of person-years lived by women of age "\\[ x"," x + delta \\)) .`,
+    typst_inline: `op("ASFR")_(\\[ x, x + delta \\)) = frac(" number of births to women of age "\\[ x"," x + delta \\), " number of person-years lived by women of age "\\[ x"," x + delta \\)) .`,
+  },
+  {
+    latex: `\\binom{a,b}{c}`,
+    typst: `binom(a"," b, c)`,
+    typst_inline: `binom(a"," b, c)`,
+  },
+  {
+    latex: `\\sqrt{a,b}`,
+    typst: `sqrt(a"," b)`,
+    typst_inline: `sqrt(a"," b)`,
+  },
+  {
+    latex: `\\sqrt[3]{x,y}`,
+    typst: `root(3, x"," y)`,
+    typst_inline: `root(3, x"," y)`,
+  },
   // === Basic operations ===
   {
     latex: `\\frac{a}{b}`,

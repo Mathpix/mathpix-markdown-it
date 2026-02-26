@@ -30,16 +30,35 @@ export const addSpaceToTypstData = (data: ITypstData): void => {
 };
 
 /** Check if child at index i in a node's childNodes starts a thousand-separator
- *  pattern: mn, mo(,), mn(exactly 3 digits). Returns true if pattern matches. */
+ *  pattern: mn, mo(,), mn(3 digits). Also handles Indian numbering (2-digit groups
+ *  like 41,70,000) by accepting 2-digit groups when the chain ends with a 3-digit group. */
 export const isThousandSepComma = (node: any, i: number): boolean => {
   try {
     if (i + 2 >= node.childNodes.length) return false;
     const child = node.childNodes[i];
     const comma = node.childNodes[i + 1];
     const next = node.childNodes[i + 2];
-    return child?.kind === 'mn'
-      && comma?.kind === 'mo' && (comma?.childNodes?.[0] as any)?.text === ','
-      && next?.kind === 'mn' && /^\d{3}$/.test((next?.childNodes?.[0] as any)?.text || '');
+    if (child?.kind !== 'mn') return false;
+    if (comma?.kind !== 'mo' || (comma?.childNodes?.[0] as any)?.text !== ',') return false;
+    if (next?.kind !== 'mn') return false;
+    const nextText: string = (next?.childNodes?.[0] as any)?.text || '';
+    // Standard: exactly 3 digits after comma
+    if (/^\d{3}$/.test(nextText)) return true;
+    // Indian numbering: exactly 2 digits — accept if the chain eventually reaches a 3-digit group
+    if (/^\d{2}$/.test(nextText)) {
+      let j = i + 2;
+      while (j + 2 < node.childNodes.length) {
+        const nc = node.childNodes[j + 1];
+        const nn = node.childNodes[j + 2];
+        if (nc?.kind !== 'mo' || (nc?.childNodes?.[0] as any)?.text !== ',') break;
+        if (nn?.kind !== 'mn') break;
+        const nt: string = (nn?.childNodes?.[0] as any)?.text || '';
+        if (/^\d{3}$/.test(nt)) return true;
+        if (!/^\d{2}$/.test(nt)) break;
+        j += 2;
+      }
+    }
+    return false;
   } catch (_e) {
     return false;
   }
