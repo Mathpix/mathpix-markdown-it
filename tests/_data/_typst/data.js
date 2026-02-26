@@ -2217,4 +2217,86 @@ module.exports = [
     typst: `upright("CO")""_2`,
     typst_inline: `upright("CO")""_2`,
   },
+
+  // === Bare delimiter pairs with subscripts/superscripts (scripted closing delimiter) ===
+  // ‖...‖ with scripts → norm(...)_sub^sup
+  {
+    latex: `\\|x\\|_2 \\leq \\|x\\|_1`,
+    typst: `norm(x)_2 lt.eq norm(x)_1`,
+    typst_inline: `norm(x)_2 lt.eq norm(x)_1`,
+  },
+  {
+    latex: `\\|x\\|_2`,
+    typst: `norm(x)_2`,
+    typst_inline: `norm(x)_2`,
+  },
+  {
+    latex: `\\|x\\|^2`,
+    typst: `norm(x)^2`,
+    typst_inline: `norm(x)^2`,
+  },
+  {
+    latex: `\\|x\\|_2^p`,
+    typst: `norm(x)_2^p`,
+    typst_inline: `norm(x)_2^p`,
+  },
+  {
+    latex: `\\|x\\|_p \\leq \\|x\\|_q`,
+    typst: `norm(x)_p lt.eq norm(x)_q`,
+    typst_inline: `norm(x)_p lt.eq norm(x)_q`,
+  },
+  {
+    latex: `\\|A\\|_{\\mathrm{F}}`,
+    typst: `norm(A)_(upright(F))`,
+    typst_inline: `norm(A)_(upright(F))`,
+  },
+  {
+    latex: `\\|x\\| + \\|y\\|`,
+    typst: `norm(x) + norm(y)`,
+    typst_inline: `norm(x) + norm(y)`,
+  },
+  // |...| with scripts → lr(|...|)_sub^sup
+  {
+    latex: `|x|_2`,
+    typst: `lr(| x |)_2`,
+    typst_inline: `lr(| x |)_2`,
+  },
+  {
+    latex: `|x|^2`,
+    typst: `lr(| x |)^2`,
+    typst_inline: `lr(| x |)^2`,
+  },
+  // ⌊...⌋ / ⌈...⌉ with scripts
+  {
+    latex: `\\lfloor x \\rfloor_n`,
+    typst: `floor(x)_n`,
+    typst_inline: `floor(x)_n`,
+  },
+  {
+    latex: `\\lceil y \\rceil^2`,
+    typst: `ceil(y)^2`,
+    typst_inline: `ceil(y)^2`,
+  },
+
+  // === Bare angle bracket pairs ⟨...⟩ ===
+  {
+    latex: `\\langle x, y \\rangle`,
+    typst: `lr(chevron.l x, y chevron.r)`,
+    typst_inline: `lr(chevron.l x, y chevron.r)`,
+  },
+  {
+    latex: `\\langle x \\rangle`,
+    typst: `lr(chevron.l x chevron.r)`,
+    typst_inline: `lr(chevron.l x chevron.r)`,
+  },
+  {
+    latex: `\\langle x | y \\rangle`,
+    typst: `lr(chevron.l x|y chevron.r)`,
+    typst_inline: `lr(chevron.l x|y chevron.r)`,
+  },
+  {
+    latex: `\\langle \\phi | \\psi \\rangle`,
+    typst: `lr(chevron.l phi.alt|psi chevron.r)`,
+    typst_inline: `lr(chevron.l phi.alt|psi chevron.r)`,
+  },
 ];

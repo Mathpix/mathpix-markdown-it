@@ -29,7 +29,7 @@ const getBigDelimInfo = (node: any): { delim: string, size: string, isOpen: bool
 };
 
 // Return the text content of a single-mo node (bare mo, mrow or TeXAtom wrapping one mo).
-// Used to detect delimiter characters like |, ⌊, ⌋, ⌈, ⌉, ‖.
+// Used to detect delimiter characters like |, ⌊, ⌋, ⌈, ⌉, ‖, ⟨, ⟩.
 const getDelimiterChar = (node: any): string | null => {
   try {
     let moNode: any = null;
@@ -50,6 +50,21 @@ const getDelimiterChar = (node: any): string | null => {
   }
 };
 
+// Check if node is msub/msup/msubsup whose BASE is a closing delimiter.
+// Returns the delimiter char if found, null otherwise.
+// Used to detect \|x\|_2 where the closing ‖ is inside msub(‖, 2).
+const getScriptedDelimiterChar = (node: any): string | null => {
+  try {
+    const k = node?.kind;
+    if (k === 'msub' || k === 'msup' || k === 'msubsup') {
+      return getDelimiterChar(node.childNodes?.[0]);
+    }
+    return null;
+  } catch (_e) {
+    return null;
+  }
+};
+
 // Node kinds that carry sub/sup scripts (used in \idotsint pattern detection).
 const SCRIPT_KINDS: Set<string> = new Set(['msubsup', 'msub', 'msup']);
 
@@ -59,6 +74,8 @@ const BARE_DELIM_PAIRS: Record<string, { close: string; typstOpen: string; typst
   '\u230A': { close: '\u230B', typstOpen: 'floor(', typstClose: ')' },  // ⌊...⌋
   '\u2308': { close: '\u2309', typstOpen: 'ceil(',  typstClose: ')' },  // ⌈...⌉
   '\u2016': { close: '\u2016', typstOpen: 'norm(',  typstClose: ')' },  // ‖...‖
+  '\u27E8': { close: '\u27E9', typstOpen: 'lr(chevron.l ', typstClose: ' chevron.r)' }, // ⟨...⟩
+  '\u2329': { close: '\u232A', typstOpen: 'lr(chevron.l ', typstClose: ' chevron.r)' }, // 〈...〉 (old form)
 };
 
 export interface ITypstVisitorOptions {
@@ -141,16 +158,25 @@ export class SerializedTypstVisitor extends MmlVisitor {
           }
         }
         // Detect paired delimiters without \left...\right:
-        // |...| → lr(| ... |), ⌊...⌋ → floor(...), ⌈...⌉ → ceil(...), ‖...‖ → norm(...)
+        // |...| → lr(| ... |), ⌊...⌋ → floor(...), ⌈...⌉ → ceil(...), ‖...‖ → norm(...), ⟨...⟩ → lr(chevron.l ... chevron.r)
         // For symmetric delimiters (|, ‖), skip inside TeXAtom groups
         // (e.g. {|\alpha|} in superscripts) where content is already grouped.
+        // Also detects closing delimiters inside msub/msup/msubsup (e.g. \|x\|_2 → norm(x)_2).
         const delimChar = getDelimiterChar(child);
         const delimPair = delimChar ? BARE_DELIM_PAIRS[delimChar] : null;
         if (delimPair && !(delimChar === delimPair.close && (node as any).parent?.kind === 'TeXAtom')) {
           let closeIdx = -1;
+          let closeIsScripted = false;
           for (let k = j + 1; k < node.childNodes.length; k++) {
+            // First check bare delimiter
             if (getDelimiterChar(node.childNodes[k]) === delimPair.close) {
               closeIdx = k;
+              break;
+            }
+            // Then check delimiter inside msub/msup/msubsup base (e.g. ‖_2)
+            if (getScriptedDelimiterChar(node.childNodes[k]) === delimPair.close) {
+              closeIdx = k;
+              closeIsScripted = true;
               break;
             }
           }
@@ -163,7 +189,24 @@ export class SerializedTypstVisitor extends MmlVisitor {
               }
               content += innerData.typst;
             }
-            const delimExpr = delimPair.typstOpen + content.trim() + delimPair.typstClose;
+            let delimExpr = delimPair.typstOpen + content.trim() + delimPair.typstClose;
+            // When the closing delimiter is inside a script node (e.g. ‖_2),
+            // extract and append the script parts to the delimited expression.
+            if (closeIsScripted) {
+              const scriptNode = node.childNodes[closeIdx];
+              if (scriptNode.kind === 'msubsup') {
+                const sub = scriptNode.childNodes[1] ? this.visitNode(scriptNode.childNodes[1], '').typst.trim() : '';
+                const sup = scriptNode.childNodes[2] ? this.visitNode(scriptNode.childNodes[2], '').typst.trim() : '';
+                if (sub) delimExpr += '_' + (needsParens(sub) ? '(' + sub + ')' : sub);
+                if (sup) delimExpr += '^' + (needsParens(sup) ? '(' + sup + ')' : sup);
+              } else if (scriptNode.kind === 'msub') {
+                const sub = scriptNode.childNodes[1] ? this.visitNode(scriptNode.childNodes[1], '').typst.trim() : '';
+                if (sub) delimExpr += '_' + (needsParens(sub) ? '(' + sub + ')' : sub);
+              } else if (scriptNode.kind === 'msup') {
+                const sup = scriptNode.childNodes[1] ? this.visitNode(scriptNode.childNodes[1], '').typst.trim() : '';
+                if (sup) delimExpr += '^' + (needsParens(sup) ? '(' + sup + ')' : sup);
+              }
+            }
             if (needsTokenSeparator(res.typst, delimExpr)) {
               addSpaceToTypstData(res);
             }
