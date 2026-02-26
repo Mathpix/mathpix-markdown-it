@@ -2031,4 +2031,16 @@ module.exports = [
     typst: `frac((a + b^((c + d))), \\( e + f)`,
     typst_inline: `frac((a + b^((c + d))), \\( e + f)`,
   },
+  // colon escaping in mat() cells (prevents named-argument parsing)
+  {
+    latex: `K \\equiv\\left\\{\\begin{array}{l:}\np: \\\\\n\\text { conservation of flow equation }\n\\end{array}\\right\\}`,
+    typst: `K equiv lr({ mat(delim: #none, align: #left, \n  p\":\";\n  \" conservation of flow equation \",\n) })`,
+    typst_inline: `K equiv lr({ mat(delim: #none, align: #left, \n  p\":\";\n  \" conservation of flow equation \",\n) })`,
+  },
+  // colon escaping in cases() cells
+  {
+    latex: `\\left\\{\\begin{array}{l}p: \\\\\\text { conservation of flow equation }\\end{array}\\right.`,
+    typst: `cases(\n  p\":\",\n  \" conservation of flow equation \",\n)`,
+    typst_inline: `cases(\n  p\":\",\n  \" conservation of flow equation \",\n)`,
+  },
 ];
