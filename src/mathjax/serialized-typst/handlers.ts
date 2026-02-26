@@ -1860,12 +1860,12 @@ const mrow = () => {
             res = addToTypstData(res, { typst: 'lr(' + open + ' ' + escapeLrSemicolons(trimmedContent) + ' ' + close + ')' });
           }
         } else {
-          // One or both delimiters invisible: wrap visible side in lr()
-          // with escaped delimiters so bare ASCII chars don't break parsing
-          // and auto-sizing from \left/\right is preserved.
+          // One or both delimiters invisible: wrap visible side in lr().
+          // Opening delimiters ( [ { and } must be escaped to avoid parse errors.
+          // Closing delimiters ) ] are left unescaped so lr() can auto-size them.
           const trimmed = content.trim();
-          const openEsc = openDelim ? escapeDelimiterForLr(openDelim) : '';
-          const closeEsc = closeDelim ? escapeDelimiterForLr(closeDelim) : '';
+          const openEsc = openDelim ? escapeLrOpenDelimiter(openDelim) : '';
+          const closeEsc = closeDelim ? escapeLrOpenDelimiter(closeDelim) : '';
           if (openEsc) {
             res = addToTypstData(res, { typst: 'lr(' + openEsc + ' ' + escapeLrSemicolons(trimmed) + ')' });
           } else if (closeEsc) {
@@ -1946,20 +1946,20 @@ const mapDelimiter = (delim: string): string => {
   return delim;
 };
 
-// Escape ASCII delimiters for use inside lr() within mat()/cases() context.
-// Bare [ { ( break Typst function-call parsing; backslash-escaping makes them
-// literal math delimiters that lr() can auto-size.
-const delimiterEscapeMap: Record<string, string> = {
-  '[': '\\[',
-  ']': '\\]',
+// Escape delimiters that cause parse errors inside lr() when unpaired.
+// All ASCII brackets except ] are escaped: ( and [ open groups/content blocks,
+// ) closes the lr() function call prematurely, { and } are code block syntax.
+// ] is left unescaped so lr() can recognise and auto-size it as a delimiter.
+const lrOpenEscapeMap: Record<string, string> = {
   '(': '\\(',
   ')': '\\)',
+  '[': '\\[',
   '{': '\\{',
   '}': '\\}',
 };
 
-const escapeDelimiterForLr = (delim: string): string => {
-  if (delimiterEscapeMap[delim]) return delimiterEscapeMap[delim];
+const escapeLrOpenDelimiter = (delim: string): string => {
+  if (lrOpenEscapeMap[delim]) return lrOpenEscapeMap[delim];
   const mapped = typstSymbolMap.get(delim);
   if (mapped) return mapped;
   return delim;

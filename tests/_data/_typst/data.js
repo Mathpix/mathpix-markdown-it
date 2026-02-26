@@ -824,8 +824,8 @@ module.exports = [
   // One-sided \left[...\right. in aligned → lr(\[ ...)
   {
     latex: `\\begin{aligned} a &= \\left[ b + c \\right. \\\\ &\\left. + d \\right] \\end{aligned}`,
-    typst: `a &= lr(\\[ b + c) \\\n &lr(+ d \\])`,
-    typst_inline: `a &= lr(\\[ b + c) \\\n &lr(+ d \\])`,
+    typst: `a &= lr(\\[ b + c) \\\n &lr(+ d ])`,
+    typst_inline: `a &= lr(\\[ b + c) \\\n &lr(+ d ])`,
   },
   // One-sided \left(...\right. in aligned → lr(\( ...)
   {
@@ -838,8 +838,8 @@ module.exports = [
   // Square brackets spanning rows
   {
     latex: `\\begin{array}{l} \\left[ x \\right. \\\\ \\left. y \\right] \\end{array}`,
-    typst: `mat(delim: #none, align: #left, \n  lr(\\[ x);\n  lr(y \\]),\n)`,
-    typst_inline: `mat(delim: #none, align: #left, \n  lr(\\[ x);\n  lr(y \\]),\n)`,
+    typst: `mat(delim: #none, align: #left, \n  lr(\\[ x);\n  lr(y ]),\n)`,
+    typst_inline: `mat(delim: #none, align: #left, \n  lr(\\[ x);\n  lr(y ]),\n)`,
   },
   // Parentheses spanning rows
   {
@@ -868,8 +868,8 @@ module.exports = [
   // Tall content: bracket with fraction
   {
     latex: `\\begin{array}{l} \\left[ \\frac{x}{y} \\right. \\\\ \\left. z \\right] \\end{array}`,
-    typst: `mat(delim: #none, align: #left, \n  lr(\\[ frac(x, y));\n  lr(z \\]),\n)`,
-    typst_inline: `mat(delim: #none, align: #left, \n  lr(\\[ frac(x, y));\n  lr(z \\]),\n)`,
+    typst: `mat(delim: #none, align: #left, \n  lr(\\[ frac(x, y));\n  lr(z ]),\n)`,
+    typst_inline: `mat(delim: #none, align: #left, \n  lr(\\[ frac(x, y));\n  lr(z ]),\n)`,
   },
 
   // === Token spacing inside \left...\right delimiters ===
@@ -2051,13 +2051,13 @@ module.exports = [
   // unpaired brackets inside \left...\right fences
   {
     latex: `\\left. x [ y ) \\right]`,
-    typst: `lr(x \\[ y \\) \\])`,
-    typst_inline: `lr(x \\[ y \\) \\])`,
+    typst: `lr(x \\[ y \\) ])`,
+    typst_inline: `lr(x \\[ y \\) ])`,
   },
   {
     latex: `\\left.\\frac{1}{50}[36 i+12 j)\\right]`,
-    typst: `lr(frac(1, 50)\\[ 36 i + 12 j \\) \\])`,
-    typst_inline: `lr(frac(1, 50)\\[ 36 i + 12 j \\) \\])`,
+    typst: `lr(frac(1, 50)\\[ 36 i + 12 j \\) ])`,
+    typst_inline: `lr(frac(1, 50)\\[ 36 i + 12 j \\) ])`,
   },
   {
     latex: `\\left( a [ b \\right)`,
@@ -2067,8 +2067,8 @@ module.exports = [
   // aligned with unpaired [ and ) inside \left.\right] fence
   {
     latex: `\\begin{aligned}\n& r_{c m}=\\frac{1}{50}[20(3 i+3 j)+18(-2 i-2 j)+12(i-j)] \\\\\n& \\left.r_{c m}=\\frac{1}{50}[36 i+12 j)\\right]=\\frac{36}{50} i+\\frac{12}{50} j=0.72 i+0.24 j\n\\end{aligned}`,
-    typst: `&r_(c m) = frac(1, 50)[20(3 i + 3 j) + 18( - 2 i - 2 j) + 12(i - j)] \\\n &lr(r_(c m) = frac(1, 50)\\[ 36 i + 12 j \\) \\]) = frac(36, 50) i + frac(12, 50) j = 0.72 i + 0.24 j`,
-    typst_inline: `&r_(c m) = frac(1, 50)[20(3 i + 3 j) + 18( - 2 i - 2 j) + 12(i - j)] \\\n &lr(r_(c m) = frac(1, 50)\\[ 36 i + 12 j \\) \\]) = frac(36, 50) i + frac(12, 50) j = 0.72 i + 0.24 j`,
+    typst: `&r_(c m) = frac(1, 50)[20(3 i + 3 j) + 18( - 2 i - 2 j) + 12(i - j)] \\\n &lr(r_(c m) = frac(1, 50)\\[ 36 i + 12 j \\) ]) = frac(36, 50) i + frac(12, 50) j = 0.72 i + 0.24 j`,
+    typst_inline: `&r_(c m) = frac(1, 50)[20(3 i + 3 j) + 18( - 2 i - 2 j) + 12(i - j)] \\\n &lr(r_(c m) = frac(1, 50)\\[ 36 i + 12 j \\) ]) = frac(36, 50) i + frac(12, 50) j = 0.72 i + 0.24 j`,
   },
   // colon escaping in mat() cells (prevents named-argument parsing)
   {
