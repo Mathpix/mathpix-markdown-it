@@ -212,13 +212,13 @@ Built-in Typst math operators (`sin`, `cos`, `tan`, `log`, `lim`, etc.) pass thr
 
 **Separator-safe fallback for shorthand functions:** `abs()`, `norm()`, `floor()`, `ceil()` accept exactly one argument. If the delimited content contains a top-level `,` or `;` (detected by `hasTopLevelSeparators()`), these would be misinterpreted as argument/row separators inside the function call. In such cases, the serializer falls back to `lr()` with explicit delimiter characters (`lr(| ... |)`, `lr(‖ ... ‖)`, `lr(⌊ ... ⌋)`, `lr(⌈ ... ⌉)`), where commas just separate content fragments without breaking semantics. Characters inside nested parentheses/brackets are not counted.
 
-**Semicolon escaping inside `lr()`:** Even after falling back to `lr()`, semicolons remain dangerous — Typst interprets `;` inside any function call as a row separator (like in `mat()`). The `escapeLrSemicolons()` helper replaces top-level `;` with `";"` (Typst text literal) inside all `lr()` calls: shorthand fallbacks, the general `lr()` path, and one-sided delimiter wrapping. Commas are safe in `lr()` since it accepts `..content` (variadic) — they just separate content fragments that get concatenated.
+**Semicolon escaping inside `lr()`:** Even after falling back to `lr()`, semicolons remain dangerous — Typst interprets `;` inside any function call as a row separator (like in `mat()`). The `escapeLrSemicolons()` helper replaces top-level `;` with `\;` (backslash-escaped semicolon) inside all `lr()` calls: shorthand fallbacks, the general `lr()` path, and one-sided delimiter wrapping. Commas are safe in `lr()` since it accepts `..content` (variadic) — they just separate content fragments that get concatenated.
 
 | LaTeX | Typst |
 |-------|-------|
-| `\left\lfloor a ; b \right\rfloor` | `lr(⌊ a";" b ⌋)` |
-| `\left\| a ; b \right\|` | `lr(‖ a";" b ‖)` |
-| `\left( a ; b \right)` | `lr(( a";" b ))` |
+| `\left\lfloor a ; b \right\rfloor` | `lr(⌊ a\; b ⌋)` |
+| `\left\| a ; b \right\|` | `lr(‖ a\; b ‖)` |
+| `\left( a ; b \right)` | `lr(( a\; b ))` |
 
 **Unbalanced parenthesis escaping in `menclose` wrappers:** When serialized child content contains unbalanced `)` characters (e.g. from `\smash{)}` inside `\lcm`), they would prematurely close the wrapping function call (`underline(...)`, `overline(...)`, `sqrt(...)`, etc.). The `escapeUnbalancedParens()` helper tracks parenthesis depth and replaces any `)` at depth 0 with `")"` (Typst string literal). Applied to all `menclose` branches that wrap content: `bottom`, `top`, `radical`, `longdiv`.
 
@@ -362,29 +362,35 @@ Explicit tag with label:
 
 **Separator escaping in all function-call wrappers**: In Typst, commas and semicolons inside any function call are parsed as argument/row separators. This affects not only `mat()`/`cases()` but every wrapper that places serialized content inside `(...)`: `sqrt()`, `root()`, `overline()`, `underline()`, `cancel()`, `limits()`, `stretch()`, `scripts()`, `attach()`, `hat()`, `arrow()`, `macron()`, `accent()`, `underbrace()`, `overbrace()`, etc.
 
-Two escape helpers handle this:
+Two escape helpers handle this, using **backslash escapes** per [official Typst documentation](https://typst.app/docs/reference/math/): "To write a verbatim comma or semicolon in a math call, escape it with a backslash."
 
-- **`escapeContentSeparators(expr)`** — escapes `,` → `","` and `;` → `";"` at parenthesis depth 0. Applied to content arguments of all function-call wrappers listed above.
-- **`escapeCasesSeparators(expr)`** — additionally escapes `:` → `":"` (named-argument syntax). Applied only to `mat()`/`cases()` cells where colons are also dangerous (e.g. `p:` parsed as named argument).
+- **`escapeContentSeparators(expr)`** — escapes `,` → `\,` and `;` → `\;` at parenthesis depth 0. Applied to content arguments of all function-call wrappers listed above, including `frac()` numerator/denominator.
+- **`escapeCasesSeparators(expr)`** — additionally handles `:` (named-argument syntax). Instead of escaping, inserts a space before `:` when preceded by an identifier (e.g. `p:` → `p :`) per Typst docs: "The colon is only recognized in a special way if directly preceded by an identifier." Applied only to `mat()`/`cases()` cells.
 
-Both helpers use `isAlreadyEscaped()` — a peek at adjacent characters (`expr[i-1] === '"' && expr[i+1] === '"'`) — to skip separators that are already escaped as `","` / `";"` / `":"`. This prevents double-escaping when content passes through multiple nested wrappers (e.g. `\underline{\underline{14,320}}` → `underline(underline(14","320))`). Characters inside nested parentheses/brackets (e.g. `f(t_n, x^n)`) are left untouched (depth > 0).
+Both helpers skip content that should not be modified:
+- **Quoted strings** (`"..."`) — copied verbatim, handles escaped quotes `\"` inside strings (e.g. `\text{}` content)
+- **Backslash-escaped characters** (`\,`, `\;`, `\(`, `\)`, `\[`, `\]`, `\{`, `\}`) — already-escaped sequences are not re-processed
+- **Nested parentheses/brackets** (depth > 0) — e.g. `f(a, b)` inside `sqrt()` is left untouched
 
 | LaTeX | Typst | Wrapper |
 |-------|-------|---------|
-| `\underset{\sim}{0,0}` | `limits(0"," 0)_(tilde.op)` | `limits()` |
-| `\sqrt{a,b}` | `sqrt(a"," b)` | `sqrt()` |
-| `\overline{a;b}` | `overline(a";" b)` | `overline()` |
-| `\cancel{x,y}` | `cancel(x"," y)` | `cancel()` |
-| `\hat{x,y}` | `hat(x"," y)` | accent |
+| `\underset{\sim}{0,0}` | `limits(0\, 0)_(tilde.op)` | `limits()` |
+| `\sqrt{a,b}` | `sqrt(a\, b)` | `sqrt()` |
+| `\overline{a;b}` | `overline(a\; b)` | `overline()` |
+| `\cancel{x,y}` | `cancel(x\, y)` | `cancel()` |
+| `\hat{x,y}` | `hat(x\, y)` | accent |
 | `\sqrt{f(a,b)}` | `sqrt(f(a, b))` | depth > 0, not escaped |
-| `\underline{\underline{14,320}}` | `underline(underline(14","320))` | nested, no double-escape |
+| `\underline{\underline{14,320}}` | `underline(underline(14\,320))` | nested, no double-escape |
+| `\frac{a,b}{c,d}` | `frac(a\, b, c\, d)` | `frac()` numerator/denominator |
+| `\frac{f(a,b)}{c}` | `frac(f(a, b), c)` | depth > 0 in frac, not escaped |
+| `\frac{\text{a,b}}{c}` | `frac("a,b", c)` | `"..."` skipped, commas inside safe |
 
 Regular cases with commas (`f(x) = \left\{ \begin{array}{ll} {x^2+1,} & {x>1} \\ {1,} & {x=1} \\ {x+1,} & {x<1} \end{array} \right.`):
 ```typst
 f(x) = cases(
-  x^2 + 1"," & x > 1,
-  1"," & x = 1,
-  x + 1"," & x < 1,
+  x^2 + 1\, & x > 1,
+  1\, & x = 1,
+  x + 1\, & x < 1,
 )
 ```
 
@@ -402,15 +408,15 @@ Empty prefix numcases with commas, explicit tags, and labels (`\begin{numcases}{
 )
 ```
 
-Note: the comma inside `lr(( t_n, x^n ))` is at depth 2 and preserved as-is, while top-level commas like `),"` and `1","` are escaped. The comma between `N` and `x^0` is the actual `cases()` row separator. Semicolons are escaped the same way — e.g. `L(u) = 1;` in a cases cell becomes `L(u) = 1";"`. Colons are escaped to prevent named-argument interpretation — e.g. `p:` in a mat() cell becomes `p":"`.
+Note: the comma inside `lr(( t_n, x^n ))` is at depth 2 and preserved as-is, while top-level commas like `)\,` and `1\,` are escaped. The comma between `N` and `x^0` is the actual `cases()` row separator. Semicolons are escaped the same way — e.g. `L(u) = 1;` in a cases cell becomes `L(u) = 1\;`. Colons are handled by inserting a space — e.g. `p:` in a mat() cell becomes `p :`.
 
 Matrix cell escaping examples:
 ```
 LaTeX:  \begin{pmatrix} a & b; \\ c & d \end{pmatrix}
-Typst:  mat(delim: "(", a, b";"; c, d)
+Typst:  mat(delim: "(", a, b\;; c, d)
 
 LaTeX:  \begin{array}{l} p: \\ q \end{array}
-Typst:  mat(delim: #none, align: #left, p":"; q)
+Typst:  mat(delim: #none, align: #left, p :; q)
 ```
 
 **Math inside `\tag`:** Tags can contain inline math, e.g. `\tag{$x\sqrt{5}$ 1.3.1}`. MathJax represents this as a mix of `mtext` and math nodes inside the label `mtd`. The `serializeTagContent` helper walks the label tree and emits `mtext` as plain text and math groups as `$typst$`, producing `n => [($x sqrt(5)$ 1.3.1)]`.
@@ -515,7 +521,7 @@ In Typst, `underbrace` and `overbrace` take annotations as a second argument: `u
 | `\text{if }` | `"if "` |
 | `\text{"hello"}` | `"\"hello\""` (inner `"` escaped — prevents breaking the Typst string literal) |
 | `f'(x)` | `f'(x)` (prime shorthand) |
-| `\$ 120,000` | `\$ 120","000` (escaped dollar + thousand-separator commas) |
+| `\$ 120,000` | `\$ 120\,000` (escaped dollar + thousand-separator commas) |
 | `\wp` | `℘` (Unicode output — no named Typst symbol) |
 | `6 \longdiv{84}` | `6 overline(")"84)` (long division symbol — no space after `)` for tight rendering) |
 | `\enclose{longdiv}{500}` | `overline(")"500)` (same via menclose) |
@@ -577,7 +583,11 @@ Note: `\%` produces `upright(%)` — `%` has no special meaning in Typst math mo
 
 ### Thousand-separator commas
 
-Numbers like `120,000` arrive as three MathML nodes: `mn(120)`, `mo(,)`, `mn(000)`. A bare comma in Typst math acts as an argument separator, so `120, 000` would be misinterpreted. The `isThousandSepComma()` helper in `common.ts` detects the pattern `mn` + `mo(,)` + `mn(exactly 3 digits)` and is applied in both `visitInferredMrowNode` (top-level) and the `mrow` handler (nested contexts like `\underline{\underline{14,320}}`), merging them into a single token: `14","320`. The `","` is a Typst text literal that renders as a visual comma without separator semantics.
+Numbers like `120,000` arrive as three MathML nodes: `mn(120)`, `mo(,)`, `mn(000)`. A bare comma in Typst math acts as an argument separator, so `120, 000` would be misinterpreted. The `isThousandSepComma()` helper in `common.ts` detects the pattern `mn` + `mo(,)` + `mn(exactly 3 digits)` and is applied in both `visitInferredMrowNode` (top-level) and the `mrow` handler (nested contexts like `\underline{\underline{14,320}}`), merging them into a single token with escaped commas: `14\,320`. The `\,` is Typst's backslash-escaped comma that renders as a visual comma without separator semantics.
+
+**Chain detection** handles multi-group numbers: `1,000,000` → `1\,000\,000`. A `while` loop continues merging as long as the next pair matches the thousand-separator pattern.
+
+**Indian numbering** (e.g. `41,70,000`): `isThousandSepComma()` also accepts 2-digit groups when the chain eventually reaches a 3-digit group. This correctly handles Indian numbering like `41,70,000` → `41\,70\,000` and `\frac{41,70,000}{7}` → `frac(41\,70\,000, 7)`.
 
 ### Slash escaping
 
