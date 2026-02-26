@@ -1139,14 +1139,14 @@ const serializePrefixBeforeMo = (node, serialize, stopMoText: string): string =>
 // Characters inside function calls like lr((...)) are left as-is.
 
 /** Escape , and ; at parenthesis depth 0 in content placed inside any Typst function call.
- *  Prevents commas/semicolons from being parsed as argument/row separators.
- *  Skips content inside "..." strings and escaped brackets like \[ \] \( \) \{ \}. */
+ *  Uses backslash escapes (\, and \;) per official Typst documentation.
+ *  Skips content inside "..." strings and already-escaped sequences. */
 const escapeContentSeparators = (expr: string): string => {
   let depth = 0;
   let result = '';
   for (let i = 0; i < expr.length; i++) {
     const ch = expr[i];
-    // Skip quoted strings: copy "..." verbatim (commas inside are safe)
+    // Skip quoted strings: copy "..." verbatim
     if (ch === '"') {
       let j = i + 1;
       while (j < expr.length) {
@@ -1160,8 +1160,8 @@ const escapeContentSeparators = (expr: string): string => {
         continue;
       }
     }
-    // Skip escaped brackets: \( \) \[ \] \{ \} are literal glyphs, not depth changes
-    if (ch === '\\' && i + 1 < expr.length && '()[]{}' .includes(expr[i + 1])) {
+    // Skip backslash-escaped chars: \, \; \( \) \[ \] \{ \} etc.
+    if (ch === '\\' && i + 1 < expr.length) {
       result += ch + expr[i + 1];
       i++;
       continue;
@@ -1173,9 +1173,9 @@ const escapeContentSeparators = (expr: string): string => {
       depth--;
       result += ch;
     } else if (ch === ',' && depth === 0) {
-      result += '","';
+      result += '\\,';
     } else if (ch === ';' && depth === 0) {
-      result += '";"';
+      result += '\\;';
     } else {
       result += ch;
     }
@@ -1184,13 +1184,14 @@ const escapeContentSeparators = (expr: string): string => {
 };
 
 /** Escape , ; and : at depth 0 — for mat()/cases() cells where : is also a named-argument marker.
- *  Skips content inside "..." strings to avoid double-escaping. */
+ *  Uses backslash escapes (\, and \;) per official Typst documentation.
+ *  For colons: inserts space before : when preceded by identifier (prevents named-arg parsing). */
 const escapeCasesSeparators = (expr: string): string => {
   let depth = 0;
   let result = '';
   for (let i = 0; i < expr.length; i++) {
     const ch = expr[i];
-    // Skip quoted strings: copy "..." verbatim (commas inside are safe)
+    // Skip quoted strings: copy "..." verbatim
     if (ch === '"') {
       let j = i + 1;
       while (j < expr.length) {
@@ -1204,8 +1205,8 @@ const escapeCasesSeparators = (expr: string): string => {
         continue;
       }
     }
-    // Skip escaped brackets: \( \) \[ \] \{ \} are literal glyphs, not depth changes
-    if (ch === '\\' && i + 1 < expr.length && '()[]{}' .includes(expr[i + 1])) {
+    // Skip backslash-escaped chars: \, \; \( \) \[ \] \{ \} etc.
+    if (ch === '\\' && i + 1 < expr.length) {
       result += ch + expr[i + 1];
       i++;
       continue;
@@ -1217,11 +1218,16 @@ const escapeCasesSeparators = (expr: string): string => {
       depth--;
       result += ch;
     } else if (ch === ',' && depth === 0) {
-      result += '","';
+      result += '\\,';
     } else if (ch === ';' && depth === 0) {
-      result += '";"';
+      result += '\\;';
     } else if (ch === ':' && depth === 0) {
-      result += '":"';
+      // Insert space before : when preceded by word char to prevent named-arg parsing
+      if (result.length > 0 && /\w/.test(result[result.length - 1])) {
+        result += ' :';
+      } else {
+        result += ':';
+      }
     } else {
       result += ch;
     }
@@ -1244,7 +1250,7 @@ const hasTopLevelSeparators = (expr: string): boolean => {
       }
       if (j < expr.length) { i = j; continue; }
     }
-    if (ch === '\\' && i + 1 < expr.length && '()[]{}' .includes(expr[i + 1])) { i++; continue; }
+    if (ch === '\\' && i + 1 < expr.length) { i++; continue; }
     if (ch === '(' || ch === '[' || ch === '{') { depth++; }
     else if ((ch === ')' || ch === ']' || ch === '}') && depth > 0) { depth--; }
     else if ((ch === ',' || ch === ';') && depth === 0) { return true; }
@@ -1252,8 +1258,8 @@ const hasTopLevelSeparators = (expr: string): boolean => {
   return false;
 };
 
-/** Escape top-level `;` → `";"` inside lr() content (commas are safe in lr).
- *  Skips content inside "..." strings (handles escaped quotes). */
+/** Escape top-level `;` → `\;` inside lr() content (commas are safe in lr).
+ *  Skips content inside "..." strings and backslash-escaped chars. */
 const escapeLrSemicolons = (expr: string): string => {
   let depth = 0;
   let result = '';
@@ -1272,12 +1278,12 @@ const escapeLrSemicolons = (expr: string): string => {
         continue;
       }
     }
-    if (ch === '\\' && i + 1 < expr.length && '()[]{}' .includes(expr[i + 1])) {
+    if (ch === '\\' && i + 1 < expr.length) {
       result += ch + expr[i + 1]; i++; continue;
     }
     if (ch === '(' || ch === '[' || ch === '{') { depth++; result += ch; }
     else if ((ch === ')' || ch === ']' || ch === '}') && depth > 0) { depth--; result += ch; }
-    else if (ch === ';' && depth === 0) { result += '";"'; }
+    else if (ch === ';' && depth === 0) { result += '\\;'; }
     else { result += ch; }
   }
   return result;
@@ -1307,8 +1313,8 @@ const escapeUnbalancedParens = (content: string): string => {
         continue;
       }
     }
-    // Skip escaped parens: \( \) are literal glyphs, not depth changes
-    if (ch === '\\' && i + 1 < content.length && (content[i + 1] === '(' || content[i + 1] === ')')) {
+    // Skip backslash-escaped chars: \( \) \, \; etc.
+    if (ch === '\\' && i + 1 < content.length) {
       result += ch + content[i + 1]; i++; continue;
     }
     if (ch === '(') { depth++; result += ch; }
@@ -2004,7 +2010,7 @@ const mrow = () => {
             let j = i;
             while (isThousandSepComma(node, j)) {
               const nextData: ITypstData = serialize.visitNode(node.childNodes[j + 2], '');
-              chainTypst += '","' + nextData.typst;
+              chainTypst += '\\,' + nextData.typst;
               j += 2;
             }
             res = addToTypstData(res, { typst: chainTypst });

@@ -218,53 +218,53 @@ module.exports = [
   // === Dollar sign and thousand separators ===
   {
     latex: `\\$ 120,000`,
-    typst: `\\$ 120","000`,
-    typst_inline: `\\$ 120","000`,
+    typst: `\\$ 120\\,000`,
+    typst_inline: `\\$ 120\\,000`,
   },
   {
     latex: `\\underline{\\underline{14,320}}`,
-    typst: `underline(underline(14","320))`,
-    typst_inline: `underline(underline(14","320))`,
+    typst: `underline(underline(14\\,320))`,
+    typst_inline: `underline(underline(14\\,320))`,
   },
   {
     latex: `1,000,000`,
-    typst: `1","000","000`,
-    typst_inline: `1","000","000`,
+    typst: `1\\,000\\,000`,
+    typst_inline: `1\\,000\\,000`,
   },
   {
     latex: `\\frac{1,234,567}{89}`,
-    typst: `frac(1","234","567, 89)`,
-    typst_inline: `frac(1","234","567, 89)`,
+    typst: `frac(1\\,234\\,567, 89)`,
+    typst_inline: `frac(1\\,234\\,567, 89)`,
   },
   {
     latex: `\\frac{41,70,000}{7}`,
-    typst: `frac(41","70","000, 7)`,
-    typst_inline: `frac(41","70","000, 7)`,
+    typst: `frac(41\\,70\\,000, 7)`,
+    typst_inline: `frac(41\\,70\\,000, 7)`,
   },
   {
     latex: `\\frac{a,b,c}{d}`,
-    typst: `frac(a"," b"," c, d)`,
-    typst_inline: `frac(a"," b"," c, d)`,
+    typst: `frac(a\\, b\\, c, d)`,
+    typst_inline: `frac(a\\, b\\, c, d)`,
   },
   {
     latex: `=\\frac{41,70,000,1,2,3,4,5}{7}=595714.28`,
-    typst: `= frac(41","70","000"," 1"," 2"," 3"," 4"," 5, 7) = 595714.28`,
-    typst_inline: `= frac(41","70","000"," 1"," 2"," 3"," 4"," 5, 7) = 595714.28`,
+    typst: `= frac(41\\,70\\,000\\, 1\\, 2\\, 3\\, 4\\, 5, 7) = 595714.28`,
+    typst_inline: `= frac(41\\,70\\,000\\, 1\\, 2\\, 3\\, 4\\, 5, 7) = 595714.28`,
   },
   {
     latex: `=\\frac{2,\\text{41,70,000,1,2,3,4,5}}{7}=595714.28`,
-    typst: `= frac(2"," "41,70,000,1,2,3,4,5", 7) = 595714.28`,
-    typst_inline: `= frac(2"," "41,70,000,1,2,3,4,5", 7) = 595714.28`,
+    typst: `= frac(2\\, "41,70,000,1,2,3,4,5", 7) = 595714.28`,
+    typst_inline: `= frac(2\\, "41,70,000,1,2,3,4,5", 7) = 595714.28`,
   },
   {
     latex: `=\\frac{2,\\text{ a "41,70,000",1,2,3,4,5}}{7}=595714.28`,
-    typst: `= frac(2"," " a \\"41,70,000\\",1,2,3,4,5", 7) = 595714.28`,
-    typst_inline: `= frac(2"," " a \\"41,70,000\\",1,2,3,4,5", 7) = 595714.28`,
+    typst: `= frac(2\\, " a \\"41,70,000\\",1,2,3,4,5", 7) = 595714.28`,
+    typst_inline: `= frac(2\\, " a \\"41,70,000\\",1,2,3,4,5", 7) = 595714.28`,
   },
   {
     latex: `=\\frac{2,\\text{ a "41,70,000,1,2,3,4,5}}{7}=595714.28`,
-    typst: `= frac(2"," " a \\"41,70,000,1,2,3,4,5", 7) = 595714.28`,
-    typst_inline: `= frac(2"," " a \\"41,70,000,1,2,3,4,5", 7) = 595714.28`,
+    typst: `= frac(2\\, " a \\"41,70,000,1,2,3,4,5", 7) = 595714.28`,
+    typst_inline: `= frac(2\\, " a \\"41,70,000,1,2,3,4,5", 7) = 595714.28`,
   },
   {
     latex: `\\left(\\text{a;b}\\right)`,
@@ -278,18 +278,18 @@ module.exports = [
   },
   {
     latex: `\\left(x ; \\text{a;b} ; y\\right)`,
-    typst: `lr(( x";" "a;b"";" y ))`,
-    typst_inline: `lr(( x";" "a;b"";" y ))`,
+    typst: `lr(( x\\; "a;b"\\; y ))`,
+    typst_inline: `lr(( x\\; "a;b"\\; y ))`,
   },
   {
     latex: `\\frac{a,b}{c,d}`,
-    typst: `frac(a"," b, c"," d)`,
-    typst_inline: `frac(a"," b, c"," d)`,
+    typst: `frac(a\\, b, c\\, d)`,
+    typst_inline: `frac(a\\, b, c\\, d)`,
   },
   {
     latex: `\\frac{1;2}{3}`,
-    typst: `frac(1";" 2, 3)`,
-    typst_inline: `frac(1";" 2, 3)`,
+    typst: `frac(1\\; 2, 3)`,
+    typst_inline: `frac(1\\; 2, 3)`,
   },
   {
     latex: `\\frac{f(a,b)}{c}`,
@@ -298,28 +298,28 @@ module.exports = [
   },
   {
     latex: `\\frac{1,000}{2,000}`,
-    typst: `frac(1","000, 2","000)`,
-    typst_inline: `frac(1","000, 2","000)`,
+    typst: `frac(1\\,000, 2\\,000)`,
+    typst_inline: `frac(1\\,000, 2\\,000)`,
   },
   {
     latex: `\\operatorname{ASFR}_{[x, x+\\delta)}=\\frac{\\text { number of births to women of age }[x, x+\\delta)}{\\text { number of person-years lived by women of age }[x, x+\\delta)} .`,
-    typst: `op("ASFR")_(\\[ x, x + delta \\)) = frac(" number of births to women of age "\\[ x"," x + delta \\), " number of person-years lived by women of age "\\[ x"," x + delta \\)) .`,
-    typst_inline: `op("ASFR")_(\\[ x, x + delta \\)) = frac(" number of births to women of age "\\[ x"," x + delta \\), " number of person-years lived by women of age "\\[ x"," x + delta \\)) .`,
+    typst: `op("ASFR")_(\\[ x, x + delta \\)) = frac(" number of births to women of age "\\[ x\\, x + delta \\), " number of person-years lived by women of age "\\[ x\\, x + delta \\)) .`,
+    typst_inline: `op("ASFR")_(\\[ x, x + delta \\)) = frac(" number of births to women of age "\\[ x\\, x + delta \\), " number of person-years lived by women of age "\\[ x\\, x + delta \\)) .`,
   },
   {
     latex: `\\binom{a,b}{c}`,
-    typst: `binom(a"," b, c)`,
-    typst_inline: `binom(a"," b, c)`,
+    typst: `binom(a\\, b, c)`,
+    typst_inline: `binom(a\\, b, c)`,
   },
   {
     latex: `\\sqrt{a,b}`,
-    typst: `sqrt(a"," b)`,
-    typst_inline: `sqrt(a"," b)`,
+    typst: `sqrt(a\\, b)`,
+    typst_inline: `sqrt(a\\, b)`,
   },
   {
     latex: `\\sqrt[3]{x,y}`,
-    typst: `root(3, x"," y)`,
-    typst_inline: `root(3, x"," y)`,
+    typst: `root(3, x\\, y)`,
+    typst_inline: `root(3, x\\, y)`,
   },
   // === Basic operations ===
   {
@@ -1756,20 +1756,20 @@ module.exports = [
   // cases via array with commas in cells (commas must be escaped)
   {
     latex: `f ( x ) = \\left\\{ \\begin{array} { l l } { x ^ { 2} + 1,} & { x > 1} \\\\ { 1,} & { x = 1} \\\\ { x + 1,} & { x < 1} \\end{array} \\right.`,
-    typst: `f(x) = cases(\n  x^2 + 1"," & x > 1,\n  1"," & x = 1,\n  x + 1"," & x < 1,\n)`,
-    typst_inline: `f(x) = cases(\n  x^2 + 1"," & x > 1,\n  1"," & x = 1,\n  x + 1"," & x < 1,\n)`,
+    typst: `f(x) = cases(\n  x^2 + 1\\, & x > 1,\n  1\\, & x = 1,\n  x + 1\\, & x < 1,\n)`,
+    typst_inline: `f(x) = cases(\n  x^2 + 1\\, & x > 1,\n  1\\, & x = 1,\n  x + 1\\, & x < 1,\n)`,
   },
   // cases via array with semicolons in cells (semicolons must be escaped)
   {
     latex: `\\left\\{ \\begin{array}{ll} \\sigma (x), & L(u) = 1; \\\\ 1 - \\sigma (x), & L(u) = 0, \\end{array} \\right.`,
-    typst: `cases(\n  sigma(x)"," & L(u) = 1";",\n  1 - sigma(x)"," & L(u) = 0",",\n)`,
-    typst_inline: `cases(\n  sigma(x)"," & L(u) = 1";",\n  1 - sigma(x)"," & L(u) = 0",",\n)`,
+    typst: `cases(\n  sigma(x)\\, & L(u) = 1\\;,\n  1 - sigma(x)\\, & L(u) = 0\\,,\n)`,
+    typst_inline: `cases(\n  sigma(x)\\, & L(u) = 1\\;,\n  1 - sigma(x)\\, & L(u) = 0\\,,\n)`,
   },
   // numcases with empty prefix and explicit \tag (processed by MathJax as real tags)
   {
     latex: `\\begin{numcases}{} \\Delta_{q}^{\\alpha} x^{n}=f\\left(t_{n}, x^{n}\\right), n=1,2, \\ldots, N \\tag{3.12}\\label{eq:3.12}\\\\ x^{0}=x_{0} \\tag{3.13}\\label{eq3.13} \\end{numcases}`,
-    typst: `#grid(\n  columns: (1fr, auto),\n  align: (left, right + horizon),\n  math.equation(block: true, numbering: none, $ cases(\n  Delta_q^(alpha) x^n = f lr(( t_n, x^n ))"," n = 1"," 2"," dots"," N,\n  x^0 = x_0,\n) $),\n  grid(\n    row-gutter: 0.65em,\n    [#figure(kind: "eq-tag", supplement: none, numbering: n => [(3.12)], [(3.12)]) <eq:3.12>],\n    [#figure(kind: "eq-tag", supplement: none, numbering: n => [(3.13)], [(3.13)]) <eq3.13>],\n  ),\n)`,
-    typst_inline: `cases(\n  Delta_q^(alpha) x^n = f lr(( t_n, x^n ))"," n = 1"," 2"," dots"," N,\n  x^0 = x_0,\n)`,
+    typst: `#grid(\n  columns: (1fr, auto),\n  align: (left, right + horizon),\n  math.equation(block: true, numbering: none, $ cases(\n  Delta_q^(alpha) x^n = f lr(( t_n, x^n ))\\, n = 1\\, 2\\, dots\\, N,\n  x^0 = x_0,\n) $),\n  grid(\n    row-gutter: 0.65em,\n    [#figure(kind: "eq-tag", supplement: none, numbering: n => [(3.12)], [(3.12)]) <eq:3.12>],\n    [#figure(kind: "eq-tag", supplement: none, numbering: n => [(3.13)], [(3.13)]) <eq3.13>],\n  ),\n)`,
+    typst_inline: `cases(\n  Delta_q^(alpha) x^n = f lr(( t_n, x^n ))\\, n = 1\\, 2\\, dots\\, N,\n  x^0 = x_0,\n)`,
   },
   // === Unpaired brackets in matrix cells → Typst symbol names ===
   // Unpaired [ ] spanning rows → bracket.l / bracket.r
@@ -1813,17 +1813,17 @@ module.exports = [
     typst_inline: `x`,
   },
   // === Separator escaping in mat() cells ===
-  // Semicolon in matrix cell must be escaped to ";"
+  // Semicolon in matrix cell must be escaped to \\;
   {
     latex: `\\begin{pmatrix} a & b; \\\\ c & d \\end{pmatrix}`,
-    typst: `mat(delim: "(", \n  a, b";";\n  c, d,\n)`,
-    typst_inline: `mat(delim: "(", \n  a, b";";\n  c, d,\n)`,
+    typst: `mat(delim: "(", \n  a, b\\;;\n  c, d,\n)`,
+    typst_inline: `mat(delim: "(", \n  a, b\\;;\n  c, d,\n)`,
   },
-  // Comma in matrix cell must be escaped to ","
+  // Comma in matrix cell must be escaped to \\,
   {
     latex: `\\begin{pmatrix} a, b & c \\\\ d & e \\end{pmatrix}`,
-    typst: `mat(delim: "(", \n  a"," b, c;\n  d, e,\n)`,
-    typst_inline: `mat(delim: "(", \n  a"," b, c;\n  d, e,\n)`,
+    typst: `mat(delim: "(", \n  a\\, b, c;\n  d, e,\n)`,
+    typst_inline: `mat(delim: "(", \n  a\\, b, c;\n  d, e,\n)`,
   },
   // === \textit produces italic() wrapper on mtext ===
   {
@@ -1977,18 +1977,18 @@ module.exports = [
   // === semicolons escaped inside lr() fallback ===
   {
     latex: `\\left|a ; b\\right|`,
-    typst: `lr(| a";" b |)`,
-    typst_inline: `lr(| a";" b |)`,
+    typst: `lr(| a\\; b |)`,
+    typst_inline: `lr(| a\\; b |)`,
   },
   {
     latex: `\\left\\lfloor a ; b\\right\\rfloor`,
-    typst: `lr(⌊ a";" b ⌋)`,
-    typst_inline: `lr(⌊ a";" b ⌋)`,
+    typst: `lr(⌊ a\\; b ⌋)`,
+    typst_inline: `lr(⌊ a\\; b ⌋)`,
   },
   {
     latex: `\\left( a ; b \\right)`,
-    typst: `lr(( a";" b ))`,
-    typst_inline: `lr(( a";" b ))`,
+    typst: `lr(( a\\; b ))`,
+    typst_inline: `lr(( a\\; b ))`,
   },
   // === longdiv ===
   {
@@ -2168,14 +2168,14 @@ module.exports = [
   // colon escaping in mat() cells (prevents named-argument parsing)
   {
     latex: `K \\equiv\\left\\{\\begin{array}{l:}\np: \\\\\n\\text { conservation of flow equation }\n\\end{array}\\right\\}`,
-    typst: `K equiv lr({ mat(delim: #none, align: #left, \n  p\":\";\n  \" conservation of flow equation \",\n) })`,
-    typst_inline: `K equiv lr({ mat(delim: #none, align: #left, \n  p\":\";\n  \" conservation of flow equation \",\n) })`,
+    typst: `K equiv lr({ mat(delim: #none, align: #left, \n  p :;\n  " conservation of flow equation ",\n) })`,
+    typst_inline: `K equiv lr({ mat(delim: #none, align: #left, \n  p :;\n  " conservation of flow equation ",\n) })`,
   },
   // colon escaping in cases() cells
   {
     latex: `\\left\\{\\begin{array}{l}p: \\\\\\text { conservation of flow equation }\\end{array}\\right.`,
-    typst: `cases(\n  p\":\",\n  \" conservation of flow equation \",\n)`,
-    typst_inline: `cases(\n  p\":\",\n  \" conservation of flow equation \",\n)`,
+    typst: `cases(\n  p :,\n  " conservation of flow equation ",\n)`,
+    typst_inline: `cases(\n  p :,\n  " conservation of flow equation ",\n)`,
   },
   // double-quote escaping (bare " starts a string literal in Typst math)
   {
@@ -2222,106 +2222,106 @@ module.exports = [
   // limits()
   {
     latex: `\\underset{\\sim}{0,0}`,
-    typst: `limits(0"," 0)_(tilde.op)`,
-    typst_inline: `limits(0"," 0)_(tilde.op)`,
+    typst: `limits(0\\, 0)_(tilde.op)`,
+    typst_inline: `limits(0\\, 0)_(tilde.op)`,
   },
   {
     latex: `\\overset{n}{0,0}`,
-    typst: `limits(0"," 0)^n`,
-    typst_inline: `limits(0"," 0)^n`,
+    typst: `limits(0\\, 0)^n`,
+    typst_inline: `limits(0\\, 0)^n`,
   },
   // sqrt()
   {
     latex: `\\sqrt{a,b}`,
-    typst: `sqrt(a"," b)`,
-    typst_inline: `sqrt(a"," b)`,
+    typst: `sqrt(a\\, b)`,
+    typst_inline: `sqrt(a\\, b)`,
   },
   {
     latex: `\\sqrt{a;b}`,
-    typst: `sqrt(a";" b)`,
-    typst_inline: `sqrt(a";" b)`,
+    typst: `sqrt(a\\; b)`,
+    typst_inline: `sqrt(a\\; b)`,
   },
   // root()
   {
     latex: `\\sqrt[3]{a,b}`,
-    typst: `root(3, a"," b)`,
-    typst_inline: `root(3, a"," b)`,
+    typst: `root(3, a\\, b)`,
+    typst_inline: `root(3, a\\, b)`,
   },
   // overline() / underline()
   {
     latex: `\\overline{a,b}`,
-    typst: `overline(a"," b)`,
-    typst_inline: `overline(a"," b)`,
+    typst: `overline(a\\, b)`,
+    typst_inline: `overline(a\\, b)`,
   },
   {
     latex: `\\overline{a;b}`,
-    typst: `overline(a";" b)`,
-    typst_inline: `overline(a";" b)`,
+    typst: `overline(a\\; b)`,
+    typst_inline: `overline(a\\; b)`,
   },
   {
     latex: `\\underline{x,y}`,
-    typst: `underline(x"," y)`,
-    typst_inline: `underline(x"," y)`,
+    typst: `underline(x\\, y)`,
+    typst_inline: `underline(x\\, y)`,
   },
   // cancel() / bcancel()
   {
     latex: `\\cancel{x,y}`,
-    typst: `cancel(x"," y)`,
-    typst_inline: `cancel(x"," y)`,
+    typst: `cancel(x\\, y)`,
+    typst_inline: `cancel(x\\, y)`,
   },
   {
     latex: `\\bcancel{a,b}`,
-    typst: `cancel(inverted: #true, a"," b)`,
-    typst_inline: `cancel(inverted: #true, a"," b)`,
+    typst: `cancel(inverted: #true, a\\, b)`,
+    typst_inline: `cancel(inverted: #true, a\\, b)`,
   },
   // accents: hat, vec, bar, tilde
   {
     latex: `\\hat{x,y}`,
-    typst: `hat(x"," y)`,
-    typst_inline: `hat(x"," y)`,
+    typst: `hat(x\\, y)`,
+    typst_inline: `hat(x\\, y)`,
   },
   {
     latex: `\\vec{a,b}`,
-    typst: `arrow(a"," b)`,
-    typst_inline: `arrow(a"," b)`,
+    typst: `arrow(a\\, b)`,
+    typst_inline: `arrow(a\\, b)`,
   },
   {
     latex: `\\bar{x;y}`,
-    typst: `macron(x";" y)`,
-    typst_inline: `macron(x";" y)`,
+    typst: `macron(x\\; y)`,
+    typst_inline: `macron(x\\; y)`,
   },
   {
     latex: `\\tilde{a;b}`,
-    typst: `tilde(a";" b)`,
-    typst_inline: `tilde(a";" b)`,
+    typst: `tilde(a\\; b)`,
+    typst_inline: `tilde(a\\; b)`,
   },
   // underbrace / overbrace with annotation
   {
     latex: `\\underbrace{a,b}_{n}`,
-    typst: `underbrace(a"," b, n)`,
-    typst_inline: `underbrace(a"," b, n)`,
+    typst: `underbrace(a\\, b, n)`,
+    typst_inline: `underbrace(a\\, b, n)`,
   },
   {
     latex: `\\overbrace{x,y}^{\\text{sum}}`,
-    typst: `overbrace(x"," y, "sum")`,
-    typst_inline: `overbrace(x"," y, "sum")`,
+    typst: `overbrace(x\\, y, "sum")`,
+    typst_inline: `overbrace(x\\, y, "sum")`,
   },
   // nested wrappers — no double-escaping
   {
     latex: `\\underline{\\underline{14,320}}`,
-    typst: `underline(underline(14","320))`,
-    typst_inline: `underline(underline(14","320))`,
+    typst: `underline(underline(14\\,320))`,
+    typst_inline: `underline(underline(14\\,320))`,
   },
   {
     latex: `\\overline{\\sqrt{a,b}}`,
-    typst: `overline(sqrt(a"," b))`,
-    typst_inline: `overline(sqrt(a"," b))`,
+    typst: `overline(sqrt(a\\, b))`,
+    typst_inline: `overline(sqrt(a\\, b))`,
   },
   // escaped quote + comma (\" must not break escaping)
   {
     latex: `\\sqrt{a " b, c}`,
-    typst: `sqrt(a\\" b"," c)`,
-    typst_inline: `sqrt(a\\" b"," c)`,
+    typst: `sqrt(a\\" b\\, c)`,
+    typst_inline: `sqrt(a\\" b\\, c)`,
   },
   // comma inside nested parens — NOT escaped (depth > 0)
   {
