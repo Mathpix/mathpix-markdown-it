@@ -2043,4 +2043,15 @@ module.exports = [
     typst: `cases(\n  p\":\",\n  \" conservation of flow equation \",\n)`,
     typst_inline: `cases(\n  p\":\",\n  \" conservation of flow equation \",\n)`,
   },
+  // double-quote escaping (bare " starts a string literal in Typst math)
+  {
+    latex: `d " r`,
+    typst: `d\\" r`,
+    typst_inline: `d\\" r`,
+  },
+  {
+    latex: `a " b " c`,
+    typst: `a\\" b\\" c`,
+    typst_inline: `a\\" b\\" c`,
+  },
 ];

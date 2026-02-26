@@ -287,6 +287,7 @@ const miscSymbols: ReadonlyArray<[string, string]> = [
   ["\u2063", ""],               // invisible separator
   ["\u2064", ""],               // invisible plus
   ["$", "\\$"],                 // dollar sign — must be escaped in Typst math mode
+  ['"', '\\"'],                  // " — must be escaped; bare " starts a string literal in Typst math
   ["\u0131", "dotless.i"],      // ı (imath)
   ["\u0237", "dotless.j"],      // ȷ (jmath)
 ];
