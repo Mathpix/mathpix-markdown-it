@@ -529,13 +529,23 @@ Correct Typst output requires careful spacing to prevent token merging and avoid
 
 Adjacent word-character tokens must be separated by spaces. The `needsTokenSeparator(prev, next)` helper in `common.ts` centralizes this check: it returns `true` when `prev` does not end with a separator (`\s`, `(`, `{`, `[`, `,`, `|`) and `next` starts with a word character, dot, or quote. This helper is used in both `visitInferredMrowNode` (index.ts) and the `mrow` handler (handlers.ts), replacing ~12 previously duplicated inline checks.
 
-### Dollar sign escaping
+### Special character escaping
 
-In Typst math mode, `$` terminates the formula. LaTeX `\$` produces an `mi` node containing the literal `$` character. The symbol map maps `$` → `\$` so it is escaped in output. Without this, the `mi` handler would wrap it as `upright($)`, which breaks Typst parsing.
+Several characters have syntactic meaning in Typst math mode and must be escaped with `\` in the symbol map. These characters arrive as `mi` nodes (from `\#`, `\$`, `\&`, `\_`) or `mo` nodes (from `"`) with `mathvariant="normal"`. Without escaping, the `mi` handler would wrap them in `upright()` (e.g. `upright(#)`), which breaks Typst parsing because the special character retains its syntactic role inside the function call.
 
-### Double-quote escaping
+**Escape-form bypass in `mi` handler:** When a symbol maps to an escape form (starts with `\`), the `mi` handler skips all font wrapping (`upright()`, `bold()`, etc.) and outputs the escaped form directly. This is enforced by the condition `!(isKnownSymbol && typstValue.startsWith('\\'))` in the font-wrapping branch.
 
-In Typst math mode, `"` starts a string literal. LaTeX `"` in math produces an `mo` node containing the literal `"` character. The symbol map maps `"` → `\"` so it is escaped in output. Without this, a bare `"` would open a Typst string context and cause a parse error (e.g. `d " r` → `d \" r`).
+| LaTeX | Typst | Why escape is needed |
+|-------|-------|---------------------|
+| `\$` | `\$` | `$` terminates math mode |
+| `\#` | `\#` | `#` starts a code expression |
+| `\"` (in math) | `\"` | `"` starts a string literal |
+| `\&` | `\&` | `&` is alignment separator |
+| `\_` | `\_` | `_` is subscript operator |
+| `\surd` | `\√` | `√` triggers sqrt operator |
+| `a/b` | `a\/ b` | `/` creates a fraction (handled in `mo` handler, not symbol map) |
+
+Note: `\%` produces `upright(%)` — `%` has no special meaning in Typst math mode, so no escaping is needed.
 
 ### Thousand-separator commas
 

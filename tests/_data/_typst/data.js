@@ -2054,4 +2054,22 @@ module.exports = [
     typst: `a\\" b\\" c`,
     typst_inline: `a\\" b\\" c`,
   },
+  // hash escaping (bare # starts a code expression in Typst)
+  {
+    latex: `\\#`,
+    typst: `\\#`,
+    typst_inline: `\\#`,
+  },
+  // ampersand escaping (bare & is alignment separator in Typst math)
+  {
+    latex: `\\&`,
+    typst: `\\&`,
+    typst_inline: `\\&`,
+  },
+  // underscore escaping (bare _ is subscript operator in Typst math)
+  {
+    latex: `\\_`,
+    typst: `\\_`,
+    typst_inline: `\\_`,
+  },
 ];

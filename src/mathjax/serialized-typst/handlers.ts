@@ -211,8 +211,10 @@ const mi = () => {
       // Skip font wrapping for known symbols with non-bold variants (e.g. \infty with mathvariant="normal")
       // Skip font wrapping for built-in Typst math operators (sin, cos, log, etc.)
       // Allow bold wrapping for known symbols (e.g. \boldsymbol{\alpha} → bold(alpha))
+      // Skip font wrapping for escape-form symbols (\#, \$, \/, \√, \") — they break inside upright()
       else if (mathvariant && mathvariant !== 'italic' && !isKnownOperator
-        && (!isKnownSymbol || mathvariant === 'bold' || mathvariant === 'bold-italic')) {
+        && (!isKnownSymbol || mathvariant === 'bold' || mathvariant === 'bold-italic')
+        && !(isKnownSymbol && typstValue.startsWith('\\'))) {
         const fontFn = typstFontMap.get(mathvariant);
         if (fontFn) {
           // Multi-letter text needs quotes in Typst math (e.g. italic("word"), bold("text"))
