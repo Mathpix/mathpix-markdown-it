@@ -444,13 +444,14 @@ const msup = () => {
       if (sup) {
         const braceMatch = BRACE_ANNOTATION_RE.exec(baseTrimmed);
         if (braceMatch && (braceMatch[1] === 'overbrace' || braceMatch[1] === 'overbracket')) {
-          res = addToTypstData(res, { typst: braceMatch[1] + '(' + braceMatch[2] + ', ' + sup + ')' });
+          // braceMatch[2] already processed by accent handler — don't re-escape
+          res = addToTypstData(res, { typst: braceMatch[1] + '(' + braceMatch[2] + ', ' + escapeContentSeparators(sup) + ')' });
           return res;
         }
       }
       // \nolimits: wrap known limit-type operators in scripts() to force side placement
       if (baseTrimmed && needsScriptsWrapper(baseTrimmed)) {
-        res = addToTypstData(res, { typst: 'scripts(' + baseTrimmed + ')' });
+        res = addToTypstData(res, { typst: 'scripts(' + escapeContentSeparators(baseTrimmed) + ')' });
       } else {
         // Empty base (e.g. LaTeX ^{x} with no preceding base): use empty placeholder
         res = addToTypstData(res, { typst: baseTrimmed ? base : '""' });
@@ -493,13 +494,14 @@ const msub = () => {
       if (sub) {
         const braceMatch = BRACE_ANNOTATION_RE.exec(baseTrimmed);
         if (braceMatch && (braceMatch[1] === 'underbrace' || braceMatch[1] === 'underbracket')) {
-          res = addToTypstData(res, { typst: braceMatch[1] + '(' + braceMatch[2] + ', ' + sub + ')' });
+          // braceMatch[2] already processed by accent handler — don't re-escape
+          res = addToTypstData(res, { typst: braceMatch[1] + '(' + braceMatch[2] + ', ' + escapeContentSeparators(sub) + ')' });
           return res;
         }
       }
       // \nolimits: wrap known limit-type operators in scripts() to force side placement
       if (baseTrimmed && needsScriptsWrapper(baseTrimmed)) {
-        res = addToTypstData(res, { typst: 'scripts(' + baseTrimmed + ')' });
+        res = addToTypstData(res, { typst: 'scripts(' + escapeContentSeparators(baseTrimmed) + ')' });
       } else {
         res = addToTypstData(res, { typst: baseTrimmed ? base : '""' });
       }
@@ -571,7 +573,7 @@ const msqrt = () => {
     try {
       const firstChild = node.childNodes[0] || null;
       const dataFirst: ITypstData = firstChild ? serialize.visitNode(firstChild, '') : initTypstData();
-      const content = dataFirst.typst.trim() || '""';
+      const content = escapeContentSeparators(dataFirst.typst.trim()) || '""';
       res = addToTypstData(res, { typst: 'sqrt(' + content + ')' });
       return res;
     } catch (e) {
@@ -590,10 +592,10 @@ const mroot = () => {
       const index = node.childNodes[1] || null;
       const dataRadicand: ITypstData = radicand ? serialize.visitNode(radicand, '') : initTypstData();
       const dataIndex: ITypstData = index ? serialize.visitNode(index, '') : initTypstData();
-      const radicandContent = dataRadicand.typst.trim() || '""';
+      const radicandContent = escapeContentSeparators(dataRadicand.typst.trim()) || '""';
       // Typst root: root(index, radicand)
       res = addToTypstData(res, {
-        typst: 'root(' + dataIndex.typst.trim() + ', ' + radicandContent + ')'
+        typst: 'root(' + escapeContentSeparators(dataIndex.typst.trim()) + ', ' + radicandContent + ')'
       });
       return res;
     } catch (e) {
@@ -692,10 +694,10 @@ const buildLimitBase = (firstChild: any, baseTrimmed: string, base: string): ITy
     }
     // Operator doesn't natively place limits above/below (e.g. \intop → integral).
     // Block: limits()/stretch() to force above/below; inline: bare operator for side placement.
-    return { typst: wrapper + '(' + baseTrimmed + ')', typst_inline: base };
+    return { typst: wrapper + '(' + escapeContentSeparators(baseTrimmed) + ')', typst_inline: base };
   } else if (movablelimits === false) {
     // Explicit \limits — force below/above placement in both modes
-    return { typst: wrapper + '(' + baseTrimmed + ')' };
+    return { typst: wrapper + '(' + escapeContentSeparators(baseTrimmed) + ')' };
   } else {
     // Non-mo base (mrow, etc.) — use existing logic
     const baseIsNativeLimitOp = TYPST_DISPLAY_LIMIT_OPS.has(baseTrimmed);
@@ -712,7 +714,7 @@ const buildLimitBase = (firstChild: any, baseTrimmed: string, base: string): ITy
     if (baseIsNativeLimitOp || baseIsSpecialFn) {
       return { typst: base };
     }
-    return { typst: wrapper + '(' + baseTrimmed + ')' };
+    return { typst: wrapper + '(' + escapeContentSeparators(baseTrimmed) + ')' };
   }
 };
 
@@ -761,7 +763,7 @@ const mover = () => {
         const accentChar = getChildrenText(secondChild);
         const accentFn = typstAccentMap.get(accentChar);
         if (accentFn) {
-          const content = dataFirst.typst.trim() || '""';
+          const content = escapeContentSeparators(dataFirst.typst.trim()) || '""';
           if (TYPST_ACCENT_SHORTHANDS.has(accentFn)) {
             // Shorthand accent: fn(content)
             res = addToTypstData(res, { typst: accentFn + '(' + content + ')' });
@@ -779,7 +781,8 @@ const mover = () => {
         // overbrace/overbracket annotation: insert as second argument
         const braceMatch = BRACE_ANNOTATION_RE.exec(baseTrimmed);
         if (braceMatch && (braceMatch[1] === 'overbrace' || braceMatch[1] === 'overbracket')) {
-          res = addToTypstData(res, { typst: braceMatch[1] + '(' + braceMatch[2] + ', ' + over + ')' });
+          // braceMatch[2] already processed by accent handler — don't re-escape
+          res = addToTypstData(res, { typst: braceMatch[1] + '(' + braceMatch[2] + ', ' + escapeContentSeparators(over) + ')' });
           return res;
         }
         const baseData = buildLimitBase(firstChild, baseTrimmed, dataFirst.typst);
@@ -834,7 +837,7 @@ const munder = () => {
         if (accentFn === 'overline') { accentFn = 'underline'; }
         if (accentFn === 'overbrace') { accentFn = 'underbrace'; }
         if (accentFn) {
-          const content = dataFirst.typst.trim() || '""';
+          const content = escapeContentSeparators(dataFirst.typst.trim()) || '""';
           // Arrows/harpoons have no under-variant in Typst — use attach(base, b: symbol)
           const underSymbol = MUNDER_ATTACH_SYMBOLS.get(accentFn);
           if (underSymbol) {
@@ -856,7 +859,8 @@ const munder = () => {
         // underbrace/underbracket annotation: insert as second argument
         const braceMatch = BRACE_ANNOTATION_RE.exec(baseTrimmed);
         if (braceMatch && (braceMatch[1] === 'underbrace' || braceMatch[1] === 'underbracket')) {
-          res = addToTypstData(res, { typst: braceMatch[1] + '(' + braceMatch[2] + ', ' + under + ')' });
+          // braceMatch[2] already processed by accent handler — don't re-escape
+          res = addToTypstData(res, { typst: braceMatch[1] + '(' + braceMatch[2] + ', ' + escapeContentSeparators(under) + ')' });
           return res;
         }
         const baseData = buildLimitBase(firstChild, baseTrimmed, dataFirst.typst);
@@ -1005,7 +1009,7 @@ const mmultiscripts = () => {
         if (postSup) parts.push('t: ' + postSup);
         if (postSub) parts.push('b: ' + postSub);
         res = addToTypstData(res, {
-          typst: 'attach(' + baseTrimmed + ', ' + parts.join(', ') + ')'
+          typst: 'attach(' + escapeContentSeparators(baseTrimmed) + ', ' + parts.join(', ') + ')'
         });
       }
 
@@ -1120,6 +1124,38 @@ const serializePrefixBeforeMo = (node, serialize, stopMoText: string): string =>
 // (Typst text strings) so they render visually but aren't parsed as
 // cases()/mat() argument separators, row separators, or named-argument syntax.
 // Characters inside function calls like lr((...)) are left as-is.
+/** Check if the separator at position i is already escaped as "X" (surrounded by quotes). */
+const isAlreadyEscaped = (expr: string, i: number): boolean => {
+  return i > 0 && i + 1 < expr.length && expr[i - 1] === '"' && expr[i + 1] === '"';
+};
+
+/** Escape , and ; at parenthesis depth 0 in content placed inside any Typst function call.
+ *  Prevents commas/semicolons from being parsed as argument/row separators.
+ *  Skips already-escaped separators ("," / ";") to avoid double-escaping. */
+const escapeContentSeparators = (expr: string): string => {
+  let depth = 0;
+  let result = '';
+  for (let i = 0; i < expr.length; i++) {
+    const ch = expr[i];
+    if (ch === '(' || ch === '[' || ch === '{') {
+      depth++;
+      result += ch;
+    } else if ((ch === ')' || ch === ']' || ch === '}') && depth > 0) {
+      depth--;
+      result += ch;
+    } else if (ch === ',' && depth === 0 && !isAlreadyEscaped(expr, i)) {
+      result += '","';
+    } else if (ch === ';' && depth === 0 && !isAlreadyEscaped(expr, i)) {
+      result += '";"';
+    } else {
+      result += ch;
+    }
+  }
+  return result;
+};
+
+/** Escape , ; and : at depth 0 — for mat()/cases() cells where : is also a named-argument marker.
+ *  Skips already-escaped separators to avoid double-escaping. */
 const escapeCasesSeparators = (expr: string): string => {
   let depth = 0;
   let result = '';
@@ -1131,11 +1167,11 @@ const escapeCasesSeparators = (expr: string): string => {
     } else if ((ch === ')' || ch === ']' || ch === '}') && depth > 0) {
       depth--;
       result += ch;
-    } else if (ch === ',' && depth === 0) {
+    } else if (ch === ',' && depth === 0 && !isAlreadyEscaped(expr, i)) {
       result += '","';
-    } else if (ch === ';' && depth === 0) {
+    } else if (ch === ';' && depth === 0 && !isAlreadyEscaped(expr, i)) {
       result += '";"';
-    } else if (ch === ':' && depth === 0) {
+    } else if (ch === ':' && depth === 0 && !isAlreadyEscaped(expr, i)) {
       result += '":"';
     } else {
       result += ch;
@@ -1985,33 +2021,33 @@ const menclose = () => {
         // \cancel uses updiagonalstrike (lower-left to upper-right) → Typst cancel() default
         // \bcancel uses downdiagonalstrike (upper-left to lower-right) → Typst cancel(inverted: true)
         if (notation.indexOf('downdiagonalstrike') > -1 && notation.indexOf('updiagonalstrike') === -1) {
-          res = addToTypstData(res, { typst: 'cancel(inverted: #true, ' + content + ')' });
+          res = addToTypstData(res, { typst: 'cancel(inverted: #true, ' + escapeContentSeparators(content) + ')' });
         } else {
-          res = addToTypstData(res, { typst: 'cancel(' + content + ')' });
+          res = addToTypstData(res, { typst: 'cancel(' + escapeContentSeparators(content) + ')' });
         }
       } else if (notation.indexOf('horizontalstrike') > -1) {
-        res = addToTypstData(res, { typst: 'cancel(' + content + ')' });
+        res = addToTypstData(res, { typst: 'cancel(' + escapeContentSeparators(content) + ')' });
       } else if (notation.indexOf('longdiv') > -1) {
         // \longdiv / \enclose{longdiv} → overline(")" content)
-        res = addToTypstData(res, { typst: 'overline(")"' + escapeUnbalancedParens(content) + ')' });
+        res = addToTypstData(res, { typst: 'overline(")"' + escapeContentSeparators(escapeUnbalancedParens(content)) + ')' });
       } else if (notation.indexOf('circle') > -1) {
         // \enclose{circle} → #circle with inset
         res = addToTypstData(res, { typst: '#circle(inset: 3pt, $' + content + '$)', typst_inline: content });
       } else if (notation.indexOf('radical') > -1) {
         // \enclose{radical} → sqrt()
-        res = addToTypstData(res, { typst: 'sqrt(' + escapeUnbalancedParens(content) + ')' });
+        res = addToTypstData(res, { typst: 'sqrt(' + escapeContentSeparators(escapeUnbalancedParens(content)) + ')' });
       } else if (notation.indexOf('top') > -1) {
         // \enclose{top} → overline()
-        res = addToTypstData(res, { typst: 'overline(' + escapeUnbalancedParens(content) + ')' });
+        res = addToTypstData(res, { typst: 'overline(' + escapeContentSeparators(escapeUnbalancedParens(content)) + ')' });
       } else if (notation.indexOf('bottom') > -1) {
         // \enclose{bottom} → underline()
         // Detect \smash{)} prefix (used in \lcm macro): strip leading ) or \), trailing spacing, no space
         if (content.startsWith(')') || content.startsWith('\\)')) {
           const skip = content.startsWith('\\)') ? 2 : 1;
           let inner = content.slice(skip).trim().replace(/\s+(?:med|thin|thick|quad)$/, '');
-          res = addToTypstData(res, { typst: 'underline(")"' + inner + ')' });
+          res = addToTypstData(res, { typst: 'underline(")"' + escapeContentSeparators(inner) + ')' });
         } else {
-          res = addToTypstData(res, { typst: 'underline(' + escapeUnbalancedParens(content) + ')' });
+          res = addToTypstData(res, { typst: 'underline(' + escapeContentSeparators(escapeUnbalancedParens(content)) + ')' });
         }
       } else {
         // Unknown notation: pass through content

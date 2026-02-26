@@ -2084,4 +2084,120 @@ module.exports = [
     typst: `aleph planck dotless.i dotless.j ell ℘ Re Im partial infinity prime emptyset nabla top bot angle triangle.stroked.t without forall exists not not flat natural sharp suit.club.filled suit.diamond.stroked suit.heart.stroked suit.spade.filled`,
     typst_inline: `aleph planck dotless.i dotless.j ell ℘ Re Im partial infinity prime emptyset nabla top bot angle triangle.stroked.t without forall exists not not flat natural sharp suit.club.filled suit.diamond.stroked suit.heart.stroked suit.spade.filled`,
   },
+  // separator escaping in function-call wrappers (, and ; at depth 0)
+  // limits()
+  {
+    latex: `\\underset{\\sim}{0,0}`,
+    typst: `limits(0"," 0)_(tilde.op)`,
+    typst_inline: `limits(0"," 0)_(tilde.op)`,
+  },
+  {
+    latex: `\\overset{n}{0,0}`,
+    typst: `limits(0"," 0)^n`,
+    typst_inline: `limits(0"," 0)^n`,
+  },
+  // sqrt()
+  {
+    latex: `\\sqrt{a,b}`,
+    typst: `sqrt(a"," b)`,
+    typst_inline: `sqrt(a"," b)`,
+  },
+  {
+    latex: `\\sqrt{a;b}`,
+    typst: `sqrt(a";" b)`,
+    typst_inline: `sqrt(a";" b)`,
+  },
+  // root()
+  {
+    latex: `\\sqrt[3]{a,b}`,
+    typst: `root(3, a"," b)`,
+    typst_inline: `root(3, a"," b)`,
+  },
+  // overline() / underline()
+  {
+    latex: `\\overline{a,b}`,
+    typst: `overline(a"," b)`,
+    typst_inline: `overline(a"," b)`,
+  },
+  {
+    latex: `\\overline{a;b}`,
+    typst: `overline(a";" b)`,
+    typst_inline: `overline(a";" b)`,
+  },
+  {
+    latex: `\\underline{x,y}`,
+    typst: `underline(x"," y)`,
+    typst_inline: `underline(x"," y)`,
+  },
+  // cancel() / bcancel()
+  {
+    latex: `\\cancel{x,y}`,
+    typst: `cancel(x"," y)`,
+    typst_inline: `cancel(x"," y)`,
+  },
+  {
+    latex: `\\bcancel{a,b}`,
+    typst: `cancel(inverted: #true, a"," b)`,
+    typst_inline: `cancel(inverted: #true, a"," b)`,
+  },
+  // accents: hat, vec, bar, tilde
+  {
+    latex: `\\hat{x,y}`,
+    typst: `hat(x"," y)`,
+    typst_inline: `hat(x"," y)`,
+  },
+  {
+    latex: `\\vec{a,b}`,
+    typst: `arrow(a"," b)`,
+    typst_inline: `arrow(a"," b)`,
+  },
+  {
+    latex: `\\bar{x;y}`,
+    typst: `macron(x";" y)`,
+    typst_inline: `macron(x";" y)`,
+  },
+  {
+    latex: `\\tilde{a;b}`,
+    typst: `tilde(a";" b)`,
+    typst_inline: `tilde(a";" b)`,
+  },
+  // underbrace / overbrace with annotation
+  {
+    latex: `\\underbrace{a,b}_{n}`,
+    typst: `underbrace(a"," b, n)`,
+    typst_inline: `underbrace(a"," b, n)`,
+  },
+  {
+    latex: `\\overbrace{x,y}^{\\text{sum}}`,
+    typst: `overbrace(x"," y, "sum")`,
+    typst_inline: `overbrace(x"," y, "sum")`,
+  },
+  // nested wrappers — no double-escaping
+  {
+    latex: `\\underline{\\underline{14,320}}`,
+    typst: `underline(underline(14","320))`,
+    typst_inline: `underline(underline(14","320))`,
+  },
+  {
+    latex: `\\overline{\\sqrt{a,b}}`,
+    typst: `overline(sqrt(a"," b))`,
+    typst_inline: `overline(sqrt(a"," b))`,
+  },
+  // escaped quote + comma (\" must not break escaping)
+  {
+    latex: `\\sqrt{a " b, c}`,
+    typst: `sqrt(a\\" b"," c)`,
+    typst_inline: `sqrt(a\\" b"," c)`,
+  },
+  // comma inside nested parens — NOT escaped (depth > 0)
+  {
+    latex: `\\sqrt{f(a,b)}`,
+    typst: `sqrt(f(a, b))`,
+    typst_inline: `sqrt(f(a, b))`,
+  },
+  {
+    latex: `\\overline{g(x,y)+h(a,b)}`,
+    typst: `overline(g(x, y) + h(a, b))`,
+    typst_inline: `overline(g(x, y) + h(a, b))`,
+  },
 ];
