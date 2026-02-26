@@ -508,6 +508,7 @@ In Typst, `underbrace` and `overbrace` take annotations as a second argument: `u
 | `a \bmod b` | `a mod b` |
 | `a \pmod{b}` | `a quad (mod b)` |
 | `\text{if }` | `"if "` |
+| `\text{"hello"}` | `"\"hello\""` (inner `"` escaped — prevents breaking the Typst string literal) |
 | `f'(x)` | `f'(x)` (prime shorthand) |
 | `\$ 120,000` | `\$ 120","000` (escaped dollar + thousand-separator commas) |
 | `\wp` | `℘` (Unicode output — no named Typst symbol) |
@@ -566,6 +567,8 @@ Several characters have syntactic meaning in Typst math mode and must be escaped
 | `a/b` | `a\/ b` | `/` creates a fraction (handled in `mo` handler, not symbol map) |
 
 Note: `\%` produces `upright(%)` — `%` has no special meaning in Typst math mode, so no escaping is needed.
+
+**Quote escaping inside `mtext`:** The `mtext` handler wraps text content in `"..."`. When the original text contains literal `"` characters (e.g. `\text{"hello"}`), they are escaped as `\"` before wrapping to avoid breaking the Typst string literal: `"\"hello\""`. This uses `value.replace(/"/g, '\\"')` before the `'"' + value + '"'` concatenation.
 
 ### Thousand-separator commas
 
