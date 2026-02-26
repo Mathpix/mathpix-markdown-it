@@ -278,14 +278,15 @@ Each numbered equation is emitted as an independent `#math.equation(block: true,
 
 **Counter rollback for explicit `\tag{}`:** In LaTeX, `\tag{...}` does not increment the equation counter — only auto-numbered equations do. However, Typst's `math.equation` with any `numbering` always steps the counter. To preserve correct numbering, the serializer emits `#counter(math.equation).update(n => n - 1)` after each explicit-tagged equation, undoing the unwanted step.
 
-**Multi-row environments** (`align`, `gather`): each row becomes a separate block. Numbered rows use `#math.equation(...)`, unnumbered rows use bare `$ ... $`.
+**Multi-row environments** (`align`, `gather`): each row becomes a separate block. Numbered rows use `#math.equation(...)`, unnumbered rows (`\nonumber`, `\notag`, or untagged rows in `align*`) use `#math.equation(block: true, numbering: none, ...)` to avoid bare `$ ... $` which would cause double math-mode wrapping.
 
 | LaTeX | Typst |
 |-------|-------|
 | `\begin{align} a &= b \\ c &= d \end{align}` (auto) | `#math.equation(block: true, numbering: "(1)", $ a = b $)` + newline + `#math.equation(block: true, numbering: "(1)", $ c = d $)` |
 | `\begin{align} a &= b \tag{A} \\ c &= d \tag{B} \end{align}` | `#math.equation(block: true, numbering: n => [(A)], ...)` + `#counter(...)` rollback per row |
-| `\begin{align} a &= b \\ c &= d \nonumber \end{align}` | `#math.equation(...)` + newline + `$ c = d $` |
-| `\begin{align*} a &= b \\ &= d \end{align*}` | `a = b \` + newline + ` = d` (no numbering, single block) |
+| `\begin{align} a &= b \\ c &= d \nonumber \end{align}` | `#math.equation(...)` + newline + `#math.equation(block: true, numbering: none, $ c = d $)` |
+| `\begin{align*} hv &= ... \\ hv &= ... \tag{i} \\ 1.2 hv &= ... \tag{ii} \end{align*}` | `#math.equation(block: true, numbering: none, $ ... $)` + tagged rows with `numbering: n => [(i)]` etc. |
+| `\begin{align*} a &= b \\ &= d \end{align*}` | `a = b \` + newline + ` = d` (no tags at all → single block, no wrappers) |
 | `\begin{equation} \begin{split} a &= b \\ &= c \end{split} \end{equation}` | `#math.equation(block: true, numbering: "(1)", $ a = b \` newline ` = c $)` (single number) |
 
 **Labels on equations** (`\label{eq:1}`): When a `\label{}` is present, the serializer emits a Typst label `<key>` after the equation block, and adds `supplement: none` to prevent Typst from prefixing "Equation" when referencing:
@@ -659,7 +660,7 @@ LaTeX allows unmatched brackets like `\sigma(\mathrm{nm} ;` where `(` has no clo
 
 **Output format:** Escaped Typst delimiters (`\(`, `\)`, `\[`, `\]`, `\{`, `\}`) — these render as literal bracket glyphs in math mode with proper kerning, without being parsed as function-call or group delimiters.
 
-**No skip conditions:** All bracket `mo` nodes are collected regardless of `fence` attribute or parent mrow type. Fence delimiters from `\left...\right` are collected and pair naturally with each other. The `mrow` handler skips fence `mo` children via `continue`, so any mark on them is harmless.
+**Fence delimiter exclusion:** `\left...\right` delimiters are excluded from collection. They are detected structurally: an `mo` node is a fence delimiter if it is the first or last child of an `mrow` with `texClass === TEXCLASS.INNER` and `open`/`close` properties. The MathML `fence` attribute cannot be used for this check — it defaults to `true` for ALL bracket characters in MathML, not just `\left...\right`. Without this exclusion, `\right]` would pair with an inner `[` inside the fence and prevent it from being marked as unpaired.
 
 | LaTeX | Typst | Why |
 |-------|-------|-----|
@@ -672,6 +673,8 @@ LaTeX allows unmatched brackets like `\sigma(\mathrm{nm} ;` where `(` has no clo
 | `\sigma(x)` | `sigma(x)` | paired — unchanged |
 | `(q/p)^{(z-k)}` | `(q\/ p)^((z - k))` | all paired — unchanged |
 | `\left( x \right)` | `lr(( x ))` | fence delimiters — handled by mrow |
+| `\left. x [ y ) \right]` | `lr(x \[ y \) \])` | `[` and `)` unpaired inside fence, `\right]` excluded |
+| `\left( a [ b \right)` | `lr(( a \[ b ))` | `[` unpaired inside fence |
 
 **Integration with `menclose`:** The `\lcm` macro expands to `\enclose{bottom}{\smash{)}{...}\:}`. The `menclose{bottom}` handler detects both `)` and `\)` prefix (since the tree walk may mark the `)` from `\smash` as unpaired) and produces `underline(")"...)` in both cases.
 
