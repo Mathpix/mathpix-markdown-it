@@ -355,7 +355,24 @@ Explicit tag with label:
 
 **Empty prefix support**: `isNumcasesTable()` accepts 3+ children per row (not just 4+). With an empty prefix `{}` and no `&` separator, MathML has 3 columns (label + prefix-with-brace + content) instead of 4 (label + prefix + value + condition). The content column iteration (`startCol` to `childNodes.length`) handles both layouts.
 
-**Separator and colon escaping in `cases()` and `mat()` cells**: In Typst, commas are cell separators in both `cases()` and `mat()`, semicolons are row separators in `mat()`, and colons act as named-argument syntax (e.g. `p:` inside `mat()` would be parsed as named argument `p`). When cell content contains literal commas, semicolons, or colons (e.g. `x^2 + 1,`, `L(u) = 1;`, or `p:`), they would be misinterpreted as structural syntax. The `escapeCasesSeparators()` helper replaces at parenthesis depth 0: commas → `","`, semicolons → `";"`, colons → `":"` (Typst text strings), so they render visually without acting as separators or named-argument markers. Characters inside nested parentheses/brackets (e.g. `f(t_n, x^n)`) are left untouched. This applies to all `cases()` rows (regular and numcases, single-cell and multi-cell) and all `mat()` cells.
+**Separator escaping in all function-call wrappers**: In Typst, commas and semicolons inside any function call are parsed as argument/row separators. This affects not only `mat()`/`cases()` but every wrapper that places serialized content inside `(...)`: `sqrt()`, `root()`, `overline()`, `underline()`, `cancel()`, `limits()`, `stretch()`, `scripts()`, `attach()`, `hat()`, `arrow()`, `macron()`, `accent()`, `underbrace()`, `overbrace()`, etc.
+
+Two escape helpers handle this:
+
+- **`escapeContentSeparators(expr)`** — escapes `,` → `","` and `;` → `";"` at parenthesis depth 0. Applied to content arguments of all function-call wrappers listed above.
+- **`escapeCasesSeparators(expr)`** — additionally escapes `:` → `":"` (named-argument syntax). Applied only to `mat()`/`cases()` cells where colons are also dangerous (e.g. `p:` parsed as named argument).
+
+Both helpers use `isAlreadyEscaped()` — a peek at adjacent characters (`expr[i-1] === '"' && expr[i+1] === '"'`) — to skip separators that are already escaped as `","` / `";"` / `":"`. This prevents double-escaping when content passes through multiple nested wrappers (e.g. `\underline{\underline{14,320}}` → `underline(underline(14","320))`). Characters inside nested parentheses/brackets (e.g. `f(t_n, x^n)`) are left untouched (depth > 0).
+
+| LaTeX | Typst | Wrapper |
+|-------|-------|---------|
+| `\underset{\sim}{0,0}` | `limits(0"," 0)_(tilde.op)` | `limits()` |
+| `\sqrt{a,b}` | `sqrt(a"," b)` | `sqrt()` |
+| `\overline{a;b}` | `overline(a";" b)` | `overline()` |
+| `\cancel{x,y}` | `cancel(x"," y)` | `cancel()` |
+| `\hat{x,y}` | `hat(x"," y)` | accent |
+| `\sqrt{f(a,b)}` | `sqrt(f(a, b))` | depth > 0, not escaped |
+| `\underline{\underline{14,320}}` | `underline(underline(14","320))` | nested, no double-escape |
 
 Regular cases with commas (`f(x) = \left\{ \begin{array}{ll} {x^2+1,} & {x>1} \\ {1,} & {x=1} \\ {x+1,} & {x<1} \end{array} \right.`):
 ```typst
