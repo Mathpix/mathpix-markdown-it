@@ -1363,16 +1363,30 @@ const UNPAIRED_BRACKET_TYPST: Record<string, string> = {
 export const markUnpairedBrackets = (root: any): void => {
   const bracketNodes: { node: any; char: string }[] = [];
 
+  // Check if an mo node is a \left...\right delimiter (first/last child of
+  // an mrow with texClass=INNER and open/close properties).  These must NOT
+  // participate in pairing — otherwise \right] would pair with an inner [.
+  const isLeftRightDelimiter = (moNode: any): boolean => {
+    const parent = moNode.parent;
+    if (!parent || parent.kind !== 'mrow') return false;
+    const pp = parent.properties || {};
+    if (pp.texClass !== TEXCLASS.INNER) return false;
+    if (!pp.hasOwnProperty('open') && !pp.hasOwnProperty('close')) return false;
+    const ch = parent.childNodes;
+    if (!ch || ch.length === 0) return false;
+    return ch[0] === moNode || ch[ch.length - 1] === moNode;
+  };
+
   // DFS — always recurse into childNodes (even for mo)
   const walk = (node: any): void => {
     if (!node) return;
     if (node.kind === 'mo') {
       const text = getChildrenText(node);
       if (text && (OPEN_BRACKETS[text] || CLOSE_BRACKETS[text])) {
-        // Collect all bracket mo nodes — no skip conditions.
-        // Fence delimiters (\left...\right) are skipped by the mrow handler
-        // (via `continue`) so any unpaired mark on them is harmless.
-        bracketNodes.push({ node, char: text });
+        // Skip \left...\right delimiters — they are handled by the mrow handler
+        if (!isLeftRightDelimiter(node)) {
+          bracketNodes.push({ node, char: text });
+        }
       }
     }
     if (node.childNodes) {
@@ -1656,10 +1670,10 @@ const mtable = () => {
                   eqnBlocks.push('#counter(math.equation).update(n => n - 1)');
                 }
               } else {
-                eqnBlocks.push('$ ' + rowContent + ' $');
+                eqnBlocks.push('#math.equation(block: true, numbering: none, $ ' + rowContent + ' $)');
               }
             } else {
-              eqnBlocks.push('$ ' + rowContent + ' $');
+              eqnBlocks.push('#math.equation(block: true, numbering: none, $ ' + rowContent + ' $)');
             }
           }
           res = addToTypstData(res, { typst: eqnBlocks.join('\n') });

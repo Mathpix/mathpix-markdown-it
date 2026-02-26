@@ -1572,8 +1572,14 @@ module.exports = [
   },
   {
     latex: `\\begin{align} a &= b \\\\ c &= d \\nonumber \\end{align}`,
-    typst: `#math.equation(block: true, numbering: "(1)", $ a &= b $)\n$ c &= d $`,
+    typst: `#math.equation(block: true, numbering: "(1)", $ a &= b $)\n#math.equation(block: true, numbering: none, $ c &= d $)`,
     typst_inline: `a &= b \\\nc &= d`,
+  },
+  // align* with partial tags: untagged rows must use #math.equation(numbering: none)
+  {
+    latex: `\\begin{align*}\nh v & =\\phi_{0}+K_{\\max } \\\\\nh v & =\\phi_{0}+0.5  \\tag{i}\\\\\n1.2 h v & =\\phi_{0}+0.8 \\tag{ii}\n\\end{align*}`,
+    typst: `#math.equation(block: true, numbering: none, $ h v &= phi.alt_0 + K_(max) $)\n#math.equation(block: true, numbering: n => [(i)], $ h v &= phi.alt_0 + 0.5 $)\n#counter(math.equation).update(n => n - 1)\n#math.equation(block: true, numbering: n => [(ii)], $ 1.2 h v &= phi.alt_0 + 0.8 $)\n#counter(math.equation).update(n => n - 1)`,
+    typst_inline: `h v &= phi.alt_0 + K_(max) \\\nh v &= phi.alt_0 + 0.5 \\\n1.2 h v &= phi.alt_0 + 0.8`,
   },
   {
     latex: `\\begin{gather} x = 1 \\\\ y = 2 \\end{gather}`,
@@ -1613,7 +1619,7 @@ module.exports = [
   // align: label on first row, \nonumber on second
   {
     latex: `\\begin{align} a &= b \\label{eq:a} \\\\ c &= d \\nonumber \\end{align}`,
-    typst: `#math.equation(block: true, supplement: none, numbering: "(1)", $ a &= b $) <eq:a>\n$ c &= d $`,
+    typst: `#math.equation(block: true, supplement: none, numbering: "(1)", $ a &= b $) <eq:a>\n#math.equation(block: true, numbering: none, $ c &= d $)`,
     typst_inline: `a &= b \\\nc &= d`,
   },
   // split inside equation with label
@@ -2041,6 +2047,28 @@ module.exports = [
     latex: `\\frac{(a+b^{(c+d)})}{(e+f}`,
     typst: `frac((a + b^((c + d))), \\( e + f)`,
     typst_inline: `frac((a + b^((c + d))), \\( e + f)`,
+  },
+  // unpaired brackets inside \left...\right fences
+  {
+    latex: `\\left. x [ y ) \\right]`,
+    typst: `lr(x \\[ y \\) \\])`,
+    typst_inline: `lr(x \\[ y \\) \\])`,
+  },
+  {
+    latex: `\\left.\\frac{1}{50}[36 i+12 j)\\right]`,
+    typst: `lr(frac(1, 50)\\[ 36 i + 12 j \\) \\])`,
+    typst_inline: `lr(frac(1, 50)\\[ 36 i + 12 j \\) \\])`,
+  },
+  {
+    latex: `\\left( a [ b \\right)`,
+    typst: `lr(( a \\[ b ))`,
+    typst_inline: `lr(( a \\[ b ))`,
+  },
+  // aligned with unpaired [ and ) inside \left.\right] fence
+  {
+    latex: `\\begin{aligned}\n& r_{c m}=\\frac{1}{50}[20(3 i+3 j)+18(-2 i-2 j)+12(i-j)] \\\\\n& \\left.r_{c m}=\\frac{1}{50}[36 i+12 j)\\right]=\\frac{36}{50} i+\\frac{12}{50} j=0.72 i+0.24 j\n\\end{aligned}`,
+    typst: `&r_(c m) = frac(1, 50)[20(3 i + 3 j) + 18( - 2 i - 2 j) + 12(i - j)] \\\n &lr(r_(c m) = frac(1, 50)\\[ 36 i + 12 j \\) \\]) = frac(36, 50) i + frac(12, 50) j = 0.72 i + 0.24 j`,
+    typst_inline: `&r_(c m) = frac(1, 50)[20(3 i + 3 j) + 18( - 2 i - 2 j) + 12(i - j)] \\\n &lr(r_(c m) = frac(1, 50)\\[ 36 i + 12 j \\) \\]) = frac(36, 50) i + frac(12, 50) j = 0.72 i + 0.24 j`,
   },
   // colon escaping in mat() cells (prevents named-argument parsing)
   {
