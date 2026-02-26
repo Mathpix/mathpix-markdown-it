@@ -374,8 +374,9 @@ const mtext = () => {
         res = addToTypstData(res, { typst: spaceBefore + typstValue + spaceAfter });
         return res;
       }
-      // In Typst math, text is wrapped in double quotes
-      let textContent = '"' + value + '"';
+      // In Typst math, text is wrapped in double quotes.
+      // Escape any literal " inside the text to avoid breaking the string.
+      let textContent = '"' + value.replace(/"/g, '\\"') + '"';
       // Apply font wrapping if mathvariant is set (e.g. \textbf, \textit)
       const atr = getAttributes(node);
       const mathvariant: string = atr?.mathvariant || '';

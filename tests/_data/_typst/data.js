@@ -1044,6 +1044,17 @@ module.exports = [
     typst: `"if " x > 0`,
     typst_inline: `"if " x > 0`,
   },
+  // Quotes inside \text must be escaped
+  {
+    latex: `\\text{"hello"}`,
+    typst: `"\\"hello\\""`,
+    typst_inline: `"\\"hello\\""`,
+  },
+  {
+    latex: `\\text{"some" }`,
+    typst: `"\\"some\\" "`,
+    typst_inline: `"\\"some\\" "`,
+  },
 
   // === Phantom variants (Typst hide preserves dimensions) ===
   {
