@@ -684,8 +684,22 @@ LaTeX delimiters without `\left...\right` produce unpaired `<mo>` nodes in MathM
 | `\lfloor` (⌊) | `\rfloor` (⌋) | `floor(content)` |
 | `\lceil` (⌈) | `\rceil` (⌉) | `ceil(content)` |
 | `\|` (‖) | `\|` (‖) | `norm(content)` |
+| `\langle` (⟨) | `\rangle` (⟩) | `lr(chevron.l content chevron.r)` |
 
 This ensures paired delimiters form grouped expressions in Typst (important after `/` for correct fraction denominator binding). For symmetric delimiters (`|`, `‖`), pairs inside `TeXAtom` groups (e.g. superscript `{|\alpha|}`) are left as-is since the enclosing script parens already provide grouping.
+
+**Scripted closing delimiters:** When the closing delimiter carries a subscript or superscript (e.g. `\|x\|_2` where `‖` is the base of `msub(‖, 2)`), the `getDelimiterChar()` helper cannot see it directly. The `getScriptedDelimiterChar()` helper looks inside `msub`/`msup`/`msubsup` nodes to check if their base is a matching closing delimiter. When found, the script parts are extracted and appended to the delimited expression:
+
+| LaTeX | Typst |
+|-------|-------|
+| `\|x\|_2` | `norm(x)_2` |
+| `\|x\|^2` | `norm(x)^2` |
+| `\|x\|_2^p` | `norm(x)_2^p` |
+| `\|x\|_p \leq \|x\|_q` | `norm(x)_p lt.eq norm(x)_q` |
+| `\|A\|_{\mathrm{F}}` | `norm(A)_(upright(F))` |
+| `|x|_2` | `lr(\| x \|)_2` |
+| `\lfloor x \rfloor_n` | `floor(x)_n` |
+| `\lceil y \rceil^2` | `ceil(y)^2` |
 
 ## Example
 
@@ -705,7 +719,7 @@ This ensures paired delimiters form grouped expressions in Typst (important afte
 
 | File | Change |
 |------|--------|
-| `src/mathjax/serialized-typst/index.ts` | **New.** `SerializedTypstVisitor` class with root traversal, big-delimiter detection, bare delimiter-pair grouping (`|`, `⌊⌋`, `⌈⌉`, `‖`), `\idotsint` grouping via `SCRIPT_KINDS`, thousand-separator comma detection; uses `needsTokenSeparator` for token spacing |
+| `src/mathjax/serialized-typst/index.ts` | **New.** `SerializedTypstVisitor` class with root traversal, big-delimiter detection, bare delimiter-pair grouping (`|`, `⌊⌋`, `⌈⌉`, `‖`, `⟨⟩`) with scripted-closing-delimiter support (`getScriptedDelimiterChar`), `\idotsint` grouping via `SCRIPT_KINDS`, thousand-separator comma detection; uses `needsTokenSeparator` for token spacing |
 | `src/mathjax/serialized-typst/handlers.ts` | **New.** 20+ MathML node-type handlers for Typst serialization; handlers for `mtable`/frame and `menclose`/box set separate `typst_inline` without block wrappers |
 | `src/mathjax/serialized-typst/typst-symbol-map.ts` | **New.** Unicode → Typst symbol mapping (~300 entries), accent map, font map |
 | `src/mathjax/serialized-typst/common.ts` | **New.** `ITypstData` interface with optional `typst_inline`; `initTypstData`, `addToTypstData` (always propagates `typst_inline` with `typst` fallback), `addSpaceToTypstData`, `needsParens`, `isThousandSepComma`, `needsTokenSeparator` |
