@@ -527,7 +527,7 @@ Correct Typst output requires careful spacing to prevent token merging and avoid
 
 ### Token separation
 
-Adjacent word-character tokens must be separated by spaces. The `needsTokenSeparator(prev, next)` helper in `common.ts` centralizes this check: it returns `true` when `prev` does not end with a separator (`\s`, `(`, `{`, `[`, `,`, `|`) and `next` starts with a word character, dot, or quote. This helper is used in both `visitInferredMrowNode` (index.ts) and the `mrow` handler (handlers.ts), replacing ~12 previously duplicated inline checks.
+Adjacent tokens must be separated by spaces to prevent merging. The `needsTokenSeparator(prev, next)` helper in `common.ts` centralizes this check: it returns `true` when `prev` does not end with a separator (`\s`, `(`, `{`, `[`, `,`, `|`) and `next` starts with a word character, dot, quote, or non-ASCII Unicode character (U+0080–U+FFFF). The Unicode range is needed because some symbols (e.g. `℘` from `\wp`) are output as raw Unicode — without the check, `ell℘` would merge into a single unparseable token. This helper is used in both `visitInferredMrowNode` (index.ts) and the `mrow` handler (handlers.ts).
 
 ### Special character escaping
 

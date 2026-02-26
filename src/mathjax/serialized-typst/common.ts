@@ -50,7 +50,7 @@ export const isThousandSepComma = (node: any, i: number): boolean => {
  *  and `prev` doesn't end with a natural separator (whitespace, open paren, etc.). */
 export const needsTokenSeparator = (prev: string, next: string): boolean => {
   return !!prev && !!next
-    && /^[\w."]/.test(next)
+    && /^[\w."\u0080-\uFFFF]/.test(next)
     && !/[\s({[,|]$/.test(prev);
 };
 

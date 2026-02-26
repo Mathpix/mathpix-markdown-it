@@ -2072,4 +2072,16 @@ module.exports = [
     typst: `\\_`,
     typst_inline: `\\_`,
   },
+  // Unicode symbol spacing (℘ must not merge with preceding token like ell)
+  {
+    latex: `\\ell \\wp`,
+    typst: `ell ℘`,
+    typst_inline: `ell ℘`,
+  },
+  // misc math symbols (full set)
+  {
+    latex: `\\aleph \\hbar \\imath \\jmath \\ell \\wp \\Re \\Im \\partial \\infty \\prime \\emptyset \\nabla \\top \\bot \\angle \\triangle \\setminus \\forall \\exists \\neg \\lnot \\flat \\natural \\sharp \\clubsuit \\diamondsuit \\heartsuit \\spadesuit`,
+    typst: `aleph planck dotless.i dotless.j ell ℘ Re Im partial infinity prime emptyset nabla top bot angle triangle.stroked.t without forall exists not not flat natural sharp suit.club.filled suit.diamond.stroked suit.heart.stroked suit.spade.filled`,
+    typst_inline: `aleph planck dotless.i dotless.j ell ℘ Re Im partial infinity prime emptyset nabla top bot angle triangle.stroked.t without forall exists not not flat natural sharp suit.club.filled suit.diamond.stroked suit.heart.stroked suit.spade.filled`,
+  },
 ];
