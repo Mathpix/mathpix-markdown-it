@@ -1113,10 +1113,10 @@ const serializePrefixBeforeMo = (node, serialize, stopMoText: string): string =>
   return result.trim();
 };
 
-// Escape top-level commas and semicolons in a Typst expression for use inside cases().
-// Replaces commas at depth 0 with "," and semicolons at depth 0 with ";"
+// Escape top-level commas, semicolons, and colons in a Typst expression for use inside cases()/mat().
+// Replaces at depth 0: commas → ",", semicolons → ";", colons → ":"
 // (Typst text strings) so they render visually but aren't parsed as
-// cases()/mat() argument or row separators.
+// cases()/mat() argument separators, row separators, or named-argument syntax.
 // Characters inside function calls like lr((...)) are left as-is.
 const escapeCasesSeparators = (expr: string): string => {
   let depth = 0;
@@ -1133,6 +1133,8 @@ const escapeCasesSeparators = (expr: string): string => {
       result += '","';
     } else if (ch === ';' && depth === 0) {
       result += '";"';
+    } else if (ch === ':' && depth === 0) {
+      result += '":"';
     } else {
       result += ch;
     }
