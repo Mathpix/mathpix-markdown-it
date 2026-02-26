@@ -533,6 +533,10 @@ Adjacent word-character tokens must be separated by spaces. The `needsTokenSepar
 
 In Typst math mode, `$` terminates the formula. LaTeX `\$` produces an `mi` node containing the literal `$` character. The symbol map maps `$` → `\$` so it is escaped in output. Without this, the `mi` handler would wrap it as `upright($)`, which breaks Typst parsing.
 
+### Double-quote escaping
+
+In Typst math mode, `"` starts a string literal. LaTeX `"` in math produces an `mo` node containing the literal `"` character. The symbol map maps `"` → `\"` so it is escaped in output. Without this, a bare `"` would open a Typst string context and cause a parse error (e.g. `d " r` → `d \" r`).
+
 ### Thousand-separator commas
 
 Numbers like `120,000` arrive as three MathML nodes: `mn(120)`, `mo(,)`, `mn(000)`. A bare comma in Typst math acts as an argument separator, so `120, 000` would be misinterpreted. The `isThousandSepComma()` helper in `common.ts` detects the pattern `mn` + `mo(,)` + `mn(exactly 3 digits)` and is applied in both `visitInferredMrowNode` (top-level) and the `mrow` handler (nested contexts like `\underline{\underline{14,320}}`), merging them into a single token: `14","320`. The `","` is a Typst text literal that renders as a visual comma without separator semantics.
