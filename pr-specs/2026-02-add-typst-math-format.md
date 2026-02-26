@@ -199,12 +199,16 @@ Built-in Typst math operators (`sin`, `cos`, `tan`, `log`, `lim`, etc.) pass thr
 | `\left\| a, b \right\|` | `lr(‖ a, b ‖)` (fallback) |
 | `\left\lfloor a, b \right\rfloor` | `lr(⌊ a, b ⌋)` (fallback) |
 | `\left\lceil a, b \right\rceil` | `lr(⌈ a, b ⌉)` (fallback) |
-| `\left( x \right.` | `( x` (one-sided) |
+| `\left( x \right.` | `lr(\( x)` (one-sided, `(` escaped) |
+| `\left. x \right]` | `lr(x ])` (one-sided, `]` unescaped for lr() auto-sizing) |
+| `\left. x \right)` | `lr(x \))` (one-sided, `)` escaped — closes lr() otherwise) |
 | `\big( x \big)` | `lr(size: #1.2em, ( x ))` |
 | `|x|` (without `\left...\right`) | `lr(| x |)` (pipe-pair detection) |
 | `\lfloor x \rfloor` (without `\left...\right`) | `floor(x)` (bare delimiter-pair detection) |
 | `\lceil y \rceil` (without `\left...\right`) | `ceil(y)` (bare delimiter-pair detection) |
 | `\|x\|` (‖, without `\left...\right`) | `norm(x)` (bare delimiter-pair detection) |
+
+**One-side-invisible delimiter escaping:** When one delimiter is invisible (`\left.` or `\right.`), the visible delimiter is wrapped in `lr()`. Escaping rules for the visible delimiter: `(`, `)`, `[`, `{`, `}` are backslash-escaped; `]` is left **unescaped** so `lr()` can recognise and auto-size it. Rationale: `(` and `[` open groups/content blocks causing parse errors; `)` prematurely closes the `lr()` function call; `{` and `}` are code block syntax. `]` is safe because it doesn't have special syntactic meaning inside function-call arguments. Additionally, `replaceUnpairedBrackets()` (string-level post-processing for mat/cases cells) would corrupt unescaped `)` — it sees the first `)` as the `lr()` function-call close and replaces the second `)` with `paren.r`. Unescaped `]` is safe here because it falls inside the `lr(...)` function call scope and is skipped by the function-call-aware scanner.
 
 **Separator-safe fallback for shorthand functions:** `abs()`, `norm()`, `floor()`, `ceil()` accept exactly one argument. If the delimited content contains a top-level `,` or `;` (detected by `hasTopLevelSeparators()`), these would be misinterpreted as argument/row separators inside the function call. In such cases, the serializer falls back to `lr()` with explicit delimiter characters (`lr(| ... |)`, `lr(‖ ... ‖)`, `lr(⌊ ... ⌋)`, `lr(⌈ ... ⌉)`), where commas just separate content fragments without breaking semantics. Characters inside nested parentheses/brackets are not counted.
 
@@ -257,11 +261,11 @@ LaTeX:  \begin{array}{lc} a & [ b + c \\ d & + e ] \end{array}
 Typst:  mat(delim: #none, a, bracket.l b + c; d, + e bracket.r)
 ```
 
-**Spanning `\left...\right` inside `mat()`:** When `\left[...\right.` / `\left...\right]` produce one-sided delimiters inside a matrix, the `isInsideNonEqnArrayTable()` helper detects the mat()/cases() context and wraps the delimiter in `lr()` with backslash-escaping (`\[`, `\(`, `\{`) so bare ASCII chars don't break function-call syntax:
+**Spanning `\left...\right` inside `mat()`:** When `\left[...\right.` / `\left...\right]` produce one-sided delimiters inside a matrix, the mrow handler wraps the delimiter in `lr()`. Opening delimiters (`(`, `[`, `{`) and `)` are backslash-escaped to avoid parse errors. Closing `]` is left unescaped so `lr()` can auto-size it:
 
 ```
 LaTeX:  \begin{array}{l} \left[ x \right. \\ \left. y \right] \end{array}
-Typst:  mat(delim: #none, align: #left, lr(\[ x); lr(y \]))
+Typst:  mat(delim: #none, align: #left, lr(\[ x); lr(y ]))
 ```
 
 ### Equation tags and numbering
@@ -673,7 +677,7 @@ LaTeX allows unmatched brackets like `\sigma(\mathrm{nm} ;` where `(` has no clo
 | `\sigma(x)` | `sigma(x)` | paired — unchanged |
 | `(q/p)^{(z-k)}` | `(q\/ p)^((z - k))` | all paired — unchanged |
 | `\left( x \right)` | `lr(( x ))` | fence delimiters — handled by mrow |
-| `\left. x [ y ) \right]` | `lr(x \[ y \) \])` | `[` and `)` unpaired inside fence, `\right]` excluded |
+| `\left. x [ y ) \right]` | `lr(x \[ y \) ])` | `[` and `)` unpaired inside fence; fence `]` unescaped for lr() auto-sizing |
 | `\left( a [ b \right)` | `lr(( a \[ b ))` | `[` unpaired inside fence |
 
 **Integration with `menclose`:** The `\lcm` macro expands to `\enclose{bottom}{\smash{)}{...}\:}`. The `menclose{bottom}` handler detects both `)` and `\)` prefix (since the tree walk may mark the `)` from `\smash` as unpaired) and produces `underline(")"...)` in both cases.
