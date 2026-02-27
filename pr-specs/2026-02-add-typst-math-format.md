@@ -282,16 +282,24 @@ Each numbered equation is emitted as an independent `#math.equation(block: true,
 
 **Counter rollback for explicit `\tag{}`:** In LaTeX, `\tag{...}` does not increment the equation counter — only auto-numbered equations do. However, Typst's `math.equation` with any `numbering` always steps the counter. To preserve correct numbering, the serializer emits `#counter(math.equation).update(n => n - 1)` after each explicit-tagged equation, undoing the unwanted step.
 
-**Multi-row environments** (`align`, `gather`): each row becomes a separate block. Numbered rows use `#math.equation(...)`, unnumbered rows (`\nonumber`, `\notag`, or untagged rows in `align*`) use `#math.equation(block: true, numbering: none, ...)` to avoid bare `$ ... $` which would cause double math-mode wrapping.
+**Multi-row environments** (`align`, `align*`, `gather`, `gather*`): the output strategy depends on tag analysis:
 
-| LaTeX | Typst |
-|-------|-------|
-| `\begin{align} a &= b \\ c &= d \end{align}` (auto) | `#math.equation(block: true, numbering: "(1)", $ a = b $)` + newline + `#math.equation(block: true, numbering: "(1)", $ c = d $)` |
-| `\begin{align} a &= b \tag{A} \\ c &= d \tag{B} \end{align}` | `#math.equation(block: true, numbering: n => [(A)], ...)` + `#counter(...)` rollback per row |
-| `\begin{align} a &= b \\ c &= d \nonumber \end{align}` | `#math.equation(...)` + newline + `#math.equation(block: true, numbering: none, $ c = d $)` |
-| `\begin{align*} hv &= ... \\ hv &= ... \tag{i} \\ 1.2 hv &= ... \tag{ii} \end{align*}` | `#math.equation(block: true, numbering: none, $ ... $)` + tagged rows with `numbering: n => [(i)]` etc. |
-| `\begin{align*} a &= b \\ &= d \end{align*}` | `a = b \` + newline + ` = d` (no tags at all → single block, no wrappers) |
-| `\begin{equation} \begin{split} a &= b \\ &= c \end{split} \end{equation}` | `#math.equation(block: true, numbering: "(1)", $ a = b \` newline ` = c $)` (single number) |
+*Strategy 1 — Single block (no tags):* When no row has a tag (e.g. `align*` without `\tag{}`), all rows stay in one block with `\` separators, preserving `&` alignment.
+
+*Strategy 2 — `number-align` (exactly one explicit `\tag{}`):* When exactly one row has an explicit `\tag{}` and there are no auto-numbered rows, the entire equation stays in a single `math.equation(...)` block. The `number-align` parameter controls tag vertical position: `end + bottom` (tag on last row), `end + top` (first row), or `end + horizon` (middle row). This preserves `&` alignment — critical for production data where 64% of tagged `align*` blocks have exactly one tag.
+
+*Strategy 3 — Separate equations (multiple tags or auto-numbering):* When multiple rows have tags or rows are auto-numbered, each row becomes a separate `#math.equation(...)` block. This loses `&` alignment but ensures correct per-row numbering.
+
+| LaTeX | Strategy | Typst |
+|-------|----------|-------|
+| `\begin{align*} a &= b \\ &= d \end{align*}` | single | `a = b \` + newline + ` = d` (no wrappers) |
+| `\begin{align*} a &= b \\ &= c \tag{i} \end{align*}` | number-align | `#math.equation(block: true, numbering: n => [(i)], number-align: end + bottom, $ a = b \ = c $)` + counter rollback |
+| `\begin{align*} a &= b \tag{i} \\ &= c \end{align*}` | number-align | `...number-align: end + top...` |
+| `\begin{align*} a &= b \\ c &= d \tag{i} \\ e &= f \end{align*}` | number-align | `...number-align: end + horizon...` |
+| `\begin{align*} hv &= ... \\ hv &= ... \tag{i} \\ 1.2 hv &= ... \tag{ii} \end{align*}` | separate | `#math.equation(block: true, numbering: none, $ ... $)` + tagged rows with `numbering: n => [(i)]` etc. |
+| `\begin{align} a &= b \\ c &= d \end{align}` (auto) | separate | `#math.equation(block: true, numbering: "(1)", $ a = b $)` per row |
+| `\begin{align} a &= b \\ c &= d \nonumber \end{align}` | separate | `#math.equation(...)` + `#math.equation(block: true, numbering: none, ...)` |
+| `\begin{equation} \begin{split} a &= b \\ &= c \end{split} \end{equation}` | single-row | `#math.equation(block: true, numbering: "(1)", $ a = b \` newline ` = c $)` (single number) |
 
 **Labels on equations** (`\label{eq:1}`): When a `\label{}` is present, the serializer emits a Typst label `<key>` after the equation block, and adds `supplement: none` to prevent Typst from prefixing "Equation" when referencing:
 
