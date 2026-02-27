@@ -1730,6 +1730,56 @@ module.exports = [
     typst_inline: `f(x) = cases(\n  0 & "x < 0 ",\n  x & "x \\geq 0 ",\n)`,
   },
 
+  // === number-align: single-tag align*/gather* → preserve & alignment ===
+  // Case 2: one explicit tag on LAST row → number-align: end + bottom
+  {
+    latex: `\\begin{align*} a &= b + c \\\\ &= d + e \\\\ &= f \\tag{i} \\end{align*}`,
+    typst: `#math.equation(block: true, numbering: n => [(i)], number-align: end + bottom, $ a &= b + c \\\n &= d + e \\\n &= f $)\n#counter(math.equation).update(n => n - 1)`,
+    typst_inline: `a &= b + c \\\n &= d + e \\\n &= f`,
+  },
+  // Case 3: one explicit tag on FIRST row → number-align: end + top
+  {
+    latex: `\\begin{align*} a &= b + c \\tag{i} \\\\ &= d + e \\\\ &= f \\end{align*}`,
+    typst: `#math.equation(block: true, numbering: n => [(i)], number-align: end + top, $ a &= b + c \\\n &= d + e \\\n &= f $)\n#counter(math.equation).update(n => n - 1)`,
+    typst_inline: `a &= b + c \\\n &= d + e \\\n &= f`,
+  },
+  // Case 4: one explicit tag on MIDDLE row → number-align: end + horizon
+  {
+    latex: `\\begin{align*} a &= b \\\\ c &= d \\tag{i} \\\\ e &= f \\end{align*}`,
+    typst: `#math.equation(block: true, numbering: n => [(i)], number-align: end + horizon, $ a &= b \\\nc &= d \\\ne &= f $)\n#counter(math.equation).update(n => n - 1)`,
+    typst_inline: `a &= b \\\nc &= d \\\ne &= f`,
+  },
+  // gather* with one tag on last row
+  {
+    latex: `\\begin{gather*} x = 1 \\\\ y = 2 \\\\ x = 3 \\tag{1} \\end{gather*}`,
+    typst: `#math.equation(block: true, numbering: n => [(1)], number-align: end + bottom, $ x = 1 \\\ny = 2 \\\nx = 3 $)\n#counter(math.equation).update(n => n - 1)`,
+    typst_inline: `x = 1 \\\ny = 2 \\\nx = 3`,
+  },
+  // Original problem: align* with tag on middle row (production pattern)
+  {
+    latex: `\\begin{align*} & a_{r}=a_{1}-a_{0} \\\\ & \\Rightarrow \\quad \\tag{iii}\\\\ & a_{1}=a_{r}+a_{0} \\end{align*}`,
+    typst: `#math.equation(block: true, numbering: n => [(iii)], number-align: end + horizon, $ &a_r = a_1 - a_0 \\\n &arrow.r.double quad \\\n &a_1 = a_r + a_0 $)\n#counter(math.equation).update(n => n - 1)`,
+    typst_inline: `&a_r = a_1 - a_0 \\\n &arrow.r.double quad \\\n &a_1 = a_r + a_0`,
+  },
+  // align* with fractions + one tag on last row
+  {
+    latex: `\\begin{align*} x &= \\frac{a}{b} + \\frac{c}{d} \\\\ &= \\frac{11}{4} \\tag{ii} \\end{align*}`,
+    typst: `#math.equation(block: true, numbering: n => [(ii)], number-align: end + bottom, $ x &= frac(a, b) + frac(c, d) \\\n &= frac(11, 4) $)\n#counter(math.equation).update(n => n - 1)`,
+    typst_inline: `x &= frac(a, b) + frac(c, d) \\\n &= frac(11, 4)`,
+  },
+  // align* with one tag + label → supplement: none + <label>
+  {
+    latex: `\\begin{align*} a &= b \\\\ &= c \\tag{1} \\label{eq:test} \\end{align*}`,
+    typst: `#math.equation(block: true, supplement: none, numbering: n => [(1)], number-align: end + bottom, $ a &= b \\\n &= c $) <eq:test>\n#counter(math.equation).update(n => n - 1)`,
+    typst_inline: `a &= b \\\n &= c`,
+  },
+  // gather* with multiple tags → separate equations (NOT number-align)
+  {
+    latex: `\\begin{gather*} x = 1 \\tag{a} \\\\ y = 2 \\tag{b} \\end{gather*}`,
+    typst: `#math.equation(block: true, numbering: n => [(a)], $ x = 1 $)\n#counter(math.equation).update(n => n - 1)\n#math.equation(block: true, numbering: n => [(b)], $ y = 2 $)\n#counter(math.equation).update(n => n - 1)`,
+    typst_inline: `x = 1 \\\ny = 2`,
+  },
+
   // === Empty base superscript, pipes as absolute value, operator before paren ===
   {
     latex: `^{|\\alpha|} \\sqrt{x^{\\alpha}} \\leq(x \\bullet \\alpha) /|\\alpha|`,

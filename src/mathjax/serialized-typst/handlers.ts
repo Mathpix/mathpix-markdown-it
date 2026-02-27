@@ -1731,42 +1731,84 @@ const mtable = () => {
           (child: any) => child.kind === 'mlabeledtr'
         );
         if (hasAnyTag) {
-          // Emit each row as a separate block equation:
-          // - numbered rows → #math.equation(block: true, numbering: ..., $ ... $)
-          // - unnumbered rows → $ ... $
-          const eqnBlocks: string[] = [];
+          // Analyze tag pattern: count explicit tags and auto-number tags
+          const rowTagInfos: { isTagged: boolean; isAutoTag: boolean; isExplicitTag: boolean; tagContent: string; labelKey: string | null }[] = [];
           for (let i = 0; i < countRow; i++) {
             const mtrNode = node.childNodes[i];
-            const rowContent = rows[i];
             if (mtrNode.kind === 'mlabeledtr' && mtrNode.childNodes.length > 0) {
               const labelCell = mtrNode.childNodes[0];
               const tagContent = serializeTagContent(labelCell, serialize);
-              if (tagContent) {
-                const isAutoNumber = !!(labelCell as any).properties?.['data-tag-auto'];
-                const numbering = isAutoNumber
+              const isAutoNumber = !!(labelCell as any).properties?.['data-tag-auto'];
+              const labelKey = getLabelKey(labelCell);
+              rowTagInfos.push({
+                isTagged: !!tagContent,
+                isAutoTag: isAutoNumber && !!tagContent,
+                isExplicitTag: !isAutoNumber && !!tagContent,
+                tagContent: tagContent || '',
+                labelKey,
+              });
+            } else {
+              rowTagInfos.push({ isTagged: false, isAutoTag: false, isExplicitTag: false, tagContent: '', labelKey: null });
+            }
+          }
+
+          const explicitTagIndices = rowTagInfos.map((r, i) => r.isExplicitTag ? i : -1).filter(i => i >= 0);
+          const autoTagIndices = rowTagInfos.map((r, i) => r.isAutoTag ? i : -1).filter(i => i >= 0);
+          const totalTagged = explicitTagIndices.length + autoTagIndices.length;
+
+          // Strategy: number-align — exactly ONE explicit tag in multi-row, no auto-tags
+          if (explicitTagIndices.length === 1 && autoTagIndices.length === 0 && countRow > 1) {
+            const tagIdx = explicitTagIndices[0];
+            const info = rowTagInfos[tagIdx];
+            // Determine number-align based on tag position
+            let numberAlign: string;
+            if (tagIdx === countRow - 1) {
+              numberAlign = 'end + bottom';
+            } else if (tagIdx === 0) {
+              numberAlign = 'end + top';
+            } else {
+              numberAlign = 'end + horizon';
+            }
+            const mathContent = rows.join(' \\\n');
+            const supplementPart = info.labelKey ? ', supplement: none' : '';
+            const numberAlignPart = ', number-align: ' + numberAlign;
+            const labelSuffix = info.labelKey ? ' <' + info.labelKey + '>' : '';
+            const block = '#math.equation(block: true' + supplementPart
+              + ', numbering: n => [' + info.tagContent + ']'
+              + numberAlignPart + ', $ ' + mathContent + ' $)' + labelSuffix
+              + '\n#counter(math.equation).update(n => n - 1)';
+            res = addToTypstData(res, { typst: block });
+            res.typst_inline = rows.join(' \\\n');
+          } else if (totalTagged > 0) {
+            // Strategy: separate — multiple tags or auto-numbered rows
+            // Each row becomes a separate #math.equation block
+            const eqnBlocks: string[] = [];
+            for (let i = 0; i < countRow; i++) {
+              const info = rowTagInfos[i];
+              const rowContent = rows[i];
+              if (info.isTagged) {
+                const numbering = info.isAutoTag
                   ? '"(1)"'
-                  : 'n => [' + tagContent + ']';
-                const labelKey = getLabelKey(labelCell);
+                  : 'n => [' + info.tagContent + ']';
+                const labelKey = info.labelKey;
                 const labelSuffix = labelKey ? ' <' + labelKey + '>' : '';
                 const supplementPart = labelKey ? ', supplement: none' : '';
                 eqnBlocks.push(
                   '#math.equation(block: true' + supplementPart + ', numbering: ' + numbering + ', $ ' + rowContent + ' $)' + labelSuffix
                 );
-                // Explicit \tag{} does not consume a number in LaTeX, but
-                // math.equation always steps the counter in Typst — undo it.
-                if (!isAutoNumber) {
+                if (info.isExplicitTag) {
                   eqnBlocks.push('#counter(math.equation).update(n => n - 1)');
                 }
               } else {
                 eqnBlocks.push('#math.equation(block: true, numbering: none, $ ' + rowContent + ' $)');
               }
-            } else {
-              eqnBlocks.push('#math.equation(block: true, numbering: none, $ ' + rowContent + ' $)');
             }
+            res = addToTypstData(res, { typst: eqnBlocks.join('\n') });
+            res.typst_inline = rows.join(' \\\n');
+          } else {
+            // mlabeledtr nodes present but no actual tag content — treat as no-tag
+            res = addToTypstData(res, { typst: rows.join(' \\\n') });
           }
-          res = addToTypstData(res, { typst: eqnBlocks.join('\n') });
-          // Inline variant: pure math content without #math.equation wrappers
-          res.typst_inline = rows.join(' \\\n');
         } else {
           // No tags at all (e.g. align*): emit as single block with \ separators
           res = addToTypstData(res, { typst: rows.join(' \\\n') });
