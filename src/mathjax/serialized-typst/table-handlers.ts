@@ -419,8 +419,7 @@ const buildMatrix = (
 export const mtable = () => {
   return (node, serialize): ITypstData => {
     let res: ITypstData = initTypstData();
-    try {
-      const countRow = node.childNodes.length;
+    const countRow = node.childNodes.length;
       const envName = node.attributes.get('name') as string;
       // Check for enclosing brackets from \left...\right (mrow parent with open/close)
       const parentMrow = node.parent?.kind === 'mrow' ? node.parent : null;
@@ -498,9 +497,6 @@ export const mtable = () => {
         return buildMatrix(node, rows, branchOpen, branchClose);
       }
       return res;
-    } catch (e) {
-      return res;
-    }
   };
 };
 
@@ -508,17 +504,13 @@ export const mtable = () => {
 export const mtr = () => {
   return (node, serialize): ITypstData => {
     let res: ITypstData = initTypstData();
-    try {
-      for (let i = 0; i < node.childNodes.length; i++) {
-        if (i > 0) {
-          res = addToTypstData(res, { typst: ', ' });
-        }
-        const data: ITypstData = serialize.visitNode(node.childNodes[i], '');
-        res = addToTypstData(res, data);
+    for (let i = 0; i < node.childNodes.length; i++) {
+      if (i > 0) {
+        res = addToTypstData(res, { typst: ', ' });
       }
-      return res;
-    } catch (e) {
-      return res;
+      const data: ITypstData = serialize.visitNode(node.childNodes[i], '');
+      res = addToTypstData(res, data);
     }
+    return res;
   };
 };

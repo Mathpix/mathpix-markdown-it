@@ -39,6 +39,12 @@ export const RE_TOKEN_START = /^[\w."\u0080-\uFFFF]/;
 /** Natural separator at end of string */
 export const RE_SEPARATOR_END = /[\s({[,|]$/;
 
+/** Typst empty-content placeholder: two double-quotes represent an empty string in math mode */
+export const TYPST_PLACEHOLDER = '""';
+
+/** Return the expression if non-empty, otherwise the Typst empty placeholder '""'. */
+export const typstPlaceholder = (s: string): string => s || TYPST_PLACEHOLDER;
+
 export interface ITypstData {
   typst: string;
   /** Inline-safe variant: same as typst when no block wrappers are used,
@@ -142,6 +148,12 @@ export const isFirstChild = (node: any): boolean => {
 export const isLastChild = (node: any): boolean => {
   return node.parent && node.parent.childNodes
     && node.parent.childNodes[node.parent.childNodes.length - 1] === node;
+};
+
+/** Find the index of a node among its parent's childNodes. Returns -1 if not found. */
+export const getSiblingIndex = (node: any): number => {
+  if (!node.parent || !node.parent.childNodes) return -1;
+  return node.parent.childNodes.findIndex((item: any) => item === node);
 };
 
 /** Concatenate text content of all child nodes. */
