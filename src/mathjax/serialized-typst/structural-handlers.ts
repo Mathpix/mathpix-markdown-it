@@ -10,7 +10,7 @@ import {
 } from "./consts";
 import {
   initTypstData, addToTypstData, addSpaceToTypstData,
-  getNodeText, getAttrs,
+  getNodeText, getAttrs, getProp,
   typstPlaceholder, isThousandSepComma, needsTokenSeparator, handleAll,
 } from "./common";
 import {
@@ -78,15 +78,15 @@ const wrapWithColor = (content: string, mathcolor: string): string => {
 
 export const mrow: HandlerFn = (node, serialize) => {
   let res: ITypstData = initTypstData();
-  const openProp = node.getProperty('open');
-  const closeProp = node.getProperty('close');
+  const openProp = getProp<string>(node, 'open');
+  const closeProp = getProp<string>(node, 'close');
   const hasOpen = openProp !== undefined;
   const hasClose = closeProp !== undefined;
   const openDelim: string = hasOpen ? String(openProp) : '';
   const closeDelim: string = hasClose ? String(closeProp) : '';
   // Check if this mrow has \left...\right delimiters
   const isLeftRight = (hasOpen || hasClose)
-    && node.getProperty('texClass') === TEXCLASS.INNER;
+    && getProp<number>(node, 'texClass') === TEXCLASS.INNER;
   // If this mrow wraps a matrix, let mtable handle the delimiters
   const hasTableChild = node.childNodes.some(child => child.kind === 'mtable');
   if (isLeftRight && !hasTableChild) {

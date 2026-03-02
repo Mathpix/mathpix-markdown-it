@@ -30,5 +30,7 @@ export declare const getChildText: (node: MathNode) => string;
 export declare const getNodeText: (node: MathNode) => string;
 /** Get typed attributes from a node. The single `as T` cast localises the any boundary. */
 export declare const getAttrs: <T extends object>(node: MathNode) => T;
+/** Get a typed property from a node. Accepts nullable node for convenience (returns undefined). */
+export declare const getProp: <T>(node: MathNode | null | undefined, key: string) => T;
 /** Serialize all children of a node by visiting each one and concatenating the results. */
 export declare const handleAll: HandlerFn;

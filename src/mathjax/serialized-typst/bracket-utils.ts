@@ -5,7 +5,7 @@ import {
   UNPAIRED_BRACKET_PROP, OPEN_BRACKETS, CLOSE_BRACKETS,
   DOUBLE_VERT, PARALLEL_SIGN,
 } from "./consts";
-import { getNodeText } from "./common";
+import { getNodeText, getProp } from "./common";
 import { typstSymbolMap } from "./typst-symbol-map";
 
 const BRACKET_SYMBOL_MAP: Record<string, string> = {
@@ -177,8 +177,8 @@ export const markUnpairedBrackets = (root: MathNode): void => {
   const isLeftRightDelimiter = (moNode: MathNode): boolean => {
     const parent = moNode.parent;
     if (!parent || parent.kind !== 'mrow') return false;
-    if (parent.getProperty('texClass') !== TEXCLASS.INNER) return false;
-    if (parent.getProperty('open') === undefined && parent.getProperty('close') === undefined) return false;
+    if (getProp<number>(parent, 'texClass') !== TEXCLASS.INNER) return false;
+    if (getProp<string>(parent, 'open') === undefined && getProp<string>(parent, 'close') === undefined) return false;
     const ch = parent.childNodes;
     if (!ch || ch.length === 0) return false;
     return ch[0] === moNode || ch[ch.length - 1] === moNode;

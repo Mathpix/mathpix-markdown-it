@@ -4,7 +4,7 @@ import {
   DATA_PRE_CONTENT, DATA_POST_CONTENT,
   DATA_TAG_AUTO, DATA_LABEL_KEY, DEFAULT_EQ_NUMBERING, EQ_TAG_FIGURE_KIND,
 } from "./consts";
-import { initTypstData, addToTypstData, getChildText } from "./common";
+import { initTypstData, addToTypstData, getChildText, getProp } from "./common";
 import { escapeCasesSeparators } from "./escape-utils";
 import {
   treeContainsMo, serializePrefixBeforeMo, replaceUnpairedBrackets, delimiterToTypst,
@@ -13,7 +13,7 @@ import {
 /** Extract the original \label{} key from an mlabeledtr label cell.
  *  MathJax stores the id as "mjx-eqn:<label_key>" when useLabelIds is true. */
 const getLabelKey = (labelCell: MathNode): string | null => {
-  const key = labelCell?.getProperty(DATA_LABEL_KEY);
+  const key = getProp<string>(labelCell, DATA_LABEL_KEY);
   return key ? String(key) : null;
 };
 
@@ -132,7 +132,7 @@ const buildNumcasesGrid = (node: MathNode, serialize: ITypstSerializer, countRow
     if (condTag) {
       rowTagSources.push({ source: 'condition', content: condTag, labelKey });
     } else if (labelCell) {
-      const isAutoNumber = !!labelCell.getProperty(DATA_TAG_AUTO);
+      const isAutoNumber = !!getProp<boolean>(labelCell, DATA_TAG_AUTO);
       if (!isAutoNumber) {
         const tagContent = serializeTagContent(labelCell, serialize);
         rowTagSources.push({ source: 'label', content: tagContent, labelKey });
@@ -225,7 +225,7 @@ const buildTaggedEqnArray = (
     if (mtrNode.kind === 'mlabeledtr' && mtrNode.childNodes.length > 0) {
       const labelCell = mtrNode.childNodes[0];
       const tagContent = serializeTagContent(labelCell, serialize);
-      const isAutoNumber = !!labelCell.getProperty(DATA_TAG_AUTO);
+      const isAutoNumber = !!getProp<boolean>(labelCell, DATA_TAG_AUTO);
       const labelKey = getLabelKey(labelCell);
       rowTagInfos.push({
         isTagged: !!tagContent,
@@ -416,8 +416,8 @@ export const mtable: HandlerFn = (node, serialize) => {
   const envName = node.attributes.get('name') as string;
   // Check for enclosing brackets from \left...\right (mrow parent with open/close)
   const parentMrow = node.parent?.kind === 'mrow' ? node.parent : null;
-  const openProp = parentMrow?.getProperty('open');
-  const closeProp = parentMrow?.getProperty('close');
+  const openProp = getProp<string>(parentMrow, 'open');
+  const closeProp = getProp<string>(parentMrow, 'close');
   const branchOpen: string = openProp !== undefined ? String(openProp) : '';
   const branchClose: string = closeProp !== undefined ? String(closeProp) : '';
   // Determine if this is a cases environment
@@ -471,8 +471,8 @@ export const mtable: HandlerFn = (node, serialize) => {
     const hasAnyTag = node.childNodes.some(
       (child: MathNode) => child.kind === 'mlabeledtr'
     );
-    const preContent = String(node.getProperty(DATA_PRE_CONTENT) || '');
-    const postContent = String(node.getProperty(DATA_POST_CONTENT) || '');
+    const preContent = String(getProp<string>(node, DATA_PRE_CONTENT) || '');
+    const postContent = String(getProp<string>(node, DATA_POST_CONTENT) || '');
     if (hasAnyTag) {
       return buildTaggedEqnArray(node, serialize, rows, countRow, preContent, postContent);
     } else {

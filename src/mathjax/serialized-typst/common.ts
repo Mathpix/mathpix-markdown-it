@@ -133,6 +133,10 @@ export const getNodeText = (node: MathNode): string => {
 export const getAttrs = <T extends object>(node: MathNode): T =>
   node.attributes.getAllAttributes() as T;
 
+/** Get a typed property from a node. Accepts nullable node for convenience (returns undefined). */
+export const getProp = <T>(node: MathNode | null | undefined, key: string): T | undefined =>
+  node?.getProperty(key) as T | undefined;
+
 /** Serialize all children of a node by visiting each one and concatenating the results. */
 export const handleAll: HandlerFn = (node, serialize) => {
   let res: ITypstData = initTypstData();

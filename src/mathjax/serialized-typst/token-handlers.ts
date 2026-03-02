@@ -11,7 +11,7 @@ import {
 } from "./consts";
 import {
   initTypstData, addToTypstData,
-  getNodeText, getChildText, getAttrs,
+  getNodeText, getChildText, getAttrs, getProp,
   isFirstChild, isLastChild, getSiblingIndex, typstPlaceholder,
 } from "./common";
 import { findTypstSymbol, typstFontMap, typstSymbolMap } from "./typst-symbol-map";
@@ -169,7 +169,7 @@ export const mi: HandlerFn = (node, _serialize) => {
 export const mo: HandlerFn = (node, _serialize) => {
   let res: ITypstData = initTypstData();
   const value = getNodeText(node);
-  const unpairedDir = node.getProperty(UNPAIRED_BRACKET_PROP);
+  const unpairedDir = getProp<string>(node, UNPAIRED_BRACKET_PROP);
   if (unpairedDir && UNPAIRED_BRACKET_TYPST[value]) {
     const spaceBefore = needsSpaceBefore(node) ? ' ' : '';
     const spaceAfter = needsSpaceAfter(node) ? ' ' : '';
