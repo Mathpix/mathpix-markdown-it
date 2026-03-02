@@ -110,6 +110,26 @@ const isNumcasesTable = (node: MathNode): boolean => {
   return treeContainsMo(prefixCell, '{');
 };
 
+/** Build a label suffix ` <key>` or empty string. */
+const labelSuffix = (key: string | null): string =>
+  key ? ` <${key}>` : '';
+
+/** Build a #figure() wrapper for an explicit equation tag with a label. */
+const buildFigureTag = (tagContent: string, labelKey: string): string => {
+  const figure = `#figure(kind: "${EQ_TAG_FIGURE_KIND}", supplement: none, numbering: n => [${tagContent}], [${tagContent}])`;
+  return `[${figure} <${labelKey}>]`;
+};
+
+/** Build an auto-numbered tag entry with a label (counter step + figure for referenceability). */
+const buildAutoTagWithLabel = (labelKey: string): string => {
+  const getNum = `numbering(${DEFAULT_EQ_NUMBERING}, ..counter(math.equation).get())`;
+  const figure = `#figure(kind: "${EQ_TAG_FIGURE_KIND}", supplement: none, numbering: _ => n, [#n])`;
+  return `{ counter(math.equation).step(); context { let n = ${getNum}; [${figure} <${labelKey}>] } }`;
+};
+
+/** Simple auto-numbered tag entry (counter step + display). */
+const AUTO_TAG_ENTRY = `{ counter(math.equation).step(); context counter(math.equation).display(${DEFAULT_EQ_NUMBERING}) }`;
+
 /** numcases/subnumcases → #grid() with cases + numbering column */
 const buildNumcasesGrid = (node: MathNode, serialize: ITypstSerializer, countRow: number): ITypstData => {
   let res: ITypstData = initTypstData();
@@ -120,7 +140,6 @@ const buildNumcasesGrid = (node: MathNode, serialize: ITypstSerializer, countRow
   // 1. Condition-embedded \tag{...} in mtext (MathJax leaves it as literal text)
   // 2. Label cell explicit tag (MathJax processed \tag, data-tag-auto is false)
   // 3. Auto-numbered (data-tag-auto is true)
-  const autoTagEntry = '{ counter(math.equation).step(); context counter(math.equation).display(' + DEFAULT_EQ_NUMBERING + ') }';
   const rowTagSources: { source: 'condition' | 'label' | 'auto'; content: string; labelKey: string | null }[] = [];
   for (let i = 0; i < countRow; i++) {
     const mtrNode = node.childNodes[i];
@@ -168,43 +187,43 @@ const buildNumcasesGrid = (node: MathNode, serialize: ITypstSerializer, countRow
   }
   let casesContent: string;
   if (caseRows.length >= 2) {
-    casesContent = 'cases(\n  ' + caseRows.join(',\n  ') + ',\n)';
+    casesContent = `cases(\n  ${caseRows.join(',\n  ')},\n)`;
   } else {
-    casesContent = 'cases(' + caseRows.join(', ') + ')';
+    casesContent = `cases(${caseRows.join(', ')})`;
   }
-  const mathContent = prefix ? prefix + ' ' + casesContent : casesContent;
+  const mathContent = prefix ? `${prefix} ${casesContent}` : casesContent;
   const tagEntries: string[] = [];
   for (let i = 0; i < countRow; i++) {
     const info = rowTagSources[i];
     let tagText = '';
     if (info.source === 'condition') {
       // Escape content-mode special chars in condition-embedded tag text
-      tagText = '(' + info.content.replace(RE_CONTENT_SPECIAL, '\\$&') + ')';
+      tagText = `(${info.content.replace(RE_CONTENT_SPECIAL, '\\$&')})`;
     } else if (info.source === 'label' && info.content) {
       tagText = info.content;  // already escaped by serializeTagContent
     }
     if (tagText && info.labelKey) {
       // Explicit tag with label — wrap in #figure() so the label is referenceable
-      tagEntries.push('[#figure(kind: "' + EQ_TAG_FIGURE_KIND + '", supplement: none, numbering: n => [' + tagText + '], [' + tagText + ']) <' + info.labelKey + '>]');
+      tagEntries.push(buildFigureTag(tagText, info.labelKey));
     } else if (tagText) {
-      tagEntries.push('[' + tagText + ']');
+      tagEntries.push(`[${tagText}]`);
     } else if (info.labelKey) {
       // Auto-numbered with label — step counter outside context, wrap in #figure() for referenceability
-      tagEntries.push('{ counter(math.equation).step(); context { let n = numbering(' + DEFAULT_EQ_NUMBERING + ', ..counter(math.equation).get()); [#figure(kind: "' + EQ_TAG_FIGURE_KIND + '", supplement: none, numbering: _ => n, [#n]) <' + info.labelKey + '>] } }');
+      tagEntries.push(buildAutoTagWithLabel(info.labelKey));
     } else {
-      tagEntries.push(autoTagEntry);
+      tagEntries.push(AUTO_TAG_ENTRY);
     }
   }
   const gridLines: string[] = [
     '#grid(',
     '  columns: (1fr, auto),',
     '  align: (left, right + horizon),',
-    '  math.equation(block: true, numbering: none, $ ' + mathContent + ' $),',
+    `  math.equation(block: true, numbering: none, $ ${mathContent} $),`,
     '  grid(',
     '    row-gutter: 0.65em,',
   ];
   for (const entry of tagEntries) {
-    gridLines.push('    ' + entry + ',');
+    gridLines.push(`    ${entry},`);
   }
   gridLines.push('  ),');
   gridLines.push(')');
@@ -212,6 +231,12 @@ const buildNumcasesGrid = (node: MathNode, serialize: ITypstSerializer, countRow
   res.typst_inline = mathContent;
   return res;
 };
+
+/** Join rows with \\ separators, optionally prepending preContent. */
+const joinRows = (rows: string[], preContent: string): string =>
+  preContent
+    ? `${preContent} \\\n${rows.join(' \\\n')}`
+    : rows.join(' \\\n');
 
 /** eqnArray with tags → number-align / separate / no-tag strategies */
 const buildTaggedEqnArray = (
@@ -247,7 +272,7 @@ const buildTaggedEqnArray = (
     const info = rowTagInfos[tagIdx];
     // Merge pre/post content into rows
     if (postContent && rows.length > 0) {
-      rows[rows.length - 1] = rows[rows.length - 1] + ' ' + postContent;
+      rows[rows.length - 1] += ` ${postContent}`;
     }
     // Determine number-align based on tag position
     // When preContent exists, it becomes an extra row at the top
@@ -262,29 +287,21 @@ const buildTaggedEqnArray = (
     } else {
       numberAlign = 'end + horizon';
     }
-    const mathContent = preContent
-      ? preContent + ' \\\n' + rows.join(' \\\n')
-      : rows.join(' \\\n');
+    const mathContent = joinRows(rows, preContent);
     const supplementPart = info.labelKey ? ', supplement: none' : '';
-    const numberAlignPart = ', number-align: ' + numberAlign;
-    const labelSuffix = info.labelKey ? ' <' + info.labelKey + '>' : '';
-    const block = '#math.equation(block: true' + supplementPart
-      + ', numbering: n => [' + info.tagContent + ']'
-      + numberAlignPart + ', $ ' + mathContent + ' $)' + labelSuffix
-      + '\n#counter(math.equation).update(n => n - 1)';
+    const eqn = `#math.equation(block: true${supplementPart}, numbering: n => [${info.tagContent}], number-align: ${numberAlign}, $ ${mathContent} $)`;
+    const block = `${eqn}${labelSuffix(info.labelKey)}\n#counter(math.equation).update(n => n - 1)`;
     res = addToTypstData(res, { typst: block });
-    res.typst_inline = preContent
-      ? preContent + ' \\\n' + rows.join(' \\\n')
-      : rows.join(' \\\n');
+    res.typst_inline = joinRows(rows, preContent);
   } else if (totalTagged > 0) {
     // Strategy: separate — multiple tags or auto-numbered rows
     // Each row becomes a separate #math.equation block
     // Merge pre/post content into rows
     if (preContent && rows.length > 0) {
-      rows[0] = preContent + ' \\\n' + rows[0];
+      rows[0] = `${preContent} \\\n${rows[0]}`;
     }
     if (postContent && rows.length > 0) {
-      rows[rows.length - 1] = rows[rows.length - 1] + ' ' + postContent;
+      rows[rows.length - 1] += ` ${postContent}`;
     }
     const eqnBlocks: string[] = [];
     for (let i = 0; i < countRow; i++) {
@@ -293,18 +310,16 @@ const buildTaggedEqnArray = (
       if (info.isTagged) {
         const numbering = info.isAutoTag
           ? DEFAULT_EQ_NUMBERING
-          : 'n => [' + info.tagContent + ']';
-        const labelKey = info.labelKey;
-        const labelSuffix = labelKey ? ' <' + labelKey + '>' : '';
-        const supplementPart = labelKey ? ', supplement: none' : '';
+          : `n => [${info.tagContent}]`;
+        const supplementPart = info.labelKey ? ', supplement: none' : '';
         eqnBlocks.push(
-          '#math.equation(block: true' + supplementPart + ', numbering: ' + numbering + ', $ ' + rowContent + ' $)' + labelSuffix
+          `#math.equation(block: true${supplementPart}, numbering: ${numbering}, $ ${rowContent} $)${labelSuffix(info.labelKey)}`
         );
         if (info.isExplicitTag) {
           eqnBlocks.push('#counter(math.equation).update(n => n - 1)');
         }
       } else {
-        eqnBlocks.push('#math.equation(block: true, numbering: none, $ ' + rowContent + ' $)');
+        eqnBlocks.push(`#math.equation(block: true, numbering: none, $ ${rowContent} $)`);
       }
     }
     res = addToTypstData(res, { typst: eqnBlocks.join('\n') });
@@ -322,11 +337,9 @@ const buildUntaggedEqnArray = (
 ): ITypstData => {
   let res: ITypstData = initTypstData();
   if (postContent && rows.length > 0) {
-    rows[rows.length - 1] = rows[rows.length - 1] + ' ' + postContent;
+    rows[rows.length - 1] += ` ${postContent}`;
   }
-  const content = preContent
-    ? preContent + ' \\\n' + rows.join(' \\\n')
-    : rows.join(' \\\n');
+  const content = joinRows(rows, preContent);
   res = addToTypstData(res, { typst: content });
   return res;
 };
@@ -338,7 +351,7 @@ const buildMatrix = (
   let res: ITypstData = initTypstData();
   let matContent: string;
   if (rows.length >= 2) {
-    matContent = '\n  ' + rows.join(';\n  ') + ',\n';
+    matContent = `\n  ${rows.join(';\n  ')},\n`;
   } else {
     matContent = rows.join('; ');
   }
@@ -367,16 +380,16 @@ const buildMatrix = (
   if (hlinePositions.length > 0 || vlinePositions.length > 0) {
     const parts: string[] = [];
     if (hlinePositions.length === 1) {
-      parts.push('hline: ' + hlinePositions[0]);
+      parts.push(`hline: ${hlinePositions[0]}`);
     } else if (hlinePositions.length > 1) {
-      parts.push('hline: (' + hlinePositions.join(', ') + ')');
+      parts.push(`hline: (${hlinePositions.join(', ')})`);
     }
     if (vlinePositions.length === 1) {
-      parts.push('vline: ' + vlinePositions[0]);
+      parts.push(`vline: ${vlinePositions[0]}`);
     } else if (vlinePositions.length > 1) {
-      parts.push('vline: (' + vlinePositions.join(', ') + ')');
+      parts.push(`vline: (${vlinePositions.join(', ')})`);
     }
-    augmentStr = 'augment: #(' + parts.join(', ') + '), ';
+    augmentStr = `augment: #(${parts.join(', ')}), `;
   }
   const columnAlign = node.attributes.get('columnalign') as string;
   const alignArr = columnAlign ? columnAlign.trim().split(/\s+/) : [];
@@ -388,22 +401,22 @@ const buildMatrix = (
   const hasDelimiters = branchOpen || branchClose;
   if (hasDelimiters) {
     if (branchOpen) {
-      params.push('delim: ' + delimiterToTypst(branchOpen));
+      params.push(`delim: ${delimiterToTypst(branchOpen)}`);
     }
   } else {
     // Arrays/matrices without parent delimiters should not have parens
     params.push('delim: #none');
   }
   if (matAlign) {
-    params.push('align: #' + matAlign);
+    params.push(`align: #${matAlign}`);
   }
   if (augmentStr) {
     params.push(augmentStr.slice(0, -2)); // remove trailing ", "
   }
   const paramStr = params.length > 0 ? params.join(', ') + ', ' : '';
-  const matExpr = 'mat(' + paramStr + matContent + ')';
+  const matExpr = `mat(${paramStr}${matContent})`;
   if (frame === 'solid') {
-    res = addToTypstData(res, { typst: '#box(stroke: 0.5pt, inset: 3pt, $ ' + matExpr + ' $)', typst_inline: matExpr });
+    res = addToTypstData(res, { typst: `#box(stroke: 0.5pt, inset: 3pt, $ ${matExpr} $)`, typst_inline: matExpr });
   } else {
     res = addToTypstData(res, { typst: matExpr });
   }
@@ -451,7 +464,7 @@ export const mtable: HandlerFn = (node, serialize) => {
       const pairs: string[] = [];
       for (let k = 0; k < cells.length; k += 2) {
         if (k + 1 < cells.length) {
-          pairs.push(cells[k] + ' &' + cells[k + 1]);
+          pairs.push(`${cells[k]} &${cells[k + 1]}`);
         } else {
           pairs.push(cells[k]);
         }
@@ -482,9 +495,9 @@ export const mtable: HandlerFn = (node, serialize) => {
     // Cases environment
     let casesBody: string;
     if (rows.length >= 2) {
-      casesBody = 'cases(\n  ' + rows.join(',\n  ') + ',\n)';
+      casesBody = `cases(\n  ${rows.join(',\n  ')},\n)`;
     } else {
-      casesBody = 'cases(' + rows.join(', ') + ')';
+      casesBody = `cases(${rows.join(', ')})`;
     }
     res = addToTypstData(res, { typst: casesBody });
   } else {
