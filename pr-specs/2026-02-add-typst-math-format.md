@@ -672,11 +672,19 @@ The serializer checks `labelCell.properties['data-tag-auto']`: if `true` → `nu
 ### Tag label serialization
 
 Tag labels are serialized by `serializeTagContent()` in `handlers.ts`, which walks the label `mtd` tree and emits each node according to its type:
-- `mtext` nodes → plain text (for Typst content mode inside `[...]`)
+- `mtext` nodes → plain text with content-mode escaping (for Typst content mode inside `[...]`)
 - `mrow`/`TeXAtom` containing `mtext` children → recurse into children
 - Pure math groups (`mrow` without `mtext`) → serialize as Typst math and wrap in `$...$`
 
-This handles mixed tags like `\tag{$x\sqrt{5}$ 1.3.1}` where the MathML label contains interleaved `mtext` and math nodes: `<mtext>(</mtext>`, `<mrow><mi>x</mi><msqrt>...</msqrt></mrow>`, `<mtext> 1.3.1)</mtext>` → `($x sqrt(5)$ 1.3.1)`.
+**Content-mode character escaping:** Tag text from `mtext` nodes is placed inside `[...]` (Typst content mode), where certain characters have special meaning. The serializer escapes `*` → `\*`, `_` → `\_`, `` ` `` → `` \` ``, `@` → `\@`, `#` → `\#`, `<` → `\<` in text portions. Math portions wrapped in `$...$` are not affected. The same escaping is applied to condition-embedded tags in numcases (`extractTagFromConditionCell`). Characters that are only special at line start (`=`, `-`, `+`) or in combinations (`//`, `/*`) are not escaped since tag content is always inline.
+
+| LaTeX | Typst numbering |
+|-------|----------------|
+| `\tag{*}` | `n => [(\*)]` |
+| `\tag{**}` | `n => [(\*\*)]` |
+| `\tag{8.14}` | `n => [(8.14)]` (no special chars — unchanged) |
+
+This also handles mixed tags like `\tag{$x\sqrt{5}$ 1.3.1}` where the MathML label contains interleaved `mtext` and math nodes: `<mtext>(</mtext>`, `<mrow><mi>x</mi><msqrt>...</msqrt></mrow>`, `<mtext> 1.3.1)</mtext>` → `($x sqrt(5)$ 1.3.1)`.
 
 ### Unpaired bracket escaping (pre-serialization tree walk)
 

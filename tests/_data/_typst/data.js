@@ -1811,6 +1811,13 @@ module.exports = [
     typst_inline: `a &= b \\\nc &= d`,
   },
 
+  // Tag with * — must be escaped in Typst content mode
+  {
+    latex: `\\begin{align*} E = mc^2 \\tag{*} \\end{align*}`,
+    typst: `#math.equation(block: true, numbering: n => [(\\*)], $ E = m c^2 $)\n#counter(math.equation).update(n => n - 1)`,
+    typst_inline: `E = m c^2`,
+  },
+
   // Pre-align content: math before \begin{align*} merged into equation block
   {
     latex: `\\overrightarrow{\\boldsymbol{P}}=\\overrightarrow{\\boldsymbol{p}}_{A}+\\cdots \\begin{align*}\n& \\text { (total momentum of }  \\tag{8.14}\\\\\n& \\text { a system of particles) }\n\\end{align*}`,

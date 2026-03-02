@@ -50,10 +50,14 @@ const serializeTagContent = (labelCell: any, serialize: any): string => {
     const visitChild = (child: any) => {
       if (!child) return;
       if (child.kind === 'mtext') {
-        // Text node — emit as plain text
-        const text = child.childNodes?.[0]?.text || '';
+        // Text node — emit as plain text for Typst content mode [...]
+        // Escape characters with special meaning in content mode:
+        // * (bold), _ (emphasis), ` (raw), @ (reference), # (scripting)
+        let text = child.childNodes?.[0]?.text || '';
         if (text) {
-          parts.push(text.replace(/\u00A0/g, ' '));
+          text = text.replace(/\u00A0/g, ' ');
+          text = text.replace(/[*_`@#<]/g, '\\$&');
+          parts.push(text);
         }
       } else if (child.isInferred) {
         // Inferred mrow — always recurse
@@ -1650,9 +1654,10 @@ const mtable = () => {
           const info = rowTagSources[i];
           let tagText = '';
           if (info.source === 'condition') {
-            tagText = '(' + info.content + ')';
+            // Escape content-mode special chars in condition-embedded tag text
+            tagText = '(' + info.content.replace(/[*_`@#<]/g, '\\$&') + ')';
           } else if (info.source === 'label' && info.content) {
-            tagText = info.content;
+            tagText = info.content;  // already escaped by serializeTagContent
           }
           if (tagText && info.labelKey) {
             // Explicit tag with label — wrap in #figure() so the label is referenceable
