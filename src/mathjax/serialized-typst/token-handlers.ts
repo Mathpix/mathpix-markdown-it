@@ -200,7 +200,8 @@ export const mo: HandlerFn = (node, _serialize) => {
   // Check if this operator is inside sub/sup/munderover — no spacing there
   const parentKind = node.parent?.kind;
   const inScript = parentKind === 'msub' || parentKind === 'msup'
-    || parentKind === 'msubsup' || parentKind === 'munderover';
+    || parentKind === 'msubsup' || parentKind === 'munderover'
+    || parentKind === 'munder' || parentKind === 'mover';
   if (typstValue.length > 1 && RE_WORD_START.test(typstValue)) {
     const spaceBefore = needsSpaceBefore(node) ? ' ' : '';
     let spaceAfter = needsSpaceAfter(node) ? ' ' : '';

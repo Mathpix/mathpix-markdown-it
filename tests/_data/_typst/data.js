@@ -1559,8 +1559,8 @@ module.exports = [
   // === Multiscripts (attach) ===
   {
     latex: `\\sideset{_a^b}{_c^d} \\sum`,
-    typst: `attach(sum, tl: b, bl: a, t: d, b: c)`,
-    typst_inline: `attach(sum, tl: b, bl: a, t: d, b: c)`,
+    typst: `attach(sum, tl: b, bl: a, tr: d, br: c)`,
+    typst_inline: `attach(sum, tl: b, bl: a, tr: d, br: c)`,
   },
   {
     latex: `\\sideset{_1^2}{} \\sum`,
