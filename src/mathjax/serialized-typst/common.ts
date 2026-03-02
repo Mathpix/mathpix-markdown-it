@@ -92,7 +92,7 @@ export const needsParens = (s: string): boolean => {
  *  Returns e.g. '_x', '_(x + y)', '^n', '^(a b)', or '' if content is empty. */
 export const formatScript = (prefix: '_' | '^', content: string): string => {
   if (!content) return '';
-  return prefix + (needsParens(content) ? '(' + content + ')' : content);
+  return prefix + (needsParens(content) ? `(${content})` : content);
 };
 
 /** Check if a node is the first child of its parent. */
