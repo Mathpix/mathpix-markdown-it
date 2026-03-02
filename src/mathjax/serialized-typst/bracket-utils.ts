@@ -8,7 +8,7 @@ import {
 import { getNodeText, getProp } from "./common";
 import { typstSymbolMap } from "./typst-symbol-map";
 
-const BRACKET_SYMBOL_MAP: Record<string, string> = {
+const BRACKET_SYMBOL_MAP: Readonly<Record<string, string>> = {
   '[': 'bracket.l',
   ']': 'bracket.r',
   '(': 'paren.l',
@@ -21,7 +21,7 @@ const BRACKET_SYMBOL_MAP: Record<string, string> = {
 // All ASCII brackets except ] are escaped: ( and [ open groups/content blocks,
 // ) closes the lr() function call prematurely, { and } are code block syntax.
 // ] is left unescaped so lr() can recognise and auto-size it as a delimiter.
-const lrOpenEscapeMap: Record<string, string> = {
+const lrOpenEscapeMap: Readonly<Record<string, string>> = {
   '(': '\\(',
   ')': '\\)',
   '[': '\\[',
@@ -63,7 +63,7 @@ export const treeContainsMo = (node: MathNode, moText: string, skipPhantom = tru
 // the first mo with the given text. Returns the serialized prefix.
 export const serializePrefixBeforeMo = (node: MathNode, serialize: ITypstSerializer, stopMoText: string): string => {
   // Walk the mtd → inferredMrow → mpadded chain to find the flat math children
-  let flatChildren: MathNode[] = [];
+  const flatChildren: MathNode[] = [];
   const extractFlat = (n: MathNode) => {
     if (!n || !n.childNodes) return;
     if (n.kind === 'mphantom') return;

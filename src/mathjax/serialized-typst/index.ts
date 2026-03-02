@@ -16,10 +16,10 @@ import {
 import { findTypstSymbol } from './typst-symbol-map';
 
 // Node kinds that carry sub/sup scripts (used in \idotsint pattern detection).
-const SCRIPT_KINDS: Set<string> = new Set(['msubsup', 'msub', 'msup']);
+const SCRIPT_KINDS: ReadonlySet<string> = new Set(['msubsup', 'msub', 'msup']);
 
 // Map of opening delimiter char → expected close char + Typst output format.
-const BARE_DELIM_PAIRS: Record<string, { close: string; typstOpen: string; typstClose: string }> = {
+const BARE_DELIM_PAIRS: Readonly<Record<string, { close: string; typstOpen: string; typstClose: string }>> = {
   '|':              { close: '|',              typstOpen: 'lr(| ',          typstClose: ' |)' },
   [LEFT_FLOOR]:     { close: RIGHT_FLOOR,      typstOpen: 'floor(',         typstClose: ')' },
   [LEFT_CEIL]:      { close: RIGHT_CEIL,       typstOpen: 'ceil(',          typstClose: ')' },
@@ -47,7 +47,7 @@ const getBigDelimInfo = (node: MathNode): { delim: string, size: string, isOpen:
     if (tc !== TEXCLASS.OPEN && tc !== TEXCLASS.CLOSE) return null;
     const delim = getChildText(mo);
     return { delim, size: String(atr.minsize), isOpen: tc === TEXCLASS.OPEN };
-  } catch (e) {
+  } catch (_e: unknown) {
     return null;
   }
 };
@@ -69,7 +69,7 @@ const getDelimiterChar = (node: MathNode): string | null => {
       }
     }
     return moNode ? (getChildText(moNode) || null) : null;
-  } catch (_e) {
+  } catch (_e: unknown) {
     return null;
   }
 };
@@ -84,7 +84,7 @@ const getScriptedDelimiterChar = (node: MathNode): string | null => {
       return getDelimiterChar(node.childNodes?.[0]);
     }
     return null;
-  } catch (_e) {
+  } catch (_e: unknown) {
     return null;
   }
 };
@@ -242,11 +242,11 @@ const tryThousandSepPattern = (
 };
 
 export interface ITypstVisitorOptions {
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export class SerializedTypstVisitor extends MmlVisitor {
-  options: ITypstVisitorOptions = {};
+  readonly options: ITypstVisitorOptions = {};
 
   constructor(options?: ITypstVisitorOptions) {
     super();
@@ -257,7 +257,8 @@ export class SerializedTypstVisitor extends MmlVisitor {
     return this.visitNode(node, '');
   }
 
-  public visitNode(node: any, ...args: any[]): ITypstData {
+  // Parent AbstractVisitor forces ...args: any[] signature
+  public visitNode(node: MathNode, ...args: any[]): ITypstData {
     let handler = this.nodeHandlers.get(node.kind) || this.visitDefault;
     return handler.call(this, node, ...args);
   }
@@ -268,7 +269,7 @@ export class SerializedTypstVisitor extends MmlVisitor {
       const text: string = node.getText();
       res = addToTypstData(res, { typst: text });
       return res;
-    } catch (e) {
+    } catch (_e: unknown) {
       return res;
     }
   }
@@ -352,7 +353,7 @@ export class SerializedTypstVisitor extends MmlVisitor {
         j++;
       }
       return res;
-    } catch (e) {
+    } catch (_e: unknown) {
       return res;
     }
   }
@@ -361,11 +362,11 @@ export class SerializedTypstVisitor extends MmlVisitor {
     let res: ITypstData = initTypstData();
     try {
       const children: ITypstData = this.childNodeMml(node, space + '  ', '\n');
-      if (children.typst?.match(/\S/)) {
+      if (children.typst.match(/\S/)) {
         res = addToTypstData(res, children);
       }
       return res;
-    } catch (e) {
+    } catch (_e: unknown) {
       return res;
     }
   }
@@ -385,7 +386,7 @@ export class SerializedTypstVisitor extends MmlVisitor {
       const data: ITypstData = handleCh(node, this);
       res = addToTypstData(res, data);
       return res;
-    } catch (e) {
+    } catch (_e: unknown) {
       return res;
     }
   }

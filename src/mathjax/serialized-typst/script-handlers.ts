@@ -13,7 +13,7 @@ import { typstAccentMap } from "./typst-symbol-map";
 import { escapeContentSeparators } from "./escape-utils";
 
 // Prime symbol → Typst ' shorthand mapping
-const PRIME_SHORTHANDS: Map<string, string> = new Map([
+const PRIME_SHORTHANDS: ReadonlyMap<string, string> = new Map([
   ['prime', "'"],
   ['prime.double', "''"],
   ['prime.triple', "'''"],
@@ -26,7 +26,7 @@ const RE_TRAILING_PAREN = /\)$/;
 
 // Operators that Typst places below/above in display mode by default.
 // Used to detect \nolimits (when these appear in msubsup/msub/msup instead of munderover).
-const TYPST_DISPLAY_LIMIT_OPS: Set<string> = new Set([
+const TYPST_DISPLAY_LIMIT_OPS: ReadonlySet<string> = new Set([
   // Named function operators with limits placement
   'lim', 'limsup', 'liminf', 'max', 'min', 'inf', 'sup',
   'det', 'gcd', 'Pr',
@@ -39,7 +39,7 @@ const TYPST_DISPLAY_LIMIT_OPS: Set<string> = new Set([
 ]);
 
 // Extensible arrows/harpoons: use stretch() instead of limits() for \xrightarrow, \xleftarrow, etc.
-const STRETCH_BASE_SYMBOLS: Set<string> = new Set([
+const STRETCH_BASE_SYMBOLS: ReadonlySet<string> = new Set([
   'arrow.r', 'arrow.l', 'arrow.l.r',
   'arrow.r.twohead', 'arrow.l.twohead',
   'arrow.r.bar',                       // \xmapsto
@@ -53,7 +53,7 @@ const STRETCH_BASE_SYMBOLS: Set<string> = new Set([
 
 // Accent functions that have no under-variant in Typst.
 // In munder context, these use attach(base, b: symbol) instead of accent function.
-const MUNDER_ATTACH_SYMBOLS: Map<string, string> = new Map([
+const MUNDER_ATTACH_SYMBOLS: ReadonlyMap<string, string> = new Map([
   ['arrow', 'arrow.r'],        // → below
   ['arrow.l', 'arrow.l'],      // ← below
   ['arrow.l.r', 'arrow.l.r'],  // ↔ below
@@ -63,7 +63,7 @@ const MUNDER_ATTACH_SYMBOLS: Map<string, string> = new Map([
 
 // Typst accent shorthand functions that can be called as fn(content).
 // Accents NOT in this set must use the accent(content, symbol) form.
-const TYPST_ACCENT_SHORTHANDS: Set<string> = new Set([
+const TYPST_ACCENT_SHORTHANDS: ReadonlySet<string> = new Set([
   'hat', 'tilde', 'acute', 'grave', 'macron', 'overline', 'underline',
   'breve', 'dot', 'diaer', 'caron', 'arrow', 'circle',
   'overbrace', 'underbrace', 'overbracket', 'underbracket',
@@ -93,7 +93,7 @@ const getMovablelimits = (node: MathNode): boolean | undefined => {
   try {
     const atr = getAttrs<MoAttrs>(node);
     return atr.movablelimits;
-  } catch (e) {
+  } catch (_e: unknown) {
     return undefined;
   }
 };
@@ -118,7 +118,7 @@ const isStretchyBase = (baseTrimmed: string, firstChild: MathNode): boolean => {
   try {
     const atr = getAttrs<MoAttrs>(moNode);
     return atr.stretchy === true;
-  } catch (e) { return false; }
+  } catch (_e: unknown) { return false; }
 };
 
 /** Check if baseTrimmed is a Typst operator that natively places limits

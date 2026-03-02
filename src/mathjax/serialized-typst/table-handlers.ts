@@ -69,7 +69,7 @@ const serializeTagContent = (labelCell: MathNode, serialize: ITypstSerializer): 
       }
     }
     return parts.join('').trim();
-  } catch (_e) {
+  } catch (_e: unknown) {
     return '';
   }
 };
@@ -356,13 +356,13 @@ const buildMatrix = (
     matContent = rows.join('; ');
   }
   const columnlines = node.attributes.isSet('columnlines')
-    ? (node.attributes.get('columnlines') as string).split(' ')
+    ? String(node.attributes.get('columnlines') || '').split(' ')
     : [];
   const rowlines = node.attributes.isSet('rowlines')
-    ? (node.attributes.get('rowlines') as string).split(' ')
+    ? String(node.attributes.get('rowlines') || '').split(' ')
     : [];
   const frame = node.attributes.isSet('frame')
-    ? (node.attributes.get('frame') as string)
+    ? String(node.attributes.get('frame') || '')
     : '';
   const vlinePositions: number[] = [];
   for (let i = 0; i < columnlines.length; i++) {
@@ -391,7 +391,7 @@ const buildMatrix = (
     }
     augmentStr = `augment: #(${parts.join(', ')}), `;
   }
-  const columnAlign = node.attributes.get('columnalign') as string;
+  const columnAlign = String(node.attributes.get('columnalign') || '');
   const alignArr = columnAlign ? columnAlign.trim().split(/\s+/) : [];
   const uniqueAligns = [...new Set(alignArr)];
   const matAlign = (uniqueAligns.length === 1 && uniqueAligns[0] !== 'center')
@@ -426,7 +426,7 @@ const buildMatrix = (
 export const mtable: HandlerFn = (node, serialize) => {
   let res: ITypstData = initTypstData();
   const countRow = node.childNodes.length;
-  const envName = node.attributes.get('name') as string;
+  const envName = String(node.attributes.get('name') || '');
   // Check for enclosing brackets from \left...\right (mrow parent with open/close)
   const parentMrow = node.parent?.kind === 'mrow' ? node.parent : null;
   const openProp = getProp<string>(parentMrow, 'open');

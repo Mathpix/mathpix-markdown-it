@@ -17,12 +17,12 @@ import {
 import { findTypstSymbol, typstFontMap, typstSymbolMap } from "./typst-symbol-map";
 import { escapeContentSeparators } from "./escape-utils";
 
-const INVISIBLE_CHARS: Set<string> = new Set([
+const INVISIBLE_CHARS: ReadonlySet<string> = new Set([
   FUNC_APPLY, INVISIBLE_TIMES, INVISIBLE_SEP, INVISIBLE_PLUS,
 ]);
 
 // Built-in Typst math operators — should NOT be wrapped in upright()
-const TYPST_MATH_OPERATORS: Set<string> = new Set([
+const TYPST_MATH_OPERATORS: ReadonlySet<string> = new Set([
   'sin', 'cos', 'tan', 'cot', 'sec', 'csc',
   'arcsin', 'arccos', 'arctan',
   'sinh', 'cosh', 'tanh', 'coth',
@@ -33,24 +33,24 @@ const TYPST_MATH_OPERATORS: Set<string> = new Set([
   'Pr', 'tr',
 ]);
 
-const BB_SHORTHAND_LETTERS: Set<string> = new Set(
+const BB_SHORTHAND_LETTERS: ReadonlySet<string> = new Set(
   'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
 );
 
 // Operators that should have spaces around them for readability
-const SPACED_OPERATORS: Set<string> = new Set([
+const SPACED_OPERATORS: ReadonlySet<string> = new Set([
   '+', '-', '=', '<', '>', MINUS_SIGN, PLUS_MINUS, MINUS_PLUS,
 ]);
 
 // Multi-word MathJax operator names → Typst built-in operator names.
 // MathJax uses thin space (U+2006) between words; we normalize before lookup.
-const MATHJAX_MULTIWORD_OPS: Map<string, string> = new Map([
+const MATHJAX_MULTIWORD_OPS: ReadonlyMap<string, string> = new Map([
   ['lim sup', 'limsup'],
   ['lim inf', 'liminf'],
 ]);
 
 // MathML spacing widths → Typst spacing keywords
-const MSPACE_WIDTH_MAP: Record<string, string> = {
+const MSPACE_WIDTH_MAP: Readonly<Record<string, string>> = {
   '2em': ' wide ',
   '1em': ' quad ',
   '0.2778em': ' thick ',  // \; → thickmathspace
@@ -82,7 +82,7 @@ const needsSpaceBefore = (node: MathNode): boolean => {
     }
     if (prev.kind === 'mn') return true;
     return false;
-  } catch (e) {
+  } catch (_e: unknown) {
     return false;
   }
 };
@@ -107,7 +107,7 @@ const needsSpaceAfter = (node: MathNode): boolean => {
     }
     if (next && next.kind === 'mn') return true;
     return false;
-  } catch (e) {
+  } catch (_e: unknown) {
     return false;
   }
 };
@@ -214,7 +214,7 @@ export const mo: HandlerFn = (node, _serialize) => {
           const nt = getNodeText(next);
           if (nt === '(' || nt === '[') spaceAfter = ' ';
         }
-      } catch (_e) { /* ignore */ }
+      } catch (_e: unknown) { /* ignore */ }
     }
     res = addToTypstData(res, { typst: spaceBefore + typstValue + spaceAfter });
   } else if (!inScript && SPACED_OPERATORS.has(value)) {

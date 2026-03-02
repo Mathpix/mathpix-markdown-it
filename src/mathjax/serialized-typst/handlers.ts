@@ -10,7 +10,9 @@ import { mtable, mtr } from './table-handlers';
 
 const defaultHandler: HandlerFn = (node, serialize) => handleAll(node, serialize);
 
-const handlers: Record<HandlerKind, HandlerFn> = {
+const isHandlerKind = (k: string): k is HandlerKind => k in handlers;
+
+const handlers: Readonly<Record<HandlerKind, HandlerFn>> = {
   mi, mo, mn, mfrac, msup, msub, msubsup, msqrt,
   mover, munder, munderover, mmultiscripts, mspace, mtext,
   mtable, mrow, mtr, mpadded, mroot, menclose, mstyle, mphantom,
@@ -18,12 +20,10 @@ const handlers: Record<HandlerKind, HandlerFn> = {
 
 export const handle: HandlerFn = (node, serialize) => {
   const kind = node.kind;
-  const handler = kind in handlers
-    ? handlers[kind as HandlerKind]
-    : defaultHandler;
+  const handler = isHandlerKind(kind) ? handlers[kind] : defaultHandler;
   try {
     return handler(node, serialize);
-  } catch (e) {
+  } catch (e: unknown) {
     if (typeof console !== 'undefined' && console.warn) {
       console.warn(`[typst-serializer] handler error for "${kind || 'unknown'}":`, e);
     }

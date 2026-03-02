@@ -296,7 +296,7 @@ const miscSymbols: ReadonlyArray<[string, string]> = [
 ];
 
 // Build the combined symbol map
-export const typstSymbolMap: Map<string, string> = new Map<string, string>([
+export const typstSymbolMap: ReadonlyMap<string, string> = new Map<string, string>([
   ...greekSymbols,
   ...binaryOperators,
   ...relationOperators,
@@ -309,7 +309,7 @@ export const typstSymbolMap: Map<string, string> = new Map<string, string>([
 
 // Accent Unicode → Typst accent function name
 // Maps the accent character (from MathML mover/munder accent attribute) to Typst function
-export const typstAccentMap: Map<string, string> = new Map<string, string>([
+export const typstAccentMap: ReadonlyMap<string, string> = new Map<string, string>([
   ["\u005E", "hat"],          // ^ (hat)
   ["\u00AF", "macron"],       // ¯ (bar/overline as macron)
   ["\u203E", "overline"],     // ‾ (overline)
@@ -339,7 +339,7 @@ export const typstAccentMap: Map<string, string> = new Map<string, string>([
 ]);
 
 // MathML mathvariant attribute → Typst font function name
-export const typstFontMap: Map<string, string> = new Map<string, string>([
+export const typstFontMap: ReadonlyMap<string, string> = new Map<string, string>([
   ["bold", "bold"],
   ["bold-italic", "bold"],
   ["double-struck", "bb"],

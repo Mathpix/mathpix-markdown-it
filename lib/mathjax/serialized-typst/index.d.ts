@@ -2,13 +2,13 @@ import { MmlVisitor } from 'mathjax-full/js/core/MmlTree/MmlVisitor.js';
 import { TextNode, XMLNode } from 'mathjax-full/js/core/MmlTree/MmlNode.js';
 import { ITypstData, MathNode } from './types';
 export interface ITypstVisitorOptions {
-    [key: string]: any;
+    [key: string]: unknown;
 }
 export declare class SerializedTypstVisitor extends MmlVisitor {
-    options: ITypstVisitorOptions;
+    readonly options: ITypstVisitorOptions;
     constructor(options?: ITypstVisitorOptions);
     visitTree(node: MathNode): ITypstData;
-    visitNode(node: any, ...args: any[]): ITypstData;
+    visitNode(node: MathNode, ...args: any[]): ITypstData;
     visitTextNode(node: TextNode, _space: string): ITypstData;
     visitXMLNode(_node: XMLNode, _space: string): ITypstData;
     visitInferredMrowNode(node: MathNode, space: string): ITypstData;

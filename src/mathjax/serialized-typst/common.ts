@@ -62,7 +62,7 @@ export const isThousandSepComma = (node: MathNode, i: number): boolean => {
       }
     }
     return false;
-  } catch (_e) {
+  } catch (_e: unknown) {
     return false;
   }
 };
@@ -97,12 +97,12 @@ export const formatScript = (prefix: '_' | '^', content: string): string => {
 
 /** Check if a node is the first child of its parent. */
 export const isFirstChild = (node: MathNode): boolean => {
-  return node.parent && node.parent.childNodes[0] && node.parent.childNodes[0] === node;
+  return !!node.parent && !!node.parent.childNodes[0] && node.parent.childNodes[0] === node;
 };
 
 /** Check if a node is the last child of its parent. */
 export const isLastChild = (node: MathNode): boolean => {
-  return node.parent && node.parent.childNodes
+  return !!node.parent && !!node.parent.childNodes
     && node.parent.childNodes[node.parent.childNodes.length - 1] === node;
 };
 

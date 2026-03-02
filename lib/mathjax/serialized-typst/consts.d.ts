@@ -72,7 +72,7 @@ export declare const INTEGRAL_SIGN = "\u222B";
 export declare const MIDLINE_ELLIPSIS = "\u22EF";
 /** Maximum tree depth for shallow walks (accent detection, phantom check, etc.) */
 export declare const SHALLOW_TREE_MAX_DEPTH = 5;
-export declare const OPEN_BRACKETS: Record<string, string>;
-export declare const CLOSE_BRACKETS: Record<string, string>;
+export declare const OPEN_BRACKETS: Readonly<Record<string, string>>;
+export declare const CLOSE_BRACKETS: Readonly<Record<string, string>>;
 /** Typst escaped-delimiter output for unpaired brackets (math-mode safe) */
-export declare const UNPAIRED_BRACKET_TYPST: Record<string, string>;
+export declare const UNPAIRED_BRACKET_TYPST: Readonly<Record<string, string>>;

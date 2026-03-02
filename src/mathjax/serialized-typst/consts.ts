@@ -82,13 +82,13 @@ export const MIDLINE_ELLIPSIS = '\u22EF';      // ⋯
 /** Maximum tree depth for shallow walks (accent detection, phantom check, etc.) */
 export const SHALLOW_TREE_MAX_DEPTH = 5;
 
-export const OPEN_BRACKETS: Record<string, string> = {
+export const OPEN_BRACKETS: Readonly<Record<string, string>> = {
   '(': ')', '[': ']', '{': '}',
 };
-export const CLOSE_BRACKETS: Record<string, string> = {
+export const CLOSE_BRACKETS: Readonly<Record<string, string>> = {
   ')': '(', ']': '[', '}': '{',
 };
 /** Typst escaped-delimiter output for unpaired brackets (math-mode safe) */
-export const UNPAIRED_BRACKET_TYPST: Record<string, string> = {
+export const UNPAIRED_BRACKET_TYPST: Readonly<Record<string, string>> = {
   '(': '\\(', ')': '\\)', '[': '\\[', ']': '\\]', '{': '\\{', '}': '\\}',
 };
