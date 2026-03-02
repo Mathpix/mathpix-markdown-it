@@ -51,7 +51,6 @@ const scanExpression = (expr: string, opts: ScanOptions): string => {
         continue;
       }
     }
-
     // Skip backslash-escaped chars: \, \; \( \) \[ \] \{ \} etc.
     if (ch === '\\' && i + 1 < expr.length) {
       if (!opts.detectOnly) { result += ch + expr[i + 1]; }

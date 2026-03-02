@@ -500,10 +500,10 @@ export const mmultiscripts: HandlerFn = (node, serialize) => {
   } else {
     // Has prescripts — use attach(base, tl:, bl:, t:, b:)
     const parts: string[] = [];
-    if (lastPreSup) parts.push('tl: ' + lastPreSup);
-    if (lastPreSub) parts.push('bl: ' + lastPreSub);
-    if (lastPostSup) parts.push('t: ' + lastPostSup);
-    if (lastPostSub) parts.push('b: ' + lastPostSub);
+    if (lastPreSup) parts.push(`tl: ${lastPreSup}`);
+    if (lastPreSub) parts.push(`bl: ${lastPreSub}`);
+    if (lastPostSup) parts.push(`t: ${lastPostSup}`);
+    if (lastPostSub) parts.push(`b: ${lastPostSub}`);
     res = addToTypstData(res, {
       typst: `attach(${escapeContentSeparators(baseTrimmed)}, ${parts.join(', ')})`
     });
