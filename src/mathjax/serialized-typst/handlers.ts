@@ -32,7 +32,8 @@ const getAttributes = (node): any => {
 /** Extract the primary Typst symbol text from a node (mi/mo).
  *  Gets the first child's text and maps it through findTypstSymbol. */
 const getNodeTypstSymbol = (node: any): string => {
-  const text = (node.childNodes[0] as any)?.text || '';
+  const text = (node?.childNodes?.[0] as any)?.text ?? '';
+  if (!text) return '';
   return findTypstSymbol(text);
 };
 
@@ -68,7 +69,7 @@ const needsSpaceAfter = (node): boolean => {
     if (index < 0) return false;
     let next = node.parent.childNodes[index + 1];
     // Skip invisible function application (U+2061)
-    if (next && (next.childNodes[0] as any)?.text === '\u2061' && !isLastChild(next)) {
+    if (next && (next.childNodes?.[0] as any)?.text === '\u2061' && index + 2 < node.parent.childNodes.length) {
       next = node.parent.childNodes[index + 2];
     }
     if (next && (next.kind === 'mi' || next.kind === 'mo')) {
@@ -190,7 +191,7 @@ const mo = () => {
     }
     // Detect custom named operators (e.g. \injlim → "inj lim", \projlim → "proj lim")
     // Don't add limits: #true here — parent handler (munderover/munder/mover) decides placement
-    if (value.length > 1 && RE_WORD_START.test(value) && !typstSymbolMap.has(value) && !TYPST_MATH_OPERATORS.has(value)) {
+    if (normalizedValue.length > 1 && RE_WORD_START.test(normalizedValue) && !typstSymbolMap.has(value) && !TYPST_MATH_OPERATORS.has(value)) {
       const opName = normalizedValue;
       res = addToTypstData(res, { typst: 'op("' + opName + '")' });
       return res;
@@ -269,7 +270,7 @@ const mtext = () => {
       res = addToTypstData(res, { typst: spaceBefore + typstValue + spaceAfter });
       return res;
     }
-    let textContent = '"' + value.replace(/"/g, '\\"') + '"';
+    let textContent = '"' + value.replace(/\\/g, '\\\\').replace(/"/g, '\\"') + '"';
     const atr = getAttributes(node);
     const mathvariant: string = atr?.mathvariant || '';
     if (mathvariant && mathvariant !== 'normal') {
@@ -329,7 +330,8 @@ const matchBraceAnnotation = (
 ): ITypstData | null => {
   const m = BRACE_ANNOTATION_RE.exec(baseTrimmed);
   if (!m || !kinds.includes(m[1] as any)) return null;
-  return { typst: m[1] + '(' + m[2] + ', ' + escapeContentSeparators(annotation) + ')' };
+  const ann = typstPlaceholder(escapeContentSeparators(annotation));
+  return { typst: m[1] + '(' + m[2] + ', ' + ann + ')' };
 };
 
 // --- MSUP handler: superscripts ---
@@ -464,9 +466,10 @@ const mroot = () => {
     const dataRadicand: ITypstData = radicand ? serialize.visitNode(radicand, '') : initTypstData();
     const dataIndex: ITypstData = index ? serialize.visitNode(index, '') : initTypstData();
     const radicandContent = typstPlaceholder(escapeContentSeparators(dataRadicand.typst.trim()));
+    const indexContent = typstPlaceholder(escapeContentSeparators(dataIndex.typst.trim()));
     // Typst root: root(index, radicand)
     res = addToTypstData(res, {
-      typst: 'root(' + escapeContentSeparators(dataIndex.typst.trim()) + ', ' + radicandContent + ')'
+      typst: 'root(' + indexContent + ', ' + radicandContent + ')'
     });
     return res;
   };
@@ -550,8 +553,10 @@ const isNativeDisplayLimitOp = (baseTrimmed: string): boolean =>
 const isSpecialFnCall = (baseTrimmed: string): boolean =>
   RE_SPECIAL_FN_CALL.test(baseTrimmed);
 
-/** Build limit-placement base, returns different block/inline bases for movablelimits. */
+/** Build limit-placement base, returns different block/inline bases for movablelimits.
+ *  baseTrimmed must be the raw trimmed value (no placeholder) for correct classification. */
 const buildLimitBase = (firstChild: any, baseTrimmed: string, base: string): ITypstData => {
+  if (!baseTrimmed) return { typst: typstPlaceholder(base) };
   const movablelimits = getMovablelimits(firstChild);
   const wrapper = isStretchyBase(baseTrimmed, firstChild) ? 'stretch' : 'limits';
   if (movablelimits === true) {
@@ -630,16 +635,16 @@ const mover = () => {
         return res;
       }
     }
-    const baseTrimmed = typstPlaceholder(dataFirst.typst.trim());
+    const rawBase = dataFirst.typst.trim();
     const over = dataSecond.typst.trim();
     if (over) {
-      const braceRes = matchBraceAnnotation(baseTrimmed, over, ['overbrace', 'overbracket']);
+      const braceRes = matchBraceAnnotation(rawBase, over, ['overbrace', 'overbracket']);
       if (braceRes) { res = addToTypstData(res, braceRes); return res; }
-      const baseData = buildLimitBase(firstChild, baseTrimmed, dataFirst.typst);
+      const baseData = buildLimitBase(firstChild, rawBase, dataFirst.typst);
       res = addToTypstData(res, baseData);
       res = addToTypstData(res, { typst: formatScript('^', over) });
     } else {
-      res = addToTypstData(res, { typst: baseTrimmed });
+      res = addToTypstData(res, { typst: typstPlaceholder(rawBase) });
     }
     return res;
   };
@@ -693,16 +698,16 @@ const munder = () => {
         return res;
       }
     }
-    const baseTrimmed = typstPlaceholder(dataFirst.typst.trim());
+    const rawBase = dataFirst.typst.trim();
     const under = dataSecond.typst.trim();
     if (under) {
-      const braceRes = matchBraceAnnotation(baseTrimmed, under, ['underbrace', 'underbracket']);
+      const braceRes = matchBraceAnnotation(rawBase, under, ['underbrace', 'underbracket']);
       if (braceRes) { res = addToTypstData(res, braceRes); return res; }
-      const baseData = buildLimitBase(firstChild, baseTrimmed, dataFirst.typst);
+      const baseData = buildLimitBase(firstChild, rawBase, dataFirst.typst);
       res = addToTypstData(res, baseData);
       res = addToTypstData(res, { typst: formatScript('_', under) });
     } else {
-      res = addToTypstData(res, { typst: baseTrimmed });
+      res = addToTypstData(res, { typst: typstPlaceholder(rawBase) });
     }
     return res;
   };
@@ -721,8 +726,8 @@ const munderover = () => {
     const under = dataSecond.typst.trim();
     const over = dataThird.typst.trim();
     // Use movablelimits to decide between default placement and limits() wrapping
-    const baseTrimmed = typstPlaceholder(dataFirst.typst.trim());
-    const baseData = buildLimitBase(firstChild, baseTrimmed, dataFirst.typst);
+    const rawBase = dataFirst.typst.trim();
+    const baseData = buildLimitBase(firstChild, rawBase, dataFirst.typst);
     res = addToTypstData(res, baseData);
     if (under) {
       res = addToTypstData(res, { typst: formatScript('_', under) });
@@ -755,58 +760,57 @@ const mmultiscripts = () => {
       }
     }
     // Collect post-scripts (pairs after base, before mprescripts).
-    // NOTE: LaTeX generates at most one sub/sup pair per position in mmultiscripts.
-    // These loops keep only the LAST non-empty value. If multiple non-empty pairs
-    // are ever provided, only the final values are emitted.
+    // NOTE: MathML allows multiple sub/sup pairs; in practice LaTeX produces at most one.
+    // Typst attach() accepts only one value per position, so we keep the LAST non-empty value.
     const postEnd = prescriptsIdx >= 0 ? prescriptsIdx : node.childNodes.length;
-    let postSub = '';
-    let postSup = '';
+    let lastPostSub = '';
+    let lastPostSup = '';
     for (let i = 1; i < postEnd; i += 2) {
       const subNode = node.childNodes[i];
       const supNode = node.childNodes[i + 1] || null;
       if (subNode && subNode.kind !== 'none') {
         const d: ITypstData = serialize.visitNode(subNode, '');
-        if (d.typst.trim()) postSub = d.typst.trim();
+        if (d.typst.trim()) lastPostSub = d.typst.trim();
       }
       if (supNode && supNode.kind !== 'none') {
         const d: ITypstData = serialize.visitNode(supNode, '');
-        if (d.typst.trim()) postSup = d.typst.trim();
+        if (d.typst.trim()) lastPostSup = d.typst.trim();
       }
     }
     // Collect pre-scripts (pairs after mprescripts)
-    let preSub = '';
-    let preSup = '';
+    let lastPreSub = '';
+    let lastPreSup = '';
     if (prescriptsIdx >= 0) {
       for (let i = prescriptsIdx + 1; i < node.childNodes.length; i += 2) {
         const subNode = node.childNodes[i];
         const supNode = node.childNodes[i + 1] || null;
         if (subNode && subNode.kind !== 'none') {
           const d: ITypstData = serialize.visitNode(subNode, '');
-          if (d.typst.trim()) preSub = d.typst.trim();
+          if (d.typst.trim()) lastPreSub = d.typst.trim();
         }
         if (supNode && supNode.kind !== 'none') {
           const d: ITypstData = serialize.visitNode(supNode, '');
-          if (d.typst.trim()) preSup = d.typst.trim();
+          if (d.typst.trim()) lastPreSup = d.typst.trim();
         }
       }
     }
-    const hasPrescripts = preSub || preSup;
+    const hasPrescripts = lastPreSub || lastPreSup;
     if (!hasPrescripts) {
       // No prescripts — use simple base_sub^sup syntax
       res = addToTypstData(res, { typst: baseTrimmed });
-      if (postSub) {
-        res = addToTypstData(res, { typst: formatScript('_', postSub) });
+      if (lastPostSub) {
+        res = addToTypstData(res, { typst: formatScript('_', lastPostSub) });
       }
-      if (postSup) {
-        res = addToTypstData(res, { typst: formatScript('^', postSup) });
+      if (lastPostSup) {
+        res = addToTypstData(res, { typst: formatScript('^', lastPostSup) });
       }
     } else {
       // Has prescripts — use attach(base, tl:, bl:, t:, b:)
       const parts: string[] = [];
-      if (preSup) parts.push('tl: ' + preSup);
-      if (preSub) parts.push('bl: ' + preSub);
-      if (postSup) parts.push('t: ' + postSup);
-      if (postSub) parts.push('b: ' + postSub);
+      if (lastPreSup) parts.push('tl: ' + lastPreSup);
+      if (lastPreSub) parts.push('bl: ' + lastPreSub);
+      if (lastPostSup) parts.push('t: ' + lastPostSup);
+      if (lastPostSub) parts.push('b: ' + lastPostSub);
       res = addToTypstData(res, {
         typst: 'attach(' + escapeContentSeparators(baseTrimmed) + ', ' + parts.join(', ') + ')'
       });
@@ -1138,15 +1142,11 @@ export const handle = (node, serialize): ITypstData => {
 
 const handleAll = (node, serialize): ITypstData => {
   let res: ITypstData = initTypstData();
-  try {
-    for (const child of node.childNodes) {
-      const data: ITypstData = serialize.visitNode(child, '');
-      res = addToTypstData(res, data);
-    }
-    return res;
-  } catch (e) {
-    return res;
+  for (const child of node.childNodes) {
+    const data: ITypstData = serialize.visitNode(child, '');
+    res = addToTypstData(res, data);
   }
+  return res;
 };
 
 /** Check if mstyle contains only operator-internal mspace nodes (inside a TeXAtom chain).
