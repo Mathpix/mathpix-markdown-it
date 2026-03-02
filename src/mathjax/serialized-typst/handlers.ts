@@ -866,7 +866,20 @@ const mmultiscripts = () => {
   };
 };
 
-// --- MSPACE handler: spacing commands ---
+// MathML spacing widths → Typst spacing keywords
+const MSPACE_WIDTH_MAP: Record<string, string> = {
+  '2em': ' wide ',
+  '1em': ' quad ',
+  '0.2778em': ' thick ',  // \; → thickmathspace
+  '0.278em': ' thick ',
+  '0.2222em': ' med ',    // \: → mediummathspace
+  '0.222em': ' med ',
+  '0.1667em': ' thin ',   // \, → thinmathspace
+  '0.167em': ' thin ',
+  '-0.1667em': '',         // \! → negative thin space (Typst has no negthin; skip)
+  '-0.167em': '',
+};
+
 const mspace = () => {
   return (node, _serialize): ITypstData => {
     let res: ITypstData = initTypstData();
@@ -876,25 +889,12 @@ const mspace = () => {
         return res;
       }
       const width: string = atr.width.toString();
-      if (width === '2em') {
-        res = addToTypstData(res, { typst: ' wide ' });
-      } else if (width === '1em') {
-        res = addToTypstData(res, { typst: ' quad ' });
-      } else if (width === '0.2778em' || width === '0.278em') {
-        // \; → thickmathspace
-        res = addToTypstData(res, { typst: ' thick ' });
-      } else if (width === '0.2222em' || width === '0.222em') {
-        // \: → mediummathspace
-        res = addToTypstData(res, { typst: ' med ' });
-      } else if (width === '0.1667em' || width === '0.167em') {
-        // \, → thinmathspace
-        res = addToTypstData(res, { typst: ' thin ' });
-      } else if (width === '-0.1667em' || width === '-0.167em') {
-        // \! → negative thin space (Typst has no negthin; skip)
+      const mapped = MSPACE_WIDTH_MAP[width];
+      if (mapped !== undefined) {
+        if (mapped) res = addToTypstData(res, { typst: mapped });
         return res;
-      } else {
-        res = addToTypstData(res, { typst: ' ' });
       }
+      res = addToTypstData(res, { typst: ' ' });
       return res;
     } catch (e) {
       return res;
