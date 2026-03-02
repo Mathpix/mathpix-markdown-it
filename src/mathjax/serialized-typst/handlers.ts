@@ -1,6 +1,6 @@
 import { TEXCLASS } from "mathjax-full/js/core/MmlTree/MmlNode";
+import { ITypstData, ITypstSerializer, HandlerFn, MathNode } from "./types";
 import {
-  ITypstData, ITypstSerializer, HandlerFn, MathNode,
   initTypstData, addToTypstData, addSpaceToTypstData,
   formatScript, isThousandSepComma, needsTokenSeparator, getNodeText, getChildText,
   isFirstChild, isLastChild, getSiblingIndex, typstPlaceholder,

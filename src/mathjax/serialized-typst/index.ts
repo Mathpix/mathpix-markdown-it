@@ -1,7 +1,8 @@
 import { MmlVisitor } from 'mathjax-full/js/core/MmlTree/MmlVisitor.js';
 import { TextNode, XMLNode, TEXCLASS } from 'mathjax-full/js/core/MmlTree/MmlNode.js';
 import { handle } from './handlers';
-import { ITypstData, MathNode, addToTypstData, addSpaceToTypstData, initTypstData, isThousandSepComma, formatScript, needsTokenSeparator, getChildText, DATA_PRE_CONTENT, DATA_POST_CONTENT } from './common';
+import { ITypstData, MathNode } from './types';
+import { addToTypstData, addSpaceToTypstData, initTypstData, isThousandSepComma, formatScript, needsTokenSeparator, getChildText, DATA_PRE_CONTENT, DATA_POST_CONTENT } from './common';
 import { findTypstSymbol } from './typst-symbol-map';
 
 // Extract big delimiter info from a TeXAtom node wrapping a sized mo.

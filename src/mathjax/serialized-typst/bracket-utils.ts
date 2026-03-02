@@ -1,5 +1,6 @@
 import { TEXCLASS } from "mathjax-full/js/core/MmlTree/MmlNode";
-import { getNodeText, RE_BRACKET_CHARS, RE_WORD_CHAR, RE_WORD_DOT_END, ITypstData, ITypstSerializer, MathNode } from "./common";
+import { ITypstData, ITypstSerializer, MathNode } from "./types";
+import { getNodeText, RE_BRACKET_CHARS, RE_WORD_CHAR, RE_WORD_DOT_END } from "./common";
 import { typstSymbolMap } from "./typst-symbol-map";
 
 export const delimiterToTypst = (delim: string): string => {

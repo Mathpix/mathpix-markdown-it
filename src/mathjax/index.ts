@@ -4,7 +4,7 @@ import { SerializedMmlVisitor as MmlVisitor } from 'mathjax-full/js/core/MmlTree
 import { LiteElement } from "mathjax-full/js/adaptors/lite/Element.js";
 import { SerializedAsciiVisitor as AsciiVisitor } from './serialized-ascii';
 import { SerializedTypstVisitor } from './serialized-typst';
-import { ITypstData } from './serialized-typst/common';
+import { ITypstData } from './serialized-typst/types';
 import { markUnpairedBrackets } from './serialized-typst/bracket-utils';
 import { MathMLVisitorWord } from './mathml-word';
 import { getSpeech } from '../sre';

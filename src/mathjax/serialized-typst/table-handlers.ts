@@ -1,5 +1,5 @@
+import { ITypstData, ITypstSerializer, HandlerFn, MathNode } from "./types";
 import {
-  ITypstData, ITypstSerializer, HandlerFn, MathNode,
   initTypstData, addToTypstData, getChildText,
   RE_NBSP, RE_CONTENT_SPECIAL, RE_TAG_EXTRACT, RE_TAG_STRIP,
   DATA_PRE_CONTENT, DATA_POST_CONTENT,
