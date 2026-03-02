@@ -1,7 +1,7 @@
 import { MmlVisitor } from 'mathjax-full/js/core/MmlTree/MmlVisitor.js';
 import { TextNode, XMLNode, TEXCLASS } from 'mathjax-full/js/core/MmlTree/MmlNode.js';
 import { handle } from './handlers';
-import { ITypstData, MathNode } from './types';
+import { ITypstData, ITypstSerializer, MathNode } from './types';
 import {
   DATA_PRE_CONTENT, DATA_POST_CONTENT,
   LEFT_FLOOR, RIGHT_FLOOR, LEFT_CEIL, RIGHT_CEIL,
@@ -9,7 +9,10 @@ import {
   LEFT_ANGLE_OLD, RIGHT_ANGLE_OLD,
   INTEGRAL_SIGN, MIDLINE_ELLIPSIS,
 } from './consts';
-import { addToTypstData, addSpaceToTypstData, initTypstData, isThousandSepComma, formatScript, needsTokenSeparator, getChildText } from './common';
+import {
+  addToTypstData, addSpaceToTypstData, initTypstData,
+  isThousandSepComma, formatScript, needsTokenSeparator, getChildText, getAttrs,
+} from './common';
 import { findTypstSymbol } from './typst-symbol-map';
 
 // Node kinds that carry sub/sup scripts (used in \idotsint pattern detection).
@@ -37,7 +40,7 @@ const getBigDelimInfo = (node: MathNode): { delim: string, size: string, isOpen:
     if (!inferred || !inferred.isInferred) return null;
     const mo = inferred.childNodes?.[0];
     if (!mo || mo.kind !== 'mo') return null;
-    const atr = mo.attributes?.getAllAttributes() || {};
+    const atr = getAttrs<{ minsize?: string }>(mo);
     if (!atr.minsize) return null;
     // Check if this is OPEN or CLOSE via the mo or inferredMrow texClass
     const tc = mo.texClass ?? inferred.texClass ?? node.texClass;
@@ -86,6 +89,158 @@ const getScriptedDelimiterChar = (node: MathNode): string | null => {
   }
 };
 
+/** Check if a child node is a tagged eqnArray mtable. */
+const isTaggedEqnArray = (child: MathNode): boolean => {
+  if (child.kind !== 'mtable') return false;
+  const isEqnArray = child.childNodes.length > 0
+    && child.childNodes[0].attributes?.get('displaystyle');
+  return isEqnArray && child.childNodes.some((c) => c.kind === 'mlabeledtr');
+};
+
+/** Result of a successful pattern match in visitInferredMrowNode. */
+interface PatternResult {
+  typst: string;
+  nextJ: number;
+}
+
+/** Serialize content between two sibling indices, joining with token separators. */
+const serializeRange = (
+  node: MathNode, from: number, to: number,
+  space: string, serialize: ITypstSerializer
+): string => {
+  let content = '';
+  for (let k = from; k < to; k++) {
+    const innerData = serialize.visitNode(node.childNodes[k], space);
+    if (needsTokenSeparator(content, innerData.typst)) content += ' ';
+    content += innerData.typst;
+  }
+  return content;
+};
+
+/** Big delimiter pattern: TeXAtom(OPEN) ... TeXAtom(CLOSE) with sized mo (\big, \Big, etc.) */
+const tryBigDelimiterPattern = (
+  node: MathNode, j: number, space: string, serialize: ITypstSerializer
+): PatternResult | null => {
+  const openInfo = getBigDelimInfo(node.childNodes[j]);
+  if (!openInfo || !openInfo.isOpen) return null;
+  let closeIdx = -1;
+  for (let k = j + 1; k < node.childNodes.length; k++) {
+    const closeCandidate = getBigDelimInfo(node.childNodes[k]);
+    if (closeCandidate && !closeCandidate.isOpen) {
+      closeIdx = k;
+      break;
+    }
+  }
+  if (closeIdx < 0) return null;
+  const closeInfo = getBigDelimInfo(node.childNodes[closeIdx]);
+  const content = serializeRange(node, j + 1, closeIdx, space, serialize);
+  const openDelim = findTypstSymbol(openInfo.delim);
+  const closeDelim = findTypstSymbol(closeInfo?.delim || ')');
+  return {
+    typst: `lr(size: #${openInfo.size}, ${openDelim} ${content.trim()} ${closeDelim})`,
+    nextJ: closeIdx + 1,
+  };
+};
+
+/** Bare delimiter pairing: |...|, ⌊...⌋, ⌈...⌉, ‖...‖, ⟨...⟩ without \left...\right.
+ *  Also detects closing delimiters inside msub/msup/msubsup (e.g. \|x\|_2 → norm(x)_2). */
+const tryBareDelimiterPattern = (
+  node: MathNode, j: number, space: string, serialize: ITypstSerializer
+): PatternResult | null => {
+  const delimChar = getDelimiterChar(node.childNodes[j]);
+  const delimPair = delimChar ? BARE_DELIM_PAIRS[delimChar] : null;
+  if (!delimPair) return null;
+  // For symmetric delimiters, skip inside TeXAtom groups
+  if (delimChar === delimPair.close && node.parent?.kind === 'TeXAtom') return null;
+  let closeIdx = -1;
+  let closeIsScripted = false;
+  for (let k = j + 1; k < node.childNodes.length; k++) {
+    if (getDelimiterChar(node.childNodes[k]) === delimPair.close) {
+      closeIdx = k;
+      break;
+    }
+    if (getScriptedDelimiterChar(node.childNodes[k]) === delimPair.close) {
+      closeIdx = k;
+      closeIsScripted = true;
+      break;
+    }
+  }
+  if (closeIdx <= j + 1) return null; // need at least one node between delimiters
+  const content = serializeRange(node, j + 1, closeIdx, space, serialize);
+  let delimExpr = `${delimPair.typstOpen}${content.trim()}${delimPair.typstClose}`;
+  // When the closing delimiter is inside a script node (e.g. ‖_2),
+  // extract and append the script parts to the delimited expression.
+  if (closeIsScripted) {
+    const scriptNode = node.childNodes[closeIdx];
+    if (scriptNode.kind === 'msubsup') {
+      const sub = scriptNode.childNodes[1] ? serialize.visitNode(scriptNode.childNodes[1], '').typst.trim() : '';
+      const sup = scriptNode.childNodes[2] ? serialize.visitNode(scriptNode.childNodes[2], '').typst.trim() : '';
+      if (sub) delimExpr += formatScript('_', sub);
+      if (sup) delimExpr += formatScript('^', sup);
+    } else if (scriptNode.kind === 'msub') {
+      const sub = scriptNode.childNodes[1] ? serialize.visitNode(scriptNode.childNodes[1], '').typst.trim() : '';
+      if (sub) delimExpr += formatScript('_', sub);
+    } else if (scriptNode.kind === 'msup') {
+      const sup = scriptNode.childNodes[1] ? serialize.visitNode(scriptNode.childNodes[1], '').typst.trim() : '';
+      if (sup) delimExpr += formatScript('^', sup);
+    }
+  }
+  return { typst: delimExpr, nextJ: closeIdx + 1 };
+};
+
+/** \idotsint pattern: mo(∫) mo(⋯) scripted(mo(∫)) → lr(integral dots.c integral)_sub^sup */
+const tryIdotsintPattern = (
+  node: MathNode, j: number, space: string, serialize: ITypstSerializer
+): PatternResult | null => {
+  const child = node.childNodes[j];
+  if (child?.kind !== 'mo' || getChildText(child) !== INTEGRAL_SIGN) return null;
+  const next1 = node.childNodes[j + 1];
+  const next2 = node.childNodes[j + 2];
+  if (!next1 || next1.kind !== 'mo' || getChildText(next1) !== MIDLINE_ELLIPSIS || !next2) return null;
+  const scriptBase = next2.childNodes?.[0];
+  if (!SCRIPT_KINDS.has(next2.kind) || scriptBase?.kind !== 'mo' || getChildText(scriptBase) !== INTEGRAL_SIGN) return null;
+  // Serialize the three base parts
+  const part1 = serialize.visitNode(child, space);
+  const part2 = serialize.visitNode(next1, space);
+  const part3 = findTypstSymbol(INTEGRAL_SIGN);
+  // Build base: "integral dots.c integral"
+  let baseContent = part1.typst;
+  if (needsTokenSeparator(baseContent, part2.typst)) baseContent += ' ';
+  baseContent += part2.typst;
+  if (needsTokenSeparator(baseContent, part3)) baseContent += ' ';
+  baseContent += part3;
+  let typst = `lr(${baseContent.trim()})`;
+  // Add scripts from the scripted node
+  const subChild = next2.kind !== 'msup' ? next2.childNodes[1] : null;
+  const supChild = next2.kind === 'msubsup' ? next2.childNodes[2]
+                 : next2.kind === 'msup' ? next2.childNodes[1] : null;
+  if (subChild) {
+    const sub = serialize.visitNode(subChild, space).typst.trim();
+    if (sub) typst += formatScript('_', sub);
+  }
+  if (supChild) {
+    const sup = serialize.visitNode(supChild, space).typst.trim();
+    if (sup) typst += formatScript('^', sup);
+  }
+  return { typst, nextJ: j + 3 };
+};
+
+/** Thousand separator chain: mn, mo(,), mn(3 digits) → 1\,000\,000 */
+const tryThousandSepPattern = (
+  node: MathNode, j: number, space: string, serialize: ITypstSerializer
+): PatternResult | null => {
+  if (!isThousandSepComma(node, j)) return null;
+  const numData = serialize.visitNode(node.childNodes[j], space);
+  let chainTypst = numData.typst;
+  let k = j;
+  while (isThousandSepComma(node, k)) {
+    const nextData = serialize.visitNode(node.childNodes[k + 2], space);
+    chainTypst += `\\,${nextData.typst}`;
+    k += 2;
+  }
+  return { typst: chainTypst, nextJ: k + 1 };
+};
+
 export interface ITypstVisitorOptions {
   [key: string]: any;
 }
@@ -128,207 +283,65 @@ export class SerializedTypstVisitor extends MmlVisitor {
       let j = 0;
       while (j < node.childNodes.length) {
         const child = node.childNodes[j];
-        // Detect big delimiter pattern: TeXAtom(OPEN) ... TeXAtom(CLOSE)
-        // with sized mo (from \big, \Big, \bigg, \Bigg)
-        const openInfo = getBigDelimInfo(child);
-        if (openInfo && openInfo.isOpen) {
-          // Find matching CLOSE
-          let closeIdx = -1;
-          for (let k = j + 1; k < node.childNodes.length; k++) {
-            const closeCandidate = getBigDelimInfo(node.childNodes[k]);
-            if (closeCandidate && !closeCandidate.isOpen) {
-              closeIdx = k;
-              break;
-            }
-          }
-          if (closeIdx >= 0) {
-            const closeInfo = getBigDelimInfo(node.childNodes[closeIdx]);
-            // Serialize content between delimiters
-            let content = '';
-            for (let k = j + 1; k < closeIdx; k++) {
-              const innerData: ITypstData = this.visitNode(node.childNodes[k], space);
-              if (needsTokenSeparator(content, innerData.typst)) {
-                content += ' ';
-              }
-              content += innerData.typst;
-            }
-            const openDelim = findTypstSymbol(openInfo.delim);
-            const closeDelim = findTypstSymbol(closeInfo?.delim || ')');
-            const lrContent = openDelim + ' ' + content.trim() + ' ' + closeDelim;
-            const lrExpr = 'lr(size: #' + openInfo.size + ', ' + lrContent + ')';
-            // Add spacing before lr if needed
-            if (needsTokenSeparator(res.typst, lrExpr)) {
-              addSpaceToTypstData(res);
-            }
-            res = addToTypstData(res, { typst: lrExpr });
-            j = closeIdx + 1;
-            continue;
-          }
-        }
-        // Detect paired delimiters without \left...\right:
-        // |...| → lr(| ... |), ⌊...⌋ → floor(...), ⌈...⌉ → ceil(...), ‖...‖ → norm(...), ⟨...⟩ → lr(chevron.l ... chevron.r)
-        // For symmetric delimiters (|, ‖), skip inside TeXAtom groups
-        // (e.g. {|\alpha|} in superscripts) where content is already grouped.
-        // Also detects closing delimiters inside msub/msup/msubsup (e.g. \|x\|_2 → norm(x)_2).
-        const delimChar = getDelimiterChar(child);
-        const delimPair = delimChar ? BARE_DELIM_PAIRS[delimChar] : null;
-        if (delimPair && !(delimChar === delimPair.close && node.parent?.kind === 'TeXAtom')) {
-          let closeIdx = -1;
-          let closeIsScripted = false;
-          for (let k = j + 1; k < node.childNodes.length; k++) {
-            // First check bare delimiter
-            if (getDelimiterChar(node.childNodes[k]) === delimPair.close) {
-              closeIdx = k;
-              break;
-            }
-            // Then check delimiter inside msub/msup/msubsup base (e.g. ‖_2)
-            if (getScriptedDelimiterChar(node.childNodes[k]) === delimPair.close) {
-              closeIdx = k;
-              closeIsScripted = true;
-              break;
-            }
-          }
-          if (closeIdx > j + 1) {
-            let content = '';
-            for (let k = j + 1; k < closeIdx; k++) {
-              const innerData: ITypstData = this.visitNode(node.childNodes[k], space);
-              if (needsTokenSeparator(content, innerData.typst)) {
-                content += ' ';
-              }
-              content += innerData.typst;
-            }
-            let delimExpr = delimPair.typstOpen + content.trim() + delimPair.typstClose;
-            // When the closing delimiter is inside a script node (e.g. ‖_2),
-            // extract and append the script parts to the delimited expression.
-            if (closeIsScripted) {
-              const scriptNode = node.childNodes[closeIdx];
-              if (scriptNode.kind === 'msubsup') {
-                const sub = scriptNode.childNodes[1] ? this.visitNode(scriptNode.childNodes[1], '').typst.trim() : '';
-                const sup = scriptNode.childNodes[2] ? this.visitNode(scriptNode.childNodes[2], '').typst.trim() : '';
-                if (sub) delimExpr += formatScript('_', sub);
-                if (sup) delimExpr += formatScript('^', sup);
-              } else if (scriptNode.kind === 'msub') {
-                const sub = scriptNode.childNodes[1] ? this.visitNode(scriptNode.childNodes[1], '').typst.trim() : '';
-                if (sub) delimExpr += formatScript('_', sub);
-              } else if (scriptNode.kind === 'msup') {
-                const sup = scriptNode.childNodes[1] ? this.visitNode(scriptNode.childNodes[1], '').typst.trim() : '';
-                if (sup) delimExpr += formatScript('^', sup);
-              }
-            }
-            if (needsTokenSeparator(res.typst, delimExpr)) {
-              addSpaceToTypstData(res);
-            }
-            res = addToTypstData(res, { typst: delimExpr });
-            j = closeIdx + 1;
-            continue;
-          }
-        }
-        // Detect \idotsint pattern: mo(∫) mo(⋯) msubsup/msub/msup(mo(∫), ...)
-        // Group as lr(integral dots.c integral)_(sub)^(sup)
-        if (child?.kind === 'mo' && getChildText(child) === INTEGRAL_SIGN) {
-          const next1 = node.childNodes[j + 1];
-          const next2 = node.childNodes[j + 2];
-          if (next1?.kind === 'mo' && getChildText(next1) === MIDLINE_ELLIPSIS && next2) {
-            const scriptBase = next2.childNodes?.[0];
-            if (SCRIPT_KINDS.has(next2.kind)
-              && scriptBase?.kind === 'mo'
-              && getChildText(scriptBase) === INTEGRAL_SIGN) {
-              // Serialize the three base parts
-              const part1: ITypstData = this.visitNode(child, space);
-              const part2: ITypstData = this.visitNode(next1, space);
-              const part3 = findTypstSymbol(INTEGRAL_SIGN);
-              // Build base: "integral dots.c integral"
-              let baseContent = part1.typst;
-              if (needsTokenSeparator(baseContent, part2.typst)) {
-                baseContent += ' ';
-              }
-              baseContent += part2.typst;
-              if (needsTokenSeparator(baseContent, part3)) {
-                baseContent += ' ';
-              }
-              baseContent += part3;
-              const lrExpr = 'lr(' + baseContent.trim() + ')';
-              // Add spacing before lr if needed
-              if (needsTokenSeparator(res.typst, lrExpr)) {
-                addSpaceToTypstData(res);
-              }
-              res = addToTypstData(res, { typst: lrExpr });
-              // Add scripts from the scripted node (sub at childNodes[1], sup at childNodes[2] for msubsup;
-              // single script at childNodes[1] for msub/msup)
-              const subChild = next2.kind !== 'msup' ? next2.childNodes[1] : null;
-              const supChild = next2.kind === 'msubsup' ? next2.childNodes[2]
-                             : next2.kind === 'msup' ? next2.childNodes[1] : null;
-              if (subChild) {
-                const sub = this.visitNode(subChild, space).typst.trim();
-                if (sub) {
-                  res = addToTypstData(res, { typst: formatScript('_', sub) });
-                }
-              }
-              if (supChild) {
-                const sup = this.visitNode(supChild, space).typst.trim();
-                if (sup) {
-                  res = addToTypstData(res, { typst: formatScript('^', sup) });
-                }
-              }
-              j += 3;
-              continue;
-            }
-          }
-        }
-        // Detect thousand-separator chain: mn, mo(,), mn(3 digits), ...
-        // e.g. 1,000,000 → 1\,000\,000 (commas escaped so Typst doesn't treat them as separators)
-        // Also handles Indian numbering: 41,70,000 → 41\,70\,000
-        if (isThousandSepComma(node, j)) {
-          const numData: ITypstData = this.visitNode(child, space);
-          if (needsTokenSeparator(res.typst, numData.typst)) {
-            addSpaceToTypstData(res);
-          }
-          let chainTypst = numData.typst;
-          let k = j;
-          while (isThousandSepComma(node, k)) {
-            const nextData: ITypstData = this.visitNode(node.childNodes[k + 2], space);
-            chainTypst += '\\,' + nextData.typst;
-            k += 2;
-          }
-          res = addToTypstData(res, { typst: chainTypst });
-          j = k + 1;
+        // Pattern 1: Big delimiter (\big, \Big, \bigg, \Bigg)
+        const bigDelim = tryBigDelimiterPattern(node, j, space, this);
+        if (bigDelim) {
+          if (needsTokenSeparator(res.typst, bigDelim.typst)) addSpaceToTypstData(res);
+          res = addToTypstData(res, { typst: bigDelim.typst });
+          j = bigDelim.nextJ;
           continue;
         }
-        // Check if this child is a tagged eqnArray mtable with sibling content.
-        // When math content precedes or follows \begin{align*}/\begin{gather*} inside
-        // the same $...$, it must be merged into the equation block.
-        if (child.kind === 'mtable') {
-          const childIsEqnArray = child.childNodes.length > 0
-            && child.childNodes[0].attributes?.get('displaystyle');
-          const childHasTag = childIsEqnArray
-            && child.childNodes.some((c) => c.kind === 'mlabeledtr');
-          if (childHasTag) {
-            // Pre-content: accumulated prefix before the mtable
-            if (res.typst.trim()) {
-              child.setProperty(DATA_PRE_CONTENT, res.typst.trim());
-              res = initTypstData();
-            }
-            // Post-content: serialize remaining siblings after the mtable
-            let postContent = '';
-            for (let k = j + 1; k < node.childNodes.length; k++) {
-              const postData: ITypstData = this.visitNode(node.childNodes[k], space);
-              if (needsTokenSeparator(postContent, postData.typst)) {
-                postContent += ' ';
-              }
-              postContent += postData.typst;
-            }
-            if (postContent.trim()) {
-              child.setProperty(DATA_POST_CONTENT, postContent.trim());
-            }
-            // Process the mtable itself
-            const data: ITypstData = this.visitNode(child, space);
-            if (needsTokenSeparator(res.typst, data.typst)) {
-              addSpaceToTypstData(res);
-            }
-            res = addToTypstData(res, data);
-            // Skip all remaining siblings (already serialized as post-content)
-            break;
+        // Pattern 2: Bare delimiter pairing (|...|, ⌊...⌋, ⌈...⌉, ‖...‖, ⟨...⟩)
+        const bareDelim = tryBareDelimiterPattern(node, j, space, this);
+        if (bareDelim) {
+          if (needsTokenSeparator(res.typst, bareDelim.typst)) addSpaceToTypstData(res);
+          res = addToTypstData(res, { typst: bareDelim.typst });
+          j = bareDelim.nextJ;
+          continue;
+        }
+        // Pattern 3: \idotsint (∫⋯∫ with scripts)
+        const idotsint = tryIdotsintPattern(node, j, space, this);
+        if (idotsint) {
+          if (needsTokenSeparator(res.typst, idotsint.typst)) addSpaceToTypstData(res);
+          res = addToTypstData(res, { typst: idotsint.typst });
+          j = idotsint.nextJ;
+          continue;
+        }
+        // Pattern 4: Thousand separator chain (1,000,000)
+        const thousandSep = tryThousandSepPattern(node, j, space, this);
+        if (thousandSep) {
+          if (needsTokenSeparator(res.typst, thousandSep.typst)) addSpaceToTypstData(res);
+          res = addToTypstData(res, { typst: thousandSep.typst });
+          j = thousandSep.nextJ;
+          continue;
+        }
+        // Pattern 5: Tagged eqnArray mtable with sibling content
+        if (isTaggedEqnArray(child)) {
+          // Pre-content: accumulated prefix before the mtable
+          if (res.typst.trim()) {
+            child.setProperty(DATA_PRE_CONTENT, res.typst.trim());
+            res = initTypstData();
           }
+          // Post-content: serialize remaining siblings after the mtable
+          let postContent = '';
+          for (let k = j + 1; k < node.childNodes.length; k++) {
+            const postData: ITypstData = this.visitNode(node.childNodes[k], space);
+            if (needsTokenSeparator(postContent, postData.typst)) {
+              postContent += ' ';
+            }
+            postContent += postData.typst;
+          }
+          if (postContent.trim()) {
+            child.setProperty(DATA_POST_CONTENT, postContent.trim());
+          }
+          // Process the mtable itself
+          const data: ITypstData = this.visitNode(child, space);
+          if (needsTokenSeparator(res.typst, data.typst)) {
+            addSpaceToTypstData(res);
+          }
+          res = addToTypstData(res, data);
+          // Skip all remaining siblings (already serialized as post-content)
+          break;
         }
         // Normal processing
         const data: ITypstData = this.visitNode(child, space);
