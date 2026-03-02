@@ -288,6 +288,19 @@ export class SerializedTypstVisitor extends MmlVisitor {
           j = k + 1;
           continue;
         }
+        // Check if this child is a tagged eqnArray mtable with accumulated prefix content.
+        // When math content precedes \begin{align*} inside the same $...$, the prefix
+        // must be merged into the equation block rather than orphaned outside it.
+        if (child.kind === 'mtable' && res.typst.trim()) {
+          const childIsEqnArray = child.childNodes.length > 0
+            && child.childNodes[0].attributes?.get('displaystyle');
+          const childHasTag = childIsEqnArray
+            && child.childNodes.some((c: any) => c.kind === 'mlabeledtr');
+          if (childHasTag) {
+            child.properties['data-pre-content'] = res.typst.trim();
+            res = initTypstData();
+          }
+        }
         // Normal processing
         const data: ITypstData = this.visitNode(child, space);
         if (needsTokenSeparator(res.typst, data.typst)) {

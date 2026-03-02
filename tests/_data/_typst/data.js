@@ -1811,6 +1811,13 @@ module.exports = [
     typst_inline: `a &= b \\\nc &= d`,
   },
 
+  // Pre-align content: math before \begin{align*} merged into equation block
+  {
+    latex: `\\overrightarrow{\\boldsymbol{P}}=\\overrightarrow{\\boldsymbol{p}}_{A}+\\cdots \\begin{align*}\n& \\text { (total momentum of }  \\tag{8.14}\\\\\n& \\text { a system of particles) }\n\\end{align*}`,
+    typst: `#math.equation(block: true, numbering: n => [(8.14)], number-align: end + horizon, $ arrow(bold(P)) = arrow(bold(p))_A + dots.c \\\n &" (total momentum of " \\\n &" a system of particles) " $)\n#counter(math.equation).update(n => n - 1)`,
+    typst_inline: `arrow(bold(P)) = arrow(bold(p))_A + dots.c \\\n &" (total momentum of " \\\n &" a system of particles) "`,
+  },
+
   // === Empty base superscript, pipes as absolute value, operator before paren ===
   {
     latex: `^{|\\alpha|} \\sqrt{x^{\\alpha}} \\leq(x \\bullet \\alpha) /|\\alpha|`,

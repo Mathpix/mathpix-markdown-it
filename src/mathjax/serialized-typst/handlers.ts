@@ -1730,6 +1730,10 @@ const mtable = () => {
         const hasAnyTag = node.childNodes.some(
           (child: any) => child.kind === 'mlabeledtr'
         );
+        // Check for pre-content passed from visitInferredMrowNode
+        // (math content preceding this mtable in the same $...$)
+        const preContent = (node as any).properties?.['data-pre-content'] || '';
+
         if (hasAnyTag) {
           // Analyze tag pattern: count explicit tags and auto-number tags
           const rowTagInfos: { isTagged: boolean; isAutoTag: boolean; isExplicitTag: boolean; tagContent: string; labelKey: string | null }[] = [];
@@ -1761,15 +1765,20 @@ const mtable = () => {
             const tagIdx = explicitTagIndices[0];
             const info = rowTagInfos[tagIdx];
             // Determine number-align based on tag position
+            // When preContent exists, it becomes an extra row at the top
+            const totalRows = preContent ? countRow + 1 : countRow;
+            const adjustedTagIdx = preContent ? tagIdx + 1 : tagIdx;
             let numberAlign: string;
-            if (tagIdx === countRow - 1) {
+            if (adjustedTagIdx === totalRows - 1) {
               numberAlign = 'end + bottom';
-            } else if (tagIdx === 0) {
+            } else if (adjustedTagIdx === 0) {
               numberAlign = 'end + top';
             } else {
               numberAlign = 'end + horizon';
             }
-            const mathContent = rows.join(' \\\n');
+            const mathContent = preContent
+              ? preContent + ' \\\n' + rows.join(' \\\n')
+              : rows.join(' \\\n');
             const supplementPart = info.labelKey ? ', supplement: none' : '';
             const numberAlignPart = ', number-align: ' + numberAlign;
             const labelSuffix = info.labelKey ? ' <' + info.labelKey + '>' : '';
@@ -1778,10 +1787,16 @@ const mtable = () => {
               + numberAlignPart + ', $ ' + mathContent + ' $)' + labelSuffix
               + '\n#counter(math.equation).update(n => n - 1)';
             res = addToTypstData(res, { typst: block });
-            res.typst_inline = rows.join(' \\\n');
+            res.typst_inline = preContent
+              ? preContent + ' \\\n' + rows.join(' \\\n')
+              : rows.join(' \\\n');
           } else if (totalTagged > 0) {
             // Strategy: separate — multiple tags or auto-numbered rows
             // Each row becomes a separate #math.equation block
+            // Prepend pre-content to first row if present
+            if (preContent && rows.length > 0) {
+              rows[0] = preContent + ' \\\n' + rows[0];
+            }
             const eqnBlocks: string[] = [];
             for (let i = 0; i < countRow; i++) {
               const info = rowTagInfos[i];
@@ -1807,7 +1822,10 @@ const mtable = () => {
             res.typst_inline = rows.join(' \\\n');
           } else {
             // mlabeledtr nodes present but no actual tag content — treat as no-tag
-            res = addToTypstData(res, { typst: rows.join(' \\\n') });
+            const noTagContent = preContent
+              ? preContent + ' \\\n' + rows.join(' \\\n')
+              : rows.join(' \\\n');
+            res = addToTypstData(res, { typst: noTagContent });
           }
         } else {
           // No tags at all (e.g. align*): emit as single block with \ separators
