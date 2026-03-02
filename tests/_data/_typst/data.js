@@ -1818,6 +1818,13 @@ module.exports = [
     typst_inline: `arrow(bold(P)) = arrow(bold(p))_A + dots.c \\\n &" (total momentum of " \\\n &" a system of particles) "`,
   },
 
+  // Post-align content: math after \end{gather*} merged into last row
+  {
+    latex: `\\begin{gather*}\n\\tau_{i, j}  \\tag{2-4}\\\\\n\\}\n\\end{gather*}(t+1)=\\rho \\tau_{i, j}(t)+\\Delta \\tau_{i, j}(t, t+1)`,
+    typst: `#math.equation(block: true, numbering: n => [(2-4)], number-align: end + top, $ tau_(i, j) \\\n\\} (t + 1) = rho tau_(i, j)(t) + Delta tau_(i, j)(t, t + 1) $)\n#counter(math.equation).update(n => n - 1)`,
+    typst_inline: `tau_(i, j) \\\n\\} (t + 1) = rho tau_(i, j)(t) + Delta tau_(i, j)(t, t + 1)`,
+  },
+
   // === Empty base superscript, pipes as absolute value, operator before paren ===
   {
     latex: `^{|\\alpha|} \\sqrt{x^{\\alpha}} \\leq(x \\bullet \\alpha) /|\\alpha|`,

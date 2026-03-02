@@ -288,17 +288,40 @@ export class SerializedTypstVisitor extends MmlVisitor {
           j = k + 1;
           continue;
         }
-        // Check if this child is a tagged eqnArray mtable with accumulated prefix content.
-        // When math content precedes \begin{align*} inside the same $...$, the prefix
-        // must be merged into the equation block rather than orphaned outside it.
-        if (child.kind === 'mtable' && res.typst.trim()) {
+        // Check if this child is a tagged eqnArray mtable with sibling content.
+        // When math content precedes or follows \begin{align*}/\begin{gather*} inside
+        // the same $...$, it must be merged into the equation block.
+        if (child.kind === 'mtable') {
           const childIsEqnArray = child.childNodes.length > 0
             && child.childNodes[0].attributes?.get('displaystyle');
           const childHasTag = childIsEqnArray
             && child.childNodes.some((c: any) => c.kind === 'mlabeledtr');
           if (childHasTag) {
-            child.properties['data-pre-content'] = res.typst.trim();
-            res = initTypstData();
+            // Pre-content: accumulated prefix before the mtable
+            if (res.typst.trim()) {
+              child.properties['data-pre-content'] = res.typst.trim();
+              res = initTypstData();
+            }
+            // Post-content: serialize remaining siblings after the mtable
+            let postContent = '';
+            for (let k = j + 1; k < node.childNodes.length; k++) {
+              const postData: ITypstData = this.visitNode(node.childNodes[k], space);
+              if (needsTokenSeparator(postContent, postData.typst)) {
+                postContent += ' ';
+              }
+              postContent += postData.typst;
+            }
+            if (postContent.trim()) {
+              child.properties['data-post-content'] = postContent.trim();
+            }
+            // Process the mtable itself
+            const data: ITypstData = this.visitNode(child, space);
+            if (needsTokenSeparator(res.typst, data.typst)) {
+              addSpaceToTypstData(res);
+            }
+            res = addToTypstData(res, data);
+            // Skip all remaining siblings (already serialized as post-content)
+            break;
           }
         }
         // Normal processing

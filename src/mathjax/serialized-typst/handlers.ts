@@ -1730,9 +1730,10 @@ const mtable = () => {
         const hasAnyTag = node.childNodes.some(
           (child: any) => child.kind === 'mlabeledtr'
         );
-        // Check for pre-content passed from visitInferredMrowNode
-        // (math content preceding this mtable in the same $...$)
+        // Check for pre/post-content passed from visitInferredMrowNode
+        // (math content preceding/following this mtable in the same $...$)
         const preContent = (node as any).properties?.['data-pre-content'] || '';
+        const postContent = (node as any).properties?.['data-post-content'] || '';
 
         if (hasAnyTag) {
           // Analyze tag pattern: count explicit tags and auto-number tags
@@ -1764,9 +1765,14 @@ const mtable = () => {
           if (explicitTagIndices.length === 1 && autoTagIndices.length === 0 && countRow > 1) {
             const tagIdx = explicitTagIndices[0];
             const info = rowTagInfos[tagIdx];
+            // Merge pre/post content into rows
+            if (postContent && rows.length > 0) {
+              rows[rows.length - 1] = rows[rows.length - 1] + ' ' + postContent;
+            }
             // Determine number-align based on tag position
             // When preContent exists, it becomes an extra row at the top
-            const totalRows = preContent ? countRow + 1 : countRow;
+            const totalRows = (preContent ? countRow + 1 : countRow)
+              + (postContent && rows.length === 0 ? 1 : 0);
             const adjustedTagIdx = preContent ? tagIdx + 1 : tagIdx;
             let numberAlign: string;
             if (adjustedTagIdx === totalRows - 1) {
@@ -1793,9 +1799,12 @@ const mtable = () => {
           } else if (totalTagged > 0) {
             // Strategy: separate — multiple tags or auto-numbered rows
             // Each row becomes a separate #math.equation block
-            // Prepend pre-content to first row if present
+            // Merge pre/post content into rows
             if (preContent && rows.length > 0) {
               rows[0] = preContent + ' \\\n' + rows[0];
+            }
+            if (postContent && rows.length > 0) {
+              rows[rows.length - 1] = rows[rows.length - 1] + ' ' + postContent;
             }
             const eqnBlocks: string[] = [];
             for (let i = 0; i < countRow; i++) {
@@ -1822,6 +1831,9 @@ const mtable = () => {
             res.typst_inline = rows.join(' \\\n');
           } else {
             // mlabeledtr nodes present but no actual tag content — treat as no-tag
+            if (postContent && rows.length > 0) {
+              rows[rows.length - 1] = rows[rows.length - 1] + ' ' + postContent;
+            }
             const noTagContent = preContent
               ? preContent + ' \\\n' + rows.join(' \\\n')
               : rows.join(' \\\n');
@@ -1829,7 +1841,13 @@ const mtable = () => {
           }
         } else {
           // No tags at all (e.g. align*): emit as single block with \ separators
-          res = addToTypstData(res, { typst: rows.join(' \\\n') });
+          if (postContent && rows.length > 0) {
+            rows[rows.length - 1] = rows[rows.length - 1] + ' ' + postContent;
+          }
+          const noTagContent2 = preContent
+            ? preContent + ' \\\n' + rows.join(' \\\n')
+            : rows.join(' \\\n');
+          res = addToTypstData(res, { typst: noTagContent2 });
         }
       } else if (isCases) {
         // Cases environment
