@@ -90,7 +90,7 @@ All new Typst code lives in `src/mathjax/serialized-typst/`:
 
 | File | Purpose |
 |------|---------|
-| `index.ts` | `SerializedTypstVisitor` class — extends MathJax's `MmlVisitor`, handles root traversal, inferred mrow spacing, big delimiter detection (`\big`, `\Big`, etc.), bare delimiter-pair grouping (`|...|`, `⌊...⌋`, `⌈...⌉`, `‖...‖`), `\idotsint` grouping (integral-dots-integral pattern via `SCRIPT_KINDS` constant), and thousand-separator comma detection |
+| `index.ts` | `SerializedTypstVisitor` class — extends MathJax's `MmlVisitor`, handles root traversal, inferred mrow spacing, big delimiter detection (`\big`, `\Big`, etc.), bare delimiter-pair grouping (`|...|`, `⌊...⌋`, `⌈...⌉`, `‖...‖`), `\idotsint` grouping (integral-dots-integral pattern via `SCRIPT_KINDS` constant), thousand-separator comma detection, and pre-align content merging (passes accumulated prefix to tagged eqnArray mtable via `data-pre-content` property) |
 | `handlers.ts` | Node-type handlers — one function per MathML element (`mi`, `mo`, `mn`, `mfrac`, `msup`, `msub`, `msubsup`, `msqrt`, `mroot`, `mover`, `munder`, `munderover`, `mmultiscripts`, `mrow`, `mtable`, `mtext`, `mspace`, `mpadded`, `mstyle`, `mphantom`, `menclose`) |
 | `typst-symbol-map.ts` | Unicode → Typst symbol name mapping tables (Greek, binary operators, relations, arrows, delimiters, large operators, misc) plus accent map and font map |
 | `common.ts` | `ITypstData` interface, `initTypstData`, `addToTypstData`, `addSpaceToTypstData`, `needsParens`, `isThousandSepComma`, `needsTokenSeparator` helpers |
@@ -300,6 +300,12 @@ Each numbered equation is emitted as an independent `#math.equation(block: true,
 | `\begin{align} a &= b \\ c &= d \end{align}` (auto) | separate | `#math.equation(block: true, numbering: "(1)", $ a = b $)` per row |
 | `\begin{align} a &= b \\ c &= d \nonumber \end{align}` | separate | `#math.equation(...)` + `#math.equation(block: true, numbering: none, ...)` |
 | `\begin{equation} \begin{split} a &= b \\ &= c \end{split} \end{equation}` | single-row | `#math.equation(block: true, numbering: "(1)", $ a = b \` newline ` = c $)` (single number) |
+
+**Pre-align content merging:** When math content precedes `\begin{align*}` inside the same `$...$` (e.g. `$\vec{P}=\vec{p}_A+\cdots \begin{align*} & \text{(total momentum...} \tag{8.14} \\ & \text{...} \end{align*}$`), the MathML tree places the mtable as a sibling child in `inferredMrow` alongside the preceding math nodes. Without special handling, the prefix content would be serialized outside the `#math.equation(...)` block, breaking Typst output. The `visitInferredMrowNode` method detects this pattern — when accumulated prefix content precedes a tagged eqnArray mtable, it stores the prefix on the mtable node via a `data-pre-content` property. The mtable handler reads this property and prepends the prefix as the first visual row (separated by `\`), recalculating `number-align` for the adjusted row count.
+
+| LaTeX | Typst |
+|-------|-------|
+| `\vec{P}=\vec{p}_A+\cdots \begin{align*} & \text{(total momentum...} \tag{8.14} \\ & \text{...particles)} \end{align*}` | `#math.equation(block: true, numbering: n => [(8.14)], number-align: end + horizon, $ arrow(bold(P)) = ... + dots.c \` newline `&"(total momentum..." \` newline `&"...particles)" $)` + counter rollback |
 
 **Labels on equations** (`\label{eq:1}`): When a `\label{}` is present, the serializer emits a Typst label `<key>` after the equation block, and adds `supplement: none` to prevent Typst from prefixing "Equation" when referencing:
 
@@ -747,7 +753,7 @@ This ensures paired delimiters form grouped expressions in Typst (important afte
 
 | File | Change |
 |------|--------|
-| `src/mathjax/serialized-typst/index.ts` | **New.** `SerializedTypstVisitor` class with root traversal, big-delimiter detection, bare delimiter-pair grouping (`|`, `⌊⌋`, `⌈⌉`, `‖`, `⟨⟩`) with scripted-closing-delimiter support (`getScriptedDelimiterChar`), `\idotsint` grouping via `SCRIPT_KINDS`, thousand-separator comma detection; uses `needsTokenSeparator` for token spacing |
+| `src/mathjax/serialized-typst/index.ts` | **New.** `SerializedTypstVisitor` class with root traversal, big-delimiter detection, bare delimiter-pair grouping (`|`, `⌊⌋`, `⌈⌉`, `‖`, `⟨⟩`) with scripted-closing-delimiter support (`getScriptedDelimiterChar`), `\idotsint` grouping via `SCRIPT_KINDS`, thousand-separator comma detection, pre-align content merging (detects tagged eqnArray mtable with sibling prefix and passes prefix via `data-pre-content` property); uses `needsTokenSeparator` for token spacing |
 | `src/mathjax/serialized-typst/handlers.ts` | **New.** 20+ MathML node-type handlers for Typst serialization; handlers for `mtable`/frame and `menclose`/box set separate `typst_inline` without block wrappers |
 | `src/mathjax/serialized-typst/typst-symbol-map.ts` | **New.** Unicode → Typst symbol mapping (~300 entries), accent map, font map |
 | `src/mathjax/serialized-typst/common.ts` | **New.** `ITypstData` interface with optional `typst_inline`; `initTypstData`, `addToTypstData` (always propagates `typst_inline` with `typst` fallback), `addSpaceToTypstData`, `needsParens`, `isThousandSepComma`, `needsTokenSeparator` |
@@ -767,7 +773,7 @@ This ensures paired delimiters form grouped expressions in Typst (important afte
 - All existing conversion formats (MathML, AsciiMath, LaTeX, SVG) must remain unchanged
 - All existing tests must continue to pass
 - Typst output is only generated when `include_typst: true` is set — zero overhead when disabled
-- The visitor is read-only over the MathML tree — the only mutation is `markUnpairedBrackets()` setting `node.properties['data-unpaired-bracket']` before traversal, which is inert for other serializers (ASCII, MathML) since they never read it
+- The visitor is read-only over the MathML tree — the only mutations are `markUnpairedBrackets()` setting `node.properties['data-unpaired-bracket']` before traversal and `visitInferredMrowNode` setting `node.properties['data-pre-content']` on tagged eqnArray mtable nodes with preceding math content; both are inert for other serializers (ASCII, MathML) since they never read them
 - MathJax tag state (`parseOptions.tags`) must be reset before each `TexConvertToTypstData` call to prevent "Label multiply defined" errors across repeated conversions
 
 ## Testing
