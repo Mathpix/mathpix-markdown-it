@@ -22,6 +22,10 @@ export const RE_BRACKET_CHARS = /[\[\](){}]/;
 export const RE_UNICODE_SPACES = /[\u2006\u2005\u2004\u2009\u200A\u00A0]/g;
 /** Trailing Typst spacing keywords */
 export const RE_TRAILING_SPACING = /\s+(?:med|thin|thick|quad)$/;
+/** Property name for pre-mtable content (set in index.ts, read in table-handlers.ts) */
+export const DATA_PRE_CONTENT = 'data-pre-content';
+/** Property name for post-mtable content (set in index.ts, read in table-handlers.ts) */
+export const DATA_POST_CONTENT = 'data-post-content';
 /** Exactly 3 digits (thousand separator) */
 export const RE_THREE_DIGITS = /^\d{3}$/;
 /** Exactly 2 digits (Indian numbering) */

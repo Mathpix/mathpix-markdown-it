@@ -1,16 +1,22 @@
 import {
   ITypstData, initTypstData, addToTypstData,
   RE_NBSP, RE_CONTENT_SPECIAL, RE_TAG_EXTRACT, RE_TAG_STRIP,
+  DATA_PRE_CONTENT, DATA_POST_CONTENT,
 } from "./common";
 import { escapeCasesSeparators } from "./escape-utils";
 import {
   treeContainsMo, serializePrefixBeforeMo, replaceUnpairedBrackets, delimiterToTypst,
 } from "./bracket-utils";
 
+const DATA_TAG_AUTO = 'data-tag-auto';
+const DATA_LABEL_KEY = 'data-label-key';
+const DEFAULT_EQ_NUMBERING = '"(1)"';
+const EQ_TAG_FIGURE_KIND = 'eq-tag';
+
 /** Extract the original \label{} key from an mlabeledtr label cell.
  *  MathJax stores the id as "mjx-eqn:<label_key>" when useLabelIds is true. */
 const getLabelKey = (labelCell: any): string | null => {
-  const key = labelCell?.properties?.['data-label-key'];
+  const key = labelCell?.properties?.[DATA_LABEL_KEY];
   return key ? String(key) : null;
 };
 
@@ -119,7 +125,7 @@ const buildNumcasesGrid = (node: any, serialize: any, countRow: number): ITypstD
   // 1. Condition-embedded \tag{...} in mtext (MathJax leaves it as literal text)
   // 2. Label cell explicit tag (MathJax processed \tag, data-tag-auto is false)
   // 3. Auto-numbered (data-tag-auto is true)
-  const autoTagEntry = '{ counter(math.equation).step(); context counter(math.equation).display("(1)") }';
+  const autoTagEntry = '{ counter(math.equation).step(); context counter(math.equation).display(' + DEFAULT_EQ_NUMBERING + ') }';
   const rowTagSources: { source: 'condition' | 'label' | 'auto'; content: string; labelKey: string | null }[] = [];
   for (let i = 0; i < countRow; i++) {
     const mtrNode = node.childNodes[i];
@@ -131,7 +137,7 @@ const buildNumcasesGrid = (node: any, serialize: any, countRow: number): ITypstD
     if (condTag) {
       rowTagSources.push({ source: 'condition', content: condTag, labelKey });
     } else if (labelCell) {
-      const isAutoNumber = !!(labelCell as any).properties?.['data-tag-auto'];
+      const isAutoNumber = !!(labelCell as any).properties?.[DATA_TAG_AUTO];
       if (!isAutoNumber) {
         const tagContent = serializeTagContent(labelCell, serialize);
         rowTagSources.push({ source: 'label', content: tagContent, labelKey });
@@ -184,12 +190,12 @@ const buildNumcasesGrid = (node: any, serialize: any, countRow: number): ITypstD
     }
     if (tagText && info.labelKey) {
       // Explicit tag with label — wrap in #figure() so the label is referenceable
-      tagEntries.push('[#figure(kind: "eq-tag", supplement: none, numbering: n => [' + tagText + '], [' + tagText + ']) <' + info.labelKey + '>]');
+      tagEntries.push('[#figure(kind: "' + EQ_TAG_FIGURE_KIND + '", supplement: none, numbering: n => [' + tagText + '], [' + tagText + ']) <' + info.labelKey + '>]');
     } else if (tagText) {
       tagEntries.push('[' + tagText + ']');
     } else if (info.labelKey) {
       // Auto-numbered with label — step counter outside context, wrap in #figure() for referenceability
-      tagEntries.push('{ counter(math.equation).step(); context { let n = numbering("(1)", ..counter(math.equation).get()); [#figure(kind: "eq-tag", supplement: none, numbering: _ => n, [#n]) <' + info.labelKey + '>] } }');
+      tagEntries.push('{ counter(math.equation).step(); context { let n = numbering(' + DEFAULT_EQ_NUMBERING + ', ..counter(math.equation).get()); [#figure(kind: "' + EQ_TAG_FIGURE_KIND + '", supplement: none, numbering: _ => n, [#n]) <' + info.labelKey + '>] } }');
     } else {
       tagEntries.push(autoTagEntry);
     }
@@ -224,7 +230,7 @@ const buildTaggedEqnArray = (
     if (mtrNode.kind === 'mlabeledtr' && mtrNode.childNodes.length > 0) {
       const labelCell = mtrNode.childNodes[0];
       const tagContent = serializeTagContent(labelCell, serialize);
-      const isAutoNumber = !!(labelCell as any).properties?.['data-tag-auto'];
+      const isAutoNumber = !!(labelCell as any).properties?.[DATA_TAG_AUTO];
       const labelKey = getLabelKey(labelCell);
       rowTagInfos.push({
         isTagged: !!tagContent,
@@ -291,7 +297,7 @@ const buildTaggedEqnArray = (
       const rowContent = rows[i];
       if (info.isTagged) {
         const numbering = info.isAutoTag
-          ? '"(1)"'
+          ? DEFAULT_EQ_NUMBERING
           : 'n => [' + info.tagContent + ']';
         const labelKey = info.labelKey;
         const labelSuffix = labelKey ? ' <' + labelKey + '>' : '';
@@ -472,8 +478,8 @@ export const mtable = () => {
         const hasAnyTag = node.childNodes.some(
           (child: any) => child.kind === 'mlabeledtr'
         );
-        const preContent = (node as any).properties?.['data-pre-content'] || '';
-        const postContent = (node as any).properties?.['data-post-content'] || '';
+        const preContent = (node as any).properties?.[DATA_PRE_CONTENT] || '';
+        const postContent = (node as any).properties?.[DATA_POST_CONTENT] || '';
         if (hasAnyTag) {
           return buildTaggedEqnArray(node, serialize, rows, countRow, preContent, postContent);
         } else {

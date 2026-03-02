@@ -1,7 +1,7 @@
 import { MmlVisitor } from 'mathjax-full/js/core/MmlTree/MmlVisitor.js';
 import { MmlNode, TextNode, XMLNode, TEXCLASS } from 'mathjax-full/js/core/MmlTree/MmlNode.js';
 import { handle } from './handlers';
-import { ITypstData, addToTypstData, addSpaceToTypstData, initTypstData, isThousandSepComma, formatScript, needsTokenSeparator } from './common';
+import { ITypstData, addToTypstData, addSpaceToTypstData, initTypstData, isThousandSepComma, formatScript, needsTokenSeparator, DATA_PRE_CONTENT, DATA_POST_CONTENT } from './common';
 import { findTypstSymbol } from './typst-symbol-map';
 
 // Extract big delimiter info from a TeXAtom node wrapping a sized mo.
@@ -297,7 +297,7 @@ export class SerializedTypstVisitor extends MmlVisitor {
           if (childHasTag) {
             // Pre-content: accumulated prefix before the mtable
             if (res.typst.trim()) {
-              child.properties['data-pre-content'] = res.typst.trim();
+              child.properties[DATA_PRE_CONTENT] = res.typst.trim();
               res = initTypstData();
             }
             // Post-content: serialize remaining siblings after the mtable
@@ -310,7 +310,7 @@ export class SerializedTypstVisitor extends MmlVisitor {
               postContent += postData.typst;
             }
             if (postContent.trim()) {
-              child.properties['data-post-content'] = postContent.trim();
+              child.properties[DATA_POST_CONTENT] = postContent.trim();
             }
             // Process the mtable itself
             const data: ITypstData = this.visitNode(child, space);
