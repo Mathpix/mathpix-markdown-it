@@ -18,6 +18,8 @@ export const RE_TAG_EXTRACT = /\\tag\{([^}]+)\}/;
 export const RE_TAG_STRIP = /\s*\\tag\{[^}]+\}/g;
 /** Any ASCII bracket character */
 export const RE_BRACKET_CHARS = /[\[\](){}]/;
+/** Single word character (for single-char tests) */
+export const RE_WORD_CHAR = /\w/;
 /** Unicode thin/medium/narrow spaces and NBSP */
 export const RE_UNICODE_SPACES = /[\u2006\u2005\u2004\u2009\u200A\u00A0]/g;
 /** Trailing Typst spacing keywords */

@@ -9,6 +9,8 @@
  * a single parametric scanner with thin wrappers preserving the original API.
  */
 
+import { RE_WORD_CHAR } from "./common";
+
 interface ScanOptions {
   /** Escape commas at depth 0: , → \, */
   escapeComma?: boolean;
@@ -91,7 +93,7 @@ const scanExpression = (expr: string, opts: ScanOptions): string => {
         continue;
       }
       if (ch === ':' && opts.escapeColon) {
-        if (result.length > 0 && /\w/.test(result[result.length - 1])) {
+        if (result.length > 0 && RE_WORD_CHAR.test(result[result.length - 1])) {
           result += ' :';
         } else {
           result += ':';

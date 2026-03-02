@@ -1,5 +1,5 @@
 import { TEXCLASS } from "mathjax-full/js/core/MmlTree/MmlNode";
-import { getNodeText, RE_BRACKET_CHARS, RE_WORD_DOT_END, ITypstData } from "./common";
+import { getNodeText, RE_BRACKET_CHARS, RE_WORD_CHAR, RE_WORD_DOT_END, ITypstData } from "./common";
 import { typstSymbolMap } from "./typst-symbol-map";
 
 export const delimiterToTypst = (delim: string): string => {
@@ -102,7 +102,7 @@ export const replaceUnpairedBrackets = (expr: string): string => {
       }
       continue;
     }
-    if ('[](){}'.includes(ch)) {
+    if (RE_BRACKET_CHARS.test(ch)) {
       // Skip function-call parens (preceded by word char or .)
       if (ch === '(' && i > 0 && RE_WORD_DOT_END.test(expr[i - 1])) {
         let depth = 1;
@@ -154,7 +154,7 @@ export const replaceUnpairedBrackets = (expr: string): string => {
         result += ' ';
       }
       result += sym;
-      if (i + 1 < expr.length && /\w/.test(expr[i + 1])) {
+      if (i + 1 < expr.length && RE_WORD_CHAR.test(expr[i + 1])) {
         result += ' ';
       }
     } else {
