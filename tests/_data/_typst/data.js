@@ -1780,6 +1780,37 @@ module.exports = [
     typst_inline: `x = 1 \\\ny = 2`,
   },
 
+  // align* one tag with math content in tag
+  {
+    latex: `\\begin{align*} a &= b \\\\ &= c \\tag{$x\\sqrt{5}$ 1.3.1} \\end{align*}`,
+    typst: `#math.equation(block: true, numbering: n => [($x sqrt(5)$ 1.3.1)], number-align: end + bottom, $ a &= b \\\n &= c $)\n#counter(math.equation).update(n => n - 1)`,
+    typst_inline: `a &= b \\\n &= c`,
+  },
+  // gather* one tag on FIRST row → end + top
+  {
+    latex: `\\begin{gather*} x = 1 \\tag{A} \\\\ y = 2 \\\\ z = 3 \\end{gather*}`,
+    typst: `#math.equation(block: true, numbering: n => [(A)], number-align: end + top, $ x = 1 \\\ny = 2 \\\nz = 3 $)\n#counter(math.equation).update(n => n - 1)`,
+    typst_inline: `x = 1 \\\ny = 2 \\\nz = 3`,
+  },
+  // gather* one tag on MIDDLE row → end + horizon
+  {
+    latex: `\\begin{gather*} x = 1 \\\\ y = 2 \\tag{B} \\\\ z = 3 \\end{gather*}`,
+    typst: `#math.equation(block: true, numbering: n => [(B)], number-align: end + horizon, $ x = 1 \\\ny = 2 \\\nz = 3 $)\n#counter(math.equation).update(n => n - 1)`,
+    typst_inline: `x = 1 \\\ny = 2 \\\nz = 3`,
+  },
+  // align* 2 rows — tag on first (edge case: top vs bottom)
+  {
+    latex: `\\begin{align*} a &= b \\tag{i} \\\\ c &= d \\end{align*}`,
+    typst: `#math.equation(block: true, numbering: n => [(i)], number-align: end + top, $ a &= b \\\nc &= d $)\n#counter(math.equation).update(n => n - 1)`,
+    typst_inline: `a &= b \\\nc &= d`,
+  },
+  // align* 2 rows — tag on last
+  {
+    latex: `\\begin{align*} a &= b \\\\ c &= d \\tag{i} \\end{align*}`,
+    typst: `#math.equation(block: true, numbering: n => [(i)], number-align: end + bottom, $ a &= b \\\nc &= d $)\n#counter(math.equation).update(n => n - 1)`,
+    typst_inline: `a &= b \\\nc &= d`,
+  },
+
   // === Empty base superscript, pipes as absolute value, operator before paren ===
   {
     latex: `^{|\\alpha|} \\sqrt{x^{\\alpha}} \\leq(x \\bullet \\alpha) /|\\alpha|`,
