@@ -1,5 +1,5 @@
 import { TEXCLASS } from "mathjax-full/js/core/MmlTree/MmlNode";
-import { ITypstData, HandlerFn, MathNode } from "./types";
+import { ITypstData, HandlerFn, HandlerKind, MathNode } from "./types";
 import {
   RE_NBSP, RE_WORD_DOT_END, RE_WORD_DOT_START,
   RE_WORD_START, RE_OP_WRAPPER,
@@ -201,7 +201,7 @@ const mi: HandlerFn = (node, _serialize) => {
   // \operatorname{name}: texClass=OP, multi-char, not built-in
   // Don't add limits: #true here — parent handler (munderover/munder/mover) decides placement.
   if (node.texClass === TEXCLASS.OP && value.length > 1 && !isKnownOperator) {
-    typstValue = 'op("' + value + '")';
+    typstValue = `op("${value}")`;
   }
   // \mathrm{d} → dif (differential operator shorthand, single-char d only)
   else if (mathvariant === 'normal' && value === 'd' && !isKnownSymbol) {
@@ -218,12 +218,12 @@ const mi: HandlerFn = (node, _serialize) => {
     const fontFn = typstFontMap.get(mathvariant);
     if (fontFn) {
       // Multi-letter text needs quotes in Typst math (e.g. italic("word"), bold("text"))
-      const inner = value.length > 1 && !isKnownSymbol ? '"' + value + '"' : typstValue;
+      const inner = value.length > 1 && !isKnownSymbol ? `"${value}"` : typstValue;
       // \mathbf produces mathvariant="bold" which is upright bold in LaTeX
       if (mathvariant === 'bold' && !isKnownSymbol) {
-        typstValue = 'upright(bold(' + inner + '))';
+        typstValue = `upright(bold(${inner}))`;
       } else {
-        typstValue = fontFn + '(' + inner + ')';
+        typstValue = `${fontFn}(${inner})`;
       }
     }
   }
@@ -266,7 +266,7 @@ const mo: HandlerFn = (node, _serialize) => {
   // Don't add limits: #true here — parent handler (munderover/munder/mover) decides placement
   if (normalizedValue.length > 1 && RE_WORD_START.test(normalizedValue) && !typstSymbolMap.has(value) && !TYPST_MATH_OPERATORS.has(value)) {
     const opName = normalizedValue;
-    res = addToTypstData(res, { typst: 'op("' + opName + '")' });
+    res = addToTypstData(res, { typst: `op("${opName}")` });
     return res;
   }
   // Check if this operator is inside sub/sup/munderover — no spacing there
@@ -311,7 +311,7 @@ const mn: HandlerFn = (node, _serialize) => {
     const fontFn = typstFontMap.get(mathvariant);
     if (fontFn) {
       const content = typstPlaceholder(escapeContentSeparators(value));
-      res = addToTypstData(res, { typst: fontFn + '(' + content + ')' });
+      res = addToTypstData(res, { typst: `${fontFn}(${content})` });
       return res;
     }
   }
@@ -336,13 +336,13 @@ const mtext: HandlerFn = (node, _serialize) => {
     res = addToTypstData(res, { typst: spaceBefore + typstValue + spaceAfter });
     return res;
   }
-  let textContent = '"' + value.replace(/"/g, '\\"') + '"';
+  let textContent = `"${value.replace(/"/g, '\\"')}"`;
   const atr = getAttributes(node);
   const mathvariant: string = atr?.mathvariant || '';
   if (mathvariant && mathvariant !== 'normal') {
     const fontFn = typstFontMap.get(mathvariant);
     if (fontFn) {
-      textContent = fontFn + '(' + textContent + ')';
+      textContent = `${fontFn}(${textContent})`;
     }
   }
   res = addToTypstData(res, { typst: textContent });
@@ -360,9 +360,9 @@ const mfrac: HandlerFn = (node, serialize) => {
   // Check for linethickness=0 which indicates \binom (\choose)
   const atr = getAttributes(node);
   if (atr && (atr.linethickness === '0' || atr.linethickness === 0)) {
-    res = addToTypstData(res, { typst: 'binom(' + num + ', ' + den + ')' });
+    res = addToTypstData(res, { typst: `binom(${num}, ${den})` });
   } else {
-    res = addToTypstData(res, { typst: 'frac(' + num + ', ' + den + ')' });
+    res = addToTypstData(res, { typst: `frac(${num}, ${den})` });
   }
   return res;
 };
@@ -380,8 +380,9 @@ const matchBraceAnnotation = (
   const m = BRACE_ANNOTATION_RE.exec(baseTrimmed);
   const kind = m?.[1] as typeof kinds[number] | undefined;
   if (!kind || !kinds.includes(kind)) return null;
+  const base = m[2];
   const ann = typstPlaceholder(escapeContentSeparators(annotation));
-  return { typst: m[1] + '(' + m[2] + ', ' + ann + ')' };
+  return { typst: `${kind}(${base}, ${ann})` };
 };
 
 const msup: HandlerFn = (node, serialize) => {
@@ -404,7 +405,7 @@ const msup: HandlerFn = (node, serialize) => {
   }
   // \nolimits: wrap known limit-type operators in scripts() to force side placement
   if (baseTrimmed && needsScriptsWrapper(baseTrimmed)) {
-    res = addToTypstData(res, { typst: 'scripts(' + escapeContentSeparators(baseTrimmed) + ')' });
+    res = addToTypstData(res, { typst: `scripts(${escapeContentSeparators(baseTrimmed)})` });
   } else {
     // Empty base (e.g. LaTeX ^{x} with no preceding base): use empty placeholder
     res = addToTypstData(res, { typst: baseTrimmed ? base : '""' });
@@ -442,7 +443,7 @@ const msub: HandlerFn = (node, serialize) => {
   }
   // \nolimits: wrap known limit-type operators in scripts() to force side placement
   if (baseTrimmed && needsScriptsWrapper(baseTrimmed)) {
-    res = addToTypstData(res, { typst: 'scripts(' + escapeContentSeparators(baseTrimmed) + ')' });
+    res = addToTypstData(res, { typst: `scripts(${escapeContentSeparators(baseTrimmed)})` });
   } else {
     res = addToTypstData(res, { typst: baseTrimmed ? base : '""' });
   }
@@ -471,7 +472,7 @@ const msubsup: HandlerFn = (node, serialize) => {
   }
   // \nolimits: wrap known limit-type operators in scripts() to force side placement
   if (baseTrimmed && needsScriptsWrapper(baseTrimmed)) {
-    res = addToTypstData(res, { typst: 'scripts(' + escapeContentSeparators(baseTrimmed) + ')' });
+    res = addToTypstData(res, { typst: `scripts(${escapeContentSeparators(baseTrimmed)})` });
   } else {
     res = addToTypstData(res, { typst: baseTrimmed ? base : '""' });
   }
@@ -490,7 +491,7 @@ const msqrt: HandlerFn = (node, serialize) => {
   const firstChild = node.childNodes[0] || null;
   const dataFirst: ITypstData = firstChild ? serialize.visitNode(firstChild, '') : initTypstData();
   const content = typstPlaceholder(escapeContentSeparators(dataFirst.typst.trim()));
-  res = addToTypstData(res, { typst: 'sqrt(' + content + ')' });
+  res = addToTypstData(res, { typst: `sqrt(${content})` });
   return res;
 };
 
@@ -505,7 +506,7 @@ const mroot: HandlerFn = (node, serialize) => {
   const indexContent = typstPlaceholder(escapeContentSeparators(dataIndex.typst.trim()));
   // Typst root: root(index, radicand)
   res = addToTypstData(res, {
-    typst: 'root(' + indexContent + ', ' + radicandContent + ')'
+    typst: `root(${indexContent}, ${radicandContent})`
   });
   return res;
 };
@@ -567,9 +568,9 @@ const buildLimitBase = (firstChild: MathNode | null, baseTrimmed: string, base: 
     if (isNativeDisplayLimitOp(baseTrimmed)) {
       return { typst: base };
     }
-    return { typst: wrapper + '(' + escapeContentSeparators(basePlaceholder) + ')', typst_inline: base };
+    return { typst: `${wrapper}(${escapeContentSeparators(basePlaceholder)})`, typst_inline: base };
   } else if (movablelimits === false) {
-    return { typst: wrapper + '(' + escapeContentSeparators(basePlaceholder) + ')' };
+    return { typst: `${wrapper}(${escapeContentSeparators(basePlaceholder)})` };
   } else {
     if (isCustomOp(baseTrimmed) && firstChild?.texClass === TEXCLASS.OP) {
       if (firstChild?.kind === 'TeXAtom') {
@@ -580,7 +581,7 @@ const buildLimitBase = (firstChild: MathNode | null, baseTrimmed: string, base: 
     if (isNativeDisplayLimitOp(baseTrimmed) || isSpecialFnCall(baseTrimmed)) {
       return { typst: base };
     }
-    return { typst: wrapper + '(' + escapeContentSeparators(basePlaceholder) + ')' };
+    return { typst: `${wrapper}(${escapeContentSeparators(basePlaceholder)})` };
   }
 };
 
@@ -609,9 +610,9 @@ const mover: HandlerFn = (node, serialize) => {
     if (accentFn) {
       const content = typstPlaceholder(escapeContentSeparators(dataFirst.typst.trim()));
       if (TYPST_ACCENT_SHORTHANDS.has(accentFn)) {
-        res = addToTypstData(res, { typst: accentFn + '(' + content + ')' });
+        res = addToTypstData(res, { typst: `${accentFn}(${content})` });
       } else {
-        res = addToTypstData(res, { typst: 'accent(' + content + ', ' + accentFn + ')' });
+        res = addToTypstData(res, { typst: `accent(${content}, ${accentFn})` });
       }
       return res;
     }
@@ -665,13 +666,13 @@ const munder: HandlerFn = (node, serialize) => {
       // Arrows/harpoons have no under-variant in Typst — use attach(base, b: symbol)
       const underSymbol = MUNDER_ATTACH_SYMBOLS.get(accentFn);
       if (underSymbol) {
-        res = addToTypstData(res, { typst: 'attach(' + content + ', b: ' + underSymbol + ')' });
+        res = addToTypstData(res, { typst: `attach(${content}, b: ${underSymbol})` });
         return res;
       }
       if (TYPST_ACCENT_SHORTHANDS.has(accentFn)) {
-        res = addToTypstData(res, { typst: accentFn + '(' + content + ')' });
+        res = addToTypstData(res, { typst: `${accentFn}(${content})` });
       } else {
-        res = addToTypstData(res, { typst: 'accent(' + content + ', ' + accentFn + ')' });
+        res = addToTypstData(res, { typst: `accent(${content}, ${accentFn})` });
       }
       return res;
     }
@@ -784,7 +785,7 @@ const mmultiscripts: HandlerFn = (node, serialize) => {
     if (lastPostSup) parts.push('t: ' + lastPostSup);
     if (lastPostSub) parts.push('b: ' + lastPostSub);
     res = addToTypstData(res, {
-      typst: 'attach(' + escapeContentSeparators(baseTrimmed) + ', ' + parts.join(', ') + ')'
+      typst: `attach(${escapeContentSeparators(baseTrimmed)}, ${parts.join(', ')})`
     });
   }
   return res;
@@ -856,31 +857,28 @@ const mrow: HandlerFn = (node, serialize) => {
       // (these would be parsed as argument/row separators inside a function call).
       const hasSep = hasTopLevelSeparators(trimmedContent);
       if (openDelim === '|' && closeDelim === '|') {
+        const escaped = escapeLrSemicolons(trimmedContent);
         res = addToTypstData(res, { typst: hasSep
-          ? 'lr(| ' + escapeLrSemicolons(trimmedContent) + ' |)'
-          : 'abs(' + trimmedContent + ')' });
+          ? `lr(| ${escaped} |)` : `abs(${trimmedContent})` });
       } else if (openDelim === DOUBLE_VERT && closeDelim === DOUBLE_VERT) {
-        // ‖...‖ → norm() or lr(‖ ... ‖)
+        const escaped = escapeLrSemicolons(trimmedContent);
         res = addToTypstData(res, { typst: hasSep
-          ? 'lr(‖ ' + escapeLrSemicolons(trimmedContent) + ' ‖)'
-          : 'norm(' + trimmedContent + ')' });
+          ? `lr(‖ ${escaped} ‖)` : `norm(${trimmedContent})` });
       } else if (openDelim === LEFT_FLOOR && closeDelim === RIGHT_FLOOR) {
-        // ⌊...⌋ → floor() or lr(⌊ ... ⌋)
+        const escaped = escapeLrSemicolons(trimmedContent);
         res = addToTypstData(res, { typst: hasSep
-          ? 'lr(⌊ ' + escapeLrSemicolons(trimmedContent) + ' ⌋)'
-          : 'floor(' + trimmedContent + ')' });
+          ? `lr(⌊ ${escaped} ⌋)` : `floor(${trimmedContent})` });
       } else if (openDelim === LEFT_CEIL && closeDelim === RIGHT_CEIL) {
-        // ⌈...⌉ → ceil() or lr(⌈ ... ⌉)
+        const escaped = escapeLrSemicolons(trimmedContent);
         res = addToTypstData(res, { typst: hasSep
-          ? 'lr(⌈ ' + escapeLrSemicolons(trimmedContent) + ' ⌉)'
-          : 'ceil(' + trimmedContent + ')' });
+          ? `lr(⌈ ${escaped} ⌉)` : `ceil(${trimmedContent})` });
       } else {
         // Mismatched ASCII brackets must be escaped: ( [ { start groups, ) closes lr()
         const escapedOpen = (openDelim in OPEN_BRACKETS && OPEN_BRACKETS[openDelim] !== closeDelim)
           ? '\\' + openDelim : open;
         const escapedClose = (closeDelim in CLOSE_BRACKETS && CLOSE_BRACKETS[closeDelim] !== openDelim)
           ? '\\' + closeDelim : close;
-        res = addToTypstData(res, { typst: 'lr(' + escapedOpen + ' ' + escapeLrSemicolons(trimmedContent) + ' ' + escapedClose + ')' });
+        res = addToTypstData(res, { typst: `lr(${escapedOpen} ${escapeLrSemicolons(trimmedContent)} ${escapedClose})` });
       }
     } else {
       // One or both delimiters invisible: wrap visible side in lr()
@@ -888,9 +886,9 @@ const mrow: HandlerFn = (node, serialize) => {
       const openEsc = openDelim ? escapeLrOpenDelimiter(openDelim) : '';
       const closeEsc = closeDelim ? escapeLrOpenDelimiter(closeDelim) : '';
       if (openEsc) {
-        res = addToTypstData(res, { typst: 'lr(' + openEsc + ' ' + escapeLrSemicolons(trimmed) + ')' });
+        res = addToTypstData(res, { typst: `lr(${openEsc} ${escapeLrSemicolons(trimmed)})` });
       } else if (closeEsc) {
-        res = addToTypstData(res, { typst: 'lr(' + escapeLrSemicolons(trimmed) + ' ' + closeEsc + ')' });
+        res = addToTypstData(res, { typst: `lr(${escapeLrSemicolons(trimmed)} ${closeEsc})` });
       } else {
         res = addToTypstData(res, { typst: trimmed });
       }
@@ -1001,10 +999,10 @@ const mpadded: HandlerFn = (node, serialize) => {
   const mathbg: string = rawBg && rawBg !== MATHJAX_INHERIT_SENTINEL ? rawBg : '';
   if (mathbg && content) {
     const fillValue = mathbg.startsWith('#')
-      ? 'rgb("' + mathbg + '")'
+      ? `rgb("${mathbg}")`
       : mathbg;
     res = addToTypstData(res, {
-      typst: '#highlight(fill: ' + fillValue + ')[$' + content + '$]',
+      typst: `#highlight(fill: ${fillValue})[$${content}$]`,
       typst_inline: content
     });
     return res;
@@ -1018,7 +1016,7 @@ const mphantom: HandlerFn = (node, serialize) => {
   const data: ITypstData = handleAll(node, serialize);
   const content = data.typst.trim();
   if (content) {
-    res = addToTypstData(res, { typst: '#hide($' + content + '$)' });
+    res = addToTypstData(res, { typst: `#hide($${content}$)` });
   }
   return res;
 };
@@ -1031,38 +1029,38 @@ const menclose: HandlerFn = (node, serialize) => {
   const content = typstPlaceholder(data.typst.trim());
   if (notation.includes('box')) {
     // \boxed → #box with stroke
-    res = addToTypstData(res, { typst: '#box(stroke: 0.5pt, inset: 3pt, $' + content + '$)', typst_inline: content });
+    res = addToTypstData(res, { typst: `#box(stroke: 0.5pt, inset: 3pt, $${content}$)`, typst_inline: content });
   } else if (notation.includes('updiagonalstrike') || notation.includes('downdiagonalstrike')) {
     // \cancel uses updiagonalstrike (lower-left to upper-right) → Typst cancel() default
     // \bcancel uses downdiagonalstrike (upper-left to lower-right) → Typst cancel(inverted: true)
     if (notation.includes('downdiagonalstrike') && !notation.includes('updiagonalstrike')) {
-      res = addToTypstData(res, { typst: 'cancel(inverted: #true, ' + escapeContentSeparators(content) + ')' });
+      res = addToTypstData(res, { typst: `cancel(inverted: #true, ${escapeContentSeparators(content)})` });
     } else {
-      res = addToTypstData(res, { typst: 'cancel(' + escapeContentSeparators(content) + ')' });
+      res = addToTypstData(res, { typst: `cancel(${escapeContentSeparators(content)})` });
     }
   } else if (notation.includes('horizontalstrike')) {
-    res = addToTypstData(res, { typst: 'cancel(' + escapeContentSeparators(content) + ')' });
+    res = addToTypstData(res, { typst: `cancel(${escapeContentSeparators(content)})` });
   } else if (notation.includes('longdiv')) {
     // \longdiv / \enclose{longdiv} → overline(")" content)
-    res = addToTypstData(res, { typst: 'overline(")"' + escapeContentSeparators(escapeUnbalancedParens(content)) + ')' });
+    res = addToTypstData(res, { typst: `overline(")"${escapeContentSeparators(escapeUnbalancedParens(content))})` });
   } else if (notation.includes('circle')) {
     // \enclose{circle} → #circle with inset
-    res = addToTypstData(res, { typst: '#circle(inset: 3pt, $' + content + '$)', typst_inline: content });
+    res = addToTypstData(res, { typst: `#circle(inset: 3pt, $${content}$)`, typst_inline: content });
   } else if (notation.includes('radical')) {
     // \enclose{radical} → sqrt()
-    res = addToTypstData(res, { typst: 'sqrt(' + escapeContentSeparators(escapeUnbalancedParens(content)) + ')' });
+    res = addToTypstData(res, { typst: `sqrt(${escapeContentSeparators(escapeUnbalancedParens(content))})` });
   } else if (notation.includes('top')) {
     // \enclose{top} → overline()
-    res = addToTypstData(res, { typst: 'overline(' + escapeContentSeparators(escapeUnbalancedParens(content)) + ')' });
+    res = addToTypstData(res, { typst: `overline(${escapeContentSeparators(escapeUnbalancedParens(content))})` });
   } else if (notation.includes('bottom')) {
     // \enclose{bottom} → underline()
     // Detect \smash{)} prefix (used in \lcm macro): strip leading ) or \), trailing spacing, no space
     if (content.startsWith(')') || content.startsWith('\\)')) {
       const skip = content.startsWith('\\)') ? 2 : 1;
       let inner = content.slice(skip).trim().replace(RE_TRAILING_SPACING, '');
-      res = addToTypstData(res, { typst: 'underline(")"' + escapeContentSeparators(inner) + ')' });
+      res = addToTypstData(res, { typst: `underline(")"${escapeContentSeparators(inner)})` });
     } else {
-      res = addToTypstData(res, { typst: 'underline(' + escapeContentSeparators(escapeUnbalancedParens(content)) + ')' });
+      res = addToTypstData(res, { typst: `underline(${escapeContentSeparators(escapeUnbalancedParens(content))})` });
     }
   } else {
     // Unknown notation: pass through content
@@ -1072,12 +1070,15 @@ const menclose: HandlerFn = (node, serialize) => {
 };
 
 export const handle: HandlerFn = (node, serialize) => {
-  const handler = handlers[node.kind] || defaultHandler;
+  const kind = node.kind;
+  const handler = kind in handlers
+    ? handlers[kind as HandlerKind]
+    : defaultHandler;
   try {
     return handler(node, serialize);
   } catch (e) {
     if (typeof console !== 'undefined' && console.warn) {
-      console.warn('[typst-serializer] handler error for "' + (node.kind || 'unknown') + '":', e);
+      console.warn(`[typst-serializer] handler error for "${kind || 'unknown'}":`, e);
     }
     return initTypstData();
   }
@@ -1106,9 +1107,9 @@ const isOperatorInternalSpacing = (node: MathNode): boolean => {
  *  Hex colors (#D61F06) are converted to rgb("...") format. */
 const wrapWithColor = (content: string, mathcolor: string): string => {
   const fillValue = mathcolor.startsWith('#')
-    ? 'rgb("' + mathcolor + '")'
+    ? `rgb("${mathcolor}")`
     : mathcolor;
-  return '#text(fill: ' + fillValue + ')[' + content + ']';
+  return `#text(fill: ${fillValue})[${content}]`;
 };
 
 const mstyle: HandlerFn = (node, serialize) => {
@@ -1127,7 +1128,7 @@ const mstyle: HandlerFn = (node, serialize) => {
   return data;
 };
 
-const handlers: Record<string, HandlerFn> = {
+const handlers: Record<HandlerKind, HandlerFn> = {
   mi, mo, mn, mfrac, msup, msub, msubsup, msqrt,
   mover, munder, munderover, mmultiscripts, mspace, mtext,
   mtable, mrow, mtr, mpadded, mroot, menclose, mstyle, mphantom,

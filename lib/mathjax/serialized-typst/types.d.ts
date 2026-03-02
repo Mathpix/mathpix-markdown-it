@@ -12,6 +12,8 @@ export interface ITypstSerializer {
 }
 /** Handler function signature. */
 export type HandlerFn = (node: MathNode, serialize: ITypstSerializer) => ITypstData;
+/** Supported MathML element kinds — keys of the handler registry. */
+export type HandlerKind = 'mi' | 'mo' | 'mn' | 'mtext' | 'mspace' | 'mfrac' | 'msup' | 'msub' | 'msubsup' | 'msqrt' | 'mroot' | 'mover' | 'munder' | 'munderover' | 'mmultiscripts' | 'mrow' | 'mpadded' | 'mphantom' | 'menclose' | 'mstyle' | 'mtable' | 'mtr';
 export interface ITypstData {
     typst: string;
     /** Inline-safe variant: same as typst when no block wrappers are used,
