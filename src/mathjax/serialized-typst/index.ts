@@ -1,7 +1,7 @@
 import { MmlVisitor } from 'mathjax-full/js/core/MmlTree/MmlVisitor.js';
 import { MmlNode, TextNode, XMLNode, TEXCLASS } from 'mathjax-full/js/core/MmlTree/MmlNode.js';
 import { handle } from './handlers';
-import { ITypstData, addToTypstData, addSpaceToTypstData, initTypstData, isThousandSepComma, formatScript, needsTokenSeparator, DATA_PRE_CONTENT, DATA_POST_CONTENT } from './common';
+import { ITypstData, addToTypstData, addSpaceToTypstData, initTypstData, isThousandSepComma, formatScript, needsTokenSeparator, getChildText, DATA_PRE_CONTENT, DATA_POST_CONTENT } from './common';
 import { findTypstSymbol } from './typst-symbol-map';
 
 // Extract big delimiter info from a TeXAtom node wrapping a sized mo.
@@ -164,7 +164,7 @@ export class SerializedTypstVisitor extends MmlVisitor {
         // Also detects closing delimiters inside msub/msup/msubsup (e.g. \|x\|_2 → norm(x)_2).
         const delimChar = getDelimiterChar(child);
         const delimPair = delimChar ? BARE_DELIM_PAIRS[delimChar] : null;
-        if (delimPair && !(delimChar === delimPair.close && (node as any).parent?.kind === 'TeXAtom')) {
+        if (delimPair && !(delimChar === delimPair.close && node.parent?.kind === 'TeXAtom')) {
           let closeIdx = -1;
           let closeIsScripted = false;
           for (let k = j + 1; k < node.childNodes.length; k++) {
@@ -217,14 +217,14 @@ export class SerializedTypstVisitor extends MmlVisitor {
         }
         // Detect \idotsint pattern: mo(∫) mo(⋯) msubsup/msub/msup(mo(∫), ...)
         // Group as lr(integral dots.c integral)_(sub)^(sup)
-        if (child?.kind === 'mo' && (child?.childNodes?.[0] as any)?.text === '\u222B') {
+        if (child?.kind === 'mo' && getChildText(child) === '\u222B') {
           const next1: any = node.childNodes[j + 1];
           const next2: any = node.childNodes[j + 2];
-          if (next1?.kind === 'mo' && next1?.childNodes?.[0]?.text === '\u22EF' && next2) {
+          if (next1?.kind === 'mo' && getChildText(next1) === '\u22EF' && next2) {
             const scriptBase = next2.childNodes?.[0];
             if (SCRIPT_KINDS.has(next2.kind)
               && scriptBase?.kind === 'mo'
-              && scriptBase?.childNodes?.[0]?.text === '\u222B') {
+              && getChildText(scriptBase) === '\u222B') {
               // Serialize the three base parts
               const part1: ITypstData = this.visitNode(child, space);
               const part2: ITypstData = this.visitNode(next1, space);

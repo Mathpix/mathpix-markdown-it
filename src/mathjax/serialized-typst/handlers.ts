@@ -1,7 +1,7 @@
 import { TEXCLASS } from "mathjax-full/js/core/MmlTree/MmlNode";
 import {
   ITypstData, initTypstData, addToTypstData, addSpaceToTypstData,
-  formatScript, isThousandSepComma, needsTokenSeparator, getNodeText,
+  formatScript, isThousandSepComma, needsTokenSeparator, getNodeText, getChildText,
   isFirstChild, isLastChild, getSiblingIndex, typstPlaceholder,
   RE_NBSP, RE_WORD_DOT_END, RE_WORD_DOT_START,
   RE_WORD_START, RE_OP_WRAPPER,
@@ -32,7 +32,7 @@ const getAttributes = (node): any => {
 /** Extract the primary Typst symbol text from a node (mi/mo).
  *  Gets the first child's text and maps it through findTypstSymbol. */
 const getNodeTypstSymbol = (node: any): string => {
-  const text = (node?.childNodes?.[0] as any)?.text ?? '';
+  const text = getChildText(node);
   if (!text) return '';
   return findTypstSymbol(text);
 };
@@ -69,7 +69,7 @@ const needsSpaceAfter = (node): boolean => {
     if (index < 0) return false;
     let next = node.parent.childNodes[index + 1];
     // Skip invisible function application (U+2061)
-    if (next && (next.childNodes?.[0] as any)?.text === '\u2061' && index + 2 < node.parent.childNodes.length) {
+    if (next && getChildText(next) === '\u2061' && index + 2 < node.parent.childNodes.length) {
       next = node.parent.childNodes[index + 2];
     }
     if (next && (next.kind === 'mi' || next.kind === 'mo')) {
@@ -329,7 +329,8 @@ const matchBraceAnnotation = (
   kinds: ('overbrace' | 'overbracket' | 'underbrace' | 'underbracket')[]
 ): ITypstData | null => {
   const m = BRACE_ANNOTATION_RE.exec(baseTrimmed);
-  if (!m || !kinds.includes(m[1] as any)) return null;
+  const kind = m?.[1] as typeof kinds[number] | undefined;
+  if (!kind || !kinds.includes(kind)) return null;
   const ann = typstPlaceholder(escapeContentSeparators(annotation));
   return { typst: m[1] + '(' + m[2] + ', ' + ann + ')' };
 };

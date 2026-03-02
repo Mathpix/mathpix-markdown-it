@@ -1,3 +1,5 @@
+import { TextNode } from 'mathjax-full/js/core/MmlTree/MmlNode.js';
+
 // --- Regex Constants ---
 
 /** Non-breaking space U+00A0 (global replacement) */
@@ -86,9 +88,9 @@ export const isThousandSepComma = (node: any, i: number): boolean => {
     const comma = node.childNodes[i + 1];
     const next = node.childNodes[i + 2];
     if (child?.kind !== 'mn') return false;
-    if (comma?.kind !== 'mo' || (comma?.childNodes?.[0] as any)?.text !== ',') return false;
+    if (comma?.kind !== 'mo' || getChildText(comma) !== ',') return false;
     if (next?.kind !== 'mn') return false;
-    const nextText: string = (next?.childNodes?.[0] as any)?.text || '';
+    const nextText: string = getChildText(next);
     // Standard: exactly 3 digits after comma
     if (RE_THREE_DIGITS.test(nextText)) return true;
     // Indian numbering: exactly 2 digits — accept if the chain eventually reaches a 3-digit group
@@ -97,9 +99,9 @@ export const isThousandSepComma = (node: any, i: number): boolean => {
       while (j + 2 < node.childNodes.length) {
         const nextComma = node.childNodes[j + 1];
         const nextNode = node.childNodes[j + 2];
-        if (nextComma?.kind !== 'mo' || (nextComma?.childNodes?.[0] as any)?.text !== ',') break;
+        if (nextComma?.kind !== 'mo' || getChildText(nextComma) !== ',') break;
         if (nextNode?.kind !== 'mn') break;
-        const nextDigits: string = (nextNode?.childNodes?.[0] as any)?.text || '';
+        const nextDigits: string = getChildText(nextNode);
         if (RE_THREE_DIGITS.test(nextDigits)) return true;
         if (!RE_TWO_DIGITS.test(nextDigits)) break;
         j += 2;
@@ -156,15 +158,19 @@ export const getSiblingIndex = (node: any): number => {
   return node.parent.childNodes.findIndex((item: any) => item === node);
 };
 
+/** Get text content of a node's first child (TextNode).
+ *  Safe: returns '' if node has no children or first child is not a TextNode. */
+export const getChildText = (node: any): string => {
+  const child = node?.childNodes?.[0];
+  return child instanceof TextNode ? child.getText() : '';
+};
+
 /** Concatenate text content of all child nodes. */
 export const getNodeText = (node: any): string => {
-  let text: string = '';
-  try {
-    node.childNodes.forEach((child: any) => {
-      text += child.text;
-    });
-    return text;
-  } catch (e) {
-    return text;
+  if (!node?.childNodes) return '';
+  let text = '';
+  for (const child of node.childNodes) {
+    if (child instanceof TextNode) text += child.getText();
   }
+  return text;
 };

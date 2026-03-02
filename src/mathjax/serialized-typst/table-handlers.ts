@@ -137,7 +137,7 @@ const buildNumcasesGrid = (node: any, serialize: any, countRow: number): ITypstD
     if (condTag) {
       rowTagSources.push({ source: 'condition', content: condTag, labelKey });
     } else if (labelCell) {
-      const isAutoNumber = !!(labelCell as any).properties?.[DATA_TAG_AUTO];
+      const isAutoNumber = !!labelCell.getProperty(DATA_TAG_AUTO);
       if (!isAutoNumber) {
         const tagContent = serializeTagContent(labelCell, serialize);
         rowTagSources.push({ source: 'label', content: tagContent, labelKey });
@@ -230,7 +230,7 @@ const buildTaggedEqnArray = (
     if (mtrNode.kind === 'mlabeledtr' && mtrNode.childNodes.length > 0) {
       const labelCell = mtrNode.childNodes[0];
       const tagContent = serializeTagContent(labelCell, serialize);
-      const isAutoNumber = !!(labelCell as any).properties?.[DATA_TAG_AUTO];
+      const isAutoNumber = !!labelCell.getProperty(DATA_TAG_AUTO);
       const labelKey = getLabelKey(labelCell);
       rowTagInfos.push({
         isTagged: !!tagContent,
@@ -477,8 +477,8 @@ export const mtable = () => {
         const hasAnyTag = node.childNodes.some(
           (child: any) => child.kind === 'mlabeledtr'
         );
-        const preContent = (node as any).properties?.[DATA_PRE_CONTENT] || '';
-        const postContent = (node as any).properties?.[DATA_POST_CONTENT] || '';
+        const preContent = node.getProperty(DATA_PRE_CONTENT) || '';
+        const postContent = node.getProperty(DATA_POST_CONTENT) || '';
         if (hasAnyTag) {
           return buildTaggedEqnArray(node, serialize, rows, countRow, preContent, postContent);
         } else {
