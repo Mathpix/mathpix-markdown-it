@@ -207,7 +207,6 @@ const buildNumcasesGrid = (node: any, serialize: any, countRow: number): ITypstD
   }
   gridLines.push('  ),');
   gridLines.push(')');
-
   res = addToTypstData(res, { typst: gridLines.join('\n') });
   res.typst_inline = mathContent;
   return res;

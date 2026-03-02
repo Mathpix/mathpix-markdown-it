@@ -118,7 +118,6 @@ const mi = () => {
       const isKnownSymbol = typstSymbolMap.has(value);
       const isKnownOperator = TYPST_MATH_OPERATORS.has(value);
       let typstValue: string = findTypstSymbol(value);
-
       // \operatorname{name}: texClass=OP, multi-char, not built-in
       // Don't add limits: #true here — parent handler (munderover/munder/mover) decides placement.
       if (node.texClass === TEXCLASS.OP && value.length > 1 && !isKnownOperator) {
@@ -579,7 +578,6 @@ const buildLimitBase = (firstChild: any, baseTrimmed: string, base: string): ITy
     }
   }
   const wrapper = isStretchy ? 'stretch' : 'limits';
-
   if (movablelimits === true) {
     // Default placement — above/below in display, side in inline.
     if (baseIsCustomOp) {
@@ -883,17 +881,17 @@ const mspace = () => {
       } else if (width === '1em') {
         res = addToTypstData(res, { typst: ' quad ' });
       } else if (width === '0.2778em' || width === '0.278em') {
-        // \; or \: → medmathspace
+        // \; → thickmathspace
+        res = addToTypstData(res, { typst: ' thick ' });
+      } else if (width === '0.2222em' || width === '0.222em') {
+        // \: → mediummathspace
         res = addToTypstData(res, { typst: ' med ' });
       } else if (width === '0.1667em' || width === '0.167em') {
         // \, → thinmathspace
         res = addToTypstData(res, { typst: ' thin ' });
       } else if (width === '-0.1667em' || width === '-0.167em') {
-        // \! → negative thin space — skip (Typst has no negthin; this is a LaTeX spacing hack)
+        // \! → negative thin space (Typst has no negthin; skip)
         return res;
-      } else if (width === '0.2222em' || width === '0.222em') {
-        // \: → mediummathspace
-        res = addToTypstData(res, { typst: ' med ' });
       } else {
         res = addToTypstData(res, { typst: ' ' });
       }
@@ -945,8 +943,8 @@ const mrow = () => {
           }
           content += data.typst;
         }
-        let open = openDelim ? mapDelimiter(openDelim) : '';
-        let close = closeDelim ? mapDelimiter(closeDelim) : '';
+        const open = openDelim ? mapDelimiter(openDelim) : '';
+        const close = closeDelim ? mapDelimiter(closeDelim) : '';
         const hasVisibleOpen = !!open;
         const hasVisibleClose = !!close;
         if (hasVisibleOpen && hasVisibleClose) {
@@ -1150,32 +1148,32 @@ const menclose = () => {
       const notation: string = atr?.notation?.toString() || '';
       const data: ITypstData = handlerApi.handleAll(node, serialize);
       const content = data.typst.trim() || '""';
-      if (notation.indexOf('box') > -1) {
+      if (notation.includes('box')) {
         // \boxed → #box with stroke
         res = addToTypstData(res, { typst: '#box(stroke: 0.5pt, inset: 3pt, $' + content + '$)', typst_inline: content });
-      } else if (notation.indexOf('updiagonalstrike') > -1 || notation.indexOf('downdiagonalstrike') > -1) {
+      } else if (notation.includes('updiagonalstrike') || notation.includes('downdiagonalstrike')) {
         // \cancel uses updiagonalstrike (lower-left to upper-right) → Typst cancel() default
         // \bcancel uses downdiagonalstrike (upper-left to lower-right) → Typst cancel(inverted: true)
-        if (notation.indexOf('downdiagonalstrike') > -1 && notation.indexOf('updiagonalstrike') === -1) {
+        if (notation.includes('downdiagonalstrike') && !notation.includes('updiagonalstrike')) {
           res = addToTypstData(res, { typst: 'cancel(inverted: #true, ' + escapeContentSeparators(content) + ')' });
         } else {
           res = addToTypstData(res, { typst: 'cancel(' + escapeContentSeparators(content) + ')' });
         }
-      } else if (notation.indexOf('horizontalstrike') > -1) {
+      } else if (notation.includes('horizontalstrike')) {
         res = addToTypstData(res, { typst: 'cancel(' + escapeContentSeparators(content) + ')' });
-      } else if (notation.indexOf('longdiv') > -1) {
+      } else if (notation.includes('longdiv')) {
         // \longdiv / \enclose{longdiv} → overline(")" content)
         res = addToTypstData(res, { typst: 'overline(")"' + escapeContentSeparators(escapeUnbalancedParens(content)) + ')' });
-      } else if (notation.indexOf('circle') > -1) {
+      } else if (notation.includes('circle')) {
         // \enclose{circle} → #circle with inset
         res = addToTypstData(res, { typst: '#circle(inset: 3pt, $' + content + '$)', typst_inline: content });
-      } else if (notation.indexOf('radical') > -1) {
+      } else if (notation.includes('radical')) {
         // \enclose{radical} → sqrt()
         res = addToTypstData(res, { typst: 'sqrt(' + escapeContentSeparators(escapeUnbalancedParens(content)) + ')' });
-      } else if (notation.indexOf('top') > -1) {
+      } else if (notation.includes('top')) {
         // \enclose{top} → overline()
         res = addToTypstData(res, { typst: 'overline(' + escapeContentSeparators(escapeUnbalancedParens(content)) + ')' });
-      } else if (notation.indexOf('bottom') > -1) {
+      } else if (notation.includes('bottom')) {
         // \enclose{bottom} → underline()
         // Detect \smash{)} prefix (used in \lcm macro): strip leading ) or \), trailing spacing, no space
         if (content.startsWith(')') || content.startsWith('\\)')) {
