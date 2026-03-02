@@ -84,13 +84,13 @@ export const isThousandSepComma = (node: any, i: number): boolean => {
     if (RE_TWO_DIGITS.test(nextText)) {
       let j = i + 2;
       while (j + 2 < node.childNodes.length) {
-        const nc = node.childNodes[j + 1];
-        const nn = node.childNodes[j + 2];
-        if (nc?.kind !== 'mo' || (nc?.childNodes?.[0] as any)?.text !== ',') break;
-        if (nn?.kind !== 'mn') break;
-        const nt: string = (nn?.childNodes?.[0] as any)?.text || '';
-        if (RE_THREE_DIGITS.test(nt)) return true;
-        if (!RE_TWO_DIGITS.test(nt)) break;
+        const nextComma = node.childNodes[j + 1];
+        const nextNode = node.childNodes[j + 2];
+        if (nextComma?.kind !== 'mo' || (nextComma?.childNodes?.[0] as any)?.text !== ',') break;
+        if (nextNode?.kind !== 'mn') break;
+        const nextDigits: string = (nextNode?.childNodes?.[0] as any)?.text || '';
+        if (RE_THREE_DIGITS.test(nextDigits)) return true;
+        if (!RE_TWO_DIGITS.test(nextDigits)) break;
         j += 2;
       }
     }
@@ -119,4 +119,22 @@ export const needsParens = (s: string): boolean => {
     return false;
   }
   return true;
+};
+
+/** Format a subscript or superscript with proper Typst grouping.
+ *  Returns e.g. '_x', '_(x + y)', '^n', '^(a b)', or '' if content is empty. */
+export const formatScript = (prefix: '_' | '^', content: string): string => {
+  if (!content) return '';
+  return prefix + (needsParens(content) ? '(' + content + ')' : content);
+};
+
+/** Check if a node is the first child of its parent. */
+export const isFirstChild = (node: any): boolean => {
+  return node.parent && node.parent.childNodes[0] && node.parent.childNodes[0] === node;
+};
+
+/** Check if a node is the last child of its parent. */
+export const isLastChild = (node: any): boolean => {
+  return node.parent && node.parent.childNodes
+    && node.parent.childNodes[node.parent.childNodes.length - 1] === node;
 };

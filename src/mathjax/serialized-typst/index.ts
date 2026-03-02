@@ -1,7 +1,7 @@
 import { MmlVisitor } from 'mathjax-full/js/core/MmlTree/MmlVisitor.js';
 import { MmlNode, TextNode, XMLNode, TEXCLASS } from 'mathjax-full/js/core/MmlTree/MmlNode.js';
 import { handle } from './handlers';
-import { ITypstData, addToTypstData, addSpaceToTypstData, initTypstData, isThousandSepComma, needsParens, needsTokenSeparator } from './common';
+import { ITypstData, addToTypstData, addSpaceToTypstData, initTypstData, isThousandSepComma, needsParens, formatScript, needsTokenSeparator } from './common';
 import { findTypstSymbol } from './typst-symbol-map';
 
 // Extract big delimiter info from a TeXAtom node wrapping a sized mo.
@@ -197,14 +197,14 @@ export class SerializedTypstVisitor extends MmlVisitor {
               if (scriptNode.kind === 'msubsup') {
                 const sub = scriptNode.childNodes[1] ? this.visitNode(scriptNode.childNodes[1], '').typst.trim() : '';
                 const sup = scriptNode.childNodes[2] ? this.visitNode(scriptNode.childNodes[2], '').typst.trim() : '';
-                if (sub) delimExpr += '_' + (needsParens(sub) ? '(' + sub + ')' : sub);
-                if (sup) delimExpr += '^' + (needsParens(sup) ? '(' + sup + ')' : sup);
+                if (sub) delimExpr += formatScript('_', sub);
+                if (sup) delimExpr += formatScript('^', sup);
               } else if (scriptNode.kind === 'msub') {
                 const sub = scriptNode.childNodes[1] ? this.visitNode(scriptNode.childNodes[1], '').typst.trim() : '';
-                if (sub) delimExpr += '_' + (needsParens(sub) ? '(' + sub + ')' : sub);
+                if (sub) delimExpr += formatScript('_', sub);
               } else if (scriptNode.kind === 'msup') {
                 const sup = scriptNode.childNodes[1] ? this.visitNode(scriptNode.childNodes[1], '').typst.trim() : '';
-                if (sup) delimExpr += '^' + (needsParens(sup) ? '(' + sup + ')' : sup);
+                if (sup) delimExpr += formatScript('^', sup);
               }
             }
             if (needsTokenSeparator(res.typst, delimExpr)) {

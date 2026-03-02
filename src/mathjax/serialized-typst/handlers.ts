@@ -1,14 +1,19 @@
 import { TEXCLASS } from "mathjax-full/js/core/MmlTree/MmlNode";
 import {
   ITypstData, initTypstData, addToTypstData, addSpaceToTypstData,
-  needsParens, isThousandSepComma, needsTokenSeparator,
+  formatScript, isThousandSepComma, needsTokenSeparator,
+  isFirstChild, isLastChild,
   RE_NBSP, RE_CONTENT_SPECIAL, RE_WORD_DOT_END, RE_WORD_DOT_START,
   RE_WORD_START, RE_OP_WRAPPER, RE_TAG_EXTRACT, RE_TAG_STRIP,
   RE_BRACKET_CHARS, RE_UNICODE_SPACES, RE_TRAILING_SPACING,
 } from "./common";
 import { findTypstSymbol, typstAccentMap, typstFontMap, typstSymbolMap } from "./typst-symbol-map";
 import { escapeContentSeparators, escapeCasesSeparators, hasTopLevelSeparators, escapeLrSemicolons, escapeUnbalancedParens } from "./escape-utils";
-import { isFirstChild, isLastChild } from "./node-utils";
+
+// Max tree depth for phantom search in hasPhantomChild
+const PHANTOM_SEARCH_MAX_DEPTH = 5;
+// Max ancestor depth for mstyle/TeXAtom traversal
+const ANCESTOR_MAX_DEPTH = 10;
 
 const INVISIBLE_CHARS: Set<string> = new Set([
   '\u2061', // function application
@@ -17,7 +22,7 @@ const INVISIBLE_CHARS: Set<string> = new Set([
   '\u2064', // invisible plus
 ]);
 
-const getChildrenText = (node): string => {
+const getNodeText = (node): string => {
   let text: string = '';
   try {
     node.childNodes.forEach((child: any) => {
@@ -33,7 +38,7 @@ const getAttributes = (node): any => {
   return node.attributes.getAllAttributes();
 };
 
-const defHandle = (node, serialize): ITypstData => {
+const defaultHandler = (node, serialize): ITypstData => {
   return handlerApi.handleAll(node, serialize);
 };
 
@@ -115,7 +120,7 @@ const serializeTagContent = (labelCell: any, serialize: any): string => {
 
 // Spacing helper: check if previous sibling ends with a word character
 // and current node starts with a word character, requiring a space separator
-const needSpaceBefore = (node): boolean => {
+const needsSpaceBefore = (node): boolean => {
   try {
     if (isFirstChild(node)) {
       return false;
@@ -137,7 +142,7 @@ const needSpaceBefore = (node): boolean => {
   }
 };
 
-const needSpaceAfter = (node): boolean => {
+const needsSpaceAfter = (node): boolean => {
   try {
     if (isLastChild(node)) {
       return false;
@@ -240,8 +245,8 @@ const mi = () => {
       }
       // Add spacing around multi-character Typst symbol names
       if (typstValue.length > 1 && RE_WORD_START.test(typstValue)) {
-        const spaceBefore = needSpaceBefore(node) ? ' ' : '';
-        const spaceAfter = needSpaceAfter(node) ? ' ' : '';
+        const spaceBefore = needsSpaceBefore(node) ? ' ' : '';
+        const spaceAfter = needsSpaceAfter(node) ? ' ' : '';
         res = addToTypstData(res, { typst: spaceBefore + typstValue + spaceAfter });
       } else {
         res = addToTypstData(res, { typst: typstValue });
@@ -265,12 +270,12 @@ const mo = () => {
   return (node, _serialize): ITypstData => {
     let res: ITypstData = initTypstData();
     try {
-      const value = getChildrenText(node);
+      const value = getNodeText(node);
       // EARLY: unpaired bracket → emit escaped delimiter
       const unpairedDir = node.properties?.['data-unpaired-bracket'];
       if (unpairedDir && UNPAIRED_BRACKET_TYPST[value]) {
-        const spaceBefore = needSpaceBefore(node) ? ' ' : '';
-        const spaceAfter = needSpaceAfter(node) ? ' ' : '';
+        const spaceBefore = needsSpaceBefore(node) ? ' ' : '';
+        const spaceAfter = needsSpaceAfter(node) ? ' ' : '';
         res = addToTypstData(res, { typst: spaceBefore + UNPAIRED_BRACKET_TYPST[value] + spaceAfter });
         return res;
       }
@@ -284,8 +289,8 @@ const mo = () => {
       const normalizedValue = value.replace(RE_UNICODE_SPACES, ' ');
       const mappedOp = MATHJAX_MULTIWORD_OPS.get(normalizedValue);
       if (mappedOp) {
-        const spaceBefore = needSpaceBefore(node) ? ' ' : '';
-        const spaceAfter = needSpaceAfter(node) ? ' ' : '';
+        const spaceBefore = needsSpaceBefore(node) ? ' ' : '';
+        const spaceAfter = needsSpaceAfter(node) ? ' ' : '';
         res = addToTypstData(res, { typst: spaceBefore + mappedOp + spaceAfter });
         return res;
       }
@@ -303,8 +308,8 @@ const mo = () => {
       // Add spacing around operators for readability
       if (typstValue.length > 1 && RE_WORD_START.test(typstValue)) {
         // Multi-char Typst symbol names: "times", "lt.eq", etc.
-        const spaceBefore = needSpaceBefore(node) ? ' ' : '';
-        let spaceAfter = needSpaceAfter(node) ? ' ' : '';
+        const spaceBefore = needsSpaceBefore(node) ? ' ' : '';
+        let spaceAfter = needsSpaceAfter(node) ? ' ' : '';
         // Prevent Typst from interpreting "symbol(" as a function call
         // (e.g. "lt.eq(x)" would call lt.eq as a function)
         if (!spaceAfter && !inScript) {
@@ -312,7 +317,7 @@ const mo = () => {
             const idx = node.parent.childNodes.findIndex(item => item === node);
             const next = node.parent.childNodes[idx + 1];
             if (next && next.kind === 'mo') {
-              const nt = getChildrenText(next);
+              const nt = getNodeText(next);
               if (nt === '(' || nt === '[') spaceAfter = ' ';
             }
           } catch (_e) { /* ignore */ }
@@ -342,7 +347,7 @@ const mn = () => {
   return (node, _serialize): ITypstData => {
     let res: ITypstData = initTypstData();
     try {
-      const value = getChildrenText(node);
+      const value = getNodeText(node);
       // Check for font variant (e.g. \mathbb{1})
       const atr = getAttributes(node);
       const mathvariant: string = atr?.mathvariant || '';
@@ -380,8 +385,8 @@ const mtext = () => {
       // Check if this is a single symbol character with a known Typst mapping
       if (value.length === 1 && typstSymbolMap.has(value)) {
         const typstValue = findTypstSymbol(value);
-        const spaceBefore = needSpaceBefore(node) ? ' ' : '';
-        const spaceAfter = needSpaceAfter(node) ? ' ' : '';
+        const spaceBefore = needsSpaceBefore(node) ? ' ' : '';
+        const spaceAfter = needsSpaceAfter(node) ? ' ' : '';
         res = addToTypstData(res, { typst: spaceBefore + typstValue + spaceAfter });
         return res;
       }
@@ -440,6 +445,17 @@ const PRIME_SHORTHANDS: Map<string, string> = new Map([
 // Regex to detect overbrace/overbracket/underbrace/underbracket as outermost call
 const BRACE_ANNOTATION_RE = /^(overbrace|overbracket|underbrace|underbracket)\((.+)\)$/s;
 
+/** Match a brace annotation (overbrace/underbrace/etc.) and return it with annotation as second argument.
+ *  Returns null if baseTrimmed doesn't match any of the specified kinds. */
+const matchBraceAnnotation = (
+  baseTrimmed: string, annotation: string,
+  kinds: ('overbrace' | 'overbracket' | 'underbrace' | 'underbracket')[]
+): ITypstData | null => {
+  const m = BRACE_ANNOTATION_RE.exec(baseTrimmed);
+  if (!m || !kinds.includes(m[1] as any)) return null;
+  return { typst: m[1] + '(' + m[2] + ', ' + escapeContentSeparators(annotation) + ')' };
+};
+
 // --- MSUP handler: superscripts ---
 const msup = () => {
   return (node, serialize): ITypstData => {
@@ -454,12 +470,8 @@ const msup = () => {
       const baseTrimmed = base.trim();
       // overbrace/overbracket annotation: insert as second argument instead of ^
       if (sup) {
-        const braceMatch = BRACE_ANNOTATION_RE.exec(baseTrimmed);
-        if (braceMatch && (braceMatch[1] === 'overbrace' || braceMatch[1] === 'overbracket')) {
-          // braceMatch[2] already processed by accent handler — don't re-escape
-          res = addToTypstData(res, { typst: braceMatch[1] + '(' + braceMatch[2] + ', ' + escapeContentSeparators(sup) + ')' });
-          return res;
-        }
+        const braceRes = matchBraceAnnotation(baseTrimmed, sup, ['overbrace', 'overbracket']);
+        if (braceRes) { res = addToTypstData(res, braceRes); return res; }
       }
       // All parts empty (e.g. mhchem phantom alignment msup) → skip entirely
       if (!baseTrimmed && !sup) {
@@ -479,12 +491,7 @@ const msup = () => {
         if (primeShorthand) {
           res = addToTypstData(res, { typst: primeShorthand });
         } else {
-          res = addToTypstData(res, { typst: '^' });
-          if (needsParens(sup)) {
-            res = addToTypstData(res, { typst: '(' + sup + ')' });
-          } else {
-            res = addToTypstData(res, { typst: sup });
-          }
+          res = addToTypstData(res, { typst: formatScript('^', sup) });
         }
       }
       return res;
@@ -508,12 +515,8 @@ const msub = () => {
       const baseTrimmed = base.trim();
       // underbrace/underbracket annotation: insert as second argument instead of _
       if (sub) {
-        const braceMatch = BRACE_ANNOTATION_RE.exec(baseTrimmed);
-        if (braceMatch && (braceMatch[1] === 'underbrace' || braceMatch[1] === 'underbracket')) {
-          // braceMatch[2] already processed by accent handler — don't re-escape
-          res = addToTypstData(res, { typst: braceMatch[1] + '(' + braceMatch[2] + ', ' + escapeContentSeparators(sub) + ')' });
-          return res;
-        }
+        const braceRes = matchBraceAnnotation(baseTrimmed, sub, ['underbrace', 'underbracket']);
+        if (braceRes) { res = addToTypstData(res, braceRes); return res; }
       }
       // All parts empty (e.g. mhchem phantom alignment msub) → skip entirely
       if (!baseTrimmed && !sub) {
@@ -527,12 +530,7 @@ const msub = () => {
       }
       // Skip empty subscript (e.g. LaTeX m_{} → just "m")
       if (sub) {
-        res = addToTypstData(res, { typst: '_' });
-        if (needsParens(sub)) {
-          res = addToTypstData(res, { typst: '(' + sub + ')' });
-        } else {
-          res = addToTypstData(res, { typst: sub });
-        }
+        res = addToTypstData(res, { typst: formatScript('_', sub) });
       }
       return res;
     } catch (e) {
@@ -568,20 +566,10 @@ const msubsup = () => {
       }
       // Skip empty subscript/superscript (e.g. LaTeX m_{}^{x} → just "m^x")
       if (sub) {
-        res = addToTypstData(res, { typst: '_' });
-        if (needsParens(sub)) {
-          res = addToTypstData(res, { typst: '(' + sub + ')' });
-        } else {
-          res = addToTypstData(res, { typst: sub });
-        }
+        res = addToTypstData(res, { typst: formatScript('_', sub) });
       }
       if (sup) {
-        res = addToTypstData(res, { typst: '^' });
-        if (needsParens(sup)) {
-          res = addToTypstData(res, { typst: '(' + sup + ')' });
-        } else {
-          res = addToTypstData(res, { typst: sup });
-        }
+        res = addToTypstData(res, { typst: formatScript('^', sup) });
       }
       return res;
     } catch (e) {
@@ -776,15 +764,15 @@ const mover = () => {
       const dataSecond: ITypstData = secondChild ? serialize.visitNode(secondChild, '') : initTypstData();
       // Detect \varlimsup pattern: mover(mi("lim"), mo("―")) → op(overline(lim))
       if (firstChild?.kind === 'mi' && secondChild?.kind === 'mo') {
-        const baseText = getChildrenText(firstChild);
-        const overChar = getChildrenText(secondChild);
+        const baseText = getNodeText(firstChild);
+        const overChar = getNodeText(secondChild);
         if (baseText === 'lim' && overChar === '\u2015') {
           res = addToTypstData(res, { typst: 'op(overline(lim))' });
           return res;
         }
       }
       if (secondChild && secondChild.kind === 'mo') {
-        const accentChar = getChildrenText(secondChild);
+        const accentChar = getNodeText(secondChild);
         const accentFn = typstAccentMap.get(accentChar);
         if (accentFn) {
           const content = escapeContentSeparators(dataFirst.typst.trim()) || '""';
@@ -803,20 +791,11 @@ const mover = () => {
       const over = dataSecond.typst.trim();
       if (over) {
         // overbrace/overbracket annotation: insert as second argument
-        const braceMatch = BRACE_ANNOTATION_RE.exec(baseTrimmed);
-        if (braceMatch && (braceMatch[1] === 'overbrace' || braceMatch[1] === 'overbracket')) {
-          // braceMatch[2] already processed by accent handler — don't re-escape
-          res = addToTypstData(res, { typst: braceMatch[1] + '(' + braceMatch[2] + ', ' + escapeContentSeparators(over) + ')' });
-          return res;
-        }
+        const braceRes = matchBraceAnnotation(baseTrimmed, over, ['overbrace', 'overbracket']);
+        if (braceRes) { res = addToTypstData(res, braceRes); return res; }
         const baseData = buildLimitBase(firstChild, baseTrimmed, dataFirst.typst);
         res = addToTypstData(res, baseData);
-        res = addToTypstData(res, { typst: '^' });
-        if (needsParens(over)) {
-          res = addToTypstData(res, { typst: '(' + over + ')' });
-        } else {
-          res = addToTypstData(res, { typst: over });
-        }
+        res = addToTypstData(res, { typst: formatScript('^', over) });
       } else {
         res = addToTypstData(res, { typst: baseTrimmed });
       }
@@ -839,8 +818,8 @@ const munder = () => {
       // Detect \varinjlim / \varprojlim / \varliminf patterns: munder(mi("lim"), mo(...))
       // Map to equivalent Typst operators (losing the visual decoration).
       if (firstChild?.kind === 'mi' && secondChild?.kind === 'mo') {
-        const baseText = getChildrenText(firstChild);
-        const underChar = getChildrenText(secondChild);
+        const baseText = getNodeText(firstChild);
+        const underChar = getNodeText(secondChild);
         if (baseText === 'lim' && underChar === '\u2192') {        // → below lim
           res = addToTypstData(res, { typst: 'op("inj lim")' });
           return res;
@@ -855,7 +834,7 @@ const munder = () => {
         }
       }
       if (secondChild && secondChild.kind === 'mo') {
-        const accentChar = getChildrenText(secondChild);
+        const accentChar = getNodeText(secondChild);
         let accentFn = typstAccentMap.get(accentChar);
         // Flip over-accents to under-accents when used in munder context
         if (accentFn === 'overline') { accentFn = 'underline'; }
@@ -881,20 +860,11 @@ const munder = () => {
       const under = dataSecond.typst.trim();
       if (under) {
         // underbrace/underbracket annotation: insert as second argument
-        const braceMatch = BRACE_ANNOTATION_RE.exec(baseTrimmed);
-        if (braceMatch && (braceMatch[1] === 'underbrace' || braceMatch[1] === 'underbracket')) {
-          // braceMatch[2] already processed by accent handler — don't re-escape
-          res = addToTypstData(res, { typst: braceMatch[1] + '(' + braceMatch[2] + ', ' + escapeContentSeparators(under) + ')' });
-          return res;
-        }
+        const braceRes = matchBraceAnnotation(baseTrimmed, under, ['underbrace', 'underbracket']);
+        if (braceRes) { res = addToTypstData(res, braceRes); return res; }
         const baseData = buildLimitBase(firstChild, baseTrimmed, dataFirst.typst);
         res = addToTypstData(res, baseData);
-        res = addToTypstData(res, { typst: '_' });
-        if (needsParens(under)) {
-          res = addToTypstData(res, { typst: '(' + under + ')' });
-        } else {
-          res = addToTypstData(res, { typst: under });
-        }
+        res = addToTypstData(res, { typst: formatScript('_', under) });
       } else {
         res = addToTypstData(res, { typst: baseTrimmed });
       }
@@ -923,20 +893,10 @@ const munderover = () => {
       const baseData = buildLimitBase(firstChild, baseTrimmed, dataFirst.typst);
       res = addToTypstData(res, baseData);
       if (under) {
-        res = addToTypstData(res, { typst: '_' });
-        if (needsParens(under)) {
-          res = addToTypstData(res, { typst: '(' + under + ')' });
-        } else {
-          res = addToTypstData(res, { typst: under });
-        }
+        res = addToTypstData(res, { typst: formatScript('_', under) });
       }
       if (over) {
-        res = addToTypstData(res, { typst: '^' });
-        if (needsParens(over)) {
-          res = addToTypstData(res, { typst: '(' + over + ')' });
-        } else {
-          res = addToTypstData(res, { typst: over });
-        }
+        res = addToTypstData(res, { typst: formatScript('^', over) });
       }
       return res;
     } catch (e) {
@@ -1010,20 +970,10 @@ const mmultiscripts = () => {
         // No prescripts — use simple base_sub^sup syntax
         res = addToTypstData(res, { typst: baseTrimmed });
         if (postSub) {
-          res = addToTypstData(res, { typst: '_' });
-          if (needsParens(postSub)) {
-            res = addToTypstData(res, { typst: '(' + postSub + ')' });
-          } else {
-            res = addToTypstData(res, { typst: postSub });
-          }
+          res = addToTypstData(res, { typst: formatScript('_', postSub) });
         }
         if (postSup) {
-          res = addToTypstData(res, { typst: '^' });
-          if (needsParens(postSup)) {
-            res = addToTypstData(res, { typst: '(' + postSup + ')' });
-          } else {
-            res = addToTypstData(res, { typst: postSup });
-          }
+          res = addToTypstData(res, { typst: formatScript('^', postSup) });
         }
       } else {
         // Has prescripts — use attach(base, tl:, bl:, t:, b:)
@@ -1103,7 +1053,7 @@ const treeContainsMo = (node, moText: string, skipPhantom = true): boolean => {
   if (!node) return false;
   if (skipPhantom && node.kind === 'mphantom') return false;
   if (node.kind === 'mo') {
-    const text = getChildrenText(node);
+    const text = getNodeText(node);
     if (text === moText) return true;
   }
   if (node.childNodes) {
@@ -1134,7 +1084,7 @@ const serializePrefixBeforeMo = (node, serialize, stopMoText: string): string =>
   // Serialize children up to the stop mo
   let result = '';
   for (const child of flatChildren) {
-    if (child.kind === 'mo' && getChildrenText(child) === stopMoText) {
+    if (child.kind === 'mo' && getNodeText(child) === stopMoText) {
       break;
     }
     const data: ITypstData = serialize.visitNode(child, '');
@@ -1208,10 +1158,9 @@ const replaceUnpairedBrackets = (expr: string): string => {
   }
 
   // Pair brackets using stacks for each bracket type
-  const BRACKET_PAIRS: Record<string, string> = { '[': ']', '(': ')', '{': '}' };
   const unmatched = new Set<number>();
 
-  for (const [open, close] of Object.entries(BRACKET_PAIRS)) {
+  for (const [open, close] of Object.entries(OPEN_BRACKETS)) {
     const stack: number[] = [];
     for (const b of brackets) {
       if (b.char === open) {
@@ -1286,7 +1235,7 @@ export const markUnpairedBrackets = (root: any): void => {
   const walk = (node: any): void => {
     if (!node) return;
     if (node.kind === 'mo') {
-      const text = getChildrenText(node);
+      const text = getNodeText(node);
       if (text && (OPEN_BRACKETS[text] || CLOSE_BRACKETS[text])) {
         // Skip \left...\right delimiters — they are handled by the mrow handler
         if (!isLeftRightDelimiter(node)) {
@@ -1372,6 +1321,334 @@ const isNumcasesTable = (node): boolean => {
 
 // Check if a node is inside a non-eqnArray mtable (mat()/cases() function call syntax)
 // where bare ASCII delimiters like [ { ( would break parsing.
+// --- MTABLE helper functions ---
+
+/** numcases/subnumcases → #grid() with cases + numbering column */
+const buildNumcasesGrid = (node: any, serialize: any, countRow: number): ITypstData => {
+  let res: ITypstData = initTypstData();
+  const firstRow = node.childNodes[0];
+  const prefixCell = firstRow.childNodes[1]; // cell after label
+  const prefix = serializePrefixBeforeMo(prefixCell, serialize, '{');
+
+  // Determine tag source for each row:
+  // 1. Condition-embedded \tag{...} in mtext (MathJax leaves it as literal text)
+  // 2. Label cell explicit tag (MathJax processed \tag, data-tag-auto is false)
+  // 3. Auto-numbered (data-tag-auto is true)
+  const autoTagEntry = '{ counter(math.equation).step(); context counter(math.equation).display("(1)") }';
+  const rowTagSources: { source: 'condition' | 'label' | 'auto'; content: string; labelKey: string | null }[] = [];
+  for (let i = 0; i < countRow; i++) {
+    const mtrNode = node.childNodes[i];
+    const labelCell = (mtrNode.kind === 'mlabeledtr' && mtrNode.childNodes.length > 0) ? mtrNode.childNodes[0] : null;
+    const labelKey = labelCell ? getLabelKey(labelCell) : null;
+    // Check condition cell for embedded \tag{...} in mtext
+    const condCell = mtrNode.childNodes[mtrNode.childNodes.length - 1];
+    const condTag = extractTagFromConditionCell(condCell);
+    if (condTag) {
+      rowTagSources.push({ source: 'condition', content: condTag, labelKey });
+    } else if (labelCell) {
+      const isAutoNumber = !!(labelCell as any).properties?.['data-tag-auto'];
+      if (!isAutoNumber) {
+        const tagContent = serializeTagContent(labelCell, serialize);
+        rowTagSources.push({ source: 'label', content: tagContent, labelKey });
+      } else {
+        rowTagSources.push({ source: 'auto', content: '', labelKey });
+      }
+    } else {
+      rowTagSources.push({ source: 'auto', content: '', labelKey: null });
+    }
+  }
+
+  // Build case rows from content columns (after label + prefix)
+  const caseRows: string[] = [];
+  for (let i = 0; i < countRow; i++) {
+    const mtrNode = node.childNodes[i];
+    const startCol = mtrNode.kind === 'mlabeledtr' ? 2 : 1; // skip label + prefix
+    const cells: string[] = [];
+    for (let j = startCol; j < mtrNode.childNodes.length; j++) {
+      const mtdNode = mtrNode.childNodes[j];
+      const cellData: ITypstData = serialize.visitNode(mtdNode, '');
+      let trimmed = cellData.typst.trim();
+      // Strip \tag{...} from condition column if tag was extracted from there
+      if (j === mtrNode.childNodes.length - 1 && rowTagSources[i].source === 'condition') {
+        trimmed = trimmed.replace(RE_TAG_STRIP, '');
+        trimmed = trimmed.replace(/\s+"$/g, '"');
+        trimmed = trimmed.trim();
+      }
+      if (trimmed) cells.push(trimmed);
+    }
+    if (cells.length === 1) {
+      // Single cell (no & separator): escape top-level commas
+      // to prevent them being parsed as cases() argument separators
+      caseRows.push(escapeCasesSeparators(replaceUnpairedBrackets(cells[0])));
+    } else {
+      caseRows.push(cells.map(c => escapeCasesSeparators(replaceUnpairedBrackets(c))).join(' & '));
+    }
+  }
+
+  let casesContent: string;
+  if (caseRows.length >= 2) {
+    casesContent = 'cases(\n  ' + caseRows.join(',\n  ') + ',\n)';
+  } else {
+    casesContent = 'cases(' + caseRows.join(', ') + ')';
+  }
+  const mathContent = prefix ? prefix + ' ' + casesContent : casesContent;
+
+  // Build tag entries for numbering column
+  const tagEntries: string[] = [];
+  for (let i = 0; i < countRow; i++) {
+    const info = rowTagSources[i];
+    let tagText = '';
+    if (info.source === 'condition') {
+      // Escape content-mode special chars in condition-embedded tag text
+      tagText = '(' + info.content.replace(RE_CONTENT_SPECIAL, '\\$&') + ')';
+    } else if (info.source === 'label' && info.content) {
+      tagText = info.content;  // already escaped by serializeTagContent
+    }
+    if (tagText && info.labelKey) {
+      // Explicit tag with label — wrap in #figure() so the label is referenceable
+      tagEntries.push('[#figure(kind: "eq-tag", supplement: none, numbering: n => [' + tagText + '], [' + tagText + ']) <' + info.labelKey + '>]');
+    } else if (tagText) {
+      tagEntries.push('[' + tagText + ']');
+    } else if (info.labelKey) {
+      // Auto-numbered with label — step counter outside context, wrap in #figure() for referenceability
+      tagEntries.push('{ counter(math.equation).step(); context { let n = numbering("(1)", ..counter(math.equation).get()); [#figure(kind: "eq-tag", supplement: none, numbering: _ => n, [#n]) <' + info.labelKey + '>] } }');
+    } else {
+      tagEntries.push(autoTagEntry);
+    }
+  }
+
+  // Build grid output
+  const gridLines: string[] = [
+    '#grid(',
+    '  columns: (1fr, auto),',
+    '  align: (left, right + horizon),',
+    '  math.equation(block: true, numbering: none, $ ' + mathContent + ' $),',
+    '  grid(',
+    '    row-gutter: 0.65em,',
+  ];
+  for (const entry of tagEntries) {
+    gridLines.push('    ' + entry + ',');
+  }
+  gridLines.push('  ),');
+  gridLines.push(')');
+
+  res = addToTypstData(res, { typst: gridLines.join('\n') });
+  // Inline variant: pure math content without #grid wrapper
+  res.typst_inline = mathContent;
+  return res;
+};
+
+/** eqnArray with tags → number-align / separate / no-tag strategies */
+const buildTaggedEqnArray = (
+  node: any, serialize: any, rows: string[], countRow: number,
+  preContent: string, postContent: string
+): ITypstData => {
+  let res: ITypstData = initTypstData();
+  // Analyze tag pattern: count explicit tags and auto-number tags
+  const rowTagInfos: { isTagged: boolean; isAutoTag: boolean; isExplicitTag: boolean; tagContent: string; labelKey: string | null }[] = [];
+  for (let i = 0; i < countRow; i++) {
+    const mtrNode = node.childNodes[i];
+    if (mtrNode.kind === 'mlabeledtr' && mtrNode.childNodes.length > 0) {
+      const labelCell = mtrNode.childNodes[0];
+      const tagContent = serializeTagContent(labelCell, serialize);
+      const isAutoNumber = !!(labelCell as any).properties?.['data-tag-auto'];
+      const labelKey = getLabelKey(labelCell);
+      rowTagInfos.push({
+        isTagged: !!tagContent,
+        isAutoTag: isAutoNumber && !!tagContent,
+        isExplicitTag: !isAutoNumber && !!tagContent,
+        tagContent: tagContent || '',
+        labelKey,
+      });
+    } else {
+      rowTagInfos.push({ isTagged: false, isAutoTag: false, isExplicitTag: false, tagContent: '', labelKey: null });
+    }
+  }
+
+  const explicitTagIndices = rowTagInfos.map((r, i) => r.isExplicitTag ? i : -1).filter(i => i >= 0);
+  const autoTagIndices = rowTagInfos.map((r, i) => r.isAutoTag ? i : -1).filter(i => i >= 0);
+  const totalTagged = explicitTagIndices.length + autoTagIndices.length;
+
+  // Strategy: number-align — exactly ONE explicit tag in multi-row, no auto-tags
+  if (explicitTagIndices.length === 1 && autoTagIndices.length === 0 && countRow > 1) {
+    const tagIdx = explicitTagIndices[0];
+    const info = rowTagInfos[tagIdx];
+    // Merge pre/post content into rows
+    if (postContent && rows.length > 0) {
+      rows[rows.length - 1] = rows[rows.length - 1] + ' ' + postContent;
+    }
+    // Determine number-align based on tag position
+    // When preContent exists, it becomes an extra row at the top
+    const totalRows = (preContent ? countRow + 1 : countRow)
+      + (postContent && rows.length === 0 ? 1 : 0);
+    const adjustedTagIdx = preContent ? tagIdx + 1 : tagIdx;
+    let numberAlign: string;
+    if (adjustedTagIdx === totalRows - 1) {
+      numberAlign = 'end + bottom';
+    } else if (adjustedTagIdx === 0) {
+      numberAlign = 'end + top';
+    } else {
+      numberAlign = 'end + horizon';
+    }
+    const mathContent = preContent
+      ? preContent + ' \\\n' + rows.join(' \\\n')
+      : rows.join(' \\\n');
+    const supplementPart = info.labelKey ? ', supplement: none' : '';
+    const numberAlignPart = ', number-align: ' + numberAlign;
+    const labelSuffix = info.labelKey ? ' <' + info.labelKey + '>' : '';
+    const block = '#math.equation(block: true' + supplementPart
+      + ', numbering: n => [' + info.tagContent + ']'
+      + numberAlignPart + ', $ ' + mathContent + ' $)' + labelSuffix
+      + '\n#counter(math.equation).update(n => n - 1)';
+    res = addToTypstData(res, { typst: block });
+    res.typst_inline = preContent
+      ? preContent + ' \\\n' + rows.join(' \\\n')
+      : rows.join(' \\\n');
+  } else if (totalTagged > 0) {
+    // Strategy: separate — multiple tags or auto-numbered rows
+    // Each row becomes a separate #math.equation block
+    // Merge pre/post content into rows
+    if (preContent && rows.length > 0) {
+      rows[0] = preContent + ' \\\n' + rows[0];
+    }
+    if (postContent && rows.length > 0) {
+      rows[rows.length - 1] = rows[rows.length - 1] + ' ' + postContent;
+    }
+    const eqnBlocks: string[] = [];
+    for (let i = 0; i < countRow; i++) {
+      const info = rowTagInfos[i];
+      const rowContent = rows[i];
+      if (info.isTagged) {
+        const numbering = info.isAutoTag
+          ? '"(1)"'
+          : 'n => [' + info.tagContent + ']';
+        const labelKey = info.labelKey;
+        const labelSuffix = labelKey ? ' <' + labelKey + '>' : '';
+        const supplementPart = labelKey ? ', supplement: none' : '';
+        eqnBlocks.push(
+          '#math.equation(block: true' + supplementPart + ', numbering: ' + numbering + ', $ ' + rowContent + ' $)' + labelSuffix
+        );
+        if (info.isExplicitTag) {
+          eqnBlocks.push('#counter(math.equation).update(n => n - 1)');
+        }
+      } else {
+        eqnBlocks.push('#math.equation(block: true, numbering: none, $ ' + rowContent + ' $)');
+      }
+    }
+    res = addToTypstData(res, { typst: eqnBlocks.join('\n') });
+    res.typst_inline = rows.join(' \\\n');
+  } else {
+    // mlabeledtr nodes present but no actual tag content — treat as no-tag
+    return buildUntaggedEqnArray(rows, preContent, postContent);
+  }
+  return res;
+};
+
+/** eqnArray without tags → rows with \\ separators */
+const buildUntaggedEqnArray = (
+  rows: string[], preContent: string, postContent: string
+): ITypstData => {
+  let res: ITypstData = initTypstData();
+  if (postContent && rows.length > 0) {
+    rows[rows.length - 1] = rows[rows.length - 1] + ' ' + postContent;
+  }
+  const content = preContent
+    ? preContent + ' \\\n' + rows.join(' \\\n')
+    : rows.join(' \\\n');
+  res = addToTypstData(res, { typst: content });
+  return res;
+};
+
+/** matrix → mat(delim: ..., ...) with augment/align/frame */
+const buildMatrix = (
+  node: any, rows: string[], branchOpen: string, branchClose: string
+): ITypstData => {
+  let res: ITypstData = initTypstData();
+  let matContent: string;
+  if (rows.length >= 2) {
+    matContent = '\n  ' + rows.join(';\n  ') + ',\n';
+  } else {
+    matContent = rows.join('; ');
+  }
+
+  // Parse array line attributes for augment parameter
+  const columnlines = node.attributes.isSet('columnlines')
+    ? (node.attributes.get('columnlines') as string).split(' ')
+    : [];
+  const rowlines = node.attributes.isSet('rowlines')
+    ? (node.attributes.get('rowlines') as string).split(' ')
+    : [];
+  const frame = node.attributes.isSet('frame')
+    ? (node.attributes.get('frame') as string)
+    : '';
+
+  const vlinePositions: number[] = [];
+  for (let i = 0; i < columnlines.length; i++) {
+    if (columnlines[i] === 'solid' || columnlines[i] === 'dashed') {
+      vlinePositions.push(i + 1);
+    }
+  }
+  const hlinePositions: number[] = [];
+  for (let i = 0; i < rowlines.length; i++) {
+    if (rowlines[i] === 'solid' || rowlines[i] === 'dashed') {
+      hlinePositions.push(i + 1);
+    }
+  }
+
+  // Build augment string
+  let augmentStr = '';
+  if (hlinePositions.length > 0 || vlinePositions.length > 0) {
+    const parts: string[] = [];
+    if (hlinePositions.length === 1) {
+      parts.push('hline: ' + hlinePositions[0]);
+    } else if (hlinePositions.length > 1) {
+      parts.push('hline: (' + hlinePositions.join(', ') + ')');
+    }
+    if (vlinePositions.length === 1) {
+      parts.push('vline: ' + vlinePositions[0]);
+    } else if (vlinePositions.length > 1) {
+      parts.push('vline: (' + vlinePositions.join(', ') + ')');
+    }
+    augmentStr = 'augment: #(' + parts.join(', ') + '), ';
+  }
+
+  // Extract column alignment
+  const columnAlign = node.attributes.get('columnalign') as string;
+  const alignArr = columnAlign ? columnAlign.trim().split(/\s+/) : [];
+  const uniqueAligns = [...new Set(alignArr)];
+  const matAlign = (uniqueAligns.length === 1 && uniqueAligns[0] !== 'center')
+    ? uniqueAligns[0]  // 'left' or 'right'
+    : '';
+
+  // Build mat() parameters
+  const params: string[] = [];
+  const hasDelimiters = branchOpen || branchClose;
+  if (hasDelimiters) {
+    if (branchOpen) {
+      params.push('delim: ' + delimiterToTypst(branchOpen));
+    }
+  } else {
+    // Arrays/matrices without parent delimiters should not have parens
+    params.push('delim: #none');
+  }
+  if (matAlign) {
+    params.push('align: #' + matAlign);
+  }
+  if (augmentStr) {
+    params.push(augmentStr.slice(0, -2)); // remove trailing ", "
+  }
+
+  const paramStr = params.length > 0 ? params.join(', ') + ', ' : '';
+  const matExpr = 'mat(' + paramStr + matContent + ')';
+
+  if (frame === 'solid') {
+    res = addToTypstData(res, { typst: '#box(stroke: 0.5pt, inset: 3pt, $ ' + matExpr + ' $)', typst_inline: matExpr });
+  } else {
+    res = addToTypstData(res, { typst: matExpr });
+  }
+  return res;
+};
+
 // --- MTABLE handler: matrices and equation arrays ---
 const mtable = () => {
   return (node, serialize): ITypstData => {
@@ -1393,117 +1670,7 @@ const mtable = () => {
         && node.childNodes[0].attributes?.get('displaystyle');
 
       if (isNumcases) {
-        // numcases/subnumcases: build #grid() with cases + numbering column
-        const firstRow = node.childNodes[0];
-        const prefixCell = firstRow.childNodes[1]; // cell after label
-        const prefix = serializePrefixBeforeMo(prefixCell, serialize, '{');
-
-        // Determine tag source for each row:
-        // 1. Condition-embedded \tag{...} in mtext (MathJax leaves it as literal text)
-        // 2. Label cell explicit tag (MathJax processed \tag, data-tag-auto is false)
-        // 3. Auto-numbered (data-tag-auto is true)
-        const autoTagEntry = '{ counter(math.equation).step(); context counter(math.equation).display("(1)") }';
-        const rowTagSources: { source: 'condition' | 'label' | 'auto'; content: string; labelKey: string | null }[] = [];
-        for (let i = 0; i < countRow; i++) {
-          const mtrNode = node.childNodes[i];
-          const labelCell = (mtrNode.kind === 'mlabeledtr' && mtrNode.childNodes.length > 0) ? mtrNode.childNodes[0] : null;
-          const labelKey = labelCell ? getLabelKey(labelCell) : null;
-          // Check condition cell for embedded \tag{...} in mtext
-          const condCell = mtrNode.childNodes[mtrNode.childNodes.length - 1];
-          const condTag = extractTagFromConditionCell(condCell);
-          if (condTag) {
-            rowTagSources.push({ source: 'condition', content: condTag, labelKey });
-          } else if (labelCell) {
-            const isAutoNumber = !!(labelCell as any).properties?.['data-tag-auto'];
-            if (!isAutoNumber) {
-              const tagContent = serializeTagContent(labelCell, serialize);
-              rowTagSources.push({ source: 'label', content: tagContent, labelKey });
-            } else {
-              rowTagSources.push({ source: 'auto', content: '', labelKey });
-            }
-          } else {
-            rowTagSources.push({ source: 'auto', content: '', labelKey: null });
-          }
-        }
-
-        // Build case rows from content columns (after label + prefix)
-        const caseRows: string[] = [];
-        for (let i = 0; i < countRow; i++) {
-          const mtrNode = node.childNodes[i];
-          const startCol = mtrNode.kind === 'mlabeledtr' ? 2 : 1; // skip label + prefix
-          const cells: string[] = [];
-          for (let j = startCol; j < mtrNode.childNodes.length; j++) {
-            const mtdNode = mtrNode.childNodes[j];
-            const cellData: ITypstData = serialize.visitNode(mtdNode, '');
-            let trimmed = cellData.typst.trim();
-            // Strip \tag{...} from condition column if tag was extracted from there
-            if (j === mtrNode.childNodes.length - 1 && rowTagSources[i].source === 'condition') {
-              trimmed = trimmed.replace(RE_TAG_STRIP, '');
-              trimmed = trimmed.replace(/\s+"$/g, '"');
-              trimmed = trimmed.trim();
-            }
-            if (trimmed) cells.push(trimmed);
-          }
-          if (cells.length === 1) {
-            // Single cell (no & separator): escape top-level commas
-            // to prevent them being parsed as cases() argument separators
-            caseRows.push(escapeCasesSeparators(replaceUnpairedBrackets(cells[0])));
-          } else {
-            caseRows.push(cells.map(c => escapeCasesSeparators(replaceUnpairedBrackets(c))).join(' & '));
-          }
-        }
-
-        let casesContent: string;
-        if (caseRows.length >= 2) {
-          casesContent = 'cases(\n  ' + caseRows.join(',\n  ') + ',\n)';
-        } else {
-          casesContent = 'cases(' + caseRows.join(', ') + ')';
-        }
-        const mathContent = prefix ? prefix + ' ' + casesContent : casesContent;
-
-        // Build tag entries for numbering column
-        const tagEntries: string[] = [];
-        for (let i = 0; i < countRow; i++) {
-          const info = rowTagSources[i];
-          let tagText = '';
-          if (info.source === 'condition') {
-            // Escape content-mode special chars in condition-embedded tag text
-            tagText = '(' + info.content.replace(RE_CONTENT_SPECIAL, '\\$&') + ')';
-          } else if (info.source === 'label' && info.content) {
-            tagText = info.content;  // already escaped by serializeTagContent
-          }
-          if (tagText && info.labelKey) {
-            // Explicit tag with label — wrap in #figure() so the label is referenceable
-            tagEntries.push('[#figure(kind: "eq-tag", supplement: none, numbering: n => [' + tagText + '], [' + tagText + ']) <' + info.labelKey + '>]');
-          } else if (tagText) {
-            tagEntries.push('[' + tagText + ']');
-          } else if (info.labelKey) {
-            // Auto-numbered with label — step counter outside context, wrap in #figure() for referenceability
-            tagEntries.push('{ counter(math.equation).step(); context { let n = numbering("(1)", ..counter(math.equation).get()); [#figure(kind: "eq-tag", supplement: none, numbering: _ => n, [#n]) <' + info.labelKey + '>] } }');
-          } else {
-            tagEntries.push(autoTagEntry);
-          }
-        }
-
-        // Build grid output
-        const lines: string[] = [
-          '#grid(',
-          '  columns: (1fr, auto),',
-          '  align: (left, right + horizon),',
-          '  math.equation(block: true, numbering: none, $ ' + mathContent + ' $),',
-          '  grid(',
-          '    row-gutter: 0.65em,',
-        ];
-        for (const entry of tagEntries) {
-          lines.push('    ' + entry + ',');
-        }
-        lines.push('  ),');
-        lines.push(')');
-
-        res = addToTypstData(res, { typst: lines.join('\n') });
-        // Inline variant: pure math content without #grid wrapper
-        res.typst_inline = mathContent;
-        return res;
+        return buildNumcasesGrid(node, serialize, countRow);
       }
 
       // Build rows
@@ -1543,129 +1710,17 @@ const mtable = () => {
           rows.push(cells.map(c => escapeCasesSeparators(replaceUnpairedBrackets(c))).join(', '));
         }
       }
+
       if (isEqnArray) {
-        // Check if any row has a tag (mlabeledtr)
         const hasAnyTag = node.childNodes.some(
           (child: any) => child.kind === 'mlabeledtr'
         );
-        // Check for pre/post-content passed from visitInferredMrowNode
-        // (math content preceding/following this mtable in the same $...$)
         const preContent = (node as any).properties?.['data-pre-content'] || '';
         const postContent = (node as any).properties?.['data-post-content'] || '';
-
         if (hasAnyTag) {
-          // Analyze tag pattern: count explicit tags and auto-number tags
-          const rowTagInfos: { isTagged: boolean; isAutoTag: boolean; isExplicitTag: boolean; tagContent: string; labelKey: string | null }[] = [];
-          for (let i = 0; i < countRow; i++) {
-            const mtrNode = node.childNodes[i];
-            if (mtrNode.kind === 'mlabeledtr' && mtrNode.childNodes.length > 0) {
-              const labelCell = mtrNode.childNodes[0];
-              const tagContent = serializeTagContent(labelCell, serialize);
-              const isAutoNumber = !!(labelCell as any).properties?.['data-tag-auto'];
-              const labelKey = getLabelKey(labelCell);
-              rowTagInfos.push({
-                isTagged: !!tagContent,
-                isAutoTag: isAutoNumber && !!tagContent,
-                isExplicitTag: !isAutoNumber && !!tagContent,
-                tagContent: tagContent || '',
-                labelKey,
-              });
-            } else {
-              rowTagInfos.push({ isTagged: false, isAutoTag: false, isExplicitTag: false, tagContent: '', labelKey: null });
-            }
-          }
-
-          const explicitTagIndices = rowTagInfos.map((r, i) => r.isExplicitTag ? i : -1).filter(i => i >= 0);
-          const autoTagIndices = rowTagInfos.map((r, i) => r.isAutoTag ? i : -1).filter(i => i >= 0);
-          const totalTagged = explicitTagIndices.length + autoTagIndices.length;
-
-          // Strategy: number-align — exactly ONE explicit tag in multi-row, no auto-tags
-          if (explicitTagIndices.length === 1 && autoTagIndices.length === 0 && countRow > 1) {
-            const tagIdx = explicitTagIndices[0];
-            const info = rowTagInfos[tagIdx];
-            // Merge pre/post content into rows
-            if (postContent && rows.length > 0) {
-              rows[rows.length - 1] = rows[rows.length - 1] + ' ' + postContent;
-            }
-            // Determine number-align based on tag position
-            // When preContent exists, it becomes an extra row at the top
-            const totalRows = (preContent ? countRow + 1 : countRow)
-              + (postContent && rows.length === 0 ? 1 : 0);
-            const adjustedTagIdx = preContent ? tagIdx + 1 : tagIdx;
-            let numberAlign: string;
-            if (adjustedTagIdx === totalRows - 1) {
-              numberAlign = 'end + bottom';
-            } else if (adjustedTagIdx === 0) {
-              numberAlign = 'end + top';
-            } else {
-              numberAlign = 'end + horizon';
-            }
-            const mathContent = preContent
-              ? preContent + ' \\\n' + rows.join(' \\\n')
-              : rows.join(' \\\n');
-            const supplementPart = info.labelKey ? ', supplement: none' : '';
-            const numberAlignPart = ', number-align: ' + numberAlign;
-            const labelSuffix = info.labelKey ? ' <' + info.labelKey + '>' : '';
-            const block = '#math.equation(block: true' + supplementPart
-              + ', numbering: n => [' + info.tagContent + ']'
-              + numberAlignPart + ', $ ' + mathContent + ' $)' + labelSuffix
-              + '\n#counter(math.equation).update(n => n - 1)';
-            res = addToTypstData(res, { typst: block });
-            res.typst_inline = preContent
-              ? preContent + ' \\\n' + rows.join(' \\\n')
-              : rows.join(' \\\n');
-          } else if (totalTagged > 0) {
-            // Strategy: separate — multiple tags or auto-numbered rows
-            // Each row becomes a separate #math.equation block
-            // Merge pre/post content into rows
-            if (preContent && rows.length > 0) {
-              rows[0] = preContent + ' \\\n' + rows[0];
-            }
-            if (postContent && rows.length > 0) {
-              rows[rows.length - 1] = rows[rows.length - 1] + ' ' + postContent;
-            }
-            const eqnBlocks: string[] = [];
-            for (let i = 0; i < countRow; i++) {
-              const info = rowTagInfos[i];
-              const rowContent = rows[i];
-              if (info.isTagged) {
-                const numbering = info.isAutoTag
-                  ? '"(1)"'
-                  : 'n => [' + info.tagContent + ']';
-                const labelKey = info.labelKey;
-                const labelSuffix = labelKey ? ' <' + labelKey + '>' : '';
-                const supplementPart = labelKey ? ', supplement: none' : '';
-                eqnBlocks.push(
-                  '#math.equation(block: true' + supplementPart + ', numbering: ' + numbering + ', $ ' + rowContent + ' $)' + labelSuffix
-                );
-                if (info.isExplicitTag) {
-                  eqnBlocks.push('#counter(math.equation).update(n => n - 1)');
-                }
-              } else {
-                eqnBlocks.push('#math.equation(block: true, numbering: none, $ ' + rowContent + ' $)');
-              }
-            }
-            res = addToTypstData(res, { typst: eqnBlocks.join('\n') });
-            res.typst_inline = rows.join(' \\\n');
-          } else {
-            // mlabeledtr nodes present but no actual tag content — treat as no-tag
-            if (postContent && rows.length > 0) {
-              rows[rows.length - 1] = rows[rows.length - 1] + ' ' + postContent;
-            }
-            const noTagContent = preContent
-              ? preContent + ' \\\n' + rows.join(' \\\n')
-              : rows.join(' \\\n');
-            res = addToTypstData(res, { typst: noTagContent });
-          }
+          return buildTaggedEqnArray(node, serialize, rows, countRow, preContent, postContent);
         } else {
-          // No tags at all (e.g. align*): emit as single block with \ separators
-          if (postContent && rows.length > 0) {
-            rows[rows.length - 1] = rows[rows.length - 1] + ' ' + postContent;
-          }
-          const noTagContent2 = preContent
-            ? preContent + ' \\\n' + rows.join(' \\\n')
-            : rows.join(' \\\n');
-          res = addToTypstData(res, { typst: noTagContent2 });
+          return buildUntaggedEqnArray(rows, preContent, postContent);
         }
       } else if (isCases) {
         // Cases environment
@@ -1677,89 +1732,7 @@ const mtable = () => {
         }
         res = addToTypstData(res, { typst: casesBody });
       } else {
-        // Matrix: mat(delim: ..., a, b; c, d)
-        let matContent: string;
-        if (rows.length >= 2) {
-          matContent = '\n  ' + rows.join(';\n  ') + ',\n';
-        } else {
-          matContent = rows.join('; ');
-        }
-
-        // Parse array line attributes for augment parameter
-        const columnlines = node.attributes.isSet('columnlines')
-          ? (node.attributes.get('columnlines') as string).split(' ')
-          : [];
-        const rowlines = node.attributes.isSet('rowlines')
-          ? (node.attributes.get('rowlines') as string).split(' ')
-          : [];
-        const frame = node.attributes.isSet('frame')
-          ? (node.attributes.get('frame') as string)
-          : '';
-
-        const vlinePositions: number[] = [];
-        for (let i = 0; i < columnlines.length; i++) {
-          if (columnlines[i] === 'solid' || columnlines[i] === 'dashed') {
-            vlinePositions.push(i + 1);
-          }
-        }
-        const hlinePositions: number[] = [];
-        for (let i = 0; i < rowlines.length; i++) {
-          if (rowlines[i] === 'solid' || rowlines[i] === 'dashed') {
-            hlinePositions.push(i + 1);
-          }
-        }
-
-        // Build augment string
-        let augmentStr = '';
-        if (hlinePositions.length > 0 || vlinePositions.length > 0) {
-          const parts: string[] = [];
-          if (hlinePositions.length === 1) {
-            parts.push('hline: ' + hlinePositions[0]);
-          } else if (hlinePositions.length > 1) {
-            parts.push('hline: (' + hlinePositions.join(', ') + ')');
-          }
-          if (vlinePositions.length === 1) {
-            parts.push('vline: ' + vlinePositions[0]);
-          } else if (vlinePositions.length > 1) {
-            parts.push('vline: (' + vlinePositions.join(', ') + ')');
-          }
-          augmentStr = 'augment: #(' + parts.join(', ') + '), ';
-        }
-
-        // Extract column alignment
-        const columnAlign = node.attributes.get('columnalign') as string;
-        const alignArr = columnAlign ? columnAlign.trim().split(/\s+/) : [];
-        const uniqueAligns = [...new Set(alignArr)];
-        const matAlign = (uniqueAligns.length === 1 && uniqueAligns[0] !== 'center')
-          ? uniqueAligns[0]  // 'left' or 'right'
-          : '';
-
-        // Build mat() parameters
-        const params: string[] = [];
-        const hasDelimiters = branchOpen || branchClose;
-        if (hasDelimiters) {
-          if (branchOpen) {
-            params.push('delim: ' + delimiterToTypst(branchOpen));
-          }
-        } else {
-          // Arrays/matrices without parent delimiters should not have parens
-          params.push('delim: #none');
-        }
-        if (matAlign) {
-          params.push('align: #' + matAlign);
-        }
-        if (augmentStr) {
-          params.push(augmentStr.slice(0, -2)); // remove trailing ", "
-        }
-
-        const paramStr = params.length > 0 ? params.join(', ') + ', ' : '';
-        const matExpr = 'mat(' + paramStr + matContent + ')';
-
-        if (frame === 'solid') {
-          res = addToTypstData(res, { typst: '#box(stroke: 0.5pt, inset: 3pt, $ ' + matExpr + ' $)', typst_inline: matExpr });
-        } else {
-          res = addToTypstData(res, { typst: matExpr });
-        }
+        return buildMatrix(node, rows, branchOpen, branchClose);
       }
       return res;
     } catch (e) {
@@ -1791,14 +1764,14 @@ const mrow = () => {
           const child = node.childNodes[i];
           // Skip opening delimiter mo (first child matching open property)
           if (i === 0 && child.kind === 'mo') {
-            const moText = getChildrenText(child);
+            const moText = getNodeText(child);
             if (moText === openDelim || (!moText && !openDelim)) {
               continue;
             }
           }
           // Skip closing delimiter mo (last child matching close property)
           if (i === node.childNodes.length - 1 && child.kind === 'mo') {
-            const moText = getChildrenText(child);
+            const moText = getNodeText(child);
             if (moText === closeDelim || (!moText && !closeDelim)) {
               continue;
             }
@@ -1844,11 +1817,9 @@ const mrow = () => {
             // When delimiters are mismatched types (e.g. \left(\right\rangle),
             // ASCII brackets must be escaped to avoid parse errors:
             // ( [ { start groups/blocks, ) closes lr(), } closes code block.
-            const openMatchClose: Record<string, string> = { '(': ')', '[': ']', '{': '}' };
-            const closeMatchOpen: Record<string, string> = { ')': '(', '}': '{' };
-            const escapedOpen = (openDelim in openMatchClose && openMatchClose[openDelim] !== closeDelim)
+            const escapedOpen = (openDelim in OPEN_BRACKETS && OPEN_BRACKETS[openDelim] !== closeDelim)
               ? '\\' + openDelim : open;
-            const escapedClose = (closeDelim in closeMatchOpen && closeMatchOpen[closeDelim] !== openDelim)
+            const escapedClose = (closeDelim in CLOSE_BRACKETS && CLOSE_BRACKETS[closeDelim] !== openDelim)
               ? '\\' + closeDelim : close;
             res = addToTypstData(res, { typst: 'lr(' + escapedOpen + ' ' + escapeLrSemicolons(trimmedContent) + ' ' + escapedClose + ')' });
           }
@@ -1873,11 +1844,11 @@ const mrow = () => {
         for (let i = 0; i < node.childNodes.length; i++) {
           const child = node.childNodes[i];
           if (i === 0 && child.kind === 'mo') {
-            const moText = getChildrenText(child);
+            const moText = getNodeText(child);
             if (moText === openDelim || (!moText && !openDelim)) { continue; }
           }
           if (i === node.childNodes.length - 1 && child.kind === 'mo') {
-            const moText = getChildrenText(child);
+            const moText = getNodeText(child);
             if (moText === closeDelim || (!moText && !closeDelim)) { continue; }
           }
           const data: ITypstData = serialize.visitNode(child, '');
@@ -1986,7 +1957,7 @@ const mtr = () => {
 /** Check if a node subtree contains an mphantom (shallow — up to 5 levels). */
 const hasPhantomChild = (node: any): boolean => {
   const check = (n: any, depth: number): boolean => {
-    if (!n || depth > 5) return false;
+    if (!n || depth > PHANTOM_SEARCH_MAX_DEPTH) return false;
     if (n.kind === 'mphantom') return true;
     if (n.childNodes) {
       for (const c of n.childNodes) {
@@ -2120,7 +2091,7 @@ const menclose = () => {
 
 // --- Handler dispatch ---
 export const handle = (node, serialize): ITypstData => {
-  const handler = handlers[node.kind] || defHandle;
+  const handler = handlers[node.kind] || defaultHandler;
   return handler(node, serialize);
 };
 
@@ -2156,7 +2127,7 @@ const mstyle = () => {
           // user spacing sits directly in the top-level inferredMrow.
           let isOperatorSpacing = false;
           let p = node.parent;
-          for (let d = 0; d < 10 && p; d++) {
+          for (let d = 0; d < ANCESTOR_MAX_DEPTH && p; d++) {
             if (p.kind === 'math') break;
             if (p.kind === 'TeXAtom') { isOperatorSpacing = true; break; }
             p = p.parent;
