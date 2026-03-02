@@ -2194,8 +2194,19 @@ module.exports = [
   },
   {
     latex: `\\begin{aligned}\n\\bar{x}=& \\vec{a}\\left(\\cos \\psi+\\epsilon \\frac{\\partial x_{1}}{\\partial a}+\\epsilon^{2} \\frac{\\partial x_{2}}{\\partial u}+\\cdots\\right)+\\\\\n& \\ddot{\\psi}\\left(-u \\sin \\psi+\\varepsilon \\frac{\\partial x_{1}}{\\partial \\psi}+\\varepsilon^{2} \\frac{\\partial x_{2}}{\\partial \\psi}+\\cdots\\right)-\\\\\n& \\dot{a}^{2}\\left(\\varepsilon \\frac{\\partial^{2} x_{1}}{\\partial a^{2}}+\\varepsilon^{2} \\frac{\\partial^{2}}{\\partial} \\frac{x_{2}}{\\partial^{2}}+\\cdots\\right)+\\\\\n& 2 \\dot{a} \\dot{\\psi}\\left(-\\sin \\psi+\\varepsilon \\frac{d^{2} x_{1}}{\\partial a \\partial \\psi}+e^{2} \\frac{\\partial^{2} x_{2}}{\\partial a \\partial \\psi}+\\cdots\\right)+\\\\\n& \\dot{\\psi}^{2}\\left\\{-a \\cos \\psi+\\varepsilon \\frac{\\partial^{2} x_{1}}{\\partial \\psi^{2}}+\\varepsilon^{2} \\frac{\\partial^{2} x_{2}}{\\partial \\psi^{2}}+\\cdots\\right)\n\\end{aligned}`,
-    typst: `macron(x) = &arrow(a) lr(( cos psi + epsilon.alt frac(partial x_1, partial a) + epsilon.alt^2 frac(partial x_2, partial u) + dots.c )) + \\\n &diaer(psi) lr(( - u sin psi + epsilon frac(partial x_1, partial psi) + epsilon^2 frac(partial x_2, partial psi) + dots.c )) - \\\n &dot(a)^2 lr(( epsilon frac(partial^2 x_1, partial a^2) + epsilon^2 frac(partial^2, partial) frac(x_2, partial^2) + dots.c )) + \\\n &2 dot(a) dot(psi) lr(( - sin psi + epsilon frac(d^2 x_1, partial a partial psi) + e^2 frac(partial^2 x_2, partial a partial psi) + dots.c )) + \\\n &dot(psi)^2 lr({ - a cos psi + epsilon frac(partial^2 x_1, partial psi^2) + epsilon^2 frac(partial^2 x_2, partial psi^2) + dots.c ))`,
-    typst_inline: `macron(x) = &arrow(a) lr(( cos psi + epsilon.alt frac(partial x_1, partial a) + epsilon.alt^2 frac(partial x_2, partial u) + dots.c )) + \\\n &diaer(psi) lr(( - u sin psi + epsilon frac(partial x_1, partial psi) + epsilon^2 frac(partial x_2, partial psi) + dots.c )) - \\\n &dot(a)^2 lr(( epsilon frac(partial^2 x_1, partial a^2) + epsilon^2 frac(partial^2, partial) frac(x_2, partial^2) + dots.c )) + \\\n &2 dot(a) dot(psi) lr(( - sin psi + epsilon frac(d^2 x_1, partial a partial psi) + e^2 frac(partial^2 x_2, partial a partial psi) + dots.c )) + \\\n &dot(psi)^2 lr({ - a cos psi + epsilon frac(partial^2 x_1, partial psi^2) + epsilon^2 frac(partial^2 x_2, partial psi^2) + dots.c ))`,
+    typst: `macron(x) = &arrow(a) lr(( cos psi + epsilon.alt frac(partial x_1, partial a) + epsilon.alt^2 frac(partial x_2, partial u) + dots.c )) + \\\n &diaer(psi) lr(( - u sin psi + epsilon frac(partial x_1, partial psi) + epsilon^2 frac(partial x_2, partial psi) + dots.c )) - \\\n &dot(a)^2 lr(( epsilon frac(partial^2 x_1, partial a^2) + epsilon^2 frac(partial^2, partial) frac(x_2, partial^2) + dots.c )) + \\\n &2 dot(a) dot(psi) lr(( - sin psi + epsilon frac(d^2 x_1, partial a partial psi) + e^2 frac(partial^2 x_2, partial a partial psi) + dots.c )) + \\\n &dot(psi)^2 lr(\\{ - a cos psi + epsilon frac(partial^2 x_1, partial psi^2) + epsilon^2 frac(partial^2 x_2, partial psi^2) + dots.c \\))`,
+    typst_inline: `macron(x) = &arrow(a) lr(( cos psi + epsilon.alt frac(partial x_1, partial a) + epsilon.alt^2 frac(partial x_2, partial u) + dots.c )) + \\\n &diaer(psi) lr(( - u sin psi + epsilon frac(partial x_1, partial psi) + epsilon^2 frac(partial x_2, partial psi) + dots.c )) - \\\n &dot(a)^2 lr(( epsilon frac(partial^2 x_1, partial a^2) + epsilon^2 frac(partial^2, partial) frac(x_2, partial^2) + dots.c )) + \\\n &2 dot(a) dot(psi) lr(( - sin psi + epsilon frac(d^2 x_1, partial a partial psi) + e^2 frac(partial^2 x_2, partial a partial psi) + dots.c )) + \\\n &dot(psi)^2 lr(\\{ - a cos psi + epsilon frac(partial^2 x_1, partial psi^2) + epsilon^2 frac(partial^2 x_2, partial psi^2) + dots.c \\))`,
+  },
+  // mismatched \left...\right delimiter types — ASCII brackets must be escaped inside lr()
+  {
+    latex: `\\left(a + b\\right\\rangle`,
+    typst: `lr(\\( a + b chevron.r)`,
+    typst_inline: `lr(\\( a + b chevron.r)`,
+  },
+  {
+    latex: `\\left\\langle a + b\\right)`,
+    typst: `lr(chevron.l a + b \\))`,
+    typst_inline: `lr(chevron.l a + b \\))`,
   },
   // unpaired [ bracket
   {

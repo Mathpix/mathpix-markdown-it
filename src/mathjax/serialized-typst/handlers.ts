@@ -2027,8 +2027,17 @@ const mrow = () => {
               ? 'lr(⌈ ' + escapeLrSemicolons(trimmedContent) + ' ⌉)'
               : 'ceil(' + trimmedContent + ')' });
           } else {
-            // General lr() for auto-sizing — escape semicolons
-            res = addToTypstData(res, { typst: 'lr(' + open + ' ' + escapeLrSemicolons(trimmedContent) + ' ' + close + ')' });
+            // General lr() for auto-sizing — escape semicolons.
+            // When delimiters are mismatched types (e.g. \left(\right\rangle),
+            // ASCII brackets must be escaped to avoid parse errors:
+            // ( [ { start groups/blocks, ) closes lr(), } closes code block.
+            const openMatchClose: Record<string, string> = { '(': ')', '[': ']', '{': '}' };
+            const closeMatchOpen: Record<string, string> = { ')': '(', '}': '{' };
+            const escapedOpen = (openDelim in openMatchClose && openMatchClose[openDelim] !== closeDelim)
+              ? '\\' + openDelim : open;
+            const escapedClose = (closeDelim in closeMatchOpen && closeMatchOpen[closeDelim] !== openDelim)
+              ? '\\' + closeDelim : close;
+            res = addToTypstData(res, { typst: 'lr(' + escapedOpen + ' ' + escapeLrSemicolons(trimmedContent) + ' ' + escapedClose + ')' });
           }
         } else {
           // One or both delimiters invisible: wrap visible side in lr().

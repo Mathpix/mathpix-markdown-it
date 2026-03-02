@@ -220,6 +220,18 @@ Built-in Typst math operators (`sin`, `cos`, `tan`, `log`, `lim`, etc.) pass thr
 | `\left\| a ; b \right\|` | `lr(‖ a\; b ‖)` |
 | `\left( a ; b \right)` | `lr(( a\; b ))` |
 
+**Mismatched delimiter-type escaping in `lr()`:** When `\left...\right` use different bracket types (e.g. `\left(\right\rangle`, `\left\langle\right)`), the non-Unicode ASCII brackets (`(`, `)`, `[`, `{`, `}`) must be escaped inside `lr()` to prevent parse errors. Without escaping, `lr(( ... chevron.r)` would fail because `(` opens a group that never closes with `)`. The mrow handler detects mismatched pairs using `openMatchClose` / `closeMatchOpen` maps and escapes with backslash:
+
+| LaTeX | Typst | Why |
+|-------|-------|-----|
+| `\left(a + b\right\rangle` | `lr(\( a + b chevron.r)` | `(` doesn't match `⟩` → escaped |
+| `\left\langle a + b\right)` | `lr(chevron.l a + b \))` | `)` doesn't match `⟨` → escaped |
+| `\left[a + b\right\rangle` | `lr(\[ a + b chevron.r)` | `[` doesn't match `⟩` → escaped |
+| `\left\{a + b\right)` | `lr(\{ a + b \))` | both mismatched → both escaped |
+| `\left(a + b\right)` | `lr(( a + b ))` | matched pair → no escaping |
+
+Note: Non-ASCII delimiter symbols (`chevron.l`, `chevron.r`, etc.) don't need escaping — they have no syntactic meaning in Typst. Only ASCII brackets that would be misinterpreted as group/function-call openers/closers require escaping.
+
 **Unbalanced parenthesis escaping in `menclose` wrappers:** When serialized child content contains unbalanced `)` characters (e.g. from `\smash{)}` inside `\lcm`), they would prematurely close the wrapping function call (`underline(...)`, `overline(...)`, `sqrt(...)`, etc.). The `escapeUnbalancedParens()` helper tracks parenthesis depth and replaces any `)` at depth 0 with `")"` (Typst string literal). Applied to all `menclose` branches that wrap content: `bottom`, `top`, `radical`, `longdiv`.
 
 ### Matrices and equation arrays
