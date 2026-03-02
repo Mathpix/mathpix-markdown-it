@@ -10,7 +10,7 @@ import {
 import { findTypstSymbol, typstAccentMap, typstFontMap, typstSymbolMap } from "./typst-symbol-map";
 import { escapeContentSeparators, hasTopLevelSeparators, escapeLrSemicolons, escapeUnbalancedParens } from "./escape-utils";
 import {
-  OPEN_BRACKETS, CLOSE_BRACKETS, UNPAIRED_BRACKET_TYPST,
+  OPEN_BRACKETS, CLOSE_BRACKETS, UNPAIRED_BRACKET_TYPST, UNPAIRED_BRACKET_PROP,
   mapDelimiter, escapeLrOpenDelimiter,
 } from "./bracket-utils";
 import { mtable, mtr } from "./table-handlers";
@@ -175,7 +175,7 @@ const mo = () => {
     let res: ITypstData = initTypstData();
     try {
       const value = getNodeText(node);
-      const unpairedDir = node.properties?.['data-unpaired-bracket'];
+      const unpairedDir = node.properties?.[UNPAIRED_BRACKET_PROP];
       if (unpairedDir && UNPAIRED_BRACKET_TYPST[value]) {
         const spaceBefore = needsSpaceBefore(node) ? ' ' : '';
         const spaceAfter = needsSpaceAfter(node) ? ' ' : '';
@@ -336,6 +336,7 @@ const PRIME_SHORTHANDS: Map<string, string> = new Map([
 
 // Regex to detect overbrace/overbracket/underbrace/underbracket as outermost call
 const BRACE_ANNOTATION_RE = /^(overbrace|overbracket|underbrace|underbracket)\((.+)\)$/s;
+const RE_SPECIAL_FN_CALL = /^(overbrace|underbrace|overline|underline|op)\(/;
 
 /** Match a brace annotation (overbrace/underbrace/etc.) and return it with annotation as second argument.
  *  Returns null if baseTrimmed doesn't match any of the specified kinds. */
@@ -607,7 +608,7 @@ const buildLimitBase = (firstChild: any, baseTrimmed: string, base: string): ITy
       // mi(OP): \operatorname*{name} — add limits: #true inside op()
       return { typst: baseTrimmed.replace(/\)$/, ', limits: #true)') };
     }
-    const baseIsSpecialFn = /^(overbrace|underbrace|overline|underline|op)\(/.test(baseTrimmed);
+    const baseIsSpecialFn = RE_SPECIAL_FN_CALL.test(baseTrimmed);
     if (baseIsNativeLimitOp || baseIsSpecialFn) {
       return { typst: base };
     }

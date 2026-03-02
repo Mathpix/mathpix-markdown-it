@@ -151,6 +151,8 @@ export const replaceUnpairedBrackets = (expr: string): string => {
   return result;
 };
 
+export const UNPAIRED_BRACKET_PROP = 'data-unpaired-bracket';
+
 // --- Pre-serialization tree walk: mark unpaired ASCII brackets ---
 export const OPEN_BRACKETS: Record<string, string> = {
   '(': ')', '[': ']', '{': '}',
@@ -218,7 +220,7 @@ export const markUnpairedBrackets = (root: any): void => {
   for (let i = 0; i < bracketNodes.length; i++) {
     if (!paired.has(i)) {
       const ch = bracketNodes[i].char;
-      bracketNodes[i].node.properties['data-unpaired-bracket'] =
+      bracketNodes[i].node.properties[UNPAIRED_BRACKET_PROP] =
         OPEN_BRACKETS[ch] ? 'open' : 'close';
     }
   }
