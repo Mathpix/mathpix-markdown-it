@@ -58,8 +58,7 @@ const scanExpression = (expr: string, opts: ScanOptions): string => {
     }
 
     if (ch === '(' || ch === '[' || ch === '{') {
-      if (!opts.escapeUnbalancedClose || ch === '(') { depth++; }
-      else { depth++; }
+      depth++;
       if (!opts.detectOnly) { result += ch; }
       continue;
     }

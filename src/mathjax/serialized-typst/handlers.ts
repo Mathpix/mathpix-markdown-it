@@ -15,8 +15,9 @@ import {
 } from "./bracket-utils";
 import { mtable, mtr } from "./table-handlers";
 
-const PHANTOM_SEARCH_MAX_DEPTH = 5;
+const SHALLOW_TREE_MAX_DEPTH = 5;
 const ANCESTOR_MAX_DEPTH = 10;
+const MATHJAX_INHERIT_SENTINEL = '_inherit_';
 const INVISIBLE_CHARS: Set<string> = new Set([
   '\u2061', // function application
   '\u2062', // invisible times
@@ -563,7 +564,7 @@ const buildLimitBase = (firstChild: any, baseTrimmed: string, base: string): ITy
   if (STRETCH_BASE_SYMBOLS.has(baseTrimmed)) {
     // Find the inner mo node — MathJax may wrap in mstyle/inferredMrow
     let moNode = firstChild;
-    for (let i = 0; i < 5 && moNode && moNode.kind !== 'mo'; i++) {
+    for (let i = 0; i < SHALLOW_TREE_MAX_DEPTH && moNode && moNode.kind !== 'mo'; i++) {
       if (moNode.childNodes?.length === 1) {
         moNode = moNode.childNodes[0];
       } else {
@@ -1065,7 +1066,7 @@ const mrow = () => {
 /** Check if a node subtree contains an mphantom (shallow — up to 5 levels). */
 const hasPhantomChild = (node: any): boolean => {
   const check = (n: any, depth: number): boolean => {
-    if (!n || depth > PHANTOM_SEARCH_MAX_DEPTH) return false;
+    if (!n || depth > SHALLOW_TREE_MAX_DEPTH) return false;
     if (n.kind === 'mphantom') return true;
     if (n.childNodes) {
       for (const c of n.childNodes) {
@@ -1104,7 +1105,7 @@ const mpadded = () => {
       const content = data.typst.trim();
       // Handle mathbackground attribute (\colorbox{color}{...})
       const rawBg: string = atr?.mathbackground || '';
-      const mathbg: string = rawBg && rawBg !== '_inherit_' ? rawBg : '';
+      const mathbg: string = rawBg && rawBg !== MATHJAX_INHERIT_SENTINEL ? rawBg : '';
       if (mathbg && content) {
         const fillValue = mathbg.startsWith('#')
           ? 'rgb("' + mathbg + '")'
@@ -1245,7 +1246,7 @@ const mstyle = () => {
       // Filter out MathJax internal "_inherit_" sentinel value
       const atr = getAttributes(node);
       const rawColor: string = atr?.mathcolor || '';
-      const mathcolor: string = rawColor && rawColor !== '_inherit_' ? rawColor : '';
+      const mathcolor: string = rawColor && rawColor !== MATHJAX_INHERIT_SENTINEL ? rawColor : '';
       const data: ITypstData = handlerApi.handleAll(node, serialize);
       if (mathcolor && data.typst.trim()) {
         // Hex colors (#D61F06) need rgb("...") wrapper; named colors (red) pass through
