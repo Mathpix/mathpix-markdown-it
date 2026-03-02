@@ -389,7 +389,7 @@ const buildMatrix = (
     } else if (vlinePositions.length > 1) {
       parts.push(`vline: (${vlinePositions.join(', ')})`);
     }
-    augmentStr = `augment: #(${parts.join(', ')}), `;
+    augmentStr = `augment: #(${parts.join(', ')})`;
   }
   const columnAlign = String(node.attributes.get('columnalign') || '');
   const alignArr = columnAlign ? columnAlign.trim().split(/\s+/) : [];
@@ -411,7 +411,7 @@ const buildMatrix = (
     params.push(`align: #${matAlign}`);
   }
   if (augmentStr) {
-    params.push(augmentStr.slice(0, -2)); // remove trailing ", "
+    params.push(augmentStr);
   }
   const paramStr = params.length > 0 ? params.join(', ') + ', ' : '';
   const matExpr = `mat(${paramStr}${matContent})`;
@@ -440,7 +440,7 @@ export const mtable: HandlerFn = (node, serialize) => {
   // Determine if this is an equation array (align, gather, split, etc.)
   // Skip eqnArray detection for numcases — it should be treated as cases
   const isEqnArray = !isNumcases && !isCases && node.childNodes.length > 0
-    && node.childNodes[0].attributes?.get('displaystyle');
+    && node.childNodes[0].attributes?.get('displaystyle') === true;
   if (isNumcases) {
     return buildNumcasesGrid(node, serialize, countRow);
   }

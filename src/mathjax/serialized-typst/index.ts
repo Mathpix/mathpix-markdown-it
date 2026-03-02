@@ -93,7 +93,7 @@ const getScriptedDelimiterChar = (node: MathNode): string | null => {
 const isTaggedEqnArray = (child: MathNode): boolean => {
   if (child.kind !== 'mtable') return false;
   const isEqnArray = child.childNodes.length > 0
-    && child.childNodes[0].attributes?.get('displaystyle');
+    && child.childNodes[0].attributes?.get('displaystyle') === true;
   return isEqnArray && child.childNodes.some((c) => c.kind === 'mlabeledtr');
 };
 
@@ -361,8 +361,8 @@ export class SerializedTypstVisitor extends MmlVisitor {
   public visitTeXAtomNode(node: MathNode, space: string): ITypstData {
     let res: ITypstData = initTypstData();
     try {
-      const children: ITypstData = this.childNodeMml(node, space + '  ', '\n');
-      if (children.typst.match(/\S/)) {
+      const children: ITypstData = this.childNodeMml(node);
+      if (children.typst.trim()) {
         res = addToTypstData(res, children);
       }
       return res;
@@ -376,10 +376,10 @@ export class SerializedTypstVisitor extends MmlVisitor {
   }
 
   public visitDefault(node: MathNode, _space: string): ITypstData {
-    return this.childNodeMml(node, '  ', '');
+    return this.childNodeMml(node);
   }
 
-  protected childNodeMml(node: MathNode, _space: string, _nl: string): ITypstData {
+  protected childNodeMml(node: MathNode): ITypstData {
     const handleCh = handle.bind(this);
     let res: ITypstData = initTypstData();
     try {

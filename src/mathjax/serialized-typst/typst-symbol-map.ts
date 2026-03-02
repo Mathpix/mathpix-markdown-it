@@ -70,7 +70,7 @@ const binaryOperators: ReadonlyArray<[string, string]> = [
   ["\u22C4", "diamond.stroked"],  // ⋄
   ["\u2020", "dagger"],           // †
   ["\u2021", "dagger.double"],    // ‡
-  ["\u2210", "product.co"],       // ∐
+  // Note: U+2210 (∐) is mapped to "product.co" in largeOperators (not duplicated here)
   ["\u2212", "-"],                // − (use ASCII minus for natural Typst output)
   ["\u25C3", "triangle.stroked.small.l"], // ◃ (triangleleft)
   ["\u25B9", "triangle.stroked.small.r"], // ▹ (triangleright)
@@ -135,8 +135,6 @@ const relationOperators: ReadonlyArray<[string, string]> = [
   ["\u2273", "gt.tilde"],         // ≳ (\gtrsim)
   ["\u2250", "≐"],               // ≐ (\doteq) — no named Typst symbol
   ["\u225C", "eq.delta"],         // ≜ (\triangleq)
-  ["\u227A", "prec"],             // ≺ (\prec)
-  ["\u227B", "succ"],             // ≻ (\succ)
   ["\u227C", "prec.eq"],          // ≼ (\preceq)
   ["\u227D", "succ.eq"],          // ≽ (\succeq)
 ];
@@ -248,7 +246,7 @@ const miscSymbols: ReadonlyArray<[string, string]> = [
   ["\u2300", "diameter"],        // ⌀ (varnothing)
   ["\u00AC", "not"],            // ¬
   ["\u22A4", "top"],            // ⊤
-  ["\u22A5", "bot"],            // ⊥
+  // Note: U+22A5 (⊥) is mapped to "perp" in relationOperators (not duplicated here)
   ["\u2220", "angle"],          // ∠
   ["\u25B3", "triangle.stroked.t"], // △
   ["\u2032", "prime"],          // ′

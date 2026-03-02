@@ -55,7 +55,7 @@ module.exports = [
   { latex: `\\simeq`, typst: `tilde.eq`, typst_inline: `tilde.eq` },
   { latex: `\\ni`, typst: `in.rev`, typst_inline: `in.rev` },
   { latex: `\\mid`, typst: `divides`, typst_inline: `divides` },
-  { latex: `\\perp`, typst: `bot`, typst_inline: `bot` },
+  { latex: `\\perp`, typst: `perp`, typst_inline: `perp` },
   { latex: `\\ll`, typst: `lt.double`, typst_inline: `lt.double` },
   { latex: `\\gg`, typst: `gt.double`, typst_inline: `gt.double` },
   { latex: `\\vdash`, typst: `tack.r`, typst_inline: `tack.r` },
@@ -124,7 +124,7 @@ module.exports = [
   { latex: `\\therefore`, typst: `therefore`, typst_inline: `therefore` },
   { latex: `\\because`, typst: `because`, typst_inline: `because` },
   { latex: `\\top`, typst: `top`, typst_inline: `top` },
-  { latex: `\\bot`, typst: `bot`, typst_inline: `bot` },
+  { latex: `\\bot`, typst: `perp`, typst_inline: `perp` },
   { latex: `\\angle`, typst: `angle`, typst_inline: `angle` },
   { latex: `\\measuredangle`, typst: `angle.arc`, typst_inline: `angle.arc` },
   { latex: `\\sphericalangle`, typst: `angle.spheric`, typst_inline: `angle.spheric` },
@@ -2328,8 +2328,8 @@ module.exports = [
   // misc math symbols (full set)
   {
     latex: `\\aleph \\hbar \\imath \\jmath \\ell \\wp \\Re \\Im \\partial \\infty \\prime \\emptyset \\nabla \\top \\bot \\angle \\triangle \\setminus \\forall \\exists \\neg \\lnot \\flat \\natural \\sharp \\clubsuit \\diamondsuit \\heartsuit \\spadesuit`,
-    typst: `aleph planck dotless.i dotless.j ell ℘ Re Im partial infinity prime emptyset nabla top bot angle triangle.stroked.t without forall exists not not flat natural sharp suit.club.filled suit.diamond.stroked suit.heart.stroked suit.spade.filled`,
-    typst_inline: `aleph planck dotless.i dotless.j ell ℘ Re Im partial infinity prime emptyset nabla top bot angle triangle.stroked.t without forall exists not not flat natural sharp suit.club.filled suit.diamond.stroked suit.heart.stroked suit.spade.filled`,
+    typst: `aleph planck dotless.i dotless.j ell ℘ Re Im partial infinity prime emptyset nabla top perp angle triangle.stroked.t without forall exists not not flat natural sharp suit.club.filled suit.diamond.stroked suit.heart.stroked suit.spade.filled`,
+    typst_inline: `aleph planck dotless.i dotless.j ell ℘ Re Im partial infinity prime emptyset nabla top perp angle triangle.stroked.t without forall exists not not flat natural sharp suit.club.filled suit.diamond.stroked suit.heart.stroked suit.spade.filled`,
   },
   // separator escaping in function-call wrappers (, and ; at depth 0)
   // limits()

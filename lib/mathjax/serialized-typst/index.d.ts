@@ -15,5 +15,5 @@ export declare class SerializedTypstVisitor extends MmlVisitor {
     visitTeXAtomNode(node: MathNode, space: string): ITypstData;
     visitAnnotationNode(_node: MathNode, _space: string): ITypstData;
     visitDefault(node: MathNode, _space: string): ITypstData;
-    protected childNodeMml(node: MathNode, _space: string, _nl: string): ITypstData;
+    protected childNodeMml(node: MathNode): ITypstData;
 }

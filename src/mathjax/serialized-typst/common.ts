@@ -78,15 +78,8 @@ export const needsTokenSeparator = (prev: string, next: string): boolean => {
     && !RE_SEPARATOR_END.test(prev);
 };
 
-export const needsParens = (s: string): boolean => {
-  // In Typst, sub/superscript grouping always uses (): x^(content), x_(content)
-  // Even if the content itself starts/ends with () — those are literal, not grouping.
-  // e.g. f^{(n)} in LaTeX → f^((n)) in Typst (outer = grouping, inner = literal)
-  if (s.length <= 1) {
-    return false;
-  }
-  return true;
-};
+/** In Typst, multi-char sub/superscript content needs grouping parens: x^(a b), x_(i+1). */
+export const needsParens = (s: string): boolean => s.length > 1;
 
 /** Format a subscript or superscript with proper Typst grouping.
  *  Returns e.g. '_x', '_(x + y)', '^n', '^(a b)', or '' if content is empty. */

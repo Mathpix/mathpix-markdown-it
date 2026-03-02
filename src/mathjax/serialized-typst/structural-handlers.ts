@@ -40,7 +40,7 @@ const hasPhantomChild = (node: MathNode): boolean => {
 /** Check if node has an msub/msup/msubsup/mmultiscripts ancestor (mhchem alignment pattern). */
 const hasScriptAncestor = (node: MathNode): boolean => {
   let cur = node?.parent;
-  while (cur) {
+  for (let d = 0; d < ANCESTOR_MAX_DEPTH && cur; d++) {
     const k = cur.kind;
     if (k === 'msub' || k === 'msup' || k === 'msubsup' || k === 'mmultiscripts') return true;
     cur = cur.parent;
