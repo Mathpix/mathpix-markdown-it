@@ -5,7 +5,7 @@ import { LiteElement } from "mathjax-full/js/adaptors/lite/Element.js";
 import { SerializedAsciiVisitor as AsciiVisitor } from './serialized-ascii';
 import { SerializedTypstVisitor } from './serialized-typst';
 import { ITypstData } from './serialized-typst/common';
-import { markUnpairedBrackets } from './serialized-typst/handlers';
+import { markUnpairedBrackets } from './serialized-typst/bracket-utils';
 import { MathMLVisitorWord } from './mathml-word';
 import { getSpeech } from '../sre';
 import { TAccessibility } from "../mathpix-markdown-model";

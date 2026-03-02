@@ -138,3 +138,16 @@ export const isLastChild = (node: any): boolean => {
   return node.parent && node.parent.childNodes
     && node.parent.childNodes[node.parent.childNodes.length - 1] === node;
 };
+
+/** Concatenate text content of all child nodes. */
+export const getNodeText = (node: any): string => {
+  let text: string = '';
+  try {
+    node.childNodes.forEach((child: any) => {
+      text += child.text;
+    });
+    return text;
+  } catch (e) {
+    return text;
+  }
+};
