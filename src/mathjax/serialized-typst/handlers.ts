@@ -1,5 +1,11 @@
 import { TEXCLASS } from "mathjax-full/js/core/MmlTree/MmlNode";
-import { ITypstData, initTypstData, addToTypstData, addSpaceToTypstData, needsParens, isThousandSepComma, needsTokenSeparator } from "./common";
+import {
+  ITypstData, initTypstData, addToTypstData, addSpaceToTypstData,
+  needsParens, isThousandSepComma, needsTokenSeparator,
+  RE_NBSP, RE_CONTENT_SPECIAL, RE_WORD_DOT_END, RE_WORD_DOT_START,
+  RE_WORD_START, RE_OP_WRAPPER, RE_TAG_EXTRACT, RE_TAG_STRIP,
+  RE_BRACKET_CHARS, RE_UNICODE_SPACES, RE_TRAILING_SPACING,
+} from "./common";
 import { findTypstSymbol, typstAccentMap, typstFontMap, typstSymbolMap } from "./typst-symbol-map";
 import { isFirstChild, isLastChild } from "./node-utils";
 
@@ -55,8 +61,8 @@ const serializeTagContent = (labelCell: any, serialize: any): string => {
         // * (bold), _ (emphasis), ` (raw), @ (reference), # (scripting)
         let text = child.childNodes?.[0]?.text || '';
         if (text) {
-          text = text.replace(/\u00A0/g, ' ');
-          text = text.replace(/[*_`@#<]/g, '\\$&');
+          text = text.replace(RE_NBSP, ' ');
+          text = text.replace(RE_CONTENT_SPECIAL, '\\$&');
           parts.push(text);
         }
       } else if (child.isInferred) {
@@ -119,7 +125,7 @@ const needSpaceBefore = (node): boolean => {
       const text = (prev.childNodes[0] as any)?.text || '';
       const prevTypst = findTypstSymbol(text);
       // Any word char or dot at end of previous Typst output needs separation
-      return /[\w.]$/.test(prevTypst);
+      return RE_WORD_DOT_END.test(prevTypst);
     }
     if (prev.kind === 'mn') {
       return true;
@@ -150,7 +156,7 @@ const needSpaceAfter = (node): boolean => {
       const text = (next.childNodes[0] as any)?.text || '';
       const nextTypst = findTypstSymbol(text);
       // Any word char or dot at start of next Typst output needs separation
-      return /^[\w.]/.test(nextTypst);
+      return RE_WORD_DOT_START.test(nextTypst);
     }
     if (next && next.kind === 'mn') {
       return true;
@@ -232,7 +238,7 @@ const mi = () => {
         }
       }
       // Add spacing around multi-character Typst symbol names
-      if (typstValue.length > 1 && /^\w/.test(typstValue)) {
+      if (typstValue.length > 1 && RE_WORD_START.test(typstValue)) {
         const spaceBefore = needSpaceBefore(node) ? ' ' : '';
         const spaceAfter = needSpaceAfter(node) ? ' ' : '';
         res = addToTypstData(res, { typst: spaceBefore + typstValue + spaceAfter });
@@ -274,7 +280,7 @@ const mo = () => {
       const typstValue: string = findTypstSymbol(value);
       // Map multi-word MathJax operator names to Typst built-in equivalents
       // (e.g. \limsup → "lim⁠sup" with thin space → "limsup")
-      const normalizedValue = value.replace(/[\u2006\u2005\u2004\u2009\u200A\u00A0]/g, ' ');
+      const normalizedValue = value.replace(RE_UNICODE_SPACES, ' ');
       const mappedOp = MATHJAX_MULTIWORD_OPS.get(normalizedValue);
       if (mappedOp) {
         const spaceBefore = needSpaceBefore(node) ? ' ' : '';
@@ -284,7 +290,7 @@ const mo = () => {
       }
       // Detect custom named operators (e.g. \injlim → "inj lim", \projlim → "proj lim")
       // Don't add limits: #true here — parent handler (munderover/munder/mover) decides placement
-      if (value.length > 1 && /^\w/.test(value) && !typstSymbolMap.has(value) && !TYPST_MATH_OPERATORS.has(value)) {
+      if (value.length > 1 && RE_WORD_START.test(value) && !typstSymbolMap.has(value) && !TYPST_MATH_OPERATORS.has(value)) {
         const opName = normalizedValue;
         res = addToTypstData(res, { typst: 'op("' + opName + '")' });
         return res;
@@ -294,7 +300,7 @@ const mo = () => {
       const inScript = parentKind === 'msub' || parentKind === 'msup'
         || parentKind === 'msubsup' || parentKind === 'munderover';
       // Add spacing around operators for readability
-      if (typstValue.length > 1 && /^\w/.test(typstValue)) {
+      if (typstValue.length > 1 && RE_WORD_START.test(typstValue)) {
         // Multi-char Typst symbol names: "times", "lt.eq", etc.
         const spaceBefore = needSpaceBefore(node) ? ' ' : '';
         let spaceAfter = needSpaceAfter(node) ? ' ' : '';
@@ -369,7 +375,7 @@ const mtext = () => {
         return res;
       }
       // Replace non-breaking spaces with regular spaces
-      value = value.replace(/\u00A0/g, ' ');
+      value = value.replace(RE_NBSP, ' ');
       // Check if this is a single symbol character with a known Typst mapping
       if (value.length === 1 && typstSymbolMap.has(value)) {
         const typstValue = findTypstSymbol(value);
@@ -675,7 +681,7 @@ const STRETCH_BASE_SYMBOLS: Set<string> = new Set([
 
 const buildLimitBase = (firstChild: any, baseTrimmed: string, base: string): ITypstData => {
   const movablelimits = getMovablelimits(firstChild);
-  const baseIsCustomOp = /^op\(/.test(baseTrimmed);
+  const baseIsCustomOp = RE_OP_WRAPPER.test(baseTrimmed);
   // Extensible arrows/symbols: MathJax sets stretchy=true on the base mo.
   // Use stretch() for these (e.g. \xrightarrow), limits() for stacking (\stackrel, \overset).
   let isStretchy = false;
@@ -719,7 +725,7 @@ const buildLimitBase = (firstChild: any, baseTrimmed: string, base: string): ITy
     // Non-mo base (mrow, etc.) — use existing logic
     const baseIsNativeLimitOp = TYPST_DISPLAY_LIMIT_OPS.has(baseTrimmed);
     // OP-class base with op() output — two cases:
-    if (/^op\(/.test(baseTrimmed) && firstChild?.texClass === TEXCLASS.OP) {
+    if (RE_OP_WRAPPER.test(baseTrimmed) && firstChild?.texClass === TEXCLASS.OP) {
       if (firstChild?.kind === 'TeXAtom') {
         // TeXAtom(OP): \varinjlim, \varliminf, etc. — same as movablelimits custom op
         return { typst: baseTrimmed.replace(/\)$/, ', limits: #true)'), typst_inline: base };
@@ -1346,7 +1352,7 @@ const BRACKET_SYMBOL_MAP: Record<string, string> = {
 // inside function-call parens (e.g. frac(...)) are ignored.
 const replaceUnpairedBrackets = (expr: string): string => {
   // Quick exit if no bracket characters present
-  if (!/[\[\](){}]/.test(expr)) return expr;
+  if (!RE_BRACKET_CHARS.test(expr)) return expr;
 
   type BracketInfo = { char: string; pos: number };
   const brackets: BracketInfo[] = [];
@@ -1371,7 +1377,7 @@ const replaceUnpairedBrackets = (expr: string): string => {
     if ('[](){}'.includes(ch)) {
       // Check if ( is a function-call paren (preceded by word char or .)
       // If so, skip the entire function call content
-      if (ch === '(' && i > 0 && /[\w.]/.test(expr[i - 1])) {
+      if (ch === '(' && i > 0 && RE_WORD_DOT_END.test(expr[i - 1])) {
         let depth = 1;
         i++;
         while (i < expr.length && depth > 0) {
@@ -1425,7 +1431,7 @@ const replaceUnpairedBrackets = (expr: string): string => {
     if (unmatched.has(i)) {
       const sym = BRACKET_SYMBOL_MAP[expr[i]];
       // Add space before if preceded by word char or dot
-      if (result.length > 0 && /[\w.]/.test(result[result.length - 1])) {
+      if (result.length > 0 && RE_WORD_DOT_END.test(result[result.length - 1])) {
         result += ' ';
       }
       result += sym;
@@ -1528,7 +1534,7 @@ const extractTagFromConditionCell = (cell: any): string | null => {
     if (!n) return null;
     if (n.kind === 'mtext') {
       const text = n.childNodes?.[0]?.text || '';
-      const match = text.match(/\\tag\{([^}]+)\}/);
+      const match = text.match(RE_TAG_EXTRACT);
       return match ? match[1] : null;
     }
     if (n.childNodes) {
@@ -1625,7 +1631,7 @@ const mtable = () => {
             let trimmed = cellData.typst.trim();
             // Strip \tag{...} from condition column if tag was extracted from there
             if (j === mtrNode.childNodes.length - 1 && rowTagSources[i].source === 'condition') {
-              trimmed = trimmed.replace(/\s*\\tag\{[^}]+\}/g, '');
+              trimmed = trimmed.replace(RE_TAG_STRIP, '');
               trimmed = trimmed.replace(/\s+"$/g, '"');
               trimmed = trimmed.trim();
             }
@@ -1655,7 +1661,7 @@ const mtable = () => {
           let tagText = '';
           if (info.source === 'condition') {
             // Escape content-mode special chars in condition-embedded tag text
-            tagText = '(' + info.content.replace(/[*_`@#<]/g, '\\$&') + ')';
+            tagText = '(' + info.content.replace(RE_CONTENT_SPECIAL, '\\$&') + ')';
           } else if (info.source === 'label' && info.content) {
             tagText = info.content;  // already escaped by serializeTagContent
           }
@@ -2289,7 +2295,7 @@ const menclose = () => {
         // Detect \smash{)} prefix (used in \lcm macro): strip leading ) or \), trailing spacing, no space
         if (content.startsWith(')') || content.startsWith('\\)')) {
           const skip = content.startsWith('\\)') ? 2 : 1;
-          let inner = content.slice(skip).trim().replace(/\s+(?:med|thin|thick|quad)$/, '');
+          let inner = content.slice(skip).trim().replace(RE_TRAILING_SPACING, '');
           res = addToTypstData(res, { typst: 'underline(")"' + escapeContentSeparators(inner) + ')' });
         } else {
           res = addToTypstData(res, { typst: 'underline(' + escapeContentSeparators(escapeUnbalancedParens(content)) + ')' });
