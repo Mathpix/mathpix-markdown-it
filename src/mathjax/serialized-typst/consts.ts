@@ -50,6 +50,35 @@ export const DEFAULT_EQ_NUMBERING = '"(1)"';
 /** Figure kind for equation tags */
 export const EQ_TAG_FIGURE_KIND = 'eq-tag';
 
+// Unicode character constants — named for readability
+// Invisible math operators (MathML)
+export const FUNC_APPLY = '\u2061';            // ⁡ function application
+export const INVISIBLE_TIMES = '\u2062';       // ⁢ invisible times
+export const INVISIBLE_SEP = '\u2063';         // ⁣ invisible separator
+export const INVISIBLE_PLUS = '\u2064';        // ⁤ invisible plus
+// Math operator code points
+export const MINUS_SIGN = '\u2212';            // −
+export const PLUS_MINUS = '\u00B1';            // ±
+export const MINUS_PLUS = '\u2213';            // ∓
+// Characters used in lim variant detection
+export const HORIZ_BAR = '\u2015';             // ― horizontal bar
+export const RIGHT_ARROW = '\u2192';           // →
+export const LEFT_ARROW = '\u2190';            // ←
+// Delimiter code points
+export const DOUBLE_VERT = '\u2016';           // ‖ double vertical bar
+export const PARALLEL_SIGN = '\u2225';         // ∥ parallel to
+export const LEFT_FLOOR = '\u230A';            // ⌊
+export const RIGHT_FLOOR = '\u230B';           // ⌋
+export const LEFT_CEIL = '\u2308';             // ⌈
+export const RIGHT_CEIL = '\u2309';            // ⌉
+export const LEFT_CHEVRON = '\u27E8';          // ⟨
+export const RIGHT_CHEVRON = '\u27E9';         // ⟩
+export const LEFT_ANGLE_OLD = '\u2329';        // 〈 (deprecated Unicode form)
+export const RIGHT_ANGLE_OLD = '\u232A';       // 〉 (deprecated Unicode form)
+// Other math symbols
+export const INTEGRAL_SIGN = '\u222B';         // ∫
+export const MIDLINE_ELLIPSIS = '\u22EF';      // ⋯
+
 export const OPEN_BRACKETS: Record<string, string> = {
   '(': ')', '[': ']', '{': '}',
 };

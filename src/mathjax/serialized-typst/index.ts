@@ -2,7 +2,13 @@ import { MmlVisitor } from 'mathjax-full/js/core/MmlTree/MmlVisitor.js';
 import { TextNode, XMLNode, TEXCLASS } from 'mathjax-full/js/core/MmlTree/MmlNode.js';
 import { handle } from './handlers';
 import { ITypstData, MathNode } from './types';
-import { DATA_PRE_CONTENT, DATA_POST_CONTENT } from './consts';
+import {
+  DATA_PRE_CONTENT, DATA_POST_CONTENT,
+  LEFT_FLOOR, RIGHT_FLOOR, LEFT_CEIL, RIGHT_CEIL,
+  DOUBLE_VERT, LEFT_CHEVRON, RIGHT_CHEVRON,
+  LEFT_ANGLE_OLD, RIGHT_ANGLE_OLD,
+  INTEGRAL_SIGN, MIDLINE_ELLIPSIS,
+} from './consts';
 import { addToTypstData, addSpaceToTypstData, initTypstData, isThousandSepComma, formatScript, needsTokenSeparator, getChildText } from './common';
 import { findTypstSymbol } from './typst-symbol-map';
 
@@ -11,12 +17,12 @@ const SCRIPT_KINDS: Set<string> = new Set(['msubsup', 'msub', 'msup']);
 
 // Map of opening delimiter char → expected close char + Typst output format.
 const BARE_DELIM_PAIRS: Record<string, { close: string; typstOpen: string; typstClose: string }> = {
-  '|':      { close: '|',      typstOpen: 'lr(| ', typstClose: ' |)' },
-  '\u230A': { close: '\u230B', typstOpen: 'floor(', typstClose: ')' },  // ⌊...⌋
-  '\u2308': { close: '\u2309', typstOpen: 'ceil(',  typstClose: ')' },  // ⌈...⌉
-  '\u2016': { close: '\u2016', typstOpen: 'norm(',  typstClose: ')' },  // ‖...‖
-  '\u27E8': { close: '\u27E9', typstOpen: 'lr(chevron.l ', typstClose: ' chevron.r)' }, // ⟨...⟩
-  '\u2329': { close: '\u232A', typstOpen: 'lr(chevron.l ', typstClose: ' chevron.r)' }, // 〈...〉 (old form)
+  '|':              { close: '|',              typstOpen: 'lr(| ',          typstClose: ' |)' },
+  [LEFT_FLOOR]:     { close: RIGHT_FLOOR,      typstOpen: 'floor(',         typstClose: ')' },
+  [LEFT_CEIL]:      { close: RIGHT_CEIL,       typstOpen: 'ceil(',          typstClose: ')' },
+  [DOUBLE_VERT]:    { close: DOUBLE_VERT,      typstOpen: 'norm(',          typstClose: ')' },
+  [LEFT_CHEVRON]:   { close: RIGHT_CHEVRON,    typstOpen: 'lr(chevron.l ',  typstClose: ' chevron.r)' },
+  [LEFT_ANGLE_OLD]: { close: RIGHT_ANGLE_OLD,  typstOpen: 'lr(chevron.l ',  typstClose: ' chevron.r)' },
 };
 
 // Extract big delimiter info from a TeXAtom node wrapping a sized mo.
@@ -219,18 +225,18 @@ export class SerializedTypstVisitor extends MmlVisitor {
         }
         // Detect \idotsint pattern: mo(∫) mo(⋯) msubsup/msub/msup(mo(∫), ...)
         // Group as lr(integral dots.c integral)_(sub)^(sup)
-        if (child?.kind === 'mo' && getChildText(child) === '\u222B') {
+        if (child?.kind === 'mo' && getChildText(child) === INTEGRAL_SIGN) {
           const next1 = node.childNodes[j + 1];
           const next2 = node.childNodes[j + 2];
-          if (next1?.kind === 'mo' && getChildText(next1) === '\u22EF' && next2) {
+          if (next1?.kind === 'mo' && getChildText(next1) === MIDLINE_ELLIPSIS && next2) {
             const scriptBase = next2.childNodes?.[0];
             if (SCRIPT_KINDS.has(next2.kind)
               && scriptBase?.kind === 'mo'
-              && getChildText(scriptBase) === '\u222B') {
+              && getChildText(scriptBase) === INTEGRAL_SIGN) {
               // Serialize the three base parts
               const part1: ITypstData = this.visitNode(child, space);
               const part2: ITypstData = this.visitNode(next1, space);
-              const part3 = findTypstSymbol('\u222B'); // integral
+              const part3 = findTypstSymbol(INTEGRAL_SIGN);
               // Build base: "integral dots.c integral"
               let baseContent = part1.typst;
               if (needsTokenSeparator(baseContent, part2.typst)) {

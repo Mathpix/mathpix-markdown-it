@@ -48,6 +48,28 @@ export declare const TYPST_PLACEHOLDER = "\"\"";
 export declare const DEFAULT_EQ_NUMBERING = "\"(1)\"";
 /** Figure kind for equation tags */
 export declare const EQ_TAG_FIGURE_KIND = "eq-tag";
+export declare const FUNC_APPLY = "\u2061";
+export declare const INVISIBLE_TIMES = "\u2062";
+export declare const INVISIBLE_SEP = "\u2063";
+export declare const INVISIBLE_PLUS = "\u2064";
+export declare const MINUS_SIGN = "\u2212";
+export declare const PLUS_MINUS = "\u00B1";
+export declare const MINUS_PLUS = "\u2213";
+export declare const HORIZ_BAR = "\u2015";
+export declare const RIGHT_ARROW = "\u2192";
+export declare const LEFT_ARROW = "\u2190";
+export declare const DOUBLE_VERT = "\u2016";
+export declare const PARALLEL_SIGN = "\u2225";
+export declare const LEFT_FLOOR = "\u230A";
+export declare const RIGHT_FLOOR = "\u230B";
+export declare const LEFT_CEIL = "\u2308";
+export declare const RIGHT_CEIL = "\u2309";
+export declare const LEFT_CHEVRON = "\u27E8";
+export declare const RIGHT_CHEVRON = "\u27E9";
+export declare const LEFT_ANGLE_OLD = "\u2329";
+export declare const RIGHT_ANGLE_OLD = "\u232A";
+export declare const INTEGRAL_SIGN = "\u222B";
+export declare const MIDLINE_ELLIPSIS = "\u22EF";
 export declare const OPEN_BRACKETS: Record<string, string>;
 export declare const CLOSE_BRACKETS: Record<string, string>;
 /** Typst escaped-delimiter output for unpaired brackets (math-mode safe) */

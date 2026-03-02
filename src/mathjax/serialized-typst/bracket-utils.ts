@@ -3,6 +3,7 @@ import { ITypstData, ITypstSerializer, MathNode } from "./types";
 import {
   RE_BRACKET_CHARS, RE_WORD_CHAR, RE_WORD_DOT_END,
   UNPAIRED_BRACKET_PROP, OPEN_BRACKETS, CLOSE_BRACKETS,
+  DOUBLE_VERT, PARALLEL_SIGN,
 } from "./consts";
 import { getNodeText } from "./common";
 import { typstSymbolMap } from "./typst-symbol-map";
@@ -37,8 +38,8 @@ export const delimiterToTypst = (delim: string): string => {
     case '{': return '"{"';
     case '}': return '"}"';
     case '|': return '"|"';
-    case '\u2016': return '"\u2016"'; // double vertical bar ‖
-    case '\u2225': return '"\u2016"'; // parallel → ‖
+    case DOUBLE_VERT: return '"' + DOUBLE_VERT + '"';
+    case PARALLEL_SIGN: return '"' + DOUBLE_VERT + '"';
     default: return '"' + delim + '"';
   }
 };

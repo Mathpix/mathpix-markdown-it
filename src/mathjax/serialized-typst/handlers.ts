@@ -5,6 +5,10 @@ import {
   RE_WORD_START, RE_OP_WRAPPER,
   RE_UNICODE_SPACES, RE_TRAILING_SPACING,
   OPEN_BRACKETS, CLOSE_BRACKETS, UNPAIRED_BRACKET_TYPST, UNPAIRED_BRACKET_PROP,
+  FUNC_APPLY, INVISIBLE_TIMES, INVISIBLE_SEP, INVISIBLE_PLUS,
+  MINUS_SIGN, PLUS_MINUS, MINUS_PLUS,
+  HORIZ_BAR, RIGHT_ARROW, LEFT_ARROW,
+  DOUBLE_VERT, LEFT_FLOOR, RIGHT_FLOOR, LEFT_CEIL, RIGHT_CEIL,
 } from "./consts";
 import {
   initTypstData, addToTypstData, addSpaceToTypstData,
@@ -20,10 +24,7 @@ const SHALLOW_TREE_MAX_DEPTH = 5;
 const ANCESTOR_MAX_DEPTH = 10;
 const MATHJAX_INHERIT_SENTINEL = '_inherit_';
 const INVISIBLE_CHARS: Set<string> = new Set([
-  '\u2061', // function application
-  '\u2062', // invisible times
-  '\u2063', // invisible separator
-  '\u2064', // invisible plus
+  FUNC_APPLY, INVISIBLE_TIMES, INVISIBLE_SEP, INVISIBLE_PLUS,
 ]);
 
 // Built-in Typst math operators — should NOT be wrapped in upright()
@@ -44,9 +45,7 @@ const BB_SHORTHAND_LETTERS: Set<string> = new Set(
 
 // Operators that should have spaces around them for readability
 const SPACED_OPERATORS: Set<string> = new Set([
-  '+', '-', '=', '<', '>', '\u2212', // minus sign
-  '\u00B1', // ±
-  '\u2213', // ∓
+  '+', '-', '=', '<', '>', MINUS_SIGN, PLUS_MINUS, MINUS_PLUS,
 ]);
 
 // Prime symbol → Typst ' shorthand mapping
@@ -172,7 +171,7 @@ const needsSpaceAfter = (node: MathNode): boolean => {
     if (index < 0) return false;
     let next = node.parent.childNodes[index + 1];
     // Skip invisible function application (U+2061)
-    if (next && getChildText(next) === '\u2061' && index + 2 < node.parent.childNodes.length) {
+    if (next && getChildText(next) === FUNC_APPLY && index + 2 < node.parent.childNodes.length) {
       next = node.parent.childNodes[index + 2];
     }
     if (next && (next.kind === 'mi' || next.kind === 'mo')) {
@@ -599,7 +598,7 @@ const mover: HandlerFn = (node, serialize) => {
   if (firstChild?.kind === 'mi' && secondChild?.kind === 'mo') {
     const baseText = getNodeText(firstChild);
     const overChar = getNodeText(secondChild);
-    if (baseText === 'lim' && overChar === '\u2015') {
+    if (baseText === 'lim' && overChar === HORIZ_BAR) {
       res = addToTypstData(res, { typst: 'op(overline(lim))' });
       return res;
     }
@@ -642,15 +641,15 @@ const munder: HandlerFn = (node, serialize) => {
   if (firstChild?.kind === 'mi' && secondChild?.kind === 'mo') {
     const baseText = getNodeText(firstChild);
     const underChar = getNodeText(secondChild);
-    if (baseText === 'lim' && underChar === '\u2192') {        // → below lim
+    if (baseText === 'lim' && underChar === RIGHT_ARROW) {     // \varinjlim
       res = addToTypstData(res, { typst: 'op("inj lim")' });
       return res;
     }
-    if (baseText === 'lim' && underChar === '\u2190') {        // ← below lim
+    if (baseText === 'lim' && underChar === LEFT_ARROW) {      // \varprojlim
       res = addToTypstData(res, { typst: 'op("proj lim")' });
       return res;
     }
-    if (baseText === 'lim' && underChar === '\u2015') {        // ― below lim (\varliminf)
+    if (baseText === 'lim' && underChar === HORIZ_BAR) {       // \varliminf
       res = addToTypstData(res, { typst: 'op(underline(lim))' });
       return res;
     }
@@ -860,17 +859,17 @@ const mrow: HandlerFn = (node, serialize) => {
         res = addToTypstData(res, { typst: hasSep
           ? 'lr(| ' + escapeLrSemicolons(trimmedContent) + ' |)'
           : 'abs(' + trimmedContent + ')' });
-      } else if (openDelim === '\u2016' && closeDelim === '\u2016') {
+      } else if (openDelim === DOUBLE_VERT && closeDelim === DOUBLE_VERT) {
         // ‖...‖ → norm() or lr(‖ ... ‖)
         res = addToTypstData(res, { typst: hasSep
           ? 'lr(‖ ' + escapeLrSemicolons(trimmedContent) + ' ‖)'
           : 'norm(' + trimmedContent + ')' });
-      } else if (openDelim === '\u230A' && closeDelim === '\u230B') {
+      } else if (openDelim === LEFT_FLOOR && closeDelim === RIGHT_FLOOR) {
         // ⌊...⌋ → floor() or lr(⌊ ... ⌋)
         res = addToTypstData(res, { typst: hasSep
           ? 'lr(⌊ ' + escapeLrSemicolons(trimmedContent) + ' ⌋)'
           : 'floor(' + trimmedContent + ')' });
-      } else if (openDelim === '\u2308' && closeDelim === '\u2309') {
+      } else if (openDelim === LEFT_CEIL && closeDelim === RIGHT_CEIL) {
         // ⌈...⌉ → ceil() or lr(⌈ ... ⌉)
         res = addToTypstData(res, { typst: hasSep
           ? 'lr(⌈ ' + escapeLrSemicolons(trimmedContent) + ' ⌉)'
