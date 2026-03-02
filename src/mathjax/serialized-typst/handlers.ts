@@ -1,6 +1,6 @@
 import { TEXCLASS } from "mathjax-full/js/core/MmlTree/MmlNode";
 import {
-  ITypstData, ITypstSerializer, HandlerFn, MmlNode,
+  ITypstData, ITypstSerializer, HandlerFn, MathNode,
   initTypstData, addToTypstData, addSpaceToTypstData,
   formatScript, isThousandSepComma, needsTokenSeparator, getNodeText, getChildText,
   isFirstChild, isLastChild, getSiblingIndex, typstPlaceholder,
@@ -27,13 +27,13 @@ const INVISIBLE_CHARS: Set<string> = new Set([
 ]);
 
 /** Get all attributes from a node. Return type matches MathJax's PropertyList. */
-const getAttributes = (node: MmlNode): Record<string, any> => {
+const getAttributes = (node: MathNode): Record<string, any> => {
   return node.attributes.getAllAttributes();
 };
 
 /** Extract the primary Typst symbol text from a node (mi/mo).
  *  Gets the first child's text and maps it through findTypstSymbol. */
-const getNodeTypstSymbol = (node: MmlNode): string => {
+const getNodeTypstSymbol = (node: MathNode): string => {
   const text = getChildText(node);
   if (!text) return '';
   return findTypstSymbol(text);
@@ -43,7 +43,7 @@ const defaultHandler: HandlerFn = (node, serialize) => {
   return handlerApi.handleAll(node, serialize);
 };
 
-const needsSpaceBefore = (node: MmlNode): boolean => {
+const needsSpaceBefore = (node: MathNode): boolean => {
   try {
     if (isFirstChild(node)) return false;
     const index = getSiblingIndex(node);
@@ -59,7 +59,7 @@ const needsSpaceBefore = (node: MmlNode): boolean => {
   }
 };
 
-const needsSpaceAfter = (node: MmlNode): boolean => {
+const needsSpaceAfter = (node: MathNode): boolean => {
   try {
     if (isLastChild(node)) return false;
     const parentKind = node.parent?.kind;
@@ -102,7 +102,7 @@ const BB_SHORTHAND_LETTERS: Set<string> = new Set(
 
 // --- MI handler: identifiers ---
 const mi = () => {
-  return (node: MmlNode, _serialize: ITypstSerializer): ITypstData => {
+  return (node: MathNode, _serialize: ITypstSerializer): ITypstData => {
     let res: ITypstData = initTypstData();
     if (!node.childNodes || node.childNodes.length === 0) {
       return res;
@@ -166,7 +166,7 @@ const SPACED_OPERATORS: Set<string> = new Set([
 
 // --- MO handler: operators ---
 const mo = () => {
-  return (node: MmlNode, _serialize: ITypstSerializer): ITypstData => {
+  return (node: MathNode, _serialize: ITypstSerializer): ITypstData => {
     let res: ITypstData = initTypstData();
     const value = getNodeText(node);
     const unpairedDir = node.getProperty(UNPAIRED_BRACKET_PROP);
@@ -233,7 +233,7 @@ const mo = () => {
 
 // --- MN handler: numbers ---
 const mn = () => {
-  return (node: MmlNode, _serialize: ITypstSerializer): ITypstData => {
+  return (node: MathNode, _serialize: ITypstSerializer): ITypstData => {
     let res: ITypstData = initTypstData();
     const value = getNodeText(node);
     const atr = getAttributes(node);
@@ -253,7 +253,7 @@ const mn = () => {
 
 // --- MTEXT handler: text content ---
 const mtext = () => {
-  return (node: MmlNode, _serialize: ITypstSerializer): ITypstData => {
+  return (node: MathNode, _serialize: ITypstSerializer): ITypstData => {
     let res: ITypstData = initTypstData();
     if (!node.childNodes || node.childNodes.length === 0) {
       return res;
@@ -286,7 +286,7 @@ const mtext = () => {
 
 // --- MFRAC handler: fractions ---
 const mfrac = () => {
-  return (node: MmlNode, serialize: ITypstSerializer): ITypstData => {
+  return (node: MathNode, serialize: ITypstSerializer): ITypstData => {
     let res: ITypstData = initTypstData();
     const firstChild = node.childNodes[0] || null;
     const secondChild = node.childNodes[1] || null;
@@ -337,7 +337,7 @@ const matchBraceAnnotation = (
 
 // --- MSUP handler: superscripts ---
 const msup = () => {
-  return (node: MmlNode, serialize: ITypstSerializer): ITypstData => {
+  return (node: MathNode, serialize: ITypstSerializer): ITypstData => {
     let res: ITypstData = initTypstData();
     const firstChild = node.childNodes[0] || null;
     const secondChild = node.childNodes[1] || null;
@@ -378,7 +378,7 @@ const msup = () => {
 
 // --- MSUB handler: subscripts ---
 const msub = () => {
-  return (node: MmlNode, serialize: ITypstSerializer): ITypstData => {
+  return (node: MathNode, serialize: ITypstSerializer): ITypstData => {
     let res: ITypstData = initTypstData();
     const firstChild = node.childNodes[0] || null;
     const secondChild = node.childNodes[1] || null;
@@ -412,7 +412,7 @@ const msub = () => {
 
 // --- MSUBSUP handler: combined subscript+superscript ---
 const msubsup = () => {
-  return (node: MmlNode, serialize: ITypstSerializer): ITypstData => {
+  return (node: MathNode, serialize: ITypstSerializer): ITypstData => {
     let res: ITypstData = initTypstData();
     const firstChild = node.childNodes[0] || null;
     const secondChild = node.childNodes[1] || null;
@@ -447,7 +447,7 @@ const msubsup = () => {
 
 // --- MSQRT handler: square root ---
 const msqrt = () => {
-  return (node: MmlNode, serialize: ITypstSerializer): ITypstData => {
+  return (node: MathNode, serialize: ITypstSerializer): ITypstData => {
     let res: ITypstData = initTypstData();
     const firstChild = node.childNodes[0] || null;
     const dataFirst: ITypstData = firstChild ? serialize.visitNode(firstChild, '') : initTypstData();
@@ -459,7 +459,7 @@ const msqrt = () => {
 
 // --- MROOT handler: nth root ---
 const mroot = () => {
-  return (node: MmlNode, serialize: ITypstSerializer): ITypstData => {
+  return (node: MathNode, serialize: ITypstSerializer): ITypstData => {
     let res: ITypstData = initTypstData();
     // MathML mroot: child[0] = radicand, child[1] = index
     const radicand = node.childNodes[0] || null;
@@ -498,7 +498,7 @@ const TYPST_DISPLAY_LIMIT_OPS: Set<string> = new Set([
 ]);
 
 /** Get movablelimits attribute from a node (typically the base mo of munderover) */
-const getMovablelimits = (node: MmlNode): boolean | undefined => {
+const getMovablelimits = (node: MathNode): boolean | undefined => {
   if (!node || node.kind !== 'mo') return undefined;
   try {
     const atr = getAttributes(node);
@@ -527,9 +527,9 @@ const isCustomOp = (baseTrimmed: string): boolean =>
 
 /** Check if baseTrimmed is a stretchy extensible symbol (\xrightarrow, \xleftarrow, etc.).
  *  Walks into firstChild to find the inner mo and check its stretchy attribute. */
-const isStretchyBase = (baseTrimmed: string, firstChild: MmlNode): boolean => {
+const isStretchyBase = (baseTrimmed: string, firstChild: MathNode): boolean => {
   if (!STRETCH_BASE_SYMBOLS.has(baseTrimmed)) return false;
-  let moNode: MmlNode = firstChild;
+  let moNode: MathNode = firstChild;
   for (let i = 0; i < SHALLOW_TREE_MAX_DEPTH && moNode && moNode.kind !== 'mo'; i++) {
     if (moNode.childNodes?.length === 1) {
       moNode = moNode.childNodes[0];
@@ -556,7 +556,7 @@ const isSpecialFnCall = (baseTrimmed: string): boolean =>
 
 /** Build limit-placement base, returns different block/inline bases for movablelimits.
  *  baseTrimmed must be the raw trimmed value (no placeholder) for correct classification. */
-const buildLimitBase = (firstChild: MmlNode | null, baseTrimmed: string, base: string): ITypstData => {
+const buildLimitBase = (firstChild: MathNode | null, baseTrimmed: string, base: string): ITypstData => {
   if (!baseTrimmed) return { typst: typstPlaceholder(base) };
   const movablelimits = firstChild ? getMovablelimits(firstChild) : undefined;
   const wrapper = firstChild && isStretchyBase(baseTrimmed, firstChild) ? 'stretch' : 'limits';
@@ -608,7 +608,7 @@ const TYPST_ACCENT_SHORTHANDS: Set<string> = new Set([
 
 // --- MOVER handler: accents and overbrace ---
 const mover = () => {
-  return (node: MmlNode, serialize: ITypstSerializer): ITypstData => {
+  return (node: MathNode, serialize: ITypstSerializer): ITypstData => {
     let res: ITypstData = initTypstData();
     const firstChild = node.childNodes[0] || null;
     const secondChild = node.childNodes[1] || null;
@@ -653,7 +653,7 @@ const mover = () => {
 
 // --- MUNDER handler: under-accents and underbrace ---
 const munder = () => {
-  return (node: MmlNode, serialize: ITypstSerializer): ITypstData => {
+  return (node: MathNode, serialize: ITypstSerializer): ITypstData => {
     let res: ITypstData = initTypstData();
     const firstChild = node.childNodes[0] || null;
     const secondChild = node.childNodes[1] || null;
@@ -716,7 +716,7 @@ const munder = () => {
 
 // --- MUNDEROVER handler: combined under+over (e.g. sum with limits) ---
 const munderover = () => {
-  return (node: MmlNode, serialize: ITypstSerializer): ITypstData => {
+  return (node: MathNode, serialize: ITypstSerializer): ITypstData => {
     let res: ITypstData = initTypstData();
     const firstChild = node.childNodes[0] || null;
     const secondChild = node.childNodes[1] || null;
@@ -742,7 +742,7 @@ const munderover = () => {
 
 // --- MMULTISCRIPTS handler: pre/post scripts via attach() ---
 const mmultiscripts = () => {
-  return (node: MmlNode, serialize: ITypstSerializer): ITypstData => {
+  return (node: MathNode, serialize: ITypstSerializer): ITypstData => {
     let res: ITypstData = initTypstData();
     if (!node.childNodes || node.childNodes.length === 0) return res;
     // Parse mmultiscripts structure:
@@ -835,7 +835,7 @@ const MSPACE_WIDTH_MAP: Record<string, string> = {
 };
 
 const mspace = () => {
-  return (node: MmlNode, _serialize: ITypstSerializer): ITypstData => {
+  return (node: MathNode, _serialize: ITypstSerializer): ITypstData => {
     let res: ITypstData = initTypstData();
     const atr = getAttributes(node);
     if (!atr || !atr.width) {
@@ -854,7 +854,7 @@ const mspace = () => {
 
 // --- MROW handler: grouped content, lr() for \left...\right ---
 const mrow = () => {
-  return (node: MmlNode, serialize: ITypstSerializer): ITypstData => {
+  return (node: MathNode, serialize: ITypstSerializer): ITypstData => {
     let res: ITypstData = initTypstData();
     const openProp = node.getProperty('open');
     const closeProp = node.getProperty('close');
@@ -1009,8 +1009,8 @@ const mrow = () => {
 };
 
 /** Check if a node subtree contains an mphantom (shallow — up to 5 levels). */
-const hasPhantomChild = (node: MmlNode): boolean => {
-  const check = (n: MmlNode, depth: number): boolean => {
+const hasPhantomChild = (node: MathNode): boolean => {
+  const check = (n: MathNode, depth: number): boolean => {
     if (!n || depth > SHALLOW_TREE_MAX_DEPTH) return false;
     if (n.kind === 'mphantom') return true;
     if (n.childNodes) {
@@ -1024,7 +1024,7 @@ const hasPhantomChild = (node: MmlNode): boolean => {
 };
 
 /** Check if node has an msub/msup/msubsup/mmultiscripts ancestor (mhchem alignment pattern). */
-const hasScriptAncestor = (node: MmlNode): boolean => {
+const hasScriptAncestor = (node: MathNode): boolean => {
   let cur = node?.parent;
   while (cur) {
     const k = cur.kind;
@@ -1036,7 +1036,7 @@ const hasScriptAncestor = (node: MmlNode): boolean => {
 
 // --- MPADDED handler: strip padding, emit content ---
 const mpadded = () => {
-  return (node: MmlNode, serialize: ITypstSerializer): ITypstData => {
+  return (node: MathNode, serialize: ITypstSerializer): ITypstData => {
     let res: ITypstData = initTypstData();
     const atr = getAttributes(node);
     // mhchem alignment phantom: mpadded width=0 or height=0 containing mphantom
@@ -1067,7 +1067,7 @@ const mpadded = () => {
 
 // --- MPHANTOM handler: \phantom → hide() ---
 const mphantom = () => {
-  return (node: MmlNode, serialize: ITypstSerializer): ITypstData => {
+  return (node: MathNode, serialize: ITypstSerializer): ITypstData => {
     let res: ITypstData = initTypstData();
     const data: ITypstData = handlerApi.handleAll(node, serialize);
     const content = data.typst.trim();
@@ -1080,7 +1080,7 @@ const mphantom = () => {
 
 // --- MENCLOSE handler: cancel, strikethrough ---
 const menclose = () => {
-  return (node: MmlNode, serialize: ITypstSerializer): ITypstData => {
+  return (node: MathNode, serialize: ITypstSerializer): ITypstData => {
     let res: ITypstData = initTypstData();
     const atr = getAttributes(node);
     const notation: string = atr?.notation?.toString() || '';
@@ -1154,7 +1154,7 @@ const handleAll: HandlerFn = (node, serialize) => {
 /** Check if mstyle contains only operator-internal mspace nodes (inside a TeXAtom chain).
  *  These represent spacing injected by MathJax for compound operators (e.g. \oint)
  *  and should be suppressed. Explicit user spacing (\, \quad) is preserved. */
-const isOperatorInternalSpacing = (node: MmlNode): boolean => {
+const isOperatorInternalSpacing = (node: MathNode): boolean => {
   const children = node.childNodes || [];
   if (children.length !== 1 || !children[0].isInferred) return false;
   const innerChildren = children[0].childNodes || [];
@@ -1181,7 +1181,7 @@ const wrapWithColor = (content: string, mathcolor: string): string => {
 
 // --- MSTYLE handler: skip operator-internal spacing, pass through otherwise ---
 const mstyle = () => {
-  return (node: MmlNode, serialize: ITypstSerializer): ITypstData => {
+  return (node: MathNode, serialize: ITypstSerializer): ITypstData => {
     let res: ITypstData = initTypstData();
     if (isOperatorInternalSpacing(node)) {
       return res;

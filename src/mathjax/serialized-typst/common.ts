@@ -1,22 +1,22 @@
-import { MmlNode as MmlNodeBase, TextNode } from 'mathjax-full/js/core/MmlTree/MmlNode.js';
+import { MmlNode, TextNode } from 'mathjax-full/js/core/MmlTree/MmlNode.js';
 
-/** MmlNode with childNodes typed as MmlNode[] to match AbstractMmlNode runtime behavior.
+/** MmlNode with childNodes typed as MathNode[] to match AbstractMmlNode runtime behavior.
  *  All nodes in a MathJax MathML tree are MmlNode instances; this extension narrows
- *  the childNodes type from Node[] to MmlNode[] to eliminate casts at access sites. */
-export interface MmlNode extends MmlNodeBase {
-  childNodes: MmlNode[];
-  parent: MmlNode;
+ *  the childNodes type from Node[] to MathNode[] to eliminate casts at access sites. */
+export interface MathNode extends MmlNode {
+  childNodes: MathNode[];
+  parent: MathNode;
 }
 
 export { TextNode };
 
 /** Visitor/serializer interface used by handlers. */
 export interface ITypstSerializer {
-  visitNode(node: MmlNode, space: string): ITypstData;
+  visitNode(node: MathNode, space: string): ITypstData;
 }
 
 /** Handler function signature. */
-export type HandlerFn = (node: MmlNode, serialize: ITypstSerializer) => ITypstData;
+export type HandlerFn = (node: MathNode, serialize: ITypstSerializer) => ITypstData;
 
 // --- Regex Constants ---
 
@@ -99,7 +99,7 @@ export const addSpaceToTypstData = (data: ITypstData): void => {
 /** Check if child at index i in a node's childNodes starts a thousand-separator
  *  pattern: mn, mo(,), mn(3 digits). Also handles Indian numbering (2-digit groups
  *  like 41,70,000) by accepting 2-digit groups when the chain ends with a 3-digit group. */
-export const isThousandSepComma = (node: MmlNode, i: number): boolean => {
+export const isThousandSepComma = (node: MathNode, i: number): boolean => {
   try {
     if (i + 2 >= node.childNodes.length) return false;
     const child = node.childNodes[i];
@@ -160,31 +160,31 @@ export const formatScript = (prefix: '_' | '^', content: string): string => {
 };
 
 /** Check if a node is the first child of its parent. */
-export const isFirstChild = (node: MmlNode): boolean => {
+export const isFirstChild = (node: MathNode): boolean => {
   return node.parent && node.parent.childNodes[0] && node.parent.childNodes[0] === node;
 };
 
 /** Check if a node is the last child of its parent. */
-export const isLastChild = (node: MmlNode): boolean => {
+export const isLastChild = (node: MathNode): boolean => {
   return node.parent && node.parent.childNodes
     && node.parent.childNodes[node.parent.childNodes.length - 1] === node;
 };
 
 /** Find the index of a node among its parent's childNodes. Returns -1 if not found. */
-export const getSiblingIndex = (node: MmlNode): number => {
+export const getSiblingIndex = (node: MathNode): number => {
   if (!node.parent || !node.parent.childNodes) return -1;
   return node.parent.childNodes.findIndex((item) => item === node);
 };
 
 /** Get text content of a node's first child (TextNode).
  *  Safe: returns '' if node has no children or first child is not a TextNode. */
-export const getChildText = (node: MmlNode): string => {
+export const getChildText = (node: MathNode): string => {
   const child = node?.childNodes?.[0];
   return child instanceof TextNode ? child.getText() : '';
 };
 
 /** Concatenate text content of all child nodes. */
-export const getNodeText = (node: MmlNode): string => {
+export const getNodeText = (node: MathNode): string => {
   if (!node?.childNodes) return '';
   let text = '';
   for (const child of node.childNodes) {

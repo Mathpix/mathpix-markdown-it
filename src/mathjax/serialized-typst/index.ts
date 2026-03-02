@@ -1,14 +1,14 @@
 import { MmlVisitor } from 'mathjax-full/js/core/MmlTree/MmlVisitor.js';
 import { TextNode, XMLNode, TEXCLASS } from 'mathjax-full/js/core/MmlTree/MmlNode.js';
 import { handle } from './handlers';
-import { ITypstData, MmlNode, addToTypstData, addSpaceToTypstData, initTypstData, isThousandSepComma, formatScript, needsTokenSeparator, getChildText, DATA_PRE_CONTENT, DATA_POST_CONTENT } from './common';
+import { ITypstData, MathNode, addToTypstData, addSpaceToTypstData, initTypstData, isThousandSepComma, formatScript, needsTokenSeparator, getChildText, DATA_PRE_CONTENT, DATA_POST_CONTENT } from './common';
 import { findTypstSymbol } from './typst-symbol-map';
 
 // Extract big delimiter info from a TeXAtom node wrapping a sized mo.
 // The TeXAtom itself may have texClass=0 (ORD); the OPEN/CLOSE class
 // is on the inner inferredMrow or mo node.
 // Returns { delim, size, isOpen } if found, or null.
-const getBigDelimInfo = (node: MmlNode): { delim: string, size: string, isOpen: boolean } | null => {
+const getBigDelimInfo = (node: MathNode): { delim: string, size: string, isOpen: boolean } | null => {
   try {
     if (node.kind !== 'TeXAtom') return null;
     // TeXAtom > inferredMrow > mo(minsize/maxsize)
@@ -30,9 +30,9 @@ const getBigDelimInfo = (node: MmlNode): { delim: string, size: string, isOpen: 
 
 // Return the text content of a single-mo node (bare mo, mrow or TeXAtom wrapping one mo).
 // Used to detect delimiter characters like |, ⌊, ⌋, ⌈, ⌉, ‖, ⟨, ⟩.
-const getDelimiterChar = (node: MmlNode): string | null => {
+const getDelimiterChar = (node: MathNode): string | null => {
   try {
-    let moNode: MmlNode | null = null;
+    let moNode: MathNode | null = null;
     if (node?.kind === 'mo') {
       moNode = node;
     } else if (node?.kind === 'mrow' || node?.kind === 'TeXAtom') {
@@ -53,7 +53,7 @@ const getDelimiterChar = (node: MmlNode): string | null => {
 // Check if node is msub/msup/msubsup whose BASE is a closing delimiter.
 // Returns the delimiter char if found, null otherwise.
 // Used to detect \|x\|_2 where the closing ‖ is inside msub(‖, 2).
-const getScriptedDelimiterChar = (node: MmlNode): string | null => {
+const getScriptedDelimiterChar = (node: MathNode): string | null => {
   try {
     const k = node?.kind;
     if (k === 'msub' || k === 'msup' || k === 'msubsup') {
@@ -90,7 +90,7 @@ export class SerializedTypstVisitor extends MmlVisitor {
     this.options = options || {};
   }
 
-  public visitTree(node: MmlNode): ITypstData {
+  public visitTree(node: MathNode): ITypstData {
     return this.visitNode(node, '');
   }
 
@@ -114,7 +114,7 @@ export class SerializedTypstVisitor extends MmlVisitor {
     return initTypstData();
   }
 
-  public visitInferredMrowNode(node: MmlNode, space: string): ITypstData {
+  public visitInferredMrowNode(node: MathNode, space: string): ITypstData {
     let res: ITypstData = initTypstData();
     try {
       let j = 0;
@@ -336,7 +336,7 @@ export class SerializedTypstVisitor extends MmlVisitor {
     }
   }
 
-  public visitTeXAtomNode(node: MmlNode, space: string): ITypstData {
+  public visitTeXAtomNode(node: MathNode, space: string): ITypstData {
     let res: ITypstData = initTypstData();
     try {
       const children: ITypstData = this.childNodeMml(node, space + '  ', '\n');
@@ -349,15 +349,15 @@ export class SerializedTypstVisitor extends MmlVisitor {
     }
   }
 
-  public visitAnnotationNode(_node: MmlNode, _space: string): ITypstData {
+  public visitAnnotationNode(_node: MathNode, _space: string): ITypstData {
     return initTypstData();
   }
 
-  public visitDefault(node: MmlNode, _space: string): ITypstData {
+  public visitDefault(node: MathNode, _space: string): ITypstData {
     return this.childNodeMml(node, '  ', '');
   }
 
-  protected childNodeMml(node: MmlNode, _space: string, _nl: string): ITypstData {
+  protected childNodeMml(node: MathNode, _space: string, _nl: string): ITypstData {
     const handleCh = handle.bind(this);
     let res: ITypstData = initTypstData();
     try {

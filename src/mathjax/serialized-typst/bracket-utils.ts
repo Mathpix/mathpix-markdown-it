@@ -1,5 +1,5 @@
 import { TEXCLASS } from "mathjax-full/js/core/MmlTree/MmlNode";
-import { getNodeText, RE_BRACKET_CHARS, RE_WORD_CHAR, RE_WORD_DOT_END, ITypstData, ITypstSerializer, MmlNode } from "./common";
+import { getNodeText, RE_BRACKET_CHARS, RE_WORD_CHAR, RE_WORD_DOT_END, ITypstData, ITypstSerializer, MathNode } from "./common";
 import { typstSymbolMap } from "./typst-symbol-map";
 
 export const delimiterToTypst = (delim: string): string => {
@@ -17,7 +17,7 @@ export const delimiterToTypst = (delim: string): string => {
   }
 };
 
-export const treeContainsMo = (node: MmlNode, moText: string, skipPhantom = true): boolean => {
+export const treeContainsMo = (node: MathNode, moText: string, skipPhantom = true): boolean => {
   if (!node) return false;
   if (skipPhantom && node.kind === 'mphantom') return false;
   if (node.kind === 'mo') {
@@ -34,10 +34,10 @@ export const treeContainsMo = (node: MmlNode, moText: string, skipPhantom = true
 
 // Serialize all visible content in a node subtree up to (but not including)
 // the first mo with the given text. Returns the serialized prefix.
-export const serializePrefixBeforeMo = (node: MmlNode, serialize: ITypstSerializer, stopMoText: string): string => {
+export const serializePrefixBeforeMo = (node: MathNode, serialize: ITypstSerializer, stopMoText: string): string => {
   // Walk the mtd → inferredMrow → mpadded chain to find the flat math children
-  let flatChildren: MmlNode[] = [];
-  const extractFlat = (n: MmlNode) => {
+  let flatChildren: MathNode[] = [];
+  const extractFlat = (n: MathNode) => {
     if (!n || !n.childNodes) return;
     if (n.kind === 'mphantom') return;
     if (n.kind === 'mtd' || n.kind === 'mpadded' || n.kind === 'mstyle' || n.isInferred) {
@@ -165,12 +165,12 @@ export const replaceUnpairedBrackets = (expr: string): string => {
 };
 
 // --- Pre-serialization tree walk: mark unpaired ASCII brackets ---
-export const markUnpairedBrackets = (root: MmlNode): void => {
-  const bracketNodes: { node: MmlNode; char: string }[] = [];
+export const markUnpairedBrackets = (root: MathNode): void => {
+  const bracketNodes: { node: MathNode; char: string }[] = [];
   // Check if an mo node is a \left...\right delimiter (first/last child of
   // an mrow with texClass=INNER and open/close properties).  These must NOT
   // participate in pairing — otherwise \right] would pair with an inner [.
-  const isLeftRightDelimiter = (moNode: MmlNode): boolean => {
+  const isLeftRightDelimiter = (moNode: MathNode): boolean => {
     const parent = moNode.parent;
     if (!parent || parent.kind !== 'mrow') return false;
     if (parent.getProperty('texClass') !== TEXCLASS.INNER) return false;
@@ -179,7 +179,7 @@ export const markUnpairedBrackets = (root: MmlNode): void => {
     if (!ch || ch.length === 0) return false;
     return ch[0] === moNode || ch[ch.length - 1] === moNode;
   };
-  const walk = (node: MmlNode): void => {
+  const walk = (node: MathNode): void => {
     if (!node) return;
     if (node.kind === 'mo') {
       const text = getNodeText(node);
