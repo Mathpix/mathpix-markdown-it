@@ -410,102 +410,97 @@ const buildMatrix = (
   return res;
 };
 
-export const mtable = (): HandlerFn => {
-  return (node: MathNode, serialize: ITypstSerializer): ITypstData => {
-    let res: ITypstData = initTypstData();
-    const countRow = node.childNodes.length;
-      const envName = node.attributes.get('name') as string;
-      // Check for enclosing brackets from \left...\right (mrow parent with open/close)
-      const parentMrow = node.parent?.kind === 'mrow' ? node.parent : null;
-      const openProp = parentMrow?.getProperty('open');
-      const closeProp = parentMrow?.getProperty('close');
-      const branchOpen: string = openProp !== undefined ? String(openProp) : '';
-      const branchClose: string = closeProp !== undefined ? String(closeProp) : '';
-      // Determine if this is a cases environment
-      const isCases = envName === 'cases' || (branchOpen === '{' && branchClose === '');
-      // Detect numcases/subnumcases pattern
-      const isNumcases = isNumcasesTable(node);
-      // Determine if this is an equation array (align, gather, split, etc.)
-      // Skip eqnArray detection for numcases — it should be treated as cases
-      const isEqnArray = !isNumcases && !isCases && node.childNodes.length > 0
-        && node.childNodes[0].attributes?.get('displaystyle');
-
-      if (isNumcases) {
-        return buildNumcasesGrid(node, serialize, countRow);
-      }
-      const rows: string[] = [];
-      for (let i = 0; i < countRow; i++) {
-        const mtrNode = node.childNodes[i];
-        const countColl = mtrNode.childNodes?.length || 0;
-        // For mlabeledtr (numbered equation rows), the first child is the
-        // equation number label — skip it so we only emit the math content
-        const startCol = mtrNode.kind === 'mlabeledtr' ? 1 : 0;
-        const cells: string[] = [];
-        for (let j = startCol; j < countColl; j++) {
-          const mtdNode = mtrNode.childNodes[j];
-          const cellData: ITypstData = serialize.visitNode(mtdNode, '');
-          cells.push(cellData.typst.trim());
-        }
-        if (isEqnArray) {
-          // Join cells with & alignment markers.
-          // Within each column pair (right-left): &
-          // Between column pairs: &quad for visual spacing.
-          const pairs: string[] = [];
-          for (let k = 0; k < cells.length; k += 2) {
-            if (k + 1 < cells.length) {
-              pairs.push(cells[k] + ' &' + cells[k + 1]);
-            } else {
-              pairs.push(cells[k]);
-            }
-          }
-          rows.push(pairs.join(' &quad '));
-        } else if (isCases) {
-          // Cases: escape top-level commas in each cell to prevent them
-          // being parsed as cases() argument separators, then join with &
-          rows.push(cells.map(c => escapeCasesSeparators(replaceUnpairedBrackets(c))).join(' & '));
+export const mtable: HandlerFn = (node, serialize) => {
+  let res: ITypstData = initTypstData();
+  const countRow = node.childNodes.length;
+  const envName = node.attributes.get('name') as string;
+  // Check for enclosing brackets from \left...\right (mrow parent with open/close)
+  const parentMrow = node.parent?.kind === 'mrow' ? node.parent : null;
+  const openProp = parentMrow?.getProperty('open');
+  const closeProp = parentMrow?.getProperty('close');
+  const branchOpen: string = openProp !== undefined ? String(openProp) : '';
+  const branchClose: string = closeProp !== undefined ? String(closeProp) : '';
+  // Determine if this is a cases environment
+  const isCases = envName === 'cases' || (branchOpen === '{' && branchClose === '');
+  // Detect numcases/subnumcases pattern
+  const isNumcases = isNumcasesTable(node);
+  // Determine if this is an equation array (align, gather, split, etc.)
+  // Skip eqnArray detection for numcases — it should be treated as cases
+  const isEqnArray = !isNumcases && !isCases && node.childNodes.length > 0
+    && node.childNodes[0].attributes?.get('displaystyle');
+  if (isNumcases) {
+    return buildNumcasesGrid(node, serialize, countRow);
+  }
+  const rows: string[] = [];
+  for (let i = 0; i < countRow; i++) {
+    const mtrNode = node.childNodes[i];
+    const countColl = mtrNode.childNodes?.length || 0;
+    // For mlabeledtr (numbered equation rows), the first child is the
+    // equation number label — skip it so we only emit the math content
+    const startCol = mtrNode.kind === 'mlabeledtr' ? 1 : 0;
+    const cells: string[] = [];
+    for (let j = startCol; j < countColl; j++) {
+      const mtdNode = mtrNode.childNodes[j];
+      const cellData: ITypstData = serialize.visitNode(mtdNode, '');
+      cells.push(cellData.typst.trim());
+    }
+    if (isEqnArray) {
+      // Join cells with & alignment markers.
+      // Within each column pair (right-left): &
+      // Between column pairs: &quad for visual spacing.
+      const pairs: string[] = [];
+      for (let k = 0; k < cells.length; k += 2) {
+        if (k + 1 < cells.length) {
+          pairs.push(cells[k] + ' &' + cells[k + 1]);
         } else {
-          // Matrix: escape top-level commas and semicolons in each cell
-          // to prevent them being parsed as mat() cell/row separators
-          rows.push(cells.map(c => escapeCasesSeparators(replaceUnpairedBrackets(c))).join(', '));
+          pairs.push(cells[k]);
         }
       }
-      if (isEqnArray) {
-        const hasAnyTag = node.childNodes.some(
-          (child: MathNode) => child.kind === 'mlabeledtr'
-        );
-        const preContent = String(node.getProperty(DATA_PRE_CONTENT) || '');
-        const postContent = String(node.getProperty(DATA_POST_CONTENT) || '');
-        if (hasAnyTag) {
-          return buildTaggedEqnArray(node, serialize, rows, countRow, preContent, postContent);
-        } else {
-          return buildUntaggedEqnArray(rows, preContent, postContent);
-        }
-      } else if (isCases) {
-        // Cases environment
-        let casesBody: string;
-        if (rows.length >= 2) {
-          casesBody = 'cases(\n  ' + rows.join(',\n  ') + ',\n)';
-        } else {
-          casesBody = 'cases(' + rows.join(', ') + ')';
-        }
-        res = addToTypstData(res, { typst: casesBody });
-      } else {
-        return buildMatrix(node, rows, branchOpen, branchClose);
-      }
-      return res;
-  };
+      rows.push(pairs.join(' &quad '));
+    } else if (isCases) {
+      // Cases: escape top-level commas in each cell to prevent them
+      // being parsed as cases() argument separators, then join with &
+      rows.push(cells.map(c => escapeCasesSeparators(replaceUnpairedBrackets(c))).join(' & '));
+    } else {
+      // Matrix: escape top-level commas and semicolons in each cell
+      // to prevent them being parsed as mat() cell/row separators
+      rows.push(cells.map(c => escapeCasesSeparators(replaceUnpairedBrackets(c))).join(', '));
+    }
+  }
+  if (isEqnArray) {
+    const hasAnyTag = node.childNodes.some(
+      (child: MathNode) => child.kind === 'mlabeledtr'
+    );
+    const preContent = String(node.getProperty(DATA_PRE_CONTENT) || '');
+    const postContent = String(node.getProperty(DATA_POST_CONTENT) || '');
+    if (hasAnyTag) {
+      return buildTaggedEqnArray(node, serialize, rows, countRow, preContent, postContent);
+    } else {
+      return buildUntaggedEqnArray(rows, preContent, postContent);
+    }
+  } else if (isCases) {
+    // Cases environment
+    let casesBody: string;
+    if (rows.length >= 2) {
+      casesBody = 'cases(\n  ' + rows.join(',\n  ') + ',\n)';
+    } else {
+      casesBody = 'cases(' + rows.join(', ') + ')';
+    }
+    res = addToTypstData(res, { typst: casesBody });
+  } else {
+    return buildMatrix(node, rows, branchOpen, branchClose);
+  }
+  return res;
 };
 
-export const mtr = (): HandlerFn => {
-  return (node: MathNode, serialize: ITypstSerializer): ITypstData => {
-    let res: ITypstData = initTypstData();
-    for (let i = 0; i < node.childNodes.length; i++) {
-      if (i > 0) {
-        res = addToTypstData(res, { typst: ', ' });
-      }
-      const data: ITypstData = serialize.visitNode(node.childNodes[i], '');
-      res = addToTypstData(res, data);
+export const mtr: HandlerFn = (node, serialize) => {
+  let res: ITypstData = initTypstData();
+  for (let i = 0; i < node.childNodes.length; i++) {
+    if (i > 0) {
+      res = addToTypstData(res, { typst: ', ' });
     }
-    return res;
-  };
+    const data: ITypstData = serialize.visitNode(node.childNodes[i], '');
+    res = addToTypstData(res, data);
+  }
+  return res;
 };

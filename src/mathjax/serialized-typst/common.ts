@@ -1,5 +1,5 @@
 import { TextNode } from 'mathjax-full/js/core/MmlTree/MmlNode.js';
-import { MathNode, ITypstData } from './types';
+import { MathNode, ITypstData, HandlerFn } from './types';
 import {
   RE_THREE_DIGITS, RE_TWO_DIGITS, RE_PHANTOM_BASE,
   RE_TOKEN_START, RE_SEPARATOR_END, TYPST_PLACEHOLDER,
@@ -127,4 +127,14 @@ export const getNodeText = (node: MathNode): string => {
     if (child instanceof TextNode) text += child.getText();
   }
   return text;
+};
+
+/** Serialize all children of a node by visiting each one and concatenating the results. */
+export const handleAll: HandlerFn = (node, serialize) => {
+  let res: ITypstData = initTypstData();
+  for (const child of node.childNodes) {
+    const data: ITypstData = serialize.visitNode(child, '');
+    res = addToTypstData(res, data);
+  }
+  return res;
 };
