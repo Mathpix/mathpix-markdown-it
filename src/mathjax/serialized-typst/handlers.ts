@@ -337,7 +337,7 @@ const mtext: HandlerFn = (node, _serialize) => {
     res = addToTypstData(res, { typst: spaceBefore + typstValue + spaceAfter });
     return res;
   }
-  let textContent = '"' + value.replace(/\\/g, '\\\\').replace(/"/g, '\\"') + '"';
+  let textContent = '"' + value.replace(/"/g, '\\"') + '"';
   const atr = getAttributes(node);
   const mathvariant: string = atr?.mathvariant || '';
   if (mathvariant && mathvariant !== 'normal') {
@@ -556,9 +556,9 @@ const isSpecialFnCall = (baseTrimmed: string): boolean =>
   RE_SPECIAL_FN_CALL.test(baseTrimmed);
 
 /** Build limit-placement base, returns different block/inline bases for movablelimits.
- *  baseTrimmed must be the raw trimmed value (no placeholder) for correct classification. */
+ *  baseTrimmed is the raw trimmed value; empty bases get placeholder '""' inside wrappers. */
 const buildLimitBase = (firstChild: MathNode | null, baseTrimmed: string, base: string): ITypstData => {
-  if (!baseTrimmed) return { typst: typstPlaceholder(base) };
+  const basePlaceholder = typstPlaceholder(baseTrimmed);
   const movablelimits = firstChild ? getMovablelimits(firstChild) : undefined;
   const wrapper = firstChild && isStretchyBase(baseTrimmed, firstChild) ? 'stretch' : 'limits';
   if (movablelimits === true) {
@@ -568,9 +568,9 @@ const buildLimitBase = (firstChild: MathNode | null, baseTrimmed: string, base: 
     if (isNativeDisplayLimitOp(baseTrimmed)) {
       return { typst: base };
     }
-    return { typst: wrapper + '(' + escapeContentSeparators(baseTrimmed) + ')', typst_inline: base };
+    return { typst: wrapper + '(' + escapeContentSeparators(basePlaceholder) + ')', typst_inline: base };
   } else if (movablelimits === false) {
-    return { typst: wrapper + '(' + escapeContentSeparators(baseTrimmed) + ')' };
+    return { typst: wrapper + '(' + escapeContentSeparators(basePlaceholder) + ')' };
   } else {
     if (isCustomOp(baseTrimmed) && firstChild?.texClass === TEXCLASS.OP) {
       if (firstChild?.kind === 'TeXAtom') {
@@ -581,7 +581,7 @@ const buildLimitBase = (firstChild: MathNode | null, baseTrimmed: string, base: 
     if (isNativeDisplayLimitOp(baseTrimmed) || isSpecialFnCall(baseTrimmed)) {
       return { typst: base };
     }
-    return { typst: wrapper + '(' + escapeContentSeparators(baseTrimmed) + ')' };
+    return { typst: wrapper + '(' + escapeContentSeparators(basePlaceholder) + ')' };
   }
 };
 
