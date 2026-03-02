@@ -32,7 +32,10 @@ interface ScanOptions {
  * In transform mode: returns the escaped expression string.
  */
 const scanExpression = (expr: string, opts: ScanOptions): string => {
-  let depth = 0;
+  // Separate depth counters per bracket type to avoid cross-type mismatches
+  let parenDepth = 0;   // ()
+  let bracketDepth = 0; // []
+  let braceDepth = 0;   // {}
   let result = '';
   for (let i = 0; i < expr.length; i++) {
     const ch = expr[i];
@@ -58,28 +61,31 @@ const scanExpression = (expr: string, opts: ScanOptions): string => {
       continue;
     }
 
-    if (ch === '(' || ch === '[' || ch === '{') {
-      depth++;
-      if (!opts.detectOnly) { result += ch; }
-      continue;
-    }
-    if (ch === ')' || ch === ']' || ch === '}') {
+    if (ch === '(') { parenDepth++; if (!opts.detectOnly) result += ch; continue; }
+    if (ch === '[') { bracketDepth++; if (!opts.detectOnly) result += ch; continue; }
+    if (ch === '{') { braceDepth++; if (!opts.detectOnly) result += ch; continue; }
+    if (ch === ')') {
       if (opts.escapeUnbalancedClose) {
-        // Only track ( ) pairs for unbalanced-close mode
-        if (ch === ')') {
-          if (depth > 0) { depth--; result += ch; }
-          else { result += '")"'; }
-        } else {
-          if (depth > 0) depth--;
-          result += ch;
-        }
+        if (parenDepth > 0) { parenDepth--; result += ch; }
+        else { result += '")"'; }
         continue;
       }
-      if (depth > 0) { depth--; }
-      if (!opts.detectOnly) { result += ch; }
+      if (parenDepth > 0) parenDepth--;
+      if (!opts.detectOnly) result += ch;
+      continue;
+    }
+    if (ch === ']') {
+      if (bracketDepth > 0) bracketDepth--;
+      if (!opts.detectOnly) result += ch;
+      continue;
+    }
+    if (ch === '}') {
+      if (braceDepth > 0) braceDepth--;
+      if (!opts.detectOnly) result += ch;
       continue;
     }
 
+    const depth = parenDepth + bracketDepth + braceDepth;
     if (depth === 0) {
       if (ch === ',' && (opts.escapeComma || opts.detectOnly)) {
         if (opts.detectOnly) return 'found';

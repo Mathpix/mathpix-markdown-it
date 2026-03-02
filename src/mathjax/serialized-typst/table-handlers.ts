@@ -240,10 +240,11 @@ const joinRows = (rows: string[], preContent: string): string =>
 
 /** eqnArray with tags → number-align / separate / no-tag strategies */
 const buildTaggedEqnArray = (
-  node: MathNode, serialize: ITypstSerializer, rows: string[], countRow: number,
+  node: MathNode, serialize: ITypstSerializer, inputRows: string[], countRow: number,
   preContent: string, postContent: string
 ): ITypstData => {
   let res: ITypstData = initTypstData();
+  const rows = [...inputRows];
   const rowTagInfos: { isTagged: boolean; isAutoTag: boolean; isExplicitTag: boolean; tagContent: string; labelKey: string | null }[] = [];
   for (let i = 0; i < countRow; i++) {
     const mtrNode = node.childNodes[i];
@@ -333,9 +334,10 @@ const buildTaggedEqnArray = (
 
 /** eqnArray without tags → rows with \\ separators */
 const buildUntaggedEqnArray = (
-  rows: string[], preContent: string, postContent: string
+  inputRows: string[], preContent: string, postContent: string
 ): ITypstData => {
   let res: ITypstData = initTypstData();
+  const rows = [...inputRows];
   if (postContent && rows.length > 0) {
     rows[rows.length - 1] += ` ${postContent}`;
   }

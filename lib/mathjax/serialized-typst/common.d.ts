@@ -13,6 +13,7 @@ export declare const isThousandSepComma: (node: MathNode, i: number) => boolean;
  *  Returns true when `next` starts with a word/dot/quote character
  *  and `prev` doesn't end with a natural separator (whitespace, open paren, etc.). */
 export declare const needsTokenSeparator: (prev: string, next: string) => boolean;
+/** In Typst, multi-char sub/superscript content needs grouping parens: x^(a b), x_(i+1). */
 export declare const needsParens: (s: string) => boolean;
 /** Format a subscript or superscript with proper Typst grouping.
  *  Returns e.g. '_x', '_(x + y)', '^n', '^(a b)', or '' if content is empty. */
