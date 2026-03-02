@@ -1,7 +1,7 @@
 import { MmlVisitor } from 'mathjax-full/js/core/MmlTree/MmlVisitor.js';
 import { MmlNode, TextNode, XMLNode, TEXCLASS } from 'mathjax-full/js/core/MmlTree/MmlNode.js';
 import { handle } from './handlers';
-import { ITypstData, addToTypstData, addSpaceToTypstData, initTypstData, isThousandSepComma, needsParens, formatScript, needsTokenSeparator } from './common';
+import { ITypstData, addToTypstData, addSpaceToTypstData, initTypstData, isThousandSepComma, formatScript, needsTokenSeparator } from './common';
 import { findTypstSymbol } from './typst-symbol-map';
 
 // Extract big delimiter info from a TeXAtom node wrapping a sized mo.
@@ -253,15 +253,13 @@ export class SerializedTypstVisitor extends MmlVisitor {
               if (subChild) {
                 const sub = this.visitNode(subChild, space).typst.trim();
                 if (sub) {
-                  res = addToTypstData(res, { typst: '_' });
-                  res = addToTypstData(res, { typst: needsParens(sub) ? '(' + sub + ')' : sub });
+                  res = addToTypstData(res, { typst: formatScript('_', sub) });
                 }
               }
               if (supChild) {
                 const sup = this.visitNode(supChild, space).typst.trim();
                 if (sup) {
-                  res = addToTypstData(res, { typst: '^' });
-                  res = addToTypstData(res, { typst: needsParens(sup) ? '(' + sup + ')' : sup });
+                  res = addToTypstData(res, { typst: formatScript('^', sup) });
                 }
               }
               j += 3;

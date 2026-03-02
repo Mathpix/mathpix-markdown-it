@@ -60,6 +60,19 @@ export const serializePrefixBeforeMo = (node, serialize, stopMoText: string): st
   return result.trim();
 };
 
+export const UNPAIRED_BRACKET_PROP = 'data-unpaired-bracket';
+
+export const OPEN_BRACKETS: Record<string, string> = {
+  '(': ')', '[': ']', '{': '}',
+};
+export const CLOSE_BRACKETS: Record<string, string> = {
+  ')': '(', ']': '[', '}': '{',
+};
+// Typst escaped-delimiter output for unpaired brackets (math-mode safe)
+export const UNPAIRED_BRACKET_TYPST: Record<string, string> = {
+  '(': '\\(', ')': '\\)', '[': '\\[', ']': '\\]', '{': '\\{', '}': '\\}',
+};
+
 const BRACKET_SYMBOL_MAP: Record<string, string> = {
   '[': 'bracket.l',
   ']': 'bracket.r',
@@ -151,20 +164,7 @@ export const replaceUnpairedBrackets = (expr: string): string => {
   return result;
 };
 
-export const UNPAIRED_BRACKET_PROP = 'data-unpaired-bracket';
-
 // --- Pre-serialization tree walk: mark unpaired ASCII brackets ---
-export const OPEN_BRACKETS: Record<string, string> = {
-  '(': ')', '[': ']', '{': '}',
-};
-export const CLOSE_BRACKETS: Record<string, string> = {
-  ')': '(', ']': '[', '}': '{',
-};
-// Typst escaped-delimiter output for unpaired brackets (math-mode safe)
-export const UNPAIRED_BRACKET_TYPST: Record<string, string> = {
-  '(': '\\(', ')': '\\)', '[': '\\[', ']': '\\]', '{': '\\{', '}': '\\}',
-};
-
 export const markUnpairedBrackets = (root: any): void => {
   const bracketNodes: { node: any; char: string }[] = [];
   // Check if an mo node is a \left...\right delimiter (first/last child of

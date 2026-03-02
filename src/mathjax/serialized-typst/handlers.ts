@@ -59,7 +59,7 @@ const needsSpaceAfter = (node): boolean => {
     if (isLastChild(node)) {
       return false;
     }
-    const parentKind = node.parent && (node.parent as any).kind;
+    const parentKind = node.parent?.kind;
     if (parentKind === 'msub' || parentKind === 'msup' || parentKind === 'msubsup'
       || parentKind === 'munderover' || parentKind === 'munder' || parentKind === 'mover') {
       return false;
@@ -337,6 +337,12 @@ const PRIME_SHORTHANDS: Map<string, string> = new Map([
 // Regex to detect overbrace/overbracket/underbrace/underbracket as outermost call
 const BRACE_ANNOTATION_RE = /^(overbrace|overbracket|underbrace|underbracket)\((.+)\)$/s;
 const RE_SPECIAL_FN_CALL = /^(overbrace|underbrace|overline|underline|op)\(/;
+const RE_TRAILING_PAREN = /\)$/;
+
+/** Append ", limits: #true" inside an op() wrapper: op("name") → op("name", limits: #true) */
+const addLimitsParam = (opExpr: string): string =>
+  opExpr.replace(RE_TRAILING_PAREN, ', limits: #true)');
+
 
 /** Match a brace annotation (overbrace/underbrace/etc.) and return it with annotation as second argument.
  *  Returns null if baseTrimmed doesn't match any of the specified kinds. */
@@ -583,7 +589,7 @@ const buildLimitBase = (firstChild: any, baseTrimmed: string, base: string): ITy
     // Default placement — above/below in display, side in inline.
     if (baseIsCustomOp) {
       // Custom op: display uses limits: #true for above/below; inline omits it for side placement
-      return { typst: baseTrimmed.replace(/\)$/, ', limits: #true)'), typst_inline: base };
+      return { typst: addLimitsParam(baseTrimmed), typst_inline: base };
     }
     // Check if Typst operator natively places limits above/below in display mode.
     // If yes (e.g. sum), Typst already handles movablelimits — same for both modes.
@@ -603,10 +609,10 @@ const buildLimitBase = (firstChild: any, baseTrimmed: string, base: string): ITy
     if (RE_OP_WRAPPER.test(baseTrimmed) && firstChild?.texClass === TEXCLASS.OP) {
       if (firstChild?.kind === 'TeXAtom') {
         // TeXAtom(OP): \varinjlim, \varliminf, etc. — same as movablelimits custom op
-        return { typst: baseTrimmed.replace(/\)$/, ', limits: #true)'), typst_inline: base };
+        return { typst: addLimitsParam(baseTrimmed), typst_inline: base };
       }
       // mi(OP): \operatorname*{name} — add limits: #true inside op()
-      return { typst: baseTrimmed.replace(/\)$/, ', limits: #true)') };
+      return { typst: addLimitsParam(baseTrimmed) };
     }
     const baseIsSpecialFn = RE_SPECIAL_FN_CALL.test(baseTrimmed);
     if (baseIsNativeLimitOp || baseIsSpecialFn) {
