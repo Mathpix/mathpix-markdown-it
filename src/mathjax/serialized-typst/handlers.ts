@@ -1,19 +1,19 @@
 import { TEXCLASS } from "mathjax-full/js/core/MmlTree/MmlNode";
 import { ITypstData, ITypstSerializer, HandlerFn, MathNode } from "./types";
 import {
-  initTypstData, addToTypstData, addSpaceToTypstData,
-  formatScript, isThousandSepComma, needsTokenSeparator, getNodeText, getChildText,
-  isFirstChild, isLastChild, getSiblingIndex, typstPlaceholder,
   RE_NBSP, RE_WORD_DOT_END, RE_WORD_DOT_START,
   RE_WORD_START, RE_OP_WRAPPER,
   RE_UNICODE_SPACES, RE_TRAILING_SPACING,
+  OPEN_BRACKETS, CLOSE_BRACKETS, UNPAIRED_BRACKET_TYPST, UNPAIRED_BRACKET_PROP,
+} from "./consts";
+import {
+  initTypstData, addToTypstData, addSpaceToTypstData,
+  formatScript, isThousandSepComma, needsTokenSeparator, getNodeText, getChildText,
+  isFirstChild, isLastChild, getSiblingIndex, typstPlaceholder,
 } from "./common";
 import { findTypstSymbol, typstAccentMap, typstFontMap, typstSymbolMap } from "./typst-symbol-map";
 import { escapeContentSeparators, hasTopLevelSeparators, escapeLrSemicolons, escapeUnbalancedParens } from "./escape-utils";
-import {
-  OPEN_BRACKETS, CLOSE_BRACKETS, UNPAIRED_BRACKET_TYPST, UNPAIRED_BRACKET_PROP,
-  mapDelimiter, escapeLrOpenDelimiter,
-} from "./bracket-utils";
+import { mapDelimiter, escapeLrOpenDelimiter } from "./bracket-utils";
 import { mtable, mtr } from "./table-handlers";
 
 const SHALLOW_TREE_MAX_DEPTH = 5;
@@ -25,6 +25,107 @@ const INVISIBLE_CHARS: Set<string> = new Set([
   '\u2063', // invisible separator
   '\u2064', // invisible plus
 ]);
+
+// Built-in Typst math operators — should NOT be wrapped in upright()
+const TYPST_MATH_OPERATORS: Set<string> = new Set([
+  'sin', 'cos', 'tan', 'cot', 'sec', 'csc',
+  'arcsin', 'arccos', 'arctan',
+  'sinh', 'cosh', 'tanh', 'coth',
+  'exp', 'log', 'ln', 'lg',
+  'det', 'dim', 'gcd', 'mod',
+  'inf', 'sup', 'lim', 'liminf', 'limsup',
+  'max', 'min', 'arg', 'deg', 'hom', 'ker',
+  'Pr', 'tr',
+]);
+
+const BB_SHORTHAND_LETTERS: Set<string> = new Set(
+  'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
+);
+
+// Operators that should have spaces around them for readability
+const SPACED_OPERATORS: Set<string> = new Set([
+  '+', '-', '=', '<', '>', '\u2212', // minus sign
+  '\u00B1', // ±
+  '\u2213', // ∓
+]);
+
+// Prime symbol → Typst ' shorthand mapping
+const PRIME_SHORTHANDS: Map<string, string> = new Map([
+  ['prime', "'"],
+  ['prime.double', "''"],
+  ['prime.triple', "'''"],
+]);
+
+// Regex to detect overbrace/overbracket/underbrace/underbracket as outermost call
+const BRACE_ANNOTATION_RE = /^(overbrace|overbracket|underbrace|underbracket)\((.+)\)$/s;
+const RE_SPECIAL_FN_CALL = /^(overbrace|underbrace|overline|underline|op)\(/;
+const RE_TRAILING_PAREN = /\)$/;
+
+// Multi-word MathJax operator names → Typst built-in operator names.
+// MathJax uses thin space (U+2006) between words; we normalize before lookup.
+const MATHJAX_MULTIWORD_OPS: Map<string, string> = new Map([
+  ['lim sup', 'limsup'],
+  ['lim inf', 'liminf'],
+]);
+
+// Operators that Typst places below/above in display mode by default.
+// Used to detect \nolimits (when these appear in msubsup/msub/msup instead of munderover).
+const TYPST_DISPLAY_LIMIT_OPS: Set<string> = new Set([
+  // Named function operators with limits placement
+  'lim', 'limsup', 'liminf', 'max', 'min', 'inf', 'sup',
+  'det', 'gcd', 'Pr',
+  // Large operators
+  'sum', 'product', 'product.co',
+  'union.big', 'inter.big',
+  'dot.o.big', 'plus.o.big', 'times.o.big',
+  'union.plus.big', 'union.sq.big',
+  'or.big', 'and.big',
+]);
+
+// Extensible arrows/harpoons: use stretch() instead of limits() for \xrightarrow, \xleftarrow, etc.
+const STRETCH_BASE_SYMBOLS: Set<string> = new Set([
+  'arrow.r', 'arrow.l', 'arrow.l.r',
+  'arrow.r.twohead', 'arrow.l.twohead',
+  'arrow.r.bar',                       // \xmapsto
+  'arrow.r.hook', 'arrow.l.hook',      // \xhookrightarrow, \xhookleftarrow
+  'arrow.r.double', 'arrow.l.double', 'arrow.l.r.double',
+  'harpoon.rt', 'harpoon.lb',          // \xrightharpoonup, \xleftharpoondown
+  'harpoons.rtlb', 'harpoons.ltrb',    // \xrightleftharpoons, \xleftrightharpoons
+  'arrows.rr',                         // \xtofrom
+  '=',                                 // \xlongequal
+]);
+
+// Accent functions that have no under-variant in Typst.
+// In munder context, these use attach(base, b: symbol) instead of accent function.
+const MUNDER_ATTACH_SYMBOLS: Map<string, string> = new Map([
+  ['arrow', 'arrow.r'],        // → below
+  ['arrow.l', 'arrow.l'],      // ← below
+  ['arrow.l.r', 'arrow.l.r'],  // ↔ below
+  ['harpoon', 'harpoon'],      // ⇀ below
+  ['harpoon.lt', 'harpoon.lt'],// ↼ below
+]);
+
+// Typst accent shorthand functions that can be called as fn(content).
+// Accents NOT in this set must use the accent(content, symbol) form.
+const TYPST_ACCENT_SHORTHANDS: Set<string> = new Set([
+  'hat', 'tilde', 'acute', 'grave', 'macron', 'overline', 'underline',
+  'breve', 'dot', 'diaer', 'caron', 'arrow', 'circle',
+  'overbrace', 'underbrace', 'overbracket', 'underbracket',
+]);
+
+// MathML spacing widths → Typst spacing keywords
+const MSPACE_WIDTH_MAP: Record<string, string> = {
+  '2em': ' wide ',
+  '1em': ' quad ',
+  '0.2778em': ' thick ',  // \; → thickmathspace
+  '0.278em': ' thick ',
+  '0.2222em': ' med ',    // \: → mediummathspace
+  '0.222em': ' med ',
+  '0.1667em': ' thin ',   // \, → thinmathspace
+  '0.167em': ' thin ',
+  '-0.1667em': '',         // \! → negative thin space (Typst has no negthin; skip)
+  '-0.167em': '',
+};
 
 /** Get all attributes from a node. Return type matches MathJax's PropertyList. */
 const getAttributes = (node: MathNode): Record<string, any> => {
@@ -84,23 +185,6 @@ const needsSpaceAfter = (node: MathNode): boolean => {
   }
 };
 
-// Built-in Typst math operators — should NOT be wrapped in upright()
-const TYPST_MATH_OPERATORS: Set<string> = new Set([
-  'sin', 'cos', 'tan', 'cot', 'sec', 'csc',
-  'arcsin', 'arccos', 'arctan',
-  'sinh', 'cosh', 'tanh', 'coth',
-  'exp', 'log', 'ln', 'lg',
-  'det', 'dim', 'gcd', 'mod',
-  'inf', 'sup', 'lim', 'liminf', 'limsup',
-  'max', 'min', 'arg', 'deg', 'hom', 'ker',
-  'Pr', 'tr',
-]);
-
-const BB_SHORTHAND_LETTERS: Set<string> = new Set(
-  'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
-);
-
-// --- MI handler: identifiers ---
 const mi = () => {
   return (node: MathNode, _serialize: ITypstSerializer): ITypstData => {
     let res: ITypstData = initTypstData();
@@ -157,14 +241,6 @@ const mi = () => {
   };
 };
 
-// Operators that should have spaces around them for readability
-const SPACED_OPERATORS: Set<string> = new Set([
-  '+', '-', '=', '<', '>', '\u2212', // minus sign
-  '\u00B1', // ±
-  '\u2213', // ∓
-]);
-
-// --- MO handler: operators ---
 const mo = () => {
   return (node: MathNode, _serialize: ITypstSerializer): ITypstData => {
     let res: ITypstData = initTypstData();
@@ -231,7 +307,6 @@ const mo = () => {
   };
 };
 
-// --- MN handler: numbers ---
 const mn = () => {
   return (node: MathNode, _serialize: ITypstSerializer): ITypstData => {
     let res: ITypstData = initTypstData();
@@ -251,7 +326,6 @@ const mn = () => {
   };
 };
 
-// --- MTEXT handler: text content ---
 const mtext = () => {
   return (node: MathNode, _serialize: ITypstSerializer): ITypstData => {
     let res: ITypstData = initTypstData();
@@ -284,7 +358,6 @@ const mtext = () => {
   };
 };
 
-// --- MFRAC handler: fractions ---
 const mfrac = () => {
   return (node: MathNode, serialize: ITypstSerializer): ITypstData => {
     let res: ITypstData = initTypstData();
@@ -305,22 +378,9 @@ const mfrac = () => {
   };
 };
 
-// Prime symbol → Typst ' shorthand mapping
-const PRIME_SHORTHANDS: Map<string, string> = new Map([
-  ['prime', "'"],
-  ['prime.double', "''"],
-  ['prime.triple', "'''"],
-]);
-
-// Regex to detect overbrace/overbracket/underbrace/underbracket as outermost call
-const BRACE_ANNOTATION_RE = /^(overbrace|overbracket|underbrace|underbracket)\((.+)\)$/s;
-const RE_SPECIAL_FN_CALL = /^(overbrace|underbrace|overline|underline|op)\(/;
-const RE_TRAILING_PAREN = /\)$/;
-
 /** Append ", limits: #true" inside an op() wrapper: op("name") → op("name", limits: #true) */
 const addLimitsParam = (opExpr: string): string =>
   opExpr.replace(RE_TRAILING_PAREN, ', limits: #true)');
-
 
 /** Match a brace annotation (overbrace/underbrace/etc.) and return it with annotation as second argument.
  *  Returns null if baseTrimmed doesn't match any of the specified kinds. */
@@ -335,7 +395,6 @@ const matchBraceAnnotation = (
   return { typst: m[1] + '(' + m[2] + ', ' + ann + ')' };
 };
 
-// --- MSUP handler: superscripts ---
 const msup = () => {
   return (node: MathNode, serialize: ITypstSerializer): ITypstData => {
     let res: ITypstData = initTypstData();
@@ -376,7 +435,6 @@ const msup = () => {
   };
 };
 
-// --- MSUB handler: subscripts ---
 const msub = () => {
   return (node: MathNode, serialize: ITypstSerializer): ITypstData => {
     let res: ITypstData = initTypstData();
@@ -410,7 +468,6 @@ const msub = () => {
   };
 };
 
-// --- MSUBSUP handler: combined subscript+superscript ---
 const msubsup = () => {
   return (node: MathNode, serialize: ITypstSerializer): ITypstData => {
     let res: ITypstData = initTypstData();
@@ -445,7 +502,6 @@ const msubsup = () => {
   };
 };
 
-// --- MSQRT handler: square root ---
 const msqrt = () => {
   return (node: MathNode, serialize: ITypstSerializer): ITypstData => {
     let res: ITypstData = initTypstData();
@@ -457,7 +513,6 @@ const msqrt = () => {
   };
 };
 
-// --- MROOT handler: nth root ---
 const mroot = () => {
   return (node: MathNode, serialize: ITypstSerializer): ITypstData => {
     let res: ITypstData = initTypstData();
@@ -476,27 +531,6 @@ const mroot = () => {
   };
 };
 
-// Multi-word MathJax operator names → Typst built-in operator names.
-// MathJax uses thin space (U+2006) between words; we normalize before lookup.
-const MATHJAX_MULTIWORD_OPS: Map<string, string> = new Map([
-  ['lim sup', 'limsup'],
-  ['lim inf', 'liminf'],
-]);
-
-// Operators that Typst places below/above in display mode by default.
-// Used to detect \nolimits (when these appear in msubsup/msub/msup instead of munderover).
-const TYPST_DISPLAY_LIMIT_OPS: Set<string> = new Set([
-  // Named function operators with limits placement
-  'lim', 'limsup', 'liminf', 'max', 'min', 'inf', 'sup',
-  'det', 'gcd', 'Pr',
-  // Large operators
-  'sum', 'product', 'product.co',
-  'union.big', 'inter.big',
-  'dot.o.big', 'plus.o.big', 'times.o.big',
-  'union.plus.big', 'union.sq.big',
-  'or.big', 'and.big',
-]);
-
 /** Get movablelimits attribute from a node (typically the base mo of munderover) */
 const getMovablelimits = (node: MathNode): boolean | undefined => {
   if (!node || node.kind !== 'mo') return undefined;
@@ -507,19 +541,6 @@ const getMovablelimits = (node: MathNode): boolean | undefined => {
     return undefined;
   }
 };
-
-// Extensible arrows/harpoons: use stretch() instead of limits() for \xrightarrow, \xleftarrow, etc.
-const STRETCH_BASE_SYMBOLS: Set<string> = new Set([
-  'arrow.r', 'arrow.l', 'arrow.l.r',
-  'arrow.r.twohead', 'arrow.l.twohead',
-  'arrow.r.bar',                       // \xmapsto
-  'arrow.r.hook', 'arrow.l.hook',      // \xhookrightarrow, \xhookleftarrow
-  'arrow.r.double', 'arrow.l.double', 'arrow.l.r.double',
-  'harpoon.rt', 'harpoon.lb',          // \xrightharpoonup, \xleftharpoondown
-  'harpoons.rtlb', 'harpoons.ltrb',    // \xrightleftharpoons, \xleftrightharpoons
-  'arrows.rr',                         // \xtofrom
-  '=',                                 // \xlongequal
-]);
 
 /** Check if baseTrimmed is a custom op() wrapper (e.g. op("name")). */
 const isCustomOp = (baseTrimmed: string): boolean =>
@@ -588,25 +609,6 @@ const buildLimitBase = (firstChild: MathNode | null, baseTrimmed: string, base: 
 const needsScriptsWrapper = (baseTrimmed: string): boolean =>
   isNativeDisplayLimitOp(baseTrimmed);
 
-// Accent functions that have no under-variant in Typst.
-// In munder context, these use attach(base, b: symbol) instead of accent function.
-const MUNDER_ATTACH_SYMBOLS: Map<string, string> = new Map([
-  ['arrow', 'arrow.r'],        // → below
-  ['arrow.l', 'arrow.l'],      // ← below
-  ['arrow.l.r', 'arrow.l.r'],  // ↔ below
-  ['harpoon', 'harpoon'],      // ⇀ below
-  ['harpoon.lt', 'harpoon.lt'],// ↼ below
-]);
-
-// Typst accent shorthand functions that can be called as fn(content).
-// Accents NOT in this set must use the accent(content, symbol) form.
-const TYPST_ACCENT_SHORTHANDS: Set<string> = new Set([
-  'hat', 'tilde', 'acute', 'grave', 'macron', 'overline', 'underline',
-  'breve', 'dot', 'diaer', 'caron', 'arrow', 'circle',
-  'overbrace', 'underbrace', 'overbracket', 'underbracket',
-]);
-
-// --- MOVER handler: accents and overbrace ---
 const mover = () => {
   return (node: MathNode, serialize: ITypstSerializer): ITypstData => {
     let res: ITypstData = initTypstData();
@@ -651,7 +653,6 @@ const mover = () => {
   };
 };
 
-// --- MUNDER handler: under-accents and underbrace ---
 const munder = () => {
   return (node: MathNode, serialize: ITypstSerializer): ITypstData => {
     let res: ITypstData = initTypstData();
@@ -714,7 +715,6 @@ const munder = () => {
   };
 };
 
-// --- MUNDEROVER handler: combined under+over (e.g. sum with limits) ---
 const munderover = () => {
   return (node: MathNode, serialize: ITypstSerializer): ITypstData => {
     let res: ITypstData = initTypstData();
@@ -740,7 +740,6 @@ const munderover = () => {
   };
 };
 
-// --- MMULTISCRIPTS handler: pre/post scripts via attach() ---
 const mmultiscripts = () => {
   return (node: MathNode, serialize: ITypstSerializer): ITypstData => {
     let res: ITypstData = initTypstData();
@@ -820,20 +819,6 @@ const mmultiscripts = () => {
   };
 };
 
-// MathML spacing widths → Typst spacing keywords
-const MSPACE_WIDTH_MAP: Record<string, string> = {
-  '2em': ' wide ',
-  '1em': ' quad ',
-  '0.2778em': ' thick ',  // \; → thickmathspace
-  '0.278em': ' thick ',
-  '0.2222em': ' med ',    // \: → mediummathspace
-  '0.222em': ' med ',
-  '0.1667em': ' thin ',   // \, → thinmathspace
-  '0.167em': ' thin ',
-  '-0.1667em': '',         // \! → negative thin space (Typst has no negthin; skip)
-  '-0.167em': '',
-};
-
 const mspace = () => {
   return (node: MathNode, _serialize: ITypstSerializer): ITypstData => {
     let res: ITypstData = initTypstData();
@@ -852,7 +837,6 @@ const mspace = () => {
   };
 };
 
-// --- MROW handler: grouped content, lr() for \left...\right ---
 const mrow = () => {
   return (node: MathNode, serialize: ITypstSerializer): ITypstData => {
     let res: ITypstData = initTypstData();
@@ -1034,7 +1018,6 @@ const hasScriptAncestor = (node: MathNode): boolean => {
   return false;
 };
 
-// --- MPADDED handler: strip padding, emit content ---
 const mpadded = () => {
   return (node: MathNode, serialize: ITypstSerializer): ITypstData => {
     let res: ITypstData = initTypstData();
@@ -1065,7 +1048,6 @@ const mpadded = () => {
   };
 };
 
-// --- MPHANTOM handler: \phantom → hide() ---
 const mphantom = () => {
   return (node: MathNode, serialize: ITypstSerializer): ITypstData => {
     let res: ITypstData = initTypstData();
@@ -1078,7 +1060,6 @@ const mphantom = () => {
   };
 };
 
-// --- MENCLOSE handler: cancel, strikethrough ---
 const menclose = () => {
   return (node: MathNode, serialize: ITypstSerializer): ITypstData => {
     let res: ITypstData = initTypstData();
@@ -1129,7 +1110,6 @@ const menclose = () => {
   };
 };
 
-// --- Handler dispatch ---
 export const handle: HandlerFn = (node, serialize) => {
   const handler = handlers[node.kind] || defaultHandler;
   try {
@@ -1179,7 +1159,6 @@ const wrapWithColor = (content: string, mathcolor: string): string => {
   return '#text(fill: ' + fillValue + ')[' + content + ']';
 };
 
-// --- MSTYLE handler: skip operator-internal spacing, pass through otherwise ---
 const mstyle = () => {
   return (node: MathNode, serialize: ITypstSerializer): ITypstData => {
     let res: ITypstData = initTypstData();

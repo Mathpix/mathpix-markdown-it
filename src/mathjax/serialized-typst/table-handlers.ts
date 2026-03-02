@@ -1,18 +1,14 @@
 import { ITypstData, ITypstSerializer, HandlerFn, MathNode } from "./types";
 import {
-  initTypstData, addToTypstData, getChildText,
   RE_NBSP, RE_CONTENT_SPECIAL, RE_TAG_EXTRACT, RE_TAG_STRIP,
   DATA_PRE_CONTENT, DATA_POST_CONTENT,
-} from "./common";
+  DATA_TAG_AUTO, DATA_LABEL_KEY, DEFAULT_EQ_NUMBERING, EQ_TAG_FIGURE_KIND,
+} from "./consts";
+import { initTypstData, addToTypstData, getChildText } from "./common";
 import { escapeCasesSeparators } from "./escape-utils";
 import {
   treeContainsMo, serializePrefixBeforeMo, replaceUnpairedBrackets, delimiterToTypst,
 } from "./bracket-utils";
-
-const DATA_TAG_AUTO = 'data-tag-auto';
-const DATA_LABEL_KEY = 'data-label-key';
-const DEFAULT_EQ_NUMBERING = '"(1)"';
-const EQ_TAG_FIGURE_KIND = 'eq-tag';
 
 /** Extract the original \label{} key from an mlabeledtr label cell.
  *  MathJax stores the id as "mjx-eqn:<label_key>" when useLabelIds is true. */
@@ -414,7 +410,6 @@ const buildMatrix = (
   return res;
 };
 
-// --- MTABLE handler: matrices and equation arrays ---
 export const mtable = (): HandlerFn => {
   return (node: MathNode, serialize: ITypstSerializer): ITypstData => {
     let res: ITypstData = initTypstData();
@@ -501,7 +496,6 @@ export const mtable = (): HandlerFn => {
   };
 };
 
-// --- MTR handler: table row ---
 export const mtr = (): HandlerFn => {
   return (node: MathNode, serialize: ITypstSerializer): ITypstData => {
     let res: ITypstData = initTypstData();

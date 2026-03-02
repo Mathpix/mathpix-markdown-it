@@ -2,8 +2,22 @@ import { MmlVisitor } from 'mathjax-full/js/core/MmlTree/MmlVisitor.js';
 import { TextNode, XMLNode, TEXCLASS } from 'mathjax-full/js/core/MmlTree/MmlNode.js';
 import { handle } from './handlers';
 import { ITypstData, MathNode } from './types';
-import { addToTypstData, addSpaceToTypstData, initTypstData, isThousandSepComma, formatScript, needsTokenSeparator, getChildText, DATA_PRE_CONTENT, DATA_POST_CONTENT } from './common';
+import { DATA_PRE_CONTENT, DATA_POST_CONTENT } from './consts';
+import { addToTypstData, addSpaceToTypstData, initTypstData, isThousandSepComma, formatScript, needsTokenSeparator, getChildText } from './common';
 import { findTypstSymbol } from './typst-symbol-map';
+
+// Node kinds that carry sub/sup scripts (used in \idotsint pattern detection).
+const SCRIPT_KINDS: Set<string> = new Set(['msubsup', 'msub', 'msup']);
+
+// Map of opening delimiter char → expected close char + Typst output format.
+const BARE_DELIM_PAIRS: Record<string, { close: string; typstOpen: string; typstClose: string }> = {
+  '|':      { close: '|',      typstOpen: 'lr(| ', typstClose: ' |)' },
+  '\u230A': { close: '\u230B', typstOpen: 'floor(', typstClose: ')' },  // ⌊...⌋
+  '\u2308': { close: '\u2309', typstOpen: 'ceil(',  typstClose: ')' },  // ⌈...⌉
+  '\u2016': { close: '\u2016', typstOpen: 'norm(',  typstClose: ')' },  // ‖...‖
+  '\u27E8': { close: '\u27E9', typstOpen: 'lr(chevron.l ', typstClose: ' chevron.r)' }, // ⟨...⟩
+  '\u2329': { close: '\u232A', typstOpen: 'lr(chevron.l ', typstClose: ' chevron.r)' }, // 〈...〉 (old form)
+};
 
 // Extract big delimiter info from a TeXAtom node wrapping a sized mo.
 // The TeXAtom itself may have texClass=0 (ORD); the OPEN/CLOSE class
@@ -64,19 +78,6 @@ const getScriptedDelimiterChar = (node: MathNode): string | null => {
   } catch (_e) {
     return null;
   }
-};
-
-// Node kinds that carry sub/sup scripts (used in \idotsint pattern detection).
-const SCRIPT_KINDS: Set<string> = new Set(['msubsup', 'msub', 'msup']);
-
-// Map of opening delimiter char → expected close char + Typst output format.
-const BARE_DELIM_PAIRS: Record<string, { close: string; typstOpen: string; typstClose: string }> = {
-  '|':      { close: '|',      typstOpen: 'lr(| ', typstClose: ' |)' },
-  '\u230A': { close: '\u230B', typstOpen: 'floor(', typstClose: ')' },  // ⌊...⌋
-  '\u2308': { close: '\u2309', typstOpen: 'ceil(',  typstClose: ')' },  // ⌈...⌉
-  '\u2016': { close: '\u2016', typstOpen: 'norm(',  typstClose: ')' },  // ‖...‖
-  '\u27E8': { close: '\u27E9', typstOpen: 'lr(chevron.l ', typstClose: ' chevron.r)' }, // ⟨...⟩
-  '\u2329': { close: '\u232A', typstOpen: 'lr(chevron.l ', typstClose: ' chevron.r)' }, // 〈...〉 (old form)
 };
 
 export interface ITypstVisitorOptions {

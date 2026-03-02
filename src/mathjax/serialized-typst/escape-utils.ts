@@ -9,7 +9,7 @@
  * a single parametric scanner with thin wrappers preserving the original API.
  */
 
-import { RE_WORD_CHAR } from "./common";
+import { RE_WORD_CHAR } from "./consts";
 
 interface ScanOptions {
   /** Escape commas at depth 0: , → \, */

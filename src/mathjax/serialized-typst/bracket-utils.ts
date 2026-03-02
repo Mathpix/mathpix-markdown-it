@@ -1,7 +1,32 @@
 import { TEXCLASS } from "mathjax-full/js/core/MmlTree/MmlNode";
 import { ITypstData, ITypstSerializer, MathNode } from "./types";
-import { getNodeText, RE_BRACKET_CHARS, RE_WORD_CHAR, RE_WORD_DOT_END } from "./common";
+import {
+  RE_BRACKET_CHARS, RE_WORD_CHAR, RE_WORD_DOT_END,
+  UNPAIRED_BRACKET_PROP, OPEN_BRACKETS, CLOSE_BRACKETS,
+} from "./consts";
+import { getNodeText } from "./common";
 import { typstSymbolMap } from "./typst-symbol-map";
+
+const BRACKET_SYMBOL_MAP: Record<string, string> = {
+  '[': 'bracket.l',
+  ']': 'bracket.r',
+  '(': 'paren.l',
+  ')': 'paren.r',
+  '{': 'brace.l',
+  '}': 'brace.r',
+};
+
+// Escape delimiters that cause parse errors inside lr() when unpaired.
+// All ASCII brackets except ] are escaped: ( and [ open groups/content blocks,
+// ) closes the lr() function call prematurely, { and } are code block syntax.
+// ] is left unescaped so lr() can recognise and auto-size it as a delimiter.
+const lrOpenEscapeMap: Record<string, string> = {
+  '(': '\\(',
+  ')': '\\)',
+  '[': '\\[',
+  '{': '\\{',
+  '}': '\\}',
+};
 
 export const delimiterToTypst = (delim: string): string => {
   switch (delim) {
@@ -59,28 +84,6 @@ export const serializePrefixBeforeMo = (node: MathNode, serialize: ITypstSeriali
     result += data.typst;
   }
   return result.trim();
-};
-
-export const UNPAIRED_BRACKET_PROP = 'data-unpaired-bracket';
-
-export const OPEN_BRACKETS: Record<string, string> = {
-  '(': ')', '[': ']', '{': '}',
-};
-export const CLOSE_BRACKETS: Record<string, string> = {
-  ')': '(', ']': '[', '}': '{',
-};
-// Typst escaped-delimiter output for unpaired brackets (math-mode safe)
-export const UNPAIRED_BRACKET_TYPST: Record<string, string> = {
-  '(': '\\(', ')': '\\)', '[': '\\[', ']': '\\]', '{': '\\{', '}': '\\}',
-};
-
-const BRACKET_SYMBOL_MAP: Record<string, string> = {
-  '[': 'bracket.l',
-  ']': 'bracket.r',
-  '(': 'paren.l',
-  ')': 'paren.r',
-  '{': 'brace.l',
-  '}': 'brace.r',
 };
 
 // Replace unpaired brackets in a matrix/cases cell with Typst symbol names.
@@ -165,7 +168,6 @@ export const replaceUnpairedBrackets = (expr: string): string => {
   return result;
 };
 
-// --- Pre-serialization tree walk: mark unpaired ASCII brackets ---
 export const markUnpairedBrackets = (root: MathNode): void => {
   const bracketNodes: { node: MathNode; char: string }[] = [];
   // Check if an mo node is a \left...\right delimiter (first/last child of
@@ -232,18 +234,6 @@ export const mapDelimiter = (delim: string): string => {
     return mapped;
   }
   return delim;
-};
-
-// Escape delimiters that cause parse errors inside lr() when unpaired.
-// All ASCII brackets except ] are escaped: ( and [ open groups/content blocks,
-// ) closes the lr() function call prematurely, { and } are code block syntax.
-// ] is left unescaped so lr() can recognise and auto-size it as a delimiter.
-const lrOpenEscapeMap: Record<string, string> = {
-  '(': '\\(',
-  ')': '\\)',
-  '[': '\\[',
-  '{': '\\{',
-  '}': '\\}',
 };
 
 export const escapeLrOpenDelimiter = (delim: string): string => {
