@@ -1,5 +1,5 @@
 import { TEXCLASS } from "mathjax-full/js/core/MmlTree/MmlNode";
-import { getNodeText, RE_BRACKET_CHARS, RE_WORD_CHAR, RE_WORD_DOT_END, ITypstData } from "./common";
+import { getNodeText, RE_BRACKET_CHARS, RE_WORD_CHAR, RE_WORD_DOT_END, ITypstData, ITypstSerializer, TreeNode, MmlNode } from "./common";
 import { typstSymbolMap } from "./typst-symbol-map";
 
 export const delimiterToTypst = (delim: string): string => {
@@ -17,7 +17,7 @@ export const delimiterToTypst = (delim: string): string => {
   }
 };
 
-export const treeContainsMo = (node, moText: string, skipPhantom = true): boolean => {
+export const treeContainsMo = (node: TreeNode, moText: string, skipPhantom = true): boolean => {
   if (!node) return false;
   if (skipPhantom && node.kind === 'mphantom') return false;
   if (node.kind === 'mo') {
@@ -34,13 +34,13 @@ export const treeContainsMo = (node, moText: string, skipPhantom = true): boolea
 
 // Serialize all visible content in a node subtree up to (but not including)
 // the first mo with the given text. Returns the serialized prefix.
-export const serializePrefixBeforeMo = (node, serialize, stopMoText: string): string => {
+export const serializePrefixBeforeMo = (node: TreeNode, serialize: ITypstSerializer, stopMoText: string): string => {
   // Walk the mtd → inferredMrow → mpadded chain to find the flat math children
-  let flatChildren: any[] = [];
-  const extractFlat = (n) => {
+  let flatChildren: TreeNode[] = [];
+  const extractFlat = (n: TreeNode) => {
     if (!n || !n.childNodes) return;
     if (n.kind === 'mphantom') return;
-    if (n.kind === 'mtd' || n.kind === 'mpadded' || n.kind === 'mstyle' || n.isInferred) {
+    if (n.kind === 'mtd' || n.kind === 'mpadded' || n.kind === 'mstyle' || (n as MmlNode).isInferred) {
       for (const child of n.childNodes) {
         extractFlat(child);
       }
@@ -165,22 +165,21 @@ export const replaceUnpairedBrackets = (expr: string): string => {
 };
 
 // --- Pre-serialization tree walk: mark unpaired ASCII brackets ---
-export const markUnpairedBrackets = (root: any): void => {
-  const bracketNodes: { node: any; char: string }[] = [];
+export const markUnpairedBrackets = (root: TreeNode): void => {
+  const bracketNodes: { node: TreeNode; char: string }[] = [];
   // Check if an mo node is a \left...\right delimiter (first/last child of
   // an mrow with texClass=INNER and open/close properties).  These must NOT
   // participate in pairing — otherwise \right] would pair with an inner [.
-  const isLeftRightDelimiter = (moNode: any): boolean => {
+  const isLeftRightDelimiter = (moNode: TreeNode): boolean => {
     const parent = moNode.parent;
     if (!parent || parent.kind !== 'mrow') return false;
-    const pp = parent.properties || {};
-    if (pp.texClass !== TEXCLASS.INNER) return false;
-    if (!pp.hasOwnProperty('open') && !pp.hasOwnProperty('close')) return false;
+    if (parent.getProperty('texClass') !== TEXCLASS.INNER) return false;
+    if (parent.getProperty('open') === undefined && parent.getProperty('close') === undefined) return false;
     const ch = parent.childNodes;
     if (!ch || ch.length === 0) return false;
     return ch[0] === moNode || ch[ch.length - 1] === moNode;
   };
-  const walk = (node: any): void => {
+  const walk = (node: TreeNode): void => {
     if (!node) return;
     if (node.kind === 'mo') {
       const text = getNodeText(node);
@@ -220,8 +219,8 @@ export const markUnpairedBrackets = (root: any): void => {
   for (let i = 0; i < bracketNodes.length; i++) {
     if (!paired.has(i)) {
       const ch = bracketNodes[i].char;
-      bracketNodes[i].node.properties[UNPAIRED_BRACKET_PROP] =
-        OPEN_BRACKETS[ch] ? 'open' : 'close';
+      bracketNodes[i].node.setProperty(UNPAIRED_BRACKET_PROP,
+        OPEN_BRACKETS[ch] ? 'open' : 'close');
     }
   }
 };

@@ -1,5 +1,7 @@
+import { MmlNode } from "mathjax-full/js/core/MmlTree/MmlNode";
 import {
-  ITypstData, initTypstData, addToTypstData,
+  ITypstData, ITypstSerializer, HandlerFn, TreeNode,
+  initTypstData, addToTypstData, getChildText,
   RE_NBSP, RE_CONTENT_SPECIAL, RE_TAG_EXTRACT, RE_TAG_STRIP,
   DATA_PRE_CONTENT, DATA_POST_CONTENT,
 } from "./common";
@@ -15,37 +17,35 @@ const EQ_TAG_FIGURE_KIND = 'eq-tag';
 
 /** Extract the original \label{} key from an mlabeledtr label cell.
  *  MathJax stores the id as "mjx-eqn:<label_key>" when useLabelIds is true. */
-const getLabelKey = (labelCell: any): string | null => {
-  const key = labelCell?.properties?.[DATA_LABEL_KEY];
+const getLabelKey = (labelCell: TreeNode): string | null => {
+  const key = labelCell?.getProperty(DATA_LABEL_KEY);
   return key ? String(key) : null;
 };
 
 /** Serialize a tag label mtd as Typst content for use inside [...].
  *  mtext → plain text, math → $typst_math$.
  *  "(1.2)" → "1.2", "($x\sqrt{5}$ 1.3.1)" → "$x sqrt(5)$ 1.3.1". */
-const serializeTagContent = (labelCell: any, serialize: any): string => {
+const serializeTagContent = (labelCell: TreeNode, serialize: ITypstSerializer): string => {
   try {
     const parts: string[] = [];
-    const visitChild = (child: any) => {
+    const visitChild = (child: TreeNode) => {
       if (!child) return;
       if (child.kind === 'mtext') {
-        // Escape content-mode specials: * _ ` @ # <
-        let text = child.childNodes?.[0]?.text || '';
+        let text = getChildText(child);
         if (text) {
           text = text.replace(RE_NBSP, ' ');
           text = text.replace(RE_CONTENT_SPECIAL, '\\$&');
           parts.push(text);
         }
-      } else if (child.isInferred) {
+      } else if ((child as MmlNode).isInferred) {
         if (child.childNodes) {
           for (const c of child.childNodes) {
             visitChild(c);
           }
         }
       } else if (child.kind === 'mrow' || child.kind === 'TeXAtom') {
-        // Mixed content (has mtext) → recurse; pure math → serialize as $...$
         const hasMtext = child.childNodes?.some(
-          (c: any) => c && (c.kind === 'mtext' || (c.isInferred && c.childNodes?.some((cc: any) => cc?.kind === 'mtext')))
+          (c: TreeNode) => c && (c.kind === 'mtext' || ((c as MmlNode).isInferred && c.childNodes?.some((cc: TreeNode) => cc?.kind === 'mtext')))
         );
         if (hasMtext) {
           if (child.childNodes) {
@@ -81,11 +81,11 @@ const serializeTagContent = (labelCell: any, serialize: any): string => {
 
 // Extract explicit \tag{...} from a condition cell's mtext content.
 // Returns the tag content (e.g. "3.12") or null if no \tag found.
-const extractTagFromConditionCell = (cell: any): string | null => {
-  const walk = (n: any): string | null => {
+const extractTagFromConditionCell = (cell: TreeNode): string | null => {
+  const walk = (n: TreeNode): string | null => {
     if (!n) return null;
     if (n.kind === 'mtext') {
-      const text = n.childNodes?.[0]?.text || '';
+      const text = getChildText(n);
       const match = text.match(RE_TAG_EXTRACT);
       return match ? match[1] : null;
     }
@@ -105,7 +105,7 @@ const extractTagFromConditionCell = (cell: any): string | null => {
 //   3 children: empty prefix or no & separator → label + prefix_with_brace + content
 //   4 children: non-empty prefix with & separator → label + prefix + value + condition
 // - First row's cell[1] contains a visible '{' mo (inside mpadded, outside mphantom)
-const isNumcasesTable = (node): boolean => {
+const isNumcasesTable = (node: TreeNode): boolean => {
   if (!node.childNodes || node.childNodes.length === 0) return false;
   const firstRow = node.childNodes[0];
   if (firstRow.kind !== 'mlabeledtr') return false;
@@ -116,7 +116,7 @@ const isNumcasesTable = (node): boolean => {
 };
 
 /** numcases/subnumcases → #grid() with cases + numbering column */
-const buildNumcasesGrid = (node: any, serialize: any, countRow: number): ITypstData => {
+const buildNumcasesGrid = (node: TreeNode, serialize: ITypstSerializer, countRow: number): ITypstData => {
   let res: ITypstData = initTypstData();
   const firstRow = node.childNodes[0];
   const prefixCell = firstRow.childNodes[1]; // cell after label
@@ -220,7 +220,7 @@ const buildNumcasesGrid = (node: any, serialize: any, countRow: number): ITypstD
 
 /** eqnArray with tags → number-align / separate / no-tag strategies */
 const buildTaggedEqnArray = (
-  node: any, serialize: any, rows: string[], countRow: number,
+  node: TreeNode, serialize: ITypstSerializer, rows: string[], countRow: number,
   preContent: string, postContent: string
 ): ITypstData => {
   let res: ITypstData = initTypstData();
@@ -338,7 +338,7 @@ const buildUntaggedEqnArray = (
 
 /** matrix → mat(delim: ..., ...) with augment/align/frame */
 const buildMatrix = (
-  node: any, rows: string[], branchOpen: string, branchClose: string
+  node: MmlNode, rows: string[], branchOpen: string, branchClose: string
 ): ITypstData => {
   let res: ITypstData = initTypstData();
   let matContent: string;
@@ -416,15 +416,18 @@ const buildMatrix = (
 };
 
 // --- MTABLE handler: matrices and equation arrays ---
-export const mtable = () => {
-  return (node, serialize): ITypstData => {
+export const mtable = (): HandlerFn => {
+  return (node: TreeNode, serialize: ITypstSerializer): ITypstData => {
     let res: ITypstData = initTypstData();
     const countRow = node.childNodes.length;
-      const envName = node.attributes.get('name') as string;
+      const mmlNode = node as MmlNode;
+      const envName = mmlNode.attributes.get('name') as string;
       // Check for enclosing brackets from \left...\right (mrow parent with open/close)
       const parentMrow = node.parent?.kind === 'mrow' ? node.parent : null;
-      const branchOpen = parentMrow?.properties?.hasOwnProperty('open') ? parentMrow.properties['open'] : '';
-      const branchClose = parentMrow?.properties?.hasOwnProperty('close') ? parentMrow.properties['close'] : '';
+      const openProp = parentMrow?.getProperty('open');
+      const closeProp = parentMrow?.getProperty('close');
+      const branchOpen: string = openProp !== undefined ? String(openProp) : '';
+      const branchClose: string = closeProp !== undefined ? String(closeProp) : '';
       // Determine if this is a cases environment
       const isCases = envName === 'cases' || (branchOpen === '{' && branchClose === '');
       // Detect numcases/subnumcases pattern
@@ -432,7 +435,7 @@ export const mtable = () => {
       // Determine if this is an equation array (align, gather, split, etc.)
       // Skip eqnArray detection for numcases — it should be treated as cases
       const isEqnArray = !isNumcases && !isCases && node.childNodes.length > 0
-        && node.childNodes[0].attributes?.get('displaystyle');
+        && (node.childNodes[0] as MmlNode).attributes?.get('displaystyle');
 
       if (isNumcases) {
         return buildNumcasesGrid(node, serialize, countRow);
@@ -475,10 +478,10 @@ export const mtable = () => {
       }
       if (isEqnArray) {
         const hasAnyTag = node.childNodes.some(
-          (child: any) => child.kind === 'mlabeledtr'
+          (child: TreeNode) => child.kind === 'mlabeledtr'
         );
-        const preContent = node.getProperty(DATA_PRE_CONTENT) || '';
-        const postContent = node.getProperty(DATA_POST_CONTENT) || '';
+        const preContent = String(node.getProperty(DATA_PRE_CONTENT) || '');
+        const postContent = String(node.getProperty(DATA_POST_CONTENT) || '');
         if (hasAnyTag) {
           return buildTaggedEqnArray(node, serialize, rows, countRow, preContent, postContent);
         } else {
@@ -494,15 +497,15 @@ export const mtable = () => {
         }
         res = addToTypstData(res, { typst: casesBody });
       } else {
-        return buildMatrix(node, rows, branchOpen, branchClose);
+        return buildMatrix(mmlNode, rows, branchOpen, branchClose);
       }
       return res;
   };
 };
 
 // --- MTR handler: table row ---
-export const mtr = () => {
-  return (node, serialize): ITypstData => {
+export const mtr = (): HandlerFn => {
+  return (node: TreeNode, serialize: ITypstSerializer): ITypstData => {
     let res: ITypstData = initTypstData();
     for (let i = 0; i < node.childNodes.length; i++) {
       if (i > 0) {
