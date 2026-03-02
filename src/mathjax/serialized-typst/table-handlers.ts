@@ -1,6 +1,5 @@
-import { MmlNode } from "mathjax-full/js/core/MmlTree/MmlNode";
 import {
-  ITypstData, ITypstSerializer, HandlerFn, TreeNode,
+  ITypstData, ITypstSerializer, HandlerFn, MmlNode,
   initTypstData, addToTypstData, getChildText,
   RE_NBSP, RE_CONTENT_SPECIAL, RE_TAG_EXTRACT, RE_TAG_STRIP,
   DATA_PRE_CONTENT, DATA_POST_CONTENT,
@@ -17,7 +16,7 @@ const EQ_TAG_FIGURE_KIND = 'eq-tag';
 
 /** Extract the original \label{} key from an mlabeledtr label cell.
  *  MathJax stores the id as "mjx-eqn:<label_key>" when useLabelIds is true. */
-const getLabelKey = (labelCell: TreeNode): string | null => {
+const getLabelKey = (labelCell: MmlNode): string | null => {
   const key = labelCell?.getProperty(DATA_LABEL_KEY);
   return key ? String(key) : null;
 };
@@ -25,10 +24,10 @@ const getLabelKey = (labelCell: TreeNode): string | null => {
 /** Serialize a tag label mtd as Typst content for use inside [...].
  *  mtext → plain text, math → $typst_math$.
  *  "(1.2)" → "1.2", "($x\sqrt{5}$ 1.3.1)" → "$x sqrt(5)$ 1.3.1". */
-const serializeTagContent = (labelCell: TreeNode, serialize: ITypstSerializer): string => {
+const serializeTagContent = (labelCell: MmlNode, serialize: ITypstSerializer): string => {
   try {
     const parts: string[] = [];
-    const visitChild = (child: TreeNode) => {
+    const visitChild = (child: MmlNode) => {
       if (!child) return;
       if (child.kind === 'mtext') {
         let text = getChildText(child);
@@ -37,7 +36,7 @@ const serializeTagContent = (labelCell: TreeNode, serialize: ITypstSerializer): 
           text = text.replace(RE_CONTENT_SPECIAL, '\\$&');
           parts.push(text);
         }
-      } else if ((child as MmlNode).isInferred) {
+      } else if (child.isInferred) {
         if (child.childNodes) {
           for (const c of child.childNodes) {
             visitChild(c);
@@ -45,7 +44,7 @@ const serializeTagContent = (labelCell: TreeNode, serialize: ITypstSerializer): 
         }
       } else if (child.kind === 'mrow' || child.kind === 'TeXAtom') {
         const hasMtext = child.childNodes?.some(
-          (c: TreeNode) => c && (c.kind === 'mtext' || ((c as MmlNode).isInferred && c.childNodes?.some((cc: TreeNode) => cc?.kind === 'mtext')))
+          (c: MmlNode) => c && (c.kind === 'mtext' || (c.isInferred && c.childNodes?.some((cc: MmlNode) => cc?.kind === 'mtext')))
         );
         if (hasMtext) {
           if (child.childNodes) {
@@ -81,8 +80,8 @@ const serializeTagContent = (labelCell: TreeNode, serialize: ITypstSerializer): 
 
 // Extract explicit \tag{...} from a condition cell's mtext content.
 // Returns the tag content (e.g. "3.12") or null if no \tag found.
-const extractTagFromConditionCell = (cell: TreeNode): string | null => {
-  const walk = (n: TreeNode): string | null => {
+const extractTagFromConditionCell = (cell: MmlNode): string | null => {
+  const walk = (n: MmlNode): string | null => {
     if (!n) return null;
     if (n.kind === 'mtext') {
       const text = getChildText(n);
@@ -105,7 +104,7 @@ const extractTagFromConditionCell = (cell: TreeNode): string | null => {
 //   3 children: empty prefix or no & separator → label + prefix_with_brace + content
 //   4 children: non-empty prefix with & separator → label + prefix + value + condition
 // - First row's cell[1] contains a visible '{' mo (inside mpadded, outside mphantom)
-const isNumcasesTable = (node: TreeNode): boolean => {
+const isNumcasesTable = (node: MmlNode): boolean => {
   if (!node.childNodes || node.childNodes.length === 0) return false;
   const firstRow = node.childNodes[0];
   if (firstRow.kind !== 'mlabeledtr') return false;
@@ -116,7 +115,7 @@ const isNumcasesTable = (node: TreeNode): boolean => {
 };
 
 /** numcases/subnumcases → #grid() with cases + numbering column */
-const buildNumcasesGrid = (node: TreeNode, serialize: ITypstSerializer, countRow: number): ITypstData => {
+const buildNumcasesGrid = (node: MmlNode, serialize: ITypstSerializer, countRow: number): ITypstData => {
   let res: ITypstData = initTypstData();
   const firstRow = node.childNodes[0];
   const prefixCell = firstRow.childNodes[1]; // cell after label
@@ -220,7 +219,7 @@ const buildNumcasesGrid = (node: TreeNode, serialize: ITypstSerializer, countRow
 
 /** eqnArray with tags → number-align / separate / no-tag strategies */
 const buildTaggedEqnArray = (
-  node: TreeNode, serialize: ITypstSerializer, rows: string[], countRow: number,
+  node: MmlNode, serialize: ITypstSerializer, rows: string[], countRow: number,
   preContent: string, postContent: string
 ): ITypstData => {
   let res: ITypstData = initTypstData();
@@ -417,11 +416,10 @@ const buildMatrix = (
 
 // --- MTABLE handler: matrices and equation arrays ---
 export const mtable = (): HandlerFn => {
-  return (node: TreeNode, serialize: ITypstSerializer): ITypstData => {
+  return (node: MmlNode, serialize: ITypstSerializer): ITypstData => {
     let res: ITypstData = initTypstData();
     const countRow = node.childNodes.length;
-      const mmlNode = node as MmlNode;
-      const envName = mmlNode.attributes.get('name') as string;
+      const envName = node.attributes.get('name') as string;
       // Check for enclosing brackets from \left...\right (mrow parent with open/close)
       const parentMrow = node.parent?.kind === 'mrow' ? node.parent : null;
       const openProp = parentMrow?.getProperty('open');
@@ -435,7 +433,7 @@ export const mtable = (): HandlerFn => {
       // Determine if this is an equation array (align, gather, split, etc.)
       // Skip eqnArray detection for numcases — it should be treated as cases
       const isEqnArray = !isNumcases && !isCases && node.childNodes.length > 0
-        && (node.childNodes[0] as MmlNode).attributes?.get('displaystyle');
+        && node.childNodes[0].attributes?.get('displaystyle');
 
       if (isNumcases) {
         return buildNumcasesGrid(node, serialize, countRow);
@@ -478,7 +476,7 @@ export const mtable = (): HandlerFn => {
       }
       if (isEqnArray) {
         const hasAnyTag = node.childNodes.some(
-          (child: TreeNode) => child.kind === 'mlabeledtr'
+          (child: MmlNode) => child.kind === 'mlabeledtr'
         );
         const preContent = String(node.getProperty(DATA_PRE_CONTENT) || '');
         const postContent = String(node.getProperty(DATA_POST_CONTENT) || '');
@@ -497,7 +495,7 @@ export const mtable = (): HandlerFn => {
         }
         res = addToTypstData(res, { typst: casesBody });
       } else {
-        return buildMatrix(mmlNode, rows, branchOpen, branchClose);
+        return buildMatrix(node, rows, branchOpen, branchClose);
       }
       return res;
   };
@@ -505,7 +503,7 @@ export const mtable = (): HandlerFn => {
 
 // --- MTR handler: table row ---
 export const mtr = (): HandlerFn => {
-  return (node: TreeNode, serialize: ITypstSerializer): ITypstData => {
+  return (node: MmlNode, serialize: ITypstSerializer): ITypstData => {
     let res: ITypstData = initTypstData();
     for (let i = 0; i < node.childNodes.length; i++) {
       if (i > 0) {

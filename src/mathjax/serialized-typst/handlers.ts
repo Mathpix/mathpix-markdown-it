@@ -1,6 +1,6 @@
-import { TEXCLASS, MmlNode } from "mathjax-full/js/core/MmlTree/MmlNode";
+import { TEXCLASS } from "mathjax-full/js/core/MmlTree/MmlNode";
 import {
-  ITypstData, ITypstSerializer, HandlerFn, TreeNode,
+  ITypstData, ITypstSerializer, HandlerFn, MmlNode,
   initTypstData, addToTypstData, addSpaceToTypstData,
   formatScript, isThousandSepComma, needsTokenSeparator, getNodeText, getChildText,
   isFirstChild, isLastChild, getSiblingIndex, typstPlaceholder,
@@ -33,7 +33,7 @@ const getAttributes = (node: MmlNode): Record<string, any> => {
 
 /** Extract the primary Typst symbol text from a node (mi/mo).
  *  Gets the first child's text and maps it through findTypstSymbol. */
-const getNodeTypstSymbol = (node: TreeNode): string => {
+const getNodeTypstSymbol = (node: MmlNode): string => {
   const text = getChildText(node);
   if (!text) return '';
   return findTypstSymbol(text);
@@ -527,9 +527,9 @@ const isCustomOp = (baseTrimmed: string): boolean =>
 
 /** Check if baseTrimmed is a stretchy extensible symbol (\xrightarrow, \xleftarrow, etc.).
  *  Walks into firstChild to find the inner mo and check its stretchy attribute. */
-const isStretchyBase = (baseTrimmed: string, firstChild: TreeNode): boolean => {
+const isStretchyBase = (baseTrimmed: string, firstChild: MmlNode): boolean => {
   if (!STRETCH_BASE_SYMBOLS.has(baseTrimmed)) return false;
-  let moNode: TreeNode = firstChild;
+  let moNode: MmlNode = firstChild;
   for (let i = 0; i < SHALLOW_TREE_MAX_DEPTH && moNode && moNode.kind !== 'mo'; i++) {
     if (moNode.childNodes?.length === 1) {
       moNode = moNode.childNodes[0];
@@ -539,7 +539,7 @@ const isStretchyBase = (baseTrimmed: string, firstChild: TreeNode): boolean => {
   }
   if (moNode?.kind !== 'mo') return false;
   try {
-    const atr = getAttributes(moNode as MmlNode);
+    const atr = getAttributes(moNode);
     return atr?.stretchy === true;
   } catch (e) { return false; }
 };
@@ -556,9 +556,9 @@ const isSpecialFnCall = (baseTrimmed: string): boolean =>
 
 /** Build limit-placement base, returns different block/inline bases for movablelimits.
  *  baseTrimmed must be the raw trimmed value (no placeholder) for correct classification. */
-const buildLimitBase = (firstChild: TreeNode | null, baseTrimmed: string, base: string): ITypstData => {
+const buildLimitBase = (firstChild: MmlNode | null, baseTrimmed: string, base: string): ITypstData => {
   if (!baseTrimmed) return { typst: typstPlaceholder(base) };
-  const movablelimits = firstChild ? getMovablelimits(firstChild as MmlNode) : undefined;
+  const movablelimits = firstChild ? getMovablelimits(firstChild) : undefined;
   const wrapper = firstChild && isStretchyBase(baseTrimmed, firstChild) ? 'stretch' : 'limits';
   if (movablelimits === true) {
     if (isCustomOp(baseTrimmed)) {
@@ -571,7 +571,7 @@ const buildLimitBase = (firstChild: TreeNode | null, baseTrimmed: string, base: 
   } else if (movablelimits === false) {
     return { typst: wrapper + '(' + escapeContentSeparators(baseTrimmed) + ')' };
   } else {
-    if (isCustomOp(baseTrimmed) && (firstChild as MmlNode)?.texClass === TEXCLASS.OP) {
+    if (isCustomOp(baseTrimmed) && firstChild?.texClass === TEXCLASS.OP) {
       if (firstChild?.kind === 'TeXAtom') {
         return { typst: addLimitsParam(baseTrimmed), typst_inline: base };
       }
@@ -968,10 +968,10 @@ const mrow = () => {
         const middle = node.childNodes[1];
         const last = node.childNodes[2];
         if (middle.kind === 'mfrac') {
-          const midAtr = getAttributes(middle as MmlNode);
+          const midAtr = getAttributes(middle);
           if (midAtr && (midAtr.linethickness === '0' || midAtr.linethickness === 0)
-            && (first as MmlNode).texClass === TEXCLASS.OPEN
-            && (last as MmlNode).texClass === TEXCLASS.CLOSE) {
+            && first.texClass === TEXCLASS.OPEN
+            && last.texClass === TEXCLASS.CLOSE) {
             const data: ITypstData = serialize.visitNode(middle, '');
             res = addToTypstData(res, data);
             return res;
@@ -1010,7 +1010,7 @@ const mrow = () => {
 
 /** Check if a node subtree contains an mphantom (shallow — up to 5 levels). */
 const hasPhantomChild = (node: MmlNode): boolean => {
-  const check = (n: TreeNode, depth: number): boolean => {
+  const check = (n: MmlNode, depth: number): boolean => {
     if (!n || depth > SHALLOW_TREE_MAX_DEPTH) return false;
     if (n.kind === 'mphantom') return true;
     if (n.childNodes) {
@@ -1156,7 +1156,7 @@ const handleAll: HandlerFn = (node, serialize) => {
  *  and should be suppressed. Explicit user spacing (\, \quad) is preserved. */
 const isOperatorInternalSpacing = (node: MmlNode): boolean => {
   const children = node.childNodes || [];
-  if (children.length !== 1 || !(children[0] as MmlNode).isInferred) return false;
+  if (children.length !== 1 || !children[0].isInferred) return false;
   const innerChildren = children[0].childNodes || [];
   if (innerChildren.length === 0 || !innerChildren.every((child) => child.kind === 'mspace')) {
     return false;

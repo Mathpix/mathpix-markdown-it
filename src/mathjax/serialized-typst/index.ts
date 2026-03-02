@@ -1,25 +1,25 @@
 import { MmlVisitor } from 'mathjax-full/js/core/MmlTree/MmlVisitor.js';
-import { MmlNode, TextNode, XMLNode, TEXCLASS } from 'mathjax-full/js/core/MmlTree/MmlNode.js';
+import { TextNode, XMLNode, TEXCLASS } from 'mathjax-full/js/core/MmlTree/MmlNode.js';
 import { handle } from './handlers';
-import { ITypstData, TreeNode, addToTypstData, addSpaceToTypstData, initTypstData, isThousandSepComma, formatScript, needsTokenSeparator, getChildText, DATA_PRE_CONTENT, DATA_POST_CONTENT } from './common';
+import { ITypstData, MmlNode, addToTypstData, addSpaceToTypstData, initTypstData, isThousandSepComma, formatScript, needsTokenSeparator, getChildText, DATA_PRE_CONTENT, DATA_POST_CONTENT } from './common';
 import { findTypstSymbol } from './typst-symbol-map';
 
 // Extract big delimiter info from a TeXAtom node wrapping a sized mo.
 // The TeXAtom itself may have texClass=0 (ORD); the OPEN/CLOSE class
 // is on the inner inferredMrow or mo node.
 // Returns { delim, size, isOpen } if found, or null.
-const getBigDelimInfo = (node: TreeNode): { delim: string, size: string, isOpen: boolean } | null => {
+const getBigDelimInfo = (node: MmlNode): { delim: string, size: string, isOpen: boolean } | null => {
   try {
     if (node.kind !== 'TeXAtom') return null;
     // TeXAtom > inferredMrow > mo(minsize/maxsize)
     const inferred = node.childNodes?.[0];
-    if (!inferred || !(inferred as MmlNode).isInferred) return null;
+    if (!inferred || !inferred.isInferred) return null;
     const mo = inferred.childNodes?.[0];
     if (!mo || mo.kind !== 'mo') return null;
-    const atr = (mo as MmlNode).attributes?.getAllAttributes() || {};
+    const atr = mo.attributes?.getAllAttributes() || {};
     if (!atr.minsize) return null;
     // Check if this is OPEN or CLOSE via the mo or inferredMrow texClass
-    const tc = (mo as MmlNode).texClass ?? (inferred as MmlNode).texClass ?? (node as MmlNode).texClass;
+    const tc = mo.texClass ?? inferred.texClass ?? node.texClass;
     if (tc !== TEXCLASS.OPEN && tc !== TEXCLASS.CLOSE) return null;
     const delim = getChildText(mo);
     return { delim, size: String(atr.minsize), isOpen: tc === TEXCLASS.OPEN };
@@ -30,14 +30,14 @@ const getBigDelimInfo = (node: TreeNode): { delim: string, size: string, isOpen:
 
 // Return the text content of a single-mo node (bare mo, mrow or TeXAtom wrapping one mo).
 // Used to detect delimiter characters like |, ⌊, ⌋, ⌈, ⌉, ‖, ⟨, ⟩.
-const getDelimiterChar = (node: TreeNode): string | null => {
+const getDelimiterChar = (node: MmlNode): string | null => {
   try {
-    let moNode: TreeNode | null = null;
+    let moNode: MmlNode | null = null;
     if (node?.kind === 'mo') {
       moNode = node;
     } else if (node?.kind === 'mrow' || node?.kind === 'TeXAtom') {
       let children = node.childNodes;
-      if (children?.length === 1 && (children[0] as MmlNode).isInferred) {
+      if (children?.length === 1 && children[0].isInferred) {
         children = children[0].childNodes;
       }
       if (children?.length === 1 && children[0].kind === 'mo') {
@@ -53,7 +53,7 @@ const getDelimiterChar = (node: TreeNode): string | null => {
 // Check if node is msub/msup/msubsup whose BASE is a closing delimiter.
 // Returns the delimiter char if found, null otherwise.
 // Used to detect \|x\|_2 where the closing ‖ is inside msub(‖, 2).
-const getScriptedDelimiterChar = (node: TreeNode): string | null => {
+const getScriptedDelimiterChar = (node: MmlNode): string | null => {
   try {
     const k = node?.kind;
     if (k === 'msub' || k === 'msup' || k === 'msubsup') {
@@ -290,15 +290,14 @@ export class SerializedTypstVisitor extends MmlVisitor {
         // When math content precedes or follows \begin{align*}/\begin{gather*} inside
         // the same $...$, it must be merged into the equation block.
         if (child.kind === 'mtable') {
-          const mtableChild = child as MmlNode;
-          const childIsEqnArray = mtableChild.childNodes.length > 0
-            && (mtableChild.childNodes[0] as MmlNode).attributes?.get('displaystyle');
+          const childIsEqnArray = child.childNodes.length > 0
+            && child.childNodes[0].attributes?.get('displaystyle');
           const childHasTag = childIsEqnArray
-            && mtableChild.childNodes.some((c) => c.kind === 'mlabeledtr');
+            && child.childNodes.some((c) => c.kind === 'mlabeledtr');
           if (childHasTag) {
             // Pre-content: accumulated prefix before the mtable
             if (res.typst.trim()) {
-              mtableChild.setProperty(DATA_PRE_CONTENT, res.typst.trim());
+              child.setProperty(DATA_PRE_CONTENT, res.typst.trim());
               res = initTypstData();
             }
             // Post-content: serialize remaining siblings after the mtable
@@ -311,7 +310,7 @@ export class SerializedTypstVisitor extends MmlVisitor {
               postContent += postData.typst;
             }
             if (postContent.trim()) {
-              mtableChild.setProperty(DATA_POST_CONTENT, postContent.trim());
+              child.setProperty(DATA_POST_CONTENT, postContent.trim());
             }
             // Process the mtable itself
             const data: ITypstData = this.visitNode(child, space);
