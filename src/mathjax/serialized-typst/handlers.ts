@@ -15,18 +15,14 @@ import {
 } from "./bracket-utils";
 import { mtable, mtr } from "./table-handlers";
 
-// Max tree depth for phantom search in hasPhantomChild
 const PHANTOM_SEARCH_MAX_DEPTH = 5;
-// Max ancestor depth for mstyle/TeXAtom traversal
 const ANCESTOR_MAX_DEPTH = 10;
-
 const INVISIBLE_CHARS: Set<string> = new Set([
   '\u2061', // function application
   '\u2062', // invisible times
   '\u2063', // invisible separator
   '\u2064', // invisible plus
 ]);
-
 
 const getAttributes = (node): any => {
   return node.attributes.getAllAttributes();
@@ -36,8 +32,6 @@ const defaultHandler = (node, serialize): ITypstData => {
   return handlerApi.handleAll(node, serialize);
 };
 
-// Spacing helper: check if previous sibling ends with a word character
-// and current node starts with a word character, requiring a space separator
 const needsSpaceBefore = (node): boolean => {
   try {
     if (isFirstChild(node)) {
@@ -48,7 +42,6 @@ const needsSpaceBefore = (node): boolean => {
     if (prev.kind === 'mi' || prev.kind === 'mo') {
       const text = (prev.childNodes[0] as any)?.text || '';
       const prevTypst = findTypstSymbol(text);
-      // Any word char or dot at end of previous Typst output needs separation
       return RE_WORD_DOT_END.test(prevTypst);
     }
     if (prev.kind === 'mn') {
@@ -79,7 +72,6 @@ const needsSpaceAfter = (node): boolean => {
     if (next && (next.kind === 'mi' || next.kind === 'mo')) {
       const text = (next.childNodes[0] as any)?.text || '';
       const nextTypst = findTypstSymbol(text);
-      // Any word char or dot at start of next Typst output needs separation
       return RE_WORD_DOT_START.test(nextTypst);
     }
     if (next && next.kind === 'mn') {
@@ -91,8 +83,7 @@ const needsSpaceAfter = (node): boolean => {
   }
 };
 
-// Built-in Typst math function names — these are already rendered upright
-// and should NOT be wrapped in upright()
+// Built-in Typst math operators — should NOT be wrapped in upright()
 const TYPST_MATH_OPERATORS: Set<string> = new Set([
   'sin', 'cos', 'tan', 'cot', 'sec', 'csc',
   'arcsin', 'arccos', 'arctan',
@@ -104,7 +95,6 @@ const TYPST_MATH_OPERATORS: Set<string> = new Set([
   'Pr', 'tr',
 ]);
 
-// Single uppercase letters that can use doubled-letter shorthand for \mathbb
 const BB_SHORTHAND_LETTERS: Set<string> = new Set(
   'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
 );
@@ -141,11 +131,7 @@ const mi = () => {
       else if (mathvariant === 'double-struck' && value.length === 1 && BB_SHORTHAND_LETTERS.has(value)) {
         typstValue = value + value;
       }
-      // Apply font wrapping if mathvariant is set and not the default italic
-      // Skip font wrapping for known symbols with non-bold variants (e.g. \infty with mathvariant="normal")
-      // Skip font wrapping for built-in Typst math operators (sin, cos, log, etc.)
-      // Allow bold wrapping for known symbols (e.g. \boldsymbol{\alpha} → bold(alpha))
-      // Skip font wrapping for escape-form symbols (\#, \$, \/, \√, \") — they break inside upright()
+      // Font wrapping: skip for known non-bold symbols, operators, and escape-form symbols (\#, \$)
       else if (mathvariant && mathvariant !== 'italic' && !isKnownOperator
         && (!isKnownSymbol || mathvariant === 'bold' || mathvariant === 'bold-italic')
         && !(isKnownSymbol && typstValue.startsWith('\\'))) {
@@ -189,7 +175,6 @@ const mo = () => {
     let res: ITypstData = initTypstData();
     try {
       const value = getNodeText(node);
-      // EARLY: unpaired bracket → emit escaped delimiter
       const unpairedDir = node.properties?.['data-unpaired-bracket'];
       if (unpairedDir && UNPAIRED_BRACKET_TYPST[value]) {
         const spaceBefore = needsSpaceBefore(node) ? ' ' : '';
@@ -197,7 +182,6 @@ const mo = () => {
         res = addToTypstData(res, { typst: spaceBefore + UNPAIRED_BRACKET_TYPST[value] + spaceAfter });
         return res;
       }
-      // Skip invisible operators
       if (INVISIBLE_CHARS.has(value)) {
         return res;
       }
@@ -223,9 +207,7 @@ const mo = () => {
       const parentKind = node.parent?.kind;
       const inScript = parentKind === 'msub' || parentKind === 'msup'
         || parentKind === 'msubsup' || parentKind === 'munderover';
-      // Add spacing around operators for readability
       if (typstValue.length > 1 && RE_WORD_START.test(typstValue)) {
-        // Multi-char Typst symbol names: "times", "lt.eq", etc.
         const spaceBefore = needsSpaceBefore(node) ? ' ' : '';
         let spaceAfter = needsSpaceAfter(node) ? ' ' : '';
         // Prevent Typst from interpreting "symbol(" as a function call
@@ -242,10 +224,8 @@ const mo = () => {
         }
         res = addToTypstData(res, { typst: spaceBefore + typstValue + spaceAfter });
       } else if (!inScript && SPACED_OPERATORS.has(value)) {
-        // Common binary/relational operators: add spaces
         res = addToTypstData(res, { typst: ' ' + typstValue + ' ' });
       } else if (!inScript && value === ',') {
-        // Commas: add trailing space for readability
         res = addToTypstData(res, { typst: ', ' });
       } else if (value === '/') {
         // Escape slash: in Typst math, / creates a fraction; \/ is a literal slash
@@ -266,7 +246,6 @@ const mn = () => {
     let res: ITypstData = initTypstData();
     try {
       const value = getNodeText(node);
-      // Check for font variant (e.g. \mathbb{1})
       const atr = getAttributes(node);
       const mathvariant: string = atr?.mathvariant || '';
       if (mathvariant && mathvariant !== 'normal') {
@@ -298,9 +277,7 @@ const mtext = () => {
       if (!value || !value.trim()) {
         return res;
       }
-      // Replace non-breaking spaces with regular spaces
       value = value.replace(RE_NBSP, ' ');
-      // Check if this is a single symbol character with a known Typst mapping
       if (value.length === 1 && typstSymbolMap.has(value)) {
         const typstValue = findTypstSymbol(value);
         const spaceBefore = needsSpaceBefore(node) ? ' ' : '';
@@ -308,10 +285,7 @@ const mtext = () => {
         res = addToTypstData(res, { typst: spaceBefore + typstValue + spaceAfter });
         return res;
       }
-      // In Typst math, text is wrapped in double quotes.
-      // Escape any literal " inside the text to avoid breaking the string.
       let textContent = '"' + value.replace(/"/g, '\\"') + '"';
-      // Apply font wrapping if mathvariant is set (e.g. \textbf, \textit)
       const atr = getAttributes(node);
       const mathvariant: string = atr?.mathvariant || '';
       if (mathvariant && mathvariant !== 'normal') {
@@ -566,14 +540,7 @@ const getMovablelimits = (node: any): boolean | undefined => {
   }
 };
 
-/** Build limit-placement base for munderover/munder/mover handlers.
- *  Returns ITypstData with potentially different block/inline bases for movablelimits. */
-/**
- * Symbols that should use stretch() instead of limits() when used as the base
- * of mover/munder/munderover — extensible arrows, harpoons, and equal sign.
- * stretch() makes the symbol grow to fit its annotations, matching LaTeX's
- * \xrightarrow, \xleftarrow, \xlongequal, etc.
- */
+// Extensible arrows/harpoons: use stretch() instead of limits() for \xrightarrow, \xleftarrow, etc.
 const STRETCH_BASE_SYMBOLS: Set<string> = new Set([
   'arrow.r', 'arrow.l', 'arrow.l.r',
   'arrow.r.twohead', 'arrow.l.twohead',
@@ -586,6 +553,7 @@ const STRETCH_BASE_SYMBOLS: Set<string> = new Set([
   '=',                                 // \xlongequal
 ]);
 
+/** Build limit-placement base, returns different block/inline bases for movablelimits. */
 const buildLimitBase = (firstChild: any, baseTrimmed: string, base: string): ITypstData => {
   const movablelimits = getMovablelimits(firstChild);
   const baseIsCustomOp = RE_OP_WRAPPER.test(baseTrimmed);
@@ -695,20 +663,16 @@ const mover = () => {
         if (accentFn) {
           const content = escapeContentSeparators(dataFirst.typst.trim()) || '""';
           if (TYPST_ACCENT_SHORTHANDS.has(accentFn)) {
-            // Shorthand accent: fn(content)
             res = addToTypstData(res, { typst: accentFn + '(' + content + ')' });
           } else {
-            // Non-shorthand accent: accent(content, symbol)
             res = addToTypstData(res, { typst: 'accent(' + content + ', ' + accentFn + ')' });
           }
           return res;
         }
       }
-      // Fallback: base^(over) — uses movablelimits to decide limits() wrapping
       const baseTrimmed = dataFirst.typst.trim() || '""';
       const over = dataSecond.typst.trim();
       if (over) {
-        // overbrace/overbracket annotation: insert as second argument
         const braceRes = matchBraceAnnotation(baseTrimmed, over, ['overbrace', 'overbracket']);
         if (braceRes) { res = addToTypstData(res, braceRes); return res; }
         const baseData = buildLimitBase(firstChild, baseTrimmed, dataFirst.typst);
@@ -773,11 +737,9 @@ const munder = () => {
           return res;
         }
       }
-      // Fallback: base_(under) — uses movablelimits to decide limits() wrapping
       const baseTrimmed = dataFirst.typst.trim() || '""';
       const under = dataSecond.typst.trim();
       if (under) {
-        // underbrace/underbracket annotation: insert as second argument
         const braceRes = matchBraceAnnotation(baseTrimmed, under, ['underbrace', 'underbracket']);
         if (braceRes) { res = addToTypstData(res, braceRes); return res; }
         const baseData = buildLimitBase(firstChild, baseTrimmed, dataFirst.typst);
@@ -829,7 +791,6 @@ const mmultiscripts = () => {
     let res: ITypstData = initTypstData();
     try {
       if (!node.childNodes || node.childNodes.length === 0) return res;
-
       // Parse mmultiscripts structure:
       // child[0] = base
       // child[1..prescriptsIdx-1] = post-scripts (pairs of sub, sup)
@@ -838,7 +799,6 @@ const mmultiscripts = () => {
       const base = node.childNodes[0];
       const baseData: ITypstData = serialize.visitNode(base, '');
       const baseTrimmed = baseData.typst.trim() || '""';
-
       let prescriptsIdx = -1;
       for (let i = 1; i < node.childNodes.length; i++) {
         if (node.childNodes[i].kind === 'mprescripts') {
@@ -846,7 +806,6 @@ const mmultiscripts = () => {
           break;
         }
       }
-
       // Collect post-scripts (pairs after base, before mprescripts)
       const postEnd = prescriptsIdx >= 0 ? prescriptsIdx : node.childNodes.length;
       let postSub = '';
@@ -863,7 +822,6 @@ const mmultiscripts = () => {
           if (d.typst.trim()) postSup = d.typst.trim();
         }
       }
-
       // Collect pre-scripts (pairs after mprescripts)
       let preSub = '';
       let preSup = '';
@@ -881,9 +839,7 @@ const mmultiscripts = () => {
           }
         }
       }
-
       const hasPrescripts = preSub || preSup;
-
       if (!hasPrescripts) {
         // No prescripts — use simple base_sub^sup syntax
         res = addToTypstData(res, { typst: baseTrimmed });
@@ -904,7 +860,6 @@ const mmultiscripts = () => {
           typst: 'attach(' + escapeContentSeparators(baseTrimmed) + ', ' + parts.join(', ') + ')'
         });
       }
-
       return res;
     } catch (e) {
       return res;
@@ -922,7 +877,6 @@ const mspace = () => {
         return res;
       }
       const width: string = atr.width.toString();
-      // Map common MathML spacing widths to Typst spacing keywords
       if (width === '2em') {
         res = addToTypstData(res, { typst: ' wide ' });
       } else if (width === '1em') {
@@ -940,7 +894,6 @@ const mspace = () => {
         // \: → mediummathspace
         res = addToTypstData(res, { typst: ' med ' });
       } else {
-        // Generic space fallback
         res = addToTypstData(res, { typst: ' ' });
       }
       return res;
@@ -991,7 +944,6 @@ const mrow = () => {
           }
           content += data.typst;
         }
-        // Map delimiter characters to Typst
         let open = openDelim ? mapDelimiter(openDelim) : '';
         let close = closeDelim ? mapDelimiter(closeDelim) : '';
         const hasVisibleOpen = !!open;
@@ -1022,10 +974,7 @@ const mrow = () => {
               ? 'lr(⌈ ' + escapeLrSemicolons(trimmedContent) + ' ⌉)'
               : 'ceil(' + trimmedContent + ')' });
           } else {
-            // General lr() for auto-sizing — escape semicolons.
-            // When delimiters are mismatched types (e.g. \left(\right\rangle),
-            // ASCII brackets must be escaped to avoid parse errors:
-            // ( [ { start groups/blocks, ) closes lr(), } closes code block.
+            // Mismatched ASCII brackets must be escaped: ( [ { start groups, ) closes lr()
             const escapedOpen = (openDelim in OPEN_BRACKETS && OPEN_BRACKETS[openDelim] !== closeDelim)
               ? '\\' + openDelim : open;
             const escapedClose = (closeDelim in CLOSE_BRACKETS && CLOSE_BRACKETS[closeDelim] !== openDelim)
@@ -1033,9 +982,7 @@ const mrow = () => {
             res = addToTypstData(res, { typst: 'lr(' + escapedOpen + ' ' + escapeLrSemicolons(trimmedContent) + ' ' + escapedClose + ')' });
           }
         } else {
-          // One or both delimiters invisible: wrap visible side in lr().
-          // Opening delimiters ( [ { and } must be escaped to avoid parse errors.
-          // Closing delimiters ) ] are left unescaped so lr() can auto-size them.
+          // One or both delimiters invisible: wrap visible side in lr()
           const trimmed = content.trim();
           const openEsc = openDelim ? escapeLrOpenDelimiter(openDelim) : '';
           const closeEsc = closeDelim ? escapeLrOpenDelimiter(closeDelim) : '';
@@ -1076,7 +1023,6 @@ const mrow = () => {
             if (midAtr && (midAtr.linethickness === '0' || midAtr.linethickness === 0)
               && first.texClass === TEXCLASS.OPEN
               && last.texClass === TEXCLASS.CLOSE) {
-              // binom() in Typst already includes parentheses — skip OPEN/CLOSE wrappers
               const data: ITypstData = serialize.visitNode(middle, '');
               res = addToTypstData(res, data);
               return res;
@@ -1177,9 +1123,7 @@ const mpadded = () => {
   };
 };
 
-// --- MPHANTOM handler: invisible content that preserves space ---
-// Typst's hide() is the equivalent of LaTeX \phantom — renders content
-// invisibly while preserving its dimensions.
+// --- MPHANTOM handler: \phantom → hide() ---
 const mphantom = () => {
   return (node, serialize): ITypstData => {
     let res: ITypstData = initTypstData();
@@ -1283,10 +1227,8 @@ const mstyle = () => {
         const hasOnlySpaces = innerChildren.length > 0
           && innerChildren.every((child) => child.kind === 'mspace');
         if (hasOnlySpaces) {
-          // Only skip if this is operator-internal spacing (e.g. around \oint)
-          // not explicit user spacing (e.g. \, \quad).
-          // Operator-internal mstyle nodes are nested inside TeXAtom chains;
-          // user spacing sits directly in the top-level inferredMrow.
+          // Skip operator-internal spacing (inside TeXAtom chains, e.g. \oint),
+          // but preserve explicit user spacing (\, \quad) in top-level inferredMrow
           let isOperatorSpacing = false;
           let p = node.parent;
           for (let d = 0; d < ANCESTOR_MAX_DEPTH && p; d++) {

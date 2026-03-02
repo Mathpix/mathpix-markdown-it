@@ -2,7 +2,6 @@ import { TEXCLASS } from "mathjax-full/js/core/MmlTree/MmlNode";
 import { getNodeText, RE_BRACKET_CHARS, RE_WORD_DOT_END, ITypstData } from "./common";
 import { typstSymbolMap } from "./typst-symbol-map";
 
-// Delimiter mapping for matrix environments
 export const delimiterToTypst = (delim: string): string => {
   switch (delim) {
     case '(': return '"("';
@@ -18,7 +17,6 @@ export const delimiterToTypst = (delim: string): string => {
   }
 };
 
-// Check if a node subtree (outside mphantom) contains an mo with the given text
 export const treeContainsMo = (node, moText: string, skipPhantom = true): boolean => {
   if (!node) return false;
   if (skipPhantom && node.kind === 'mphantom') return false;
@@ -51,7 +49,6 @@ export const serializePrefixBeforeMo = (node, serialize, stopMoText: string): st
     }
   };
   extractFlat(node);
-  // Serialize children up to the stop mo
   let result = '';
   for (const child of flatChildren) {
     if (child.kind === 'mo' && getNodeText(child) === stopMoText) {
@@ -63,7 +60,6 @@ export const serializePrefixBeforeMo = (node, serialize, stopMoText: string): st
   return result.trim();
 };
 
-// Escape top-level commas, semicolons, and colons in a Typst expression for use inside cases()/mat().
 const BRACKET_SYMBOL_MAP: Record<string, string> = {
   '[': 'bracket.l',
   ']': 'bracket.r',
@@ -78,19 +74,12 @@ const BRACKET_SYMBOL_MAP: Record<string, string> = {
 // Escaped brackets (\[), brackets inside quoted strings ("..."), and brackets
 // inside function-call parens (e.g. frac(...)) are ignored.
 export const replaceUnpairedBrackets = (expr: string): string => {
-  // Quick exit if no bracket characters present
   if (!RE_BRACKET_CHARS.test(expr)) return expr;
-
   type BracketInfo = { char: string; pos: number };
   const brackets: BracketInfo[] = [];
-
   for (let i = 0; i < expr.length; i++) {
     const ch = expr[i];
-    // Skip backslash-escaped characters
-    if (ch === '\\') {
-      i++; // skip next char
-      continue;
-    }
+    if (ch === '\\') { i++; continue; } // skip backslash-escaped
     // Skip quoted strings
     if (ch === '"') {
       i++;
@@ -100,10 +89,8 @@ export const replaceUnpairedBrackets = (expr: string): string => {
       }
       continue;
     }
-    // Check if this is a bracket character
     if ('[](){}'.includes(ch)) {
-      // Check if ( is a function-call paren (preceded by word char or .)
-      // If so, skip the entire function call content
+      // Skip function-call parens (preceded by word char or .)
       if (ch === '(' && i > 0 && RE_WORD_DOT_END.test(expr[i - 1])) {
         let depth = 1;
         i++;
@@ -126,10 +113,7 @@ export const replaceUnpairedBrackets = (expr: string): string => {
       brackets.push({ char: ch, pos: i });
     }
   }
-
-  // Pair brackets using stacks for each bracket type
   const unmatched = new Set<number>();
-
   for (const [open, close] of Object.entries(OPEN_BRACKETS)) {
     const stack: number[] = [];
     for (const b of brackets) {
@@ -148,20 +132,15 @@ export const replaceUnpairedBrackets = (expr: string): string => {
       unmatched.add(pos);
     }
   }
-
   if (unmatched.size === 0) return expr;
-
-  // Replace unmatched brackets with symbol names, adding spaces where needed
   let result = '';
   for (let i = 0; i < expr.length; i++) {
     if (unmatched.has(i)) {
       const sym = BRACKET_SYMBOL_MAP[expr[i]];
-      // Add space before if preceded by word char or dot
       if (result.length > 0 && RE_WORD_DOT_END.test(result[result.length - 1])) {
         result += ' ';
       }
       result += sym;
-      // Add space after if followed by word char
       if (i + 1 < expr.length && /\w/.test(expr[i + 1])) {
         result += ' ';
       }
@@ -186,7 +165,6 @@ export const UNPAIRED_BRACKET_TYPST: Record<string, string> = {
 
 export const markUnpairedBrackets = (root: any): void => {
   const bracketNodes: { node: any; char: string }[] = [];
-
   // Check if an mo node is a \left...\right delimiter (first/last child of
   // an mrow with texClass=INNER and open/close properties).  These must NOT
   // participate in pairing — otherwise \right] would pair with an inner [.
@@ -200,8 +178,6 @@ export const markUnpairedBrackets = (root: any): void => {
     if (!ch || ch.length === 0) return false;
     return ch[0] === moNode || ch[ch.length - 1] === moNode;
   };
-
-  // DFS — always recurse into childNodes (even for mo)
   const walk = (node: any): void => {
     if (!node) return;
     if (node.kind === 'mo') {
@@ -219,13 +195,10 @@ export const markUnpairedBrackets = (root: any): void => {
       }
     }
   };
-
   walk(root);
-
   // STRICT stack pairing: closing bracket matches ONLY the top of the stack
   const stack: number[] = [];
   const paired = new Set<number>();
-
   for (let i = 0; i < bracketNodes.length; i++) {
     const ch = bracketNodes[i].char;
     if (OPEN_BRACKETS[ch]) {
@@ -242,8 +215,6 @@ export const markUnpairedBrackets = (root: any): void => {
       }
     }
   }
-
-  // Mark unpaired nodes with direction metadata
   for (let i = 0; i < bracketNodes.length; i++) {
     if (!paired.has(i)) {
       const ch = bracketNodes[i].char;
@@ -253,7 +224,6 @@ export const markUnpairedBrackets = (root: any): void => {
   }
 };
 
-// Map delimiter characters to Typst representation
 export const mapDelimiter = (delim: string): string => {
   const mapped = typstSymbolMap.get(delim);
   if (mapped) {

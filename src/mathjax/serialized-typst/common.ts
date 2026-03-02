@@ -1,5 +1,4 @@
 // --- Regex Constants ---
-// Centralized regex patterns used across handlers.ts, index.ts, and common.ts.
 
 /** Non-breaking space U+00A0 (global replacement) */
 export const RE_NBSP = /\u00A0/g;

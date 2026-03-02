@@ -14,22 +14,16 @@ const getLabelKey = (labelCell: any): string | null => {
   return key ? String(key) : null;
 };
 
-// Serialize a tag label mtd as Typst content for use inside [...].
-// mtext nodes → plain text, math nodes → $typst_math$.
-// For simple tags like "(1.2)", returns "1.2" (stripped parens).
-// For mixed tags like "($x\sqrt{5}$ 1.3.1)", returns "$x sqrt(5)$ 1.3.1".
+/** Serialize a tag label mtd as Typst content for use inside [...].
+ *  mtext → plain text, math → $typst_math$.
+ *  "(1.2)" → "1.2", "($x\sqrt{5}$ 1.3.1)" → "$x sqrt(5)$ 1.3.1". */
 const serializeTagContent = (labelCell: any, serialize: any): string => {
   try {
-    // Walk the children of the label mtd's content.
-    // Simple tag: mtd > mtext("(1.2)")
-    // Mixed tag: mtd > mrow > [mtext("("), mrow(math), mtext(" 1.3.1)")]
     const parts: string[] = [];
     const visitChild = (child: any) => {
       if (!child) return;
       if (child.kind === 'mtext') {
-        // Text node — emit as plain text for Typst content mode [...]
-        // Escape characters with special meaning in content mode:
-        // * (bold), _ (emphasis), ` (raw), @ (reference), # (scripting)
+        // Escape content-mode specials: * _ ` @ # <
         let text = child.childNodes?.[0]?.text || '';
         if (text) {
           text = text.replace(RE_NBSP, ' ');
@@ -37,15 +31,13 @@ const serializeTagContent = (labelCell: any, serialize: any): string => {
           parts.push(text);
         }
       } else if (child.isInferred) {
-        // Inferred mrow — always recurse
         if (child.childNodes) {
           for (const c of child.childNodes) {
             visitChild(c);
           }
         }
       } else if (child.kind === 'mrow' || child.kind === 'TeXAtom') {
-        // Check if this group contains any mtext (mixed content) — recurse
-        // Otherwise it's a pure math group — serialize as one $...$ block
+        // Mixed content (has mtext) → recurse; pure math → serialize as $...$
         const hasMtext = child.childNodes?.some(
           (c: any) => c && (c.kind === 'mtext' || (c.isInferred && c.childNodes?.some((cc: any) => cc?.kind === 'mtext')))
         );
@@ -56,7 +48,6 @@ const serializeTagContent = (labelCell: any, serialize: any): string => {
             }
           }
         } else {
-          // Pure math group — serialize whole thing
           const data: ITypstData = serialize.visitNode(child, '');
           const mathStr = data.typst.trim();
           if (mathStr) {
@@ -64,7 +55,6 @@ const serializeTagContent = (labelCell: any, serialize: any): string => {
           }
         }
       } else {
-        // Math node — serialize and wrap in $...$
         const data: ITypstData = serialize.visitNode(child, '');
         const mathStr = data.typst.trim();
         if (mathStr) {
@@ -119,17 +109,12 @@ const isNumcasesTable = (node): boolean => {
   return treeContainsMo(prefixCell, '{');
 };
 
-// Check if a node is inside a non-eqnArray mtable (mat()/cases() function call syntax)
-// where bare ASCII delimiters like [ { ( would break parsing.
-// --- MTABLE helper functions ---
-
 /** numcases/subnumcases → #grid() with cases + numbering column */
 const buildNumcasesGrid = (node: any, serialize: any, countRow: number): ITypstData => {
   let res: ITypstData = initTypstData();
   const firstRow = node.childNodes[0];
   const prefixCell = firstRow.childNodes[1]; // cell after label
   const prefix = serializePrefixBeforeMo(prefixCell, serialize, '{');
-
   // Determine tag source for each row:
   // 1. Condition-embedded \tag{...} in mtext (MathJax leaves it as literal text)
   // 2. Label cell explicit tag (MathJax processed \tag, data-tag-auto is false)
@@ -157,8 +142,6 @@ const buildNumcasesGrid = (node: any, serialize: any, countRow: number): ITypstD
       rowTagSources.push({ source: 'auto', content: '', labelKey: null });
     }
   }
-
-  // Build case rows from content columns (after label + prefix)
   const caseRows: string[] = [];
   for (let i = 0; i < countRow; i++) {
     const mtrNode = node.childNodes[i];
@@ -177,14 +160,11 @@ const buildNumcasesGrid = (node: any, serialize: any, countRow: number): ITypstD
       if (trimmed) cells.push(trimmed);
     }
     if (cells.length === 1) {
-      // Single cell (no & separator): escape top-level commas
-      // to prevent them being parsed as cases() argument separators
       caseRows.push(escapeCasesSeparators(replaceUnpairedBrackets(cells[0])));
     } else {
       caseRows.push(cells.map(c => escapeCasesSeparators(replaceUnpairedBrackets(c))).join(' & '));
     }
   }
-
   let casesContent: string;
   if (caseRows.length >= 2) {
     casesContent = 'cases(\n  ' + caseRows.join(',\n  ') + ',\n)';
@@ -192,8 +172,6 @@ const buildNumcasesGrid = (node: any, serialize: any, countRow: number): ITypstD
     casesContent = 'cases(' + caseRows.join(', ') + ')';
   }
   const mathContent = prefix ? prefix + ' ' + casesContent : casesContent;
-
-  // Build tag entries for numbering column
   const tagEntries: string[] = [];
   for (let i = 0; i < countRow; i++) {
     const info = rowTagSources[i];
@@ -216,8 +194,6 @@ const buildNumcasesGrid = (node: any, serialize: any, countRow: number): ITypstD
       tagEntries.push(autoTagEntry);
     }
   }
-
-  // Build grid output
   const gridLines: string[] = [
     '#grid(',
     '  columns: (1fr, auto),',
@@ -233,7 +209,6 @@ const buildNumcasesGrid = (node: any, serialize: any, countRow: number): ITypstD
   gridLines.push(')');
 
   res = addToTypstData(res, { typst: gridLines.join('\n') });
-  // Inline variant: pure math content without #grid wrapper
   res.typst_inline = mathContent;
   return res;
 };
@@ -244,7 +219,6 @@ const buildTaggedEqnArray = (
   preContent: string, postContent: string
 ): ITypstData => {
   let res: ITypstData = initTypstData();
-  // Analyze tag pattern: count explicit tags and auto-number tags
   const rowTagInfos: { isTagged: boolean; isAutoTag: boolean; isExplicitTag: boolean; tagContent: string; labelKey: string | null }[] = [];
   for (let i = 0; i < countRow; i++) {
     const mtrNode = node.childNodes[i];
@@ -264,11 +238,9 @@ const buildTaggedEqnArray = (
       rowTagInfos.push({ isTagged: false, isAutoTag: false, isExplicitTag: false, tagContent: '', labelKey: null });
     }
   }
-
   const explicitTagIndices = rowTagInfos.map((r, i) => r.isExplicitTag ? i : -1).filter(i => i >= 0);
   const autoTagIndices = rowTagInfos.map((r, i) => r.isAutoTag ? i : -1).filter(i => i >= 0);
   const totalTagged = explicitTagIndices.length + autoTagIndices.length;
-
   // Strategy: number-align — exactly ONE explicit tag in multi-row, no auto-tags
   if (explicitTagIndices.length === 1 && autoTagIndices.length === 0 && countRow > 1) {
     const tagIdx = explicitTagIndices[0];
@@ -370,8 +342,6 @@ const buildMatrix = (
   } else {
     matContent = rows.join('; ');
   }
-
-  // Parse array line attributes for augment parameter
   const columnlines = node.attributes.isSet('columnlines')
     ? (node.attributes.get('columnlines') as string).split(' ')
     : [];
@@ -381,7 +351,6 @@ const buildMatrix = (
   const frame = node.attributes.isSet('frame')
     ? (node.attributes.get('frame') as string)
     : '';
-
   const vlinePositions: number[] = [];
   for (let i = 0; i < columnlines.length; i++) {
     if (columnlines[i] === 'solid' || columnlines[i] === 'dashed') {
@@ -394,8 +363,6 @@ const buildMatrix = (
       hlinePositions.push(i + 1);
     }
   }
-
-  // Build augment string
   let augmentStr = '';
   if (hlinePositions.length > 0 || vlinePositions.length > 0) {
     const parts: string[] = [];
@@ -411,16 +378,12 @@ const buildMatrix = (
     }
     augmentStr = 'augment: #(' + parts.join(', ') + '), ';
   }
-
-  // Extract column alignment
   const columnAlign = node.attributes.get('columnalign') as string;
   const alignArr = columnAlign ? columnAlign.trim().split(/\s+/) : [];
   const uniqueAligns = [...new Set(alignArr)];
   const matAlign = (uniqueAligns.length === 1 && uniqueAligns[0] !== 'center')
     ? uniqueAligns[0]  // 'left' or 'right'
     : '';
-
-  // Build mat() parameters
   const params: string[] = [];
   const hasDelimiters = branchOpen || branchClose;
   if (hasDelimiters) {
@@ -437,10 +400,8 @@ const buildMatrix = (
   if (augmentStr) {
     params.push(augmentStr.slice(0, -2)); // remove trailing ", "
   }
-
   const paramStr = params.length > 0 ? params.join(', ') + ', ' : '';
   const matExpr = 'mat(' + paramStr + matContent + ')';
-
   if (frame === 'solid') {
     res = addToTypstData(res, { typst: '#box(stroke: 0.5pt, inset: 3pt, $ ' + matExpr + ' $)', typst_inline: matExpr });
   } else {
@@ -472,8 +433,6 @@ export const mtable = () => {
       if (isNumcases) {
         return buildNumcasesGrid(node, serialize, countRow);
       }
-
-      // Build rows
       const rows: string[] = [];
       for (let i = 0; i < countRow; i++) {
         const mtrNode = node.childNodes[i];
@@ -510,7 +469,6 @@ export const mtable = () => {
           rows.push(cells.map(c => escapeCasesSeparators(replaceUnpairedBrackets(c))).join(', '));
         }
       }
-
       if (isEqnArray) {
         const hasAnyTag = node.childNodes.some(
           (child: any) => child.kind === 'mlabeledtr'

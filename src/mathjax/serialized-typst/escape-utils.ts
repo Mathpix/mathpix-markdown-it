@@ -34,7 +34,6 @@ const scanExpression = (expr: string, opts: ScanOptions): string => {
   let result = '';
   for (let i = 0; i < expr.length; i++) {
     const ch = expr[i];
-
     // Skip quoted strings: copy "..." verbatim
     if (ch === '"') {
       let j = i + 1;
@@ -58,7 +57,6 @@ const scanExpression = (expr: string, opts: ScanOptions): string => {
       continue;
     }
 
-    // Track bracket depth
     if (ch === '(' || ch === '[' || ch === '{') {
       if (!opts.escapeUnbalancedClose || ch === '(') { depth++; }
       else { depth++; }
@@ -82,7 +80,6 @@ const scanExpression = (expr: string, opts: ScanOptions): string => {
       continue;
     }
 
-    // At depth 0: apply escape/detection operations
     if (depth === 0) {
       if (ch === ',' && (opts.escapeComma || opts.detectOnly)) {
         if (opts.detectOnly) return 'found';
