@@ -129,6 +129,10 @@ export const getNodeText = (node: MathNode): string => {
   return text;
 };
 
+/** Get typed attributes from a node. The single `as T` cast localises the any boundary. */
+export const getAttrs = <T extends object>(node: MathNode): T =>
+  node.attributes.getAllAttributes() as T;
+
 /** Serialize all children of a node by visiting each one and concatenating the results. */
 export const handleAll: HandlerFn = (node, serialize) => {
   let res: ITypstData = initTypstData();

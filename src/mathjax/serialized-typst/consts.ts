@@ -79,6 +79,9 @@ export const RIGHT_ANGLE_OLD = '\u232A';       // 〉 (deprecated Unicode form)
 export const INTEGRAL_SIGN = '\u222B';         // ∫
 export const MIDLINE_ELLIPSIS = '\u22EF';      // ⋯
 
+/** Maximum tree depth for shallow walks (accent detection, phantom check, etc.) */
+export const SHALLOW_TREE_MAX_DEPTH = 5;
+
 export const OPEN_BRACKETS: Record<string, string> = {
   '(': ')', '[': ']', '{': '}',
 };

@@ -28,5 +28,7 @@ export declare const getSiblingIndex: (node: MathNode) => number;
 export declare const getChildText: (node: MathNode) => string;
 /** Concatenate text content of all child nodes. */
 export declare const getNodeText: (node: MathNode) => string;
+/** Get typed attributes from a node. The single `as T` cast localises the any boundary. */
+export declare const getAttrs: <T extends object>(node: MathNode) => T;
 /** Serialize all children of a node by visiting each one and concatenating the results. */
 export declare const handleAll: HandlerFn;

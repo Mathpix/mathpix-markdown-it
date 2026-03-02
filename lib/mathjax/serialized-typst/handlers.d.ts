@@ -1,2 +1,2 @@
-import { HandlerFn } from "./types";
+import { HandlerFn } from './types';
 export declare const handle: HandlerFn;
