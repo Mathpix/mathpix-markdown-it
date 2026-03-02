@@ -1,5 +1,8 @@
 import { TEXCLASS } from "mathjax-full/js/core/MmlTree/MmlNode";
-import { ITypstData, HandlerFn, HandlerKind, MathNode } from "./types";
+import {
+  ITypstData, HandlerFn, HandlerKind, MathNode,
+  FontAttrs, FracAttrs, MoAttrs, SpaceAttrs, PaddedAttrs, EncloseAttrs, StyleAttrs,
+} from "./types";
 import {
   RE_NBSP, RE_WORD_DOT_END, RE_WORD_DOT_START,
   RE_WORD_START, RE_OP_WRAPPER,
@@ -126,10 +129,9 @@ const MSPACE_WIDTH_MAP: Record<string, string> = {
   '-0.167em': '',
 };
 
-/** Get all attributes from a node. Return type matches MathJax's PropertyList. */
-const getAttributes = (node: MathNode): Record<string, any> => {
-  return node.attributes.getAllAttributes();
-};
+/** Get typed attributes from a node. The single `as T` cast localises the any boundary. */
+const getAttrs = <T extends object>(node: MathNode): T =>
+  node.attributes.getAllAttributes() as T;
 
 /** Extract the primary Typst symbol text from a node (mi/mo).
  *  Gets the first child's text and maps it through findTypstSymbol. */
@@ -193,8 +195,8 @@ const mi: HandlerFn = (node, _serialize) => {
   if (!value) {
     return res;
   }
-  const atr = getAttributes(node);
-  const mathvariant: string = atr?.mathvariant || '';
+  const atr = getAttrs<FontAttrs>(node);
+  const mathvariant = atr.mathvariant || '';
   const isKnownSymbol = typstSymbolMap.has(value);
   const isKnownOperator = TYPST_MATH_OPERATORS.has(value);
   let typstValue: string = findTypstSymbol(value);
@@ -305,8 +307,8 @@ const mo: HandlerFn = (node, _serialize) => {
 const mn: HandlerFn = (node, _serialize) => {
   let res: ITypstData = initTypstData();
   const value = getNodeText(node);
-  const atr = getAttributes(node);
-  const mathvariant: string = atr?.mathvariant || '';
+  const atr = getAttrs<FontAttrs>(node);
+  const mathvariant = atr.mathvariant || '';
   if (mathvariant && mathvariant !== 'normal') {
     const fontFn = typstFontMap.get(mathvariant);
     if (fontFn) {
@@ -337,8 +339,8 @@ const mtext: HandlerFn = (node, _serialize) => {
     return res;
   }
   let textContent = `"${value.replace(/"/g, '\\"')}"`;
-  const atr = getAttributes(node);
-  const mathvariant: string = atr?.mathvariant || '';
+  const atr = getAttrs<FontAttrs>(node);
+  const mathvariant = atr.mathvariant || '';
   if (mathvariant && mathvariant !== 'normal') {
     const fontFn = typstFontMap.get(mathvariant);
     if (fontFn) {
@@ -358,8 +360,8 @@ const mfrac: HandlerFn = (node, serialize) => {
   const num = typstPlaceholder(escapeContentSeparators(dataFirst.typst.trim()));
   const den = typstPlaceholder(escapeContentSeparators(dataSecond.typst.trim()));
   // Check for linethickness=0 which indicates \binom (\choose)
-  const atr = getAttributes(node);
-  if (atr && (atr.linethickness === '0' || atr.linethickness === 0)) {
+  const atr = getAttrs<FracAttrs>(node);
+  if (atr.linethickness === '0' || atr.linethickness === 0) {
     res = addToTypstData(res, { typst: `binom(${num}, ${den})` });
   } else {
     res = addToTypstData(res, { typst: `frac(${num}, ${den})` });
@@ -515,8 +517,8 @@ const mroot: HandlerFn = (node, serialize) => {
 const getMovablelimits = (node: MathNode): boolean | undefined => {
   if (!node || node.kind !== 'mo') return undefined;
   try {
-    const atr = getAttributes(node);
-    return atr?.movablelimits;
+    const atr = getAttrs<MoAttrs>(node);
+    return atr.movablelimits;
   } catch (e) {
     return undefined;
   }
@@ -540,8 +542,8 @@ const isStretchyBase = (baseTrimmed: string, firstChild: MathNode): boolean => {
   }
   if (moNode?.kind !== 'mo') return false;
   try {
-    const atr = getAttributes(moNode);
-    return atr?.stretchy === true;
+    const atr = getAttrs<MoAttrs>(moNode);
+    return atr.stretchy === true;
   } catch (e) { return false; }
 };
 
@@ -793,11 +795,11 @@ const mmultiscripts: HandlerFn = (node, serialize) => {
 
 const mspace: HandlerFn = (node, _serialize) => {
   let res: ITypstData = initTypstData();
-  const atr = getAttributes(node);
-  if (!atr || !atr.width) {
+  const atr = getAttrs<SpaceAttrs>(node);
+  if (!atr.width) {
     return res;
   }
-  const width: string = atr.width.toString();
+  const width = atr.width.toString();
   const mapped = MSPACE_WIDTH_MAP[width];
   if (mapped !== undefined) {
     if (mapped) res = addToTypstData(res, { typst: mapped });
@@ -918,8 +920,8 @@ const mrow: HandlerFn = (node, serialize) => {
       const middle = node.childNodes[1];
       const last = node.childNodes[2];
       if (middle.kind === 'mfrac') {
-        const midAtr = getAttributes(middle);
-        if (midAtr && (midAtr.linethickness === '0' || midAtr.linethickness === 0)
+        const midAtr = getAttrs<FracAttrs>(middle);
+        if ((midAtr.linethickness === '0' || midAtr.linethickness === 0)
           && first.texClass === TEXCLASS.OPEN
           && last.texClass === TEXCLASS.CLOSE) {
           const data: ITypstData = serialize.visitNode(middle, '');
@@ -985,17 +987,17 @@ const hasScriptAncestor = (node: MathNode): boolean => {
 
 const mpadded: HandlerFn = (node, serialize) => {
   let res: ITypstData = initTypstData();
-  const atr = getAttributes(node);
+  const atr = getAttrs<PaddedAttrs>(node);
   // mhchem alignment phantom: mpadded width=0 or height=0 containing mphantom
   // inside msub/msup/msubsup — zero-size alignment box, emit empty string.
   // Only skip inside script ancestors; standalone \hphantom/\vphantom must still produce #hide().
-  if ((atr?.width === 0 || atr?.height === 0) && hasPhantomChild(node) && hasScriptAncestor(node)) {
+  if ((atr.width === 0 || atr.height === 0) && hasPhantomChild(node) && hasScriptAncestor(node)) {
     return res;
   }
   const data: ITypstData = handleAll(node, serialize);
   const content = data.typst.trim();
   // Handle mathbackground attribute (\colorbox{color}{...})
-  const rawBg: string = atr?.mathbackground || '';
+  const rawBg = atr.mathbackground || '';
   const mathbg: string = rawBg && rawBg !== MATHJAX_INHERIT_SENTINEL ? rawBg : '';
   if (mathbg && content) {
     const fillValue = mathbg.startsWith('#')
@@ -1023,8 +1025,8 @@ const mphantom: HandlerFn = (node, serialize) => {
 
 const menclose: HandlerFn = (node, serialize) => {
   let res: ITypstData = initTypstData();
-  const atr = getAttributes(node);
-  const notation: string = atr?.notation?.toString() || '';
+  const atr = getAttrs<EncloseAttrs>(node);
+  const notation = atr.notation?.toString() || '';
   const data: ITypstData = handleAll(node, serialize);
   const content = typstPlaceholder(data.typst.trim());
   if (notation.includes('box')) {
@@ -1117,8 +1119,8 @@ const mstyle: HandlerFn = (node, serialize) => {
   if (isOperatorInternalSpacing(node)) {
     return res;
   }
-  const atr = getAttributes(node);
-  const rawColor: string = atr?.mathcolor || '';
+  const atr = getAttrs<StyleAttrs>(node);
+  const rawColor = atr.mathcolor || '';
   const mathcolor: string = rawColor && rawColor !== MATHJAX_INHERIT_SENTINEL ? rawColor : '';
   const data: ITypstData = handleAll(node, serialize);
   if (mathcolor && data.typst.trim()) {

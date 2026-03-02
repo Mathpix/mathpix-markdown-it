@@ -26,6 +26,21 @@ export type HandlerKind =
   | 'mrow' | 'mpadded' | 'mphantom' | 'menclose' | 'mstyle'
   | 'mtable' | 'mtr';
 
+/** Attributes for nodes with font styling (mi, mn, mtext). */
+export interface FontAttrs { mathvariant?: string; }
+/** Attributes for mfrac (also used for nested mfrac detection in mrow). */
+export interface FracAttrs { linethickness?: string | number; }
+/** Attributes for mo (operator behavior). */
+export interface MoAttrs { movablelimits?: boolean; stretchy?: boolean; }
+/** Attributes for mspace (spacing). */
+export interface SpaceAttrs { width?: string | number; }
+/** Attributes for mpadded (padding / colorbox). */
+export interface PaddedAttrs { width?: string | number; height?: string | number; mathbackground?: string; }
+/** Attributes for menclose (notation). */
+export interface EncloseAttrs { notation?: string; }
+/** Attributes for mstyle (color). */
+export interface StyleAttrs { mathcolor?: string; }
+
 export interface ITypstData {
   typst: string;
   /** Inline-safe variant: same as typst when no block wrappers are used,
