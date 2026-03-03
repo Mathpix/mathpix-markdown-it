@@ -88,7 +88,14 @@ export const mrow: HandlerFn = (node, serialize) => {
   const isLeftRight = (hasOpen || hasClose)
     && getProp<number>(node, 'texClass') === TEXCLASS.INNER;
   // If this mrow wraps a matrix, let mtable handle the delimiters
-  const hasTableChild = node.childNodes.some(child => child.kind === 'mtable');
+  const hasTableChild = node.childNodes.some(child => {
+    if (child.kind === 'mtable') return true;
+    // MathJax often wraps mtable in an inferred mrow
+    if (child.isInferred && child.childNodes) {
+      return child.childNodes.some(c => c.kind === 'mtable');
+    }
+    return false;
+  });
   if (isLeftRight && !hasTableChild) {
     // Serialize inner children, skipping the delimiter mo nodes
     // (delimiters are reconstructed from the open/close properties)
@@ -277,12 +284,12 @@ export const menclose: HandlerFn = (node, serialize) => {
     // \cancel uses updiagonalstrike (lower-left to upper-right) → Typst cancel() default
     // \bcancel uses downdiagonalstrike (upper-left to lower-right) → Typst cancel(inverted: true)
     if (notation.includes('downdiagonalstrike') && !notation.includes('updiagonalstrike')) {
-      res = addToTypstData(res, { typst: `cancel(inverted: #true, ${escapeContentSeparators(content)})` });
+      res = addToTypstData(res, { typst: `cancel(inverted: #true, ${escapeContentSeparators(escapeUnbalancedParens(content))})` });
     } else {
-      res = addToTypstData(res, { typst: `cancel(${escapeContentSeparators(content)})` });
+      res = addToTypstData(res, { typst: `cancel(${escapeContentSeparators(escapeUnbalancedParens(content))})` });
     }
   } else if (notation.includes('horizontalstrike')) {
-    res = addToTypstData(res, { typst: `cancel(${escapeContentSeparators(content)})` });
+    res = addToTypstData(res, { typst: `cancel(${escapeContentSeparators(escapeUnbalancedParens(content))})` });
   } else if (notation.includes('longdiv')) {
     // \longdiv / \enclose{longdiv} → overline(")" content)
     res = addToTypstData(res, { typst: `overline(")"${escapeContentSeparators(escapeUnbalancedParens(content))})` });
@@ -320,9 +327,22 @@ export const mstyle: HandlerFn = (node, serialize) => {
   const atr = getAttrs<StyleAttrs>(node);
   const rawColor = atr.mathcolor || '';
   const mathcolor: string = rawColor && rawColor !== MATHJAX_INHERIT_SENTINEL ? rawColor : '';
+  const rawBg = atr.mathbackground || '';
+  const mathbg: string = rawBg && rawBg !== MATHJAX_INHERIT_SENTINEL ? rawBg : '';
   const data: ITypstData = handleAll(node, serialize);
-  if (mathcolor && data.typst.trim()) {
-    res = addToTypstData(res, { typst: wrapWithColor(data.typst.trim(), mathcolor) });
+  const content = data.typst.trim();
+  // Handle mathbackground (same as mpadded colorbox)
+  if (mathbg && content) {
+    const fillValue = mathbg.startsWith('#') ? `rgb("${mathbg}")` : mathbg;
+    let typst = `#highlight(fill: ${fillValue})[$${content}$]`;
+    if (mathcolor) {
+      typst = wrapWithColor(typst, mathcolor);
+    }
+    res = addToTypstData(res, { typst, typst_inline: content });
+    return res;
+  }
+  if (mathcolor && content) {
+    res = addToTypstData(res, { typst: wrapWithColor(content, mathcolor) });
     return res;
   }
   return data;

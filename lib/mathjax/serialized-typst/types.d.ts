@@ -41,9 +41,10 @@ export interface PaddedAttrs {
 export interface EncloseAttrs {
     notation?: string;
 }
-/** Attributes for mstyle (color). */
+/** Attributes for mstyle (color, background). */
 export interface StyleAttrs {
     mathcolor?: string;
+    mathbackground?: string;
 }
 export interface ITypstData {
     typst: string;
