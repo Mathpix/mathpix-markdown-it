@@ -20,9 +20,8 @@ const PRIME_SHORTHANDS: ReadonlyMap<string, string> = new Map([
 ]);
 
 // Regex to detect overbrace/overbracket/underbrace/underbracket as outermost call
-const BRACE_ANNOTATION_RE = /^(overbrace|overbracket|underbrace|underbracket)\((.+)\)$/s;
+const BRACE_ANNOTATION_RE = /^(overbrace|overbracket|underbrace|underbracket)\(([\s\S]+?)\)$/;
 const RE_SPECIAL_FN_CALL = /^(overbrace|underbrace|overline|underline|op)\(/;
-const RE_TRAILING_PAREN = /\)$/;
 
 // Operators that Typst places below/above in display mode by default.
 // Used to detect \nolimits (when these appear in msubsup/msub/msup instead of munderover).
@@ -71,7 +70,7 @@ const TYPST_ACCENT_SHORTHANDS: ReadonlySet<string> = new Set([
 
 /** Append ", limits: #true" inside an op() wrapper: op("name") → op("name", limits: #true) */
 const addLimitsParam = (opExpr: string): string =>
-  opExpr.replace(RE_TRAILING_PAREN, ', limits: #true)');
+  opExpr.endsWith(')') ? `${opExpr.slice(0, -1)}, limits: #true)` : opExpr;
 
 /** Match a brace annotation (overbrace/underbrace/etc.) and return it with annotation as second argument.
  *  Returns null if baseTrimmed doesn't match any of the specified kinds. */
@@ -82,7 +81,7 @@ const matchBraceAnnotation = (
   const m = BRACE_ANNOTATION_RE.exec(baseTrimmed);
   const kind = m?.[1] as typeof kinds[number] | undefined;
   if (!kind || !kinds.includes(kind)) return null;
-  const base = m[2];
+  const base = typstPlaceholder(escapeContentSeparators(m[2]));
   const ann = typstPlaceholder(escapeContentSeparators(annotation));
   return { typst: `${kind}(${base}, ${ann})` };
 };
@@ -106,7 +105,7 @@ const isCustomOp = (baseTrimmed: string): boolean =>
  *  Walks into firstChild to find the inner mo and check its stretchy attribute. */
 const isStretchyBase = (baseTrimmed: string, firstChild: MathNode): boolean => {
   if (!STRETCH_BASE_SYMBOLS.has(baseTrimmed)) return false;
-  let moNode: MathNode = firstChild;
+  let moNode = firstChild;
   for (let i = 0; i < SHALLOW_TREE_MAX_DEPTH && moNode && moNode.kind !== 'mo'; i++) {
     if (moNode.childNodes?.length === 1) {
       moNode = moNode.childNodes[0];
@@ -134,7 +133,7 @@ const isSpecialFnCall = (baseTrimmed: string): boolean =>
 /** Build limit-placement base, returns different block/inline bases for movablelimits.
  *  baseTrimmed is the raw trimmed value; empty bases get placeholder '""' inside wrappers. */
 const buildLimitBase = (firstChild: MathNode | null, baseTrimmed: string, base: string): ITypstData => {
-  const basePlaceholder = typstPlaceholder(baseTrimmed);
+  const baseEscaped = escapeContentSeparators(typstPlaceholder(baseTrimmed));
   const movablelimits = firstChild ? getMovablelimits(firstChild) : undefined;
   const wrapper = firstChild && isStretchyBase(baseTrimmed, firstChild) ? 'stretch' : 'limits';
   if (movablelimits === true) {
@@ -144,9 +143,9 @@ const buildLimitBase = (firstChild: MathNode | null, baseTrimmed: string, base: 
     if (isNativeDisplayLimitOp(baseTrimmed)) {
       return { typst: base };
     }
-    return { typst: `${wrapper}(${escapeContentSeparators(basePlaceholder)})`, typst_inline: base };
+    return { typst: `${wrapper}(${baseEscaped})`, typst_inline: base };
   } else if (movablelimits === false) {
-    return { typst: `${wrapper}(${escapeContentSeparators(basePlaceholder)})` };
+    return { typst: `${wrapper}(${baseEscaped})` };
   } else {
     if (isCustomOp(baseTrimmed) && firstChild?.texClass === TEXCLASS.OP) {
       if (firstChild?.kind === 'TeXAtom') {
@@ -157,7 +156,7 @@ const buildLimitBase = (firstChild: MathNode | null, baseTrimmed: string, base: 
     if (isNativeDisplayLimitOp(baseTrimmed) || isSpecialFnCall(baseTrimmed)) {
       return { typst: base };
     }
-    return { typst: `${wrapper}(${escapeContentSeparators(basePlaceholder)})` };
+    return { typst: `${wrapper}(${baseEscaped})` };
   }
 };
 
@@ -499,13 +498,14 @@ export const mmultiscripts: HandlerFn = (node, serialize) => {
     }
   } else {
     // Has prescripts — use attach(base, tl:, bl:, tr:, br:)
+    const esc = (s: string): string => typstPlaceholder(escapeContentSeparators(s));
     const parts: string[] = [];
-    if (lastPreSup) parts.push(`tl: ${lastPreSup}`);
-    if (lastPreSub) parts.push(`bl: ${lastPreSub}`);
-    if (lastPostSup) parts.push(`tr: ${lastPostSup}`);
-    if (lastPostSub) parts.push(`br: ${lastPostSub}`);
+    if (lastPreSup) parts.push(`tl: ${esc(lastPreSup)}`);
+    if (lastPreSub) parts.push(`bl: ${esc(lastPreSub)}`);
+    if (lastPostSup) parts.push(`tr: ${esc(lastPostSup)}`);
+    if (lastPostSub) parts.push(`br: ${esc(lastPostSub)}`);
     res = addToTypstData(res, {
-      typst: `attach(${escapeContentSeparators(baseTrimmed)}, ${parts.join(', ')})`
+      typst: `attach(${esc(baseTrimmed)}, ${parts.join(', ')})`
     });
   }
   return res;
