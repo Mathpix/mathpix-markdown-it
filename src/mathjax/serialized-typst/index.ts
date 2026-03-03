@@ -28,11 +28,13 @@ const BARE_DELIM_PAIRS: Readonly<Record<string, { close: string; typstOpen: stri
   [LEFT_ANGLE_OLD]: { close: RIGHT_ANGLE_OLD,  typstOpen: 'lr(chevron.l ',  typstClose: ' chevron.r)' },
 };
 
+interface BigDelimInfo { delim: string; size: string; isOpen: boolean }
+
 // Extract big delimiter info from a TeXAtom node wrapping a sized mo.
 // The TeXAtom itself may have texClass=0 (ORD); the OPEN/CLOSE class
 // is on the inner inferredMrow or mo node.
 // Returns { delim, size, isOpen } if found, or null.
-const getBigDelimInfo = (node: MathNode): { delim: string, size: string, isOpen: boolean } | null => {
+const getBigDelimInfo = (node: MathNode): BigDelimInfo | null => {
   try {
     if (node.kind !== 'TeXAtom') return null;
     // TeXAtom > inferredMrow > mo(minsize/maxsize)
@@ -117,6 +119,25 @@ const serializeRange = (
   return content;
 };
 
+/** Serialize and append sub/sup scripts from a script node (msub, msup, msubsup). */
+const appendScripts = (
+  base: string, scriptNode: MathNode, space: string, serialize: ITypstSerializer
+): string => {
+  let result = base;
+  const kind = scriptNode.kind;
+  if ((kind === 'msub' || kind === 'msubsup') && scriptNode.childNodes[1]) {
+    const sub = serialize.visitNode(scriptNode.childNodes[1], space).typst.trim();
+    if (sub) result += formatScript('_', sub);
+  }
+  const supNode = kind === 'msup' ? scriptNode.childNodes[1]
+    : kind === 'msubsup' ? scriptNode.childNodes[2] : null;
+  if (supNode) {
+    const sup = serialize.visitNode(supNode, space).typst.trim();
+    if (sup) result += formatScript('^', sup);
+  }
+  return result;
+};
+
 /** Big delimiter pattern: TeXAtom(OPEN) ... TeXAtom(CLOSE) with sized mo (\big, \Big, etc.) */
 const tryBigDelimiterPattern = (
   node: MathNode, j: number, space: string, serialize: ITypstSerializer
@@ -124,18 +145,19 @@ const tryBigDelimiterPattern = (
   const openInfo = getBigDelimInfo(node.childNodes[j]);
   if (!openInfo || !openInfo.isOpen) return null;
   let closeIdx = -1;
+  let closeInfo: BigDelimInfo | null = null;
   for (let k = j + 1; k < node.childNodes.length; k++) {
-    const closeCandidate = getBigDelimInfo(node.childNodes[k]);
-    if (closeCandidate && !closeCandidate.isOpen) {
+    const candidate = getBigDelimInfo(node.childNodes[k]);
+    if (candidate && !candidate.isOpen) {
       closeIdx = k;
+      closeInfo = candidate;
       break;
     }
   }
-  if (closeIdx < 0) return null;
-  const closeInfo = getBigDelimInfo(node.childNodes[closeIdx]);
+  if (closeIdx < 0 || !closeInfo) return null;
   const content = serializeRange(node, j + 1, closeIdx, space, serialize);
   const openDelim = findTypstSymbol(openInfo.delim);
-  const closeDelim = findTypstSymbol(closeInfo?.delim || ')');
+  const closeDelim = findTypstSymbol(closeInfo.delim);
   return {
     typst: `lr(size: #${openInfo.size}, ${openDelim} ${content.trim()} ${closeDelim})`,
     nextJ: closeIdx + 1,
@@ -148,7 +170,7 @@ const tryBareDelimiterPattern = (
   node: MathNode, j: number, space: string, serialize: ITypstSerializer
 ): PatternResult | null => {
   const delimChar = getDelimiterChar(node.childNodes[j]);
-  const delimPair = delimChar ? BARE_DELIM_PAIRS[delimChar] : null;
+  const delimPair = delimChar ? BARE_DELIM_PAIRS[delimChar] : undefined;
   if (!delimPair) return null;
   // For symmetric delimiters, skip inside TeXAtom groups
   if (delimChar === delimPair.close && node.parent?.kind === 'TeXAtom') return null;
@@ -171,19 +193,7 @@ const tryBareDelimiterPattern = (
   // When the closing delimiter is inside a script node (e.g. ‖_2),
   // extract and append the script parts to the delimited expression.
   if (closeIsScripted) {
-    const scriptNode = node.childNodes[closeIdx];
-    if (scriptNode.kind === 'msubsup') {
-      const sub = scriptNode.childNodes[1] ? serialize.visitNode(scriptNode.childNodes[1], '').typst.trim() : '';
-      const sup = scriptNode.childNodes[2] ? serialize.visitNode(scriptNode.childNodes[2], '').typst.trim() : '';
-      if (sub) delimExpr += formatScript('_', sub);
-      if (sup) delimExpr += formatScript('^', sup);
-    } else if (scriptNode.kind === 'msub') {
-      const sub = scriptNode.childNodes[1] ? serialize.visitNode(scriptNode.childNodes[1], '').typst.trim() : '';
-      if (sub) delimExpr += formatScript('_', sub);
-    } else if (scriptNode.kind === 'msup') {
-      const sup = scriptNode.childNodes[1] ? serialize.visitNode(scriptNode.childNodes[1], '').typst.trim() : '';
-      if (sup) delimExpr += formatScript('^', sup);
-    }
+    delimExpr = appendScripts(delimExpr, node.childNodes[closeIdx], '', serialize);
   }
   return { typst: delimExpr, nextJ: closeIdx + 1 };
 };
@@ -209,19 +219,7 @@ const tryIdotsintPattern = (
   baseContent += part2.typst;
   if (needsTokenSeparator(baseContent, part3)) baseContent += ' ';
   baseContent += part3;
-  let typst = `lr(${baseContent.trim()})`;
-  // Add scripts from the scripted node
-  const subChild = next2.kind !== 'msup' ? next2.childNodes[1] : null;
-  const supChild = next2.kind === 'msubsup' ? next2.childNodes[2]
-                 : next2.kind === 'msup' ? next2.childNodes[1] : null;
-  if (subChild) {
-    const sub = serialize.visitNode(subChild, space).typst.trim();
-    if (sub) typst += formatScript('_', sub);
-  }
-  if (supChild) {
-    const sup = serialize.visitNode(supChild, space).typst.trim();
-    if (sup) typst += formatScript('^', sup);
-  }
+  const typst = appendScripts(`lr(${baseContent.trim()})`, next2, '', serialize);
   return { typst, nextJ: j + 3 };
 };
 
@@ -246,11 +244,8 @@ export interface ITypstVisitorOptions {
 }
 
 export class SerializedTypstVisitor extends MmlVisitor {
-  readonly options: ITypstVisitorOptions = {};
-
-  constructor(options?: ITypstVisitorOptions) {
+  constructor(public readonly options: ITypstVisitorOptions = {}) {
     super();
-    this.options = options || {};
   }
 
   public visitTree(node: MathNode): ITypstData {
@@ -259,14 +254,14 @@ export class SerializedTypstVisitor extends MmlVisitor {
 
   // Parent AbstractVisitor forces ...args: any[] signature
   public visitNode(node: MathNode, ...args: any[]): ITypstData {
-    let handler = this.nodeHandlers.get(node.kind) || this.visitDefault;
+    const handler = this.nodeHandlers.get(node.kind) || this.visitDefault;
     return handler.call(this, node, ...args);
   }
 
   public visitTextNode(node: TextNode, _space: string): ITypstData {
     let res: ITypstData = initTypstData();
     try {
-      const text: string = node.getText();
+      const text = node.getText();
       res = addToTypstData(res, { typst: text });
       return res;
     } catch (_e: unknown) {
@@ -281,9 +276,10 @@ export class SerializedTypstVisitor extends MmlVisitor {
   public visitInferredMrowNode(node: MathNode, space: string): ITypstData {
     let res: ITypstData = initTypstData();
     try {
+      const children = node.childNodes;
       let j = 0;
-      while (j < node.childNodes.length) {
-        const child = node.childNodes[j];
+      while (j < children.length) {
+        const child = children[j];
         // Pattern 1: Big delimiter (\big, \Big, \bigg, \Bigg)
         const bigDelim = tryBigDelimiterPattern(node, j, space, this);
         if (bigDelim) {
@@ -325,8 +321,8 @@ export class SerializedTypstVisitor extends MmlVisitor {
           }
           // Post-content: serialize remaining siblings after the mtable
           let postContent = '';
-          for (let k = j + 1; k < node.childNodes.length; k++) {
-            const postData: ITypstData = this.visitNode(node.childNodes[k], space);
+          for (let k = j + 1; k < children.length; k++) {
+            const postData = this.visitNode(children[k], space);
             if (needsTokenSeparator(postContent, postData.typst)) {
               postContent += ' ';
             }
@@ -336,7 +332,7 @@ export class SerializedTypstVisitor extends MmlVisitor {
             child.setProperty(DATA_POST_CONTENT, postContent.trim());
           }
           // Process the mtable itself
-          const data: ITypstData = this.visitNode(child, space);
+          const data = this.visitNode(child, space);
           if (needsTokenSeparator(res.typst, data.typst)) {
             addSpaceToTypstData(res);
           }
@@ -345,7 +341,7 @@ export class SerializedTypstVisitor extends MmlVisitor {
           break;
         }
         // Normal processing
-        const data: ITypstData = this.visitNode(child, space);
+        const data = this.visitNode(child, space);
         if (needsTokenSeparator(res.typst, data.typst)) {
           addSpaceToTypstData(res);
         }
@@ -358,12 +354,12 @@ export class SerializedTypstVisitor extends MmlVisitor {
     }
   }
 
-  public visitTeXAtomNode(node: MathNode, space: string): ITypstData {
+  public visitTeXAtomNode(node: MathNode, _space: string): ITypstData {
     let res: ITypstData = initTypstData();
     try {
-      const children: ITypstData = this.childNodeMml(node);
-      if (children.typst.trim()) {
-        res = addToTypstData(res, children);
+      const childData = this.childNodeMml(node);
+      if (childData.typst.trim()) {
+        res = addToTypstData(res, childData);
       }
       return res;
     } catch (_e: unknown) {
@@ -380,14 +376,6 @@ export class SerializedTypstVisitor extends MmlVisitor {
   }
 
   protected childNodeMml(node: MathNode): ITypstData {
-    const handleCh = handle.bind(this);
-    let res: ITypstData = initTypstData();
-    try {
-      const data: ITypstData = handleCh(node, this);
-      res = addToTypstData(res, data);
-      return res;
-    } catch (_e: unknown) {
-      return res;
-    }
+    return addToTypstData(initTypstData(), handle(node, this));
   }
 }
