@@ -1,6 +1,6 @@
 /** Non-breaking space U+00A0 (global replacement) */
 export declare const RE_NBSP: RegExp;
-/** Content-mode special characters: * _ ` @ # < (must be escaped in Typst [...]) */
+/** Content-mode special characters: * _ ` @ # < [ ] (must be escaped in Typst [...]) */
 export declare const RE_CONTENT_SPECIAL: RegExp;
 /** Word char or dot at end of string */
 export declare const RE_WORD_DOT_END: RegExp;

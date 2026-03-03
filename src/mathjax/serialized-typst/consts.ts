@@ -1,7 +1,7 @@
 /** Non-breaking space U+00A0 (global replacement) */
 export const RE_NBSP = /\u00A0/g;
-/** Content-mode special characters: * _ ` @ # < (must be escaped in Typst [...]) */
-export const RE_CONTENT_SPECIAL = /[*_`@#<]/g;
+/** Content-mode special characters: * _ ` @ # < [ ] (must be escaped in Typst [...]) */
+export const RE_CONTENT_SPECIAL = /[*_`@#<\[\]]/g;
 /** Word char or dot at end of string */
 export const RE_WORD_DOT_END = /[\w.]$/;
 /** Word char or dot at start of string */

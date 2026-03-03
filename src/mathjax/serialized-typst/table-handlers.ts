@@ -76,30 +76,38 @@ const serializeTagContent = (labelCell: MathNode, serialize: ITypstSerializer): 
 
 // Extract explicit \tag{...} from a condition cell's mtext content.
 // Returns the tag content (e.g. "3.12") or null if no \tag found.
+// When multiple \tag{} are present, the last one wins (LaTeX behavior).
+const RE_TAG_EXTRACT_G = new RegExp(
+  RE_TAG_EXTRACT.source,
+  RE_TAG_EXTRACT.flags.includes('g') ? RE_TAG_EXTRACT.flags : RE_TAG_EXTRACT.flags + 'g'
+);
+
 const extractTagFromConditionCell = (cell: MathNode): string | null => {
-  const walk = (n: MathNode): string | null => {
-    if (!n) return null;
+  let lastTag: string | null = null;
+  const walk = (n: MathNode): void => {
+    if (!n) return;
     if (n.kind === 'mtext') {
       const text = getChildText(n);
-      const match = text.match(RE_TAG_EXTRACT);
-      return match ? match[1] : null;
-    }
-    if (n.childNodes) {
-      for (const child of n.childNodes) {
-        const found = walk(child);
-        if (found) return found;
+      RE_TAG_EXTRACT_G.lastIndex = 0;
+      let m: RegExpExecArray | null;
+      while ((m = RE_TAG_EXTRACT_G.exec(text)) !== null) {
+        lastTag = m[1];
       }
+      return;
     }
-    return null;
+    n.childNodes?.forEach(walk);
   };
-  return walk(cell);
+  walk(cell);
+  return lastTag;
 };
 
-// Detect numcases/subnumcases pattern:
+// Detect numcases/subnumcases pattern (best-effort heuristic):
 // - First row is mlabeledtr with 3+ children (label + prefix + content [+ condition])
 //   3 children: empty prefix or no & separator → label + prefix_with_brace + content
 //   4 children: non-empty prefix with & separator → label + prefix + value + condition
 // - First row's cell[1] contains a visible '{' mo (inside mpadded, outside mphantom)
+// Note: '{' as a math symbol (e.g. \{x\}) in cell[1] could cause a false positive,
+// but this position is almost always the cases brace in labeled equation arrays.
 const isNumcasesTable = (node: MathNode): boolean => {
   if (!node.childNodes || node.childNodes.length === 0) return false;
   const firstRow = node.childNodes[0];
@@ -174,6 +182,7 @@ const buildNumcasesGrid = (node: MathNode, serialize: ITypstSerializer, countRow
       // Strip \tag{...} from condition column if tag was extracted from there
       if (j === mtrNode.childNodes.length - 1 && rowTagSources[i].source === 'condition') {
         trimmed = trimmed.replace(RE_TAG_STRIP, '');
+        trimmed = trimmed.replace(/\s{2,}/g, ' ');
         trimmed = trimmed.replace(/\s+"$/g, '"');
         trimmed = trimmed.trim();
       }
@@ -358,10 +367,10 @@ const buildMatrix = (
     matContent = rows.join('; ');
   }
   const columnlines = node.attributes.isSet('columnlines')
-    ? String(node.attributes.get('columnlines') || '').split(' ')
+    ? String(node.attributes.get('columnlines') || '').trim().split(/\s+/)
     : [];
   const rowlines = node.attributes.isSet('rowlines')
-    ? String(node.attributes.get('rowlines') || '').split(' ')
+    ? String(node.attributes.get('rowlines') || '').trim().split(/\s+/)
     : [];
   const frame = node.attributes.isSet('frame')
     ? String(node.attributes.get('frame') || '')
