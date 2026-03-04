@@ -140,13 +140,93 @@ Removed duplicate selectors in original code: `.tabular tr, .tabular tr` → `.t
 
 ---
 
+## Style system improvements
+
+### `buildStyles(opts: StyleBundleOpts)` — single style builder
+
+All 4 style assembly points (`loadMathJax`, `getMathpixStyleOnly`, `getMathpixStyle`, `getMathpixMarkdownStyles`) now delegate to a single `buildStyles()` method. Old methods remain as thin wrappers for backward compatibility.
+
+```typescript
+interface StyleBundleOpts {
+    setTextAlignJustify?: boolean;
+    useColors?: boolean;
+    maxWidth?: string;
+    scaleEquation?: boolean;
+    isPptx?: boolean;
+    resetBody?: boolean;
+    container?: boolean;
+    mathjax?: boolean;
+    code?: boolean;       // default: true
+    preview?: boolean;
+    toc?: boolean;
+    tocContainerName?: string;
+    menu?: boolean;
+}
+```
+
+Module composition per caller:
+
+| Module | loadMathJax | getMathpixStyleOnly | getMathpixStyle | getMathpixMarkdownStyles |
+|---|:---:|:---:|:---:|:---:|
+| resetBody | conditional | - | - | - |
+| container | - | - | + | + |
+| mathjax | - | + | + | + |
+| MathpixStyle | + | + | + | + |
+| code | + | + | + | - |
+| tabular | + | + | + | + |
+| lists | + | + | + | + |
+| preview | - | - | if stylePreview | - |
+| toc | + | - | if preview+toc | - |
+| menu+clipboard | + | + | if stylePreview | - |
+
+### `loadMathJax` DOM re-injection fix
+
+Previously, if `#Mathpix-styles` already existed in the DOM, `loadMathJax()` skipped style update entirely — even if parameters changed. Now it updates `innerHTML` of the existing element.
+
+### `useColors` propagation
+
+Added `useColors` parameter to `loadMathJax`, `getMathpixStyleOnly`, `getMathpixStyle` — passed through to all style functions. Previously hardcoded to `true`.
+
+### `codeStyles` conversion
+
+Converted from static string to function accepting `useColors` parameter. Code/pre background and base text color now respect `useColors`.
+
+### Bug fixes in `src/styles/index.ts`
+
+- Missing dot: `math-inline svg` → `.math-inline svg` in `@media print`
+- Missing dot: `svg math-block` → `svg .math-block`
+- Unscoped selectors: `h1, h2, ...` → `#setText > h1, #setText > h2, ...`
+- Missing template interpolation: `#{containerName}` → `#${containerName}` in TocStyle
+- Assignment expression: `scaleEquation = true` → `scaleEquation` in getMathpixMarkdownStyles
+- Dead code: removed empty `if (showToc) {}`
+
+### Types and formatting
+
+- Added explicit `: boolean` types to all style function parameters
+- Added `: string` return types to all style functions
+- Extracted shared `COLOR_CODE_BG = '#f8f8fa'` constant
+- Fixed formatting: trailing whitespace, double spaces, indent consistency
+
+### Snapshot tests
+
+Added `tests/_styles.js` with 46 tests:
+- 16 snapshot tests for individual style functions (all param variants)
+- 30 composition tests verifying assembly methods include correct modules
+
+---
+
 ## Files Changed
 
 | File | Change |
 |---|---|
-| `src/styles/styles-tabular.ts` | Boost specificity via `.table_tabular .tabular` prefix for `th`/`tr`/`td`/`td > p`; add defensive defaults; `div.figure_img img`; remove duplicate selectors |
-| `src/styles/styles-lists.ts` | Add `margin` to `ol.enumerate, ul.itemize`; add nested list reset; add `margin-bottom: 0` to list items |
-| `src/styles/index.ts` | Fix missing dot: `math-inline` → `.math-inline` in `@media print` |
+| `src/styles/styles-tabular.ts` | Boost specificity via `.table_tabular .tabular` prefix; add defensive defaults; `div.figure_img img`; types |
+| `src/styles/styles-lists.ts` | Add `margin` to `ol.enumerate, ul.itemize`; nested list reset; `margin-bottom: 0` to list items |
+| `src/styles/styles-code.ts` | Convert to function with `useColors` param; import `COLOR_CODE_BG` |
+| `src/styles/styles-container.ts` | Add explicit types |
+| `src/styles/index.ts` | Bug fixes; `COLOR_CODE_BG` constant; types; formatting |
+| `src/mathpix-markdown-model/index.ts` | `StyleBundleOpts` interface; `buildStyles()` method; `loadMathJax` DOM re-injection fix; `useColors` propagation; old methods as wrappers |
+| `tests/_styles.js` | New: 46 snapshot + composition tests |
+| `tests/_data/_styles/*.snap.css` | New: 16 snapshot files |
 
 ---
 
@@ -154,6 +234,7 @@ Removed duplicate selectors in original code: `.tabular tr, .tabular tr` → `.t
 
 - HTML output class names unchanged — no downstream breakage.
 - `#setText` / `#preview-content` CSS selectors unchanged.
+- Public API methods (`getMathpixStyle`, `getMathpixStyleOnly`, `getMathpixMarkdownStyles`) unchanged — same signatures, same output.
 - Inherited CSS properties (`font-family`, `color`, `line-height`) intentionally cascade from host into MMD content.
 - Hosts still need `:not(.tabular)`, `:not(.itemize)` etc. to apply their own styles to non-MMD elements — this is expected behavior, not a bug.
 
@@ -165,6 +246,13 @@ Removed duplicate selectors in original code: `.tabular tr, .tabular tr` → `.t
 - [x] Defensive styles added for figures (display, margin)
 - [x] Defensive styles added for lists (ul/ol margin, nested list margin reset, li margin-bottom)
 - [x] Duplicate selectors cleaned up
+- [x] `buildStyles(opts)` single builder with `StyleBundleOpts`
+- [x] `loadMathJax` DOM re-injection fix
+- [x] `useColors` propagated through all style functions
+- [x] `codeStyles` converted to function
+- [x] Pre-existing bugs fixed (missing dots, unscoped selectors, template interpolation, dead code)
+- [x] Types and formatting cleaned up
+- [x] Snapshot + composition tests added (46 tests)
 - [x] PPTX converter baseCss updated to override library list margins
-- [x] All existing tests pass
+- [x] All existing tests pass (3205)
 - [x] Status updated to Implemented

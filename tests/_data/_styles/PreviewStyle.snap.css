@@ -1,0 +1,19 @@
+
+  #preview {
+    font-family: 'CMU Serif', 'Georgia', Helvetica, Arial, sans-serif;
+    font-size: 17px;
+    visibility: visible;
+    word-break: break-word;
+    padding: 2.5em;
+    max-width: 800px;
+    margin: auto;
+    box-sizing: content-box;
+  }
+
+  #preview h1, #preview h2, #preview h3, #preview h4, #preview h5, #preview strong {
+    font-family: 'CMU Serif Bold', 'Georgia', Helvetica, Arial, sans-serif;
+  }
+
+  #preview i, #preview em {
+    font-family: 'CMU Serif Italic', 'Georgia', Helvetica, Arial, sans-serif;
+  }

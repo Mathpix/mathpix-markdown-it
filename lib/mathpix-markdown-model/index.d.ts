@@ -2,6 +2,21 @@ import { Property } from 'csstype';
 import { ISmilesOptions } from '../markdown/md-chemistry';
 import { IFontMetricsOptions } from "../markdown/common/text-dimentions";
 import { size, ISize } from "../markdown/common/counters";
+export interface StyleBundleOpts {
+    setTextAlignJustify?: boolean;
+    useColors?: boolean;
+    maxWidth?: string;
+    scaleEquation?: boolean;
+    isPptx?: boolean;
+    resetBody?: boolean;
+    container?: boolean;
+    mathjax?: boolean;
+    code?: boolean;
+    preview?: boolean;
+    toc?: boolean;
+    tocContainerName?: string;
+    menu?: boolean;
+}
 export interface optionsMathpixMarkdown {
     alignMathBlock?: Property.TextAlign;
     display?: Property.Display;
@@ -234,7 +249,8 @@ declare class MathpixMarkdown_Model {
     scrollPage: (parent: any, offsetTarget: any) => void;
     loadMathJax: (notScrolling?: boolean, setTextAlignJustify?: boolean, isResetBodyStyles?: boolean, maxWidth?: string, scaleEquation?: boolean, useColors?: boolean) => boolean;
     convertToHTML: (str: string, options?: TMarkdownItOptions) => string;
-    getMathjaxStyle: () => any;
+    getMathjaxStyle: () => string;
+    buildStyles: (opts?: StyleBundleOpts) => string;
     getMathpixStyleOnly: (scaleEquation?: boolean, useColors?: boolean) => string;
     getMathpixStyle: (stylePreview?: boolean, showToc?: boolean, tocContainerName?: string, scaleEquation?: boolean, isPptx?: boolean, useColors?: boolean) => string;
     getMathpixMarkdownStyles: (useColors?: boolean, scaleEquation?: boolean) => string;

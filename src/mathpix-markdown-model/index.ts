@@ -20,6 +20,24 @@ import { getDisableRuleTypes } from "../markdown/common/mmdRulesToDisable";
 import { fontMetrics, IFontMetricsOptions } from "../markdown/common/text-dimentions";
 import { resetSizeCounter, size, ISize } from "../markdown/common/counters";
 
+export interface StyleBundleOpts {
+    // MathpixStyle parameters
+    setTextAlignJustify?: boolean;
+    useColors?: boolean;
+    maxWidth?: string;
+    scaleEquation?: boolean;
+    isPptx?: boolean;
+    // Module toggles
+    resetBody?: boolean;
+    container?: boolean;
+    mathjax?: boolean;
+    code?: boolean;
+    preview?: boolean;
+    toc?: boolean;
+    tocContainerName?: string;
+    menu?: boolean;
+}
+
 export interface optionsMathpixMarkdown {
     alignMathBlock?: Property.TextAlign;
     display?: Property.Display;
@@ -432,24 +450,25 @@ class MathpixMarkdown_Model {
               document.head.appendChild(MathJaxStyle);
             }
 
-            const elStyle = document.getElementById('Mathpix-styles');
             if (!notScrolling) {
               window.addEventListener('click', this.handleClick, false);
             }
-            if (!elStyle) {
-                const style = document.createElement("style");
-                style.setAttribute("id", "Mathpix-styles");
-                let bodyStyles = isResetBodyStyles ? resetBodyStyles : '';
-                style.innerHTML = bodyStyles
-                  + MathpixStyle(setTextAlignJustify, useColors, maxWidth, scaleEquation)
-                  + codeStyles(useColors)
-                  + tabularStyles(useColors)
-                  + listsStyles
-                  + TocStyle("toc")
-                  + menuStyle()
-                  + clipboardCopyStyles()
-                ;
-                document.head.appendChild(style);
+
+            const newStyles = this.buildStyles({
+              setTextAlignJustify, useColors, maxWidth, scaleEquation,
+              resetBody: isResetBodyStyles,
+              toc: true,
+              menu: true,
+            });
+
+            const elStyle = document.getElementById('Mathpix-styles');
+            if (elStyle) {
+              elStyle.innerHTML = newStyles;
+            } else {
+              const style = document.createElement("style");
+              style.setAttribute("id", "Mathpix-styles");
+              style.innerHTML = newStyles;
+              document.head.appendChild(style);
             }
             return true;
         } catch (e) {
@@ -475,7 +494,7 @@ class MathpixMarkdown_Model {
       }
     };
 
-    getMathjaxStyle = () => {
+    getMathjaxStyle = (): string => {
       try {
         const MathJaxStyle: any = MathJax.Stylesheet();
         return MathJaxStyle.children[0] && MathJaxStyle.children[0].value
@@ -486,41 +505,64 @@ class MathpixMarkdown_Model {
       }
     };
 
+    buildStyles = (opts: StyleBundleOpts = {}): string => {
+      const {
+        setTextAlignJustify = false,
+        useColors = true,
+        maxWidth = '',
+        scaleEquation = true,
+        isPptx = false,
+        resetBody = false,
+        container = false,
+        mathjax = false,
+        code = true,
+        preview = false,
+        toc = false,
+        tocContainerName = 'toc',
+        menu = false,
+      } = opts;
+
+      let css = '';
+      if (resetBody)  css += resetBodyStyles;
+      if (container)  css += ContainerStyle(useColors);
+      if (mathjax)    css += this.getMathjaxStyle();
+      css += MathpixStyle(setTextAlignJustify, useColors, maxWidth, scaleEquation, isPptx);
+      if (code)       css += codeStyles(useColors);
+      css += tabularStyles(useColors);
+      css += listsStyles;
+      if (preview)    css += PreviewStyle;
+      if (toc)        css += TocStyle(tocContainerName);
+      if (menu)       { css += menuStyle(); css += clipboardCopyStyles(); }
+      return css;
+    };
+
     getMathpixStyleOnly = (scaleEquation: boolean = true, useColors: boolean = true): string => {
-      let style: string =  this.getMathjaxStyle()
-        + MathpixStyle(false, useColors, '', scaleEquation)
-        + codeStyles(useColors)
-        + tabularStyles(useColors)
-        + listsStyles
-        + menuStyle()
-        + clipboardCopyStyles();
-      return style;
+      return this.buildStyles({
+        useColors, scaleEquation,
+        mathjax: true,
+        menu: true,
+      });
     };
 
     getMathpixStyle = (stylePreview: boolean = false, showToc: boolean = false, tocContainerName: string = 'toc', scaleEquation: boolean = true, isPptx: boolean = false, useColors: boolean = true): string => {
-      let style: string = ContainerStyle(useColors)
-        + this.getMathjaxStyle()
-        + MathpixStyle(false, useColors, '', scaleEquation, isPptx)
-        + codeStyles(useColors)
-        + tabularStyles(useColors)
-        + listsStyles;
-      if (!stylePreview) {
-        return style;
-      }
-
-      return showToc
-          ? style + PreviewStyle + TocStyle(tocContainerName) + menuStyle() + clipboardCopyStyles()
-          : style + PreviewStyle + menuStyle() + clipboardCopyStyles();
+      return this.buildStyles({
+        useColors, scaleEquation, isPptx, tocContainerName,
+        container: true,
+        mathjax: true,
+        preview: stylePreview,
+        toc: stylePreview && showToc,
+        menu: stylePreview,
+      });
     };
 
     getMathpixMarkdownStyles = (useColors: boolean = true, scaleEquation: boolean = true): string => {
-      let style: string = ContainerStyle(useColors);
-      style += this.getMathjaxStyle();
-      style += MathpixStyle(false, useColors, '', scaleEquation);
       // codeStyles excluded — VSCode provides its own syntax highlighting
-      style += tabularStyles(useColors);
-      style += listsStyles;
-      return style;
+      return this.buildStyles({
+        useColors, scaleEquation,
+        container: true,
+        mathjax: true,
+        code: false,
+      });
     };
 
     getMathpixFontsStyle = () => {
