@@ -259,6 +259,7 @@ class MathpixMarkdown_Model {
     public disableRules: string[];
     public isCheckFormula?: boolean;
     public showTimeLog?: boolean;
+    private isClickHandlerBound: boolean = false;
 
     setOptions(disableRules: string[], isCheckFormula?: boolean, showTimeLog?: boolean){
         this.disableRules = disableRules;
@@ -328,7 +329,12 @@ class MathpixMarkdown_Model {
         : '';
 
       const styles = htmlWrapper.includeStyles
-        ? `<style>${this.getMathpixStyle(true)}</style>`
+        ? `<style>${this.buildStyles({
+            container: true,
+            mathjax: true,
+            preview: true,
+            menu: true,
+          })}</style>`
         : '';
       const fonts = htmlWrapper.includeFonts
         ? '<link rel="stylesheet" href="https://cdn.mathpix.com/fonts/cmu.css"/>'
@@ -442,6 +448,7 @@ class MathpixMarkdown_Model {
         }, 10);
     };
 
+    /** Browser runtime: injects SVG-styles + Mathpix-styles into DOM. Includes: core, code, tabular, lists, toc, menu. No container/mathjax (SVG injected separately). */
     loadMathJax = (notScrolling: boolean = false, setTextAlignJustify: boolean = false, isResetBodyStyles: boolean = false, maxWidth: string = '', scaleEquation: boolean = true, useColors: boolean = true): boolean => {
         try {
             const el = document.getElementById('SVG-styles');
@@ -450,8 +457,9 @@ class MathpixMarkdown_Model {
               document.head.appendChild(MathJaxStyle);
             }
 
-            if (!notScrolling) {
+            if (!notScrolling && !this.isClickHandlerBound) {
               window.addEventListener('click', this.handleClick, false);
+              this.isClickHandlerBound = true;
             }
 
             const newStyles = this.buildStyles({
@@ -463,7 +471,9 @@ class MathpixMarkdown_Model {
 
             const elStyle = document.getElementById('Mathpix-styles');
             if (elStyle) {
-              elStyle.innerHTML = newStyles;
+              if (elStyle.innerHTML !== newStyles) {
+                elStyle.innerHTML = newStyles;
+              }
             } else {
               const style = document.createElement("style");
               style.setAttribute("id", "Mathpix-styles");
@@ -505,6 +515,15 @@ class MathpixMarkdown_Model {
       }
     };
 
+    /**
+     * Single CSS builder. All style assembly methods delegate here.
+     *
+     * Canonical order:
+     *   resetBody → container → mathjax → MathpixStyle → code → tabular → lists → preview → toc → menu+clipboard
+     *
+     * Modules always included: MathpixStyle, tabularStyles, listsStyles.
+     * Modules toggled via opts: resetBody, container, mathjax, code (default: on), preview, toc, menu+clipboard.
+     */
     buildStyles = (opts: StyleBundleOpts = {}): string => {
       const {
         setTextAlignJustify = false,
@@ -536,6 +555,7 @@ class MathpixMarkdown_Model {
       return css;
     };
 
+    /** Styles for embedded widget (no container/preview). Includes: mathjax, core, code, tabular, lists, menu. */
     getMathpixStyleOnly = (scaleEquation: boolean = true, useColors: boolean = true): string => {
       return this.buildStyles({
         useColors, scaleEquation,
@@ -544,6 +564,7 @@ class MathpixMarkdown_Model {
       });
     };
 
+    /** Full page styles. Includes: container, mathjax, core, code, tabular, lists. Optionally: preview, toc, menu. */
     getMathpixStyle = (stylePreview: boolean = false, showToc: boolean = false, tocContainerName: string = 'toc', scaleEquation: boolean = true, isPptx: boolean = false, useColors: boolean = true): string => {
       return this.buildStyles({
         useColors, scaleEquation, isPptx, tocContainerName,
@@ -555,8 +576,8 @@ class MathpixMarkdown_Model {
       });
     };
 
+    /** VSCode markdown preview styles. Includes: container, mathjax, core, tabular, lists. No code (VSCode provides its own). */
     getMathpixMarkdownStyles = (useColors: boolean = true, scaleEquation: boolean = true): string => {
-      // codeStyles excluded — VSCode provides its own syntax highlighting
       return this.buildStyles({
         useColors, scaleEquation,
         container: true,
@@ -598,12 +619,14 @@ class MathpixMarkdown_Model {
         const disableRules = isDisableFancy ? this.disableFancyArrayDef : options ? options.disableRules || [] : [];
 
         if (showToc) {
-          const index = disableRules.indexOf('toc');
-          if (disableRules.indexOf('toc') === -1) {
-            disableRules.splice(index, 1);
+          const idx = disableRules.indexOf('toc');
+          if (idx !== -1) {
+            disableRules.splice(idx, 1);
           }
         } else {
-          disableRules.push('toc');
+          if (!disableRules.includes('toc')) {
+            disableRules.push('toc');
+          }
         }
         const disableRuleTypes: eMmdRuleType[] = renderOptions ? getDisableRuleTypes(renderOptions) : [];
         const markdownItOptions: TMarkdownItOptions = {

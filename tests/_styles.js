@@ -263,3 +263,187 @@ describe('Style assembly methods — composition:', () => {
     });
   });
 });
+
+// ─── buildStyles direct tests ────────────────────────────────────────
+
+const { menuStyle } = require('../lib/contex-menu/styles');
+const { clipboardCopyStyles } = require('../lib/copy-to-clipboard/clipboard-copy-styles');
+
+describe('buildStyles — direct option combinations:', () => {
+
+  it('defaults: MathpixStyle + code + tabular + lists only', () => {
+    const css = MM.buildStyles();
+    css.should.include(MathpixStyle());
+    css.should.include(codeStyles());
+    css.should.include(tabularStyles());
+    css.should.include(listsStyles);
+    css.should.not.include('html,body');          // no container
+    css.should.not.include(PreviewStyle);         // no preview
+    css.should.not.include(resetBodyStyles);      // no resetBody
+  });
+
+  it('resetBody: true adds resetBodyStyles', () => {
+    const css = MM.buildStyles({ resetBody: true });
+    css.should.include(resetBodyStyles);
+  });
+
+  it('container: true adds ContainerStyle', () => {
+    const css = MM.buildStyles({ container: true });
+    css.should.include(ContainerStyle());
+  });
+
+  it('container + useColors=false passes useColors to ContainerStyle', () => {
+    const css = MM.buildStyles({ container: true, useColors: false });
+    css.should.include(ContainerStyle(false));
+    css.should.not.include(ContainerStyle(true));
+  });
+
+  it('code: false excludes codeStyles', () => {
+    const css = MM.buildStyles({ code: false });
+    css.should.not.include('font-family: Inconsolata');
+    css.should.include(MathpixStyle());
+    css.should.include(tabularStyles());
+  });
+
+  it('preview: true adds PreviewStyle', () => {
+    const css = MM.buildStyles({ preview: true });
+    css.should.include(PreviewStyle);
+  });
+
+  it('toc: true adds TocStyle', () => {
+    const css = MM.buildStyles({ toc: true });
+    css.should.include(TocStyle('toc'));
+  });
+
+  it('toc: true with custom tocContainerName', () => {
+    const css = MM.buildStyles({ toc: true, tocContainerName: 'my-toc' });
+    css.should.include(TocStyle('my-toc'));
+    css.should.not.include('#toc {');
+  });
+
+  it('menu: true adds menuStyle + clipboardCopyStyles', () => {
+    const css = MM.buildStyles({ menu: true });
+    css.should.include(menuStyle());
+    css.should.include(clipboardCopyStyles());
+  });
+
+  it('menu: false excludes menu and clipboard', () => {
+    const css = MM.buildStyles();
+    css.should.not.include(menuStyle());
+  });
+
+  it('isPptx: true passes through to MathpixStyle', () => {
+    const css = MM.buildStyles({ isPptx: true });
+    css.should.include(MathpixStyle(false, true, '', true, true));
+  });
+
+  it('setTextAlignJustify: true passes through to MathpixStyle', () => {
+    const css = MM.buildStyles({ setTextAlignJustify: true });
+    css.should.include('text-align: justify;');
+  });
+
+  it('maxWidth passes through to MathpixStyle', () => {
+    const css = MM.buildStyles({ maxWidth: '800px' });
+    css.should.include('max-width:800px;');
+  });
+
+  // ── Canonical order ──
+
+  it('canonical order: container before MathpixStyle', () => {
+    const css = MM.buildStyles({ container: true });
+    const containerIdx = css.indexOf(ContainerStyle());
+    const mathpixIdx = css.indexOf(MathpixStyle());
+    containerIdx.should.be.below(mathpixIdx);
+  });
+
+  it('canonical order: MathpixStyle before codeStyles', () => {
+    const css = MM.buildStyles();
+    const mathpixIdx = css.indexOf(MathpixStyle());
+    const codeIdx = css.indexOf(codeStyles());
+    mathpixIdx.should.be.below(codeIdx);
+  });
+
+  it('canonical order: tabular before lists', () => {
+    const css = MM.buildStyles();
+    const tabularIdx = css.indexOf(tabularStyles());
+    const listsIdx = css.indexOf(listsStyles);
+    tabularIdx.should.be.below(listsIdx);
+  });
+
+  it('canonical order: lists before preview', () => {
+    const css = MM.buildStyles({ preview: true });
+    const listsIdx = css.indexOf(listsStyles);
+    const previewIdx = css.indexOf(PreviewStyle);
+    listsIdx.should.be.below(previewIdx);
+  });
+
+  it('canonical order: preview before toc', () => {
+    const css = MM.buildStyles({ preview: true, toc: true });
+    const previewIdx = css.indexOf(PreviewStyle);
+    const tocIdx = css.indexOf(TocStyle('toc'));
+    previewIdx.should.be.below(tocIdx);
+  });
+
+  // ── Full combos matching the 4 callers ──
+
+  it('loadMathJax combo: resetBody + core + code + tabular + lists + toc + menu', () => {
+    const css = MM.buildStyles({
+      resetBody: true,
+      toc: true,
+      menu: true,
+    });
+    css.should.include(resetBodyStyles);
+    css.should.include(MathpixStyle());
+    css.should.include(codeStyles());
+    css.should.include(tabularStyles());
+    css.should.include(listsStyles);
+    css.should.include(TocStyle('toc'));
+    css.should.include(menuStyle());
+    css.should.not.include(ContainerStyle());
+  });
+
+  it('getMathpixStyleOnly combo: mathjax + core + code + tabular + lists + menu', () => {
+    const css = MM.buildStyles({
+      mathjax: true,
+      menu: true,
+    });
+    css.should.include(MathpixStyle());
+    css.should.include(codeStyles());
+    css.should.include(tabularStyles());
+    css.should.include(listsStyles);
+    css.should.include(menuStyle());
+    css.should.not.include(ContainerStyle());
+    css.should.not.include(PreviewStyle);
+  });
+
+  it('getMathpixStyle(preview) combo: container + mathjax + core + code + tabular + lists + preview + menu', () => {
+    const css = MM.buildStyles({
+      container: true,
+      mathjax: true,
+      preview: true,
+      menu: true,
+    });
+    css.should.include(ContainerStyle());
+    css.should.include(MathpixStyle());
+    css.should.include(codeStyles());
+    css.should.include(tabularStyles());
+    css.should.include(listsStyles);
+    css.should.include(PreviewStyle);
+    css.should.include(menuStyle());
+  });
+
+  it('getMathpixMarkdownStyles combo: container + mathjax + core + tabular + lists, no code', () => {
+    const css = MM.buildStyles({
+      container: true,
+      mathjax: true,
+      code: false,
+    });
+    css.should.include(ContainerStyle());
+    css.should.include(MathpixStyle());
+    css.should.include(tabularStyles());
+    css.should.include(listsStyles);
+    css.should.not.include('font-family: Inconsolata');
+    css.should.not.include(PreviewStyle);
+    css.should.not.include(menuStyle());
+  });
+});

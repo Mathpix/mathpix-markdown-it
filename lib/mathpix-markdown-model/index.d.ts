@@ -223,6 +223,7 @@ declare class MathpixMarkdown_Model {
     disableRules: string[];
     isCheckFormula?: boolean;
     showTimeLog?: boolean;
+    private isClickHandlerBound;
     setOptions(disableRules: string[], isCheckFormula?: boolean, showTimeLog?: boolean): void;
     checkFormula: (mathString: string, showTimeLog?: boolean) => string;
     texReset: (n?: number) => void;
@@ -247,12 +248,25 @@ declare class MathpixMarkdown_Model {
     checkEquationNumber: (html: string) => string;
     handleClick: (e: any) => void;
     scrollPage: (parent: any, offsetTarget: any) => void;
+    /** Browser runtime: injects SVG-styles + Mathpix-styles into DOM. Includes: core, code, tabular, lists, toc, menu. No container/mathjax (SVG injected separately). */
     loadMathJax: (notScrolling?: boolean, setTextAlignJustify?: boolean, isResetBodyStyles?: boolean, maxWidth?: string, scaleEquation?: boolean, useColors?: boolean) => boolean;
     convertToHTML: (str: string, options?: TMarkdownItOptions) => string;
     getMathjaxStyle: () => string;
+    /**
+     * Single CSS builder. All style assembly methods delegate here.
+     *
+     * Canonical order:
+     *   resetBody → container → mathjax → MathpixStyle → code → tabular → lists → preview → toc → menu+clipboard
+     *
+     * Modules always included: MathpixStyle, tabularStyles, listsStyles.
+     * Modules toggled via opts: resetBody, container, mathjax, code (default: on), preview, toc, menu+clipboard.
+     */
     buildStyles: (opts?: StyleBundleOpts) => string;
+    /** Styles for embedded widget (no container/preview). Includes: mathjax, core, code, tabular, lists, menu. */
     getMathpixStyleOnly: (scaleEquation?: boolean, useColors?: boolean) => string;
+    /** Full page styles. Includes: container, mathjax, core, code, tabular, lists. Optionally: preview, toc, menu. */
     getMathpixStyle: (stylePreview?: boolean, showToc?: boolean, tocContainerName?: string, scaleEquation?: boolean, isPptx?: boolean, useColors?: boolean) => string;
+    /** VSCode markdown preview styles. Includes: container, mathjax, core, tabular, lists. No code (VSCode provides its own). */
     getMathpixMarkdownStyles: (useColors?: boolean, scaleEquation?: boolean) => string;
     getMathpixFontsStyle: () => string;
     render: (text: string, options?: optionsMathpixMarkdown) => string;
