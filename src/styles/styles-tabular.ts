@@ -1,45 +1,57 @@
 export const tabularStyles = (useColors = true) => `
-    .table_tabular table th,  .table_tabular table th {
+    .table_tabular {
+        overflow-x: auto;
+        padding: 0 2px 0.5em 2px;
+    }
+    .table_tabular .tabular, .tabular {
+        display: inline-table !important;
+        width: auto;
+        table-layout: auto;
+        border-collapse: collapse;
+        border-spacing: 0;
+        margin: 0;
+        font-size: inherit;
+        height: fit-content;
+    }
+    .table_tabular .tabular th {
         border: none !important;
         padding: 6px 13px;
+        background-color: transparent;
+        font-weight: bold;
     }
-      
-    .tabular tr, .tabular tr {
+    .table_tabular .tabular tr {
         border-top: none !important;
         border-bottom: none !important;
+        background-color: transparent;
     }
-    .tabular td, .tabular td {
+    .table_tabular .tabular td {
         border-style: none !important;
         ${useColors ? 'background-color: #fff;' : 'background-color: transparent;'}
         ${useColors ? 'border-color: #000 !important;' : 'border-color: currentColor !important;'}
         word-break: keep-all;
         padding: 0.1em 0.5em !important;
     }
-    .tabular {
-        display: inline-table !important;
-        height: fit-content;
-    }
-    .tabular td > p {
+    .table_tabular .tabular td > p {
         margin-bottom: 0;
         margin-top: 0;
     }
     .tabular td._empty {
-      height: 1.3em;
+        height: 1.3em;
     }
     .tabular td .f {
-      opacity: 0;
+        opacity: 0;
     }
-    
-    html[data-theme="dark"] .tabular tr, html[data-theme="dark"] .tabular td {
-      ${useColors ? 'background-color: #202226;' : 'background-color: transparent;'}
-      ${useColors ? 'border-color: #fff !important;' : 'border-color: currentColor !important;'}
-    }  
-    .table_tabular {
-        overflow-x: auto;
-        padding: 0 2px 0.5em 2px;
+    html[data-theme="dark"] .table_tabular .tabular tr,
+    html[data-theme="dark"] .table_tabular .tabular td {
+        ${useColors ? 'background-color: #202226;' : 'background-color: transparent;'}
+        ${useColors ? 'border-color: #fff !important;' : 'border-color: currentColor !important;'}
     }
     .figure_img {
-       margin-bottom: 0.5em;
-       overflow-x: auto;
+        margin-bottom: 0.5em;
+        overflow-x: auto;
+    }
+    div.figure_img img {
+        display: inline;
+        margin: 0;
     }
 `;

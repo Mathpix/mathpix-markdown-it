@@ -1,138 +1,142 @@
-# PR: Add `.mmd` wrapper class for CSS scoping
+# PR: Add defensive CSS defaults to MMD class selectors
 
-Status: Draft
+Status: Implemented
 Owner: @OlgaRedozubova
 
 ---
 
 ## Context
 
-MMD styles use `#setText` / `#preview-content` ID selectors for scoping, plus global class selectors (`.tabular`, `.figure_img`, `.enumerate`, `.itemize`, `.math-block`, etc.). When MMD content is embedded on a host page with its own CSS (e.g., `.docs-content table { width: 100% }`), the host styles override MMD class-based rules due to equal or higher specificity.
+MMD styles use two scoping mechanisms:
+1. **ID selectors** (`#setText h1`, `#preview-content table`) for generic HTML elements — specificity (1,0,1), already beats any host class-based CSS.
+2. **Class selectors** (`.tabular`, `.figure_img`, `.itemize`, `.enumerate`) for MMD-specific elements — these are effectively namespaced (unique to MMD), but lacked defensive defaults for properties commonly overridden by host CSS.
 
-This causes table/figure/list rendering conflicts on host pages. The only workaround is adding `:not(.tabular)`, `:not(.itemize)`, etc. on the host side — fragile and requires every host to replicate.
+When MMD content is embedded on a host page (e.g., `.docs-content table { width: 100% }`), the host styles override MMD class-based rules for properties that MMD didn't explicitly set. This caused tabular tables to stretch, figure alignment to break, and list spacing to change.
 
 ---
 
 ## Goal
 
-- Add `.mmd` as an additional CSS scoping class so MMD styles win over typical host CSS via higher specificity.
-- Allow host pages to use simple generic selectors (`.docs-content table { ... }`) without `:not()` exclusions.
-- No breaking changes: existing `#setText`/`#preview-content` selectors remain; `.mmd` is additive. HTML class names on rendered elements do not change.
+- Add defensive default styles to existing MMD class selectors so they resist common host CSS overrides.
+- No new wrapper elements, no CSS duplication, no breaking changes.
+- Hosts still need `:not(.tabular)` etc. for their OWN generic element styles — this is expected and unavoidable (the library cannot prevent a host from styling its own `<table>` elements).
 
 ---
 
 ## Non-Goals
 
-- Renaming CSS classes (`.tabular` → `.mmd-tabular`) — avoids breaking downstream consumers.
+- Adding a `.mmd` wrapper class (rejected: `#setText` already serves as wrapper; `.mmd` would duplicate CSS ~2× for no specificity gain on generic elements).
+- Renaming CSS classes `.tabular` → `.mmd-tabular` (rejected: these names are already unique to MMD; renaming is a breaking change with no real benefit).
 - Shadow DOM encapsulation.
-- Changing `ContainerStyle()` — global reset used only for standalone HTML pages, not injected by `loadMathJax()`.
+- Protecting generic HTML elements (`<h1>`, `<blockquote>`, `<pre>`, `<code>`) — these are already scoped via `#setText`/`#preview-content` ID selectors.
 
 ---
 
-## How It Works: Specificity
+## Why Not `.mmd` Wrapper?
 
-With `.mmd` as ancestor, all MMD selectors gain one extra class in specificity:
-
-| Host CSS selector | Spec | MMD selector (with `.mmd`) | Spec | Winner |
-|---|---|---|---|---|
-| `.docs-content table` | (0,1,1) | `.mmd .tabular` | (0,2,0) | **MMD** |
-| `.docs-content table th` | (0,1,2) | `.mmd .table_tabular table th` | (0,2,2) | **MMD** |
-| `.docs-content table td` | (0,1,2) | `.mmd .tabular td` | (0,2,1) | **MMD** |
-| `.docs-content img` | (0,1,1) | `.mmd .figure_img img` | (0,2,1) | **MMD** |
-| `.docs-content ul` | (0,1,1) | `.mmd ul.itemize` | (0,2,1) | **MMD** |
-| `.docs-content li` | (0,1,1) | `.mmd .itemize > li` | (0,2,1) | **MMD** |
-
-In all cases, 2 classes > 1 class — MMD wins regardless of element count.
+Considered and rejected for these reasons:
+1. `#setText` already provides ID-scoped wrapper — adding `.mmd` is redundant.
+2. `.mmd table` specificity (0,1,1) = `.docs-content table` (0,1,1) — no specificity gain for generic elements.
+3. Every CSS rule would need duplication (`.tabular, .mmd .tabular`), roughly doubling CSS payload.
+4. `markdownToHTML()` returns raw HTML without wrapper — consumers would need to manually add `<div class="mmd">`.
 
 ---
 
-## Current Behavior
+## Why Not Rename Classes?
 
-- Host CSS like `.docs-content table { width: 100% }` stretches MMD tabular tables.
-- Host `img { border-radius: 8px; margin: 16px 0 }` adds unwanted styling to `.figure_img` images.
-- Host `ul/ol { padding-left: 24px; list-style: disc }` overrides MMD list spacing/markers.
-- Host `li { margin-bottom: 4px }` adds extra spacing to MMD list items.
-- Host `table th { background; font-weight; text-align }` overrides MMD tabular headers.
-- Host pages must work around this with `:not()` selectors to exclude MMD elements.
+`.tabular`, `.figure_img`, `.itemize`, `.enumerate`, `.math-block` etc. are already effectively namespaced — no CSS framework uses these names. Renaming to `.mmd-tabular` would be a breaking change for downstream consumers who parse class names, with no practical benefit.
 
 ---
 
-## Desired Behavior
+## Existing Protection (no changes needed)
 
-- MMD tabular tables, figures, and lists render correctly regardless of host CSS, without the host needing `:not()` exclusions.
-- Existing rendering in `#setText` / `#preview-content` wrappers is unchanged.
-- All existing consumers of the library are unaffected.
+| Element | Protection | Mechanism |
+|---|---|---|
+| Generic `<h1>`–`<h6>`, `<table>`, `<blockquote>`, `<pre>`, `<code>` | `#setText`, `#preview-content` | ID specificity (1,0,1) |
+| `.tabular` display | `display: inline-table !important` | `!important` |
+| `.tabular td` borders, padding | `border-style: none !important`, `padding !important` | `!important` |
+| `.tabular tr` borders | `border-top/bottom: none !important` | `!important` |
+| `<td>` text-align | `style="text-align: ..."` | Inline style |
+| `<ul>/<ol>` list-style-type | `style="list-style-type: ..."` | Inline style |
+| `<blockquote>` margins, padding | `style="margin: ...; padding: ..."` | Inline style (forDocx) |
 
 ---
 
-## Approach
+## Changes: Defensive Defaults Added
 
-Add `.mmd` class to all MMD output wrappers. Duplicate all CSS rules with `.mmd` as ancestor selector, keeping originals for backward compatibility.
-
-### Style file changes
-
-For every `#setText`/`#preview-content` scoped rule, add `.mmd` as a third selector:
-```css
-#setText table, #preview-content table, .mmd table { ... }
-```
-
-For every unscoped rule, add `.mmd`-prefixed duplicate:
-```css
-.tabular, .mmd .tabular { display: inline-table !important; ... }
-```
-
-Files: `src/styles/index.ts`, `styles-tabular.ts`, `styles-lists.ts`, `styles-code.ts`, `halpers.ts`.
-
-### Defensive styles (new, `.mmd`-only)
-
-Explicit resets to protect MMD elements from common host CSS patterns:
+### `src/styles/styles-tabular.ts`
 
 ```css
 /* Prevent host "table { width:100%; table-layout:fixed }" */
-.mmd .tabular { width: auto; table-layout: auto; border-collapse: collapse; border-spacing: 0; }
+.table_tabular .tabular, .tabular {
+    width: auto;
+    table-layout: auto;
+    border-collapse: collapse;
+    border-spacing: 0;
+    margin: 0;
+    font-size: inherit;
+}
 
-/* Prevent host "table { margin; font-size }" */
-.mmd .table_tabular table { margin: 0; font-size: inherit; }
+/* Prevent host "th { background; font-weight:600 }" — (0,2,1) beats (0,1,2) */
+.table_tabular .tabular th {
+    background-color: transparent;
+    font-weight: bold;
+}
 
-/* Prevent host "th { background; font-weight:600; text-align:left }" */
-.mmd .table_tabular table th { background: transparent; font-weight: bold; text-align: center; }
+/* Prevent host "tr:nth-child(2n) { background }" — (0,2,1) beats (0,1,2) */
+.table_tabular .tabular tr {
+    background-color: transparent;
+}
 
-/* Prevent host "tr:nth-child(2n) { background }" from striping tabular rows */
-.mmd .tabular tr { background-color: transparent; }
+/* Prevent host "td { background; word-break }" — (0,2,1) beats (0,1,2) */
+.table_tabular .tabular td {
+    background-color: #fff;
+    word-break: keep-all;
+}
 
-/* Prevent host "img { display:block; margin:16px 0; border-radius:8px }" */
-.mmd .figure_img img { display: inline; margin: 0; border-radius: initial; border: none; box-shadow: none; }
+/* Prevent host "img { display:block; margin:16px 0 }" — (0,1,2) beats (0,1,1) */
+div.figure_img img {
+    display: inline;
+    margin: 0;
+}
+```
 
-/* Prevent host "ul { margin: 0 0 24px }" from adding unexpected spacing */
-.mmd ol.enumerate, .mmd ul.itemize { margin: 0 0 1em 0; }
+Note: `.table_tabular .tabular` prefix gives (0,2,x) specificity which beats `.docs-content table *` (0,1,x). `div.figure_img img` (0,1,2) beats `.docs-content img` (0,1,1). Bare `.tabular` kept as fallback for the table element itself.
 
-/* Reset margin on nested MMD lists */
-.mmd li > ol.enumerate, .mmd li > ul.itemize { margin: 0; }
+### `src/styles/styles-lists.ts`
+
+```css
+/* Prevent host "ul { margin: 0 0 24px }" */
+ol.enumerate, ul.itemize {
+    margin: 0 0 1em 0;
+}
+
+/* Reset nested list margin */
+li > ol.enumerate, li > ul.itemize {
+    margin: 0;
+}
 
 /* Prevent host "li { margin-bottom: 4px }" */
-.mmd .itemize > li, .mmd .li_enumerate, .mmd .li_itemize { margin-bottom: 0; }
+ul.itemize > li {
+    margin-bottom: 0;
+}
+.enumerate > .li_enumerate {
+    margin-bottom: 0;
+}
 ```
 
-Properties already protected by existing rules (no additional defense needed):
-- `.tabular { display: inline-table !important }`, `.tabular td { border-style: none !important; padding: ... !important }`, `.tabular tr { border-top/bottom: none !important }`
-- `<td>` text-align — inline `style=` attribute on elements
-- `<ul>/<ol>` list-style-type, padding — inline `style=` attribute on elements
+Note: `ul.itemize > li` specificity (0,1,2) beats `.docs-content li` (0,1,1). `.enumerate > .li_enumerate` specificity (0,2,0) also beats (0,1,1).
 
-### Wrapper changes
+### `src/styles/index.ts`
 
-- React component (`src/components/mathpix-markdown/index.tsx`): add `className="mmd"` to `#setText` div.
-- `render()` (`src/mathpix-markdown-model/index.ts`): add `class="mmd"` to `#setText` in HTML string.
-- `generateHtmlPage()` (`src/mathpix-markdown-model/html-page.ts`): add `class="mmd"` to `#preview-content`.
-
-### Documentation
-
-When using `markdownToHTML()` (which returns raw HTML without a wrapper), users should wrap the output in a `<div class="mmd">` container to get proper style isolation:
-
-```html
-<div class="mmd">
-  ${markdownToHTML(input, options)}
-</div>
+```css
+/* Bug fix: missing dot before math-inline in @media print */
+.math-block svg, .math-inline svg { margin-top: 1px; }
 ```
+
+### Also fixed: duplicate selectors
+
+Removed duplicate selectors in original code: `.tabular tr, .tabular tr` → `.tabular tr`, `.tabular td, .tabular td` → `.tabular td`, `.table_tabular table th, .table_tabular table th` → `.table_tabular table th`.
 
 ---
 
@@ -140,39 +144,27 @@ When using `markdownToHTML()` (which returns raw HTML without a wrapper), users 
 
 | File | Change |
 |---|---|
-| `src/styles/index.ts` | Add `.mmd` to all scoped rules, add `.mmd` ancestor to all unscoped rules |
-| `src/styles/styles-tabular.ts` | Add `.mmd` ancestor to all rules, add defensive table/figure resets |
-| `src/styles/styles-lists.ts` | Add `.mmd` ancestor to all rules, add defensive list item resets |
-| `src/styles/styles-code.ts` | Add `.mmd` to scoped rules, add `.mmd` ancestor to `.hljs-*` rules |
-| `src/styles/halpers.ts` | Add `.mmd` ancestor to unscoped rules |
-| `src/components/mathpix-markdown/index.tsx` | Add `className='mmd'` to `#setText` div |
-| `src/mathpix-markdown-model/index.ts` | Add `class="mmd"` to `#setText` in `render()` |
-| `src/mathpix-markdown-model/html-page.ts` | Add `class="mmd"` to `#preview-content` in `generateHtmlPage()` |
+| `src/styles/styles-tabular.ts` | Boost specificity via `.table_tabular .tabular` prefix for `th`/`tr`/`td`/`td > p`; add defensive defaults; `div.figure_img img`; remove duplicate selectors |
+| `src/styles/styles-lists.ts` | Add `margin` to `ol.enumerate, ul.itemize`; add nested list reset; add `margin-bottom: 0` to list items |
+| `src/styles/index.ts` | Fix missing dot: `math-inline` → `.math-inline` in `@media print` |
 
 ---
 
 ## Constraints / Invariants
 
-- HTML output class names (`.tabular`, `.enumerate`, `.figure_img`, etc.) must not change — downstream consumers parse them by name.
-- Existing `#setText` / `#preview-content` CSS selectors must remain — backward compatibility for all current consumers.
+- HTML output class names unchanged — no downstream breakage.
+- `#setText` / `#preview-content` CSS selectors unchanged.
 - Inherited CSS properties (`font-family`, `color`, `line-height`) intentionally cascade from host into MMD content.
-- This approach beats host selectors with 1 class. Hosts using 2+ classes in selectors (e.g., `.page .docs-content table`) may still override — acceptable for ~95% of real-world cases; `!important` and source order handle the rest.
-
----
-
-## Observability
-
-N/A — CSS-only change with no runtime side effects.
+- Hosts still need `:not(.tabular)`, `:not(.itemize)` etc. to apply their own styles to non-MMD elements — this is expected behavior, not a bug.
 
 ---
 
 ## Done When
 
-- [ ] All style files updated with `.mmd` selectors (additive, backward-compatible)
-- [ ] Defensive styles added for tables (width, table-layout, border-collapse, border-spacing, margin, font-size, th background/font-weight/text-align, tr background)
-- [ ] Defensive styles added for figures (display, margin, border-radius, border, box-shadow)
-- [ ] Defensive styles added for lists (ul/ol margin, nested list margin reset, li margin-bottom)
-- [ ] React component, `render()`, and `generateHtmlPage()` add `class="mmd"` to wrappers
-- [ ] All existing tests pass
-- [ ] Manual verification: test page with hostile host CSS confirms MMD renders correctly inside `<div class="mmd">`
-- [ ] Status updated to Implemented
+- [x] Defensive styles added for tables (width, table-layout, border-collapse, border-spacing, margin, font-size, th background/font-weight, tr background)
+- [x] Defensive styles added for figures (display, margin)
+- [x] Defensive styles added for lists (ul/ol margin, nested list margin reset, li margin-bottom)
+- [x] Duplicate selectors cleaned up
+- [x] PPTX converter baseCss updated to override library list margins
+- [x] All existing tests pass
+- [x] Status updated to Implemented

@@ -260,7 +260,7 @@ export const MathpixStyle = (
         shape-rendering: crispEdges;
       }
 
-      .math-block svg, math-inline svg {
+      .math-block svg, .math-inline svg {
         margin-top: 1px;
       }
 
