@@ -1,17 +1,17 @@
-export const codeStyles = `
+export const codeStyles = (useColors = true) => `
     #preview-content code, #setText code {
       font-family: Inconsolata;
       font-size: inherit;
       display: initial;
-      background: #f8f8fa;
+      ${useColors ? 'background: #f8f8fa;' : ''}
     }
-    #preview-content .mmd-highlight code, #setText .mmd-highlight code, 
+    #preview-content .mmd-highlight code, #setText .mmd-highlight code,
     #preview-content pre.mmd-highlight code, #setText pre.mmd-highlight code {
       background-color: transparent;
     }
     #preview-content pre code, #setText pre code {
       font-family: 'DM Mono', Inconsolata, monospace;
-      color: #333;
+      ${useColors ? 'color: #333;' : ''}
       font-size: 15px;
     }
 

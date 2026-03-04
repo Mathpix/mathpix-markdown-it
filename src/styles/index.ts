@@ -22,7 +22,7 @@ export const MathpixStyle = (
         ${maxWidth ? 'overflow-x: auto;' : ''}
     }
     
-    ${maxWidth ? '#setText > blockquote, h1, h2, h3, h4, h5, h6 { overflow-x: auto; }' : ''}
+    ${maxWidth ? '#setText > blockquote, #setText > h1, #setText > h2, #setText > h3, #setText > h4, #setText > h5, #setText > h6 { overflow-x: auto; }' : ''}
     
     ${!isPptx ? '#setText div:last-child {\n        margin-bottom: 0 !important;\n    }' : ''}
 
@@ -115,7 +115,7 @@ export const MathpixStyle = (
       padding: 0;
     }
     
-    svg math-block[data-width="full"] {
+    svg .math-block[data-width="full"] {
       overflow: visible;
     }
     
@@ -445,12 +445,12 @@ export const TocStyle = (containerName: string = 'toc') => `
     min-width: 370px; 
   }
   @media only screen and (max-width: 960px) {
-    #{containerName}  {
-      display: none; 
-    } 
+    #${containerName}  {
+      display: none;
+    }
   }
   @media print {
-    #{containerName}  {
+    #${containerName}  {
       display: none; 
     } 
   } 

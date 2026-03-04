@@ -424,7 +424,7 @@ class MathpixMarkdown_Model {
         }, 10);
     };
 
-    loadMathJax = (notScrolling:boolean=false, setTextAlignJustify: boolean=false, isResetBodyStyles: boolean=false, maxWidth: string = '', scaleEquation = true):boolean => {
+    loadMathJax = (notScrolling:boolean=false, setTextAlignJustify: boolean=false, isResetBodyStyles: boolean=false, maxWidth: string = '', scaleEquation = true, useColors = true):boolean => {
         try {
             const el = document.getElementById('SVG-styles');
             if (!el) {
@@ -440,11 +440,11 @@ class MathpixMarkdown_Model {
                 const style = document.createElement("style");
                 style.setAttribute("id", "Mathpix-styles");
                 let bodyStyles = isResetBodyStyles ? resetBodyStyles : '';
-                style.innerHTML = bodyStyles 
-                  + MathpixStyle(setTextAlignJustify, true, maxWidth, scaleEquation) 
-                  + codeStyles 
-                  + tabularStyles() 
-                  + listsStyles 
+                style.innerHTML = bodyStyles
+                  + MathpixStyle(setTextAlignJustify, useColors, maxWidth, scaleEquation)
+                  + codeStyles(useColors)
+                  + tabularStyles(useColors)
+                  + listsStyles
                   + TocStyle("toc")
                   + menuStyle()
                   + clipboardCopyStyles()
@@ -486,25 +486,24 @@ class MathpixMarkdown_Model {
       }
     };
 
-    getMathpixStyleOnly = (scaleEquation = true ) => {
-      let style: string =  this.getMathjaxStyle() 
-        + MathpixStyle(false, true, '', scaleEquation) 
-        + codeStyles 
-        + tabularStyles() 
+    getMathpixStyleOnly = (scaleEquation = true, useColors = true) => {
+      let style: string =  this.getMathjaxStyle()
+        + MathpixStyle(false, useColors, '', scaleEquation)
+        + codeStyles(useColors)
+        + tabularStyles(useColors)
         + listsStyles
         + menuStyle()
         + clipboardCopyStyles();
       return style;
     };
 
-    getMathpixStyle = (stylePreview: boolean = false, showToc: boolean = false, tocContainerName: string = 'toc', scaleEquation = true, isPptx = false ) => {
-      let style: string = ContainerStyle() + this.getMathjaxStyle() + MathpixStyle(false, true, '', scaleEquation, isPptx) + codeStyles + tabularStyles() + listsStyles;
-      if (showToc) {}
+    getMathpixStyle = (stylePreview: boolean = false, showToc: boolean = false, tocContainerName: string = 'toc', scaleEquation = true, isPptx = false, useColors = true) => {
+      let style: string = ContainerStyle(useColors) + this.getMathjaxStyle() + MathpixStyle(false, useColors, '', scaleEquation, isPptx) + codeStyles(useColors) + tabularStyles(useColors) + listsStyles;
       if (!stylePreview) {
         return style;
       }
-      
-      return showToc 
+
+      return showToc
           ? style + PreviewStyle + TocStyle(tocContainerName) + menuStyle() + clipboardCopyStyles()
           : style + PreviewStyle + menuStyle() + clipboardCopyStyles();
     };
@@ -512,8 +511,8 @@ class MathpixMarkdown_Model {
     getMathpixMarkdownStyles = ( useColors: boolean = true, scaleEquation = true ) => {
       let style: string = ContainerStyle(useColors);
       style += this.getMathjaxStyle();
-      style += MathpixStyle(false, useColors, '', scaleEquation = true );
-      // style += codeStyles;
+      style += MathpixStyle(false, useColors, '', scaleEquation);
+      // codeStyles excluded — VSCode provides its own syntax highlighting
       style += tabularStyles(useColors);
       style += listsStyles;
       return style;
