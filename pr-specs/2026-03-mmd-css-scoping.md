@@ -1,6 +1,6 @@
-# PR: Add defensive CSS defaults to MMD class selectors
+# PR: CSS conflict hardening — defensive defaults + specificity boost for MMD styles
 
-Status: Implemented
+Status: Active
 Owner: @OlgaRedozubova
 
 ---
@@ -19,7 +19,7 @@ When MMD content is embedded on a host page (e.g., `.docs-content table { width:
 
 - Add defensive default styles to existing MMD class selectors so they resist common host CSS overrides.
 - No new wrapper elements, no CSS duplication, no breaking changes.
-- Hosts still need `:not(.tabular)` etc. for their OWN generic element styles — this is expected and unavoidable (the library cannot prevent a host from styling its own `<table>` elements).
+- MMD-specific elements no longer inherit common framework defaults; hosts may still exclude MMD classes when styling their own generic tables/lists.
 
 ---
 
@@ -209,9 +209,10 @@ Converted from static string to function accepting `useColors` parameter. Code/p
 
 ### Snapshot tests
 
-Added `tests/_styles.js` with 46 tests:
+Added `tests/_styles.js` with 68 tests:
 - 16 snapshot tests for individual style functions (all param variants)
 - 30 composition tests verifying assembly methods include correct modules
+- 22 direct `buildStyles()` tests (option combos, canonical order, caller-matching combos)
 
 ---
 
@@ -224,8 +225,8 @@ Added `tests/_styles.js` with 46 tests:
 | `src/styles/styles-code.ts` | Convert to function with `useColors` param; import `COLOR_CODE_BG` |
 | `src/styles/styles-container.ts` | Add explicit types |
 | `src/styles/index.ts` | Bug fixes; `COLOR_CODE_BG` constant; types; formatting |
-| `src/mathpix-markdown-model/index.ts` | `StyleBundleOpts` interface; `buildStyles()` method; `loadMathJax` DOM re-injection fix; `useColors` propagation; old methods as wrappers |
-| `tests/_styles.js` | New: 46 snapshot + composition tests |
+| `src/mathpix-markdown-model/index.ts` | `StyleBundleOpts` interface; `buildStyles()` method; `loadMathJax` DOM re-injection + listener + DOM guard fixes; `htmlWrapper` via `buildStyles`; `useColors` propagation; showToc/disableRules splice fix; old methods as wrappers |
+| `tests/_styles.js` | New: 68 snapshot + composition + buildStyles tests |
 | `tests/_data/_styles/*.snap.css` | New: 16 snapshot files |
 
 ---
@@ -236,7 +237,7 @@ Added `tests/_styles.js` with 46 tests:
 - `#setText` / `#preview-content` CSS selectors unchanged.
 - Public API methods (`getMathpixStyle`, `getMathpixStyleOnly`, `getMathpixMarkdownStyles`) unchanged — same signatures, same output.
 - Inherited CSS properties (`font-family`, `color`, `line-height`) intentionally cascade from host into MMD content.
-- Hosts still need `:not(.tabular)`, `:not(.itemize)` etc. to apply their own styles to non-MMD elements — this is expected behavior, not a bug.
+- MMD-specific elements no longer inherit common framework defaults, which reduces host-side exceptions significantly. Hosts may still choose to exclude MMD classes (e.g. `:not(.tabular)`) when styling their own generic tables/lists.
 
 ---
 
@@ -247,12 +248,13 @@ Added `tests/_styles.js` with 46 tests:
 - [x] Defensive styles added for lists (ul/ol margin, nested list margin reset, li margin-bottom)
 - [x] Duplicate selectors cleaned up
 - [x] `buildStyles(opts)` single builder with `StyleBundleOpts`
-- [x] `loadMathJax` DOM re-injection fix
+- [x] `loadMathJax` DOM re-injection fix + duplicate listener guard + DOM update guard
+- [x] `htmlWrapper.includeStyles` uses `buildStyles()` directly
 - [x] `useColors` propagated through all style functions
 - [x] `codeStyles` converted to function
-- [x] Pre-existing bugs fixed (missing dots, unscoped selectors, template interpolation, dead code)
+- [x] Pre-existing bugs fixed (missing dots, unscoped selectors, template interpolation, dead code, showToc/disableRules splice)
 - [x] Types and formatting cleaned up
-- [x] Snapshot + composition tests added (46 tests)
+- [x] Snapshot + composition + buildStyles tests added (68 tests)
 - [x] PPTX converter baseCss updated to override library list margins
-- [x] All existing tests pass (3205)
-- [x] Status updated to Implemented
+- [x] All existing tests pass (3227)
+- [ ] PR reviewed and merged
