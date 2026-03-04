@@ -424,7 +424,7 @@ class MathpixMarkdown_Model {
         }, 10);
     };
 
-    loadMathJax = (notScrolling:boolean=false, setTextAlignJustify: boolean=false, isResetBodyStyles: boolean=false, maxWidth: string = '', scaleEquation = true, useColors = true):boolean => {
+    loadMathJax = (notScrolling: boolean = false, setTextAlignJustify: boolean = false, isResetBodyStyles: boolean = false, maxWidth: string = '', scaleEquation: boolean = true, useColors: boolean = true): boolean => {
         try {
             const el = document.getElementById('SVG-styles');
             if (!el) {
@@ -486,7 +486,7 @@ class MathpixMarkdown_Model {
       }
     };
 
-    getMathpixStyleOnly = (scaleEquation = true, useColors = true) => {
+    getMathpixStyleOnly = (scaleEquation: boolean = true, useColors: boolean = true): string => {
       let style: string =  this.getMathjaxStyle()
         + MathpixStyle(false, useColors, '', scaleEquation)
         + codeStyles(useColors)
@@ -497,8 +497,13 @@ class MathpixMarkdown_Model {
       return style;
     };
 
-    getMathpixStyle = (stylePreview: boolean = false, showToc: boolean = false, tocContainerName: string = 'toc', scaleEquation = true, isPptx = false, useColors = true) => {
-      let style: string = ContainerStyle(useColors) + this.getMathjaxStyle() + MathpixStyle(false, useColors, '', scaleEquation, isPptx) + codeStyles(useColors) + tabularStyles(useColors) + listsStyles;
+    getMathpixStyle = (stylePreview: boolean = false, showToc: boolean = false, tocContainerName: string = 'toc', scaleEquation: boolean = true, isPptx: boolean = false, useColors: boolean = true): string => {
+      let style: string = ContainerStyle(useColors)
+        + this.getMathjaxStyle()
+        + MathpixStyle(false, useColors, '', scaleEquation, isPptx)
+        + codeStyles(useColors)
+        + tabularStyles(useColors)
+        + listsStyles;
       if (!stylePreview) {
         return style;
       }
@@ -508,7 +513,7 @@ class MathpixMarkdown_Model {
           : style + PreviewStyle + menuStyle() + clipboardCopyStyles();
     };
 
-    getMathpixMarkdownStyles = ( useColors: boolean = true, scaleEquation = true ) => {
+    getMathpixMarkdownStyles = (useColors: boolean = true, scaleEquation: boolean = true): string => {
       let style: string = ContainerStyle(useColors);
       style += this.getMathjaxStyle();
       style += MathpixStyle(false, useColors, '', scaleEquation);

@@ -1,9 +1,11 @@
-export const codeStyles = (useColors = true) => `
+import { COLOR_CODE_BG } from "./index";
+
+export const codeStyles = (useColors: boolean = true): string => `
     #preview-content code, #setText code {
       font-family: Inconsolata;
       font-size: inherit;
       display: initial;
-      ${useColors ? 'background: #f8f8fa;' : ''}
+      ${useColors ? `background: ${COLOR_CODE_BG};` : ''}
     }
     #preview-content .mmd-highlight code, #setText .mmd-highlight code,
     #preview-content pre.mmd-highlight code, #setText pre.mmd-highlight code {

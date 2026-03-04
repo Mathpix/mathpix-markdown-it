@@ -1,5 +1,8 @@
 import { HIGHLIGHT_COLOR, HIGHLIGHT_TEXT_COLOR } from "../markdown/common/consts";
 
+/** Shared color used for code/pre backgrounds across style modules */
+export const COLOR_CODE_BG = '#f8f8fa';
+
 export const resetBodyStyles = `
   body {
     margin: 0;
@@ -10,9 +13,9 @@ export const MathpixStyle = (
   setTextAlignJustify: boolean = false,
   useColors: boolean = true,
   maxWidth: string = '',
-  scaleEquation = true,
-  isPptx = false
-) => {
+  scaleEquation: boolean = true,
+  isPptx: boolean = false
+): string => {
   return `
     #setText > div {
         justify-content: inherit;
@@ -34,8 +37,8 @@ export const MathpixStyle = (
         margin-top: 0;
         margin-bottom: 1em;
         ${setTextAlignJustify ? 'text-align: justify;' : ''}
-    }    
-    
+    }
+
     .proof > div, .theorem > div {
         margin-top: 1rem;
     }
@@ -154,7 +157,7 @@ export const MathpixStyle = (
         max-width: 100%;
     }
     
-    #preview-content blockquote,  #setText blockquote {
+    #preview-content blockquote, #setText blockquote {
         page-break-inside: avoid;
         ${useColors ? 'color: #666;' : ''}
         margin: 0 0 1em 0;
@@ -170,9 +173,9 @@ export const MathpixStyle = (
         line-height: 1.45;
         border-radius: 6px;
         box-sizing: border-box;
-        ${useColors ? 'background: #f8f8fa;' : ''}
+        ${useColors ? `background: ${COLOR_CODE_BG};` : ''}
     }
-    #preview-content pre code, #setText pre code{
+    #preview-content pre code, #setText pre code {
         padding: 1rem;
         display: block;
         overflow-x: auto;
@@ -185,7 +188,7 @@ export const MathpixStyle = (
     }
 
     #setText table, #preview-content table {
-        display: table; 
+        display: table;
         overflow: auto;
         max-width: 100%;
         border-collapse: collapse;
@@ -218,7 +221,7 @@ export const MathpixStyle = (
         margin: 0 auto 1em auto;
     }
 
-    #preview-content .author, #setText .author  {
+    #preview-content .author, #setText .author {
         text-align: center;
         margin: 0 auto;
         display: flex;
@@ -407,14 +410,14 @@ export const MathpixStyle = (
       text-align: right;
     }
     
-   .smiles {
-     text-align: center;
-   }
+    .smiles {
+        text-align: center;
+    }
 
-   div.svg-container, #setText > div.svg-container {
-      display: flex;
-      justify-content: center;
-   }
+    div.svg-container, #setText > div.svg-container {
+        display: flex;
+        justify-content: center;
+    }
 `};
 
 export const PreviewStyle = `
@@ -433,7 +436,7 @@ export const PreviewStyle = `
     font-family: 'CMU Serif Bold', 'Georgia', Helvetica, Arial, sans-serif;
   }
 
-  #preview  i, #preview  em {
+  #preview i, #preview em {
     font-family: 'CMU Serif Italic', 'Georgia', Helvetica, Arial, sans-serif;
   }
 `;

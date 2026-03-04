@@ -1,4 +1,4 @@
-export const tabularStyles = (useColors = true) => `
+export const tabularStyles = (useColors: boolean = true): string => `
     .table_tabular {
         overflow-x: auto;
         padding: 0 2px 0.5em 2px;
