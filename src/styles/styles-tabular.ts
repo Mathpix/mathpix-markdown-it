@@ -1,3 +1,8 @@
+import {
+  COLOR_TABULAR_TD_BG, COLOR_TABULAR_TD_BORDER,
+  COLOR_DARK_BG, COLOR_DARK_TABULAR_TD_BORDER,
+} from "./colors";
+
 export const tabularStyles = (useColors: boolean = true): string => `
     .table_tabular,
     #preview-content .table_tabular, #setText .table_tabular {
@@ -31,8 +36,8 @@ export const tabularStyles = (useColors: boolean = true): string => `
     .tabular td,
     #preview-content .tabular td, #setText .tabular td {
         border-style: none !important;
-        ${useColors ? 'background-color: #fff;' : 'background-color: transparent;'}
-        ${useColors ? 'border-color: #000 !important;' : 'border-color: currentColor !important;'}
+        ${useColors ? `background-color: ${COLOR_TABULAR_TD_BG};` : 'background-color: transparent;'}
+        ${useColors ? `border-color: ${COLOR_TABULAR_TD_BORDER} !important;` : 'border-color: currentColor !important;'}
         word-break: keep-all;
         padding: 0.1em 0.5em !important;
     }
@@ -56,8 +61,8 @@ export const tabularStyles = (useColors: boolean = true): string => `
     html[data-theme="dark"] #preview-content .tabular tr, html[data-theme="dark"] #setText .tabular tr,
     html[data-theme="dark"] .tabular td,
     html[data-theme="dark"] #preview-content .tabular td, html[data-theme="dark"] #setText .tabular td {
-        ${useColors ? 'background-color: #202226;' : 'background-color: transparent;'}
-        ${useColors ? 'border-color: #fff !important;' : 'border-color: currentColor !important;'}
+        ${useColors ? `background-color: ${COLOR_DARK_BG};` : 'background-color: transparent;'}
+        ${useColors ? `border-color: ${COLOR_DARK_TABULAR_TD_BORDER} !important;` : 'border-color: currentColor !important;'}
     }
     .figure_img,
     #preview-content .figure_img, #setText .figure_img {

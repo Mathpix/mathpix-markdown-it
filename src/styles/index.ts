@@ -1,7 +1,12 @@
 import { HIGHLIGHT_COLOR, HIGHLIGHT_TEXT_COLOR } from "../markdown/common/consts";
+import {
+  COLOR_CODE_BG, COLOR_BLOCKQUOTE_TEXT, COLOR_BLOCKQUOTE_BORDER,
+  COLOR_TABLE_BORDER, COLOR_TABLE_ROW_BG, COLOR_TABLE_ROW_BORDER, COLOR_TABLE_ROW_ALT_BG,
+  COLOR_LINK, COLOR_MARK_BG, COLOR_MATH_ERROR_BG, COLOR_MATH_ERROR_TEXT,
+  COLOR_TOC_SUBTITLE, COLOR_TOC_LINK, COLOR_TOC_LINK_HOVER, COLOR_TOC_LINK_ACTIVE,
+} from "./colors";
 
-/** Shared color used for code/pre backgrounds across style modules */
-export const COLOR_CODE_BG = '#f8f8fa';
+export { COLOR_CODE_BG } from "./colors";
 
 export const resetBodyStyles = `
   body {
@@ -143,8 +148,8 @@ const mathStyles = (maxWidth: string): string => [
         margin: 0 !important;
     }
     .math-error {
-        background-color: yellow;
-        color: red;
+        background-color: ${COLOR_MATH_ERROR_BG};
+        color: ${COLOR_MATH_ERROR_TEXT};
     }`,
 ].filter(Boolean).join('');
 
@@ -156,10 +161,10 @@ const imageStyles = (): string => `
 const blockquoteStyles = (useColors: boolean): string => `
     #preview-content blockquote, #setText blockquote {
         page-break-inside: avoid;
-        ${useColors ? 'color: #666;' : ''}
+        ${useColors ? `color: ${COLOR_BLOCKQUOTE_TEXT};` : ''}
         margin: 0 0 1em 0;
         padding-left: 3em;
-        border-left: .5em solid #eee;
+        border-left: .5em solid ${COLOR_BLOCKQUOTE_BORDER};
     }`;
 
 const codeBlockStyles = (useColors: boolean): string => `
@@ -195,15 +200,15 @@ const tableStyles = (useColors: boolean): string => `
     }
     #preview-content table td, #setText table td,
     #preview-content table th, #setText table th {
-        border: 1px solid #dfe2e5;
+        border: 1px solid ${COLOR_TABLE_BORDER};
         padding: 6px 13px;
     }
     #preview-content table tr, #setText table tr {
-        ${useColors ? 'background-color: #fff;' : ''}
-        border-top: 1px solid ${useColors ? '#c6cbd1' : 'currentColor'};
+        ${useColors ? `background-color: ${COLOR_TABLE_ROW_BG};` : ''}
+        border-top: 1px solid ${useColors ? COLOR_TABLE_ROW_BORDER : 'currentColor'};
     }
     #preview-content table tr:nth-child(2n), #setText table tr:nth-child(2n) {
-        ${useColors ? 'background-color: #f6f8fa;' : ''}
+        ${useColors ? `background-color: ${COLOR_TABLE_ROW_ALT_BG};` : ''}
     }`;
 
 const docStructureStyles = (): string => `
@@ -256,23 +261,23 @@ const docStructureStyles = (): string => `
 const inlineTextStyles = (useColors: boolean): string => `
     .text-url,
     #preview-content .text-url, #setText .text-url {
-        ${useColors ? 'color: #0B93ff;' : ''}
+        ${useColors ? `color: ${COLOR_LINK};` : ''}
         cursor: text;
         pointer-events: none;
     }
     .text-url a:hover,
     #preview-content .text-url a:hover, #setText .text-url a:hover {
-        ${useColors ? 'color: #0B93ff;' : ''}
+        ${useColors ? `color: ${COLOR_LINK};` : ''}
     }
     mark,
     #preview-content mark, #setText mark {
-        background-color: #feffe6;
+        background-color: ${COLOR_MARK_BG};
     }
     span[data-underline-type] mark,
     #preview-content span[data-underline-type] mark,
     #setText span[data-underline-type] mark {
         background: inherit;
-        background-color: #feffe6;
+        background-color: ${COLOR_MARK_BG};
         padding-top: 0;
         padding-bottom: 0;
     }`;
@@ -406,7 +411,7 @@ export const TocStyle = (containerName: string = 'toc') => `
   }
   #toc_container .toc-title-3 a, #toc_container .toc-title-4 > a, #toc_container .toc-title-5 > a, .previewPage #toc_container .toc-title-6 > a {
     font-size: 1em;
-    color: #979797;
+    color: ${COLOR_TOC_SUBTITLE};
   }
   #toc_container ul {
     list-style: none;
@@ -417,13 +422,13 @@ export const TocStyle = (containerName: string = 'toc') => `
     padding-top: 20px;
   }
   #toc_container li a {
-    color: #000;
+    color: ${COLOR_TOC_LINK};
   }
   #toc_container li a:hover {
-    color: #0093FF;
+    color: ${COLOR_TOC_LINK_HOVER};
   }
   #toc_container li a:active,
   #toc_container li .selected {
-    color: #047DD6 !important;
+    color: ${COLOR_TOC_LINK_ACTIVE} !important;
   }
 `;

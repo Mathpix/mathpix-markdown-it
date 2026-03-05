@@ -1,3 +1,8 @@
+import {
+  COLOR_BODY_TEXT, COLOR_HEADING_TEXT, COLOR_CAPTION_TEXT,
+  COLOR_LINK, COLOR_LINK_HOVER, COLOR_LINK_ACTIVE, COLOR_LINK_DISABLED,
+} from "./colors";
+
 export const ContainerStyle = (useColors: boolean = true): string => `
   html,body {
     width: 100%;
@@ -8,7 +13,7 @@ export const ContainerStyle = (useColors: boolean = true): string => `
   }
   body {
     margin: 0;
-    ${useColors ? 'color: #1E2029;' : ''}
+    ${useColors ? `color: ${COLOR_BODY_TEXT};` : ''}
     font-size: 14px;
     line-height: normal;
   }
@@ -20,7 +25,7 @@ export const ContainerStyle = (useColors: boolean = true): string => `
   h1, h2, h3, h4, h5, h6 {
     margin-top: 0;
     margin-bottom: 0.5em;
-    ${useColors ? 'color: rgba(0, 0, 0, 0.85);' : ''}
+    ${useColors ? `color: ${COLOR_HEADING_TEXT};` : ''}
     font-weight: 500;
   }
   p {
@@ -66,7 +71,7 @@ export const ContainerStyle = (useColors: boolean = true): string => `
     top: -0.5em;
   }
   a {
-    ${useColors ? 'color: #0B93ff;' : ''}
+    ${useColors ? `color: ${COLOR_LINK};` : ''}
     text-decoration: none;
     background-color: transparent;
     outline: none;
@@ -74,17 +79,17 @@ export const ContainerStyle = (useColors: boolean = true): string => `
     transition: color 0.3s;
   }
   a:hover {
-    ${useColors ? 'color: #33aaff;' : ''}
+    ${useColors ? `color: ${COLOR_LINK_HOVER};` : ''}
   }
   a:active {
-    ${useColors ? 'color: #0070d9;' : ''}
+    ${useColors ? `color: ${COLOR_LINK_ACTIVE};` : ''}
   }
   a:active, a:hover {
     text-decoration: none;
     outline: 0;
   }
   a[disabled] {
-    ${useColors ? 'color: rgba(0, 0, 0, 0.25);' : ''}
+    ${useColors ? `color: ${COLOR_LINK_DISABLED};` : ''}
     cursor: not-allowed;
     pointer-events: none;
   }
@@ -112,7 +117,7 @@ export const ContainerStyle = (useColors: boolean = true): string => `
   caption {
     padding-top: 0.75em;
     padding-bottom: 0.3em;
-    ${useColors ? 'color: rgba(0, 0, 0, 0.45);' : ''}
+    ${useColors ? `color: ${COLOR_CAPTION_TEXT};` : ''}
     text-align: left;
     caption-side: bottom;
   }
