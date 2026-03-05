@@ -1,4 +1,4 @@
-# PR: CSS conflict hardening — defensive defaults + specificity boost for MMD styles
+# PR: CSS scoping — `#preview-content`/`#setText` specificity boost for all MMD selectors
 
 Status: Active
 Owner: @OlgaRedozubova
@@ -9,42 +9,59 @@ Owner: @OlgaRedozubova
 
 MMD styles use two scoping mechanisms:
 1. **ID selectors** (`#setText h1`, `#preview-content table`) for generic HTML elements — specificity (1,0,1), already beats any host class-based CSS.
-2. **Class selectors** (`.tabular`, `.figure_img`, `.itemize`, `.enumerate`) for MMD-specific elements — these are effectively namespaced (unique to MMD), but lacked defensive defaults for properties commonly overridden by host CSS.
+2. **Class selectors** (`.tabular`, `.figure_img`, `.itemize`, `.enumerate`, `.hljs-*`, `.proof`, `.author`, etc.) for MMD-specific elements — were bare, vulnerable to host CSS overrides with equal or higher specificity.
 
-When MMD content is embedded on a host page (e.g., `.docs-content table { width: 100% }`), the host styles override MMD class-based rules for properties that MMD didn't explicitly set. This caused tabular tables to stretch, figure alignment to break, and list spacing to change.
+When MMD content is embedded on a host page (e.g., `.docs-content table { width: 100% }`), the host styles override MMD class-based rules. This caused tabular tables to stretch, figure alignment to break, list spacing to change, and syntax highlighting colors to be overridden.
 
 ---
 
 ## Goal
 
-- Add defensive default styles to existing MMD class selectors so they resist common host CSS overrides.
-- No new wrapper elements, no CSS duplication, no breaking changes.
-- MMD-specific elements no longer inherit common framework defaults; hosts may still exclude MMD classes when styling their own generic tables/lists.
+- Boost specificity of all MMD class selectors by adding `#preview-content`/`#setText` scoped variants.
+- Keep bare selectors as fallback for `markdownToHTML()` which returns raw HTML without wrapper.
+- Clean up dead code, fix bugs, restructure style modules for readability.
+- No new wrapper elements, no breaking changes to HTML output or public API signatures.
+
+---
+
+## Scoping Strategy
+
+### Pattern: bare + scoped
+
+Every MMD class selector now follows this pattern:
+
+```css
+.selector,
+#preview-content .selector, #setText .selector {
+    /* styles */
+}
+```
+
+- **Bare** (0,1,0) — fallback for `markdownToHTML()` consumers without `#setText`/`#preview-content` wrapper.
+- **Scoped** (1,1,0) — beats host `.docs-content .selector` (0,1,x) when inside containers.
+
+### Exceptions (bare only, no scoped)
+
+| Selector | Reason |
+|---|---|
+| `.math-block`, `.math-inline`, `.math-error` | `math-` prefix is distinctive enough; no known collisions |
+| `mjx-container` | Custom element, cannot collide with host CSS |
+| `*[data-has-dotfill]`, `*[data-has-dotfill] .dotfill` | `data-` attribute scoping is sufficient |
+| `svg .math-inline`, `svg mjx-container`, etc. | SVG context selectors |
+
+### Exceptions (scoped only, no bare)
+
+| Selector | Reason |
+|---|---|
+| `code`, `pre code`, `pre`, `table`, `blockquote`, `img`, `sup`, `h1`–`h6` | Generic HTML elements — bare selectors would affect all elements on host page |
 
 ---
 
 ## Non-Goals
 
-- Adding a `.mmd` wrapper class (rejected: `#setText` already serves as wrapper; `.mmd` would duplicate CSS ~2× for no specificity gain on generic elements).
-- Renaming CSS classes `.tabular` → `.mmd-tabular` (rejected: these names are already unique to MMD; renaming is a breaking change with no real benefit).
+- Adding a `.mmd` wrapper class (rejected: `#setText` already serves as wrapper).
+- Renaming CSS classes `.tabular` → `.mmd-tabular` (rejected: breaking change with no real benefit).
 - Shadow DOM encapsulation.
-- Protecting generic HTML elements (`<h1>`, `<blockquote>`, `<pre>`, `<code>`) — these are already scoped via `#setText`/`#preview-content` ID selectors.
-
----
-
-## Why Not `.mmd` Wrapper?
-
-Considered and rejected for these reasons:
-1. `#setText` already provides ID-scoped wrapper — adding `.mmd` is redundant.
-2. `.mmd table` specificity (0,1,1) = `.docs-content table` (0,1,1) — no specificity gain for generic elements.
-3. Every CSS rule would need duplication (`.tabular, .mmd .tabular`), roughly doubling CSS payload.
-4. `markdownToHTML()` returns raw HTML without wrapper — consumers would need to manually add `<div class="mmd">`.
-
----
-
-## Why Not Rename Classes?
-
-`.tabular`, `.figure_img`, `.itemize`, `.enumerate`, `.math-block` etc. are already effectively namespaced — no CSS framework uses these names. Renaming to `.mmd-tabular` would be a breaking change for downstream consumers who parse class names, with no practical benefit.
 
 ---
 
@@ -62,96 +79,96 @@ Considered and rejected for these reasons:
 
 ---
 
-## Changes: Defensive Defaults Added
+## Changes by File
 
-### `src/styles/styles-tabular.ts`
+### `src/styles/index.ts` — restructured into sub-functions
+
+Monolithic `MathpixStyle` function split into 10 named sub-functions composed via array join:
+
+```typescript
+export const MathpixStyle = (...) => [
+  layoutStyles({ setTextAlignJustify, maxWidth, isPptx }),
+  mathStyles(maxWidth),
+  imageStyles(),
+  blockquoteStyles(useColors),
+  codeBlockStyles(useColors),
+  tableStyles(useColors),
+  docStructureStyles(),
+  inlineTextStyles(useColors),
+  miscStyles(),
+  printStyles(),
+].join('');
+```
+
+Scoped selectors added for: `.proof`, `.theorem`, `.main-title`, `.author`, `.section-title`, `.abstract`, `.text-url`, `mark`, `span[data-underline-type] mark`, `.smiles`, `div.svg-container`.
+
+Dead code removed: `.empty` (never generated), `.preview-right` (used as id, not class), `scaleEquation` parameter (accepted but never used in CSS output).
+
+Bug fixes: `div.svg-container` child combinator consistency (`>` for both `#preview-content` and `#setText`).
+
+### `src/styles/styles-tabular.ts` — replaced `.table_tabular .tabular` with ID scoping
+
+Before (commit f0e068a): specificity boosted via `.table_tabular .tabular` compound selector.
+Now: replaced with `#preview-content .tabular, #setText .tabular` — cleaner, consistent with other files.
 
 ```css
-/* Prevent host "table { width:100%; table-layout:fixed }" */
-.table_tabular .tabular, .tabular {
+.tabular,
+#preview-content .tabular, #setText .tabular {
+    display: inline-table !important;
     width: auto;
-    table-layout: auto;
-    border-collapse: collapse;
-    border-spacing: 0;
-    margin: 0;
-    font-size: inherit;
-}
-
-/* Prevent host "th { background; font-weight:600 }" — (0,2,1) beats (0,1,2) */
-.table_tabular .tabular th {
-    background-color: transparent;
-    font-weight: bold;
-}
-
-/* Prevent host "tr:nth-child(2n) { background }" — (0,2,1) beats (0,1,2) */
-.table_tabular .tabular tr {
-    background-color: transparent;
-}
-
-/* Prevent host "td { background; word-break }" — (0,2,1) beats (0,1,2) */
-.table_tabular .tabular td {
-    background-color: #fff;
-    word-break: keep-all;
-}
-
-/* Prevent host "img { display:block; margin:16px 0 }" — (0,1,2) beats (0,1,1) */
-div.figure_img img {
-    display: inline;
-    margin: 0;
+    /* ... */
 }
 ```
 
-Note: `.table_tabular .tabular` prefix gives (0,2,x) specificity which beats `.docs-content table *` (0,1,x). `div.figure_img img` (0,1,2) beats `.docs-content img` (0,1,1). Bare `.tabular` kept as fallback for the table element itself.
+Also scoped: `.table_tabular`, `.tabular th/tr/td/td>p`, `.tabular td._empty`, `.tabular td .f`, `.figure_img`, `div.figure_img img`, dark theme selectors.
 
-### `src/styles/styles-lists.ts`
+Note: `.sub-table` rule moved here from `index.ts` (where it didn't belong).
 
-```css
-/* Prevent host "ul { margin: 0 0 24px }" */
-ol.enumerate, ul.itemize {
-    margin: 0 0 1em 0;
-}
+### `src/styles/styles-code.ts` — scoped hljs, normalized indentation
 
-/* Reset nested list margin */
-li > ol.enumerate, li > ul.itemize {
-    margin: 0;
-}
+All 19 `.hljs-*` rule blocks now follow bare + scoped pattern. Indentation normalized from 6 to 8 spaces.
 
-/* Prevent host "li { margin-bottom: 4px }" */
-ul.itemize > li {
-    margin-bottom: 0;
-}
-.enumerate > .li_enumerate {
-    margin-bottom: 0;
-}
-```
+### `src/styles/styles-lists.ts` — scoped all selectors
 
-Note: `ul.itemize > li` specificity (0,1,2) beats `.docs-content li` (0,1,1). `.enumerate > .li_enumerate` specificity (0,2,0) also beats (0,1,1).
+All list selectors (`ol.enumerate`, `ul.itemize`, `.li_enumerate`, `.li_level`, `.not_number`) now have bare + scoped variants.
 
-### `src/styles/index.ts`
+### `src/styles/halpers.ts` → `src/styles/helpers.ts` — renamed, cleaned up
 
-```css
-/* Bug fix: missing dot before math-inline in @media print */
-.math-block svg, .math-inline svg { margin-top: 1px; }
-```
+- Fixed typo in filename: `halpers` → `helpers`
+- Fixed `max-width:` formatting (added space after colon)
+- Added scoped variants for `.math-block`, `.smiles`, `.smiles-inline`, `.table_tabular`
+- Combined h1-h6 `::-webkit-scrollbar` into single `hideScroll()` call
+- Normalized indentation
 
-### Also fixed: duplicate selectors
+### `src/mathpix-markdown-model/index.ts`
 
-Removed duplicate selectors in original code: `.tabular tr, .tabular tr` → `.tabular tr`, `.tabular td, .tabular td` → `.tabular td`, `.table_tabular table th, .table_tabular table th` → `.table_tabular table th`.
+- Import path updated: `halpers` → `helpers`
+- Removed `scaleEquation` from `StyleBundleOpts` interface and `buildStyles()`
+- Public methods keep `_scaleEquation` parameter with `@deprecated` for backward compatibility
+
+### `tests/_styles.js`
+
+- Updated `MathpixStyle` calls: removed `scaleEquation` argument
+- Updated `max-width` assertion: `'max-width:800px;'` → `'max-width: 800px;'`
+- All 68 tests pass
+
+### Snapshot files
+
+All 16 `tests/_data/_styles/*.snap.css` files regenerated.
 
 ---
 
-## Style system improvements
+## Style system improvements (from prior commits)
 
 ### `buildStyles(opts: StyleBundleOpts)` — single style builder
 
-All 4 style assembly points (`loadMathJax`, `getMathpixStyleOnly`, `getMathpixStyle`, `getMathpixMarkdownStyles`) now delegate to a single `buildStyles()` method. Old methods remain as thin wrappers for backward compatibility.
+All 4 style assembly points (`loadMathJax`, `getMathpixStyleOnly`, `getMathpixStyle`, `getMathpixMarkdownStyles`) delegate to a single `buildStyles()` method.
 
 ```typescript
 interface StyleBundleOpts {
     setTextAlignJustify?: boolean;
     useColors?: boolean;
     maxWidth?: string;
-    scaleEquation?: boolean;
     isPptx?: boolean;
     resetBody?: boolean;
     container?: boolean;
@@ -181,80 +198,56 @@ Module composition per caller:
 
 ### `loadMathJax` DOM re-injection fix
 
-Previously, if `#Mathpix-styles` already existed in the DOM, `loadMathJax()` skipped style update entirely — even if parameters changed. Now it updates `innerHTML` of the existing element.
+Previously, if `#Mathpix-styles` already existed in the DOM, `loadMathJax()` skipped style update entirely. Now it updates `innerHTML` of the existing element.
 
 ### `useColors` propagation
 
-Added `useColors` parameter to `loadMathJax`, `getMathpixStyleOnly`, `getMathpixStyle` — passed through to all style functions. Previously hardcoded to `true`.
+Added `useColors` parameter to `loadMathJax`, `getMathpixStyleOnly`, `getMathpixStyle` — passed through to all style functions.
 
 ### `codeStyles` conversion
 
-Converted from static string to function accepting `useColors` parameter. Code/pre background and base text color now respect `useColors`.
+Converted from static string to function accepting `useColors` parameter.
 
-### Bug fixes in `src/styles/index.ts`
+### Pre-existing bug fixes
 
 - Missing dot: `math-inline svg` → `.math-inline svg` in `@media print`
 - Missing dot: `svg math-block` → `svg .math-block`
 - Unscoped selectors: `h1, h2, ...` → `#setText > h1, #setText > h2, ...`
 - Missing template interpolation: `#{containerName}` → `#${containerName}` in TocStyle
-- Assignment expression: `scaleEquation = true` → `scaleEquation` in getMathpixMarkdownStyles
 - Dead code: removed empty `if (showToc) {}`
-
-### Types and formatting
-
-- Added explicit `: boolean` types to all style function parameters
-- Added `: string` return types to all style functions
-- Extracted shared `COLOR_CODE_BG = '#f8f8fa'` constant
-- Fixed formatting: trailing whitespace, double spaces, indent consistency
-
-### Snapshot tests
-
-Added `tests/_styles.js` with 68 tests:
-- 16 snapshot tests for individual style functions (all param variants)
-- 30 composition tests verifying assembly methods include correct modules
-- 22 direct `buildStyles()` tests (option combos, canonical order, caller-matching combos)
 
 ---
 
-## Files Changed
+## Downstream Impact
 
-| File | Change |
-|---|---|
-| `src/styles/styles-tabular.ts` | Boost specificity via `.table_tabular .tabular` prefix; add defensive defaults; `div.figure_img img`; types |
-| `src/styles/styles-lists.ts` | Add `margin` to `ol.enumerate, ul.itemize`; nested list reset; `margin-bottom: 0` to list items |
-| `src/styles/styles-code.ts` | Convert to function with `useColors` param; import `COLOR_CODE_BG` |
-| `src/styles/styles-container.ts` | Add explicit types |
-| `src/styles/index.ts` | Bug fixes; `COLOR_CODE_BG` constant; types; formatting |
-| `src/mathpix-markdown-model/index.ts` | `StyleBundleOpts` interface; `buildStyles()` method; `loadMathJax` DOM re-injection + listener + DOM guard fixes; `htmlWrapper` via `buildStyles`; `useColors` propagation; showToc/disableRules splice fix; old methods as wrappers |
-| `tests/_styles.js` | New: 68 snapshot + composition + buildStyles tests |
-| `tests/_data/_styles/*.snap.css` | New: 16 snapshot files |
+- Consumers that override MMD class selectors (e.g., `#preview-main .tabular { width: 100% }`) at specificity (1,1,0) — same as the new scoped selectors. Consumer styles that load after MMD styles win by cascade order. No breakage expected.
+- Consumers with their own `.math-block`/`.math-inline` SCSS — bare selectors preserved, no breakage.
+- `auto-render.ts` uses `querySelectorAll('.math-inline, .math-block')` — DOM query, not affected by CSS changes.
 
 ---
 
 ## Constraints / Invariants
 
 - HTML output class names unchanged — no downstream breakage.
-- `#setText` / `#preview-content` CSS selectors unchanged.
-- Public API methods (`getMathpixStyle`, `getMathpixStyleOnly`, `getMathpixMarkdownStyles`) unchanged — same signatures, same output.
+- Public API methods unchanged — same signatures, same output.
 - Inherited CSS properties (`font-family`, `color`, `line-height`) intentionally cascade from host into MMD content.
-- MMD-specific elements no longer inherit common framework defaults, which reduces host-side exceptions significantly. Hosts may still choose to exclude MMD classes (e.g. `:not(.tabular)`) when styling their own generic tables/lists.
 
 ---
 
 ## Done When
 
-- [x] Defensive styles added for tables (width, table-layout, border-collapse, border-spacing, margin, font-size, th background/font-weight, tr background)
-- [x] Defensive styles added for figures (display, margin)
-- [x] Defensive styles added for lists (ul/ol margin, nested list margin reset, li margin-bottom)
-- [x] Duplicate selectors cleaned up
+- [x] All MMD class selectors scoped via `#preview-content`/`#setText` (or justified exception)
+- [x] Defensive defaults for tables, figures, lists
+- [x] `.table_tabular .tabular` replaced with ID scoping
+- [x] hljs selectors scoped in styles-code.ts
+- [x] lists selectors scoped in styles-lists.ts
+- [x] `halpers.ts` → `helpers.ts` rename + cleanup
+- [x] `index.ts` restructured into sub-functions
+- [x] Dead code removed (`scaleEquation`, `.empty`, `.preview-right`)
 - [x] `buildStyles(opts)` single builder with `StyleBundleOpts`
-- [x] `loadMathJax` DOM re-injection fix + duplicate listener guard + DOM update guard
-- [x] `htmlWrapper.includeStyles` uses `buildStyles()` directly
+- [x] `loadMathJax` DOM re-injection fix
 - [x] `useColors` propagated through all style functions
-- [x] `codeStyles` converted to function
-- [x] Pre-existing bugs fixed (missing dots, unscoped selectors, template interpolation, dead code, showToc/disableRules splice)
-- [x] Types and formatting cleaned up
-- [x] Snapshot + composition + buildStyles tests added (68 tests)
-- [x] PPTX converter baseCss updated to override library list margins
-- [x] All existing tests pass (3227)
+- [x] Pre-existing bugs fixed
+- [x] Snapshot + composition + buildStyles tests (68 tests)
+- [x] All existing tests pass
 - [ ] PR reviewed and merged
