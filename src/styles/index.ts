@@ -164,7 +164,7 @@ const blockquoteStyles = (useColors: boolean): string => `
         ${useColors ? `color: ${COLOR_BLOCKQUOTE_TEXT};` : ''}
         margin: 0 0 1em 0;
         padding-left: 3em;
-        border-left: .5em solid ${COLOR_BLOCKQUOTE_BORDER};
+        border-left: .5em solid ${useColors ? COLOR_BLOCKQUOTE_BORDER : 'currentColor'};
     }`;
 
 const codeBlockStyles = (useColors: boolean): string => `
@@ -200,7 +200,7 @@ const tableStyles = (useColors: boolean): string => `
     }
     #preview-content table td, #setText table td,
     #preview-content table th, #setText table th {
-        border: 1px solid ${COLOR_TABLE_BORDER};
+        border: 1px solid ${useColors ? COLOR_TABLE_BORDER : 'currentColor'};
         padding: 6px 13px;
     }
     #preview-content table tr, #setText table tr {
@@ -271,13 +271,13 @@ const inlineTextStyles = (useColors: boolean): string => `
     }
     mark,
     #preview-content mark, #setText mark {
-        background-color: ${COLOR_MARK_BG};
+        ${useColors ? `background-color: ${COLOR_MARK_BG};` : ''}
     }
     span[data-underline-type] mark,
     #preview-content span[data-underline-type] mark,
     #setText span[data-underline-type] mark {
         background: inherit;
-        background-color: ${COLOR_MARK_BG};
+        ${useColors ? `background-color: ${COLOR_MARK_BG};` : ''}
         padding-top: 0;
         padding-bottom: 0;
     }`;

@@ -113,7 +113,7 @@
         
         margin: 0 0 1em 0;
         padding-left: 3em;
-        border-left: .5em solid #eee;
+        border-left: .5em solid currentColor;
     }
     #preview-content pre, #setText pre {
         border: none;
@@ -145,7 +145,7 @@
     }
     #preview-content table td, #setText table td,
     #preview-content table th, #setText table th {
-        border: 1px solid #dfe2e5;
+        border: 1px solid currentColor;
         padding: 6px 13px;
     }
     #preview-content table tr, #setText table tr {
@@ -212,13 +212,13 @@
     }
     mark,
     #preview-content mark, #setText mark {
-        background-color: #feffe6;
+        
     }
     span[data-underline-type] mark,
     #preview-content span[data-underline-type] mark,
     #setText span[data-underline-type] mark {
         background: inherit;
-        background-color: #feffe6;
+        
         padding-top: 0;
         padding-bottom: 0;
     }

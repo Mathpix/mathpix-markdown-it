@@ -334,3 +334,65 @@ describe('buildStyles — direct option combinations:', () => {
     css.should.not.include(menuStyle());
   });
 });
+
+describe('loadMathJax — DOM behavior:', () => {
+  beforeEach(() => {
+    const el = document.getElementById('Mathpix-styles');
+    if (el) el.remove();
+    if (!document.getElementById('SVG-styles')) {
+      const svg = document.createElement('style');
+      svg.id = 'SVG-styles';
+      document.head.appendChild(svg);
+    }
+    MM.isClickHandlerBound = false;
+  });
+  it('creates #Mathpix-styles element', () => {
+    MM.loadMathJax().should.equal(true);
+    const el = document.getElementById('Mathpix-styles');
+    should.exist(el);
+    el.innerHTML.should.include(MathpixStyle());
+  });
+  it('updates existing element on second call', () => {
+    MM.loadMathJax(false, false);
+    MM.loadMathJax(false, true);
+    const el = document.getElementById('Mathpix-styles');
+    el.innerHTML.should.include('text-align: justify;');
+  });
+  it('does not duplicate #Mathpix-styles', () => {
+    MM.loadMathJax();
+    MM.loadMathJax();
+    document.querySelectorAll('#Mathpix-styles').length.should.equal(1);
+  });
+  it('binds click handler only once', () => {
+    MM.loadMathJax();
+    MM.isClickHandlerBound.should.equal(true);
+    MM.loadMathJax();
+    MM.isClickHandlerBound.should.equal(true);
+  });
+  it('notScrolling=true skips click handler', () => {
+    MM.loadMathJax(true);
+    MM.isClickHandlerBound.should.equal(false);
+  });
+});
+
+const { getMaxWidthStyle } = require('../lib/styles/helpers');
+
+describe('getMaxWidthStyle:', () => {
+  it('returns empty string when maxWidth is empty', () => {
+    getMaxWidthStyle().should.equal('');
+    getMaxWidthStyle('').should.equal('');
+  });
+  it('sets max-width on #setText', () => {
+    const css = getMaxWidthStyle('800px');
+    css.should.include('max-width: 800px');
+  });
+  it('includes scrollbar hiding when isHideScroll=true', () => {
+    const css = getMaxWidthStyle('800px', true);
+    css.should.include('::-webkit-scrollbar');
+    css.should.include('display: none');
+  });
+  it('omits scrollbar hiding when isHideScroll=false', () => {
+    const css = getMaxWidthStyle('800px', false);
+    css.should.not.include('::-webkit-scrollbar');
+  });
+});

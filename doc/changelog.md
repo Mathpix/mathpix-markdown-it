@@ -1,3 +1,28 @@
+# March 2026
+
+## CSS scoping and style module cleanup
+
+- CSS Scoping:
+  - All MMD class selectors now have `#preview-content`/`#setText` scoped variants for specificity boost.
+  - Bare selectors preserved as fallback for `markdownToHTML()` (no wrapper).
+
+- Style Architecture:
+  - New `buildStyles(opts: StyleBundleOpts)` single CSS builder — all assembly methods delegate here.
+  - `MathpixStyle` restructured into 10 composable sub-functions.
+  - Color constants extracted into `src/styles/colors.ts`.
+  - `halpers.ts` renamed to `helpers.ts`.
+
+- Bug Fixes:
+  - `useColors=false` now correctly omits blockquote border, table border, and mark background colors.
+  - `div.svg-container` child combinator consistency (`>` for both `#preview-content` and `#setText`).
+  - `loadMathJax` updates existing `#Mathpix-styles` element instead of skipping.
+
+- Breaking Changes:
+  - `scaleEquation` parameter removed from `loadMathJax`, `getMathpixStyleOnly`, `getMathpixStyle`, and `getMathpixMarkdownStyles`. It was never used in CSS output. If you were passing it positionally, shift your arguments. Use `buildStyles(opts)` for a named-parameter alternative.
+
+- Dead Code Removed:
+  - `.empty` selector (never generated), `.preview-right` selector (used as id, not class).
+
 # February 2026
 
 ## [2.0.36] - 16 February 2026
