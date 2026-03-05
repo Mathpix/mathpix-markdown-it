@@ -6,7 +6,6 @@ export interface StyleBundleOpts {
     setTextAlignJustify?: boolean;
     useColors?: boolean;
     maxWidth?: string;
-    scaleEquation?: boolean;
     isPptx?: boolean;
     resetBody?: boolean;
     container?: boolean;
@@ -249,7 +248,8 @@ declare class MathpixMarkdown_Model {
     handleClick: (e: any) => void;
     scrollPage: (parent: any, offsetTarget: any) => void;
     /** Browser runtime: injects SVG-styles + Mathpix-styles into DOM. Includes: core, code, tabular, lists, toc, menu. No container/mathjax (SVG injected separately). */
-    loadMathJax: (notScrolling?: boolean, setTextAlignJustify?: boolean, isResetBodyStyles?: boolean, maxWidth?: string, scaleEquation?: boolean, useColors?: boolean) => boolean;
+    /** @deprecated scaleEquation is unused — kept for backward compatibility */
+    loadMathJax: (notScrolling?: boolean, setTextAlignJustify?: boolean, isResetBodyStyles?: boolean, maxWidth?: string, _scaleEquation?: boolean, useColors?: boolean) => boolean;
     convertToHTML: (str: string, options?: TMarkdownItOptions) => string;
     getMathjaxStyle: () => string;
     /**
@@ -262,12 +262,15 @@ declare class MathpixMarkdown_Model {
      * Modules toggled via opts: resetBody, container, mathjax, code (default: on), preview, toc, menu+clipboard.
      */
     buildStyles: (opts?: StyleBundleOpts) => string;
-    /** Styles for embedded widget (no container/preview). Includes: mathjax, core, code, tabular, lists, menu. */
-    getMathpixStyleOnly: (scaleEquation?: boolean, useColors?: boolean) => string;
-    /** Full page styles. Includes: container, mathjax, core, code, tabular, lists. Optionally: preview, toc, menu. */
-    getMathpixStyle: (stylePreview?: boolean, showToc?: boolean, tocContainerName?: string, scaleEquation?: boolean, isPptx?: boolean, useColors?: boolean) => string;
-    /** VSCode markdown preview styles. Includes: container, mathjax, core, tabular, lists. No code (VSCode provides its own). */
-    getMathpixMarkdownStyles: (useColors?: boolean, scaleEquation?: boolean) => string;
+    /** Styles for embedded widget (no container/preview). Includes: mathjax, core, code, tabular, lists, menu.
+     *  @deprecated _scaleEquation is unused — kept for backward compatibility */
+    getMathpixStyleOnly: (_scaleEquation?: boolean, useColors?: boolean) => string;
+    /** Full page styles. Includes: container, mathjax, core, code, tabular, lists. Optionally: preview, toc, menu.
+     *  @deprecated _scaleEquation is unused — kept for backward compatibility */
+    getMathpixStyle: (stylePreview?: boolean, showToc?: boolean, tocContainerName?: string, _scaleEquation?: boolean, isPptx?: boolean, useColors?: boolean) => string;
+    /** VSCode markdown preview styles. Includes: container, mathjax, core, tabular, lists. No code (VSCode provides its own).
+     *  @deprecated _scaleEquation is unused — kept for backward compatibility */
+    getMathpixMarkdownStyles: (useColors?: boolean, _scaleEquation?: boolean) => string;
     getMathpixFontsStyle: () => string;
     render: (text: string, options?: optionsMathpixMarkdown) => string;
     mmdYamlToHTML: (mmd: string, options?: TMarkdownItOptions, isAddYamlToHtml?: boolean) => {

@@ -1,9 +1,11 @@
 
-    .table_tabular {
+    .table_tabular,
+    #preview-content .table_tabular, #setText .table_tabular {
         overflow-x: auto;
         padding: 0 2px 0.5em 2px;
     }
-    .table_tabular .tabular, .tabular {
+    .tabular,
+    #preview-content .tabular, #setText .tabular {
         display: inline-table !important;
         width: auto;
         table-layout: auto;
@@ -13,44 +15,57 @@
         font-size: inherit;
         height: fit-content;
     }
-    .table_tabular .tabular th {
+    .tabular th,
+    #preview-content .tabular th, #setText .tabular th {
         border: none !important;
         padding: 6px 13px;
         background-color: transparent;
         font-weight: bold;
     }
-    .table_tabular .tabular tr {
+    .tabular tr,
+    #preview-content .tabular tr, #setText .tabular tr {
         border-top: none !important;
         border-bottom: none !important;
         background-color: transparent;
     }
-    .table_tabular .tabular td {
+    .tabular td,
+    #preview-content .tabular td, #setText .tabular td {
         border-style: none !important;
         background-color: transparent;
         border-color: currentColor !important;
         word-break: keep-all;
         padding: 0.1em 0.5em !important;
     }
-    .table_tabular .tabular td > p {
+    .tabular td > p,
+    #preview-content .tabular td > p, #setText .tabular td > p {
         margin-bottom: 0;
         margin-top: 0;
     }
-    .tabular td._empty {
+    .tabular td._empty,
+    #preview-content .tabular td._empty, #setText .tabular td._empty {
         height: 1.3em;
     }
-    .tabular td .f {
+    .tabular td .f,
+    #preview-content .tabular td .f, #setText .tabular td .f {
         opacity: 0;
     }
-    html[data-theme="dark"] .table_tabular .tabular tr,
-    html[data-theme="dark"] .table_tabular .tabular td {
+    #preview-content .sub-table table, #setText .sub-table table {
+        margin-bottom: 0;
+    }
+    html[data-theme="dark"] .tabular tr,
+    html[data-theme="dark"] #preview-content .tabular tr, html[data-theme="dark"] #setText .tabular tr,
+    html[data-theme="dark"] .tabular td,
+    html[data-theme="dark"] #preview-content .tabular td, html[data-theme="dark"] #setText .tabular td {
         background-color: transparent;
         border-color: currentColor !important;
     }
-    .figure_img {
+    .figure_img,
+    #preview-content .figure_img, #setText .figure_img {
         margin-bottom: 0.5em;
         overflow-x: auto;
     }
-    div.figure_img img {
+    div.figure_img img,
+    #preview-content div.figure_img img, #setText div.figure_img img {
         display: inline;
         margin: 0;
     }

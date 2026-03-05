@@ -66,7 +66,7 @@ describe('Style snapshots — individual functions:', () => {
   });
 
   it('MathpixStyle (isPptx=true)', () => {
-    assertSnapshot('MathpixStyle-pptx', MathpixStyle(false, true, '', true, true));
+    assertSnapshot('MathpixStyle-pptx', MathpixStyle(false, true, '', true));
   });
 
   it('ContainerStyle (defaults)', () => {
@@ -223,7 +223,7 @@ describe('Style assembly methods — composition:', () => {
     const css = MM.getMathpixStyle(false, false, 'toc', true, true);
 
     it('includes MathpixStyle with isPptx=true', () => {
-      css.should.include(MathpixStyle(false, true, '', true, true));
+      css.should.include(MathpixStyle(false, true, '', true));
     });
   });
 
@@ -334,7 +334,7 @@ describe('buildStyles — direct option combinations:', () => {
 
   it('isPptx: true passes through to MathpixStyle', () => {
     const css = MM.buildStyles({ isPptx: true });
-    css.should.include(MathpixStyle(false, true, '', true, true));
+    css.should.include(MathpixStyle(false, true, '', true));
   });
 
   it('setTextAlignJustify: true passes through to MathpixStyle', () => {
@@ -344,7 +344,7 @@ describe('buildStyles — direct option combinations:', () => {
 
   it('maxWidth passes through to MathpixStyle', () => {
     const css = MM.buildStyles({ maxWidth: '800px' });
-    css.should.include('max-width:800px;');
+    css.should.include('max-width: 800px;');
   });
 
   // ── Canonical order ──
