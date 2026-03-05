@@ -448,8 +448,7 @@ class MathpixMarkdown_Model {
     };
 
     /** Browser runtime: injects SVG-styles + Mathpix-styles into DOM. Includes: core, code, tabular, lists, toc, menu. No container/mathjax (SVG injected separately). */
-    /** @deprecated scaleEquation is unused — kept for backward compatibility */
-    loadMathJax = (notScrolling: boolean = false, setTextAlignJustify: boolean = false, isResetBodyStyles: boolean = false, maxWidth: string = '', _scaleEquation: boolean = true, useColors: boolean = true): boolean => {
+    loadMathJax = (notScrolling: boolean = false, setTextAlignJustify: boolean = false, isResetBodyStyles: boolean = false, maxWidth: string = '', useColors: boolean = true): boolean => {
         try {
             const el = document.getElementById('SVG-styles');
             if (!el) {
@@ -554,9 +553,8 @@ class MathpixMarkdown_Model {
       return css;
     };
 
-    /** Styles for embedded widget (no container/preview). Includes: mathjax, core, code, tabular, lists, menu.
-     *  @deprecated _scaleEquation is unused — kept for backward compatibility */
-    getMathpixStyleOnly = (_scaleEquation: boolean = true, useColors: boolean = true): string => {
+    /** Styles for embedded widget (no container/preview). Includes: mathjax, core, code, tabular, lists, menu.*/
+    getMathpixStyleOnly = (useColors: boolean = true): string => {
       return this.buildStyles({
         useColors,
         mathjax: true,
@@ -564,9 +562,8 @@ class MathpixMarkdown_Model {
       });
     };
 
-    /** Full page styles. Includes: container, mathjax, core, code, tabular, lists. Optionally: preview, toc, menu.
-     *  @deprecated _scaleEquation is unused — kept for backward compatibility */
-    getMathpixStyle = (stylePreview: boolean = false, showToc: boolean = false, tocContainerName: string = 'toc', _scaleEquation: boolean = true, isPptx: boolean = false, useColors: boolean = true): string => {
+    /** Full page styles. Includes: container, mathjax, core, code, tabular, lists. Optionally: preview, toc, menu.*/
+    getMathpixStyle = (stylePreview: boolean = false, showToc: boolean = false, tocContainerName: string = 'toc', useColors: boolean = true, isPptx: boolean = false): string => {
       return this.buildStyles({
         useColors, isPptx, tocContainerName,
         container: true,
@@ -577,9 +574,8 @@ class MathpixMarkdown_Model {
       });
     };
 
-    /** VSCode markdown preview styles. Includes: container, mathjax, core, tabular, lists. No code (VSCode provides its own).
-     *  @deprecated _scaleEquation is unused — kept for backward compatibility */
-    getMathpixMarkdownStyles = (useColors: boolean = true, _scaleEquation: boolean = true): string => {
+    /** VSCode markdown preview styles. Includes: container, mathjax, core, tabular, lists. No code (VSCode provides its own).*/
+    getMathpixMarkdownStyles = (useColors: boolean = true): string => {
       return this.buildStyles({
         useColors,
         container: true,

@@ -143,8 +143,7 @@ All list selectors (`ol.enumerate`, `ul.itemize`, `.li_enumerate`, `.li_level`, 
 ### `src/mathpix-markdown-model/index.ts`
 
 - Import path updated: `halpers` → `helpers`
-- Removed `scaleEquation` from `StyleBundleOpts` interface and `buildStyles()`
-- Public methods keep `_scaleEquation` parameter with `@deprecated` for backward compatibility
+- Removed `scaleEquation` from `StyleBundleOpts` interface, `buildStyles()`, and all public method signatures
 
 ### `tests/_styles.js`
 
