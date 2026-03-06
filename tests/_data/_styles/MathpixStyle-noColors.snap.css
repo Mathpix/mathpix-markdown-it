@@ -1,283 +1,283 @@
 
-    #setText > div {
-        justify-content: inherit;
-        margin-top: 0;
-        margin-bottom: 1em;
-        
-        
-    }
-    #setText div:last-child {
-        margin-bottom: 0 !important;
-    }
-    #setText > br, #preview-content br {
-        line-height: 1.2;
-    }
-    #preview-content > div {
-        margin-top: 0;
-        margin-bottom: 1em;
-        
-    }
-    .proof > div,
-    #preview-content .proof > div, #setText .proof > div,
-    .theorem > div,
-    #preview-content .theorem > div, #setText .theorem > div {
-        margin-top: 1rem;
-    }
-    mjx-container {
-        text-indent: 0;
-        overflow-y: hidden;
-        overflow-x: auto;
-        padding-top: 1px;
-        padding-bottom: 1px;
-        
-        
-    }
-    .math-inline mjx-container {
-        display: inline-block !important;
-        page-break-inside: avoid;
-        max-width: 100%;
-        padding: 0;
-        line-height: 0;
-    }
-    .math-inline[data-overflow="visible"] mjx-container {
-        overflow: visible;
-    }
-    .math-inline mjx-container mjx-assistive-mml {
-        max-width: 100%;
-    }
-    .math-block {
-        align-items: center;
-        page-break-after: auto;
-        page-break-inside: avoid;
-        margin: 0;
-        display: block;
-    }
-    .math-inline {
-        display: inline-flex;
-        max-width: 100%;
-    }
-    .math-block[data-width="full"] {
-        overflow-x: auto;
-        display: flex;
-    }
-    .math-block[data-width="full"] mjx-container[jax=SVG][display=true] {
-        display: flex;
-        flex: 1 1;
-        justify-content: center;
-    }
-    svg .math-inline {
-        display: initial;
-        max-width: initial;
-    }
-    svg .math-inline mjx-container {
-        max-width: initial;
-    }
-    svg mjx-container {
-        overflow: visible;
-        padding: 0;
-    }
-    svg .math-block[data-width="full"] {
-        overflow: visible;
-    }
-    .math-block, .math-inline {
-        --mmd-highlight-color: rgba(0, 147, 255, 0.25);
-        --mmd-highlight-text-color: #1e2029;
-    }
-    .math-block[data-highlight-color] mjx-container[jax="SVG"] > svg {
-        background-color: var(--mmd-highlight-color);
-    }
-    .math-block[data-highlight-text-color] mjx-container[jax="SVG"] > svg {
-        color: var(--mmd-highlight-text-color);
-    }
-    .math-inline[data-highlight-color] mjx-container[jax="SVG"] {
-        background-color: var(--mmd-highlight-color);
-    }
-    .math-inline[data-highlight-text-color] mjx-container[jax="SVG"] {
-        color: var(--mmd-highlight-text-color);
-    }
-    .math-block p {
-        flex-shrink: 1;
-    }
-    .math-block mjx-container {
-        margin: 0 !important;
-    }
-    .math-error {
-        background-color: yellow;
-        color: red;
-    }
-    #preview-content img, #setText img {
-        max-width: 100%;
-    }
-    #preview-content blockquote, #setText blockquote {
-        page-break-inside: avoid;
-        
-        margin: 0 0 1em 0;
-        padding-left: 3em;
-        border-left: .5em solid currentColor;
-    }
-    #preview-content pre, #setText pre {
-        border: none;
-        padding: 0;
-        overflow: auto;
-        font-size: 85%;
-        line-height: 1.45;
-        border-radius: 6px;
-        box-sizing: border-box;
-        
-    }
-    #preview-content pre code, #setText pre code {
-        padding: 1rem;
-        display: block;
-        overflow-x: auto;
-        line-height: 24px;
-    }
-    #preview-content table, #setText table {
-        display: table;
-        overflow: auto;
-        max-width: 100%;
-        border-collapse: collapse;
-        page-break-inside: avoid;
-        margin-bottom: 1em;
-    }
-    #preview-content table th, #setText table th {
-        text-align: center;
-        font-weight: bold;
-    }
-    #preview-content table td, #setText table td,
-    #preview-content table th, #setText table th {
-        border: 1px solid currentColor;
-        padding: 6px 13px;
-    }
-    #preview-content table tr, #setText table tr {
-        
-        border-top: 1px solid currentColor;
-    }
-    #preview-content table tr:nth-child(2n), #setText table tr:nth-child(2n) {
-        
-    }
-    .main-title,
-    #preview-content .main-title, #setText .main-title {
-        text-align: center;
-        line-height: 1.2;
-        margin: 0 auto 1em auto;
-    }
-    .author,
-    #preview-content .author, #setText .author {
-        text-align: center;
-        margin: 0 auto;
-        display: flex;
-        justify-content: center;
-        flex-wrap: wrap;
-    }
-    .author p,
-    #preview-content .author p, #setText .author p {
-        min-width: 30%;
-        max-width: 50%;
-        padding: 0 7px;
-    }
-    .author > p > span,
-    #preview-content .author > p > span, #setText .author > p > span {
-        display: block;
-        text-align: center;
-    }
-    .section-title,
-    #preview-content .section-title, #setText .section-title {
-        margin-top: 1.5em;
-    }
-    .abstract,
-    #preview-content .abstract, #setText .abstract {
-        text-align: justify;
-        margin-bottom: 1em;
-    }
-    .abstract p,
-    #preview-content .abstract p, #setText .abstract p {
-        margin-bottom: 0;
-    }
-    #preview-content sup, #setText sup {
-        top: -.5em;
-        position: relative;
-        font-size: 75%;
-        line-height: 0;
-        vertical-align: baseline;
-    }
-    .text-url,
-    #preview-content .text-url, #setText .text-url {
-        
-        cursor: text;
-        pointer-events: none;
-    }
-    .text-url a:hover,
-    #preview-content .text-url a:hover, #setText .text-url a:hover {
-        
-    }
-    mark,
-    #preview-content mark, #setText mark {
-        
-    }
-    span[data-underline-type] mark,
-    #preview-content span[data-underline-type] mark,
-    #setText span[data-underline-type] mark {
-        background: inherit;
-        
-        padding-top: 0;
-        padding-bottom: 0;
-    }
-    *[data-has-dotfill] {
-        position: relative;
-        overflow: hidden;
-    }
-    *[data-has-dotfill] .dotfill::after {
-        position: absolute;
-        padding-left: .25ch;
-        content: " . . . . . . . . . . . . . . . . . . . "
-            ". . . . . . . . . . . . . . . . . . . . . . . "
-            ". . . . . . . . . . . . . . . . . . . . . . . "
-            ". . . . . . . . . . . . . . . . . . . . . . . "
-            ". . . . . . . . . . . . . . . . . . . . . . . "
-            ". . . . . . . . . . . . . . . . . . . . . . . "
-            ". . . . . . . . . . . . . . . . . . . . . . . ";
-        text-align: right;
-    }
-    .smiles,
-    #preview-content .smiles, #setText .smiles {
-        text-align: center;
-    }
-    div.svg-container,
-    #preview-content > div.svg-container,
-    #setText > div.svg-container {
-        display: flex;
-        justify-content: center;
-    }
-    @media print {
-        #preview {
-            font-size: 10pt !important;
-        }
-        .math-block svg, .math-inline svg {
-            shape-rendering: crispEdges;
-            margin-top: 1px;
-        }
-        #preview-content img, #setText img {
-            display: block;
-        }
-        #preview-content .figure_img img, #setText .figure_img img {
-            display: inline;
-        }
-        #preview-content h1, #preview-content h2, #preview-content h3,
-        #preview-content h4, #preview-content h5, #preview-content h6,
-        #setText h1, #setText h2, #setText h3,
-        #setText h4, #setText h5, #setText h6 {
-            page-break-inside: avoid;
-            position: relative;
-            border: 2px solid transparent;
-        }
-        #preview-content h1::after, #preview-content h2::after, #preview-content h3::after,
-        #preview-content h4::after, #preview-content h5::after, #preview-content h6::after,
-        #setText h1::after, #setText h2::after, #setText h3::after,
-        #setText h4::after, #setText h5::after, #setText h6::after {
-            content: "";
-            display: block;
-            height: 100px;
-            margin-bottom: -100px;
-            position: relative;
-        }
-    }
+#setText > div {
+  justify-content: inherit;
+  margin-top: 0;
+  margin-bottom: 1em;
+  
+  
+}
+#setText div:last-child {
+  margin-bottom: 0 !important;
+}
+#setText > br, #preview-content br {
+  line-height: 1.2;
+}
+#preview-content > div {
+  margin-top: 0;
+  margin-bottom: 1em;
+  
+}
+.proof > div,
+#preview-content .proof > div, #setText .proof > div,
+.theorem > div,
+#preview-content .theorem > div, #setText .theorem > div {
+  margin-top: 1rem;
+}
+mjx-container {
+  text-indent: 0;
+  overflow-y: hidden;
+  overflow-x: auto;
+  padding-top: 1px;
+  padding-bottom: 1px;
+  
+  
+}
+.math-inline mjx-container {
+  display: inline-block !important;
+  page-break-inside: avoid;
+  max-width: 100%;
+  padding: 0;
+  line-height: 0;
+}
+.math-inline[data-overflow="visible"] mjx-container {
+  overflow: visible;
+}
+.math-inline mjx-container mjx-assistive-mml {
+  max-width: 100%;
+}
+.math-block {
+  align-items: center;
+  page-break-after: auto;
+  page-break-inside: avoid;
+  margin: 0;
+  display: block;
+}
+.math-inline {
+  display: inline-flex;
+  max-width: 100%;
+}
+.math-block[data-width="full"] {
+  overflow-x: auto;
+  display: flex;
+}
+.math-block[data-width="full"] mjx-container[jax=SVG][display=true] {
+  display: flex;
+  flex: 1 1;
+  justify-content: center;
+}
+svg .math-inline {
+  display: initial;
+  max-width: initial;
+}
+svg .math-inline mjx-container {
+  max-width: initial;
+}
+svg mjx-container {
+  overflow: visible;
+  padding: 0;
+}
+svg .math-block[data-width="full"] {
+  overflow: visible;
+}
+.math-block, .math-inline {
+  --mmd-highlight-color: rgba(0, 147, 255, 0.25);
+  --mmd-highlight-text-color: #1e2029;
+}
+.math-block[data-highlight-color] mjx-container[jax="SVG"] > svg {
+  background-color: var(--mmd-highlight-color);
+}
+.math-block[data-highlight-text-color] mjx-container[jax="SVG"] > svg {
+  color: var(--mmd-highlight-text-color);
+}
+.math-inline[data-highlight-color] mjx-container[jax="SVG"] {
+  background-color: var(--mmd-highlight-color);
+}
+.math-inline[data-highlight-text-color] mjx-container[jax="SVG"] {
+  color: var(--mmd-highlight-text-color);
+}
+.math-block p {
+  flex-shrink: 1;
+}
+.math-block mjx-container {
+  margin: 0 !important;
+}
+.math-error {
+  background-color: yellow;
+  color: red;
+}
+#preview-content img, #setText img {
+  max-width: 100%;
+}
+#preview-content blockquote, #setText blockquote {
+  page-break-inside: avoid;
+  
+  margin: 0 0 1em 0;
+  padding-left: 3em;
+  border-left: .5em solid currentColor;
+}
+#preview-content pre, #setText pre {
+  border: none;
+  padding: 0;
+  overflow: auto;
+  font-size: 85%;
+  line-height: 1.45;
+  border-radius: 6px;
+  box-sizing: border-box;
+  
+}
+#preview-content pre code, #setText pre code {
+  padding: 1rem;
+  display: block;
+  overflow-x: auto;
+  line-height: 24px;
+}
+#preview-content table, #setText table {
+  display: table;
+  overflow: auto;
+  max-width: 100%;
+  border-collapse: collapse;
+  page-break-inside: avoid;
+  margin-bottom: 1em;
+}
+#preview-content table th, #setText table th {
+  text-align: center;
+  font-weight: bold;
+}
+#preview-content table td, #setText table td,
+#preview-content table th, #setText table th {
+  border: 1px solid currentColor;
+  padding: 6px 13px;
+}
+#preview-content table tr, #setText table tr {
+  
+  border-top: 1px solid currentColor;
+}
+#preview-content table tr:nth-child(2n), #setText table tr:nth-child(2n) {
+  
+}
+.main-title,
+#preview-content .main-title, #setText .main-title {
+  text-align: center;
+  line-height: 1.2;
+  margin: 0 auto 1em auto;
+}
+.author,
+#preview-content .author, #setText .author {
+  text-align: center;
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.author p,
+#preview-content .author p, #setText .author p {
+  min-width: 30%;
+  max-width: 50%;
+  padding: 0 7px;
+}
+.author > p > span,
+#preview-content .author > p > span, #setText .author > p > span {
+  display: block;
+  text-align: center;
+}
+.section-title,
+#preview-content .section-title, #setText .section-title {
+  margin-top: 1.5em;
+}
+.abstract,
+#preview-content .abstract, #setText .abstract {
+  text-align: justify;
+  margin-bottom: 1em;
+}
+.abstract p,
+#preview-content .abstract p, #setText .abstract p {
+  margin-bottom: 0;
+}
+#preview-content sup, #setText sup {
+  top: -.5em;
+  position: relative;
+  font-size: 75%;
+  line-height: 0;
+  vertical-align: baseline;
+}
+.text-url,
+#preview-content .text-url, #setText .text-url {
+  
+  cursor: text;
+  pointer-events: none;
+}
+.text-url a:hover,
+#preview-content .text-url a:hover, #setText .text-url a:hover {
+  
+}
+mark,
+#preview-content mark, #setText mark {
+  
+}
+span[data-underline-type] mark,
+#preview-content span[data-underline-type] mark,
+#setText span[data-underline-type] mark {
+  background: inherit;
+  
+  padding-top: 0;
+  padding-bottom: 0;
+}
+*[data-has-dotfill] {
+  position: relative;
+  overflow: hidden;
+}
+*[data-has-dotfill] .dotfill::after {
+  position: absolute;
+  padding-left: .25ch;
+  content: " . . . . . . . . . . . . . . . . . . . "
+      ". . . . . . . . . . . . . . . . . . . . . . . "
+      ". . . . . . . . . . . . . . . . . . . . . . . "
+      ". . . . . . . . . . . . . . . . . . . . . . . "
+      ". . . . . . . . . . . . . . . . . . . . . . . "
+      ". . . . . . . . . . . . . . . . . . . . . . . "
+      ". . . . . . . . . . . . . . . . . . . . . . . ";
+  text-align: right;
+}
+.smiles,
+#preview-content .smiles, #setText .smiles {
+  text-align: center;
+}
+div.svg-container,
+#preview-content > div.svg-container,
+#setText > div.svg-container {
+  display: flex;
+  justify-content: center;
+}
+@media print {
+  #preview {
+    font-size: 10pt !important;
+  }
+  .math-block svg, .math-inline svg {
+    shape-rendering: crispEdges;
+    margin-top: 1px;
+  }
+  #preview-content img, #setText img {
+    display: block;
+  }
+  #preview-content .figure_img img, #setText .figure_img img {
+    display: inline;
+  }
+  #preview-content h1, #preview-content h2, #preview-content h3,
+  #preview-content h4, #preview-content h5, #preview-content h6,
+  #setText h1, #setText h2, #setText h3,
+  #setText h4, #setText h5, #setText h6 {
+    page-break-inside: avoid;
+    position: relative;
+    border: 2px solid transparent;
+  }
+  #preview-content h1::after, #preview-content h2::after, #preview-content h3::after,
+  #preview-content h4::after, #preview-content h5::after, #preview-content h6::after,
+  #setText h1::after, #setText h2::after, #setText h3::after,
+  #setText h4::after, #setText h5::after, #setText h6::after {
+    content: "";
+    display: block;
+    height: 100px;
+    margin-bottom: -100px;
+    position: relative;
+  }
+}

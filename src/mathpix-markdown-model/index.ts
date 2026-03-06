@@ -538,19 +538,33 @@ class MathpixMarkdown_Model {
         tocContainerName = 'toc',
         menu = false,
       } = opts;
-
-      let css = '';
-      if (resetBody)  css += resetBodyStyles;
-      if (container)  css += ContainerStyle(useColors);
-      if (mathjax)    css += this.getMathjaxStyle();
-      css += MathpixStyle(setTextAlignJustify, useColors, maxWidth, isPptx);
-      if (code)       css += codeStyles(useColors);
-      css += tabularStyles(useColors, isPptx);
-      css += listsStyles;
-      if (preview)    css += PreviewStyle;
-      if (toc)        css += TocStyle(tocContainerName);
-      if (menu)       { css += menuStyle(); css += clipboardCopyStyles(); }
-      return css;
+      const parts: string[] = [];
+      if (resetBody){
+        parts.push(resetBodyStyles);
+      }
+      if (container){
+        parts.push(ContainerStyle(useColors));
+      }
+      if (mathjax){
+        parts.push(this.getMathjaxStyle());
+      }
+      parts.push(MathpixStyle(setTextAlignJustify, useColors, maxWidth, isPptx));
+      if (code){
+        parts.push(codeStyles(useColors));
+      }
+      parts.push(tabularStyles(useColors, isPptx));
+      parts.push(listsStyles);
+      if (preview){
+        parts.push(PreviewStyle);
+      }
+      if (toc){
+        parts.push(TocStyle(tocContainerName));
+      }
+      if (menu){
+        parts.push(menuStyle());
+        parts.push(clipboardCopyStyles());
+      }
+      return parts.map(s => s.trim()).join('\n');
     };
 
     /** Styles for embedded widget (no container/preview). Includes: mathjax, core, code, tabular, lists, menu.*/
