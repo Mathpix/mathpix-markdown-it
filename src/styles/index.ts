@@ -71,7 +71,6 @@ mjx-container {
   padding-top: 1px;
   padding-bottom: 1px;
   ${maxWidth ? `max-width: ${maxWidth};` : ''}
-  ${maxWidth ? 'overflow-x: auto;' : ''}
 }`,
     maxWidth && `
 mjx-container[jax="SVG"] > svg {

@@ -100,7 +100,7 @@ export const MathpixStyle = (...) => [
 ].join('');
 ```
 
-Scoped selectors added for: `.proof`, `.theorem`, `.main-title`, `.author`, `.section-title`, `.abstract`, `.text-url`, `mark`, `span[data-underline-type] mark`, `.smiles`, `div.svg-container`.
+Scoped selectors added for: `.proof`, `.theorem`, `.main-title`, `.author`, `.section-title`, `.abstract`, `.text-url`, `mark`, `span[data-underline-type] mark`, `.smiles`, `div.svg-container`. Bare `h1, h2, ...` in `maxWidth` overflow block scoped as `#setText > h1, #setText > h2, ...`.
 
 Dead code removed: `.empty` (never generated), `.preview-right` (used as id, not class), `scaleEquation` parameter (accepted but never used in CSS output).
 
@@ -130,7 +130,7 @@ Note: `.sub-table` rule moved here from `index.ts` (where it didn't belong).
 
 ### `src/styles/styles-code.ts` — scoped hljs, normalized indentation
 
-All 19 `.hljs-*` rule blocks now follow bare + scoped pattern. Indentation normalized from 6 to 8 spaces.
+All 19 `.hljs-*` rule blocks now follow bare + scoped pattern. Indentation normalized to 0/2 (0 for selectors, 2 for properties).
 
 ### `src/styles/styles-lists.ts` — scoped all selectors
 
@@ -153,11 +153,15 @@ All list selectors (`ol.enumerate`, `ul.itemize`, `.li_enumerate`, `.li_level`, 
 
 - Updated `MathpixStyle` calls: removed `scaleEquation` argument
 - Updated `max-width` assertion: `'max-width:800px;'` → `'max-width: 800px;'`
-- All 68 tests pass
+- Added `t()` trim helper for composition/buildStyles assertions (accounts for `parts.map(s => s.trim()).join('\n')` in `buildStyles`)
+- Added `tabularStyles(isPptx=true)` snapshot test
+- Added `codeStyles(false)` coverage in `getMathpixStyle(useColors=false)` test
+- Added `tabularStyles(true, true)` assertion in `buildStyles isPptx` test
+- All 79 tests pass
 
 ### Snapshot files
 
-All 16 `tests/_data/_styles/*.snap.css` files regenerated.
+All 17 `tests/_data/_styles/*.snap.css` files regenerated (including `tabularStyles-pptx`).
 
 ---
 
@@ -215,9 +219,16 @@ Converted from static string to function accepting `useColors` parameter.
 
 - Missing dot: `math-inline svg` → `.math-inline svg` in `@media print`
 - Missing dot: `svg math-block` → `svg .math-block`
-- Unscoped selectors: `h1, h2, ...` → `#setText > h1, #setText > h2, ...`
 - Missing template interpolation: `#{containerName}` → `#${containerName}` in TocStyle
 - Dead code: removed empty `if (showToc) {}`
+
+### CSS output cleanup
+
+- All style files normalized to 0/2 indentation (0 spaces for selectors, 2 spaces for properties).
+- `buildStyles` refactored from string concatenation to `parts.map(s => s.trim()).join('\n')` — eliminates blank lines between CSS modules.
+- Removed duplicate `overflow-x: auto` in `mjx-container` rule (was emitted both unconditionally and conditionally when `maxWidth` is set).
+- Color constants extracted into `src/styles/colors.ts` (link, text, border, background, hljs, toc, menu, clipboard colors).
+- `src/contex-menu/styles.ts` and `src/copy-to-clipboard/clipboard-copy-styles.ts` refactored: colors moved to constants, formatting normalized, minor CSS optimizations (`0px` → `0`, padding shorthand).
 
 ---
 
@@ -232,7 +243,7 @@ Converted from static string to function accepting `useColors` parameter.
 ## Constraints / Invariants
 
 - HTML output class names unchanged — no downstream breakage.
-- Public API methods unchanged — same signatures, same output.
+- Public API method signatures changed: `scaleEquation` parameter removed (was unused). Positional callers must shift arguments. `buildStyles(opts)` available as named-parameter alternative.
 - Inherited CSS properties (`font-family`, `color`, `line-height`) intentionally cascade from host into MMD content.
 
 ---
@@ -251,6 +262,6 @@ Converted from static string to function accepting `useColors` parameter.
 - [x] `loadMathJax` DOM re-injection fix
 - [x] `useColors` propagated through all style functions
 - [x] Pre-existing bugs fixed
-- [x] Snapshot + composition + buildStyles tests (68 tests)
+- [x] Snapshot + composition + buildStyles tests (79 tests)
 - [x] All existing tests pass
 - [ ] PR reviewed and merged

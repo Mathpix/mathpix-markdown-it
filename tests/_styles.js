@@ -62,6 +62,9 @@ describe('Style snapshots — individual functions:', () => {
   it('tabularStyles (useColors=false)', () => {
     assertSnapshot('tabularStyles-noColors', tabularStyles(false));
   });
+  it('tabularStyles (isPptx=true)', () => {
+    assertSnapshot('tabularStyles-pptx', tabularStyles(true, true));
+  });
   it('listsStyles', () => {
     assertSnapshot('listsStyles', listsStyles);
   });
@@ -160,6 +163,9 @@ describe('Style assembly methods — composition:', () => {
     it('includes tabularStyles with useColors=false', () => {
       css.should.include(t(tabularStyles(false)));
     });
+    it('includes codeStyles with useColors=false', () => {
+      css.should.include(t(codeStyles(false)));
+    });
   });
   describe('getMathpixStyle (isPptx=true)', () => {
     const css = MM.getMathpixStyle(false, false, 'toc', true, true);
@@ -254,6 +260,7 @@ describe('buildStyles — direct option combinations:', () => {
   it('isPptx: true passes through to MathpixStyle', () => {
     const css = MM.buildStyles({ isPptx: true });
     css.should.include(t(MathpixStyle(false, true, '', true)));
+    css.should.include(t(tabularStyles(true, true)));
   });
   it('setTextAlignJustify: true passes through to MathpixStyle', () => {
     const css = MM.buildStyles({ setTextAlignJustify: true });

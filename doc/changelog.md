@@ -1,6 +1,6 @@
 # March 2026
 
-## CSS scoping and style module cleanup
+## [2.0.37] - CSS scoping and style module cleanup
 
 - CSS Scoping:
   - All MMD class selectors now have `#preview-content`/`#setText` scoped variants for specificity boost.
@@ -12,9 +12,12 @@
   - Color constants extracted into `src/styles/colors.ts`.
   - `halpers.ts` renamed to `helpers.ts`.
 
-- Bug Fixes:
+- Improvements:
   - `.tabular` now renders consistently regardless of context (standalone vs nested inside a list). Previously, list context could affect table width and font size via cascade. Fixed with explicit `margin: 0 0 1em`, `font-size: inherit`, and other defensive defaults.
   - `useColors=false` now correctly omits blockquote border, table border, and mark background colors.
+  - `getMathpixStyle(useColors=false)` now also omits `ContainerStyle` colors (body text, headings, links, captions). Previously `ContainerStyle()` was always called with default colors.
+
+- Bug Fixes:
   - `div.svg-container` child combinator consistency (`>` for both `#preview-content` and `#setText`).
   - `loadMathJax` updates existing `#Mathpix-styles` element instead of skipping.
 
@@ -23,6 +26,9 @@
 
 - Dead Code Removed:
   - `.empty` selector (never generated), `.preview-right` selector (used as id, not class).
+
+- Docs:
+  - Added implementation details in `pr-specs/2026-03-mmd-css-scoping.md`.
 
 # February 2026
 
