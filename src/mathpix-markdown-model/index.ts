@@ -545,7 +545,7 @@ class MathpixMarkdown_Model {
       if (mathjax)    css += this.getMathjaxStyle();
       css += MathpixStyle(setTextAlignJustify, useColors, maxWidth, isPptx);
       if (code)       css += codeStyles(useColors);
-      css += tabularStyles(useColors);
+      css += tabularStyles(useColors, isPptx);
       css += listsStyles;
       if (preview)    css += PreviewStyle;
       if (toc)        css += TocStyle(tocContainerName);
