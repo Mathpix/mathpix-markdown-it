@@ -16,7 +16,7 @@ export const tabularStyles = (useColors: boolean = true): string => `
         table-layout: auto;
         border-collapse: collapse;
         border-spacing: 0;
-        margin: 0;
+        margin: 0 0 1em;
         font-size: inherit;
         height: fit-content;
     }

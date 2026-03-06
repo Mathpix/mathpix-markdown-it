@@ -104,7 +104,11 @@ Scoped selectors added for: `.proof`, `.theorem`, `.main-title`, `.author`, `.se
 
 Dead code removed: `.empty` (never generated), `.preview-right` (used as id, not class), `scaleEquation` parameter (accepted but never used in CSS output).
 
-Bug fixes: `div.svg-container` child combinator consistency (`>` for both `#preview-content` and `#setText`).
+Specificity side-effect fix: `.tabular` had `margin: 0` which at (0,1,0) was overridden by `#setText table { margin-bottom: 1em }` (1,0,1). After scoping, `#setText .tabular` (1,1,0) beats `#setText table` (1,0,1), dropping the margin. Fixed by replacing `margin: 0` with `margin: 0 0 1em` so `.tabular` explicitly declares its own bottom margin.
+
+`useColors=false` color leaks fixed: blockquote `border-left`, table `border`, and `mark` `background-color` now gated behind `useColors`.
+
+Bug fix: `div.svg-container` child combinator consistency (`>` for both `#preview-content` and `#setText`).
 
 ### `src/styles/styles-tabular.ts` — replaced `.table_tabular .tabular` with ID scoping
 
