@@ -44,3 +44,20 @@ export declare const COLOR_TOC_SUBTITLE = "#979797";
 export declare const COLOR_TOC_LINK = "#000";
 export declare const COLOR_TOC_LINK_HOVER = "#0093FF";
 export declare const COLOR_TOC_LINK_ACTIVE = "#047DD6";
+/** Context menu */
+export declare const COLOR_MENU_BORDER = "#E5E6EB";
+export declare const COLOR_MENU_SHADOW = "#808080";
+export declare const COLOR_MENU_ITEM_ACTIVE_BG = "#e1e0e5";
+export declare const COLOR_MENU_ITEM_VALUE = "#7d829c";
+export declare const COLOR_MENU_OVERLAY = "rgba(0, 0, 0, 0.56)";
+export declare const COLOR_DARK_MENU_TITLE = "#ebefe7";
+export declare const COLOR_DARK_MENU_BG = "#33363a";
+/** Clipboard */
+export declare const COLOR_CLIPBOARD_TEXT = "rgb(36, 41, 47)";
+export declare const COLOR_CLIPBOARD_BG = "rgb(246, 248, 250)";
+export declare const COLOR_CLIPBOARD_BORDER = "rgba(31, 35, 40, 0.15)";
+export declare const COLOR_CLIPBOARD_SHADOW = "rgba(31, 35, 40, 0.04)";
+export declare const COLOR_CLIPBOARD_SHADOW_INSET = "rgba(255, 255, 255, 0.25)";
+export declare const COLOR_CLIPBOARD_HOVER_BG = "rgb(243, 244, 246)";
+export declare const COLOR_CLIPBOARD_COPY_ICON = "rgb(101, 109, 118)";
+export declare const COLOR_CLIPBOARD_CHECK_ICON = "rgb(26, 127, 55)";
