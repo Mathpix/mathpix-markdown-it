@@ -104,7 +104,7 @@ Scoped selectors added for: `.proof`, `.theorem`, `.main-title`, `.author`, `.se
 
 Dead code removed: `.empty` (never generated), `.preview-right` (used as id, not class), `scaleEquation` parameter (accepted but never used in CSS output).
 
-Specificity side-effect fix: `.tabular` had `margin: 0` which at (0,1,0) was overridden by `#setText table { margin-bottom: 1em }` (1,0,1). After scoping, `#setText .tabular` (1,1,0) beats `#setText table` (1,0,1), dropping the margin. Fixed by replacing `margin: 0` with `margin: 0 0 1em` so `.tabular` explicitly declares its own bottom margin.
+Specificity side-effect fix: `.tabular` had `margin: 0` which at (0,1,0) was overridden by `#setText table { margin-bottom: 1em }` (1,0,1). After scoping, `#setText .tabular` (1,1,0) beats `#setText table` (1,0,1), dropping the margin. Fixed by replacing `margin: 0` with `margin: 0 0 1em` so `.tabular` explicitly declares its own bottom margin. Additionally, `font-size: inherit` and other defensive defaults now ensure `.tabular` renders consistently regardless of context (e.g., standalone vs nested inside a list) — previously, list context could affect table width and font size via cascade.
 
 `useColors=false` color leaks fixed: blockquote `border-left`, table `border`, and `mark` `background-color` now gated behind `useColors`.
 

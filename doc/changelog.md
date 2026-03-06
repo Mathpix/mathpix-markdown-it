@@ -13,6 +13,7 @@
   - `halpers.ts` renamed to `helpers.ts`.
 
 - Bug Fixes:
+  - `.tabular` now renders consistently regardless of context (standalone vs nested inside a list). Previously, list context could affect table width and font size via cascade. Fixed with explicit `margin: 0 0 1em`, `font-size: inherit`, and other defensive defaults.
   - `useColors=false` now correctly omits blockquote border, table border, and mark background colors.
   - `div.svg-container` child combinator consistency (`>` for both `#preview-content` and `#setText`).
   - `loadMathJax` updates existing `#Mathpix-styles` element instead of skipping.
