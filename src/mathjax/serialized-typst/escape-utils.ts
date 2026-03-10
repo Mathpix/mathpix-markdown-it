@@ -1,37 +1,49 @@
 /**
  * Unified expression scanner for Typst escape operations.
  *
- * All escape functions share the same infrastructure: walk a Typst expression
- * tracking bracket depth, skip quoted strings ("...") and backslash-escaped
- * characters, and apply operations on specific characters at depth 0.
- *
- * This module consolidates five previously duplicated implementations into
- * a single parametric scanner with thin wrappers preserving the original API.
+ * Walks a Typst expression tracking bracket depth, skips quoted strings ("...")
+ * and backslash-escaped characters, applies escape/detection at depth 0.
  */
 
 import { RE_WORD_CHAR } from "./consts";
 
-interface ScanOptions {
+const SEPARATOR_FOUND = 'found';
+
+interface DetectOptions {
+  /** Detection mode: return early with SEPARATOR_FOUND if , or ; at depth 0 */
+  detectOnly: true;
+}
+
+interface TransformOptions {
+  detectOnly?: false;
   /** Escape commas at depth 0: , → \, */
   escapeComma?: boolean;
   /** Escape semicolons at depth 0: ; → \; */
   escapeSemicolon?: boolean;
   /** Escape colons at depth 0: word: → word : (space prevents named-arg parsing) */
   escapeColon?: boolean;
-  /** Escape unbalanced closing parens at depth 0: ) → ")" */
-  escapeUnbalancedClose?: boolean;
-  /** Detection mode: return early with 'found' if , or ; at depth 0 */
-  detectOnly?: boolean;
+  /** Escape unbalanced closing parens at depth 0: ) → ")" (only parentheses, not ] or }) */
+  escapeUnbalancedCloseParen?: boolean;
 }
+
+type ScanOptions = DetectOptions | TransformOptions;
 
 /**
  * Walk a Typst expression tracking bracket depth, skipping quoted strings
  * and backslash-escaped characters. Apply escape/detection per opts.
  *
- * In detectOnly mode: returns '' if no separator found, or 'found' on first hit.
+ * In detectOnly mode: returns '' if no separator found, or SEPARATOR_FOUND on first hit.
  * In transform mode: returns the escaped expression string.
  */
+const isDetectMode = (opts: ScanOptions): opts is DetectOptions =>
+  opts.detectOnly === true;
+
 const scanExpression = (expr: string, opts: ScanOptions): string => {
+  const detectOnly = isDetectMode(opts);
+  const escapeComma = !detectOnly && !!opts.escapeComma;
+  const escapeSemicolon = !detectOnly && !!opts.escapeSemicolon;
+  const escapeColon = !detectOnly && !!opts.escapeColon;
+  const escapeUnbalancedCloseParen = !detectOnly && !!opts.escapeUnbalancedCloseParen;
   // Separate depth counters per bracket type to avoid cross-type mismatches
   let parenDepth = 0;   // ()
   let bracketDepth = 0; // []
@@ -39,7 +51,7 @@ const scanExpression = (expr: string, opts: ScanOptions): string => {
   let result = '';
   for (let i = 0; i < expr.length; i++) {
     const ch = expr[i];
-    // Skip quoted strings: copy "..." verbatim
+    // Skip quoted strings: copy "..." verbatim (unclosed quote consumes to end)
     if (ch === '"') {
       let j = i + 1;
       while (j < expr.length) {
@@ -47,58 +59,60 @@ const scanExpression = (expr: string, opts: ScanOptions): string => {
         if (expr[j] === '"') break;
         j++;
       }
-      if (j < expr.length) {
-        if (opts.detectOnly) { i = j; continue; }
-        result += expr.slice(i, j + 1);
-        i = j;
-        continue;
-      }
+      const end = j < expr.length ? j : expr.length - 1;
+      if (!detectOnly) { result += expr.slice(i, end + 1); }
+      i = end;
+      continue;
     }
     // Skip backslash-escaped chars: \, \; \( \) \[ \] \{ \} etc.
     if (ch === '\\' && i + 1 < expr.length) {
-      if (!opts.detectOnly) { result += ch + expr[i + 1]; }
+      if (!detectOnly) { result += ch + expr[i + 1]; }
       i++;
       continue;
     }
-
-    if (ch === '(') { parenDepth++; if (!opts.detectOnly) result += ch; continue; }
-    if (ch === '[') { bracketDepth++; if (!opts.detectOnly) result += ch; continue; }
-    if (ch === '{') { braceDepth++; if (!opts.detectOnly) result += ch; continue; }
+    if (ch === '(') { parenDepth++; if (!detectOnly) result += ch; continue; }
+    if (ch === '[') { bracketDepth++; if (!detectOnly) result += ch; continue; }
+    if (ch === '{') { braceDepth++; if (!detectOnly) result += ch; continue; }
     if (ch === ')') {
-      if (opts.escapeUnbalancedClose) {
-        if (parenDepth > 0) { parenDepth--; result += ch; }
-        else { result += '")"'; }
+      if (escapeUnbalancedCloseParen) {
+        if (parenDepth > 0) {
+          parenDepth--;
+          result += ch;
+        } else {
+          result += '")"';
+        }
         continue;
       }
       if (parenDepth > 0) parenDepth--;
-      if (!opts.detectOnly) result += ch;
+      if (!detectOnly) result += ch;
       continue;
     }
     if (ch === ']') {
       if (bracketDepth > 0) bracketDepth--;
-      if (!opts.detectOnly) result += ch;
+      if (!detectOnly) result += ch;
       continue;
     }
     if (ch === '}') {
       if (braceDepth > 0) braceDepth--;
-      if (!opts.detectOnly) result += ch;
+      if (!detectOnly) result += ch;
       continue;
     }
-
-    const depth = parenDepth + bracketDepth + braceDepth;
-    if (depth === 0) {
-      if (ch === ',' && (opts.escapeComma || opts.detectOnly)) {
-        if (opts.detectOnly) return 'found';
+    const isTopLevel = parenDepth === 0 && bracketDepth === 0 && braceDepth === 0;
+    if (isTopLevel) {
+      if (ch === ',' && (escapeComma || detectOnly)) {
+        if (detectOnly) return SEPARATOR_FOUND;
         result += '\\,';
         continue;
       }
-      if (ch === ';' && (opts.escapeSemicolon || opts.detectOnly)) {
-        if (opts.detectOnly) return 'found';
+      if (ch === ';' && (escapeSemicolon || detectOnly)) {
+        if (detectOnly) return SEPARATOR_FOUND;
         result += '\\;';
         continue;
       }
-      if (ch === ':' && opts.escapeColon) {
-        if (result.length > 0 && RE_WORD_CHAR.test(result[result.length - 1])) {
+      if (ch === ':' && escapeColon) {
+        // Check the preceding char in the source expression, not the transformed result,
+        // so other transformations cannot affect colon-spacing logic
+        if (i > 0 && RE_WORD_CHAR.test(expr[i - 1])) {
           result += ' :';
         } else {
           result += ':';
@@ -106,10 +120,9 @@ const scanExpression = (expr: string, opts: ScanOptions): string => {
         continue;
       }
     }
-
-    if (!opts.detectOnly) { result += ch; }
+    if (!detectOnly) { result += ch; }
   }
-  return opts.detectOnly ? '' : result;
+  return detectOnly ? '' : result;
 };
 
 /** Escape , and ; at depth 0 in content placed inside any Typst function call.
@@ -123,10 +136,10 @@ export const escapeContentSeparators = (expr: string): string =>
 export const escapeCasesSeparators = (expr: string): string =>
   scanExpression(expr, { escapeComma: true, escapeSemicolon: true, escapeColon: true });
 
-/** Check whether a Typst expression contains , or ; at parenthesis depth 0.
+/** Check whether a Typst expression contains , or ; at top level (outside (), [] and {}).
  *  Skips content inside "..." strings (handles escaped quotes). */
 export const hasTopLevelSeparators = (expr: string): boolean =>
-  scanExpression(expr, { detectOnly: true }) !== '';
+  scanExpression(expr, { detectOnly: true }) === SEPARATOR_FOUND;
 
 /** Escape top-level ; → \; inside lr() content (commas are safe in lr).
  *  Skips content inside "..." strings and backslash-escaped chars. */
@@ -136,4 +149,4 @@ export const escapeLrSemicolons = (expr: string): string =>
 /** Escape unbalanced closing parentheses at depth 0: ) → ")".
  *  Prevents premature closure of wrapping function calls. */
 export const escapeUnbalancedParens = (content: string): string =>
-  scanExpression(content, { escapeUnbalancedClose: true });
+  scanExpression(content, { escapeUnbalancedCloseParen: true });
