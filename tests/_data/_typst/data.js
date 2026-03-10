@@ -2646,4 +2646,14 @@ module.exports = [
     typst: `f^((n))(a)`,
     typst_inline: `f^((n))(a)`,
   },
+  {
+    latex: `\\begin{align*}\n& \\left.\\begin{array}{l}\nd=L_{2} \\varepsilon u=L_{2} \\alpha \\\\\ng=\\delta L_{2}+s\n\\end{array}\\right\\}  \\tag{6-81}\\\\\n& d^{2}=u^{2}+(g-y)^{2}\n\\end{align*}`,
+    typst: `#math.equation(block: true, numbering: n => [(6-81)], number-align: end + top, $ &lr(mat(delim: #none, align: #left, \n  d = L_2 epsilon u = L_2 alpha;\n  g = delta L_2 + s,\n) \\}) \\\n &d^2 = u^2 + (g - y)^2 $)\n#counter(math.equation).update(n => n - 1)`,
+    typst_inline: `&lr(mat(delim: #none, align: #left, \n  d = L_2 epsilon u = L_2 alpha;\n  g = delta L_2 + s,\n) \\}) \\\n &d^2 = u^2 + (g - y)^2`,
+  },
+  {
+    latex: `\\left[\\begin{array}{l} a \\\\ b \\end{array}\\right)`,
+    typst: `lr(\\[ mat(delim: #none, align: #left, \n  a;\n  b,\n) \\))`,
+    typst_inline: `lr(\\[ mat(delim: #none, align: #left, \n  a;\n  b,\n) \\))`,
+  },
 ];

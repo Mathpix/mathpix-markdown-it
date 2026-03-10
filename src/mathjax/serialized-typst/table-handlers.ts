@@ -3,11 +3,13 @@ import {
   RE_NBSP, RE_CONTENT_SPECIAL, RE_TAG_EXTRACT, RE_TAG_STRIP,
   DATA_PRE_CONTENT, DATA_POST_CONTENT,
   DATA_TAG_AUTO, DATA_LABEL_KEY, DEFAULT_EQ_NUMBERING, EQ_TAG_FIGURE_KIND,
+  OPEN_BRACKETS,
 } from "./consts";
 import { initTypstData, addToTypstData, getChildText, getProp } from "./common";
 import { escapeCasesSeparators } from "./escape-utils";
 import {
   treeContainsMo, serializePrefixBeforeMo, replaceUnpairedBrackets, delimiterToTypst,
+  escapeLrDelimiter,
 } from "./bracket-utils";
 
 /** Extract the original \label{} key from an mlabeledtr label cell.
@@ -410,12 +412,13 @@ const buildMatrix = (
     : '';
   const params: string[] = [];
   const hasDelimiters = branchOpen || branchClose;
-  if (hasDelimiters) {
-    if (branchOpen) {
-      params.push(`delim: ${delimiterToTypst(branchOpen)}`);
-    }
+  // Matched pair (same char like |…| or paired like (…)) → mat(delim: ...).
+  // Mismatched or asymmetric → mat(delim: #none) wrapped in lr() below.
+  const isMatchedPair = branchOpen && branchClose
+    && (branchOpen === branchClose || OPEN_BRACKETS[branchOpen] === branchClose);
+  if (isMatchedPair) {
+    params.push(`delim: ${delimiterToTypst(branchOpen)}`);
   } else {
-    // Arrays/matrices without parent delimiters should not have parens
     params.push('delim: #none');
   }
   if (matAlign) {
@@ -425,7 +428,19 @@ const buildMatrix = (
     params.push(augmentStr);
   }
   const paramStr = params.length > 0 ? params.join(', ') + ', ' : '';
-  const matExpr = `mat(${paramStr}${matContent})`;
+  let matExpr = `mat(${paramStr}${matContent})`;
+  // Non-matched delimiters (asymmetric or mismatched): wrap mat() in lr()
+  if (hasDelimiters && !isMatchedPair) {
+    const openEsc = branchOpen ? escapeLrDelimiter(branchOpen) : '';
+    const closeEsc = branchClose ? escapeLrDelimiter(branchClose) : '';
+    if (openEsc && closeEsc) {
+      matExpr = `lr(${openEsc} ${matExpr} ${closeEsc})`;
+    } else if (openEsc) {
+      matExpr = `lr(${openEsc} ${matExpr})`;
+    } else if (closeEsc) {
+      matExpr = `lr(${matExpr} ${closeEsc})`;
+    }
+  }
   if (frame === 'solid') {
     res = addToTypstData(res, { typst: `#box(stroke: 0.5pt, inset: 3pt, $ ${matExpr} $)`, typst_inline: matExpr });
   } else {
