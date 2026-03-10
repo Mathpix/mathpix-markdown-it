@@ -37,7 +37,7 @@ const BB_SHORTHAND_LETTERS: ReadonlySet<string> = new Set(
   'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
 );
 
-// Operators that should have spaces around them for readability
+// Operators that get spaces around them in non-script contexts for readability
 const SPACED_OPERATORS: ReadonlySet<string> = new Set([
   '+', '-', '=', '<', '>', MINUS_SIGN, PLUS_MINUS, MINUS_PLUS,
 ]);
@@ -50,18 +50,43 @@ const MATHJAX_MULTIWORD_OPS: ReadonlyMap<string, string> = new Map([
 ]);
 
 // MathML spacing widths → Typst spacing keywords
-const MSPACE_WIDTH_MAP: Readonly<Record<string, string>> = {
-  '2em': ' wide ',
-  '1em': ' quad ',
-  '0.2778em': ' thick ',  // \; → thickmathspace
-  '0.278em': ' thick ',
-  '0.2222em': ' med ',    // \: → mediummathspace
-  '0.222em': ' med ',
-  '0.1667em': ' thin ',   // \, → thinmathspace
-  '0.167em': ' thin ',
-  '-0.1667em': '',         // \! → negative thin space (Typst has no negthin; skip)
-  '-0.167em': '',
-};
+const MSPACE_WIDTH_MAP: ReadonlyMap<string, string> = new Map([
+  ['2em', ' wide '],
+  ['1em', ' quad '],
+  ['0.2778em', ' thick '],  // \; → thickmathspace
+  ['0.278em', ' thick '],
+  ['0.2222em', ' med '],    // \: → mediummathspace
+  ['0.222em', ' med '],
+  ['0.1667em', ' thin '],   // \, → thinmathspace
+  ['0.167em', ' thin '],
+  ['-0.1667em', ''],         // \! → negative thin space (Typst has no negthin; skip)
+  ['-0.167em', ''],
+]);
+
+// Parent node kinds that represent sub/superscript contexts
+const SCRIPT_PARENT_KINDS: ReadonlySet<string> = new Set([
+  'msub', 'msup', 'msubsup', 'munderover', 'munder', 'mover',
+]);
+
+/** Escape a string for use inside Typst string literals ("...") */
+const escapeTypstString = (s: string): string =>
+  s.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+
+/** Normalize multi-word operator name (thin/non-breaking spaces → regular space) */
+const normalizeOperatorName = (value: string): string =>
+  value.replace(RE_UNICODE_SPACES, ' ').trim();
+
+/** True when the token looks like a word (multi-char, starts with letter/dot) */
+const isWordLikeToken = (value: string): boolean =>
+  value.length > 1 && RE_WORD_START.test(value);
+
+/** Check if a node is inside a sub/superscript context */
+const isInScriptContext = (node: MathNode): boolean =>
+  !!node.parent && SCRIPT_PARENT_KINDS.has(node.parent.kind);
+
+/** Shorthand: create ITypstData with a single typst string */
+const singleTypst = (typst: string): ITypstData =>
+  addToTypstData(initTypstData(), { typst });
 
 /** Extract the primary Typst symbol text from a node (mi/mo).
  *  Gets the first child's text and maps it through findTypstSymbol. */
@@ -71,65 +96,117 @@ const getNodeTypstSymbol = (node: MathNode): string => {
   return findTypstSymbol(text);
 };
 
+/** Wrap value with context-dependent spaces (before/after sibling-aware) */
+const withContextSpaces = (node: MathNode, value: string): string => {
+  const before = needsSpaceBefore(node) ? ' ' : '';
+  const after = needsSpaceAfter(node) ? ' ' : '';
+  return before + value + after;
+};
+
 const needsSpaceBefore = (node: MathNode): boolean => {
-  try {
-    if (isFirstChild(node)) return false;
-    const index = getSiblingIndex(node);
-    if (index <= 0) return false;
-    const prev = node.parent.childNodes[index - 1];
-    if (prev.kind === 'mi' || prev.kind === 'mo') {
-      return RE_WORD_DOT_END.test(getNodeTypstSymbol(prev));
-    }
-    if (prev.kind === 'mn') return true;
-    return false;
-  } catch (_e: unknown) {
-    return false;
+  const parent = node.parent;
+  if (!parent || isFirstChild(node)) return false;
+  const index = getSiblingIndex(node);
+  if (index <= 0) return false;
+  const prev = parent.childNodes[index - 1];
+  if (!prev) return false;
+  if (prev.kind === 'mi' || prev.kind === 'mo') {
+    return RE_WORD_DOT_END.test(getNodeTypstSymbol(prev));
   }
+  return prev.kind === 'mn';
 };
 
 const needsSpaceAfter = (node: MathNode): boolean => {
-  try {
-    if (isLastChild(node)) return false;
-    const parentKind = node.parent?.kind;
-    if (parentKind === 'msub' || parentKind === 'msup' || parentKind === 'msubsup'
-      || parentKind === 'munderover' || parentKind === 'munder' || parentKind === 'mover') {
-      return false;
-    }
-    const index = getSiblingIndex(node);
-    if (index < 0) return false;
-    let next = node.parent.childNodes[index + 1];
-    // Skip invisible function application (U+2061)
-    if (next && getChildText(next) === FUNC_APPLY && index + 2 < node.parent.childNodes.length) {
-      next = node.parent.childNodes[index + 2];
-    }
-    if (next && (next.kind === 'mi' || next.kind === 'mo')) {
-      return RE_WORD_DOT_START.test(getNodeTypstSymbol(next));
-    }
-    if (next && next.kind === 'mn') return true;
-    return false;
-  } catch (_e: unknown) {
-    return false;
+  const parent = node.parent;
+  if (!parent || isLastChild(node)) return false;
+  if (isInScriptContext(node)) return false;
+  const index = getSiblingIndex(node);
+  if (index < 0) return false;
+  let next = parent.childNodes[index + 1];
+  if (!next) return false;
+  // Skip invisible function application (U+2061)
+  if (getChildText(next) === FUNC_APPLY && index + 2 < parent.childNodes.length) {
+    next = parent.childNodes[index + 2];
   }
+  if (!next) return false;
+  if (next.kind === 'mi' || next.kind === 'mo') {
+    return RE_WORD_DOT_START.test(getNodeTypstSymbol(next));
+  }
+  return next.kind === 'mn';
+};
+
+/** Handle unpaired brackets like \left( ... \right. */
+const trySerializeUnpairedBracket = (
+  node: MathNode, value: string,
+): ITypstData | null => {
+  const unpairedDir = getProp<string>(node, UNPAIRED_BRACKET_PROP);
+  if (!unpairedDir || !UNPAIRED_BRACKET_TYPST[value]) return null;
+  return singleTypst(withContextSpaces(node, UNPAIRED_BRACKET_TYPST[value]));
+};
+
+/** Handle multi-word MathJax operator names (e.g. "lim sup" → "limsup") */
+const trySerializeMultiwordOp = (
+  node: MathNode, normalizedName: string,
+): ITypstData | null => {
+  const mappedOp = MATHJAX_MULTIWORD_OPS.get(normalizedName);
+  if (!mappedOp) return null;
+  return singleTypst(withContextSpaces(node, mappedOp));
+};
+
+/** Handle custom named operators (e.g. \injlim → op("inj lim")) */
+const trySerializeNamedOperator = (
+  node: MathNode, value: string, normalizedName: string,
+): ITypstData | null => {
+  if (
+    isWordLikeToken(normalizedName)
+    && !typstSymbolMap.has(value)
+    && !TYPST_MATH_OPERATORS.has(normalizedName)
+  ) {
+    return singleTypst(withContextSpaces(node, `op("${escapeTypstString(normalizedName)}")`));
+  }
+  return null;
+};
+
+/** True when the next sibling is ( or [ — needs a space to prevent
+ *  Typst from interpreting "symbol(" as a function call */
+const needsDisambiguatingSpaceAfter = (node: MathNode, inScript: boolean): boolean => {
+  if (inScript) return false;
+  const parent = node.parent;
+  if (!parent) return false;
+  const idx = getSiblingIndex(node);
+  const next = idx >= 0 ? parent.childNodes[idx + 1] : undefined;
+  if (!next || next.kind !== 'mo') return false;
+  const nt = getNodeText(next);
+  return nt === '(' || nt === '[';
+};
+
+/** Handle word-like Typst symbol names that need spacing and bracket disambiguation */
+const trySerializeWordLikeOperator = (
+  node: MathNode, typstValue: string, inScript: boolean,
+): ITypstData | null => {
+  if (!isWordLikeToken(typstValue)) return null;
+  const spaceBefore = needsSpaceBefore(node) ? ' ' : '';
+  const spaceAfter = (needsSpaceAfter(node) || needsDisambiguatingSpaceAfter(node, inScript)) ? ' ' : '';
+  return singleTypst(spaceBefore + typstValue + spaceAfter);
 };
 
 export const mi: HandlerFn = (node, _serialize) => {
-  let res: ITypstData = initTypstData();
   if (!node.childNodes || node.childNodes.length === 0) {
-    return res;
+    return initTypstData();
   }
   const value = getChildText(node);
   if (!value) {
-    return res;
+    return initTypstData();
   }
-  const atr = getAttrs<FontAttrs>(node);
-  const mathvariant = atr.mathvariant || '';
+  const attrs = getAttrs<FontAttrs>(node);
+  const mathvariant = attrs.mathvariant || '';
   const isKnownSymbol = typstSymbolMap.has(value);
   const isKnownOperator = TYPST_MATH_OPERATORS.has(value);
   let typstValue: string = findTypstSymbol(value);
   // \operatorname{name}: texClass=OP, multi-char, not built-in
   // Don't add limits: #true here — parent handler (munderover/munder/mover) decides placement.
   if (node.texClass === TEXCLASS.OP && value.length > 1 && !isKnownOperator) {
-    typstValue = `op("${value}")`;
+    typstValue = `op("${escapeTypstString(value)}")`;
   }
   // \mathrm{d} → dif (differential operator shorthand, single-char d only)
   else if (mathvariant === 'normal' && value === 'd' && !isKnownSymbol) {
@@ -146,7 +223,7 @@ export const mi: HandlerFn = (node, _serialize) => {
     const fontFn = typstFontMap.get(mathvariant);
     if (fontFn) {
       // Multi-letter text needs quotes in Typst math (e.g. italic("word"), bold("text"))
-      const inner = value.length > 1 && !isKnownSymbol ? `"${value}"` : typstValue;
+      const inner = value.length > 1 && !isKnownSymbol ? `"${escapeTypstString(value)}"` : typstValue;
       // \mathbf produces mathvariant="bold" which is upright bold in LaTeX
       if (mathvariant === 'bold' && !isKnownSymbol) {
         typstValue = `upright(bold(${inner}))`;
@@ -155,141 +232,91 @@ export const mi: HandlerFn = (node, _serialize) => {
       }
     }
   }
-  // Add spacing around multi-character Typst symbol names
-  if (typstValue.length > 1 && RE_WORD_START.test(typstValue)) {
-    const spaceBefore = needsSpaceBefore(node) ? ' ' : '';
-    const spaceAfter = needsSpaceAfter(node) ? ' ' : '';
-    res = addToTypstData(res, { typst: spaceBefore + typstValue + spaceAfter });
-  } else {
-    res = addToTypstData(res, { typst: typstValue });
+  // Add spacing around multi-character word-like Typst symbol names
+  if (isWordLikeToken(typstValue)) {
+    return singleTypst(withContextSpaces(node, typstValue));
   }
-  return res;
+  return singleTypst(typstValue);
 };
 
 export const mo: HandlerFn = (node, _serialize) => {
-  let res: ITypstData = initTypstData();
   const value = getNodeText(node);
-  const unpairedDir = getProp<string>(node, UNPAIRED_BRACKET_PROP);
-  if (unpairedDir && UNPAIRED_BRACKET_TYPST[value]) {
-    const spaceBefore = needsSpaceBefore(node) ? ' ' : '';
-    const spaceAfter = needsSpaceAfter(node) ? ' ' : '';
-    res = addToTypstData(res, { typst: spaceBefore + UNPAIRED_BRACKET_TYPST[value] + spaceAfter });
-    return res;
-  }
-  if (INVISIBLE_CHARS.has(value)) {
-    return res;
-  }
+  const unpaired = trySerializeUnpairedBracket(node, value);
+  if (unpaired) return unpaired;
+  if (INVISIBLE_CHARS.has(value)) return initTypstData();
   const typstValue: string = findTypstSymbol(value);
-  // Map multi-word MathJax operator names to Typst built-in equivalents
-  // (e.g. \limsup → "lim⁠sup" with thin space → "limsup")
-  const normalizedValue = value.replace(RE_UNICODE_SPACES, ' ');
-  const mappedOp = MATHJAX_MULTIWORD_OPS.get(normalizedValue);
-  if (mappedOp) {
-    const spaceBefore = needsSpaceBefore(node) ? ' ' : '';
-    const spaceAfter = needsSpaceAfter(node) ? ' ' : '';
-    res = addToTypstData(res, { typst: spaceBefore + mappedOp + spaceAfter });
-    return res;
+  const normalizedName = normalizeOperatorName(value);
+  const multiword = trySerializeMultiwordOp(node, normalizedName);
+  if (multiword) return multiword;
+  // Don't add limits: #true here — parent handler decides placement.
+  const namedOp = trySerializeNamedOperator(node, value, normalizedName);
+  if (namedOp) return namedOp;
+  const inScript = isInScriptContext(node);
+  const wordLike = trySerializeWordLikeOperator(node, typstValue, inScript);
+  if (wordLike) return wordLike;
+  if (!inScript && SPACED_OPERATORS.has(value)) {
+    return singleTypst(' ' + typstValue + ' ');
   }
-  // Detect custom named operators (e.g. \injlim → "inj lim", \projlim → "proj lim")
-  // Don't add limits: #true here — parent handler (munderover/munder/mover) decides placement
-  if (normalizedValue.length > 1 && RE_WORD_START.test(normalizedValue) && !typstSymbolMap.has(value) && !TYPST_MATH_OPERATORS.has(value)) {
-    const opName = normalizedValue;
-    res = addToTypstData(res, { typst: `op("${opName}")` });
-    return res;
+  if (!inScript && value === ',') {
+    return singleTypst(', ');
   }
-  // Check if this operator is inside sub/sup/munderover — no spacing there
-  const parentKind = node.parent?.kind;
-  const inScript = parentKind === 'msub' || parentKind === 'msup'
-    || parentKind === 'msubsup' || parentKind === 'munderover'
-    || parentKind === 'munder' || parentKind === 'mover';
-  if (typstValue.length > 1 && RE_WORD_START.test(typstValue)) {
-    const spaceBefore = needsSpaceBefore(node) ? ' ' : '';
-    let spaceAfter = needsSpaceAfter(node) ? ' ' : '';
-    // Prevent Typst from interpreting "symbol(" as a function call
-    // (e.g. "lt.eq(x)" would call lt.eq as a function)
-    if (!spaceAfter && !inScript) {
-      try {
-        const idx = getSiblingIndex(node);
-        const next = node.parent.childNodes[idx + 1];
-        if (next && next.kind === 'mo') {
-          const nt = getNodeText(next);
-          if (nt === '(' || nt === '[') spaceAfter = ' ';
-        }
-      } catch (_e: unknown) { /* ignore */ }
-    }
-    res = addToTypstData(res, { typst: spaceBefore + typstValue + spaceAfter });
-  } else if (!inScript && SPACED_OPERATORS.has(value)) {
-    res = addToTypstData(res, { typst: ' ' + typstValue + ' ' });
-  } else if (!inScript && value === ',') {
-    res = addToTypstData(res, { typst: ', ' });
-  } else if (value === '/') {
-    // Escape slash: in Typst math, / creates a fraction; \/ is a literal slash
-    res = addToTypstData(res, { typst: '\\/' });
-  } else {
-    res = addToTypstData(res, { typst: typstValue });
+  // Escape slash: in Typst math, / creates a fraction; \/ is a literal slash
+  if (value === '/') {
+    return singleTypst('\\/');
   }
-  return res;
+  return singleTypst(typstValue);
 };
 
 export const mn: HandlerFn = (node, _serialize) => {
-  let res: ITypstData = initTypstData();
   const value = getNodeText(node);
-  const atr = getAttrs<FontAttrs>(node);
-  const mathvariant = atr.mathvariant || '';
+  const attrs = getAttrs<FontAttrs>(node);
+  const mathvariant = attrs.mathvariant || '';
   if (mathvariant && mathvariant !== 'normal') {
     const fontFn = typstFontMap.get(mathvariant);
     if (fontFn) {
       const content = typstPlaceholder(escapeContentSeparators(value));
-      res = addToTypstData(res, { typst: `${fontFn}(${content})` });
-      return res;
+      return singleTypst(`${fontFn}(${content})`);
     }
   }
-  res = addToTypstData(res, { typst: value });
-  return res;
+  return singleTypst(value);
 };
 
 export const mtext: HandlerFn = (node, _serialize) => {
-  let res: ITypstData = initTypstData();
   if (!node.childNodes || node.childNodes.length === 0) {
-    return res;
+    return initTypstData();
   }
   let value = getChildText(node);
   if (!value || !value.trim()) {
-    return res;
+    return initTypstData();
   }
   value = value.replace(RE_NBSP, ' ');
   if (value.length === 1 && typstSymbolMap.has(value)) {
     const typstValue = findTypstSymbol(value);
-    const spaceBefore = needsSpaceBefore(node) ? ' ' : '';
-    const spaceAfter = needsSpaceAfter(node) ? ' ' : '';
-    res = addToTypstData(res, { typst: spaceBefore + typstValue + spaceAfter });
-    return res;
+    return singleTypst(withContextSpaces(node, typstValue));
   }
+  // Only escape quotes here — backslashes in mtext content are intentional
+  // (e.g. numcases text like "x \geq 0" should keep the backslash as-is)
   let textContent = `"${value.replace(/"/g, '\\"')}"`;
-  const atr = getAttrs<FontAttrs>(node);
-  const mathvariant = atr.mathvariant || '';
+  const attrs = getAttrs<FontAttrs>(node);
+  const mathvariant = attrs.mathvariant || '';
   if (mathvariant && mathvariant !== 'normal') {
     const fontFn = typstFontMap.get(mathvariant);
     if (fontFn) {
       textContent = `${fontFn}(${textContent})`;
     }
   }
-  res = addToTypstData(res, { typst: textContent });
-  return res;
+  return singleTypst(textContent);
 };
 
 export const mspace: HandlerFn = (node, _serialize) => {
-  let res: ITypstData = initTypstData();
-  const atr = getAttrs<SpaceAttrs>(node);
-  if (!atr.width) {
-    return res;
+  const attrs = getAttrs<SpaceAttrs>(node);
+  if (!attrs.width) {
+    return initTypstData();
   }
-  const width = atr.width.toString();
-  const mapped = MSPACE_WIDTH_MAP[width];
+  const width = attrs.width.toString().trim();
+  const mapped = MSPACE_WIDTH_MAP.get(width);
   if (mapped !== undefined) {
-    if (mapped) res = addToTypstData(res, { typst: mapped });
-    return res;
+    return mapped ? singleTypst(mapped) : initTypstData();
   }
-  res = addToTypstData(res, { typst: ' ' });
-  return res;
+  return singleTypst(' ');
 };
