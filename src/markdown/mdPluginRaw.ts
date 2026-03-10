@@ -182,7 +182,7 @@ export const multiMath: RuleInline = (state, silent) => {
     if (state.md.options.highlights?.length) {
       token.canonicalizedPositions = token.content ? canonicalMathPositions(token.content) : [];
     }
-    if (!state.md.options.forLatex) {
+    if (!state.md.options.forLatex || state.md.options.outMath?.include_typst) {
       /** Perform math to conversion to html and get additional data from MathJax to pass it to render rules */
       convertMathToHtml(state, token, state.md.options);
     }
@@ -289,7 +289,7 @@ export const simpleMath: RuleInline = (state, silent) => {
       token.canonicalizedPositions = token.content ? canonicalMathPositions(token.content) : [];
     }
     /** Perform math to conversion to html and get additional data from MathJax to pass it to render rules */
-    if (!state.md.options.forLatex) {
+    if (!state.md.options.forLatex || state.md.options.outMath?.include_typst) {
       convertMathToHtml(state, token, state.md.options);
     }
   }

@@ -41,8 +41,37 @@ AbstractTags.prototype.startEquation = function (math) {
   this['stack'] = [];
   this.clearTag();
   this.currentTag = new TagInfo('', undefined, undefined);
+  this['_isAutoTag'] = false;
   startEquation.call(this, math);
 }
+
+/** Mark auto-numbered tags so the Typst serializer can distinguish them
+ *  from explicit \tag{...} commands. autoTag() sets a flag, and getTag()
+ *  propagates it as a 'data-tag-auto' property on the mtd label node. */
+const origAutoTag = AbstractTags.prototype.autoTag;
+AbstractTags.prototype.autoTag = function () {
+  const hadTag = this.currentTag.tag != null;
+  origAutoTag.call(this);
+  // Only mark as auto if autoTag() actually assigned the tag
+  // (i.e. tag was null before — no explicit \tag{...} was set)
+  if (!hadTag && this.currentTag.tag != null) {
+    this['_isAutoTag'] = true;
+  }
+};
+
+const origGetTag = AbstractTags.prototype.getTag;
+AbstractTags.prototype.getTag = function (force?: boolean) {
+  this['_isAutoTag'] = false;
+  const labelKey = this.label || '';
+  const node = origGetTag.call(this, force);
+  if (node && this['_isAutoTag']) {
+    node.properties['data-tag-auto'] = true;
+  }
+  if (node && labelKey) {
+    node.properties['data-label-key'] = labelKey;
+  }
+  return node;
+};
 
 const texConfig = Object.assign({}, MathJaxConfig.TeX || {});
 /** for TSV/CSV, add the array package, which will add an additional name attribute that points to the environment */
