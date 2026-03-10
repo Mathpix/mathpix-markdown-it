@@ -11,7 +11,8 @@ import {
 } from './consts';
 import {
   addToTypstData, addSpaceToTypstData, initTypstData,
-  serializeThousandSepChain, formatScript, needsTokenSeparator, getChildText, getAttrs,
+  serializeThousandSepChain, formatScript, needsTokenSeparator, needsSpaceBetweenNodes,
+  getChildText, getAttrs,
 } from './common';
 import { findTypstSymbol } from './typst-symbol-map';
 
@@ -335,7 +336,7 @@ export class SerializedTypstVisitor extends MmlVisitor {
         }
         // Normal processing
         const data = this.visitNode(child, space);
-        if (needsTokenSeparator(res.typst, data.typst)) {
+        if (needsSpaceBetweenNodes(res.typst, data.typst, j > 0 ? children[j - 1] : null)) {
           addSpaceToTypstData(res);
         }
         res = addToTypstData(res, data);

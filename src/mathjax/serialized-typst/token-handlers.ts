@@ -8,6 +8,7 @@ import {
   UNPAIRED_BRACKET_PROP, UNPAIRED_BRACKET_TYPST,
   FUNC_APPLY, INVISIBLE_TIMES, INVISIBLE_SEP, INVISIBLE_PLUS,
   MINUS_SIGN, PLUS_MINUS, MINUS_PLUS,
+  SCRIPT_NODE_KINDS,
 } from "./consts";
 import {
   initTypstData, addToTypstData,
@@ -63,10 +64,19 @@ const MSPACE_WIDTH_MAP: ReadonlyMap<string, string> = new Map([
   ['-0.167em', ''],
 ]);
 
-// Parent node kinds that represent sub/superscript contexts
-const SCRIPT_PARENT_KINDS: ReadonlySet<string> = new Set([
-  'msub', 'msup', 'msubsup', 'munderover', 'munder', 'mover',
-]);
+/** Check if a +/- operator is in unary prefix position (after OPEN paren or at start).
+ *  Unary: (-1), (+x). Binary: a - b, x + 1, )+ (end of group). */
+const isUnaryPrefix = (node: MathNode): boolean => {
+  if (isFirstChild(node)) return true;
+  const parent = node.parent;
+  if (!parent) return false;
+  const idx = getSiblingIndex(node);
+  if (idx <= 0) return false;
+  const prev = parent.childNodes[idx - 1];
+  // After an opening bracket → unary
+  if (prev.kind === 'mo' && prev.texClass === TEXCLASS.OPEN) return true;
+  return false;
+};
 
 /** Escape a string for use inside Typst string literals ("...") */
 const escapeTypstString = (s: string): string =>
@@ -82,7 +92,7 @@ const isWordLikeToken = (value: string): boolean =>
 
 /** Check if a node is inside a sub/superscript context */
 const isInScriptContext = (node: MathNode): boolean =>
-  !!node.parent && SCRIPT_PARENT_KINDS.has(node.parent.kind);
+  !!node.parent && SCRIPT_NODE_KINDS.has(node.parent.kind);
 
 /** Shorthand: create ITypstData with a single typst string */
 const singleTypst = (typst: string): ITypstData =>
@@ -255,6 +265,11 @@ export const mo: HandlerFn = (node, _serialize) => {
   const wordLike = trySerializeWordLikeOperator(node, typstValue, inScript);
   if (wordLike) return wordLike;
   if (!inScript && SPACED_OPERATORS.has(value)) {
+    // Unary prefix operators (after OPEN paren or at start) get no space after:
+    // (-1) → (-1), not ( - 1). Binary/other contexts get spaces on both sides.
+    if (isUnaryPrefix(node)) {
+      return singleTypst(needsSpaceBefore(node) ? ' ' + typstValue : typstValue);
+    }
     return singleTypst(' ' + typstValue + ' ');
   }
   if (!inScript && value === ',') {

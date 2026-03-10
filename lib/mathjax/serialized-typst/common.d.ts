@@ -22,6 +22,13 @@ export declare const serializeThousandSepChain: (node: MathNode, start: number, 
  *  Returns true when `next` starts with a word/dot/quote character
  *  and `prev` doesn't end with a natural separator (whitespace, open paren, etc.). */
 export declare const needsTokenSeparator: (prev: string, next: string) => boolean;
+/** Extended spacing check for mrow/inferredMrow child concatenation.
+ *  First applies the standard token separator heuristic, then checks whether
+ *  a scripted node (msub, msup, …) is followed by (, [ or { — a space is needed
+ *  to prevent Typst from parsing them as function call / content block / code block
+ *  and to improve readability: q_j (chi, eta), P_l^n (cos chi), x^n [ln x].
+ *  Exception: derivative patterns f'(x), f''(x), f^{(n)}(a) keep no space. */
+export declare const needsSpaceBetweenNodes: (prevTypst: string, nextTypst: string, prevNode: MathNode | null) => boolean;
 /** Simple heuristic for Typst sub/superscript grouping: multi-char content needs parens. */
 export declare const needsParens: (s: string) => boolean;
 /** Format a subscript or superscript with proper Typst grouping.

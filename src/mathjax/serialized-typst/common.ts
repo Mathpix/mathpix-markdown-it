@@ -3,6 +3,7 @@ import { MathNode, ITypstData, ITypstSerializer, HandlerFn } from './types';
 import {
   RE_THREE_DIGITS, RE_TWO_DIGITS, RE_PHANTOM_BASE,
   RE_TOKEN_START, RE_SEPARATOR_END, TYPST_PLACEHOLDER,
+  SCRIPT_NODE_KINDS, PRIME_CHARS,
 } from './consts';
 
 /** Return the expression if non-empty, otherwise the Typst empty placeholder '""'. */
@@ -90,6 +91,40 @@ export const needsTokenSeparator = (prev: string, next: string): boolean => {
   if (RE_PHANTOM_BASE.test(next)) return false;
   return RE_TOKEN_START.test(next)
     && !RE_SEPARATOR_END.test(prev);
+};
+
+/** Check if a scripted node represents a derivative pattern: f'(x), f''(x), f^{(n)}(a).
+ *  These are msup with mi base and prime (mo with ′/″/‴) or parenthesized-group (TeXAtom) superscript. */
+const isDerivativePattern = (node: MathNode): boolean => {
+  if (node.kind !== 'msup') return false;
+  if (node.childNodes?.[0]?.kind !== 'mi') return false;
+  const script = node.childNodes?.[1];
+  // f'(x), f''(x) — superscript is mo with prime character (′ ″ ‴)
+  if (script?.kind === 'mo') {
+    const scriptText = getChildText(script);
+    return PRIME_CHARS.has(scriptText);
+  }
+  // f^{(n)}(a) — superscript is TeXAtom (parenthesized group)
+  if (script?.kind === 'TeXAtom') return true;
+  return false;
+};
+
+/** Extended spacing check for mrow/inferredMrow child concatenation.
+ *  First applies the standard token separator heuristic, then checks whether
+ *  a scripted node (msub, msup, …) is followed by (, [ or { — a space is needed
+ *  to prevent Typst from parsing them as function call / content block / code block
+ *  and to improve readability: q_j (chi, eta), P_l^n (cos chi), x^n [ln x].
+ *  Exception: derivative patterns f'(x), f''(x), f^{(n)}(a) keep no space. */
+export const needsSpaceBetweenNodes = (
+  prevTypst: string, nextTypst: string, prevNode: MathNode | null,
+): boolean => {
+  if (needsTokenSeparator(prevTypst, nextTypst)) return true;
+  if (prevNode && SCRIPT_NODE_KINDS.has(prevNode.kind) && nextTypst.length > 0) {
+    const ch = nextTypst[0];
+    if (ch === '[' || ch === '{') return true;
+    if (ch === '(' && !isDerivativePattern(prevNode)) return true;
+  }
+  return false;
 };
 
 /** Simple heuristic for Typst sub/superscript grouping: multi-char content needs parens. */

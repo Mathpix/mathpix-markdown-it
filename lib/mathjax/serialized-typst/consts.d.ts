@@ -70,6 +70,10 @@ export declare const LEFT_ANGLE_OLD = "\u2329";
 export declare const RIGHT_ANGLE_OLD = "\u232A";
 export declare const INTEGRAL_SIGN = "\u222B";
 export declare const MIDLINE_ELLIPSIS = "\u22EF";
+/** Node kinds that carry sub/superscripts */
+export declare const SCRIPT_NODE_KINDS: ReadonlySet<string>;
+/** Prime characters used in derivative patterns (′ ″ ‴) */
+export declare const PRIME_CHARS: ReadonlySet<string>;
 /** Maximum tree depth for shallow walks (accent detection, phantom check, etc.) */
 export declare const SHALLOW_TREE_MAX_DEPTH = 5;
 export declare const OPEN_BRACKETS: Readonly<Record<string, string>>;

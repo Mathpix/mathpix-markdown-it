@@ -2275,8 +2275,8 @@ module.exports = [
   // aligned with unpaired [ and ) inside \left.\right] fence
   {
     latex: `\\begin{aligned}\n& r_{c m}=\\frac{1}{50}[20(3 i+3 j)+18(-2 i-2 j)+12(i-j)] \\\\\n& \\left.r_{c m}=\\frac{1}{50}[36 i+12 j)\\right]=\\frac{36}{50} i+\\frac{12}{50} j=0.72 i+0.24 j\n\\end{aligned}`,
-    typst: `&r_(c m) = frac(1, 50)[20(3 i + 3 j) + 18( - 2 i - 2 j) + 12(i - j)] \\\n &lr(r_(c m) = frac(1, 50)\\[ 36 i + 12 j \\) ]) = frac(36, 50) i + frac(12, 50) j = 0.72 i + 0.24 j`,
-    typst_inline: `&r_(c m) = frac(1, 50)[20(3 i + 3 j) + 18( - 2 i - 2 j) + 12(i - j)] \\\n &lr(r_(c m) = frac(1, 50)\\[ 36 i + 12 j \\) ]) = frac(36, 50) i + frac(12, 50) j = 0.72 i + 0.24 j`,
+    typst: `&r_(c m) = frac(1, 50)[20(3 i + 3 j) + 18(- 2 i - 2 j) + 12(i - j)] \\\n &lr(r_(c m) = frac(1, 50)\\[ 36 i + 12 j \\) ]) = frac(36, 50) i + frac(12, 50) j = 0.72 i + 0.24 j`,
+    typst_inline: `&r_(c m) = frac(1, 50)[20(3 i + 3 j) + 18(- 2 i - 2 j) + 12(i - j)] \\\n &lr(r_(c m) = frac(1, 50)\\[ 36 i + 12 j \\) ]) = frac(36, 50) i + frac(12, 50) j = 0.72 i + 0.24 j`,
   },
   // colon escaping in mat() cells (prevents named-argument parsing)
   {
@@ -2550,5 +2550,100 @@ module.exports = [
     latex: `|a| + |b|`,
     typst: `lr(| a |) + lr(| b |)`,
     typst_inline: `lr(| a |) + lr(| b |)`,
+  },
+  {
+    latex: `\\frac{(a+m)_{n}(b+m)_{n}}{n!(n+m)!}`,
+    typst: `frac((a + m)_n (b + m)_n, n!(n + m)!)`,
+    typst_inline: `frac((a + m)_n (b + m)_n, n!(n + m)!)`,
+  },
+  {
+    latex: `(1-z)^{n}[\\ln(1-z)]`,
+    typst: `(1 - z)^n [ln(1 - z)]`,
+    typst_inline: `(1 - z)^n [ln(1 - z)]`,
+  },
+  {
+    latex: `\\begin{align*}\nF(a, b ; a+b+m ; z)= & \\frac{\\Gamma(m) \\Gamma(a+b+m)}{\\Gamma(a+m) \\Gamma(b+m)} \\sum_{n=0}^{m-1} \\frac{(a)_{n}(b)_{n}}{n!(1-m)_{n}}(1-z)^{n}  \\tag{15.3.11}\\\\\n& \\quad-\\frac{\\Gamma(a+b+m)}{\\Gamma(a) \\Gamma(b)}(z-1)^{m} \\sum_{n=0}^{\\infty} \\frac{(a+m)_{n}(b+m)_{n}}{n!(n+m)!}(1-z)^{n}[\\ln (1-z)-\\psi(n+1) \\\\\n& -\\psi(n+m+1)+\\psi(a+n+m)+\\psi(b+n+m)] \\quad(|\\arg (1-z)|<\\pi,|1-z|<1)\n\\end{align*}`,
+    typst: `#math.equation(block: true, numbering: n => [(15.3.11)], number-align: end + top, $ F(a, b; a + b + m; z) = &frac(Gamma(m) Gamma(a + b + m), Gamma(a + m) Gamma(b + m)) sum_(n = 0)^(m - 1) frac((a)_n (b)_n, n!(1 - m)_n)(1 - z)^n \\\n &quad - frac(Gamma(a + b + m), Gamma(a) Gamma(b))(z - 1)^m sum_(n = 0)^(infinity) frac((a + m)_n (b + m)_n, n!(n + m)!)(1 - z)^n [ln(1 - z) - psi(n + 1) \\\n &- psi(n + m + 1) + psi(a + n + m) + psi(b + n + m)] quad (lr(| arg(1 - z) |) < pi, lr(| 1 - z |) < 1) $)\n#counter(math.equation).update(n => n - 1)`,
+    typst_inline: `F(a, b; a + b + m; z) = &frac(Gamma(m) Gamma(a + b + m), Gamma(a + m) Gamma(b + m)) sum_(n = 0)^(m - 1) frac((a)_n (b)_n, n!(1 - m)_n)(1 - z)^n \\\n &quad - frac(Gamma(a + b + m), Gamma(a) Gamma(b))(z - 1)^m sum_(n = 0)^(infinity) frac((a + m)_n (b + m)_n, n!(n + m)!)(1 - z)^n [ln(1 - z) - psi(n + 1) \\\n &- psi(n + m + 1) + psi(a + n + m) + psi(b + n + m)] quad (lr(| arg(1 - z) |) < pi, lr(| 1 - z |) < 1)`,
+  },
+  {
+    latex: `x^n\\{a,b\\}`,
+    typst: `x^n {a, b}`,
+    typst_inline: `x^n {a, b}`,
+  },
+  {
+    latex: `f_n[x]`,
+    typst: `f_n [x]`,
+    typst_inline: `f_n [x]`,
+  },
+  {
+    latex: `(a+b)^2(c+d)`,
+    typst: `(a + b)^2 (c + d)`,
+    typst_inline: `(a + b)^2 (c + d)`,
+  },
+  {
+    latex: `\\alpha^j(-1)^m`,
+    typst: `alpha^j (- 1)^m`,
+    typst_inline: `alpha^j (- 1)^m`,
+  },
+  {
+    latex: `q_j(\\chi, \\eta)`,
+    typst: `q_j (chi, eta)`,
+    typst_inline: `q_j (chi, eta)`,
+  },
+  {
+    latex: `P_l^n(\\cos \\chi)`,
+    typst: `P_l^n (cos chi)`,
+    typst_inline: `P_l^n (cos chi)`,
+  },
+  {
+    latex: `f_i(x)`,
+    typst: `f_i (x)`,
+    typst_inline: `f_i (x)`,
+  },
+  {
+    latex: `g_n(x+1)`,
+    typst: `g_n (x + 1)`,
+    typst_inline: `g_n (x + 1)`,
+  },
+  {
+    latex: `h^2(t)`,
+    typst: `h^2 (t)`,
+    typst_inline: `h^2 (t)`,
+  },
+  {
+    latex: `A_{lm}(-1)^{m+n}`,
+    typst: `A_(l m) (- 1)^(m + n)`,
+    typst_inline: `A_(l m) (- 1)^(m + n)`,
+  },
+  {
+    latex: `a_n[b+c]`,
+    typst: `a_n [b + c]`,
+    typst_inline: `a_n [b + c]`,
+  },
+  {
+    latex: `x_k\\{1,2,3\\}`,
+    typst: `x_k {1, 2, 3}`,
+    typst_inline: `x_k {1, 2, 3}`,
+  },
+  {
+    latex: `\\begin{align*}\n& \\alpha_{i m}^{j}=\\frac{1}{2 \\pi} \\int_{0}^{2 \\pi} \\int_{0}^{\\pi} q_{j}(\\chi, \\eta) P_{l}^{n}(\\cos \\chi) \\cos m \\eta \\sin \\chi \\mathrm{~d} \\chi \\mathrm{~d} \\eta  \\tag{2-40}\\\\\n& \\beta_{i m}^{j}=\\frac{1}{2 \\pi} \\int_{0}^{2 \\pi} \\int_{0}^{\\pi} q_{j}(\\chi, \\eta) P_{l}^{m}(\\cos \\chi) \\sin m \\eta \\sin \\chi \\mathrm{~d} \\chi \\mathrm{~d} \\eta \\tag{2-41}\n\\end{align*}`,
+    typst: `#math.equation(block: true, numbering: n => [(2-40)], $ &alpha_(i m)^j = frac(1, 2 pi) integral_0^(2 pi) integral_0^(pi) q_j (chi, eta) P_l^n (cos chi) cos m eta sin chi dif chi dif eta $)\n#counter(math.equation).update(n => n - 1)\n#math.equation(block: true, numbering: n => [(2-41)], $ &beta_(i m)^j = frac(1, 2 pi) integral_0^(2 pi) integral_0^(pi) q_j (chi, eta) P_l^m (cos chi) sin m eta sin chi dif chi dif eta $)\n#counter(math.equation).update(n => n - 1)`,
+    typst_inline: `&alpha_(i m)^j = frac(1, 2 pi) integral_0^(2 pi) integral_0^(pi) q_j (chi, eta) P_l^n (cos chi) cos m eta sin chi dif chi dif eta \\\n &beta_(i m)^j = frac(1, 2 pi) integral_0^(2 pi) integral_0^(pi) q_j (chi, eta) P_l^m (cos chi) sin m eta sin chi dif chi dif eta`,
+  },
+  {
+    latex: `\\left[I_{l}(s)-I_{s}(s)\\right]`,
+    typst: `lr([ I_l (s) - I_s (s) ])`,
+    typst_inline: `lr([ I_l (s) - I_s (s) ])`,
+  },
+  {
+    latex: `\\begin{align*}\n& G_{p}(r)=\\frac{2}{\\pi} \\int_{0}^{\\infty} s\\left[I_{l}(s)-I_{s}(s)\\right] x_{p}^{-1} \\sin (s r) d s(5-72) \\\\\n& \\Delta G(r)=-\\frac{2}{\\pi} \\int_{0}^{\\infty} s\\left[I_{l}(s)-I_{s}(s)\\right] \\sin (s r) d s \\tag{5-73}\n\\end{align*}`,
+    typst: `#math.equation(block: true, numbering: n => [(5-73)], number-align: end + bottom, $ &G_p (r) = frac(2, pi) integral_0^(infinity) s lr([ I_l (s) - I_s (s) ]) x_p^(- 1) sin(s r) d s(5 - 72) \\\n &Delta G(r) = - frac(2, pi) integral_0^(infinity) s lr([ I_l (s) - I_s (s) ]) sin(s r) d s $)\n#counter(math.equation).update(n => n - 1)`,
+    typst_inline: `&G_p (r) = frac(2, pi) integral_0^(infinity) s lr([ I_l (s) - I_s (s) ]) x_p^(- 1) sin(s r) d s(5 - 72) \\\n &Delta G(r) = - frac(2, pi) integral_0^(infinity) s lr([ I_l (s) - I_s (s) ]) sin(s r) d s`,
+  },
+  {
+    latex: `f^{(n)}(a)`,
+    typst: `f^((n))(a)`,
+    typst_inline: `f^((n))(a)`,
   },
 ];

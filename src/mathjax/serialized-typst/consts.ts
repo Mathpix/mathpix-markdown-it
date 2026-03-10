@@ -79,6 +79,16 @@ export const RIGHT_ANGLE_OLD = '\u232A';       // 〉 (deprecated Unicode form)
 export const INTEGRAL_SIGN = '\u222B';         // ∫
 export const MIDLINE_ELLIPSIS = '\u22EF';      // ⋯
 
+/** Node kinds that carry sub/superscripts */
+export const SCRIPT_NODE_KINDS: ReadonlySet<string> = new Set([
+  'msub', 'msup', 'msubsup', 'munder', 'mover', 'munderover',
+]);
+
+/** Prime characters used in derivative patterns (′ ″ ‴) */
+export const PRIME_CHARS: ReadonlySet<string> = new Set([
+  '\u2032', '\u2033', '\u2034',
+]);
+
 /** Maximum tree depth for shallow walks (accent detection, phantom check, etc.) */
 export const SHALLOW_TREE_MAX_DEPTH = 5;
 

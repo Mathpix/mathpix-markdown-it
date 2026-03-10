@@ -11,7 +11,8 @@ import {
 import {
   initTypstData, addToTypstData, addSpaceToTypstData,
   getNodeText, getAttrs, getProp,
-  typstPlaceholder, serializeThousandSepChain, needsTokenSeparator, handleAll,
+  typstPlaceholder, serializeThousandSepChain, needsTokenSeparator, needsSpaceBetweenNodes,
+  handleAll,
 } from "./common";
 import {
   escapeContentSeparators, hasTopLevelSeparators,
@@ -117,7 +118,9 @@ export const mrow: HandlerFn = (node, serialize) => {
         }
       }
       const data: ITypstData = serialize.visitNode(child, '');
-      if (needsTokenSeparator(content, data.typst)) {
+      // prevNode may be the skipped opening delimiter mo —
+      // safe because mo is not in SCRIPT_NODE_KINDS.
+      if (needsSpaceBetweenNodes(content, data.typst, i > 0 ? node.childNodes[i - 1] : null)) {
         content += ' ';
       }
       content += data.typst;
@@ -216,8 +219,9 @@ export const mrow: HandlerFn = (node, serialize) => {
         i = chain.nextIndex - 1; // -1 because the for-loop will i++
         continue;
       }
-      const data: ITypstData = serialize.visitNode(node.childNodes[i], '');
-      if (needsTokenSeparator(res.typst, data.typst)) {
+      const child = node.childNodes[i];
+      const data: ITypstData = serialize.visitNode(child, '');
+      if (needsSpaceBetweenNodes(res.typst, data.typst, i > 0 ? node.childNodes[i - 1] : null)) {
         addSpaceToTypstData(res);
       }
       res = addToTypstData(res, data);
