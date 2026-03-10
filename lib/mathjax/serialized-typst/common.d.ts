@@ -2,8 +2,10 @@ import { MathNode, ITypstData, HandlerFn } from './types';
 /** Return the expression if non-empty, otherwise the Typst empty placeholder '""'. */
 export declare const typstPlaceholder: (s: string) => string;
 export declare const initTypstData: () => ITypstData;
+/** Mutates dataOutput by appending dataInput fields. Returns dataOutput for chaining. */
 export declare const addToTypstData: (dataOutput: ITypstData, dataInput: ITypstData) => ITypstData;
-/** Add a separator space to both typst and typst_inline fields. */
+/** Add a separator space to both typst and typst_inline fields.
+ *  Does not create typst_inline if it hasn't been initialized yet. */
 export declare const addSpaceToTypstData: (data: ITypstData) => void;
 /** Check if child at index i in a node's childNodes starts a thousand-separator
  *  pattern: mn, mo(,), mn(3 digits). Also handles Indian numbering (2-digit groups
@@ -13,7 +15,7 @@ export declare const isThousandSepComma: (node: MathNode, i: number) => boolean;
  *  Returns true when `next` starts with a word/dot/quote character
  *  and `prev` doesn't end with a natural separator (whitespace, open paren, etc.). */
 export declare const needsTokenSeparator: (prev: string, next: string) => boolean;
-/** In Typst, multi-char sub/superscript content needs grouping parens: x^(a b), x_(i+1). */
+/** Simple heuristic for Typst sub/superscript grouping: multi-char content needs parens. */
 export declare const needsParens: (s: string) => boolean;
 /** Format a subscript or superscript with proper Typst grouping.
  *  Returns e.g. '_x', '_(x + y)', '^n', '^(a b)', or '' if content is empty. */
@@ -27,7 +29,7 @@ export declare const getSiblingIndex: (node: MathNode) => number;
 /** Get text content of a node's first child (TextNode).
  *  Safe: returns '' if node has no children or first child is not a TextNode. */
 export declare const getChildText: (node: MathNode) => string;
-/** Concatenate text content of all child nodes. */
+/** Concatenate direct TextNode children of a node (non-recursive). */
 export declare const getNodeText: (node: MathNode) => string;
 /** Get typed attributes from a node. The single `as T` cast localises the any boundary. */
 export declare const getAttrs: <T extends object>(node: MathNode) => T;

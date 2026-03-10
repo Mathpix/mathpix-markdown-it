@@ -8,10 +8,9 @@ import {
 /** Return the expression if non-empty, otherwise the Typst empty placeholder '""'. */
 export const typstPlaceholder = (s: string): string => s || TYPST_PLACEHOLDER;
 
-export const initTypstData = (): ITypstData => {
-  return { typst: '' };
-};
+export const initTypstData = (): ITypstData => ({ typst: '' });
 
+/** Mutates dataOutput by appending dataInput fields. Returns dataOutput for chaining. */
 export const addToTypstData = (
   dataOutput: ITypstData,
   dataInput: ITypstData
@@ -24,7 +23,8 @@ export const addToTypstData = (
   return dataOutput;
 };
 
-/** Add a separator space to both typst and typst_inline fields. */
+/** Add a separator space to both typst and typst_inline fields.
+ *  Does not create typst_inline if it hasn't been initialized yet. */
 export const addSpaceToTypstData = (data: ITypstData): void => {
   data.typst += ' ';
   if (data.typst_inline !== undefined) {
@@ -36,35 +36,31 @@ export const addSpaceToTypstData = (data: ITypstData): void => {
  *  pattern: mn, mo(,), mn(3 digits). Also handles Indian numbering (2-digit groups
  *  like 41,70,000) by accepting 2-digit groups when the chain ends with a 3-digit group. */
 export const isThousandSepComma = (node: MathNode, i: number): boolean => {
-  try {
-    if (i + 2 >= node.childNodes.length) return false;
-    const child = node.childNodes[i];
-    const comma = node.childNodes[i + 1];
-    const next = node.childNodes[i + 2];
-    if (child?.kind !== 'mn') return false;
-    if (comma?.kind !== 'mo' || getChildText(comma) !== ',') return false;
-    if (next?.kind !== 'mn') return false;
-    const nextText: string = getChildText(next);
-    // Standard: exactly 3 digits after comma
-    if (RE_THREE_DIGITS.test(nextText)) return true;
-    // Indian numbering: exactly 2 digits — accept if the chain eventually reaches a 3-digit group
-    if (RE_TWO_DIGITS.test(nextText)) {
-      let j = i + 2;
-      while (j + 2 < node.childNodes.length) {
-        const nextComma = node.childNodes[j + 1];
-        const nextNode = node.childNodes[j + 2];
-        if (nextComma?.kind !== 'mo' || getChildText(nextComma) !== ',') break;
-        if (nextNode?.kind !== 'mn') break;
-        const nextDigits: string = getChildText(nextNode);
-        if (RE_THREE_DIGITS.test(nextDigits)) return true;
-        if (!RE_TWO_DIGITS.test(nextDigits)) break;
-        j += 2;
-      }
-    }
-    return false;
-  } catch (_e: unknown) {
-    return false;
+  const children = node.childNodes;
+  if (!children || i < 0 || i + 2 >= children.length) return false;
+  const child = children[i];
+  const comma = children[i + 1];
+  const next = children[i + 2];
+  if (child?.kind !== 'mn') return false;
+  if (comma?.kind !== 'mo' || getChildText(comma) !== ',') return false;
+  if (next?.kind !== 'mn') return false;
+  const nextText = getChildText(next);
+  // Standard: exactly 3 digits after comma
+  if (RE_THREE_DIGITS.test(nextText)) return true;
+  // Indian numbering: exactly 2 digits — accept if the chain eventually reaches a 3-digit group
+  if (!RE_TWO_DIGITS.test(nextText)) return false;
+  let j = i + 2;
+  while (j + 2 < children.length) {
+    const nextComma = children[j + 1];
+    const nextNode = children[j + 2];
+    if (nextComma?.kind !== 'mo' || getChildText(nextComma) !== ',') return false;
+    if (nextNode?.kind !== 'mn') return false;
+    const nextDigits = getChildText(nextNode);
+    if (RE_THREE_DIGITS.test(nextDigits)) return true;
+    if (!RE_TWO_DIGITS.test(nextDigits)) return false;
+    j += 2;
   }
+  return false;
 };
 
 /** Check if a space separator is needed between two adjacent Typst tokens.
@@ -78,7 +74,7 @@ export const needsTokenSeparator = (prev: string, next: string): boolean => {
     && !RE_SEPARATOR_END.test(prev);
 };
 
-/** In Typst, multi-char sub/superscript content needs grouping parens: x^(a b), x_(i+1). */
+/** Simple heuristic for Typst sub/superscript grouping: multi-char content needs parens. */
 export const needsParens = (s: string): boolean => s.length > 1;
 
 /** Format a subscript or superscript with proper Typst grouping.
@@ -89,20 +85,17 @@ export const formatScript = (prefix: '_' | '^', content: string): string => {
 };
 
 /** Check if a node is the first child of its parent. */
-export const isFirstChild = (node: MathNode): boolean => {
-  return !!node.parent && !!node.parent.childNodes[0] && node.parent.childNodes[0] === node;
-};
+export const isFirstChild = (node: MathNode): boolean =>
+  !!node.parent && node.parent.childNodes[0] === node;
 
 /** Check if a node is the last child of its parent. */
-export const isLastChild = (node: MathNode): boolean => {
-  return !!node.parent && !!node.parent.childNodes
-    && node.parent.childNodes[node.parent.childNodes.length - 1] === node;
-};
+export const isLastChild = (node: MathNode): boolean =>
+  !!node.parent && node.parent.childNodes[node.parent.childNodes.length - 1] === node;
 
 /** Find the index of a node among its parent's childNodes. Returns -1 if not found. */
 export const getSiblingIndex = (node: MathNode): number => {
   if (!node.parent || !node.parent.childNodes) return -1;
-  return node.parent.childNodes.findIndex((item) => item === node);
+  return node.parent.childNodes.indexOf(node);
 };
 
 /** Get text content of a node's first child (TextNode).
@@ -112,7 +105,7 @@ export const getChildText = (node: MathNode): string => {
   return child instanceof TextNode ? child.getText() : '';
 };
 
-/** Concatenate text content of all child nodes. */
+/** Concatenate direct TextNode children of a node (non-recursive). */
 export const getNodeText = (node: MathNode): string => {
   if (!node?.childNodes) return '';
   let text = '';
@@ -133,9 +126,8 @@ export const getProp = <T>(node: MathNode | null | undefined, key: string): T | 
 /** Serialize all children of a node by visiting each one and concatenating the results. */
 export const handleAll: HandlerFn = (node, serialize) => {
   let res: ITypstData = initTypstData();
-  for (const child of node.childNodes) {
-    const data: ITypstData = serialize.visitNode(child, '');
-    res = addToTypstData(res, data);
+  for (const child of (node.childNodes ?? [])) {
+    res = addToTypstData(res, serialize.visitNode(child, ''));
   }
   return res;
 };
