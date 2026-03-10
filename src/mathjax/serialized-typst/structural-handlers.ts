@@ -11,7 +11,7 @@ import {
 import {
   initTypstData, addToTypstData, addSpaceToTypstData,
   getNodeText, getAttrs, getProp,
-  typstPlaceholder, isThousandSepComma, needsTokenSeparator, handleAll,
+  typstPlaceholder, serializeThousandSepChain, needsTokenSeparator, handleAll,
 } from "./common";
 import {
   escapeContentSeparators, hasTopLevelSeparators,
@@ -207,20 +207,13 @@ export const mrow: HandlerFn = (node, serialize) => {
     // Regular mrow: concatenate children with spacing to prevent merging
     for (let i = 0; i < node.childNodes.length; i++) {
       // Thousand-separator chain: mn","mn","mn... (handles 41,70,000 and 1,000,000)
-      if (isThousandSepComma(node, i)) {
-        const numData: ITypstData = serialize.visitNode(node.childNodes[i], '');
-        if (needsTokenSeparator(res.typst, numData.typst)) {
+      const chain = serializeThousandSepChain(node, i, serialize);
+      if (chain) {
+        if (needsTokenSeparator(res.typst, chain.typst)) {
           addSpaceToTypstData(res);
         }
-        let chainTypst = numData.typst;
-        let j = i;
-        while (isThousandSepComma(node, j)) {
-          const nextData: ITypstData = serialize.visitNode(node.childNodes[j + 2], '');
-          chainTypst += '\\,' + nextData.typst;
-          j += 2;
-        }
-        res = addToTypstData(res, { typst: chainTypst });
-        i = j;
+        res = addToTypstData(res, { typst: chain.typst });
+        i = chain.nextIndex - 1; // -1 because the for-loop will i++
         continue;
       }
       const data: ITypstData = serialize.visitNode(node.childNodes[i], '');

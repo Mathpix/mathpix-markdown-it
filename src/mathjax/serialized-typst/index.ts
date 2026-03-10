@@ -11,7 +11,7 @@ import {
 } from './consts';
 import {
   addToTypstData, addSpaceToTypstData, initTypstData,
-  isThousandSepComma, formatScript, needsTokenSeparator, getChildText, getAttrs,
+  serializeThousandSepChain, formatScript, needsTokenSeparator, getChildText, getAttrs,
 } from './common';
 import { findTypstSymbol } from './typst-symbol-map';
 
@@ -225,18 +225,11 @@ const tryIdotsintPattern = (
 
 /** Thousand separator chain: mn, mo(,), mn(3 digits) → 1\,000\,000 */
 const tryThousandSepPattern = (
-  node: MathNode, j: number, space: string, serialize: ITypstSerializer
+  node: MathNode, j: number, _space: string, serialize: ITypstSerializer
 ): PatternResult | null => {
-  if (!isThousandSepComma(node, j)) return null;
-  const numData = serialize.visitNode(node.childNodes[j], space);
-  let chainTypst = numData.typst;
-  let k = j;
-  while (isThousandSepComma(node, k)) {
-    const nextData = serialize.visitNode(node.childNodes[k + 2], space);
-    chainTypst += `\\,${nextData.typst}`;
-    k += 2;
-  }
-  return { typst: chainTypst, nextJ: k + 1 };
+  const chain = serializeThousandSepChain(node, j, serialize);
+  if (!chain) return null;
+  return { typst: chain.typst, nextJ: chain.nextIndex };
 };
 
 export interface ITypstVisitorOptions {

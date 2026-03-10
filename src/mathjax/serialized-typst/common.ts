@@ -1,5 +1,5 @@
 import { TextNode } from 'mathjax-full/js/core/MmlTree/MmlNode.js';
-import { MathNode, ITypstData, HandlerFn } from './types';
+import { MathNode, ITypstData, ITypstSerializer, HandlerFn } from './types';
 import {
   RE_THREE_DIGITS, RE_TWO_DIGITS, RE_PHANTOM_BASE,
   RE_TOKEN_START, RE_SEPARATOR_END, TYPST_PLACEHOLDER,
@@ -61,6 +61,24 @@ export const isThousandSepComma = (node: MathNode, i: number): boolean => {
     j += 2;
   }
   return false;
+};
+
+/** Serialize a thousand-separator chain starting at index `start` in a node's childNodes.
+ *  Returns { typst, nextIndex } where nextIndex is the first unconsumed child index,
+ *  or null if no chain starts at `start`. */
+export const serializeThousandSepChain = (
+  node: MathNode, start: number, serialize: ITypstSerializer
+): { typst: string; nextIndex: number } | null => {
+  if (!isThousandSepComma(node, start)) return null;
+  const numData = serialize.visitNode(node.childNodes[start], '');
+  let chainTypst = numData.typst;
+  let k = start;
+  while (isThousandSepComma(node, k)) {
+    const nextData = serialize.visitNode(node.childNodes[k + 2], '');
+    chainTypst += `\\,${nextData.typst}`;
+    k += 2;
+  }
+  return { typst: chainTypst, nextIndex: k + 1 };
 };
 
 /** Check if a space separator is needed between two adjacent Typst tokens.

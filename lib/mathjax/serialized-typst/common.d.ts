@@ -1,4 +1,4 @@
-import { MathNode, ITypstData, HandlerFn } from './types';
+import { MathNode, ITypstData, ITypstSerializer, HandlerFn } from './types';
 /** Return the expression if non-empty, otherwise the Typst empty placeholder '""'. */
 export declare const typstPlaceholder: (s: string) => string;
 export declare const initTypstData: () => ITypstData;
@@ -11,6 +11,13 @@ export declare const addSpaceToTypstData: (data: ITypstData) => void;
  *  pattern: mn, mo(,), mn(3 digits). Also handles Indian numbering (2-digit groups
  *  like 41,70,000) by accepting 2-digit groups when the chain ends with a 3-digit group. */
 export declare const isThousandSepComma: (node: MathNode, i: number) => boolean;
+/** Serialize a thousand-separator chain starting at index `start` in a node's childNodes.
+ *  Returns { typst, nextIndex } where nextIndex is the first unconsumed child index,
+ *  or null if no chain starts at `start`. */
+export declare const serializeThousandSepChain: (node: MathNode, start: number, serialize: ITypstSerializer) => {
+    typst: string;
+    nextIndex: number;
+} | null;
 /** Check if a space separator is needed between two adjacent Typst tokens.
  *  Returns true when `next` starts with a word/dot/quote character
  *  and `prev` doesn't end with a natural separator (whitespace, open paren, etc.). */

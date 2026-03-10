@@ -182,8 +182,10 @@ export const multiMath: RuleInline = (state, silent) => {
     if (state.md.options.highlights?.length) {
       token.canonicalizedPositions = token.content ? canonicalMathPositions(token.content) : [];
     }
+    // forLatex mode normally skips MathJax conversion (perf optimization).
+    // When include_typst is requested, we need MathJax to build the MathML tree
+    // that SerializedTypstVisitor walks — so we force conversion in that case.
     if (!state.md.options.forLatex || state.md.options.outMath?.include_typst) {
-      /** Perform math to conversion to html and get additional data from MathJax to pass it to render rules */
       convertMathToHtml(state, token, state.md.options);
     }
   }
@@ -288,7 +290,9 @@ export const simpleMath: RuleInline = (state, silent) => {
     if (state.md.options.highlights?.length) {
       token.canonicalizedPositions = token.content ? canonicalMathPositions(token.content) : [];
     }
-    /** Perform math to conversion to html and get additional data from MathJax to pass it to render rules */
+    // forLatex mode normally skips MathJax conversion (perf optimization).
+    // When include_typst is requested, we need MathJax to build the MathML tree
+    // that SerializedTypstVisitor walks — so we force conversion in that case.
     if (!state.md.options.forLatex || state.md.options.outMath?.include_typst) {
       convertMathToHtml(state, token, state.md.options);
     }
