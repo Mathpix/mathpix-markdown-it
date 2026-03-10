@@ -17,7 +17,7 @@ import {
   escapeContentSeparators, hasTopLevelSeparators,
   escapeLrSemicolons, escapeUnbalancedParens,
 } from "./escape-utils";
-import { mapDelimiter, escapeLrOpenDelimiter } from "./bracket-utils";
+import { mapDelimiter, escapeLrDelimiter } from "./bracket-utils";
 
 const ANCESTOR_MAX_DEPTH = 10;
 const MATHJAX_INHERIT_SENTINEL = '_inherit_';
@@ -159,8 +159,8 @@ export const mrow: HandlerFn = (node, serialize) => {
     } else {
       // One or both delimiters invisible: wrap visible side in lr()
       const trimmed = content.trim();
-      const openEsc = openDelim ? escapeLrOpenDelimiter(openDelim) : '';
-      const closeEsc = closeDelim ? escapeLrOpenDelimiter(closeDelim) : '';
+      const openEsc = openDelim ? escapeLrDelimiter(openDelim) : '';
+      const closeEsc = closeDelim ? escapeLrDelimiter(closeDelim) : '';
       if (openEsc) {
         res = addToTypstData(res, { typst: `lr(${openEsc} ${escapeLrSemicolons(trimmed)})` });
       } else if (closeEsc) {

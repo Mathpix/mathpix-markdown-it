@@ -21,7 +21,7 @@ const BRACKET_SYMBOL_MAP: Readonly<Record<string, string>> = {
 // All ASCII brackets except ] are escaped: ( and [ open groups/content blocks,
 // ) closes the lr() function call prematurely, { and } are code block syntax.
 // ] is left unescaped so lr() can recognise and auto-size it as a delimiter.
-const lrOpenEscapeMap: Readonly<Record<string, string>> = {
+const LR_DELIMITER_ESCAPE_MAP: Readonly<Record<string, string>> = {
   '(': '\\(',
   ')': '\\)',
   '[': '\\[',
@@ -29,45 +29,60 @@ const lrOpenEscapeMap: Readonly<Record<string, string>> = {
   '}': '\\}',
 };
 
-export const delimiterToTypst = (delim: string): string => {
-  switch (delim) {
-    case '(': return '"("';
-    case ')': return '")"';
-    case '[': return '"["';
-    case ']': return '"]"';
-    case '{': return '"{"';
-    case '}': return '"}"';
-    case '|': return '"|"';
-    case DOUBLE_VERT: return '"' + DOUBLE_VERT + '"';
-    case PARALLEL_SIGN: return '"' + DOUBLE_VERT + '"';
-    default: return '"' + delim + '"';
-  }
+// Delimiter → Typst string literal mapping for explicit delimiter arguments
+const DELIMITER_LITERAL_MAP: Readonly<Record<string, string>> = {
+  '(': '"("',
+  ')': '")"',
+  '[': '"["',
+  ']': '"]"',
+  '{': '"{"',
+  '}': '"}"',
+  '|': '"|"',
+  [DOUBLE_VERT]: `"${DOUBLE_VERT}"`,
+  [PARALLEL_SIGN]: `"${DOUBLE_VERT}"`,
 };
+
+// Container kinds that should be flattened when walking to find direct math children
+const FLATTENABLE_CONTAINER_KINDS: ReadonlySet<string> = new Set([
+  'mtd', 'mpadded', 'mstyle',
+]);
+
+const shouldFlattenNode = (n: MathNode): boolean =>
+  FLATTENABLE_CONTAINER_KINDS.has(n.kind) || n.isInferred;
+
+/** Skip past a quoted string starting at position i (the opening ").
+ *  Returns the index of the closing " or end of string. */
+const skipQuotedString = (expr: string, i: number): number => {
+  i++;
+  while (i < expr.length && expr[i] !== '"') {
+    if (expr[i] === '\\') i++;
+    i++;
+  }
+  return i;
+};
+
+// Delimiter is always a single Unicode char (safe for unescaped Typst string literal)
+export const delimiterToTypst = (delim: string): string =>
+  DELIMITER_LITERAL_MAP[delim] ?? `"${delim}"`;
 
 export const treeContainsMo = (node: MathNode, moText: string, skipPhantom = true): boolean => {
   if (!node) return false;
   if (skipPhantom && node.kind === 'mphantom') return false;
-  if (node.kind === 'mo') {
-    const text = getNodeText(node);
-    if (text === moText) return true;
-  }
-  if (node.childNodes) {
-    for (const child of node.childNodes) {
-      if (treeContainsMo(child, moText, skipPhantom)) return true;
-    }
+  if (node.kind === 'mo' && getNodeText(node) === moText) return true;
+  for (const child of (node.childNodes ?? [])) {
+    if (treeContainsMo(child, moText, skipPhantom)) return true;
   }
   return false;
 };
 
 // Serialize all visible content in a node subtree up to (but not including)
-// the first mo with the given text. Returns the serialized prefix.
+// the first mo with the given text. Returns the serialized prefix (block variant only).
 export const serializePrefixBeforeMo = (node: MathNode, serialize: ITypstSerializer, stopMoText: string): string => {
-  // Walk the mtd → inferredMrow → mpadded chain to find the flat math children
   const flatChildren: MathNode[] = [];
   const extractFlat = (n: MathNode) => {
     if (!n || !n.childNodes) return;
     if (n.kind === 'mphantom') return;
-    if (n.kind === 'mtd' || n.kind === 'mpadded' || n.kind === 'mstyle' || n.isInferred) {
+    if (shouldFlattenNode(n)) {
       for (const child of n.childNodes) {
         extractFlat(child);
       }
@@ -78,13 +93,70 @@ export const serializePrefixBeforeMo = (node: MathNode, serialize: ITypstSeriali
   extractFlat(node);
   let result = '';
   for (const child of flatChildren) {
-    if (child.kind === 'mo' && getNodeText(child) === stopMoText) {
-      break;
-    }
+    if (child.kind === 'mo' && getNodeText(child) === stopMoText) break;
     const data: ITypstData = serialize.visitNode(child, '');
     result += data.typst;
   }
   return result.trim();
+};
+
+type BracketToken = { char: string; pos: number };
+
+/** Scan a Typst expression and collect bracket positions, skipping escaped chars,
+ *  quoted strings, and function-call parens (preceded by word char or dot). */
+const scanBracketTokens = (expr: string): BracketToken[] => {
+  const brackets: BracketToken[] = [];
+  for (let i = 0; i < expr.length; i++) {
+    const ch = expr[i];
+    if (ch === '\\') { i++; continue; }
+    if (ch === '"') { i = skipQuotedString(expr, i); continue; }
+    if (RE_BRACKET_CHARS.test(ch)) {
+      // Skip function-call parens (preceded by word char or .)
+      if (ch === '(' && i > 0 && RE_WORD_DOT_END.test(expr[i - 1])) {
+        let depth = 1;
+        i++;
+        while (i < expr.length && depth > 0) {
+          if (expr[i] === '\\') { i++; }
+          else if (expr[i] === '"') { i = skipQuotedString(expr, i); }
+          else if (expr[i] === '(') depth++;
+          else if (expr[i] === ')') depth--;
+          if (depth > 0) i++;
+        }
+        continue;
+      }
+      brackets.push({ char: ch, pos: i });
+    }
+  }
+  return brackets;
+};
+
+/** Strict stack pairing: a closing bracket matches ONLY the corresponding open
+ *  at the top of the stack. On mismatch the top stays in the stack and the
+ *  closing bracket is left unpaired — both sides remain unmatched.
+ *  Returns the set of indices (into the chars array) that are unpaired. */
+const findUnpairedIndices = (chars: string[]): Set<number> => {
+  const stack: number[] = [];
+  const paired = new Set<number>();
+  for (let i = 0; i < chars.length; i++) {
+    const ch = chars[i];
+    if (OPEN_BRACKETS[ch]) {
+      stack.push(i);
+    } else if (CLOSE_BRACKETS[ch]) {
+      if (stack.length > 0) {
+        const topIdx = stack[stack.length - 1];
+        if (chars[topIdx] === CLOSE_BRACKETS[ch]) {
+          paired.add(topIdx);
+          paired.add(i);
+          stack.pop();
+        }
+      }
+    }
+  }
+  const unpaired = new Set<number>();
+  for (let i = 0; i < chars.length; i++) {
+    if (!paired.has(i)) unpaired.add(i);
+  }
+  return unpaired;
 };
 
 // Replace unpaired brackets in a matrix/cases cell with Typst symbol names.
@@ -93,67 +165,16 @@ export const serializePrefixBeforeMo = (node: MathNode, serialize: ITypstSeriali
 // inside function-call parens (e.g. frac(...)) are ignored.
 export const replaceUnpairedBrackets = (expr: string): string => {
   if (!RE_BRACKET_CHARS.test(expr)) return expr;
-  type BracketInfo = { char: string; pos: number };
-  const brackets: BracketInfo[] = [];
-  for (let i = 0; i < expr.length; i++) {
-    const ch = expr[i];
-    if (ch === '\\') { i++; continue; } // skip backslash-escaped
-    // Skip quoted strings
-    if (ch === '"') {
-      i++;
-      while (i < expr.length && expr[i] !== '"') {
-        if (expr[i] === '\\') i++; // skip escaped char in string
-        i++;
-      }
-      continue;
-    }
-    if (RE_BRACKET_CHARS.test(ch)) {
-      // Skip function-call parens (preceded by word char or .)
-      if (ch === '(' && i > 0 && RE_WORD_DOT_END.test(expr[i - 1])) {
-        let depth = 1;
-        i++;
-        while (i < expr.length && depth > 0) {
-          if (expr[i] === '\\') { i++; }
-          else if (expr[i] === '"') {
-            i++;
-            while (i < expr.length && expr[i] !== '"') {
-              if (expr[i] === '\\') i++;
-              i++;
-            }
-          }
-          else if (expr[i] === '(') depth++;
-          else if (expr[i] === ')') depth--;
-          if (depth > 0) i++;
-        }
-        // i now points to the closing ), skip it
-        continue;
-      }
-      brackets.push({ char: ch, pos: i });
-    }
+  const brackets = scanBracketTokens(expr);
+  const unpairedTokenIndices = findUnpairedIndices(brackets.map(b => b.char));
+  const unmatchedPositions = new Set<number>();
+  for (const idx of unpairedTokenIndices) {
+    unmatchedPositions.add(brackets[idx].pos);
   }
-  const unmatched = new Set<number>();
-  for (const [open, close] of Object.entries(OPEN_BRACKETS)) {
-    const stack: number[] = [];
-    for (const b of brackets) {
-      if (b.char === open) {
-        stack.push(b.pos);
-      } else if (b.char === close) {
-        if (stack.length > 0) {
-          stack.pop(); // matched
-        } else {
-          unmatched.add(b.pos); // unmatched close
-        }
-      }
-    }
-    // Any remaining in stack are unmatched opens
-    for (const pos of stack) {
-      unmatched.add(pos);
-    }
-  }
-  if (unmatched.size === 0) return expr;
+  if (unmatchedPositions.size === 0) return expr;
   let result = '';
   for (let i = 0; i < expr.length; i++) {
-    if (unmatched.has(i)) {
+    if (unmatchedPositions.has(i)) {
       const sym = BRACKET_SYMBOL_MAP[expr[i]];
       if (result.length > 0 && RE_WORD_DOT_END.test(result[result.length - 1])) {
         result += ' ';
@@ -188,58 +209,28 @@ export const markUnpairedBrackets = (root: MathNode): void => {
     if (node.kind === 'mo') {
       const text = getNodeText(node);
       if (text && (OPEN_BRACKETS[text] || CLOSE_BRACKETS[text])) {
-        // Skip \left...\right delimiters — they are handled by the mrow handler
         if (!isLeftRightDelimiter(node)) {
           bracketNodes.push({ node, char: text });
         }
       }
     }
-    if (node.childNodes) {
-      for (const child of node.childNodes) {
-        walk(child);
-      }
+    for (const child of (node.childNodes ?? [])) {
+      walk(child);
     }
   };
   walk(root);
-  // STRICT stack pairing: closing bracket matches ONLY the top of the stack
-  const stack: number[] = [];
-  const paired = new Set<number>();
-  for (let i = 0; i < bracketNodes.length; i++) {
+  const unpairedIndices = findUnpairedIndices(bracketNodes.map(b => b.char));
+  for (const i of unpairedIndices) {
     const ch = bracketNodes[i].char;
-    if (OPEN_BRACKETS[ch]) {
-      stack.push(i);
-    } else if (CLOSE_BRACKETS[ch]) {
-      if (stack.length > 0) {
-        const topIdx = stack[stack.length - 1];
-        if (bracketNodes[topIdx].char === CLOSE_BRACKETS[ch]) {
-          paired.add(topIdx);
-          paired.add(i);
-          stack.pop();
-        }
-        // Top doesn't match → do NOT search deeper, leave both unpaired
-      }
-    }
-  }
-  for (let i = 0; i < bracketNodes.length; i++) {
-    if (!paired.has(i)) {
-      const ch = bracketNodes[i].char;
-      bracketNodes[i].node.setProperty(UNPAIRED_BRACKET_PROP,
-        OPEN_BRACKETS[ch] ? 'open' : 'close');
-    }
+    bracketNodes[i].node.setProperty(UNPAIRED_BRACKET_PROP,
+      OPEN_BRACKETS[ch] ? 'open' : 'close');
   }
 };
 
-export const mapDelimiter = (delim: string): string => {
-  const mapped = typstSymbolMap.get(delim);
-  if (mapped) {
-    return mapped;
-  }
-  return delim;
-};
+export const mapDelimiter = (delim: string): string =>
+  typstSymbolMap.get(delim) ?? delim;
 
-export const escapeLrOpenDelimiter = (delim: string): string => {
-  if (lrOpenEscapeMap[delim]) return lrOpenEscapeMap[delim];
-  const mapped = typstSymbolMap.get(delim);
-  if (mapped) return mapped;
-  return delim;
-};
+/** Map delimiter for use inside lr(): apply lr-specific escapes first,
+ *  then fall back to typstSymbolMap, then return as-is. */
+export const escapeLrDelimiter = (delim: string): string =>
+  LR_DELIMITER_ESCAPE_MAP[delim] ?? typstSymbolMap.get(delim) ?? delim;

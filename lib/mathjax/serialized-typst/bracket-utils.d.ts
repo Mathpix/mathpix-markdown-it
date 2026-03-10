@@ -5,4 +5,6 @@ export declare const serializePrefixBeforeMo: (node: MathNode, serialize: ITypst
 export declare const replaceUnpairedBrackets: (expr: string) => string;
 export declare const markUnpairedBrackets: (root: MathNode) => void;
 export declare const mapDelimiter: (delim: string) => string;
-export declare const escapeLrOpenDelimiter: (delim: string) => string;
+/** Map delimiter for use inside lr(): apply lr-specific escapes first,
+ *  then fall back to typstSymbolMap, then return as-is. */
+export declare const escapeLrDelimiter: (delim: string) => string;
