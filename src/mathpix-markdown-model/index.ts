@@ -11,7 +11,7 @@ import { Property } from 'csstype'; // at top of file
 import { ISmilesOptions } from '../markdown/md-chemistry';
 import { yamlParser } from '../yaml-parser';
 import { generateHtmlPage } from './html-page';
-import { getMaxWidthStyle } from '../styles/halpers';
+import { getMaxWidthStyle } from '../styles/helpers';
 import { parseMarkdownByElement } from '../helpers/parse-mmd-element';
 import { menuStyle } from '../contex-menu/styles';
 import { clipboardCopyStyles } from '../copy-to-clipboard/clipboard-copy-styles';
@@ -19,6 +19,23 @@ import { eMmdRuleType } from "../markdown/common/mmdRules";
 import { getDisableRuleTypes } from "../markdown/common/mmdRulesToDisable";
 import { fontMetrics, IFontMetricsOptions } from "../markdown/common/text-dimentions";
 import { resetSizeCounter, size, ISize } from "../markdown/common/counters";
+
+export interface StyleBundleOpts {
+    // MathpixStyle parameters
+    setTextAlignJustify?: boolean;
+    useColors?: boolean;
+    maxWidth?: string;
+    isPptx?: boolean;
+    // Module toggles
+    resetBody?: boolean;
+    container?: boolean;
+    mathjax?: boolean;
+    code?: boolean;
+    preview?: boolean;
+    toc?: boolean;
+    tocContainerName?: string;
+    menu?: boolean;
+}
 
 export interface optionsMathpixMarkdown {
     alignMathBlock?: Property.TextAlign;
@@ -241,6 +258,7 @@ class MathpixMarkdown_Model {
     public disableRules: string[];
     public isCheckFormula?: boolean;
     public showTimeLog?: boolean;
+    private isClickHandlerBound: boolean = false;
 
     setOptions(disableRules: string[], isCheckFormula?: boolean, showTimeLog?: boolean){
         this.disableRules = disableRules;
@@ -310,7 +328,12 @@ class MathpixMarkdown_Model {
         : '';
 
       const styles = htmlWrapper.includeStyles
-        ? `<style>${this.getMathpixStyle(true)}</style>`
+        ? `<style>${this.buildStyles({
+            container: true,
+            mathjax: true,
+            preview: true,
+            menu: true,
+          })}</style>`
         : '';
       const fonts = htmlWrapper.includeFonts
         ? '<link rel="stylesheet" href="https://cdn.mathpix.com/fonts/cmu.css"/>'
@@ -424,7 +447,8 @@ class MathpixMarkdown_Model {
         }, 10);
     };
 
-    loadMathJax = (notScrolling:boolean=false, setTextAlignJustify: boolean=false, isResetBodyStyles: boolean=false, maxWidth: string = '', scaleEquation = true):boolean => {
+    /** Browser runtime: injects SVG-styles + Mathpix-styles into DOM. Includes: core, code, tabular, lists, toc, menu. No container/mathjax (SVG injected separately). */
+    loadMathJax = (notScrolling: boolean = false, setTextAlignJustify: boolean = false, isResetBodyStyles: boolean = false, maxWidth: string = '', useColors: boolean = true): boolean => {
         try {
             const el = document.getElementById('SVG-styles');
             if (!el) {
@@ -432,24 +456,28 @@ class MathpixMarkdown_Model {
               document.head.appendChild(MathJaxStyle);
             }
 
-            const elStyle = document.getElementById('Mathpix-styles');
-            if (!notScrolling) {
+            if (!notScrolling && !this.isClickHandlerBound) {
               window.addEventListener('click', this.handleClick, false);
+              this.isClickHandlerBound = true;
             }
-            if (!elStyle) {
-                const style = document.createElement("style");
-                style.setAttribute("id", "Mathpix-styles");
-                let bodyStyles = isResetBodyStyles ? resetBodyStyles : '';
-                style.innerHTML = bodyStyles 
-                  + MathpixStyle(setTextAlignJustify, true, maxWidth, scaleEquation) 
-                  + codeStyles 
-                  + tabularStyles() 
-                  + listsStyles 
-                  + TocStyle("toc")
-                  + menuStyle()
-                  + clipboardCopyStyles()
-                ;
-                document.head.appendChild(style);
+
+            const newStyles = this.buildStyles({
+              setTextAlignJustify, useColors, maxWidth,
+              resetBody: isResetBodyStyles,
+              toc: true,
+              menu: true,
+            });
+
+            const elStyle = document.getElementById('Mathpix-styles');
+            if (elStyle) {
+              if (elStyle.innerHTML !== newStyles) {
+                elStyle.innerHTML = newStyles;
+              }
+            } else {
+              const style = document.createElement("style");
+              style.setAttribute("id", "Mathpix-styles");
+              style.innerHTML = newStyles;
+              document.head.appendChild(style);
             }
             return true;
         } catch (e) {
@@ -475,7 +503,7 @@ class MathpixMarkdown_Model {
       }
     };
 
-    getMathjaxStyle = () => {
+    getMathjaxStyle = (): string => {
       try {
         const MathJaxStyle: any = MathJax.Stylesheet();
         return MathJaxStyle.children[0] && MathJaxStyle.children[0].value
@@ -486,37 +514,88 @@ class MathpixMarkdown_Model {
       }
     };
 
-    getMathpixStyleOnly = (scaleEquation = true ) => {
-      let style: string =  this.getMathjaxStyle() 
-        + MathpixStyle(false, true, '', scaleEquation) 
-        + codeStyles 
-        + tabularStyles() 
-        + listsStyles
-        + menuStyle()
-        + clipboardCopyStyles();
-      return style;
-    };
-
-    getMathpixStyle = (stylePreview: boolean = false, showToc: boolean = false, tocContainerName: string = 'toc', scaleEquation = true, isPptx = false ) => {
-      let style: string = ContainerStyle() + this.getMathjaxStyle() + MathpixStyle(false, true, '', scaleEquation, isPptx) + codeStyles + tabularStyles() + listsStyles;
-      if (showToc) {}
-      if (!stylePreview) {
-        return style;
+    /**
+     * Single CSS builder. All style assembly methods delegate here.
+     *
+     * Canonical order:
+     *   resetBody → container → mathjax → MathpixStyle → code → tabular → lists → preview → toc → menu+clipboard
+     *
+     * Modules always included: MathpixStyle, tabularStyles, listsStyles.
+     * Modules toggled via opts: resetBody, container, mathjax, code (default: on), preview, toc, menu+clipboard.
+     */
+    buildStyles = (opts: StyleBundleOpts = {}): string => {
+      const {
+        setTextAlignJustify = false,
+        useColors = true,
+        maxWidth = '',
+        isPptx = false,
+        resetBody = false,
+        container = false,
+        mathjax = false,
+        code = true,
+        preview = false,
+        toc = false,
+        tocContainerName = 'toc',
+        menu = false,
+      } = opts;
+      const parts: string[] = [];
+      if (resetBody){
+        parts.push(resetBodyStyles);
       }
-      
-      return showToc 
-          ? style + PreviewStyle + TocStyle(tocContainerName) + menuStyle() + clipboardCopyStyles()
-          : style + PreviewStyle + menuStyle() + clipboardCopyStyles();
+      if (container){
+        parts.push(ContainerStyle(useColors));
+      }
+      if (mathjax){
+        parts.push(this.getMathjaxStyle());
+      }
+      parts.push(MathpixStyle(setTextAlignJustify, useColors, maxWidth, isPptx));
+      if (code){
+        parts.push(codeStyles(useColors));
+      }
+      parts.push(tabularStyles(useColors, isPptx));
+      parts.push(listsStyles);
+      if (preview){
+        parts.push(PreviewStyle);
+      }
+      if (toc){
+        parts.push(TocStyle(tocContainerName));
+      }
+      if (menu){
+        parts.push(menuStyle());
+        parts.push(clipboardCopyStyles());
+      }
+      return parts.map(s => s.trim()).join('\n');
     };
 
-    getMathpixMarkdownStyles = ( useColors: boolean = true, scaleEquation = true ) => {
-      let style: string = ContainerStyle(useColors);
-      style += this.getMathjaxStyle();
-      style += MathpixStyle(false, useColors, '', scaleEquation = true );
-      // style += codeStyles;
-      style += tabularStyles(useColors);
-      style += listsStyles;
-      return style;
+    /** Styles for embedded widget (no container/preview). Includes: mathjax, core, code, tabular, lists, menu.*/
+    getMathpixStyleOnly = (useColors: boolean = true): string => {
+      return this.buildStyles({
+        useColors,
+        mathjax: true,
+        menu: true,
+      });
+    };
+
+    /** Full page styles. Includes: container, mathjax, core, code, tabular, lists. Optionally: preview, toc, menu.*/
+    getMathpixStyle = (stylePreview: boolean = false, showToc: boolean = false, tocContainerName: string = 'toc', useColors: boolean = true, isPptx: boolean = false): string => {
+      return this.buildStyles({
+        useColors, isPptx, tocContainerName,
+        container: true,
+        mathjax: true,
+        preview: stylePreview,
+        toc: stylePreview && showToc,
+        menu: stylePreview,
+      });
+    };
+
+    /** VSCode markdown preview styles. Includes: container, mathjax, core, tabular, lists. No code (VSCode provides its own).*/
+    getMathpixMarkdownStyles = (useColors: boolean = true): string => {
+      return this.buildStyles({
+        useColors,
+        container: true,
+        mathjax: true,
+        code: false,
+      });
     };
 
     getMathpixFontsStyle = () => {
@@ -552,12 +631,14 @@ class MathpixMarkdown_Model {
         const disableRules = isDisableFancy ? this.disableFancyArrayDef : options ? options.disableRules || [] : [];
 
         if (showToc) {
-          const index = disableRules.indexOf('toc');
-          if (disableRules.indexOf('toc') === -1) {
-            disableRules.splice(index, 1);
+          const idx = disableRules.indexOf('toc');
+          if (idx !== -1) {
+            disableRules.splice(idx, 1);
           }
         } else {
-          disableRules.push('toc');
+          if (!disableRules.includes('toc')) {
+            disableRules.push('toc');
+          }
         }
         const disableRuleTypes: eMmdRuleType[] = renderOptions ? getDisableRuleTypes(renderOptions) : [];
         const markdownItOptions: TMarkdownItOptions = {

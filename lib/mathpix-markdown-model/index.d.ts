@@ -2,6 +2,20 @@ import { Property } from 'csstype';
 import { ISmilesOptions } from '../markdown/md-chemistry';
 import { IFontMetricsOptions } from "../markdown/common/text-dimentions";
 import { size, ISize } from "../markdown/common/counters";
+export interface StyleBundleOpts {
+    setTextAlignJustify?: boolean;
+    useColors?: boolean;
+    maxWidth?: string;
+    isPptx?: boolean;
+    resetBody?: boolean;
+    container?: boolean;
+    mathjax?: boolean;
+    code?: boolean;
+    preview?: boolean;
+    toc?: boolean;
+    tocContainerName?: string;
+    menu?: boolean;
+}
 export interface optionsMathpixMarkdown {
     alignMathBlock?: Property.TextAlign;
     display?: Property.Display;
@@ -208,6 +222,7 @@ declare class MathpixMarkdown_Model {
     disableRules: string[];
     isCheckFormula?: boolean;
     showTimeLog?: boolean;
+    private isClickHandlerBound;
     setOptions(disableRules: string[], isCheckFormula?: boolean, showTimeLog?: boolean): void;
     checkFormula: (mathString: string, showTimeLog?: boolean) => string;
     texReset: (n?: number) => void;
@@ -232,12 +247,26 @@ declare class MathpixMarkdown_Model {
     checkEquationNumber: (html: string) => string;
     handleClick: (e: any) => void;
     scrollPage: (parent: any, offsetTarget: any) => void;
-    loadMathJax: (notScrolling?: boolean, setTextAlignJustify?: boolean, isResetBodyStyles?: boolean, maxWidth?: string, scaleEquation?: boolean) => boolean;
+    /** Browser runtime: injects SVG-styles + Mathpix-styles into DOM. Includes: core, code, tabular, lists, toc, menu. No container/mathjax (SVG injected separately). */
+    loadMathJax: (notScrolling?: boolean, setTextAlignJustify?: boolean, isResetBodyStyles?: boolean, maxWidth?: string, useColors?: boolean) => boolean;
     convertToHTML: (str: string, options?: TMarkdownItOptions) => string;
-    getMathjaxStyle: () => any;
-    getMathpixStyleOnly: (scaleEquation?: boolean) => string;
-    getMathpixStyle: (stylePreview?: boolean, showToc?: boolean, tocContainerName?: string, scaleEquation?: boolean, isPptx?: boolean) => string;
-    getMathpixMarkdownStyles: (useColors?: boolean, scaleEquation?: boolean) => string;
+    getMathjaxStyle: () => string;
+    /**
+     * Single CSS builder. All style assembly methods delegate here.
+     *
+     * Canonical order:
+     *   resetBody → container → mathjax → MathpixStyle → code → tabular → lists → preview → toc → menu+clipboard
+     *
+     * Modules always included: MathpixStyle, tabularStyles, listsStyles.
+     * Modules toggled via opts: resetBody, container, mathjax, code (default: on), preview, toc, menu+clipboard.
+     */
+    buildStyles: (opts?: StyleBundleOpts) => string;
+    /** Styles for embedded widget (no container/preview). Includes: mathjax, core, code, tabular, lists, menu.*/
+    getMathpixStyleOnly: (useColors?: boolean) => string;
+    /** Full page styles. Includes: container, mathjax, core, code, tabular, lists. Optionally: preview, toc, menu.*/
+    getMathpixStyle: (stylePreview?: boolean, showToc?: boolean, tocContainerName?: string, useColors?: boolean, isPptx?: boolean) => string;
+    /** VSCode markdown preview styles. Includes: container, mathjax, core, tabular, lists. No code (VSCode provides its own).*/
+    getMathpixMarkdownStyles: (useColors?: boolean) => string;
     getMathpixFontsStyle: () => string;
     render: (text: string, options?: optionsMathpixMarkdown) => string;
     mmdYamlToHTML: (mmd: string, options?: TMarkdownItOptions, isAddYamlToHtml?: boolean) => {

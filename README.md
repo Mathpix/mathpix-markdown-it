@@ -854,10 +854,12 @@ The `MathpixMarkdown` React element accepts the following props:
 |                                                    | returns | description                                                                                                               |         |
 |----------------------------------------------------|---------|---------------------------------------------------------------------------------------------------------------------------|---------|
 | **Style methods:**                                 |         |                                                                                                                           |         |
+| buildStyles(opts?: [StyleBundleOpts](https://github.com/Mathpix/mathpix-markdown-it#stylebundleopts)) | string | Single CSS builder. All style assembly methods delegate here. Modules toggled via opts.                                   |         |
 | loadMathJax()                                      | boolean | Adds a style element into the head of the document and returns true. In case of an error, returns false.                  |[example](https://github.com/Mathpix/mathpix-markdown-it/tree/master/examples/react-app/use-markdownToHTML-method)|
-| getMathpixStyleOnly()                              | string  | returns styles as a string.                                                                                               |         |
-| getMathpixStyle(true)                              | string  | returns styles as a string including styles for container.                                                                |[example](https://github.com/Mathpix/mathpix-markdown-it/tree/master/examples/react-app/use-render-method)|
-| getMathpixFontsStyle()                             | boolean | returns fonts styles as a string.                                                                                         |[example](https://github.com/Mathpix/mathpix-markdown-it/tree/master/examples/react-app/use-render-method)|
+| getMathpixStyleOnly(useColors?)                     | string  | Styles for embedded widget (no container/preview).                                                                        |         |
+| getMathpixStyle(stylePreview?, showToc?, tocContainerName?, useColors?, isPptx?) | string | Full page styles including container.                                                                                     |[example](https://github.com/Mathpix/mathpix-markdown-it/tree/master/examples/react-app/use-render-method)|
+| getMathpixFontsStyle()                             | string  | Returns fonts styles as a string.                                                                                         |[example](https://github.com/Mathpix/mathpix-markdown-it/tree/master/examples/react-app/use-render-method)|
+| getMaxWidthStyle(maxWidth?, isHideScroll?)         | string  | Returns CSS for math/tabular max-width constraints and optional scrollbar hiding.                                         |         |
 | **Render methods:**                                |         |                                                                                                                           |         |
 | markdownToHTML(str, options: [TMarkdownItOptions](https://github.com/Mathpix/mathpix-markdown-it#tmarkdownitoptions)) | string  | Renders input text to html element as a string.                                                                           |[example](https://github.com/Mathpix/mathpix-markdown-it/tree/master/examples/react-app/use-markdownToHTML-method)|
 | render(str, options: [optionsMathpixMarkdown](https://github.com/Mathpix/mathpix-markdown-it#optionsmathpixmarkdown))     | string  | Renders input text to  HTML element as a string and wraps it in a container. Should be used to render the entire document.|[example](https://github.com/Mathpix/mathpix-markdown-it/tree/master/examples/react-app/use-render-method)|
@@ -865,6 +867,24 @@ The `MathpixMarkdown` React element accepts the following props:
 | parseMarkdownByHTML(htmlString)                    | Array   | parses input html string and returns array of formats.                                                                    |[examples](https://github.com/Mathpix/mathpix-markdown-it/tree/master/examples/react-app/use-parseMarkdownByHTML-method)|
 | parseMarkdownByElement(htmlElement)                | Array   | parses input html element and returns array of formats.                                                                   |         |
 
+
+
+### StyleBundleOpts
+
+|                          | type&nbsp;*`default`*         | description                                                |
+|--------------------------|-------------------------------|------------------------------------------------------------|
+| `setTextAlignJustify`    | boolean&nbsp;*`false`*        | Enables `text-align: justify` on content blocks            |
+| `useColors`              | boolean&nbsp;*`true`*         | When `false`, omits color declarations from CSS output     |
+| `maxWidth`               | string&nbsp;*`''`*            | Sets max-width for math/tabular containers (e.g. `'800px'`)|
+| `isPptx`                 | boolean&nbsp;*`false`*        | Adjusts layout for PowerPoint export                       |
+| `resetBody`              | boolean&nbsp;*`false`*        | Includes body margin/line-height reset                     |
+| `container`              | boolean&nbsp;*`false`*        | Includes base element styles (headings, links, tables etc) |
+| `mathjax`                | boolean&nbsp;*`false`*        | Includes MathJax stylesheet                                |
+| `code`                   | boolean&nbsp;*`true`*         | Includes syntax-highlighting styles                        |
+| `preview`                | boolean&nbsp;*`false`*        | Includes `#preview` wrapper styles                         |
+| `toc`                    | boolean&nbsp;*`false`*        | Includes table-of-contents styles                          |
+| `tocContainerName`       | string&nbsp;*`'toc'`*        | ID of the TOC container element                            |
+| `menu`                   | boolean&nbsp;*`false`*        | Includes context-menu and clipboard styles                 |
 
 
 ### TMarkdownItOptions
