@@ -1,6 +1,6 @@
 # PR: CSS scoping — `#preview-content`/`#setText` specificity boost for all MMD selectors
 
-Status: Active
+Status: Implemented
 Owner: @OlgaRedozubova
 
 ---
@@ -264,4 +264,4 @@ Converted from static string to function accepting `useColors` parameter.
 - [x] Pre-existing bugs fixed
 - [x] Snapshot + composition + buildStyles tests (79 tests)
 - [x] All existing tests pass
-- [ ] PR reviewed and merged
+- [x] PR reviewed and merged
