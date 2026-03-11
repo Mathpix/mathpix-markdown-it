@@ -12,7 +12,7 @@ import {
   initTypstData, addToTypstData, addSpaceToTypstData,
   getNodeText, getAttrs, getProp,
   typstPlaceholder, serializeThousandSepChain, needsTokenSeparator, needsSpaceBetweenNodes,
-  handleAll,
+  handleAll, isNegationOverlay,
 } from "./common";
 import {
   escapeContentSeparators, hasTopLevelSeparators,
@@ -220,6 +220,17 @@ export const mrow: HandlerFn = (node, serialize) => {
         continue;
       }
       const child = node.childNodes[i];
+      // \not negation overlay: wrap next sibling in cancel()
+      if (isNegationOverlay(child) && i + 1 < node.childNodes.length) {
+        const nextData: ITypstData = serialize.visitNode(node.childNodes[i + 1], '');
+        const cancelTypst = `cancel(${nextData.typst.trim()})`;
+        if (needsSpaceBetweenNodes(res.typst, cancelTypst, i > 0 ? node.childNodes[i - 1] : null)) {
+          addSpaceToTypstData(res);
+        }
+        res = addToTypstData(res, { typst: cancelTypst });
+        i++; // skip the consumed sibling
+        continue;
+      }
       const data: ITypstData = serialize.visitNode(child, '');
       if (needsSpaceBetweenNodes(res.typst, data.typst, i > 0 ? node.childNodes[i - 1] : null)) {
         addSpaceToTypstData(res);

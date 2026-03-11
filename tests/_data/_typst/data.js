@@ -2652,6 +2652,16 @@ module.exports = [
     typst_inline: `&lr(mat(delim: #none, align: #left, \n  d = L_2 epsilon u = L_2 alpha;\n  g = delta L_2 + s,\n) \\}) \\\n &d^2 = u^2 + (g - y)^2`,
   },
   {
+    latex: `\\not 7,60`,
+    typst: `cancel(7), 60`,
+    typst_inline: `cancel(7), 60`,
+  },
+  {
+    latex: `\\not k + \\not q`,
+    typst: `cancel(k) + cancel(q)`,
+    typst_inline: `cancel(k) + cancel(q)`,
+  },
+  {
     latex: `\\left[\\begin{array}{l} a \\\\ b \\end{array}\\right)`,
     typst: `lr(\\[ mat(delim: #none, align: #left, \n  a;\n  b,\n) \\))`,
     typst_inline: `lr(\\[ mat(delim: #none, align: #left, \n  a;\n  b,\n) \\))`,

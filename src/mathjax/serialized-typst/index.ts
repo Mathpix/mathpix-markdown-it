@@ -12,7 +12,7 @@ import {
 import {
   addToTypstData, addSpaceToTypstData, initTypstData,
   serializeThousandSepChain, formatScript, needsTokenSeparator, needsSpaceBetweenNodes,
-  getChildText, getAttrs,
+  getChildText, getAttrs, isNegationOverlay,
 } from './common';
 import { findTypstSymbol } from './typst-symbol-map';
 
@@ -333,6 +333,18 @@ export class SerializedTypstVisitor extends MmlVisitor {
           res = addToTypstData(res, data);
           // Skip all remaining siblings (already serialized as post-content)
           break;
+        }
+        // Pattern 6: \not negation overlay — mrow[REL] > mpadded[width=0] > mtext(⧸)
+        // Consume the next sibling and wrap it in cancel()
+        if (isNegationOverlay(child) && j + 1 < children.length) {
+          const nextData = this.visitNode(children[j + 1], space);
+          const cancelTypst = `cancel(${nextData.typst.trim()})`;
+          if (needsSpaceBetweenNodes(res.typst, cancelTypst, j > 0 ? children[j - 1] : null)) {
+            addSpaceToTypstData(res);
+          }
+          res = addToTypstData(res, { typst: cancelTypst });
+          j += 2;
+          continue;
         }
         // Normal processing
         const data = this.visitNode(child, space);

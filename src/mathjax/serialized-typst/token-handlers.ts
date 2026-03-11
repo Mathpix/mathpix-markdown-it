@@ -22,6 +22,17 @@ const INVISIBLE_CHARS: ReadonlySet<string> = new Set([
   FUNC_APPLY, INVISIBLE_TIMES, INVISIBLE_SEP, INVISIBLE_PLUS,
 ]);
 
+/** Combining long solidus overlay (U+0338) — used by MathJax for \not on mi/mo/mtext */
+const COMBINING_NOT_SLASH = '\u0338';
+
+/** Strip trailing combining not slash and return [cleanValue, hasCancelSlash] */
+const stripCombiningNot = (value: string): [string, boolean] => {
+  if (value.endsWith(COMBINING_NOT_SLASH)) {
+    return [value.slice(0, -1), true];
+  }
+  return [value, false];
+};
+
 // Built-in Typst math operators — should NOT be wrapped in upright()
 const TYPST_MATH_OPERATORS: ReadonlySet<string> = new Set([
   'sin', 'cos', 'tan', 'cot', 'sec', 'csc',
@@ -204,10 +215,14 @@ export const mi: HandlerFn = (node, _serialize) => {
   if (!node.childNodes || node.childNodes.length === 0) {
     return initTypstData();
   }
-  const value = getChildText(node);
-  if (!value) {
+  // getNodeText (not getChildText) to capture combining chars like U+0338 (\not)
+  const rawValue = getNodeText(node);
+  if (!rawValue) {
     return initTypstData();
   }
+  // \not on mi: combining long solidus overlay (U+0338) → cancel()
+  const [value, hasNot] = stripCombiningNot(rawValue);
+  if (!value) return initTypstData();
   const attrs = getAttrs<FontAttrs>(node);
   const mathvariant = attrs.mathvariant || '';
   const isKnownSymbol = typstSymbolMap.has(value);
@@ -242,6 +257,7 @@ export const mi: HandlerFn = (node, _serialize) => {
       }
     }
   }
+  if (hasNot) typstValue = `cancel(${typstValue})`;
   // Add spacing around multi-character word-like Typst symbol names
   if (isWordLikeToken(typstValue)) {
     return singleTypst(withContextSpaces(node, typstValue));
@@ -250,17 +266,20 @@ export const mi: HandlerFn = (node, _serialize) => {
 };
 
 export const mo: HandlerFn = (node, _serialize) => {
-  const value = getNodeText(node);
+  const rawValue = getNodeText(node);
+  // \not on mo: combining long solidus overlay (U+0338) → cancel()
+  const [value, hasNot] = stripCombiningNot(rawValue);
   const unpaired = trySerializeUnpairedBracket(node, value);
-  if (unpaired) return unpaired;
+  if (unpaired) return hasNot ? singleTypst(`cancel(${unpaired.typst})`) : unpaired;
   if (INVISIBLE_CHARS.has(value)) return initTypstData();
-  const typstValue: string = findTypstSymbol(value);
+  let typstValue: string = findTypstSymbol(value);
   const normalizedName = normalizeOperatorName(value);
   const multiword = trySerializeMultiwordOp(node, normalizedName);
-  if (multiword) return multiword;
+  if (multiword) return hasNot ? singleTypst(`cancel(${multiword.typst.trim()})`) : multiword;
   // Don't add limits: #true here — parent handler decides placement.
   const namedOp = trySerializeNamedOperator(node, value, normalizedName);
-  if (namedOp) return namedOp;
+  if (namedOp) return hasNot ? singleTypst(`cancel(${namedOp.typst.trim()})`) : namedOp;
+  if (hasNot) typstValue = `cancel(${typstValue})`;
   const inScript = isInScriptContext(node);
   const wordLike = trySerializeWordLikeOperator(node, typstValue, inScript);
   if (wordLike) return wordLike;

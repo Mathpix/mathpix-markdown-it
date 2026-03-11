@@ -176,6 +176,38 @@ export const getAttrs = <T extends object>(node: MathNode): T =>
 export const getProp = <T>(node: MathNode | null | undefined, key: string): T | undefined =>
   node?.getProperty(key) as T | undefined;
 
+/** Unicode negation slash used by MathJax for \not overlay (U+29F8) */
+const NEGATION_SLASH = '\u29F8';
+
+/** Check if a node is a \not negation overlay: mrow[REL] > mpadded[width=0] > mtext(⧸).
+ *  When true, the next sibling should be wrapped in cancel(). */
+export const isNegationOverlay = (node: MathNode): boolean => {
+  // MathJax represents \not as TeXAtom(REL) in the internal tree
+  // (serialized as mrow in MathML output)
+  if (node.kind !== 'TeXAtom' && node.kind !== 'mrow') return false;
+  // Walk through inferred mrow wrappers to find the mpadded
+  let target = node.childNodes;
+  if (!target) return false;
+  while (target.length === 1 && target[0].isInferred && target[0].childNodes) {
+    target = target[0].childNodes;
+  }
+  if (target.length !== 1) return false;
+  const mpadded = target[0];
+  if (mpadded.kind !== 'mpadded') return false;
+  const attrs = mpadded.attributes.getAllAttributes();
+  if (attrs.width !== 0) return false;
+  // Walk through inferred mrow inside mpadded
+  let mpTarget = mpadded.childNodes;
+  if (!mpTarget) return false;
+  while (mpTarget.length === 1 && mpTarget[0].isInferred && mpTarget[0].childNodes) {
+    mpTarget = mpTarget[0].childNodes;
+  }
+  if (mpTarget.length !== 1) return false;
+  const mtext = mpTarget[0];
+  if (mtext.kind !== 'mtext') return false;
+  return getChildText(mtext) === NEGATION_SLASH;
+};
+
 /** Serialize all children of a node by visiting each one and concatenating the results. */
 export const handleAll: HandlerFn = (node, serialize) => {
   let res: ITypstData = initTypstData();
