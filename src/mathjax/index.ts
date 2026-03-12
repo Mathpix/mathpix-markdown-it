@@ -74,7 +74,7 @@ const makeAssistiveMmlAccessible = (adaptor, mjxContainer) => {
     id = MathJax.nextAssistiveId();
     adaptor.setAttribute(assistive, 'id', id);
   }
-  adaptor.setAttribute(mjxContainer, 'aria-labelledby', id);
+  // adaptor.setAttribute(mjxContainer, 'aria-labelledby', id);
   adaptor.removeAttribute(assistive, 'aria-hidden');
 }
 
