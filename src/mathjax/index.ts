@@ -61,8 +61,6 @@ const toAsciiML = ((node, optionAscii): IAsciiData => {
 });
 
 const normalizeMathJaxA11y = (adaptor, mjxContainer) => {
-  adaptor.setAttribute(mjxContainer, 'role', 'math');
-  adaptor.setAttribute(mjxContainer, 'tabindex', '0');
   const svg = adaptor.firstChild(mjxContainer);
   if (svg) {
     adaptor.setAttribute(svg, 'aria-hidden', 'true');

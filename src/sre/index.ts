@@ -32,8 +32,6 @@ export const addSpeechToMathContainer = (
   if (!speech) return;
   // Set accessibility attributes
   elMath.setAttribute('aria-label', speech);
-  elMath.setAttribute('role', 'math');
-  elMath.setAttribute('tabindex', '0');
   elMath.removeAttribute('aria-labelledby');
   // Add hidden speech element for context menu
   const elSpeech = doc.createElement('speech');
