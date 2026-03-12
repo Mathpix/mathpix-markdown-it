@@ -41,12 +41,6 @@ describe('add-speech (addSpeechToMathContainer):', () => {
       mjx.hasAttribute('aria-label').should.be.true;
       mjx.getAttribute('aria-label').should.be.a('string').and.not.be.empty;
     });
-    it('sets role="math"', () => {
-      const dom = renderAndParse('$x^2$');
-      const mjx = dom.window.document.querySelector('mjx-container');
-      addSpeechToMathContainer(sre, mjx, dom.window.document);
-      mjx.getAttribute('role').should.equal('math');
-    });
     it('removes aria-labelledby when aria-label is set', () => {
       const dom = renderAndParse('$x^2$');
       const mjx = dom.window.document.querySelector('mjx-container');
@@ -110,13 +104,6 @@ describe('add-speech (addSpeechToMathContainer):', () => {
       const result = addAriaToMathHTML(sre, html);
       result.should.equal(html);
     });
-    it('adds role="math" to each container', () => {
-      const html = MM.markdownToHTML('$x^2$', {
-        accessibility: { assistiveMml: true }
-      });
-      const result = addAriaToMathHTML(sre, html);
-      result.should.include('role="math"');
-    });
     it('integration: server render → addAriaToMathHTML → full speech pipeline', () => {
       const html = MM.markdownToHTML('$\\frac{a}{b}$', {
         accessibility: { assistiveMml: true }
@@ -126,9 +113,8 @@ describe('add-speech (addSpeechToMathContainer):', () => {
       html.should.include('aria-labelledby');
       html.should.not.include('aria-label=');
       const result = addAriaToMathHTML(sre, html);
-      // After: has aria-label, role, tabindex, speech element
+      // After: has aria-label, speech element
       result.should.include('aria-label');
-      result.should.include('role="math"');
       result.should.include('<speech');
     });
   });
