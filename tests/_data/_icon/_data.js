@@ -109,6 +109,26 @@ module.exports = [
       "<span  style=\"color: hsl(120, 100%, 50%);\">×</span> <span  style=\"color: hsl(120, 100%, 50%);\">×</span></div>"
   },
   {
+    mmd: "[\\icon{unknown}](http://example.com)",
+    html: "<div><a href=\"http://example.com\" target=\"_blank\" rel=\"noopener\" style=\"display: inline-block\"><span >�</span></a></div>",
+    description: "icon inside link label must not cause infinite loop (silent mode must advance state.pos)"
+  },
+  {
+    mmd: "[\\diagbox{A}{B}](http://example.com)",
+    html: "<div><a href=\"http://example.com\" target=\"_blank\" rel=\"noopener\" style=\"word-break: break-word\"><div  class=\"diagonal-cell\" style=\"grid-template-columns: repeat(2, 1fr); padding: 0; display: inline-grid; background-size: 100% 100%; background-image: linear-gradient(to bottom left, transparent calc(50% - 0.5px), black 50%, black 50%, transparent calc(50% + 0.5px));\"><div  class=\"cell-item diagonal-cell-topRight\" style=\"grid-row-start: 1; grid-column-start: 2; text-align: right; white-space: nowrap; min-height: 1.5em;\">B</div><div  class=\"cell-item diagonal-cell-bottomLeft\" style=\"grid-row-start: 2; grid-column-start: 1; text-align: left; white-space: nowrap; min-height: 1.5em; margin-top: auto;\">A</div></div></a></div>",
+    description: "diagbox inside link label must not cause infinite loop (silent mode must advance state.pos)"
+  },
+  {
+    mmd: "[\\icon{unknown}] text",
+    html: "<div>[<span >�</span>] text</div>",
+    description: "icon inside brackets without URL must not cause infinite loop"
+  },
+  {
+    mmd: "[\\diagbox{A}{B}] text",
+    html: "<div>[<div  class=\"diagonal-cell\" style=\"grid-template-columns: repeat(2, 1fr); padding: 0; display: inline-grid; background-size: 100% 100%; background-image: linear-gradient(to bottom left, transparent calc(50% - 0.5px), black 50%, black 50%, transparent calc(50% + 0.5px));\"><div  class=\"cell-item diagonal-cell-topRight\" style=\"grid-row-start: 1; grid-column-start: 2; text-align: right; white-space: nowrap; min-height: 1.5em;\">B</div><div  class=\"cell-item diagonal-cell-bottomLeft\" style=\"grid-row-start: 2; grid-column-start: 1; text-align: left; white-space: nowrap; min-height: 1.5em; margin-top: auto;\">A</div></div>] text</div>",
+    description: "diagbox inside brackets without URL must not cause infinite loop"
+  },
+  {
     mmd: "\\[\n" +
       "\\icon{circled_white_bullet color=#d1ff00} \\icon{circled_white_bullet #d1ff00}\n" +
       "\\icon{circled_white_bullet color=rgb(209 255 0)} \\icon{circled_white_bullet rgb(209 255 0)}\n" +
