@@ -1,5 +1,21 @@
 # March 2026
 
+## [2.0.38] - Fix infinite loop in `inlineMmdIcon` and `inlineDiagbox` silent mode
+
+- Bug Fix:
+  - Fixed page freeze when `\icon{...}` or `\diagbox{...}` appeared inside link labels (e.g. `[\icon{unknown}]`). The inline rules returned `true` in silent mode without advancing `state.pos`, causing an infinite loop in markdown-it's `parseLinkLabel` → `skipToken`.
+
+- Refactoring:
+  - `inlineMmdIcon` and `inlineDiagbox` refactored to follow the `if (!silent) { ... } state.pos = endPos; return true;` pattern used by all other inline rules.
+  - `mmd-icon.ts`: extracted `endPos` constant, eliminated 6 duplicated position assignments.
+  - `diagbox-inline.ts`: moved `extractNextBraceContent` before the silent check so `endIndex` is available in both modes.
+
+- Tests:
+  - Added 4 test cases for icon and diagbox inside link labels and bare brackets.
+
+- Docs:
+  - Added implementation details in `pr-specs/2026-03-fix-silent-mode-state-pos.md`.
+
 ## [2.0.37] - CSS scoping and style module cleanup
 
 - CSS Scoping:
