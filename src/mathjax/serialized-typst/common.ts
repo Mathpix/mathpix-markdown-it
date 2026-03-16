@@ -2,8 +2,8 @@ import { TextNode } from 'mathjax-full/js/core/MmlTree/MmlNode.js';
 import { MathNode, ITypstData, ITypstSerializer, HandlerFn } from './types';
 import {
   RE_THREE_DIGITS, RE_TWO_DIGITS, RE_PHANTOM_BASE,
-  RE_TOKEN_START, RE_SEPARATOR_END, TYPST_PLACEHOLDER,
-  SCRIPT_NODE_KINDS, PRIME_CHARS,
+  RE_TOKEN_START, RE_SEPARATOR_END, RE_ALPHA_END, RE_TRAILING_IDENT,
+  TYPST_PLACEHOLDER, SCRIPT_NODE_KINDS, PRIME_CHARS, TYPST_BUILTIN_OPS,
 } from './consts';
 
 /** Return the expression if non-empty, otherwise the Typst empty placeholder '""'. */
@@ -123,6 +123,13 @@ export const needsSpaceBetweenNodes = (
     const ch = nextTypst[0];
     if (ch === '[' || ch === '{') return true;
     if (ch === '(' && !isDerivativePattern(prevNode)) return true;
+  }
+  // Prevent Typst from parsing symbol( as a function call: emptyset(i) → emptyset (i).
+  // Multi-char Typst names (Greek, symbol names) followed by ( need a space.
+  // Single-char identifiers (f, g, x) and built-in math operators (sin, cos, ln) don't.
+  if (nextTypst[0] === '(' && RE_ALPHA_END.test(prevTypst)) {
+    const lastWord = prevTypst.match(RE_TRAILING_IDENT);
+    if (lastWord && lastWord[1].length > 1 && !TYPST_BUILTIN_OPS.has(lastWord[1])) return true;
   }
   return false;
 };

@@ -1864,8 +1864,8 @@ module.exports = [
   // cases via array with semicolons in cells (semicolons must be escaped)
   {
     latex: `\\left\\{ \\begin{array}{ll} \\sigma (x), & L(u) = 1; \\\\ 1 - \\sigma (x), & L(u) = 0, \\end{array} \\right.`,
-    typst: `cases(\n  sigma(x)\\, & L(u) = 1\\;,\n  1 - sigma(x)\\, & L(u) = 0\\,,\n)`,
-    typst_inline: `cases(\n  sigma(x)\\, & L(u) = 1\\;,\n  1 - sigma(x)\\, & L(u) = 0\\,,\n)`,
+    typst: `cases(\n  sigma (x)\\, & L(u) = 1\\;,\n  1 - sigma (x)\\, & L(u) = 0\\,,\n)`,
+    typst_inline: `cases(\n  sigma (x)\\, & L(u) = 1\\;,\n  1 - sigma (x)\\, & L(u) = 0\\,,\n)`,
   },
   // numcases with empty prefix and explicit \tag (processed by MathJax as real tags)
   {
@@ -2174,13 +2174,13 @@ module.exports = [
   },
   {
     latex: `\\sigma(x)`,
-    typst: `sigma(x)`,
-    typst_inline: `sigma(x)`,
+    typst: `sigma (x)`,
+    typst_inline: `sigma (x)`,
   },
   {
     latex: `\\alpha(x+y)`,
-    typst: `alpha(x + y)`,
-    typst_inline: `alpha(x + y)`,
+    typst: `alpha (x + y)`,
+    typst_inline: `alpha (x + y)`,
   },
   {
     latex: `1 - \\sum _ { k = 0 } ^ { z } \\frac { \\lambda ^ { k } e ^ { - \\lambda } } { k ! } \\left( 1 - ( q / p ) ^ { ( z - k ) } \\right)`,
@@ -2563,8 +2563,8 @@ module.exports = [
   },
   {
     latex: `\\begin{align*}\nF(a, b ; a+b+m ; z)= & \\frac{\\Gamma(m) \\Gamma(a+b+m)}{\\Gamma(a+m) \\Gamma(b+m)} \\sum_{n=0}^{m-1} \\frac{(a)_{n}(b)_{n}}{n!(1-m)_{n}}(1-z)^{n}  \\tag{15.3.11}\\\\\n& \\quad-\\frac{\\Gamma(a+b+m)}{\\Gamma(a) \\Gamma(b)}(z-1)^{m} \\sum_{n=0}^{\\infty} \\frac{(a+m)_{n}(b+m)_{n}}{n!(n+m)!}(1-z)^{n}[\\ln (1-z)-\\psi(n+1) \\\\\n& -\\psi(n+m+1)+\\psi(a+n+m)+\\psi(b+n+m)] \\quad(|\\arg (1-z)|<\\pi,|1-z|<1)\n\\end{align*}`,
-    typst: `#math.equation(block: true, numbering: n => [(15.3.11)], number-align: end + top, $ F(a, b; a + b + m; z) = &frac(Gamma(m) Gamma(a + b + m), Gamma(a + m) Gamma(b + m)) sum_(n = 0)^(m - 1) frac((a)_n (b)_n, n!(1 - m)_n)(1 - z)^n \\\n &quad - frac(Gamma(a + b + m), Gamma(a) Gamma(b))(z - 1)^m sum_(n = 0)^(infinity) frac((a + m)_n (b + m)_n, n!(n + m)!)(1 - z)^n [ln(1 - z) - psi(n + 1) \\\n &- psi(n + m + 1) + psi(a + n + m) + psi(b + n + m)] quad (lr(| arg(1 - z) |) < pi, lr(| 1 - z |) < 1) $)\n#counter(math.equation).update(n => n - 1)`,
-    typst_inline: `F(a, b; a + b + m; z) = &frac(Gamma(m) Gamma(a + b + m), Gamma(a + m) Gamma(b + m)) sum_(n = 0)^(m - 1) frac((a)_n (b)_n, n!(1 - m)_n)(1 - z)^n \\\n &quad - frac(Gamma(a + b + m), Gamma(a) Gamma(b))(z - 1)^m sum_(n = 0)^(infinity) frac((a + m)_n (b + m)_n, n!(n + m)!)(1 - z)^n [ln(1 - z) - psi(n + 1) \\\n &- psi(n + m + 1) + psi(a + n + m) + psi(b + n + m)] quad (lr(| arg(1 - z) |) < pi, lr(| 1 - z |) < 1)`,
+    typst: `#math.equation(block: true, numbering: n => [(15.3.11)], number-align: end + top, $ F(a, b; a + b + m; z) = &frac(Gamma (m) Gamma (a + b + m), Gamma (a + m) Gamma (b + m)) sum_(n = 0)^(m - 1) frac((a)_n (b)_n, n!(1 - m)_n)(1 - z)^n \\\n &quad - frac(Gamma (a + b + m), Gamma (a) Gamma (b))(z - 1)^m sum_(n = 0)^(infinity) frac((a + m)_n (b + m)_n, n!(n + m)!)(1 - z)^n [ln(1 - z) - psi (n + 1) \\\n &- psi (n + m + 1) + psi (a + n + m) + psi (b + n + m)] quad (lr(| arg(1 - z) |) < pi, lr(| 1 - z |) < 1) $)\n#counter(math.equation).update(n => n - 1)`,
+    typst_inline: `F(a, b; a + b + m; z) = &frac(Gamma (m) Gamma (a + b + m), Gamma (a + m) Gamma (b + m)) sum_(n = 0)^(m - 1) frac((a)_n (b)_n, n!(1 - m)_n)(1 - z)^n \\\n &quad - frac(Gamma (a + b + m), Gamma (a) Gamma (b))(z - 1)^m sum_(n = 0)^(infinity) frac((a + m)_n (b + m)_n, n!(n + m)!)(1 - z)^n [ln(1 - z) - psi (n + 1) \\\n &- psi (n + m + 1) + psi (a + n + m) + psi (b + n + m)] quad (lr(| arg(1 - z) |) < pi, lr(| 1 - z |) < 1)`,
   },
   {
     latex: `x^n\\{a,b\\}`,
@@ -2693,5 +2693,10 @@ b_{3}
 \\end{array}\\right]`,
     typst: `lr(mat(delim: #none, \n  a_(11) x_1 + a_(12) x_2 + a_(13) x_3 = b_1;\n  a_(21) x_1 + a_(22) x_2 + a_(23) x_3 = b_2;\n  a_(31) x_1 + a_(32) x_2 + a_(33) x_3 = b_3,\n) arrow.r.long mat(delim: #none, mat(delim: "[", align: #left, \n  a_(11), a_(12), a_(13);\n  a_(21), a_(22), a_(23);\n  a_(31), a_(32), a_(33),\n) dot.op mat(delim: "[", align: #left, \n  x_1;\n  x_2;\n  x_3,\n), arrow.r.long) ]) = mat(delim: "[", align: #left, \n  b_1;\n  b_2;\n  b_3,\n)`,
     typst_inline: `lr(mat(delim: #none, \n  a_(11) x_1 + a_(12) x_2 + a_(13) x_3 = b_1;\n  a_(21) x_1 + a_(22) x_2 + a_(23) x_3 = b_2;\n  a_(31) x_1 + a_(32) x_2 + a_(33) x_3 = b_3,\n) arrow.r.long mat(delim: #none, mat(delim: "[", align: #left, \n  a_(11), a_(12), a_(13);\n  a_(21), a_(22), a_(23);\n  a_(31), a_(32), a_(33),\n) dot.op mat(delim: "[", align: #left, \n  x_1;\n  x_2;\n  x_3,\n), arrow.r.long) ]) = mat(delim: "[", align: #left, \n  b_1;\n  b_2;\n  b_3,\n)`,
+  },
+  {
+    latex: `c_{i} \\cap c_{j}=\\varnothing(i \\neq j ; i, j=1,2,3,4,5), \\varnothing`,
+    typst: `c_i inter c_j = emptyset (i eq.not j; i, j = 1, 2, 3, 4, 5), emptyset`,
+    typst_inline: `c_i inter c_j = emptyset (i eq.not j; i, j = 1, 2, 3, 4, 5), emptyset`,
   },
 ];

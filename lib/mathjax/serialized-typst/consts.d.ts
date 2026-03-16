@@ -32,6 +32,10 @@ export declare const RE_PHANTOM_BASE: RegExp;
 export declare const RE_TOKEN_START: RegExp;
 /** Natural separator at end of string */
 export declare const RE_SEPARATOR_END: RegExp;
+/** Ends with an ASCII letter (for function-call ambiguity check) */
+export declare const RE_ALPHA_END: RegExp;
+/** Trailing word starting with a letter (captures the identifier) */
+export declare const RE_TRAILING_IDENT: RegExp;
 /** Property name for pre-mtable content (set in index.ts, read in table-handlers.ts) */
 export declare const DATA_PRE_CONTENT = "data-pre-content";
 /** Property name for post-mtable content (set in index.ts, read in table-handlers.ts) */
@@ -78,5 +82,9 @@ export declare const PRIME_CHARS: ReadonlySet<string>;
 export declare const SHALLOW_TREE_MAX_DEPTH = 5;
 export declare const OPEN_BRACKETS: Readonly<Record<string, string>>;
 export declare const CLOSE_BRACKETS: Readonly<Record<string, string>>;
+/** Built-in Typst math operators where name( is valid function-call syntax.
+ *  Multi-char identifiers NOT in this set get a space before ( to avoid
+ *  Typst parsing e.g. emptyset(x) as a function call. */
+export declare const TYPST_BUILTIN_OPS: ReadonlySet<string>;
 /** Typst escaped-delimiter output for unpaired brackets (math-mode safe) */
 export declare const UNPAIRED_BRACKET_TYPST: Readonly<Record<string, string>>;

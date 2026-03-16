@@ -32,6 +32,10 @@ export const RE_PHANTOM_BASE = /^""[_^]/;
 export const RE_TOKEN_START = /^[\w."\u0080-\uFFFF]/;
 /** Natural separator at end of string */
 export const RE_SEPARATOR_END = /[\s({[,|]$/;
+/** Ends with an ASCII letter (for function-call ambiguity check) */
+export const RE_ALPHA_END = /[a-zA-Z]$/;
+/** Trailing word starting with a letter (captures the identifier) */
+export const RE_TRAILING_IDENT = /([a-zA-Z]\w*)$/;
 
 /** Property name for pre-mtable content (set in index.ts, read in table-handlers.ts) */
 export const DATA_PRE_CONTENT = 'data-pre-content';
@@ -98,6 +102,26 @@ export const OPEN_BRACKETS: Readonly<Record<string, string>> = {
 export const CLOSE_BRACKETS: Readonly<Record<string, string>> = {
   ')': '(', ']': '[', '}': '{',
 };
+/** Built-in Typst math operators where name( is valid function-call syntax.
+ *  Multi-char identifiers NOT in this set get a space before ( to avoid
+ *  Typst parsing e.g. emptyset(x) as a function call. */
+export const TYPST_BUILTIN_OPS: ReadonlySet<string> = new Set([
+  // Standard math operators
+  'sin', 'cos', 'tan', 'cot', 'sec', 'csc',
+  'arcsin', 'arccos', 'arctan', 'arccot', 'arcsec', 'arccsc',
+  'sinh', 'cosh', 'tanh', 'coth', 'sech', 'csch',
+  'ln', 'log', 'lg', 'exp',
+  'lim', 'limsup', 'liminf',
+  'max', 'min', 'sup', 'inf',
+  'det', 'gcd', 'dim', 'ker', 'deg', 'arg', 'mod',
+  'hom', 'Pr',
+  // Typst math functions used by the converter
+  'frac', 'sqrt', 'mat', 'cases', 'lr', 'abs', 'norm', 'floor', 'ceil',
+  'op', 'scripts', 'limits', 'cancel', 'overline', 'underline',
+  'overbrace', 'underbrace', 'overbracket', 'underbracket',
+  'stretch', 'attach',
+]);
+
 /** Typst escaped-delimiter output for unpaired brackets (math-mode safe) */
 export const UNPAIRED_BRACKET_TYPST: Readonly<Record<string, string>> = {
   '(': '\\(', ')': '\\)', '[': '\\[', ']': '\\]', '{': '\\{', '}': '\\}',
