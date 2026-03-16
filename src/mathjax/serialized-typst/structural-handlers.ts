@@ -102,7 +102,12 @@ export const mrow: HandlerFn = (node, serialize) => {
   // the regular lr() path so all content stays inside one lr() call.
   const contentChildren = getContentChildren(node);
   const hasTableChild = contentChildren.length === 1 && containsTable(contentChildren[0]);
-  if (isLeftRight && !hasTableChild) {
+  // \left\{ table ... \right. with extra content after the table:
+  // the table inherits { as its open delimiter (→ cases()), extra content follows.
+  const close = closeDelim ? mapDelimiter(closeDelim) : '';
+  const hasTableFirst = !hasTableChild && contentChildren.length > 1
+    && containsTable(contentChildren[0]) && openDelim && !close;
+  if (isLeftRight && !hasTableChild && !hasTableFirst) {
     // Serialize inner children, skipping the delimiter mo nodes
     // (delimiters are reconstructed from the open/close properties)
     let content = '';
@@ -186,9 +191,13 @@ export const mrow: HandlerFn = (node, serialize) => {
     } else {
       res = addToTypstData(res, { typst: lrTypst });
     }
-  } else if (isLeftRight && hasTableChild) {
+  } else if (isLeftRight && (hasTableChild || hasTableFirst)) {
     // Matrix/cases inside \left...\right: skip delimiter mo children
-    // (the mtable handler uses the parent mrow's open/close properties for delimiters)
+    // (the mtable handler uses the parent mrow's open/close properties for delimiters).
+    // When hasTableFirst, the close delimiter is invisible (\right.) and extra
+    // content follows the table — serialize it normally after the table.
+    let contentInline = '';
+    let hasInlineDiff = false;
     for (let i = 0; i < node.childNodes.length; i++) {
       const child = node.childNodes[i];
       if (i === 0 && child.kind === 'mo') {
@@ -200,7 +209,20 @@ export const mrow: HandlerFn = (node, serialize) => {
         if (moText === closeDelim || (!moText && !closeDelim)) { continue; }
       }
       const data: ITypstData = serialize.visitNode(child, '');
+      const inlineTypst = data.typst_inline ?? data.typst;
+      if (inlineTypst !== data.typst) hasInlineDiff = true;
+      const prevNode = i > 0 ? node.childNodes[i - 1] : null;
+      if (needsSpaceBetweenNodes(res.typst, data.typst, prevNode)) {
+        addSpaceToTypstData(res);
+      }
+      if (needsSpaceBetweenNodes(contentInline, inlineTypst, prevNode)) {
+        contentInline += ' ';
+      }
       res = addToTypstData(res, data);
+      contentInline += inlineTypst;
+    }
+    if (hasInlineDiff) {
+      res.typst_inline = contentInline;
     }
   } else {
     // Check for OPEN/CLOSE mrow pattern wrapping a binom

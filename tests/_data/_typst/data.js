@@ -1002,6 +1002,18 @@ module.exports = [
     typst: `cases(\n  x & "if " x > 0,\n  - x & "otherwise",\n)`,
     typst_inline: `cases(\n  x & "if " x > 0,\n  - x & "otherwise",\n)`,
   },
+  // Reverse cases: \left.\aligned\right\}
+  {
+    latex: `\\left.\\begin{aligned} x-3 y & =2 \\\\ 2 x+3 y & =5\\end{aligned}\\right\\}`,
+    typst: `cases(reverse: #true, \n  x - 3 y & = 2,\n  2 x + 3 y & = 5,\n)`,
+    typst_inline: `cases(reverse: #true, \n  x - 3 y & = 2,\n  2 x + 3 y & = 5,\n)`,
+  },
+  // \left\{ aligned \xrightarrow{} \right. → cases() + stretch()
+  {
+    latex: `\\left\\{\\begin{aligned} x & =1 \\\\ y & =2\\end{aligned} \\xrightarrow{f}\\right.`,
+    typst: `cases(\n  x & = 1,\n  y & = 2,\n) stretch(arrow.r)^f`,
+    typst_inline: `cases(\n  x & = 1,\n  y & = 2,\n) stretch(arrow.r)^f`,
+  },
 
   // === Misc symbols ===
   {

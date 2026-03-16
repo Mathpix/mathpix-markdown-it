@@ -539,12 +539,25 @@ export const mtable: HandlerFn = (node, serialize) => {
       || getProp<string>(parentMrow, 'close') !== undefined);
   const isSoleContent = hasParentDelims
     && getContentChildren(parentMrow!).length === 1;
-  const openProp = isSoleContent ? getProp<string>(parentMrow, 'open') : undefined;
+  // Also inherit open delimiter when this table is the first content child
+  // and close is invisible (\right.), even with extra content after the table.
+  // The mrow handler (hasTableFirst path) skips delimiters and serializes
+  // children normally — the table picks up { and becomes cases().
+  const closeStr = hasParentDelims ? String(getProp<string>(parentMrow, 'close') ?? '') : '';
+  const parentContent = hasParentDelims ? getContentChildren(parentMrow!) : [];
+  const isFirstWithInvisibleClose = hasParentDelims && !isSoleContent
+    && !closeStr && parentContent[0] === node;
+  const openProp = (isSoleContent || isFirstWithInvisibleClose) ? getProp<string>(parentMrow, 'open') : undefined;
   const closeProp = isSoleContent ? getProp<string>(parentMrow, 'close') : undefined;
   const branchOpen: string = openProp !== undefined ? String(openProp) : '';
   const branchClose: string = closeProp !== undefined ? String(closeProp) : '';
   // Determine if this is a cases environment
-  const isCases = envName === 'cases' || (branchOpen === '{' && branchClose === '');
+  // Reverse cases: \left.\begin{aligned}...\end{aligned}\right\} → cases(reverse: #true, ...)
+  // Only for eqnArray-like tables (rows with displaystyle) — regular arrays keep matrix form.
+  const firstRowDisplaystyle = node.childNodes.length > 0
+    && node.childNodes[0].attributes?.get('displaystyle') === true;
+  const isReverseCases = branchOpen === '' && branchClose === '}' && firstRowDisplaystyle;
+  const isCases = envName === 'cases' || (branchOpen === '{' && branchClose === '') || isReverseCases;
   // Detect numcases/subnumcases pattern
   const isNumcases = isNumcasesTable(node);
   // Determine if this is an equation array (align, gather, split, etc.)
@@ -647,11 +660,12 @@ export const mtable: HandlerFn = (node, serialize) => {
     }
   } else if (isCases) {
     // Cases environment
+    const reverseParam = isReverseCases ? 'reverse: #true, ' : '';
     let casesBody: string;
     if (rows.length >= 2) {
-      casesBody = `cases(\n  ${rows.join(',\n  ')},\n)`;
+      casesBody = `cases(${reverseParam}\n  ${rows.join(',\n  ')},\n)`;
     } else {
-      casesBody = `cases(${rows.join(', ')})`;
+      casesBody = `cases(${reverseParam}${rows.join(', ')})`;
     }
     res = addToTypstData(res, { typst: casesBody });
   } else {
