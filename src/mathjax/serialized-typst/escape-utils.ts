@@ -6,6 +6,7 @@
  */
 
 import { RE_WORD_CHAR } from "./consts";
+import { scanBracketTokens, findUnpairedIndices, replaceUnpairedBrackets } from "./bracket-utils";
 
 const SEPARATOR_FOUND = 'found';
 
@@ -125,16 +126,42 @@ const scanExpression = (expr: string, opts: ScanOptions): string => {
   return detectOnly ? '' : result;
 };
 
-/** Escape , and ; at depth 0 in content placed inside any Typst function call.
- *  Uses backslash escapes (\, and \;) per official Typst documentation.
+/** Escape unpaired [ and ] with backslash to prevent Typst content-block syntax.
+ *  Reuses scanBracketTokens (which skips quoted strings, escaped chars, and
+ *  function-call parens) and findUnpairedIndices from bracket-utils. */
+const escapeUnpairedBrackets = (expr: string): string => {
+  if (expr.indexOf('[') === -1 && expr.indexOf(']') === -1) return expr;
+  const allBrackets = scanBracketTokens(expr);
+  const squareBrackets = allBrackets.filter(b => b.char === '[' || b.char === ']');
+  if (squareBrackets.length === 0) return expr;
+  const unpairedTokenIndices = findUnpairedIndices(squareBrackets.map(b => b.char));
+  if (unpairedTokenIndices.size === 0) return expr;
+  const unpairedPositions = new Set<number>();
+  for (const idx of unpairedTokenIndices) {
+    unpairedPositions.add(squareBrackets[idx].pos);
+  }
+  let result = '';
+  for (let i = 0; i < expr.length; i++) {
+    if (unpairedPositions.has(i)) {
+      result += '\\' + expr[i];
+    } else {
+      result += expr[i];
+    }
+  }
+  return result;
+};
+
+/** Escape , and ; at depth 0, and unpaired [ ] in content placed inside any Typst function call.
+ *  Uses backslash escapes (\, \; \[ \]) per official Typst documentation.
  *  Skips content inside "..." strings and already-escaped sequences. */
 export const escapeContentSeparators = (expr: string): string =>
-  scanExpression(expr, { escapeComma: true, escapeSemicolon: true });
+  scanExpression(escapeUnpairedBrackets(expr), { escapeComma: true, escapeSemicolon: true });
 
 /** Escape , ; and : at depth 0 — for mat()/cases() cells where : is also a named-argument marker.
- *  For colons: inserts space before : when preceded by identifier. */
+ *  For colons: inserts space before : when preceded by identifier.
+ *  Also replaces unpaired brackets with Typst symbol names (bracket.l etc.). */
 export const escapeCasesSeparators = (expr: string): string =>
-  scanExpression(expr, { escapeComma: true, escapeSemicolon: true, escapeColon: true });
+  scanExpression(replaceUnpairedBrackets(expr), { escapeComma: true, escapeSemicolon: true, escapeColon: true });
 
 /** Check whether a Typst expression contains , or ; at top level (outside (), [] and {}).
  *  Skips content inside "..." strings (handles escaped quotes). */

@@ -2666,4 +2666,9 @@ module.exports = [
     typst: `lr(\\[ mat(delim: #none, align: #left, \n  a;\n  b,\n) \\))`,
     typst_inline: `lr(\\[ mat(delim: #none, align: #left, \n  a;\n  b,\n) \\))`,
   },
+  {
+    latex: `\\frac{(+)[4 x+10 y-5 z}{9 x}  =-3]`,
+    typst: `frac((+)\\[4 x + 10 y - 5 z, 9 x) = - 3]`,
+    typst_inline: `frac((+)\\[4 x + 10 y - 5 z, 9 x) = - 3]`,
+  },
 ];

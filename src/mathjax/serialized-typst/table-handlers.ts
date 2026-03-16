@@ -8,7 +8,7 @@ import {
 import { initTypstData, addToTypstData, getChildText, getProp } from "./common";
 import { escapeCasesSeparators } from "./escape-utils";
 import {
-  treeContainsMo, serializePrefixBeforeMo, replaceUnpairedBrackets, delimiterToTypst,
+  treeContainsMo, serializePrefixBeforeMo, delimiterToTypst,
   escapeLrDelimiter,
 } from "./bracket-utils";
 
@@ -191,9 +191,9 @@ const buildNumcasesGrid = (node: MathNode, serialize: ITypstSerializer, countRow
       if (trimmed) cells.push(trimmed);
     }
     if (cells.length === 1) {
-      caseRows.push(escapeCasesSeparators(replaceUnpairedBrackets(cells[0])));
+      caseRows.push(escapeCasesSeparators(cells[0]));
     } else {
-      caseRows.push(cells.map(c => escapeCasesSeparators(replaceUnpairedBrackets(c))).join(' & '));
+      caseRows.push(cells.map(c => escapeCasesSeparators(c)).join(' & '));
     }
   }
   let casesContent: string;
@@ -499,11 +499,11 @@ export const mtable: HandlerFn = (node, serialize) => {
     } else if (isCases) {
       // Cases: escape top-level commas in each cell to prevent them
       // being parsed as cases() argument separators, then join with &
-      rows.push(cells.map(c => escapeCasesSeparators(replaceUnpairedBrackets(c))).join(' & '));
+      rows.push(cells.map(c => escapeCasesSeparators(c)).join(' & '));
     } else {
       // Matrix: escape top-level commas and semicolons in each cell
       // to prevent them being parsed as mat() cell/row separators
-      rows.push(cells.map(c => escapeCasesSeparators(replaceUnpairedBrackets(c))).join(', '));
+      rows.push(cells.map(c => escapeCasesSeparators(c)).join(', '));
     }
   }
   if (isEqnArray) {

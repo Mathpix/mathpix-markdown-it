@@ -100,11 +100,11 @@ export const serializePrefixBeforeMo = (node: MathNode, serialize: ITypstSeriali
   return result.trim();
 };
 
-type BracketToken = { char: string; pos: number };
+export type BracketToken = { char: string; pos: number };
 
 /** Scan a Typst expression and collect bracket positions, skipping escaped chars,
  *  quoted strings, and function-call parens (preceded by word char or dot). */
-const scanBracketTokens = (expr: string): BracketToken[] => {
+export const scanBracketTokens = (expr: string): BracketToken[] => {
   const brackets: BracketToken[] = [];
   for (let i = 0; i < expr.length; i++) {
     const ch = expr[i];
@@ -134,7 +134,7 @@ const scanBracketTokens = (expr: string): BracketToken[] => {
  *  at the top of the stack. On mismatch the top stays in the stack and the
  *  closing bracket is left unpaired — both sides remain unmatched.
  *  Returns the set of indices (into the chars array) that are unpaired. */
-const findUnpairedIndices = (chars: string[]): Set<number> => {
+export const findUnpairedIndices = (chars: string[]): Set<number> => {
   const stack: number[] = [];
   const paired = new Set<number>();
   for (let i = 0; i < chars.length; i++) {
