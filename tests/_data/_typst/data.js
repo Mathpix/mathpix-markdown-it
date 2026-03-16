@@ -2699,4 +2699,9 @@ b_{3}
     typst: `c_i inter c_j = emptyset (i eq.not j; i, j = 1, 2, 3, 4, 5), emptyset`,
     typst_inline: `c_i inter c_j = emptyset (i eq.not j; i, j = 1, 2, 3, 4, 5), emptyset`,
   },
+  {
+    latex: `\\min \\left|k: \\sum_{i=k}^{K} \\mu_{i} \\geqslant \\lambda\\right|`,
+    typst: `min abs(k : sum_(i = k)^K mu_i gt.eq.slant lambda)`,
+    typst_inline: `min abs(k : sum_(i = k)^K mu_i gt.eq.slant lambda)`,
+  },
 ];

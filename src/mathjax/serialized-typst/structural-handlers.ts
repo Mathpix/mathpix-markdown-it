@@ -143,19 +143,19 @@ export const mrow: HandlerFn = (node, serialize) => {
       if (openDelim === '|' && closeDelim === '|') {
         const escaped = escapeLrSemicolons(trimmedContent);
         res = addToTypstData(res, { typst: hasSep
-          ? `lr(| ${escaped} |)` : `abs(${trimmedContent})` });
+          ? `lr(| ${escaped} |)` : `abs(${escapeContentSeparators(trimmedContent)})` });
       } else if (openDelim === DOUBLE_VERT && closeDelim === DOUBLE_VERT) {
         const escaped = escapeLrSemicolons(trimmedContent);
         res = addToTypstData(res, { typst: hasSep
-          ? `lr(‖ ${escaped} ‖)` : `norm(${trimmedContent})` });
+          ? `lr(‖ ${escaped} ‖)` : `norm(${escapeContentSeparators(trimmedContent)})` });
       } else if (openDelim === LEFT_FLOOR && closeDelim === RIGHT_FLOOR) {
         const escaped = escapeLrSemicolons(trimmedContent);
         res = addToTypstData(res, { typst: hasSep
-          ? `lr(⌊ ${escaped} ⌋)` : `floor(${trimmedContent})` });
+          ? `lr(⌊ ${escaped} ⌋)` : `floor(${escapeContentSeparators(trimmedContent)})` });
       } else if (openDelim === LEFT_CEIL && closeDelim === RIGHT_CEIL) {
         const escaped = escapeLrSemicolons(trimmedContent);
         res = addToTypstData(res, { typst: hasSep
-          ? `lr(⌈ ${escaped} ⌉)` : `ceil(${trimmedContent})` });
+          ? `lr(⌈ ${escaped} ⌉)` : `ceil(${escapeContentSeparators(trimmedContent)})` });
       } else {
         // Mismatched ASCII brackets must be escaped: ( [ { start groups, ) closes lr()
         const escapedOpen = (openDelim in OPEN_BRACKETS && OPEN_BRACKETS[openDelim] !== closeDelim)

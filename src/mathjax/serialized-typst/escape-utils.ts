@@ -151,11 +151,12 @@ const escapeUnpairedBrackets = (expr: string): string => {
   return result;
 };
 
-/** Escape , and ; at depth 0, and unpaired [ ] in content placed inside any Typst function call.
- *  Uses backslash escapes (\, \; \[ \]) per official Typst documentation.
+/** Escape , ; and : at depth 0, and unpaired [ ] in content placed inside any Typst function call.
+ *  Uses backslash escapes (\, \;) and space-before-colon (word: → word :) to prevent
+ *  Typst from parsing as argument separators or named arguments.
  *  Skips content inside "..." strings and already-escaped sequences. */
 export const escapeContentSeparators = (expr: string): string =>
-  scanExpression(escapeUnpairedBrackets(expr), { escapeComma: true, escapeSemicolon: true });
+  scanExpression(escapeUnpairedBrackets(expr), { escapeComma: true, escapeSemicolon: true, escapeColon: true });
 
 /** Escape , ; and : at depth 0 — for mat()/cases() cells where : is also a named-argument marker.
  *  For colons: inserts space before : when preceded by identifier.

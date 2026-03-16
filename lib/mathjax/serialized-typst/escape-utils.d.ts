@@ -4,8 +4,9 @@
  * Walks a Typst expression tracking bracket depth, skips quoted strings ("...")
  * and backslash-escaped characters, applies escape/detection at depth 0.
  */
-/** Escape , and ; at depth 0, and unpaired [ ] in content placed inside any Typst function call.
- *  Uses backslash escapes (\, \; \[ \]) per official Typst documentation.
+/** Escape , ; and : at depth 0, and unpaired [ ] in content placed inside any Typst function call.
+ *  Uses backslash escapes (\, \;) and space-before-colon (word: → word :) to prevent
+ *  Typst from parsing as argument separators or named arguments.
  *  Skips content inside "..." strings and already-escaped sequences. */
 export declare const escapeContentSeparators: (expr: string) => string;
 /** Escape , ; and : at depth 0 — for mat()/cases() cells where : is also a named-argument marker.
