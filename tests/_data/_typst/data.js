@@ -2704,4 +2704,28 @@ b_{3}
     typst: `min abs(k : sum_(i = k)^K mu_i gt.eq.slant lambda)`,
     typst_inline: `min abs(k : sum_(i = k)^K mu_i gt.eq.slant lambda)`,
   },
+  // Standalone ‖ symbols should NOT be falsely paired as norm()
+  {
+    latex: `\\|\\,|\\vec{i} \\times \\vec{s}|=\\|`,
+    typst: `bar.v.double thin lr(| arrow(i) times arrow(s) |) = bar.v.double`,
+    typst_inline: `bar.v.double thin lr(| arrow(i) times arrow(s) |) = bar.v.double`,
+  },
+  // Complex expression with standalone ‖ (comma after ‖), bare | delimiters around arrays
+  {
+    latex: `\\begin{align*}\n\\begin{gathered}\n2 l+m-n=0, \\mid \\vec{i} \\times \\vec{s}) \\cdot \\overrightarrow{O M}|=| \\begin{array}{ccc}\n2 & 2 & 2 \\\\\n1 & 0 & 0 \\\\\nl & m & n\n\\end{array}\\|,|\\vec{i} \\times \\vec{s}|=\\| \\begin{array}{ccc}\ni & \\vec{j} & \\vec{k} \\\\\n1 & 0 & 0 \\\\\nl & m & n\n\\end{array} \\| \\text {, 故 } \\\\\nd=2=\\frac{\\mid \\vec{i} \\times \\vec{s}) \\cdot \\overrightarrow{O M} \\mid}{|\\vec{i} \\times \\vec{s}|}=\\frac{2|-n+m|}{\\sqrt{n^{2}+m^{2}}} \\text {, 即 } \\quad m \\cdot n=0\n\\end{gathered}\n\\end{align*}`,
+    typst: `2 l + m - n = 0, divides arrow(i) times arrow(s)\\) dot.op arrow(O M) lr(| = |) mat(delim: #none, \n  2, 2, 2;\n  1, 0, 0;\n  l, m, n,\n) bar.v.double, lr(| arrow(i) times arrow(s) |) = norm(mat(delim: #none, \n  i, arrow(j), arrow(k);\n  1, 0, 0;\n  l, m, n,\n)) ", 故 " \\\nd = 2 = frac(divides arrow(i) times arrow(s)\\) dot.op arrow(O M) divides, |arrow(i) times arrow(s)|) = frac(2| - n + m|, sqrt(n^2 + m^2)) ", 即 " quad m dot.op n = 0`,
+    typst_inline: `2 l + m - n = 0, divides arrow(i) times arrow(s)\\) dot.op arrow(O M) lr(| = |) mat(delim: #none, \n  2, 2, 2;\n  1, 0, 0;\n  l, m, n,\n) bar.v.double, lr(| arrow(i) times arrow(s) |) = norm(mat(delim: #none, \n  i, arrow(j), arrow(k);\n  1, 0, 0;\n  l, m, n,\n)) ", 故 " \\\nd = 2 = frac(divides arrow(i) times arrow(s)\\) dot.op arrow(O M) divides, |arrow(i) times arrow(s)|) = frac(2| - n + m|, sqrt(n^2 + m^2)) ", 即 " quad m dot.op n = 0`,
+  },
+  // Standalone ‖ with number before comma: \|22,|...|=\|
+  {
+    latex: `\\begin{align*}\n\\begin{gathered}\n2 l+m-n=0, \\mid \\vec{i} \\times \\vec{s}) \\cdot \\overrightarrow{O M}|=| \\begin{array}{ccc}\n2 & 2 & 2 \\\\\n1 & 0 & 0 \\\\\nl & m & n\n\\end{array}\\|22,|\\vec{i} \\times \\vec{s}|=\\| \\begin{array}{ccc}\ni & \\vec{j} & \\vec{k} \\\\\n1 & 0 & 0 \\\\\nl & m & n\n\\end{array} \\| \\text {, 故 } \\\\\nd=2=\\frac{\\mid \\vec{i} \\times \\vec{s}) \\cdot \\overrightarrow{O M} \\mid}{|\\vec{i} \\times \\vec{s}|}=\\frac{2|-n+m|}{\\sqrt{n^{2}+m^{2}}} \\text {, 即 } \\quad m \\cdot n=0\n\\end{gathered}\n\\end{align*}`,
+    typst: `2 l + m - n = 0, divides arrow(i) times arrow(s)\\) dot.op arrow(O M) lr(| = |) mat(delim: #none, \n  2, 2, 2;\n  1, 0, 0;\n  l, m, n,\n) bar.v.double 22, lr(| arrow(i) times arrow(s) |) = norm(mat(delim: #none, \n  i, arrow(j), arrow(k);\n  1, 0, 0;\n  l, m, n,\n)) ", 故 " \\\nd = 2 = frac(divides arrow(i) times arrow(s)\\) dot.op arrow(O M) divides, |arrow(i) times arrow(s)|) = frac(2| - n + m|, sqrt(n^2 + m^2)) ", 即 " quad m dot.op n = 0`,
+    typst_inline: `2 l + m - n = 0, divides arrow(i) times arrow(s)\\) dot.op arrow(O M) lr(| = |) mat(delim: #none, \n  2, 2, 2;\n  1, 0, 0;\n  l, m, n,\n) bar.v.double 22, lr(| arrow(i) times arrow(s) |) = norm(mat(delim: #none, \n  i, arrow(j), arrow(k);\n  1, 0, 0;\n  l, m, n,\n)) ", 故 " \\\nd = 2 = frac(divides arrow(i) times arrow(s)\\) dot.op arrow(O M) divides, |arrow(i) times arrow(s)|) = frac(2| - n + m|, sqrt(n^2 + m^2)) ", 即 " quad m dot.op n = 0`,
+  },
+  // Standalone ‖ with variable before comma: \|x,|...|=\|
+  {
+    latex: `\\begin{align*}\n\\begin{gathered}\n2 l+m-n=0, \\mid \\vec{i} \\times \\vec{s}) \\cdot \\overrightarrow{O M}|=| \\begin{array}{ccc}\n2 & 2 & 2 \\\\\n1 & 0 & 0 \\\\\nl & m & n\n\\end{array}\\|x,|\\vec{i} \\times \\vec{s}|=\\| \\begin{array}{ccc}\ni & \\vec{j} & \\vec{k} \\\\\n1 & 0 & 0 \\\\\nl & m & n\n\\end{array} \\| \\text {, 故 } \\\\\nd=2=\\frac{\\mid \\vec{i} \\times \\vec{s}) \\cdot \\overrightarrow{O M} \\mid}{|\\vec{i} \\times \\vec{s}|}=\\frac{2|-n+m|}{\\sqrt{n^{2}+m^{2}}} \\text {, 即 } \\quad m \\cdot n=0\n\\end{gathered}\n\\end{align*}`,
+    typst: `2 l + m - n = 0, divides arrow(i) times arrow(s)\\) dot.op arrow(O M) lr(| = |) mat(delim: #none, \n  2, 2, 2;\n  1, 0, 0;\n  l, m, n,\n) bar.v.double x, lr(| arrow(i) times arrow(s) |) = norm(mat(delim: #none, \n  i, arrow(j), arrow(k);\n  1, 0, 0;\n  l, m, n,\n)) ", 故 " \\\nd = 2 = frac(divides arrow(i) times arrow(s)\\) dot.op arrow(O M) divides, |arrow(i) times arrow(s)|) = frac(2| - n + m|, sqrt(n^2 + m^2)) ", 即 " quad m dot.op n = 0`,
+    typst_inline: `2 l + m - n = 0, divides arrow(i) times arrow(s)\\) dot.op arrow(O M) lr(| = |) mat(delim: #none, \n  2, 2, 2;\n  1, 0, 0;\n  l, m, n,\n) bar.v.double x, lr(| arrow(i) times arrow(s) |) = norm(mat(delim: #none, \n  i, arrow(j), arrow(k);\n  1, 0, 0;\n  l, m, n,\n)) ", 故 " \\\nd = 2 = frac(divides arrow(i) times arrow(s)\\) dot.op arrow(O M) divides, |arrow(i) times arrow(s)|) = frac(2| - n + m|, sqrt(n^2 + m^2)) ", 即 " quad m dot.op n = 0`,
+  },
 ];

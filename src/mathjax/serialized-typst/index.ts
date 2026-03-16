@@ -15,18 +15,24 @@ import {
   getChildText, getAttrs, isNegationOverlay,
 } from './common';
 import { findTypstSymbol } from './typst-symbol-map';
+import { escapeContentSeparators } from './escape-utils';
 
 // Node kinds that carry sub/sup scripts (used in \idotsint pattern detection).
 const SCRIPT_KINDS: ReadonlySet<string> = new Set(['msubsup', 'msub', 'msup']);
 
 // Map of opening delimiter char → expected close char + Typst output format.
-const BARE_DELIM_PAIRS: Readonly<Record<string, { close: string; typstOpen: string; typstClose: string }>> = {
-  '|':              { close: '|',              typstOpen: 'lr(| ',          typstClose: ' |)' },
-  [LEFT_FLOOR]:     { close: RIGHT_FLOOR,      typstOpen: 'floor(',         typstClose: ')' },
-  [LEFT_CEIL]:      { close: RIGHT_CEIL,       typstOpen: 'ceil(',          typstClose: ')' },
-  [DOUBLE_VERT]:    { close: DOUBLE_VERT,      typstOpen: 'norm(',          typstClose: ')' },
-  [LEFT_CHEVRON]:   { close: RIGHT_CHEVRON,    typstOpen: 'lr(chevron.l ',  typstClose: ' chevron.r)' },
-  [LEFT_ANGLE_OLD]: { close: RIGHT_ANGLE_OLD,  typstOpen: 'lr(chevron.l ',  typstClose: ' chevron.r)' },
+// isFuncCall: true when content is placed inside a function-call argument
+// (norm, floor, ceil) and needs separator escaping to prevent Typst from
+// parsing commas/semicolons/colons as argument separators or named args.
+const BARE_DELIM_PAIRS: Readonly<Record<string, {
+  close: string; typstOpen: string; typstClose: string; isFuncCall: boolean;
+}>> = {
+  '|':              { close: '|',              typstOpen: 'lr(| ',          typstClose: ' |)',          isFuncCall: false },
+  [LEFT_FLOOR]:     { close: RIGHT_FLOOR,      typstOpen: 'floor(',         typstClose: ')',            isFuncCall: true },
+  [LEFT_CEIL]:      { close: RIGHT_CEIL,       typstOpen: 'ceil(',          typstClose: ')',            isFuncCall: true },
+  [DOUBLE_VERT]:    { close: DOUBLE_VERT,      typstOpen: 'norm(',          typstClose: ')',            isFuncCall: true },
+  [LEFT_CHEVRON]:   { close: RIGHT_CHEVRON,    typstOpen: 'lr(chevron.l ',  typstClose: ' chevron.r)',  isFuncCall: false },
+  [LEFT_ANGLE_OLD]: { close: RIGHT_ANGLE_OLD,  typstOpen: 'lr(chevron.l ',  typstClose: ' chevron.r)',  isFuncCall: false },
 };
 
 interface BigDelimInfo { delim: string; size: string; isOpen: boolean }
@@ -55,26 +61,29 @@ const getBigDelimInfo = (node: MathNode): BigDelimInfo | null => {
   }
 };
 
-// Return the text content of a single-mo node (bare mo, mrow or TeXAtom wrapping one mo).
-// Used to detect delimiter characters like |, ⌊, ⌋, ⌈, ⌉, ‖, ⟨, ⟩.
-const getDelimiterChar = (node: MathNode): string | null => {
+// Resolve the inner mo node from a bare mo, mrow, or TeXAtom wrapping one mo.
+// Returns the mo MathNode or null if the structure doesn't match.
+const resolveDelimiterMo = (node: MathNode): MathNode | null => {
   try {
-    let moNode: MathNode | null = null;
-    if (node?.kind === 'mo') {
-      moNode = node;
-    } else if (node?.kind === 'mrow' || node?.kind === 'TeXAtom') {
+    if (node?.kind === 'mo') return node;
+    if (node?.kind === 'mrow' || node?.kind === 'TeXAtom') {
       let children = node.childNodes;
       if (children?.length === 1 && children[0].isInferred) {
         children = children[0].childNodes;
       }
-      if (children?.length === 1 && children[0].kind === 'mo') {
-        moNode = children[0];
-      }
+      if (children?.length === 1 && children[0].kind === 'mo') return children[0];
     }
-    return moNode ? (getChildText(moNode) || null) : null;
+    return null;
   } catch (_e: unknown) {
     return null;
   }
+};
+
+// Return the text content of a single-mo node (bare mo, mrow or TeXAtom wrapping one mo).
+// Used to detect delimiter characters like |, ⌊, ⌋, ⌈, ⌉, ‖, ⟨, ⟩.
+const getDelimiterChar = (node: MathNode): string | null => {
+  const mo = resolveDelimiterMo(node);
+  return mo ? (getChildText(mo) || null) : null;
 };
 
 // Check if node is msub/msup/msubsup whose BASE is a closing delimiter.
@@ -175,6 +184,13 @@ const tryBareDelimiterPattern = (
   if (!delimPair) return null;
   // For symmetric delimiters, skip inside TeXAtom groups
   if (delimChar === delimPair.close && node.parent?.kind === 'TeXAtom') return null;
+  // For symmetric delimiters (| ‖), skip if the opener mo has CLOSE texClass —
+  // it is actually a closing delimiter from a surrounding pair, not an opener.
+  const isSymmetric = delimChar === delimPair.close;
+  if (isSymmetric) {
+    const openerMo = resolveDelimiterMo(node.childNodes[j]);
+    if (openerMo && openerMo.texClass === TEXCLASS.CLOSE) return null;
+  }
   let closeIdx = -1;
   let closeIsScripted = false;
   for (let k = j + 1; k < node.childNodes.length; k++) {
@@ -189,8 +205,22 @@ const tryBareDelimiterPattern = (
     }
   }
   if (closeIdx <= j + 1) return null; // need at least one node between delimiters
-  const content = serializeRange(node, j + 1, closeIdx, space, serialize);
-  let delimExpr = `${delimPair.typstOpen}${content.trim()}${delimPair.typstClose}`;
+  // For ‖…‖: reject if content between the delimiters contains a top-level
+  // separator (PUNCT, e.g. comma) or if the pair spans the entire row and
+  // contains a relational operator. Both patterns indicate the ‖ symbols are
+  // standalone boundary delimiters, not a matched norm pair.
+  if (delimChar === DOUBLE_VERT) {
+    for (let k = j + 1; k < closeIdx; k++) {
+      const tc = node.childNodes[k]?.texClass;
+      if (tc === TEXCLASS.PUNCT) return null;
+      if (j === 0 && closeIdx === node.childNodes.length - 1
+          && tc === TEXCLASS.REL) return null;
+    }
+  }
+  const rawContent = serializeRange(node, j + 1, closeIdx, space, serialize);
+  const content = delimPair.isFuncCall
+    ? escapeContentSeparators(rawContent.trim()) : rawContent.trim();
+  let delimExpr = `${delimPair.typstOpen}${content}${delimPair.typstClose}`;
   // When the closing delimiter is inside a script node (e.g. ‖_2),
   // extract and append the script parts to the delimited expression.
   if (closeIsScripted) {
