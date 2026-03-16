@@ -190,6 +190,16 @@ export const replaceUnpairedBrackets = (expr: string): string => {
   return result;
 };
 
+// Nodes whose Typst handlers wrap children in function calls (sqrt(), frac(),
+// cancel(), etc.).  Brackets inside these nodes cannot pair with brackets
+// outside — each child is processed as a separate scope.
+// N.B. msub/msup/msubsup are NOT boundaries: LaTeX (a+b)^2 creates
+// msup(mo(")"), mn(2)) where ) is the base — splitting would orphan (.
+// mover/munder are also excluded: the base is often a single node.
+const SCOPE_BOUNDARIES = new Set([
+  'msqrt', 'mroot', 'mfrac', 'menclose',
+]);
+
 export const markUnpairedBrackets = (root: MathNode): void => {
   const bracketNodes: { node: MathNode; char: string }[] = [];
   // Check if an mo node is a \left...\right delimiter (first/last child of
@@ -215,7 +225,15 @@ export const markUnpairedBrackets = (root: MathNode): void => {
       }
     }
     for (const child of (node.childNodes ?? [])) {
-      walk(child);
+      if (SCOPE_BOUNDARIES.has(child.kind)) {
+        // Each child of the scope boundary is a separate scope
+        // (e.g. frac numerator vs denominator, base vs sub/superscript)
+        for (const grandchild of (child.childNodes ?? [])) {
+          markUnpairedBrackets(grandchild);
+        }
+      } else {
+        walk(child);
+      }
     }
   };
   walk(root);

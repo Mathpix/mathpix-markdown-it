@@ -2668,8 +2668,8 @@ module.exports = [
   },
   {
     latex: `\\frac{(+)[4 x+10 y-5 z}{9 x}  =-3]`,
-    typst: `frac((+)\\[4 x + 10 y - 5 z, 9 x) = - 3]`,
-    typst_inline: `frac((+)\\[4 x + 10 y - 5 z, 9 x) = - 3]`,
+    typst: `frac((+)\\[ 4 x + 10 y - 5 z, 9 x) = - 3 \\]`,
+    typst_inline: `frac((+)\\[ 4 x + 10 y - 5 z, 9 x) = - 3 \\]`,
   },
   {
     latex: `\\left.\\begin{array}{c}
@@ -2780,5 +2780,17 @@ x=4
 \end{aligned}`,
     typst: `mat(delim: #none, align: #left, augment: #(hline: 1), \n  display(cases(\n  3 x + y = 15,\n  x + y = 7,\n));\n  display(mat(delim: #none, align: #left, \n  2 x quad = 8;\n  x = 4,\n));\n  x = 4 " en " x + y = 7 " geeft " 4 + y = 7\\, " dus " y = 3 .,\n)`,
     typst_inline: `mat(delim: #none, align: #left, augment: #(hline: 1), \n  cases(\n  3 x + y = 15,\n  x + y = 7,\n);\n  mat(delim: #none, align: #left, \n  2 x quad = 8;\n  x = 4,\n);\n  x = 4 " en " x + y = 7 " geeft " 4 + y = 7\\, " dus " y = 3 .,\n)`,
+  },
+  // msqrt scope boundary: ( inside msqrt and ) outside are unpaired → escaped
+  {
+    latex: String.raw`\sqrt(\Upsilon^{\acute{\beta}})`,
+    typst: `sqrt(\\() Upsilon^(acute(beta))\\)`,
+    typst_inline: `sqrt(\\() Upsilon^(acute(beta))\\)`,
+  },
+  // msqrt with braces: both ( and ) inside msqrt — paired, no escaping
+  {
+    latex: String.raw`\sqrt{(\Upsilon^{\acute{\beta}})}`,
+    typst: `sqrt((Upsilon^(acute(beta))))`,
+    typst_inline: `sqrt((Upsilon^(acute(beta))))`,
   },
 ];

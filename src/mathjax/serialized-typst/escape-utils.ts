@@ -178,3 +178,4 @@ export const escapeLrSemicolons = (expr: string): string =>
  *  Prevents premature closure of wrapping function calls. */
 export const escapeUnbalancedParens = (content: string): string =>
   scanExpression(content, { escapeUnbalancedCloseParen: true });
+
