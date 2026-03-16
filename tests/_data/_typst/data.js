@@ -2728,4 +2728,29 @@ b_{3}
     typst: `2 l + m - n = 0, divides arrow(i) times arrow(s)\\) dot.op arrow(O M) lr(| = |) mat(delim: #none, \n  2, 2, 2;\n  1, 0, 0;\n  l, m, n,\n) bar.v.double x, lr(| arrow(i) times arrow(s) |) = norm(mat(delim: #none, \n  i, arrow(j), arrow(k);\n  1, 0, 0;\n  l, m, n,\n)) ", 故 " \\\nd = 2 = frac(divides arrow(i) times arrow(s)\\) dot.op arrow(O M) divides, |arrow(i) times arrow(s)|) = frac(2| - n + m|, sqrt(n^2 + m^2)) ", 即 " quad m dot.op n = 0`,
     typst_inline: `2 l + m - n = 0, divides arrow(i) times arrow(s)\\) dot.op arrow(O M) lr(| = |) mat(delim: #none, \n  2, 2, 2;\n  1, 0, 0;\n  l, m, n,\n) bar.v.double x, lr(| arrow(i) times arrow(s) |) = norm(mat(delim: #none, \n  i, arrow(j), arrow(k);\n  1, 0, 0;\n  l, m, n,\n)) ", 故 " \\\nd = 2 = frac(divides arrow(i) times arrow(s)\\) dot.op arrow(O M) divides, |arrow(i) times arrow(s)|) = frac(2| - n + m|, sqrt(n^2 + m^2)) ", 即 " quad m dot.op n = 0`,
   },
+  // Nested aligned inside array (mat cell): should use mat(delim:#none) with ; separators, not \\
+  {
+    latex: String.raw`\begin{array}{r|r}
+3 x^{2}-2 x+1 \\
+3 x + 2 \longdiv { 9 x ^ { 3 } + 0 x ^ { 2 } - x - 3 } & \begin{aligned}
+& \text { You can write this result as } \\
+&(-) \begin{aligned}
+\frac{9 x^{3}-x-3}{3 x+2}+6 x^{2} \\
+-6 x^{2}
+\end{aligned}-x
+\end{aligned} \\
+=3 x^{2}-2 x+1+\frac{-5}{3 x+2}, x \neq-\frac{2}{3} \\
+=3 x^{2}-2 x+1-\frac{5}{3 x+2}, x \neq-\frac{2}{3} .
+\end{array}`,
+    typst: `mat(delim: #none, align: #right, augment: #(vline: 1), \n  3 x^2 - 2 x + 1;\n  3 x + 2 overline(")"9 x^3 + 0 x^2 - x - 3), display(mat(delim: #none, align: #left, \n  " You can write this result as ";\n  (-) display(mat(delim: #none, align: #right, \n  frac(9 x^3 - x - 3, 3 x + 2) + 6 x^2;\n  - 6 x^2,\n)) - x,\n));\n  = 3 x^2 - 2 x + 1 + frac(- 5, 3 x + 2)\\, x eq.not - frac(2, 3);\n  = 3 x^2 - 2 x + 1 - frac(5, 3 x + 2)\\, x eq.not - frac(2, 3) .,\n)`,
+    typst_inline: `mat(delim: #none, align: #right, augment: #(vline: 1), \n  3 x^2 - 2 x + 1;\n  3 x + 2 overline(")"9 x^3 + 0 x^2 - x - 3), mat(delim: #none, align: #left, \n  " You can write this result as ";\n  (-) mat(delim: #none, align: #right, \n  frac(9 x^3 - x - 3, 3 x + 2) + 6 x^2;\n  - 6 x^2,\n) - x,\n);\n  = 3 x^2 - 2 x + 1 + frac(- 5, 3 x + 2)\\, x eq.not - frac(2, 3);\n  = 3 x^2 - 2 x + 1 - frac(5, 3 x + 2)\\, x eq.not - frac(2, 3) .,\n)`,
+  },
+  // Nested aligned inside array(c): display() wrapper for block, none for inline
+  {
+    latex: String.raw`\begin{array}{c}q^{3}=1.\\
+\begin{aligned}\therefore\quad q_{1}=1,q_{2}&=-\frac{1}{2}+\frac{\sqrt{3}}{2}i=-\left(\cos\frac{\pi}{3}-i\sin\frac{\pi}{3}\right),\\
+q_{3}&=-\frac{1}{2}-\frac{\sqrt{3}}{2}i=-\left(\cos\frac{\pi}{3}+i\sin\frac{\pi}{3}\right).\end{aligned}\end{array}`,
+    typst: `mat(delim: #none, \n  q^3 = 1.;\n  display(mat(delim: #none, align: #left, \n  therefore quad q_1 = 1\\, q_2 = - frac(1, 2) + frac(sqrt(3), 2) i = - lr(( cos frac(pi, 3) - i sin frac(pi, 3) ))\\,;\n  q_3 = - frac(1, 2) - frac(sqrt(3), 2) i = - lr(( cos frac(pi, 3) + i sin frac(pi, 3) )) .,\n)),\n)`,
+    typst_inline: `mat(delim: #none, \n  q^3 = 1.;\n  mat(delim: #none, align: #left, \n  therefore quad q_1 = 1\\, q_2 = - frac(1, 2) + frac(sqrt(3), 2) i = - lr(( cos frac(pi, 3) - i sin frac(pi, 3) ))\\,;\n  q_3 = - frac(1, 2) - frac(sqrt(3), 2) i = - lr(( cos frac(pi, 3) + i sin frac(pi, 3) )) .,\n),\n)`,
+  },
 ];
