@@ -106,6 +106,8 @@ export const mrow: HandlerFn = (node, serialize) => {
     // Serialize inner children, skipping the delimiter mo nodes
     // (delimiters are reconstructed from the open/close properties)
     let content = '';
+    let contentInline = '';
+    let hasInlineDiff = false;
     for (let i = 0; i < node.childNodes.length; i++) {
       const child = node.childNodes[i];
       // Skip opening delimiter mo (first child matching open property)
@@ -123,59 +125,66 @@ export const mrow: HandlerFn = (node, serialize) => {
         }
       }
       const data: ITypstData = serialize.visitNode(child, '');
+      const inlineTypst = data.typst_inline ?? data.typst;
+      if (inlineTypst !== data.typst) hasInlineDiff = true;
       // prevNode may be the skipped opening delimiter mo —
       // safe because mo is not in SCRIPT_NODE_KINDS.
-      if (needsSpaceBetweenNodes(content, data.typst, i > 0 ? node.childNodes[i - 1] : null)) {
+      const prevNode = i > 0 ? node.childNodes[i - 1] : null;
+      if (needsSpaceBetweenNodes(content, data.typst, prevNode)) {
         content += ' ';
       }
+      if (needsSpaceBetweenNodes(contentInline, inlineTypst, prevNode)) {
+        contentInline += ' ';
+      }
       content += data.typst;
+      contentInline += inlineTypst;
     }
     const open = openDelim ? mapDelimiter(openDelim) : '';
     const close = closeDelim ? mapDelimiter(closeDelim) : '';
     const hasVisibleOpen = !!open;
     const hasVisibleClose = !!close;
-    if (hasVisibleOpen && hasVisibleClose) {
-      const trimmedContent = content.trim();
-      // Optimize common delimiter pairs to Typst shorthand functions,
-      // but fall back to lr() when content has top-level , or ;
-      // (these would be parsed as argument/row separators inside a function call).
-      const hasSep = hasTopLevelSeparators(trimmedContent);
-      if (openDelim === '|' && closeDelim === '|') {
-        const escaped = escapeLrSemicolons(trimmedContent);
-        res = addToTypstData(res, { typst: hasSep
-          ? `lr(| ${escaped} |)` : `abs(${escapeContentSeparators(trimmedContent)})` });
-      } else if (openDelim === DOUBLE_VERT && closeDelim === DOUBLE_VERT) {
-        const escaped = escapeLrSemicolons(trimmedContent);
-        res = addToTypstData(res, { typst: hasSep
-          ? `lr(‖ ${escaped} ‖)` : `norm(${escapeContentSeparators(trimmedContent)})` });
-      } else if (openDelim === LEFT_FLOOR && closeDelim === RIGHT_FLOOR) {
-        const escaped = escapeLrSemicolons(trimmedContent);
-        res = addToTypstData(res, { typst: hasSep
-          ? `lr(⌊ ${escaped} ⌋)` : `floor(${escapeContentSeparators(trimmedContent)})` });
-      } else if (openDelim === LEFT_CEIL && closeDelim === RIGHT_CEIL) {
-        const escaped = escapeLrSemicolons(trimmedContent);
-        res = addToTypstData(res, { typst: hasSep
-          ? `lr(⌈ ${escaped} ⌉)` : `ceil(${escapeContentSeparators(trimmedContent)})` });
+    // Build lr() expression from content string
+    const buildLrExpr = (cnt: string): string => {
+      if (hasVisibleOpen && hasVisibleClose) {
+        const trimmed = cnt.trim();
+        const hasSep = hasTopLevelSeparators(trimmed);
+        if (openDelim === '|' && closeDelim === '|') {
+          const escaped = escapeLrSemicolons(trimmed);
+          return hasSep ? `lr(| ${escaped} |)` : `abs(${escapeContentSeparators(trimmed)})`;
+        } else if (openDelim === DOUBLE_VERT && closeDelim === DOUBLE_VERT) {
+          const escaped = escapeLrSemicolons(trimmed);
+          return hasSep ? `lr(‖ ${escaped} ‖)` : `norm(${escapeContentSeparators(trimmed)})`;
+        } else if (openDelim === LEFT_FLOOR && closeDelim === RIGHT_FLOOR) {
+          const escaped = escapeLrSemicolons(trimmed);
+          return hasSep ? `lr(⌊ ${escaped} ⌋)` : `floor(${escapeContentSeparators(trimmed)})`;
+        } else if (openDelim === LEFT_CEIL && closeDelim === RIGHT_CEIL) {
+          const escaped = escapeLrSemicolons(trimmed);
+          return hasSep ? `lr(⌈ ${escaped} ⌉)` : `ceil(${escapeContentSeparators(trimmed)})`;
+        } else {
+          const escapedOpen = (openDelim in OPEN_BRACKETS && OPEN_BRACKETS[openDelim] !== closeDelim)
+            ? '\\' + openDelim : open;
+          const escapedClose = (closeDelim in CLOSE_BRACKETS && CLOSE_BRACKETS[closeDelim] !== openDelim)
+            ? '\\' + closeDelim : close;
+          return `lr(${escapedOpen} ${escapeLrSemicolons(trimmed)} ${escapedClose})`;
+        }
       } else {
-        // Mismatched ASCII brackets must be escaped: ( [ { start groups, ) closes lr()
-        const escapedOpen = (openDelim in OPEN_BRACKETS && OPEN_BRACKETS[openDelim] !== closeDelim)
-          ? '\\' + openDelim : open;
-        const escapedClose = (closeDelim in CLOSE_BRACKETS && CLOSE_BRACKETS[closeDelim] !== openDelim)
-          ? '\\' + closeDelim : close;
-        res = addToTypstData(res, { typst: `lr(${escapedOpen} ${escapeLrSemicolons(trimmedContent)} ${escapedClose})` });
+        const trimmed = cnt.trim();
+        const openEsc = openDelim ? escapeLrDelimiter(openDelim) : '';
+        const closeEsc = closeDelim ? escapeLrDelimiter(closeDelim) : '';
+        if (openEsc) {
+          return `lr(${openEsc} ${escapeLrSemicolons(trimmed)})`;
+        } else if (closeEsc) {
+          return `lr(${escapeLrSemicolons(trimmed)} ${closeEsc})`;
+        } else {
+          return trimmed;
+        }
       }
+    };
+    const lrTypst = buildLrExpr(content);
+    if (hasInlineDiff) {
+      res = addToTypstData(res, { typst: lrTypst, typst_inline: buildLrExpr(contentInline) });
     } else {
-      // One or both delimiters invisible: wrap visible side in lr()
-      const trimmed = content.trim();
-      const openEsc = openDelim ? escapeLrDelimiter(openDelim) : '';
-      const closeEsc = closeDelim ? escapeLrDelimiter(closeDelim) : '';
-      if (openEsc) {
-        res = addToTypstData(res, { typst: `lr(${openEsc} ${escapeLrSemicolons(trimmed)})` });
-      } else if (closeEsc) {
-        res = addToTypstData(res, { typst: `lr(${escapeLrSemicolons(trimmed)} ${closeEsc})` });
-      } else {
-        res = addToTypstData(res, { typst: trimmed });
-      }
+      res = addToTypstData(res, { typst: lrTypst });
     }
   } else if (isLeftRight && hasTableChild) {
     // Matrix/cases inside \left...\right: skip delimiter mo children

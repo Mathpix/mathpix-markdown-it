@@ -359,9 +359,11 @@ const buildUntaggedEqnArray = (
 
 /** Check if a node is nested inside a mat()/cases() cell where \\ linebreaks
  *  are ignored by Typst. Walks up the parent chain looking for mtd → mtr →
- *  mtable. Returns true when any ancestor mtable is a matrix or cases
- *  (not an eqnArray at the top level). When the immediate outer mtable is
- *  an eqnArray that is itself nested, continues walking up. */
+ *  mtable. Returns true when any ancestor mtable will be rendered as mat():
+ *  - Regular matrix or cases (not eqnArray)
+ *  - eqnArray with row/column lines (rendered as mat to preserve augment)
+ *  When the immediate outer mtable is a plain eqnArray (no lines), continues
+ *  walking up to check if that eqnArray is itself nested. */
 const isInsideMatrixCell = (node: MathNode): boolean => {
   let current = node.parent;
   while (current) {
@@ -372,7 +374,11 @@ const isInsideMatrixCell = (node: MathNode): boolean => {
         const firstRow = outerTable.childNodes?.[0];
         const isOuterEqnArray = firstRow?.attributes?.get('displaystyle') === true;
         if (!isOuterEqnArray) return true;
-        // Outer is eqnArray — continue walking up to check if it is also nested
+        // eqnArray with lines → rendered as mat() → we're inside a mat cell
+        const outerHasLines = outerTable.attributes.isSet('rowlines')
+          || outerTable.attributes.isSet('columnlines');
+        if (outerHasLines) return true;
+        // Plain eqnArray — continue walking up to check if it is also nested
         current = outerTable.parent;
         continue;
       }
@@ -383,24 +389,74 @@ const isInsideMatrixCell = (node: MathNode): boolean => {
   return false;
 };
 
-/** Nested eqnArray inside a mat()/cases() cell → mat(delim: #none, ...).
- *  Rows use ; separators instead of \\ linebreaks (which Typst ignores in cells).
- *  Rows are already escaped; align is a pre-formatted string like "#right",
- *  "#(right, left)", or "" (omit for default center). */
-const buildNestedMat = (inputRows: string[], align: string): string => {
-  const alignPart = align ? `, align: ${align}` : '';
-  if (inputRows.length >= 2) {
-    return `mat(delim: #none${alignPart}, \n  ${inputRows.join(';\n  ')},\n)`;
+/** Compute Typst augment string from a node's rowlines/columnlines attributes. */
+const computeAugment = (node: MathNode): string => {
+  const columnlines = node.attributes.isSet('columnlines')
+    ? String(node.attributes.get('columnlines') || '').trim().split(/\s+/)
+    : [];
+  const rowlines = node.attributes.isSet('rowlines')
+    ? String(node.attributes.get('rowlines') || '').trim().split(/\s+/)
+    : [];
+  const vlinePositions: number[] = [];
+  let hasDashedLine = false;
+  let hasSolidLine = false;
+  for (let i = 0; i < columnlines.length; i++) {
+    if (columnlines[i] === 'solid' || columnlines[i] === 'dashed') {
+      vlinePositions.push(i + 1);
+      if (columnlines[i] === 'dashed') hasDashedLine = true;
+      else hasSolidLine = true;
+    }
   }
-  return `mat(delim: #none${alignPart}, ${inputRows.join('; ')})`;
+  const hlinePositions: number[] = [];
+  for (let i = 0; i < rowlines.length; i++) {
+    if (rowlines[i] === 'solid' || rowlines[i] === 'dashed') {
+      hlinePositions.push(i + 1);
+      if (rowlines[i] === 'dashed') hasDashedLine = true;
+      else hasSolidLine = true;
+    }
+  }
+  if (hlinePositions.length === 0 && vlinePositions.length === 0) return '';
+  const parts: string[] = [];
+  if (hlinePositions.length === 1) {
+    parts.push(`hline: ${hlinePositions[0]}`);
+  } else if (hlinePositions.length > 1) {
+    parts.push(`hline: (${hlinePositions.join(', ')})`);
+  }
+  if (vlinePositions.length === 1) {
+    parts.push(`vline: ${vlinePositions[0]}`);
+  } else if (vlinePositions.length > 1) {
+    parts.push(`vline: (${vlinePositions.join(', ')})`);
+  }
+  if (hasDashedLine && !hasSolidLine) {
+    parts.push('stroke: (dash: "dashed")');
+  }
+  return `augment: #(${parts.join(', ')})`;
 };
 
-const buildNestedEqnArray = (
-  inputRows: string[], inputRowsInline: string[], align: string
+/** Build a mat(delim: #none, ...) string for an eqnArray rendered as mat.
+ *  align is a pre-formatted string like "#right" or "" (omit for center).
+ *  augment is an optional augment string like "augment: #(hline: 2)". */
+const buildEqnArrayMatStr = (inputRows: string[], align: string, augment: string): string => {
+  const alignPart = align ? `, align: ${align}` : '';
+  const augPart = augment ? `, ${augment}` : '';
+  if (inputRows.length >= 2) {
+    return `mat(delim: #none${alignPart}${augPart}, \n  ${inputRows.join(';\n  ')},\n)`;
+  }
+  return `mat(delim: #none${alignPart}${augPart}, ${inputRows.join('; ')})`;
+};
+
+/** eqnArray rendered as mat() — either nested inside a mat cell or has lines.
+ *  addDisplay: wrap block output in display() (for nested; not for top-level with lines). */
+const buildEqnArrayAsMat = (
+  inputRows: string[], inputRowsInline: string[],
+  align: string, augment: string, addDisplay: boolean
 ): ITypstData => {
-  const mat = buildNestedMat(inputRows, align);
-  const matInline = buildNestedMat(inputRowsInline, align);
-  return { typst: `display(${mat})`, typst_inline: matInline };
+  const mat = buildEqnArrayMatStr(inputRows, align, augment);
+  const matInline = buildEqnArrayMatStr(inputRowsInline, align, augment);
+  return {
+    typst: addDisplay ? `display(${mat})` : mat,
+    typst_inline: matInline,
+  };
 };
 
 /** matrix → mat(delim: ..., ...) with augment/align/frame.
@@ -411,42 +467,10 @@ const buildMatrix = (
   rowsInline?: string[]
 ): ITypstData => {
   let res: ITypstData = initTypstData();
-  const columnlines = node.attributes.isSet('columnlines')
-    ? String(node.attributes.get('columnlines') || '').trim().split(/\s+/)
-    : [];
-  const rowlines = node.attributes.isSet('rowlines')
-    ? String(node.attributes.get('rowlines') || '').trim().split(/\s+/)
-    : [];
   const frame = node.attributes.isSet('frame')
     ? String(node.attributes.get('frame') || '')
     : '';
-  const vlinePositions: number[] = [];
-  for (let i = 0; i < columnlines.length; i++) {
-    if (columnlines[i] === 'solid' || columnlines[i] === 'dashed') {
-      vlinePositions.push(i + 1);
-    }
-  }
-  const hlinePositions: number[] = [];
-  for (let i = 0; i < rowlines.length; i++) {
-    if (rowlines[i] === 'solid' || rowlines[i] === 'dashed') {
-      hlinePositions.push(i + 1);
-    }
-  }
-  let augmentStr = '';
-  if (hlinePositions.length > 0 || vlinePositions.length > 0) {
-    const parts: string[] = [];
-    if (hlinePositions.length === 1) {
-      parts.push(`hline: ${hlinePositions[0]}`);
-    } else if (hlinePositions.length > 1) {
-      parts.push(`hline: (${hlinePositions.join(', ')})`);
-    }
-    if (vlinePositions.length === 1) {
-      parts.push(`vline: ${vlinePositions[0]}`);
-    } else if (vlinePositions.length > 1) {
-      parts.push(`vline: (${vlinePositions.join(', ')})`);
-    }
-    augmentStr = `augment: #(${parts.join(', ')})`;
-  }
+  const augmentStr = computeAugment(node);
   const columnAlign = String(node.attributes.get('columnalign') || '');
   const alignArr = columnAlign ? columnAlign.trim().split(/\s+/) : [];
   const uniqueAligns = [...new Set(alignArr)];
@@ -524,12 +548,16 @@ export const mtable: HandlerFn = (node, serialize) => {
   // Detect numcases/subnumcases pattern
   const isNumcases = isNumcasesTable(node);
   // Determine if this is an equation array (align, gather, split, etc.)
-  // Skip eqnArray detection for numcases — it should be treated as cases
+  // Skip eqnArray detection for numcases — it should be treated as cases.
+  const hasLines = node.attributes.isSet('rowlines') || node.attributes.isSet('columnlines');
   const isEqnArray = !isNumcases && !isCases && node.childNodes.length > 0
     && node.childNodes[0].attributes?.get('displaystyle') === true;
-  // Nested aligned/gathered inside a mat()/cases() cell: Typst ignores \\
-  // linebreaks in cells, so we must produce a nested mat() with ; separators.
-  const isNested = isEqnArray && isInsideMatrixCell(node);
+  const insideMatCell = isInsideMatrixCell(node);
+  // eqnArray that must be rendered as mat() instead of rows with \\ :
+  // - Nested inside a mat()/cases() cell (Typst ignores \\ in cells)
+  // - Has row/column lines that require mat(augment: ...) to preserve
+  const isNested = isEqnArray && insideMatCell;
+  const eqnArrayAsMat = isNested || (isEqnArray && hasLines);
   if (isNumcases) {
     return buildNumcasesGrid(node, serialize, countRow);
   }
@@ -556,7 +584,7 @@ export const mtable: HandlerFn = (node, serialize) => {
       cellsInline.push(inline);
       if (block !== inline) hasInlineDiff = true;
     }
-    if (isNested) {
+    if (eqnArrayAsMat) {
       nestedRawRows.push(cells);
       nestedRawRowsInline.push(cellsInline);
     } else if (isEqnArray) {
@@ -583,26 +611,29 @@ export const mtable: HandlerFn = (node, serialize) => {
       rowsInline.push(cellsInline.map(c => escapeCasesSeparators(c)).join(', '));
     }
   }
-  if (isNested) {
+  if (eqnArrayAsMat) {
     const isGathered = envName === 'gathered' || envName === 'gather' || envName === 'gather*';
     const maxCols = nestedRawRows.reduce((m, r) => Math.max(m, r.length), 0);
     // Analyze column usage in rl-pairs to pick a single alignment.
     // Even columns (0, 2, ...) are right-aligned, odd are left.
-    const hasOddContent = nestedRawRows.some(r =>
-      r.some((c, k) => k % 2 === 1 && c !== ''));
+    const hasEvenContent = nestedRawRows.some(r =>
+      r.some((c, k) => k % 2 === 0 && c !== ''));
     let nestedAlign: string;
     if (isGathered || maxCols <= 0) {
       nestedAlign = '';  // gathered: center (Typst mat default)
-    } else if (!hasOddContent) {
-      nestedAlign = '#right';  // content only in even (right) columns
+    } else if (!hasEvenContent) {
+      nestedAlign = '#left';   // all content in odd (left) columns: & content
     } else {
-      nestedAlign = '#left';   // content in odd (left) columns or mixed
+      nestedAlign = '#right';  // content in even (right) columns or mixed
     }
     const nestedRows = nestedRawRows.map(r =>
       escapeCasesSeparators(r.join(' ').trim()));
     const nestedRowsInline = nestedRawRowsInline.map(r =>
       escapeCasesSeparators(r.join(' ').trim()));
-    return buildNestedEqnArray(nestedRows, nestedRowsInline, nestedAlign);
+    const augment = hasLines ? computeAugment(node) : '';
+    // Nested inside mat cell → wrap in display() to reset scriptlevel.
+    // Top-level with lines → no outer display() (cells handle their own).
+    return buildEqnArrayAsMat(nestedRows, nestedRowsInline, nestedAlign, augment, isNested);
   } else if (isEqnArray) {
     const hasAnyTag = node.childNodes.some(
       (child: MathNode) => child.kind === 'mlabeledtr'
@@ -624,8 +655,15 @@ export const mtable: HandlerFn = (node, serialize) => {
     }
     res = addToTypstData(res, { typst: casesBody });
   } else {
-    return buildMatrix(node, rows, branchOpen, branchClose,
+    res = buildMatrix(node, rows, branchOpen, branchClose,
       hasInlineDiff ? rowsInline : undefined);
+  }
+  // Wrap in display() for block output when this table is inside a mat() cell
+  // to prevent Typst scriptlevel reduction. eqnArrays handle this via
+  // buildEqnArrayAsMat; this covers cases() and plain matrices.
+  if (insideMatCell) {
+    const blockTypst = res.typst;
+    res = { typst: `display(${blockTypst})`, typst_inline: res.typst_inline ?? blockTypst };
   }
   return res;
 };

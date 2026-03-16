@@ -2691,7 +2691,7 @@ b_{1} \\\\
 b_{2} \\\\
 b_{3}
 \\end{array}\\right]`,
-    typst: `lr(mat(delim: #none, \n  a_(11) x_1 + a_(12) x_2 + a_(13) x_3 = b_1;\n  a_(21) x_1 + a_(22) x_2 + a_(23) x_3 = b_2;\n  a_(31) x_1 + a_(32) x_2 + a_(33) x_3 = b_3,\n) arrow.r.long mat(delim: #none, mat(delim: "[", align: #left, \n  a_(11), a_(12), a_(13);\n  a_(21), a_(22), a_(23);\n  a_(31), a_(32), a_(33),\n) dot.op mat(delim: "[", align: #left, \n  x_1;\n  x_2;\n  x_3,\n), arrow.r.long) ]) = mat(delim: "[", align: #left, \n  b_1;\n  b_2;\n  b_3,\n)`,
+    typst: `lr(mat(delim: #none, \n  a_(11) x_1 + a_(12) x_2 + a_(13) x_3 = b_1;\n  a_(21) x_1 + a_(22) x_2 + a_(23) x_3 = b_2;\n  a_(31) x_1 + a_(32) x_2 + a_(33) x_3 = b_3,\n) arrow.r.long mat(delim: #none, display(mat(delim: "[", align: #left, \n  a_(11), a_(12), a_(13);\n  a_(21), a_(22), a_(23);\n  a_(31), a_(32), a_(33),\n)) dot.op display(mat(delim: "[", align: #left, \n  x_1;\n  x_2;\n  x_3,\n)), arrow.r.long) ]) = mat(delim: "[", align: #left, \n  b_1;\n  b_2;\n  b_3,\n)`,
     typst_inline: `lr(mat(delim: #none, \n  a_(11) x_1 + a_(12) x_2 + a_(13) x_3 = b_1;\n  a_(21) x_1 + a_(22) x_2 + a_(23) x_3 = b_2;\n  a_(31) x_1 + a_(32) x_2 + a_(33) x_3 = b_3,\n) arrow.r.long mat(delim: #none, mat(delim: "[", align: #left, \n  a_(11), a_(12), a_(13);\n  a_(21), a_(22), a_(23);\n  a_(31), a_(32), a_(33),\n) dot.op mat(delim: "[", align: #left, \n  x_1;\n  x_2;\n  x_3,\n), arrow.r.long) ]) = mat(delim: "[", align: #left, \n  b_1;\n  b_2;\n  b_3,\n)`,
   },
   {
@@ -2750,7 +2750,35 @@ b_{3}
     latex: String.raw`\begin{array}{c}q^{3}=1.\\
 \begin{aligned}\therefore\quad q_{1}=1,q_{2}&=-\frac{1}{2}+\frac{\sqrt{3}}{2}i=-\left(\cos\frac{\pi}{3}-i\sin\frac{\pi}{3}\right),\\
 q_{3}&=-\frac{1}{2}-\frac{\sqrt{3}}{2}i=-\left(\cos\frac{\pi}{3}+i\sin\frac{\pi}{3}\right).\end{aligned}\end{array}`,
-    typst: `mat(delim: #none, \n  q^3 = 1.;\n  display(mat(delim: #none, align: #left, \n  therefore quad q_1 = 1\\, q_2 = - frac(1, 2) + frac(sqrt(3), 2) i = - lr(( cos frac(pi, 3) - i sin frac(pi, 3) ))\\,;\n  q_3 = - frac(1, 2) - frac(sqrt(3), 2) i = - lr(( cos frac(pi, 3) + i sin frac(pi, 3) )) .,\n)),\n)`,
-    typst_inline: `mat(delim: #none, \n  q^3 = 1.;\n  mat(delim: #none, align: #left, \n  therefore quad q_1 = 1\\, q_2 = - frac(1, 2) + frac(sqrt(3), 2) i = - lr(( cos frac(pi, 3) - i sin frac(pi, 3) ))\\,;\n  q_3 = - frac(1, 2) - frac(sqrt(3), 2) i = - lr(( cos frac(pi, 3) + i sin frac(pi, 3) )) .,\n),\n)`,
+    typst: `mat(delim: #none, \n  q^3 = 1.;\n  display(mat(delim: #none, align: #right, \n  therefore quad q_1 = 1\\, q_2 = - frac(1, 2) + frac(sqrt(3), 2) i = - lr(( cos frac(pi, 3) - i sin frac(pi, 3) ))\\,;\n  q_3 = - frac(1, 2) - frac(sqrt(3), 2) i = - lr(( cos frac(pi, 3) + i sin frac(pi, 3) )) .,\n)),\n)`,
+    typst_inline: `mat(delim: #none, \n  q^3 = 1.;\n  mat(delim: #none, align: #right, \n  therefore quad q_1 = 1\\, q_2 = - frac(1, 2) + frac(sqrt(3), 2) i = - lr(( cos frac(pi, 3) - i sin frac(pi, 3) ))\\,;\n  q_3 = - frac(1, 2) - frac(sqrt(3), 2) i = - lr(( cos frac(pi, 3) + i sin frac(pi, 3) )) .,\n),\n)`,
+  },
+  // aligned with \hline: preserve augment via mat(), not lose hline
+  {
+    latex: String.raw`\begin{aligned}x+y-2 z & =3 \\+\quad x+2 y-5 z & =4 \\\hline 2 x+3 y-7 z & =7,\end{aligned}`,
+    typst: `mat(delim: #none, align: #right, augment: #(hline: 2), \n  x + y - 2 z = 3;\n  + quad x + 2 y - 5 z = 4;\n  2 x + 3 y - 7 z = 7\\,,\n)`,
+    typst_inline: `mat(delim: #none, align: #right, augment: #(hline: 2), \n  x + y - 2 z = 3;\n  + quad x + 2 y - 5 z = 4;\n  2 x + 3 y - 7 z = 7\\,,\n)`,
+  },
+  // Dashed column separator (:) → augment with stroke: (dash: "dashed")
+  {
+    latex: String.raw`\left[\begin{array}{rrrr:r}1 & 4 & 0 & 1 & 2 \\ 0 & 1 & 2 & -3 & 0 \\ 1 & 0 & -3 & -8 & -1 \\ 3 & 2 & 3 & 0 & 9\end{array}\right]`,
+    typst: `mat(delim: "[", align: #right, augment: #(vline: 4, stroke: (dash: "dashed")), \n  1, 4, 0, 1, 2;\n  0, 1, 2, - 3, 0;\n  1, 0, - 3, - 8, - 1;\n  3, 2, 3, 0, 9,\n)`,
+    typst_inline: `mat(delim: "[", align: #right, augment: #(vline: 4, stroke: (dash: "dashed")), \n  1, 4, 0, 1, 2;\n  0, 1, 2, - 3, 0;\n  1, 0, - 3, - 8, - 1;\n  3, 2, 3, 0, 9,\n)`,
+  },
+  // Nested cases + inner array inside aligned-with-hline: display() for block, not inline
+  {
+    latex: String.raw`\begin{aligned}
+& \left\{\begin{array}{l}
+3 x+y=15 \\
+x+y=7
+\end{array}\right. \\
+& \hline \begin{array}{l}
+2 x \quad=8 \\
+x=4
+\end{array} \\
+& x=4 \text { en } x+y=7 \text { geeft } 4+y=7, \text { dus } y=3 .
+\end{aligned}`,
+    typst: `mat(delim: #none, align: #left, augment: #(hline: 1), \n  display(cases(\n  3 x + y = 15,\n  x + y = 7,\n));\n  display(mat(delim: #none, align: #left, \n  2 x quad = 8;\n  x = 4,\n));\n  x = 4 " en " x + y = 7 " geeft " 4 + y = 7\\, " dus " y = 3 .,\n)`,
+    typst_inline: `mat(delim: #none, align: #left, augment: #(hline: 1), \n  cases(\n  3 x + y = 15,\n  x + y = 7,\n);\n  mat(delim: #none, align: #left, \n  2 x quad = 8;\n  x = 4,\n);\n  x = 4 " en " x + y = 7 " geeft " 4 + y = 7\\, " dus " y = 3 .,\n)`,
   },
 ];
