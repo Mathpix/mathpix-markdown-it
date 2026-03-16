@@ -5,7 +5,7 @@ import {
   DATA_TAG_AUTO, DATA_LABEL_KEY, DEFAULT_EQ_NUMBERING, EQ_TAG_FIGURE_KIND,
   OPEN_BRACKETS,
 } from "./consts";
-import { initTypstData, addToTypstData, getChildText, getProp } from "./common";
+import { initTypstData, addToTypstData, getChildText, getProp, getContentChildren } from "./common";
 import { escapeCasesSeparators } from "./escape-utils";
 import {
   treeContainsMo, serializePrefixBeforeMo, delimiterToTypst,
@@ -453,10 +453,18 @@ export const mtable: HandlerFn = (node, serialize) => {
   let res: ITypstData = initTypstData();
   const countRow = node.childNodes.length;
   const envName = String(node.attributes.get('name') || '');
-  // Check for enclosing brackets from \left...\right (mrow parent with open/close)
+  // Check for enclosing brackets from \left...\right (mrow parent with open/close).
+  // Only inherit parent delimiters when this mtable is the sole content child
+  // (excluding delimiter mo's).  When the parent mrow contains other content
+  // alongside the mtable, the mrow handler wraps everything in lr() itself.
   const parentMrow = node.parent?.kind === 'mrow' ? node.parent : null;
-  const openProp = getProp<string>(parentMrow, 'open');
-  const closeProp = getProp<string>(parentMrow, 'close');
+  const hasParentDelims = parentMrow
+    && (getProp<string>(parentMrow, 'open') !== undefined
+      || getProp<string>(parentMrow, 'close') !== undefined);
+  const isSoleContent = hasParentDelims
+    && getContentChildren(parentMrow!).length === 1;
+  const openProp = isSoleContent ? getProp<string>(parentMrow, 'open') : undefined;
+  const closeProp = isSoleContent ? getProp<string>(parentMrow, 'close') : undefined;
   const branchOpen: string = openProp !== undefined ? String(openProp) : '';
   const branchClose: string = closeProp !== undefined ? String(closeProp) : '';
   // Determine if this is a cases environment

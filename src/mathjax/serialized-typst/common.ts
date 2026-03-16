@@ -176,6 +176,12 @@ export const getAttrs = <T extends object>(node: MathNode): T =>
 export const getProp = <T>(node: MathNode | null | undefined, key: string): T | undefined =>
   node?.getProperty(key) as T | undefined;
 
+/** Return child nodes excluding the first/last mo (delimiter fences from \left...\right). */
+export const getContentChildren = (node: MathNode): MathNode[] =>
+  node.childNodes.filter((child, i) =>
+    !(child.kind === 'mo' && (i === 0 || i === node.childNodes.length - 1))
+  );
+
 /** Unicode negation slash used by MathJax for \not overlay (U+29F8) */
 const NEGATION_SLASH = '\u29F8';
 

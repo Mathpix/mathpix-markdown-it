@@ -49,6 +49,8 @@ export declare const getNodeText: (node: MathNode) => string;
 export declare const getAttrs: <T extends object>(node: MathNode) => T;
 /** Get a typed property from a node. Accepts nullable node for convenience (returns undefined). */
 export declare const getProp: <T>(node: MathNode | null | undefined, key: string) => T;
+/** Return child nodes excluding the first/last mo (delimiter fences from \left...\right). */
+export declare const getContentChildren: (node: MathNode) => MathNode[];
 /** Check if a node is a \not negation overlay: mrow[REL] > mpadded[width=0] > mtext(⧸).
  *  When true, the next sibling should be wrapped in cancel(). */
 export declare const isNegationOverlay: (node: MathNode) => boolean;

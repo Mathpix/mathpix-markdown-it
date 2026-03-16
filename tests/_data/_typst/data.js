@@ -2671,4 +2671,27 @@ module.exports = [
     typst: `frac((+)\\[4 x + 10 y - 5 z, 9 x) = - 3]`,
     typst_inline: `frac((+)\\[4 x + 10 y - 5 z, 9 x) = - 3]`,
   },
+  {
+    latex: `\\left.\\begin{array}{c}
+a_{11} x_{1}+a_{12} x_{2}+a_{13} x_{3}=b_{1} \\\\
+a_{21} x_{1}+a_{22} x_{2}+a_{23} x_{3}=b_{2} \\\\
+a_{31} x_{1}+a_{32} x_{2}+a_{33} x_{3}=b_{3}
+\\end{array} \\longrightarrow \\begin{array}{ccc}
+{\\left[\\begin{array}{lll}
+a_{11} & a_{12} & a_{13} \\\\
+a_{21} & a_{22} & a_{23} \\\\
+a_{31} & a_{32} & a_{33}
+\\end{array}\\right] \\cdot\\left[\\begin{array}{l}
+x_{1} \\\\
+x_{2} \\\\
+x_{3}
+\\end{array}\\right]} & \\longrightarrow
+\\end{array}\\right]=\\left[\\begin{array}{l}
+b_{1} \\\\
+b_{2} \\\\
+b_{3}
+\\end{array}\\right]`,
+    typst: `lr(mat(delim: #none, \n  a_(11) x_1 + a_(12) x_2 + a_(13) x_3 = b_1;\n  a_(21) x_1 + a_(22) x_2 + a_(23) x_3 = b_2;\n  a_(31) x_1 + a_(32) x_2 + a_(33) x_3 = b_3,\n) arrow.r.long mat(delim: #none, mat(delim: "[", align: #left, \n  a_(11), a_(12), a_(13);\n  a_(21), a_(22), a_(23);\n  a_(31), a_(32), a_(33),\n) dot.op mat(delim: "[", align: #left, \n  x_1;\n  x_2;\n  x_3,\n), arrow.r.long) ]) = mat(delim: "[", align: #left, \n  b_1;\n  b_2;\n  b_3,\n)`,
+    typst_inline: `lr(mat(delim: #none, \n  a_(11) x_1 + a_(12) x_2 + a_(13) x_3 = b_1;\n  a_(21) x_1 + a_(22) x_2 + a_(23) x_3 = b_2;\n  a_(31) x_1 + a_(32) x_2 + a_(33) x_3 = b_3,\n) arrow.r.long mat(delim: #none, mat(delim: "[", align: #left, \n  a_(11), a_(12), a_(13);\n  a_(21), a_(22), a_(23);\n  a_(31), a_(32), a_(33),\n) dot.op mat(delim: "[", align: #left, \n  x_1;\n  x_2;\n  x_3,\n), arrow.r.long) ]) = mat(delim: "[", align: #left, \n  b_1;\n  b_2;\n  b_3,\n)`,
+  },
 ];

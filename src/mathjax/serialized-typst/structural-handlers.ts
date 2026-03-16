@@ -10,7 +10,7 @@ import {
 } from "./consts";
 import {
   initTypstData, addToTypstData, addSpaceToTypstData,
-  getNodeText, getAttrs, getProp,
+  getNodeText, getAttrs, getProp, getContentChildren,
   typstPlaceholder, serializeThousandSepChain, needsTokenSeparator, needsSpaceBetweenNodes,
   handleAll, isNegationOverlay,
 } from "./common";
@@ -77,6 +77,14 @@ const wrapWithColor = (content: string, mathcolor: string): string => {
   return `#text(fill: ${fillValue})[${content}]`;
 };
 
+const containsTable = (child: MathNode): boolean => {
+  if (child.kind === 'mtable') return true;
+  if (child.isInferred && child.childNodes) {
+    return child.childNodes.some(c => c.kind === 'mtable');
+  }
+  return false;
+};
+
 export const mrow: HandlerFn = (node, serialize) => {
   let res: ITypstData = initTypstData();
   const openProp = getProp<string>(node, 'open');
@@ -88,15 +96,12 @@ export const mrow: HandlerFn = (node, serialize) => {
   // Check if this mrow has \left...\right delimiters
   const isLeftRight = (hasOpen || hasClose)
     && getProp<number>(node, 'texClass') === TEXCLASS.INNER;
-  // If this mrow wraps a matrix, let mtable handle the delimiters
-  const hasTableChild = node.childNodes.some(child => {
-    if (child.kind === 'mtable') return true;
-    // MathJax often wraps mtable in an inferred mrow
-    if (child.isInferred && child.childNodes) {
-      return child.childNodes.some(c => c.kind === 'mtable');
-    }
-    return false;
-  });
+  // If this mrow wraps ONLY a matrix (no other content besides delimiter mo's),
+  // let mtable handle the delimiters.  When the mrow contains a matrix alongside
+  // other nodes (e.g. \left. array \longrightarrow array \right]), we must use
+  // the regular lr() path so all content stays inside one lr() call.
+  const contentChildren = getContentChildren(node);
+  const hasTableChild = contentChildren.length === 1 && containsTable(contentChildren[0]);
   if (isLeftRight && !hasTableChild) {
     // Serialize inner children, skipping the delimiter mo nodes
     // (delimiters are reconstructed from the open/close properties)
