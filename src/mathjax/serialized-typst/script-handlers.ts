@@ -327,7 +327,9 @@ export const mover: HandlerFn = (node, serialize) => {
       return res;
     }
   }
-  if (secondChild && secondChild.kind === 'mo') {
+  // Only treat as accent when accent attribute is set (e.g. \overrightarrow).
+  // \overset creates mover without accent — must go through general limits path.
+  if (node.attributes.get('accent') && secondChild && secondChild.kind === 'mo') {
     const accentChar = getNodeText(secondChild);
     const accentFn = typstAccentMap.get(accentChar);
     if (accentFn) {
@@ -378,7 +380,9 @@ export const munder: HandlerFn = (node, serialize) => {
       return res;
     }
   }
-  if (secondChild && secondChild.kind === 'mo') {
+  // Only treat as accent when accentunder is set (e.g. \underrightarrow).
+  // \underset creates munder without accentunder — must go through general limits path.
+  if (node.attributes.get('accentunder') && secondChild && secondChild.kind === 'mo') {
     const accentChar = getNodeText(secondChild);
     let accentFn = typstAccentMap.get(accentChar);
     // Flip over-accents to under-accents when used in munder context

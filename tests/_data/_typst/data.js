@@ -2971,6 +2971,18 @@ x=4
     typst: `limits(underline(2))_(2 upright(m)\\/ upright(s))`,
     typst_inline: `limits(underline(2))_(2 upright(m)\\/ upright(s))`,
   },
+  // \underset with arrow — limits path, not accent (no accentunder attribute)
+  {
+    latex: String.raw`\underset{\rightarrow}{r}`,
+    typst: `limits(r)_(arrow.r)`,
+    typst_inline: `limits(r)_(arrow.r)`,
+  },
+  // \overset with arrow — limits path, not accent (no accent attribute)
+  {
+    latex: String.raw`\overset{\rightarrow}{r}`,
+    typst: `limits(r)^(arrow.r)`,
+    typst_inline: `limits(r)^(arrow.r)`,
+  },
   // \overset with = base — limits() forces above placement
   {
     latex: String.raw`\overset{\text{def}}{=}`,
