@@ -1045,6 +1045,25 @@ module.exports = [
     typst_inline: `mat(delim: #none, align: #left, \n  a + g paren.l brace.l x;\n  y brace.r paren.r + b,\n)`,
   },
 
+  // Colon inside lr(): identifier before : must be spaced to prevent named-arg parsing
+  {
+    latex: `D_{\\left.g: K_{0}\\right]}`,
+    typst: `D_(lr(g : K_0 ]))`,
+    typst_inline: `D_(lr(g : K_0 ]))`,
+  },
+  // Colon inside abs() shorthand
+  {
+    latex: `\\left| x: y \\right|`,
+    typst: `abs(x : y)`,
+    typst_inline: `abs(x : y)`,
+  },
+  // Colon inside general lr()
+  {
+    latex: `\\left( a: b \\right)`,
+    typst: `lr(( a : b ))`,
+    typst_inline: `lr(( a : b ))`,
+  },
+
   // === Cases ===
   {
     latex: `\\begin{cases} x & \\text{if } x > 0 \\\\ -x & \\text{otherwise} \\end{cases}`,

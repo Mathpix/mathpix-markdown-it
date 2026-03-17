@@ -16,8 +16,8 @@ export declare const escapeCasesSeparators: (expr: string) => string;
 /** Check whether a Typst expression contains , or ; at top level (outside (), [] and {}).
  *  Skips content inside "..." strings (handles escaped quotes). */
 export declare const hasTopLevelSeparators: (expr: string) => boolean;
-/** Escape top-level ; → \; inside lr() content (commas are safe in lr).
- *  Skips content inside "..." strings and backslash-escaped chars. */
+/** Escape top-level ; → \; and colons after identifiers (word :) inside lr() content.
+ *  Commas are safe in lr.  Skips content inside "..." strings and backslash-escaped chars. */
 export declare const escapeLrSemicolons: (expr: string) => string;
 /** Escape unbalanced closing parentheses at depth 0: ) → ")".
  *  Prevents premature closure of wrapping function calls. */

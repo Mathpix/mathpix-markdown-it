@@ -169,10 +169,10 @@ export const escapeCasesSeparators = (expr: string): string =>
 export const hasTopLevelSeparators = (expr: string): boolean =>
   scanExpression(expr, { detectOnly: true }) === SEPARATOR_FOUND;
 
-/** Escape top-level ; → \; inside lr() content (commas are safe in lr).
- *  Skips content inside "..." strings and backslash-escaped chars. */
+/** Escape top-level ; → \; and colons after identifiers (word :) inside lr() content.
+ *  Commas are safe in lr.  Skips content inside "..." strings and backslash-escaped chars. */
 export const escapeLrSemicolons = (expr: string): string =>
-  scanExpression(expr, { escapeSemicolon: true });
+  scanExpression(expr, { escapeSemicolon: true, escapeColon: true });
 
 /** Escape unbalanced closing parentheses at depth 0: ) → ")".
  *  Prevents premature closure of wrapping function calls. */
