@@ -357,8 +357,9 @@ export const menclose: HandlerFn = (node, serialize) => {
   } else if (notation.includes('horizontalstrike')) {
     res = addToTypstData(res, { typst: `cancel(${escapeContentSeparators(escapeUnbalancedParens(content))})` });
   } else if (notation.includes('longdiv')) {
-    // \longdiv / \enclose{longdiv} → overline(")" content)
-    res = addToTypstData(res, { typst: `overline(")"${escapeContentSeparators(escapeUnbalancedParens(content))})` });
+    // \longdiv / \enclose{longdiv} → overline(lr(\) content))
+    // lr(\) ...) makes the ) delimiter stretch to match content height
+    res = addToTypstData(res, { typst: `overline(lr(\\) ${escapeContentSeparators(escapeUnbalancedParens(content))}))` });
   } else if (notation.includes('circle')) {
     // \enclose{circle} → #circle with inset
     res = addToTypstData(res, { typst: `#align(center, circle(inset: 3pt, $${content}$))`, typst_inline: content });
@@ -370,11 +371,12 @@ export const menclose: HandlerFn = (node, serialize) => {
     res = addToTypstData(res, { typst: `overline(${escapeContentSeparators(escapeUnbalancedParens(content))})` });
   } else if (notation.includes('bottom')) {
     // \enclose{bottom} → underline()
-    // Detect \smash{)} prefix (used in \lcm macro): strip leading ) or \), trailing spacing, no space
+    // Detect \smash{)} prefix (used in \lcm macro): strip leading ) or \), trailing spacing
+    // lr(\) ...) makes the ) delimiter stretch to match content height
     if (content.startsWith(')') || content.startsWith('\\)')) {
       const skip = content.startsWith('\\)') ? 2 : 1;
       let inner = content.slice(skip).trim().replace(RE_TRAILING_SPACING, '');
-      res = addToTypstData(res, { typst: `underline(")"${escapeContentSeparators(inner)})` });
+      res = addToTypstData(res, { typst: `underline(lr(\\) ${escapeContentSeparators(inner)}))` });
     } else {
       res = addToTypstData(res, { typst: `underline(${escapeContentSeparators(escapeUnbalancedParens(content))})` });
     }

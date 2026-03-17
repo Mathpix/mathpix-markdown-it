@@ -2175,33 +2175,39 @@ module.exports = [
   // === longdiv ===
   {
     latex: `6 \\longdiv { 84 }`,
-    typst: `6 overline(")"84)`,
-    typst_inline: `6 overline(")"84)`,
+    typst: `6 overline(lr(\\) 84))`,
+    typst_inline: `6 overline(lr(\\) 84))`,
   },
   {
     latex: `1 2 \\longdiv { 24 }`,
-    typst: `1 2 overline(")"24)`,
-    typst_inline: `1 2 overline(")"24)`,
+    typst: `1 2 overline(lr(\\) 24))`,
+    typst_inline: `1 2 overline(lr(\\) 24))`,
   },
   {
     latex: `\\longdiv{52}`,
-    typst: `overline(")"52)`,
-    typst_inline: `overline(")"52)`,
+    typst: `overline(lr(\\) 52))`,
+    typst_inline: `overline(lr(\\) 52))`,
   },
   {
     latex: `4 \\enclose{longdiv}{500}`,
-    typst: `4 overline(")"500)`,
-    typst_inline: `4 overline(")"500)`,
+    typst: `4 overline(lr(\\) 500))`,
+    typst_inline: `4 overline(lr(\\) 500))`,
   },
   {
     latex: `x + 2\\longdiv { 2x ^ { 3} - x - 11}`,
-    typst: `x + 2 overline(")"2 x^3 - x - 11)`,
-    typst_inline: `x + 2 overline(")"2 x^3 - x - 11)`,
+    typst: `x + 2 overline(lr(\\) 2 x^3 - x - 11))`,
+    typst_inline: `x + 2 overline(lr(\\) 2 x^3 - x - 11))`,
   },
   {
     latex: `0.05\\longdiv { 341.5}`,
-    typst: `0.05 overline(")"341.5)`,
-    typst_inline: `0.05 overline(")"341.5)`,
+    typst: `0.05 overline(lr(\\) 341.5))`,
+    typst_inline: `0.05 overline(lr(\\) 341.5))`,
+  },
+  // longdiv with frac: lr(\) stretches ) to match content height
+  {
+    latex: String.raw`\longdiv { \frac { 5 n ^ { 2 } T } { N _ { 0 } } }`,
+    typst: `overline(lr(\\) frac(5 n^2 T, N_0)))`,
+    typst_inline: `overline(lr(\\) frac(5 n^2 T, N_0)))`,
   },
   // === enclose{circle} ===
   {
@@ -2238,13 +2244,13 @@ module.exports = [
   // === lcm: \enclose{bottom} with \smash{)} prefix — stripped to ")" with no space ===
   {
     latex: `1 2 \\lcm{24}`,
-    typst: `1 2 underline(")"24)`,
-    typst_inline: `1 2 underline(")"24)`,
+    typst: `1 2 underline(lr(\\) 24))`,
+    typst_inline: `1 2 underline(lr(\\) 24))`,
   },
   {
     latex: `\\lcm{x+y}`,
-    typst: `underline(")"x + y)`,
-    typst_inline: `underline(")"x + y)`,
+    typst: `underline(lr(\\) x + y))`,
+    typst_inline: `underline(lr(\\) x + y))`,
   },
   // --- Unpaired bracket escaping (pre-serialization tree walk) ---
   {
@@ -2822,8 +2828,8 @@ b_{3}
 =3 x^{2}-2 x+1+\frac{-5}{3 x+2}, x \neq-\frac{2}{3} \\
 =3 x^{2}-2 x+1-\frac{5}{3 x+2}, x \neq-\frac{2}{3} .
 \end{array}`,
-    typst: `mat(delim: #none, align: #right, augment: #(vline: 1), \n  3 x^2 - 2 x + 1;\n  3 x + 2 overline(")"9 x^3 + 0 x^2 - x - 3), display(mat(delim: #none, align: #left, \n  " You can write this result as ";\n  (-) display(mat(delim: #none, align: #right, \n  frac(9 x^3 - x - 3, 3 x + 2) + 6 x^2;\n  - 6 x^2,\n)) - x,\n));\n  = 3 x^2 - 2 x + 1 + frac(- 5, 3 x + 2)\\, x eq.not - frac(2, 3);\n  = 3 x^2 - 2 x + 1 - frac(5, 3 x + 2)\\, x eq.not - frac(2, 3) .,\n)`,
-    typst_inline: `mat(delim: #none, align: #right, augment: #(vline: 1), \n  3 x^2 - 2 x + 1;\n  3 x + 2 overline(")"9 x^3 + 0 x^2 - x - 3), mat(delim: #none, align: #left, \n  " You can write this result as ";\n  (-) mat(delim: #none, align: #right, \n  frac(9 x^3 - x - 3, 3 x + 2) + 6 x^2;\n  - 6 x^2,\n) - x,\n);\n  = 3 x^2 - 2 x + 1 + frac(- 5, 3 x + 2)\\, x eq.not - frac(2, 3);\n  = 3 x^2 - 2 x + 1 - frac(5, 3 x + 2)\\, x eq.not - frac(2, 3) .,\n)`,
+    typst: `mat(delim: #none, align: #right, augment: #(vline: 1), \n  3 x^2 - 2 x + 1;\n  3 x + 2 overline(lr(\\) 9 x^3 + 0 x^2 - x - 3)), display(mat(delim: #none, align: #left, \n  " You can write this result as ";\n  (-) display(mat(delim: #none, align: #right, \n  frac(9 x^3 - x - 3, 3 x + 2) + 6 x^2;\n  - 6 x^2,\n)) - x,\n));\n  = 3 x^2 - 2 x + 1 + frac(- 5, 3 x + 2)\\, x eq.not - frac(2, 3);\n  = 3 x^2 - 2 x + 1 - frac(5, 3 x + 2)\\, x eq.not - frac(2, 3) .,\n)`,
+    typst_inline: `mat(delim: #none, align: #right, augment: #(vline: 1), \n  3 x^2 - 2 x + 1;\n  3 x + 2 overline(lr(\\) 9 x^3 + 0 x^2 - x - 3)), mat(delim: #none, align: #left, \n  " You can write this result as ";\n  (-) mat(delim: #none, align: #right, \n  frac(9 x^3 - x - 3, 3 x + 2) + 6 x^2;\n  - 6 x^2,\n) - x,\n);\n  = 3 x^2 - 2 x + 1 + frac(- 5, 3 x + 2)\\, x eq.not - frac(2, 3);\n  = 3 x^2 - 2 x + 1 - frac(5, 3 x + 2)\\, x eq.not - frac(2, 3) .,\n)`,
   },
   // Nested aligned inside array(c): display() wrapper for block, none for inline
   {
