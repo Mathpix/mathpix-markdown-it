@@ -123,7 +123,8 @@ const serializeRange = (
   let content = '';
   for (let k = from; k < to; k++) {
     const innerData = serialize.visitNode(node.childNodes[k], space);
-    if (needsTokenSeparator(content, innerData.typst)) content += ' ';
+    const prevNode = k > from ? node.childNodes[k - 1] : null;
+    if (needsSpaceBetweenNodes(content, innerData.typst, prevNode)) content += ' ';
     content += innerData.typst;
   }
   return content;

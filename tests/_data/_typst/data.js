@@ -3084,4 +3084,10 @@ x=4
     typst: `#align(center, box(stroke: 0.5pt, inset: 3pt, $ mat(delim: #none, align: #left, augment: #(vline: (1, 2)), , , ) $))`,
     typst_inline: `mat(delim: #none, align: #left, augment: #(vline: (1, 2)), , , )`,
   },
+  // bare ‖…‖ delimiter: space between scripted node and ( inside norm()
+  {
+    latex: String.raw`r(\Delta\mathrm{S}_{N}^{n})=o(\|\mathrm{L}_{N}^{n}(\Delta\mathrm{S}_{N}^{n})\|_{\infty})`,
+    typst: `r(Delta upright(S)_N^n) = o(norm(upright(L)_N^n (Delta upright(S)_N^n))_(infinity))`,
+    typst_inline: `r(Delta upright(S)_N^n) = o(norm(upright(L)_N^n (Delta upright(S)_N^n))_(infinity))`,
+  },
 ];
