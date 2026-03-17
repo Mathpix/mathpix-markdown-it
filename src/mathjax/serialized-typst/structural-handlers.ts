@@ -11,7 +11,7 @@ import {
 import {
   initTypstData, addToTypstData, addSpaceToTypstData,
   getNodeText, getAttrs, getProp, getContentChildren,
-  typstPlaceholder, serializeThousandSepChain, needsTokenSeparator, needsSpaceBetweenNodes,
+  typstPlaceholder, serializeThousandSepChain, serializeCombiningMiChain, needsTokenSeparator, needsSpaceBetweenNodes,
   handleAll, isNegationOverlay,
 } from "./common";
 import {
@@ -253,6 +253,16 @@ export const mrow: HandlerFn = (node, serialize) => {
         }
         res = addToTypstData(res, { typst: chain.typst });
         i = chain.nextIndex - 1; // -1 because the for-loop will i++
+        continue;
+      }
+      // Combining-mark chain: consecutive mi nodes with combining chars (Devanagari, etc.)
+      const combChain = serializeCombiningMiChain(node, i);
+      if (combChain) {
+        if (needsTokenSeparator(res.typst, combChain.typst)) {
+          addSpaceToTypstData(res);
+        }
+        res = addToTypstData(res, { typst: combChain.typst });
+        i = combChain.nextIndex - 1;
         continue;
       }
       const child = node.childNodes[i];

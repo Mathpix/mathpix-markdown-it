@@ -42,6 +42,10 @@ export declare const RE_SEPARATOR_END: RegExp;
 export declare const RE_ALPHA_END: RegExp;
 /** Trailing word starting with a letter (captures the identifier) */
 export declare const RE_TRAILING_IDENT: RegExp;
+/** Text with at least one Latin-script letter, optionally with combining marks/digits (NOT non-Latin) */
+export declare const RE_LATIN_WITH_MARKS: RegExp;
+/** String of Unicode letters and combining marks only */
+export declare const RE_LETTERS_AND_MARKS: RegExp;
 /** Property name for pre-mtable content (set in index.ts, read in table-handlers.ts) */
 export declare const DATA_PRE_CONTENT = "data-pre-content";
 /** Property name for post-mtable content (set in index.ts, read in table-handlers.ts) */

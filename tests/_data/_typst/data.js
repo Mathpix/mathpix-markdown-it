@@ -2873,4 +2873,47 @@ x=4
     typst: `sqrt((Upsilon^(acute(beta))))`,
     typst_inline: `sqrt((Upsilon^(acute(beta))))`,
   },
+  // === Non-Latin script grouping (Devanagari, Arabic) ===
+  // Devanagari: combining characters grouped into single quoted string
+  {
+    latex: String.raw`\mathrm{टेक}`,
+    typst: `upright("टेक")`,
+    typst_inline: `upright("टेक")`,
+  },
+  // Two separate Devanagari words
+  {
+    latex: String.raw`\mathrm{एम} \mathrm{टेक}`,
+    typst: `upright("एम") upright("टेक")`,
+    typst_inline: `upright("एम") upright("टेक")`,
+  },
+  // Mixed Latin + Devanagari in same \mathrm
+  {
+    latex: String.raw`\mathrm{MTech/एम} \mathrm{टेक}`,
+    typst: `upright("MTech")\\/ upright("एम") upright("टेक")`,
+    typst_inline: `upright("MTech")\\/ upright("एम") upright("टेक")`,
+  },
+  // Arabic script grouped
+  {
+    latex: String.raw`\mathrm{مرحبا}`,
+    typst: `upright("مرحبا")`,
+    typst_inline: `upright("مرحبا")`,
+  },
+  // Latin + Devanagari: Latin x stays separate, Devanagari grouped
+  {
+    latex: String.raw`\mathrm{xटेक}`,
+    typst: `upright(x) upright("टेक")`,
+    typst_inline: `upright(x) upright("टेक")`,
+  },
+  // Bold Devanagari
+  {
+    latex: String.raw`\mathbf{टेक}`,
+    typst: `upright(bold("टेक"))`,
+    typst_inline: `upright(bold("टेक"))`,
+  },
+  // Math symbols (∂, ψ) must NOT be grouped as non-Latin text
+  {
+    latex: String.raw`\partial \psi`,
+    typst: `partial psi`,
+    typst_inline: `partial psi`,
+  },
 ];

@@ -11,7 +11,7 @@ import {
 } from './consts';
 import {
   addToTypstData, addSpaceToTypstData, initTypstData,
-  serializeThousandSepChain, formatScript, needsTokenSeparator, needsSpaceBetweenNodes,
+  serializeThousandSepChain, serializeCombiningMiChain, formatScript, needsTokenSeparator, needsSpaceBetweenNodes,
   getChildText, getAttrs, isNegationOverlay,
 } from './common';
 import { findTypstSymbol } from './typst-symbol-map';
@@ -336,7 +336,15 @@ export class SerializedTypstVisitor extends MmlVisitor {
           j = thousandSep.nextJ;
           continue;
         }
-        // Pattern 5: Tagged eqnArray mtable with sibling content
+        // Pattern 5: Combining-mark chain (Devanagari, Arabic, etc.)
+        const combChain = serializeCombiningMiChain(node, j);
+        if (combChain) {
+          if (needsTokenSeparator(res.typst, combChain.typst)) addSpaceToTypstData(res);
+          res = addToTypstData(res, { typst: combChain.typst });
+          j = combChain.nextIndex;
+          continue;
+        }
+        // Pattern 6: Tagged eqnArray mtable with sibling content
         if (isTaggedEqnArray(child)) {
           // Pre-content: accumulated prefix before the mtable
           if (res.typst.trim()) {

@@ -18,6 +18,17 @@ export declare const serializeThousandSepChain: (node: MathNode, start: number, 
     typst: string;
     nextIndex: number;
 } | null;
+/** Detect one or more consecutive mi nodes containing non-Latin script text
+ *  (Devanagari, Arabic, CJK, etc.) with the same mathvariant.
+ *  MathJax splits \mathrm{टेक} into individual mi nodes per character,
+ *  breaking combining sequences and word grouping.
+ *  This function merges them into a single font-wrapped string.
+ *  Skips known math symbols (∂, ψ, ∅, etc.) that have specific Typst mappings.
+ *  Returns { typst, nextIndex } or null if node at `start` is not non-Latin mi. */
+export declare const serializeCombiningMiChain: (node: MathNode, start: number) => {
+    typst: string;
+    nextIndex: number;
+} | null;
 /** Check if a space separator is needed between two adjacent Typst tokens.
  *  Returns true when `next` starts with a word/dot/quote character
  *  and `prev` doesn't end with a natural separator (whitespace, open paren, etc.). */
@@ -54,5 +65,6 @@ export declare const getContentChildren: (node: MathNode) => MathNode[];
 /** Check if a node is a \not negation overlay: mrow[REL] > mpadded[width=0] > mtext(⧸).
  *  When true, the next sibling should be wrapped in cancel(). */
 export declare const isNegationOverlay: (node: MathNode) => boolean;
-/** Serialize all children of a node by visiting each one and concatenating the results. */
+/** Serialize all children of a node by visiting each one and concatenating the results.
+ *  Detects combining-mark chains in consecutive mi nodes (Devanagari, Arabic, etc.). */
 export declare const handleAll: HandlerFn;

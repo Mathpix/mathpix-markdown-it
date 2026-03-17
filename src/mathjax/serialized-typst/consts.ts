@@ -42,6 +42,10 @@ export const RE_SEPARATOR_END = /[\s({[,|]$/;
 export const RE_ALPHA_END = /[a-zA-Z]$/;
 /** Trailing word starting with a letter (captures the identifier) */
 export const RE_TRAILING_IDENT = /([a-zA-Z]\w*)$/;
+/** Text with at least one Latin-script letter, optionally with combining marks/digits (NOT non-Latin) */
+export const RE_LATIN_WITH_MARKS = /^[\p{Script=Latin}\p{M}\d]*\p{Script=Latin}[\p{Script=Latin}\p{M}\d]*$/u;
+/** String of Unicode letters and combining marks only */
+export const RE_LETTERS_AND_MARKS = /^[\p{L}\p{M}]+$/u;
 
 /** Property name for pre-mtable content (set in index.ts, read in table-handlers.ts) */
 export const DATA_PRE_CONTENT = 'data-pre-content';

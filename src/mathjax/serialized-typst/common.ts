@@ -3,8 +3,31 @@ import { MathNode, ITypstData, ITypstSerializer, HandlerFn } from './types';
 import {
   RE_THREE_DIGITS, RE_TWO_DIGITS, RE_PHANTOM_BASE,
   RE_TOKEN_START, RE_SEPARATOR_END, RE_ALPHA_END, RE_TRAILING_IDENT,
+  RE_LATIN_WITH_MARKS, RE_LETTERS_AND_MARKS,
   TYPST_PLACEHOLDER, SCRIPT_NODE_KINDS, PRIME_CHARS, TYPST_BUILTIN_OPS,
 } from './consts';
+import { typstSymbolMap } from './typst-symbol-map';
+
+/** Unicode negation slash used by MathJax for \not overlay (U+29F8) */
+const NEGATION_SLASH = '\u29F8';
+
+/** Map mathvariant attribute values to Typst font function names. */
+const FONT_FN_MAP: Readonly<Record<string, string>> = {
+  'normal': 'upright',
+  'bold': 'bold',
+  'bold-italic': 'bold',
+  'italic': 'italic',
+  '-tex-mathit': 'italic',
+  'double-struck': 'bb',
+  'script': 'cal',
+  '-tex-calligraphic': 'cal',
+  'fraktur': 'frak',
+  'bold-fraktur': 'frak',
+  'sans-serif': 'sans',
+  'bold-sans-serif': 'sans',
+  'sans-serif-italic': 'sans',
+  'monospace': 'mono',
+};
 
 /** Return the expression if non-empty, otherwise the Typst empty placeholder '""'. */
 export const typstPlaceholder = (s: string): string => s || TYPST_PLACEHOLDER;
@@ -80,6 +103,61 @@ export const serializeThousandSepChain = (
     k += 2;
   }
   return { typst: chainTypst, nextIndex: k + 1 };
+};
+
+/** Check if text is a non-Latin script character (Devanagari, Arabic, CJK, etc.)
+ *  that is NOT a known math symbol with a Typst mapping. */
+const isNonLatinText = (text: string): boolean => {
+  // Must consist of letters and combining marks only (not math symbols \p{S})
+  if (!RE_LETTERS_AND_MARKS.test(text)) return false;
+  // Latin letters with combining marks (k̸, ñ, etc.) are NOT non-Latin
+  if (RE_LATIN_WITH_MARKS.test(text)) return false;
+  // Must NOT be a known math symbol (∂→partial, ψ→psi, ∅→emptyset, etc.)
+  if (typstSymbolMap.has(text)) return false;
+  return true;
+};
+
+/** Detect one or more consecutive mi nodes containing non-Latin script text
+ *  (Devanagari, Arabic, CJK, etc.) with the same mathvariant.
+ *  MathJax splits \mathrm{टेक} into individual mi nodes per character,
+ *  breaking combining sequences and word grouping.
+ *  This function merges them into a single font-wrapped string.
+ *  Skips known math symbols (∂, ψ, ∅, etc.) that have specific Typst mappings.
+ *  Returns { typst, nextIndex } or null if node at `start` is not non-Latin mi. */
+export const serializeCombiningMiChain = (
+  node: MathNode, start: number,
+): { typst: string; nextIndex: number } | null => {
+  const children = node.childNodes;
+  if (!children || start >= children.length) return null;
+  const first = children[start];
+  if (first.kind !== 'mi') return null;
+  const firstText = getNodeText(first);
+  if (!firstText || !isNonLatinText(firstText)) return null;
+  const variant = String(first.attributes?.get('mathvariant') ?? '');
+  // Collect consecutive mi nodes with the same mathvariant and non-Latin text
+  let merged = firstText;
+  let k = start + 1;
+  while (k < children.length) {
+    const sib = children[k];
+    if (sib.kind !== 'mi') break;
+    const sibVariant = String(sib.attributes?.get('mathvariant') ?? '');
+    if (sibVariant !== variant) break;
+    const sibText = getNodeText(sib);
+    if (!sibText || !isNonLatinText(sibText)) break;
+    merged += sibText;
+    k++;
+  }
+  // Build font-wrapped string
+  const escaped = merged.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+  const fontFn = variant === 'bold' ? null : FONT_FN_MAP[variant];
+  if (!fontFn) {
+    // bold special case or unknown variant — just quote it
+    if (variant === 'bold') {
+      return { typst: `upright(bold("${escaped}"))`, nextIndex: k };
+    }
+    return { typst: `"${escaped}"`, nextIndex: k };
+  }
+  return { typst: `${fontFn}("${escaped}")`, nextIndex: k };
 };
 
 /** Check if a space separator is needed between two adjacent Typst tokens.
@@ -189,9 +267,6 @@ export const getContentChildren = (node: MathNode): MathNode[] =>
     !(child.kind === 'mo' && (i === 0 || i === node.childNodes.length - 1))
   );
 
-/** Unicode negation slash used by MathJax for \not overlay (U+29F8) */
-const NEGATION_SLASH = '\u29F8';
-
 /** Check if a node is a \not negation overlay: mrow[REL] > mpadded[width=0] > mtext(⧸).
  *  When true, the next sibling should be wrapped in cancel(). */
 export const isNegationOverlay = (node: MathNode): boolean => {
@@ -221,11 +296,20 @@ export const isNegationOverlay = (node: MathNode): boolean => {
   return getChildText(mtext) === NEGATION_SLASH;
 };
 
-/** Serialize all children of a node by visiting each one and concatenating the results. */
+/** Serialize all children of a node by visiting each one and concatenating the results.
+ *  Detects combining-mark chains in consecutive mi nodes (Devanagari, Arabic, etc.). */
 export const handleAll: HandlerFn = (node, serialize) => {
   let res: ITypstData = initTypstData();
-  for (const child of (node.childNodes ?? [])) {
-    res = addToTypstData(res, serialize.visitNode(child, ''));
+  const children = node.childNodes ?? [];
+  for (let i = 0; i < children.length; i++) {
+    const combChain = serializeCombiningMiChain(node, i);
+    if (combChain) {
+      if (needsTokenSeparator(res.typst, combChain.typst)) addSpaceToTypstData(res);
+      res = addToTypstData(res, { typst: combChain.typst });
+      i = combChain.nextIndex - 1;
+      continue;
+    }
+    res = addToTypstData(res, serialize.visitNode(children[i], ''));
   }
   return res;
 };
