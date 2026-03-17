@@ -216,15 +216,20 @@ export const replaceUnpairedBrackets = (expr: string): string => {
   return result;
 };
 
-// Nodes whose Typst handlers wrap children in function calls (sqrt(), frac(),
+// Nodes whose Typst handlers wrap ALL children in function calls (sqrt(), frac(),
 // cancel(), overline(), underline(), hat(), etc.).  Brackets inside these nodes
 // cannot pair with brackets outside — each child is processed as a separate scope.
-// N.B. msub/msup/msubsup are NOT boundaries: LaTeX (a+b)^2 creates
-// msup(mo(")"), mn(2)) where ) is the base — splitting would orphan (.
-// mover/munder ARE boundaries: their accent handlers wrap content in function
-// calls, so \overline(x) needs ( and ) escaped independently.
 const SCOPE_BOUNDARIES = new Set([
   'msqrt', 'mroot', 'mfrac', 'menclose', 'mover', 'munder',
+]);
+
+// Nodes where the base (child[0]) stays in the parent scope but script children
+// (sub/sup) are separate scopes.  The base of msub/msup is in the same visual
+// scope as surrounding content (e.g. (a+b)^2 → ) is the base of msup and must
+// pair with ( outside).  But script children are wrapped in ^(…) / _(…), so
+// brackets inside scripts cannot pair with brackets outside.
+const SCRIPT_SCOPE_KINDS = new Set([
+  'msub', 'msup', 'msubsup',
 ]);
 
 export const markUnpairedBrackets = (root: MathNode): void => {
@@ -254,9 +259,15 @@ export const markUnpairedBrackets = (root: MathNode): void => {
     for (const child of (node.childNodes ?? [])) {
       if (SCOPE_BOUNDARIES.has(child.kind)) {
         // Each child of the scope boundary is a separate scope
-        // (e.g. frac numerator vs denominator, base vs sub/superscript)
         for (const grandchild of (child.childNodes ?? [])) {
           markUnpairedBrackets(grandchild);
+        }
+      } else if (SCRIPT_SCOPE_KINDS.has(child.kind)) {
+        // Base (child[0]) stays in parent scope; script children are separate
+        const kids = child.childNodes ?? [];
+        if (kids[0]) walk(kids[0]);
+        for (let k = 1; k < kids.length; k++) {
+          markUnpairedBrackets(kids[k]);
         }
       } else {
         walk(child);

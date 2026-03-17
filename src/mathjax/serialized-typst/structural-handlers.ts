@@ -347,12 +347,16 @@ export const menclose: HandlerFn = (node, serialize) => {
     // \boxed → #box with stroke
     res = addToTypstData(res, { typst: `#align(center, box(stroke: 0.5pt, inset: 3pt, $${content}$))`, typst_inline: content });
   } else if (notation.includes('updiagonalstrike') || notation.includes('downdiagonalstrike')) {
-    // \cancel uses updiagonalstrike (lower-left to upper-right) → Typst cancel() default
-    // \bcancel uses downdiagonalstrike (upper-left to lower-right) → Typst cancel(inverted: true)
-    if (notation.includes('downdiagonalstrike') && !notation.includes('updiagonalstrike')) {
-      res = addToTypstData(res, { typst: `cancel(inverted: #true, ${escapeContentSeparators(escapeUnbalancedParens(content))})` });
+    // \cancel uses updiagonalstrike → Typst cancel() default
+    // \bcancel uses downdiagonalstrike → Typst cancel(inverted: #true)
+    // \xcancel uses both → Typst cancel(cross: #true)
+    const escaped = escapeContentSeparators(escapeUnbalancedParens(content));
+    if (notation.includes('updiagonalstrike') && notation.includes('downdiagonalstrike')) {
+      res = addToTypstData(res, { typst: `cancel(cross: #true, ${escaped})` });
+    } else if (notation.includes('downdiagonalstrike')) {
+      res = addToTypstData(res, { typst: `cancel(inverted: #true, ${escaped})` });
     } else {
-      res = addToTypstData(res, { typst: `cancel(${escapeContentSeparators(escapeUnbalancedParens(content))})` });
+      res = addToTypstData(res, { typst: `cancel(${escaped})` });
     }
   } else if (notation.includes('horizontalstrike')) {
     res = addToTypstData(res, { typst: `cancel(${escapeContentSeparators(escapeUnbalancedParens(content))})` });

@@ -1214,6 +1214,24 @@ module.exports = [
     typst: `cancel(x)`,
     typst_inline: `cancel(x)`,
   },
+  // \xcancel → cancel(cross: #true, ...)
+  {
+    latex: String.raw`\xcancel{5y}`,
+    typst: `cancel(cross: #true, 5 y)`,
+    typst_inline: `cancel(cross: #true, 5 y)`,
+  },
+  // \cancelto with unbalanced parens: ( in script, ) outside — both escaped
+  {
+    latex: String.raw`\cancelto{5(y}x)`,
+    typst: `cancel(x)^(5 \\( y)\\)`,
+    typst_inline: `cancel(x)^(5 \\( y)\\)`,
+  },
+  // \xcancel with unbalanced parens inside menclose
+  {
+    latex: String.raw`\xcancel{5(y})`,
+    typst: `cancel(cross: #true, 5 \\( y)\\)`,
+    typst_inline: `cancel(cross: #true, 5 \\( y)\\)`,
+  },
   {
     latex: `\\text{if } x > 0`,
     typst: `"if " x > 0`,

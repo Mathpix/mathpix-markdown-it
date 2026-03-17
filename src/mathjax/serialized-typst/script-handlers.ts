@@ -19,6 +19,10 @@ const PRIME_SHORTHANDS: ReadonlyMap<string, string> = new Map([
   ['prime.triple', "'''"],
 ]);
 
+/** formatScript with unbalanced-paren escaping for ^(…) / _(…) grouping. */
+const safeFormatScript = (prefix: '_' | '^', content: string): string =>
+  formatScript(prefix, escapeUnbalancedParens(content));
+
 // Regex to detect overbrace/overbracket/underbrace/underbracket as outermost call
 const BRACE_ANNOTATION_RE = /^(overbrace|overbracket|underbrace|underbracket)\(([\s\S]+?)\)$/;
 const RE_SPECIAL_FN_CALL = /^(overbrace|underbrace|overbracket|underbracket|op)\(/;
@@ -214,7 +218,7 @@ export const msup: HandlerFn = (node, serialize) => {
     if (primeShorthand) {
       res = addToTypstData(res, { typst: primeShorthand });
     } else {
-      res = addToTypstData(res, { typst: formatScript('^', sup) });
+      res = addToTypstData(res, { typst: safeFormatScript('^', sup) });
     }
   }
   return res;
@@ -246,7 +250,7 @@ export const msub: HandlerFn = (node, serialize) => {
   }
   // Skip empty subscript (e.g. LaTeX m_{} → just "m")
   if (sub) {
-    res = addToTypstData(res, { typst: formatScript('_', sub) });
+    res = addToTypstData(res, { typst: safeFormatScript('_', sub) });
   }
   return res;
 };
@@ -275,10 +279,10 @@ export const msubsup: HandlerFn = (node, serialize) => {
   }
   // Skip empty subscript/superscript (e.g. LaTeX m_{}^{x} → just "m^x")
   if (sub) {
-    res = addToTypstData(res, { typst: formatScript('_', sub) });
+    res = addToTypstData(res, { typst: safeFormatScript('_', sub) });
   }
   if (sup) {
-    res = addToTypstData(res, { typst: formatScript('^', sup) });
+    res = addToTypstData(res, { typst: safeFormatScript('^', sup) });
   }
   return res;
 };
@@ -343,7 +347,7 @@ export const mover: HandlerFn = (node, serialize) => {
     if (braceRes) { res = addToTypstData(res, braceRes); return res; }
     const baseData = buildLimitBase(firstChild, rawBase, dataFirst.typst);
     res = addToTypstData(res, baseData);
-    res = addToTypstData(res, { typst: formatScript('^', over) });
+    res = addToTypstData(res, { typst: safeFormatScript('^', over) });
   } else {
     res = addToTypstData(res, { typst: typstPlaceholder(rawBase) });
   }
@@ -403,7 +407,7 @@ export const munder: HandlerFn = (node, serialize) => {
     if (braceRes) { res = addToTypstData(res, braceRes); return res; }
     const baseData = buildLimitBase(firstChild, rawBase, dataFirst.typst);
     res = addToTypstData(res, baseData);
-    res = addToTypstData(res, { typst: formatScript('_', under) });
+    res = addToTypstData(res, { typst: safeFormatScript('_', under) });
   } else {
     res = addToTypstData(res, { typst: typstPlaceholder(rawBase) });
   }
@@ -425,10 +429,10 @@ export const munderover: HandlerFn = (node, serialize) => {
   const baseData = buildLimitBase(firstChild, rawBase, dataFirst.typst);
   res = addToTypstData(res, baseData);
   if (under) {
-    res = addToTypstData(res, { typst: formatScript('_', under) });
+    res = addToTypstData(res, { typst: safeFormatScript('_', under) });
   }
   if (over) {
-    res = addToTypstData(res, { typst: formatScript('^', over) });
+    res = addToTypstData(res, { typst: safeFormatScript('^', over) });
   }
   return res;
 };
@@ -491,10 +495,10 @@ export const mmultiscripts: HandlerFn = (node, serialize) => {
     // No prescripts — use simple base_sub^sup syntax
     res = addToTypstData(res, { typst: baseTrimmed });
     if (lastPostSub) {
-      res = addToTypstData(res, { typst: formatScript('_', lastPostSub) });
+      res = addToTypstData(res, { typst: safeFormatScript('_', lastPostSub) });
     }
     if (lastPostSup) {
-      res = addToTypstData(res, { typst: formatScript('^', lastPostSup) });
+      res = addToTypstData(res, { typst: safeFormatScript('^', lastPostSup) });
     }
   } else {
     // Has prescripts — use attach(base, tl:, bl:, tr:, br:)
