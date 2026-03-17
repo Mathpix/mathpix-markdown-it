@@ -2916,4 +2916,23 @@ x=4
     typst: `partial psi`,
     typst_inline: `partial psi`,
   },
+  // === \underset / \overset: limits() placement ===
+  // \underset with underline base — limits() forces below placement
+  {
+    latex: String.raw`\underset{2 \mathrm{~m} / \mathrm{s}}{\underline{2}}`,
+    typst: `limits(underline(2))_(2 upright(m)\\/ upright(s))`,
+    typst_inline: `limits(underline(2))_(2 upright(m)\\/ upright(s))`,
+  },
+  // \overset with = base — limits() forces above placement
+  {
+    latex: String.raw`\overset{\text{def}}{=}`,
+    typst: `limits(=)^("def")`,
+    typst_inline: `limits(=)^("def")`,
+  },
+  // \overset with overbrace base — no extra limits(), overbrace handles placement
+  {
+    latex: String.raw`\overset{n}{\overbrace{a+b}}`,
+    typst: `overbrace(a + b, n)`,
+    typst_inline: `overbrace(a + b, n)`,
+  },
 ];

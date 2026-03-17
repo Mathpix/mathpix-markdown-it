@@ -21,7 +21,7 @@ const PRIME_SHORTHANDS: ReadonlyMap<string, string> = new Map([
 
 // Regex to detect overbrace/overbracket/underbrace/underbracket as outermost call
 const BRACE_ANNOTATION_RE = /^(overbrace|overbracket|underbrace|underbracket)\(([\s\S]+?)\)$/;
-const RE_SPECIAL_FN_CALL = /^(overbrace|underbrace|overline|underline|op)\(/;
+const RE_SPECIAL_FN_CALL = /^(overbrace|underbrace|overbracket|underbracket|op)\(/;
 
 // Operators that Typst places below/above in display mode by default.
 // Used to detect \nolimits (when these appear in msubsup/msub/msup instead of munderover).
@@ -126,7 +126,7 @@ const isNativeDisplayLimitOp = (baseTrimmed: string): boolean =>
   TYPST_DISPLAY_LIMIT_OPS.has(baseTrimmed);
 
 /** Check if baseTrimmed starts with a special function call
- *  (overbrace, underbrace, overline, underline, op). */
+ *  (overbrace, underbrace, overbracket, underbracket, op). */
 const isSpecialFnCall = (baseTrimmed: string): boolean =>
   RE_SPECIAL_FN_CALL.test(baseTrimmed);
 
