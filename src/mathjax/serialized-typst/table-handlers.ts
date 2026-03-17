@@ -518,7 +518,7 @@ const buildMatrix = (
   const matExpr = buildMatExpr(rows);
   const matExprInline = rowsInline ? buildMatExpr(rowsInline) : undefined;
   if (frame === 'solid') {
-    res = addToTypstData(res, { typst: `#box(stroke: 0.5pt, inset: 3pt, $ ${matExpr} $)`, typst_inline: matExprInline ?? matExpr });
+    res = addToTypstData(res, { typst: `#align(center, box(stroke: 0.5pt, inset: 3pt, $ ${matExpr} $))`, typst_inline: matExprInline ?? matExpr });
   } else {
     res = addToTypstData(res, { typst: matExpr, ...(matExprInline ? { typst_inline: matExprInline } : {}) });
   }

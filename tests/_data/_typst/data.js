@@ -1355,7 +1355,7 @@ module.exports = [
   // === Boxed ===
   {
     latex: `\\boxed{x=1}`,
-    typst: `#box(stroke: 0.5pt, inset: 3pt, $x = 1$)`,
+    typst: `#align(center, box(stroke: 0.5pt, inset: 3pt, $x = 1$))`,
     typst_inline: `x = 1`,
   },
 
@@ -1658,7 +1658,7 @@ module.exports = [
   // === Array lines (augment) ===
   {
     latex: `\\begin{array}{|c|c|} \\hline a & b \\\\ \\hline c & d \\\\ \\hline \\end{array}`,
-    typst: `#box(stroke: 0.5pt, inset: 3pt, $ mat(delim: #none, augment: #(hline: 1, vline: 1), \n  a, b;\n  c, d,\n) $)`,
+    typst: `#align(center, box(stroke: 0.5pt, inset: 3pt, $ mat(delim: #none, augment: #(hline: 1, vline: 1), \n  a, b;\n  c, d,\n) $))`,
     typst_inline: `mat(delim: #none, augment: #(hline: 1, vline: 1), \n  a, b;\n  c, d,\n)`,
   },
   {
@@ -2206,7 +2206,7 @@ module.exports = [
   // === enclose{circle} ===
   {
     latex: `\\enclose{circle}{x+y}`,
-    typst: `#circle(inset: 3pt, $x + y$)`,
+    typst: `#align(center, circle(inset: 3pt, $x + y$))`,
     typst_inline: `x + y`,
   },
   {
@@ -2969,4 +2969,17 @@ x=4
   { latex: String.raw`x \lessapprox y`, typst: `x lt.approx y`, typst_inline: `x lt.approx y` },
   // \gtrapprox → gt.approx
   { latex: String.raw`x \gtrapprox y`, typst: `x gt.approx y`, typst_inline: `x gt.approx y` },
+  // === #align(center, box()) for block mode ===
+  // \boxed with aligned content — block uses #align(center, box()), inline strips box
+  {
+    latex: String.raw`\boxed{\begin{aligned} x &= 1 \\ y &= 2 \end{aligned}}`,
+    typst: `#align(center, box(stroke: 0.5pt, inset: 3pt, $x &= 1 \\\ny &= 2$))`,
+    typst_inline: `x &= 1 \\\ny &= 2`,
+  },
+  // array with \hline frame → #align(center, box()) in block, plain mat() inline
+  {
+    latex: String.raw`\begin{array}{|l|}\hline O_{\text {driehoek }}=\frac{1}{2} b h \\O_{\text {parallellogram }}=b h \\O_{\text {trapezium }}=\frac{1}{2}(a+b) h \\O_{\text {cirkel }}=\pi r^{2} \\\hline\end{array}`,
+    typst: `#align(center, box(stroke: 0.5pt, inset: 3pt, $ mat(delim: #none, align: #left, \n  O_("driehoek ") = frac(1, 2) b h;\n  O_("parallellogram ") = b h;\n  O_("trapezium ") = frac(1, 2)(a + b) h;\n  O_("cirkel ") = pi r^2,\n) $))`,
+    typst_inline: `mat(delim: #none, align: #left, \n  O_("driehoek ") = frac(1, 2) b h;\n  O_("parallellogram ") = b h;\n  O_("trapezium ") = frac(1, 2)(a + b) h;\n  O_("cirkel ") = pi r^2,\n)`,
+  },
 ];

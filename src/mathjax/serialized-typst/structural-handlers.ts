@@ -345,7 +345,7 @@ export const menclose: HandlerFn = (node, serialize) => {
   const content = typstPlaceholder(data.typst.trim());
   if (notation.includes('box')) {
     // \boxed → #box with stroke
-    res = addToTypstData(res, { typst: `#box(stroke: 0.5pt, inset: 3pt, $${content}$)`, typst_inline: content });
+    res = addToTypstData(res, { typst: `#align(center, box(stroke: 0.5pt, inset: 3pt, $${content}$))`, typst_inline: content });
   } else if (notation.includes('updiagonalstrike') || notation.includes('downdiagonalstrike')) {
     // \cancel uses updiagonalstrike (lower-left to upper-right) → Typst cancel() default
     // \bcancel uses downdiagonalstrike (upper-left to lower-right) → Typst cancel(inverted: true)
@@ -361,7 +361,7 @@ export const menclose: HandlerFn = (node, serialize) => {
     res = addToTypstData(res, { typst: `overline(")"${escapeContentSeparators(escapeUnbalancedParens(content))})` });
   } else if (notation.includes('circle')) {
     // \enclose{circle} → #circle with inset
-    res = addToTypstData(res, { typst: `#circle(inset: 3pt, $${content}$)`, typst_inline: content });
+    res = addToTypstData(res, { typst: `#align(center, circle(inset: 3pt, $${content}$))`, typst_inline: content });
   } else if (notation.includes('radical')) {
     // \enclose{radical} → sqrt()
     res = addToTypstData(res, { typst: `sqrt(${escapeContentSeparators(escapeUnbalancedParens(content))})` });
