@@ -16,7 +16,7 @@ import {
 } from "./common";
 import {
   escapeContentSeparators, hasTopLevelSeparators,
-  escapeLrSemicolons, escapeUnbalancedParens,
+  escapeLrSemicolons, escapeLrBrackets, escapeUnbalancedParens,
 } from "./escape-utils";
 import { mapDelimiter, escapeLrDelimiter } from "./bracket-utils";
 
@@ -149,37 +149,49 @@ export const mrow: HandlerFn = (node, serialize) => {
     const hasVisibleOpen = !!open;
     const hasVisibleClose = !!close;
     // Build lr() expression from content string
+    // Collect which ASCII bracket chars match the lr() delimiters —
+    // only these need escaping inside lr() to prevent auto-scaling.
+    const lrBracketChars = new Set<string>();
+    for (const d of [openDelim, closeDelim]) {
+      if (d && (d in OPEN_BRACKETS || d in CLOSE_BRACKETS)) {
+        lrBracketChars.add(d);
+        const peer = OPEN_BRACKETS[d] ?? CLOSE_BRACKETS[d];
+        if (peer) lrBracketChars.add(peer);
+      }
+    }
+    const escBr = (s: string): string =>
+      lrBracketChars.size > 0 ? escapeLrBrackets(s, lrBracketChars) : s;
     const buildLrExpr = (cnt: string): string => {
       if (hasVisibleOpen && hasVisibleClose) {
         const trimmed = cnt.trim();
         const hasSep = hasTopLevelSeparators(trimmed);
         if (openDelim === '|' && closeDelim === '|') {
-          const escaped = escapeLrSemicolons(trimmed);
+          const escaped = escapeLrSemicolons(escBr(trimmed));
           return hasSep ? `lr(| ${escaped} |)` : `abs(${escapeContentSeparators(trimmed)})`;
         } else if (openDelim === DOUBLE_VERT && closeDelim === DOUBLE_VERT) {
-          const escaped = escapeLrSemicolons(trimmed);
+          const escaped = escapeLrSemicolons(escBr(trimmed));
           return hasSep ? `lr(‖ ${escaped} ‖)` : `norm(${escapeContentSeparators(trimmed)})`;
         } else if (openDelim === LEFT_FLOOR && closeDelim === RIGHT_FLOOR) {
-          const escaped = escapeLrSemicolons(trimmed);
+          const escaped = escapeLrSemicolons(escBr(trimmed));
           return hasSep ? `lr(⌊ ${escaped} ⌋)` : `floor(${escapeContentSeparators(trimmed)})`;
         } else if (openDelim === LEFT_CEIL && closeDelim === RIGHT_CEIL) {
-          const escaped = escapeLrSemicolons(trimmed);
+          const escaped = escapeLrSemicolons(escBr(trimmed));
           return hasSep ? `lr(⌈ ${escaped} ⌉)` : `ceil(${escapeContentSeparators(trimmed)})`;
         } else {
           const escapedOpen = (openDelim in OPEN_BRACKETS && OPEN_BRACKETS[openDelim] !== closeDelim)
             ? '\\' + openDelim : open;
           const escapedClose = (closeDelim in CLOSE_BRACKETS && CLOSE_BRACKETS[closeDelim] !== openDelim)
             ? '\\' + closeDelim : close;
-          return `lr(${escapedOpen} ${escapeLrSemicolons(trimmed)} ${escapedClose})`;
+          return `lr(${escapedOpen} ${escapeLrSemicolons(escBr(trimmed))} ${escapedClose})`;
         }
       } else {
         const trimmed = cnt.trim();
         const openEsc = openDelim ? escapeLrDelimiter(openDelim) : '';
         const closeEsc = closeDelim ? escapeLrDelimiter(closeDelim) : '';
         if (openEsc) {
-          return `lr(${openEsc} ${escapeLrSemicolons(trimmed)})`;
+          return `lr(${openEsc} ${escapeLrSemicolons(escBr(trimmed))})`;
         } else if (closeEsc) {
-          return `lr(${escapeLrSemicolons(trimmed)} ${closeEsc})`;
+          return `lr(${escapeLrSemicolons(escBr(trimmed))} ${closeEsc})`;
         } else {
           return trimmed;
         }

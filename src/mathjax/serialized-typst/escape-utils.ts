@@ -5,7 +5,7 @@
  * and backslash-escaped characters, applies escape/detection at depth 0.
  */
 
-import { RE_WORD_CHAR } from "./consts";
+import { RE_WORD_CHAR, RE_BRACKET_CHARS } from "./consts";
 import { scanBracketTokens, findUnpairedIndices, replaceUnpairedBrackets } from "./bracket-utils";
 
 const SEPARATOR_FOUND = 'found';
@@ -173,6 +173,33 @@ export const hasTopLevelSeparators = (expr: string): boolean =>
  *  Commas are safe in lr.  Skips content inside "..." strings and backslash-escaped chars. */
 export const escapeLrSemicolons = (expr: string): string =>
   scanExpression(expr, { escapeSemicolon: true, escapeColon: true });
+
+/** Escape inner bracket characters inside lr() content so Typst doesn't auto-scale them.
+ *  lr() auto-scales ALL unescaped delimiters inside it, but \left...\right only scales
+ *  its own pair.  `chars` specifies which bracket characters to escape (defaults to all).
+ *  Reuses scanBracketTokens which skips syntax parens (function calls, subscript/
+ *  superscript grouping), quoted strings, and already-escaped chars. */
+export const escapeLrBrackets = (expr: string, chars?: ReadonlySet<string>): string => {
+  if (!RE_BRACKET_CHARS.test(expr)) return expr;
+  const brackets = scanBracketTokens(expr);
+  if (brackets.length === 0) return expr;
+  const positions = new Set<number>();
+  for (const b of brackets) {
+    if (!chars || chars.has(b.char)) {
+      positions.add(b.pos);
+    }
+  }
+  if (positions.size === 0) return expr;
+  let result = '';
+  for (let i = 0; i < expr.length; i++) {
+    if (positions.has(i)) {
+      result += '\\' + expr[i];
+    } else {
+      result += expr[i];
+    }
+  }
+  return result;
+};
 
 /** Escape unbalanced closing parentheses at depth 0: ) → ")".
  *  Prevents premature closure of wrapping function calls. */

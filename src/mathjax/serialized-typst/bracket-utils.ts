@@ -102,20 +102,22 @@ export const serializePrefixBeforeMo = (node: MathNode, serialize: ITypstSeriali
 
 export type BracketToken = { char: string; pos: number };
 
-/** Check whether ( at position i is a function-call paren.
- *  True when preceded by an ASCII letter or by . preceded by an ASCII letter
- *  (e.g. sqrt(, arrow.r().  Only ASCII letters count — Typst function names
- *  are ASCII identifiers.  Unicode letters (л, α) are math variables, not calls.
+/** Check whether ( at position i is a syntactic paren (not a math delimiter).
+ *  True when preceded by:
+ *  - ASCII letter: function call — sqrt(, frac(
+ *  - dot + ASCII letter: method call — arrow.r(
+ *  - _ or ^: subscript/superscript grouping — _(x + y), ^(n)
+ *  Unicode letters (л, α) are math variables, not calls.
  *  Digits before ( are mathematical grouping (.4(), not a call. */
-const isFuncCallParen = (expr: string, i: number): boolean => {
+const isSyntaxParen = (expr: string, i: number): boolean => {
   const prev = expr[i - 1];
-  if (RE_ASCII_LETTER.test(prev)) return true;
-  if (prev === '.' && i > 1 && RE_ASCII_LETTER.test(expr[i - 2])) return true;
-  return false;
+  return RE_ASCII_LETTER.test(prev)
+    || (prev === '.' && i > 1 && RE_ASCII_LETTER.test(expr[i - 2]))
+    || prev === '_' || prev === '^';
 };
 
 /** Scan a Typst expression and collect bracket positions, skipping escaped chars,
- *  quoted strings, and function-call parens (preceded by a letter or dot-letter). */
+ *  quoted strings, and syntax parens (function calls, subscript/superscript grouping). */
 export const scanBracketTokens = (expr: string): BracketToken[] => {
   const brackets: BracketToken[] = [];
   for (let i = 0; i < expr.length; i++) {
@@ -123,10 +125,10 @@ export const scanBracketTokens = (expr: string): BracketToken[] => {
     if (ch === '\\') { i++; continue; }
     if (ch === '"') { i = skipQuotedString(expr, i); continue; }
     if (RE_BRACKET_CHARS.test(ch)) {
-      // Skip function-call parens: preceded by a letter (sqrt(), frac())
-      // or by . after a letter (arrow.r.long()).  Digits before ( are NOT
-      // function calls — .4( is mathematical grouping, not a call.
-      if (ch === '(' && i > 0 && isFuncCallParen(expr, i)) {
+      // Skip syntax parens: function calls (sqrt(), frac()), method calls
+      // (arrow.r()), and script grouping (_(), ^()).  Digits before ( are
+      // NOT syntax — .4( is mathematical grouping, not a call.
+      if (ch === '(' && i > 0 && isSyntaxParen(expr, i)) {
         const openPos = i;
         let depth = 1;
         i++;

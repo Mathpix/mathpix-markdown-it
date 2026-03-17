@@ -2264,8 +2264,8 @@ module.exports = [
   },
   {
     latex: `1 - \\sum _ { k = 0 } ^ { z } \\frac { \\lambda ^ { k } e ^ { - \\lambda } } { k ! } \\left( 1 - ( q / p ) ^ { ( z - k ) } \\right)`,
-    typst: `1 - sum_(k = 0)^z frac(lambda^k e^(- lambda), k!) lr(( 1 - (q\\/ p)^((z - k)) ))`,
-    typst_inline: `1 - sum_(k = 0)^z frac(lambda^k e^(- lambda), k!) lr(( 1 - (q\\/ p)^((z - k)) ))`,
+    typst: `1 - sum_(k = 0)^z frac(lambda^k e^(- lambda), k!) lr(( 1 - \\(q\\/ p\\)^((z - k)) ))`,
+    typst_inline: `1 - sum_(k = 0)^z frac(lambda^k e^(- lambda), k!) lr(( 1 - \\(q\\/ p\\)^((z - k)) ))`,
   },
   {
     latex: `(q/p)^{(z-k)}`,
@@ -2934,5 +2934,30 @@ x=4
     latex: String.raw`\overset{n}{\overbrace{a+b}}`,
     typst: `overbrace(a + b, n)`,
     typst_inline: `overbrace(a + b, n)`,
+  },
+  // === Inner bracket escaping inside lr() ===
+  // Inner [] inside \left[...\right] — escaped to prevent lr() auto-scaling
+  {
+    latex: String.raw`\left[ [\underset{\tilde{\mu}}{\hat{\sigma}}] \right]`,
+    typst: `lr([ \\[limits(hat(sigma))_(tilde(mu))\\] ])`,
+    typst_inline: `lr([ \\[limits(hat(sigma))_(tilde(mu))\\] ])`,
+  },
+  // Inner () inside \left(...\right) — escaped
+  {
+    latex: String.raw`\left( (a+b)^2 \right)`,
+    typst: `lr(( \\(a + b\\)^2 ))`,
+    typst_inline: `lr(( \\(a + b\\)^2 ))`,
+  },
+  // Inner {} inside \left\{...\right\} — escaped
+  {
+    latex: String.raw`\left\{ \{x\} \right\}`,
+    typst: `lr({ \\{x\\} })`,
+    typst_inline: `lr({ \\{x\\} })`,
+  },
+  // Full example: inner brackets + limits + overset
+  {
+    latex: String.raw`\frac{\partial^2}{\partial x \partial y} \left[ [\underset{\tilde{\mu}}{\hat{\sigma}}] \right] \gtrapprox \overset{\acute{\eta}}{\psi}`,
+    typst: `frac(partial^2, partial x partial y) lr([ \\[limits(hat(sigma))_(tilde(mu))\\] ]) ⪆ limits(psi)^(acute(eta))`,
+    typst_inline: `frac(partial^2, partial x partial y) lr([ \\[limits(hat(sigma))_(tilde(mu))\\] ]) ⪆ limits(psi)^(acute(eta))`,
   },
 ];
