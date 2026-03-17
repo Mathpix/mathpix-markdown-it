@@ -10,7 +10,7 @@ import {
   typstPlaceholder, formatScript,
 } from "./common";
 import { typstAccentMap } from "./typst-symbol-map";
-import { escapeContentSeparators } from "./escape-utils";
+import { escapeContentSeparators, escapeUnbalancedParens } from "./escape-utils";
 
 // Prime symbol → Typst ' shorthand mapping
 const PRIME_SHORTHANDS: ReadonlyMap<string, string> = new Map([
@@ -327,7 +327,7 @@ export const mover: HandlerFn = (node, serialize) => {
     const accentChar = getNodeText(secondChild);
     const accentFn = typstAccentMap.get(accentChar);
     if (accentFn) {
-      const content = typstPlaceholder(escapeContentSeparators(dataFirst.typst.trim()));
+      const content = typstPlaceholder(escapeContentSeparators(escapeUnbalancedParens(dataFirst.typst.trim())));
       if (TYPST_ACCENT_SHORTHANDS.has(accentFn)) {
         res = addToTypstData(res, { typst: `${accentFn}(${content})` });
       } else {
@@ -381,7 +381,7 @@ export const munder: HandlerFn = (node, serialize) => {
     if (accentFn === 'overline') { accentFn = 'underline'; }
     if (accentFn === 'overbrace') { accentFn = 'underbrace'; }
     if (accentFn) {
-      const content = typstPlaceholder(escapeContentSeparators(dataFirst.typst.trim()));
+      const content = typstPlaceholder(escapeContentSeparators(escapeUnbalancedParens(dataFirst.typst.trim())));
       // Arrows/harpoons have no under-variant in Typst — use attach(base, b: symbol)
       const underSymbol = MUNDER_ATTACH_SYMBOLS.get(accentFn);
       if (underSymbol) {

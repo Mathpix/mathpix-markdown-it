@@ -217,13 +217,14 @@ export const replaceUnpairedBrackets = (expr: string): string => {
 };
 
 // Nodes whose Typst handlers wrap children in function calls (sqrt(), frac(),
-// cancel(), etc.).  Brackets inside these nodes cannot pair with brackets
-// outside — each child is processed as a separate scope.
+// cancel(), overline(), underline(), hat(), etc.).  Brackets inside these nodes
+// cannot pair with brackets outside — each child is processed as a separate scope.
 // N.B. msub/msup/msubsup are NOT boundaries: LaTeX (a+b)^2 creates
 // msup(mo(")"), mn(2)) where ) is the base — splitting would orphan (.
-// mover/munder are also excluded: the base is often a single node.
+// mover/munder ARE boundaries: their accent handlers wrap content in function
+// calls, so \overline(x) needs ( and ) escaped independently.
 const SCOPE_BOUNDARIES = new Set([
-  'msqrt', 'mroot', 'mfrac', 'menclose',
+  'msqrt', 'mroot', 'mfrac', 'menclose', 'mover', 'munder',
 ]);
 
 export const markUnpairedBrackets = (root: MathNode): void => {

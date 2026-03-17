@@ -23,8 +23,6 @@ interface TransformOptions {
   escapeSemicolon?: boolean;
   /** Escape colons at depth 0: word: → word : (space prevents named-arg parsing) */
   escapeColon?: boolean;
-  /** Escape unbalanced closing parens at depth 0: ) → ")" (only parentheses, not ] or }) */
-  escapeUnbalancedCloseParen?: boolean;
 }
 
 type ScanOptions = DetectOptions | TransformOptions;
@@ -44,7 +42,6 @@ const scanExpression = (expr: string, opts: ScanOptions): string => {
   const escapeComma = !detectOnly && !!opts.escapeComma;
   const escapeSemicolon = !detectOnly && !!opts.escapeSemicolon;
   const escapeColon = !detectOnly && !!opts.escapeColon;
-  const escapeUnbalancedCloseParen = !detectOnly && !!opts.escapeUnbalancedCloseParen;
   // Separate depth counters per bracket type to avoid cross-type mismatches
   let parenDepth = 0;   // ()
   let bracketDepth = 0; // []
@@ -75,15 +72,6 @@ const scanExpression = (expr: string, opts: ScanOptions): string => {
     if (ch === '[') { bracketDepth++; if (!detectOnly) result += ch; continue; }
     if (ch === '{') { braceDepth++; if (!detectOnly) result += ch; continue; }
     if (ch === ')') {
-      if (escapeUnbalancedCloseParen) {
-        if (parenDepth > 0) {
-          parenDepth--;
-          result += ch;
-        } else {
-          result += '")"';
-        }
-        continue;
-      }
       if (parenDepth > 0) parenDepth--;
       if (!detectOnly) result += ch;
       continue;
@@ -201,8 +189,30 @@ export const escapeLrBrackets = (expr: string, chars?: ReadonlySet<string>): str
   return result;
 };
 
-/** Escape unbalanced closing parentheses at depth 0: ) → ")".
- *  Prevents premature closure of wrapping function calls. */
-export const escapeUnbalancedParens = (content: string): string =>
-  scanExpression(content, { escapeUnbalancedCloseParen: true });
+/** Escape unbalanced parentheses: ( → "(" and ) → ")".
+ *  Prevents lone parens from being parsed as Typst syntax (group open/close)
+ *  inside wrapping function calls like overline(), cancel(), etc.
+ *  Uses scanBracketTokens (which skips syntax parens, quoted strings,
+ *  and escaped chars) + findUnpairedIndices for reliable pairing. */
+export const escapeUnbalancedParens = (content: string): string => {
+  if (content.indexOf('(') === -1 && content.indexOf(')') === -1) return content;
+  const allBrackets = scanBracketTokens(content);
+  const parens = allBrackets.filter(b => b.char === '(' || b.char === ')');
+  if (parens.length === 0) return content;
+  const unpairedTokenIndices = findUnpairedIndices(parens.map(b => b.char));
+  if (unpairedTokenIndices.size === 0) return content;
+  const unpairedPositions = new Set<number>();
+  for (const idx of unpairedTokenIndices) {
+    unpairedPositions.add(parens[idx].pos);
+  }
+  let result = '';
+  for (let i = 0; i < content.length; i++) {
+    if (unpairedPositions.has(i)) {
+      result += '\\' + content[i];
+    } else {
+      result += content[i];
+    }
+  }
+  return result;
+};
 

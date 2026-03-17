@@ -2867,6 +2867,30 @@ x=4
     typst: `sqrt(\\() Upsilon^(acute(beta))\\)`,
     typst_inline: `sqrt(\\() Upsilon^(acute(beta))\\)`,
   },
+  // accent with unbalanced parens: \overline(x) → lone ( inside overline, ) outside
+  {
+    latex: String.raw`\overline(x)`,
+    typst: `overline(\\() x \\)`,
+    typst_inline: `overline(\\() x \\)`,
+  },
+  // accent with balanced parens: \overline{(x)} → paired, no escaping
+  {
+    latex: String.raw`\overline{(x)}`,
+    typst: `overline((x))`,
+    typst_inline: `overline((x))`,
+  },
+  // hat with unbalanced parens
+  {
+    latex: String.raw`\hat(x)`,
+    typst: `hat(\\() x \\)`,
+    typst_inline: `hat(\\() x \\)`,
+  },
+  // underline with unbalanced parens
+  {
+    latex: String.raw`\underline(x)`,
+    typst: `underline(\\() x \\)`,
+    typst_inline: `underline(\\() x \\)`,
+  },
   // msqrt with braces: both ( and ) inside msqrt — paired, no escaping
   {
     latex: String.raw`\sqrt{(\Upsilon^{\acute{\beta}})}`,

@@ -7,7 +7,7 @@ export type BracketToken = {
     pos: number;
 };
 /** Scan a Typst expression and collect bracket positions, skipping escaped chars,
- *  quoted strings, and function-call parens (preceded by a letter or dot-letter). */
+ *  quoted strings, and syntax parens (function calls, subscript/superscript grouping). */
 export declare const scanBracketTokens: (expr: string) => BracketToken[];
 /** Strict stack pairing: a closing bracket matches ONLY the corresponding open
  *  at the top of the stack. On mismatch the top stays in the stack and the

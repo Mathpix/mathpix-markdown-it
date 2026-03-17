@@ -25,6 +25,9 @@ export declare const escapeLrSemicolons: (expr: string) => string;
  *  Reuses scanBracketTokens which skips syntax parens (function calls, subscript/
  *  superscript grouping), quoted strings, and already-escaped chars. */
 export declare const escapeLrBrackets: (expr: string, chars?: ReadonlySet<string>) => string;
-/** Escape unbalanced closing parentheses at depth 0: ) → ")".
- *  Prevents premature closure of wrapping function calls. */
+/** Escape unbalanced parentheses: ( → "(" and ) → ")".
+ *  Prevents lone parens from being parsed as Typst syntax (group open/close)
+ *  inside wrapping function calls like overline(), cancel(), etc.
+ *  Uses scanBracketTokens (which skips syntax parens, quoted strings,
+ *  and escaped chars) + findUnpairedIndices for reliable pairing. */
 export declare const escapeUnbalancedParens: (content: string) => string;
