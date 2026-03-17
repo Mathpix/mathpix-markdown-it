@@ -252,7 +252,7 @@ const joinRows = (rows: string[], preContent: string): string =>
 /** eqnArray with tags → number-align / separate / no-tag strategies */
 const buildTaggedEqnArray = (
   node: MathNode, serialize: ITypstSerializer, inputRows: string[], countRow: number,
-  preContent: string, postContent: string
+  preContent: string, postContent: string, inputRowsInline?: string[]
 ): ITypstData => {
   let res: ITypstData = initTypstData();
   const rows = [...inputRows];
@@ -304,7 +304,9 @@ const buildTaggedEqnArray = (
     const eqn = `#math.equation(block: true${supplementPart}, numbering: n => [${info.tagContent}], number-align: ${numberAlign}, $ ${mathContent} $)`;
     const block = `${eqn}${labelSuffix(info.labelKey)}\n#counter(math.equation).update(n => n - 1)`;
     res = addToTypstData(res, { typst: block });
-    res.typst_inline = joinRows(rows, preContent);
+    res.typst_inline = inputRowsInline
+      ? joinRows([...inputRowsInline], preContent)
+      : joinRows(rows, preContent);
   } else if (totalTagged > 0) {
     // Strategy: separate — multiple tags or auto-numbered rows
     // Each row becomes a separate #math.equation block
@@ -335,17 +337,20 @@ const buildTaggedEqnArray = (
       }
     }
     res = addToTypstData(res, { typst: eqnBlocks.join('\n') });
-    res.typst_inline = rows.join(' \\\n');
+    res.typst_inline = inputRowsInline
+      ? inputRowsInline.join(' \\\n')
+      : rows.join(' \\\n');
   } else {
     // mlabeledtr nodes present but no actual tag content — treat as no-tag
-    return buildUntaggedEqnArray(rows, preContent, postContent);
+    return buildUntaggedEqnArray(rows, preContent, postContent, inputRowsInline);
   }
   return res;
 };
 
 /** eqnArray without tags → rows with \\ separators */
 const buildUntaggedEqnArray = (
-  inputRows: string[], preContent: string, postContent: string
+  inputRows: string[], preContent: string, postContent: string,
+  inputRowsInline?: string[]
 ): ITypstData => {
   let res: ITypstData = initTypstData();
   const rows = [...inputRows];
@@ -354,6 +359,13 @@ const buildUntaggedEqnArray = (
   }
   const content = joinRows(rows, preContent);
   res = addToTypstData(res, { typst: content });
+  if (inputRowsInline) {
+    const inlineRows = [...inputRowsInline];
+    if (postContent && inlineRows.length > 0) {
+      inlineRows[inlineRows.length - 1] += ` ${postContent}`;
+    }
+    res.typst_inline = joinRows(inlineRows, preContent);
+  }
   return res;
 };
 
@@ -381,6 +393,43 @@ const isInsideMatrixCell = (node: MathNode): boolean => {
         // Plain eqnArray — continue walking up to check if it is also nested
         current = outerTable.parent;
         continue;
+      }
+      return false;
+    }
+    current = current.parent;
+  }
+  return false;
+};
+
+/** Check if a node is inside an eqnArray cell with sibling content.
+ *  Returns true only when the node shares its nearest mtd cell with other
+ *  content (e.g. gathered + quad + equation in the same cell).  When the
+ *  gathered is the sole content of its cell, its \\ rows can safely merge
+ *  into the parent eqnArray and no mat() wrapping is needed. */
+const isInsideEqnArrayCellWithSiblings = (node: MathNode): boolean => {
+  let current = node.parent;
+  const MAX_DEPTH = 20;
+  for (let i = 0; i < MAX_DEPTH && current; i++) {
+    // Check inferred mrow of mtd — count siblings
+    if (current.isInferred && current.parent?.kind === 'mtd') {
+      const siblingCount = current.childNodes?.length ?? 0;
+      if (siblingCount <= 1) return false;  // sole content — no need to mat()-ify
+      const mtr = current.parent.parent;
+      const outerTable = mtr?.parent;
+      if (outerTable?.kind === 'mtable') {
+        const firstRow = outerTable.childNodes?.[0];
+        return firstRow?.attributes?.get('displaystyle') === true;
+      }
+      return false;
+    }
+    if (current.kind === 'mtd') {
+      const contentCount = current.childNodes?.length ?? 0;
+      if (contentCount <= 1) return false;  // sole content
+      const mtr = current.parent;
+      const outerTable = mtr?.parent;
+      if (outerTable?.kind === 'mtable') {
+        const firstRow = outerTable.childNodes?.[0];
+        return firstRow?.attributes?.get('displaystyle') === true;
       }
       return false;
     }
@@ -583,10 +632,19 @@ export const mtable: HandlerFn = (node, serialize) => {
   const isEqnArray = !isNumcases && !isCases && node.childNodes.length > 0
     && node.childNodes[0].attributes?.get('displaystyle') === true;
   const insideMatCell = isInsideMatrixCell(node);
+  // Detect gathered-like environments: single-column centered eqnArrays.
+  // MathJax doesn't propagate the envName for gathered, but it always has
+  // columnalign="center" and 1 cell per row. When nested inside another
+  // eqnArray, their \\ rows merge into the parent — must render as mat().
+  const columnAlign = String(node.attributes.get('columnalign') || '').trim();
+  const isGatheredLike = isEqnArray && columnAlign === 'center'
+    && node.childNodes.every((row: MathNode) => (row.childNodes?.length ?? 0) <= 1);
+  const insideEqnArrayCell = isGatheredLike && isInsideEqnArrayCellWithSiblings(node);
   // eqnArray that must be rendered as mat() instead of rows with \\ :
   // - Nested inside a mat()/cases() cell (Typst ignores \\ in cells)
   // - Has row/column lines that require mat(augment: ...) to preserve
-  const isNested = isEqnArray && insideMatCell;
+  // - gathered inside another eqnArray (detected by center + single-column)
+  const isNested = isEqnArray && (insideMatCell || insideEqnArrayCell);
   const eqnArrayAsMat = isNested || (isEqnArray && hasLines);
   if (isNumcases) {
     return buildNumcasesGrid(node, serialize, countRow);
@@ -622,14 +680,18 @@ export const mtable: HandlerFn = (node, serialize) => {
       // Within each column pair (right-left): &
       // Between column pairs: &quad for visual spacing.
       const pairs: string[] = [];
+      const pairsInline: string[] = [];
       for (let k = 0; k < cells.length; k += 2) {
         if (k + 1 < cells.length) {
           pairs.push(`${cells[k]} &${cells[k + 1]}`);
+          pairsInline.push(`${cellsInline[k]} &${cellsInline[k + 1]}`);
         } else {
           pairs.push(cells[k]);
+          pairsInline.push(cellsInline[k]);
         }
       }
       rows.push(pairs.join(' &quad '));
+      rowsInline.push(pairsInline.join(' &quad '));
     } else if (isCases) {
       // Cases: escape top-level commas in each cell to prevent them
       // being parsed as cases() argument separators, then join with &
@@ -642,8 +704,9 @@ export const mtable: HandlerFn = (node, serialize) => {
     }
   }
   if (eqnArrayAsMat) {
-    const isGathered = envName === 'gathered' || envName === 'gather' || envName === 'gather*';
     const maxCols = nestedRawRows.reduce((m, r) => Math.max(m, r.length), 0);
+    const isGathered = envName === 'gathered' || envName === 'gather' || envName === 'gather*'
+      || isGatheredLike;
     // Analyze column usage in rl-pairs to pick a single alignment.
     // Even columns (0, 2, ...) are right-aligned, odd are left.
     const hasEvenContent = nestedRawRows.some(r =>
@@ -670,10 +733,11 @@ export const mtable: HandlerFn = (node, serialize) => {
     );
     const preContent = String(getProp<string>(node, DATA_PRE_CONTENT) || '');
     const postContent = String(getProp<string>(node, DATA_POST_CONTENT) || '');
+    const inlineRows = hasInlineDiff ? rowsInline : undefined;
     if (hasAnyTag) {
-      return buildTaggedEqnArray(node, serialize, rows, countRow, preContent, postContent);
+      return buildTaggedEqnArray(node, serialize, rows, countRow, preContent, postContent, inlineRows);
     } else {
-      return buildUntaggedEqnArray(rows, preContent, postContent);
+      return buildUntaggedEqnArray(rows, preContent, postContent, inlineRows);
     }
   } else if (isCases) {
     // Cases environment

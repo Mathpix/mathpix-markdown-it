@@ -2832,6 +2832,12 @@ b_{3}
     typst: `2 l + m - n = 0, divides arrow(i) times arrow(s)\\) dot.op arrow(O M) lr(| = |) mat(delim: #none, \n  2, 2, 2;\n  1, 0, 0;\n  l, m, n,\n) bar.v.double x, lr(| arrow(i) times arrow(s) |) = norm(mat(delim: #none, \n  i, arrow(j), arrow(k);\n  1, 0, 0;\n  l, m, n,\n)) ", 故 " \\\nd = 2 = frac(divides arrow(i) times arrow(s)\\) dot.op arrow(O M) divides, |arrow(i) times arrow(s)|) = frac(2| - n + m|, sqrt(n^2 + m^2)) ", 即 " quad m dot.op n = 0`,
     typst_inline: `2 l + m - n = 0, divides arrow(i) times arrow(s)\\) dot.op arrow(O M) lr(| = |) mat(delim: #none, \n  2, 2, 2;\n  1, 0, 0;\n  l, m, n,\n) bar.v.double x, lr(| arrow(i) times arrow(s) |) = norm(mat(delim: #none, \n  i, arrow(j), arrow(k);\n  1, 0, 0;\n  l, m, n,\n)) ", 故 " \\\nd = 2 = frac(divides arrow(i) times arrow(s)\\) dot.op arrow(O M) divides, |arrow(i) times arrow(s)|) = frac(2| - n + m|, sqrt(n^2 + m^2)) ", 即 " quad m dot.op n = 0`,
   },
+  // gathered inside aligned inside align*: gathered should produce mat(delim:#none) with display() in typst, without display() in typst_inline
+  {
+    latex: String.raw`\begin{align*}\begin{aligned}& \begin{gathered}\text{求和起点数增大，}\\  \text{余项} r_{n}(x) \rightarrow 0\end{gathered} \quad f(x)-f(0)=\sum_{k=1}^{n} \frac{f^{(k)}(0)}{k !} x^{k}+r_{n}(x)\end{aligned}\end{align*}`,
+    typst: `&display(mat(delim: #none, \n  "求和起点数增大，";\n  "余项" r_n (x) arrow.r 0,\n)) quad f(x) - f(0) = sum_(k = 1)^n frac(f^((k))(0), k!) x^k + r_n (x)`,
+    typst_inline: `&mat(delim: #none, \n  "求和起点数增大，";\n  "余项" r_n (x) arrow.r 0,\n) quad f(x) - f(0) = sum_(k = 1)^n frac(f^((k))(0), k!) x^k + r_n (x)`,
+  },
   // Nested aligned inside array (mat cell): should use mat(delim:#none) with ; separators, not \\
   {
     latex: String.raw`\begin{array}{r|r}
