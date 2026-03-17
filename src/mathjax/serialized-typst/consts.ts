@@ -2,12 +2,12 @@
 export const RE_NBSP = /\u00A0/g;
 /** Content-mode special characters: * _ ` @ # < [ ] (must be escaped in Typst [...]) */
 export const RE_CONTENT_SPECIAL = /[*_`@#<\[\]]/g;
-/** Word char or dot at end of string */
-export const RE_WORD_DOT_END = /[\w.]$/;
-/** Word char or dot at start of string */
-export const RE_WORD_DOT_START = /^[\w.]/;
-/** Word char at start of string */
-export const RE_WORD_START = /^\w/;
+/** Word char (incl. Unicode letters) or dot at end of string */
+export const RE_WORD_DOT_END = /[\w\p{L}.]$/u;
+/** Word char (incl. Unicode letters) or dot at start of string */
+export const RE_WORD_DOT_START = /^[\w\p{L}.]/u;
+/** Word char (incl. Unicode letters) at start of string */
+export const RE_WORD_START = /^[\w\p{L}]/u;
 /** Detects op() wrapper prefix */
 export const RE_OP_WRAPPER = /^op\(/;
 /** Extracts \tag{...} content from mtext */
@@ -17,7 +17,13 @@ export const RE_TAG_STRIP = /\s*\\tag\{[^}]+\}/g;
 /** Any ASCII bracket character */
 export const RE_BRACKET_CHARS = /[\[\](){}]/;
 /** Single word character (for single-char tests) */
-export const RE_WORD_CHAR = /\w/;
+export const RE_WORD_CHAR = /[\w\p{L}]/u;
+/** ASCII letter (for function-call detection — Typst funcs are ASCII identifiers) */
+export const RE_ASCII_LETTER = /[a-zA-Z]/;
+/** Trailing whitespace */
+export const RE_TRAILING_WS = /\s$/;
+/** Leading whitespace */
+export const RE_LEADING_WS = /^\s/;
 /** Unicode thin/medium/narrow spaces and NBSP */
 export const RE_UNICODE_SPACES = /[\u2006\u2005\u2004\u2009\u200A\u00A0]/g;
 /** Trailing Typst spacing keywords */

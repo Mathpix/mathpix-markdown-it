@@ -996,6 +996,55 @@ module.exports = [
     typst_inline: `mat(delim: "|", \n  a, b;\n  c, d,\n)`,
   },
 
+  // Unpaired brackets across matrix rows: .4( in row 1, ) in row 2
+  {
+    latex: `\\begin{array}{r}\nw(.44+.6 i) \\approx .6(.522246+.167880 i)+.4(.498591 \\\\\n+.202666 i)=.512784+.181794 i\n\\end{array}`,
+    typst: `mat(delim: #none, align: #right, \n  w(.44 + .6 i) approx .6(.522246 + .167880 i) + .4 paren.l .498591;\n  + .202666 i paren.r = .512784 + .181794 i,\n)`,
+    typst_inline: `mat(delim: #none, align: #right, \n  w(.44 + .6 i) approx .6(.522246 + .167880 i) + .4 paren.l .498591;\n  + .202666 i paren.r = .512784 + .181794 i,\n)`,
+  },
+  // Unpaired k( across rows — letter before ( looks like function call but has no matching )
+  {
+    latex: `\\begin{array}{r}\na+k(.498591 \\\\\n+.202666 i)=b\n\\end{array}`,
+    typst: `mat(delim: #none, align: #right, \n  a + k paren.l .498591;\n  + .202666 i paren.r = b,\n)`,
+    typst_inline: `mat(delim: #none, align: #right, \n  a + k paren.l .498591;\n  + .202666 i paren.r = b,\n)`,
+  },
+  // Unpaired f( across rows — single-letter "function" without matching )
+  {
+    latex: `\\begin{array}{r}\nx+f(a+b \\\\\n+c)=d\n\\end{array}`,
+    typst: `mat(delim: #none, align: #right, \n  x + f paren.l a + b;\n  + c paren.r = d,\n)`,
+    typst_inline: `mat(delim: #none, align: #right, \n  x + f paren.l a + b;\n  + c paren.r = d,\n)`,
+  },
+  // Real sqrt() paired + unpaired g( across rows
+  {
+    latex: `\\begin{array}{r}\n\\sqrt{x}+g(y \\\\\n+z)=w\n\\end{array}`,
+    typst: `mat(delim: #none, align: #right, \n  sqrt(x) + g paren.l y;\n  + z paren.r = w,\n)`,
+    typst_inline: `mat(delim: #none, align: #right, \n  sqrt(x) + g paren.l y;\n  + z paren.r = w,\n)`,
+  },
+  // Unpaired [ and ] across rows
+  {
+    latex: `\\begin{array}{l}\na+[b \\\\\nc]+d\n\\end{array}`,
+    typst: `mat(delim: #none, align: #left, \n  a + bracket.l b;\n  c bracket.r + d,\n)`,
+    typst_inline: `mat(delim: #none, align: #left, \n  a + bracket.l b;\n  c bracket.r + d,\n)`,
+  },
+  // Unpaired \{ and \} across rows
+  {
+    latex: `\\begin{array}{l}\na+\\{b \\\\\nc\\}+d\n\\end{array}`,
+    typst: `mat(delim: #none, align: #left, \n  a + brace.l b;\n  c brace.r + d,\n)`,
+    typst_inline: `mat(delim: #none, align: #left, \n  a + brace.l b;\n  c brace.r + d,\n)`,
+  },
+  // Unpaired f( with [ inside across rows — backtrack catches inner brackets
+  {
+    latex: `\\begin{array}{l}\na+f([x \\\\\ny])+b\n\\end{array}`,
+    typst: `mat(delim: #none, align: #left, \n  a + f paren.l bracket.l x;\n  y bracket.r paren.r + b,\n)`,
+    typst_inline: `mat(delim: #none, align: #left, \n  a + f paren.l bracket.l x;\n  y bracket.r paren.r + b,\n)`,
+  },
+  // Unpaired g( with \{ inside across rows — backtrack catches inner braces
+  {
+    latex: `\\begin{array}{l}\na+g(\\{x \\\\\ny\\})+b\n\\end{array}`,
+    typst: `mat(delim: #none, align: #left, \n  a + g paren.l brace.l x;\n  y brace.r paren.r + b,\n)`,
+    typst_inline: `mat(delim: #none, align: #left, \n  a + g paren.l brace.l x;\n  y brace.r paren.r + b,\n)`,
+  },
+
   // === Cases ===
   {
     latex: `\\begin{cases} x & \\text{if } x > 0 \\\\ -x & \\text{otherwise} \\end{cases}`,

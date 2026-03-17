@@ -1,7 +1,7 @@
 import { TEXCLASS } from "mathjax-full/js/core/MmlTree/MmlNode";
 import { ITypstData, ITypstSerializer, MathNode } from "./types";
 import {
-  RE_BRACKET_CHARS, RE_WORD_CHAR, RE_WORD_DOT_END,
+  RE_BRACKET_CHARS, RE_ASCII_LETTER, RE_TRAILING_WS, RE_LEADING_WS,
   UNPAIRED_BRACKET_PROP, OPEN_BRACKETS, CLOSE_BRACKETS,
   DOUBLE_VERT, PARALLEL_SIGN,
 } from "./consts";
@@ -102,8 +102,20 @@ export const serializePrefixBeforeMo = (node: MathNode, serialize: ITypstSeriali
 
 export type BracketToken = { char: string; pos: number };
 
+/** Check whether ( at position i is a function-call paren.
+ *  True when preceded by an ASCII letter or by . preceded by an ASCII letter
+ *  (e.g. sqrt(, arrow.r().  Only ASCII letters count — Typst function names
+ *  are ASCII identifiers.  Unicode letters (л, α) are math variables, not calls.
+ *  Digits before ( are mathematical grouping (.4(), not a call. */
+const isFuncCallParen = (expr: string, i: number): boolean => {
+  const prev = expr[i - 1];
+  if (RE_ASCII_LETTER.test(prev)) return true;
+  if (prev === '.' && i > 1 && RE_ASCII_LETTER.test(expr[i - 2])) return true;
+  return false;
+};
+
 /** Scan a Typst expression and collect bracket positions, skipping escaped chars,
- *  quoted strings, and function-call parens (preceded by word char or dot). */
+ *  quoted strings, and function-call parens (preceded by a letter or dot-letter). */
 export const scanBracketTokens = (expr: string): BracketToken[] => {
   const brackets: BracketToken[] = [];
   for (let i = 0; i < expr.length; i++) {
@@ -111,8 +123,11 @@ export const scanBracketTokens = (expr: string): BracketToken[] => {
     if (ch === '\\') { i++; continue; }
     if (ch === '"') { i = skipQuotedString(expr, i); continue; }
     if (RE_BRACKET_CHARS.test(ch)) {
-      // Skip function-call parens (preceded by word char or .)
-      if (ch === '(' && i > 0 && RE_WORD_DOT_END.test(expr[i - 1])) {
+      // Skip function-call parens: preceded by a letter (sqrt(), frac())
+      // or by . after a letter (arrow.r.long()).  Digits before ( are NOT
+      // function calls — .4( is mathematical grouping, not a call.
+      if (ch === '(' && i > 0 && isFuncCallParen(expr, i)) {
+        const openPos = i;
         let depth = 1;
         i++;
         while (i < expr.length && depth > 0) {
@@ -121,6 +136,13 @@ export const scanBracketTokens = (expr: string): BracketToken[] => {
           else if (expr[i] === '(') depth++;
           else if (expr[i] === ')') depth--;
           if (depth > 0) i++;
+        }
+        // If no matching ) found, this is not a real function call —
+        // register the ( and backtrack so the for-loop re-scans the
+        // range from openPos+1, picking up any [, ], {, } inside.
+        if (depth > 0) {
+          brackets.push({ char: '(', pos: openPos });
+          i = openPos; // for-loop i++ → openPos+1
         }
         continue;
       }
@@ -176,11 +198,13 @@ export const replaceUnpairedBrackets = (expr: string): string => {
   for (let i = 0; i < expr.length; i++) {
     if (unmatchedPositions.has(i)) {
       const sym = BRACKET_SYMBOL_MAP[expr[i]];
-      if (result.length > 0 && RE_WORD_DOT_END.test(result[result.length - 1])) {
+      // Symbol names (paren.l, bracket.r, …) are Typst identifiers —
+      // they must be space-separated from any adjacent non-whitespace.
+      if (result.length > 0 && !RE_TRAILING_WS.test(result)) {
         result += ' ';
       }
       result += sym;
-      if (i + 1 < expr.length && RE_WORD_CHAR.test(expr[i + 1])) {
+      if (i + 1 < expr.length && !RE_LEADING_WS.test(expr[i + 1])) {
         result += ' ';
       }
     } else {

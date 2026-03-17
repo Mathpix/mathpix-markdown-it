@@ -2,11 +2,11 @@
 export declare const RE_NBSP: RegExp;
 /** Content-mode special characters: * _ ` @ # < [ ] (must be escaped in Typst [...]) */
 export declare const RE_CONTENT_SPECIAL: RegExp;
-/** Word char or dot at end of string */
+/** Word char (incl. Unicode letters) or dot at end of string */
 export declare const RE_WORD_DOT_END: RegExp;
-/** Word char or dot at start of string */
+/** Word char (incl. Unicode letters) or dot at start of string */
 export declare const RE_WORD_DOT_START: RegExp;
-/** Word char at start of string */
+/** Word char (incl. Unicode letters) at start of string */
 export declare const RE_WORD_START: RegExp;
 /** Detects op() wrapper prefix */
 export declare const RE_OP_WRAPPER: RegExp;
@@ -18,6 +18,12 @@ export declare const RE_TAG_STRIP: RegExp;
 export declare const RE_BRACKET_CHARS: RegExp;
 /** Single word character (for single-char tests) */
 export declare const RE_WORD_CHAR: RegExp;
+/** ASCII letter (for function-call detection — Typst funcs are ASCII identifiers) */
+export declare const RE_ASCII_LETTER: RegExp;
+/** Trailing whitespace */
+export declare const RE_TRAILING_WS: RegExp;
+/** Leading whitespace */
+export declare const RE_LEADING_WS: RegExp;
 /** Unicode thin/medium/narrow spaces and NBSP */
 export declare const RE_UNICODE_SPACES: RegExp;
 /** Trailing Typst spacing keywords */
