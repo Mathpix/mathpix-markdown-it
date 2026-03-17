@@ -64,6 +64,18 @@ const MUNDER_ATTACH_SYMBOLS: ReadonlyMap<string, string> = new Map([
   ['harpoon.lt', 'harpoon.lt'],// ↼ below
 ]);
 
+// Constructed long arrows: MathJax builds some long arrows from pieces
+// (e.g. \longrightleftharpoons → mover with harpoon.lb + dash base, dash + harpoon.rt over).
+// Detect from serialized base/over and collapse to a single Typst symbol.
+// Key: "base_stripped|over_stripped" where dashes and spaces are removed.
+const CONSTRUCTED_LONG_ARROWS: ReadonlyMap<string, string> = new Map([
+  ['harpoon.lb|harpoon.rt', 'harpoons.rtlb'],   // \longrightleftharpoons  ⇌
+  ['harpoon.rb|harpoon.lt', 'harpoons.ltrb'],   // \longleftrightharpoons  ⇋
+  ['arrow.l.long|arrow.r.long', 'arrows.lr'],   // \longleftrightarrows   ⇆
+]);
+
+const stripDashes = (s: string): string => s.replace(/[\s\-\u2212\u2013\u2014\u2015\u23AF\u2500]/g, '');
+
 // Typst accent shorthand functions that can be called as fn(content).
 // Accents NOT in this set must use the accent(content, symbol) form.
 const TYPST_ACCENT_SHORTHANDS: ReadonlySet<string> = new Set([
@@ -88,6 +100,21 @@ const matchBraceAnnotation = (
   const base = typstPlaceholder(escapeContentSeparators(m[2]));
   const ann = typstPlaceholder(escapeContentSeparators(annotation));
   return { typst: `${kind}(${base}, ${ann})` };
+};
+
+/** Unwrap TeXAtom/inferredMrow containers to find the actual script node inside.
+ *  Returns the inner node if it's a single-child wrapper, or the input node itself. */
+const unwrapToScriptNode = (node: MathNode | null): MathNode | null => {
+  let n = node;
+  for (let i = 0; i < SHALLOW_TREE_MAX_DEPTH && n; i++) {
+    if (n.kind === 'mover' || n.kind === 'munder' || n.kind === 'munderover') return n;
+    if ((n.kind === 'TeXAtom' || n.isInferred) && n.childNodes?.length === 1) {
+      n = n.childNodes[0];
+    } else {
+      break;
+    }
+  }
+  return n;
 };
 
 /** Get movablelimits attribute from a node (typically the base mo of munderover) */
@@ -344,9 +371,25 @@ export const mover: HandlerFn = (node, serialize) => {
   }
   const rawBase = dataFirst.typst.trim();
   const over = dataSecond.typst.trim();
+  // Detect constructed long arrows (e.g. \longrightleftharpoons)
+  if (over) {
+    const longArrow = CONSTRUCTED_LONG_ARROWS.get(`${stripDashes(rawBase)}|${stripDashes(over)}`);
+    if (longArrow) {
+      res = addToTypstData(res, { typst: longArrow });
+      return res;
+    }
+  }
   if (over) {
     const braceRes = matchBraceAnnotation(rawBase, over, ['overbrace', 'overbracket']);
     if (braceRes) { res = addToTypstData(res, braceRes); return res; }
+    // Flatten mover(munder(...), over): inner munder already has limits() + subscript.
+    // MathJax may wrap the inner node in TeXAtom/inferredMrow — unwrap to find the real kind.
+    const innerBase = unwrapToScriptNode(firstChild);
+    if (innerBase && (innerBase.kind === 'munder' || innerBase.kind === 'munderover')) {
+      res = addToTypstData(res, dataFirst);
+      res = addToTypstData(res, { typst: safeFormatScript('^', over) });
+      return res;
+    }
     const baseData = buildLimitBase(firstChild, rawBase, dataFirst.typst);
     res = addToTypstData(res, baseData);
     res = addToTypstData(res, { typst: safeFormatScript('^', over) });

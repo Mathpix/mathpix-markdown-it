@@ -2995,6 +2995,24 @@ x=4
     typst: `overbrace(a + b, n)`,
     typst_inline: `overbrace(a + b, n)`,
   },
+  // \longrightleftharpoons: constructed from pieces → collapsed to harpoons.rtlb
+  {
+    latex: String.raw`\longrightleftharpoons`,
+    typst: `harpoons.rtlb`,
+    typst_inline: `harpoons.rtlb`,
+  },
+  // \longleftrightarrows: constructed from pieces → collapsed to arrows.lr
+  {
+    latex: String.raw`\longleftrightarrows`,
+    typst: `arrows.lr`,
+    typst_inline: `arrows.lr`,
+  },
+  // \stackrel + \underset around \longrightleftharpoons: flattened to single limits()
+  {
+    latex: String.raw`A \stackrel{k_{1}}{\underset{k_{2}}{\longrightleftharpoons}} B`,
+    typst: `A limits(harpoons.rtlb)_(k_2)^(k_1) B`,
+    typst_inline: `A limits(harpoons.rtlb)_(k_2)^(k_1) B`,
+  },
   // === Inner bracket escaping inside lr() ===
   // Inner [] inside \left[...\right] — escaped to prevent lr() auto-scaling
   {
