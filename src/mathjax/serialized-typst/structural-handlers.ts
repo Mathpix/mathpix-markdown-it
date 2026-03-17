@@ -337,43 +337,83 @@ export const mphantom: HandlerFn = (node, serialize) => {
   return res;
 };
 
+/** Word-boundary safe check for space-separated menclose notation keywords.
+ *  Converts notation to a Set once, then lookups are O(1). */
+const parseNotation = (notation: string): Set<string> =>
+  new Set(notation.split(/\s+/).filter(Boolean));
+
+/** Check if a parsed notation set contains a keyword. */
+const hasNotation = (words: Set<string>, keyword: string): boolean =>
+  words.has(keyword);
+
+/** Border-side keywords recognised in menclose notation. */
+const BORDER_SIDES = ['top', 'bottom', 'left', 'right'] as const;
+
+/** Check if the notation contains at least two border-side keywords,
+ *  indicating a selective box stroke (e.g. "left right top" from \begin{array}{|l|}\hline).
+ *  Single-side notations ("top" only or "bottom" only) keep the existing
+ *  overline/underline path for non-table contexts. */
+const hasBorderNotation = (words: Set<string>): boolean => {
+  let count = 0;
+  for (const side of BORDER_SIDES) {
+    if (words.has(side)) count++;
+  }
+  return count >= 2;
+};
+
+/** Build Typst stroke dictionary entries from notation keywords.
+ *  E.g. {top, left, right} → "top: 0.5pt, bottom: 0pt, left: 0.5pt, right: 0.5pt" */
+const buildStrokeSides = (words: Set<string>): string =>
+  BORDER_SIDES.map(side =>
+    `${side}: ${words.has(side) ? '0.5pt' : '0pt'}`
+  ).join(', ');
+
 export const menclose: HandlerFn = (node, serialize) => {
   let res: ITypstData = initTypstData();
   const atr = getAttrs<EncloseAttrs>(node);
   const notation = atr.notation?.toString() || '';
+  const words = parseNotation(notation);
   const data: ITypstData = handleAll(node, serialize);
   const content = typstPlaceholder(data.typst.trim());
-  if (notation.includes('box')) {
+  if (hasNotation(words, 'box')) {
     // \boxed → #box with stroke
     res = addToTypstData(res, { typst: `#align(center, box(stroke: 0.5pt, inset: 3pt, $${content}$))`, typst_inline: content });
-  } else if (notation.includes('updiagonalstrike') || notation.includes('downdiagonalstrike')) {
+  } else if (hasNotation(words, 'updiagonalstrike') || hasNotation(words, 'downdiagonalstrike')) {
     // \cancel uses updiagonalstrike → Typst cancel() default
     // \bcancel uses downdiagonalstrike → Typst cancel(inverted: #true)
     // \xcancel uses both → Typst cancel(cross: #true)
     const escaped = escapeContentSeparators(escapeUnbalancedParens(content));
-    if (notation.includes('updiagonalstrike') && notation.includes('downdiagonalstrike')) {
+    if (hasNotation(words, 'updiagonalstrike') && hasNotation(words, 'downdiagonalstrike')) {
       res = addToTypstData(res, { typst: `cancel(cross: #true, ${escaped})` });
-    } else if (notation.includes('downdiagonalstrike')) {
+    } else if (hasNotation(words, 'downdiagonalstrike')) {
       res = addToTypstData(res, { typst: `cancel(inverted: #true, ${escaped})` });
     } else {
       res = addToTypstData(res, { typst: `cancel(${escaped})` });
     }
-  } else if (notation.includes('horizontalstrike')) {
+  } else if (hasNotation(words, 'horizontalstrike')) {
     res = addToTypstData(res, { typst: `cancel(${escapeContentSeparators(escapeUnbalancedParens(content))})` });
-  } else if (notation.includes('longdiv')) {
+  } else if (hasNotation(words, 'longdiv')) {
     // \longdiv / \enclose{longdiv} → overline(lr(\) content))
     // lr(\) ...) makes the ) delimiter stretch to match content height
     res = addToTypstData(res, { typst: `overline(lr(\\) ${escapeContentSeparators(escapeUnbalancedParens(content))}))` });
-  } else if (notation.includes('circle')) {
+  } else if (hasNotation(words, 'circle')) {
     // \enclose{circle} → #circle with inset
     res = addToTypstData(res, { typst: `#align(center, circle(inset: 3pt, $${content}$))`, typst_inline: content });
-  } else if (notation.includes('radical')) {
+  } else if (hasNotation(words, 'radical')) {
     // \enclose{radical} → sqrt()
     res = addToTypstData(res, { typst: `sqrt(${escapeContentSeparators(escapeUnbalancedParens(content))})` });
-  } else if (notation.includes('top')) {
+  } else if (hasBorderNotation(words)) {
+    // \begin{array}{|l|} \hline ... → menclose with notation="left right top" etc.
+    // Generate #box(stroke: (...)) with selective strokes for the specified sides.
+    const sides = buildStrokeSides(words);
+    res = addToTypstData(res, {
+      typst: `#align(center, box(stroke: (${sides}), inset: 3pt, $ ${content} $))`,
+      typst_inline: content,
+    });
+  } else if (hasNotation(words, 'top')) {
     // \enclose{top} → overline()
     res = addToTypstData(res, { typst: `overline(${escapeContentSeparators(escapeUnbalancedParens(content))})` });
-  } else if (notation.includes('bottom')) {
+  } else if (hasNotation(words, 'bottom')) {
     // \enclose{bottom} → underline()
     // Detect \smash{)} prefix (used in \lcm macro): strip leading ) or \), trailing spacing
     // lr(\) ...) makes the ) delimiter stretch to match content height

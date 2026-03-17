@@ -3060,4 +3060,28 @@ x=4
     typst: `#align(center, box(stroke: 0.5pt, inset: 3pt, $ mat(delim: #none, align: #left, \n  O_("driehoek ") = frac(1, 2) b h;\n  O_("parallellogram ") = b h;\n  O_("trapezium ") = frac(1, 2)(a + b) h;\n  O_("cirkel ") = pi r^2,\n) $))`,
     typst_inline: `mat(delim: #none, align: #left, \n  O_("driehoek ") = frac(1, 2) b h;\n  O_("parallellogram ") = b h;\n  O_("trapezium ") = frac(1, 2)(a + b) h;\n  O_("cirkel ") = pi r^2,\n)`,
   },
+  // array with {|l|} and \hline at top only → selective box stroke (no bottom)
+  {
+    latex: String.raw`\begin{array}{|l|} \hline \text { Le }^{[116]} \\ \text { glash }^{[117]} \end{array}`,
+    typst: `#align(center, box(stroke: (top: 0.5pt, bottom: 0pt, left: 0.5pt, right: 0.5pt), inset: 3pt, $ mat(delim: #none, align: #left, \n  " Le "^([116]);\n  " glash "^([117]),\n) $))`,
+    typst_inline: `mat(delim: #none, align: #left, \n  " Le "^([116]);\n  " glash "^([117]),\n)`,
+  },
+  // array with {|l|} and no hlines → box with left+right strokes only
+  {
+    latex: String.raw`\begin{array}{|l|} \text { Le }^{[116]} \\ \text { glash }^{[117]} \end{array}`,
+    typst: `#align(center, box(stroke: (top: 0pt, bottom: 0pt, left: 0.5pt, right: 0.5pt), inset: 3pt, $ mat(delim: #none, align: #left, \n  " Le "^([116]);\n  " glash "^([117]),\n) $))`,
+    typst_inline: `mat(delim: #none, align: #left, \n  " Le "^([116]);\n  " glash "^([117]),\n)`,
+  },
+  // array with {|l|} and \hline at bottom only → selective box stroke (no top)
+  {
+    latex: String.raw`\begin{array}{|l|} \text { Le }^{[116]} \\ \text { glash }^{[117]} \\ \hline \end{array}`,
+    typst: `#align(center, box(stroke: (top: 0pt, bottom: 0.5pt, left: 0.5pt, right: 0.5pt), inset: 3pt, $ mat(delim: #none, align: #left, \n  " Le "^([116]);\n  " glash "^([117]),\n) $))`,
+    typst_inline: `mat(delim: #none, align: #left, \n  " Le "^([116]);\n  " glash "^([117]),\n)`,
+  },
+  // array with more column-spec columns than actual data cells — vline indices must be capped
+  {
+    latex: String.raw`\begin{array}{|l|l|l|l|l|}\hline & & \\\hline\end{array}`,
+    typst: `#align(center, box(stroke: 0.5pt, inset: 3pt, $ mat(delim: #none, align: #left, augment: #(vline: (1, 2)), , , ) $))`,
+    typst_inline: `mat(delim: #none, align: #left, augment: #(vline: (1, 2)), , , )`,
+  },
 ];

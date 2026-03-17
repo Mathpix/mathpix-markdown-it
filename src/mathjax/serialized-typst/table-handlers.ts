@@ -389,7 +389,19 @@ const isInsideMatrixCell = (node: MathNode): boolean => {
   return false;
 };
 
-/** Compute Typst augment string from a node's rowlines/columnlines attributes. */
+/** Count the actual maximum number of columns across all rows (mtr/mtd children). */
+const getActualColumnCount = (node: MathNode): number => {
+  let maxCols = 0;
+  for (const row of node.childNodes ?? []) {
+    const cols = row.childNodes?.length ?? 0;
+    if (cols > maxCols) maxCols = cols;
+  }
+  return maxCols;
+};
+
+/** Compute Typst augment string from a node's rowlines/columnlines attributes.
+ *  Vline positions are capped at (actualColumns - 1) to avoid indices exceeding
+ *  the real column count (MathJax columnlines can be longer than the data). */
 const computeAugment = (node: MathNode): string => {
   const columnlines = node.attributes.isSet('columnlines')
     ? String(node.attributes.get('columnlines') || '').trim().split(/\s+/)
@@ -397,12 +409,17 @@ const computeAugment = (node: MathNode): string => {
   const rowlines = node.attributes.isSet('rowlines')
     ? String(node.attributes.get('rowlines') || '').trim().split(/\s+/)
     : [];
+  const actualCols = getActualColumnCount(node);
+  // vline positions are between columns: max valid index is actualCols - 1
+  const maxVline = actualCols > 0 ? actualCols - 1 : 0;
   const vlinePositions: number[] = [];
   let hasDashedLine = false;
   let hasSolidLine = false;
   for (let i = 0; i < columnlines.length; i++) {
     if (columnlines[i] === 'solid' || columnlines[i] === 'dashed') {
-      vlinePositions.push(i + 1);
+      const pos = i + 1;
+      if (pos > maxVline) continue;  // skip out-of-bounds vlines
+      vlinePositions.push(pos);
       if (columnlines[i] === 'dashed') hasDashedLine = true;
       else hasSolidLine = true;
     }
