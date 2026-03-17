@@ -2957,7 +2957,16 @@ x=4
   // Full example: inner brackets + limits + overset
   {
     latex: String.raw`\frac{\partial^2}{\partial x \partial y} \left[ [\underset{\tilde{\mu}}{\hat{\sigma}}] \right] \gtrapprox \overset{\acute{\eta}}{\psi}`,
-    typst: `frac(partial^2, partial x partial y) lr([ \\[limits(hat(sigma))_(tilde(mu))\\] ]) ⪆ limits(psi)^(acute(eta))`,
-    typst_inline: `frac(partial^2, partial x partial y) lr([ \\[limits(hat(sigma))_(tilde(mu))\\] ]) ⪆ limits(psi)^(acute(eta))`,
+    typst: `frac(partial^2, partial x partial y) lr([ \\[limits(hat(sigma))_(tilde(mu))\\] ]) gt.approx limits(psi)^(acute(eta))`,
+    typst_inline: `frac(partial^2, partial x partial y) lr([ \\[limits(hat(sigma))_(tilde(mu))\\] ]) gt.approx limits(psi)^(acute(eta))`,
   },
+  // === Missing symbol mappings ===
+  // \oiint → integral.surf
+  { latex: String.raw`\oiint_{\alpha}^{b} f`, typst: `integral.surf_(alpha)^b f`, typst_inline: `integral.surf_(alpha)^b f` },
+  // \oslash → slash.o
+  { latex: String.raw`a \oslash b`, typst: `a slash.o b`, typst_inline: `a slash.o b` },
+  // \lessapprox → lt.approx
+  { latex: String.raw`x \lessapprox y`, typst: `x lt.approx y`, typst_inline: `x lt.approx y` },
+  // \gtrapprox → gt.approx
+  { latex: String.raw`x \gtrapprox y`, typst: `x gt.approx y`, typst_inline: `x gt.approx y` },
 ];

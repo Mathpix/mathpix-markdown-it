@@ -58,6 +58,7 @@ const binaryOperators: ReadonlyArray<[string, string]> = [
   ["\u2295", "plus.o"],           // ⊕
   ["\u2296", "minus.o"],          // ⊖
   ["\u2297", "times.o"],          // ⊗
+  ["\u2298", "slash.o"],          // ⊘ (oslash)
   ["\u2299", "dot.o"],       // ⊙
   ["\u222A", "union"],            // ∪
   ["\u2229", "inter"],             // ∩
@@ -133,6 +134,8 @@ const relationOperators: ReadonlyArray<[string, string]> = [
   ["\u2249", "approx.not"],       // ≉ (\not\approx)
   ["\u2272", "lt.tilde"],         // ≲ (\lesssim)
   ["\u2273", "gt.tilde"],         // ≳ (\gtrsim)
+  ["\u2A85", "lt.approx"],        // ⪅ (\lessapprox)
+  ["\u2A86", "gt.approx"],        // ⪆ (\gtrapprox)
   ["\u2250", "≐"],               // ≐ (\doteq) — no named Typst symbol
   ["\u225C", "eq.delta"],         // ≜ (\triangleq)
   ["\u227C", "prec.eq"],          // ≼ (\preceq)
@@ -195,6 +198,7 @@ const largeOperators: ReadonlyArray<[string, string]> = [
   ["\u222C", "integral.double"],    // ∬
   ["\u222D", "integral.triple"],    // ∭
   ["\u222E", "integral.cont"],      // ∮
+  ["\u222F", "integral.surf"],      // ∯ (oiint — surface integral)
   ["\u22C3", "union.big"],          // ⋃
   ["\u22C2", "inter.big"],           // ⋂
   ["\u2A01", "plus.o.big"],         // ⨁
