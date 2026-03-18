@@ -185,7 +185,10 @@ module.exports = [
   { latex: `\\mho`, typst: `Omega.inv`, typst_inline: `Omega.inv` },
   { latex: `\\frown`, typst: `frown`, typst_inline: `frown` },
   { latex: `\\prime`, typst: `prime`, typst_inline: `prime` },
-  { latex: `\\bowtie`, typst: `⋈`, typst_inline: `⋈` },
+  { latex: `\\bowtie`, typst: `join`, typst_inline: `join` },
+  { latex: `\\backprime`, typst: `prime.rev`, typst_inline: `prime.rev` },
+  { latex: `\\backsimeq`, typst: `tilde.eq.rev`, typst_inline: `tilde.eq.rev` },
+  { latex: `\\Join`, typst: `join`, typst_inline: `join` },
   // Binary operators (new batch)
   { latex: `\\uplus`, typst: `union.plus`, typst_inline: `union.plus` },
   { latex: `\\dotplus`, typst: `plus.dot`, typst_inline: `plus.dot` },

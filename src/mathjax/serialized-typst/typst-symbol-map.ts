@@ -81,7 +81,7 @@ const binaryOperators: ReadonlyArray<[string, string]> = [
   ["\u22B5", "gt.tri.eq"],        // ⊵ (unrhd)
   ["\u2240", "wreath"],           // ≀ (wreath product)
   ["\u2A3F", "product.co"],       // ⨿ (amalg)
-  ["\u22C8", "⋈"],               // ⋈ (bowtie / Join) — no named Typst symbol
+  ["\u22C8", "join"],             // ⋈ (bowtie / Join)
   ["\u22C9", "times.l"],          // ⋉ (ltimes)
   ["\u22CA", "times.r"],          // ⋊ (rtimes)
   ["\u22A0", "times.square"],     // ⊠ (boxtimes)
@@ -180,6 +180,7 @@ const relationOperators: ReadonlyArray<[string, string]> = [
   ["\u2253", "eq.dots.up"],       // ≓ (\risingdotseq)
   ["\u2252", "eq.dots.down"],     // ≒ (\fallingdotseq)
   ["\u223D", "tilde.eq.rev"],     // ∽ (\backsim)
+  ["\u22CD", "tilde.eq.rev"],     // ⋍ (\backsimeq)
   ["\u22D0", "subset.double"],    // ⋐ (\Subset)
   ["\u22D1", "supset.double"],    // ⋑ (\Supset)
   ["\u22DE", "eq.prec"],          // ⋞ (\curlyeqprec)
@@ -345,6 +346,7 @@ const miscSymbols: ReadonlyArray<[string, string]> = [
   ["\u2032", "prime"],          // ′
   ["\u2033", "prime.double"],   // ″
   ["\u2034", "prime.triple"],   // ‴
+  ["\u2035", "prime.rev"],      // ‵ (backprime)
   ["\u2224", "divides.not"],    // ∤
   ["\u2135", "aleph"],           // ℵ
   ["\u210F", "planck"],         // ℏ
