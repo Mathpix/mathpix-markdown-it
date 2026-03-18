@@ -199,6 +199,9 @@ const largeOperators: ReadonlyArray<[string, string]> = [
   ["\u222D", "integral.triple"],    // ∭
   ["\u222E", "integral.cont"],      // ∮
   ["\u222F", "integral.surf"],      // ∯ (oiint — surface integral)
+  ["\u2230", "integral.vol"],       // ∰ (oiiint — volume integral)
+  ["\u2232", "integral.cont.cw"],   // ∲ (ointclockwise)
+  ["\u2233", "integral.cont.ccw"],  // ∳ (ointctrclockwise)
   ["\u22C3", "union.big"],          // ⋃
   ["\u22C2", "inter.big"],           // ⋂
   ["\u2A01", "plus.o.big"],         // ⨁
@@ -282,6 +285,8 @@ const miscSymbols: ReadonlyArray<[string, string]> = [
   ["\u266E", "natural"],        // ♮
   ["\u00F0", "ð"],               // ð — no named Typst symbol
   ["\u2127", "Omega.inv"],      // ℧ (mho)
+  ["\u212B", "angstrom"],       // Å (angstrom sign)
+  ["\u2AEB", "tack.t.double"],  // ⫫ (Perp — double up tack)
   ["\u2322", "frown"],          // ⌢
   ["\u00A0", "space.nobreak"],   // non-breaking space
   ["\u2061", ""],               // function application (invisible)

@@ -16,7 +16,9 @@ interface CustomCmdEntry {
 }
 
 export const customCmdMap: Record<string, CustomCmdEntry> = {
-  Varangle: { unicode: '\u2222', typst: 'angle.spheric' },  // ∢ spherical angle
+  Varangle:   { unicode: '\u2222', typst: 'angle.spheric' },  // ∢ spherical angle
+  llbracket:  { unicode: '\u27E6', typst: 'bracket.l.stroked' },  // ⟦ left double bracket
+  rrbracket:  { unicode: '\u27E7', typst: 'bracket.r.stroked' },  // ⟧ right double bracket
 };
 
 /** Lookup Unicode replacement for a custom command. Returns undefined if not found. */

@@ -130,6 +130,11 @@ module.exports = [
   { latex: `\\sphericalangle`, typst: `angle.spheric`, typst_inline: `angle.spheric` },
   { latex: `\\varangle`, typst: `angle.spheric`, typst_inline: `angle.spheric` },
   { latex: `\\Varangle`, typst: `angle.spheric`, typst_inline: `angle.spheric` },
+  { latex: `\\AA`, typst: `angstrom`, typst_inline: `angstrom` },
+  { latex: `\\Perp`, typst: `tack.t.double`, typst_inline: `tack.t.double` },
+  { latex: `\\llbracket`, typst: `bracket.l.stroked`, typst_inline: `bracket.l.stroked` },
+  { latex: `\\rrbracket`, typst: `bracket.r.stroked`, typst_inline: `bracket.r.stroked` },
+  { latex: String.raw`\llbracket x \rrbracket`, typst: `bracket.l.stroked x bracket.r.stroked`, typst_inline: `bracket.l.stroked x bracket.r.stroked` },
   { latex: `\\nexists`, typst: `exists.not`, typst_inline: `exists.not` },
   { latex: `\\varnothing`, typst: `emptyset`, typst_inline: `emptyset` },
   { latex: `\\triangle`, typst: `triangle.stroked.t`, typst_inline: `triangle.stroked.t` },
@@ -3049,6 +3054,12 @@ x=4
   // === Missing symbol mappings ===
   // \oiint → integral.surf
   { latex: String.raw`\oiint_{\alpha}^{b} f`, typst: `integral.surf_(alpha)^b f`, typst_inline: `integral.surf_(alpha)^b f` },
+  // \oiiint → integral.vol
+  { latex: String.raw`\oiiint_{\alpha}^{b} f`, typst: `integral.vol_(alpha)^b f`, typst_inline: `integral.vol_(alpha)^b f` },
+  // \ointclockwise → integral.cont.cw
+  { latex: String.raw`\ointclockwise f`, typst: `integral.cont.cw f`, typst_inline: `integral.cont.cw f` },
+  // \ointctrclockwise → integral.cont.ccw
+  { latex: String.raw`\ointctrclockwise f`, typst: `integral.cont.ccw f`, typst_inline: `integral.cont.ccw f` },
   // \oslash → slash.o
   { latex: String.raw`a \oslash b`, typst: `a slash.o b`, typst_inline: `a slash.o b` },
   // \lessapprox → lt.approx

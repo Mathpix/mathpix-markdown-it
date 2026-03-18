@@ -44,6 +44,8 @@ interface BigDelimInfo { delim: string; size: string; isOpen: boolean }
 const getBigDelimInfo = (node: MathNode): BigDelimInfo | null => {
   try {
     if (node.kind !== 'TeXAtom') return null;
+    // Custom-command TeXAtoms are not delimiters
+    if (node.getProperty?.('data-custom-cmd')) return null;
     // TeXAtom > inferredMrow > mo(minsize/maxsize)
     const inferred = node.childNodes?.[0];
     if (!inferred || !inferred.isInferred) return null;
@@ -66,6 +68,8 @@ const getBigDelimInfo = (node: MathNode): BigDelimInfo | null => {
 const resolveDelimiterMo = (node: MathNode): MathNode | null => {
   try {
     if (node?.kind === 'mo') return node;
+    // Custom-command TeXAtoms should not be resolved as delimiters
+    if (node?.getProperty?.('data-custom-cmd')) return null;
     if (node?.kind === 'mrow' || node?.kind === 'TeXAtom') {
       let children = node.childNodes;
       if (children?.length === 1 && children[0].isInferred) {

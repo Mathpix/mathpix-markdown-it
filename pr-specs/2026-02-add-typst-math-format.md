@@ -92,7 +92,7 @@ All new Typst code lives in `src/mathjax/serialized-typst/`:
 
 | File | Purpose |
 |------|---------|
-| `index.ts` | `SerializedTypstVisitor` class — extends MathJax's `MmlVisitor`, handles root traversal, inferred mrow spacing (decomposed into pattern functions: `handleBigDelimiterPattern`, `handleIdotsintPattern`, `handleBareDelimiterPairPattern`, `handleThousandSepPattern`, `handleEqnArrayMtablePattern`, `handleNotNegationPattern`), big delimiter detection (`\big`, `\Big`, etc.), bare delimiter-pair grouping (`\|...\|`, `⌊...⌋`, `⌈...⌉`, `‖...‖`) with function-call-aware scanner to avoid false `‖` pairing inside function args, `\idotsint` grouping (integral-dots-integral pattern via `SCRIPT_KINDS` constant), `\not` negation overlay detection, thousand-separator comma detection, sibling content merging for tagged eqnArray mtables (passes prefix via `data-pre-content` and suffix via `data-post-content` properties), custom command detection in `visitTeXAtomNode` via `getCustomCmdTypstSymbol`; `serializeRange` uses `needsSpaceBetweenNodes` for correct spacing inside bare-delimiter pairs |
+| `index.ts` | `SerializedTypstVisitor` class — extends MathJax's `MmlVisitor`, handles root traversal, inferred mrow spacing (decomposed into pattern functions: `handleBigDelimiterPattern`, `handleIdotsintPattern`, `handleBareDelimiterPairPattern`, `handleThousandSepPattern`, `handleEqnArrayMtablePattern`, `handleNotNegationPattern`), big delimiter detection (`\big`, `\Big`, etc.), bare delimiter-pair grouping (`\|...\|`, `⌊...⌋`, `⌈...⌉`, `‖...‖`) with function-call-aware scanner to avoid false `‖` pairing inside function args, `\idotsint` grouping (integral-dots-integral pattern via `SCRIPT_KINDS` constant), `\not` negation overlay detection, thousand-separator comma detection, sibling content merging for tagged eqnArray mtables (passes prefix via `data-pre-content` and suffix via `data-post-content` properties), custom command detection in `visitTeXAtomNode` via `getCustomCmdTypstSymbol`, delimiter-pairing guard in `getBigDelimInfo`/`resolveDelimiterMo` to skip `data-custom-cmd` nodes; `serializeRange` uses `needsSpaceBetweenNodes` for correct spacing inside bare-delimiter pairs |
 | `types.ts` | Shared type definitions: `MathNode`, `ITypstData`, `ITypstSerializer`, `HandlerFn`, `HandlerKind`, attribute interfaces (`FracAttrs`, `PaddedAttrs`, `EncloseAttrs`, `StyleAttrs`, etc.) |
 | `consts.ts` | Module-wide constants and regex patterns: bracket maps (`OPEN_BRACKETS`, `CLOSE_BRACKETS`, `UNPAIRED_BRACKET_TYPST`), regex patterns (`RE_THREE_DIGITS`, `RE_PHANTOM_BASE`, `RE_TOKEN_START`, `RE_SEPARATOR_END`, `RE_LETTERS_AND_MARKS`, `RE_LATIN_WITH_MARKS`, etc.), string constants (`TYPST_PLACEHOLDER`, delimiter characters, `NEGATION_SLASH`), `KNOWN_TYPST_FUNCTIONS` set (for function-call paren heuristic in bracket scanner), `SCRIPT_NODE_KINDS` |
 | `handlers.ts` | Top-level dispatch: `handle()` routes MathML nodes to the appropriate handler via `isHandlerKind` type guard, with a top-level try/catch for resilience. Handlers themselves are imported from the domain-specific modules below |
@@ -116,7 +116,7 @@ All new Typst code lives in `src/mathjax/serialized-typst/`:
 | `src/contex-menu/menu/menu-items.ts` | Skips `typst_inline` when its value equals `typst` (no redundant menu entry) |
 | `src/helpers/parse-mmd-element.ts` | `'TYPSTMATH'` and `'TYPSTMATH_INLINE'` recognized in DOM parser; mapped to types `'typst'` and `'typst_inline'` |
 | `src/mathjax/custom-cmd-map.ts` | **New.** Central registry mapping `data-custom-cmd` property values to `{ unicode, typst }` output symbols. Shared by MathML visitors, ASCII serializer, and Typst serializer |
-| `src/mathjax/my-BaseMappings.ts` | Added `CustomMethods` with `Varangle` handler (parses macro, stamps `data-custom-cmd`). `wasysym-macros` CommandMap uses merged `allMethods` |
+| `src/mathjax/my-BaseMappings.ts` | Added `CustomMethods` with `Varangle`, `llbracket`, `rrbracket` handlers (parse macro, stamp `data-custom-cmd`). `wasysym-macros` CommandMap uses merged `allMethods` |
 | `src/mathjax/mathjax.ts` | Added `patchVisitorTeXAtom` — typed patch on `SerializedMmlVisitor`/`LimitedMmlVisitor` prototypes for `data-custom-cmd` interception |
 | `src/mathjax/serialized-ascii/index.ts` | `visitTeXAtomNode` checks `data-custom-cmd` → emits Unicode via `getCustomCmdUnicode()` |
 
@@ -636,6 +636,11 @@ The `typst-symbol-map.ts` file maps ~300 Unicode characters to Typst symbol name
 | Symbol | Typst | Unicode |
 |--------|-------|---------|
 | `integral.surf` | `integral.surf` | ∯ |
+| `integral.vol` | `integral.vol` | ∰ |
+| `integral.cont.cw` | `integral.cont.cw` | ∲ |
+| `integral.cont.ccw` | `integral.cont.ccw` | ∳ |
+| `angstrom` | `angstrom` | Å |
+| `tack.t.double` | `tack.t.double` | ⫫ |
 | `slash.o` | `ø` (Unicode) | ø |
 | `lt.approx` | `lt.approx` | ⪅ |
 | `gt.approx` | `gt.approx` | ⪆ |
@@ -705,17 +710,25 @@ Some LaTeX commands (e.g. `\Varangle`) expand into visual-hack subtrees in MathJ
 1. **Tagging at parse time** — `my-BaseMappings.ts` defines custom handler methods (instead of `['Macro', ...]` text substitution) that parse the macro expansion into a MathML subtree, then stamp the root node with a `data-custom-cmd` property carrying the original command name
 2. **Central dispatch map** — `custom-cmd-map.ts` maps command names to output symbols for each format:
    ```typescript
-   { Varangle: { unicode: '\u2222', typst: 'angle.spheric' } }
+   {
+     Varangle:  { unicode: '\u2222', typst: 'angle.spheric' },
+     llbracket: { unicode: '\u27E6', typst: 'bracket.l.stroked' },
+     rrbracket: { unicode: '\u27E7', typst: 'bracket.r.stroked' },
+   }
    ```
 3. **Serializer lookup** — each serializer checks `data-custom-cmd` on TeXAtom nodes and emits the symbol from the central map:
-   - **MathML visitors** (`mathjax.ts`): `patchVisitorTeXAtom` monkey-patches `visitTeXAtomNode` on both `SerializedMmlVisitor` and `LimitedMmlVisitor` prototypes, emitting `<mrow><mo>∢</mo></mrow>` via typed `MmlVisitorProto` interface
-   - **Typst** (`common.ts`): `getCustomCmdTypstSymbol()` → `getCustomCmdTypst()` → emits `angle.spheric`
-   - **ASCII** (`serialized-ascii/index.ts`): `getCustomCmdUnicode()` → emits `∢`
+   - **MathML visitors** (`mathjax.ts`): `patchVisitorTeXAtom` monkey-patches `visitTeXAtomNode` on both `SerializedMmlVisitor` and `LimitedMmlVisitor` prototypes, emitting `<mrow><mo>…</mo></mrow>` via typed `MmlVisitorProto` interface
+   - **Typst** (`common.ts`): `getCustomCmdTypstSymbol()` → `getCustomCmdTypst()` → emits the Typst symbol name
+   - **ASCII** (`serialized-ascii/index.ts`): `getCustomCmdUnicode()` → emits the Unicode character
+4. **Delimiter-pairing guard** — `getBigDelimInfo` and `resolveDelimiterMo` in `index.ts` skip nodes with `data-custom-cmd`, preventing the delimiter-pairing logic from looking inside custom-command TeXAtoms and falsely pairing their inner `[`/`]` or `(`/`)` characters
 
 | LaTeX | Typst | MathML | ASCII |
 |-------|-------|--------|-------|
 | `\Varangle` | `angle.spheric` | `<mo>∢</mo>` | `∢` |
 | `\varangle` | `angle.spheric` | `<mo>∢</mo>` | `∢` |
+| `\llbracket` | `bracket.l.stroked` | `<mo>⟦</mo>` | `⟦` |
+| `\rrbracket` | `bracket.r.stroked` | `<mo>⟧</mo>` | `⟧` |
+| `\llbracket x \rrbracket` | `bracket.l.stroked x bracket.r.stroked` | `<mo>⟦</mo>x<mo>⟧</mo>` | `⟦x⟧` |
 
 **Adding a new custom command** requires only two changes: (1) add an entry to `customCmdMap` in `custom-cmd-map.ts`, (2) add a handler in `my-BaseMappings.ts` that sets `data-custom-cmd`.
 
@@ -887,7 +900,7 @@ This ensures paired delimiters form grouped expressions in Typst (important afte
 | `src/mathjax/serialized-typst/common.ts` | **New.** Shared helpers: `initTypstData`, `addToTypstData` (always propagates `typst_inline` with `typst` fallback), `addSpaceToTypstData`, `needsParens`, `isThousandSepComma`, `serializeThousandSepChain`, `needsTokenSeparator`, `needsSpaceBetweenNodes` (extends token separator with script+bracket check), `formatScript`, tree-position utilities (`isFirstChild`/`isLastChild`/`getSiblingIndex`), node accessors (`getChildText`/`getNodeText`/`getAttrs`/`getProp`/`getContentChildren`), `isNegationOverlay` (`\not` detection), `getCustomCmdTypstSymbol` (custom command → Typst lookup via central map), `serializeCombiningMiChain` (non-Latin script grouping), `handleAll` |
 | `src/mathjax/serialized-typst/escape-utils.ts` | **New.** Unified expression scanner (`scanExpression`) with per-bracket-type depth counters (paren/bracket/brace); thin wrappers: `escapeContentSeparators`, `escapeCasesSeparators`, `hasTopLevelSeparators`, `escapeLrSemicolons`, `escapeUnbalancedParens`, `escapeColonsInLr`, `escapeInnerBrackets` |
 | `src/mathjax/serialized-typst/bracket-utils.ts` | **New.** Delimiter mapping/escaping: `delimiterToTypst`, `escapeLrDelimiter`, `replaceUnpairedBrackets` (cell-level bracket escaping for mat/cases with scope boundaries for `msqrt`, `mroot`, `mfrac`, `menclose`), `treeContainsMo`, `serializePrefixBeforeMo`, function-call-aware paren heuristic via `KNOWN_TYPST_FUNCTIONS` |
-| `src/mathjax/custom-cmd-map.ts` | **New.** Central registry for custom LaTeX commands: maps `data-custom-cmd` property values to `{ unicode, typst }` output symbols. Lookup helpers: `getCustomCmdUnicode()`, `getCustomCmdTypst()`. Currently contains `Varangle` → `{ unicode: '∢', typst: 'angle.spheric' }` |
+| `src/mathjax/custom-cmd-map.ts` | **New.** Central registry for custom LaTeX commands: maps `data-custom-cmd` property values to `{ unicode, typst }` output symbols. Lookup helpers: `getCustomCmdUnicode()`, `getCustomCmdTypst()`. Contains `Varangle` → `angle.spheric`/`∢`, `llbracket` → `bracket.l.stroked`/`⟦`, `rrbracket` → `bracket.r.stroked`/`⟧` |
 | `src/mathjax/my-BaseMappings.ts` | Added custom handler methods (`CustomMethods`) for commands that need `data-custom-cmd` tagging. `Varangle` handler parses the macro expansion via `TexParser`, stamps the resulting node with `data-custom-cmd: 'Varangle'` via both `setProperty` and `setProperties`. `wasysym-macros` CommandMap now uses `allMethods` (merged `BaseMethods` + `CustomMethods`) |
 | `src/mathjax/mathjax.ts` | Patched `AbstractTags` (`autoTag`, `getTag`, `startEquation`) to mark auto-numbered tags with `data-tag-auto` property and preserve `\label{}` keys as `data-label-key`. Added `patchVisitorTeXAtom` — typed monkey-patch (`MmlVisitorProto` interface) on `SerializedMmlVisitor` and `LimitedMmlVisitor` prototypes that intercepts `data-custom-cmd` nodes and emits clean `<mo>` via `getCustomCmdUnicode()` from central map |
 | `src/mathjax/serialized-ascii/index.ts` | `visitTeXAtomNode` now checks `data-custom-cmd` property and emits the canonical Unicode symbol via `getCustomCmdUnicode()` from central map |
@@ -938,7 +951,7 @@ The test runner (`tests/_typst.js`) uses `TexConvertToTypstData` and validates b
 - mhchem (chemical formulas — phantom alignment stripping, isotope notation)
 - Constructed long arrows and nested mover/munder flattening
 - `\not` negation overlay
-- Custom commands (`\Varangle` → `angle.spheric` via `data-custom-cmd` dispatch)
+- Custom commands (`\Varangle` → `angle.spheric`, `\llbracket`/`\rrbracket` → `bracket.l.stroked`/`bracket.r.stroked` via `data-custom-cmd` dispatch; paired `\llbracket x \rrbracket` test)
 - Non-Latin script grouping (Devanagari, Arabic, CJK)
 - Reverse cases (`\left.\begin{aligned}...\right\}`)
 - Nested tables (aligned/gathered inside mat/cases cells, display() wrapping)
