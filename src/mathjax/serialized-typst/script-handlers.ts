@@ -50,7 +50,7 @@ const STRETCH_BASE_SYMBOLS: ReadonlySet<string> = new Set([
   'arrow.r.double', 'arrow.l.double', 'arrow.l.r.double',
   'harpoon.rt', 'harpoon.lb',          // \xrightharpoonup, \xleftharpoondown
   'harpoons.rtlb', 'harpoons.ltrb',    // \xrightleftharpoons, \xleftrightharpoons
-  'arrows.rr',                         // \xtofrom
+  'arrows.rl',                         // \xtofrom
   '=',                                 // \xlongequal
 ]);
 
