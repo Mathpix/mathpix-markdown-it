@@ -55,8 +55,10 @@ The converter always produces **two** Typst representations:
 For most expressions these are identical. They differ for:
 - **Numbered equations** (`\begin{equation}`, `\tag{}`): `typstmath` uses `#math.equation(block: true, numbering: ..., $ ... $)`, `typstmath_inline` contains the raw math
 - **Numcases/subnumcases**: `typstmath` uses `#grid(...)`, `typstmath_inline` contains just `cases(...)`
-- **Boxed expressions** (`\boxed{}`): `typstmath` uses `#box(stroke: 0.5pt, inset: 3pt, $ ... $)`, `typstmath_inline` contains the inner content
+- **Boxed expressions** (`\boxed{}`): `typstmath` uses `#align(center, box(stroke: 0.5pt, inset: 3pt, $ ... $))`, `typstmath_inline` contains the inner content
 - **Bordered arrays** (array with `frame=solid`): similar to boxed
+- **Nested tables** (eqnArray/gathered inside mat/cases cells): `typstmath` wraps in `display(...)` to preserve displaystyle, `typstmath_inline` contains the bare `mat(...)` without `display()` wrapper
+- **eqnArray rows containing nested tables**: `typst_inline` is propagated through eqnArray row building so `display()` never leaks into the inline variant
 
 **Implementation details:**
 
@@ -90,18 +92,18 @@ All new Typst code lives in `src/mathjax/serialized-typst/`:
 
 | File | Purpose |
 |------|---------|
-| `index.ts` | `SerializedTypstVisitor` class — extends MathJax's `MmlVisitor`, handles root traversal, inferred mrow spacing (decomposed into pattern functions: `handleBigDelimiterPattern`, `handleIdotsintPattern`, `handleBareDelimiterPairPattern`, `handleThousandSepPattern`, `handleEqnArrayMtablePattern`), big delimiter detection (`\big`, `\Big`, etc.), bare delimiter-pair grouping (`\|...\|`, `⌊...⌋`, `⌈...⌉`, `‖...‖`), `\idotsint` grouping (integral-dots-integral pattern via `SCRIPT_KINDS` constant), thousand-separator comma detection, and sibling content merging for tagged eqnArray mtables (passes prefix via `data-pre-content` and suffix via `data-post-content` properties) |
+| `index.ts` | `SerializedTypstVisitor` class — extends MathJax's `MmlVisitor`, handles root traversal, inferred mrow spacing (decomposed into pattern functions: `handleBigDelimiterPattern`, `handleIdotsintPattern`, `handleBareDelimiterPairPattern`, `handleThousandSepPattern`, `handleEqnArrayMtablePattern`, `handleNotNegationPattern`), big delimiter detection (`\big`, `\Big`, etc.), bare delimiter-pair grouping (`\|...\|`, `⌊...⌋`, `⌈...⌉`, `‖...‖`) with function-call-aware scanner to avoid false `‖` pairing inside function args, `\idotsint` grouping (integral-dots-integral pattern via `SCRIPT_KINDS` constant), `\not` negation overlay detection, thousand-separator comma detection, and sibling content merging for tagged eqnArray mtables (passes prefix via `data-pre-content` and suffix via `data-post-content` properties); `serializeRange` uses `needsSpaceBetweenNodes` for correct spacing inside bare-delimiter pairs |
 | `types.ts` | Shared type definitions: `MathNode`, `ITypstData`, `ITypstSerializer`, `HandlerFn`, `HandlerKind`, attribute interfaces (`FracAttrs`, `PaddedAttrs`, `EncloseAttrs`, `StyleAttrs`, etc.) |
-| `consts.ts` | Module-wide constants and regex patterns: bracket maps (`OPEN_BRACKETS`, `CLOSE_BRACKETS`, `UNPAIRED_BRACKET_TYPST`), regex patterns (`RE_THREE_DIGITS`, `RE_PHANTOM_BASE`, `RE_TOKEN_START`, `RE_SEPARATOR_END`, etc.), string constants (`TYPST_PLACEHOLDER`, delimiter characters) |
+| `consts.ts` | Module-wide constants and regex patterns: bracket maps (`OPEN_BRACKETS`, `CLOSE_BRACKETS`, `UNPAIRED_BRACKET_TYPST`), regex patterns (`RE_THREE_DIGITS`, `RE_PHANTOM_BASE`, `RE_TOKEN_START`, `RE_SEPARATOR_END`, `RE_LETTERS_AND_MARKS`, `RE_LATIN_WITH_MARKS`, etc.), string constants (`TYPST_PLACEHOLDER`, delimiter characters, `NEGATION_SLASH`), `KNOWN_TYPST_FUNCTIONS` set (for function-call paren heuristic in bracket scanner), `SCRIPT_NODE_KINDS` |
 | `handlers.ts` | Top-level dispatch: `handle()` routes MathML nodes to the appropriate handler via `isHandlerKind` type guard, with a top-level try/catch for resilience. Handlers themselves are imported from the domain-specific modules below |
 | `token-handlers.ts` | Leaf-node handlers: `mi` (identifiers, font wrapping, symbol map lookup), `mo` (operators, spacing, slash/special-char escaping, unpaired bracket detection), `mn` (numbers), `mtext` (text with quote escaping), `mspace` (spacing commands) |
-| `script-handlers.ts` | Script and root handlers: `mfrac` (fractions, binomials), `msup`/`msub`/`msubsup` (scripts with empty-base/empty-exponent handling, `\nolimits` detection), `msqrt`/`mroot` (roots), `mover`/`munder`/`munderover` (accents, limits, extensible arrows, brace annotations), `mmultiscripts` (prescripts via `attach()` with `tl:/bl:/tr:/br:` positions) |
-| `structural-handlers.ts` | Structural wrappers: `mrow` (delimiter pairing, `\left..\right`, shorthand functions with separator fallback), `mpadded` (mhchem phantom stripping, `\colorbox`), `mphantom` (`#hide()`), `menclose` (cancel, boxed, longdiv, circle, overline/underline), `mstyle` (color wrapping) |
-| `table-handlers.ts` | Table/array handlers: `mtable` (matrix, cases, numcases, eqnArray with tagged/untagged strategies, augmented columns, column alignment), `mtr` (row iteration) |
+| `script-handlers.ts` | Script and root handlers: `mfrac` (fractions, binomials), `msup`/`msub`/`msubsup` (scripts with empty-base/empty-exponent handling, `\nolimits` detection), `msqrt`/`mroot` (roots), `mover`/`munder`/`munderover` (accents, limits, extensible arrows, brace annotations, constructed long arrow collapsing via `CONSTRUCTED_LONG_ARROWS` map, nested mover/munder flattening via `unwrapToScriptNode`, accent/accentunder attribute gating), `mmultiscripts` (prescripts via `attach()` with `tl:/bl:/tr:/br:` positions) |
+| `structural-handlers.ts` | Structural wrappers: `mrow` (delimiter pairing, `\left..\right`, shorthand functions with separator fallback, `\not` negation wrapping via `cancel()`), `mpadded` (mhchem phantom stripping, `\colorbox`, `mstyle` background handling), `mphantom` (`#hide()`), `menclose` (cancel/xcancel/bcancel, boxed, longdiv with `lr(\) ...)`, circle, selective border strokes via `parseNotation()`/`hasNotation()` Set-based matching, overline/underline), `mstyle` (color wrapping) |
+| `table-handlers.ts` | Table/array handlers: `mtable` (matrix with asymmetric delimiter support, cases, reverse cases, numcases, eqnArray with tagged/untagged strategies, augmented columns with vline capping via `getActualColumnCount()`, column alignment, nested eqnArray/gathered detection via `isInsideMatrixCell`/`isInsideEqnArrayCellWithSiblings`, `display()` wrapping for nested tables, `typst_inline` propagation through eqnArray rows), `mtr` (row iteration) |
 | `typst-symbol-map.ts` | Unicode → Typst symbol name mapping tables (`ReadonlyMap`s for Greek, binary operators, relations, arrows, delimiters, large operators, misc) plus accent map and font map |
-| `common.ts` | Shared helpers: `initTypstData`, `addToTypstData` (always propagates `typst_inline` with `typst` fallback), `addSpaceToTypstData`, `needsParens` (`s.length > 1`), `isThousandSepComma` (with Indian numbering support), `needsTokenSeparator`, `formatScript`, `isFirstChild`/`isLastChild`/`getSiblingIndex`, `getChildText`/`getNodeText`, `getAttrs`/`getProp`, `handleAll` |
-| `escape-utils.ts` | Unified expression scanner (`scanExpression`) with per-bracket-type depth counters (`parenDepth`, `bracketDepth`, `braceDepth`); thin wrappers: `escapeContentSeparators`, `escapeCasesSeparators`, `hasTopLevelSeparators`, `escapeLrSemicolons`, `escapeUnbalancedParens` |
-| `bracket-utils.ts` | Delimiter mapping and escaping: `mapDelimiter`, `escapeLrOpenDelimiter`, `replaceUnpairedBrackets` (cell-level bracket escaping for mat/cases), `BRACKET_SYMBOL_MAP`, `lrOpenEscapeMap` |
+| `common.ts` | Shared helpers: `initTypstData`, `addToTypstData` (always propagates `typst_inline` with `typst` fallback), `addSpaceToTypstData`, `needsParens` (`s.length > 1`), `isThousandSepComma` (with Indian numbering support), `serializeThousandSepChain`, `needsTokenSeparator`, `needsSpaceBetweenNodes` (extends `needsTokenSeparator` with script+bracket spacing check), `formatScript`, `isFirstChild`/`isLastChild`/`getSiblingIndex`, `getChildText`/`getNodeText`, `getAttrs`/`getProp`/`getContentChildren`, `isNegationOverlay` (`\not` detection), `serializeCombiningMiChain` (non-Latin script grouping for Devanagari, Arabic, CJK, etc.), `handleAll` |
+| `escape-utils.ts` | Unified expression scanner (`scanExpression`) with per-bracket-type depth counters (`parenDepth`, `bracketDepth`, `braceDepth`); thin wrappers: `escapeContentSeparators`, `escapeCasesSeparators`, `hasTopLevelSeparators`, `escapeLrSemicolons`, `escapeUnbalancedParens`, `escapeColonsInLr` (colon escaping inside `lr()` to prevent named-argument parsing), `escapeInnerBrackets` (bracket escaping inside `lr()` to prevent group parsing) |
+| `bracket-utils.ts` | Delimiter mapping and escaping: `mapDelimiter`, `delimiterToTypst`, `escapeLrDelimiter`, `replaceUnpairedBrackets` (cell-level bracket escaping for mat/cases with scope boundaries for `msqrt`, `mroot`, `mfrac`, `menclose`), `treeContainsMo`, `serializePrefixBeforeMo`, function-call-aware paren heuristic via `KNOWN_TYPST_FUNCTIONS` |
 
 ### Integration points
 
@@ -174,6 +176,12 @@ Spaced binary operators (`+`, `-`, `=`, `<`, `>`), named operators (`\cdot` → 
 
 Standard arrows (`\rightarrow` → `arrow.r`, `\Leftrightarrow` → `arrow.l.r.double`, `\mapsto` → `arrow.r.bar`), extensible arrows (`\xrightarrow{f}` → `stretch(arrow.r)^f`), harpoons (`\rightleftharpoons` → `harpoons.rtlb`).
 
+**Constructed long arrows:** MathJax builds some long arrows from overlaid pieces (e.g. `\longrightleftharpoons` → `mover` with harpoon fragments and dash base). The serializer detects these via `CONSTRUCTED_LONG_ARROWS` map (matching stripped base/over patterns) and collapses them to single Typst symbols: `\longrightleftharpoons` → `harpoons.rtlb`, `\longleftrightharpoons` → `harpoons.ltrb`, `\longleftrightarrows` → `arrows.lr`.
+
+**Nested mover/munder flattening:** `\stackrel{k_1}{\underset{k_2}{\longrightleftharpoons}}` creates `mover(munder(base, k2), k1)`. Without flattening this would nest: `limits(limits(base)_(k_2))^(k_1)`. The `unwrapToScriptNode()` helper detects inner script nodes through TeXAtom/inferredMrow wrappers and produces `limits(harpoons.rtlb)_(k_2)^(k_1)`.
+
+**Accent attribute gating:** `mover`/`munder` accent logic is gated on `accent`/`accentunder` attributes — only nodes with these attributes use shorthand accent functions. This prevents non-accent `mover` (like `\stackrel`) from being incorrectly processed as accents.
+
 **Extensible arrows vs stacking:** LaTeX extensible arrows (`\xrightarrow`, `\xleftarrow`, `\xtwoheadrightarrow`, `\xmapsto`, `\xlongequal`, `\xtofrom`, etc.) stretch the base symbol to fit annotations. Stacking commands (`\stackrel`, `\overset`, `\underset`) place text above/below without stretching. The serializer distinguishes these by checking the `stretchy` attribute on the base `mo` node (MathJax sets `stretchy=true` for extensible arrows). The inner `mo` is found by unwrapping `mstyle`/`inferredMrow` wrappers (up to 5 levels). Only symbols in `STRETCH_BASE_SYMBOLS` (arrows, harpoons, `=`) are eligible.
 
 | LaTeX | Typst | Why |
@@ -227,6 +235,10 @@ Built-in Typst math operators (`sin`, `cos`, `tan`, `log`, `lim`, etc.) pass thr
 | `\left\| a ; b \right\|` | `lr(‖ a\; b ‖)` |
 | `\left( a ; b \right)` | `lr(( a\; b ))` |
 
+**Colon escaping inside `lr()`:** Typst interprets `:` after an identifier as a named-argument separator inside function calls. The `escapeColonsInLr()` helper inserts a space before `:` when preceded by an identifier inside `lr()` calls, preventing `lr(p: ...)` from being parsed as a named argument.
+
+**Inner bracket escaping inside `lr()`:** Unpaired ASCII brackets (`(`, `[`, `{`) inside `lr()` content can cause parse errors. The `escapeInnerBrackets()` helper backslash-escapes these when they appear at depth 0 inside the `lr()` content.
+
 **Mismatched delimiter-type escaping in `lr()`:** When `\left...\right` use different bracket types (e.g. `\left(\right\rangle`, `\left\langle\right)`), the non-Unicode ASCII brackets (`(`, `)`, `[`, `{`, `}`) must be escaped inside `lr()` to prevent parse errors. Without escaping, `lr(( ... chevron.r)` would fail because `(` opens a group that never closes with `)`. The mrow handler detects mismatched pairs using `OPEN_BRACKETS` / `CLOSE_BRACKETS` maps and escapes with backslash:
 
 | LaTeX | Typst | Why |
@@ -252,6 +264,7 @@ Note: Non-ASCII delimiter symbols (`chevron.l`, `chevron.r`, etc.) don't need es
 | `\begin{array}{ll}` | `mat(delim: #none, align: #left, ...)` (uniform non-center alignment) |
 | `\begin{aligned}` | Row-separated with `\` |
 | `\begin{cases}` | `cases(...)` |
+| `\left.\begin{aligned}...\end{aligned}\right\}` | `cases(reverse: #true, ...)` |
 | `\begin{numcases}` | `#grid(...)` with `cases(...)` + numbering column |
 
 **Multiline formatting for 2+ rows:** When a `mat()` or `cases()` expression has 2 or more rows, the output uses multiline format with 2-space indentation for readability. Only single-row expressions remain on one line.
@@ -286,6 +299,27 @@ Typst:  mat(delim: #none, a, bracket.l b + c; d, + e bracket.r)
 LaTeX:  \begin{array}{l} \left[ x \right. \\ \left. y \right] \end{array}
 Typst:  mat(delim: #none, align: #left, lr(\[ x); lr(y ]))
 ```
+
+**Asymmetric/mismatched delimiters on matrices:** When `\left...\right` use different bracket types around a matrix (e.g. `\left(\begin{array}...\end{array}\right\rangle`), the matrix handler emits `mat(delim: #none, ...)` wrapped in `lr()` with the appropriate delimiters. When the matrix is the sole content and delimiters form a matched pair, `mat(delim: ...)` is used directly.
+
+**Vline index capping:** MathJax's `columnlines` attribute can contain more entries than actual data columns (e.g. 44 column specs but only 41 data cells). `getActualColumnCount()` counts the real maximum columns across all rows, and `computeAugment()` caps vline positions at `actualCols - 1` to avoid out-of-bounds augment indices.
+
+**Selective border strokes:** `\begin{array}{|l|}\hline...\end{array}` (arrays with partial border annotations via `\hline` and column spec `|`) produces selective box strokes. The menclose handler uses `parseNotation()` to build a Set of notation keywords and `hasBorderNotation()` to detect when 2+ of `top`/`bottom`/`left`/`right` are present. `buildStrokeSides()` generates per-side stroke values (0.5pt for present sides, 0pt for absent):
+
+```
+LaTeX:  \begin{array}{|l|}\hline text \\ text \end{array}
+Typst:  #align(center, box(stroke: (left: 0.5pt, right: 0.5pt, top: 0.5pt, bottom: 0pt), inset: 3pt, $ mat(...) $))
+```
+
+**Word-safe notation matching:** All `menclose` notation checks use `parseNotation()` → `Set<string>` + `hasNotation()` instead of `String.includes()`, preventing false matches like `"bottom"` matching `"top"` via substring.
+
+**Nested eqnArray/matrix tables:** When an `aligned`/`gathered` environment is nested inside a `mat()` or `cases()` cell, Typst ignores `\\` linebreaks in cells. The serializer detects this via `isInsideMatrixCell()` (walks parent chain for mat/cases ancestor) and converts the nested eqnArray to `mat(delim: #none, ...)` with `;` row separators. The block output wraps in `display()` to preserve displaystyle; `typst_inline` omits the wrapper.
+
+**Gathered inside eqnArray:** `\begin{gathered}` inside another equation array (e.g. `\begin{aligned}`) is detected by `columnalign="center"` + single-column heuristic (since MathJax doesn't propagate `envName` for gathered). However, only gathered with **sibling content** in the same cell (e.g. `\begin{gathered}...\end{gathered} \quad f(x)=...`) is mat()-ified. Gathered that is the **sole content** of its cell (e.g. `\begin{align*}\begin{gathered}...\end{gathered}\end{align*}`) keeps `\\`-separated rows. Detection uses `isInsideEqnArrayCellWithSiblings()`.
+
+**Reverse cases:** `\left.\begin{aligned}...\end{aligned}\right\}` (right-brace cases) produces `cases(reverse: #true, ...)`. Detected when `branchOpen=''` and `branchClose='}'` on an eqnArray table.
+
+**`typst_inline` propagation in eqnArrays:** The eqnArray row-building path now tracks inline row variants (`rowsInline`) alongside block rows. This ensures `display()` wrappers from nested tables never leak into `typst_inline`. Both `buildUntaggedEqnArray` and `buildTaggedEqnArray` accept and use inline rows.
 
 ### Equation tags and numbering
 
@@ -537,12 +571,15 @@ In Typst, `underbrace` and `overbrace` take annotations as a second argument: `u
 |-------|-------|
 | `\cancel{x}` | `cancel(x)` |
 | `\bcancel{x}` | `cancel(inverted: #true, x)` |
-| `\boxed{x=1}` | `#box(stroke: 0.5pt, inset: 3pt, $x = 1$)` (block) / `x = 1` (inline) |
-| `\enclose{circle}{x+y}` | `#circle(inset: 3pt, $x + y$)` (block) / `x + y` (inline) |
+| `\xcancel{x}` | `cancel(cross: #true, x)` |
+| `\not\equiv` | `cancel(equiv)` (when `\not` precedes a symbol, wraps it in `cancel()`) |
+| `\boxed{x=1}` | `#align(center, box(stroke: 0.5pt, inset: 3pt, $x = 1$))` (block) / `x = 1` (inline) |
+| `\enclose{circle}{x+y}` | `#align(center, circle(inset: 3pt, $x + y$))` (block) / `x + y` (inline) |
 | `\enclose{radical}{x+y}` | `sqrt(x + y)` |
 | `\enclose{top}{x+y}` | `overline(x + y)` |
 | `\enclose{bottom}{x+y}` | `underline(x + y)` |
-| `\lcm{24}` | `underline(")"24)` (macro expands to `\enclose{bottom}{\smash{)}{24}\:}`; leading `)` from `\smash` → `")"`, trailing `med` from `\:` stripped, no space for tight rendering) |
+| `\enclose{left right top}{x}` | `#align(center, box(stroke: (left: 0.5pt, right: 0.5pt, top: 0.5pt, bottom: 0pt), inset: 3pt, $ x $))` (selective border strokes) |
+| `\lcm{24}` | `underline(lr(\) 24))` (macro expands to `\enclose{bottom}{\smash{)}{24}\:}`; `lr(\) ...)` stretches the `)` delimiter to match content height) |
 | `\color{red}{x}` | `#text(fill: red)[x]` |
 | `\color{#D61F06}{60}` | `#text(fill: rgb("#D61F06"))[60]` (hex colors wrapped in `rgb("...")`) |
 | `\colorbox{yellow}{x+y}` | `#highlight(fill: yellow)[$"x+y"$]` (block) / `"x+y"` (inline) |
@@ -562,8 +599,8 @@ In Typst, `underbrace` and `overbrace` take annotations as a second argument: `u
 | `f'(x)` | `f'(x)` (prime shorthand) |
 | `\$ 120,000` | `\$ 120\,000` (escaped dollar + thousand-separator commas) |
 | `\wp` | `℘` (Unicode output — no named Typst symbol) |
-| `6 \longdiv{84}` | `6 overline(")"84)` (long division symbol — no space after `)` for tight rendering) |
-| `\enclose{longdiv}{500}` | `overline(")"500)` (same via menclose) |
+| `6 \longdiv{84}` | `6 overline(lr(\) 84))` (long division — `lr(\) ...)` stretches `)` to content height) |
+| `\enclose{longdiv}{500}` | `overline(lr(\) 500))` (same via menclose) |
 
 ## Symbol Map Validation
 
@@ -590,7 +627,16 @@ The `typst-symbol-map.ts` file maps ~300 Unicode characters to Typst symbol name
 | `triangle.b` | `triangle.stroked.b` | ▽ |
 | `wp` | `℘` (Unicode) | ℘ |
 
-For symbols without a named Typst equivalent (`⋈`, `≐`, `ð`, `℘`), the Unicode character is output directly — Typst accepts Unicode in math mode.
+**Additional symbol mappings added post-initial:**
+
+| Symbol | Typst | Unicode |
+|--------|-------|---------|
+| `integral.surf` | `integral.surf` | ∯ |
+| `slash.o` | `ø` (Unicode) | ø |
+| `lt.approx` | `lt.approx` | ⪅ |
+| `gt.approx` | `gt.approx` | ⪆ |
+
+For symbols without a named Typst equivalent (`⋈`, `≐`, `ð`, `℘`, `ø`), the Unicode character is output directly — Typst accepts Unicode in math mode.
 
 ## Spacing and Grouping Logic
 
@@ -634,7 +680,23 @@ In LaTeX, `a/b` is a literal slash between tokens. In Typst, `/` creates a fract
 
 ### Operator-paren spacing
 
-Multi-character Typst symbol names (e.g. `lt.eq`, `gt.eq`, `arrow.r`) must have a space before `(` or `[` to prevent Typst from interpreting `lt.eq(x)` as a function call. The `mo` handler detects this by peeking at the next sibling.
+Multi-character Typst symbol names (e.g. `lt.eq`, `gt.eq`, `arrow.r`) must have a space before `(` or `[` to prevent Typst from interpreting `lt.eq(x)` as a function call. The `mo` handler detects this by peeking at the next sibling. Additionally, `needsSpaceBetweenNodes()` in `common.ts` checks for scripted nodes followed by `(` — e.g. `L_N^n(` needs a space to avoid `L_N^n(` being parsed as a function call on the superscript. This is used by `serializeRange()` inside bare-delimiter pairs.
+
+### `\not` negation overlay
+
+LaTeX `\not` produces a zero-width overlay slash in MathML: `TeXAtom(REL) > mpadded[width=0] > mtext(⧸)`. The serializer detects this pattern via `isNegationOverlay()` in `common.ts` and wraps the next sibling symbol in `cancel()`:
+
+| LaTeX | Typst |
+|-------|-------|
+| `\not\equiv` | `cancel(equiv)` |
+| `\not\in` | `cancel(in)` |
+| `\not=` | `cancel(=)` |
+
+Detection happens in two places: `visitInferredMrowNode` (top-level via `handleNotNegationPattern`) and the `mrow` handler (nested contexts). When the negation overlay is detected, it is skipped and the next sibling is wrapped.
+
+### Non-Latin script grouping
+
+MathJax splits non-Latin text (Devanagari, Arabic, CJK, etc.) from `\mathrm{टेक}` into individual `mi` nodes per character, breaking combining sequences and word grouping. The `serializeCombiningMiChain()` helper in `common.ts` detects consecutive `mi` nodes with non-Latin text and the same `mathvariant`, merging them into a single font-wrapped string. Known math symbols (∂, ψ, ∅, etc.) with Typst mappings are excluded. Applied in `visitInferredMrowNode`, `mrow` handler, and `handleAll`.
 
 ### Empty-base scripts
 
@@ -715,7 +777,7 @@ LaTeX allows unmatched brackets like `\sigma(\mathrm{nm} ;` where `(` has no clo
 
 1. Before `visitTree()`, `markUnpairedBrackets(root)` walks the entire MathML tree via DFS
 2. Collects all `mo` nodes containing `( ) [ ] { }` (excludes `|` and `‖` — handled separately)
-3. Pairs brackets using a **strict stack**: a closing bracket matches ONLY the top of the stack (no cross-pairing like `({)}`)
+3. Pairs brackets using a **strict stack**: a closing bracket matches ONLY the top of the stack (no cross-pairing like `({)}`). **Scope boundaries** (`msqrt`, `mroot`, `mfrac`, `menclose`) prevent brackets from pairing across structural boundaries — a `(` inside `\sqrt{}` cannot pair with a `)` outside it
 4. Marks unpaired nodes with `node.properties['data-unpaired-bracket'] = 'open' | 'close'`
 5. The `mo` handler checks this property **early** (before symbol-map lookup, spacing, slash escaping) and emits escaped delimiters
 
@@ -755,6 +817,8 @@ LaTeX delimiters without `\left...\right` produce unpaired `<mo>` nodes in MathM
 
 This ensures paired delimiters form grouped expressions in Typst (important after `/` for correct fraction denominator binding). For symmetric delimiters (`|`, `‖`), pairs inside `TeXAtom` groups (e.g. superscript `{|\alpha|}`) are left as-is since the enclosing script parens already provide grouping.
 
+**Function-call-aware `‖` scanning:** The bare delimiter scanner skips `‖` characters that appear inside function-call arguments (e.g. `norm(...)`, `abs(...)`) to avoid false pairing. The scanner tracks parenthesis depth and only considers `‖` at depth 0 as potential pair boundaries.
+
 **Scripted closing delimiters:** When the closing delimiter carries a subscript or superscript (e.g. `\|x\|_2` where `‖` is the base of `msub(‖, 2)`), the `getDelimiterChar()` helper cannot see it directly. The `getScriptedDelimiterChar()` helper looks inside `msub`/`msup`/`msubsup` nodes to check if their base is a matching closing delimiter. When found, the script parts are extracted and appended to the delimited expression:
 
 | LaTeX | Typst |
@@ -786,18 +850,18 @@ This ensures paired delimiters form grouped expressions in Typst (important afte
 
 | File | Change |
 |------|--------|
-| `src/mathjax/serialized-typst/index.ts` | **New.** `SerializedTypstVisitor` class with root traversal; `visitInferredMrowNode` decomposed into pattern functions (`handleBigDelimiterPattern`, `handleIdotsintPattern`, `handleBareDelimiterPairPattern`, `handleThousandSepPattern`, `handleEqnArrayMtablePattern`); big-delimiter detection, bare delimiter-pair grouping (`\|`, `⌊⌋`, `⌈⌉`, `‖`, `⟨⟩`) with scripted-closing-delimiter support (`getScriptedDelimiterChar`), `\idotsint` grouping via `SCRIPT_KINDS`, thousand-separator comma detection, sibling content merging for tagged eqnArray mtables (detects prefix/suffix content and passes via `data-pre-content`/`data-post-content` properties); uses `needsTokenSeparator` for token spacing |
+| `src/mathjax/serialized-typst/index.ts` | **New.** `SerializedTypstVisitor` class with root traversal; `visitInferredMrowNode` decomposed into pattern functions (`handleBigDelimiterPattern`, `handleIdotsintPattern`, `handleBareDelimiterPairPattern`, `handleThousandSepPattern`, `handleEqnArrayMtablePattern`, `handleNotNegationPattern`); big-delimiter detection, bare delimiter-pair grouping (`\|`, `⌊⌋`, `⌈⌉`, `‖`, `⟨⟩`) with function-call-aware `‖` scanning and scripted-closing-delimiter support (`getScriptedDelimiterChar`), `\idotsint` grouping via `SCRIPT_KINDS`, `\not` negation overlay detection, thousand-separator comma detection, sibling content merging for tagged eqnArray mtables; `serializeRange` uses `needsSpaceBetweenNodes` for correct script+bracket spacing inside bare-delimiter pairs |
 | `src/mathjax/serialized-typst/types.ts` | **New.** Shared type definitions (`MathNode`, `ITypstData`, `ITypstSerializer`, `HandlerFn`, `HandlerKind`, attribute interfaces) |
-| `src/mathjax/serialized-typst/consts.ts` | **New.** Module-wide constants: bracket maps (`Readonly<Record>`), regex patterns, string constants |
+| `src/mathjax/serialized-typst/consts.ts` | **New.** Module-wide constants: bracket maps (`Readonly<Record>`), regex patterns (`RE_LETTERS_AND_MARKS`, `RE_LATIN_WITH_MARKS`, etc.), string constants (`NEGATION_SLASH`), `KNOWN_TYPST_FUNCTIONS` set, `SCRIPT_NODE_KINDS` |
 | `src/mathjax/serialized-typst/handlers.ts` | **New.** Top-level dispatch with `isHandlerKind` type guard and two-tier error handling (utility functions return safe defaults; top-level catch logs warning and returns empty output). Handlers imported from domain-specific modules |
-| `src/mathjax/serialized-typst/token-handlers.ts` | **New.** Leaf-node handlers: `mi`, `mo`, `mn`, `mtext`, `mspace` — symbol map lookup, font wrapping, operator spacing, slash/special-char escaping, unpaired bracket detection |
-| `src/mathjax/serialized-typst/script-handlers.ts` | **New.** Script and root handlers: `mfrac`, `msup`/`msub`/`msubsup`, `msqrt`/`mroot`, `mover`/`munder`/`munderover`, `mmultiscripts` — accents, limits, extensible arrows, brace annotations, prescripts (`tl:/bl:/tr:/br:`) |
-| `src/mathjax/serialized-typst/structural-handlers.ts` | **New.** Structural wrappers: `mrow` (delimiter pairing, shorthand functions with separator fallback), `mpadded` (mhchem phantom stripping, `\colorbox`), `mphantom`, `menclose`, `mstyle` (color wrapping); handlers for `mtable`/frame and `menclose`/box set separate `typst_inline` without block wrappers |
-| `src/mathjax/serialized-typst/table-handlers.ts` | **New.** Table/array handlers: `mtable` (matrix, cases, numcases, eqnArray with tagged/untagged strategies, augmented columns, column alignment), `mtr` |
+| `src/mathjax/serialized-typst/token-handlers.ts` | **New.** Leaf-node handlers: `mi` (identifiers, font wrapping, symbol map lookup, non-Latin mi chain detection), `mo` (operators, spacing, slash/special-char escaping, unpaired bracket detection, `\not` negation handling), `mn` (numbers), `mtext` (text with quote escaping), `mspace` (spacing commands) |
+| `src/mathjax/serialized-typst/script-handlers.ts` | **New.** Script and root handlers: `mfrac`, `msup`/`msub`/`msubsup`, `msqrt`/`mroot`, `mover`/`munder`/`munderover` (with accent/accentunder gating, constructed long arrow collapsing via `CONSTRUCTED_LONG_ARROWS`, nested mover/munder flattening via `unwrapToScriptNode`), `mmultiscripts` — accents, limits, extensible arrows, brace annotations, prescripts (`tl:/bl:/tr:/br:`) |
+| `src/mathjax/serialized-typst/structural-handlers.ts` | **New.** Structural wrappers: `mrow` (delimiter pairing, shorthand functions with separator fallback, `\not` negation wrapping, `hasTableFirst` path for reverse cases), `mpadded` (mhchem phantom stripping, `\colorbox`, `mstyle` background), `mphantom`, `menclose` (cancel/xcancel/bcancel, boxed with `#align(center, ...)`, longdiv with `lr(\) ...)`, circle, selective border strokes via Set-based notation matching, overline/underline), `mstyle` (color wrapping); handlers set separate `typst_inline` without block wrappers |
+| `src/mathjax/serialized-typst/table-handlers.ts` | **New.** Table/array handlers: `mtable` (matrix with asymmetric delimiter support, cases, reverse cases, numcases, eqnArray with tagged/untagged strategies, augmented columns with vline capping via `getActualColumnCount()`, column alignment, nested eqnArray detection via `isInsideMatrixCell`/`isInsideEqnArrayCellWithSiblings`, gathered-like detection by `columnalign="center"` + single-column, `display()` wrapping for nested tables, `typst_inline` propagation through eqnArray rows), `mtr` |
 | `src/mathjax/serialized-typst/typst-symbol-map.ts` | **New.** Unicode → Typst symbol mapping (~300 entries as `ReadonlyMap`s), accent map, font map |
-| `src/mathjax/serialized-typst/common.ts` | **New.** Shared helpers: `initTypstData`, `addToTypstData` (always propagates `typst_inline` with `typst` fallback), `addSpaceToTypstData`, `needsParens`, `isThousandSepComma`, `needsTokenSeparator`, `formatScript`, tree-position utilities (`isFirstChild`/`isLastChild`/`getSiblingIndex`), node accessors (`getChildText`/`getNodeText`/`getAttrs`/`getProp`), `handleAll` |
-| `src/mathjax/serialized-typst/escape-utils.ts` | **New.** Unified expression scanner (`scanExpression`) with per-bracket-type depth counters (paren/bracket/brace); thin wrappers: `escapeContentSeparators`, `escapeCasesSeparators`, `hasTopLevelSeparators`, `escapeLrSemicolons`, `escapeUnbalancedParens` |
-| `src/mathjax/serialized-typst/bracket-utils.ts` | **New.** Delimiter mapping/escaping: `mapDelimiter`, `escapeLrOpenDelimiter`, `replaceUnpairedBrackets` (cell-level bracket escaping for mat/cases) |
+| `src/mathjax/serialized-typst/common.ts` | **New.** Shared helpers: `initTypstData`, `addToTypstData` (always propagates `typst_inline` with `typst` fallback), `addSpaceToTypstData`, `needsParens`, `isThousandSepComma`, `serializeThousandSepChain`, `needsTokenSeparator`, `needsSpaceBetweenNodes` (extends token separator with script+bracket check), `formatScript`, tree-position utilities (`isFirstChild`/`isLastChild`/`getSiblingIndex`), node accessors (`getChildText`/`getNodeText`/`getAttrs`/`getProp`/`getContentChildren`), `isNegationOverlay` (`\not` detection), `serializeCombiningMiChain` (non-Latin script grouping), `handleAll` |
+| `src/mathjax/serialized-typst/escape-utils.ts` | **New.** Unified expression scanner (`scanExpression`) with per-bracket-type depth counters (paren/bracket/brace); thin wrappers: `escapeContentSeparators`, `escapeCasesSeparators`, `hasTopLevelSeparators`, `escapeLrSemicolons`, `escapeUnbalancedParens`, `escapeColonsInLr`, `escapeInnerBrackets` |
+| `src/mathjax/serialized-typst/bracket-utils.ts` | **New.** Delimiter mapping/escaping: `delimiterToTypst`, `escapeLrDelimiter`, `replaceUnpairedBrackets` (cell-level bracket escaping for mat/cases with scope boundaries for `msqrt`, `mroot`, `mfrac`, `menclose`), `treeContainsMo`, `serializePrefixBeforeMo`, function-call-aware paren heuristic via `KNOWN_TYPST_FUNCTIONS` |
 | `src/mathjax/mathjax.ts` | Patched `AbstractTags` (`autoTag`, `getTag`, `startEquation`) to mark auto-numbered tags with `data-tag-auto` property and preserve `\label{}` keys as `data-label-key` |
 | `src/mathjax/index.ts` | `toTypstData()` calls `markUnpairedBrackets(node)` before `visitTree()` to mark unpaired ASCII brackets; returns `{ typstmath, typstmath_inline }` from the visitor's `ITypstData`; `OuterData()` and `OuterHTML()` populate both fields; `OuterHTML()` emits `<typstmath>` and `<typstmath_inline>` hidden tags; `TexConvertToTypstData()` is the sole public API for Typst (resets MathJax tag state before each conversion); `normalizeTypstSpaces` preserves line-leading indentation (`/(\S) {2,}/g`) |
 | `src/mathpix-markdown-model/index.ts` | Added `include_typst?: boolean` to `TOutputMath`; `typstmath_inline?: string` to `IOuterData` |
@@ -844,7 +908,16 @@ The test runner (`tests/_typst.js`) uses `TexConvertToTypstData` and validates b
 - Mod variants (bmod, pmod)
 - Labels on equations (equation, align, gather, split, tag+label, numcases with labels)
 - mhchem (chemical formulas — phantom alignment stripping, isotope notation)
-- Edge cases (empty-base scripts, empty-exponent scripts, cancel, color, boxed, primes, pipe grouping)
+- Constructed long arrows and nested mover/munder flattening
+- `\not` negation overlay
+- Non-Latin script grouping (Devanagari, Arabic, CJK)
+- Reverse cases (`\left.\begin{aligned}...\right\}`)
+- Nested tables (aligned/gathered inside mat/cases cells, display() wrapping)
+- Gathered inside eqnArray (sole content vs with siblings)
+- Selective border strokes (array with partial `\hline`/column spec borders)
+- Vline index capping for large arrays
+- Bare delimiter-pair spacing (scripted node + bracket)
+- Edge cases (empty-base scripts, empty-exponent scripts, cancel/xcancel, color, boxed, primes, pipe grouping)
 
 **Commands:**
 ```bash
