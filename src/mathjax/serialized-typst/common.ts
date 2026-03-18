@@ -296,6 +296,14 @@ export const isNegationOverlay = (node: MathNode): boolean => {
   return getChildText(mtext) === NEGATION_SLASH;
 };
 
+import { getCustomCmdTypst } from "../custom-cmd-map";
+
+/** Get Typst symbol for a custom-cmd node, or undefined if not a custom command. */
+export const getCustomCmdTypstSymbol = (node: MathNode): string | undefined => {
+  const cmd = node.getProperty?.('data-custom-cmd') as string | undefined;
+  return cmd ? getCustomCmdTypst(cmd) : undefined;
+};
+
 /** Serialize all children of a node by visiting each one and concatenating the results.
  *  Detects combining-mark chains in consecutive mi nodes (Devanagari, Arabic, etc.). */
 export const handleAll: HandlerFn = (node, serialize) => {

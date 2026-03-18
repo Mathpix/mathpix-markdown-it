@@ -128,6 +128,8 @@ module.exports = [
   { latex: `\\angle`, typst: `angle`, typst_inline: `angle` },
   { latex: `\\measuredangle`, typst: `angle.arc`, typst_inline: `angle.arc` },
   { latex: `\\sphericalangle`, typst: `angle.spheric`, typst_inline: `angle.spheric` },
+  { latex: `\\varangle`, typst: `angle.spheric`, typst_inline: `angle.spheric` },
+  { latex: `\\Varangle`, typst: `angle.spheric`, typst_inline: `angle.spheric` },
   { latex: `\\nexists`, typst: `exists.not`, typst_inline: `exists.not` },
   { latex: `\\varnothing`, typst: `emptyset`, typst_inline: `emptyset` },
   { latex: `\\triangle`, typst: `triangle.stroked.t`, typst_inline: `triangle.stroked.t` },

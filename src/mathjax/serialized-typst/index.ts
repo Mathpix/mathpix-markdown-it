@@ -12,7 +12,7 @@ import {
 import {
   addToTypstData, addSpaceToTypstData, initTypstData,
   serializeThousandSepChain, serializeCombiningMiChain, formatScript, needsTokenSeparator, needsSpaceBetweenNodes,
-  getChildText, getAttrs, isNegationOverlay,
+  getChildText, getAttrs, isNegationOverlay, getCustomCmdTypstSymbol,
 } from './common';
 import { findTypstSymbol } from './typst-symbol-map';
 import { escapeContentSeparators } from './escape-utils';
@@ -402,6 +402,11 @@ export class SerializedTypstVisitor extends MmlVisitor {
   public visitTeXAtomNode(node: MathNode, _space: string): ITypstData {
     let res: ITypstData = initTypstData();
     try {
+      // Custom commands (e.g. \Varangle) — emit the Typst symbol from central map
+      const customTypst = getCustomCmdTypstSymbol(node);
+      if (customTypst) {
+        return addToTypstData(res, { typst: customTypst });
+      }
       const childData = this.childNodeMml(node);
       if (childData.typst.trim()) {
         res = addToTypstData(res, childData);

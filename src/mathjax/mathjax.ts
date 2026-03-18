@@ -14,7 +14,36 @@ import './helpers/array/ArrayConfiguration';
 /** Load configuration for additional package icon */
 import './helpers/icon/IconConfiguration';
 
-import {AssistiveMmlHandler} from'mathjax-full/js/a11y/assistive-mml.js';
+import {AssistiveMmlHandler, LimitedMmlVisitor} from'mathjax-full/js/a11y/assistive-mml.js';
+import {SerializedMmlVisitor} from 'mathjax-full/js/core/MmlTree/SerializedMmlVisitor.js';
+import {getCustomCmdUnicode} from './custom-cmd-map';
+
+/**
+ * Patch MML visitors so that TeXAtom nodes with `data-custom-cmd` property
+ * emit a clean <mo> instead of the visual-hack subtree.
+ * Zero extra overhead — hooks into the existing visitor dispatch.
+ */
+import { MmlNode } from 'mathjax-full/js/core/MmlTree/MmlNode.js';
+
+interface MmlVisitorProto {
+  visitTeXAtomNode(node: MmlNode, space: string): string;
+}
+
+const patchVisitorTeXAtom = (proto: MmlVisitorProto) => {
+  const orig = proto.visitTeXAtomNode;
+  proto.visitTeXAtomNode = function(node: MmlNode, space: string) {
+    const cmd: string | undefined = node.getProperty('data-custom-cmd') as string | undefined;
+    const unicode = cmd && getCustomCmdUnicode(cmd);
+    if (unicode) {
+      return space + '<mrow><mo>' + unicode + '</mo></mrow>';
+    }
+    return orig.call(this, node, space);
+  };
+};
+
+// Patch both visitors: LimitedMmlVisitor (assistive MML) and SerializedMmlVisitor (MathML / MathML Word)
+patchVisitorTeXAtom(LimitedMmlVisitor.prototype);
+patchVisitorTeXAtom(SerializedMmlVisitor.prototype);
 
 //Fix MathJax error https://github.com/mathjax/MathJax/issues/3033#issuecomment-1511374166
 import { Configuration } from "mathjax-full/js/input/tex/Configuration";

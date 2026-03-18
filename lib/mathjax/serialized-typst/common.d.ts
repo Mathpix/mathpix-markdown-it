@@ -65,6 +65,8 @@ export declare const getContentChildren: (node: MathNode) => MathNode[];
 /** Check if a node is a \not negation overlay: mrow[REL] > mpadded[width=0] > mtext(⧸).
  *  When true, the next sibling should be wrapped in cancel(). */
 export declare const isNegationOverlay: (node: MathNode) => boolean;
+/** Get Typst symbol for a custom-cmd node, or undefined if not a custom command. */
+export declare const getCustomCmdTypstSymbol: (node: MathNode) => string | undefined;
 /** Serialize all children of a node by visiting each one and concatenating the results.
  *  Detects combining-mark chains in consecutive mi nodes (Devanagari, Arabic, etc.). */
 export declare const handleAll: HandlerFn;
