@@ -1433,6 +1433,12 @@ module.exports = [
     typst: `binom(a, b)`,
     typst_inline: `binom(a, b)`,
   },
+  // === Atop (stack without bar and without parens) ===
+  {
+    latex: `{a \\atop b}`,
+    typst: `mat(delim: #none, a; b)`,
+    typst_inline: `mat(delim: #none, a; b)`,
+  },
 
   // === Negated relations ===
   {

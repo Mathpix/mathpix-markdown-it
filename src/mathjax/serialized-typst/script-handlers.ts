@@ -203,10 +203,22 @@ export const mfrac: HandlerFn = (node, serialize) => {
   const dataSecond: ITypstData = secondChild ? serialize.visitNode(secondChild, '') : initTypstData();
   const num = typstPlaceholder(escapeContentSeparators(dataFirst.typst.trim()));
   const den = typstPlaceholder(escapeContentSeparators(dataSecond.typst.trim()));
-  // Check for linethickness=0 which indicates \binom (\choose)
+  // Check for linethickness=0 which indicates \binom or \atop
   const atr = getAttrs<FracAttrs>(node);
   if (atr.linethickness === '0' || atr.linethickness === 0) {
-    res = addToTypstData(res, { typst: `binom(${num}, ${den})` });
+    // \binom: mfrac inside mrow with OPEN/CLOSE fences → binom()
+    // \atop:  bare mfrac without fences → mat(delim: #none, ...; ...)
+    const parent = node.parent;
+    const hasFenceParent = parent
+      && parent.kind === 'mrow'
+      && parent.childNodes.length === 3
+      && parent.childNodes[0]?.texClass === TEXCLASS.OPEN
+      && parent.childNodes[2]?.texClass === TEXCLASS.CLOSE;
+    if (hasFenceParent) {
+      res = addToTypstData(res, { typst: `binom(${num}, ${den})` });
+    } else {
+      res = addToTypstData(res, { typst: `mat(delim: #none, ${num}; ${den})` });
+    }
   } else {
     res = addToTypstData(res, { typst: `frac(${num}, ${den})` });
   }

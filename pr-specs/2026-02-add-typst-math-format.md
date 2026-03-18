@@ -134,7 +134,8 @@ All new Typst code lives in `src/mathjax/serialized-typst/`:
 | `\sqrt{x}` | `sqrt(x)` | `msqrt` |
 | `\sqrt[3]{x}` | `root(3, x)` | `mroot` |
 | `\surd` | `\√` | `mo` (escaped — bare `√` triggers Typst sqrt operator) |
-| `\binom{n}{k}` | `binom(n, k)` | `mfrac` (linethickness=0) |
+| `\binom{n}{k}` | `binom(n, k)` | `mfrac` (linethickness=0, fenced) |
+| `{a \atop b}` | `mat(delim: #none, a; b)` | `mfrac` (linethickness=0, no fence) |
 
 ### Greek letters
 
@@ -608,7 +609,7 @@ In Typst, `underbrace` and `overbrace` take annotations as a second argument: `u
 
 ## Symbol Map Validation
 
-The `typst-symbol-map.ts` file maps ~300 Unicode characters to Typst symbol names. All names were validated against the [Typst sym reference](https://typst.app/docs/reference/symbols/sym/). Fixes applied:
+The `typst-symbol-map.ts` file maps ~370 Unicode characters to Typst symbol names. All names were validated against the [Typst sym reference](https://typst.app/docs/reference/symbols/sym/). Fixes applied:
 
 | Original (invalid) | Fixed | Symbols |
 |---------------------|-------|---------|
@@ -645,7 +646,19 @@ The `typst-symbol-map.ts` file maps ~300 Unicode characters to Typst symbol name
 | `lt.approx` | `lt.approx` | ⪅ |
 | `gt.approx` | `gt.approx` | ⪆ |
 
-For symbols without a named Typst equivalent (`⋈`, `≐`, `ð`, `℘`, `ø`), the Unicode character is output directly — Typst accepts Unicode in math mode.
+**Batch 2 — binary operators, relations, arrows, misc (~70 symbols):**
+
+Binary operators: `union.plus`, `plus.dot`, `inter.double`, `union.double`, `times.three.l`, `times.three.r`, `minus.square`, `dash.o`, `ast.op.o`, `dot.square`, `compose.o`, `plus.square`, `times.div`.
+
+Relations: `approx.eq`, `lt.gt`, `gt.lt`, `lt.eq.gt`, `gt.eq.lt`, `eq.dots`, `eq.dots.up`, `eq.dots.down`, `tilde.eq.rev`, `subset.double`, `supset.double`, `eq.prec`, `eq.succ`, `prec.approx`, `succ.approx`, `forces`, `minus.tilde`, `lt.neq`, `gt.neq`, `lt.nequiv`, `gt.nequiv`, `lt.ntilde`, `gt.ntilde`, `lt.napprox`, `gt.napprox`, `prec.nequiv`, `succ.nequiv`, `prec.ntilde`, `succ.ntilde`, `prec.napprox`, `succ.napprox`, `parallel.not`, `tack.r.not`, `tack.r.double.not`, `forces.not`, `lt.tri.eq.not`, `gt.tri.eq.not`.
+
+Arrows: `arrow.l.triple`, `arrow.r.triple`, `arrow.l.tail`, `arrow.l.loop`, `arrow.r.loop`, `arrow.ccw.half`, `arrow.cw.half`, `arrows.tt`, `arrows.bb`, `arrow.l.r.wave`, `arrow.l.r.not`, `arrow.l.r.double.not`.
+
+Misc: `triangle.filled.small.t`, `triangle.filled.small.b`, `star.filled`, `checkmark`, `maltese`, `triangle.filled.small.l`, `triangle.filled.small.r`, `prime.rev`, `join`.
+
+**Arrow mapping fixes:** `\rightleftarrows` (U+21C4) → `arrows.rl`, `\leftrightarrows` (U+21C6) → `arrows.lr` (were swapped), `\bowtie`/`\Join` (U+22C8) → `join` (was raw `⋈`).
+
+For symbols without a named Typst equivalent (`≐`, `ð`, `℘`, `ø`), the Unicode character is output directly — Typst accepts Unicode in math mode.
 
 ## Spacing and Grouping Logic
 
@@ -895,10 +908,10 @@ This ensures paired delimiters form grouped expressions in Typst (important afte
 | `src/mathjax/serialized-typst/consts.ts` | **New.** Module-wide constants: bracket maps (`Readonly<Record>`), regex patterns (`RE_LETTERS_AND_MARKS`, `RE_LATIN_WITH_MARKS`, etc.), string constants (`NEGATION_SLASH`), `KNOWN_TYPST_FUNCTIONS` set, `SCRIPT_NODE_KINDS` |
 | `src/mathjax/serialized-typst/handlers.ts` | **New.** Top-level dispatch with `isHandlerKind` type guard and two-tier error handling (utility functions return safe defaults; top-level catch logs warning and returns empty output). Handlers imported from domain-specific modules |
 | `src/mathjax/serialized-typst/token-handlers.ts` | **New.** Leaf-node handlers: `mi` (identifiers, font wrapping, symbol map lookup, non-Latin mi chain detection), `mo` (operators, spacing, slash/special-char escaping, unpaired bracket detection, `\not` negation handling), `mn` (numbers), `mtext` (text with quote escaping), `mspace` (spacing commands) |
-| `src/mathjax/serialized-typst/script-handlers.ts` | **New.** Script and root handlers: `mfrac`, `msup`/`msub`/`msubsup`, `msqrt`/`mroot`, `mover`/`munder`/`munderover` (with accent/accentunder gating, constructed long arrow collapsing via `CONSTRUCTED_LONG_ARROWS`, nested mover/munder flattening via `unwrapToScriptNode`), `mmultiscripts` — accents, limits, extensible arrows, brace annotations, prescripts (`tl:/bl:/tr:/br:`) |
+| `src/mathjax/serialized-typst/script-handlers.ts` | **New.** Script and root handlers: `mfrac` (with `\atop` vs `\binom` disambiguation via fence detection), `msup`/`msub`/`msubsup`, `msqrt`/`mroot`, `mover`/`munder`/`munderover` (with accent/accentunder gating, constructed long arrow collapsing via `CONSTRUCTED_LONG_ARROWS`, nested mover/munder flattening via `unwrapToScriptNode`), `mmultiscripts` — accents, limits, extensible arrows, brace annotations, prescripts (`tl:/bl:/tr:/br:`) |
 | `src/mathjax/serialized-typst/structural-handlers.ts` | **New.** Structural wrappers: `mrow` (delimiter pairing, shorthand functions with separator fallback, `\not` negation wrapping, `hasTableFirst` path for reverse cases), `mpadded` (mhchem phantom stripping, `\colorbox`, `mstyle` background), `mphantom`, `menclose` (cancel/xcancel/bcancel, boxed with `#align(center, ...)`, longdiv with `lr(\) ...)`, circle, selective border strokes via Set-based notation matching, overline/underline), `mstyle` (color wrapping); handlers set separate `typst_inline` without block wrappers |
 | `src/mathjax/serialized-typst/table-handlers.ts` | **New.** Table/array handlers: `mtable` (matrix with asymmetric delimiter support, cases, reverse cases, numcases, eqnArray with tagged/untagged strategies, augmented columns with vline capping via `getActualColumnCount()`, column alignment, nested eqnArray detection via `isInsideMatrixCell`/`isInsideEqnArrayCellWithSiblings`, gathered-like detection by `columnalign="center"` + single-column, `display()` wrapping for nested tables, `typst_inline` propagation through eqnArray rows), `mtr` |
-| `src/mathjax/serialized-typst/typst-symbol-map.ts` | **New.** Unicode → Typst symbol mapping (~300 entries as `ReadonlyMap`s), accent map, font map |
+| `src/mathjax/serialized-typst/typst-symbol-map.ts` | **New.** Unicode → Typst symbol mapping (~370 entries as `ReadonlyMap`s), accent map, font map |
 | `src/mathjax/serialized-typst/common.ts` | **New.** Shared helpers: `initTypstData`, `addToTypstData` (always propagates `typst_inline` with `typst` fallback), `addSpaceToTypstData`, `needsParens`, `isThousandSepComma`, `serializeThousandSepChain`, `needsTokenSeparator`, `needsSpaceBetweenNodes` (extends token separator with script+bracket check), `formatScript`, tree-position utilities (`isFirstChild`/`isLastChild`/`getSiblingIndex`), node accessors (`getChildText`/`getNodeText`/`getAttrs`/`getProp`/`getContentChildren`), `isNegationOverlay` (`\not` detection), `getCustomCmdTypstSymbol` (custom command → Typst lookup via central map), `serializeCombiningMiChain` (non-Latin script grouping), `handleAll` |
 | `src/mathjax/serialized-typst/escape-utils.ts` | **New.** Unified expression scanner (`scanExpression`) with per-bracket-type depth counters (paren/bracket/brace); thin wrappers: `escapeContentSeparators`, `escapeCasesSeparators`, `hasTopLevelSeparators`, `escapeLrSemicolons`, `escapeUnbalancedParens`, `escapeColonsInLr`, `escapeInnerBrackets` |
 | `src/mathjax/serialized-typst/bracket-utils.ts` | **New.** Delimiter mapping/escaping: `delimiterToTypst`, `escapeLrDelimiter`, `replaceUnpairedBrackets` (cell-level bracket escaping for mat/cases with scope boundaries for `msqrt`, `mroot`, `mfrac`, `menclose`), `treeContainsMo`, `serializePrefixBeforeMo`, function-call-aware paren heuristic via `KNOWN_TYPST_FUNCTIONS` |
