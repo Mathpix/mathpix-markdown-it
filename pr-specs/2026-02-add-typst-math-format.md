@@ -116,7 +116,7 @@ All new Typst code lives in `src/mathjax/serialized-typst/`:
 | `src/contex-menu/menu/menu-items.ts` | Skips `typst_inline` when its value equals `typst` (no redundant menu entry) |
 | `src/helpers/parse-mmd-element.ts` | `'TYPSTMATH'` and `'TYPSTMATH_INLINE'` recognized in DOM parser; mapped to types `'typst'` and `'typst_inline'` |
 | `src/mathjax/custom-cmd-map.ts` | **New.** Central registry mapping `data-custom-cmd` property values to `{ unicode, typst }` output symbols. Shared by MathML visitors, ASCII serializer, and Typst serializer |
-| `src/mathjax/my-BaseMappings.ts` | Added `CustomMethods` with `Varangle`, `llbracket`, `rrbracket` handlers (parse macro, stamp `data-custom-cmd`). `wasysym-macros` CommandMap uses merged `allMethods` |
+| `src/mathjax/my-BaseMappings.ts` | `makeCustomCmdHandler` factory + `CustomMethods` (`Varangle`, `llbracket`, `rrbracket`, `pounds`). `wasysym-macros` CommandMap uses merged `allMethods` |
 | `src/mathjax/mathjax.ts` | Added `patchVisitorTeXAtom` — typed patch on `SerializedMmlVisitor`/`LimitedMmlVisitor` prototypes for `data-custom-cmd` interception |
 | `src/mathjax/serialized-ascii/index.ts` | `visitTeXAtomNode` checks `data-custom-cmd` → emits Unicode via `getCustomCmdUnicode()` |
 
@@ -714,6 +714,7 @@ Some LaTeX commands (e.g. `\Varangle`) expand into visual-hack subtrees in MathJ
      Varangle:  { unicode: '\u2222', typst: 'angle.spheric' },
      llbracket: { unicode: '\u27E6', typst: 'bracket.l.stroked' },
      rrbracket: { unicode: '\u27E7', typst: 'bracket.r.stroked' },
+     pounds:    { unicode: '\u00A3', typst: 'pound' },
    }
    ```
 3. **Serializer lookup** — each serializer checks `data-custom-cmd` on TeXAtom nodes and emits the symbol from the central map:
@@ -729,6 +730,7 @@ Some LaTeX commands (e.g. `\Varangle`) expand into visual-hack subtrees in MathJ
 | `\llbracket` | `bracket.l.stroked` | `<mo>⟦</mo>` | `⟦` |
 | `\rrbracket` | `bracket.r.stroked` | `<mo>⟧</mo>` | `⟧` |
 | `\llbracket x \rrbracket` | `bracket.l.stroked x bracket.r.stroked` | `<mo>⟦</mo>x<mo>⟧</mo>` | `⟦x⟧` |
+| `\pounds` | `pound` | `<mo>£</mo>` | `£` |
 
 **Adding a new custom command** requires only two changes: (1) add an entry to `customCmdMap` in `custom-cmd-map.ts`, (2) add a handler in `my-BaseMappings.ts` that sets `data-custom-cmd`.
 
@@ -900,8 +902,8 @@ This ensures paired delimiters form grouped expressions in Typst (important afte
 | `src/mathjax/serialized-typst/common.ts` | **New.** Shared helpers: `initTypstData`, `addToTypstData` (always propagates `typst_inline` with `typst` fallback), `addSpaceToTypstData`, `needsParens`, `isThousandSepComma`, `serializeThousandSepChain`, `needsTokenSeparator`, `needsSpaceBetweenNodes` (extends token separator with script+bracket check), `formatScript`, tree-position utilities (`isFirstChild`/`isLastChild`/`getSiblingIndex`), node accessors (`getChildText`/`getNodeText`/`getAttrs`/`getProp`/`getContentChildren`), `isNegationOverlay` (`\not` detection), `getCustomCmdTypstSymbol` (custom command → Typst lookup via central map), `serializeCombiningMiChain` (non-Latin script grouping), `handleAll` |
 | `src/mathjax/serialized-typst/escape-utils.ts` | **New.** Unified expression scanner (`scanExpression`) with per-bracket-type depth counters (paren/bracket/brace); thin wrappers: `escapeContentSeparators`, `escapeCasesSeparators`, `hasTopLevelSeparators`, `escapeLrSemicolons`, `escapeUnbalancedParens`, `escapeColonsInLr`, `escapeInnerBrackets` |
 | `src/mathjax/serialized-typst/bracket-utils.ts` | **New.** Delimiter mapping/escaping: `delimiterToTypst`, `escapeLrDelimiter`, `replaceUnpairedBrackets` (cell-level bracket escaping for mat/cases with scope boundaries for `msqrt`, `mroot`, `mfrac`, `menclose`), `treeContainsMo`, `serializePrefixBeforeMo`, function-call-aware paren heuristic via `KNOWN_TYPST_FUNCTIONS` |
-| `src/mathjax/custom-cmd-map.ts` | **New.** Central registry for custom LaTeX commands: maps `data-custom-cmd` property values to `{ unicode, typst }` output symbols. Lookup helpers: `getCustomCmdUnicode()`, `getCustomCmdTypst()`. Contains `Varangle` → `angle.spheric`/`∢`, `llbracket` → `bracket.l.stroked`/`⟦`, `rrbracket` → `bracket.r.stroked`/`⟧` |
-| `src/mathjax/my-BaseMappings.ts` | Added custom handler methods (`CustomMethods`) for commands that need `data-custom-cmd` tagging. `Varangle` handler parses the macro expansion via `TexParser`, stamps the resulting node with `data-custom-cmd: 'Varangle'` via both `setProperty` and `setProperties`. `wasysym-macros` CommandMap now uses `allMethods` (merged `BaseMethods` + `CustomMethods`) |
+| `src/mathjax/custom-cmd-map.ts` | **New.** Central registry for custom LaTeX commands: maps `data-custom-cmd` property values to `{ unicode, typst }` output symbols. Lookup helpers: `getCustomCmdUnicode()`, `getCustomCmdTypst()`. Contains `Varangle` → `angle.spheric`/`∢`, `llbracket` → `bracket.l.stroked`/`⟦`, `rrbracket` → `bracket.r.stroked`/`⟧`, `pounds` → `pound`/`£` |
+| `src/mathjax/my-BaseMappings.ts` | `makeCustomCmdHandler(macro, cmd)` factory creates handlers that parse the macro via `TexParser` and stamp `data-custom-cmd` via `setProperty` (property-only, not attribute — does not leak into SVG/MathML output). `CustomMethods`: `Varangle`, `llbracket`, `rrbracket`, `pounds`. `wasysym-macros` CommandMap uses merged `allMethods` |
 | `src/mathjax/mathjax.ts` | Patched `AbstractTags` (`autoTag`, `getTag`, `startEquation`) to mark auto-numbered tags with `data-tag-auto` property and preserve `\label{}` keys as `data-label-key`. Added `patchVisitorTeXAtom` — typed monkey-patch (`MmlVisitorProto` interface) on `SerializedMmlVisitor` and `LimitedMmlVisitor` prototypes that intercepts `data-custom-cmd` nodes and emits clean `<mo>` via `getCustomCmdUnicode()` from central map |
 | `src/mathjax/serialized-ascii/index.ts` | `visitTeXAtomNode` now checks `data-custom-cmd` property and emits the canonical Unicode symbol via `getCustomCmdUnicode()` from central map |
 | `src/mathjax/index.ts` | `toTypstData()` calls `markUnpairedBrackets(node)` before `visitTree()` to mark unpaired ASCII brackets; returns `{ typstmath, typstmath_inline }` from the visitor's `ITypstData`; `OuterData()` and `OuterHTML()` populate both fields; `OuterHTML()` emits `<typstmath>` and `<typstmath_inline>` hidden tags; `TexConvertToTypstData()` is the sole public API for Typst (resets MathJax tag state before each conversion); `normalizeTypstSpaces` preserves line-leading indentation (`/(\S) {2,}/g`) |

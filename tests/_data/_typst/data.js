@@ -132,6 +132,7 @@ module.exports = [
   { latex: `\\Varangle`, typst: `angle.spheric`, typst_inline: `angle.spheric` },
   { latex: `\\AA`, typst: `angstrom`, typst_inline: `angstrom` },
   { latex: `\\Perp`, typst: `tack.t.double`, typst_inline: `tack.t.double` },
+  { latex: `\\pounds`, typst: `pound`, typst_inline: `pound` },
   { latex: `\\llbracket`, typst: `bracket.l.stroked`, typst_inline: `bracket.l.stroked` },
   { latex: `\\rrbracket`, typst: `bracket.r.stroked`, typst_inline: `bracket.r.stroked` },
   { latex: String.raw`\llbracket x \rrbracket`, typst: `bracket.l.stroked x bracket.r.stroked`, typst_inline: `bracket.l.stroked x bracket.r.stroked` },

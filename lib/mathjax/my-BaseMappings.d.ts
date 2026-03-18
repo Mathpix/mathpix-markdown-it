@@ -1,7 +1,6 @@
 declare const sm: any;
 declare const ParseMethods_js_1: any;
 declare const BaseMethods_js_1: any;
-declare const NodeUtil_js_1: any;
 declare const TexParser_js_1: any;
 /**
  * Factory: creates a custom command handler that parses a TeX macro
@@ -17,5 +16,6 @@ declare const CustomMethods: {
     Varangle: (parser: any, name: any) => void;
     llbracket: (parser: any, name: any) => void;
     rrbracket: (parser: any, name: any) => void;
+    pounds: (parser: any, name: any) => void;
 };
 declare const allMethods: any;

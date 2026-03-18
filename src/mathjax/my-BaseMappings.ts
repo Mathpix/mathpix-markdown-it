@@ -3,7 +3,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const sm = require("mathjax-full/js/input/tex/SymbolMap.js");
 const ParseMethods_js_1 = require("mathjax-full/js/input/tex/ParseMethods.js");
 const BaseMethods_js_1 = require("mathjax-full/js/input/tex/base/BaseMethods.js");
-const NodeUtil_js_1 = require("mathjax-full/js/input/tex/NodeUtil.js");
 const TexParser_js_1 = require("mathjax-full/js/input/tex/TexParser.js");
 
 new sm.CharacterMap('wasysym-mathchar0mo', ParseMethods_js_1.default.mathchar0mo, {
@@ -25,8 +24,9 @@ const makeCustomCmdHandler = (macro, cmd) => function(parser, name) {
     macro, Object.assign({}, parser.stack.env), parser.configuration
   ).mml();
   if (mml) {
+    // Set only as property (not attribute) — visible to visitor serializers
+    // via getProperty(), but does not leak into SVG or MathML output.
     mml.setProperty('data-custom-cmd', cmd);
-    NodeUtil_js_1.default.setProperties(mml, { 'data-custom-cmd': cmd });
     parser.Push(mml);
   }
 };
@@ -37,6 +37,7 @@ const CustomMethods = {
   // \llbracket / \rrbracket — double brackets via negative thin space
   llbracket: makeCustomCmdHandler('{[\\![}', 'llbracket'),
   rrbracket: makeCustomCmdHandler('{]\\!]}', 'rrbracket'),
+  pounds:    makeCustomCmdHandler('{\\it\\unicode{xA3}}', 'pounds'),
 };
 
 // Merge custom methods with BaseMethods for CommandMap
@@ -56,7 +57,7 @@ new sm.CommandMap('wasysym-macros', {
   rrbracket: 'rrbracket',
   hhline: ['Macro', '\\hline \\hline'],
   AA: ['Macro', '{\\unicode{x212B}}'],
-  pounds: ['Macro', '{\\it\\unicode{xA3}}'],
+  pounds: 'pounds',
   highlight: ['Macro', '\\mathchoice' +
   '%{\\colorbox{#1}{$\\displaystyle{#2}$}}' +
   '%{\\colorbox{#1}{$\\textstyle{#2}$}}' +
