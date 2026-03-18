@@ -460,10 +460,23 @@ export const typstFontMap: ReadonlyMap<string, string> = new Map<string, string>
   ["monospace", "mono"],
 ]);
 
+// MathJax merges adjacent mo nodes that lack operands into a single text node
+// (e.g. \approx \approxeq → one mo with "≈≊"). This regex distinguishes
+// merged Unicode symbols from ASCII operator names ("lim", "sin") that must
+// stay intact.
+const ALL_NON_ASCII = /^[^\x00-\x7F]+$/;
+
 export const findTypstSymbol = (unicode: string): string => {
   const result = typstSymbolMap.get(unicode);
   if (result !== undefined) {
     return result;
+  }
+  if (unicode.length > 1 && ALL_NON_ASCII.test(unicode)) {
+    const parts: string[] = [];
+    for (const ch of unicode) {
+      parts.push(typstSymbolMap.get(ch) ?? ch);
+    }
+    return parts.join(' ');
   }
   return unicode;
 };

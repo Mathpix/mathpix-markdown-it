@@ -212,6 +212,7 @@ module.exports = [
   { latex: `\\blacktriangleleft`, typst: `triangle.filled.small.l`, typst_inline: `triangle.filled.small.l` },
   { latex: `\\blacktriangleright`, typst: `triangle.filled.small.r`, typst_inline: `triangle.filled.small.r` },
   // Relations (new batch)
+  { latex: `\\approx \\approxeq`, typst: `approx approx.eq`, typst_inline: `approx approx.eq` },
   { latex: `\\approxeq`, typst: `approx.eq`, typst_inline: `approx.eq` },
   { latex: `\\lessgtr`, typst: `lt.gt`, typst_inline: `lt.gt` },
   { latex: `\\gtrless`, typst: `gt.lt`, typst_inline: `gt.lt` },
