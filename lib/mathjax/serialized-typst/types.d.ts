@@ -45,6 +45,7 @@ export interface EncloseAttrs {
 export interface StyleAttrs {
     mathcolor?: string;
     mathbackground?: string;
+    mathsize?: string | number;
 }
 export interface ITypstData {
     typst: string;

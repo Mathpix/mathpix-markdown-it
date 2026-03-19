@@ -39,7 +39,7 @@ export interface PaddedAttrs { width?: string | number; height?: string | number
 /** Attributes for menclose (notation). */
 export interface EncloseAttrs { notation?: string; }
 /** Attributes for mstyle (color, background). */
-export interface StyleAttrs { mathcolor?: string; mathbackground?: string; }
+export interface StyleAttrs { mathcolor?: string; mathbackground?: string; mathsize?: string | number; }
 
 export interface ITypstData {
   typst: string;

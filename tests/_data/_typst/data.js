@@ -215,6 +215,7 @@ module.exports = [
   { latex: `\\blacklozenge`, typst: `lozenge.filled`, typst_inline: `lozenge.filled` },
   { latex: `\\backepsilon`, typst: `in.rev.small`, typst_inline: `in.rev.small` },
   { latex: `\\beth`, typst: `beth`, typst_inline: `beth` },
+  { latex: `\\tripledash`, typst: `hyph hyph hyph`, typst_inline: `hyph hyph hyph` },
   { latex: `\\varkappa`, typst: `kappa.alt`, typst_inline: `kappa.alt` },
   { latex: `\\yen`, typst: `yen`, typst_inline: `yen` },
   { latex: `\\S`, typst: `section`, typst_inline: `section` },

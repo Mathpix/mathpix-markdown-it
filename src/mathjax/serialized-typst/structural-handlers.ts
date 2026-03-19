@@ -305,7 +305,10 @@ export const mpadded: HandlerFn = (node, serialize) => {
   // mhchem alignment phantom: mpadded width=0 or height=0 containing mphantom
   // inside msub/msup/msubsup — zero-size alignment box, emit empty string.
   // Only skip inside script ancestors; standalone \hphantom/\vphantom must still produce #hide().
-  if ((atr.width === 0 || atr.height === 0) && hasPhantomChild(node) && hasScriptAncestor(node)) {
+  const isZeroWidth = atr.width === 0 || atr.width === '0';
+  const isZeroHeight = atr.height === 0 || atr.height === '0';
+  if ((isZeroWidth || isZeroHeight) && hasPhantomChild(node)
+    && (hasScriptAncestor(node) || hasAdjacentTripledashStyle(node))) {
     return res;
   }
   const data: ITypstData = handleAll(node, serialize);
@@ -431,10 +434,65 @@ export const menclose: HandlerFn = (node, serialize) => {
   return res;
 };
 
+// mhchem \tripledash: mstyle(mathsize<1em) containing only mtext("-") and mspace.
+// Detect and replace dashes with Typst `hyph` symbols.
+const QUOTED_DASH_GLOBAL = /"-"/g;
+const isTripledashStyle = (node: MathNode): boolean => {
+  const atr = getAttrs<StyleAttrs>(node);
+  const ms = atr.mathsize;
+  if (!ms || (typeof ms === 'string' ? parseFloat(ms) >= 1 : ms >= 1)) return false;
+  const children = node.childNodes?.[0]?.childNodes ?? node.childNodes ?? [];
+  let dashCount = 0;
+  for (const child of children) {
+    if (child.kind === 'mspace') continue;
+    if (child.kind === 'mtext') { dashCount++; continue; }
+    return false;
+  }
+  return dashCount > 0;
+};
+
+/** Recursively check if a subtree contains a tripledash mstyle (shallow). */
+const containsTripledashStyle = (node: MathNode, depth = 0): boolean => {
+  if (depth > SHALLOW_TREE_MAX_DEPTH) return false;
+  if (node.kind === 'mstyle' && isTripledashStyle(node)) return true;
+  if (node.childNodes) {
+    for (const child of node.childNodes) {
+      if (containsTripledashStyle(child, depth + 1)) return true;
+    }
+  }
+  return false;
+};
+
+/** Check if a sibling (up to 2 parent levels) contains a tripledash mstyle.
+ *  Used by mpadded to suppress the #hide() phantom preceding tripledash. */
+const hasAdjacentTripledashStyle = (node: MathNode): boolean => {
+  let cur: MathNode | null = node;
+  for (let depth = 0; depth < 3 && cur; depth++) {
+    const parent = cur.parent;
+    if (!parent?.childNodes) { cur = parent; continue; }
+    for (const sibling of parent.childNodes) {
+      if (sibling === cur) continue;
+      if (containsTripledashStyle(sibling)) return true;
+    }
+    cur = parent;
+  }
+  return false;
+};
+
 export const mstyle: HandlerFn = (node, serialize) => {
   let res: ITypstData = initTypstData();
   if (isOperatorInternalSpacing(node)) {
     return res;
+  }
+  // mhchem \tripledash pattern: tiny dashes → hyph symbols
+  if (isTripledashStyle(node)) {
+    const data: ITypstData = handleAll(node, serialize);
+    const content = data.typst.trim();
+    const replaced = content.replace(QUOTED_DASH_GLOBAL, 'hyph');
+    if (replaced !== content) {
+      res = addToTypstData(res, { typst: replaced });
+      return res;
+    }
   }
   const atr = getAttrs<StyleAttrs>(node);
   const rawColor = atr.mathcolor || '';
