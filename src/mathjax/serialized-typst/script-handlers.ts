@@ -55,7 +55,7 @@ const STRETCH_BASE_SYMBOLS: ReadonlySet<string> = new Set([
 ]);
 
 // Accent functions that have no under-variant in Typst.
-// In munder context, these use attach(base, b: symbol) instead of accent function.
+// In munder context, these use limits(base)_symbol instead of accent function.
 const MUNDER_ATTACH_SYMBOLS: ReadonlyMap<string, string> = new Map([
   ['arrow', 'arrow.r'],        // → below
   ['arrow.l', 'arrow.l'],      // ← below
@@ -449,10 +449,10 @@ export const munder: HandlerFn = (node, serialize) => {
     if (accentFn === 'overbrace') { accentFn = 'underbrace'; }
     if (accentFn) {
       const content = typstPlaceholder(escapeContentSeparators(escapeUnbalancedParens(dataFirst.typst.trim())));
-      // Arrows/harpoons have no under-variant in Typst — use attach(base, b: symbol)
+      // Arrows/harpoons have no under-variant in Typst — use limits(base)_(symbol)
       const underSymbol = MUNDER_ATTACH_SYMBOLS.get(accentFn);
       if (underSymbol) {
-        res = addToTypstData(res, { typst: `attach(${content}, b: ${underSymbol})` });
+        res = addToTypstData(res, { typst: `limits(${content})_${underSymbol}` });
         return res;
       }
       if (TYPST_ACCENT_SHORTHANDS.has(accentFn)) {
