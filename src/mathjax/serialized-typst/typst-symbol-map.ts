@@ -16,12 +16,14 @@ const greekSymbols: ReadonlyArray<[string, string]> = [
   ["\u0398", "Theta"],    // Θ
   ["\u03B9", "iota"],     // ι
   ["\u03BA", "kappa"],    // κ
+  ["\u03F0", "kappa.alt"],// ϰ (varkappa)
   ["\u03BB", "lambda"],   // λ
   ["\u039B", "Lambda"],   // Λ
   ["\u03BC", "mu"],       // μ
   ["\u03BD", "nu"],       // ν
   ["\u03BE", "xi"],       // ξ
   ["\u039E", "Xi"],       // Ξ
+  ["\u03BF", "omicron"],  // ο
   ["\u03C0", "pi"],       // π
   ["\u03D6", "pi.alt"],   // ϖ (varpi)
   ["\u03A0", "Pi"],       // Π
@@ -41,6 +43,7 @@ const greekSymbols: ReadonlyArray<[string, string]> = [
   ["\u03A8", "Psi"],      // Ψ
   ["\u03C9", "omega"],    // ω
   ["\u03A9", "Omega"],    // Ω
+  ["\u03DD", "digamma"],  // ϝ (\digamma)
 ];
 
 // Binary operators: Unicode → Typst symbol name
@@ -126,6 +129,7 @@ const relationOperators: ReadonlyArray<[string, string]> = [
   ["\u2287", "supset.eq"],        // ⊇
   ["\u2208", "in"],               // ∈
   ["\u220B", "in.rev"],           // ∋
+  ["\u220D", "in.rev.small"],     // ∍ (\backepsilon)
   ["\u2209", "in.not"],           // ∉
   ["\u221D", "prop"],             // ∝
   ["\u2223", "divides"],          // ∣
@@ -207,6 +211,10 @@ const relationOperators: ReadonlyArray<[string, string]> = [
   ["\u22AC", "tack.r.not"],       // ⊬ (\nvdash)
   ["\u22AD", "tack.r.double.not"],// ⊭ (\nvDash)
   ["\u22AE", "forces.not"],       // ⊮ (\nVdash)
+  ["\u22E0", "prec.curly.eq.not"],// ⋠ (\npreceq)
+  ["\u22E1", "succ.curly.eq.not"],// ⋡ (\nsucceq)
+  ["\u22EA", "lt.tri.not"],       // ⋪ (\ntriangleleft)
+  ["\u22EB", "gt.tri.not"],       // ⋫ (\ntriangleright)
   ["\u22EC", "lt.tri.eq.not"],    // ⋬ (\ntrianglelefteq)
   ["\u22ED", "gt.tri.eq.not"],    // ⋭ (\ntrianglerighteq)
 ];
@@ -267,6 +275,10 @@ const arrows: ReadonlyArray<[string, string]> = [
   ["\u21A2", "arrow.l.tail"],         // ↢ (leftarrowtail)
   ["\u21AB", "arrow.l.loop"],         // ↫ (looparrowleft)
   ["\u21AC", "arrow.r.loop"],         // ↬ (looparrowright)
+  ["\u21BA", "arrow.ccw"],             // ↺ (circlearrowleft)
+  ["\u21BB", "arrow.cw"],             // ↻ (circlearrowright)
+  ["\u21E0", "arrow.l.dashed"],       // ⇠ (dashleftarrow)
+  ["\u21E2", "arrow.r.dashed"],       // ⇢ (dashrightarrow)
   ["\u21B6", "arrow.ccw.half"],       // ↶ (curvearrowleft)
   ["\u21B7", "arrow.cw.half"],        // ↷ (curvearrowright)
   ["\u21C8", "arrows.tt"],            // ⇈ (upuparrows)
@@ -316,6 +328,10 @@ const delimiters: ReadonlyArray<[string, string]> = [
   ["\u231E", "corner.l.b"],    // ⌞
   ["\u231F", "corner.r.b"],    // ⌟
   ["\u2016", "bar.v.double"],  // ‖
+  ["\u27EE", "paren.l.flat"],  // ⟮ (\lgroup)
+  ["\u27EF", "paren.r.flat"],  // ⟯ (\rgroup)
+  ["\u23B0", "mustache.l"],    // ⎰ (\lmoustache)
+  ["\u23B1", "mustache.r"],    // ⎱ (\rmoustache)
   // Note: \u2225 (∥) is NOT duplicated here — it maps to "parallel" in relationOperators
 ];
 
@@ -349,6 +365,9 @@ const miscSymbols: ReadonlyArray<[string, string]> = [
   ["\u2035", "prime.rev"],      // ‵ (backprime)
   ["\u2224", "divides.not"],    // ∤
   ["\u2135", "aleph"],           // ℵ
+  ["\u2136", "beth"],            // ℶ (\beth)
+  ["\u2137", "gimel"],           // ℷ (\gimel)
+  ["\u2138", "daleth"],          // ℸ (\daleth)
   ["\u210F", "planck"],         // ℏ
   ["\u2113", "ell"],            // ℓ
   ["\u211C", "Re"],             // ℜ
@@ -397,6 +416,11 @@ const miscSymbols: ReadonlyArray<[string, string]> = [
   ["\u2720", "maltese"],         // ✠ (maltese)
   ["\u25C2", "triangle.filled.small.l"], // ◂ (blacktriangleleft)
   ["\u25B8", "triangle.filled.small.r"], // ▸ (blacktriangleright)
+  ["\u25EF", "circle.stroked.big"],  // ◯ (\bigcirc)
+  ["\u29EB", "lozenge.filled"],      // ⧫ (\blacklozenge)
+  ["\u00A5", "yen"],              // ¥ (\yen)
+  ["\u00A7", "section"],          // § (\S)
+  ["\u00AE", "trademark.registered"],// ® (\circledR)
 ];
 
 // Build the combined symbol map
@@ -439,6 +463,7 @@ export const typstAccentMap: ReadonlyMap<string, string> = new Map<string, strin
   ["\u23DF", "underbrace"],   // ⏟ (underbrace)
   ["\u23B4", "overbracket"],  // ⎴ (overbracket)
   ["\u23B5", "underbracket"], // ⎵ (underbracket)
+  ["\u23DC", "overparen"],   // ⏜ (overparen)
   ["―", "overline"],          // ― (horizontal bar → overline)
 ]);
 
@@ -461,17 +486,18 @@ export const typstFontMap: ReadonlyMap<string, string> = new Map<string, string>
 ]);
 
 // MathJax merges adjacent mo nodes that lack operands into a single text node
-// (e.g. \approx \approxeq → one mo with "≈≊"). This regex distinguishes
-// merged Unicode symbols from ASCII operator names ("lim", "sin") that must
-// stay intact.
-const ALL_NON_ASCII = /^[^\x00-\x7F]+$/;
+// (e.g. \approx \approxeq → one mo with "≈≊"). Merged strings may include
+// ASCII operators like > or <, so we cannot simply check for non-ASCII.
+// Instead we skip purely alphabetic strings — those are operator names
+// ("lim", "sin", "mod") that must stay intact.
+const ALL_ALPHA = /^[a-zA-Z]+$/;
 
 export const findTypstSymbol = (unicode: string): string => {
   const result = typstSymbolMap.get(unicode);
   if (result !== undefined) {
     return result;
   }
-  if (unicode.length > 1 && ALL_NON_ASCII.test(unicode)) {
+  if (unicode.length > 1 && !ALL_ALPHA.test(unicode)) {
     const parts: string[] = [];
     for (const ch of unicode) {
       parts.push(typstSymbolMap.get(ch) ?? ch);

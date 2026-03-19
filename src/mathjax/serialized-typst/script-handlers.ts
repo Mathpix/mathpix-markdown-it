@@ -74,14 +74,18 @@ const CONSTRUCTED_LONG_ARROWS: ReadonlyMap<string, string> = new Map([
   ['arrow.l.long|arrow.r.long', 'arrows.lr'],   // \longleftrightarrows   ⇆
 ]);
 
-const stripDashes = (s: string): string => s.replace(/[\s\-\u2212\u2013\u2014\u2015\u23AF\u2500]/g, '');
+const HIDE_PATTERN = /#hide\(\$[^$]*\$\)/g;
+const DASH_CHARS = /[\s\-\u2212\u2013\u2014\u2015\u23AF\u2500]/g;
+
+const stripDashes = (s: string): string =>
+  s.replace(HIDE_PATTERN, '').replace(DASH_CHARS, '');
 
 // Typst accent shorthand functions that can be called as fn(content).
 // Accents NOT in this set must use the accent(content, symbol) form.
 const TYPST_ACCENT_SHORTHANDS: ReadonlySet<string> = new Set([
   'hat', 'tilde', 'acute', 'grave', 'macron', 'overline', 'underline',
   'breve', 'dot', 'diaer', 'caron', 'arrow', 'circle',
-  'overbrace', 'underbrace', 'overbracket', 'underbracket',
+  'overbrace', 'underbrace', 'overbracket', 'underbracket', 'overparen',
 ]);
 
 /** Append ", limits: #true" inside an op() wrapper: op("name") → op("name", limits: #true) */

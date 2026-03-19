@@ -609,7 +609,7 @@ In Typst, `underbrace` and `overbrace` take annotations as a second argument: `u
 
 ## Symbol Map Validation
 
-The `typst-symbol-map.ts` file maps ~370 Unicode characters to Typst symbol names. All names were validated against the [Typst sym reference](https://typst.app/docs/reference/symbols/sym/). Fixes applied:
+The `typst-symbol-map.ts` file maps ~400 Unicode characters to Typst symbol names. All names were validated against the [Typst sym reference](https://typst.app/docs/reference/symbols/sym/). Fixes applied:
 
 | Original (invalid) | Fixed | Symbols |
 |---------------------|-------|---------|
@@ -656,7 +656,25 @@ Arrows: `arrow.l.triple`, `arrow.r.triple`, `arrow.l.tail`, `arrow.l.loop`, `arr
 
 Misc: `triangle.filled.small.t`, `triangle.filled.small.b`, `star.filled`, `checkmark`, `maltese`, `triangle.filled.small.l`, `triangle.filled.small.r`, `prime.rev`, `join`.
 
+**Batch 3 — misc symbols, delimiters, Greek, relations, arrows, accents (~30 symbols):**
+
+Greek: `omicron`, `kappa.alt` (varkappa), `digamma`.
+
+Misc: `gimel`, `daleth`, `beth`, `in.rev.small` (backepsilon), `circle.stroked.big` (bigcirc), `lozenge.filled` (blacklozenge), `yen`, `section`, `trademark.registered` (circledR).
+
+Delimiters: `paren.l.flat` (lgroup), `paren.r.flat` (rgroup), `mustache.l` (lmoustache), `mustache.r` (rmoustache).
+
+Relations: `prec.curly.eq.not` (npreceq), `succ.curly.eq.not` (nsucceq), `lt.tri.not` (ntriangleleft), `gt.tri.not` (ntriangleright).
+
+Arrows: `arrow.ccw` (circlearrowleft), `arrow.cw` (circlearrowright), `arrow.l.dashed` (dashleftarrow), `arrow.r.dashed` (dashrightarrow).
+
+Accents: `overparen` (U+23DC) added to accent map and shorthand set.
+
 **Arrow mapping fixes:** `\rightleftarrows` (U+21C4) → `arrows.rl`, `\leftrightarrows` (U+21C6) → `arrows.lr` (were swapped), `\bowtie`/`\Join` (U+22C8) → `join` (was raw `⋈`).
+
+**Constructed long arrow fix:** `\longLeftrightharpoons` now collapses to `harpoons.rtlb` (was `limits(harpoon.lb-)^(#hide($-$) harpoon.rt)`). Fixed `stripDashes` to also strip `#hide(...)` patterns from over/base before matching.
+
+**Merged mo fix:** MathJax merges adjacent `mo` nodes without operands into a single text node (e.g. `\approx \approxeq` → `"≈≊"`). `findTypstSymbol` now splits multi-character non-alphabetic strings and maps each character individually. This handles merged Unicode symbols while preserving ASCII operator names ("lim", "sin") intact.
 
 For symbols without a named Typst equivalent (`≐`, `ð`, `℘`, `ø`), the Unicode character is output directly — Typst accepts Unicode in math mode.
 
@@ -911,7 +929,7 @@ This ensures paired delimiters form grouped expressions in Typst (important afte
 | `src/mathjax/serialized-typst/script-handlers.ts` | **New.** Script and root handlers: `mfrac` (with `\atop` vs `\binom` disambiguation via fence detection), `msup`/`msub`/`msubsup`, `msqrt`/`mroot`, `mover`/`munder`/`munderover` (with accent/accentunder gating, constructed long arrow collapsing via `CONSTRUCTED_LONG_ARROWS`, nested mover/munder flattening via `unwrapToScriptNode`), `mmultiscripts` — accents, limits, extensible arrows, brace annotations, prescripts (`tl:/bl:/tr:/br:`) |
 | `src/mathjax/serialized-typst/structural-handlers.ts` | **New.** Structural wrappers: `mrow` (delimiter pairing, shorthand functions with separator fallback, `\not` negation wrapping, `hasTableFirst` path for reverse cases), `mpadded` (mhchem phantom stripping, `\colorbox`, `mstyle` background), `mphantom`, `menclose` (cancel/xcancel/bcancel, boxed with `#align(center, ...)`, longdiv with `lr(\) ...)`, circle, selective border strokes via Set-based notation matching, overline/underline), `mstyle` (color wrapping); handlers set separate `typst_inline` without block wrappers |
 | `src/mathjax/serialized-typst/table-handlers.ts` | **New.** Table/array handlers: `mtable` (matrix with asymmetric delimiter support, cases, reverse cases, numcases, eqnArray with tagged/untagged strategies, augmented columns with vline capping via `getActualColumnCount()`, column alignment, nested eqnArray detection via `isInsideMatrixCell`/`isInsideEqnArrayCellWithSiblings`, gathered-like detection by `columnalign="center"` + single-column, `display()` wrapping for nested tables, `typst_inline` propagation through eqnArray rows), `mtr` |
-| `src/mathjax/serialized-typst/typst-symbol-map.ts` | **New.** Unicode → Typst symbol mapping (~370 entries as `ReadonlyMap`s), accent map, font map |
+| `src/mathjax/serialized-typst/typst-symbol-map.ts` | **New.** Unicode → Typst symbol mapping (~400 entries as `ReadonlyMap`s), accent map, font map. `findTypstSymbol` handles merged multi-char mo nodes via per-character split |
 | `src/mathjax/serialized-typst/common.ts` | **New.** Shared helpers: `initTypstData`, `addToTypstData` (always propagates `typst_inline` with `typst` fallback), `addSpaceToTypstData`, `needsParens`, `isThousandSepComma`, `serializeThousandSepChain`, `needsTokenSeparator`, `needsSpaceBetweenNodes` (extends token separator with script+bracket check), `formatScript`, tree-position utilities (`isFirstChild`/`isLastChild`/`getSiblingIndex`), node accessors (`getChildText`/`getNodeText`/`getAttrs`/`getProp`/`getContentChildren`), `isNegationOverlay` (`\not` detection), `getCustomCmdTypstSymbol` (custom command → Typst lookup via central map), `serializeCombiningMiChain` (non-Latin script grouping), `handleAll` |
 | `src/mathjax/serialized-typst/escape-utils.ts` | **New.** Unified expression scanner (`scanExpression`) with per-bracket-type depth counters (paren/bracket/brace); thin wrappers: `escapeContentSeparators`, `escapeCasesSeparators`, `hasTopLevelSeparators`, `escapeLrSemicolons`, `escapeUnbalancedParens`, `escapeColonsInLr`, `escapeInnerBrackets` |
 | `src/mathjax/serialized-typst/bracket-utils.ts` | **New.** Delimiter mapping/escaping: `delimiterToTypst`, `escapeLrDelimiter`, `replaceUnpairedBrackets` (cell-level bracket escaping for mat/cases with scope boundaries for `msqrt`, `mroot`, `mfrac`, `menclose`), `treeContainsMo`, `serializePrefixBeforeMo`, function-call-aware paren heuristic via `KNOWN_TYPST_FUNCTIONS` |
