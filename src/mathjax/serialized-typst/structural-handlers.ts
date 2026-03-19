@@ -7,6 +7,7 @@ import {
   RE_TRAILING_SPACING, SHALLOW_TREE_MAX_DEPTH, TEX_ATOM,
   OPEN_BRACKETS, CLOSE_BRACKETS,
   DOUBLE_VERT, LEFT_FLOOR, RIGHT_FLOOR, LEFT_CEIL, RIGHT_CEIL,
+  BOX_STROKE, BOX_INSET,
 } from "./consts";
 import {
   initTypstData, addToTypstData, addSpaceToTypstData,
@@ -370,7 +371,7 @@ const hasBorderNotation = (words: Set<string>): boolean => {
  *  E.g. {top, left, right} → "top: 0.5pt, bottom: 0pt, left: 0.5pt, right: 0.5pt" */
 const buildStrokeSides = (words: Set<string>): string =>
   BORDER_SIDES.map(side =>
-    `${side}: ${words.has(side) ? '0.5pt' : '0pt'}`
+    `${side}: ${words.has(side) ? BOX_STROKE : '0pt'}`
   ).join(', ');
 
 export const menclose: HandlerFn = (node, serialize) => {
@@ -382,7 +383,7 @@ export const menclose: HandlerFn = (node, serialize) => {
   const content = typstPlaceholder(data.typst.trim());
   if (hasNotation(words, 'box')) {
     // \boxed → #box with stroke
-    res = addToTypstData(res, { typst: `#align(center, box(stroke: 0.5pt, inset: 3pt, $${content}$))`, typst_inline: content });
+    res = addToTypstData(res, { typst: `#align(center, box(stroke: ${BOX_STROKE}, inset: ${BOX_INSET}, $${content}$))`, typst_inline: content });
   } else if (hasNotation(words, 'updiagonalstrike') || hasNotation(words, 'downdiagonalstrike')) {
     // \cancel uses updiagonalstrike → Typst cancel() default
     // \bcancel uses downdiagonalstrike → Typst cancel(inverted: #true)
@@ -403,7 +404,7 @@ export const menclose: HandlerFn = (node, serialize) => {
     res = addToTypstData(res, { typst: `overline(lr(\\) ${escapeContentSeparators(escapeUnbalancedParens(content))}))` });
   } else if (hasNotation(words, 'circle')) {
     // \enclose{circle} → #circle with inset
-    res = addToTypstData(res, { typst: `#align(center, circle(inset: 3pt, $${content}$))`, typst_inline: content });
+    res = addToTypstData(res, { typst: `#align(center, circle(inset: ${BOX_INSET}, $${content}$))`, typst_inline: content });
   } else if (hasNotation(words, 'radical')) {
     // \enclose{radical} → sqrt()
     res = addToTypstData(res, { typst: `sqrt(${escapeContentSeparators(escapeUnbalancedParens(content))})` });
@@ -412,7 +413,7 @@ export const menclose: HandlerFn = (node, serialize) => {
     // Generate #box(stroke: (...)) with selective strokes for the specified sides.
     const sides = buildStrokeSides(words);
     res = addToTypstData(res, {
-      typst: `#align(center, box(stroke: (${sides}), inset: 3pt, $ ${content} $))`,
+      typst: `#align(center, box(stroke: (${sides}), inset: ${BOX_INSET}, $ ${content} $))`,
       typst_inline: content,
     });
   } else if (hasNotation(words, 'top')) {

@@ -14,6 +14,10 @@ describe('Latex to Typst math format:', () => {
       data.typstmath.should.equal(t.typst);
       data.typstmath_inline.should.be.a('string');
       data.typstmath_inline.should.equal(t.typst_inline);
+      if (t.error) {
+        data.error.should.be.a('string');
+        data.error.should.equal(t.error);
+      }
     });
   });
 });

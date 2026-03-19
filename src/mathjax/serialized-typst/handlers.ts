@@ -31,10 +31,7 @@ export const handle: HandlerFn = (node: MathNode, serialize: ITypstSerializer): 
   const handler: HandlerFn = isHandlerKind(kind) ? handlers[kind] : handleAll;
   try {
     return handler(node, serialize);
-  } catch (e: unknown) {
-    if (typeof console !== 'undefined' && console.warn) {
-      console.warn(`[typst-serializer] handler error for "${kind || 'unknown'}":`, e);
-    }
+  } catch (_e: unknown) {
     return initTypstData();
   }
 };

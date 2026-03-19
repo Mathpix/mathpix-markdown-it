@@ -98,11 +98,16 @@ export declare const PRIME_CHARS: ReadonlySet<string>;
 export declare const SHALLOW_TREE_MAX_DEPTH = 5;
 export declare const OPEN_BRACKETS: Readonly<Record<string, string>>;
 export declare const CLOSE_BRACKETS: Readonly<Record<string, string>>;
+/** Built-in Typst math operators — should NOT be wrapped in upright() or op().
+ *  Only includes operators natively recognized by Typst. Non-built-in operators
+ *  (arccot, arcsec, arccsc, sech, csch) need op() wrapping and are NOT listed here. */
+export declare const TYPST_MATH_OPERATORS: ReadonlySet<string>;
 /** Built-in Typst math operators and functions where name( is valid syntax.
  *  Multi-char identifiers NOT in this set get a space before ( to avoid
- *  Typst parsing e.g. emptyset(x) as a function call.
- *  Note: non-built-in operators (arccot, arcsec, arccsc, sech, csch) are
- *  intentionally excluded — they need op() wrapping, not bare name(). */
+ *  Typst parsing e.g. emptyset(x) as a function call. */
 export declare const TYPST_BUILTIN_OPS: ReadonlySet<string>;
+/** Typst box styling constants for \boxed, \fbox, \circle, bordered arrays. */
+export declare const BOX_STROKE = "0.5pt";
+export declare const BOX_INSET = "3pt";
 /** Typst escaped-delimiter output for unpaired brackets (math-mode safe) */
 export declare const UNPAIRED_BRACKET_TYPST: Readonly<Record<string, string>>;

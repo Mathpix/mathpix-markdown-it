@@ -16,6 +16,9 @@ export declare const scanBracketTokens: (expr: string) => BracketToken[];
 export declare const findUnpairedIndices: (chars: string[]) => Set<number>;
 export declare const replaceUnpairedBrackets: (expr: string) => string;
 export declare const markUnpairedBrackets: (root: MathNode) => void;
+/** Remove data-unpaired-bracket properties set by markUnpairedBrackets.
+ *  Call after Typst serialization to avoid leaking state to other visitors. */
+export declare const clearUnpairedBracketMarks: (root: MathNode) => void;
 export declare const mapDelimiter: (delim: string) => string;
 /** Map delimiter for use inside lr(): apply lr-specific escapes first,
  *  then fall back to typstSymbolMap, then return as-is. */

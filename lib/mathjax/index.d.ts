@@ -39,6 +39,7 @@ export declare const MathJax: {
     TexConvertToTypstData: (string: any, options?: any) => {
         typstmath: string;
         typstmath_inline: string;
+        error?: string;
     };
     /**
      * Typeset a TeX expression and return the SVG tree for it

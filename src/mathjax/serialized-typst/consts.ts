@@ -120,27 +120,38 @@ export const OPEN_BRACKETS: Readonly<Record<string, string>> = {
 export const CLOSE_BRACKETS: Readonly<Record<string, string>> = {
   ')': '(', ']': '[', '}': '{',
 };
-/** Built-in Typst math operators and functions where name( is valid syntax.
- *  Multi-char identifiers NOT in this set get a space before ( to avoid
- *  Typst parsing e.g. emptyset(x) as a function call.
- *  Note: non-built-in operators (arccot, arcsec, arccsc, sech, csch) are
- *  intentionally excluded — they need op() wrapping, not bare name(). */
-export const TYPST_BUILTIN_OPS: ReadonlySet<string> = new Set([
-  // Standard math operators (must match TYPST_MATH_OPERATORS in token-handlers.ts)
+/** Built-in Typst math operators — should NOT be wrapped in upright() or op().
+ *  Only includes operators natively recognized by Typst. Non-built-in operators
+ *  (arccot, arcsec, arccsc, sech, csch) need op() wrapping and are NOT listed here. */
+export const TYPST_MATH_OPERATORS: ReadonlySet<string> = new Set([
   'sin', 'cos', 'tan', 'cot', 'sec', 'csc',
   'arcsin', 'arccos', 'arctan',
   'sinh', 'cosh', 'tanh', 'coth',
-  'ln', 'log', 'lg', 'exp',
-  'lim', 'limsup', 'liminf',
-  'max', 'min', 'sup', 'inf',
-  'det', 'gcd', 'dim', 'ker', 'deg', 'arg', 'mod',
-  'hom', 'Pr', 'tr',
-  // Typst math functions used by the converter
+  'exp', 'log', 'ln', 'lg',
+  'det', 'dim', 'gcd', 'mod',
+  'inf', 'sup', 'lim', 'liminf', 'limsup',
+  'max', 'min', 'arg', 'deg', 'hom', 'ker',
+  'Pr', 'tr',
+]);
+
+/** Typst math functions used by the converter (not operators). */
+const TYPST_MATH_FUNCTIONS: ReadonlySet<string> = new Set([
   'frac', 'sqrt', 'mat', 'cases', 'lr', 'abs', 'norm', 'floor', 'ceil',
   'op', 'scripts', 'limits', 'cancel', 'overline', 'underline',
   'overbrace', 'underbrace', 'overbracket', 'underbracket', 'overparen', 'underparen',
   'stretch', 'attach',
 ]);
+
+/** Built-in Typst math operators and functions where name( is valid syntax.
+ *  Multi-char identifiers NOT in this set get a space before ( to avoid
+ *  Typst parsing e.g. emptyset(x) as a function call. */
+export const TYPST_BUILTIN_OPS: ReadonlySet<string> = new Set([
+  ...TYPST_MATH_OPERATORS, ...TYPST_MATH_FUNCTIONS,
+]);
+
+/** Typst box styling constants for \boxed, \fbox, \circle, bordered arrays. */
+export const BOX_STROKE = '0.5pt';
+export const BOX_INSET = '3pt';
 
 /** Typst escaped-delimiter output for unpaired brackets (math-mode safe) */
 export const UNPAIRED_BRACKET_TYPST: Readonly<Record<string, string>> = {

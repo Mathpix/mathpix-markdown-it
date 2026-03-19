@@ -38,10 +38,20 @@ LaTeX string
   → SerializedTypstVisitor (new)
   → ITypstData { typst, typst_inline? }
   → toTypstData() normalization
-  → { typstmath, typstmath_inline }
+  → { typstmath, typstmath_inline, error? }
 ```
 
 The visitor walks the same MathML tree that the existing `SerializedAsciiVisitor` uses. It is invoked when `include_typst: true` is set in `outMath` options.
+
+### Error handling
+
+When MathJax fails to parse LaTeX input (e.g. `\nonexistentcmd`, unbalanced `\left`), it creates an `merror` node in the MathML tree instead of throwing. `toTypstData()` detects `merror` via `findMerror()` before serialization and returns:
+
+```ts
+{ typstmath: '', typstmath_inline: '', error: 'Undefined control sequence \\nonexistentcmd' }
+```
+
+The error message is extracted from the `data-mjx-error` attribute (set by MathJax) or from the `merror` node's text content. Errors are **not** serialized into `typstmath` / `typstmath_inline` — those fields remain empty strings.
 
 ### Dual output format — block vs inline
 
@@ -928,7 +938,7 @@ This ensures paired delimiters form grouped expressions in Typst (important afte
 | `src/mathjax/serialized-typst/index.ts` | **New.** `SerializedTypstVisitor` class with root traversal; `visitInferredMrowNode` decomposed into pattern functions (`handleBigDelimiterPattern`, `handleIdotsintPattern`, `handleBareDelimiterPairPattern`, `handleThousandSepPattern`, `handleEqnArrayMtablePattern`, `handleNotNegationPattern`); big-delimiter detection, bare delimiter-pair grouping (`\|`, `⌊⌋`, `⌈⌉`, `‖`, `⟨⟩`) with function-call-aware `‖` scanning and scripted-closing-delimiter support (`getScriptedDelimiterChar`), `\idotsint` grouping via `SCRIPT_KINDS`, `\not` negation overlay detection, thousand-separator comma detection, sibling content merging for tagged eqnArray mtables; `visitTeXAtomNode` intercepts `data-custom-cmd` nodes via `getCustomCmdTypstSymbol()`; `serializeRange` uses `needsSpaceBetweenNodes` for correct script+bracket spacing inside bare-delimiter pairs |
 | `src/mathjax/serialized-typst/types.ts` | **New.** Shared type definitions (`MathNode`, `ITypstData`, `ITypstSerializer`, `HandlerFn`, `HandlerKind`, attribute interfaces) |
 | `src/mathjax/serialized-typst/consts.ts` | **New.** Module-wide constants: bracket maps (`Readonly<Record>`), regex patterns (`RE_LETTERS_AND_MARKS`, `RE_LATIN_WITH_MARKS`, etc.), string constants (`NEGATION_SLASH`), `KNOWN_TYPST_FUNCTIONS` set, `SCRIPT_NODE_KINDS` |
-| `src/mathjax/serialized-typst/handlers.ts` | **New.** Top-level dispatch with `isHandlerKind` type guard and two-tier error handling (utility functions return safe defaults; top-level catch logs warning and returns empty output). Handlers imported from domain-specific modules |
+| `src/mathjax/serialized-typst/handlers.ts` | **New.** Top-level dispatch with `isHandlerKind` type guard and silent error handling (utility functions return safe defaults; top-level catch returns empty output). Handlers imported from domain-specific modules |
 | `src/mathjax/serialized-typst/token-handlers.ts` | **New.** Leaf-node handlers: `mi` (identifiers, font wrapping, symbol map lookup, non-Latin mi chain detection), `mo` (operators, spacing, slash/special-char escaping, unpaired bracket detection, `\not` negation handling), `mn` (numbers), `mtext` (text with quote escaping), `mspace` (spacing commands) |
 | `src/mathjax/serialized-typst/script-handlers.ts` | **New.** Script and root handlers: `mfrac` (with `\atop` vs `\binom` disambiguation via fence detection), `msup`/`msub`/`msubsup`, `msqrt`/`mroot`, `mover`/`munder`/`munderover` (with accent/accentunder gating, constructed long arrow collapsing via `CONSTRUCTED_LONG_ARROWS`, nested mover/munder flattening via `unwrapToScriptNode`), `mmultiscripts` — accents, limits, extensible arrows, brace annotations, prescripts (`tl:/bl:/tr:/br:`) |
 | `src/mathjax/serialized-typst/structural-handlers.ts` | **New.** Structural wrappers: `mrow` (delimiter pairing, shorthand functions with separator fallback, `\not` negation wrapping, `hasTableFirst` path for reverse cases), `mpadded` (mhchem phantom stripping, `\colorbox`, `mstyle` background), `mphantom`, `menclose` (cancel/xcancel/bcancel, boxed with `#align(center, ...)`, longdiv with `lr(\) ...)`, circle, selective border strokes via Set-based notation matching, overline/underline), `mstyle` (color wrapping); handlers set separate `typst_inline` without block wrappers |

@@ -4,8 +4,10 @@ import { SerializedMmlVisitor as MmlVisitor } from 'mathjax-full/js/core/MmlTree
 import { LiteElement } from "mathjax-full/js/adaptors/lite/Element.js";
 import { SerializedAsciiVisitor as AsciiVisitor } from './serialized-ascii';
 import { SerializedTypstVisitor } from './serialized-typst';
-import { ITypstData } from './serialized-typst/types';
-import { markUnpairedBrackets } from './serialized-typst/bracket-utils';
+import { ITypstData, MathNode } from './serialized-typst/types';
+import { markUnpairedBrackets, clearUnpairedBracketMarks } from './serialized-typst/bracket-utils';
+import { getNodeText } from './serialized-typst/common';
+import { DATA_PRE_CONTENT, DATA_POST_CONTENT } from './serialized-typst/consts';
 import { MathMLVisitorWord } from './mathml-word';
 import { getSpeech } from '../sre';
 import { TAccessibility } from "../mathpix-markdown-model";
@@ -77,19 +79,60 @@ const normalizeMathJaxA11y = (adaptor, mjxContainer) => {
 const normalizeTypstSpaces = (s: string): string =>
   s ? s.trim().replace(/(\S) {2,}/g, '$1 ') : '';
 
+/** Find the first merror node in the tree and return its error message, or null. */
+const findMerror = (node: MathNode): string | null => {
+  if (!node) return null;
+  if (node.kind === 'merror') {
+    const attrMsg = node.attributes?.get('data-mjx-error') as string | undefined;
+    if (attrMsg) return attrMsg;
+    const textMsg = (node.childNodes ?? [])
+      .map(c => getNodeText(c)).join('');
+    return textMsg || 'Unknown error';
+  }
+  for (const child of (node.childNodes ?? [])) {
+    const err = findMerror(child);
+    if (err) return err;
+  }
+  return null;
+};
+
 /** Return both block and inline Typst math from the MathML AST.
- *  typstmath_inline always present — equals typstmath when no block wrappers are used. */
-const toTypstData = ((node, optionTypst?): { typstmath: string; typstmath_inline: string } => {
-  // N.B. markUnpairedBrackets and visitInferredMrowNode both mutate the shared
+ *  typstmath_inline always present — equals typstmath when no block wrappers are used.
+ *  If the tree contains a merror node, returns empty typst with an error field.
+ *
+ *  Temporarily mutates the shared MathML tree via setProperty()
+ *  (data-unpaired-bracket, data-pre-content, data-post-content).
+ *  All mutations are cleaned up after serialization. */
+const toTypstData = (node: MathNode): { typstmath: string; typstmath_inline: string; error?: string } => {
+  const error = findMerror(node);
+  if (error) {
+    return { typstmath: '', typstmath_inline: '', error };
+  }
+  // markUnpairedBrackets and visitInferredMrowNode both mutate the shared
   // MathML tree (setting properties / reading them). markUnpairedBrackets must
   // run first so that bracket properties are available during serialization.
   markUnpairedBrackets(node);
-  const visitorT = new SerializedTypstVisitor(optionTypst);
+  const visitorT = new SerializedTypstVisitor();
   const data: ITypstData = visitorT.visitTree(node);
+  // Clean up tree mutations so properties don't leak to other visitors
+  clearUnpairedBracketMarks(node);
+  clearTypstProperties(node);
   const typstmath = normalizeTypstSpaces(data?.typst);
   const typstmath_inline = normalizeTypstSpaces(data?.typst_inline ?? data?.typst);
   return { typstmath, typstmath_inline };
-});
+};
+
+/** Remove data-pre-content and data-post-content properties set during Typst serialization. */
+const clearTypstProperties = (root: MathNode): void => {
+  const walk = (node: MathNode): void => {
+    if (!node) return;
+    node.removeProperty(DATA_PRE_CONTENT, DATA_POST_CONTENT);
+    if (node.childNodes) {
+      for (const child of node.childNodes) walk(child);
+    }
+  };
+  walk(root);
+};
 
 const makeAssistiveMmlAccessible = (adaptor, mjxContainer) => {
   const assistive = adaptor.lastChild(mjxContainer);

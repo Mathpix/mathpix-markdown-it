@@ -4,6 +4,7 @@ import {
   DATA_PRE_CONTENT, DATA_POST_CONTENT,
   DATA_TAG_AUTO, DATA_LABEL_KEY, DEFAULT_EQ_NUMBERING, EQ_TAG_FIGURE_KIND,
   OPEN_BRACKETS, TEX_ATOM, MLABELEDTR,
+  BOX_STROKE, BOX_INSET,
 } from "./consts";
 import { initTypstData, addToTypstData, getChildText, getProp, getContentChildren } from "./common";
 import { escapeCasesSeparators } from "./escape-utils";
@@ -79,20 +80,18 @@ const serializeTagContent = (labelCell: MathNode, serialize: ITypstSerializer): 
 // Extract explicit \tag{...} from a condition cell's mtext content.
 // Returns the tag content (e.g. "3.12") or null if no \tag found.
 // When multiple \tag{} are present, the last one wins (LaTeX behavior).
-const RE_TAG_EXTRACT_G = new RegExp(
-  RE_TAG_EXTRACT.source,
-  RE_TAG_EXTRACT.flags.includes('g') ? RE_TAG_EXTRACT.flags : RE_TAG_EXTRACT.flags + 'g'
-);
-
 const extractTagFromConditionCell = (cell: MathNode): string | null => {
   let lastTag: string | null = null;
   const walk = (n: MathNode): void => {
     if (!n) return;
     if (n.kind === 'mtext') {
       const text = getChildText(n);
-      RE_TAG_EXTRACT_G.lastIndex = 0;
+      const re = new RegExp(
+        RE_TAG_EXTRACT.source,
+        RE_TAG_EXTRACT.flags.includes('g') ? RE_TAG_EXTRACT.flags : RE_TAG_EXTRACT.flags + 'g'
+      );
       let m: RegExpExecArray | null;
-      while ((m = RE_TAG_EXTRACT_G.exec(text)) !== null) {
+      while ((m = re.exec(text)) !== null) {
         lastTag = m[1];
       }
       return;
@@ -584,7 +583,7 @@ const buildMatrix = (
   const matExpr = buildMatExpr(rows);
   const matExprInline = rowsInline ? buildMatExpr(rowsInline) : undefined;
   if (frame === 'solid') {
-    res = addToTypstData(res, { typst: `#align(center, box(stroke: 0.5pt, inset: 3pt, $ ${matExpr} $))`, typst_inline: matExprInline ?? matExpr });
+    res = addToTypstData(res, { typst: `#align(center, box(stroke: ${BOX_STROKE}, inset: ${BOX_INSET}, $ ${matExpr} $))`, typst_inline: matExprInline ?? matExpr });
   } else {
     res = addToTypstData(res, { typst: matExpr, ...(matExprInline ? { typst_inline: matExprInline } : {}) });
   }

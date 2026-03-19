@@ -18,7 +18,7 @@ import { findTypstSymbol } from './typst-symbol-map';
 import { escapeContentSeparators } from './escape-utils';
 
 // Node kinds that carry sub/sup scripts (used in \idotsint pattern detection).
-const SUBSCRIPT_KINDS: ReadonlySet<string> = new Set(['msubsup', 'msub', 'msup']);
+const IDOTSINT_SCRIPT_KINDS: ReadonlySet<string> = new Set(['msubsup', 'msub', 'msup']);
 
 // Map of opening delimiter char → expected close char + Typst output format.
 // isFuncCall: true when content is placed inside a function-call argument
@@ -58,10 +58,7 @@ const getBigDelimInfo = (node: MathNode): BigDelimInfo | null => {
     if (tc !== TEXCLASS.OPEN && tc !== TEXCLASS.CLOSE) return null;
     const delim = getChildText(mo);
     return { delim, size: String(atr.minsize), isOpen: tc === TEXCLASS.OPEN };
-  } catch (e: unknown) {
-    if (typeof console !== 'undefined' && console.warn) {
-      console.warn('[typst-serializer] getBigDelimInfo error:', e);
-    }
+  } catch (_e: unknown) {
     return null;
   }
 };
@@ -81,10 +78,7 @@ const resolveDelimiterMo = (node: MathNode): MathNode | null => {
       if (children?.length === 1 && children[0].kind === 'mo') return children[0];
     }
     return null;
-  } catch (e: unknown) {
-    if (typeof console !== 'undefined' && console.warn) {
-      console.warn('[typst-serializer] resolveDelimiterMo error:', e);
-    }
+  } catch (_e: unknown) {
     return null;
   }
 };
@@ -251,7 +245,7 @@ const tryIdotsintPattern = (
   const next2 = node.childNodes[j + 2];
   if (!next1 || next1.kind !== 'mo' || getChildText(next1) !== MIDLINE_ELLIPSIS || !next2) return null;
   const scriptBase = next2.childNodes?.[0];
-  if (!SUBSCRIPT_KINDS.has(next2.kind) || scriptBase?.kind !== 'mo' || getChildText(scriptBase) !== INTEGRAL_SIGN) return null;
+  if (!IDOTSINT_SCRIPT_KINDS.has(next2.kind) || scriptBase?.kind !== 'mo' || getChildText(scriptBase) !== INTEGRAL_SIGN) return null;
   // Serialize the three base parts
   const part1 = serialize.visitNode(child, space);
   const part2 = serialize.visitNode(next1, space);

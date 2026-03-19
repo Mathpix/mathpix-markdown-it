@@ -282,6 +282,21 @@ export const markUnpairedBrackets = (root: MathNode): void => {
   }
 };
 
+/** Remove data-unpaired-bracket properties set by markUnpairedBrackets.
+ *  Call after Typst serialization to avoid leaking state to other visitors. */
+export const clearUnpairedBracketMarks = (root: MathNode): void => {
+  const walk = (node: MathNode): void => {
+    if (!node) return;
+    if (getProp<string>(node, UNPAIRED_BRACKET_PROP) !== undefined) {
+      node.removeProperty(UNPAIRED_BRACKET_PROP);
+    }
+    if (node.childNodes) {
+      for (const child of node.childNodes) walk(child);
+    }
+  };
+  walk(root);
+};
+
 export const mapDelimiter = (delim: string): string =>
   typstSymbolMap.get(delim) ?? delim;
 

@@ -3296,7 +3296,7 @@ x=4
 
   // === Edge cases ===
   { latex: ``, typst: ``, typst_inline: `` },
-  { latex: `\\frac{`, typst: `"Missing close brace"`, typst_inline: `"Missing close brace"` },
+  { latex: `\\frac{`, typst: ``, typst_inline: ``, error: `Missing close brace` },
   {
     latex: `\\frac{\\frac{\\frac{\\frac{\\frac{a}{b}}{c}}{d}}{e}}{f}`,
     typst: `frac(frac(frac(frac(frac(a, b), c), d), e), f)`,
@@ -3309,4 +3309,30 @@ x=4
   },
   { latex: `\\Varangle^2_3`, typst: `angle.spheric_3^2`, typst_inline: `angle.spheric_3^2` },
   { latex: `41,70,000`, typst: String.raw`41\,70\,000`, typst_inline: String.raw`41\,70\,000` },
+  // deeply nested frac (15 levels) — no stack overflow
+  {
+    latex: `\\frac{\\frac{\\frac{\\frac{\\frac{\\frac{\\frac{\\frac{\\frac{\\frac{\\frac{\\frac{\\frac{\\frac{\\frac{a}{b}}{c}}{d}}{e}}{f}}{g}}{h}}{i}}{j}}{k}}{l}}{m}}{n}}{o}}{p}`,
+    typst: `frac(frac(frac(frac(frac(frac(frac(frac(frac(frac(frac(frac(frac(frac(frac(a, b), c), d), e), f), g), h), i), j), k), l), m), n), o), p)`,
+    typst_inline: `frac(frac(frac(frac(frac(frac(frac(frac(frac(frac(frac(frac(frac(frac(frac(a, b), c), d), e), f), g), h), i), j), k), l), m), n), o), p)`,
+  },
+  // unbalanced \left( without \right — error, empty typst
+  {
+    latex: String.raw`\left( a + b`,
+    typst: ``,
+    typst_inline: ``,
+    error: String.raw`Extra \left or missing \right`,
+  },
+  // unknown command — error, empty typst
+  {
+    latex: String.raw`\nonexistentcmd{x}`,
+    typst: ``,
+    typst_inline: ``,
+    error: String.raw`Undefined control sequence \nonexistentcmd`,
+  },
+  // escape injection — quotes must be escaped in text output
+  {
+    latex: String.raw`\text{"; #eval("malicious")}`,
+    typst: String.raw`"\"; #eval(\"malicious\")"`,
+    typst_inline: String.raw`"\"; #eval(\"malicious\")"`,
+  },
 ];

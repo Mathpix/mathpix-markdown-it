@@ -8,7 +8,7 @@ import {
   UNPAIRED_BRACKET_PROP, UNPAIRED_BRACKET_TYPST,
   FUNC_APPLY, INVISIBLE_TIMES, INVISIBLE_SEP, INVISIBLE_PLUS,
   MINUS_SIGN, PLUS_MINUS, MINUS_PLUS,
-  SCRIPT_NODE_KINDS,
+  SCRIPT_NODE_KINDS, TYPST_MATH_OPERATORS,
 } from "./consts";
 import {
   initTypstData, addToTypstData,
@@ -34,21 +34,6 @@ const stripCombiningNot = (value: string): [string, boolean] => {
   return [value, false];
 };
 
-// Built-in Typst math operators — should NOT be wrapped in upright() or op().
-// Only includes operators natively recognized by Typst. Non-built-in operators
-// (arccot, arcsec, arccsc, sech, csch) need op() wrapping and are NOT listed here.
-// See also TYPST_BUILTIN_OPS in consts.ts (superset: adds Typst math functions
-// like frac, sqrt, etc. for space-before-paren disambiguation).
-const TYPST_MATH_OPERATORS: ReadonlySet<string> = new Set([
-  'sin', 'cos', 'tan', 'cot', 'sec', 'csc',
-  'arcsin', 'arccos', 'arctan',
-  'sinh', 'cosh', 'tanh', 'coth',
-  'exp', 'log', 'ln', 'lg',
-  'det', 'dim', 'gcd', 'mod',
-  'inf', 'sup', 'lim', 'liminf', 'limsup',
-  'max', 'min', 'arg', 'deg', 'hom', 'ker',
-  'Pr', 'tr',
-]);
 
 const BB_SHORTHAND_LETTERS: ReadonlySet<string> = new Set(
   'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
