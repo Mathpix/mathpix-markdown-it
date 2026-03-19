@@ -293,7 +293,7 @@ For `Latex` formulas, the result will be:
     <mathml style="display: none">...</mathml>
     <asciimath style="display: none">...</asciimath>
     <typstmath style="display: none">...</typstmath>
-    <typstmath_inline style="display: none">...</typstmath_inline>
+    <typstmath-inline style="display: none">...</typstmath-inline>
     <latex style="display: none">...</latex>
     <mjx-comtainer class="MathJax" jax="SVG">..</mjx-comtainer>
 </span>

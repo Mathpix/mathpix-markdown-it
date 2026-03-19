@@ -431,7 +431,7 @@ export const OuterHTML = (data, outMath, forPptx: boolean = false) => {
   if (include_typst && data.typstmath) {
     if (!outHTML) { outHTML += '\n'}
     outHTML += '<typstmath style="display: none;">' + formatSource(data.typstmath) + '</typstmath>';
-    outHTML += '<typstmath_inline style="display: none;">' + formatSource(data.typstmath_inline || data.typstmath) + '</typstmath_inline>';
+    outHTML += '<typstmath-inline style="display: none;">' + formatSource(data.typstmath_inline || data.typstmath) + '</typstmath-inline>';
   }
   if (include_speech && data.speech) {
     if (!outHTML) { outHTML += '\n'}
