@@ -4,7 +4,7 @@ import {
   FracAttrs, PaddedAttrs, EncloseAttrs, StyleAttrs,
 } from "./types";
 import {
-  RE_TRAILING_SPACING, SHALLOW_TREE_MAX_DEPTH,
+  RE_TRAILING_SPACING, SHALLOW_TREE_MAX_DEPTH, TEX_ATOM,
   OPEN_BRACKETS, CLOSE_BRACKETS,
   DOUBLE_VERT, LEFT_FLOOR, RIGHT_FLOOR, LEFT_CEIL, RIGHT_CEIL,
 } from "./consts";
@@ -20,6 +20,8 @@ import {
 } from "./escape-utils";
 import { mapDelimiter, escapeLrDelimiter } from "./bracket-utils";
 
+/** Max ancestor levels to walk when checking script/TeXAtom context.
+ *  Typical MathML nesting (mrow/TeXAtom/inferredMrow) rarely exceeds 6–8 levels. */
 const ANCESTOR_MAX_DEPTH = 10;
 const MATHJAX_INHERIT_SENTINEL = '_inherit_';
 
@@ -62,7 +64,7 @@ const isOperatorInternalSpacing = (node: MathNode): boolean => {
   let p = node.parent;
   for (let d = 0; d < ANCESTOR_MAX_DEPTH && p; d++) {
     if (p.kind === 'math') break;
-    if (p.kind === 'TeXAtom') return true;
+    if (p.kind === TEX_ATOM) return true;
     p = p.parent;
   }
   return false;
@@ -104,9 +106,9 @@ export const mrow: HandlerFn = (node, serialize) => {
   const hasTableChild = contentChildren.length === 1 && containsTable(contentChildren[0]);
   // \left\{ table ... \right. with extra content after the table:
   // the table inherits { as its open delimiter (→ cases()), extra content follows.
-  const close = closeDelim ? mapDelimiter(closeDelim) : '';
+  const closeMapped = closeDelim ? mapDelimiter(closeDelim) : '';
   const hasTableFirst = !hasTableChild && contentChildren.length > 1
-    && containsTable(contentChildren[0]) && openDelim && !close;
+    && containsTable(contentChildren[0]) && openDelim && !closeMapped;
   if (isLeftRight && !hasTableChild && !hasTableFirst) {
     // Serialize inner children, skipping the delimiter mo nodes
     // (delimiters are reconstructed from the open/close properties)

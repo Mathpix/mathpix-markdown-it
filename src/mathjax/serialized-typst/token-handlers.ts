@@ -14,6 +14,7 @@ import {
   initTypstData, addToTypstData,
   getNodeText, getChildText, getAttrs, getProp,
   isFirstChild, isLastChild, getSiblingIndex, typstPlaceholder,
+  escapeTypstString,
 } from "./common";
 import { findTypstSymbol, typstFontMap, typstSymbolMap } from "./typst-symbol-map";
 import { escapeContentSeparators } from "./escape-utils";
@@ -33,7 +34,11 @@ const stripCombiningNot = (value: string): [string, boolean] => {
   return [value, false];
 };
 
-// Built-in Typst math operators — should NOT be wrapped in upright()
+// Built-in Typst math operators — should NOT be wrapped in upright() or op().
+// Only includes operators natively recognized by Typst. Non-built-in operators
+// (arccot, arcsec, arccsc, sech, csch) need op() wrapping and are NOT listed here.
+// See also TYPST_BUILTIN_OPS in consts.ts (superset: adds Typst math functions
+// like frac, sqrt, etc. for space-before-paren disambiguation).
 const TYPST_MATH_OPERATORS: ReadonlySet<string> = new Set([
   'sin', 'cos', 'tan', 'cot', 'sec', 'csc',
   'arcsin', 'arccos', 'arctan',
@@ -88,10 +93,6 @@ const isUnaryPrefix = (node: MathNode): boolean => {
   if (prev.kind === 'mo' && prev.texClass === TEXCLASS.OPEN) return true;
   return false;
 };
-
-/** Escape a string for use inside Typst string literals ("...") */
-const escapeTypstString = (s: string): string =>
-  s.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
 
 /** Normalize multi-word operator name (thin/non-breaking spaces → regular space) */
 const normalizeOperatorName = (value: string): string =>

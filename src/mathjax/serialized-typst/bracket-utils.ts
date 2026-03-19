@@ -160,25 +160,24 @@ export const scanBracketTokens = (expr: string): BracketToken[] => {
  *  Returns the set of indices (into the chars array) that are unpaired. */
 export const findUnpairedIndices = (chars: string[]): Set<number> => {
   const stack: number[] = [];
-  const paired = new Set<number>();
+  // Start with all bracket indices as unpaired; remove when matched
+  const unpaired = new Set<number>();
   for (let i = 0; i < chars.length; i++) {
     const ch = chars[i];
     if (OPEN_BRACKETS[ch]) {
+      unpaired.add(i);
       stack.push(i);
     } else if (CLOSE_BRACKETS[ch]) {
+      unpaired.add(i);
       if (stack.length > 0) {
         const topIdx = stack[stack.length - 1];
         if (chars[topIdx] === CLOSE_BRACKETS[ch]) {
-          paired.add(topIdx);
-          paired.add(i);
+          unpaired.delete(topIdx);
+          unpaired.delete(i);
           stack.pop();
         }
       }
     }
-  }
-  const unpaired = new Set<number>();
-  for (let i = 0; i < chars.length; i++) {
-    if (!paired.has(i)) unpaired.add(i);
   }
   return unpaired;
 };

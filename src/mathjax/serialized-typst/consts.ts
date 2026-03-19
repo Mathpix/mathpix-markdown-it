@@ -1,3 +1,9 @@
+/** MathJax TeXAtom node kind string */
+export const TEX_ATOM = 'TeXAtom';
+
+/** MathJax mlabeledtr node kind string (numbered equation rows) */
+export const MLABELEDTR = 'mlabeledtr';
+
 /** Non-breaking space U+00A0 (global replacement) */
 export const RE_NBSP = /\u00A0/g;
 /** Content-mode special characters: * _ ` @ # < [ ] (must be escaped in Typst [...]) */
@@ -103,7 +109,9 @@ export const PRIME_CHARS: ReadonlySet<string> = new Set([
   '\u2032', '\u2033', '\u2034',
 ]);
 
-/** Maximum tree depth for shallow walks (accent detection, phantom check, etc.) */
+/** Maximum tree depth for shallow walks (accent detection, phantom check, etc.).
+ *  MathJax wraps content in inferredMrow/TeXAtom layers; 5 levels is enough
+ *  to reach through these wrappers without traversing the entire tree. */
 export const SHALLOW_TREE_MAX_DEPTH = 5;
 
 export const OPEN_BRACKETS: Readonly<Record<string, string>> = {
@@ -112,23 +120,25 @@ export const OPEN_BRACKETS: Readonly<Record<string, string>> = {
 export const CLOSE_BRACKETS: Readonly<Record<string, string>> = {
   ')': '(', ']': '[', '}': '{',
 };
-/** Built-in Typst math operators where name( is valid function-call syntax.
+/** Built-in Typst math operators and functions where name( is valid syntax.
  *  Multi-char identifiers NOT in this set get a space before ( to avoid
- *  Typst parsing e.g. emptyset(x) as a function call. */
+ *  Typst parsing e.g. emptyset(x) as a function call.
+ *  Note: non-built-in operators (arccot, arcsec, arccsc, sech, csch) are
+ *  intentionally excluded — they need op() wrapping, not bare name(). */
 export const TYPST_BUILTIN_OPS: ReadonlySet<string> = new Set([
-  // Standard math operators
+  // Standard math operators (must match TYPST_MATH_OPERATORS in token-handlers.ts)
   'sin', 'cos', 'tan', 'cot', 'sec', 'csc',
-  'arcsin', 'arccos', 'arctan', 'arccot', 'arcsec', 'arccsc',
-  'sinh', 'cosh', 'tanh', 'coth', 'sech', 'csch',
+  'arcsin', 'arccos', 'arctan',
+  'sinh', 'cosh', 'tanh', 'coth',
   'ln', 'log', 'lg', 'exp',
   'lim', 'limsup', 'liminf',
   'max', 'min', 'sup', 'inf',
   'det', 'gcd', 'dim', 'ker', 'deg', 'arg', 'mod',
-  'hom', 'Pr',
+  'hom', 'Pr', 'tr',
   // Typst math functions used by the converter
   'frac', 'sqrt', 'mat', 'cases', 'lr', 'abs', 'norm', 'floor', 'ceil',
   'op', 'scripts', 'limits', 'cancel', 'overline', 'underline',
-  'overbrace', 'underbrace', 'overbracket', 'underbracket',
+  'overbrace', 'underbrace', 'overbracket', 'underbracket', 'overparen', 'underparen',
   'stretch', 'attach',
 ]);
 

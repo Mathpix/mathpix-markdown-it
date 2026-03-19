@@ -46,7 +46,7 @@ const scanExpression = (expr: string, opts: ScanOptions): string => {
   let parenDepth = 0;   // ()
   let bracketDepth = 0; // []
   let braceDepth = 0;   // {}
-  let result = '';
+  const parts: string[] = [];
   for (let i = 0; i < expr.length; i++) {
     const ch = expr[i];
     // Skip quoted strings: copy "..." verbatim (unclosed quote consumes to end)
@@ -57,66 +57,82 @@ const scanExpression = (expr: string, opts: ScanOptions): string => {
         if (expr[j] === '"') break;
         j++;
       }
+      // end = closing quote position, or last char if unclosed.
+      // slice(i, end + 1) captures the full quoted segment (including both quotes).
+      // Setting i = end lets the for-loop's i++ advance past the closing quote.
       const end = j < expr.length ? j : expr.length - 1;
-      if (!detectOnly) { result += expr.slice(i, end + 1); }
+      if (!detectOnly) { parts.push(expr.slice(i, end + 1)); }
       i = end;
       continue;
     }
     // Skip backslash-escaped chars: \, \; \( \) \[ \] \{ \} etc.
     if (ch === '\\' && i + 1 < expr.length) {
-      if (!detectOnly) { result += ch + expr[i + 1]; }
+      if (!detectOnly) { parts.push(ch, expr[i + 1]); }
       i++;
       continue;
     }
-    if (ch === '(') { parenDepth++; if (!detectOnly) result += ch; continue; }
-    if (ch === '[') { bracketDepth++; if (!detectOnly) result += ch; continue; }
-    if (ch === '{') { braceDepth++; if (!detectOnly) result += ch; continue; }
+    if (ch === '(') { parenDepth++; if (!detectOnly) parts.push(ch); continue; }
+    if (ch === '[') { bracketDepth++; if (!detectOnly) parts.push(ch); continue; }
+    if (ch === '{') { braceDepth++; if (!detectOnly) parts.push(ch); continue; }
     if (ch === ')') {
       if (parenDepth > 0) parenDepth--;
-      if (!detectOnly) result += ch;
+      if (!detectOnly) parts.push(ch);
       continue;
     }
     if (ch === ']') {
       if (bracketDepth > 0) bracketDepth--;
-      if (!detectOnly) result += ch;
+      if (!detectOnly) parts.push(ch);
       continue;
     }
     if (ch === '}') {
       if (braceDepth > 0) braceDepth--;
-      if (!detectOnly) result += ch;
+      if (!detectOnly) parts.push(ch);
       continue;
     }
     const isTopLevel = parenDepth === 0 && bracketDepth === 0 && braceDepth === 0;
     if (isTopLevel) {
       if (ch === ',' && (escapeComma || detectOnly)) {
         if (detectOnly) return SEPARATOR_FOUND;
-        result += '\\,';
+        parts.push('\\,');
         continue;
       }
       if (ch === ';' && (escapeSemicolon || detectOnly)) {
         if (detectOnly) return SEPARATOR_FOUND;
-        result += '\\;';
+        parts.push('\\;');
         continue;
       }
       if (ch === ':' && escapeColon) {
         // Check the preceding char in the source expression, not the transformed result,
         // so other transformations cannot affect colon-spacing logic
         if (i > 0 && RE_WORD_CHAR.test(expr[i - 1])) {
-          result += ' :';
+          parts.push(' :');
         } else {
-          result += ':';
+          parts.push(':');
         }
         continue;
       }
     }
-    if (!detectOnly) { result += ch; }
+    if (!detectOnly) { parts.push(ch); }
   }
-  return detectOnly ? '' : result;
+  return detectOnly ? '' : parts.join('');
 };
 
 /** Escape unpaired [ and ] with backslash to prevent Typst content-block syntax.
  *  Reuses scanBracketTokens (which skips quoted strings, escaped chars, and
  *  function-call parens) and findUnpairedIndices from bracket-utils. */
+/** Escape characters at given positions by prepending backslash. */
+const escapeAtPositions = (expr: string, positions: ReadonlySet<number>): string => {
+  const parts: string[] = [];
+  for (let i = 0; i < expr.length; i++) {
+    if (positions.has(i)) {
+      parts.push('\\', expr[i]);
+    } else {
+      parts.push(expr[i]);
+    }
+  }
+  return parts.join('');
+};
+
 const escapeUnpairedBrackets = (expr: string): string => {
   if (expr.indexOf('[') === -1 && expr.indexOf(']') === -1) return expr;
   const allBrackets = scanBracketTokens(expr);
@@ -128,15 +144,7 @@ const escapeUnpairedBrackets = (expr: string): string => {
   for (const idx of unpairedTokenIndices) {
     unpairedPositions.add(squareBrackets[idx].pos);
   }
-  let result = '';
-  for (let i = 0; i < expr.length; i++) {
-    if (unpairedPositions.has(i)) {
-      result += '\\' + expr[i];
-    } else {
-      result += expr[i];
-    }
-  }
-  return result;
+  return escapeAtPositions(expr, unpairedPositions);
 };
 
 /** Escape , ; and : at depth 0, and unpaired [ ] in content placed inside any Typst function call.
@@ -178,15 +186,7 @@ export const escapeLrBrackets = (expr: string, chars?: ReadonlySet<string>): str
     }
   }
   if (positions.size === 0) return expr;
-  let result = '';
-  for (let i = 0; i < expr.length; i++) {
-    if (positions.has(i)) {
-      result += '\\' + expr[i];
-    } else {
-      result += expr[i];
-    }
-  }
-  return result;
+  return escapeAtPositions(expr, positions);
 };
 
 /** Escape unbalanced parentheses: ( → "(" and ) → ")".
@@ -205,14 +205,6 @@ export const escapeUnbalancedParens = (content: string): string => {
   for (const idx of unpairedTokenIndices) {
     unpairedPositions.add(parens[idx].pos);
   }
-  let result = '';
-  for (let i = 0; i < content.length; i++) {
-    if (unpairedPositions.has(i)) {
-      result += '\\' + content[i];
-    } else {
-      result += content[i];
-    }
-  }
-  return result;
+  return escapeAtPositions(content, unpairedPositions);
 };
 

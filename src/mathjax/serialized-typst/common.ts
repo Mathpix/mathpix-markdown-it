@@ -4,12 +4,18 @@ import {
   RE_THREE_DIGITS, RE_TWO_DIGITS, RE_PHANTOM_BASE,
   RE_TOKEN_START, RE_SEPARATOR_END, RE_ALPHA_END, RE_TRAILING_IDENT,
   RE_LATIN_WITH_MARKS, RE_LETTERS_AND_MARKS,
-  TYPST_PLACEHOLDER, SCRIPT_NODE_KINDS, PRIME_CHARS, TYPST_BUILTIN_OPS,
+  TYPST_PLACEHOLDER, SCRIPT_NODE_KINDS, PRIME_CHARS, TYPST_BUILTIN_OPS, TEX_ATOM,
 } from './consts';
 import { typstSymbolMap } from './typst-symbol-map';
 
 /** Unicode negation slash used by MathJax for \not overlay (U+29F8) */
 const NEGATION_SLASH = '\u29F8';
+
+/** Escape backslashes and quotes for Typst string literals ("...") */
+const RE_BACKSLASH_GLOBAL = /\\/g;
+const RE_QUOTE_GLOBAL = /"/g;
+export const escapeTypstString = (s: string): string =>
+  s.replace(RE_BACKSLASH_GLOBAL, '\\\\').replace(RE_QUOTE_GLOBAL, '\\"');
 
 /** Map mathvariant attribute values to Typst font function names. */
 const FONT_FN_MAP: Readonly<Record<string, string>> = {
@@ -148,7 +154,7 @@ export const serializeCombiningMiChain = (
     k++;
   }
   // Build font-wrapped string
-  const escaped = merged.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+  const escaped = escapeTypstString(merged);
   const fontFn = variant === 'bold' ? null : FONT_FN_MAP[variant];
   if (!fontFn) {
     // bold special case or unknown variant — just quote it
@@ -183,7 +189,7 @@ const isDerivativePattern = (node: MathNode): boolean => {
     return PRIME_CHARS.has(scriptText);
   }
   // f^{(n)}(a) — superscript is TeXAtom (parenthesized group)
-  if (script?.kind === 'TeXAtom') return true;
+  if (script?.kind === TEX_ATOM) return true;
   return false;
 };
 
@@ -272,7 +278,7 @@ export const getContentChildren = (node: MathNode): MathNode[] =>
 export const isNegationOverlay = (node: MathNode): boolean => {
   // MathJax represents \not as TeXAtom(REL) in the internal tree
   // (serialized as mrow in MathML output)
-  if (node.kind !== 'TeXAtom' && node.kind !== 'mrow') return false;
+  if (node.kind !== TEX_ATOM && node.kind !== 'mrow') return false;
   // Walk through inferred mrow wrappers to find the mpadded
   let target = node.childNodes;
   if (!target) return false;
@@ -317,7 +323,9 @@ export const handleAll: HandlerFn = (node, serialize) => {
       i = combChain.nextIndex - 1;
       continue;
     }
-    res = addToTypstData(res, serialize.visitNode(children[i], ''));
+    const data = serialize.visitNode(children[i], '');
+    if (needsTokenSeparator(res.typst, data.typst)) addSpaceToTypstData(res);
+    res = addToTypstData(res, data);
   }
   return res;
 };

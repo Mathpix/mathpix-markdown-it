@@ -1,3 +1,7 @@
+/** MathJax TeXAtom node kind string */
+export declare const TEX_ATOM = "TeXAtom";
+/** MathJax mlabeledtr node kind string (numbered equation rows) */
+export declare const MLABELEDTR = "mlabeledtr";
 /** Non-breaking space U+00A0 (global replacement) */
 export declare const RE_NBSP: RegExp;
 /** Content-mode special characters: * _ ` @ # < [ ] (must be escaped in Typst [...]) */
@@ -88,13 +92,17 @@ export declare const MIDLINE_ELLIPSIS = "\u22EF";
 export declare const SCRIPT_NODE_KINDS: ReadonlySet<string>;
 /** Prime characters used in derivative patterns (′ ″ ‴) */
 export declare const PRIME_CHARS: ReadonlySet<string>;
-/** Maximum tree depth for shallow walks (accent detection, phantom check, etc.) */
+/** Maximum tree depth for shallow walks (accent detection, phantom check, etc.).
+ *  MathJax wraps content in inferredMrow/TeXAtom layers; 5 levels is enough
+ *  to reach through these wrappers without traversing the entire tree. */
 export declare const SHALLOW_TREE_MAX_DEPTH = 5;
 export declare const OPEN_BRACKETS: Readonly<Record<string, string>>;
 export declare const CLOSE_BRACKETS: Readonly<Record<string, string>>;
-/** Built-in Typst math operators where name( is valid function-call syntax.
+/** Built-in Typst math operators and functions where name( is valid syntax.
  *  Multi-char identifiers NOT in this set get a space before ( to avoid
- *  Typst parsing e.g. emptyset(x) as a function call. */
+ *  Typst parsing e.g. emptyset(x) as a function call.
+ *  Note: non-built-in operators (arccot, arcsec, arccsc, sech, csch) are
+ *  intentionally excluded — they need op() wrapping, not bare name(). */
 export declare const TYPST_BUILTIN_OPS: ReadonlySet<string>;
 /** Typst escaped-delimiter output for unpaired brackets (math-mode safe) */
 export declare const UNPAIRED_BRACKET_TYPST: Readonly<Record<string, string>>;

@@ -3,7 +3,7 @@ import {
   RE_NBSP, RE_CONTENT_SPECIAL, RE_TAG_EXTRACT, RE_TAG_STRIP,
   DATA_PRE_CONTENT, DATA_POST_CONTENT,
   DATA_TAG_AUTO, DATA_LABEL_KEY, DEFAULT_EQ_NUMBERING, EQ_TAG_FIGURE_KIND,
-  OPEN_BRACKETS,
+  OPEN_BRACKETS, TEX_ATOM, MLABELEDTR,
 } from "./consts";
 import { initTypstData, addToTypstData, getChildText, getProp, getContentChildren } from "./common";
 import { escapeCasesSeparators } from "./escape-utils";
@@ -40,7 +40,7 @@ const serializeTagContent = (labelCell: MathNode, serialize: ITypstSerializer): 
             visitChild(c);
           }
         }
-      } else if (child.kind === 'mrow' || child.kind === 'TeXAtom') {
+      } else if (child.kind === 'mrow' || child.kind === TEX_ATOM) {
         const hasMtext = child.childNodes?.some(
           (c: MathNode) => c && (c.kind === 'mtext' || (c.isInferred && c.childNodes?.some((cc: MathNode) => cc?.kind === 'mtext')))
         );
@@ -113,7 +113,7 @@ const extractTagFromConditionCell = (cell: MathNode): string | null => {
 const isNumcasesTable = (node: MathNode): boolean => {
   if (!node.childNodes || node.childNodes.length === 0) return false;
   const firstRow = node.childNodes[0];
-  if (firstRow.kind !== 'mlabeledtr') return false;
+  if (firstRow.kind !== MLABELEDTR) return false;
   if (firstRow.childNodes.length < 3) return false;
   // Check that cell[1] (first data column) contains a '{' brace
   const prefixCell = firstRow.childNodes[1];
@@ -153,7 +153,7 @@ const buildNumcasesGrid = (node: MathNode, serialize: ITypstSerializer, countRow
   const rowTagSources: { source: 'condition' | 'label' | 'auto'; content: string; labelKey: string | null }[] = [];
   for (let i = 0; i < countRow; i++) {
     const mtrNode = node.childNodes[i];
-    const labelCell = (mtrNode.kind === 'mlabeledtr' && mtrNode.childNodes.length > 0) ? mtrNode.childNodes[0] : null;
+    const labelCell = (mtrNode.kind === MLABELEDTR && mtrNode.childNodes.length > 0) ? mtrNode.childNodes[0] : null;
     const labelKey = labelCell ? getLabelKey(labelCell) : null;
     // Check condition cell for embedded \tag{...} in mtext
     const condCell = mtrNode.childNodes[mtrNode.childNodes.length - 1];
@@ -175,7 +175,7 @@ const buildNumcasesGrid = (node: MathNode, serialize: ITypstSerializer, countRow
   const caseRows: string[] = [];
   for (let i = 0; i < countRow; i++) {
     const mtrNode = node.childNodes[i];
-    const startCol = mtrNode.kind === 'mlabeledtr' ? 2 : 1; // skip label + prefix
+    const startCol = mtrNode.kind === MLABELEDTR ? 2 : 1; // skip label + prefix
     const cells: string[] = [];
     for (let j = startCol; j < mtrNode.childNodes.length; j++) {
       const mtdNode = mtrNode.childNodes[j];
@@ -259,7 +259,7 @@ const buildTaggedEqnArray = (
   const rowTagInfos: { isTagged: boolean; isAutoTag: boolean; isExplicitTag: boolean; tagContent: string; labelKey: string | null }[] = [];
   for (let i = 0; i < countRow; i++) {
     const mtrNode = node.childNodes[i];
-    if (mtrNode.kind === 'mlabeledtr' && mtrNode.childNodes.length > 0) {
+    if (mtrNode.kind === MLABELEDTR && mtrNode.childNodes.length > 0) {
       const labelCell = mtrNode.childNodes[0];
       const tagContent = serializeTagContent(labelCell, serialize);
       const isAutoNumber = !!getProp<boolean>(labelCell, DATA_TAG_AUTO);
@@ -660,7 +660,7 @@ export const mtable: HandlerFn = (node, serialize) => {
     const countColl = mtrNode.childNodes?.length || 0;
     // For mlabeledtr (numbered equation rows), the first child is the
     // equation number label — skip it so we only emit the math content
-    const startCol = mtrNode.kind === 'mlabeledtr' ? 1 : 0;
+    const startCol = mtrNode.kind === MLABELEDTR ? 1 : 0;
     const cells: string[] = [];
     const cellsInline: string[] = [];
     for (let j = startCol; j < countColl; j++) {
@@ -729,7 +729,7 @@ export const mtable: HandlerFn = (node, serialize) => {
     return buildEqnArrayAsMat(nestedRows, nestedRowsInline, nestedAlign, augment, isNested);
   } else if (isEqnArray) {
     const hasAnyTag = node.childNodes.some(
-      (child: MathNode) => child.kind === 'mlabeledtr'
+      (child: MathNode) => child.kind === MLABELEDTR
     );
     const preContent = String(getProp<string>(node, DATA_PRE_CONTENT) || '');
     const postContent = String(getProp<string>(node, DATA_POST_CONTENT) || '');

@@ -3257,4 +3257,39 @@ x=4
     typst: `r(Delta upright(S)_N^n) = o(norm(upright(L)_N^n (Delta upright(S)_N^n))_(infinity))`,
     typst_inline: `r(Delta upright(S)_N^n) = o(norm(upright(L)_N^n (Delta upright(S)_N^n))_(infinity))`,
   },
+
+  // === Block vs inline divergence (typst ≠ typst_inline) ===
+  // These tests verify that block wrappers (#box, #align, #math.equation, #highlight)
+  // are present in typst but stripped in typst_inline.
+  {
+    latex: `\\boxed{a+b}`,
+    typst: `#align(center, box(stroke: 0.5pt, inset: 3pt, $a + b$))`,
+    typst_inline: `a + b`,
+  },
+  {
+    latex: `\\colorbox{yellow}{x}`,
+    typst: `#highlight(fill: yellow)[$"x"$]`,
+    typst_inline: `"x"`,
+  },
+  {
+    latex: `x^2 \\tag{A}`,
+    typst: `#math.equation(block: true, numbering: n => [(A)], $ x^2 $)\n#counter(math.equation).update(n => n - 1)`,
+    typst_inline: `x^2`,
+  },
+
+  // === Edge cases ===
+  { latex: ``, typst: ``, typst_inline: `` },
+  { latex: `\\frac{`, typst: `"Missing close brace"`, typst_inline: `"Missing close brace"` },
+  {
+    latex: `\\frac{\\frac{\\frac{\\frac{\\frac{a}{b}}{c}}{d}}{e}}{f}`,
+    typst: `frac(frac(frac(frac(frac(a, b), c), d), e), f)`,
+    typst_inline: `frac(frac(frac(frac(frac(a, b), c), d), e), f)`,
+  },
+  {
+    latex: String.raw`\left( a, b; c: d \right)`,
+    typst: String.raw`lr(( a, b\; c : d ))`,
+    typst_inline: String.raw`lr(( a, b\; c : d ))`,
+  },
+  { latex: `\\Varangle^2_3`, typst: `angle.spheric_3^2`, typst_inline: `angle.spheric_3^2` },
+  { latex: `41,70,000`, typst: String.raw`41\,70\,000`, typst_inline: String.raw`41\,70\,000` },
 ];

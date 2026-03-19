@@ -1,7 +1,7 @@
 import { TEXCLASS } from "mathjax-full/js/core/MmlTree/MmlNode";
 import { ITypstData, HandlerFn, MathNode, FracAttrs, MoAttrs } from "./types";
 import {
-  RE_OP_WRAPPER, SHALLOW_TREE_MAX_DEPTH,
+  RE_OP_WRAPPER, SHALLOW_TREE_MAX_DEPTH, TEX_ATOM,
   HORIZ_BAR, RIGHT_ARROW, LEFT_ARROW,
 } from "./consts";
 import {
@@ -112,7 +112,7 @@ const unwrapToScriptNode = (node: MathNode | null): MathNode | null => {
   let n = node;
   for (let i = 0; i < SHALLOW_TREE_MAX_DEPTH && n; i++) {
     if (n.kind === 'mover' || n.kind === 'munder' || n.kind === 'munderover') return n;
-    if ((n.kind === 'TeXAtom' || n.isInferred) && n.childNodes?.length === 1) {
+    if ((n.kind === TEX_ATOM || n.isInferred) && n.childNodes?.length === 1) {
       n = n.childNodes[0];
     } else {
       break;
@@ -183,7 +183,7 @@ const buildLimitBase = (firstChild: MathNode | null, baseTrimmed: string, base: 
     return { typst: `${wrapper}(${baseEscaped})` };
   } else {
     if (isCustomOp(baseTrimmed) && firstChild?.texClass === TEXCLASS.OP) {
-      if (firstChild?.kind === 'TeXAtom') {
+      if (firstChild?.kind === TEX_ATOM) {
         return { typst: addLimitsParam(baseTrimmed), typst_inline: base };
       }
       return { typst: addLimitsParam(baseTrimmed) };

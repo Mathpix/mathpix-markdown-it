@@ -7,7 +7,7 @@ import {
   LEFT_FLOOR, RIGHT_FLOOR, LEFT_CEIL, RIGHT_CEIL,
   DOUBLE_VERT, LEFT_CHEVRON, RIGHT_CHEVRON,
   LEFT_ANGLE_OLD, RIGHT_ANGLE_OLD,
-  INTEGRAL_SIGN, MIDLINE_ELLIPSIS,
+  INTEGRAL_SIGN, MIDLINE_ELLIPSIS, TEX_ATOM, MLABELEDTR,
 } from './consts';
 import {
   addToTypstData, addSpaceToTypstData, initTypstData,
@@ -18,7 +18,7 @@ import { findTypstSymbol } from './typst-symbol-map';
 import { escapeContentSeparators } from './escape-utils';
 
 // Node kinds that carry sub/sup scripts (used in \idotsint pattern detection).
-const SCRIPT_KINDS: ReadonlySet<string> = new Set(['msubsup', 'msub', 'msup']);
+const SUBSCRIPT_KINDS: ReadonlySet<string> = new Set(['msubsup', 'msub', 'msup']);
 
 // Map of opening delimiter char → expected close char + Typst output format.
 // isFuncCall: true when content is placed inside a function-call argument
@@ -43,7 +43,7 @@ interface BigDelimInfo { delim: string; size: string; isOpen: boolean }
 // Returns { delim, size, isOpen } if found, or null.
 const getBigDelimInfo = (node: MathNode): BigDelimInfo | null => {
   try {
-    if (node.kind !== 'TeXAtom') return null;
+    if (node.kind !== TEX_ATOM) return null;
     // Custom-command TeXAtoms are not delimiters
     if (node.getProperty?.('data-custom-cmd')) return null;
     // TeXAtom > inferredMrow > mo(minsize/maxsize)
@@ -58,7 +58,10 @@ const getBigDelimInfo = (node: MathNode): BigDelimInfo | null => {
     if (tc !== TEXCLASS.OPEN && tc !== TEXCLASS.CLOSE) return null;
     const delim = getChildText(mo);
     return { delim, size: String(atr.minsize), isOpen: tc === TEXCLASS.OPEN };
-  } catch (_e: unknown) {
+  } catch (e: unknown) {
+    if (typeof console !== 'undefined' && console.warn) {
+      console.warn('[typst-serializer] getBigDelimInfo error:', e);
+    }
     return null;
   }
 };
@@ -70,7 +73,7 @@ const resolveDelimiterMo = (node: MathNode): MathNode | null => {
     if (node?.kind === 'mo') return node;
     // Custom-command TeXAtoms should not be resolved as delimiters
     if (node?.getProperty?.('data-custom-cmd')) return null;
-    if (node?.kind === 'mrow' || node?.kind === 'TeXAtom') {
+    if (node?.kind === 'mrow' || node?.kind === TEX_ATOM) {
       let children = node.childNodes;
       if (children?.length === 1 && children[0].isInferred) {
         children = children[0].childNodes;
@@ -78,7 +81,10 @@ const resolveDelimiterMo = (node: MathNode): MathNode | null => {
       if (children?.length === 1 && children[0].kind === 'mo') return children[0];
     }
     return null;
-  } catch (_e: unknown) {
+  } catch (e: unknown) {
+    if (typeof console !== 'undefined' && console.warn) {
+      console.warn('[typst-serializer] resolveDelimiterMo error:', e);
+    }
     return null;
   }
 };
@@ -110,7 +116,7 @@ const isTaggedEqnArray = (child: MathNode): boolean => {
   if (child.kind !== 'mtable') return false;
   const isEqnArray = child.childNodes.length > 0
     && child.childNodes[0].attributes?.get('displaystyle') === true;
-  return isEqnArray && child.childNodes.some((c) => c.kind === 'mlabeledtr');
+  return isEqnArray && child.childNodes.some((c) => c.kind === MLABELEDTR);
 };
 
 /** Result of a successful pattern match in visitInferredMrowNode. */
@@ -173,6 +179,7 @@ const tryBigDelimiterPattern = (
   const content = serializeRange(node, j + 1, closeIdx, space, serialize);
   const openDelim = findTypstSymbol(openInfo.delim);
   const closeDelim = findTypstSymbol(closeInfo.delim);
+  if (!openDelim || !closeDelim) return null;
   return {
     typst: `lr(size: #${openInfo.size}, ${openDelim} ${content.trim()} ${closeDelim})`,
     nextJ: closeIdx + 1,
@@ -188,7 +195,7 @@ const tryBareDelimiterPattern = (
   const delimPair = delimChar ? BARE_DELIM_PAIRS[delimChar] : undefined;
   if (!delimPair) return null;
   // For symmetric delimiters, skip inside TeXAtom groups
-  if (delimChar === delimPair.close && node.parent?.kind === 'TeXAtom') return null;
+  if (delimChar === delimPair.close && node.parent?.kind === TEX_ATOM) return null;
   // For symmetric delimiters (| ‖), skip if the opener mo has CLOSE texClass —
   // it is actually a closing delimiter from a surrounding pair, not an opener.
   const isSymmetric = delimChar === delimPair.close;
@@ -244,7 +251,7 @@ const tryIdotsintPattern = (
   const next2 = node.childNodes[j + 2];
   if (!next1 || next1.kind !== 'mo' || getChildText(next1) !== MIDLINE_ELLIPSIS || !next2) return null;
   const scriptBase = next2.childNodes?.[0];
-  if (!SCRIPT_KINDS.has(next2.kind) || scriptBase?.kind !== 'mo' || getChildText(scriptBase) !== INTEGRAL_SIGN) return null;
+  if (!SUBSCRIPT_KINDS.has(next2.kind) || scriptBase?.kind !== 'mo' || getChildText(scriptBase) !== INTEGRAL_SIGN) return null;
   // Serialize the three base parts
   const part1 = serialize.visitNode(child, space);
   const part2 = serialize.visitNode(next1, space);
@@ -377,7 +384,7 @@ export class SerializedTypstVisitor extends MmlVisitor {
           // Skip all remaining siblings (already serialized as post-content)
           break;
         }
-        // Pattern 6: \not negation overlay — mrow[REL] > mpadded[width=0] > mtext(⧸)
+        // Pattern 7: \not negation overlay — mrow[REL] > mpadded[width=0] > mtext(⧸)
         // Consume the next sibling and wrap it in cancel()
         if (isNegationOverlay(child) && j + 1 < children.length) {
           const nextData = this.visitNode(children[j + 1], space);

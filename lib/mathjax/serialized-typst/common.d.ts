@@ -1,4 +1,5 @@
 import { MathNode, ITypstData, ITypstSerializer, HandlerFn } from './types';
+export declare const escapeTypstString: (s: string) => string;
 /** Return the expression if non-empty, otherwise the Typst empty placeholder '""'. */
 export declare const typstPlaceholder: (s: string) => string;
 export declare const initTypstData: () => ITypstData;
