@@ -88,6 +88,17 @@ const TYPST_ACCENT_SHORTHANDS: ReadonlySet<string> = new Set([
   'overbrace', 'underbrace', 'overbracket', 'underbracket', 'overparen', 'underparen',
 ]);
 
+/** Unwrap TeXAtom > inferredMrow > mo to get the delimiter text.
+ *  Returns empty string if structure doesn't match. */
+const unwrapToMoText = (node: MathNode): string => {
+  let cur = node;
+  for (let d = 0; d < SHALLOW_TREE_MAX_DEPTH && cur; d++) {
+    if (cur.kind === 'mo') return getNodeText(cur) || '';
+    if (cur.childNodes?.length === 1) { cur = cur.childNodes[0]; } else break;
+  }
+  return '';
+};
+
 /** Append ", limits: #true" inside an op() wrapper: op("name") → op("name", limits: #true) */
 const addLimitsParam = (opExpr: string): string =>
   opExpr.endsWith(')') ? `${opExpr.slice(0, -1)}, limits: #true)` : opExpr;
@@ -219,7 +230,16 @@ export const mfrac: HandlerFn = (node, serialize) => {
       && parent.childNodes[0]?.texClass === TEXCLASS.OPEN
       && parent.childNodes[2]?.texClass === TEXCLASS.CLOSE;
     if (hasFenceParent) {
-      res = addToTypstData(res, { typst: `binom(${num}, ${den})` });
+      // Check delimiter type: \binom uses (), \brace uses {}, \brack uses []
+      // Delimiters are wrapped in TeXAtom > inferredMrow > mo — unwrap to get text
+      const closeDelim = unwrapToMoText(parent.childNodes[2]);
+      if (closeDelim === ')') {
+        res = addToTypstData(res, { typst: `binom(${num}, ${den})` });
+      } else {
+        const openDelim = unwrapToMoText(parent.childNodes[0]);
+        const delimTypst = openDelim ? `"${openDelim}"` : '#none';
+        res = addToTypstData(res, { typst: `mat(delim: ${delimTypst}, ${num}; ${den})` });
+      }
     } else {
       res = addToTypstData(res, { typst: `mat(delim: #none, ${num}; ${den})` });
     }

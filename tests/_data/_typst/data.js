@@ -1473,6 +1473,23 @@ module.exports = [
     typst: `mat(delim: #none, a; b)`,
     typst_inline: `mat(delim: #none, a; b)`,
   },
+  // === Brace (stack with curly brace delimiter) ===
+  {
+    latex: `\\brace{x}`,
+    typst: `mat(delim: "{", ""; x)`,
+    typst_inline: `mat(delim: "{", ""; x)`,
+  },
+  {
+    latex: `{a \\brace b}`,
+    typst: `mat(delim: "{", a; b)`,
+    typst_inline: `mat(delim: "{", a; b)`,
+  },
+  // === Brack (stack with square bracket delimiter) ===
+  {
+    latex: `{a \\brack b}`,
+    typst: `mat(delim: "[", a; b)`,
+    typst_inline: `mat(delim: "[", a; b)`,
+  },
 
   // === Negated relations ===
   {
