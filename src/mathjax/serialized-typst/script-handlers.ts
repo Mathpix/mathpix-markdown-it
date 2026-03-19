@@ -85,7 +85,7 @@ const stripDashes = (s: string): string =>
 const TYPST_ACCENT_SHORTHANDS: ReadonlySet<string> = new Set([
   'hat', 'tilde', 'acute', 'grave', 'macron', 'overline', 'underline',
   'breve', 'dot', 'diaer', 'caron', 'arrow', 'circle',
-  'overbrace', 'underbrace', 'overbracket', 'underbracket', 'overparen',
+  'overbrace', 'underbrace', 'overbracket', 'underbracket', 'overparen', 'underparen',
 ]);
 
 /** Append ", limits: #true" inside an op() wrapper: op("name") → op("name", limits: #true) */
@@ -447,6 +447,7 @@ export const munder: HandlerFn = (node, serialize) => {
     // Flip over-accents to under-accents when used in munder context
     if (accentFn === 'overline') { accentFn = 'underline'; }
     if (accentFn === 'overbrace') { accentFn = 'underbrace'; }
+    if (accentFn === 'overparen') { accentFn = 'underparen'; }
     if (accentFn) {
       const content = typstPlaceholder(escapeContentSeparators(escapeUnbalancedParens(dataFirst.typst.trim())));
       // Arrows/harpoons have no under-variant in Typst — use limits(base)_(symbol)

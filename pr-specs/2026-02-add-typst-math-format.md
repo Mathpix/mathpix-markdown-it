@@ -668,7 +668,9 @@ Relations: `prec.curly.eq.not` (npreceq), `succ.curly.eq.not` (nsucceq), `lt.tri
 
 Arrows: `arrow.ccw` (circlearrowleft), `arrow.cw` (circlearrowright), `arrow.l.dashed` (dashleftarrow), `arrow.r.dashed` (dashrightarrow).
 
-Accents: `overparen` (U+23DC) added to accent map and shorthand set.
+Accents: `overparen` (U+23DC) and `underparen` (U+23DD) added to accent map and shorthand set. `overparen` → `underparen` flip in munder handler (like `overline` → `underline`).
+
+**Under-arrow fix:** `\underleftarrow`, `\underrightarrow`, `\underleftrightarrow` now produce `limits(base)_arrow.l` etc. instead of `attach(base, b: arrow.l)`. The `MUNDER_ATTACH_SYMBOLS` map provides the symbol, and output uses `limits()_symbol` without parens to avoid rendering issues when combined with additional subscripts.
 
 **Arrow mapping fixes:** `\rightleftarrows` (U+21C4) → `arrows.rl`, `\leftrightarrows` (U+21C6) → `arrows.lr` (were swapped), `\bowtie`/`\Join` (U+22C8) → `join` (was raw `⋈`).
 

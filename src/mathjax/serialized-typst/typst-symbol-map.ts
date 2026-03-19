@@ -464,6 +464,7 @@ export const typstAccentMap: ReadonlyMap<string, string> = new Map<string, strin
   ["\u23B4", "overbracket"],  // ⎴ (overbracket)
   ["\u23B5", "underbracket"], // ⎵ (underbracket)
   ["\u23DC", "overparen"],   // ⏜ (overparen)
+  ["\u23DD", "underparen"],  // ⏝ (underparen)
   ["―", "overline"],          // ― (horizontal bar → overline)
 ]);
 
