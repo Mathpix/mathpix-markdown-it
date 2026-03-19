@@ -1,5 +1,10 @@
 import { TAccessibility } from "../mathpix-markdown-model";
 import { Label } from 'mathjax-full/js/input/tex/Tags.js';
+interface ITypstConvertResult {
+    typstmath: string;
+    typstmath_inline: string;
+    error?: string;
+}
 export interface IOuterData {
     mathml?: string;
     mathml_word?: string;
@@ -36,11 +41,7 @@ export declare const MathJax: {
     Stylesheet: () => unknown;
     TexConvert: (string: any, options?: any, throwError?: boolean) => IOuterData;
     TexConvertToAscii: (string: any, options?: any) => string;
-    TexConvertToTypstData: (string: any, options?: any) => {
-        typstmath: string;
-        typstmath_inline: string;
-        error?: string;
-    };
+    TexConvertToTypstData: (string: string, options?: any) => ITypstConvertResult;
     /**
      * Typeset a TeX expression and return the SVG tree for it
      *
@@ -148,3 +149,4 @@ export declare const MathJax: {
     Reset: (n?: number) => void;
     GetLastEquationNumber: () => any;
 };
+export {};

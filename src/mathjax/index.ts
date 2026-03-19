@@ -20,6 +20,12 @@ import { uid } from "../markdown/utils";
 
 const MJ = new MathJaxConfigure();
 
+interface ITypstConvertResult {
+  typstmath: string;
+  typstmath_inline: string;
+  error?: string;
+}
+
 export interface IOuterData {
   mathml?: string,
   mathml_word?: string,
@@ -103,7 +109,7 @@ const findMerror = (node: MathNode): string | null => {
  *  Temporarily mutates the shared MathML tree via setProperty()
  *  (data-unpaired-bracket, data-pre-content, data-post-content).
  *  All mutations are cleaned up after serialization. */
-const toTypstData = (node: MathNode): { typstmath: string; typstmath_inline: string; error?: string } => {
+const toTypstData = (node: MathNode): ITypstConvertResult => {
   const error = findMerror(node);
   if (error) {
     return { typstmath: '', typstmath_inline: '', error };
@@ -564,7 +570,7 @@ export const MathJax = {
     const dataAscii: IAsciiData = toAsciiML(outputJax.math.root, optionAscii);
     return dataAscii.ascii;
   },
-  TexConvertToTypstData: function(string, options: any={}) {
+  TexConvertToTypstData: function(string: string, options: any = {}): ITypstConvertResult {
     const {display = true, metric = {}, accessibility = null} = options;
     const {em = 16, ex = 8, cwidth = 1200, lwidth = 100000, scale = 1} = metric;
     this.checkAccessibility(accessibility);

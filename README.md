@@ -268,13 +268,14 @@ class ConvertForm extends React.Component {
 
 #### [Example of Latex to mathml/asciimath/tsv conversion](https://github.com/Mathpix/mathpix-markdown-it/tree/master/examples/react-app/use-parseMarkdownByHTML-method)
 
-Rendering methods have the ability to convert `Latex` representation to such formats as: `mathml`, `asciimath`, `tsv`
+Rendering methods have the ability to convert `Latex` representation to such formats as: `mathml`, `asciimath`, `typst`, `tsv`
 
 ```js
 const options = {
       outMath: { //You can set which formats should be included into html result
         include_mathml: true,
         include_asciimath: true,
+        include_typst: true,
         include_latex: true,
         include_svg: true, // sets in default
         include_tsv: true,
@@ -291,6 +292,8 @@ For `Latex` formulas, the result will be:
 <span class="math-inline">
     <mathml style="display: none">...</mathml>
     <asciimath style="display: none">...</asciimath>
+    <typstmath style="display: none">...</typstmath>
+    <typstmath_inline style="display: none">...</typstmath_inline>
     <latex style="display: none">...</latex>
     <mjx-comtainer class="MathJax" jax="SVG">..</mjx-comtainer>
 </span>
@@ -316,6 +319,14 @@ For `Latex` formulas:
     {
        "type": "asciimath",
        "value": "x^(x)"
+     },
+    {
+       "type": "typst",
+       "value": "x^x"
+     },
+    {
+       "type": "typst_inline",
+       "value": "x^x"
      },
     {
        "type": "latex",
@@ -420,6 +431,76 @@ const parsed = MathpixMarkdownModel.parseMarkdownByHTML(html, false);
 ```
 
 
+### Latex to Typst math conversion
+
+You can convert LaTeX math directly to [Typst](https://typst.app/) math notation:
+
+```js
+const { MathJax } = require('mathpix-markdown-it/lib/mathjax/index.js');
+
+const result = MathJax.TexConvertToTypstData('\\frac{a}{b}');
+// result = { typstmath: 'frac(a, b)', typstmath_inline: 'frac(a, b)' }
+// result.error is undefined (set only when LaTeX is invalid)
+```
+
+Conversion examples — note how Typst uses function-call syntax instead of LaTeX backslash commands:
+
+```js
+// Fractions: \frac{}{} → frac()
+MathJax.TexConvertToTypstData('\\frac{x+1}{x-1}');
+// { typstmath: 'frac(x + 1, x - 1)', typstmath_inline: 'frac(x + 1, x - 1)' }
+
+// Roots: \sqrt → sqrt(), \sqrt[n] → root()
+MathJax.TexConvertToTypstData('\\sqrt[3]{x}');
+// { typstmath: 'root(3, x)', typstmath_inline: 'root(3, x)' }
+
+// Matrices: \begin{pmatrix} → mat(delim: "(", ...)
+MathJax.TexConvertToTypstData('\\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix}');
+// { typstmath: 'mat(delim: "(", \n  a, b;\n  c, d,\n)',
+//   typstmath_inline: 'mat(delim: "(", \n  a, b;\n  c, d,\n)' }
+
+// Cases: \begin{cases} → cases()
+MathJax.TexConvertToTypstData('\\begin{cases} x & \\text{if } x > 0 \\\\ -x & \\text{otherwise} \\end{cases}');
+// { typstmath: 'cases(\n  x & "if " x > 0,\n  - x & "otherwise",\n)',
+//   typstmath_inline: 'cases(\n  x & "if " x > 0,\n  - x & "otherwise",\n)' }
+
+// Delimiters: \lfloor..\rfloor → floor(), \|..\| → norm()
+MathJax.TexConvertToTypstData('\\lfloor x/2 \\rfloor + \\lceil y \\rceil');
+// { typstmath: 'floor(x\\/ 2) + ceil(y)', typstmath_inline: 'floor(x\\/ 2) + ceil(y)' }
+
+// Blackboard bold: \mathbb{Z} → ZZ
+MathJax.TexConvertToTypstData('\\mathbb{Z}');
+// { typstmath: 'ZZ', typstmath_inline: 'ZZ' }
+
+// Custom operators: \operatorname*{} → op("", limits: #true)
+MathJax.TexConvertToTypstData('\\operatorname*{argmax}_{x} f(x)');
+// { typstmath: 'op("argmax", limits: #true)_x f(x)',
+//   typstmath_inline: 'op("argmax", limits: #true)_x f(x)' }
+
+// Partial derivatives
+MathJax.TexConvertToTypstData('\\frac{\\partial f}{\\partial x}');
+// { typstmath: 'frac(partial f, partial x)', typstmath_inline: 'frac(partial f, partial x)' }
+
+// Text in math: \text{} → ""
+MathJax.TexConvertToTypstData('x \\text{ and } y');
+// { typstmath: 'x " and " y', typstmath_inline: 'x " and " y' }
+```
+
+The converter returns two representations — `typstmath` (block, may include Typst code-mode wrappers like `#math.equation()`, `#box()`) and `typstmath_inline` (pure math-mode, safe for inline `$...$` contexts). They differ for `\boxed`, `\tag`, and similar constructs:
+
+```js
+// \boxed — block wraps in #box(), inline is plain math:
+MathJax.TexConvertToTypstData('\\boxed{a+b}');
+// { typstmath:        '#align(center, box(stroke: 0.5pt, inset: 3pt, $a + b$))',
+//   typstmath_inline: 'a + b' }
+
+// Invalid LaTeX — empty typst, error message returned:
+MathJax.TexConvertToTypstData('\\frac{');
+// { typstmath: '', typstmath_inline: '', error: 'Missing close brace' }
+```
+
+When included via `outMath` options (`include_typst: true`), Typst output is also available through the rendering pipeline alongside MathML, AsciiMath, and other formats.
+
 ### Example of the include_sub_math option usage for tables containing nested tables and formulas
 
 #### parseMarkdownByHTML(html: string, include_sub_math: boolean = true)
@@ -431,6 +512,7 @@ const options = {
     outMath: {
         include_asciimath: true,
         include_mathml: true,
+        include_typst: true,
         include_latex: true,
         include_svg: true,
         include_tsv: true,
@@ -457,16 +539,22 @@ const parsed = MathpixMarkdownModel.parseMarkdownByHTML(html);
   
   { type: 'mathml', value: '<math xmlns="http://www.w3.org/1998/Math/MathML">\n  <msup>\n    <mi>x</mi>\n    <mn>1</mn>\n  </msup>\n</math>' },
   { type: 'asciimath', value: 'x^(1)' },
+  { type: 'typst', value: 'x^1' },
+  { type: 'typst_inline', value: 'x^1' },
   { type: 'latex', value: 'x^1' },
   { type: 'svg', value: '<svg >..</svg>' },
-    
+
   { type: 'mathml', value: '<math xmlns="http://www.w3.org/1998/Math/MathML">\n  <msup>\n    <mi>y</mi>\n    <mn>1</mn>\n  </msup>\n</math>' },
   { type: 'asciimath', value: 'y^(1)' },
+  { type: 'typst', value: 'y^1' },
+  { type: 'typst_inline', value: 'y^1' },
   { type: 'latex', value: 'y^1' },
   { type: 'svg', value: '<svg ></svg>' },
-      
+
   { type: 'mathml', value: '<math xmlns="http://www.w3.org/1998/Math/MathML">\n  <msup>\n    <mi>z</mi>\n    <mn>1</mn>\n  </msup>\n</math>' },
   { type: 'asciimath', value: 'z^(1)' },
+  { type: 'typst', value: 'z^1' },
+  { type: 'typst_inline', value: 'z^1' },
   { type: 'latex', value: 'z^1' },
   { type: 'svg', value: '<svg ></svg>' }
 ]
@@ -479,6 +567,7 @@ const options = {
     outMath: {
         include_asciimath: true,
         include_mathml: true,
+        include_typst: true,
         include_latex: true,
         include_svg: true,
         include_tsv: true,
