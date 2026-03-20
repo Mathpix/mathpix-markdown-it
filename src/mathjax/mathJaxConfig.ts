@@ -3,7 +3,7 @@ const MathJaxConfig = {
     TeX: {
         packages: ['base', 'ams', 'boldsymbol', 'html', 'newcommand', 'unicode', 'color', 'mhchem', 'enclose', 'extpfeil', 'empheq', 'cases',
             'cancel',
-            'fix-unicode', 'icon'], // extensions to use
+            'fix-unicode', 'icon', 'bbox'], // extensions to use
         tagSide: "right", // side for \tag macros
         tagIndent: "0.8em", // amount to indent tags
         multlineWidth: "100%", // width of multline environment
