@@ -214,6 +214,13 @@ export declare const terminatedRules: {
     };
 };
 export declare const mathTokenTypes: string[];
+/** Semantic block types for token.meta.mmd_type — used by non-HTML converters (e.g. Typst). */
+export declare const MMD_TYPES: {
+    readonly abstract: "abstract";
+    readonly theorem: "theorem";
+    readonly proof: "proof";
+    readonly align: "align";
+};
 export declare const codeHighlightDef: {
     auto: boolean;
     code: boolean;
