@@ -646,10 +646,16 @@ const abstractBlock: RuleBlock = (state, startLine, endLine, silent) => {
   token.attrSet('class', 'abstract_head');
   token.attrSet('style', 'text-align: center;');
   token.mmd_type = 'abstract_title';
+  token.meta = token.meta || {};
+  token.meta.mmd_type = MMD_TYPES.abstract_title;
   token = state.push('text', '', 0);
   token.content = 'Abstract';
   token.children = [];
+  token.meta = token.meta || {};
+  token.meta.mmd_type = MMD_TYPES.abstract_title;
   token = state.push('heading_close', 'h4', -1);
+  token.meta = token.meta || {};
+  token.meta.mmd_type = MMD_TYPES.abstract_title;
 
   for (let i = 0; i < tokenContent.length; i++) {
     token = state.push('paragraph_open', 'p', 1);
