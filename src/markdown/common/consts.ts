@@ -331,6 +331,8 @@ export const MMD_TYPES = {
   theorem: 'theorem',
   proof: 'proof',
   align: 'align',
+  figure: 'figure',
+  table: 'table',
 } as const;
 
 export const codeHighlightDef = {

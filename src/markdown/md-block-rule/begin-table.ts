@@ -13,7 +13,8 @@ import {
   RE_CAPTION_TAG,
   RE_CAPTION_TAG_BEGIN,
   RE_CAPTION_TAG_GLOBAL,
-  RE_INCLUDEGRAPHICS_WITH_ALIGNMENT_GLOBAL
+  RE_INCLUDEGRAPHICS_WITH_ALIGNMENT_GLOBAL,
+  MMD_TYPES
 } from "../common/consts";
 
 var couterTables = 0;
@@ -105,7 +106,9 @@ const StatePushPatagraphOpenTable = (state, startLine: number, nextLine: number,
     number: currentNumber,
     tokenUuidInParentBlock: token.uuid
   };
-  
+  token.meta = token.meta || {};
+  token.meta.mmd_type = type === TBegin.figure ? MMD_TYPES.figure : MMD_TYPES.table;
+  token.meta.number = currentNumber;
   if (align) {
     if (state.env.captionIsSingleLineCheck) {
       token.attrs.push(['style', `text-align: ${align}`]);

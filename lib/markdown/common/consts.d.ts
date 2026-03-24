@@ -221,6 +221,8 @@ export declare const MMD_TYPES: {
     readonly theorem: "theorem";
     readonly proof: "proof";
     readonly align: "align";
+    readonly figure: "figure";
+    readonly table: "table";
 };
 export declare const codeHighlightDef: {
     auto: boolean;
