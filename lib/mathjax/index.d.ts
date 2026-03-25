@@ -42,6 +42,7 @@ export declare const MathJax: {
     TexConvert: (string: any, options?: any, throwError?: boolean) => IOuterData;
     TexConvertToAscii: (string: any, options?: any) => string;
     TexConvertToTypstData: (string: string, options?: any) => ITypstConvertResult;
+    MathMLConvertToTypstData: (string: string, options?: any) => ITypstConvertResult;
     /**
      * Typeset a TeX expression and return the SVG tree for it
      *
@@ -145,7 +146,21 @@ export declare const MathJax: {
             heightEx?: number;
         };
     };
+    /** @deprecated Use TypesetAsciiMath instead. Kept for backward compatibility. */
     AsciiMathToSvg: (string: any, options?: any) => string;
+    TypesetAsciiMath: (string: any, options?: any) => {
+        html: string;
+        data: {
+            mathml?: string;
+            mathml_word?: string;
+            asciimath?: string;
+            typstmath?: string;
+            typstmath_inline?: string;
+            latex?: string;
+            svg?: string;
+            speech?: string;
+        };
+    };
     Reset: (n?: number) => void;
     GetLastEquationNumber: () => any;
 };

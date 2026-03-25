@@ -297,6 +297,7 @@ const OuterDataAscii = (adaptor, node, math, outMath, forDocx = false, accessibi
     include_mathml = false,
     include_mathml_word = false,
     include_asciimath = false,
+    include_typst = false,
     include_svg = true,
     include_speech = false,
     output_format = 'svg'
@@ -305,6 +306,8 @@ const OuterDataAscii = (adaptor, node, math, outMath, forDocx = false, accessibi
     mathml?: string,
     mathml_word?: string,
     asciimath?: string,
+    typstmath?: string,
+    typstmath_inline?: string,
     latex?: string,
     svg?: string,
     speech?: string
@@ -327,6 +330,11 @@ const OuterDataAscii = (adaptor, node, math, outMath, forDocx = false, accessibi
       ? math.math
       : math.inputJax.processStrings ? '' : math.start.node.outerHTML);
   }
+  if (include_typst) {
+    const typstData = toTypstData(math.root);
+    res.typstmath = typstData.typstmath;
+    res.typstmath_inline = typstData.typstmath_inline;
+  }
   if (include_svg) {
     res.svg = adaptor.outerHTML(node)
   }
@@ -342,6 +350,7 @@ const OuterDataMathMl = (adaptor, node, math, outMath, forDocx = false, accessib
     include_svg = true,
     include_speech = false,
     include_linearmath = false,
+    include_typst = false,
     optionAscii = {
       showStyle: false,
       extraBrackets: true
@@ -371,7 +380,11 @@ const OuterDataMathMl = (adaptor, node, math, outMath, forDocx = false, accessib
       res.linearmath = dataAscii.linear;
     }
   }
-
+  if (include_typst) {
+    const typstData = toTypstData(math.root);
+    res.typstmath = typstData.typstmath;
+    res.typstmath_inline = typstData.typstmath_inline;
+  }
   if (include_svg) {
     res.svg = adaptor.outerHTML(node);
     if (node) {
@@ -581,6 +594,16 @@ export const MathJax = {
     const outputJax = MJ.docTeX.outputJax as any;
     return toTypstData(outputJax.math.root);
   },
+  MathMLConvertToTypstData: function(string: string, options: any = {}): ITypstConvertResult {
+    const {display = true, metric = {}, accessibility = null} = options;
+    const {em = 16, ex = 8, cwidth = 1200, lwidth = 100000, scale = 1} = metric;
+    this.checkAccessibility(accessibility);
+    MJ.docMathML.convert(string, {
+      display, em, ex, containerWidth: cwidth, lineWidth: lwidth, scale,
+    });
+    const outputJax = MJ.docMathML.outputJax as any;
+    return toTypstData(outputJax.math.root);
+  },
   /**
    * Typeset a TeX expression and return the SVG tree for it
    *
@@ -641,19 +664,26 @@ export const MathJax = {
     };
   },
 
+  /** @deprecated Use TypesetAsciiMath instead. Kept for backward compatibility. */
   AsciiMathToSvg: function(string, options: any={}) {
+    return this.TypesetAsciiMath(string, options).html;
+  },
+
+  TypesetAsciiMath: function(string, options: any={}) {
     const {display = true, metric = {}, outMath = {}, forDocx={}, accessibility = null} = options;
     const {em = 16, ex = 8, cwidth = 1200, lwidth = 100000, scale = 1} = metric;
-
     this.checkAccessibility(accessibility);
     const node = MJ.docAsciiMath.convert(string, {
       display, em, ex, containerWidth: cwidth, lineWidth: lwidth, scale,
     });
     const outputJax = MJ.docAsciiMath.outputJax as any;
     const outerDataAscii = OuterDataAscii(MJ.adaptor, node, outputJax.math, outMath, forDocx, accessibility);
-    return outMath?.output_format === 'mathml'
-      ? formatSourceMML(outerDataAscii.mathml)
-      : OuterHTML(outerDataAscii, options.outMath);
+    return {
+      html: outMath?.output_format === 'mathml'
+        ? formatSourceMML(outerDataAscii.mathml)
+        : OuterHTML(outerDataAscii, options.outMath),
+      data: outerDataAscii,
+    };
   },
 
   //
