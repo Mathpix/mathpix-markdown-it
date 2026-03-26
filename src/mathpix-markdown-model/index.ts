@@ -154,6 +154,7 @@ export type TOutputMath = {
   include_csv?: boolean,
   include_table_markdown?: boolean,
   include_smiles?: boolean,
+  include_smiles_svg?: boolean,
   include_mol?: boolean,
   include_typst?: boolean,
   include_speech?: boolean,
