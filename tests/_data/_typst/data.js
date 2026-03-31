@@ -2569,13 +2569,13 @@ module.exports = [
   // double-quote escaping (bare " starts a string literal in Typst math)
   {
     latex: `d " r`,
-    typst: `d\\" r`,
-    typst_inline: `d\\" r`,
+    typst: `d quote.double r`,
+    typst_inline: `d quote.double r`,
   },
   {
     latex: `a " b " c`,
-    typst: `a\\" b\\" c`,
-    typst_inline: `a\\" b\\" c`,
+    typst: `a quote.double b quote.double c`,
+    typst_inline: `a quote.double b quote.double c`,
   },
   // hash escaping (bare # starts a code expression in Typst)
   {
@@ -2706,11 +2706,11 @@ module.exports = [
     typst: `overline(sqrt(a\\, b))`,
     typst_inline: `overline(sqrt(a\\, b))`,
   },
-  // escaped quote + comma (\" must not break escaping)
+  // escaped quote + comma (quote.double must not break escaping)
   {
     latex: `\\sqrt{a " b, c}`,
-    typst: `sqrt(a\\" b\\, c)`,
-    typst_inline: `sqrt(a\\" b\\, c)`,
+    typst: `sqrt(a quote.double b\\, c)`,
+    typst_inline: `sqrt(a quote.double b\\, c)`,
   },
   // comma inside nested parens — NOT escaped (depth > 0)
   {
@@ -2722,6 +2722,108 @@ module.exports = [
     latex: `\\overline{g(x,y)+h(a,b)}`,
     typst: `overline(g(x, y) + h(a, b))`,
     typst_inline: `overline(g(x, y) + h(a, b))`,
+  },
+
+  // === quote.double in various structural contexts ===
+  // quote in superscript
+  {
+    latex: `x^{" a}`,
+    typst: `x^(quote.double a)`,
+    typst_inline: `x^(quote.double a)`,
+  },
+  // quote in subscript
+  {
+    latex: `x_{" b}`,
+    typst: `x_(quote.double b)`,
+    typst_inline: `x_(quote.double b)`,
+  },
+  // quote inside frac
+  {
+    latex: `\\frac{a " b}{c}`,
+    typst: `frac(a quote.double b, c)`,
+    typst_inline: `frac(a quote.double b, c)`,
+  },
+  // quote inside sqrt
+  {
+    latex: `\\sqrt{a " b " c}`,
+    typst: `sqrt(a quote.double b quote.double c)`,
+    typst_inline: `sqrt(a quote.double b quote.double c)`,
+  },
+  // quote adjacent to \text{} — must not break quote pairing
+  {
+    latex: `A " \\text{hello} + B`,
+    typst: `A quote.double "hello" + B`,
+    typst_inline: `A quote.double "hello" + B`,
+  },
+  // quote inside matrix cells
+  {
+    latex: `\\begin{pmatrix} a " & b \\\\ c & d " \\end{pmatrix}`,
+    typst: `mat(delim: "(", \n  a quote.double, b;\n  c, d quote.double,\n)`,
+    typst_inline: `mat(delim: "(", \n  a quote.double, b;\n  c, d quote.double,\n)`,
+  },
+  // quote inside cases cells
+  {
+    latex: `\\begin{cases} x " & y \\\\ z & w " \\end{cases}`,
+    typst: `cases(\n  x quote.double & y,\n  z & w quote.double,\n)`,
+    typst_inline: `cases(\n  x quote.double & y,\n  z & w quote.double,\n)`,
+  },
+  // double consecutive quotes
+  {
+    latex: `a "" b`,
+    typst: `a quote.double quote.double b`,
+    typst_inline: `a quote.double quote.double b`,
+  },
+  // quote inside \left...\right
+  {
+    latex: `\\left( a " b \\right)`,
+    typst: `lr(( a quote.double b ))`,
+    typst_inline: `lr(( a quote.double b ))`,
+  },
+
+  // === multiple special chars combined ===
+  // quote + slash + semicolon in one expression
+  {
+    latex: `a " b / c ; d`,
+    typst: `a quote.double b\\/ c\\; d`,
+    typst_inline: `a quote.double b\\/ c\\; d`,
+  },
+  // quote + semicolon inside frac, slash in denominator
+  {
+    latex: `\\frac{a " b ; c}{d / e}`,
+    typst: `frac(a quote.double b\\; c, d\\/ e)`,
+    typst_inline: `frac(a quote.double b\\; c, d\\/ e)`,
+  },
+  // deeply nested: quote + comma + semicolon inside sqrt(frac(...))
+  {
+    latex: `\\sqrt{\\frac{a " b, c ; d}{e}}`,
+    typst: `sqrt(frac(a quote.double b\\, c\\; d, e))`,
+    typst_inline: `sqrt(frac(a quote.double b\\, c\\; d, e))`,
+  },
+  // quote + comma + semicolon inside sqrt
+  {
+    latex: `\\sqrt{" , ;}`,
+    typst: `sqrt(quote.double\\, \\;)`,
+    typst_inline: `sqrt(quote.double\\, \\;)`,
+  },
+
+  // === mtext backslash edge cases ===
+  // backslash-quote inside mtext (\" must become literal \ + literal " in Typst string)
+  {
+    latex: `\\text{a\\"b}`,
+    typst: `"a\\\\\\"b"`,
+    typst_inline: `"a\\\\\\"b"`,
+  },
+  // trailing backslash in mtext (must not leave unterminated escape)
+  {
+    latex: `\\text{abc\\\\}`,
+    typst: `"abc\\\\"`,
+    typst_inline: `"abc\\\\"`,
+  },
+  // plain backslashes in mtext (unknown escapes like \b, \c are kept as-is by Typst)
+  {
+    latex: `\\text{a\\\\b\\\\c}`,
+    typst: `"a\\b\\c"`,
+    typst_inline: `"a\\b\\c"`,
   },
 
   // === mhchem: phantom alignment boxes stripped inside sub/superscripts ===

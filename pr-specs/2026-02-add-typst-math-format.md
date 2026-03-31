@@ -610,7 +610,7 @@ In Typst, `underbrace` and `overbrace` take annotations as a second argument: `u
 | `a \bmod b` | `a mod b` |
 | `a \pmod{b}` | `a quad (mod b)` |
 | `\text{if }` | `"if "` |
-| `\text{"hello"}` | `"\"hello\""` (inner `"` escaped — prevents breaking the Typst string literal) |
+| `\text{"hello"}` | `"\"hello\""` (inner `"` escaped — prevents breaking the Typst string literal; backslashes before `"` and at end-of-string are doubled to stay literal) |
 | `f'(x)` | `f'(x)` (prime shorthand) |
 | `\$ 120,000` | `\$ 120\,000` (escaped dollar + thousand-separator commas) |
 | `\wp` | `℘` (Unicode output — no named Typst symbol) |
@@ -702,7 +702,7 @@ Adjacent tokens must be separated by spaces to prevent merging. The `needsTokenS
 
 ### Special character escaping
 
-Several characters have syntactic meaning in Typst math mode and must be escaped with `\` in the symbol map. These characters arrive as `mi` nodes (from `\#`, `\$`, `\&`, `\_`) or `mo` nodes (from `"`) with `mathvariant="normal"`. Without escaping, the `mi` handler would wrap them in `upright()` (e.g. `upright(#)`), which breaks Typst parsing because the special character retains its syntactic role inside the function call.
+Several characters have syntactic meaning in Typst math mode and must be escaped or replaced. Characters like `\#`, `\$`, `\&`, `\_` arrive as `mi` nodes with `mathvariant="normal"` and are mapped to backslash-escaped forms in the symbol map. Bare `"` arrives as an `mo` node and is replaced with the Typst symbol name `quote.double` (handled directly in the `mo` handler). Without escaping, the `mi` handler would wrap them in `upright()` (e.g. `upright(#)`), which breaks Typst parsing because the special character retains its syntactic role inside the function call.
 
 **Escape-form bypass in `mi` handler:** When a symbol maps to an escape form (starts with `\`), the `mi` handler skips all font wrapping (`upright()`, `bold()`, etc.) and outputs the escaped form directly. This is enforced by the condition `!(isKnownSymbol && typstValue.startsWith('\\'))` in the font-wrapping branch.
 
@@ -710,7 +710,7 @@ Several characters have syntactic meaning in Typst math mode and must be escaped
 |-------|-------|---------------------|
 | `\$` | `\$` | `$` terminates math mode |
 | `\#` | `\#` | `#` starts a code expression |
-| `\"` (in math) | `\"` | `"` starts a string literal |
+| `"` (in math `mo`) | `quote.double` | `"` starts a string literal — bare `"` breaks quote pairing for the rest of the expression; `quote.double` is the Typst symbol name |
 | `\&` | `\&` | `&` is alignment separator |
 | `\_` | `\_` | `_` is subscript operator |
 | `\surd` | `\√` | `√` triggers sqrt operator |
@@ -718,7 +718,11 @@ Several characters have syntactic meaning in Typst math mode and must be escaped
 
 Note: `\%` produces `upright(%)` — `%` has no special meaning in Typst math mode, so no escaping is needed.
 
-**Quote escaping inside `mtext`:** The `mtext` handler wraps text content in `"..."`. When the original text contains literal `"` characters (e.g. `\text{"hello"}`), they are escaped as `\"` before wrapping to avoid breaking the Typst string literal: `"\"hello\""`. This uses `value.replace(/"/g, '\\"')` before the `'"' + value + '"'` concatenation.
+**Quote and backslash escaping inside `mtext`:** The `mtext` handler wraps text content in `"..."`. Two escaping steps are applied:
+1. **Backslash before `"` and trailing `\`:** `value.replace(/\\(?=")|\\$/g, '\\\\')` doubles backslashes that would otherwise be parsed as escape sequences. Only these specific positions are escaped — general backslashes (e.g. `\g` from MathJax-preserved raw LaTeX like `\geq` in numcases) are left alone because Typst treats unknown `\x` escapes as literal characters.
+2. **Quote escaping:** `.replace(/"/g, '\\"')` escapes all `"` to `\"` to avoid breaking the Typst string literal.
+
+Example: `\text{"hello"}` → `"\"hello\""`, `\text{abc\}` → `"abc\\"`, `\text{a\"b}` → `"a\\\\"b"`.
 
 ### Thousand-separator commas
 

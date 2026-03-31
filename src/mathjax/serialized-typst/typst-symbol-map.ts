@@ -403,7 +403,7 @@ const miscSymbols: ReadonlyArray<[string, string]> = [
   ["\u2063", ""],               // invisible separator
   ["\u2064", ""],               // invisible plus
   ["$", "\\$"],                 // dollar sign — must be escaped in Typst math mode
-  ['"', '\\"'],                  // " — must be escaped; bare " starts a string literal in Typst math
+  ['"', 'quote.double'],          // " — bare " starts a string literal in Typst math; use symbol name
   ['#', '\\#'],                  // # — must be escaped; bare # starts a code expression in Typst
   ['&', '\\&'],                  // & — must be escaped; bare & is alignment separator in Typst math
   ['_', '\\_'],                  // _ — must be escaped; bare _ is subscript operator in Typst math

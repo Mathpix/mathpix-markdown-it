@@ -289,6 +289,11 @@ export const mo: HandlerFn = (node, _serialize) => {
   if (value === ';') {
     return singleTypst('\\;');
   }
+  // Escape double quote: bare " in Typst math starts a string literal,
+  // breaking quote pairing for the rest of the expression.
+  if (value === '"') {
+    return singleTypst('quote.double');
+  }
   return singleTypst(typstValue);
 };
 
@@ -319,9 +324,15 @@ export const mtext: HandlerFn = (node, _serialize) => {
     const typstValue = findTypstSymbol(value);
     return singleTypst(withContextSpaces(node, typstValue));
   }
-  // Only escape quotes here — backslashes in mtext content are intentional
-  // (e.g. numcases text like "x \geq 0" should keep the backslash as-is)
-  let textContent = `"${value.replace(/"/g, '\\"')}"`;
+  // Escape quotes and dangerous backslash sequences for a valid Typst string.
+  // Note: we do NOT escape all backslashes because MathJax preserves raw LaTeX
+  // in some contexts (e.g. numcases text column: "x \geq 0").
+  // Typst treats unknown \x escapes as literal characters, so \g, \j etc. are fine.
+  // We only fix: \ before " (would be parsed as escaped quote) and trailing \ (unterminated escape).
+  // Step 1: double \ before " (lookahead) and at end-of-string so they become literal backslashes.
+  // Step 2: escape all bare " as \" for the Typst string delimiter.
+  let textContent = `"${value.replace(/\\(?=")|\\$/g, '\\\\').replace(/"/g, '\\"')}"`;
+
   const attrs = getAttrs<FontAttrs>(node);
   const mathvariant = attrs.mathvariant || '';
   if (mathvariant && mathvariant !== 'normal') {
