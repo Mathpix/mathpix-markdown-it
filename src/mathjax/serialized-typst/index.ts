@@ -15,7 +15,7 @@ import {
   getChildText, getAttrs, isNegationOverlay, getCustomCmdTypstSymbol,
 } from './common';
 import { findTypstSymbol } from './typst-symbol-map';
-import { escapeContentSeparators } from './escape-utils';
+import { escapeContentSeparators, escapeLrSemicolons } from './escape-utils';
 
 // Node kinds that carry sub/sup scripts (used in \idotsint pattern detection).
 const IDOTSINT_SCRIPT_KINDS: ReadonlySet<string> = new Set(['msubsup', 'msub', 'msup']);
@@ -211,6 +211,19 @@ const tryBareDelimiterPattern = (
     }
   }
   if (closeIdx <= j + 1) return null; // need at least one node between delimiters
+  // Reject if content between delimiters contains unbalanced fence mo characters
+  // ({, }, (, )) — this means the | symbols are not a matched pair.
+  let fenceDepth = 0;
+  let hasFenceImbalance = false;
+  for (let k = j + 1; k < closeIdx; k++) {
+    const ch = getDelimiterChar(node.childNodes[k]);
+    if (ch === '(' || ch === '{') fenceDepth++;
+    else if (ch === ')' || ch === '}') {
+      fenceDepth--;
+      if (fenceDepth < 0) { hasFenceImbalance = true; break; }
+    }
+  }
+  if (fenceDepth !== 0 || hasFenceImbalance) return null;
   // For ‖…‖: reject if content between the delimiters contains a top-level
   // separator (PUNCT, e.g. comma) or if the pair spans the entire row and
   // contains a relational operator. Both patterns indicate the ‖ symbols are
@@ -225,7 +238,7 @@ const tryBareDelimiterPattern = (
   }
   const rawContent = serializeRange(node, j + 1, closeIdx, space, serialize);
   const content = delimPair.isFuncCall
-    ? escapeContentSeparators(rawContent.trim()) : rawContent.trim();
+    ? escapeContentSeparators(rawContent.trim()) : escapeLrSemicolons(rawContent.trim());
   let delimExpr = `${delimPair.typstOpen}${content}${delimPair.typstClose}`;
   // When the closing delimiter is inside a script node (e.g. ‖_2),
   // extract and append the script parts to the delimited expression.

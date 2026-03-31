@@ -284,6 +284,11 @@ export const mo: HandlerFn = (node, _serialize) => {
   if (value === '/') {
     return singleTypst('\\/');
   }
+  // Escape semicolon: ; inside () creates arrays in Typst; \; is a literal semicolon.
+  // mat/cases row separators are inserted as raw strings, not through mo handler.
+  if (value === ';') {
+    return singleTypst('\\;');
+  }
   return singleTypst(typstValue);
 };
 

@@ -2349,13 +2349,13 @@ module.exports = [
   // === semicolons escaped inside lr() fallback ===
   {
     latex: `\\left|a ; b\\right|`,
-    typst: `lr(| a\\; b |)`,
-    typst_inline: `lr(| a\\; b |)`,
+    typst: `abs(a\\; b)`,
+    typst_inline: `abs(a\\; b)`,
   },
   {
     latex: `\\left\\lfloor a ; b\\right\\rfloor`,
-    typst: `lr(⌊ a\\; b ⌋)`,
-    typst_inline: `lr(⌊ a\\; b ⌋)`,
+    typst: `floor(a\\; b)`,
+    typst_inline: `floor(a\\; b)`,
   },
   {
     latex: `\\left( a ; b \\right)`,
@@ -2445,8 +2445,8 @@ module.exports = [
   // --- Unpaired bracket escaping (pre-serialization tree walk) ---
   {
     latex: `\\sigma(\\mathrm{nm} ;`,
-    typst: `sigma \\(upright("nm");`,
-    typst_inline: `sigma \\(upright("nm");`,
+    typst: `sigma \\(upright("nm")\\;`,
+    typst_inline: `sigma \\(upright("nm")\\;`,
   },
   {
     latex: `\\sigma(x)`,
@@ -2839,8 +2839,8 @@ module.exports = [
   },
   {
     latex: `\\begin{align*}\nF(a, b ; a+b+m ; z)= & \\frac{\\Gamma(m) \\Gamma(a+b+m)}{\\Gamma(a+m) \\Gamma(b+m)} \\sum_{n=0}^{m-1} \\frac{(a)_{n}(b)_{n}}{n!(1-m)_{n}}(1-z)^{n}  \\tag{15.3.11}\\\\\n& \\quad-\\frac{\\Gamma(a+b+m)}{\\Gamma(a) \\Gamma(b)}(z-1)^{m} \\sum_{n=0}^{\\infty} \\frac{(a+m)_{n}(b+m)_{n}}{n!(n+m)!}(1-z)^{n}[\\ln (1-z)-\\psi(n+1) \\\\\n& -\\psi(n+m+1)+\\psi(a+n+m)+\\psi(b+n+m)] \\quad(|\\arg (1-z)|<\\pi,|1-z|<1)\n\\end{align*}`,
-    typst: `#math.equation(block: true, numbering: n => [(15.3.11)], number-align: end + top, $ F(a, b; a + b + m; z) = &frac(Gamma (m) Gamma (a + b + m), Gamma (a + m) Gamma (b + m)) sum_(n = 0)^(m - 1) frac((a)_n (b)_n, n!(1 - m)_n)(1 - z)^n \\\n &quad - frac(Gamma (a + b + m), Gamma (a) Gamma (b))(z - 1)^m sum_(n = 0)^(infinity) frac((a + m)_n (b + m)_n, n!(n + m)!)(1 - z)^n [ln(1 - z) - psi (n + 1) \\\n &- psi (n + m + 1) + psi (a + n + m) + psi (b + n + m)] quad (lr(| arg(1 - z) |) < pi, lr(| 1 - z |) < 1) $)\n#counter(math.equation).update(n => n - 1)`,
-    typst_inline: `F(a, b; a + b + m; z) = &frac(Gamma (m) Gamma (a + b + m), Gamma (a + m) Gamma (b + m)) sum_(n = 0)^(m - 1) frac((a)_n (b)_n, n!(1 - m)_n)(1 - z)^n \\\n &quad - frac(Gamma (a + b + m), Gamma (a) Gamma (b))(z - 1)^m sum_(n = 0)^(infinity) frac((a + m)_n (b + m)_n, n!(n + m)!)(1 - z)^n [ln(1 - z) - psi (n + 1) \\\n &- psi (n + m + 1) + psi (a + n + m) + psi (b + n + m)] quad (lr(| arg(1 - z) |) < pi, lr(| 1 - z |) < 1)`,
+    typst: `#math.equation(block: true, numbering: n => [(15.3.11)], number-align: end + top, $ F(a, b\\; a + b + m\\; z) = &frac(Gamma (m) Gamma (a + b + m), Gamma (a + m) Gamma (b + m)) sum_(n = 0)^(m - 1) frac((a)_n (b)_n, n!(1 - m)_n)(1 - z)^n \\\n &quad - frac(Gamma (a + b + m), Gamma (a) Gamma (b))(z - 1)^m sum_(n = 0)^(infinity) frac((a + m)_n (b + m)_n, n!(n + m)!)(1 - z)^n [ln(1 - z) - psi (n + 1) \\\n &- psi (n + m + 1) + psi (a + n + m) + psi (b + n + m)] quad (lr(| arg(1 - z) |) < pi, lr(| 1 - z |) < 1) $)\n#counter(math.equation).update(n => n - 1)`,
+    typst_inline: `F(a, b\\; a + b + m\\; z) = &frac(Gamma (m) Gamma (a + b + m), Gamma (a + m) Gamma (b + m)) sum_(n = 0)^(m - 1) frac((a)_n (b)_n, n!(1 - m)_n)(1 - z)^n \\\n &quad - frac(Gamma (a + b + m), Gamma (a) Gamma (b))(z - 1)^m sum_(n = 0)^(infinity) frac((a + m)_n (b + m)_n, n!(n + m)!)(1 - z)^n [ln(1 - z) - psi (n + 1) \\\n &- psi (n + m + 1) + psi (a + n + m) + psi (b + n + m)] quad (lr(| arg(1 - z) |) < pi, lr(| 1 - z |) < 1)`,
   },
   {
     latex: `x^n\\{a,b\\}`,
@@ -2972,8 +2972,8 @@ b_{3}
   },
   {
     latex: `c_{i} \\cap c_{j}=\\varnothing(i \\neq j ; i, j=1,2,3,4,5), \\varnothing`,
-    typst: `c_i inter c_j = emptyset (i eq.not j; i, j = 1, 2, 3, 4, 5), emptyset`,
-    typst_inline: `c_i inter c_j = emptyset (i eq.not j; i, j = 1, 2, 3, 4, 5), emptyset`,
+    typst: `c_i inter c_j = emptyset (i eq.not j\\; i, j = 1, 2, 3, 4, 5), emptyset`,
+    typst_inline: `c_i inter c_j = emptyset (i eq.not j\\; i, j = 1, 2, 3, 4, 5), emptyset`,
   },
   {
     latex: `\\min \\left|k: \\sum_{i=k}^{K} \\mu_{i} \\geqslant \\lambda\\right|`,
@@ -3334,5 +3334,77 @@ x=4
     latex: String.raw`\text{"; #eval("malicious")}`,
     typst: String.raw`"\"; #eval(\"malicious\")"`,
     typst_inline: String.raw`"\"; #eval(\"malicious\")"`,
+  },
+  // semicolons inside bare |…| must be escaped in lr()
+  {
+    latex: String.raw`/(| a ;| \wedge a )`,
+    typst: String.raw`\/(lr(| a\; |) and a)`,
+    typst_inline: String.raw`\/(lr(| a\; |) and a)`,
+  },
+  // bare |…| must not span across unbalanced { }
+  {
+    latex: String.raw`\{|f ; f e|: f c \in N\}`,
+    typst: String.raw`{lr(| f\; f e |): f c in N}`,
+    typst_inline: String.raw`{lr(| f\; f e |): f c in N}`,
+  },
+  // complex expression with multiple bare |, { }, semicolons and \operatorname
+  {
+    latex: String.raw`|f| £ ; f c|=\operatorname{mf}\{|f ; f e|: f c € N\}=\lim | £ f c \mid`,
+    typst: String.raw`lr(| f |) £\; f c| = op("mf"){lr(| f\; f e |): f c € N} = lim|£ f c divides`,
+    typst_inline: String.raw`lr(| f |) £\; f c| = op("mf"){lr(| f\; f e |): f c € N} = lim|£ f c divides`,
+  },
+  // bare |…| skipped when { } are between outer pipes
+  {
+    latex: String.raw`\lim |\{|/,, /|> a \}|=0`,
+    typst: String.raw`lim|{lr(| \/, , \/ |) > a}| = 0`,
+    typst_inline: String.raw`lim|{lr(| \/, , \/ |) > a}| = 0`,
+  },
+  // \langle \rangle with nested { } and comma separators
+  {
+    latex: String.raw`S P=\langle\{a\},\{\downarrow x .\langle a\rangle \neg x\}\rangle`,
+    typst: String.raw`S P = chevron.l{a}, {arrow.b x . lr(chevron.l a chevron.r) not x} chevron.r`,
+    typst_inline: String.raw`S P = chevron.l{a}, {arrow.b x . lr(chevron.l a chevron.r) not x} chevron.r`,
+  },
+  // dotted symbol name followed by ( must have space to avoid function call
+  {
+    latex: String.raw`\leftarrow (a+b)`,
+    typst: String.raw`arrow.l (a + b)`,
+    typst_inline: String.raw`arrow.l (a + b)`,
+  },
+  // semicolons inside builtin op args must be escaped: sin(a; b) → sin(a\; b)
+  {
+    latex: String.raw`\sin (7 r / a ; 2)`,
+    typst: String.raw`sin(7 r\/ a\; 2)`,
+    typst_inline: String.raw`sin(7 r\/ a\; 2)`,
+  },
+  // scripted builtin op: sin^2(a; b) → sin^2(a\; b)
+  {
+    latex: String.raw`\sin^2 (a ; b)`,
+    typst: String.raw`sin^2(a\; b)`,
+    typst_inline: String.raw`sin^2(a\; b)`,
+  },
+  // non-builtin function: f(a; b) — semicolon escaped at mo level
+  {
+    latex: String.raw`f(a ; b)`,
+    typst: String.raw`f(a\; b)`,
+    typst_inline: String.raw`f(a\; b)`,
+  },
+  // \operatorname followed by (a; b) — semicolon escaped at mo level
+  {
+    latex: String.raw`\operatorname{mf}(a ; b)`,
+    typst: String.raw`op("mf")(a\; b)`,
+    typst_inline: String.raw`op("mf")(a\; b)`,
+  },
+  // nested builtin ops: sin(cos(a; b)) — inner semicolon escaped
+  {
+    latex: String.raw`\sin(\cos(a ; b))`,
+    typst: String.raw`sin(cos(a\; b))`,
+    typst_inline: String.raw`sin(cos(a\; b))`,
+  },
+  // semicolon in subscript: x_{a;b} → x_(a\; b)
+  {
+    latex: String.raw`x_{a;b}`,
+    typst: String.raw`x_(a\; b)`,
+    typst_inline: String.raw`x_(a\; b)`,
   },
 ];

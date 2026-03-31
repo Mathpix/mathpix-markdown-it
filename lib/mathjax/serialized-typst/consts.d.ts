@@ -46,6 +46,8 @@ export declare const RE_SEPARATOR_END: RegExp;
 export declare const RE_ALPHA_END: RegExp;
 /** Trailing word starting with a letter (captures the identifier) */
 export declare const RE_TRAILING_IDENT: RegExp;
+/** Trailing dotted symbol name: arrow.l, chevron.r, floor.l, etc. */
+export declare const RE_TRAILING_DOTTED_IDENT: RegExp;
 /** Text with at least one Latin-script letter, optionally with combining marks/digits (NOT non-Latin) */
 export declare const RE_LATIN_WITH_MARKS: RegExp;
 /** String of Unicode letters and combining marks only */
