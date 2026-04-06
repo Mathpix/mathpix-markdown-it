@@ -17,7 +17,7 @@ import {
   escapeTypstString,
 } from "./common";
 import { findTypstSymbol, typstFontMap, typstSymbolMap } from "./typst-symbol-map";
-import { escapeContentSeparators } from "./escape-utils";
+import { escapeContentSeparators, escapeUnbalancedParens } from "./escape-utils";
 
 const INVISIBLE_CHARS: ReadonlySet<string> = new Set([
   FUNC_APPLY, INVISIBLE_TIMES, INVISIBLE_SEP, INVISIBLE_PLUS,
@@ -33,6 +33,11 @@ const stripCombiningNot = (value: string): [string, boolean] => {
   }
   return [value, false];
 };
+
+/** Wrap a Typst expression in cancel(), escaping unbalanced parens and
+ *  separators inside. Bare ( ) [ inside cancel() break Typst parsing. */
+const wrapCancel = (expr: string): string =>
+  `cancel(${escapeContentSeparators(escapeUnbalancedParens(expr))})`;
 
 
 const BB_SHORTHAND_LETTERS: ReadonlySet<string> = new Set(
@@ -243,7 +248,7 @@ export const mi: HandlerFn = (node, _serialize) => {
       }
     }
   }
-  if (hasNot) typstValue = `cancel(${typstValue})`;
+  if (hasNot) typstValue = wrapCancel(typstValue);
   // Add spacing around multi-character word-like Typst symbol names
   if (isWordLikeToken(typstValue)) {
     return singleTypst(withContextSpaces(node, typstValue));
@@ -256,16 +261,16 @@ export const mo: HandlerFn = (node, _serialize) => {
   // \not on mo: combining long solidus overlay (U+0338) → cancel()
   const [value, hasNot] = stripCombiningNot(rawValue);
   const unpaired = trySerializeUnpairedBracket(node, value);
-  if (unpaired) return hasNot ? singleTypst(`cancel(${unpaired.typst})`) : unpaired;
+  if (unpaired) return hasNot ? singleTypst(wrapCancel(unpaired.typst)) : unpaired;
   if (INVISIBLE_CHARS.has(value)) return initTypstData();
   let typstValue: string = findTypstSymbol(value);
   const normalizedName = normalizeOperatorName(value);
   const multiword = trySerializeMultiwordOp(node, normalizedName);
-  if (multiword) return hasNot ? singleTypst(`cancel(${multiword.typst.trim()})`) : multiword;
+  if (multiword) return hasNot ? singleTypst(wrapCancel(multiword.typst.trim())) : multiword;
   // Don't add limits: #true here — parent handler decides placement.
   const namedOp = trySerializeNamedOperator(node, value, normalizedName);
-  if (namedOp) return hasNot ? singleTypst(`cancel(${namedOp.typst.trim()})`) : namedOp;
-  if (hasNot) typstValue = `cancel(${typstValue})`;
+  if (namedOp) return hasNot ? singleTypst(wrapCancel(namedOp.typst.trim())) : namedOp;
+  if (hasNot) typstValue = wrapCancel(typstValue);
   const inScript = isInScriptContext(node);
   const wordLike = trySerializeWordLikeOperator(node, typstValue, inScript);
   if (wordLike) return wordLike;

@@ -284,7 +284,7 @@ export const mrow: HandlerFn = (node, serialize) => {
       // \not negation overlay: wrap next sibling in cancel()
       if (isNegationOverlay(child) && i + 1 < node.childNodes.length) {
         const nextData: ITypstData = serialize.visitNode(node.childNodes[i + 1], '');
-        const cancelTypst = `cancel(${nextData.typst.trim()})`;
+        const cancelTypst = `cancel(${escapeContentSeparators(escapeUnbalancedParens(nextData.typst.trim()))})`;
         if (needsSpaceBetweenNodes(res.typst, cancelTypst, i > 0 ? node.childNodes[i - 1] : null)) {
           addSpaceToTypstData(res);
         }

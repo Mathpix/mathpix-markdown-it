@@ -15,7 +15,7 @@ import {
   getChildText, getAttrs, isNegationOverlay, getCustomCmdTypstSymbol,
 } from './common';
 import { findTypstSymbol } from './typst-symbol-map';
-import { escapeContentSeparators, escapeLrSemicolons } from './escape-utils';
+import { escapeContentSeparators, escapeLrSemicolons, escapeUnbalancedParens } from './escape-utils';
 
 // Node kinds that carry sub/sup scripts (used in \idotsint pattern detection).
 const IDOTSINT_SCRIPT_KINDS: ReadonlySet<string> = new Set(['msubsup', 'msub', 'msup']);
@@ -395,7 +395,7 @@ export class SerializedTypstVisitor extends MmlVisitor {
         // Consume the next sibling and wrap it in cancel()
         if (isNegationOverlay(child) && j + 1 < children.length) {
           const nextData = this.visitNode(children[j + 1], space);
-          const cancelTypst = `cancel(${nextData.typst.trim()})`;
+          const cancelTypst = `cancel(${escapeContentSeparators(escapeUnbalancedParens(nextData.typst.trim()))})`;
           if (needsSpaceBetweenNodes(res.typst, cancelTypst, j > 0 ? children[j - 1] : null)) {
             addSpaceToTypstData(res);
           }

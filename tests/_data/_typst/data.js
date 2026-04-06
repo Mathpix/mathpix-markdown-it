@@ -2826,6 +2826,26 @@ module.exports = [
     typst_inline: `"a\\b\\c"`,
   },
 
+  // === \not with bracket operands (cancel must escape unbalanced parens/brackets) ===
+  // \not( — bare ( inside cancel() would break Typst grouping
+  {
+    latex: `\\not(T)`,
+    typst: `cancel(\\() T \\)`,
+    typst_inline: `cancel(\\() T \\)`,
+  },
+  // \not) — bare ) inside cancel()
+  {
+    latex: `\\not)`,
+    typst: `cancel(\\))`,
+    typst_inline: `cancel(\\))`,
+  },
+  // \not[ — bare [ inside cancel() would start content block
+  {
+    latex: `\\not[`,
+    typst: `cancel(\\[)`,
+    typst_inline: `cancel(\\[)`,
+  },
+
   // === Separator characters as script bases ===
   // Comma as subscript base: must be wrapped in quotes to prevent Typst separator parsing
   {
