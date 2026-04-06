@@ -5,6 +5,7 @@ import { handle, needLastSpaceAfterTeXAtom, needFirstSpaceBeforeTeXAtom } from "
 import { IAsciiData, AddToAsciiData, getFunctionNameFromAscii, initAsciiData } from "./common";
 import { regExpIsFunction } from "./helperA";
 import { needsParensForFollowingDivision, needBrackets } from "./helperLinear";
+import { getCustomCmdUnicode } from "../custom-cmd-map";
 
 export class SerializedAsciiVisitor extends MmlVisitor {
   options = null;
@@ -326,6 +327,15 @@ export class SerializedAsciiVisitor extends MmlVisitor {
   public visitTeXAtomNode(node: MmlNode, space: string): IAsciiData {
     let res: IAsciiData = initAsciiData();
     try {
+      // Custom-command nodes (e.g. \Varangle) — emit the canonical symbol
+      const customCmd: string | undefined = (node as any).getProperty?.('data-custom-cmd');
+      const customSym = customCmd && getCustomCmdUnicode(customCmd);
+      if (customSym) {
+        return AddToAsciiData(res, {
+          ascii: customSym, linear: customSym,
+          ascii_tsv: customSym, ascii_csv: customSym, ascii_md: customSym
+        });
+      }
       let children: IAsciiData = this.childNodeMml(node, space + '  ', '\n');
       if (needFirstSpaceBeforeTeXAtom(node)) {
         res = AddToAsciiData(res, {ascii: ' ', linear: ' '});

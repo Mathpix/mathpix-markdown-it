@@ -20,6 +20,7 @@ const options = {
   outMath: {
     include_mathml: true,
     include_asciimath: true,
+    include_typst: true,
     include_latex: true,
     include_svg: true,
     include_tsv: true,

@@ -187,6 +187,34 @@ const typesetMathForToken = (params: {
 }
 
 /**
+ * Converts an ascii math token via TypesetAsciiMath at parsing stage.
+ * Sets token.mathEquation (HTML) and token.mathData (metrics/typst/etc).
+ */
+export const convertAsciiMathToHtml = (state, token) => {
+  const math = token.content;
+  const options = state.md.options;
+  try {
+    const containerWidth = options?.width && options.width > 0
+      ? options.width
+      : getWidthFromDocument(1200);
+    const result = MathJax.TypesetAsciiMath(math, {
+      display: false,
+      metric: { cwidth: containerWidth },
+      outMath: options.outMath,
+      mathJax: options.mathJax,
+      forDocx: options.forDocx,
+      accessibility: options.accessibility,
+    });
+    token.mathEquation = result.html;
+    token.mathData = result.data;
+  } catch (e) {
+    console.error('ERROR [convertAsciiMathToHtml] MathJax =>', e.message, e);
+    formatMathJaxError(e, math, 'convertAsciiMathToHtml');
+    token.error = { message: e.message, error: e };
+  }
+};
+
+/**
  * Converts a math token into HTML and attaches MathJax metadata to the token.
  * Also extracts equation labels and stores them in the shared labels list.
  */

@@ -3,15 +3,49 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const sm = require("mathjax-full/js/input/tex/SymbolMap.js");
 const ParseMethods_js_1 = require("mathjax-full/js/input/tex/ParseMethods.js");
 const BaseMethods_js_1 = require("mathjax-full/js/input/tex/base/BaseMethods.js");
+const TexParser_js_1 = require("mathjax-full/js/input/tex/TexParser.js");
 
 new sm.CharacterMap('wasysym-mathchar0mo', ParseMethods_js_1.default.mathchar0mo, {
   varangle: '\u2222',
   Perp: '\u2AEB',
 });
 
+/**
+ * Factory: creates a custom command handler that parses a TeX macro
+ * and stamps the resulting MathML node with `data-custom-cmd` property.
+ * Downstream serializers (MathML, Typst, ASCII, assistive MML) use this
+ * property to emit a clean Unicode symbol instead of the visual-hack subtree.
+ *
+ * @param macro  TeX expansion string (e.g. '{[\\![}')
+ * @param cmd    Command name registered in custom-cmd-map.ts (e.g. 'llbracket')
+ */
+const makeCustomCmdHandler = (macro, cmd) => function(parser, name) {
+  const mml = new TexParser_js_1.default(
+    macro, Object.assign({}, parser.stack.env), parser.configuration
+  ).mml();
+  if (mml) {
+    // Set only as property (not attribute) — visible to visitor serializers
+    // via getProperty(), but does not leak into SVG or MathML output.
+    mml.setProperty('data-custom-cmd', cmd);
+    parser.Push(mml);
+  }
+};
+
+const CustomMethods = {
+  // \Varangle — overlapping < and smaller ) via negative kern
+  Varangle:  makeCustomCmdHandler('{\\mathrel{<\\mkern-14mu{\\small)}}}', 'Varangle'),
+  // \llbracket / \rrbracket — double brackets via negative thin space
+  llbracket: makeCustomCmdHandler('{[\\![}', 'llbracket'),
+  rrbracket: makeCustomCmdHandler('{]\\!]}', 'rrbracket'),
+  pounds:    makeCustomCmdHandler('{\\it\\unicode{xA3}}', 'pounds'),
+};
+
+// Merge custom methods with BaseMethods for CommandMap
+const allMethods = Object.assign({}, BaseMethods_js_1.default, CustomMethods);
+
 new sm.CommandMap('wasysym-macros', {
   Vmathcal: ['Macro', '{\\cal #1}', 1],
-  Varangle: ['Macro', '{\\mathop{{<\\!\\!\\!\\!\\!\\small)}\\:}\\nolimits}'],
+  Varangle: 'Varangle',
   longdiv: ['Macro', '\\enclose{longdiv}{#1}', 1],
   lcm: ['Macro', '\\enclose{bottom}{\\smash{)}{#1}\\:}', 1], 
   oint: ['Macro', '{\\mathop{\\vcenter{\\mathchoice{\\huge\\unicode{x222E}\\,}{\\unicode{x222E}}{\\unicode{x222E}}{\\unicode{x222E}}}\\,}\\nolimits}'],
@@ -19,17 +53,17 @@ new sm.CommandMap('wasysym-macros', {
   oiiint: ['Macro', '{\\mathop{\\vcenter{\\mathchoice{\\huge\\unicode{x2230}\\,}{\\unicode{x2230}}{\\unicode{x2230}}{\\unicode{x2230}}}\\,}\\nolimits}'],
   ointclockwise: ['Macro', '{\\mathop{\\vcenter{\\mathchoice{\\huge\\unicode{x2232}\\,}{\\unicode{x2232}}{\\unicode{x2232}}{\\unicode{x2232}}}\\,}\\nolimits}'],
   ointctrclockwise: ['Macro', '{\\mathop{\\vcenter{\\mathchoice{\\huge\\unicode{x2233}\\,}{\\unicode{x2233}}{\\unicode{x2233}}{\\unicode{x2233}}}\\,}\\nolimits}'],
-  llbracket: ['Macro', '{[\\![}'],
-  rrbracket: ['Macro', '{]\\!]}'],
+  llbracket: 'llbracket',
+  rrbracket: 'rrbracket',
   hhline: ['Macro', '\\hline \\hline'],
   AA: ['Macro', '{\\unicode{x212B}}'],
-  pounds: ['Macro', '{\\it\\unicode{xA3}}'],
+  pounds: 'pounds',
   highlight: ['Macro', '\\mathchoice' +
   '%{\\colorbox{#1}{$\\displaystyle{#2}$}}' +
   '%{\\colorbox{#1}{$\\textstyle{#2}$}}' +
   '%{\\colorbox{#1}{$\\scriptstyle{#2}$}}' +
   '%{\\colorbox{#1}{$\\scriptscriptstyle{#2}$}}', 2]
   // highlight: ['Macro', '[green]{#2{\\mathchoice%{\\colorbox{#1}{$\\displaystyle#2$}}%{\\colorbox{#1}{$\\textstyle#2$}}%{\\colorbox{#1}{$\\scriptstyle#2$}}%{\\colorbox{#1}{$\\scriptscriptstyle#2$}}}}', 2]
-}, BaseMethods_js_1.default);
+}, allMethods);
 
 //# sourceMappingURL=BaseMappings.js.map

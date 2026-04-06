@@ -3,6 +3,11 @@ import { MathJaxConfigure, svg } from './mathjax';
 import { SerializedMmlVisitor as MmlVisitor } from 'mathjax-full/js/core/MmlTree/SerializedMmlVisitor.js';
 import { LiteElement } from "mathjax-full/js/adaptors/lite/Element.js";
 import { SerializedAsciiVisitor as AsciiVisitor } from './serialized-ascii';
+import { SerializedTypstVisitor } from './serialized-typst';
+import { ITypstData, MathNode } from './serialized-typst/types';
+import { markUnpairedBrackets, clearUnpairedBracketMarks } from './serialized-typst/bracket-utils';
+import { getNodeText } from './serialized-typst/common';
+import { DATA_PRE_CONTENT, DATA_POST_CONTENT } from './serialized-typst/consts';
 import { MathMLVisitorWord } from './mathml-word';
 import { getSpeech } from '../sre';
 import { TAccessibility } from "../mathpix-markdown-model";
@@ -15,6 +20,12 @@ import { uid } from "../markdown/utils";
 
 const MJ = new MathJaxConfigure();
 
+interface ITypstConvertResult {
+  typstmath: string;
+  typstmath_inline: string;
+  error?: string;
+}
+
 export interface IOuterData {
   mathml?: string,
   mathml_word?: string,
@@ -23,6 +34,8 @@ export interface IOuterData {
   asciimath_tsv?: string,
   asciimath_csv?: string,
   asciimath_md?: string,
+  typstmath?: string,
+  typstmath_inline?: string,  // always set when typstmath is set
   latex?: string,
   svg?: string,
   speech?: string,
@@ -68,6 +81,64 @@ const normalizeMathJaxA11y = (adaptor, mjxContainer) => {
     adaptor.setAttribute(svg, 'aria-hidden', 'true');
   }
 }
+
+const normalizeTypstSpaces = (s: string): string =>
+  s ? s.trim().replace(/(\S) {2,}/g, '$1 ') : '';
+
+/** Find the first merror node in the tree and return its error message, or null. */
+const findMerror = (node: MathNode): string | null => {
+  if (!node) return null;
+  if (node.kind === 'merror') {
+    const attrMsg = node.attributes?.get('data-mjx-error') as string | undefined;
+    if (attrMsg) return attrMsg;
+    const textMsg = (node.childNodes ?? [])
+      .map(c => getNodeText(c)).join('');
+    return textMsg || 'Unknown error';
+  }
+  for (const child of (node.childNodes ?? [])) {
+    const err = findMerror(child);
+    if (err) return err;
+  }
+  return null;
+};
+
+/** Return both block and inline Typst math from the MathML AST.
+ *  typstmath_inline always present — equals typstmath when no block wrappers are used.
+ *  If the tree contains a merror node, returns empty typst with an error field.
+ *
+ *  Temporarily mutates the shared MathML tree via setProperty()
+ *  (data-unpaired-bracket, data-pre-content, data-post-content).
+ *  All mutations are cleaned up after serialization. */
+const toTypstData = (node: MathNode): ITypstConvertResult => {
+  const error = findMerror(node);
+  if (error) {
+    return { typstmath: '', typstmath_inline: '', error };
+  }
+  // markUnpairedBrackets and visitInferredMrowNode both mutate the shared
+  // MathML tree (setting properties / reading them). markUnpairedBrackets must
+  // run first so that bracket properties are available during serialization.
+  markUnpairedBrackets(node);
+  const visitorT = new SerializedTypstVisitor();
+  const data: ITypstData = visitorT.visitTree(node);
+  // Clean up tree mutations so properties don't leak to other visitors
+  clearUnpairedBracketMarks(node);
+  clearTypstProperties(node);
+  const typstmath = normalizeTypstSpaces(data?.typst);
+  const typstmath_inline = normalizeTypstSpaces(data?.typst_inline ?? data?.typst);
+  return { typstmath, typstmath_inline };
+};
+
+/** Remove data-pre-content and data-post-content properties set during Typst serialization. */
+const clearTypstProperties = (root: MathNode): void => {
+  const walk = (node: MathNode): void => {
+    if (!node) return;
+    node.removeProperty(DATA_PRE_CONTENT, DATA_POST_CONTENT);
+    if (node.childNodes) {
+      for (const child of node.childNodes) walk(child);
+    }
+  };
+  walk(root);
+};
 
 const makeAssistiveMmlAccessible = (adaptor, mjxContainer) => {
   const assistive = adaptor.lastChild(mjxContainer);
@@ -124,6 +195,7 @@ const OuterData = (adaptor, node, math, outMath, forDocx = false, accessibility?
     include_asciimath = false,
     include_latex = false,
     include_linearmath = false,
+    include_typst = false,
     include_svg = true,
     include_speech = false,
     optionAscii = {
@@ -157,7 +229,13 @@ const OuterData = (adaptor, node, math, outMath, forDocx = false, accessibility?
       res.linearmath = dataAscii.linear;
     }
   }
-  
+
+  if (include_typst) {
+    const typstData = toTypstData(math.root);
+    res.typstmath = typstData.typstmath;
+    res.typstmath_inline = typstData.typstmath_inline;
+  }
+
   if (include_latex) {
     res.latex = (math.math
       ? math.math
@@ -219,6 +297,7 @@ const OuterDataAscii = (adaptor, node, math, outMath, forDocx = false, accessibi
     include_mathml = false,
     include_mathml_word = false,
     include_asciimath = false,
+    include_typst = false,
     include_svg = true,
     include_speech = false,
     output_format = 'svg'
@@ -227,6 +306,8 @@ const OuterDataAscii = (adaptor, node, math, outMath, forDocx = false, accessibi
     mathml?: string,
     mathml_word?: string,
     asciimath?: string,
+    typstmath?: string,
+    typstmath_inline?: string,
     latex?: string,
     svg?: string,
     speech?: string
@@ -249,6 +330,11 @@ const OuterDataAscii = (adaptor, node, math, outMath, forDocx = false, accessibi
       ? math.math
       : math.inputJax.processStrings ? '' : math.start.node.outerHTML);
   }
+  if (include_typst) {
+    const typstData = toTypstData(math.root);
+    res.typstmath = typstData.typstmath;
+    res.typstmath_inline = typstData.typstmath_inline;
+  }
   if (include_svg) {
     res.svg = adaptor.outerHTML(node)
   }
@@ -264,6 +350,7 @@ const OuterDataMathMl = (adaptor, node, math, outMath, forDocx = false, accessib
     include_svg = true,
     include_speech = false,
     include_linearmath = false,
+    include_typst = false,
     optionAscii = {
       showStyle: false,
       extraBrackets: true
@@ -293,7 +380,11 @@ const OuterDataMathMl = (adaptor, node, math, outMath, forDocx = false, accessib
       res.linearmath = dataAscii.linear;
     }
   }
-
+  if (include_typst) {
+    const typstData = toTypstData(math.root);
+    res.typstmath = typstData.typstmath;
+    res.typstmath_inline = typstData.typstmath_inline;
+  }
   if (include_svg) {
     res.svg = adaptor.outerHTML(node);
     if (node) {
@@ -322,6 +413,7 @@ export const OuterHTML = (data, outMath, forPptx: boolean = false) => {
     include_asciimath = false,
     include_linearmath = false,
     include_latex = false,
+    include_typst = false,
     include_svg = true,
     include_error = false,
     include_speech = false
@@ -348,7 +440,12 @@ export const OuterHTML = (data, outMath, forPptx: boolean = false) => {
   if (include_latex && data.latex) {
     if (!outHTML) { outHTML += '\n'}
     outHTML += '<latex style="display: none;">' + formatSource(data.latex) + '</latex>';
-  }    
+  }
+  if (include_typst && data.typstmath) {
+    if (!outHTML) { outHTML += '\n'}
+    outHTML += '<typstmath style="display: none;">' + formatSource(data.typstmath) + '</typstmath>';
+    outHTML += '<typstmath-inline style="display: none;">' + formatSource(data.typstmath_inline || data.typstmath) + '</typstmath-inline>';
+  }
   if (include_speech && data.speech) {
     if (!outHTML) { outHTML += '\n'}
     outHTML += '<speech style="display: none;">' + formatSource(data.speech) + '</speech>';
@@ -486,6 +583,27 @@ export const MathJax = {
     const dataAscii: IAsciiData = toAsciiML(outputJax.math.root, optionAscii);
     return dataAscii.ascii;
   },
+  TexConvertToTypstData: function(string: string, options: any = {}): ITypstConvertResult {
+    const {display = true, metric = {}, accessibility = null} = options;
+    const {em = 16, ex = 8, cwidth = 1200, lwidth = 100000, scale = 1} = metric;
+    this.checkAccessibility(accessibility);
+    (MJ.docTeX as any).inputJax?.parseOptions?.tags?.reset();
+    MJ.docTeX.convert(string, {
+      display, em, ex, containerWidth: cwidth, lineWidth: lwidth, scale,
+    });
+    const outputJax = MJ.docTeX.outputJax as any;
+    return toTypstData(outputJax.math.root);
+  },
+  MathMLConvertToTypstData: function(string: string, options: any = {}): ITypstConvertResult {
+    const {display = true, metric = {}, accessibility = null} = options;
+    const {em = 16, ex = 8, cwidth = 1200, lwidth = 100000, scale = 1} = metric;
+    this.checkAccessibility(accessibility);
+    MJ.docMathML.convert(string, {
+      display, em, ex, containerWidth: cwidth, lineWidth: lwidth, scale,
+    });
+    const outputJax = MJ.docMathML.outputJax as any;
+    return toTypstData(outputJax.math.root);
+  },
   /**
    * Typeset a TeX expression and return the SVG tree for it
    *
@@ -546,19 +664,26 @@ export const MathJax = {
     };
   },
 
+  /** @deprecated Use TypesetAsciiMath instead. Kept for backward compatibility. */
   AsciiMathToSvg: function(string, options: any={}) {
+    return this.TypesetAsciiMath(string, options).html;
+  },
+
+  TypesetAsciiMath: function(string, options: any={}) {
     const {display = true, metric = {}, outMath = {}, forDocx={}, accessibility = null} = options;
     const {em = 16, ex = 8, cwidth = 1200, lwidth = 100000, scale = 1} = metric;
-
     this.checkAccessibility(accessibility);
     const node = MJ.docAsciiMath.convert(string, {
       display, em, ex, containerWidth: cwidth, lineWidth: lwidth, scale,
     });
     const outputJax = MJ.docAsciiMath.outputJax as any;
     const outerDataAscii = OuterDataAscii(MJ.adaptor, node, outputJax.math, outMath, forDocx, accessibility);
-    return outMath?.output_format === 'mathml'
-      ? formatSourceMML(outerDataAscii.mathml)
-      : OuterHTML(outerDataAscii, options.outMath);
+    return {
+      html: outMath?.output_format === 'mathml'
+        ? formatSourceMML(outerDataAscii.mathml)
+        : OuterHTML(outerDataAscii, options.outMath),
+      data: outerDataAscii,
+    };
   },
 
   //
