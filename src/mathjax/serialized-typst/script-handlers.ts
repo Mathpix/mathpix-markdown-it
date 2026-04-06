@@ -88,6 +88,16 @@ const TYPST_ACCENT_SHORTHANDS: ReadonlySet<string> = new Set([
   'overbrace', 'underbrace', 'overbracket', 'underbracket', 'overparen', 'underparen',
 ]);
 
+/** Characters that act as separators in Typst math and cannot be bare script bases.
+ *  When one of these is the base of msub/msup/msubsup, wrap in quotes to form a text atom. */
+const TYPST_SEPARATOR_BASES: ReadonlySet<string> = new Set([',', ';']);
+
+/** Return a safe script base: wraps separator chars in quotes, uses '""' for empty bases. */
+const safeScriptBase = (base: string, baseTrimmed: string): string => {
+  if (TYPST_SEPARATOR_BASES.has(baseTrimmed)) return `"${baseTrimmed}"`;
+  return baseTrimmed ? base : '""';
+};
+
 /** Unwrap TeXAtom > inferredMrow > mo to get the delimiter text.
  *  Returns empty string if structure doesn't match. */
 const unwrapToMoText = (node: MathNode): string => {
@@ -272,7 +282,8 @@ export const msup: HandlerFn = (node, serialize) => {
     res = addToTypstData(res, { typst: `scripts(${escapeContentSeparators(baseTrimmed)})` });
   } else {
     // Empty base (e.g. LaTeX ^{x} with no preceding base): use empty placeholder
-    res = addToTypstData(res, { typst: baseTrimmed ? base : '""' });
+    // Separator bases (e.g. ,^{x}): wrap in quotes to form a valid atom
+    res = addToTypstData(res, { typst: safeScriptBase(base, baseTrimmed) });
   }
   // Skip empty superscript (e.g. LaTeX m^{} → just "m")
   if (sup) {
@@ -309,7 +320,8 @@ export const msub: HandlerFn = (node, serialize) => {
   if (baseTrimmed && needsScriptsWrapper(baseTrimmed)) {
     res = addToTypstData(res, { typst: `scripts(${escapeContentSeparators(baseTrimmed)})` });
   } else {
-    res = addToTypstData(res, { typst: baseTrimmed ? base : '""' });
+    // Separator bases (e.g. ,_{x}): wrap in quotes to form a valid atom
+    res = addToTypstData(res, { typst: safeScriptBase(base, baseTrimmed) });
   }
   // Skip empty subscript (e.g. LaTeX m_{} → just "m")
   if (sub) {
@@ -338,7 +350,8 @@ export const msubsup: HandlerFn = (node, serialize) => {
   if (baseTrimmed && needsScriptsWrapper(baseTrimmed)) {
     res = addToTypstData(res, { typst: `scripts(${escapeContentSeparators(baseTrimmed)})` });
   } else {
-    res = addToTypstData(res, { typst: baseTrimmed ? base : '""' });
+    // Separator bases (e.g. ,_{}^{x}): wrap in quotes to form a valid atom
+    res = addToTypstData(res, { typst: safeScriptBase(base, baseTrimmed) });
   }
   // Skip empty subscript/superscript (e.g. LaTeX m_{}^{x} → just "m^x")
   if (sub) {

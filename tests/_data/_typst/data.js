@@ -2826,6 +2826,45 @@ module.exports = [
     typst_inline: `"a\\b\\c"`,
   },
 
+  // === Separator characters as script bases ===
+  // Comma as subscript base: must be wrapped in quotes to prevent Typst separator parsing
+  {
+    latex: `,_{x}`,
+    typst: `","_x`,
+    typst_inline: `","_x`,
+  },
+  // Comma as superscript base
+  {
+    latex: `,^{x}`,
+    typst: `","^x`,
+    typst_inline: `","^x`,
+  },
+  // Comma as sub+sup base
+  {
+    latex: `,_{a}^{b}`,
+    typst: `","_a^b`,
+    typst_inline: `","_a^b`,
+  },
+  // Comma subscript preceded by delta (real-world record type notation)
+  {
+    latex: `\\delta,_{-}`,
+    typst: `delta ","_-`,
+    typst_inline: `delta ","_-`,
+  },
+  // Comma subscript inside angle brackets (lr with non-standard delimiters)
+  {
+    latex: `\\left\\langle a,_{-} \\right\\rangle`,
+    typst: `lr(chevron.l a ","_- chevron.r)`,
+    typst_inline: `lr(chevron.l a ","_- chevron.r)`,
+  },
+
+  // Full formula with comma-subscript inside nested lr() with angle brackets
+  {
+    latex: `\\operatorname{tag}\\left(c^{V}\\right)=\\operatorname{tag}\\left(\\{(d, \\partial), \\ldots,(d, \\partial)\\}^{V}\\right)= \\operatorname{tag}\\left(\\operatorname{Rec}\\left(d^{\\text { }}\\right)^{V}\\right)=\\operatorname{tag}\\left(\\left\\langle\\ell_{1}=\\delta, \\ldots, \\ell_{n}=\\delta,_{-}=\\perp^{\\emptyset} \\nabla_{L}^{V}\\right)=\\operatorname{tag}\\left(\\perp^{V}\\right)=V\\right.`,
+    typst: `op("tag") lr(( c^V )) = op("tag") lr(( {\\(d, partial\\), dots, \\(d, partial\\)}^V )) = op("tag") lr(( op("Rec") lr(( d ))^V )) = op("tag") lr(\\( lr(chevron.l ell_1 = delta, dots, ell_n = delta ","_- = perp^(emptyset) nabla_L^V \\)) = op("tag") lr(( perp^V )) = V)`,
+    typst_inline: `op("tag") lr(( c^V )) = op("tag") lr(( {\\(d, partial\\), dots, \\(d, partial\\)}^V )) = op("tag") lr(( op("Rec") lr(( d ))^V )) = op("tag") lr(\\( lr(chevron.l ell_1 = delta, dots, ell_n = delta ","_- = perp^(emptyset) nabla_L^V \\)) = op("tag") lr(( perp^V )) = V)`,
+  },
+
   // === mhchem: phantom alignment boxes stripped inside sub/superscripts ===
   {
     latex: `\\ce{H2O}`,
