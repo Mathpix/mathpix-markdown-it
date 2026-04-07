@@ -3,6 +3,12 @@
 Status: Implemented
 Owner: @OlgaRedozubova
 
+> **Note:** The internal architecture was refactored to use a typed AST layer.
+> File structure, escape handling, and handler organization described below
+> reflect the initial design. See [2026-04-typst-math-ast-refactor.md](2026-04-typst-math-ast-refactor.md)
+> for the current architecture. Feature design, symbol mapping, dual output,
+> and equation numbering sections below remain accurate.
+
 ---
 
 ## Context
