@@ -1,245 +1,119 @@
 import { TextNode } from 'mathjax-full/js/core/MmlTree/MmlNode.js';
-import { MathNode, ITypstData, ITypstSerializer, HandlerFn } from './types';
+import { MathNode } from './types';
 import {
   RE_THREE_DIGITS, RE_TWO_DIGITS, RE_PHANTOM_BASE,
-  RE_TOKEN_START, RE_SEPARATOR_END, RE_ALPHA_END, RE_TRAILING_DOTTED_IDENT,
+  RE_TOKEN_START, RE_SEPARATOR_END, RE_WORD_DOT_END,
   RE_LATIN_WITH_MARKS, RE_LETTERS_AND_MARKS,
-  TYPST_PLACEHOLDER, SCRIPT_NODE_KINDS, PRIME_CHARS, TYPST_BUILTIN_OPS, TEX_ATOM,
+  TEX_ATOM,
 } from './consts';
 import { typstSymbolMap } from './typst-symbol-map';
 
 /** Unicode negation slash used by MathJax for \not overlay (U+29F8) */
 const NEGATION_SLASH = '\u29F8';
-
-/** Escape backslashes and quotes for Typst string literals ("...") */
-const RE_BACKSLASH_GLOBAL = /\\/g;
-const RE_QUOTE_GLOBAL = /"/g;
-export const escapeTypstString = (s: string): string =>
-  s.replace(RE_BACKSLASH_GLOBAL, '\\\\').replace(RE_QUOTE_GLOBAL, '\\"');
-
-/** Map mathvariant attribute values to Typst font function names. */
-const FONT_FN_MAP: Readonly<Record<string, string>> = {
-  'normal': 'upright',
-  'bold': 'bold',
-  'bold-italic': 'bold',
-  'italic': 'italic',
-  '-tex-mathit': 'italic',
-  'double-struck': 'bb',
-  'script': 'cal',
-  '-tex-calligraphic': 'cal',
-  'fraktur': 'frak',
-  'bold-fraktur': 'frak',
-  'sans-serif': 'sans',
-  'bold-sans-serif': 'sans',
-  'sans-serif-italic': 'sans',
-  'monospace': 'mono',
-};
-
-/** Return the expression if non-empty, otherwise the Typst empty placeholder '""'. */
-export const typstPlaceholder = (s: string): string => s || TYPST_PLACEHOLDER;
-
-export const initTypstData = (): ITypstData => ({ typst: '' });
-
-/** Mutates dataOutput by appending dataInput fields. Returns dataOutput for chaining. */
-export const addToTypstData = (
-  dataOutput: ITypstData,
-  dataInput: ITypstData
-): ITypstData => {
-  dataOutput.typst += dataInput.typst;
-  // Always propagate inline variant: use explicit typst_inline if set,
-  // otherwise fall back to typst (inline == block for most nodes).
-  dataOutput.typst_inline = (dataOutput.typst_inline ?? '')
-    + (dataInput.typst_inline !== undefined ? dataInput.typst_inline : dataInput.typst);
-  return dataOutput;
-};
-
-/** Add a separator space to both typst and typst_inline fields.
- *  Does not create typst_inline if it hasn't been initialized yet. */
-export const addSpaceToTypstData = (data: ITypstData): void => {
-  data.typst += ' ';
-  if (data.typst_inline !== undefined) {
-    data.typst_inline += ' ';
-  }
-};
+/** Any escaped bracket at start: \( \) \[ \] \{ \} */
+const RE_ESCAPED_BRACKET_START = /^\\[()[\]{}]/;
+/** Any escaped bracket at end: ...\( ...\) etc. — NOT a natural separator */
+const RE_ESCAPED_BRACKET_END = /\\[()[\]{}]$/;
 
 /** Check if child at index i in a node's childNodes starts a thousand-separator
  *  pattern: mn, mo(,), mn(3 digits). Also handles Indian numbering (2-digit groups
  *  like 41,70,000) by accepting 2-digit groups when the chain ends with a 3-digit group. */
 export const isThousandSepComma = (node: MathNode, i: number): boolean => {
   const children = node.childNodes;
-  if (!children || i < 0 || i + 2 >= children.length) return false;
+  if (!children || i < 0 || i + 2 >= children.length) {
+    return false;
+  }
   const child = children[i];
   const comma = children[i + 1];
   const next = children[i + 2];
-  if (child?.kind !== 'mn') return false;
-  if (comma?.kind !== 'mo' || getChildText(comma) !== ',') return false;
-  if (next?.kind !== 'mn') return false;
+  if (child?.kind !== 'mn') {
+    return false;
+  }
+  if (comma?.kind !== 'mo' || getChildText(comma) !== ',') {
+    return false;
+  }
+  if (next?.kind !== 'mn') {
+    return false;
+  }
   const nextText = getChildText(next);
   // Standard: exactly 3 digits after comma
-  if (RE_THREE_DIGITS.test(nextText)) return true;
+  if (RE_THREE_DIGITS.test(nextText)) {
+    return true;
+  }
   // Indian numbering: exactly 2 digits — accept if the chain eventually reaches a 3-digit group
-  if (!RE_TWO_DIGITS.test(nextText)) return false;
+  if (!RE_TWO_DIGITS.test(nextText)) {
+    return false;
+  }
   let j = i + 2;
   while (j + 2 < children.length) {
     const nextComma = children[j + 1];
     const nextNode = children[j + 2];
-    if (nextComma?.kind !== 'mo' || getChildText(nextComma) !== ',') return false;
-    if (nextNode?.kind !== 'mn') return false;
+    if (nextComma?.kind !== 'mo' || getChildText(nextComma) !== ',') {
+      return false;
+    }
+    if (nextNode?.kind !== 'mn') {
+      return false;
+    }
     const nextDigits = getChildText(nextNode);
-    if (RE_THREE_DIGITS.test(nextDigits)) return true;
-    if (!RE_TWO_DIGITS.test(nextDigits)) return false;
+    if (RE_THREE_DIGITS.test(nextDigits)) {
+      return true;
+    }
+    if (!RE_TWO_DIGITS.test(nextDigits)) {
+      return false;
+    }
     j += 2;
   }
   return false;
 };
 
-/** Serialize a thousand-separator chain starting at index `start` in a node's childNodes.
- *  Returns { typst, nextIndex } where nextIndex is the first unconsumed child index,
- *  or null if no chain starts at `start`. */
-export const serializeThousandSepChain = (
-  node: MathNode, start: number, serialize: ITypstSerializer
-): { typst: string; nextIndex: number } | null => {
-  if (!isThousandSepComma(node, start)) return null;
-  const numData = serialize.visitNode(node.childNodes[start], '');
-  let chainTypst = numData.typst;
-  let k = start;
-  while (isThousandSepComma(node, k)) {
-    const nextData = serialize.visitNode(node.childNodes[k + 2], '');
-    chainTypst += `\\,${nextData.typst}`;
-    k += 2;
-  }
-  return { typst: chainTypst, nextIndex: k + 1 };
-};
-
 /** Check if text is a non-Latin script character (Devanagari, Arabic, CJK, etc.)
  *  that is NOT a known math symbol with a Typst mapping. */
-const isNonLatinText = (text: string): boolean => {
+export const isNonLatinText = (text: string): boolean => {
   // Must consist of letters and combining marks only (not math symbols \p{S})
-  if (!RE_LETTERS_AND_MARKS.test(text)) return false;
+  if (!RE_LETTERS_AND_MARKS.test(text)) {
+    return false;
+  }
   // Latin letters with combining marks (k̸, ñ, etc.) are NOT non-Latin
-  if (RE_LATIN_WITH_MARKS.test(text)) return false;
+  if (RE_LATIN_WITH_MARKS.test(text)) {
+    return false;
+  }
   // Must NOT be a known math symbol (∂→partial, ψ→psi, ∅→emptyset, etc.)
-  if (typstSymbolMap.has(text)) return false;
+  if (typstSymbolMap.has(text)) {
+    return false;
+  }
   return true;
 };
 
-/** Detect one or more consecutive mi nodes containing non-Latin script text
- *  (Devanagari, Arabic, CJK, etc.) with the same mathvariant.
- *  MathJax splits \mathrm{टेक} into individual mi nodes per character,
- *  breaking combining sequences and word grouping.
- *  This function merges them into a single font-wrapped string.
- *  Skips known math symbols (∂, ψ, ∅, etc.) that have specific Typst mappings.
- *  Returns { typst, nextIndex } or null if node at `start` is not non-Latin mi. */
-export const serializeCombiningMiChain = (
-  node: MathNode, start: number,
-): { typst: string; nextIndex: number } | null => {
-  const children = node.childNodes;
-  if (!children || start >= children.length) return null;
-  const first = children[start];
-  if (first.kind !== 'mi') return null;
-  const firstText = getNodeText(first);
-  if (!firstText || !isNonLatinText(firstText)) return null;
-  const variant = String(first.attributes?.get('mathvariant') ?? '');
-  // Collect consecutive mi nodes with the same mathvariant and non-Latin text
-  let merged = firstText;
-  let k = start + 1;
-  while (k < children.length) {
-    const sib = children[k];
-    if (sib.kind !== 'mi') break;
-    const sibVariant = String(sib.attributes?.get('mathvariant') ?? '');
-    if (sibVariant !== variant) break;
-    const sibText = getNodeText(sib);
-    if (!sibText || !isNonLatinText(sibText)) break;
-    merged += sibText;
-    k++;
-  }
-  // Build font-wrapped string
-  const escaped = escapeTypstString(merged);
-  const fontFn = variant === 'bold' ? null : FONT_FN_MAP[variant];
-  if (!fontFn) {
-    // bold special case or unknown variant — just quote it
-    if (variant === 'bold') {
-      return { typst: `upright(bold("${escaped}"))`, nextIndex: k };
-    }
-    return { typst: `"${escaped}"`, nextIndex: k };
-  }
-  return { typst: `${fontFn}("${escaped}")`, nextIndex: k };
-};
-
-/** Check if a space separator is needed between two adjacent Typst tokens.
- *  Returns true when `next` starts with a word/dot/quote character
- *  and `prev` doesn't end with a natural separator (whitespace, open paren, etc.). */
+/** Check if a space separator is needed between two adjacent Typst tokens. */
 export const needsTokenSeparator = (prev: string, next: string): boolean => {
-  if (!prev || !next) return false;
-  // No space before phantom subscript/superscript base (""_ or ""^)
-  if (RE_PHANTOM_BASE.test(next)) return false;
-  return RE_TOKEN_START.test(next)
-    && !RE_SEPARATOR_END.test(prev);
-};
-
-/** Check if a scripted node represents a derivative pattern: f'(x), f''(x), f^{(n)}(a).
- *  These are msup with mi base and prime (mo with ′/″/‴) or parenthesized-group (TeXAtom) superscript. */
-const isDerivativePattern = (node: MathNode): boolean => {
-  if (node.kind !== 'msup') return false;
-  if (node.childNodes?.[0]?.kind !== 'mi') return false;
-  const script = node.childNodes?.[1];
-  // f'(x), f''(x) — superscript is mo with prime character (′ ″ ‴)
-  if (script?.kind === 'mo') {
-    const scriptText = getChildText(script);
-    return PRIME_CHARS.has(scriptText);
+  if (!prev || !next) {
+    return false;
   }
-  // f^{(n)}(a) — superscript is TeXAtom (parenthesized group)
-  if (script?.kind === TEX_ATOM) return true;
-  return false;
-};
-
-/** Extended spacing check for mrow/inferredMrow child concatenation.
- *  First applies the standard token separator heuristic, then checks whether
- *  a scripted node (msub, msup, …) is followed by (, [ or { — a space is needed
- *  to prevent Typst from parsing them as function call / content block / code block
- *  and to improve readability: q_j (chi, eta), P_l^n (cos chi), x^n [ln x].
- *  Exception: derivative patterns f'(x), f''(x), f^{(n)}(a) keep no space. */
-export const needsSpaceBetweenNodes = (
-  prevTypst: string, nextTypst: string, prevNode: MathNode | null,
-): boolean => {
-  if (needsTokenSeparator(prevTypst, nextTypst)) return true;
-  if (prevNode && SCRIPT_NODE_KINDS.has(prevNode.kind) && nextTypst.length > 0) {
-    const ch = nextTypst[0];
-    if (ch === '[' || ch === '{') return true;
-    if (ch === '(' && !isDerivativePattern(prevNode)) return true;
+  if (RE_PHANTOM_BASE.test(next)) {
+    return false;
   }
-  // Prevent Typst from parsing symbol( as a function call: emptyset(i) → emptyset (i).
-  // Multi-char Typst names (Greek, symbol names) followed by ( need a space.
-  // Single-char identifiers (f, g, x) and built-in math operators (sin, cos, ln) don't.
-  // Also handles dotted symbol names: arrow.l( → arrow.l (
-  if (nextTypst[0] === '(' && RE_ALPHA_END.test(prevTypst)) {
-    const lastWord = prevTypst.match(RE_TRAILING_DOTTED_IDENT);
-    if (lastWord && lastWord[1].length > 1 && !TYPST_BUILTIN_OPS.has(lastWord[1])) return true;
+  // Standard check: next starts with word/dot/quote, prev doesn't end with separator
+  if (RE_TOKEN_START.test(next)) {
+    // Escaped bracket at end (\( \) \[ etc.) is NOT a separator
+    const prevIsSeparator = RE_SEPARATOR_END.test(prev) && !RE_ESCAPED_BRACKET_END.test(prev);
+    return !prevIsSeparator;
+  }
+  // Any escaped bracket at start of next needs space after word/dot chars
+  if (RE_ESCAPED_BRACKET_START.test(next)) {
+    return RE_WORD_DOT_END.test(prev);
   }
   return false;
-};
-
-/** Simple heuristic for Typst sub/superscript grouping: multi-char content needs parens. */
-export const needsParens = (s: string): boolean => s.length > 1;
-
-/** Format a subscript or superscript with proper Typst grouping.
- *  Returns e.g. '_x', '_(x + y)', '^n', '^(a b)', or '' if content is empty. */
-export const formatScript = (prefix: '_' | '^', content: string): string => {
-  if (!content) return '';
-  return prefix + (needsParens(content) ? `(${content})` : content);
 };
 
 /** Check if a node is the first child of its parent. */
 export const isFirstChild = (node: MathNode): boolean =>
   !!node.parent && node.parent.childNodes[0] === node;
 
-/** Check if a node is the last child of its parent. */
-export const isLastChild = (node: MathNode): boolean =>
-  !!node.parent && node.parent.childNodes[node.parent.childNodes.length - 1] === node;
-
 /** Find the index of a node among its parent's childNodes. Returns -1 if not found. */
 export const getSiblingIndex = (node: MathNode): number => {
-  if (!node.parent || !node.parent.childNodes) return -1;
+  if (!node.parent || !node.parent.childNodes) {
+    return -1;
+  }
   return node.parent.childNodes.indexOf(node);
 };
 
@@ -252,10 +126,14 @@ export const getChildText = (node: MathNode): string => {
 
 /** Concatenate direct TextNode children of a node (non-recursive). */
 export const getNodeText = (node: MathNode): string => {
-  if (!node?.childNodes) return '';
+  if (!node?.childNodes) {
+    return '';
+  }
   let text = '';
   for (const child of node.childNodes) {
-    if (child instanceof TextNode) text += child.getText();
+    if (child instanceof TextNode) {
+      text += child.getText();
+    }
   }
   return text;
 };
@@ -279,54 +157,43 @@ export const getContentChildren = (node: MathNode): MathNode[] =>
 export const isNegationOverlay = (node: MathNode): boolean => {
   // MathJax represents \not as TeXAtom(REL) in the internal tree
   // (serialized as mrow in MathML output)
-  if (node.kind !== TEX_ATOM && node.kind !== 'mrow') return false;
+  if (node.kind !== TEX_ATOM && node.kind !== 'mrow') {
+    return false;
+  }
   // Walk through inferred mrow wrappers to find the mpadded
   let target = node.childNodes;
-  if (!target) return false;
+  if (!target) {
+    return false;
+  }
   while (target.length === 1 && target[0].isInferred && target[0].childNodes) {
     target = target[0].childNodes;
   }
-  if (target.length !== 1) return false;
+  if (target.length !== 1) {
+    return false;
+  }
   const mpadded = target[0];
-  if (mpadded.kind !== 'mpadded') return false;
+  if (mpadded.kind !== 'mpadded') {
+    return false;
+  }
   const attrs = mpadded.attributes.getAllAttributes();
-  if (attrs.width !== 0) return false;
+  if (attrs.width !== 0) {
+    return false;
+  }
   // Walk through inferred mrow inside mpadded
   let mpTarget = mpadded.childNodes;
-  if (!mpTarget) return false;
+  if (!mpTarget) {
+    return false;
+  }
   while (mpTarget.length === 1 && mpTarget[0].isInferred && mpTarget[0].childNodes) {
     mpTarget = mpTarget[0].childNodes;
   }
-  if (mpTarget.length !== 1) return false;
+  if (mpTarget.length !== 1) {
+    return false;
+  }
   const mtext = mpTarget[0];
-  if (mtext.kind !== 'mtext') return false;
+  if (mtext.kind !== 'mtext') {
+    return false;
+  }
   return getChildText(mtext) === NEGATION_SLASH;
 };
 
-import { getCustomCmdTypst } from "../custom-cmd-map";
-
-/** Get Typst symbol for a custom-cmd node, or undefined if not a custom command. */
-export const getCustomCmdTypstSymbol = (node: MathNode): string | undefined => {
-  const cmd = node.getProperty?.('data-custom-cmd') as string | undefined;
-  return cmd ? getCustomCmdTypst(cmd) : undefined;
-};
-
-/** Serialize all children of a node by visiting each one and concatenating the results.
- *  Detects combining-mark chains in consecutive mi nodes (Devanagari, Arabic, etc.). */
-export const handleAll: HandlerFn = (node, serialize) => {
-  let res: ITypstData = initTypstData();
-  const children = node.childNodes ?? [];
-  for (let i = 0; i < children.length; i++) {
-    const combChain = serializeCombiningMiChain(node, i);
-    if (combChain) {
-      if (needsTokenSeparator(res.typst, combChain.typst)) addSpaceToTypstData(res);
-      res = addToTypstData(res, { typst: combChain.typst });
-      i = combChain.nextIndex - 1;
-      continue;
-    }
-    const data = serialize.visitNode(children[i], '');
-    if (needsTokenSeparator(res.typst, data.typst)) addSpaceToTypstData(res);
-    res = addToTypstData(res, data);
-  }
-  return res;
-};

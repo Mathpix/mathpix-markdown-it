@@ -2098,8 +2098,8 @@ module.exports = [
   // Post-align content: math after \end{gather*} merged into last row
   {
     latex: `\\begin{gather*}\n\\tau_{i, j}  \\tag{2-4}\\\\\n\\}\n\\end{gather*}(t+1)=\\rho \\tau_{i, j}(t)+\\Delta \\tau_{i, j}(t, t+1)`,
-    typst: `#math.equation(block: true, numbering: n => [(2-4)], number-align: end + top, $ tau_(i, j) \\\n\\} (t + 1) = rho tau_(i, j)(t) + Delta tau_(i, j)(t, t + 1) $)\n#counter(math.equation).update(n => n - 1)`,
-    typst_inline: `tau_(i, j) \\\n\\} (t + 1) = rho tau_(i, j)(t) + Delta tau_(i, j)(t, t + 1)`,
+    typst: `#math.equation(block: true, numbering: n => [(2-4)], number-align: end + top, $ tau_(i, j) \\\nbrace.r (t + 1) = rho tau_(i, j) (t) + Delta tau_(i, j) (t, t + 1) $)\n#counter(math.equation).update(n => n - 1)`,
+    typst_inline: `tau_(i, j) \\\nbrace.r (t + 1) = rho tau_(i, j) (t) + Delta tau_(i, j) (t, t + 1)`,
   },
 
   // === Empty base superscript, pipes as absolute value, operator before paren ===
@@ -2445,8 +2445,8 @@ module.exports = [
   // --- Unpaired bracket escaping (pre-serialization tree walk) ---
   {
     latex: `\\sigma(\\mathrm{nm} ;`,
-    typst: `sigma \\(upright("nm")\\;`,
-    typst_inline: `sigma \\(upright("nm")\\;`,
+    typst: `sigma \\( upright("nm")\\;`,
+    typst_inline: `sigma \\( upright("nm")\\;`,
   },
   {
     latex: `\\sigma(x)`,
@@ -2551,8 +2551,8 @@ module.exports = [
   // aligned with unpaired [ and ) inside \left.\right] fence
   {
     latex: `\\begin{aligned}\n& r_{c m}=\\frac{1}{50}[20(3 i+3 j)+18(-2 i-2 j)+12(i-j)] \\\\\n& \\left.r_{c m}=\\frac{1}{50}[36 i+12 j)\\right]=\\frac{36}{50} i+\\frac{12}{50} j=0.72 i+0.24 j\n\\end{aligned}`,
-    typst: `&r_(c m) = frac(1, 50)[20(3 i + 3 j) + 18(- 2 i - 2 j) + 12(i - j)] \\\n &lr(r_(c m) = frac(1, 50)\\[ 36 i + 12 j \\) ]) = frac(36, 50) i + frac(12, 50) j = 0.72 i + 0.24 j`,
-    typst_inline: `&r_(c m) = frac(1, 50)[20(3 i + 3 j) + 18(- 2 i - 2 j) + 12(i - j)] \\\n &lr(r_(c m) = frac(1, 50)\\[ 36 i + 12 j \\) ]) = frac(36, 50) i + frac(12, 50) j = 0.72 i + 0.24 j`,
+    typst: `&r_(c m) = frac(1, 50)[20(3 i + 3 j) + 18(- 2 i - 2 j) + 12(i - j)] \\\n &lr(r_(c m) = frac(1, 50) bracket.l 36 i + 12 j paren.r ]) = frac(36, 50) i + frac(12, 50) j = 0.72 i + 0.24 j`,
+    typst_inline: `&r_(c m) = frac(1, 50)[20(3 i + 3 j) + 18(- 2 i - 2 j) + 12(i - j)] \\\n &lr(r_(c m) = frac(1, 50) bracket.l 36 i + 12 j paren.r ]) = frac(36, 50) i + frac(12, 50) j = 0.72 i + 0.24 j`,
   },
   // colon escaping in mat() cells (prevents named-argument parsing)
   {
@@ -2881,8 +2881,8 @@ module.exports = [
   // Full formula with comma-subscript inside nested lr() with angle brackets
   {
     latex: `\\operatorname{tag}\\left(c^{V}\\right)=\\operatorname{tag}\\left(\\{(d, \\partial), \\ldots,(d, \\partial)\\}^{V}\\right)= \\operatorname{tag}\\left(\\operatorname{Rec}\\left(d^{\\text { }}\\right)^{V}\\right)=\\operatorname{tag}\\left(\\left\\langle\\ell_{1}=\\delta, \\ldots, \\ell_{n}=\\delta,_{-}=\\perp^{\\emptyset} \\nabla_{L}^{V}\\right)=\\operatorname{tag}\\left(\\perp^{V}\\right)=V\\right.`,
-    typst: `op("tag") lr(( c^V )) = op("tag") lr(( {\\(d, partial\\), dots, \\(d, partial\\)}^V )) = op("tag") lr(( op("Rec") lr(( d ))^V )) = op("tag") lr(\\( lr(chevron.l ell_1 = delta, dots, ell_n = delta ","_- = perp^(emptyset) nabla_L^V \\)) = op("tag") lr(( perp^V )) = V)`,
-    typst_inline: `op("tag") lr(( c^V )) = op("tag") lr(( {\\(d, partial\\), dots, \\(d, partial\\)}^V )) = op("tag") lr(( op("Rec") lr(( d ))^V )) = op("tag") lr(\\( lr(chevron.l ell_1 = delta, dots, ell_n = delta ","_- = perp^(emptyset) nabla_L^V \\)) = op("tag") lr(( perp^V )) = V)`,
+    typst: `op("tag") lr(( c^V )) = op("tag") lr(( \\{\\(d, partial\\), dots, \\(d, partial\\)\\}^V )) = op("tag") lr(( op("Rec") lr(( d ))^V )) = op("tag") lr(\\( lr(chevron.l ell_1 = delta, dots, ell_n = delta ","_- = perp^(emptyset) nabla_L^V \\)) = op("tag") lr(( perp^V )) = V)`,
+    typst_inline: `op("tag") lr(( c^V )) = op("tag") lr(( \\{\\(d, partial\\), dots, \\(d, partial\\)\\}^V )) = op("tag") lr(( op("Rec") lr(( d ))^V )) = op("tag") lr(\\( lr(chevron.l ell_1 = delta, dots, ell_n = delta ","_- = perp^(emptyset) nabla_L^V \\)) = op("tag") lr(( perp^V )) = V)`,
   },
 
   // === mhchem: phantom alignment boxes stripped inside sub/superscripts ===
@@ -3000,13 +3000,13 @@ module.exports = [
   },
   {
     latex: `\\begin{align*}\nF(a, b ; a+b+m ; z)= & \\frac{\\Gamma(m) \\Gamma(a+b+m)}{\\Gamma(a+m) \\Gamma(b+m)} \\sum_{n=0}^{m-1} \\frac{(a)_{n}(b)_{n}}{n!(1-m)_{n}}(1-z)^{n}  \\tag{15.3.11}\\\\\n& \\quad-\\frac{\\Gamma(a+b+m)}{\\Gamma(a) \\Gamma(b)}(z-1)^{m} \\sum_{n=0}^{\\infty} \\frac{(a+m)_{n}(b+m)_{n}}{n!(n+m)!}(1-z)^{n}[\\ln (1-z)-\\psi(n+1) \\\\\n& -\\psi(n+m+1)+\\psi(a+n+m)+\\psi(b+n+m)] \\quad(|\\arg (1-z)|<\\pi,|1-z|<1)\n\\end{align*}`,
-    typst: `#math.equation(block: true, numbering: n => [(15.3.11)], number-align: end + top, $ F(a, b\\; a + b + m\\; z) = &frac(Gamma (m) Gamma (a + b + m), Gamma (a + m) Gamma (b + m)) sum_(n = 0)^(m - 1) frac((a)_n (b)_n, n!(1 - m)_n)(1 - z)^n \\\n &quad - frac(Gamma (a + b + m), Gamma (a) Gamma (b))(z - 1)^m sum_(n = 0)^(infinity) frac((a + m)_n (b + m)_n, n!(n + m)!)(1 - z)^n [ln(1 - z) - psi (n + 1) \\\n &- psi (n + m + 1) + psi (a + n + m) + psi (b + n + m)] quad (lr(| arg(1 - z) |) < pi, lr(| 1 - z |) < 1) $)\n#counter(math.equation).update(n => n - 1)`,
-    typst_inline: `F(a, b\\; a + b + m\\; z) = &frac(Gamma (m) Gamma (a + b + m), Gamma (a + m) Gamma (b + m)) sum_(n = 0)^(m - 1) frac((a)_n (b)_n, n!(1 - m)_n)(1 - z)^n \\\n &quad - frac(Gamma (a + b + m), Gamma (a) Gamma (b))(z - 1)^m sum_(n = 0)^(infinity) frac((a + m)_n (b + m)_n, n!(n + m)!)(1 - z)^n [ln(1 - z) - psi (n + 1) \\\n &- psi (n + m + 1) + psi (a + n + m) + psi (b + n + m)] quad (lr(| arg(1 - z) |) < pi, lr(| 1 - z |) < 1)`,
+    typst: `#math.equation(block: true, numbering: n => [(15.3.11)], number-align: end + top, $ F(a, b\\; a + b + m\\; z) = &frac(Gamma (m) Gamma (a + b + m), Gamma (a + m) Gamma (b + m)) sum_(n = 0)^(m - 1) frac((a)_n (b)_n, n!(1 - m)_n)(1 - z)^n \\\n &quad - frac(Gamma (a + b + m), Gamma (a) Gamma (b))(z - 1)^m sum_(n = 0)^(infinity) frac((a + m)_n (b + m)_n, n!(n + m)!)(1 - z)^n bracket.l ln(1 - z) - psi (n + 1) \\\n &- psi (n + m + 1) + psi (a + n + m) + psi (b + n + m) bracket.r quad (lr(| arg(1 - z) |) < pi, lr(| 1 - z |) < 1) $)\n#counter(math.equation).update(n => n - 1)`,
+    typst_inline: `F(a, b\\; a + b + m\\; z) = &frac(Gamma (m) Gamma (a + b + m), Gamma (a + m) Gamma (b + m)) sum_(n = 0)^(m - 1) frac((a)_n (b)_n, n!(1 - m)_n)(1 - z)^n \\\n &quad - frac(Gamma (a + b + m), Gamma (a) Gamma (b))(z - 1)^m sum_(n = 0)^(infinity) frac((a + m)_n (b + m)_n, n!(n + m)!)(1 - z)^n bracket.l ln(1 - z) - psi (n + 1) \\\n &- psi (n + m + 1) + psi (a + n + m) + psi (b + n + m) bracket.r quad (lr(| arg(1 - z) |) < pi, lr(| 1 - z |) < 1)`,
   },
   {
     latex: `x^n\\{a,b\\}`,
-    typst: `x^n {a, b}`,
-    typst_inline: `x^n {a, b}`,
+    typst: String.raw`x^n \{ a, b \}`,
+    typst_inline: String.raw`x^n \{ a, b \}`,
   },
   {
     latex: `f_n[x]`,
@@ -3060,8 +3060,8 @@ module.exports = [
   },
   {
     latex: `x_k\\{1,2,3\\}`,
-    typst: `x_k {1, 2, 3}`,
-    typst_inline: `x_k {1, 2, 3}`,
+    typst: String.raw`x_k \{ 1, 2, 3 \}`,
+    typst_inline: String.raw`x_k \{ 1, 2, 3 \}`,
   },
   {
     latex: `\\begin{align*}\n& \\alpha_{i m}^{j}=\\frac{1}{2 \\pi} \\int_{0}^{2 \\pi} \\int_{0}^{\\pi} q_{j}(\\chi, \\eta) P_{l}^{n}(\\cos \\chi) \\cos m \\eta \\sin \\chi \\mathrm{~d} \\chi \\mathrm{~d} \\eta  \\tag{2-40}\\\\\n& \\beta_{i m}^{j}=\\frac{1}{2 \\pi} \\int_{0}^{2 \\pi} \\int_{0}^{\\pi} q_{j}(\\chi, \\eta) P_{l}^{m}(\\cos \\chi) \\sin m \\eta \\sin \\chi \\mathrm{~d} \\chi \\mathrm{~d} \\eta \\tag{2-41}\n\\end{align*}`,
@@ -3150,20 +3150,20 @@ b_{3}
   // Complex expression with standalone ‖ (comma after ‖), bare | delimiters around arrays
   {
     latex: `\\begin{align*}\n\\begin{gathered}\n2 l+m-n=0, \\mid \\vec{i} \\times \\vec{s}) \\cdot \\overrightarrow{O M}|=| \\begin{array}{ccc}\n2 & 2 & 2 \\\\\n1 & 0 & 0 \\\\\nl & m & n\n\\end{array}\\|,|\\vec{i} \\times \\vec{s}|=\\| \\begin{array}{ccc}\ni & \\vec{j} & \\vec{k} \\\\\n1 & 0 & 0 \\\\\nl & m & n\n\\end{array} \\| \\text {, 故 } \\\\\nd=2=\\frac{\\mid \\vec{i} \\times \\vec{s}) \\cdot \\overrightarrow{O M} \\mid}{|\\vec{i} \\times \\vec{s}|}=\\frac{2|-n+m|}{\\sqrt{n^{2}+m^{2}}} \\text {, 即 } \\quad m \\cdot n=0\n\\end{gathered}\n\\end{align*}`,
-    typst: `2 l + m - n = 0, divides arrow(i) times arrow(s)\\) dot.op arrow(O M) lr(| = |) mat(delim: #none, \n  2, 2, 2;\n  1, 0, 0;\n  l, m, n,\n) bar.v.double, lr(| arrow(i) times arrow(s) |) = norm(mat(delim: #none, \n  i, arrow(j), arrow(k);\n  1, 0, 0;\n  l, m, n,\n)) ", 故 " \\\nd = 2 = frac(divides arrow(i) times arrow(s)\\) dot.op arrow(O M) divides, |arrow(i) times arrow(s)|) = frac(2| - n + m|, sqrt(n^2 + m^2)) ", 即 " quad m dot.op n = 0`,
-    typst_inline: `2 l + m - n = 0, divides arrow(i) times arrow(s)\\) dot.op arrow(O M) lr(| = |) mat(delim: #none, \n  2, 2, 2;\n  1, 0, 0;\n  l, m, n,\n) bar.v.double, lr(| arrow(i) times arrow(s) |) = norm(mat(delim: #none, \n  i, arrow(j), arrow(k);\n  1, 0, 0;\n  l, m, n,\n)) ", 故 " \\\nd = 2 = frac(divides arrow(i) times arrow(s)\\) dot.op arrow(O M) divides, |arrow(i) times arrow(s)|) = frac(2| - n + m|, sqrt(n^2 + m^2)) ", 即 " quad m dot.op n = 0`,
+    typst: `2 l + m - n = 0, divides arrow(i) times arrow(s) paren.r dot.op arrow(O M) lr(| = |) mat(delim: #none, \n  2, 2, 2;\n  1, 0, 0;\n  l, m, n,\n) bar.v.double, lr(| arrow(i) times arrow(s) |) = norm(mat(delim: #none, \n  i, arrow(j), arrow(k);\n  1, 0, 0;\n  l, m, n,\n)) ", 故 " \\\nd = 2 = frac(divides arrow(i) times arrow(s) paren.r dot.op arrow(O M) divides, |arrow(i) times arrow(s)|) = frac(2| - n + m|, sqrt(n^2 + m^2)) ", 即 " quad m dot.op n = 0`,
+    typst_inline: `2 l + m - n = 0, divides arrow(i) times arrow(s) paren.r dot.op arrow(O M) lr(| = |) mat(delim: #none, \n  2, 2, 2;\n  1, 0, 0;\n  l, m, n,\n) bar.v.double, lr(| arrow(i) times arrow(s) |) = norm(mat(delim: #none, \n  i, arrow(j), arrow(k);\n  1, 0, 0;\n  l, m, n,\n)) ", 故 " \\\nd = 2 = frac(divides arrow(i) times arrow(s) paren.r dot.op arrow(O M) divides, |arrow(i) times arrow(s)|) = frac(2| - n + m|, sqrt(n^2 + m^2)) ", 即 " quad m dot.op n = 0`,
   },
   // Standalone ‖ with number before comma: \|22,|...|=\|
   {
     latex: `\\begin{align*}\n\\begin{gathered}\n2 l+m-n=0, \\mid \\vec{i} \\times \\vec{s}) \\cdot \\overrightarrow{O M}|=| \\begin{array}{ccc}\n2 & 2 & 2 \\\\\n1 & 0 & 0 \\\\\nl & m & n\n\\end{array}\\|22,|\\vec{i} \\times \\vec{s}|=\\| \\begin{array}{ccc}\ni & \\vec{j} & \\vec{k} \\\\\n1 & 0 & 0 \\\\\nl & m & n\n\\end{array} \\| \\text {, 故 } \\\\\nd=2=\\frac{\\mid \\vec{i} \\times \\vec{s}) \\cdot \\overrightarrow{O M} \\mid}{|\\vec{i} \\times \\vec{s}|}=\\frac{2|-n+m|}{\\sqrt{n^{2}+m^{2}}} \\text {, 即 } \\quad m \\cdot n=0\n\\end{gathered}\n\\end{align*}`,
-    typst: `2 l + m - n = 0, divides arrow(i) times arrow(s)\\) dot.op arrow(O M) lr(| = |) mat(delim: #none, \n  2, 2, 2;\n  1, 0, 0;\n  l, m, n,\n) bar.v.double 22, lr(| arrow(i) times arrow(s) |) = norm(mat(delim: #none, \n  i, arrow(j), arrow(k);\n  1, 0, 0;\n  l, m, n,\n)) ", 故 " \\\nd = 2 = frac(divides arrow(i) times arrow(s)\\) dot.op arrow(O M) divides, |arrow(i) times arrow(s)|) = frac(2| - n + m|, sqrt(n^2 + m^2)) ", 即 " quad m dot.op n = 0`,
-    typst_inline: `2 l + m - n = 0, divides arrow(i) times arrow(s)\\) dot.op arrow(O M) lr(| = |) mat(delim: #none, \n  2, 2, 2;\n  1, 0, 0;\n  l, m, n,\n) bar.v.double 22, lr(| arrow(i) times arrow(s) |) = norm(mat(delim: #none, \n  i, arrow(j), arrow(k);\n  1, 0, 0;\n  l, m, n,\n)) ", 故 " \\\nd = 2 = frac(divides arrow(i) times arrow(s)\\) dot.op arrow(O M) divides, |arrow(i) times arrow(s)|) = frac(2| - n + m|, sqrt(n^2 + m^2)) ", 即 " quad m dot.op n = 0`,
+    typst: `2 l + m - n = 0, divides arrow(i) times arrow(s) paren.r dot.op arrow(O M) lr(| = |) mat(delim: #none, \n  2, 2, 2;\n  1, 0, 0;\n  l, m, n,\n) bar.v.double 22, lr(| arrow(i) times arrow(s) |) = norm(mat(delim: #none, \n  i, arrow(j), arrow(k);\n  1, 0, 0;\n  l, m, n,\n)) ", 故 " \\\nd = 2 = frac(divides arrow(i) times arrow(s) paren.r dot.op arrow(O M) divides, |arrow(i) times arrow(s)|) = frac(2| - n + m|, sqrt(n^2 + m^2)) ", 即 " quad m dot.op n = 0`,
+    typst_inline: `2 l + m - n = 0, divides arrow(i) times arrow(s) paren.r dot.op arrow(O M) lr(| = |) mat(delim: #none, \n  2, 2, 2;\n  1, 0, 0;\n  l, m, n,\n) bar.v.double 22, lr(| arrow(i) times arrow(s) |) = norm(mat(delim: #none, \n  i, arrow(j), arrow(k);\n  1, 0, 0;\n  l, m, n,\n)) ", 故 " \\\nd = 2 = frac(divides arrow(i) times arrow(s) paren.r dot.op arrow(O M) divides, |arrow(i) times arrow(s)|) = frac(2| - n + m|, sqrt(n^2 + m^2)) ", 即 " quad m dot.op n = 0`,
   },
   // Standalone ‖ with variable before comma: \|x,|...|=\|
   {
     latex: `\\begin{align*}\n\\begin{gathered}\n2 l+m-n=0, \\mid \\vec{i} \\times \\vec{s}) \\cdot \\overrightarrow{O M}|=| \\begin{array}{ccc}\n2 & 2 & 2 \\\\\n1 & 0 & 0 \\\\\nl & m & n\n\\end{array}\\|x,|\\vec{i} \\times \\vec{s}|=\\| \\begin{array}{ccc}\ni & \\vec{j} & \\vec{k} \\\\\n1 & 0 & 0 \\\\\nl & m & n\n\\end{array} \\| \\text {, 故 } \\\\\nd=2=\\frac{\\mid \\vec{i} \\times \\vec{s}) \\cdot \\overrightarrow{O M} \\mid}{|\\vec{i} \\times \\vec{s}|}=\\frac{2|-n+m|}{\\sqrt{n^{2}+m^{2}}} \\text {, 即 } \\quad m \\cdot n=0\n\\end{gathered}\n\\end{align*}`,
-    typst: `2 l + m - n = 0, divides arrow(i) times arrow(s)\\) dot.op arrow(O M) lr(| = |) mat(delim: #none, \n  2, 2, 2;\n  1, 0, 0;\n  l, m, n,\n) bar.v.double x, lr(| arrow(i) times arrow(s) |) = norm(mat(delim: #none, \n  i, arrow(j), arrow(k);\n  1, 0, 0;\n  l, m, n,\n)) ", 故 " \\\nd = 2 = frac(divides arrow(i) times arrow(s)\\) dot.op arrow(O M) divides, |arrow(i) times arrow(s)|) = frac(2| - n + m|, sqrt(n^2 + m^2)) ", 即 " quad m dot.op n = 0`,
-    typst_inline: `2 l + m - n = 0, divides arrow(i) times arrow(s)\\) dot.op arrow(O M) lr(| = |) mat(delim: #none, \n  2, 2, 2;\n  1, 0, 0;\n  l, m, n,\n) bar.v.double x, lr(| arrow(i) times arrow(s) |) = norm(mat(delim: #none, \n  i, arrow(j), arrow(k);\n  1, 0, 0;\n  l, m, n,\n)) ", 故 " \\\nd = 2 = frac(divides arrow(i) times arrow(s)\\) dot.op arrow(O M) divides, |arrow(i) times arrow(s)|) = frac(2| - n + m|, sqrt(n^2 + m^2)) ", 即 " quad m dot.op n = 0`,
+    typst: `2 l + m - n = 0, divides arrow(i) times arrow(s) paren.r dot.op arrow(O M) lr(| = |) mat(delim: #none, \n  2, 2, 2;\n  1, 0, 0;\n  l, m, n,\n) bar.v.double x, lr(| arrow(i) times arrow(s) |) = norm(mat(delim: #none, \n  i, arrow(j), arrow(k);\n  1, 0, 0;\n  l, m, n,\n)) ", 故 " \\\nd = 2 = frac(divides arrow(i) times arrow(s) paren.r dot.op arrow(O M) divides, |arrow(i) times arrow(s)|) = frac(2| - n + m|, sqrt(n^2 + m^2)) ", 即 " quad m dot.op n = 0`,
+    typst_inline: `2 l + m - n = 0, divides arrow(i) times arrow(s) paren.r dot.op arrow(O M) lr(| = |) mat(delim: #none, \n  2, 2, 2;\n  1, 0, 0;\n  l, m, n,\n) bar.v.double x, lr(| arrow(i) times arrow(s) |) = norm(mat(delim: #none, \n  i, arrow(j), arrow(k);\n  1, 0, 0;\n  l, m, n,\n)) ", 故 " \\\nd = 2 = frac(divides arrow(i) times arrow(s) paren.r dot.op arrow(O M) divides, |arrow(i) times arrow(s)|) = frac(2| - n + m|, sqrt(n^2 + m^2)) ", 即 " quad m dot.op n = 0`,
   },
   // gathered inside aligned inside align*: gathered should produce mat(delim:#none) with display() in typst, without display() in typst_inline
   {
@@ -3368,8 +3368,8 @@ x=4
   // Inner {} inside \left\{...\right\} — escaped
   {
     latex: String.raw`\left\{ \{x\} \right\}`,
-    typst: `lr({ \\{x\\} })`,
-    typst_inline: `lr({ \\{x\\} })`,
+    typst: String.raw`lr({ \{ x \} })`,
+    typst_inline: String.raw`lr({ \{ x \} })`,
   },
   // Full example: inner brackets + limits + overset
   {
@@ -3426,8 +3426,8 @@ x=4
   // array with more column-spec columns than actual data cells — vline indices must be capped
   {
     latex: String.raw`\begin{array}{|l|l|l|l|l|}\hline & & \\\hline\end{array}`,
-    typst: `#align(center, box(stroke: 0.5pt, inset: 3pt, $ mat(delim: #none, align: #left, augment: #(vline: (1, 2)), , , ) $))`,
-    typst_inline: `mat(delim: #none, align: #left, augment: #(vline: (1, 2)), , , )`,
+    typst: `#align(center, box(stroke: 0.5pt, inset: 3pt, $ mat(delim: #none, align: #left, augment: #(vline: (1, 2)), , ,) $))`,
+    typst_inline: `mat(delim: #none, align: #left, augment: #(vline: (1, 2)), , ,)`,
   },
   // bare ‖…‖ delimiter: space between scripted node and ( inside norm()
   {
@@ -3505,26 +3505,38 @@ x=4
   // bare |…| must not span across unbalanced { }
   {
     latex: String.raw`\{|f ; f e|: f c \in N\}`,
-    typst: String.raw`{lr(| f\; f e |): f c in N}`,
-    typst_inline: String.raw`{lr(| f\; f e |): f c in N}`,
+    typst: String.raw`\{ lr(| f\; f e |): f c in N \}`,
+    typst_inline: String.raw`\{ lr(| f\; f e |): f c in N \}`,
   },
   // complex expression with multiple bare |, { }, semicolons and \operatorname
   {
     latex: String.raw`|f| £ ; f c|=\operatorname{mf}\{|f ; f e|: f c € N\}=\lim | £ f c \mid`,
-    typst: String.raw`lr(| f |) £\; f c| = op("mf"){lr(| f\; f e |): f c € N} = lim|£ f c divides`,
-    typst_inline: String.raw`lr(| f |) £\; f c| = op("mf"){lr(| f\; f e |): f c € N} = lim|£ f c divides`,
+    typst: String.raw`lr(| f |) £\; f c| = op("mf")\{ lr(| f\; f e |): f c € N \} = lim|£ f c divides`,
+    typst_inline: String.raw`lr(| f |) £\; f c| = op("mf")\{ lr(| f\; f e |): f c € N \} = lim|£ f c divides`,
   },
   // bare |…| skipped when { } are between outer pipes
   {
     latex: String.raw`\lim |\{|/,, /|> a \}|=0`,
-    typst: String.raw`lim|{lr(| \/, , \/ |) > a}| = 0`,
-    typst_inline: String.raw`lim|{lr(| \/, , \/ |) > a}| = 0`,
+    typst: String.raw`lim|\{ lr(| \/, , \/ |) > a \}| = 0`,
+    typst_inline: String.raw`lim|\{ lr(| \/, , \/ |) > a \}| = 0`,
   },
   // \langle \rangle with nested { } and comma separators
   {
     latex: String.raw`S P=\langle\{a\},\{\downarrow x .\langle a\rangle \neg x\}\rangle`,
-    typst: String.raw`S P = chevron.l{a}, {arrow.b x . lr(chevron.l a chevron.r) not x} chevron.r`,
-    typst_inline: String.raw`S P = chevron.l{a}, {arrow.b x . lr(chevron.l a chevron.r) not x} chevron.r`,
+    typst: String.raw`S P = lr(chevron.l \{ a \}, \{ arrow.b x . chevron.l a chevron.r not x \} chevron.r)`,
+    typst_inline: String.raw`S P = lr(chevron.l \{ a \}, \{ arrow.b x . chevron.l a chevron.r not x \} chevron.r)`,
+  },
+  // \Varangle contains hidden mo(")") inside mstyle — must not break outer bracket pairing
+  {
+    latex: String.raw`\cos (\Varangle x , y )=\frac{( x y )}{| x || y |}`,
+    typst: String.raw`cos(angle.spheric x, y) = frac((x y), |x||y|)`,
+    typst_inline: String.raw`cos(angle.spheric x, y) = frac((x y), |x||y|)`,
+  },
+  // Opening bracket as script base: [^{\circ} → separate bracket from script with ""
+  {
+    latex: String.raw`[ ^{\circ} C ]`,
+    typst: String.raw`[""^(compose) C]`,
+    typst_inline: String.raw`[""^(compose) C]`,
   },
   // dotted symbol name followed by ( must have space to avoid function call
   {

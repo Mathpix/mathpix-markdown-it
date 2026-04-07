@@ -1,5 +1,5 @@
 import { TEXCLASS } from "mathjax-full/js/core/MmlTree/MmlNode";
-import { ITypstData, ITypstSerializer, MathNode } from "./types";
+import { MathNode } from "./types";
 import {
   RE_BRACKET_CHARS, RE_ASCII_LETTER, RE_TRAILING_WS, RE_LEADING_WS,
   UNPAIRED_BRACKET_PROP, OPEN_BRACKETS, CLOSE_BRACKETS,
@@ -42,20 +42,34 @@ const DELIMITER_LITERAL_MAP: Readonly<Record<string, string>> = {
   [PARALLEL_SIGN]: `"${DOUBLE_VERT}"`,
 };
 
-// Container kinds that should be flattened when walking to find direct math children
-const FLATTENABLE_CONTAINER_KINDS: ReadonlySet<string> = new Set([
-  'mtd', 'mpadded', 'mstyle',
+export type BracketToken = { char: string; pos: number };
+
+// Function wrappers (sqrt, frac, etc.): brackets inside cannot pair with outside.
+// mtr/mlabeledtr: each cell (mtd) is a separate scope — brackets cannot pair
+// across cells or rows, preventing orphaned brackets in aligned/mat() output.
+const SCOPE_BOUNDARIES = new Set([
+  'msqrt', 'mroot', 'mfrac', 'menclose', 'mover', 'munder',
+  'mtr', 'mlabeledtr',
+  'mstyle',
 ]);
 
-const shouldFlattenNode = (n: MathNode): boolean =>
-  FLATTENABLE_CONTAINER_KINDS.has(n.kind) || n.isInferred;
+// Nodes where the base (child[0]) stays in the parent scope but script children
+// (sub/sup) are separate scopes.  The base of msub/msup is in the same visual
+// scope as surrounding content (e.g. (a+b)^2 → ) is the base of msup and must
+// pair with ( outside).  But script children are wrapped in ^(…) / _(…), so
+// brackets inside scripts cannot pair with brackets outside.
+const SCRIPT_SCOPE_KINDS = new Set([
+  'msub', 'msup', 'msubsup',
+]);
 
 /** Skip past a quoted string starting at position i (the opening ").
  *  Returns the index of the closing " or end of string. */
 const skipQuotedString = (expr: string, i: number): number => {
   i++;
   while (i < expr.length && expr[i] !== '"') {
-    if (expr[i] === '\\') i++;
+    if (expr[i] === '\\') {
+      i++;
+    }
     i++;
   }
   return i;
@@ -66,41 +80,22 @@ export const delimiterToTypst = (delim: string): string =>
   DELIMITER_LITERAL_MAP[delim] ?? `"${delim}"`;
 
 export const treeContainsMo = (node: MathNode, moText: string, skipPhantom = true): boolean => {
-  if (!node) return false;
-  if (skipPhantom && node.kind === 'mphantom') return false;
-  if (node.kind === 'mo' && getNodeText(node) === moText) return true;
+  if (!node) {
+    return false;
+  }
+  if (skipPhantom && node.kind === 'mphantom') {
+    return false;
+  }
+  if (node.kind === 'mo' && getNodeText(node) === moText) {
+    return true;
+  }
   for (const child of (node.childNodes ?? [])) {
-    if (treeContainsMo(child, moText, skipPhantom)) return true;
+    if (treeContainsMo(child, moText, skipPhantom)) {
+      return true;
+    }
   }
   return false;
 };
-
-// Serialize all visible content in a node subtree up to (but not including)
-// the first mo with the given text. Returns the serialized prefix (block variant only).
-export const serializePrefixBeforeMo = (node: MathNode, serialize: ITypstSerializer, stopMoText: string): string => {
-  const flatChildren: MathNode[] = [];
-  const extractFlat = (n: MathNode) => {
-    if (!n || !n.childNodes) return;
-    if (n.kind === 'mphantom') return;
-    if (shouldFlattenNode(n)) {
-      for (const child of n.childNodes) {
-        extractFlat(child);
-      }
-    } else {
-      flatChildren.push(n);
-    }
-  };
-  extractFlat(node);
-  let result = '';
-  for (const child of flatChildren) {
-    if (child.kind === 'mo' && getNodeText(child) === stopMoText) break;
-    const data: ITypstData = serialize.visitNode(child, '');
-    result += data.typst;
-  }
-  return result.trim();
-};
-
-export type BracketToken = { char: string; pos: number };
 
 /** Check whether ( at position i is a syntactic paren (not a math delimiter).
  *  True when preceded by:
@@ -122,8 +117,14 @@ export const scanBracketTokens = (expr: string): BracketToken[] => {
   const brackets: BracketToken[] = [];
   for (let i = 0; i < expr.length; i++) {
     const ch = expr[i];
-    if (ch === '\\') { i++; continue; }
-    if (ch === '"') { i = skipQuotedString(expr, i); continue; }
+    if (ch === '\\') {
+      i++;
+      continue;
+    }
+    if (ch === '"') {
+      i = skipQuotedString(expr, i);
+      continue;
+    }
     if (RE_BRACKET_CHARS.test(ch)) {
       // Skip syntax parens: function calls (sqrt(), frac()), method calls
       // (arrow.r()), and script grouping (_(), ^()).  Digits before ( are
@@ -133,11 +134,17 @@ export const scanBracketTokens = (expr: string): BracketToken[] => {
         let depth = 1;
         i++;
         while (i < expr.length && depth > 0) {
-          if (expr[i] === '\\') { i++; }
-          else if (expr[i] === '"') { i = skipQuotedString(expr, i); }
-          else if (expr[i] === '(') depth++;
-          else if (expr[i] === ')') depth--;
-          if (depth > 0) i++;
+          if (expr[i] === '\\') {
+            i++;
+          } else if (expr[i] === '"') {
+            i = skipQuotedString(expr, i);
+          } else if (expr[i] === '(') {
+            depth++;
+          } else if (expr[i] === ')') {
+            depth--;
+          } if (depth > 0) {
+            i++;
+          }
         }
         // If no matching ) found, this is not a real function call —
         // register the ( and backtrack so the for-loop re-scans the
@@ -187,14 +194,18 @@ export const findUnpairedIndices = (chars: string[]): Set<number> => {
 // Escaped brackets (\[), brackets inside quoted strings ("..."), and brackets
 // inside function-call parens (e.g. frac(...)) are ignored.
 export const replaceUnpairedBrackets = (expr: string): string => {
-  if (!RE_BRACKET_CHARS.test(expr)) return expr;
+  if (!RE_BRACKET_CHARS.test(expr)) {
+    return expr;
+  }
   const brackets = scanBracketTokens(expr);
   const unpairedTokenIndices = findUnpairedIndices(brackets.map(b => b.char));
   const unmatchedPositions = new Set<number>();
   for (const idx of unpairedTokenIndices) {
     unmatchedPositions.add(brackets[idx].pos);
   }
-  if (unmatchedPositions.size === 0) return expr;
+  if (unmatchedPositions.size === 0) {
+    return expr;
+  }
   let result = '';
   for (let i = 0; i < expr.length; i++) {
     if (unmatchedPositions.has(i)) {
@@ -215,38 +226,30 @@ export const replaceUnpairedBrackets = (expr: string): string => {
   return result;
 };
 
-// Nodes whose Typst handlers wrap ALL children in function calls (sqrt(), frac(),
-// cancel(), overline(), underline(), hat(), etc.).  Brackets inside these nodes
-// cannot pair with brackets outside — each child is processed as a separate scope.
-const SCOPE_BOUNDARIES = new Set([
-  'msqrt', 'mroot', 'mfrac', 'menclose', 'mover', 'munder',
-]);
-
-// Nodes where the base (child[0]) stays in the parent scope but script children
-// (sub/sup) are separate scopes.  The base of msub/msup is in the same visual
-// scope as surrounding content (e.g. (a+b)^2 → ) is the base of msup and must
-// pair with ( outside).  But script children are wrapped in ^(…) / _(…), so
-// brackets inside scripts cannot pair with brackets outside.
-const SCRIPT_SCOPE_KINDS = new Set([
-  'msub', 'msup', 'msubsup',
-]);
-
-export const markUnpairedBrackets = (root: MathNode): void => {
+export const markUnpairedBrackets = (root: MathNode, inTableCell = false): void => {
   const bracketNodes: { node: MathNode; char: string }[] = [];
   // Check if an mo node is a \left...\right delimiter (first/last child of
   // an mrow with texClass=INNER and open/close properties).  These must NOT
   // participate in pairing — otherwise \right] would pair with an inner [.
   const isLeftRightDelimiter = (moNode: MathNode): boolean => {
     const parent = moNode.parent;
-    if (!parent || parent.kind !== 'mrow') return false;
-    if (getProp<number>(parent, 'texClass') !== TEXCLASS.INNER) return false;
+    if (!parent || parent.kind !== 'mrow') {
+      return false;
+    }
+    if (getProp<number>(parent, 'texClass') !== TEXCLASS.INNER) {
+      return false;
+    }
     if (getProp<string>(parent, 'open') === undefined && getProp<string>(parent, 'close') === undefined) return false;
     const ch = parent.childNodes;
-    if (!ch || ch.length === 0) return false;
+    if (!ch || ch.length === 0) {
+      return false;
+    }
     return ch[0] === moNode || ch[ch.length - 1] === moNode;
   };
   const walk = (node: MathNode): void => {
-    if (!node) return;
+    if (!node) {
+      return;
+    }
     if (node.kind === 'mo') {
       const text = getNodeText(node);
       if (text && (OPEN_BRACKETS[text] || CLOSE_BRACKETS[text])) {
@@ -257,16 +260,23 @@ export const markUnpairedBrackets = (root: MathNode): void => {
     }
     for (const child of (node.childNodes ?? [])) {
       if (SCOPE_BOUNDARIES.has(child.kind)) {
-        // Each child of the scope boundary is a separate scope
+        // Each child of the scope boundary is a separate scope.
+        // mtable: each row is separate; brackets can't pair across rows.
+        const childInMatrix = child.kind === 'mtr' || child.kind === 'mlabeledtr' || inTableCell;
         for (const grandchild of (child.childNodes ?? [])) {
-          markUnpairedBrackets(grandchild);
+          markUnpairedBrackets(grandchild, childInMatrix);
         }
       } else if (SCRIPT_SCOPE_KINDS.has(child.kind)) {
-        // Base (child[0]) stays in parent scope; script children are separate
+        // Base (child[0]) stays in parent scope; script children are separate.
+        // Exception: opening bracket as script base (e.g. [^{\circ}) must be
+        // excluded — in Typst [^(compose) C] the [ starts auto-matching and
+        // the ^ inside has no base, causing a parse error.
         const kids = child.childNodes ?? [];
-        if (kids[0]) walk(kids[0]);
+        if (kids[0]) {
+          walk(kids[0]);
+        }
         for (let k = 1; k < kids.length; k++) {
-          markUnpairedBrackets(kids[k]);
+          markUnpairedBrackets(kids[k], inTableCell);
         }
       } else {
         walk(child);
@@ -277,8 +287,11 @@ export const markUnpairedBrackets = (root: MathNode): void => {
   const unpairedIndices = findUnpairedIndices(bracketNodes.map(b => b.char));
   for (const i of unpairedIndices) {
     const ch = bracketNodes[i].char;
+    const dir = OPEN_BRACKETS[ch] ? 'open' : 'close';
+    // In table cell context, use 'table-open'/'table-close' so moAst uses symbol
+    // names (paren.l, bracket.l, brace.l) instead of escaped forms (\(, \[, \{).
     bracketNodes[i].node.setProperty(UNPAIRED_BRACKET_PROP,
-      OPEN_BRACKETS[ch] ? 'open' : 'close');
+      inTableCell ? 'table-' + dir : dir);
   }
 };
 
@@ -286,12 +299,16 @@ export const markUnpairedBrackets = (root: MathNode): void => {
  *  Call after Typst serialization to avoid leaking state to other visitors. */
 export const clearUnpairedBracketMarks = (root: MathNode): void => {
   const walk = (node: MathNode): void => {
-    if (!node) return;
+    if (!node) {
+      return;
+    }
     if (getProp<string>(node, UNPAIRED_BRACKET_PROP) !== undefined) {
       node.removeProperty(UNPAIRED_BRACKET_PROP);
     }
     if (node.childNodes) {
-      for (const child of node.childNodes) walk(child);
+      for (const child of node.childNodes) {
+        walk(child);
+      }
     }
   };
   walk(root);

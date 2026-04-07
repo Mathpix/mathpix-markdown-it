@@ -1,9 +1,7 @@
 /** MathJax TeXAtom node kind string */
 export const TEX_ATOM = 'TeXAtom';
-
 /** MathJax mlabeledtr node kind string (numbered equation rows) */
 export const MLABELEDTR = 'mlabeledtr';
-
 /** Non-breaking space U+00A0 (global replacement) */
 export const RE_NBSP = /\u00A0/g;
 /** Content-mode special characters: * _ ` @ # < [ ] (must be escaped in Typst [...]) */
@@ -54,7 +52,6 @@ export const RE_TRAILING_DOTTED_IDENT = /([a-zA-Z]\w*(?:\.[a-zA-Z]\w*)*)$/;
 export const RE_LATIN_WITH_MARKS = /^[\p{Script=Latin}\p{M}\d]*\p{Script=Latin}[\p{Script=Latin}\p{M}\d]*$/u;
 /** String of Unicode letters and combining marks only */
 export const RE_LETTERS_AND_MARKS = /^[\p{L}\p{M}]+$/u;
-
 /** Property name for pre-mtable content (set in index.ts, read in table-handlers.ts) */
 export const DATA_PRE_CONTENT = 'data-pre-content';
 /** Property name for post-mtable content (set in index.ts, read in table-handlers.ts) */
@@ -71,7 +68,6 @@ export const TYPST_PLACEHOLDER = '""';
 export const DEFAULT_EQ_NUMBERING = '"(1)"';
 /** Figure kind for equation tags */
 export const EQ_TAG_FIGURE_KIND = 'eq-tag';
-
 // Unicode character constants — named for readability
 // Invisible math operators (MathML)
 export const FUNC_APPLY = '\u2061';            // ⁡ function application
@@ -100,22 +96,18 @@ export const RIGHT_ANGLE_OLD = '\u232A';       // 〉 (deprecated Unicode form)
 // Other math symbols
 export const INTEGRAL_SIGN = '\u222B';         // ∫
 export const MIDLINE_ELLIPSIS = '\u22EF';      // ⋯
-
 /** Node kinds that carry sub/superscripts */
 export const SCRIPT_NODE_KINDS: ReadonlySet<string> = new Set([
   'msub', 'msup', 'msubsup', 'munder', 'mover', 'munderover',
 ]);
-
 /** Prime characters used in derivative patterns (′ ″ ‴) */
 export const PRIME_CHARS: ReadonlySet<string> = new Set([
   '\u2032', '\u2033', '\u2034',
 ]);
-
 /** Maximum tree depth for shallow walks (accent detection, phantom check, etc.).
  *  MathJax wraps content in inferredMrow/TeXAtom layers; 5 levels is enough
  *  to reach through these wrappers without traversing the entire tree. */
 export const SHALLOW_TREE_MAX_DEPTH = 5;
-
 export const OPEN_BRACKETS: Readonly<Record<string, string>> = {
   '(': ')', '[': ']', '{': '}',
 };
@@ -158,4 +150,12 @@ export const BOX_INSET = '3pt';
 /** Typst escaped-delimiter output for unpaired brackets (math-mode safe) */
 export const UNPAIRED_BRACKET_TYPST: Readonly<Record<string, string>> = {
   '(': '\\(', ')': '\\)', '[': '\\[', ']': '\\]', '{': '\\{', '}': '\\}',
+};
+
+/** Typst symbol-name output for unpaired brackets inside mat() cells.
+ *  Symbol names avoid escaping issues in mat() argument context. */
+export const UNPAIRED_BRACKET_TABLE_TYPST: Readonly<Record<string, string>> = {
+  '(': 'paren.l', ')': 'paren.r',
+  '[': 'bracket.l', ']': 'bracket.r',
+  '{': 'brace.l', '}': 'brace.r',
 };

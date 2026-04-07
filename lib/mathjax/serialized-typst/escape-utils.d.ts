@@ -13,6 +13,9 @@ export declare const escapeContentSeparators: (expr: string) => string;
  *  For colons: inserts space before : when preceded by identifier.
  *  Also replaces unpaired brackets with Typst symbol names (bracket.l etc.). */
 export declare const escapeCasesSeparators: (expr: string) => string;
+/** Escape ; and : at depth 0 — for mat() rows where commas are intentional column separators.
+ *  Replaces unpaired brackets with Typst symbol names. */
+export declare const escapeMatrixRowSeparators: (expr: string) => string;
 /** Check whether a Typst expression contains , or ; at top level (outside (), [] and {}).
  *  Skips content inside "..." strings (handles escaped quotes). */
 export declare const hasTopLevelSeparators: (expr: string) => boolean;

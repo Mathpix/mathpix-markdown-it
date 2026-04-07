@@ -113,3 +113,6 @@ export declare const BOX_STROKE = "0.5pt";
 export declare const BOX_INSET = "3pt";
 /** Typst escaped-delimiter output for unpaired brackets (math-mode safe) */
 export declare const UNPAIRED_BRACKET_TYPST: Readonly<Record<string, string>>;
+/** Typst symbol-name output for unpaired brackets inside mat() cells.
+ *  Symbol names avoid escaping issues in mat() argument context. */
+export declare const UNPAIRED_BRACKET_TABLE_TYPST: Readonly<Record<string, string>>;

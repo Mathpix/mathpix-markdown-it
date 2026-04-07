@@ -6,14 +6,6 @@ export interface MathNode extends MmlNode {
     childNodes: MathNode[];
     parent: MathNode;
 }
-/** Visitor/serializer interface used by handlers. */
-export interface ITypstSerializer {
-    visitNode(node: MathNode, space: string): ITypstData;
-}
-/** Handler function signature. */
-export type HandlerFn = (node: MathNode, serialize: ITypstSerializer) => ITypstData;
-/** Supported MathML element kinds — keys of the handler registry. */
-export type HandlerKind = 'mi' | 'mo' | 'mn' | 'mtext' | 'mspace' | 'mfrac' | 'msup' | 'msub' | 'msubsup' | 'msqrt' | 'mroot' | 'mover' | 'munder' | 'munderover' | 'mmultiscripts' | 'mrow' | 'mpadded' | 'mphantom' | 'menclose' | 'mstyle' | 'mtable' | 'mtr';
 /** Attributes for nodes with font styling (mi, mn, mtext). */
 export interface FontAttrs {
     mathvariant?: string;

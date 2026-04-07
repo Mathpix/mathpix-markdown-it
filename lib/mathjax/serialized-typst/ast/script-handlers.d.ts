@@ -1,0 +1,12 @@
+import { MathNode } from "../types";
+import { TypstMathResult, ITypstMathSerializer } from "./types";
+export declare const mfracAst: (node: MathNode, serialize: ITypstMathSerializer) => TypstMathResult;
+export declare const msupAst: (node: MathNode, serialize: ITypstMathSerializer) => TypstMathResult;
+export declare const msubAst: (node: MathNode, serialize: ITypstMathSerializer) => TypstMathResult;
+export declare const msubsupAst: (node: MathNode, serialize: ITypstMathSerializer) => TypstMathResult;
+export declare const msqrtAst: (node: MathNode, serialize: ITypstMathSerializer) => TypstMathResult;
+export declare const mrootAst: (node: MathNode, serialize: ITypstMathSerializer) => TypstMathResult;
+export declare const moverAst: (node: MathNode, serialize: ITypstMathSerializer) => TypstMathResult;
+export declare const munderAst: (node: MathNode, serialize: ITypstMathSerializer) => TypstMathResult;
+export declare const munderoverAst: (node: MathNode, serialize: ITypstMathSerializer) => TypstMathResult;
+export declare const mmultiscriptsAst: (node: MathNode, serialize: ITypstMathSerializer) => TypstMathResult;
