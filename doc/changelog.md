@@ -3,7 +3,7 @@
 ## [2.0.39] - Add Typst math format output
 
 - New Feature:
-  - LaTeX-to-Typst math conversion via `MathJax.TexConvertToTypstData(latex)`. Returns `{ typstmath, typstmath_inline, error? }`.
+  - LaTeX-to-Typst and MathML-to-Typst math conversion via `MathJax.TexConvertToTypstData(latex)` and `MathJax.MathMLConvertToTypstData(mathml)`. Returns `{ typstmath, typstmath_inline, error? }`.
   - `typstmath` — block representation (may include `#math.equation()`, `#box()`, `#align()` wrappers).
   - `typstmath_inline` — pure math-mode output, safe for inline `$...$` contexts.
   - `include_typst: true` option in `outMath` to include `<typstmath>` and `<typstmath_inline>` tags in rendered HTML.
@@ -14,7 +14,12 @@
   - Blackboard bold shorthands: `\mathbb{Z}` → `ZZ`, `\mathbb{N}` → `NN`, etc.
   - Custom operators: `\operatorname*{argmax}` → `op("argmax", limits: #true)`.
   - Text in math: `\text{...}` → `"..."`.
-  - Tags, labels, equation numbering, aligned environments, `\boxed`, accents, cancellations, colors, and 4200+ test cases.
+  - Tags, labels, equation numbering, aligned environments, `\boxed`, accents, cancellations, colors, and 924 test cases.
+
+- Architecture:
+  - Typed AST intermediate layer (`TypstMathNode`) — all 22 handlers return typed nodes, escaping centralized in a single serializer with 7 context-aware escape modes.
+  - Per-cell bracket scoping for tables prevents orphaned brackets in aligned/eqnarray output.
+  - Nested chevron pairing, bare brace escaping, opening-bracket-as-script-base separation.
 
 - Error Handling:
   - `merror` nodes (invalid LaTeX) return `{ typstmath: '', typstmath_inline: '', error: '...' }` — errors never appear in Typst output.
