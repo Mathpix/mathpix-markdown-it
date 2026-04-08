@@ -3556,11 +3556,35 @@ x=4
     typst: `overbrace(underbrace(x, a), b)`,
     typst_inline: `overbrace(underbrace(x, a), b)`,
   },
+  // Tag content escaping: // in URL must not start a Typst comment
+  {
+    latex: String.raw`\begin{equation*}\text{x} \tag{file://path/img.jpg}\end{equation*}`,
+    typst: String.raw`#math.equation(block: true, numbering: n => [(file:\/\/path/img.jpg)], $ "x" $)` + '\n' + String.raw`#counter(math.equation).update(n => n - 1)`,
+    typst_inline: `"x"`,
+  },
+  // Tag content escaping: ~ # @ * _ { } must be escaped in content mode
+  {
+    latex: String.raw`\begin{equation*}\text{x} \tag{item #1 a~b}\end{equation*}`,
+    typst: String.raw`#math.equation(block: true, numbering: n => [(item \#1 a\~b)], $ "x" $)` + '\n' + String.raw`#counter(math.equation).update(n => n - 1)`,
+    typst_inline: `"x"`,
+  },
   // Chemistry with underset+underbrace and Korean text
   {
     latex: String.raw`\mathrm{C}_{12} \mathrm{H}_{22} \mathrm{O}_{11}+\mathrm{H}_{2} \mathrm{O} \underset{\text { 전화 }}{\underbrace{\mathrm{C}_{6} \mathrm{H}_{12} \mathrm{O}_{6}+\mathrm{C}_{6} \mathrm{H}_{12} \mathrm{O}_{6}}_{\text {전화당 }}}`,
     typst: String.raw`upright(C)_(12) upright(H)_(22) upright(O)_(11) + upright(H)_2 upright(O) limits(underbrace(upright(C)_6 upright(H)_(12) upright(O)_6 + upright(C)_6 upright(H)_(12) upright(O)_6, "전화당 "))_(" 전화 ")`,
     typst_inline: String.raw`upright(C)_(12) upright(H)_(22) upright(O)_(11) + upright(H)_2 upright(O) limits(underbrace(upright(C)_6 upright(H)_(12) upright(O)_6 + upright(C)_6 upright(H)_(12) upright(O)_6, "전화당 "))_(" 전화 ")`,
+  },
+  // Label with special chars: < > encoded as hex in <label> syntax
+  {
+    latex: String.raw`\begin{equation} x \label{<nc:1>} \end{equation}`,
+    typst: `#math.equation(block: true, supplement: none, numbering: "(1)", \$ x \$) <_3Cnc:1_3E>`,
+    typst_inline: `x`,
+  },
+  // Label with space encoded as hex
+  {
+    latex: String.raw`\begin{equation} x \label{my label} \end{equation}`,
+    typst: `#math.equation(block: true, supplement: none, numbering: "(1)", \$ x \$) <my_20label>`,
+    typst_inline: `x`,
   },
   // dotted symbol name followed by ( must have space to avoid function call
   {

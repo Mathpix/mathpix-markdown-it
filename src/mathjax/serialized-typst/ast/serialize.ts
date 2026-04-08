@@ -27,6 +27,7 @@ import {
   RE_ALPHA_END, RE_TRAILING_DOTTED_IDENT, TYPST_BUILTIN_OPS,
   OPEN_BRACKETS, CLOSE_BRACKETS,
 } from '../consts';
+import { sanitizeTypstLabel } from '../common';
 import { mapDelimiter, escapeLrDelimiter } from '../bracket-utils';
 
 /** Any escaped bracket at start: \( \) \[ \] \{ \} */
@@ -109,7 +110,7 @@ export const serializeTypstMath = (node: TypstMathNode): string => {
     case TypstMathNodeType.Placeholder:
       return '""';
     case TypstMathNodeType.Label:
-      return ' <' + node.key + '>';
+      return ' <' + sanitizeTypstLabel(node.key) + '>';
     case TypstMathNodeType.MatrixRow:
       return node.cells
         .map(cell => escapeCasesSeparators(serializeTypstMath(cell).trim()))

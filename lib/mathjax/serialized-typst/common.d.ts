@@ -1,4 +1,11 @@
 import { MathNode } from './types';
+/** Sanitize a label key for Typst <label> syntax.
+ *  Encodes invalid chars as _XX hex to preserve uniqueness.
+ *  Valid label chars: letters, digits, _, -, :, . */
+export declare const sanitizeTypstLabel: (key: string) => string;
+/** Escape text for Typst content mode ([...] blocks).
+ *  Handles: markup specials (* _ ` @ # < [ ]) and comment starts (// /\*). */
+export declare const escapeTypstContent: (text: string) => string;
 /** Check if child at index i in a node's childNodes starts a thousand-separator
  *  pattern: mn, mo(,), mn(3 digits). Also handles Indian numbering (2-digit groups
  *  like 41,70,000) by accepting 2-digit groups when the chain ends with a 3-digit group. */

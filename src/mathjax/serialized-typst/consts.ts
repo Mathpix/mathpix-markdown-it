@@ -4,8 +4,10 @@ export const TEX_ATOM = 'TeXAtom';
 export const MLABELEDTR = 'mlabeledtr';
 /** Non-breaking space U+00A0 (global replacement) */
 export const RE_NBSP = /\u00A0/g;
-/** Content-mode special characters: * _ ` @ # < [ ] (must be escaped in Typst [...]) */
-export const RE_CONTENT_SPECIAL = /[*_`@#<\[\]]/g;
+/** Content-mode special characters that must be escaped in Typst [...] blocks.
+ *  Covers: bold (*), italic (_), raw (`), math ($), code (#), label (<),
+ *  citation (@), non-breaking space (~), content block ([ ]), code block ({ }). */
+export const RE_CONTENT_SPECIAL = /[*_`$#<@~\[\]{}]/g;
 /** Word char (incl. Unicode letters) or dot at end of string */
 export const RE_WORD_DOT_END = /[\w\p{L}.]$/u;
 /** Word char (incl. Unicode letters) or dot at start of string */

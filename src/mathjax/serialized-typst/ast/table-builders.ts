@@ -1,11 +1,10 @@
 import { MathNode } from "../types";
 import {
-  RE_CONTENT_SPECIAL,
   DATA_TAG_AUTO, DEFAULT_EQ_NUMBERING,
   OPEN_BRACKETS, MLABELEDTR,
   BOX_STROKE, BOX_INSET,
 } from "../consts";
-import { getProp } from "../common";
+import { getProp, escapeTypstContent } from "../common";
 import { delimiterToTypst } from "../bracket-utils";
 import { TypstMathNode, TypstMathResult, FuncArg, FuncCallNode, DelimitedKind, ITypstMathSerializer } from "./types";
 import { FuncEscapeContext } from "./serialize-context";
@@ -108,7 +107,7 @@ export const buildNumcasesGrid = (
     const info = rowTagSources[i];
     let tagText = '';
     if (info.source === 'condition') {
-      tagText = `(${info.content.replace(RE_CONTENT_SPECIAL, '\\$&')})`;
+      tagText = `(${escapeTypstContent(info.content)})`;
     } else if (info.source === 'label' && info.content) {
       tagText = info.content;
     }

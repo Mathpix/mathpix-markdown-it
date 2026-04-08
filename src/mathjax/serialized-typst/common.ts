@@ -4,12 +4,30 @@ import {
   RE_THREE_DIGITS, RE_TWO_DIGITS, RE_PHANTOM_BASE,
   RE_TOKEN_START, RE_SEPARATOR_END, RE_WORD_DOT_END,
   RE_LATIN_WITH_MARKS, RE_LETTERS_AND_MARKS,
+  RE_CONTENT_SPECIAL,
   TEX_ATOM,
 } from './consts';
 import { typstSymbolMap } from './typst-symbol-map';
 
 /** Unicode negation slash used by MathJax for \not overlay (U+29F8) */
 const NEGATION_SLASH = '\u29F8';
+const RE_COMMENT_START = /\/\/|\/\*/g;
+/** Chars NOT allowed in Typst <label> syntax — replaced with hyphens.
+ *  Valid: letters, digits, _, -, :, . */
+const RE_INVALID_LABEL_CHARS = /[^\w\-.:\p{L}]/gu;
+
+/** Sanitize a label key for Typst <label> syntax.
+ *  Encodes invalid chars as _XX hex to preserve uniqueness.
+ *  Valid label chars: letters, digits, _, -, :, . */
+export const sanitizeTypstLabel = (key: string): string =>
+  key.replace(RE_INVALID_LABEL_CHARS, (ch) => '_' + ch.charCodeAt(0).toString(16).toUpperCase()) || 'label';
+
+/** Escape text for Typst content mode ([...] blocks).
+ *  Handles: markup specials (* _ ` @ # < [ ]) and comment starts (// /\*). */
+export const escapeTypstContent = (text: string): string =>
+  text
+    .replace(RE_CONTENT_SPECIAL, '\\$&')
+    .replace(RE_COMMENT_START, (m) => m.replace(/./g, '\\$&'));
 /** Any escaped bracket at start: \( \) \[ \] \{ \} */
 const RE_ESCAPED_BRACKET_START = /^\\[()[\]{}]/;
 /** Any escaped bracket at end: ...\( ...\) etc. — NOT a natural separator */

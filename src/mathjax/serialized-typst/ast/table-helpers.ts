@@ -1,10 +1,10 @@
 import { MathNode } from "../types";
 import {
-  RE_NBSP, RE_CONTENT_SPECIAL, RE_TAG_EXTRACT, RE_TAG_STRIP,
+  RE_NBSP, RE_TAG_EXTRACT, RE_TAG_STRIP,
   DATA_LABEL_KEY, DEFAULT_EQ_NUMBERING, EQ_TAG_FIGURE_KIND,
   TEX_ATOM, MLABELEDTR,
 } from "../consts";
-import { getChildText, getNodeText, getProp } from "../common";
+import { getChildText, getNodeText, getProp, escapeTypstContent, sanitizeTypstLabel } from "../common";
 import { treeContainsMo } from "../bracket-utils";
 import { TypstMathNode, ITypstMathSerializer } from "./types";
 import { seq } from "./builders";
@@ -33,7 +33,7 @@ export const serializeTagContent = (labelCell: MathNode, serialize: ITypstMathSe
         let text = getChildText(child);
         if (text) {
           text = text.replace(RE_NBSP, ' ');
-          text = text.replace(RE_CONTENT_SPECIAL, '\\$&');
+          text = escapeTypstContent(text);
           parts.push(text);
         }
       } else if (child.isInferred) {
@@ -252,14 +252,14 @@ export const computeAugment = (node: MathNode): string => {
 /** Build a #figure() wrapper for an explicit equation tag with a label. */
 export const buildFigureTag = (tagContent: string, labelKey: string): string => {
   const figure = `#figure(kind: "${EQ_TAG_FIGURE_KIND}", supplement: none, numbering: n => [${tagContent}], [${tagContent}])`;
-  return `[${figure} <${labelKey}>]`;
+  return `[${figure} <${sanitizeTypstLabel(labelKey)}>]`;
 };
 
 /** Build an auto-numbered tag entry with a label. */
 export const buildAutoTagWithLabel = (labelKey: string): string => {
   const getNum = `numbering(${DEFAULT_EQ_NUMBERING}, ..counter(math.equation).get())`;
   const figure = `#figure(kind: "${EQ_TAG_FIGURE_KIND}", supplement: none, numbering: _ => n, [#n])`;
-  return `{ counter(math.equation).step(); context { let n = ${getNum}; [${figure} <${labelKey}>] } }`;
+  return `{ counter(math.equation).step(); context { let n = ${getNum}; [${figure} <${sanitizeTypstLabel(labelKey)}>] } }`;
 };
 
 /** Simple auto-numbered tag entry. */
