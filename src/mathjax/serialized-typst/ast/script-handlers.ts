@@ -7,7 +7,7 @@ import {
 } from "../consts";
 import { getNodeText, getAttrs } from "../common";
 import { typstAccentMap } from "../typst-symbol-map";
-import { TypstMathNode, TypstMathResult, ITypstMathSerializer } from "./types";
+import { TypstMathNode, TypstMathResult, ITypstMathSerializer, FuncArgKind } from "./types";
 import { seq, symbol, placeholder, funcCall, scriptNode, posArg, namedArg, mathVal, strVal, boolVal, identVal } from "./builders";
 import { serializeTypstMath } from "./serialize";
 
@@ -111,14 +111,20 @@ const addLimitsToNode = (baseNode: TypstMathNode): TypstMathNode => {
 
 type BraceKind = 'overbrace' | 'overbracket' | 'underbrace' | 'underbracket';
 
-/** If baseNode is a FuncCallNode matching overbrace/underbrace/etc.,
- *  add annotation as second argument. Returns null if no match. */
+/** If baseNode is a FuncCallNode matching overbrace/underbrace/etc. that has
+ *  no annotation yet (1 positional arg = content only), add annotation as second
+ *  argument. Returns null if no match or annotation already present.
+ *  This prevents \underset{x}{\underbrace{y}_{z}} from producing underbrace(y, z, x). */
 const matchBraceAnnotation = (
   baseNode: TypstMathNode, annotationNode: TypstMathNode,
   kinds: BraceKind[]
 ): TypstMathNode | null => {
   const inner = unwrapSeq(baseNode);
   if (inner.type === 'func' && (kinds as string[]).indexOf(inner.name) >= 0) {
+    const positionalCount = inner.args.filter(a => a.kind === FuncArgKind.Positional).length;
+    if (positionalCount >= 2) {
+      return null;
+    }
     return funcCall(inner.name, [...inner.args, posArg(mathVal(annotationNode))]);
   }
   return null;
@@ -138,7 +144,9 @@ const unwrapToScriptNode = (node: MathNode | null): MathNode | null => {
 };
 
 const getMovablelimits = (node: MathNode): boolean | undefined => {
-  if (!node || node.kind !== 'mo') return undefined;
+  if (!node || node.kind !== 'mo') {
+    return undefined;
+  }
   try {
     return getAttrs<MoAttrs>(node).movablelimits;
   } catch (_e: unknown) {
@@ -245,10 +253,28 @@ const buildLimitBase = (
       };
     }
   }
-  if (isNativeDisplayLimitOp(baseTrimmed) || isSpecialFnCall(baseTrimmed)) {
+  if (isNativeDisplayLimitOp(baseTrimmed)) {
     return {
       block: baseNode
     };
+  }
+  // Special fn calls (overbrace, underbrace, op) without annotation don't need limits —
+  // they handle placement internally. But with annotation (2+ positional args),
+  // they need limits() for \underset/\overset to place below/above.
+  if (isSpecialFnCall(baseTrimmed)) {
+    const inner = unwrapSeq(baseNode);
+    if (inner.type === 'func') {
+      const positionalCount = inner.args.filter(a => a.kind === FuncArgKind.Positional).length;
+      if (positionalCount < 2) {
+        return {
+          block: baseNode
+        };
+      }
+    } else {
+      return {
+        block: baseNode
+      };
+    }
   }
   return {
     block: wrapBase()
@@ -553,7 +579,8 @@ export const moverAst = (node: MathNode, serialize: ITypstMathSerializer): Typst
         node: braceStr
       };
     }
-    // Flatten mover(munder(...), over): inner munder already has limits() + subscript
+    // Flatten mover(munder(...), over): attach over as superscript directly
+    // (inner munder already resolved its own sub via limits/underbrace/etc.)
     const innerBase = unwrapToScriptNode(firstChild);
     if (innerBase && (innerBase.kind === 'munder' || innerBase.kind === 'munderover')) {
       return {

@@ -3538,6 +3538,30 @@ x=4
     typst: String.raw`[""^(compose) C]`,
     typst_inline: String.raw`[""^(compose) C]`,
   },
+  // \underset wrapping \underbrace: annotation must not merge into underbrace args
+  {
+    latex: String.raw`\underset{\text { ower }}{\underbrace{1}_{\text {under }}}`,
+    typst: `limits(underbrace(1, "under "))_(" ower ")`,
+    typst_inline: `limits(underbrace(1, "under "))_(" ower ")`,
+  },
+  // \overset wrapping \overbrace: same pattern for overbrace
+  {
+    latex: String.raw`\overset{\text{above}}{\overbrace{x+y}^{\text{over}}}`,
+    typst: `limits(overbrace(x + y, "over"))^("above")`,
+    typst_inline: `limits(overbrace(x + y, "over"))^("above")`,
+  },
+  // Nested overbrace(underbrace): both annotations applied correctly
+  {
+    latex: String.raw`\overbrace{\underbrace{x}_{a}}^{b}`,
+    typst: `overbrace(underbrace(x, a), b)`,
+    typst_inline: `overbrace(underbrace(x, a), b)`,
+  },
+  // Chemistry with underset+underbrace and Korean text
+  {
+    latex: String.raw`\mathrm{C}_{12} \mathrm{H}_{22} \mathrm{O}_{11}+\mathrm{H}_{2} \mathrm{O} \underset{\text { 전화 }}{\underbrace{\mathrm{C}_{6} \mathrm{H}_{12} \mathrm{O}_{6}+\mathrm{C}_{6} \mathrm{H}_{12} \mathrm{O}_{6}}_{\text {전화당 }}}`,
+    typst: String.raw`upright(C)_(12) upright(H)_(22) upright(O)_(11) + upright(H)_2 upright(O) limits(underbrace(upright(C)_6 upright(H)_(12) upright(O)_6 + upright(C)_6 upright(H)_(12) upright(O)_6, "전화당 "))_(" 전화 ")`,
+    typst_inline: String.raw`upright(C)_(12) upright(H)_(22) upright(O)_(11) + upright(H)_2 upright(O) limits(underbrace(upright(C)_6 upright(H)_(12) upright(O)_6 + upright(C)_6 upright(H)_(12) upright(O)_6, "전화당 "))_(" 전화 ")`,
+  },
   // dotted symbol name followed by ( must have space to avoid function call
   {
     latex: String.raw`\leftarrow (a+b)`,
