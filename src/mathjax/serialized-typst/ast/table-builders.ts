@@ -35,7 +35,7 @@ export const buildNumcasesGrid = (
   for (let i = 0; i < countRow; i++) {
     const mtrNode = node.childNodes[i];
     const labelCell = (mtrNode.kind === MLABELEDTR && mtrNode.childNodes.length > 0) ? mtrNode.childNodes[0] : null;
-    const labelKey = labelCell ? getLabelKey(labelCell) : null;
+    const labelKey = labelCell ? getLabelKey(labelCell, serialize.labels) : null;
     const condCell = mtrNode.childNodes[mtrNode.childNodes.length - 1];
     const condTag = extractTagFromConditionCell(condCell);
     if (condTag) {
@@ -214,7 +214,7 @@ export const buildTaggedEqnArrayResult = (
       const labelCell = mtrNode.childNodes[0];
       const tagContent = serializeTagContent(labelCell, serialize);
       const isAutoNumber = !!getProp<boolean>(labelCell, DATA_TAG_AUTO);
-      const labelKey = getLabelKey(labelCell);
+      const labelKey = getLabelKey(labelCell, serialize.labels);
       rowTagInfos.push({
         isTagged: !!tagContent,
         isAutoTag: isAutoNumber && !!tagContent,

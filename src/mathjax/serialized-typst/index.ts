@@ -3,16 +3,13 @@ import { TextNode, XMLNode } from 'mathjax-full/js/core/MmlTree/MmlNode.js';
 import { ITypstData, MathNode } from './types';
 import { createAstSerializer, dispatchFull } from './ast/dispatcher';
 import { serializeTypstMath } from './ast/serialize';
-
-export interface ITypstVisitorOptions {
-  [key: string]: unknown;
-}
+import { LabelsMap } from './ast/types';
 
 export class SerializedTypstVisitor extends MmlVisitor {
-  private readonly astSerializer = createAstSerializer();
-
-  constructor(public readonly options: ITypstVisitorOptions = {}) {
+  private readonly astSerializer;
+  constructor(labels: LabelsMap = null) {
     super();
+    this.astSerializer = createAstSerializer(labels);
   }
 
   public visitTree(node: MathNode): ITypstData {

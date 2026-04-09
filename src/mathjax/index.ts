@@ -103,13 +103,10 @@ const findMerror = (node: MathNode): string | null => {
 };
 
 /** Return both block and inline Typst math from the MathML AST.
- *  typstmath_inline always present — equals typstmath when no block wrappers are used.
- *  If the tree contains a merror node, returns empty typst with an error field.
- *
  *  Temporarily mutates the shared MathML tree via setProperty()
  *  (data-unpaired-bracket, data-pre-content, data-post-content).
  *  All mutations are cleaned up after serialization. */
-const toTypstData = (node: MathNode): ITypstConvertResult => {
+const toTypstData = (node: MathNode, labels?: Record<string, { tag: string; id: string }> | null): ITypstConvertResult => {
   const error = findMerror(node);
   if (error) {
     return { typstmath: '', typstmath_inline: '', error };
@@ -118,7 +115,7 @@ const toTypstData = (node: MathNode): ITypstConvertResult => {
   // MathML tree (setting properties / reading them). markUnpairedBrackets must
   // run first so that bracket properties are available during serialization.
   markUnpairedBrackets(node);
-  const visitorT = new SerializedTypstVisitor();
+  const visitorT = new SerializedTypstVisitor(labels ?? null);
   const data: ITypstData = visitorT.visitTree(node);
   // Clean up tree mutations so properties don't leak to other visitors
   clearUnpairedBracketMarks(node);
@@ -229,9 +226,12 @@ const OuterData = (adaptor, node, math, outMath, forDocx = false, accessibility?
       res.linearmath = dataAscii.linear;
     }
   }
-
+  /** Get information about the current labels. */
+  const tagLabels = math.inputJax?.parseOptions?.tags?.labels
+    ? {...math.inputJax.parseOptions.tags.labels}
+    : null;
   if (include_typst) {
-    const typstData = toTypstData(math.root);
+    const typstData = toTypstData(math.root, tagLabels);
     res.typstmath = typstData.typstmath;
     res.typstmath_inline = typstData.typstmath_inline;
   }
@@ -259,10 +259,7 @@ const OuterData = (adaptor, node, math, outMath, forDocx = false, accessibility?
       }
     }
   }
-  /** Get information about the current labels. */
-  res.labels = math.inputJax.parseOptions?.tags?.labels
-    ? {...math.inputJax.parseOptions.tags.labels}
-    : null;
+  res.labels = tagLabels;
   return res;
 };
 
@@ -331,7 +328,10 @@ const OuterDataAscii = (adaptor, node, math, outMath, forDocx = false, accessibi
       : math.inputJax.processStrings ? '' : math.start.node.outerHTML);
   }
   if (include_typst) {
-    const typstData = toTypstData(math.root);
+    const tagLabels = math.inputJax?.parseOptions?.tags?.labels
+      ? {...math.inputJax.parseOptions.tags.labels}
+      : null;
+    const typstData = toTypstData(math.root, tagLabels);
     res.typstmath = typstData.typstmath;
     res.typstmath_inline = typstData.typstmath_inline;
   }
@@ -381,7 +381,10 @@ const OuterDataMathMl = (adaptor, node, math, outMath, forDocx = false, accessib
     }
   }
   if (include_typst) {
-    const typstData = toTypstData(math.root);
+    const tagLabels = math.inputJax?.parseOptions?.tags?.labels
+      ? {...math.inputJax.parseOptions.tags.labels}
+      : null;
+    const typstData = toTypstData(math.root, tagLabels);
     res.typstmath = typstData.typstmath;
     res.typstmath_inline = typstData.typstmath_inline;
   }
@@ -592,7 +595,8 @@ export const MathJax = {
       display, em, ex, containerWidth: cwidth, lineWidth: lwidth, scale,
     });
     const outputJax = MJ.docTeX.outputJax as any;
-    return toTypstData(outputJax.math.root);
+    const tagLabels = outputJax?.math?.inputJax?.parseOptions?.tags?.labels ?? null;
+    return toTypstData(outputJax.math.root, tagLabels);
   },
   MathMLConvertToTypstData: function(string: string, options: any = {}): ITypstConvertResult {
     const {display = true, metric = {}, accessibility = null} = options;

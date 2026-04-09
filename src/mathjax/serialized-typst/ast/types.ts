@@ -261,10 +261,15 @@ export interface TypstMathResult {
   readonly nodeInline?: TypstMathNode;
 }
 
+/** Label info from MathJax tags system: maps labelKey → { tag, id } */
+export type LabelsMap = Readonly<Record<string, { tag: string; id: string }>> | null;
+
 /** Serializer interface for AST-returning handlers */
 export interface ITypstMathSerializer {
   visitNode(node: MathNode): TypstMathNode;
   visitNodeFull(node: MathNode): TypstMathResult;
+  /** Labels from MathJax tags system — used by getLabelKey for bare display math */
+  readonly labels: LabelsMap;
 }
 
 /** Handler signature for AST-returning handlers */

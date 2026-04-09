@@ -6,15 +6,33 @@ import {
 } from "../consts";
 import { getChildText, getNodeText, getProp, escapeTypstContent, sanitizeTypstLabel } from "../common";
 import { treeContainsMo } from "../bracket-utils";
-import { TypstMathNode, ITypstMathSerializer } from "./types";
+import { TypstMathNode, ITypstMathSerializer, LabelsMap } from "./types";
 import { seq } from "./builders";
 import { serializeTypstMath } from "./serialize";
 
 /** Extract the original \label{} key from an mlabeledtr label cell.
- *  MathJax stores the id as "mjx-eqn:<label_key>" when useLabelIds is true. */
-export const getLabelKey = (labelCell: MathNode): string | null => {
+ *  Primary: data-label-key property (set by mathjax.ts getTag patch for environments).
+ *  Fallback: labels map from MathJax tags system (for bare display math where
+ *  getTag isn't called). Matches by mtd id attribute → label key. */
+export const getLabelKey = (labelCell: MathNode, labels: LabelsMap): string | null => {
   const key = getProp<string>(labelCell, DATA_LABEL_KEY);
-  return key ? String(key) : null;
+  if (key) {
+    return String(key);
+  }
+  // Fallback: look up label by mtd id in the labels map
+  if (labels) {
+    try {
+      const id = labelCell.attributes?.get('id') as string | undefined;
+      if (id) {
+        for (const [labelKey, info] of Object.entries(labels)) {
+          if (info?.id === id) {
+            return labelKey;
+          }
+        }
+      }
+    } catch (_e: unknown) { /* */ }
+  }
+  return null;
 };
 
 /** Serialize a tag label mtd as Typst content for use inside [...].

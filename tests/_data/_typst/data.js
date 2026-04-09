@@ -3574,6 +3574,12 @@ x=4
     typst: String.raw`upright(C)_(12) upright(H)_(22) upright(O)_(11) + upright(H)_2 upright(O) limits(underbrace(upright(C)_6 upright(H)_(12) upright(O)_6 + upright(C)_6 upright(H)_(12) upright(O)_6, "전화당 "))_(" 전화 ")`,
     typst_inline: String.raw`upright(C)_(12) upright(H)_(22) upright(O)_(11) + upright(H)_2 upright(O) limits(underbrace(upright(C)_6 upright(H)_(12) upright(O)_6 + upright(C)_6 upright(H)_(12) upright(O)_6, "전화당 "))_(" 전화 ")`,
   },
+  // \tag + \label: both tag content and label preserved
+  {
+    latex: String.raw`x^2 + y^2 = z^2 \tag{eq 1.1} \label{eq:tag-test}`,
+    typst: '#math.equation(block: true, supplement: none, numbering: n => [(eq 1.1)], $ x^2 + y^2 = z^2 $) <eq:tag-test>\n#counter(math.equation).update(n => n - 1)',
+    typst_inline: 'x^2 + y^2 = z^2',
+  },
   // Label with special chars: < > encoded as hex in <label> syntax
   {
     latex: String.raw`\begin{equation} x \label{<nc:1>} \end{equation}`,

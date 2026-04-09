@@ -1,6 +1,6 @@
 import { TextNode, XMLNode } from 'mathjax-full/js/core/MmlTree/MmlNode.js';
 import { MathNode } from '../types';
-import { TypstMathNode, TypstMathResult, ITypstMathSerializer, AstHandlerFn, astNodeStore } from './types';
+import { TypstMathNode, TypstMathResult, ITypstMathSerializer, AstHandlerFn, astNodeStore, LabelsMap } from './types';
 import { seq, symbol, funcCall, posArg, mathVal } from './builders';
 import { serializeTypstMath } from './serialize';
 import { isNegationOverlay } from '../common';
@@ -257,10 +257,11 @@ const visitInferredMrowAst = (node: MathNode, serialize: ITypstMathSerializer): 
  * Create a self-referencing ITypstMathSerializer that dispatches through the AST pipeline.
  * Children are returned as typed TypstMathNode, not raw(string).
  */
-export const createAstSerializer = (): ITypstMathSerializer => {
+export const createAstSerializer = (labels: LabelsMap = null): ITypstMathSerializer => {
   const serialize: ITypstMathSerializer = {
     visitNode: (child: MathNode): TypstMathNode => dispatch(child, serialize),
     visitNodeFull: (child: MathNode): TypstMathResult => dispatchFull(child, serialize),
+    labels,
   };
   return serialize;
 };
