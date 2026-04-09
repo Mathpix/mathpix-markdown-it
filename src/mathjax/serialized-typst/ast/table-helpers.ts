@@ -5,19 +5,30 @@ import {
   TEX_ATOM, MLABELEDTR,
 } from "../consts";
 import { getChildText, getNodeText, getProp, escapeTypstContent } from "../common";
-import { sanitizeLabel } from "../../../markdown/common/labels";
+import { sanitizeLabel, getLabelByKeyFromLabelsList } from "../../../markdown/common/labels";
 import { treeContainsMo } from "../bracket-utils";
 import { TypstMathNode, ITypstMathSerializer, LabelsMap } from "./types";
 import { seq } from "./builders";
 import { serializeTypstMath } from "./serialize";
 
+/** Check if this label key was already emitted by a previous equation.
+ *  addIntoLabelsList runs AFTER toTypstData, so finding the key in labelsList
+ *  means a previous equation already claimed it → duplicate. */
+const isDuplicateLabel = (key: string): boolean =>
+  !!getLabelByKeyFromLabelsList(key);
+
 /** Extract the original \label{} key from an mlabeledtr label cell.
  *  Primary: data-label-key property (set by mathjax.ts getTag patch for environments).
  *  Fallback: labels map from MathJax tags system (for bare display math where
- *  getTag isn't called). Matches by mtd id attribute → label key. */
+ *  getTag isn't called). Matches by mtd id attribute → label key.
+ *  Dedup: checks global labelsList — if another entry owns this key with a different
+ *  tagId, returns null (duplicate label — Typst doesn't allow duplicate <label>). */
 export const getLabelKey = (labelCell: MathNode, labels: LabelsMap): string | null => {
   const key = getProp<string>(labelCell, DATA_LABEL_KEY);
   if (key) {
+    if (isDuplicateLabel(key)) {
+      return null;
+    }
     return String(key);
   }
   // Fallback: look up label by mtd id in the labels map
@@ -27,6 +38,9 @@ export const getLabelKey = (labelCell: MathNode, labels: LabelsMap): string | nu
       if (id) {
         for (const [labelKey, info] of Object.entries(labels)) {
           if (info?.id === id) {
+            if (isDuplicateLabel(labelKey)) {
+              return null;
+            }
             return labelKey;
           }
         }

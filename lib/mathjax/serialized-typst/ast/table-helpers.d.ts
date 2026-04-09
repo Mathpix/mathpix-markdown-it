@@ -3,7 +3,9 @@ import { TypstMathNode, ITypstMathSerializer, LabelsMap } from "./types";
 /** Extract the original \label{} key from an mlabeledtr label cell.
  *  Primary: data-label-key property (set by mathjax.ts getTag patch for environments).
  *  Fallback: labels map from MathJax tags system (for bare display math where
- *  getTag isn't called). Matches by mtd id attribute → label key. */
+ *  getTag isn't called). Matches by mtd id attribute → label key.
+ *  Dedup: checks global labelsList — if another entry owns this key with a different
+ *  tagId, returns null (duplicate label — Typst doesn't allow duplicate <label>). */
 export declare const getLabelKey: (labelCell: MathNode, labels: LabelsMap) => string | null;
 /** Serialize a tag label mtd as Typst content for use inside [...].
  *  mtext → plain text, math → $typst_math$.
