@@ -4,7 +4,8 @@ import {
   DATA_LABEL_KEY, DEFAULT_EQ_NUMBERING, EQ_TAG_FIGURE_KIND,
   TEX_ATOM, MLABELEDTR,
 } from "../consts";
-import { getChildText, getNodeText, getProp, escapeTypstContent, sanitizeTypstLabel } from "../common";
+import { getChildText, getNodeText, getProp, escapeTypstContent } from "../common";
+import { sanitizeLabel } from "../../../markdown/common/labels";
 import { treeContainsMo } from "../bracket-utils";
 import { TypstMathNode, ITypstMathSerializer, LabelsMap } from "./types";
 import { seq } from "./builders";
@@ -270,14 +271,14 @@ export const computeAugment = (node: MathNode): string => {
 /** Build a #figure() wrapper for an explicit equation tag with a label. */
 export const buildFigureTag = (tagContent: string, labelKey: string): string => {
   const figure = `#figure(kind: "${EQ_TAG_FIGURE_KIND}", supplement: none, numbering: n => [${tagContent}], [${tagContent}])`;
-  return `[${figure} <${sanitizeTypstLabel(labelKey)}>]`;
+  return `[${figure} <${sanitizeLabel(labelKey)}>]`;
 };
 
 /** Build an auto-numbered tag entry with a label. */
 export const buildAutoTagWithLabel = (labelKey: string): string => {
   const getNum = `numbering(${DEFAULT_EQ_NUMBERING}, ..counter(math.equation).get())`;
   const figure = `#figure(kind: "${EQ_TAG_FIGURE_KIND}", supplement: none, numbering: _ => n, [#n])`;
-  return `{ counter(math.equation).step(); context { let n = ${getNum}; [${figure} <${sanitizeTypstLabel(labelKey)}>] } }`;
+  return `{ counter(math.equation).step(); context { let n = ${getNum}; [${figure} <${sanitizeLabel(labelKey)}>] } }`;
 };
 
 /** Simple auto-numbered tag entry. */

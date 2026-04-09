@@ -21,8 +21,12 @@ export interface ILabel {
     tagId?: string;
     tagChildrenTokens?: any; /** parsed tag content */
     type: eLabelType;
+    sanitizedKey?: string; /** Label key with special chars encoded as _XX hex (for systems that restrict label chars) */
     tokenUuidInParentBlock?: string; /** uuid of parent block */
 }
+/** Sanitize a label key for systems that restrict allowed characters.
+ *  Encodes invalid chars as _XX hex to preserve uniqueness. */
+export declare const sanitizeLabel: (key: string) => string;
 export declare let labelsList: Array<ILabel>;
 export declare const addIntoLabelsList: (label: ILabel) => void;
 export declare const clearLabelsList: () => void;

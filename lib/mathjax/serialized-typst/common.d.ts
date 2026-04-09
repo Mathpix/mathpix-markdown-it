@@ -1,8 +1,4 @@
 import { MathNode } from './types';
-/** Sanitize a label key for Typst <label> syntax.
- *  Encodes invalid chars as _XX hex to preserve uniqueness.
- *  Valid label chars: letters, digits, _, -, :, . */
-export declare const sanitizeTypstLabel: (key: string) => string;
 /** Escape text for Typst content mode ([...] blocks).
  *  Handles: markup specials (* _ ` @ # < [ ]) and comment starts (// /\*). */
 export declare const escapeTypstContent: (text: string) => string;
