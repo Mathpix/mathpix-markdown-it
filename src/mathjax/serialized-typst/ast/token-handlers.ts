@@ -22,6 +22,12 @@ const INVISIBLE_CHARS: ReadonlySet<string> = new Set([
 
 const COMBINING_NOT_SLASH = '\u0338';
 
+/** Precomposed characters with combining marks (ṭ, ñ, é) decompose into
+ *  base + mark in NFD. Typst math can't shape them as single glyphs —
+ *  they must be wrapped in text() ("ṭ") instead of bare symbol (ṭ). */
+const hasCombiningMarks = (s: string): boolean =>
+  s.normalize('NFD').length > s.length;
+
 const stripCombiningNot = (value: string): [string, boolean] => {
   if (value.endsWith(COMBINING_NOT_SLASH)) {
     return [value.slice(0, -1), true];
@@ -153,7 +159,9 @@ export const miAst = (node: MathNode, _serialize: ITypstMathSerializer): TypstMa
   ) {
     const fontFn = typstFontMap.get(mathvariant);
     if (fontFn) {
-      const innerNode: TypstMathNode = value.length > 1 && !isKnownSymbol
+      const useText = !isKnownSymbol
+        && (value.length > 1 || hasCombiningMarks(value));
+      const innerNode: TypstMathNode = useText
         ? text(value)
         : symbol(typstSymbol);
       if (mathvariant === 'bold' && !isKnownSymbol) {
@@ -162,11 +170,15 @@ export const miAst = (node: MathNode, _serialize: ITypstMathSerializer): TypstMa
         result = funcCall(fontFn, [posArg(mathVal(innerNode))]);
       }
     } else {
-      result = symbol(typstSymbol);
+      result = !isKnownSymbol && hasCombiningMarks(value)
+        ? text(value)
+        : symbol(typstSymbol);
     }
   }
   else {
-    result = symbol(typstSymbol);
+    result = !isKnownSymbol && hasCombiningMarks(value)
+      ? text(value)
+      : symbol(typstSymbol);
   }
   if (hasNot) {
     result = funcCall('cancel', [posArg(mathVal(result))]);

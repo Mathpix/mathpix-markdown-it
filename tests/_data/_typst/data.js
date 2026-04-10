@@ -3744,4 +3744,10 @@ x=4
     typst: String.raw`EE lr(size: #2.470em, [ J_(h a r m) (cal(R)(P(dot.op divides tilde(x), y_(< t)), cal(H)_(e v a l))) ])`,
     typst_inline: String.raw`EE lr(size: #2.470em, [ J_(h a r m) (cal(R)(P(dot.op divides tilde(x), y_(< t)), cal(H)_(e v a l))) ])`,
   },
+  // precomposed chars with combining marks (ṭ) → text("ṭ") not bare symbol
+  {
+    latex: String.raw`{ }^{\mathrm{c}} \mathrm{Aṭa} \mathrm{a}^{\mathrm{a}}`,
+    typst: String.raw`""^(upright(c)) upright(A) upright("ṭ") upright(a) upright(a)^(upright(a))`,
+    typst_inline: String.raw`""^(upright(c)) upright(A) upright("ṭ") upright(a) upright(a)^(upright(a))`,
+  },
 ];
