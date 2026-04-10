@@ -11,6 +11,7 @@ import {
   DOUBLE_VERT, LEFT_CHEVRON, RIGHT_CHEVRON,
   LEFT_ANGLE_OLD, RIGHT_ANGLE_OLD,
   INTEGRAL_SIGN, MIDLINE_ELLIPSIS, TEX_ATOM, MLABELEDTR,
+  UNPAIRED_BRACKET_PROP,
 } from './consts';
 import {
   getChildText, getAttrs, isThousandSepComma,
@@ -24,6 +25,68 @@ import { serializeTypstMath } from './ast/serialize';
 
 // Node kinds that carry sub/sup scripts (used in \idotsint pattern detection).
 const IDOTSINT_SCRIPT_KINDS: ReadonlySet<string> = new Set(['msubsup', 'msub', 'msup']);
+
+// Comprehensive bracket sets for fence balance validation inside bare delimiter pairing.
+// Covers ALL asymmetric bracket types that Typst auto-scales inside lr().
+// Excludes | and ‖ — they are symmetric and handled by the pairing logic itself.
+const FENCE_OPEN_CHARS: ReadonlySet<string> = new Set([
+  '(', '{', '[', LEFT_CHEVRON, LEFT_ANGLE_OLD, LEFT_FLOOR, LEFT_CEIL,
+]);
+const FENCE_CLOSE_CHARS: ReadonlySet<string> = new Set([
+  ')', '}', ']', RIGHT_CHEVRON, RIGHT_ANGLE_OLD, RIGHT_FLOOR, RIGHT_CEIL,
+]);
+
+/** Check that all brackets between positions [from, to) are balanced.
+ *  Returns false if any opening bracket has no matching close, or vice versa.
+ *  Used to validate bare delimiter pairing — rejects |...| when unmatched
+ *  brackets (e.g. [, ⟩) sit between the two pipes. */
+const isFenceBalanced = (node: MathNode, from: number, to: number): boolean => {
+  let depth = 0;
+  for (let k = from; k < to; k++) {
+    const child = node.childNodes[k];
+    // Skip brackets already marked as unpaired by markUnpairedBrackets() —
+    // they'll be escaped (\[, \]) or replaced (bracket.l) in the serialized
+    // output and won't affect Typst's delimiter matching inside lr().
+    const mo = resolveDelimiterMo(child);
+    if (mo?.getProperty?.(UNPAIRED_BRACKET_PROP)) {
+      continue;
+    }
+    const ch = getDelimiterChar(child);
+    if (!ch) {
+      continue;
+    }
+    if (FENCE_OPEN_CHARS.has(ch)) {
+      depth++;
+    } else if (FENCE_CLOSE_CHARS.has(ch)) {
+      depth--;
+      if (depth < 0) {
+        return false;
+      } // unmatched close bracket
+    }
+  }
+  return depth === 0;
+};
+
+/** Additional validation for ‖...‖ (DOUBLE_VERT) pairs.
+ *  Rejects pairing when content contains PUNCT (set builder notation: {x ‖ P(x)})
+ *  or REL when the pair spans the entire expression (a ‖ b is "parallel to"). */
+const isDoubleVertContentValid = (
+  node: MathNode, j: number, closeIdx: number, delimChar: string,
+): boolean => {
+  if (delimChar !== DOUBLE_VERT) {
+    return true;
+  }
+  for (let k = j + 1; k < closeIdx; k++) {
+    const tc = node.childNodes[k]?.texClass;
+    if (tc === TEXCLASS.PUNCT) {
+      return false;
+    }
+    if (j === 0 && closeIdx === node.childNodes.length - 1 && tc === TEXCLASS.REL) {
+      return false;
+    }
+  }
+  return true;
+};
 
 // Map of opening delimiter char -> expected close char + Typst output format.
 // Note: |..| uses Lr (not Abs) in inferred mrow to produce lr(| ... |) form.
@@ -209,7 +272,12 @@ export const tryBigDelimiterPattern = (
 
 /** Bare delimiter pairing: |...|, floor, ceil, norm, chevron.
  *  Groups content for correct subscript/superscript attachment and produces
- *  Typst shorthand functions (ceil, floor, norm) or lr() for matched pairs. */
+ *  Typst shorthand functions (ceil, floor, norm) or lr() for matched pairs.
+ *
+ *  Key invariant: the content between opener and closer must have balanced
+ *  brackets — ALL delimiter types ((), [], {}, ⟨⟩, ⌊⌋, ⌈⌉) are tracked.
+ *  This prevents |...\rangle from being swallowed into a wrong |...| pair
+ *  when ⟩ sits between the two pipes. */
 export const tryBareDelimiterPattern = (
   node: MathNode, j: number, serialize: ITypstMathSerializer
 ): PatternResult | null => {
@@ -268,35 +336,15 @@ export const tryBareDelimiterPattern = (
   if (closeIdx <= j + 1) {
     return null;
   }
-  let fenceDepth = 0;
-  let hasFenceImbalance = false;
-  for (let k = j + 1; k < closeIdx; k++) {
-    const ch = getDelimiterChar(node.childNodes[k]);
-    if (ch === '(' || ch === '{') {
-      fenceDepth++;
-    }
-    else if (ch === ')' || ch === '}') {
-      fenceDepth--;
-      if (fenceDepth < 0) {
-        hasFenceImbalance = true;
-        break;
-      }
-    }
-  }
-  if (fenceDepth !== 0 || hasFenceImbalance) {
+  // Validate: ALL bracket types must be balanced between opener and closer.
+  // This prevents |ψ⟩ = ...[|↑↓⟩] from pairing the first | with a distant |
+  // through an unmatched ⟩ or [.
+  if (!isFenceBalanced(node, j + 1, closeIdx)) {
     return null;
   }
-  if (delimChar === DOUBLE_VERT) {
-    for (let k = j + 1; k < closeIdx; k++) {
-      const tc = node.childNodes[k]?.texClass;
-      if (tc === TEXCLASS.PUNCT) {
-        return null;
-      }
-      if (j === 0 && closeIdx === node.childNodes.length - 1
-          && tc === TEXCLASS.REL) {
-        return null;
-      }
-    }
+  // Additional ‖ validation
+  if (!isDoubleVertContentValid(node, j, closeIdx, delimChar)) {
+    return null;
   }
   const contentNodes = visitRange(node, j + 1, closeIdx, serialize);
   const bodyNode = seq(contentNodes);

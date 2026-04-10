@@ -12,7 +12,12 @@ export declare const isTaggedEqnArray: (child: MathNode) => boolean;
 export declare const tryBigDelimiterPattern: (node: MathNode, j: number, serialize: ITypstMathSerializer) => PatternResult | null;
 /** Bare delimiter pairing: |...|, floor, ceil, norm, chevron.
  *  Groups content for correct subscript/superscript attachment and produces
- *  Typst shorthand functions (ceil, floor, norm) or lr() for matched pairs. */
+ *  Typst shorthand functions (ceil, floor, norm) or lr() for matched pairs.
+ *
+ *  Key invariant: the content between opener and closer must have balanced
+ *  brackets — ALL delimiter types ((), [], {}, ⟨⟩, ⌊⌋, ⌈⌉) are tracked.
+ *  This prevents |...\rangle from being swallowed into a wrong |...| pair
+ *  when ⟩ sits between the two pipes. */
 export declare const tryBareDelimiterPattern: (node: MathNode, j: number, serialize: ITypstMathSerializer) => PatternResult | null;
 /** \idotsint pattern: mo(integral) mo(dots) scripted(mo(integral)) */
 export declare const tryIdotsintPattern: (node: MathNode, j: number, serialize: ITypstMathSerializer) => PatternResult | null;

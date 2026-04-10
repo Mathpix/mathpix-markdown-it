@@ -15,6 +15,18 @@ import {
   buildUntaggedEqnArrayResult, buildMatrixResult,
 } from "./table-builders";
 
+/** Check if a node (or its seq children) contains a code-mode function (#hash prefix).
+ *  Code-mode blocks like #align(center, box()) break math flow in eqnArray cells. */
+const hasCodeModeFunc = (node: TypstMathNode): boolean => {
+  if (node.type === 'func') {
+    return !!node.hash;
+  }
+  if (node.type === 'seq') {
+    return node.children.some(hasCodeModeFunc);
+  }
+  return false;
+};
+
 export const mtableAst = (node: MathNode, serialize: ITypstMathSerializer): TypstMathResult => {
   const countRow = node.childNodes.length;
   const envName = String(node.attributes.get('name') || '');
@@ -69,7 +81,11 @@ export const mtableAst = (node: MathNode, serialize: ITypstMathSerializer): Typs
       const result = serialize.visitNodeFull(mtdNode);
       const blockNode = result.node;
       const inlineNode = result.nodeInline ?? result.node;
-      cellNodes.push(blockNode);
+      // Code-mode blocks (#align, #box) break math flow in eqnArray rows.
+      // Use inline variant to keep everything in math mode.
+      const useInlineForBlock = isEqnArray && result.nodeInline !== undefined
+        && hasCodeModeFunc(blockNode);
+      cellNodes.push(useInlineForBlock ? inlineNode : blockNode);
       cellNodesInline.push(inlineNode);
       if (result.nodeInline !== undefined) {
         hasInlineDiff = true;

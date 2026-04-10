@@ -2551,8 +2551,8 @@ module.exports = [
   // aligned with unpaired [ and ) inside \left.\right] fence
   {
     latex: `\\begin{aligned}\n& r_{c m}=\\frac{1}{50}[20(3 i+3 j)+18(-2 i-2 j)+12(i-j)] \\\\\n& \\left.r_{c m}=\\frac{1}{50}[36 i+12 j)\\right]=\\frac{36}{50} i+\\frac{12}{50} j=0.72 i+0.24 j\n\\end{aligned}`,
-    typst: `&r_(c m) = frac(1, 50)[20(3 i + 3 j) + 18(- 2 i - 2 j) + 12(i - j)] \\\n &lr(r_(c m) = frac(1, 50) bracket.l 36 i + 12 j paren.r ]) = frac(36, 50) i + frac(12, 50) j = 0.72 i + 0.24 j`,
-    typst_inline: `&r_(c m) = frac(1, 50)[20(3 i + 3 j) + 18(- 2 i - 2 j) + 12(i - j)] \\\n &lr(r_(c m) = frac(1, 50) bracket.l 36 i + 12 j paren.r ]) = frac(36, 50) i + frac(12, 50) j = 0.72 i + 0.24 j`,
+    typst: `&r_(c m) = frac(1, 50) [20(3 i + 3 j) + 18(- 2 i - 2 j) + 12(i - j)] \\\n &lr(r_(c m) = frac(1, 50) bracket.l 36 i + 12 j paren.r ]) = frac(36, 50) i + frac(12, 50) j = 0.72 i + 0.24 j`,
+    typst_inline: `&r_(c m) = frac(1, 50) [20(3 i + 3 j) + 18(- 2 i - 2 j) + 12(i - j)] \\\n &lr(r_(c m) = frac(1, 50) bracket.l 36 i + 12 j paren.r ]) = frac(36, 50) i + frac(12, 50) j = 0.72 i + 0.24 j`,
   },
   // colon escaping in mat() cells (prevents named-argument parsing)
   {
@@ -3633,5 +3633,109 @@ x=4
     latex: String.raw`x_{a;b}`,
     typst: String.raw`x_(a\; b)`,
     typst_inline: String.raw`x_(a\; b)`,
+  },
+  // ── Bra-ket notation: bare | must NOT pair across ⟩ or [] ──
+  // |Ψ⟩ = frac[⟨↑↓⟩+⟨↓↑⟩] — bare pipes stay as symbols, \left|\right⟩ uses lr()
+  {
+    latex: String.raw`|\Psi\rangle=\frac{1}{\sqrt{2}}\left[\left|\uparrow_{1} \downarrow_{2}\right\rangle+\left|\downarrow_{1} \uparrow_{2}\right\rangle\right]=\frac{1}{\sqrt{2}}[|\uparrow \downarrow\rangle+|\downarrow \uparrow\rangle]`,
+    typst: String.raw`|Psi chevron.r = frac(1, sqrt(2)) lr([ lr(| arrow.t_1 arrow.b_2 chevron.r) + lr(| arrow.b_1 arrow.t_2 chevron.r) ]) = frac(1, sqrt(2)) [|arrow.t arrow.b chevron.r + |arrow.b arrow.t chevron.r]`,
+    typst_inline: String.raw`|Psi chevron.r = frac(1, sqrt(2)) lr([ lr(| arrow.t_1 arrow.b_2 chevron.r) + lr(| arrow.b_1 arrow.t_2 chevron.r) ]) = frac(1, sqrt(2)) [|arrow.t arrow.b chevron.r + |arrow.b arrow.t chevron.r]`,
+  },
+  // aligned with bare ket notation |H⟩, |V⟩
+  {
+    latex: String.raw`\begin{aligned} & |H\rangle=\frac{1}{\sqrt{2}}[|D\rangle+|A\rangle] \\ & |V\rangle=\frac{1}{\sqrt{2}}[|D\rangle-|A\rangle] \end{aligned}`,
+    typst: `&|H chevron.r = frac(1, sqrt(2)) [|D chevron.r + |A chevron.r] \\\n &|V chevron.r = frac(1, sqrt(2)) [|D chevron.r - |A chevron.r]`,
+    typst_inline: `&|H chevron.r = frac(1, sqrt(2)) [|D chevron.r + |A chevron.r] \\\n &|V chevron.r = frac(1, sqrt(2)) [|D chevron.r - |A chevron.r]`,
+  },
+  // array with H_+: / H_-: — colon must be space-escaped to prevent named-arg parsing
+  {
+    latex: String.raw`\begin{array}{ll} H_{+}: & \left(\frac{k+i(\alpha+a)}{k+i(\alpha+1)}\right) \widetilde{\phi}_{+}-\left(\frac{k+i(\alpha-1)}{k+i(\alpha-a)}\right) \widetilde{f}_{+}-\frac{\beta}{k+i(\alpha-a)}=0, \\ H_{-}: & \left(\frac{k+i(\alpha-1)}{k+i(\alpha-a)}\right) \widetilde{g}_{-}-\frac{\beta}{k+i(\alpha-a)}=0 . \end{array}`,
+    typst: `mat(delim: #none, align: #left, \n  H_+ :, lr(( frac(k + i(alpha + a), k + i(alpha + 1)) )) tilde(phi.alt)_+ - lr(( frac(k + i(alpha - 1), k + i(alpha - a)) )) tilde(f)_+ - frac(beta, k + i(alpha - a)) = 0\\,;\n  H_- :, lr(( frac(k + i(alpha - 1), k + i(alpha - a)) )) tilde(g)_- - frac(beta, k + i(alpha - a)) = 0 .,\n)`,
+    typst_inline: `mat(delim: #none, align: #left, \n  H_+ :, lr(( frac(k + i(alpha + a), k + i(alpha + 1)) )) tilde(phi.alt)_+ - lr(( frac(k + i(alpha - 1), k + i(alpha - a)) )) tilde(f)_+ - frac(beta, k + i(alpha - a)) = 0\\,;\n  H_- :, lr(( frac(k + i(alpha - 1), k + i(alpha - a)) )) tilde(g)_- - frac(beta, k + i(alpha - a)) = 0 .,\n)`,
+  },
+  // bordered array with sibling math — inline variant used to keep math flow
+  {
+    latex: String.raw`\begin{array}{|c|} \hline \lim _{x \rightarrow a} f(x)=\lim _{x \rightarrow a} h(x)=\ell \\ \text { et pour tout } x \text { de } I, \quad f(x) \leq g(x) \leq h(x) \end{array} \quad \Longrightarrow \quad \lim _{x \rightarrow a} g(x)=\ell`,
+    typst: `mat(delim: #none, \n  lim_(x arrow.r a) f(x) = lim_(x arrow.r a) h(x) = ell;\n  " et pour tout " x " de " I\\, quad f(x) lt.eq g(x) lt.eq h(x),\n) quad arrow.r.long.double quad lim_(x arrow.r a) g(x) = ell`,
+    typst_inline: `mat(delim: #none, \n  lim_(x arrow.r a) f(x) = lim_(x arrow.r a) h(x) = ell;\n  " et pour tout " x " de " I\\, quad f(x) lt.eq g(x) lt.eq h(x),\n) quad arrow.r.long.double quad lim_(x arrow.r a) g(x) = ell`,
+  },
+  // bare ket: |φ⟩ = frac(...)[|↑↓⟩-|↓↑⟩]
+  {
+    latex: String.raw`|\phi\rangle=\frac{1}{\sqrt{2}}[|\uparrow \downarrow\rangle-|\downarrow \uparrow\rangle]`,
+    typst: String.raw`|phi.alt chevron.r = frac(1, sqrt(2)) [|arrow.t arrow.b chevron.r - |arrow.b arrow.t chevron.r]`,
+    typst_inline: String.raw`|phi.alt chevron.r = frac(1, sqrt(2)) [|arrow.t arrow.b chevron.r - |arrow.b arrow.t chevron.r]`,
+  },
+  // mixed bra-ket: (⟨φ|B)|ψ⟩ = [⟨φ|(B|ψ⟩)]⋆
+  {
+    latex: String.raw`(\langle\phi| B)|\psi\rangle=[\langle\phi|(B|\psi\rangle)]^{\star}`,
+    typst: String.raw`(chevron.l phi.alt|B)|psi chevron.r = [chevron.l phi.alt|(B|psi chevron.r)]^(star)`,
+    typst_inline: String.raw`(chevron.l phi.alt|B)|psi chevron.r = [chevron.l phi.alt|(B|psi chevron.r)]^(star)`,
+  },
+  // ket with number states: |ψ⟩ = frac[|1⟩|0⟩ - |0⟩|1⟩]
+  {
+    latex: String.raw`|\psi\rangle=\frac{1}{\sqrt{2}}[|1\rangle|0\rangle-|0\rangle|1\rangle]`,
+    typst: String.raw`|psi chevron.r = frac(1, sqrt(2)) [|1 chevron.r|0 chevron.r - |0 chevron.r|1 chevron.r]`,
+    typst_inline: String.raw`|psi chevron.r = frac(1, sqrt(2)) [|1 chevron.r|0 chevron.r - |0 chevron.r|1 chevron.r]`,
+  },
+  // ket with underset/underbrace and |α|² absolute value
+  {
+    latex: String.raw`|\Psi\rangle \underset{\nu \rightarrow 0}{\approx}\left(1-|\alpha|^{2}\right)[|0\rangle+\alpha \underbrace{\left(|1\rangle_{p}|1\rangle_{-p}+e^{i \phi}|1\rangle_{q}|1\rangle_{-q}\right)}_{|\Phi\rangle}]`,
+    typst: String.raw`|Psi chevron.r limits(approx)_(nu arrow.r 0) lr(( 1 - |alpha|^2 )) [|0 chevron.r + alpha underbrace(lr(( |1 chevron.r_p|1 chevron.r_(- p) + e^(i phi.alt)|1 chevron.r_q|1 chevron.r_(- q) )), |Phi chevron.r)]`,
+    typst_inline: String.raw`|Psi chevron.r limits(approx)_(nu arrow.r 0) lr(( 1 - |alpha|^2 )) [|0 chevron.r + alpha underbrace(lr(( |1 chevron.r_p|1 chevron.r_(- p) + e^(i phi.alt)|1 chevron.r_q|1 chevron.r_(- q) )), |Phi chevron.r)]`,
+  },
+  // array H±: with wedge product — colon escaping after subscript
+  {
+    latex: String.raw`\begin{array}{ll} H_{+}: & F_{+}=\mathrm{d} A+A \wedge A=\mathrm{i} \lambda_{k} \frac{2}{a^{2}}\left(e^{\mathrm{o}} \wedge e^{k}+\frac{1}{2} \epsilon_{k i j} e^{i} \wedge e^{j}\right) \\ H_{-}: & F_{-}=\mathrm{d} A^{\prime}+A^{\prime} \wedge A^{\prime}=h F_{+} h^{-1} \end{array}`,
+    typst: `mat(delim: #none, align: #left, \n  H_+ :, F_+ = dif A + A and A = upright(i) lambda_k frac(2, a^2) lr(( e^(upright(o)) and e^k + frac(1, 2) epsilon.alt_(k i j) e^i and e^j ));\n  H_- :, F_- = dif A' + A' and A' = h F_+ h^(- 1),\n)`,
+    typst_inline: `mat(delim: #none, align: #left, \n  H_+ :, F_+ = dif A + A and A = upright(i) lambda_k frac(2, a^2) lr(( e^(upright(o)) and e^k + frac(1, 2) epsilon.alt_(k i j) e^i and e^j ));\n  H_- :, F_- = dif A' + A' and A' = h F_+ h^(- 1),\n)`,
+  },
+  // |Pr[|Q|≥t]| — inner |Q|, |R| pair correctly, outer | stays bare
+  {
+    latex: String.raw`|\operatorname{Pr}[|Q| \geq t]-\operatorname{Pr}[|R| \geq t]|=O\left(\frac{k^{-1 / p}}{1+t^{p+1}}+\frac{k^{-2 / p}}{1+t^{2}}+2^{-\Omega(k)}\right)`,
+    typst: String.raw`|Pr[lr(| Q |) gt.eq t] - Pr[lr(| R |) gt.eq t]| = O lr(( frac(k^(- 1\/ p), 1 + t^(p + 1)) + frac(k^(- 2\/ p), 1 + t^2) + 2^(- Omega (k)) ))`,
+    typst_inline: String.raw`|Pr[lr(| Q |) gt.eq t] - Pr[lr(| R |) gt.eq t]| = O lr(( frac(k^(- 1\/ p), 1 + t^(p + 1)) + frac(k^(- 2\/ p), 1 + t^2) + 2^(- Omega (k)) ))`,
+  },
+  // aligned with |E[|⟨Z,x⟩|]| and absolute value nesting
+  {
+    latex: String.raw`\begin{aligned} |E[|\langle Z, x\rangle|]-E[|\langle Y, x\rangle|]| & \leq E[| |\langle Z, x\rangle|-|\langle Y, x\rangle||] \\ & \leq E[|\langle Z-Y, x\rangle|] \\ & \leq \frac{n}{F} \end{aligned}`,
+    typst: `|E[lr(| chevron.l Z, x chevron.r |)] - E[lr(| chevron.l Y, x chevron.r |)]| &lt.eq E[|lr(| chevron.l Z, x chevron.r |) - lr(| chevron.l Y, x chevron.r |)|] \\\n &lt.eq E[lr(| chevron.l Z - Y, x chevron.r |)] \\\n &lt.eq frac(n, F)`,
+    typst_inline: `|E[lr(| chevron.l Z, x chevron.r |)] - E[lr(| chevron.l Y, x chevron.r |)]| &lt.eq E[|lr(| chevron.l Z, x chevron.r |) - lr(| chevron.l Y, x chevron.r |)|] \\\n &lt.eq E[lr(| chevron.l Z - Y, x chevron.r |)] \\\n &lt.eq frac(n, F)`,
+  },
+  // bordered array + gathered siblings — inline variant keeps math flow
+  {
+    latex: String.raw`\begin{array}{|l|} \hline \mathbf{E}_{\mathrm{L}}=\Delta \mathbf{m c}^{2} \\ \hline \end{array} \begin{gathered} \text { avec } \mathbf{E}_{\mathrm{L}} \text { énergie de liaison (J) } \\ \Delta \mathbf{m} \text { défaut de masse (kg) } \\ \mathbf{C} \text { vitesse de la lumière }\left(3.10^{8} \mathrm{~m} . \mathrm{s}^{-1}\right) \\ \mathbf{E}_{\mathrm{L}}=\Delta \mathbf{m} \times \mathbf{9 3 1 , 5} \quad \end{gathered} \begin{gathered} \mathbf{E}_{\mathrm{L}} \text { énergie de liaison (MeV) } \\ \Delta \mathbf{m} \text { défaut de masse (u) } \end{gathered}`,
+    typst: `mat(delim: #none, align: #left, upright(bold(E))_(upright(L)) = Delta upright(bold(m)) upright(bold(c))^2) " avec " upright(bold(E))_(upright(L)) " énergie de liaison (J) " \\\nDelta upright(bold(m)) " défaut de masse (kg) " \\\nupright(bold(C)) " vitesse de la lumière " lr(( 3.10^8 upright(m) . upright(s)^(- 1) )) \\\nupright(bold(E))_(upright(L)) = Delta upright(bold(m)) times bold(9) bold(3) bold(1), bold(5) quad upright(bold(E))_(upright(L)) " énergie de liaison (MeV) " \\\nDelta upright(bold(m)) " défaut de masse (u) "`,
+    typst_inline: `mat(delim: #none, align: #left, upright(bold(E))_(upright(L)) = Delta upright(bold(m)) upright(bold(c))^2) " avec " upright(bold(E))_(upright(L)) " énergie de liaison (J) " \\\nDelta upright(bold(m)) " défaut de masse (kg) " \\\nupright(bold(C)) " vitesse de la lumière " lr(( 3.10^8 upright(m) . upright(s)^(- 1) )) \\\nupright(bold(E))_(upright(L)) = Delta upright(bold(m)) times bold(9) bold(3) bold(1), bold(5) quad upright(bold(E))_(upright(L)) " énergie de liaison (MeV) " \\\nDelta upright(bold(m)) " défaut de masse (u) "`,
+  },
+  // \boxed inside \begin{aligned} — inline variant drops #align to keep math flow
+  {
+    latex: String.raw`\begin{aligned} \boxed{0_{\mu, \lambda}} & \leqslant \omega\left\{\text { n.t. } \limsup _{y \rightarrow \xi}\left|u_{f \omega}(y)-f(\xi)\right|>\lambda / 2\right\}+\omega\left\{\text { n.t. } \limsup _{y \rightarrow \xi}\left|u_{\nu}(y)-0\right|>\lambda / 2\right\} \\ & =0_{f \omega, \lambda / 2}+\omega\left\{\text { n.t. } \limsup _{y \rightarrow \xi}\left|u_{\nu}(y)-0\right|>\lambda / 2\right\} . \end{aligned}`,
+    typst: `0_(mu, lambda) &lt.eq.slant omega lr({ " n.t. " limsup_(y arrow.r xi) abs(u_(f omega) (y) - f(xi)) > lambda\\/ 2 }) + omega lr({ " n.t. " limsup_(y arrow.r xi) abs(u_(nu) (y) - 0) > lambda\\/ 2 }) \\\n &= 0_(f omega, lambda\\/ 2) + omega lr({ " n.t. " limsup_(y arrow.r xi) abs(u_(nu) (y) - 0) > lambda\\/ 2 }) .`,
+    typst_inline: `0_(mu, lambda) &lt.eq.slant omega lr({ " n.t. " limsup_(y arrow.r xi) abs(u_(f omega) (y) - f(xi)) > lambda\\/ 2 }) + omega lr({ " n.t. " limsup_(y arrow.r xi) abs(u_(nu) (y) - 0) > lambda\\/ 2 }) \\\n &= 0_(f omega, lambda\\/ 2) + omega lr({ " n.t. " limsup_(y arrow.r xi) abs(u_(nu) (y) - 0) > lambda\\/ 2 }) .`,
+  },
+  // ── Edge cases: trailing content block prevention ──
+  // frac(...) followed by [ — space prevents Typst trailing content block
+  {
+    latex: String.raw`\frac{1}{2}[x+y]`,
+    typst: String.raw`frac(1, 2) [x + y]`,
+    typst_inline: String.raw`frac(1, 2) [x + y]`,
+  },
+  // lr(...) followed by [ — space prevents trailing content block
+  {
+    latex: String.raw`\left(a+b\right)[c]`,
+    typst: String.raw`lr(( a + b )) [c]`,
+    typst_inline: String.raw`lr(( a + b )) [c]`,
+  },
+  // nested |x| inside \left|...\right| absolute value
+  {
+    latex: String.raw`\left|\{|x|\}\right|`,
+    typst: String.raw`abs(\{|x|\})`,
+    typst_inline: String.raw`abs(\{|x|\})`,
+  },
+  // mismatched \left|...\right] — escaped ] in lr()
+  {
+    latex: String.raw`\left|a\right] + b`,
+    typst: String.raw`lr(| a \]) + b`,
+    typst_inline: String.raw`lr(| a \]) + b`,
   },
 ];

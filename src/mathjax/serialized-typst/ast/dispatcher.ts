@@ -129,6 +129,19 @@ const handleAllAst = (node: MathNode, serialize: ITypstMathSerializer): TypstMat
   };
 };
 
+/** Check if a node (or its seq children) contains a code-mode function (#hash prefix).
+ *  Code-mode blocks like #align(center, box()) break math flow when placed
+ *  alongside other math content inside $ ... $. */
+const containsCodeModeFunc = (node: TypstMathNode): boolean => {
+  if (node.type === 'func' && node.hash) {
+    return true;
+  }
+  if (node.type === 'seq') {
+    return node.children.some(containsCodeModeFunc);
+  }
+  return false;
+};
+
 /**
  * Inferred mrow with pattern matching. Order matters:
  *
@@ -243,6 +256,22 @@ const visitInferredMrowAst = (node: MathNode, serialize: ITypstMathSerializer): 
     if (typeof console !== 'undefined') console.warn('[TypstConvert] inferred mrow error', e);
   }
   if (hasInlineDiff) {
+    // Code-mode blocks (#align, #box) with siblings disrupt math flow.
+    // Use inline variants to keep everything in math mode.
+    if (blockNodes.length > 1) {
+      let hasCodeModeBlock = false;
+      for (let i = 0; i < blockNodes.length; i++) {
+        if (blockNodes[i] !== inlineNodes[i] && containsCodeModeFunc(blockNodes[i])) {
+          hasCodeModeBlock = true;
+          break;
+        }
+      }
+      if (hasCodeModeBlock) {
+        return {
+          node: seq(inlineNodes),
+        };
+      }
+    }
     return {
       node: seq(blockNodes),
       nodeInline: seq(inlineNodes)

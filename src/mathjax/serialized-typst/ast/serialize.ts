@@ -198,6 +198,22 @@ const needsSeparator = (
       return true;
     }
   }
+  // Space before [ or { after a function call to prevent Typst trailing-content-block parsing.
+  // frac(1, 2)[x] → Typst parses [x] as body argument to frac, causing an error.
+  if (prevNode.type === TypstMathNodeType.FuncCall) {
+    const ch = next[0];
+    if (ch === '[' || ch === '{') {
+      return true;
+    }
+  }
+  // Space before [ or { after a delimited node (lr, abs, norm, etc.)
+  // lr(| x |)[y] → Typst parses [y] as body argument to lr.
+  if (prevNode.type === TypstMathNodeType.Delimited) {
+    const ch = next[0];
+    if (ch === '[' || ch === '{') {
+      return true;
+    }
+  }
   // Space before ( after multi-char identifier to prevent emptyset(i) → function call
   if (next[0] === '(' && RE_ALPHA_END.test(prev)) {
     const match = prev.match(RE_TRAILING_DOTTED_IDENT);
@@ -456,17 +472,29 @@ const formatScriptPart = (prefix: string, content: string): string => {
 };
 
 /** Build the set of ASCII bracket chars to escape inside lr() based on delimiters.
- *  Only the delimiter pair and its peer need escaping to prevent Typst auto-scaling. */
+ *  When delimiters are standard brackets, escape those and their peers.
+ *  When delimiters are non-bracket chars (|, ‖, ⟨, etc.), Typst still auto-scales
+ *  ALL unescaped brackets inside lr(), so we escape all ASCII bracket types. */
 const buildLrBracketChars = (openDelim: string, closeDelim: string): Set<string> => {
   const chars = new Set<string>();
+  let hasBracketDelim = false;
   for (const d of [openDelim, closeDelim]) {
     if (d && (d in OPEN_BRACKETS || d in CLOSE_BRACKETS)) {
+      hasBracketDelim = true;
       chars.add(d);
       const peer = OPEN_BRACKETS[d] ?? CLOSE_BRACKETS[d];
       if (peer) {
         chars.add(peer);
       }
     }
+  }
+  if (!hasBracketDelim && (openDelim || closeDelim)) {
+    chars.add('[');
+    chars.add(']');
+    chars.add('(');
+    chars.add(')');
+    chars.add('{');
+    chars.add('}');
   }
   return chars;
 };

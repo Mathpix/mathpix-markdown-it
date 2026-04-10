@@ -5,7 +5,7 @@
  * and backslash-escaped characters, applies escape/detection at depth 0.
  */
 
-import { RE_WORD_CHAR, RE_BRACKET_CHARS } from "./consts";
+import { RE_BRACKET_CHARS } from "./consts";
 import { scanBracketTokens, findUnpairedIndices, replaceUnpairedBrackets } from "./bracket-utils";
 
 const SEPARATOR_FOUND = 'found';
@@ -145,9 +145,11 @@ const scanExpression = (expr: string, opts: ScanOptions): string => {
         continue;
       }
       if (ch === ':' && escapeColon) {
-        // Check the preceding char in the source expression, not the transformed result,
-        // so other transformations cannot affect colon-spacing logic
-        if (i > 0 && RE_WORD_CHAR.test(expr[i - 1])) {
+        // Insert space before : to prevent Typst named-argument parsing.
+        // In mat() cells, H_+: or H_-: can be misinterpreted as named args
+        // even though + and - are not word chars. Always add space when
+        // preceded by any non-whitespace character.
+        if (i > 0 && expr[i - 1] !== ' ') {
           parts.push(' :');
         } else {
           parts.push(':');
