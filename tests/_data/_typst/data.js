@@ -3738,4 +3738,10 @@ x=4
     typst: String.raw`lr(| a \]) + b`,
     typst_inline: String.raw`lr(| a \]) + b`,
   },
+  // nested \Bigg[ \bigg( \Big( \big( — big delimiter nesting must track depth
+  {
+    latex: String.raw`\mathbb{E} \Bigg[ J_{harm}\bigg( \mathcal{R}\Big( P\big(\cdot \mid \tilde{x}, y_{<t}\big), \mathcal{H}_{eval} \Big) \bigg) \Bigg]`,
+    typst: String.raw`EE lr(size: #2.470em, [ J_(h a r m) (cal(R)(P(dot.op divides tilde(x), y_(< t)), cal(H)_(e v a l))) ])`,
+    typst_inline: String.raw`EE lr(size: #2.470em, [ J_(h a r m) (cal(R)(P(dot.op divides tilde(x), y_(< t)), cal(H)_(e v a l))) ])`,
+  },
 ];

@@ -240,9 +240,17 @@ export const tryBigDelimiterPattern = (
   }
   let closeIdx = -1;
   let closeInfo: BigDelimInfo | null = null;
+  let bigDepth = 0;
   for (let k = j + 1; k < node.childNodes.length; k++) {
     const candidate = getBigDelimInfo(node.childNodes[k]);
-    if (candidate && !candidate.isOpen) {
+    if (!candidate) {
+      continue;
+    }
+    if (candidate.isOpen) {
+      bigDepth++;
+    } else if (bigDepth > 0) {
+      bigDepth--;
+    } else {
       closeIdx = k;
       closeInfo = candidate;
       break;
