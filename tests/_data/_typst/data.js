@@ -1545,8 +1545,8 @@ module.exports = [
   // === Boxed ===
   {
     latex: `\\boxed{x=1}`,
-    typst: `#align(center, box(stroke: 0.5pt, inset: 3pt, $x = 1$))`,
-    typst_inline: `x = 1`,
+    typst: `#box(stroke: 0.5pt, inset: 3pt, $ x = 1 $)`,
+    typst_inline: `#box(stroke: 0.5pt, inset: 3pt, $ x = 1 $)`,
   },
 
   // === Big delimiters ===
@@ -1848,8 +1848,8 @@ module.exports = [
   // === Array lines (augment) ===
   {
     latex: `\\begin{array}{|c|c|} \\hline a & b \\\\ \\hline c & d \\\\ \\hline \\end{array}`,
-    typst: `#align(center, box(stroke: 0.5pt, inset: 3pt, $ mat(delim: #none, augment: #(hline: 1, vline: 1), \n  a, b;\n  c, d,\n) $))`,
-    typst_inline: `mat(delim: #none, augment: #(hline: 1, vline: 1), \n  a, b;\n  c, d,\n)`,
+    typst: `#box(stroke: 0.5pt, inset: 3pt, $ mat(delim: #none, augment: #(hline: 1, vline: 1), \n  a, b;\n  c, d,\n) $)`,
+    typst_inline: `#box(stroke: 0.5pt, inset: 3pt, $ mat(delim: #none, augment: #(hline: 1, vline: 1), \n  a, b;\n  c, d,\n) $)`,
   },
   {
     latex: `\\begin{array}{c|c} a & b \\\\ c & d \\end{array}`,
@@ -2402,8 +2402,8 @@ module.exports = [
   // === enclose{circle} ===
   {
     latex: `\\enclose{circle}{x+y}`,
-    typst: `#align(center, circle(inset: 3pt, $x + y$))`,
-    typst_inline: `x + y`,
+    typst: `#ellipse(inset: 3pt, align(center + horizon, $ x + y $))`,
+    typst_inline: `#ellipse(inset: 3pt, align(center + horizon, $ x + y $))`,
   },
   {
     latex: `\\enclose{radical}{x+y}`,
@@ -3392,42 +3392,42 @@ x=4
   { latex: String.raw`x \lessapprox y`, typst: `x lt.approx y`, typst_inline: `x lt.approx y` },
   // \gtrapprox → gt.approx
   { latex: String.raw`x \gtrapprox y`, typst: `x gt.approx y`, typst_inline: `x gt.approx y` },
-  // === #align(center, box()) for block mode ===
-  // \boxed with aligned content — block uses #align(center, box()), inline strips box
+  // === #box() for block mode ===
+  // \boxed with aligned content — block uses #box(), inline strips box
   {
     latex: String.raw`\boxed{\begin{aligned} x &= 1 \\ y &= 2 \end{aligned}}`,
-    typst: `#align(center, box(stroke: 0.5pt, inset: 3pt, $x &= 1 \\\ny &= 2$))`,
-    typst_inline: `x &= 1 \\\ny &= 2`,
+    typst: `#box(stroke: 0.5pt, inset: 3pt, $ x &= 1 \\\ny &= 2 $)`,
+    typst_inline: `#box(stroke: 0.5pt, inset: 3pt, $ x &= 1 \\\ny &= 2 $)`,
   },
-  // array with \hline frame → #align(center, box()) in block, plain mat() inline
+  // array with \hline frame → #box() in block, plain mat() inline
   {
     latex: String.raw`\begin{array}{|l|}\hline O_{\text {driehoek }}=\frac{1}{2} b h \\O_{\text {parallellogram }}=b h \\O_{\text {trapezium }}=\frac{1}{2}(a+b) h \\O_{\text {cirkel }}=\pi r^{2} \\\hline\end{array}`,
-    typst: `#align(center, box(stroke: 0.5pt, inset: 3pt, $ mat(delim: #none, align: #left, \n  O_("driehoek ") = frac(1, 2) b h;\n  O_("parallellogram ") = b h;\n  O_("trapezium ") = frac(1, 2)(a + b) h;\n  O_("cirkel ") = pi r^2,\n) $))`,
-    typst_inline: `mat(delim: #none, align: #left, \n  O_("driehoek ") = frac(1, 2) b h;\n  O_("parallellogram ") = b h;\n  O_("trapezium ") = frac(1, 2)(a + b) h;\n  O_("cirkel ") = pi r^2,\n)`,
+    typst: `#box(stroke: 0.5pt, inset: 3pt, $ mat(delim: #none, align: #left, \n  O_("driehoek ") = frac(1, 2) b h;\n  O_("parallellogram ") = b h;\n  O_("trapezium ") = frac(1, 2)(a + b) h;\n  O_("cirkel ") = pi r^2,\n) $)`,
+    typst_inline: `#box(stroke: 0.5pt, inset: 3pt, $ mat(delim: #none, align: #left, \n  O_("driehoek ") = frac(1, 2) b h;\n  O_("parallellogram ") = b h;\n  O_("trapezium ") = frac(1, 2)(a + b) h;\n  O_("cirkel ") = pi r^2,\n) $)`,
   },
   // array with {|l|} and \hline at top only → selective box stroke (no bottom)
   {
     latex: String.raw`\begin{array}{|l|} \hline \text { Le }^{[116]} \\ \text { glash }^{[117]} \end{array}`,
-    typst: `#align(center, box(stroke: (top: 0.5pt, bottom: 0pt, left: 0.5pt, right: 0.5pt), inset: 3pt, $ mat(delim: #none, align: #left, \n  " Le "^([116]);\n  " glash "^([117]),\n) $))`,
-    typst_inline: `mat(delim: #none, align: #left, \n  " Le "^([116]);\n  " glash "^([117]),\n)`,
+    typst: `#box(stroke: (top: 0.5pt, bottom: 0pt, left: 0.5pt, right: 0.5pt), inset: 3pt, $ mat(delim: #none, align: #left, \n  " Le "^([116]);\n  " glash "^([117]),\n) $)`,
+    typst_inline: `#box(stroke: (top: 0.5pt, bottom: 0pt, left: 0.5pt, right: 0.5pt), inset: 3pt, $ mat(delim: #none, align: #left, \n  " Le "^([116]);\n  " glash "^([117]),\n) $)`,
   },
   // array with {|l|} and no hlines → box with left+right strokes only
   {
     latex: String.raw`\begin{array}{|l|} \text { Le }^{[116]} \\ \text { glash }^{[117]} \end{array}`,
-    typst: `#align(center, box(stroke: (top: 0pt, bottom: 0pt, left: 0.5pt, right: 0.5pt), inset: 3pt, $ mat(delim: #none, align: #left, \n  " Le "^([116]);\n  " glash "^([117]),\n) $))`,
-    typst_inline: `mat(delim: #none, align: #left, \n  " Le "^([116]);\n  " glash "^([117]),\n)`,
+    typst: `#box(stroke: (top: 0pt, bottom: 0pt, left: 0.5pt, right: 0.5pt), inset: 3pt, $ mat(delim: #none, align: #left, \n  " Le "^([116]);\n  " glash "^([117]),\n) $)`,
+    typst_inline: `#box(stroke: (top: 0pt, bottom: 0pt, left: 0.5pt, right: 0.5pt), inset: 3pt, $ mat(delim: #none, align: #left, \n  " Le "^([116]);\n  " glash "^([117]),\n) $)`,
   },
   // array with {|l|} and \hline at bottom only → selective box stroke (no top)
   {
     latex: String.raw`\begin{array}{|l|} \text { Le }^{[116]} \\ \text { glash }^{[117]} \\ \hline \end{array}`,
-    typst: `#align(center, box(stroke: (top: 0pt, bottom: 0.5pt, left: 0.5pt, right: 0.5pt), inset: 3pt, $ mat(delim: #none, align: #left, \n  " Le "^([116]);\n  " glash "^([117]),\n) $))`,
-    typst_inline: `mat(delim: #none, align: #left, \n  " Le "^([116]);\n  " glash "^([117]),\n)`,
+    typst: `#box(stroke: (top: 0pt, bottom: 0.5pt, left: 0.5pt, right: 0.5pt), inset: 3pt, $ mat(delim: #none, align: #left, \n  " Le "^([116]);\n  " glash "^([117]),\n) $)`,
+    typst_inline: `#box(stroke: (top: 0pt, bottom: 0.5pt, left: 0.5pt, right: 0.5pt), inset: 3pt, $ mat(delim: #none, align: #left, \n  " Le "^([116]);\n  " glash "^([117]),\n) $)`,
   },
   // array with more column-spec columns than actual data cells — vline indices must be capped
   {
     latex: String.raw`\begin{array}{|l|l|l|l|l|}\hline & & \\\hline\end{array}`,
-    typst: `#align(center, box(stroke: 0.5pt, inset: 3pt, $ mat(delim: #none, align: #left, augment: #(vline: (1, 2)), , ,) $))`,
-    typst_inline: `mat(delim: #none, align: #left, augment: #(vline: (1, 2)), , ,)`,
+    typst: `#box(stroke: 0.5pt, inset: 3pt, $ mat(delim: #none, align: #left, augment: #(vline: (1, 2)), , ,) $)`,
+    typst_inline: `#box(stroke: 0.5pt, inset: 3pt, $ mat(delim: #none, align: #left, augment: #(vline: (1, 2)), , ,) $)`,
   },
   // bare ‖…‖ delimiter: space between scripted node and ( inside norm()
   {
@@ -3441,8 +3441,8 @@ x=4
   // are present in typst but stripped in typst_inline.
   {
     latex: `\\boxed{a+b}`,
-    typst: `#align(center, box(stroke: 0.5pt, inset: 3pt, $a + b$))`,
-    typst_inline: `a + b`,
+    typst: `#box(stroke: 0.5pt, inset: 3pt, $ a + b $)`,
+    typst_inline: `#box(stroke: 0.5pt, inset: 3pt, $ a + b $)`,
   },
   {
     latex: `\\colorbox{yellow}{x}`,
@@ -3656,8 +3656,8 @@ x=4
   // bordered array with sibling math — inline variant used to keep math flow
   {
     latex: String.raw`\begin{array}{|c|} \hline \lim _{x \rightarrow a} f(x)=\lim _{x \rightarrow a} h(x)=\ell \\ \text { et pour tout } x \text { de } I, \quad f(x) \leq g(x) \leq h(x) \end{array} \quad \Longrightarrow \quad \lim _{x \rightarrow a} g(x)=\ell`,
-    typst: `mat(delim: #none, \n  lim_(x arrow.r a) f(x) = lim_(x arrow.r a) h(x) = ell;\n  " et pour tout " x " de " I\\, quad f(x) lt.eq g(x) lt.eq h(x),\n) quad arrow.r.long.double quad lim_(x arrow.r a) g(x) = ell`,
-    typst_inline: `mat(delim: #none, \n  lim_(x arrow.r a) f(x) = lim_(x arrow.r a) h(x) = ell;\n  " et pour tout " x " de " I\\, quad f(x) lt.eq g(x) lt.eq h(x),\n) quad arrow.r.long.double quad lim_(x arrow.r a) g(x) = ell`,
+    typst: `#box(stroke: (top: 0.5pt, bottom: 0pt, left: 0.5pt, right: 0.5pt), inset: 3pt, $ mat(delim: #none, \n  lim_(x arrow.r a) f(x) = lim_(x arrow.r a) h(x) = ell;\n  " et pour tout " x " de " I\\, quad f(x) lt.eq g(x) lt.eq h(x),\n) $) quad arrow.r.long.double quad lim_(x arrow.r a) g(x) = ell`,
+    typst_inline: `#box(stroke: (top: 0.5pt, bottom: 0pt, left: 0.5pt, right: 0.5pt), inset: 3pt, $ mat(delim: #none, \n  lim_(x arrow.r a) f(x) = lim_(x arrow.r a) h(x) = ell;\n  " et pour tout " x " de " I\\, quad f(x) lt.eq g(x) lt.eq h(x),\n) $) quad arrow.r.long.double quad lim_(x arrow.r a) g(x) = ell`,
   },
   // bare ket: |φ⟩ = frac(...)[|↑↓⟩-|↓↑⟩]
   {
@@ -3701,17 +3701,17 @@ x=4
     typst: `|E[lr(| chevron.l Z, x chevron.r |)] - E[lr(| chevron.l Y, x chevron.r |)]| &lt.eq E[|lr(| chevron.l Z, x chevron.r |) - lr(| chevron.l Y, x chevron.r |)|] \\\n &lt.eq E[lr(| chevron.l Z - Y, x chevron.r |)] \\\n &lt.eq frac(n, F)`,
     typst_inline: `|E[lr(| chevron.l Z, x chevron.r |)] - E[lr(| chevron.l Y, x chevron.r |)]| &lt.eq E[|lr(| chevron.l Z, x chevron.r |) - lr(| chevron.l Y, x chevron.r |)|] \\\n &lt.eq E[lr(| chevron.l Z - Y, x chevron.r |)] \\\n &lt.eq frac(n, F)`,
   },
-  // bordered array + gathered siblings — inline variant keeps math flow
+  // bordered array + gathered siblings — #box preserves frame in math flow
   {
     latex: String.raw`\begin{array}{|l|} \hline \mathbf{E}_{\mathrm{L}}=\Delta \mathbf{m c}^{2} \\ \hline \end{array} \begin{gathered} \text { avec } \mathbf{E}_{\mathrm{L}} \text { énergie de liaison (J) } \\ \Delta \mathbf{m} \text { défaut de masse (kg) } \\ \mathbf{C} \text { vitesse de la lumière }\left(3.10^{8} \mathrm{~m} . \mathrm{s}^{-1}\right) \\ \mathbf{E}_{\mathrm{L}}=\Delta \mathbf{m} \times \mathbf{9 3 1 , 5} \quad \end{gathered} \begin{gathered} \mathbf{E}_{\mathrm{L}} \text { énergie de liaison (MeV) } \\ \Delta \mathbf{m} \text { défaut de masse (u) } \end{gathered}`,
-    typst: `mat(delim: #none, align: #left, upright(bold(E))_(upright(L)) = Delta upright(bold(m)) upright(bold(c))^2) " avec " upright(bold(E))_(upright(L)) " énergie de liaison (J) " \\\nDelta upright(bold(m)) " défaut de masse (kg) " \\\nupright(bold(C)) " vitesse de la lumière " lr(( 3.10^8 upright(m) . upright(s)^(- 1) )) \\\nupright(bold(E))_(upright(L)) = Delta upright(bold(m)) times bold(9) bold(3) bold(1), bold(5) quad upright(bold(E))_(upright(L)) " énergie de liaison (MeV) " \\\nDelta upright(bold(m)) " défaut de masse (u) "`,
-    typst_inline: `mat(delim: #none, align: #left, upright(bold(E))_(upright(L)) = Delta upright(bold(m)) upright(bold(c))^2) " avec " upright(bold(E))_(upright(L)) " énergie de liaison (J) " \\\nDelta upright(bold(m)) " défaut de masse (kg) " \\\nupright(bold(C)) " vitesse de la lumière " lr(( 3.10^8 upright(m) . upright(s)^(- 1) )) \\\nupright(bold(E))_(upright(L)) = Delta upright(bold(m)) times bold(9) bold(3) bold(1), bold(5) quad upright(bold(E))_(upright(L)) " énergie de liaison (MeV) " \\\nDelta upright(bold(m)) " défaut de masse (u) "`,
+    typst: `#box(stroke: 0.5pt, inset: 3pt, $ mat(delim: #none, align: #left, upright(bold(E))_(upright(L)) = Delta upright(bold(m)) upright(bold(c))^2) $) " avec " upright(bold(E))_(upright(L)) " énergie de liaison (J) " \\\nDelta upright(bold(m)) " défaut de masse (kg) " \\\nupright(bold(C)) " vitesse de la lumière " lr(( 3.10^8 upright(m) . upright(s)^(- 1) )) \\\nupright(bold(E))_(upright(L)) = Delta upright(bold(m)) times bold(9) bold(3) bold(1), bold(5) quad upright(bold(E))_(upright(L)) " énergie de liaison (MeV) " \\\nDelta upright(bold(m)) " défaut de masse (u) "`,
+    typst_inline: `#box(stroke: 0.5pt, inset: 3pt, $ mat(delim: #none, align: #left, upright(bold(E))_(upright(L)) = Delta upright(bold(m)) upright(bold(c))^2) $) " avec " upright(bold(E))_(upright(L)) " énergie de liaison (J) " \\\nDelta upright(bold(m)) " défaut de masse (kg) " \\\nupright(bold(C)) " vitesse de la lumière " lr(( 3.10^8 upright(m) . upright(s)^(- 1) )) \\\nupright(bold(E))_(upright(L)) = Delta upright(bold(m)) times bold(9) bold(3) bold(1), bold(5) quad upright(bold(E))_(upright(L)) " énergie de liaison (MeV) " \\\nDelta upright(bold(m)) " défaut de masse (u) "`,
   },
-  // \boxed inside \begin{aligned} — inline variant drops #align to keep math flow
+  // \boxed inside \begin{aligned} — #box preserves frame in math flow
   {
     latex: String.raw`\begin{aligned} \boxed{0_{\mu, \lambda}} & \leqslant \omega\left\{\text { n.t. } \limsup _{y \rightarrow \xi}\left|u_{f \omega}(y)-f(\xi)\right|>\lambda / 2\right\}+\omega\left\{\text { n.t. } \limsup _{y \rightarrow \xi}\left|u_{\nu}(y)-0\right|>\lambda / 2\right\} \\ & =0_{f \omega, \lambda / 2}+\omega\left\{\text { n.t. } \limsup _{y \rightarrow \xi}\left|u_{\nu}(y)-0\right|>\lambda / 2\right\} . \end{aligned}`,
-    typst: `0_(mu, lambda) &lt.eq.slant omega lr({ " n.t. " limsup_(y arrow.r xi) abs(u_(f omega) (y) - f(xi)) > lambda\\/ 2 }) + omega lr({ " n.t. " limsup_(y arrow.r xi) abs(u_(nu) (y) - 0) > lambda\\/ 2 }) \\\n &= 0_(f omega, lambda\\/ 2) + omega lr({ " n.t. " limsup_(y arrow.r xi) abs(u_(nu) (y) - 0) > lambda\\/ 2 }) .`,
-    typst_inline: `0_(mu, lambda) &lt.eq.slant omega lr({ " n.t. " limsup_(y arrow.r xi) abs(u_(f omega) (y) - f(xi)) > lambda\\/ 2 }) + omega lr({ " n.t. " limsup_(y arrow.r xi) abs(u_(nu) (y) - 0) > lambda\\/ 2 }) \\\n &= 0_(f omega, lambda\\/ 2) + omega lr({ " n.t. " limsup_(y arrow.r xi) abs(u_(nu) (y) - 0) > lambda\\/ 2 }) .`,
+    typst: `#box(stroke: 0.5pt, inset: 3pt, $ 0_(mu, lambda) $) &lt.eq.slant omega lr({ " n.t. " limsup_(y arrow.r xi) abs(u_(f omega) (y) - f(xi)) > lambda\\/ 2 }) + omega lr({ " n.t. " limsup_(y arrow.r xi) abs(u_(nu) (y) - 0) > lambda\\/ 2 }) \\\n &= 0_(f omega, lambda\\/ 2) + omega lr({ " n.t. " limsup_(y arrow.r xi) abs(u_(nu) (y) - 0) > lambda\\/ 2 }) .`,
+    typst_inline: `#box(stroke: 0.5pt, inset: 3pt, $ 0_(mu, lambda) $) &lt.eq.slant omega lr({ " n.t. " limsup_(y arrow.r xi) abs(u_(f omega) (y) - f(xi)) > lambda\\/ 2 }) + omega lr({ " n.t. " limsup_(y arrow.r xi) abs(u_(nu) (y) - 0) > lambda\\/ 2 }) \\\n &= 0_(f omega, lambda\\/ 2) + omega lr({ " n.t. " limsup_(y arrow.r xi) abs(u_(nu) (y) - 0) > lambda\\/ 2 }) .`,
   },
   // ── Edge cases: trailing content block prevention ──
   // frac(...) followed by [ — space prevents Typst trailing content block
@@ -3749,5 +3749,23 @@ x=4
     latex: String.raw`{ }^{\mathrm{c}} \mathrm{Aṭa} \mathrm{a}^{\mathrm{a}}`,
     typst: String.raw`""^(upright(c)) upright(A) upright("ṭ") upright(a) upright(a)^(upright(a))`,
     typst_inline: String.raw`""^(upright(c)) upright(A) upright("ṭ") upright(a) upright(a)^(upright(a))`,
+  },
+  // \boxed with superscript — scripts attach to inline #box atom (regression guard)
+  {
+    latex: String.raw`\boxed{a}^2`,
+    typst: String.raw`#box(stroke: 0.5pt, inset: 3pt, $ a $)^2`,
+    typst_inline: String.raw`#box(stroke: 0.5pt, inset: 3pt, $ a $)^2`,
+  },
+  // \boxed with subscript
+  {
+    latex: String.raw`\boxed{a}_2`,
+    typst: String.raw`#box(stroke: 0.5pt, inset: 3pt, $ a $)_2`,
+    typst_inline: String.raw`#box(stroke: 0.5pt, inset: 3pt, $ a $)_2`,
+  },
+  // \boxed with sub+sup
+  {
+    latex: String.raw`\boxed{a}_i^2`,
+    typst: String.raw`#box(stroke: 0.5pt, inset: 3pt, $ a $)_i^2`,
+    typst_inline: String.raw`#box(stroke: 0.5pt, inset: 3pt, $ a $)_i^2`,
   },
 ];

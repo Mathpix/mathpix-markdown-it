@@ -4,7 +4,7 @@ import { TypstMathNode, TypstMathResult, ITypstMathSerializer, AstHandlerFn, ast
 import { seq, symbol, funcCall, posArg, mathVal } from './builders';
 import { serializeTypstMath } from './serialize';
 import { isNegationOverlay } from '../common';
-import { TEX_ATOM } from '../consts';
+import { TEX_ATOM, BLOCK_CODE_FUNCS } from '../consts';
 import { getCustomCmdTypst } from '../../custom-cmd-map';
 import {
   tryBigDelimiterPattern, tryBareDelimiterPattern, tryIdotsintPattern,
@@ -129,15 +129,15 @@ const handleAllAst = (node: MathNode, serialize: ITypstMathSerializer): TypstMat
   };
 };
 
-/** Check if a node (or its seq children) contains a code-mode function (#hash prefix).
- *  Code-mode blocks like #align(center, box()) break math flow when placed
- *  alongside other math content inside $ ... $. */
-const containsCodeModeFunc = (node: TypstMathNode): boolean => {
-  if (node.type === 'func' && node.hash) {
+/** Check if a node contains a block-level code-mode function (#align, #grid, etc.).
+ *  Only recurses into SeqNode children — does NOT inspect FuncCall.args or
+ *  Delimited.body. Sufficient for current emission patterns. */
+const containsBlockCodeFunc = (node: TypstMathNode): boolean => {
+  if (node.type === 'func' && node.hash && BLOCK_CODE_FUNCS.has(node.name)) {
     return true;
   }
   if (node.type === 'seq') {
-    return node.children.some(containsCodeModeFunc);
+    return node.children.some(containsBlockCodeFunc);
   }
   return false;
 };
@@ -256,12 +256,13 @@ const visitInferredMrowAst = (node: MathNode, serialize: ITypstMathSerializer): 
     if (typeof console !== 'undefined') console.warn('[TypstConvert] inferred mrow error', e);
   }
   if (hasInlineDiff) {
-    // Code-mode blocks (#align, #box) with siblings disrupt math flow.
-    // Use inline variants to keep everything in math mode.
+    // Block-level code-mode funcs (#align, #grid, #math.equation) with siblings
+    // disrupt math flow. Use inline variants to keep everything in math mode.
+    // Inline #box/#circle/#text/#highlight/#hide are safe and do NOT trigger this.
     if (blockNodes.length > 1) {
       let hasCodeModeBlock = false;
       for (let i = 0; i < blockNodes.length; i++) {
-        if (blockNodes[i] !== inlineNodes[i] && containsCodeModeFunc(blockNodes[i])) {
+        if (blockNodes[i] !== inlineNodes[i] && containsBlockCodeFunc(blockNodes[i])) {
           hasCodeModeBlock = true;
           break;
         }

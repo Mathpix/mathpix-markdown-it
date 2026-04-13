@@ -113,6 +113,16 @@ export declare const TYPST_BUILTIN_OPS: ReadonlySet<string>;
 /** Typst box styling constants for \boxed, \fbox, \circle, bordered arrays. */
 export declare const BOX_STROKE = "0.5pt";
 export declare const BOX_INSET = "3pt";
+/** Block-level code-mode function names — break math flow when placed
+ *  alongside other math in $...$. Inline #box/#circle/#text/#highlight/#hide
+ *  are safe and NOT listed here.
+ *
+ *  Currently emitted (as funcCall(name, ..., { hash: true })):
+ *   - 'math.equation' — tagged equations (table-builders.ts)
+ *   - 'grid' — numcases / subnumcases (table-builders.ts)
+ *
+ *  EXTEND when emitting a new block-level funcCall(name, ..., { hash: true }). */
+export declare const BLOCK_CODE_FUNCS: ReadonlySet<string>;
 /** Typst escaped-delimiter output for unpaired brackets (math-mode safe) */
 export declare const UNPAIRED_BRACKET_TYPST: Readonly<Record<string, string>>;
 /** Typst symbol-name output for unpaired brackets inside mat() cells.

@@ -18,7 +18,7 @@ This PR introduces a typed AST with centralized escaping to eliminate these bug 
 1. Introduce a typed intermediate representation (`TypstMathNode`) between MathML tree traversal and Typst string output
 2. Migrate all 22 handlers to return AST nodes instead of strings
 3. Centralize all escaping in a single serializer with a context registry
-4. Maintain 100% output compatibility: all 924 tests pass
+4. Maintain 100% output compatibility: all 937 tests pass
 5. Eliminate escaping-related bug classes at the architectural level
 
 ---
@@ -89,17 +89,17 @@ Builder options extracted as named interfaces extending Node interfaces:
 | MatrixCell | Same but [] → bracket.l/bracket.r | mat, cases |
 | Wrapper | Standard + () → "("/")" | cancel, overline, underline, sqrt, root, overbrace, underbrace, accent, hat, tilde, etc. |
 | StringArg | \\ → \\\\\\ " → \\" | op |
-| LrContent | ; → \\; : → word : + delimiter brackets | lr (via serializeDelimited) |
+| LrContent | ; → \\; : → space before : (after any non-space char); delimiter brackets escaped; for non-bracket delimiters (\|, ‖, ⟨) all ASCII brackets () [] {} escaped | lr (via serializeDelimited) |
 
 ### AST dispatcher (7 patterns, order matters)
 
-1. **Big delimiters** — before bare: \bigl( is TeXAtom(sized mo), not a bare mo
-2. **Bare delimiters** — before normal mo: groups |..|→lr(), ⌈⌉→ceil() for correct subscript attachment
-3. **\idotsint** — ∫⋯∫ with scripts merged into lr() with shared scripts
-4. **Thousand separators** — before comma becomes operator: 1,000→1\,000
-5. **Combining chains** — consecutive non-Latin mi→text("merged")
+1. **Big delimiters** — before bare: `\bigl(` is TeXAtom(sized mo), not a bare mo. Tracks nesting depth to pair `\Bigg[...\Bigg]` correctly across inner `\bigg(...\bigg)` pairs.
+2. **Bare delimiters** — before normal mo: groups `|..|`→`lr()`, `⌈⌉`→`ceil()` for correct subscript attachment. Validates fence balance across ALL bracket types: `()`, `{}`, `[]`, `⟨⟩`, `⌊⌋`, `⌈⌉` (skips brackets marked as unpaired by `markUnpairedBrackets`). `DOUBLE_VERT` rejection rule extracted to `isDoubleVertContentValid` helper.
+3. **\idotsint** — `∫⋯∫` with scripts merged into `lr()` with shared scripts
+4. **Thousand separators** — before comma becomes operator: `1,000`→`1\,000`
+5. **Combining chains** — consecutive non-Latin mi→`text("merged")`. Individual characters with NFD-decomposing combining marks (ṭ, é, ç, ö, č, ά) are separately wrapped in `text()` by `miAst` via `hasCombiningMarks` — prevents Typst "yielded more than one glyph" errors.
 6. **Tagged eqnArray** — consumes all remaining siblings (pre/post content)
-7. **\not overlay** — wraps next sibling in cancel()
+7. **\not overlay** — wraps next sibling in `cancel()`
 
 ### Bracket pairing (`markUnpairedBrackets`)
 
@@ -167,6 +167,37 @@ The single remaining `raw()` is a static constant: `#counter(math.equation).upda
 - **Per-cell bracket scoping**: `mtr`/`mlabeledtr` added to SCOPE_BOUNDARIES — brackets in different table cells cannot pair, preventing orphaned brackets in aligned/eqnarray cross-row output
 - **mstyle scope boundary**: prevents hidden `mo(")") ` inside `\Varangle` from breaking outer bracket pairing
 - **Opening bracket as script base**: `[^{\circ}` → `[""^(compose)` — separates bracket from superscript to prevent Typst auto-matching error
+- **Bare delimiter fence balance (all bracket types)**: `tryBareDelimiterPattern` now validates balance of `()`, `{}`, `[]`, `⟨⟩`, `⌊⌋`, `⌈⌉` independently (previously only `()` and `{}`). Brackets marked as unpaired by `markUnpairedBrackets` are skipped. Prevents bra-ket `|\psi\rangle=...[|\uparrow\downarrow\rangle]` from wrongly pairing the first `|` with a distant `|` across an unmatched `⟩` or `[`.
+- **Big delimiter nesting depth**: `tryBigDelimiterPattern` tracks open/close depth so `\Bigg[ \bigg( ... \bigg) \Bigg]` pairs `\Bigg[` with `\Bigg]`, not the nearest `\big)`.
+
+### Typst formatting safety (`needsSeparator` in `serialize.ts`)
+Guards against Typst parser ambiguities that previously produced broken output:
+- **Space before `[`/`{` after FuncCall/Delimited**: prevents trailing-content-block parsing. `frac(1, 2)[x]` would be parsed as `frac` with body `[x]` — add space: `frac(1, 2) [x]`. Same for `lr(( a + b )) [c]`.
+- **Space before `(` after code-mode (`#hash`) FuncCall**: prevents chained-call parsing in code mode. `#box(stroke: ..., $ G $)(s)` would call the box result with `(s)` — add space: `#box(...) (s)`. Math-mode calls like `frac(1, 2)(x)` are left as-is.
+- **Space before `:` after any non-space char**: broadened from "word chars only". `H_+:` in `mat()` cells has `+` before `:` — still needs space to prevent named-argument parsing by Typst.
+
+### Boxed/circle/border simplification
+
+**Problem:** `\boxed{}`, `\enclose{circle}`, bordered arrays, `frame=solid` matrices previously emitted `#align(center, box/circle(...))` as the block variant with raw content as the inline variant. This caused:
+1. `#align(center, ...)` is block-level — breaks math flow when placed alongside other math (`\boxed{z}^T \boxed{z}`)
+2. Subscript/superscript on a block-level atom is ill-defined
+3. `typst_inline` dropped the frame entirely
+
+**Fix:**
+- `\boxed{}` → `#box(stroke: ..., inset: ..., $ content $)` — inline-safe
+- `\enclose{circle}` → `#ellipse(inset: ..., align(center + horizon, $ content $))` — uses `#ellipse()` for visual parity with MathJax (which stretches the circle to content width). `#circle()` would enforce 1:1 aspect ratio producing oversized frames for long content. Neither shape auto-centers content; explicit `align(center + horizon, ...)` is required.
+- Bordered arrays and `frame=solid` use `#box()` without `#align()`
+- `typst_inline` is identical to `typst` — frame preserved in inline variant since `#box()` / `#ellipse()` are inline-safe
+- Always uses `$ content $` (display math) inside the box — inline `$content$` breaks multi-line `&`/`\\` alignment
+- No `baseline` parameter — Typst's default layout handles display centering naturally
+
+### Block-level code-mode func guard
+
+`BLOCK_CODE_FUNCS` set in `consts.ts`: `{math.equation, grid}`. Inline code-mode functions (`#box`, `#ellipse`, `#circle`, `#text`, `#highlight`, `#hide`) are safe in any math context and NOT in the set.
+
+`containsBlockCodeFunc` (`dispatcher.ts`) and `hasBlockCodeFunc` (`table-handlers.ts`) detect when block-level funcs appear with siblings and switch to inline variants. Recursion scope: SeqNode children only — does not inspect `FuncCall.args` or `Delimited.body` (sufficient for current emission patterns).
+
+EXTEND the set when adding a new block-level `funcCall(name, ..., { hash: true })` — otherwise guards will miss it and math flow may silently break.
 
 ### Code cleanup
 - Deduplicated `COMBINING_FONT_MAP` → use `typstFontMap` from single source
@@ -185,7 +216,7 @@ The single remaining `raw()` is a static constant: `#counter(math.equation).upda
 
 ## Constraints / Invariants
 
-1. **All 924 tests pass.** Output verified at each step.
+1. **All 937 tests pass.** Output verified at each step.
 2. **Escaping is serializer-only.** No handler calls escape functions directly.
 3. **Typed discriminants.** All node type, arg value, and func arg comparisons use const enums.
 4. **Public API preserved.** `ITypstData` remains the external interface.
@@ -195,7 +226,7 @@ The single remaining `raw()` is a static constant: `#counter(math.equation).upda
 
 ## Observability
 
-- All 924 tests verified at each step
+- All 937 tests verified at each step
 - TypeScript strict mode — zero `any` types in AST handlers
 - console.warn on handler errors (previously silently swallowed)
 
@@ -213,5 +244,5 @@ The single remaining `raw()` is a static constant: `#counter(math.equation).upda
 - [x] Bare `\{`/`\}` correctly escaped, chevron nesting tracked
 - [x] Opening bracket separated from script base
 - [x] Dead code removed, files split, types unified
-- [x] All 924 tests pass
+- [x] All 937 tests pass
 - [x] `Status` updated to `Implemented`

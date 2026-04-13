@@ -1,5 +1,5 @@
 import { MathNode } from "../types";
-import { MLABELEDTR } from "../consts";
+import { MLABELEDTR, BLOCK_CODE_FUNCS } from "../consts";
 import { getProp, getContentChildren } from "../common";
 import { TypstMathNode, TypstMathResult, FuncArg, ITypstMathSerializer, astNodeStore } from "./types";
 import {
@@ -15,14 +15,14 @@ import {
   buildUntaggedEqnArrayResult, buildMatrixResult,
 } from "./table-builders";
 
-/** Check if a node (or its seq children) contains a code-mode function (#hash prefix).
- *  Code-mode blocks like #align(center, box()) break math flow in eqnArray cells. */
-const hasCodeModeFunc = (node: TypstMathNode): boolean => {
-  if (node.type === 'func') {
-    return !!node.hash;
+/** Same scope as containsBlockCodeFunc in dispatcher.ts: recurses only
+ *  into SeqNode children, not FuncCall.args / Delimited.body. */
+const hasBlockCodeFunc = (node: TypstMathNode): boolean => {
+  if (node.type === 'func' && node.hash && BLOCK_CODE_FUNCS.has(node.name)) {
+    return true;
   }
   if (node.type === 'seq') {
-    return node.children.some(hasCodeModeFunc);
+    return node.children.some(hasBlockCodeFunc);
   }
   return false;
 };
@@ -81,10 +81,11 @@ export const mtableAst = (node: MathNode, serialize: ITypstMathSerializer): Typs
       const result = serialize.visitNodeFull(mtdNode);
       const blockNode = result.node;
       const inlineNode = result.nodeInline ?? result.node;
-      // Code-mode blocks (#align, #box) break math flow in eqnArray rows.
-      // Use inline variant to keep everything in math mode.
+      // Block-level code-mode funcs (#align, #grid, #math.equation) break math
+      // flow in eqnArray rows. Use inline variant to keep everything in math mode.
+      // Inline #box/#circle are safe and do NOT trigger this.
       const useInlineForBlock = isEqnArray && result.nodeInline !== undefined
-        && hasCodeModeFunc(blockNode);
+        && hasBlockCodeFunc(blockNode);
       cellNodes.push(useInlineForBlock ? inlineNode : blockNode);
       cellNodesInline.push(inlineNode);
       if (result.nodeInline !== undefined) {

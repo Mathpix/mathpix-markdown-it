@@ -200,9 +200,14 @@ const needsSeparator = (
   }
   // Space before [ or { after a function call to prevent Typst trailing-content-block parsing.
   // frac(1, 2)[x] → Typst parses [x] as body argument to frac, causing an error.
+  // Space before ( after code-mode (#hash) function to prevent chained-call parsing.
+  // #box(stroke: 0.5pt, $G$)(s) → Typst calls box result with (s), causing an error.
   if (prevNode.type === TypstMathNodeType.FuncCall) {
     const ch = next[0];
     if (ch === '[' || ch === '{') {
+      return true;
+    }
+    if (ch === '(' && prevNode.hash) {
       return true;
     }
   }

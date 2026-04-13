@@ -149,6 +149,19 @@ export const TYPST_BUILTIN_OPS: ReadonlySet<string> = new Set([
 export const BOX_STROKE = '0.5pt';
 export const BOX_INSET = '3pt';
 
+/** Block-level code-mode function names — break math flow when placed
+ *  alongside other math in $...$. Inline #box/#circle/#text/#highlight/#hide
+ *  are safe and NOT listed here.
+ *
+ *  Currently emitted (as funcCall(name, ..., { hash: true })):
+ *   - 'math.equation' — tagged equations (table-builders.ts)
+ *   - 'grid' — numcases / subnumcases (table-builders.ts)
+ *
+ *  EXTEND when emitting a new block-level funcCall(name, ..., { hash: true }). */
+export const BLOCK_CODE_FUNCS: ReadonlySet<string> = new Set([
+  'math.equation', 'grid',
+]);
+
 /** Typst escaped-delimiter output for unpaired brackets (math-mode safe) */
 export const UNPAIRED_BRACKET_TYPST: Readonly<Record<string, string>> = {
   '(': '\\(', ')': '\\)', '[': '\\[', ']': '\\]', '{': '\\{', '}': '\\}',

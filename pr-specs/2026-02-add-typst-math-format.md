@@ -71,8 +71,8 @@ The converter always produces **two** Typst representations:
 For most expressions these are identical. They differ for:
 - **Numbered equations** (`\begin{equation}`, `\tag{}`): `typstmath` uses `#math.equation(block: true, numbering: ..., $ ... $)`, `typstmath_inline` contains the raw math
 - **Numcases/subnumcases**: `typstmath` uses `#grid(...)`, `typstmath_inline` contains just `cases(...)`
-- **Boxed expressions** (`\boxed{}`): `typstmath` uses `#align(center, box(stroke: 0.5pt, inset: 3pt, $ ... $))`, `typstmath_inline` contains the inner content
-- **Bordered arrays** (array with `frame=solid`): similar to boxed
+- **Boxed expressions** (`\boxed{}`): `typstmath` uses `#box(stroke: 0.5pt, inset: 3pt, $ ... $)` (inline-safe in any math context). `typstmath_inline` is identical — the box is preserved in both variants since `#box()` renders correctly inline.
+- **Bordered arrays** (array with `frame=solid` or `|c|`/`\hline`): similar — `#box(stroke: ..., $ mat(...) $)` without `#align()` wrapper. Inline variant preserves the frame too.
 - **Nested tables** (eqnArray/gathered inside mat/cases cells): `typstmath` wraps in `display(...)` to preserve displaystyle, `typstmath_inline` contains the bare `mat(...)` without `display()` wrapper
 - **eqnArray rows containing nested tables**: `typst_inline` is propagated through eqnArray row building so `display()` never leaks into the inline variant
 
@@ -97,8 +97,8 @@ interface ITypstData {
 | LaTeX | `typstmath` (block) | `typstmath_inline` |
 |-------|--------------------|--------------------|
 | `\begin{equation} y^2 \end{equation}` | `#math.equation(block: true, numbering: "(1)", $ y^2 $)` | `y^2` |
-| `\boxed{x=1}` | `#box(stroke: 0.5pt, inset: 3pt, $ x = 1 $)` | `x = 1` |
-| `\begin{array}{\|c\|}\hline a \\ \hline\end{array}` | `#box(stroke: 0.5pt, inset: 3pt, $ mat(...) $)` | `mat(...)` |
+| `\boxed{x=1}` | `#box(stroke: 0.5pt, inset: 3pt, $ x = 1 $)` | (same as typst — box preserved) |
+| `\begin{array}{\|c\|}\hline a \\ \hline\end{array}` | `#box(stroke: 0.5pt, inset: 3pt, $ mat(...) $)` | (same as typst — frame preserved) |
 
 For most expressions (e.g. `\frac{a}{b}`, `\sum_{i=1}^n x_i`) both fields are identical: `frac(a, b)`, `sum_(i = 1)^n x_i`.
 
@@ -256,7 +256,11 @@ Built-in Typst math operators (`sin`, `cos`, `tan`, `log`, `lim`, etc.) pass thr
 | `\left\| a ; b \right\|` | `lr(‖ a\; b ‖)` |
 | `\left( a ; b \right)` | `lr(( a\; b ))` |
 
-**Colon escaping inside `lr()`:** Typst interprets `:` after an identifier as a named-argument separator inside function calls. The `escapeColonsInLr()` helper inserts a space before `:` when preceded by an identifier inside `lr()` calls, preventing `lr(p: ...)` from being parsed as a named argument.
+**Colon escaping inside `lr()` and `mat()`/`cases()`:** Typst interprets `:` after an identifier as a named-argument separator inside function calls. The scanner inserts a space before `:` when preceded by **any non-space character** (not just word-chars), preventing cases like:
+- `lr(p: ...)` — identifier followed by `:` would be parsed as named arg
+- `H_+: ...` — operator+subscript+`:` in `mat()` cells would also be misparsed; `+` and `-` are not word chars but still need the space separator
+
+Applied in all function-arg contexts (Standard, MatrixCell, MatrixRow, LrContent).
 
 **Inner bracket escaping inside `lr()`:** Unpaired ASCII brackets (`(`, `[`, `{`) inside `lr()` content can cause parse errors. The `escapeInnerBrackets()` helper backslash-escapes these when they appear at depth 0 inside the `lr()` content.
 
@@ -329,7 +333,7 @@ Typst:  mat(delim: #none, align: #left, lr(\[ x); lr(y ]))
 
 ```
 LaTeX:  \begin{array}{|l|}\hline text \\ text \end{array}
-Typst:  #align(center, box(stroke: (left: 0.5pt, right: 0.5pt, top: 0.5pt, bottom: 0pt), inset: 3pt, $ mat(...) $))
+Typst:  #box(stroke: (left: 0.5pt, right: 0.5pt, top: 0.5pt, bottom: 0pt), inset: 3pt, $ mat(...) $)
 ```
 
 **Word-safe notation matching:** All `menclose` notation checks use `parseNotation()` → `Set<string>` + `hasNotation()` instead of `String.includes()`, preventing false matches like `"bottom"` matching `"top"` via substring.
@@ -594,12 +598,12 @@ In Typst, `underbrace` and `overbrace` take annotations as a second argument: `u
 | `\bcancel{x}` | `cancel(inverted: #true, x)` |
 | `\xcancel{x}` | `cancel(cross: #true, x)` |
 | `\not\equiv` | `cancel(equiv)` (when `\not` precedes a symbol, wraps it in `cancel()`) |
-| `\boxed{x=1}` | `#align(center, box(stroke: 0.5pt, inset: 3pt, $x = 1$))` (block) / `x = 1` (inline) |
-| `\enclose{circle}{x+y}` | `#align(center, circle(inset: 3pt, $x + y$))` (block) / `x + y` (inline) |
+| `\boxed{x=1}` | `#box(stroke: 0.5pt, inset: 3pt, $ x = 1 $)` (same in both typst and typst_inline — `#box()` is inline-safe) |
+| `\enclose{circle}{x+y}` | `#ellipse(inset: 3pt, align(center + horizon, $ x + y $))` — uses `#ellipse()` not `#circle()` for visual parity with MathJax (which stretches the circle to content width). Typst's `#circle()` maintains 1:1 aspect and would produce an oversized frame for long content. Neither shape auto-centers content, so `align(center + horizon, ...)` is required per Typst docs. |
 | `\enclose{radical}{x+y}` | `sqrt(x + y)` |
 | `\enclose{top}{x+y}` | `overline(x + y)` |
 | `\enclose{bottom}{x+y}` | `underline(x + y)` |
-| `\enclose{left right top}{x}` | `#align(center, box(stroke: (left: 0.5pt, right: 0.5pt, top: 0.5pt, bottom: 0pt), inset: 3pt, $ x $))` (selective border strokes) |
+| `\enclose{left right top}{x}` | `#box(stroke: (left: 0.5pt, right: 0.5pt, top: 0.5pt, bottom: 0pt), inset: 3pt, $ x $)` (selective border strokes — no `#align()` wrapper) |
 | `\lcm{24}` | `underline(lr(\) 24))` (macro expands to `\enclose{bottom}{\smash{)}{24}\:}`; `lr(\) ...)` stretches the `)` delimiter to match content height) |
 | `\color{red}{x}` | `#text(fill: red)[x]` |
 | `\color{#D61F06}{60}` | `#text(fill: rgb("#D61F06"))[60]` (hex colors wrapped in `rgb("...")`) |
@@ -914,6 +918,15 @@ This ensures paired delimiters form grouped expressions in Typst (important afte
 
 **Function-call-aware `‖` scanning:** The bare delimiter scanner skips `‖` characters that appear inside function-call arguments (e.g. `norm(...)`, `abs(...)`) to avoid false pairing. The scanner tracks parenthesis depth and only considers `‖` at depth 0 as potential pair boundaries.
 
+**Fence balance validation for ALL bracket types** (added 2026-04): Before accepting a pairing, `tryBareDelimiterPattern` validates that brackets between opener and closer are balanced across ALL types: `()`, `{}`, `[]`, `⟨⟩`, `⌊⌋`, `⌈⌉`. Previously only `()` and `{}` were tracked, allowing `|ψ⟩ = ...[|↑↓⟩]` to wrongly pair the first `|` with a distant `|` across an unmatched `⟩` or `[`. Now:
+- `isFenceBalanced(from, to)` tracks each bracket type independently
+- Brackets already marked as unpaired by `markUnpairedBrackets()` are skipped (they'll be escaped in the output)
+- `isDoubleVertContentValid()` extracts the ‖-specific rejection rule (PUNCT or whole-expression REL) into a dedicated helper
+
+This prevents bra-ket notation like `|\psi\rangle=\frac{1}{\sqrt{2}}[|\uparrow\downarrow\rangle-|\downarrow\uparrow\rangle]` from producing broken `lr(| ... |)` spans that swallow unmatched brackets.
+
+**Big delimiter nesting depth** (added 2026-04): `tryBigDelimiterPattern` now tracks open/close depth to correctly pair `\Bigg[ \bigg( ... \bigg) \Bigg]` — the outer `\Bigg[` matches `\Bigg]`, not the nearest `\big)`. Without depth tracking, nested expressions like `\Bigg[ J_{harm}\bigg( \mathcal{R}\Big( P\big(...\big) \Big) \bigg) \Bigg]` produced broken output with the outer bracket mispaired.
+
 **Scripted closing delimiters:** When the closing delimiter carries a subscript or superscript (e.g. `\|x\|_2` where `‖` is the base of `msub(‖, 2)`), the `getDelimiterChar()` helper cannot see it directly. The `getScriptedDelimiterChar()` helper looks inside `msub`/`msup`/`msubsup` nodes to check if their base is a matching closing delimiter. When found, the script parts are extracted and appended to the delimited expression:
 
 | LaTeX | Typst |
@@ -969,6 +982,73 @@ This ensures paired delimiters form grouped expressions in Typst (important afte
 | `src/helpers/parse-mmd-element.ts` | Added `'TYPSTMATH'` → `'typst'` and `'TYPSTMATH_INLINE'` → `'typst_inline'` to DOM tag parser |
 | `tests/_typst.js` | **New.** Mocha test runner — uses `TexConvertToTypstData`, tests both `typstmath` and `typstmath_inline` in a single loop |
 | `tests/_data/_typst/data.js` | **New.** Test cases covering all supported constructs; each entry has `latex`, `typst`, and `typst_inline` fields |
+
+## Typst formatting safety (added 2026-04)
+
+The serializer applies several safety rules in `needsSeparator` (`serialize.ts`) to prevent ambiguous parsing by Typst's math parser.
+
+### Trailing content block prevention
+
+Typst parses `func(args)[body]` as a function call with a trailing content block. In math mode, `frac(1, 2)[x]` would be parsed as `frac` with `(1, 2)` args AND `[x]` as body — which `frac` rejects. A space breaks this:
+
+| Previous node | Next char | Rule | Example |
+|---------------|-----------|------|---------|
+| `FuncCall` | `[` or `{` | add space | `frac(1, 2)` + `[x]` → `frac(1, 2) [x]` |
+| `Delimited` (`lr`, `abs`, `norm`, …) | `[` or `{` | add space | `lr(( a + b ))` + `[c]` → `lr(( a + b )) [c]` |
+
+### Chained-call prevention (code-mode)
+
+In Typst code mode, `func(a)(b)` chains two calls: apply `func(a)`, then call the result with `(b)`. For `#box()` returning content, this produces an error. A space breaks the chain:
+
+| Previous node | Next char | Rule | Example |
+|---------------|-----------|------|---------|
+| code-mode `FuncCall` (`hash: true`) | `(` | add space | `#box(..., $ G $)` + `(s)` → `#box(..., $ G $) (s)` |
+
+Only code-mode (`#`) function calls trigger this — math-mode `frac(1, 2)(x)` is left as-is (math-mode parens don't chain-call).
+
+## Block-level code-mode funcs (added 2026-04)
+
+`#math.equation(block: true, ...)` and `#grid(...)` are block-level Typst functions — when placed inline with other math content, they disrupt math flow. Inline code-mode functions (`#box`, `#ellipse`, `#circle`, `#text`, `#highlight`, `#hide`) are safe in any math context.
+
+`BLOCK_CODE_FUNCS` set in `consts.ts`: `{math.equation, grid}`. Two guards detect them and switch to inline variants when block-level funcs appear with siblings:
+
+- `containsBlockCodeFunc` (`dispatcher.ts`) — triggers inline-variant fallback in `visitInferredMrowAst` when block-level funcs have siblings in an inferred mrow
+- `hasBlockCodeFunc` (`table-handlers.ts`) — triggers inline-variant fallback in eqnArray cells
+
+**Currently emitted:** `#math.equation(block: true, ...)` (tagged equations) and `#grid(...)` (numcases). `#align(center, ...)` is no longer emitted — `\boxed{}` / `\enclose{circle}` / bordered arrays migrated to plain `#box()` / `#ellipse()` in 2026-04 (see "Boxed/circle simplification" below).
+
+### Boxed/circle simplification (changed 2026-04)
+
+Previously `\boxed{}`, `\enclose{circle}`, bordered arrays, and `frame=solid` matrices produced `#align(center, box/circle(...))` as the block variant with raw inner content as the inline variant. This caused multiple issues:
+
+1. `#align(center, ...)` is block-level — breaks math flow when placed inline with other math (`\boxed{z}^T \boxed{z}`)
+2. Subscript/superscript on a `#align()` atom is ill-defined in Typst math
+3. Inline variant dropped the frame entirely
+
+**New behavior:**
+- `\boxed{x=1}` → `#box(stroke: 0.5pt, inset: 3pt, $ x = 1 $)` — inline-safe, works everywhere
+- `\enclose{circle}{x+y}` → `#ellipse(inset: 3pt, align(center + horizon, $ x + y $))` — uses `#ellipse()` not `#circle()` for visual parity with MathJax, which renders `\enclose{circle}` as a stretched ellipse. Typst's `#circle()` would maintain 1:1 aspect ratio and produce an oversized frame for long content. Neither shape auto-centers content, so explicit `align(center + horizon, ...)` wraps the body.
+- Bordered arrays and `frame=solid` — `#box(stroke: ..., $ mat(...) $)` without `#align()`
+- `typst_inline` is identical to `typst` — the frame is preserved because `#box()` / `#ellipse()` are inline-safe
+- Always uses `$ content $` (display math) inside the box for consistent rendering of both simple and multi-line content (inline `$content$` inside box breaks multi-line `&`/`\\` alignment)
+- No `baseline` parameter — relying on Typst's default layout; display math centers boxes naturally on their line
+
+## Combining-mark character escaping (added 2026-04)
+
+Unicode characters with combining marks that decompose in NFD (e.g. `ṭ` = U+1E6D → `t` + combining dot below) cannot be shaped by Typst as single math glyphs. Typst raises "Shaping the text 'ṭ' yielded more than one glyph".
+
+`hasCombiningMarks(s)` in `token-handlers.ts` checks if `s.normalize('NFD').length > s.length`. When true, `miAst` wraps the character in `text(value)` (producing `upright("ṭ")` etc.) instead of a bare symbol.
+
+Covers transliteration diacritics (ṭ, ḍ, ṣ), European accents (é, ç, ö, č, ř), macrons (ā, ē, ī), Greek accents (ά, έ). Standard Latin/Greek letters (a, α) and characters that don't decompose (ø, ł, đ) are unaffected.
+
+## lr() content escaping with non-bracket delimiters (clarified 2026-04)
+
+`buildLrBracketChars` in `serialize.ts` determines which ASCII brackets to escape inside `lr()` to prevent Typst auto-scaling. Rules:
+
+- **Bracket-pair delimiters** (`()`, `[]`, `{}`): escape only the pair and its peer
+- **Non-bracket delimiters** (`|`, `‖`, `⟨`, `⌊`, `⌈`): escape **all ASCII bracket types** (`(`, `)`, `[`, `]`, `{`, `}`) — Typst's `lr()` auto-scales every unescaped bracket character, so bracket content inside `lr(| [a] |)` would render `[a]` auto-scaled
+
+Example: `|[a, b]|` in LaTeX → `lr(| \[a, b\] |)` (brackets escaped) instead of `lr(| [a, b] |)` (brackets would auto-scale).
 
 ## Constraints
 

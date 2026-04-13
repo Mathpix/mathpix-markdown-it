@@ -410,15 +410,15 @@ export const mencloseAst = (node: MathNode, serialize: ITypstMathSerializer): Ty
   const contentNode = visitAllChildren(node, serialize);
   const contentStr = serializeTypstMath(contentNode).trim();
   if (hasNotation(words, 'box')) {
+    // #box() is inline-safe — keep frame in both variants.
+    // Always use $ display $ math inside: it renders simple and multi-line
+    // content correctly. $inline$ inside box breaks multi-line alignment (&, \\).
     const boxNode = funcCall('box', [
       namedArg('stroke', lengthVal(BOX_STROKE)),
       namedArg('inset', lengthVal(BOX_INSET)),
-      posArg(inlineMathVal(contentNode)),
-    ]);
-    return {
-      node: funcCall('align', [posArg(identVal('center')), posArg(callVal(boxNode))], { hash: true }),
-      nodeInline: contentNode,
-    };
+      posArg(inlineMathVal(contentNode, true)),
+    ], { hash: true });
+    return { node: boxNode };
   }
   // cancel variants → FuncCallNode (serializer applies Wrapper escaping)
   if (hasNotation(words, 'updiagonalstrike') || hasNotation(words, 'downdiagonalstrike')) {
@@ -449,14 +449,19 @@ export const mencloseAst = (node: MathNode, serialize: ITypstMathSerializer): Ty
     };
   }
   if (hasNotation(words, 'circle')) {
-    const circleNode = funcCall('circle', [
-      namedArg('inset', lengthVal(BOX_INSET)),
-      posArg(inlineMathVal(contentNode)),
+    // MathJax renders \enclose{circle} as an ellipse (stretched to content
+    // width) — use #ellipse() for visual parity. #circle() would force 1:1
+    // aspect ratio, producing oversized frames for long single-line content.
+    // Neither #ellipse() nor #circle() auto-centers content — wrap in align().
+    const centered = funcCall('align', [
+      posArg(rawVal('center + horizon')),
+      posArg(inlineMathVal(contentNode, true)),
     ]);
-    return {
-      node: funcCall('align', [posArg(identVal('center')), posArg(callVal(circleNode))], { hash: true }),
-      nodeInline: contentNode,
-    };
+    const ellipseNode = funcCall('ellipse', [
+      namedArg('inset', lengthVal(BOX_INSET)),
+      posArg(callVal(centered)),
+    ], { hash: true });
+    return { node: ellipseNode };
   }
   if (hasNotation(words, 'radical')) {
     return {
@@ -464,15 +469,17 @@ export const mencloseAst = (node: MathNode, serialize: ITypstMathSerializer): Ty
     };
   }
   if (hasBorderNotation(words)) {
+    // #box() with partial borders is inline-safe — keep frame in both variants.
     const sides = buildStrokeSides(words);
     const borderBoxNode = funcCall('box', [
       namedArg('stroke', rawVal('(' + sides + ')')),
       namedArg('inset', lengthVal(BOX_INSET)),
       posArg(inlineMathVal(contentNode, true)),
-    ]);
+    ], {
+      hash: true
+    });
     return {
-      node: funcCall('align', [posArg(identVal('center')), posArg(callVal(borderBoxNode))], { hash: true }),
-      nodeInline: contentNode,
+      node: borderBoxNode
     };
   }
   if (hasNotation(words, 'top')) {

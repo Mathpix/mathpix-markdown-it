@@ -441,15 +441,24 @@ export const buildMatrixResult = (
   const matExpr = buildExpr(rowNodes);
   const matExprInline = rowNodesInline ? buildExpr(rowNodesInline) : undefined;
   if (frame === 'solid') {
-    const boxNode = funcCall('box', [
+    // #box() with solid frame is inline-safe — keep frame in both variants.
+    // Always use $ display $ math inside for correct rendering (simple and multi-line).
+    const wrapInBox = (expr: TypstMathNode): TypstMathNode => funcCall('box', [
       namedArg('stroke', rawVal(BOX_STROKE)),
       namedArg('inset', rawVal(BOX_INSET)),
-      posArg(inlineMathVal(matExpr, true)),
-    ]);
-    return {
-      node: funcCall('align', [posArg(rawVal('center')), posArg(callVal(boxNode))], { hash: true }),
-      nodeInline: matExprInline ?? matExpr,
-    };
+      posArg(inlineMathVal(expr, true)),
+    ], {
+      hash: true
+    });
+    const blockNode = wrapInBox(matExpr);
+    return matExprInline
+      ? {
+        node: blockNode,
+        nodeInline: wrapInBox(matExprInline)
+      }
+      : {
+        node: blockNode
+      };
   }
   if (matExprInline) {
     return {
