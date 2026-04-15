@@ -174,6 +174,7 @@ The single remaining `raw()` is a static constant: `#counter(math.equation).upda
 Guards against Typst parser ambiguities that previously produced broken output:
 - **Space before `[`/`{` after FuncCall/Delimited**: prevents trailing-content-block parsing. `frac(1, 2)[x]` would be parsed as `frac` with body `[x]` — add space: `frac(1, 2) [x]`. Same for `lr(( a + b )) [c]`.
 - **Space before `(` after code-mode (`#hash`) FuncCall**: prevents chained-call parsing in code mode. `#box(stroke: ..., $ G $)(s)` would call the box result with `(s)` — add space: `#box(...) (s)`. Math-mode calls like `frac(1, 2)(x)` are left as-is.
+- **Space before `(` after any multi-char identifier** (including Typst builtin ops `sin`, `cos`, `sup`, `max`, etc.): prevents function-call parsing that can treat inner `:` as named arg. `\sup(i: Typ1)` → `sup (i: Typ1)` — without space, Typst parses `i:` as named arg and errors. In Typst math, `sin(x)` and `sin (x)` render identically, so the space is always safe. Covers bare identifiers (`sup (x)`), scripted identifiers (`sin^2 (x)`, `log_2 (n)`) and non-builtin names (`emptyset (x)`). Derivative patterns (`f'(x)`) are exempted via `isDerivativeScript`.
 - **Space before `:` after any non-space char**: broadened from "word chars only". `H_+:` in `mat()` cells has `+` before `:` — still needs space to prevent named-argument parsing by Typst.
 
 ### Boxed/circle/border simplification

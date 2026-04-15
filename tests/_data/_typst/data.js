@@ -2995,13 +2995,13 @@ module.exports = [
   },
   {
     latex: `(1-z)^{n}[\\ln(1-z)]`,
-    typst: `(1 - z)^n [ln(1 - z)]`,
-    typst_inline: `(1 - z)^n [ln(1 - z)]`,
+    typst: `(1 - z)^n [ln (1 - z)]`,
+    typst_inline: `(1 - z)^n [ln (1 - z)]`,
   },
   {
     latex: `\\begin{align*}\nF(a, b ; a+b+m ; z)= & \\frac{\\Gamma(m) \\Gamma(a+b+m)}{\\Gamma(a+m) \\Gamma(b+m)} \\sum_{n=0}^{m-1} \\frac{(a)_{n}(b)_{n}}{n!(1-m)_{n}}(1-z)^{n}  \\tag{15.3.11}\\\\\n& \\quad-\\frac{\\Gamma(a+b+m)}{\\Gamma(a) \\Gamma(b)}(z-1)^{m} \\sum_{n=0}^{\\infty} \\frac{(a+m)_{n}(b+m)_{n}}{n!(n+m)!}(1-z)^{n}[\\ln (1-z)-\\psi(n+1) \\\\\n& -\\psi(n+m+1)+\\psi(a+n+m)+\\psi(b+n+m)] \\quad(|\\arg (1-z)|<\\pi,|1-z|<1)\n\\end{align*}`,
-    typst: `#math.equation(block: true, numbering: n => [(15.3.11)], number-align: end + top, $ F(a, b\\; a + b + m\\; z) = &frac(Gamma (m) Gamma (a + b + m), Gamma (a + m) Gamma (b + m)) sum_(n = 0)^(m - 1) frac((a)_n (b)_n, n!(1 - m)_n)(1 - z)^n \\\n &quad - frac(Gamma (a + b + m), Gamma (a) Gamma (b))(z - 1)^m sum_(n = 0)^(infinity) frac((a + m)_n (b + m)_n, n!(n + m)!)(1 - z)^n bracket.l ln(1 - z) - psi (n + 1) \\\n &- psi (n + m + 1) + psi (a + n + m) + psi (b + n + m) bracket.r quad (lr(| arg(1 - z) |) < pi, lr(| 1 - z |) < 1) $)\n#counter(math.equation).update(n => n - 1)`,
-    typst_inline: `F(a, b\\; a + b + m\\; z) = &frac(Gamma (m) Gamma (a + b + m), Gamma (a + m) Gamma (b + m)) sum_(n = 0)^(m - 1) frac((a)_n (b)_n, n!(1 - m)_n)(1 - z)^n \\\n &quad - frac(Gamma (a + b + m), Gamma (a) Gamma (b))(z - 1)^m sum_(n = 0)^(infinity) frac((a + m)_n (b + m)_n, n!(n + m)!)(1 - z)^n bracket.l ln(1 - z) - psi (n + 1) \\\n &- psi (n + m + 1) + psi (a + n + m) + psi (b + n + m) bracket.r quad (lr(| arg(1 - z) |) < pi, lr(| 1 - z |) < 1)`,
+    typst: `#math.equation(block: true, numbering: n => [(15.3.11)], number-align: end + top, $ F(a, b\\; a + b + m\\; z) = &frac(Gamma (m) Gamma (a + b + m), Gamma (a + m) Gamma (b + m)) sum_(n = 0)^(m - 1) frac((a)_n (b)_n, n!(1 - m)_n)(1 - z)^n \\\n &quad - frac(Gamma (a + b + m), Gamma (a) Gamma (b))(z - 1)^m sum_(n = 0)^(infinity) frac((a + m)_n (b + m)_n, n!(n + m)!)(1 - z)^n bracket.l ln (1 - z) - psi (n + 1) \\\n &- psi (n + m + 1) + psi (a + n + m) + psi (b + n + m) bracket.r quad (lr(| arg \\(1 - z\\) |) < pi, lr(| 1 - z |) < 1) $)\n#counter(math.equation).update(n => n - 1)`,
+    typst_inline: `F(a, b\\; a + b + m\\; z) = &frac(Gamma (m) Gamma (a + b + m), Gamma (a + m) Gamma (b + m)) sum_(n = 0)^(m - 1) frac((a)_n (b)_n, n!(1 - m)_n)(1 - z)^n \\\n &quad - frac(Gamma (a + b + m), Gamma (a) Gamma (b))(z - 1)^m sum_(n = 0)^(infinity) frac((a + m)_n (b + m)_n, n!(n + m)!)(1 - z)^n bracket.l ln (1 - z) - psi (n + 1) \\\n &- psi (n + m + 1) + psi (a + n + m) + psi (b + n + m) bracket.r quad (lr(| arg \\(1 - z\\) |) < pi, lr(| 1 - z |) < 1)`,
   },
   {
     latex: `x^n\\{a,b\\}`,
@@ -3075,8 +3075,8 @@ module.exports = [
   },
   {
     latex: `\\begin{align*}\n& G_{p}(r)=\\frac{2}{\\pi} \\int_{0}^{\\infty} s\\left[I_{l}(s)-I_{s}(s)\\right] x_{p}^{-1} \\sin (s r) d s(5-72) \\\\\n& \\Delta G(r)=-\\frac{2}{\\pi} \\int_{0}^{\\infty} s\\left[I_{l}(s)-I_{s}(s)\\right] \\sin (s r) d s \\tag{5-73}\n\\end{align*}`,
-    typst: `#math.equation(block: true, numbering: n => [(5-73)], number-align: end + bottom, $ &G_p (r) = frac(2, pi) integral_0^(infinity) s lr([ I_l (s) - I_s (s) ]) x_p^(- 1) sin(s r) d s(5 - 72) \\\n &Delta G(r) = - frac(2, pi) integral_0^(infinity) s lr([ I_l (s) - I_s (s) ]) sin(s r) d s $)\n#counter(math.equation).update(n => n - 1)`,
-    typst_inline: `&G_p (r) = frac(2, pi) integral_0^(infinity) s lr([ I_l (s) - I_s (s) ]) x_p^(- 1) sin(s r) d s(5 - 72) \\\n &Delta G(r) = - frac(2, pi) integral_0^(infinity) s lr([ I_l (s) - I_s (s) ]) sin(s r) d s`,
+    typst: `#math.equation(block: true, numbering: n => [(5-73)], number-align: end + bottom, $ &G_p (r) = frac(2, pi) integral_0^(infinity) s lr([ I_l (s) - I_s (s) ]) x_p^(- 1) sin (s r) d s(5 - 72) \\\n &Delta G(r) = - frac(2, pi) integral_0^(infinity) s lr([ I_l (s) - I_s (s) ]) sin (s r) d s $)\n#counter(math.equation).update(n => n - 1)`,
+    typst_inline: `&G_p (r) = frac(2, pi) integral_0^(infinity) s lr([ I_l (s) - I_s (s) ]) x_p^(- 1) sin (s r) d s(5 - 72) \\\n &Delta G(r) = - frac(2, pi) integral_0^(infinity) s lr([ I_l (s) - I_s (s) ]) sin (s r) d s`,
   },
   {
     latex: `f^{(n)}(a)`,
@@ -3529,8 +3529,8 @@ x=4
   // \Varangle contains hidden mo(")") inside mstyle — must not break outer bracket pairing
   {
     latex: String.raw`\cos (\Varangle x , y )=\frac{( x y )}{| x || y |}`,
-    typst: String.raw`cos(angle.spheric x, y) = frac((x y), |x||y|)`,
-    typst_inline: String.raw`cos(angle.spheric x, y) = frac((x y), |x||y|)`,
+    typst: String.raw`cos (angle.spheric x, y) = frac((x y), |x||y|)`,
+    typst_inline: String.raw`cos (angle.spheric x, y) = frac((x y), |x||y|)`,
   },
   // Opening bracket as script base: [^{\circ} → separate bracket from script with ""
   {
@@ -3601,14 +3601,14 @@ x=4
   // semicolons inside builtin op args must be escaped: sin(a; b) → sin(a\; b)
   {
     latex: String.raw`\sin (7 r / a ; 2)`,
-    typst: String.raw`sin(7 r\/ a\; 2)`,
-    typst_inline: String.raw`sin(7 r\/ a\; 2)`,
+    typst: String.raw`sin (7 r\/ a\; 2)`,
+    typst_inline: String.raw`sin (7 r\/ a\; 2)`,
   },
-  // scripted builtin op: sin^2(a; b) → sin^2(a\; b)
+  // scripted builtin op: sin^2(a; b) → sin^2 (a\; b)
   {
     latex: String.raw`\sin^2 (a ; b)`,
-    typst: String.raw`sin^2(a\; b)`,
-    typst_inline: String.raw`sin^2(a\; b)`,
+    typst: String.raw`sin^2 (a\; b)`,
+    typst_inline: String.raw`sin^2 (a\; b)`,
   },
   // non-builtin function: f(a; b) — semicolon escaped at mo level
   {
@@ -3625,8 +3625,8 @@ x=4
   // nested builtin ops: sin(cos(a; b)) — inner semicolon escaped
   {
     latex: String.raw`\sin(\cos(a ; b))`,
-    typst: String.raw`sin(cos(a\; b))`,
-    typst_inline: String.raw`sin(cos(a\; b))`,
+    typst: String.raw`sin (cos (a\; b))`,
+    typst_inline: String.raw`sin (cos (a\; b))`,
   },
   // semicolon in subscript: x_{a;b} → x_(a\; b)
   {
@@ -3767,5 +3767,42 @@ x=4
     latex: String.raw`\boxed{a}_i^2`,
     typst: String.raw`#box(stroke: 0.5pt, inset: 3pt, $ a $)_i^2`,
     typst_inline: String.raw`#box(stroke: 0.5pt, inset: 3pt, $ a $)_i^2`,
+  },
+  // ── Builtin op + ( : space prevents Typst function-call / named-arg parsing ──
+  // \sup(i: ...) would be parsed as named arg without space
+  {
+    latex: String.raw`\sup ( i : ~ T y p 1): ~ T y p 2 ;`,
+    typst: String.raw`sup (i: T y p 1): T y p 2\;`,
+    typst_inline: String.raw`sup (i: T y p 1): T y p 2\;`,
+  },
+  // \max(k: v) — colon after identifier inside parens
+  {
+    latex: String.raw`\max(k : v)`,
+    typst: String.raw`max (k: v)`,
+    typst_inline: String.raw`max (k: v)`,
+  },
+  // \sin(x) — space is harmless, renders identically in Typst math
+  {
+    latex: String.raw`\sin(x)`,
+    typst: String.raw`sin (x)`,
+    typst_inline: String.raw`sin (x)`,
+  },
+  // \sin^2(x) — scripted builtin also gets space before (
+  {
+    latex: String.raw`\sin^2(x)`,
+    typst: String.raw`sin^2 (x)`,
+    typst_inline: String.raw`sin^2 (x)`,
+  },
+  // \log_2(n) — subscripted builtin
+  {
+    latex: String.raw`\log_2(n)`,
+    typst: String.raw`log_2 (n)`,
+    typst_inline: String.raw`log_2 (n)`,
+  },
+  // f'(x) — derivative: NO space (isDerivativeScript exemption)
+  {
+    latex: String.raw`f'(x)`,
+    typst: String.raw`f'(x)`,
+    typst_inline: String.raw`f'(x)`,
   },
 ];

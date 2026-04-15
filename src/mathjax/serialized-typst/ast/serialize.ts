@@ -24,7 +24,7 @@ import {
 } from '../escape-utils';
 import {
   RE_PHANTOM_BASE, RE_TOKEN_START, RE_SEPARATOR_END, RE_WORD_DOT_END,
-  RE_ALPHA_END, RE_TRAILING_DOTTED_IDENT, TYPST_BUILTIN_OPS,
+  RE_ALPHA_END, RE_TRAILING_DOTTED_IDENT,
   OPEN_BRACKETS, CLOSE_BRACKETS,
 } from '../consts';
 import { sanitizeLabel } from '../../../markdown/common/labels';
@@ -191,10 +191,6 @@ const needsSeparator = (
       if (isDerivativeScript(prevNode)) {
         return false;
       }
-      // Builtin ops with scripts: sin^2(x) — no space needed
-      if (isBuiltinOpScript(prevNode)) {
-        return false;
-      }
       return true;
     }
   }
@@ -219,10 +215,14 @@ const needsSeparator = (
       return true;
     }
   }
-  // Space before ( after multi-char identifier to prevent emptyset(i) → function call
+  // Space before ( after multi-char identifier to prevent Typst function-call parsing.
+  // Covers both non-builtins (emptyset(x) → emptyset (x)) and builtins
+  // (sup(i: Typ1) → sup (i: Typ1)) — without space, : inside parens after a
+  // builtin op is parsed as a named argument. In Typst math sin(x) and sin (x)
+  // render identically, so the space is safe for all multi-char identifiers.
   if (next[0] === '(' && RE_ALPHA_END.test(prev)) {
     const match = prev.match(RE_TRAILING_DOTTED_IDENT);
-    if (match && match[1].length > 1 && !TYPST_BUILTIN_OPS.has(match[1])) {
+    if (match && match[1].length > 1) {
       return true;
     }
   }
@@ -254,15 +254,6 @@ const isDerivativeScript = (node: ScriptNode): boolean => {
   const supStr = serializeTypstMath(node.sup).trim();
   if (supStr.startsWith('(') && supStr.endsWith(')')) {
     return true;
-  }
-  return false;
-};
-
-/** Check if a ScriptNode's base is a Typst builtin operator (sin, cos, log, etc.).
- *  sin^2(x) should NOT get space before ( — builtin ops accept args directly. */
-const isBuiltinOpScript = (node: ScriptNode): boolean => {
-  if (node.base.type === TypstMathNodeType.Symbol) {
-    return TYPST_BUILTIN_OPS.has(node.base.value);
   }
   return false;
 };

@@ -1006,6 +1006,18 @@ In Typst code mode, `func(a)(b)` chains two calls: apply `func(a)`, then call th
 
 Only code-mode (`#`) function calls trigger this — math-mode `frac(1, 2)(x)` is left as-is (math-mode parens don't chain-call).
 
+### Function-call / named-arg prevention for builtin ops
+
+In Typst math, `sup(i: Typ1)` is parsed as a function call to `sup` with named argument `i`. The colon creates a named-arg ambiguity that fails with "unexpected argument: i". To prevent this, we add a space before `(` after **any multi-char identifier** (including Typst builtin ops like `sin`, `cos`, `sup`, `max`, `log`, `ln`) — not only non-builtin names. `sin(x)` and `sin (x)` render identically in Typst math, so the space is always safe.
+
+| Previous token | Next char | Rule | Example |
+|----------------|-----------|------|---------|
+| multi-char identifier ending with letter/dot | `(` | add space | `sup` + `(i: Typ1)` → `sup (i: Typ1)` |
+| `ScriptNode` with multi-char base | `(` | add space | `sin^2` + `(x)` → `sin^2 (x)` |
+| Derivative `ScriptNode` (`f'`) | `(` | **no** space | `f'` + `(x)` → `f'(x)` |
+
+This unifies the pre-2026-04 split where `emptyset(x)` got a space but `sin(x)` did not — now both get the space, preventing any `sup(i: ...)`-class issue.
+
 ## Block-level code-mode funcs (added 2026-04)
 
 `#math.equation(block: true, ...)` and `#grid(...)` are block-level Typst functions — when placed inline with other math content, they disrupt math flow. Inline code-mode functions (`#box`, `#ellipse`, `#circle`, `#text`, `#highlight`, `#hide`) are safe in any math context.
