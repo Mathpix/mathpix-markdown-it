@@ -10,6 +10,7 @@ import { eMmdRuleType } from "./common/mmdRules";
 /** md renderer */
 const mdInit = (options: TMarkdownItOptions) => {
   const {htmlTags = false, htmlDisableTagMatching = false, xhtmlOut = false, width = 1200, breaks = true, typographer = true, linkify = true,
+          maxNesting = 100,
           outMath = {}, mathJax = {}, renderElement = {},
           lineNumbering = false, startLine = 0, htmlSanitize = true, smiles = {},
     forDocx = false, forPptx = false,
@@ -44,6 +45,7 @@ const mdInit = (options: TMarkdownItOptions) => {
     forDocx: forDocx,
     forPptx: forPptx,
     maxWidth: maxWidth,
+    maxNesting: maxNesting,
     enableFileLinks: enableFileLinks,
     validateLink: validateLink,
     toc: toc,
@@ -73,6 +75,7 @@ const mdInit = (options: TMarkdownItOptions) => {
     linkify: linkify,
     typographer: typographer,
     quotes: "“”‘’",
+    maxNesting: maxNesting,
     lineNumbering: lineNumbering,
     startLine: startLine,
     htmlSanitize: htmlSanitize,

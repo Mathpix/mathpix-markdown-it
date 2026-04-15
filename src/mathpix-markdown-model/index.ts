@@ -55,6 +55,7 @@ export interface optionsMathpixMarkdown {
     breaks?: boolean,
     typographer?: boolean,
     linkify?: boolean,
+    maxNesting?: number, // markdown-it internal protection: recursion limit for nested block rules (default 100)
     enableFileLinks?: boolean,
     validateLink?: (url: string) => void;
     xhtmlOut?: boolean,
@@ -100,6 +101,7 @@ export type TMarkdownItOptions = {
   breaks?: boolean,
   typographer?: boolean,
   linkify?: boolean,
+  maxNesting?: number, // markdown-it internal protection: recursion limit for nested block rules (default 100)
   enableFileLinks?: boolean,
   validateLink?: (url: string) => void,
   xhtmlOut?: boolean,
@@ -609,6 +611,7 @@ class MathpixMarkdown_Model {
           isDisableFancy=false, isDisableEmoji=false, isDisableEmojiShortcuts=false, isDisableRefs=false, isDisableFootnotes=false,
           fontSize=null, padding=null, htmlTags=false, htmlDisableTagMatching = false, width=0, showToc = false,
           overflowY='unset', breaks = true, typographer = true, linkify = true, xhtmlOut = false,
+          maxNesting = 100,
           outMath = {}, mathJax = {}, htmlSanitize = {}, smiles = {}, openLinkInNewWindow = true,
           maxWidth='',
           enableFileLinks=false, validateLink = null,
@@ -656,6 +659,7 @@ class MathpixMarkdown_Model {
           breaks: breaks,
           typographer: typographer,
           linkify: linkify,
+          maxNesting: maxNesting,
           width: width,
           outMath: outMath,
           mathJax: mathJax,

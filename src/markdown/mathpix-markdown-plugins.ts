@@ -26,6 +26,7 @@ export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
   const {width = 1200,  outMath = {}, smiles = {}, mathJax = {}, renderElement = {},
     forDocx = false, forLatex = false, forMD = false, forPptx = false,
     maxWidth = '',
+    maxNesting = 100,
     enableFileLinks = false, validateLink = null,
     toc = {},
     accessibility = null,
@@ -55,6 +56,7 @@ export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
     forMD: forMD,
     forPptx: forPptx,
     maxWidth: maxWidth,
+    maxNesting: maxNesting,
     enableFileLinks: enableFileLinks,
     accessibility: accessibility,
     nonumbers: nonumbers,
@@ -217,7 +219,8 @@ export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
 
 export const setBaseOptionsMd = (baseOption, mmdOptions) => {
   const {
-    htmlTags = false, xhtmlOut = false, breaks = true, typographer = true, linkify = true, openLinkInNewWindow = true
+    htmlTags = false, xhtmlOut = false, breaks = true, typographer = true, linkify = true, openLinkInNewWindow = true,
+    maxNesting = 100
   } = mmdOptions;
   const disableRuleTypes: eMmdRuleType[] = mmdOptions?.renderOptions ? getDisableRuleTypes(mmdOptions.renderOptions) : [];
   baseOption.html = htmlTags && !disableRuleTypes.includes(eMmdRuleType.html);
@@ -228,6 +231,7 @@ export const setBaseOptionsMd = (baseOption, mmdOptions) => {
   baseOption.typographer = typographer;
   baseOption.quotes = "“”‘’";
   baseOption.openLinkInNewWindow = openLinkInNewWindow;
+  baseOption.maxNesting = maxNesting;
 };
 
 const setOptionForPreview = (mdOption, mmdOptions) => {
