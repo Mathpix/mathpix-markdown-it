@@ -4,7 +4,8 @@ import { TypstMathNode, TypstMathResult, ITypstMathSerializer, AstHandlerFn, ast
 import { seq, symbol, funcCall, posArg, mathVal } from './builders';
 import { serializeTypstMath } from './serialize';
 import { isNegationOverlay } from '../common';
-import { TEX_ATOM, BLOCK_CODE_FUNCS } from '../consts';
+import { TEX_ATOM } from '../consts';
+import { containsBlockCodeFunc } from './code-mode-utils';
 import { getCustomCmdTypst } from '../../custom-cmd-map';
 import {
   tryBigDelimiterPattern, tryBareDelimiterPattern, tryIdotsintPattern,
@@ -80,10 +81,6 @@ export const dispatchFull = (node: MathNode, serialize: ITypstMathSerializer): T
   return handleAllAst(node, serialize);
 };
 
-/** Dispatch a MathML node, returning only the block TypstMathNode. */
-export const dispatch = (node: MathNode, serialize: ITypstMathSerializer): TypstMathNode =>
-  dispatchFull(node, serialize).node;
-
 /** TeXAtom: check for custom command, otherwise delegate to single child. */
 const visitTeXAtomAst = (node: MathNode, serialize: ITypstMathSerializer): TypstMathResult => {
   try {
@@ -127,19 +124,6 @@ const handleAllAst = (node: MathNode, serialize: ITypstMathSerializer): TypstMat
   return {
     node: seq(blockChildren)
   };
-};
-
-/** Check if a node contains a block-level code-mode function (#align, #grid, etc.).
- *  Only recurses into SeqNode children — does NOT inspect FuncCall.args or
- *  Delimited.body. Sufficient for current emission patterns. */
-const containsBlockCodeFunc = (node: TypstMathNode): boolean => {
-  if (node.type === 'func' && node.hash && BLOCK_CODE_FUNCS.has(node.name)) {
-    return true;
-  }
-  if (node.type === 'seq') {
-    return node.children.some(containsBlockCodeFunc);
-  }
-  return false;
 };
 
 /**
@@ -286,10 +270,23 @@ const visitInferredMrowAst = (node: MathNode, serialize: ITypstMathSerializer): 
 /**
  * Create a self-referencing ITypstMathSerializer that dispatches through the AST pipeline.
  * Children are returned as typed TypstMathNode, not raw(string).
+ *
+ * visitNode auto-prefers nodeInline when the block variant contains a block-level
+ * code-mode function (#math.equation, #grid). Handlers that wrap children in math
+ * constructs (frac, sqrt, lr, hat, hide, box, etc.) call visitNode and would
+ * otherwise nest block-level constructs inside math wrappers — which Typst rejects.
+ * Handlers that need both variants explicitly use visitNodeFull (mtable, mrow with
+ * \left...\right, inferred mrow) and handle the block/inline split themselves.
  */
 export const createAstSerializer = (labels: LabelsMap = null): ITypstMathSerializer => {
   const serialize: ITypstMathSerializer = {
-    visitNode: (child: MathNode): TypstMathNode => dispatch(child, serialize),
+    visitNode: (child: MathNode): TypstMathNode => {
+      const result = dispatchFull(child, serialize);
+      if (result.nodeInline && containsBlockCodeFunc(result.node)) {
+        return result.nodeInline;
+      }
+      return result.node;
+    },
     visitNodeFull: (child: MathNode): TypstMathResult => dispatchFull(child, serialize),
     labels,
   };

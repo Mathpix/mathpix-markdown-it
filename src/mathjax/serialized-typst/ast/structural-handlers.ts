@@ -22,6 +22,7 @@ import {
   mathVal, boolVal, identVal, lengthVal, rawVal, inlineMathVal, callVal,
 } from "./builders";
 import { serializeTypstMath } from "./serialize";
+import { containsBlockCodeFunc } from "./code-mode-utils";
 
 const ANCESTOR_MAX_DEPTH = 10;
 const MATHJAX_INHERIT_SENTINEL = '_inherit_';
@@ -244,6 +245,15 @@ export const mrowAst = (node: MathNode, serialize: ITypstMathSerializer): TypstM
       }
     }
     const kind = detectDelimitedKind(openDelim, closeDelim);
+    // If any child has a block-level code-mode function (#math.equation, #grid),
+    // we cannot wrap it in lr() — those constructs break math flow inside delimiters.
+    // Use inline variants for BOTH variants of the Delimited node.
+    const hasBlockCode = blockChildren.some(containsBlockCodeFunc);
+    if (hasBlockCode) {
+      return {
+        node: delimited(kind, seq(inlineChildren), openDelim, closeDelim)
+      };
+    }
     const blockNode = delimited(kind, seq(blockChildren), openDelim, closeDelim);
     if (hasInlineDiff) {
       return {

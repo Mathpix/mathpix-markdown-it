@@ -3827,4 +3827,25 @@ x=4
     typst: String.raw`a + #hide($\( b$) + c \)`,
     typst_inline: String.raw`a + #hide($\( b$) + c \)`,
   },
+  // \left...\right wrapping tagged \begin{align*} — block-level #math.equation
+  // must NOT end up inside lr(). mrowAst falls back to inline children when
+  // body contains block-level code-mode funcs.
+  {
+    latex: String.raw`\left\lvert\, \begin{align*} \frac{\partial u}{\partial t} & =f(x, t) \tag{1}\\ u(x, t) & =0 \\ u(x, 0) & =u^{0}(x) \end{align*}\right.`,
+    typst: `lr(| thin frac(partial u, partial t) &= f(x, t) \\\nu(x, t) &= 0 \\\nu(x, 0) &= u^0 \\(x\\))`,
+    typst_inline: `lr(| thin frac(partial u, partial t) &= f(x, t) \\\nu(x, t) &= 0 \\\nu(x, 0) &= u^0 \\(x\\))`,
+  },
+  // Wrappers (frac, sqrt, hat, phantom) containing tagged equation — block-level
+  // #math.equation must be replaced with inline rows in any math wrapper.
+  // visitNode auto-prefers nodeInline when block contains block-level code-mode.
+  {
+    latex: String.raw`\sqrt{\begin{align*}x&=1 \tag{1}\end{align*}}`,
+    typst: String.raw`sqrt(x &= 1)`,
+    typst_inline: String.raw`sqrt(x &= 1)`,
+  },
+  {
+    latex: String.raw`\frac{\begin{align*}x&=1 \tag{1}\end{align*}}{y}`,
+    typst: String.raw`frac(x &= 1, y)`,
+    typst_inline: String.raw`frac(x &= 1, y)`,
+  },
 ];

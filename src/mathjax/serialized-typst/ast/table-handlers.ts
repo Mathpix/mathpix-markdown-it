@@ -1,5 +1,6 @@
 import { MathNode } from "../types";
-import { MLABELEDTR, BLOCK_CODE_FUNCS } from "../consts";
+import { MLABELEDTR } from "../consts";
+import { containsBlockCodeFunc } from "./code-mode-utils";
 import { getProp, getContentChildren } from "../common";
 import { TypstMathNode, TypstMathResult, FuncArg, ITypstMathSerializer, astNodeStore } from "./types";
 import {
@@ -14,18 +15,6 @@ import {
   buildNumcasesGrid, buildEqnArrayAsMatResult, buildTaggedEqnArrayResult,
   buildUntaggedEqnArrayResult, buildMatrixResult,
 } from "./table-builders";
-
-/** Same scope as containsBlockCodeFunc in dispatcher.ts: recurses only
- *  into SeqNode children, not FuncCall.args / Delimited.body. */
-const hasBlockCodeFunc = (node: TypstMathNode): boolean => {
-  if (node.type === 'func' && node.hash && BLOCK_CODE_FUNCS.has(node.name)) {
-    return true;
-  }
-  if (node.type === 'seq') {
-    return node.children.some(hasBlockCodeFunc);
-  }
-  return false;
-};
 
 export const mtableAst = (node: MathNode, serialize: ITypstMathSerializer): TypstMathResult => {
   const countRow = node.childNodes.length;
@@ -85,7 +74,7 @@ export const mtableAst = (node: MathNode, serialize: ITypstMathSerializer): Typs
       // flow in eqnArray rows. Use inline variant to keep everything in math mode.
       // Inline #box/#circle are safe and do NOT trigger this.
       const useInlineForBlock = isEqnArray && result.nodeInline !== undefined
-        && hasBlockCodeFunc(blockNode);
+        && containsBlockCodeFunc(blockNode);
       cellNodes.push(useInlineForBlock ? inlineNode : blockNode);
       cellNodesInline.push(inlineNode);
       if (result.nodeInline !== undefined) {
