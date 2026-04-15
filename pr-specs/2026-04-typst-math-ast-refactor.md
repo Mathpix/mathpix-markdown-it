@@ -18,7 +18,7 @@ This PR introduces a typed AST with centralized escaping to eliminate these bug 
 1. Introduce a typed intermediate representation (`TypstMathNode`) between MathML tree traversal and Typst string output
 2. Migrate all 22 handlers to return AST nodes instead of strings
 3. Centralize all escaping in a single serializer with a context registry
-4. Maintain 100% output compatibility: all 937 tests pass
+4. Maintain 100% output compatibility: all 952 tests pass
 5. Eliminate escaping-related bug classes at the architectural level
 
 ---
@@ -143,7 +143,9 @@ src/mathjax/serialized-typst/
     ├── builders.ts        ← Factory functions for all nodes and arguments
     ├── serialize.ts       ← serializeTypstMath(), escaping, spacing, scripts, delimiters
     ├── serialize-context.ts ← FuncEscapeContext enum, FUNC_ESCAPE_CONTEXTS registry
-    ├── dispatcher.ts      ← AST dispatcher with 7 documented patterns
+    ├── dispatcher.ts      ← AST dispatcher with 7 documented patterns; visitNode
+    │                         auto-fallback to nodeInline when block contains block-code
+    ├── code-mode-utils.ts ← containsBlockCodeFunc shared helper (added 2026-04)
     ├── token-handlers.ts  ← mi, mo, mn, mtext, mspace
     ├── script-handlers.ts ← mfrac, msup, msub, msubsup, msqrt, mroot,
     │                         mover, munder, munderover, mmultiscripts
@@ -196,9 +198,21 @@ Guards against Typst parser ambiguities that previously produced broken output:
 
 `BLOCK_CODE_FUNCS` set in `consts.ts`: `{math.equation, grid}`. Inline code-mode functions (`#box`, `#ellipse`, `#circle`, `#text`, `#highlight`, `#hide`) are safe in any math context and NOT in the set.
 
-`containsBlockCodeFunc` (`dispatcher.ts`) and `hasBlockCodeFunc` (`table-handlers.ts`) detect when block-level funcs appear with siblings and switch to inline variants. Recursion scope: SeqNode children only — does not inspect `FuncCall.args` or `Delimited.body` (sufficient for current emission patterns).
+`containsBlockCodeFunc` shared helper in `ast/code-mode-utils.ts`. Recursion scope: SeqNode children only — does not inspect `FuncCall.args/body` or `Delimited.body` (those subtrees were already processed via `visitNode` auto-fallback, so block-code cannot remain in their descendants).
 
-EXTEND the set when adding a new block-level `funcCall(name, ..., { hash: true })` — otherwise guards will miss it and math flow may silently break.
+**Three layers of protection** ensure block-level code-mode never nests inside math wrappers:
+
+1. **`visitNode` auto-fallback** (`dispatcher.ts`): when `dispatchFull(child).node` contains block-code AND `nodeInline` is provided, return `nodeInline`. Covers ALL handlers that wrap children in math constructs (mfrac, msqrt, mroot, mover, munder, munderover, mmultiscripts, msup/msub/msubsup, mencloseAst, mphantomAst, mpaddedAst, mstyleAst, mrowAst simple path) — they call `serialize.visitNode(child)` and get the inline variant transparently.
+
+2. **`visitInferredMrowAst`** (`dispatcher.ts`): when block-code child has siblings in an inferred mrow, use inline variants for all children. Uses `visitNodeFull` (bypasses auto-fallback) and has its own `containsBlockCodeFunc` check.
+
+3. **`mtableAst`** (`table-handlers.ts`): when an eqnArray cell contains block-code, use inline variant for that cell. Uses `visitNodeFull` and has its own `containsBlockCodeFunc` check.
+
+4. **`mrowAst` for `\left...\right`** (`structural-handlers.ts`): when content of `lr()` would contain block-code, use inline children for both block and inline variants. Uses `visitNodeFull` and has its own check.
+
+Contract: handlers emitting block-code (`buildTaggedEqnArrayResult`, `buildNumcasesGrid` in `table-builders.ts`) MUST also provide `nodeInline` — otherwise the auto-fallback has no safe variant to substitute.
+
+EXTEND `BLOCK_CODE_FUNCS` set when adding a new block-level `funcCall(name, ..., { hash: true })` — protection automatically propagates to all 4 layers.
 
 ### Code cleanup
 - Deduplicated `COMBINING_FONT_MAP` → use `typstFontMap` from single source
@@ -217,7 +231,7 @@ EXTEND the set when adding a new block-level `funcCall(name, ..., { hash: true }
 
 ## Constraints / Invariants
 
-1. **All 937 tests pass.** Output verified at each step.
+1. **All 952 tests pass.** Output verified at each step.
 2. **Escaping is serializer-only.** No handler calls escape functions directly.
 3. **Typed discriminants.** All node type, arg value, and func arg comparisons use const enums.
 4. **Public API preserved.** `ITypstData` remains the external interface.
@@ -227,7 +241,7 @@ EXTEND the set when adding a new block-level `funcCall(name, ..., { hash: true }
 
 ## Observability
 
-- All 937 tests verified at each step
+- All 952 tests verified at each step
 - TypeScript strict mode — zero `any` types in AST handlers
 - console.warn on handler errors (previously silently swallowed)
 
@@ -245,5 +259,5 @@ EXTEND the set when adding a new block-level `funcCall(name, ..., { hash: true }
 - [x] Bare `\{`/`\}` correctly escaped, chevron nesting tracked
 - [x] Opening bracket separated from script base
 - [x] Dead code removed, files split, types unified
-- [x] All 937 tests pass
+- [x] All 952 tests pass
 - [x] `Status` updated to `Implemented`

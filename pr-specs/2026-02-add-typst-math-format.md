@@ -1022,12 +1022,20 @@ This unifies the pre-2026-04 split where `emptyset(x)` got a space but `sin(x)` 
 
 `#math.equation(block: true, ...)` and `#grid(...)` are block-level Typst functions — when placed inline with other math content, they disrupt math flow. Inline code-mode functions (`#box`, `#ellipse`, `#circle`, `#text`, `#highlight`, `#hide`) are safe in any math context.
 
-`BLOCK_CODE_FUNCS` set in `consts.ts`: `{math.equation, grid}`. Two guards detect them and switch to inline variants when block-level funcs appear with siblings:
+`BLOCK_CODE_FUNCS` set in `consts.ts`: `{math.equation, grid}`. Shared helper `containsBlockCodeFunc` in `ast/code-mode-utils.ts` detects them.
 
-- `containsBlockCodeFunc` (`dispatcher.ts`) — triggers inline-variant fallback in `visitInferredMrowAst` when block-level funcs have siblings in an inferred mrow
-- `hasBlockCodeFunc` (`table-handlers.ts`) — triggers inline-variant fallback in eqnArray cells
+**Four layers of protection** prevent block-code from nesting inside math wrappers:
+
+1. **`visitNode` auto-fallback** (`dispatcher.ts`): when `dispatchFull(child).node` contains block-code AND `nodeInline` is provided, return `nodeInline` instead. Covers ALL handlers that wrap children in math constructs (mfrac, msqrt, mover, mphantom, mencloseAst, etc.) — they call `serialize.visitNode(child)` and get the safe inline variant transparently. Handlers needing both variants explicitly use `visitNodeFull` and have their own checks (layers 2-4).
+2. **`visitInferredMrowAst`**: block-code child + siblings → use inline variants for all children
+3. **`mtableAst`**: block-code in eqnArray cell → use inline variant for that cell
+4. **`mrowAst` for `\left...\right`**: block-code in lr() body → use inline children for both block and inline variants
+
+**Contract:** handlers emitting block-code (`buildTaggedEqnArrayResult`, `buildNumcasesGrid`) MUST also provide `nodeInline`.
 
 **Currently emitted:** `#math.equation(block: true, ...)` (tagged equations) and `#grid(...)` (numcases). `#align(center, ...)` is no longer emitted — `\boxed{}` / `\enclose{circle}` / bordered arrays migrated to plain `#box()` / `#ellipse()` in 2026-04 (see "Boxed/circle simplification" below).
+
+EXTEND `BLOCK_CODE_FUNCS` when adding a new block-level `funcCall(name, ..., { hash: true })` — protection auto-propagates to all 4 layers.
 
 ### Boxed/circle simplification (changed 2026-04)
 
