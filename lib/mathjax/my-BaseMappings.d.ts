@@ -8,6 +8,11 @@ declare const TexParser_js_1: any;
  * Downstream serializers (MathML, Typst, ASCII, assistive MML) use this
  * property to emit a clean Unicode symbol instead of the visual-hack subtree.
  *
+ * REQUIRED invariant: any custom command whose macro contains brackets
+ * (like \rrbracket = `]\!]`) MUST go through this handler. Otherwise the
+ * inner brackets leak into markUnpairedBrackets pairing logic and break
+ * the visible bracket balance of the surrounding expression.
+ *
  * @param macro  TeX expansion string (e.g. '{[\\![}')
  * @param cmd    Command name registered in custom-cmd-map.ts (e.g. 'llbracket')
  */

@@ -45,25 +45,23 @@ const DELIMITER_LITERAL_MAP: Readonly<Record<string, string>> = {
 export type BracketToken = { char: string; pos: number };
 
 // Function wrappers (sqrt, frac, etc.): brackets inside cannot pair with outside.
-// mtr/mlabeledtr: each cell (mtd) is a separate scope — brackets cannot pair
-// across cells or rows, preventing orphaned brackets in aligned/mat() output.
-// mphantom/mpadded: content is wrapped in #hide($...$) / #highlight[$...$] —
-// brackets inside the wrapped $...$ must pair within it, else they end up
-// unmatched across the wrapping boundary in the Typst output.
+// mtr/mlabeledtr: each cell (mtd) is a separate scope.
+// mphantom/mpadded: content wrapped in #hide($...$) / #highlight[$...$].
+// maction/merror/semantics: self-contained containers — content isolated.
 const SCOPE_BOUNDARIES = new Set([
   'msqrt', 'mroot', 'mfrac', 'menclose', 'mover', 'munder', 'munderover',
   'mphantom', 'mpadded',
   'mtr', 'mlabeledtr',
   'mstyle',
+  'maction', 'merror', 'semantics',
 ]);
 
 // Nodes where the base (child[0]) stays in the parent scope but script children
-// (sub/sup) are separate scopes.  The base of msub/msup is in the same visual
-// scope as surrounding content (e.g. (a+b)^2 → ) is the base of msup and must
-// pair with ( outside).  But script children are wrapped in ^(…) / _(…), so
-// brackets inside scripts cannot pair with brackets outside.
+// (sub/sup, pre/post-scripts) are separate scopes. The base of msub/msup is in
+// the same visual scope as surrounding content. Script children are wrapped in
+// ^(…) / _(…) / attach() args, so their brackets cannot pair with brackets outside.
 const SCRIPT_SCOPE_KINDS = new Set([
-  'msub', 'msup', 'msubsup',
+  'msub', 'msup', 'msubsup', 'mmultiscripts',
 ]);
 
 /** Skip past a quoted string starting at position i (the opening ").
@@ -274,6 +272,15 @@ export const markUnpairedBrackets = (root: MathNode, inTableCell = false): void 
       }
     }
     for (const child of (node.childNodes ?? [])) {
+      // Custom commands (\llbracket, \rrbracket, \Varangle, etc.) serialize
+      // to a single Typst symbol via getCustomCmdTypst — their internal
+      // MathML structure (e.g. \rrbracket = `]\!]` → mrow of mo nodes) is
+      // OPAQUE and must not participate in bracket pairing. Without this
+      // skip, markUnpairedBrackets would see the inner ] of \rrbracket as
+      // a closing bracket, falsely pairing it with an outer [.
+      if (child.getProperty?.('data-custom-cmd')) {
+        continue;
+      }
       if (SCOPE_BOUNDARIES.has(child.kind)) {
         // Each child of the scope boundary is a separate scope.
         // mtable: each row is separate; brackets can't pair across rows.
@@ -332,6 +339,17 @@ export const clearUnpairedBracketMarks = (root: MathNode): void => {
     }
   };
   walk(root);
+};
+
+/** Count unpaired ASCII brackets in a Typst expression string. Uses
+ *  scanBracketTokens (skips quoted strings, escaped chars, syntax parens).
+ *  Returns total unpaired count across (), [], {}. Used as a dev invariant. */
+export const countUnpairedBrackets = (expr: string): number => {
+  const tokens = scanBracketTokens(expr);
+  if (tokens.length === 0) {
+    return 0;
+  }
+  return findUnpairedIndices(tokens.map(t => t.char)).size;
 };
 
 export const mapDelimiter = (delim: string): string =>

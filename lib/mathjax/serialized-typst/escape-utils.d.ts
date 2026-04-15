@@ -4,10 +4,11 @@
  * Walks a Typst expression tracking bracket depth, skips quoted strings ("...")
  * and backslash-escaped characters, applies escape/detection at depth 0.
  */
-/** Escape , ; and : at depth 0, and unpaired [ ] in content placed inside any Typst function call.
- *  Uses backslash escapes (\, \;) and space-before-colon (word: → word :) to prevent
- *  Typst from parsing as argument separators or named arguments.
- *  Skips content inside "..." strings and already-escaped sequences. */
+export declare const escapeUnpairedBrackets: (expr: string) => string;
+export declare const escapeUnbalancedBraces: (expr: string) => string;
+/** Escape , ; : at depth 0, plus unpaired [], (), {} in content inside Typst function
+ *  calls. Backslash-escapes prevent Typst from parsing them as argument separators,
+ *  named arguments, or unclosed delimiters. Skips "..." strings and escaped chars. */
 export declare const escapeContentSeparators: (expr: string) => string;
 /** Escape , ; and : at depth 0 — for mat()/cases() cells where : is also a named-argument marker.
  *  For colons: inserts space before : when preceded by identifier.
@@ -28,9 +29,5 @@ export declare const escapeLrSemicolons: (expr: string) => string;
  *  Reuses scanBracketTokens which skips syntax parens (function calls, subscript/
  *  superscript grouping), quoted strings, and already-escaped chars. */
 export declare const escapeLrBrackets: (expr: string, chars?: ReadonlySet<string>) => string;
-/** Escape unbalanced parentheses: ( → "(" and ) → ")".
- *  Prevents lone parens from being parsed as Typst syntax (group open/close)
- *  inside wrapping function calls like overline(), cancel(), etc.
- *  Uses scanBracketTokens (which skips syntax parens, quoted strings,
- *  and escaped chars) + findUnpairedIndices for reliable pairing. */
-export declare const escapeUnbalancedParens: (content: string) => string;
+/** Escape unbalanced parens to prevent Typst group open/close interpretation. */
+export declare const escapeUnbalancedParens: (expr: string) => string;

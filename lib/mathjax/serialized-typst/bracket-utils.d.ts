@@ -18,6 +18,10 @@ export declare const markUnpairedBrackets: (root: MathNode, inTableCell?: boolea
 /** Remove data-unpaired-bracket properties set by markUnpairedBrackets.
  *  Call after Typst serialization to avoid leaking state to other visitors. */
 export declare const clearUnpairedBracketMarks: (root: MathNode) => void;
+/** Count unpaired ASCII brackets in a Typst expression string. Uses
+ *  scanBracketTokens (skips quoted strings, escaped chars, syntax parens).
+ *  Returns total unpaired count across (), [], {}. Used as a dev invariant. */
+export declare const countUnpairedBrackets: (expr: string) => number;
 export declare const mapDelimiter: (delim: string) => string;
 /** Map delimiter for use inside lr(): apply lr-specific escapes first,
  *  then fall back to typstSymbolMap, then return as-is. */

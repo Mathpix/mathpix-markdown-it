@@ -3848,4 +3848,23 @@ x=4
     typst: String.raw`frac(x &= 1, y)`,
     typst_inline: String.raw`frac(x &= 1, y)`,
   },
+  // Custom commands (\rrbracket) are OPAQUE in bracket pairing — their internal
+  // MathML structure (\rrbracket → mrow ]\!]) must not leak into pairing.
+  // Without this, [ before \rrbracket) would falsely pair with the inner ] of
+  // \rrbracket, leaving a bare [ inside lr() → "unclosed delimiter" error.
+  {
+    latex: String.raw`[x\rrbracket)`,
+    typst: String.raw`\[ x bracket.r.stroked \)`,
+    typst_inline: String.raw`\[ x bracket.r.stroked \)`,
+  },
+  // Full real-world case: tagged equation with \left(...\right. containing [ and
+  // \rrbracket inside. Tests all fixes together: custom-cmd opacity, isLeftRightScope,
+  // table-context unpaired bracket marking (→ bracket.l / paren.r symbol names).
+  {
+    latex: String.raw`\begin{equation*}
+f(X)=u^{(m)}(X) g^{(m)}(X) \bmod \left(m^{m}[X \rrbracket)\right. \tag{A.3.3}
+\end{equation*}`,
+    typst: `#math.equation(block: true, numbering: n => [(A.3.3)], $ f(X) = u^((m))(X) g^((m))(X) mod lr(\\( m^m bracket.l X bracket.r.stroked paren.r) $)\n#counter(math.equation).update(n => n - 1)`,
+    typst_inline: `f(X) = u^((m))(X) g^((m))(X) mod lr(\\( m^m bracket.l X bracket.r.stroked paren.r)`,
+  },
 ];

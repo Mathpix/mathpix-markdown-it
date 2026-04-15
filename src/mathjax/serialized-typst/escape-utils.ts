@@ -180,36 +180,42 @@ const escapeAtPositions = (expr: string, positions: ReadonlySet<number>): string
   return parts.join('');
 };
 
-const escapeUnpairedBrackets = (expr: string): string => {
-  if (expr.indexOf('[') === -1 && expr.indexOf(']') === -1) {
+/** Escape unpaired brackets of a specific pair (openChar, closeChar) with backslash.
+ *  Uses scanBracketTokens which skips quoted strings, escaped chars, and syntax
+ *  parens — so already-escaped brackets pass through unchanged. */
+const escapeUnpairedOfType = (expr: string, openChar: string, closeChar: string): string => {
+  if (expr.indexOf(openChar) === -1 && expr.indexOf(closeChar) === -1) {
     return expr;
   }
-  const allBrackets = scanBracketTokens(expr);
-  const squareBrackets = allBrackets.filter(b => b.char === '[' || b.char === ']');
-  if (squareBrackets.length === 0) {
+  const matching = scanBracketTokens(expr).filter(b => b.char === openChar || b.char === closeChar);
+  if (matching.length === 0) {
     return expr;
   }
-  const unpairedTokenIndices = findUnpairedIndices(squareBrackets.map(b => b.char));
-  if (unpairedTokenIndices.size === 0) {
+  const unpairedIndices = findUnpairedIndices(matching.map(b => b.char));
+  if (unpairedIndices.size === 0) {
     return expr;
   }
-  const unpairedPositions = new Set<number>();
-  for (const idx of unpairedTokenIndices) {
-    unpairedPositions.add(squareBrackets[idx].pos);
+  const positions = new Set<number>();
+  for (const idx of unpairedIndices) {
+    positions.add(matching[idx].pos);
   }
-  return escapeAtPositions(expr, unpairedPositions);
+  return escapeAtPositions(expr, positions);
 };
 
-/** Escape , ; and : at depth 0, and unpaired [ ] in content placed inside any Typst function call.
- *  Uses backslash escapes (\, \;) and space-before-colon (word: → word :) to prevent
- *  Typst from parsing as argument separators or named arguments.
- *  Skips content inside "..." strings and already-escaped sequences. */
+export const escapeUnpairedBrackets = (expr: string): string =>
+  escapeUnpairedOfType(expr, '[', ']');
+
+export const escapeUnbalancedBraces = (expr: string): string =>
+  escapeUnpairedOfType(expr, '{', '}');
+
+/** Escape , ; : at depth 0, plus unpaired [], (), {} in content inside Typst function
+ *  calls. Backslash-escapes prevent Typst from parsing them as argument separators,
+ *  named arguments, or unclosed delimiters. Skips "..." strings and escaped chars. */
 export const escapeContentSeparators = (expr: string): string =>
-  scanExpression(escapeUnpairedBrackets(expr), {
-    escapeComma: true,
-    escapeSemicolon: true,
-    escapeColon: true
-  });
+  scanExpression(
+    escapeUnbalancedBraces(escapeUnbalancedParens(escapeUnpairedBrackets(expr))),
+    { escapeComma: true, escapeSemicolon: true, escapeColon: true }
+  );
 
 /** Escape , ; and : at depth 0 — for mat()/cases() cells where : is also a named-argument marker.
  *  For colons: inserts space before : when preceded by identifier.
@@ -267,28 +273,7 @@ export const escapeLrBrackets = (expr: string, chars?: ReadonlySet<string>): str
   return escapeAtPositions(expr, positions);
 };
 
-/** Escape unbalanced parentheses: ( → "(" and ) → ")".
- *  Prevents lone parens from being parsed as Typst syntax (group open/close)
- *  inside wrapping function calls like overline(), cancel(), etc.
- *  Uses scanBracketTokens (which skips syntax parens, quoted strings,
- *  and escaped chars) + findUnpairedIndices for reliable pairing. */
-export const escapeUnbalancedParens = (content: string): string => {
-  if (content.indexOf('(') === -1 && content.indexOf(')') === -1) {
-    return content;
-  }
-  const allBrackets = scanBracketTokens(content);
-  const parens = allBrackets.filter(b => b.char === '(' || b.char === ')');
-  if (parens.length === 0) {
-    return content;
-  }
-  const unpairedTokenIndices = findUnpairedIndices(parens.map(b => b.char));
-  if (unpairedTokenIndices.size === 0) {
-    return content;
-  }
-  const unpairedPositions = new Set<number>();
-  for (const idx of unpairedTokenIndices) {
-    unpairedPositions.add(parens[idx].pos);
-  }
-  return escapeAtPositions(content, unpairedPositions);
-};
+/** Escape unbalanced parens to prevent Typst group open/close interpretation. */
+export const escapeUnbalancedParens = (expr: string): string =>
+  escapeUnpairedOfType(expr, '(', ')');
 

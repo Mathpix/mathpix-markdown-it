@@ -20,6 +20,8 @@ import {
   escapeLrSemicolons,
   escapeLrBrackets,
   escapeUnbalancedParens,
+  escapeUnpairedBrackets,
+  escapeUnbalancedBraces,
   hasTopLevelSeparators,
 } from '../escape-utils';
 import {
@@ -28,7 +30,7 @@ import {
   OPEN_BRACKETS, CLOSE_BRACKETS,
 } from '../consts';
 import { sanitizeLabel } from '../../../markdown/common/labels';
-import { mapDelimiter, escapeLrDelimiter } from '../bracket-utils';
+import { mapDelimiter, escapeLrDelimiter, countUnpairedBrackets } from '../bracket-utils';
 
 /** Any escaped bracket at start: \( \) \[ \] \{ \} */
 const RE_ESCAPED_BRACKET_START = /^\\[()[\]{}]/;
@@ -402,11 +404,19 @@ const applyFuncEscaping = (expr: string, ctx: FuncEscapeContext): string => {
     case FuncEscapeContext.MatrixRow:
       return escapeMatrixRowSeparators(expr);
     case FuncEscapeContext.Wrapper:
-      return escapeUnbalancedParens(escapeContentSeparators(expr));
+      // escapeContentSeparators already handles unbalanced (), [], {}.
+      return escapeContentSeparators(expr);
     case FuncEscapeContext.StringArg:
       return escapeStringContent(expr);
-    case FuncEscapeContext.LrContent:
-      return escapeLrSemicolons(expr);
+    case FuncEscapeContext.LrContent: {
+      // lr() body must not contain unpaired ASCII brackets (parse error).
+      // escapeLrBody handles the delimiter-specific escape separately; here
+      // we only need the bracket backstop + ; : escaping.
+      let lr = escapeUnpairedBrackets(expr);
+      lr = escapeUnbalancedParens(lr);
+      lr = escapeUnbalancedBraces(lr);
+      return escapeLrSemicolons(lr);
+    }
   }
 };
 
@@ -455,14 +465,17 @@ const serializeScript = (node: ScriptNode): string => {
   return result;
 };
 
-/** Format _x or _(multi-char). Escapes unbalanced parens inside grouping to
- *  prevent bare ( or ) from breaking the ^(...) / _(...) syntax. */
+/** Format _x or _(multi-char). Escapes unbalanced brackets/parens/braces
+ *  inside grouping to prevent them from breaking ^(...) / _(...) syntax. */
 const formatScriptPart = (prefix: string, content: string): string => {
   if (!content) {
     return '';
   }
   if (content.length > 1) {
-    return prefix + '(' + escapeUnbalancedParens(content) + ')';
+    let safe = escapeUnpairedBrackets(content);
+    safe = escapeUnbalancedParens(safe);
+    safe = escapeUnbalancedBraces(safe);
+    return prefix + '(' + safe + ')';
   }
   return prefix + content;
 };
@@ -496,10 +509,25 @@ const buildLrBracketChars = (openDelim: string, closeDelim: string): Set<string>
 };
 
 /** Escape body content for lr() with delimiter-specific bracket escaping */
+/** Escape body for lr(). Backstop: catch residual unpaired ASCII brackets that
+ *  tree-level markUnpairedBrackets might have missed (unknown scope, new node
+ *  kind, missing data-custom-cmd). Converts parse errors into visual diffs. */
 const escapeLrBody = (body: string, openDelim: string, closeDelim: string): string => {
   const chars = buildLrBracketChars(openDelim, closeDelim);
-  const escaped = chars.size > 0 ? escapeLrBrackets(body, chars) : body;
-  return escapeLrSemicolons(escaped);
+  let escaped = chars.size > 0 ? escapeLrBrackets(body, chars) : body;
+  escaped = escapeUnpairedBrackets(escaped);
+  escaped = escapeUnbalancedParens(escaped);
+  escaped = escapeUnbalancedBraces(escaped);
+  escaped = escapeLrSemicolons(escaped);
+  // Invariant check — all backstops should leave body balanced.
+  // If not, something upstream is broken; warn in dev builds.
+  if (process.env.NODE_ENV !== 'production' && typeof console !== 'undefined') {
+    const unpaired = countUnpairedBrackets(escaped);
+    if (unpaired > 0) {
+      console.warn('[typst-lr] unbalanced lr() body (' + unpaired + ' unpaired): ' + escaped);
+    }
+  }
+  return escaped;
 };
 
 const serializeDelimited = (node: DelimitedNode): string => {
