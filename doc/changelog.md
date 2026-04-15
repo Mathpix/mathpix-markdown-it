@@ -24,16 +24,6 @@
 - Error Handling:
   - `merror` nodes (invalid LaTeX) return `{ typstmath: '', typstmath_inline: '', error: '...' }` — errors never appear in Typst output.
 
-- New Option: `maxNesting` — cap block-rule recursion depth
-  - Exposed markdown-it's native `maxNesting` option through `TMarkdownItOptions` / `optionsMathpixMarkdown` (default `100`, matches markdown-it's `default` preset).
-  - Limits nested block-rule recursion (bullet/ordered lists, blockquotes, html_block). Each list nesting level adds 2 to `state.level`, so `maxNesting: 12` → up to ~6 list levels, `maxNesting: 20` (CommonMark preset) → up to ~10 levels.
-  - Prevents pathological input like `+ + + + + ...` (valid CommonMark — each `+ ` is a bullet marker whose content is parsed recursively) from rendering as deeply-nested `<ul><li><ul><li>...` structures.
-  - Usage: `MM.markdownToHTML(input, { maxNesting: 12 })`.
-  - Propagated at all entry points: `markdownToHTML`, `MM.render`, `<MathpixMarkdown>` React component, and through `setBaseOptionsMd` in the preview re-render path.
-
-- Tests:
-  - Added 7 test cases in `tests/_lists.js` — describe block `Check maxNesting option caps deep list nesting` — covering cap behavior at `maxNesting ∈ {3, 5, 10, 12, 20}`, default-100 passthrough, and correctness of a 3-level real list at low `maxNesting`.
-
 ## [2.0.38] - Fix infinite loop in `inlineMmdIcon` and `inlineDiagbox` silent mode
 
 - Bug Fix:

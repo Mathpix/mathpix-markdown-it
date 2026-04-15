@@ -34,7 +34,6 @@ export interface optionsMathpixMarkdown {
     breaks?: boolean;
     typographer?: boolean;
     linkify?: boolean;
-    maxNesting?: number;
     enableFileLinks?: boolean;
     validateLink?: (url: string) => void;
     xhtmlOut?: boolean;
@@ -79,7 +78,6 @@ export type TMarkdownItOptions = {
     breaks?: boolean;
     typographer?: boolean;
     linkify?: boolean;
-    maxNesting?: number;
     enableFileLinks?: boolean;
     validateLink?: (url: string) => void;
     xhtmlOut?: boolean;
