@@ -85,6 +85,15 @@ const normalizeMathJaxA11y = (adaptor, mjxContainer) => {
 const normalizeTypstSpaces = (s: string): string =>
   s ? s.trim().replace(/(\S) {2,}/g, '$1 ') : '';
 
+/** Strip trailing \\ linebreak sequences. Needed for inline `$...$` where a
+ *  trailing \ combines with the closing $ to form \$ (escaped dollar), breaking
+ *  math-mode termination. Block `$ ... $` has a space before $ that saves it,
+ *  so trailing linebreaks can remain there for visual parity with MathJax. */
+const RE_TRAILING_LINEBREAKS = /(?:\s*\\)+\s*$/;
+
+const stripTrailingLinebreaks = (s: string): string =>
+  s ? s.replace(RE_TRAILING_LINEBREAKS, '') : '';
+
 /** Find the first merror node in the tree and return its error message, or null. */
 const findMerror = (node: MathNode): string | null => {
   if (!node) return null;
@@ -121,7 +130,9 @@ const toTypstData = (node: MathNode, labels?: Record<string, { tag: string; id: 
   clearUnpairedBracketMarks(node);
   clearTypstProperties(node);
   const typstmath = normalizeTypstSpaces(data?.typst);
-  const typstmath_inline = normalizeTypstSpaces(data?.typst_inline ?? data?.typst);
+  const typstmath_inline = stripTrailingLinebreaks(
+    normalizeTypstSpaces(data?.typst_inline ?? data?.typst)
+  );
   return { typstmath, typstmath_inline };
 };
 

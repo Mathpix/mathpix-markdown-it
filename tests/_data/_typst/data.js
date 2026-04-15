@@ -3805,4 +3805,11 @@ x=4
     typst: String.raw`f'(x)`,
     typst_inline: String.raw`f'(x)`,
   },
+  // gathered with trailing \\ — inline strips them (to prevent \$ escape),
+  // block keeps them (safe because $ ... $ has space before $).
+  {
+    latex: String.raw`\begin{gathered}y=x^{2} \\ \\ \\ \\ \\ \\ \end{gathered}`,
+    typst: `y = x^2 \\\n \\\n \\\n \\\n \\`,
+    typst_inline: `y = x^2`,
+  },
 ];
