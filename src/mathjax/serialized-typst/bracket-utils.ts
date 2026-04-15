@@ -47,8 +47,12 @@ export type BracketToken = { char: string; pos: number };
 // Function wrappers (sqrt, frac, etc.): brackets inside cannot pair with outside.
 // mtr/mlabeledtr: each cell (mtd) is a separate scope — brackets cannot pair
 // across cells or rows, preventing orphaned brackets in aligned/mat() output.
+// mphantom/mpadded: content is wrapped in #hide($...$) / #highlight[$...$] —
+// brackets inside the wrapped $...$ must pair within it, else they end up
+// unmatched across the wrapping boundary in the Typst output.
 const SCOPE_BOUNDARIES = new Set([
-  'msqrt', 'mroot', 'mfrac', 'menclose', 'mover', 'munder',
+  'msqrt', 'mroot', 'mfrac', 'menclose', 'mover', 'munder', 'munderover',
+  'mphantom', 'mpadded',
   'mtr', 'mlabeledtr',
   'mstyle',
 ]);
@@ -226,6 +230,21 @@ export const replaceUnpairedBrackets = (expr: string): string => {
   return result;
 };
 
+/** A mrow with open/close properties (from \left...\right) is a scope
+ *  boundary for bracket pairing — inner brackets must not pair with outer
+ *  ones. Otherwise \left( [ x \right) would pair [ inside with ] outside,
+ *  leaving an unclosed [ in the serialized lr() body. */
+const isLeftRightScope = (node: MathNode): boolean => {
+  if (node.kind !== 'mrow') {
+    return false;
+  }
+  if (getProp<number>(node, 'texClass') !== TEXCLASS.INNER) {
+    return false;
+  }
+  return getProp<string>(node, 'open') !== undefined
+    || getProp<string>(node, 'close') !== undefined;
+};
+
 export const markUnpairedBrackets = (root: MathNode, inTableCell = false): void => {
   const bracketNodes: { node: MathNode; char: string }[] = [];
   // Check if an mo node is a \left...\right delimiter (first/last child of
@@ -233,13 +252,9 @@ export const markUnpairedBrackets = (root: MathNode, inTableCell = false): void 
   // participate in pairing — otherwise \right] would pair with an inner [.
   const isLeftRightDelimiter = (moNode: MathNode): boolean => {
     const parent = moNode.parent;
-    if (!parent || parent.kind !== 'mrow') {
+    if (!parent || !isLeftRightScope(parent)) {
       return false;
     }
-    if (getProp<number>(parent, 'texClass') !== TEXCLASS.INNER) {
-      return false;
-    }
-    if (getProp<string>(parent, 'open') === undefined && getProp<string>(parent, 'close') === undefined) return false;
     const ch = parent.childNodes;
     if (!ch || ch.length === 0) {
       return false;
@@ -266,6 +281,11 @@ export const markUnpairedBrackets = (root: MathNode, inTableCell = false): void 
         for (const grandchild of (child.childNodes ?? [])) {
           markUnpairedBrackets(grandchild, childInMatrix);
         }
+      } else if (isLeftRightScope(child)) {
+        // mrow from \left...\right: inner brackets pair only within this mrow,
+        // not with outer siblings. Run markUnpairedBrackets on the whole mrow
+        // as a single scope (NOT per-grandchild — tokens inside form ONE expression).
+        markUnpairedBrackets(child, inTableCell);
       } else if (SCRIPT_SCOPE_KINDS.has(child.kind)) {
         // Base (child[0]) stays in parent scope; script children are separate.
         // Exception: opening bracket as script base (e.g. [^{\circ}) must be

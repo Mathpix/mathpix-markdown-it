@@ -3812,4 +3812,19 @@ x=4
     typst: `y = x^2 \\\n \\\n \\\n \\\n \\`,
     typst_inline: `y = x^2`,
   },
+  // \left(...\right. with unbalanced [ inside pairing ] outside — must NOT
+  // pair across \left...\right boundary, else [ gets trapped in lr() body
+  // without its ] closing it. Both [ and ] should be escaped (\[ and \]).
+  {
+    latex: String.raw`N(a)\left(N(a, b, c)=\frac{1}{6}[N(a+b+c)-N(a+b)-N(b+c)-N(a+c)+N(a)\right. +\mathrm{N}(\mathrm{b})+\mathrm{N}(\mathrm{c})])`,
+    typst: String.raw`N(a) lr(\( N(a, b, c) = frac(1, 6)\[ N(a + b + c) - N(a + b) - N(b + c) - N(a + c) + N(a)) + upright(N)(upright(b)) + upright(N)(upright(c))\]\)`,
+    typst_inline: String.raw`N(a) lr(\( N(a, b, c) = frac(1, 6)\[ N(a + b + c) - N(a + b) - N(b + c) - N(a + c) + N(a)) + upright(N)(upright(b)) + upright(N)(upright(c))\]\)`,
+  },
+  // \phantom with unbalanced ( inside — content wrapped in #hide($...$), so
+  // ( must be escaped inside the inner $...$ (scope boundary prevents cross-pairing)
+  {
+    latex: String.raw`a + \phantom{(b} + c)`,
+    typst: String.raw`a + #hide($\( b$) + c \)`,
+    typst_inline: String.raw`a + #hide($\( b$) + c \)`,
+  },
 ];
