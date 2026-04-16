@@ -508,10 +508,8 @@ const buildLrBracketChars = (openDelim: string, closeDelim: string): Set<string>
   return chars;
 };
 
-/** Escape body content for lr() with delimiter-specific bracket escaping */
 /** Escape body for lr(). Backstop: catch residual unpaired ASCII brackets that
- *  tree-level markUnpairedBrackets might have missed (unknown scope, new node
- *  kind, missing data-custom-cmd). Converts parse errors into visual diffs. */
+ *  tree-level markUnpairedBrackets might have missed. Converts errors into visual diffs. */
 const escapeLrBody = (body: string, openDelim: string, closeDelim: string): string => {
   const chars = buildLrBracketChars(openDelim, closeDelim);
   let escaped = chars.size > 0 ? escapeLrBrackets(body, chars) : body;

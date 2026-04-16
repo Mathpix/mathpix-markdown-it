@@ -2,6 +2,7 @@ import { UNWRAP_MAX_DEPTH } from '../consts';
 import {
   TypstMathNodeType,
   TypstMathNode,
+  TypstMathResult,
   SeqNode, SeqOpts,
   SymbolNode,
   TextNode, TextOpts,
@@ -34,6 +35,10 @@ export const seq = (children: TypstMathNode[], opts?: SeqOpts): SeqNode => ({
   children,
   ...opts,
 });
+
+export const EMPTY_RESULT: TypstMathResult = {
+  node: seq([])
+};
 
 export const symbol = (value: string): SymbolNode => ({
   type: TypstMathNodeType.Symbol,

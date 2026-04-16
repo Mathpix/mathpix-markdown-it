@@ -1,5 +1,6 @@
-import { TypstMathNode, SeqNode, SeqOpts, SymbolNode, TextNode, TextOpts, NumberNode, OperatorNode, OperatorOpts, FuncCallNode, FuncCallOpts, ScriptNode, ScriptOpts, DelimitedNode, DelimitedKind, DelimiterSize, SpaceNode, LinebreakNode, AlignmentNode, RawNode, RawOpts, PlaceholderNode, InlineMathNode, InlineMathOpts, LabelNode, MatrixRowNode, ErrorNode, FuncArg, PositionalArg, NamedArg, ArgValue } from './types';
+import { TypstMathNode, TypstMathResult, SeqNode, SeqOpts, SymbolNode, TextNode, TextOpts, NumberNode, OperatorNode, OperatorOpts, FuncCallNode, FuncCallOpts, ScriptNode, ScriptOpts, DelimitedNode, DelimitedKind, DelimiterSize, SpaceNode, LinebreakNode, AlignmentNode, RawNode, RawOpts, PlaceholderNode, InlineMathNode, InlineMathOpts, LabelNode, MatrixRowNode, ErrorNode, FuncArg, PositionalArg, NamedArg, ArgValue } from './types';
 export declare const seq: (children: TypstMathNode[], opts?: SeqOpts) => SeqNode;
+export declare const EMPTY_RESULT: TypstMathResult;
 export declare const symbol: (value: string) => SymbolNode;
 export declare const text: (value: string, opts?: TextOpts) => TextNode;
 export declare const num: (value: string) => NumberNode;

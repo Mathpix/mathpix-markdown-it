@@ -1,7 +1,7 @@
 import { TextNode, XMLNode } from 'mathjax-full/js/core/MmlTree/MmlNode.js';
 import { MathNode } from '../types';
 import { TypstMathNode, TypstMathResult, ITypstMathSerializer, AstHandlerFn, astNodeStore, LabelsMap } from './types';
-import { seq, symbol, funcCall, posArg, mathVal, errorNode } from './builders';
+import { seq, symbol, funcCall, posArg, mathVal, errorNode, EMPTY_RESULT } from './builders';
 import { serializeTypstMath } from './serialize';
 import { isNegationOverlay, getNodeText } from '../common';
 import { TEX_ATOM } from '../consts';
@@ -45,10 +45,6 @@ const AST_HANDLERS: Readonly<Record<string, AstHandlerFn>> = {
   mstyle: mstyleAst,
   mtable: mtableAst,
   mtr: mtrAst,
-};
-
-const EMPTY_RESULT: TypstMathResult = {
-  node: seq([])
 };
 
 /** Build an error result with fallback text extracted from the MathML node.

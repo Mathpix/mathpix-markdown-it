@@ -14,7 +14,7 @@ import {
 } from "../common";
 import { findTypstSymbol, typstFontMap, typstSymbolMap } from "../typst-symbol-map";
 import { TypstMathNode, TypstMathResult, ITypstMathSerializer } from "./types";
-import { seq, symbol, text, funcCall, num, operator, space, placeholder, posArg, mathVal, strVal } from "./builders";
+import { symbol, text, funcCall, num, operator, space, placeholder, posArg, mathVal, strVal, EMPTY_RESULT } from "./builders";
 
 const INVISIBLE_CHARS: ReadonlySet<string> = new Set([
   FUNC_APPLY, INVISIBLE_TIMES, INVISIBLE_SEP, INVISIBLE_PLUS,
@@ -60,8 +60,6 @@ const MSPACE_WIDTH_MAP: ReadonlyMap<string, string | null> = new Map([
   ['-0.1667em', null],
   ['-0.167em', null],
 ]);
-
-const EMPTY_RESULT: TypstMathResult = { node: seq([]) };
 
 const singleResult = (node: TypstMathNode): TypstMathResult => ({ node });
 

@@ -8,7 +8,7 @@ import {
 import { getNodeText, getAttrs } from "../common";
 import { typstAccentMap } from "../typst-symbol-map";
 import { TypstMathNode, TypstMathResult, ITypstMathSerializer, FuncArgKind } from "./types";
-import { seq, symbol, placeholder, funcCall, scriptNode, posArg, namedArg, mathVal, strVal, boolVal, identVal, isEmptyNode, getSymbolValue } from "./builders";
+import { seq, symbol, placeholder, funcCall, scriptNode, posArg, namedArg, mathVal, strVal, boolVal, identVal, isEmptyNode, getSymbolValue, EMPTY_RESULT } from "./builders";
 import { serializeTypstMath } from "./serialize";
 
 const PRIME_SHORTHANDS: ReadonlyMap<string, string> = new Map([
@@ -64,8 +64,6 @@ const TYPST_ACCENT_SHORTHANDS: ReadonlySet<string> = new Set([
   'overbrace', 'underbrace', 'overbracket', 'underbracket', 'overparen', 'underparen',
 ]);
 
-const EMPTY_RESULT: TypstMathResult = { node: seq([]) };
-
 const stripDashes = (s: string): string =>
   s.replace(HIDE_PATTERN, '')
     .replace(DASH_CHARS, '');
@@ -118,7 +116,7 @@ const matchBraceAnnotation = (
   kinds: BraceKind[]
 ): TypstMathNode | null => {
   const inner = unwrapSeq(baseNode);
-  if (inner.type === 'func' && (kinds as string[]).indexOf(inner.name) >= 0) {
+  if (inner.type === 'func' && (kinds as readonly string[]).includes(inner.name)) {
     const positionalCount = inner.args.filter(a => a.kind === FuncArgKind.Positional).length;
     if (positionalCount >= 2) {
       return null;
@@ -516,8 +514,8 @@ export const moverAst = (node: MathNode, serialize: ITypstMathSerializer): Typst
   const secondChild = node.childNodes[1] || null;
   const baseNode = visitChildNode(serialize, firstChild);
   const overNode = visitChildNode(serialize, secondChild);
-  const baseStr = serializeTypstMath(baseNode);
-  const overStr = serializeTypstMath(overNode);
+  const baseEmpty = isEmptyNode(baseNode);
+  const overEmpty = isEmptyNode(overNode);
   // \varlimsup: mover(mi("lim"), mo("―"))
   if (firstChild?.kind === 'mi' && secondChild?.kind === 'mo') {
     const baseText = getNodeText(firstChild);
@@ -543,8 +541,8 @@ export const moverAst = (node: MathNode, serialize: ITypstMathSerializer): Typst
       };
     }
   }
-  const rawBase = baseStr.trim();
-  const over = overStr.trim();
+  const rawBase = baseEmpty ? '' : serializeTypstMath(baseNode).trim();
+  const over = overEmpty ? '' : serializeTypstMath(overNode).trim();
   // Constructed long arrows
   if (over) {
     const longArrow = CONSTRUCTED_LONG_ARROWS.get(stripDashes(rawBase) + '|' + stripDashes(over));
@@ -580,7 +578,7 @@ export const moverAst = (node: MathNode, serialize: ITypstMathSerializer): Typst
     };
   }
   return {
-    node: baseStr.trim() ? baseNode : placeholder()
+    node: !baseEmpty ? baseNode : placeholder()
   };
 };
 
@@ -589,8 +587,8 @@ export const munderAst = (node: MathNode, serialize: ITypstMathSerializer): Typs
   const secondChild = node.childNodes[1] || null;
   const baseNode = visitChildNode(serialize, firstChild);
   const underNode = visitChildNode(serialize, secondChild);
-  const baseStr = serializeTypstMath(baseNode);
-  const underStr = serializeTypstMath(underNode);
+  const baseEmpty = isEmptyNode(baseNode);
+  const underEmpty = isEmptyNode(underNode);
   // \varinjlim / \varprojlim / \varliminf
   if (firstChild?.kind === 'mi' && secondChild?.kind === 'mo') {
     const baseText = getNodeText(firstChild);
@@ -643,8 +641,8 @@ export const munderAst = (node: MathNode, serialize: ITypstMathSerializer): Typs
       };
     }
   }
-  const rawBase = baseStr.trim();
-  const under = underStr.trim();
+  const rawBase = baseEmpty ? '' : serializeTypstMath(baseNode).trim();
+  const under = underEmpty ? '' : serializeTypstMath(underNode).trim();
   if (under) {
     const braceStr = matchBraceAnnotation(baseNode, underNode, ['underbrace', 'underbracket']);
     if (braceStr) {
@@ -664,7 +662,7 @@ export const munderAst = (node: MathNode, serialize: ITypstMathSerializer): Typs
     };
   }
   return {
-    node: rawBase ? baseNode : placeholder()
+    node: !baseEmpty ? baseNode : placeholder()
   };
 };
 
