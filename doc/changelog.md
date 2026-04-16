@@ -1,3 +1,20 @@
+# April 2026
+
+## [2.0.39] - Optimize tabular parsing performance
+
+- Performance:
+  - Rewrote `getSubMath()` from recursive to iterative single-pass algorithm. The old version rebuilt the entire string on every math expression found (O(N×M) complexity). The new version scans once with a global regex, collects segments into an array, and joins at the end.
+  - Replaced `mathTable` backing store from `Array` + `findIndex()` to `Map` for O(1) lookups.
+  - Added MathJax typeset result cache for `inline_math` and `display_math` tokens. Documents with repeated math expressions (e.g. coordinate tables with 66.8% duplicates) now skip redundant MathJax calls.
+  - Cache is scoped per `md.parse()` call and cleared automatically. Numbered equations and ascii-extraction tokens are excluded from caching due to side effects.
+
+- Benchmark (3.9 MB MMD document with 165 tabulars and 60K math expressions):
+  - Parse time: 158s → 16.8s (9.4× faster)
+  - Heap usage: 5.7 GB → 367 MB (15.5× less)
+
+- Docs:
+  - Added implementation details in `pr-specs/2026-04-optimize-tabular-parsing.md`.
+
 # March 2026
 
 ## [2.0.38] - Fix infinite loop in `inlineMmdIcon` and `inlineDiagbox` silent mode
