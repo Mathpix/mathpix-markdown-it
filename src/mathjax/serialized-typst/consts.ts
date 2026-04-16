@@ -119,6 +119,8 @@ export const SHALLOW_TREE_MAX_DEPTH = 5;
 export const ANCESTOR_MAX_DEPTH = 10;
 /** Max parent-chain depth for table-cell ancestor detection. */
 export const TABLE_ANCESTOR_MAX_DEPTH = 20;
+/** Max recursion depth for unwrapping single-child SeqNode / getSymbolValue. */
+export const UNWRAP_MAX_DEPTH = 10;
 /** Canonical ASCII bracket pairs — single source of truth.
  *  OPEN_BRACKETS / CLOSE_BRACKETS derived from this. */
 export const OPEN_BRACKETS: Readonly<Record<string, string>> = {

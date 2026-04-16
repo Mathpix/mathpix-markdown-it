@@ -1,7 +1,7 @@
 import { TEXCLASS } from "mathjax-full/js/core/MmlTree/MmlNode";
 import { MathNode, FracAttrs, MoAttrs } from "../types";
 import {
-  RE_OP_WRAPPER, SHALLOW_TREE_MAX_DEPTH, TEX_ATOM,
+  RE_OP_WRAPPER, SHALLOW_TREE_MAX_DEPTH, UNWRAP_MAX_DEPTH, TEX_ATOM,
   HORIZ_BAR, RIGHT_ARROW, LEFT_ARROW,
   OPEN_BRACKETS,
 } from "../consts";
@@ -85,12 +85,10 @@ const unwrapToMoText = (node: MathNode): string => {
   return '';
 };
 
-/** Unwrap single-child SeqNode to get the inner node.
- *  Inferred mrow processing wraps results in seq([node]),
- *  which needs unwrapping for type checks (e.g., matching FuncCallNode). */
-const unwrapSeq = (node: TypstMathNode): TypstMathNode => {
-  if (node.type === 'seq' && node.children.length === 1) {
-    return unwrapSeq(node.children[0]);
+/** Unwrap single-child SeqNode to get the inner node. */
+const unwrapSeq = (node: TypstMathNode, depth = 0): TypstMathNode => {
+  if (depth < UNWRAP_MAX_DEPTH && node.type === 'seq' && node.children.length === 1) {
+    return unwrapSeq(node.children[0], depth + 1);
   }
   return node;
 };
@@ -370,142 +368,104 @@ export const mfracAst = (node: MathNode, serialize: ITypstMathSerializer): Typst
   };
 };
 
-export const msupAst = (node: MathNode, serialize: ITypstMathSerializer): TypstMathResult => {
+/** Common logic for msup, msub, msubsup — handles opening bracket base,
+ *  brace annotations, scripts wrapper, prime shorthands, limits mode. */
+const handleScriptAst = (
+  node: MathNode, serialize: ITypstMathSerializer,
+  config: { hasSub: boolean; hasSup: boolean },
+): TypstMathResult => {
+  const { hasSub, hasSup } = config;
+  const subIdx = 1;
+  const supIdx = hasSub && hasSup ? 2 : 1;
   // Opening bracket as script base: [^{\circ} → [ ""^(compose)
-  // In Typst [^(...) starts auto-matching, so separate bracket from script.
   if (isOpeningBracketBase(node.childNodes[0])) {
     const bracketNode = visitChildNode(serialize, node.childNodes[0]);
-    const supNode = visitChildNode(serialize, node.childNodes[1] || null);
-    return {
-      node: seq([bracketNode, scriptNode(placeholder(), { sup: supNode })])
-    };
-  }
-  const baseNode = visitChildNode(serialize, node.childNodes[0] || null);
-  const supNode = visitChildNode(serialize, node.childNodes[1] || null);
-  const baseEmpty = isEmptyNode(baseNode);
-  const supEmpty = isEmptyNode(supNode);
-  // Brace annotation: overbrace(content)^annotation → overbrace(content, annotation)
-  if (!supEmpty) {
-    const braceStr = matchBraceAnnotation(baseNode, supNode, ['overbrace', 'overbracket']);
-    if (braceStr) return {
-      node: braceStr
-    };
-  }
-  if (baseEmpty && supEmpty) return EMPTY_RESULT;
-  // \nolimits: wrap known limit operators in scripts() to force side placement
-  const baseTrimmed = baseEmpty ? '' : serializeTypstMath(baseNode).trim();
-  if (baseTrimmed && needsScriptsWrapper(baseTrimmed)) {
-    return {
-      node: scriptNode(funcCall('scripts', [posArg(mathVal(baseNode))]), { sup: supNode })
-    };
-  }
-  // Prime shorthand: ′ → ', ″ → '', ‴ → '''
-  const supSymbol = getSymbolValue(supNode);
-  if (supSymbol) {
-    const primeShorthand = PRIME_SHORTHANDS.get(supSymbol);
-    if (primeShorthand) {
-      // Prime is concatenated directly: f' not f^' (Typst shorthand)
-      return {
-        node: seq([baseNode, symbol(primeShorthand)])
-      };
+    const opts: {
+      sub?: TypstMathNode;
+      sup?: TypstMathNode
+    } = {};
+    if (hasSub) {
+      const sub = visitChildNode(serialize, node.childNodes[subIdx] || null);
+      if (!isEmptyNode(sub)) {
+        opts.sub = sub;
+      }
     }
-  }
-  // Custom op() in msubsup context: add limits: #true for block variant
-  const firstChild = node.childNodes[0] || null;
-  if (needsLimitsMode(baseTrimmed, firstChild)) {
-    return {
-      node: scriptNode(addLimitsToNode(baseNode), !supEmpty ? { sup: supNode } : {})
-    };
-  }
-  return {
-    node: scriptNode(baseNode, !supEmpty ? { sup: supNode } : {})
-  };
-};
-
-export const msubAst = (node: MathNode, serialize: ITypstMathSerializer): TypstMathResult => {
-  if (isOpeningBracketBase(node.childNodes[0])) {
-    const bracketNode = visitChildNode(serialize, node.childNodes[0]);
-    const subNode = visitChildNode(serialize, node.childNodes[1] || null);
-    return {
-      node: seq([bracketNode, scriptNode(placeholder(), { sub: subNode })])
-    };
-  }
-  const baseNode = visitChildNode(serialize, node.childNodes[0] || null);
-  const subNode = visitChildNode(serialize, node.childNodes[1] || null);
-  const baseEmpty = isEmptyNode(baseNode);
-  const subEmpty = isEmptyNode(subNode);
-  // Brace annotation: underbrace(content)_annotation → underbrace(content, annotation)
-  if (!subEmpty) {
-    const braceStr = matchBraceAnnotation(baseNode, subNode, ['underbrace', 'underbracket']);
-    if (braceStr) {
-      return {
-        node: braceStr
-      };
-    }
-  }
-  if (baseEmpty && subEmpty) return EMPTY_RESULT;
-  const baseTrimmed = baseEmpty ? '' : serializeTypstMath(baseNode).trim();
-  if (baseTrimmed && needsScriptsWrapper(baseTrimmed)) {
-    return {
-      node: scriptNode(funcCall('scripts', [posArg(mathVal(baseNode))]), { sub: subNode })
-    };
-  }
-  const firstChild = node.childNodes[0] || null;
-  if (needsLimitsMode(baseTrimmed, firstChild)) {
-    return {
-      node: scriptNode(addLimitsToNode(baseNode), !subEmpty ? { sub: subNode } : {})
-    };
-  }
-  return {
-    node: scriptNode(baseNode, !subEmpty ? { sub: subNode } : {})
-  };
-};
-
-export const msubsupAst = (node: MathNode, serialize: ITypstMathSerializer): TypstMathResult => {
-  if (isOpeningBracketBase(node.childNodes[0])) {
-    const bracketNode = visitChildNode(serialize, node.childNodes[0]);
-    const subNode = visitChildNode(serialize, node.childNodes[1] || null);
-    const supNode = visitChildNode(serialize, node.childNodes[2] || null);
-    const opts: { sub?: TypstMathNode; sup?: TypstMathNode } = {};
-    if (!isEmptyNode(subNode)) {
-      opts.sub = subNode;
-    }
-    if (!isEmptyNode(supNode)) {
-      opts.sup = supNode;
+    if (hasSup) {
+      const sup = visitChildNode(serialize, node.childNodes[supIdx] || null);
+      if (!isEmptyNode(sup)) {
+        opts.sup = sup;
+      }
     }
     return {
       node: seq([bracketNode, scriptNode(placeholder(), opts)])
     };
   }
   const baseNode = visitChildNode(serialize, node.childNodes[0] || null);
-  const subNode = visitChildNode(serialize, node.childNodes[1] || null);
-  const supNode = visitChildNode(serialize, node.childNodes[2] || null);
+  const subNode = hasSub ? visitChildNode(serialize, node.childNodes[subIdx] || null) : null;
+  const supNode = hasSup ? visitChildNode(serialize, node.childNodes[supIdx] || null) : null;
   const baseEmpty = isEmptyNode(baseNode);
-  const subEmpty = isEmptyNode(subNode);
-  const supEmpty = isEmptyNode(supNode);
+  const subEmpty = !subNode || isEmptyNode(subNode);
+  const supEmpty = !supNode || isEmptyNode(supNode);
+  // Brace annotation: overbrace(content)^annotation / underbrace(content)_annotation
+  if (hasSup && !supEmpty) {
+    const braceStr = matchBraceAnnotation(baseNode, supNode!, ['overbrace', 'overbracket']);
+    if (braceStr) {
+      return {
+        node: braceStr
+      };
+    }
+  }
+  if (hasSub && !subEmpty) {
+    const braceStr = matchBraceAnnotation(baseNode, subNode!, ['underbrace', 'underbracket']);
+    if (braceStr) {
+      return {
+        node: braceStr
+      };
+    }
+  }
   if (baseEmpty && subEmpty && supEmpty) {
     return EMPTY_RESULT;
   }
   const baseTrimmed = baseEmpty ? '' : serializeTypstMath(baseNode).trim();
+  // \nolimits: wrap known limit operators in scripts()
   if (baseTrimmed && needsScriptsWrapper(baseTrimmed)) {
-    const opts: { sub?: TypstMathNode; sup?: TypstMathNode } = {};
+    const opts: {
+      sub?: TypstMathNode;
+      sup?: TypstMathNode
+    } = {};
     if (!subEmpty) {
-      opts.sub = subNode;
+      opts.sub = subNode!;
     }
     if (!supEmpty) {
-      opts.sup = supNode;
+      opts.sup = supNode!;
     }
     return {
       node: scriptNode(funcCall('scripts', [posArg(mathVal(baseNode))]), opts)
     };
   }
-  const opts: { sub?: TypstMathNode; sup?: TypstMathNode } = {};
+  // Prime shorthand: ′ → ', ″ → '', ‴ → ''' (sup-only)
+  if (hasSup && !hasSub && !supEmpty) {
+    const supSymbol = getSymbolValue(supNode!);
+    if (supSymbol) {
+      const primeShorthand = PRIME_SHORTHANDS.get(supSymbol);
+      if (primeShorthand) {
+        return {
+          node: seq([baseNode, symbol(primeShorthand)])
+        };
+      }
+    }
+  }
+  const opts: {
+    sub?: TypstMathNode;
+    sup?: TypstMathNode
+  } = {};
   if (!subEmpty) {
-    opts.sub = subNode;
+    opts.sub = subNode!;
   }
   if (!supEmpty) {
-    opts.sup = supNode;
+    opts.sup = supNode!;
   }
+  // Custom op(): add limits: #true for block variant
   const firstChild = node.childNodes[0] || null;
   if (needsLimitsMode(baseTrimmed, firstChild)) {
     return {
@@ -516,6 +476,24 @@ export const msubsupAst = (node: MathNode, serialize: ITypstMathSerializer): Typ
     node: scriptNode(baseNode, opts)
   };
 };
+
+export const msupAst = (node: MathNode, serialize: ITypstMathSerializer): TypstMathResult =>
+  handleScriptAst(node, serialize, {
+    hasSub: false,
+    hasSup: true
+  });
+
+export const msubAst = (node: MathNode, serialize: ITypstMathSerializer): TypstMathResult =>
+  handleScriptAst(node, serialize, {
+    hasSub: true,
+    hasSup: false
+  });
+
+export const msubsupAst = (node: MathNode, serialize: ITypstMathSerializer): TypstMathResult =>
+  handleScriptAst(node, serialize, {
+    hasSub: true,
+    hasSup: true
+  });
 
 export const msqrtAst = (node: MathNode, serialize: ITypstMathSerializer): TypstMathResult => {
   const contentNode = visitChildNode(serialize, node.childNodes[0] || null);

@@ -1,3 +1,4 @@
+import { UNWRAP_MAX_DEPTH } from '../consts';
 import {
   TypstMathNodeType,
   TypstMathNode,
@@ -209,12 +210,12 @@ export const isEmptyNode = (node: TypstMathNode): boolean => {
 
 /** Get the value of a single Symbol node, unwrapping single-child Seq.
  *  Returns null for non-symbol or multi-node trees. */
-export const getSymbolValue = (node: TypstMathNode): string | null => {
+export const getSymbolValue = (node: TypstMathNode, depth = 0): string | null => {
   if (node.type === TypstMathNodeType.Symbol) {
     return node.value;
   }
-  if (node.type === TypstMathNodeType.Seq && node.children.length === 1) {
-    return getSymbolValue(node.children[0]);
+  if (depth < UNWRAP_MAX_DEPTH && node.type === TypstMathNodeType.Seq && node.children.length === 1) {
+    return getSymbolValue(node.children[0], depth + 1);
   }
   return null;
 };

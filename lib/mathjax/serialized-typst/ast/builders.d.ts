@@ -31,4 +31,4 @@ export declare const errorNode: (fallbackText: string, nodeKind: string, message
 export declare const isEmptyNode: (node: TypstMathNode) => boolean;
 /** Get the value of a single Symbol node, unwrapping single-child Seq.
  *  Returns null for non-symbol or multi-node trees. */
-export declare const getSymbolValue: (node: TypstMathNode) => string | null;
+export declare const getSymbolValue: (node: TypstMathNode, depth?: number) => string | null;

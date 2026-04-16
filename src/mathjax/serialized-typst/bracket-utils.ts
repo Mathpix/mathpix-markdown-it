@@ -209,24 +209,25 @@ export const replaceUnpairedBrackets = (expr: string): string => {
   if (unmatchedPositions.size === 0) {
     return expr;
   }
-  let result = '';
+  const parts: string[] = [];
   for (let i = 0; i < expr.length; i++) {
     if (unmatchedPositions.has(i)) {
       const sym = BRACKET_SYMBOL_MAP[expr[i]];
       // Symbol names (paren.l, bracket.r, …) are Typst identifiers —
       // they must be space-separated from any adjacent non-whitespace.
-      if (result.length > 0 && !RE_TRAILING_WS.test(result)) {
-        result += ' ';
+      const prev = parts.length > 0 ? parts[parts.length - 1] : '';
+      if (prev && !RE_TRAILING_WS.test(prev)) {
+        parts.push(' ');
       }
-      result += sym;
+      parts.push(sym);
       if (i + 1 < expr.length && !RE_LEADING_WS.test(expr[i + 1])) {
-        result += ' ';
+        parts.push(' ');
       }
     } else {
-      result += expr[i];
+      parts.push(expr[i]);
     }
   }
-  return result;
+  return parts.join('');
 };
 
 /** A mrow with open/close properties (from \left...\right) is a scope
