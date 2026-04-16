@@ -36,6 +36,7 @@ import {coreInline} from './md-inline-rule/core-inline';
 import {refsInline, refInsideMathDelimiter} from './md-inline-rule/refs';
 import {hardBreak, softBreak} from './md-renderer-rules/breaks';
 import { clearLabelsList, getLabelByKeyFromLabelsList, ILabel } from "./common/labels";
+import { clearTypesetCache } from "./common/convert-math-to-html";
 import { getTerminatedRules, checkTagOutsideInlineCode } from './common';
 import { convertMathToHtml } from "./common/convert-math-to-html";
 import {highlightText} from "./highlight/common";
@@ -806,6 +807,7 @@ export default options => {
       resetTheoremEnvironments();
       /** TODO: check it in vscode */
       clearLabelsList(); /** Clean up the global list of all labels */
+      clearTypesetCache(); /** Clean up the MathJax typeset cache */
     }
     if (!md.options.htmlDisableTagMatching) {
       md.block.ruler.at("html_block", mmdHtmlBlock, {alt: ['paragraph', 'reference', 'blockquote']});
