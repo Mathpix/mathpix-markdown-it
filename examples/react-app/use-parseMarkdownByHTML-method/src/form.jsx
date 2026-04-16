@@ -22,6 +22,7 @@ class ConvertForm extends React.Component {
       result: '',
       include_mathml: true,
       include_asciimath: true,
+      include_typst: true,
       include_latex: true,
       include_svg: true,
       include_tsv: true,
@@ -54,6 +55,7 @@ class ConvertForm extends React.Component {
       outMath: {
         include_mathml: this.state.include_mathml,
         include_asciimath: this.state.include_asciimath,
+        include_typst: this.state.include_typst,
         include_latex: this.state.include_latex,
         include_svg: this.state.include_svg,
         include_tsv: this.state.include_tsv,
@@ -90,6 +92,14 @@ class ConvertForm extends React.Component {
                   checked={this.state.include_asciimath}
                   onChange={this.handleInputChange} />
                 asciimath
+              </label>
+              <label>
+                <input
+                  name="include_typst"
+                  type="checkbox"
+                  checked={this.state.include_typst}
+                  onChange={this.handleInputChange} />
+                typst
               </label>
               <label>
                 <input

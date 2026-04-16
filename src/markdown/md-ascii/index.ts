@@ -1,7 +1,5 @@
 import { RuleInline } from 'markdown-it';
-import { MathJax } from "../../mathjax";
-import { getWidthFromDocument } from '../utils';
-import {formatMathJaxError} from "../../helpers/utils";
+import { convertAsciiMathToHtml } from "../common/convert-math-to-html";
 
 export const asciiMath: RuleInline = (state, silent) => {
   const notRenderAsciiMath = state.md.options.mathJax
@@ -47,6 +45,7 @@ export const asciiMath: RuleInline = (state, silent) => {
     if (state.md.options.forLatex) {
       token.markup = startMathPos;
     }
+    convertAsciiMathToHtml(state, token);
   }
   state.pos = nextPos;
   return true;
@@ -88,6 +87,7 @@ export const backtickAsAsciiMath: RuleInline = (state, silent) => {
         token.content = state.src.slice(pos, matchStart)
           .replace(/[ \n]+/g, ' ')
           .trim();
+        convertAsciiMathToHtml(state, token);
       }
       state.pos = matchEnd;
       return true;
@@ -101,37 +101,11 @@ export const backtickAsAsciiMath: RuleInline = (state, silent) => {
 
 export const renderAsciiMath = (tokens, idx, options) => {
   const token = tokens[idx];
-  let mathEquation = null;
-  const math = token.content;
-  try {
-    let cwidth = 1200;
-    if (options && options.width && options.width > 0) {
-      cwidth = options.width;
-    } else {
-      cwidth = getWidthFromDocument(cwidth);
+  if (token.error) {
+    if (options?.outMath?.not_catch_errors) {
+      throw token.error;
     }
-
-    mathEquation = MathJax.AsciiMathToSvg(math, {display: false, metric: { cwidth: cwidth },
-      outMath: options.outMath, mathJax: options.mathJax, forDocx: options.forDocx,
-      accessibility: options.accessibility
-    });
-  } catch (e) {
-    console.error('ERROR [renderAsciiMath] MathJax =>', e.message, e);
-    formatMathJaxError(e, math, 'renderAsciiMath');
-    if (options.outMath && options.outMath.not_catch_errors) {
-      throw ({
-        message: e.message,
-        error: e
-      })
-    }
-
-    if (token.type === 'display_mathML' || token.type === 'inline_mathML') {
-      mathEquation = `<span class="math-error">${math}</span>`;
-    } else {
-      mathEquation = math;
-      return `<p class="math-error">${mathEquation}</p>`;
-    }
+    return `<p class="math-error">${token.content}</p>`;
   }
-
-  return `<span class="math-inline ascii">${mathEquation}</span>`
+  return `<span class="math-inline ascii">${token.mathEquation}</span>`;
 };

@@ -324,6 +324,17 @@ export const terminatedRules = {
 
 export const mathTokenTypes = ["display_math", "inline_math", "equation_math_not_number", "equation_math"];
 
+/** Semantic block types for token.meta.mmd_type — used by non-HTML converters (e.g. Typst). */
+export const MMD_TYPES = {
+  abstract: 'abstract',
+  abstract_title: 'abstract_title',
+  theorem: 'theorem',
+  proof: 'proof',
+  align: 'align',
+  figure: 'figure',
+  table: 'table',
+} as const;
+
 export const codeHighlightDef = {
   auto: false,
   code: true

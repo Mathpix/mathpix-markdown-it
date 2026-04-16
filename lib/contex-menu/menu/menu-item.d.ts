@@ -1,1 +1,2 @@
-export declare const createMathMenuItem: (type: any, value: string) => HTMLDivElement;
+import { eMathType } from "./consts";
+export declare const createMathMenuItem: (type: eMathType, value: string) => HTMLDivElement;

@@ -10,12 +10,14 @@ export const paddingMenuBottomSmall = 34;
 export const maxWidthMenu = 320;
 
 export const mathExportTypes = [
-  'latex', 
+  'latex',
   'asciimath',
   'linearmath',
-  'mathml', 
-  'mathmlword', 
-  'tsv', 
+  'mathml',
+  'mathmlword',
+  'typst',
+  'typst_inline',
+  'tsv',
   'csv',
   'table-markdown',
   'smiles'
@@ -32,6 +34,8 @@ export enum eMathType {
   mathmlword = 'mathmlword',
   tsv = 'tsv',
   csv = 'csv',
+  typst = 'typst',
+  typst_inline = 'typst_inline',
   table_markdown = 'table-markdown',
   smiles = 'smiles'
 }

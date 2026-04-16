@@ -1,1 +1,1 @@
-export declare const mathMenuItems: (el: any) => any[];
+export declare const mathMenuItems: (el: HTMLElement) => any[];

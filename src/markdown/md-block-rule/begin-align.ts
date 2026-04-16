@@ -1,7 +1,7 @@
 import { RuleBlock, Token } from 'markdown-it';
 import { StatePushDiv, StatePushTabularBlock } from "./begin-tabular";
 import { StatePushIncludeGraphics } from "../md-inline-rule/includegraphics";
-import { RE_ALIGN_ENV_BLOCK, RE_BEGIN_ALIGN_ENV } from "../common/consts";
+import { RE_ALIGN_ENV_BLOCK, RE_BEGIN_ALIGN_ENV, MMD_TYPES } from "../common/consts";
 
 const endTag = (arg:string='center'): RegExp  => { return new RegExp('\\end\s{0,}\{(' + arg + ')\}')};
 
@@ -57,6 +57,9 @@ const InlineBlockBeginAlign: RuleBlock = (state, startLine) => {
     [ 'class', 'center' ],
     [ 'style', `text-align: ${align ? align : 'center'}`]
   ];
+  token.meta = token.meta || {};
+  token.meta.mmd_type = MMD_TYPES.align;
+  token.meta.align = align || 'center';
   if (state.md.options.forLatex) {
     if (align && ['left', 'right'].includes(align)) {
       token.latex = `\\begin{flush${align}}`;
@@ -179,6 +182,9 @@ export const BeginAlign: RuleBlock = (state, startLine, endLine, silent) => {
     [ 'class', 'center' ],
     [ 'style', `text-align: ${align ? align : 'center'}`]
   ];
+  token.meta = token.meta || {};
+  token.meta.mmd_type = MMD_TYPES.align;
+  token.meta.align = align || 'center';
   if (state.md.options.forLatex) {
     if (align && ['left', 'right'].includes(align)) {
       token.latex = `\\begin{flush${align}}`;
