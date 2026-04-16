@@ -3867,4 +3867,12 @@ f(X)=u^{(m)}(X) g^{(m)}(X) \bmod \left(m^{m}[X \rrbracket)\right. \tag{A.3.3}
     typst: `#math.equation(block: true, numbering: n => [(A.3.3)], $ f(X) = u^((m))(X) g^((m))(X) mod lr(\\( m^m bracket.l X bracket.r.stroked paren.r) $)\n#counter(math.equation).update(n => n - 1)`,
     typst_inline: `f(X) = u^((m))(X) g^((m))(X) mod lr(\\( m^m bracket.l X bracket.r.stroked paren.r)`,
   },
+  // \tag{\#} — backslash+hash in tag: must render as literal \# in Typst.
+  // escapeTypstContent escapes \ first (→ \\), then # (→ \#), producing \\\#
+  // which Typst content mode reads as literal-backslash + literal-hash.
+  {
+    latex: String.raw`\begin{equation*} |f(z)| \leq|f|_{\partial B} \quad \text { für alle } z \in B . \tag{\#} \end{equation*}`,
+    typst: `#math.equation(block: true, numbering: n => [(\\\\\\#)], $ lr(| f(z) |) lt.eq lr(| f |)_(partial B) quad " für alle " z in B . $)\n#counter(math.equation).update(n => n - 1)`,
+    typst_inline: `lr(| f(z) |) lt.eq lr(| f |)_(partial B) quad " für alle " z in B .`,
+  },
 ];

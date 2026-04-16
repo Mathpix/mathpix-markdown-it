@@ -14,9 +14,12 @@ const NEGATION_SLASH = '\u29F8';
 const RE_COMMENT_START = /\/\/|\/\*/g;
 
 /** Escape text for Typst content mode ([...] blocks).
- *  Handles: markup specials (* _ ` @ # < [ ]) and comment starts (// /\*). */
+ *  Handles: markup specials (* _ ` @ # < [ ] { } $ ~) and comment starts (// /\*).
+ *  Backslashes are escaped FIRST so that existing \# sequences become \\# (literal
+ *  backslash + escaped hash) rather than being treated as pre-escaped. */
 export const escapeTypstContent = (text: string): string =>
   text
+    .replace(/\\/g, '\\\\')
     .replace(RE_CONTENT_SPECIAL, '\\$&')
     .replace(RE_COMMENT_START, (m) => m.replace(/./g, '\\$&'));
 /** Any escaped bracket at start: \( \) \[ \] \{ \} */

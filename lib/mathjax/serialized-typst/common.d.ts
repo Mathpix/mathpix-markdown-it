@@ -1,6 +1,8 @@
 import { MathNode } from './types';
 /** Escape text for Typst content mode ([...] blocks).
- *  Handles: markup specials (* _ ` @ # < [ ]) and comment starts (// /\*). */
+ *  Handles: markup specials (* _ ` @ # < [ ] { } $ ~) and comment starts (// /\*).
+ *  Backslashes are escaped FIRST so that existing \# sequences become \\# (literal
+ *  backslash + escaped hash) rather than being treated as pre-escaped. */
 export declare const escapeTypstContent: (text: string) => string;
 /** Check if child at index i in a node's childNodes starts a thousand-separator
  *  pattern: mn, mo(,), mn(3 digits). Also handles Indian numbering (2-digit groups
