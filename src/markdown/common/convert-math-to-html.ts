@@ -20,6 +20,20 @@ type TypesetResult = {
 };
 
 /**
+ * Cache for MathJax typesetting results.
+ * Key: math content + "|" + display mode ("D" or "I").
+ * Only used for simple TeX typesetting (path 3 in typesetMathForToken) —
+ * MathML tokens, ascii-extraction tokens, and numbered equations are NOT cached
+ * because they have side effects (equation counter, different MathJax paths).
+ */
+let typesetCache: Map<string, TypesetResult> = new Map();
+
+/** Clear the typeset cache. Call between independent documents to prevent stale data. */
+export const clearTypesetCache = (): void => {
+  typesetCache = new Map();
+};
+
+/**
  * Returns true when token already contains MathML input (display or inline).
  * These tokens use a separate MathJax path: TypesetMathML().
  */
@@ -131,7 +145,19 @@ const typesetMathForToken = (params: {
     };
   }
   MathJax.Reset(beginNumber); // Reset is important for equation numbering stability across tokens.
-  // 2) AsciiMath extraction requested
+  // 2) Cache lookup for simple inline/display math (no equation numbering, no ascii extraction).
+  //    Numbered equations (equation_math*) are never cached — they advance the equation counter.
+  //    Ascii-extraction tokens have side-effect options and are also excluded.
+  const isCacheable = !token.return_asciimath
+    && (token.type === 'inline_math' || token.type === 'display_math');
+  if (isCacheable) {
+    const cacheKey = math + '|' + (isBlock ? 'D' : 'I');
+    const cached = typesetCache.get(cacheKey);
+    if (cached) {
+      return cached;
+    }
+  }
+  // 3) AsciiMath extraction requested
   if (token.return_asciimath) {
     const typeset = MathJax.TypesetSvgAndAscii(math, {
       display: isBlock,
@@ -157,7 +183,7 @@ const typesetMathForToken = (params: {
       labels: typeset.labels,
     };
   }
-  // 3) Default TeX typesetting
+  // 4) Default TeX typesetting
   const typeset = MathJax.Typeset(math, {
     display: isBlock,
     metric: { cwidth: containerWidth },
@@ -175,7 +201,7 @@ const typesetMathForToken = (params: {
     renderedHtml: typeset.html,
     renderedData: typeset.data,
   });
-  return {
+  const result: TypesetResult = {
     ...fmt,
     ascii: typeset.ascii,
     linear: typeset.linear,
@@ -184,6 +210,11 @@ const typesetMathForToken = (params: {
     ascii_md: typeset.ascii_md,
     labels: typeset.labels,
   };
+  if (isCacheable) {
+    const cacheKey = math + '|' + (isBlock ? 'D' : 'I');
+    typesetCache.set(cacheKey, result);
+  }
+  return result;
 }
 
 /**

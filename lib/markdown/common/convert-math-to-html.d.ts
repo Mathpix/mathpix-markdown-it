@@ -1,3 +1,5 @@
+/** Clear the typeset cache. Call between independent documents to prevent stale data. */
+export declare const clearTypesetCache: () => void;
 /**
  * Converts an ascii math token via TypesetAsciiMath at parsing stage.
  * Sets token.mathEquation (HTML) and token.mathData (metrics/typst/etc).
