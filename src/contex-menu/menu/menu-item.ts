@@ -1,7 +1,7 @@
 import { classNameMenuItem, eMathType } from "./consts";
 import { formatSource, formatSourceMML } from "../../helpers/parse-mmd-element";
 
-export const createMathMenuItem = (type, value: string) => {
+export const createMathMenuItem = (type: eMathType, value: string) => {
   try {
     let itemTitle = '';
     let sourceStr = '';

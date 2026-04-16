@@ -190,7 +190,8 @@ const typesetMathForToken = (params: {
  * Converts an ascii math token via TypesetAsciiMath at parsing stage.
  * Sets token.mathEquation (HTML) and token.mathData (metrics/typst/etc).
  */
-export const convertAsciiMathToHtml = (state, token) => {
+// state/token types from markdown-it — not exported, using any at boundary.
+export const convertAsciiMathToHtml = (state: any, token: any) => {
   const math = token.content;
   const options = state.md.options;
   try {

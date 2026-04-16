@@ -8,11 +8,12 @@ import {
 import { getNodeText, getProp } from "./common";
 import { typstSymbolMap } from "./typst-symbol-map";
 
+/** ASCII bracket → Typst symbol name. Keys = union of OPEN_BRACKETS + CLOSE_BRACKETS. */
 const BRACKET_SYMBOL_MAP: Readonly<Record<string, string>> = {
-  '[': 'bracket.l',
-  ']': 'bracket.r',
   '(': 'paren.l',
   ')': 'paren.r',
+  '[': 'bracket.l',
+  ']': 'bracket.r',
   '{': 'brace.l',
   '}': 'brace.r',
 };

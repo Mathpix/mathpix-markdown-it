@@ -2,7 +2,7 @@ import { mathExportTypes } from "./consts";
 import { createMathMenuItem } from "./menu-item";
 import { parseMmdElement } from "../../helpers/parse-mmd-element";
 
-export const mathMenuItems = (el) => {
+export const mathMenuItems = (el: HTMLElement) => {
   const items = [];
   try {
     const res = parseMmdElement(el);

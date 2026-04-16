@@ -56,3 +56,92 @@ describe('Typst AST ErrorNode:', () => {
     data.typstmath.should.equal('');
   });
 });
+
+describe('Typst AST helpers (isEmptyNode, getSymbolValue):', () => {
+  const { isEmptyNode, getSymbolValue, seq, symbol, num, placeholder, space, funcCall, posArg, mathVal } = require('../lib/mathjax/serialized-typst/ast/builders.js');
+  it('empty seq is empty', () => {
+    isEmptyNode(seq([])).should.equal(true);
+  });
+  it('seq with children is not empty', () => {
+    isEmptyNode(seq([symbol('x')])).should.equal(false);
+  });
+  it('nested empty seqs are empty', () => {
+    isEmptyNode(seq([seq([]), seq([])])).should.equal(true);
+  });
+  it('symbol with value is not empty', () => {
+    isEmptyNode(symbol('alpha')).should.equal(false);
+  });
+  it('symbol with empty value is empty', () => {
+    isEmptyNode(symbol('')).should.equal(true);
+  });
+  it('placeholder is not empty', () => {
+    isEmptyNode(placeholder()).should.equal(false);
+  });
+  it('null-width space is empty', () => {
+    isEmptyNode(space(null)).should.equal(true);
+  });
+  it('named space is not empty', () => {
+    isEmptyNode(space('thin')).should.equal(false);
+  });
+  it('funcCall is not empty', () => {
+    isEmptyNode(funcCall('frac', [posArg(mathVal(symbol('a')))])).should.equal(false);
+  });
+  it('getSymbolValue from symbol', () => {
+    should.equal(getSymbolValue(symbol('alpha')), 'alpha');
+  });
+  it('getSymbolValue from single-child seq', () => {
+    should.equal(getSymbolValue(seq([symbol('beta')])), 'beta');
+  });
+  it('getSymbolValue from multi-child seq returns null', () => {
+    should.equal(getSymbolValue(seq([symbol('a'), symbol('b')])), null);
+  });
+  it('getSymbolValue from non-symbol returns null', () => {
+    should.equal(getSymbolValue(num('42')), null);
+  });
+});
+
+describe('Typst bracket-utils:', () => {
+  const { scanBracketTokens, findUnpairedIndices, countUnpairedBrackets } = require('../lib/mathjax/serialized-typst/bracket-utils.js');
+  it('scanBracketTokens skips quoted brackets', () => {
+    const tokens = scanBracketTokens('"["abc]');
+    tokens.length.should.equal(1);
+    tokens[0].char.should.equal(']');
+    tokens[0].pos.should.equal(6);
+  });
+  it('scanBracketTokens skips escaped brackets', () => {
+    const tokens = scanBracketTokens('\\[x\\]');
+    tokens.length.should.equal(0);
+  });
+  it('scanBracketTokens skips syntax parens (function calls)', () => {
+    const tokens = scanBracketTokens('frac(a, b)[x]');
+    // ( and ) are syntax parens of frac() — skipped; [ and ] collected
+    tokens.length.should.equal(2);
+    tokens[0].char.should.equal('[');
+    tokens[1].char.should.equal(']');
+  });
+  it('findUnpairedIndices all paired', () => {
+    findUnpairedIndices(['(', ')', '[', ']']).size.should.equal(0);
+  });
+  it('findUnpairedIndices mixed brackets', () => {
+    const unpaired = findUnpairedIndices(['(', '[', ']', '{']);
+    unpaired.size.should.equal(2);
+    unpaired.has(0).should.equal(true);  // ( unpaired
+    unpaired.has(3).should.equal(true);  // { unpaired
+  });
+  it('findUnpairedIndices nested', () => {
+    findUnpairedIndices(['(', '[', ']', ')']).size.should.equal(0);
+  });
+  it('findUnpairedIndices mismatched', () => {
+    const unpaired = findUnpairedIndices(['(', ']']);
+    unpaired.size.should.equal(2);
+  });
+  it('countUnpairedBrackets balanced', () => {
+    countUnpairedBrackets('frac(a, b)').should.equal(0);
+  });
+  it('countUnpairedBrackets with orphan [', () => {
+    countUnpairedBrackets('a [b').should.be.greaterThan(0);
+  });
+  it('countUnpairedBrackets with escaped brackets', () => {
+    countUnpairedBrackets('\\[ a \\]').should.equal(0);
+  });
+});

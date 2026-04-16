@@ -4,7 +4,7 @@ import {
   FracAttrs, PaddedAttrs, EncloseAttrs, StyleAttrs,
 } from "../types";
 import {
-  SHALLOW_TREE_MAX_DEPTH, TEX_ATOM,
+  SHALLOW_TREE_MAX_DEPTH, ANCESTOR_MAX_DEPTH, TEX_ATOM,
   DOUBLE_VERT, LEFT_FLOOR, RIGHT_FLOOR, LEFT_CEIL, RIGHT_CEIL,
   BOX_STROKE, BOX_INSET,
 } from "../consts";
@@ -24,7 +24,6 @@ import {
 import { serializeTypstMath } from "./serialize";
 import { containsBlockCodeFunc } from "./code-mode-utils";
 
-const ANCESTOR_MAX_DEPTH = 10;
 const MATHJAX_INHERIT_SENTINEL = '_inherit_';
 
 /** Map delimiter char pair to DelimitedKind */

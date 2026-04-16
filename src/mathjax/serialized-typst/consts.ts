@@ -40,6 +40,10 @@ export const RE_THREE_DIGITS = /^\d{3}$/;
 export const RE_TWO_DIGITS = /^\d{2}$/;
 /** Phantom subscript/superscript base pattern */
 export const RE_PHANTOM_BASE = /^""[_^]/;
+/** Any escaped bracket at start: \( \) \[ \] \{ \} */
+export const RE_ESCAPED_BRACKET_START = /^\\[()[\]{}]/;
+/** Any escaped bracket at end: ...\( ...\) etc. — NOT a separator */
+export const RE_ESCAPED_BRACKET_END = /\\[()[\]{}]$/;
 /** Token start: word char, dot, quote, or non-ASCII */
 export const RE_TOKEN_START = /^[\w."\u0080-\uFFFF]/;
 /** Natural separator at end of string */
@@ -109,13 +113,30 @@ export const PRIME_CHARS: ReadonlySet<string> = new Set([
 /** Maximum tree depth for shallow walks (accent detection, phantom check, etc.).
  *  MathJax wraps content in inferredMrow/TeXAtom layers; 5 levels is enough
  *  to reach through these wrappers without traversing the entire tree. */
+/** Max depth for shallow tree walks (accent detection, phantom check). */
 export const SHALLOW_TREE_MAX_DEPTH = 5;
+/** Max parent-chain walk depth (covers MathJax inferredMrow/TeXAtom nesting). */
+export const ANCESTOR_MAX_DEPTH = 10;
+/** Max parent-chain depth for table-cell ancestor detection. */
+export const TABLE_ANCESTOR_MAX_DEPTH = 20;
+/** Canonical ASCII bracket pairs — single source of truth.
+ *  OPEN_BRACKETS / CLOSE_BRACKETS derived from this. */
 export const OPEN_BRACKETS: Readonly<Record<string, string>> = {
   '(': ')', '[': ']', '{': '}',
 };
 export const CLOSE_BRACKETS: Readonly<Record<string, string>> = {
   ')': '(', ']': '[', '}': '{',
 };
+
+/** ALL asymmetric bracket types (ASCII + Unicode) for fence balance validation.
+ *  Used by isFenceBalanced in inferred-mrow-patterns.ts.
+ *  Derived from OPEN/CLOSE_BRACKETS + Unicode delimiters. */
+export const FENCE_OPEN_CHARS: ReadonlySet<string> = new Set([
+  ...Object.keys(OPEN_BRACKETS), LEFT_CHEVRON, LEFT_ANGLE_OLD, LEFT_FLOOR, LEFT_CEIL,
+]);
+export const FENCE_CLOSE_CHARS: ReadonlySet<string> = new Set([
+  ...Object.keys(CLOSE_BRACKETS), RIGHT_CHEVRON, RIGHT_ANGLE_OLD, RIGHT_FLOOR, RIGHT_CEIL,
+]);
 /** Built-in Typst math operators — should NOT be wrapped in upright() or op().
  *  Only includes operators natively recognized by Typst. Non-built-in operators
  *  (arccot, arcsec, arccsc, sech, csch) need op() wrapping and are NOT listed here. */

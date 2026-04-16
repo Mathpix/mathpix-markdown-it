@@ -2,7 +2,7 @@ import { MathNode } from "../types";
 import {
   RE_NBSP, RE_TAG_EXTRACT, RE_TAG_STRIP,
   DATA_LABEL_KEY, DEFAULT_EQ_NUMBERING, EQ_TAG_FIGURE_KIND,
-  TEX_ATOM, MLABELEDTR,
+  TEX_ATOM, MLABELEDTR, TABLE_ANCESTOR_MAX_DEPTH,
 } from "../consts";
 import { getChildText, getNodeText, getProp, escapeTypstContent } from "../common";
 import { sanitizeLabel, getLabelByKeyFromLabelsList } from "../../../markdown/common/labels";
@@ -181,8 +181,7 @@ export const isInsideMatrixCell = (node: MathNode): boolean => {
 /** Check if a node is inside an eqnArray cell with sibling content. */
 export const isInsideEqnArrayCellWithSiblings = (node: MathNode): boolean => {
   let current = node.parent;
-  const MAX_DEPTH = 20;
-  for (let i = 0; i < MAX_DEPTH && current; i++) {
+  for (let i = 0; i < TABLE_ANCESTOR_MAX_DEPTH && current; i++) {
     if (current.isInferred && current.parent?.kind === 'mtd') {
       const siblingCount = current.childNodes?.length ?? 0;
       if (siblingCount <= 1) {

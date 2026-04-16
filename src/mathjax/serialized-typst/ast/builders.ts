@@ -183,3 +183,38 @@ export const errorNode = (fallbackText: string, nodeKind: string, message: strin
   nodeKind,
   message,
 });
+
+/** Check if a node will serialize to empty/whitespace-only string.
+ *  Avoids O(n) serializeTypstMath() for emptiness checks. */
+export const isEmptyNode = (node: TypstMathNode): boolean => {
+  switch (node.type) {
+    case TypstMathNodeType.Seq:
+      return node.children.length === 0 || node.children.every(isEmptyNode);
+    case TypstMathNodeType.Symbol:
+      return !node.value;
+    case TypstMathNodeType.Text:
+      return !node.value;
+    case TypstMathNodeType.Number:
+      return !node.value;
+    case TypstMathNodeType.Placeholder:
+      return false; // serializes to "" which is non-empty
+    case TypstMathNodeType.Space:
+      return !node.width; // null-width spaces serialize to ''
+    case TypstMathNodeType.Error:
+      return !node.fallbackText;
+    default:
+      return false;
+  }
+};
+
+/** Get the value of a single Symbol node, unwrapping single-child Seq.
+ *  Returns null for non-symbol or multi-node trees. */
+export const getSymbolValue = (node: TypstMathNode): string | null => {
+  if (node.type === TypstMathNodeType.Symbol) {
+    return node.value;
+  }
+  if (node.type === TypstMathNodeType.Seq && node.children.length === 1) {
+    return getSymbolValue(node.children[0]);
+  }
+  return null;
+};

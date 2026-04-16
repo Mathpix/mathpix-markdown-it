@@ -40,6 +40,10 @@ export declare const RE_THREE_DIGITS: RegExp;
 export declare const RE_TWO_DIGITS: RegExp;
 /** Phantom subscript/superscript base pattern */
 export declare const RE_PHANTOM_BASE: RegExp;
+/** Any escaped bracket at start: \( \) \[ \] \{ \} */
+export declare const RE_ESCAPED_BRACKET_START: RegExp;
+/** Any escaped bracket at end: ...\( ...\) etc. — NOT a separator */
+export declare const RE_ESCAPED_BRACKET_END: RegExp;
 /** Token start: word char, dot, quote, or non-ASCII */
 export declare const RE_TOKEN_START: RegExp;
 /** Natural separator at end of string */
@@ -99,9 +103,21 @@ export declare const PRIME_CHARS: ReadonlySet<string>;
 /** Maximum tree depth for shallow walks (accent detection, phantom check, etc.).
  *  MathJax wraps content in inferredMrow/TeXAtom layers; 5 levels is enough
  *  to reach through these wrappers without traversing the entire tree. */
+/** Max depth for shallow tree walks (accent detection, phantom check). */
 export declare const SHALLOW_TREE_MAX_DEPTH = 5;
+/** Max parent-chain walk depth (covers MathJax inferredMrow/TeXAtom nesting). */
+export declare const ANCESTOR_MAX_DEPTH = 10;
+/** Max parent-chain depth for table-cell ancestor detection. */
+export declare const TABLE_ANCESTOR_MAX_DEPTH = 20;
+/** Canonical ASCII bracket pairs — single source of truth.
+ *  OPEN_BRACKETS / CLOSE_BRACKETS derived from this. */
 export declare const OPEN_BRACKETS: Readonly<Record<string, string>>;
 export declare const CLOSE_BRACKETS: Readonly<Record<string, string>>;
+/** ALL asymmetric bracket types (ASCII + Unicode) for fence balance validation.
+ *  Used by isFenceBalanced in inferred-mrow-patterns.ts.
+ *  Derived from OPEN/CLOSE_BRACKETS + Unicode delimiters. */
+export declare const FENCE_OPEN_CHARS: ReadonlySet<string>;
+export declare const FENCE_CLOSE_CHARS: ReadonlySet<string>;
 /** Built-in Typst math operators — should NOT be wrapped in upright() or op().
  *  Only includes operators natively recognized by Typst. Non-built-in operators
  *  (arccot, arcsec, arccsc, sech, csch) need op() wrapping and are NOT listed here. */

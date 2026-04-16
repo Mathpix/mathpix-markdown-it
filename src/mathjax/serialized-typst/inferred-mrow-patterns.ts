@@ -12,6 +12,7 @@ import {
   LEFT_ANGLE_OLD, RIGHT_ANGLE_OLD,
   INTEGRAL_SIGN, MIDLINE_ELLIPSIS, TEX_ATOM, MLABELEDTR,
   UNPAIRED_BRACKET_PROP,
+  FENCE_OPEN_CHARS, FENCE_CLOSE_CHARS,
 } from './consts';
 import {
   getChildText, getAttrs, isThousandSepComma,
@@ -25,16 +26,6 @@ import { serializeTypstMath } from './ast/serialize';
 
 // Node kinds that carry sub/sup scripts (used in \idotsint pattern detection).
 const IDOTSINT_SCRIPT_KINDS: ReadonlySet<string> = new Set(['msubsup', 'msub', 'msup']);
-
-// Comprehensive bracket sets for fence balance validation inside bare delimiter pairing.
-// Covers ALL asymmetric bracket types that Typst auto-scales inside lr().
-// Excludes | and ‖ — they are symmetric and handled by the pairing logic itself.
-const FENCE_OPEN_CHARS: ReadonlySet<string> = new Set([
-  '(', '{', '[', LEFT_CHEVRON, LEFT_ANGLE_OLD, LEFT_FLOOR, LEFT_CEIL,
-]);
-const FENCE_CLOSE_CHARS: ReadonlySet<string> = new Set([
-  ')', '}', ']', RIGHT_CHEVRON, RIGHT_ANGLE_OLD, RIGHT_FLOOR, RIGHT_CEIL,
-]);
 
 /** Check that all brackets between positions [from, to) are balanced.
  *  Returns false if any opening bracket has no matching close, or vice versa.

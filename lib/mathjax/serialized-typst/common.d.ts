@@ -22,7 +22,7 @@ export declare const getSiblingIndex: (node: MathNode) => number;
 export declare const getChildText: (node: MathNode) => string;
 /** Concatenate direct TextNode children of a node (non-recursive). */
 export declare const getNodeText: (node: MathNode) => string;
-/** Get typed attributes from a node. The single `as T` cast localises the any boundary. */
+/** Get typed attributes from a node. Unsafe cast — callers must handle missing fields via ?. or ||. */
 export declare const getAttrs: <T extends object>(node: MathNode) => T;
 /** Get a typed property from a node. Accepts nullable node for convenience (returns undefined). */
 export declare const getProp: <T>(node: MathNode | null | undefined, key: string) => T;

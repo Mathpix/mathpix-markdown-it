@@ -26,3 +26,9 @@ export declare const inlineMath: (body: TypstMathNode, opts?: InlineMathOpts) =>
 export declare const inlineMathVal: (node: TypstMathNode, display?: boolean) => ArgValue;
 export declare const callVal: (node: FuncCallNode) => ArgValue;
 export declare const errorNode: (fallbackText: string, nodeKind: string, message: string) => ErrorNode;
+/** Check if a node will serialize to empty/whitespace-only string.
+ *  Avoids O(n) serializeTypstMath() for emptiness checks. */
+export declare const isEmptyNode: (node: TypstMathNode) => boolean;
+/** Get the value of a single Symbol node, unwrapping single-child Seq.
+ *  Returns null for non-symbol or multi-node trees. */
+export declare const getSymbolValue: (node: TypstMathNode) => string | null;

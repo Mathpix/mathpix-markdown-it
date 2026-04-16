@@ -3,6 +3,7 @@ import { MathNode } from './types';
 import {
   RE_THREE_DIGITS, RE_TWO_DIGITS, RE_PHANTOM_BASE,
   RE_TOKEN_START, RE_SEPARATOR_END, RE_WORD_DOT_END,
+  RE_ESCAPED_BRACKET_START, RE_ESCAPED_BRACKET_END,
   RE_LATIN_WITH_MARKS, RE_LETTERS_AND_MARKS,
   RE_CONTENT_SPECIAL,
   TEX_ATOM,
@@ -22,10 +23,6 @@ export const escapeTypstContent = (text: string): string =>
     .replace(/\\/g, '\\\\')
     .replace(RE_CONTENT_SPECIAL, '\\$&')
     .replace(RE_COMMENT_START, (m) => m.replace(/./g, '\\$&'));
-/** Any escaped bracket at start: \( \) \[ \] \{ \} */
-const RE_ESCAPED_BRACKET_START = /^\\[()[\]{}]/;
-/** Any escaped bracket at end: ...\( ...\) etc. — NOT a natural separator */
-const RE_ESCAPED_BRACKET_END = /\\[()[\]{}]$/;
 
 /** Check if child at index i in a node's childNodes starts a thousand-separator
  *  pattern: mn, mo(,), mn(3 digits). Also handles Indian numbering (2-digit groups
@@ -150,7 +147,7 @@ export const getNodeText = (node: MathNode): string => {
   return text;
 };
 
-/** Get typed attributes from a node. The single `as T` cast localises the any boundary. */
+/** Get typed attributes from a node. Unsafe cast — callers must handle missing fields via ?. or ||. */
 export const getAttrs = <T extends object>(node: MathNode): T =>
   node.attributes.getAllAttributes() as T;
 

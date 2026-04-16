@@ -27,15 +27,12 @@ import {
 import {
   RE_PHANTOM_BASE, RE_TOKEN_START, RE_SEPARATOR_END, RE_WORD_DOT_END,
   RE_ALPHA_END, RE_TRAILING_DOTTED_IDENT,
+  RE_ESCAPED_BRACKET_START, RE_ESCAPED_BRACKET_END,
   OPEN_BRACKETS, CLOSE_BRACKETS,
 } from '../consts';
 import { sanitizeLabel } from '../../../markdown/common/labels';
 import { mapDelimiter, escapeLrDelimiter, countUnpairedBrackets } from '../bracket-utils';
 
-/** Any escaped bracket at start: \( \) \[ \] \{ \} */
-const RE_ESCAPED_BRACKET_START = /^\\[()[\]{}]/;
-/** Any escaped bracket at end: ...\( ...\) etc. — NOT a separator */
-const RE_ESCAPED_BRACKET_END = /\\[()[\]{}]$/;
 const RE_BACKSLASH = /\\/g;
 const RE_DOUBLE_QUOTE = /"/g;
 /** Only escape \ before " and trailing \ — for mtext where MathJax preserves raw LaTeX */

@@ -8,7 +8,7 @@ import {
 import { getNodeText, getAttrs } from "../common";
 import { typstAccentMap } from "../typst-symbol-map";
 import { TypstMathNode, TypstMathResult, ITypstMathSerializer, FuncArgKind } from "./types";
-import { seq, symbol, placeholder, funcCall, scriptNode, posArg, namedArg, mathVal, strVal, boolVal, identVal } from "./builders";
+import { seq, symbol, placeholder, funcCall, scriptNode, posArg, namedArg, mathVal, strVal, boolVal, identVal, isEmptyNode, getSymbolValue } from "./builders";
 import { serializeTypstMath } from "./serialize";
 
 const PRIME_SHORTHANDS: ReadonlyMap<string, string> = new Map([
@@ -382,25 +382,27 @@ export const msupAst = (node: MathNode, serialize: ITypstMathSerializer): TypstM
   }
   const baseNode = visitChildNode(serialize, node.childNodes[0] || null);
   const supNode = visitChildNode(serialize, node.childNodes[1] || null);
-  const baseTrimmed = serializeTypstMath(baseNode).trim();
-  const sup = serializeTypstMath(supNode).trim();
+  const baseEmpty = isEmptyNode(baseNode);
+  const supEmpty = isEmptyNode(supNode);
   // Brace annotation: overbrace(content)^annotation → overbrace(content, annotation)
-  if (sup) {
+  if (!supEmpty) {
     const braceStr = matchBraceAnnotation(baseNode, supNode, ['overbrace', 'overbracket']);
     if (braceStr) return {
       node: braceStr
     };
   }
-  if (!baseTrimmed && !sup) return EMPTY_RESULT;
+  if (baseEmpty && supEmpty) return EMPTY_RESULT;
   // \nolimits: wrap known limit operators in scripts() to force side placement
+  const baseTrimmed = baseEmpty ? '' : serializeTypstMath(baseNode).trim();
   if (baseTrimmed && needsScriptsWrapper(baseTrimmed)) {
     return {
       node: scriptNode(funcCall('scripts', [posArg(mathVal(baseNode))]), { sup: supNode })
     };
   }
   // Prime shorthand: ′ → ', ″ → '', ‴ → '''
-  if (sup) {
-    const primeShorthand = PRIME_SHORTHANDS.get(sup);
+  const supSymbol = getSymbolValue(supNode);
+  if (supSymbol) {
+    const primeShorthand = PRIME_SHORTHANDS.get(supSymbol);
     if (primeShorthand) {
       // Prime is concatenated directly: f' not f^' (Typst shorthand)
       return {
@@ -412,11 +414,11 @@ export const msupAst = (node: MathNode, serialize: ITypstMathSerializer): TypstM
   const firstChild = node.childNodes[0] || null;
   if (needsLimitsMode(baseTrimmed, firstChild)) {
     return {
-      node: scriptNode(addLimitsToNode(baseNode), sup ? { sup: supNode } : {})
+      node: scriptNode(addLimitsToNode(baseNode), !supEmpty ? { sup: supNode } : {})
     };
   }
   return {
-    node: scriptNode(baseNode, sup ? { sup: supNode } : {})
+    node: scriptNode(baseNode, !supEmpty ? { sup: supNode } : {})
   };
 };
 
@@ -430,10 +432,10 @@ export const msubAst = (node: MathNode, serialize: ITypstMathSerializer): TypstM
   }
   const baseNode = visitChildNode(serialize, node.childNodes[0] || null);
   const subNode = visitChildNode(serialize, node.childNodes[1] || null);
-  const baseTrimmed = serializeTypstMath(baseNode).trim();
-  const sub = serializeTypstMath(subNode).trim();
+  const baseEmpty = isEmptyNode(baseNode);
+  const subEmpty = isEmptyNode(subNode);
   // Brace annotation: underbrace(content)_annotation → underbrace(content, annotation)
-  if (sub) {
+  if (!subEmpty) {
     const braceStr = matchBraceAnnotation(baseNode, subNode, ['underbrace', 'underbracket']);
     if (braceStr) {
       return {
@@ -441,7 +443,8 @@ export const msubAst = (node: MathNode, serialize: ITypstMathSerializer): TypstM
       };
     }
   }
-  if (!baseTrimmed && !sub) return EMPTY_RESULT;
+  if (baseEmpty && subEmpty) return EMPTY_RESULT;
+  const baseTrimmed = baseEmpty ? '' : serializeTypstMath(baseNode).trim();
   if (baseTrimmed && needsScriptsWrapper(baseTrimmed)) {
     return {
       node: scriptNode(funcCall('scripts', [posArg(mathVal(baseNode))]), { sub: subNode })
@@ -450,11 +453,11 @@ export const msubAst = (node: MathNode, serialize: ITypstMathSerializer): TypstM
   const firstChild = node.childNodes[0] || null;
   if (needsLimitsMode(baseTrimmed, firstChild)) {
     return {
-      node: scriptNode(addLimitsToNode(baseNode), sub ? { sub: subNode } : {})
+      node: scriptNode(addLimitsToNode(baseNode), !subEmpty ? { sub: subNode } : {})
     };
   }
   return {
-    node: scriptNode(baseNode, sub ? { sub: subNode } : {})
+    node: scriptNode(baseNode, !subEmpty ? { sub: subNode } : {})
   };
 };
 
@@ -464,12 +467,10 @@ export const msubsupAst = (node: MathNode, serialize: ITypstMathSerializer): Typ
     const subNode = visitChildNode(serialize, node.childNodes[1] || null);
     const supNode = visitChildNode(serialize, node.childNodes[2] || null);
     const opts: { sub?: TypstMathNode; sup?: TypstMathNode } = {};
-    const sub = serializeTypstMath(subNode).trim();
-    const sup = serializeTypstMath(supNode).trim();
-    if (sub) {
+    if (!isEmptyNode(subNode)) {
       opts.sub = subNode;
     }
-    if (sup) {
+    if (!isEmptyNode(supNode)) {
       opts.sup = supNode;
     }
     return {
@@ -479,18 +480,19 @@ export const msubsupAst = (node: MathNode, serialize: ITypstMathSerializer): Typ
   const baseNode = visitChildNode(serialize, node.childNodes[0] || null);
   const subNode = visitChildNode(serialize, node.childNodes[1] || null);
   const supNode = visitChildNode(serialize, node.childNodes[2] || null);
-  const baseTrimmed = serializeTypstMath(baseNode).trim();
-  const sub = serializeTypstMath(subNode).trim();
-  const sup = serializeTypstMath(supNode).trim();
-  if (!baseTrimmed && !sub && !sup) {
+  const baseEmpty = isEmptyNode(baseNode);
+  const subEmpty = isEmptyNode(subNode);
+  const supEmpty = isEmptyNode(supNode);
+  if (baseEmpty && subEmpty && supEmpty) {
     return EMPTY_RESULT;
   }
+  const baseTrimmed = baseEmpty ? '' : serializeTypstMath(baseNode).trim();
   if (baseTrimmed && needsScriptsWrapper(baseTrimmed)) {
     const opts: { sub?: TypstMathNode; sup?: TypstMathNode } = {};
-    if (sub) {
+    if (!subEmpty) {
       opts.sub = subNode;
     }
-    if (sup) {
+    if (!supEmpty) {
       opts.sup = supNode;
     }
     return {
@@ -498,10 +500,10 @@ export const msubsupAst = (node: MathNode, serialize: ITypstMathSerializer): Typ
     };
   }
   const opts: { sub?: TypstMathNode; sup?: TypstMathNode } = {};
-  if (sub) {
+  if (!subEmpty) {
     opts.sub = subNode;
   }
-  if (sup) {
+  if (!supEmpty) {
     opts.sup = supNode;
   }
   const firstChild = node.childNodes[0] || null;
@@ -693,15 +695,13 @@ export const munderoverAst = (node: MathNode, serialize: ITypstMathSerializer): 
   const baseNode = visitChildNode(serialize, firstChild);
   const underNode = visitChildNode(serialize, node.childNodes[1] || null);
   const overNode = visitChildNode(serialize, node.childNodes[2] || null);
-  const rawBase = serializeTypstMath(baseNode).trim();
-  const under = serializeTypstMath(underNode).trim();
-  const over = serializeTypstMath(overNode).trim();
+  const rawBase = isEmptyNode(baseNode) ? '' : serializeTypstMath(baseNode).trim();
   const limitBase = buildLimitBase(firstChild, rawBase, baseNode);
   const opts: { sub?: TypstMathNode; sup?: TypstMathNode } = {};
-  if (under) {
+  if (!isEmptyNode(underNode)) {
     opts.sub = underNode;
   }
-  if (over) {
+  if (!isEmptyNode(overNode)) {
     opts.sup = overNode;
   }
   const blockResult = scriptNode(limitBase.block, opts);
