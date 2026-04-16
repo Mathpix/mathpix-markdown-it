@@ -21,6 +21,8 @@ export const enum TypstMathNodeType {
   Label = 'label',
   /** Matrix row with separate cells for per-cell escaping */
   MatrixRow = 'matrix-row',
+  /** Fallback for handler errors — preserves node text instead of losing it. */
+  Error = 'error',
 }
 
 export const enum DelimitedKind {
@@ -192,6 +194,18 @@ export interface InlineMathNode extends InlineMathOpts {
   readonly body: TypstMathNode;
 }
 
+/** Fallback when a handler throws — preserves source text and records the error
+ *  for diagnostics. Serializes as the fallback text (best effort). */
+export interface ErrorNode {
+  readonly type: TypstMathNodeType.Error;
+  /** Best-effort text extracted from the MathML node. */
+  readonly fallbackText: string;
+  /** Handler kind that failed (e.g. 'mfrac', 'msup'). */
+  readonly nodeKind: string;
+  /** Error message from the caught exception. */
+  readonly message: string;
+}
+
 export type TypstMathNode =
   | SeqNode
   | SymbolNode
@@ -208,7 +222,8 @@ export type TypstMathNode =
   | PlaceholderNode
   | InlineMathNode
   | LabelNode
-  | MatrixRowNode;
+  | MatrixRowNode
+  | ErrorNode;
 
 export type FuncArg =
   | PositionalArg
@@ -270,6 +285,8 @@ export interface ITypstMathSerializer {
   visitNodeFull(node: MathNode): TypstMathResult;
   /** Labels from MathJax tags system — used by getLabelKey for bare display math */
   readonly labels: LabelsMap;
+  /** Accumulated conversion errors — handler failures, unexpected nodes, etc. */
+  readonly errors: string[];
 }
 
 /** Handler signature for AST-returning handlers */

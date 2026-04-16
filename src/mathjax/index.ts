@@ -36,9 +36,11 @@ export interface IOuterData {
   asciimath_md?: string,
   typstmath?: string,
   typstmath_inline?: string,  // always set when typstmath is set
+  typstmath_error?: string,   // non-fatal conversion errors from Typst handlers
   latex?: string,
   svg?: string,
   speech?: string,
+  error?: string,
   labels?: {
     [key: string]: Label;
   },
@@ -116,9 +118,13 @@ const findMerror = (node: MathNode): string | null => {
  *  (data-unpaired-bracket, data-pre-content, data-post-content).
  *  All mutations are cleaned up after serialization. */
 const toTypstData = (node: MathNode, labels?: Record<string, { tag: string; id: string }> | null): ITypstConvertResult => {
-  const error = findMerror(node);
-  if (error) {
-    return { typstmath: '', typstmath_inline: '', error };
+  const parseError = findMerror(node);
+  if (parseError) {
+    return {
+      typstmath: '',
+      typstmath_inline: '',
+      error: parseError
+    };
   }
   // markUnpairedBrackets and visitInferredMrowNode both mutate the shared
   // MathML tree (setting properties / reading them). markUnpairedBrackets must
@@ -133,7 +139,16 @@ const toTypstData = (node: MathNode, labels?: Record<string, { tag: string; id: 
   const typstmath_inline = stripTrailingLinebreaks(
     normalizeTypstSpaces(data?.typst_inline ?? data?.typst)
   );
-  return { typstmath, typstmath_inline };
+  // Propagate non-fatal conversion errors (handler failures).
+  // Output still contains best-effort fallback text.
+  const error = data?.errors?.length
+    ? data.errors.join('; ')
+    : undefined;
+  return {
+    typstmath,
+    typstmath_inline,
+    error
+  };
 };
 
 /** Remove data-pre-content and data-post-content properties set during Typst serialization. */
@@ -245,6 +260,9 @@ const OuterData = (adaptor, node, math, outMath, forDocx = false, accessibility?
     const typstData = toTypstData(math.root, tagLabels);
     res.typstmath = typstData.typstmath;
     res.typstmath_inline = typstData.typstmath_inline;
+    if (typstData.error) {
+      res.typstmath_error = typstData.error;
+    }
   }
 
   if (include_latex) {
@@ -316,6 +334,7 @@ const OuterDataAscii = (adaptor, node, math, outMath, forDocx = false, accessibi
     asciimath?: string,
     typstmath?: string,
     typstmath_inline?: string,
+    typstmath_error?: string,
     latex?: string,
     svg?: string,
     speech?: string
@@ -345,6 +364,9 @@ const OuterDataAscii = (adaptor, node, math, outMath, forDocx = false, accessibi
     const typstData = toTypstData(math.root, tagLabels);
     res.typstmath = typstData.typstmath;
     res.typstmath_inline = typstData.typstmath_inline;
+    if (typstData.error) {
+      res.typstmath_error = typstData.error;
+    }
   }
   if (include_svg) {
     res.svg = adaptor.outerHTML(node)
@@ -398,6 +420,9 @@ const OuterDataMathMl = (adaptor, node, math, outMath, forDocx = false, accessib
     const typstData = toTypstData(math.root, tagLabels);
     res.typstmath = typstData.typstmath;
     res.typstmath_inline = typstData.typstmath_inline;
+    if (typstData.error) {
+      res.typstmath_error = typstData.error;
+    }
   }
   if (include_svg) {
     res.svg = adaptor.outerHTML(node);

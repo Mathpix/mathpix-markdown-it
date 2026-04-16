@@ -1,4 +1,4 @@
-import { TypstMathNode, SeqNode, SeqOpts, SymbolNode, TextNode, TextOpts, NumberNode, OperatorNode, OperatorOpts, FuncCallNode, FuncCallOpts, ScriptNode, ScriptOpts, DelimitedNode, DelimitedKind, DelimiterSize, SpaceNode, LinebreakNode, AlignmentNode, RawNode, RawOpts, PlaceholderNode, InlineMathNode, InlineMathOpts, LabelNode, MatrixRowNode, FuncArg, PositionalArg, NamedArg, ArgValue } from './types';
+import { TypstMathNode, SeqNode, SeqOpts, SymbolNode, TextNode, TextOpts, NumberNode, OperatorNode, OperatorOpts, FuncCallNode, FuncCallOpts, ScriptNode, ScriptOpts, DelimitedNode, DelimitedKind, DelimiterSize, SpaceNode, LinebreakNode, AlignmentNode, RawNode, RawOpts, PlaceholderNode, InlineMathNode, InlineMathOpts, LabelNode, MatrixRowNode, ErrorNode, FuncArg, PositionalArg, NamedArg, ArgValue } from './types';
 export declare const seq: (children: TypstMathNode[], opts?: SeqOpts) => SeqNode;
 export declare const symbol: (value: string) => SymbolNode;
 export declare const text: (value: string, opts?: TextOpts) => TextNode;
@@ -25,3 +25,4 @@ export declare const label: (key: string) => LabelNode;
 export declare const inlineMath: (body: TypstMathNode, opts?: InlineMathOpts) => InlineMathNode;
 export declare const inlineMathVal: (node: TypstMathNode, display?: boolean) => ArgValue;
 export declare const callVal: (node: FuncCallNode) => ArgValue;
+export declare const errorNode: (fallbackText: string, nodeKind: string, message: string) => ErrorNode;

@@ -21,3 +21,38 @@ describe('Latex to Typst math format:', () => {
     });
   });
 });
+
+describe('Typst AST ErrorNode:', () => {
+  const { serializeTypstMath } = require('../lib/mathjax/serialized-typst/ast/serialize.js');
+  const { errorNode, seq, symbol } = require('../lib/mathjax/serialized-typst/ast/builders.js');
+
+  it('ErrorNode serializes to fallbackText', () => {
+    const node = errorNode('x + y', 'mfrac', 'test error');
+    serializeTypstMath(node).should.equal('x + y');
+  });
+
+  it('ErrorNode with empty fallback serializes to empty string', () => {
+    const node = errorNode('', 'msup', 'null child');
+    serializeTypstMath(node).should.equal('');
+  });
+
+  it('ErrorNode preserves text in seq with siblings', () => {
+    const node = seq([symbol('a'), errorNode('LOST', 'mo', 'err'), symbol('b')]);
+    serializeTypstMath(node).should.equal('a LOST b');
+  });
+
+  it('ErrorNode carries nodeKind and message', () => {
+    const node = errorNode('fallback', 'mfrac', 'division by zero');
+    node.type.should.equal('error');
+    node.fallbackText.should.equal('fallback');
+    node.nodeKind.should.equal('mfrac');
+    node.message.should.equal('division by zero');
+  });
+
+  it('Parse errors (merror) return error string', () => {
+    const data = MathJax.TexConvertToTypstData('\\frac{');
+    data.error.should.be.a('string');
+    data.error.should.include('Missing close brace');
+    data.typstmath.should.equal('');
+  });
+});

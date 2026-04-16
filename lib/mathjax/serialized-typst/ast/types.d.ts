@@ -19,7 +19,9 @@ export declare const enum TypstMathNodeType {
     /** Typst label: <key> */
     Label = "label",
     /** Matrix row with separate cells for per-cell escaping */
-    MatrixRow = "matrix-row"
+    MatrixRow = "matrix-row",
+    /** Fallback for handler errors — preserves node text instead of losing it. */
+    Error = "error"
 }
 export declare const enum DelimitedKind {
     /** lr(open ... close) */
@@ -165,7 +167,18 @@ export interface InlineMathNode extends InlineMathOpts {
     readonly type: TypstMathNodeType.InlineMath;
     readonly body: TypstMathNode;
 }
-export type TypstMathNode = SeqNode | SymbolNode | TextNode | NumberNode | OperatorNode | FuncCallNode | ScriptNode | DelimitedNode | SpaceNode | LinebreakNode | AlignmentNode | RawNode | PlaceholderNode | InlineMathNode | LabelNode | MatrixRowNode;
+/** Fallback when a handler throws — preserves source text and records the error
+ *  for diagnostics. Serializes as the fallback text (best effort). */
+export interface ErrorNode {
+    readonly type: TypstMathNodeType.Error;
+    /** Best-effort text extracted from the MathML node. */
+    readonly fallbackText: string;
+    /** Handler kind that failed (e.g. 'mfrac', 'msup'). */
+    readonly nodeKind: string;
+    /** Error message from the caught exception. */
+    readonly message: string;
+}
+export type TypstMathNode = SeqNode | SymbolNode | TextNode | NumberNode | OperatorNode | FuncCallNode | ScriptNode | DelimitedNode | SpaceNode | LinebreakNode | AlignmentNode | RawNode | PlaceholderNode | InlineMathNode | LabelNode | MatrixRowNode | ErrorNode;
 export type FuncArg = PositionalArg | NamedArg;
 export declare const enum FuncArgKind {
     Positional = "positional",
@@ -236,6 +249,8 @@ export interface ITypstMathSerializer {
     visitNodeFull(node: MathNode): TypstMathResult;
     /** Labels from MathJax tags system — used by getLabelKey for bare display math */
     readonly labels: LabelsMap;
+    /** Accumulated conversion errors — handler failures, unexpected nodes, etc. */
+    readonly errors: string[];
 }
 /** Handler signature for AST-returning handlers */
 export type AstHandlerFn = (node: MathNode, serialize: ITypstMathSerializer) => TypstMathResult;

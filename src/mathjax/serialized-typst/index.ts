@@ -16,7 +16,8 @@ export class SerializedTypstVisitor extends MmlVisitor {
     return this.visitNode(node, '');
   }
 
-  public visitNode(node: MathNode, ...args: any[]): ITypstData {
+  // Signature inherited from MmlVisitor — rest args required by base class contract.
+  public visitNode(node: MathNode, ...args: string[]): ITypstData {
     const handler = this.nodeHandlers.get(node.kind) || this.visitDefault;
     return handler.call(this, node, ...args);
   }
@@ -45,9 +46,13 @@ export class SerializedTypstVisitor extends MmlVisitor {
     const typstInline = result.nodeInline
       ? serializeTypstMath(result.nodeInline)
       : undefined;
+    const errors = this.astSerializer.errors.length > 0
+      ? [...this.astSerializer.errors]
+      : undefined;
     return {
       typst,
-      typst_inline: typstInline
+      typst_inline: typstInline,
+      errors,
     };
   }
 }

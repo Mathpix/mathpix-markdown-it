@@ -1,9 +1,9 @@
 import { TextNode, XMLNode } from 'mathjax-full/js/core/MmlTree/MmlNode.js';
 import { MathNode } from '../types';
 import { TypstMathNode, TypstMathResult, ITypstMathSerializer, AstHandlerFn, astNodeStore, LabelsMap } from './types';
-import { seq, symbol, funcCall, posArg, mathVal } from './builders';
+import { seq, symbol, funcCall, posArg, mathVal, errorNode } from './builders';
 import { serializeTypstMath } from './serialize';
-import { isNegationOverlay } from '../common';
+import { isNegationOverlay, getNodeText } from '../common';
 import { TEX_ATOM } from '../consts';
 import { containsBlockCodeFunc } from './code-mode-utils';
 import { getCustomCmdTypst } from '../../custom-cmd-map';
@@ -51,6 +51,17 @@ const EMPTY_RESULT: TypstMathResult = {
   node: seq([])
 };
 
+/** Build an error result with fallback text extracted from the MathML node.
+ *  Returns the error message alongside the result for error collection. */
+const makeError = (node: MathNode, kind: string, e: unknown): { result: TypstMathResult; message: string } => {
+  const message = e instanceof Error ? e.message : String(e);
+  const fallback = getNodeText(node) || '';
+  return {
+    result: { node: errorNode(fallback, kind, message) },
+    message: `[${kind}] ${message}`,
+  }
+};
+
 /** Dispatch a MathML node to its AST handler. Returns TypstMathResult (block + inline). */
 export const dispatchFull = (node: MathNode, serialize: ITypstMathSerializer): TypstMathResult => {
   if (node instanceof TextNode) {
@@ -74,8 +85,9 @@ export const dispatchFull = (node: MathNode, serialize: ITypstMathSerializer): T
     try {
       return handler(node, serialize);
     } catch (e: unknown) {
-      if (typeof console !== 'undefined') console.warn('[TypstConvert] handler error for', node.kind, e);
-      return EMPTY_RESULT;
+      const err = makeError(node, node.kind, e);
+      serialize.errors.push(err.message);
+      return err.result;
     }
   }
   return handleAllAst(node, serialize);
@@ -96,8 +108,9 @@ const visitTeXAtomAst = (node: MathNode, serialize: ITypstMathSerializer): Typst
     }
     return EMPTY_RESULT;
   } catch (e: unknown) {
-    if (typeof console !== 'undefined') console.warn('[TypstConvert] TeXAtom error', e);
-    return EMPTY_RESULT;
+    const err = makeError(node, TEX_ATOM, e);
+    serialize.errors.push(err.message);
+    return err.result;
   }
 };
 
@@ -237,7 +250,10 @@ const visitInferredMrowAst = (node: MathNode, serialize: ITypstMathSerializer): 
       j++;
     }
   } catch (e: unknown) {
-    if (typeof console !== 'undefined') console.warn('[TypstConvert] inferred mrow error', e);
+    const err = makeError(node, 'inferred-mrow', e);
+    serialize.errors.push(err.message);
+    blockNodes.push(err.result.node);
+    inlineNodes.push(err.result.node);
   }
   if (hasInlineDiff) {
     // Block-level code-mode funcs (#align, #grid, #math.equation) with siblings
@@ -279,6 +295,7 @@ const visitInferredMrowAst = (node: MathNode, serialize: ITypstMathSerializer): 
  * \left...\right, inferred mrow) and handle the block/inline split themselves.
  */
 export const createAstSerializer = (labels: LabelsMap = null): ITypstMathSerializer => {
+  const errors: string[] = [];
   const serialize: ITypstMathSerializer = {
     visitNode: (child: MathNode): TypstMathNode => {
       const result = dispatchFull(child, serialize);
@@ -289,6 +306,7 @@ export const createAstSerializer = (labels: LabelsMap = null): ITypstMathSeriali
     },
     visitNodeFull: (child: MathNode): TypstMathResult => dispatchFull(child, serialize),
     labels,
+    errors,
   };
   return serialize;
 };

@@ -15,9 +15,11 @@ export interface IOuterData {
     asciimath_md?: string;
     typstmath?: string;
     typstmath_inline?: string;
+    typstmath_error?: string;
     latex?: string;
     svg?: string;
     speech?: string;
+    error?: string;
     labels?: {
         [key: string]: Label;
     };
@@ -69,9 +71,11 @@ export declare const MathJax: {
             asciimath_md?: string;
             typstmath?: string;
             typstmath_inline?: string;
+            typstmath_error?: string;
             latex?: string;
             svg?: string;
             speech?: string;
+            error?: string;
             labels?: {
                 [key: string]: Label;
             };
@@ -102,9 +106,11 @@ export declare const MathJax: {
             asciimath_md?: string;
             typstmath?: string;
             typstmath_inline?: string;
+            typstmath_error?: string;
             latex?: string;
             svg?: string;
             speech?: string;
+            error?: string;
             labels?: {
                 [key: string]: Label;
             };
@@ -133,9 +139,11 @@ export declare const MathJax: {
             asciimath_md?: string;
             typstmath?: string;
             typstmath_inline?: string;
+            typstmath_error?: string;
             latex?: string;
             svg?: string;
             speech?: string;
+            error?: string;
             labels?: {
                 [key: string]: Label;
             };
@@ -156,6 +164,7 @@ export declare const MathJax: {
             asciimath?: string;
             typstmath?: string;
             typstmath_inline?: string;
+            typstmath_error?: string;
             latex?: string;
             svg?: string;
             speech?: string;

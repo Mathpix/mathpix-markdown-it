@@ -44,4 +44,6 @@ export interface ITypstData {
     /** Inline-safe variant: same as typst when no block wrappers are used,
      *  otherwise contains pure math expressions without #math.equation() wrappers. */
     typst_inline?: string;
+    /** Conversion errors from handler failures — empty when no errors occurred. */
+    errors?: string[];
 }

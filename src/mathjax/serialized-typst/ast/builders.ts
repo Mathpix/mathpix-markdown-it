@@ -19,6 +19,7 @@ import {
   InlineMathNode, InlineMathOpts,
   LabelNode,
   MatrixRowNode,
+  ErrorNode,
   FuncArg,
   PositionalArg,
   NamedArg,
@@ -174,4 +175,11 @@ export const inlineMathVal = (node: TypstMathNode, display?: boolean): ArgValue 
 export const callVal = (node: FuncCallNode): ArgValue => ({
   type: ArgValueType.Call,
   node,
+});
+
+export const errorNode = (fallbackText: string, nodeKind: string, message: string): ErrorNode => ({
+  type: TypstMathNodeType.Error,
+  fallbackText,
+  nodeKind,
+  message,
 });

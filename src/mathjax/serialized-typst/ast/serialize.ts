@@ -121,6 +121,9 @@ export const serializeTypstMath = (node: TypstMathNode): string => {
       const inner = serializeTypstMath(node.body);
       return node.display ? '$ ' + inner + ' $' : '$' + inner + '$';
     }
+    case TypstMathNodeType.Error:
+      // Best-effort: output the extracted text so the formula isn't lost.
+      return node.fallbackText;
   }
 };
 
@@ -521,7 +524,7 @@ const escapeLrBody = (body: string, openDelim: string, closeDelim: string): stri
   escaped = escapeLrSemicolons(escaped);
   // Invariant check — all backstops should leave body balanced.
   // If not, something upstream is broken; warn in dev builds.
-  if (process.env.NODE_ENV !== 'production' && typeof console !== 'undefined') {
+  if (typeof process !== 'undefined' && process.env?.NODE_ENV !== 'production' && typeof console !== 'undefined') {
     const unpaired = countUnpairedBrackets(escaped);
     if (unpaired > 0) {
       console.warn('[typst-lr] unbalanced lr() body (' + unpaired + ' unpaired): ' + escaped);
