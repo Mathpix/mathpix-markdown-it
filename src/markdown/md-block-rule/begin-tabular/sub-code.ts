@@ -9,22 +9,16 @@ import {
 const CODE_FENCE = '```';
 const CODE_FENCE_RE = /```/;
 
-type TExtractedCodeBlock = {id: string, content: string}
-var extractedCodeBlocks: Array<TExtractedCodeBlock> = [];
+type TExtractedCodeBlock = { id: string; content: string }
+let extractedCodeBlocks: Map<string, string> = new Map();
 
-/**
- * Clear all previously extracted code blocks.
- */
 export const ClearExtractedCodeBlocks = (): void => {
-  extractedCodeBlocks = [];
+  extractedCodeBlocks.clear();
 };
 
-/**
- * Add a single extracted code block to the internal storage.
- */
 export const addExtractedCodeBlock = (item: TExtractedCodeBlock) => {
-  extractedCodeBlocks.push(item)
-}
+  extractedCodeBlocks.set(item.id, item.content);
+};
 
 /**
  * Replace placeholder markers (<<id>> / <id>) with extracted code block content.
@@ -43,15 +37,14 @@ export const getExtractedCodeBlockContent = (inputStr: string, i: number): strin
     if (!id) {
       continue;
     }
-    const index: number = extractedCodeBlocks.findIndex((item) => item.id === id);
-    if (index < 0) {
+    if (!extractedCodeBlocks.has(id)) {
       continue;
     }
+    const original: string = extractedCodeBlocks.get(id)!;
     const start: number = resContent.indexOf(placeholder);
     if (start === -1) {
       continue;
     }
-    const original: string = extractedCodeBlocks[index].content ?? "";
     const end: number = start + placeholder.length;
     // expand nested placeholders first
     let injected: string = getExtractedCodeBlockContent(original, 0);

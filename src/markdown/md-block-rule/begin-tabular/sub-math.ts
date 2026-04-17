@@ -28,9 +28,9 @@ export const mathTablePush = (idOrItem: string | { id: string; content: string }
  *  Uses trimmed string for regex matching (consistent with getSubMath),
  *  but untrimmed sub for slicing to preserve original whitespace. */
 export const getMathTableContent = (sub: string, i: number): string => {
-  const trimmed = sub.trim();
-  let cellM: Array<string> = trimmed.slice(i).match(doubleCurlyBracketUuidPattern);
-  cellM = cellM ? cellM : trimmed.slice(i).match(singleCurlyBracketPattern);
+  const tail = sub.trim().slice(i);
+  let cellM: Array<string> = tail.match(doubleCurlyBracketUuidPattern);
+  cellM = cellM ? cellM : tail.match(singleCurlyBracketPattern);
   if (!cellM) {
     return '';
   }

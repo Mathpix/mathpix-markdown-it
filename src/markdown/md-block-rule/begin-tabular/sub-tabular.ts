@@ -11,17 +11,16 @@ import {
 } from "./placeholder-utils";
 
 type TSubTabular = {
-  id: string,
   content: string,
   parsed?: Array<TTokenTabular>,
   parents?: Array<string>,
   isBlock?: boolean,
   children?: Array<string>
 };
-var subTabular: Array<TSubTabular> = [];
+let subTabular: Map<string, TSubTabular> = new Map();
 
 export const ClearSubTableLists = (): void => {
-  subTabular = [];
+  subTabular.clear();
 };
 
 /**
@@ -50,18 +49,17 @@ export const pushSubTabular = (
   const id: string = generateUniqueId();
   const childIds: string[] = extractChildIds(subTabularContent);
   for (const childId of childIds) {
-    const cIdx: number = subTabular.findIndex((item: TSubTabular) => item.id === childId);
-    if (cIdx >= 0) {
-      (subTabular[cIdx].parents ??= []).push(id);
+    const child = subTabular.get(childId);
+    if (child) {
+      (child.parents ??= []).push(id);
     }
   }
   const isBlockLocal: boolean = detectLocalBlock(subTabularContent);
   const childBlock: boolean = childIds.some(cid => {
-    const cIdx: number = subTabular.findIndex(item => item.id === cid);
-    return cIdx >= 0 ? !!subTabular[cIdx].isBlock : false;
+    const child = subTabular.get(cid);
+    return child ? !!child.isBlock : false;
   });
-  subTabular.push({
-    id,
+  subTabular.set(id, {
     content: subTabularContent,
     parsed: subRes,
     children: childIds,
@@ -91,10 +89,9 @@ export const getSubTabular = (
   if (isCell) {
     sub = getContent(sub);
   }
-  // fast path: exact id matches a cached parsed tabular
-  const directIndex: number = subTabular.findIndex((item: TSubTabular) => item.id === sub);
-  if (directIndex >= 0 && subTabular[directIndex].parsed?.length) {
-    return subTabular[directIndex].parsed!;
+  const directEntry = subTabular.get(sub);
+  if (directEntry?.parsed?.length) {
+    return directEntry.parsed;
   }
   // find placeholders
   const cellM: RegExpMatchArray = findPlaceholders(sub, i);
@@ -118,11 +115,10 @@ export const getSubTabular = (
     // prefix text between placeholders
     let prefix: string = sub.slice(cursor, start);
     // Avoid trimming around list-begin tokens to keep `\begin{itemize}` detectable.
-    const idx: number = subTabular.findIndex((item: TSubTabular) => item.id === id);
+    const entry = subTabular.get(id);
     let isBlockRule: boolean = false;
-    if (idx >= 0) {
-      const content = subTabular[idx].content;
-      isBlockRule = !!subTabular[idx].isBlock || detectLocalBlock(prefix) || detectLocalBlock(content);
+    if (entry) {
+      isBlockRule = !!entry.isBlock || detectLocalBlock(prefix) || detectLocalBlock(entry.content);
       if (!isBlockRule || prefix.trim() === "") {
         prefix = prefix.trim();
       }
@@ -133,9 +129,9 @@ export const getSubTabular = (
       }
     }
     let injected: string = "";
-    if (idx >= 0) {
-      parents = subTabular[idx].parents;
-      injected = subTabular[idx].content ?? "";
+    if (entry) {
+      parents = entry.parents;
+      injected = entry.content ?? "";
     } else {
       injected = findInDiagboxTable(id) ?? "";
     }

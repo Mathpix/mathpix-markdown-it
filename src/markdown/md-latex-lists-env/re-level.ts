@@ -68,22 +68,22 @@ export interface ItemizeLevelTokenResult {
 export const SetItemizeLevelTokens = (
   state: StateBlock | StateInline
 ): ItemizeLevelTokenResult => {
-  const originalOptions = { ...state.md.options };
+  const originalOutMath = state.md.options.outMath;
   if (state.md.options.forDocx) {
-    state.md.options = {
-      ...state.md.options,
-      outMath: {
-        include_svg: true,
-        include_mathml_word: false,
-      },
+    state.md.options.outMath = {
+      include_svg: true,
+      include_mathml_word: false,
     };
   }
-  itemizeLevelTokens = itemizeLevel.map((level) => {
-    const children: Token[] = [];
-    state.md.inline.parse(level, state.md, state.env, children);
-    return children;
-  });
-  state.md.options = originalOptions;
+  try {
+    itemizeLevelTokens = itemizeLevel.map((level) => {
+      const children: Token[] = [];
+      state.md.inline.parse(level, state.md, state.env, children);
+      return children;
+    });
+  } finally {
+    state.md.options.outMath = originalOutMath;
+  }
   return {
     tokens: [...itemizeLevelTokens],
     contents: [...itemizeLevel],
@@ -97,20 +97,20 @@ export const SetItemizeLevelTokensByIndex = (
   state: StateBlock | StateInline,
   index: number
 ): void => {
-  const originalOptions = { ...state.md.options };
+  const originalOutMath = state.md.options.outMath;
   if (state.md.options.forDocx) {
-    state.md.options = {
-      ...state.md.options,
-      outMath: {
-        include_svg: true,
-        include_mathml_word: false,
-      },
+    state.md.options.outMath = {
+      include_svg: true,
+      include_mathml_word: false,
     };
   }
-  const children: Token[] = [];
-  state.md.inline.parse(itemizeLevel[index], state.md, state.env, children);
-  itemizeLevelTokens[index] = children;
-  state.md.options = originalOptions;
+  try {
+    const children: Token[] = [];
+    state.md.inline.parse(itemizeLevel[index], state.md, state.env, children);
+    itemizeLevelTokens[index] = children;
+  } finally {
+    state.md.options.outMath = originalOutMath;
+  }
 };
 
 /**

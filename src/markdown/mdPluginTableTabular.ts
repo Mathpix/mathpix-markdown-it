@@ -7,19 +7,31 @@ import { InlineIncludeGraphics } from './md-inline-rule/includegraphics';
 import { CaptionTable, InlineDecimal, IncludeGraphics } from './md-renderer-rules';
 import { ClearSubTableLists } from "./md-block-rule/begin-tabular/sub-tabular";
 import { ClearSubMathLists } from "./md-block-rule/begin-tabular/sub-math";
+import { ClearDiagboxTable } from "./md-block-rule/begin-tabular/sub-cell";
 import {ClearParseError} from "./md-block-rule/parse-error";
 import { BeginTheorem, BeginProof } from "./md-theorem/block-rule";
 import { getTerminatedRules } from "./common";
 import { ClearExtractedCodeBlocks } from "./md-block-rule/begin-tabular/sub-code";
 
-export default (md: MarkdownIt, options) => {
+const clearTabularState = () => {
   ClearTableNumbers();
   ClearFigureNumbers();
   ClearSubTableLists();
   ClearSubMathLists();
+  ClearDiagboxTable();
   ClearParseError();
   ClearExtractedCodeBlocks();
+};
+
+export default (md: MarkdownIt, options) => {
+  clearTabularState();
   Object.assign(md.options, options);
+  const hasHook = md.core.ruler.__find__('reset_tabular_state') >= 0;
+  if (hasHook) {
+    md.core.ruler.at('reset_tabular_state', clearTabularState);
+  } else {
+    md.core.ruler.before('normalize', 'reset_tabular_state', clearTabularState);
+  }
 
   md.block.ruler.after("fence", "BeginTabular", BeginTabular, 
     Object.assign({}, md.options, {alt: getTerminatedRules('BeginTabular')}));
