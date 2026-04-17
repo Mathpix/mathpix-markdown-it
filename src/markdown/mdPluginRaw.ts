@@ -807,7 +807,7 @@ export default options => {
       resetTheoremEnvironments();
       /** TODO: check it in vscode */
       clearLabelsList(); /** Clean up the global list of all labels */
-      clearTypesetCache(); /** Clean up the MathJax typeset cache */
+      md.core.ruler.before('normalize', 'reset_typeset_cache', () => { clearTypesetCache(); });
     }
     if (!md.options.htmlDisableTagMatching) {
       md.block.ruler.at("html_block", mmdHtmlBlock, {alt: ['paragraph', 'reference', 'blockquote']});

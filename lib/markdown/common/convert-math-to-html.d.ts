@@ -1,4 +1,5 @@
-/** Clear the typeset cache. Call between independent documents to prevent stale data. */
+/** Clear the typeset cache. Must be called at the start of every md.parse()
+ *  to prevent stale data and unbounded growth in long-lived processes. */
 export declare const clearTypesetCache: () => void;
 /**
  * Converts a math token into HTML and attaches MathJax metadata to the token.

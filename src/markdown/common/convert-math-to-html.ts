@@ -20,17 +20,23 @@ type TypesetResult = {
 };
 
 /**
- * Cache for MathJax typesetting results.
- * Key: math content + "|" + display mode ("D" or "I").
- * Only used for simple TeX typesetting (path 3 in typesetMathForToken) —
+ * Two-level cache for MathJax typesetting results.
+ * Outer key: display mode (true = block, false = inline).
+ * Inner key: raw math content string (no separator — eliminates collision risk).
+ * Only used for simple TeX typesetting (path 4 in typesetMathForToken) —
  * MathML tokens, ascii-extraction tokens, and numbered equations are NOT cached
  * because they have side effects (equation counter, different MathJax paths).
  */
-let typesetCache: Map<string, TypesetResult> = new Map();
+const typesetCache: Map<boolean, Map<string, TypesetResult>> = new Map([
+  [true, new Map()],
+  [false, new Map()],
+]);
 
-/** Clear the typeset cache. Call between independent documents to prevent stale data. */
+/** Clear the typeset cache. Must be called at the start of every md.parse()
+ *  to prevent stale data and unbounded growth in long-lived processes. */
 export const clearTypesetCache = (): void => {
-  typesetCache = new Map();
+  typesetCache.get(true)!.clear();
+  typesetCache.get(false)!.clear();
 };
 
 /**
@@ -45,19 +51,33 @@ const isMathMLToken = (token: any) =>
  * Mutates the token in-place.
  */
 const applyTypesetResultToToken = (token: any, res: TypesetResult): void => {
-  if (res.html != null) token.mathEquation = res.html;
+  if (res.html != null) {
+    token.mathEquation = res.html;
+  }
   if (res.data != null) {
     token.mathData = res.data;
     token.widthEx = res.data.widthEx;
     token.heightEx = res.data.heightEx;
   }
   // Optional fields (present only when requested via outMath options)
-  if (res.ascii != null) token.ascii = res.ascii;
-  if (res.linear != null) token.linear = res.linear;
-  if (res.ascii_tsv != null) token.ascii_tsv = res.ascii_tsv;
-  if (res.ascii_csv != null) token.ascii_csv = res.ascii_csv;
-  if (res.ascii_md != null) token.ascii_md = res.ascii_md;
-  if (res.labels != null) token.labels = res.labels;
+  if (res.ascii != null) {
+    token.ascii = res.ascii;
+  }
+  if (res.linear != null) {
+    token.linear = res.linear;
+  }
+  if (res.ascii_tsv != null) {
+    token.ascii_tsv = res.ascii_tsv;
+  }
+  if (res.ascii_csv != null) {
+    token.ascii_csv = res.ascii_csv;
+  }
+  if (res.ascii_md != null) {
+    token.ascii_md = res.ascii_md;
+  }
+  if (res.labels != null) {
+    token.labels = res.labels;
+  }
 }
 
 /**
@@ -151,8 +171,7 @@ const typesetMathForToken = (params: {
   const isCacheable = !token.return_asciimath
     && (token.type === 'inline_math' || token.type === 'display_math');
   if (isCacheable) {
-    const cacheKey = math + '|' + (isBlock ? 'D' : 'I');
-    const cached = typesetCache.get(cacheKey);
+    const cached = typesetCache.get(isBlock)!.get(math);
     if (cached) {
       return cached;
     }
@@ -211,8 +230,7 @@ const typesetMathForToken = (params: {
     labels: typeset.labels,
   };
   if (isCacheable) {
-    const cacheKey = math + '|' + (isBlock ? 'D' : 'I');
-    typesetCache.set(cacheKey, result);
+    typesetCache.get(isBlock)!.set(math, result);
   }
   return result;
 }

@@ -61,10 +61,10 @@ Replaced `mathTable: Array` with `Map<string, string>` for O(1) lookups.
 
 ### 2. MathJax typeset result cache
 
-Added a `Map<string, TypesetResult>` cache in `typesetMathForToken()`:
-- **Key:** `math_content + "|" + display_mode` (`"D"` or `"I"`)
-- **Cache hit:** returns stored result, skips MathJax entirely
-- **Cache scope:** cleared on every `md.parse()` call via `clearTypesetCache()` (called alongside `clearLabelsList()` in `mdPluginRaw.ts`)
+Added a two-level `Map<boolean, Map<string, TypesetResult>>` cache in `typesetMathForToken()`:
+- **Key:** outer = display mode (`true`/`false`), inner = raw math content string. No separator in key — eliminates collision risk.
+- **Cache hit:** returns stored result, skips MathJax entirely.
+- **Cache scope:** cleared at the start of every `md.parse()` via a `core.ruler.before('normalize', 'reset_typeset_cache', ...)` hook registered in `mdPluginRaw.ts`. The hook is registered only for full renders (`!isRenderElement`) — partial re-renders preserve the cache from the preceding full render. This guarantees the cache does not leak across documents in long-lived processes (web servers, PDF generators).
 
 **What is cached:** `inline_math` and `display_math` tokens only (path 4 in `typesetMathForToken`).
 
@@ -102,7 +102,7 @@ Mode: `include_svg: true` (standard HTML pipeline)
 |------|--------|
 | `src/markdown/md-block-rule/begin-tabular/sub-math.ts` | Rewrite `getSubMath` to iterative; `mathTable` Array → Map; extract helpers |
 | `src/markdown/common/convert-math-to-html.ts` | Add `typesetCache` Map + `clearTypesetCache()`; cache inline/display math results |
-| `src/markdown/mdPluginRaw.ts` | Call `clearTypesetCache()` on plugin init |
+| `src/markdown/mdPluginRaw.ts` | Register `core.ruler` hook to clear typeset cache at the start of every `md.parse()` |
 
 ---
 
