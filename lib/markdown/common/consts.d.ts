@@ -214,7 +214,6 @@ export declare const terminatedRules: {
     };
 };
 export declare const mathTokenTypes: string[];
-export declare const DEFAULT_TYPESET_CACHE_SIZE = 50000;
 export declare const codeHighlightDef: {
     auto: boolean;
     code: boolean;

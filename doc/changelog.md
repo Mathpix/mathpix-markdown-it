@@ -10,7 +10,7 @@
   - Cache exclusions: `equation_math`/`equation_math_not_number` (numbering side effects), `inline_mathML`/`display_mathML` (different MathJax path), `return_asciimath` tokens (ascii extraction side effects).
   - Rewrote `getMathTableContent()` to use `parts[]` + `join()` instead of repeated slice+concat.
   - Added `typesetCacheSize` option (default 50,000) to control the maximum number of cached MathJax results per display-mode bucket. Set to `0` to disable caching entirely. Configurable via `md.options`, `MathpixMarkdownModel.render()`, or the `<MathpixMarkdown>` React component props.
-  - Breaking: `mathTablePush` signature changed from `(item: {id, content})` to `(id: string, content: string)` — no external callers found.
+  - `mathTablePush` now accepts both `(id, content)` and `({id, content})` forms (backward-compatible overload).
 
 - Benchmark (3.9 MB MMD document with 165 tabulars and 60K math expressions):
   - Parse time: 158s → 16.8s (9.4× faster)

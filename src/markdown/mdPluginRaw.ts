@@ -36,7 +36,7 @@ import {coreInline} from './md-inline-rule/core-inline';
 import {refsInline, refInsideMathDelimiter} from './md-inline-rule/refs';
 import {hardBreak, softBreak} from './md-renderer-rules/breaks';
 import { clearLabelsList, getLabelByKeyFromLabelsList, ILabel } from "./common/labels";
-import { clearTypesetCache } from "./common/convert-math-to-html";
+import { initMathCache } from "./common/convert-math-to-html";
 import { getTerminatedRules, checkTagOutsideInlineCode } from './common';
 import { convertMathToHtml } from "./common/convert-math-to-html";
 import {highlightText} from "./highlight/common";
@@ -808,18 +808,16 @@ export default options => {
       /** TODO: check it in vscode */
       clearLabelsList(); /** Clean up the global list of all labels */
     }
-    const resetCacheHook = (state) => {
-      const isPartial = state.md.options.renderElement
-        && state.md.options.renderElement.hasOwnProperty('startLine');
-      if (!isPartial) {
-        clearTypesetCache(state.md.options);
-      }
-    };
-    const hookExists = md.core.ruler.__find__('reset_typeset_cache') >= 0;
-    if (hookExists) {
-      md.core.ruler.at('reset_typeset_cache', resetCacheHook);
+    // init_math_cache fires on EVERY parse (including partial renders).
+    // Unlike reset_tabular_state, the math cache does not need to persist
+    // across partial render calls — it's purely an optimization for
+    // within-parse deduplication of identical math expressions.
+    const hasInitHook = typeof md.core.ruler.__find__ === 'function'
+      && md.core.ruler.__find__('init_math_cache') >= 0;
+    if (hasInitHook) {
+      md.core.ruler.at('init_math_cache', initMathCache);
     } else {
-      md.core.ruler.before('normalize', 'reset_typeset_cache', resetCacheHook);
+      md.core.ruler.before('normalize', 'init_math_cache', initMathCache);
     }
     if (!md.options.htmlDisableTagMatching) {
       md.block.ruler.at("html_block", mmdHtmlBlock, {alt: ['paragraph', 'reference', 'blockquote']});

@@ -3,8 +3,10 @@ import { getWidthFromDocument } from "../utils";
 import { addIntoLabelsList, eLabelType } from "./labels";
 import { envArraysShouldBeFlattenInTSV } from '../../helpers/consts';
 import { formatMathJaxError } from "../../helpers/utils";
-import { csvSeparatorsDef, mdSeparatorsDef, tsvSeparatorsDef, DEFAULT_TYPESET_CACHE_SIZE } from './consts';
+import { csvSeparatorsDef, mdSeparatorsDef, tsvSeparatorsDef } from './consts';
 import { formatSource } from "../../helpers/parse-mmd-element";
+
+const RE_MJX_ASSISTIVE_ID = /<mjx-assistive-mml[^>]*\bid="([^"]+)"/;
 
 type TypesetResult = {
   /** Rendered HTML string for this math token (SVG/MathML/LaTeX depending on output_format). */
@@ -19,42 +21,47 @@ type TypesetResult = {
   labels?: Record<string, any>;
 };
 
-type DisplayCache = Map<string, TypesetResult>;
-type InstanceCache = Map<boolean, DisplayCache>;
+type CachedResult = TypesetResult & { _mjxId?: string };
 
 /**
- * Instance-scoped cache for MathJax typesetting results.
- * Keyed by the md.options object reference — each MarkdownIt instance gets
- * its own isolated cache. This prevents cross-instance contamination when
- * multiple md instances with different options coexist in one process
- * (e.g. one for HTML, another for DOCX).
- *
- * Inner structure: Map<isBlock, Map<math, TypesetResult>>.
- * Only used for simple TeX typesetting (path 4 in typesetMathForToken) —
- * MathML tokens, ascii-extraction tokens, and numbered equations are NOT cached
- * because they have side effects (equation counter, different MathJax paths).
- *
- * Capped at DEFAULT_TYPESET_CACHE_SIZE (configurable via options.typesetCacheSize) per display-mode bucket to prevent
- * unbounded growth on documents with many unique formulas.
+ * Per-parse math typeset cache, stored in state.env.__mathpix.
+ * Following markdown-it convention (see markdown-it-footnote plugin):
+ * - Scoped to a single md.parse() via the env object
+ * - Initialized by init_math_cache core ruler hook at parse start
+ * - Automatically isolated between parses and between md instances
+ * - No module-level mutable state, no WeakMap, no signature computation
  */
-const typesetCaches = new WeakMap<object, InstanceCache>();
-
-const getInstanceCache = (options: object): InstanceCache => {
-  let cache = typesetCaches.get(options);
-  if (!cache) {
-    cache = new Map([[true, new Map()], [false, new Map()]]);
-    typesetCaches.set(options, cache);
-  }
-  return cache;
+type MathpixEnvState = {
+  inlineCache: Map<string, CachedResult>;
+  displayCache: Map<string, CachedResult>;
+  cacheBypass: number;
 };
 
-const getBucket = (options: object, isBlock: boolean): DisplayCache =>
-  getInstanceCache(options).get(!!isBlock)!;
+const MATHPIX_ENV_KEY = '__mathpix';
 
-/** Clear the typeset cache for a specific md instance.
- *  Called at the start of every md.parse() via core.ruler hook. */
-export const clearTypesetCache = (options: object): void => {
-  typesetCaches.delete(options);
+/** Called from init_math_cache hook at the start of every md.parse(). */
+export const initMathCache = (state: any): void => {
+  if (!state.env) state.env = {};
+  state.env[MATHPIX_ENV_KEY] = {
+    inlineCache: new Map(),
+    displayCache: new Map(),
+    cacheBypass: 0,
+  } as MathpixEnvState;
+};
+
+const getMathpixEnv = (state: any): MathpixEnvState | null =>
+  state?.env?.[MATHPIX_ENV_KEY] || null;
+
+/** Begin a section where cache must not be used (options.outMath is temporarily mutated). */
+export const beginCacheBypass = (state: any): void => {
+  const mx = getMathpixEnv(state);
+  if (mx) mx.cacheBypass++;
+};
+
+/** End a cache-bypass section. */
+export const endCacheBypass = (state: any): void => {
+  const mx = getMathpixEnv(state);
+  if (mx && mx.cacheBypass > 0) mx.cacheBypass--;
 };
 
 /**
@@ -154,6 +161,7 @@ const buildFormatOutputs = (params: {
  * A future optimization could add a fast path that skips SVG generation for these formats.
  */
 const typesetMathForToken = (params: {
+  state: any;
   token: any;
   math: string;
   isBlock: boolean;
@@ -161,13 +169,9 @@ const typesetMathForToken = (params: {
   containerWidth: number;
   options: any;
 }): TypesetResult => {
-  const { token, math, isBlock, beginNumber, containerWidth, options } = params;
+  const { state, token, math, isBlock, beginNumber, containerWidth, options } = params;
   const outputFormat = options.outMath?.output_format;
   // 1) MathML tokens: MathJax input is MathML (not TeX).
-  // Format routing is handled inside TypesetMathML:
-  // - 'mathml': returns formatSourceMML(mathml) directly.
-  // - 'latex': no MathML→LaTeX converter; falls back to SVG.
-  // - 'svg' (default): standard SVG rendering.
   if (isMathMLToken(token)) {
     const typeset = MathJax.TypesetMathML(math, {
       display: true,
@@ -183,19 +187,33 @@ const typesetMathForToken = (params: {
     };
   }
   MathJax.Reset(beginNumber); // Reset is important for equation numbering stability across tokens.
-  // 2) Cache lookup for simple inline/display math (no equation numbering, no ascii extraction).
+  // 2) Per-parse cache lookup for simple inline/display math.
   //    Numbered equations (equation_math*) are never cached — they advance the equation counter.
   //    Ascii-extraction tokens have side-effect options and are also excluded.
+  //    Cache is bypassed when options.outMath is temporarily mutated (e.g. SetItemizeLevelTokens).
+  const mx = getMathpixEnv(state);
+  const cache = mx && mx.cacheBypass === 0
+    ? (isBlock ? mx.displayCache : mx.inlineCache)
+    : null;
   const isCacheable = !token.return_asciimath
     && (token.type === 'inline_math' || token.type === 'display_math');
-  if (isCacheable) {
-    const cached = getBucket(options, isBlock).get(math);
+  if (isCacheable && cache) {
+    const cached = cache.get(math);
     if (cached) {
+      let hitHtml = cached.html || '';
+      let hitSvg = cached.data?.svg;
+      if (cached._mjxId) {
+        const freshId = MathJax.nextAssistiveId();
+        hitHtml = hitHtml.split(cached._mjxId).join(freshId);
+        if (hitSvg) hitSvg = hitSvg.split(cached._mjxId).join(freshId);
+      }
+      const hitData = cached.data ? { ...cached.data, svg: hitSvg } : cached.data;
+      const { _mjxId, ...rest } = cached;
       const fmt = buildFormatOutputs({
         outputFormat, inputLatex: token.inputLatex,
-        renderedHtml: cached.html || '', renderedData: cached.data,
+        renderedHtml: hitHtml, renderedData: hitData,
       });
-      return { ...cached, ...fmt };
+      return { ...rest, html: hitHtml, data: hitData, ...fmt };
     }
   }
   // 3) AsciiMath extraction requested
@@ -246,13 +264,15 @@ const typesetMathForToken = (params: {
     ascii_md: typeset.ascii_md,
     labels: typeset.labels,
   };
-  if (isCacheable) {
-    const bucket = getBucket(options, isBlock);
-    const sizeRaw = options.typesetCacheSize;
-    const maxSize = typeof sizeRaw === 'number' && sizeRaw >= 0 ? sizeRaw : DEFAULT_TYPESET_CACHE_SIZE;
-    if (maxSize > 0 && bucket.size < maxSize) {
-      bucket.set(math, rawResult);
-    }
+  if (isCacheable && cache) {
+    const mjxIdMatch = rawResult.html?.match(RE_MJX_ASSISTIVE_ID);
+    const entry: CachedResult = {
+      ...rawResult,
+      data: rawResult.data ? { ...rawResult.data } : rawResult.data,
+      labels: rawResult.labels ? { ...rawResult.labels } : rawResult.labels,
+    };
+    if (mjxIdMatch && mjxIdMatch[1]) entry._mjxId = mjxIdMatch[1];
+    cache.set(math, entry);
   }
   const fmt = buildFormatOutputs({
     outputFormat, inputLatex: token.inputLatex,
@@ -273,6 +293,7 @@ export const convertMathToHtml = (state, token, options) => {
       ? options.width
       : getWidthFromDocument(1200);
     const res: TypesetResult = typesetMathForToken({
+      state,
       token,
       math,
       isBlock: token.type !== 'inline_math',

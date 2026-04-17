@@ -1,6 +1,7 @@
 import type Token from "markdown-it/lib/token";
 import type StateBlock from 'markdown-it/lib/rules_block/state_block';
 import type StateInline from 'markdown-it/lib/rules_inline/state_inline';
+import { beginCacheBypass, endCacheBypass } from '../common/convert-math-to-html';
 import { itemizeLevelDefaults, enumerateLevelDefaults } from "../common/list-markers";
 import {
   ENUM_LEVEL_COMMANDS, ENUM_STYLES, ITEM_LEVEL_COMMANDS,
@@ -69,11 +70,13 @@ export const SetItemizeLevelTokens = (
   state: StateBlock | StateInline
 ): ItemizeLevelTokenResult => {
   const originalOutMath = state.md.options.outMath;
-  if (state.md.options.forDocx) {
+  const docxMutation = !!state.md.options.forDocx;
+  if (docxMutation) {
     state.md.options.outMath = {
       include_svg: true,
       include_mathml_word: false,
     };
+    beginCacheBypass(state);
   }
   try {
     itemizeLevelTokens = itemizeLevel.map((level) => {
@@ -83,6 +86,7 @@ export const SetItemizeLevelTokens = (
     });
   } finally {
     state.md.options.outMath = originalOutMath;
+    if (docxMutation) endCacheBypass(state);
   }
   return {
     tokens: [...itemizeLevelTokens],
@@ -98,11 +102,13 @@ export const SetItemizeLevelTokensByIndex = (
   index: number
 ): void => {
   const originalOutMath = state.md.options.outMath;
-  if (state.md.options.forDocx) {
+  const docxMutation = !!state.md.options.forDocx;
+  if (docxMutation) {
     state.md.options.outMath = {
       include_svg: true,
       include_mathml_word: false,
     };
+    beginCacheBypass(state);
   }
   try {
     const children: Token[] = [];
@@ -110,6 +116,7 @@ export const SetItemizeLevelTokensByIndex = (
     itemizeLevelTokens[index] = children;
   } finally {
     state.md.options.outMath = originalOutMath;
+    if (docxMutation) endCacheBypass(state);
   }
 };
 

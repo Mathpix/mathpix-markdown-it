@@ -156,7 +156,7 @@ export const getSubMath = (str: string): string => {
     if (isCodeEnv) {
       addExtractedCodeBlock({ id, content });
     } else {
-      mathTable.set(id, content);
+      mathTablePush(id, content);
     }
     const placeholder = isCodeEnv ? `<<${id}>>` : `{${id}}`;
     parts.push(str.slice(lastCopied, beginMarkerPos));

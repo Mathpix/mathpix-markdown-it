@@ -5,7 +5,7 @@ let { MathpixMarkdownModel } = require('../lib/index.js');
 const markdownIt = require('markdown-it');
 const { mathpixMarkdownPlugin } = require('../lib/index.js');
 
-describe('MathJax typeset cache:', () => {
+describe('MathJax per-parse typeset cache (state.env scoped):', () => {
   let origTypeset;
   let callCount;
   beforeEach(() => {
@@ -34,7 +34,7 @@ describe('MathJax typeset cache:', () => {
     );
     callCount.should.equal(2);
   });
-  it('cache is cleared between parse calls on same md instance', () => {
+  it('cache does NOT persist between md.parse calls on same instance', () => {
     const md = markdownIt({ html: true, breaks: true }).use(mathpixMarkdownPlugin, {
       outMath: { include_svg: true }, mathJax: {}, renderElement: {},
       smiles: {}, forDocx: false, forLatex: false,
@@ -48,30 +48,41 @@ describe('MathJax typeset cache:', () => {
     MathpixMarkdownModel.markdownToHTML('$x^2$ and $$x^2$$');
     callCount.should.equal(2);
   });
-  it('cache respects typesetCacheSize limit (cap=2, 4 unique, 6 calls over 2 passes)', () => {
+  it('cache is scoped to env — passing different env creates isolated caches', () => {
     const md = markdownIt({ html: true, breaks: true }).use(mathpixMarkdownPlugin, {
-      typesetCacheSize: 2,
       outMath: { include_svg: true }, mathJax: {}, renderElement: {},
       smiles: {}, forDocx: false, forLatex: false,
     });
-    md.render('$a$ $b$ $c$ $d$ $a$ $b$ $c$ $d$');
-    callCount.should.equal(6);
-  });
-  it('cache isolates between two md instances with different options', () => {
-    const md1 = markdownIt({ html: true, breaks: true }).use(mathpixMarkdownPlugin, {
-      outMath: { include_svg: true }, mathJax: {}, renderElement: {},
-      smiles: {}, forDocx: false, forLatex: false,
-    });
-    const md2 = markdownIt({ html: true, breaks: true }).use(mathpixMarkdownPlugin, {
-      outMath: { include_svg: false }, mathJax: {}, renderElement: {},
-      smiles: {}, forDocx: false, forLatex: false,
-    });
-    md1.render('$x$');
+    md.parse('$x$', {});
     callCount.should.equal(1);
-    md2.render('$x$');
+    md.parse('$x$', {});
     callCount.should.equal(2);
   });
+  it('reusing env across parses still produces fresh cache (init hook resets)', () => {
+    const md = markdownIt({ html: true, breaks: true }).use(mathpixMarkdownPlugin, {
+      outMath: { include_svg: true }, mathJax: {}, renderElement: {},
+      smiles: {}, forDocx: false, forLatex: false,
+    });
+    const env = {};
+    md.parse('$x$', env);
+    callCount.should.equal(1);
+    md.parse('$x$', env);
+    callCount.should.equal(2);
+  });
+  it('cache returns isolated data — mutation does not corrupt cache', () => {
+    const md = markdownIt({ html: true, breaks: true }).use(mathpixMarkdownPlugin, {
+      outMath: { include_svg: true }, mathJax: {}, renderElement: {},
+      smiles: {}, forDocx: false, forLatex: false,
+    });
+    const tokens = md.parse('$x^2$ and $x^2$', {});
+    const mathTokens = tokens.flatMap(t => t.children || []).filter(t => t.type === 'inline_math');
+    mathTokens.length.should.equal(2);
+    mathTokens[0].mathData.svg.should.be.a('string');
+    mathTokens[0].mathData.svg = 'CORRUPTED';
+    mathTokens[1].mathData.svg.should.not.equal('CORRUPTED');
+  });
   it('output_format=latex preserves different inputLatex for same math content', () => {
+    MathJax.Typeset = origTypeset;
     const md = markdownIt({ html: true, breaks: true }).use(mathpixMarkdownPlugin, {
       outMath: { include_svg: true, output_format: 'latex' }, mathJax: {}, renderElement: {},
       smiles: {}, forDocx: false, forLatex: false,
@@ -79,5 +90,59 @@ describe('MathJax typeset cache:', () => {
     const html = md.render('$x^2$ and \\(x^2\\)');
     html.should.include('$x^2$');
     html.should.match(/\\\(x\^2\\\)/);
+  });
+  it('cached math with accessibility produces unique mjx-mml IDs', () => {
+    MathJax.Typeset = origTypeset;
+    const html = MathpixMarkdownModel.markdownToHTML(
+      '$\\leftarrow$ and $\\leftarrow$ and $\\leftarrow$',
+      { outMath: { include_svg: true }, accessibility: { assistiveMml: true }, previewUuid: 'ID' }
+    );
+    const ids = [...html.matchAll(/<mjx-assistive-mml[^>]*\bid="([^"]+)"/g)].map(m => m[1]);
+    ids.length.should.be.at.least(3);
+    new Set(ids).size.should.equal(ids.length);
+  });
+  it('cache works with unusual previewUuid containing special chars', () => {
+    MathJax.Typeset = origTypeset;
+    const html = MathpixMarkdownModel.markdownToHTML(
+      '$\\leftarrow$ and $\\leftarrow$',
+      { outMath: { include_svg: true }, accessibility: { assistiveMml: true }, previewUuid: 'my_uuid.v2' }
+    );
+    const ids = [...html.matchAll(/<mjx-assistive-mml[^>]*\bid="([^"]+)"/g)].map(m => m[1]);
+    ids.length.should.be.at.least(2);
+    new Set(ids).size.should.equal(ids.length);
+  });
+  it('beginCacheBypass/endCacheBypass controls cache bypass counter', () => {
+    const { initMathCache, beginCacheBypass, endCacheBypass } = require('../lib/markdown/common/convert-math-to-html');
+    const state = { env: {} };
+    initMathCache(state);
+    state.env.__mathpix.cacheBypass.should.equal(0);
+    beginCacheBypass(state);
+    state.env.__mathpix.cacheBypass.should.equal(1);
+    beginCacheBypass(state);
+    state.env.__mathpix.cacheBypass.should.equal(2);
+    endCacheBypass(state);
+    state.env.__mathpix.cacheBypass.should.equal(1);
+    endCacheBypass(state);
+    state.env.__mathpix.cacheBypass.should.equal(0);
+  });
+  it('endCacheBypass does not go below zero', () => {
+    const { initMathCache, endCacheBypass } = require('../lib/markdown/common/convert-math-to-html');
+    const state = { env: {} };
+    initMathCache(state);
+    endCacheBypass(state);
+    state.env.__mathpix.cacheBypass.should.equal(0);
+  });
+  it('SetItemizeLevelTokens with forDocx does not pollute cache for main text', () => {
+    MathJax.Typeset = origTypeset;
+    const md = markdownIt({ html: true, breaks: true }).use(mathpixMarkdownPlugin, {
+      outMath: { include_svg: true, include_mathml_word: true },
+      forDocx: true,
+      mathJax: {}, renderElement: {}, smiles: {},
+    });
+    const doc = '\\renewcommand{\\labelitemi}{$\\alpha$}\n\n' +
+      '\\begin{itemize}\n\\item item text\n\\end{itemize}\n\n' +
+      'Inline: $\\alpha$ here.';
+    const html = md.render(doc);
+    (html.match(/<mathmlword/gi) || []).length.should.be.greaterThan(0);
   });
 });

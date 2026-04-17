@@ -1,4 +1,4 @@
-# PR: Optimize tabular parsing — iterative getSubMath + MathJax result cache
+# PR: Optimize tabular parsing performance
 
 Status: Implemented
 Owner: @OlgaRedozubova
@@ -7,100 +7,106 @@ Owner: @OlgaRedozubova
 
 ## Context
 
-Parsing a 3.9 MB MMD document with 165 `\begin{tabular}` blocks and 60K inline math expressions caused:
-- **158 seconds** for `md.parse()`
-- **5.7 GB** peak heap usage
-
-The document represents a realistic worst case: large geographic coordinate tables where every cell contains `\( ... \)` math.
+Parsing a 3.9 MB MMD document with 165 `\begin{tabular}` blocks and 60K inline math expressions caused 158 seconds for `md.parse()` and 5.7 GB peak heap usage. The document represents a realistic worst case: large geographic coordinate tables where every cell contains `\( ... \)` math.
 
 ---
 
-## Root Cause
+## Goal
 
-### 1. `getSubMath()` — recursive O(N x M) string rebuilding
-
-**File:** `src/markdown/md-block-rule/begin-tabular/sub-math.ts`
-
-The function extracted math expressions from tabular content by:
-1. Finding a math opener (regex `.match()` on `str.slice(startPos)` — copies the string)
-2. Replacing the match with a UUID placeholder via string concatenation (`str.slice(0, start) + placeholder + str.slice(end)` — copies the whole string again)
-3. Recursively calling itself on the rebuilt string
-
-For a 36 KB tabular block with 100 math expressions, this produced ~200 intermediate string copies, totaling ~7 MB of garbage per block. Across 165 blocks: **~1.2 GB of transient string allocations**, plus GC pressure that pushed V8 to 5+ GB before collection.
-
-Additionally, `mathTable` was an `Array<{id, content}>` with `findIndex()` for lookups — O(n) linear scan growing with every extracted expression.
-
-### 2. Duplicate MathJax calls — 66.8% redundancy
-
-**File:** `src/markdown/common/convert-math-to-html.ts`
-
-V8 profiling showed `multiMath` (the inline rule calling `MathJax.Typeset()`) consumed 36 seconds. Analysis revealed:
-- 60,305 total MathJax calls
-- Only 20,016 unique expressions
-- 40,289 duplicate calls (66.8%)
-
-Common symbols repeated across table cells accounted for the majority of duplicates.
+Reduce parse time and memory usage for documents with many tabular environments and repeated math expressions.
 
 ---
 
-## Fix
+## Non-Goals
 
-### 1. Iterative single-pass `getSubMath()`
+- Persistent cross-parse MathJax cache (decided against — complexity outweighs benefit for the converter use case).
+- Migrating all module-level state to `state.env` (separate PR scope, tracked in `pr-specs/2026-04-global-state-cleanup-and-perf.md`).
 
-Replaced the recursive implementation with an iterative algorithm:
-- Uses `RE_MATH_OPEN` with global flag (`/g`) and `exec()` in a `while` loop
-- Collects non-math segments and placeholders into `parts: string[]`
-- Joins once at the end: `parts.join('')`
-- The original string is never mutated or rebuilt mid-scan
+---
 
-Extracted helper functions for readability:
-- `getEndMarker(match)` — maps opening marker to closing marker
-- `shouldSkipDollar(str, marker, begin, end)` — validates `$`/`$$` matches (escaped, whitespace-padded, digit-followed)
+## Current Behavior
 
-Replaced `mathTable: Array` with `Map<string, string>` for O(1) lookups.
+- `getSubMath()` recursively rebuilds the entire string on every math expression found — O(N×M) where N=string length, M=math count.
+- `mathTable` uses `Array` with `findIndex()` for lookups — O(n) per lookup.
+- `MathJax.Typeset()` is called for every math token, including 40K duplicates (66.8% of 60K total).
 
-### 2. MathJax typeset result cache
+---
 
-Added a two-level `Map<boolean, Map<string, TypesetResult>>` cache in `typesetMathForToken()`:
-- **Key:** outer = display mode (`true`/`false`), inner = raw math content string. No separator in key — eliminates collision risk.
-- **Cache hit:** returns stored result, skips MathJax entirely.
-- **Cache scope:** instance-scoped via `WeakMap<options, InstanceCache>` — each md instance has its own isolated cache. Cleared at the start of every full `md.parse()` via a `core.ruler.before('normalize', 'reset_typeset_cache', ...)` hook. The hook checks `renderElement` at runtime: partial re-renders skip the clear so the same instance's cache survives. Different md instances never share cache entries. Capped at 50,000 entries per display-mode bucket.
+## Desired Behavior
 
-**What is cached:** `inline_math` and `display_math` tokens only (path 4 in `typesetMathForToken`).
+- `getSubMath()` scans the string once with a global regex, collects segments into an array, joins at the end — O(N+M).
+- `mathTable` uses `Map` for O(1) lookups.
+- Duplicate `inline_math` and `display_math` tokens within a single `md.parse()` reuse cached MathJax results — per-parse deduplication via `state.env`.
 
-**What is NOT cached:**
-- `equation_math` / `equation_math_not_number` — these advance the MathJax equation counter via `MathJax.Reset(beginNumber)`
-- MathML input tokens — different MathJax path (`TypesetMathML`)
-- Ascii-extraction tokens (`return_asciimath`) — different MathJax path (`TypesetSvgAndAscii`) with side-effect options
+---
 
-### Configuration
+## Constraints / Invariants
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `typesetCacheSize` | `number` | `50000` | Max entries per display-mode bucket. Set to `0` to disable caching. |
+- Cache must NOT persist between `md.parse()` calls — each parse gets a fresh cache via `state.env.__mathpix` (following markdown-it-footnote convention).
+- Cache must NOT be used when `options.outMath` is temporarily mutated (e.g. `SetItemizeLevelTokens` for `forDocx`) — `beginCacheBypass(state)` / `endCacheBypass(state)` counter mechanism.
+- Cached results must be isolated from downstream mutation — `data` and `labels` are shallow-cloned on cache insert.
+- Accessibility IDs (`mjx-mml-*`) must be unique per token — on cache hit, the original ID is replaced with a fresh one via `MathJax.nextAssistiveId()`.
+- Numbered equations (`equation_math`, `equation_math_not_number`), MathML input tokens, and ascii-extraction tokens are never cached (side effects).
+- `buildFormatOutputs` is applied after cache lookup (not cached) to correctly handle `output_format: 'latex'` with different `inputLatex`.
 
-Available in all option entry points: `MathpixMarkdownModel.render()`, `mathpixMarkdownPlugin` options, `<MathpixMarkdown>` React props, and `mdInit()` in `markdown/index.ts`.
+---
+
+## Done When
+
+- [x] `getSubMath` is iterative single-pass
+- [x] `mathTable` is `Map<string, string>`
+- [x] Per-parse math cache in `state.env.__mathpix` deduplicates identical math
+- [x] Cache bypass for `SetItemizeLevelTokens` forDocx mutation
+- [x] Accessibility IDs unique on cache hits
+- [x] All existing tests pass
+- [x] New tests cover: dedup, equation bypass, env isolation, mutation protection, accessibility ID uniqueness, cache bypass counter, forDocx integration
+- [x] Benchmark: 158s → ~15s parse time, 5.7GB → ~365MB heap
+
+---
+
+## Architecture
+
+### getSubMath (sub-math.ts)
+
+Iterative single-pass with local `new RegExp(RE_MATH_OPEN.source, 'g')`:
+- `RE_MATH_OPEN` stored as literal without `/g` flag (immutable template)
+- Each call creates a local copy — reentrant-safe
+- `getEndMarker()` uses capture groups for eqref/ref detection (no substring matching)
+- `shouldSkipDollar()` validates `$`/`$$` edge cases
+- `mathTablePush()` accepts both `(id, content)` and `({id, content})` for backward compatibility
+
+### Per-parse math cache (convert-math-to-html.ts)
+
+```
+state.env.__mathpix = {
+  inlineCache: Map<math, CachedResult>,   // inline_math tokens
+  displayCache: Map<math, CachedResult>,  // display_math tokens
+  cacheBypass: number,                     // >0 disables cache (SetItemizeLevelTokens)
+}
+```
+
+Initialized by `init_math_cache` core ruler hook (fires on every parse, including partial renders).
+
+On cache hit with accessibility:
+- Extract original `_mjxId` from `<mjx-assistive-mml id="...">` via `RE_MJX_ASSISTIVE_ID` regex
+- Replace with fresh ID from `MathJax.nextAssistiveId()` via `split().join()`
+- Applied to both `html` and `data.svg`
+
+### Cache bypass (re-level.ts)
+
+`SetItemizeLevelTokens` and `SetItemizeLevelTokensByIndex` call `beginCacheBypass(state)` before mutating `outMath` for forDocx, and `endCacheBypass(state)` in `finally` block. Counter (not boolean) handles nested calls.
 
 ---
 
 ## Benchmark
 
-Test document: 3.9 MB MMD, 15,956 lines, 165 tabulars, 60,308 math expressions.
+Test document: 3.9 MB MMD, 165 tabulars, 60K math expressions.
 
-Mode: `include_typst: true, include_svg: false` (Typst converter pipeline)
-
-| Metric | Before | After | Improvement |
-|--------|--------|-------|-------------|
-| `md.parse()` time | 158 s | 16.8 s | **9.4x faster** |
-| Heap after parse | 5,700 MB | 367 MB | **15.5x less** |
-| RSS after parse | 5,700 MB | 600 MB | **9.5x less** |
-
-Mode: `include_svg: true` (standard HTML pipeline)
-
-| Metric | Before | After | Improvement |
-|--------|--------|-------|-------------|
-| Total time | 179 s | 32 s | **5.6x faster** |
-| RSS | 2,549 MB | 1,497 MB | **-1 GB** |
+| Mode | Before | After | Improvement |
+|------|--------|-------|-------------|
+| Typst (`include_svg: false`) | 158s | **~15s** | **10×** |
+| SVG (`include_svg: true`) | 179s | **~15s** | **12×** |
+| SVG + assistiveMml | 179s | **~22s** | **8×** |
 
 ---
 
@@ -108,26 +114,18 @@ Mode: `include_svg: true` (standard HTML pipeline)
 
 | File | Change |
 |------|--------|
-| `src/markdown/md-block-rule/begin-tabular/sub-math.ts` | Rewrite `getSubMath` to iterative; `mathTable` Array → Map; extract helpers |
-| `src/markdown/common/convert-math-to-html.ts` | Add `typesetCache` Map + `clearTypesetCache()`; cache inline/display math results |
-| `src/markdown/mdPluginRaw.ts` | Register `core.ruler` hook to clear typeset cache at the start of every `md.parse()` |
+| `src/markdown/md-block-rule/begin-tabular/sub-math.ts` | Iterative `getSubMath`; `mathTable` Array→Map; `mathTablePush` overload; `getEndMarker` with capture groups |
+| `src/markdown/common/convert-math-to-html.ts` | Per-parse cache in `state.env.__mathpix`; `initMathCache`; `beginCacheBypass`/`endCacheBypass`; accessibility ID replacement |
+| `src/markdown/mdPluginRaw.ts` | Register `init_math_cache` core ruler hook |
+| `src/markdown/md-latex-lists-env/re-level.ts` | `beginCacheBypass`/`endCacheBypass` around forDocx mutation; `try/finally` for `outMath` restoration |
+| `tests/_sub-math.js` | 26 unit tests for `getSubMath` edge cases |
+| `tests/_typeset-cache.js` | 14 tests: dedup, env isolation, mutation protection, accessibility IDs, bypass counter, forDocx integration |
+| `tests/_accessibility.js` | 3 tests: unique IDs with cache, aria-labelledby consistency, no IDs without a11y |
 
 ---
 
 ## Testing
 
-- All existing tests pass (3,242 on master branch)
-- Added `tests/_sub-math.js` — 23 unit tests for `getSubMath` edge cases: escaped `$`, whitespace-padded `$`, digit after `$`, unclosed `$`, trailing unclosed `$`, `\\[...\\]`, `\\(...\\)`, `\begin{abstract}`, `\begin{tabular}`, `\begin{equation}`, `\begin{referral}`, eqref, ref, multiple expressions, sequential calls
-- Added `tests/_typeset-cache.js` — 6 tests verifying cache behavior: duplicate inline_math cache hit, equation_math bypass (numbering), cache cleared between parse calls, display/inline mode isolation, typesetCacheSize cap
-- Verified output identity: HTML output matches original on benchmark file
-
-### Breaking change
-
-- `mathTablePush` signature changed from `(item: {id, content})` to `(id: string, content: string)`. No external callers found in the codebase.
-
-### Cache exclusions
-
-The following token types are **never** cached (to preserve correctness):
-- `equation_math` / `equation_math_not_number` — advance MathJax equation counter
-- `inline_mathML` / `display_mathML` — different MathJax path (TypesetMathML)
-- tokens with `return_asciimath` — different MathJax path (TypesetSvgAndAscii) with side-effect options
+- All 3,286 tests pass
+- No new public API options (removed `typesetCacheSize` — cache is always on, scoped per-parse)
+- `mathTablePush` backward-compatible overload preserved

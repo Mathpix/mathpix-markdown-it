@@ -26,11 +26,19 @@ const clearTabularState = () => {
 export default (md: MarkdownIt, options) => {
   clearTabularState();
   Object.assign(md.options, options);
-  const hasHook = md.core.ruler.__find__('reset_tabular_state') >= 0;
+  const resetTabularHook = (state) => {
+    const isPartial = state.md.options.renderElement
+      && state.md.options.renderElement.hasOwnProperty('startLine');
+    if (!isPartial) {
+      clearTabularState();
+    }
+  };
+  const hasHook = typeof md.core.ruler.__find__ === 'function'
+    && md.core.ruler.__find__('reset_tabular_state') >= 0;
   if (hasHook) {
-    md.core.ruler.at('reset_tabular_state', clearTabularState);
+    md.core.ruler.at('reset_tabular_state', resetTabularHook);
   } else {
-    md.core.ruler.before('normalize', 'reset_tabular_state', clearTabularState);
+    md.core.ruler.before('normalize', 'reset_tabular_state', resetTabularHook);
   }
 
   md.block.ruler.after("fence", "BeginTabular", BeginTabular, 

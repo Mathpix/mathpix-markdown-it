@@ -151,4 +151,12 @@ describe('getSubMath — iterative math extraction:', () => {
     const result = getMathTableContent(r, 0);
     result.should.include(placeholder);
   });
+  it('round-trip: getSubMath then getMathTableContent restores original', () => {
+    ClearSubMathLists();
+    const original = 'text $x^2$ more $y$ end';
+    const withPlaceholders = getSubMath(original);
+    withPlaceholders.should.not.include('$');
+    const restored = getMathTableContent(withPlaceholders, 0);
+    restored.should.equal(original);
+  });
 });

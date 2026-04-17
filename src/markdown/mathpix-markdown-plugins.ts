@@ -1,6 +1,5 @@
 import { MarkdownIt } from 'markdown-it';
 import { MathpixMarkdownModel, ParserErrors } from "../mathpix-markdown-model";
-import { DEFAULT_TYPESET_CACHE_SIZE } from './common/consts';
 import { resetTextCounter } from './mdPluginText';
 import { resetTheoremEnvironments } from './md-theorem/helper';
 import { rest_mmd_footnotes_list } from './md-latex-footnotes/utils';
@@ -44,7 +43,6 @@ export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
     renderOptions = null,
     previewUuid = "",
     enableSizeCalculation = false,
-    typesetCacheSize = DEFAULT_TYPESET_CACHE_SIZE,
   } = options;
   Object.assign(md.options, smiles);
   Object.assign(md.options, {
@@ -73,7 +71,6 @@ export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
     renderOptions: renderOptions,
     previewUuid: previewUuid,
     enableSizeCalculation: enableSizeCalculation,
-    typesetCacheSize: typesetCacheSize,
   });
 
   md
