@@ -7,47 +7,89 @@ import { preserveNewlineUnlessDoubleAngleUuidRegex } from "../../common/consts";
 type TLines = {left?: string, right?: string, bottom?: string, top?: string};
 type TAligns = {h?: string, v?: string, w?: string};
 
-const verticalCellLine = (line: string, pos: string='left'): string => {
-  let lines = line.split(' ');
+// Interned cell-border style strings. `verticalCellLine`/`horizontalCellLine`
+// are invoked once per border per <td> — for large tabulars this is millions
+// of calls with only ~8 unique return values per orientation. Pre-building the
+// strings lets V8 share a single instance instead of re-allocating identical
+// ~70-byte strings for every cell (heap-snapshot on a 16 MB MMD showed the
+// top retainer was 395 125 copies of one such string = 96 MB).
+const V_LEFT_NONE = 'border-left: none !important; ';
+const V_LEFT_SOLID = 'border-left-style: solid !important; border-left-width: 1px !important; ';
+const V_LEFT_DOUBLE = 'border-left-style: double !important; border-left-width: 3px !important; ';
+const V_LEFT_DASHED = 'border-left-style: dashed !important; border-left-width: 1px !important; ';
+const V_RIGHT_NONE = 'border-right: none !important; ';
+const V_RIGHT_SOLID = 'border-right-style: solid !important; border-right-width: 1px !important; ';
+const V_RIGHT_DOUBLE = 'border-right-style: double !important; border-right-width: 3px !important; ';
+const V_RIGHT_DASHED = 'border-right-style: dashed !important; border-right-width: 1px !important; ';
+
+const H_TOP_NONE = 'border-top: none !important; ';
+const H_TOP_SOLID = 'border-top-style: solid !important; border-top-width: 1px !important; ';
+const H_TOP_DOUBLE = 'border-top-style: double !important; border-top-width: 3px !important; ';
+const H_TOP_DASHED = 'border-top-style: dashed !important; border-top-width: 1px !important; ';
+const H_BOTTOM_NONE = 'border-bottom: none !important; ';
+const H_BOTTOM_SOLID = 'border-bottom-style: solid !important; border-bottom-width: 1px !important; ';
+const H_BOTTOM_DOUBLE = 'border-bottom-style: double !important; border-bottom-width: 3px !important; ';
+const H_BOTTOM_DASHED = 'border-bottom-style: dashed !important; border-bottom-width: 1px !important; ';
+
+const verticalCellLine = (line: string, pos: string = 'left'): string => {
+  const lines = line.split(' ');
+  const isLeft = pos === 'left';
   if (lines.length > 1) {
-    return `border-${pos}-style: double !important; border-${pos}-width: 3px !important; `;
-  } else {
-    switch (lines[0]) {
-      case '':
-        return ``;
-        //return `border-${pos}: none !important; `;
-      case 'none':
-        return `border-${pos}: none !important; `;
-      case 'solid':
-        return `border-${pos}-style: solid !important; border-${pos}-width: 1px !important; `;
-      case 'double':
-        return `border-${pos}-style: double !important; border-${pos}-width: 3px !important; `;
-      case 'dashed':
-        return `border-${pos}-style: dashed !important; border-${pos}-width: 1px !important; `;
-      default:
-        return `border-${pos}-style: solid !important; border-${pos}-width: 1px !important; `;
-    }
+    return isLeft ? V_LEFT_DOUBLE : V_RIGHT_DOUBLE;
+  }
+  switch (lines[0]) {
+    case '':
+      return '';
+    case 'none':
+      return isLeft ? V_LEFT_NONE : V_RIGHT_NONE;
+    case 'solid':
+      return isLeft ? V_LEFT_SOLID : V_RIGHT_SOLID;
+    case 'double':
+      return isLeft ? V_LEFT_DOUBLE : V_RIGHT_DOUBLE;
+    case 'dashed':
+      return isLeft ? V_LEFT_DASHED : V_RIGHT_DASHED;
+    default:
+      return isLeft ? V_LEFT_SOLID : V_RIGHT_SOLID;
   }
 };
 
-const horizontalCellLine = (line: string, pos: string='bottom'): string => {
-  let lines = line.split(' ');
+const horizontalCellLine = (line: string, pos: string = 'bottom'): string => {
+  const lines = line.split(' ');
+  const isTop = pos === 'top';
   if (lines.length > 1) {
-    return `border-${pos}-style: double !important; border-${pos}-width: 3px !important; `;
-  } else {
-    switch (lines[0]) {
-      case 'none':
-        return `border-${pos}: none !important; `;
-      case 'hline':
-        return `border-${pos}-style: solid !important; border-${pos}-width: 1px !important; `;
-      case 'hhline':
-        return `border-${pos}-style: double !important; border-${pos}-width: 3px !important; `;
-      case 'hdashline':
-        return `border-${pos}-style: dashed !important; border-${pos}-width: 1px !important; `;
-      default:
-        return `border-${pos}: none !important; `;
-    }
+    return isTop ? H_TOP_DOUBLE : H_BOTTOM_DOUBLE;
   }
+  switch (lines[0]) {
+    case 'none':
+      return isTop ? H_TOP_NONE : H_BOTTOM_NONE;
+    case 'hline':
+      return isTop ? H_TOP_SOLID : H_BOTTOM_SOLID;
+    case 'hhline':
+      return isTop ? H_TOP_DOUBLE : H_BOTTOM_DOUBLE;
+    case 'hdashline':
+      return isTop ? H_TOP_DASHED : H_BOTTOM_DASHED;
+    default:
+      return isTop ? H_TOP_NONE : H_BOTTOM_NONE;
+  }
+};
+
+// Per-parse dedup cache for the concatenated style attribute of tabular <td>
+// cells. A 16 MB MMD document with 165 tabulars produced ~400K <td> tokens
+// whose style strings only had a few hundred unique values — V8 retained ~80 MB
+// of duplicate style strings. Interning via this Map collapses them to a
+// single shared instance. Cleared at the start of every md.parse() via the
+// `reset_tabular_state` core rule (see mdPluginTableTabular).
+const columnStyleCache = new Map<string, string>();
+
+export const clearColumnStyleCache = (): void => {
+  columnStyleCache.clear();
+};
+
+const internStyle = (style: string): string => {
+  const cached = columnStyleCache.get(style);
+  if (cached !== undefined) return cached;
+  columnStyleCache.set(style, style);
+  return style;
 };
 
 export const setColumnLines = (aligns: TAligns| null, lines: TLines): string[] => {
@@ -60,7 +102,7 @@ export const setColumnLines = (aligns: TAligns| null, lines: TLines): string[] =
   const borderRight: string = verticalCellLine(right, 'right');
   const borderBottom: string = horizontalCellLine(bottom, 'bottom');
   const borderTop: string = horizontalCellLine(top, 'top');
-  const textAlign: string = `text-align: ${h 
+  const textAlign: string = `text-align: ${h
     ? h ==='decimal' ? 'center' : h
     : 'center'}; `;
   let width: string = '';
@@ -71,7 +113,8 @@ export const setColumnLines = (aligns: TAligns| null, lines: TLines): string[] =
     }
   }
   const vAlign: string = v ? `vertical-align: ${v}; ` : '';
-  return [ 'style', textAlign + borderLeft + borderRight + borderBottom + borderTop + width + vAlign];
+  const style: string = textAlign + borderLeft + borderRight + borderBottom + borderTop + width + vAlign;
+  return [ 'style', internStyle(style)];
 };
 
 export const addStyle = (attrs: any[], style: string): Array<TAttrs> => {

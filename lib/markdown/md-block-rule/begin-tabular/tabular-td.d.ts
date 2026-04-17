@@ -11,6 +11,7 @@ type TAligns = {
     v?: string;
     w?: string;
 };
+export declare const clearColumnStyleCache: () => void;
 export declare const setColumnLines: (aligns: TAligns | null, lines: TLines) => string[];
 export declare const addStyle: (attrs: any[], style: string) => Array<TAttrs>;
 export declare const addHLineIntoStyle: (attrs: any[], line?: string, pos?: string) => Array<TAttrs>;

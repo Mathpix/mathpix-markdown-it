@@ -20,10 +20,7 @@ import { TMarkdownItOptions } from '../mathpix-markdown-model';
  */
 export declare const markdownToHtmlPipelineSegments: (content: string, options?: TMarkdownItOptions) => {
     content: string;
-    map: [
-        number,
-        number
-    ][];
+    map: [number, number][];
 };
 /** String transformtion pipeline */
 export declare const markdownToHtmlPipeline: (content: string, options?: TMarkdownItOptions) => any;

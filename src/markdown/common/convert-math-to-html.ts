@@ -74,13 +74,28 @@ const isMathMLToken = (token: any) =>
 /**
  * Applies the typesetting output to the markdown-it token.
  * Mutates the token in-place.
+ *
+ * `options.highlights` is consulted to decide whether to retain the SVG string
+ * on `token.mathData.svg`. That field is only read by `renderMathHighlight`
+ * (src/markdown/highlight/render-rule-highlights.ts), which rebuilds HTML via
+ * `OuterHTML(token.mathData, ...)` and is only registered when highlights are
+ * active. The default render rule (`mdPluginRaw.ts:renderMath`) uses
+ * `token.mathEquation` and only reads `width`/`widthEx`/`error` from
+ * `mathData`. Dropping `svg` there avoids holding the same string twice on
+ * every math token — a significant memory saver on SVG-heavy documents.
  */
-const applyTypesetResultToToken = (token: any, res: TypesetResult): void => {
+const applyTypesetResultToToken = (token: any, res: TypesetResult, options: any): void => {
   if (res.html != null) {
     token.mathEquation = res.html;
   }
   if (res.data != null) {
-    token.mathData = res.data;
+    const keepSvgInMathData = !!options?.highlights?.length;
+    if (keepSvgInMathData || res.data.svg == null) {
+      token.mathData = res.data;
+    } else {
+      const { svg, ...rest } = res.data as any;
+      token.mathData = rest;
+    }
     token.widthEx = res.data.widthEx;
     token.heightEx = res.data.heightEx;
   }
@@ -301,7 +316,7 @@ export const convertMathToHtml = (state, token, options) => {
       containerWidth,
       options,
     });
-    applyTypesetResultToToken(token, res);
+    applyTypesetResultToToken(token, res, options);
     // After typesetting, equation counter may have advanced.
     const number = MathJax.GetLastEquationNumber();
     // Collect labels (e.g. \label{...}) so we can resolve refs later.

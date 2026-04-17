@@ -12,6 +12,7 @@ import {ClearParseError} from "./md-block-rule/parse-error";
 import { BeginTheorem, BeginProof } from "./md-theorem/block-rule";
 import { getTerminatedRules } from "./common";
 import { ClearExtractedCodeBlocks } from "./md-block-rule/begin-tabular/sub-code";
+import { clearColumnStyleCache } from "./md-block-rule/begin-tabular/tabular-td";
 
 const clearTabularState = () => {
   ClearTableNumbers();
@@ -21,6 +22,7 @@ const clearTabularState = () => {
   ClearDiagboxTable();
   ClearParseError();
   ClearExtractedCodeBlocks();
+  clearColumnStyleCache();
 };
 
 export default (md: MarkdownIt, options) => {

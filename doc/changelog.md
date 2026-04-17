@@ -27,6 +27,13 @@
   - Parse time: 179s → ~16s (11× faster)
   - Heap usage: 5.7 GB → ~346 MB (16× less)
 
+- Memory (tabular-heavy documents, 16 MB MMD with ~400K `<td>` cells):
+  - Interned cell-border style strings (`tabular-td.ts`): 16 canonical strings for `border-{top,bottom,left,right}-style` variants replace per-cell template-literal allocations.
+  - Added per-parse dedup cache for the composed `<td>` style attribute (`columnStyleCache` cleared by `reset_tabular_state`). Collapses hundreds of thousands of identical style strings to one shared instance.
+  - `applyTypesetResultToToken`: drop `svg` from `token.mathData` when `options.highlights` is not set. The field is only read by `renderMathHighlight` (active under highlights); the default render rule uses `token.mathEquation` directly and only reads metrics from `mathData`. Saves one SVG string per math token (~7 KB × tens of thousands).
+  - Removed dead-code file `src/markdown/mdPluginSeparateForBlock.ts` — never registered with markdown-it, not imported anywhere. Its two core rules (`separateForBlock`, `separateBeforeBlock`) were shipped in the initial 2019 commit and never wired in. Files dropped in both `src/` and `lib/` (including the `.d.ts` stub) to avoid misleading future readers.
+  - Cumulative heap-after-parse: −416 MB (−22%) on a 16 MB MMD with accessibility enabled.
+
 - Docs:
   - Added implementation details in `pr-specs/2026-04-optimize-tabular-parsing.md` and `pr-specs/2026-04-global-state-cleanup-and-perf.md`.
 

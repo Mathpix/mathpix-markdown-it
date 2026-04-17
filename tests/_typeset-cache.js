@@ -77,9 +77,12 @@ describe('MathJax per-parse typeset cache (state.env scoped):', () => {
     const tokens = md.parse('$x^2$ and $x^2$', {});
     const mathTokens = tokens.flatMap(t => t.children || []).filter(t => t.type === 'inline_math');
     mathTokens.length.should.equal(2);
-    mathTokens[0].mathData.svg.should.be.a('string');
-    mathTokens[0].mathData.svg = 'CORRUPTED';
-    mathTokens[1].mathData.svg.should.not.equal('CORRUPTED');
+    // Each token must get its own mathData object (not a shared reference)
+    // so that mutating one does not leak into cache or other tokens.
+    mathTokens[0].mathData.should.not.equal(mathTokens[1].mathData);
+    mathTokens[0].mathEquation.should.be.a('string');
+    mathTokens[0].mathEquation = 'CORRUPTED';
+    mathTokens[1].mathEquation.should.not.equal('CORRUPTED');
   });
   it('output_format=latex preserves different inputLatex for same math content', () => {
     MathJax.Typeset = origTypeset;
