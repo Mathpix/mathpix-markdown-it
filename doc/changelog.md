@@ -3,21 +3,32 @@
 ## [2.0.39] - Optimize tabular parsing performance
 
 - Performance:
-  - Rewrote `getSubMath()` from recursive to iterative single-pass algorithm. The old version rebuilt the entire string on every math expression found (O(N×M) complexity). The new version scans once with a global regex, collects segments into an array, and joins at the end.
+  - Rewrote `getSubMath()` from recursive to iterative single-pass algorithm (O(N×M) → O(N+M)).
   - Replaced `mathTable` backing store from `Array` + `findIndex()` to `Map` for O(1) lookups.
-  - Added instance-scoped MathJax typeset result cache (`WeakMap<options, Map<displayMode, Map<math, result>>>`) for `inline_math` and `display_math` tokens. Documents with repeated math expressions (e.g. coordinate tables with ~67% duplicates) now skip redundant MathJax calls. Cache is capped at 50,000 entries per display-mode bucket.
-  - Cache is cleared at the start of every full `md.parse()` via a new `reset_typeset_cache` core ruler hook. Partial re-renders preserve the cache. The hook checks `renderElement` at runtime, not at registration time.
+  - Added per-parse MathJax typeset result cache in `state.env.__mathpix` (following markdown-it-footnote convention). Duplicate `inline_math`/`display_math` expressions within a single parse reuse cached results. Cache is automatically scoped per-parse — no persistence between calls, no public API options.
   - Cache exclusions: `equation_math`/`equation_math_not_number` (numbering side effects), `inline_mathML`/`display_mathML` (different MathJax path), `return_asciimath` tokens (ascii extraction side effects).
+  - Cache bypass via `beginCacheBypass`/`endCacheBypass` when `outMath` is temporarily mutated (e.g. `SetItemizeLevelTokens` for `forDocx`).
+  - Accessibility IDs (`mjx-mml-*`) regenerated on cache hit to ensure uniqueness in DOM.
   - Rewrote `getMathTableContent()` to use `parts[]` + `join()` instead of repeated slice+concat.
-  - Added `typesetCacheSize` option (default 50,000) to control the maximum number of cached MathJax results per display-mode bucket. Set to `0` to disable caching entirely. Configurable via `md.options`, `MathpixMarkdownModel.render()`, or the `<MathpixMarkdown>` React component props.
   - `mathTablePush` now accepts both `(id, content)` and `({id, content})` forms (backward-compatible overload).
+  - Shared `envToInline` object per table to avoid 500K+ object copies on large documents.
 
-- Benchmark (3.9 MB MMD document with 165 tabulars and 60K math expressions):
-  - Parse time: 158s → 16.8s (9.4× faster)
-  - Heap usage: 5.7 GB → 367 MB (15.5× less)
+- Global state cleanup:
+  - Per-parse `reset_tabular_state` core ruler hook clears all tabular module-level state (`mathTable`, `subTabular`, `extractedCodeBlocks`, `diagboxTable`, table/figure counters, parse errors).
+  - `diagboxTable`: added `ClearDiagboxTable()` + `diagboxById` reverse Map for O(1) lookup.
+  - `subTabular`: Array → Map. `extractedCodeBlocks`: Array → Map.
+  - `labelsByKey` + `labelsByUuid` Map indexes for O(1) label lookups.
+  - `buildInlineCodePositionSet()` → `Set<number>` for O(1) position check in `findEndMarker`.
+  - `tagRegexCache` memoization for HTML block regex. Fixed `lastIndex` corruption (`.test()` → `.match()`).
+  - `utf8Encode`: `parts[]` + `join()` instead of O(n²) string concat.
+  - `SetItemizeLevelTokens`: save/restore only `outMath` + `try/finally`.
+
+- Benchmark (3.9 MB MMD document with 165 tabulars and 60K math expressions, SVG mode):
+  - Parse time: 179s → ~16s (11× faster)
+  - Heap usage: 5.7 GB → ~346 MB (16× less)
 
 - Docs:
-  - Added implementation details in `pr-specs/2026-04-optimize-tabular-parsing.md`.
+  - Added implementation details in `pr-specs/2026-04-optimize-tabular-parsing.md` and `pr-specs/2026-04-global-state-cleanup-and-perf.md`.
 
 # March 2026
 

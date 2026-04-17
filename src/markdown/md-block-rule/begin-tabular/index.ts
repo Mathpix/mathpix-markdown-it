@@ -211,6 +211,7 @@ export const StatePushTabulars = (state, cTabular: TTypeContentList, align: stri
     }
     const envSubTabular: boolean = !!state.env.subTabular;
     const envIsInline: boolean = !!state.env?.isInline;
+    let sharedEnvToInline: any = null;
     for (let j = 0; j < res.length; j++) {
       let tok:Token = res[j];
       if (res[j].token === 'inline') {
@@ -230,7 +231,13 @@ export const StatePushTabulars = (state, cTabular: TTypeContentList, align: stri
             state.env.isInline = envIsInline;
             continue;
           }
-          tok.envToInline = {...state.env};
+          const isSubTab = res[j].type === 'subTabular' || res[j].isSubTabular;
+          if (isSubTab) {
+            tok.envToInline = {...state.env};
+          } else {
+            if (!sharedEnvToInline) sharedEnvToInline = {...state.env};
+            tok.envToInline = sharedEnvToInline;
+          }
           state.env.tabulare = false;
           state.env.subTabular = envSubTabular;
           tok.content  = res[j].content;

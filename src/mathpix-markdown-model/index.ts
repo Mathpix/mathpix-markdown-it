@@ -624,7 +624,7 @@ class MathpixMarkdown_Model {
           footnotes = {},
           copyToClipboard = false,
           renderOptions = null,
-          previewUuid = '',
+          previewUuid = ''
         }
          = options || {};
 
@@ -677,7 +677,7 @@ class MathpixMarkdown_Model {
           footnotes: footnotes,
           copyToClipboard: copyToClipboard,
           renderOptions: renderOptions,
-          previewUuid: previewUuid,
+          previewUuid: previewUuid
         };
 
         const styleFontSize = fontSize ? ` font-size: ${options.fontSize}px;` : '';

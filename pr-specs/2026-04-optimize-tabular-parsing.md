@@ -60,7 +60,7 @@ Reduce parse time and memory usage for documents with many tabular environments 
 - [x] Accessibility IDs unique on cache hits
 - [x] All existing tests pass
 - [x] New tests cover: dedup, equation bypass, env isolation, mutation protection, accessibility ID uniqueness, cache bypass counter, forDocx integration
-- [x] Benchmark: 158s → ~15s parse time, 5.7GB → ~365MB heap
+- [x] Benchmark: 179s → ~16s parse time (SVG mode), 5.7GB → ~346MB heap
 
 ---
 
@@ -104,8 +104,7 @@ Test document: 3.9 MB MMD, 165 tabulars, 60K math expressions.
 
 | Mode | Before | After | Improvement |
 |------|--------|-------|-------------|
-| Typst (`include_svg: false`) | 158s | **~15s** | **10×** |
-| SVG (`include_svg: true`) | 179s | **~15s** | **12×** |
+| SVG (`include_svg: true`) | 179s | **~16s** | **11×** |
 | SVG + assistiveMml | 179s | **~22s** | **8×** |
 
 ---
@@ -127,5 +126,6 @@ Test document: 3.9 MB MMD, 165 tabulars, 60K math expressions.
 ## Testing
 
 - All 3,286 tests pass
-- No new public API options (removed `typesetCacheSize` — cache is always on, scoped per-parse)
+- No new public API options — cache is always on, scoped per-parse via `state.env`
+- Shared `envToInline` per table reduces memory for large documents with many table cells
 - `mathTablePush` backward-compatible overload preserved
