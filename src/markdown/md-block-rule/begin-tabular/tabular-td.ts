@@ -73,16 +73,42 @@ const horizontalCellLine = (line: string, pos: string = 'bottom'): string => {
   }
 };
 
-// Per-parse dedup cache for the concatenated style attribute of tabular <td>
-// cells. A 16 MB MMD document with 165 tabulars produced ~400K <td> tokens
-// whose style strings only had a few hundred unique values — V8 retained ~80 MB
-// of duplicate style strings. Interning via this Map collapses them to a
-// single shared instance. Cleared at the start of every md.parse() via the
-// `reset_tabular_state` core rule (see mdPluginTableTabular).
+// Per-parse intern cache for tabular-cell style strings and for the whole
+// attrs array attached to `td_open` tokens.
+//
+// On a 16 MB MMD document the 479K AddTd() calls produced only ~38 distinct
+// style strings — the top one alone was used 393K times. Each call still
+// allocated its own outer attrs array `[['style', X]]`, inner tuple, and two
+// array-backing stores. `attrsSharedMarker`/`cellAttrsCache` dedupe the whole
+// attrs structure so cells with identical (style + isEmpty + latex?) share
+// one attrs instance, saving ~1M array allocations on this doc.
+//
+// Shared attrs must be treated as read-only. `tokenAttrSet` /
+// `tokenAttrGet` in `md-renderer-rules/render-tabular.ts` clone attrs on
+// first write via the `attrsSharedMarker` property.
 const columnStyleCache = new Map<string, string>();
+const cellAttrsCache = new Map<string, TAttrs[]>();
+
+/**
+ * Non-enumerable marker set on cached shared `attrs` arrays so that code
+ * paths that mutate attrs (highlight, diagbox overlays) can detach a private
+ * copy instead of corrupting every cell that shares the instance.
+ *
+ * Consumers check the marker via `(attrs as any)[attrsSharedMarker] === true`.
+ * The marker is defined with `configurable: true` so the clone can clear it.
+ */
+export const attrsSharedMarker = Symbol.for('mathpix.tabular.attrsShared');
+
+const markAttrsShared = (attrs: TAttrs[]): TAttrs[] => {
+  Object.defineProperty(attrs, attrsSharedMarker, {
+    value: true, enumerable: false, configurable: true, writable: true,
+  });
+  return attrs;
+};
 
 export const clearColumnStyleCache = (): void => {
   columnStyleCache.clear();
+  cellAttrsCache.clear();
 };
 
 const internStyle = (style: string): string => {
@@ -92,29 +118,59 @@ const internStyle = (style: string): string => {
   return style;
 };
 
-export const setColumnLines = (aligns: TAligns| null, lines: TLines): string[] => {
+/**
+ * Builds the final style string for a tabular cell from the aligns/lines
+ * descriptor and optional padding-bottom space. Returned string is interned
+ * per-parse.
+ */
+const composeCellStyle = (aligns: TAligns | null, lines: TLines, space: string): string => {
   const {left = '', right = '', bottom = '', top = ''} = lines;
-  if (!aligns) {
-    aligns = {h: '', v: '', w: ''}
-  }
+  if (!aligns) aligns = {h: '', v: '', w: ''};
   const {h = '', v = '', w = ''} = aligns;
   const borderLeft: string = verticalCellLine(left, 'left');
   const borderRight: string = verticalCellLine(right, 'right');
   const borderBottom: string = horizontalCellLine(bottom, 'bottom');
   const borderTop: string = horizontalCellLine(top, 'top');
   const textAlign: string = `text-align: ${h
-    ? h ==='decimal' ? 'center' : h
+    ? h === 'decimal' ? 'center' : h
     : 'center'}; `;
   let width: string = '';
   if (w) {
     width = getLatexTextWidth(w, 1200);
-    if (!width) {
-      width = `width: ${w}; `
-    }
+    if (!width) width = `width: ${w}; `;
   }
   const vAlign: string = v ? `vertical-align: ${v}; ` : '';
-  const style: string = textAlign + borderLeft + borderRight + borderBottom + borderTop + width + vAlign;
-  return [ 'style', internStyle(style)];
+  const padding: string = space && space !== 'none' ? `padding-bottom: ${space} !important;` : '';
+  const style = textAlign + borderLeft + borderRight + borderBottom + borderTop + width + vAlign + padding;
+  return internStyle(style);
+};
+
+/**
+ * Returns a read-only shared attrs array for a `<td>` cell. Tokens with the
+ * same (style, isEmpty) pair reuse the same instance. Mutation paths must
+ * clone first — see `attrsSharedMarker`.
+ */
+const getSharedCellAttrs = (style: string, isEmpty: boolean): TAttrs[] => {
+  const key = isEmpty ? style + '\0E' : style;
+  const cached = cellAttrsCache.get(key);
+  if (cached) return cached;
+  const attrs: TAttrs[] = isEmpty
+    ? [['style', style], ['class', '_empty']]
+    : [['style', style]];
+  markAttrsShared(attrs);
+  cellAttrsCache.set(key, attrs);
+  return attrs;
+};
+
+/**
+ * Backward-compatible helper: returns a single `['style', X]` tuple.
+ * Kept for callers (AddTdSubTable, other code paths) that still build
+ * non-shared attrs arrays; prefer `composeCellStyle` + `getSharedCellAttrs`
+ * for hot paths.
+ */
+export const setColumnLines = (aligns: TAligns| null, lines: TLines): string[] => {
+  const style = composeCellStyle(aligns, lines, '');
+  return ['style', style];
 };
 
 export const addStyle = (attrs: any[], style: string): Array<TAttrs> => {
@@ -134,19 +190,10 @@ export const addHLineIntoStyle = (attrs: any[], line: string = '', pos: string =
 
 export const AddTd = (content: string, aligns: TAligns| null, lines: TLines, space: string, decimal: TDecimal|null = null): {res: Array<TTokenTabular>, content: string} => {
   let res: Array<TTokenTabular> = [];
-  const attrs: Array<TAttrs> = [];
-  const slyleLines = setColumnLines(aligns, lines);
-
-  attrs.push(slyleLines);
-  if (space && space !== 'none') {
-    addStyle(attrs, `padding-bottom: ${space} !important;`)
-  }
-
-  if (!content) {
-    attrs.push(['class', '_empty'])
-  }
+  const style = composeCellStyle(aligns, lines, space);
   content = content.replace(preserveNewlineUnlessDoubleAngleUuidRegex, ' ');
   content = getExtractedCodeBlockContent(content, 0);
+  const attrs = getSharedCellAttrs(style, !content);
   res.push({token:'td_open', type:'td_open', tag: 'td', n: 1, attrs: attrs});
   if (content) {
     if (decimal && parseFloat(content)) {
