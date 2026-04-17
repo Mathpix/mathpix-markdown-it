@@ -1,6 +1,6 @@
-/** Clear the typeset cache. Must be called at the start of every md.parse()
- *  to prevent stale data and unbounded growth in long-lived processes. */
-export declare const clearTypesetCache: () => void;
+/** Clear the typeset cache for a specific md instance.
+ *  Called at the start of every md.parse() via core.ruler hook. */
+export declare const clearTypesetCache: (options: object) => void;
 /**
  * Converts a math token into HTML and attaches MathJax metadata to the token.
  * Also extracts equation labels and stores them in the shared labels list.

@@ -807,7 +807,20 @@ export default options => {
       resetTheoremEnvironments();
       /** TODO: check it in vscode */
       clearLabelsList(); /** Clean up the global list of all labels */
-      md.core.ruler.before('normalize', 'reset_typeset_cache', () => { clearTypesetCache(); });
+    }
+    const resetCacheHook = (state) => {
+      const isPartial = state.md.options.renderElement
+        && state.md.options.renderElement.hasOwnProperty('startLine');
+      if (!isPartial) {
+        clearTypesetCache(state.md.options);
+      }
+    };
+    // enable() returns matched rule names; used as idempotent existence probe (ignoreMissing=true)
+    const hookExists = md.core.ruler.enable(['reset_typeset_cache'], true).length > 0;
+    if (hookExists) {
+      md.core.ruler.at('reset_typeset_cache', resetCacheHook);
+    } else {
+      md.core.ruler.before('normalize', 'reset_typeset_cache', resetCacheHook);
     }
     if (!md.options.htmlDisableTagMatching) {
       md.block.ruler.at("html_block", mmdHtmlBlock, {alt: ['paragraph', 'reference', 'blockquote']});

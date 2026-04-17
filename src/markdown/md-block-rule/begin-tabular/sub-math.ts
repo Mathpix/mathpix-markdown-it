@@ -8,7 +8,7 @@ import {
   singleCurlyBracketPattern
 } from "../../common/consts";
 
-const RE_MATH_OPEN = /\\\\\[|\\\[|\\\\\(|\\\(|\$\$|\$|\\begin\{([^}]*)\}|eqref\{([^}]*)\}|ref\{([^}]*)\}/g;
+const RE_MATH_OPEN = /\\\\\[|\\\[|\\\\\(|\\\(|\$\$|\$|\\begin\{([^}]*)\}|eqref\{([^}]*)\}|ref\{([^}]*)\}/;
 
 let mathTable: Map<string, string> = new Map();
 
@@ -20,6 +20,9 @@ export const mathTablePush = (id: string, content: string): void => {
   mathTable.set(id, content);
 };
 
+/** Replace UUID placeholders with original math content.
+ *  Uses trimmed string for regex matching (consistent with getSubMath),
+ *  but untrimmed sub for slicing to preserve original whitespace. */
 export const getMathTableContent = (sub: string, i: number): string => {
   const trimmed = sub.trim();
   let cellM: Array<string> = trimmed.slice(i).match(doubleCurlyBracketUuidPattern);
@@ -29,51 +32,42 @@ export const getMathTableContent = (sub: string, i: number): string => {
   }
   const parts: string[] = [];
   let lastIdx = 0;
-  let resContent: string = sub;
   for (let j = 0; j < cellM.length; j++) {
     const id: string = cellM[j].replace(/\{/g, '').replace(/\}/g, '');
     const mathContent = mathTable.get(id);
     if (mathContent !== undefined) {
-      const iB: number = resContent.indexOf(cellM[j], lastIdx);
+      const iB: number = sub.indexOf(cellM[j], lastIdx);
       if (iB >= 0) {
-        parts.push(resContent.slice(lastIdx, iB));
+        parts.push(sub.slice(lastIdx, iB));
         parts.push(mathContent);
         lastIdx = iB + cellM[j].length;
       }
     }
   }
   if (parts.length === 0) {
-    return getContent(resContent);
+    return getContent(sub);
   }
-  parts.push(resContent.slice(lastIdx));
+  parts.push(sub.slice(lastIdx));
   return getContent(parts.join(''));
 };
 
+/**
+ * Returns the end marker for a matched opening marker.
+ * - string: end marker to search for (e.g. "\\]", "$")
+ * - null: self-closing match (eqref/ref) — no end marker needed, content = match itself
+ * - undefined: \begin{env} — caller must resolve via balanced tag search
+ */
 const getEndMarker = (
   matchStr: string, envGroup: string | undefined,
   eqrefGroup: string | undefined, refGroup: string | undefined,
-): string | undefined => {
-  if (matchStr === "\\\\[") {
-    return "\\\\]";
-  }
-  if (matchStr === "\\[") {
-    return "\\]";
-  }
-  if (matchStr === "\\\\(") {
-    return "\\\\)";
-  }
-  if (matchStr === "\\(") {
-    return "\\)";
-  }
-  if (eqrefGroup !== undefined || refGroup !== undefined) {
-    return "";
-  }
-  if (matchStr === "$$") {
-    return "$$";
-  }
-  if (matchStr === "$") {
-    return "$";
-  }
+): string | null | undefined => {
+  if (matchStr === "\\\\[") return "\\\\]";
+  if (matchStr === "\\[") return "\\]";
+  if (matchStr === "\\\\(") return "\\\\)";
+  if (matchStr === "\\(") return "\\)";
+  if (eqrefGroup !== undefined || refGroup !== undefined) return null;
+  if (matchStr === "$$") return "$$";
+  if (matchStr === "$") return "$";
   return undefined;
 };
 
@@ -115,7 +109,10 @@ export const getSubMath = (str: string): string => {
     const envGroup = match[1];
     let endMarker = getEndMarker(match[0], envGroup, match[2], match[3]);
     let endMarkerPos = -1;
-    if (endMarker === undefined) {
+    if (endMarker === null) {
+      endMarkerPos = startMathPos;
+      endMarker = '';
+    } else if (endMarker === undefined) {
       if (envGroup && envGroup !== 'abstract' && envGroup !== 'tabular') {
         const environment = envGroup.trim();
         const openTag: RegExp = beginTag(environment, true);

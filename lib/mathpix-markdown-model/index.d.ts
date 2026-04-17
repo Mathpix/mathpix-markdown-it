@@ -65,6 +65,7 @@ export interface optionsMathpixMarkdown {
     copyToClipboard?: boolean;
     renderOptions?: RenderOptions;
     previewUuid?: string;
+    typesetCacheSize?: number;
 }
 export type TMarkdownItOptions = {
     isDisableFancy?: boolean;
@@ -117,6 +118,7 @@ export type TMarkdownItOptions = {
     renderOptions?: RenderOptions;
     previewUuid?: string;
     enableSizeCalculation?: boolean;
+    typesetCacheSize?: number;
 };
 export type TOutputMath = {
     output_format?: 'svg' | 'mathml' | 'latex';

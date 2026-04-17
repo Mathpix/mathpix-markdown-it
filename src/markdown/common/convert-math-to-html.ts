@@ -3,7 +3,7 @@ import { getWidthFromDocument } from "../utils";
 import { addIntoLabelsList, eLabelType } from "./labels";
 import { envArraysShouldBeFlattenInTSV } from '../../helpers/consts';
 import { formatMathJaxError } from "../../helpers/utils";
-import { csvSeparatorsDef, mdSeparatorsDef, tsvSeparatorsDef } from './consts';
+import { csvSeparatorsDef, mdSeparatorsDef, tsvSeparatorsDef, DEFAULT_TYPESET_CACHE_SIZE } from './consts';
 import { formatSource } from "../../helpers/parse-mmd-element";
 
 type TypesetResult = {
@@ -19,24 +19,42 @@ type TypesetResult = {
   labels?: Record<string, any>;
 };
 
+type DisplayCache = Map<string, TypesetResult>;
+type InstanceCache = Map<boolean, DisplayCache>;
+
 /**
- * Two-level cache for MathJax typesetting results.
- * Outer key: display mode (true = block, false = inline).
- * Inner key: raw math content string (no separator — eliminates collision risk).
+ * Instance-scoped cache for MathJax typesetting results.
+ * Keyed by the md.options object reference — each MarkdownIt instance gets
+ * its own isolated cache. This prevents cross-instance contamination when
+ * multiple md instances with different options coexist in one process
+ * (e.g. one for HTML, another for DOCX).
+ *
+ * Inner structure: Map<isBlock, Map<math, TypesetResult>>.
  * Only used for simple TeX typesetting (path 4 in typesetMathForToken) —
  * MathML tokens, ascii-extraction tokens, and numbered equations are NOT cached
  * because they have side effects (equation counter, different MathJax paths).
+ *
+ * Capped at MAX_CACHE_SIZE entries per display-mode bucket to prevent
+ * unbounded growth on documents with many unique formulas.
  */
-const typesetCache: Map<boolean, Map<string, TypesetResult>> = new Map([
-  [true, new Map()],
-  [false, new Map()],
-]);
+const typesetCaches = new WeakMap<object, InstanceCache>();
 
-/** Clear the typeset cache. Must be called at the start of every md.parse()
- *  to prevent stale data and unbounded growth in long-lived processes. */
-export const clearTypesetCache = (): void => {
-  typesetCache.get(true)!.clear();
-  typesetCache.get(false)!.clear();
+const getInstanceCache = (options: object): InstanceCache => {
+  let cache = typesetCaches.get(options);
+  if (!cache) {
+    cache = new Map([[true, new Map()], [false, new Map()]]);
+    typesetCaches.set(options, cache);
+  }
+  return cache;
+};
+
+const getBucket = (options: object, isBlock: boolean): DisplayCache =>
+  getInstanceCache(options).get(!!isBlock)!;
+
+/** Clear the typeset cache for a specific md instance.
+ *  Called at the start of every md.parse() via core.ruler hook. */
+export const clearTypesetCache = (options: object): void => {
+  typesetCaches.delete(options);
 };
 
 /**
@@ -171,7 +189,7 @@ const typesetMathForToken = (params: {
   const isCacheable = !token.return_asciimath
     && (token.type === 'inline_math' || token.type === 'display_math');
   if (isCacheable) {
-    const cached = typesetCache.get(isBlock)!.get(math);
+    const cached = getBucket(options, isBlock).get(math);
     if (cached) {
       return cached;
     }
@@ -230,7 +248,12 @@ const typesetMathForToken = (params: {
     labels: typeset.labels,
   };
   if (isCacheable) {
-    typesetCache.get(isBlock)!.set(math, result);
+    const bucket = getBucket(options, isBlock);
+    const raw = options.typesetCacheSize;
+    const maxSize = typeof raw === 'number' && raw >= 0 ? raw : DEFAULT_TYPESET_CACHE_SIZE;
+    if (maxSize > 0 && bucket.size < maxSize) {
+      bucket.set(math, result);
+    }
   }
   return result;
 }

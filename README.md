@@ -751,6 +751,7 @@ window.MathpixRender.renderMathInElement(document.getElementById('content'), {
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
 | `outMath` | `TOutputMath` | `{ output_format: 'svg', include_svg: true }` | Controls which hidden formats to generate. Set `include_mathml`, `include_latex`, `include_asciimath`, etc. to `true` to generate hidden format elements for context menu compatibility. |
+| `typesetCacheSize` | `number` | `50000` | Max cached MathJax results per display-mode bucket. Duplicate math expressions reuse cached results instead of calling MathJax again. Set to `0` to disable caching. |
 | `accessibility.assistive_mml` | `boolean` | `true` | Add `<mjx-assistive-mml>` element for screen readers |
 | `accessibility.include_speech` | `boolean` | `false` | Add `aria-label` with speech text (requires `assistive_mml: true`) |
 

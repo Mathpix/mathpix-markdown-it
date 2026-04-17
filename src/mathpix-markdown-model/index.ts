@@ -7,6 +7,7 @@ import { tabularStyles } from "../styles/styles-tabular";
 import { fontsStyles } from "../styles/styles-fonts";
 import { listsStyles } from "../styles/styles-lists";
 import {MathJax} from '../mathjax';
+import { DEFAULT_TYPESET_CACHE_SIZE } from '../markdown/common/consts';
 import { Property } from 'csstype'; // at top of file
 import { ISmilesOptions } from '../markdown/md-chemistry';
 import { yamlParser } from '../yaml-parser';
@@ -86,6 +87,7 @@ export interface optionsMathpixMarkdown {
     copyToClipboard?: boolean;
     renderOptions?: RenderOptions;
     previewUuid?: string;
+    typesetCacheSize?: number;
 }
 
 export type TMarkdownItOptions = {
@@ -139,6 +141,7 @@ export type TMarkdownItOptions = {
   renderOptions?: RenderOptions;
   previewUuid?: string;
   enableSizeCalculation?: boolean;
+  typesetCacheSize?: number;
 }
 
 export type TOutputMath = {
@@ -624,7 +627,8 @@ class MathpixMarkdown_Model {
           footnotes = {},
           copyToClipboard = false,
           renderOptions = null,
-          previewUuid = ''
+          previewUuid = '',
+          typesetCacheSize = DEFAULT_TYPESET_CACHE_SIZE,
         }
          = options || {};
 
@@ -677,7 +681,8 @@ class MathpixMarkdown_Model {
           footnotes: footnotes,
           copyToClipboard: copyToClipboard,
           renderOptions: renderOptions,
-          previewUuid: previewUuid
+          previewUuid: previewUuid,
+          typesetCacheSize: typesetCacheSize,
         };
 
         const styleFontSize = fontSize ? ` font-size: ${options.fontSize}px;` : '';

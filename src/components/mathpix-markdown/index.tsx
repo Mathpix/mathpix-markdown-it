@@ -7,6 +7,7 @@ import {
 } from '../../mathpix-markdown-model';
 import { eMmdRuleType } from "../../markdown/common/mmdRules";
 import { getDisableRuleTypes } from "../../markdown/common/mmdRulesToDisable";
+import { DEFAULT_TYPESET_CACHE_SIZE } from "../../markdown/common/consts";
 
 
 export interface MathpixMarkdownProps extends optionsMathpixMarkdown{
@@ -33,7 +34,8 @@ class MathpixMarkdown extends React.Component<MathpixMarkdownProps> {
           footnotes = {},
           copyToClipboard = false,
           renderOptions = null,
-          previewUuid = ""
+          previewUuid = "",
+          typesetCacheSize = DEFAULT_TYPESET_CACHE_SIZE,
         } = this.props;
         const disableRules = isDisableFancy ? MM.disableFancyArrayDef : this.props.disableRules || [];
         const disableRuleTypes: eMmdRuleType[] = renderOptions ? getDisableRuleTypes(renderOptions) : [];
@@ -71,7 +73,8 @@ class MathpixMarkdown extends React.Component<MathpixMarkdownProps> {
             footnotes: footnotes,
             copyToClipboard: copyToClipboard,
             renderOptions: renderOptions,
-            previewUuid: previewUuid
+            previewUuid: previewUuid,
+            typesetCacheSize: typesetCacheSize,
         };
 
          MM.setOptions(disableRules, isCheckFormula, showTimeLog);

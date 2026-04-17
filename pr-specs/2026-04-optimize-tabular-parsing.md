@@ -64,7 +64,7 @@ Replaced `mathTable: Array` with `Map<string, string>` for O(1) lookups.
 Added a two-level `Map<boolean, Map<string, TypesetResult>>` cache in `typesetMathForToken()`:
 - **Key:** outer = display mode (`true`/`false`), inner = raw math content string. No separator in key — eliminates collision risk.
 - **Cache hit:** returns stored result, skips MathJax entirely.
-- **Cache scope:** cleared at the start of every `md.parse()` via a `core.ruler.before('normalize', 'reset_typeset_cache', ...)` hook registered in `mdPluginRaw.ts`. The hook is registered only for full renders (`!isRenderElement`) — partial re-renders preserve the cache from the preceding full render. This guarantees the cache does not leak across documents in long-lived processes (web servers, PDF generators).
+- **Cache scope:** instance-scoped via `WeakMap<options, InstanceCache>` — each md instance has its own isolated cache. Cleared at the start of every full `md.parse()` via a `core.ruler.before('normalize', 'reset_typeset_cache', ...)` hook. The hook checks `renderElement` at runtime: partial re-renders skip the clear so the same instance's cache survives. Different md instances never share cache entries. Capped at 50,000 entries per display-mode bucket.
 
 **What is cached:** `inline_math` and `display_math` tokens only (path 4 in `typesetMathForToken`).
 
@@ -72,6 +72,14 @@ Added a two-level `Map<boolean, Map<string, TypesetResult>>` cache in `typesetMa
 - `equation_math` / `equation_math_not_number` — these advance the MathJax equation counter via `MathJax.Reset(beginNumber)`
 - MathML input tokens — different MathJax path (`TypesetMathML`)
 - Ascii-extraction tokens (`return_asciimath`) — different MathJax path (`TypesetSvgAndAscii`) with side-effect options
+
+### Configuration
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `typesetCacheSize` | `number` | `50000` | Max entries per display-mode bucket. Set to `0` to disable caching. |
+
+Available in all option entry points: `MathpixMarkdownModel.render()`, `mathpixMarkdownPlugin` options, `<MathpixMarkdown>` React props, and `mdInit()` in `markdown/index.ts`.
 
 ---
 
@@ -109,5 +117,17 @@ Mode: `include_svg: true` (standard HTML pipeline)
 ## Testing
 
 - All existing tests pass (3,242 on master branch)
-- No new test files — optimization is transparent to output
-- Verified output identity: HTML output from patched version matches original byte-for-byte on the benchmark file
+- Added `tests/_sub-math.js` — 23 unit tests for `getSubMath` edge cases: escaped `$`, whitespace-padded `$`, digit after `$`, unclosed `$`, trailing unclosed `$`, `\\[...\\]`, `\\(...\\)`, `\begin{abstract}`, `\begin{tabular}`, `\begin{equation}`, `\begin{referral}`, eqref, ref, multiple expressions, sequential calls
+- Added `tests/_typeset-cache.js` — 6 tests verifying cache behavior: duplicate inline_math cache hit, equation_math bypass (numbering), cache cleared between parse calls, display/inline mode isolation, typesetCacheSize cap
+- Verified output identity: HTML output matches original on benchmark file
+
+### Breaking change
+
+- `mathTablePush` signature changed from `(item: {id, content})` to `(id: string, content: string)`. No external callers found in the codebase.
+
+### Cache exclusions
+
+The following token types are **never** cached (to preserve correctness):
+- `equation_math` / `equation_math_not_number` — advance MathJax equation counter
+- `inline_mathML` / `display_mathML` — different MathJax path (TypesetMathML)
+- tokens with `return_asciimath` — different MathJax path (TypesetSvgAndAscii) with side-effect options

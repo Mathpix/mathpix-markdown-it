@@ -1,6 +1,6 @@
 import { mdPluginCollapsible, mdSetPositionsAndHighlight } from "./mdPluginConfigured";
-
 import { mathpixMarkdownPlugin } from './mathpix-markdown-plugins';
+import { DEFAULT_TYPESET_CACHE_SIZE } from './common/consts';
 
 import { injectRenderRules } from "./rules";
 import { MathpixMarkdownModel as MM, TMarkdownItOptions, ParserErrors } from '../mathpix-markdown-model';
@@ -33,7 +33,8 @@ const mdInit = (options: TMarkdownItOptions) => {
     copyToClipboard = false,
     renderOptions = null,
     previewUuid = "",
-    enableSizeCalculation = false
+    enableSizeCalculation = false,
+    typesetCacheSize = DEFAULT_TYPESET_CACHE_SIZE,
   } = options;
   const mmdOptions = {
     width: width,
@@ -61,7 +62,8 @@ const mdInit = (options: TMarkdownItOptions) => {
     copyToClipboard: copyToClipboard,
     renderOptions: renderOptions,
     previewUuid: previewUuid,
-    enableSizeCalculation: enableSizeCalculation
+    enableSizeCalculation: enableSizeCalculation,
+    typesetCacheSize: typesetCacheSize,
   };
   const disableRuleTypes: eMmdRuleType[] = renderOptions ? getDisableRuleTypes(renderOptions) : [];
   let md = require("markdown-it")({

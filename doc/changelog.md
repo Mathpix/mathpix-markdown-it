@@ -5,9 +5,12 @@
 - Performance:
   - Rewrote `getSubMath()` from recursive to iterative single-pass algorithm. The old version rebuilt the entire string on every math expression found (O(N×M) complexity). The new version scans once with a global regex, collects segments into an array, and joins at the end.
   - Replaced `mathTable` backing store from `Array` + `findIndex()` to `Map` for O(1) lookups.
-  - Added MathJax typeset result cache (two-level `Map<displayMode, Map<math, result>>`) for `inline_math` and `display_math` tokens. Documents with repeated math expressions (e.g. coordinate tables with ~67% duplicates) now skip redundant MathJax calls.
-  - Cache is cleared at the start of every `md.parse()` via a new `reset_typeset_cache` core ruler hook (registered only for full renders, not partial re-renders). Numbered equations and ascii-extraction tokens are excluded from caching due to side effects.
+  - Added instance-scoped MathJax typeset result cache (`WeakMap<options, Map<displayMode, Map<math, result>>>`) for `inline_math` and `display_math` tokens. Documents with repeated math expressions (e.g. coordinate tables with ~67% duplicates) now skip redundant MathJax calls. Cache is capped at 50,000 entries per display-mode bucket.
+  - Cache is cleared at the start of every full `md.parse()` via a new `reset_typeset_cache` core ruler hook. Partial re-renders preserve the cache. The hook checks `renderElement` at runtime, not at registration time.
+  - Cache exclusions: `equation_math`/`equation_math_not_number` (numbering side effects), `inline_mathML`/`display_mathML` (different MathJax path), `return_asciimath` tokens (ascii extraction side effects).
   - Rewrote `getMathTableContent()` to use `parts[]` + `join()` instead of repeated slice+concat.
+  - Added `typesetCacheSize` option (default 50,000) to control the maximum number of cached MathJax results per display-mode bucket. Set to `0` to disable caching entirely. Configurable via `md.options`, `MathpixMarkdownModel.render()`, or the `<MathpixMarkdown>` React component props.
+  - Breaking: `mathTablePush` signature changed from `(item: {id, content})` to `(id: string, content: string)` — no external callers found.
 
 - Benchmark (3.9 MB MMD document with 165 tabulars and 60K math expressions):
   - Parse time: 158s → 16.8s (9.4× faster)
