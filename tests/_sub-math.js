@@ -1,6 +1,6 @@
 let chai = require('chai');
 let should = chai.should();
-let { getSubMath, ClearSubMathLists } = require('../lib/markdown/md-block-rule/begin-tabular/sub-math');
+let { getSubMath, ClearSubMathLists, getMathTableContent } = require('../lib/markdown/md-block-rule/begin-tabular/sub-math');
 
 describe('getSubMath — iterative math extraction:', () => {
   beforeEach(() => { ClearSubMathLists(); });
@@ -126,11 +126,29 @@ describe('getSubMath — iterative math extraction:', () => {
     result.should.match(/\{[a-z0-9-]+\}/);
   });
 
-  it('sequential calls produce independent results', () => {
+  it('sequential calls replace different content with different placeholders', () => {
     ClearSubMathLists();
     const r1 = getSubMath('$x$');
+    const placeholder1 = r1.match(/\{([a-z0-9-]+)\}/)[1];
     ClearSubMathLists();
     const r2 = getSubMath('$y$');
-    r1.should.not.equal(r2);
+    const placeholder2 = r2.match(/\{([a-z0-9-]+)\}/)[1];
+    placeholder1.should.not.equal(placeholder2);
+  });
+  it('unclosed \\begin{array} does not hang', () => {
+    const result = getSubMath('a \\begin{array}{c} x');
+    result.should.be.a('string');
+  });
+  it('getMathTableContent with no matching placeholders returns empty', () => {
+    ClearSubMathLists();
+    getMathTableContent('text without placeholders', 0).should.equal('');
+  });
+  it('getMathTableContent with real placeholder but no mathTable entry preserves it', () => {
+    ClearSubMathLists();
+    const r = getSubMath('a $x$ b');
+    const placeholder = r.match(/\{([a-z0-9-]+)\}/)[0];
+    ClearSubMathLists();
+    const result = getMathTableContent(r, 0);
+    result.should.include(placeholder);
   });
 });

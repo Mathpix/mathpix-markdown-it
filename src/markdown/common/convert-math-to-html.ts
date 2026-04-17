@@ -34,7 +34,7 @@ type InstanceCache = Map<boolean, DisplayCache>;
  * MathML tokens, ascii-extraction tokens, and numbered equations are NOT cached
  * because they have side effects (equation counter, different MathJax paths).
  *
- * Capped at MAX_CACHE_SIZE entries per display-mode bucket to prevent
+ * Capped at DEFAULT_TYPESET_CACHE_SIZE (configurable via options.typesetCacheSize) per display-mode bucket to prevent
  * unbounded growth on documents with many unique formulas.
  */
 const typesetCaches = new WeakMap<object, InstanceCache>();
@@ -191,7 +191,11 @@ const typesetMathForToken = (params: {
   if (isCacheable) {
     const cached = getBucket(options, isBlock).get(math);
     if (cached) {
-      return cached;
+      const fmt = buildFormatOutputs({
+        outputFormat, inputLatex: token.inputLatex,
+        renderedHtml: cached.html || '', renderedData: cached.data,
+      });
+      return { ...cached, ...fmt };
     }
   }
   // 3) AsciiMath extraction requested
@@ -232,14 +236,9 @@ const typesetMathForToken = (params: {
     nonumbers: options.nonumbers,
     renderingErrors: options.renderingErrors,
   });
-  const fmt: Pick<TypesetResult, "html" | "data"> = buildFormatOutputs({
-    outputFormat,
-    inputLatex: token.inputLatex,
-    renderedHtml: typeset.html,
-    renderedData: typeset.data,
-  });
-  const result: TypesetResult = {
-    ...fmt,
+  const rawResult: TypesetResult = {
+    html: typeset.html,
+    data: typeset.data,
     ascii: typeset.ascii,
     linear: typeset.linear,
     ascii_tsv: typeset.ascii_tsv,
@@ -249,13 +248,17 @@ const typesetMathForToken = (params: {
   };
   if (isCacheable) {
     const bucket = getBucket(options, isBlock);
-    const raw = options.typesetCacheSize;
-    const maxSize = typeof raw === 'number' && raw >= 0 ? raw : DEFAULT_TYPESET_CACHE_SIZE;
+    const sizeRaw = options.typesetCacheSize;
+    const maxSize = typeof sizeRaw === 'number' && sizeRaw >= 0 ? sizeRaw : DEFAULT_TYPESET_CACHE_SIZE;
     if (maxSize > 0 && bucket.size < maxSize) {
-      bucket.set(math, result);
+      bucket.set(math, rawResult);
     }
   }
-  return result;
+  const fmt = buildFormatOutputs({
+    outputFormat, inputLatex: token.inputLatex,
+    renderedHtml: rawResult.html || '', renderedData: rawResult.data,
+  });
+  return { ...rawResult, ...fmt };
 }
 
 /**

@@ -815,8 +815,7 @@ export default options => {
         clearTypesetCache(state.md.options);
       }
     };
-    // enable() returns matched rule names; used as idempotent existence probe (ignoreMissing=true)
-    const hookExists = md.core.ruler.enable(['reset_typeset_cache'], true).length > 0;
+    const hookExists = md.core.ruler.__find__('reset_typeset_cache') >= 0;
     if (hookExists) {
       md.core.ruler.at('reset_typeset_cache', resetCacheHook);
     } else {

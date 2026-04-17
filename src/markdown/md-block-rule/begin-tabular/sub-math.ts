@@ -16,8 +16,12 @@ export const ClearSubMathLists = (): void => {
   mathTable.clear();
 };
 
-export const mathTablePush = (id: string, content: string): void => {
-  mathTable.set(id, content);
+export const mathTablePush = (idOrItem: string | { id: string; content: string }, content?: string): void => {
+  if (typeof idOrItem === 'string') {
+    mathTable.set(idOrItem, content!);
+  } else {
+    mathTable.set(idOrItem.id, idOrItem.content);
+  }
 };
 
 /** Replace UUID placeholders with original math content.
@@ -121,8 +125,9 @@ export const getSubMath = (str: string): string => {
           const data = findOpenCloseTagsMathEnvironment(
             str.slice(beginMarkerPos), openTag, closeTag
           );
-          if (data?.arrClose?.length) {
-            endMarkerPos = beginMarkerPos + data.arrClose[data.arrClose.length - 1]?.posStart;
+          const lastClose = data?.arrClose?.length ? data.arrClose[data.arrClose.length - 1] : null;
+          if (lastClose && typeof lastClose.posStart === 'number') {
+            endMarkerPos = beginMarkerPos + lastClose.posStart;
           }
           endMarker = `\\end{${envGroup}}`;
         }

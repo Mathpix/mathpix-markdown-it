@@ -1,5 +1,8 @@
 export declare const ClearSubMathLists: () => void;
-export declare const mathTablePush: (id: string, content: string) => void;
+export declare const mathTablePush: (idOrItem: string | {
+    id: string;
+    content: string;
+}, content?: string) => void;
 /** Replace UUID placeholders with original math content.
  *  Uses trimmed string for regex matching (consistent with getSubMath),
  *  but untrimmed sub for slicing to preserve original whitespace. */
