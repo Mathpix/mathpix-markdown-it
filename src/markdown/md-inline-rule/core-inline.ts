@@ -40,18 +40,35 @@ const walkInlineInTokens = (
   if (!list?.length) return;
   // base env for this level is: (root envToInline) then stack overrides
   const baseEnv = Object.assign({}, getRootEnvToInline(), ...envStack);
+  let lastEnvToInline: any = null;
+  let cachedMergedEnv: any = null;
+  let cachedStateEnv: any = null;
   for (let i = 0; i < list.length; i++) {
     let tok: any = list[i];
     if (tok?.token === "inline_decimal") {
       inlineDecimalParse(tok);
       continue;
     }
-    const nextStack = tok?.envToInline ? [...envStack, tok.envToInline] : envStack;
-    const mergedEnvToInline = tok?.envToInline ? Object.assign({}, baseEnv, tok.envToInline) : baseEnv;
+    const tokEnv = tok?.envToInline;
+    const nextStack = tokEnv ? [...envStack, tokEnv] : envStack;
+    const mergedEnvToInline = tokEnv ? (
+      tokEnv === lastEnvToInline ? cachedMergedEnv
+        : Object.assign({}, baseEnv, tokEnv)
+    ) : baseEnv;
+    if (tokEnv && tokEnv !== lastEnvToInline) {
+      lastEnvToInline = tokEnv;
+      cachedMergedEnv = mergedEnvToInline;
+      cachedStateEnv = null;
+    }
     if (isInlineLike(tok)) {
-      state.env = Object.assign({}, { ...state.env }, {
-        currentTag: getCurrentTag(),
-      }, mergedEnvToInline);
+      if (cachedStateEnv && tokEnv === lastEnvToInline) {
+        state.env = cachedStateEnv;
+      } else {
+        state.env = Object.assign({}, { ...state.env }, {
+          currentTag: getCurrentTag(),
+        }, mergedEnvToInline);
+        if (tokEnv) cachedStateEnv = state.env;
+      }
       if (!tok.children?.length) {
         state.md.inline.parse(tok.content, state.md, state.env, tok.children);
       }
@@ -142,7 +159,7 @@ export const coreInline = (state) => {
       walkInlineInTokens(token.children as any, state, () => currentTag, () => envToInline);
       continue;
     }
-    if (token.type === 'inline' 
+    if (token.type === 'inline'
       || ['title', 'section', 'subsection', 'subsubsection', 'addcontentsline',
         'item_inline', 'caption_table'
       ].includes(token.type)) {
