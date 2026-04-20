@@ -123,7 +123,10 @@ const composeCellStyle = (aligns: TAligns | null, lines: TLines, space: string):
 };
 
 /** Read-only shared attrs keyed by (style, isEmpty). Mutators must clone. */
-const getSharedCellAttrs = (style: string, isEmpty: boolean): TAttrs[] => {
+const getSharedCellAttrs = (style: string, isEmpty: boolean, skipVisual: boolean = false): TAttrs[] | undefined => {
+  // Style and `_empty` class are HTML/CSS-only. XLSX reads style too but
+  // doesn't set skipVisual, so that path is unaffected.
+  if (skipVisual) return undefined;
   const key = isEmpty ? style + '\0E' : style;
   const cached = cellAttrsCache.get(key);
   if (cached) return cached;
@@ -143,7 +146,9 @@ let TR_OPEN_ATTRS_SHARED: TAttrs[] | null = null;
 
 const TR_OPEN_STYLE = 'border-top: none !important; border-bottom: none !important;';
 
-export const getSharedTableOpenAttrs = (extraClass?: string): TAttrs[] => {
+export const getSharedTableOpenAttrs = (extraClass?: string, skipVisual: boolean = false): TAttrs[] | undefined => {
+  // class='tabular' is HTML-only (used for table detection by DOCX/PPTX builders).
+  if (skipVisual && !extraClass) return undefined;
   const key = extraClass || '';
   const cached = TABLE_OPEN_ATTRS_CACHE.get(key);
   if (cached) return cached;
@@ -165,7 +170,9 @@ export const getSharedTbodyOpenAttrs = (numCol: number): TAttrs[] => {
   return attrs;
 };
 
-export const getSharedTrOpenAttrs = (): TAttrs[] => {
+export const getSharedTrOpenAttrs = (skipVisual: boolean = false): TAttrs[] | undefined => {
+  // tr_open.style is the HTML border-reset — no MD/LaTeX/XLSX consumer.
+  if (skipVisual) return undefined;
   if (TR_OPEN_ATTRS_SHARED) return TR_OPEN_ATTRS_SHARED;
   const attrs: TAttrs[] = [['style', TR_OPEN_STYLE]];
   markAttrsShared(attrs);
@@ -208,12 +215,12 @@ export const addHLineIntoStyle = (attrs: any[], line: string = '', pos: string =
   return addStyle(attrs, style);
 };
 
-export const AddTd = (content: string, aligns: TAligns| null, lines: TLines, space: string, decimal: TDecimal|null = null): {res: Array<TTokenTabular>, content: string} => {
+export const AddTd = (content: string, aligns: TAligns| null, lines: TLines, space: string, decimal: TDecimal|null = null, skipVisual: boolean = false): {res: Array<TTokenTabular>, content: string} => {
   let res: Array<TTokenTabular> = [];
-  const style = composeCellStyle(aligns, lines, space);
+  const style = skipVisual ? '' : composeCellStyle(aligns, lines, space);
   content = content.replace(preserveNewlineUnlessDoubleAngleUuidRegex, ' ');
   content = getExtractedCodeBlockContent(content, 0);
-  const attrs = getSharedCellAttrs(style, !content);
+  const attrs = getSharedCellAttrs(style, !content, skipVisual);
   res.push({token:'td_open', type:'td_open', tag: 'td', n: 1, attrs: attrs});
   if (content) {
     if (decimal && parseFloat(content)) {
@@ -243,13 +250,12 @@ export const AddTd = (content: string, aligns: TAligns| null, lines: TLines, spa
   return {res: res, content: content};
 };
 
-export const AddTdSubTable = (subTable: Array<TTokenTabular>, aligns: TAligns, lines: TLines): Array<TTokenTabular> => {
+export const AddTdSubTable = (subTable: Array<TTokenTabular>, aligns: TAligns, lines: TLines, skipVisual: boolean = false): Array<TTokenTabular> => {
   let res: Array<TTokenTabular> = [];
-  const attrs: Array<TAttrs> = [];
-  const slyleLines = setColumnLines(aligns, lines);
-
-  attrs.push(slyleLines);
-
+  let attrs: Array<TAttrs> | undefined;
+  if (!skipVisual) {
+    attrs = [setColumnLines(aligns, lines)];
+  }
   res.push({token:'td_open', type:'td_open', tag: 'td', n: 1, attrs: attrs});
   for (const t of subTable) {
     res.push(t);

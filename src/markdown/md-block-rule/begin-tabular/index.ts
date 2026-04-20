@@ -155,17 +155,22 @@ export const parseInlineTabular = (str: string): TTypeContentList | null => {
 const StatePushParagraphOpen = (state, startLine: number, align: string, centerTables = false) => {
   let token: Token;
   token = state.push('paragraph_open', 'div', 1);
-  token.attrJoin("class", "table_tabular");
   token.parentType = 'table_tabular';
-  if (align) {
-    token.attrs.push(['style', `text-align: ${align}`]);
-  } else {
-    if (centerTables) {
+  const forLatex = !!state.md.options.forLatex;
+  const forMD = !!state.md.options.forMD;
+  // MD identifies the wrapper via `token.parentType`; LaTeX keeps data-align.
+  // The class/style attrs are HTML-only.
+  const skipVisual = forMD || forLatex;
+  if (!skipVisual) {
+    token.attrJoin('class', 'table_tabular');
+    if (align) {
+      token.attrs.push(['style', `text-align: ${align}`]);
+    } else if (centerTables) {
       token.attrs.push(['style', `text-align: center}`]);
     }
   }
-  if (centerTables && state.md.options.forLatex) {
-    token.attrs.push(['data-align', align])
+  if (centerTables && forLatex) {
+    token.attrJoin('data-align', align);
   }
   token.map = [startLine, state.line];
 };

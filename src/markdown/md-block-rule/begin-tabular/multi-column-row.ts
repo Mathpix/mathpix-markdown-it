@@ -36,7 +36,7 @@ export const getCurrentMC = (cells: string[], i: number): number => {
   return res;
 };
 
-export const getMultiColumnMultiRow = (str: string, params: {lLines: string, align: string, rLines: string}, forLatex = false, forPptx = false): TMulti | null => {
+export const getMultiColumnMultiRow = (str: string, params: {lLines: string, align: string, rLines: string}, forLatex = false, forPptx = false, skipVisual = false): TMulti | null => {
   let attrs: Array<TAttrs> = [];
   let mr: number = 0;
   let mc: number = 0;
@@ -71,10 +71,12 @@ export const getMultiColumnMultiRow = (str: string, params: {lLines: string, ali
     const cLeft: string = cLines && cLines[0] ? cLines[0] : '';
     const cRight: string = cLines && cLines[1] ? cLines[1] : '';
 
-    attrs.push(setColumnLines({
-      h: cAlign ? cAlign[0] : '',
-      v: vpos === 't' ? 'top' : vpos === 'b' ? 'bottom' : '',
-    }, {left: cLeft,  right: cRight}));
+    if (!skipVisual) {
+      attrs.push(setColumnLines({
+        h: cAlign ? cAlign[0] : '',
+        v: vpos === 't' ? 'top' : vpos === 'b' ? 'bottom' : '',
+      }, {left: cLeft,  right: cRight}));
+    }
     if (!forPptx || mc > 1) {
       attrs.push(['colspan', mc.toString()]);
     }
@@ -83,12 +85,12 @@ export const getMultiColumnMultiRow = (str: string, params: {lLines: string, ali
   if (matchMR) {
     mr = Number(nrows);
     let w: string = width || '';
-    if (!matchMC) {
+    if (!matchMC && !skipVisual) {
       attrs.push(setColumnLines(
         {
           h: params.align ? params.align : '',
           v: vpos === 't' ? 'top' : vpos === 'b' ? 'bottom' : '',
-        }, 
+        },
         {left: params.lLines,  right: params.rLines}))
     }
     if (mr > 0) {
@@ -98,7 +100,7 @@ export const getMultiColumnMultiRow = (str: string, params: {lLines: string, ali
     }
 
     w = w.trim().replace('*', 'auto');
-    if (w && w.length > 0 ) {
+    if (w && w.length > 0 && !skipVisual) {
       attrs = addStyle(attrs, `width: ${w}; `);
     }
     str = str.slice(0, matchMR.index) + str.slice(matchMR.index + matchMR[0].length);

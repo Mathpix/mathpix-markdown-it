@@ -103,9 +103,10 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}, is
   const {cAlign, vAlign, cWidth, colSpec} = dataAlign;
   const decimal: Array<TDecimal> = getDecimal(cAlign, cellsAll);
   const { forLatex = false, outMath = {} } = options;
+  const skipVisual = !!options?.forMD || !!forLatex;
 
   res.push({token:'table_open', type:'table_open', tag: 'table', n: 1,
-    attrs: getSharedTableOpenAttrs(),
+    attrs: getSharedTableOpenAttrs(undefined, skipVisual),
     latex: forLatex
       ? align
       : outMath.include_table_markdown
@@ -124,7 +125,7 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}, is
     if (!cellsAll[i] || cellsAll[i].length === 0) {
       if (i < cellsAll.length-1) {
         res.push({token:'tr_open', type:'tr_open', tag: 'tr', n: 1,
-          attrs: getSharedTrOpenAttrs(),
+          attrs: getSharedTrOpenAttrs(skipVisual),
           latex: forLatex && data && data.sLines && data.sLines.length > i ? data.sLines[i] : ''
         });
         for (let k = 0; k < numCol; k++) {
@@ -137,7 +138,7 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}, is
           const data = AddTd('', {h: cAlign[k], v: vAlign[k], w: cWidth[k]},
             {left: cLeft, right: cRight, bottom: CellsHLines[i+1] ? CellsHLines[i+1][k] : 'none',
               top: i === 0 ? CellsHLines[i] ? CellsHLines[i][k] : 'none' : ''},
-            CellsHLSpaces[i+1][k]
+            CellsHLSpaces[i+1][k], null, skipVisual
           );
           markColIfHasList(colsToFixWidth, k, data.content);
           for (const t of data.res) {
@@ -149,7 +150,7 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}, is
       continue;
     }
     res.push({token:'tr_open', type:'tr_open', tag: 'tr', n: 1,
-      attrs: getSharedTrOpenAttrs(),
+      attrs: getSharedTrOpenAttrs(skipVisual),
       latex: forLatex && data && data.sLines && data.sLines.length > i ? data.sLines[i] : ''
     });
 
@@ -170,7 +171,7 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}, is
           const data = AddTd('', {h: cAlign[k], v: vAlign[k], w: cWidth[k]},
             {left: cLeft, right: cRight, bottom: CellsHLines[i+1] ? CellsHLines[i+1][k] : 'none',
               top: i === 0 ? CellsHLines[i] ? CellsHLines[i][k] : 'none' : ''},
-            CellsHLSpaces[i+1][k]
+            CellsHLSpaces[i+1][k], null, skipVisual
           );
           markColIfHasList(colsToFixWidth, k, data.content);
           for (const t of data.res) {
@@ -185,7 +186,7 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}, is
 
 
       if (cells[j] && cells[j].trim().length > 0) {
-        const multi = getMultiColumnMultiRow(cells[j], {lLines: cLines[ic], align: cAlign[ic], rLines: cRight}, forLatex, options?.forPptx);
+        const multi = getMultiColumnMultiRow(cells[j], {lLines: cLines[ic], align: cAlign[ic], rLines: cRight}, forLatex, options?.forPptx, skipVisual);
         if (multi) {
           let mr = multi.mr > rows.length ? rows.length : multi.mr;
           let mc = multi.mc > numCol ? numCol : multi.mc;
@@ -234,7 +235,7 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}, is
               MR[ic] = mr;
             }
 
-            if (mr+i >= rows.length-1) {
+            if (mr+i >= rows.length-1 && !skipVisual) {
               multi.attrs = addHLineIntoStyle(multi.attrs, CellsHLines[mr+i] ? CellsHLines[mr+i][ic] : 'none');
             }
 
@@ -260,13 +261,15 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}, is
           }
 
 
-          if (i === 0){
-            multi.attrs = addHLineIntoStyle(multi.attrs, CellsHLines[i] ? CellsHLines[i][ic] : 'none', 'top');
-          }
-          if (mr && mr > 0) {
-            multi.attrs = addHLineIntoStyle(multi.attrs, CellsHLines[mr+i] ? CellsHLines[mr+i][ic] : 'none');
-          } else {
-            multi.attrs = addHLineIntoStyle(multi.attrs, CellsHLines[i+1] ? CellsHLines[i+1][ic] : 'none');
+          if (!skipVisual) {
+            if (i === 0){
+              multi.attrs = addHLineIntoStyle(multi.attrs, CellsHLines[i] ? CellsHLines[i][ic] : 'none', 'top');
+            }
+            if (mr && mr > 0) {
+              multi.attrs = addHLineIntoStyle(multi.attrs, CellsHLines[mr+i] ? CellsHLines[mr+i][ic] : 'none');
+            } else {
+              multi.attrs = addHLineIntoStyle(multi.attrs, CellsHLines[i+1] ? CellsHLines[i+1][ic] : 'none');
+            }
           }
 
           const tdOpen: TTokenTabular = {
@@ -343,7 +346,8 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}, is
               right: cRight,
               bottom: CellsHLines[i + 1] ? CellsHLines[i + 1][ic] : 'none',
               top: i === 0 ? (CellsHLines[i] ? CellsHLines[i][ic] : 'none') : ''
-            }
+            },
+            skipVisual
           );
         }
         const parseSub = getSubTabular(content, 0, true, forLatex);
@@ -357,7 +361,7 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}, is
           {h: cAlign[ic], v: vAlign[ic], w: cWidth[ic]},
            {left: cLeft, right: cRight, bottom: CellsHLines[i+1] ? CellsHLines[i+1][ic]: 'none',
              top: i === 0 ? CellsHLines[i] ? CellsHLines[i][ic] : 'none' : ''},
-            CellsHLSpaces[i+1][ic], decimal[ic]
+            CellsHLSpaces[i+1][ic], decimal[ic], skipVisual
           );
         markColIfHasList(colsToFixWidth, ic, data.content);
         for (const t of data.res) {
@@ -375,7 +379,7 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}, is
           {h: cAlign[ic], v: vAlign[ic], w: cWidth[ic]},
            {left: cLeft, right: cRight, bottom: CellsHLines[i+1] ? CellsHLines[i+1][ic] : 'none',
              top: i === 0 ? CellsHLines[i] ? CellsHLines[i][ic] : 'none' : ''},
-            CellsHLSpaces[i+1][ic]
+            CellsHLSpaces[i+1][ic], null, skipVisual
           );
         markColIfHasList(colsToFixWidth, ic, data.content);
         for (const t of data.res) {
