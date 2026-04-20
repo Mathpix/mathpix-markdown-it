@@ -1,41 +1,76 @@
 # April 2026
 
-## [2.0.39] - Optimize tabular parsing performance
+## [2.0.39] - Optimize tabular parsing memory and performance
 
-- Performance:
-  - Rewrote `getSubMath()` from recursive to iterative single-pass algorithm (O(N×M) → O(N+M)).
-  - Replaced `mathTable` backing store from `Array` + `findIndex()` to `Map` for O(1) lookups.
-  - Added per-parse MathJax typeset result cache in `state.env.__mathpix` (following markdown-it-footnote convention). Duplicate `inline_math`/`display_math` expressions within a single parse reuse cached results. Cache is automatically scoped per-parse — no persistence between calls, no public API options.
-  - Cache exclusions: `equation_math`/`equation_math_not_number` (numbering side effects), `inline_mathML`/`display_mathML` (different MathJax path), `return_asciimath` tokens (ascii extraction side effects).
-  - Cache bypass via `beginCacheBypass`/`endCacheBypass` when `outMath` is temporarily mutated (e.g. `SetItemizeLevelTokens` for `forDocx`).
-  - Accessibility IDs (`mjx-mml-*`) regenerated on cache hit to ensure uniqueness in DOM.
-  - Rewrote `getMathTableContent()` to use `parts[]` + `join()` instead of repeated slice+concat.
-  - `mathTablePush` now accepts both `(id, content)` and `({id, content})` forms (backward-compatible overload).
-  - Shared `envToInline` object per table to avoid 500K+ object copies on large documents.
-
-- Global state cleanup:
-  - Per-parse `reset_tabular_state` core ruler hook clears all tabular module-level state (`mathTable`, `subTabular`, `extractedCodeBlocks`, `diagboxTable`, table/figure counters, parse errors).
-  - `diagboxTable`: added `ClearDiagboxTable()` + `diagboxById` reverse Map for O(1) lookup.
-  - `subTabular`: Array → Map. `extractedCodeBlocks`: Array → Map.
-  - `labelsByKey` + `labelsByUuid` Map indexes for O(1) label lookups.
-  - `buildInlineCodePositionSet()` → `Set<number>` for O(1) position check in `findEndMarker`.
-  - `tagRegexCache` memoization for HTML block regex. Fixed `lastIndex` corruption (`.test()` → `.match()`).
+- Algorithms:
+  - Rewrote `getSubMath()` from recursive to iterative single-pass (O(N×M) → O(N+M)); `getMathTableContent()` now uses `parts[]` + `join()` instead of repeated slice+concat.
+  - `mathTable`, `subTabular`, `extractedCodeBlocks` converted from Array + `findIndex()` to Map for O(1) lookups.
+  - `labelsByKey` + `labelsByUuid` Map indexes; `labelsList` Array export kept as a deprecated backward-compatible view.
+  - `diagboxById` reverse Map + `ClearDiagboxTable()`.
+  - `buildInlineCodePositionSet()` returns `Set<number>` for O(1) position checks in `findEndMarker` (previously O(n×m) per character).
+  - `tagRegexCache` memoizes HTML block regexes; fixed `lastIndex` corruption by swapping `.test()` on g-flag regex for `.match()`.
   - `utf8Encode`: `parts[]` + `join()` instead of O(n²) string concat.
-  - `SetItemizeLevelTokens`: save/restore only `outMath` + `try/finally`.
+  - `SetItemizeLevelTokens`: saves/restores only `outMath` with `try/finally`.
+  - `mathTablePush` accepts both `(id, content)` and `({id, content})` forms (backward-compatible overload).
+  - `mathpixMarkdownPlugin`: shared `envToInline` object per table to avoid hundreds of thousands of object copies on large documents.
 
-- Benchmark (3.9 MB MMD document with 165 tabulars and 60K math expressions, SVG mode):
-  - Parse time: 179s → ~16s (11× faster)
-  - Heap usage: 5.7 GB → ~346 MB (16× less)
+- Per-parse math cache:
+  - Added `state.env.__mathpix` cache (following markdown-it-footnote convention) that deduplicates identical `inline_math` / `display_math` expressions within a single parse. No persistence between parses, no public API options.
+  - Cache exclusions: `equation_math` / `equation_math_not_number` (numbering side effects), `inline_mathML` / `display_mathML` (different MathJax path), `return_asciimath` tokens (ascii extraction side effects).
+  - Cache bypass via `beginCacheBypass` / `endCacheBypass` when `outMath` is temporarily mutated (e.g. `SetItemizeLevelTokens` for `forDocx`).
+  - Accessibility IDs (`mjx-mml-*`) regenerated on cache hit so every token keeps a unique DOM id.
 
-- Memory (tabular-heavy documents, 16 MB MMD with ~400K `<td>` cells):
-  - Interned cell-border style strings (`tabular-td.ts`): 16 canonical strings for `border-{top,bottom,left,right}-style` variants replace per-cell template-literal allocations.
-  - Added per-parse dedup cache for the composed `<td>` style attribute (`columnStyleCache` cleared by `reset_tabular_state`). Collapses hundreds of thousands of identical style strings to one shared instance.
-  - `applyTypesetResultToToken`: drop `svg` from `token.mathData` when `options.highlights` is not set. The field is only read by `renderMathHighlight` (active under highlights); the default render rule uses `token.mathEquation` directly and only reads metrics from `mathData`. Saves one SVG string per math token (~7 KB × tens of thousands).
-  - Removed dead-code file `src/markdown/mdPluginSeparateForBlock.ts` — never registered with markdown-it, not imported anywhere. Its two core rules (`separateForBlock`, `separateBeforeBlock`) were shipped in the initial 2019 commit and never wired in. Files dropped in both `src/` and `lib/` (including the `.d.ts` stub) to avoid misleading future readers.
-  - Cumulative heap-after-parse: −416 MB (−22%) on a 16 MB MMD with accessibility enabled.
+- Token-tree retention fixes:
+  - `mdPluginTOC`: stored the parse state on a module-level `gstate` variable so the TOC render rule could reach the top-level token list. The reference was never cleared and pinned the entire token tree across unrelated parses. The token list is now stashed on `state.env[TOC_ENV_KEY]` and released with the env when the parse ends.
+  - `coreInline`: rebound `state.env` to a fresh object inside the inline loop. That desynced state.env from the env reference the caller of `md.render(src, env)` still held, so parse-time mutations (TOC / cache) became invisible to render rules. Now mutates state.env in place and uses a private `inlineEnv` for the nested `inline.parse()` call.
+
+- Two-hook tabular-state cleanup:
+  - `reset_tabular_state` core-ruler hook (before `normalize`) clears tabular module-level state at the start of every `md.parse()`.
+  - New `cleanup_tabular_state` hook (pushed, end of core pipeline) drops parse-only caches (`subTabular`, `mathTable`, `extractedCodeBlocks`, `diagboxTable`, column-style intern cache) at the end of parse — they're never read during render. Both hooks respect `renderElement.startLine` for partial renders.
+
+- Per-token allocation reduction:
+  - Pre-interned 16 border-style strings (`border-{top,bottom,left,right}-style`: solid / double / dashed / none) replace per-cell template-literal allocations.
+  - `columnStyleCache` per-parse intern for the composed `<td>` style string.
+  - `getSharedCellAttrs` / `getSharedTableOpenAttrs` / `getSharedTbodyOpenAttrs` / `getSharedTrOpenAttrs` return read-only shared attrs arrays keyed by (style, isEmpty) / (extraClass, numCol). Shared arrays carry the non-enumerable `Symbol.for('mathpix.tabular.attrsShared')` marker; mutation sites (`tokenAttrSet` in the tabular renderer, `addAttributesToParentTokenByType` in utils) clone-on-write before writing.
+  - Frozen singleton close-token markers: `SHARED_TD_CLOSE`, `SHARED_TR_CLOSE`, `SHARED_TABLE_CLOSE`. `tbody_close` stays per-instance because it carries a `latex` payload when `forLatex` is set.
+  - `StatePushTabulars` no longer assigns `content` / `children = []` onto open/close markers — those fields are never read on markers and assignment would throw on the frozen close singletons.
+  - Replaced `res = res.concat(...)` with in-place `res.push(...)` inside the tabular construction loop to remove intermediate array allocations.
+  - `applyTypesetResultToToken` drops `svg` from `token.mathData` when `options.highlights` is not set — the field is only read by `renderMathHighlight` (active under highlights); the default render rule uses `token.mathEquation`. The highlight path re-populates `mathData.svg` in `convertMathToHtmlWithHighlight`.
+  - `OuterData` returns `null` for empty `labels` instead of cloning an empty `{}` onto every math token.
+
+- Output gating in the tabular renderer:
+  - `renderInlineTokenBlock` and `renderNonTableTokenIntoCell` build each output only when the caller requested it: `needHtml` (from `!forMD && include_table_html !== false`), `needTsv` (`include_tsv`), `needCsv` (`include_csv`), `needMd` (`forMD || include_table_markdown`), `needSmoothed` (`forPptx`). Every `result += ...`, array push, cell accumulator update, and `formatTsvCell` / `formatCsvCell` call is gated on the corresponding flag.
+  - Leaf-token handling still calls `slf.renderInline([token], options, env)` even when `needHtml` is false — the `latex_list_item_open` render rule sets `token.meta.itemizeLevel` as a side effect that `handleListTokensForCellMarkdown` reads to emit list markers.
+
+- HTML-visual attrs skipped for non-HTML outputs:
+  - `td_open` style / `_empty` class, `tr_open` border-reset style, `table_open` `class='tabular'`, and the `table_tabular` class + text-align style on the wrapping `paragraph_open` are HTML/CSS-only. When the caller sets `forMD` or `forLatex`, `AddTd` / `AddTdSubTable` / `getMultiColumnMultiRow` / `StatePushParagraphOpen` skip those assignments. Multicol/multirow cells still carry `colspan` / `rowspan`; `paragraph_open.data-align` is preserved for `forLatex`.
+
+- New public option:
+  - `outMath.skipMathToHtml` (default `false`). When `true`, `applyTypesetResultToToken` skips `token.mathEquation` and `typesetMathForToken` passes `include_svg: false` to MathJax so the SVG string is never serialized. Other MathJax outputs respect their own `include_*` flags. Intended for callers that walk the token tree directly and never read the serialized math HTML.
+
+- Cleanup:
+  - Removed dead file `src/markdown/mdPluginSeparateForBlock.ts` (and its `lib/*` artifacts). It was never registered with markdown-it; its two core rules (`separateForBlock`, `separateBeforeBlock`) shipped in the initial 2019 commit and never wired in.
+
+- Benchmark (16 MB MMD with 13,713 tabular blocks, ~479K `<td>` cells, ~49K inline math expressions):
+
+  Full SVG/HTML render path:
+
+  | Stage                   | Before  | After  | Δ            |
+  |-------------------------|--------:|-------:|-------------:|
+  | Peak heap (html held)   | 2597 MB | 778 MB | −1819 (−70%) |
+  | Heap after drop html    | 1887 MB |  68 MB | −1819 (−96%) |
+  | Parse time              |  17.9 s | 14.6 s |        −18%  |
+
+  Token-only path (`forMD: true`, `outMath.skipMathToHtml: true`):
+
+  | Stage                   | Before  | After  | Δ            |
+  |-------------------------|--------:|-------:|-------------:|
+  | Peak heap               | 2597 MB | 443 MB | −2154 (−83%) |
+  | Heap after drop output  | 1887 MB |  81 MB | −1806 (−96%) |
+  | Serialized output size  |  355 MB | 165 MB |        −190  |
 
 - Docs:
-  - Added implementation details in `pr-specs/2026-04-optimize-tabular-parsing.md` and `pr-specs/2026-04-global-state-cleanup-and-perf.md`.
+  - Implementation details in `pr-specs/2026-04-optimize-tabular-parsing.md` and `pr-specs/2026-04-global-state-cleanup-and-perf.md`.
 
 # March 2026
 

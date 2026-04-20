@@ -7,47 +7,44 @@ Owner: @OlgaRedozubova
 
 ## Context
 
-Parsing a 3.9 MB MMD document with 165 `\begin{tabular}` blocks and 60K inline math expressions caused 158 seconds for `md.parse()` and 5.7 GB peak heap usage. The document represents a realistic worst case: large geographic coordinate tables where every cell contains `\( ... \)` math.
+Parsing and rendering large documents with many `\begin{tabular}` blocks was
+slow and memory-hungry. The benchmark document — a 16 MB MMD with 13,713
+tabular blocks, ~479K `<td>` cells, and ~49K inline math expressions —
+showed a peak heap of 2.6 GB for the full SVG/HTML render path.
+
+Profiling revealed three classes of waste:
+
+1. **Algorithmic**: `getSubMath()` rebuilt the placeholder string on every
+   math expression found (O(N×M)); several lookup tables used `Array +
+   findIndex()`; MathJax was invoked for every math token, including 67%
+   duplicates.
+2. **Per-token allocation**: CSS border strings, `attrs` arrays, and
+   close-token objects were allocated fresh for every `<td>`/`<tr>`/`<table>`
+   even though the underlying content was identical across thousands of
+   tokens.
+3. **Speculative output**: `renderInlineTokenBlock` always built all five
+   outputs (HTML, TSV, CSV, tableMd, tableSmoothed) regardless of which one
+   the caller actually consumed; `token.mathEquation` was stored on every
+   math token even when the caller only walked the token tree.
 
 ---
 
 ## Goal
 
-Reduce parse time and memory usage for documents with many tabular environments and repeated math expressions.
+Reduce parse time and memory usage for documents with many tabular
+environments and repeated math expressions. Avoid building per-token data
+that the caller will not read.
 
 ---
 
 ## Non-Goals
 
-- Persistent cross-parse MathJax cache (decided against — complexity outweighs benefit for the converter use case).
-- Migrating all module-level state to `state.env` (separate PR scope, tracked in `pr-specs/2026-04-global-state-cleanup-and-perf.md`).
-
----
-
-## Current Behavior
-
-- `getSubMath()` recursively rebuilds the entire string on every math expression found — O(N×M) where N=string length, M=math count.
-- `mathTable` uses `Array` with `findIndex()` for lookups — O(n) per lookup.
-- `MathJax.Typeset()` is called for every math token, including 40K duplicates (66.8% of 60K total).
-
----
-
-## Desired Behavior
-
-- `getSubMath()` scans the string once with a global regex, collects segments into an array, joins at the end — O(N+M).
-- `mathTable` uses `Map` for O(1) lookups.
-- Duplicate `inline_math` and `display_math` tokens within a single `md.parse()` reuse cached MathJax results — per-parse deduplication via `state.env`.
-
----
-
-## Constraints / Invariants
-
-- Cache must NOT persist between `md.parse()` calls — each parse gets a fresh cache via `state.env.__mathpix` (following markdown-it-footnote convention).
-- Cache must NOT be used when `options.outMath` is temporarily mutated (e.g. `SetItemizeLevelTokens` for `forDocx`) — `beginCacheBypass(state)` / `endCacheBypass(state)` counter mechanism.
-- Cached results must be isolated from downstream mutation — `data` and `labels` are shallow-cloned on cache insert.
-- Accessibility IDs (`mjx-mml-*`) must be unique per token — on cache hit, the original ID is replaced with a fresh one via `MathJax.nextAssistiveId()`.
-- Numbered equations (`equation_math`, `equation_math_not_number`), MathML input tokens, and ascii-extraction tokens are never cached (side effects).
-- `buildFormatOutputs` is applied after cache lookup (not cached) to correctly handle `output_format: 'latex'` with different `inputLatex`.
+- Persistent cross-parse MathJax cache (decided against — complexity
+  outweighs benefit for the supported use cases; cache is per-parse via
+  `state.env`).
+- Migrating all module-level state to `state.env` (tracked in the sibling
+  `global-state-cleanup-and-perf.md` spec).
+- Changing the markdown-it Token shape (kept for downstream compatibility).
 
 ---
 
@@ -55,57 +52,196 @@ Reduce parse time and memory usage for documents with many tabular environments 
 
 - [x] `getSubMath` is iterative single-pass
 - [x] `mathTable` is `Map<string, string>`
-- [x] Per-parse math cache in `state.env.__mathpix` deduplicates identical math
+- [x] Per-parse math cache in `state.env.__mathpix` deduplicates identical
+      math
 - [x] Cache bypass for `SetItemizeLevelTokens` forDocx mutation
-- [x] Accessibility IDs unique on cache hits
-- [x] All existing tests pass
-- [x] New tests cover: dedup, equation bypass, env isolation, mutation protection, accessibility ID uniqueness, cache bypass counter, forDocx integration
-- [x] Benchmark: 179s → ~16s parse time (SVG mode), 5.7GB → ~346MB heap
+- [x] Accessibility `mjx-mml-*` IDs remain unique on cache hits
+- [x] `outMath.skipMathToHtml` option — skips SVG serialization and
+      `token.mathEquation` storage for token-only callers
+- [x] Border-style strings pre-interned; composed cell style deduplicated
+      per parse
+- [x] Shared attrs arrays for `td_open` / `tr_open` / `table_open` /
+      `tbody_open` with clone-on-write
+- [x] Frozen singleton close-tokens for `td_close` / `tr_close` /
+      `table_close`
+- [x] `StatePushTabulars` skips `content` / `children = []` assignments on
+      marker tokens
+- [x] `res.concat` → in-place `res.push` inside the tabular construction
+      loop
+- [x] `renderInlineTokenBlock` and `renderNonTableTokenIntoCell` build each
+      output only when the caller requested it via `options.outMath.include_*`
+- [x] HTML-visual attrs (style, `_empty` class, `table_tabular` class,
+      `border-*` tr style) skipped when the caller sets `forMD` or
+      `forLatex`
+- [x] `token.mathData.svg` retained only when highlights are active
+- [x] Empty `labels` object is returned as `null` from MathJax `OuterData`
+      (no empty `{}` per math token)
+- [x] All 3,286 tests pass
+- [x] New unit tests cover: `getSubMath` edge cases, math-cache dedup/
+      bypass/isolation, accessibility ID uniqueness, cell-attrs sharing,
+      round-trip placeholder restoration
 
 ---
 
 ## Architecture
 
-### getSubMath (sub-math.ts)
+### Iterative getSubMath (sub-math.ts)
 
-Iterative single-pass with local `new RegExp(RE_MATH_OPEN.source, 'g')`:
-- `RE_MATH_OPEN` stored as literal without `/g` flag (immutable template)
+Single-pass scan with a local `new RegExp(RE_MATH_OPEN.source, 'g')`:
+- `RE_MATH_OPEN` stored as literal without the `/g` flag (immutable template)
 - Each call creates a local copy — reentrant-safe
-- `getEndMarker()` uses capture groups for eqref/ref detection (no substring matching)
+- `getEndMarker()` uses capture groups for eqref/ref detection (no substring
+  matching)
 - `shouldSkipDollar()` validates `$`/`$$` edge cases
-- `mathTablePush()` accepts both `(id, content)` and `({id, content})` for backward compatibility
+- `mathTablePush()` accepts both `(id, content)` and `({id, content})` for
+  backward compatibility
 
 ### Per-parse math cache (convert-math-to-html.ts)
 
 ```
 state.env.__mathpix = {
-  inlineCache: Map<math, CachedResult>,   // inline_math tokens
-  displayCache: Map<math, CachedResult>,  // display_math tokens
-  cacheBypass: number,                     // >0 disables cache (SetItemizeLevelTokens)
+  inlineCache:  Map<math, CachedResult>,   // inline_math tokens
+  displayCache: Map<math, CachedResult>,   // display_math tokens
+  cacheBypass:  number,                    // >0 disables cache
 }
 ```
 
-Initialized by `init_math_cache` core ruler hook (fires on every parse, including partial renders).
+Initialized by the `init_math_cache` core-ruler hook. On cache hit with
+accessibility, the original `mjx-assistive-mml` id is replaced with a fresh
+one from `MathJax.nextAssistiveId()`.
 
-On cache hit with accessibility:
-- Extract original `_mjxId` from `<mjx-assistive-mml id="...">` via `RE_MJX_ASSISTIVE_ID` regex
-- Replace with fresh ID from `MathJax.nextAssistiveId()` via `split().join()`
-- Applied to both `html` and `data.svg`
+### `outMath.skipMathToHtml` (convert-math-to-html.ts)
 
-### Cache bypass (re-level.ts)
+When set, `applyTypesetResultToToken` does not copy the serialized math HTML
+to `token.mathEquation`, and `typesetMathForToken` path 4 forces
+`outMath.include_svg = false` for the MathJax call so the SVG string is
+never built. Other MathJax outputs (mathml_word, asciimath, metrics) still
+populate when the caller enabled them.
 
-`SetItemizeLevelTokens` and `SetItemizeLevelTokensByIndex` call `beginCacheBypass(state)` before mutating `outMath` for forDocx, and `endCacheBypass(state)` in `finally` block. Counter (not boolean) handles nested calls.
+### Pre-interned border styles + per-parse style intern (tabular-td.ts)
+
+`verticalCellLine` / `horizontalCellLine` switch on the line token and
+return one of 16 module-level border strings (solid/double/dashed/none × 4
+sides) — template-literal allocation per call is gone. The composed cell
+style (`composeCellStyle`) is interned in a per-parse `columnStyleCache` so
+repeated cells share a single string instance.
+
+### Shared attrs for structural tabular tokens
+
+`getSharedCellAttrs(style, isEmpty, skipVisual)`,
+`getSharedTableOpenAttrs(extraClass?, skipVisual)`,
+`getSharedTbodyOpenAttrs(numCol)`, and `getSharedTrOpenAttrs(skipVisual)`
+return read-only attrs arrays cached per-parse by key. The shared arrays
+carry the non-enumerable `Symbol.for('mathpix.tabular.attrsShared')` marker
+so mutation sites (`tokenAttrSet` in the tabular renderer,
+`addAttributesToParentTokenByType` in utils) detach a private clone before
+writing.
+
+### Frozen close-token singletons
+
+`td_close`, `tr_close`, and `table_close` have no variable data. A single
+`Object.freeze`d instance per kind is exported and pushed everywhere these
+markers appear. `tbody_close` is NOT shared because it carries a per-table
+`latex` payload when `forLatex` is set.
+
+`StatePushTabulars` no longer assigns `content` / `children = []` onto
+marker tokens — those fields are never read on open/close markers and
+assignment would throw on the frozen close singletons.
+
+### Output gating in renderInlineTokenBlock / renderNonTableTokenIntoCell
+
+The tabular renderer computes flags up front and only populates the outputs
+the caller asked for:
+
+```ts
+const forMD = !!options?.forMD;
+const needHtml = !forMD && outMath.include_table_html !== false;
+const needTsv  = !!outMath.include_tsv;
+const needCsv  = !!outMath.include_csv;
+const needMd   = forMD || !!outMath.include_table_markdown;
+const needSmoothed = !!options?.forPptx;
+```
+
+Every `result += ...`, `arr*.push(...)`, cell-accumulator update, and
+`formatTsvCell` / `formatCsvCell` call is gated on the corresponding flag.
+
+Leaf-token handling still invokes `slf.renderInline([token], options, env)`
+even when `needHtml` is false — the `latex_list_item_open` render rule sets
+`token.meta.itemizeLevel` as a side effect, which
+`handleListTokensForCellMarkdown` reads to emit list markers.
+
+### HTML-visual attrs skipped for forMD / forLatex
+
+`td_open.style`, `td_open.class='_empty'`, `tr_open.style`,
+`table_open.class='tabular'`, and the `table_tabular` class + text-align
+style on the wrapping `paragraph_open` are HTML/CSS-only. When the caller
+sets `forMD` or `forLatex`, `AddTd` / `AddTdSubTable` /
+`getMultiColumnMultiRow` / `StatePushParagraphOpen` skip these. Colspan /
+rowspan on multicol/multirow cells and `paragraph_open.data-align` (for
+forLatex) are preserved.
+
+### mathData.svg only retained under highlights
+
+`applyTypesetResultToToken` shallow-clones `mathData` without the `svg`
+field unless `options.highlights?.length` is set. The SVG is still
+available on `token.mathEquation` (the HTML render rule path) — only the
+duplicate copy on `mathData` is dropped. The highlight render path
+re-populates `mathData.svg` in `convertMathToHtmlWithHighlight`.
+
+### OuterData empty-labels guard (mathjax/index.ts)
+
+When the current equation has no labels, `res.labels` is set to `null`
+instead of `{...emptyObject}` so each math token does not carry an empty
+`{}` allocation.
+
+### res.concat → res.push in tabular construction
+
+Tabular token arrays are assembled in a hot loop. `res = res.concat(data.res)`
+allocated a new array on every iteration; replaced with
+`for (const t of data.res) res.push(t)` to mutate in place.
 
 ---
 
-## Benchmark
+## Public API changes
 
-Test document: 3.9 MB MMD, 165 tabulars, 60K math expressions.
+| Option | Type | Default | Effect |
+|--------|------|--------:|--------|
+| `outMath.skipMathToHtml` | boolean | `false` | When `true`, skips SVG serialization and `token.mathEquation` storage; other MathJax outputs still respect their own `include_*` flags. Intended for callers that walk tokens directly and never read the serialized math HTML. |
 
-| Mode | Before | After | Improvement |
-|------|--------|-------|-------------|
-| SVG (`include_svg: true`) | 179s | **~16s** | **11×** |
-| SVG + assistiveMml | 179s | **~22s** | **8×** |
+No other options introduced. Existing flags — `options.forMD`,
+`options.forLatex`, `options.forDocx`, `options.forPptx`,
+`outMath.include_tsv` / `include_csv` / `include_table_html` /
+`include_table_markdown`, `options.highlights` — drive the output-gating
+decisions described above.
+
+---
+
+## Memory impact
+
+Benchmark document: 16 MB MMD with 13,713 tabular blocks, ~479K `<td>`
+cells, and ~49K inline math expressions.
+
+### Full SVG/HTML render path
+
+| Stage                   | Before  | After  | Δ            |
+|-------------------------|--------:|-------:|-------------:|
+| Peak heap (html held)   | 2597 MB | 778 MB | −1819 (−70%) |
+| Heap after drop html    | 1887 MB |  68 MB | −1819 (−96%) |
+| Parse time              |  17.9 s | 14.6 s |        −18%  |
+| HTML output size        |  355 MB | 355 MB |             0 |
+
+### Token-only path (`forMD: true`, `outMath.skipMathToHtml: true`)
+
+| Stage                   | Before  | After  | Δ            |
+|-------------------------|--------:|-------:|-------------:|
+| Peak heap               | 2597 MB | 443 MB | −2154 (−83%) |
+| Heap after drop output  | 1887 MB |  81 MB | −1806 (−96%) |
+| Parse time              |  17.9 s | 20.5 s |               |
+| Serialized output size  |  355 MB | 165 MB |        −190  |
+
+Parse time on the token-only path includes more bookkeeping but skips SVG
+serialization; wall-clock depends heavily on which MathJax outputs the
+caller enables.
 
 ---
 
@@ -114,18 +250,29 @@ Test document: 3.9 MB MMD, 165 tabulars, 60K math expressions.
 | File | Change |
 |------|--------|
 | `src/markdown/md-block-rule/begin-tabular/sub-math.ts` | Iterative `getSubMath`; `mathTable` Array→Map; `mathTablePush` overload; `getEndMarker` with capture groups |
-| `src/markdown/common/convert-math-to-html.ts` | Per-parse cache in `state.env.__mathpix`; `initMathCache`; `beginCacheBypass`/`endCacheBypass`; accessibility ID replacement |
-| `src/markdown/mdPluginRaw.ts` | Register `init_math_cache` core ruler hook |
-| `src/markdown/md-latex-lists-env/re-level.ts` | `beginCacheBypass`/`endCacheBypass` around forDocx mutation; `try/finally` for `outMath` restoration |
-| `tests/_sub-math.js` | 26 unit tests for `getSubMath` edge cases |
-| `tests/_typeset-cache.js` | 14 tests: dedup, env isolation, mutation protection, accessibility IDs, bypass counter, forDocx integration |
-| `tests/_accessibility.js` | 3 tests: unique IDs with cache, aria-labelledby consistency, no IDs without a11y |
+| `src/markdown/md-block-rule/begin-tabular/tabular-td.ts` | Pre-interned border strings; `columnStyleCache` per-parse intern; `getSharedCellAttrs` / `getSharedTableOpenAttrs` / `getSharedTrOpenAttrs` / `getSharedTbodyOpenAttrs` with clone-on-write marker; frozen `SHARED_TD_CLOSE` / `SHARED_TR_CLOSE` / `SHARED_TABLE_CLOSE`; `skipVisual` pathway in `AddTd` / `AddTdSubTable` |
+| `src/markdown/md-block-rule/begin-tabular/parse-tabular.ts` | Derives `skipVisual = forMD \|\| forLatex`; gates style-only calls (`addHLineIntoStyle`, shared attrs helpers); `res.concat` → `res.push` in the construction loop |
+| `src/markdown/md-block-rule/begin-tabular/multi-column-row.ts` | `getMultiColumnMultiRow` honors `skipVisual`; colspan/rowspan always preserved, style/width skipped under the flag |
+| `src/markdown/md-block-rule/begin-tabular/index.ts` | `StatePushTabulars` skips `content` / `children = []` on open/close markers; `StatePushParagraphOpen` gates class/style on `forMD \|\| forLatex`, preserves `data-align` for forLatex |
+| `src/markdown/md-inline-rule/tabular.ts` | Subtable `table_open` uses `getSharedTableOpenAttrs('subtable')` instead of mutating shared attrs |
+| `src/markdown/md-renderer-rules/render-tabular.ts` | Clone-on-write `tokenAttrSet`; per-output `needHtml` / `needTsv` / `needCsv` / `needMd` / `needSmoothed` gates throughout `renderInlineTokenBlock` and `renderNonTableTokenIntoCell`; leaf-token `renderInline` retained for list-marker side effect |
+| `src/markdown/common/convert-math-to-html.ts` | Per-parse cache in `state.env.__mathpix`; `initMathCache`; `beginCacheBypass` / `endCacheBypass`; accessibility ID replacement; `outMath.skipMathToHtml` path that disables SVG serialization and `mathEquation` storage; `mathData.svg` gated on `options.highlights` |
+| `src/markdown/mdPluginRaw.ts` | Registers `init_math_cache` core-ruler hook |
+| `src/markdown/md-latex-lists-env/re-level.ts` | `beginCacheBypass` / `endCacheBypass` around forDocx mutation; `try/finally` for `outMath` restoration |
+| `src/markdown/utils.ts` | Clone-on-write in `addAttributesToParentTokenByType` (shared attrs marker) |
+| `src/mathjax/index.ts` | `OuterData` returns `null` for empty `labels` instead of an empty `{}` clone |
+| `tests/_sub-math.js` | Unit tests for `getSubMath` edge cases |
+| `tests/_typeset-cache.js` | Tests for dedup, env isolation, mutation protection, accessibility IDs, bypass counter, forDocx integration, mathData svg gating |
+| `tests/_accessibility.js` | Tests for unique IDs with cache, aria-labelledby consistency |
 
 ---
 
 ## Testing
 
 - All 3,286 tests pass
-- No new public API options — cache is always on, scoped per-parse via `state.env`
-- Shared `envToInline` per table reduces memory for large documents with many table cells
-- `mathTablePush` backward-compatible overload preserved
+- `outMath.skipMathToHtml` is opt-in; existing callers see identical output
+- Shared attrs + close-token singletons verified correct under
+  highlight/diagbox/forDocx paths (tests exercise cloning)
+- MD list markers in tabular cells verified — leaf-token `renderInline` is
+  still invoked so the `latex_list_item_open` render rule can set
+  `token.meta.itemizeLevel`
