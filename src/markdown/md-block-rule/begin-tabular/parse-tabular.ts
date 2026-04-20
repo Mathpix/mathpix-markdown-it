@@ -1,5 +1,9 @@
 import { TTokenTabular } from "./index";
-import {addHLineIntoStyle, AddTd, AddTdSubTable } from "./tabular-td";
+import {
+  addHLineIntoStyle, AddTd, AddTdSubTable,
+  getSharedTableOpenAttrs, getSharedTbodyOpenAttrs, getSharedTrOpenAttrs,
+  SHARED_TR_CLOSE, SHARED_TABLE_CLOSE,
+} from "./tabular-td";
 import {
   getContent, getRowLines, getCellsAll, getDecimal, TDecimal,
   TAlignData, getVerticallyColumnAlign, getParams, getColumnLines, shouldRewriteColSpec,
@@ -101,7 +105,7 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}, is
   const { forLatex = false, outMath = {} } = options;
 
   res.push({token:'table_open', type:'table_open', tag: 'table', n: 1,
-    attrs: [[ 'class', 'tabular' ]],
+    attrs: getSharedTableOpenAttrs(),
     latex: forLatex
       ? align
       : outMath.include_table_markdown
@@ -110,7 +114,7 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}, is
   });
   const tableOpen: TTokenTabular = res[0];
   if (options?.forPptx) {
-    res.push({token:'tbody_open', type:'tbody_open', tag: 'tbody', n: 1, attrs: [['data_num_col', numCol.toString()]]});
+    res.push({token:'tbody_open', type:'tbody_open', tag: 'tbody', n: 1, attrs: getSharedTbodyOpenAttrs(numCol)});
   } else {
     res.push({token:'tbody_open', type:'tbody_open', tag: 'tbody', n: 1});
   }
@@ -120,7 +124,7 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}, is
     if (!cellsAll[i] || cellsAll[i].length === 0) {
       if (i < cellsAll.length-1) {
         res.push({token:'tr_open', type:'tr_open', tag: 'tr', n: 1,
-          attrs: [[ 'style', 'border-top: none !important; border-bottom: none !important;' ]],
+          attrs: getSharedTrOpenAttrs(),
           latex: forLatex && data && data.sLines && data.sLines.length > i ? data.sLines[i] : ''
         });
         for (let k = 0; k < numCol; k++) {
@@ -138,12 +142,12 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}, is
           markColIfHasList(colsToFixWidth, k, data.content);
           res = res.concat(data.res);
         }
-        res.push({token:'tr_close', type:'tr_close', tag: 'tr', n: -1});
+        res.push(SHARED_TR_CLOSE);
       }
       continue;
     }
     res.push({token:'tr_open', type:'tr_open', tag: 'tr', n: 1,
-      attrs: [[ 'style', 'border-top: none !important; border-bottom: none !important;' ]],
+      attrs: getSharedTrOpenAttrs(),
       latex: forLatex && data && data.sLines && data.sLines.length > i ? data.sLines[i] : ''
     });
 
@@ -368,12 +372,12 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}, is
       }
 
     }
-    res.push({token:'tr_close', type:'tr_close', tag: 'tr', n: -1});
+    res.push(SHARED_TR_CLOSE);
   }
   res.push({token:'tbody_close', type:'tbody_close', tag: 'tbody', n: -1,
     latex: forLatex && data && data.sLines && data.sLines.length ? data.sLines[data.sLines.length-1] : ''
   });
-  res.push({token:'table_close', type:'table_close', tag: 'table', n: -1});
+  res.push(SHARED_TABLE_CLOSE);
   if (forLatex) {
     tableOpen.meta = {
       colsToFixWidth,

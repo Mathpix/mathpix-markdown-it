@@ -85,7 +85,13 @@ const isMathMLToken = (token: any) =>
  * every math token — a significant memory saver on SVG-heavy documents.
  */
 const applyTypesetResultToToken = (token: any, res: TypesetResult, options: any): void => {
-  if (res.html != null) {
+  // Callers that consume tokens directly (mmd-to-md, mmd-to-xlsx, mmd-to-latex-zip
+  // in the mmd-converter pipeline) do not read `token.mathEquation` — verified
+  // via repository-wide grep. When they opt in with `outMath.skipMathToHtml`
+  // we skip storing the serialized HTML (SVG/mathml_word/assistive-mml blob),
+  // which saves ~190 MB of retained heap on a 16 MB MMD with 49K math tokens.
+  const skipMathEquation = !!options?.outMath?.skipMathToHtml;
+  if (res.html != null && !skipMathEquation) {
     token.mathEquation = res.html;
   }
   if (res.data != null) {
@@ -258,10 +264,19 @@ const typesetMathForToken = (params: {
     };
   }
   // 4) Default TeX typesetting
+  // When the caller opts out of HTML render (e.g. mmd-to-md / mmd-to-xlsx /
+  // mmd-to-latex-zip work on tokens directly and never read
+  // `token.mathEquation`), disable SVG serialization inside MathJax so the
+  // 7-KB-per-token SVG string is never allocated. The other outputs
+  // (mathml_word, asciimath, metrics) are still produced.
+  const skipMathToHtml = !!options.outMath?.skipMathToHtml;
+  const outMathForTypeset = skipMathToHtml && options.outMath?.include_svg !== false
+    ? { ...options.outMath, include_svg: false }
+    : options.outMath;
   const typeset = MathJax.Typeset(math, {
     display: isBlock,
     metric: { cwidth: containerWidth },
-    outMath: options.outMath,
+    outMath: outMathForTypeset,
     mathJax: options.mathJax,
     forDocx: options.forDocx,
     forPptx: options.forPptx,

@@ -216,7 +216,6 @@ export const StatePushTabulars = (state, cTabular: TTypeContentList, align: stri
       let tok:Token = res[j];
       if (res[j].token === 'inline') {
         tok.block = true;
-        tok.envToInline = {};
         if (res[j].content) {
           state.env.tabulare = state.md.options.outMath.include_tsv
             || state.md.options.outMath.include_csv
@@ -244,7 +243,22 @@ export const StatePushTabulars = (state, cTabular: TTypeContentList, align: stri
           tok.children = [];
         }
       } else {
-          if (res[j].token !== 'inline_decimal') {
+          // Open/close tokens are markers — their content (cell text) lives
+          // in the sibling `inline` token, not on the marker itself. Skipping
+          // `content` / `children = []` here:
+          //   - avoids touching the frozen shared close-tokens (SHARED_*_CLOSE)
+          //   - eliminates ~1.2M useless empty-array and undefined-content
+          //     assignments per parse on a 16 MB MMD (td_open/tr_open/td_close/
+          //     tr_close + their table/tbody peers).
+          // `inline_decimal` is produced by `inlineDecimalParse` which already
+          // owns its children; `tabular` / `tabular_inline` nested tokens
+          // carry their own content/children set upstream.
+          const t = res[j].token;
+          const isMarker = t === 'td_open' || t === 'td_close'
+            || t === 'tr_open' || t === 'tr_close'
+            || t === 'table_open' || t === 'table_close'
+            || t === 'tbody_open' || t === 'tbody_close';
+          if (!isMarker && t !== 'inline_decimal') {
             tok.content  = res[j].content;
             tok.children = [];
           }

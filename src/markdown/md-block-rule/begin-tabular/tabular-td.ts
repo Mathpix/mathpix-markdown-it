@@ -109,6 +109,9 @@ const markAttrsShared = (attrs: TAttrs[]): TAttrs[] => {
 export const clearColumnStyleCache = (): void => {
   columnStyleCache.clear();
   cellAttrsCache.clear();
+  TABLE_OPEN_ATTRS_CACHE.clear();
+  TBODY_OPEN_ATTRS_CACHE.clear();
+  TR_OPEN_ATTRS_SHARED = null;
 };
 
 const internStyle = (style: string): string => {
@@ -161,6 +164,65 @@ const getSharedCellAttrs = (style: string, isEmpty: boolean): TAttrs[] => {
   cellAttrsCache.set(key, attrs);
   return attrs;
 };
+
+// Shared attrs for the other tabular structural tokens. All of these are
+// identical across thousands of tokens in a large document and were
+// previously allocated fresh at each row/table — a 16 MB MMD produced 112K
+// `tr_open` and 13K `table_open`/`tbody_open` tokens with duplicate attrs.
+const TABLE_OPEN_ATTRS_CACHE = new Map<string, TAttrs[]>();
+const TBODY_OPEN_ATTRS_CACHE = new Map<string, TAttrs[]>();
+let TR_OPEN_ATTRS_SHARED: TAttrs[] | null = null;
+
+const TR_OPEN_STYLE = 'border-top: none !important; border-bottom: none !important;';
+
+export const getSharedTableOpenAttrs = (extraClass?: string): TAttrs[] => {
+  const key = extraClass || '';
+  const cached = TABLE_OPEN_ATTRS_CACHE.get(key);
+  if (cached) return cached;
+  const attrs: TAttrs[] = extraClass
+    ? [['class', 'tabular'], ['data-type', extraClass]]
+    : [['class', 'tabular']];
+  markAttrsShared(attrs);
+  TABLE_OPEN_ATTRS_CACHE.set(key, attrs);
+  return attrs;
+};
+
+export const getSharedTbodyOpenAttrs = (numCol: number): TAttrs[] => {
+  const key = numCol.toString();
+  const cached = TBODY_OPEN_ATTRS_CACHE.get(key);
+  if (cached) return cached;
+  const attrs: TAttrs[] = [['data_num_col', key]];
+  markAttrsShared(attrs);
+  TBODY_OPEN_ATTRS_CACHE.set(key, attrs);
+  return attrs;
+};
+
+export const getSharedTrOpenAttrs = (): TAttrs[] => {
+  if (TR_OPEN_ATTRS_SHARED) return TR_OPEN_ATTRS_SHARED;
+  const attrs: TAttrs[] = [['style', TR_OPEN_STYLE]];
+  markAttrsShared(attrs);
+  TR_OPEN_ATTRS_SHARED = attrs;
+  return attrs;
+};
+
+// Shared close-token instances. `td_close` / `tr_close` / `table_close` carry
+// no variable data (only the fixed `token`/`type`/`tag`/`n` shape) and are
+// only read-accessed across the entire codebase — no mutation paths exist
+// (verified by grep for `.token === 'td_close' =`, `.attrs.push`, etc.).
+// Sharing a single frozen instance per kind saves ~670K plain-Object
+// allocations on a 16 MB MMD document.
+//
+// NOTE: `tbody_close` is NOT shared because it carries a per-table `latex`
+// payload (set from the last `\\hline` row when `forLatex: true`).
+export const SHARED_TD_CLOSE: TTokenTabular = Object.freeze({
+  token: 'td_close', type: 'td_close', tag: 'td', n: -1,
+}) as TTokenTabular;
+export const SHARED_TR_CLOSE: TTokenTabular = Object.freeze({
+  token: 'tr_close', type: 'tr_close', tag: 'tr', n: -1,
+}) as TTokenTabular;
+export const SHARED_TABLE_CLOSE: TTokenTabular = Object.freeze({
+  token: 'table_close', type: 'table_close', tag: 'table', n: -1,
+}) as TTokenTabular;
 
 /**
  * Backward-compatible helper: returns a single `['style', X]` tuple.
@@ -219,7 +281,7 @@ export const AddTd = (content: string, aligns: TAligns| null, lines: TLines, spa
       res.push({token:'inline', type:'inline', tag: '', n: 0, content: content});
     }
   }
-  res.push({token:'td_close', type:'td_close', tag: 'td', n: -1});
+  res.push(SHARED_TD_CLOSE);
   return {res: res, content: content};
 };
 
@@ -232,6 +294,6 @@ export const AddTdSubTable = (subTable: Array<TTokenTabular>, aligns: TAligns, l
 
   res.push({token:'td_open', type:'td_open', tag: 'td', n: 1, attrs: attrs});
   res = res.concat(subTable);
-  res.push({token:'td_close', type:'td_close', tag: 'td', n: -1});
+  res.push(SHARED_TD_CLOSE);
   return res;
 };

@@ -21,6 +21,12 @@ type TAligns = {
  */
 export declare const attrsSharedMarker: unique symbol;
 export declare const clearColumnStyleCache: () => void;
+export declare const getSharedTableOpenAttrs: (extraClass?: string) => TAttrs[];
+export declare const getSharedTbodyOpenAttrs: (numCol: number) => TAttrs[];
+export declare const getSharedTrOpenAttrs: () => TAttrs[];
+export declare const SHARED_TD_CLOSE: TTokenTabular;
+export declare const SHARED_TR_CLOSE: TTokenTabular;
+export declare const SHARED_TABLE_CLOSE: TTokenTabular;
 /**
  * Backward-compatible helper: returns a single `['style', X]` tuple.
  * Kept for callers (AddTdSubTable, other code paths) that still build
