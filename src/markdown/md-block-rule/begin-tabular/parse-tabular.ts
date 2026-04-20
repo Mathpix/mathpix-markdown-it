@@ -327,7 +327,8 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}, is
         let content = parseMath || getContent(cells[j]);
 
         const handleSubTable = (subTable: Array<TTokenTabular>) => {
-          if (subTable.some((item: TTokenTabular) => detectLocalBlock(item.content))) {
+          if (!colsToFixWidth.has(ic)
+            && subTable.some((item: TTokenTabular) => detectLocalBlock(item.content))) {
             colsToFixWidth.add(ic);
           }
           return AddTdSubTable(subTable,
