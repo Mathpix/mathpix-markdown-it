@@ -743,9 +743,7 @@ export const getSpacesFromLeft = (str: string) => {
   return str ? str.length - strTrimLeft.length : 0;
 };
 
-// Shared-attrs marker (see md-block-rule/begin-tabular/tabular-td.ts). Used
-// here to clone td_open attrs on first write so overlays on one cell do not
-// leak into every other cell that reuses the same cached attrs array.
+// Shared-attrs marker (see md-block-rule/begin-tabular/tabular-td.ts).
 const ATTRS_SHARED = Symbol.for('mathpix.tabular.attrsShared');
 
 /** add additional attributes to the parent token */

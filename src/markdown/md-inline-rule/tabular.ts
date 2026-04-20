@@ -42,8 +42,7 @@ export const inlineTabular: RuleInline = (state, silent) => {
       for (let j = 0; j < res.length;  j++) {
         let tok = res[j];
         if (tok.token === 'table_open' && state.md.options?.forDocx ) {
-          // Swap the shared default attrs for the shared subtable variant
-          // to avoid mutating (and thereby corrupting) the shared instance.
+          // Swap instead of mutating — tok.attrs is shared.
           tok.attrs = getSharedTableOpenAttrs('subtable');
         }
         if (tok.token === 'inline') {

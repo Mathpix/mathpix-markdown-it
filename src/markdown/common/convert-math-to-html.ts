@@ -72,24 +72,12 @@ const isMathMLToken = (token: any) =>
   token.type === 'display_mathML' || token.type === 'inline_mathML';
 
 /**
- * Applies the typesetting output to the markdown-it token.
- * Mutates the token in-place.
- *
- * `options.highlights` is consulted to decide whether to retain the SVG string
- * on `token.mathData.svg`. That field is only read by `renderMathHighlight`
- * (src/markdown/highlight/render-rule-highlights.ts), which rebuilds HTML via
- * `OuterHTML(token.mathData, ...)` and is only registered when highlights are
- * active. The default render rule (`mdPluginRaw.ts:renderMath`) uses
- * `token.mathEquation` and only reads `width`/`widthEx`/`error` from
- * `mathData`. Dropping `svg` there avoids holding the same string twice on
- * every math token — a significant memory saver on SVG-heavy documents.
+ * Applies typesetting output to a token in place.
+ * `mathData.svg` is only read by renderMathHighlight, so drop it when
+ * highlights are off. `outMath.skipMathToHtml` opts token-only callers out
+ * of mathEquation entirely.
  */
 const applyTypesetResultToToken = (token: any, res: TypesetResult, options: any): void => {
-  // Callers that consume tokens directly (mmd-to-md, mmd-to-xlsx, mmd-to-latex-zip
-  // in the mmd-converter pipeline) do not read `token.mathEquation` — verified
-  // via repository-wide grep. When they opt in with `outMath.skipMathToHtml`
-  // we skip storing the serialized HTML (SVG/mathml_word/assistive-mml blob),
-  // which saves ~190 MB of retained heap on a 16 MB MMD with 49K math tokens.
   const skipMathEquation = !!options?.outMath?.skipMathToHtml;
   if (res.html != null && !skipMathEquation) {
     token.mathEquation = res.html;
@@ -263,12 +251,9 @@ const typesetMathForToken = (params: {
       labels: typeset.labels,
     };
   }
-  // 4) Default TeX typesetting
-  // When the caller opts out of HTML render (e.g. mmd-to-md / mmd-to-xlsx /
-  // mmd-to-latex-zip work on tokens directly and never read
-  // `token.mathEquation`), disable SVG serialization inside MathJax so the
-  // 7-KB-per-token SVG string is never allocated. The other outputs
-  // (mathml_word, asciimath, metrics) are still produced.
+  // 4) Default TeX typesetting.
+  // skipMathToHtml → disable SVG serialization; mathml_word / ascii / metrics
+  // are still produced for token-only callers.
   const skipMathToHtml = !!options.outMath?.skipMathToHtml;
   const outMathForTypeset = skipMathToHtml && options.outMath?.include_svg !== false
     ? { ...options.outMath, include_svg: false }

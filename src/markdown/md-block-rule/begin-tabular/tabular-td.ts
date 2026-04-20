@@ -7,12 +7,8 @@ import { preserveNewlineUnlessDoubleAngleUuidRegex } from "../../common/consts";
 type TLines = {left?: string, right?: string, bottom?: string, top?: string};
 type TAligns = {h?: string, v?: string, w?: string};
 
-// Interned cell-border style strings. `verticalCellLine`/`horizontalCellLine`
-// are invoked once per border per <td> — for large tabulars this is millions
-// of calls with only ~8 unique return values per orientation. Pre-building the
-// strings lets V8 share a single instance instead of re-allocating identical
-// ~70-byte strings for every cell (heap-snapshot on a 16 MB MMD showed the
-// top retainer was 395 125 copies of one such string = 96 MB).
+// Pre-interned border styles — only ~8 unique values per orientation,
+// share one instance across every <td> instead of reallocating per call.
 const V_LEFT_NONE = 'border-left: none !important; ';
 const V_LEFT_SOLID = 'border-left-style: solid !important; border-left-width: 1px !important; ';
 const V_LEFT_DOUBLE = 'border-left-style: double !important; border-left-width: 3px !important; ';
@@ -73,30 +69,13 @@ const horizontalCellLine = (line: string, pos: string = 'bottom'): string => {
   }
 };
 
-// Per-parse intern cache for tabular-cell style strings and for the whole
-// attrs array attached to `td_open` tokens.
-//
-// On a 16 MB MMD document the 479K AddTd() calls produced only ~38 distinct
-// style strings — the top one alone was used 393K times. Each call still
-// allocated its own outer attrs array `[['style', X]]`, inner tuple, and two
-// array-backing stores. `attrsSharedMarker`/`cellAttrsCache` dedupe the whole
-// attrs structure so cells with identical (style + isEmpty + latex?) share
-// one attrs instance, saving ~1M array allocations on this doc.
-//
-// Shared attrs must be treated as read-only. `tokenAttrSet` /
-// `tokenAttrGet` in `md-renderer-rules/render-tabular.ts` clone attrs on
-// first write via the `attrsSharedMarker` property.
+// Per-parse dedup caches: style strings and full <td> attrs arrays. Shared
+// attrs must be treated read-only; mutators clone via `attrsSharedMarker`
+// (see `tokenAttrSet` in md-renderer-rules/render-tabular.ts).
 const columnStyleCache = new Map<string, string>();
 const cellAttrsCache = new Map<string, TAttrs[]>();
 
-/**
- * Non-enumerable marker set on cached shared `attrs` arrays so that code
- * paths that mutate attrs (highlight, diagbox overlays) can detach a private
- * copy instead of corrupting every cell that shares the instance.
- *
- * Consumers check the marker via `(attrs as any)[attrsSharedMarker] === true`.
- * The marker is defined with `configurable: true` so the clone can clear it.
- */
+/** Marker on shared attrs arrays; mutators must clone before writing. */
 export const attrsSharedMarker = Symbol.for('mathpix.tabular.attrsShared');
 
 const markAttrsShared = (attrs: TAttrs[]): TAttrs[] => {
@@ -121,11 +100,6 @@ const internStyle = (style: string): string => {
   return style;
 };
 
-/**
- * Builds the final style string for a tabular cell from the aligns/lines
- * descriptor and optional padding-bottom space. Returned string is interned
- * per-parse.
- */
 const composeCellStyle = (aligns: TAligns | null, lines: TLines, space: string): string => {
   const {left = '', right = '', bottom = '', top = ''} = lines;
   if (!aligns) aligns = {h: '', v: '', w: ''};
@@ -148,11 +122,7 @@ const composeCellStyle = (aligns: TAligns | null, lines: TLines, space: string):
   return internStyle(style);
 };
 
-/**
- * Returns a read-only shared attrs array for a `<td>` cell. Tokens with the
- * same (style, isEmpty) pair reuse the same instance. Mutation paths must
- * clone first — see `attrsSharedMarker`.
- */
+/** Read-only shared attrs keyed by (style, isEmpty). Mutators must clone. */
 const getSharedCellAttrs = (style: string, isEmpty: boolean): TAttrs[] => {
   const key = isEmpty ? style + '\0E' : style;
   const cached = cellAttrsCache.get(key);
@@ -165,10 +135,8 @@ const getSharedCellAttrs = (style: string, isEmpty: boolean): TAttrs[] => {
   return attrs;
 };
 
-// Shared attrs for the other tabular structural tokens. All of these are
-// identical across thousands of tokens in a large document and were
-// previously allocated fresh at each row/table — a 16 MB MMD produced 112K
-// `tr_open` and 13K `table_open`/`tbody_open` tokens with duplicate attrs.
+// Shared attrs for structural tabular tokens — same values repeat thousands
+// of times per doc.
 const TABLE_OPEN_ATTRS_CACHE = new Map<string, TAttrs[]>();
 const TBODY_OPEN_ATTRS_CACHE = new Map<string, TAttrs[]>();
 let TR_OPEN_ATTRS_SHARED: TAttrs[] | null = null;
@@ -205,15 +173,9 @@ export const getSharedTrOpenAttrs = (): TAttrs[] => {
   return attrs;
 };
 
-// Shared close-token instances. `td_close` / `tr_close` / `table_close` carry
-// no variable data (only the fixed `token`/`type`/`tag`/`n` shape) and are
-// only read-accessed across the entire codebase — no mutation paths exist
-// (verified by grep for `.token === 'td_close' =`, `.attrs.push`, etc.).
-// Sharing a single frozen instance per kind saves ~670K plain-Object
-// allocations on a 16 MB MMD document.
-//
-// NOTE: `tbody_close` is NOT shared because it carries a per-table `latex`
-// payload (set from the last `\\hline` row when `forLatex: true`).
+// Frozen shared close-token markers — fixed shape, never mutated.
+// tbody_close is NOT shared because it carries a per-table `latex` payload
+// when `forLatex` is set.
 export const SHARED_TD_CLOSE: TTokenTabular = Object.freeze({
   token: 'td_close', type: 'td_close', tag: 'td', n: -1,
 }) as TTokenTabular;
@@ -224,12 +186,8 @@ export const SHARED_TABLE_CLOSE: TTokenTabular = Object.freeze({
   token: 'table_close', type: 'table_close', tag: 'table', n: -1,
 }) as TTokenTabular;
 
-/**
- * Backward-compatible helper: returns a single `['style', X]` tuple.
- * Kept for callers (AddTdSubTable, other code paths) that still build
- * non-shared attrs arrays; prefer `composeCellStyle` + `getSharedCellAttrs`
- * for hot paths.
- */
+// Legacy entry point: callers that build their own attrs array (AddTdSubTable,
+// multi-column paths) still use this — hot <td> path uses getSharedCellAttrs.
 export const setColumnLines = (aligns: TAligns| null, lines: TLines): string[] => {
   const style = composeCellStyle(aligns, lines, '');
   return ['style', style];
@@ -293,7 +251,9 @@ export const AddTdSubTable = (subTable: Array<TTokenTabular>, aligns: TAligns, l
   attrs.push(slyleLines);
 
   res.push({token:'td_open', type:'td_open', tag: 'td', n: 1, attrs: attrs});
-  res = res.concat(subTable);
+  for (const t of subTable) {
+    res.push(t);
+  }
   res.push(SHARED_TD_CLOSE);
   return res;
 };

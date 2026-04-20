@@ -119,13 +119,17 @@ export const parseInlineTabular = (str: string): TTypeContentList | null => {
       break;
     } else {
       if (!matchE) {
-        res = res.concat(addContentToList(str.slice( posB, posB + matchB.index+matchB[0].length)));
+        for (const t of addContentToList(str.slice( posB, posB + matchB.index+matchB[0].length))) {
+          res.push(t);
+        }
         break;
       }
     }
 
     if (posB + matchB.index > posE + matchE.index ) {
-      res = res.concat(addContentToList(str.slice(pos, pos + matchE.index)));
+      for (const t of addContentToList(str.slice(pos, pos + matchE.index))) {
+        res.push(t);
+      }
       posB += matchE.index + matchE[0].length;
       pos += matchE.index + matchE[0].length;
       i = posB;
@@ -135,7 +139,9 @@ export const parseInlineTabular = (str: string): TTypeContentList | null => {
       if (openTag.test(str.slice(posB, posE + matchE.index + matchE[0].length))) {
         posE += matchE.index + matchE[0].length;
       } else {
-        res = res.concat(addContentToList(str.slice(pos, posE + matchE.index)));
+        for (const t of addContentToList(str.slice(pos, posE + matchE.index))) {
+          res.push(t);
+        }
         posE = posE + matchE.index + matchE[0].length;
         pos = posE;
         posB = posE;
@@ -243,16 +249,9 @@ export const StatePushTabulars = (state, cTabular: TTypeContentList, align: stri
           tok.children = [];
         }
       } else {
-          // Open/close tokens are markers — their content (cell text) lives
-          // in the sibling `inline` token, not on the marker itself. Skipping
-          // `content` / `children = []` here:
-          //   - avoids touching the frozen shared close-tokens (SHARED_*_CLOSE)
-          //   - eliminates ~1.2M useless empty-array and undefined-content
-          //     assignments per parse on a 16 MB MMD (td_open/tr_open/td_close/
-          //     tr_close + their table/tbody peers).
-          // `inline_decimal` is produced by `inlineDecimalParse` which already
-          // owns its children; `tabular` / `tabular_inline` nested tokens
-          // carry their own content/children set upstream.
+          // Markers carry no content/children — skip the assignments so we
+          // don't touch SHARED_*_CLOSE and don't allocate throwaway arrays.
+          // inline_decimal already sets its own children.
           const t = res[j].token;
           const isMarker = t === 'td_open' || t === 'td_close'
             || t === 'tr_open' || t === 'tr_close'

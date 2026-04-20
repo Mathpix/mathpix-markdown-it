@@ -140,7 +140,9 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}, is
             CellsHLSpaces[i+1][k]
           );
           markColIfHasList(colsToFixWidth, k, data.content);
-          res = res.concat(data.res);
+          for (const t of data.res) {
+            res.push(t);
+          }
         }
         res.push(SHARED_TR_CLOSE);
       }
@@ -171,7 +173,9 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}, is
             CellsHLSpaces[i+1][k]
           );
           markColIfHasList(colsToFixWidth, k, data.content);
-          res = res.concat(data.res);
+          for (const t of data.res) {
+            res.push(t);
+          }
         }
         break;
       }
@@ -292,7 +296,9 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}, is
                 tdOpen.meta.forceMultiFixedWidth = true;
               }
             }
-            res = res.concat(multi.subTable);
+            for (const t of multi.subTable) {
+              res.push(t);
+            }
           } else {
             if (multi.content) {
               if (detectLocalBlock(multi.content)) {
@@ -342,7 +348,9 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}, is
         }
         const parseSub = getSubTabular(content, 0, true, forLatex);
         if (parseSub && parseSub.length > 0) {
-          res = res.concat(handleSubTable(parseSub));
+          for (const t of handleSubTable(parseSub)) {
+            res.push(t);
+          }
           continue;
         }
         const data = AddTd(content,
@@ -352,7 +360,9 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}, is
             CellsHLSpaces[i+1][ic], decimal[ic]
           );
         markColIfHasList(colsToFixWidth, ic, data.content);
-        res = res.concat(data.res);
+        for (const t of data.res) {
+          res.push(t);
+        }
       } else {
         MR[ic] = MR[ic] > 0 ? MR[ic] - 1 : 0;
         if (MR[ic] && MR[ic] > 0) {
@@ -368,7 +378,9 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}, is
             CellsHLSpaces[i+1][ic]
           );
         markColIfHasList(colsToFixWidth, ic, data.content);
-        res = res.concat(data.res);
+        for (const t of data.res) {
+          res.push(t);
+        }
       }
 
     }

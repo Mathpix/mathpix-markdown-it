@@ -83,19 +83,14 @@ const formatCsvCell = (lines: string[]): string => {
   return(lines ?? []).join('\n');
 };
 
-// Shared-attrs marker: td_open tokens reuse a frozen attrs array across cells
-// with identical style (see tabular-td.ts::getSharedCellAttrs). Before any
-// mutation we must detach a private copy; otherwise a highlight or diagbox
-// overlay on one cell would corrupt every other cell in the document.
-// We resolve the symbol by name so this file does not have to import from
-// the parser module (avoids circular deps at module-init time).
+// Shared-attrs marker (see tabular-td.ts::attrsSharedMarker). Resolved by
+// name to sidestep a circular import between renderer and parser modules.
 const ATTRS_SHARED = Symbol.for('mathpix.tabular.attrsShared');
 
-/** Detaches a writable copy of `token.attrs` if the current one is shared. */
+/** Clone-on-write: detach shared `token.attrs` before a mutator touches it. */
 const ensureOwnAttrs = (token): void => {
   const attrs = token.attrs;
   if (attrs && attrs[ATTRS_SHARED]) {
-    // Clone the outer array and every inner tuple so edits are local.
     token.attrs = attrs.map(pair => [pair[0], pair[1]]);
   }
 };

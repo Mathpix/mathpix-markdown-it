@@ -163,11 +163,17 @@ export const coreInline = (state) => {
       || ['title', 'section', 'subsection', 'subsubsection', 'addcontentsline',
         'item_inline', 'caption_table'
       ].includes(token.type)) {
-      state.env = Object.assign({}, {...state.env}, {
+      // Mutate state.env in place — replacing the binding would desync it
+      // from the caller's env reference shared with md.render.
+      const inlineEnv = Object.assign({}, state.env, {
         currentTag: currentTag,
-      }, {...envToInline});
+      }, envToInline);
+      state.env.currentTag = currentTag;
+      if (envToInline && typeof envToInline === 'object') {
+        Object.assign(state.env, envToInline);
+      }
       if (!token.children?.length) {
-        state.md.inline.parse(token.content, state.md, state.env, token.children);
+        state.md.inline.parse(token.content, state.md, inlineEnv, token.children);
       }
       if (token.meta?.isMathInText && token.children?.length) {
         applyAttrToInlineMath(token.children, "data-math-in-text", "true");

@@ -3,7 +3,9 @@ import { slugify, tocRegexp, uniqueSlug } from './common';
 import { TTocStyle } from '../mathpix-markdown-model';
 import { uid } from './utils';
 
-let gstate;
+// Per-parse stash on state.env so the full token list is released with env,
+// not retained in a module-level ref across unrelated parses.
+const TOC_ENV_KEY = '__mathpix_toc_tokens';
 
 const defaults = {
   includeLevel: [ 1, 2, 3, 4, 5, 6 ]
@@ -70,8 +72,8 @@ const renderTocClose: Renderer = () => {
 
 const renderTocBody: Renderer = (tokens, index, options, env, slf) => {
   let res: string = '';
-  const dataToc: ITocData = getTocList(0, gstate.tokens, options,-1, env, slf);
-
+  const allTokens = (env && env[TOC_ENV_KEY]) || tokens || [];
+  const dataToc: ITocData = getTocList(0, allTokens, options,-1, env, slf);
   if (!dataToc || !dataToc.tocList?.length) {
     return res;
   }
@@ -271,11 +273,12 @@ const mapping = {
 export default (md: MarkdownIt, opts) => {
   clearSlugsTocItems();
   Object.assign(md.options, defaults, opts);
-  // Catch all the tokens for iteration later
   md.core.ruler.push('grab_state', (state) => {
-    gstate = state;
+    if (!state.env) {
+      state.env = {};
+    }
+    state.env[TOC_ENV_KEY] = state.tokens;
   });
-
   // Insert TOC
   md.inline.ruler.after('emphasis', 'toc', toc);
   md.inline.ruler.push('tocHide', tocHide);
