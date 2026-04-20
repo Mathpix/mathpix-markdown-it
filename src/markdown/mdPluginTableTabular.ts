@@ -25,6 +25,15 @@ const clearTabularState = () => {
   clearColumnStyleCache();
 };
 
+// Parse-only caches — never read during render; safe to drop post-parse.
+const dropParseCaches = () => {
+  ClearSubTableLists();
+  ClearSubMathLists();
+  ClearDiagboxTable();
+  ClearExtractedCodeBlocks();
+  clearColumnStyleCache();
+};
+
 export default (md: MarkdownIt, options) => {
   clearTabularState();
   Object.assign(md.options, options);
@@ -42,7 +51,20 @@ export default (md: MarkdownIt, options) => {
   } else {
     md.core.ruler.before('normalize', 'reset_tabular_state', resetTabularHook);
   }
-
+  const cleanupHook = (state) => {
+    const isPartial = state.md.options.renderElement
+      && state.md.options.renderElement.hasOwnProperty('startLine');
+    if (!isPartial) {
+      dropParseCaches();
+    }
+  };
+  const hasCleanupHook = typeof md.core.ruler.__find__ === 'function'
+    && md.core.ruler.__find__('cleanup_tabular_state') >= 0;
+  if (hasCleanupHook) {
+    md.core.ruler.at('cleanup_tabular_state', cleanupHook);
+  } else {
+    md.core.ruler.push('cleanup_tabular_state', cleanupHook);
+  }
   md.block.ruler.after("fence", "BeginTabular", BeginTabular, 
     Object.assign({}, md.options, {alt: getTerminatedRules('BeginTabular')}));
   md.block.ruler.before("BeginTabular", "BeginAlign", BeginAlign, 
