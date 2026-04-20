@@ -181,9 +181,9 @@ const OuterData = (adaptor, node, math, outMath, forDocx = false, accessibility?
       }
     }
   }
-  /** Get information about the current labels. */
-  res.labels = math.inputJax.parseOptions?.tags?.labels
-    ? {...math.inputJax.parseOptions.tags.labels}
+  const labelsSrc = math.inputJax.parseOptions?.tags?.labels;
+  res.labels = labelsSrc && Object.keys(labelsSrc).length > 0
+    ? {...labelsSrc}
     : null;
   return res;
 };
