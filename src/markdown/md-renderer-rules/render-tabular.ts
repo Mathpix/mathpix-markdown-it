@@ -159,20 +159,28 @@ const renderNonTableTokenIntoCell = (
   acc: CellAccumulators
 ): void => {
   const { options, env, slf, highlight } = ctx;
+  const outMath = options?.outMath || {};
+  const forMD = !!options?.forMD;
+  const needHtml = !forMD && outMath.include_table_html !== false;
+  const needTsv = !!outMath.include_tsv;
+  const needCsv = !!outMath.include_csv;
+  const needSmoothed = !!options?.forPptx;
   if (token?.type === 'tabular' || token?.type === 'tabular_inline') {
     const data = renderInlineTokenBlock(token.children, options, env, slf, true, highlight);
-    acc.result += data.table;
+    if (needHtml) {
+      acc.result += data.table;
+    }
     if (Array.isArray(data.tableMd) && data.tableMd.length) {
       if (acc.cellMd?.trim()) {
         acc.cellMd += '<br>';
       }
       acc.cellMd += data.tableMd.map(item => (typeof item === 'string' ? item : item.join(' '))).join(' <br> ');
     }
-    if (data.tsv) {
+    if (needTsv && data.tsv) {
       ensureTrailingEmptyLine(acc.cellTsvLines);
       appendToLastLine(acc.cellTsvLines, TsvJoin(data.tsv, options));
     }
-    if (data.csv) {
+    if (needCsv && data.csv) {
       ensureTrailingEmptyLine(acc.cellCsvLines);
       appendToLastLine(acc.cellCsvLines, CsvJoin(data.csv, options, true));
     }
@@ -180,16 +188,28 @@ const renderNonTableTokenIntoCell = (
   }
   if (token?.children?.length) {
     const cellRender: RenderTableCellContentResult = renderTableCellContent(token, true, options, env, slf);
-    acc.result += cellRender.content;
-    appendToLastLine(acc.cellTsvLines, cellRender.tsv);
-    appendToLastLine(acc.cellCsvLines, cellRender.csv);
+    if (needHtml) {
+      acc.result += cellRender.content;
+    }
+    if (needTsv) {
+      appendToLastLine(acc.cellTsvLines, cellRender.tsv);
+    }
+    if (needCsv) {
+      appendToLastLine(acc.cellCsvLines, cellRender.csv);
+    }
+    if (needSmoothed) {
+      acc.cellSmoothed += cellRender.tableSmoothed;
+    }
     acc.cellMd += cellRender.tableMd;
-    acc.cellSmoothed += cellRender.tableSmoothed;
     return;
   }
-  // Leaf token
-  acc.result += slf.renderInline([token], options, env);
-  // List-related markdown stitching inside table cells
+  // renderInline must run even when HTML is skipped: the latex_list_item_open
+  // render rule sets `token.meta.itemizeLevel` as a side effect, which
+  // handleListTokensForCellMarkdown reads below to emit list markers.
+  const rendered = slf.renderInline([token], options, env);
+  if (needHtml) {
+    acc.result += rendered;
+  }
   handleListTokensForCellMarkdown(token, ctx, acc);
 };
 
@@ -350,6 +370,16 @@ export const renderInlineTokenBlock = (
   isSubTable = false,
   highlight = null
 ): RenderInlineTokenBlockResult => {
+  // Each output is built only when requested via `options.outMath.include_*`.
+  // `forMD` forces HTML off; `forPptx` is the sole consumer of the smoothed
+  // variant.
+  const outMath = options?.outMath || {};
+  const forMD = !!options?.forMD;
+  const needHtml = !forMD && outMath.include_table_html !== false;
+  const needTsv = !!outMath.include_tsv;
+  const needCsv = !!outMath.include_csv;
+  const needMd = forMD || !!outMath.include_table_markdown;
+  const needSmoothed = !!options?.forPptx;
   let nextToken,
     result = '',
     needLf = false;
@@ -379,7 +409,9 @@ export const renderInlineTokenBlock = (
     }
 
     if ( token.n !== -1 && idx && tokens[idx - 1].hidden) {
-      result += '\n';
+      if (needHtml) {
+        result += '\n';
+      }
     }
     if (token.token === 'table_open' || token.token === 'tbody_open') {
       arrTsv = [];
@@ -401,10 +433,16 @@ export const renderInlineTokenBlock = (
       arrRowSmoothed = [];
     }
     if (token.token === 'tr_close') {
-      arrTsv.push(arrRow);
-      arrCsv.push(arrRowCsv);
+      if (needTsv) {
+        arrTsv.push(arrRow);
+      }
+      if (needCsv) {
+        arrCsv.push(arrRowCsv);
+      }
+      if (needSmoothed) {
+        arrSmoothed.push(arrRowSmoothed);
+      }
       arrMd.push(arrRowMd);
-      arrSmoothed.push(arrRowSmoothed);
       const l = arrRow &&  arrRow.length > 0 ? arrRow.length  : 0;
       const l2 = rowspan &&  rowspan.length > 0 ? rowspan.length  : 0;
       if (l < l2) {
@@ -489,16 +527,19 @@ export const renderInlineTokenBlock = (
         }
       }
       l = arrRow &&  arrRow.length > 0 ? arrRow.length  : 0;
+      const tsvCell = needTsv ? formatTsvCell(cellTsvLines, isSubTable) : '';
+      const csvCell = needCsv ? formatCsvCell(cellCsvLines) : '';
+      const smoothedVal = needSmoothed ? cellSmoothed : '';
       if (!mr && rowspan[l] && rowspan[l][0] > 0) {
-        arrRow.push(formatTsvCell(cellTsvLines, isSubTable));
-        arrRowCsv.push(formatCsvCell(cellCsvLines));
+        arrRow.push(tsvCell);
+        arrRowCsv.push(csvCell);
         arrRowMd.push(cellMd);
-        arrRowSmoothed.push(cellSmoothed);
+        arrRowSmoothed.push(smoothedVal);
       } else {
-        arrRow.push(formatTsvCell(cellTsvLines, isSubTable));
-        arrRowCsv.push(formatCsvCell(cellCsvLines));
+        arrRow.push(tsvCell);
+        arrRowCsv.push(csvCell);
         arrRowMd.push(cellMd);
-        arrRowSmoothed.push(cellSmoothed);
+        arrRowSmoothed.push(smoothedVal);
         if (colspan && colspan > 1) {
           for (let i = 0; i < colspan-1; i++) {
             arrRow.push('');
@@ -517,19 +558,39 @@ export const renderInlineTokenBlock = (
       let content: string = '';
       if (token.children) {
         const cellRender: RenderTableCellContentResult = renderTableCellContent(token, true, options, env, slf);
-        content += cellRender.content;
-        appendToLastLine(cellTsvLines, cellRender.tsv);
-        appendToLastLine(cellCsvLines, cellRender.csv);
-        cellMd += cellRender.tableMd;
-        cellSmoothed += cellRender.tableSmoothed;
+        if (needHtml) {
+          content += cellRender.content;
+        }
+        if (needTsv) {
+          appendToLastLine(cellTsvLines, cellRender.tsv);
+        }
+        if (needCsv) {
+          appendToLastLine(cellCsvLines, cellRender.csv);
+        }
+        if (needSmoothed) {
+          cellSmoothed += cellRender.tableSmoothed;
+        }
+        if (needMd) {
+          cellMd += cellRender.tableMd;
+        }
       } else {
         content = slf.renderInline([{type: 'text', content: token.content}], options, env);
-        appendToLastLine(cellTsvLines, content);
-        appendToLastLine(cellCsvLines, content);
-        cellMd += content;
-        cellSmoothed += content;
+        if (needTsv) {
+          appendToLastLine(cellTsvLines, content);
+        }
+        if (needCsv) {
+          appendToLastLine(cellCsvLines, content);
+        }
+        if (needSmoothed) {
+          cellSmoothed += content;
+        }
+        if (needMd) {
+          cellMd += content;
+        }
       }
-      result += content;
+      if (needHtml) {
+        result += content;
+      }
       continue;
     }
     if (!TABLE_TOKENS.has(token.token) && !TABLE_TOKENS.has(token.type)) {
@@ -546,6 +607,10 @@ export const renderInlineTokenBlock = (
       cellSmoothed = acc.cellSmoothed;
       cellTsvLines = acc.cellTsvLines;
       cellCsvLines = acc.cellCsvLines;
+      continue;
+    }
+    if (!needHtml) {
+      // Non-HTML outputs (MD / TSV / CSV only) don't need table tag markup.
       continue;
     }
     let tokenTag = token.tag;
