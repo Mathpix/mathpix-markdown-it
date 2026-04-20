@@ -274,10 +274,31 @@ export default (md: MarkdownIt, opts) => {
   clearSlugsTocItems();
   Object.assign(md.options, defaults, opts);
   md.core.ruler.push('grab_state', (state) => {
+    // Only stash the token tree when the doc actually used [[toc]] — otherwise
+    // env retains the whole tree until release. toc_body is pushed inside an
+    // inline token's children, so we scan children of top-level inline tokens.
     if (!state.env) {
-      state.env = {};
+      return;
     }
-    state.env[TOC_ENV_KEY] = state.tokens;
+    let hasToc = false;
+    for (let i = 0; i < state.tokens.length; i++) {
+      const children = state.tokens[i].children;
+      if (!children) {
+        continue;
+      }
+      for (let j = 0; j < children.length; j++) {
+        if (children[j].type === 'toc_body') {
+          hasToc = true;
+          break;
+        }
+      }
+      if (hasToc) {
+        break;
+      }
+    }
+    if (hasToc) {
+      state.env[TOC_ENV_KEY] = state.tokens;
+    }
   });
   // Insert TOC
   md.inline.ruler.after('emphasis', 'toc', toc);

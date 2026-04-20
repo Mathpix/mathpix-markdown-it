@@ -62,4 +62,19 @@ describe('parse isolation: repeat-render of same source produces identical HTML'
     const clean2 = md.render(clean);
     clean2.should.equal(clean1);
   });
+  it('math cache on env is released at end of parse', () => {
+    const md = mkMd();
+    const env = {};
+    md.parse('$x^2$ and $x^2$', env);
+    (env.__mathpix === null || env.__mathpix === undefined).should.equal(true);
+  });
+  it('TOC token-tree stash happens only when [[toc]] is used', () => {
+    const md = mkMd();
+    const envWith = {};
+    md.parse('[[toc]]\n\n# H', envWith);
+    envWith.should.have.property('__mathpix_toc_tokens');
+    const envWithout = {};
+    md.parse('# H\n\n## H2', envWithout);
+    envWithout.should.not.have.property('__mathpix_toc_tokens');
+  });
 });

@@ -36,7 +36,7 @@ import {coreInline} from './md-inline-rule/core-inline';
 import {refsInline, refInsideMathDelimiter} from './md-inline-rule/refs';
 import {hardBreak, softBreak} from './md-renderer-rules/breaks';
 import { clearLabelsList, getLabelByKeyFromLabelsList, ILabel } from "./common/labels";
-import { initMathCache } from "./common/convert-math-to-html";
+import { initMathCache, cleanupMathCache } from "./common/convert-math-to-html";
 import { getTerminatedRules, checkTagOutsideInlineCode } from './common';
 import { convertMathToHtml } from "./common/convert-math-to-html";
 import {highlightText} from "./highlight/common";
@@ -818,6 +818,13 @@ export default options => {
       md.core.ruler.at('init_math_cache', initMathCache);
     } else {
       md.core.ruler.before('normalize', 'init_math_cache', initMathCache);
+    }
+    const hasCleanupHook = typeof md.core.ruler.__find__ === 'function'
+      && md.core.ruler.__find__('cleanup_math_cache') >= 0;
+    if (hasCleanupHook) {
+      md.core.ruler.at('cleanup_math_cache', cleanupMathCache);
+    } else {
+      md.core.ruler.push('cleanup_math_cache', cleanupMathCache);
     }
     if (!md.options.htmlDisableTagMatching) {
       md.block.ruler.at("html_block", mmdHtmlBlock, {alt: ['paragraph', 'reference', 'blockquote']});

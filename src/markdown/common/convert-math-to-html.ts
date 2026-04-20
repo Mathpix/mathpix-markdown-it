@@ -55,6 +55,19 @@ export const initMathCache = (state: any): void => {
   } as MathpixEnvState;
 };
 
+/** Called from cleanup_math_cache hook at the end of every md.parse().
+ *  The cache is for within-parse dedup only; after parse it's dead weight
+ *  on env (holds MathJax html/svg strings for every unique expression). */
+export const cleanupMathCache = (state: any): void => {
+  const mx = state?.env?.[MATHPIX_ENV_KEY];
+  if (!mx) {
+    return;
+  }
+  mx.inlineCache.clear();
+  mx.displayCache.clear();
+  state.env[MATHPIX_ENV_KEY] = null;
+};
+
 const getMathpixEnv = (state: any): MathpixEnvState | null =>
   state?.env?.[MATHPIX_ENV_KEY] || null;
 

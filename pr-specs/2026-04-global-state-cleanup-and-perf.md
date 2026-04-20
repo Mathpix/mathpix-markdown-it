@@ -78,6 +78,11 @@ Sub-plugins (TOC, theorem, labels, footnotes, list-env, text counters) each main
 
 A new core-ruler hook `reset_mmd_global_state` (registered `before('normalize')` from `mathpixMarkdownPlugin`) calls all the reset functions at the start of every `md.parse()`. It respects `renderElement.startLine` so partial re-renders don't tear down the enclosing parse's cross-reference state.
 
+### Additional parse-only retention fixes
+
+- `cleanup_math_cache` core-ruler hook (pushed, end of pipeline) clears `state.env.__mathpix`. Previously the per-parse math dedup cache was only initialized, never released — MathJax html/svg strings for every unique expression stayed on env until the caller dropped it.
+- `mdPluginTOC.grab_state` stashes `state.tokens` on `state.env[TOC_ENV_KEY]` only when the document actually used `[[toc]]`, detected by a one-pass scan of inline-token children for `toc_body`. Documents without `[[toc]]` no longer retain the whole token tree on env.
+
 ---
 
 ## Done When
