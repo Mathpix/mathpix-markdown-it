@@ -27,7 +27,7 @@ export const generateUniqueId = (onlyUuid = false): string => {
 export const getColumnLines = (str: string, numCol: number = 0): Array<string> => {
   str = str
     .replace(/\{(.*?)\}/g, '')
-    .replace(/[^clrSmpb|:]/g, '').split('').join('');
+    .replace(/[^clrSmpb|:]/g, '');
   let res: Array<string> = [];
   const cLines: Array<string> = str
     .replace(/l/g, ';')
@@ -83,7 +83,7 @@ export const getColumnLines = (str: string, numCol: number = 0): Array<string> =
 };
 
 export const getColumnAlign = (align: string): string[]|[] => {
-  align = align.replace(/[^clrS|:]/g, '').split('').join('');
+  align = align.replace(/[^clrS|:]/g, '');
   align = align.replace(/[^clrS]/g, '').split('').join(' ');
   align = align
     .replace(/l/g, 'left')

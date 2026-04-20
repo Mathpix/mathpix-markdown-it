@@ -72,7 +72,7 @@ const getRows = (str: string): string[] => {
  * contains an inline list environment.
  */
 const markColIfHasList = (
-  colsToFixWidth: number[],
+  colsToFixWidth: Set<number>,
   colIndex: number,
   content?: string
 ): void => {
@@ -82,9 +82,7 @@ const markColIfHasList = (
   if (!detectLocalBlock(content)) {
     return;
   }
-  if (!colsToFixWidth.includes(colIndex)) {
-    colsToFixWidth.push(colIndex);
-  }
+  colsToFixWidth.add(colIndex);
 };
 
 const setTokensTabular = (str: string, align: string = '', options: any = {}, isSubTabular: boolean = false): Array<TTokenTabular>|null => {
@@ -96,7 +94,7 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}, is
   let data = getRowLines(rows, numCol);
   let CellsHLines: Array<Array<string>> = data.cLines;
   let CellsHLSpaces: Array<Array<string>> = data.cSpaces;
-  let colsToFixWidth: number[] = [];
+  const colsToFixWidth: Set<number> = new Set();
 
   const dataAlign: TAlignData = getVerticallyColumnAlign(align, numCol);
   const cLines: Array<string> = getColumnLines(align, numCol);
@@ -292,9 +290,7 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}, is
           }
           if (multi.subTable) {
             if (multi.subTable.some((item: TTokenTabular) => detectLocalBlock(item.content))) {
-              if (!colsToFixWidth.includes(ic)) {
-                colsToFixWidth.push(ic);
-              }
+              colsToFixWidth.add(ic);
               if (forLatex) {
                 tdOpen.meta.forceMultiFixedWidth = true;
               }
@@ -305,9 +301,7 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}, is
           } else {
             if (multi.content) {
               if (detectLocalBlock(multi.content)) {
-                if (!colsToFixWidth.includes(ic)) {
-                  colsToFixWidth.push(ic);
-                }
+                colsToFixWidth.add(ic);
                 if (forLatex) {
                   tdOpen.meta.forceMultiFixedWidth = true;
                 }
@@ -333,10 +327,8 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}, is
         let content = parseMath || getContent(cells[j]);
 
         const handleSubTable = (subTable: Array<TTokenTabular>) => {
-          if (!colsToFixWidth.includes(ic)) {
-            if (subTable.some((item: TTokenTabular) => detectLocalBlock(item.content))) {
-              colsToFixWidth.push(ic);
-            }
+          if (subTable.some((item: TTokenTabular) => detectLocalBlock(item.content))) {
+            colsToFixWidth.add(ic);
           }
           return AddTdSubTable(subTable,
             { h: cAlign[ic], v: vAlign[ic], w: cWidth[ic] },
@@ -394,15 +386,16 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}, is
   });
   res.push(SHARED_TABLE_CLOSE);
   if (forLatex) {
+    const colsToFixWidthArr = Array.from(colsToFixWidth);
     tableOpen.meta = {
-      colsToFixWidth,
+      colsToFixWidth: colsToFixWidthArr,
       colSpecs: colSpec,
       colCount: numCol,
       isSubTabular,
       vLineSpec: cLines
     }
-    if (colsToFixWidth?.length) {
-      tableOpen.meta.shouldRewriteColSpec = shouldRewriteColSpec(colsToFixWidth, colSpec);
+    if (colsToFixWidthArr.length) {
+      tableOpen.meta.shouldRewriteColSpec = shouldRewriteColSpec(colsToFixWidthArr, colSpec);
     }
   }
   return res;

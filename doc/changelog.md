@@ -4,6 +4,8 @@
 
 - Algorithms:
   - Rewrote `getSubMath()` from recursive to iterative single-pass (O(N×M) → O(N+M)); `getMathTableContent()` now uses `parts[]` + `join()` instead of repeated slice+concat. The `startPos: number = 0` optional parameter is preserved for signature compatibility with deep-import consumers.
+  - `colsToFixWidth` in the tabular parser converted from `Array` + `.includes()` + `.push()` to `Set<number>` for O(1) dedup-on-insert. Previous code was O(N²) in cell count for wide tables; Set path is O(N). Converted to array once at `tableOpen.meta` assignment.
+  - Removed two dead `.split('').join('')` round-trips in `common.ts` (`getColumnLines` and `getColumnAlign`) — identity operations that allocated a per-call character array. The `.split('').join(' ')` call on the next line is NOT a no-op and is preserved.
   - `mathTable`, `subTabular`, `extractedCodeBlocks` converted from Array + `findIndex()` to Map for O(1) lookups.
   - `labelsByKey` + `labelsByUuid` Map indexes; `labelsList` export kept as a deprecated backward-compatible `Proxy` that returns a fresh snapshot of `labelsByKey.values()` on each access — supports `.length`, iteration, and Array methods.
   - `diagboxById` reverse Map + `ClearDiagboxTable()`.

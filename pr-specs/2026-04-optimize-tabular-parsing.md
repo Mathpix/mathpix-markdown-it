@@ -65,6 +65,14 @@ Single-pass scan with a local `new RegExp(RE_MATH_OPEN.source, 'g')`:
 - `shouldSkipDollar()` validates `$`/`$$` edge cases
 - `mathTablePush()` accepts both `(id, content)` and `({id, content})` for backward compatibility
 
+### colsToFixWidth: Array → Set (parse-tabular.ts)
+
+The per-table set of column indices that need fixed width was tracked as a `number[]` with `.includes()` + `.push()` for dedup — O(N²) in cell count for wide tables. Converted to a local `Set<number>` with `.add()` (O(1) dedup). Converted to a plain array once at `tableOpen.meta.colsToFixWidth` assignment so downstream consumers (`shouldRewriteColSpec`) keep their existing array input shape. Removes four identical `if-includes-push` fragments along the way.
+
+### Dead split/join round-trips removed (common.ts)
+
+`getColumnLines` and `getColumnAlign` ended with `.split('').join('')` — an identity operation that allocates a per-call character array for nothing. The neighbouring `.split('').join(' ')` (which inserts spaces between characters) is not a no-op and is preserved.
+
 ### Per-parse math cache (convert-math-to-html.ts)
 
 ```
