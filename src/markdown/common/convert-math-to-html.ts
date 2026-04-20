@@ -18,7 +18,13 @@ type TypesetResult = {
   ascii_tsv?: string;
   ascii_csv?: string;
   ascii_md?: string;
-  labels?: Record<string, any>;
+  /** Map of label key → {tag, id} produced by MathJax when the math source
+   *  contains `\label{...}`. `tag` is the rendered number/string for the
+   *  equation; `id` is the per-parse DOM id suffix used by ref/eqref. */
+  labels?: Record<string, { tag: string; id?: string }>;
+  /** Set on cache-hit returns so the caller can skip re-running addIntoLabelsList and
+   * the inline-parse of each label tag — labels were already registered on first miss. */
+  _labelsRegistered?: boolean;
 };
 
 type CachedResult = TypesetResult & { _mjxId?: string };
@@ -222,7 +228,13 @@ const typesetMathForToken = (params: {
         outputFormat, inputLatex: token.inputLatex,
         renderedHtml: hitHtml, renderedData: hitData,
       });
-      return { ...rest, html: hitHtml, data: hitData, ...fmt };
+      return {
+        ...rest,
+        html: hitHtml,
+        data: hitData,
+        ...fmt,
+        _labelsRegistered: true
+      };
     }
   }
   // 3) AsciiMath extraction requested
@@ -320,26 +332,31 @@ export const convertMathToHtml = (state, token, options) => {
     // After typesetting, equation counter may have advanced.
     const number = MathJax.GetLastEquationNumber();
     // Collect labels (e.g. \label{...}) so we can resolve refs later.
+    // On cache hit the labels were already parsed & registered on first miss;
+    // re-running inline.parse + addIntoLabelsList is idempotent for the same
+    // key+content, so we skip the loop and only recompute idLabels.
     let idLabels: string = '';
     if (token.labels) {
       const labelKeys: string[] = Object.keys(token.labels);
       idLabels = labelKeys.length
         ? encodeURIComponent(labelKeys.join('_'))
         : '';
-      for (const key in token.labels) {
-        const tagContent = token.labels[key].tag;
-        // Parse label content as inline markdown-it tokens
-        // so we can render it consistently in UI.
-        const tagChildrenTokens: any[] = [];
-        state.md.inline.parse(tagContent, state.md, state.env, tagChildrenTokens);
-        addIntoLabelsList({
-          key,
-          id: idLabels,
-          tag: tagContent,
-          tagId: token.labels[key].id,
-          tagChildrenTokens,
-          type: eLabelType.equation
-        });
+      if (!res._labelsRegistered) {
+        for (const key in token.labels) {
+          const tagContent = token.labels[key].tag;
+          // Parse label content as inline markdown-it tokens
+          // so we can render it consistently in UI.
+          const tagChildrenTokens: any[] = [];
+          state.md.inline.parse(tagContent, state.md, state.env, tagChildrenTokens);
+          addIntoLabelsList({
+            key,
+            id: idLabels,
+            tag: tagContent,
+            tagId: token.labels[key].id,
+            tagChildrenTokens,
+            type: eLabelType.equation
+          });
+        }
       }
     }
     token.idLabels = idLabels;

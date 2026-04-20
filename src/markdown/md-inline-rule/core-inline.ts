@@ -61,16 +61,26 @@ const walkInlineInTokens = (
       cachedStateEnv = null;
     }
     if (isInlineLike(tok)) {
+      // Mutate state.env in place — rebinding would desync it from the env
+      // reference the caller of md.render(src, env) passes to render rules.
+      // Use a private inlineEnv for the nested inline.parse() call.
+      let inlineEnv: any;
       if (cachedStateEnv && tokEnv === lastEnvToInline) {
-        state.env = cachedStateEnv;
+        inlineEnv = cachedStateEnv;
       } else {
-        state.env = Object.assign({}, { ...state.env }, {
+        inlineEnv = Object.assign({}, state.env, {
           currentTag: getCurrentTag(),
         }, mergedEnvToInline);
-        if (tokEnv) cachedStateEnv = state.env;
+        if (tokEnv) {
+          cachedStateEnv = inlineEnv;
+        }
+      }
+      state.env.currentTag = getCurrentTag();
+      if (mergedEnvToInline && typeof mergedEnvToInline === 'object') {
+        Object.assign(state.env, mergedEnvToInline);
       }
       if (!tok.children?.length) {
-        state.md.inline.parse(tok.content, state.md, state.env, tok.children);
+        state.md.inline.parse(tok.content, state.md, inlineEnv, tok.children);
       }
       if (tok.meta?.isMathInText && tok.children?.length) {
         applyAttrToInlineMath(tok, "data-math-in-text", "true");

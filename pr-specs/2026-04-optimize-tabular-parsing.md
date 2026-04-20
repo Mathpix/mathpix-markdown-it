@@ -90,6 +90,9 @@ that the caller will not read.
 Single-pass scan with a local `new RegExp(RE_MATH_OPEN.source, 'g')`:
 - `RE_MATH_OPEN` stored as literal without the `/g` flag (immutable template)
 - Each call creates a local copy — reentrant-safe
+- The `startPos: number = 0` optional parameter is preserved for signature
+  compatibility with the earlier recursive implementation; it is seeked to
+  via `re.lastIndex = startPos` before the scan loop
 - `getEndMarker()` uses capture groups for eqref/ref detection (no substring
   matching)
 - `shouldSkipDollar()` validates `$`/`$$` edge cases
@@ -109,6 +112,14 @@ state.env.__mathpix = {
 Initialized by the `init_math_cache` core-ruler hook. On cache hit with
 accessibility, the original `mjx-assistive-mml` id is replaced with a fresh
 one from `MathJax.nextAssistiveId()`.
+
+Cache hits mark the returned `TypesetResult` with `_labelsRegistered: true`
+so `convertMathToHtml` skips the label-registration loop — the
+`state.md.inline.parse` for every `\label{}` tag and the
+`addIntoLabelsList` side-effect already ran on the first miss and are
+idempotent for the same key+content. `idLabels` is still computed from
+`Object.keys(token.labels)` so downstream ref/eqref resolution is
+unaffected.
 
 ### `outMath.skipMathToHtml` (convert-math-to-html.ts)
 
@@ -146,7 +157,14 @@ markers appear. `tbody_close` is NOT shared because it carries a per-table
 
 `StatePushTabulars` no longer assigns `content` / `children = []` onto
 marker tokens — those fields are never read on open/close markers and
-assignment would throw on the frozen close singletons.
+assignment would throw on the frozen close singletons. The multi-column
+branch of `parse-tabular.ts` also pushes `SHARED_TD_CLOSE` directly
+instead of allocating a fresh `{token:'td_close', ...}` object per cell.
+
+`addStyle` / `addHLineIntoStyle` (`tabular-td.ts`) check the input attrs
+for the `attrsSharedMarker` symbol and clone before mutating so that
+callers which pass in a shared-attrs array do not corrupt the cached
+object.
 
 ### Output gating in renderInlineTokenBlock / renderNonTableTokenIntoCell
 

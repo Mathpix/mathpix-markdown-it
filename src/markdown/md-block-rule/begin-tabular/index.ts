@@ -166,7 +166,7 @@ const StatePushParagraphOpen = (state, startLine: number, align: string, centerT
     if (align) {
       token.attrs.push(['style', `text-align: ${align}`]);
     } else if (centerTables) {
-      token.attrs.push(['style', `text-align: center}`]);
+      token.attrs.push(['style', `text-align: center`]);
     }
   }
   if (centerTables && forLatex) {

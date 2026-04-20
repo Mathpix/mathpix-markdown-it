@@ -148,4 +148,28 @@ describe('MathJax per-parse typeset cache (state.env scoped):', () => {
     const html = md.render(doc);
     (html.match(/<mathmlword/gi) || []).length.should.be.greaterThan(0);
   });
+  it('duplicate display_math with \\label runs MathJax once and registers the label once', () => {
+    const { clearLabelsList, getLabelsList } = require('../lib/markdown/common/labels.js');
+    clearLabelsList();
+    const { MathpixMarkdownModel } = require('../lib/index.js');
+    MathpixMarkdownModel.markdownToHTML(
+      '$$a\\label{eqA}$$\n\n$$a\\label{eqA}$$',
+      { outMath: { include_svg: true }, mathJax: {} }
+    );
+    callCount.should.equal(1);
+    getLabelsList().filter(l => l.key === 'eqA').length.should.equal(1);
+  });
+  // Per-parse caches (subTabular / mathTable / etc) must be empty at the start
+  // of every parse — otherwise repeated parses on the same md instance drift.
+  it('repeated parses on the same md instance produce identical output', () => {
+    const md = markdownIt({ html: true, breaks: true }).use(mathpixMarkdownPlugin, {
+      outMath: { include_svg: true }, mathJax: {}, renderElement: {},
+      smiles: {}, forDocx: false, forLatex: false,
+    });
+    const src = '\\begin{tabular}{|c|} \\hline $x$ \\\\ \\hline \\end{tabular}';
+    const first = md.render(src);
+    for (let i = 0; i < 4; i++) {
+      md.render(src).should.equal(first);
+    }
+  });
 });

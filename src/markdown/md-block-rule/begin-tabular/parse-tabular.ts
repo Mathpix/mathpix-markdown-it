@@ -2,7 +2,7 @@ import { TTokenTabular } from "./index";
 import {
   addHLineIntoStyle, AddTd, AddTdSubTable,
   getSharedTableOpenAttrs, getSharedTbodyOpenAttrs, getSharedTrOpenAttrs,
-  SHARED_TR_CLOSE, SHARED_TABLE_CLOSE,
+  SHARED_TD_CLOSE, SHARED_TR_CLOSE, SHARED_TABLE_CLOSE,
 } from "./tabular-td";
 import {
   getContent, getRowLines, getCellsAll, getDecimal, TDecimal,
@@ -315,8 +315,7 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}, is
               res.push({token:'inline', type:'inline', tag: '', n: 0, content: multi.content});
             }
           }
-
-          res.push({token:'td_close', type:'td_close', tag: 'td', n: -1});
+          res.push(SHARED_TD_CLOSE);
           continue;
         }
 

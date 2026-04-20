@@ -28,6 +28,25 @@ export interface ILabel {
 let labelsByKey: Map<string, ILabel> = new Map();
 let labelsByUuid: Map<string, ILabel> = new Map();
 
+/**
+ * @deprecated Use `getLabelsList()`, `getLabelByKeyFromLabelsList()`, or
+ * `getLabelByUuidFromLabelsList()` instead. Kept as a derived read-only view
+ * for deep-import consumers that imported the array directly.
+ */
+export const labelsList: ReadonlyArray<ILabel> = new Proxy([] as ILabel[], {
+  get(_target, prop, receiver) {
+    const snapshot = Array.from(labelsByKey.values());
+    if (prop === 'length') {
+      return snapshot.length;
+    }
+    if (prop === Symbol.iterator) {
+      return snapshot[Symbol.iterator].bind(snapshot);
+    }
+    const value = (snapshot as any)[prop];
+    return typeof value === 'function' ? value.bind(snapshot) : value;
+  },
+}) as ReadonlyArray<ILabel>;
+
 export const addIntoLabelsList = (label: ILabel) => {
   const existing = labelsByKey.get(label.key);
   if (existing) {

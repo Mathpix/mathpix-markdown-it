@@ -201,6 +201,12 @@ export const setColumnLines = (aligns: TAligns| null, lines: TLines): string[] =
 };
 
 export const addStyle = (attrs: any[], style: string): Array<TAttrs> => {
+  // Clone-on-write: shared attrs (from the per-parse cache) are read-only.
+  // Clone the outer array AND each inner [name, value] tuple, because
+  // `attrs[i][1] += style` below would otherwise mutate the cached tuple.
+  if (attrs && (attrs as any)[attrsSharedMarker]) {
+    attrs = attrs.map(pair => Array.isArray(pair) ? [pair[0], pair[1]] : pair);
+  }
   let index: number = attrs.findIndex(item => item[0]==='style');
   if (index >= 0) {
     attrs[index][1] += style;

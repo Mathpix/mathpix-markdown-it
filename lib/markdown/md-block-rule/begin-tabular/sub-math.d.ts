@@ -9,7 +9,9 @@ export declare const mathTablePush: (idOrItem: string | {
 export declare const getMathTableContent: (sub: string, i: number) => string;
 /**
  * Extract math expressions from a string, replacing them with placeholders.
- * Iterative single-pass: scans the original string once with a local RegExp,
- * collects non-math segments and placeholders into an array, joins at the end.
+ * Iterative single-pass: scans the original string once, collects non-math
+ * segments and placeholders into an array, joins at the end.
+ *
+ * `startPos` is a seek offset applied via `re.lastIndex` before scanning.
  */
-export declare const getSubMath: (str: string) => string;
+export declare const getSubMath: (str: string, startPos?: number) => string;

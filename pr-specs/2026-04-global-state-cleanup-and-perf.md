@@ -99,7 +99,8 @@ and render.
 - Highlight rendering files (`render-rule-highlights.ts`, `common.ts`) are NOT
   modified — reverted to master to avoid behavioural regression.
 - `labelsList` export kept for deep-import backward compatibility (deprecated,
-  derived from `labelsByKey` Map).
+  exposed as a `Proxy` that returns a fresh snapshot of `labelsByKey.values()`
+  on each access — supports `.length`, iteration, and Array methods).
 
 ---
 
@@ -184,6 +185,11 @@ if (envToInline && typeof envToInline === 'object') {
 }
 state.md.inline.parse(token.content, state.md, inlineEnv, token.children);
 ```
+
+The same pattern is applied in the deeper recursive walker
+`walkInlineInTokens` (used by `footnote_latex` / `tabular` deep-walk): it
+now also builds a private `inlineEnv` per token and mutates `state.env` in
+place, rather than rebinding it.
 
 ---
 

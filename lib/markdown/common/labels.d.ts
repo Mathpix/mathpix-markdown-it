@@ -23,6 +23,12 @@ export interface ILabel {
     type: eLabelType;
     tokenUuidInParentBlock?: string; /** uuid of parent block */
 }
+/**
+ * @deprecated Use `getLabelsList()`, `getLabelByKeyFromLabelsList()`, or
+ * `getLabelByUuidFromLabelsList()` instead. Kept as a derived read-only view
+ * for deep-import consumers that imported the array directly.
+ */
+export declare const labelsList: ReadonlyArray<ILabel>;
 export declare const addIntoLabelsList: (label: ILabel) => void;
 export declare const clearLabelsList: () => void;
 export declare const getLabelByKeyFromLabelsList: (key: string) => ILabel;

@@ -10,6 +10,10 @@ import {
 
 const RE_MATH_OPEN = /\\\\\[|\\\[|\\\\\(|\\\(|\$\$|\$|\\begin\{([^}]*)\}|eqref\{([^}]*)\}|ref\{([^}]*)\}/;
 
+// Shared `/g`-flag scanner reused across calls — getSubMath is not reentrant
+// (no recursion, no callbacks out), so we just reset lastIndex on entry.
+const RE_MATH_OPEN_G = new RegExp(RE_MATH_OPEN.source, 'g');
+
 let mathTable: Map<string, string> = new Map();
 
 export const ClearSubMathLists = (): void => {
@@ -99,11 +103,14 @@ const shouldSkipDollar = (
 
 /**
  * Extract math expressions from a string, replacing them with placeholders.
- * Iterative single-pass: scans the original string once with a local RegExp,
- * collects non-math segments and placeholders into an array, joins at the end.
+ * Iterative single-pass: scans the original string once, collects non-math
+ * segments and placeholders into an array, joins at the end.
+ *
+ * `startPos` is a seek offset applied via `re.lastIndex` before scanning.
  */
-export const getSubMath = (str: string): string => {
-  const re = new RegExp(RE_MATH_OPEN.source, 'g');
+export const getSubMath = (str: string, startPos: number = 0): string => {
+  const re = RE_MATH_OPEN_G;
+  re.lastIndex = startPos > 0 ? startPos : 0;
   const parts: string[] = [];
   let lastCopied = 0;
   let match: RegExpExecArray | null;
