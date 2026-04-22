@@ -38,13 +38,14 @@ import { ISmilesOptions } from './markdown/md-chemistry';
 import { resetTheoremEnvironments } from './markdown/md-theorem/helper';
 import { rest_mmd_footnotes_list } from './markdown/md-latex-footnotes/utils';
 import { FootnoteItem } from './markdown/md-latex-footnotes/interfaces';
-import { 
-  eLabelType, 
-  ILabel, 
-  getLabelsList, 
-  getLabelByKeyFromLabelsList, 
-  clearLabelsList 
+import {
+  eLabelType,
+  ILabel,
+  getLabelsList,
+  getLabelByKeyFromLabelsList,
+  clearLabelsList
 } from "./markdown/common/labels";
+import { resetMmdGlobalState } from "./markdown/common/reset-mmd-state";
 
 import { normalizeLink } from './helpers/normalize-link';
 
@@ -65,6 +66,7 @@ export {
   ParserErrors,
   Footnotes,
   eLabelType, ILabel, getLabelsList, getLabelByKeyFromLabelsList, clearLabelsList,
+  resetMmdGlobalState,
   normalizeLink,
   RenderOptions
 };

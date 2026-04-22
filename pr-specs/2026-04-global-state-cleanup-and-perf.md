@@ -76,12 +76,16 @@ Sub-plugins (TOC, theorem, labels, footnotes, list-env, text counters) each main
 - `resetTextCounter` / size counter / `MathJax.Reset()` (equation numbering) were also wrapper-only.
 - `ParseErrorList` was the worst offender: `ClearParseErrorList()` was defined but never called anywhere — tabular parse errors grew monotonically.
 
-A new core-ruler hook `reset_mmd_global_state` (registered `before('normalize')` from `mathpixMarkdownPlugin`) calls all the reset functions at the start of every `md.parse()`. It respects `renderElement.startLine` so partial re-renders don't tear down the enclosing parse's cross-reference state.
+A new core-ruler hook `reset_mmd_global_state` (registered `before('normalize')` from `mathpixMarkdownPlugin`) calls all the reset functions at the start of every `md.parse()`. It respects `renderElement.startLine` so partial re-renders don't tear down the enclosing parse's cross-reference state. The same implementation is exported as `resetMmdGlobalState()` from the package root so one-shot converters (e.g. DOCX export) can release module-level state immediately after render without waiting for the next parse.
 
 ### Additional parse-only retention fixes
 
 - `cleanup_math_cache` core-ruler hook (pushed, end of pipeline) clears `state.env.__mathpix`. Previously the per-parse math dedup cache was only initialized, never released — MathJax html/svg strings for every unique expression stayed on env until the caller dropped it.
 - `mdPluginTOC.grab_state` stashes `state.tokens` on `state.env[TOC_ENV_KEY]` only when the document actually used `[[toc]]`, detected by a one-pass scan of inline-token children for `toc_body`. Documents without `[[toc]]` no longer retain the whole token tree on env.
+
+### `markdownToHtmlPipelineSegments` balance fix
+
+The segments renderer tracked a single `pendingCloseTag` + `pendingLevel` pair, so a nested same-type same-level `_open` terminated the segment mid-block. Concrete case: md-theorem wraps an inner `paragraph_open` at level 0 inside the outer `paragraph_open` class `theorem_block` — the first `paragraph_close` closed the segment prematurely, leaving `<div><div>...</div>` in one segment and `</div></div>...` in the next. Added a `pendingDepth` counter so nested opens of the same type at the same level increment depth; the segment closes only when depth drops back to zero. Regression test in `tests/_html-segments.js` covers 38 scenarios across all block rules from `mmdRules.ts`.
 
 ---
 
