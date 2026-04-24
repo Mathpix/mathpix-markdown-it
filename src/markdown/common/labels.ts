@@ -27,15 +27,29 @@ export interface ILabel {
 
 let labelsByKey: Map<string, ILabel> = new Map();
 let labelsByUuid: Map<string, ILabel> = new Map();
+let labelsVersion: number = 0;
+let labelsSnapshot: ILabel[] | null = null;
+let labelsSnapshotVersion: number = -1;
+
+const getLabelsSnapshot = (): ILabel[] => {
+  if (labelsSnapshotVersion !== labelsVersion) {
+    labelsSnapshot = Array.from(labelsByKey.values());
+    labelsSnapshotVersion = labelsVersion;
+  }
+  return labelsSnapshot;
+};
 
 /**
  * @deprecated Use `getLabelsList()`, `getLabelByKeyFromLabelsList()`, or
  * `getLabelByUuidFromLabelsList()` instead. Kept as a derived read-only view
  * for deep-import consumers that imported the array directly.
+ *
+ * Reads return a cached snapshot of `labelsByKey.values()` — writes (`.push`,
+ * index assignment) target the throwaway target array and are effectively ignored.
  */
 export const labelsList: ReadonlyArray<ILabel> = new Proxy([] as ILabel[], {
   get(_target, prop, receiver) {
-    const snapshot = Array.from(labelsByKey.values());
+    const snapshot = getLabelsSnapshot();
     if (prop === 'length') {
       return snapshot.length;
     }
@@ -58,6 +72,7 @@ export const addIntoLabelsList = (label: ILabel) => {
     if (label.tokenUuidInParentBlock) {
       labelsByUuid.set(label.tokenUuidInParentBlock, label);
     }
+    labelsVersion++;
     return;
   }
   label = groupLabelIdByUuidFromLabelsList(label);
@@ -65,11 +80,13 @@ export const addIntoLabelsList = (label: ILabel) => {
   if (label.tokenUuidInParentBlock) {
     labelsByUuid.set(label.tokenUuidInParentBlock, label);
   }
+  labelsVersion++;
 };
 
 export const clearLabelsList = () => {
   labelsByKey.clear();
   labelsByUuid.clear();
+  labelsVersion++;
 };
 
 export const getLabelByKeyFromLabelsList = (key: string): ILabel => {

@@ -62,7 +62,7 @@ Fix memory leaks from module-level state, improve lookup performance for tabular
 - `reset_tabular_state` and `cleanup_tabular_state` both respect `renderElement.startLine` — partial renders skip cleanup so the enclosing re-parse still sees the cached state.
 - `labelsByKey` / `labelsByUuid` survive `cleanup_tabular_state` — labels are read by render rules for `\ref{}` / `\eqref{}` resolution.
 - Highlight rendering files (`render-rule-highlights.ts`, `common.ts`) are NOT modified — reverted to master to avoid behavioural regression.
-- `labelsList` export kept for deep-import backward compatibility (deprecated, exposed as a `Proxy` that returns a fresh snapshot of `labelsByKey.values()` on each access — supports `.length`, iteration, and Array methods).
+- `labelsList` export kept for deep-import backward compatibility (deprecated, exposed as a `Proxy` that returns a version-cached snapshot of `labelsByKey.values()` — snapshot is rebuilt only when `addIntoLabelsList` / `clearLabelsList` bumps the version. Supports `.length`, iteration, and Array methods. Mutations (`.push`, index assignment) target the throwaway target array and are effectively ignored).
 
 ### Per-parse cross-plugin state reset
 

@@ -173,3 +173,53 @@ describe('MathJax per-parse typeset cache (state.env scoped):', () => {
     }
   });
 });
+
+describe('outMath.skipMathToHtml:', () => {
+  const getInlineMathTokens = (tokens) =>
+    tokens.flatMap(t => t.children || []).filter(t => t.type === 'inline_math');
+
+  it('skipMathToHtml: true — token.mathEquation is unset, mathData.svg is absent', () => {
+    const md = markdownIt({ html: true, breaks: true }).use(mathpixMarkdownPlugin, {
+      outMath: { include_svg: true, skipMathToHtml: true },
+      mathJax: {}, renderElement: {}, smiles: {},
+    });
+    const [math] = getInlineMathTokens(md.parse('$x^2$', {}));
+    should.not.exist(math.mathEquation);
+    if (math.mathData) {
+      should.not.exist(math.mathData.svg);
+    }
+  });
+
+  it('skipMathToHtml: false (default) — token.mathEquation is populated', () => {
+    const md = markdownIt({ html: true, breaks: true }).use(mathpixMarkdownPlugin, {
+      outMath: { include_svg: true },
+      mathJax: {}, renderElement: {}, smiles: {},
+    });
+    const [math] = getInlineMathTokens(md.parse('$x^2$', {}));
+    math.mathEquation.should.be.a('string').and.match(/<mjx-/);
+  });
+
+  it('skipMathToHtml overrides include_svg: true (no SVG serialization)', () => {
+    const md = markdownIt({ html: true, breaks: true }).use(mathpixMarkdownPlugin, {
+      outMath: { include_svg: true, skipMathToHtml: true },
+      mathJax: {}, renderElement: {}, smiles: {},
+    });
+    const html = md.render('$x^2$');
+    html.should.not.include('<svg');
+  });
+
+  it('skipMathToHtml: true — ascii / linear outputs still populate', () => {
+    const md = markdownIt({ html: true, breaks: true }).use(mathpixMarkdownPlugin, {
+      outMath: {
+        include_svg: true,
+        skipMathToHtml: true,
+        include_asciimath: true,
+        include_linearmath: true,
+      },
+      mathJax: {}, renderElement: {}, smiles: {},
+    });
+    const [math] = getInlineMathTokens(md.parse('$x^2$', {}));
+    math.ascii.should.be.a('string');
+    math.linear.should.be.a('string');
+  });
+});

@@ -9,9 +9,9 @@ import { resetListState } from '../md-latex-lists-env/list-state';
 import { resetSizeCounter } from './counters';
 import { MathJax } from '../../mathjax';
 
-/** Reset per-parse module-level state. Auto-invoked at parse start via the
- *  reset_mmd_global_state core-ruler hook; export exists for one-shot
- *  converters to release state after render. */
+/** Resets module-level cross-parse state: TOC slugs, labels, theorem/list/footnote counters, MathJax numbering.
+ *  Does NOT clear state.env.__mathpix (released with env) or tabular caches (cleanup_tabular_state hook handles those).
+ *  Auto-invoked via reset_mmd_global_state hook; exported for one-shot converters. */
 export const resetMmdGlobalState = (): void => {
   clearSlugsTocItems();
   ClearParseErrorList();

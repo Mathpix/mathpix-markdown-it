@@ -2,7 +2,7 @@ import { TAttrs, TTokenTabular } from './index';
 import { TDecimal } from "./common";
 import { getLatexTextWidth } from "../../utils";
 import { getExtractedCodeBlockContent } from "./sub-code";
-import { preserveNewlineUnlessDoubleAngleUuidRegex } from "../../common/consts";
+import { preserveNewlineUnlessDoubleAngleUuidRegex, attrsSharedMarker } from "../../common/consts";
 
 type TLines = {left?: string, right?: string, bottom?: string, top?: string};
 type TAligns = {h?: string, v?: string, w?: string};
@@ -69,14 +69,10 @@ const horizontalCellLine = (line: string, pos: string = 'bottom'): string => {
   }
 };
 
-// Per-parse dedup caches: style strings and full <td> attrs arrays. Shared
-// attrs must be treated read-only; mutators clone via `attrsSharedMarker`
-// (see `tokenAttrSet` in md-renderer-rules/render-tabular.ts).
+// Per-parse dedup caches for style strings and <td> attrs arrays. Shared attrs
+// are read-only; mutators clone via `attrsSharedMarker` (see tokenAttrSet).
 const columnStyleCache = new Map<string, string>();
 const cellAttrsCache = new Map<string, TAttrs[]>();
-
-/** Marker on shared attrs arrays; mutators must clone before writing. */
-export const attrsSharedMarker = Symbol.for('mathpix.tabular.attrsShared');
 
 const markAttrsShared = (attrs: TAttrs[]): TAttrs[] => {
   Object.defineProperty(attrs, attrsSharedMarker, {
@@ -148,13 +144,16 @@ const TR_OPEN_STYLE = 'border-top: none !important; border-bottom: none !importa
 
 export const getSharedTableOpenAttrs = (extraClass?: string, skipVisual: boolean = false): TAttrs[] | undefined => {
   // class='tabular' is HTML-only (used for table detection by DOCX/PPTX builders).
+  // Under skipVisual, keep only data-type (non-visual subtable marker).
   if (skipVisual && !extraClass) return undefined;
-  const key = extraClass || '';
+  const key = (skipVisual ? 'v:' : '') + (extraClass || '');
   const cached = TABLE_OPEN_ATTRS_CACHE.get(key);
   if (cached) return cached;
-  const attrs: TAttrs[] = extraClass
-    ? [['class', 'tabular'], ['data-type', extraClass]]
-    : [['class', 'tabular']];
+  const attrs: TAttrs[] = skipVisual
+    ? [['data-type', extraClass as string]]
+    : (extraClass
+      ? [['class', 'tabular'], ['data-type', extraClass]]
+      : [['class', 'tabular']]);
   markAttrsShared(attrs);
   TABLE_OPEN_ATTRS_CACHE.set(key, attrs);
   return attrs;
@@ -180,9 +179,7 @@ export const getSharedTrOpenAttrs = (skipVisual: boolean = false): TAttrs[] | un
   return attrs;
 };
 
-// Frozen shared close-token markers — fixed shape, never mutated.
-// tbody_close is NOT shared because it carries a per-table `latex` payload
-// when `forLatex` is set.
+// Frozen shared close-tokens. SHARED_TBODY_CLOSE only when !forLatex (forLatex carries per-table `latex` payload).
 export const SHARED_TD_CLOSE: TTokenTabular = Object.freeze({
   token: 'td_close', type: 'td_close', tag: 'td', n: -1,
 }) as TTokenTabular;
@@ -191,6 +188,9 @@ export const SHARED_TR_CLOSE: TTokenTabular = Object.freeze({
 }) as TTokenTabular;
 export const SHARED_TABLE_CLOSE: TTokenTabular = Object.freeze({
   token: 'table_close', type: 'table_close', tag: 'table', n: -1,
+}) as TTokenTabular;
+export const SHARED_TBODY_CLOSE: TTokenTabular = Object.freeze({
+  token: 'tbody_close', type: 'tbody_close', tag: 'tbody', n: -1,
 }) as TTokenTabular;
 
 // Legacy entry point: callers that build their own attrs array (AddTdSubTable,
@@ -204,6 +204,7 @@ export const addStyle = (attrs: any[], style: string): Array<TAttrs> => {
   // Clone-on-write: shared attrs (from the per-parse cache) are read-only.
   // Clone the outer array AND each inner [name, value] tuple, because
   // `attrs[i][1] += style` below would otherwise mutate the cached tuple.
+  // Array.isArray guard: legacy callers may pass mixed-shape attrs; preserve non-tuple items as-is.
   if (attrs && (attrs as any)[attrsSharedMarker]) {
     attrs = attrs.map(pair => Array.isArray(pair) ? [pair[0], pair[1]] : pair);
   }

@@ -77,4 +77,18 @@ describe('parse isolation: repeat-render of same source produces identical HTML'
     md.parse('# H\n\n## H2', envWithout);
     envWithout.should.not.have.property('__mathpix_toc_tokens');
   });
+  // coreInline writes envToInline keys to state.env for block-rule visibility.
+  // This test pins the invariant: two tokens with different envToInline objects
+  // render correctly; a regression here signals iteration-level leak affecting output.
+  it('two section tokens with envToInline render independently', () => {
+    const md = mkMd();
+    const src = '\\section{First // line}\n\nplain text\n\n\\section{Second // line}\n';
+    const first = md.render(src);
+    const second = md.render(src);
+    second.should.equal(first);
+    // doubleSlashToSoftBreak from section envToInline must take effect in BOTH
+    // section titles and NOT bleed into the plain paragraph between them.
+    first.should.match(/First/);
+    first.should.match(/Second/);
+  });
 });

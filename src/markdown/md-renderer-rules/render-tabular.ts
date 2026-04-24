@@ -8,6 +8,7 @@ import {
   RenderTableCellContentResult
 } from "../common/render-table-cell-content";
 import { getItemizePlainMarker, getEnumeratePlainMarker } from "../common/list-markers";
+import { attrsSharedMarker } from "../common/consts";
 
 const TABLE_TOKENS = new Set([
   'table_open','table_close','tbody_open','tbody_close','tr_open','tr_close','td_open','td_close',
@@ -83,14 +84,10 @@ const formatCsvCell = (lines: string[]): string => {
   return(lines ?? []).join('\n');
 };
 
-// Shared-attrs marker (see tabular-td.ts::attrsSharedMarker). Resolved by
-// name to sidestep a circular import between renderer and parser modules.
-const ATTRS_SHARED = Symbol.for('mathpix.tabular.attrsShared');
-
 /** Clone-on-write: detach shared `token.attrs` before a mutator touches it. */
 const ensureOwnAttrs = (token): void => {
   const attrs = token.attrs;
-  if (attrs && attrs[ATTRS_SHARED]) {
+  if (attrs && attrs[attrsSharedMarker]) {
     token.attrs = attrs.map(pair => [pair[0], pair[1]]);
   }
 };
@@ -140,6 +137,27 @@ type RenderCtx = {
   highlight?: any;
 };
 
+type OutputGates = {
+  needHtml: boolean;
+  needTsv: boolean;
+  needCsv: boolean;
+  needMd: boolean;
+  needSmoothed: boolean;
+};
+
+// Shared by renderInlineTokenBlock and renderNonTableTokenIntoCell so gates can't drift.
+const computeOutputGates = (options: any): OutputGates => {
+  const outMath = options?.outMath || {};
+  const forMD = !!options?.forMD;
+  return {
+    needHtml: !forMD && outMath.include_table_html !== false,
+    needTsv: !!outMath.include_tsv,
+    needCsv: !!outMath.include_csv,
+    needMd: forMD || !!outMath.include_table_markdown,
+    needSmoothed: !!options?.forPptx,
+  };
+};
+
 /**
  * Renders a non-table token into the current table-cell accumulators.
  *
@@ -159,18 +177,13 @@ const renderNonTableTokenIntoCell = (
   acc: CellAccumulators
 ): void => {
   const { options, env, slf, highlight } = ctx;
-  const outMath = options?.outMath || {};
-  const forMD = !!options?.forMD;
-  const needHtml = !forMD && outMath.include_table_html !== false;
-  const needTsv = !!outMath.include_tsv;
-  const needCsv = !!outMath.include_csv;
-  const needSmoothed = !!options?.forPptx;
+  const { needHtml, needTsv, needCsv, needMd, needSmoothed } = computeOutputGates(options);
   if (token?.type === 'tabular' || token?.type === 'tabular_inline') {
     const data = renderInlineTokenBlock(token.children, options, env, slf, true, highlight);
     if (needHtml) {
       acc.result += data.table;
     }
-    if (Array.isArray(data.tableMd) && data.tableMd.length) {
+    if (needMd && Array.isArray(data.tableMd) && data.tableMd.length) {
       if (acc.cellMd?.trim()) {
         acc.cellMd += '<br>';
       }
@@ -200,7 +213,9 @@ const renderNonTableTokenIntoCell = (
     if (needSmoothed) {
       acc.cellSmoothed += cellRender.tableSmoothed;
     }
-    acc.cellMd += cellRender.tableMd;
+    if (needMd) {
+      acc.cellMd += cellRender.tableMd;
+    }
     return;
   }
   // renderInline must run even when HTML is skipped: the latex_list_item_open
@@ -370,16 +385,7 @@ export const renderInlineTokenBlock = (
   isSubTable = false,
   highlight = null
 ): RenderInlineTokenBlockResult => {
-  // Each output is built only when requested via `options.outMath.include_*`.
-  // `forMD` forces HTML off; `forPptx` is the sole consumer of the smoothed
-  // variant.
-  const outMath = options?.outMath || {};
-  const forMD = !!options?.forMD;
-  const needHtml = !forMD && outMath.include_table_html !== false;
-  const needTsv = !!outMath.include_tsv;
-  const needCsv = !!outMath.include_csv;
-  const needMd = forMD || !!outMath.include_table_markdown;
-  const needSmoothed = !!options?.forPptx;
+  const { needHtml, needTsv, needCsv, needMd, needSmoothed } = computeOutputGates(options);
   let nextToken,
     result = '',
     needLf = false;
@@ -442,7 +448,9 @@ export const renderInlineTokenBlock = (
       if (needSmoothed) {
         arrSmoothed.push(arrRowSmoothed);
       }
-      arrMd.push(arrRowMd);
+      if (needMd) {
+        arrMd.push(arrRowMd);
+      }
       const l = arrRow &&  arrRow.length > 0 ? arrRow.length  : 0;
       const l2 = rowspan &&  rowspan.length > 0 ? rowspan.length  : 0;
       if (l < l2) {
@@ -687,14 +695,16 @@ export const renderInlineTokenBlock = (
 
 export const renderTabularInline = (a, token, options, env, slf) => {
   const {
-    include_tsv = false, 
-    include_csv = false, 
-    include_table_markdown = false, 
+    include_tsv = false,
+    include_csv = false,
+    include_table_markdown = false,
     include_table_html = true
   } = options.outMath;
   let tabular = '';
-  if (!include_tsv && !include_csv && !include_table_html && !include_table_markdown) {
-    return ''
+  // forMD forces HTML off regardless of include_table_html.
+  const needHtml = !options?.forMD && include_table_html;
+  if (!needHtml && !include_tsv && !include_csv && !include_table_markdown) {
+    return '';
   }
   let highlight = token.highlights?.length ? token.highlights[0] : null;
   const data = renderInlineTokenBlock(token.children, options, env, slf, token.isSubTable, highlight);

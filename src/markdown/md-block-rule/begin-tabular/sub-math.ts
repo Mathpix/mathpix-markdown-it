@@ -14,7 +14,7 @@ const RE_MATH_OPEN = /\\\\\[|\\\[|\\\\\(|\\\(|\$\$|\$|\\begin\{([^}]*)\}|eqref\{
 // (no recursion, no callbacks out), so we just reset lastIndex on entry.
 const RE_MATH_OPEN_G = new RegExp(RE_MATH_OPEN.source, 'g');
 
-let mathTable: Map<string, string> = new Map();
+const mathTable: Map<string, string> = new Map();
 
 export const ClearSubMathLists = (): void => {
   mathTable.clear();

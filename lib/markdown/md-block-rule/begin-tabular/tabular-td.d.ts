@@ -11,8 +11,6 @@ type TAligns = {
     v?: string;
     w?: string;
 };
-/** Marker on shared attrs arrays; mutators must clone before writing. */
-export declare const attrsSharedMarker: unique symbol;
 export declare const clearColumnStyleCache: () => void;
 export declare const getSharedTableOpenAttrs: (extraClass?: string, skipVisual?: boolean) => TAttrs[] | undefined;
 export declare const getSharedTbodyOpenAttrs: (numCol: number) => TAttrs[];
@@ -20,6 +18,7 @@ export declare const getSharedTrOpenAttrs: (skipVisual?: boolean) => TAttrs[] | 
 export declare const SHARED_TD_CLOSE: TTokenTabular;
 export declare const SHARED_TR_CLOSE: TTokenTabular;
 export declare const SHARED_TABLE_CLOSE: TTokenTabular;
+export declare const SHARED_TBODY_CLOSE: TTokenTabular;
 export declare const setColumnLines: (aligns: TAligns | null, lines: TLines) => string[];
 export declare const addStyle: (attrs: any[], style: string) => Array<TAttrs>;
 export declare const addHLineIntoStyle: (attrs: any[], line?: string, pos?: string) => Array<TAttrs>;

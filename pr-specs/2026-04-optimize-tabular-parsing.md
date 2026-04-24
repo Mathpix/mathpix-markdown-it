@@ -101,7 +101,7 @@ When set, `applyTypesetResultToToken` does not copy the serialized math HTML to 
 
 ### Frozen close-token singletons
 
-`td_close`, `tr_close`, and `table_close` have no variable data. A single `Object.freeze`d instance per kind is exported and pushed everywhere these markers appear. `tbody_close` is NOT shared because it carries a per-table `latex` payload when `forLatex` is set.
+`td_close`, `tr_close`, `table_close`, and `tbody_close` (non-forLatex only) have no variable data. A single `Object.freeze`d instance per kind is exported and pushed everywhere these markers appear. Under `forLatex`, `tbody_close` carries a per-table `latex` payload and is allocated per-instance.
 
 `StatePushTabulars` no longer assigns `content` / `children = []` onto marker tokens — those fields are never read on open/close markers and assignment would throw on the frozen close singletons. The multi-column branch of `parse-tabular.ts` also pushes `SHARED_TD_CLOSE` directly instead of allocating a fresh `{token:'td_close', ...}` object per cell.
 
@@ -109,18 +109,17 @@ When set, `applyTypesetResultToToken` does not copy the serialized math HTML to 
 
 ### Output gating in renderInlineTokenBlock / renderNonTableTokenIntoCell
 
-The tabular renderer computes flags up front and only populates the outputs the caller asked for:
+The tabular renderer computes flags via a shared `computeOutputGates(options)` helper and only populates the outputs the caller asked for:
 
 ```ts
-const forMD = !!options?.forMD;
-const needHtml = !forMD && outMath.include_table_html !== false;
-const needTsv  = !!outMath.include_tsv;
-const needCsv  = !!outMath.include_csv;
-const needMd   = forMD || !!outMath.include_table_markdown;
-const needSmoothed = !!options?.forPptx;
+const { needHtml, needTsv, needCsv, needMd, needSmoothed } = computeOutputGates(options);
+// needHtml: !forMD && include_table_html !== false
+// needTsv/needCsv: include_tsv / include_csv
+// needMd: forMD || include_table_markdown
+// needSmoothed: forPptx
 ```
 
-Every `result += ...`, `arr*.push(...)`, cell-accumulator update, and `formatTsvCell` / `formatCsvCell` call is gated on the corresponding flag.
+`renderInlineTokenBlock` and `renderNonTableTokenIntoCell` both use the same helper so their gating cannot drift. Every `result += ...`, `arr*.push(...)`, `cellMd += ...`, and `formatTsvCell` / `formatCsvCell` call is gated on the corresponding flag.
 
 Leaf-token handling still invokes `slf.renderInline([token], options, env)` even when `needHtml` is false — the `latex_list_item_open` render rule sets `token.meta.itemizeLevel` as a side effect, which `handleListTokensForCellMarkdown` reads to emit list markers.
 
@@ -130,7 +129,11 @@ Leaf-token handling still invokes `slf.renderInline([token], options, env)` even
 
 ### mathData.svg only retained under highlights
 
-`applyTypesetResultToToken` shallow-clones `mathData` without the `svg` field unless `options.highlights?.length` is set. The SVG is still available on `token.mathEquation` (the HTML render rule path) — only the duplicate copy on `mathData` is dropped. The highlight render path re-populates `mathData.svg` in `convertMathToHtmlWithHighlight`.
+`applyTypesetResultToToken` shallow-clones `mathData` without the `svg` field unless `options.highlights?.length` is set. The SVG is still available on `token.mathEquation` (the HTML render rule path) — only the duplicate copy on `mathData` is dropped. The highlight render path re-populates `mathData.svg` in `convertMathToHtmlWithHighlight`. Invariant: the `highlights` length is read at parse time; mutating `options.highlights` between parse and render does not retroactively re-populate `mathData.svg`.
+
+### Hot-path outMath spread memoization (skipMathToHtml path)
+
+`typesetMathForToken` under `skipMathToHtml: true` forces `include_svg: false` for the MathJax call. The spread `{ ...options.outMath, include_svg: false }` would run per math token (~49K times on the benchmark). A `WeakMap<outMath, clone>` cache memoizes the spread — first token pays the allocation, the rest reuse the cached clone. GC-friendly: when the parse's `options.outMath` is released, the cache entry goes with it.
 
 ### OuterData empty-labels guard (mathjax/index.ts)
 

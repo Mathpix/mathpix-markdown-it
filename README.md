@@ -978,6 +978,7 @@ The `MathpixMarkdown` React element accepts the following props:
 | `include_speech`         | boolean&nbsp;*`false`*       | outputs speech `<speech>...</speech`                                                                              | 
 | `md_separators`          | `{column: ' ', row: ' <br> '}`| Separators for Markdown tables                                                                                   | 
 | `table_markdown`         | `{math_as_ascii: false, math_inline_delimiters: ['$','$']}`| By default, math goes into Markdown tables as latex and is enclosed in `$...$` delimiters. If `math_as_ascii` is set to `true`, then math will be represented as asciimath | 
+| `skipMathToHtml`         | boolean&nbsp;*`false`*       | When `true`, skips SVG serialization and `token.mathEquation` storage. Overrides `include_svg`; other MathJax outputs (`mathml`, `asciimath`, `linearmath`, etc.) still respect their own `include_*` flags. Intended for callers that walk the token tree directly and never read the serialized math HTML. |
 
 ### TOutputMathJax
 

@@ -27,6 +27,9 @@ export interface ILabel {
  * @deprecated Use `getLabelsList()`, `getLabelByKeyFromLabelsList()`, or
  * `getLabelByUuidFromLabelsList()` instead. Kept as a derived read-only view
  * for deep-import consumers that imported the array directly.
+ *
+ * Reads return a cached snapshot of `labelsByKey.values()` — writes (`.push`,
+ * index assignment) target the throwaway target array and are effectively ignored.
  */
 export declare const labelsList: ReadonlyArray<ILabel>;
 export declare const addIntoLabelsList: (label: ILabel) => void;

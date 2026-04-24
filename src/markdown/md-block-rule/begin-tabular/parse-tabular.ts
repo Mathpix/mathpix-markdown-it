@@ -2,7 +2,7 @@ import { TTokenTabular } from "./index";
 import {
   addHLineIntoStyle, AddTd, AddTdSubTable,
   getSharedTableOpenAttrs, getSharedTbodyOpenAttrs, getSharedTrOpenAttrs,
-  SHARED_TD_CLOSE, SHARED_TR_CLOSE, SHARED_TABLE_CLOSE,
+  SHARED_TD_CLOSE, SHARED_TR_CLOSE, SHARED_TABLE_CLOSE, SHARED_TBODY_CLOSE,
 } from "./tabular-td";
 import {
   getContent, getRowLines, getCellsAll, getDecimal, TDecimal,
@@ -382,9 +382,13 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}, is
     }
     res.push(SHARED_TR_CLOSE);
   }
-  res.push({token:'tbody_close', type:'tbody_close', tag: 'tbody', n: -1,
-    latex: forLatex && data && data.sLines && data.sLines.length ? data.sLines[data.sLines.length-1] : ''
-  });
+  if (forLatex) {
+    res.push({token:'tbody_close', type:'tbody_close', tag: 'tbody', n: -1,
+      latex: data && data.sLines && data.sLines.length ? data.sLines[data.sLines.length-1] : ''
+    });
+  } else {
+    res.push(SHARED_TBODY_CLOSE);
+  }
   res.push(SHARED_TABLE_CLOSE);
   if (forLatex) {
     const colsToFixWidthArr = Array.from(colsToFixWidth);

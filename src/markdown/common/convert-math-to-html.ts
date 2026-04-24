@@ -90,11 +90,21 @@ export const endCacheBypass = (state: any): void => {
 const isMathMLToken = (token: any) =>
   token.type === 'display_mathML' || token.type === 'inline_mathML';
 
+// Memoized per-outMath spread used by skipMathToHtml path — avoid 49K clones in hot path.
+const skipSvgOutMathCache = new WeakMap<object, any>();
+const getOutMathWithSvgOff = (outMath: any): any => {
+  const cached = skipSvgOutMathCache.get(outMath);
+  if (cached) return cached;
+  const fresh = { ...outMath, include_svg: false };
+  skipSvgOutMathCache.set(outMath, fresh);
+  return fresh;
+};
+
 /**
  * Applies typesetting output to a token in place.
- * `mathData.svg` is only read by renderMathHighlight, so drop it when
- * highlights are off. `outMath.skipMathToHtml` opts token-only callers out
- * of mathEquation entirely.
+ * Invariant: mathData.svg is dropped at parse time unless `options.highlights`
+ * is non-empty — mutating `options.highlights` between parse and render will
+ * NOT re-populate it. Highlight render path re-computes svg in convertMathToHtmlWithHighlight.
  */
 const applyTypesetResultToToken = (token: any, res: TypesetResult, options: any): void => {
   const skipMathEquation = !!options?.outMath?.skipMathToHtml;
@@ -276,12 +286,9 @@ const typesetMathForToken = (params: {
       labels: typeset.labels,
     };
   }
-  // 4) Default TeX typesetting.
-  // skipMathToHtml → disable SVG serialization; mathml_word / ascii / metrics
-  // are still produced for token-only callers.
-  const skipMathToHtml = !!options.outMath?.skipMathToHtml;
-  const outMathForTypeset = skipMathToHtml && options.outMath?.include_svg !== false
-    ? { ...options.outMath, include_svg: false }
+  // 4) Default TeX typesetting. skipMathToHtml → force include_svg off; memoized clone keeps hot path allocation-free.
+  const outMathForTypeset = options.outMath?.skipMathToHtml && options.outMath?.include_svg !== false
+    ? getOutMathWithSvgOff(options.outMath)
     : options.outMath;
   const typeset = MathJax.Typeset(math, {
     display: isBlock,

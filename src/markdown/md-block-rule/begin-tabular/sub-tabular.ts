@@ -1,6 +1,6 @@
 import {TTokenTabular} from "./index";
 import { generateUniqueId, getContent, detectLocalBlock } from "./common";
-import { doubleAngleBracketUuidPattern, singleAngleBracketPattern, ANGLE_BRACKETS_RE } from "../../common/consts";
+import { doubleAngleBracketUuidPattern, singleAngleBracketPattern, ANGLE_BRACKETS_RE, uuidPatternNoCapture } from "../../common/consts";
 import { findInDiagboxTable } from "./sub-cell";
 import { getExtractedCodeBlockContent } from "./sub-code";
 import {
@@ -17,7 +17,10 @@ type TSubTabular = {
   isBlock?: boolean,
   children?: Array<string>
 };
-let subTabular: Map<string, TSubTabular> = new Map();
+const subTabular: Map<string, TSubTabular> = new Map();
+
+// Guards direct lookup: keys are generateUniqueId() UUIDs, cell text should match exactly.
+const SUB_TABULAR_KEY_RE: RegExp = new RegExp(`^${uuidPatternNoCapture}$`);
 
 export const ClearSubTableLists = (): void => {
   subTabular.clear();
@@ -89,9 +92,11 @@ export const getSubTabular = (
   if (isCell) {
     sub = getContent(sub);
   }
-  const directEntry = subTabular.get(sub);
-  if (directEntry?.parsed?.length) {
-    return directEntry.parsed;
+  if (SUB_TABULAR_KEY_RE.test(sub)) {
+    const directEntry = subTabular.get(sub);
+    if (directEntry?.parsed?.length) {
+      return directEntry.parsed;
+    }
   }
   // find placeholders
   const cellM: RegExpMatchArray = findPlaceholders(sub, i);
