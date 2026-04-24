@@ -9,6 +9,9 @@ export interface InlineCodeItem {
     posEnd: number;
     content: string;
 }
+/** Build a Set of all character positions that fall inside inline code spans.
+ *  O(1) lookup per position instead of O(m) Array.find per check. */
+export declare const buildInlineCodePositionSet: (codeList: Array<InlineCodeItem>) => Set<number>;
 export declare const getInlineCodeListFromString: (str: any) => Array<InlineCodeItem>;
 /** The function finds the position of the end marker in the specified string
  * and returns that position and the content between the start and end markers.

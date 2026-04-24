@@ -3,6 +3,7 @@ import { MathpixMarkdownModel, ParserErrors } from "../mathpix-markdown-model";
 import { resetTextCounter } from './mdPluginText';
 import { resetTheoremEnvironments } from './md-theorem/helper';
 import { rest_mmd_footnotes_list } from './md-latex-footnotes/utils';
+import { resetMmdGlobalState } from './common/reset-mmd-state';
 
 import {
   mdPluginMathJax,
@@ -84,7 +85,23 @@ export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
     .use(mdPluginHighlightCode, codeHighlight)
     .use(mdPluginAnchor)
     .use(mdPluginTOC, {toc: toc});
-
+  // Per-parse reset of sub-plugins' module-level state. Skipped for partial
+  // re-renders so cross-refs survive.
+  const resetHook = (state) => {
+    const isPartial = state.md.options.renderElement
+      && Object.prototype.hasOwnProperty.call(state.md.options.renderElement, 'startLine');
+    if (isPartial) {
+      return;
+    }
+    resetMmdGlobalState();
+  };
+  const hasGlobalHook = typeof md.core.ruler.__find__ === 'function'
+    && md.core.ruler.__find__('reset_mmd_global_state') >= 0;
+  if (hasGlobalHook) {
+    md.core.ruler.at('reset_mmd_global_state', resetHook);
+  } else {
+    md.core.ruler.before('normalize', 'reset_mmd_global_state', resetHook);
+  }
   if ( forDocx ) {
     md.use(mdPluginSvgToBase64);
   }

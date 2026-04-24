@@ -252,6 +252,7 @@ export const highlightMathToken = (state, token) => {
       }
     }
     if (!mathContent?.length) {
+      // highlightAll skips convertMathToHtmlWithHighlight — relies on mathData.svg kept at parse time (options.highlights truthy).
       token.highlightAll = true;
       return;
     }

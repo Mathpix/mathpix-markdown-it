@@ -1,8 +1,14 @@
 import { generateUniqueId } from "./common";
 import { reDiagboxG } from "../../common/consts";
-import { InlineCodeItem, getInlineCodeListFromString } from "../../common";
+import { getInlineCodeListFromString, buildInlineCodePositionSet } from "../../common";
 
 const diagboxTable = new Map<string, string>();
+const diagboxById = new Map<string, string>();
+
+export const ClearDiagboxTable = (): void => {
+  diagboxTable.clear();
+  diagboxById.clear();
+};
 
 export const getSubDiagbox = (str: string): string => {
   let result: string = '';
@@ -17,6 +23,7 @@ export const getSubDiagbox = (str: string): string => {
     if (!id) {
       id = generateUniqueId();
       diagboxTable.set(fullMatch, id);
+      diagboxById.set(id, fullMatch);
     }
     result += str.slice(lastIndex, index) + `<<${id}>>`;
     lastIndex = endIndex;
@@ -33,13 +40,10 @@ export const extractNextBraceContent = (str: string, startIndex: number): [strin
     return ['', startIndex];
   }
   let beforeCharCode: number = 0;
-  let inlineCodeList: Array<InlineCodeItem> = getInlineCodeListFromString(str);
+  const codePositions = buildInlineCodePositionSet(getInlineCodeListFromString(str));
   while (i < str.length) {
     const char = str[i];
-    let isCode = inlineCodeList?.length
-      ? inlineCodeList.find(item => item.posStart <= i && item.posEnd >= i)
-      : null;
-    if (beforeCharCode !== 0x5c /* \ */ && !isCode) {
+    if (beforeCharCode !== 0x5c /* \ */ && !codePositions.has(i)) {
       if (char === '{' && depth++ === 0) { i++; continue; }
       if (char === '}' && --depth === 0) return [content, i + 1];
     }
@@ -50,11 +54,5 @@ export const extractNextBraceContent = (str: string, startIndex: number): [strin
   return ['', startIndex];
 };
 
-export const findInDiagboxTable = (id: string): string | undefined => {
-  for (const [key, value] of diagboxTable) {
-    if (value === id) {
-      return key;
-    }
-  }
-  return undefined;
-};
+export const findInDiagboxTable = (id: string): string | undefined =>
+  diagboxById.get(id);

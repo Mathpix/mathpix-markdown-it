@@ -1,5 +1,9 @@
 import { TTokenTabular } from "./index";
-import {addHLineIntoStyle, AddTd, AddTdSubTable } from "./tabular-td";
+import {
+  addHLineIntoStyle, AddTd, AddTdSubTable,
+  getSharedTableOpenAttrs, getSharedTbodyOpenAttrs, getSharedTrOpenAttrs,
+  SHARED_TD_CLOSE, SHARED_TR_CLOSE, SHARED_TABLE_CLOSE, SHARED_TBODY_CLOSE,
+} from "./tabular-td";
 import {
   getContent, getRowLines, getCellsAll, getDecimal, TDecimal,
   TAlignData, getVerticallyColumnAlign, getParams, getColumnLines, shouldRewriteColSpec,
@@ -68,7 +72,7 @@ const getRows = (str: string): string[] => {
  * contains an inline list environment.
  */
 const markColIfHasList = (
-  colsToFixWidth: number[],
+  colsToFixWidth: Set<number>,
   colIndex: number,
   content?: string
 ): void => {
@@ -78,9 +82,7 @@ const markColIfHasList = (
   if (!detectLocalBlock(content)) {
     return;
   }
-  if (!colsToFixWidth.includes(colIndex)) {
-    colsToFixWidth.push(colIndex);
-  }
+  colsToFixWidth.add(colIndex);
 };
 
 const setTokensTabular = (str: string, align: string = '', options: any = {}, isSubTabular: boolean = false): Array<TTokenTabular>|null => {
@@ -92,16 +94,17 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}, is
   let data = getRowLines(rows, numCol);
   let CellsHLines: Array<Array<string>> = data.cLines;
   let CellsHLSpaces: Array<Array<string>> = data.cSpaces;
-  let colsToFixWidth: number[] = [];
+  const colsToFixWidth: Set<number> = new Set();
 
   const dataAlign: TAlignData = getVerticallyColumnAlign(align, numCol);
   const cLines: Array<string> = getColumnLines(align, numCol);
   const {cAlign, vAlign, cWidth, colSpec} = dataAlign;
   const decimal: Array<TDecimal> = getDecimal(cAlign, cellsAll);
   const { forLatex = false, outMath = {} } = options;
+  const skipVisual = !!options?.forMD || !!forLatex;
 
   res.push({token:'table_open', type:'table_open', tag: 'table', n: 1,
-    attrs: [[ 'class', 'tabular' ]],
+    attrs: getSharedTableOpenAttrs(undefined, skipVisual),
     latex: forLatex
       ? align
       : outMath.include_table_markdown
@@ -110,7 +113,7 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}, is
   });
   const tableOpen: TTokenTabular = res[0];
   if (options?.forPptx) {
-    res.push({token:'tbody_open', type:'tbody_open', tag: 'tbody', n: 1, attrs: [['data_num_col', numCol.toString()]]});
+    res.push({token:'tbody_open', type:'tbody_open', tag: 'tbody', n: 1, attrs: getSharedTbodyOpenAttrs(numCol)});
   } else {
     res.push({token:'tbody_open', type:'tbody_open', tag: 'tbody', n: 1});
   }
@@ -120,7 +123,7 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}, is
     if (!cellsAll[i] || cellsAll[i].length === 0) {
       if (i < cellsAll.length-1) {
         res.push({token:'tr_open', type:'tr_open', tag: 'tr', n: 1,
-          attrs: [[ 'style', 'border-top: none !important; border-bottom: none !important;' ]],
+          attrs: getSharedTrOpenAttrs(skipVisual),
           latex: forLatex && data && data.sLines && data.sLines.length > i ? data.sLines[i] : ''
         });
         for (let k = 0; k < numCol; k++) {
@@ -133,17 +136,19 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}, is
           const data = AddTd('', {h: cAlign[k], v: vAlign[k], w: cWidth[k]},
             {left: cLeft, right: cRight, bottom: CellsHLines[i+1] ? CellsHLines[i+1][k] : 'none',
               top: i === 0 ? CellsHLines[i] ? CellsHLines[i][k] : 'none' : ''},
-            CellsHLSpaces[i+1][k]
+            CellsHLSpaces[i+1][k], null, skipVisual
           );
           markColIfHasList(colsToFixWidth, k, data.content);
-          res = res.concat(data.res);
+          for (const t of data.res) {
+            res.push(t);
+          }
         }
-        res.push({token:'tr_close', type:'tr_close', tag: 'tr', n: -1});
+        res.push(SHARED_TR_CLOSE);
       }
       continue;
     }
     res.push({token:'tr_open', type:'tr_open', tag: 'tr', n: 1,
-      attrs: [[ 'style', 'border-top: none !important; border-bottom: none !important;' ]],
+      attrs: getSharedTrOpenAttrs(skipVisual),
       latex: forLatex && data && data.sLines && data.sLines.length > i ? data.sLines[i] : ''
     });
 
@@ -164,10 +169,12 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}, is
           const data = AddTd('', {h: cAlign[k], v: vAlign[k], w: cWidth[k]},
             {left: cLeft, right: cRight, bottom: CellsHLines[i+1] ? CellsHLines[i+1][k] : 'none',
               top: i === 0 ? CellsHLines[i] ? CellsHLines[i][k] : 'none' : ''},
-            CellsHLSpaces[i+1][k]
+            CellsHLSpaces[i+1][k], null, skipVisual
           );
           markColIfHasList(colsToFixWidth, k, data.content);
-          res = res.concat(data.res);
+          for (const t of data.res) {
+            res.push(t);
+          }
         }
         break;
       }
@@ -177,7 +184,7 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}, is
 
 
       if (cells[j] && cells[j].trim().length > 0) {
-        const multi = getMultiColumnMultiRow(cells[j], {lLines: cLines[ic], align: cAlign[ic], rLines: cRight}, forLatex, options?.forPptx);
+        const multi = getMultiColumnMultiRow(cells[j], {lLines: cLines[ic], align: cAlign[ic], rLines: cRight}, forLatex, options?.forPptx, skipVisual);
         if (multi) {
           let mr = multi.mr > rows.length ? rows.length : multi.mr;
           let mc = multi.mc > numCol ? numCol : multi.mc;
@@ -226,7 +233,7 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}, is
               MR[ic] = mr;
             }
 
-            if (mr+i >= rows.length-1) {
+            if (mr+i >= rows.length-1 && !skipVisual) {
               multi.attrs = addHLineIntoStyle(multi.attrs, CellsHLines[mr+i] ? CellsHLines[mr+i][ic] : 'none');
             }
 
@@ -252,13 +259,15 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}, is
           }
 
 
-          if (i === 0){
-            multi.attrs = addHLineIntoStyle(multi.attrs, CellsHLines[i] ? CellsHLines[i][ic] : 'none', 'top');
-          }
-          if (mr && mr > 0) {
-            multi.attrs = addHLineIntoStyle(multi.attrs, CellsHLines[mr+i] ? CellsHLines[mr+i][ic] : 'none');
-          } else {
-            multi.attrs = addHLineIntoStyle(multi.attrs, CellsHLines[i+1] ? CellsHLines[i+1][ic] : 'none');
+          if (!skipVisual) {
+            if (i === 0){
+              multi.attrs = addHLineIntoStyle(multi.attrs, CellsHLines[i] ? CellsHLines[i][ic] : 'none', 'top');
+            }
+            if (mr && mr > 0) {
+              multi.attrs = addHLineIntoStyle(multi.attrs, CellsHLines[mr+i] ? CellsHLines[mr+i][ic] : 'none');
+            } else {
+              multi.attrs = addHLineIntoStyle(multi.attrs, CellsHLines[i+1] ? CellsHLines[i+1][ic] : 'none');
+            }
           }
 
           const tdOpen: TTokenTabular = {
@@ -281,20 +290,18 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}, is
           }
           if (multi.subTable) {
             if (multi.subTable.some((item: TTokenTabular) => detectLocalBlock(item.content))) {
-              if (!colsToFixWidth.includes(ic)) {
-                colsToFixWidth.push(ic);
-              }
+              colsToFixWidth.add(ic);
               if (forLatex) {
                 tdOpen.meta.forceMultiFixedWidth = true;
               }
             }
-            res = res.concat(multi.subTable);
+            for (const t of multi.subTable) {
+              res.push(t);
+            }
           } else {
             if (multi.content) {
               if (detectLocalBlock(multi.content)) {
-                if (!colsToFixWidth.includes(ic)) {
-                  colsToFixWidth.push(ic);
-                }
+                colsToFixWidth.add(ic);
                 if (forLatex) {
                   tdOpen.meta.forceMultiFixedWidth = true;
                 }
@@ -302,8 +309,7 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}, is
               res.push({token:'inline', type:'inline', tag: '', n: 0, content: multi.content});
             }
           }
-
-          res.push({token:'td_close', type:'td_close', tag: 'td', n: -1});
+          res.push(SHARED_TD_CLOSE);
           continue;
         }
 
@@ -321,10 +327,9 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}, is
         let content = parseMath || getContent(cells[j]);
 
         const handleSubTable = (subTable: Array<TTokenTabular>) => {
-          if (!colsToFixWidth.includes(ic)) {
-            if (subTable.some((item: TTokenTabular) => detectLocalBlock(item.content))) {
-              colsToFixWidth.push(ic);
-            }
+          if (!colsToFixWidth.has(ic)
+            && subTable.some((item: TTokenTabular) => detectLocalBlock(item.content))) {
+            colsToFixWidth.add(ic);
           }
           return AddTdSubTable(subTable,
             { h: cAlign[ic], v: vAlign[ic], w: cWidth[ic] },
@@ -333,22 +338,27 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}, is
               right: cRight,
               bottom: CellsHLines[i + 1] ? CellsHLines[i + 1][ic] : 'none',
               top: i === 0 ? (CellsHLines[i] ? CellsHLines[i][ic] : 'none') : ''
-            }
+            },
+            skipVisual
           );
         }
         const parseSub = getSubTabular(content, 0, true, forLatex);
         if (parseSub && parseSub.length > 0) {
-          res = res.concat(handleSubTable(parseSub));
+          for (const t of handleSubTable(parseSub)) {
+            res.push(t);
+          }
           continue;
         }
         const data = AddTd(content,
           {h: cAlign[ic], v: vAlign[ic], w: cWidth[ic]},
            {left: cLeft, right: cRight, bottom: CellsHLines[i+1] ? CellsHLines[i+1][ic]: 'none',
              top: i === 0 ? CellsHLines[i] ? CellsHLines[i][ic] : 'none' : ''},
-            CellsHLSpaces[i+1][ic], decimal[ic]
+            CellsHLSpaces[i+1][ic], decimal[ic], skipVisual
           );
         markColIfHasList(colsToFixWidth, ic, data.content);
-        res = res.concat(data.res);
+        for (const t of data.res) {
+          res.push(t);
+        }
       } else {
         MR[ic] = MR[ic] > 0 ? MR[ic] - 1 : 0;
         if (MR[ic] && MR[ic] > 0) {
@@ -361,29 +371,36 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}, is
           {h: cAlign[ic], v: vAlign[ic], w: cWidth[ic]},
            {left: cLeft, right: cRight, bottom: CellsHLines[i+1] ? CellsHLines[i+1][ic] : 'none',
              top: i === 0 ? CellsHLines[i] ? CellsHLines[i][ic] : 'none' : ''},
-            CellsHLSpaces[i+1][ic]
+            CellsHLSpaces[i+1][ic], null, skipVisual
           );
         markColIfHasList(colsToFixWidth, ic, data.content);
-        res = res.concat(data.res);
+        for (const t of data.res) {
+          res.push(t);
+        }
       }
 
     }
-    res.push({token:'tr_close', type:'tr_close', tag: 'tr', n: -1});
+    res.push(SHARED_TR_CLOSE);
   }
-  res.push({token:'tbody_close', type:'tbody_close', tag: 'tbody', n: -1,
-    latex: forLatex && data && data.sLines && data.sLines.length ? data.sLines[data.sLines.length-1] : ''
-  });
-  res.push({token:'table_close', type:'table_close', tag: 'table', n: -1});
   if (forLatex) {
+    res.push({token:'tbody_close', type:'tbody_close', tag: 'tbody', n: -1,
+      latex: data && data.sLines && data.sLines.length ? data.sLines[data.sLines.length-1] : ''
+    });
+  } else {
+    res.push(SHARED_TBODY_CLOSE);
+  }
+  res.push(SHARED_TABLE_CLOSE);
+  if (forLatex) {
+    const colsToFixWidthArr = Array.from(colsToFixWidth);
     tableOpen.meta = {
-      colsToFixWidth,
+      colsToFixWidth: colsToFixWidthArr,
       colSpecs: colSpec,
       colCount: numCol,
       isSubTabular,
       vLineSpec: cLines
     }
-    if (colsToFixWidth?.length) {
-      tableOpen.meta.shouldRewriteColSpec = shouldRewriteColSpec(colsToFixWidth, colSpec);
+    if (colsToFixWidthArr.length) {
+      tableOpen.meta.shouldRewriteColSpec = shouldRewriteColSpec(colsToFixWidthArr, colSpec);
     }
   }
   return res;

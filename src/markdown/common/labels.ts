@@ -25,49 +25,86 @@ export interface ILabel {
   tokenUuidInParentBlock?: string /** uuid of parent block */
 }
 
-export let labelsList: Array<ILabel> = [];
+let labelsByKey: Map<string, ILabel> = new Map();
+let labelsByUuid: Map<string, ILabel> = new Map();
+let labelsVersion: number = 0;
+let labelsSnapshot: ILabel[] | null = null;
+let labelsSnapshotVersion: number = -1;
+
+const getLabelsSnapshot = (): ILabel[] => {
+  if (labelsSnapshotVersion !== labelsVersion) {
+    labelsSnapshot = Array.from(labelsByKey.values());
+    labelsSnapshotVersion = labelsVersion;
+  }
+  return labelsSnapshot;
+};
+
+/**
+ * @deprecated Use `getLabelsList()`, `getLabelByKeyFromLabelsList()`, or
+ * `getLabelByUuidFromLabelsList()` instead. Kept as a derived read-only view
+ * for deep-import consumers that imported the array directly.
+ *
+ * Reads return a cached snapshot of `labelsByKey.values()` — writes (`.push`,
+ * index assignment) target the throwaway target array and are effectively ignored.
+ */
+export const labelsList: ReadonlyArray<ILabel> = new Proxy([] as ILabel[], {
+  get(_target, prop, receiver) {
+    const snapshot = getLabelsSnapshot();
+    if (prop === 'length') {
+      return snapshot.length;
+    }
+    if (prop === Symbol.iterator) {
+      return snapshot[Symbol.iterator].bind(snapshot);
+    }
+    const value = (snapshot as any)[prop];
+    return typeof value === 'function' ? value.bind(snapshot) : value;
+  },
+}) as ReadonlyArray<ILabel>;
 
 export const addIntoLabelsList = (label: ILabel) => {
-  /** Label key should be unique */
-  const index = labelsList?.length
-    ? labelsList.findIndex(item => item.key === label.key)
-    : -1;
-  /** If the list already has a label with this key, 
-   * it will be replaced by a new one (like in Overleaf) */
-  if (index !== -1) {
-    labelsList[index] = label;
+  const existing = labelsByKey.get(label.key);
+  if (existing) {
+    if (existing.tokenUuidInParentBlock
+      && existing.tokenUuidInParentBlock !== label.tokenUuidInParentBlock) {
+      labelsByUuid.delete(existing.tokenUuidInParentBlock);
+    }
+    labelsByKey.set(label.key, label);
+    if (label.tokenUuidInParentBlock) {
+      labelsByUuid.set(label.tokenUuidInParentBlock, label);
+    }
+    labelsVersion++;
     return;
   }
-  /** If the theorem has multiple labels, then we add all those labels to the id
-   * that will be used to jump to the parent block for all references of those labels */
   label = groupLabelIdByUuidFromLabelsList(label);
-  labelsList.push(label);
+  labelsByKey.set(label.key, label);
+  if (label.tokenUuidInParentBlock) {
+    labelsByUuid.set(label.tokenUuidInParentBlock, label);
+  }
+  labelsVersion++;
 };
 
 export const clearLabelsList = () => {
-  labelsList = [];
+  labelsByKey.clear();
+  labelsByUuid.clear();
+  labelsVersion++;
 };
 
 export const getLabelByKeyFromLabelsList = (key: string): ILabel => {
-  return labelsList?.length
-    ? labelsList.find(item => item.key === key)
-    : null;
+  return labelsByKey.get(key) ?? null;
 };
 
 export const getLabelByUuidFromLabelsList = (uuid: string): ILabel => {
-  return labelsList?.length
-    ? labelsList.find((item: ILabel) => item.tokenUuidInParentBlock === uuid)
-    : null;
+  return labelsByUuid.get(uuid) ?? null;
 };
-/** If the theorem has multiple labels, then we add all those labels to the id 
+
+/** If the theorem has multiple labels, then we add all those labels to the id
  * that will be used to jump to the parent block for all references of those labels */
 export const groupLabelIdByUuidFromLabelsList = (label: ILabel): ILabel => {
-  if (!label.tokenUuidInParentBlock || !labelsList.length) {
+  if (!label.tokenUuidInParentBlock || labelsByKey.size === 0) {
     return label;
   }
   let lastLabelId = '';
-  for (let i = 0; i < labelsList.length; i++) {
-    const item: ILabel = labelsList[i];
+  for (const item of labelsByKey.values()) {
     if (item.tokenUuidInParentBlock !== label.tokenUuidInParentBlock) {
       continue;
     }
@@ -81,17 +118,15 @@ export const groupLabelIdByUuidFromLabelsList = (label: ILabel): ILabel => {
 };
 
 export const getLabelsList = (showAllInformation = false) => {
-  /** Get all information including auxiliary fields like tagChildrenTokens */
-  if (showAllInformation) {
-    return [...labelsList]
+  if (labelsByKey.size === 0) {
+    return [];
   }
-  return labelsList?.length 
-    ? labelsList.map((item: ILabel) =>  { 
-      return {
-        key: item.key, /** label key specified in \label{key}. It should be unique */
-        tag: item.tag, /** tag of label (number or tag) */
-        type: item.type
-      }
-    })
-    : [];
+  if (showAllInformation) {
+    return Array.from(labelsByKey.values());
+  }
+  return Array.from(labelsByKey.values()).map((item: ILabel) => ({
+    key: item.key,
+    tag: item.tag,
+    type: item.type,
+  }));
 };

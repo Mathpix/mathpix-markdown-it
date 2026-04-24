@@ -152,6 +152,8 @@ export type TOutputMath = {
         math_inline_delimiters?: Array<string>;
     };
     not_catch_errors?: boolean;
+    /** Skip SVG + `token.mathEquation`. Overrides `include_svg`; other outputs respect their flags. */
+    skipMathToHtml?: boolean;
 };
 export type TOutputMathJax = {
     mtextInheritFont?: boolean;

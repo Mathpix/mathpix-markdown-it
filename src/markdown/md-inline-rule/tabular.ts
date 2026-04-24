@@ -1,6 +1,7 @@
 import { RuleInline } from 'markdown-it';
 import {parseInlineTabular, TTokenTabular, inlineDecimalParse} from "../md-block-rule/begin-tabular";
 import { ParseTabular } from "../md-block-rule/begin-tabular/parse-tabular";
+import { getSharedTableOpenAttrs } from "../md-block-rule/begin-tabular/tabular-td";
 import { findFirstTagContentWithNesting } from "../utils";
 import {
   BEGIN_TABULAR_INLINE_RE,
@@ -41,7 +42,8 @@ export const inlineTabular: RuleInline = (state, silent) => {
       for (let j = 0; j < res.length;  j++) {
         let tok = res[j];
         if (tok.token === 'table_open' && state.md.options?.forDocx ) {
-          tok.attrs.push(['data-type', 'subtable'])
+          // Swap instead of mutating — tok.attrs is shared.
+          tok.attrs = getSharedTableOpenAttrs('subtable');
         }
         if (tok.token === 'inline') {
           let children = [];

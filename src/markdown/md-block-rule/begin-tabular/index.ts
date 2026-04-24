@@ -119,13 +119,17 @@ export const parseInlineTabular = (str: string): TTypeContentList | null => {
       break;
     } else {
       if (!matchE) {
-        res = res.concat(addContentToList(str.slice( posB, posB + matchB.index+matchB[0].length)));
+        for (const t of addContentToList(str.slice( posB, posB + matchB.index+matchB[0].length))) {
+          res.push(t);
+        }
         break;
       }
     }
 
     if (posB + matchB.index > posE + matchE.index ) {
-      res = res.concat(addContentToList(str.slice(pos, pos + matchE.index)));
+      for (const t of addContentToList(str.slice(pos, pos + matchE.index))) {
+        res.push(t);
+      }
       posB += matchE.index + matchE[0].length;
       pos += matchE.index + matchE[0].length;
       i = posB;
@@ -135,7 +139,9 @@ export const parseInlineTabular = (str: string): TTypeContentList | null => {
       if (openTag.test(str.slice(posB, posE + matchE.index + matchE[0].length))) {
         posE += matchE.index + matchE[0].length;
       } else {
-        res = res.concat(addContentToList(str.slice(pos, posE + matchE.index)));
+        for (const t of addContentToList(str.slice(pos, posE + matchE.index))) {
+          res.push(t);
+        }
         posE = posE + matchE.index + matchE[0].length;
         pos = posE;
         posB = posE;
@@ -149,17 +155,22 @@ export const parseInlineTabular = (str: string): TTypeContentList | null => {
 const StatePushParagraphOpen = (state, startLine: number, align: string, centerTables = false) => {
   let token: Token;
   token = state.push('paragraph_open', 'div', 1);
-  token.attrJoin("class", "table_tabular");
   token.parentType = 'table_tabular';
-  if (align) {
-    token.attrs.push(['style', `text-align: ${align}`]);
-  } else {
-    if (centerTables) {
-      token.attrs.push(['style', `text-align: center}`]);
+  const forLatex = !!state.md.options.forLatex;
+  const forMD = !!state.md.options.forMD;
+  // MD identifies the wrapper via `token.parentType`; LaTeX keeps data-align.
+  // The class/style attrs are HTML-only.
+  const skipVisual = forMD || forLatex;
+  if (!skipVisual) {
+    token.attrJoin('class', 'table_tabular');
+    if (align) {
+      token.attrs.push(['style', `text-align: ${align}`]);
+    } else if (centerTables) {
+      token.attrs.push(['style', `text-align: center`]);
     }
   }
-  if (centerTables && state.md.options.forLatex) {
-    token.attrs.push(['data-align', align])
+  if (centerTables && forLatex) {
+    token.attrJoin('data-align', align);
   }
   token.map = [startLine, state.line];
 };
@@ -211,11 +222,11 @@ export const StatePushTabulars = (state, cTabular: TTypeContentList, align: stri
     }
     const envSubTabular: boolean = !!state.env.subTabular;
     const envIsInline: boolean = !!state.env?.isInline;
+    let sharedEnvToInline: any = null;
     for (let j = 0; j < res.length; j++) {
       let tok:Token = res[j];
       if (res[j].token === 'inline') {
         tok.block = true;
-        tok.envToInline = {};
         if (res[j].content) {
           state.env.tabulare = state.md.options.outMath.include_tsv
             || state.md.options.outMath.include_csv
@@ -230,14 +241,28 @@ export const StatePushTabulars = (state, cTabular: TTypeContentList, align: stri
             state.env.isInline = envIsInline;
             continue;
           }
-          tok.envToInline = {...state.env};
+          const isSubTab = res[j].type === 'subTabular' || res[j].isSubTabular;
+          if (isSubTab) {
+            tok.envToInline = {...state.env};
+          } else {
+            if (!sharedEnvToInline) sharedEnvToInline = {...state.env};
+            tok.envToInline = sharedEnvToInline;
+          }
           state.env.tabulare = false;
           state.env.subTabular = envSubTabular;
           tok.content  = res[j].content;
           tok.children = [];
         }
       } else {
-          if (res[j].token !== 'inline_decimal') {
+          // Markers carry no content/children — skip the assignments so we
+          // don't touch SHARED_*_CLOSE and don't allocate throwaway arrays.
+          // inline_decimal already sets its own children.
+          const t = res[j].token;
+          const isMarker = t === 'td_open' || t === 'td_close'
+            || t === 'tr_open' || t === 'tr_close'
+            || t === 'table_open' || t === 'table_close'
+            || t === 'tbody_open' || t === 'tbody_close';
+          if (!isMarker && t !== 'inline_decimal') {
             tok.content  = res[j].content;
             tok.children = [];
           }

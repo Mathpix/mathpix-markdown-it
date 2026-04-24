@@ -8,125 +8,172 @@ import {
   singleCurlyBracketPattern
 } from "../../common/consts";
 
-type TSubMath = {id: string, content: string}
-var mathTable: Array<TSubMath> = [];
+const RE_MATH_OPEN = /\\\\\[|\\\[|\\\\\(|\\\(|\$\$|\$|\\begin\{([^}]*)\}|eqref\{([^}]*)\}|ref\{([^}]*)\}/;
+
+// Shared `/g`-flag scanner reused across calls — getSubMath is not reentrant
+// (no recursion, no callbacks out), so we just reset lastIndex on entry.
+const RE_MATH_OPEN_G = new RegExp(RE_MATH_OPEN.source, 'g');
+
+const mathTable: Map<string, string> = new Map();
 
 export const ClearSubMathLists = (): void => {
-  mathTable = [];
+  mathTable.clear();
 };
 
-export const mathTablePush = (item: TSubMath) => {
-  mathTable.push(item)
-}
+export const mathTablePush = (idOrItem: string | { id: string; content: string }, content?: string): void => {
+  if (typeof idOrItem === 'string') {
+    mathTable.set(idOrItem, content!);
+  } else {
+    mathTable.set(idOrItem.id, idOrItem.content);
+  }
+};
 
+/** Replace UUID placeholders with original math content.
+ *  Uses trimmed string for regex matching (consistent with getSubMath),
+ *  but untrimmed sub for slicing to preserve original whitespace. */
 export const getMathTableContent = (sub: string, i: number): string => {
-  let resContent: string = sub;
-  sub = sub.trim();
-  let cellM: Array<string> =  sub.slice(i).match(doubleCurlyBracketUuidPattern);
-  cellM =  cellM ? cellM : sub.slice(i).match(singleCurlyBracketPattern);
+  const tail = sub.trim().slice(i);
+  let cellM: Array<string> = tail.match(doubleCurlyBracketUuidPattern);
+  cellM = cellM ? cellM : tail.match(singleCurlyBracketPattern);
   if (!cellM) {
     return '';
   }
+  const parts: string[] = [];
+  let lastIdx = 0;
   for (let j = 0; j < cellM.length; j++) {
-    let content: string = cellM[j].replace(/\{/g, '').replace(/\}/g, '');
-    const index: number = mathTable.findIndex(item => item.id === content);
-    if (index >= 0) {
-      let iB: number = resContent.indexOf(cellM[j]);
-      resContent = resContent.slice(0, iB) + mathTable[index].content + resContent.slice(iB + cellM[j].length);
+    const id: string = cellM[j].replace(/\{/g, '').replace(/\}/g, '');
+    const mathContent = mathTable.get(id);
+    if (mathContent !== undefined) {
+      const iB: number = sub.indexOf(cellM[j], lastIdx);
+      if (iB >= 0) {
+        parts.push(sub.slice(lastIdx, iB));
+        parts.push(mathContent);
+        lastIdx = iB + cellM[j].length;
+      }
     }
   }
-  resContent = getContent(resContent);
-  return resContent;
+  if (parts.length === 0) {
+    return getContent(sub);
+  }
+  parts.push(sub.slice(lastIdx));
+  return getContent(parts.join(''));
 };
 
-export const getSubMath = (str: string, startPos = 0): string => {
-  const match: RegExpMatchArray = str
-    .slice(startPos)
-    .match(/(?:\\\\\[|\\\[|\\\\\(|\\\(|\$\$|\$|\\begin\{([^}]*)\}|eqref\{([^}]*)\}|ref\{([^}]*)\})/);
-  let endMarkerPos = -1;
-  if (match) {
-    let beginMarkerPos: number = startPos + match.index;
-    let startMathPos: number = beginMarkerPos + match[0].length;
-    let endMarker: string;
-    if (match[0] === "\\\\[") {
-      endMarker = "\\\\]";
-    } else if (match[0] === "\\[") {
-      endMarker = "\\]";
-    } else if (match[0] === "\\\\(") {
-      endMarker = "\\\\)";
-    } else if (match[0] === "\\(") {
-      endMarker = "\\)";
-    } else if (match[0].includes("eqref")) {
-      endMarker = "";
-    } else if (match[0].includes("ref")) {
-      endMarker = "";
-    } else if (match[1] && match[1] !== 'abstract' && match[1] !== 'tabular') {
-      const environment = match[1].trim();
-      const openTag: RegExp = beginTag(environment, true);
-      const closeTag: RegExp = endTag(environment, true);
-      if (closeTag && openTag) {
-        const data = findOpenCloseTagsMathEnvironment(str.slice(startPos), openTag, closeTag);
-        if (data?.arrClose?.length) {
-          endMarkerPos = startPos + data.arrClose[data.arrClose.length - 1]?.posStart;
-        }
-        endMarker = `\\end{${match[1]}}`;
-      }
-    } else if (match[0] === "$$") {
-      endMarker = match[0];
-    } else if (match[0] === "$") {
-      endMarker = match[0];
+/**
+ * Returns the end marker for a matched opening marker.
+ * - string: end marker to search for (e.g. "\\]", "$")
+ * - null: self-closing match (eqref/ref) — no end marker needed, content = match itself
+ * - undefined: \begin{env} — caller must resolve via balanced tag search
+ */
+const getEndMarker = (
+  matchStr: string, envGroup: string | undefined,
+  eqrefGroup: string | undefined, refGroup: string | undefined,
+): string | null | undefined => {
+  if (matchStr === "\\\\[") return "\\\\]";
+  if (matchStr === "\\[") return "\\]";
+  if (matchStr === "\\\\(") return "\\\\)";
+  if (matchStr === "\\(") return "\\)";
+  if (eqrefGroup !== undefined || refGroup !== undefined) return null;
+  if (matchStr === "$$") return "$$";
+  if (matchStr === "$") return "$";
+  return undefined;
+};
+
+const shouldSkipDollar = (
+  str: string, marker: string, beginMarkerPos: number, endMarkerPos: number
+): boolean => {
+  const beforeEnd = str.charCodeAt(endMarkerPos - 1);
+  if (beforeEnd === 0x5c ||
+    (beginMarkerPos > 0 && str.charCodeAt(beginMarkerPos - 1) === 0x5c)) {
+    return true;
+  }
+  if (marker === "$") {
+    const afterStart = str.charCodeAt(beginMarkerPos + 1);
+    if (beforeEnd === 0x20 || beforeEnd === 0x09 || beforeEnd === 0x0a ||
+      afterStart === 0x20 || afterStart === 0x09 || afterStart === 0x0a) {
+      return true;
     }
-    endMarkerPos = endMarkerPos !== -1 
-      ? endMarkerPos 
-      : findEndMarkerPos(str, endMarker, startMathPos);
+  }
+  const suffix = str.charCodeAt(endMarkerPos + 1);
+  if (suffix >= 0x30 && suffix < 0x3a) {
+    return true;
+  }
+  return false;
+};
+
+/**
+ * Extract math expressions from a string, replacing them with placeholders.
+ * Iterative single-pass: scans the original string once, collects non-math
+ * segments and placeholders into an array, joins at the end.
+ *
+ * `startPos` is a seek offset applied via `re.lastIndex` before scanning.
+ */
+export const getSubMath = (str: string, startPos: number = 0): string => {
+  const re = RE_MATH_OPEN_G;
+  re.lastIndex = startPos > 0 ? startPos : 0;
+  const parts: string[] = [];
+  let lastCopied = 0;
+  let match: RegExpExecArray | null;
+  while ((match = re.exec(str)) !== null) {
+    const beginMarkerPos = match.index;
+    const startMathPos = beginMarkerPos + match[0].length;
+    const envGroup = match[1];
+    let endMarker = getEndMarker(match[0], envGroup, match[2], match[3]);
+    let endMarkerPos = -1;
+    if (endMarker === null) {
+      endMarkerPos = startMathPos;
+      endMarker = '';
+    } else if (endMarker === undefined) {
+      if (envGroup && envGroup !== 'abstract' && envGroup !== 'tabular') {
+        const environment = envGroup.trim();
+        const openTag: RegExp = beginTag(environment, true);
+        const closeTag: RegExp = endTag(environment, true);
+        if (closeTag && openTag) {
+          const data = findOpenCloseTagsMathEnvironment(
+            str.slice(beginMarkerPos), openTag, closeTag
+          );
+          const lastClose = data?.arrClose?.length ? data.arrClose[data.arrClose.length - 1] : null;
+          if (lastClose && typeof lastClose.posStart === 'number') {
+            endMarkerPos = beginMarkerPos + lastClose.posStart;
+          }
+          endMarker = `\\end{${envGroup}}`;
+        }
+      }
+      if (endMarker === undefined) {
+        continue;
+      }
+    }
     if (endMarkerPos === -1) {
-      /** If the end marker is not found, it is necessary to search further, excluding the current marker. */
-      str = getSubMath(str, startMathPos);
-      return str;
+      endMarkerPos = findEndMarkerPos(str, endMarker, startMathPos);
+    }
+    if (endMarkerPos === -1) {
+      re.lastIndex = startMathPos;
+      continue;
     }
     if (match[0] === "$" || match[0] === "$$") {
-      const beforeEndMarker = str.charCodeAt(endMarkerPos - 1);
-      if ( beforeEndMarker === 0x5c /* \ */ ||
-          (beginMarkerPos > 0 && str.charCodeAt(beginMarkerPos - 1)=== 0x5c /* \ */)
-      ) {
-        /** If the marker is shielded, it is necessary to search further, excluding the current marker. */
-        str = getSubMath(str, startMathPos);
-        return str;
-      }
-      if (match[0] === "$") {
-        const afterStartMarker = str.charCodeAt(beginMarkerPos + 1)
-        if ( beforeEndMarker  === 0x20 /* space */ ||
-             beforeEndMarker  === 0x09 /* \t */ ||
-             beforeEndMarker  === 0x0a /* \n */ ||
-             afterStartMarker === 0x20 /* space */ ||
-             afterStartMarker === 0x09 /* \t */ ||
-             afterStartMarker === 0x0a /* \n */
-        ) {
-          str = getSubMath(str, startMathPos);
-          return str;
-        }
-      }
-      // Skip if closing $ is succeeded by a digit (eg $5 $10 ...)
-      const suffix = str.charCodeAt(endMarkerPos+1);
-      if (suffix >= 0x30 && suffix < 0x3a) {
-        str = getSubMath(str, startMathPos);
-        return str;
+      if (shouldSkipDollar(str, match[0], beginMarkerPos, endMarkerPos)) {
+        re.lastIndex = startMathPos;
+        continue;
       }
     }
-    const nextPos: number = endMarkerPos + endMarker.length;
-
-    const content: string = str.slice(beginMarkerPos, nextPos);
-
-    const id: string = generateUniqueId();
-    const isCodeEnv: boolean = match[1] && LATEX_BLOCK_ENV.has(match[1]);
+    const nextPos = endMarkerPos + endMarker.length;
+    const content = str.slice(beginMarkerPos, nextPos);
+    const id = generateUniqueId();
+    const isCodeEnv: boolean = !!(envGroup && LATEX_BLOCK_ENV.has(envGroup));
     if (isCodeEnv) {
       addExtractedCodeBlock({ id, content });
     } else {
-      mathTable.push({ id, content });
+      mathTablePush(id, content);
     }
     const placeholder = isCodeEnv ? `<<${id}>>` : `{${id}}`;
-    str = str.slice(0, startPos) + str.slice(startPos, beginMarkerPos) + placeholder + str.slice(endMarkerPos + endMarker.length);
-    str = getSubMath(str, startPos);
+    parts.push(str.slice(lastCopied, beginMarkerPos));
+    parts.push(placeholder);
+    lastCopied = nextPos;
+    re.lastIndex = nextPos;
   }
-  return str;
+  if (parts.length === 0) {
+    return str;
+  }
+  parts.push(str.slice(lastCopied));
+  return parts.join('');
 };
