@@ -8,7 +8,7 @@ import {
   reOpenTagFootnotetextNumbered
 } from "../common/consts";
 import { findEndMarker } from "../common";
-import { findOpenCloseTags, getCachedSrcPositions } from "../utils";
+import { findOpenCloseTags } from "../utils";
 import * as fence from 'markdown-it/lib/rules_block/fence.js'
 
 const FOOTNOTE_POS_KEY = '__mmd_footnoteSrcPositions' as const;
@@ -18,6 +18,33 @@ const FOOTNOTE_TOKEN_RE: RegExp = /\\footnote(?![a-zA-Z])/;
 const FOOTNOTE_TOKEN_RE_G: RegExp = new RegExp(FOOTNOTE_TOKEN_RE.source, 'g');
 const FOOTNOTETEXT_TOKEN_RE: RegExp = /\\(?:bl)?footnotetext(?![a-zA-Z])/;
 const FOOTNOTETEXT_TOKEN_RE_G: RegExp = new RegExp(FOOTNOTETEXT_TOKEN_RE.source, 'g');
+
+type MmdCacheKey = `__mmd_${string}`;
+
+// Per-state cache of `pattern` match positions in `state.src`. Fast path: caller passes a /g regex owned by this helper. Defensive fallback lifts non-/g to /g per cache-miss.
+const getCachedSrcPositions = (
+  state: { src: string; [k: string]: unknown },
+  key: MmdCacheKey,
+  pattern: RegExp,
+): number[] => {
+  const cached = state[key];
+  if (Array.isArray(cached)) {
+    return cached;
+  }
+  // Strip `y` (sticky+global → SyntaxError) and `g` (re-added) from inherited flags.
+  const re = pattern.global ? pattern : new RegExp(pattern.source, pattern.flags.replace(/[gy]/g, '') + 'g');
+  re.lastIndex = 0;
+  const positions: number[] = [];
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(state.src)) !== null) {
+    positions.push(m.index);
+    if (m.index === re.lastIndex) {
+      re.lastIndex++;
+    }
+  }
+  state[key] = positions;
+  return positions;
+};
 
 const getTerminatorRulesForFootnotes = (ruler: Ruler) => {
   const rules = ruler.__rules__;
@@ -80,11 +107,16 @@ export const latex_footnote_block: RuleBlock = (state, startLine, endLine, silen
         }
         fullContent += fullContent ? '\n' : '';
         fullContent += lineText;
+        // Two cheap gates before the O(fullContent) regex; mutually exclusive — exactly one substring test runs per line.
         if (!sawFootnoteToken) {
           if (!FOOTNOTE_TOKEN_RE.test(lineText)) {
             continue;
           }
           sawFootnoteToken = true;
+        }
+        // Opening tag requires `{` — skip lines without it (covers `\footnote\n…\n{` without rescanning fullContent).
+        if (lineText.indexOf('{') === -1) {
+          continue;
         }
         if (reOpenTagFootnoteG.test(fullContent)) {
           hasOpenTag = true;
@@ -266,11 +298,16 @@ export const latex_footnotetext_block: RuleBlock = (state, startLine, endLine, s
         }
         fullContent += fullContent ? '\n' : '';
         fullContent += lineText;
+        // Two cheap gates before the O(fullContent) regex; mutually exclusive — exactly one substring test runs per line.
         if (!sawFootnotetextToken) {
           if (!FOOTNOTETEXT_TOKEN_RE.test(lineText)) {
             continue;
           }
           sawFootnotetextToken = true;
+        }
+        // Opening tag requires `{` — skip lines without it (covers `\footnotetext\n…\n{` without rescanning fullContent).
+        if (lineText.indexOf('{') === -1) {
+          continue;
         }
         if (reOpenTagFootnotetextG.test(fullContent)) {
           hasOpenTag = true;

@@ -8,31 +8,6 @@ import {
   attrsSharedMarker
 } from "./common/consts";
 
-// Per-state cache of `pattern` match positions in `state.src`. Fast path: caller passes a /g regex owned by this helper (we mutate `lastIndex`). Defensive fallback: non-/g regex is lifted to a /g copy per cache-miss. Key namespace `__mmd_*` enforced at compile time.
-export type MmdCacheKey = `__mmd_${string}`;
-export const getCachedSrcPositions = (
-  state: { src: string; [k: string]: unknown },
-  key: MmdCacheKey,
-  pattern: RegExp,
-): number[] => {
-  if (state[key] !== undefined) {
-    return state[key] as number[];
-  }
-  // Defensive fallback if a non-global regex is passed — would otherwise infinite-loop in `exec`.
-  const re = pattern.global ? pattern : new RegExp(pattern.source, pattern.flags + 'g');
-  re.lastIndex = 0;
-  const positions: number[] = [];
-  let m: RegExpExecArray | null;
-  while ((m = re.exec(state.src)) !== null) {
-    positions.push(m.index);
-    if (m.index === re.lastIndex) {
-      re.lastIndex++;
-    }
-  }
-  state[key] = positions;
-  return positions;
-};
-
 export const endTag = (arg: string, shouldBeFirst = false): RegExp  => {
   try {
     if (arg.indexOf('*') !== -1) {

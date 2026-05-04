@@ -191,17 +191,29 @@ describe('markdownToHTMLSegments — segment balance:', () => {
 });
 
 describe('markdownToHTMLSegments — addPositionsToTokens with inline tabular:', () => {
-  // setChildrenPositions must skip `tabular` and `tabular_inline` parents so
-  // recursion does not reach the frozen shared close-token singletons.
+  // setChildrenPositions must not assign `.positions` to frozen shared close-token singletons
+  // inside `tabular_inline` subtrees; non-frozen siblings (td_open, inline math) still get full processing.
   const renderWithPositions = (src) =>
     MathpixMarkdownModel.markdownToHTMLSegments(src, { addPositionsToTokens: true });
 
   const cases = [
-    { name: 'inline tabular inside paragraph', src: 'Some text \\begin{tabular}{c}A\\end{tabular} more text' },
-    { name: 'inline tabular after inline math', src: 'A \\(x\\) \\begin{tabular}{c}cell\\end{tabular} after' },
-    { name: 'two inline tabulars in one paragraph', src: 'Word \\begin{tabular}{|c|}\\hline X \\end{tabular} and \\begin{tabular}{|c|}\\hline Y \\end{tabular} done.' },
+    {
+      name: 'inline tabular inside paragraph',
+      src: 'Some text \\begin{tabular}{c}A\\end{tabular} more text',
+      expectContains: ['Some text', 'more text', '<table'],
+    },
+    {
+      name: 'inline tabular after inline math',
+      src: 'A \\(x\\) \\begin{tabular}{c}cell\\end{tabular} after',
+      expectContains: ['mjx-container', '<table', 'after'],
+    },
+    {
+      name: 'two inline tabulars in one paragraph',
+      src: 'Word \\begin{tabular}{|c|}\\hline X \\end{tabular} and \\begin{tabular}{|c|}\\hline Y \\end{tabular} done.',
+      expectContains: ['Word', 'and', 'done.', '<table'],
+    },
   ];
-  cases.forEach(({ name, src }) => {
+  cases.forEach(({ name, src, expectContains }) => {
     it(name, () => {
       const result = renderWithPositions(src);
       should.exist(result);
@@ -209,6 +221,9 @@ describe('markdownToHTMLSegments — addPositionsToTokens with inline tabular:',
       result.should.have.property('map').that.is.an('array');
       result.content.length.should.be.greaterThan(0);
       result.map.length.should.be.greaterThan(0);
+      for (const fragment of expectContains) {
+        result.content.should.contain(fragment);
+      }
     });
   });
 });

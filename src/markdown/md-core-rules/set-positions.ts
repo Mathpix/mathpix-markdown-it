@@ -7,10 +7,6 @@ import {
 import { mathTokenTypes } from "../common/consts";
 
 const setChildrenPositions = (state, token, pos, highlights, isBlockquote = false) => {
-  // tabular*/children include frozen shared close-tokens — skip recursion (positions not meaningful here).
-  if (token.type === 'tabular' || token.type === 'tabular_inline') {
-    return { token };
-  }
   if (token.hasOwnProperty('offsetLeft')) {
     pos += token.offsetLeft;
   }
@@ -29,7 +25,10 @@ const setChildrenPositions = (state, token, pos, highlights, isBlockquote = fals
     let child = token.children[i];
     let childBefore = i - 1 >= 0 ? token.children[i-1] : null;
     const startPos = pos;
-    if (child.type ==="link_open" && !child.hasOwnProperty('nextPos')) {
+    // Skip if link_open or its text child is frozen — fall through to the per-child guarded path.
+    if (child.type === "link_open" && !child.hasOwnProperty('nextPos')
+      && Object.isExtensible(child)
+      && token.children[i + 1] && Object.isExtensible(token.children[i + 1])) {
       if (token.children[i+1].hasOwnProperty('nextPos')) {
         token.children[i+1].positions = {
           start: startPos + 1,
@@ -81,6 +80,11 @@ const setChildrenPositions = (state, token, pos, highlights, isBlockquote = fals
       if (child.type === 'softbreak') {
         pos++;
       }
+    }
+
+    // Skip frozen shared tokens (e.g. tabular SHARED_*_CLOSE singletons) — assigning `.positions` would throw `Cannot add property … not extensible`. Non-frozen siblings still get full processing including highlights.
+    if (!Object.isExtensible(child)) {
+      continue;
     }
 
     child.positions = {
