@@ -160,3 +160,25 @@ describe('Check block \\footnote:', () => {
     MM.texReset();
   });
 });
+
+// Performance regression: the per-state position cache must keep the rule's cost on documents with thousands of footnote-free paragraphs at O(1) per block start, not O(N × paragraph-length). Without the early-exit, a single forgotten optimization can regress this back into the seconds-to-minutes range.
+describe('Footnote rule performance regression:', () => {
+  it('4,000-paragraph document with one early footnote parses well under the budget', function () {
+    this.timeout(15000);
+    const lines = [];
+    lines.push('Header paragraph with one footnote \\footnote{single}.');
+    lines.push('');
+    for (let i = 0; i < 4000; i++) {
+      lines.push('This paragraph contains plain prose without any footnote-related markup.');
+      if ((i & 7) === 0) lines.push('');
+    }
+    const mmd = lines.join('\n');
+    const t0 = Date.now();
+    const html = MM.markdownToHTML(mmd, options);
+    const elapsed = Date.now() - t0;
+    html.should.contain('footnote-ref');
+    // 5 s budget: the optimized path runs in ~80 ms; the budget is loose enough for slow CI runners but tight enough to catch a return to seconds-per-parse.
+    elapsed.should.be.below(5000);
+    MM.texReset();
+  });
+});

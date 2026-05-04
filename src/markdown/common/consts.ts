@@ -60,6 +60,7 @@ export const closeTagTabular: RegExp = /^\\end\s{0,}{tabular}/;
 
 export const reFootNote: RegExp = /^\\footnote/;
 export const reOpenTagFootnote: RegExp = /^\\footnote\s{0,}\[\s{0,}\]\s{0,}{|^\\footnote\s{0,}\[-?\d+\]\s{0,}{|^\\footnote\s{0,}{/;
+// `G` suffix means "non-anchored" (no `^`), NOT the /g flag — `.test()` callers depend on stateless behaviour. Same for `reOpenTagFootnotetextG` below.
 export const reOpenTagFootnoteG: RegExp = /\\footnote\s{0,}\[\s{0,}\]\s{0,}{|\\footnote\s{0,}\[-?\d+\]\s{0,}{|\\footnote\s{0,}{/;
 export const reOpenTagFootnoteNumbered: RegExp = /\\footnote\s{0,}\[(?<number>-?\d+)\]\s{0,}{/;
 export const reOpenTagFootnotetext: RegExp = /^\\footnotetext\s{0,}\[\s{0,}\]\s{0,}{|^\\footnotetext\s{0,}\[-?\d+\]\s{0,}{|^\\footnotetext\s{0,}{|^\\blfootnotetext\s{0,}{/;

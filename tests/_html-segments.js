@@ -213,9 +213,12 @@ describe('markdownToHTMLSegments — addPositionsToTokens with inline tabular:',
       name: 'two inline tabulars in one paragraph',
       src: 'Word \\begin{tabular}{|c|}\\hline X \\end{tabular} and \\begin{tabular}{|c|}\\hline Y \\end{tabular} done.',
       expectContains: ['Word', 'and', 'done.', '<table'],
+      // Both tables must render (sibling not eaten by setChildrenPositions).
+      expectMatch: [/<td[^>]*>\s*X\s*<\/td>/, /<td[^>]*>\s*Y\s*<\/td>/],
+      expectTableCount: 2,
     },
   ];
-  cases.forEach(({ name, src, expectContains, expectMatch }) => {
+  cases.forEach(({ name, src, expectContains, expectMatch, expectTableCount }) => {
     it(name, () => {
       const result = renderWithPositions(src);
       should.exist(result);
@@ -228,6 +231,9 @@ describe('markdownToHTMLSegments — addPositionsToTokens with inline tabular:',
       }
       for (const re of (expectMatch || [])) {
         result.content.should.match(re);
+      }
+      if (expectTableCount !== undefined) {
+        (result.content.match(/<table/g) || []).length.should.equal(expectTableCount);
       }
     });
   });

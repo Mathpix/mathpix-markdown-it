@@ -1,5 +1,5 @@
-import { Token, RuleBlock, Ruler } from 'markdown-it';
-import { 
+import { Token, RuleBlock, Ruler, StateBlock } from 'markdown-it';
+import {
   reOpenTagFootnote,
   reOpenTagFootnoteG,
   reOpenTagFootnoteNumbered,
@@ -11,28 +11,25 @@ import { findEndMarker } from "../common";
 import { findOpenCloseTags } from "../utils";
 import * as fence from 'markdown-it/lib/rules_block/fence.js'
 
-const FOOTNOTE_POS_KEY = '__mmd_footnoteSrcPositions' as const;
-const FOOTNOTETEXT_POS_KEY = '__mmd_footnotetextSrcPositions' as const;
+// Symbol keys: collision-free namespace on the StateBlock instance — no risk of clashing with future plugins claiming a `__mmd_*` string property.
+const FOOTNOTE_POS_KEY = Symbol('mmd.footnoteSrcPositions');
+const FOOTNOTETEXT_POS_KEY = Symbol('mmd.footnotetextSrcPositions');
 // `(?![a-zA-Z])` anchors the literal token so `\footnotemark` / `\footnotesize` / `\footnotetext` do not match.
 const FOOTNOTE_TOKEN_RE: RegExp = /\\footnote(?![a-zA-Z])/;
-const FOOTNOTE_TOKEN_RE_G: RegExp = new RegExp(FOOTNOTE_TOKEN_RE.source, 'g');
 const FOOTNOTETEXT_TOKEN_RE: RegExp = /\\(?:bl)?footnotetext(?![a-zA-Z])/;
-const FOOTNOTETEXT_TOKEN_RE_G: RegExp = new RegExp(FOOTNOTETEXT_TOKEN_RE.source, 'g');
-// Stateless versions of the open-tag regexes for boolean `.test()` — avoids `lastIndex` pollution that the /g originals carry across calls.
-const reOpenTagFootnoteRe: RegExp = new RegExp(reOpenTagFootnoteG.source);
-const reOpenTagFootnotetextRe: RegExp = new RegExp(reOpenTagFootnotetextG.source);
+// Owned by `getCachedSrcPositions` (helper resets `lastIndex` before each sweep). Do NOT use these /g constants for ad-hoc `.test()`.
+const FOOTNOTE_TOKEN_SWEEP_G: RegExp = new RegExp(FOOTNOTE_TOKEN_RE.source, 'g');
+const FOOTNOTETEXT_TOKEN_SWEEP_G: RegExp = new RegExp(FOOTNOTETEXT_TOKEN_RE.source, 'g');
 
-type MmdCacheKey = `__mmd_${string}`;
-
-// Per-state cache of `patternG` match positions in `state.src`. Caller must pass a /g regex owned by this helper (we mutate `lastIndex`). Module-private — callers are the two rules below, both pass /g.
+// Per-state cache of `patternG` match positions in `state.src`. `patternG` MUST be a /g regex — without /g, `exec` ignores `lastIndex` and the loop below would never advance. Caller's contract: pass one of the module-local `*_SWEEP_G` constants (both built with /g via `new RegExp(..., 'g')`). Helper resets `lastIndex` on entry so a stale value cannot leak between calls.
 const getCachedSrcPositions = (
-  state: { src: string; [k: string]: unknown },
-  key: MmdCacheKey,
+  state: StateBlock,
+  key: symbol,
   patternG: RegExp,
 ): number[] => {
-  const cached = state[key];
+  const cached = (state as unknown as Record<symbol, unknown>)[key];
   if (Array.isArray(cached)) {
-    return cached;
+    return cached as number[];
   }
   patternG.lastIndex = 0;
   const positions: number[] = [];
@@ -43,7 +40,7 @@ const getCachedSrcPositions = (
       patternG.lastIndex++;
     }
   }
-  state[key] = positions;
+  (state as unknown as Record<symbol, number[]>)[key] = positions;
   return positions;
 };
 
@@ -76,7 +73,7 @@ export const latex_footnote_block: RuleBlock = (state, startLine, endLine, silen
       pos: number = state.bMarks[startLine] + state.tShift[startLine],
       max: number = state.eMarks[startLine];
     // Skip when the last `\footnote` literal is strictly before this block's start (`<`, not `<=` — `==` keeps the token in scope).
-    const positions = getCachedSrcPositions(state, FOOTNOTE_POS_KEY, FOOTNOTE_TOKEN_RE_G);
+    const positions = getCachedSrcPositions(state, FOOTNOTE_POS_KEY, FOOTNOTE_TOKEN_SWEEP_G);
     if (positions.length === 0 || positions[positions.length - 1] < state.bMarks[startLine]) {
       return false;
     }
@@ -90,7 +87,7 @@ export const latex_footnote_block: RuleBlock = (state, startLine, endLine, silen
     let terminate = false;
     // Literal token can't span `\n` — gate the O(fullContent) regex on per-line presence.
     let sawFootnoteToken: boolean = FOOTNOTE_TOKEN_RE.test(lineText);
-    if (!sawFootnoteToken || !reOpenTagFootnoteRe.test(lineText)) {
+    if (!sawFootnoteToken || !reOpenTagFootnoteG.test(lineText)) {
       // jump line-by-line until empty one or EOF
       for (; nextLine < endLine; nextLine++) {
         if (fence(state, nextLine, endLine, true)) {
@@ -108,7 +105,7 @@ export const latex_footnote_block: RuleBlock = (state, startLine, endLine, silen
         }
         fullContent += fullContent ? '\n' : '';
         fullContent += lineText;
-        // Inside this loop: exactly one substring test per iteration via mutually exclusive gates.
+        // Two cheap gates (token-seen, `{` present) both must hold before we run the heavy O(fullContent) regex; either gate's `continue` shortcuts to the next line.
         if (!sawFootnoteToken) {
           if (!FOOTNOTE_TOKEN_RE.test(lineText)) {
             continue;
@@ -119,7 +116,7 @@ export const latex_footnote_block: RuleBlock = (state, startLine, endLine, silen
         if (lineText.indexOf('{') === -1) {
           continue;
         }
-        if (reOpenTagFootnoteRe.test(fullContent)) {
+        if (reOpenTagFootnoteG.test(fullContent)) {
           hasOpenTag = true;
           nextLine += 1;
           break;
@@ -261,7 +258,7 @@ export const latex_footnotetext_block: RuleBlock = (state, startLine, endLine, s
       pos: number = state.bMarks[startLine] + state.tShift[startLine],
       max: number = state.eMarks[startLine];
     // Skip when the last `\footnotetext`/`\blfootnotetext` literal is strictly before this block's start.
-    const positions = getCachedSrcPositions(state, FOOTNOTETEXT_POS_KEY, FOOTNOTETEXT_TOKEN_RE_G);
+    const positions = getCachedSrcPositions(state, FOOTNOTETEXT_POS_KEY, FOOTNOTETEXT_TOKEN_SWEEP_G);
     if (positions.length === 0 || positions[positions.length - 1] < state.bMarks[startLine]) {
       return false;
     }
@@ -276,7 +273,7 @@ export const latex_footnotetext_block: RuleBlock = (state, startLine, endLine, s
     const terminatorRules = getTerminatorRulesForFootnotes(state.md.block.ruler);
     // Literal token can't span `\n` — gate the O(fullContent) regex on per-line presence.
     let sawFootnotetextToken: boolean = FOOTNOTETEXT_TOKEN_RE.test(lineText);
-    if (!sawFootnotetextToken || !reOpenTagFootnotetextRe.test(lineText)) {
+    if (!sawFootnotetextToken || !reOpenTagFootnotetextG.test(lineText)) {
       // jump line-by-line until empty one or EOF
       for (; nextLine < endLine; nextLine++) {
         for (let i = 0; i < terminatorRules.length; i++) {
@@ -299,7 +296,7 @@ export const latex_footnotetext_block: RuleBlock = (state, startLine, endLine, s
         }
         fullContent += fullContent ? '\n' : '';
         fullContent += lineText;
-        // Inside this loop: exactly one substring test per iteration via mutually exclusive gates.
+        // Two cheap gates (token-seen, `{` present) both must hold before we run the heavy O(fullContent) regex; either gate's `continue` shortcuts to the next line.
         if (!sawFootnotetextToken) {
           if (!FOOTNOTETEXT_TOKEN_RE.test(lineText)) {
             continue;
@@ -310,7 +307,7 @@ export const latex_footnotetext_block: RuleBlock = (state, startLine, endLine, s
         if (lineText.indexOf('{') === -1) {
           continue;
         }
-        if (reOpenTagFootnotetextRe.test(fullContent)) {
+        if (reOpenTagFootnotetextG.test(fullContent)) {
           hasOpenTag = true;
           nextLine += 1;
           break;

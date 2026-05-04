@@ -808,6 +808,8 @@ a continuous function.</div>
   // Three fixtures below pin a pre-existing quirk: the body text inside an unregistered theorem env
   // is dropped by an unrelated math-block fallback rule. This PR only stops emitting the unmatched
   // leading `<div class="theorem_block">` wrapper. See pr-specs/2026-05-…md → "Known limitations".
+  // ⚠ When the body-drop quirk is fixed upstream, these three fixtures will start failing — replace
+  // the expected `html` with the new positive output rather than treating the failure as a regression.
   {
     latex: '\\begin{tikzpicture}\nfoo\n\\end{tikzpicture}',
     html: '<div><span  class="math-block equation-number " number="0"></span></div>'

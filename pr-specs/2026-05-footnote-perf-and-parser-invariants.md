@@ -146,11 +146,12 @@ For an unregistered theorem environment (e.g. `\begin{lemma}…\end{lemma}` with
 Module-private helper inside `md-latex-footnotes/block-rule.ts` (kept private until a second caller appears — promotion to a shared util is a one-line change):
 
 ```ts
-type MmdCacheKey = `__mmd_${string}`;
+const FOOTNOTE_POS_KEY = Symbol('mmd.footnoteSrcPositions');
+const FOOTNOTETEXT_POS_KEY = Symbol('mmd.footnotetextSrcPositions');
 
 const getCachedSrcPositions = (
-  state: { src: string; [k: string]: unknown },
-  key: MmdCacheKey,
+  state: any,
+  key: symbol,
   patternG: RegExp,
 ): number[] => {
   const cached = state[key];
@@ -167,13 +168,13 @@ const getCachedSrcPositions = (
 };
 ```
 
-The cache is keyed by a property on the `StateBlock` instance, not on `state.env`. `state.md.block.parse(content, state.md, state.env, children)` builds a fresh state for nested parses, so each parse scope sees its own `state.src` and recomputes its own positions on first access. Env keying would be incorrect — env is shared between outer and nested parses, but the source strings differ.
+The cache is keyed by a `Symbol` on the `StateBlock` instance, not on `state.env`. `state.md.block.parse(content, state.md, state.env, children)` builds a fresh state for nested parses, so each parse scope sees its own `state.src` and recomputes its own positions on first access. Env keying would be incorrect — env is shared between outer and nested parses, but the source strings differ.
 
-Caller responsibilities, enforced where possible:
+Caller responsibilities:
 
-- **Cache key** must start with `__mmd_` — enforced at compile time by the `MmdCacheKey` template literal type for TS callers; JS callers must follow the convention by hand. The helper is module-private so this is internal-only contract.
-- **Pattern** must be a /g regex owned by this helper (the helper mutates `lastIndex`). The two callers in the same module both pass module-level /g constants, so there's no defensive-fallback branch — keeping dead code paths out of the helper.
-- **Cache hit** uses `Array.isArray(cached)` rather than `!== undefined` so a stale `null`/non-array value (e.g. an out-of-band write to the same property) re-computes instead of returning garbage.
+- **Cache key** is a module-private `Symbol`. Collisions with `StateBlock` fields (`tokens`, `src`, `line`, …) or other plugins' state property writes are impossible — Symbols are unique per module load.
+- **Pattern** must be a /g regex owned by this helper (the helper mutates `lastIndex`). The two callers pass module-level /g constants (`FOOTNOTE_TOKEN_SWEEP_G` / `FOOTNOTETEXT_TOKEN_SWEEP_G`) named so it's obvious they belong to the helper — do NOT use them for ad-hoc `.test()`. The helper resets `lastIndex` on entry so a stale value cannot leak in.
+- **Cache hit** uses `Array.isArray(cached)` rather than `!== undefined` so a stale `null`/non-array value re-computes instead of returning garbage.
 - **Returned array** is treated as read-only by the caller (no mutation; cache invariant is "stable for the lifetime of the parse state").
 
 The /g regex is constructed once at module load via `new RegExp(NON_G_RE.source, 'g')`, so per-parse the helper does **no** regex construction at all — it just resets `lastIndex` and runs the `exec` loop on cache miss.
@@ -205,29 +206,27 @@ Reading the *last* element of the positions array makes the check O(1) and corre
 The forward-scanning loop in Phase 1 (used to detect a multi-line opening tag) carries two cheap gates that protect the O(`fullContent`) regex test:
 
 ```ts
-const reOpenTagFootnoteRe = new RegExp(reOpenTagFootnoteG.source);  // stateless alias for `.test()`
-…
 let sawFootnoteToken = FOOTNOTE_TOKEN_RE.test(lineText);
-if (!sawFootnoteToken || !reOpenTagFootnoteRe.test(lineText)) {
+if (!sawFootnoteToken || !reOpenTagFootnoteG.test(lineText)) {
   for (; nextLine < endLine; nextLine++) {
     // … fence/empty checks, accumulate fullContent …
-    // Inside this loop: exactly one substring test per iteration via mutually exclusive gates.
+    // Two cheap gates (token-seen, `{` present) both must hold before we run the heavy O(fullContent) regex; either gate's `continue` shortcuts to the next line.
     if (!sawFootnoteToken) {
       if (!FOOTNOTE_TOKEN_RE.test(lineText)) continue;
       sawFootnoteToken = true;
     }
     // Opening tag requires `{` — skip lines without it.
     if (lineText.indexOf('{') === -1) continue;
-    if (reOpenTagFootnoteRe.test(fullContent)) { … }
+    if (reOpenTagFootnoteG.test(fullContent)) { … }
   }
 }
 ```
 
-- Per-line `.test()` runs against a stateless (non-/g) alias derived from `reOpenTagFootnoteG.source`. The /g version (used by `getCachedSrcPositions` for `exec`) carries `lastIndex` across calls; using the non-/g alias for boolean tests removes a pre-existing footgun where a successful match could leave `lastIndex` past a subsequent shorter line and produce a one-shot false negative.
+- The imported `reOpenTagFootnoteG` / `reOpenTagFootnotetextG` constants from `consts.ts` are named with the `G` suffix but are defined without the `/g` flag, so `.test()` on them is already stateless — no `lastIndex` pollution to defend against.
 - The token gate skips lines until the literal `\footnote` (anchored by lookahead) appears.
 - After the token has been seen, the `{` gate continues to skip lines that cannot complete the opening pattern (every alternative in `reOpenTagFootnoteG` ends in `{`). This prevents the worst-case `\footnote\n…(many lines without `{`)…\n{` pattern from degrading back to O(N×M).
 
-`latex_footnotetext_block` follows the identical shape with `FOOTNOTETEXT_TOKEN_RE` and `reOpenTagFootnotetextRe`.
+`latex_footnotetext_block` follows the identical shape with `FOOTNOTETEXT_TOKEN_RE` and `reOpenTagFootnotetextG`.
 
 ### Why the token guard is sound
 
@@ -313,7 +312,7 @@ The post-change segment count on this input rises because the segment renderer i
 
 | File | Change |
 |------|--------|
-| `src/markdown/md-latex-footnotes/block-rule.ts` | Module-private `getCachedSrcPositions` helper + `MmdCacheKey` template literal type (helper requires /g regex by contract; both callers in this module pass module-level /g constants). Whole-document early exit at the top of `latex_footnote_block` / `latex_footnotetext_block`; per-line token guard (regex with `(?![a-zA-Z])` lookahead) plus `{` gate inside Phase 1 forward-scan. Boolean `.test()` calls switched from `reOpenTagFootnoteG` / `reOpenTagFootnotetextG` to module-local stateless aliases to remove `lastIndex` pollution between calls. |
+| `src/markdown/md-latex-footnotes/block-rule.ts` | Module-private `getCachedSrcPositions` helper keyed by per-module `Symbol` (collision-free namespace on `StateBlock`); helper-owned /g constants named `*_SWEEP_G` so future contributors know not to reuse them for ad-hoc `.test()`. Whole-document early exit at the top of `latex_footnote_block` / `latex_footnotetext_block`; per-line token guard (regex with `(?![a-zA-Z])` lookahead) plus `{` gate inside Phase 1 forward-scan. |
 | `src/markdown/md-core-rules/set-positions.ts` | Per-child `Object.isExtensible` guard before `child.positions = …` assignment, so frozen `SHARED_*_CLOSE` singletons inside `tabular_inline` subtrees skip cleanly while non-frozen siblings (math, includegraphics, td_open) keep full position + highlight processing. Same guard on the `link_open` special-case branch entry condition; comment notes the fall-through path is positions-degraded if a `link_*` token is ever frozen (fix at that time, no current failing path). Top-level skip list also extended from `['tabular']` to `['tabular', 'tabular_inline']`. |
 | `src/markdown/md-theorem/block-rule.ts` | `BeginTheorem` env-index lookup gated on `!silent` and hoisted above `endTag()` / forward-scan in non-silent mode — unregistered environments bail in O(1) without touching `state.tokens`. Silent-mode terminator probes keep close-tag-based answer (required by `newTheoremBlock` ↔ `\begin{NAME}` adjacent-line handshake). |
 | `tests/_data/_footnotes_latex/_data-footnote.js` | Five new fixtures: `\footnote`-prefixed commands that must not trigger the rule (`\footnotemark[1]` mid-line, `\footnotesize` in multi-line paragraph, repeated `\footnotemark`); mixed `\footnotemark` + real `\footnote{}` in the same paragraph; `\footnote{}` at the very end of source (boundary check for the `<` comparison in the early-exit). |
@@ -327,7 +326,7 @@ No public API surface, no exported names, no option flags introduced.
 
 ## Testing
 
-- Full suite: **3,357 passing** (3,342 prior + 15 new: 5 footnote-prefix / mixed-mark / end-of-source cases, 3 tabular position-token fixtures, 3 inline-tabular `markdownToHTMLSegments` regression cases, 3 unregistered-theorem-env cases, 1 adjacent-line `\newtheorem`/`\begin{NAME}` regression case).
+- Full suite: **3,358 passing** (3,342 prior + 16 new: 5 footnote-prefix / mixed-mark / end-of-source cases, 3 tabular position-token fixtures, 3 inline-tabular `markdownToHTMLSegments` regression cases, 3 unregistered-theorem-env cases, 1 adjacent-line `\newtheorem`/`\begin{NAME}` regression case, 1 perf regression smoke-test on a synthetic 4,000-paragraph no-footnote document with a 5-second wall-clock budget — runs in ~80 ms after the optimization; the budget is set well above that to remain stable on slow CI runners while still catching a regression back into seconds-per-parse).
 - Footnote suite: 3 new cases lock in token-guard behavior on `\footnote`-prefixed commands that must not trigger the rule.
 - Theorem suite: 3 new cases pin HTML output for `\begin{tikzpicture}`, `\begin{lemma}`, `\begin{example}` confirming `class="theorem_block"` is absent; 1 new case pins HTML output for `\newtheorem{theorem}{Theorem}\n\\begin{theorem}\n…\n\end{theorem}` (no empty line between) — locks the silent-mode terminator handshake in `newTheoremBlock`.
 - HTML-segments suite: 3 new cases directly exercise the regression path that `setChildrenPositions` previously threw on (`tabular_inline` child of an `inline` block), asserting `markdownToHTMLSegments({ addPositionsToTokens: true })` returns a non-null result.
