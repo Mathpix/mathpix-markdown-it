@@ -11,11 +11,13 @@ import { findEndMarker } from "../common";
 import { findOpenCloseTags, getCachedSrcPositions } from "../utils";
 import * as fence from 'markdown-it/lib/rules_block/fence.js'
 
-const FOOTNOTE_POS_KEY: string = '__mmd_footnoteSrcPositions';
-const FOOTNOTETEXT_POS_KEY: string = '__mmd_footnotetextSrcPositions';
+const FOOTNOTE_POS_KEY = '__mmd_footnoteSrcPositions' as const;
+const FOOTNOTETEXT_POS_KEY = '__mmd_footnotetextSrcPositions' as const;
 // `(?![a-zA-Z])` anchors the literal token so `\footnotemark` / `\footnotesize` / `\footnotetext` do not match.
 const FOOTNOTE_TOKEN_RE: RegExp = /\\footnote(?![a-zA-Z])/;
+const FOOTNOTE_TOKEN_RE_G: RegExp = new RegExp(FOOTNOTE_TOKEN_RE.source, 'g');
 const FOOTNOTETEXT_TOKEN_RE: RegExp = /\\(?:bl)?footnotetext(?![a-zA-Z])/;
+const FOOTNOTETEXT_TOKEN_RE_G: RegExp = new RegExp(FOOTNOTETEXT_TOKEN_RE.source, 'g');
 
 const getTerminatorRulesForFootnotes = (ruler: Ruler) => {
   const rules = ruler.__rules__;
@@ -46,7 +48,7 @@ export const latex_footnote_block: RuleBlock = (state, startLine, endLine, silen
       pos: number = state.bMarks[startLine] + state.tShift[startLine],
       max: number = state.eMarks[startLine];
     // Skip if no `\footnote` token at/after this block.
-    const positions = getCachedSrcPositions(state, FOOTNOTE_POS_KEY, FOOTNOTE_TOKEN_RE);
+    const positions = getCachedSrcPositions(state, FOOTNOTE_POS_KEY, FOOTNOTE_TOKEN_RE_G);
     if (positions.length === 0 || positions[positions.length - 1] < state.bMarks[startLine]) {
       return false;
     }
@@ -226,7 +228,7 @@ export const latex_footnotetext_block: RuleBlock = (state, startLine, endLine, s
       pos: number = state.bMarks[startLine] + state.tShift[startLine],
       max: number = state.eMarks[startLine];
     // Skip if no `\footnotetext` / `\blfootnotetext` token at/after this block.
-    const positions = getCachedSrcPositions(state, FOOTNOTETEXT_POS_KEY, FOOTNOTETEXT_TOKEN_RE);
+    const positions = getCachedSrcPositions(state, FOOTNOTETEXT_POS_KEY, FOOTNOTETEXT_TOKEN_RE_G);
     if (positions.length === 0 || positions[positions.length - 1] < state.bMarks[startLine]) {
       return false;
     }

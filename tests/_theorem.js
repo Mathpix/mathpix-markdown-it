@@ -21,14 +21,7 @@ describe('Check Theorem environments:', () => {
     const html = MM.markdownToHTML(test.latex, options);
     describe('Latex => ' + test.latex, () => {
       it('Checking result html', (done) => {
-        if (test.html !== undefined) {
-          html.trim().should.equal(test.html);
-        }
-        if (test.htmlNotInclude !== undefined) {
-          for (const s of [].concat(test.htmlNotInclude)) {
-            html.should.not.include(s);
-          }
-        }
+        html.trim().should.equal(test.html);
         done();
       });
     });

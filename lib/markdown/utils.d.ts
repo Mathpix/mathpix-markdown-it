@@ -1,8 +1,9 @@
 import { Token } from 'markdown-it';
+export type MmdCacheKey = `__mmd_${string}`;
 export declare const getCachedSrcPositions: (state: {
     [k: string]: unknown;
     src: string;
-}, key: string, pattern: RegExp) => number[];
+}, key: MmdCacheKey, pattern: RegExp) => number[];
 export declare const endTag: (arg: string, shouldBeFirst?: boolean) => RegExp;
 export declare const beginTag: (arg: string, shouldBeFirst?: boolean) => RegExp;
 export declare const getWidthFromDocument: (cwidth?: number) => number;

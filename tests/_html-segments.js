@@ -207,6 +207,8 @@ describe('markdownToHTMLSegments — addPositionsToTokens with inline tabular:',
       should.exist(result);
       result.should.have.property('content').that.is.a('string');
       result.should.have.property('map').that.is.an('array');
+      result.content.length.should.be.greaterThan(0);
+      result.map.length.should.be.greaterThan(0);
     });
   });
 });

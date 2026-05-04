@@ -277,6 +277,7 @@ export const BeginTheorem: RuleBlock = (state, startLine, endLine, silent) => {
     latexEnd = matchE[0];
     // pE = matchE.index
   }
+
   state.line = nextLine + 1;
   token = state.push('paragraph_open', 'div', 1);
   token.attrSet('class','theorem_block');
