@@ -201,6 +201,8 @@ describe('markdownToHTMLSegments — addPositionsToTokens with inline tabular:',
       name: 'inline tabular inside paragraph',
       src: 'Some text \\begin{tabular}{c}A\\end{tabular} more text',
       expectContains: ['Some text', 'more text', '<table'],
+      // Assert the cell body actually rendered, not just an empty `<table></table>`.
+      expectMatch: [/<td[^>]*>\s*A\s*<\/td>/],
     },
     {
       name: 'inline tabular after inline math',
@@ -213,7 +215,7 @@ describe('markdownToHTMLSegments — addPositionsToTokens with inline tabular:',
       expectContains: ['Word', 'and', 'done.', '<table'],
     },
   ];
-  cases.forEach(({ name, src, expectContains }) => {
+  cases.forEach(({ name, src, expectContains, expectMatch }) => {
     it(name, () => {
       const result = renderWithPositions(src);
       should.exist(result);
@@ -223,6 +225,9 @@ describe('markdownToHTMLSegments — addPositionsToTokens with inline tabular:',
       result.map.length.should.be.greaterThan(0);
       for (const fragment of expectContains) {
         result.content.should.contain(fragment);
+      }
+      for (const re of (expectMatch || [])) {
+        result.content.should.match(re);
       }
     });
   });

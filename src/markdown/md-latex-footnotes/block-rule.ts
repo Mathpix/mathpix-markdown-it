@@ -18,28 +18,29 @@ const FOOTNOTE_TOKEN_RE: RegExp = /\\footnote(?![a-zA-Z])/;
 const FOOTNOTE_TOKEN_RE_G: RegExp = new RegExp(FOOTNOTE_TOKEN_RE.source, 'g');
 const FOOTNOTETEXT_TOKEN_RE: RegExp = /\\(?:bl)?footnotetext(?![a-zA-Z])/;
 const FOOTNOTETEXT_TOKEN_RE_G: RegExp = new RegExp(FOOTNOTETEXT_TOKEN_RE.source, 'g');
+// Stateless versions of the open-tag regexes for boolean `.test()` — avoids `lastIndex` pollution that the /g originals carry across calls.
+const reOpenTagFootnoteRe: RegExp = new RegExp(reOpenTagFootnoteG.source);
+const reOpenTagFootnotetextRe: RegExp = new RegExp(reOpenTagFootnotetextG.source);
 
 type MmdCacheKey = `__mmd_${string}`;
 
-// Per-state cache of `pattern` match positions in `state.src`. Fast path: caller passes a /g regex owned by this helper. Defensive fallback lifts non-/g to /g per cache-miss.
+// Per-state cache of `patternG` match positions in `state.src`. Caller must pass a /g regex owned by this helper (we mutate `lastIndex`). Module-private — callers are the two rules below, both pass /g.
 const getCachedSrcPositions = (
   state: { src: string; [k: string]: unknown },
   key: MmdCacheKey,
-  pattern: RegExp,
+  patternG: RegExp,
 ): number[] => {
   const cached = state[key];
   if (Array.isArray(cached)) {
     return cached;
   }
-  // Strip `y` (sticky+global → SyntaxError) and `g` (re-added) from inherited flags.
-  const re = pattern.global ? pattern : new RegExp(pattern.source, pattern.flags.replace(/[gy]/g, '') + 'g');
-  re.lastIndex = 0;
+  patternG.lastIndex = 0;
   const positions: number[] = [];
   let m: RegExpExecArray | null;
-  while ((m = re.exec(state.src)) !== null) {
+  while ((m = patternG.exec(state.src)) !== null) {
     positions.push(m.index);
-    if (m.index === re.lastIndex) {
-      re.lastIndex++;
+    if (m.index === patternG.lastIndex) {
+      patternG.lastIndex++;
     }
   }
   state[key] = positions;
@@ -74,7 +75,7 @@ export const latex_footnote_block: RuleBlock = (state, startLine, endLine, silen
       lineText: string,
       pos: number = state.bMarks[startLine] + state.tShift[startLine],
       max: number = state.eMarks[startLine];
-    // Skip if no `\footnote` token at/after this block.
+    // Skip when the last `\footnote` literal is strictly before this block's start (`<`, not `<=` — `==` keeps the token in scope).
     const positions = getCachedSrcPositions(state, FOOTNOTE_POS_KEY, FOOTNOTE_TOKEN_RE_G);
     if (positions.length === 0 || positions[positions.length - 1] < state.bMarks[startLine]) {
       return false;
@@ -89,7 +90,7 @@ export const latex_footnote_block: RuleBlock = (state, startLine, endLine, silen
     let terminate = false;
     // Literal token can't span `\n` — gate the O(fullContent) regex on per-line presence.
     let sawFootnoteToken: boolean = FOOTNOTE_TOKEN_RE.test(lineText);
-    if (!sawFootnoteToken || !reOpenTagFootnoteG.test(lineText)) {
+    if (!sawFootnoteToken || !reOpenTagFootnoteRe.test(lineText)) {
       // jump line-by-line until empty one or EOF
       for (; nextLine < endLine; nextLine++) {
         if (fence(state, nextLine, endLine, true)) {
@@ -107,7 +108,7 @@ export const latex_footnote_block: RuleBlock = (state, startLine, endLine, silen
         }
         fullContent += fullContent ? '\n' : '';
         fullContent += lineText;
-        // Two cheap gates before the O(fullContent) regex; mutually exclusive — exactly one substring test runs per line.
+        // Inside this loop: exactly one substring test per iteration via mutually exclusive gates.
         if (!sawFootnoteToken) {
           if (!FOOTNOTE_TOKEN_RE.test(lineText)) {
             continue;
@@ -118,7 +119,7 @@ export const latex_footnote_block: RuleBlock = (state, startLine, endLine, silen
         if (lineText.indexOf('{') === -1) {
           continue;
         }
-        if (reOpenTagFootnoteG.test(fullContent)) {
+        if (reOpenTagFootnoteRe.test(fullContent)) {
           hasOpenTag = true;
           nextLine += 1;
           break;
@@ -259,7 +260,7 @@ export const latex_footnotetext_block: RuleBlock = (state, startLine, endLine, s
       lineText: string,
       pos: number = state.bMarks[startLine] + state.tShift[startLine],
       max: number = state.eMarks[startLine];
-    // Skip if no `\footnotetext` / `\blfootnotetext` token at/after this block.
+    // Skip when the last `\footnotetext`/`\blfootnotetext` literal is strictly before this block's start.
     const positions = getCachedSrcPositions(state, FOOTNOTETEXT_POS_KEY, FOOTNOTETEXT_TOKEN_RE_G);
     if (positions.length === 0 || positions[positions.length - 1] < state.bMarks[startLine]) {
       return false;
@@ -275,7 +276,7 @@ export const latex_footnotetext_block: RuleBlock = (state, startLine, endLine, s
     const terminatorRules = getTerminatorRulesForFootnotes(state.md.block.ruler);
     // Literal token can't span `\n` — gate the O(fullContent) regex on per-line presence.
     let sawFootnotetextToken: boolean = FOOTNOTETEXT_TOKEN_RE.test(lineText);
-    if (!sawFootnotetextToken || !reOpenTagFootnotetextG.test(lineText)) {
+    if (!sawFootnotetextToken || !reOpenTagFootnotetextRe.test(lineText)) {
       // jump line-by-line until empty one or EOF
       for (; nextLine < endLine; nextLine++) {
         for (let i = 0; i < terminatorRules.length; i++) {
@@ -298,7 +299,7 @@ export const latex_footnotetext_block: RuleBlock = (state, startLine, endLine, s
         }
         fullContent += fullContent ? '\n' : '';
         fullContent += lineText;
-        // Two cheap gates before the O(fullContent) regex; mutually exclusive — exactly one substring test runs per line.
+        // Inside this loop: exactly one substring test per iteration via mutually exclusive gates.
         if (!sawFootnotetextToken) {
           if (!FOOTNOTETEXT_TOKEN_RE.test(lineText)) {
             continue;
@@ -309,7 +310,7 @@ export const latex_footnotetext_block: RuleBlock = (state, startLine, endLine, s
         if (lineText.indexOf('{') === -1) {
           continue;
         }
-        if (reOpenTagFootnotetextG.test(fullContent)) {
+        if (reOpenTagFootnotetextRe.test(fullContent)) {
           hasOpenTag = true;
           nextLine += 1;
           break;

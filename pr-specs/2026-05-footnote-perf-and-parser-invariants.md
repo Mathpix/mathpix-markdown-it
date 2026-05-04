@@ -151,18 +151,16 @@ type MmdCacheKey = `__mmd_${string}`;
 const getCachedSrcPositions = (
   state: { src: string; [k: string]: unknown },
   key: MmdCacheKey,
-  pattern: RegExp,
+  patternG: RegExp,
 ): number[] => {
   const cached = state[key];
   if (Array.isArray(cached)) return cached;
-  // Strip `y` (sticky+global is a SyntaxError) and `g` (re-added) from inherited flags.
-  const re = pattern.global ? pattern : new RegExp(pattern.source, pattern.flags.replace(/[gy]/g, '') + 'g');
-  re.lastIndex = 0;
+  patternG.lastIndex = 0;
   const positions: number[] = [];
   let m: RegExpExecArray | null;
-  while ((m = re.exec(state.src)) !== null) {
+  while ((m = patternG.exec(state.src)) !== null) {
     positions.push(m.index);
-    if (m.index === re.lastIndex) re.lastIndex++;
+    if (m.index === patternG.lastIndex) patternG.lastIndex++;
   }
   state[key] = positions;
   return positions;
@@ -173,12 +171,12 @@ The cache is keyed by a property on the `StateBlock` instance, not on `state.env
 
 Caller responsibilities, enforced where possible:
 
-- **Cache key** must start with `__mmd_` — enforced at compile time by the `MmdCacheKey` template literal type, so collisions with `StateBlock` fields (`tokens`, `src`, `line`, …) are impossible from TS callers.
-- **Pattern** should be a `/g` regex owned by this helper (the helper mutates `lastIndex`). A non-global regex is silently lifted to a `/g` copy as a defensive fallback (with `[gy]` stripped from inherited flags to avoid `SyntaxError` on `y`) — library code stays robust on JS-side misuse.
+- **Cache key** must start with `__mmd_` — enforced at compile time by the `MmdCacheKey` template literal type for TS callers; JS callers must follow the convention by hand. The helper is module-private so this is internal-only contract.
+- **Pattern** must be a /g regex owned by this helper (the helper mutates `lastIndex`). The two callers in the same module both pass module-level /g constants, so there's no defensive-fallback branch — keeping dead code paths out of the helper.
 - **Cache hit** uses `Array.isArray(cached)` rather than `!== undefined` so a stale `null`/non-array value (e.g. an out-of-band write to the same property) re-computes instead of returning garbage.
 - **Returned array** is treated as read-only by the caller (no mutation; cache invariant is "stable for the lifetime of the parse state").
 
-For our two callers the `/g` regex is constructed once at module load via `new RegExp(NON_G_RE.source, 'g')`, so per-parse the helper does **no** regex construction at all — it just resets `lastIndex` and runs the `exec` loop on cache miss.
+The /g regex is constructed once at module load via `new RegExp(NON_G_RE.source, 'g')`, so per-parse the helper does **no** regex construction at all — it just resets `lastIndex` and runs the `exec` loop on cache miss.
 
 ### Token guards
 
@@ -207,26 +205,29 @@ Reading the *last* element of the positions array makes the check O(1) and corre
 The forward-scanning loop in Phase 1 (used to detect a multi-line opening tag) carries two cheap gates that protect the O(`fullContent`) regex test:
 
 ```ts
+const reOpenTagFootnoteRe = new RegExp(reOpenTagFootnoteG.source);  // stateless alias for `.test()`
+…
 let sawFootnoteToken = FOOTNOTE_TOKEN_RE.test(lineText);
-if (!sawFootnoteToken || !reOpenTagFootnoteG.test(lineText)) {
+if (!sawFootnoteToken || !reOpenTagFootnoteRe.test(lineText)) {
   for (; nextLine < endLine; nextLine++) {
     // … fence/empty checks, accumulate fullContent …
+    // Inside this loop: exactly one substring test per iteration via mutually exclusive gates.
     if (!sawFootnoteToken) {
       if (!FOOTNOTE_TOKEN_RE.test(lineText)) continue;
       sawFootnoteToken = true;
     }
-    // Opening tag requires `{` — skip regex on lines without it (handles `\footnote\n…\n{`
-    // patterns without re-scanning fullContent on every intermediate line).
+    // Opening tag requires `{` — skip lines without it.
     if (lineText.indexOf('{') === -1) continue;
-    if (reOpenTagFootnoteG.test(fullContent)) { … }
+    if (reOpenTagFootnoteRe.test(fullContent)) { … }
   }
 }
 ```
 
+- Per-line `.test()` runs against a stateless (non-/g) alias derived from `reOpenTagFootnoteG.source`. The /g version (used by `getCachedSrcPositions` for `exec`) carries `lastIndex` across calls; using the non-/g alias for boolean tests removes a pre-existing footgun where a successful match could leave `lastIndex` past a subsequent shorter line and produce a one-shot false negative.
 - The token gate skips lines until the literal `\footnote` (anchored by lookahead) appears.
 - After the token has been seen, the `{` gate continues to skip lines that cannot complete the opening pattern (every alternative in `reOpenTagFootnoteG` ends in `{`). This prevents the worst-case `\footnote\n…(many lines without `{`)…\n{` pattern from degrading back to O(N×M).
 
-`latex_footnotetext_block` follows the identical shape with `FOOTNOTETEXT_TOKEN_RE`.
+`latex_footnotetext_block` follows the identical shape with `FOOTNOTETEXT_TOKEN_RE` and `reOpenTagFootnotetextRe`.
 
 ### Why the token guard is sound
 
@@ -312,8 +313,8 @@ The post-change segment count on this input rises because the segment renderer i
 
 | File | Change |
 |------|--------|
-| `src/markdown/md-latex-footnotes/block-rule.ts` | Module-private `getCachedSrcPositions` helper + `MmdCacheKey` template literal type (kept private — single internal caller for now). Whole-document early exit at the top of `latex_footnote_block` / `latex_footnotetext_block`; per-line token guard (regex with `(?![a-zA-Z])` lookahead) plus `{` gate inside Phase 1 forward-scan. |
-| `src/markdown/md-core-rules/set-positions.ts` | Per-child `Object.isExtensible` guard before `child.positions = …` assignment, so frozen `SHARED_*_CLOSE` singletons inside `tabular_inline` subtrees skip cleanly while non-frozen siblings (math, includegraphics, td_open) keep full position + highlight processing. Same guard added to the `link_open` special-case branch entry condition. Top-level skip list also extended from `['tabular']` to `['tabular', 'tabular_inline']`. |
+| `src/markdown/md-latex-footnotes/block-rule.ts` | Module-private `getCachedSrcPositions` helper + `MmdCacheKey` template literal type (helper requires /g regex by contract; both callers in this module pass module-level /g constants). Whole-document early exit at the top of `latex_footnote_block` / `latex_footnotetext_block`; per-line token guard (regex with `(?![a-zA-Z])` lookahead) plus `{` gate inside Phase 1 forward-scan. Boolean `.test()` calls switched from `reOpenTagFootnoteG` / `reOpenTagFootnotetextG` to module-local stateless aliases to remove `lastIndex` pollution between calls. |
+| `src/markdown/md-core-rules/set-positions.ts` | Per-child `Object.isExtensible` guard before `child.positions = …` assignment, so frozen `SHARED_*_CLOSE` singletons inside `tabular_inline` subtrees skip cleanly while non-frozen siblings (math, includegraphics, td_open) keep full position + highlight processing. Same guard on the `link_open` special-case branch entry condition; comment notes the fall-through path is positions-degraded if a `link_*` token is ever frozen (fix at that time, no current failing path). Top-level skip list also extended from `['tabular']` to `['tabular', 'tabular_inline']`. |
 | `src/markdown/md-theorem/block-rule.ts` | `BeginTheorem` env-index lookup gated on `!silent` and hoisted above `endTag()` / forward-scan in non-silent mode — unregistered environments bail in O(1) without touching `state.tokens`. Silent-mode terminator probes keep close-tag-based answer (required by `newTheoremBlock` ↔ `\begin{NAME}` adjacent-line handshake). |
 | `tests/_data/_footnotes_latex/_data-footnote.js` | Five new fixtures: `\footnote`-prefixed commands that must not trigger the rule (`\footnotemark[1]` mid-line, `\footnotesize` in multi-line paragraph, repeated `\footnotemark`); mixed `\footnotemark` + real `\footnote{}` in the same paragraph; `\footnote{}` at the very end of source (boundary check for the `<` comparison in the early-exit). |
 | `tests/_data/_theorem/_data.js` | Four new fixtures: three for unregistered environments (`tikzpicture`, `lemma`, `example`) — full HTML pinning shows that the rule no longer emits `class="theorem_block"`; one for `\newtheorem{NAME}` + `\begin{NAME}` on adjacent lines (silent-mode handshake regression). |

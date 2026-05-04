@@ -805,6 +805,9 @@ a continuous function.</div>
       '<div class="theorem" style="font-style: italic; padding: 10px 0;"><span style="font-weight: bold; font-style: normal;" class="theorem-title">Theorem 1.</span><span style="margin-right: 16px"></span><div style="display: inline;" data-display="inline">Body content.</div>\n' +
       '</div></div>'
   },
+  // Three fixtures below pin a pre-existing quirk: the body text inside an unregistered theorem env
+  // is dropped by an unrelated math-block fallback rule. This PR only stops emitting the unmatched
+  // leading `<div class="theorem_block">` wrapper. See pr-specs/2026-05-…md → "Known limitations".
   {
     latex: '\\begin{tikzpicture}\nfoo\n\\end{tikzpicture}',
     html: '<div><span  class="math-block equation-number " number="0"></span></div>'

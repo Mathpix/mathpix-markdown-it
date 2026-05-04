@@ -25,7 +25,7 @@ const setChildrenPositions = (state, token, pos, highlights, isBlockquote = fals
     let child = token.children[i];
     let childBefore = i - 1 >= 0 ? token.children[i-1] : null;
     const startPos = pos;
-    // Skip if link_open or its text child is frozen — fall through to the per-child guarded path.
+    // Skip if link_open or its text child is frozen — fall through to the per-child guarded path. NOTE: in that fall-through, position accuracy for the link's text/close is degraded (link_open carries no `content`/`markup` so `pos` doesn't advance). Acceptable today since no `link_*` token is frozen in the parser; if one ever is, this branch needs a positions-aware skip path.
     if (child.type === "link_open" && !child.hasOwnProperty('nextPos')
       && Object.isExtensible(child)
       && token.children[i + 1] && Object.isExtensible(token.children[i + 1])) {

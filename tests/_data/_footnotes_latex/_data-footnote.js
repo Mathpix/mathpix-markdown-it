@@ -182,7 +182,10 @@ module.exports = [
     html: '<div>Word <sup class="footnote-ref">[2]</sup>then <sup class="footnote-ref">[3]</sup>then plain text.</div>'
   },
   {
-    // mixed `\footnotemark` and real `\footnote{}` in the same paragraph
+    // Mixed `\footnotemark` and real `\footnote{}` in the same paragraph.
+    // Pre-existing rendering quirk: both display "[1]" — `\footnotemark[1]` echoes the explicit mark
+    // while the auto-numbered `\footnote{}` is also numbered 1 (links to #fn2). This fixture pins the
+    // current behavior so a fix to the numbering scheme would surface here intentionally.
     mmd: 'Word \\footnotemark[1] then \\footnote{real one} more.',
     html: '<div>Word <sup class="footnote-ref">[1]</sup>then <sup class="footnote-ref"><a href="#fn2" id="fnref2">[1]</a></sup> more.</div>\n' +
       '<hr class="footnotes-sep">\n' +
