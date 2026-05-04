@@ -62,9 +62,13 @@ export const reFootNote: RegExp = /^\\footnote/;
 export const reOpenTagFootnote: RegExp = /^\\footnote\s{0,}\[\s{0,}\]\s{0,}{|^\\footnote\s{0,}\[-?\d+\]\s{0,}{|^\\footnote\s{0,}{/;
 // `G` suffix means "non-anchored" (no `^`), NOT the /g flag — `.test()` callers depend on stateless behaviour. Same for `reOpenTagFootnotetextG` below.
 export const reOpenTagFootnoteG: RegExp = /\\footnote\s{0,}\[\s{0,}\]\s{0,}{|\\footnote\s{0,}\[-?\d+\]\s{0,}{|\\footnote\s{0,}{/;
+// Cheap per-line token guard: matches the literal `\footnote` only when followed by a non-letter, so `\footnotemark` / `\footnotesize` / `\footnotetext` do not satisfy it.
+export const reFootnoteToken: RegExp = /\\footnote(?![a-zA-Z])/;
 export const reOpenTagFootnoteNumbered: RegExp = /\\footnote\s{0,}\[(?<number>-?\d+)\]\s{0,}{/;
 export const reOpenTagFootnotetext: RegExp = /^\\footnotetext\s{0,}\[\s{0,}\]\s{0,}{|^\\footnotetext\s{0,}\[-?\d+\]\s{0,}{|^\\footnotetext\s{0,}{|^\\blfootnotetext\s{0,}{/;
 export const reOpenTagFootnotetextG: RegExp = /\\footnotetext\s{0,}\[\s{0,}\]\s{0,}{|\\footnotetext\s{0,}\[-?\d+\]\s{0,}{|\\footnotetext\s{0,}{|\\blfootnotetext\s{0,}{/;
+// Same shape as `reFootnoteToken` for `\footnotetext` and `\blfootnotetext`.
+export const reFootnotetextToken: RegExp = /\\(?:bl)?footnotetext(?![a-zA-Z])/;
 export const reOpenTagFootnotetextNumbered: RegExp = /\\footnotetext\s{0,}\[(?<number>-?\d+)\]\s{0,}{/;
 export const reFootNoteMark: RegExp = /^\\footnotemark/;
 export const reFootNoteText: RegExp = /^\\footnotetext|\\blfootnotetext/;

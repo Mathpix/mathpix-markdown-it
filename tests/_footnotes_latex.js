@@ -3,6 +3,12 @@ let should = chai.should();
 
 let MM = require('../lib/mathpix-markdown-model/index').MathpixMarkdownModel;
 const { getLabelsList } = require('../lib/index');
+const {
+  reFootnoteToken,
+  reFootnotetextToken,
+  reOpenTagFootnoteG,
+  reOpenTagFootnotetextG,
+} = require('../lib/markdown/common/consts');
 
 const options = {
   cwidth: 800
@@ -161,24 +167,56 @@ describe('Check block \\footnote:', () => {
   });
 });
 
-// Performance regression: the per-state position cache must keep the rule's cost on documents with thousands of footnote-free paragraphs at O(1) per block start, not O(N × paragraph-length). Without the early-exit, a single forgotten optimization can regress this back into the seconds-to-minutes range.
+// Performance regression: the per-state position cache must keep both `latex_footnote_block` and `latex_footnotetext_block` at O(1) per block start on footnote-free paragraphs, not O(N × paragraph-length). Without the early-exit, a single forgotten optimization can regress this back into the seconds-to-minutes range.
+const buildLargeNoFootnoteDoc = (header) => {
+  const lines = [header, ''];
+  for (let i = 0; i < 4000; i++) {
+    lines.push('This paragraph contains plain prose without any footnote-related markup.');
+    if ((i & 7) === 0) lines.push('');
+  }
+  return lines.join('\n');
+};
+
+// Soundness of the per-line token guard: any string that matches the open-tag regex MUST also match the cheap token guard. Locks the invariant the spec relies on — if a future contributor adds an alternative to the open-tag regex that doesn't begin with the literal token followed by a non-letter, this test fails.
+describe('Footnote token-guard soundness:', () => {
+  const cases = [
+    { name: 'reOpenTagFootnoteG',     fullRe: reOpenTagFootnoteG,     tokenRe: reFootnoteToken,     samples: ['\\footnote[]{x}', '\\footnote[1]{x}', '\\footnote{x}', '\\footnote {x}', '\\footnote\n{x}'] },
+    { name: 'reOpenTagFootnotetextG', fullRe: reOpenTagFootnotetextG, tokenRe: reFootnotetextToken, samples: ['\\footnotetext[]{x}', '\\footnotetext[1]{x}', '\\footnotetext{x}', '\\footnotetext\n{x}', '\\blfootnotetext{x}'] },
+  ];
+  cases.forEach(({ name, fullRe, tokenRe, samples }) => {
+    samples.forEach((s) => {
+      it(`${name} matches "${s.replace(/\n/g, '\\n')}" → token guard also matches`, () => {
+        fullRe.test(s).should.equal(true);
+        tokenRe.test(s).should.equal(true);
+      });
+    });
+  });
+});
+
 describe('Footnote rule performance regression:', () => {
-  it('4,000-paragraph document with one early footnote parses well under the budget', function () {
-    this.timeout(15000);
-    const lines = [];
-    lines.push('Header paragraph with one footnote \\footnote{single}.');
-    lines.push('');
-    for (let i = 0; i < 4000; i++) {
-      lines.push('This paragraph contains plain prose without any footnote-related markup.');
-      if ((i & 7) === 0) lines.push('');
-    }
-    const mmd = lines.join('\n');
+  // Optimized path: ~80 ms locally. 1.5 s budget catches a return to seconds-per-parse (~20× regression and up) while staying loose enough for slow CI runners. Warmup parse absorbs JIT / MathJax init so the measured run isn't penalised on first call.
+  const measure = (mmd) => {
+    MM.markdownToHTML(mmd, options);
+    MM.texReset();
     const t0 = Date.now();
     const html = MM.markdownToHTML(mmd, options);
     const elapsed = Date.now() - t0;
-    html.should.contain('footnote-ref');
-    // 5 s budget: the optimized path runs in ~80 ms; the budget is loose enough for slow CI runners but tight enough to catch a return to seconds-per-parse.
-    elapsed.should.be.below(5000);
     MM.texReset();
+    return { html, elapsed };
+  };
+
+  it('4,000-paragraph document with one early \\footnote{} parses well under the budget', function () {
+    this.timeout(15000);
+    const mmd = buildLargeNoFootnoteDoc('Header paragraph with one footnote \\footnote{single}.');
+    const { html, elapsed } = measure(mmd);
+    html.should.contain('footnote-ref');
+    elapsed.should.be.below(1500);
+  });
+
+  it('4,000-paragraph document with one early \\footnotetext{} parses well under the budget', function () {
+    this.timeout(15000);
+    const mmd = buildLargeNoFootnoteDoc('\\footnotetext[1]{single}\n');
+    const { elapsed } = measure(mmd);
+    elapsed.should.be.below(1500);
   });
 });

@@ -208,4 +208,30 @@ module.exports = [
       '</ol>\n' +
       '</section>'
   },
+  {
+    // tShift invariant: `\footnote{}` after leading whitespace. Cached source position is `bMarks[startLine] + tShift`, never `< bMarks[startLine]`, so the early-exit `<` boundary correctly keeps it in scope.
+    mmd: '   \\footnote{indented} text after.',
+    html: '<div><sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup> text after.</div>\n' +
+      '<hr class="footnotes-sep">\n' +
+      '<section class="footnotes" style="margin-bottom: 1em;">\n' +
+      '<ol class="footnotes-list" style="margin-bottom: 0;">\n' +
+      '<li id="fn1" class="footnote-item"><div>indented <a href="#fnref1" class="footnote-backref">↩︎</a></div>\n' +
+      '</li>\n' +
+      '</ol>\n' +
+      '</section>'
+  },
+  {
+    // Nested `\footnote{}` inside another `\footnote{}` body: outer's body is parsed via `state.md.block.parse(content, …)` which builds a fresh StateBlock; the cache symbol on the outer state must NOT leak into the nested parse (the new state has its own `state.src`).
+    mmd: 'Outer text \\footnote{outer body with nested \\footnote{inner} ref} after.',
+    html: '<div>Outer text <sup class="footnote-ref"><a href="#fn2" id="fnref2">[2]</a></sup> after.</div>\n' +
+      '<hr class="footnotes-sep">\n' +
+      '<section class="footnotes" style="margin-bottom: 1em;">\n' +
+      '<ol class="footnotes-list" style="margin-bottom: 0;">\n' +
+      '<li id="fn1" class="footnote-item"><div>inner <a href="#fnref1" class="footnote-backref">↩︎</a></div>\n' +
+      '</li>\n' +
+      '<li id="fn2" class="footnote-item"><div>outer body with nested <sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup> ref <a href="#fnref2" class="footnote-backref">↩︎</a></div>\n' +
+      '</li>\n' +
+      '</ol>\n' +
+      '</section>'
+  },
 ];

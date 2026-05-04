@@ -181,16 +181,19 @@ The /g regex is constructed once at module load via `new RegExp(NON_G_RE.source,
 
 ### Token guards
 
-Per-rule constants — non-/g for `.test()` per-line guard, /g derived once via `.source` for the cache helper:
+Token-guard constants live in `common/consts.ts` so the soundness test can pin the same patterns the rule consumes:
 
 ```ts
-const FOOTNOTE_TOKEN_RE = /\\footnote(?![a-zA-Z])/;
-const FOOTNOTE_TOKEN_RE_G = new RegExp(FOOTNOTE_TOKEN_RE.source, 'g');
-const FOOTNOTETEXT_TOKEN_RE = /\\(?:bl)?footnotetext(?![a-zA-Z])/;
-const FOOTNOTETEXT_TOKEN_RE_G = new RegExp(FOOTNOTETEXT_TOKEN_RE.source, 'g');
+// consts.ts
+export const reFootnoteToken     = /\\footnote(?![a-zA-Z])/;
+export const reFootnotetextToken = /\\(?:bl)?footnotetext(?![a-zA-Z])/;
+
+// block-rule.ts: /g sweep version derived once via `.source` for the cache helper
+const FOOTNOTE_TOKEN_SWEEP_G     = new RegExp(reFootnoteToken.source,     'g');
+const FOOTNOTETEXT_TOKEN_SWEEP_G = new RegExp(reFootnotetextToken.source, 'g');
 ```
 
-The `(?![a-zA-Z])` lookahead anchors the literal so commands sharing a prefix (`\footnotemark`, `\footnotesize`, `\footnotetextStyle`, etc.) do not match. Single-source-of-truth via `.source`: any future tweak to the lookahead lives in one place.
+The `(?![a-zA-Z])` lookahead anchors the literal so commands sharing a prefix (`\footnotemark`, `\footnotesize`, `\footnotetextStyle`, etc.) do not match. Single-source-of-truth via `.source`: any future tweak to the lookahead lives in one place. The non-/g consts are shared between the rule's per-line `.test()` calls and the soundness test in `_footnotes_latex.js`, so drift between rule and test is impossible.
 
 Both rules begin with:
 
@@ -206,13 +209,13 @@ Reading the *last* element of the positions array makes the check O(1) and corre
 The forward-scanning loop in Phase 1 (used to detect a multi-line opening tag) carries two cheap gates that protect the O(`fullContent`) regex test:
 
 ```ts
-let sawFootnoteToken = FOOTNOTE_TOKEN_RE.test(lineText);
+let sawFootnoteToken = reFootnoteToken.test(lineText);
 if (!sawFootnoteToken || !reOpenTagFootnoteG.test(lineText)) {
   for (; nextLine < endLine; nextLine++) {
     // … fence/empty checks, accumulate fullContent …
     // Two cheap gates (token-seen, `{` present) both must hold before we run the heavy O(fullContent) regex; either gate's `continue` shortcuts to the next line.
     if (!sawFootnoteToken) {
-      if (!FOOTNOTE_TOKEN_RE.test(lineText)) continue;
+      if (!reFootnoteToken.test(lineText)) continue;
       sawFootnoteToken = true;
     }
     // Opening tag requires `{` — skip lines without it.
@@ -230,7 +233,7 @@ if (!sawFootnoteToken || !reOpenTagFootnoteG.test(lineText)) {
 
 ### Why the token guard is sound
 
-Every alternative in `reOpenTagFootnoteG` requires the literal `\\footnote` immediately followed by `\s*` (which includes `\n`) and then `[`/`{`. The character right after `\footnote` is therefore never a letter — never inside `[a-zA-Z]`. So `FOOTNOTE_TOKEN_RE` is equivalent (at the prefix level) to "any position the rule's full regex could match starting from".
+Every alternative in `reOpenTagFootnoteG` requires the literal `\\footnote` immediately followed by `\s*` (which includes `\n`) and then `[`/`{`. The character right after `\footnote` is therefore never a letter — never inside `[a-zA-Z]`. So `reFootnoteToken` is equivalent (at the prefix level) to "any position the rule's full regex could match starting from".
 
 `fullContent` is built by joining lines with `\n`, and `\n` is not in `\footnote`, so the literal cannot straddle a join. Therefore: if no individual line in `fullContent` contains `\footnote(?![a-zA-Z])`, the rule's full regex cannot match. The guard's `continue` is an admissible early termination.
 
@@ -312,7 +315,8 @@ The post-change segment count on this input rises because the segment renderer i
 
 | File | Change |
 |------|--------|
-| `src/markdown/md-latex-footnotes/block-rule.ts` | Module-private `getCachedSrcPositions` helper keyed by per-module `Symbol` (collision-free namespace on `StateBlock`); helper-owned /g constants named `*_SWEEP_G` so future contributors know not to reuse them for ad-hoc `.test()`. Whole-document early exit at the top of `latex_footnote_block` / `latex_footnotetext_block`; per-line token guard (regex with `(?![a-zA-Z])` lookahead) plus `{` gate inside Phase 1 forward-scan. |
+| `src/markdown/common/consts.ts` | New `reFootnoteToken` and `reFootnotetextToken` exports — the per-line token guards used by both `latex_footnote_block`/`latex_footnotetext_block` and the soundness test. Comment on `reOpenTagFootnoteG` flags the misleading `G` suffix (means "non-anchored", not the /g flag). |
+| `src/markdown/md-latex-footnotes/block-rule.ts` | Module-private `getCachedSrcPositions` helper keyed by per-module `Symbol` with `{ src, positions }` cache entries (re-computes on src mismatch); helper-owned /g constants named `*_SWEEP_G` so future contributors know not to reuse them for ad-hoc `.test()`. Whole-document early exit at the top of `latex_footnote_block` / `latex_footnotetext_block`; per-line token guard (`reFootnoteToken` / `reFootnotetextToken`) plus `{` gate inside Phase 1 forward-scan. |
 | `src/markdown/md-core-rules/set-positions.ts` | Per-child `Object.isExtensible` guard before `child.positions = …` assignment, so frozen `SHARED_*_CLOSE` singletons inside `tabular_inline` subtrees skip cleanly while non-frozen siblings (math, includegraphics, td_open) keep full position + highlight processing. Same guard on the `link_open` special-case branch entry condition; comment notes the fall-through path is positions-degraded if a `link_*` token is ever frozen (fix at that time, no current failing path). Top-level skip list also extended from `['tabular']` to `['tabular', 'tabular_inline']`. |
 | `src/markdown/md-theorem/block-rule.ts` | `BeginTheorem` env-index lookup gated on `!silent` and hoisted above `endTag()` / forward-scan in non-silent mode — unregistered environments bail in O(1) without touching `state.tokens`. Silent-mode terminator probes keep close-tag-based answer (required by `newTheoremBlock` ↔ `\begin{NAME}` adjacent-line handshake). |
 | `tests/_data/_footnotes_latex/_data-footnote.js` | Five new fixtures: `\footnote`-prefixed commands that must not trigger the rule (`\footnotemark[1]` mid-line, `\footnotesize` in multi-line paragraph, repeated `\footnotemark`); mixed `\footnotemark` + real `\footnote{}` in the same paragraph; `\footnote{}` at the very end of source (boundary check for the `<` comparison in the early-exit). |
@@ -326,7 +330,14 @@ No public API surface, no exported names, no option flags introduced.
 
 ## Testing
 
-- Full suite: **3,358 passing** (3,342 prior + 16 new: 5 footnote-prefix / mixed-mark / end-of-source cases, 3 tabular position-token fixtures, 3 inline-tabular `markdownToHTMLSegments` regression cases, 3 unregistered-theorem-env cases, 1 adjacent-line `\newtheorem`/`\begin{NAME}` regression case, 1 perf regression smoke-test on a synthetic 4,000-paragraph no-footnote document with a 5-second wall-clock budget — runs in ~80 ms after the optimization; the budget is set well above that to remain stable on slow CI runners while still catching a regression back into seconds-per-parse).
+- Full suite: **3,370 passing** (3,342 prior + 28 new):
+  - 7 footnote correctness fixtures: 3 `\footnote`-prefixed commands that must not trigger the rule (`\footnotemark[1]` mid-line, `\footnotesize` in a multi-line paragraph, repeated `\footnotemark`); mixed `\footnotemark` + real `\footnote{}`; `\footnote{}` at end of source (boundary check for the `<` early-exit comparison); `\footnote{}` after leading whitespace (tShift invariant); nested `\footnote{outer with \footnote{inner}}` (cache must not leak across `state.md.block.parse` boundaries).
+  - 9 token-guard soundness cases assert that for every alternative of `reOpenTagFootnoteG` / `reOpenTagFootnotetextG`, a representative match also satisfies the cheap per-line token guard — locks the invariant the spec relies on.
+  - 2 perf regression smoke-tests (one for `\footnote{}`, one for `\footnotetext{}`) on synthetic 4,000-paragraph no-footnote inputs; warmup parse absorbs JIT cost, measured run has a 1.5 s wall-clock budget. Optimized path runs in ~110-150 ms; the budget catches a return to seconds-per-parse.
+  - 3 tabular position-token fixtures.
+  - 3 inline-tabular `markdownToHTMLSegments` regression cases (frozen close-token guard).
+  - 3 unregistered-theorem-env quirk fixtures, isolated in `_data_known_quirks.js` under a separate `Pre-existing body-drop quirk for unregistered theorem envs (TO BE FIXED)` describe block so the failure mode is obvious when the quirk gets fixed upstream.
+  - 1 adjacent-line `\newtheorem` / `\begin{NAME}` silent-mode handshake regression case.
 - Footnote suite: 3 new cases lock in token-guard behavior on `\footnote`-prefixed commands that must not trigger the rule.
 - Theorem suite: 3 new cases pin HTML output for `\begin{tikzpicture}`, `\begin{lemma}`, `\begin{example}` confirming `class="theorem_block"` is absent; 1 new case pins HTML output for `\newtheorem{theorem}{Theorem}\n\\begin{theorem}\n…\n\end{theorem}` (no empty line between) — locks the silent-mode terminator handshake in `newTheoremBlock`.
 - HTML-segments suite: 3 new cases directly exercise the regression path that `setChildrenPositions` previously threw on (`tabular_inline` child of an `inline` block), asserting `markdownToHTMLSegments({ addPositionsToTokens: true })` returns a non-null result.
