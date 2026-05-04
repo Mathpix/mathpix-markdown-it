@@ -1,3 +1,16 @@
+# May 2026
+
+## [2.0.40] - Footnote block-rule performance and parser invariants
+
+- `latex_footnote_block` / `latex_footnotetext_block`: per-state position cache + per-line token guard turn the O(N×M) accumulation scan into one O(|src|) sweep per parse and O(1) per subsequent block-start on footnote-free blocks (~60× speedup on large doc-with-few-footnotes input).
+- `setChildrenPositions`: per-child `Object.isExtensible` guard before `.positions` assignment fixes `TypeError` thrown by frozen `SHARED_*_CLOSE` singletons inside `tabular_inline` subtrees, restoring `markdownToHTMLSegments({ addPositionsToTokens: true })` on documents with inline subtables. `link_open` branch split into strict-triple `[text](url)` (legacy snapshot-pinned math) + span fallback for fancy contents (`[**bold**](url)`, `` [`code`](url) ``, `[![alt](img)](url)`) — fixes silent NaN/off-by-N positions that existed on master.
+- `BeginTheorem`: env-name validation hoisted above `state.push` in non-silent mode — unregistered environments no longer leave unmatched `<div class="theorem_block">` wrappers in the rendered HTML. Silent-mode terminator probes preserved (required by `\newtheorem` ↔ `\begin{NAME}` adjacent-line handshake).
+- Behavior change for unregistered `\begin{NAME}…\end{NAME}` (e.g. TikZ): previously the rule emitted an unmatched `<div class="theorem_block">` wrapper around a math-block fallback `<span class="math-block equation-number" number="0"></span>`. Now the wrapper is gone; the inner placeholder is unchanged. `.equation-number` element count is unchanged vs master. Register via `\newtheorem{NAME}{…}` to get the body rendered.
+- Behavior change for `markdownToHTMLSegments` consumers: same documents emit more segments than before because the previously unmatched wrapper was preventing segment delimiters from breaking at natural boundaries. Output bytes are unchanged; segment counts are not.
+- Behavior change for highlights consumers: fancy-link span fallback (`[**bold**](url)` etc. with overlapping `highlights:`) emits empty `<span class="mmd-highlight"></span>` wrappers around markup-only inner tokens (strong_open/strong_close). Filter empty `.mmd-highlight` matches if iterating.
+
+See `pr-specs/2026-05-footnote-perf-and-parser-invariants.md` for design and known limitations.
+
 # April 2026
 
 ## [2.0.39] - Optimize tabular parsing memory and performance

@@ -29,6 +29,7 @@ export const inlineTabular: RuleInline = (state, silent) => {
   const nextPos = startMathPos + block.close.posEnd;
   if (!silent) {
     const token = state.push("tabular_inline", "", 0);
+    // Invariant: content === verbatim src slice. setChildrenPositions advances pos by content.length.
     token.content = fullBlock;
     token.children =[];
     const cTabular =  parseInlineTabular(token.content);

@@ -189,3 +189,97 @@ describe('markdownToHTMLSegments — segment balance:', () => {
     segmentImbalances(content, map).should.deep.equal([]);
   });
 });
+
+describe('markdownToHTMLSegments — addPositionsToTokens with inline tabular:', () => {
+  // setChildrenPositions must not assign `.positions` to frozen shared close-token singletons
+  // inside `tabular_inline` subtrees; non-frozen siblings (td_open, inline math) still get full processing.
+  const renderWithPositions = (src) =>
+    MathpixMarkdownModel.markdownToHTMLSegments(src, { addPositionsToTokens: true });
+
+  const cases = [
+    {
+      name: 'inline tabular inside paragraph',
+      src: 'Some text \\begin{tabular}{c}A\\end{tabular} more text',
+      expectContains: ['Some text', 'more text', '<table'],
+      // Assert the cell body actually rendered, not just an empty `<table></table>`.
+      expectMatch: [/<td[^>]*>\s*A\s*<\/td>/],
+    },
+    {
+      name: 'inline tabular after inline math',
+      src: 'A \\(x\\) \\begin{tabular}{c}cell\\end{tabular} after',
+      expectContains: ['mjx-container', '<table', 'after'],
+    },
+    {
+      name: 'two inline tabulars in one paragraph',
+      src: 'Word \\begin{tabular}{|c|}\\hline X \\end{tabular} and \\begin{tabular}{|c|}\\hline Y \\end{tabular} done.',
+      expectContains: ['Word', 'and', 'done.', '<table'],
+      // Both tables must render (sibling not eaten by setChildrenPositions).
+      expectMatch: [/<td[^>]*>\s*X\s*<\/td>/, /<td[^>]*>\s*Y\s*<\/td>/],
+      expectTableCount: 2,
+    },
+    {
+      // Standard `[text](url)`: link_open special-case branch math is calibrated for this
+      // exact (link_open, text, link_close) triple. Sibling-type guard must keep this path live.
+      name: 'standard markdown link enters link_open special case',
+      src: 'Visit [Mathpix](https://mathpix.com) today.',
+      expectContains: ['Visit', 'today.', '<a href="https://mathpix.com"', 'Mathpix</a>'],
+    },
+    {
+      // Strong INSIDE brackets: tokenizer emits (link_open, strong_open, text, strong_close, link_close).
+      // Strict triple fails type checks (i+1 is strong_open, not text) → span fallback fires, finds matching
+      // link_close, sets link_open span and lets per-child loop position inner children.
+      name: 'link with strong inside brackets exercises span fallback',
+      src: 'Open the [**bold**](https://mathpix.com) link.',
+      expectContains: ['Open the', 'link.', '<a href="https://mathpix.com"', '<strong>bold</strong>'],
+    },
+    {
+      // Code inside brackets: (link_open, code_inline, link_close) — i+1 is code_inline, not text → span fallback.
+      name: 'link with code_inline inside brackets exercises span fallback',
+      src: 'See [`code link`](https://mathpix.com) inline.',
+      expectContains: ['See', 'inline.', '<a href="https://mathpix.com"', '<code>code link</code>'],
+    },
+    {
+      // Image inside brackets: (link_open, image, link_close) — exercises depth-tracking in span fallback.
+      name: 'link with image inside brackets exercises span fallback depth tracking',
+      src: 'Click [![alt text](https://mathpix.com/img.png)](https://mathpix.com) here.',
+      expectContains: ['Click', 'here.', '<a href="https://mathpix.com"', '<img', 'alt="alt text"'],
+    },
+    {
+      // Nested-bracket source: CommonMark forbids nested links, but pin the depth-scan output.
+      name: 'nested-bracket link does not crash depth tracking',
+      src: 'See [outer [inner](https://b.org)](https://a.org) end.',
+      expectContains: ['See', 'end.', '<a href="https://b.org"'],
+    },
+  ];
+  cases.forEach(({ name, src, expectContains, expectMatch, expectTableCount }) => {
+    it(name, () => {
+      const result = renderWithPositions(src);
+      should.exist(result);
+      result.should.have.property('content').that.is.a('string');
+      result.should.have.property('map').that.is.an('array');
+      result.content.length.should.be.greaterThan(0);
+      result.map.length.should.be.greaterThan(0);
+      for (const fragment of expectContains) {
+        result.content.should.contain(fragment);
+      }
+      for (const re of (expectMatch || [])) {
+        result.content.should.match(re);
+      }
+      if (expectTableCount !== undefined) {
+        (result.content.match(/<table/g) || []).length.should.equal(expectTableCount);
+      }
+    });
+  });
+});
+
+// BeginTheorem behavior change: unregistered envs no longer leave unmatched <div class="theorem_block"> wrapper.
+describe('markdownToHTMLSegments — unregistered theorem env (TikZ):', () => {
+  it('emits no <div class="theorem_block"> wrapper around tikzpicture and segments break at natural boundaries', () => {
+    const src = 'Before\n\n\\begin{tikzpicture}\nfoo\n\\end{tikzpicture}\n\nAfter';
+    const result = MathpixMarkdownModel.markdownToHTMLSegments(src, {});
+    should.exist(result);
+    result.content.should.not.contain('class="theorem_block"');
+    // 3 segments: Before / tikz body / After. Master coalesced into 1 due to unmatched wrapper.
+    result.map.length.should.equal(3);
+  });
+});

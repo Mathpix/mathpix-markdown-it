@@ -6,6 +6,9 @@ import {
 } from "../highlight/common";
 import { mathTokenTypes } from "../common/consts";
 
+const OPEN_BRACKET_CHARCODE = 0x5B;
+const TABULAR_TYPES = new Set(['tabular', 'tabular_inline']);
+
 const setChildrenPositions = (state, token, pos, highlights, isBlockquote = false) => {
   if (token.hasOwnProperty('offsetLeft')) {
     pos += token.offsetLeft;
@@ -25,8 +28,32 @@ const setChildrenPositions = (state, token, pos, highlights, isBlockquote = fals
     let child = token.children[i];
     let childBefore = i - 1 >= 0 ? token.children[i-1] : null;
     const startPos = pos;
-    if (child.type ==="link_open" && !child.hasOwnProperty('nextPos')) {
-      if (token.children[i+1].hasOwnProperty('nextPos')) {
+    // Mirror top-level setPositions skip: position the tabular token itself but don't recurse
+    // into its cells (cell content is reconstructed from `token.content`, not from `state.src`
+    // slicing). pos advances by `content.length` so subsequent siblings stay correctly placed.
+    if (TABULAR_TYPES.has(child.type)) {
+      const len = typeof child.content === 'string' ? child.content.length : 0;
+      if (Object.isExtensible(child)) {
+        child.positions = { start: startPos, end: startPos + len };
+        if (!hasInlineHtml) {
+          child.highlights = findPositionsInHighlights(highlights, child.positions);
+        }
+        child.content_test_str = state.src.slice(child.positions.start, child.positions.end);
+      }
+      pos = startPos + len;
+      continue;
+    }
+    // `[text](url)` (link_open, text, link_close): special case keeps the legacy text-positioned math
+    // (snapshots in tests/_data/_tokenPositions/_data.js pin it). Skipped unless the triple is writable
+    // and link_close carries `nextPos` (used as the link end — `undefined` would propagate as `NaN`).
+    // i+2 (link_close) is read-only here — loop skips it via `i += 2`, so no extensibility check needed.
+    if (child.type === "link_open" && !child.hasOwnProperty('nextPos')
+      && Object.isExtensible(child)
+      && token.children[i + 1] && token.children[i + 1].type === 'text'
+      && Object.isExtensible(token.children[i + 1])
+      && token.children[i + 2] && token.children[i + 2].type === 'link_close'
+      && typeof token.children[i + 2].nextPos === 'number') {
+      if (typeof token.children[i+1].nextPos === 'number') {
         token.children[i+1].positions = {
           start: startPos + 1,
           end: start_content + token.children[i+1].nextPos
@@ -35,9 +62,13 @@ const setChildrenPositions = (state, token, pos, highlights, isBlockquote = fals
           token.children[i + 1].highlights = findPositionsInHighlights(highlights, token.children[i + 1].positions);
         }
       } else {
+        // Guard `content` is a string before `.length` — markdown-it's contract sets text content
+        // to a string, but a defensive check stops `undefined.length` → `NaN` from poisoning `.positions.end`.
+        const innerContent = token.children[i+1].content;
+        const innerLen = typeof innerContent === 'string' ? innerContent.length : 0;
         token.children[i+1].positions = {
           start: startPos + 1,
-          end: startPos + 1 + token.children[i+1].content?.length
+          end: startPos + 1 + innerLen
         };
         if (!hasInlineHtml) {
           token.children[i + 1].highlights = findPositionsInHighlights(highlights, token.children[i + 1].positions);
@@ -61,6 +92,46 @@ const setChildrenPositions = (state, token, pos, highlights, isBlockquote = fals
       i+= 2;
       continue;
     }
+    // Span-based fallback for fancy link contents (`[**bold**](url)`, `` [`code`](url) ``,
+    // `[![alt](img)](url)`): set `link_open.positions` to the full `[…](…)` span via the matching
+    // `link_close.nextPos`, advance `pos` past `[`, and let the per-child loop position each inner
+    // child by its own `nextPos`/`content`/`markup`. `start_content`/`end_content` are intentionally
+    // not set on link_open (consistent with strict-triple branch). `highlightAll` cascade is also
+    // omitted — would require a post-hoc pass; not needed for current consumers.
+    if (child.type === "link_open" && !child.hasOwnProperty('nextPos') && Object.isExtensible(child)) {
+      let linkCloseIdx = -1;
+      let depth = 1;
+      for (let j = i + 1; j < token.children.length; j++) {
+        const c = token.children[j];
+        if (c.type === 'link_open') {
+          depth++;
+        } else if (c.type === 'link_close') {
+          depth--;
+          if (depth === 0) {
+            linkCloseIdx = j;
+            break;
+          }
+        }
+      }
+      if (linkCloseIdx !== -1 && typeof token.children[linkCloseIdx].nextPos === 'number') {
+        child.positions = {
+          start: startPos,
+          end: start_content + token.children[linkCloseIdx].nextPos
+        };
+        if (!hasInlineHtml) {
+          child.highlights = findPositionsInHighlights(highlights, child.positions);
+        }
+        child.content_test_str = state.src.slice(child.positions.start, child.positions.end);
+        // Skip the `[` so inner children align. Custom emitters without `[` keep pos at startPos.
+        pos = state.src.charCodeAt(startPos) === OPEN_BRACKET_CHARCODE ? startPos + 1 : startPos;
+        continue;
+      }
+      // Malformed token stream defensive path — markdown-it always pairs link_open/link_close, so this is unreachable in normal streams.
+      child.positions = { start: startPos, end: startPos };
+      child.content_test_str = '';
+      pos = startPos;
+      continue;
+    }
 
     if (child.hasOwnProperty('nextPos')) {
       pos = start_content + child.nextPos;
@@ -77,6 +148,12 @@ const setChildrenPositions = (state, token, pos, highlights, isBlockquote = fals
       if (child.type === 'softbreak') {
         pos++;
       }
+    }
+
+    // Skip frozen shared tokens (safety net for any frozen non-tabular singleton). MUST run
+    // AFTER the pos-advance block above so siblings stay correctly placed when this fires.
+    if (!Object.isExtensible(child)) {
+      continue;
     }
 
     child.positions = {
@@ -248,7 +325,7 @@ export const setPositions = (state) => {
       }
       /** Ignore set positions for children.
        * Since the content may not match the original string. Line breaks can be removed*/
-      if (['tabular'].includes(token.type)) {
+      if (TABULAR_TYPES.has(token.type)) {
         continue;
       }
       if (token.children?.length && token.positions) {
@@ -289,5 +366,4 @@ export const setPositions = (state) => {
       }
     }
   }
-  // console.log("[MMD]=>[state.tokens]=>", state.tokens)
 };

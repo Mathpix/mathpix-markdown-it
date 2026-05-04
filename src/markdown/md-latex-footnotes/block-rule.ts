@@ -1,5 +1,7 @@
-import { Token, RuleBlock, Ruler } from 'markdown-it';
-import { 
+import { Token, RuleBlock, Ruler, StateBlock } from 'markdown-it';
+import {
+  reFootnoteToken,
+  reFootnotetextToken,
   reOpenTagFootnote,
   reOpenTagFootnoteG,
   reOpenTagFootnoteNumbered,
@@ -10,6 +12,43 @@ import {
 import { findEndMarker } from "../common";
 import { findOpenCloseTags } from "../utils";
 import * as fence from 'markdown-it/lib/rules_block/fence.js'
+
+// Symbol keys: collision-free on StateBlock; invisible to JSON.stringify/Object.keys (use `Object.getOwnPropertySymbols` to inspect).
+const FOOTNOTE_POS_KEY = Symbol('mmd.footnoteSrcPositions');
+const FOOTNOTETEXT_POS_KEY = Symbol('mmd.footnotetextSrcPositions');
+// Helper-owned /g sweeps. lastIndex is reset in the helper before each scan; sync-only.
+const FOOTNOTE_TOKEN_SWEEP_G: RegExp = new RegExp(reFootnoteToken.source, 'g');
+const FOOTNOTETEXT_TOKEN_SWEEP_G: RegExp = new RegExp(reFootnotetextToken.source, 'g');
+
+type FootnoteCacheEntry = { src: string; lastPos: number };
+
+// Per-state cache of the last match offset (-1 if none). `patternG` MUST be /g.
+// Nested `state.md.block.parse(...)` builds a fresh StateBlock with its own src, so the Symbol-keyed cache on the outer state never leaks into nested parses.
+const getCachedSrcPositions = (
+  state: StateBlock,
+  key: symbol,
+  patternG: RegExp,
+): number => {
+  const slot = state as unknown as Record<symbol, FootnoteCacheEntry | undefined>;
+  const cached = slot[key];
+  // JS strings are immutable — identity check correctly invalidates on any reassignment of `state.src`.
+  if (cached && cached.src === state.src) {
+    return cached.lastPos;
+  }
+  patternG.lastIndex = 0;
+  let lastPos = -1;
+  let m: RegExpExecArray | null;
+  while ((m = patternG.exec(state.src)) !== null) {
+    lastPos = m.index;
+    // Empty-match guard for future regex edits.
+    if (m.index === patternG.lastIndex) {
+      patternG.lastIndex++;
+    }
+  }
+  patternG.lastIndex = 0;
+  slot[key] = { src: state.src, lastPos };
+  return lastPos;
+};
 
 const getTerminatorRulesForFootnotes = (ruler: Ruler) => {
   const rules = ruler.__rules__;
@@ -39,7 +78,11 @@ export const latex_footnote_block: RuleBlock = (state, startLine, endLine, silen
       lineText: string,
       pos: number = state.bMarks[startLine] + state.tShift[startLine],
       max: number = state.eMarks[startLine];
-
+    // Bail when the last `\footnote` literal is strictly before this block's start. Equality keeps the literal in scope (token starts on this block). `-1` from cache means no match anywhere.
+    const lastFootnotePos = getCachedSrcPositions(state, FOOTNOTE_POS_KEY, FOOTNOTE_TOKEN_SWEEP_G);
+    if (lastFootnotePos < state.bMarks[startLine]) {
+      return false;
+    }
     let nextLine: number = startLine + 1;
     let startPos = pos;
     let numbered;
@@ -48,8 +91,10 @@ export const latex_footnote_block: RuleBlock = (state, startLine, endLine, silen
     let hasOpenTag = false;
     let pending = '';
     let terminate = false;
-    if (!reOpenTagFootnoteG.test(lineText)) {
-      // jump line-by-line until empty one or EOF
+    // Literal token can't span `\n` — gate the O(fullContent) regex on per-line presence.
+    let sawFootnoteToken: boolean = reFootnoteToken.test(lineText);
+    if (!sawFootnoteToken || !reOpenTagFootnoteG.test(lineText)) {
+      // Only `fence` terminates here; footnotetext uses full terminator list (pre-existing).
       for (; nextLine < endLine; nextLine++) {
         if (fence(state, nextLine, endLine, true)) {
           terminate = true;
@@ -66,6 +111,21 @@ export const latex_footnote_block: RuleBlock = (state, startLine, endLine, silen
         }
         fullContent += fullContent ? '\n' : '';
         fullContent += lineText;
+        // Two cheap gates (token-seen, `{` present) both must hold before we run the heavy O(fullContent) regex; either gate's `continue` shortcuts to the next line.
+        if (!sawFootnoteToken) {
+          if (!reFootnoteToken.test(lineText)) {
+            continue;
+          }
+          sawFootnoteToken = true;
+        }
+        // Opening tag requires `{` — every alternative of the open-tag regex ends with literal `{`.
+        // Lines without `{` cannot complete the pattern, so `continue` defers the heavy regex run
+        // until a line with `{` arrives. Soundness: `{` cannot straddle a `\n` (it's a single char),
+        // so if the pattern matches in `fullContent` after this iteration appended `lineText`, the
+        // closing `{` must be present in `lineText` and the gate doesn't lose a match.
+        if (!lineText.includes('{')) {
+          continue;
+        }
         if (reOpenTagFootnoteG.test(fullContent)) {
           hasOpenTag = true;
           nextLine += 1;
@@ -207,7 +267,11 @@ export const latex_footnotetext_block: RuleBlock = (state, startLine, endLine, s
       lineText: string,
       pos: number = state.bMarks[startLine] + state.tShift[startLine],
       max: number = state.eMarks[startLine];
-
+    // Bail when the last `\footnotetext`/`\blfootnotetext` literal is strictly before this block's start. Equality keeps it in scope. `-1` means no match anywhere.
+    const lastFootnotetextPos = getCachedSrcPositions(state, FOOTNOTETEXT_POS_KEY, FOOTNOTETEXT_TOKEN_SWEEP_G);
+    if (lastFootnotetextPos < state.bMarks[startLine]) {
+      return false;
+    }
     let nextLine: number = startLine + 1;
     let startPos = pos;
     let numbered;
@@ -217,7 +281,9 @@ export const latex_footnotetext_block: RuleBlock = (state, startLine, endLine, s
     let pending = '';
     let terminate = false;
     const terminatorRules = getTerminatorRulesForFootnotes(state.md.block.ruler);
-    if (!reOpenTagFootnotetextG.test(lineText)) {
+    // Literal token can't span `\n` — gate the O(fullContent) regex on per-line presence.
+    let sawFootnotetextToken: boolean = reFootnotetextToken.test(lineText);
+    if (!sawFootnotetextToken || !reOpenTagFootnotetextG.test(lineText)) {
       // jump line-by-line until empty one or EOF
       for (; nextLine < endLine; nextLine++) {
         for (let i = 0; i < terminatorRules.length; i++) {
@@ -240,6 +306,17 @@ export const latex_footnotetext_block: RuleBlock = (state, startLine, endLine, s
         }
         fullContent += fullContent ? '\n' : '';
         fullContent += lineText;
+        // Two cheap gates (token-seen, `{` present) both must hold before we run the heavy O(fullContent) regex; either gate's `continue` shortcuts to the next line.
+        if (!sawFootnotetextToken) {
+          if (!reFootnotetextToken.test(lineText)) {
+            continue;
+          }
+          sawFootnotetextToken = true;
+        }
+        // Opening tag requires `{` — skip lines without it (covers `\footnotetext\n…\n{` without rescanning fullContent).
+        if (!lineText.includes('{')) {
+          continue;
+        }
         if (reOpenTagFootnotetextG.test(fullContent)) {
           hasOpenTag = true;
           nextLine += 1;

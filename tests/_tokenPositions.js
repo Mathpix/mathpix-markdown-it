@@ -159,3 +159,32 @@ describe('Testing positions for lists:', () => {
     });
   });
 });
+
+// Invariant: link_open carries no `start_content`/`end_content` (consistent across strict-triple and span-fallback branches).
+describe('link_open positions invariant:', () => {
+  const findLinkOpens = (tokens) => {
+    const out = [];
+    for (const t of tokens) {
+      if (t.type === 'link_open') out.push(t);
+      if (t.children?.length) out.push(...findLinkOpens(t.children));
+    }
+    return out;
+  };
+  const cases = [
+    { name: 'strict-triple [text](url)', mmd: 'A [text](http://x.org) B' },
+    { name: 'span fallback [**bold**](url)', mmd: 'A [**bold**](http://x.org) B' },
+  ];
+  cases.forEach(({ name, mmd }) => {
+    it(`${name}: link_open.positions has no start_content/end_content`, () => {
+      const linkOpens = findLinkOpens(md.parse(mmd, {}));
+      linkOpens.length.should.be.greaterThan(0);
+      linkOpens.forEach((tok) => {
+        if (tok.positions) {
+          tok.positions.should.not.have.property('start_content');
+          tok.positions.should.not.have.property('end_content');
+        }
+      });
+    });
+  });
+});
+
