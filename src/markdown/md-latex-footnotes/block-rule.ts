@@ -13,8 +13,9 @@ import * as fence from 'markdown-it/lib/rules_block/fence.js'
 
 const FOOTNOTE_POS_KEY: string = '__mmd_footnoteSrcPositions';
 const FOOTNOTETEXT_POS_KEY: string = '__mmd_footnotetextSrcPositions';
-const FOOTNOTE_NEEDLES: string[] = ['\\footnote'];
-const FOOTNOTETEXT_NEEDLES: string[] = ['\\footnotetext', '\\blfootnotetext'];
+// `(?![a-zA-Z])` anchors the literal token so `\footnotemark` / `\footnotesize` / `\footnotetext` do not match.
+const FOOTNOTE_TOKEN_RE: RegExp = /\\footnote(?![a-zA-Z])/;
+const FOOTNOTETEXT_TOKEN_RE: RegExp = /\\(?:bl)?footnotetext(?![a-zA-Z])/;
 
 const getTerminatorRulesForFootnotes = (ruler: Ruler) => {
   const rules = ruler.__rules__;
@@ -44,8 +45,8 @@ export const latex_footnote_block: RuleBlock = (state, startLine, endLine, silen
       lineText: string,
       pos: number = state.bMarks[startLine] + state.tShift[startLine],
       max: number = state.eMarks[startLine];
-    // Skip whole-doc scan if no `\footnote` exists at or after this block.
-    const positions = getCachedSrcPositions(state, FOOTNOTE_POS_KEY, FOOTNOTE_NEEDLES);
+    // Skip if no `\footnote` token at/after this block.
+    const positions = getCachedSrcPositions(state, FOOTNOTE_POS_KEY, FOOTNOTE_TOKEN_RE);
     if (positions.length === 0 || positions[positions.length - 1] < state.bMarks[startLine]) {
       return false;
     }
@@ -57,9 +58,9 @@ export const latex_footnote_block: RuleBlock = (state, startLine, endLine, silen
     let hasOpenTag = false;
     let pending = '';
     let terminate = false;
-    // `\footnote` literal can't span lines — skip the O(fullContent) regex while no line contains it.
-    let sawFootnoteSubstr: boolean = lineText.indexOf('\\footnote') !== -1;
-    if (!sawFootnoteSubstr || !reOpenTagFootnoteG.test(lineText)) {
+    // Literal token can't span `\n` — gate the O(fullContent) regex on per-line presence.
+    let sawFootnoteToken: boolean = FOOTNOTE_TOKEN_RE.test(lineText);
+    if (!sawFootnoteToken || !reOpenTagFootnoteG.test(lineText)) {
       // jump line-by-line until empty one or EOF
       for (; nextLine < endLine; nextLine++) {
         if (fence(state, nextLine, endLine, true)) {
@@ -77,11 +78,11 @@ export const latex_footnote_block: RuleBlock = (state, startLine, endLine, silen
         }
         fullContent += fullContent ? '\n' : '';
         fullContent += lineText;
-        if (!sawFootnoteSubstr) {
-          if (lineText.indexOf('\\footnote') === -1) {
+        if (!sawFootnoteToken) {
+          if (!FOOTNOTE_TOKEN_RE.test(lineText)) {
             continue;
           }
-          sawFootnoteSubstr = true;
+          sawFootnoteToken = true;
         }
         if (reOpenTagFootnoteG.test(fullContent)) {
           hasOpenTag = true;
@@ -224,8 +225,8 @@ export const latex_footnotetext_block: RuleBlock = (state, startLine, endLine, s
       lineText: string,
       pos: number = state.bMarks[startLine] + state.tShift[startLine],
       max: number = state.eMarks[startLine];
-    // Skip whole-doc scan if no `\footnotetext` / `\blfootnotetext` exists at or after this block.
-    const positions = getCachedSrcPositions(state, FOOTNOTETEXT_POS_KEY, FOOTNOTETEXT_NEEDLES);
+    // Skip if no `\footnotetext` / `\blfootnotetext` token at/after this block.
+    const positions = getCachedSrcPositions(state, FOOTNOTETEXT_POS_KEY, FOOTNOTETEXT_TOKEN_RE);
     if (positions.length === 0 || positions[positions.length - 1] < state.bMarks[startLine]) {
       return false;
     }
@@ -238,10 +239,9 @@ export const latex_footnotetext_block: RuleBlock = (state, startLine, endLine, s
     let pending = '';
     let terminate = false;
     const terminatorRules = getTerminatorRulesForFootnotes(state.md.block.ruler);
-    // `\footnotetext`/`\blfootnotetext` literal can't span lines — skip the O(fullContent) regex while no line contains it.
-    let sawFootnotetextSubstr: boolean = lineText.indexOf('\\footnotetext') !== -1
-      || lineText.indexOf('\\blfootnotetext') !== -1;
-    if (!sawFootnotetextSubstr || !reOpenTagFootnotetextG.test(lineText)) {
+    // Literal token can't span `\n` — gate the O(fullContent) regex on per-line presence.
+    let sawFootnotetextToken: boolean = FOOTNOTETEXT_TOKEN_RE.test(lineText);
+    if (!sawFootnotetextToken || !reOpenTagFootnotetextG.test(lineText)) {
       // jump line-by-line until empty one or EOF
       for (; nextLine < endLine; nextLine++) {
         for (let i = 0; i < terminatorRules.length; i++) {
@@ -264,12 +264,11 @@ export const latex_footnotetext_block: RuleBlock = (state, startLine, endLine, s
         }
         fullContent += fullContent ? '\n' : '';
         fullContent += lineText;
-        if (!sawFootnotetextSubstr) {
-          if (lineText.indexOf('\\footnotetext') === -1
-            && lineText.indexOf('\\blfootnotetext') === -1) {
+        if (!sawFootnotetextToken) {
+          if (!FOOTNOTETEXT_TOKEN_RE.test(lineText)) {
             continue;
           }
-          sawFootnotetextSubstr = true;
+          sawFootnotetextToken = true;
         }
         if (reOpenTagFootnotetextG.test(fullContent)) {
           hasOpenTag = true;

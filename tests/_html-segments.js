@@ -189,3 +189,24 @@ describe('markdownToHTMLSegments — segment balance:', () => {
     segmentImbalances(content, map).should.deep.equal([]);
   });
 });
+
+describe('markdownToHTMLSegments — addPositionsToTokens with inline tabular:', () => {
+  // setChildrenPositions must skip `tabular` and `tabular_inline` parents so
+  // recursion does not reach the frozen shared close-token singletons.
+  const renderWithPositions = (src) =>
+    MathpixMarkdownModel.markdownToHTMLSegments(src, { addPositionsToTokens: true });
+
+  const cases = [
+    { name: 'inline tabular inside paragraph', src: 'Some text \\begin{tabular}{c}A\\end{tabular} more text' },
+    { name: 'inline tabular after inline math', src: 'A \\(x\\) \\begin{tabular}{c}cell\\end{tabular} after' },
+    { name: 'two inline tabulars in one paragraph', src: 'Word \\begin{tabular}{|c|}\\hline X \\end{tabular} and \\begin{tabular}{|c|}\\hline Y \\end{tabular} done.' },
+  ];
+  cases.forEach(({ name, src }) => {
+    it(name, () => {
+      const result = renderWithPositions(src);
+      should.exist(result);
+      result.should.have.property('content').that.is.a('string');
+      result.should.have.property('map').that.is.an('array');
+    });
+  });
+});

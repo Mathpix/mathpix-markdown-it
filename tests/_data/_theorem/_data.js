@@ -798,15 +798,23 @@ a continuous function.</div>
       '<div style="margin-top: 0; margin-bottom: 0;"></div>'
   },
   {
+    // `\newtheorem{NAME}` and `\begin{NAME}` on adjacent lines — silent-mode terminator handshake before NAME is registered.
+    latex: '\\newtheorem{theorem}{Theorem}\n\\begin{theorem}\nBody content.\n\\end{theorem}',
+    html: '<div style="margin-top: 0; margin-bottom: 0;"></div>\n' +
+      '<div class="theorem_block">\n' +
+      '<div class="theorem" style="font-style: italic; padding: 10px 0;"><span style="font-weight: bold; font-style: normal;" class="theorem-title">Theorem 1.</span><span style="margin-right: 16px"></span><div style="display: inline;" data-display="inline">Body content.</div>\n' +
+      '</div></div>'
+  },
+  {
     latex: '\\begin{tikzpicture}\nfoo\n\\end{tikzpicture}',
-    html: '<div><span  class="math-block equation-number " number="0"></span></div>'
+    htmlNotInclude: ['class="theorem_block"', 'theorem_open']
   },
   {
     latex: '\\begin{lemma}\nstatement\n\\end{lemma}',
-    html: '<div><span  class="math-block equation-number " number="0"></span></div>'
+    htmlNotInclude: ['class="theorem_block"', 'theorem_open']
   },
   {
     latex: 'Prefix \\begin{example}\nbody\n\\end{example} suffix',
-    html: '<div>Prefix <span  class="math-block equation-number " number="0"></span> suffix</div>'
+    htmlNotInclude: ['class="theorem_block"', 'theorem_open']
   }
 ];

@@ -97,7 +97,7 @@ Validation of `envName` against the registered theorem environments runs after t
 
 1. **Whole-document early exit (footnotes).** On its first invocation per parse, each rule scans `state.src` once with `String.prototype.indexOf` for its keyword(s) and caches the offsets on the parser state. If the offset of the *last* keyword occurrence is before the current block's start, the rule returns `false` in O(1) without entering any loop.
 
-2. **Per-line substring guard inside the accumulation loop (footnotes).** The expensive `reOpenTagFootnoteG.test(fullContent)` runs only after a line that contains the literal keyword has been seen. Sound by construction: the regex always begins with `\\footnote` (resp. `\\footnotetext` / `\\blfootnotetext`), and those literals are contiguous and cannot span a line break.
+2. **Per-line token guard inside the accumulation loop (footnotes).** The expensive `reOpenTagFootnoteG.test(fullContent)` runs only after a line that contains the literal token has been seen. Sound by construction: the regex always begins with `\\footnote` (resp. `\\footnotetext` / `\\blfootnotetext`), and those literals are contiguous and cannot span a line break. Guard regex `/\\footnote(?![a-zA-Z])/` (resp. `/\\(?:bl)?footnotetext(?![a-zA-Z])/`) excludes `\footnotemark` / `\footnotesize` / `\footnotetextStyle` etc. so the guard does not hold the line on prefix-only matches.
 
 3. **`setChildrenPositions` early-return for `tabular` and `tabular_inline` parents.** Mirrors the existing top-level skip and prevents recursion from reaching the frozen close-token singletons. The top-level skip list is also broadened to `['tabular', 'tabular_inline']` for symmetry.
 
@@ -111,8 +111,8 @@ Validation of `envName` against the registered theorem environments runs after t
 
 - The keyword-position cache is pinned to `state` (not `state.env`). Nested `state.md.block.parse(content, …)` calls construct a new `StateBlock` with their own `src`, so each scope computes its own positions; an outer cache cannot leak through to nested parses with different source strings.
 - The cache holds plain `number[]` arrays. Sizing is bounded by the number of keyword occurrences in the source string. When the parser state is released after `md.parse` returns, the cache is released with it via normal GC.
-- Soundness of the substring guard rests on a single property: the literal token `\footnote` (resp. `\footnotetext`, `\blfootnotetext`) is a contiguous run of characters that cannot be split by `\n`. If no line in `fullContent` contains the literal, the regex — which has the literal as a required prefix in every alternative — cannot match.
-- `\footnotemark` / `\footnotesize` and other `\footnote`-prefixed commands cause the substring guard to admit the line; the regex then correctly fails to match. This is a benign false positive at the guard level, identical in behavior to the pre-change path.
+- Soundness of the token guard rests on a single property: the literal token `\footnote` (resp. `\footnotetext`, `\blfootnotetext`) is a contiguous run of characters that cannot be split by `\n`. If no line in `fullContent` contains the literal followed by a non-letter (the guard's lookahead anchor), the rule's regex — which has the literal as a required prefix in every alternative followed by `\s*`/`[`/`{` — cannot match.
+- `\footnotemark` / `\footnotesize` / `\footnotetextStyle` and other `\footnote*` longer forms are excluded by the `(?![a-zA-Z])` lookahead, so the guard correctly skips lines that only contain those prefixes.
 - The footnote rule's silent-mode contract (advance `state.line` only when not silent) is preserved — the new early-exit returns `false`, which is the same as the pre-change path on a non-matching block.
 - `tabular` and `tabular_inline` token children are parser-private (frozen close-token singletons + per-cell tokens with non-source content). Skipping them in `setChildrenPositions` matches the existing semantics — source-position metadata on those nodes is not consumed downstream because the tabular renderer reconstructs cell content from `token.content` rather than from `state.src` slices.
 - `BeginTheorem`'s behavior for registered environments is unchanged — the lookup is the same, downstream tokens are the same, only the order of operations changes.
@@ -126,7 +126,7 @@ Validation of `envName` against the registered theorem environments runs after t
 - [x] Per-iteration substring guard prevents the O(`fullContent.length`) regex from running on lines that cannot complete the pattern.
 - [x] `setChildrenPositions` returns early for `tabular` / `tabular_inline` parent tokens, so frozen close-token singletons are never written to.
 - [x] `markdownToHTMLSegments({ addPositionsToTokens: true })` returns a non-null result on documents with inline subtables.
-- [x] `BeginTheorem` validates `envName` before any `state.push`; unregistered environments no longer leave unmatched `<div class="theorem_block">` in the output.
+- [x] `BeginTheorem` (non-silent) bails for unregistered environments before `endTag()` / forward scan / any `state.push`; silent-mode terminator probes preserve the original close-tag-based answer so the `\newtheorem` ↔ `\begin{NAME}` adjacent-line handshake keeps working.
 - [x] All existing tests pass; new fixtures cover each change.
 - [x] Output of `markdownToHTMLSegments` on the footnote-perf benchmark input is byte-identical before and after the change (same content, same segment map).
 - [x] Status is updated to `Implemented`.
@@ -140,75 +140,75 @@ Validation of `envName` against the registered theorem environments runs after t
 Exposed as a shared helper since both `latex_footnote_block` and `latex_footnotetext_block` use the same shape:
 
 ```ts
-export const getCachedSrcPositions = (state, key, needles) => {
-  if (state[key] !== undefined) return state[key];
-  const src = state.src;
-  const positions = [];
-  for (const needle of needles) {
-    let pos = 0;
-    while ((pos = src.indexOf(needle, pos)) !== -1) {
-      positions.push(pos);
-      pos += 1;
-    }
+export const getCachedSrcPositions = (
+  state: { src: string; [k: string]: unknown },
+  key: string,
+  pattern: RegExp,
+): number[] => {
+  if (state[key] !== undefined) return state[key] as number[];
+  const re = new RegExp(pattern.source, 'g');
+  const positions: number[] = [];
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(state.src)) !== null) {
+    positions.push(m.index);
+    if (m.index === re.lastIndex) re.lastIndex++;
   }
-  if (needles.length > 1) positions.sort((a, b) => a - b);
   state[key] = positions;
   return positions;
 };
 ```
 
-The cache is keyed by a property on the `StateBlock` instance itself, not on `state.env`. Because `state.md.block.parse(content, state.md, state.env, children)` builds a fresh state for nested parses, each parse scope sees its own `state.src` and recomputes its own positions on first access. Env keying would be incorrect — env is shared between outer and nested parses, but the source strings differ.
+Pattern is compiled once with the `g` flag locally so the caller's RegExp is not mutated through `lastIndex`. The cache is keyed by a property on the `StateBlock` instance itself, not on `state.env`. `state.md.block.parse(content, state.md, state.env, children)` builds a fresh state for nested parses, so each parse scope sees its own `state.src` and recomputes its own positions on first access. Env keying would be incorrect — env is shared between outer and nested parses, but the source strings differ.
 
-`indexOf` is the fastest available substring search in V8. One pass over a 2.5 MB source completes in single-digit milliseconds; a one-pass scan of larger documents is also well below the existing per-rule overhead.
+The returned array is treated as read-only by the caller (no mutation; cache invariant is "stable for the lifetime of the parse state").
 
-### Whole-document early exit
+### Token guards
 
-Both footnote rules begin with:
+Per-rule constants:
 
 ```ts
-const positions = getCachedSrcPositions(state, KEY, NEEDLES);
+const FOOTNOTE_TOKEN_RE = /\\footnote(?![a-zA-Z])/;
+const FOOTNOTETEXT_TOKEN_RE = /\\(?:bl)?footnotetext(?![a-zA-Z])/;
+```
+
+The `(?![a-zA-Z])` lookahead anchors the literal so commands sharing a prefix (`\footnotemark`, `\footnotesize`, `\footnotetextStyle`, etc.) do not match.
+
+Both rules begin with:
+
+```ts
+const positions = getCachedSrcPositions(state, KEY, FOOTNOTE_TOKEN_RE);
 if (positions.length === 0 || positions[positions.length - 1] < state.bMarks[startLine]) {
   return false;
 }
 ```
 
-Reading the *last* element of the positions array makes the check O(1). The check returns `false` whenever no keyword occurrence exists at or after the current block's source offset — covering both "no footnote in document" and "all footnotes already passed".
+Reading the *last* element of the positions array makes the check O(1) and correctly returns `false` whether the document has no footnote at all or all footnotes are already past.
 
-### Per-iteration substring guard
-
-The forward-scanning loop in Phase 1 (used to detect a multi-line opening tag) keeps a `sawFootnoteSubstr` flag:
+The forward-scanning loop in Phase 1 (used to detect a multi-line opening tag) keeps a `sawFootnoteToken` flag:
 
 ```ts
-let sawFootnoteSubstr = lineText.indexOf('\\footnote') !== -1;
-if (!sawFootnoteSubstr || !reOpenTagFootnoteG.test(lineText)) {
+let sawFootnoteToken = FOOTNOTE_TOKEN_RE.test(lineText);
+if (!sawFootnoteToken || !reOpenTagFootnoteG.test(lineText)) {
   for (; nextLine < endLine; nextLine++) {
     // … fence/empty checks, accumulate fullContent …
-    if (!sawFootnoteSubstr) {
-      if (lineText.indexOf('\\footnote') === -1) continue;
-      sawFootnoteSubstr = true;
+    if (!sawFootnoteToken) {
+      if (!FOOTNOTE_TOKEN_RE.test(lineText)) continue;
+      sawFootnoteToken = true;
     }
     if (reOpenTagFootnoteG.test(fullContent)) { … }
   }
 }
 ```
 
-The flag flips to `true` the first time a line contains the literal keyword. Until then, the O(`fullContent`) regex test is skipped via `continue`, replaced by an O(`lineText`) substring check.
+The flag flips to `true` the first time a line contains the literal token. Until then, the O(`fullContent`) regex test is skipped via `continue`, replaced by an O(`lineText`) regex test against a small fixed pattern. `latex_footnotetext_block` follows the identical shape with `FOOTNOTETEXT_TOKEN_RE`.
 
-The same shape is applied to `latex_footnotetext_block` with `\\footnotetext` and `\\blfootnotetext` substrings (either keyword on the line is enough to admit the regex test).
+### Why the token guard is sound
 
-### Why the substring guard is sound
+Every alternative in `reOpenTagFootnoteG` requires the literal `\\footnote` immediately followed by `\s*` (which includes `\n`) and then `[`/`{`. The character right after `\footnote` is therefore never a letter — never inside `[a-zA-Z]`. So `FOOTNOTE_TOKEN_RE` is equivalent (at the prefix level) to "any position the rule's full regex could match starting from".
 
-Every alternative in `reOpenTagFootnoteG` begins with the literal `\\footnote`:
+`fullContent` is built by joining lines with `\n`, and `\n` is not in `\footnote`, so the literal cannot straddle a join. Therefore: if no individual line in `fullContent` contains `\footnote(?![a-zA-Z])`, the rule's full regex cannot match. The guard's `continue` is an admissible early termination.
 
-```
-/\\footnote\s{0,}\[\s{0,}\]\s{0,}\{
- |\\footnote\s{0,}\[-?\d+\]\s{0,}\{
- |\\footnote\s{0,}\{/
-```
-
-For the regex to match at any position in `fullContent`, the literal nine-character substring `\footnote` must appear contiguously at that position. `fullContent` is built by joining lines with `\n`, and `\n` is not one of the characters in `\footnote`, so the substring cannot straddle a join. Therefore: if no individual line in `fullContent` contains `\footnote`, the regex cannot match. The guard's `continue` is an admissible early termination.
-
-The same argument applies to `reOpenTagFootnotetextG` with literals `\footnotetext` and `\blfootnotetext`.
+The same argument applies to `reOpenTagFootnotetextG` and `FOOTNOTETEXT_TOKEN_RE`.
 
 ### `setChildrenPositions` skip for tabular parents (`set-positions.ts`)
 
@@ -231,24 +231,30 @@ if (['tabular', 'tabular_inline'].includes(token.type)) {
 
 The early-return inside `setChildrenPositions` is the load-bearing change: the failing path is a recursive call from a non-tabular parent (an `inline` token whose subtree contains a subtable). The top-level update is a symmetry change for the case where future code inserts a `tabular_inline` directly at top level.
 
-### `BeginTheorem` validates before pushing (`md-theorem/block-rule.ts`)
+### `BeginTheorem` registration check (`md-theorem/block-rule.ts`)
 
 ```ts
-// Validate before pushing — markdown-it has no rollback on `return false`.
-const envIndex = envName
-  ? getTheoremEnvironmentIndex(envName)
-  : -1;
-if (envIndex === -1) {
+if (latexEnvironments.includes(envName) || mathEnvironments.includes(envName)) {
   return false;
 }
 
-state.line = nextLine + 1;
-token = state.push('paragraph_open', 'div', 1);
-token.attrSet('class','theorem_block');
-// … rest of the rule body …
+// Non-silent: bail early for unregistered envs (saves closeTag scan).
+// Silent must skip this — `newTheoremBlock` calls BeginTheorem(silent) before `\newtheorem` registers.
+let envIndex: number = -1;
+if (!silent) {
+  envIndex = getTheoremEnvironmentIndex(envName);
+  if (envIndex === -1) {
+    return false;
+  }
+}
+
+// … endTag(), forward-scan loop. After `if (silent) return true;` (close-tag-based answer),
+// non-silent path continues to `state.push` using envIndex set above.
 ```
 
-The lookup is moved to the position previously held by the same validation block (which was situated *between* the `paragraph_open` push and the `theorem_open` push). Behavior for registered environments is unchanged — same lookup, same downstream tokens; only the order of operations changes.
+The split is required by an existing handshake: `newTheoremBlock` registers `\newtheorem{NAME}` and on its forward scan calls `BeginTheorem(state, line, …, silent=true)` on the next `\begin{NAME}` line as a terminator probe. At that moment NAME is not yet registered. The original silent answer was close-tag-presence-based; the non-silent path is what actually mutates `state.tokens` and is therefore where the registration check is load-bearing.
+
+For unregistered environments (`\begin{tikzpicture}`, `\begin{lemma}` without a matching `\newtheorem`) the non-silent invocation now bails before `endTag()` and the O(blockSize) forward scan, in addition to no longer leaving any token in `state.tokens`. Registered environments are unchanged — same lookup, same downstream tokens.
 
 ---
 
@@ -280,13 +286,14 @@ The post-change segment count on this input rises because the segment renderer i
 
 | File | Change |
 |------|--------|
-| `src/markdown/utils.ts` | New `getCachedSrcPositions(state, key, needles)` exported helper — per-state cache of substring offsets in `state.src` |
-| `src/markdown/md-latex-footnotes/block-rule.ts` | Whole-document early exit at the top of `latex_footnote_block` and `latex_footnotetext_block`; substring-existence guard inside Phase 1 forward-scan in both rules |
+| `src/markdown/utils.ts` | New `getCachedSrcPositions(state, key, pattern)` exported helper — per-state cache of regex match positions in `state.src`; returned array is read-only |
+| `src/markdown/md-latex-footnotes/block-rule.ts` | Whole-document early exit at the top of `latex_footnote_block` and `latex_footnotetext_block`; per-line token guard (regex with `(?![a-zA-Z])` lookahead) inside Phase 1 forward-scan in both rules |
 | `src/markdown/md-core-rules/set-positions.ts` | `setChildrenPositions` early-returns for `tabular` / `tabular_inline` parents; top-level skip list extended from `['tabular']` to `['tabular', 'tabular_inline']` |
-| `src/markdown/md-theorem/block-rule.ts` | `BeginTheorem` validates `envIndex !== -1` before any `state.push`; existing validation block hoisted |
-| `tests/_data/_footnotes_latex/_data-footnote.js` | Three new fixtures pinning behavior on `\footnote`-prefixed commands that should not trigger the rule (`\footnotemark[1]` mid-line, `\footnotesize` in multi-line paragraph, repeated `\footnotemark`) |
-| `tests/_data/_theorem/_data.js` | Three new fixtures pinning HTML output for unregistered environments (`tikzpicture`, `lemma`, `example`) — asserts `class="theorem_block"` is absent |
-| `tests/_tokenPositions.js` + `tests/_data/_tokenPositions/_data_tabulars.js` | New describe block + three tabular fixtures (block tabular, subtable inline, tabular surrounded by paragraphs) for the position-tokens suite |
+| `src/markdown/md-theorem/block-rule.ts` | `BeginTheorem` env-index lookup gated on `!silent` and hoisted above `endTag()` / forward-scan in non-silent mode — unregistered environments bail in O(1) without touching `state.tokens`. Silent-mode terminator probes keep close-tag-based answer (required by `newTheoremBlock` ↔ `\begin{NAME}` adjacent-line handshake) |
+| `tests/_data/_footnotes_latex/_data-footnote.js` | Three new fixtures pinning behavior on `\footnote`-prefixed commands that must not trigger the rule (`\footnotemark[1]` mid-line, `\footnotesize` in multi-line paragraph, repeated `\footnotemark`) |
+| `tests/_data/_theorem/_data.js` + `tests/_theorem.js` | Three new fixtures for unregistered environments (`tikzpicture`, `lemma`, `example`) using `htmlNotInclude` to assert specific markup absence without pinning the entire HTML; one fixture for `\newtheorem{NAME}` + `\begin{NAME}` on adjacent lines (silent-mode handshake regression). Test runner extended to support an `htmlNotInclude: string \| string[]` field. |
+| `tests/_html-segments.js` | New describe block — three regression cases call `markdownToHTMLSegments` with `addPositionsToTokens: true` on inputs containing inline tabulars (paragraph + subtable, after inline math, two subtables in one paragraph); each must return a non-null `{content, map}` |
+| `tests/_tokenPositions.js` + `tests/_data/_tokenPositions/_data_tabulars.js` | New describe block + three tabular position-tokens fixtures (block tabular, nested tabular, tabular surrounded by paragraphs) |
 
 No public API surface, no exported names beyond `getCachedSrcPositions`, no option flags introduced.
 
@@ -294,9 +301,10 @@ No public API surface, no exported names beyond `getCachedSrcPositions`, no opti
 
 ## Testing
 
-- Full suite: **3,351 passing** (3,342 prior + 9 new: 3 footnote-prefix cases, 3 tabular position fixtures, 3 unregistered-theorem-env cases).
-- Footnote suites (`tests/_footnotes_latex.js`, `tests/_footnotes.js`): all existing cases unchanged; 3 new cases lock in the substring-guard behavior on `\footnote`-prefixed commands that must not trigger the rule.
-- Theorem suite (`tests/_theorem.js`): existing cases unchanged + 3 new cases asserting that `\begin{tikzpicture}`, `\begin{lemma}`, `\begin{example}` do not emit `class="theorem_block"`.
-- Position suite (`tests/_tokenPositions.js`): existing fixtures unchanged + 3 new fixtures in `_data_tabulars.js` covering block tabular, subtable inline (`tabular_inline`), and tabular surrounded by paragraphs.
-- Output equivalence on the footnote-perf benchmark: `markdownToHTMLSegments({ addPositionsToTokens: true })` produces a byte-identical 6,675,761-byte HTML and the same 9,082-entry segment map before and after the change. Verified at every step (baseline → +guard → +cache → +theorem hoist).
-- Output equivalence on the TikZ-heavy benchmark: with the new behavior, `markdownToHTMLSegments({ addPositionsToTokens: true })` returns `segs=3915, bytes=1,696,520` in 741 ms with zero `theorem_block` divs.
+- Full suite: **3,355 passing** (3,342 prior + 13 new: 3 footnote-prefix cases, 3 tabular position-token fixtures, 3 inline-tabular `markdownToHTMLSegments` regression cases, 3 unregistered-theorem-env cases, 1 adjacent-line `\newtheorem`/`\begin{NAME}` regression case).
+- Footnote suite: 3 new cases lock in token-guard behavior on `\footnote`-prefixed commands that must not trigger the rule.
+- Theorem suite: 3 new cases assert that `\begin{tikzpicture}`, `\begin{lemma}`, `\begin{example}` do not emit `class="theorem_block"` / `theorem_open` markup (via `htmlNotInclude` assertion-mode); 1 new case pins HTML output for `\newtheorem{theorem}{Theorem}\n\\begin{theorem}\n…\n\end{theorem}` (no empty line between) — locks the silent-mode terminator handshake in `newTheoremBlock`.
+- HTML-segments suite: 3 new cases directly exercise the regression path that `setChildrenPositions` previously threw on (`tabular_inline` child of an `inline` block), asserting `markdownToHTMLSegments({ addPositionsToTokens: true })` returns a non-null result.
+- Position suite: 3 new fixtures cover token shape on block tabular, nested tabular, and tabular surrounded by paragraphs.
+- Output equivalence on the footnote-perf benchmark: `markdownToHTMLSegments({ addPositionsToTokens: true })` produces a byte-identical 6,675,761-byte HTML and the same 9,082-entry segment map before and after the change. Verified at every step.
+- TikZ-heavy benchmark: `markdownToHTMLSegments({ addPositionsToTokens: true })` returns a non-null `{segs=3915, bytes=1,696,520}` in 741 ms; 0 `class="theorem_block"` occurrences in HTML output.

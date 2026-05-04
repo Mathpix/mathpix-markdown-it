@@ -187,6 +187,16 @@ export const BeginTheorem: RuleBlock = (state, startLine, endLine, silent) => {
     return false;
   }
 
+  // Non-silent: bail early for unregistered envs (saves closeTag scan).
+  // Silent must skip this — `newTheoremBlock` calls BeginTheorem(silent) before `\newtheorem` registers.
+  let envIndex: number = -1;
+  if (!silent) {
+    envIndex = getTheoremEnvironmentIndex(envName);
+    if (envIndex === -1) {
+      return false;
+    }
+  }
+
   /** Inline content before theorem block */
   strBefore = match.index > 0 ? lineText.slice(0, match.index) : '';
 
@@ -266,13 +276,6 @@ export const BeginTheorem: RuleBlock = (state, startLine, endLine, silent) => {
     resText += lineText.slice(0, matchE.index);
     latexEnd = matchE[0];
     // pE = matchE.index
-  }
-  // Validate before pushing — markdown-it has no rollback on `return false`.
-  const envIndex = envName
-    ? getTheoremEnvironmentIndex(envName)
-    : -1;
-  if (envIndex === -1) {
-    return false;
   }
   state.line = nextLine + 1;
   token = state.push('paragraph_open', 'div', 1);

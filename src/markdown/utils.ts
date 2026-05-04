@@ -8,22 +8,23 @@ import {
   attrsSharedMarker
 } from "./common/consts";
 
-// Per-state cache of `needle` offsets in `state.src`; pinned to state so nested `block.parse()` gets its own.
-export const getCachedSrcPositions = (state: any, key: string, needles: string[]): number[] => {
+// Per-state cache of `pattern` match positions in `state.src`. Pinned to state so nested `block.parse()` gets its own. Read-only return.
+export const getCachedSrcPositions = (
+  state: { src: string; [k: string]: unknown },
+  key: string,
+  pattern: RegExp,
+): number[] => {
   if (state[key] !== undefined) {
-    return state[key];
+    return state[key] as number[];
   }
-  const src: string = state.src;
+  const re = new RegExp(pattern.source, 'g');
   const positions: number[] = [];
-  for (const needle of needles) {
-    let pos: number = 0;
-    while ((pos = src.indexOf(needle, pos)) !== -1) {
-      positions.push(pos);
-      pos += 1;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(state.src)) !== null) {
+    positions.push(m.index);
+    if (m.index === re.lastIndex) {
+      re.lastIndex++;
     }
-  }
-  if (needles.length > 1) {
-    positions.sort((a, b) => a - b);
   }
   state[key] = positions;
   return positions;

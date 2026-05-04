@@ -1,5 +1,8 @@
 import { Token } from 'markdown-it';
-export declare const getCachedSrcPositions: (state: any, key: string, needles: string[]) => number[];
+export declare const getCachedSrcPositions: (state: {
+    [k: string]: unknown;
+    src: string;
+}, key: string, pattern: RegExp) => number[];
 export declare const endTag: (arg: string, shouldBeFirst?: boolean) => RegExp;
 export declare const beginTag: (arg: string, shouldBeFirst?: boolean) => RegExp;
 export declare const getWidthFromDocument: (cwidth?: number) => number;
