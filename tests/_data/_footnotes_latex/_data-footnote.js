@@ -169,8 +169,16 @@ module.exports = [
       '</ol>\n' +
       '</section>'
   },
-  // {
-  //   mmd: '',
-  //   html: ''
-  // },
+  {
+    mmd: 'Some text \\footnotemark[1] more text',
+    html: '<div>Some text <sup class="footnote-ref">[1]</sup>more text</div>'
+  },
+  {
+    mmd: 'Long paragraph without footnotes\nbut containing \\footnotesize text\nthat should not match the rule.',
+    html: '<div>Long paragraph without footnotes<br>\nbut containing \\footnotesize text<br>\nthat should not match the rule.</div>'
+  },
+  {
+    mmd: 'Word \\footnotemark[2] then \\footnotemark[3] then plain text.',
+    html: '<div>Word <sup class="footnote-ref">[2]</sup>then <sup class="footnote-ref">[3]</sup>then plain text.</div>'
+  },
 ];

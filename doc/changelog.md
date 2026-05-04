@@ -1,3 +1,25 @@
+# May 2026
+
+## [2.0.40] - Footnote block-rule performance and parser invariants
+
+- Footnote rule performance:
+  - `latex_footnote_block` and `latex_footnotetext_block` previously ran an O(N×M) accumulation+regex scan at every block start, dominating parse time on documents with few or no footnotes. Added a per-state cache of `\footnote` / `\footnotetext` / `\blfootnotetext` substring offsets in `state.src` (one pass via `String.prototype.indexOf` on first invocation, pinned to state). Each subsequent rule call short-circuits in O(1) when no relevant directive remains at or after the current block's source offset.
+  - Inside the Phase 1 forward-scan, the expensive `reOpenTagFootnoteG.test(fullContent)` (resp. `reOpenTagFootnotetextG`) now only runs after a line that contains the literal keyword has been seen — sound because every alternative in those regexes begins with the literal `\\footnote` (resp. `\\footnotetext` / `\\blfootnotetext`), and those literals cannot span a `\n`. Documents without the directive skip the regex entirely; the substring guard is O(`lineText`) instead of O(`fullContent`).
+  - Cache helper `getCachedSrcPositions(state, key, needles)` exported from `utils.ts` for reuse by other rules with the same shape.
+
+- `setPositions` / `setChildrenPositions` skip alignment:
+  - Top-level `setPositions` already skipped `tabular`-typed tokens from child-position assignment — their subtrees carry parser-private structure, including frozen shared close-token singletons. The recursive `setChildrenPositions` did not, and the inline tabular variant `tabular_inline` (used for subtables inside paragraphs) was missing from the existing skip list. When a non-tabular parent contained a `tabular_inline` child and the caller passed `addPositionsToTokens: true`, recursion reached the frozen singletons and `.positions` assignment threw `TypeError: Cannot add property positions, object is not extensible`, returning `null` from `markdownToHTMLSegments`.
+  - `setChildrenPositions` now early-returns for both `tabular` and `tabular_inline` parents. The top-level skip list is also extended to `['tabular', 'tabular_inline']` for symmetry.
+
+- `BeginTheorem` validation order:
+  - The rule pushed `paragraph_open` (with `class="theorem_block"`) and an optional `inline` token before validating `envName` against the registered theorem environments. markdown-it has no rollback on `return false`, so unregistered environments left half-built tokens in the stream and the renderer emitted unmatched `<div class="theorem_block">` wrappers around subsequent content.
+  - Validation hoisted above the first `state.push`. Behavior for registered environments is unchanged — same lookup, same downstream tokens, only the order of operations changes.
+
+- New tests:
+  - 3 fixtures in `_data/_footnotes_latex/_data-footnote.js` covering `\footnote`-prefixed commands that must not trigger the rule (`\footnotemark[1]` mid-line, `\footnotesize` in a multi-line paragraph, repeated `\footnotemark`).
+  - 3 fixtures in `_data/_theorem/_data.js` covering unregistered environments (`tikzpicture`, `lemma`, `example`) — assert `class="theorem_block"` is absent in the output.
+  - 3 fixtures in new `_data/_tokenPositions/_data_tabulars.js` for the position-tokens suite (block tabular, subtable inline, tabular surrounded by paragraphs); wired via a new `Testing positions for tabulars` describe in `_tokenPositions.js`.
+
 # April 2026
 
 ## [2.0.39] - Optimize tabular parsing memory and performance

@@ -8,8 +8,13 @@ import {
   reOpenTagFootnotetextNumbered
 } from "../common/consts";
 import { findEndMarker } from "../common";
-import { findOpenCloseTags } from "../utils";
+import { findOpenCloseTags, getCachedSrcPositions } from "../utils";
 import * as fence from 'markdown-it/lib/rules_block/fence.js'
+
+const FOOTNOTE_POS_KEY: string = '__mmd_footnoteSrcPositions';
+const FOOTNOTETEXT_POS_KEY: string = '__mmd_footnotetextSrcPositions';
+const FOOTNOTE_NEEDLES: string[] = ['\\footnote'];
+const FOOTNOTETEXT_NEEDLES: string[] = ['\\footnotetext', '\\blfootnotetext'];
 
 const getTerminatorRulesForFootnotes = (ruler: Ruler) => {
   const rules = ruler.__rules__;
@@ -39,7 +44,11 @@ export const latex_footnote_block: RuleBlock = (state, startLine, endLine, silen
       lineText: string,
       pos: number = state.bMarks[startLine] + state.tShift[startLine],
       max: number = state.eMarks[startLine];
-
+    // Skip whole-doc scan if no `\footnote` exists at or after this block.
+    const positions = getCachedSrcPositions(state, FOOTNOTE_POS_KEY, FOOTNOTE_NEEDLES);
+    if (positions.length === 0 || positions[positions.length - 1] < state.bMarks[startLine]) {
+      return false;
+    }
     let nextLine: number = startLine + 1;
     let startPos = pos;
     let numbered;
@@ -48,7 +57,9 @@ export const latex_footnote_block: RuleBlock = (state, startLine, endLine, silen
     let hasOpenTag = false;
     let pending = '';
     let terminate = false;
-    if (!reOpenTagFootnoteG.test(lineText)) {
+    // `\footnote` literal can't span lines — skip the O(fullContent) regex while no line contains it.
+    let sawFootnoteSubstr: boolean = lineText.indexOf('\\footnote') !== -1;
+    if (!sawFootnoteSubstr || !reOpenTagFootnoteG.test(lineText)) {
       // jump line-by-line until empty one or EOF
       for (; nextLine < endLine; nextLine++) {
         if (fence(state, nextLine, endLine, true)) {
@@ -66,6 +77,12 @@ export const latex_footnote_block: RuleBlock = (state, startLine, endLine, silen
         }
         fullContent += fullContent ? '\n' : '';
         fullContent += lineText;
+        if (!sawFootnoteSubstr) {
+          if (lineText.indexOf('\\footnote') === -1) {
+            continue;
+          }
+          sawFootnoteSubstr = true;
+        }
         if (reOpenTagFootnoteG.test(fullContent)) {
           hasOpenTag = true;
           nextLine += 1;
@@ -207,7 +224,11 @@ export const latex_footnotetext_block: RuleBlock = (state, startLine, endLine, s
       lineText: string,
       pos: number = state.bMarks[startLine] + state.tShift[startLine],
       max: number = state.eMarks[startLine];
-
+    // Skip whole-doc scan if no `\footnotetext` / `\blfootnotetext` exists at or after this block.
+    const positions = getCachedSrcPositions(state, FOOTNOTETEXT_POS_KEY, FOOTNOTETEXT_NEEDLES);
+    if (positions.length === 0 || positions[positions.length - 1] < state.bMarks[startLine]) {
+      return false;
+    }
     let nextLine: number = startLine + 1;
     let startPos = pos;
     let numbered;
@@ -217,7 +238,10 @@ export const latex_footnotetext_block: RuleBlock = (state, startLine, endLine, s
     let pending = '';
     let terminate = false;
     const terminatorRules = getTerminatorRulesForFootnotes(state.md.block.ruler);
-    if (!reOpenTagFootnotetextG.test(lineText)) {
+    // `\footnotetext`/`\blfootnotetext` literal can't span lines — skip the O(fullContent) regex while no line contains it.
+    let sawFootnotetextSubstr: boolean = lineText.indexOf('\\footnotetext') !== -1
+      || lineText.indexOf('\\blfootnotetext') !== -1;
+    if (!sawFootnotetextSubstr || !reOpenTagFootnotetextG.test(lineText)) {
       // jump line-by-line until empty one or EOF
       for (; nextLine < endLine; nextLine++) {
         for (let i = 0; i < terminatorRules.length; i++) {
@@ -240,6 +264,13 @@ export const latex_footnotetext_block: RuleBlock = (state, startLine, endLine, s
         }
         fullContent += fullContent ? '\n' : '';
         fullContent += lineText;
+        if (!sawFootnotetextSubstr) {
+          if (lineText.indexOf('\\footnotetext') === -1
+            && lineText.indexOf('\\blfootnotetext') === -1) {
+            continue;
+          }
+          sawFootnotetextSubstr = true;
+        }
         if (reOpenTagFootnotetextG.test(fullContent)) {
           hasOpenTag = true;
           nextLine += 1;

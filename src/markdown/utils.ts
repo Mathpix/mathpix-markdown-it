@@ -8,6 +8,27 @@ import {
   attrsSharedMarker
 } from "./common/consts";
 
+// Per-state cache of `needle` offsets in `state.src`; pinned to state so nested `block.parse()` gets its own.
+export const getCachedSrcPositions = (state: any, key: string, needles: string[]): number[] => {
+  if (state[key] !== undefined) {
+    return state[key];
+  }
+  const src: string = state.src;
+  const positions: number[] = [];
+  for (const needle of needles) {
+    let pos: number = 0;
+    while ((pos = src.indexOf(needle, pos)) !== -1) {
+      positions.push(pos);
+      pos += 1;
+    }
+  }
+  if (needles.length > 1) {
+    positions.sort((a, b) => a - b);
+  }
+  state[key] = positions;
+  return positions;
+};
+
 export const endTag = (arg: string, shouldBeFirst = false): RegExp  => {
   try {
     if (arg.indexOf('*') !== -1) {

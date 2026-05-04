@@ -159,3 +159,14 @@ describe('Testing positions for lists:', () => {
     });
   });
 });
+
+describe('Testing positions for tabulars:', () => {
+  const tests = require('./_data/_tokenPositions/_data_tabulars');
+  tests.forEach((test, index) => {
+    it('MMD [' + index + ']=>' + test.mmd, async () => {
+      const parseTokens = md.parse(test.mmd, {});
+      parseTokens.should.have.length(test.tokens.length);
+      checkTokens(parseTokens, test.tokens, test.mmd);
+    });
+  });
+});

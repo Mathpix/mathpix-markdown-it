@@ -267,7 +267,13 @@ export const BeginTheorem: RuleBlock = (state, startLine, endLine, silent) => {
     latexEnd = matchE[0];
     // pE = matchE.index
   }
-  
+  // Validate before pushing — markdown-it has no rollback on `return false`.
+  const envIndex = envName
+    ? getTheoremEnvironmentIndex(envName)
+    : -1;
+  if (envIndex === -1) {
+    return false;
+  }
   state.line = nextLine + 1;
   token = state.push('paragraph_open', 'div', 1);
   token.attrSet('class','theorem_block');
@@ -279,12 +285,6 @@ export const BeginTheorem: RuleBlock = (state, startLine, endLine, silent) => {
     token.content = strBefore;
   }
 
-  const envIndex = envName
-    ? getTheoremEnvironmentIndex(envName)
-    : -1;
-  if (envIndex === -1) {
-    return false
-  }
   const theoremNumber: string = getTheoremNumber(envIndex, state.env);
   token = state.push('theorem_open', 'div', 1);
   token.environment = envName;

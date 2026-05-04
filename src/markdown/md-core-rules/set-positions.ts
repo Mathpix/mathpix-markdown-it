@@ -7,6 +7,10 @@ import {
 import { mathTokenTypes } from "../common/consts";
 
 const setChildrenPositions = (state, token, pos, highlights, isBlockquote = false) => {
+  // tabular*/children include frozen shared close-tokens — skip recursion (positions not meaningful here).
+  if (token.type === 'tabular' || token.type === 'tabular_inline') {
+    return { token };
+  }
   if (token.hasOwnProperty('offsetLeft')) {
     pos += token.offsetLeft;
   }
@@ -248,7 +252,7 @@ export const setPositions = (state) => {
       }
       /** Ignore set positions for children.
        * Since the content may not match the original string. Line breaks can be removed*/
-      if (['tabular'].includes(token.type)) {
+      if (['tabular', 'tabular_inline'].includes(token.type)) {
         continue;
       }
       if (token.children?.length && token.positions) {

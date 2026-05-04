@@ -796,5 +796,17 @@ a continuous function.</div>
       'is a continuous function.</div>\n' +
       '</div></div>\n' +
       '<div style="margin-top: 0; margin-bottom: 0;"></div>'
+  },
+  {
+    latex: '\\begin{tikzpicture}\nfoo\n\\end{tikzpicture}',
+    html: '<div><span  class="math-block equation-number " number="0"></span></div>'
+  },
+  {
+    latex: '\\begin{lemma}\nstatement\n\\end{lemma}',
+    html: '<div><span  class="math-block equation-number " number="0"></span></div>'
+  },
+  {
+    latex: 'Prefix \\begin{example}\nbody\n\\end{example} suffix',
+    html: '<div>Prefix <span  class="math-block equation-number " number="0"></span> suffix</div>'
   }
 ];
