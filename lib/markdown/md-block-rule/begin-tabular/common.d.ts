@@ -6,18 +6,21 @@ export type TParselines = {
 export declare const getContent: (content: string, onlyOne?: boolean, skipTrim?: boolean) => string;
 export declare const generateUniqueId: (onlyUuid?: boolean) => string;
 export declare const getColumnLines: (str: string, numCol?: number) => Array<string>;
-export declare const getColumnAlign: (align: string) => string[] | [
-];
+export declare const getColumnAlign: (align: string) => string[] | [];
 export type TAlignData = {
     cAlign: Array<string>;
     vAlign: Array<string>;
     cWidth: Array<string>;
     colSpec: Array<string>;
 };
-export declare const getVerticallyColumnAlign: (align: string, numCol: number) => TAlignData;
+export type TVerticalPos = 't' | 'c' | 'b';
+export declare const parseTabularPos: (raw: string | undefined | null) => TVerticalPos | undefined;
+export declare const normalizeDefaultCellVerticalAlign: (value: string | undefined | null) => TVerticalPos | undefined;
+export declare const getVerticallyColumnAlign: (align: string, numCol: number, posDefault?: TVerticalPos) => TAlignData;
 export declare const getParams: (str: string, i: number) => {
     align: string;
     index: number;
+    pos: TVerticalPos;
 };
 export type TDecimal = {
     l: number;

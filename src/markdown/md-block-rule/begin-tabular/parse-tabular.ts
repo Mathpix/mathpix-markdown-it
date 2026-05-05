@@ -7,13 +7,16 @@ import {
 import {
   getContent, getRowLines, getCellsAll, getDecimal, TDecimal,
   TAlignData, getVerticallyColumnAlign, getParams, getColumnLines, shouldRewriteColSpec,
-  detectLocalBlock
+  detectLocalBlock, normalizeDefaultCellVerticalAlign, TVerticalPos
 } from './common';
 import { getMathTableContent, getSubMath } from './sub-math';
 import { getSubTabular, pushSubTabular } from './sub-tabular';
 import { getMultiColumnMultiRow, getCurrentMC, getMC } from './multi-column-row';
 import { getSubDiagbox } from "./sub-cell";
 import { isEscapedAt } from "../../utils";
+
+// `\begin{tabular}` with optional [pos] and required {align}.
+const RE_BEGIN_TABULAR_BRACKET = /\\begin{tabular}\s*(?:\[[^\]]*\])?\s*\{([^}]*)\}/;
 
 /**
  * Splits a tabular row into columns by unescaped '&' characters.
@@ -85,7 +88,7 @@ const markColIfHasList = (
   colsToFixWidth.add(colIndex);
 };
 
-const setTokensTabular = (str: string, align: string = '', options: any = {}, isSubTabular: boolean = false): Array<TTokenTabular>|null => {
+const setTokensTabular = (str: string, align: string = '', options: any = {}, isSubTabular: boolean = false, pos?: TVerticalPos): Array<TTokenTabular>|null => {
   let res: Array<TTokenTabular> = [];
   const rows: string[] = getRows(str);
 
@@ -96,12 +99,18 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}, is
   let CellsHLSpaces: Array<Array<string>> = data.cSpaces;
   const colsToFixWidth: Set<number> = new Set();
 
-  const dataAlign: TAlignData = getVerticallyColumnAlign(align, numCol);
+  // Source bracket wins; otherwise fall back to the document-level option.
+  const optionPos: TVerticalPos | undefined = normalizeDefaultCellVerticalAlign(options?.defaultCellVerticalAlign);
+  const effectivePos: TVerticalPos | undefined = pos ?? optionPos;
+  const dataAlign: TAlignData = getVerticallyColumnAlign(align, numCol, effectivePos);
   const cLines: Array<string> = getColumnLines(align, numCol);
   const {cAlign, vAlign, cWidth, colSpec} = dataAlign;
   const decimal: Array<TDecimal> = getDecimal(cAlign, cellsAll);
   const { forLatex = false, outMath = {} } = options;
   const skipVisual = !!options?.forMD || !!forLatex;
+
+  // Source bracket wins; option only injects 't'/'b' to preserve round-trip for unset/'c'.
+  const latexPos: TVerticalPos | undefined = pos ?? (optionPos === 'c' ? undefined : optionPos);
 
   res.push({token:'table_open', type:'table_open', tag: 'table', n: 1,
     attrs: getSharedTableOpenAttrs(undefined, skipVisual),
@@ -184,7 +193,7 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}, is
 
 
       if (cells[j] && cells[j].trim().length > 0) {
-        const multi = getMultiColumnMultiRow(cells[j], {lLines: cLines[ic], align: cAlign[ic], rLines: cRight}, forLatex, options?.forPptx, skipVisual);
+        const multi = getMultiColumnMultiRow(cells[j], {lLines: cLines[ic], align: cAlign[ic], rLines: cRight, posDefault: effectivePos}, forLatex, options?.forPptx, skipVisual);
         if (multi) {
           let mr = multi.mr > rows.length ? rows.length : multi.mr;
           let mc = multi.mc > numCol ? numCol : multi.mc;
@@ -399,6 +408,9 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}, is
       isSubTabular,
       vLineSpec: cLines
     }
+    if (latexPos) {
+      tableOpen.meta.pos = latexPos;
+    }
     if (colsToFixWidthArr.length) {
       tableOpen.meta.shouldRewriteColSpec = shouldRewriteColSpec(colsToFixWidthArr, colSpec);
     }
@@ -406,7 +418,7 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}, is
   return res;
 };
 
-export const ParseTabular = (str: string, i: number, align: string='', options = {}, isSubTabular: boolean = false): Array<TTokenTabular> | null => {
+export const ParseTabular = (str: string, i: number, align: string='', options = {}, isSubTabular: boolean = false, pos?: TVerticalPos): Array<TTokenTabular> | null => {
   let res: Array<TTokenTabular> = [];
   let posEnd: number = str.indexOf('\\end{tabular}');
   if (posEnd > 0) {
@@ -417,24 +429,24 @@ export const ParseTabular = (str: string, i: number, align: string='', options =
       if (params) {
         const subT: string = str.slice(posBegin, posEnd+ '\\end{tabular}'.length);
         str = pushSubTabular(str, subT, [], posBegin, posEnd, i);
-        res = ParseTabular(str, 0, align, options, isSubTabular);
+        res = ParseTabular(str, 0, align, options, isSubTabular, pos);
       } else {
         let match = str
           .slice(posBegin)
-          .match(/(?:\\begin{tabular}\s{0,}\{([^}]*)\})/);
+          .match(RE_BEGIN_TABULAR_BRACKET);
 
         const subT: string = str.slice(posBegin, posEnd + '\\end{tabular}'.length);
         str = pushSubTabular(str, subT, [], posBegin + match.index, posEnd, i);
-        res = ParseTabular(str, 0, align, options, isSubTabular);
+        res = ParseTabular(str, 0, align, options, isSubTabular, pos);
       }
     } else {
       const subT: string = str.slice(i, posEnd);
-      const subRes: Array<TTokenTabular> = setTokensTabular(subT, align, options);
+      const subRes: Array<TTokenTabular> = setTokensTabular(subT, align, options, false, pos);
       str = pushSubTabular(str, subT, subRes, 0, posEnd);
-      res = ParseTabular(str, 0, align, options, isSubTabular);
+      res = ParseTabular(str, 0, align, options, isSubTabular, pos);
     }
   } else {
-    res = setTokensTabular(str, align, options, isSubTabular);
+    res = setTokensTabular(str, align, options, isSubTabular, pos);
   }
   return res;
 };

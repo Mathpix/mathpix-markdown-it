@@ -1,4 +1,5 @@
 import { RuleBlock, Token } from 'markdown-it';
+import { TVerticalPos } from './common';
 export declare const openTag: RegExp;
 export declare const openTagG: RegExp;
 export declare const closeTag: RegExp;
@@ -6,6 +7,7 @@ type TTypeContent = {
     type?: string;
     content?: string;
     align?: string;
+    pos?: TVerticalPos;
 };
 type TTypeContentList = Array<TTypeContent>;
 export type TAttrs = string[];

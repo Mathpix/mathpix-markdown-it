@@ -77,6 +77,7 @@ export interface optionsMathpixMarkdown {
     showPageBreaks?: boolean;
     centerImages?: boolean;
     centerTables?: boolean;
+    defaultCellVerticalAlign?: 'top' | 'middle' | 'bottom';
     enableCodeBlockRuleForLatexCommands?: boolean;
     addPositionsToTokens?: boolean;
     highlights?: Array<THighlight>;
@@ -129,6 +130,8 @@ export type TMarkdownItOptions = {
   showPageBreaks?: boolean;
   centerImages?: boolean;
   centerTables?: boolean;
+  // Fallback vertical alignment for tabular cells without an explicit \begin{tabular}[pos]{...} bracket.
+  defaultCellVerticalAlign?: 'top' | 'middle' | 'bottom';
   enableCodeBlockRuleForLatexCommands?: boolean;
   addPositionsToTokens?: boolean;
   highlights?: Array<THighlight>;
@@ -618,6 +621,7 @@ class MathpixMarkdown_Model {
           showPageBreaks = false,
           centerImages = true,
           centerTables = true,
+          defaultCellVerticalAlign = undefined,
           enableCodeBlockRuleForLatexCommands = false,
           addPositionsToTokens = false,
           highlights = [],
@@ -671,6 +675,7 @@ class MathpixMarkdown_Model {
           showPageBreaks: showPageBreaks,
           centerImages: centerImages,
           centerTables: centerTables,
+          defaultCellVerticalAlign: defaultCellVerticalAlign,
           enableCodeBlockRuleForLatexCommands: enableCodeBlockRuleForLatexCommands,
           addPositionsToTokens: addPositionsToTokens,
           highlights: highlights,

@@ -38,7 +38,7 @@ export const inlineTabular: RuleInline = (state, silent) => {
     }
     for (let i = 0; i < cTabular.length; i++) {
       if (cTabular[i].type === 'inline'){continue}
-      const res: Array<TTokenTabular> | null = ParseTabular(cTabular[i].content, 0, cTabular[i].align, state.md.options, state.env.subTabular);
+      const res: Array<TTokenTabular> | null = ParseTabular(cTabular[i].content, 0, cTabular[i].align, state.md.options, state.env.subTabular, cTabular[i].pos);
 
       for (let j = 0; j < res.length;  j++) {
         let tok = res[j];

@@ -55,7 +55,7 @@ export const reAddContentsLineG: RegExp = /^\\addcontentsline\s{0,}\{(?<exp>[^}]
 export const reMultiRowWithVPos: RegExp = /(?:\\multirow\s{0,}\[(?<vpos>[^\]]*)\]\s{0,}\{(?<nrows>[^}]*)\}\s{0,}\{(?<width>[^}]*)\})/;
 export const reMultiRow: RegExp = /(?:\\multirow\s{0,}\{(?<nrows>[^}]*)\}\s{0,}\{(?<width>[^}]*)\})/;
 
-export const openTagTabular: RegExp = /^\\begin\s{0,}{tabular}\s{0,}\{([^}]*)\}/;
+export const openTagTabular: RegExp = /^\\begin\s{0,}{tabular}\s{0,}(?:\[[^\]]*\])?\s{0,}\{([^}]*)\}/;
 export const closeTagTabular: RegExp = /^\\end\s{0,}{tabular}/;
 
 export const reFootNote: RegExp = /^\\footnote/;
@@ -128,7 +128,7 @@ export const BEGIN_LST_FAST_RE: RegExp = /^\\begin\{lstlisting\}/;
 export const END_LST_RE = /^\\end\{lstlisting\}\s*$/;
 export const BEGIN_LST_RE = /^\\begin\{lstlisting\}(?:\[(.*?)\])?\s*$/;
 export const BEGIN_LST_INLINE_RE = /\\begin\{lstlisting\}(?:\[(.*?)\])?/;
-export const BEGIN_TABULAR_INLINE_RE: RegExp = /\\begin\s{0,}{tabular}\s{0,}\{([^}]*)\}/;
+export const BEGIN_TABULAR_INLINE_RE: RegExp = /\\begin\s{0,}{tabular}\s{0,}(?:\[[^\]]*\])?\s{0,}\{([^}]*)\}/;
 export const END_LST_INLINE_RE   = /\\end\{lstlisting\}/;
 export const END_TABULAR_INLINE_RE: RegExp   = /\\end\{tabular\}/;
 /** Horizontal spaces (no CR/LF) + at most one newline (CRLF or LF), optional */

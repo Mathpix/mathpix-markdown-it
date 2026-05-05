@@ -56,6 +56,7 @@ export interface optionsMathpixMarkdown {
     showPageBreaks?: boolean;
     centerImages?: boolean;
     centerTables?: boolean;
+    defaultCellVerticalAlign?: 'top' | 'middle' | 'bottom';
     enableCodeBlockRuleForLatexCommands?: boolean;
     addPositionsToTokens?: boolean;
     highlights?: Array<THighlight>;
@@ -107,6 +108,7 @@ export type TMarkdownItOptions = {
     showPageBreaks?: boolean;
     centerImages?: boolean;
     centerTables?: boolean;
+    defaultCellVerticalAlign?: 'top' | 'middle' | 'bottom';
     enableCodeBlockRuleForLatexCommands?: boolean;
     addPositionsToTokens?: boolean;
     highlights?: Array<THighlight>;
@@ -238,10 +240,7 @@ declare class MathpixMarkdown_Model {
     };
     markdownToHTMLSegments: (markdown: string, options?: TMarkdownItOptions) => {
         content: string;
-        map: [
-            number,
-            number
-        ][];
+        map: [number, number][];
     };
     markdownToHTML: (markdown: string, options?: TMarkdownItOptions) => string;
     showTocInContainer: (html: string, containerName?: string) => void;

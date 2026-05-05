@@ -1,6 +1,15 @@
 # May 2026
 
-## [2.0.40] - Footnote block-rule performance and parser invariants
+## [2.0.40] - Tabular vertical-align bracket and footnote performance
+
+- Tabular vertical alignment:
+  - Parse the optional `[t]/[c]/[b]` bracket on `\begin{tabular}` (standard LaTeX2e syntax) and use it as the row-level vertical-align default for `l/c/r/S` columns. Per-column `m`/`p`/`b` continues to override. Bracket on a tabular affects only that tabular's own cells; it is not propagated into nested tabulars or outward to the containing cell.
+  - New option `defaultCellVerticalAlign?: 'top' | 'middle' | 'bottom'`. When set to `'top'` or `'bottom'`, applies as the fallback for `\begin{tabular}` blocks without an explicit bracket — affects HTML rendering and `forLatex` round-trip (`tableOpen.meta.pos` is set so the consumer can serialize `\begin{tabular}[pos]{...}`). Explicit source bracket always wins. Default unset / `'middle'` is a no-op on existing MMD.
+  - `\multicolumn` / `\multirow` cells inherit the row-level top/bottom default; `'middle'` is not propagated to multi-col cells to keep their existing rendering byte-identical.
+  - Updated `openTagTabular`, `BEGIN_TABULAR_INLINE_RE`, and the local `openTag`/`openTagG` to allow optional non-capturing `[...]` bracket between `\begin{tabular}` and `{...}` so existing capture-group consumers see the column spec at group 1 unchanged.
+  - `getParams` (column-spec parser) now skips an optional `[pos]` before `{` and returns the normalized bracket position.
+
+- Footnote rule performance:
 
 - `latex_footnote_block` / `latex_footnotetext_block`: per-state position cache + per-line token guard turn the O(N×M) accumulation scan into one O(|src|) sweep per parse and O(1) per subsequent block-start. ~120× speedup on a 2.45 MB MMD with 706 long tabular blocks (worst case for the pre-change Phase 1 scan); HTML output byte-identical.
 - `setChildrenPositions`: per-child `Object.isExtensible` guard before `.positions` assignment fixes `TypeError` thrown by frozen `SHARED_*_CLOSE` singletons inside `tabular_inline` subtrees, restoring `markdownToHTMLSegments({ addPositionsToTokens: true })` on documents with inline subtables. `link_open` branch split into strict-triple `[text](url)` (legacy snapshot-pinned math) + span fallback for fancy contents (`[**bold**](url)`, `` [`code`](url) ``, `[![alt](img)](url)`) — fixes silent NaN/off-by-N positions that existed on master.
