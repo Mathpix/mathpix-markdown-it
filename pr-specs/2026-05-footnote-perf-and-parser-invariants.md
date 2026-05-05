@@ -182,17 +182,21 @@ The `highlightAll` cascade is intentionally omitted from the span branch — imp
 
 ## Performance impact
 
-Profiled on a 2.5 MB / 43,607-line MMD input (706 `\begin{tabular}`, 28 `\begin{align*}`, 11 `\begin{array}`, 1,585 `\section*`, 155 images, 3 `\footnote{}`, 3 `\footnotetext{}`). V8 CPU profiler, local machine.
+Profiled on a 2.45 MB / 43,608-line MMD input (706 `\begin{tabular}`, 1,065 `\section*`, 0 `\footnote{}`, 3 `\footnotetext{}`). The pathological structure here is **706 long tabular blocks without empty-line separators** — Phase 1 forward-scan terminates only on `fence`/empty-line/EOF, so each block-start near a tabular pays O(table-size) to re-test the growing `fullContent` against `reOpenTagFootnoteG`.
 
-| Stage | Before | + substring guard | + position cache | Δ vs before |
+Median of 5 runs (1 warmup + 5 measure via `performance.now()`); single-run on master because of the multi-minute parse time:
+
+| Stage | Master | PR | Speedup | Output bytes |
 |---|---:|---:|---:|---:|
-| `markdownToHTMLSegments` total | 93,593 ms | 1,943 ms | **1,560 ms** | **−60×** |
-| `latex_footnote_block` self-time | 60,255 ms | 251 ms | not in top 30 | eliminated |
-| `reOpenTagFootnoteG` self-time | 23,411 ms | not in top 30 | not in top 30 | eliminated |
-| Output bytes | 6,675,761 | 6,675,761 | 6,675,761 | 0 |
-| Segments emitted | 9,082 | 9,082 | 9,082 | 0 |
+| `markdownToHTML` | 178,078 ms | 1,525 ms | **117×** | 22,564,133 (byte-identical) |
+| `markdownToHTMLSegments` | 193,023 ms | 1,498 ms | **129×** | 22,564,121 / 9,082 segments (byte-identical) |
+| `markdownToHTMLSegments({ addPositionsToTokens: true })` | 207,115 ms | 1,531 ms | **135×** | 22,564,121 / 9,082 segments (byte-identical) |
 
-A second 1.1 MB profiling input (44 `\begin{tabular}`, 482 `\begin{tikzpicture}`, 726 sections — a TikZ-heavy document with inline subtables) covers the `setPositions` and `BeginTheorem` paths:
+Output verified byte-identical between master and PR via diff (modulo random per-parse IDs from the smiles plugin, which is non-determinism unrelated to this PR).
+
+Note: this pathological case is structural, not universal. Smaller documents (~30 KB) and a 1.1 MB TikZ-heavy input parse fast on master too — the quadratic blow-up requires (a) >1 MB src and (b) many long tabular blocks without empty-line separators between rows.
+
+A second TikZ-heavy benchmark (44 `\begin{tabular}`, 482 `\begin{tikzpicture}`, 726 sections) covers the `setPositions` and `BeginTheorem` paths:
 
 | Stage | Before | After |
 |---|---|---:|
