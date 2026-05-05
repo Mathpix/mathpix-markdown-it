@@ -2,7 +2,7 @@ import {TAttrs, TMulti, TTokenTabular} from "./index";
 import {addStyle, setColumnLines} from "./tabular-td";
 import {getSubTabular} from "./sub-tabular";
 import {getMathTableContent} from "./sub-math";
-import {getContent, getColumnAlign, getColumnLines} from "./common";
+import {getContent, getColumnAlign, getColumnLines, parseTabularPos, TVerticalPos} from "./common";
 import { reMultiRowWithVPos, reMultiRow } from "../../common/consts";
 import { getExtractedCodeBlockContent } from "./sub-code";
 
@@ -62,12 +62,12 @@ export const getMultiColumnMultiRow = (str: string, params: {lLines: string, ali
     }
   }
   vpos = vpos ? vpos.trim() : '';
-  // \multirow[vpos] wins; otherwise inherit row-level 't'/'b' (no-op for 'c'/unset to preserve legacy snapshots).
+  // Explicit \multirow[…] wins over row-level posDefault.
+  const effectivePos: TVerticalPos | undefined = parseTabularPos(vpos) ?? params.posDefault;
   const cellV: string =
-    vpos === 't' ? 'top'
-    : vpos === 'b' ? 'bottom'
-    : params.posDefault === 't' ? 'top'
-    : params.posDefault === 'b' ? 'bottom'
+    effectivePos === 't' ? 'top'
+    : effectivePos === 'b' ? 'bottom'
+    : effectivePos === 'c' ? 'middle'
     : '';
 
   if (matchMC) {
