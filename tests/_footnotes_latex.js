@@ -225,46 +225,50 @@ describe('Footnote token-guard soundness:', () => {
 });
 
 describe('Footnote rule performance regression:', () => {
-  // Ratio-based: linear scaling on 10× size diff gives ratio ~10; O(N×M) regression gives ~1000.
-  // 60× limit catches partial regressions while absorbing CI noise (both measurements share runner).
+  // Parse-only timing — bypasses MathJax/render, isolates Phase 1 cost.
+  const { mathpixMarkdownPlugin } = require('../lib/markdown/mathpix-markdown-plugins');
+  const perfMd = require('markdown-it')({ html: true, breaks: true, linkify: true })
+    .use(mathpixMarkdownPlugin, { width: 800 })
+    .use(require('markdown-it-footnote'));
   const SCALING_RATIO_LIMIT = 60;
   const SMALL_FLOOR_MS = 5;
-  // Median of 5 runs via `performance.now()` — sub-millisecond resolution, robust to single-sample GC spikes.
   const measureMs = (mmd) => {
-    MM.markdownToHTML(mmd, options);
-    MM.texReset();
+    perfMd.parse(mmd, {}); // warmup
     const samples = [];
     for (let i = 0; i < 5; i++) {
       const t0 = performance.now();
-      MM.markdownToHTML(mmd, options);
+      perfMd.parse(mmd, {});
       samples.push(performance.now() - t0);
-      MM.texReset();
     }
     samples.sort((a, b) => a - b);
     return samples[2];
   };
-  const buildBody = (paragraphCount) => {
+  // Worst case: long paragraph with literal substring inline — forces regex backtracking on master's Phase 1.
+  const buildBodyWithLiteral = (lineCount, literal) => {
     const lines = [];
-    for (let i = 0; i < paragraphCount; i++) {
-      lines.push('This paragraph contains plain prose without any footnote-related markup.');
-      if ((i & 7) === 0) lines.push('');
+    for (let i = 0; i < lineCount; i++) {
+      lines.push(`Line ${i} mentions ${literal} without command syntax in this long paragraph.`);
     }
     return lines.join('\n');
   };
 
-  it('cache early-exit path scales linearly (footnote at start)', function () {
-    this.timeout(30000);
-    const head = '\\footnote{single} early footnote.\n\n';
-    const small = measureMs(head + buildBody(400));
-    const large = measureMs(head + buildBody(4000));
-    (large / Math.max(small, SMALL_FLOOR_MS)).should.be.below(SCALING_RATIO_LIMIT);
-  });
+  const cases = [
+    { rule: 'latex_footnote_block',     literal: '\\footnote',     head: '\\footnote{single} early.\n\n',     tail: '\n\nLater \\footnote{single}.' },
+    { rule: 'latex_footnotetext_block', literal: '\\footnotetext', head: '\\footnotetext{single} early.\n\n', tail: '\n\nLater \\footnotetext{single}.' },
+  ];
+  cases.forEach(({ rule, literal, head, tail }) => {
+    it(`${rule}: cache early-exit path scales linearly (literal at start)`, function () {
+      this.timeout(60000);
+      const small = measureMs(head + buildBodyWithLiteral(200, literal));
+      const large = measureMs(head + buildBodyWithLiteral(2000, literal));
+      (large / Math.max(small, SMALL_FLOOR_MS)).should.be.below(SCALING_RATIO_LIMIT);
+    });
 
-  it('per-line gate path scales linearly (footnote at end)', function () {
-    this.timeout(30000);
-    const tail = '\n\nLater \\footnote{single}.';
-    const small = measureMs(buildBody(400) + tail);
-    const large = measureMs(buildBody(4000) + tail);
-    (large / Math.max(small, SMALL_FLOOR_MS)).should.be.below(SCALING_RATIO_LIMIT);
+    it(`${rule}: per-line gate path scales linearly (literal at end)`, function () {
+      this.timeout(60000);
+      const small = measureMs(buildBodyWithLiteral(200, literal) + tail);
+      const large = measureMs(buildBodyWithLiteral(2000, literal) + tail);
+      (large / Math.max(small, SMALL_FLOOR_MS)).should.be.below(SCALING_RATIO_LIMIT);
+    });
   });
 });
