@@ -110,23 +110,24 @@ describe('forLatex parent bracket on td_open:', () => {
     return tds;
   };
 
-  it('outer [t] → every td_open gets parentBracket = "t"', () => {
+  it('outer [t] → exactly 2 outer td_opens have parentBracket="t", inner has no parentBracket', () => {
     const tokens = parseTokens(
       '\\begin{tabular}[t]{|l|l|}\n\\hline\n\\begin{tabular}{l}\nx \\\\ y\n\\end{tabular} & b \\\\\n\\hline\n\\end{tabular}'
     );
     const tds = findAllTdOpens(tokens);
-    // Outer td_opens carry parentBracket = 't'; inner td_opens (from nested tabular) carry their own (undefined here).
     const outerTds = tds.filter(t => t.meta?.parentBracket === 't');
-    outerTds.length.should.be.at.least(2);
+    outerTds.length.should.equal(2);
+    const innerTds = tds.filter(t => !t.meta?.parentBracket);
+    innerTds.length.should.equal(2); // inner tabular's two cells (x, y) — outer has no bracket pushed onto inner
   });
 
-  it('outer [b] → every td_open gets parentBracket = "b"', () => {
+  it('outer [b] → exactly 2 outer td_opens have parentBracket="b"', () => {
     const tokens = parseTokens(
       '\\begin{tabular}[b]{|l|l|}\n\\hline\n\\begin{tabular}{l}\nx \\\\ y\n\\end{tabular} & b \\\\\n\\hline\n\\end{tabular}'
     );
     const tds = findAllTdOpens(tokens);
     const outerTds = tds.filter(t => t.meta?.parentBracket === 'b');
-    outerTds.length.should.be.at.least(2);
+    outerTds.length.should.equal(2);
   });
 
   it('outer without bracket → no parentBracket on any td_open', () => {
@@ -137,14 +138,14 @@ describe('forLatex parent bracket on td_open:', () => {
     tds.every(t => !t.meta?.parentBracket).should.be.true;
   });
 
-  it("option 'top' on outer (no bracket) → td_opens get parentBracket = 't'", () => {
+  it("option 'top' propagates: outer (2) + inner (2) td_opens get parentBracket='t'", () => {
     const tokens = parseTokens(
       '\\begin{tabular}{|l|l|}\n\\hline\n\\begin{tabular}{l}\nx \\\\ y\n\\end{tabular} & b \\\\\n\\hline\n\\end{tabular}',
       { defaultCellVerticalAlign: 'top' }
     );
     const tds = findAllTdOpens(tokens);
-    const outerTds = tds.filter(t => t.meta?.parentBracket === 't');
-    outerTds.length.should.be.at.least(2);
+    tds.every(t => t.meta?.parentBracket === 't').should.be.true;
+    tds.length.should.equal(4);
   });
 
   it("option 'middle' (round-trip preserved) → no parentBracket on td_opens", () => {

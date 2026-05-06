@@ -95,7 +95,7 @@ The motivating case is tables that contain mixed-height cells — for example, o
 
 | Option | Type | Default | Effect |
 |--------|------|--------:|--------|
-| `defaultCellVerticalAlign` | `'top' \| 'middle' \| 'bottom' \| undefined` | `undefined` | Vertical-align fallback for `\begin{tabular}` blocks without an explicit `[pos]` bracket. Affects `<td>` HTML style and (for `'top'`/`'bottom'`) `forLatex` round-trip via `tableOpen.meta.bracket`. Propagates into `\multicolumn`/`\multirow` cells. Per-column `m`/`p`/`b` and any explicit `[t]/[c]/[b]` source bracket always override. Unset → byte-identical to legacy. |
+| `defaultCellVerticalAlign` | `'top' \| 'middle' \| 'bottom' \| undefined` | `undefined` | Vertical-align fallback for `\begin{tabular}` blocks without an explicit `[pos]` bracket. Affects `<td>` HTML style and (for `'top'`/`'bottom'`) `forLatex` round-trip via `tableOpen.meta.bracket`. Propagates into `\multicolumn`/`\multirow` cells only for `'top'`/`'bottom'` (option `'middle'` stays no-op on multicol to preserve legacy). Per-column `m`/`p`/`b` and any explicit `[t]/[c]/[b]` source bracket always override. Unset → byte-identical to legacy. |
 
 No other options introduced.
 
@@ -130,7 +130,7 @@ Audit `getParams` and the recursive sub-tabular splice path so the bracket is re
 
 The captured bracket position needs to reach `getVerticallyColumnAlign` and the `forLatex` payload builder. Two existing call sites:
 
-- `setTokensTabular` in `parse-tabular.ts` — this is where `getVerticallyColumnAlign` is invoked. Add a `posDefault?: 't' | 'c' | 'b'` parameter threaded through `setTokensTabular → getVerticallyColumnAlign`.
+- `setTokensTabular` in `parse-tabular.ts` — this is where `getVerticallyColumnAlign` is invoked. Add a `bracketDefault?: 't' | 'c' | 'b'` parameter threaded through `setTokensTabular → getVerticallyColumnAlign`.
 - `table_open` token construction — `latex` payload field. When `forLatex`, emit the bracket into the serialized `\begin{tabular}` open. Source bracket preserved as-is; option-derived bracket injected only if source had none.
 
 The bracket value also enters the per-table state for `multi-column-row.ts` (`getMultiColumnMultiRow`) only if multi-row/multi-column cells inherit row-level vAlign — verify whether they currently inherit `vAlign` from the column or use their own. If they use their own, no thread-through needed.
@@ -143,15 +143,15 @@ Extend signature:
 getVerticallyColumnAlign(
   align: string,
   numCol: number,
-  posDefault?: 't' | 'c' | 'b',
+  bracketDefault?: 't' | 'c' | 'b',
 ): TAlignData
 ```
 
-For `l/c/r/S` switch branches, replace `vAlign.push('middle')` with a helper that maps `posDefault` → `'top' | 'middle' | 'bottom'`, defaulting to `'middle'` when `posDefault` is undefined.
+For `l/c/r/S` switch branches, replace `vAlign.push('middle')` with a helper that maps `bracketDefault` → `'top' | 'middle' | 'bottom'`, defaulting to `'middle'` when `bracketDefault` is undefined.
 
 `m`/`p`/`b` branches are not modified — they already set `vAlign` explicitly and that always wins.
 
-The trailing `arrayFillDef(vAlign, 'middle', numCol)` fallback stays as `'middle'` (only triggers when the user wrote a malformed `align` string with fewer entries than columns; not a path that should observe the new default).
+The trailing `arrayFillDef(vAlign, defaultV, numCol)` fallback uses the same `defaultV` for symmetry — extra columns past the column-spec length get the row-level default rather than hardcoded `'middle'`.
 
 ### `defaultCellVerticalAlign` option threading
 
@@ -192,7 +192,8 @@ This preserves the no-op invariant for existing documents.
 - **Per-column override**: `\begin{tabular}[t]{|l|m{2cm}|}` — column 0 = top (from bracket), column 1 = middle (from `m{}`).
 - **`forMD` export**: the visual gating already skips `<td>` style under `forMD`. No new behavior needed for MD export — vAlign is HTML/visual only.
 - **`forDocx`/`forPptx`**: vAlign currently propagates via the cell metadata for these exporters; verify the new vAlign values (`'top'`/`'bottom'`) are recognized. If not, existing behavior is preserved (only `'middle'` was emitted before).
-- **`multicolumn` / `multirow`**: row-level `'t'`/`'c'`/`'b'` (from bracket or option) propagates into multicol/multirow cells, symmetric with regular `l/c/r/S` cells. Explicit `\multirow[…]` always wins. Plain `\multicolumn{}`/`\multirow{}` in an absent-bracket tabular emits no `vertical-align` (legacy).
+- **`multicolumn` / `multirow`**: explicit source bracket `'t'`/`'c'`/`'b'` propagates; option `'top'`/`'bottom'` propagates; option `'middle'` does NOT (preserves legacy no-vertical-align on multicol). Explicit `\multirow[…]` always wins. Plain `\multicolumn{}`/`\multirow{}` in an absent-bracket tabular emits no `vertical-align`.
+- **Diagbox cells**: render-tabular always emits `vertical-align: middle` for cells containing `\diagbox`/`\slashbox`/`\backslashbox`. Parser detects via `getSubTabular`'s `hasDiagbox` flag and skips its own vertical-align emit so the result has a single `vertical-align: middle` (no duplication). Outer tabular's bracket does not override this — the diagonal split visual always centers content.
 
 ---
 
@@ -200,13 +201,13 @@ This preserves the no-op invariant for existing documents.
 
 - [x] `parse-tabular.ts` regex captures `[t]/[c]/[b]` on `\begin{tabular}` and threads it to `getVerticallyColumnAlign`
 - [x] All `\begin{tabular}` parsing sites in the file audited so bracket is not dropped on the recursive sub-tabular path
-- [x] `getVerticallyColumnAlign` accepts a `posDefault` argument; `l/c/r/S` columns honor it; `m`/`p`/`b` columns continue to win
+- [x] `getVerticallyColumnAlign` accepts a `bracketDefault` argument; `l/c/r/S` columns honor it; `m`/`p`/`b` columns continue to win
 - [x] `defaultCellVerticalAlign` option threaded from `state.md.options` to the parser; treated as fallback when source bracket is absent
 - [x] `forLatex` `tableOpen.meta.bracket` carries the source bracket; option-derived `'t'`/`'b'` is injected when the source has no bracket; `'c'`/unset preserves round-trip (no `meta.bracket`)
 - [x] HTML output: `<td>` gains `vertical-align: top` (or `bottom`) only when bracket is present or option is set; no-op for existing MMD
-- [x] `\multicolumn` / `\multirow` cells inherit the row-level `'t'`/`'c'`/`'b'` default; only unset (no bracket, no option) is not propagated, preserving the legacy no-CSS path for plain `\multicolumn{}`/`\multirow{}` in absent-bracket tabulars
+- [x] `\multicolumn` / `\multirow` cells inherit explicit source `'t'`/`'c'`/`'b'` and option `'top'`/`'bottom'`; option `'middle'` and unset stay no-op (preserves legacy no-CSS path on multicol)
 - [x] Explicit `\multirow[t]`/`\multirow[c]`/`\multirow[b]` always wins over the row-level default and emits explicit `vertical-align`; `[c]` no longer leaks `[t]`/`[b]` from the outer tabular
-- [x] All existing tests pass with no snapshot updates required
+- [x] All existing tests pass; two `\multirow[c]` snapshots in `tests/_data/_tabular/_data_digbox.js` updated to include the now-explicit `vertical-align: middle` (intentional behavior change — see "Multirow vpos handling" notes)
 - [x] New unit tests cover the cases listed under Testing
 - [x] Changelog entry added
 - [ ] `Status` updated to `Implemented` after merge

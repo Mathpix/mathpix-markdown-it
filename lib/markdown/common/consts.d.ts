@@ -91,6 +91,8 @@ export declare const END_LST_RE: RegExp;
 export declare const BEGIN_LST_RE: RegExp;
 export declare const BEGIN_LST_INLINE_RE: RegExp;
 export declare const BEGIN_TABULAR_INLINE_RE: RegExp;
+export declare const BEGIN_TABULAR_BRACKET_RE: RegExp;
+export declare const BEGIN_TABULAR_BRACKET_RE_G: RegExp;
 export declare const END_LST_INLINE_RE: RegExp;
 export declare const END_TABULAR_INLINE_RE: RegExp;
 /** Full begin line: \begin{lstlisting}[...]( +hspace +≤1 NL ) */

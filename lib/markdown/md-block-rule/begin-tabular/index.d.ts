@@ -7,7 +7,7 @@ type TTypeContent = {
     type?: string;
     content?: string;
     align?: string;
-    pos?: TVerticalPos;
+    bracket?: TVerticalPos;
 };
 type TTypeContentList = Array<TTypeContent>;
 export type TAttrs = string[];
@@ -27,6 +27,7 @@ export type TTokenTabular = {
     latex?: string;
     parents?: Array<string>;
     isSubTabular?: boolean;
+    hasDiagbox?: boolean;
     meta?: any;
 };
 export type TMulti = {

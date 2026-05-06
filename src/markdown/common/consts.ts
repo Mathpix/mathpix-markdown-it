@@ -129,6 +129,9 @@ export const END_LST_RE = /^\\end\{lstlisting\}\s*$/;
 export const BEGIN_LST_RE = /^\\begin\{lstlisting\}(?:\[(.*?)\])?\s*$/;
 export const BEGIN_LST_INLINE_RE = /\\begin\{lstlisting\}(?:\[(.*?)\])?/;
 export const BEGIN_TABULAR_INLINE_RE: RegExp = /\\begin\s{0,}{tabular}\s{0,}(?:\[[^\]]*\])?\s{0,}\{([^}]*)\}/;
+// Captures bracket (group 1) and align (group 2).
+export const BEGIN_TABULAR_BRACKET_RE: RegExp = /\\begin\s{0,}{tabular}\s{0,}(?:\[([^\]]*)\])?\s{0,}\{([^}]*)\}/;
+export const BEGIN_TABULAR_BRACKET_RE_G: RegExp = /\\begin\s{0,}{tabular}\s{0,}(?:\[([^\]]*)\])?\s{0,}\{([^}]*)\}/g;
 export const END_LST_INLINE_RE   = /\\end\{lstlisting\}/;
 export const END_TABULAR_INLINE_RE: RegExp   = /\\end\{tabular\}/;
 /** Horizontal spaces (no CR/LF) + at most one newline (CRLF or LF), optional */

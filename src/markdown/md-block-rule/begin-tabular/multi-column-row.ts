@@ -2,7 +2,7 @@ import {TAttrs, TMulti, TTokenTabular} from "./index";
 import {addStyle, setColumnLines} from "./tabular-td";
 import {getSubTabular} from "./sub-tabular";
 import {getMathTableContent} from "./sub-math";
-import {getContent, getColumnAlign, getColumnLines, parseTabularPos, TVerticalPos} from "./common";
+import {getContent, getColumnAlign, getColumnLines, parseTabularPos, bracketToVAlign, TVerticalPos} from "./common";
 import { reMultiRowWithVPos, reMultiRow } from "../../common/consts";
 import { getExtractedCodeBlockContent } from "./sub-code";
 
@@ -36,7 +36,7 @@ export const getCurrentMC = (cells: string[], i: number): number => {
   return res;
 };
 
-export const getMultiColumnMultiRow = (str: string, params: {lLines: string, align: string, rLines: string, posDefault?: 't' | 'c' | 'b'}, forLatex = false, forPptx = false, skipVisual = false): TMulti | null => {
+export const getMultiColumnMultiRow = (str: string, params: {lLines: string, align: string, rLines: string, bracketDefault?: TVerticalPos}, forLatex = false, forPptx = false, skipVisual = false): TMulti | null => {
   let attrs: Array<TAttrs> = [];
   let mr: number = 0;
   let mc: number = 0;
@@ -62,13 +62,9 @@ export const getMultiColumnMultiRow = (str: string, params: {lLines: string, ali
     }
   }
   vpos = vpos ? vpos.trim() : '';
-  // Explicit \multirow[…] wins over row-level posDefault.
-  const effectivePos: TVerticalPos | undefined = parseTabularPos(vpos) ?? params.posDefault;
-  const cellV: string =
-    effectivePos === 't' ? 'top'
-    : effectivePos === 'b' ? 'bottom'
-    : effectivePos === 'c' ? 'middle'
-    : '';
+  // Explicit \multirow[…] wins over row-level bracketDefault. Legacy: undefined → '' (no CSS).
+  const effectiveBracket: TVerticalPos | undefined = parseTabularPos(vpos) ?? params.bracketDefault;
+  const cellV: string = effectiveBracket ? bracketToVAlign(effectiveBracket) : '';
 
   if (matchMC) {
     mc = Number(matchMC[1]);

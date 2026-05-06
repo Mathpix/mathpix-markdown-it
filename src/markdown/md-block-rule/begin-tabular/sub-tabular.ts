@@ -1,5 +1,5 @@
 import {TTokenTabular} from "./index";
-import { generateUniqueId, getContent, detectLocalBlock } from "./common";
+import { generateUniqueId, getContent, detectLocalBlock, getParams, TVerticalPos } from "./common";
 import { doubleAngleBracketUuidPattern, singleAngleBracketPattern, ANGLE_BRACKETS_RE, uuidPatternNoCapture } from "../../common/consts";
 import { findInDiagboxTable } from "./sub-cell";
 import { getExtractedCodeBlockContent } from "./sub-code";
@@ -15,7 +15,8 @@ type TSubTabular = {
   parsed?: Array<TTokenTabular>,
   parents?: Array<string>,
   isBlock?: boolean,
-  children?: Array<string>
+  children?: Array<string>,
+  bracket?: TVerticalPos
 };
 const subTabular: Map<string, TSubTabular> = new Map();
 
@@ -24,6 +25,12 @@ const SUB_TABULAR_KEY_RE: RegExp = new RegExp(`^${uuidPatternNoCapture}$`);
 
 export const ClearSubTableLists = (): void => {
   subTabular.clear();
+};
+
+// Bracket of the nested tabular referenced by the placeholder `<<id>>` (or bare uuid).
+export const getSubTabularBracket = (placeholderOrId: string): TVerticalPos | undefined => {
+  const id = placeholderOrId.replace(ANGLE_BRACKETS_RE, '');
+  return subTabular.get(id)?.bracket;
 };
 
 /**
@@ -62,11 +69,17 @@ export const pushSubTabular = (
     const child = subTabular.get(cid);
     return child ? !!child.isBlock : false;
   });
+  // Parse the bracket once at insert time so cell-level inference can read it without re-scanning content.
+  const beginIdx: number = subTabularContent.indexOf('\\begin{tabular}');
+  const bracket: TVerticalPos | undefined = beginIdx >= 0
+    ? getParams(subTabularContent, beginIdx + '\\begin{tabular}'.length)?.bracket
+    : undefined;
   subTabular.set(id, {
     content: subTabularContent,
     parsed: subRes,
     children: childIds,
     isBlock: isBlockLocal || childBlock,
+    bracket,
   });
   if (posBegin > 0) {
     return str.slice(i, posBegin) + `<<${id}>>` + str.slice(posEnd + '\\end{tabular}'.length, str.length);
@@ -106,6 +119,7 @@ export const getSubTabular = (
   let parents: any = null;
   let cursor: number = 0;
   let contentFragments: string[] = [];
+  let hasDiagbox: boolean = false;
   for (let j = 0; j < cellM.length; j++) {
     const placeholder: string = cellM[j];
     const id: string = placeholderToId(placeholder);
@@ -138,7 +152,11 @@ export const getSubTabular = (
       parents = entry.parents;
       injected = entry.content ?? "";
     } else {
-      injected = findInDiagboxTable(id) ?? "";
+      const diagboxMatch = findInDiagboxTable(id);
+      if (diagboxMatch) {
+        hasDiagbox = true;
+        injected = diagboxMatch;
+      }
     }
     // decide wrapping using non-space neighbors around placeholder
     const { beforeNonSpace, afterNonSpace } = getInlineContextAroundSpan(sub, start, end);
@@ -162,6 +180,7 @@ export const getSubTabular = (
       type: forLatex ? "inline" : "subTabular",
       parents,
       isSubTabular: true,
+      hasDiagbox,
     },
   ];
 };

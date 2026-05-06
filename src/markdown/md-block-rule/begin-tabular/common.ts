@@ -134,8 +134,9 @@ export const normalizeDefaultCellVerticalAlign = (value: string | undefined | nu
   }
 };
 
-const posToVAlign = (pos: TVerticalPos | undefined): string => {
-  switch (pos) {
+// Bracket → CSS vertical-align (default 'middle').
+export const bracketToVAlign = (bracket: TVerticalPos | undefined): string => {
+  switch (bracket) {
     case 't': return 'top';
     case 'b': return 'bottom';
     default: return 'middle';
@@ -150,7 +151,7 @@ const arrayFillDef = (arr: Array<string>, str: string, num: number): Array<strin
   }
 };
 
-export const getVerticallyColumnAlign = (align: string, numCol: number, posDefault?: TVerticalPos): TAlignData => {
+export const getVerticallyColumnAlign = (align: string, numCol: number, bracketDefault?: TVerticalPos): TAlignData => {
   const aH = ['c', 'S', 'r', 'l'];
   const aV = ['m', 'p', 'b'];
   let hAlign: Array<string> = [];
@@ -158,7 +159,7 @@ export const getVerticallyColumnAlign = (align: string, numCol: number, posDefau
   let cWidth: Array<string> = [];
   let colSpec: Array<string> = [];
   align = align.replace(/ /g, '').trim();
-  const defaultV: string = posToVAlign(posDefault);
+  const defaultV: string = bracketToVAlign(bracketDefault);
 
   for (let j = 0; j < align.length; j++) {
     const ch: string = align[j];
@@ -224,15 +225,15 @@ export const getVerticallyColumnAlign = (align: string, numCol: number, posDefau
 };
 
 export const getParams = (str: string, i: number) => {
-  // Skip optional [pos] before {align}.
-  let pos: TVerticalPos | undefined;
+  // Skip optional [bracket] before {align}.
+  let bracket: TVerticalPos | undefined;
   let scanFrom = i;
-  while (scanFrom < str.length && (str[scanFrom] === ' ' || str[scanFrom] === '\t')) scanFrom++;
+  while (scanFrom < str.length && /\s/.test(str[scanFrom])) scanFrom++;
   if (str[scanFrom] === '[') {
     const closeIdx = str.indexOf(']', scanFrom + 1);
     const openBrace = str.indexOf('{', scanFrom);
     if (closeIdx > scanFrom && (openBrace < 0 || closeIdx < openBrace)) {
-      pos = parseTabularPos(str.slice(scanFrom + 1, closeIdx));
+      bracket = parseTabularPos(str.slice(scanFrom + 1, closeIdx));
       scanFrom = closeIdx + 1;
     }
   }
@@ -257,7 +258,7 @@ export const getParams = (str: string, i: number) => {
     }
     res += str[j];
   }
-  return {align: res, index: ires, pos};
+  return {align: res, index: ires, bracket};
 };
 
 export type TDecimal = {l: number, r: number}

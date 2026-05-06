@@ -471,7 +471,7 @@ module.exports = [
 <div class="inline-tabular"><table class="tabular">
 <tbody>
 <tr style="border-top: none !important; border-bottom: none !important;">
-<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; background-size: 100% 100%;vertical-align: middle;background-image: linear-gradient(to bottom left, transparent calc(50% - 0.5px), black 50%, black 50%, transparent calc(50% + 0.5px));"><div  class="diagonal-cell" style="grid-template-columns: repeat(2, 1fr); padding: 0; display: grid; height: 100%; grid-auto-rows: 1fr; min-width: max-content;"><div  class="cell-item diagonal-cell-topRight" style="grid-row-start: 1; grid-column-start: 2; text-align: right; white-space: nowrap; min-height: 1.5em;">B</div><div  class="cell-item diagonal-cell-bottomLeft" style="grid-row-start: 2; grid-column-start: 1; text-align: left; white-space: nowrap; min-height: 1.5em; margin-top: auto;">A</div></div></td>
+<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; background-size: 100% 100%;vertical-align: middle;background-image: linear-gradient(to bottom left, transparent calc(50% - 0.5px), black 50%, black 50%, transparent calc(50% + 0.5px));"><div  class="diagonal-cell" style="grid-template-columns: repeat(2, 1fr); padding: 0; display: grid; height: 100%; grid-auto-rows: 1fr; min-width: max-content;"><div  class="cell-item diagonal-cell-topRight" style="grid-row-start: 1; grid-column-start: 2; text-align: right; white-space: nowrap; min-height: 1.5em;">B</div><div  class="cell-item diagonal-cell-bottomLeft" style="grid-row-start: 2; grid-column-start: 1; text-align: left; white-space: nowrap; min-height: 1.5em; margin-top: auto;">A</div></div></td>
 <td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; ">x</td>
 </tr>
 </tbody>
@@ -479,13 +479,13 @@ module.exports = [
 </div></div>`
   },
   {
-    title: '\\diagbox cell with [t] — bracket applies to td, diagbox keeps own internal CSS',
+    title: '\\diagbox cell with outer [t] — diagbox always renders middle, sibling honors [t]',
     mmd: '\\begin{tabular}[t]{|l|l|}\n\\hline\n\\diagbox{A}{B} & x \\\\\n\\hline\n\\end{tabular}',
     html: `<div class="table_tabular" style="text-align: center">
 <div class="inline-tabular"><table class="tabular">
 <tbody>
 <tr style="border-top: none !important; border-bottom: none !important;">
-<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: top; background-size: 100% 100%;vertical-align: middle;background-image: linear-gradient(to bottom left, transparent calc(50% - 0.5px), black 50%, black 50%, transparent calc(50% + 0.5px));"><div  class="diagonal-cell" style="grid-template-columns: repeat(2, 1fr); padding: 0; display: grid; height: 100%; grid-auto-rows: 1fr; min-width: max-content;"><div  class="cell-item diagonal-cell-topRight" style="grid-row-start: 1; grid-column-start: 2; text-align: right; white-space: nowrap; min-height: 1.5em;">B</div><div  class="cell-item diagonal-cell-bottomLeft" style="grid-row-start: 2; grid-column-start: 1; text-align: left; white-space: nowrap; min-height: 1.5em; margin-top: auto;">A</div></div></td>
+<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; background-size: 100% 100%;vertical-align: middle;background-image: linear-gradient(to bottom left, transparent calc(50% - 0.5px), black 50%, black 50%, transparent calc(50% + 0.5px));"><div  class="diagonal-cell" style="grid-template-columns: repeat(2, 1fr); padding: 0; display: grid; height: 100%; grid-auto-rows: 1fr; min-width: max-content;"><div  class="cell-item diagonal-cell-topRight" style="grid-row-start: 1; grid-column-start: 2; text-align: right; white-space: nowrap; min-height: 1.5em;">B</div><div  class="cell-item diagonal-cell-bottomLeft" style="grid-row-start: 2; grid-column-start: 1; text-align: left; white-space: nowrap; min-height: 1.5em; margin-top: auto;">A</div></div></td>
 <td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: top; ">x</td>
 </tr>
 </tbody>
@@ -554,6 +554,35 @@ module.exports = [
 </tbody>
 </table>
 </div> after</div>`
+  },
+  {
+    title: 'Source [c] propagates to multicol (asymmetric vs option middle)',
+    mmd: '\\begin{tabular}[c]{|l|l|l|}\n\\hline\n\\multicolumn{2}{|l|}{span} & d \\\\\n\\hline\n\\end{tabular}',
+    html: `<div class="table_tabular" style="text-align: center">
+<div class="inline-tabular"><table class="tabular">
+<tbody>
+<tr style="border-top: none !important; border-bottom: none !important;">
+<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom: none !important; border-top: none !important; vertical-align: middle; border-top-style: solid !important; border-top-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; " colspan="2">span</td>
+<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; ">d</td>
+</tr>
+</tbody>
+</table>
+</div></div>`
+  },
+  {
+    title: "Option 'middle' is no-op for multicol cells (legacy: no vertical-align)",
+    mmd: '\\begin{tabular}{|l|l|l|}\n\\hline\n\\multicolumn{2}{|l|}{span} & d \\\\\n\\hline\n\\end{tabular}',
+    options: { defaultCellVerticalAlign: 'middle' },
+    html: `<div class="table_tabular" style="text-align: center">
+<div class="inline-tabular"><table class="tabular">
+<tbody>
+<tr style="border-top: none !important; border-bottom: none !important;">
+<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom: none !important; border-top: none !important; border-top-style: solid !important; border-top-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; " colspan="2">span</td>
+<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; ">d</td>
+</tr>
+</tbody>
+</table>
+</div></div>`
   },
   {
     title: "Invalid option value 'TOP' — rejected, defaults to middle",
