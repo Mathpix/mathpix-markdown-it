@@ -53,13 +53,21 @@ The motivating case is tables that contain mixed-height cells — for example, o
 - `\begin{tabular}{|l|l|l|}` (absent bracket) → defaults to `'middle'` (unchanged) unless `defaultCellVerticalAlign` option overrides it.
 - Any other bracket value (whitespace, unknown letter, multi-char) → ignored, treated as absent.
 - Per-column `m`/`p`/`b` always overrides the row-level bracket default.
-- The bracket on a table affects only that table's cells. It does not propagate into nested tabulars (each nested tabular is parsed with its own bracket) nor outward into the cell that contains it.
+- The bracket on a table affects only that table's cells. It does not propagate into nested tabulars (each nested tabular is parsed with its own bracket).
+
+### Cell-level inference (nested bracket → outer td)
+
+- When an outer cell's content contains a nested `\begin{tabular}[t/c/b]`, the outer `<td>` inherits that vertical-align (matching LaTeX baseline semantics — `[t]` on the inner tabular sits at the top of the row baseline, effectively top-aligning the outer cell's content).
+- Cell-level inference overrides the row-level bracket for that single cell. Siblings in the same row are not affected.
+- Per-column `m`/`p`/`b` on the outer column still wins (most-specific rule).
+- If the cell contains a bare nested `\begin{tabular}{...}` without bracket, no inference fires; the outer cell uses the row-level default.
 
 ### `forLatex` export
 
-- When the source had a bracket, the bracket is preserved verbatim in `tableOpen.meta.pos`.
-- When `defaultCellVerticalAlign: 'top'` (or `'bottom'`) and the source had no explicit bracket, the option's value is injected as `'t'` (or `'b'`) into `tableOpen.meta.pos` so the consumer can serialize `\begin{tabular}[pos]{...}` and keep HTML and exported LaTeX consistent.
-- When `defaultCellVerticalAlign: 'middle'` or unset, no `meta.pos` is set on absent-bracket tables (preserves round-trip).
+- When the source had a bracket, the bracket is preserved verbatim in `tableOpen.meta.bracket`.
+- When `defaultCellVerticalAlign: 'top'` (or `'bottom'`) and the source had no explicit bracket, the option's value is injected as `'t'` (or `'b'`) into `tableOpen.meta.bracket` so the consumer can serialize `\begin{tabular}[pos]{...}` and keep HTML and exported LaTeX consistent.
+- When `defaultCellVerticalAlign: 'middle'` or unset, no `meta.bracket` is set on absent-bracket tables (preserves round-trip).
+- Every `td_open` of a tabular with an effective bracket carries `meta.parentBracket` set to that bracket. Consumers iterating forLatex tokens see parent context directly on each cell. `AddTd` and `AddTdSubTable` accept an optional `meta?: TTdMeta` parameter; the multicol path sets `parentBracket` alongside its existing meta fields. New `TTdMeta` type in `common.ts` captures the known shape of `td_open.meta` for forLatex (parentBracket, multi, colCount, colSpecs, currentColIndex, isSubTabular, forceMultiFixedWidth).
 
 ### `defaultCellVerticalAlign` option
 
@@ -76,7 +84,7 @@ The motivating case is tables that contain mixed-height cells — for example, o
 - **No-op on existing MMD**: documents without the bracket and without the option set must produce byte-identical HTML output.
 - **LaTeX semantics for the bracket**: `[t]/[c]/[b]` is a row-level default. Per-column `m`/`p`/`b` must continue to win.
 - **Round-trip safety**: a source with `\begin{tabular}[t]{|l|l|}` must serialize back to `\begin{tabular}[t]{|l|l|}` in `forLatex` mode (bracket preserved).
-- **Scope isolation**: bracket on a table affects only that table's cells. Not propagated into nested tabulars; not propagated outward to the containing cell.
+- **Scope rules**: bracket on a table is row-level for that table's own cells. Bracket on a nested tabular additionally propagates to the outer cell containing it (cell-level inference, matches LaTeX baseline semantics). Bracket does not propagate into deeper nested tabulars.
 - **Unknown bracket value**: silently treated as absent; never throws or produces malformed output.
 - **Existing performance optimizations are not regressed**: `columnStyleCache`, `cellAttrsCache`, shared close-tokens, `colsToFixWidth` Set, and per-parse interning all continue to work. The new `vAlign` value (one of `'top'`/`'middle'`/`'bottom'`) participates in style key generation as before.
 - **Test surface**: all existing tests must pass.
@@ -87,7 +95,7 @@ The motivating case is tables that contain mixed-height cells — for example, o
 
 | Option | Type | Default | Effect |
 |--------|------|--------:|--------|
-| `defaultCellVerticalAlign` | `'top' \| 'middle' \| 'bottom' \| undefined` | `undefined` | Vertical-align fallback for `\begin{tabular}` blocks without an explicit `[pos]` bracket. Affects `<td>` HTML style and (for `'top'`/`'bottom'`) `forLatex` round-trip via `tableOpen.meta.pos`. Propagates into `\multicolumn`/`\multirow` cells. Per-column `m`/`p`/`b` and any explicit `[t]/[c]/[b]` source bracket always override. Unset → byte-identical to legacy. |
+| `defaultCellVerticalAlign` | `'top' \| 'middle' \| 'bottom' \| undefined` | `undefined` | Vertical-align fallback for `\begin{tabular}` blocks without an explicit `[pos]` bracket. Affects `<td>` HTML style and (for `'top'`/`'bottom'`) `forLatex` round-trip via `tableOpen.meta.bracket`. Propagates into `\multicolumn`/`\multirow` cells. Per-column `m`/`p`/`b` and any explicit `[t]/[c]/[b]` source bracket always override. Unset → byte-identical to legacy. |
 
 No other options introduced.
 
@@ -156,7 +164,7 @@ Document-level option, not per-call. Same option applies to every tabular in the
 The `latex` payload for `table_open` currently emits only the column spec. Extend so that when:
 
 - Source bracket present → serialize as `\begin{tabular}[<src-bracket>]{...}`.
-- Source bracket absent + `defaultCellVerticalAlign` set to `'top'`/`'bottom'` → set `tableOpen.meta.pos` to `'t'`/`'b'` accordingly.
+- Source bracket absent + `defaultCellVerticalAlign` set to `'top'`/`'bottom'` → set `tableOpen.meta.bracket` to `'t'`/`'b'` accordingly.
 - Source bracket absent + no option → emit as today (no bracket).
 
 The `latex` field on `table_open` is consumed by the LaTeX-emitting render path. Verify that consumer accepts the bracket-augmented payload without further modification.
@@ -194,7 +202,7 @@ This preserves the no-op invariant for existing documents.
 - [x] All `\begin{tabular}` parsing sites in the file audited so bracket is not dropped on the recursive sub-tabular path
 - [x] `getVerticallyColumnAlign` accepts a `posDefault` argument; `l/c/r/S` columns honor it; `m`/`p`/`b` columns continue to win
 - [x] `defaultCellVerticalAlign` option threaded from `state.md.options` to the parser; treated as fallback when source bracket is absent
-- [x] `forLatex` `tableOpen.meta.pos` carries the source bracket; option-derived `'t'`/`'b'` is injected when the source has no bracket; `'c'`/unset preserves round-trip (no `meta.pos`)
+- [x] `forLatex` `tableOpen.meta.bracket` carries the source bracket; option-derived `'t'`/`'b'` is injected when the source has no bracket; `'c'`/unset preserves round-trip (no `meta.bracket`)
 - [x] HTML output: `<td>` gains `vertical-align: top` (or `bottom`) only when bracket is present or option is set; no-op for existing MMD
 - [x] `\multicolumn` / `\multirow` cells inherit the row-level `'t'`/`'c'`/`'b'` default; only unset (no bracket, no option) is not propagated, preserving the legacy no-CSS path for plain `\multicolumn{}`/`\multirow{}` in absent-bracket tabulars
 - [x] Explicit `\multirow[t]`/`\multirow[c]`/`\multirow[b]` always wins over the row-level default and emits explicit `vertical-align`; `[c]` no longer leaks `[t]`/`[b]` from the outer tabular
@@ -221,9 +229,9 @@ Cases:
 - `\begin{tabular}[ ]{|l|l|}` (empty/whitespace bracket) → treated as absent.
 - `\begin{tabular}  [t]  {|l|l|}` (whitespace around bracket) → `vAlign = ['top', 'top']`.
 - Nested: outer `\begin{tabular}{|l|l|}` + inner `\begin{tabular}[t]{l}` — outer cells stay middle, inner cells become top.
-- `defaultCellVerticalAlign: 'top'` set, source no bracket → vAlign top, `tableOpen.meta.pos = 't'`.
-- `defaultCellVerticalAlign: 'top'` set, source explicitly `[c]` → vAlign middle, `tableOpen.meta.pos = 'c'` (source bracket wins over option).
-- `defaultCellVerticalAlign: 'middle'` set, source no bracket → vAlign middle, `tableOpen.meta.pos` undefined (round-trip preserved).
+- `defaultCellVerticalAlign: 'top'` set, source no bracket → vAlign top, `tableOpen.meta.bracket = 't'`.
+- `defaultCellVerticalAlign: 'top'` set, source explicitly `[c]` → vAlign middle, `tableOpen.meta.bracket = 'c'` (source bracket wins over option).
+- `defaultCellVerticalAlign: 'middle'` set, source no bracket → vAlign middle, `tableOpen.meta.bracket` undefined (round-trip preserved).
 - `defaultCellVerticalAlign` unset, source no bracket → no change (regression guard).
 
 ### Snapshot tests
@@ -235,7 +243,7 @@ Cases:
 
 - Render a sample MMD with `\begin{tabular}[t]{|l|l|l|}` containing nested-tabular cells of unequal lengths. Confirm short cells in HTML preview now align to the top.
 - Render same document via `forLatex` export, confirm bracket is preserved in the emitted LaTeX source.
-- Render same document with `defaultCellVerticalAlign: 'top'` and **without** the source bracket; confirm both HTML emits `vertical-align: top` and `tableOpen.meta.pos === 't'`.
+- Render same document with `defaultCellVerticalAlign: 'top'` and **without** the source bracket; confirm both HTML emits `vertical-align: top` and `tableOpen.meta.bracket === 't'`.
 
 ### Commands
 

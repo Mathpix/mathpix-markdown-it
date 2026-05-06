@@ -913,6 +913,7 @@ The `MathpixMarkdown` React element accepts the following props:
 | `showPageBreaks`                      | boolean;*`false`*            | Hidden tags will be shown in html like page break                                                                      |
 | `centerImages`                        | boolean;*`true`*             | Center align images by default                                                                                         |
 | `centerTables`                        | boolean;*`true`*             | Center align tables by default                                                                                         |
+| `defaultCellVerticalAlign`            | "top" \| "middle" \| "bottom";*`undefined`* | Fallback vertical alignment for tabular cells without an explicit `\begin{tabular}[t/c/b]{...}` bracket. Per-column `m`/`p`/`b` and any explicit `[t]/[c]/[b]` source bracket always override. Unset → no override. |
 | `validateLink`                        | function;*`null`*            | The function `(url: string) => void` to override md link validator                                                     |
 | `enableCodeBlockRuleForLatexCommands` | boolean;*`false`* | By default, if latex commands are indented (4 spaces / 1 tab) they do not become `Code Blocks`.               |
 | `parserErrors`                        | [ParserErrors](https://github.com/Mathpix/mathpix-markdown-it#parsererrors);*`{}`*        | Sets options to output parser errors for equations and tabular                    |
@@ -947,6 +948,7 @@ The `MathpixMarkdown` React element accepts the following props:
 | `showPageBreaks`                      | boolean;*`false`*            | Hidden tags will be shown in html like page break                                                                      |
 | `centerImages`                        | boolean;*`true`*             | Center align images by default                                                                                         |
 | `centerTables`                        | boolean;*`true`*             | Center align tables by default                                                                                         |
+| `defaultCellVerticalAlign`            | "top" \| "middle" \| "bottom";*`undefined`* | Fallback vertical alignment for tabular cells without an explicit `\begin{tabular}[t/c/b]{...}` bracket. Per-column `m`/`p`/`b` and any explicit `[t]/[c]/[b]` source bracket always override. Unset → no override. |
 | `validateLink`                        | function;*`null`*            | The function `(url: string) => void` to override md link validator                                                     |
 | `enableCodeBlockRuleForLatexCommands` | boolean;*`false`* | By default, if latex commands are indented (4 spaces / 1 tab) they do not become `Code Blocks`.               |
 | `parserErrors`                        | [ParserErrors](https://github.com/Mathpix/mathpix-markdown-it#parsererrors);*`{}`*        | Sets options to output parser errors for equations and tabular                    |

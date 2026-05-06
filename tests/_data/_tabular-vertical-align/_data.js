@@ -127,8 +127,32 @@ module.exports = [
 </div></div>`
   },
   {
-    title: 'Nested: outer no bracket, inner [t] — outer cells stay middle, inner cells become top',
+    title: 'Nested [t] in cell — outer td inherits top via cell-level inference, sibling stays middle',
     mmd: '\\begin{tabular}{|l|l|}\n\\hline\n\\begin{tabular}[t]{l}\nx \\\\\ny\n\\end{tabular} & b \\\\\n\\hline\n\\end{tabular}',
+    html: `<div class="table_tabular" style="text-align: center">
+<div class="inline-tabular"><table class="tabular">
+<tbody>
+<tr style="border-top: none !important; border-bottom: none !important;">
+<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: top; "><div class="inline-tabular sub-table"><table class="tabular">
+<tbody>
+<tr style="border-top: none !important; border-bottom: none !important;">
+<td style="text-align: left; border-left: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: top; ">x</td>
+</tr>
+<tr style="border-top: none !important; border-bottom: none !important;">
+<td style="text-align: left; border-left: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: top; ">y</td>
+</tr>
+</tbody>
+</table>
+</div></td>
+<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; ">b</td>
+</tr>
+</tbody>
+</table>
+</div></div>`
+  },
+  {
+    title: 'Cell-level: nested [c] overrides outer [t]',
+    mmd: '\\begin{tabular}[t]{|l|l|}\n\\hline\n\\begin{tabular}[c]{l}x \\\\ y\\end{tabular} & b \\\\\n\\hline\n\\end{tabular}',
     html: `<div class="table_tabular" style="text-align: center">
 <div class="inline-tabular"><table class="tabular">
 <tbody>
@@ -136,10 +160,58 @@ module.exports = [
 <td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; "><div class="inline-tabular sub-table"><table class="tabular">
 <tbody>
 <tr style="border-top: none !important; border-bottom: none !important;">
-<td style="text-align: left; border-left: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: top; ">x</td>
+<td style="text-align: left; border-left: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">x</td>
 </tr>
 <tr style="border-top: none !important; border-bottom: none !important;">
-<td style="text-align: left; border-left: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: top; ">y</td>
+<td style="text-align: left; border-left: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">y</td>
+</tr>
+</tbody>
+</table>
+</div></td>
+<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: top; ">b</td>
+</tr>
+</tbody>
+</table>
+</div></div>`
+  },
+  {
+    title: 'Cell-level: nested [b] overrides outer [t]',
+    mmd: '\\begin{tabular}[t]{|l|l|}\n\\hline\n\\begin{tabular}[b]{l}x \\\\ y\\end{tabular} & b \\\\\n\\hline\n\\end{tabular}',
+    html: `<div class="table_tabular" style="text-align: center">
+<div class="inline-tabular"><table class="tabular">
+<tbody>
+<tr style="border-top: none !important; border-bottom: none !important;">
+<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: bottom; "><div class="inline-tabular sub-table"><table class="tabular">
+<tbody>
+<tr style="border-top: none !important; border-bottom: none !important;">
+<td style="text-align: left; border-left: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: bottom; ">x</td>
+</tr>
+<tr style="border-top: none !important; border-bottom: none !important;">
+<td style="text-align: left; border-left: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: bottom; ">y</td>
+</tr>
+</tbody>
+</table>
+</div></td>
+<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: top; ">b</td>
+</tr>
+</tbody>
+</table>
+</div></div>`
+  },
+  {
+    title: 'Cell-level: per-column p{} wins over nested [c] (outer td stays top)',
+    mmd: '\\begin{tabular}{|p{2cm}|l|}\n\\hline\n\\begin{tabular}[c]{l}x \\\\ y\\end{tabular} & b \\\\\n\\hline\n\\end{tabular}',
+    html: `<div class="table_tabular" style="text-align: center">
+<div class="inline-tabular"><table class="tabular">
+<tbody>
+<tr style="border-top: none !important; border-bottom: none !important;">
+<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: 2cm; vertical-align: top; "><div class="inline-tabular sub-table"><table class="tabular">
+<tbody>
+<tr style="border-top: none !important; border-bottom: none !important;">
+<td style="text-align: left; border-left: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">x</td>
+</tr>
+<tr style="border-top: none !important; border-bottom: none !important;">
+<td style="text-align: left; border-left: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">y</td>
 </tr>
 </tbody>
 </table>

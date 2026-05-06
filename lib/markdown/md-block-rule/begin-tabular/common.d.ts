@@ -6,8 +6,7 @@ export type TParselines = {
 export declare const getContent: (content: string, onlyOne?: boolean, skipTrim?: boolean) => string;
 export declare const generateUniqueId: (onlyUuid?: boolean) => string;
 export declare const getColumnLines: (str: string, numCol?: number) => Array<string>;
-export declare const getColumnAlign: (align: string) => string[] | [
-];
+export declare const getColumnAlign: (align: string) => string[] | [];
 export type TAlignData = {
     cAlign: Array<string>;
     vAlign: Array<string>;
@@ -15,6 +14,15 @@ export type TAlignData = {
     colSpec: Array<string>;
 };
 export type TVerticalPos = 't' | 'c' | 'b';
+export type TTdMeta = {
+    parentBracket?: TVerticalPos;
+    multi?: any;
+    colCount?: number;
+    colSpecs?: string[];
+    currentColIndex?: number;
+    isSubTabular?: boolean;
+    forceMultiFixedWidth?: boolean;
+};
 export declare const parseTabularPos: (raw: string | undefined | null) => TVerticalPos | undefined;
 export declare const normalizeDefaultCellVerticalAlign: (value: string | undefined | null) => TVerticalPos | undefined;
 export declare const getVerticallyColumnAlign: (align: string, numCol: number, posDefault?: TVerticalPos) => TAlignData;

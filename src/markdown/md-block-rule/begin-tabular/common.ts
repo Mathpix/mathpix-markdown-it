@@ -102,6 +102,17 @@ export type TAlignData = {
 
 export type TVerticalPos = 't' | 'c' | 'b';
 
+// Known fields on td_open.meta (forLatex / multicol pipelines).
+export type TTdMeta = {
+  parentBracket?: TVerticalPos;
+  multi?: any;
+  colCount?: number;
+  colSpecs?: string[];
+  currentColIndex?: number;
+  isSubTabular?: boolean;
+  forceMultiFixedWidth?: boolean;
+};
+
 // Parses the source bracket value of `\begin{tabular}[...]{...}`.
 export const parseTabularPos = (raw: string | undefined | null): TVerticalPos | undefined => {
   if (!raw) return undefined;

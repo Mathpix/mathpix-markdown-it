@@ -7,7 +7,7 @@ import {
 import {
   getContent, getRowLines, getCellsAll, getDecimal, TDecimal,
   TAlignData, getVerticallyColumnAlign, getParams, getColumnLines, shouldRewriteColSpec,
-  detectLocalBlock, normalizeDefaultCellVerticalAlign, TVerticalPos
+  detectLocalBlock, normalizeDefaultCellVerticalAlign, parseTabularPos, TVerticalPos, TTdMeta
 } from './common';
 import { getMathTableContent, getSubMath } from './sub-math';
 import { getSubTabular, pushSubTabular } from './sub-tabular';
@@ -15,8 +15,10 @@ import { getMultiColumnMultiRow, getCurrentMC, getMC } from './multi-column-row'
 import { getSubDiagbox } from "./sub-cell";
 import { isEscapedAt } from "../../utils";
 
-// `\begin{tabular}` with optional [pos] and required {align}.
-const RE_BEGIN_TABULAR_BRACKET = /\\begin{tabular}\s*(?:\[[^\]]*\])?\s*\{([^}]*)\}/;
+// `\begin{tabular}` with optional [pos] (group 1) and required {align} (group 2).
+const RE_BEGIN_TABULAR_BRACKET = /\\begin{tabular}\s*(?:\[([^\]]*)\])?\s*\{([^}]*)\}/;
+// Column spec letters that carry explicit vertical alignment.
+const RE_EXPLICIT_V_COL_SPEC = /^[mpb]/;
 
 /**
  * Splits a tabular row into columns by unescaped '&' characters.
@@ -109,8 +111,10 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}, is
   const { forLatex = false, outMath = {} } = options;
   const skipVisual = !!options?.forMD || !!forLatex;
 
-  // Source bracket wins; option only injects 't'/'b' to preserve round-trip for unset/'c'.
+  // Source bracket wins; option only injects 't'/'b' to preserve round-trip.
   const latexPos: TVerticalPos | undefined = pos ?? (optionPos === 'c' ? undefined : optionPos);
+  // Parent bracket attached to every td_open under forLatex.
+  const tdMeta: TTdMeta | undefined = forLatex && latexPos ? { parentBracket: latexPos } : undefined;
 
   res.push({token:'table_open', type:'table_open', tag: 'table', n: 1,
     attrs: getSharedTableOpenAttrs(undefined, skipVisual),
@@ -145,7 +149,7 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}, is
           const data = AddTd('', {h: cAlign[k], v: vAlign[k], w: cWidth[k]},
             {left: cLeft, right: cRight, bottom: CellsHLines[i+1] ? CellsHLines[i+1][k] : 'none',
               top: i === 0 ? CellsHLines[i] ? CellsHLines[i][k] : 'none' : ''},
-            CellsHLSpaces[i+1][k], null, skipVisual
+            CellsHLSpaces[i+1][k], null, skipVisual, tdMeta
           );
           markColIfHasList(colsToFixWidth, k, data.content);
           for (const t of data.res) {
@@ -178,7 +182,7 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}, is
           const data = AddTd('', {h: cAlign[k], v: vAlign[k], w: cWidth[k]},
             {left: cLeft, right: cRight, bottom: CellsHLines[i+1] ? CellsHLines[i+1][k] : 'none',
               top: i === 0 ? CellsHLines[i] ? CellsHLines[i][k] : 'none' : ''},
-            CellsHLSpaces[i+1][k], null, skipVisual
+            CellsHLSpaces[i+1][k], null, skipVisual, tdMeta
           );
           markColIfHasList(colsToFixWidth, k, data.content);
           for (const t of data.res) {
@@ -290,11 +294,12 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}, is
           res.push(tdOpen);
           if (forLatex) {
             tdOpen.meta = {
+              ...tdMeta,
               multi: multi.multi,
               colCount: numCol,
               colSpecs: colSpec,
               currentColIndex: ic,
-              isSubTabular
+              isSubTabular,
             }
           }
           if (multi.subTable) {
@@ -335,25 +340,35 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}, is
         const parseMath = getMathTableContent(cells[j], 0);
         let content = parseMath || getContent(cells[j]);
 
-        const handleSubTable = (subTable: Array<TTokenTabular>) => {
+        const handleSubTable = (subTable: Array<TTokenTabular>, vOverride: string) => {
           if (!colsToFixWidth.has(ic)
             && subTable.some((item: TTokenTabular) => detectLocalBlock(item.content))) {
             colsToFixWidth.add(ic);
           }
           return AddTdSubTable(subTable,
-            { h: cAlign[ic], v: vAlign[ic], w: cWidth[ic] },
+            { h: cAlign[ic], v: vOverride, w: cWidth[ic] },
             {
               left: cLeft,
               right: cRight,
               bottom: CellsHLines[i + 1] ? CellsHLines[i + 1][ic] : 'none',
               top: i === 0 ? (CellsHLines[i] ? CellsHLines[i][ic] : 'none') : ''
             },
-            skipVisual
+            skipVisual,
+            tdMeta
           );
         }
         const parseSub = getSubTabular(content, 0, true, forLatex);
         if (parseSub && parseSub.length > 0) {
-          for (const t of handleSubTable(parseSub)) {
+          // Nested \begin{tabular}[…] propagates to outer td; per-column m/p/b wins.
+          let cellV: string = vAlign[ic];
+          if (!RE_EXPLICIT_V_COL_SPEC.test(colSpec[ic] || '')) {
+            const nestedMatch = (parseSub[0]?.content || '').match(RE_BEGIN_TABULAR_BRACKET);
+            const cellPos = parseTabularPos(nestedMatch?.[1]);
+            if (cellPos) {
+              cellV = cellPos === 't' ? 'top' : cellPos === 'b' ? 'bottom' : 'middle';
+            }
+          }
+          for (const t of handleSubTable(parseSub, cellV)) {
             res.push(t);
           }
           continue;
@@ -362,7 +377,7 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}, is
           {h: cAlign[ic], v: vAlign[ic], w: cWidth[ic]},
            {left: cLeft, right: cRight, bottom: CellsHLines[i+1] ? CellsHLines[i+1][ic]: 'none',
              top: i === 0 ? CellsHLines[i] ? CellsHLines[i][ic] : 'none' : ''},
-            CellsHLSpaces[i+1][ic], decimal[ic], skipVisual
+            CellsHLSpaces[i+1][ic], decimal[ic], skipVisual, tdMeta
           );
         markColIfHasList(colsToFixWidth, ic, data.content);
         for (const t of data.res) {
@@ -380,7 +395,7 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}, is
           {h: cAlign[ic], v: vAlign[ic], w: cWidth[ic]},
            {left: cLeft, right: cRight, bottom: CellsHLines[i+1] ? CellsHLines[i+1][ic] : 'none',
              top: i === 0 ? CellsHLines[i] ? CellsHLines[i][ic] : 'none' : ''},
-            CellsHLSpaces[i+1][ic], null, skipVisual
+            CellsHLSpaces[i+1][ic], null, skipVisual, tdMeta
           );
         markColIfHasList(colsToFixWidth, ic, data.content);
         for (const t of data.res) {
@@ -409,7 +424,7 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}, is
       vLineSpec: cLines
     }
     if (latexPos) {
-      tableOpen.meta.pos = latexPos;
+      tableOpen.meta.bracket = latexPos;
     }
     if (colsToFixWidthArr.length) {
       tableOpen.meta.shouldRewriteColSpec = shouldRewriteColSpec(colsToFixWidthArr, colSpec);
