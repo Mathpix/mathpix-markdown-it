@@ -15,7 +15,7 @@ import {
 } from "../../common/consts";
 import { parseBlockIntoTokenChildren } from "../helper";
 
-// group 1 = bracket, group 2 = align.
+// group 1 = bracket pos, group 2 = column spec.
 export const openTag: RegExp = BEGIN_TABULAR_BRACKET_RE;
 export const openTagG: RegExp = BEGIN_TABULAR_BRACKET_RE_G;
 export const closeTag: RegExp = /(?:\\end\s{0,}{tabular})/;

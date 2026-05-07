@@ -88,6 +88,7 @@ The motivating case is tables that contain mixed-height cells — for example, o
 - **Unknown bracket value**: silently treated as absent; never throws or produces malformed output.
 - **Existing performance optimizations are not regressed**: `columnStyleCache`, `cellAttrsCache`, shared close-tokens, `colsToFixWidth` Set, and per-parse interning all continue to work. The new `vAlign` value (one of `'top'`/`'middle'`/`'bottom'`) participates in style key generation as before.
 - **Test surface**: all existing tests must pass.
+- **Frozen shared `td_open.meta`**: the per-bracket `TD_META_BY_BRACKET` singletons are `Object.freeze`'d; extend via spread (`{...meta, extra}`), never in-place. No clone-on-write marker (asymmetric with `attrs` / `attrsSharedMarker`) because the codebase has no in-place meta mutators — add a `metaSharedMarker` only when a legit mutator appears.
 
 ---
 
@@ -171,14 +172,9 @@ The `latex` field on `table_open` is consumed by the LaTeX-emitting render path.
 
 ### HTML `<td>` style
 
-`composeCellStyle` in `tabular-td.ts` already emits `vertical-align: ${v}` whenever the `aligns.v` field is non-empty. With the bracket parsed, `vAlign` for `l/c/r/S` columns becomes one of `'top'/'middle'/'bottom'` (instead of always `'middle'` falling through to the no-emit path).
+`composeCellStyle` in `tabular-td.ts` emits `vertical-align: ${v}` whenever `aligns.v` is non-empty. For regular `l/c/r/S` columns `bracketToVAlign` maps `'t' → 'top'`, `'b' → 'bottom'`, and everything else (`'c'`, `undefined`) → `'middle'` — so `vertical-align: middle` is always present for these cells. This matches master, where the legacy code pushed `'middle'` unconditionally; existing snapshots already include `vertical-align: middle` and remain byte-identical.
 
-To keep absent-bracket + no-option behavior byte-identical, distinguish two cases inside `getVerticallyColumnAlign`:
-
-- bracket explicitly `'c'` (or option set to `'c'`) → emit `'middle'` (visible in CSS)
-- bracket absent and option absent → push empty string `''` (no CSS emitted, current behavior)
-
-This preserves the no-op invariant for existing documents.
+The `\multicolumn` / `\multirow` path uses a different guard: it emits `vertical-align` only when an effective bracket (`'t'`/`'c'`/`'b'`) is set, and stays no-CSS when the bracket is absent and the option is `'middle'` or unset. This preserves the legacy no-`vertical-align` output on multicol/multirow cells in absent-bracket tabulars.
 
 ---
 
@@ -187,6 +183,7 @@ This preserves the no-op invariant for existing documents.
 - **Whitespace**: `\begin{tabular}  [t]  {|l|}` — extended regex must allow whitespace between `tabular`, bracket, and `{...}`.
 - **Multiple tabulars in one document**: each tabular parses its own bracket independently.
 - **Nested tabulars**: outer and inner each parse their own bracket. Outer bracket does not propagate into inner; inner bracket does not propagate outward.
+- **Multiple nested tabulars in one cell**: only the first nested `\begin{tabular}[...]` contributes its bracket to the outer cell. Subsequent nested tabulars in the same cell render with their own brackets but do not override the outer cell's vertical-align.
 - **Unknown bracket value**: `\begin{tabular}[x]{|l|}` or `\begin{tabular}[tt]{|l|}` — bracket ignored, treated as absent.
 - **Empty bracket**: `\begin{tabular}[]{|l|}` — treated as absent.
 - **Per-column override**: `\begin{tabular}[t]{|l|m{2cm}|}` — column 0 = top (from bracket), column 1 = middle (from `m{}`).
@@ -223,7 +220,7 @@ Cases:
 - `\begin{tabular}[t]{|l|l|}` → `vAlign = ['top', 'top']`, HTML emits `vertical-align: top` on both `<td>`.
 - `\begin{tabular}[b]{|l|l|}` → `vAlign = ['bottom', 'bottom']`, HTML emits `vertical-align: bottom`.
 - `\begin{tabular}[c]{|l|l|}` → `vAlign = ['middle', 'middle']`, HTML emits `vertical-align: middle` (explicit centering).
-- `\begin{tabular}{|l|l|}` (no bracket, no option) → `vAlign = ['middle', 'middle']`, HTML emits no `vertical-align` (current behavior preserved).
+- `\begin{tabular}{|l|l|}` (no bracket, no option) → `vAlign = ['middle', 'middle']`, HTML emits `vertical-align: middle` (matches master — legacy code pushed `'middle'` unconditionally; snapshots include it).
 - `\begin{tabular}[t]{|l|m{2cm}|}` → `vAlign = ['top', 'middle']` (per-column `m{}` wins).
 - `\begin{tabular}[t]{|l|p{2cm}|b{2cm}|}` → `vAlign = ['top', 'top', 'bottom']` (`p` is already top; `b{}` overrides bracket).
 - `\begin{tabular}[x]{|l|l|}` (unknown bracket) → treated as absent.

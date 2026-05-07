@@ -151,6 +151,34 @@ module.exports = [
 </div></div>`
   },
   {
+    title: 'Cell-level: two nested tabulars in one cell — first wins ([t] then [b] → outer top)',
+    mmd: '\\begin{tabular}{|l|l|}\n\\hline\n\\begin{tabular}[t]{l}a\\end{tabular} \\begin{tabular}[b]{l}b\\end{tabular} & c \\\\\n\\hline\n\\end{tabular}',
+    html: `<div class="table_tabular" style="text-align: center">
+<div class="inline-tabular"><table class="tabular">
+<tbody>
+<tr style="border-top: none !important; border-bottom: none !important;">
+<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: top; "><div class="inline-tabular sub-table"><table class="tabular">
+<tbody>
+<tr style="border-top: none !important; border-bottom: none !important;">
+<td style="text-align: left; border-left: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: top; ">a</td>
+</tr>
+</tbody>
+</table>
+</div><div class="inline-tabular sub-table"><table class="tabular">
+<tbody>
+<tr style="border-top: none !important; border-bottom: none !important;">
+<td style="text-align: left; border-left: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: bottom; ">b</td>
+</tr>
+</tbody>
+</table>
+</div></td>
+<td style="text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; ">c</td>
+</tr>
+</tbody>
+</table>
+</div></div>`
+  },
+  {
     title: 'Cell-level: nested [c] overrides outer [t]',
     mmd: '\\begin{tabular}[t]{|l|l|}\n\\hline\n\\begin{tabular}[c]{l}x \\\\ y\\end{tabular} & b \\\\\n\\hline\n\\end{tabular}',
     html: `<div class="table_tabular" style="text-align: center">

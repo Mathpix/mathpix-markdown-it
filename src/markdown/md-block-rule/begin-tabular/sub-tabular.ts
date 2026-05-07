@@ -1,5 +1,5 @@
 import {TTokenTabular} from "./index";
-import { generateUniqueId, getContent, detectLocalBlock, getParams, TVerticalPos } from "./common";
+import { generateUniqueId, getContent, detectLocalBlock, TVerticalPos } from "./common";
 import { doubleAngleBracketUuidPattern, singleAngleBracketPattern, ANGLE_BRACKETS_RE, uuidPatternNoCapture } from "../../common/consts";
 import { findInDiagboxTable } from "./sub-cell";
 import { getExtractedCodeBlockContent } from "./sub-code";
@@ -54,7 +54,8 @@ export const pushSubTabular = (
     posBegin: number=0,
     posEnd: number,
     i: number=0,
-    level=0
+    level=0,
+    bracket?: TVerticalPos
 ): string => {
   const id: string = generateUniqueId();
   const childIds: string[] = extractChildIds(subTabularContent);
@@ -69,11 +70,6 @@ export const pushSubTabular = (
     const child = subTabular.get(cid);
     return child ? !!child.isBlock : false;
   });
-  // Parse the bracket once at insert time so cell-level inference can read it without re-scanning content.
-  const beginIdx: number = subTabularContent.indexOf('\\begin{tabular}');
-  const bracket: TVerticalPos | undefined = beginIdx >= 0
-    ? getParams(subTabularContent, beginIdx + '\\begin{tabular}'.length)?.bracket
-    : undefined;
   subTabular.set(id, {
     content: subTabularContent,
     parsed: subRes,
