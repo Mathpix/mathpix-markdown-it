@@ -366,9 +366,9 @@ const setTokensTabular = (str: string, align: string = '', options: any = {}, is
         const parseSub = getSubTabular(content, 0, true, forLatex);
         if (parseSub && parseSub.length > 0) {
           let cellV: string = vAlign[ic];
-          // Diagbox: skip parser emit — render-tabular adds vertical-align: middle once.
+          // Diagbox always centers, ignoring outer bracket.
           if (parseSub[0]?.hasDiagbox) {
-            cellV = '';
+            cellV = 'middle';
           } else if (!EXPLICIT_V_COL_SPEC.includes(colSpec[ic]?.[0] || '')) {
             const placeholder = content.match(doubleAngleBracketUuidPattern)?.[0];
             const cellBracket = placeholder ? getSubTabularBracket(placeholder) : undefined;
