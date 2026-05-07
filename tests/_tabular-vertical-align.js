@@ -138,14 +138,17 @@ describe('forLatex parent bracket on td_open:', () => {
     tds.every(t => !t.meta?.parentBracket).should.be.true;
   });
 
-  it("option 'top' propagates: outer (2) + inner (2) td_opens get parentBracket='t'", () => {
+  it("option 'top' applies only to outer (top-level) — inner stays bracket-less for round-trip", () => {
     const tokens = parseTokens(
       '\\begin{tabular}{|l|l|}\n\\hline\n\\begin{tabular}{l}\nx \\\\ y\n\\end{tabular} & b \\\\\n\\hline\n\\end{tabular}',
       { defaultCellVerticalAlign: 'top' }
     );
     const tds = findAllTdOpens(tokens);
-    tds.every(t => t.meta?.parentBracket === 't').should.be.true;
     tds.length.should.equal(4);
+    const outerWithT = tds.filter(t => t.meta?.parentBracket === 't');
+    const innerWithoutBracket = tds.filter(t => !t.meta?.parentBracket);
+    outerWithT.length.should.equal(2);
+    innerWithoutBracket.length.should.equal(2);
   });
 
   it("option 'middle' (round-trip preserved) → no parentBracket on td_opens", () => {

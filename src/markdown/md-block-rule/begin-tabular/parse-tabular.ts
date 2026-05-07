@@ -121,8 +121,8 @@ const setTokensTabular = (str: string, {
   const { forLatex = false, outMath = {} } = options;
   const skipVisual = !!options?.forMD || !!forLatex;
 
-  // For forLatex round-trip: source bracket OR option ('t'/'b' only — 'c' skipped to preserve round-trip).
-  const latexBracket: TVerticalPos | undefined = bracket ?? (optionBracket === 'c' ? undefined : optionBracket);
+  // Option fallback only at top level — nested keeps source bracket (round-trip).
+  const latexBracket: TVerticalPos | undefined = bracket ?? (isSubTabular ? undefined : (optionBracket === 'c' ? undefined : optionBracket));
   // Parent bracket attached to every td_open under forLatex.
   const tdMeta: TTdMeta | undefined = forLatex && latexBracket ? TD_META_BY_BRACKET[latexBracket] : undefined;
 

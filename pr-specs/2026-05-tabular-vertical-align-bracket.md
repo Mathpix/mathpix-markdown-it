@@ -65,7 +65,7 @@ The motivating case is tables that contain mixed-height cells — for example, o
 ### `forLatex` export
 
 - When the source had a bracket, the bracket is preserved verbatim in `tableOpen.meta.bracket`.
-- When `defaultCellVerticalAlign: 'top'` (or `'bottom'`) and the source had no explicit bracket, the option's value is injected as `'t'` (or `'b'`) into `tableOpen.meta.bracket` so the consumer can serialize `\begin{tabular}[pos]{...}` and keep HTML and exported LaTeX consistent.
+- When `defaultCellVerticalAlign: 'top'` (or `'bottom'`) and the source had no explicit bracket, the option's value is injected as `'t'` (or `'b'`) into `tableOpen.meta.bracket` so the consumer can serialize `\begin{tabular}[pos]{...}` and keep HTML and exported LaTeX consistent. **Top-level only** — nested absent-bracket tabulars stay bracket-less to preserve round-trip.
 - When `defaultCellVerticalAlign: 'middle'` or unset, no `meta.bracket` is set on absent-bracket tables (preserves round-trip).
 - Every `td_open` of a tabular with an effective bracket carries `meta.parentBracket` set to that bracket. Consumers iterating forLatex tokens see parent context directly on each cell. `AddTd` and `AddTdSubTable` accept an optional `meta?: TTdMeta` parameter; the multicol path sets `parentBracket` alongside its existing meta fields. New `TTdMeta` type in `common.ts` captures the known shape of `td_open.meta` for forLatex (parentBracket, multi, colCount, colSpecs, currentColIndex, isSubTabular, forceMultiFixedWidth).
 
@@ -96,7 +96,7 @@ The motivating case is tables that contain mixed-height cells — for example, o
 
 | Option | Type | Default | Effect |
 |--------|------|--------:|--------|
-| `defaultCellVerticalAlign` | `'top' \| 'middle' \| 'bottom' \| undefined` | `undefined` | Vertical-align fallback for `\begin{tabular}` blocks without an explicit `[pos]` bracket. Affects `<td>` HTML style and (for `'top'`/`'bottom'`) `forLatex` round-trip via `tableOpen.meta.bracket`. Propagates into `\multicolumn`/`\multirow` cells only for `'top'`/`'bottom'` (option `'middle'` stays no-op on multicol to preserve legacy). Per-column `m`/`p`/`b` and any explicit `[t]/[c]/[b]` source bracket always override. Unset → byte-identical to legacy. |
+| `defaultCellVerticalAlign` | `'top' \| 'middle' \| 'bottom' \| undefined` | `undefined` | Vertical-align fallback for `\begin{tabular}` blocks without an explicit `[pos]` bracket. Affects `<td>` HTML style. Propagates into `\multicolumn`/`\multirow` cells only for `'top'`/`'bottom'` (option `'middle'` stays no-op on multicol to preserve legacy). Per-column `m`/`p`/`b` and any explicit `[t]/[c]/[b]` source bracket always override. Unset → byte-identical to legacy. See `forLatex export` for round-trip behavior. |
 
 No other options introduced.
 
