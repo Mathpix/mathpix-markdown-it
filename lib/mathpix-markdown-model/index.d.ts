@@ -56,6 +56,7 @@ export interface optionsMathpixMarkdown {
     showPageBreaks?: boolean;
     centerImages?: boolean;
     centerTables?: boolean;
+    defaultCellVerticalAlign?: 'top' | 'middle' | 'bottom';
     enableCodeBlockRuleForLatexCommands?: boolean;
     addPositionsToTokens?: boolean;
     highlights?: Array<THighlight>;
@@ -107,6 +108,7 @@ export type TMarkdownItOptions = {
     showPageBreaks?: boolean;
     centerImages?: boolean;
     centerTables?: boolean;
+    defaultCellVerticalAlign?: 'top' | 'middle' | 'bottom';
     enableCodeBlockRuleForLatexCommands?: boolean;
     addPositionsToTokens?: boolean;
     highlights?: Array<THighlight>;

@@ -206,6 +206,42 @@ module.exports = [
     ],
     html: '<div><span class="mmd-highlight" style="background-color: var(--textHighlightColor);color: var(--darkTextColor);">To describe the supervised learning problem slightly</span> more formally</div>'
   },
+  // Fancy-link span fallback: pins highlight rendering across the three branches that fall through to it.
+  // The `<a>` wrapper has no highlight style (`highlightAll` cascade is omitted by design in the span branch).
+  {
+    content: '[**bold**](http://x.org)',
+    highlights: [
+      {
+        start: 0, end: 24,
+        highlight_color: 'var(--textHighlightColor)',
+        text_color: 'var(--darkTextColor)',
+      },
+    ],
+    html: '<div><a href="http://x.org" target="_blank" rel="noopener" style="word-break: break-word"><span class="mmd-highlight" style="background-color: var(--textHighlightColor);color: var(--darkTextColor);"></span><strong><span class="mmd-highlight" style="background-color: var(--textHighlightColor);color: var(--darkTextColor);">bold</span></strong><span class="mmd-highlight" style="background-color: var(--textHighlightColor);color: var(--darkTextColor);"></span></a></div>'
+  },
+  {
+    content: '[`code`](http://x.org)',
+    highlights: [
+      {
+        start: 0, end: 22,
+        highlight_color: 'var(--textHighlightColor)',
+        text_color: 'var(--darkTextColor)',
+      },
+    ],
+    html: '<div><a href="http://x.org" target="_blank" rel="noopener" style="display: inline-block"><span class="mmd-highlight" style="background-color: var(--textHighlightColor);color: var(--darkTextColor);"><code style="background-color: transparent;">code</code></span></a></div>'
+  },
+  // image-in-link: no highlights surface (image token has no inner text positions; link wrapper omits highlightAll).
+  {
+    content: '[![alt](img.png)](http://x.org)',
+    highlights: [
+      {
+        start: 0, end: 31,
+        highlight_color: 'var(--textHighlightColor)',
+        text_color: 'var(--darkTextColor)',
+      },
+    ],
+    html: '<div><a href="http://x.org" target="_blank" rel="noopener" style="display: inline-block"><img src="img.png" alt="alt"></a></div>'
+  },
   // {
   //   content: '',
   //   highlights: [],

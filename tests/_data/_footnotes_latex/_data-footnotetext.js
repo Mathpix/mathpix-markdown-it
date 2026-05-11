@@ -167,8 +167,34 @@ module.exports = [
       '</ol>\n' +
       '</section>'
   },
-  // {
-  //   mmd: '',
-  //   html: ''
-  // },
+  // Pre-gate regression: `\blfootnotetext` doesn't contain `\footnote` substring (`\` before `b`).
+  // Pre-gate must probe `\blfootnote` separately, else `\blfootnotetext`-only docs skip the rule.
+  {
+    mmd: '\\blfootnotetext{Body line 1\nBody line 2}',
+    html: '<hr class="footnotes-sep">\n' +
+      '<section class="footnotes" style="margin-bottom: 1em;">\n' +
+      '<ol class="footnotes-list" style="padding-left: 20px; margin-bottom: 0;">\n' +
+      '<li id="fn1" class="footnote-item" style="list-style-type: none;"><div>Body line 1<br>\n' +
+      'Body line 2</div>\n' +
+      '</li>\n' +
+      '</ol>\n' +
+      '</section>'
+  },
+  // Mixed `\footnotetext` + `\blfootnotetext` in one document — both pre-gate prefixes must work together.
+  {
+    mmd: '\\footnotetext[1]{First}\n\n\\blfootnotetext{Second}',
+    html: '<div></div>\n' +
+      '<div></div>\n' +
+      '<hr class="footnotes-sep">\n' +
+      '<section class="footnotes" style="margin-bottom: 1em;">\n' +
+      '<ol class="footnotes-list" style="margin-bottom: 0;">\n' +
+      '<li id="fn1" class="footnote-item" value="1"><div>First</div>\n' +
+      '</li>\n' +
+      '</ol>\n' +
+      '<ol class="footnotes-list" style="padding-left: 20px; margin-bottom: 0;">\n' +
+      '<li id="fn2" class="footnote-item" style="list-style-type: none;"><div>Second</div>\n' +
+      '</li>\n' +
+      '</ol>\n' +
+      '</section>'
+  },
 ];

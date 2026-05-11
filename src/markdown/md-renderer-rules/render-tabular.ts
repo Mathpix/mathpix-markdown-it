@@ -486,9 +486,9 @@ export const renderInlineTokenBlock = (
         const diagBoxToken = nextToken.children[0];
         diagBoxToken.meta = { ...diagBoxToken.meta, isBlock: true };
         const dir = diagBoxToken.type === 'backslashbox' ? 'left' : 'right';
-        let styles = tokenAttrGet(token, 'style');
+        let styles = tokenAttrGet(token, 'style') || '';
+        if (!/vertical-align:/.test(styles)) styles += 'vertical-align: middle;';
         styles += 'background-size: 100% 100%;';
-        styles += 'vertical-align: middle;';
         styles += `background-image: linear-gradient(to bottom ${dir}, transparent calc(50% - 0.5px), black 50%, black 50%, transparent calc(50% + 0.5px));`;
         tokenAttrSet(token, 'style', styles);
       }

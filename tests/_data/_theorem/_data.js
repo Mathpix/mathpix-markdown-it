@@ -796,5 +796,13 @@ a continuous function.</div>
       'is a continuous function.</div>\n' +
       '</div></div>\n' +
       '<div style="margin-top: 0; margin-bottom: 0;"></div>'
-  }
+  },
+  {
+    // `\newtheorem{NAME}` and `\begin{NAME}` on adjacent lines — silent-mode terminator handshake before NAME is registered.
+    latex: '\\newtheorem{theorem}{Theorem}\n\\begin{theorem}\nBody content.\n\\end{theorem}',
+    html: '<div style="margin-top: 0; margin-bottom: 0;"></div>\n' +
+      '<div class="theorem_block">\n' +
+      '<div class="theorem" style="font-style: italic; padding: 10px 0;"><span style="font-weight: bold; font-style: normal;" class="theorem-title">Theorem 1.</span><span style="margin-right: 16px"></span><div style="display: inline;" data-display="inline">Body content.</div>\n' +
+      '</div></div>'
+  },
 ];

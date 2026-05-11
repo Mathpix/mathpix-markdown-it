@@ -29,6 +29,7 @@ export const inlineTabular: RuleInline = (state, silent) => {
   const nextPos = startMathPos + block.close.posEnd;
   if (!silent) {
     const token = state.push("tabular_inline", "", 0);
+    // Invariant: content === verbatim src slice. setChildrenPositions advances pos by content.length.
     token.content = fullBlock;
     token.children =[];
     const cTabular =  parseInlineTabular(token.content);
@@ -37,7 +38,7 @@ export const inlineTabular: RuleInline = (state, silent) => {
     }
     for (let i = 0; i < cTabular.length; i++) {
       if (cTabular[i].type === 'inline'){continue}
-      const res: Array<TTokenTabular> | null = ParseTabular(cTabular[i].content, 0, cTabular[i].align, state.md.options, state.env.subTabular);
+      const res: Array<TTokenTabular> | null = ParseTabular(cTabular[i].content, 0, cTabular[i].align, state.md.options, state.env.subTabular, cTabular[i].bracket);
 
       for (let j = 0; j < res.length;  j++) {
         let tok = res[j];

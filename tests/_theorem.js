@@ -15,8 +15,7 @@ global.document = jsdom.window.document;
 global.DOMParser = jsdom.window.DOMParser;
 
 
-describe('Check Theorem environments:', () => {
-  const tests = require('./_data/_theorem/_data');
+const runTheoremFixtures = (tests) => {
   tests.forEach(function(test) {
     const html = MM.markdownToHTML(test.latex, options);
     describe('Latex => ' + test.latex, () => {
@@ -27,4 +26,13 @@ describe('Check Theorem environments:', () => {
     });
   });
   MM.texReset();
+};
+
+describe('Check Theorem environments:', () => {
+  runTheoremFixtures(require('./_data/_theorem/_data'));
+});
+
+// Pinned-quirk tests: the expected HTML documents pre-existing parser behaviour we'd like to fix one day. See `_data_known_quirks.js` for the full warning.
+describe('Pre-existing body-drop quirk for unregistered theorem envs (TO BE FIXED):', () => {
+  runTheoremFixtures(require('./_data/_theorem/_data_known_quirks'));
 });

@@ -1,7 +1,7 @@
 import { RuleBlock, Token } from 'markdown-it';
 import { ParseTabular } from './parse-tabular';
 import { pushError, CheckParseError } from '../parse-error';
-import { getParams, detectLocalBlock } from './common';
+import { getParams, detectLocalBlock, parseTabularPos, TVerticalPos } from './common';
 import {StatePushIncludeGraphics} from "../../md-inline-rule/includegraphics";
 import { getSubCode, codeInlineContent } from "./sub-code";
 import { findOpenCloseTags } from "../../utils";
@@ -9,16 +9,19 @@ import {
   openTagTabular,
   closeTagTabular,
   BEGIN_LST_RE,
-  END_LST_RE
+  END_LST_RE,
+  BEGIN_TABULAR_BRACKET_RE,
+  BEGIN_TABULAR_BRACKET_RE_G
 } from "../../common/consts";
 import { parseBlockIntoTokenChildren } from "../helper";
 
-export const openTag: RegExp = /(?:\\begin\s{0,}{tabular}\s{0,}\{([^}]*)\})/;
-export const openTagG: RegExp = /(?:\\begin\s{0,}{tabular}\s{0,}\{([^}]*)\})/g;
+// group 1 = bracket pos, group 2 = column spec.
+export const openTag: RegExp = BEGIN_TABULAR_BRACKET_RE;
+export const openTagG: RegExp = BEGIN_TABULAR_BRACKET_RE_G;
 export const closeTag: RegExp = /(?:\\end\s{0,}{tabular})/;
 const closeTagG: RegExp = /(?:\\end\s{0,}{tabular})/g;
 
-type TTypeContent = {type?: string, content?: string, align?: string}
+type TTypeContent = {type?: string, content?: string, align?: string, bracket?: TVerticalPos}
 type TTypeContentList = Array<TTypeContent>;
 export type TAttrs = string[];
 export type TTokenTabular = {
@@ -37,6 +40,7 @@ export type TTokenTabular = {
   latex?: string,
   parents?: Array<string>,
   isSubTabular?: boolean,
+  hasDiagbox?: boolean,
   meta?: any
 };
 
@@ -60,7 +64,7 @@ const addContentToList = (str: string): TTypeContentList => {
       if (match.index > 0) {
         res.push({type: 'inline', content: str.slice( 0, match.index), align: ''});
       }
-      res.push({type: 'tabular', content: str.slice( params.index), align: params.align});
+      res.push({type: 'tabular', content: str.slice( params.index), align: params.align, bracket: params.bracket});
     } else {
       let mB: RegExpMatchArray = str
         .match(openTag);
@@ -68,7 +72,7 @@ const addContentToList = (str: string): TTypeContentList => {
         if (mB.index > 0) {
           res.push({type: 'inline', content: str.slice( 0, mB.index), align:''});
         }
-        res.push({type: 'tabular', content: str.slice( mB.index + mB[0].length), align: mB[1]});
+        res.push({type: 'tabular', content: str.slice( mB.index + mB[0].length), align: mB[2], bracket: parseTabularPos(mB[1])});
       } else {
         res.push({type: 'inline', content: str, align:''});
       }
@@ -216,7 +220,7 @@ export const StatePushTabulars = (state, cTabular: TTypeContentList, align: stri
     token.map = [startLine, state.line];
     token.bMarks = 0;
 
-    const res: Array<TTokenTabular> | null = ParseTabular(cTabular[i].content, 0, cTabular[i].align, state.md.options, state.env.subTabular);
+    const res: Array<TTokenTabular> | null = ParseTabular(cTabular[i].content, 0, cTabular[i].align, state.md.options, state.env.subTabular, cTabular[i].bracket);
     if (!res || res.length === 0) {
       continue;
     }

@@ -1,5 +1,5 @@
 import { TAttrs, TTokenTabular } from './index';
-import { TDecimal } from "./common";
+import { TDecimal, TTdMeta } from "./common";
 type TLines = {
     left?: string;
     right?: string;
@@ -22,9 +22,9 @@ export declare const SHARED_TBODY_CLOSE: TTokenTabular;
 export declare const setColumnLines: (aligns: TAligns | null, lines: TLines) => string[];
 export declare const addStyle: (attrs: any[], style: string) => Array<TAttrs>;
 export declare const addHLineIntoStyle: (attrs: any[], line?: string, pos?: string) => Array<TAttrs>;
-export declare const AddTd: (content: string, aligns: TAligns | null, lines: TLines, space: string, decimal?: TDecimal | null, skipVisual?: boolean) => {
+export declare const AddTd: (content: string, aligns: TAligns | null, lines: TLines, space: string, decimal?: TDecimal | null, skipVisual?: boolean, meta?: TTdMeta) => {
     res: Array<TTokenTabular>;
     content: string;
 };
-export declare const AddTdSubTable: (subTable: Array<TTokenTabular>, aligns: TAligns, lines: TLines, skipVisual?: boolean) => Array<TTokenTabular>;
+export declare const AddTdSubTable: (subTable: Array<TTokenTabular>, aligns: TAligns, lines: TLines, skipVisual?: boolean, meta?: TTdMeta) => Array<TTokenTabular>;
 export {};

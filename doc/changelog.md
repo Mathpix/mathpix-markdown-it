@@ -1,3 +1,30 @@
+# May 2026
+
+## [2.0.40] - Tabular vertical-align bracket and footnote performance
+
+- Tabular vertical alignment:
+  - Parse the optional `[t]/[c]/[b]` bracket on `\begin{tabular}` (standard LaTeX2e syntax) and use it as the row-level vertical-align default for `l/c/r/S` columns. Per-column `m`/`p`/`b` continues to override.
+  - Cell-level inference: when an outer cell's content includes a nested `\begin{tabular}[t/c/b]`, the outer `<td>` inherits that vertical-align (matching LaTeX baseline semantics — the cell containing the `[t]` inner tabular sits at the top of the row). Per-column `m`/`p`/`b` on the outer column still wins. Cell-level inference overrides the row-level bracket for that single cell.
+  - In `forLatex`, every `td_open` of a tabular with an effective bracket carries `meta.parentBracket` (`'t'`/`'c'`/`'b'`) — the bracket of THIS table, set on every cell of that table. Consumers walking forLatex tokens see parent context directly on each `<td>` without re-deriving from the parent `table_open`. `AddTd` and `AddTdSubTable` accept an optional `meta?: TTdMeta` parameter to attach this and other forLatex-specific cell info.
+  - New option `defaultCellVerticalAlign?: 'top' | 'middle' | 'bottom'`. HTML rendering: applies as the fallback for `\begin{tabular}` blocks without an explicit bracket. Explicit source bracket always wins. Default unset is byte-identical to legacy on existing MMD. `'middle'` propagates to regular `l/c/r/S` cells (matches existing default), but is a no-op for `\multicolumn` / `\multirow` cells (preserves legacy no-vertical-align on multicol).
+  - `forLatex` round-trip: for `'top'`/`'bottom'` (top-level only) the option's value is injected into `tableOpen.meta.bracket` so the consumer can serialize `\begin{tabular}[pos]{...}`. Nested absent-bracket tabulars stay bracket-less to preserve round-trip.
+  - `\multicolumn` / `\multirow` cells inherit `'t'`/`'b'` from any source (bracket or option), and `'c'` only from an explicit source bracket — never from option `'middle'`. Plain `\multicolumn{}` / `\multirow{}` in an absent-bracket tabular continues to emit no `vertical-align` (legacy).
+  - Diagbox cells always render with `vertical-align: middle` regardless of the outer tabular's bracket: `getSubTabular` flags wrappers with `hasDiagbox`, the parser skips its own vertical-align emit, and `render-tabular` adds `middle` once. Removes the duplicate `vertical-align: middle;` from existing diagbox snapshots.
+  - Explicit `\multirow[t/c/b]` always wins over the row-level default and emits explicit `vertical-align`. Fixes a regression where `\multirow[c]` inside `\begin{tabular}[t]{...}` silently inherited the outer `[t]` instead of honoring the user's explicit `[c]`. Two existing `\multirow[c]` snapshots in `_tabular/_data_digbox.js` updated to include the now-explicit `vertical-align: middle`.
+  - **Breaking change** to the exported `openTag` / `openTagG` regexes in `md-block-rule/begin-tabular`: the optional `[pos]` bracket is now a capture group. New shape is `match[1]` = bracket pos (`t`/`c`/`b` or `undefined`), `match[2]` = column spec. Previously `match[1]` = column spec. Consumers calling `openTag.exec(src)[1]` / `src.match(openTag)[1]` for the column spec must read `[2]` instead. `openTagTabular` and `BEGIN_TABULAR_INLINE_RE` (presence-check regexes) likewise allow the optional bracket but keep their existing capture groups.
+  - `getParams` (column-spec parser) now skips an optional `[pos]` before `{` and returns the normalized bracket position.
+
+- Footnote rule performance:
+
+- `latex_footnote_block` / `latex_footnotetext_block`: per-state position cache + per-line token guard turn the O(N×M) accumulation scan into one O(|src|) sweep per parse and O(1) per subsequent block-start. ~120× speedup on a 2.45 MB MMD with 706 long tabular blocks (worst case for the pre-change Phase 1 scan); HTML output byte-identical.
+- `setChildrenPositions`: per-child `Object.isExtensible` guard before `.positions` assignment fixes `TypeError` thrown by frozen `SHARED_*_CLOSE` singletons inside `tabular_inline` subtrees, restoring `markdownToHTMLSegments({ addPositionsToTokens: true })` on documents with inline subtables. `link_open` branch split into strict-triple `[text](url)` (legacy snapshot-pinned math) + span fallback for fancy contents (`[**bold**](url)`, `` [`code`](url) ``, `[![alt](img)](url)`) — fixes silent NaN/off-by-N positions that existed on master.
+- `BeginTheorem`: env-name validation hoisted above `state.push` in non-silent mode — unregistered environments no longer leave unmatched `<div class="theorem_block">` wrappers in the rendered HTML. Silent-mode terminator probes preserved (required by `\newtheorem` ↔ `\begin{NAME}` adjacent-line handshake).
+- Behavior change for unregistered `\begin{NAME}…\end{NAME}` (e.g. TikZ): previously the rule emitted an unmatched `<div class="theorem_block">` wrapper around a math-block fallback `<span class="math-block equation-number" number="0"></span>`. Now the wrapper is gone; the inner placeholder is unchanged. `.equation-number` element count is unchanged vs master. Register via `\newtheorem{NAME}{…}` to get the body rendered.
+- Behavior change for `markdownToHTMLSegments` consumers: same documents emit more segments than before because the previously unmatched wrapper was preventing segment delimiters from breaking at natural boundaries. Output bytes are unchanged; segment counts are not.
+- Behavior change for highlights consumers: fancy-link span fallback (`[**bold**](url)` etc. with overlapping `highlights:`) emits empty `<span class="mmd-highlight"></span>` wrappers around markup-only inner tokens (strong_open/strong_close). Filter empty `.mmd-highlight` matches if iterating.
+
+See `pr-specs/2026-05-footnote-perf-and-parser-invariants.md` for design and known limitations.
+
 # April 2026
 
 ## [2.0.39] - Optimize tabular parsing memory and performance

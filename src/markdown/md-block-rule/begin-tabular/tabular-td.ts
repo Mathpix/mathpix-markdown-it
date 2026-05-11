@@ -1,5 +1,5 @@
 import { TAttrs, TTokenTabular } from './index';
-import { TDecimal } from "./common";
+import { TDecimal, TTdMeta } from "./common";
 import { getLatexTextWidth } from "../../utils";
 import { getExtractedCodeBlockContent } from "./sub-code";
 import { preserveNewlineUnlessDoubleAngleUuidRegex, attrsSharedMarker } from "../../common/consts";
@@ -222,13 +222,15 @@ export const addHLineIntoStyle = (attrs: any[], line: string = '', pos: string =
   return addStyle(attrs, style);
 };
 
-export const AddTd = (content: string, aligns: TAligns| null, lines: TLines, space: string, decimal: TDecimal|null = null, skipVisual: boolean = false): {res: Array<TTokenTabular>, content: string} => {
+export const AddTd = (content: string, aligns: TAligns| null, lines: TLines, space: string, decimal: TDecimal|null = null, skipVisual: boolean = false, meta?: TTdMeta): {res: Array<TTokenTabular>, content: string} => {
   let res: Array<TTokenTabular> = [];
   const style = skipVisual ? '' : composeCellStyle(aligns, lines, space);
   content = content.replace(preserveNewlineUnlessDoubleAngleUuidRegex, ' ');
   content = getExtractedCodeBlockContent(content, 0);
   const attrs = getSharedCellAttrs(style, !content, skipVisual);
-  res.push({token:'td_open', type:'td_open', tag: 'td', n: 1, attrs: attrs});
+  const tdOpen: TTokenTabular = {token:'td_open', type:'td_open', tag: 'td', n: 1, attrs: attrs};
+  if (meta) tdOpen.meta = meta;
+  res.push(tdOpen);
   if (content) {
     if (decimal && parseFloat(content)) {
       let arr = content.split('.');
@@ -257,13 +259,15 @@ export const AddTd = (content: string, aligns: TAligns| null, lines: TLines, spa
   return {res: res, content: content};
 };
 
-export const AddTdSubTable = (subTable: Array<TTokenTabular>, aligns: TAligns, lines: TLines, skipVisual: boolean = false): Array<TTokenTabular> => {
+export const AddTdSubTable = (subTable: Array<TTokenTabular>, aligns: TAligns, lines: TLines, skipVisual: boolean = false, meta?: TTdMeta): Array<TTokenTabular> => {
   let res: Array<TTokenTabular> = [];
   let attrs: Array<TAttrs> | undefined;
   if (!skipVisual) {
     attrs = [setColumnLines(aligns, lines)];
   }
-  res.push({token:'td_open', type:'td_open', tag: 'td', n: 1, attrs: attrs});
+  const tdOpen: TTokenTabular = {token:'td_open', type:'td_open', tag: 'td', n: 1, attrs: attrs};
+  if (meta) tdOpen.meta = meta;
+  res.push(tdOpen);
   for (const t of subTable) {
     res.push(t);
   }

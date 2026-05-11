@@ -169,8 +169,52 @@ module.exports = [
       '</ol>\n' +
       '</section>'
   },
-  // {
-  //   mmd: '',
-  //   html: ''
-  // },
+  {
+    mmd: 'Some text \\footnotemark[1] more text',
+    html: '<div>Some text <sup class="footnote-ref">[1]</sup>more text</div>'
+  },
+  {
+    mmd: 'Long paragraph without footnotes\nbut containing \\footnotesize text\nthat should not match the rule.',
+    html: '<div>Long paragraph without footnotes<br>\nbut containing \\footnotesize text<br>\nthat should not match the rule.</div>'
+  },
+  {
+    mmd: 'Word \\footnotemark[2] then \\footnotemark[3] then plain text.',
+    html: '<div>Word <sup class="footnote-ref">[2]</sup>then <sup class="footnote-ref">[3]</sup>then plain text.</div>'
+  },
+  {
+    // boundary: `\footnote{}` at end of source.
+    mmd: 'Text \\footnote{tail}',
+    html: '<div>Text <sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup></div>\n' +
+      '<hr class="footnotes-sep">\n' +
+      '<section class="footnotes" style="margin-bottom: 1em;">\n' +
+      '<ol class="footnotes-list" style="margin-bottom: 0;">\n' +
+      '<li id="fn1" class="footnote-item"><div>tail <a href="#fnref1" class="footnote-backref">↩︎</a></div>\n' +
+      '</li>\n' +
+      '</ol>\n' +
+      '</section>'
+  },
+  {
+    // tShift: `\footnote{}` after leading whitespace.
+    mmd: '   \\footnote{indented} text after.',
+    html: '<div><sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup> text after.</div>\n' +
+      '<hr class="footnotes-sep">\n' +
+      '<section class="footnotes" style="margin-bottom: 1em;">\n' +
+      '<ol class="footnotes-list" style="margin-bottom: 0;">\n' +
+      '<li id="fn1" class="footnote-item"><div>indented <a href="#fnref1" class="footnote-backref">↩︎</a></div>\n' +
+      '</li>\n' +
+      '</ol>\n' +
+      '</section>'
+  },
+  // Multi-line opening tag — exercises per-line `{` gate.
+  {
+    mmd: 'Text\n\\footnote\n[1]\n{multi-line body}\nafter.',
+    html: '<div>Text <sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup> after.</div>\n' +
+      '<hr class="footnotes-sep">\n' +
+      '<section class="footnotes" style="margin-bottom: 1em;">\n' +
+      '<ol class="footnotes-list" style="margin-bottom: 0;">\n' +
+      '<li id="fn1" class="footnote-item" value="1"><div>multi-line body <a href="#fnref1" class="footnote-backref">↩︎</a></div>\n' +
+      '</li>\n' +
+      '</ol>\n' +
+      '</section>'
+  },
 ];

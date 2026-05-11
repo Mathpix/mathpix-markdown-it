@@ -1,4 +1,5 @@
 import { RuleBlock, Token } from 'markdown-it';
+import { TVerticalPos } from './common';
 export declare const openTag: RegExp;
 export declare const openTagG: RegExp;
 export declare const closeTag: RegExp;
@@ -6,6 +7,7 @@ type TTypeContent = {
     type?: string;
     content?: string;
     align?: string;
+    bracket?: TVerticalPos;
 };
 type TTypeContentList = Array<TTypeContent>;
 export type TAttrs = string[];
@@ -25,6 +27,7 @@ export type TTokenTabular = {
     latex?: string;
     parents?: Array<string>;
     isSubTabular?: boolean;
+    hasDiagbox?: boolean;
     meta?: any;
 };
 export type TMulti = {
