@@ -188,6 +188,17 @@ export const BeginTheorem: RuleBlock = (state, startLine, endLine, silent) => {
     return false;
   }
 
+  // Non-silent: bail early for unregistered envs (saves closeTag scan).
+  // Silent must skip this — `newTheoremBlock` calls BeginTheorem(silent) before `\newtheorem` registers.
+  // Silent mode keeps envIndex = -1; downstream readers (getTheoremNumber, theoremEnvironments[…]) sit BELOW the `if (silent) return true` exit.
+  let envIndex: number = -1;
+  if (!silent) {
+    envIndex = getTheoremEnvironmentIndex(envName);
+    if (envIndex === -1) {
+      return false;
+    }
+  }
+
   /** Inline content before theorem block */
   strBefore = match.index > 0 ? lineText.slice(0, match.index) : '';
 
@@ -268,7 +279,7 @@ export const BeginTheorem: RuleBlock = (state, startLine, endLine, silent) => {
     latexEnd = matchE[0];
     // pE = matchE.index
   }
-  
+
   state.line = nextLine + 1;
   token = state.push('paragraph_open', 'div', 1);
   token.attrSet('class','theorem_block');
@@ -282,12 +293,6 @@ export const BeginTheorem: RuleBlock = (state, startLine, endLine, silent) => {
     token.content = strBefore;
   }
 
-  const envIndex = envName
-    ? getTheoremEnvironmentIndex(envName)
-    : -1;
-  if (envIndex === -1) {
-    return false
-  }
   const theoremNumber: string = getTheoremNumber(envIndex, state.env);
   token = state.push('theorem_open', 'div', 1);
   token.environment = envName;

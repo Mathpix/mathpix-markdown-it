@@ -4,7 +4,8 @@ import {
   CLOSING_STYLE_TOKENS,
   INLINE_ELEMENT_TOKENS,
   SIMPLE_MATH_DELIM_RE,
-  latexEnvironments
+  latexEnvironments,
+  attrsSharedMarker
 } from "./common/consts";
 
 export const endTag = (arg: string, shouldBeFirst = false): RegExp  => {
@@ -745,7 +746,7 @@ export const getSpacesFromLeft = (str: string) => {
 
 /** add additional attributes to the parent token */
 export const addAttributesToParentTokenByType = (
-  parentToken: Token, 
+  parentToken: Token,
   token: Token,
   tokenType: string,
   attrs: string[],
@@ -760,6 +761,9 @@ export const addAttributesToParentTokenByType = (
     }
     if (token.children.find(item => item.type === tokenType)) {
       if (parentToken.attrs?.length) {
+        if ((parentToken.attrs as any)[attrsSharedMarker]) {
+          parentToken.attrs = parentToken.attrs.map(p => [p[0], p[1]]);
+        }
         parentToken.attrs.push(attrs)
       } else {
         parentToken.attrs = [attrs];

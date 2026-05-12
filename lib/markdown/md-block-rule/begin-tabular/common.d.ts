@@ -14,10 +14,24 @@ export type TAlignData = {
     cWidth: Array<string>;
     colSpec: Array<string>;
 };
-export declare const getVerticallyColumnAlign: (align: string, numCol: number) => TAlignData;
+export type TVerticalPos = 't' | 'c' | 'b';
+export type TTdMeta = {
+    parentBracket?: TVerticalPos;
+    multi?: any;
+    colCount?: number;
+    colSpecs?: string[];
+    currentColIndex?: number;
+    isSubTabular?: boolean;
+    forceMultiFixedWidth?: boolean;
+};
+export declare const parseTabularPos: (raw: string | undefined | null) => TVerticalPos | undefined;
+export declare const normalizeDefaultCellVerticalAlign: (value: string | undefined | null) => TVerticalPos | undefined;
+export declare const bracketToVAlign: (bracket: TVerticalPos | undefined) => string;
+export declare const getVerticallyColumnAlign: (align: string, numCol: number, bracketDefault?: TVerticalPos) => TAlignData;
 export declare const getParams: (str: string, i: number) => {
     align: string;
     index: number;
+    bracket: TVerticalPos;
 };
 export type TDecimal = {
     l: number;

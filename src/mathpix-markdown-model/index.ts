@@ -77,6 +77,7 @@ export interface optionsMathpixMarkdown {
     showPageBreaks?: boolean;
     centerImages?: boolean;
     centerTables?: boolean;
+    defaultCellVerticalAlign?: 'top' | 'middle' | 'bottom';
     enableCodeBlockRuleForLatexCommands?: boolean;
     addPositionsToTokens?: boolean;
     highlights?: Array<THighlight>;
@@ -129,6 +130,8 @@ export type TMarkdownItOptions = {
   showPageBreaks?: boolean;
   centerImages?: boolean;
   centerTables?: boolean;
+  // Fallback vertical alignment for tabular cells without an explicit \begin{tabular}[pos]{...} bracket.
+  defaultCellVerticalAlign?: 'top' | 'middle' | 'bottom';
   enableCodeBlockRuleForLatexCommands?: boolean;
   addPositionsToTokens?: boolean;
   highlights?: Array<THighlight>;
@@ -176,7 +179,9 @@ export type TOutputMath = {
     math_as_ascii?: boolean,
     math_inline_delimiters?: Array<string>
   },
-  not_catch_errors?: boolean
+  not_catch_errors?: boolean,
+  /** Skip SVG + `token.mathEquation`. Overrides `include_svg`; other outputs respect their flags. */
+  skipMathToHtml?: boolean
 }
 
 export type TOutputMathJax = {
@@ -618,6 +623,7 @@ class MathpixMarkdown_Model {
           showPageBreaks = false,
           centerImages = true,
           centerTables = true,
+          defaultCellVerticalAlign = undefined,
           enableCodeBlockRuleForLatexCommands = false,
           addPositionsToTokens = false,
           highlights = [],
@@ -671,6 +677,7 @@ class MathpixMarkdown_Model {
           showPageBreaks: showPageBreaks,
           centerImages: centerImages,
           centerTables: centerTables,
+          defaultCellVerticalAlign: defaultCellVerticalAlign,
           enableCodeBlockRuleForLatexCommands: enableCodeBlockRuleForLatexCommands,
           addPositionsToTokens: addPositionsToTokens,
           highlights: highlights,

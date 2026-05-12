@@ -3380,5 +3380,193 @@ break }
         "content": ""
       }
     ]
+  },
+  {
+    // Strict-triple: link_close has `nextPos` only (no `.positions`). Pinned to lock asymmetry vs span fallback below.
+    mmd: 'A [text](http://x.org) B',
+    tokens: [
+      {
+        "type": "paragraph_open",
+        "children": null,
+        "content": "",
+        "positions": { "start": 0, "end": 24 },
+        "content_test_str": "A [text](http://x.org) B"
+      },
+      {
+        "type": "inline",
+        "children": [
+          {
+            "type": "text",
+            "children": null,
+            "content": "A ",
+            "positions": { "start": 0, "end": 2 },
+            "content_test_str": "A "
+          },
+          {
+            "type": "link_open",
+            "children": null,
+            "content": "",
+            "positions": { "start": 2, "end": 22 },
+            "content_test_str": "[text](http://x.org)"
+          },
+          {
+            "type": "text",
+            "children": null,
+            "content": "text",
+            "nextPos": 7,
+            "positions": { "start": 3, "end": 7 },
+            "content_test_str": "text"
+          },
+          {
+            "type": "link_close",
+            "children": null,
+            "content": "",
+            "nextPos": 22
+          },
+          {
+            "type": "text",
+            "children": null,
+            "content": " B",
+            "positions": { "start": 22, "end": 24 },
+            "content_test_str": " B"
+          }
+        ],
+        "content": "A [text](http://x.org) B",
+        "positions": { "start": 0, "end": 24 },
+        "content_test_str": "A [text](http://x.org) B"
+      },
+      {
+        "type": "paragraph_close",
+        "children": null,
+        "content": ""
+      }
+    ]
+  },
+  {
+    // Span fallback for fancy link content: `[**bold**](url)` does NOT match the strict triple
+    // (i+1 is strong_open, not text) — link_open span is set from link_close.nextPos, pos
+    // advances past `[`, and the per-child loop positions strong_open/text/strong_close/link_close
+    // by their own markup/content/nextPos. This fixture pins exact positions so a future drift in
+    // span-fallback math (e.g. forgetting `pos = startPos + 1`) shows up as a positional delta.
+    mmd: 'Open [**bold**](http://x.org) end.',
+    tokens: [
+      {
+        "type": "paragraph_open",
+        "children": null,
+        "content": "",
+        "positions": { "start": 0, "end": 34 },
+        "content_test_str": "Open [**bold**](http://x.org) end."
+      },
+      {
+        "type": "inline",
+        "children": [
+          {
+            "type": "text",
+            "children": null,
+            "content": "Open ",
+            "positions": { "start": 0, "end": 5 },
+            "content_test_str": "Open "
+          },
+          {
+            "type": "link_open",
+            "children": null,
+            "content": "",
+            "positions": { "start": 5, "end": 29 },
+            "content_test_str": "[**bold**](http://x.org)"
+          },
+          {
+            "type": "strong_open",
+            "children": null,
+            "content": "",
+            "positions": { "start": 6, "end": 8 },
+            "content_test_str": "**"
+          },
+          {
+            "type": "text",
+            "children": null,
+            "content": "bold",
+            "positions": { "start": 8, "end": 12 },
+            "content_test_str": "bold"
+          },
+          {
+            "type": "strong_close",
+            "children": null,
+            "content": "",
+            "positions": { "start": 12, "end": 14 },
+            "content_test_str": "**"
+          },
+          {
+            "type": "link_close",
+            "children": null,
+            "content": "",
+            "nextPos": 29,
+            "positions": { "start": 14, "end": 29 },
+            "content_test_str": "](http://x.org)"
+          },
+          {
+            "type": "text",
+            "children": null,
+            "content": " end.",
+            "positions": { "start": 29, "end": 34 },
+            "content_test_str": " end."
+          }
+        ],
+        "content": "Open [**bold**](http://x.org) end.",
+        "positions": { "start": 0, "end": 34 },
+        "content_test_str": "Open [**bold**](http://x.org) end."
+      },
+      {
+        "type": "paragraph_close",
+        "children": null,
+        "content": ""
+      }
+    ]
+  },
+  {
+    // Regression: setChildrenPositions skip for tabular_inline must still advance `pos` by the
+    // block's source length so siblings (the trailing " after" text here) position correctly.
+    mmd: 'Before \\begin{tabular}{c}A\\end{tabular} after',
+    tokens: [
+      {
+        "type": "paragraph_open",
+        "children": null,
+        "content": "",
+        "positions": { "start": 0, "end": 45 },
+        "content_test_str": "Before \\begin{tabular}{c}A\\end{tabular} after"
+      },
+      {
+        "type": "inline",
+        "children": [
+          {
+            "type": "text",
+            "children": null,
+            "content": "Before ",
+            "positions": { "start": 0, "end": 7 },
+            "content_test_str": "Before "
+          },
+          {
+            "type": "tabular_inline",
+            "content": "\\begin{tabular}{c}A\\end{tabular}",
+            "positions": { "start": 7, "end": 39 },
+            "content_test_str": "\\begin{tabular}{c}A\\end{tabular}"
+          },
+          {
+            "type": "text",
+            "children": null,
+            "content": " after",
+            "positions": { "start": 39, "end": 45 },
+            "content_test_str": " after"
+          }
+        ],
+        "content": "Before \\begin{tabular}{c}A\\end{tabular} after",
+        "positions": { "start": 0, "end": 45 },
+        "content_test_str": "Before \\begin{tabular}{c}A\\end{tabular} after"
+      },
+      {
+        "type": "paragraph_close",
+        "children": null,
+        "content": ""
+      }
+    ]
   }
 ];

@@ -1,5 +1,4 @@
 import { mdPluginCollapsible, mdSetPositionsAndHighlight } from "./mdPluginConfigured";
-
 import { mathpixMarkdownPlugin } from './mathpix-markdown-plugins';
 
 import { injectRenderRules } from "./rules";
@@ -24,6 +23,7 @@ const mdInit = (options: TMarkdownItOptions) => {
     showPageBreaks = false,
     centerImages = true,
     centerTables = true,
+    defaultCellVerticalAlign = undefined,
     enableCodeBlockRuleForLatexCommands = false,
     addPositionsToTokens = false,
     highlights = [],
@@ -52,6 +52,7 @@ const mdInit = (options: TMarkdownItOptions) => {
     showPageBreaks: showPageBreaks,
     centerImages: centerImages,
     centerTables: centerTables,
+    defaultCellVerticalAlign: defaultCellVerticalAlign,
     enableCodeBlockRuleForLatexCommands: enableCodeBlockRuleForLatexCommands,
     addPositionsToTokens: addPositionsToTokens,
     highlights: highlights,
@@ -142,6 +143,9 @@ export const markdownToHtmlPipelineSegments = (content: string, options: TMarkdo
     let line: string = '';
     let pendingCloseTag: string = '';
     let pendingLevel: number = 0;
+    // Depth counter for same-type same-level opens (e.g. theorem block
+    // wraps an inner paragraph_open at the same level).
+    let pendingDepth: number = 0;
 
     const isFirstBlockMathInList = (current: any, prev: any, next: any) => {
       if (current.type !== 'paragraph_open' || prev?.type !== 'list_item_open') return false;
@@ -167,14 +171,23 @@ export const markdownToHtmlPipelineSegments = (content: string, options: TMarkdo
       }
 
       if (pendingCloseTag) {
-        if (token.type === pendingCloseTag && pendingLevel === token.level) {
+        const openType = pendingCloseTag.replace('_close', '_open');
+        if (token.type === openType && token.level === pendingLevel) {
+          pendingDepth++;
           line += rendered;
-          const start: number = content.length;
-          content += line;
-          map.push([start, content.length]);
-          line = '';
-          pendingCloseTag = '';
-          pendingLevel = 0;
+          continue;
+        }
+        if (token.type === pendingCloseTag && pendingLevel === token.level) {
+          pendingDepth--;
+          line += rendered;
+          if (pendingDepth === 0) {
+            const start: number = content.length;
+            content += line;
+            map.push([start, content.length]);
+            line = '';
+            pendingCloseTag = '';
+            pendingLevel = 0;
+          }
           continue;
         }
         line += rendered;
@@ -182,8 +195,9 @@ export const markdownToHtmlPipelineSegments = (content: string, options: TMarkdo
       }
 
       if (token.type.endsWith('_open')) {
-        pendingCloseTag = token.type.replace('open', 'close');
+        pendingCloseTag = token.type.replace('_open', '_close');
         pendingLevel = token.level;
+        pendingDepth = 1;
         line += rendered;
         continue;
       }

@@ -2,13 +2,7 @@ type TExtractedCodeBlock = {
     id: string;
     content: string;
 };
-/**
- * Clear all previously extracted code blocks.
- */
 export declare const ClearExtractedCodeBlocks: () => void;
-/**
- * Add a single extracted code block to the internal storage.
- */
 export declare const addExtractedCodeBlock: (item: TExtractedCodeBlock) => void;
 /**
  * Replace placeholder markers (<<id>> / <id>) with extracted code block content.

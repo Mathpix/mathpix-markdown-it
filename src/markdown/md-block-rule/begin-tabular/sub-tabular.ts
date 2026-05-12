@@ -1,6 +1,6 @@
 import {TTokenTabular} from "./index";
-import { generateUniqueId, getContent, detectLocalBlock } from "./common";
-import { doubleAngleBracketUuidPattern, singleAngleBracketPattern, ANGLE_BRACKETS_RE } from "../../common/consts";
+import { generateUniqueId, getContent, detectLocalBlock, TVerticalPos } from "./common";
+import { doubleAngleBracketUuidPattern, singleAngleBracketPattern, ANGLE_BRACKETS_RE, uuidPatternNoCapture } from "../../common/consts";
 import { findInDiagboxTable } from "./sub-cell";
 import { getExtractedCodeBlockContent } from "./sub-code";
 import {
@@ -11,17 +11,26 @@ import {
 } from "./placeholder-utils";
 
 type TSubTabular = {
-  id: string,
   content: string,
   parsed?: Array<TTokenTabular>,
   parents?: Array<string>,
   isBlock?: boolean,
-  children?: Array<string>
+  children?: Array<string>,
+  bracket?: TVerticalPos
 };
-var subTabular: Array<TSubTabular> = [];
+const subTabular: Map<string, TSubTabular> = new Map();
+
+// Guards direct lookup: keys are generateUniqueId() UUIDs, cell text should match exactly.
+const SUB_TABULAR_KEY_RE: RegExp = new RegExp(`^${uuidPatternNoCapture}$`);
 
 export const ClearSubTableLists = (): void => {
-  subTabular = [];
+  subTabular.clear();
+};
+
+// Bracket of the nested tabular referenced by the placeholder `<<id>>` (or bare uuid).
+export const getSubTabularBracket = (placeholderOrId: string): TVerticalPos | undefined => {
+  const id = placeholderOrId.replace(ANGLE_BRACKETS_RE, '');
+  return subTabular.get(id)?.bracket;
 };
 
 /**
@@ -45,27 +54,28 @@ export const pushSubTabular = (
     posBegin: number=0,
     posEnd: number,
     i: number=0,
-    level=0
+    level=0,
+    bracket?: TVerticalPos
 ): string => {
   const id: string = generateUniqueId();
   const childIds: string[] = extractChildIds(subTabularContent);
   for (const childId of childIds) {
-    const cIdx: number = subTabular.findIndex((item: TSubTabular) => item.id === childId);
-    if (cIdx >= 0) {
-      (subTabular[cIdx].parents ??= []).push(id);
+    const child = subTabular.get(childId);
+    if (child) {
+      (child.parents ??= []).push(id);
     }
   }
   const isBlockLocal: boolean = detectLocalBlock(subTabularContent);
   const childBlock: boolean = childIds.some(cid => {
-    const cIdx: number = subTabular.findIndex(item => item.id === cid);
-    return cIdx >= 0 ? !!subTabular[cIdx].isBlock : false;
+    const child = subTabular.get(cid);
+    return child ? !!child.isBlock : false;
   });
-  subTabular.push({
-    id,
+  subTabular.set(id, {
     content: subTabularContent,
     parsed: subRes,
     children: childIds,
     isBlock: isBlockLocal || childBlock,
+    bracket,
   });
   if (posBegin > 0) {
     return str.slice(i, posBegin) + `<<${id}>>` + str.slice(posEnd + '\\end{tabular}'.length, str.length);
@@ -91,10 +101,11 @@ export const getSubTabular = (
   if (isCell) {
     sub = getContent(sub);
   }
-  // fast path: exact id matches a cached parsed tabular
-  const directIndex: number = subTabular.findIndex((item: TSubTabular) => item.id === sub);
-  if (directIndex >= 0 && subTabular[directIndex].parsed?.length) {
-    return subTabular[directIndex].parsed!;
+  if (SUB_TABULAR_KEY_RE.test(sub)) {
+    const directEntry = subTabular.get(sub);
+    if (directEntry?.parsed?.length) {
+      return directEntry.parsed;
+    }
   }
   // find placeholders
   const cellM: RegExpMatchArray = findPlaceholders(sub, i);
@@ -104,6 +115,7 @@ export const getSubTabular = (
   let parents: any = null;
   let cursor: number = 0;
   let contentFragments: string[] = [];
+  let hasDiagbox: boolean = false;
   for (let j = 0; j < cellM.length; j++) {
     const placeholder: string = cellM[j];
     const id: string = placeholderToId(placeholder);
@@ -118,11 +130,10 @@ export const getSubTabular = (
     // prefix text between placeholders
     let prefix: string = sub.slice(cursor, start);
     // Avoid trimming around list-begin tokens to keep `\begin{itemize}` detectable.
-    const idx: number = subTabular.findIndex((item: TSubTabular) => item.id === id);
+    const entry = subTabular.get(id);
     let isBlockRule: boolean = false;
-    if (idx >= 0) {
-      const content = subTabular[idx].content;
-      isBlockRule = !!subTabular[idx].isBlock || detectLocalBlock(prefix) || detectLocalBlock(content);
+    if (entry) {
+      isBlockRule = !!entry.isBlock || detectLocalBlock(prefix) || detectLocalBlock(entry.content);
       if (!isBlockRule || prefix.trim() === "") {
         prefix = prefix.trim();
       }
@@ -133,11 +144,15 @@ export const getSubTabular = (
       }
     }
     let injected: string = "";
-    if (idx >= 0) {
-      parents = subTabular[idx].parents;
-      injected = subTabular[idx].content ?? "";
+    if (entry) {
+      parents = entry.parents;
+      injected = entry.content ?? "";
     } else {
-      injected = findInDiagboxTable(id) ?? "";
+      const diagboxMatch = findInDiagboxTable(id);
+      if (diagboxMatch) {
+        hasDiagbox = true;
+        injected = diagboxMatch;
+      }
     }
     // decide wrapping using non-space neighbors around placeholder
     const { beforeNonSpace, afterNonSpace } = getInlineContextAroundSpan(sub, start, end);
@@ -161,6 +176,7 @@ export const getSubTabular = (
       type: forLatex ? "inline" : "subTabular",
       parents,
       isSubTabular: true,
+      hasDiagbox,
     },
   ];
 };

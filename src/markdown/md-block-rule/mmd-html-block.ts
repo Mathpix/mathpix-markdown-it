@@ -11,6 +11,15 @@ const makeTagRegexes = (tag: string) => ({
   SELF_CLOSING_INLINE:    new RegExp(`<${tag}\\b[^>]*\\/\\s*>`, 'gi'),
   CLOSE_ANY:              new RegExp(`</${tag}\\s*>`, 'gi'),
 });
+const tagRegexCache = new Map<string, ReturnType<typeof makeTagRegexes>>();
+const getTagRegexes = (tag: string): ReturnType<typeof makeTagRegexes> => {
+  let rx = tagRegexCache.get(tag);
+  if (!rx) {
+    rx = makeTagRegexes(tag);
+    tagRegexCache.set(tag, rx);
+  }
+  return rx;
+};
 
 const netDepthDelta = (line: string, rx: ReturnType<typeof makeTagRegexes>): number => {
   const opens       = (line.match(rx.OPEN_ANY) || []).length;
@@ -100,7 +109,7 @@ export const mmdHtmlBlock: RuleBlock = (state, startLine, endLine, silent): bool
     return true;
   }
 
-  const RX = makeTagRegexes(tagName);
+  const RX = getTagRegexes(tagName);
 
   // - self-closing on line OR void tag one on line
   const isSelfClosingLine = RX.SELF_CLOSING_ONELINE.test(lineText);
@@ -116,7 +125,7 @@ export const mmdHtmlBlock: RuleBlock = (state, startLine, endLine, silent): bool
   }
 
   // pair <tag>…</tag> on one line → let it process the inline rule
-  if (RX.CLOSE_ANY.test(lineText) && netDepthDelta(lineText, RX) <= 0) {
+  if (lineText.match(RX.CLOSE_ANY) && netDepthDelta(lineText, RX) <= 0) {
     return false;
   }
 

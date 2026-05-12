@@ -55,15 +55,22 @@ export const reAddContentsLineG: RegExp = /^\\addcontentsline\s{0,}\{(?<exp>[^}]
 export const reMultiRowWithVPos: RegExp = /(?:\\multirow\s{0,}\[(?<vpos>[^\]]*)\]\s{0,}\{(?<nrows>[^}]*)\}\s{0,}\{(?<width>[^}]*)\})/;
 export const reMultiRow: RegExp = /(?:\\multirow\s{0,}\{(?<nrows>[^}]*)\}\s{0,}\{(?<width>[^}]*)\})/;
 
-export const openTagTabular: RegExp = /^\\begin\s{0,}{tabular}\s{0,}\{([^}]*)\}/;
+export const openTagTabular: RegExp = /^\\begin\s{0,}{tabular}\s{0,}(?:\[[^\]]*\])?\s{0,}\{([^}]*)\}/;
 export const closeTagTabular: RegExp = /^\\end\s{0,}{tabular}/;
 
 export const reFootNote: RegExp = /^\\footnote/;
 export const reOpenTagFootnote: RegExp = /^\\footnote\s{0,}\[\s{0,}\]\s{0,}{|^\\footnote\s{0,}\[-?\d+\]\s{0,}{|^\\footnote\s{0,}{/;
+// `G` suffix means "non-anchored" (no `^`), NOT the /g flag — `.test()` callers depend on stateless behaviour. Same for `reOpenTagFootnotetextG` below.
+// Invariant: every alternative ends with literal `{`. The Phase 1 `lineText.includes('{')` gate in `block-rule.ts` relies on this — keep it true.
 export const reOpenTagFootnoteG: RegExp = /\\footnote\s{0,}\[\s{0,}\]\s{0,}{|\\footnote\s{0,}\[-?\d+\]\s{0,}{|\\footnote\s{0,}{/;
+// Cheap per-line token guard: matches the literal `\footnote` only when followed by a non-letter, so `\footnotemark` / `\footnotesize` / `\footnotetext` do not satisfy it.
+// `(?![a-zA-Z])` follows TeX command-name semantics: a command name ends at the first non-letter.
+export const reFootnoteToken: RegExp = /\\footnote(?![a-zA-Z])/;
 export const reOpenTagFootnoteNumbered: RegExp = /\\footnote\s{0,}\[(?<number>-?\d+)\]\s{0,}{/;
 export const reOpenTagFootnotetext: RegExp = /^\\footnotetext\s{0,}\[\s{0,}\]\s{0,}{|^\\footnotetext\s{0,}\[-?\d+\]\s{0,}{|^\\footnotetext\s{0,}{|^\\blfootnotetext\s{0,}{/;
 export const reOpenTagFootnotetextG: RegExp = /\\footnotetext\s{0,}\[\s{0,}\]\s{0,}{|\\footnotetext\s{0,}\[-?\d+\]\s{0,}{|\\footnotetext\s{0,}{|\\blfootnotetext\s{0,}{/;
+// Same shape as `reFootnoteToken` for `\footnotetext` and `\blfootnotetext`.
+export const reFootnotetextToken: RegExp = /\\(?:bl)?footnotetext(?![a-zA-Z])/;
 export const reOpenTagFootnotetextNumbered: RegExp = /\\footnotetext\s{0,}\[(?<number>-?\d+)\]\s{0,}{/;
 export const reFootNoteMark: RegExp = /^\\footnotemark/;
 export const reFootNoteText: RegExp = /^\\footnotetext|\\blfootnotetext/;
@@ -80,6 +87,8 @@ export const doubleCurlyBracketUuidPattern: RegExp = new RegExp(`\\{\\{(?:${uuid
 export const singleCurlyBracketPattern: RegExp = new RegExp(`\\{(?:${uuidPattern})\\}`, "g");
 export const preserveNewlineUnlessDoubleAngleUuidRegex: RegExp = new RegExp(String.raw`\r?\n(?!\s*<<(?:${uuidPatternNoCapture})>>)` , "g");
 export const ANGLE_BRACKETS_RE: RegExp = /[<>]/g;
+// Clone-on-write marker for shared tabular attrs arrays.
+export const attrsSharedMarker: symbol = Symbol.for('mathpix.tabular.attrsShared');
 export const RE_TAG_WITH_HLINE: RegExp = /\[(.*?)\]\s{0,}\\hline/;
 export const RE_TAG_WITH_HHLINE: RegExp = /\[(.*?)\]\s{0,}\\hhline/;
 export const RE_TAG_WITH_HDASHLINE: RegExp = /\[(.*?)\]\s{0,}\\hdashline/;
@@ -119,7 +128,10 @@ export const BEGIN_LST_FAST_RE: RegExp = /^\\begin\{lstlisting\}/;
 export const END_LST_RE = /^\\end\{lstlisting\}\s*$/;
 export const BEGIN_LST_RE = /^\\begin\{lstlisting\}(?:\[(.*?)\])?\s*$/;
 export const BEGIN_LST_INLINE_RE = /\\begin\{lstlisting\}(?:\[(.*?)\])?/;
-export const BEGIN_TABULAR_INLINE_RE: RegExp = /\\begin\s{0,}{tabular}\s{0,}\{([^}]*)\}/;
+export const BEGIN_TABULAR_INLINE_RE: RegExp = /\\begin\s{0,}{tabular}\s{0,}(?:\[[^\]]*\])?\s{0,}\{([^}]*)\}/;
+// Captures bracket (group 1) and align (group 2).
+export const BEGIN_TABULAR_BRACKET_RE: RegExp = /\\begin\s{0,}{tabular}\s{0,}(?:\[([^\]]*)\])?\s{0,}\{([^}]*)\}/;
+export const BEGIN_TABULAR_BRACKET_RE_G: RegExp = /\\begin\s{0,}{tabular}\s{0,}(?:\[([^\]]*)\])?\s{0,}\{([^}]*)\}/g;
 export const END_LST_INLINE_RE   = /\\end\{lstlisting\}/;
 export const END_TABULAR_INLINE_RE: RegExp   = /\\end\{tabular\}/;
 /** Horizontal spaces (no CR/LF) + at most one newline (CRLF or LF), optional */

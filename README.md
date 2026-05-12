@@ -1002,6 +1002,7 @@ The `MathpixMarkdown` React element accepts the following props:
 | `showPageBreaks`                      | boolean;*`false`*            | Hidden tags will be shown in html like page break                                                                      |
 | `centerImages`                        | boolean;*`true`*             | Center align images by default                                                                                         |
 | `centerTables`                        | boolean;*`true`*             | Center align tables by default                                                                                         |
+| `defaultCellVerticalAlign`            | "top" \| "middle" \| "bottom";*`undefined`* | Fallback vertical alignment for tabular cells without an explicit `\begin{tabular}[t/c/b]{...}` bracket. Per-column `m`/`p`/`b` and any explicit `[t]/[c]/[b]` source bracket always override. Unset → no override. |
 | `validateLink`                        | function;*`null`*            | The function `(url: string) => void` to override md link validator                                                     |
 | `enableCodeBlockRuleForLatexCommands` | boolean;*`false`* | By default, if latex commands are indented (4 spaces / 1 tab) they do not become `Code Blocks`.               |
 | `parserErrors`                        | [ParserErrors](https://github.com/Mathpix/mathpix-markdown-it#parsererrors);*`{}`*        | Sets options to output parser errors for equations and tabular                    |
@@ -1036,6 +1037,7 @@ The `MathpixMarkdown` React element accepts the following props:
 | `showPageBreaks`                      | boolean;*`false`*            | Hidden tags will be shown in html like page break                                                                      |
 | `centerImages`                        | boolean;*`true`*             | Center align images by default                                                                                         |
 | `centerTables`                        | boolean;*`true`*             | Center align tables by default                                                                                         |
+| `defaultCellVerticalAlign`            | "top" \| "middle" \| "bottom";*`undefined`* | Fallback vertical alignment for tabular cells without an explicit `\begin{tabular}[t/c/b]{...}` bracket. Per-column `m`/`p`/`b` and any explicit `[t]/[c]/[b]` source bracket always override. Unset → no override. |
 | `validateLink`                        | function;*`null`*            | The function `(url: string) => void` to override md link validator                                                     |
 | `enableCodeBlockRuleForLatexCommands` | boolean;*`false`* | By default, if latex commands are indented (4 spaces / 1 tab) they do not become `Code Blocks`.               |
 | `parserErrors`                        | [ParserErrors](https://github.com/Mathpix/mathpix-markdown-it#parsererrors);*`{}`*        | Sets options to output parser errors for equations and tabular                    |
@@ -1067,6 +1069,7 @@ The `MathpixMarkdown` React element accepts the following props:
 | `include_speech`         | boolean&nbsp;*`false`*       | outputs speech `<speech>...</speech`                                                                              | 
 | `md_separators`          | `{column: ' ', row: ' <br> '}`| Separators for Markdown tables                                                                                   | 
 | `table_markdown`         | `{math_as_ascii: false, math_inline_delimiters: ['$','$']}`| By default, math goes into Markdown tables as latex and is enclosed in `$...$` delimiters. If `math_as_ascii` is set to `true`, then math will be represented as asciimath | 
+| `skipMathToHtml`         | boolean&nbsp;*`false`*       | When `true`, skips SVG serialization and `token.mathEquation` storage. Overrides `include_svg`; other MathJax outputs (`mathml`, `asciimath`, `linearmath`, etc.) still respect their own `include_*` flags. Intended for callers that walk the token tree directly and never read the serialized math HTML. |
 
 ### TOutputMathJax
 

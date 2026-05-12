@@ -1,5 +1,13 @@
-/** Clear the typeset cache. Call between independent documents to prevent stale data. */
-export declare const clearTypesetCache: () => void;
+/** Called from init_math_cache hook at the start of every md.parse(). */
+export declare const initMathCache: (state: any) => void;
+/** Called from cleanup_math_cache hook at the end of every md.parse().
+ *  The cache is for within-parse dedup only; after parse it's dead weight
+ *  on env (holds MathJax html/svg strings for every unique expression). */
+export declare const cleanupMathCache: (state: any) => void;
+/** Begin a section where cache must not be used (options.outMath is temporarily mutated). */
+export declare const beginCacheBypass: (state: any) => void;
+/** End a cache-bypass section. */
+export declare const endCacheBypass: (state: any) => void;
 /**
  * Converts an ascii math token via TypesetAsciiMath at parsing stage.
  * Sets token.mathEquation (HTML) and token.mathData (metrics/typst/etc).

@@ -1,6 +1,7 @@
 import type Token from "markdown-it/lib/token";
 import type StateBlock from 'markdown-it/lib/rules_block/state_block';
 import type StateInline from 'markdown-it/lib/rules_inline/state_inline';
+import { beginCacheBypass, endCacheBypass } from '../common/convert-math-to-html';
 import { itemizeLevelDefaults, enumerateLevelDefaults } from "../common/list-markers";
 import {
   ENUM_LEVEL_COMMANDS, ENUM_STYLES, ITEM_LEVEL_COMMANDS,
@@ -68,22 +69,25 @@ export interface ItemizeLevelTokenResult {
 export const SetItemizeLevelTokens = (
   state: StateBlock | StateInline
 ): ItemizeLevelTokenResult => {
-  const originalOptions = { ...state.md.options };
-  if (state.md.options.forDocx) {
-    state.md.options = {
-      ...state.md.options,
-      outMath: {
-        include_svg: true,
-        include_mathml_word: false,
-      },
+  const originalOutMath = state.md.options.outMath;
+  const docxMutation = !!state.md.options.forDocx;
+  if (docxMutation) {
+    state.md.options.outMath = {
+      include_svg: true,
+      include_mathml_word: false,
     };
+    beginCacheBypass(state);
   }
-  itemizeLevelTokens = itemizeLevel.map((level) => {
-    const children: Token[] = [];
-    state.md.inline.parse(level, state.md, state.env, children);
-    return children;
-  });
-  state.md.options = originalOptions;
+  try {
+    itemizeLevelTokens = itemizeLevel.map((level) => {
+      const children: Token[] = [];
+      state.md.inline.parse(level, state.md, state.env, children);
+      return children;
+    });
+  } finally {
+    state.md.options.outMath = originalOutMath;
+    if (docxMutation) endCacheBypass(state);
+  }
   return {
     tokens: [...itemizeLevelTokens],
     contents: [...itemizeLevel],
@@ -97,20 +101,23 @@ export const SetItemizeLevelTokensByIndex = (
   state: StateBlock | StateInline,
   index: number
 ): void => {
-  const originalOptions = { ...state.md.options };
-  if (state.md.options.forDocx) {
-    state.md.options = {
-      ...state.md.options,
-      outMath: {
-        include_svg: true,
-        include_mathml_word: false,
-      },
+  const originalOutMath = state.md.options.outMath;
+  const docxMutation = !!state.md.options.forDocx;
+  if (docxMutation) {
+    state.md.options.outMath = {
+      include_svg: true,
+      include_mathml_word: false,
     };
+    beginCacheBypass(state);
   }
-  const children: Token[] = [];
-  state.md.inline.parse(itemizeLevel[index], state.md, state.env, children);
-  itemizeLevelTokens[index] = children;
-  state.md.options = originalOptions;
+  try {
+    const children: Token[] = [];
+    state.md.inline.parse(itemizeLevel[index], state.md, state.env, children);
+    itemizeLevelTokens[index] = children;
+  } finally {
+    state.md.options.outMath = originalOutMath;
+    if (docxMutation) endCacheBypass(state);
+  }
 };
 
 /**

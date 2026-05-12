@@ -37,6 +37,18 @@ export interface InlineCodeItem {
   content: string
 }
 
+/** Build a Set of all character positions that fall inside inline code spans.
+ *  O(1) lookup per position instead of O(m) Array.find per check. */
+export const buildInlineCodePositionSet = (codeList: Array<InlineCodeItem>): Set<number> => {
+  const positions = new Set<number>();
+  for (const item of codeList) {
+    for (let p = item.posStart; p < item.posEnd; p++) {
+      positions.add(p);
+    }
+  }
+  return positions;
+};
+
 export const getInlineCodeListFromString = (str): Array<InlineCodeItem> => {
   let inlineCodeList: Array<InlineCodeItem> = [];
   if (!str || !str.trim()) {
@@ -112,28 +124,21 @@ export const findEndMarker = (str: string, startPos: number = 0, beginMarker: st
   }
   let openBrackets = openBracketsBefore ? openBracketsBefore : 1;
   let beforeCharCode: number = 0;
-  let inlineCodeList: Array<InlineCodeItem> = getInlineCodeListFromString(str);
+  const inlineCodeList: Array<InlineCodeItem> = getInlineCodeListFromString(str);
+  const codePositions: Set<number> = buildInlineCodePositionSet(inlineCodeList);
   for (let i = startPos + 1; i < str.length; i++) {
     const chr = str[i];
     nextPos = i;
-    /** Found beginMarker and it is not inline code. (and it's not shielded '\{' )
-     * We increase the counter of open tags <openBrackets> and continue the search */
     if (chr === beginMarker && beforeCharCode !== 0x5c /* \ */) {
       content += chr;
-      let isCode = inlineCodeList?.length 
-        ? inlineCodeList.find(item => item.posStart <= i && item.posEnd >= i)
-        : null;
-      if (!isCode) {
+      if (!codePositions.has(i)) {
         openBrackets++;
       }
       continue;
     }
     /** Found endMarker and it is not inline code (and it's not shielded '\}' ) */
     if (chr === endMarker && beforeCharCode !== 0x5c /* \ */) {
-      let isCode = inlineCodeList?.length  
-        ? inlineCodeList.find(item => item.posStart <= i && item.posEnd >= i)
-        : null;
-      if (!isCode) {
+      if (!codePositions.has(i)) {
         openBrackets--;
       }
       if (openBrackets > 0) {
