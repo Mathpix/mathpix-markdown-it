@@ -11,7 +11,8 @@ import {
   reNewCommandQedSymbolG,
   defQED,
   reTheoremStyleG,
-  reSetCounterG
+  reSetCounterG,
+  MMD_TYPES
 } from "../common/consts";
 import {
   theoremEnvironments,
@@ -282,6 +283,8 @@ export const BeginTheorem: RuleBlock = (state, startLine, endLine, silent) => {
   state.line = nextLine + 1;
   token = state.push('paragraph_open', 'div', 1);
   token.attrSet('class','theorem_block');
+  token.meta = token.meta || {};
+  token.meta.mmd_type = MMD_TYPES.theorem;
   token.map = [startLine, state.line];
 
   if (strBefore && strBefore?.trim()) {
@@ -509,6 +512,8 @@ export const BeginProof: RuleBlock = (state, startLine, endLine, silent) => {
   state.line = nextLine + 1;
   token = state.push('paragraph_open', 'div', 1);
   token.attrSet('class','proof_block');
+  token.meta = token.meta || {};
+  token.meta.mmd_type = MMD_TYPES.proof;
   token.map = [startLine, state.line];
 
   if (strBefore && strBefore?.trim()) {

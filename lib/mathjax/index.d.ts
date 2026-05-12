@@ -1,5 +1,10 @@
 import { TAccessibility } from "../mathpix-markdown-model";
 import { Label } from 'mathjax-full/js/input/tex/Tags.js';
+interface ITypstConvertResult {
+    typstmath: string;
+    typstmath_inline: string;
+    error?: string;
+}
 export interface IOuterData {
     mathml?: string;
     mathml_word?: string;
@@ -8,9 +13,13 @@ export interface IOuterData {
     asciimath_tsv?: string;
     asciimath_csv?: string;
     asciimath_md?: string;
+    typstmath?: string;
+    typstmath_inline?: string;
+    typstmath_error?: string;
     latex?: string;
     svg?: string;
     speech?: string;
+    error?: string;
     labels?: {
         [key: string]: Label;
     };
@@ -34,6 +43,8 @@ export declare const MathJax: {
     Stylesheet: () => unknown;
     TexConvert: (string: any, options?: any, throwError?: boolean) => IOuterData;
     TexConvertToAscii: (string: any, options?: any) => string;
+    TexConvertToTypstData: (string: string, options?: any) => ITypstConvertResult;
+    MathMLConvertToTypstData: (string: string, options?: any) => ITypstConvertResult;
     /**
      * Typeset a TeX expression and return the SVG tree for it
      *
@@ -58,9 +69,13 @@ export declare const MathJax: {
             asciimath_tsv?: string;
             asciimath_csv?: string;
             asciimath_md?: string;
+            typstmath?: string;
+            typstmath_inline?: string;
+            typstmath_error?: string;
             latex?: string;
             svg?: string;
             speech?: string;
+            error?: string;
             labels?: {
                 [key: string]: Label;
             };
@@ -89,9 +104,13 @@ export declare const MathJax: {
             asciimath_tsv?: string;
             asciimath_csv?: string;
             asciimath_md?: string;
+            typstmath?: string;
+            typstmath_inline?: string;
+            typstmath_error?: string;
             latex?: string;
             svg?: string;
             speech?: string;
+            error?: string;
             labels?: {
                 [key: string]: Label;
             };
@@ -118,9 +137,13 @@ export declare const MathJax: {
             asciimath_tsv?: string;
             asciimath_csv?: string;
             asciimath_md?: string;
+            typstmath?: string;
+            typstmath_inline?: string;
+            typstmath_error?: string;
             latex?: string;
             svg?: string;
             speech?: string;
+            error?: string;
             labels?: {
                 [key: string]: Label;
             };
@@ -131,7 +154,23 @@ export declare const MathJax: {
             heightEx?: number;
         };
     };
+    /** @deprecated Use TypesetAsciiMath instead. Kept for backward compatibility. */
     AsciiMathToSvg: (string: any, options?: any) => string;
+    TypesetAsciiMath: (string: any, options?: any) => {
+        html: string;
+        data: {
+            mathml?: string;
+            mathml_word?: string;
+            asciimath?: string;
+            typstmath?: string;
+            typstmath_inline?: string;
+            typstmath_error?: string;
+            latex?: string;
+            svg?: string;
+            speech?: string;
+        };
+    };
     Reset: (n?: number) => void;
     GetLastEquationNumber: () => any;
 };
+export {};

@@ -1,6 +1,6 @@
 let chai = require('chai');
 let should = chai.should();
-
+let MathJax = require('../lib/mathjax/index.js').MathJax;
 let MM = require('../lib/mathpix-markdown-model/index').MathpixMarkdownModel;
 
 
@@ -72,5 +72,14 @@ describe('Check rendering ascii:', () => {
       elAscii.should.have.length(1);
       done();
     });
+  });
+});
+
+describe('AsciiMathToSvg backward compatibility:', () => {
+  it('should return string', function() {
+    const result = MathJax.AsciiMathToSvg('x^2', {
+      outMath: { include_svg: false }
+    });
+    result.should.be.a('string');
   });
 });

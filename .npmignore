@@ -2,6 +2,7 @@
 /node_modules
 /examples
 /tests
+/pr-specs
 webpack.config.js
 webpack.dev.js
 .gitignore

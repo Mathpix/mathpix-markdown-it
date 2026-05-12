@@ -9,7 +9,7 @@ import {
   renderOutOpen,
   renderOutText
 } from "./md-renderer-rules/underline";
-import { closeTagSpan, reSpan, reAddContentsLine } from "./common/consts";
+import { closeTagSpan, reSpan, reAddContentsLine, MMD_TYPES } from "./common/consts";
 import { findEndMarker, getTerminatedRules } from "./common";
 import { uid , getSpacesFromLeft, isMathInText } from "./utils";
 import { ILabel, getLabelByUuidFromLabelsList } from "./common/labels";
@@ -637,6 +637,8 @@ const abstractBlock: RuleBlock = (state, startLine, endLine, silent) => {
   token.attrSet('class', 'abstract');
   token.attrSet('style', 'width: 80%; margin: 0 auto 1em auto; font-size: .9em;');
   token.mmd_type = 'abstract';
+  token.meta = token.meta || {};
+  token.meta.mmd_type = MMD_TYPES.abstract;
 
   token = state.push('heading_open', 'h4', 1);
   token.markup = '########'.slice(0, 4);
@@ -644,10 +646,16 @@ const abstractBlock: RuleBlock = (state, startLine, endLine, silent) => {
   token.attrSet('class', 'abstract_head');
   token.attrSet('style', 'text-align: center;');
   token.mmd_type = 'abstract_title';
+  token.meta = token.meta || {};
+  token.meta.mmd_type = MMD_TYPES.abstract_title;
   token = state.push('text', '', 0);
   token.content = 'Abstract';
   token.children = [];
+  token.meta = token.meta || {};
+  token.meta.mmd_type = MMD_TYPES.abstract_title;
   token = state.push('heading_close', 'h4', -1);
+  token.meta = token.meta || {};
+  token.meta.mmd_type = MMD_TYPES.abstract_title;
 
   for (let i = 0; i < tokenContent.length; i++) {
     token = state.push('paragraph_open', 'p', 1);
@@ -670,7 +678,9 @@ const abstractBlock: RuleBlock = (state, startLine, endLine, silent) => {
     token = state.push('paragraph_close', 'p', -1);
   }
   token = state.push('paragraph_close', 'div', -1);
-  
+  token.meta = token.meta || {};
+  token.meta.mmd_type = MMD_TYPES.abstract;
+
   if (strAfterEnd && strAfterEnd.trim()) {
     token = state.push('inline', '', 0);
     token.content = strAfterEnd;

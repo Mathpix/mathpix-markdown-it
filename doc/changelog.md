@@ -1,5 +1,54 @@
 # May 2026
 
+# March 2026
+
+## [2.0.41] - Typst math format: reliability, defense-in-depth, code quality
+
+- Delimiter pairing fixes:
+  - Fence balance check now tracks ALL bracket types (`()`, `[]`, `{}`, `⟨⟩`, `⌊⌋`, `⌈⌉`) — prevents bra-ket `|\psi\rangle` from swallowing content across unmatched brackets.
+  - Big delimiter nesting depth tracked (`\Bigg[ \bigg( ... \bigg) \Bigg]` pairs correctly).
+  - `\left...\right` mrow is a scope boundary for bracket pairing — prevents cross-boundary mismatches.
+  - Custom commands (`\rrbracket`, `\llbracket`) opaque to bracket pairing via `data-custom-cmd`.
+  - `mphantom`, `mpadded`, `munderover`, `maction`, `merror`, `semantics` added to scope boundaries.
+  - `mmultiscripts` added to script scope kinds.
+
+- Boxed/circle output simplified:
+  - `\boxed{}` → `#box(stroke:..., $ content $)` (was `#align(center, box(...))`). Inline-safe, works with scripts/subscripts/neighbors.
+  - `\enclose{circle}` → `#ellipse(...)` (was `#circle()`) for visual parity with MathJax stretched rendering.
+  - `typst_inline` preserves the frame (was stripped).
+  - Always uses `$ display $` math inside box for correct multi-line alignment.
+
+- Defense-in-depth for unclosed delimiters:
+  - `escapeLrBody` backstop: escapes residual unpaired `[]`, `()`, `{}` at string level.
+  - `escapeContentSeparators` (Standard context) now escapes all 3 bracket types.
+  - Dev-only invariant check (`countUnpairedBrackets`) warns on unbalanced lr() body.
+  - `visitNode` auto-fallback: block-level code-mode (`#math.equation`, `#grid`) never nests inside math wrappers — inline variant used automatically.
+
+- Typst formatting safety:
+  - Space before `[`/`{` after FuncCall/Delimited (prevents trailing-content-block parsing).
+  - Space before `(` after any multi-char identifier including builtins (`sup (i: ...)` prevents named-arg errors).
+  - Colon escaping after any non-space char (fixes `H_+:` in `mat()` cells).
+  - Backslash escaping in tag content (`\tag{\#}` → `\\\#` for correct Typst rendering).
+  - Trailing `\\` stripped from `typst_inline` (prevents `\$` escape error).
+
+- New AST features:
+  - `ErrorNode` type — handler failures preserve source text as fallback instead of losing math.
+  - `errors[]` collector in serializer, propagated to `ITypstConvertResult.error` and `IOuterData.typstmath_error`.
+  - `isEmptyNode` / `getSymbolValue` helpers reduce O(n) re-serialization in script handlers.
+  - `containsBlockCodeFunc` shared in `code-mode-utils.ts`.
+
+- Code quality:
+  - `handleScriptAst` unifies msup/msub/msubsup (~70 lines removed).
+  - `EMPTY_RESULT` consolidated in `builders.ts`.
+  - Depth constants (`ANCESTOR_MAX_DEPTH`, `TABLE_ANCESTOR_MAX_DEPTH`, `UNWRAP_MAX_DEPTH`) in `consts.ts`.
+  - `FENCE_OPEN/CLOSE_CHARS`, `RE_ESCAPED_BRACKET_START/END` in `consts.ts` (was duplicated).
+  - `process.env.NODE_ENV` guarded for browser environments.
+  - `visitNode` signature: `...args: string[]` (was `any[]`).
+  - Combining-mark chars (`ṭ`, `é`, `ç`) wrapped in `text()` to prevent Typst shaping errors.
+  - `escapeUnpairedOfType` shared helper for `[]`, `()`, `{}` escaping.
+  - Recursion limits on `unwrapSeq` and `getSymbolValue`.
+  - 983 test cases (was 924).
+
 ## [2.0.40] - Tabular vertical-align bracket and footnote performance
 
 - Tabular vertical alignment:
@@ -125,8 +174,6 @@ See `pr-specs/2026-05-footnote-perf-and-parser-invariants.md` for design and kno
 
 - Docs:
   - Implementation details in `pr-specs/2026-04-optimize-tabular-parsing.md` and `pr-specs/2026-04-global-state-cleanup-and-perf.md`.
-
-# March 2026
 
 ## [2.0.38] - Fix infinite loop in `inlineMmdIcon` and `inlineDiagbox` silent mode
 

@@ -48,6 +48,7 @@ import {
 import { resetMmdGlobalState } from "./markdown/common/reset-mmd-state";
 
 import { normalizeLink } from './helpers/normalize-link';
+import { MMD_TYPES } from './markdown/common/consts';
 
 export {
   MathpixLoader, MathpixMarkdown, MathpixMarkdownModel,
@@ -66,6 +67,7 @@ export {
   ParserErrors,
   Footnotes,
   eLabelType, ILabel, getLabelsList, getLabelByKeyFromLabelsList, clearLabelsList,
+  MMD_TYPES,
   resetMmdGlobalState,
   normalizeLink,
   RenderOptions

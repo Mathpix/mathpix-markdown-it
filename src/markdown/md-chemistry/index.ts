@@ -178,7 +178,7 @@ const smilesDrawerInline: RuleInline = (state, silent) => {
 
 const renderSmilesDrawerBlock = (tokens, idx, options, env, slf) => {
   const { outMath = {} } = options;
-  const { include_smiles = false, include_svg = true  } = outMath;
+  const { include_smiles = false, include_svg = true, include_smiles_svg = false } = outMath;
   const token = tokens[idx];
   if (!token.content) {
     return '';
@@ -187,7 +187,7 @@ const renderSmilesDrawerBlock = (tokens, idx, options, env, slf) => {
     ? uid()
     : '';
 
-  let resSvg = include_svg || options.forDocx
+  let resSvg = include_svg || include_smiles_svg || options.forDocx
     ? ChemistryDrawer.drawSvgSync(token.content.trim(), id, options, options.forPptx)
     : '';
 
@@ -217,7 +217,7 @@ const renderSmilesDrawerBlock = (tokens, idx, options, env, slf) => {
 
 const renderSmilesDrawerInline = (tokens, idx, options, env, slf) => {
   const { outMath = {} } = options;
-  const { include_smiles = false, include_svg = true } = outMath;
+  const { include_smiles = false, include_svg = true, include_smiles_svg = false } = outMath;
   const token = tokens[idx];
   if (!token.content) {
     return '';
@@ -226,7 +226,7 @@ const renderSmilesDrawerInline = (tokens, idx, options, env, slf) => {
     ? uid()
     : '';
 
-  let resSvg = include_svg || options.forDocx
+  let resSvg = include_svg || include_smiles_svg || options.forDocx
     ? ChemistryDrawer.drawSvgSync(token.content.trim(), id, options, options.forPptx)
     : '';
 

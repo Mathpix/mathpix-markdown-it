@@ -22,8 +22,17 @@ export interface ILabel {
   tagId?: string,
   tagChildrenTokens?: any, /** parsed tag content */
   type: eLabelType,
+  sanitizedKey?: string, /** Label key with special chars encoded as _XX hex (for systems that restrict label chars) */
   tokenUuidInParentBlock?: string /** uuid of parent block */
 }
+
+/** Chars not allowed in sanitized label keys: only letters, digits, _, -, :, . are valid */
+const RE_INVALID_LABEL_CHARS = /[^\w\-.:\p{L}]/gu;
+
+/** Sanitize a label key for systems that restrict allowed characters.
+ *  Encodes invalid chars as _XX hex to preserve uniqueness. */
+export const sanitizeLabel = (key: string): string =>
+  key.replace(RE_INVALID_LABEL_CHARS, (ch) => '_' + ch.charCodeAt(0).toString(16).toUpperCase()) || 'label';
 
 let labelsByKey: Map<string, ILabel> = new Map();
 let labelsByUuid: Map<string, ILabel> = new Map();
@@ -43,9 +52,6 @@ const getLabelsSnapshot = (): ILabel[] => {
  * @deprecated Use `getLabelsList()`, `getLabelByKeyFromLabelsList()`, or
  * `getLabelByUuidFromLabelsList()` instead. Kept as a derived read-only view
  * for deep-import consumers that imported the array directly.
- *
- * Reads return a cached snapshot of `labelsByKey.values()` — writes (`.push`,
- * index assignment) target the throwaway target array and are effectively ignored.
  */
 export const labelsList: ReadonlyArray<ILabel> = new Proxy([] as ILabel[], {
   get(_target, prop, receiver) {
@@ -62,6 +68,9 @@ export const labelsList: ReadonlyArray<ILabel> = new Proxy([] as ILabel[], {
 }) as ReadonlyArray<ILabel>;
 
 export const addIntoLabelsList = (label: ILabel) => {
+  if (!label.sanitizedKey) {
+    label.sanitizedKey = sanitizeLabel(label.key);
+  }
   const existing = labelsByKey.get(label.key);
   if (existing) {
     if (existing.tokenUuidInParentBlock
