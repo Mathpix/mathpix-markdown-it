@@ -2,29 +2,52 @@
 
 # March 2026
 
-## [2.0.41] - Add Typst math format output
+## [2.0.41] - Typst math format: reliability, defense-in-depth, code quality
 
-- New Feature:
-  - LaTeX-to-Typst and MathML-to-Typst math conversion via `MathJax.TexConvertToTypstData(latex)` and `MathJax.MathMLConvertToTypstData(mathml)`. Returns `{ typstmath, typstmath_inline, error? }`.
-  - `typstmath` — block representation (may include `#math.equation()`, `#box()`, `#align()` wrappers).
-  - `typstmath_inline` — pure math-mode output, safe for inline `$...$` contexts.
-  - `include_typst: true` option in `outMath` to include `<typstmath>` and `<typstmath_inline>` tags in rendered HTML.
+- Delimiter pairing fixes:
+  - Fence balance check now tracks ALL bracket types (`()`, `[]`, `{}`, `⟨⟩`, `⌊⌋`, `⌈⌉`) — prevents bra-ket `|\psi\rangle` from swallowing content across unmatched brackets.
+  - Big delimiter nesting depth tracked (`\Bigg[ \bigg( ... \bigg) \Bigg]` pairs correctly).
+  - `\left...\right` mrow is a scope boundary for bracket pairing — prevents cross-boundary mismatches.
+  - Custom commands (`\rrbracket`, `\llbracket`) opaque to bracket pairing via `data-custom-cmd`.
+  - `mphantom`, `mpadded`, `munderover`, `maction`, `merror`, `semantics` added to scope boundaries.
+  - `mmultiscripts` added to script scope kinds.
 
-- Supported constructs:
-  - Fractions (`\frac` → `frac()`), roots (`\sqrt` → `sqrt()`, `\sqrt[n]` → `root()`), matrices (`pmatrix`/`bmatrix`/`vmatrix` → `mat()`), cases (`\begin{cases}` → `cases()`).
-  - Delimiter optimization: `\lfloor..\rfloor` → `floor()`, `\lceil..\rceil` → `ceil()`, `\|..\|` → `norm()`, `|..|` → `abs()`.
-  - Blackboard bold shorthands: `\mathbb{Z}` → `ZZ`, `\mathbb{N}` → `NN`, etc.
-  - Custom operators: `\operatorname*{argmax}` → `op("argmax", limits: #true)`.
-  - Text in math: `\text{...}` → `"..."`.
-  - Tags, labels, equation numbering, aligned environments, `\boxed`, accents, cancellations, colors, and 924 test cases.
+- Boxed/circle output simplified:
+  - `\boxed{}` → `#box(stroke:..., $ content $)` (was `#align(center, box(...))`). Inline-safe, works with scripts/subscripts/neighbors.
+  - `\enclose{circle}` → `#ellipse(...)` (was `#circle()`) for visual parity with MathJax stretched rendering.
+  - `typst_inline` preserves the frame (was stripped).
+  - Always uses `$ display $` math inside box for correct multi-line alignment.
 
-- Architecture:
-  - Typed AST intermediate layer (`TypstMathNode`) — all 22 handlers return typed nodes, escaping centralized in a single serializer with 7 context-aware escape modes.
-  - Per-cell bracket scoping for tables prevents orphaned brackets in aligned/eqnarray output.
-  - Nested chevron pairing, bare brace escaping, opening-bracket-as-script-base separation.
+- Defense-in-depth for unclosed delimiters:
+  - `escapeLrBody` backstop: escapes residual unpaired `[]`, `()`, `{}` at string level.
+  - `escapeContentSeparators` (Standard context) now escapes all 3 bracket types.
+  - Dev-only invariant check (`countUnpairedBrackets`) warns on unbalanced lr() body.
+  - `visitNode` auto-fallback: block-level code-mode (`#math.equation`, `#grid`) never nests inside math wrappers — inline variant used automatically.
 
-- Error Handling:
-  - `merror` nodes (invalid LaTeX) return `{ typstmath: '', typstmath_inline: '', error: '...' }` — errors never appear in Typst output.
+- Typst formatting safety:
+  - Space before `[`/`{` after FuncCall/Delimited (prevents trailing-content-block parsing).
+  - Space before `(` after any multi-char identifier including builtins (`sup (i: ...)` prevents named-arg errors).
+  - Colon escaping after any non-space char (fixes `H_+:` in `mat()` cells).
+  - Backslash escaping in tag content (`\tag{\#}` → `\\\#` for correct Typst rendering).
+  - Trailing `\\` stripped from `typst_inline` (prevents `\$` escape error).
+
+- New AST features:
+  - `ErrorNode` type — handler failures preserve source text as fallback instead of losing math.
+  - `errors[]` collector in serializer, propagated to `ITypstConvertResult.error` and `IOuterData.typstmath_error`.
+  - `isEmptyNode` / `getSymbolValue` helpers reduce O(n) re-serialization in script handlers.
+  - `containsBlockCodeFunc` shared in `code-mode-utils.ts`.
+
+- Code quality:
+  - `handleScriptAst` unifies msup/msub/msubsup (~70 lines removed).
+  - `EMPTY_RESULT` consolidated in `builders.ts`.
+  - Depth constants (`ANCESTOR_MAX_DEPTH`, `TABLE_ANCESTOR_MAX_DEPTH`, `UNWRAP_MAX_DEPTH`) in `consts.ts`.
+  - `FENCE_OPEN/CLOSE_CHARS`, `RE_ESCAPED_BRACKET_START/END` in `consts.ts` (was duplicated).
+  - `process.env.NODE_ENV` guarded for browser environments.
+  - `visitNode` signature: `...args: string[]` (was `any[]`).
+  - Combining-mark chars (`ṭ`, `é`, `ç`) wrapped in `text()` to prevent Typst shaping errors.
+  - `escapeUnpairedOfType` shared helper for `[]`, `()`, `{}` escaping.
+  - Recursion limits on `unwrapSeq` and `getSymbolValue`.
+  - 983 test cases (was 924).
 
 ## [2.0.40] - Tabular vertical-align bracket and footnote performance
 

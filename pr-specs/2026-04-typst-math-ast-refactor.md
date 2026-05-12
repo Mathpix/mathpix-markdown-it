@@ -18,7 +18,7 @@ This PR introduces a typed AST with centralized escaping to eliminate these bug 
 1. Introduce a typed intermediate representation (`TypstMathNode`) between MathML tree traversal and Typst string output
 2. Migrate all 22 handlers to return AST nodes instead of strings
 3. Centralize all escaping in a single serializer with a context registry
-4. Maintain 100% output compatibility: all 952 tests pass
+4. Maintain 100% output compatibility: all 983 tests pass
 5. Eliminate escaping-related bug classes at the architectural level
 
 ---
@@ -231,7 +231,7 @@ EXTEND `BLOCK_CODE_FUNCS` set when adding a new block-level `funcCall(name, ...,
 
 ## Constraints / Invariants
 
-1. **All 952 tests pass.** Output verified at each step.
+1. **All 983 tests pass.** Output verified at each step.
 2. **Escaping is serializer-only.** No handler calls escape functions directly.
 3. **Typed discriminants.** All node type, arg value, and func arg comparisons use const enums.
 4. **Public API preserved.** `ITypstData` remains the external interface.
@@ -241,7 +241,7 @@ EXTEND `BLOCK_CODE_FUNCS` set when adding a new block-level `funcCall(name, ...,
 
 ## Observability
 
-- All 952 tests verified at each step
+- All 983 tests verified at each step
 - TypeScript strict mode — zero `any` types in AST handlers
 - console.warn on handler errors (previously silently swallowed)
 
@@ -259,5 +259,5 @@ EXTEND `BLOCK_CODE_FUNCS` set when adding a new block-level `funcCall(name, ...,
 - [x] Bare `\{`/`\}` correctly escaped, chevron nesting tracked
 - [x] Opening bracket separated from script base
 - [x] Dead code removed, files split, types unified
-- [x] All 952 tests pass
+- [x] All 983 tests pass
 - [x] `Status` updated to `Implemented`
