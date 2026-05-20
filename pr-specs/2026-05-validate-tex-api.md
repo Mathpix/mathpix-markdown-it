@@ -1,15 +1,15 @@
 # PR: Add `validateTex` API for fast side-effect-free TeX syntax checking
 
-Status: Active
+Status: Implemented
 Owner: @OlgaRedozubova
 
 ---
 
 ## Context
 
-The `forLatex` output mode (used by `forDocx`/`forMD`/`forPptx` and direct LaTeX export) bypasses MathJax conversion to keep latex export cheap — `mdPluginRaw.ts:174-191` skips `convertMathToHtml` and stores raw markup on tokens. The cost: **broken formulas are not detected** and silently end up in the output, where downstream LaTeX compilation fails.
+The `forLatex` output mode bypasses MathJax conversion to keep latex-output cheap — `mdPluginRaw.ts:174-191` skips `convertMathToHtml` and stores raw markup on tokens. The trade-off: this mode does not detect formula parse errors, since MathJax never runs.
 
-This PR adds an opt-in API that lets consumers ask MathJax "is this formula parseable?" without producing rendered output and without affecting the rendering pipeline's equation counter, labels, or ids.
+This PR adds an opt-in API that lets a consumer ask MathJax "is this formula parseable?" without producing rendered output and without affecting the rendering pipeline's equation counter, labels, or ids.
 
 ---
 
@@ -35,7 +35,7 @@ This PR adds an opt-in API that lets consumers ask MathJax "is this formula pars
 
 ## Current Behavior
 
-- `forLatex: true` skips `convertMathToHtml` entirely. No syntactic check on formula contents.
+- `forLatex: true` skips `convertMathToHtml` entirely. No syntactic check on formula contents is performed by the library.
 - The only existing pre-flight check is `checkFormula` (`src/mathpix-markdown-model/check-formula.ts`) which matches delimiters but does not parse formula bodies.
 
 ---
@@ -139,7 +139,6 @@ The constructor restores the prototype chain explicitly — required because the
 - [x] `MathpixMarkdownModel.validateTex` exposes the API as a method on the public singleton
 - [x] Unit tests in `tests/_validateTex.js` cover return value, no-side-effect on counter, no-side-effect on labels, statelessness, isolation from render pipeline
 - [x] All existing tests pass; full suite reports `3491 passing` (3478 existing + 13 new)
-- [ ] `Status` updated to `Implemented` after merge
 
 ---
 

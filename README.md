@@ -719,7 +719,7 @@ When using `'mathml'` or `'latex'`, the server outputs minimal HTML containing o
 
 ## Validating TeX formulas
 
-Use `MathpixMarkdownModel.validateTex(latex, options?)` to check whether a TeX expression parses without rendering it. Useful before `forLatex` export, when a broken formula would cause downstream LaTeX compilation to fail.
+Use `MathpixMarkdownModel.validateTex(latex, options?)` to check whether a TeX expression parses without rendering it. Useful when a consumer needs to detect parse errors in TeX expressions without paying for full SVG rendering.
 
 ### Example usage
 
