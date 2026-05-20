@@ -68,6 +68,7 @@ export class MathJaxConfigure {
   public mTex;
   public tex;
   public texTSV;
+  public validateTex: TeX<any, any, any>;
   public mathjax;
   public adaptor;
   public domNode;
@@ -115,6 +116,9 @@ export class MathJaxConfigure {
       this.tex = new TeX(texConfig);
       this.texTSV = new TeX(texTSVConfig);
     }
+    // Isolated MTeX for validateTex.
+    // @ts-ignore
+    this.validateTex = new MTeX(Object.assign({}, texConfig, {tags: "none"}));
   }
   
   setHandler = (acssistiveMml = false, nonumbers = false) => {
@@ -144,6 +148,8 @@ export class MathJaxConfigure {
       InputJax: asciimath,
       OutputJax: svg
     });
+    // Wire the same MmlFactory into the isolated validateTex (NodeFactory needs it).
+    this.validateTex.setMmlFactory(this.mTex.mmlFactory);
   };
   
   changeHandler = (acssistiveMml = false, nonumbers = false) => {

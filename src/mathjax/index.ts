@@ -8,12 +8,31 @@ import { getSpeech } from '../sre';
 import { TAccessibility } from "../mathpix-markdown-model";
 import { formatSource, formatSourceMML } from "../helpers/parse-mmd-element";
 import { Label } from 'mathjax-full/js/input/tex/Tags.js';
+import TexParser from 'mathjax-full/js/input/tex/TexParser.js';
+import TexError from 'mathjax-full/js/input/tex/TexError.js';
 import { IAsciiData } from "./serialized-ascii/common";
 import { formatMathJaxError } from "../helpers/utils";
 import { getMathDimensions, IMathDimensions } from "./utils";
 import { uid } from "../markdown/utils";
 
 const MJ = new MathJaxConfigure();
+
+export class TexValidationError extends Error {
+  readonly code?: string;
+  readonly latex: string;
+  constructor(message: string, latex: string, code?: string) {
+    super(message);
+    // Restore prototype chain (ES5 target breaks it on extends Error).
+    Object.setPrototypeOf(this, TexValidationError.prototype);
+    this.name = 'TexValidationError';
+    this.latex = latex;
+    this.code = code;
+  }
+}
+
+export type TexValidationResult =
+  | { valid: true }
+  | { valid: false; error: TexValidationError };
 
 export interface IOuterData {
   mathml?: string,
@@ -465,6 +484,26 @@ export const MathJax = {
         return OuterDataError(MJ.adaptor, node, string, err, outMath);
       }
       return OuterDataError(MJ.adaptor, null, string, err, outMath);
+    }
+  },
+  // Runs TexParser directly on the isolated MTeX — skips post-filters, MathItem, MathDocument.
+  ValidateTex: function(latex: string, options: { display?: boolean } = {}): TexValidationResult {
+    const { display = true } = options;
+    const validateInputJax = MJ.validateTex;
+    const parseOptions = validateInputJax.parseOptions;
+    parseOptions.clear();
+    parseOptions.tags.reset(0);
+    parseOptions.tags.startEquation({ inputData: {} } as any);
+    try {
+      const parser = new TexParser(latex, { display, isInner: false }, parseOptions);
+      parser.mml();
+      return { valid: true };
+    } catch (err) {
+      if (err instanceof TexError) {
+        return { valid: false, error: new TexValidationError('TeX error: ' + err.message, latex, err.id) };
+      }
+      const message = err instanceof Error ? err.message : String(err);
+      return { valid: false, error: new TexValidationError(message, latex) };
     }
   },
   TexConvertToAscii: function(string, options: any={}) {

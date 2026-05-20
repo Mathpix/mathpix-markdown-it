@@ -1,3 +1,4 @@
+import { TeX } from 'mathjax-full/js/input/tex.js';
 import { MathML } from "mathjax-full/js/input/mathml.js";
 import { SVG } from 'mathjax-full/js/output/svg.js';
 import { AsciiMath } from 'mathjax-full/js/input/asciimath.js';
@@ -13,6 +14,7 @@ export declare class MathJaxConfigure {
     mTex: any;
     tex: any;
     texTSV: any;
+    validateTex: TeX<any, any, any>;
     mathjax: any;
     adaptor: any;
     domNode: any;

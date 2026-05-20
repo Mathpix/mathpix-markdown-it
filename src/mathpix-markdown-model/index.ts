@@ -274,6 +274,7 @@ class MathpixMarkdown_Model {
 
   texReset = MathJax.Reset;
   getLastEquationNumber = MathJax.GetLastEquationNumber;
+  validateTex = MathJax.ValidateTex;
 
   getMaxWidthStyle = getMaxWidthStyle;
   

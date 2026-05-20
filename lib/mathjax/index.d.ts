@@ -1,5 +1,16 @@
 import { TAccessibility } from "../mathpix-markdown-model";
 import { Label } from 'mathjax-full/js/input/tex/Tags.js';
+export declare class TexValidationError extends Error {
+    readonly code?: string;
+    readonly latex: string;
+    constructor(message: string, latex: string, code?: string);
+}
+export type TexValidationResult = {
+    valid: true;
+} | {
+    valid: false;
+    error: TexValidationError;
+};
 export interface IOuterData {
     mathml?: string;
     mathml_word?: string;
@@ -33,6 +44,9 @@ export declare const MathJax: {
     checkAccessibility: (accessibility?: TAccessibility, nonumbers?: boolean) => void;
     Stylesheet: () => unknown;
     TexConvert: (string: any, options?: any, throwError?: boolean) => IOuterData;
+    ValidateTex: (latex: string, options?: {
+        display?: boolean;
+    }) => TexValidationResult;
     TexConvertToAscii: (string: any, options?: any) => string;
     /**
      * Typeset a TeX expression and return the SVG tree for it
