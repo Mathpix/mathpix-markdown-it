@@ -717,6 +717,53 @@ const html = MathpixMarkdownModel.markdownToHTML('$x^2$', options);
 When using `'mathml'` or `'latex'`, the server outputs minimal HTML containing only the raw format. Use the browser rendering script (`auto-render.js`) to transform this into the full structure with SVG and hidden formats.
 
 
+## Validating TeX formulas
+
+Use `MathpixMarkdownModel.validateTex(latex, options?)` to check whether a TeX expression parses without rendering it. Useful before `forLatex` export, when a broken formula would cause downstream LaTeX compilation to fail.
+
+### Example usage
+
+```js
+const { MathpixMarkdownModel } = require('mathpix-markdown-it');
+
+const result = MathpixMarkdownModel.validateTex('\\frac{1}{2');
+
+if (!result.valid) {
+  console.error(`[${result.error.code ?? 'unknown'}] ${result.error.message}`);
+  console.error(`Formula: ${result.error.latex}`);
+}
+```
+
+### Return value
+
+The result is a discriminated union:
+
+```ts
+type TexValidationResult =
+  | { valid: true }
+  | { valid: false; error: TexValidationError };
+```
+
+`TexValidationError extends Error` carries:
+
+- `code` — MathJax error code (e.g. `'MissingArgFor'`, `'BadMath'`) when the failure originates from a `TexError`
+- `latex` — the input formula that failed, useful for batch error reports
+- standard `message`, `name`, `stack` from `Error`
+
+### Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `display` | `boolean` | `true` | Treat formula as display (block) math. Set `false` for inline math; affects which constructs are valid (e.g. `\tag{}` requires display). |
+
+### Guarantees
+
+- **Never throws** on bad input — batch callers always get a return value.
+- **No side-effects** on the rendering pipeline. Equation counter, labels, and ids accumulated by `markdownToHTML` are unaffected.
+- **No SVG output** — runs only the TeX parser, no glyph measurement or DOM mutation.
+- **Stateless** — repeated identical inputs produce identical results, even with `\label{...}`.
+
+
 ## Browser Rendering Script (auto-render.js)
 
 For `output_format: 'mathml'` or `output_format: 'latex'`, use the browser bundle to render math on the client side.
