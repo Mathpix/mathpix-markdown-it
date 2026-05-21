@@ -68,7 +68,7 @@ export class MathJaxConfigure {
   public mTex;
   public tex;
   public texTSV;
-  public validateTex: TeX<any, any, any>;
+  private _validateTex: TeX<any, any, any> | null = null;
   public mathjax;
   public adaptor;
   public domNode;
@@ -116,13 +116,21 @@ export class MathJaxConfigure {
       this.tex = new TeX(texConfig);
       this.texTSV = new TeX(texTSVConfig);
     }
-    // Isolated MTeX for validateTex.
-    // @ts-ignore
-    this.validateTex = new MTeX(Object.assign({}, texConfig, {tags: "none"}));
+  }
+
+  // Lazy: only allocated on first validateTex() call.
+  public get validateTex(): TeX<any, any, any> {
+    if (!this._validateTex) {
+      // @ts-ignore
+      this._validateTex = new MTeX(Object.assign({}, texConfig, {tags: "none"}));
+      this._validateTex.setMmlFactory(this.mTex.mmlFactory);
+    }
+    return this._validateTex;
   }
   
   setHandler = (acssistiveMml = false, nonumbers = false) => {
     this.initTex(nonumbers)
+    this._validateTex = null; // re-lazy: pick up the new mTex.mmlFactory next access
     this.handler = RegisterHTMLHandler(this.adaptor);
     if (acssistiveMml) {
       AssistiveMmlHandler(this.handler);
@@ -148,8 +156,6 @@ export class MathJaxConfigure {
       InputJax: asciimath,
       OutputJax: svg
     });
-    // Wire the same MmlFactory into the isolated validateTex (NodeFactory needs it).
-    this.validateTex.setMmlFactory(this.mTex.mmlFactory);
   };
   
   changeHandler = (acssistiveMml = false, nonumbers = false) => {

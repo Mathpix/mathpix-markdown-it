@@ -56,7 +56,7 @@ Semantics:
 - Returns `{ valid: true }` if MathJax's `TexParser` completes without throwing.
 - Returns `{ valid: false; error }` on `TexError`; non-`TexError` exceptions (rare; would indicate MathJax internal bug) are also wrapped, with `code` unset.
 - Never throws. Batch callers processing thousands of formulas always get a return value.
-- Stateless: each call resets the validator's internal `tags` state. Repeated identical inputs always produce the same result.
+- Stateless on per-equation tag state (counter, labels, ids reset on each call via `startEquation`). Package-level state held in `parseOptions.packageData` (e.g. `color`'s `ColorModel`, `textmacros`) is **shared across calls** — same contract as MathJax's render path, where `packageData` persists across equations within a single parse. Two consecutive identical inputs produce the same result.
 
 ---
 
@@ -89,7 +89,7 @@ No removals, no signature changes to existing methods.
 
 The render path's input jax (`MJ.mTex`) cannot be repurposed for validation without **side-effects on shared `parseOptions.tags` state**: a valid formula's `finishEquation` commits `allCounter`, `allLabels`, `allIds` (`Tags.js:203-215`). Snapshot/restore is fragile (couples to internal field names) and was tried first.
 
-The clean design uses MathJax's own isolation mechanism — a separate `MTeX` instance with its own `parseOptions`, configured with `tags: 'none'` (same `NoTags` class already used by the `nonumbers` mode). The `MmlFactory` is shared with `mTex` because `MmlFactory` is stateless and wiring a fresh one normally requires constructing a full `MathDocument` (unnecessary overhead). See `mathjax.ts` (`initTex`, `setHandler`).
+The clean design uses MathJax's own isolation mechanism — a separate `MTeX` instance with its own `parseOptions`, configured with `tags: 'none'` (same `NoTags` class already used by the `nonumbers` mode). The instance is allocated lazily via a `validateTex` getter on first use (so consumers who don't call the API pay zero), and invalidated when `setHandler` re-runs (accessibility/nonumbers toggle) so it picks up the fresh `mTex.mmlFactory` on next access. The `MmlFactory` is shared with `mTex` because `MmlFactory` is stateless and wiring a fresh one normally requires constructing a full `MathDocument` (unnecessary overhead). See `mathjax.ts` (`validateTex` getter, `setHandler`).
 
 ### Why bypass `MathItem.compile()` and call `TexParser` directly
 
@@ -97,7 +97,7 @@ The clean design uses MathJax's own isolation mechanism — a separate `MTeX` in
 
 The validation function in `mathjax/index.ts`:
 1. `parseOptions.clear()` — resets per-call state.
-2. `tags.reset(0)` — clears accumulated labels from prior validation calls (the isolated instance is reused; without reset, repeated `\label{eq}` would raise "duplicate label" on the second call).
+2. `tags.reset(0)` — defensive zero-out of `allLabels`/`allIds`/`allCounter`. In the current flow these are only ever written by `finishEquation` (which we never call), so this is a no-op today; kept as a guard against future MathJax changes. The actual protection against repeated `\label{eq}` raising "duplicate label" comes from `startEquation` resetting per-equation `this.labels = {}`.
 3. `tags.startEquation(stub)` — initializes `currentTag` for environment macros. The stub `{ inputData: {} } as any` is sufficient because `startEquation` reads only `math.inputData.recompile` (`Tags.js:197-201`).
 4. `new TexParser(latex, env, parseOptions); parser.mml()` — the actual parse.
 5. Catch `TexError` → return `{ valid: false; error }`. Catch other errors → also return wrapped (never propagate).
@@ -119,11 +119,11 @@ The constructor restores the prototype chain explicitly — required because the
 
 ## Edge Cases
 
-- **Repeated identical formulas**: stateless. Two identical inputs always produce the same result. No "duplicate label" leakage between calls.
+- **Repeated identical formulas**: two identical inputs produce the same result. Per-equation tag state (labels, ids, counter) resets on each call; package-level state in `parseOptions.packageData` (e.g. color definitions) persists across calls — same contract as MathJax's render path within one parse.
 - **Empty or whitespace-only input**: parser treats as empty math; returns `{ valid: true }`. Caller decides whether empty is meaningful.
 - **Formula with `\label{foo}`**: validates as `{ valid: true }`. The label is **not** written to the rendering pipeline's `getLabelsList()`.
 - **Formula with `\begin{equation}` auto-numbered**: validates as `{ valid: true }`. `getLastEquationNumber()` is unaffected.
-- **Display vs inline**: `display: true` (default) for block math, `display: false` for inline. Affects which constructs are valid (e.g. `\tag{}` requires display).
+- **Display vs inline**: `display: true` (default) for block math, `display: false` for inline. Forwarded to MathJax's `TexParser` environment. In the current MathJax configuration with `tags: 'none'` this rarely affects the verdict (display-only constructs like `\tag{}` are still accepted in inline mode); the option is kept for parity with the render API and for forward-compatibility with future MathJax versions that may use the flag for syntactic discrimination.
 - **Non-TexError thrown inside MathJax**: wrapped into `TexValidationError` with no `code`. Caller can detect via absence of `code`.
 - **Concurrent calls**: JavaScript is single-threaded; the isolated instance is reused serially. Each call resets state before parsing.
 
@@ -131,14 +131,14 @@ The constructor restores the prototype chain explicitly — required because the
 
 ## Done When
 
-- [x] `src/mathjax/mathjax.ts` declares typed `public validateTex: TeX<any, any, any>` and instantiates `MTeX` with `tags: 'none'` in `initTex`
-- [x] `setHandler` wires `mmlFactory` from `mTex` into `validateTex`
+- [x] `src/mathjax/mathjax.ts` exposes `validateTex` as a lazy getter (typed `TeX<any, any, any>`) that allocates `MTeX` with `tags: 'none'` on first use and wires `mmlFactory` from `mTex` at that point
+- [x] `setHandler` resets the lazy slot so re-init picks up the fresh `mTex.mmlFactory` on next access
 - [x] `src/mathjax/index.ts` exports `TexValidationError` class and `TexValidationResult` type
 - [x] `MathJax.ValidateTex` calls `TexParser` directly, bypassing `MathItem`/`MathDocument`
 - [x] `TexValidationError` constructor restores prototype chain (ES5 target compatibility)
 - [x] `MathpixMarkdownModel.validateTex` exposes the API as a method on the public singleton
 - [x] Unit tests in `tests/_validateTex.js` cover return value, no-side-effect on counter, no-side-effect on labels, statelessness, isolation from render pipeline
-- [x] All existing tests pass; full suite reports `3491 passing` (3478 existing + 13 new)
+- [x] All existing tests pass; full suite reports `3489 passing` (3465 existing + 24 new)
 
 ---
 
@@ -158,7 +158,7 @@ The constructor restores the prototype chain explicitly — required because the
 npm test
 ```
 
-Full suite must report `3491 passing`.
+Full suite must report `3489 passing`.
 
 ---
 
@@ -169,7 +169,7 @@ Full suite must report `3491 passing`.
 - Purely additive. Existing render paths are not modified.
 - Validation runs against an isolated MathJax instance; no shared mutable state with the render pipeline.
 - Opt-in: nothing calls `validateTex` automatically. Consumers who don't use it experience zero behavior change.
-- One-time memory cost: extra `MTeX` instance (~100-500 KB). No per-call allocations beyond the MML tree, immediately GC'd.
+- Lazy initialization: the isolated `MTeX` instance is allocated on the first `validateTex` call. Consumers who never call `validateTex` pay zero memory cost. First-call cost is ~100-300 KB; subsequent calls reuse the same instance and allocate only a transient MML tree which is GC'd immediately.
 
 **Risk areas to watch**:
 

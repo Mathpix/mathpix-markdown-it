@@ -6,7 +6,7 @@
 - `TexValidationError extends Error` exposes `code` (MathJax `TexError.id`, e.g. `'MissingArgFor'`, `'BadMath'`) and `latex` (the input formula that failed) alongside standard `message`/`name`/`stack`. `instanceof TexValidationError` works under the ES5 target (prototype chain explicitly restored in the constructor).
 - Implementation uses a dedicated isolated `MTeX` instance (`tags: 'none'`) and invokes `TexParser` directly, bypassing `MathItem`/`MathDocument`, output jax, and the six post-filter tree walks. Guarantees zero side-effects on the rendering pipeline: `getLastEquationNumber()`, `getLabelsList()`, and rendered HTML are byte-identical whether or not `validateTex` is called between renders.
 - Never throws on bad input — batch callers processing thousands of formulas always get a return value. Stateless across calls: two consecutive calls with the same `\label{...}` both succeed (no duplicate-label leakage).
-- Opt-in: nothing in the existing render pipeline calls `validateTex` automatically. Consumers who don't use the API experience zero behavior change. One-time memory cost is ~100-300 KB for the extra `MTeX` instance (shares `MmlFactory` with the rendering input jax).
+- Opt-in: nothing in the existing render pipeline calls `validateTex` automatically. The isolated `MTeX` instance is lazily allocated on first call (~100-300 KB, shares `MmlFactory` with the rendering input jax); consumers who never call `validateTex` pay zero memory cost.
 
 See `pr-specs/2026-05-validate-tex-api.md` for design rationale and invariants.
 

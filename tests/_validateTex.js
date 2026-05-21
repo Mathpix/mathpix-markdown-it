@@ -1,8 +1,7 @@
 let chai = require('chai');
 let should = chai.should();
 
-let MM = require('../lib/mathpix-markdown-model/index').MathpixMarkdownModel;
-const { TexValidationError } = require('../lib/mathjax/index');
+const { MathpixMarkdownModel: MM, TexValidationError } = require('../lib/index');
 
 const options = {
   cwidth: 800
@@ -39,17 +38,82 @@ describe('validateTex: return value', () => {
     result.error.latex.should.equal('\\frac{1}{2');
     done();
   });
-  it('returns valid:false with error code for an unknown control sequence', (done) => {
+  it('returns code "UndefinedControlSequence" for an unknown macro', (done) => {
     const result = MM.validateTex('\\nosuchmacro{x}');
     result.valid.should.be.false;
     result.error.should.be.an.instanceof(TexValidationError);
-    should.exist(result.error.code);
+    result.error.code.should.equal('UndefinedControlSequence');
+    result.error.message.should.match(/undefined control sequence/i);
+    done();
+  });
+  it('returns code "MissingArgFor" for a macro with too few arguments', (done) => {
+    const result = MM.validateTex('\\frac{1}');
+    result.valid.should.be.false;
+    result.error.should.be.an.instanceof(TexValidationError);
+    result.error.code.should.equal('MissingArgFor');
+    result.error.message.should.match(/missing argument/i);
     done();
   });
   it('returns valid:false for an unclosed environment', (done) => {
     const result = MM.validateTex('\\begin{equation} x = 1');
     result.valid.should.be.false;
     result.error.should.be.an.instanceof(TexValidationError);
+    done();
+  });
+  it('accepts an empty string', (done) => {
+    MM.validateTex('').valid.should.be.true;
+    done();
+  });
+  it('accepts a whitespace-only string', (done) => {
+    MM.validateTex('   ').valid.should.be.true;
+    done();
+  });
+});
+
+describe('validateTex: package-driven constructs are accepted (render-parity)', () => {
+  beforeEach(() => MM.texReset());
+  it('accepts \\color{red}{x}', (done) => {
+    MM.validateTex('\\color{red}{x}').valid.should.be.true;
+    done();
+  });
+  it('accepts \\textcolor{red}{x}', (done) => {
+    MM.validateTex('\\textcolor{red}{x}').valid.should.be.true;
+    done();
+  });
+  it('accepts \\definecolor + \\color in one formula', (done) => {
+    MM.validateTex('\\definecolor{c1}{rgb}{0.1,0.2,0.3} \\color{c1}{x}').valid.should.be.true;
+    done();
+  });
+  it('accepts \\ce{H2O} (mhchem)', (done) => {
+    MM.validateTex('\\ce{H2O}').valid.should.be.true;
+    done();
+  });
+  it('accepts \\boldsymbol{x} and \\cancel{x}', (done) => {
+    MM.validateTex('\\boldsymbol{x}').valid.should.be.true;
+    MM.validateTex('\\cancel{x}').valid.should.be.true;
+    done();
+  });
+});
+
+describe('validateTex: verdict parity with render path', () => {
+  beforeEach(() => MM.texReset());
+  // Render signals failure by emitting an empty math span (no <svg>).
+  it('both validateTex and markdownToHTML flag an unmatched brace', (done) => {
+    const latex = '\\frac{1}{2';
+    MM.validateTex(latex).valid.should.be.false;
+    MM.markdownToHTML('$' + latex + '$', options).should.not.match(/<svg/);
+    done();
+  });
+  it('both validateTex and markdownToHTML flag an unknown control sequence', (done) => {
+    const latex = '\\nosuchmacro{x}';
+    MM.validateTex(latex).valid.should.be.false;
+    MM.markdownToHTML('$' + latex + '$', options).should.not.match(/<svg/);
+    done();
+  });
+  it('both accept a valid formula', (done) => {
+    const latex = '\\frac{a}{b}';
+    MM.validateTex(latex).valid.should.be.true;
+    MM.markdownToHTML('$' + latex + '$', options).should.match(/<svg/);
     done();
   });
 });

@@ -49,8 +49,11 @@ import { resetMmdGlobalState } from "./markdown/common/reset-mmd-state";
 
 import { normalizeLink } from './helpers/normalize-link';
 
+import { TexValidationError, TexValidationResult } from './mathjax';
+
 export {
   MathpixLoader, MathpixMarkdown, MathpixMarkdownModel,
+  TexValidationError, TexValidationResult,
   mathpixMarkdownPlugin, mdPluginCollapsible,
   mdLatexFootnotes,
   mdSetPositionsAndHighlight,

@@ -724,12 +724,13 @@ Use `MathpixMarkdownModel.validateTex(latex, options?)` to check whether a TeX e
 ### Example usage
 
 ```js
-const { MathpixMarkdownModel } = require('mathpix-markdown-it');
+const { MathpixMarkdownModel, TexValidationError } = require('mathpix-markdown-it');
 
 const result = MathpixMarkdownModel.validateTex('\\frac{1}{2');
 
 if (!result.valid) {
-  console.error(`[${result.error.code ?? 'unknown'}] ${result.error.message}`);
+  // result.error instanceof TexValidationError === true
+  console.error(`[${result.error.code || 'unknown'}] ${result.error.message}`);
   console.error(`Formula: ${result.error.latex}`);
 }
 ```
@@ -746,7 +747,7 @@ type TexValidationResult =
 
 `TexValidationError extends Error` carries:
 
-- `code` — MathJax error code (e.g. `'MissingArgFor'`, `'BadMath'`) when the failure originates from a `TexError`
+- `code` — MathJax error code (e.g. `'MissingArgFor'`, `'BadMath'`) when the failure originates from a `TexError`; `undefined` for unexpected non-`TexError` exceptions
 - `latex` — the input formula that failed, useful for batch error reports
 - standard `message`, `name`, `stack` from `Error`
 
@@ -754,7 +755,7 @@ type TexValidationResult =
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `display` | `boolean` | `true` | Treat formula as display (block) math. Set `false` for inline math; affects which constructs are valid (e.g. `\tag{}` requires display). |
+| `display` | `boolean` | `true` | Whether to parse the formula as display (block) or inline math. Forwarded to MathJax's `TexParser` environment. In the current MathJax configuration this rarely affects the verdict; the option is kept for parity with the render API and for future-proofing. |
 
 ### Guarantees
 
@@ -762,6 +763,11 @@ type TexValidationResult =
 - **No side-effects** on the rendering pipeline. Equation counter, labels, and ids accumulated by `markdownToHTML` are unaffected.
 - **No SVG output** — runs only the TeX parser, no glyph measurement or DOM mutation.
 - **Stateless** — repeated identical inputs produce identical results, even with `\label{...}`.
+- **Empty input** — an empty or whitespace-only string is treated as valid. Filter at the call site if your consumer requires non-empty math.
+
+### Notes for batch validation
+
+When validating mixed inline/display math from a source document, pass `display` according to the original context (`$...$` vs `$$...$$` / `\(...\)` vs `\[...\]`). The default `display: true` matches `MathpixMarkdownModel.markdownToHTML` for block math, but inline expressions should be validated with `display: false` to keep results consistent with the render path.
 
 
 ## Browser Rendering Script (auto-render.js)

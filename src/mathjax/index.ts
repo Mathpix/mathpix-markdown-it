@@ -492,18 +492,22 @@ export const MathJax = {
     const validateInputJax = MJ.validateTex;
     const parseOptions = validateInputJax.parseOptions;
     parseOptions.clear();
-    parseOptions.tags.reset(0);
+    parseOptions.tags.reset(0); // defensive; see pr-specs/2026-05-validate-tex-api.md §Architecture step 2
     parseOptions.tags.startEquation({ inputData: {} } as any);
     try {
       const parser = new TexParser(latex, { display, isInner: false }, parseOptions);
       parser.mml();
       return { valid: true };
     } catch (err) {
-      if (err instanceof TexError) {
-        return { valid: false, error: new TexValidationError('TeX error: ' + err.message, latex, err.id) };
+      // TexError is not an Error subclass — duck-type .message.
+      const rawMessage = typeof (err as any)?.message === 'string'
+        ? (err as any).message as string
+        : String(err);
+      const code = typeof (err as any)?.id === 'string' ? (err as any).id as string : undefined;
+      if (err instanceof TexError || code) {
+        return { valid: false, error: new TexValidationError('TeX error: ' + rawMessage, latex, code) };
       }
-      const message = err instanceof Error ? err.message : String(err);
-      return { valid: false, error: new TexValidationError(message, latex) };
+      return { valid: false, error: new TexValidationError(rawMessage, latex) };
     }
   },
   TexConvertToAscii: function(string, options: any={}) {
@@ -600,9 +604,7 @@ export const MathJax = {
       : OuterHTML(outerDataAscii, options.outMath);
   },
 
-  //
-  //  Reset tags and labels
-  //
+  // Resets render-path tags only. The isolated validateTex jax owns its state and resets per call.
   Reset: function (n = 0) {
     if (n) {n--} else {n = 0}
     MJ.mTex.parseOptions.tags.reset(n);

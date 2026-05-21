@@ -14,7 +14,7 @@ export declare class MathJaxConfigure {
     mTex: any;
     tex: any;
     texTSV: any;
-    validateTex: TeX<any, any, any>;
+    private _validateTex;
     mathjax: any;
     adaptor: any;
     domNode: any;
@@ -27,6 +27,7 @@ export declare class MathJaxConfigure {
     constructor();
     chooseAdaptor: () => void;
     initTex: (nonumbers?: boolean) => void;
+    get validateTex(): TeX<any, any, any>;
     setHandler: (acssistiveMml?: boolean, nonumbers?: boolean) => void;
     changeHandler: (acssistiveMml?: boolean, nonumbers?: boolean) => void;
 }
