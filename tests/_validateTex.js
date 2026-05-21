@@ -34,7 +34,7 @@ describe('validateTex: return value', () => {
     const result = MM.validateTex('\\frac{1}{2');
     result.valid.should.be.false;
     result.error.should.be.an.instanceof(TexValidationError);
-    result.error.message.should.match(/TeX error/i);
+    result.error.message.should.match(/missing|brace/i);
     result.error.latex.should.equal('\\frac{1}{2');
     done();
   });
@@ -52,6 +52,20 @@ describe('validateTex: return value', () => {
     result.error.should.be.an.instanceof(TexValidationError);
     result.error.code.should.equal('MissingArgFor');
     result.error.message.should.match(/missing argument/i);
+    done();
+  });
+  it('returns code "UnknownEnv" for an unknown environment', (done) => {
+    const result = MM.validateTex('\\begin{nosuchenv} x \\end{nosuchenv}');
+    result.valid.should.be.false;
+    result.error.should.be.an.instanceof(TexValidationError);
+    result.error.code.should.equal('UnknownEnv');
+    done();
+  });
+  it('returns code "ExtraLeftMissingRight" for an unclosed \\left', (done) => {
+    const result = MM.validateTex('\\left( x');
+    result.valid.should.be.false;
+    result.error.should.be.an.instanceof(TexValidationError);
+    result.error.code.should.equal('ExtraLeftMissingRight');
     done();
   });
   it('returns valid:false for an unclosed environment', (done) => {
@@ -97,7 +111,7 @@ describe('validateTex: package-driven constructs are accepted (render-parity)', 
 
 describe('validateTex: verdict parity with render path', () => {
   beforeEach(() => MM.texReset());
-  // Render signals failure by emitting an empty math span (no <svg>).
+  // MTeX.formatError throws (mathjax.ts), so failure produces empty span — no merror; <svg> presence is the signal.
   it('both validateTex and markdownToHTML flag an unmatched brace', (done) => {
     const latex = '\\frac{1}{2';
     MM.validateTex(latex).valid.should.be.false;
@@ -115,6 +129,71 @@ describe('validateTex: verdict parity with render path', () => {
     MM.validateTex(latex).valid.should.be.true;
     MM.markdownToHTML('$' + latex + '$', options).should.match(/<svg/);
     done();
+  });
+});
+
+describe('validateTex: cold-start and contract smoke:', () => {
+  it('does not throw on a trivial valid formula immediately after texReset', () => {
+    MM.texReset();
+    MM.validateTex('x').valid.should.equal(true);
+  });
+  it('error.code on a real failure is one of the documented values', () => {
+    const r = MM.validateTex('\\nosuchmacro');
+    r.valid.should.equal(false);
+    ['UndefinedControlSequence', 'MissingArgFor', 'InternalError'].should.include(r.error.code);
+  });
+  it('non-TexError exception is wrapped with code "InternalError"', () => {
+    const TexParserMod = require('mathjax-full/js/input/tex/TexParser.js');
+    const TexParser = TexParserMod.default || TexParserMod;
+    const orig = TexParser.prototype.mml;
+    TexParser.prototype.mml = function () { throw new Error('mock non-TexError'); };
+    try {
+      const r = MM.validateTex('x');
+      r.valid.should.equal(false);
+      r.error.code.should.equal('InternalError');
+      r.error.message.should.equal('mock non-TexError');
+    } finally {
+      TexParser.prototype.mml = orig;
+    }
+  });
+});
+
+describe('validateTex: package state persistence and render-pipeline isolation:', () => {
+  beforeEach(() => MM.texReset());
+  // Macro names use a `zzz` prefix to avoid collision; LaTeX command names accept only letters.
+  it('\\newcommand registered in one validateTex call is visible to the next', () => {
+    MM.validateTex('\\newcommand{\\zzzPersistA}{42} \\zzzPersistA').valid.should.equal(true);
+    MM.validateTex('\\zzzPersistA').valid.should.equal(true);
+    MM.validateTex('\\zzzNeverDefined').valid.should.equal(false);
+  });
+  it('validateTex does not see macros registered by markdownToHTML', () => {
+    MM.markdownToHTML('$\\newcommand{\\zzzRenderOnly}{Y} \\zzzRenderOnly$', options);
+    MM.validateTex('\\zzzRenderOnly').valid.should.equal(false);
+  });
+  it('markdownToHTML does not see macros registered by validateTex', () => {
+    MM.validateTex('\\newcommand{\\zzzValidateOnly}{X}');
+    MM.markdownToHTML('$\\zzzValidateOnly$', options).should.not.match(/<svg/);
+  });
+});
+
+describe('validateTex: parity on edge MML shapes (post-filter coverage)', () => {
+  beforeEach(() => MM.texReset());
+  // Exercises post-filters; verifies validateTex stays aligned with render path.
+  const edgeCases = [
+    'x_i^j + \\sum_{i=0}^n a_i',
+    '\\left( \\frac{a}{b} \\right)',
+    '\\overline{\\overline{x}}',
+    'a \\stackrel{!}{=} b',
+    '\\binom{n}{k}',
+    '\\sqrt[3]{x}',
+    '\\int_0^\\infty e^{-x} dx',
+    '\\begin{matrix} a & b \\\\ c & d \\end{matrix}',
+  ];
+  edgeCases.forEach((latex) => {
+    it(`valid: ${latex}`, () => {
+      MM.validateTex(latex).valid.should.equal(true);
+      MM.markdownToHTML('$' + latex + '$', options).should.match(/<svg/);
+    });
   });
 });
 

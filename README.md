@@ -747,7 +747,7 @@ type TexValidationResult =
 
 `TexValidationError extends Error` carries:
 
-- `code` — MathJax error code (e.g. `'MissingArgFor'`, `'BadMath'`) when the failure originates from a `TexError`; `undefined` for unexpected non-`TexError` exceptions
+- `code` — MathJax error code (e.g. `'UndefinedControlSequence'`, `'MissingArgFor'`, `'UnknownEnv'`) when the failure originates from a `TexError`; `'InternalError'` when MathJax itself threw a non-`TexError` (signals "parser crashed", not "invalid formula")
 - `latex` — the input formula that failed, useful for batch error reports
 - standard `message`, `name`, `stack` from `Error`
 
@@ -762,12 +762,18 @@ type TexValidationResult =
 - **Never throws** on bad input — batch callers always get a return value.
 - **No side-effects** on the rendering pipeline. Equation counter, labels, and ids accumulated by `markdownToHTML` are unaffected.
 - **No SVG output** — runs only the TeX parser, no glyph measurement or DOM mutation.
-- **Stateless** — repeated identical inputs produce identical results, even with `\label{...}`.
+- **Stateless on per-equation tag state** — repeated identical inputs produce identical results, even with `\label{...}`. Equation counter, labels, ids reset on every call.
+- **Isolated from the render pipeline** — validateTex owns a separate `MTeX` instance with its own `parseOptions`. It does NOT share `packageData` (e.g. custom `\newcommand`s registered via `textmacros`) with `markdownToHTML`. A macro defined during rendering is not visible to subsequent `validateTex` calls, and vice versa.
+- **Package state persists across validateTex calls** — within the validator's own instance, `parseOptions.packageData` is not cleared between calls. A `\newcommand` registered by one `validateTex` call is visible to the next.
 - **Empty input** — an empty or whitespace-only string is treated as valid. Filter at the call site if your consumer requires non-empty math.
 
 ### Notes for batch validation
 
 When validating mixed inline/display math from a source document, pass `display` according to the original context (`$...$` vs `$$...$$` / `\(...\)` vs `\[...\]`). The default `display: true` matches `MathpixMarkdownModel.markdownToHTML` for block math, but inline expressions should be validated with `display: false` to keep results consistent with the render path.
+
+```js
+MathpixMarkdownModel.validateTex(formula, { display: srcIsInline ? false : true });
+```
 
 
 ## Browser Rendering Script (auto-render.js)

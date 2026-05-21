@@ -30,7 +30,7 @@ All three round-trip to `\begin{figure}[h]`. Documents authored with `[t]` or `[
 
 - Changing how HTML rendering uses (or ignores) the specifier — it has no visual effect on the HTML pipeline today and that stays.
 - Changing the existing `token.latex` value. Keeping `\begin{<type>}[h]` for both figure and table preserves the current contract; the truth about the source moves to a side channel (`meta.placement`).
-- Extending the regex to cover `[t!]`/`[b!]`/`[p!]` (post-bang variants). These are valid LaTeX but the existing regex does not match them; they fall back to the no-bracket regex and `meta.placement` becomes `undefined`. Out of scope here.
+- Extending the regex to cover multi-char placement combinations such as `[htbp]` or `[!htbp]`. These are valid LaTeX (a hint list ordered by preference) but the existing regex matches a single specifier only; multi-char sources fall back to the no-bracket regex and `meta.placement` is absent. Out of scope here.
 - New rendering / styling driven by the specifier.
 
 ---
@@ -70,7 +70,8 @@ token.meta = {
 - **No-op on HTML output.** The HTML pipeline does not look at `token.latex` or `token.meta.placement`. Rendering is byte-identical.
 - **No-op on existing `token.latex` shape.** All existing forLatex consumers reading `token.latex` continue to see `\begin{<type>}[h]`. The new contract is purely additive on `meta`.
 - **No new options.** This PR does not introduce a `defaultFigurePlacement` option (unlike the tabular-bracket PR, where the `defaultCellVerticalAlign` option had a real HTML side-effect). For figure/table the placement has no rendering impact, so an option would carry no observable effect; consumers can decide injection policy themselves from `meta.placement`.
-- **Defensive `meta` initialization.** `paragraph_open` may already carry a non-null `meta` in other code paths. Use a merge (`{ ...token.meta, type, placement }`) rather than assignment to avoid clobbering future use.
+- **Defensive `meta` initialization.** `paragraph_open` may already carry a non-null `meta` in other code paths. Use a merge (`{ ...(token.meta ?? {}), type }` + conditional `placement`) rather than assignment to avoid clobbering future use.
+- **Sparse `meta.placement`.** The `placement` key is set only when the source actually carried a bracket. Sources without a bracket produce `meta` with `type` only — `'placement' in meta === false`. Consumers iterating via `Object.entries(meta)` see a clean shape.
 - **Existing regex unchanged.** `RE_BEGIN_TABLE_OR_FIGURE_WITH_PLACEMENT` already captures the standard set (`h`/`!h`/`h!`/`H`/`!H`/`H!`/`t`/`!t`/`b`/`!b`/`p`/`!p`). Reuse `match[2]` as-is.
 - **Both code paths covered.** `InlineBlockBeginTable` (`begin-table.ts:161`) and the multi-line `BeginTable` (`begin-table.ts:~270`) construct the `paragraph_open` independently. Both must thread `match[2]` through to `StatePushPatagraphOpenTable`.
 
@@ -81,7 +82,10 @@ token.meta = {
 | Symbol | Where | Effect |
 |--------|-------|--------|
 | `token.meta.type` | forLatex `paragraph_open` for figure/table | New field. `'figure'` or `'table'`. |
-| `token.meta.placement` | forLatex `paragraph_open` for figure/table | New field. The captured specifier or `undefined`. |
+| `token.meta.placement` | forLatex `paragraph_open` for figure/table | New field. The captured specifier (literal union, see below), or absent from `meta` entirely when the source had no bracket. |
+| `FigureTablePlacement` | `src/index.tsx` re-export | Literal union of the 15 captured specifiers: `'h' \| 'H' \| 't' \| 'b' \| 'p' \| '!h' \| 'h!' \| '!H' \| 'H!' \| '!t' \| 't!' \| '!b' \| 'b!' \| '!p' \| 'p!'`. |
+| `FigureTableType` | `src/index.tsx` re-export | Literal union `'figure' \| 'table'`. |
+| `FigureTableOpenMeta` | `src/index.tsx` re-export | Shape of `meta` on figure/table `paragraph_open` tokens: `{ type: 'figure' \| 'table'; placement?: FigureTablePlacement }`. |
 
 No removals, no signature changes to existing public functions. No new options.
 
@@ -104,7 +108,9 @@ let latex = match[1] === 'figure' || match[1] === 'table'
 
 `StatePushPatagraphOpenTable` (`begin-table.ts:71`) gains an optional `placement?: string` parameter. Inside, when `state.md.options.forLatex` is set (the same gate already used for `token.latex`), the function attaches:
 ```ts
-token.meta = Object.assign({}, token.meta, { type, placement });
+const meta: FigureTableOpenMeta = { ...(token.meta ?? {}), type };
+if (placement) meta.placement = placement;
+token.meta = meta;
 ```
 
 Both call sites (`begin-table.ts:233` and `begin-table.ts:464`) pass `match[2]` as the new argument.
@@ -131,7 +137,7 @@ Both call sites (`begin-table.ts:233` and `begin-table.ts:464`) pass `match[2]` 
 ## Done When
 
 - [x] `begin-table.ts:230` and `begin-table.ts:461` extract `match[2]` (may be `undefined`) and pass it to `StatePushPatagraphOpenTable`.
-- [x] `StatePushPatagraphOpenTable` accepts `placement?: string` and merges `{ type, placement }` into `token.meta` when `forLatex` is set.
+- [x] `StatePushPatagraphOpenTable` accepts `placement?: FigureTablePlacement` and merges `{ type }` (plus `placement` when defined) into `token.meta` when `forLatex` is set.
 - [x] `token.latex` remains `\\begin{<type>}[h]` for both `figure` and `table` (existing snapshots stay green).
 - [x] Unit tests cover: explicit `[t]`, explicit `[!h]`, explicit `[H]`, no-bracket source for both `figure` and `table`. Each asserts `token.meta.placement` and `token.meta.type` on the corresponding `paragraph_open`.
 - [x] Changelog entry added for v2.0.41.
@@ -140,20 +146,19 @@ Both call sites (`begin-table.ts:233` and `begin-table.ts:464`) pass `match[2]` 
 
 ## Testing
 
-### Unit tests (extend `tests/_figures*` or new file)
+### Unit tests (`tests/_figure-placement.js`)
 
-Cases:
-- `\\begin{figure}[t] ... \\end{figure}` → `meta.placement === 't'`, `meta.type === 'figure'`, `latex === '\\begin{figure}[h]'`.
-- `\\begin{figure}[!h] ... \\end{figure}` → `meta.placement === '!h'`.
-- `\\begin{figure}[H] ... \\end{figure}` → `meta.placement === 'H'`.
-- `\\begin{figure} ... \\end{figure}` (no bracket) → `meta.placement === undefined`, `meta.type === 'figure'`.
-- `\\begin{table}[b] ... \\end{table}` → `meta.placement === 'b'`, `meta.type === 'table'`.
-- Whitespace variant: `\\begin{figure}  [t] ... \\end{figure}` → `meta.placement === 't'`.
+- Mixed-case sanity: `\\begin{figure}[t]`, `\\begin{figure}[!h]`, `\\begin{figure}[H]`, `\\begin{table}[b]`, no-bracket for both `figure` and `table`.
+- Whitespace variant: `\\begin{figure}  [t]` still captures `'t'`.
+- Back-compat: `token.latex === '\\begin{<type>}[h]'` regardless of source.
+- Absent key: `'placement' in meta === false` when source had no bracket.
+- **Full specifier coverage**: parameterized test over all 12 captured values (`h`, `H`, `t`, `b`, `p`, `!h`, `h!`, `!H`, `H!`, `!t`, `!b`, `!p`) — guards against accidental regex narrowing.
+- **Invalid bracket contents**: `[x]`, `[]`, `[tt]`, `[ht]`, `[ ]` — none populate `meta.placement`; only `meta.type` is set.
 - Without `forLatex`: `meta` may stay `null` (no expectation either way — these consumers don't use the meta).
 
 ### Regression suite
 
-`npm test` continues to pass at the post-validateTex count, with the new meta-checking tests added on top.
+Figure-placement adds 29 new tests (8 mixed-case + 15 specifier-coverage + 5 invalid-bracket + 1 placement-key-absence). Full suite after this PR reports `3534 passing` (3465 existing + 40 validateTex + 29 figure-placement).
 
 ---
 

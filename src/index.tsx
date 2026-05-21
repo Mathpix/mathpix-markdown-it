@@ -49,11 +49,13 @@ import { resetMmdGlobalState } from "./markdown/common/reset-mmd-state";
 
 import { normalizeLink } from './helpers/normalize-link';
 
-import { TexValidationError, TexValidationResult } from './mathjax';
+import { TexValidationError } from './mathjax';
+import type { TexValidationResult } from './mathjax';
+import type { FigureTablePlacement, FigureTableOpenMeta, FigureTableType } from './markdown/md-block-rule/begin-table';
 
 export {
   MathpixLoader, MathpixMarkdown, MathpixMarkdownModel,
-  TexValidationError, TexValidationResult,
+  TexValidationError,
   mathpixMarkdownPlugin, mdPluginCollapsible,
   mdLatexFootnotes,
   mdSetPositionsAndHighlight,
@@ -73,4 +75,6 @@ export {
   normalizeLink,
   RenderOptions
 };
+
+export type { TexValidationResult, FigureTablePlacement, FigureTableOpenMeta, FigureTableType };
 

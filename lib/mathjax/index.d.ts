@@ -1,5 +1,12 @@
 import { TAccessibility } from "../mathpix-markdown-model";
 import { Label } from 'mathjax-full/js/input/tex/Tags.js';
+/**
+ * Error returned by `MathpixMarkdownModel.validateTex` when parsing fails.
+ * - `code`: MathJax `TexError.id` (e.g. `'UndefinedControlSequence'`, `'MissingArgFor'`) for parse errors,
+ *   or `'InternalError'` if MathJax itself threw a non-TexError (signals "parser crashed", not "invalid formula" —
+ *   the caller may want a different fallback strategy).
+ * - `latex`: the input formula that triggered the error.
+ */
 export declare class TexValidationError extends Error {
     readonly code?: string;
     readonly latex: string;
@@ -44,6 +51,15 @@ export declare const MathJax: {
     checkAccessibility: (accessibility?: TAccessibility, nonumbers?: boolean) => void;
     Stylesheet: () => unknown;
     TexConvert: (string: any, options?: any, throwError?: boolean) => IOuterData;
+    /**
+     * Validates a TeX expression using MathJax's parser without producing SVG output.
+     * Runs `TexParser` directly on an isolated `MTeX` instance — skips MathItem/MathDocument,
+     * post-filters, and the output jax. No side-effects on the rendering pipeline.
+     *
+     * @param latex - The TeX source to validate.
+     * @param options.display - `true` (default) for block math, `false` for inline.
+     * @returns `{ valid: true }` if parsing succeeds, `{ valid: false, error: TexValidationError }` otherwise. Never throws.
+     */
     ValidateTex: (latex: string, options?: {
         display?: boolean;
     }) => TexValidationResult;

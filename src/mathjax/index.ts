@@ -17,6 +17,13 @@ import { uid } from "../markdown/utils";
 
 const MJ = new MathJaxConfigure();
 
+/**
+ * Error returned by `MathpixMarkdownModel.validateTex` when parsing fails.
+ * - `code`: MathJax `TexError.id` (e.g. `'UndefinedControlSequence'`, `'MissingArgFor'`) for parse errors,
+ *   or `'InternalError'` if MathJax itself threw a non-TexError (signals "parser crashed", not "invalid formula" —
+ *   the caller may want a different fallback strategy).
+ * - `latex`: the input formula that triggered the error.
+ */
 export class TexValidationError extends Error {
   readonly code?: string;
   readonly latex: string;
@@ -486,28 +493,38 @@ export const MathJax = {
       return OuterDataError(MJ.adaptor, null, string, err, outMath);
     }
   },
-  // Runs TexParser directly on the isolated MTeX — skips post-filters, MathItem, MathDocument.
+  /**
+   * Validates a TeX expression using MathJax's parser without producing SVG output.
+   * Runs `TexParser` directly on an isolated `MTeX` instance — skips MathItem/MathDocument,
+   * post-filters, and the output jax. No side-effects on the rendering pipeline.
+   *
+   * @param latex - The TeX source to validate.
+   * @param options.display - `true` (default) for block math, `false` for inline.
+   * @returns `{ valid: true }` if parsing succeeds, `{ valid: false, error: TexValidationError }` otherwise. Never throws.
+   */
   ValidateTex: function(latex: string, options: { display?: boolean } = {}): TexValidationResult {
     const { display = true } = options;
     const validateInputJax = MJ.validateTex;
     const parseOptions = validateInputJax.parseOptions;
     parseOptions.clear();
-    parseOptions.tags.reset(0); // defensive; see pr-specs/2026-05-validate-tex-api.md §Architecture step 2
+    parseOptions.tags.reset(0); // defensive: guards against a future MathJax writing to all*Labels outside finishEquation
+    // Stub verified against mathjax-full 3.2.2 — startEquation reads only math.inputData.recompile.
     parseOptions.tags.startEquation({ inputData: {} } as any);
     try {
+      // isInner: false → top-level math context, matching the render path.
       const parser = new TexParser(latex, { display, isInner: false }, parseOptions);
       parser.mml();
       return { valid: true };
     } catch (err) {
-      // TexError is not an Error subclass — duck-type .message.
+      // TexError isn't an Error subclass; duck-type .message and .id.
       const rawMessage = typeof (err as any)?.message === 'string'
         ? (err as any).message as string
         : String(err);
       const code = typeof (err as any)?.id === 'string' ? (err as any).id as string : undefined;
       if (err instanceof TexError || code) {
-        return { valid: false, error: new TexValidationError('TeX error: ' + rawMessage, latex, code) };
+        return { valid: false, error: new TexValidationError(rawMessage, latex, code) };
       }
-      return { valid: false, error: new TexValidationError(rawMessage, latex) };
+      return { valid: false, error: new TexValidationError(rawMessage, latex, 'InternalError') };
     }
   },
   TexConvertToAscii: function(string, options: any={}) {

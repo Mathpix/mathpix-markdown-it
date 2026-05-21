@@ -50,13 +50,13 @@ type TexValidationResult =
   | { valid: false; error: TexValidationError };
 ```
 
-`TexValidationError extends Error` carries `code` (`TexError.id`, e.g. `'MissingArgFor'`, `'BadMath'`) and `latex` (the failed input — useful for batch error reporting).
+`TexValidationError extends Error` carries `code` (`TexError.id`, e.g. `'UndefinedControlSequence'`, `'MissingArgFor'`, `'UnknownEnv'`; or `'InternalError'` for unexpected non-TexError exceptions) and `latex` (the failed input — useful for batch error reporting).
 
 Semantics:
 - Returns `{ valid: true }` if MathJax's `TexParser` completes without throwing.
 - Returns `{ valid: false; error }` on `TexError`; non-`TexError` exceptions (rare; would indicate MathJax internal bug) are also wrapped, with `code` unset.
 - Never throws. Batch callers processing thousands of formulas always get a return value.
-- Stateless on per-equation tag state (counter, labels, ids reset on each call via `startEquation`). Package-level state held in `parseOptions.packageData` (e.g. `color`'s `ColorModel`, `textmacros`) is **shared across calls** — same contract as MathJax's render path, where `packageData` persists across equations within a single parse. Two consecutive identical inputs produce the same result.
+- Stateless on per-equation tag state (counter, labels, ids reset on each call via `startEquation`). The validator owns a separate `parseOptions` from `mTex` (the rendering input jax), so `packageData` does not flow in either direction between `markdownToHTML` and `validateTex`. Within the validator's own instance, `packageData` persists across calls (e.g. a `textmacros` `\newcommand` registered by one call is visible to the next). Two consecutive identical inputs produce the same result.
 
 ---
 
@@ -119,7 +119,7 @@ The constructor restores the prototype chain explicitly — required because the
 
 ## Edge Cases
 
-- **Repeated identical formulas**: two identical inputs produce the same result. Per-equation tag state (labels, ids, counter) resets on each call; package-level state in `parseOptions.packageData` (e.g. color definitions) persists across calls — same contract as MathJax's render path within one parse.
+- **Repeated identical formulas**: two identical inputs produce the same result. Per-equation tag state (labels, ids, counter) resets on each call; package-level state in `parseOptions.packageData` (e.g. `textmacros` `\newcommand`s) persists across calls within the validator's own instance, but does not flow to or from `markdownToHTML`.
 - **Empty or whitespace-only input**: parser treats as empty math; returns `{ valid: true }`. Caller decides whether empty is meaningful.
 - **Formula with `\label{foo}`**: validates as `{ valid: true }`. The label is **not** written to the rendering pipeline's `getLabelsList()`.
 - **Formula with `\begin{equation}` auto-numbered**: validates as `{ valid: true }`. `getLastEquationNumber()` is unaffected.
@@ -138,7 +138,7 @@ The constructor restores the prototype chain explicitly — required because the
 - [x] `TexValidationError` constructor restores prototype chain (ES5 target compatibility)
 - [x] `MathpixMarkdownModel.validateTex` exposes the API as a method on the public singleton
 - [x] Unit tests in `tests/_validateTex.js` cover return value, no-side-effect on counter, no-side-effect on labels, statelessness, isolation from render pipeline
-- [x] All existing tests pass; full suite reports `3489 passing` (3465 existing + 24 new)
+- [x] All existing tests pass; validateTex adds 40 new tests. Full suite after this PR (including figure-placement) reports `3534 passing`.
 
 ---
 
@@ -146,8 +146,11 @@ The constructor restores the prototype chain explicitly — required because the
 
 ### Unit tests (`tests/_validateTex.js`)
 
-- **Return value**: valid inline / valid display / valid environment → `{ valid: true }`; unmatched brace / unknown control sequence / unclosed environment → `{ valid: false; error: TexValidationError }`.
-- **`TexValidationError` properties**: `instanceof`, `message` matches `/TeX error/i`, `latex` equals the input, `code` is set for known TexError IDs.
+- **Return value**: valid inline / valid display / valid environment → `{ valid: true }`; unmatched brace / unknown control sequence / unclosed environment → `{ valid: false; error: TexValidationError }`. Empty and whitespace-only strings are accepted as valid.
+- **`TexValidationError` properties**: `instanceof TexValidationError`, `latex` equals the input, `code` equals a specific known id (`'UndefinedControlSequence'` for `\nosuchmacro`, `'MissingArgFor'` for `\frac{1}`), and `message` carries the real MathJax description (e.g. `/undefined control sequence/i`, `/missing argument/i`) — pinning the API against the `'[object Object]'` regression that exists when `instanceof Error` is used to gate `String(err)`.
+- **Render-parity (invariant)**: for several broken and valid formulas, `validateTex(s).valid` agrees with the presence/absence of `<svg` in `markdownToHTML('$' + s + '$')`. Covers unmatched brace, unknown control sequence, and a valid baseline.
+- **Edge MML shapes**: a fixed list of post-filter-exercising formulas (`\sum_{i=0}^n a_i`, `\left( \frac{a}{b} \right)`, `\overline{\overline{x}}`, `\stackrel{!}{=}`, `\binom`, `\sqrt[3]{x}`, `\int_0^\infty`, `\begin{matrix}…\end{matrix}`) must all validate as valid AND render with `<svg` — pins the spec's "post-filters never throw on parse-valid input" claim.
+- **Package-driven constructs**: `\color`, `\textcolor`, `\definecolor + \color`, `\ce{H2O}`, `\boldsymbol`, `\cancel` all validate as valid (regression guard against changes that would break a package whose runtime state lives on `parseOptions.packageData`).
 - **No side-effects on equation counter**: `getLastEquationNumber()` unchanged after validating valid auto-numbered equations, invalid formulas, and many calls in a loop.
 - **No side-effects on labels**: rendering `\label{eq:a}` + `\eqref{eq:a}` produces identical HTML whether or not the same formula was validated beforehand. Two consecutive `validateTex` calls with the same `\label{...}` both succeed.
 - **Cross-render isolation**: two `markdownToHTML` calls produce the same output whether or not `validateTex` is invoked between them.
@@ -158,7 +161,7 @@ The constructor restores the prototype chain explicitly — required because the
 npm test
 ```
 
-Full suite must report `3489 passing`.
+Full suite must report `3534 passing` after this PR. The validateTex change contributes 40 new tests (the remainder are added by `2026-05-figure-placement-bracket.md`).
 
 ---
 
