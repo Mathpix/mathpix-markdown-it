@@ -507,7 +507,7 @@ export const MathJax = {
     const validateInputJax = MJ.validateTex;
     const parseOptions = validateInputJax.parseOptions;
     parseOptions.clear();
-    parseOptions.tags.reset(0); // defensive: guards against a future MathJax writing to all*Labels outside finishEquation
+    parseOptions.tags.reset(0); // defensive: clears allLabels/allIds/allCounter (no-op today since finishEquation is bypassed)
     // Stub verified against mathjax-full 3.2.2 — startEquation reads only math.inputData.recompile.
     parseOptions.tags.startEquation({ inputData: {} } as any);
     try {
@@ -625,6 +625,10 @@ export const MathJax = {
   Reset: function (n = 0) {
     if (n) {n--} else {n = 0}
     MJ.mTex.parseOptions.tags.reset(n);
+  },
+  // Drops the validator instance; next call rebuilds with empty packageData.
+  ResetValidateTex: function () {
+    MJ.resetValidateTex();
   },
   GetLastEquationNumber: function () {
     const tags: any = MJ.mTex.parseOptions.tags;

@@ -28,6 +28,7 @@ export declare class MathJaxConfigure {
     chooseAdaptor: () => void;
     initTex: (nonumbers?: boolean) => void;
     get validateTex(): TeX<any, any, any>;
+    resetValidateTex: () => void;
     setHandler: (acssistiveMml?: boolean, nonumbers?: boolean) => void;
     changeHandler: (acssistiveMml?: boolean, nonumbers?: boolean) => void;
 }

@@ -67,12 +67,12 @@ token.meta = {
 
 ## Constraints / Invariants
 
-- **No-op on HTML output.** The HTML pipeline does not look at `token.latex` or `token.meta.placement`. Rendering is byte-identical.
+- **No-op on HTML output for previously-recognized brackets.** The HTML pipeline does not look at `token.latex` or `token.meta.placement`, so for sources whose bracket was already captured by the original regex (12 specifiers) rendering is byte-identical. Sources containing the newly-captured `[t!]`/`[b!]`/`[p!]` see the bracket consumed instead of leaking into content — this is a parser-fidelity fix. Verified empty (no snapshot drift): `grep -rln '\[t!\]\|\[b!\]\|\[p!\]' tests/` returns no matches.
 - **No-op on existing `token.latex` shape.** All existing forLatex consumers reading `token.latex` continue to see `\begin{<type>}[h]`. The new contract is purely additive on `meta`.
 - **No new options.** This PR does not introduce a `defaultFigurePlacement` option (unlike the tabular-bracket PR, where the `defaultCellVerticalAlign` option had a real HTML side-effect). For figure/table the placement has no rendering impact, so an option would carry no observable effect; consumers can decide injection policy themselves from `meta.placement`.
 - **Defensive `meta` initialization.** `paragraph_open` may already carry a non-null `meta` in other code paths. Use a merge (`{ ...(token.meta ?? {}), type }` + conditional `placement`) rather than assignment to avoid clobbering future use.
 - **Sparse `meta.placement`.** The `placement` key is set only when the source actually carried a bracket. Sources without a bracket produce `meta` with `type` only — `'placement' in meta === false`. Consumers iterating via `Object.entries(meta)` see a clean shape.
-- **Existing regex unchanged.** `RE_BEGIN_TABLE_OR_FIGURE_WITH_PLACEMENT` already captures the standard set (`h`/`!h`/`h!`/`H`/`!H`/`H!`/`t`/`!t`/`b`/`!b`/`p`/`!p`). Reuse `match[2]` as-is.
+- **Regex extended symmetrically.** `RE_BEGIN_TABLE_OR_FIGURE_WITH_PLACEMENT` previously captured 12 specifiers (`h`/`!h`/`h!`/`H`/`!H`/`H!`/`t`/`!t`/`b`/`!b`/`p`/`!p`) — note the asymmetry: `h!` was captured but `t!`, `b!`, `p!` were not. This PR adds those three so all valid LaTeX post-bang variants are recognized; 15 total. **Behavior change for sources containing `[t!]`, `[b!]`, `[p!]`**: previously these fell through to `RE_BEGIN_FIGURE_OR_TABLE_ENV`, the bracket leaked into the environment's content and rendered as literal text. Now the bracket is consumed correctly and `meta.placement` carries the value. This is a parser-fidelity fix, not a regression.
 - **Both code paths covered.** `InlineBlockBeginTable` (`begin-table.ts:161`) and the multi-line `BeginTable` (`begin-table.ts:~270`) construct the `paragraph_open` independently. Both must thread `match[2]` through to `StatePushPatagraphOpenTable`.
 
 ---
@@ -152,13 +152,13 @@ Both call sites (`begin-table.ts:233` and `begin-table.ts:464`) pass `match[2]` 
 - Whitespace variant: `\\begin{figure}  [t]` still captures `'t'`.
 - Back-compat: `token.latex === '\\begin{<type>}[h]'` regardless of source.
 - Absent key: `'placement' in meta === false` when source had no bracket.
-- **Full specifier coverage**: parameterized test over all 12 captured values (`h`, `H`, `t`, `b`, `p`, `!h`, `h!`, `!H`, `H!`, `!t`, `!b`, `!p`) — guards against accidental regex narrowing.
+- **Full specifier coverage**: parameterized test over all 15 captured values (`h`, `H`, `t`, `b`, `p`, `!h`, `h!`, `!H`, `H!`, `!t`, `t!`, `!b`, `b!`, `!p`, `p!`) — guards against accidental regex narrowing.
 - **Invalid bracket contents**: `[x]`, `[]`, `[tt]`, `[ht]`, `[ ]` — none populate `meta.placement`; only `meta.type` is set.
 - Without `forLatex`: `meta` may stay `null` (no expectation either way — these consumers don't use the meta).
 
 ### Regression suite
 
-Figure-placement adds 29 new tests (8 mixed-case + 15 specifier-coverage + 5 invalid-bracket + 1 placement-key-absence). Full suite after this PR reports `3534 passing` (3465 existing + 40 validateTex + 29 figure-placement).
+Figure-placement adds 29 new tests (8 mixed-case + 15 specifier-coverage + 5 invalid-bracket + 1 placement-key-absence). Full suite after this PR reports `3549 passing` (3465 existing + 55 validateTex + 29 figure-placement).
 
 ---
 

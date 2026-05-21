@@ -234,6 +234,7 @@ declare class MathpixMarkdown_Model {
     validateTex: (latex: string, options?: {
         display?: boolean;
     }) => import("../mathjax").TexValidationResult;
+    resetValidateTex: () => void;
     getMaxWidthStyle: (maxWidth?: string, isHideScroll?: boolean) => string;
     parseMarkdownByHTML: (html: string, include_sub_math?: boolean) => any[];
     parseMarkdownByElement: (el: Document | HTMLElement, include_sub_math?: boolean) => any[];

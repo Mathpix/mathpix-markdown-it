@@ -14,7 +14,7 @@ global.document = jsdom.window.document;
 global.DOMParser = jsdom.window.DOMParser;
 
 describe('validateTex: return value', () => {
-  beforeEach(() => MM.texReset());
+  beforeEach(() => { MM.texReset(); MM.resetValidateTex(); });
   it('returns valid:true for a valid inline formula', (done) => {
     const result = MM.validateTex('\\frac{1}{2}', { display: false });
     result.valid.should.be.true;
@@ -85,7 +85,7 @@ describe('validateTex: return value', () => {
 });
 
 describe('validateTex: package-driven constructs are accepted (render-parity)', () => {
-  beforeEach(() => MM.texReset());
+  beforeEach(() => { MM.texReset(); MM.resetValidateTex(); });
   it('accepts \\color{red}{x}', (done) => {
     MM.validateTex('\\color{red}{x}').valid.should.be.true;
     done();
@@ -110,7 +110,7 @@ describe('validateTex: package-driven constructs are accepted (render-parity)', 
 });
 
 describe('validateTex: verdict parity with render path', () => {
-  beforeEach(() => MM.texReset());
+  beforeEach(() => { MM.texReset(); MM.resetValidateTex(); });
   // MTeX.formatError throws (mathjax.ts), so failure produces empty span — no merror; <svg> presence is the signal.
   it('both validateTex and markdownToHTML flag an unmatched brace', (done) => {
     const latex = '\\frac{1}{2';
@@ -130,9 +130,43 @@ describe('validateTex: verdict parity with render path', () => {
     MM.markdownToHTML('$' + latex + '$', options).should.match(/<svg/);
     done();
   });
+  // Parameterized parity sweep: validate vs render must agree; invalid cases also pin error.code.
+  const parityCases = [
+    { latex: '\\sqrt{x}',                expected: true                                       },
+    { latex: '\\sqrt',                   expected: false, code: 'MissingArgFor'               },
+    { latex: '\\frac',                   expected: false, code: 'MissingArgFor'               },
+    { latex: '\\left( x',                expected: false, code: 'ExtraLeftMissingRight'       },
+    { latex: '\\begin{matrix} a',        expected: false, code: 'EnvMissingEnd'               },
+    { latex: '\\overset',                expected: false, code: 'MissingArgFor'               },
+    { latex: '\\nosuchcommand',          expected: false, code: 'UndefinedControlSequence'    },
+    { latex: '\\sum_{i=0}^n a_i',        expected: true                                       },
+    { latex: '\\binom{n}{k}',            expected: true                                       },
+    { latex: '\\ce{H2O}',                expected: true                                       },
+    { latex: '\\color{red}{x}',          expected: true                                       },
+  ];
+  parityCases.forEach(({ latex, expected, code }) => {
+    it(`parity (${expected ? 'valid' : 'invalid'}): ${latex}`, () => {
+      const result = MM.validateTex(latex);
+      const r = /<svg/.test(MM.markdownToHTML('$' + latex + '$', options));
+      result.valid.should.equal(expected);
+      r.should.equal(expected);
+      if (!expected) result.error.code.should.equal(code);
+    });
+  });
+});
+
+describe('validateTex: display: false behavior in the current MathJax config:', () => {
+  beforeEach(() => { MM.texReset(); MM.resetValidateTex(); });
+  // tags:'none' → display-only constructs are accepted in inline mode too; option kept for forward-compat.
+  ['\\tag{1} x', '\\begin{equation} x \\end{equation}', '\\begin{align} a &= b \\end{align}'].forEach((latex) => {
+    it(`display:false accepts ${latex}`, () => {
+      MM.validateTex(latex, { display: false }).valid.should.equal(true);
+    });
+  });
 });
 
 describe('validateTex: cold-start and contract smoke:', () => {
+  beforeEach(() => { MM.texReset(); MM.resetValidateTex(); });
   it('does not throw on a trivial valid formula immediately after texReset', () => {
     MM.texReset();
     MM.validateTex('x').valid.should.equal(true);
@@ -159,7 +193,7 @@ describe('validateTex: cold-start and contract smoke:', () => {
 });
 
 describe('validateTex: package state persistence and render-pipeline isolation:', () => {
-  beforeEach(() => MM.texReset());
+  beforeEach(() => { MM.texReset(); MM.resetValidateTex(); });
   // Macro names use a `zzz` prefix to avoid collision; LaTeX command names accept only letters.
   it('\\newcommand registered in one validateTex call is visible to the next', () => {
     MM.validateTex('\\newcommand{\\zzzPersistA}{42} \\zzzPersistA').valid.should.equal(true);
@@ -174,10 +208,16 @@ describe('validateTex: package state persistence and render-pipeline isolation:'
     MM.validateTex('\\newcommand{\\zzzValidateOnly}{X}');
     MM.markdownToHTML('$\\zzzValidateOnly$', options).should.not.match(/<svg/);
   });
+  it('resetValidateTex() drops accumulated packageData', () => {
+    MM.validateTex('\\newcommand{\\zzzResetMe}{X}');
+    MM.validateTex('\\zzzResetMe').valid.should.equal(true);
+    MM.resetValidateTex();
+    MM.validateTex('\\zzzResetMe').valid.should.equal(false);
+  });
 });
 
 describe('validateTex: parity on edge MML shapes (post-filter coverage)', () => {
-  beforeEach(() => MM.texReset());
+  beforeEach(() => { MM.texReset(); MM.resetValidateTex(); });
   // Exercises post-filters; verifies validateTex stays aligned with render path.
   const edgeCases = [
     'x_i^j + \\sum_{i=0}^n a_i',
@@ -198,7 +238,7 @@ describe('validateTex: parity on edge MML shapes (post-filter coverage)', () => 
 });
 
 describe('validateTex: no side-effects on equation counter', () => {
-  beforeEach(() => MM.texReset());
+  beforeEach(() => { MM.texReset(); MM.resetValidateTex(); });
   it('does not advance getLastEquationNumber on a valid auto-numbered equation', (done) => {
     const before = MM.getLastEquationNumber();
     MM.validateTex('\\begin{equation} x = 1 \\end{equation}');
@@ -241,7 +281,7 @@ describe('validateTex: no side-effects on equation counter', () => {
 });
 
 describe('validateTex: no side-effects on labels/ids', () => {
-  beforeEach(() => MM.texReset());
+  beforeEach(() => { MM.texReset(); MM.resetValidateTex(); });
   it('produces identical rendered HTML when a \\label is validated then rendered for real', (done) => {
     MM.texReset();
     const htmlBaseline = MM.markdownToHTML(
@@ -267,6 +307,7 @@ describe('validateTex: no side-effects on labels/ids', () => {
 });
 
 describe('validateTex: validation does not leak state between independent renders', () => {
+  beforeEach(() => { MM.texReset(); MM.resetValidateTex(); });
   it('a sequence of renders produces the same output whether or not validateTex is interleaved', (done) => {
     MM.texReset();
     const renderA = MM.markdownToHTML('$$\\begin{equation} p = 1 \\end{equation}$$', options);

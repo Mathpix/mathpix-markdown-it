@@ -764,7 +764,7 @@ type TexValidationResult =
 - **No SVG output** — runs only the TeX parser, no glyph measurement or DOM mutation.
 - **Stateless on per-equation tag state** — repeated identical inputs produce identical results, even with `\label{...}`. Equation counter, labels, ids reset on every call.
 - **Isolated from the render pipeline** — validateTex owns a separate `MTeX` instance with its own `parseOptions`. It does NOT share `packageData` (e.g. custom `\newcommand`s registered via `textmacros`) with `markdownToHTML`. A macro defined during rendering is not visible to subsequent `validateTex` calls, and vice versa.
-- **Package state persists across validateTex calls** — within the validator's own instance, `parseOptions.packageData` is not cleared between calls. A `\newcommand` registered by one `validateTex` call is visible to the next.
+- **Package state persists across validateTex calls** — within the validator's own instance, `parseOptions.packageData` is not cleared between calls. A `\newcommand` registered by one `validateTex` call is visible to the next. Call `MathpixMarkdownModel.resetValidateTex()` to drop the instance and rebuild fresh on the next call (useful for long-lived processes).
 - **Empty input** — an empty or whitespace-only string is treated as valid. Filter at the call site if your consumer requires non-empty math.
 
 ### Notes for batch validation
@@ -774,6 +774,8 @@ When validating mixed inline/display math from a source document, pass `display`
 ```js
 MathpixMarkdownModel.validateTex(formula, { display: srcIsInline ? false : true });
 ```
+
+**Security note**: if validating untrusted user-supplied TeX in a long-running process, call `MathpixMarkdownModel.resetValidateTex()` between batches (or after any input you don't trust). The validator's `packageData` persists across calls, so a malicious `\newcommand{\frac}{...}` could redefine standard macros and poison subsequent validations until the process restarts. `resetValidateTex()` drops the instance and the next call rebuilds it fresh.
 
 
 ## Browser Rendering Script (auto-render.js)

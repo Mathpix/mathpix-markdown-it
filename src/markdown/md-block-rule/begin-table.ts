@@ -100,7 +100,7 @@ const StatePushPatagraphOpenTable = (state, startLine: number, nextLine: number,
   if (state.md.options.forLatex) {
     token.latex = latex;
     const meta: FigureTableOpenMeta = { ...(token.meta ?? {}), type };
-    if (placement) meta.placement = placement;
+    if (placement !== undefined) meta.placement = placement;
     token.meta = meta;
   }
   if (!caption) {
@@ -197,7 +197,8 @@ const InlineBlockBeginTable: RuleBlock = (state, startLine) => {
   if (!match) {
     return false;
   }
-  const type = (match[1].trim() in TBegin ? match[1].trim() : null) as FigureTableType | null;
+  const trimmed = match[1].trim();
+  const type = (trimmed in TBegin ? trimmed : null) as FigureTableType | null;
   if (!type) {
     return false;
   }
@@ -315,7 +316,8 @@ export const BeginTable: RuleBlock = (state, startLine, endLine, silent) => {
   if (silent) {
     return true;
   }
-  const type = (match[1].trim() in TBegin ? match[1].trim() : null) as FigureTableType | null;
+  const trimmed = match[1].trim();
+  const type = (trimmed in TBegin ? trimmed : null) as FigureTableType | null;
   if (!type) {
     return false;
   }

@@ -127,10 +127,12 @@ export class MathJaxConfigure {
     }
     return this._validateTex;
   }
+
+  // Drops lazy validator; next access rebuilds with empty packageData.
+  public resetValidateTex = () => { this._validateTex = null; };
   
   setHandler = (acssistiveMml = false, nonumbers = false) => {
     this.initTex(nonumbers)
-    this._validateTex = null; // re-lazy: pick up the new mTex.mmlFactory next access
     this.handler = RegisterHTMLHandler(this.adaptor);
     if (acssistiveMml) {
       AssistiveMmlHandler(this.handler);
@@ -156,6 +158,7 @@ export class MathJaxConfigure {
       InputJax: asciimath,
       OutputJax: svg
     });
+    this._validateTex = null; // re-lazy: pick up the new mTex.mmlFactory next access
   };
   
   changeHandler = (acssistiveMml = false, nonumbers = false) => {

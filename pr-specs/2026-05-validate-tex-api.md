@@ -138,7 +138,7 @@ The constructor restores the prototype chain explicitly — required because the
 - [x] `TexValidationError` constructor restores prototype chain (ES5 target compatibility)
 - [x] `MathpixMarkdownModel.validateTex` exposes the API as a method on the public singleton
 - [x] Unit tests in `tests/_validateTex.js` cover return value, no-side-effect on counter, no-side-effect on labels, statelessness, isolation from render pipeline
-- [x] All existing tests pass; validateTex adds 40 new tests. Full suite after this PR (including figure-placement) reports `3534 passing`.
+- [x] All existing tests pass; validateTex adds 55 new tests. Full suite after this PR (including figure-placement) reports `3549 passing`.
 
 ---
 
@@ -161,7 +161,7 @@ The constructor restores the prototype chain explicitly — required because the
 npm test
 ```
 
-Full suite must report `3534 passing` after this PR. The validateTex change contributes 40 new tests (the remainder are added by `2026-05-figure-placement-bracket.md`).
+Full suite must report `3549 passing` after this PR. The validateTex change contributes 55 new tests (the remainder are added by `2026-05-figure-placement-bracket.md`).
 
 ---
 

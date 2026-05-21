@@ -163,5 +163,6 @@ export declare const MathJax: {
     };
     AsciiMathToSvg: (string: any, options?: any) => string;
     Reset: (n?: number) => void;
+    ResetValidateTex: () => void;
     GetLastEquationNumber: () => any;
 };
