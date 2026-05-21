@@ -12,6 +12,7 @@ import { resetMmdGlobalState } from "./markdown/common/reset-mmd-state";
 import { normalizeLink } from './helpers/normalize-link';
 import { TexValidationError } from './mathjax';
 import type { TexValidationResult } from './mathjax';
-import type { FigureTablePlacement, FigureTableOpenMeta, FigureTableType } from './markdown/md-block-rule/begin-table';
+import type { FigureTablePlacement } from './markdown/common/consts';
+import type { FigureTableOpenMeta, FigureTableType } from './markdown/md-block-rule/begin-table';
 export { MathpixLoader, MathpixMarkdown, MathpixMarkdownModel, TexValidationError, mathpixMarkdownPlugin, mdPluginCollapsible, mdLatexFootnotes, mdSetPositionsAndHighlight, initMathpixMarkdown, mdPluginMathJax, mdPluginHighlightCode, mdPluginText, mdPluginTOC, mdPluginAnchor, mdPluginTableTabular, mdPluginLatexCodeEnvs, mdPluginList, mdPluginChemistry, TMarkdownItOptions, optionsMathpixMarkdown, TOutputMath, TOutputMathJax, THtmlSanitize, ISmilesOptions, resetTheoremEnvironments, rest_mmd_footnotes_list, FootnoteItem, TTocStyle, THighlight, CodeHighlight, ParserErrors, Footnotes, eLabelType, ILabel, getLabelsList, getLabelByKeyFromLabelsList, clearLabelsList, resetMmdGlobalState, normalizeLink, RenderOptions };
 export type { TexValidationResult, FigureTablePlacement, FigureTableOpenMeta, FigureTableType };

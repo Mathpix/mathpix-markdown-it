@@ -7,6 +7,7 @@ import { tabularStyles } from "../styles/styles-tabular";
 import { fontsStyles } from "../styles/styles-fonts";
 import { listsStyles } from "../styles/styles-lists";
 import {MathJax} from '../mathjax';
+import type {TexValidationResult} from '../mathjax';
 import { Property } from 'csstype'; // at top of file
 import { ISmilesOptions } from '../markdown/md-chemistry';
 import { yamlParser } from '../yaml-parser';
@@ -274,8 +275,11 @@ class MathpixMarkdown_Model {
 
   texReset = MathJax.Reset;
   getLastEquationNumber = MathJax.GetLastEquationNumber;
-  validateTex = MathJax.ValidateTex;
-  resetValidateTex = MathJax.ResetValidateTex;
+  // Detached references — contract: MathJax.{ValidateTex,ResetValidateTex,Reset} must not read `this`.
+  // Explicit types so the generated .d.ts shows the real signature (otherwise property = any).
+  validateTex: (latex: string, options?: { display?: boolean; isolated?: boolean }) => TexValidationResult =
+    MathJax.ValidateTex;
+  resetValidateTex: () => void = MathJax.ResetValidateTex;
 
   getMaxWidthStyle = getMaxWidthStyle;
   

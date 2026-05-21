@@ -1,7 +1,7 @@
 const chai = require('chai');
 chai.should();
 const markdownIt = require('markdown-it');
-const { mathpixMarkdownPlugin } = require('../lib/index.js');
+const { mathpixMarkdownPlugin, MathpixMarkdownModel: MM } = require('../lib/index.js');
 
 const { JSDOM } = require('jsdom');
 const jsdom = new JSDOM();
@@ -71,6 +71,16 @@ describe('figure/table placement: meta.placement and meta.type on paragraph_open
   });
 });
 
+describe('figure/table placement: meta is gated on forLatex:', () => {
+  it('without forLatex, paragraph_open.meta stays null for figure', () => {
+    const md = markdownIt().use(mathpixMarkdownPlugin, {});
+    const tokens = md.parse('\\begin{figure}[t]\n\\includegraphics{img.png}\n\\end{figure}', {});
+    const open = findFirstParagraphOpen(tokens);
+    chai.expect(open).to.exist;
+    chai.expect(open.meta).to.be.null;
+  });
+});
+
 describe('figure/table placement: invalid bracket contents leave meta.placement unset:', () => {
   const invalidBrackets = [
     { label: 'unknown letter [x]', src: '[x]' },
@@ -87,15 +97,26 @@ describe('figure/table placement: invalid bracket contents leave meta.placement 
       ('placement' in open.meta).should.equal(false);
     });
   });
+  it('unrecognized [x] bracket leaks into rendered content (documented fallback behavior)', () => {
+    const html = MM.markdownToHTML('\\begin{figure}[x]\n\\includegraphics{img.png}\n\\end{figure}', { cwidth: 800 });
+    html.should.match(/\[x\]/);
+  });
 });
 
-describe('figure/table placement: full coverage of all 15 captured specifiers:', () => {
+describe('figure/table placement: full coverage of all 15 captured specifiers (both env types):', () => {
   const specifiers = ['h', 'H', 't', 'b', 'p', '!h', 'h!', '!H', 'H!', '!t', 't!', '!b', 'b!', '!p', 'p!'];
-  specifiers.forEach((spec) => {
-    it(`figure[${spec}] → meta.placement === '${spec}'`, () => {
-      const tokens = parseTokens(`\\begin{figure}[${spec}]\n\\includegraphics{img.png}\n\\end{figure}`);
-      const open = findFirstParagraphOpen(tokens);
-      open.meta.placement.should.equal(spec);
+  const envs = [
+    { name: 'figure', body: '\\includegraphics{img.png}' },
+    { name: 'table',  body: '\\begin{tabular}{|l|}\\hline x \\\\\\hline\\end{tabular}' },
+  ];
+  envs.forEach(({ name, body }) => {
+    specifiers.forEach((spec) => {
+      it(`${name}[${spec}] → meta.placement === '${spec}', meta.type === '${name}'`, () => {
+        const tokens = parseTokens(`\\begin{${name}}[${spec}]\n${body}\n\\end{${name}}`);
+        const open = findFirstParagraphOpen(tokens);
+        open.meta.placement.should.equal(spec);
+        open.meta.type.should.equal(name);
+      });
     });
   });
 });

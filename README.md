@@ -729,9 +729,10 @@ const { MathpixMarkdownModel, TexValidationError } = require('mathpix-markdown-i
 const result = MathpixMarkdownModel.validateTex('\\frac{1}{2');
 
 if (!result.valid) {
-  // result.error instanceof TexValidationError === true
-  console.error(`[${result.error.code || 'unknown'}] ${result.error.message}`);
-  console.error(`Formula: ${result.error.latex}`);
+  // result.error instanceof TexValidationError === true. Invalid input is an expected
+  // return value, not a runtime error — use your normal handling path.
+  console.log(`[${result.error.code}] ${result.error.message}`);
+  console.log(`Formula: ${result.error.latex}`);
 }
 ```
 
@@ -747,7 +748,7 @@ type TexValidationResult =
 
 `TexValidationError extends Error` carries:
 
-- `code` — MathJax error code (e.g. `'UndefinedControlSequence'`, `'MissingArgFor'`, `'UnknownEnv'`) when the failure originates from a `TexError`; `'InternalError'` when MathJax itself threw a non-`TexError` (signals "parser crashed", not "invalid formula")
+- `code` — MathJax error code (e.g. `'UndefinedControlSequence'`, `'MissingArgFor'`, `'UnknownEnv'`) when the failure originates from a `TexError`. Special values: `'InvalidInput'` when the `latex` argument is not a string (caller bug); `'InternalError'` when MathJax itself threw a non-`TexError` (parser crash); `'TexError'` defensive fallback if a future MathJax ever produces a `TexError` without an `.id`.
 - `latex` — the input formula that failed, useful for batch error reports
 - standard `message`, `name`, `stack` from `Error`
 
@@ -756,6 +757,7 @@ type TexValidationResult =
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
 | `display` | `boolean` | `true` | Whether to parse the formula as display (block) or inline math. Forwarded to MathJax's `TexParser` environment. In the current MathJax configuration this rarely affects the verdict; the option is kept for parity with the render API and for future-proofing. |
+| `isolated` | `boolean` | `false` | If `true`, drops the validator's accumulated `packageData` (custom `\newcommand`s etc.) **before** this call. **Asymmetric**: macros defined by *this* input still remain in the validator afterwards — call `resetValidateTex()` after the call if you also want to clear them. **Cost**: each `isolated:true` call rebuilds the `MTeX` instance (~100-300 KB allocation + GC). For high-volume batches, prefer one `resetValidateTex()` per batch over per-call `isolated:true`. |
 
 ### Guarantees
 
@@ -769,13 +771,9 @@ type TexValidationResult =
 
 ### Notes for batch validation
 
-When validating mixed inline/display math from a source document, pass `display` according to the original context (`$...$` vs `$$...$$` / `\(...\)` vs `\[...\]`). The default `display: true` matches `MathpixMarkdownModel.markdownToHTML` for block math, but inline expressions should be validated with `display: false` to keep results consistent with the render path.
+**In the current MathJax configuration `display: false` does not change the verdict** (display-only constructs like `\tag{}` are still accepted in inline mode because the validator uses `tags: 'none'`). The flag is forwarded to MathJax's `TexParser` environment only for parity with the render API and forward-compat with future MathJax versions. If you want a forward-compatible habit, pass `display: !srcIsInline`; otherwise the default is fine for batch validation.
 
-```js
-MathpixMarkdownModel.validateTex(formula, { display: srcIsInline ? false : true });
-```
-
-**Security note**: if validating untrusted user-supplied TeX in a long-running process, call `MathpixMarkdownModel.resetValidateTex()` between batches (or after any input you don't trust). The validator's `packageData` persists across calls, so a malicious `\newcommand{\frac}{...}` could redefine standard macros and poison subsequent validations until the process restarts. `resetValidateTex()` drops the instance and the next call rebuilds it fresh.
+**Security note**: validator `packageData` persists across calls. A single malicious `\newcommand{\frac}{...}` redefines a standard macro and poisons every subsequent validation until the process restarts. For untrusted input, call `MathpixMarkdownModel.resetValidateTex()` **after each untrusted formula** — or pass `isolated: true` on each untrusted call and call `resetValidateTex()` once at the end of the run.
 
 
 ## Browser Rendering Script (auto-render.js)

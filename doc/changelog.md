@@ -2,10 +2,10 @@
 
 ## [2.0.41] - validateTex API and figure/table placement on token meta
 
-### Breaking changes for forLatex consumers
+### Behavior changes for forLatex consumers
 
-- **`paragraph_open.meta` for figure/table changes from `null` to `{ type, placement? }`** when `forLatex: true`. Code paths guarded with `if (token.meta === null)` or `if (!token.meta)` will now enter the previously-unreachable branch. Migrate to `if (token.meta && token.meta.type === 'figure')` or inspect specific keys.
-- **`\begin{figure}[t!]` / `[b!]` / `[p!]` sources**: the bracket is now consumed by the parser instead of leaking into the environment's content as literal text. If you relied on the leaked text appearing in HTML/forLatex output, output for these specific sources will differ.
+- **`paragraph_open.meta` for figure/table changes from `null` to `{ type, placement? }`** when `forLatex: true`. The field surface is purely additive (consumers reading specific keys are unaffected), but the truthiness of `token.meta` flips from `false` to `true` for these tokens. Code paths guarded with `if (token.meta === null)` or `if (!token.meta)` will now enter the previously-unreachable branch — migrate to `if (token.meta && token.meta.type === 'figure')` or inspect specific keys.
+- **`\begin{figure}[t!]` / `[b!]` / `[p!]` sources**: the bracket is now consumed by the parser instead of leaking into the environment's content as literal text — a parser-fidelity fix. Output for these specific sources will differ. No fixture in this repository contained these forms, so the in-tree snapshot suite is unaffected.
 
 ### Figure/table placement bracket
 
@@ -19,7 +19,7 @@
 ### validateTex API
 
 - New `MathpixMarkdownModel.validateTex(latex, { display? })` runs MathJax's TeX parser only and returns a discriminated `TexValidationResult` union: `{ valid: true }` or `{ valid: false; error: TexValidationError }`. Useful when a consumer needs to detect parse errors in TeX expressions without paying for full SVG rendering.
-- `TexValidationError extends Error` exposes `code` (MathJax `TexError.id`, e.g. `'UndefinedControlSequence'`, `'MissingArgFor'`, `'UnknownEnv'`, `'ExtraLeftMissingRight'`) and `latex` (the input formula that failed) alongside standard `message`/`name`/`stack`. `instanceof TexValidationError` works under the ES5 target (prototype chain explicitly restored in the constructor).
+- `TexValidationError extends Error` exposes `code` (MathJax `TexError.id` for parse errors, e.g. `'UndefinedControlSequence'`, `'MissingArgFor'`, `'UnknownEnv'`, `'ExtraLeftMissingRight'`; `'InvalidInput'` for a non-string `latex` argument; `'InternalError'` for non-TexError exceptions from MathJax) and `latex` (the input formula that failed) alongside standard `message`/`name`/`stack`. `instanceof TexValidationError` works under the ES5 target (prototype chain explicitly restored in the constructor).
 - Implementation uses a dedicated isolated `MTeX` instance (`tags: 'none'`) and invokes `TexParser` directly, bypassing `MathItem`/`MathDocument`, output jax, and the six post-filter tree walks. Guarantees zero side-effects on the rendering pipeline: `getLastEquationNumber()`, `getLabelsList()`, and rendered HTML are byte-identical whether or not `validateTex` is called between renders.
 - Never throws on bad input — batch callers processing thousands of formulas always get a return value. Per-equation tag state (counter, labels, ids) resets on each call, so two consecutive calls with the same `\label{...}` both succeed. The validator owns a separate `parseOptions` from the rendering input jax, so package-level state (custom `\newcommand`s via `textmacros`, etc.) does not flow between `markdownToHTML` and `validateTex` in either direction; within `validateTex` itself, `packageData` persists across calls.
 - Opt-in: nothing in the existing render pipeline calls `validateTex` automatically. The isolated `MTeX` instance is lazily allocated on first call (~100-300 KB, shares `MmlFactory` with the rendering input jax); consumers who never call `validateTex` pay zero memory cost.

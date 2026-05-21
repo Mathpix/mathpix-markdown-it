@@ -117,7 +117,16 @@ export const RE_CAPTION_SETUP: RegExp = /^\\captionsetup\s{0,}\{([^}]*)\}/;
 export const RE_BEGIN_ALIGN_ENV: RegExp = /\\begin\s{0,}\{(center|left|right)\}/;
 export const RE_ALIGN_ENV_BLOCK: RegExp = /\\begin\s{0,}\{(center|left|right)\}\s{0,}([\s\S]*?)\s{0,}\\end\s{0,}\{(center|left|right)\}/;
 export const RE_BEGIN_FIGURE_OR_TABLE_ENV: RegExp = /\\begin\s{0,}\{(table|figure)\}/;
-export const RE_BEGIN_TABLE_OR_FIGURE_WITH_PLACEMENT: RegExp = /\\begin\s{0,}\{(table|figure)\}\s{0,}\[(H|\!H|H\!|h|\!h|h\!|t|\!t|t\!|b|\!b|b\!|p|\!p|p\!)\]/;
+// Two-char variants before bare letter — longer-first alternation, safe if reused without trailing ].
+export const FIGURE_TABLE_PLACEMENTS = ['!H','H!','H','!h','h!','h','!t','t!','t','!b','b!','b','!p','p!','p'] as const;
+export type FigureTablePlacement = typeof FIGURE_TABLE_PLACEMENTS[number];
+export const RE_BEGIN_TABLE_OR_FIGURE_WITH_PLACEMENT: RegExp = new RegExp(
+  '\\\\begin\\s{0,}\\{(table|figure)\\}\\s{0,}\\[(' + FIGURE_TABLE_PLACEMENTS.join('|') + ')\\]'
+);
+// Runtime guard: returns undefined if s is outside the union (regex/array drift safety).
+export const toFigureTablePlacement = (s: string | undefined): FigureTablePlacement | undefined =>
+  s !== undefined && (FIGURE_TABLE_PLACEMENTS as readonly string[]).includes(s)
+    ? s as FigureTablePlacement : undefined;
 export const RE_CAPTION_TAG: RegExp = /\\caption\s{0,}\{([^}]*)\}/;
 export const RE_CAPTION_TAG_GLOBAL: RegExp = /\s{0,}\\caption\s{0,}\{([^}]*)\}\s{0,}/g;
 export const RE_CAPTION_TAG_BEGIN: RegExp = /\\caption\s{0,}\{/;

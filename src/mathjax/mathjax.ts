@@ -83,7 +83,7 @@ export class MathJaxConfigure {
   constructor() {
     this.initTex();
     this.chooseAdaptor();
-    
+
     this.setHandler(true);
   }
 
@@ -104,6 +104,7 @@ export class MathJaxConfigure {
     }
   };
 
+  // Internal: call only via setHandler — direct call leaves the new mTex without an mmlFactory until mathjax.document() runs.
   initTex = (nonumbers = false) => {
     if (nonumbers) {
       // @ts-ignore
@@ -118,12 +119,14 @@ export class MathJaxConfigure {
     }
   }
 
-  // Lazy: only allocated on first validateTex() call.
+  // Lazy. Shares mTex.mmlFactory; setHandler nulls _validateTex so re-init picks up the fresh factory.
+  // Atomic assignment — if setMmlFactory throws, _validateTex stays null and the next call retries.
   public get validateTex(): TeX<any, any, any> {
     if (!this._validateTex) {
       // @ts-ignore
-      this._validateTex = new MTeX(Object.assign({}, texConfig, {tags: "none"}));
-      this._validateTex.setMmlFactory(this.mTex.mmlFactory);
+      const fresh: TeX<any, any, any> = new MTeX(Object.assign({}, texConfig, {tags: "none"}));
+      fresh.setMmlFactory(this.mTex.mmlFactory);
+      this._validateTex = fresh;
     }
     return this._validateTex;
   }

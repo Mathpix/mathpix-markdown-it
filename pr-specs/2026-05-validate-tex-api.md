@@ -50,7 +50,7 @@ type TexValidationResult =
   | { valid: false; error: TexValidationError };
 ```
 
-`TexValidationError extends Error` carries `code` (`TexError.id`, e.g. `'UndefinedControlSequence'`, `'MissingArgFor'`, `'UnknownEnv'`; or `'InternalError'` for unexpected non-TexError exceptions) and `latex` (the failed input — useful for batch error reporting).
+`TexValidationError extends Error` carries `code` (`TexError.id`, e.g. `'UndefinedControlSequence'`, `'MissingArgFor'`, `'UnknownEnv'`; `'InvalidInput'` for non-string `latex` argument; `'InternalError'` for unexpected non-TexError exceptions from MathJax; `'TexError'` defensive fallback if a future MathJax emits a TexError without an `.id`) and `latex` (the failed input — useful for batch error reporting).
 
 Semantics:
 - Returns `{ valid: true }` if MathJax's `TexParser` completes without throwing.
@@ -96,11 +96,10 @@ The clean design uses MathJax's own isolation mechanism — a separate `MTeX` in
 `TeX.compile` (`tex.js:116-141`) does seven steps. Only step 4 (`TexParser.mml()`) raises parse errors. Steps 5-7 (math-node wrapping, `finishEquation`, six post-filter tree walks via `cleanSubSup`, `setInherited`, `moveLimits`, `cleanStretchy`, `cleanAttributes`, `combineRelations`) are **pure transformations** that never throw on parse-valid input — they prepare MML for rendering, not validation. Skipping them is ~10-20% faster and structurally simpler.
 
 The validation function in `mathjax/index.ts`:
-1. `parseOptions.clear()` — resets per-call state.
-2. `tags.reset(0)` — defensive zero-out of `allLabels`/`allIds`/`allCounter`. In the current flow these are only ever written by `finishEquation` (which we never call), so this is a no-op today; kept as a guard against future MathJax changes. The actual protection against repeated `\label{eq}` raising "duplicate label" comes from `startEquation` resetting per-equation `this.labels = {}`.
-3. `tags.startEquation(stub)` — initializes `currentTag` for environment macros. The stub `{ inputData: {} } as any` is sufficient because `startEquation` reads only `math.inputData.recompile` (`Tags.js:197-201`).
-4. `new TexParser(latex, env, parseOptions); parser.mml()` — the actual parse.
-5. Catch `TexError` → return `{ valid: false; error }`. Catch other errors → also return wrapped (never propagate).
+1. `parseOptions.clear()` — resets per-call state. Calls `tags.resetTag()` internally, which clears `currentTag`/`history`/`stack`. The protection against repeated `\label{eq}` raising "duplicate label" comes from step 2 below resetting per-equation `this.labels = {}` — `allLabels`/`allIds`/`allCounter` stay empty by construction because we never call `finishEquation`.
+2. `tags.startEquation(stub)` — initializes `currentTag` and clears per-equation `labels`/`ids` for environment macros. The stub is a small object typed via a local `StartEquationMath` interface; `startEquation` reads only `math.inputData.recompile` (`Tags.js:197-201`).
+3. `new TexParser(latex, env, parseOptions)` — constructor runs the parser; `parser.mml()` finalizes the tree (via `popParser`) and is null-checked defensively (MathJax 3.2.2 never returns falsy here, but the API does not contractually forbid it).
+4. Catch `TexError` → return `{ valid: false; error }` with `code = err.id` (or `'TexError'` fallback). Catch other errors → return wrapped with `code = 'InternalError'` (never propagate). Non-string `latex` argument short-circuits earlier with `code = 'InvalidInput'`.
 
 ### Why a custom error class
 
@@ -138,7 +137,7 @@ The constructor restores the prototype chain explicitly — required because the
 - [x] `TexValidationError` constructor restores prototype chain (ES5 target compatibility)
 - [x] `MathpixMarkdownModel.validateTex` exposes the API as a method on the public singleton
 - [x] Unit tests in `tests/_validateTex.js` cover return value, no-side-effect on counter, no-side-effect on labels, statelessness, isolation from render pipeline
-- [x] All existing tests pass; validateTex adds 55 new tests. Full suite after this PR (including figure-placement) reports `3549 passing`.
+- [x] All existing tests pass; validateTex adds 68 new tests. Full suite after this PR (including figure-placement) reports `3579 passing`.
 
 ---
 
@@ -161,7 +160,7 @@ The constructor restores the prototype chain explicitly — required because the
 npm test
 ```
 
-Full suite must report `3549 passing` after this PR. The validateTex change contributes 55 new tests (the remainder are added by `2026-05-figure-placement-bracket.md`).
+Full suite must report `3579 passing` after this PR. The validateTex change contributes 68 new tests (the remainder are added by `2026-05-figure-placement-bracket.md`).
 
 ---
 
@@ -177,6 +176,6 @@ Full suite must report `3549 passing` after this PR. The validateTex change cont
 **Risk areas to watch**:
 
 - MathJax internals (`TexParser`, `ParseOptions.clear`, `Tags.reset`, `Tags.startEquation`) are not public API. A future MathJax upgrade may change signatures. Integration is documented above so the breakage point is locatable.
-- The `{ inputData: {} } as any` stub may need adjustment if MathJax tightens the `MathItem` shape used by `startEquation`. Currently only `math.inputData.recompile` is read.
+- The `StartEquationMath` stub (cast via `unknown` to `MathItem<any, any, any>`) may need adjustment if MathJax tightens the `MathItem` shape used by `startEquation`. Currently only `math.inputData.recompile` is read.
 
 **Rollback**: revert PR. No data migrations, no API contracts broken.

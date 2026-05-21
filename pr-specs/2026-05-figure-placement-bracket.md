@@ -158,7 +158,7 @@ Both call sites (`begin-table.ts:233` and `begin-table.ts:464`) pass `match[2]` 
 
 ### Regression suite
 
-Figure-placement adds 29 new tests (8 mixed-case + 15 specifier-coverage + 5 invalid-bracket + 1 placement-key-absence). Full suite after this PR reports `3549 passing` (3465 existing + 55 validateTex + 29 figure-placement).
+Figure-placement adds 46 new tests (8 mixed-case + 30 specifier×env coverage + 5 invalid-bracket + 1 placement-key-absence + 1 no-forLatex gate + 1 unrecognized-bracket-leak). Full suite after this PR reports `3579 passing` (3465 existing + 68 validateTex + 46 figure-placement).
 
 ---
 

@@ -13,7 +13,9 @@ import {
   RE_CAPTION_TAG,
   RE_CAPTION_TAG_BEGIN,
   RE_CAPTION_TAG_GLOBAL,
-  RE_INCLUDEGRAPHICS_WITH_ALIGNMENT_GLOBAL
+  RE_INCLUDEGRAPHICS_WITH_ALIGNMENT_GLOBAL,
+  FigureTablePlacement,
+  toFigureTablePlacement
 } from "../common/consts";
 
 var couterTables = 0;
@@ -22,15 +24,6 @@ enum TBegin {table = 'table', figure = 'figure'}
 
 /** Environment kind for figure/table paragraph_open tokens. */
 export type FigureTableType = 'figure' | 'table';
-
-/**
- * LaTeX placement specifier captured on `\begin{figure}` / `\begin{table}`.
- * Single specifier only — multi-char combinations like `[htbp]` are not captured.
- */
-export type FigureTablePlacement =
-  | 'h' | 'H' | 't' | 'b' | 'p'
-  | '!h' | 'h!' | '!H' | 'H!'
-  | '!t' | 't!' | '!b' | 'b!' | '!p' | 'p!';
 
 /**
  * Shape of `meta` attached to the `paragraph_open` token of a figure/table when `forLatex` is set.
@@ -89,7 +82,7 @@ const StatePushCaptionTable = (state, type: string): void => {
   }
 };
 
-const StatePushPatagraphOpenTable = (state, startLine: number, nextLine: number, type: FigureTableType, latex?: string, hasAlignTagG = false, placement?: FigureTablePlacement) => {
+const StatePushParagraphOpenTable = (state, startLine: number, nextLine: number, type: FigureTableType, latex?: string, hasAlignTagG = false, placement?: FigureTablePlacement) => {
   let token: Token;
   let align = state.env.align;
   let caption = state.env.caption;
@@ -255,7 +248,7 @@ const InlineBlockBeginTable: RuleBlock = (state, startLine) => {
   let latex = match[1] === 'figure' || match[1] === 'table'
     ? `\\begin{${match[1]}}[h]`
     : match[0];
-  StatePushPatagraphOpenTable(state, startLine, startLine+1, type, latex, hasAlignTagG || hasAlignTagIncludeGraphicsG, match[2] as FigureTablePlacement | undefined);
+  StatePushParagraphOpenTable(state, startLine, startLine+1, type, latex, hasAlignTagG || hasAlignTagIncludeGraphicsG, toFigureTablePlacement(match[2]));
   if (state.md.options.forLatex && hasAlignTagG) {
     token = state.push('latex_align', '', 0);
     token.latex = '\\centering';
@@ -487,8 +480,8 @@ export const BeginTable: RuleBlock = (state, startLine, endLine, silent) => {
   let latex = match[1] === 'figure' || match[1] === 'table'
     ? `\\begin{${match[1]}}[h]`
     : match[0];
-  StatePushPatagraphOpenTable(state, startLine, (pE > 0) ? nextLine  : nextLine + 1, type, latex,
-    (hasAlignTagG || hasAlignTagIncludeGraphicsG), match[2] as FigureTablePlacement | undefined);
+  StatePushParagraphOpenTable(state, startLine, (pE > 0) ? nextLine  : nextLine + 1, type, latex,
+    (hasAlignTagG || hasAlignTagIncludeGraphicsG), toFigureTablePlacement(match[2]));
   if (captionFirst && !state.md.options.forLatex) {
     StatePushCaptionTable(state, type);
   }

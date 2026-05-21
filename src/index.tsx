@@ -51,7 +51,8 @@ import { normalizeLink } from './helpers/normalize-link';
 
 import { TexValidationError } from './mathjax';
 import type { TexValidationResult } from './mathjax';
-import type { FigureTablePlacement, FigureTableOpenMeta, FigureTableType } from './markdown/md-block-rule/begin-table';
+import type { FigureTablePlacement } from './markdown/common/consts';
+import type { FigureTableOpenMeta, FigureTableType } from './markdown/md-block-rule/begin-table';
 
 export {
   MathpixLoader, MathpixMarkdown, MathpixMarkdownModel,
