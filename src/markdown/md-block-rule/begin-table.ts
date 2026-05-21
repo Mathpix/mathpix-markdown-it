@@ -68,7 +68,7 @@ const StatePushCaptionTable = (state, type: string): void => {
   }
 };
 
-const StatePushPatagraphOpenTable = (state, startLine: number, nextLine: number, type: string, latex?:string, hasAlignTagG = false) => {
+const StatePushPatagraphOpenTable = (state, startLine: number, nextLine: number, type: string, latex?: string, hasAlignTagG = false, placement?: string) => {
   let token: Token;
   let align = state.env.align;
   let caption = state.env.caption;
@@ -78,6 +78,7 @@ const StatePushPatagraphOpenTable = (state, startLine: number, nextLine: number,
   token.align = align;
   if (state.md.options.forLatex) {
     token.latex = latex;
+    token.meta = { ...(token.meta ?? {}), type, placement };
   }
   if (!caption) {
     token.attrJoin("class", "table");
@@ -230,7 +231,7 @@ const InlineBlockBeginTable: RuleBlock = (state, startLine) => {
   let latex = match[1] === 'figure' || match[1] === 'table'
     ? `\\begin{${match[1]}}[h]`
     : match[0];
-  StatePushPatagraphOpenTable(state, startLine, startLine+1, type, latex, hasAlignTagG || hasAlignTagIncludeGraphicsG);
+  StatePushPatagraphOpenTable(state, startLine, startLine+1, type, latex, hasAlignTagG || hasAlignTagIncludeGraphicsG, match[2]);
   if (state.md.options.forLatex && hasAlignTagG) {
     token = state.push('latex_align', '', 0);
     token.latex = '\\centering';
@@ -461,8 +462,8 @@ export const BeginTable: RuleBlock = (state, startLine, endLine, silent) => {
   let latex = match[1] === 'figure' || match[1] === 'table'
     ? `\\begin{${match[1]}}[h]`
     : match[0];
-  StatePushPatagraphOpenTable(state, startLine, (pE > 0) ? nextLine  : nextLine + 1, type, latex, 
-    (hasAlignTagG || hasAlignTagIncludeGraphicsG));
+  StatePushPatagraphOpenTable(state, startLine, (pE > 0) ? nextLine  : nextLine + 1, type, latex,
+    (hasAlignTagG || hasAlignTagIncludeGraphicsG), match[2]);
   if (captionFirst && !state.md.options.forLatex) {
     StatePushCaptionTable(state, type);
   }

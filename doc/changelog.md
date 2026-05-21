@@ -1,14 +1,21 @@
 # May 2026
 
-## [2.0.41] - validateTex API for fast TeX syntax checking
+## [2.0.41] - validateTex API and figure/table placement on token meta
 
-- New `MathpixMarkdownModel.validateTex(latex, { display? })` runs MathJax's TeX parser only and returns a discriminated `TexValidationResult` union: `{ valid: true }` or `{ valid: false; error: TexValidationError }`. Useful when a consumer needs to detect parse errors in TeX expressions without paying for full SVG rendering.
-- `TexValidationError extends Error` exposes `code` (MathJax `TexError.id`, e.g. `'MissingArgFor'`, `'BadMath'`) and `latex` (the input formula that failed) alongside standard `message`/`name`/`stack`. `instanceof TexValidationError` works under the ES5 target (prototype chain explicitly restored in the constructor).
-- Implementation uses a dedicated isolated `MTeX` instance (`tags: 'none'`) and invokes `TexParser` directly, bypassing `MathItem`/`MathDocument`, output jax, and the six post-filter tree walks. Guarantees zero side-effects on the rendering pipeline: `getLastEquationNumber()`, `getLabelsList()`, and rendered HTML are byte-identical whether or not `validateTex` is called between renders.
-- Never throws on bad input — batch callers processing thousands of formulas always get a return value. Stateless across calls: two consecutive calls with the same `\label{...}` both succeed (no duplicate-label leakage).
-- Opt-in: nothing in the existing render pipeline calls `validateTex` automatically. The isolated `MTeX` instance is lazily allocated on first call (~100-300 KB, shares `MmlFactory` with the rendering input jax); consumers who never call `validateTex` pay zero memory cost.
+- Figure/table placement bracket:
+  - `\begin{figure}` / `\begin{table}` carrying an optional placement specifier (`[h]`, `[t]`, `[b]`, `[p]`, `[H]`, `[!h]`, `[h!]`, `[!H]`, `[H!]`, `[!t]`, `[!b]`, `[!p]`) now exposes the captured value as `paragraph_open.meta.placement` when `forLatex: true` is set. Sources without a bracket expose `meta.placement === undefined`.
+  - `paragraph_open.meta.type` carries the environment kind (`'figure'` or `'table'`) for forLatex consumers that iterate tokens.
+  - `token.latex` is unchanged — both figure and table still emit `\begin{<type>}[h]` for backward compatibility with existing forLatex serializers. The truth about source placement moves to `meta.placement`, so consumers can faithfully reconstruct the original `\begin{figure}[t]` / `\begin{figure}` instead of the previous unconditional `\begin{figure}[h]`.
+  - No HTML output change, no snapshot drift — purely additive on `meta`.
+  - See `pr-specs/2026-05-figure-placement-bracket.md`.
 
-See `pr-specs/2026-05-validate-tex-api.md` for design rationale and invariants.
+- validateTex API:
+  - New `MathpixMarkdownModel.validateTex(latex, { display? })` runs MathJax's TeX parser only and returns a discriminated `TexValidationResult` union: `{ valid: true }` or `{ valid: false; error: TexValidationError }`. Useful when a consumer needs to detect parse errors in TeX expressions without paying for full SVG rendering.
+  - `TexValidationError extends Error` exposes `code` (MathJax `TexError.id`, e.g. `'MissingArgFor'`, `'BadMath'`) and `latex` (the input formula that failed) alongside standard `message`/`name`/`stack`. `instanceof TexValidationError` works under the ES5 target (prototype chain explicitly restored in the constructor).
+  - Implementation uses a dedicated isolated `MTeX` instance (`tags: 'none'`) and invokes `TexParser` directly, bypassing `MathItem`/`MathDocument`, output jax, and the six post-filter tree walks. Guarantees zero side-effects on the rendering pipeline: `getLastEquationNumber()`, `getLabelsList()`, and rendered HTML are byte-identical whether or not `validateTex` is called between renders.
+  - Never throws on bad input — batch callers processing thousands of formulas always get a return value. Stateless across calls: two consecutive calls with the same `\label{...}` both succeed (no duplicate-label leakage).
+  - Opt-in: nothing in the existing render pipeline calls `validateTex` automatically. The isolated `MTeX` instance is lazily allocated on first call (~100-300 KB, shares `MmlFactory` with the rendering input jax); consumers who never call `validateTex` pay zero memory cost.
+  - See `pr-specs/2026-05-validate-tex-api.md` for design rationale and invariants.
 
 ## [2.0.40] - Tabular vertical-align bracket and footnote performance
 
