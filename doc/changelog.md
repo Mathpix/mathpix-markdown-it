@@ -16,6 +16,10 @@
 - `token.latex` is unchanged — both figure and table still emit `\begin{<type>}[h]` for backward compatibility with existing forLatex serializers. The truth about source placement moves to `meta.placement`, so consumers can faithfully reconstruct the original `\begin{figure}[t]` / `\begin{figure}` instead of the previous unconditional `\begin{figure}[h]`.
 - See `pr-specs/2026-05-figure-placement-bracket.md`.
 
+### Tabular parser: `\multicolumn` with nested-brace align-spec
+
+- The regex for the second argument of `\multicolumn` now accepts one level of nested braces, so `\multicolumn{2}{p{11cm}}{...}`, `\multicolumn{2}{m{2cm}}{...}`, `\multicolumn{2}{>{\centering}p{2cm}}{...}` are parsed correctly. Previously the inner `}` was eaten by the outer pattern, leaving the trailing `}` plus the actual content braces leaking into the cell as literal text (e.g. `<td>}{TEXT}</td>` or `<td>p{2cm}}{TEXT}</td>`). HTML output and `multi.mc.alignSpec` (used by forLatex consumers) are now clean.
+
 ### validateTex API
 
 - New `MathpixMarkdownModel.validateTex(latex, { display? })` runs MathJax's TeX parser only and returns a discriminated `TexValidationResult` union: `{ valid: true }` or `{ valid: false; error: TexValidationError }`. Useful when a consumer needs to detect parse errors in TeX expressions without paying for full SVG rendering.
