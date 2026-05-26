@@ -1,3 +1,4 @@
+import type { TexValidationResult } from '../mathjax';
 import { Property } from 'csstype';
 import { ISmilesOptions } from '../markdown/md-chemistry';
 import { IFontMetricsOptions } from "../markdown/common/text-dimentions";
@@ -231,6 +232,11 @@ declare class MathpixMarkdown_Model {
     checkFormula: (mathString: string, showTimeLog?: boolean) => string;
     texReset: (n?: number) => void;
     getLastEquationNumber: () => any;
+    validateTex: (latex: string, options?: {
+        display?: boolean;
+        isolated?: boolean;
+    }) => TexValidationResult;
+    resetValidateTex: () => void;
     getMaxWidthStyle: (maxWidth?: string, isHideScroll?: boolean) => string;
     parseMarkdownByHTML: (html: string, include_sub_math?: boolean) => any[];
     parseMarkdownByElement: (el: Document | HTMLElement, include_sub_math?: boolean) => any[];

@@ -43,8 +43,9 @@ export const getMultiColumnMultiRow = (str: string, params: {lLines: string, ali
   let vpos: string = '', nrows: string = '', width: string = '';
 
   str = str.trim();
+  // Second arg allows one level of nested braces (p{11cm}, >{\centering}p{2cm}).
   let matchMC: RegExpMatchArray = str
-    .match(/(?:\\multicolumn\s{0,}\{([^}]*)\}\s{0,}\{([^}]*)\})/);
+    .match(/(?:\\multicolumn\s{0,}\{([^}]*)\}\s{0,}\{((?:[^{}]|\{[^{}]*\})*)\})/);
   if (matchMC) {
     str = str.slice(0, matchMC.index) + str.slice(matchMC.index + matchMC[0].length);
   }

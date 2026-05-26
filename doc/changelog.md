@@ -1,5 +1,35 @@
 # May 2026
 
+## [2.0.41] - validateTex API and figure/table placement on token meta
+
+### Behavior changes for forLatex consumers
+
+- **`paragraph_open.meta` for figure/table changes from `null` to `{ type, placement? }`** when `forLatex: true`. The field surface is purely additive (consumers reading specific keys are unaffected), but the truthiness of `token.meta` flips from `false` to `true` for these tokens. Code paths guarded with `if (token.meta === null)` or `if (!token.meta)` will now enter the previously-unreachable branch — migrate to `if (token.meta && token.meta.type === 'figure')` or inspect specific keys.
+- **`\begin{figure}[t!]` / `[b!]` / `[p!]` sources**: the bracket is now consumed by the parser instead of leaking into the environment's content as literal text — a parser-fidelity fix. Output for these specific sources will differ. No fixture in this repository contained these forms, so the in-tree snapshot suite is unaffected.
+
+### Figure/table placement bracket
+
+- `\begin{figure}` / `\begin{table}` carrying an optional placement specifier (`[h]`, `[t]`, `[b]`, `[p]`, `[H]`, `[!h]`, `[h!]`, `[!H]`, `[H!]`, `[!t]`, `[t!]`, `[!b]`, `[b!]`, `[!p]`, `[p!]`) now exposes the captured value as `paragraph_open.meta.placement` when `forLatex: true` is set. Sources without a recognized bracket (no bracket, empty `[]`, unknown `[x]`, multi-char `[tt]`, etc.) omit the `placement` key from `meta` entirely (`'placement' in meta === false`).
+- `paragraph_open.meta.type` carries the environment kind (`'figure'` or `'table'`) for forLatex consumers that iterate tokens.
+- Placement regex extended to also capture `t!`, `b!`, `p!` (previously only the `!`-prefixed forms `!t`, `!b`, `!p` were captured); the regex now recognizes 15 LaTeX placement specifiers symmetrically. See the Breaking changes section above for the impact.
+- New exported TypeScript symbols from the package root: `FigureTableType` (`'figure' | 'table'`), `FigureTablePlacement` (literal union of the 15 captured specifiers), and `FigureTableOpenMeta` (shape of the meta object).
+- `token.latex` is unchanged — both figure and table still emit `\begin{<type>}[h]` for backward compatibility with existing forLatex serializers. The truth about source placement moves to `meta.placement`, so consumers can faithfully reconstruct the original `\begin{figure}[t]` / `\begin{figure}` instead of the previous unconditional `\begin{figure}[h]`.
+- See `pr-specs/2026-05-figure-placement-bracket.md`.
+
+### Tabular parser: `\multicolumn` with nested-brace align-spec
+
+- The regex for the second argument of `\multicolumn` now accepts one level of nested braces, so `\multicolumn{2}{p{11cm}}{...}`, `\multicolumn{2}{m{2cm}}{...}`, `\multicolumn{2}{>{\centering}p{2cm}}{...}` are parsed correctly. Previously the inner `}` was eaten by the outer pattern, leaving the trailing `}` plus the actual content braces leaking into the cell as literal text (e.g. `<td>}{TEXT}</td>` or `<td>p{2cm}}{TEXT}</td>`). HTML output and `multi.mc.alignSpec` (used by forLatex consumers) are now clean.
+
+### validateTex API
+
+- New `MathpixMarkdownModel.validateTex(latex, { display? })` runs MathJax's TeX parser only and returns a discriminated `TexValidationResult` union: `{ valid: true }` or `{ valid: false; error: TexValidationError }`. Useful when a consumer needs to detect parse errors in TeX expressions without paying for full SVG rendering.
+- `TexValidationError extends Error` exposes `code` (MathJax `TexError.id` for parse errors, e.g. `'UndefinedControlSequence'`, `'MissingArgFor'`, `'UnknownEnv'`, `'ExtraLeftMissingRight'`; `'InvalidInput'` for a non-string `latex` argument; `'InternalError'` for non-TexError exceptions from MathJax) and `latex` (the input formula that failed) alongside standard `message`/`name`/`stack`. `instanceof TexValidationError` works under the ES5 target (prototype chain explicitly restored in the constructor).
+- Implementation uses a dedicated isolated `MTeX` instance (`tags: 'none'`) and invokes `TexParser` directly, bypassing `MathItem`/`MathDocument`, output jax, and the six post-filter tree walks. Guarantees zero side-effects on the rendering pipeline: `getLastEquationNumber()`, `getLabelsList()`, and rendered HTML are byte-identical whether or not `validateTex` is called between renders.
+- Never throws on bad input — batch callers processing thousands of formulas always get a return value. Per-equation tag state (counter, labels, ids) resets on each call, so two consecutive calls with the same `\label{...}` both succeed. The validator owns a separate `parseOptions` from the rendering input jax, so package-level state (custom `\newcommand`s via `textmacros`, etc.) does not flow between `markdownToHTML` and `validateTex` in either direction; within `validateTex` itself, `packageData` persists across calls.
+- Opt-in: nothing in the existing render pipeline calls `validateTex` automatically. The isolated `MTeX` instance is lazily allocated on first call (~100-300 KB, shares `MmlFactory` with the rendering input jax); consumers who never call `validateTex` pay zero memory cost.
+- New `MathpixMarkdownModel.resetValidateTex()` drops the validator instance so the next call rebuilds it with empty `packageData`. Useful for long-lived processes that want to bound memory or clear user-defined macros accumulated across calls.
+- See `pr-specs/2026-05-validate-tex-api.md` for design rationale and invariants.
+
 ## [2.0.40] - Tabular vertical-align bracket and footnote performance
 
 - Tabular vertical alignment:

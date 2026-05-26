@@ -717,6 +717,65 @@ const html = MathpixMarkdownModel.markdownToHTML('$x^2$', options);
 When using `'mathml'` or `'latex'`, the server outputs minimal HTML containing only the raw format. Use the browser rendering script (`auto-render.js`) to transform this into the full structure with SVG and hidden formats.
 
 
+## Validating TeX formulas
+
+Use `MathpixMarkdownModel.validateTex(latex, options?)` to check whether a TeX expression parses without rendering it. Useful when a consumer needs to detect parse errors in TeX expressions without paying for full SVG rendering.
+
+### Example usage
+
+```js
+const { MathpixMarkdownModel, TexValidationError } = require('mathpix-markdown-it');
+
+const result = MathpixMarkdownModel.validateTex('\\frac{1}{2');
+
+if (!result.valid) {
+  // result.error instanceof TexValidationError === true. Invalid input is an expected
+  // return value, not a runtime error — use your normal handling path.
+  console.log(`[${result.error.code}] ${result.error.message}`);
+  console.log(`Formula: ${result.error.latex}`);
+}
+```
+
+### Return value
+
+The result is a discriminated union:
+
+```ts
+type TexValidationResult =
+  | { valid: true }
+  | { valid: false; error: TexValidationError };
+```
+
+`TexValidationError extends Error` carries:
+
+- `code` — MathJax error code (e.g. `'UndefinedControlSequence'`, `'MissingArgFor'`, `'UnknownEnv'`) when the failure originates from a `TexError`. Special values: `'InvalidInput'` when the `latex` argument is not a string (caller bug); `'InternalError'` when MathJax itself threw a non-`TexError` (parser crash); `'TexError'` defensive fallback if a future MathJax ever produces a `TexError` without an `.id`.
+- `latex` — the input formula that failed, useful for batch error reports
+- standard `message`, `name`, `stack` from `Error`
+
+### Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `display` | `boolean` | `true` | Whether to parse the formula as display (block) or inline math. Forwarded to MathJax's `TexParser` environment. In the current MathJax configuration this rarely affects the verdict; the option is kept for parity with the render API and for future-proofing. |
+| `isolated` | `boolean` | `false` | If `true`, drops the validator's accumulated `packageData` (custom `\newcommand`s etc.) **before** this call. **Asymmetric**: macros defined by *this* input still remain in the validator afterwards — call `resetValidateTex()` after the call if you also want to clear them. **Cost**: each `isolated:true` call rebuilds the `MTeX` instance (~100-300 KB allocation + GC). For high-volume batches, prefer one `resetValidateTex()` per batch over per-call `isolated:true`. |
+
+### Guarantees
+
+- **Never throws** on bad input — batch callers always get a return value.
+- **No side-effects** on the rendering pipeline. Equation counter, labels, and ids accumulated by `markdownToHTML` are unaffected.
+- **No SVG output** — runs only the TeX parser, no glyph measurement or DOM mutation.
+- **Stateless on per-equation tag state** — repeated identical inputs produce identical results, even with `\label{...}`. Equation counter, labels, ids reset on every call.
+- **Isolated from the render pipeline** — validateTex owns a separate `MTeX` instance with its own `parseOptions`. It does NOT share `packageData` (e.g. custom `\newcommand`s registered via `textmacros`) with `markdownToHTML`. A macro defined during rendering is not visible to subsequent `validateTex` calls, and vice versa.
+- **Package state persists across validateTex calls** — within the validator's own instance, `parseOptions.packageData` is not cleared between calls. A `\newcommand` registered by one `validateTex` call is visible to the next. Call `MathpixMarkdownModel.resetValidateTex()` to drop the instance and rebuild fresh on the next call (useful for long-lived processes).
+- **Empty input** — an empty or whitespace-only string is treated as valid. Filter at the call site if your consumer requires non-empty math.
+
+### Notes for batch validation
+
+**In the current MathJax configuration `display: false` does not change the verdict** (display-only constructs like `\tag{}` are still accepted in inline mode because the validator uses `tags: 'none'`). The flag is forwarded to MathJax's `TexParser` environment only for parity with the render API and forward-compat with future MathJax versions. If you want a forward-compatible habit, pass `display: !srcIsInline`; otherwise the default is fine for batch validation.
+
+**Security note**: validator `packageData` persists across calls. A single malicious `\newcommand{\frac}{...}` redefines a standard macro and poisons every subsequent validation until the process restarts. For untrusted input, call `MathpixMarkdownModel.resetValidateTex()` **after each untrusted formula** — or pass `isolated: true` on each untrusted call and call `resetValidateTex()` once at the end of the run.
+
+
 ## Browser Rendering Script (auto-render.js)
 
 For `output_format: 'mathml'` or `output_format: 'latex'`, use the browser bundle to render math on the client side.

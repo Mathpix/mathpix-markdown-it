@@ -68,6 +68,7 @@ export class MathJaxConfigure {
   public mTex;
   public tex;
   public texTSV;
+  private _validateTex: TeX<any, any, any> | null = null;
   public mathjax;
   public adaptor;
   public domNode;
@@ -82,7 +83,7 @@ export class MathJaxConfigure {
   constructor() {
     this.initTex();
     this.chooseAdaptor();
-    
+
     this.setHandler(true);
   }
 
@@ -103,6 +104,7 @@ export class MathJaxConfigure {
     }
   };
 
+  // Internal: call only via setHandler — direct call leaves the new mTex without an mmlFactory until mathjax.document() runs.
   initTex = (nonumbers = false) => {
     if (nonumbers) {
       // @ts-ignore
@@ -116,6 +118,21 @@ export class MathJaxConfigure {
       this.texTSV = new TeX(texTSVConfig);
     }
   }
+
+  // Lazy. Shares mTex.mmlFactory; setHandler nulls _validateTex so re-init picks up the fresh factory.
+  // Atomic assignment — if setMmlFactory throws, _validateTex stays null and the next call retries.
+  public get validateTex(): TeX<any, any, any> {
+    if (!this._validateTex) {
+      // @ts-ignore
+      const fresh: TeX<any, any, any> = new MTeX(Object.assign({}, texConfig, {tags: "none"}));
+      fresh.setMmlFactory(this.mTex.mmlFactory);
+      this._validateTex = fresh;
+    }
+    return this._validateTex;
+  }
+
+  // Drops lazy validator; next access rebuilds with empty packageData.
+  public resetValidateTex = () => { this._validateTex = null; };
   
   setHandler = (acssistiveMml = false, nonumbers = false) => {
     this.initTex(nonumbers)
@@ -144,6 +161,7 @@ export class MathJaxConfigure {
       InputJax: asciimath,
       OutputJax: svg
     });
+    this._validateTex = null; // re-lazy: pick up the new mTex.mmlFactory next access
   };
   
   changeHandler = (acssistiveMml = false, nonumbers = false) => {

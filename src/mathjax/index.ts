@@ -8,12 +8,43 @@ import { getSpeech } from '../sre';
 import { TAccessibility } from "../mathpix-markdown-model";
 import { formatSource, formatSourceMML } from "../helpers/parse-mmd-element";
 import { Label } from 'mathjax-full/js/input/tex/Tags.js';
+import TexParser from 'mathjax-full/js/input/tex/TexParser.js';
+import TexError from 'mathjax-full/js/input/tex/TexError.js';
+import { MathItem } from 'mathjax-full/js/core/MathItem.js';
 import { IAsciiData } from "./serialized-ascii/common";
 import { formatMathJaxError } from "../helpers/utils";
 import { getMathDimensions, IMathDimensions } from "./utils";
 import { uid } from "../markdown/utils";
 
 const MJ = new MathJaxConfigure();
+
+// Minimal shape that startEquation reads (verified against mathjax-full 3.2.2 — only inputData.recompile).
+interface StartEquationMath { inputData: { recompile?: unknown } }
+
+/**
+ * Error returned by `MathpixMarkdownModel.validateTex` when parsing fails.
+ * - `code`: MathJax `TexError.id` (e.g. `'UndefinedControlSequence'`, `'MissingArgFor'`) for parse errors;
+ *   `'InvalidInput'` when `latex` is not a string (caller bug);
+ *   `'InternalError'` when MathJax itself threw a non-TexError (parser crash);
+ *   `'TexError'` is a defensive fallback if a future MathJax produces a TexError without an `.id` (does not occur in 3.2.2).
+ * - `latex`: the input formula that triggered the error.
+ */
+export class TexValidationError extends Error {
+  readonly code?: string;
+  readonly latex: string;
+  constructor(message: string, latex: string, code?: string) {
+    super(message);
+    // Restore prototype chain (ES5 target breaks it on extends Error).
+    Object.setPrototypeOf(this, TexValidationError.prototype);
+    this.name = 'TexValidationError';
+    this.latex = latex;
+    this.code = code;
+  }
+}
+
+export type TexValidationResult =
+  | { valid: true }
+  | { valid: false; error: TexValidationError };
 
 export interface IOuterData {
   mathml?: string,
@@ -467,6 +498,65 @@ export const MathJax = {
       return OuterDataError(MJ.adaptor, null, string, err, outMath);
     }
   },
+  /**
+   * Validates a TeX expression using MathJax's parser without producing SVG output.
+   * Runs `TexParser` directly on an isolated `MTeX` instance — skips MathItem/MathDocument,
+   * post-filters, and the output jax. No side-effects on the rendering pipeline.
+   *
+   * @remarks Validator state (custom macros via `\newcommand`) persists across calls.
+   * Pass `isolated: true` (or call `ResetValidateTex()`) after untrusted input.
+   *
+   * @param latex - The TeX source to validate. An empty or whitespace-only string returns `{ valid: true }`.
+   * @param options.display - `true` (default) for block math, `false` for inline.
+   * @param options.isolated - If `true`, drop accumulated `packageData` **before** this call. Default `false`. Asymmetric: macros defined by *this* call remain after return; call `resetValidateTex()` if you also want to drop them.
+   * @returns `{ valid: true }` if parsing succeeds, `{ valid: false, error: TexValidationError }` otherwise. Never throws.
+   */
+  ValidateTex: function(latex: string, options: { display?: boolean; isolated?: boolean } = {}): TexValidationResult {
+    const { display = true, isolated = false } = options ?? {};
+    if (typeof latex !== 'string') {
+      let latexRepr: string;
+      try {
+        latexRepr = String(latex);
+      } catch {
+        latexRepr = '[unstringifiable]';
+      }
+      return {
+        valid: false,
+        error: new TexValidationError('latex must be a string', latexRepr, 'InvalidInput'),
+      };
+    }
+    if (isolated) MJ.resetValidateTex();
+    const validateInputJax = MJ.validateTex;
+    const parseOptions = validateInputJax.parseOptions;
+    try {
+      parseOptions.clear();
+      const stub: StartEquationMath = { inputData: {} };
+      // Cast via unknown so StartEquationMath stays the source of truth for what startEquation reads.
+      parseOptions.tags.startEquation(stub as unknown as MathItem<any, any, any>);
+      // isInner: false → top-level math context, matching the render path.
+      // Parse runs inside the constructor; mml() finalizes the tree and is the patch point exercised by the 'InternalError' test (do not remove).
+      const parser = new TexParser(latex, { display, isInner: false }, parseOptions);
+      // !root — defensive: mathjax-full 3.2.2 never returns falsy here, but the API does not contractually forbid it.
+      const root = parser.mml();
+      if (!root) {
+        return {
+          valid: false,
+          error: new TexValidationError('parser produced no MML root', latex, 'InternalError'),
+        };
+      }
+      return { valid: true };
+    } catch (err) {
+      // TexError isn't an Error subclass; duck-type .message and .id.
+      const rawMessage = typeof (err as any)?.message === 'string'
+        ? (err as any).message as string
+        : String(err);
+      const code = typeof (err as any)?.id === 'string' ? (err as any).id as string : undefined;
+      if (err instanceof TexError || code) {
+        return { valid: false, error: new TexValidationError(rawMessage, latex, code ?? 'TexError') };
+      }
+      return { valid: false, error: new TexValidationError(rawMessage, latex, 'InternalError') };
+    }
+  },
   TexConvertToAscii: function(string, options: any={}) {
     const {display = true, metric = {},
       outMath = {}, accessibility = null
@@ -561,12 +651,14 @@ export const MathJax = {
       : OuterHTML(outerDataAscii, options.outMath);
   },
 
-  //
-  //  Reset tags and labels
-  //
+  // Render-path tags only. Validator persists packageData across calls — use ResetValidateTex to drop.
   Reset: function (n = 0) {
     if (n) {n--} else {n = 0}
     MJ.mTex.parseOptions.tags.reset(n);
+  },
+  // Drops the validator instance; next call rebuilds with empty packageData.
+  ResetValidateTex: function () {
+    MJ.resetValidateTex();
   },
   GetLastEquationNumber: function () {
     const tags: any = MJ.mTex.parseOptions.tags;
