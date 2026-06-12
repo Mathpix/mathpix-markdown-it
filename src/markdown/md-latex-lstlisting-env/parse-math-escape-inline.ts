@@ -1,4 +1,4 @@
-import MarkdownIt from 'markdown-it';
+import MarkdownIt, { RuleInline } from 'markdown-it';
 import type Token from 'markdown-it/lib/token';
 import { multiMath, simpleMath } from '../mdPluginRaw';
 
@@ -9,6 +9,33 @@ import { multiMath, simpleMath } from '../mdPluginRaw';
 const MATH_INLINE_CACHE = new WeakMap<MarkdownIt, MarkdownIt>();
 
 type MarkdownItConstructor = new (opts?: MarkdownIt.Options) => MarkdownIt;
+
+const BACKSLASH = 0x5C;
+
+/**
+ * Verbatim backslash rule for code listings. Unlike the default `escape` rule it does not
+ * collapse `\\` -> `\` (code is literal), and it consumes a `\\` pair together so a following
+ * `\(` / `\[` from the second backslash is not re-opened as inline math (strict mode).
+ */
+const verbatimBackslash: RuleInline = (state, silent) => {
+  const max = state.posMax;
+  let pos = state.pos;
+  if (state.src.charCodeAt(pos) !== BACKSLASH) {
+    return false;
+  }
+  if (!silent) {
+    state.pending += '\\';
+  }
+  pos++;
+  if (pos < max && state.src.charCodeAt(pos) === BACKSLASH) {
+    if (!silent) {
+      state.pending += '\\';
+    }
+    pos++;
+  }
+  state.pos = pos;
+  return true;
+};
 
 /**
  * Create (or retrieve from cache) a Markdown-It instance configured to parse ONLY
@@ -28,13 +55,15 @@ export const createMathOnlyInlineParser = (baseMd: MarkdownIt): MarkdownIt => {
   const BaseMdCtor: MarkdownItConstructor = (baseMd as any).constructor as MarkdownItConstructor;
   const mathMd: MarkdownIt = new BaseMdCtor(baseMd.options);
   // Register math rules right before "text" to ensure correct precedence.
-  mathMd.inline.ruler.before('text', 'multiMath', multiMath);
-  mathMd.inline.ruler.before('text', 'simpleMath', simpleMath);
-  // Enable only our two math rules + the default "text" rule.
-  mathMd.inline.ruler.enableOnly(['multiMath', 'simpleMath', 'text']);
+  mathMd.inline.ruler.before('escape', 'multiMath', multiMath);
+  mathMd.inline.ruler.before('escape', 'simpleMath', simpleMath);
+  // Code is verbatim: replace the default `escape` (which collapses `\\` -> `\`).
+  mathMd.inline.ruler.at('escape', verbatimBackslash);
+  mathMd.inline.ruler.enableOnly(['multiMath', 'simpleMath', 'text', 'escape']);
   MATH_INLINE_CACHE.set(baseMd, mathMd);
   return mathMd;
 }
+
 
 /**
  * Parse a string with ONLY math inline rules enabled.

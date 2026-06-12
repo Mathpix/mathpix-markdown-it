@@ -179,4 +179,29 @@ describe('auto-render (renderMathInElement):', () => {
       c.innerHTML.should.include('mjx-container');
     });
   });
+  // ─── mathDelimiterMode (double-backslash delimiters) ───────────────
+  describe('mathDelimiterMode — double-backslash \\\\(...\\\\)', () => {
+    const renderInline = (inner, mode) => {
+      const c = makeContainer('<span class="math-inline">' + inner + '</span>');
+      return renderNoA11y(c, { mathDelimiterMode: mode }).then(() => c);
+    };
+    it('strict (default): double \\\\(x\\\\) is NOT rendered (stays verbatim)', async () => {
+      const c = await renderInline('\\\\(x\\\\)', 'strict');
+      c.innerHTML.should.not.include('mjx-container');
+      c.innerHTML.should.include('\\\\(x\\\\)');
+    });
+    it('legacy: double \\\\(x\\\\) IS rendered as math', async () => {
+      const c = await renderInline('\\\\(x\\\\)', 'legacy');
+      c.innerHTML.should.include('mjx-container');
+    });
+    it('legacy: double \\\\[x\\\\] IS rendered as math', async () => {
+      const c = makeContainer('<span class="math-block">\\\\[x\\\\]</span>');
+      await renderNoA11y(c, { mathDelimiterMode: 'legacy' });
+      c.innerHTML.should.include('mjx-container');
+    });
+    it('single \\(x\\) is rendered in both modes', async () => {
+      (await renderInline('\\(x\\)', 'strict')).innerHTML.should.include('mjx-container');
+      (await renderInline('\\(x\\)', 'legacy')).innerHTML.should.include('mjx-container');
+    });
+  });
 });

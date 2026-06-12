@@ -97,13 +97,21 @@ export const multiMath: RuleInline = (state, silent) => {
   let type, endMarker, includeMarkers; // eslint-disable-line
   let math_env = '';
   let endMarkerPos = -1;
+  // legacy accepts double-backslash \\( \\[ as math; strict (default) rejects them
+  const acceptDoubled = (state.md.options.mathDelimiterMode ?? 'strict') === 'legacy';
   if (match[0] === "\\[") {
+    if (!acceptDoubled) {
+      return false;
+    }
     type = "display_math";
     endMarker = "\\\\]";
   } else if (match[0] === "\[") {
     type = "display_math";
     endMarker = "\\]";
   } else if (match[0] === "\\(") {
+    if (!acceptDoubled) {
+      return false;
+    }
     type = "inline_math";
     endMarker = "\\\\)";
   } else if (match[0] === "\(") {

@@ -57,6 +57,7 @@ export interface optionsMathpixMarkdown {
     centerImages?: boolean;
     centerTables?: boolean;
     defaultCellVerticalAlign?: 'top' | 'middle' | 'bottom';
+    mathDelimiterMode?: 'strict' | 'legacy';
     enableCodeBlockRuleForLatexCommands?: boolean;
     addPositionsToTokens?: boolean;
     highlights?: Array<THighlight>;
@@ -109,6 +110,7 @@ export type TMarkdownItOptions = {
     centerImages?: boolean;
     centerTables?: boolean;
     defaultCellVerticalAlign?: 'top' | 'middle' | 'bottom';
+    mathDelimiterMode?: 'strict' | 'legacy';
     enableCodeBlockRuleForLatexCommands?: boolean;
     addPositionsToTokens?: boolean;
     highlights?: Array<THighlight>;

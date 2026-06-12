@@ -1,3 +1,21 @@
+# June 2026
+
+## [3.0.0] - Math delimiter mode (strict double-backslash handling)
+
+**Breaking change.** New `mathDelimiterMode?: 'strict' | 'legacy'` option (default **`'strict'`**) controls whether DOUBLE-backslash delimiters `\\( ... \\)` and `\\[ ... \\]` are treated as math.
+
+- `'strict'` (default): only single-backslash `\(` / `\[` (and `$` / `$$`) open math. `\\(` is **not** a math delimiter — it follows CommonMark escape semantics (`\\` → literal `\`) and renders as literal text.
+- `'legacy'`: also accept `\\(` / `\\[` as math openers — the behavior inherited from `markdown-it-mathjax`, default in all versions ≤ 2.x.
+
+**Migration:** versions ≤ 2.x rendered `\\( ... \\)` as math. Under the new `'strict'` default such content renders as literal `\(...\)`. Consumers that rely on double-backslash delimiters (e.g. pasted / legacy MathJax-era content) must pass `mathDelimiterMode: 'legacy'` explicitly. Single-backslash `\(`/`\[` and `$`/`$$` are unaffected.
+
+- Threaded onto `md.options` (via `markdownToHTML` / `markdownToHTMLSegments` / `render` / `convertToHTML` and the `MathpixMarkdown` React component) so the `multiMath` inline rule honors it.
+- lstlisting `[mathescape=true]` is verbatim code: in `'strict'`, `\\(` inside a listing stays literal (the math-only parser uses a verbatim backslash rule instead of the default escape, so code is never collapsed); single `\(` is still math (what `mathescape` enables).
+- Browser auto-render (`renderMathInElement`) honors `mathDelimiterMode` (`config.mathDelimiterMode`, default `'strict'`) for symmetry with the server parser.
+- Both modes pinned with golden tests: `tests/_math-delimiter-mode.js`, `tests/_auto_render.js`.
+
+See `pr-specs/2026-06-math-delimiter-mode.md`.
+
 # May 2026
 
 ## [2.0.40] - Tabular vertical-align bracket and footnote performance
