@@ -74,5 +74,20 @@ describe('mathDelimiterMode — math vs literal across modes:', () => {
       isMath(legacy).should.equal(true);
     });
   });
+  describe('edge cases:', () => {
+    it('prose strict: mixed literal + real math — \\\\(a\\\\) and \\(b\\)', () => {
+      const html = MM.markdownToHTML('\\\\(a\\\\) and \\(b\\)', { mathDelimiterMode: 'strict' });
+      html.should.include('\\(a\\)');                                 // doubled -> literal
+      (html.match(/<mjx-container/g) || []).length.should.equal(1);   // exactly one formula: \(b\)
+    });
+    it('lst strict: doubled abutting single — \\\\(\\(x\\) keeps \\\\( verbatim, renders \\(x\\)', () => {
+      const html = MM.markdownToHTML(lst('\\\\(\\(x\\)'), { mathDelimiterMode: 'strict' });
+      html.should.include('mjx-container');   // trailing single \(x\) is math
+      html.should.include('\\\\(');           // leading doubled \\( stays verbatim
+    });
+    it('unknown mathDelimiterMode value is treated as strict (fail-safe)', () => {
+      isMath(MM.markdownToHTML('\\\\(x\\\\)', { mathDelimiterMode: 'bogus' })).should.equal(false);
+    });
+  });
   MM.texReset();
 });

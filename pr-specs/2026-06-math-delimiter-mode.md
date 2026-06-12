@@ -34,8 +34,6 @@ enum (not a boolean) — extensible to future render modes without a new public 
 - Changing single-backslash `\(`/`\[` or dollar `$`/`$$` handling — unaffected in both modes.
 - Source rewriting / normalization (`\\(` → `\(`): the renderer never mutates source; normalization
   belongs to an editor/paste layer.
-- N≥3 backslash sequences (`\\\(`, `\\\\\(`): pathological, never emitted by the pipeline; left as-is
-  (prose follows char-by-char escape, the regex-based browser auto-render does not — out of scope).
 
 ## Desired behavior
 

@@ -203,5 +203,20 @@ describe('auto-render (renderMathInElement):', () => {
       (await renderInline('\\(x\\)', 'strict')).innerHTML.should.include('mjx-container');
       (await renderInline('\\(x\\)', 'legacy')).innerHTML.should.include('mjx-container');
     });
+    it('strict: double \\\\[x\\\\] (display) is NOT rendered (stays verbatim)', async () => {
+      const c = makeContainer('<span class="math-block">\\\\[x\\\\]</span>');
+      await renderNoA11y(c, { mathDelimiterMode: 'strict' });
+      c.innerHTML.should.not.include('mjx-container');
+      c.innerHTML.should.include('\\\\[x\\\\]');
+    });
+    it('default (no mathDelimiterMode) === strict: double \\\\(x\\\\) is NOT rendered', async () => {
+      const c = makeContainer('<span class="math-inline">\\\\(x\\\\)</span>');
+      await renderNoA11y(c);
+      c.innerHTML.should.not.include('mjx-container');
+    });
+    it('unknown mathDelimiterMode value is treated as strict (fail-safe)', async () => {
+      const c = await renderInline('\\\\(x\\\\)', 'bogus');
+      c.innerHTML.should.not.include('mjx-container');
+    });
   });
 });
