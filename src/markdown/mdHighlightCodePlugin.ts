@@ -105,7 +105,7 @@ const wrapFence = render => (tokens, idx, options, env, slf) => {
       tokens[idx].attrJoin("count_line", `${String(endLine-line)}`);
       if (options.copyToClipboard) {
         tokens[idx].attrJoin("style", `overflow: auto; position: relative;`);
-        let htmlClipboardCopy = clipboardCopyElement(tokens[idx].content);
+        let htmlClipboardCopy = clipboardCopyElement(tokens[idx].meta?.codeText ?? tokens[idx].content);
         html = '<div ' + slf.renderAttrs(tokens[idx]) + '>' + html + htmlClipboardCopy + '</div>';
       } else {
         html = html.replace('<pre>', '<pre' + slf.renderAttrs(tokens[idx]) + '>')
@@ -116,7 +116,7 @@ const wrapFence = render => (tokens, idx, options, env, slf) => {
   if (options.copyToClipboard || options.previewUuid) {
     tokens[idx].attrJoin("style", `overflow: auto; position: relative;`);
     let htmlClipboardCopy: string = options.copyToClipboard
-      ? clipboardCopyElement(tokens[idx].content)
+      ? clipboardCopyElement(tokens[idx].meta?.codeText ?? tokens[idx].content)
       : "";
     let htmlSeparatingSpan: string = options.previewUuid && tokens[idx].contentSpan
       ? getHtmlSeparatingSpanContainer(tokens[idx].contentSpan)
@@ -152,7 +152,7 @@ const wrapLatexCodeEnv = render => (tokens, idx, options, env, slf) => {
       tokens[idx].attrJoin("count_line", `${String(endLine-line)}`);
       if (options.copyToClipboard) {
         tokens[idx].attrJoin("style", `overflow: auto; position: relative;`);
-        let htmlClipboardCopy = clipboardCopyElement(tokens[idx].content);
+        let htmlClipboardCopy = clipboardCopyElement(tokens[idx].meta?.codeText ?? tokens[idx].content);
         html = '<div ' + slf.renderAttrs(tokens[idx]) + '>' + html + htmlClipboardCopy + '</div>';
       } else {
         html = html.replace('<pre>', '<pre' + slf.renderAttrs(tokens[idx]) + '>')
@@ -163,7 +163,7 @@ const wrapLatexCodeEnv = render => (tokens, idx, options, env, slf) => {
   if (options.copyToClipboard || options.previewUuid) {
     tokens[idx].attrJoin("style", `overflow: auto; position: relative;`);
     let htmlClipboardCopy: string = options.copyToClipboard
-      ? clipboardCopyElement(tokens[idx].content)
+      ? clipboardCopyElement(tokens[idx].meta?.codeText ?? tokens[idx].content)
       : "";
     let htmlSeparatingSpan: string = options.previewUuid && tokens[idx].contentSpan
       ? getHtmlSeparatingSpanContainer(tokens[idx].contentSpan)

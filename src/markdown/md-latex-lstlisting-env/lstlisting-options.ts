@@ -102,5 +102,7 @@ export const applyLstListingOptionsToToken = (
     // parse only math inside the code (no links/emphasis)
     token.children = parseMathEscapeInline(state.md, content, state.env);
     meta.hasMathescape = true;
+    // plain text for copy/convert: un-escaped literal + math verbatim (inputLatex)
+    meta.codeText = token.children.map((c: any) => c.inputLatex ?? c.content).join('');
   }
 }

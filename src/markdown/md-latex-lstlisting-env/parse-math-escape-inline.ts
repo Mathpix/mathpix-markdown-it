@@ -11,18 +11,37 @@ const MATH_INLINE_CACHE = new WeakMap<MarkdownIt, MarkdownIt>();
 type MarkdownItConstructor = new (opts?: MarkdownIt.Options) => MarkdownIt;
 
 const BACKSLASH = 0x5C;
+const DOLLAR = 0x24;
 
 /**
- * Verbatim backslash rule for code listings. Unlike the default `escape` rule it does not
- * collapse `\\` -> `\` (code is literal), and it consumes a `\\` pair together so a following
- * `\(` / `\[` from the second backslash is not re-opened as inline math (strict mode).
+ * Verbatim backslash rule for code listings. Backslashes are kept literal (code is verbatim),
+ * so a doubled `\\( / \\[` stays non-math in strict mode. Exception: a run of backslashes
+ * immediately before `$` drops exactly one backslash and the `$` is a literal dollar
+ * (`\$` -> `$`, `\\$` -> `\$`); only a bare `$` toggles math under mathescape.
  */
 const verbatimBackslash: RuleInline = (state, silent) => {
   const max = state.posMax;
-  let pos = state.pos;
-  if (state.src.charCodeAt(pos) !== BACKSLASH) {
+  const start = state.pos;
+  if (state.src.charCodeAt(start) !== BACKSLASH) {
     return false;
   }
+  // peek the maximal run of backslashes to detect a trailing $
+  let run = start;
+  while (run < max && state.src.charCodeAt(run) === BACKSLASH) {
+    run++;
+  }
+  // ONLY the \$ case: a run of backslashes immediately before $ drops exactly one backslash,
+  // and the $ is a literal dollar (\$ -> $, \\$ -> \$). Nothing else changes.
+  if (run < max && state.src.charCodeAt(run) === DOLLAR) {
+    if (!silent) {
+      state.pending += '\\'.repeat(run - start - 1) + '$';
+    }
+    state.pos = run + 1;
+    return true;
+  }
+  // every other case: original behavior — keep this backslash verbatim and consume a \\ pair so
+  // a following \( / \[ is not re-opened as math (a leftover single \( is left for multiMath)
+  let pos = start;
   if (!silent) {
     state.pending += '\\';
   }

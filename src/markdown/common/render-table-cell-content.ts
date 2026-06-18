@@ -159,7 +159,8 @@ export const renderTableCellContent = (
           mdCell += '</smiles>';
           continue;
         case "latex_lstlisting_env": {
-          let escape = escapeHtml(child.content);
+          // codeText: mathescape \$ un-escaped + verbatim math; else raw content
+          let escape = escapeHtml(child.meta?.codeText ?? child.content);
           let mdContent = escape.split('\n').join('<br>');
           mdContent = mdContent.replace(/\|/g, '&#124');
           mdCell += `<pre><code>${mdContent}</code></pre>`;

@@ -1,6 +1,6 @@
 # June 2026
 
-## [3.0.0] - Math delimiter mode (strict double-backslash handling)
+## [3.0.0] - Math delimiter mode (strict double-backslash handling) and lstlisting mathescape `\$` rendering
 
 **Breaking change.** New `mathDelimiterMode?: 'strict' | 'legacy'` option (default **`'strict'`**) controls whether DOUBLE-backslash delimiters `\\( ... \\)` and `\\[ ... \\]` are treated as math.
 
@@ -15,6 +15,12 @@
 - Both modes pinned with golden tests: `tests/_math-delimiter-mode.js`, `tests/_auto_render.js`.
 
 See `pr-specs/2026-06-math-delimiter-mode.md`.
+
+### lstlisting mathescape: literal `\$` rendering
+
+Inside a `[mathescape=true]` listing, a run of backslashes immediately before `$` drops exactly one backslash and the `$` is a literal dollar (`\$` → `$`, `\\$` → `\$`); only a bare `$` toggles math. Scoped to `$` only — `\(` / `\[` / `\\(` / `\\[` delimiter handling is unchanged. Plain listings (no `mathescape`) are unaffected. Copy-to-clipboard and a mathescape listing inside a table cell reflect the same un-escaped text via a math-aware `token.meta.codeText`. `verbatimBackslash` in `parse-math-escape-inline.ts`; pinned by `tests/_lstlisting-mathescape-dollar.js`.
+
+See `pr-specs/2026-06-lstlisting-mathescape-dollar-render.md`.
 
 # May 2026
 
