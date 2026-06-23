@@ -65,9 +65,9 @@ const verbatimBackslash: RuleInline = (state, silent) => {
  * multiMath/simpleMath still see every delimiter opener before `text` consumes it. `escape`
  * is replaced with `verbatimBackslash` because listing code is verbatim.
  *
- * Cache caveat: options are snapshotted at construction. Safe while each render builds a fresh
- * baseMd (per mdInit); if baseMd is reused across renders with different mathDelimiterMode, the
- * cached parser keeps the first mode.
+ * Cache note: options are snapshotted at construction, but `parseMathEscapeInline` refreshes the
+ * option-sensitive `mathDelimiterMode` from `baseMd.options` before each parse, so a reused baseMd
+ * whose `mathDelimiterMode` is mutated between parses is honored (see that function).
  */
 export const createMathOnlyInlineParser = (baseMd: MarkdownIt): MarkdownIt => {
   const cached = MATH_INLINE_CACHE.get(baseMd);
@@ -97,6 +97,8 @@ export const parseMathEscapeInline = (
   env = {}
 ): Token[] => {
   const mathMd: MarkdownIt = createMathOnlyInlineParser(baseMd);
+  // refresh mode from baseMd so a reused/mutated baseMd is honored (cache snapshot would be stale)
+  mathMd.options.mathDelimiterMode = baseMd.options.mathDelimiterMode === 'legacy' ? 'legacy' : 'strict';
   const tokens: Token[] = [];
   const envClone = { ...env, mathescape_ctx: true };
   mathMd.inline.parse(src, mathMd, envClone, tokens);

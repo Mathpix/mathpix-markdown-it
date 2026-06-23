@@ -8,9 +8,9 @@ import type Token from 'markdown-it/lib/token';
  * multiMath/simpleMath still see every delimiter opener before `text` consumes it. `escape`
  * is replaced with `verbatimBackslash` because listing code is verbatim.
  *
- * Cache caveat: options are snapshotted at construction. Safe while each render builds a fresh
- * baseMd (per mdInit); if baseMd is reused across renders with different mathDelimiterMode, the
- * cached parser keeps the first mode.
+ * Cache note: options are snapshotted at construction, but `parseMathEscapeInline` refreshes the
+ * option-sensitive `mathDelimiterMode` from `baseMd.options` before each parse, so a reused baseMd
+ * whose `mathDelimiterMode` is mutated between parses is honored (see that function).
  */
 export declare const createMathOnlyInlineParser: (baseMd: MarkdownIt) => MarkdownIt;
 /**

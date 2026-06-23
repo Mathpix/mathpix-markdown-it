@@ -1,8 +1,8 @@
 # PR: Fix lstlisting mathescape parser cache honoring `mathDelimiterMode`
 
-Status: Draft
-Owner: TBD
-Related: `pr-specs/2026-06-math-delimiter-mode.md`
+Status: Implemented
+Owner: @OlgaRedozubova
+Related: `pr-specs/2026-06-math-delimiter-mode.md`, `pr-specs/2026-06-lstlisting-mathescape-dollar-render.md`
 
 ---
 

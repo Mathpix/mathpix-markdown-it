@@ -12,6 +12,8 @@
 const chai = require('chai');
 const should = chai.should();
 const MM = require('../lib/mathpix-markdown-model/index').MathpixMarkdownModel;
+const MarkdownIt = require('markdown-it');
+const pluginLatexCodeEnvs = require('../lib/markdown/md-latex-lstlisting-env/index').default;
 
 const { JSDOM } = require('jsdom');
 const jsdom = new JSDOM();
@@ -87,6 +89,25 @@ describe('mathDelimiterMode — math vs literal across modes:', () => {
     });
     it('unknown mathDelimiterMode value is treated as strict (fail-safe)', () => {
       isMath(MM.markdownToHTML('\\\\(x\\\\)', { mathDelimiterMode: 'bogus' })).should.equal(false);
+    });
+  });
+  // cached math-only parser must honor a reused baseMd whose mathDelimiterMode is mutated between parses
+  describe('lstlisting mathescape — cached parser honors a reused/mutated baseMd:', () => {
+    const lstSrc = lst('\\\\(x\\\\)');
+    const itemKind = (md, mode) => {
+      md.options.mathDelimiterMode = mode;
+      const token = md.parse(lstSrc, {}).find((t) => t.type === 'latex_lstlisting_env');
+      return token.children.map((c) => c.type).join('|');
+    };
+    it('legacy then strict on one instance: math, then literal text', () => {
+      const md = new MarkdownIt({ outMath: {} }).use(pluginLatexCodeEnvs);
+      itemKind(md, 'legacy').should.equal('inline_math');
+      itemKind(md, 'strict').should.equal('text');
+    });
+    it('strict then legacy on one instance: literal text, then math', () => {
+      const md = new MarkdownIt({ outMath: {} }).use(pluginLatexCodeEnvs);
+      itemKind(md, 'strict').should.equal('text');
+      itemKind(md, 'legacy').should.equal('inline_math');
     });
   });
   MM.texReset();
