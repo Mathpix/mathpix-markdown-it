@@ -78,6 +78,8 @@ export interface optionsMathpixMarkdown {
     centerImages?: boolean;
     centerTables?: boolean;
     defaultCellVerticalAlign?: 'top' | 'middle' | 'bottom';
+    // strict (default): single-backslash only; legacy: also accept \\( \\[
+    mathDelimiterMode?: 'strict' | 'legacy';
     enableCodeBlockRuleForLatexCommands?: boolean;
     addPositionsToTokens?: boolean;
     highlights?: Array<THighlight>;
@@ -132,6 +134,8 @@ export type TMarkdownItOptions = {
   centerTables?: boolean;
   // Fallback vertical alignment for tabular cells without an explicit \begin{tabular}[pos]{...} bracket.
   defaultCellVerticalAlign?: 'top' | 'middle' | 'bottom';
+  // strict (default): single-backslash only; legacy: also accept \\( \\[
+  mathDelimiterMode?: 'strict' | 'legacy';
   enableCodeBlockRuleForLatexCommands?: boolean;
   addPositionsToTokens?: boolean;
   highlights?: Array<THighlight>;
@@ -622,6 +626,7 @@ class MathpixMarkdown_Model {
           centerImages = true,
           centerTables = true,
           defaultCellVerticalAlign = undefined,
+          mathDelimiterMode = 'strict',
           enableCodeBlockRuleForLatexCommands = false,
           addPositionsToTokens = false,
           highlights = [],
@@ -676,6 +681,7 @@ class MathpixMarkdown_Model {
           centerImages: centerImages,
           centerTables: centerTables,
           defaultCellVerticalAlign: defaultCellVerticalAlign,
+          mathDelimiterMode: mathDelimiterMode,
           enableCodeBlockRuleForLatexCommands: enableCodeBlockRuleForLatexCommands,
           addPositionsToTokens: addPositionsToTokens,
           highlights: highlights,

@@ -21,7 +21,7 @@ You can add optional attributes inside square brackets:
 | Attribute    | Example                               |	Description                                                                                                                         |
 |:-------------|:--------------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------|
 | `language`   | `\begin{lstlisting}[language=C]`      | Programming language for syntax highlighting. All highlight.js languages are supported (e.g., C, Python, JavaScript, Rust, TeX, bash).	|
-| `mathescape` | `\begin{lstlisting}[mathescape=true]` | Allows inline LaTeX math (`$...$` or `\( ... \)`) inside the code block.                                                               |
+| `mathescape` | `\begin{lstlisting}[mathescape=true]` | Allows inline LaTeX math (`$...$` or `\( ... \)`) inside the code block. A run of backslashes before `$` drops one and the `$` is a literal dollar (`\$`→`$`, `\\$`→`\$`); a bare `$` toggles math.        |
 
 ## Examples
 

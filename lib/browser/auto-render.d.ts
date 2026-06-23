@@ -11,6 +11,7 @@ export interface MathpixRenderConfig {
     /** Container width used for layout metrics (cwidth) */
     width?: number;
     previewUuid?: string;
+    mathDelimiterMode?: 'strict' | 'legacy';
 }
 /**
  * Typeset MathJax math inside a container element.

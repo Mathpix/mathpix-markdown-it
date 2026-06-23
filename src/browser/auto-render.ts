@@ -8,6 +8,9 @@ const RE_TEX_DISPLAY_BRACKETS: RegExp = /^\\\[[\s\S]*\\\]$/;
 const RE_TEX_INLINE_PARENS: RegExp = /^\\\([\s\S]*\\\)$/;
 const RE_TEX_INLINE_DOLLAR: RegExp = /^\$[\s\S]*\$$/;
 const RE_TEX_ENV_WHOLE: RegExp = /^\\begin\{[^}]+\}[\s\S]*\\end\{[^}]+\}$/;
+// double-backslash delimiters (legacy mode only)
+const RE_TEX_DISPLAY_BRACKETS_DOUBLE: RegExp = /^\\\\\[[\s\S]*\\\\\]$/;
+const RE_TEX_INLINE_PARENS_DOUBLE: RegExp = /^\\\\\([\s\S]*\\\\\)$/;
 
 export interface MathpixAccessibilityConfig {
   /** Expose MathJax assistive MathML for screen readers */
@@ -22,6 +25,8 @@ export interface MathpixRenderConfig {
   /** Container width used for layout metrics (cwidth) */
   width?: number;
   previewUuid?: string;
+  // default strict; legacy also accepts \\( \\[
+  mathDelimiterMode?: 'strict' | 'legacy';
 }
 
 const defaultConfig: MathpixRenderConfig = {
@@ -33,7 +38,8 @@ const defaultConfig: MathpixRenderConfig = {
     output_format: "svg",
     include_svg: true
   },
-  width: 1200
+  width: 1200,
+  mathDelimiterMode: 'strict'
 };
 
 type TypesetTarget =
@@ -99,16 +105,24 @@ const getMathMLString = (el: HTMLElement): { mathml: string; display: boolean } 
  * strips those outer delimiters and returns the inner TeX plus an inferred display mode.
  * Returns null if the input is not fully wrapped.
  */
-const stripOuterMathDelimitersIfWhole = (raw: string): StripResult => {
+const stripOuterMathDelimitersIfWhole = (raw: string, mode: 'strict' | 'legacy' = 'strict'): StripResult => {
   const text: string = (raw ?? '').trim();
   if (!text) return null;
   // $$...$$
   if (RE_TEX_DISPLAY_DOLLARS.test(text)) {
     return { tex: text.slice(2, -2).trim(), display: true };
   }
+  // \\[...\\] (legacy only)
+  if (mode === 'legacy' && RE_TEX_DISPLAY_BRACKETS_DOUBLE.test(text)) {
+    return { tex: text.slice(3, -3).trim(), display: true };
+  }
   // \[...\]
   if (RE_TEX_DISPLAY_BRACKETS.test(text)) {
     return { tex: text.slice(2, -2).trim(), display: true };
+  }
+  // \\(...\\) (legacy only)
+  if (mode === 'legacy' && RE_TEX_INLINE_PARENS_DOUBLE.test(text)) {
+    return { tex: text.slice(3, -3).trim(), display: false };
   }
   // \(...\)
   if (RE_TEX_INLINE_PARENS.test(text)) {
@@ -132,7 +146,7 @@ const stripOuterMathDelimitersIfWhole = (raw: string): StripResult => {
  * - If the element contains non-trivial child elements (except <br>) -> returns null.
  * - Otherwise, if its text is fully wrapped in TeX math delimiters -> returns a TeX target.
  */
-const shouldTypesetNode = (el: HTMLElement): TypesetTarget | null => {
+const shouldTypesetNode = (el: HTMLElement, mode: 'strict' | 'legacy' = 'strict'): TypesetTarget | null => {
   // 0) Pure MathML input (render it)
   if (isOnlyMathMLElement(el)) {
     const { mathml, display } = getMathMLString(el);
@@ -156,7 +170,7 @@ const shouldTypesetNode = (el: HTMLElement): TypesetTarget | null => {
   }
   // 3) Otherwise, check for fully-wrapped TeX delimiters
   const text: string = el.textContent ?? '';
-  const match = stripOuterMathDelimitersIfWhole(text);
+  const match = stripOuterMathDelimitersIfWhole(text, mode);
   if (!match) {
     return null;
   }
@@ -233,6 +247,7 @@ export const renderMathInElement = async (
   };
   const outMath: TOutputMath = cfg.outMath;
   const cwidth: number = cfg.width && cfg.width > 0 ? cfg.width : 1200;
+  const mathDelimiterMode: 'strict' | 'legacy' = cfg.mathDelimiterMode === 'legacy' ? 'legacy' : 'strict';
   // Collect candidates (we only typeset nodes that look like "raw math" input).
   const mathNodes = Array.from(
     container.querySelectorAll<HTMLElement>('.math-inline, .math-block')
@@ -243,7 +258,7 @@ export const renderMathInElement = async (
   MathJax.beginRender(cfg?.previewUuid);
   MathJax.Reset();
   for (const mathEl of mathNodes) {
-    const target: TypesetTarget = shouldTypesetNode(mathEl);
+    const target: TypesetTarget = shouldTypesetNode(mathEl, mathDelimiterMode);
     if (!target) continue;
     try {
       const metric = { cwidth };
