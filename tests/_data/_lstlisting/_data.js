@@ -874,6 +874,41 @@ module.exports = [
       '</table>\n' +
       '</div></div>',
   },
+  {
+    // lstlisting inside \begin{table} keeps its code indentation.
+    mmd: "\\begin{table}\n\\centering\n\\begin{tabular}{|l|}\n\\hline\n\\begin{lstlisting}\ndef main():\n    print(\"hi\")\n        deep()\n\\end{lstlisting} \\\\\n\\hline\n\\end{tabular}\n\\end{table}",
+    html: "<div class=\"table\">\n<div class=\"table_tabular\" style=\"text-align: center\">\n<div class=\"inline-tabular\"><table class=\"tabular\">\n<tbody>\n<tr style=\"border-top: none !important; border-bottom: none !important;\">\n<td style=\"text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; \"><pre class=\"lstlisting\"><code class=\"hljs lstlisting-code\" style=\"text-align: left;\">def main():\n    print(&quot;hi&quot;)\n        deep()</code></pre>\n</td>\n</tr>\n</tbody>\n</table>\n</div></div>\n</div>",
+  },
+  {
+    // lstlisting opening mid-cell (`C &\begin{lstlisting}`) inside \begin{center} keeps its code indentation.
+    mmd: "\\begin{center}\n\\begin{tabular}{|l|l|}\n\\hline\nC &\\begin{lstlisting}\n#include <stdio.h>\n    printf(\"hi\");\n    return 0;\n\\end{lstlisting}\\\\\n\\hline\n\\end{tabular}\n\\end{center}",
+    html: "<div class=\"center\" style=\"text-align: center\">\n<div class=\"table_tabular\" style=\"text-align: center\">\n<div class=\"inline-tabular\"><table class=\"tabular\">\n<tbody>\n<tr style=\"border-top: none !important; border-bottom: none !important;\">\n<td style=\"text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; \">C</td>\n<td style=\"text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; \"><pre class=\"lstlisting\"><code class=\"hljs lstlisting-code\" style=\"text-align: left;\">#include &lt;stdio.h&gt;\n    printf(&quot;hi&quot;);\n    return 0;</code></pre>\n</td>\n</tr>\n</tbody>\n</table>\n</div></div>\n</div>",
+  },
+  {
+    // lstlisting inside \begin{figure} keeps code indentation (figure type branch).
+    mmd: "\\begin{figure}\n\\begin{tabular}{|l|}\n\\hline\n\\begin{lstlisting}\ndef f():\n    return 1\n\\end{lstlisting} \\\\\n\\hline\n\\end{tabular}\n\\end{figure}",
+    html: "<div class=\"table\"><div class=\"inline-tabular\"><table class=\"tabular\">\n<tbody>\n<tr style=\"border-top: none !important; border-bottom: none !important;\">\n<td style=\"text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; \"><pre class=\"lstlisting\"><code class=\"hljs lstlisting-code\" style=\"text-align: left;\">def f():\n    return 1</code></pre>\n</td>\n</tr>\n</tbody>\n</table>\n</div></div>",
+  },
+  {
+    // lstlisting inside \begin{left} keeps code indentation (non-center endTag).
+    mmd: "\\begin{left}\n\\begin{tabular}{|l|}\n\\hline\n\\begin{lstlisting}\ndef f():\n    return 1\n\\end{lstlisting} \\\\\n\\hline\n\\end{tabular}\n\\end{left}",
+    html: "<div class=\"center\" style=\"text-align: left\">\n<div class=\"table_tabular\" style=\"text-align: left\">\n<div class=\"inline-tabular\"><table class=\"tabular\">\n<tbody>\n<tr style=\"border-top: none !important; border-bottom: none !important;\">\n<td style=\"text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; \"><pre class=\"lstlisting\"><code class=\"hljs lstlisting-code\" style=\"text-align: left;\">def f():\n    return 1</code></pre>\n</td>\n</tr>\n</tbody>\n</table>\n</div></div>\n</div>",
+  },
+  {
+    // lstlisting opening mid-cell inside \begin{table} keeps code indentation.
+    mmd: "\\begin{table}\n\\begin{tabular}{|l|l|}\n\\hline\nC &\\begin{lstlisting}\n#include <stdio.h>\n    printf(\"hi\");\n\\end{lstlisting}\\\\\n\\hline\n\\end{tabular}\n\\end{table}",
+    html: "<div class=\"table\">\n<div class=\"table_tabular\" style=\"text-align: center\">\n<div class=\"inline-tabular\"><table class=\"tabular\">\n<tbody>\n<tr style=\"border-top: none !important; border-bottom: none !important;\">\n<td style=\"text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; \">C</td>\n<td style=\"text-align: left; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; \"><pre class=\"lstlisting\"><code class=\"hljs lstlisting-code\" style=\"text-align: left;\">#include &lt;stdio.h&gt;\n    printf(&quot;hi&quot;);</code></pre>\n</td>\n</tr>\n</tbody>\n</table>\n</div></div>\n</div>",
+  },
+  {
+    // Marker collision: ``` inside lstlisting stays literal code, no fence opens.
+    mmd: "\\begin{center}\n\\begin{tabular}{|l|}\n\\hline\n\\begin{lstlisting}\n    ```not a fence```\n    x = 1\n\\end{lstlisting} \\\\\n\\hline\n\\end{tabular}\n\\end{center}",
+    html: "<div class=\"center\" style=\"text-align: center\">\n<div class=\"table_tabular\" style=\"text-align: center\">\n<div class=\"inline-tabular\"><table class=\"tabular\">\n<tbody>\n<tr style=\"border-top: none !important; border-bottom: none !important;\">\n<td style=\"text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; \"><pre class=\"lstlisting\"><code class=\"hljs lstlisting-code\" style=\"text-align: left;\">    ```not a fence```\n    x = 1</code></pre>\n</td>\n</tr>\n</tbody>\n</table>\n</div></div>\n</div>",
+  },
+  {
+    // Blank line inside lstlisting in \begin{table} is preserved, matching a bare tabular.
+    mmd: "\\begin{table}\n\\begin{tabular}{|l|}\n\\hline\n\\begin{lstlisting}\ndef a():\n    x = 1\n\n    y = 2\n\\end{lstlisting} \\\\\n\\hline\n\\end{tabular}\n\\end{table}",
+    html: "<div class=\"table\">\n<div class=\"table_tabular\" style=\"text-align: center\">\n<div class=\"inline-tabular\"><table class=\"tabular\">\n<tbody>\n<tr style=\"border-top: none !important; border-bottom: none !important;\">\n<td style=\"text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; \"><pre class=\"lstlisting\"><code class=\"hljs lstlisting-code\" style=\"text-align: left;\">def a():\n    x = 1\n\n    y = 2</code></pre>\n</td>\n</tr>\n</tbody>\n</table>\n</div></div>\n</div>",
+  },
   // {
   //   mmd: '',
   //   html: '',

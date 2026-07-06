@@ -7,6 +7,23 @@ type SetTokensBlockParseOptions = {
     disableBlockRules?: boolean;
 };
 /**
+ * Appends one wrapper line to the accumulated content, tracking lstlisting nesting so code lines
+ * are stored raw (indentation preserved) while normal content stays de-indented. Shared by the
+ * tabular float/align wrappers (begin-table, begin-align). lstlisting may open/close mid-line
+ * (e.g. `C &\begin{lstlisting}`), so detection is substring-based.
+ *
+ * @param state    - markdown-it block state
+ * @param nextLine - current source line index
+ * @param lineText - the de-indented line (state.bMarks[n] + state.tShift[n])
+ * @param resText  - content accumulated so far
+ * @param envDepth - current lstlisting nesting depth (>0 means inside code)
+ * @returns updated { resText, envDepth }
+ */
+export declare const appendEnvAwareContentLine: (state: StateBlock, nextLine: number, lineText: string, resText: string, envDepth: number) => {
+    resText: string;
+    envDepth: number;
+};
+/**
  * Parses a block of content with markdown-it and pushes the resulting
  * block tokens into the current state, with optional control over
  * line mapping, inline rendering, PPTX-specific behavior and temporary

@@ -1,6 +1,7 @@
 import { RuleBlock, Token } from 'markdown-it';
 import { StatePushDiv, StatePushTabularBlock } from "./begin-tabular";
 import { StatePushIncludeGraphics } from "../md-inline-rule/includegraphics";
+import { appendEnvAwareContentLine } from "./helper";
 import { RE_ALIGN_ENV_BLOCK, RE_BEGIN_ALIGN_ENV } from "../common/consts";
 
 const endTag = (arg:string='center'): RegExp  => { return new RegExp('\\end\s{0,}\{(' + arg + ')\}')};
@@ -109,6 +110,7 @@ export const BeginAlign: RuleBlock = (state, startLine, endLine, silent) => {
   let resText: string = '';
 
   let isCloseTagExist = false;
+  let envDepth = 0; // >0 — inside a lstlisting; those lines are kept raw so code indentation survives
 
   const match: RegExpMatchArray = lineText.match(RE_BEGIN_ALIGN_ENV);
   if (!match) {
@@ -146,14 +148,7 @@ export const BeginAlign: RuleBlock = (state, startLine, endLine, silent) => {
       break
       //if (state.isEmpty(nextLine+1)) { break }
     }
-
-    if (resText && lineText) {
-      resText += '\n' + lineText;
-    } else {
-      resText += lineText;
-    }
-
-
+    ({ resText, envDepth } = appendEnvAwareContentLine(state, nextLine, lineText, resText, envDepth));
     // this would be a code block normally, but after paragraph
     // it's considered a lazy continuation regardless of what's there
     if (state.sCount[nextLine] - state.blkIndent > 3) { continue; }
