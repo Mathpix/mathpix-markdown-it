@@ -1,4 +1,5 @@
 import type Token from 'markdown-it/lib/token';
+import type StateBlock from 'markdown-it/lib/rules_block/state_block';
 
 type SetTokensBlockParseOptions = {
   startLine?: number;
@@ -16,6 +17,44 @@ type SetTokensBlockParseOptions = {
 const MD_BLOCK_LEADING_RE: RegExp =
   /^(\s{0,3})(#{1,6}(?=\s|$)|>[\s>]*|(`{3,}|~{3,})[^\n]*)/;
 const defaultRulesToDisable: string[] = ['list'];
+
+/**
+ * Appends one wrapper line to the accumulated content, tracking lstlisting nesting so code lines
+ * are stored raw (indentation preserved) while normal content stays de-indented. Shared by the
+ * tabular float/align wrappers (begin-table, begin-align). lstlisting may open/close mid-line
+ * (e.g. `C &\begin{lstlisting}`), so detection is substring-based.
+ *
+ * @param state    - markdown-it block state
+ * @param nextLine - current source line index
+ * @param lineText - the de-indented line (state.bMarks[n] + state.tShift[n])
+ * @param resText  - content accumulated so far
+ * @param envDepth - current lstlisting nesting depth (>0 means inside code)
+ * @returns updated { resText, envDepth }
+ */
+export const appendEnvAwareContentLine = (
+  state: StateBlock,
+  nextLine: number,
+  lineText: string,
+  resText: string,
+  envDepth: number
+): { resText: string; envDepth: number } => {
+  const wasInsideLst: boolean = envDepth > 0;
+  if (lineText.indexOf('\\begin{lstlisting}') > -1) {
+    envDepth++;
+  }
+  if (lineText.indexOf('\\end{lstlisting}') > -1 && envDepth > 0) {
+    envDepth--;
+  }
+  if (wasInsideLst) {
+    // Inside lstlisting: keep the line raw (indentation) and always join, so blank code lines survive
+    // (matches the standalone tabular rule). resText is never empty here — the \begin line came first.
+    const rawLine: string = state.src.slice(state.bMarks[nextLine], state.eMarks[nextLine]);
+    resText = resText ? resText + '\n' + rawLine : rawLine;
+    return { resText, envDepth };
+  }
+  resText = resText && lineText ? resText + '\n' + lineText : resText + lineText;
+  return { resText, envDepth };
+};
 
 /**
  * If the first line looks like a markdown block (heading, quote, fence),

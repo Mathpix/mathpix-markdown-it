@@ -1059,5 +1059,55 @@ module.exports = [
           '</pre>\n' +
         '</li>' +
       '</ul>'
+  },
+  {
+    // Fenced code in itemize keeps the code indentation (was de-indented; lstlisting already worked).
+    latex: "\\begin{itemize}\n\\item[] Recursion example:\n```\npublic int multByFive(int num)\n{\n    int result = 5;\n    if (num > 1)\n        result = 5 + multByFive(num - 1);\n    return result;\n}\n```\n\\item[] next item\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\" data-custom-marker=\"true\" data-marker-empty=\"true\"><span class=\"li_level\" data-custom-marker=\"true\" data-marker-empty=\"true\"></span><div>Recursion example:</div>\n<pre><code class=\"hljs\">public int multByFive(int num)\n{\n    int result = 5;\n    if (num &gt; 1)\n        result = 5 + multByFive(num - 1);\n    return result;\n}\n</code></pre>\n</li><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\"><span class=\"li_level\" data-custom-marker=\"true\" data-marker-empty=\"true\"></span>next item</li></ul>"
+  },
+  {
+    // Fence with a language: keeps syntax highlighting and indentation.
+    latex: "\\begin{itemize}\n\\item[] code:\n```java\npublic class A {\n    int x = 5;\n}\n```\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\" data-custom-marker=\"true\" data-marker-empty=\"true\"><span class=\"li_level\" data-custom-marker=\"true\" data-marker-empty=\"true\"></span><div>code:</div>\n<pre><code class=\"hljs language-java\"><span class=\"hljs-keyword\">public</span> <span class=\"hljs-keyword\">class</span> <span class=\"hljs-title class_\">A</span> {\n    <span class=\"hljs-type\">int</span> <span class=\"hljs-variable\">x</span> <span class=\"hljs-operator\">=</span> <span class=\"hljs-number\">5</span>;\n}\n</code></pre>\n</li></ul>"
+  },
+  {
+    // Consecutive fenced blocks in one item.
+    latex: "\\begin{itemize}\n\\item[] two blocks:\n```\n    a = 1\n```\n```\n    b = 2\n```\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\" data-custom-marker=\"true\" data-marker-empty=\"true\"><span class=\"li_level\" data-custom-marker=\"true\" data-marker-empty=\"true\"></span><div>two blocks:</div>\n<pre><code class=\"hljs\">    a = 1\n</code></pre>\n<pre><code class=\"hljs\">    b = 2\n</code></pre>\n</li></ul>"
+  },
+  {
+    // Blank line inside a fenced block is preserved.
+    latex: "\\begin{itemize}\n\\item[] with blank line:\n```\nline 1\n\n    line 3\n```\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\" data-custom-marker=\"true\" data-marker-empty=\"true\"><span class=\"li_level\" data-custom-marker=\"true\" data-marker-empty=\"true\"></span><div>with blank line:</div>\n<pre><code class=\"hljs\">line 1\n\n    line 3\n</code></pre>\n</li></ul>"
+  },
+  {
+    // Tilde (~~~) fence: same handling as backticks.
+    latex: "\\begin{itemize}\n\\item[] t:\n~~~\n    indented\n~~~\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\" data-custom-marker=\"true\" data-marker-empty=\"true\"><span class=\"li_level\" data-custom-marker=\"true\" data-marker-empty=\"true\"></span><div>t:</div>\n<pre><code class=\"hljs\">    indented\n</code></pre>\n</li></ul>"
+  },
+  {
+    // Unclosed fence: it never closes, so ``` is treated as ordinary content and the list still renders (items intact).
+    latex: "\\begin{itemize}\n\\item[] intro\n```\n    code\n\\item[] after\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\" data-custom-marker=\"true\" data-marker-empty=\"true\"><span class=\"li_level\" data-custom-marker=\"true\" data-marker-empty=\"true\"></span><div>intro</div>\n<pre><code class=\"hljs\">code</code></pre>\n</li><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\"><span class=\"li_level\" data-custom-marker=\"true\" data-marker-empty=\"true\"></span>after</li></ul>"
+  },
+  {
+    // Marker collision: \item / \end{itemize} inside a fence stay literal; list closes on the real \end after the fence.
+    latex: "\\begin{itemize}\n\\item[] a\n```\n\\item[] not an item\n\\end{itemize} literal\n```\n\\item[] real\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\" data-custom-marker=\"true\" data-marker-empty=\"true\"><span class=\"li_level\" data-custom-marker=\"true\" data-marker-empty=\"true\"></span><div>a</div>\n<pre><code class=\"hljs\">\\item[] not an item\n\\end{itemize} literal\n</code></pre>\n</li><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\"><span class=\"li_level\" data-custom-marker=\"true\" data-marker-empty=\"true\"></span>real</li></ul>"
+  },
+  {
+    // Fence inside \begin{enumerate}: numbering kept, code indentation preserved.
+    latex: "\\begin{enumerate}\n\\item[] first\n```\n    code\n```\n\\end{enumerate}",
+    html: "<ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li class=\"li_enumerate not_number\" data-custom-marker=\"true\" data-marker-empty=\"true\" style=\"display: block\"><span class=\"li_level\" data-custom-marker=\"true\" data-marker-empty=\"true\"></span><div>first</div>\n<pre><code class=\"hljs\">    code\n</code></pre>\n</li></ol>"
+  },
+  {
+    // Fence closed by a longer marker (open ```, close ````).
+    latex: "\\begin{itemize}\n\\item[] x\n```\n    code\n````\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\" data-custom-marker=\"true\" data-marker-empty=\"true\"><span class=\"li_level\" data-custom-marker=\"true\" data-marker-empty=\"true\"></span><div>x</div>\n<pre><code class=\"hljs\">    code\n</code></pre>\n</li></ul>"
+  },
+  {
+    // Fence before the first \item (no preceding item): list still renders, no crash.
+    latex: "\\begin{itemize}\n```\n    code\n```\n\\item[] first\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><code>    code</code><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\"><span class=\"li_level\" data-custom-marker=\"true\" data-marker-empty=\"true\"></span>first</li></ul>"
   }
 ];

@@ -27,6 +27,60 @@ import {
   reSetCounter
 } from "../common/consts";
 
+// A fenced code block (``` or ~~~) inside a list env is opaque like lstlisting: its lines are collected raw so
+// the code keeps its indentation (the normal content path de-indents via tShift, which `\item` detection needs).
+// Detection mirrors the core fence rule (mmd-fence.ts): marker ` (0x60) or ~ (0x7E), run length ≥ 3, ≤ 3 leading
+// spaces; a backtick open cannot carry a backtick in its info string; a close is same char, ≥ open length, blank tail.
+const BACKTICK: number = 0x60;
+const TILDE: number = 0x7E;
+type FenceMarker = { char: number; len: number };
+const skipUpTo3Spaces = (rawLine: string): number => {
+  let pos = 0;
+  while (pos < 3 && rawLine.charCodeAt(pos) === 0x20) {
+    pos++;
+  }
+  return pos;
+};
+const detectFenceOpen = (rawLine: string): FenceMarker | null => {
+  const pos: number = skipUpTo3Spaces(rawLine);
+  const char: number = rawLine.charCodeAt(pos);
+  if (char !== BACKTICK && char !== TILDE) {
+    return null;
+  }
+  let len = 0;
+  while (rawLine.charCodeAt(pos + len) === char) {
+    len++;
+  }
+  if (len < 3) {
+    return null;
+  }
+  if (char === BACKTICK && rawLine.indexOf('`', pos + len) >= 0) {
+    return null; // an info string on a backtick fence cannot contain a backtick
+  }
+  return { char, len };
+};
+const isFenceClose = (rawLine: string, fence: FenceMarker): boolean => {
+  const pos: number = skipUpTo3Spaces(rawLine);
+  if (rawLine.charCodeAt(pos) !== fence.char) {
+    return false;
+  }
+  let len = 0;
+  while (rawLine.charCodeAt(pos + len) === fence.char) {
+    len++;
+  }
+  if (len < fence.len) {
+    return false;
+  }
+  for (let i = pos + len; i < rawLine.length; i++) {
+    const c: number = rawLine.charCodeAt(i);
+    if (c !== 0x20 && c !== 0x09) {
+      return false; // tail must be blank
+    }
+  }
+  return true;
+};
+
+
 /**
  * Detects \begin{lstlisting} or \begin{tabular} on a line and enters an opaque env.
  * - Uses `stack` to track nesting (tabular can nest, lstlisting cannot).
@@ -296,16 +350,17 @@ export const ListsInternal = (
   let items: ParsedListItem[] = [];
   let haveClose: boolean = false;
   let opaqueStack: OpaqueStack = [];
-  for (; nextLine < endLine; nextLine++) {
-    pos = state.bMarks[nextLine] + state.tShift[nextLine];
-    max = state.eMarks[nextLine];
-    lineText = state.src.slice(pos, max);
+  let fenceMarker: FenceMarker | null = null;
+  const fenceBuffer: { lineText: string; rawLine: string; line: number }[] = [];
+  // Process one ordinary (non-fence) list line: opaque envs, \setcounter, inline \begin/\end, \item, content.
+  // Returns 'abort' (bail, emit nothing), 'break' (list closed — caller advances past this line) or 'proceed'.
+  const processLine = (lineText: string, lineIdx: number): 'abort' | 'break' | 'proceed' => {
     // Handle opaque envs; may consume the line or return a tail to re-parse.
     const opaqueRes: OpaqueProcessResult = processOpaqueLine({
       lineText,
       stack: opaqueStack,
       items,
-      nextLine,
+      nextLine: lineIdx,
       state,
       renderStart
     });
@@ -313,7 +368,7 @@ export const ListsInternal = (
     items = opaqueRes.items;
     lineText = opaqueRes.lineText;
     if (opaqueRes.consumedLine) {
-      continue;
+      return 'proceed';
     }
     // Handle \setcounter lines
     if (reSetCounter.test(lineText)) {
@@ -330,9 +385,9 @@ export const ListsInternal = (
         const startNumber = parseSetCounterNumber(match) ?? 1;
         li = { value: startNumber };
         if (sE.length > 0) {
-          items = ItemsAddToPrev(items, sE, nextLine);
+          items = ItemsAddToPrev(items, sE, lineIdx);
         }
-        continue;
+        return 'proceed';
       }
     }
     // Handle inline \end{itemize}/\end{enumerate}
@@ -341,15 +396,15 @@ export const ListsInternal = (
       if (endMatch) {
         const raw: string = endMatch[1].trim();
         if (!isListType(raw)) {
-          return false;
+          return 'abort';
         }
         let { sB, sE, isBacktickEscapedPair } = splitInlineListEnv(lineText, endMatch);
         if (isBacktickEscapedPair) {
-          items = ItemsListPush(items, lineText, nextLine, nextLine);
-          continue;
+          items = ItemsListPush(items, lineText, lineIdx, lineIdx);
+          return 'proceed';
         }
         if (sB.length > 0) {
-          items = ItemsAddToPrev(items, sB, nextLine);
+          items = ItemsAddToPrev(items, sB, lineIdx);
         }
         ({ iOpen, items, li } = finalizeListItems(
           state,
@@ -361,18 +416,17 @@ export const ListsInternal = (
           itemizeLevelContents,
           tokenStart
         ));
-        setTokenCloseList(state, startLine + renderStart, nextLine + renderStart);
+        setTokenCloseList(state, startLine + renderStart, lineIdx + renderStart);
         if (sE.length > 0) {
-          items = ItemsAddToPrev(items, sE, nextLine);
+          items = ItemsAddToPrev(items, sE, lineIdx);
         }
         iOpen--;
         if (iOpen <= 0) {
           haveClose = true;
-          nextLine += 1;
-          break;
+          return 'break';
         }
       }
-      continue;
+      return 'proceed';
     }
     // Handle inline \begin{itemize}/\begin{enumerate}
     if (BEGIN_LIST_ENV_INLINE_RE.test(lineText)) {
@@ -380,17 +434,16 @@ export const ListsInternal = (
       if (beginMatch) {
         const raw = beginMatch[1].trim();
         if (!isListType(raw)) {
-          return false;
+          return 'abort';
         }
         const beginType: ListType = raw;
-
         let { sB, sE, isBacktickEscapedPair } = splitInlineListEnv(lineText, beginMatch);
         if (isBacktickEscapedPair) {
-          items = ItemsListPush(items, lineText, nextLine, nextLine);
-          continue;
+          items = ItemsListPush(items, lineText, lineIdx, lineIdx);
+          return 'proceed';
         }
         if (sB.length > 0) {
-          items = ItemsAddToPrev(items, sB, nextLine);
+          items = ItemsAddToPrev(items, sB, lineIdx);
         }
         ({ iOpen, items, li } = finalizeListItems(
           state,
@@ -404,18 +457,67 @@ export const ListsInternal = (
         ));
         setTokenOpenList(state, -1, -1, beginType, itemizeLevelTokens, enumerateLevelTypes, itemizeLevelContents);
         if (sE.length > 0) {
-          items = ItemsAddToPrev(items, sE, nextLine);
+          items = ItemsAddToPrev(items, sE, lineIdx);
         }
         iOpen++;
       }
     } else {
       // Regular line inside list: either a new \item or continuation
       if (LATEX_ITEM_COMMAND_INLINE_RE.test(lineText)) {
-        items = ItemsListPush(items, lineText, nextLine + renderStart, nextLine + renderStart);
+        items = ItemsListPush(items, lineText, lineIdx + renderStart, lineIdx + renderStart);
       } else {
-        items = ItemsAddToPrev(items, lineText, nextLine);
+        items = ItemsAddToPrev(items, lineText, lineIdx);
       }
     }
+    return 'proceed';
+  };
+  for (; nextLine < endLine; nextLine++) {
+    pos = state.bMarks[nextLine] + state.tShift[nextLine];
+    max = state.eMarks[nextLine];
+    lineText = state.src.slice(pos, max);
+    // Fence: buffer lines; commit raw (indent kept) on close, else replay as content below. Not inside lstlisting/tabular.
+    const rawLine: string = state.src.slice(state.bMarks[nextLine], state.eMarks[nextLine]);
+    if (fenceMarker) {
+      fenceBuffer.push({ lineText, rawLine, line: nextLine });
+      if (isFenceClose(rawLine, fenceMarker)) {
+        for (const b of fenceBuffer) {
+          items = ItemsAddToPrev(items, b.rawLine, b.line);
+        }
+        fenceBuffer.length = 0;
+        fenceMarker = null;
+      }
+      continue;
+    }
+    if (opaqueStack.length === 0) {
+      fenceMarker = detectFenceOpen(rawLine);
+      if (fenceMarker) {
+        fenceBuffer.push({ lineText, rawLine, line: nextLine });
+        continue;
+      }
+    }
+    const sig: 'abort' | 'break' | 'proceed' = processLine(lineText, nextLine);
+    if (sig === 'abort') {
+      return false;
+    }
+    if (sig === 'break') {
+      nextLine += 1;
+      break;
+    }
+  }
+  // Unclosed fence: buffered lines are ordinary content — replay them through the normal path.
+  if (fenceMarker) {
+    fenceMarker = null;
+    for (const b of fenceBuffer) {
+      const sig: 'abort' | 'break' | 'proceed' = processLine(b.lineText, b.line);
+      if (sig === 'abort') {
+        return false;
+      }
+      if (sig === 'break') {
+        nextLine = b.line + 1;
+        break;
+      }
+    }
+    fenceBuffer.length = 0;
   }
 
   if (!haveClose) {

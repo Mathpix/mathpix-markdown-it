@@ -5,6 +5,7 @@ import { getAlignByAlignEnvBlock, SeparateInlineBlocksBeginAlign } from './begin
 import { endTag, uid } from '../utils';
 import { includegraphicsTag } from '../md-inline-rule/utils';
 import { findEndMarker, removeCaptionsFromTableAndFigure, removeCaptionsSetupFromTableAndFigure } from "../common";
+import { appendEnvAwareContentLine } from "./helper";
 import {
   RE_ALIGN_CENTERING_GLOBAL,
   RE_BEGIN_ALIGN_ENV,
@@ -279,6 +280,7 @@ export const BeginTable: RuleBlock = (state, startLine, endLine, silent) => {
   let content: string = '';
   let resText: string = '';
   let isCloseTagExist = false;
+  let envDepth = 0; // >0 — inside a lstlisting; those lines are kept raw so code indentation survives
   let startTabular = 0;
   let match:RegExpMatchArray = lineText.match(RE_BEGIN_TABLE_OR_FIGURE_WITH_PLACEMENT);
   if (!match) {
@@ -373,13 +375,7 @@ export const BeginTable: RuleBlock = (state, startLine, endLine, silent) => {
     if (matchNewBegin && matchNewBegin[1]?.trim() === type) {
       break;
     }
-    if (resText && lineText) {
-      resText += '\n' + lineText;
-    } else {
-      resText += lineText;
-    }
-
-
+    ({ resText, envDepth } = appendEnvAwareContentLine(state, nextLine, lineText, resText, envDepth));
     // this would be a code block normally, but after paragraph
     // it's considered a lazy continuation regardless of what's there
     if (state.sCount[nextLine] - state.blkIndent > 3) { continue; }

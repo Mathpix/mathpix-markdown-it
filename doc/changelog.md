@@ -1,3 +1,16 @@
+# July 2026
+
+## [3.0.1] - Preserve code indentation inside list/table/align env wrappers
+
+Fenced code and `lstlisting` inside LaTeX environment wrappers kept their leading whitespace instead of collapsing flush-left:
+
+- **Lists** (`\begin{itemize}`/`\begin{enumerate}`): fenced code (```` ``` ````/`~~~`) is treated as an opaque region and stored raw, so indentation, blank lines and `~~~` are preserved; `~~~` now renders as a code block.
+- **Table/align wrappers** (`\begin{table}`/`\begin{figure}` and `\begin{center}`/`\begin{left}`/`\begin{right}`): `lstlisting` inside the wrapped `tabular` keeps its indentation, matching a bare `tabular`. A shared helper `appendEnvAwareContentLine` stores lines raw only while inside a `lstlisting` (detected with `indexOf`, so mid-cell `C &\begin{lstlisting}` works); normal wrapper content stays de-indented, so wrapped-tabular output (CSV/TSV) is unchanged.
+
+Known limitation: a bare ```` ``` ````/`~~~` fence written directly in a `tabular` cell (not wrapped in `lstlisting`) still renders inline — deferred to a follow-up.
+
+See `pr-specs/2026-07-code-indentation-in-env-wrappers.md`.
+
 # June 2026
 
 ## [3.0.0] - Math delimiter mode (strict double-backslash handling) and lstlisting mathescape `\$` rendering

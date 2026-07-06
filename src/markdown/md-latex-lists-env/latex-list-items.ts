@@ -72,8 +72,8 @@ export const ListItems = (
     state.env.prentLevel = state.prentLevel;
     state.env.inheritedListType = state.parentType;
     listItem.content = listItem.content.trim();
-    // Detect block-level item content
-    if (LATEX_BLOCK_ENV_OPEN_RE.test(listItem.content) || (listItem.content.indexOf('`') > -1)) {
+    // Detect block-level item content: a LaTeX block env, a backtick (code span/fence), or a tilde fence.
+    if (LATEX_BLOCK_ENV_OPEN_RE.test(listItem.content) || listItem.content.indexOf('`') > -1 || listItem.content.indexOf('~~~') > -1) {
       let match: RegExpMatchArray = listItem.content.match(LATEX_ITEM_COMMAND_RE);
       if (match) {
         setTokenListItemOpenBlock(state, listItem.startLine, listItem.endLine + 1, match[1], li, itemizeLevelTokens, enumerateLevelTypes, itemizeLevelContents);
