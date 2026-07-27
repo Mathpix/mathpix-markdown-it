@@ -568,11 +568,20 @@ export const Lists: RuleBlock = (
   if (!isListType(typeList)) {
     return false;
   }
-  // Buffer tokens first (do not write into the real state during parsing)
+  // `bufferedState` shares `env` by prototype, so a speculative parse mutates it.
+  // On abort, restore the transient fields it may leak: `isBlock` (a stale `true`
+  // wakes the inline list fallback) and `inheritedListType` (skews `isTopLevelList`
+  // for a later list). `env.parentType`/`env.prentLevel` are written but never read.
+  const envIsBlock = state.env.isBlock;
+  const envInheritedListType = state.env.inheritedListType;
   const bufferedState = createBufferedState(state);
   // Run the original logic on bufferedState instead of state
   const ok: boolean = ListsInternal(bufferedState, startLine, endLine); // we'll define it
-  if (!ok) return false;
+  if (!ok) {
+    state.env.isBlock = envIsBlock;
+    state.env.inheritedListType = envInheritedListType;
+    return false;
+  }
   // In silent mode: only report that this block can start; do not modify state or emit tokens.
   if (silent) {
     return true;

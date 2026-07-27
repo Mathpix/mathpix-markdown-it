@@ -1127,5 +1127,13 @@ module.exports = [
     // so it must clear the padding threshold like its ASCII counterpart would.
     latex: "\\begin{itemize}\n\\item[I] Item 1．\n\\item[11．] Item 11．．\n\\item[I] Item 1．\n\\end{itemize}",
     html: "<ul data-padding-inline-start=\"56\" class=\"itemize\" style=\"padding-inline-start: 56px; list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">I</span>Item 1．</li><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">11．</span>Item 11．．</li><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">I</span>Item 1．</li></ul>"
+  },
+  {
+    // Unclosed itemize followed by a tabular must degrade to plain text (like the
+    // no-tabular case) instead of a broken partial list. The aborted list parse
+    // must not leak env.isBlock, which would otherwise wake the inline list
+    // fallback and emit empty `<>` item bodies.
+    latex: "\\begin{itemize}\n\\item[(d1)] Asad Ali Khan\n\\item[(d2)] Asad Ali Khan\n\\begin{tabular}{|l|l|}\ncell\n\\end{tabular}\n\\begin{itemize}",
+    html: "<div>\\begin{itemize}<br>\n\\item[(d1)] Asad Ali Khan<br>\n\\item[(d2)] Asad Ali Khan</div>\n<div class=\"table_tabular\" style=\"text-align: center\">\n<div class=\"inline-tabular\"><table class=\"tabular\">\n<tbody>\n<tr style=\"border-top: none !important; border-bottom: none !important;\">\n<td style=\"text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; \">cell</td>\n</tr>\n</tbody>\n</table>\n</div></div>\n<div>\\begin{itemize}</div>\n"
   }
 ];
