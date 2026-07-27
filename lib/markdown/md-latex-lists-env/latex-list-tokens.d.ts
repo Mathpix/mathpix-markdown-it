@@ -1,8 +1,16 @@
 import type Token from 'markdown-it/lib/token';
 import { ListType, ListInlineContext, ParsedListItem, ListOpenResult } from "./latex-list-types";
 /**
- * Sums the character lengths of a custom `\item[...]` marker's text tokens.
- * Shared so the inline and block item paths in `ListItems` measure identically.
+ * Computes the marker padding for a custom `\item[...]` marker: the sum of the
+ * display widths of its text tokens. Non-text tokens (e.g. math) are ignored.
+ * Display width (not raw `.length`) is used so fullwidth/CJK markers such as
+ * `11．` are not undercounted and get the same indentation as ASCII markers.
+ *
+ * Kept in one place so both the inline and block item paths in `ListItems`
+ * measure markers identically (see `latex-list-items.ts`).
+ *
+ * @param markerTokens - Parsed inline tokens of the marker
+ * @returns Total display width of the marker's text tokens
  */
 export declare const computeMarkerPadding: (markerTokens: Token[] | undefined) => number;
 /**
