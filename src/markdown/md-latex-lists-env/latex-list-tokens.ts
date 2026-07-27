@@ -18,6 +18,21 @@ import {
 import { BEGIN_LIST_ENV_RE } from "../common/consts";
 
 /**
+ * Sums the character lengths of a custom `\item[...]` marker's text tokens.
+ * Shared so the inline and block item paths in `ListItems` measure identically.
+ */
+export const computeMarkerPadding = (markerTokens: Token[] | undefined): number => {
+  let padding = 0;
+  const tokens: Token[] = markerTokens ?? [];
+  for (let i = 0; i < tokens.length; i++) {
+    if (tokens[i].type === 'text') {
+      padding += tokens[i].content.length;
+    }
+  }
+  return padding;
+};
+
+/**
  * Creates an opening list-item token (<li>) for block-style LaTeX list items.
  * Handles marker parsing, enumeration start values, nesting metadata,
  * and updates the internal list-level state (item counters).
@@ -40,11 +55,11 @@ export const setTokenListItemOpenBlock = (
   itemizeLevelTokens: Token[][],
   enumerateLevelTypes: string[],
   itemizeLevelContents: string[]
-): void => {
+): Token => {
   // Check current list depth and close previous item if needed
   closeOpenListItemIfNeeded(state);
   // Create opening <li> token
-  let token: Token = state.push('latex_list_item_open', 'li', 1);
+  const token: Token = state.push('latex_list_item_open', 'li', 1);
   incrementItemCount();
   token.meta = { isBlock: true };
   token.parentType = state.types?.length > 0
@@ -71,6 +86,7 @@ export const setTokenListItemOpenBlock = (
   token.itemizeLevel = itemizeLevelTokens;
   token.itemizeLevelContents = itemizeLevelContents;
   token.enumerateLevel = enumerateLevelTypes;
+  return token;
 };
 
 /**
@@ -276,14 +292,8 @@ export const processListChildToken = (
     ctx.li = null;
   }
   // 4. Handle custom marker and compute padding
-  if ((token as any).hasOwnProperty('marker')) {
-    let paddingChild: number = 0;
-    const markerTokens = (token as any).markerTokens ?? [];
-    for (let i = 0; i < markerTokens.length; i++) {
-      if (markerTokens[i].type === 'text') {
-        paddingChild += markerTokens[i].content.length;
-      }
-    }
+  if (token.hasOwnProperty('marker')) {
+    const paddingChild: number = computeMarkerPadding(token.markerTokens);
     if (paddingChild > ctx.padding) {
       ctx.padding = paddingChild;
     }

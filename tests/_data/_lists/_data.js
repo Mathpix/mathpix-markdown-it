@@ -1109,5 +1109,17 @@ module.exports = [
     // Fence before the first \item (no preceding item): list still renders, no crash.
     latex: "\\begin{itemize}\n```\n    code\n```\n\\item[] first\n\\end{itemize}",
     html: "<ul class=\"itemize\" style=\"list-style-type: none\"><code>    code</code><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\"><span class=\"li_level\" data-custom-marker=\"true\" data-marker-empty=\"true\"></span>first</li></ul>"
+  },
+  {
+    // Long custom markers must widen the list even when every long-marker item holds
+    // block content: block items skip the inline path, so the marker is measured there too.
+    latex: "\\begin{itemize}\n\\item[11.33] a\n```\n    code1\n```\n\\item[11.34] b\n```\n    code2\n```\n\\end{itemize}",
+    html: "<ul data-padding-inline-start=\"70\" class=\"itemize\" style=\"padding-inline-start: 70px; list-style-type: none\"><li class=\"li_itemize block\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">11.33</span><div>a</div>\n<pre><code class=\"hljs\">    code1\n</code></pre>\n</li><li class=\"li_itemize block\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">11.34</span><div>b</div>\n<pre><code class=\"hljs\">    code2\n</code></pre>\n</li></ul>"
+  },
+  {
+    // Same regression with \begin{figure} items (the originally reported case): every
+    // long-marker item holds a block env, yet the list must still get padding.
+    latex: "\\begin{itemize}\n\\item[11.33] a\n\\begin{figure}\n\\includegraphics[alt={Alternative, text},max width=\\textwidth]{https://cdn.mathpix.com/cropped/99f7259a-da61-4b41-a7df-76c3e78fa9ed-1.jpg?height=154&width=197&top_left_y=918&top_left_x=694}\n\\captionsetup{labelformat=empty}\n\\caption{Fig. 11-20}\n\\end{figure}\n\\item[11.34] b\n\\begin{figure}\n\\includegraphics[alt={Alternative, text},max width=\\textwidth]{https://cdn.mathpix.com/cropped/99f7259a-da61-4b41-a7df-76c3e78fa9ed-1.jpg?height=154&width=197&top_left_y=918&top_left_x=694}\n\\captionsetup{labelformat=empty}\n\\caption{Fig. 11-21}\n\\end{figure}\n\\end{itemize}",
+    html: "<ul data-padding-inline-start=\"70\" class=\"itemize\" style=\"padding-inline-start: 70px; list-style-type: none\"><li class=\"li_itemize block\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">11.33</span><div>a</div>\n<div class=\"table\" number=\"1\">\n<div class=\"figure_img\" style=\"text-align: center;\"><img src=\"https://cdn.mathpix.com/cropped/99f7259a-da61-4b41-a7df-76c3e78fa9ed-1.jpg?height=154&width=197&top_left_y=918&top_left_x=694\" alt=\"Alternative, text\" style=\"max-width: 100%;\"/></div><div class=\"caption_figure\">Fig. 11-20</div></div>\n</li><li class=\"li_itemize block\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">11.34</span><div>b</div>\n<div class=\"table\" number=\"2\">\n<div class=\"figure_img\" style=\"text-align: center;\"><img src=\"https://cdn.mathpix.com/cropped/99f7259a-da61-4b41-a7df-76c3e78fa9ed-1.jpg?height=154&width=197&top_left_y=918&top_left_x=694\" alt=\"Alternative, text\" style=\"max-width: 100%;\"/></div><div class=\"caption_figure\">Fig. 11-21</div></div>\n</li></ul>"
   }
 ];

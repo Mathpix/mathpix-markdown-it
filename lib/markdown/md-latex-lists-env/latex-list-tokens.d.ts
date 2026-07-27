@@ -1,6 +1,11 @@
 import type Token from 'markdown-it/lib/token';
 import { ListType, ListInlineContext, ParsedListItem, ListOpenResult } from "./latex-list-types";
 /**
+ * Sums the character lengths of a custom `\item[...]` marker's text tokens.
+ * Shared so the inline and block item paths in `ListItems` measure identically.
+ */
+export declare const computeMarkerPadding: (markerTokens: Token[] | undefined) => number;
+/**
  * Creates an opening list-item token (<li>) for block-style LaTeX list items.
  * Handles marker parsing, enumeration start values, nesting metadata,
  * and updates the internal list-level state (item counters).
@@ -16,7 +21,7 @@ import { ListType, ListInlineContext, ParsedListItem, ListOpenResult } from "./l
  */
 export declare const setTokenListItemOpenBlock: (state: any, startLine: number, endLine: number, marker: string | undefined, li: {
     value: number;
-} | null, itemizeLevelTokens: Token[][], enumerateLevelTypes: string[], itemizeLevelContents: string[]) => void;
+} | null, itemizeLevelTokens: Token[][], enumerateLevelTypes: string[], itemizeLevelContents: string[]) => Token;
 /**
  * Creates an opening token for LaTeX list environments (\begin{itemize}, \begin{enumerate}).
  * Updates list nesting state, parent tracking, and attaches itemize/enumerate

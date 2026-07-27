@@ -3,7 +3,8 @@ import type StateBlock from 'markdown-it/lib/rules_block/state_block';
 import type Token from 'markdown-it/lib/token';
 import {
   setTokenListItemOpenBlock,
-  processListChildToken
+  processListChildToken,
+  computeMarkerPadding
 } from "./latex-list-tokens";
 import { SetTokensBlockParse } from "../md-block-rule/helper";
 import { ListItemsResult, ParsedListItem, ListInlineContext } from "./latex-list-types";
@@ -76,7 +77,14 @@ export const ListItems = (
     if (LATEX_BLOCK_ENV_OPEN_RE.test(listItem.content) || listItem.content.indexOf('`') > -1 || listItem.content.indexOf('~~~') > -1) {
       let match: RegExpMatchArray = listItem.content.match(LATEX_ITEM_COMMAND_RE);
       if (match) {
-        setTokenListItemOpenBlock(state, listItem.startLine, listItem.endLine + 1, match[1], li, itemizeLevelTokens, enumerateLevelTypes, itemizeLevelContents);
+        const itemToken = setTokenListItemOpenBlock(state, listItem.startLine, listItem.endLine + 1, match[1], li, itemizeLevelTokens, enumerateLevelTypes, itemizeLevelContents);
+        // Block items skip the inline path, so measure the marker here too.
+        if (itemToken.hasOwnProperty('marker')) {
+          const paddingChild: number = computeMarkerPadding(itemToken.markerTokens);
+          if (paddingChild > padding) {
+            padding = paddingChild;
+          }
+        }
         if (li && li.hasOwnProperty('value')) {
           li = null;
         }
