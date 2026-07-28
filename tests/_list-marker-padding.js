@@ -19,23 +19,26 @@ const paddingValue = (html) => {
 };
 
 describe('List marker padding — width edge cases:', () => {
-  it('math-only marker: non-text tokens are ignored, so no padding', () => {
-    // `$x^2$` contributes no text-token width; the list stays at the default indent.
-    // Assumes the math plugin tokenizes `$…$` as a non-text token (not `text`); if math
-    // tokenization changes, revisit computeMarkerPadding's text-token filter.
+  it('short math marker stays under the threshold (no padding)', () => {
+    // `$x^2$` is measured by its rendered width but is narrow (< the > 3 threshold).
     hasPadding(render('\\begin{itemize}\n\\item[$x^2$] a\n\\item[y] b\n\\end{itemize}')).should.equal(false);
   });
-
-  it('long plain marker still gets padding (control for the math case)', () => {
+  it('wide math marker gets padding from its rendered width', () => {
+    // math width comes from token.widthEx, not the text-token filter.
+    hasPadding(render('\\begin{itemize}\n\\item[$x^4 + x^4$] a\n\\end{itemize}')).should.equal(true);
+  });
+  it('bold marker gets padding from its children (\\textbf)', () => {
+    // `\textbf{…}` has no top-level text token; width comes from recursing into children.
+    hasPadding(render('\\begin{itemize}\n\\item[\\textbf{x^4 + x^4}] a\n\\end{itemize}')).should.equal(true);
+  });
+  it('long plain marker still gets padding (control)', () => {
     paddingValue(render('\\begin{itemize}\n\\item[longtext] a\n\\end{itemize}')).should.equal(112);
   });
-
   it('astral marker (emoji) counts as width 1, not a wide char', () => {
     // Documented limitation: isWideChar covers BMP ranges only. Two emoji = width 2,
     // under the threshold, so no padding — if emoji were counted as 2 this would indent.
     hasPadding(render('\\begin{itemize}\n\\item[\u{1F600}\u{1F600}] a\n\\item[x] b\n\\end{itemize}')).should.equal(false);
   });
-
   it('nested list does not receive inline padding (only the top level does)', () => {
     // Long markers at both levels; padding is applied to the top-level list only.
     const html = render(

@@ -16,57 +16,21 @@ import {
   closeOpenListItemIfNeeded,
 } from "./latex-list-common";
 import { BEGIN_LIST_ENV_RE } from "../common/consts";
+import { tokenDisplayWidth } from "../common/display-width";
 
 /**
- * Whether a code point is an East-Asian Wide/Fullwidth character, which renders
- * roughly twice as wide as an ASCII character. Approximation of Unicode's East
- * Asian Width property covering the BMP ranges relevant to list markers.
- * Astral characters (emoji, CJK Ext-B+) are out of range and count as width 1.
- */
-const isWideChar = (cp: number): boolean =>
-  (cp >= 0x1100 && cp <= 0x115F) ||   // Hangul Jamo
-  (cp >= 0x2E80 && cp <= 0x303E) ||   // CJK radicals, Kangxi, CJK symbols/punctuation
-  (cp >= 0x3041 && cp <= 0x33FF) ||   // Hiragana, Katakana, CJK symbols
-  (cp >= 0x3400 && cp <= 0x4DBF) ||   // CJK Unified Ideographs Extension A
-  (cp >= 0x4E00 && cp <= 0x9FFF) ||   // CJK Unified Ideographs
-  (cp >= 0xA000 && cp <= 0xA4CF) ||   // Yi
-  (cp >= 0xAC00 && cp <= 0xD7A3) ||   // Hangul Syllables
-  (cp >= 0xF900 && cp <= 0xFAFF) ||   // CJK Compatibility Ideographs
-  (cp >= 0xFE30 && cp <= 0xFE4F) ||   // CJK Compatibility Forms
-  (cp >= 0xFF00 && cp <= 0xFF60) ||   // Fullwidth Forms
-  (cp >= 0xFFE0 && cp <= 0xFFE6);     // Fullwidth signs
-
-/**
- * Display width of a string: East-Asian Wide/Fullwidth characters count as 2,
- * everything else as 1. Iterating by code point counts surrogate pairs once.
- */
-const displayWidth = (str: string): number => {
-  let width = 0;
-  for (const ch of str) {
-    width += isWideChar(ch.codePointAt(0)) ? 2 : 1;
-  }
-  return width;
-};
-
-/**
- * Computes the marker padding for a custom `\item[...]` marker: the sum of the
- * display widths of its text tokens. Non-text tokens (e.g. math) are ignored.
- * Display width (not raw `.length`) is used so fullwidth/CJK markers such as
- * `11．` are not undercounted and get the same indentation as ASCII markers.
- *
- * Kept in one place so both the inline and block item paths in `ListItems`
- * measure markers identically (see `latex-list-items.ts`).
+ * Marker padding for a custom `\item[...]`: total rendered width of its tokens in
+ * character cells (see `tokenDisplayWidth` — text by display width, math by `widthEx`,
+ * wrappers via children). Shared by the inline and block item paths in `ListItems`.
  *
  * @param markerTokens - Parsed inline tokens of the marker
- * @returns Total display width of the marker's text tokens
+ * @returns Total marker width in character cells
  */
 export const computeMarkerPadding = (markerTokens: Token[] | undefined): number => {
   let padding = 0;
   const tokens: Token[] = markerTokens ?? [];
   for (let i = 0; i < tokens.length; i++) {
-    if (tokens[i].type === 'text') {
-      padding += displayWidth(tokens[i].content);
-    }
+    padding += tokenDisplayWidth(tokens[i]);
   }
   return padding;
 };
