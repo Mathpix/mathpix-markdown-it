@@ -1,5 +1,3 @@
-export declare const EX_PER_CHAR_CELL = 2;
-export declare const MARKER_GAP_EX = 1.4;
 interface WidthToken {
     type?: string;
     content?: string;
@@ -20,10 +18,12 @@ export declare const isWideChar: (cp: number) => boolean;
  */
 export declare const displayWidth: (str: string) => number;
 /**
- * Width of one inline token in character cells: text by display width, math by its
- * rendered `widthEx`, wrappers (e.g. `\textbf{…}`) by recursing into children. The
- * char-based counterpart of `getTextWidthByTokens` (font-based) — used where no font
- * is loaded (`fontMetrics` runs only under markdownToHTMLWithSize).
+ * Width of one inline token in `ex`: text by display width × TEXT_EX_PER_CELL, math by its
+ * exact rendered `widthEx`, wrappers (e.g. `\textbf{…}`) by recursing into children. The
+ * char-based counterpart of `getTextWidthByTokens` (font-based) — used where no font is
+ * loaded (`fontMetrics` runs only under markdownToHTMLWithSize). Math without a `widthEx`
+ * (non-SVG output) returns 0: no measured width, so the marker keeps the default indent
+ * rather than a fabricated estimate.
  */
 export declare const tokenDisplayWidth: (token: WidthToken) => number;
 export {};

@@ -1,13 +1,9 @@
-// Math tokens carry advance width as `token.widthEx` (see convert-math-to-html).
-// `ex` is ~½ em, so ~2 ex ≈ one character cell.
-const MATH_EX_PER_CHAR = 2;
-// Marker padding is emitted in `ex` so it scales with the container font (like the math
-// SVG). 2 ex per char cell → a math token round-trips to exactly its widthEx.
-export const EX_PER_CHAR_CELL = 2;
-// Marker→content gap in ex; keep in sync with `.li_level { padding-right }` (~10px at 16px).
-export const MARKER_GAP_EX = 1.4;
-// Math types whose `widthEx` may be absent (e.g. skipMathToHtml) — fall back to source length.
-const MATH_TOKEN_TYPES = new Set<string>(['inline_math', 'equation_math', 'equation_math_not_number', 'display_math']);
+import { mathTokenTypes } from "./consts";
+
+// Marker widths are measured in `ex` (math by exact `widthEx`, text ~1.3 ex/char — a glyph
+// is ~1 ex). The producer converts the total to `em` for the emitted padding (EX_TO_EM).
+const TEXT_EX_PER_CELL = 1.3;
+const MATH_TOKEN_TYPES = new Set<string>(mathTokenTypes);
 
 // Minimal shape tokenDisplayWidth reads (a subset of markdown-it's Token).
 interface WidthToken {
@@ -50,20 +46,23 @@ export const displayWidth = (str: string): number => {
 };
 
 /**
- * Width of one inline token in character cells: text by display width, math by its
- * rendered `widthEx`, wrappers (e.g. `\textbf{…}`) by recursing into children. The
- * char-based counterpart of `getTextWidthByTokens` (font-based) — used where no font
- * is loaded (`fontMetrics` runs only under markdownToHTMLWithSize).
+ * Width of one inline token in `ex`: text by display width × TEXT_EX_PER_CELL, math by its
+ * exact rendered `widthEx`, wrappers (e.g. `\textbf{…}`) by recursing into children. The
+ * char-based counterpart of `getTextWidthByTokens` (font-based) — used where no font is
+ * loaded (`fontMetrics` runs only under markdownToHTMLWithSize). Math without a `widthEx`
+ * (non-SVG output) returns 0: no measured width, so the marker keeps the default indent
+ * rather than a fabricated estimate.
  */
 export const tokenDisplayWidth = (token: WidthToken): number => {
   if (token.type === 'text') {
-    return displayWidth(token.content ?? '');
+    return displayWidth(token.content ?? '') * TEXT_EX_PER_CELL;
   }
   if (typeof token.widthEx === 'number') {
-    return token.widthEx / MATH_EX_PER_CHAR;
+    return token.widthEx;
   }
-  if (MATH_TOKEN_TYPES.has(token.type)) {
-    return displayWidth(token.content ?? '');
+  // Math with no widthEx → 0 (don't recurse children; that branch is for wrappers).
+  if (token.type && MATH_TOKEN_TYPES.has(token.type)) {
+    return 0;
   }
   if (token.children && token.children.length) {
     let width = 0;

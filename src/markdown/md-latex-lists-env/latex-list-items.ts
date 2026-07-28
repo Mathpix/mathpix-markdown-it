@@ -7,7 +7,7 @@ import {
   computeMarkerPadding
 } from "./latex-list-tokens";
 import { SetTokensBlockParse } from "../md-block-rule/helper";
-import { EX_PER_CHAR_CELL, MARKER_GAP_EX } from "../common/display-width";
+import { EX_TO_EM, MARKER_GAP_EM, LIST_DEFAULT_INDENT_EM } from "../common/consts";
 import { ListItemsResult, ParsedListItem, ListInlineContext } from "./latex-list-types";
 import {
   END_LIST_ENV_INLINE_RE,
@@ -93,6 +93,8 @@ export const ListItems = (
         const blockContent: string = rawContent.trim();
         SetTokensBlockParse(state, blockContent, {disableBlockRules: true});
         // Mirror the inline branch's reset (below): don't leave isBlock set after a block item.
+        // Defence-in-depth only — the real guarantee is the Lists rule's finally restore; do
+        // not drop that finally on the strength of this line.
         state.env.isBlock = false;
         continue;
       }
@@ -224,10 +226,11 @@ export const finalizeListItems = (
     const p = tokenStart;
     if (!p.padding || p.padding < dataItems.padding) {
       p.padding = dataItems.padding;
-      if (p.padding > 3) {
-        // Reserve marker width + gap, in ex (see render); round to 2 decimals.
-        const ex: number = Math.round((dataItems.padding * EX_PER_CHAR_CELL + MARKER_GAP_EX) * 100) / 100;
-        p.attrSet("data-padding-inline-start", String(ex));
+      // Reserve marker width (ex→em) + gap, in em; round to 2 decimals. Emit only when it
+      // exceeds the default indent, so the padding never resolves below the default.
+      const em: number = Math.round((dataItems.padding * EX_TO_EM + MARKER_GAP_EM) * 100) / 100;
+      if (em > LIST_DEFAULT_INDENT_EM) {
+        p.attrSet("data-padding-inline-start", String(em) + "em");
       }
     }
   }

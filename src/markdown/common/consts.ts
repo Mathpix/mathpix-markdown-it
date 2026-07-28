@@ -336,6 +336,14 @@ export const terminatedRules = {
 
 export const mathTokenTypes = ["display_math", "inline_math", "equation_math_not_number", "equation_math"];
 
+// ex→em using the default font metrics (exDef 8.296875 / fonSizeDef 16, text-dimentions.ts),
+// so marker widths (measured in ex) can be emitted in em and compared with the em default.
+export const EX_TO_EM = 8.296875 / 16;
+// Marker→content gap and default list indent, in em (10px and 40px at a 16px base). Marker
+// padding is emitted only when it exceeds the default, so it never resolves below it.
+export const MARKER_GAP_EM = 0.625;
+export const LIST_DEFAULT_INDENT_EM = 2.5;
+
 export const codeHighlightDef = {
   auto: false,
   code: true

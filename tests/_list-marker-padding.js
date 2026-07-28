@@ -13,35 +13,37 @@ global.DOMParser = jsdom.window.DOMParser;
 
 const options = { cwidth: 800, htmlTags: true };
 const render = (src) => MM.markdownToHTML(src, options);
-// Only the top-level list carries the padding attribute (marker width + gap, in ex).
-const hasPadding = (html) => /data-padding-inline-start="([\d.]+)"/.test(html);
+// Only the top-level list carries the padding attribute (marker width + gap, em-valued).
+const hasPadding = (html) => /data-padding-inline-start="[\d.]+em"/.test(html);
 const paddingValue = (html) => {
-  const m = html.match(/data-padding-inline-start="([\d.]+)"/);
+  const m = html.match(/data-padding-inline-start="([\d.]+)em"/);
   return m ? Number(m[1]) : null;
 };
 
 describe('List marker padding — width edge cases:', () => {
   it('short math marker stays under the threshold (no padding)', () => {
-    // `$x^2$` is measured by its rendered width but is narrow (< the > 3 threshold).
+    // `$x^2$` is measured by its rendered widthEx but is narrow — its em value stays
+    // under the 2.5em default, so no custom padding is emitted.
     hasPadding(render('\\begin{itemize}\n\\item[$x^2$] a\n\\item[y] b\n\\end{itemize}')).should.equal(false);
   });
-  it('wide math marker gets padding from its rendered width (ex + gap)', () => {
-    // math width comes from token.widthEx (7.329ex); reserve = 7.329 + 1.4 gap = 8.73ex.
-    paddingValue(render('\\begin{itemize}\n\\item[$x^4 + x^4$] a\n\\end{itemize}')).should.equal(8.73);
+  it('wide math marker gets padding from its rendered width (em)', () => {
+    // math width comes from token.widthEx (7.329ex); reserve = (7.329 × EX_TO_EM) + gap ≈ 4.43em.
+    paddingValue(render('\\begin{itemize}\n\\item[$x^4 + x^4$] a\n\\end{itemize}')).should.equal(4.43);
   });
   it('math marker on the block-content path gets the same padding', () => {
     // Block-content items are measured on a separate code path; must match the inline one.
     paddingValue(render(
       '\\begin{itemize}\n\\item[$x^4 + x^4$] a\n\\begin{figure}\n\\caption{c}\n\\end{figure}\n\\end{itemize}'
-    )).should.equal(8.73);
+    )).should.equal(4.43);
   });
-  it('math marker gets padding regardless of outMath config', () => {
-    // widthEx is only populated in the SVG pipeline; other configs fall back to
-    // source length. The exact px differs, but padding must be present in all.
+  it('math marker padding needs a measured widthEx (SVG); other configs keep the default indent', () => {
+    // widthEx is only populated in the SVG pipeline. Without it we do not fabricate a width,
+    // so the marker keeps the default indent (no custom padding) rather than a guess.
     const src = '\\begin{itemize}\n\\item[$x^4 + x^4$] a\n\\end{itemize}';
-    [{}, { skipMathToHtml: true }, { include_latex: true, include_svg: false },
+    hasPadding(MM.markdownToHTML(src, { ...options, outMath: {} })).should.equal(true);
+    [{ skipMathToHtml: true }, { include_latex: true, include_svg: false },
      { include_mathml: true, include_svg: false }].forEach((outMath) => {
-      hasPadding(MM.markdownToHTML(src, { ...options, outMath })).should.equal(true);
+      hasPadding(MM.markdownToHTML(src, { ...options, outMath })).should.equal(false);
     });
   });
   it('edge whitespace in the marker does not inflate padding', () => {
@@ -54,8 +56,14 @@ describe('List marker padding — width edge cases:', () => {
     hasPadding(render('\\begin{itemize}\n\\item[\\textbf{x^4 + x^4}] a\n\\end{itemize}')).should.equal(true);
   });
   it('long plain marker still gets padding (control)', () => {
-    // 8 chars × 2 ex/cell + 1.4 gap = 17.4ex.
-    paddingValue(render('\\begin{itemize}\n\\item[longtext] a\n\\end{itemize}')).should.equal(17.4);
+    // 8 chars × 1.3 ex/cell × EX_TO_EM + 0.625 gap ≈ 6.02em.
+    paddingValue(render('\\begin{itemize}\n\\item[longtext] a\n\\end{itemize}')).should.equal(6.02);
+  });
+  it('reserve is per character cell, not per glyph (documents the limitation)', () => {
+    // Wide glyphs (all-caps `W`) reserve the same as a same-length narrow marker, so a
+    // wide-glyph marker can overlap the content — the no-font path has no glyph widths.
+    paddingValue(render('\\begin{itemize}\n\\item[WWWWWWWW] a\n\\end{itemize}'))
+      .should.equal(paddingValue(render('\\begin{itemize}\n\\item[longtext] a\n\\end{itemize}')));
   });
   it('astral marker (emoji) counts as width 1, not a wide char', () => {
     // Documented limitation: isWideChar covers BMP ranges only. Two emoji = width 2,

@@ -19,12 +19,13 @@ import { BEGIN_LIST_ENV_RE } from "../common/consts";
 import { tokenDisplayWidth } from "../common/display-width";
 
 /**
- * Marker padding for a custom `\item[...]`: total rendered width of its tokens in
- * character cells (see `tokenDisplayWidth` — text by display width, math by `widthEx`,
- * wrappers via children). Shared by the inline and block item paths in `ListItems`.
+ * Marker width for a custom `\item[...]`: total width of its tokens in `ex` (see
+ * `tokenDisplayWidth` — text by display width, math by `widthEx`, wrappers via children).
+ * The producer converts this to `em` for the emitted padding. Shared by the inline and
+ * block item paths in `ListItems`.
  *
  * @param markerTokens - Parsed inline tokens of the marker
- * @returns Total marker width in character cells
+ * @returns Total marker width in ex
  */
 export const computeMarkerPadding = (markerTokens: Token[] | undefined): number => {
   let padding = 0;

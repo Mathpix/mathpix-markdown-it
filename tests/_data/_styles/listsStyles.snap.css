@@ -29,7 +29,7 @@ ul.itemize > li,
   width: max-content;
   display: flex;
   justify-content: flex-end;
-  padding-right: 1.4ex;
+  padding-right: 0.625em;
   box-sizing: border-box;
 }
 .li_enumerate.not_number,

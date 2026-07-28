@@ -8,12 +8,12 @@ import { needToHighlightAll, highlightText } from "../highlight/common";
 import convertSvgToBase64 from "../md-svg-to-base64/convert-scv-to-base64";
 import { mathTokenTypes } from "../common/consts";
 import { isMathInText } from "../utils";
-
-// Marker reservation (width + gap) is stored in ex so it scales with the container font,
-// like the marker's math SVG. Empty when no custom padding.
-const markerPaddingStyle = (exAttr: string | null | undefined): string =>
-  exAttr ? `padding-inline-start: ${exAttr}ex; ` : "";
 import {CustomMarkerHtmlResult} from "./latex-list-types";
+
+// data-padding-inline-start carries the em value with its unit (e.g. "4.43em"); the producer
+// only emits it when it exceeds the default indent. Empty when no custom padding.
+const markerPaddingStyle = (padAttr: string | null | undefined): string =>
+  padAttr ? `padding-inline-start: ${padAttr}; ` : "";
 
 var level_itemize = 0;
 var level_enumerate = 0;

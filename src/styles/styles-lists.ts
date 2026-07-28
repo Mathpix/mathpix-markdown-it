@@ -1,8 +1,10 @@
+import { LIST_DEFAULT_INDENT_EM, MARKER_GAP_EM } from "../markdown/common/consts";
+
 export const listsStyles = `
 ol.enumerate, ul.itemize,
 #preview-content ol.enumerate, #setText ol.enumerate,
 #preview-content ul.itemize, #setText ul.itemize {
-  padding-inline-start: 2.5em;
+  padding-inline-start: ${LIST_DEFAULT_INDENT_EM}em;
   margin: 0 0 1em 0;
 }
 li > ol.enumerate, li > ul.itemize,
@@ -29,7 +31,7 @@ ul.itemize > li,
   width: max-content;
   display: flex;
   justify-content: flex-end;
-  padding-right: 1.4ex;
+  padding-right: ${MARKER_GAP_EM}em;
   box-sizing: border-box;
 }
 .li_enumerate.not_number,

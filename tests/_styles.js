@@ -7,6 +7,7 @@ const { ContainerStyle } = require('../lib/styles/styles-container');
 const { codeStyles } = require('../lib/styles/styles-code');
 const { tabularStyles } = require('../lib/styles/styles-tabular');
 const { listsStyles } = require('../lib/styles/styles-lists');
+const { MARKER_GAP_EM } = require('../lib/markdown/common/consts');
 const { menuStyle } = require('../lib/contex-menu/styles');
 const { clipboardCopyStyles } = require('../lib/copy-to-clipboard/clipboard-copy-styles');
 let MM = require('../lib/mathpix-markdown-model/index').MathpixMarkdownModel;
@@ -67,6 +68,10 @@ describe('Style snapshots — individual functions:', () => {
   });
   it('listsStyles', () => {
     assertSnapshot('listsStyles', listsStyles);
+  });
+  it('listsStyles marker gap matches MARKER_GAP_EM', () => {
+    // The CSS gap and the padding reservation are in separate files; keep them in sync.
+    listsStyles.should.include('padding-right: ' + MARKER_GAP_EM + 'em');
   });
   it('PreviewStyle', () => {
     assertSnapshot('PreviewStyle', PreviewStyle);

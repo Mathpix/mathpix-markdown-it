@@ -219,6 +219,9 @@ export declare const terminatedRules: {
     };
 };
 export declare const mathTokenTypes: string[];
+export declare const EX_TO_EM: number;
+export declare const MARKER_GAP_EM = 0.625;
+export declare const LIST_DEFAULT_INDENT_EM = 2.5;
 export declare const codeHighlightDef: {
     auto: boolean;
     code: boolean;
