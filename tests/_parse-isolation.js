@@ -92,3 +92,22 @@ describe('parse isolation: repeat-render of same source produces identical HTML'
     first.should.match(/Second/);
   });
 });
+
+// The Lists block rule parses speculatively into a buffered state that shares `env`
+// by prototype. A silent probe (used by the footnote block rules as a terminator)
+// must not leak env mutations into the real state.
+describe('silent-mode Lists does not mutate shared env', () => {
+  const md = markdownIt({ html: true }).use(mathpixMarkdownPlugin, {});
+  const listsRule = md.block.ruler.__rules__.find(r => r.name === 'Lists').fn;
+  it('a silent Lists probe leaves state.env unchanged', () => {
+    const env = {};
+    const src = '\\begin{itemize}\n\\item a\n\\end{itemize}\n';
+    const state = new md.block.State(src, md, env, []);
+    const beforeIsBlock = state.env.isBlock;
+    const beforeInherited = state.env.inheritedListType;
+    const ok = listsRule(state, 0, state.lineMax, true); // silent
+    ok.should.equal(true);
+    should.equal(state.env.isBlock, beforeIsBlock);
+    should.equal(state.env.inheritedListType, beforeInherited);
+  });
+});

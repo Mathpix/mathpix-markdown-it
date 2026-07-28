@@ -271,4 +271,17 @@ describe('Footnote rule performance regression:', () => {
       (large / Math.max(small, SMALL_FLOOR_MS)).should.be.below(SCALING_RATIO_LIMIT);
     });
   });
+
+  // Without the LaTeX list rule as a terminator, each footnotetext scan runs across
+  // the `\begin{itemize}` into the rest of the doc → O(N^2); the terminator bounds it → linear.
+  it('list + \\footnotetext units without blank separators scale linearly', function () {
+    this.timeout(60000);
+    const unit =
+      'Paragraph text before the list with no blank line separator.\n' +
+      '\\begin{itemize}\n\\item[] \\footnotetext{\nA footnote note inside the item.\n}\n\\end{itemize}';
+    const build = (n) => Array.from({ length: n }, () => unit).join('\n');
+    const small = measureMs(build(50));
+    const large = measureMs(build(800)); // 16x units; quadratic parsing would blow the ratio
+    (large / Math.max(small, SMALL_FLOOR_MS)).should.be.below(SCALING_RATIO_LIMIT);
+  });
 });

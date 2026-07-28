@@ -20,7 +20,8 @@ import { BEGIN_LIST_ENV_RE } from "../common/consts";
 /**
  * Whether a code point is an East-Asian Wide/Fullwidth character, which renders
  * roughly twice as wide as an ASCII character. Approximation of Unicode's East
- * Asian Width property covering the ranges relevant to list markers.
+ * Asian Width property covering the BMP ranges relevant to list markers.
+ * Astral characters (emoji, CJK Ext-B+) are out of range and count as width 1.
  */
 const isWideChar = (cp: number): boolean =>
   (cp >= 0x1100 && cp <= 0x115F) ||   // Hangul Jamo

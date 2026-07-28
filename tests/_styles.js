@@ -406,18 +406,32 @@ describe('getMaxWidthStyle:', () => {
 });
 
 describe('Code-block styles scale with the em context (no absolute px/rem):', () => {
-  it('codeStyles: pre code font-size is inherited, not absolute px', () => {
-    const css = codeStyles();
-    css.should.not.include('font-size: 15px');
-    css.should.include('font-size: inherit');
+  // Extract the declaration body of the first rule whose selector contains `needle`,
+  // so assertions are scoped to that rule and not the whole stylesheet.
+  const blockFor = (css, needle) => {
+    const start = css.indexOf(needle);
+    if (start < 0) return '';
+    const open = css.indexOf('{', start);
+    return css.slice(open + 1, css.indexOf('}', open));
+  };
+  it('pre code font-size is inherited, not absolute px', () => {
+    const block = blockFor(codeStyles(), '#preview-content pre code, #setText pre code');
+    block.should.not.equal(''); // selector must exist, else the negative asserts pass vacuously
+    block.should.include('font-size: inherit');
+    block.should.not.match(/font-size:\s*\d+px/);
   });
-  it('MathpixStyle: code block uses relative line-height/padding and em pre font-size', () => {
-    const css = MathpixStyle();
-    css.should.not.include('line-height: 24px');
-    css.should.not.include('padding: 1rem');
-    css.should.not.include('font-size: 85%');
-    css.should.include('font-size: 0.9375em');
-    css.should.include('padding: 1em');
-    css.should.include('line-height: 1.6');
+  it('pre code line-height/padding are relative (no px line-height, no rem padding)', () => {
+    const block = blockFor(MathpixStyle(), '#preview-content pre code, #setText pre code');
+    block.should.not.equal('');
+    block.should.include('line-height: 1.6');
+    block.should.include('padding: 1em');
+    block.should.not.match(/line-height:\s*\d+px/);
+    block.should.not.include('1rem');
+  });
+  it('pre font-size is em-relative, not a percentage', () => {
+    const block = blockFor(MathpixStyle(), '#preview-content pre, #setText pre');
+    block.should.not.equal('');
+    block.should.include('font-size: 0.9375em');
+    block.should.not.include('font-size: 85%');
   });
 });

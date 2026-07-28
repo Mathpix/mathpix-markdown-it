@@ -555,11 +555,11 @@ export const Lists: RuleBlock = (
 ): boolean => {
   let pos = state.bMarks[startLine] + state.tShift[startLine];
   let max = state.eMarks[startLine];
-  let lineText = state.src.slice(pos, max);
-  // Must start with backslash to be LaTeX command
-  if (lineText.charCodeAt(0) !== 0x5c /* '\' */) {
+  // Fast bail without allocating a substring: a list env line must start with '\'.
+  if (pos >= max || state.src.charCodeAt(pos) !== 0x5c /* '\' */) {
     return false;
   }
+  let lineText = state.src.slice(pos, max);
   let match: RegExpMatchArray | null = lineText.match(BEGIN_LIST_ENV_RE);
   if (!match) {
     return false;
@@ -568,23 +568,17 @@ export const Lists: RuleBlock = (
   if (!isListType(typeList)) {
     return false;
   }
-  // `bufferedState` shares `env` by prototype, so a speculative parse mutates it.
-  // On abort, restore the transient fields it may leak: `isBlock` (a stale `true`
-  // wakes the inline list fallback) and `inheritedListType` (skews `isTopLevelList`
-  // for a later list). `env.parentType`/`env.prentLevel` are written but never read.
+  // `bufferedState` shares `env` by prototype, so the parse mutates the real env.
   const envIsBlock = state.env.isBlock;
   const envInheritedListType = state.env.inheritedListType;
   const bufferedState = createBufferedState(state);
-  // Run the original logic on bufferedState instead of state
-  const ok: boolean = ListsInternal(bufferedState, startLine, endLine); // we'll define it
-  if (!ok) {
+  const ok: boolean = ListsInternal(bufferedState, startLine, endLine);
+  // Abort and silent-probe flush no tokens: restore the mutated env fields so a leaked
+  // isBlock/inheritedListType can't affect later content (`isBlock` wakes the inline fallback).
+  if (!ok || silent) {
     state.env.isBlock = envIsBlock;
     state.env.inheritedListType = envInheritedListType;
-    return false;
-  }
-  // In silent mode: only report that this block can start; do not modify state or emit tokens.
-  if (silent) {
-    return true;
+    return ok;
   }
   // Flush tokens to the real state at the end
   flushBufferedTokens(state, bufferedState.tokens);

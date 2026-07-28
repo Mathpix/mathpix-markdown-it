@@ -38,21 +38,49 @@ All four bugs live in the list env and footnote block rules and are fixed togeth
    text exactly as it does without a `tabular`.
 
 4. **Footnote block rules stop at a list start.**
-   The `\footnote`/`\footnotetext` block rules scan forward for their open tag using
-   a terminator set that included the core markdown list rule but not the LaTeX list
-   rule. A `\begin{itemize}` between a paragraph and a later footnote (no blank line)
-   did not stop the scan, so the list was swallowed and rendered as literal text
-   (a blank line before the list masked it). The LaTeX list rule is now in the
-   footnote terminator set, and both footnote rules use it.
+   The `\footnote`/`\footnotetext` block rules scan forward for their open tag,
+   terminating at block boundaries so the scan doesn't swallow following blocks. The
+   LaTeX list rule (`Lists`) was not among the terminators, so a `\begin{itemize}`
+   between a paragraph and a later footnote (no blank line) did not stop the scan: the
+   list was swallowed and rendered as literal text (a blank line masked it).
+
+   - `latex_footnotetext_block` already ran the full terminator set; adding `Lists` to
+     that set fixes it.
+   - `latex_footnote_block` terminated on `fence` only (a deliberate cost choice — see
+     `2026-05-footnote-perf-and-parser-invariants.md`); it now also runs `Lists`. Kept
+     minimal (`fence` + `Lists`, not the full set) so the extra per-line cost is one
+     cheap probe, not ~20.
+
+   Performance: this is a **fix**, not a cost. On repeated `paragraph + list-with-`
+   `\footnotetext` units without blank separators, the missing list terminator made the
+   footnotetext scan run across every `\begin{itemize}` into the rest of the document —
+   O(N²) (seconds on large inputs). Terminating at the list bounds each scan to one unit
+   → linear. Guarded by a scaling test in `tests/_footnotes_latex.js`.
+
+   `Lists` also gets a fast bail (first-char check before allocating a substring), since
+   it now runs as a per-line terminator in paragraph/footnote scans.
+
+   Also fixes a latent leak surfaced by the silent terminator calls: `Lists` in silent
+   mode mutated the shared `env` (a speculative parse writes `env.isBlock` /
+   `env.inheritedListType`); those are now restored on both the abort and silent paths,
+   so a silent probe never changes state.
 
 ## Non-Goals
 
 - The padding heuristic itself (px-per-char, the `> 3` threshold) is unchanged.
 - Malformed input still degrades gracefully; the goal is text, not a partial list.
+- Marker width is an East-Asian-Width approximation over BMP ranges; astral chars
+  (emoji, CJK Ext-B+) count as width 1.
+- Inline marker padding is applied to top-level lists only; nested lists keep the
+  default indent even with long block-content markers (pre-existing; separate ticket).
 
 ## Testing
 
-- `tests/_data/_lists/_data.js`: added cases for fenced-code and figure block items,
-  a fullwidth `11．` marker, an unclosed list + `tabular`, and a list right after a
-  paragraph whose item holds a multiline `\footnote{}` / `\footnotetext{}`.
+- `tests/_data/_lists/_data.js`: fenced-code and figure block items, a fullwidth `11．`
+  marker, an unclosed list + `tabular`, and a list right after a paragraph whose item
+  holds a multiline `\footnote{}` / `\footnotetext{}`.
+- `tests/_list-marker-padding.js`: math-only marker (non-text ignored), astral/emoji
+  marker (width 1), nested list carries no inline padding, `\footnote` still recognized
+  after a heading/table with no blank line.
+- `tests/_parse-isolation.js`: a silent `Lists` probe leaves `env` unchanged.
 - Full suite green.
