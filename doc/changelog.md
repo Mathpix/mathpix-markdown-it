@@ -11,6 +11,12 @@ Fixes for LaTeX `itemize`/`enumerate` lists that rendered incorrectly on several
 
 See `pr-specs/2026-07-list-rendering-robustness.md`.
 
+### Code-block styles scale with the em context
+
+Code-text styles were pinned to absolute values (`pre code` `font-size: 15px` / `line-height: 24px` / `padding: 1rem`, `pre` `font-size: 85%`), so a code block did not scale when a consumer sized a rendered block by setting a single `font-size` on the container (e.g. image export) — everything else scaled but the code stayed ~15px. The four properties are now relative (`pre` `font-size: 0.9375em`; `pre code` `font-size: inherit`, `line-height: 1.6`, `padding: 1em`), so a code block scales with its `em` context. Calibrated so a 16px base is pixel-identical to before, except code padding moves 16px → 15px. Styles only; no HTML/markup change.
+
+See `pr-specs/2026-07-code-block-font-scaling.md`.
+
 ## [3.0.1] - Preserve code indentation inside list/table/align env wrappers
 
 Fenced code and `lstlisting` inside LaTeX environment wrappers kept their leading whitespace instead of collapsing flush-left:

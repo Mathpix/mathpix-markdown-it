@@ -404,3 +404,20 @@ describe('getMaxWidthStyle:', () => {
     css.should.not.include('::-webkit-scrollbar');
   });
 });
+
+describe('Code-block styles scale with the em context (no absolute px/rem):', () => {
+  it('codeStyles: pre code font-size is inherited, not absolute px', () => {
+    const css = codeStyles();
+    css.should.not.include('font-size: 15px');
+    css.should.include('font-size: inherit');
+  });
+  it('MathpixStyle: code block uses relative line-height/padding and em pre font-size', () => {
+    const css = MathpixStyle();
+    css.should.not.include('line-height: 24px');
+    css.should.not.include('padding: 1rem');
+    css.should.not.include('font-size: 85%');
+    css.should.include('font-size: 0.9375em');
+    css.should.include('padding: 1em');
+    css.should.include('line-height: 1.6');
+  });
+});
