@@ -1135,5 +1135,16 @@ module.exports = [
     // fallback and emit empty `<>` item bodies.
     latex: "\\begin{itemize}\n\\item[(d1)] Asad Ali Khan\n\\item[(d2)] Asad Ali Khan\n\\begin{tabular}{|l|l|}\ncell\n\\end{tabular}\n\\begin{itemize}",
     html: "<div>\\begin{itemize}<br>\n\\item[(d1)] Asad Ali Khan<br>\n\\item[(d2)] Asad Ali Khan</div>\n<div class=\"table_tabular\" style=\"text-align: center\">\n<div class=\"inline-tabular\"><table class=\"tabular\">\n<tbody>\n<tr style=\"border-top: none !important; border-bottom: none !important;\">\n<td style=\"text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; \">cell</td>\n</tr>\n</tbody>\n</table>\n</div></div>\n<div>\\begin{itemize}</div>\n"
+  },
+  {
+    // List after a paragraph (no blank line) with a multiline \footnotetext{} item
+    // must still render as a list, not be swallowed as text by the footnotetext block.
+    latex: "Intro paragraph text.\n\\begin{itemize}\n\\item[] \\footnotetext{\n1 A footnote note.\n}\n\\end{itemize}",
+    html: "<div>Intro paragraph text.</div>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\"><span class=\"li_level\" data-custom-marker=\"true\" data-marker-empty=\"true\"></span></li></ul><hr class=\"footnotes-sep\">\n<section class=\"footnotes\" style=\"margin-bottom: 1em;\">\n<ol class=\"footnotes-list\" style=\"padding-left: 20px; margin-bottom: 0;\">\n<li id=\"fn1\" class=\"footnote-item\" style=\"list-style-type: none;\"><div><br>\n1 A footnote note.<br>\n</div>\n</li>\n</ol>\n</section>\n"
+  },
+  {
+    // Same case with \footnote instead of \footnotetext.
+    latex: "Intro paragraph text.\n\\begin{itemize}\n\\item[] \\footnote{\n1 A footnote note.\n}\n\\end{itemize}",
+    html: "<div>Intro paragraph text.</div>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\"><span class=\"li_level\" data-custom-marker=\"true\" data-marker-empty=\"true\"></span><sup class=\"footnote-ref\"><a href=\"#fn1\" id=\"fnref1\">[1]</a></sup></li></ul><hr class=\"footnotes-sep\">\n<section class=\"footnotes\" style=\"margin-bottom: 1em;\">\n<ol class=\"footnotes-list\" style=\"margin-bottom: 0;\">\n<li id=\"fn1\" class=\"footnote-item\"><div><br>\n1 A footnote note.<br>\n <a href=\"#fnref1\" class=\"footnote-backref\">↩︎</a></div>\n</li>\n</ol>\n</section>\n"
   }
 ];

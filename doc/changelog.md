@@ -1,5 +1,16 @@
 # July 2026
 
+## [3.0.2] - List rendering robustness fixes
+
+Fixes for LaTeX `itemize`/`enumerate` lists that rendered incorrectly on several inputs:
+
+- Marker padding is now measured for block-content items too (`\begin{figure}`/`\begin{tabular}`/code fence), so a list whose long-marker items all hold block content no longer loses its `padding-inline-start`.
+- Marker width counts East-Asian Wide/Fullwidth characters as 2, so a fullwidth marker like `\item[11．]` (U+FF0E) is no longer undercounted versus its ASCII twin `\item[11.42]`. ASCII markers are unchanged.
+- An unclosed list no longer leaks `env.isBlock`/`env.inheritedListType` from its aborted parse; an unclosed `itemize` before a `tabular` now degrades to plain text instead of a broken partial list with empty `<>` item bodies.
+- The `\footnote`/`\footnotetext` block rules stop at a `\begin{itemize}`/`\begin{enumerate}`, so a list right after a paragraph (no blank line) whose item holds a multiline footnote renders as a list instead of literal text.
+
+See `pr-specs/2026-07-list-rendering-robustness.md`.
+
 ## [3.0.1] - Preserve code indentation inside list/table/align env wrappers
 
 Fenced code and `lstlisting` inside LaTeX environment wrappers kept their leading whitespace instead of collapsing flush-left:

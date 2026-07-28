@@ -54,7 +54,7 @@ const getTerminatorRulesForFootnotes = (ruler: Ruler) => {
   const rules = ruler.__rules__;
   let arr: string[] = [
     "table", "smilesDrawerBlock", "collapsible", "fence", "blockquote", "hr",
-    "list", "footnote_def", "heading", "svg_block", "html_block", "pageBreaksBlock", "deflist",
+    "list", "Lists", "footnote_def", "heading", "svg_block", "html_block", "pageBreaksBlock", "deflist",
     "BeginTable", "BeginAlign", "BeginTabular", "BeginProof",
     "BeginTheorem", "headingSection", "mathMLBlock", "pageBreaksBlock",
     "abstractBlock",
@@ -94,10 +94,15 @@ export const latex_footnote_block: RuleBlock = (state, startLine, endLine, silen
     // Literal token can't span `\n` — gate the O(fullContent) regex on per-line presence.
     let sawFootnoteToken: boolean = reFootnoteToken.test(lineText);
     if (!sawFootnoteToken || !reOpenTagFootnoteG.test(lineText)) {
-      // Only `fence` terminates here; footnotetext uses full terminator list (pre-existing).
+      // Stop the pre-tag scan at any block boundary so a \begin{itemize} before
+      // the \footnote tag isn't swallowed as text.
+      const terminatorRules = getTerminatorRulesForFootnotes(state.md.block.ruler);
       for (; nextLine < endLine; nextLine++) {
-        if (fence(state, nextLine, endLine, true)) {
-          terminate = true;
+        for (let i = 0; i < terminatorRules.length; i++) {
+          if (terminatorRules[i](state, nextLine, endLine, true)) {
+            terminate = true;
+            break;
+          }
         }
         if (terminate) { break; }
         if (state.isEmpty(nextLine)) {
