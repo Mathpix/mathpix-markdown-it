@@ -70,9 +70,12 @@ export const setTokenListItemOpenBlock = (
     : '';
   // Parse marker (e.g., \item[abc])
   if (marker !== undefined) {
-    token.marker = marker.trim();
+    // Parse the trimmed marker so markerTokens (used for width and rendering)
+    // don't carry edge whitespace that inflates the padding.
+    const trimmedMarker: string = marker.trim();
+    token.marker = trimmedMarker;
     const parsedMarkerTokens: Token[] = [];
-    state.md.inline.parse(marker, state.md, state.env, parsedMarkerTokens);
+    state.md.inline.parse(trimmedMarker, state.md, state.env, parsedMarkerTokens);
     token.markerTokens = parsedMarkerTokens;
   }
   // Apply enumeration start value

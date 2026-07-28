@@ -99,15 +99,19 @@ describe('parse isolation: repeat-render of same source produces identical HTML'
 describe('silent-mode Lists does not mutate shared env', () => {
   const md = markdownIt({ html: true }).use(mathpixMarkdownPlugin, {});
   const listsRule = md.block.ruler.__rules__.find(r => r.name === 'Lists').fn;
-  it('a silent Lists probe leaves state.env unchanged', () => {
-    const env = {};
-    const src = '\\begin{itemize}\n\\item a\n\\end{itemize}\n';
-    const state = new md.block.State(src, md, env, []);
-    const beforeIsBlock = state.env.isBlock;
-    const beforeInherited = state.env.inheritedListType;
-    const ok = listsRule(state, 0, state.lineMax, true); // silent
-    ok.should.equal(true);
-    should.equal(state.env.isBlock, beforeIsBlock);
-    should.equal(state.env.inheritedListType, beforeInherited);
+  // Full-snapshot check (keys + values) so a leak of any transient env field is caught,
+  // for both a closed and an unclosed list.
+  const snapshot = (env) => Object.keys(env).sort().join(',') + '|' + JSON.stringify(env);
+  [
+    { name: 'closed list', src: '\\begin{itemize}\n\\item a\n\\end{itemize}\n' },
+    { name: 'unclosed list', src: '\\begin{itemize}\n\\item a\n' },
+  ].forEach(({ name, src }) => {
+    it(`a silent Lists probe over a ${name} leaves state.env unchanged`, () => {
+      const env = {};
+      const before = snapshot(env);
+      const state = new md.block.State(src, md, env, []);
+      listsRule(state, 0, state.lineMax, true); // silent probe
+      snapshot(state.env).should.equal(before);
+    });
   });
 });

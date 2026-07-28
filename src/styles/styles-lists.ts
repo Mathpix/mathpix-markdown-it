@@ -2,7 +2,7 @@ export const listsStyles = `
 ol.enumerate, ul.itemize,
 #preview-content ol.enumerate, #setText ol.enumerate,
 #preview-content ul.itemize, #setText ul.itemize {
-  padding-inline-start: 40px;
+  padding-inline-start: 2.5em;
   margin: 0 0 1em 0;
 }
 li > ol.enumerate, li > ul.itemize,
@@ -29,7 +29,7 @@ ul.itemize > li,
   width: max-content;
   display: flex;
   justify-content: flex-end;
-  padding-right: 10px;
+  padding-right: 1.4ex;
   box-sizing: border-box;
 }
 .li_enumerate.not_number,

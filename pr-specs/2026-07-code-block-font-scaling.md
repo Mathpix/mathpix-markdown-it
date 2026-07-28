@@ -35,13 +35,21 @@ it is *still* 15px / 24px / 16px.
 
 ## Desired Behavior
 
-The properties become relative, calibrated so a 16px base is pixel-identical to before
-(the only intentional change is code padding, 16px → 15px):
+The properties become relative, calibrated so at a 16px base the **code text** is
+pixel-identical to before (15px glyphs in a 24px line box); the only intentional visual
+change is code padding, 16px → 15px:
 
-- `#setText pre { font-size: 0.9375em; }` — `0.9375 × 16 = 15px`, replaces `85%`.
+- `#setText pre { font-size: 0.9375em; }` — replaces `85%`. Already relative; bumped from
+  `85%` (13.6px) to `0.9375em` (15px) so that `pre code { font-size: inherit }` resolves to
+  the same 15px the code text had absolutely.
 - `#setText pre code { font-size: inherit; }` — replaces `15px`; the code text inherits from `pre`.
-- `#setText pre code { line-height: 1.6; }` — replaces `24px` (`24 / 15`).
-- `#setText pre code { padding: 1em; }` — replaces `1rem`.
+- `#setText pre code { line-height: 1.6; }` — replaces `24px` (`1.6 × 15 = 24px`, unchanged).
+- `#setText pre code { padding: 1em; }` — replaces `1rem` (`1em × 15px = 15px`, was `16px`).
+
+The `pre` wrapper's own font-size moves 13.6px → 15px, so its line box (`line-height: 1.45`)
+goes 19.72px → 21.75px. `pre` wraps only the `display:block` `code` element and emits no
+direct inline text, so this is not visible — but it is a real computed-style change, not a
+pixel-for-pixel no-op.
 
 ## Constraints / Invariants
 
@@ -52,6 +60,16 @@ The properties become relative, calibrated so a 16px base is pixel-identical to 
 - **Styles only** — no change to `lstlisting` / fenced-code markup or `token.meta.codeText`.
 - `pre`'s own `font-size` changes 85% → 93.75%; observable only for a non-`code` child of a
   `pre`, which is not emitted. Called out so it is not read as an unrelated tweak.
+
+## Migration
+
+- **Code text now inherits `font-size` from `pre`.** A consumer that used to size code by
+  setting `#setText pre code { font-size: … }` still works, but one that sized it via `pre`
+  now also affects the code text (previously the absolute `15px` on `pre code` won). Set the
+  size on `pre code` if independent control is needed.
+- **Code padding is 15px, not 16px, at the default base** (`1em` of a 15px `pre`).
+- Scaling the block by a container `font-size` now scales code padding and line height too;
+  before, both stayed fixed.
 
 ## Implementation
 

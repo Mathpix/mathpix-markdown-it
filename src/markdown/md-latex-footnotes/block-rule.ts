@@ -20,6 +20,21 @@ const FOOTNOTETEXT_POS_KEY = Symbol('mmd.footnotetextSrcPositions');
 const FOOTNOTE_TOKEN_SWEEP_G: RegExp = new RegExp(reFootnoteToken.source, 'g');
 const FOOTNOTETEXT_TOKEN_SWEEP_G: RegExp = new RegExp(reFootnotetextToken.source, 'g');
 
+// Block rules that terminate a footnote pre-tag scan. Resolved fns are NOT cached because
+// `rule.enabled` toggles mid-parse; the ~0.3µs rebuild per call is cheaper than replicating
+// markdown-it's `__cache__` invalidation.
+const FOOTNOTE_TERMINATOR_NAMES = new Set<string>([
+  "table", "smilesDrawerBlock", "collapsible", "fence", "blockquote", "hr",
+  "list", "Lists", "footnote_def", "heading", "svg_block", "html_block", "pageBreaksBlock", "deflist",
+  "BeginTable", "BeginAlign", "BeginTabular", "BeginProof",
+  "BeginTheorem", "headingSection", "mathMLBlock",
+  "abstractBlock",
+  "image_with_size_block"
+]);
+// Minimal terminator set for `\footnote` (`fence` is checked directly): just the list rule,
+// so a `\begin{itemize}` before the tag isn't swallowed.
+const FOOTNOTE_LIST_TERMINATOR_NAMES = new Set<string>(["Lists"]);
+
 type FootnoteCacheEntry = { src: string; lastPos: number };
 
 // Per-state cache of the last match offset (-1 if none). `patternG` MUST be /g.
@@ -50,49 +65,20 @@ const getCachedSrcPositions = (
   return lastPos;
 };
 
-// Names of block rules that end a footnote pre-tag scan. The name set is constant, so
-// it lives at module scope (one Set, O(1) lookups). The resolved `fn` list is NOT cached:
-// it depends on `rule.enabled`, which toggles during a parse (`defaultRulesToDisable`
-// disables `list` inside nested parses), so a cache would need markdown-it's own
-// invalidation (it nulls `ruler.__cache__` on enable/disable) — replicating that means
-// coupling to that internal or risking a stale, wrong terminator. The rebuild is ~0.3µs
-// (measured), so re-resolving per call is both correct and negligibly cheap.
-const FOOTNOTE_TERMINATOR_NAMES = new Set<string>([
-  "table", "smilesDrawerBlock", "collapsible", "fence", "blockquote", "hr",
-  "list", "Lists", "footnote_def", "heading", "svg_block", "html_block", "pageBreaksBlock", "deflist",
-  "BeginTable", "BeginAlign", "BeginTabular", "BeginProof",
-  "BeginTheorem", "headingSection", "mathMLBlock",
-  "abstractBlock",
-  "image_with_size_block"
-]);
-
-const getTerminatorRulesForFootnotes = (ruler: Ruler) => {
+// Resolve the enabled block-rule fns for the given names (in ruler order). Not cached —
+// see the FOOTNOTE_TERMINATOR_NAMES note.
+const resolveEnabledRuleFns = (ruler: Ruler, names: Set<string>): RuleBlock[] => {
   const rules = ruler.__rules__;
-  let res = [];
+  const res: RuleBlock[] = [];
   if (rules?.length) {
     for (let i = 0; i < rules.length; i++) {
-      let rule = rules[i];
-      if (rule.enabled && FOOTNOTE_TERMINATOR_NAMES.has(rule.name)) {
+      const rule = rules[i];
+      if (rule.enabled && names.has(rule.name)) {
         res.push(rule.fn);
       }
     }
   }
   return res;
-}
-
-// The LaTeX list rule (registered with alt ['paragraph'] only) is not among the
-// `\footnote` pre-tag terminators, so a `\begin{itemize}` before the tag was swallowed.
-// Resolve its fn (enabled-checked) to add it as a single cheap terminator.
-const getListRuleFn = (ruler: Ruler) => {
-  const rules = ruler.__rules__;
-  if (rules?.length) {
-    for (let i = 0; i < rules.length; i++) {
-      if (rules[i].enabled && rules[i].name === 'Lists') {
-        return rules[i].fn;
-      }
-    }
-  }
-  return null;
 }
 
 export const latex_footnote_block: RuleBlock = (state, startLine, endLine, silent) => {
@@ -118,8 +104,8 @@ export const latex_footnote_block: RuleBlock = (state, startLine, endLine, silen
     let sawFootnoteToken: boolean = reFootnoteToken.test(lineText);
     if (!sawFootnoteToken || !reOpenTagFootnoteG.test(lineText)) {
       // Terminate on `fence` (original) plus the LaTeX list rule, so a `\begin{itemize}`
-      // before the tag isn't swallowed — a minimal addition, keeping the cheap fence-only scan.
-      const listRule = getListRuleFn(state.md.block.ruler);
+      // before the tag isn't swallowed — a minimal addition (fence + Lists, not the full set).
+      const listRule = resolveEnabledRuleFns(state.md.block.ruler, FOOTNOTE_LIST_TERMINATOR_NAMES)[0] ?? null;
       for (; nextLine < endLine; nextLine++) {
         if (fence(state, nextLine, endLine, true) ||
             (listRule && listRule(state, nextLine, endLine, true))) {
@@ -306,7 +292,7 @@ export const latex_footnotetext_block: RuleBlock = (state, startLine, endLine, s
     let hasOpenTag = false;
     let pending = '';
     let terminate = false;
-    const terminatorRules = getTerminatorRulesForFootnotes(state.md.block.ruler);
+    const terminatorRules = resolveEnabledRuleFns(state.md.block.ruler, FOOTNOTE_TERMINATOR_NAMES);
     // Literal token can't span `\n` — gate the O(fullContent) regex on per-line presence.
     let sawFootnotetextToken: boolean = reFootnotetextToken.test(lineText);
     if (!sawFootnotetextToken || !reOpenTagFootnotetextG.test(lineText)) {

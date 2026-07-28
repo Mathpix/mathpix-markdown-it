@@ -313,7 +313,10 @@ export const listItemInline: RuleInline = (
     token.inlinePos.end_content = token.inlinePos.start_content + content.length;
     // Optional marker: \item[<marker>]
     if (itemMatch[1] !== undefined) {
-      token.marker = itemMatch[1] ? itemMatch[1].trim() : "";
+      // Parse the trimmed marker so markerTokens (used for width and rendering)
+      // don't carry edge whitespace that inflates the padding.
+      const trimmedMarker: string = itemMatch[1] ? itemMatch[1].trim() : "";
+      token.marker = trimmedMarker;
       const children: Token[] = [];
       const beforeOptions = {...state.md.options};
       if (state.md.options.forDocx) {
@@ -325,7 +328,7 @@ export const listItemInline: RuleInline = (
           },
         };
       }
-      state.md.inline.parse(itemMatch[1], state.md, state.env, children);
+      state.md.inline.parse(trimmedMarker, state.md, state.env, children);
       state.md.options = beforeOptions;
       token.markerTokens = children;
     }

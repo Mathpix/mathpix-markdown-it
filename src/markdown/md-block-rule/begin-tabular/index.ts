@@ -14,6 +14,7 @@ import {
   BEGIN_TABULAR_BRACKET_RE_G
 } from "../../common/consts";
 import { parseBlockIntoTokenChildren } from "../helper";
+import { snapshotEnvForInline } from "../../common/env-transient";
 
 // group 1 = bracket pos, group 2 = column spec.
 export const openTag: RegExp = BEGIN_TABULAR_BRACKET_RE;
@@ -247,9 +248,9 @@ export const StatePushTabulars = (state, cTabular: TTypeContentList, align: stri
           }
           const isSubTab = res[j].type === 'subTabular' || res[j].isSubTabular;
           if (isSubTab) {
-            tok.envToInline = {...state.env};
+            tok.envToInline = snapshotEnvForInline(state.env);
           } else {
-            if (!sharedEnvToInline) sharedEnvToInline = {...state.env};
+            if (!sharedEnvToInline) sharedEnvToInline = snapshotEnvForInline(state.env);
             tok.envToInline = sharedEnvToInline;
           }
           state.env.tabulare = false;

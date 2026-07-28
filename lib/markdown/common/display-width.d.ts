@@ -1,3 +1,11 @@
+export declare const EX_PER_CHAR_CELL = 2;
+export declare const MARKER_GAP_EX = 1.4;
+interface WidthToken {
+    type?: string;
+    content?: string;
+    widthEx?: number;
+    children?: WidthToken[] | null;
+}
 /**
  * Whether a code point is an East-Asian Wide/Fullwidth character, which renders
  * roughly twice as wide as an ASCII character. Approximation of Unicode's East
@@ -17,4 +25,5 @@ export declare const displayWidth: (str: string) => number;
  * char-based counterpart of `getTextWidthByTokens` (font-based) — used where no font
  * is loaded (`fontMetrics` runs only under markdownToHTMLWithSize).
  */
-export declare const tokenDisplayWidth: (token: any) => number;
+export declare const tokenDisplayWidth: (token: WidthToken) => number;
+export {};

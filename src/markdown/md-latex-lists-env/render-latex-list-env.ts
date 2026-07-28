@@ -8,6 +8,11 @@ import { needToHighlightAll, highlightText } from "../highlight/common";
 import convertSvgToBase64 from "../md-svg-to-base64/convert-scv-to-base64";
 import { mathTokenTypes } from "../common/consts";
 import { isMathInText } from "../utils";
+
+// Marker reservation (width + gap) is stored in ex so it scales with the container font,
+// like the marker's math SVG. Empty when no custom padding.
+const markerPaddingStyle = (exAttr: string | null | undefined): string =>
+  exAttr ? `padding-inline-start: ${exAttr}ex; ` : "";
 import {CustomMarkerHtmlResult} from "./latex-list-types";
 
 var level_itemize = 0;
@@ -135,10 +140,7 @@ export const render_itemize_list_open: Renderer.RenderRule = (
     token.attrJoin("class", className);
   }
   // Translate data-padding-inline-start into inline style for top-level lists
-  const paddingInlineAttr = token.attrGet("data-padding-inline-start");
-  const paddingInlineStyle: string = paddingInlineAttr
-    ? `padding-inline-start: ${paddingInlineAttr}px; `
-    : "";
+  const paddingInlineStyle: string = markerPaddingStyle(token.attrGet("data-padding-inline-start"));
   // DOCX-specific: compute custom bullet metadata
   if (options.forDocx) {
     const itemizeLevelTokens: Token[][] = GetItemizeLevelTokens(token.itemizeLevel);
@@ -214,10 +216,7 @@ export const render_enumerate_list_open: Renderer.RenderRule = (
     token.attrJoin("class", className);
   }
   // Map data-padding-inline-start → inline CSS for top-level lists
-  const paddingInlineAttr = token.attrGet("data-padding-inline-start");
-  const paddingInlineStyle = paddingInlineAttr
-    ? `padding-inline-start: ${paddingInlineAttr}px; `
-    : "";
+  const paddingInlineStyle = markerPaddingStyle(token.attrGet("data-padding-inline-start"));
   // DOCX: pass style type to consumer
   if (options.forDocx) {
     dataAttr = ` data-list-style-type="${currentStyle}"`

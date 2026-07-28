@@ -14,6 +14,7 @@ import {
   OpaqueStack, OpaqueEnvType
 } from "./latex-list-types";
 import { parseSetCounterNumber } from "./latex-list-common";
+import { LIST_TRANSIENT_ENV_KEYS } from "../common/env-transient";
 import { flushBufferedTokens, createBufferedState } from "./latex-list-env-engine";
 import {
   BEGIN_LIST_ENV_INLINE_RE,
@@ -33,6 +34,8 @@ import {
 // spaces; a backtick open cannot carry a backtick in its info string; a close is same char, ≥ open length, blank tail.
 const BACKTICK: number = 0x60;
 const TILDE: number = 0x7E;
+// env fields ListItems/ListOpen write while parsing; restored on every exit path.
+const ENV_TRANSIENT_KEYS: string[] = LIST_TRANSIENT_ENV_KEYS;
 type FenceMarker = { char: number; len: number };
 const skipUpTo3Spaces = (rawLine: string): number => {
   let pos = 0;
@@ -568,26 +571,36 @@ export const Lists: RuleBlock = (
   if (!isListType(typeList)) {
     return false;
   }
-  // `bufferedState` shares `env` by prototype, so the parse mutates the real env.
-  const envIsBlock = state.env.isBlock;
-  const envInheritedListType = state.env.inheritedListType;
-  const bufferedState = createBufferedState(state);
-  const ok: boolean = ListsInternal(bufferedState, startLine, endLine);
-  // Abort and silent-probe flush no tokens: restore the mutated env fields so a leaked
-  // isBlock/inheritedListType can't affect later content (`isBlock` wakes the inline fallback).
-  if (!ok || silent) {
-    state.env.isBlock = envIsBlock;
-    state.env.inheritedListType = envInheritedListType;
-    return ok;
+  // `bufferedState` shares `env` by prototype, so ListsInternal mutates the real env.
+  // Snapshot/restore its transient fields on every exit (abort, silent, commit): a list
+  // ending in a block item leaks isBlock=true and wakes the inline fallback on the next
+  // block, and a silent probe must not change state.
+  const envHad: { [k: string]: boolean } = {};
+  const envSnap: { [k: string]: any } = {};
+  for (const k of ENV_TRANSIENT_KEYS) {
+    envHad[k] = k in state.env;
+    envSnap[k] = (state.env as any)[k];
   }
-  // Flush tokens to the real state at the end
-  flushBufferedTokens(state, bufferedState.tokens);
-  // Sync state fields modified by parsing
-  state.line = bufferedState.line;
-  state.startLine = bufferedState.startLine;
-  state.parentType = bufferedState.parentType;
-  state.level = bufferedState.level;
-  state.prentLevel = bufferedState.prentLevel;
-  state.env = bufferedState.env;
-  return true;
+  try {
+    const bufferedState = createBufferedState(state);
+    const ok: boolean = ListsInternal(bufferedState, startLine, endLine);
+    if (!ok || silent) {
+      return ok;
+    }
+    flushBufferedTokens(state, bufferedState.tokens);
+    state.line = bufferedState.line;
+    state.startLine = bufferedState.startLine;
+    state.parentType = bufferedState.parentType;
+    state.level = bufferedState.level;
+    state.prentLevel = bufferedState.prentLevel;
+    return true;
+  } finally {
+    for (const k of ENV_TRANSIENT_KEYS) {
+      if (envHad[k]) {
+        (state.env as any)[k] = envSnap[k];
+      } else {
+        delete (state.env as any)[k];
+      }
+    }
+  }
 };

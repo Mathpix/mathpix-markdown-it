@@ -7,6 +7,7 @@ import {
   computeMarkerPadding
 } from "./latex-list-tokens";
 import { SetTokensBlockParse } from "../md-block-rule/helper";
+import { EX_PER_CHAR_CELL, MARKER_GAP_EX } from "../common/display-width";
 import { ListItemsResult, ParsedListItem, ListInlineContext } from "./latex-list-types";
 import {
   END_LIST_ENV_INLINE_RE,
@@ -91,6 +92,8 @@ export const ListItems = (
         const rawContent: string = listItem?.content?.slice(match.index + match[0].length) ?? '';
         const blockContent: string = rawContent.trim();
         SetTokensBlockParse(state, blockContent, {disableBlockRules: true});
+        // Mirror the inline branch's reset (below): don't leave isBlock set after a block item.
+        state.env.isBlock = false;
         continue;
       }
     }
@@ -222,8 +225,9 @@ export const finalizeListItems = (
     if (!p.padding || p.padding < dataItems.padding) {
       p.padding = dataItems.padding;
       if (p.padding > 3) {
-        // padding may be fractional (math width) — round to whole px.
-        p.attrSet("data-padding-inline-start", String(Math.round(dataItems.padding * 14)));
+        // Reserve marker width + gap, in ex (see render); round to 2 decimals.
+        const ex: number = Math.round((dataItems.padding * EX_PER_CHAR_CELL + MARKER_GAP_EX) * 100) / 100;
+        p.attrSet("data-padding-inline-start", String(ex));
       }
     }
   }

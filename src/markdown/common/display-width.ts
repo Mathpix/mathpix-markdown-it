@@ -1,6 +1,21 @@
 // Math tokens carry advance width as `token.widthEx` (see convert-math-to-html).
 // `ex` is ~½ em, so ~2 ex ≈ one character cell.
 const MATH_EX_PER_CHAR = 2;
+// Marker padding is emitted in `ex` so it scales with the container font (like the math
+// SVG). 2 ex per char cell → a math token round-trips to exactly its widthEx.
+export const EX_PER_CHAR_CELL = 2;
+// Marker→content gap in ex; keep in sync with `.li_level { padding-right }` (~10px at 16px).
+export const MARKER_GAP_EX = 1.4;
+// Math types whose `widthEx` may be absent (e.g. skipMathToHtml) — fall back to source length.
+const MATH_TOKEN_TYPES = new Set<string>(['inline_math', 'equation_math', 'equation_math_not_number', 'display_math']);
+
+// Minimal shape tokenDisplayWidth reads (a subset of markdown-it's Token).
+interface WidthToken {
+  type?: string;
+  content?: string;
+  widthEx?: number;
+  children?: WidthToken[] | null;
+}
 
 /**
  * Whether a code point is an East-Asian Wide/Fullwidth character, which renders
@@ -29,7 +44,7 @@ export const isWideChar = (cp: number): boolean =>
 export const displayWidth = (str: string): number => {
   let width = 0;
   for (const ch of str) {
-    width += isWideChar(ch.codePointAt(0)) ? 2 : 1;
+    width += isWideChar(ch.codePointAt(0) ?? 0) ? 2 : 1;
   }
   return width;
 };
@@ -40,12 +55,15 @@ export const displayWidth = (str: string): number => {
  * char-based counterpart of `getTextWidthByTokens` (font-based) — used where no font
  * is loaded (`fontMetrics` runs only under markdownToHTMLWithSize).
  */
-export const tokenDisplayWidth = (token: any): number => {
+export const tokenDisplayWidth = (token: WidthToken): number => {
   if (token.type === 'text') {
-    return displayWidth(token.content);
+    return displayWidth(token.content ?? '');
   }
   if (typeof token.widthEx === 'number') {
     return token.widthEx / MATH_EX_PER_CHAR;
+  }
+  if (MATH_TOKEN_TYPES.has(token.type)) {
+    return displayWidth(token.content ?? '');
   }
   if (token.children && token.children.length) {
     let width = 0;
