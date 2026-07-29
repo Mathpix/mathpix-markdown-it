@@ -339,12 +339,14 @@ export const mathTokenTypes = ["display_math", "inline_math", "equation_math_not
 // Default font metrics (px), single source — also used by FontMetrics in text-dimentions.ts.
 export const DEFAULT_FONT_SIZE_PX = 16;
 export const DEFAULT_EX_PX = 8.296875;
-// ex→em, so ex-measured marker widths can be emitted in em.
+// ex→em for exact math (widthEx) marker widths.
 export const EX_TO_EM = DEFAULT_EX_PX / DEFAULT_FONT_SIZE_PX;
-// Marker→content gap and default list indent, in em (10px and 40px at a 16px base). Marker
-// padding is emitted only when it exceeds the default, so it never resolves below it.
+// Marker→content gap and default list indent, em (10px/40px at 16px). Emit only above default.
 export const MARKER_GAP_EM = 0.625;
 export const LIST_DEFAULT_INDENT_EM = 2.5;
+// Upper bound so a pathological marker can't blow out the content column (above it the
+// marker may overlap — see spec Non-Goals).
+export const LIST_MAX_INDENT_EM = 20;
 
 export const codeHighlightDef = {
   auto: false,

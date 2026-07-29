@@ -15,25 +15,24 @@ import {
   applyListCloseState,
   closeOpenListItemIfNeeded,
 } from "./latex-list-common";
-import { BEGIN_LIST_ENV_RE } from "../common/consts";
-import { tokenDisplayWidth } from "../common/display-width";
+import { BEGIN_LIST_ENV_RE, MARKER_GAP_EM } from "../common/consts";
+import { tokenMarkerWidth } from "../common/display-width";
 
 /**
- * Marker width for a custom `\item[...]`: total width of its tokens in `ex` (see
- * `tokenDisplayWidth` — text by display width, math by `widthEx`, wrappers via children).
- * The producer converts this to `em` for the emitted padding. Shared by the inline and
+ * Marker reservation for a custom `\item[...]` in `em`: sum of per-token widths (text by
+ * glyph class, math by `widthEx`) plus one marker→content gap. Shared by the inline and
  * block item paths in `ListItems`.
  *
  * @param markerTokens - Parsed inline tokens of the marker
- * @returns Total marker width in ex
+ * @returns Total marker reservation in em
  */
 export const computeMarkerPadding = (markerTokens: Token[] | undefined): number => {
-  let padding = 0;
+  let em = 0;
   const tokens: Token[] = markerTokens ?? [];
   for (let i = 0; i < tokens.length; i++) {
-    padding += tokenDisplayWidth(tokens[i]);
+    em += tokenMarkerWidth(tokens[i]);
   }
-  return padding;
+  return em > 0 ? em + MARKER_GAP_EM : 0;
 };
 
 /**

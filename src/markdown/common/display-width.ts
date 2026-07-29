@@ -1,17 +1,30 @@
-import { mathTokenTypes } from "./consts";
+import { mathTokenTypes, EX_TO_EM } from "./consts";
 
-// Marker widths are measured in `ex` (math by exact `widthEx`, text ~1.3 ex/char — a glyph
-// is ~1 ex). The producer converts the total to `em` for the emitted padding (EX_TO_EM).
-const TEXT_EX_PER_CELL = 1.3;
 const MATH_TOKEN_TYPES = new Set<string>(mathTokenTypes);
+// Leaf tokens whose `content` is visible text (measured); others (e.g. `html_inline`, whose
+// content is raw markup) contribute 0.
+const TEXT_LIKE_TYPES = new Set<string>(['text', 'code_inline', 'text_special']);
 
-// Minimal shape tokenDisplayWidth reads (a subset of markdown-it's Token).
+// Zero-width combining marks that fall inside the Katakana range below.
+const isZeroWidthCombining = (cp: number): boolean => cp === 0x3099 || cp === 0x309A;
+
+// Minimal shape tokenMarkerWidth reads (a subset of markdown-it's Token).
 interface WidthToken {
   type?: string;
   content?: string;
   widthEx?: number;
   children?: WidthToken[] | null;
 }
+
+// Per-char text reserve in em by width class (safety margin over Helvetica advances).
+const NARROW_RE = /[ !'"(),.\/:;|\[\]ijltfrI]/;   // thin glyphs
+const WIDE_RE = /[A-HJ-Zmw]/;                      // most capitals (except I) + m, w
+const XWIDE_RE = /[W@%]/;                           // widest glyphs
+const NARROW_EM = 0.40;
+const NORMAL_EM = 0.62;
+const WIDE_EM = 0.90;
+const XWIDE_EM = 1.10;
+const CJK_EM = 1.20;                               // East-Asian full-width glyph
 
 /**
  * Whether a code point is an East-Asian Wide/Fullwidth character, which renders
@@ -21,8 +34,7 @@ interface WidthToken {
  * U+3099/U+309A are excluded. Other combining marks are not special-cased (count 1).
  */
 export const isWideChar = (cp: number): boolean =>
-  // U+3099/U+309A are zero-width combining marks that fall inside the Katakana range below.
-  (cp !== 0x3099 && cp !== 0x309A) &&
+  !isZeroWidthCombining(cp) &&
   ((cp >= 0x1100 && cp <= 0x115F) ||   // Hangul Jamo
   (cp >= 0x2E80 && cp <= 0x303E) ||   // CJK radicals, Kangxi, CJK symbols/punctuation
   (cp >= 0x3041 && cp <= 0x33FF) ||   // Hiragana, Katakana, CJK symbols
@@ -36,47 +48,56 @@ export const isWideChar = (cp: number): boolean =>
   (cp >= 0xFFE0 && cp <= 0xFFE6));    // Fullwidth signs
 
 /**
- * Display width of a string in character cells: East-Asian Wide/Fullwidth characters count
- * as 2, the zero-width combining marks U+3099/U+309A as 0, everything else as 1. Iterates
- * by code point so surrogate pairs count once. Other combining marks are not special-cased.
+ * Reserve for a run of text in em: sum of per-char class widths. Combining marks U+3099/
+ * U+309A count 0; East-Asian wide chars use CJK_EM; else narrow/normal/wide by class.
  */
-export const displayWidth = (str: string): number => {
-  let width = 0;
+export const textReserveEm = (str: string): number => {
+  let em = 0;
   for (const ch of str) {
     const cp: number = ch.codePointAt(0) ?? 0;
-    if (cp === 0x3099 || cp === 0x309A) {
-      continue; // zero-width combining marks
+    if (isZeroWidthCombining(cp)) {
+      continue;
     }
-    width += isWideChar(cp) ? 2 : 1;
+    if (isWideChar(cp)) {
+      em += CJK_EM;
+    } else if (NARROW_RE.test(ch)) {
+      em += NARROW_EM;
+    } else if (XWIDE_RE.test(ch)) {
+      em += XWIDE_EM;
+    } else if (WIDE_RE.test(ch)) {
+      em += WIDE_EM;
+    } else {
+      em += NORMAL_EM;
+    }
   }
-  return width;
+  return em;
 };
 
 /**
- * Width of one inline token in `ex`: text by display width × TEXT_EX_PER_CELL, math by its
- * exact rendered `widthEx`, wrappers (e.g. `\textbf{…}`) by recursing into children. The
- * char-based counterpart of `getTextWidthByTokens` (font-based) — used where no font is
- * loaded (`fontMetrics` runs only under markdownToHTMLWithSize). Math without a `widthEx`
- * (non-SVG output) returns 0: no measured width, so the marker keeps the default indent
- * rather than a fabricated estimate.
+ * Width of one inline marker token in em: math by its rendered `widthEx` (converted to em),
+ * wrappers (e.g. `\textbf{…}`) by recursing into children, text-like leaves (`text` /
+ * `code_inline` / `text_special`) by per-char class widths, everything else (e.g.
+ * `html_inline`, whose content is markup) 0. The counterpart of `getTextWidthByTokens`
+ * (font-based) — used where no font is loaded. Math without a `widthEx` (non-SVG output)
+ * also contributes 0, so the marker keeps the default indent.
  */
-export const tokenDisplayWidth = (token: WidthToken): number => {
-  if (token.type === 'text') {
-    return displayWidth(token.content ?? '') * TEXT_EX_PER_CELL;
-  }
+export const tokenMarkerWidth = (token: WidthToken): number => {
   if (typeof token.widthEx === 'number') {
-    return token.widthEx;
+    return token.widthEx * EX_TO_EM;
   }
-  // Math with no widthEx → 0 (don't recurse children; that branch is for wrappers).
+  // Math with no widthEx → 0 (don't measure content; that would be a fabricated estimate).
   if (token.type && MATH_TOKEN_TYPES.has(token.type)) {
     return 0;
   }
   if (token.children && token.children.length) {
-    let width = 0;
+    let em = 0;
     for (let i = 0; i < token.children.length; i++) {
-      width += tokenDisplayWidth(token.children[i]);
+      em += tokenMarkerWidth(token.children[i]);
     }
-    return width;
+    return em;
+  }
+  if (token.type && TEXT_LIKE_TYPES.has(token.type)) {
+    return textReserveEm(token.content ?? '');
   }
   return 0;
 };

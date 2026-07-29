@@ -1,13 +1,12 @@
 import type Token from 'markdown-it/lib/token';
 import { ListType, ListInlineContext, ParsedListItem, ListOpenResult } from "./latex-list-types";
 /**
- * Marker width for a custom `\item[...]`: total width of its tokens in `ex` (see
- * `tokenDisplayWidth` — text by display width, math by `widthEx`, wrappers via children).
- * The producer converts this to `em` for the emitted padding. Shared by the inline and
+ * Marker reservation for a custom `\item[...]` in `em`: sum of per-token widths (text by
+ * glyph class, math by `widthEx`) plus one marker→content gap. Shared by the inline and
  * block item paths in `ListItems`.
  *
  * @param markerTokens - Parsed inline tokens of the marker
- * @returns Total marker width in ex
+ * @returns Total marker reservation in em
  */
 export declare const computeMarkerPadding: (markerTokens: Token[] | undefined) => number;
 /**

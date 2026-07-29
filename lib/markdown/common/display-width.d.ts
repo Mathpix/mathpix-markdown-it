@@ -13,18 +13,17 @@ interface WidthToken {
  */
 export declare const isWideChar: (cp: number) => boolean;
 /**
- * Display width of a string in character cells: East-Asian Wide/Fullwidth characters count
- * as 2, the zero-width combining marks U+3099/U+309A as 0, everything else as 1. Iterates
- * by code point so surrogate pairs count once. Other combining marks are not special-cased.
+ * Reserve for a run of text in em: sum of per-char class widths. Combining marks U+3099/
+ * U+309A count 0; East-Asian wide chars use CJK_EM; else narrow/normal/wide by class.
  */
-export declare const displayWidth: (str: string) => number;
+export declare const textReserveEm: (str: string) => number;
 /**
- * Width of one inline token in `ex`: text by display width × TEXT_EX_PER_CELL, math by its
- * exact rendered `widthEx`, wrappers (e.g. `\textbf{…}`) by recursing into children. The
- * char-based counterpart of `getTextWidthByTokens` (font-based) — used where no font is
- * loaded (`fontMetrics` runs only under markdownToHTMLWithSize). Math without a `widthEx`
- * (non-SVG output) returns 0: no measured width, so the marker keeps the default indent
- * rather than a fabricated estimate.
+ * Width of one inline marker token in em: math by its rendered `widthEx` (converted to em),
+ * wrappers (e.g. `\textbf{…}`) by recursing into children, text-like leaves (`text` /
+ * `code_inline` / `text_special`) by per-char class widths, everything else (e.g.
+ * `html_inline`, whose content is markup) 0. The counterpart of `getTextWidthByTokens`
+ * (font-based) — used where no font is loaded. Math without a `widthEx` (non-SVG output)
+ * also contributes 0, so the marker keeps the default indent.
  */
-export declare const tokenDisplayWidth: (token: WidthToken) => number;
+export declare const tokenMarkerWidth: (token: WidthToken) => number;
 export {};

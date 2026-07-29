@@ -1,17 +1,8 @@
 let chai = require('chai');
 chai.should();
 
-const { isWideChar, displayWidth, tokenDisplayWidth } = require('../lib/markdown/common/display-width');
-
-describe('display-width: displayWidth (char cells)', () => {
-  it('ASCII counts one per char', () => displayWidth('abc').should.equal(3));
-  it('CJK counts two per char', () => displayWidth('漢字').should.equal(4));
-  it('fullwidth punctuation counts two (U+FF0E)', () => displayWidth('11．').should.equal(4));
-  it('astral (emoji) counts one', () => displayWidth('\u{1F600}').should.equal(1));
-  it('zero-width combining marks add 0 (か U+304B + U+3099 = 2, not 3)', () =>
-    displayWidth('\u304B\u3099').should.equal(2));
-  it('empty string is zero', () => displayWidth('').should.equal(0));
-});
+const { isWideChar, textReserveEm, tokenMarkerWidth } = require('../lib/markdown/common/display-width');
+const { EX_TO_EM } = require('../lib/markdown/common/consts');
 
 describe('display-width: isWideChar', () => {
   it('CJK ideograph is wide', () => isWideChar(0x6F22).should.equal(true));
@@ -24,17 +15,33 @@ describe('display-width: isWideChar', () => {
   });
 });
 
-describe('display-width: tokenDisplayWidth (ex)', () => {
-  it('text token → display width × 1.3 ex/cell', () =>
-    tokenDisplayWidth({ type: 'text', content: 'ab' }).should.be.closeTo(2.6, 1e-9));
-  it('math token → exact widthEx when present', () =>
-    tokenDisplayWidth({ type: 'inline_math', widthEx: 8 }).should.equal(8));
+describe('display-width: textReserveEm (per-glyph-class em)', () => {
+  it('normal glyph = 0.62em', () => textReserveEm('a').should.be.closeTo(0.62, 1e-9));
+  it('narrow glyph = 0.40em (. i l space capital I)', () => {
+    textReserveEm('.').should.be.closeTo(0.40, 1e-9);
+    textReserveEm('I').should.be.closeTo(0.40, 1e-9);
+  });
+  it('wide glyph = 0.90em (most capitals, m)', () => textReserveEm('M').should.be.closeTo(0.90, 1e-9));
+  it('extra-wide glyph = 1.10em (W @ %)', () => textReserveEm('W').should.be.closeTo(1.10, 1e-9));
+  it('sums per character', () => textReserveEm('abc').should.be.closeTo(1.86, 1e-9));
+  it('combining mark adds 0 (\u304B + \u3099 == \u304B)', () =>
+    textReserveEm('\u304B\u3099').should.be.closeTo(textReserveEm('\u304B'), 1e-9));
+});
+
+
+describe('display-width: tokenMarkerWidth (em)', () => {
+  it('text token → per-glyph-class reserve', () =>
+    tokenMarkerWidth({ type: 'text', content: 'ab' }).should.be.closeTo(1.24, 1e-9));
+  it('math token → widthEx × EX_TO_EM when present', () =>
+    tokenMarkerWidth({ type: 'inline_math', widthEx: 8 }).should.be.closeTo(8 * EX_TO_EM, 1e-9));
   it('math without widthEx → 0 (no measured width, so marker keeps the default indent)', () =>
-    tokenDisplayWidth({ type: 'inline_math', content: 'x^2' }).should.equal(0));
+    tokenMarkerWidth({ type: 'inline_math', content: 'x^2' }).should.equal(0));
   it('math without widthEx does not recurse into children → 0', () =>
-    tokenDisplayWidth({ type: 'inline_math', children: [{ type: 'text', content: 'abc' }] }).should.equal(0));
+    tokenMarkerWidth({ type: 'inline_math', children: [{ type: 'text', content: 'abc' }] }).should.equal(0));
   it('wrapper token → sum of children', () =>
-    tokenDisplayWidth({ type: 'textbf', children: [{ type: 'text', content: 'abc' }] }).should.be.closeTo(3.9, 1e-9));
+    tokenMarkerWidth({ type: 'textbf', children: [{ type: 'text', content: 'abc' }] }).should.be.closeTo(1.86, 1e-9));
   it('unknown non-math token with no children → 0', () =>
-    tokenDisplayWidth({ type: 'softbreak' }).should.equal(0));
+    tokenMarkerWidth({ type: 'softbreak' }).should.equal(0));
+  it('html_inline is not measured (content is markup) → 0', () =>
+    tokenMarkerWidth({ type: 'html_inline', content: '<span style="color:red">' }).should.equal(0));
 });

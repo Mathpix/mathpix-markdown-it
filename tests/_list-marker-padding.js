@@ -1,9 +1,13 @@
 let chai = require('chai');
 chai.should();
 
+const fs = require('fs');
+const path = require('path');
 const MM = require('../lib/mathpix-markdown-model/index').MathpixMarkdownModel;
 const markdownIt = require('markdown-it');
 const { mathpixMarkdownPlugin } = require('../lib/index.js');
+const { FontMetrics } = require('../lib/markdown/common/text-dimentions');
+const { MARKER_GAP_EM, LIST_DEFAULT_INDENT_EM, DEFAULT_FONT_SIZE_PX, DEFAULT_EX_PX } = require('../lib/markdown/common/consts');
 
 const { JSDOM } = require('jsdom');
 const jsdom = new JSDOM();
@@ -56,18 +60,41 @@ describe('List marker padding — width edge cases:', () => {
     hasPadding(render('\\begin{itemize}\n\\item[\\textbf{x^4 + x^4}] a\n\\end{itemize}')).should.equal(true);
   });
   it('long plain marker still gets padding (control)', () => {
-    // 8 chars × 1.3 ex/cell × EX_TO_EM + 0.625 gap ≈ 6.02em.
-    paddingValue(render('\\begin{itemize}\n\\item[longtext] a\n\\end{itemize}')).should.equal(6.02);
+    // "longtext" per-glyph-class widths + 0.625 gap ≈ 4.93em.
+    paddingValue(render('\\begin{itemize}\n\\item[longtext] a\n\\end{itemize}')).should.equal(4.93);
   });
-  it('reserve is per character cell, not per glyph (documents the limitation)', () => {
-    // Wide glyphs (all-caps `W`) reserve the same as a same-length narrow marker, so a
-    // wide-glyph marker can overlap the content — the no-font path has no glyph widths.
+  it('reserve is per glyph class: wide glyphs reserve more than narrow of the same length', () => {
+    // 8 wide capitals reserve more than 8 mixed lowercase — widths are class-based, not a flat count.
     paddingValue(render('\\begin{itemize}\n\\item[WWWWWWWW] a\n\\end{itemize}'))
+      .should.be.above(paddingValue(render('\\begin{itemize}\n\\item[longtext] a\n\\end{itemize}')));
+  });
+  it('a code-span marker contributes its width (like plain text)', () => {
+    // code_inline carries content but no children; it must be measured, not skipped.
+    paddingValue(render('\\begin{itemize}\n\\item[`longtext`] a\n\\end{itemize}'))
       .should.equal(paddingValue(render('\\begin{itemize}\n\\item[longtext] a\n\\end{itemize}')));
   });
-  it('astral marker (emoji) counts as width 1, not a wide char', () => {
-    // Documented limitation: isWideChar covers BMP ranges only. Two emoji = width 2,
-    // under the threshold, so no padding — if emoji were counted as 2 this would indent.
+  it('an html-tag marker measures only the visible text, not the markup', () => {
+    // `html_inline` content is raw tags; it must not be counted (would wildly over-reserve).
+    paddingValue(render('\\begin{itemize}\n\\item[<b>longtext</b>] a\n\\end{itemize}'))
+      .should.equal(paddingValue(render('\\begin{itemize}\n\\item[longtext] a\n\\end{itemize}')));
+  });
+  it('a real (non-pathological) long marker is not clamped', () => {
+    // ~22 chars must still get its full reserve; the clamp only guards pathological widths.
+    paddingValue(render('\\begin{itemize}\n\\item[' + 'a'.repeat(22) + '] a\n\\end{itemize}')).should.be.above(12);
+  });
+  it('a pathological marker is clamped so it cannot blow out the content column', () => {
+    paddingValue(render('\\begin{itemize}\n\\item[' + 'x'.repeat(60) + '] a\n\\end{itemize}')).should.equal(20);
+  });
+  it('a mixed text+math marker sums both parts (not the max)', () => {
+    const both = paddingValue(render('\\begin{itemize}\n\\item[abcd $x^4 + x^4$] a\n\\end{itemize}'));
+    const text = paddingValue(render('\\begin{itemize}\n\\item[abcd] a\n\\end{itemize}'));
+    const math = paddingValue(render('\\begin{itemize}\n\\item[$x^4 + x^4$] a\n\\end{itemize}'));
+    both.should.be.above(text);
+    both.should.be.above(math);
+  });
+  it('astral marker (emoji) falls in the normal class, not wide', () => {
+    // isWideChar covers BMP ranges only, so astral emoji get NORMAL_EM (0.62). Two emoji
+    // ≈ 1.24em + gap < 2.5em default → no custom padding (would if they were wide/CJK).
     hasPadding(render('\\begin{itemize}\n\\item[\u{1F600}\u{1F600}] a\n\\item[x] b\n\\end{itemize}')).should.equal(false);
   });
   it('nested list does not receive inline padding (only the top level does)', () => {
@@ -157,9 +184,31 @@ describe('List marker padding — attribute contract & threshold:', () => {
     v.should.match(/^\d+(\.\d+)?em$/);
     html.should.include('padding-inline-start: ' + v + ';');
   });
-  it('a 3-char marker now gets padding (threshold is > 2.5em, ≈ 2.78 chars)', () => {
-    // Documents the shift from the old ">3 cells" (≥4 chars) threshold: "abc" now emits.
-    paddingValue(render('\\begin{itemize}\n\\item[abc] a\n\\end{itemize}')).should.equal(2.65);
+  it('a short marker below the default indent keeps the default (no attribute)', () => {
+    // "abc" ≈ 1.86em + gap = 2.49em < 2.5em default → no custom padding emitted.
+    hasPadding(render('\\begin{itemize}\n\\item[abc] a\n\\end{itemize}')).should.equal(false);
+  });
+});
+
+describe('List marker padding — reserve covers the true glyph width (Arial):', () => {
+  // The real invariant to protect: the rendered indent is never smaller than the marker's
+  // actual glyph width + gap. Measured against the Arial fixture at the default 16px/ex.
+  const metrics = new FontMetrics();
+  const dir = path.resolve(__dirname, '_data/_markdownToHTMLWithSize/fonts');
+  metrics.loadFont({
+    font: fs.readFileSync(path.join(dir, 'Arial.ttf')).buffer,
+    fontSize: DEFAULT_FONT_SIZE_PX,
+    ex: DEFAULT_EX_PX,
+  });
+  const trueEm = (text) => metrics.getWidth(text) / DEFAULT_FONT_SIZE_PX;
+  const indentEm = (marker) =>
+    paddingValue(render('\\begin{itemize}\n\\item[' + marker + '] a\n\\end{itemize}')) || LIST_DEFAULT_INDENT_EM;
+  // (CJK/fullwidth is intentionally excluded — Arial isn't its render font, so its "true"
+  // width here would be meaningless.)
+  ['note', '11.33', 'longtext', '(d1)', 'NOTE', 'SECTION', 'WWWWWWWW', 'Introduction'].forEach((marker) => {
+    it('reserves at least the glyph width + gap for "' + marker + '"', () => {
+      indentEm(marker).should.be.at.least(trueEm(marker) + MARKER_GAP_EM);
+    });
   });
 });
 
