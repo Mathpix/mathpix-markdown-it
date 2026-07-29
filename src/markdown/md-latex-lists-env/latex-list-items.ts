@@ -227,7 +227,8 @@ export const finalizeListItems = (
     if (!p.padding || p.padding < dataItems.padding) {
       p.padding = dataItems.padding;
       // padding is already in em; clamp to the max, round to 2 decimals, and emit only when
-      // it exceeds the default indent so it never resolves below the default.
+      // it exceeds the default indent. Attributed per nesting level, so each list (top-level
+      // or nested) reserves for its own markers — a wide nested marker doesn't overflow.
       const em: number = Math.round(Math.min(dataItems.padding, LIST_MAX_INDENT_EM) * 100) / 100;
       if (em > LIST_DEFAULT_INDENT_EM) {
         p.attrSet("data-padding-inline-start", String(em) + "em");

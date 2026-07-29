@@ -339,6 +339,8 @@ export const ListsInternal = (
   const openData: ListOpenResult = ListOpen(state, startLine + renderStart, lineText, itemizeLevelTokens, enumerateLevelTypes, itemizeLevelContents);
   let { iOpen = 0, tokenStart = null } = openData;
   li = openData.li ?? null;
+  // Open list tokens by nesting level — padding goes to the innermost, not an outer list.
+  const openTokens: (Token | null)[] = tokenStart ? [tokenStart] : [];
   if (iOpen === 0) {
     nextLine += 1;
     state.line = nextLine;
@@ -416,9 +418,10 @@ export const ListsInternal = (
           li,
           iOpen,
           itemizeLevelContents,
-          tokenStart
+          openTokens[openTokens.length - 1] ?? null
         ));
         setTokenCloseList(state, startLine + renderStart, lineIdx + renderStart);
+        openTokens.pop();
         if (sE.length > 0) {
           items = ItemsAddToPrev(items, sE, lineIdx);
         }
@@ -455,9 +458,10 @@ export const ListsInternal = (
           li,
           iOpen,
           itemizeLevelContents,
-          tokenStart
+          openTokens[openTokens.length - 1] ?? null
         ));
-        setTokenOpenList(state, -1, -1, beginType, itemizeLevelTokens, enumerateLevelTypes, itemizeLevelContents);
+        const nestedOpen: Token = setTokenOpenList(state, -1, -1, beginType, itemizeLevelTokens, enumerateLevelTypes, itemizeLevelContents);
+        openTokens.push(nestedOpen);
         if (sE.length > 0) {
           items = ItemsAddToPrev(items, sE, lineIdx);
         }

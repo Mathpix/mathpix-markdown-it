@@ -139,7 +139,7 @@ export const render_itemize_list_open: Renderer.RenderRule = (
   } else {
     token.attrJoin("class", className);
   }
-  // Translate data-padding-inline-start into inline style for top-level lists
+  // Translate data-padding-inline-start into inline style (top-level and nested).
   const paddingInlineStyle: string = markerPaddingStyle(token.attrGet("data-padding-inline-start"));
   // DOCX-specific: compute custom bullet metadata
   if (options.forDocx) {
@@ -159,9 +159,9 @@ export const render_itemize_list_open: Renderer.RenderRule = (
     }
   }
   const attrs: string = slf.renderAttrs(token) + dataAttr;
-  const style: string = level_itemize > 1
-    ? 'list-style-type: none'
-    : `${paddingInlineStyle}list-style-type: none`;
+  // paddingInlineStyle is emitted per level (empty unless this list has a wide marker), so a
+  // nested list reserves for its own markers instead of overflowing the container.
+  const style: string = `${paddingInlineStyle}list-style-type: none`;
   const ulOpen: string = `<ul${attrs} style="${style}">`;
   if (prevToken?.type === 'itemize_list_open') {
     return `<li class="li_itemize" data-custom-marker="true" data-marker-empty="true">${ulOpen}`;
@@ -222,9 +222,7 @@ export const render_enumerate_list_open: Renderer.RenderRule = (
     dataAttr = ` data-list-style-type="${currentStyle}"`
   }
   const attrs: string = slf.renderAttrs(token) + dataAttr;
-  const style = level_enumerate > 1
-    ? `list-style-type: ${currentStyle}`
-    : `${paddingInlineStyle}list-style-type: ${currentStyle}`;
+  const style = `${paddingInlineStyle}list-style-type: ${currentStyle}`;
   const olOpen: string = `<ol${attrs} style="${style}">`;
   if (prevToken?.type === 'itemize_list_open') {
     return `<li class="li_itemize" data-custom-marker="true" data-marker-empty="true">${olOpen}`;

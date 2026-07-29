@@ -49,7 +49,7 @@ Several unrelated inputs made LaTeX `itemize`/`enumerate` lists render incorrect
 - Malformed input still degrades gracefully; the goal is text, not a partial list.
 - Text reserve is per **glyph class** (narrow/normal/wide/extra-wide + East-Asian full-width), not per exact glyph — a coarse approximation with a margin, tuned to a Helvetica-like font. Astral chars (emoji, CJK Ext-B+) fall in the `normal` class. A very different font could still over- or under-reserve, but the class shape (narrow < normal < wide) is font-robust. Exact per-glyph widths would need a loaded font (`fontMetrics`), unavailable on this path.
 - Above the `20em` clamp the reserve is smaller than the marker needs, so a pathological marker (a very long OCR formula/label) can overlap the content. Proper degradation (switching the absolute-positioned marker to inline) is a separate ticket.
-- Inline marker padding is applied to top-level lists only; nested lists keep the default indent even with long block-content markers (pre-existing; separate ticket).
+- Marker padding is attributed per nesting level (an open-list-token stack), so a nested list's markers no longer inflate the outer list's indent. Only the top-level list emits the padding (the render applies it there); nested lists compute their own width but keep the default indent — displaying a nested list's own wide markers is a separate ticket.
 
 ## Testing
 
