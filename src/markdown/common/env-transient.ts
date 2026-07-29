@@ -3,7 +3,7 @@
 // parse. They must never be persisted into a token's `envToInline` snapshot: core-inline
 // replays envToInline onto the shared env, so a captured `isBlock: true` would leak into
 // unrelated later content and wake the inline fallback (empty `<>` list items).
-export const LIST_TRANSIENT_ENV_KEYS: string[] = ['isBlock', 'inheritedListType', 'parentType', 'prentLevel'];
+export const LIST_TRANSIENT_ENV_KEYS: readonly string[] = ['isBlock', 'inheritedListType', 'parentType', 'prentLevel'];
 
 // Snapshot of `env` for a token's `envToInline`, minus the transient list-parse flags.
 export const snapshotEnvForInline = (env: any): any => {

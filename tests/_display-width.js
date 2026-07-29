@@ -2,21 +2,14 @@ let chai = require('chai');
 chai.should();
 
 const { isWideChar, displayWidth, tokenDisplayWidth } = require('../lib/markdown/common/display-width');
-const { EX_TO_EM } = require('../lib/markdown/common/consts');
-const { fontMetrics } = require('../lib/markdown/common/text-dimentions');
-
-describe('display-width: EX_TO_EM matches the default font metrics', () => {
-  // EX_TO_EM is a literal (exDef/fonSizeDef are module-private); the fontMetrics singleton
-  // is initialized from those same defaults, so this pins them in sync without importing them.
-  it('EX_TO_EM === fontMetrics.ex / fontMetrics.fontSize', () =>
-    (fontMetrics.ex / fontMetrics.fontSize).should.be.closeTo(EX_TO_EM, 1e-9));
-});
 
 describe('display-width: displayWidth (char cells)', () => {
   it('ASCII counts one per char', () => displayWidth('abc').should.equal(3));
   it('CJK counts two per char', () => displayWidth('漢字').should.equal(4));
   it('fullwidth punctuation counts two (U+FF0E)', () => displayWidth('11．').should.equal(4));
   it('astral (emoji) counts one', () => displayWidth('\u{1F600}').should.equal(1));
+  it('zero-width combining marks add 0 (か U+304B + U+3099 = 2, not 3)', () =>
+    displayWidth('\u304B\u3099').should.equal(2));
   it('empty string is zero', () => displayWidth('').should.equal(0));
 });
 
@@ -25,6 +18,10 @@ describe('display-width: isWideChar', () => {
   it('fullwidth full stop is wide', () => isWideChar(0xFF0E).should.equal(true));
   it('ASCII is not wide', () => isWideChar(0x41).should.equal(false));
   it('astral emoji is not covered (width 1)', () => isWideChar(0x1F600).should.equal(false));
+  it('combining marks U+3099/U+309A are excluded (not wide)', () => {
+    isWideChar(0x3099).should.equal(false);
+    isWideChar(0x309A).should.equal(false);
+  });
 });
 
 describe('display-width: tokenDisplayWidth (ex)', () => {

@@ -21,8 +21,8 @@ const FOOTNOTE_TOKEN_SWEEP_G: RegExp = new RegExp(reFootnoteToken.source, 'g');
 const FOOTNOTETEXT_TOKEN_SWEEP_G: RegExp = new RegExp(reFootnotetextToken.source, 'g');
 
 // Block rules that terminate a footnote pre-tag scan. Resolved fns are NOT cached because
-// `rule.enabled` toggles mid-parse; the ~0.3µs rebuild per call is cheaper than replicating
-// markdown-it's `__cache__` invalidation.
+// `rule.enabled` toggles mid-parse; re-resolving per call avoids replicating markdown-it's
+// `__cache__` invalidation (measured branch-vs-master: no difference).
 const FOOTNOTE_TERMINATOR_NAMES = new Set<string>([
   "table", "smilesDrawerBlock", "collapsible", "fence", "blockquote", "hr",
   "list", "Lists", "footnote_def", "heading", "svg_block", "html_block", "pageBreaksBlock", "deflist",

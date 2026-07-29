@@ -10,8 +10,8 @@ import { mathTokenTypes } from "../common/consts";
 import { isMathInText } from "../utils";
 import {CustomMarkerHtmlResult} from "./latex-list-types";
 
-// data-padding-inline-start carries the em value with its unit (e.g. "4.43em"); the producer
-// only emits it when it exceeds the default indent. Empty when no custom padding.
+// data-padding-inline-start holds a machine-generated `Nem` (sole writer: list-items), so
+// it's inlined as-is — no untrusted input reaches here.
 const markerPaddingStyle = (padAttr: string | null | undefined): string =>
   padAttr ? `padding-inline-start: ${padAttr}; ` : "";
 

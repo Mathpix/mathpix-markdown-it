@@ -3,6 +3,7 @@ import type Token from 'markdown-it/lib/token';
 import type StateInline from "markdown-it/lib/rules_inline/state_inline";
 import type StateBlock from 'markdown-it/lib/rules_block/state_block';
 import { ListsInternal } from "./latex-list-env-block";
+import { getCaptionCounters, setCaptionCounters } from "../common/caption-counters";
 import { BufferedBlockState, PushFn } from "./latex-list-types";
 
 /** Shallow clone but shift known position fields by baseOffset */
@@ -123,8 +124,20 @@ export const parseListEnvRawToTokens = (
   baseEnv: any
 ): { ok: boolean; tokens: any[]; state: any } => {
   const blockState = buildBlockStateFromRaw(md, raw, baseEnv);
-  const ok: boolean = ListsInternal(blockState, 0, blockState.lineMax);
-  return { ok, tokens: blockState.tokens, state: blockState };
+  // Roll back caption counters if the speculative parse is discarded (!ok / throw); on ok
+  // the caller uses the tokens, so the numbers are kept. Mirrors the Lists block rule.
+  // (This path is reached with a complete env, so !ok only fires on an internal abort — a
+  // defensive rollback, not reachable via public input.)
+  const captionSnap = getCaptionCounters();
+  let ok = false;
+  try {
+    ok = ListsInternal(blockState, 0, blockState.lineMax);
+    return { ok, tokens: blockState.tokens, state: blockState };
+  } finally {
+    if (!ok) {
+      setCaptionCounters(captionSnap);
+    }
+  }
 };
 
 /**

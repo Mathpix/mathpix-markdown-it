@@ -3,7 +3,7 @@
 Status: Implemented
 Owner: @OlgaRedozubova
 Base: master
-Version: 3.0.2
+Version: 3.1.0
 
 ---
 

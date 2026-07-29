@@ -8,13 +8,14 @@ interface WidthToken {
  * Whether a code point is an East-Asian Wide/Fullwidth character, which renders
  * roughly twice as wide as an ASCII character. Approximation of Unicode's East
  * Asian Width property covering the BMP ranges. Astral characters (emoji, CJK
- * Ext-B+) are out of range and count as width 1.
+ * Ext-B+) are out of range and count as width 1; the zero-width combining marks
+ * U+3099/U+309A are excluded. Other combining marks are not special-cased (count 1).
  */
 export declare const isWideChar: (cp: number) => boolean;
 /**
- * Display width of a string in character cells: East-Asian Wide/Fullwidth
- * characters count as 2, everything else as 1. Iterates by code point so
- * surrogate pairs count once.
+ * Display width of a string in character cells: East-Asian Wide/Fullwidth characters count
+ * as 2, the zero-width combining marks U+3099/U+309A as 0, everything else as 1. Iterates
+ * by code point so surrogate pairs count once. Other combining marks are not special-cased.
  */
 export declare const displayWidth: (str: string) => number;
 /**

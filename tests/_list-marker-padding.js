@@ -106,6 +106,63 @@ describe('No empty <> item bodies from leaked env.isBlock:', () => {
   });
 });
 
+describe('Caption numbering is not shifted by a speculative list parse:', () => {
+  const figNos = (html) => (html.match(/Figure\s+(\d+)/g) || []).map((s) => s.match(/\d+/)[0]);
+  const figNo = (html) => figNos(html)[0] || null;
+  const tblNo = (html) => { const m = html.match(/Table\s+(\d+)/); return m ? m[1] : null; };
+  const listFig = (c) => '\\begin{itemize}\n\\item[a] x\n\\begin{figure}\n\\caption{' + c + '}\n\\end{figure}\n\\end{itemize}\n';
+  const figSrc = 'Para.\n' + listFig('F');
+  const tblSrc = 'Para.\n\\begin{itemize}\n\\item[a] x\n\\begin{table}\n\\caption{T}\n\\begin{tabular}{|l|}\nc\n\\end{tabular}\n\\end{table}\n\\end{itemize}\n';
+  // Absolute values: a relative assert would pass even if both sides shifted together (master's bug).
+  it('a figure in a list is numbered 1, not inflated by the paragraph terminator probe', () => {
+    figNo(render(figSrc)).should.equal('1');
+  });
+  it('a trailing \\footnote leaves the figure number at 1', () => {
+    figNo(render(figSrc + 'tail \\footnote{n}')).should.equal('1');
+  });
+  it('a trailing \\footnotetext leaves the figure number at 1', () => {
+    figNo(render(figSrc + 'tail \\footnotetext{n}')).should.equal('1');
+  });
+  it('a trailing \\footnote leaves the table number at 1', () => {
+    tblNo(render(tblSrc + 'tail \\footnote{n}')).should.equal('1');
+  });
+  it('two lists each with a figure number sequentially (1, 2)', () => {
+    figNos(render('Para.\n' + listFig('A') + '\nmid\n' + listFig('B'))).should.deep.equal(['1', '2']);
+  });
+  it('a bare figure, a list-with-figure, and a bare figure number 1, 2, 3', () => {
+    const src = '\\begin{figure}\n\\caption{A}\n\\end{figure}\n\n' + listFig('B') +
+      '\n\\begin{figure}\n\\caption{C}\n\\end{figure}\n';
+    figNos(render(src)).should.deep.equal(['1', '2', '3']);
+  });
+  it('a figure in a nested list is numbered 1', () => {
+    const nested = '\\begin{itemize}\n\\item[a] x\n\\begin{itemize}\n\\item[b] y\n' +
+      '\\begin{figure}\n\\caption{N}\n\\end{figure}\n\\end{itemize}\n\\end{itemize}\n';
+    figNos(render('Para.\n' + nested)).should.deep.equal(['1']);
+  });
+  it('a \\ref to a figure inside a list resolves to its caption number', () => {
+    const src = 'Para.\n\\begin{itemize}\n\\item[a] x\n\\begin{figure}\n\\caption{F}\n' +
+      '\\label{fig:a}\n\\end{figure}\n\\end{itemize}\n\nSee \\ref{fig:a}.\n';
+    const html = render(src);
+    const num = figNo(html);
+    num.should.equal('1');
+    const ref = html.match(/value="fig%3Aa"[^>]*>([^<]+)</);
+    ref[1].should.equal(num); // the \ref link renders the same number
+  });
+});
+
+describe('List marker padding — attribute contract & threshold:', () => {
+  it('data-padding-inline-start value is a bare em length and matches the inline style', () => {
+    const html = render('\\begin{itemize}\n\\item[longtext] a\n\\end{itemize}');
+    const v = html.match(/data-padding-inline-start="([^"]+)"/)[1];
+    v.should.match(/^\d+(\.\d+)?em$/);
+    html.should.include('padding-inline-start: ' + v + ';');
+  });
+  it('a 3-char marker now gets padding (threshold is > 2.5em, ≈ 2.78 chars)', () => {
+    // Documents the shift from the old ">3 cells" (≥4 chars) threshold: "abc" now emits.
+    paddingValue(render('\\begin{itemize}\n\\item[abc] a\n\\end{itemize}')).should.equal(2.65);
+  });
+});
+
 describe('Footnote does not swallow a following list / stays recognized:', () => {
   it('a \\footnote after a heading (no blank line) is still recognized', () => {
     const html = render('# Heading\ntext with \\footnote{a note}');

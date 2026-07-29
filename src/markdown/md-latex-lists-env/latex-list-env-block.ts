@@ -14,6 +14,7 @@ import {
   OpaqueStack, OpaqueEnvType
 } from "./latex-list-types";
 import { parseSetCounterNumber } from "./latex-list-common";
+import { getCaptionCounters, setCaptionCounters } from "../common/caption-counters";
 import { LIST_TRANSIENT_ENV_KEYS } from "../common/env-transient";
 import { flushBufferedTokens, createBufferedState } from "./latex-list-env-engine";
 import {
@@ -34,8 +35,6 @@ import {
 // spaces; a backtick open cannot carry a backtick in its info string; a close is same char, ≥ open length, blank tail.
 const BACKTICK: number = 0x60;
 const TILDE: number = 0x7E;
-// env fields ListItems/ListOpen write while parsing; restored on every exit path.
-const ENV_TRANSIENT_KEYS: string[] = LIST_TRANSIENT_ENV_KEYS;
 type FenceMarker = { char: number; len: number };
 const skipUpTo3Spaces = (rawLine: string): number => {
   let pos = 0;
@@ -577,16 +576,24 @@ export const Lists: RuleBlock = (
   // block, and a silent probe must not change state.
   const envHad: { [k: string]: boolean } = {};
   const envSnap: { [k: string]: any } = {};
-  for (const k of ENV_TRANSIENT_KEYS) {
+  for (const k of LIST_TRANSIENT_ENV_KEYS) {
     envHad[k] = k in state.env;
     envSnap[k] = (state.env as any)[k];
   }
+  // The speculative parse runs the list body (incl. \begin{figure}/\begin{table}\caption),
+  // which bumps the module-global caption counters. On a non-committing exit the tokens are
+  // discarded, so roll the counters back too; on commit they match the flushed tokens.
+  const captionSnap = getCaptionCounters();
+  let committed = false;
   try {
     const bufferedState = createBufferedState(state);
     const ok: boolean = ListsInternal(bufferedState, startLine, endLine);
     if (!ok || silent) {
       return ok;
     }
+    // Set before flushing: once tokens (carrying caption numbers) start entering state,
+    // a mid-flush throw must not roll the counters back out from under them.
+    committed = true;
     flushBufferedTokens(state, bufferedState.tokens);
     state.line = bufferedState.line;
     state.startLine = bufferedState.startLine;
@@ -595,12 +602,15 @@ export const Lists: RuleBlock = (
     state.prentLevel = bufferedState.prentLevel;
     return true;
   } finally {
-    for (const k of ENV_TRANSIENT_KEYS) {
+    for (const k of LIST_TRANSIENT_ENV_KEYS) {
       if (envHad[k]) {
         (state.env as any)[k] = envSnap[k];
       } else {
         delete (state.env as any)[k];
       }
+    }
+    if (!committed) {
+      setCaptionCounters(captionSnap);
     }
   }
 };

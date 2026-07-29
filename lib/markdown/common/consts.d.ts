@@ -219,6 +219,8 @@ export declare const terminatedRules: {
     };
 };
 export declare const mathTokenTypes: string[];
+export declare const DEFAULT_FONT_SIZE_PX = 16;
+export declare const DEFAULT_EX_PX = 8.296875;
 export declare const EX_TO_EM: number;
 export declare const MARKER_GAP_EM = 0.625;
 export declare const LIST_DEFAULT_INDENT_EM = 2.5;
