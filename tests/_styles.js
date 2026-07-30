@@ -73,6 +73,10 @@ describe('Style snapshots — individual functions:', () => {
     // The CSS gap and the padding reservation are in separate files; keep them in sync.
     listsStyles.should.include('padding-right: ' + MARKER_GAP_EM + 'em');
   });
+  it('listsStyles has no bare ul/ol selector (generic elements must stay scoped)', () => {
+    // A bare `ul {`/`ol {` (or `ul,`) would restyle the host page — see 2026-03-mmd-css-scoping.
+    listsStyles.should.not.match(/^\s*(ul|ol)\s*[,{]/m);
+  });
   it('PreviewStyle', () => {
     assertSnapshot('PreviewStyle', PreviewStyle);
   });
