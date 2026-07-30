@@ -7,6 +7,10 @@ ol.enumerate, ul.itemize,
   padding-inline-start: ${LIST_DEFAULT_INDENT_EM}em;
   margin: 0 0 1em 0;
 }
+#preview-content ul, #setText ul,
+#preview-content ol, #setText ol {
+  padding-inline-start: ${LIST_DEFAULT_INDENT_EM}em;
+}
 li > ol.enumerate, li > ul.itemize,
 #preview-content li > ol.enumerate, #setText li > ol.enumerate,
 #preview-content li > ul.itemize, #setText li > ul.itemize {

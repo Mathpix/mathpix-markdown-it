@@ -5,6 +5,10 @@ ol.enumerate, ul.itemize,
   padding-inline-start: 2.5em;
   margin: 0 0 1em 0;
 }
+#preview-content ul, #setText ul,
+#preview-content ol, #setText ol {
+  padding-inline-start: 2.5em;
+}
 li > ol.enumerate, li > ul.itemize,
 #preview-content li > ol.enumerate, #setText li > ol.enumerate,
 #preview-content li > ul.itemize, #setText li > ul.itemize {
