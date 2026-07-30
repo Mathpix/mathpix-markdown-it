@@ -11,6 +11,10 @@ ol.enumerate, ul.itemize,
 #preview-content ol, #setText ol {
   padding-inline-start: ${LIST_DEFAULT_INDENT_EM}em;
 }
+#preview-content #toc_container ul, #setText #toc_container ul,
+#preview-content #toc_container ol, #setText #toc_container ol {
+  padding-inline-start: 0;
+}
 li > ol.enumerate, li > ul.itemize,
 #preview-content li > ol.enumerate, #setText li > ol.enumerate,
 #preview-content li > ul.itemize, #setText li > ul.itemize {
