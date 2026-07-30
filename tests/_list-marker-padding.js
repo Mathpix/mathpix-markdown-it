@@ -128,6 +128,22 @@ describe('List marker padding — width edge cases:', () => {
     styles[0].should.match(/padding-inline-start:\s*3\.51em/);
     styles[1].should.not.match(/padding-inline-start/);
   });
+  it('nested padding does not depend on item order (resolved top-down)', () => {
+    // Same list, wide parent item after vs before the sublist → nested must resolve identically.
+    const nestedStyle = (parentFirst) => ulStyles(render(parentFirst
+      ? '\\begin{itemize}\n\\item[VERYLONGPARENT] z\n\\item[a] x\n\\begin{itemize}\n\\item[LONGCHILD] y\n\\end{itemize}\n\\end{itemize}'
+      : '\\begin{itemize}\n\\item[a] x\n\\begin{itemize}\n\\item[LONGCHILD] y\n\\end{itemize}\n\\item[VERYLONGPARENT] z\n\\end{itemize}'))[1];
+    nestedStyle(false).should.equal(nestedStyle(true));
+    nestedStyle(false).should.not.match(/padding-inline-start/); // LONGCHILD fits under the wide parent
+  });
+  it('cumulative indent is clamped: a nested pathological marker does not stack past the max', () => {
+    // Two 60-char markers: outer clamps to 20em, nested has no room left → default (not +17.82em).
+    const styles = ulStyles(render(
+      '\\begin{itemize}\n\\item[' + 'x'.repeat(60) + '] a\n' +
+      '\\begin{itemize}\n\\item[' + 'y'.repeat(60) + '] b\n\\end{itemize}\n\\end{itemize}'));
+    styles[0].should.match(/padding-inline-start:\s*20em/);
+    styles[1].should.not.match(/padding-inline-start/);
+  });
 });
 
 describe('No empty <> item bodies from leaked env.isBlock:', () => {
@@ -231,6 +247,10 @@ describe('List marker padding — reserve covers the true glyph width (Arial):',
     it('reserves at least the glyph width + gap for "' + marker + '"', () => {
       indentEm(marker).should.be.at.least(trueEm(marker) + MARKER_GAP_EM);
     });
+  });
+  it('reserves at least the glyph width + gap for a bold marker (\\textbf{note})', () => {
+    // Bold has the tightest measured margin; lock it against its rendered text "note".
+    indentEm('\\textbf{note}').should.be.at.least(trueEm('note') + MARKER_GAP_EM);
   });
 });
 

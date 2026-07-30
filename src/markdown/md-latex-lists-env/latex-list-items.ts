@@ -219,23 +219,14 @@ export const finalizeListItems = (
   li: { value: number } | null,
   iOpen: number,
   itemizeLevelContents: string[],
-  tokenStart: Token | null,
-  ancestorIndentEm: number = 0
+  tokenStart: Token | null
 ) =>  {
   const dataItems: ListItemsResult = ListItems(state, items, itemizeLevelTokens, enumerateLevelTypes, li, iOpen, itemizeLevelContents);
   if (tokenStart) {
-    const listToken = tokenStart;
-    if (!listToken.padding || listToken.padding < dataItems.padding) {
-      listToken.padding = dataItems.padding;
-      // Emit only when the marker overflows ancestor indent + default; reserve just the shortfall.
-      const need: number = dataItems.padding;
-      if (need > ancestorIndentEm + LIST_DEFAULT_INDENT_EM) {
-        const em: number = Math.round(Math.min(need - ancestorIndentEm, LIST_MAX_INDENT_EM) * 100) / 100;
-        listToken.indentEm = em;
-        listToken.attrSet("data-padding-inline-start", String(em) + "em");
-      } else {
-        listToken.indentEm = LIST_DEFAULT_INDENT_EM;
-      }
+    // Record the widest marker width; the indent is resolved later, top-down, once every list's
+    // final width is known (see resolveListPadding) — so item order can't skew a nested list.
+    if (!tokenStart.padding || tokenStart.padding < dataItems.padding) {
+      tokenStart.padding = dataItems.padding;
     }
   }
   return {
@@ -244,6 +235,31 @@ export const finalizeListItems = (
     li: null,
   };
 }
+
+/**
+ * Resolve per-list padding top-down (doc order) once every list's width is recorded. A list keeps
+ * the default unless its marker overflows the ancestor indent + default, then reserves the
+ * shortfall; the total (ancestor + own) is clamped to LIST_MAX_INDENT_EM. Depth = prentLevel.
+ */
+export const resolveListPadding = (listTokens: Token[]): void => {
+  if (!listTokens.length) return;
+  const baseDepth: number = listTokens[0].prentLevel || 0;
+  const indentByDepth: number[] = [];
+  for (const token of listTokens) {
+    const depth: number = (token.prentLevel || 0) - baseDepth;
+    const ancestorSum: number = indentByDepth.slice(0, depth).reduce((s, v) => s + v, 0);
+    const total: number = Math.min(token.padding || 0, LIST_MAX_INDENT_EM);
+    const em: number = Math.round((total - ancestorSum) * 100) / 100;
+    if (em > LIST_DEFAULT_INDENT_EM) {
+      token.indentEm = em;
+      token.attrSet("data-padding-inline-start", String(em) + "em");
+    } else {
+      token.indentEm = LIST_DEFAULT_INDENT_EM;
+    }
+    indentByDepth.length = depth;
+    indentByDepth[depth] = token.indentEm;
+  }
+};
 
 export const splitInlineListEnv = (
   lineText: string,

@@ -63,11 +63,17 @@ export declare const ItemsListPush: (items: ParsedListItem[], content: string, s
 export declare const ItemsAddToPrev: (items: ParsedListItem[], lineText: string, nextLine: number) => ParsedListItem[];
 export declare const finalizeListItems: (state: StateBlock | StateInline, items: ParsedListItem[], itemizeLevelTokens: Token[][], enumerateLevelTypes: string[], li: {
     value: number;
-} | null, iOpen: number, itemizeLevelContents: string[], tokenStart: Token | null, ancestorIndentEm?: number) => {
+} | null, iOpen: number, itemizeLevelContents: string[], tokenStart: Token | null) => {
     iOpen: number;
     items: any[];
     li: any;
 };
+/**
+ * Resolve per-list padding top-down (doc order) once every list's width is recorded. A list keeps
+ * the default unless its marker overflows the ancestor indent + default, then reserves the
+ * shortfall; the total (ancestor + own) is clamped to LIST_MAX_INDENT_EM. Depth = prentLevel.
+ */
+export declare const resolveListPadding: (listTokens: Token[]) => void;
 export declare const splitInlineListEnv: (lineText: string, match: any) => {
     sB: string;
     sE: string;

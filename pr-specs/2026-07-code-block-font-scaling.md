@@ -53,7 +53,7 @@ pixel-for-pixel no-op.
 
 ## Constraints / Invariants
 
-- **No visual change at the default 16px base** apart from the 1px code padding.
+- **Calibrated to a 16px base** — at exactly 16px the code text is pixel-identical to before (15px glyphs, 24px line box), the only change being the 1px code padding. This is a calibration point, not a guarantee of "no visual change": the values are now relative, so a consumer that sets a different base scales them. Notably the shipped `PreviewStyle` sets `#preview { font-size: 17px }`, at which the derived values are 6.25% larger (code text 15.94px, default list indent 42.5px) — expected, since scaling with the container is the point.
 - **`em`, not `rem`** — `rem` is exactly what makes padding immune to scaling.
 - **All four ship together.** Making `font-size` relative while leaving `line-height: 24px`
   would drop the line box below the glyph height at large sizes and overlap the lines.

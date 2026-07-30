@@ -2,7 +2,7 @@ import type StateBlock from 'markdown-it/lib/rules_block/state_block';
 import type Token from 'markdown-it/lib/token';
 import type { RuleBlock } from 'markdown-it/lib/parser_block';
 import { setTokenOpenList, setTokenCloseList, ListOpen } from "./latex-list-tokens";
-import { ItemsListPush, ItemsAddToPrev, finalizeListItems, splitInlineListEnv } from "./latex-list-items";
+import { ItemsListPush, ItemsAddToPrev, finalizeListItems, resolveListPadding, splitInlineListEnv } from "./latex-list-items";
 import { GetItemizeLevelTokensByState, GetEnumerateLevel, ItemizeLevelTokenResult } from "./re-level";
 import {
   ListType,
@@ -26,8 +26,7 @@ import {
   BEGIN_LIST_ENV_RE,
   END_LIST_ENV_INLINE_RE,
   LATEX_ITEM_COMMAND_INLINE_RE,
-  reSetCounter,
-  LIST_DEFAULT_INDENT_EM
+  reSetCounter
 } from "../common/consts";
 
 // A fenced code block (``` or ~~~) inside a list env is opaque like lstlisting: its lines are collected raw so
@@ -342,9 +341,8 @@ export const ListsInternal = (
   li = openData.li ?? null;
   // Open list tokens by nesting level — padding goes to the innermost, not an outer list.
   const openTokens: (Token | null)[] = tokenStart ? [tokenStart] : [];
-  // Summed indent of the current list's ancestors (an overflowing marker may hang into it).
-  const sumAncestorP = (): number =>
-    openTokens.slice(0, -1).reduce((s, t) => s + (t?.indentEm ?? LIST_DEFAULT_INDENT_EM), 0);
+  // All list-open tokens (doc order) — padding resolved in one top-down pass at the end.
+  const allListTokens: Token[] = tokenStart ? [tokenStart] : [];
   if (iOpen === 0) {
     nextLine += 1;
     state.line = nextLine;
@@ -422,8 +420,7 @@ export const ListsInternal = (
           li,
           iOpen,
           itemizeLevelContents,
-          openTokens[openTokens.length - 1] ?? null,
-          sumAncestorP()
+          openTokens[openTokens.length - 1] ?? null
         ));
         setTokenCloseList(state, startLine + renderStart, lineIdx + renderStart);
         openTokens.pop();
@@ -463,11 +460,11 @@ export const ListsInternal = (
           li,
           iOpen,
           itemizeLevelContents,
-          openTokens[openTokens.length - 1] ?? null,
-          sumAncestorP()
+          openTokens[openTokens.length - 1] ?? null
         ));
         const nestedOpen: Token = setTokenOpenList(state, -1, -1, beginType, itemizeLevelTokens, enumerateLevelTypes, itemizeLevelContents);
         openTokens.push(nestedOpen);
+        allListTokens.push(nestedOpen);
         if (sE.length > 0) {
           items = ItemsAddToPrev(items, sE, lineIdx);
         }
@@ -545,6 +542,7 @@ export const ListsInternal = (
   if (tokenStart) {
     tokenStart.map![1] = nextLine + renderStart;
   }
+  resolveListPadding(allListTokens);
   return true;
 };
 
