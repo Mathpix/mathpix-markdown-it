@@ -97,29 +97,36 @@ describe('List marker padding — width edge cases:', () => {
     // ≈ 1.24em + gap < 2.5em default → no custom padding (would if they were wide/CJK).
     hasPadding(render('\\begin{itemize}\n\\item[\u{1F600}\u{1F600}] a\n\\item[x] b\n\\end{itemize}')).should.equal(false);
   });
-  const ulStyles = (html) => [...html.matchAll(/<ul[^>]*style="([^"]*)"/g)].map((m) => m[1]);
-  it('padding is attributed per nesting level, not bubbled up to the outer list', () => {
-    // Top-level markers ("1."/"2.") are narrow; a wide marker 3 levels deep indents ITS OWN
-    // list (~4.31em), while the outer list keeps the default (not inflated by the deep marker).
+  const ulStyles = (html) => [...html.matchAll(/<[uo]l[^>]*style="([^"]*)"/g)].map((m) => m[1]);
+  it('deep numbering fits the accumulated ancestor indent, so no level over-reserves', () => {
+    // "3.1.1.1" (~4.31em) fits within the ancestors' 2.5em-per-level indent → no custom padding.
     const html = render(
       '\\begin{itemize}\n\\item[1.] a\n\\item[2.] b\n' +
       '\\begin{itemize}\n\\item[3.1] c\n' +
       '\\begin{itemize}\n\\item[3.1.1.1] d\n\\item[3.1.1.2] e\n\\end{itemize}\n' +
       '\\end{itemize}\n\\end{itemize}');
-    const styles = ulStyles(html);
-    styles[0].should.not.match(/padding-inline-start/); // outer → default
-    styles.some((s) => /padding-inline-start:\s*4\.31em/.test(s)).should.equal(true); // deepest list
+    hasPadding(html).should.equal(false);
   });
-  it('each nesting level reserves for its own markers (nested no longer inflates the outer)', () => {
-    // top-level "11.33" → 3.51em; nested "XXXXX" (5 wide caps) → its own 5.13em.
+  it('an overflowing nested marker reserves only the shortfall; the outer stays default', () => {
+    // Outer "1." narrow → default. Nested overflows (need > ancestor 2.5 + default 2.5), so it
+    // emits need − ancestorIndent on its own list, not the full width.
+    const html = render(
+      '\\begin{itemize}\n\\item[1.] a\n' +
+      '\\begin{itemize}\n\\item[XXXXXXXXXXXX] b\n\\end{itemize}\n' +
+      '\\end{itemize}');
+    const styles = ulStyles(html);
+    styles[0].should.not.match(/padding-inline-start/);
+    styles[1].should.match(/padding-inline-start:\s*8\.93em/); // 11.43 need − 2.5 ancestor
+  });
+  it('a wider parent absorbs the child: its indent counts toward the ancestor sum', () => {
+    // Top "11.33" emits 3.51em → nested "XXXXX" (5.13) fits under 3.51 + 2.5 → child stays default.
     const html = render(
       '\\begin{itemize}\n\\item[11.33] a\n' +
-      '\\begin{itemize}\n\\item[XXXXX] b\n\\begin{figure}\n\\caption{c}\n\\end{figure}\n\\end{itemize}\n' +
-      '\\end{itemize}'
-    );
+      '\\begin{itemize}\n\\item[XXXXX] b\n\\end{itemize}\n' +
+      '\\end{itemize}');
     const styles = ulStyles(html);
     styles[0].should.match(/padding-inline-start:\s*3\.51em/);
-    styles[1].should.match(/padding-inline-start:\s*5\.13em/);
+    styles[1].should.not.match(/padding-inline-start/);
   });
 });
 

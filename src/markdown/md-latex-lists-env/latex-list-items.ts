@@ -219,19 +219,22 @@ export const finalizeListItems = (
   li: { value: number } | null,
   iOpen: number,
   itemizeLevelContents: string[],
-  tokenStart: Token | null
+  tokenStart: Token | null,
+  ancestorIndentEm: number = 0
 ) =>  {
   const dataItems: ListItemsResult = ListItems(state, items, itemizeLevelTokens, enumerateLevelTypes, li, iOpen, itemizeLevelContents);
   if (tokenStart) {
-    const p = tokenStart;
-    if (!p.padding || p.padding < dataItems.padding) {
-      p.padding = dataItems.padding;
-      // padding is already in em; clamp to the max, round to 2 decimals, and emit only when
-      // it exceeds the default indent. Attributed per nesting level, so each list (top-level
-      // or nested) reserves for its own markers — a wide nested marker doesn't overflow.
-      const em: number = Math.round(Math.min(dataItems.padding, LIST_MAX_INDENT_EM) * 100) / 100;
-      if (em > LIST_DEFAULT_INDENT_EM) {
-        p.attrSet("data-padding-inline-start", String(em) + "em");
+    const listToken = tokenStart;
+    if (!listToken.padding || listToken.padding < dataItems.padding) {
+      listToken.padding = dataItems.padding;
+      // Emit only when the marker overflows ancestor indent + default; reserve just the shortfall.
+      const need: number = dataItems.padding;
+      if (need > ancestorIndentEm + LIST_DEFAULT_INDENT_EM) {
+        const em: number = Math.round(Math.min(need - ancestorIndentEm, LIST_MAX_INDENT_EM) * 100) / 100;
+        listToken.indentEm = em;
+        listToken.attrSet("data-padding-inline-start", String(em) + "em");
+      } else {
+        listToken.indentEm = LIST_DEFAULT_INDENT_EM;
       }
     }
   }

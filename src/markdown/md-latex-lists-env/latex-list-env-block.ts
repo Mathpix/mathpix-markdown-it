@@ -26,7 +26,8 @@ import {
   BEGIN_LIST_ENV_RE,
   END_LIST_ENV_INLINE_RE,
   LATEX_ITEM_COMMAND_INLINE_RE,
-  reSetCounter
+  reSetCounter,
+  LIST_DEFAULT_INDENT_EM
 } from "../common/consts";
 
 // A fenced code block (``` or ~~~) inside a list env is opaque like lstlisting: its lines are collected raw so
@@ -341,6 +342,9 @@ export const ListsInternal = (
   li = openData.li ?? null;
   // Open list tokens by nesting level — padding goes to the innermost, not an outer list.
   const openTokens: (Token | null)[] = tokenStart ? [tokenStart] : [];
+  // Summed indent of the current list's ancestors (an overflowing marker may hang into it).
+  const sumAncestorP = (): number =>
+    openTokens.slice(0, -1).reduce((s, t) => s + (t?.indentEm ?? LIST_DEFAULT_INDENT_EM), 0);
   if (iOpen === 0) {
     nextLine += 1;
     state.line = nextLine;
@@ -418,7 +422,8 @@ export const ListsInternal = (
           li,
           iOpen,
           itemizeLevelContents,
-          openTokens[openTokens.length - 1] ?? null
+          openTokens[openTokens.length - 1] ?? null,
+          sumAncestorP()
         ));
         setTokenCloseList(state, startLine + renderStart, lineIdx + renderStart);
         openTokens.pop();
@@ -458,7 +463,8 @@ export const ListsInternal = (
           li,
           iOpen,
           itemizeLevelContents,
-          openTokens[openTokens.length - 1] ?? null
+          openTokens[openTokens.length - 1] ?? null,
+          sumAncestorP()
         ));
         const nestedOpen: Token = setTokenOpenList(state, -1, -1, beginType, itemizeLevelTokens, enumerateLevelTypes, itemizeLevelContents);
         openTokens.push(nestedOpen);

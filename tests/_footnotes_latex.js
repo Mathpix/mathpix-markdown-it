@@ -285,3 +285,15 @@ describe('Footnote rule performance regression:', () => {
     (large / Math.max(small, SMALL_FLOOR_MS)).should.be.below(SCALING_RATIO_LIMIT);
   });
 });
+
+describe('Item body containing the word "item" is not mis-split as a new \\item:', () => {
+  // "item" without a backslash must not match LATEX_ITEM_COMMAND_INLINE_RE.
+  ['inside the item.', 'several items here.', 'the itemize word here.'].forEach((line) => {
+    it(`"${line}" in the body still renders the footnote, not literal text`, () => {
+      const src = 'Intro paragraph text.\n\\begin{itemize}\n\\item[] \\footnotetext{\nA footnote note that spans\n' + line + '\n}\n\\end{itemize}';
+      const html = MM.markdownToHTML(src, { ...options, htmlTags: true });
+      /\\footnotetext/.test(html).should.equal(false);
+      /class="footnotes"/.test(html).should.equal(true);
+    });
+  });
+});

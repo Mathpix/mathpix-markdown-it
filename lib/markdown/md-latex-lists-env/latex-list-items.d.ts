@@ -63,7 +63,7 @@ export declare const ItemsListPush: (items: ParsedListItem[], content: string, s
 export declare const ItemsAddToPrev: (items: ParsedListItem[], lineText: string, nextLine: number) => ParsedListItem[];
 export declare const finalizeListItems: (state: StateBlock | StateInline, items: ParsedListItem[], itemizeLevelTokens: Token[][], enumerateLevelTypes: string[], li: {
     value: number;
-} | null, iOpen: number, itemizeLevelContents: string[], tokenStart: Token | null) => {
+} | null, iOpen: number, itemizeLevelContents: string[], tokenStart: Token | null, ancestorIndentEm?: number) => {
     iOpen: number;
     items: any[];
     li: any;

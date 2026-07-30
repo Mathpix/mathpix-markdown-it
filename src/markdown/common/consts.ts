@@ -147,9 +147,9 @@ export const BEGIN_LIST_ENV_INLINE_RE: RegExp = /\\begin\s*\{(itemize|enumerate)
 export const END_LIST_ENV_INLINE_RE: RegExp = /\\end\s*\{(itemize|enumerate)\}/;
 export const END_LIST_ENV_RE: RegExp = /^\\end\s*\{(itemize|enumerate)\}/;
 /** Matches \item or \item[optional] */
-export const LATEX_ITEM_COMMAND_RE: RegExp = /^(?:\\item\s*\[([^\]]*)\]|\\item)/;
-export const LATEX_ITEM_COMMAND_INLINE_RE: RegExp = /(?:item\s*\[([^\]]*)\]|item)/;
-export const LATEX_LIST_BOUNDARY_INLINE_RE: RegExp = /\\begin\s*\{(itemize|enumerate)\}|\\end\s*\{(itemize|enumerate)\}|\\item/;
+export const LATEX_ITEM_COMMAND_RE: RegExp = /^(?:\\item\s*\[([^\]]*)\]|\\item(?![a-zA-Z]))/;
+export const LATEX_ITEM_COMMAND_INLINE_RE: RegExp = /(?:\\item\s*\[([^\]]*)\]|\\item(?![a-zA-Z]))/;
+export const LATEX_LIST_BOUNDARY_INLINE_RE: RegExp = /\\begin\s*\{(itemize|enumerate)\}|\\end\s*\{(itemize|enumerate)\}|\\item(?![a-zA-Z])/;
 /** Matches \begin{center}, \begin{left}, \begin{right}, \begin{table}, \begin{figure}, \begin{tabular}, \begin{lstlisting} */
 export const LATEX_BLOCK_ENV_OPEN_RE: RegExp =
   /\\begin{(center|left|right|table|figure|tabular|lstlisting)}/;
