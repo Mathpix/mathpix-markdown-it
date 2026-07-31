@@ -5,6 +5,11 @@
 // unrelated later content and wake the inline fallback (empty `<>` list items).
 export const LIST_TRANSIENT_ENV_KEYS: readonly string[] = ['isBlock', 'inheritedListType', 'parentType', 'prentLevel'];
 
+// Caption env written by nested float rules during the speculative list-body parse. Rolled
+// back only when the parse is discarded (abort/silent); on commit the flushed tokens own them.
+export const LIST_SPECULATIVE_CAPTION_ENV_KEYS: readonly string[] =
+  ['caption', 'captionPos', 'captionIsLabelFormatEmpty', 'captionIsSingleLineCheck'];
+
 // Snapshot of `env` for a token's `envToInline`, minus the transient list-parse flags.
 export const snapshotEnvForInline = (env: any): any => {
   const snap: any = { ...env };
@@ -12,4 +17,26 @@ export const snapshotEnvForInline = (env: any): any => {
     delete snap[k];
   }
   return snap;
+};
+
+// Record presence and value of `keys` in `env`, so they can be restored later.
+export const snapshotEnvKeys = (env: any, keys: readonly string[]): { had: { [k: string]: boolean }; snap: { [k: string]: any } } => {
+  const had: { [k: string]: boolean } = {};
+  const snap: { [k: string]: any } = {};
+  for (const k of keys) {
+    had[k] = k in env;
+    snap[k] = env[k];
+  }
+  return { had, snap };
+};
+
+// Restore `keys` in `env` from a snapshotEnvKeys() result (deletes keys that were absent).
+export const restoreEnvKeys = (env: any, keys: readonly string[], had: { [k: string]: boolean }, snap: { [k: string]: any }): void => {
+  for (const k of keys) {
+    if (had[k]) {
+      env[k] = snap[k];
+    } else {
+      delete env[k];
+    }
+  }
 };

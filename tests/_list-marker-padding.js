@@ -9,6 +9,8 @@ const { mathpixMarkdownPlugin } = require('../lib/index.js');
 const { FontMetrics } = require('../lib/markdown/common/text-dimentions');
 const { MARKER_GAP_EM, LIST_DEFAULT_INDENT_EM, DEFAULT_FONT_SIZE_PX, DEFAULT_EX_PX } = require('../lib/markdown/common/consts');
 const { resolveListPadding } = require('../lib/markdown/md-latex-lists-env/latex-list-items');
+const { render_itemize_list_open } = require('../lib/markdown/md-latex-lists-env/render-latex-list-env');
+const Token = require('markdown-it/lib/token');
 
 const { JSDOM } = require('jsdom');
 const jsdom = new JSDOM();
@@ -90,11 +92,41 @@ describe('List marker padding — reserve covers the true glyph width (Arial):',
   });
 });
 
+describe('data-padding-inline-start is sanitized before it reaches inline style:', () => {
+  // Locks the render-side guard: only a bare `Nem` may enter style="…"; anything else is dropped.
+  const md = markdownIt();
+  const styleOf = (padValue) => {
+    const token = new Token('itemize_list_open', 'ul', 1);
+    token.isTopLevelList = true;
+    token.attrSet('data-padding-inline-start', padValue);
+    const html = render_itemize_list_open([token], 0, md.options, {}, md.renderer);
+    const m = html.match(/style="([^"]*)"/);
+    return m ? m[1] : '';
+  };
+  it('a valid em value is inlined as padding-inline-start', () => {
+    styleOf('4.5em').should.contain('padding-inline-start: 4.5em');
+  });
+  it('a value carrying extra CSS never reaches the style attribute', () => {
+    styleOf('1em; background:url(x)').should.equal('list-style-type: none');
+  });
+  it('a non-em unit is dropped', () => {
+    styleOf('40px').should.equal('list-style-type: none');
+  });
+  it('malformed em values are dropped', () => {
+    ['', 'em', '-3em', '3.5.1em', '2 em', '2em ', '.5em', '2EM', '2em;'].forEach((v) => {
+      styleOf(v).should.equal('list-style-type: none');
+    });
+  });
+});
+
 describe('resolveListPadding — malformed depth is tolerated (no throw):', () => {
-  const mk = (prentLevel, padding) => ({ prentLevel, padding, attrSet() {} });
-  it('a smaller (negative-relative) then skipped depth does not throw and sets indentEm', () => {
+  const mk = (prentLevel, padding) => ({ prentLevel, padding, attrSet(k, v) { this[k] = v; } });
+  it('a smaller (negative-relative) then skipped depth does not throw; any emitted padding is a valid em', () => {
     const toks = [mk(2, 0), mk(1, 30), mk(5, 40)]; // relative depth: 0, -1→0, 3 (skips 1,2)
     (() => resolveListPadding(toks)).should.not.throw();
-    toks.forEach((t) => t.indentEm.should.be.a('number'));
+    toks.forEach((t) => {
+      const pad = t['data-padding-inline-start'];
+      if (pad !== undefined) pad.should.match(/^\d+(\.\d+)?em$/);
+    });
   });
 });

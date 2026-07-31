@@ -7,13 +7,14 @@ import {
   computeMarkerPadding
 } from "./latex-list-tokens";
 import { SetTokensBlockParse } from "../md-block-rule/helper";
-import { LIST_DEFAULT_INDENT_EM, LIST_MAX_INDENT_EM } from "../common/consts";
-import { ListItemsResult, ParsedListItem, ListInlineContext } from "./latex-list-types";
 import {
+  LIST_DEFAULT_INDENT_EM,
+  LIST_MAX_INDENT_EM,
   END_LIST_ENV_INLINE_RE,
   LATEX_ITEM_COMMAND_RE,
   LATEX_BLOCK_ENV_OPEN_RE,
 } from "../common/consts";
+import { ListItemsResult, ParsedListItem, ListInlineContext } from "./latex-list-types";
 
 /**
  * Processes block-style LaTeX list items by parsing their content
@@ -251,14 +252,13 @@ export const resolveListPadding = (listTokens: Token[]): void => {
     const ancestorSum: number = indentByDepth.slice(0, depth).reduce((s, v) => s + v, 0);
     const total: number = Math.min(token.padding || 0, LIST_MAX_INDENT_EM);
     const em: number = Math.round((total - ancestorSum) * 100) / 100;
+    // Own indent for this level: the reserved em when the marker overflows, else the default.
+    const indentEm: number = em > LIST_DEFAULT_INDENT_EM ? em : LIST_DEFAULT_INDENT_EM;
     if (em > LIST_DEFAULT_INDENT_EM) {
-      token.indentEm = em;
       token.attrSet("data-padding-inline-start", String(em) + "em");
-    } else {
-      token.indentEm = LIST_DEFAULT_INDENT_EM;
     }
     indentByDepth.length = depth;
-    indentByDepth[depth] = token.indentEm;
+    indentByDepth[depth] = indentEm;
   }
 };
 

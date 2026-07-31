@@ -15,7 +15,12 @@ import {
 } from "./latex-list-types";
 import { parseSetCounterNumber } from "./latex-list-common";
 import { getCaptionCounters, setCaptionCounters } from "../common/caption-counters";
-import { LIST_TRANSIENT_ENV_KEYS } from "../common/env-transient";
+import {
+  LIST_TRANSIENT_ENV_KEYS,
+  LIST_SPECULATIVE_CAPTION_ENV_KEYS,
+  snapshotEnvKeys,
+  restoreEnvKeys,
+} from "../common/env-transient";
 import { flushBufferedTokens, createBufferedState } from "./latex-list-env-engine";
 import {
   BEGIN_LIST_ENV_INLINE_RE,
@@ -414,6 +419,8 @@ export const ListsInternal = (
         if (sB.length > 0) {
           items = ItemsAddToPrev(items, sB, lineIdx);
         }
+        // finalizeListItems may already have popped this list via the inline path — pop by identity.
+        const closingList: Token | undefined = openTokens[openTokens.length - 1];
         ({ iOpen, items, li } = finalizeListItems(
           state,
           items,
@@ -425,7 +432,9 @@ export const ListsInternal = (
           openTokens, allListTokens
         ));
         setTokenCloseList(state, startLine + renderStart, lineIdx + renderStart);
-        openTokens.pop();
+        if (closingList && openTokens[openTokens.length - 1] === closingList) {
+          openTokens.pop();
+        }
         if (sE.length > 0) {
           items = ItemsAddToPrev(items, sE, lineIdx);
         }
@@ -548,6 +557,26 @@ export const ListsInternal = (
   return true;
 };
 
+// Per-state memo of silent-probe results, invalidated when `state.src` is reassigned.
+const LIST_PROBE_KEY = Symbol('mmd.listProbe');
+type ListProbeCache = { src: string; map: Map<string, boolean> };
+
+const getCachedListProbe = (state: StateBlock, key: string): boolean | undefined => {
+  const slot = state as unknown as Record<symbol, ListProbeCache | undefined>;
+  const cached = slot[LIST_PROBE_KEY];
+  return cached && cached.src === state.src ? cached.map.get(key) : undefined;
+};
+
+const setCachedListProbe = (state: StateBlock, key: string, ok: boolean): void => {
+  const slot = state as unknown as Record<symbol, ListProbeCache | undefined>;
+  let cached = slot[LIST_PROBE_KEY];
+  if (!cached || cached.src !== state.src) {
+    cached = { src: state.src, map: new Map() };
+    slot[LIST_PROBE_KEY] = cached;
+  }
+  cached.map.set(key, ok);
+};
+
 /**
  * Block rule that parses LaTeX list environments:
  *   \begin{itemize} ... \end{itemize}
@@ -580,25 +609,36 @@ export const Lists: RuleBlock = (
   if (!isListType(typeList)) {
     return false;
   }
+  // A silent probe answers "does a closed list env start here?", which needs the full
+  // speculative parse. Paragraph/footnote terminator scans re-ask it for the same line many
+  // times, so memoize per state. Key covers every input the answer depends on.
+  const probeKey: string = silent
+    ? `${startLine}:${endLine}:${state.parentType}:${state.prentLevel}:${(state.env as any)?.inheritedListType}`
+    : '';
+  if (silent) {
+    const cached: boolean | undefined = getCachedListProbe(state, probeKey);
+    if (cached !== undefined) {
+      return cached;
+    }
+  }
   // `bufferedState` shares `env` by prototype, so ListsInternal mutates the real env.
   // Snapshot/restore its transient fields on every exit (abort, silent, commit): a list
   // ending in a block item leaks isBlock=true and wakes the inline fallback on the next
   // block, and a silent probe must not change state.
-  const envHad: { [k: string]: boolean } = {};
-  const envSnap: { [k: string]: any } = {};
-  for (const k of LIST_TRANSIENT_ENV_KEYS) {
-    envHad[k] = k in state.env;
-    envSnap[k] = (state.env as any)[k];
-  }
+  const transientSnap = snapshotEnvKeys(state.env, LIST_TRANSIENT_ENV_KEYS);
   // The speculative parse runs the list body (incl. \begin{figure}/\begin{table}\caption),
-  // which bumps the module-global caption counters. On a non-committing exit the tokens are
-  // discarded, so roll the counters back too; on commit they match the flushed tokens.
+  // which bumps the module-global caption counters and writes caption env. On a non-committing
+  // exit the tokens are discarded, so roll both back; on commit they match the flushed tokens.
   const captionSnap = getCaptionCounters();
+  const captionEnvSnap = snapshotEnvKeys(state.env, LIST_SPECULATIVE_CAPTION_ENV_KEYS);
   let committed = false;
   try {
     const bufferedState = createBufferedState(state);
     const ok: boolean = ListsInternal(bufferedState, startLine, endLine);
     if (!ok || silent) {
+      if (silent) {
+        setCachedListProbe(state, probeKey, ok);
+      }
       return ok;
     }
     // Set before flushing: once tokens (carrying caption numbers) start entering state,
@@ -612,15 +652,10 @@ export const Lists: RuleBlock = (
     state.prentLevel = bufferedState.prentLevel;
     return true;
   } finally {
-    for (const k of LIST_TRANSIENT_ENV_KEYS) {
-      if (envHad[k]) {
-        (state.env as any)[k] = envSnap[k];
-      } else {
-        delete (state.env as any)[k];
-      }
-    }
+    restoreEnvKeys(state.env, LIST_TRANSIENT_ENV_KEYS, transientSnap.had, transientSnap.snap);
     if (!committed) {
       setCaptionCounters(captionSnap);
+      restoreEnvKeys(state.env, LIST_SPECULATIVE_CAPTION_ENV_KEYS, captionEnvSnap.had, captionEnvSnap.snap);
     }
   }
 };

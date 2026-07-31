@@ -115,3 +115,38 @@ describe('silent-mode Lists does not mutate shared env', () => {
     });
   });
 });
+
+// The silent probe answer is memoized per state, so terminator scans don't re-parse the same
+// list. The memo must not change the answer, nor short-circuit a real (non-silent) call.
+describe('silent-mode Lists probe memo', () => {
+  const md = markdownIt({ html: true }).use(mathpixMarkdownPlugin, {});
+  const listsRule = md.block.ruler.__rules__.find(r => r.name === 'Lists').fn;
+  const closed = '\\begin{itemize}\n\\item a\n\\end{itemize}\n';
+  const unclosed = '\\begin{itemize}\n\\item a\n';
+  [
+    { name: 'closed list', src: closed, expected: true },
+    { name: 'unclosed list', src: unclosed, expected: false },
+  ].forEach(({ name, src, expected }) => {
+    it(`repeated probes over a ${name} return ${expected}`, () => {
+      const state = new md.block.State(src, md, {}, []);
+      [1, 2, 3].forEach(() => listsRule(state, 0, state.lineMax, true).should.equal(expected));
+    });
+  });
+  it('a real call after silent probes still emits tokens', () => {
+    const state = new md.block.State(closed, md, {}, []);
+    listsRule(state, 0, state.lineMax, true);
+    listsRule(state, 0, state.lineMax, false).should.equal(true);
+    state.tokens.length.should.be.above(0);
+  });
+  it('reassigning state.src invalidates the memo', () => {
+    const state = new md.block.State(closed, md, {}, []);
+    listsRule(state, 0, state.lineMax, true).should.equal(true);
+    const fresh = new md.block.State(unclosed, md, {}, []);
+    state.src = fresh.src;
+    state.bMarks = fresh.bMarks;
+    state.eMarks = fresh.eMarks;
+    state.tShift = fresh.tShift;
+    state.lineMax = fresh.lineMax;
+    listsRule(state, 0, state.lineMax, true).should.equal(false);
+  });
+});

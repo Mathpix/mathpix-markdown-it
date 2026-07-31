@@ -1218,6 +1218,7 @@ module.exports = [
     html: "<ul data-padding-inline-start=\"3.11em\" class=\"itemize\" style=\"padding-inline-start: 3.11em; list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">abcd</span>a</li></ul>"
   },
   {
+    // Intentional under-reserve (spec Non-Goals): astral chars fall in the `normal` glyph class.
     name: "marker: astral emoji normal class (no padding)",
     latex: "\\begin{itemize}\n\\item[😀😀] a\n\\item[x] b\n\\end{itemize}",
     html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">😀😀</span>a</li><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">x</span>b</li></ul>"

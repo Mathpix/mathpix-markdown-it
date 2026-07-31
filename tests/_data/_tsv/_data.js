@@ -1589,5 +1589,28 @@ module.exports = [
       '"t1\n' +
       'a1, a2, a3, a4"\tST\tAlan Smith\n' +
       '\tST\tMark Viduka'
+  },
+  {
+    // Nested list on one line: item body ("d") must survive TSV extraction.
+    latex: '\\begin{tabular}{|l|}\n' +
+      '\\begin{itemize}\\item[1.] a \\begin{itemize}\\item[x] d\\end{itemize}\\end{itemize}\n' +
+      '\\end{tabular}',
+    tsv: '" 1. a\n' +
+      '   x d"'
+  },
+  {
+    // Link in a single-line nested item: the href must not be concatenated with the link text.
+    latex: '\\begin{tabular}{|l|}\n' +
+      '\\begin{itemize}\\item[1.] a \\begin{itemize}\\item[y] [t](http://a.b)\\end{itemize}\\end{itemize}\n' +
+      '\\end{tabular}',
+    tsv: '" 1. a\n' +
+      '   y http://a.b"'
+  },
+  {
+    // A link must not swallow the siblings that follow it in the cell.
+    latex: '\\begin{tabular}{|l|}\n' +
+      '[t](http://a.b) tail [u](http://c.d) **b** c\n' +
+      '\\end{tabular}',
+    tsv: 'http://a.b tail http://c.d b c'
   }
 ];

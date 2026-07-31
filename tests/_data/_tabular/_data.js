@@ -980,5 +980,23 @@ t1 & t2
       '</table>\n' +
       '</div>' +
       '</div>'
+  },
+  {
+    // A link inside a cell must close its <a> and not swallow the following siblings.
+    latex: '\\begin{tabular}{|l|}\n' +
+      '[t](http://a.b) tail [u](http://c.d) **b** c\n' +
+      '\\end{tabular}',
+    html: '<div class="table_tabular" style="text-align: center">\n' +
+      '<div class="inline-tabular"><table class="tabular">\n' +
+      '<tbody>\n' +
+      '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+      '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">' +
+      '<a href="http://a.b" target="_blank" rel="noopener" style="word-break: break-word">t</a> tail ' +
+      '<a href="http://c.d" target="_blank" rel="noopener" style="word-break: break-word">u</a> ' +
+      '<strong>b</strong> c</td>\n' +
+      '</tr>\n' +
+      '</tbody>\n' +
+      '</table>\n' +
+      '</div></div>'
   }
 ];

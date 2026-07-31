@@ -14,6 +14,24 @@ const TABLE_TOKENS = new Set([
   'table_open','table_close','tbody_open','tbody_close','tr_open','tr_close','td_open','td_close',
 ]);
 
+// List-structural tokens whose cell Markdown/TSV is emitted by handleListTokensForCellMarkdown;
+// their body must not be double-appended as leaf content.
+const LIST_STITCH_TOKEN_TYPES: Set<string> = new Set([
+  'itemize_list_open', 'enumerate_list_open',
+  'latex_list_item_open', 'latex_list_item_close',
+  'itemize_list_close', 'enumerate_list_close',
+]);
+
+// A cell token that reaches the leaf branch below, so it may join a leaf run.
+const isLeafRunMember = (token: any): boolean =>
+  !!token
+  && !token.hidden
+  && token.token !== 'inline' && token.type !== 'inline'
+  && !TABLE_TOKENS.has(token.token) && !TABLE_TOKENS.has(token.type)
+  && token.type !== 'tabular' && token.type !== 'tabular_inline'
+  && !token.children?.length
+  && !LIST_STITCH_TOKEN_TYPES.has(token.type);
+
 /**
  * Appends a text chunk to the last line of a string array.
  * If the array is empty, a new line is created.
@@ -224,6 +242,28 @@ const renderNonTableTokenIntoCell = (
   const rendered = slf.renderInline([token], options, env);
   if (needHtml) {
     acc.result += rendered;
+  }
+  // Single-line nested lists unwrap the item body to bare inline tokens (not an `inline`
+  // wrapper), so collect it here for Markdown/TSV/CSV/smoothed; HTML is already appended.
+  // Whole run at once: renderTableCellContent consumes siblings (link_open + text + link_close).
+  if (isLeafRunMember(token) && !isLeafRunMember(ctx.tokens[ctx.idx - 1])) {
+    const run: any[] = [];
+    for (let i = ctx.idx; i < ctx.tokens.length && isLeafRunMember(ctx.tokens[i]); i++) {
+      run.push(ctx.tokens[i]);
+    }
+    const leaf: RenderTableCellContentResult = renderTableCellContent({ children: run }, true, options, env, slf);
+    if (needTsv) {
+      appendToLastLine(acc.cellTsvLines, leaf.tsv);
+    }
+    if (needCsv) {
+      appendToLastLine(acc.cellCsvLines, leaf.csv);
+    }
+    if (needSmoothed) {
+      acc.cellSmoothed += leaf.tableSmoothed;
+    }
+    if (needMd) {
+      acc.cellMd += leaf.tableMd;
+    }
   }
   handleListTokensForCellMarkdown(token, ctx, acc);
 };

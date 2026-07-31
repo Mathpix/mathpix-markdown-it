@@ -112,13 +112,17 @@ export const renderTableCellContent = (
             .replace(/\|/g, '\\|');
           if (link) {
             mdCell += link;
-            if (j + 1 < token.children.length) {
-              content += slf.renderInline([token.children[++j]], options, env);
-              j++;
-            }
-            if (j + 1 < token.children.length) {
-              content += slf.renderInline([token.children[++j]], options, env);
-              j++;
+            // getMdLink already emitted [text](href). Render the rest of the link for HTML and
+            // stop on its own link_close, so following siblings are not consumed.
+            let depth = 1;
+            while (depth > 0 && j + 1 < token.children.length) {
+              const inner = token.children[++j];
+              if (inner.type === 'link_open') {
+                depth++;
+              } else if (inner.type === 'link_close') {
+                depth--;
+              }
+              content += slf.renderInline([inner], options, env);
             }
           }
           continue;

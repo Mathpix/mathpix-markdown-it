@@ -31,10 +31,6 @@ const FOOTNOTE_TERMINATOR_NAMES = new Set<string>([
   "abstractBlock",
   "image_with_size_block"
 ]);
-// Minimal terminator set for `\footnote` (`fence` is checked directly): just the list rule,
-// so a `\begin{itemize}` before the tag isn't swallowed.
-const FOOTNOTE_LIST_TERMINATOR_NAMES = new Set<string>(["Lists"]);
-
 type FootnoteCacheEntry = { src: string; lastPos: number };
 
 // Per-state cache of the last match offset (-1 if none). `patternG` MUST be /g.
@@ -63,6 +59,19 @@ const getCachedSrcPositions = (
   patternG.lastIndex = 0;
   slot[key] = { src: state.src, lastPos };
   return lastPos;
+};
+
+// Resolve a single enabled block-rule fn by name, or null. No Set/array allocation.
+const resolveEnabledRuleFn = (ruler: Ruler, name: string): RuleBlock | null => {
+  const rules = ruler.__rules__;
+  if (rules?.length) {
+    for (let i = 0; i < rules.length; i++) {
+      if (rules[i].enabled && rules[i].name === name) {
+        return rules[i].fn;
+      }
+    }
+  }
+  return null;
 };
 
 // Resolve the enabled block-rule fns for the given names (in ruler order). Not cached —
@@ -105,7 +114,7 @@ export const latex_footnote_block: RuleBlock = (state, startLine, endLine, silen
     if (!sawFootnoteToken || !reOpenTagFootnoteG.test(lineText)) {
       // Terminate on `fence` (original) plus the LaTeX list rule, so a `\begin{itemize}`
       // before the tag isn't swallowed — a minimal addition (fence + Lists, not the full set).
-      const listRule = resolveEnabledRuleFns(state.md.block.ruler, FOOTNOTE_LIST_TERMINATOR_NAMES)[0] ?? null;
+      const listRule = resolveEnabledRuleFn(state.md.block.ruler, "Lists");
       for (; nextLine < endLine; nextLine++) {
         if (fence(state, nextLine, endLine, true) ||
             (listRule && listRule(state, nextLine, endLine, true))) {

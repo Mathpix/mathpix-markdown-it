@@ -928,4 +928,60 @@ module.exports = [
       '| :--- | :--- |\n' +
       '| LaTeX image without options (should be resolved) | ![](https://mathpix-ocr-examples.s3.amazonaws.com/cases_printed_1.jpg) |'
   },
+  {
+    // Nested list on one line: item body ("d") must survive extraction, same as the block form below.
+    id: 51,
+    latex: '\\begin{tabular}{|l|}\n' +
+      '\\begin{itemize}\\item[1.] a \\begin{itemize}\\item[x] d\\end{itemize}\\end{itemize}\n' +
+      '\\end{tabular}',
+    table_markdown: '| 1. a<br>&#160;&#160;x d<br> |\n' +
+      '| :--- |'
+  },
+  {
+    id: 52,
+    latex: '\\begin{tabular}{|l|}\n' +
+      '\\begin{itemize}\n' +
+      '\\item[1.] a\n' +
+      '\\begin{itemize}\n' +
+      '\\item[x] d\n' +
+      '\\end{itemize}\n' +
+      '\\end{itemize}\n' +
+      '\\end{tabular}',
+    table_markdown: '| 1. a<br>&#160;&#160;x d<br> |\n' +
+      '| :--- |'
+  },
+  {
+    // Link in a single-line nested item: the href must survive extraction.
+    id: 53,
+    latex: '\\begin{tabular}{|l|}\n' +
+      '\\begin{itemize}\\item[1.] a \\begin{itemize}\\item[y] [t](http://a.b)\\end{itemize}\\end{itemize}\n' +
+      '\\end{tabular}',
+    table_markdown: '| 1. a<br>&#160;&#160;y [t](http://a.b)<br> |\n' +
+      '| :--- |'
+  },
+  {
+    id: 54,
+    latex: '\\begin{tabular}{|l|}\n' +
+      '\\begin{itemize}\\item[1.] a \\begin{itemize}\\item[y] ![alt](http://a/b.png)\\end{itemize}\\end{itemize}\n' +
+      '\\end{tabular}',
+    table_markdown: '| 1. a<br>&#160;&#160;y ![alt](http://a/b.png)<br> |\n' +
+      '| :--- |'
+  },
+  {
+    id: 55,
+    latex: '\\begin{tabular}{|l|}\n' +
+      '\\begin{itemize}\\item[1.] a \\begin{itemize}\\item[y] **b** c\\end{itemize}\\end{itemize}\n' +
+      '\\end{tabular}',
+    table_markdown: '| 1. a<br>&#160;&#160;y **b** c<br> |\n' +
+      '| :--- |'
+  },
+  {
+    // A link must not swallow the siblings that follow it in the cell.
+    id: 56,
+    latex: '\\begin{tabular}{|l|}\n' +
+      '[t](http://a.b) tail [u](http://c.d) **b** c\n' +
+      '\\end{tabular}',
+    table_markdown: '| [t](http://a.b) tail [u](http://c.d) **b** c |\n' +
+      '| :--- |'
+  },
 ];
