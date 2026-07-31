@@ -17,7 +17,7 @@ import { parseSetCounterNumber } from "./latex-list-common";
 import { getCaptionCounters, setCaptionCounters } from "../common/caption-counters";
 import {
   LIST_TRANSIENT_ENV_KEYS,
-  LIST_SPECULATIVE_CAPTION_ENV_KEYS,
+  LIST_SPECULATIVE_ENV_KEYS,
   snapshotEnvKeys,
   restoreEnvKeys,
 } from "../common/env-transient";
@@ -419,7 +419,8 @@ export const ListsInternal = (
         if (sB.length > 0) {
           items = ItemsAddToPrev(items, sB, lineIdx);
         }
-        // finalizeListItems may already have popped this list via the inline path — pop by identity.
+        // An inline `\end` in the item body may already have popped this list inside
+        // finalizeListItems — pop by identity so we never pop a list this `\end` didn't close.
         const closingList: Token | undefined = openTokens[openTokens.length - 1];
         ({ iOpen, items, li } = finalizeListItems(
           state,
@@ -627,10 +628,10 @@ export const Lists: RuleBlock = (
   // block, and a silent probe must not change state.
   const transientSnap = snapshotEnvKeys(state.env, LIST_TRANSIENT_ENV_KEYS);
   // The speculative parse runs the list body (incl. \begin{figure}/\begin{table}\caption),
-  // which bumps the module-global caption counters and writes caption env. On a non-committing
+  // which bumps the module-global caption counters and writes float env. On a non-committing
   // exit the tokens are discarded, so roll both back; on commit they match the flushed tokens.
   const captionSnap = getCaptionCounters();
-  const captionEnvSnap = snapshotEnvKeys(state.env, LIST_SPECULATIVE_CAPTION_ENV_KEYS);
+  const floatEnvSnap = snapshotEnvKeys(state.env, LIST_SPECULATIVE_ENV_KEYS);
   let committed = false;
   try {
     const bufferedState = createBufferedState(state);
@@ -655,7 +656,7 @@ export const Lists: RuleBlock = (
     restoreEnvKeys(state.env, LIST_TRANSIENT_ENV_KEYS, transientSnap.had, transientSnap.snap);
     if (!committed) {
       setCaptionCounters(captionSnap);
-      restoreEnvKeys(state.env, LIST_SPECULATIVE_CAPTION_ENV_KEYS, captionEnvSnap.had, captionEnvSnap.snap);
+      restoreEnvKeys(state.env, LIST_SPECULATIVE_ENV_KEYS, floatEnvSnap.had, floatEnvSnap.snap);
     }
   }
 };

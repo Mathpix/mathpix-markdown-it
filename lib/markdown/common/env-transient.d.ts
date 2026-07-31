@@ -1,5 +1,5 @@
 export declare const LIST_TRANSIENT_ENV_KEYS: readonly string[];
-export declare const LIST_SPECULATIVE_CAPTION_ENV_KEYS: readonly string[];
+export declare const LIST_SPECULATIVE_ENV_KEYS: readonly string[];
 export declare const snapshotEnvForInline: (env: any) => any;
 export declare const snapshotEnvKeys: (env: any, keys: readonly string[]) => {
     had: {

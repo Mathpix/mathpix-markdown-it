@@ -5,10 +5,14 @@
 // unrelated later content and wake the inline fallback (empty `<>` list items).
 export const LIST_TRANSIENT_ENV_KEYS: readonly string[] = ['isBlock', 'inheritedListType', 'parentType', 'prentLevel'];
 
-// Caption env written by nested float rules during the speculative list-body parse. Rolled
-// back only when the parse is discarded (abort/silent); on commit the flushed tokens own them.
-export const LIST_SPECULATIVE_CAPTION_ENV_KEYS: readonly string[] =
-  ['caption', 'captionPos', 'captionIsLabelFormatEmpty', 'captionIsSingleLineCheck'];
+// Env the nested block rules write while a list body is parsed speculatively: floats
+// (`begin-table.ts`) and tabulars (`begin-tabular`). Rolled back only when that parse is
+// discarded; on commit the flushed tokens own them. A *committed* float still leaves the float
+// keys set — `begin-table` never clears them (pre-existing, happens without a list too).
+export const LIST_SPECULATIVE_ENV_KEYS: readonly string[] =
+  ['caption', 'captionPos', 'captionIsLabelFormatEmpty', 'captionIsSingleLineCheck',
+   'envType', 'align', 'alignEnvBlock', 'number', 'type',
+   'isInline', 'subTabular', 'tabulare'];
 
 // Snapshot of `env` for a token's `envToInline`, minus the transient list-parse flags.
 export const snapshotEnvForInline = (env: any): any => {

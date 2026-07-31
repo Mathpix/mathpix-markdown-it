@@ -105,6 +105,15 @@ describe('silent-mode Lists does not mutate shared env', () => {
   [
     { name: 'closed list', src: '\\begin{itemize}\n\\item a\n\\end{itemize}\n' },
     { name: 'unclosed list', src: '\\begin{itemize}\n\\item a\n' },
+    // A float in the body makes begin-table write its env keys — none may survive the probe.
+    {
+      name: 'list holding a figure',
+      src: '\\begin{itemize}\n\\item[a] x\n\\begin{figure}\n\\centering\n\\caption{F}\n\\end{figure}\n\\end{itemize}\n',
+    },
+    {
+      name: 'unclosed list holding a table',
+      src: '\\begin{itemize}\n\\item[a] x\n\\begin{table}\n\\caption{T}\n\\begin{tabular}{|l|}\nc\n\\end{tabular}\n\\end{table}\n',
+    },
   ].forEach(({ name, src }) => {
     it(`a silent Lists probe over a ${name} leaves state.env unchanged`, () => {
       const env = {};

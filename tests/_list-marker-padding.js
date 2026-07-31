@@ -92,6 +92,18 @@ describe('List marker padding — reserve covers the true glyph width (Arial):',
   });
 });
 
+describe('List marker padding — the default-indent threshold:', () => {
+  // A custom indent is emitted only when the marker overflows LIST_DEFAULT_INDENT_EM, so the
+  // padding can never resolve below the default. Narrow glyphs (0.40em) straddle the boundary.
+  it('a marker at or under the default indent emits no attribute', () => {
+    hasPadding(render('\\begin{itemize}\n\\item[....] a\n\\end{itemize}')).should.equal(false);
+  });
+  it('a marker just over the default indent emits the reserve', () => {
+    paddingValue(render('\\begin{itemize}\n\\item[.....] a\n\\end{itemize}'))
+      .should.be.above(LIST_DEFAULT_INDENT_EM);
+  });
+});
+
 describe('data-padding-inline-start is sanitized before it reaches inline style:', () => {
   // Locks the render-side guard: only a bare `Nem` may enter style="…"; anything else is dropped.
   const md = markdownIt();

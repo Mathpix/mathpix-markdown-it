@@ -1328,4 +1328,15 @@ module.exports = [
     latex: "\\begin{itemize}\\item a\\item b\\end{itemize}",
     html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
   },
+  {
+    // Sibling sublists resolve independently: only the wide one reserves, either order.
+    name: "B2: sibling sublists wide then narrow",
+    latex: "\\begin{itemize}\n\\item[a] x\n\\begin{itemize}\n\\item[XXXXXXXXXXXX] w\n\\end{itemize}\n\\item[b] y\n\\begin{itemize}\n\\item[n] z\n\\end{itemize}\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">a</span>x<ul data-padding-inline-start=\"8.93em\" class=\"itemize\" style=\"padding-inline-start: 8.93em; list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">XXXXXXXXXXXX</span>w</li></ul></li><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">b</span>y<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">n</span>z</li></ul></li></ul>"
+  },
+  {
+    name: "B2: sibling sublists narrow then wide",
+    latex: "\\begin{itemize}\n\\item[a] x\n\\begin{itemize}\n\\item[n] z\n\\end{itemize}\n\\item[b] y\n\\begin{itemize}\n\\item[XXXXXXXXXXXX] w\n\\end{itemize}\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">a</span>x<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">n</span>z</li></ul></li><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">b</span>y<ul data-padding-inline-start=\"8.93em\" class=\"itemize\" style=\"padding-inline-start: 8.93em; list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">XXXXXXXXXXXX</span>w</li></ul></li></ul>"
+  },
 ];
