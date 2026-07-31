@@ -51,7 +51,7 @@ export declare const setTokenOpenList: (state: StateBlock, startLine: number, en
  *  - tokenStart: the created *_list_open token, if any
  *  - li: optional enumerate start value extracted via \setcounter
  */
-export declare const ListOpen: (state: StateBlock, startLine: number, lineText: string, itemizeLevelTokens: Token[][], enumerateLevelTypes: string[], itemizeLevelContents: string[]) => ListOpenResult;
+export declare const ListOpen: (state: StateBlock, startLine: number, lineText: string, itemizeLevelTokens: Token[][], enumerateLevelTypes: string[], itemizeLevelContents: string[], openTokens: Token[], allListTokens: Token[]) => ListOpenResult;
 /**
  * Closes the current LaTeX list environment (\end{itemize} / \end{enumerate}).
  *

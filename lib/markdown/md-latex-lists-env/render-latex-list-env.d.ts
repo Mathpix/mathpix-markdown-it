@@ -12,7 +12,7 @@ import type Renderer from "markdown-it/lib/renderer";
  *      - `<ul ... style="list-style-type: none">` for nested lists,
  *      - optionally wraps nested `<ul>` in `<li>` when a list is directly
  *        nested under another `itemize_list_open`.
- *  - For top-level lists, respects `data-padding-inline-start` attribute
+ *  - Respects `data-padding-inline-start` (top-level and nested)
  *    (translating it into inline CSS `padding-inline-start`).
  */
 export declare const render_itemize_list_open: Renderer.RenderRule;
@@ -26,7 +26,7 @@ export declare const render_itemize_list_open: Renderer.RenderRule;
  *  - Adds CSS class `enumerate <style>` (e.g. `enumerate decimal`).
  *  - Injects line-numbering attributes when `options.lineNumbering` is enabled.
  *  - For DOCX (`options.forDocx`), adds `data-list-style-type="<style>"`.
- *  - For top-level lists, respects `data-padding-inline-start` attribute
+ *  - Respects `data-padding-inline-start` (top-level and nested)
  *    and converts it into inline `padding-inline-start` CSS.
  */
 export declare const render_enumerate_list_open: Renderer.RenderRule;

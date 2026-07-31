@@ -336,14 +336,16 @@ export const ListsInternal = (
   const itemizeLevelContents: string[] = dataMarkers.contents;
   let nextLine: number = startLine;
   let li: { value: number } | null = null;
-  const openData: ListOpenResult = ListOpen(state, startLine + renderStart, lineText, itemizeLevelTokens, enumerateLevelTypes, itemizeLevelContents);
+  // Open list tokens by nesting level (padding → innermost) and every list-open token in doc
+  // order (resolved top-down at the end). ListOpen seeds them and handles same-line content.
+  const openTokens: Token[] = [];
+  const allListTokens: Token[] = [];
+  const openData: ListOpenResult = ListOpen(state, startLine + renderStart, lineText, itemizeLevelTokens, enumerateLevelTypes, itemizeLevelContents, openTokens, allListTokens);
   let { iOpen = 0, tokenStart = null } = openData;
   li = openData.li ?? null;
-  // Open list tokens by nesting level — padding goes to the innermost, not an outer list.
-  const openTokens: (Token | null)[] = tokenStart ? [tokenStart] : [];
-  // All list-open tokens (doc order) — padding resolved in one top-down pass at the end.
-  const allListTokens: Token[] = tokenStart ? [tokenStart] : [];
   if (iOpen === 0) {
+    // A single-line list (\begin…\item…\end on one line) is fully built by ListOpen; resolve here.
+    resolveListPadding(allListTokens);
     nextLine += 1;
     state.line = nextLine;
     state.startLine = startLine;
@@ -420,7 +422,7 @@ export const ListsInternal = (
           li,
           iOpen,
           itemizeLevelContents,
-          openTokens[openTokens.length - 1] ?? null
+          openTokens, allListTokens
         ));
         setTokenCloseList(state, startLine + renderStart, lineIdx + renderStart);
         openTokens.pop();
@@ -460,7 +462,7 @@ export const ListsInternal = (
           li,
           iOpen,
           itemizeLevelContents,
-          openTokens[openTokens.length - 1] ?? null
+          openTokens, allListTokens
         ));
         const nestedOpen: Token = setTokenOpenList(state, -1, -1, beginType, itemizeLevelTokens, enumerateLevelTypes, itemizeLevelContents);
         openTokens.push(nestedOpen);

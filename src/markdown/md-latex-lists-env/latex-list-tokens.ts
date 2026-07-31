@@ -152,11 +152,12 @@ export const ListOpen = (
   lineText: string,
   itemizeLevelTokens: Token[][],
   enumerateLevelTypes: string[],
-  itemizeLevelContents: string[]
+  itemizeLevelContents: string[],
+  openTokens: Token[],
+  allListTokens: Token[]
 ): ListOpenResult => {
   let tokenStart: Token | null = null;
   let iOpen: number = 0;
-  let padding: number = 0;
   let li: { value: number } | null = null;
   // Line must start with '\' to be a LaTeX command
   if (lineText.charCodeAt(0) !== 0x5c /* '\' */) {
@@ -189,6 +190,10 @@ export const ListOpen = (
     itemizeLevelContents
   );
   iOpen++;
+  // Register the new list so its marker padding is attributed here (same registry the block
+  // path uses), covering same-line/single-line lists that never reach the block loop.
+  openTokens.push(tokenStart);
+  allListTokens.push(tokenStart);
   // Process inline content after \begin{...}
   if (strAfter && strAfter.trim().length > 0) {
     let children: Token = [];
@@ -200,11 +205,12 @@ export const ListOpen = (
     // Context shared across child token processing
     const ctx: ListInlineContext = {
       li,
-      padding,
       iOpen,
       itemizeLevelTokens,
       enumerateLevelTypes,
-      itemizeLevelContents
+      itemizeLevelContents,
+      openTokens,
+      allListTokens
     };
     // Process each inline child token
     for (const child of children) {
@@ -216,7 +222,6 @@ export const ListOpen = (
     }
     // Update context after processing children
     li = ctx.li;
-    padding = ctx.padding;
     iOpen = ctx.iOpen;
     state.env.isBlock = false;
   }
@@ -297,11 +302,12 @@ export const processListChildToken = (
     token.attrSet('value', ctx.li.value.toString());
     ctx.li = null;
   }
-  // 4. Handle custom marker and compute padding
+  // 4. Marker width → attribute to the innermost open list (not always the outer one).
   if (token.hasOwnProperty('marker')) {
     const paddingChild: number = computeMarkerPadding(token.markerTokens);
-    if (paddingChild > ctx.padding) {
-      ctx.padding = paddingChild;
+    const top: Token = ctx.openTokens[ctx.openTokens.length - 1];
+    if (top && (!top.padding || top.padding < paddingChild)) {
+      top.padding = paddingChild;
     }
   }
   // 5. Parent metadata
@@ -326,6 +332,10 @@ export const processListChildToken = (
       state.types.push('enumerate');
     }
     ctx.iOpen++;
+    // Register in the shared registry so resolveListPadding sees inline-opened nested lists.
+    token.prentLevel = state.prentLevel; // depth after entering, matching the block path
+    ctx.openTokens.push(token);
+    ctx.allListTokens.push(token);
   } else {
     if (token.type === 'enumerate_list_close' || token.type === 'itemize_list_close') {
       state.prentLevel--;
@@ -333,6 +343,9 @@ export const processListChildToken = (
         state.types.pop();
       }
       ctx.iOpen--;
+      if (ctx.openTokens.length > 0) {
+        ctx.openTokens.pop();
+      }
     }
   }
   // 8. Attach list-level styling metadata

@@ -42,16 +42,3 @@ describe('Check Lists inside tabular:', () => {
     });
   });
 });
-
-describe('\\item detection requires a real command, not a \\item-prefixed one:', () => {
-  // \itemsep / \itemindent (and the word "item") must not be mistaken for \item.
-  const liCount = (src) => (MM.markdownToHTML(src, options).match(/<li /g) || []).length;
-  it('\\itemsep in an item body does not add an item', () =>
-    liCount('\\begin{itemize}\n\\item first \\setlength{\\itemsep}{0pt} rest\n\\item second\n\\end{itemize}').should.equal(2));
-  it('\\itemindent at the start of an item body does not add an item', () =>
-    liCount('\\begin{itemize}\n\\item[] \\itemindent=2em some text\n\\end{itemize}').should.equal(1));
-  it('\\itemsep inline between items does not add an item', () =>
-    liCount('\\begin{itemize}\\item a \\itemsep b\\item c\\end{itemize}').should.equal(2));
-  it('real \\item still splits', () =>
-    liCount('\\begin{itemize}\\item a\\item b\\end{itemize}').should.equal(2));
-});

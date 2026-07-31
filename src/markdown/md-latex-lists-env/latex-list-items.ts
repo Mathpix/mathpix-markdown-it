@@ -62,11 +62,12 @@ export const ListItems = (
   enumerateLevelTypes: string[],
   li: { value: number } | null,
   iOpen: number,
-  itemizeLevelContents: string[]
+  itemizeLevelContents: string[],
+  openTokens: Token[],
+  allListTokens: Token[]
 ): ListItemsResult => {
-  let padding = 0;
   if (!items || items.length === 0) {
-    return { iOpen, padding };
+    return { iOpen };
   }
   for (const listItem of items) {
     state.env.parentType = state.parentType;
@@ -79,11 +80,13 @@ export const ListItems = (
       let match: RegExpMatchArray = listItem.content.match(LATEX_ITEM_COMMAND_RE);
       if (match) {
         const itemToken = setTokenListItemOpenBlock(state, listItem.startLine, listItem.endLine + 1, match[1], li, itemizeLevelTokens, enumerateLevelTypes, itemizeLevelContents);
-        // Block items skip the inline path, so measure the marker here too.
+        // Block items skip the inline path, so measure the marker here too — attribute to the
+        // innermost open list (this item's list), not always the outer one.
         if (itemToken.hasOwnProperty('marker')) {
           const paddingChild: number = computeMarkerPadding(itemToken.markerTokens);
-          if (paddingChild > padding) {
-            padding = paddingChild;
+          const top: Token = openTokens[openTokens.length - 1];
+          if (top && (!top.padding || top.padding < paddingChild)) {
+            top.padding = paddingChild;
           }
         }
         if (li && li.hasOwnProperty('value')) {
@@ -103,21 +106,17 @@ export const ListItems = (
     let inlineChildren = [];
     state.md.inline.parse(listItem.content.trim(), state.md, state.env, inlineChildren);
     // Context shared across child token processing
-    const ctx: ListInlineContext = { li, padding, iOpen, itemizeLevelTokens, enumerateLevelTypes, itemizeLevelContents };
+    const ctx: ListInlineContext = { li, iOpen, itemizeLevelTokens, enumerateLevelTypes, itemizeLevelContents, openTokens, allListTokens };
     // Process each inline child token
     for (const child of inlineChildren) {
       processListChildToken(state, listItem, child, ctx);
     }
     // Update context after processing children
     li = ctx.li;
-    padding = ctx.padding;
     iOpen = ctx.iOpen;
     state.env.isBlock = false;
   }
-  return {
-    iOpen: iOpen,
-    padding: padding
-  };
+  return { iOpen };
 };
 
 /**
@@ -219,16 +218,13 @@ export const finalizeListItems = (
   li: { value: number } | null,
   iOpen: number,
   itemizeLevelContents: string[],
-  tokenStart: Token | null
+  openTokens: Token[],
+  allListTokens: Token[]
 ) =>  {
-  const dataItems: ListItemsResult = ListItems(state, items, itemizeLevelTokens, enumerateLevelTypes, li, iOpen, itemizeLevelContents);
-  if (tokenStart) {
-    // Record the widest marker width; the indent is resolved later, top-down, once every list's
-    // final width is known (see resolveListPadding) — so item order can't skew a nested list.
-    if (!tokenStart.padding || tokenStart.padding < dataItems.padding) {
-      tokenStart.padding = dataItems.padding;
-    }
-  }
+  // ListItems records each marker's width on its innermost open list (openTokens[last]) — both
+  // block items here and inline-opened nested lists — so the indent is resolved later, top-down,
+  // once every list's final width is known (see resolveListPadding), independent of item order.
+  const dataItems: ListItemsResult = ListItems(state, items, itemizeLevelTokens, enumerateLevelTypes, li, iOpen, itemizeLevelContents, openTokens, allListTokens);
   return {
     iOpen: dataItems.iOpen,
     items: [],
@@ -246,7 +242,12 @@ export const resolveListPadding = (listTokens: Token[]): void => {
   const baseDepth: number = listTokens[0].prentLevel || 0;
   const indentByDepth: number[] = [];
   for (const token of listTokens) {
-    const depth: number = (token.prentLevel || 0) - baseDepth;
+    // Clamp depth to >= 0 (a negative would throw on indentByDepth.length below).
+    const depth: number = Math.max(0, (token.prentLevel || 0) - baseDepth);
+    // Fill any skipped level with the default FIRST, so the ancestor sum has no holes (no NaN).
+    for (let i = indentByDepth.length; i < depth; i++) {
+      indentByDepth[i] = LIST_DEFAULT_INDENT_EM;
+    }
     const ancestorSum: number = indentByDepth.slice(0, depth).reduce((s, v) => s + v, 0);
     const total: number = Math.min(token.padding || 0, LIST_MAX_INDENT_EM);
     const em: number = Math.round((total - ancestorSum) * 100) / 100;

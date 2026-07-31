@@ -197,4 +197,19 @@ module.exports = [
       '</ol>\n' +
       '</section>'
   },
+  {
+    name: "item-word body: inside the item.",
+    mmd: "Intro paragraph text.\n\\begin{itemize}\n\\item[] \\footnotetext{\nA footnote note that spans\ninside the item.\n}\n\\end{itemize}",
+    html: "<div>Intro paragraph text.</div>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\"><span class=\"li_level\" data-custom-marker=\"true\" data-marker-empty=\"true\"></span></li></ul><hr class=\"footnotes-sep\">\n<section class=\"footnotes\" style=\"margin-bottom: 1em;\">\n<ol class=\"footnotes-list\" style=\"padding-left: 20px; margin-bottom: 0;\">\n<li id=\"fn1\" class=\"footnote-item\" style=\"list-style-type: none;\"><div><br>\nA footnote note that spans<br>\ninside the item.<br>\n</div>\n</li>\n</ol>\n</section>"
+  },
+  {
+    name: "item-word body: several items here.",
+    mmd: "Intro paragraph text.\n\\begin{itemize}\n\\item[] \\footnotetext{\nA footnote note that spans\nseveral items here.\n}\n\\end{itemize}",
+    html: "<div>Intro paragraph text.</div>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\"><span class=\"li_level\" data-custom-marker=\"true\" data-marker-empty=\"true\"></span></li></ul><hr class=\"footnotes-sep\">\n<section class=\"footnotes\" style=\"margin-bottom: 1em;\">\n<ol class=\"footnotes-list\" style=\"padding-left: 20px; margin-bottom: 0;\">\n<li id=\"fn1\" class=\"footnote-item\" style=\"list-style-type: none;\"><div><br>\nA footnote note that spans<br>\nseveral items here.<br>\n</div>\n</li>\n</ol>\n</section>"
+  },
+  {
+    name: "item-word body: the itemize word here.",
+    mmd: "Intro paragraph text.\n\\begin{itemize}\n\\item[] \\footnotetext{\nA footnote note that spans\nthe itemize word here.\n}\n\\end{itemize}",
+    html: "<div>Intro paragraph text.</div>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\"><span class=\"li_level\" data-custom-marker=\"true\" data-marker-empty=\"true\"></span></li></ul><hr class=\"footnotes-sep\">\n<section class=\"footnotes\" style=\"margin-bottom: 1em;\">\n<ol class=\"footnotes-list\" style=\"padding-left: 20px; margin-bottom: 0;\">\n<li id=\"fn1\" class=\"footnote-item\" style=\"list-style-type: none;\"><div><br>\nA footnote note that spans<br>\nthe itemize word here.<br>\n</div>\n</li>\n</ol>\n</section>"
+  },
 ];

@@ -1146,5 +1146,185 @@ module.exports = [
     // Same case with \footnote instead of \footnotetext.
     latex: "Intro paragraph text.\n\\begin{itemize}\n\\item[] \\footnote{\n1 A footnote note.\n}\n\\end{itemize}",
     html: "<div>Intro paragraph text.</div>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\"><span class=\"li_level\" data-custom-marker=\"true\" data-marker-empty=\"true\"></span><sup class=\"footnote-ref\"><a href=\"#fn1\" id=\"fnref1\">[1]</a></sup></li></ul><hr class=\"footnotes-sep\">\n<section class=\"footnotes\" style=\"margin-bottom: 1em;\">\n<ol class=\"footnotes-list\" style=\"margin-bottom: 0;\">\n<li id=\"fn1\" class=\"footnote-item\"><div><br>\n1 A footnote note.<br>\n <a href=\"#fnref1\" class=\"footnote-backref\">↩︎</a></div>\n</li>\n</ol>\n</section>\n"
-  }
+  },
+  {
+    name: "marker: short math under threshold (no padding)",
+    latex: "\\begin{itemize}\n\\item[$x^2$] a\n\\item[y] b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\"><span class=\"math-inline \">\n<mjx-container class=\"MathJax\" jax=\"SVG\"><svg style=\"vertical-align: -0.025ex;\" xmlns=\"http://www.w3.org/2000/svg\" width=\"2.282ex\" height=\"1.912ex\" role=\"img\" focusable=\"false\" viewBox=\"0 -833.9 1008.6 844.9\"><g stroke=\"currentColor\" fill=\"currentColor\" stroke-width=\"0\" transform=\"scale(1,-1)\"><g data-mml-node=\"math\"><g data-mml-node=\"msup\"><g data-mml-node=\"mi\"><path data-c=\"1D465\" d=\"M52 289Q59 331 106 386T222 442Q257 442 286 424T329 379Q371 442 430 442Q467 442 494 420T522 361Q522 332 508 314T481 292T458 288Q439 288 427 299T415 328Q415 374 465 391Q454 404 425 404Q412 404 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145Q504 144 502 134Q486 77 440 33T333 -11Q263 -11 227 52Q186 -10 133 -10H127Q78 -10 57 16T35 71Q35 103 54 123T99 143Q142 143 142 101Q142 81 130 66T107 46T94 41L91 40Q91 39 97 36T113 29T132 26Q168 26 194 71Q203 87 217 139T245 247T261 313Q266 340 266 352Q266 380 251 392T217 404Q177 404 142 372T93 290Q91 281 88 280T72 278H58Q52 284 52 289Z\"></path></g><g data-mml-node=\"mn\" transform=\"translate(605,363) scale(0.707)\"><path data-c=\"32\" d=\"M109 429Q82 429 66 447T50 491Q50 562 103 614T235 666Q326 666 387 610T449 465Q449 422 429 383T381 315T301 241Q265 210 201 149L142 93L218 92Q375 92 385 97Q392 99 409 186V189H449V186Q448 183 436 95T421 3V0H50V19V31Q50 38 56 46T86 81Q115 113 136 137Q145 147 170 174T204 211T233 244T261 278T284 308T305 340T320 369T333 401T340 431T343 464Q343 527 309 573T212 619Q179 619 154 602T119 569T109 550Q109 549 114 549Q132 549 151 535T170 489Q170 464 154 447T109 429Z\"></path></g></g></g></g></svg></mjx-container></span></span>a</li><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">y</span>b</li></ul>"
+  },
+  {
+    name: "marker: wide math (widthEx)",
+    latex: "\\begin{itemize}\n\\item[$x^4 + x^4$] a\n\\end{itemize}",
+    html: "<ul data-padding-inline-start=\"4.43em\" class=\"itemize\" style=\"padding-inline-start: 4.43em; list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\"><span class=\"math-inline \">\n<mjx-container class=\"MathJax\" jax=\"SVG\"><svg style=\"vertical-align: -0.186ex;\" xmlns=\"http://www.w3.org/2000/svg\" width=\"7.329ex\" height=\"2.09ex\" role=\"img\" focusable=\"false\" viewBox=\"0 -841.7 3239.6 923.7\"><g stroke=\"currentColor\" fill=\"currentColor\" stroke-width=\"0\" transform=\"scale(1,-1)\"><g data-mml-node=\"math\"><g data-mml-node=\"msup\"><g data-mml-node=\"mi\"><path data-c=\"1D465\" d=\"M52 289Q59 331 106 386T222 442Q257 442 286 424T329 379Q371 442 430 442Q467 442 494 420T522 361Q522 332 508 314T481 292T458 288Q439 288 427 299T415 328Q415 374 465 391Q454 404 425 404Q412 404 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145Q504 144 502 134Q486 77 440 33T333 -11Q263 -11 227 52Q186 -10 133 -10H127Q78 -10 57 16T35 71Q35 103 54 123T99 143Q142 143 142 101Q142 81 130 66T107 46T94 41L91 40Q91 39 97 36T113 29T132 26Q168 26 194 71Q203 87 217 139T245 247T261 313Q266 340 266 352Q266 380 251 392T217 404Q177 404 142 372T93 290Q91 281 88 280T72 278H58Q52 284 52 289Z\"></path></g><g data-mml-node=\"mn\" transform=\"translate(605,363) scale(0.707)\"><path data-c=\"34\" d=\"M462 0Q444 3 333 3Q217 3 199 0H190V46H221Q241 46 248 46T265 48T279 53T286 61Q287 63 287 115V165H28V211L179 442Q332 674 334 675Q336 677 355 677H373L379 671V211H471V165H379V114Q379 73 379 66T385 54Q393 47 442 46H471V0H462ZM293 211V545L74 212L183 211H293Z\"></path></g></g><g data-mml-node=\"mo\" transform=\"translate(1230.8,0)\"><path data-c=\"2B\" d=\"M56 237T56 250T70 270H369V420L370 570Q380 583 389 583Q402 583 409 568V270H707Q722 262 722 250T707 230H409V-68Q401 -82 391 -82H389H387Q375 -82 369 -68V230H70Q56 237 56 250Z\"></path></g><g data-mml-node=\"msup\" transform=\"translate(2231,0)\"><g data-mml-node=\"mi\"><path data-c=\"1D465\" d=\"M52 289Q59 331 106 386T222 442Q257 442 286 424T329 379Q371 442 430 442Q467 442 494 420T522 361Q522 332 508 314T481 292T458 288Q439 288 427 299T415 328Q415 374 465 391Q454 404 425 404Q412 404 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145Q504 144 502 134Q486 77 440 33T333 -11Q263 -11 227 52Q186 -10 133 -10H127Q78 -10 57 16T35 71Q35 103 54 123T99 143Q142 143 142 101Q142 81 130 66T107 46T94 41L91 40Q91 39 97 36T113 29T132 26Q168 26 194 71Q203 87 217 139T245 247T261 313Q266 340 266 352Q266 380 251 392T217 404Q177 404 142 372T93 290Q91 281 88 280T72 278H58Q52 284 52 289Z\"></path></g><g data-mml-node=\"mn\" transform=\"translate(605,363) scale(0.707)\"><path data-c=\"34\" d=\"M462 0Q444 3 333 3Q217 3 199 0H190V46H221Q241 46 248 46T265 48T279 53T286 61Q287 63 287 115V165H28V211L179 442Q332 674 334 675Q336 677 355 677H373L379 671V211H471V165H379V114Q379 73 379 66T385 54Q393 47 442 46H471V0H462ZM293 211V545L74 212L183 211H293Z\"></path></g></g></g></g></svg></mjx-container></span></span>a</li></ul>"
+  },
+  {
+    name: "marker: wide math on block-content path",
+    latex: "\\begin{itemize}\n\\item[$x^4 + x^4$] a\n\\begin{figure}\n\\caption{c}\n\\end{figure}\n\\end{itemize}",
+    html: "<ul data-padding-inline-start=\"4.43em\" class=\"itemize\" style=\"padding-inline-start: 4.43em; list-style-type: none\"><li class=\"li_itemize block\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\"><span class=\"math-inline \">\n<mjx-container class=\"MathJax\" jax=\"SVG\"><svg style=\"vertical-align: -0.186ex;\" xmlns=\"http://www.w3.org/2000/svg\" width=\"7.329ex\" height=\"2.09ex\" role=\"img\" focusable=\"false\" viewBox=\"0 -841.7 3239.6 923.7\"><g stroke=\"currentColor\" fill=\"currentColor\" stroke-width=\"0\" transform=\"scale(1,-1)\"><g data-mml-node=\"math\"><g data-mml-node=\"msup\"><g data-mml-node=\"mi\"><path data-c=\"1D465\" d=\"M52 289Q59 331 106 386T222 442Q257 442 286 424T329 379Q371 442 430 442Q467 442 494 420T522 361Q522 332 508 314T481 292T458 288Q439 288 427 299T415 328Q415 374 465 391Q454 404 425 404Q412 404 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145Q504 144 502 134Q486 77 440 33T333 -11Q263 -11 227 52Q186 -10 133 -10H127Q78 -10 57 16T35 71Q35 103 54 123T99 143Q142 143 142 101Q142 81 130 66T107 46T94 41L91 40Q91 39 97 36T113 29T132 26Q168 26 194 71Q203 87 217 139T245 247T261 313Q266 340 266 352Q266 380 251 392T217 404Q177 404 142 372T93 290Q91 281 88 280T72 278H58Q52 284 52 289Z\"></path></g><g data-mml-node=\"mn\" transform=\"translate(605,363) scale(0.707)\"><path data-c=\"34\" d=\"M462 0Q444 3 333 3Q217 3 199 0H190V46H221Q241 46 248 46T265 48T279 53T286 61Q287 63 287 115V165H28V211L179 442Q332 674 334 675Q336 677 355 677H373L379 671V211H471V165H379V114Q379 73 379 66T385 54Q393 47 442 46H471V0H462ZM293 211V545L74 212L183 211H293Z\"></path></g></g><g data-mml-node=\"mo\" transform=\"translate(1230.8,0)\"><path data-c=\"2B\" d=\"M56 237T56 250T70 270H369V420L370 570Q380 583 389 583Q402 583 409 568V270H707Q722 262 722 250T707 230H409V-68Q401 -82 391 -82H389H387Q375 -82 369 -68V230H70Q56 237 56 250Z\"></path></g><g data-mml-node=\"msup\" transform=\"translate(2231,0)\"><g data-mml-node=\"mi\"><path data-c=\"1D465\" d=\"M52 289Q59 331 106 386T222 442Q257 442 286 424T329 379Q371 442 430 442Q467 442 494 420T522 361Q522 332 508 314T481 292T458 288Q439 288 427 299T415 328Q415 374 465 391Q454 404 425 404Q412 404 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145Q504 144 502 134Q486 77 440 33T333 -11Q263 -11 227 52Q186 -10 133 -10H127Q78 -10 57 16T35 71Q35 103 54 123T99 143Q142 143 142 101Q142 81 130 66T107 46T94 41L91 40Q91 39 97 36T113 29T132 26Q168 26 194 71Q203 87 217 139T245 247T261 313Q266 340 266 352Q266 380 251 392T217 404Q177 404 142 372T93 290Q91 281 88 280T72 278H58Q52 284 52 289Z\"></path></g><g data-mml-node=\"mn\" transform=\"translate(605,363) scale(0.707)\"><path data-c=\"34\" d=\"M462 0Q444 3 333 3Q217 3 199 0H190V46H221Q241 46 248 46T265 48T279 53T286 61Q287 63 287 115V165H28V211L179 442Q332 674 334 675Q336 677 355 677H373L379 671V211H471V165H379V114Q379 73 379 66T385 54Q393 47 442 46H471V0H462ZM293 211V545L74 212L183 211H293Z\"></path></g></g></g></g></svg></mjx-container></span></span><div>a</div>\n<div class=\"table\" number=\"1\">\n<div></div>\n<div class=\"caption_figure\">Figure 1: c</div></div>\n</li></ul>"
+  },
+  {
+    name: "marker: edge whitespace trimmed",
+    latex: "\\begin{itemize}\n\\item[  wide  ] a\n\\end{itemize}",
+    html: "<ul data-padding-inline-start=\"3.17em\" class=\"itemize\" style=\"padding-inline-start: 3.17em; list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">wide</span>a</li></ul>"
+  },
+  {
+    name: "marker: plain wide (control)",
+    latex: "\\begin{itemize}\n\\item[wide] a\n\\end{itemize}",
+    html: "<ul data-padding-inline-start=\"3.17em\" class=\"itemize\" style=\"padding-inline-start: 3.17em; list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">wide</span>a</li></ul>"
+  },
+  {
+    name: "marker: bold \\textbf children",
+    latex: "\\begin{itemize}\n\\item[\\textbf{x^4 + x^4}] a\n\\end{itemize}",
+    html: "<ul data-padding-inline-start=\"5.77em\" class=\"itemize\" style=\"padding-inline-start: 5.77em; list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\"><strong>x^4 + x^4</strong></span>a</li></ul>"
+  },
+  {
+    name: "marker: long plain",
+    latex: "\\begin{itemize}\n\\item[longtext] a\n\\end{itemize}",
+    html: "<ul data-padding-inline-start=\"4.93em\" class=\"itemize\" style=\"padding-inline-start: 4.93em; list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">longtext</span>a</li></ul>"
+  },
+  {
+    name: "marker: wide capitals glyph class",
+    latex: "\\begin{itemize}\n\\item[WWWWWWWW] a\n\\end{itemize}",
+    html: "<ul data-padding-inline-start=\"9.42em\" class=\"itemize\" style=\"padding-inline-start: 9.42em; list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">WWWWWWWW</span>a</li></ul>"
+  },
+  {
+    name: "marker: code-span",
+    latex: "\\begin{itemize}\n\\item[`longtext`] a\n\\end{itemize}",
+    html: "<ul data-padding-inline-start=\"4.93em\" class=\"itemize\" style=\"padding-inline-start: 4.93em; list-style-type: none\"><li class=\"li_itemize block\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\"><code>longtext</code></span><div>a</div>\n</li></ul>"
+  },
+  {
+    name: "marker: html-tag visible text only",
+    latex: "\\begin{itemize}\n\\item[<b>longtext</b>] a\n\\end{itemize}",
+    html: "<ul data-padding-inline-start=\"4.93em\" class=\"itemize\" style=\"padding-inline-start: 4.93em; list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\"><b>longtext</b></span>a</li></ul>"
+  },
+  {
+    name: "marker: real long not clamped (22)",
+    latex: "\\begin{itemize}\n\\item[aaaaaaaaaaaaaaaaaaaaaa] a\n\\end{itemize}",
+    html: "<ul data-padding-inline-start=\"14.26em\" class=\"itemize\" style=\"padding-inline-start: 14.26em; list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">aaaaaaaaaaaaaaaaaaaaaa</span>a</li></ul>"
+  },
+  {
+    name: "marker: pathological clamp (60)",
+    latex: "\\begin{itemize}\n\\item[xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx] a\n\\end{itemize}",
+    html: "<ul data-padding-inline-start=\"20em\" class=\"itemize\" style=\"padding-inline-start: 20em; list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</span>a</li></ul>"
+  },
+  {
+    name: "marker: mixed text+math",
+    latex: "\\begin{itemize}\n\\item[abcd $x^4 + x^4$] a\n\\end{itemize}",
+    html: "<ul data-padding-inline-start=\"7.31em\" class=\"itemize\" style=\"padding-inline-start: 7.31em; list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">abcd <span class=\"math-inline \">\n<mjx-container class=\"MathJax\" jax=\"SVG\"><svg style=\"vertical-align: -0.186ex;\" xmlns=\"http://www.w3.org/2000/svg\" width=\"7.329ex\" height=\"2.09ex\" role=\"img\" focusable=\"false\" viewBox=\"0 -841.7 3239.6 923.7\"><g stroke=\"currentColor\" fill=\"currentColor\" stroke-width=\"0\" transform=\"scale(1,-1)\"><g data-mml-node=\"math\"><g data-mml-node=\"msup\"><g data-mml-node=\"mi\"><path data-c=\"1D465\" d=\"M52 289Q59 331 106 386T222 442Q257 442 286 424T329 379Q371 442 430 442Q467 442 494 420T522 361Q522 332 508 314T481 292T458 288Q439 288 427 299T415 328Q415 374 465 391Q454 404 425 404Q412 404 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145Q504 144 502 134Q486 77 440 33T333 -11Q263 -11 227 52Q186 -10 133 -10H127Q78 -10 57 16T35 71Q35 103 54 123T99 143Q142 143 142 101Q142 81 130 66T107 46T94 41L91 40Q91 39 97 36T113 29T132 26Q168 26 194 71Q203 87 217 139T245 247T261 313Q266 340 266 352Q266 380 251 392T217 404Q177 404 142 372T93 290Q91 281 88 280T72 278H58Q52 284 52 289Z\"></path></g><g data-mml-node=\"mn\" transform=\"translate(605,363) scale(0.707)\"><path data-c=\"34\" d=\"M462 0Q444 3 333 3Q217 3 199 0H190V46H221Q241 46 248 46T265 48T279 53T286 61Q287 63 287 115V165H28V211L179 442Q332 674 334 675Q336 677 355 677H373L379 671V211H471V165H379V114Q379 73 379 66T385 54Q393 47 442 46H471V0H462ZM293 211V545L74 212L183 211H293Z\"></path></g></g><g data-mml-node=\"mo\" transform=\"translate(1230.8,0)\"><path data-c=\"2B\" d=\"M56 237T56 250T70 270H369V420L370 570Q380 583 389 583Q402 583 409 568V270H707Q722 262 722 250T707 230H409V-68Q401 -82 391 -82H389H387Q375 -82 369 -68V230H70Q56 237 56 250Z\"></path></g><g data-mml-node=\"msup\" transform=\"translate(2231,0)\"><g data-mml-node=\"mi\"><path data-c=\"1D465\" d=\"M52 289Q59 331 106 386T222 442Q257 442 286 424T329 379Q371 442 430 442Q467 442 494 420T522 361Q522 332 508 314T481 292T458 288Q439 288 427 299T415 328Q415 374 465 391Q454 404 425 404Q412 404 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145Q504 144 502 134Q486 77 440 33T333 -11Q263 -11 227 52Q186 -10 133 -10H127Q78 -10 57 16T35 71Q35 103 54 123T99 143Q142 143 142 101Q142 81 130 66T107 46T94 41L91 40Q91 39 97 36T113 29T132 26Q168 26 194 71Q203 87 217 139T245 247T261 313Q266 340 266 352Q266 380 251 392T217 404Q177 404 142 372T93 290Q91 281 88 280T72 278H58Q52 284 52 289Z\"></path></g><g data-mml-node=\"mn\" transform=\"translate(605,363) scale(0.707)\"><path data-c=\"34\" d=\"M462 0Q444 3 333 3Q217 3 199 0H190V46H221Q241 46 248 46T265 48T279 53T286 61Q287 63 287 115V165H28V211L179 442Q332 674 334 675Q336 677 355 677H373L379 671V211H471V165H379V114Q379 73 379 66T385 54Q393 47 442 46H471V0H462ZM293 211V545L74 212L183 211H293Z\"></path></g></g></g></g></svg></mjx-container></span></span>a</li></ul>"
+  },
+  {
+    name: "marker: plain abcd (control for mixed)",
+    latex: "\\begin{itemize}\n\\item[abcd] a\n\\end{itemize}",
+    html: "<ul data-padding-inline-start=\"3.11em\" class=\"itemize\" style=\"padding-inline-start: 3.11em; list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">abcd</span>a</li></ul>"
+  },
+  {
+    name: "marker: astral emoji normal class (no padding)",
+    latex: "\\begin{itemize}\n\\item[😀😀] a\n\\item[x] b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">😀😀</span>a</li><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">x</span>b</li></ul>"
+  },
+  {
+    name: "marker: short abc keeps default (no attribute)",
+    latex: "\\begin{itemize}\n\\item[abc] a\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">abc</span>a</li></ul>"
+  },
+  {
+    name: "B2: deep numbering all default",
+    latex: "\\begin{itemize}\n\\item[1.] a\n\\item[2.] b\n\\begin{itemize}\n\\item[3.1] c\n\\begin{itemize}\n\\item[3.1.1.1] d\n\\item[3.1.1.2] e\n\\end{itemize}\n\\end{itemize}\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">1.</span>a</li><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">2.</span>b<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">3.1</span>c<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">3.1.1.1</span>d</li><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">3.1.1.2</span>e</li></ul></li></ul></li></ul>"
+  },
+  {
+    name: "B2: overflowing nested shortfall",
+    latex: "\\begin{itemize}\n\\item[1.] a\n\\begin{itemize}\n\\item[XXXXXXXXXXXX] b\n\\end{itemize}\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">1.</span>a<ul data-padding-inline-start=\"8.93em\" class=\"itemize\" style=\"padding-inline-start: 8.93em; list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">XXXXXXXXXXXX</span>b</li></ul></li></ul>"
+  },
+  {
+    name: "B2: wider parent absorbs child",
+    latex: "\\begin{itemize}\n\\item[11.33] a\n\\begin{itemize}\n\\item[XXXXX] b\n\\end{itemize}\n\\end{itemize}",
+    html: "<ul data-padding-inline-start=\"3.51em\" class=\"itemize\" style=\"padding-inline-start: 3.51em; list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">11.33</span>a<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">XXXXX</span>b</li></ul></li></ul>"
+  },
+  {
+    name: "B2: order A nested before wide parent",
+    latex: "\\begin{itemize}\n\\item[a] x\n\\begin{itemize}\n\\item[LONGCHILD] y\n\\end{itemize}\n\\item[VERYLONGPARENT] z\n\\end{itemize}",
+    html: "<ul data-padding-inline-start=\"13.23em\" class=\"itemize\" style=\"padding-inline-start: 13.23em; list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">a</span>x<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">LONGCHILD</span>y</li></ul></li><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">VERYLONGPARENT</span>z</li></ul>"
+  },
+  {
+    name: "B2: order B wide parent before nested",
+    latex: "\\begin{itemize}\n\\item[VERYLONGPARENT] z\n\\item[a] x\n\\begin{itemize}\n\\item[LONGCHILD] y\n\\end{itemize}\n\\end{itemize}",
+    html: "<ul data-padding-inline-start=\"13.23em\" class=\"itemize\" style=\"padding-inline-start: 13.23em; list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">VERYLONGPARENT</span>z</li><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">a</span>x<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">LONGCHILD</span>y</li></ul></li></ul>"
+  },
+  {
+    name: "B2: cumulative clamp two 60-char levels",
+    latex: "\\begin{itemize}\n\\item[xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx] a\n\\begin{itemize}\n\\item[yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy] b\n\\end{itemize}\n\\end{itemize}",
+    html: "<ul data-padding-inline-start=\"20em\" class=\"itemize\" style=\"padding-inline-start: 20em; list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</span>a<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy</span>b</li></ul></li></ul>"
+  },
+  {
+    name: "B2: nested same-line",
+    latex: "\\begin{itemize}\n\\item[1.] a \\begin{itemize} \\item[XXXXXXXXXXXX] d \\end{itemize}\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">1.</span>a<ul data-padding-inline-start=\"8.93em\" class=\"itemize\" style=\"padding-inline-start: 8.93em; list-style-type: none\"> <li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">XXXXXXXXXXXX</span>d</li></ul></li></ul>"
+  },
+  {
+    name: "B2: nested own-line",
+    latex: "\\begin{itemize}\n\\item[1.] a\n\\begin{itemize}\n\\item[XXXXXXXXXXXX] d\n\\end{itemize}\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">1.</span>a<ul data-padding-inline-start=\"8.93em\" class=\"itemize\" style=\"padding-inline-start: 8.93em; list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">XXXXXXXXXXXX</span>d</li></ul></li></ul>"
+  },
+  {
+    name: "B2: nested single-line",
+    latex: "\\begin{itemize}\\item[1.] a \\begin{itemize}\\item[XXXXXXXXXXXX] d\\end{itemize}\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">1.</span>a<ul data-padding-inline-start=\"8.93em\" class=\"itemize\" style=\"padding-inline-start: 8.93em; list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">XXXXXXXXXXXX</span>d</li></ul></li></ul>"
+  },
+  {
+    name: "B2: single-line flat wide marker",
+    latex: "\\begin{itemize}\\item[XXXXXXXXXXXX] d\\end{itemize}",
+    html: "<ul data-padding-inline-start=\"11.43em\" class=\"itemize\" style=\"padding-inline-start: 11.43em; list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">XXXXXXXXXXXX</span>d</li></ul>"
+  },
+  {
+    name: "B2: wide marker in table cell",
+    latex: "| a |\n|---|\n| \\begin{itemize}\\item[XXXXXXXXXXXX] d\\end{itemize} |",
+    html: "<table align=\"center\">\n<thead>\n<tr>\n<th>a</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td><ul data-padding-inline-start=\"11.43em\" class=\"itemize\" style=\"padding-inline-start: 11.43em; list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">XXXXXXXXXXXX</span>d</li></ul></td>\n</tr>\n</tbody>\n</table>\n"
+  },
+  {
+    name: "empty<>: figure-list then unclosed tabular-list",
+    latex: "\\begin{itemize}\n\\item[11.33] a\n\\begin{figure}\n\\caption{Fig}\n\\end{figure}\n\\end{itemize}\n\n\\begin{itemize}\n\\item[(d1)] b\n\\begin{tabular}{|l|l|}\ncell\n\\end{tabular}\n\\begin{itemize}",
+    html: "<ul data-padding-inline-start=\"3.51em\" class=\"itemize\" style=\"padding-inline-start: 3.51em; list-style-type: none\"><li class=\"li_itemize block\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">11.33</span><div>a</div>\n<div class=\"table\" number=\"1\">\n<div></div>\n<div class=\"caption_figure\">Figure 1: Fig</div></div>\n</li></ul><div>\\begin{itemize}<br>\n\\item[(d1)] b</div>\n<div class=\"table_tabular\" style=\"text-align: center\">\n<div class=\"inline-tabular\"><table class=\"tabular\">\n<tbody>\n<tr style=\"border-top: none !important; border-bottom: none !important;\">\n<td style=\"text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; \">cell</td>\n</tr>\n</tbody>\n</table>\n</div></div>\n<div>\\begin{itemize}</div>\n"
+  },
+  {
+    name: "empty<>: tabular-list then unclosed figure-list",
+    latex: "\\begin{itemize}\n\\item[a] x\n\\begin{tabular}{|l|l|}\ncell\n\\end{tabular}\n\\end{itemize}\n\n\\begin{itemize}\n\\item[b] y\n\\begin{figure}\n\\caption{Fig}\n\\end{figure}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">a</span><div>x</div>\n<div class=\"table_tabular\">\n<div class=\"inline-tabular\"><table class=\"tabular\">\n<tbody>\n<tr style=\"border-top: none !important; border-bottom: none !important;\">\n<td style=\"text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; \">cell</td>\n</tr>\n</tbody>\n</table>\n</div></div>\n</li></ul><div>\\begin{itemize}<br>\n\\item[b] y</div>\n<div class=\"table\" number=\"1\">\n<div></div>\n<div class=\"caption_figure\">Figure 1: Fig</div></div>\n"
+  },
+  {
+    name: "footnote after heading recognized",
+    latex: "# Heading\ntext with \\footnote{a note}",
+    html: "<h1 id=\"heading\">Heading</h1>\n<div>text with <sup class=\"footnote-ref\"><a href=\"#fn1\" id=\"fnref1\">[1]</a></sup></div>\n<hr class=\"footnotes-sep\">\n<section class=\"footnotes\" style=\"margin-bottom: 1em;\">\n<ol class=\"footnotes-list\" style=\"margin-bottom: 0;\">\n<li id=\"fn1\" class=\"footnote-item\"><div>a note <a href=\"#fnref1\" class=\"footnote-backref\">↩︎</a></div>\n</li>\n</ol>\n</section>\n"
+  },
+  {
+    name: "footnote after tabular recognized",
+    latex: "\\begin{tabular}{|l|}\ncell\n\\end{tabular}\ntext \\footnote{a note}",
+    html: "<div class=\"table_tabular\" style=\"text-align: center\">\n<div class=\"inline-tabular\"><table class=\"tabular\">\n<tbody>\n<tr style=\"border-top: none !important; border-bottom: none !important;\">\n<td style=\"text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; \">cell</td>\n</tr>\n</tbody>\n</table>\n</div></div>\n<div>text <sup class=\"footnote-ref\"><a href=\"#fn1\" id=\"fnref1\">[1]</a></sup></div>\n<hr class=\"footnotes-sep\">\n<section class=\"footnotes\" style=\"margin-bottom: 1em;\">\n<ol class=\"footnotes-list\" style=\"margin-bottom: 0;\">\n<li id=\"fn1\" class=\"footnote-item\"><div>a note <a href=\"#fnref1\" class=\"footnote-backref\">↩︎</a></div>\n</li>\n</ol>\n</section>\n"
+  },
+  {
+    name: "core-md list before footnote not swallowed",
+    latex: "Para text.\n- item one\n- item two\ntail \\footnote{a note}",
+    html: "<div>Para text.</div>\n<ul>\n<li>item one</li>\n<li>item two<br>\ntail <sup class=\"footnote-ref\"><a href=\"#fn1\" id=\"fnref1\">[1]</a></sup></li>\n</ul>\n<hr class=\"footnotes-sep\">\n<section class=\"footnotes\" style=\"margin-bottom: 1em;\">\n<ol class=\"footnotes-list\" style=\"margin-bottom: 0;\">\n<li id=\"fn1\" class=\"footnote-item\"><div>a note <a href=\"#fnref1\" class=\"footnote-backref\">↩︎</a></div>\n</li>\n</ol>\n</section>\n"
+  },
+  {
+    name: "\\item detection: \\itemsep in body no extra item",
+    latex: "\\begin{itemize}\n\\item first \\setlength{\\itemsep}{0pt} rest\n\\item second\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>first \\setlength{\\itemsep}{0pt} rest</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>second</li></ul>"
+  },
+  {
+    name: "\\item detection: \\itemindent at start no extra item",
+    latex: "\\begin{itemize}\n\\item[] \\itemindent=2em some text\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\"><span class=\"li_level\" data-custom-marker=\"true\" data-marker-empty=\"true\"></span>\\itemindent=2em some text</li></ul>"
+  },
+  {
+    name: "\\item detection: \\itemsep inline no extra item",
+    latex: "\\begin{itemize}\\item a \\itemsep b\\item c\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a \\itemsep b</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>c</li></ul>"
+  },
+  {
+    name: "\\item detection: real \\item still splits",
+    latex: "\\begin{itemize}\\item a\\item b\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
 ];

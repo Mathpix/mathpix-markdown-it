@@ -27,7 +27,7 @@ export declare const ListItemsBlock: (state: any, items: ParsedListItem[] | null
  */
 export declare const ListItems: (state: StateBlock | StateInline, items: ParsedListItem[], itemizeLevelTokens: Token[][], enumerateLevelTypes: string[], li: {
     value: number;
-} | null, iOpen: number, itemizeLevelContents: string[]) => ListItemsResult;
+} | null, iOpen: number, itemizeLevelContents: string[], openTokens: Token[], allListTokens: Token[]) => ListItemsResult;
 /**
  * Splits a line of LaTeX list content into logical items based on `\item`
  * and appends them to the given `items` array.
@@ -63,7 +63,7 @@ export declare const ItemsListPush: (items: ParsedListItem[], content: string, s
 export declare const ItemsAddToPrev: (items: ParsedListItem[], lineText: string, nextLine: number) => ParsedListItem[];
 export declare const finalizeListItems: (state: StateBlock | StateInline, items: ParsedListItem[], itemizeLevelTokens: Token[][], enumerateLevelTypes: string[], li: {
     value: number;
-} | null, iOpen: number, itemizeLevelContents: string[], tokenStart: Token | null) => {
+} | null, iOpen: number, itemizeLevelContents: string[], openTokens: Token[], allListTokens: Token[]) => {
     iOpen: number;
     items: any[];
     li: any;

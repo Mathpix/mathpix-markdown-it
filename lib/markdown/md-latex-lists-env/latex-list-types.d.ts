@@ -8,11 +8,12 @@ export interface ListInlineContext {
     li: {
         value: any;
     } | null;
-    padding: number;
     iOpen: number;
     itemizeLevelTokens: Token[][];
     enumerateLevelTypes: string[];
     itemizeLevelContents: string[];
+    openTokens: Token[];
+    allListTokens: Token[];
 }
 export interface ParsedListItem {
     startLine: number;
@@ -21,7 +22,6 @@ export interface ParsedListItem {
 }
 export interface ListItemsResult {
     iOpen: number;
-    padding: number;
 }
 export interface ListOpenResult {
     iOpen: number;

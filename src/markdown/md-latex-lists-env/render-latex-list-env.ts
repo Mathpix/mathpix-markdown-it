@@ -115,7 +115,7 @@ const list_injectLineNumbers = (tokens, idx, className = '') => {
  *      - `<ul ... style="list-style-type: none">` for nested lists,
  *      - optionally wraps nested `<ul>` in `<li>` when a list is directly
  *        nested under another `itemize_list_open`.
- *  - For top-level lists, respects `data-padding-inline-start` attribute
+ *  - Respects `data-padding-inline-start` (top-level and nested)
  *    (translating it into inline CSS `padding-inline-start`).
  */
 export const render_itemize_list_open: Renderer.RenderRule = (
@@ -183,7 +183,7 @@ export const render_itemize_list_open: Renderer.RenderRule = (
  *  - Adds CSS class `enumerate <style>` (e.g. `enumerate decimal`).
  *  - Injects line-numbering attributes when `options.lineNumbering` is enabled.
  *  - For DOCX (`options.forDocx`), adds `data-list-style-type="<style>"`.
- *  - For top-level lists, respects `data-padding-inline-start` attribute
+ *  - Respects `data-padding-inline-start` (top-level and nested)
  *    and converts it into inline `padding-inline-start` CSS.
  */
 export const render_enumerate_list_open: Renderer.RenderRule = (
@@ -216,7 +216,7 @@ export const render_enumerate_list_open: Renderer.RenderRule = (
   } else {
     token.attrJoin("class", className);
   }
-  // Map data-padding-inline-start → inline CSS for top-level lists
+  // Map data-padding-inline-start → inline CSS (top-level and nested)
   const paddingInlineStyle = markerPaddingStyle(token.attrGet("data-padding-inline-start"));
   // DOCX: pass style type to consumer
   if (options.forDocx) {
