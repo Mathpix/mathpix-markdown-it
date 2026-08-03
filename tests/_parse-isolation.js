@@ -164,6 +164,12 @@ describe('silent-mode Lists probe memo', () => {
     ['env.prentLevel', (s) => { s.env.prentLevel = 3; }],
     ['state.types', (s) => { s.types = ['itemize']; }],
     ['state.level', (s) => { s.level = 3; }],
+    ['state.blkIndent', (s) => { s.blkIndent = 2; }],
+    ['state.bMarks/tShift', (s) => {
+      s.src = '  ' + s.src;
+      s.bMarks = s.bMarks.map((v) => v + 2);
+      s.eMarks = s.eMarks.map((v) => v + 2);
+    }],
   ].forEach(([field, mutate]) => {
     [{ name: 'closed', src: closed }, { name: 'unclosed', src: unclosed }].forEach(({ name, src }) => {
       it(`a cached answer for a ${name} list survives a change to ${field}`, () => {

@@ -9,6 +9,7 @@ const { mathpixMarkdownPlugin } = require('../lib/index.js');
 const { FontMetrics } = require('../lib/markdown/common/text-dimentions');
 const { MARKER_GAP_EM, LIST_DEFAULT_INDENT_EM, DEFAULT_FONT_SIZE_PX, DEFAULT_EX_PX } = require('../lib/markdown/common/consts');
 const { resolveListPadding } = require('../lib/markdown/md-latex-lists-env/latex-list-items');
+const { processListChildToken } = require('../lib/markdown/md-latex-lists-env/latex-list-tokens');
 const { render_itemize_list_open } = require('../lib/markdown/md-latex-lists-env/render-latex-list-env');
 const Token = require('markdown-it/lib/token');
 
@@ -109,6 +110,13 @@ describe('List marker padding — reserve covers the true glyph width (Arial):',
         .should.be.at.least(trueEm(wide) + MARKER_GAP_EM);
     });
   });
+  // Code spans render monospace, so the reserve must clear the widest mono advance, not Arial's
+  // narrow classes. 0.6em is DM Mono, the widest face `code` uses.
+  [['`iiiiiiiiii`', 10], ['\\texttt{iiiiiiiiii}', 10], ['`....`', 4]].forEach(([marker, chars]) => {
+    it('reserves the monospace width for "' + marker + '"', () => {
+      indentEm(marker).should.be.at.least(chars * 0.6 + MARKER_GAP_EM);
+    });
+  });
   it('resolves the nested reserve for a sublist inside a tabular cell in an item', () => {
     const html = render('\\begin{itemize}\n\\item[a]\n\\begin{tabular}{|l|}\n\\begin{itemize}\\item[' +
       wide + '] y\\end{itemize}\n\\end{tabular}\n\\end{itemize}');
@@ -163,5 +171,31 @@ describe('resolveListPadding — malformed depth is tolerated (no throw):', () =
       const pad = t['data-padding-inline-start'];
       if (pad !== undefined) pad.should.match(/^\d+(\.\d+)?em$/);
     });
+  });
+});
+
+describe('processListChildToken — an unpaired close does not steal the outer list:', () => {
+  // The block path pops the registry by identity; this pins the inline path's equivalent guard,
+  // reachable only as a unit test (a stray close cannot be produced from public input).
+  const mkState = () => ({
+    tokens: [], types: ['itemize'], startLine: 0, prentLevel: 0, md: { options: {} },
+    push: () => new Token('x', '', 0),
+  });
+  const mkCtx = (openTokens) => ({
+    li: null, iOpen: 1, itemizeLevelTokens: [], enumerateLevelTypes: [],
+    itemizeLevelContents: [], openTokens, allListTokens: [...openTokens],
+  });
+  it('a stray enumerate_list_close leaves the itemize registry entry in place', () => {
+    const outer = new Token('itemize_list_open', 'ul', 1);
+    const state = mkState();
+    const ctx = mkCtx([outer]);
+    processListChildToken(state, { startLine: 0, endLine: 0 }, new Token('enumerate_list_close', 'ol', -1), ctx);
+    ctx.openTokens.should.have.lengthOf(1);
+    // The next wide marker must still be attributed to the outer list.
+    const item = new Token('latex_list_item_open', 'li', 1);
+    item.marker = 'XXXXXXXXXXXX';
+    item.markerTokens = [Object.assign(new Token('text', '', 0), { content: 'XXXXXXXXXXXX' })];
+    processListChildToken(state, { startLine: 0, endLine: 0 }, item, ctx);
+    outer.padding.should.be.above(LIST_DEFAULT_INDENT_EM);
   });
 });

@@ -30,6 +30,9 @@ const NORMAL_EM = 0.62;
 const WIDE_EM = 0.90;
 const XWIDE_EM = 1.10;
 const CJK_EM = 1.20;                               // East-Asian full-width glyph
+// Monospace advance, covering the faces `code` uses (Inconsolata 0.5em, DM Mono 0.6em).
+const MONO_EM = 0.62;
+const MONO_TOKEN_TYPES = new Set<string>(['code_inline', 'texttt']);
 
 // ASCII fast path — those classes are ASCII-only. Built from the same regexes, so it can't drift.
 const ASCII_EM: Float64Array = (() => {
@@ -65,41 +68,33 @@ export const isWideChar = (cp: number): boolean =>
   (cp >= 0xFF00 && cp <= 0xFF60) ||   // Fullwidth Forms
   (cp >= 0xFFE0 && cp <= 0xFFE6));    // Fullwidth signs
 
-// Width class of a non-ASCII code point. The ASCII classes can't see these letters, so split by
-// case: uppercase runs widest (`Љ` is 1.06em in Arial), everything else fits the wide class.
-const CLASS_EM: number[] = [0, 0, CJK_EM, XWIDE_EM, WIDE_EM];
-const classifyNonAscii = (cp: number): number => {
-  if (isZeroWidthCombining(cp)) {
-    return 1;
+// Only the case test below allocates, so only its result is worth caching — the wide and
+// zero-width checks are range comparisons. Never invalidated: a code point's class is fixed,
+// unlike the per-parse caches elsewhere in the parser.
+const casedEm: Map<number, number> = new Map();
+
+// Reserve for one non-ASCII code point in em.
+const nonAsciiEm = (cp: number): number => {
+  // A combining mark renders over the base glyph; a lone surrogate is broken input, not a glyph.
+  if (isZeroWidthCombining(cp) || (cp >= 0xD800 && cp <= 0xDFFF)) {
+    return 0;
   }
   if (isWideChar(cp)) {
-    return 2;
+    return CJK_EM;
   }
-  const ch: string = String.fromCodePoint(cp);
-  return ch !== ch.toLowerCase() && ch === ch.toUpperCase() ? 3 : 4;
-};
-
-// Cached per code point (the case test allocates, and markers repeat characters) in a fixed
-// 64 KB table rather than a growing Map; allocated on the first non-ASCII char measured.
-let bmpClass: Uint8Array | null = null;
-const nonAsciiEm = (cp: number): number => {
-  if (cp > 0xFFFF) {
-    return CLASS_EM[classifyNonAscii(cp)];
+  let em: number | undefined = casedEm.get(cp);
+  if (em === undefined) {
+    // The ASCII classes can't see these letters; uppercase runs widest (`Љ` is 1.06em in Arial).
+    const ch: string = String.fromCodePoint(cp);
+    em = ch !== ch.toLowerCase() && ch === ch.toUpperCase() ? XWIDE_EM : WIDE_EM;
+    casedEm.set(cp, em);
   }
-  if (!bmpClass) {
-    bmpClass = new Uint8Array(0x10000);
-  }
-  let cls: number = bmpClass[cp];
-  if (cls === 0) {
-    cls = classifyNonAscii(cp);
-    bmpClass[cp] = cls;
-  }
-  return CLASS_EM[cls];
+  return em;
 };
 
 /**
  * Reserve for a run of text in em: sum of per-char class widths. ASCII by the class table,
- * combining marks 0, East-Asian wide CJK_EM, other non-ASCII by case (see classifyNonAscii).
+ * combining marks 0, East-Asian wide CJK_EM, other non-ASCII by case (see nonAsciiEm).
  */
 export const textReserveEm = (str: string): number => {
   let em = 0;
@@ -133,6 +128,10 @@ export const tokenMarkerWidth = (token: WidthToken): number => {
   // Math with no widthEx → 0 (don't measure content; that would be a fabricated estimate).
   if (token.type && MATH_TOKEN_TYPES.has(token.type)) {
     return 0;
+  }
+  // These render as `<code>` in a monospace face, where the glyph-class estimate underreserves.
+  if (token.type && MONO_TOKEN_TYPES.has(token.type)) {
+    return (token.content ?? '').length * MONO_EM;
   }
   if (token.children && token.children.length) {
     let em = 0;

@@ -614,8 +614,11 @@ export const Lists: RuleBlock = (
   // A silent probe answers "does a closed list env start here?", which needs the full
   // speculative parse. Paragraph/footnote terminator scans re-ask it for the same line many
   // times, so memoize per state. Key covers every input the answer depends on.
+  // Includes the line offset and blkIndent: `state.src` alone does not pin what a line contains,
+  // since blockquote shifts bMarks/tShift for the same line numbers on the same state.
   const probeKey: string = silent
-    ? `${startLine}:${endLine}:${state.parentType}:${state.prentLevel}:${(state.env as any)?.inheritedListType}`
+    ? `${startLine}:${endLine}:${state.bMarks[startLine] + state.tShift[startLine]}:${state.blkIndent}` +
+      `:${state.parentType}:${state.prentLevel}:${(state.env as any)?.inheritedListType}`
     : '';
   if (silent) {
     const cached: boolean | undefined = getCachedListProbe(state, probeKey);

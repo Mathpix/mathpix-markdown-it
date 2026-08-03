@@ -63,6 +63,17 @@ describe('display-width: tokenMarkerWidth (em)', () => {
     tokenMarkerWidth({ type: 'textbf', children: [{ type: 'text', content: 'abc' }] }).should.be.closeTo(1.86, 1e-9));
   it('unknown non-math token with no children → 0', () =>
     tokenMarkerWidth({ type: 'softbreak' }).should.equal(0));
+  it('code_inline and texttt use the monospace advance, not the glyph classes', () => {
+    // They render as `<code>`; a glyph-class estimate underreserves narrow chars there.
+    tokenMarkerWidth({ type: 'code_inline', content: 'iiiiiiiiii' }).should.be.closeTo(6.2, 1e-9);
+    tokenMarkerWidth({ type: 'texttt', content: 'iiiiiiiiii', children: [{ type: 'text', content: 'iiiiiiiiii' }] })
+      .should.be.closeTo(6.2, 1e-9);
+  });
+  it('a lone surrogate reserves nothing', () => {
+    tokenMarkerWidth({ type: 'text', content: '\uD800' }).should.equal(0);
+    tokenMarkerWidth({ type: 'text', content: 'a\uD800b' })
+      .should.be.closeTo(tokenMarkerWidth({ type: 'text', content: 'ab' }), 1e-9);
+  });
   it('html_inline is not measured (content is markup) → 0', () =>
     tokenMarkerWidth({ type: 'html_inline', content: '<span style="color:red">' }).should.equal(0));
 });

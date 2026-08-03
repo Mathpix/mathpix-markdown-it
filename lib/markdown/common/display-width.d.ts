@@ -14,7 +14,7 @@ interface WidthToken {
 export declare const isWideChar: (cp: number) => boolean;
 /**
  * Reserve for a run of text in em: sum of per-char class widths. ASCII by the class table,
- * combining marks 0, East-Asian wide CJK_EM, other non-ASCII by case (see classifyNonAscii).
+ * combining marks 0, East-Asian wide CJK_EM, other non-ASCII by case (see nonAsciiEm).
  */
 export declare const textReserveEm: (str: string) => number;
 /**

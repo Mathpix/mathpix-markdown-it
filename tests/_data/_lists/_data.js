@@ -1190,7 +1190,7 @@ module.exports = [
   {
     name: "marker: code-span",
     latex: "\\begin{itemize}\n\\item[`longtext`] a\n\\end{itemize}",
-    html: "<ul data-padding-inline-start=\"4.93em\" class=\"itemize\" style=\"padding-inline-start: 4.93em; list-style-type: none\"><li class=\"li_itemize block\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\"><code>longtext</code></span><div>a</div>\n</li></ul>"
+    html: "<ul data-padding-inline-start=\"5.59em\" class=\"itemize\" style=\"padding-inline-start: 5.59em; list-style-type: none\"><li class=\"li_itemize block\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\"><code>longtext</code></span><div>a</div>\n</li></ul>"
   },
   {
     name: "marker: html-tag visible text only",

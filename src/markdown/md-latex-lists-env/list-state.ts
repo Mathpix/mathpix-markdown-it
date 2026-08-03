@@ -19,15 +19,21 @@ export interface ListLevelState {
 let listLevels: ListLevelState[] = [];
 let currentListDepth: number = -1; // -1 means “not inside a list”
 
-// Speculative parses reach these diagnostics once per offending line, so warn once per parse
-// (reset below): a desynced depth would otherwise flood a consumer's log on every probe.
+// Speculative parses reach these diagnostics once per offending line, so a desync would flood a
+// consumer's log. Report each distinct depth once per parse (reset below), then cap the rest —
+// a repeat carries no new information, but a different depth does.
+const WARN_LIMIT = 5;
 const warned: Set<string> = new Set();
-const warnOnce = (key: string, ...args: any[]): void => {
+const warnDistinct = (key: string, ...args: any[]): void => {
   if (warned.has(key)) {
     return;
   }
   warned.add(key);
-  console.warn(...args);
+  if (warned.size <= WARN_LIMIT) {
+    console.warn(...args);
+  } else if (warned.size === WARN_LIMIT + 1) {
+    console.warn('[list-state] further list-depth diagnostics suppressed for this parse');
+  }
 };
 
 /**
@@ -58,7 +64,8 @@ export const enterListLevel = (): void => {
  */
 export const leaveListLevel = (): void => {
   if (currentListDepth < 0) {
-    warnOnce('leave', '[list-state] Attempt to leave list level while depth = -1');
+    warnDistinct('leave:' + currentListDepth,
+      '[list-state] Attempt to leave list level while depth = -1');
     return;
   }
   currentListDepth--;
@@ -90,7 +97,7 @@ export const getCurrentListLevelState = (): ListLevelState | undefined => {
 export const incrementItemCount = (): void => {
   const level = getCurrentListLevelState();
   if (!level) {
-    warnOnce('increment',
+    warnDistinct('increment:' + currentListDepth,
       '[list-state] incrementItemCount called outside of any list level',
       {
         currentListDepth,
