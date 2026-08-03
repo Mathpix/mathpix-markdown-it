@@ -308,6 +308,29 @@ export const StatePushTabularBlock = (state, startLine: number, nextLine: number
   }
 };
 
+// Per-state offset of the last tabular closer, invalidated when `state.src` is reassigned. Own
+// regex instance: `closeTagG` is used with `match` elsewhere and this one carries a lastIndex.
+const TABULAR_END_POS_KEY = Symbol('mmd.tabularEndPos');
+const CLOSE_TAG_SWEEP_G: RegExp = new RegExp(closeTag.source, 'g');
+type TabularEndCache = { src: string; lastPos: number };
+
+const lastTabularEndPos = (state): number => {
+  const slot = state as unknown as Record<symbol, TabularEndCache | undefined>;
+  const cached = slot[TABULAR_END_POS_KEY];
+  if (cached && cached.src === state.src) {
+    return cached.lastPos;
+  }
+  CLOSE_TAG_SWEEP_G.lastIndex = 0;
+  let lastPos: number = -1;
+  let m: RegExpExecArray | null;
+  while ((m = CLOSE_TAG_SWEEP_G.exec(state.src)) !== null) {
+    lastPos = m.index;
+  }
+  CLOSE_TAG_SWEEP_G.lastIndex = 0;
+  slot[TABULAR_END_POS_KEY] = { src: state.src, lastPos };
+  return lastPos;
+};
+
 export const BeginTabular: RuleBlock = (state, startLine: number, endLine: number, silent) => {
   let pos: number = state.bMarks[startLine] + state.tShift[startLine];
   let max: number = state.eMarks[startLine];
@@ -318,6 +341,10 @@ export const BeginTabular: RuleBlock = (state, startLine: number, endLine: numbe
     return false;
   }
   if (!openTagTabular.test(lineText)) {
+    return false;
+  }
+  // No closer left in the source: the scan below can only end in `!isCloseTagExist`, so skip it.
+  if (lastTabularEndPos(state) < state.bMarks[startLine]) {
     return false;
   }
   let isCloseTagExist = false;

@@ -18,6 +18,17 @@ export type RenderTableCellContentResult = {
   tableSmoothed: string;
 };
 
+// A token that was itself rendered as a table carries its smoothed lines; everything else is
+// smoothed as rendered. Shared by the main loop and the link loop so the two cannot drift.
+const smoothedFor = (child, rendered: string): string => {
+  if (!Array.isArray(child.tableSmoothed)) {
+    return rendered;
+  }
+  return child.tableSmoothed.length > 0
+    ? child.tableSmoothed.map(item => typeof item === 'string' ? item : item.join(' ')).join(' <br> ')
+    : '';
+};
+
 /**
  * Renders a table cell token into multiple parallel representations:
  * HTML/text (`content`), TSV, CSV, Markdown (`tableMd`), and a "smoothed" variant
@@ -75,11 +86,7 @@ export const renderTableCellContent = (
         child.meta = { ...(child.meta ?? {}), isTableCell: true };
       }
       let rendered = slf.renderInline([child], options, env);
-      const smoothedRendered = Array.isArray(child.tableSmoothed)
-        ? child.tableSmoothed?.length > 0
-          ? child.tableSmoothed.map(item => typeof item === 'string' ? item : item.join(' ')).join(' <br> ')
-          : ''
-        : rendered;
+      const smoothedRendered: string = smoothedFor(child, rendered);
       smoothedCell += smoothedRendered;
       content += options.forPptx ? smoothedRendered : rendered;
 
@@ -126,7 +133,7 @@ export const renderTableCellContent = (
               content += innerRendered;
               // The loop consumes these, so the smoothed accumulator would otherwise keep the
               // opening `<a>` with no text and no closing tag.
-              smoothedCell += innerRendered;
+              smoothedCell += smoothedFor(inner, innerRendered);
             }
           }
           continue;

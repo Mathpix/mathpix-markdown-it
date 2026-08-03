@@ -1218,10 +1218,10 @@ module.exports = [
     html: "<ul data-padding-inline-start=\"3.11em\" class=\"itemize\" style=\"padding-inline-start: 3.11em; list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">abcd</span>a</li></ul>"
   },
   {
-    // Astral chars are caseless → wide class; 2×0.90+0.625 < 2.5em, so the default indent stays.
-    name: "marker: astral emoji wide class (no padding)",
+    // Emoji are East-Asian Wide, same as a BMP ideograph: 2×1.20+0.625 overflows the 2.5em default.
+    name: "marker: astral emoji reserve the CJK width",
     latex: "\\begin{itemize}\n\\item[😀😀] a\n\\item[x] b\n\\end{itemize}",
-    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">😀😀</span>a</li><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">x</span>b</li></ul>"
+    html: "<ul data-padding-inline-start=\"3.03em\" class=\"itemize\" style=\"padding-inline-start: 3.03em; list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">😀😀</span>a</li><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">x</span>b</li></ul>"
   },
   {
     name: "marker: short abc keeps default (no attribute)",

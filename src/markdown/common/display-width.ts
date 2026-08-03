@@ -6,12 +6,14 @@ const MATH_TOKEN_TYPES = new Set<string>(mathTokenTypes);
 // `code_inline` is absent on purpose: it is handled earlier, by the monospace branch.
 const TEXT_LIKE_TYPES = new Set<string>(['text', 'text_special']);
 
-// Combining marks: they render over the base glyph, so they reserve nothing.
-const isZeroWidthCombining = (cp: number): boolean =>
+// Code points that add no advance: they render over the base glyph, join it, or select a variant.
+const isZeroWidthChar = (cp: number): boolean =>
   (cp >= 0x0300 && cp <= 0x036F) ||   // Combining Diacritical Marks
   (cp >= 0x1AB0 && cp <= 0x1AFF) ||   // ... Extended
+  (cp >= 0x200B && cp <= 0x200F) ||   // zero-width space/non-joiner/joiner, bidi marks
   (cp >= 0x20D0 && cp <= 0x20F0) ||   // ... for Symbols
-  (cp >= 0xFE20 && cp <= 0xFE2F) ||   // Combining Half Marks
+  (cp >= 0xFE00 && cp <= 0xFE0F) ||   // Variation Selectors
+  (cp >= 0xFE20 && cp <= 0xFE2F) ||   // Combining Half Marks (Vertical Forms sit between: wide)
   cp === 0x3099 || cp === 0x309A;     // Katakana voiced marks (inside the wide range below)
 
 // Minimal shape tokenMarkerWidth reads (a subset of markdown-it's Token).
@@ -50,13 +52,12 @@ const ASCII_EM: Float64Array = (() => {
 
 /**
  * Whether a code point is an East-Asian Wide/Fullwidth character, which renders
- * roughly twice as wide as an ASCII character. Approximation of Unicode's East
- * Asian Width property covering the BMP ranges. Astral characters (emoji, CJK
- * Ext-B+) are out of range. Combining marks are excluded here and reserve 0 —
- * see isZeroWidthCombining.
+ * roughly twice as wide as an ASCII character. Block-level approximation of Unicode's
+ * East Asian Width property, over the BMP and the astral blocks that are Wide.
+ * Zero-advance code points are excluded here and reserve 0 — see isZeroWidthChar.
  */
 export const isWideChar = (cp: number): boolean =>
-  !isZeroWidthCombining(cp) &&
+  !isZeroWidthChar(cp) &&
   ((cp >= 0x1100 && cp <= 0x115F) ||   // Hangul Jamo
   (cp >= 0x2E80 && cp <= 0x303E) ||   // CJK radicals, Kangxi, CJK symbols/punctuation
   (cp >= 0x3041 && cp <= 0x33FF) ||   // Hiragana, Katakana, CJK symbols
@@ -65,32 +66,44 @@ export const isWideChar = (cp: number): boolean =>
   (cp >= 0xA000 && cp <= 0xA4CF) ||   // Yi
   (cp >= 0xAC00 && cp <= 0xD7A3) ||   // Hangul Syllables
   (cp >= 0xF900 && cp <= 0xFAFF) ||   // CJK Compatibility Ideographs
-  (cp >= 0xFE30 && cp <= 0xFE4F) ||   // CJK Compatibility Forms
+  (cp >= 0xFE10 && cp <= 0xFE4F) ||   // Vertical Forms, CJK Compatibility Forms
   (cp >= 0xFF00 && cp <= 0xFF60) ||   // Fullwidth Forms
-  (cp >= 0xFFE0 && cp <= 0xFFE6));    // Fullwidth signs
+  (cp >= 0xFFE0 && cp <= 0xFFE6) ||   // Fullwidth signs
+  (cp >= 0x16FE0 && cp <= 0x18D08) || // Ideographic Symbols, Tangut (+Supplement), Khitan
+  (cp >= 0x1AFF0 && cp <= 0x1B2FF) || // Kana Extended-B, Kana Supplement/Extended-A, Nushu
+  (cp >= 0x1F200 && cp <= 0x1FAFF) || // Enclosed Ideographic Supplement, emoji pictographs
+  (cp >= 0x20000 && cp <= 0x3FFFD));  // CJK Unified Ideographs Extension B–G
 
-// Only the case test below allocates, so only its result is worth caching — the wide and
-// zero-width checks are range comparisons. Never invalidated: a code point's class is fixed,
-// unlike the per-parse caches elsewhere in the parser.
-const casedEm: Map<number, number> = new Map();
+// The ASCII classes can't see these letters; uppercase runs widest (`Љ` is 1.06em in Arial).
+const casedEmFor = (cp: number): number => {
+  const ch: string = String.fromCodePoint(cp);
+  return ch !== ch.toLowerCase() && ch === ch.toUpperCase() ? XWIDE_EM : WIDE_EM;
+};
+
+// Only the case test allocates, so only it is worth caching — the wide and zero-width checks are
+// range comparisons. One byte per code point over the dense range (0 = unseen), so the cache has a
+// fixed size and needs no lifecycle owner; above it the class is computed per occurrence.
+const CASED_CACHE_MAX = 0x3000;
+const casedClass: Uint8Array = new Uint8Array(CASED_CACHE_MAX);
 
 // Reserve for one non-ASCII code point in em.
 const nonAsciiEm = (cp: number): number => {
   // A combining mark renders over the base glyph; a lone surrogate is broken input, not a glyph.
-  if (isZeroWidthCombining(cp) || (cp >= 0xD800 && cp <= 0xDFFF)) {
+  if (isZeroWidthChar(cp) || (cp >= 0xD800 && cp <= 0xDFFF)) {
     return 0;
   }
   if (isWideChar(cp)) {
     return CJK_EM;
   }
-  let em: number | undefined = casedEm.get(cp);
-  if (em === undefined) {
-    // The ASCII classes can't see these letters; uppercase runs widest (`Љ` is 1.06em in Arial).
-    const ch: string = String.fromCodePoint(cp);
-    em = ch !== ch.toLowerCase() && ch === ch.toUpperCase() ? XWIDE_EM : WIDE_EM;
-    casedEm.set(cp, em);
+  if (cp >= CASED_CACHE_MAX) {
+    return casedEmFor(cp);
   }
-  return em;
+  let cls: number = casedClass[cp];
+  if (cls === 0) {
+    cls = casedEmFor(cp) === XWIDE_EM ? 1 : 2;
+    casedClass[cp] = cls;
+  }
+  return cls === 1 ? XWIDE_EM : WIDE_EM;
 };
 
 // Monospace cells in a run: code points, not UTF-16 units, and combining marks take none.
@@ -106,7 +119,7 @@ const monoCells = (str: string): number => {
     if (cp > 0xFFFF) {
       i++;
     }
-    if (!isZeroWidthCombining(cp)) {
+    if (!isZeroWidthChar(cp)) {
       cells++;
     }
   }

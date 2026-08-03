@@ -114,6 +114,35 @@ describe('A link in a tabular cell renders well-formed in every output:', () => 
     (smoothed.match(/<a /g) || []).length.should.equal((smoothed.match(/<\/a>/g) || []).length);
     smoothed.should.include('<strong>b</strong>');
   });
+  it('a table inside the label is smoothed, not passed through as HTML', () => {
+    // Only a token rendered as a table carries smoothed lines, so this is the shape where the
+    // link loop could diverge from the main loop.
+    const nested = '\\begin{tabular}{|l|}\n[\\begin{tabular}{l}q\\end{tabular}](http://a.b) t\n\\end{tabular}';
+    const md = markdownIt({ html: true }).use(mathpixMarkdownPlugin,
+      { outMath: { include_svg: false }, forPptx: true });
+    const env = {};
+    const tokens = md.parse(nested, env);
+    md.renderer.render(tokens, md.options, env);
+    const outer = tokens.find((t) => t.type === 'tabular');
+    const smoothed = JSON.stringify(outer.tableSmoothed);
+    smoothed.should.not.match(/<table|inline-tabular/);
+    smoothed.should.include('q');
+    smoothed.should.include('</a>');
+  });
+  it('the isSubTable stamp follows the argument, so a caller cannot claim nesting silently', () => {
+    // renderTableCellContent marks the tokens it walks; later passes read the mark off them.
+    const { renderTableCellContent } = require('../lib/markdown/common/render-table-cell-content');
+    const inner = markdownIt({ html: true }).use(mathpixMarkdownPlugin, { outMath: { include_svg: false } });
+    const call = (child, isSubTable) => {
+      renderTableCellContent({ children: [child] }, isSubTable, inner.options, {}, inner.renderer);
+      return child.isSubTable;
+    };
+    const text = () => ({ type: 'text', content: 'a', attrGet: () => null });
+    (call(text(), false) === undefined).should.equal(true);
+    call(text(), true).should.equal(true);
+    // A nested table marks itself by type, whatever the caller passes.
+    call({ type: 'tabular_inline', content: '', children: [], attrGet: () => null }, false).should.equal(true);
+  });
   it('tsv keeps the href by design, not the label', () => {
     const html = MM.markdownToHTML(src, { outMath: { include_svg: false, include_tsv: true } });
     const tsv = (html.match(/<tsv[^>]*>([\s\S]*?)<\/tsv>/) || [])[1];

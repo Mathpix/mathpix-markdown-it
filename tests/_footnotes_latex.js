@@ -285,4 +285,40 @@ describe('Footnote rule performance regression:', () => {
     const large = measureMs(build(2000));
     (large / Math.max(small, SMALL_FLOOR_MS)).should.be.below(SCALING_RATIO_LIMIT);
   });
+
+  // Without the closer lookahead, each probe of an unclosed env scans to EOF — O(N^2) over N starts.
+  it('unclosed \\begin{itemize} units scale linearly', function () {
+    this.timeout(60000);
+    const unit = '\\begin{itemize}\n\\item[a] x';
+    const build = (n) => Array.from({ length: n }, () => unit).join('\n');
+    const small = measureMs(build(100));
+    const large = measureMs(build(1000));
+    (large / Math.max(small, SMALL_FLOOR_MS)).should.be.below(SCALING_RATIO_LIMIT);
+  });
+
+  // The tabular shape stays super-linear for a reason outside this rule (unterminated forward scans
+  // in newTheoremBlock/lheading), so pin the probe itself: rejecting an unclosed env must not cost
+  // more than accepting a closed one, which is what the closer lookahead guarantees.
+  it('probing an unclosed \\begin{tabular} is not dearer than probing a closed one', function () {
+    this.timeout(60000);
+    const rule = perfMd.block.ruler.__rules__.find((r) => r.name === 'BeginTabular').fn;
+    const build = (unit) => Array.from({ length: 400 }, () => unit).join('\n');
+    const probeMs = (src) => {
+      const state = new perfMd.block.State(src, perfMd, {}, []);
+      rule(state, 0, state.lineMax, true); // warm
+      const samples = [];
+      for (let i = 0; i < 5; i++) {
+        const t0 = performance.now();
+        for (let k = 0; k < 20; k++) {
+          rule(new perfMd.block.State(src, perfMd, {}, []), 0, state.lineMax, true);
+        }
+        samples.push(performance.now() - t0);
+      }
+      samples.sort((a, b) => a - b);
+      return samples[2];
+    };
+    const unclosed = probeMs(build('\\begin{tabular}{|l|}\nq'));
+    const closed = probeMs(build('\\begin{tabular}{|l|}\nq\n\\end{tabular}'));
+    unclosed.should.be.below(Math.max(closed, 1) * 2);
+  });
 });

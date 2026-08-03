@@ -8,7 +8,23 @@ describe('display-width: isWideChar', () => {
   it('CJK ideograph is wide', () => isWideChar(0x6F22).should.equal(true));
   it('fullwidth full stop is wide', () => isWideChar(0xFF0E).should.equal(true));
   it('ASCII is not wide', () => isWideChar(0x41).should.equal(false));
-  it('astral emoji is not covered (width 1)', () => isWideChar(0x1F600).should.equal(false));
+  it('astral Wide blocks count as wide, like their BMP counterparts', () => {
+    isWideChar(0x1F600).should.equal(true);  // emoticons
+    isWideChar(0x1F200).should.equal(true);  // enclosed ideographic supplement
+    isWideChar(0x20000).should.equal(true);  // CJK Ext-B
+    isWideChar(0x3FFFD).should.equal(true);  // CJK Ext-G
+    isWideChar(0x17000).should.equal(true);  // Tangut
+  });
+  it('the astral Wide blocks have no gaps at their edges', () => {
+    isWideChar(0x16FE0).should.equal(true);  // Ideographic Symbols and Punctuation
+    isWideChar(0x18D00).should.equal(true);  // Tangut Supplement
+    isWideChar(0x1AFF0).should.equal(true);  // Kana Extended-B
+  });
+  it('astral blocks that are not Wide stay out', () => {
+    isWideChar(0x1D400).should.equal(false); // math alphanumerics
+    isWideChar(0x10400).should.equal(false); // Deseret
+    isWideChar(0x40000).should.equal(false); // past the last Wide plane
+  });
   it('combining marks U+3099/U+309A are excluded (not wide)', () => {
     isWideChar(0x3099).should.equal(false);
     isWideChar(0x309A).should.equal(false);
@@ -76,4 +92,32 @@ describe('display-width: tokenMarkerWidth (em)', () => {
   });
   it('html_inline is not measured (content is markup) → 0', () =>
     tokenMarkerWidth({ type: 'html_inline', content: '<span style="color:red">' }).should.equal(0));
+  it('Vertical Forms are wide, not zero-width, though they sit between two zero-width blocks', () => {
+    isWideChar(0xFE10).should.equal(true);
+    isWideChar(0xFE19).should.equal(true);
+    textReserveEm('︐').should.be.closeTo(1.2, 1e-9);
+    // The neighbours on both sides still reserve nothing.
+    textReserveEm('️').should.equal(0);
+    textReserveEm('︠').should.equal(0);
+  });
+  it('joiners and variation selectors add no advance', () => {
+    // They compose the glyphs around them instead of taking a cell of their own.
+    const family = '\u{1F468}‍\u{1F469}‍\u{1F467}';
+    textReserveEm(family).should.be.closeTo(textReserveEm('\u{1F468}\u{1F469}\u{1F467}'), 1e-9);
+    textReserveEm('❤️').should.be.closeTo(textReserveEm('❤'), 1e-9);
+    textReserveEm('a​b‌c').should.be.closeTo(textReserveEm('abc'), 1e-9);
+  });
+  it('the cased class is the same above the cache bound as below it', () => {
+    // Below 0x3000 the class is memoised in a fixed byte array, above it recomputed per occurrence.
+    textReserveEm('Ж').should.be.closeTo(textReserveEm('Ж'), 1e-9);       // cached path, twice
+    textReserveEm('\u{10400}').should.be.closeTo(1.1, 1e-9);             // uncased path, uppercase
+    textReserveEm('\u{10428}').should.be.closeTo(0.9, 1e-9);             // uncased path, lowercase
+    textReserveEm('Ж').should.be.closeTo(1.1, 1e-9);
+  });
+  it('an astral wide glyph reserves the CJK width, not the cased fallback', () => {
+    // Measured per code point: a surrogate pair is one glyph, so three of them are 3 × 1.20.
+    textReserveEm('\u{2000B}').should.be.closeTo(1.2, 1e-9);
+    textReserveEm('\u{2000B}\u{2000B}\u{2000B}').should.be.closeTo(3.6, 1e-9);
+    textReserveEm('\u{1F600}\u{1F600}').should.be.closeTo(textReserveEm('一一'), 1e-9);
+  });
 });

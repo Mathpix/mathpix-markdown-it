@@ -579,6 +579,30 @@ const setCachedListProbe = (state: StateBlock, key: string, ok: boolean): void =
   cached.map.set(key, ok);
 };
 
+// Per-state offset of the last list closer, invalidated when `state.src` is reassigned. Without
+// it an unclosed env costs a speculative parse to EOF per probe — quadratic over a document.
+const LIST_END_POS_KEY = Symbol('mmd.listEndPos');
+// Built from the unanchored closer regex, so the sweep cannot drift from what the parser accepts.
+const END_LIST_ENV_SWEEP_G: RegExp = new RegExp(END_LIST_ENV_INLINE_RE.source, 'g');
+type ListEndCache = { src: string; lastPos: number };
+
+const lastListEndPos = (state: StateBlock): number => {
+  const slot = state as unknown as Record<symbol, ListEndCache | undefined>;
+  const cached = slot[LIST_END_POS_KEY];
+  if (cached && cached.src === state.src) {
+    return cached.lastPos;
+  }
+  END_LIST_ENV_SWEEP_G.lastIndex = 0;
+  let lastPos: number = -1;
+  let m: RegExpExecArray | null;
+  while ((m = END_LIST_ENV_SWEEP_G.exec(state.src)) !== null) {
+    lastPos = m.index;
+  }
+  END_LIST_ENV_SWEEP_G.lastIndex = 0;
+  slot[LIST_END_POS_KEY] = { src: state.src, lastPos };
+  return lastPos;
+};
+
 /**
  * Block rule that parses LaTeX list environments:
  *   \begin{itemize} ... \end{itemize}
@@ -609,6 +633,10 @@ export const Lists: RuleBlock = (
   }
   const typeList: string = match[1].trim();
   if (!isListType(typeList)) {
+    return false;
+  }
+  // No closer left in the source: the strict rule can only answer false, so skip the parse.
+  if (lastListEndPos(state) < state.bMarks[startLine]) {
     return false;
   }
   // A silent probe answers "does a closed list env start here?", which needs the full

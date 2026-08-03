@@ -29,7 +29,11 @@ import {
   BEGIN_TABULAR_INLINE_RE,
   END_LST_INLINE_RE,
   END_TABULAR_INLINE_RE,
+  END_LIST_ENV_INLINE_RE,
 } from "../common/consts"
+
+// Sticky-free closer search over the whole src, so the check needs no slice.
+const END_LIST_ENV_SEARCH_G: RegExp = new RegExp(END_LIST_ENV_INLINE_RE.source, 'g');
 
 /**
  * Finds the first complete list environment starting at `startPos`.
@@ -45,6 +49,12 @@ export const findFirstCompleteListEnv = (src: string, startPos: number): EnvMatc
   }
   const rootTypeRaw: string = (begin[1] ?? "").trim();
   if (!rootTypeRaw || !isListType(rootTypeRaw)) {
+    return null;
+  }
+  // The only success path is the closer branch below, so no closer ahead means no match. Checked
+  // up front because the scan walks char by char and slices the rest at each step.
+  END_LIST_ENV_SEARCH_G.lastIndex = startPos;
+  if (!END_LIST_ENV_SEARCH_G.exec(src)) {
     return null;
   }
   const rootType: ListType = rootTypeRaw;

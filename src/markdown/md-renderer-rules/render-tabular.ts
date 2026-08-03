@@ -153,6 +153,8 @@ type RenderCtx = {
   env: any;
   slf: any;
   highlight?: any;
+  // Nesting of the table being rendered: renderTableCellContent stamps it onto the tokens it walks.
+  isSubTable?: boolean;
 };
 
 type OutputGates = {
@@ -253,7 +255,8 @@ const renderNonTableTokenIntoCell = (
     for (let i = ctx.idx; i < ctx.tokens.length && isLeafRunMember(ctx.tokens[i]); i++) {
       run.push(ctx.tokens[i]);
     }
-    const leaf: RenderTableCellContentResult = renderTableCellContent({ children: run }, true, options, env, slf);
+    const leaf: RenderTableCellContentResult =
+      renderTableCellContent({ children: run }, !!ctx.isSubTable, options, env, slf);
     if (needTsv) {
       appendToLastLine(acc.cellTsvLines, leaf.tsv);
     }
@@ -448,7 +451,7 @@ export const renderInlineTokenBlock = (
   let colspan = 0, rowspan = [], mr = 0;
   let numCol = 0;
 
-  const ctx: RenderCtx = { tokens, idx: 0, options, env, slf, highlight };
+  const ctx: RenderCtx = { tokens, idx: 0, options, env, slf, highlight, isSubTable };
   for (let idx = 0; idx < tokens.length; idx++) {
     ctx.idx = idx;
     let token = tokens[idx];

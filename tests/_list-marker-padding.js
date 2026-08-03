@@ -7,7 +7,7 @@ const MM = require('../lib/mathpix-markdown-model/index').MathpixMarkdownModel;
 const markdownIt = require('markdown-it');
 const { mathpixMarkdownPlugin } = require('../lib/index.js');
 const { FontMetrics } = require('../lib/markdown/common/text-dimentions');
-const { MARKER_GAP_EM, LIST_DEFAULT_INDENT_EM, DEFAULT_FONT_SIZE_PX, DEFAULT_EX_PX } = require('../lib/markdown/common/consts');
+const { MARKER_GAP_EM, LIST_DEFAULT_INDENT_EM, LIST_MAX_INDENT_EM, DEFAULT_FONT_SIZE_PX, DEFAULT_EX_PX } = require('../lib/markdown/common/consts');
 const { resolveListPadding } = require('../lib/markdown/md-latex-lists-env/latex-list-items');
 const { processListChildToken, computeMarkerPadding } = require('../lib/markdown/md-latex-lists-env/latex-list-tokens');
 const { render_itemize_list_open } = require('../lib/markdown/md-latex-lists-env/render-latex-list-env');
@@ -175,6 +175,30 @@ describe('data-padding-inline-start is sanitized before it reaches inline style:
   });
 });
 
+// Migration says the attribute is now emitted on nested lists too; the docx path has its own
+// marker attributes, so pin that it carries this one as well.
+describe('forDocx keeps the per-level marker padding:', () => {
+  const src = '\\begin{itemize}\n\\item[a] x\n' +
+    '\\begin{itemize}\n\\item[WWWWWWWWWW] y\n\\end{itemize}\n\\end{itemize}';
+  it('the nested list carries data-padding-inline-start in em, the outer keeps the default', () => {
+    const html = MM.markdownToHTML(src, { outMath: { include_svg: false }, forDocx: true });
+    const opens = html.match(/<ul[^>]*>/g);
+    opens.should.have.length(2);
+    // Outer: marker fits the default, so no custom indent.
+    opens[0].should.not.match(/data-padding-inline-start/);
+    const em = (opens[1].match(/data-padding-inline-start="([^"]+)"/) || [])[1];
+    em.should.match(/^\d+(\.\d+)?em$/);
+    parseFloat(em).should.be.above(LIST_DEFAULT_INDENT_EM);
+    // Same value reaches the inline style, as on the non-docx path.
+    opens[1].should.include('padding-inline-start: ' + em);
+  });
+  it('the em value matches the non-docx render', () => {
+    const pad = (opts) => (MM.markdownToHTML(src, { outMath: { include_svg: false }, ...opts })
+      .match(/data-padding-inline-start="([^"]+)"/) || [])[1];
+    pad({ forDocx: true }).should.equal(pad({}));
+  });
+});
+
 describe('resolveListPadding — malformed depth is tolerated (no throw):', () => {
   const mk = (prentLevel, padding) => ({ prentLevel, padding, attrSet(k, v) { this[k] = v; } });
   it('a smaller (negative-relative) then skipped depth does not throw; any emitted padding is a valid em', () => {
@@ -200,6 +224,30 @@ describe('resolveListPadding — the ancestor sum follows the depth, not the las
     // deeper again: the chain is rebuilt from the current sums (2.5 + 8.5 + 2.5), not stale ones.
     pad(toks[4]).should.equal('4.5em');
     [toks[0], toks[2]].forEach((t) => (pad(t) === undefined).should.equal(true));
+  });
+
+  // The clamp is on the cumulative indent, not per level, so a chain cannot exceed it by stacking.
+  it('a chain that overflows at every level stays within the clamp', () => {
+    const pad = (t) => t['data-padding-inline-start'];
+    const emitted = (toks) => toks.map(pad).filter((v) => v !== undefined);
+    const sum = (toks) => emitted(toks).reduce((a, v) => a + parseFloat(v), 0);
+
+    // Each level wants far more than the clamp: the outermost takes all of it, the rest fall back
+    // to the default, so the chain grows by the default per level instead of by the clamp.
+    const all = [mk(0, 50), mk(1, 50), mk(2, 50)];
+    resolveListPadding(all);
+    pad(all[0]).should.equal(String(LIST_MAX_INDENT_EM) + 'em');
+    [all[1], all[2]].forEach((t) => (pad(t) === undefined).should.equal(true));
+    (sum(all) + 2 * LIST_DEFAULT_INDENT_EM)
+      .should.equal(LIST_MAX_INDENT_EM + 2 * LIST_DEFAULT_INDENT_EM);
+
+    // Overflowing only at the deepest level: the reserves add up to exactly the clamp, no more.
+    const deep = [mk(0, 5), mk(1, 12), mk(2, 30)];
+    resolveListPadding(deep);
+    emitted(deep).should.eql(['5em', '7em', '8em']);
+    sum(deep).should.equal(LIST_MAX_INDENT_EM);
+
+    [all, deep].forEach((toks) => emitted(toks).forEach((v) => v.should.match(/^\d+(\.\d+)?em$/)));
   });
 });
 
