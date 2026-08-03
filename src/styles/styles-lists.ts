@@ -12,7 +12,9 @@ ol.enumerate, ul.itemize,
   padding-inline-start: ${LIST_DEFAULT_INDENT_EM}em;
 }
 #preview-content #toc_container ul, #setText #toc_container ul,
-#preview-content #toc_container ol, #setText #toc_container ol {
+#preview-content #toc_container ol, #setText #toc_container ol,
+#preview-content .table-of-contents ul, #setText .table-of-contents ul,
+#preview-content .table-of-contents ol, #setText .table-of-contents ol {
   padding-inline-start: 0;
 }
 li > ol.enumerate, li > ul.itemize,

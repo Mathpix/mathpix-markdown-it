@@ -280,8 +280,9 @@ describe('Footnote rule performance regression:', () => {
       'Paragraph text before the list with no blank line separator.\n' +
       '\\begin{itemize}\n\\item[] \\footnotetext{\nA footnote note inside the item.\n}\n\\end{itemize}';
     const build = (n) => Array.from({ length: n }, () => unit).join('\n');
-    const small = measureMs(build(50));
-    const large = measureMs(build(800)); // 16x units; quadratic parsing would blow the ratio
+    // Same 10x growth as the cases above, so SCALING_RATIO_LIMIT means the same thing here.
+    const small = measureMs(build(200));
+    const large = measureMs(build(2000));
     (large / Math.max(small, SMALL_FLOOR_MS)).should.be.below(SCALING_RATIO_LIMIT);
   });
 });

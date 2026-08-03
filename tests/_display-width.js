@@ -26,6 +26,27 @@ describe('display-width: textReserveEm (per-glyph-class em)', () => {
   it('sums per character', () => textReserveEm('abc').should.be.closeTo(1.86, 1e-9));
   it('combining mark adds 0 (\u304B + \u3099 == \u304B)', () =>
     textReserveEm('\u304B\u3099').should.be.closeTo(textReserveEm('\u304B'), 1e-9));
+  it('uppercase non-ASCII is extra-wide (\u0416 \u0409 \u00C4 \u03A9)', () => {
+    ['\u0416', '\u0409', '\u00C4', '\u03A9'].forEach((ch) =>
+      textReserveEm(ch).should.be.closeTo(1.10, 1e-9));
+  });
+  it('lowercase non-ASCII is wide (\u0436 \u00E4 \u03C9)', () => {
+    ['\u0436', '\u00E4', '\u03C9'].forEach((ch) =>
+      textReserveEm(ch).should.be.closeTo(0.90, 1e-9));
+  });
+  it('combining marks reserve nothing, so decomposed accents cost only the base glyph', () => {
+    ['\u0301', '\u0308', '\u0327', '\u1ab0', '\u20d0', '\ufe20'].forEach((ch) =>
+      textReserveEm(ch).should.equal(0));
+    textReserveEm('e\u0301').should.be.closeTo(textReserveEm('e'), 1e-9);
+  });
+  it('caseless non-ASCII lands in the wide class (\u2014 \u2116)', () => {
+    // Pins the approximation, not exactness: these two are 1.00/1.07em in Arial, so a marker
+    // made only of them under-reserves by \u22640.2em \u2014 see the width-model Non-Goal.
+    ['\u2014', '\u2116'].forEach((ch) =>
+      textReserveEm(ch).should.be.closeTo(0.90, 1e-9));
+  });
+  it('a repeated non-ASCII char scales linearly (memo returns a stable width)', () =>
+    textReserveEm('\u0416\u0416\u0416').should.be.closeTo(3 * textReserveEm('\u0416'), 1e-9));
 });
 
 

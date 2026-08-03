@@ -976,6 +976,15 @@ module.exports = [
       '| :--- |'
   },
   {
+    // A leaf run is collected per cell: td_open/td_close bound it, so cell 2 stays out of cell 1.
+    id: 57,
+    latex: '\\begin{tabular}{|l|l|}\n' +
+      '[t](http://a.b) x & **b** y\n' +
+      '\\end{tabular}',
+    table_markdown: '| [t](http://a.b) x | **b** y |\n' +
+      '| :--- | :--- |'
+  },
+  {
     // A link must not swallow the siblings that follow it in the cell.
     id: 56,
     latex: '\\begin{tabular}{|l|}\n' +

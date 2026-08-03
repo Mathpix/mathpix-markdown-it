@@ -1612,5 +1612,12 @@ module.exports = [
       '[t](http://a.b) tail [u](http://c.d) **b** c\n' +
       '\\end{tabular}',
     tsv: 'http://a.b tail http://c.d b c'
+  },
+  {
+    // Leaf runs are bound by the cell: cell 2 must not bleed into cell 1.
+    latex: '\\begin{tabular}{|l|l|}\n' +
+      '[t](http://a.b) x & **b** y\n' +
+      '\\end{tabular}',
+    tsv: 'http://a.b x\tb y'
   }
 ];

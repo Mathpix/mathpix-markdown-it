@@ -558,7 +558,8 @@ export const ListsInternal = (
   return true;
 };
 
-// Per-state memo of silent-probe results, invalidated when `state.src` is reassigned.
+// Per-state memo of silent-probe results, invalidated when `state.src` is reassigned. Unbounded
+// by design: it lives and dies with one parse, holding at most one entry per list-start line.
 const LIST_PROBE_KEY = Symbol('mmd.listProbe');
 type ListProbeCache = { src: string; map: Map<string, boolean> };
 

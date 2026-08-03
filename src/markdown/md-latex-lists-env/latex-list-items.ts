@@ -12,6 +12,7 @@ import {
   LIST_MAX_INDENT_EM,
   END_LIST_ENV_INLINE_RE,
   LATEX_ITEM_COMMAND_RE,
+  LATEX_ITEM_SPLIT_RE,
   LATEX_BLOCK_ENV_OPEN_RE,
 } from "../common/consts";
 import { ListItemsResult, ParsedListItem, ListInlineContext } from "./latex-list-types";
@@ -145,7 +146,7 @@ export const ItemsListPush = (
   startLine: number,
   endLine: number
 ): ParsedListItem[] => {
-  const index: number = content.indexOf('\\item');
+  const index: number = content.search(LATEX_ITEM_SPLIT_RE);
   // No "\item" in the line or at the very start: treat whole line as one chunk
   if (index <= 0) {
     items.push({ content, startLine, endLine });
@@ -241,24 +242,26 @@ export const finalizeListItems = (
 export const resolveListPadding = (listTokens: Token[]): void => {
   if (!listTokens.length) return;
   const baseDepth: number = listTokens[0].prentLevel || 0;
-  const indentByDepth: number[] = [];
+  // prefix[d] = indent summed over the levels above d, so the ancestor sum is one lookup.
+  const prefix: number[] = [0];
   for (const token of listTokens) {
-    // Clamp depth to >= 0 (a negative would throw on indentByDepth.length below).
+    // Clamp depth to >= 0 (a negative would throw on prefix.length below).
     const depth: number = Math.max(0, (token.prentLevel || 0) - baseDepth);
     // Fill any skipped level with the default FIRST, so the ancestor sum has no holes (no NaN).
-    for (let i = indentByDepth.length; i < depth; i++) {
-      indentByDepth[i] = LIST_DEFAULT_INDENT_EM;
+    for (let d = prefix.length; d <= depth; d++) {
+      prefix[d] = prefix[d - 1] + LIST_DEFAULT_INDENT_EM;
     }
-    const ancestorSum: number = indentByDepth.slice(0, depth).reduce((s, v) => s + v, 0);
+    const ancestorSum: number = prefix[depth];
     const total: number = Math.min(token.padding || 0, LIST_MAX_INDENT_EM);
+    // Past the clamp (from depth 9 of plain defaults) this goes negative, so the default applies.
     const em: number = Math.round((total - ancestorSum) * 100) / 100;
     // Own indent for this level: the reserved em when the marker overflows, else the default.
     const indentEm: number = em > LIST_DEFAULT_INDENT_EM ? em : LIST_DEFAULT_INDENT_EM;
     if (em > LIST_DEFAULT_INDENT_EM) {
       token.attrSet("data-padding-inline-start", String(em) + "em");
     }
-    indentByDepth.length = depth;
-    indentByDepth[depth] = indentEm;
+    prefix.length = depth + 1;
+    prefix[depth + 1] = ancestorSum + indentEm;
   }
 };
 

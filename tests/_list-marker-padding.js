@@ -72,7 +72,11 @@ describe('List marker padding — reserve covers the true glyph width (Arial):',
     paddingValue(render('\\begin{itemize}\n\\item[' + marker + '] a\n\\end{itemize}')) || LIST_DEFAULT_INDENT_EM;
   // (CJK/fullwidth is intentionally excluded — Arial isn't its render font, so its "true"
   // width here would be meaningless.)
-  ['note', '11.33', 'longtext', '(d1)', 'NOTE', 'SECTION', 'WWWWWWWW', 'Introduction'].forEach((marker) => {
+  // Non-ASCII is measured by case, so uppercase Cyrillic/Greek/accented Latin belong here:
+  // under an ASCII-only model they resolved to the normal class and the marker was clipped.
+  ['note', '11.33', 'longtext', '(d1)', 'NOTE', 'SECTION', 'WWWWWWWW', 'Introduction',
+   'ПРИМЕЧАНИЕ', 'ШИРОКО', 'ЖЖЖЖ', 'Введение', 'примечание',
+   'ÄÖÜÄÖÜ', 'ΣΩΦΘΞ', 'ЉЉЉ', 'ÆŒÆŒ'].forEach((marker) => {
     it('reserves at least the glyph width + gap for "' + marker + '"', () => {
       indentEm(marker).should.be.at.least(trueEm(marker) + MARKER_GAP_EM);
     });
@@ -81,16 +85,34 @@ describe('List marker padding — reserve covers the true glyph width (Arial):',
     // Bold has the tightest measured margin; lock it against its rendered text "note".
     indentEm('\\textbf{note}').should.be.at.least(trueEm('note') + MARKER_GAP_EM);
   });
-  it('covers the glyph width along the ancestor chain for a nested marker', () => {
-    // Nested reserve is a shortfall, so check the CHAIN sum (ancestors + own), not one node.
-    const marker = 'WWWWWWWWWWWW';
-    const styles = [...render('\\begin{itemize}\n\\item[a] x\n\\begin{itemize}\n\\item[' + marker + '] y\n\\end{itemize}\n\\end{itemize}')
-      .matchAll(/<ul[^>]*style="([^"]*)"/g)].map((m) => m[1]);
-    const cumulative = styles.reduce((sum, st) => {
-      const m = st.match(/padding-inline-start:\s*([\d.]+)em/);
-      return sum + (m ? Number(m[1]) : LIST_DEFAULT_INDENT_EM);
+  // Nested reserve is a shortfall, so the invariant holds over the CHAIN sum, not one node.
+  const chainIndentEm = (html) => [...html.matchAll(/<ul[^>]*style="([^"]*)"/g)]
+    .reduce((sum, m) => {
+      const p = m[1].match(/padding-inline-start:\s*([\d.]+)em/);
+      return sum + (p ? Number(p[1]) : LIST_DEFAULT_INDENT_EM);
     }, 0);
-    cumulative.should.be.at.least(trueEm(marker) + MARKER_GAP_EM);
+  it('covers the glyph width along the ancestor chain for a nested marker', () => {
+    const marker = 'WWWWWWWWWWWW';
+    chainIndentEm(render('\\begin{itemize}\n\\item[a] x\n\\begin{itemize}\n\\item[' + marker + '] y\n\\end{itemize}\n\\end{itemize}'))
+      .should.be.at.least(trueEm(marker) + MARKER_GAP_EM);
+  });
+  // A sublist after block content is opened on the inline path; padding must still resolve.
+  const wide = 'XXXXXXXXXXXX';
+  const sub = '\\begin{itemize}\n\\item[' + wide + '] y\n\\end{itemize}\n';
+  [
+    ['after a tabular item', '\\begin{tabular}{|l|}\nq\n\\end{tabular}\n'],
+    ['after a fenced-code item', '```\ncode\n```\n'],
+    ['after a figure item', '\\begin{figure}\n\\caption{c}\n\\end{figure}\n'],
+  ].forEach(([name, block]) => {
+    it('resolves the nested reserve ' + name, () => {
+      chainIndentEm(render('\\begin{itemize}\n\\item[a]\n' + block + sub + '\\end{itemize}'))
+        .should.be.at.least(trueEm(wide) + MARKER_GAP_EM);
+    });
+  });
+  it('resolves the nested reserve for a sublist inside a tabular cell in an item', () => {
+    const html = render('\\begin{itemize}\n\\item[a]\n\\begin{tabular}{|l|}\n\\begin{itemize}\\item[' +
+      wide + '] y\\end{itemize}\n\\end{tabular}\n\\end{itemize}');
+    chainIndentEm(html).should.be.at.least(trueEm(wide) + MARKER_GAP_EM);
   });
 });
 

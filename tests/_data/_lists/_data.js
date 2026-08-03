@@ -1218,8 +1218,8 @@ module.exports = [
     html: "<ul data-padding-inline-start=\"3.11em\" class=\"itemize\" style=\"padding-inline-start: 3.11em; list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">abcd</span>a</li></ul>"
   },
   {
-    // Intentional under-reserve (spec Non-Goals): astral chars fall in the `normal` glyph class.
-    name: "marker: astral emoji normal class (no padding)",
+    // Astral chars are caseless → wide class; 2×0.90+0.625 < 2.5em, so the default indent stays.
+    name: "marker: astral emoji wide class (no padding)",
     latex: "\\begin{itemize}\n\\item[😀😀] a\n\\item[x] b\n\\end{itemize}",
     html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">😀😀</span>a</li><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">x</span>b</li></ul>"
   },
@@ -1327,6 +1327,18 @@ module.exports = [
     name: "\\item detection: real \\item still splits",
     latex: "\\begin{itemize}\\item a\\item b\\end{itemize}",
     html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    // \itemsep mid-line is not a split point, so "tail " stays with item a.
+    name: "\\item detection: \\itemsep is not a split point",
+    latex: "\\begin{itemize}\n\\item[a] x\ntail \\itemsep pad \\item[b] y\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">a</span>x<br>\ntail \\itemsep pad</li><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">b</span>y</li></ul>"
+  },
+  {
+    // An unsupported command renders as literal text and must not become an item.
+    name: "\\item detection: \\itemsep before the first item makes no item",
+    latex: "\\begin{itemize}\n\\itemsep 1pt\n\\item[a] x\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\">\\itemsep 1pt<li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">a</span>x</li></ul>"
   },
   {
     // Sibling sublists resolve independently: only the wide one reserves, either order.

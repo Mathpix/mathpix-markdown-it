@@ -107,6 +107,8 @@ export declare const END_LIST_ENV_RE: RegExp;
 export declare const LATEX_ITEM_COMMAND_RE: RegExp;
 export declare const LATEX_ITEM_COMMAND_INLINE_RE: RegExp;
 export declare const LATEX_LIST_BOUNDARY_INLINE_RE: RegExp;
+/** Where a chunk splits into items: a real `\item`, so `\itemsep` is not a split point. */
+export declare const LATEX_ITEM_SPLIT_RE: RegExp;
 /** Matches \begin{center}, \begin{left}, \begin{right}, \begin{table}, \begin{figure}, \begin{tabular}, \begin{lstlisting} */
 export declare const LATEX_BLOCK_ENV_OPEN_RE: RegExp;
 export declare const BLOCK_LATEX_RE: RegExp;

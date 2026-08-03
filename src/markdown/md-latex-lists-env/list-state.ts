@@ -19,6 +19,17 @@ export interface ListLevelState {
 let listLevels: ListLevelState[] = [];
 let currentListDepth: number = -1; // -1 means “not inside a list”
 
+// Speculative parses reach these diagnostics once per offending line, so warn once per parse
+// (reset below): a desynced depth would otherwise flood a consumer's log on every probe.
+const warned: Set<string> = new Set();
+const warnOnce = (key: string, ...args: any[]): void => {
+  if (warned.has(key)) {
+    return;
+  }
+  warned.add(key);
+  console.warn(...args);
+};
+
 /**
  * Reset all list-related state.
  * Should be called before starting a new parsing session.
@@ -26,6 +37,7 @@ let currentListDepth: number = -1; // -1 means “not inside a list”
 export const resetListState = (): void => {
   listLevels = [];
   currentListDepth = -1;
+  warned.clear();
 };
 
 /**
@@ -46,7 +58,7 @@ export const enterListLevel = (): void => {
  */
 export const leaveListLevel = (): void => {
   if (currentListDepth < 0) {
-    console.warn('[list-state] Attempt to leave list level while depth = -1');
+    warnOnce('leave', '[list-state] Attempt to leave list level while depth = -1');
     return;
   }
   currentListDepth--;
@@ -78,7 +90,7 @@ export const getCurrentListLevelState = (): ListLevelState | undefined => {
 export const incrementItemCount = (): void => {
   const level = getCurrentListLevelState();
   if (!level) {
-    console.warn(
+    warnOnce('increment',
       '[list-state] incrementItemCount called outside of any list level',
       {
         currentListDepth,

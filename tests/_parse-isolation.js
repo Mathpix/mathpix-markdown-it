@@ -116,6 +116,19 @@ describe('silent-mode Lists does not mutate shared env', () => {
       name: 'unclosed list holding a table',
       src: '\\begin{itemize}\n\\item[a] x\n\\begin{table}\n\\caption{T}\n\\begin{tabular}{|l|}\nc\n\\end{tabular}\n\\end{table}\n',
     },
+    // Any rule reachable from a list body may write a new env key; cover the ones that do.
+    ...[
+      ['an align env', '\\begin{align}\na &= b\n\\end{align}'],
+      ['a section', '\\section{Head}'],
+      ['a label', '\\label{x}'],
+      ['a footnote', '\\footnote{n}'],
+      ['a tabular', '\\begin{tabular}{|l|}\nq\n\\end{tabular}'],
+      ['a fence', '```\ncode\n```'],
+      ['display math', '$$x^2$$'],
+    ].map(([what, body]) => ({
+      name: 'list holding ' + what,
+      src: '\\begin{itemize}\n\\item[a] x\n' + body + '\n\\end{itemize}\n',
+    })),
   ].forEach(({ name, src }) => {
     it(`a silent Lists probe over a ${name} leaves state.env unchanged`, () => {
       const env = {};
@@ -141,6 +154,27 @@ describe('silent-mode Lists probe memo', () => {
     it(`repeated probes over a ${name} return ${expected}`, () => {
       const state = new md.block.State(src, md, {}, []);
       [1, 2, 3].forEach(() => listsRule(state, 0, state.lineMax, true).should.equal(expected));
+    });
+  });
+  // The key omits several fields ListsInternal reads. Pin that they really are irrelevant:
+  // a cached answer must equal what an unmemoized parse says under the same mutation.
+  [
+    ['env.isBlock', (s) => { s.env.isBlock = true; }],
+    ['env.parentType', (s) => { s.env.parentType = 'itemize'; }],
+    ['env.prentLevel', (s) => { s.env.prentLevel = 3; }],
+    ['state.types', (s) => { s.types = ['itemize']; }],
+    ['state.level', (s) => { s.level = 3; }],
+  ].forEach(([field, mutate]) => {
+    [{ name: 'closed', src: closed }, { name: 'unclosed', src: unclosed }].forEach(({ name, src }) => {
+      it(`a cached answer for a ${name} list survives a change to ${field}`, () => {
+        const cachedState = new md.block.State(src, md, {}, []);
+        listsRule(cachedState, 0, cachedState.lineMax, true); // fills the memo
+        mutate(cachedState);
+        const cached = listsRule(cachedState, 0, cachedState.lineMax, true);
+        const freshState = new md.block.State(src, md, {}, []);
+        mutate(freshState);
+        cached.should.equal(listsRule(freshState, 0, freshState.lineMax, true));
+      });
     });
   });
   it('a real call after silent probes still emits tokens', () => {

@@ -5,8 +5,13 @@ const MATH_TOKEN_TYPES = new Set<string>(mathTokenTypes);
 // content is raw markup) contribute 0.
 const TEXT_LIKE_TYPES = new Set<string>(['text', 'code_inline', 'text_special']);
 
-// Zero-width combining marks that fall inside the Katakana range below.
-const isZeroWidthCombining = (cp: number): boolean => cp === 0x3099 || cp === 0x309A;
+// Combining marks: they render over the base glyph, so they reserve nothing.
+const isZeroWidthCombining = (cp: number): boolean =>
+  (cp >= 0x0300 && cp <= 0x036F) ||   // Combining Diacritical Marks
+  (cp >= 0x1AB0 && cp <= 0x1AFF) ||   // ... Extended
+  (cp >= 0x20D0 && cp <= 0x20F0) ||   // ... for Symbols
+  (cp >= 0xFE20 && cp <= 0xFE2F) ||   // Combining Half Marks
+  cp === 0x3099 || cp === 0x309A;     // Katakana voiced marks (inside the wide range below)
 
 // Minimal shape tokenMarkerWidth reads (a subset of markdown-it's Token).
 interface WidthToken {
@@ -43,8 +48,8 @@ const ASCII_EM: Float64Array = (() => {
  * Whether a code point is an East-Asian Wide/Fullwidth character, which renders
  * roughly twice as wide as an ASCII character. Approximation of Unicode's East
  * Asian Width property covering the BMP ranges. Astral characters (emoji, CJK
- * Ext-B+) are out of range and count as width 1; the zero-width combining marks
- * U+3099/U+309A are excluded. Other combining marks are not special-cased (count 1).
+ * Ext-B+) are out of range. Combining marks are excluded here and reserve 0 —
+ * see isZeroWidthCombining.
  */
 export const isWideChar = (cp: number): boolean =>
   !isZeroWidthCombining(cp) &&
@@ -60,9 +65,41 @@ export const isWideChar = (cp: number): boolean =>
   (cp >= 0xFF00 && cp <= 0xFF60) ||   // Fullwidth Forms
   (cp >= 0xFFE0 && cp <= 0xFFE6));    // Fullwidth signs
 
+// Width class of a non-ASCII code point. The ASCII classes can't see these letters, so split by
+// case: uppercase runs widest (`Љ` is 1.06em in Arial), everything else fits the wide class.
+const CLASS_EM: number[] = [0, 0, CJK_EM, XWIDE_EM, WIDE_EM];
+const classifyNonAscii = (cp: number): number => {
+  if (isZeroWidthCombining(cp)) {
+    return 1;
+  }
+  if (isWideChar(cp)) {
+    return 2;
+  }
+  const ch: string = String.fromCodePoint(cp);
+  return ch !== ch.toLowerCase() && ch === ch.toUpperCase() ? 3 : 4;
+};
+
+// Cached per code point (the case test allocates, and markers repeat characters) in a fixed
+// 64 KB table rather than a growing Map; allocated on the first non-ASCII char measured.
+let bmpClass: Uint8Array | null = null;
+const nonAsciiEm = (cp: number): number => {
+  if (cp > 0xFFFF) {
+    return CLASS_EM[classifyNonAscii(cp)];
+  }
+  if (!bmpClass) {
+    bmpClass = new Uint8Array(0x10000);
+  }
+  let cls: number = bmpClass[cp];
+  if (cls === 0) {
+    cls = classifyNonAscii(cp);
+    bmpClass[cp] = cls;
+  }
+  return CLASS_EM[cls];
+};
+
 /**
- * Reserve for a run of text in em: sum of per-char class widths. Combining marks U+3099/
- * U+309A count 0; East-Asian wide chars use CJK_EM; else narrow/normal/wide by class.
+ * Reserve for a run of text in em: sum of per-char class widths. ASCII by the class table,
+ * combining marks 0, East-Asian wide CJK_EM, other non-ASCII by case (see classifyNonAscii).
  */
 export const textReserveEm = (str: string): number => {
   let em = 0;
@@ -76,10 +113,7 @@ export const textReserveEm = (str: string): number => {
     if (cp > 0xFFFF) {
       i++; // consume the low surrogate; an astral char counts once
     }
-    if (isZeroWidthCombining(cp)) {
-      continue;
-    }
-    em += isWideChar(cp) ? CJK_EM : NORMAL_EM;
+    em += nonAsciiEm(cp);
   }
   return em;
 };

@@ -74,8 +74,8 @@ describe('Style snapshots — individual functions:', () => {
     listsStyles.should.include('padding-right: ' + MARKER_GAP_EM + 'em');
   });
   it('listsStyles has no bare ul/ol selector (generic elements must stay scoped)', () => {
-    // A bare `ul`/`ol` (line-initial or after a comma, before `,{>+~`) would restyle the host
-    // page — see 2026-03-mmd-css-scoping. `ul.itemize` / `#setText ul` are fine (not bare).
+    // Generic elements must be scoped-only; MMD classes stay bare + scoped on purpose, so
+    // `ul.itemize` is fine and only an unqualified `ul`/`ol` fails (2026-03-mmd-css-scoping).
     listsStyles.should.not.match(/(^|,)\s*(ul|ol)\s*[,{>+~]/m);
   });
   it('PreviewStyle', () => {
