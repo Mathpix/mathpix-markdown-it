@@ -1151,6 +1151,15 @@ Build the es5 file for node.
 $ npm run build
 ```
 
+`lib/` and `es5/` are committed build artifacts, so `npm run build` is the only command whose
+output should be committed. `npm run compile` is for iterating: it skips `es5/`, and its `.d.ts`
+differ from the committed ones because the webpack step re-emits declarations through `ts-loader`
+(`declaration: true` in `tsconfig.json`). After a source change, build and check the tree:
+
+```shell
+$ npm run build && git diff --exit-code lib/ es5/
+```
+
 # Testing
 
 ```shell

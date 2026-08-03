@@ -253,8 +253,8 @@ export const resolveListPadding = (listTokens: Token[]): void => {
     }
     const ancestorSum: number = prefix[depth];
     const total: number = Math.min(token.padding || 0, LIST_MAX_INDENT_EM);
-    // Past the clamp (from depth 9 of plain defaults) this goes negative, so the default applies.
-    const em: number = Math.round((total - ancestorSum) * 100) / 100;
+    // Ceil, never round: the reserve must not fall below the need. Negative past the clamp.
+    const em: number = Math.ceil((total - ancestorSum) * 100) / 100;
     // Own indent for this level: the reserved em when the marker overflows, else the default.
     const indentEm: number = em > LIST_DEFAULT_INDENT_EM ? em : LIST_DEFAULT_INDENT_EM;
     if (em > LIST_DEFAULT_INDENT_EM) {

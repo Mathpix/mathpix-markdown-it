@@ -343,8 +343,9 @@ export const processListChildToken = (
         state.types.pop();
       }
       ctx.iOpen--;
-      // Pop only a list of the matching kind, so an unpaired close can't take an outer list
-      // off the registry and misattribute later markers (the block path checks by identity).
+      // Pop only a list of the matching kind. Weaker than the block path, which compares the
+      // token itself: an unpaired close of the *same* kind still pops an outer list here, since
+      // a close token carries no link to its opener in the inline stream.
       const openType: string = token.type === 'itemize_list_close' ? 'itemize_list_open' : 'enumerate_list_open';
       if (ctx.openTokens[ctx.openTokens.length - 1]?.type === openType) {
         ctx.openTokens.pop();

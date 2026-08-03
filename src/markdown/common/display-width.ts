@@ -3,7 +3,8 @@ import { mathTokenTypes, EX_TO_EM } from "./consts";
 const MATH_TOKEN_TYPES = new Set<string>(mathTokenTypes);
 // Leaf tokens whose `content` is visible text (measured); others (e.g. `html_inline`, whose
 // content is raw markup) contribute 0.
-const TEXT_LIKE_TYPES = new Set<string>(['text', 'code_inline', 'text_special']);
+// `code_inline` is absent on purpose: it is handled earlier, by the monospace branch.
+const TEXT_LIKE_TYPES = new Set<string>(['text', 'text_special']);
 
 // Combining marks: they render over the base glyph, so they reserve nothing.
 const isZeroWidthCombining = (cp: number): boolean =>
@@ -92,6 +93,26 @@ const nonAsciiEm = (cp: number): number => {
   return em;
 };
 
+// Monospace cells in a run: code points, not UTF-16 units, and combining marks take none.
+const monoCells = (str: string): number => {
+  let cells = 0;
+  for (let i = 0; i < str.length; i++) {
+    const unit: number = str.charCodeAt(i);
+    if (unit < 128) {
+      cells++;
+      continue;
+    }
+    const cp: number = str.codePointAt(i) ?? 0;
+    if (cp > 0xFFFF) {
+      i++;
+    }
+    if (!isZeroWidthCombining(cp)) {
+      cells++;
+    }
+  }
+  return cells;
+};
+
 /**
  * Reserve for a run of text in em: sum of per-char class widths. ASCII by the class table,
  * combining marks 0, East-Asian wide CJK_EM, other non-ASCII by case (see nonAsciiEm).
@@ -131,7 +152,7 @@ export const tokenMarkerWidth = (token: WidthToken): number => {
   }
   // These render as `<code>` in a monospace face, where the glyph-class estimate underreserves.
   if (token.type && MONO_TOKEN_TYPES.has(token.type)) {
-    return (token.content ?? '').length * MONO_EM;
+    return monoCells(token.content ?? '') * MONO_EM;
   }
   if (token.children && token.children.length) {
     let em = 0;

@@ -2,6 +2,8 @@
 
 ## [3.1.0] - List rendering robustness fixes
 
+This release deliberately bundles two unrelated groups of renderer changes — the list fixes below and the code-block font scaling further down — so that both reach consumers in a single package publish. They touch disjoint code (list/footnote block rules vs. the stylesheet) and are described separately.
+
 Fixes for LaTeX `itemize`/`enumerate` lists that rendered incorrectly on several inputs:
 
 - Marker padding is now measured for block-content items too (`\begin{figure}`/`\begin{tabular}`/code fence), so a list whose long-marker items all hold block content no longer loses its `padding-inline-start`.
@@ -23,7 +25,7 @@ A markdown link in a `\begin{tabular}` cell skipped two tokens too many, so its 
 
 ### Code-block styles scale with the em context
 
-Code-text styles were pinned to absolute values (`pre code` `font-size: 15px` / `line-height: 24px` / `padding: 1rem`, `pre` `font-size: 85%`), so a code block did not scale when a consumer sized a rendered block by setting a single `font-size` on the container (e.g. image export) — everything else scaled but the code stayed ~15px. The four properties are now relative (`pre` `font-size: 0.9375em`; `pre code` `font-size: inherit`, `line-height: 1.6`, `padding: 1em`), so a code block scales with its `em` context. Calibrated so that at a 16px base the code text is pixel-identical to before (15px glyphs, 24px line box); the only visible change is code padding, 16px → 15px. Note `pre code` now inherits `font-size` from `pre`, so a consumer that sized code via `pre` now also affects the code text (before, the absolute `15px` on `pre code` won). Styles only; no HTML/markup change.
+Code-text styles were pinned to absolute values (`pre code` `font-size: 15px` / `line-height: 24px` / `padding: 1rem`, `pre` `font-size: 85%`), so a code block did not scale when a consumer sized a rendered block by setting a single `font-size` on the container (e.g. image export) — everything else scaled but the code stayed ~15px. The four properties are now relative (`pre` `font-size: 0.9375em`; `pre code` `font-size: inherit`, `line-height: 1.6`, `padding: 1em`), so a code block scales with its `em` context. Calibrated so that at a 16px base the code text is pixel-identical to before (15px glyphs, 24px line box); the only visible change is code padding, 16px → 15px. Note `pre code` now inherits `font-size` from `pre`, so a consumer that sized code via `pre` now also affects the code text (before, the absolute `15px` on `pre code` won). **Migration:** the `pre` base lives in the always-emitted `MathpixStyle`, so deep-importing `lib/styles/styles-code` on its own now leaves code text at the UA `pre` default (~13px instead of 15px) — emit `MathpixStyle` as well, or set `#preview-content pre, #setText pre { font-size: 0.9375em }` yourself. Styles only; no HTML/markup change.
 
 See `pr-specs/2026-07-code-block-font-scaling.md`.
 

@@ -20,20 +20,14 @@ let listLevels: ListLevelState[] = [];
 let currentListDepth: number = -1; // -1 means “not inside a list”
 
 // Speculative parses reach these diagnostics once per offending line, so a desync would flood a
-// consumer's log. Report each distinct depth once per parse (reset below), then cap the rest —
-// a repeat carries no new information, but a different depth does.
-const WARN_LIMIT = 5;
+// consumer's log. Report each distinct case once per parse (reset below); a repeat says nothing new.
 const warned: Set<string> = new Set();
 const warnDistinct = (key: string, ...args: any[]): void => {
   if (warned.has(key)) {
     return;
   }
   warned.add(key);
-  if (warned.size <= WARN_LIMIT) {
-    console.warn(...args);
-  } else if (warned.size === WARN_LIMIT + 1) {
-    console.warn('[list-state] further list-depth diagnostics suppressed for this parse');
-  }
+  console.warn(...args);
 };
 
 /**
@@ -64,8 +58,7 @@ export const enterListLevel = (): void => {
  */
 export const leaveListLevel = (): void => {
   if (currentListDepth < 0) {
-    warnDistinct('leave:' + currentListDepth,
-      '[list-state] Attempt to leave list level while depth = -1');
+    warnDistinct('leave', '[list-state] Attempt to leave list level while depth = -1');
     return;
   }
   currentListDepth--;

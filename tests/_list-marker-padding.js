@@ -9,7 +9,7 @@ const { mathpixMarkdownPlugin } = require('../lib/index.js');
 const { FontMetrics } = require('../lib/markdown/common/text-dimentions');
 const { MARKER_GAP_EM, LIST_DEFAULT_INDENT_EM, DEFAULT_FONT_SIZE_PX, DEFAULT_EX_PX } = require('../lib/markdown/common/consts');
 const { resolveListPadding } = require('../lib/markdown/md-latex-lists-env/latex-list-items');
-const { processListChildToken } = require('../lib/markdown/md-latex-lists-env/latex-list-tokens');
+const { processListChildToken, computeMarkerPadding } = require('../lib/markdown/md-latex-lists-env/latex-list-tokens');
 const { render_itemize_list_open } = require('../lib/markdown/md-latex-lists-env/render-latex-list-env');
 const Token = require('markdown-it/lib/token');
 
@@ -133,6 +133,19 @@ describe('List marker padding — the default-indent threshold:', () => {
     paddingValue(render('\\begin{itemize}\n\\item[.....] a\n\\end{itemize}'))
       .should.be.above(LIST_DEFAULT_INDENT_EM);
   });
+  // Rounding to 2 decimals must not land below the need: `[WWWWWWWW]` needs 9.425em.
+  const mdInline = markdownIt({ html: true }).use(mathpixMarkdownPlugin, {});
+  const markerTokensOf = (marker) => {
+    const tokens = [];
+    mdInline.inline.parse(marker, mdInline, {}, tokens);
+    return tokens;
+  };
+  ['WWWWWWWW', 'aaaaaaaaaaaaaaaaaaaaaa', 'ПРИМЕЧАНИЕ', '`iiiiiiiiii`'].forEach((marker) => {
+    it('never rounds the reserve below the computed need for "' + marker + '"', () => {
+      paddingValue(render('\\begin{itemize}\n\\item[' + marker + '] a\n\\end{itemize}'))
+        .should.be.at.least(computeMarkerPadding(markerTokensOf(marker)));
+    });
+  });
 });
 
 describe('data-padding-inline-start is sanitized before it reaches inline style:', () => {
@@ -175,8 +188,8 @@ describe('resolveListPadding — malformed depth is tolerated (no throw):', () =
 });
 
 describe('processListChildToken — an unpaired close does not steal the outer list:', () => {
-  // The block path pops the registry by identity; this pins the inline path's equivalent guard,
-  // reachable only as a unit test (a stray close cannot be produced from public input).
+  // The inline guard is by kind only — weaker than the block path's identity check. Pins what it
+  // does cover; a same-kind unpaired close is not protected (see the comment at the call site).
   const mkState = () => ({
     tokens: [], types: ['itemize'], startLine: 0, prentLevel: 0, md: { options: {} },
     push: () => new Token('x', '', 0),

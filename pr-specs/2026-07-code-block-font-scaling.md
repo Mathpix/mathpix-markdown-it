@@ -72,6 +72,7 @@ pixel-for-pixel no-op.
   setting `#setText pre code { font-size: … }` still works, but one that sized it via `pre`
   now also affects the code text (previously the absolute `15px` on `pre code` won). Set the
   size on `pre code` if independent control is needed.
+- **`codeStyles` alone no longer sizes the code text — it needs the `pre` base from `MathpixStyle`.** `pre code` used to carry an absolute `15px`; now it inherits, and the `0.9375em` base lives in the always-emitted `codeBlockStyles`. A consumer deep-importing `lib/styles/styles-code` **without** `MathpixStyle` gets `pre code` inheriting the UA `pre` default (~13px monospace), i.e. code text ~13% smaller. Emit `MathpixStyle` too, or set `#preview-content pre, #setText pre { font-size: 0.9375em }` yourself.
 - **Code padding is 15px, not 16px, at the default base** (`1em` of a 15px `pre`).
 - Scaling the block by a container `font-size` now scales code padding and line height too;
   before, both stayed fixed.

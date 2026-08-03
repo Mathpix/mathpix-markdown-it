@@ -1185,7 +1185,7 @@ module.exports = [
   {
     name: "marker: wide capitals glyph class",
     latex: "\\begin{itemize}\n\\item[WWWWWWWW] a\n\\end{itemize}",
-    html: "<ul data-padding-inline-start=\"9.42em\" class=\"itemize\" style=\"padding-inline-start: 9.42em; list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">WWWWWWWW</span>a</li></ul>"
+    html: "<ul data-padding-inline-start=\"9.43em\" class=\"itemize\" style=\"padding-inline-start: 9.43em; list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">WWWWWWWW</span>a</li></ul>"
   },
   {
     name: "marker: code-span",
@@ -1200,7 +1200,7 @@ module.exports = [
   {
     name: "marker: real long not clamped (22)",
     latex: "\\begin{itemize}\n\\item[aaaaaaaaaaaaaaaaaaaaaa] a\n\\end{itemize}",
-    html: "<ul data-padding-inline-start=\"14.26em\" class=\"itemize\" style=\"padding-inline-start: 14.26em; list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">aaaaaaaaaaaaaaaaaaaaaa</span>a</li></ul>"
+    html: "<ul data-padding-inline-start=\"14.27em\" class=\"itemize\" style=\"padding-inline-start: 14.27em; list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">aaaaaaaaaaaaaaaaaaaaaa</span>a</li></ul>"
   },
   {
     name: "marker: pathological clamp (60)",

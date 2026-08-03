@@ -14,14 +14,24 @@ export const LIST_SPECULATIVE_ENV_KEYS: readonly string[] =
 
 const TRANSIENT_KEY_SET: Set<string> = new Set(LIST_TRANSIENT_ENV_KEYS);
 
+// Rolled-back keys hold `undefined`; replaying that would clear a key that went live later.
+// The begin-tabular trio is exempt — it sets these undefined on purpose and needs the replay.
+const REPLAY_UNDEFINED_KEYS: Set<string> = new Set(['isInline', 'subTabular', 'tabulare']);
+const CLOBBER_PRONE_KEYS: Set<string> = new Set(
+  LIST_SPECULATIVE_ENV_KEYS.filter((k) => !REPLAY_UNDEFINED_KEYS.has(k)));
+
 // Snapshot of `env` for a token's `envToInline`, minus the transient list-parse flags. Copies
 // wanted keys instead of deleting from a spread: `delete` leaves it in dictionary mode (~13%).
 export const snapshotEnvForInline = (env: any): any => {
   const snap: any = {};
   for (const k of Object.keys(env)) {
-    if (!TRANSIENT_KEY_SET.has(k)) {
-      snap[k] = env[k];
+    if (TRANSIENT_KEY_SET.has(k)) {
+      continue;
     }
+    if (env[k] === undefined && CLOBBER_PRONE_KEYS.has(k)) {
+      continue;
+    }
+    snap[k] = env[k];
   }
   // Symbol entries (TOC tokens, math cache) are never list flags.
   for (const k of Object.getOwnPropertySymbols(env)) {

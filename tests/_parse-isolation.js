@@ -140,6 +140,43 @@ describe('silent-mode Lists does not mutate shared env', () => {
   });
 });
 
+// An aborted parse leaks the module-global list depth — entered from two sites, so no local
+// unwind is correct (Non-Goal). Pin what actually matters: later lists still render right.
+describe('a leaked list depth does not change how later lists render', () => {
+  const md = markdownIt({ html: true }).use(mathpixMarkdownPlugin, {});
+  const list = '\\begin{itemize}\n\\item[a] x\n\\begin{itemize}\n\\item[XXXXXXXXXXXX] y\n\\end{itemize}\n\\end{itemize}\n';
+  const unclosed = (n) => Array.from({ length: n }, () => '\\begin{itemize}\n\\item stray\n').join('\n');
+  [1, 6].forEach((n) => {
+    it(`${n} unclosed \\begin{itemize} before a list leave its HTML unchanged`, () => {
+      const withPrefix = md.render(unclosed(n) + '\n' + list);
+      withPrefix.should.include(md.render(list).trim());
+    });
+  });
+  it('markers and items stay balanced after the leak', () => {
+    const html = md.render(unclosed(6) + '\n' + list);
+    const count = (re) => (html.match(re) || []).length;
+    count(/<ul/g).should.equal(count(/<\/ul>/g));
+    count(/<li/g).should.equal(count(/<\/li>/g));
+  });
+});
+
+// Rolled-back env keys hold `undefined`, and a token's envToInline is replayed onto the shared
+// env — so that `undefined` must not clear a key a later block legitimately set.
+describe('a rolled-back env key does not clobber a later live value', () => {
+  const md = markdownIt({ html: true }).use(mathpixMarkdownPlugin, { centerImages: true });
+  const alignAfter = (src) => {
+    const env = {};
+    md.render(src, env);
+    return env.align;
+  };
+  const centered = '\\begin{center}\n\\includegraphics{a.png}\n\\end{center}';
+  const listWithTabular = '\\begin{itemize}\n\\item[a] x\n\\begin{tabular}{|l|}\nq\n\\end{tabular}\n\\end{itemize}';
+  it('env.align set after a list-with-tabular survives the envToInline replay', () => {
+    alignAfter(centered).should.equal('center');
+    alignAfter(listWithTabular + '\n\n' + centered).should.equal('center');
+  });
+});
+
 // The silent probe answer is memoized per state, so terminator scans don't re-parse the same
 // list. The memo must not change the answer, nor short-circuit a real (non-silent) call.
 describe('silent-mode Lists probe memo', () => {
