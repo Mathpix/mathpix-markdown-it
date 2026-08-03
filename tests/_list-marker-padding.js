@@ -187,6 +187,22 @@ describe('resolveListPadding — malformed depth is tolerated (no throw):', () =
   });
 });
 
+describe('resolveListPadding — the ancestor sum follows the depth, not the last branch:', () => {
+  const mk = (prentLevel, padding) => ({ prentLevel, padding, attrSet(k, v) { this[k] = v; } });
+  it('a skipped level counts as the default, and a sibling after it does not inherit its sum', () => {
+    const toks = [mk(0, 0), mk(2, 12), mk(1, 0), mk(1, 11), mk(3, 18)];
+    resolveListPadding(toks);
+    const pad = (t) => t['data-padding-inline-start'];
+    // depth 2 with level 1 skipped: ancestors count as 2 × 2.5, so 12 − 5.
+    pad(toks[1]).should.equal('7em');
+    // back at depth 1: ancestors are 2.5 again, not the 12 carried by the depth-2 branch.
+    pad(toks[3]).should.equal('8.5em');
+    // deeper again: the chain is rebuilt from the current sums (2.5 + 8.5 + 2.5), not stale ones.
+    pad(toks[4]).should.equal('4.5em');
+    [toks[0], toks[2]].forEach((t) => (pad(t) === undefined).should.equal(true));
+  });
+});
+
 describe('processListChildToken — an unpaired close does not steal the outer list:', () => {
   // The inline guard is by kind only — weaker than the block path's identity check. Pins what it
   // does cover; a same-kind unpaired close is not protected (see the comment at the call site).

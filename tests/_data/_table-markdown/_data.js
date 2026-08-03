@@ -976,6 +976,15 @@ module.exports = [
       '| :--- |'
   },
   {
+    // Formatted link text spans several tokens; the whole label must survive the export.
+    id: 58,
+    latex: '\\begin{tabular}{|l|}\n' +
+      '[**bold** x](http://a.b) and [*it* `c` y](http://c.d)\n' +
+      '\\end{tabular}',
+    table_markdown: '| [**bold** x](http://a.b) and [*it* `c` y](http://c.d) |\n' +
+      '| :--- |'
+  },
+  {
     // A leaf run is collected per cell: td_open/td_close bound it, so cell 2 stays out of cell 1.
     id: 57,
     latex: '\\begin{tabular}{|l|l|}\n' +
@@ -991,6 +1000,42 @@ module.exports = [
       '[t](http://a.b) tail [u](http://c.d) **b** c\n' +
       '\\end{tabular}',
     table_markdown: '| [t](http://a.b) tail [u](http://c.d) **b** c |\n' +
+      '| :--- |'
+  },
+  {
+    // A label with no markdown marker of its own: the alt text must survive.
+    id: 59,
+    latex: '\\begin{tabular}{|l|}\n' +
+      '[![alt](i.png)](http://a.b) x\n' +
+      '\\end{tabular}',
+    table_markdown: '| [alt](http://a.b) x |\n' +
+      '| :--- |'
+  },
+  {
+    // Same for inline math: the label falls back to the latex source.
+    id: 60,
+    latex: '\\begin{tabular}{|l|}\n' +
+      '[$x^2$](http://a.b) y\n' +
+      '\\end{tabular}',
+    table_markdown: '| [x^2](http://a.b) y |\n' +
+      '| :--- |'
+  },
+  {
+    // A `]` in the label reaches markdown-it unescaped; re-escape it or it closes the label early.
+    id: 61,
+    latex: '\\begin{tabular}{|l|}\n' +
+      '[a\\]b](http://a.b) z\n' +
+      '\\end{tabular}',
+    table_markdown: '| [a\\]b](http://a.b) z |\n' +
+      '| :--- |'
+  },
+  {
+    // A self-closing token with a marker: the marker must not replace the content.
+    id: 62,
+    latex: '\\begin{tabular}{|l|}\n' +
+      '[<smiles>CCO</smiles>](http://a.b) z\n' +
+      '\\end{tabular}',
+    table_markdown: '| [<smiles>CCO</smiles>](http://a.b) z |\n' +
       '| :--- |'
   },
 ];

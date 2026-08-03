@@ -97,9 +97,8 @@ export const ListItems = (
         const rawContent: string = listItem?.content?.slice(match.index + match[0].length) ?? '';
         const blockContent: string = rawContent.trim();
         SetTokensBlockParse(state, blockContent, {disableBlockRules: true});
-        // Mirror the inline branch's reset (below): don't leave isBlock set after a block item.
-        // Defence-in-depth only — the real guarantee is the Lists rule's finally restore; do
-        // not drop that finally on the strength of this line.
+        // Clears isBlock after the *last* block item; for earlier ones the next iteration sets it
+        // back. The Lists rule's finally is the actual guarantee — do not drop it for this line.
         state.env.isBlock = false;
         continue;
       }
@@ -253,7 +252,8 @@ export const resolveListPadding = (listTokens: Token[]): void => {
     }
     const ancestorSum: number = prefix[depth];
     const total: number = Math.min(token.padding || 0, LIST_MAX_INDENT_EM);
-    // Ceil, never round: the reserve must not fall below the need. Negative past the clamp.
+    // Ceil, never round: the reserve must not fall below the need — float noise can add one
+    // hundredth on top, which is the safe direction. Negative past the clamp.
     const em: number = Math.ceil((total - ancestorSum) * 100) / 100;
     // Own indent for this level: the reserved em when the marker overflows, else the default.
     const indentEm: number = em > LIST_DEFAULT_INDENT_EM ? em : LIST_DEFAULT_INDENT_EM;

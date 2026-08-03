@@ -3,22 +3,39 @@ export const getMdLink = (child, token, j) => {
     return '';
   }
 
-  let link = '';
-  link += '[';
-  const linkRef = `(${child.attrGet('href')})`;
-  const nextChild = j+1 < token.children.length
-    ? token.children[j+1]
-    : null;
-
-  if (!nextChild) {
+  if (j + 1 >= token.children.length) {
     return '';
   }
-
-  link += nextChild.content;
-  link += ']';
-  link += linkRef;
-
-  return link;
+  // Read the whole link, not just the next token: formatted link text (`[**b** x](url)`) spans
+  // several tokens, and taking only the first yielded an empty label.
+  let text = '';
+  let depth = 1;
+  for (let i = j + 1; i < token.children.length; i++) {
+    const inner = token.children[i];
+    if (inner.type === 'link_open') {
+      depth++;
+    } else if (inner.type === 'link_close') {
+      depth--;
+      if (depth === 0) {
+        break;
+      }
+    }
+    if (inner.type === 'text') {
+      // An unescaped `]` ends the label early and breaks the link.
+      text += inner.content.replace(/\]/g, '\\]');
+    } else if (inner.type === 'code_inline') {
+      // Self-closing: same shape as the main cell loop — open marker, content, close marker.
+      text += getMdForChild(inner) + inner.content + inner.markup;
+    } else if (inner.type === 'smiles_inline') {
+      // The other self-closing type getMdForChild gives a marker for; its closer is not in markup.
+      text += getMdForChild(inner) + inner.content + '</smiles>';
+    } else {
+      // Fall back to content: an image holds its alt there, inline math its latex.
+      // Not escaped here: an image keeps the raw source in `content`, so a `]` is already escaped.
+      text += getMdForChild(inner) || (inner.content ?? '');
+    }
+  }
+  return `[${text}](${child.attrGet('href')})`;
 };
 
 export const getMdForChild = (child): string => {

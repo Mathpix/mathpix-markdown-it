@@ -122,7 +122,11 @@ export const renderTableCellContent = (
               } else if (inner.type === 'link_close') {
                 depth--;
               }
-              content += slf.renderInline([inner], options, env);
+              const innerRendered: string = slf.renderInline([inner], options, env);
+              content += innerRendered;
+              // The loop consumes these, so the smoothed accumulator would otherwise keep the
+              // opening `<a>` with no text and no closing tag.
+              smoothedCell += innerRendered;
             }
           }
           continue;

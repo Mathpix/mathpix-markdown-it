@@ -98,6 +98,8 @@ export const buildBlockStateFromRaw = (md: any, raw: string, baseEnv: any) => {
  */
 export const createBufferedState = (state: StateBlock): BufferedBlockState => {
   // prototype-inherit all read-only properties (bMarks, eMarks, src, etc.)
+  // `env` is deliberately left inherited, so the buffered parse writes straight to the real env
+  // and the commit path needs no copy-back. Give it an own `env` and those writes are lost.
   const tempState = Object.create(state) as BufferedBlockState;
   tempState.tokens = [];
   tempState.level = state.level;

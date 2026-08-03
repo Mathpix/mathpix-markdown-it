@@ -140,6 +140,24 @@ describe('silent-mode Lists does not mutate shared env', () => {
   });
 });
 
+// Only the caption counters are rolled back; the other global registries written from a list body
+// must not drift either. No blank line after `Para` is what fires the paragraph-terminator probe.
+describe('a speculative list parse does not advance other global registries', () => {
+  const md = markdownIt({ html: true }).use(mathpixMarkdownPlugin, { outMath: { include_svg: false } });
+  const bothForms = (before, list, after) =>
+    ['\n', '\n\n'].map((sep) => md.render(before + sep + list + '\n\n' + after));
+  it('a \\label inside a list body resolves to the same number either way', () => {
+    const [probed, separated] = bothForms(
+      'Para',
+      '\\begin{itemize}\n\\item[1.] \\begin{align}x=1\\label{eq:a}\\end{align}\n\\end{itemize}',
+      'See \\ref{eq:a}.');
+    const refNumber = (html) => (html.match(/>(\d+)<\/a>/) || [])[1];
+    refNumber(probed).should.equal(refNumber(separated));
+  });
+  // No theorem case: a \begin{theorem} inside a list body is not rendered at all, so its counter
+  // is unreachable from the speculative parse. See Non-Goals.
+});
+
 // An aborted parse leaks the module-global list depth — entered from two sites, so no local
 // unwind is correct (Non-Goal). Pin what actually matters: later lists still render right.
 describe('a leaked list depth does not change how later lists render', () => {
@@ -201,12 +219,8 @@ describe('silent-mode Lists probe memo', () => {
     ['env.prentLevel', (s) => { s.env.prentLevel = 3; }],
     ['state.types', (s) => { s.types = ['itemize']; }],
     ['state.level', (s) => { s.level = 3; }],
-    ['state.blkIndent', (s) => { s.blkIndent = 2; }],
-    ['state.bMarks/tShift', (s) => {
-      s.src = '  ' + s.src;
-      s.bMarks = s.bMarks.map((v) => v + 2);
-      s.eMarks = s.eMarks.map((v) => v + 2);
-    }],
+    ['state.blkIndent', (s) => { s.blkIndent = 4; }],
+    ['state.sCount', (s) => { s.sCount = s.sCount.map((v) => v + 4); }],
   ].forEach(([field, mutate]) => {
     [{ name: 'closed', src: closed }, { name: 'unclosed', src: unclosed }].forEach(({ name, src }) => {
       it(`a cached answer for a ${name} list survives a change to ${field}`, () => {
@@ -219,6 +233,16 @@ describe('silent-mode Lists probe memo', () => {
         cached.should.equal(listsRule(freshState, 0, freshState.lineMax, true));
       });
     });
+  });
+  // The other half: the fields the key does carry must separate the entries, so one call site
+  // never answers from another's. Both lists live on one state, so both share one memo.
+  it('two list starts on one state keep separate answers', () => {
+    const state = new md.block.State(closed + unclosed, md, {}, []);
+    const probe = (line) => listsRule(state, line, state.lineMax, true);
+    probe(0).should.equal(true);
+    probe(3).should.equal(false);
+    probe(0).should.equal(true);
+    probe(3).should.equal(false);
   });
   it('a real call after silent probes still emits tokens', () => {
     const state = new md.block.State(closed, md, {}, []);

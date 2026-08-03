@@ -246,7 +246,9 @@ const renderNonTableTokenIntoCell = (
   // Single-line nested lists unwrap the item body to bare inline tokens (not an `inline`
   // wrapper), so collect it here for Markdown/TSV/CSV/smoothed; HTML is already appended.
   // Whole run at once: renderTableCellContent consumes siblings (link_open + text + link_close).
-  if (isLeafRunMember(token) && !isLeafRunMember(ctx.tokens[ctx.idx - 1])) {
+  // Gated first: with no export requested this would render the run a second time for nothing.
+  if ((needTsv || needCsv || needMd || needSmoothed)
+      && isLeafRunMember(token) && !isLeafRunMember(ctx.tokens[ctx.idx - 1])) {
     const run: any[] = [];
     for (let i = ctx.idx; i < ctx.tokens.length && isLeafRunMember(ctx.tokens[i]); i++) {
       run.push(ctx.tokens[i]);

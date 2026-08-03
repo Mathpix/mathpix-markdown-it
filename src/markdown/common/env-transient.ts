@@ -7,6 +7,8 @@ export const LIST_TRANSIENT_ENV_KEYS: readonly string[] = ['isBlock', 'inherited
 
 // Env keys written by the rules reachable from a list body — floats, align, tabular, section
 // numbering; rolled back only when the speculative parse is discarded (else the tokens own them).
+// Hand-maintained, not derived from the write sites: a new key shows up as a failing probe case
+// in tests/_parse-isolation.js ("leaves state.env unchanged") and belongs in this list.
 export const LIST_SPECULATIVE_ENV_KEYS: readonly string[] =
   ['caption', 'captionPos', 'captionIsLabelFormatEmpty', 'captionIsSingleLineCheck',
    'envType', 'align', 'alignEnvBlock', 'number', 'type',

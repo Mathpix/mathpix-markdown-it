@@ -2,6 +2,8 @@ let chai = require('chai');
 let should = chai.should();
 
 let MM = require('../lib/mathpix-markdown-model/index').MathpixMarkdownModel;
+const markdownIt = require('markdown-it');
+const { mathpixMarkdownPlugin } = require('../lib/index.js');
 
 const options = {
   cwidth: 800
@@ -88,5 +90,34 @@ describe('Check tabular with diagbox:', () => {
       });
 
     });
+  });
+});
+
+describe('A link in a tabular cell renders well-formed in every output:', () => {
+  const src = '\\begin{tabular}{l}\n[**b** x](http://a.b) tail\n\\end{tabular}';
+  it('the smoothed (pptx) cell closes the anchor and keeps its label', () => {
+    // tableSmoothed is an output surface for the external pptx exporter, filled during render.
+    // The link branch consumes the inner tokens, so it used to hold a bare opening `<a>`.
+    const md = markdownIt({ html: true }).use(mathpixMarkdownPlugin,
+      { outMath: { include_svg: false }, forPptx: true });
+    const env = {};
+    const tokens = md.parse(src, env);
+    md.renderer.render(tokens, md.options, env);
+    const found = [];
+    const walk = (arr) => arr.forEach((t) => {
+      if (t.tableSmoothed) { found.push(JSON.stringify(t.tableSmoothed)); }
+      if (t.children) { walk(t.children); }
+    });
+    walk(tokens);
+    found.should.have.length.above(0);
+    const smoothed = found.join('');
+    (smoothed.match(/<a /g) || []).length.should.equal((smoothed.match(/<\/a>/g) || []).length);
+    smoothed.should.include('<strong>b</strong>');
+  });
+  it('tsv keeps the href by design, not the label', () => {
+    const html = MM.markdownToHTML(src, { outMath: { include_svg: false, include_tsv: true } });
+    const tsv = (html.match(/<tsv[^>]*>([\s\S]*?)<\/tsv>/) || [])[1];
+    tsv.should.include('http://a.b');
+    tsv.should.include('tail');
   });
 });

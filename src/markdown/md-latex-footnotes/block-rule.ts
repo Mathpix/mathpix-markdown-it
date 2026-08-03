@@ -20,9 +20,10 @@ const FOOTNOTETEXT_POS_KEY = Symbol('mmd.footnotetextSrcPositions');
 const FOOTNOTE_TOKEN_SWEEP_G: RegExp = new RegExp(reFootnoteToken.source, 'g');
 const FOOTNOTETEXT_TOKEN_SWEEP_G: RegExp = new RegExp(reFootnotetextToken.source, 'g');
 
-// Block rules that terminate a footnote pre-tag scan. Resolved fns are NOT cached because
-// `rule.enabled` toggles mid-parse; re-resolving per call avoids replicating markdown-it's
-// `__cache__` invalidation (measured branch-vs-master: no difference).
+// Terminators for the \footnote scan, kept minimal alongside fence.
+const LIST_TERMINATOR_NAME = new Set<string>(["Lists"]);
+// Terminators for the \footnotetext scan. Neither set caches resolved fns: `rule.enabled` toggles
+// mid-parse (measured: no cost).
 const FOOTNOTE_TERMINATOR_NAMES = new Set<string>([
   "table", "smilesDrawerBlock", "collapsible", "fence", "blockquote", "hr",
   "list", "Lists", "footnote_def", "heading", "svg_block", "html_block", "pageBreaksBlock", "deflist",
@@ -59,19 +60,6 @@ const getCachedSrcPositions = (
   patternG.lastIndex = 0;
   slot[key] = { src: state.src, lastPos };
   return lastPos;
-};
-
-// Resolve a single enabled block-rule fn by name, or null. No Set/array allocation.
-const resolveEnabledRuleFn = (ruler: Ruler, name: string): RuleBlock | null => {
-  const rules = ruler.__rules__;
-  if (rules?.length) {
-    for (let i = 0; i < rules.length; i++) {
-      if (rules[i].enabled && rules[i].name === name) {
-        return rules[i].fn;
-      }
-    }
-  }
-  return null;
 };
 
 // Resolve the enabled block-rule fns for the given names (in ruler order). Not cached —
@@ -114,7 +102,7 @@ export const latex_footnote_block: RuleBlock = (state, startLine, endLine, silen
     if (!sawFootnoteToken || !reOpenTagFootnoteG.test(lineText)) {
       // Terminate on `fence` (original) plus the LaTeX list rule, so a `\begin{itemize}`
       // before the tag isn't swallowed — a minimal addition (fence + Lists, not the full set).
-      const listRule = resolveEnabledRuleFn(state.md.block.ruler, "Lists");
+      const [listRule] = resolveEnabledRuleFns(state.md.block.ruler, LIST_TERMINATOR_NAME);
       for (; nextLine < endLine; nextLine++) {
         if (fence(state, nextLine, endLine, true) ||
             (listRule && listRule(state, nextLine, endLine, true))) {

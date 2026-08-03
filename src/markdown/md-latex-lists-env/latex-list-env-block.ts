@@ -614,10 +614,12 @@ export const Lists: RuleBlock = (
   // A silent probe answers "does a closed list env start here?", which needs the full
   // speculative parse. Paragraph/footnote terminator scans re-ask it for the same line many
   // times, so memoize per state. Key covers every input the answer depends on.
-  // Includes the line offset and blkIndent: `state.src` alone does not pin what a line contains,
-  // since blockquote shifts bMarks/tShift for the same line numbers on the same state.
+  // `state.src` alone does not pin what a line contains — blockquote shifts bMarks/tShift for the
+  // same line numbers on the same state — so the key carries the first line's geometry too. The
+  // later lines are not in it: the parser walks them from these same arrays, which markdown-it
+  // shifts uniformly, so the first line pins the frame.
   const probeKey: string = silent
-    ? `${startLine}:${endLine}:${state.bMarks[startLine] + state.tShift[startLine]}:${state.blkIndent}` +
+    ? `${startLine}:${endLine}:${state.bMarks[startLine] + state.tShift[startLine]}:${state.eMarks[startLine]}` +
       `:${state.parentType}:${state.prentLevel}:${(state.env as any)?.inheritedListType}`
     : '';
   if (silent) {
