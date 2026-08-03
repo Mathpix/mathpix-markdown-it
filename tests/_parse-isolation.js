@@ -101,7 +101,9 @@ describe('silent-mode Lists does not mutate shared env', () => {
   const listsRule = md.block.ruler.__rules__.find(r => r.name === 'Lists').fn;
   // Full-snapshot check (keys + values) so a leak of any transient env field is caught,
   // for both a closed and an unclosed list.
-  const snapshot = (env) => Object.keys(env).sort().join(',') + '|' + JSON.stringify(env);
+  // Keys are restored to undefined, not deleted — only defined values count as leaked state.
+  const snapshot = (env) =>
+    Object.keys(env).filter((k) => env[k] !== undefined).sort().join(',') + '|' + JSON.stringify(env);
   [
     { name: 'closed list', src: '\\begin{itemize}\n\\item a\n\\end{itemize}\n' },
     { name: 'unclosed list', src: '\\begin{itemize}\n\\item a\n' },

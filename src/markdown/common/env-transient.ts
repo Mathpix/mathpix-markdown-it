@@ -5,10 +5,8 @@
 // unrelated later content and wake the inline fallback (empty `<>` list items).
 export const LIST_TRANSIENT_ENV_KEYS: readonly string[] = ['isBlock', 'inheritedListType', 'parentType', 'prentLevel'];
 
-// Env the nested block rules write while a list body is parsed speculatively: floats
-// (`begin-table.ts`) and tabulars (`begin-tabular`). Rolled back only when that parse is
-// discarded; on commit the flushed tokens own them. A *committed* float still leaves the float
-// keys set — `begin-table` never clears them (pre-existing, happens without a list too).
+// Env keys the nested float/tabular rules write during a speculative list-body parse; rolled
+// back only when that parse is discarded (on commit the flushed tokens own them).
 export const LIST_SPECULATIVE_ENV_KEYS: readonly string[] =
   ['caption', 'captionPos', 'captionIsLabelFormatEmpty', 'captionIsSingleLineCheck',
    'envType', 'align', 'alignEnvBlock', 'number', 'type',
@@ -34,13 +32,10 @@ export const snapshotEnvKeys = (env: any, keys: readonly string[]): { had: { [k:
   return { had, snap };
 };
 
-// Restore `keys` in `env` from a snapshotEnvKeys() result (deletes keys that were absent).
+// Absent keys get `undefined`, not `delete`: `delete` drops `env` into dictionary mode for the
+// rest of the parse (~20% on list-heavy input). Readers test the value, so it is equivalent.
 export const restoreEnvKeys = (env: any, keys: readonly string[], had: { [k: string]: boolean }, snap: { [k: string]: any }): void => {
   for (const k of keys) {
-    if (had[k]) {
-      env[k] = snap[k];
-    } else {
-      delete env[k];
-    }
+    env[k] = had[k] ? snap[k] : undefined;
   }
 };

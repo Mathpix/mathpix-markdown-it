@@ -26,6 +26,19 @@ const WIDE_EM = 0.90;
 const XWIDE_EM = 1.10;
 const CJK_EM = 1.20;                               // East-Asian full-width glyph
 
+// ASCII fast path — those classes are ASCII-only. Built from the same regexes, so it can't drift.
+const ASCII_EM: Float64Array = (() => {
+  const widths = new Float64Array(128);
+  for (let cp = 0; cp < 128; cp++) {
+    const ch: string = String.fromCharCode(cp);
+    widths[cp] = NARROW_RE.test(ch) ? NARROW_EM
+      : XWIDE_RE.test(ch) ? XWIDE_EM
+      : WIDE_RE.test(ch) ? WIDE_EM
+      : NORMAL_EM;
+  }
+  return widths;
+})();
+
 /**
  * Whether a code point is an East-Asian Wide/Fullwidth character, which renders
  * roughly twice as wide as an ASCII character. Approximation of Unicode's East
@@ -53,22 +66,20 @@ export const isWideChar = (cp: number): boolean =>
  */
 export const textReserveEm = (str: string): number => {
   let em = 0;
-  for (const ch of str) {
-    const cp: number = ch.codePointAt(0) ?? 0;
+  for (let i = 0; i < str.length; i++) {
+    const unit: number = str.charCodeAt(i);
+    if (unit < 128) {
+      em += ASCII_EM[unit];
+      continue;
+    }
+    const cp: number = str.codePointAt(i) ?? 0;
+    if (cp > 0xFFFF) {
+      i++; // consume the low surrogate; an astral char counts once
+    }
     if (isZeroWidthCombining(cp)) {
       continue;
     }
-    if (isWideChar(cp)) {
-      em += CJK_EM;
-    } else if (NARROW_RE.test(ch)) {
-      em += NARROW_EM;
-    } else if (XWIDE_RE.test(ch)) {
-      em += XWIDE_EM;
-    } else if (WIDE_RE.test(ch)) {
-      em += WIDE_EM;
-    } else {
-      em += NORMAL_EM;
-    }
+    em += isWideChar(cp) ? CJK_EM : NORMAL_EM;
   }
   return em;
 };

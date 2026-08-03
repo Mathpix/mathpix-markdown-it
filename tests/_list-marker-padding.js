@@ -51,7 +51,9 @@ describe('No empty <> item bodies from leaked env.isBlock:', () => {
     const src = '\\begin{itemize}\n\\item[a] x\n\\begin{tabular}{|l|l|}\ncell\n\\end{tabular}\n\\end{itemize}';
     const env = {};
     md.render(src, env);
-    (['isBlock', 'inheritedListType', 'parentType', 'prentLevel'].some((k) => k in env)).should.equal(false);
+    // Keys are restored to undefined, not deleted — assert on the value, not on presence.
+    (['isBlock', 'inheritedListType', 'parentType', 'prentLevel']
+      .some((k) => env[k] !== undefined)).should.equal(false);
   });
 });
 
@@ -93,8 +95,7 @@ describe('List marker padding — reserve covers the true glyph width (Arial):',
 });
 
 describe('List marker padding — the default-indent threshold:', () => {
-  // A custom indent is emitted only when the marker overflows LIST_DEFAULT_INDENT_EM, so the
-  // padding can never resolve below the default. Narrow glyphs (0.40em) straddle the boundary.
+  // Narrow glyphs (0.40em) straddle the 2.5em default, so they pin both sides of the threshold.
   it('a marker at or under the default indent emits no attribute', () => {
     hasPadding(render('\\begin{itemize}\n\\item[....] a\n\\end{itemize}')).should.equal(false);
   });

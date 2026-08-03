@@ -6,6 +6,9 @@ import { ListsInternal } from "./latex-list-env-block";
 import { getCaptionCounters, setCaptionCounters } from "../common/caption-counters";
 import { BufferedBlockState, PushFn } from "./latex-list-types";
 
+// Hoisted: safeAssignToken runs per flushed token, so a per-call Set would dominate the copy.
+const SAFE_ASSIGN_SKIP: Set<string> = new Set(["type", "tag", "nesting", "level", "block"]);
+
 /** Shallow clone but shift known position fields by baseOffset */
 export const shiftTokenAbsolutePositions = (tok: any, baseOffset: number) => {
   if (!baseOffset) {
@@ -190,9 +193,8 @@ export const flushBufferedTokens = (state: StateBlock, buffered: Token[]): void 
  * Safe assign: copy custom fields but do NOT overwrite core ones that markdown-it sets.
  */
 export const safeAssignToken = (target: any, src: any) => {
-  const SKIP = new Set(["type", "tag", "nesting", "level", "block"]);
   for (const key of Object.keys(src)) {
-    if (SKIP.has(key)) continue;
+    if (SAFE_ASSIGN_SKIP.has(key)) continue;
     target[key] = src[key];
   }
   return target;
