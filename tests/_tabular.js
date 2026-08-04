@@ -187,13 +187,20 @@ describe('A link in a tabular cell renders well-formed in every output:', () => 
     balance(balanced).should.equal(0);
     balanced.tableMd.should.equal('[label](http://a.b) tail');
   });
-  it('raw markup in the label is passed through, brackets and all', () => {
-    // html_inline runs to its `>`, so a `]` inside a tag never closes the label — escaping it would
-    // only put a backslash into the HTML, which is emitted raw.
+  it('every part of the label is escaped, except an image alt', () => {
+    // A truncated label loses the whole link downstream, so `]` is escaped wherever it comes from —
+    // math latex and raw markup included. The cost is a stray backslash inside that payload; an
+    // image alt is exempt because it is raw source and already carries its own.
     const inner = markdownIt({ html: true }).use(mathpixMarkdownPlugin, { outMath: { include_svg: false } });
-    const tokens = [];
-    inner.inline.parse('[a <i title="x]y">t</i> b](http://a.b)', inner, {}, tokens);
-    getMdLink(tokens[0], { children: tokens }, 0).should.equal('[a <i title="x]y">t</i> b](http://a.b)');
+    const label = (src) => {
+      const tokens = [];
+      inner.inline.parse(src, inner, {}, tokens);
+      return getMdLink(tokens[0], { children: tokens }, 0);
+    };
+    label('[a\\]b](http://a.b)').should.equal('[a\\]b](http://a.b)');
+    label('[$a]b$](http://a.b)').should.equal('[a\\]b](http://a.b)');
+    label('[<i title="x]y">t</i>](http://a.b)').should.equal('[<i title="x\\]y">t</i>](http://a.b)');
+    label('[![a\\]b](i.png)](http://a.b)').should.equal('[a\\]b](http://a.b)');
   });
   it('a stitched nested link does not leak a literal <a> into the label', () => {
     const inner = markdownIt({ html: true }).use(mathpixMarkdownPlugin, { outMath: { include_svg: false } });

@@ -4,6 +4,9 @@ const HREF_NEEDS_ANGLES_RE: RegExp = /[\s<>]/;
 const HREF_ANGLE_ESCAPE_RE: RegExp = /([<>\\])/g;
 const LABEL_BRACKET_RE: RegExp = /\]/g;
 
+// The label ends at the first unescaped `]`, so every part of it is escaped on the way out.
+const escapeLabel = (s: string): string => s.replace(LABEL_BRACKET_RE, '\\]');
+
 // A bare destination ends at the first unbalanced `)`, so such an href needs the `<…>` form.
 const hasUnbalancedParens = (href: string): boolean => {
   let depth = 0;
@@ -50,8 +53,7 @@ export const getMdLink = (child, token, j) => {
       }
     }
     if (inner.type === 'text') {
-      // An unescaped `]` ends the label early and breaks the link.
-      text += inner.content.replace(LABEL_BRACKET_RE, '\\]');
+      text += escapeLabel(inner.content);
     } else if (inner.type === 'code_inline') {
       // Self-closing: same shape as the main cell loop — open marker, content, close marker.
       text += getMdForChild(inner) + inner.content + inner.markup;
@@ -61,10 +63,12 @@ export const getMdLink = (child, token, j) => {
     } else if (inner.type === 'link_open' || inner.type === 'link_close') {
       // A nested link has no Markdown form; getMdForChild would emit a literal `<a>` here.
       continue;
+    } else if (inner.type === 'image' || inner.type === 'includegraphics') {
+      // Alt text as written, so a `]` in it already carries its backslash.
+      text += inner.content ?? '';
     } else {
-      // Fall back to content: an image holds its alt there, inline math its latex.
-      // Not escaped here: an image keeps the raw source in `content`, so a `]` is already escaped.
-      text += getMdForChild(inner) || (inner.content ?? '');
+      // Math latex, raw markup, anything else: escaped, or a `]` truncates the label downstream.
+      text += escapeLabel(getMdForChild(inner) || (inner.content ?? ''));
     }
   }
   return `[${text}](${mdHref(child.attrGet('href'))})`;

@@ -1,8 +1,8 @@
 /**
  * State manager for nested LaTeX list environments (e.g., \begin{itemize}, \item).
  *
- * This module tracks the current depth of nested lists and the number of \item
- * entries opened at each depth level during parsing.
+ * Levels are a stack: enter pushes, leave pops, depth is the length. No separate depth index —
+ * an index plus an array are two sources of truth, and rolling back one desyncs `openItems`.
  *
  * Depth levels:
  *   -1 — outside of any list
@@ -15,9 +15,8 @@ export interface ListLevelState {
   openItems: number;
 }
 
-// Internal state
+// One entry per open list level, innermost last.
 let listLevels: ListLevelState[] = [];
-let currentListDepth: number = -1; // -1 means “not inside a list”
 
 // Speculative parses reach these diagnostics once per offending line, so a desync would flood a
 // consumer's log. Report each distinct case once per parse (reset below); a repeat says nothing new.
@@ -36,20 +35,15 @@ const warnDistinct = (key: string, ...args: any[]): void => {
  */
 export const resetListState = (): void => {
   listLevels = [];
-  currentListDepth = -1;
   warned.clear();
 };
 
 /**
  * Enter a new nested list level (e.g., encountering \begin{itemize}).
- * Automatically creates state storage for the new level if needed.
+ * The counter is always fresh: a discarded parse can leave a level with items still open.
  */
 export const enterListLevel = (): void => {
-  currentListDepth++;
-
-  if (!listLevels[currentListDepth]) {
-    listLevels[currentListDepth] = { openItems: 0 };
-  }
+  listLevels.push({ openItems: 0 });
 };
 
 /**
@@ -57,21 +51,11 @@ export const enterListLevel = (): void => {
  * If already outside lists, logs a warning.
  */
 export const leaveListLevel = (): void => {
-  if (currentListDepth < 0) {
+  if (listLevels.length === 0) {
     warnDistinct('leave', '[list-state] Attempt to leave list level while depth = -1');
     return;
   }
-  currentListDepth--;
-};
-
-/**
- * Get the state object for a specific depth level.
- *
- * @param depth - The list depth level.
- * @returns State object or undefined.
- */
-export const getListLevelState = (depth: number): ListLevelState | undefined => {
-  return listLevels[depth];
+  listLevels.pop();
 };
 
 /**
@@ -80,7 +64,7 @@ export const getListLevelState = (depth: number): ListLevelState | undefined => 
  * @returns State object or undefined.
  */
 export const getCurrentListLevelState = (): ListLevelState | undefined => {
-  return listLevels[currentListDepth];
+  return listLevels[listLevels.length - 1];
 };
 
 /**
@@ -90,14 +74,27 @@ export const getCurrentListLevelState = (): ListLevelState | undefined => {
 export const incrementItemCount = (): void => {
   const level = getCurrentListLevelState();
   if (!level) {
-    warnDistinct('increment:' + currentListDepth,
+    warnDistinct('increment:' + getListDepth(),
       '[list-state] incrementItemCount called outside of any list level',
       {
-        currentListDepth,
+        currentListDepth: getListDepth(),
         listLevels,
       }
     );
     return;
   }
   level.openItems += 1;
+};
+
+/** Current nesting depth (-1 outside any list). Read-only view for cache keys. */
+export const getListDepth = (): number => listLevels.length - 1;
+
+/** Open-level count, to hand back to restoreListLevels after a speculative parse. */
+export const snapshotListLevels = (): number => listLevels.length;
+
+/** Drop levels entered since the snapshot. Only truncates, never re-creates. */
+export const restoreListLevels = (depth: number): void => {
+  if (listLevels.length > depth) {
+    listLevels.length = depth;
+  }
 };

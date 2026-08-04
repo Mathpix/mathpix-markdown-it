@@ -1021,6 +1021,24 @@ module.exports = [
       '| :--- |'
   },
   {
+    // Raw markup in the label is kept as written, not stripped.
+    id: 70,
+    latex: '\\begin{tabular}{|l|}\n' +
+      '[a <i>it</i> b](http://a.b) z\n' +
+      '\\end{tabular}',
+    table_markdown: '| [a <i>it</i> b](http://a.b) z |\n' +
+      '| :--- |'
+  },
+  {
+    // Same for a `]` that arrives inside math latex, not in a text token.
+    id: 69,
+    latex: '\\begin{tabular}{|l|}\n' +
+      '[$a]b$](http://x.y) z\n' +
+      '\\end{tabular}',
+    table_markdown: '| [a\\]b](http://x.y) z |\n' +
+      '| :--- |'
+  },
+  {
     // A `]` in the label reaches markdown-it unescaped; re-escape it or it closes the label early.
     id: 61,
     latex: '\\begin{tabular}{|l|}\n' +

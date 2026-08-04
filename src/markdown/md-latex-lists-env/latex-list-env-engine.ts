@@ -4,6 +4,7 @@ import type StateInline from "markdown-it/lib/rules_inline/state_inline";
 import type StateBlock from 'markdown-it/lib/rules_block/state_block';
 import { ListsInternal } from "./latex-list-env-block";
 import { getCaptionCounters, setCaptionCounters } from "../common/caption-counters";
+import { snapshotListLevels, restoreListLevels } from "./list-state";
 import { BufferedBlockState, PushFn } from "./latex-list-types";
 
 // Hoisted: safeAssignToken runs per flushed token, so a per-call Set would dominate the copy.
@@ -134,6 +135,7 @@ export const parseListEnvRawToTokens = (
   // (This path is reached with a complete env, so !ok only fires on an internal abort — a
   // defensive rollback, not reachable via public input.)
   const captionSnap = getCaptionCounters();
+  const listLevelSnap: number = snapshotListLevels();
   let ok = false;
   try {
     ok = ListsInternal(blockState, 0, blockState.lineMax);
@@ -141,6 +143,7 @@ export const parseListEnvRawToTokens = (
   } finally {
     if (!ok) {
       setCaptionCounters(captionSnap);
+      restoreListLevels(listLevelSnap);
     }
   }
 };

@@ -14,7 +14,9 @@ import {
   OpaqueStack, OpaqueEnvType
 } from "./latex-list-types";
 import { parseSetCounterNumber } from "./latex-list-common";
+import { getListDepth } from "./list-state";
 import { getCaptionCounters, setCaptionCounters } from "../common/caption-counters";
+import { snapshotListLevels, restoreListLevels } from "./list-state";
 import { lastMatchPosCached } from "../common/src-pos-cache";
 import {
   LIST_TRANSIENT_ENV_KEYS,
@@ -631,11 +633,12 @@ export const Lists: RuleBlock = (
   // `state.src` alone does not pin what a line contains — blockquote shifts bMarks/tShift for the
   // same line numbers on the same state — so the key carries the first line's geometry too. The
   // later lines are not in it: the parser walks them from these same arrays, which markdown-it
-  // shifts uniformly, so the first line pins the frame. The module-global list depth is out of the
-  // key on purpose — covered by the leaked-depth case in tests/_parse-isolation.js.
+  // shifts uniformly, so the first line pins the frame.
   const probeKey: string = silent
     ? `${startLine}:${endLine}:${state.bMarks[startLine] + state.tShift[startLine]}:${state.eMarks[startLine]}` +
-      `:${state.parentType}:${state.prentLevel}:${(state.env as any)?.inheritedListType}`
+      `:${state.parentType}:${state.prentLevel}:${(state.env as any)?.inheritedListType}` +
+      // Module-global, so it is not implied by the state fields above; free to add (measured).
+      `:${getListDepth()}`
     : '';
   if (silent) {
     const cached: boolean | undefined = getCachedListProbe(state, probeKey);
@@ -653,6 +656,9 @@ export const Lists: RuleBlock = (
   // exit the tokens are discarded, so roll both back; on commit they match the flushed tokens.
   const captionSnap = getCaptionCounters();
   const floatEnvSnap = snapshotEnvKeys(state.env, LIST_SPECULATIVE_ENV_KEYS);
+  // A discarded parse enters a level per `\begin` and, having no `\end`, never leaves it — without
+  // this the depth grows with the number of probes, not with the real nesting.
+  const listLevelSnap: number = snapshotListLevels();
   let committed = false;
   try {
     const bufferedState = createBufferedState(state);
@@ -677,6 +683,7 @@ export const Lists: RuleBlock = (
     restoreEnvKeys(state.env, LIST_TRANSIENT_ENV_KEYS, transientSnap.had, transientSnap.snap);
     if (!committed) {
       setCaptionCounters(captionSnap);
+      restoreListLevels(listLevelSnap);
       restoreEnvKeys(state.env, LIST_SPECULATIVE_ENV_KEYS, floatEnvSnap.had, floatEnvSnap.snap);
     }
   }

@@ -217,6 +217,7 @@ module.exports = [
       '</tbody>\n' +
       '</table>\n' +
       '</div>\n' +
+      '</li>' +
       '<li class="li_itemize">' +
       '<span class="li_level">•</span>' +
       '<strong>Example: Nested list inside list item</strong>' +
@@ -445,6 +446,7 @@ module.exports = [
       '</tbody>\n' +
       '</table>\n' +
       '</div></div>\n' +
+      '</li>' +
       '</ul><div><span class="math-inline " data-overflow="visible">\n' +
       '<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: 0;" xmlns="http://www.w3.org/2000/svg" width="0.988ex" height="1.887ex" role="img" focusable="false" viewBox="0 -833.9 436.6 833.9"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="msup"><g data-mml-node="TeXAtom" data-mjx-texclass="ORD"></g><g data-mml-node="TeXAtom" transform="translate(33,363) scale(0.707)" data-mjx-texclass="ORD"><g data-mml-node="mn"><path data-c="31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path></g></g></g></g></g></svg></mjx-container></span> Introduction to Professional Practice, Professional Conduct Workshop 1, Prep Task 3, Question 2</div>\n' +
       '<div>© LPC Buddy</div>\n'
@@ -709,6 +711,7 @@ module.exports = [
       '</tbody>\n' +
       '</table>\n' +
       '</div></div>\n' +
+      '</li>' +
       '</ul><div>© LPC Buddy</div>\n'
   },
   {
@@ -865,6 +868,7 @@ module.exports = [
       '</tbody>\n' +
       '</table>\n' +
       '</div>\n' +
+      '</li>' +
       '</ul></td>\n' +
       '</tr>\n' +
       '</tbody>\n' +

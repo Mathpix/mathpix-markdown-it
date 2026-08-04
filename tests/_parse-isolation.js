@@ -3,6 +3,7 @@ let should = chai.should();
 
 const markdownIt = require('markdown-it');
 const { mathpixMarkdownPlugin } = require('../lib/index.js');
+const { snapshotListLevels, getListDepth } = require('../lib/markdown/md-latex-lists-env/list-state');
 
 const { JSDOM } = require('jsdom');
 const jsdom = new JSDOM();
@@ -208,9 +209,10 @@ describe('a speculative list parse does not advance other global registries', ()
   });
 });
 
-// An aborted parse leaks the module-global list depth — entered from two sites, so no local
-// unwind is correct (Non-Goal). Pin what actually matters: later lists still render right.
-describe('a leaked list depth does not change how later lists render', () => {
+// A discarded parse enters a list level per `\begin` and never leaves it, so the depth is rolled
+// back in the rule's finally. Without that the levels grow with the number of probes, and a
+// terminator scan probes each list start once per line — quadratic in the document, not linear.
+describe('a discarded list parse does not retain list levels', () => {
   const md = markdownIt({ html: true }).use(mathpixMarkdownPlugin, {});
   const list = '\\begin{itemize}\n\\item[a] x\n\\begin{itemize}\n\\item[XXXXXXXXXXXX] y\n\\end{itemize}\n\\end{itemize}\n';
   const unclosed = (n) => Array.from({ length: n }, () => '\\begin{itemize}\n\\item stray\n').join('\n');
@@ -220,11 +222,24 @@ describe('a leaked list depth does not change how later lists render', () => {
       withPrefix.should.include(md.render(list).trim());
     });
   });
-  it('markers and items stay balanced after the leak', () => {
+  it('markers and items stay balanced after the discarded parses', () => {
     const html = md.render(unclosed(6) + '\n' + list);
     const count = (re) => (html.match(re) || []).length;
     count(/<ul/g).should.equal(count(/<\/ul>/g));
     count(/<li/g).should.equal(count(/<\/li>/g));
+  });
+  // The shape that grew the levels: unclosed envs, no blank line (else the scan stops), and a
+  // closer later on (else the sweep rejects before a level is entered).
+  it('the retained level count does not grow with the number of probes', () => {
+    const unit = 'Paragraph text before the list with no blank line separator.\n' +
+      '\\begin{itemize}\n\\item[a] x\n';
+    const build = (n) => unit.repeat(n) + '\n\\begin{itemize}\n\\item[z] q\n\\end{itemize}\n';
+    [10, 60].forEach((n) => {
+      md.render(build(n));
+      // Every level entered by a discarded parse is unwound, so nothing is retained.
+      snapshotListLevels().should.equal(0, `levels retained after ${n} units`);
+      getListDepth().should.equal(-1);
+    });
   });
 });
 

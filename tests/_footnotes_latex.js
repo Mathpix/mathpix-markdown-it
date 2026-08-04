@@ -335,33 +335,27 @@ describe('Footnote rule performance regression:', () => {
     (unclosed / closed).should.be.below(5);
   });
 
-  // The tabular shape stays super-linear for a reason outside this rule (unterminated forward scans
-  // in newTheoremBlock/lheading), so pin the probe itself: rejecting an unclosed env must not cost
-  // more than accepting a closed one, which is what the closer lookahead guarantees.
-  it('probing an unclosed \\begin{tabular} is not dearer than probing a closed one', function () {
-    this.timeout(60000);
-    const rule = perfMd.block.ruler.__rules__.find((r) => r.name === 'BeginTabular').fn;
-    const build = (unit) => Array.from({ length: 400 }, () => unit).join('\n');
-    const probeMs = (src) => {
-      // One state, reused: building it costs more than the scan and would mask the difference. So
-      // this measures the memoised bail against a closed env, which pays a full scan every probe.
-      const state = new perfMd.block.State(src, perfMd, {}, []);
-      rule(state, 0, state.lineMax, true); // warm
-      const samples = [];
-      for (let i = 0; i < 5; i++) {
-        const t0 = performance.now();
-        for (let k = 0; k < 200; k++) {
-          rule(state, 0, state.lineMax, true);
-        }
-        samples.push(performance.now() - t0);
-      }
-      samples.sort((a, b) => a - b);
-      return samples[2];
+  // Counting work instead of timing it: the closer lookahead rejects an unclosed env before the
+  // scan, so the tag scanner is never entered. Deterministic — 0 with the lookahead, 12M without
+  // (counting rule invocations would not detect it: those are identical either way).
+  it('an unclosed \\begin{tabular} is rejected without scanning for tags', () => {
+    const utils = require('../lib/markdown/utils');
+    const original = utils.findOpenCloseTags;
+    let calls = 0;
+    utils.findOpenCloseTags = function counted() {
+      calls++;
+      return original.apply(this, arguments);
     };
-    const unclosed = probeMs(build('\\begin{tabular}{|l|}\nq'));
-    const closed = probeMs(build('\\begin{tabular}{|l|}\nq\n\\end{tabular}'));
-    // Floor well above timer noise: without the lookahead the gap is ~100×, so a loose bound still
-    // detects it while staying stable on a loaded CI box.
-    unclosed.should.be.below(Math.max(closed, SMALL_FLOOR_MS) * 3);
+    try {
+      const build = (unit) => Array.from({ length: 200 }, () => unit).join('\n');
+      MM.markdownToHTML(build('Para\n\\begin{tabular}{|l|}\nq'), { outMath: { include_svg: false } });
+      calls.should.equal(0);
+      // Control: a closed env does scan, so the counter is wired to something that runs.
+      MM.markdownToHTML(build('Para\n\\begin{tabular}{|l|}\nq\n\\end{tabular}'),
+        { outMath: { include_svg: false } });
+      calls.should.be.above(0);
+    } finally {
+      utils.findOpenCloseTags = original;
+    }
   });
 });

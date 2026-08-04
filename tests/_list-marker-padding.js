@@ -82,6 +82,15 @@ describe('List marker padding — reserve covers the true glyph width (Arial):',
       indentEm(marker).should.be.at.least(trueEm(marker) + MARKER_GAP_EM);
     });
   });
+  // Paired upper bound: the estimate is deliberately generous, but without a ceiling it can drift
+  // further and silently eat the content column. Worst measured ratio is 1.56 (lowercase Greek).
+  it('does not over-reserve beyond the accepted margin', () => {
+    ['примечание', 'ПРИМЕЧАНИЕ', 'note', 'NOTE', 'Introduction', 'αβγδε', 'ÄÖÜÄÖÜ',
+     '11.33', 'щщщщщщ', 'WWWWWWWW'].forEach((marker) => {
+      const need = trueEm(marker) + MARKER_GAP_EM;
+      indentEm(marker).should.be.below(need * 1.8, 'over-reserved for "' + marker + '"');
+    });
+  });
   it('reserves at least the glyph width + gap for a bold marker (\\textbf{note})', () => {
     // Bold has the tightest measured margin; lock it against its rendered text "note".
     indentEm('\\textbf{note}').should.be.at.least(trueEm('note') + MARKER_GAP_EM);
