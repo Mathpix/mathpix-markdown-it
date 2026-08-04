@@ -1,59 +1,35 @@
-# July 2026
+# August 2026
 
 ## [3.1.0] - List rendering robustness fixes
 
-Four independent groups shipped in one publish. Read **Breaking changes** before upgrading; **Revert order** lists what to drop to undo a single group.
+Four independent groups in one publish. Read **Breaking changes** before upgrading.
 
-### LaTeX `itemize` / `enumerate`
-
-- Markers no longer clip their item text: width is measured per glyph class in `em` — non-ASCII by case, East-Asian Wide over the BMP and beyond (emoji, rare ideographs), math by its rendered width, code spans and `\texttt{…}` at the monospace advance, wrappers through their content. Edge whitespace in `\item[  wide  ]` no longer inflates it.
-- The reserve is emitted per nesting level and only when the marker overflows, clamped to `20em` cumulative, so a wide marker in a nested list no longer widens the outer one and every list form (own-line, same-line, single-line, in a table cell) resolves alike.
-- Block-content items (`\begin{figure}`, `\begin{tabular}`, a code fence) are measured too, so such a list keeps its `padding-inline-start`.
-- Empty `<>` item bodies are fixed, on both paths that leaked the internal `env` flag.
-- `Figure N` / `Table N` no longer shift when a list is parsed speculatively, and a discarded parse leaves no caption, float or tabular state behind.
-- `\item` detection requires a real command, so `\itemsep` / `\itemindent` and the bare word "item" no longer split an item or break a multiline `\footnote` inside one.
-- `\footnote` / `\footnotetext` scans stop at a list start: a list right after a paragraph is no longer swallowed and shown as literal text.
-- Inline content sitting directly in a `\begin{tabular}` cell (no paragraph wrapper) now reaches the `table-markdown` / `tsv` / `csv` export — the reported case is a one-line list in a cell, whose item bodies were dropped. HTML is unchanged.
-- Core-markdown `<ul>` / `<ol>` indent `2.5em` instead of the browser default `40px`, scoped to `#preview-content` / `#setText`; the numbered footnotes list is covered too (the no-numbers one keeps its inline `padding-left: 20px`, which wins over any stylesheet rule — unchanged, and a difference that pre-dates this release).
-- Faster where parsing used to degrade quadratically: unclosed `\begin{itemize}` units 4876 → 11 ms at n=400, paragraph + list + footnote units 152 → 43 ms, lists holding a figure 22 → 18 ms; a plain list-heavy document is unchanged. Both scaling shapes are guarded by tests.
-
-See `pr-specs/2026-07-list-rendering-robustness.md`.
-
-### A link inside a tabular cell
-
-A link consumed two tokens too many, so `[t](url) tail` rendered as `<a …>t tail` with the anchor left open and the following `**bold**` or second link mangled; the `table-markdown` export lost the same content. The link now ends at its own `link_close`. Its label is read whole, so a formatted label exports fully (`[**bold** x](url)` was `[](url)`), an image or math label keeps its alt text or LaTeX, a `<smiles>` label keeps its structure, and a `]` inside a text label is re-escaped. The pptx output no longer carries a bare opening `<a>` or the raw HTML of a table written inside a label. `tsv` / `csv` still record a link by its href alone, by design. Pre-existing; unrelated to the list fixes.
-
-### Unclosed `\begin{tabular}`: quadratic parse
-
-A `\begin{tabular}` with no closer was rejected only after reading the rest of the document, once per line that a paragraph or footnote scan asked about. The rule now checks for a closing `\end{tabular}` first: 400 such units parse in 309 ms instead of 9422 ms. Output unchanged, no list involved.
-
-### Code-block styles scale with the em context
-
-`pre code` was pinned to `font-size: 15px` / `line-height: 24px` / `padding: 1rem` and `pre` to `85%`, so code did not scale when a consumer sized a block through the container `font-size` (e.g. image export). All four are now relative and calibrated to be pixel-identical at a 16px base; the only visible change is code padding, 16px → 15px.
-
-See `pr-specs/2026-07-code-block-font-scaling.md`.
+- **LaTeX lists.** Markers no longer clip their item text: width is measured per glyph class in `em` (non-ASCII by case, East-Asian Wide including emoji, monospace for code spans and `\texttt`, math by its rendered width), reserved per nesting level only when it overflows, and clamped at `20em`. Block-content items (`figure`, `tabular`, a code fence) are measured too. Also fixed: empty `<>` item bodies, `Figure N`/`Table N` shifted by a speculative parse, `\itemsep`/`\itemindent` mistaken for `\item`, and a list swallowed by a preceding `\footnote` scan. Core-markdown `<ul>`/`<ol>` indent `2.5em` instead of the browser default, scoped to `#preview-content`/`#setText`.
+- **Tabular cells.** Inline content sitting directly in a cell now reaches the `table-markdown`/`tsv`/`csv` export — a one-line list lost its item bodies there. A link no longer swallows the rest of the cell, exports its whole label, and no longer leaves an open `<a>` in the pptx output; `tsv`/`csv` still record a link by its href alone, by design.
+- **Performance.** Repeated unclosed `\begin{itemize}` or `\begin{tabular}` units no longer parse quadratically; both shapes are guarded by tests.
+- **Code-block styles.** `pre`/`pre code` sizes are relative, so a code block scales with the container `font-size` (e.g. image export). Pixel-identical at a 16px base except code padding, 16px → 15px.
 
 ### Breaking changes
 
-- **`data-padding-inline-start` is an em value with its unit** (`"56"` → `"4.23em"`), and is now emitted on nested lists too. Readers of the attribute must update.
-- **Custom-marker indents change size.** The default indent and marker gap are pixel-identical at a 16px base (`2.5em = 40px`, `0.625em = 10px`), but the width model was rewritten: a wide marker can reserve ~21% more (`56px → 4.23em`), a narrow or digit marker 36–70% less. Expect layout shifts on lists with custom markers.
-- **The wrapped-list indent now has specificity `(1,0,1)`** instead of the UA default, so a consumer rule at class specificity (`.my-list { padding-inline-start: 1em }`) no longer wins.
-- **`table-markdown` / `tsv` / `csv` change for cells holding a one-line LaTeX list** — that is the fix above; consumers diffing these outputs will see it.
-- **Deep imports:** `lib/markdown/md-block-rule/begin-table` no longer exports `ClearTableNumbers` / `ClearFigureNumbers` (now `clearTableNumbers` / `clearFigureNumbers` in `lib/markdown/common/caption-counters`, no re-export); `ListItemsResult` / `ListInlineContext` dropped `padding` and gained required `openTokens` / `allListTokens`; importing `lib/styles/styles-code` alone now leaves code text at the UA default, since its base moved to the always-emitted `MathpixStyle`.
-- **A consumer's own `env` keeps the internal list/float keys with value `undefined`** instead of absent after a parse (`'isBlock' in env` is now `true`); value-level checks are unaffected.
-
-Each item is explained in the specs above, under Migration.
+- **`data-padding-inline-start` is an em value with its unit** (`"56"` → `"4.23em"`), now emitted on nested lists too.
+- **Custom-marker indents change size** — the width model was rewritten: a wide marker reserves ~21% more, a narrow or digit marker 36–70% less. The default indent and gap are pixel-identical at a 16px base.
+- **The wrapped-list indent rises to specificity `(1,0,1)`**, so a consumer rule at class specificity no longer wins.
+- **`table-markdown`/`tsv`/`csv` change for cells holding a one-line LaTeX list** (the fix above).
+- **A consumer's own `env` keeps the internal list/float keys with value `undefined`** after a parse instead of absent; value-level checks are unaffected.
+- **Deep imports:** `ClearTableNumbers`/`ClearFigureNumbers` → `clearTableNumbers`/`clearFigureNumbers`, moved to `lib/markdown/common/caption-counters` with no re-export; `ListItemsResult`/`ListInlineContext` dropped `padding` and gained required `openTokens`/`allListTokens`; `lib/styles/styles-code` alone no longer sizes code text (its `pre` base moved to `MathpixStyle`).
 
 ### Revert order
 
-The four groups touch mostly disjoint files. Revert by scope, and in this order where they overlap:
+1. **Code-block styles** — `styles/styles-code.ts` **and** `codeBlockStyles` in `styles/index.ts`; regenerate the style snapshots. Indivisible: one file alone leaves `pre` and `pre code` disagreeing.
+2. **Unclosed-`tabular` performance** — `md-block-rule/begin-tabular/index.ts`.
+3. **Tabular-cell link export** — `common/table-markdown.ts`, `common/render-table-cell-content.ts`, the link branch of `render-tabular.ts`.
+4. **Lists** — `md-latex-lists-env/`, `common/display-width.ts`, `common/env-transient.ts`, `common/caption-counters.ts`, `md-latex-footnotes/block-rule.ts`, `styles/styles-lists.ts`, the leaf-run branch of `render-tabular.ts`.
 
-1. **Code-block styles** — `src/styles/styles-code.ts` **and** `codeBlockStyles` in `src/styles/index.ts`; regenerate the `MathpixStyle-*` / `codeStyles-*` snapshots. Independent of groups 2–4, but indivisible inside: reverting one file leaves `pre` and `pre code` disagreeing.
-2. **Unclosed-`tabular` performance** — `src/markdown/md-block-rule/begin-tabular/index.ts` only. Fully independent.
-3. **Tabular-cell link export** — `src/markdown/common/table-markdown.ts`, `common/render-table-cell-content.ts`, and the link branch of `md-renderer-rules/render-tabular.ts`.
-4. **List rendering** — everything under `md-latex-lists-env/`, plus `common/display-width.ts`, `common/env-transient.ts`, `common/caption-counters.ts`, `md-latex-footnotes/block-rule.ts`, `styles/styles-lists.ts`, and the leaf-run branch of `md-renderer-rules/render-tabular.ts`.
+Groups 3 and 4 share two files, so revert 4 first. Commits mix themes — revert by these scopes, not by commit.
 
-Groups 3 and 4 both touch `render-table-cell-content.ts` and `render-tabular.ts`, so revert 4 before 3 if both must go. Commits are thematic but not one-per-group — the later ones mix list width with tabular performance — so revert by the file scopes above rather than by commit.
+See `pr-specs/2026-07-list-rendering-robustness.md` and `pr-specs/2026-07-code-block-font-scaling.md`.
+
+# July 2026
 
 ## [3.0.1] - Preserve code indentation inside list/table/align env wrappers
 
