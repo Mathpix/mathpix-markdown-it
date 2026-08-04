@@ -35,9 +35,12 @@ export const snapshotEnvForInline = (env: any): any => {
     }
     snap[k] = env[k];
   }
-  // Symbol entries (TOC tokens, math cache) are never list flags.
+  // Symbol entries (TOC tokens, math cache) are never list flags. Enumerable only, to keep the
+  // same reach the `{...env}` spread had.
   for (const k of Object.getOwnPropertySymbols(env)) {
-    snap[k] = env[k];
+    if (Object.prototype.propertyIsEnumerable.call(env, k)) {
+      snap[k] = env[k];
+    }
   }
   return snap;
 };

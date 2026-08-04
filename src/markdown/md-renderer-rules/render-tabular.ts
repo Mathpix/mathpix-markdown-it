@@ -22,10 +22,16 @@ const LIST_STITCH_TOKEN_TYPES: Set<string> = new Set([
   'itemize_list_close', 'enumerate_list_close',
 ]);
 
+// Block boundaries end a run: `block` cannot be tested instead, because createBufferedState marks
+// the unwrapped inline leaves this branch exists for as block too. Only the block leaves actually
+// observed in a cell stream are listed — add any new one here (hr, a fence, an lstlisting env).
+const RUN_BOUNDARY_TOKEN_TYPES: Set<string> = new Set(['paragraph_open', 'paragraph_close']);
+
 // A cell token that reaches the leaf branch below, so it may join a leaf run.
 const isLeafRunMember = (token: any): boolean =>
   !!token
   && !token.hidden
+  && !RUN_BOUNDARY_TOKEN_TYPES.has(token.type)
   && token.token !== 'inline' && token.type !== 'inline'
   && !TABLE_TOKENS.has(token.token) && !TABLE_TOKENS.has(token.type)
   && token.type !== 'tabular' && token.type !== 'tabular_inline'

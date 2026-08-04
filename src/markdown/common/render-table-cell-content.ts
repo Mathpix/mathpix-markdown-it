@@ -130,10 +130,11 @@ export const renderTableCellContent = (
                 depth--;
               }
               const innerRendered: string = slf.renderInline([inner], options, env);
-              content += innerRendered;
-              // The loop consumes these, so the smoothed accumulator would otherwise keep the
-              // opening `<a>` with no text and no closing tag.
-              smoothedCell += smoothedFor(inner, innerRendered);
+              const innerSmoothed: string = smoothedFor(inner, innerRendered);
+              // Same choice as the main loop: forPptx takes the smoothed form. Without both lines
+              // the accumulators keep an opening `<a>` with no text and no closing tag.
+              content += options.forPptx ? innerSmoothed : innerRendered;
+              smoothedCell += innerSmoothed;
             }
           }
           continue;

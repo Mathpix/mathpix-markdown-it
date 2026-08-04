@@ -311,6 +311,8 @@ export const StatePushTabularBlock = (state, startLine: number, nextLine: number
 // Per-state offset of the last tabular closer, invalidated when `state.src` is reassigned. Own
 // regex instance: `closeTagG` is used with `match` elsewhere and this one carries a lastIndex.
 const TABULAR_END_POS_KEY = Symbol('mmd.tabularEndPos');
+// Deliberately the unanchored `closeTag`, not the anchored `closeTagTabular` the scan uses: a wider
+// sweep can only over-report a closer, which keeps the bail conservative. Do not "align" them.
 const CLOSE_TAG_SWEEP_G: RegExp = new RegExp(closeTag.source, 'g');
 type TabularEndCache = { src: string; lastPos: number };
 

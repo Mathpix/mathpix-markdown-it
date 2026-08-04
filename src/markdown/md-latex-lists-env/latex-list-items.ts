@@ -258,6 +258,8 @@ export const resolveListPadding = (listTokens: Token[]): void => {
     // Own indent for this level: the reserved em when the marker overflows, else the default.
     const indentEm: number = em > LIST_DEFAULT_INDENT_EM ? em : LIST_DEFAULT_INDENT_EM;
     if (em > LIST_DEFAULT_INDENT_EM) {
+      // Matches PADDING_EM_RE by construction: clamped to (default, LIST_MAX_INDENT_EM] and ceiled
+      // to two decimals, so never exponential or negative. The renderer drops a miss silently.
       token.attrSet("data-padding-inline-start", String(em) + "em");
     }
     prefix.length = depth + 1;

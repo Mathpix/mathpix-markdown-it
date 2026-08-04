@@ -100,6 +100,12 @@ describe('display-width: tokenMarkerWidth (em)', () => {
     textReserveEm('️').should.equal(0);
     textReserveEm('︠').should.equal(0);
   });
+  it('a tab or newline measures like the space it collapses into', () => {
+    ['\t', '\n', '\r'].forEach((ws) => {
+      textReserveEm('a' + ws + 'b').should.be.closeTo(textReserveEm('a b'), 1e-9);
+    });
+    textReserveEm('a\tb').should.be.above(textReserveEm('ab'));
+  });
   it('joiners and variation selectors add no advance', () => {
     // They compose the glyphs around them instead of taking a cell of their own.
     const family = '\u{1F468}‍\u{1F469}‍\u{1F467}';

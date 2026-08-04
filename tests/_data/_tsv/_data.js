@@ -1619,5 +1619,13 @@ module.exports = [
       '[t](http://a.b) x & **b** y\n' +
       '\\end{tabular}',
     tsv: 'http://a.b x\tb y'
+  },
+  {
+    // By design a link is its href here, label and all: the loop that consumes the label tokens
+    // adds nothing to tsv. Pinned so a change to that loop cannot alter it silently.
+    latex: '\\begin{tabular}{|l|}\n' +
+      '[**b** x](http://a.b) tail\n' +
+      '\\end{tabular}',
+    tsv: 'http://a.b tail'
   }
 ];

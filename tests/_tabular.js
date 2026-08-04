@@ -93,6 +93,32 @@ describe('Check tabular with diagbox:', () => {
   });
 });
 
+// Leaf runs are rendered a second time to collect the export formats; that pass throws its HTML
+// away, but it re-runs render rules, and some hold module state (marker levels). Pin that turning
+// the exports on cannot change the HTML — the double render must stay invisible.
+describe('Enabling the cell exports leaves the HTML untouched:', () => {
+  const sources = {
+    'leaf run with math': '\\begin{tabular}{|l|}\n\\begin{itemize}\\item[x] $a^2$ tail\\end{itemize}\n\\end{tabular}',
+    'nested lists': '\\begin{tabular}{|l|}\n\\begin{itemize}\\item[1.] a \\begin{itemize}\\item[y] b\\end{itemize}\\end{itemize}\n\\end{tabular}',
+    'link in a cell': '\\begin{tabular}{|l|}\n[t](http://a.b) tail\n\\end{tabular}',
+  };
+  const tableHtml = (src, extra) => {
+    const html = MM.markdownToHTML(src, { outMath: { include_svg: false, ...extra } });
+    return (html.match(/<table[\s\S]*?<\/table>/) || [])[0];
+  };
+  Object.entries(sources).forEach(([name, src]) => {
+    it(`${name}: same HTML with and without tsv/csv/table-markdown`, () => {
+      const off = tableHtml(src, {});
+      off.should.be.a('string');
+      tableHtml(src, { include_tsv: true }).should.equal(off);
+      tableHtml(src, { include_csv: true }).should.equal(off);
+      tableHtml(src, { include_table_markdown: true }).should.equal(off);
+      tableHtml(src, { include_tsv: true, include_csv: true, include_table_markdown: true })
+        .should.equal(off);
+    });
+  });
+});
+
 describe('A link in a tabular cell renders well-formed in every output:', () => {
   const src = '\\begin{tabular}{l}\n[**b** x](http://a.b) tail\n\\end{tabular}';
   it('the smoothed (pptx) cell closes the anchor and keeps its label', () => {
@@ -128,6 +154,9 @@ describe('A link in a tabular cell renders well-formed in every output:', () => 
     smoothed.should.not.match(/<table|inline-tabular/);
     smoothed.should.include('q');
     smoothed.should.include('</a>');
+    // The cell's own pptx HTML takes the same form — the accumulator and the content agree.
+    const html = md.renderer.render(tokens, md.options, env);
+    html.should.not.match(/<a [^>]*>\s*<div class="inline-tabular"/);
   });
   it('the isSubTable stamp follows the argument, so a caller cannot claim nesting silently', () => {
     // renderTableCellContent marks the tokens it walks; later passes read the mark off them.

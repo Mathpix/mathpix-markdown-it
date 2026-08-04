@@ -117,6 +117,15 @@ describe('List marker padding — reserve covers the true glyph width (Arial):',
       indentEm(marker).should.be.at.least(chars * 0.6 + MARKER_GAP_EM);
     });
   });
+  // A marker parses into texttt_open / texttt / texttt_close, so the bare `texttt` type reaches
+  // MONO_TOKEN_TYPES here — unlike the cell-export stream, where it arrives as text.
+  it('the mono branch is chosen, not merely wide enough', () => {
+    indentEm('\\texttt{iiiiiiiiii}').should.equal(indentEm('`iiiiiiiiii`'));
+    // The same letters as plain text land in the narrow class, which is what underreserved.
+    indentEm('iiiiiiiiii').should.be.below(indentEm('\\texttt{iiiiiiiiii}'));
+    // Monospace is per cell, so glyph class does not matter.
+    indentEm('\\texttt{WWWWWWWWWW}').should.equal(indentEm('\\texttt{iiiiiiiiii}'));
+  });
   it('resolves the nested reserve for a sublist inside a tabular cell in an item', () => {
     const html = render('\\begin{itemize}\n\\item[a]\n\\begin{tabular}{|l|}\n\\begin{itemize}\\item[' +
       wide + '] y\\end{itemize}\n\\end{tabular}\n\\end{itemize}');
@@ -248,6 +257,23 @@ describe('resolveListPadding — the ancestor sum follows the depth, not the las
     sum(deep).should.equal(LIST_MAX_INDENT_EM);
 
     [all, deep].forEach((toks) => emitted(toks).forEach((v) => v.should.match(/^\d+(\.\d+)?em$/)));
+  });
+
+  // The renderer drops a value that misses PADDING_EM_RE without a word, and the marker then
+  // clips — so every value the resolver can emit must match it, not just the ones in fixtures.
+  it('every emitted value matches the validator the renderer applies', () => {
+    const PADDING_EM_RE = /^\d+(\.\d+)?em$/;
+    const paddings = [2.51, 2.999, 3, 7.0001, 9.995, 12.345678, 19.999, 20, 20.01, 1e6, 1 / 3];
+    paddings.forEach((padding) => {
+      [0, 1, 2].forEach((depth) => {
+        const toks = [mk(0, 0), mk(depth, padding)];
+        resolveListPadding(toks);
+        const value = toks[1]['data-padding-inline-start'];
+        if (value !== undefined) {
+          value.should.match(PADDING_EM_RE, `padding ${padding} at depth ${depth}`);
+        }
+      });
+    });
   });
 });
 

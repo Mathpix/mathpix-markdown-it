@@ -25,7 +25,8 @@ interface WidthToken {
 }
 
 // Per-char text reserve in em by width class (safety margin over Helvetica advances).
-const NARROW_RE = /[ !'"(),.\/:;|\[\]ijltfrI]/;   // thin glyphs
+// Thin glyphs; \t\r\n collapse to a single space when rendered, so they share the space's class.
+const NARROW_RE = /[ \t\r\n!'"(),.\/:;|\[\]ijltfrI]/;
 const WIDE_RE = /[A-HJ-Zmw]/;                      // most capitals (except I) + m, w
 const XWIDE_RE = /[W@%]/;                           // widest glyphs
 const NARROW_EM = 0.40;
