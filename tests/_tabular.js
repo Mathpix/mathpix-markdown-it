@@ -186,13 +186,27 @@ describe('A link in a tabular cell renders well-formed in every output:', () => 
     balance(balanced).should.equal(0);
     balanced.tableMd.should.equal('[label](http://a.b) tail');
   });
-  it('a bracket inside raw markup in the label is escaped', () => {
-    // Not reachable through a cell (such input is not parsed as a link there), so pinned at the unit.
+  it('raw markup in the label is passed through, brackets and all', () => {
+    // html_inline runs to its `>`, so a `]` inside a tag never closes the label — escaping it would
+    // only put a backslash into the HTML, which is emitted raw.
     const { getMdLink } = require('../lib/markdown/common/table-markdown');
     const inner = markdownIt({ html: true }).use(mathpixMarkdownPlugin, { outMath: { include_svg: false } });
     const tokens = [];
     inner.inline.parse('[a <i title="x]y">t</i> b](http://a.b)', inner, {}, tokens);
-    getMdLink(tokens[0], { children: tokens }, 0).should.equal('[a <i title="x\\]y">t</i> b](http://a.b)');
+    getMdLink(tokens[0], { children: tokens }, 0).should.equal('[a <i title="x]y">t</i> b](http://a.b)');
+  });
+  it('a stitched nested link does not leak a literal <a> into the label', () => {
+    const { getMdLink } = require('../lib/markdown/common/table-markdown');
+    const inner = markdownIt({ html: true }).use(mathpixMarkdownPlugin, { outMath: { include_svg: false } });
+    const outer = [];
+    inner.inline.parse('[a b](http://a.b)', inner, {}, outer);
+    const nested = [];
+    inner.inline.parse('[q](http://c.d)', inner, {}, nested);
+    // Hand-stitched: a nested link inside the label, which the parser never produces.
+    const children = [outer[0], outer[1], ...nested, ...outer.slice(2)];
+    const md = getMdLink(children[0], { children }, 0);
+    md.should.not.include('<a>');
+    md.should.not.include('</a>');
   });
   it('the isSubTable stamp follows the argument, so a caller cannot claim nesting silently', () => {
     // renderTableCellContent marks the tokens it walks; later passes read the mark off them.

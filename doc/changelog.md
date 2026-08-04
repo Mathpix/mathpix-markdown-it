@@ -48,7 +48,7 @@ Each item is explained in the specs above, under Migration.
 
 The four groups touch mostly disjoint files. Revert by scope, and in this order where they overlap:
 
-1. **Code-block styles** — `src/styles/styles-code.ts` only. Fully independent.
+1. **Code-block styles** — `src/styles/styles-code.ts` **and** `codeBlockStyles` in `src/styles/index.ts`; regenerate the `MathpixStyle-*` / `codeStyles-*` snapshots. Independent of groups 2–4, but indivisible inside: reverting one file leaves `pre` and `pre code` disagreeing.
 2. **Unclosed-`tabular` performance** — `src/markdown/md-block-rule/begin-tabular/index.ts` only. Fully independent.
 3. **Tabular-cell link export** — `src/markdown/common/table-markdown.ts`, `common/render-table-cell-content.ts`, and the link branch of `md-renderer-rules/render-tabular.ts`.
 4. **List rendering** — everything under `md-latex-lists-env/`, plus `common/display-width.ts`, `common/env-transient.ts`, `common/caption-counters.ts`, `md-latex-footnotes/block-rule.ts`, `styles/styles-lists.ts`, and the leaf-run branch of `md-renderer-rules/render-tabular.ts`.

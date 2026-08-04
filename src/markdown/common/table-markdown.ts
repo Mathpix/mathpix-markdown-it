@@ -1,3 +1,9 @@
+// Used with `replace` only, so the /g lastIndex is reset by the call and cannot leak between them.
+const LINE_BREAKS_RE: RegExp = /[\r\n]+/g;
+const HREF_NEEDS_ANGLES_RE: RegExp = /[\s<>]/;
+const HREF_ANGLE_ESCAPE_RE: RegExp = /([<>\\])/g;
+const LABEL_BRACKET_RE: RegExp = /\]/g;
+
 // A bare destination ends at the first unbalanced `)`, so such an href needs the `<…>` form.
 const hasUnbalancedParens = (href: string): boolean => {
   let depth = 0;
@@ -12,9 +18,12 @@ const mdHref = (href: string): string => {
   if (!href) {
     return '';
   }
-  return /[\s<>]/.test(href) || hasUnbalancedParens(href)
-    ? '<' + href.replace(/([<>])/g, '\\$1') + '>'
-    : href;
+  // A line break is invalid in a destination in either form, so drop it before deciding.
+  const flat: string = href.replace(LINE_BREAKS_RE, '');
+  return HREF_NEEDS_ANGLES_RE.test(flat) || hasUnbalancedParens(flat)
+    // `\` too: a trailing one would escape the closing `>` and leave the destination open.
+    ? '<' + flat.replace(HREF_ANGLE_ESCAPE_RE, '\\$1') + '>'
+    : flat;
 };
 
 export const getMdLink = (child, token, j) => {
@@ -42,16 +51,16 @@ export const getMdLink = (child, token, j) => {
     }
     if (inner.type === 'text') {
       // An unescaped `]` ends the label early and breaks the link.
-      text += inner.content.replace(/\]/g, '\\]');
+      text += inner.content.replace(LABEL_BRACKET_RE, '\\]');
     } else if (inner.type === 'code_inline') {
       // Self-closing: same shape as the main cell loop — open marker, content, close marker.
       text += getMdForChild(inner) + inner.content + inner.markup;
     } else if (inner.type === 'smiles_inline') {
       // The other self-closing type getMdForChild gives a marker for; its closer is not in markup.
       text += getMdForChild(inner) + inner.content + '</smiles>';
-    } else if (inner.type === 'html_inline') {
-      // Raw markup, so `]` in it is not escaped yet — unlike an image alt or a math latex below.
-      text += (inner.content ?? '').replace(/\]/g, '\\]');
+    } else if (inner.type === 'link_open' || inner.type === 'link_close') {
+      // A nested link has no Markdown form; getMdForChild would emit a literal `<a>` here.
+      continue;
     } else {
       // Fall back to content: an image holds its alt there, inline math its latex.
       // Not escaped here: an image keeps the raw source in `content`, so a `]` is already escaped.

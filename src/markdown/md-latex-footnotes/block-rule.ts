@@ -76,9 +76,18 @@ export const latex_footnote_block: RuleBlock = (state, startLine, endLine, silen
       // Terminate on `fence` (original) plus the LaTeX list rule, so a `\begin{itemize}`
       // before the tag isn't swallowed — a minimal addition (fence + Lists, not the full set).
       const [listRule] = resolveEnabledRuleFns(state.md.block.ruler, LIST_TERMINATOR_NAME);
+      // The list probe parses the body, so it can throw: a probe that cannot answer is not a
+      // terminator, and must not fail the document.
+      const probes = (line: number): boolean => {
+        try {
+          return fence(state, line, endLine, true)
+            || (!!listRule && listRule(state, line, endLine, true));
+        } catch (e) {
+          return false;
+        }
+      };
       for (; nextLine < endLine; nextLine++) {
-        if (fence(state, nextLine, endLine, true) ||
-            (listRule && listRule(state, nextLine, endLine, true))) {
+        if (probes(nextLine)) {
           terminate = true;
         }
         if (terminate) { break; }

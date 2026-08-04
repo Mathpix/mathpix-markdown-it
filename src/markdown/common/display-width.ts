@@ -45,7 +45,9 @@ const ASCII_EM: Float64Array = (() => {
   const widths = new Float64Array(128);
   for (let cp = 0; cp < 128; cp++) {
     const ch: string = String.fromCharCode(cp);
-    widths[cp] = NARROW_RE.test(ch) ? NARROW_EM
+    // Controls render nothing (the whitespace ones are in NARROW_RE, which runs first).
+    widths[cp] = !NARROW_RE.test(ch) && (cp < 0x20 || cp === 0x7F) ? 0
+      : NARROW_RE.test(ch) ? NARROW_EM
       : XWIDE_RE.test(ch) ? XWIDE_EM
       : WIDE_RE.test(ch) ? WIDE_EM
       : NORMAL_EM;
@@ -153,9 +155,9 @@ export const textReserveEm = (str: string): number => {
 
 /**
  * Width of one inline marker token in em: math by its rendered `widthEx` (converted to em),
- * wrappers (e.g. `\textbf{…}`) by recursing into children, text-like leaves (`text` /
- * `code_inline` / `text_special`) by per-char class widths, everything else (e.g.
- * `html_inline`, whose content is markup) 0. The counterpart of `getTextWidthByTokens`
+ * `code_inline`/`texttt` by monospace cells, wrappers (e.g. `\textbf{…}`) by recursing into
+ * children, text-like leaves (`text` / `text_special`) by per-char class widths, everything
+ * else (e.g. `html_inline`, whose content is markup) 0. The counterpart of `getTextWidthByTokens`
  * (font-based) — used where no font is loaded. Math without a `widthEx` (non-SVG output)
  * also contributes 0, so the marker keeps the default indent.
  */

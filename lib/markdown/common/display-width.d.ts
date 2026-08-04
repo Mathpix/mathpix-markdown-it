@@ -18,9 +18,9 @@ export declare const isWideChar: (cp: number) => boolean;
 export declare const textReserveEm: (str: string) => number;
 /**
  * Width of one inline marker token in em: math by its rendered `widthEx` (converted to em),
- * wrappers (e.g. `\textbf{…}`) by recursing into children, text-like leaves (`text` /
- * `code_inline` / `text_special`) by per-char class widths, everything else (e.g.
- * `html_inline`, whose content is markup) 0. The counterpart of `getTextWidthByTokens`
+ * `code_inline`/`texttt` by monospace cells, wrappers (e.g. `\textbf{…}`) by recursing into
+ * children, text-like leaves (`text` / `text_special`) by per-char class widths, everything
+ * else (e.g. `html_inline`, whose content is markup) 0. The counterpart of `getTextWidthByTokens`
  * (font-based) — used where no font is loaded. Math without a `widthEx` (non-SVG output)
  * also contributes 0, so the marker keeps the default indent.
  */
