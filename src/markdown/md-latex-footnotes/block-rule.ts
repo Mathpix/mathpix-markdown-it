@@ -12,6 +12,7 @@ import {
 import { findEndMarker } from "../common";
 import { findOpenCloseTags } from "../utils";
 import * as fence from 'markdown-it/lib/rules_block/fence.js'
+import type StateBlock from 'markdown-it/lib/rules_block/state_block';
 import { lastMatchPosCached } from "../common/src-pos-cache"
 
 // Symbol keys: collision-free on StateBlock; invisible to JSON.stringify/Object.keys (use `Object.getOwnPropertySymbols` to inspect).
@@ -34,6 +35,26 @@ const FOOTNOTE_TERMINATOR_NAMES = new Set<string>([
   "image_with_size_block"
 ]);
 
+
+// `Lists` parses the body to answer, so a terminator probe can throw on malformed input: a probe
+// that cannot answer is not a terminator, and must not fail the document.
+const anyTerminates = (
+  rules: RuleBlock[],
+  state: StateBlock,
+  line: number,
+  endLine: number,
+): boolean => {
+  for (let i = 0; i < rules.length; i++) {
+    try {
+      if (rules[i](state, line, endLine, true)) {
+        return true;
+      }
+    } catch (e) {
+      // this rule does not answer; try the next
+    }
+  }
+  return false;
+};
 
 // Resolve the enabled block-rule fns for the given names (in ruler order). Not cached —
 // see the FOOTNOTE_TERMINATOR_NAMES note.
@@ -76,18 +97,9 @@ export const latex_footnote_block: RuleBlock = (state, startLine, endLine, silen
       // Terminate on `fence` (original) plus the LaTeX list rule, so a `\begin{itemize}`
       // before the tag isn't swallowed — a minimal addition (fence + Lists, not the full set).
       const [listRule] = resolveEnabledRuleFns(state.md.block.ruler, LIST_TERMINATOR_NAME);
-      // The list probe parses the body, so it can throw: a probe that cannot answer is not a
-      // terminator, and must not fail the document.
-      const probes = (line: number): boolean => {
-        try {
-          return fence(state, line, endLine, true)
-            || (!!listRule && listRule(state, line, endLine, true));
-        } catch (e) {
-          return false;
-        }
-      };
+      const probeRules: RuleBlock[] = listRule ? [fence as any, listRule] : [fence as any];
       for (; nextLine < endLine; nextLine++) {
-        if (probes(nextLine)) {
+        if (anyTerminates(probeRules, state, nextLine, endLine)) {
           terminate = true;
         }
         if (terminate) { break; }
@@ -277,11 +289,8 @@ export const latex_footnotetext_block: RuleBlock = (state, startLine, endLine, s
     if (!sawFootnotetextToken || !reOpenTagFootnotetextG.test(lineText)) {
       // jump line-by-line until empty one or EOF
       for (; nextLine < endLine; nextLine++) {
-        for (let i = 0; i < terminatorRules.length; i++) {
-          if (terminatorRules[i](state, nextLine, endLine, true)) {
-            terminate = true;
-            break;
-          }
+        if (anyTerminates(terminatorRules, state, nextLine, endLine)) {
+          terminate = true;
         }
         if (terminate) {
           break;

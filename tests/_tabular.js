@@ -4,6 +4,8 @@ let should = chai.should();
 let MM = require('../lib/mathpix-markdown-model/index').MathpixMarkdownModel;
 const markdownIt = require('markdown-it');
 const { mathpixMarkdownPlugin } = require('../lib/index.js');
+const { getMdLink } = require('../lib/markdown/common/table-markdown');
+const { renderTableCellContent } = require('../lib/markdown/common/render-table-cell-content');
 
 const options = {
   cwidth: 800
@@ -161,7 +163,6 @@ describe('A link in a tabular cell renders well-formed in every output:', () => 
   it('a link_open with no close still closes its anchor', () => {
     // Cell children are partly hand-stitched (sub-tabular, envToInline replay), so balance is not a
     // parser guarantee here: the loop must not leave the anchor open when it runs out of tokens.
-    const { renderTableCellContent } = require('../lib/markdown/common/render-table-cell-content');
     const inner = markdownIt({ html: true }).use(mathpixMarkdownPlugin, { outMath: { include_svg: false } });
     const tokens = [];
     inner.inline.parse('[label](http://a.b) tail', inner, {}, tokens);
@@ -189,14 +190,12 @@ describe('A link in a tabular cell renders well-formed in every output:', () => 
   it('raw markup in the label is passed through, brackets and all', () => {
     // html_inline runs to its `>`, so a `]` inside a tag never closes the label — escaping it would
     // only put a backslash into the HTML, which is emitted raw.
-    const { getMdLink } = require('../lib/markdown/common/table-markdown');
     const inner = markdownIt({ html: true }).use(mathpixMarkdownPlugin, { outMath: { include_svg: false } });
     const tokens = [];
     inner.inline.parse('[a <i title="x]y">t</i> b](http://a.b)', inner, {}, tokens);
     getMdLink(tokens[0], { children: tokens }, 0).should.equal('[a <i title="x]y">t</i> b](http://a.b)');
   });
   it('a stitched nested link does not leak a literal <a> into the label', () => {
-    const { getMdLink } = require('../lib/markdown/common/table-markdown');
     const inner = markdownIt({ html: true }).use(mathpixMarkdownPlugin, { outMath: { include_svg: false } });
     const outer = [];
     inner.inline.parse('[a b](http://a.b)', inner, {}, outer);
@@ -210,7 +209,6 @@ describe('A link in a tabular cell renders well-formed in every output:', () => 
   });
   it('the isSubTable stamp follows the argument, so a caller cannot claim nesting silently', () => {
     // renderTableCellContent marks the tokens it walks; later passes read the mark off them.
-    const { renderTableCellContent } = require('../lib/markdown/common/render-table-cell-content');
     const inner = markdownIt({ html: true }).use(mathpixMarkdownPlugin, { outMath: { include_svg: false } });
     const call = (child, isSubTable) => {
       renderTableCellContent({ children: [child] }, isSubTable, inner.options, {}, inner.renderer);

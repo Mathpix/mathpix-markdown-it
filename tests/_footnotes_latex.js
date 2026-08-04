@@ -2,7 +2,8 @@ let chai = require('chai');
 let should = chai.should();
 
 let MM = require('../lib/mathpix-markdown-model/index').MathpixMarkdownModel;
-const { getLabelsList } = require('../lib/index');
+const markdownIt = require('markdown-it');
+const { getLabelsList, mathpixMarkdownPlugin } = require('../lib/index');
 const {
   reFootnoteToken,
   reFootnotetextToken,
@@ -224,10 +225,41 @@ describe('Footnote token-guard soundness:', () => {
   });
 });
 
+// A terminator probe runs the list rule, which parses the body and can therefore throw. Both scans
+// must treat that as "not a terminator" instead of failing the whole document.
+describe('A throwing terminator probe does not fail the render:', () => {
+  const shapes = {
+    '\\footnote': 'Para \\footnote\n\\begin{itemize}\n\\item[a] x\n\\end{itemize}\n{f}',
+    '\\footnotetext': 'Para \\footnotetext\n\\begin{itemize}\n\\item[a] x\n\\end{itemize}\n{f}',
+  };
+  Object.entries(shapes).forEach(([name, src]) => {
+    it(`${name}: the scan swallows the throw and keeps scanning`, () => {
+      const md = markdownIt({ html: true })
+        .use(mathpixMarkdownPlugin, { outMath: { include_svg: false } });
+      const rule = md.block.ruler.__rules__.find((r) => r.name === 'Lists');
+      const original = rule.fn;
+      let thrown = 0;
+      // Only from the footnote scan: markdown-it's own paragraph probes have no such guard, so
+      // throwing there would fail the render for an unrelated reason.
+      rule.fn = function throwingProbe(state, start, end, silent) {
+        if (silent && (new Error().stack || '').includes('md-latex-footnotes')) {
+          thrown++;
+          throw new Error('probe blew up');
+        }
+        return original.apply(this, arguments);
+      };
+      md.block.ruler.__cache__ = null;
+      const html = md.render(src);
+      thrown.should.be.above(0, 'the scan never reached the list rule — the shape stopped exercising it');
+      html.should.be.a('string');
+      rule.fn = original;
+    });
+  });
+});
+
 describe('Footnote rule performance regression:', () => {
   // Parse-only timing — bypasses MathJax/render, isolates Phase 1 cost.
-  const { mathpixMarkdownPlugin } = require('../lib/markdown/mathpix-markdown-plugins');
-  const perfMd = require('markdown-it')({ html: true, breaks: true, linkify: true })
+  const perfMd = markdownIt({ html: true, breaks: true, linkify: true })
     .use(mathpixMarkdownPlugin, { width: 800 })
     .use(require('markdown-it-footnote'));
   const SCALING_RATIO_LIMIT = 60;
