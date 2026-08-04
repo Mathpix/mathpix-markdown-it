@@ -24,8 +24,9 @@ interface WidthToken {
   children?: WidthToken[] | null;
 }
 
-// Per-char reserve in em, over-estimating the widest glyph of each class against the bundled Arial
-// fixture at 16px (`A` advances ~0.72em, takes 0.90). Lower bound pinned in _list-marker-padding.js.
+// Per-char reserve in em, over-estimating the widest glyph of each class at 16px (`A` advances
+// ~0.72em, takes 0.90). Pinned in _list-marker-padding.js against
+// tests/_data/_markdownToHTMLWithSize/fonts/Arial.ttf.
 // Thin glyphs; \t\r\n collapse to a single space when rendered, so they share the space's class.
 const NARROW_RE = /[ \t\r\n!'"(),.\/:;|\[\]ijltfrI]/;
 const WIDE_RE = /[A-HJ-Zmw]/;                      // most capitals (except I) + m, w
@@ -168,12 +169,9 @@ export const textReserveEm = (str: string): number => {
  * also contributes 0, so the marker keeps the default indent.
  */
 export const tokenMarkerWidth = (token: WidthToken): number => {
-  if (typeof token.widthEx === 'number') {
-    return token.widthEx * EX_TO_EM;
-  }
-  // Math with no widthEx → 0 (don't measure content; that would be a fabricated estimate).
+  // Only the math pipeline fills widthEx. Without it → 0, rather than a guess from the latex.
   if (token.type && MATH_TOKEN_TYPES.has(token.type)) {
-    return 0;
+    return typeof token.widthEx === 'number' ? token.widthEx * EX_TO_EM : 0;
   }
   // These render as `<code>` in a monospace face, where the glyph-class estimate underreserves.
   if (token.type && MONO_TOKEN_TYPES.has(token.type)) {

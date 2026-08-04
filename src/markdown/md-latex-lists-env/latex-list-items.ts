@@ -249,6 +249,8 @@ export const resolveListPadding = (listTokens: Token[]): void => {
     for (let d = prefix.length; d <= depth; d++) {
       prefix[d] = prefix[d - 1] + LIST_DEFAULT_INDENT_EM;
     }
+    // Ancestor indent counts toward the marker's room: it sits at `right: 100%` of the item, so it
+    // grows leftwards into what the ancestors already reserved (see .li_level in styles-lists.ts).
     const ancestorSum: number = prefix[depth];
     const total: number = Math.min(token.padding || 0, LIST_MAX_INDENT_EM);
     // Ceil, never round: the reserve must not fall below the need — float noise can add one

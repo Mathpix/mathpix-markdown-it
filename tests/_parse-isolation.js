@@ -301,6 +301,7 @@ describe('silent-mode Lists probe memo', () => {
     ['state.types', (s) => { s.types = ['itemize']; }],
     ['state.level', (s) => { s.level = 3; }],
     ['state.blkIndent', (s) => { s.blkIndent = 4; }],
+    ['state.listIndent', (s) => { s.listIndent = 4; }],
     ['state.sCount', (s) => { s.sCount = s.sCount.map((v) => v + 4); }],
   ].forEach(([field, mutate]) => {
     [{ name: 'closed', src: closed }, { name: 'unclosed', src: unclosed }].forEach(({ name, src }) => {

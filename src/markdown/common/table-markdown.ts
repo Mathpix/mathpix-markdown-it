@@ -1,3 +1,6 @@
+import { mathTokenTypes } from "./consts";
+
+const MATH_TOKEN_TYPES = new Set<string>(mathTokenTypes);
 // Used with `replace` only, so the /g lastIndex is reset by the call and cannot leak between them.
 const LINE_BREAKS_RE: RegExp = /[\r\n]+/g;
 const HREF_NEEDS_ANGLES_RE: RegExp = /[\s<>]/;
@@ -64,11 +67,17 @@ export const getMdLink = (child, token, j) => {
     } else if (inner.type === 'link_open' || inner.type === 'link_close') {
       // Contributes nothing: a nested link has no Markdown form, and getMdForChild would hand
       // back a literal `<a>`.
+    } else if (inner.type && MATH_TOKEN_TYPES.has(inner.type)) {
+      // Verbatim, delimiters restored by type: escaping would turn every `\frac` into a LaTeX line
+      // break. The `$` also shields an unbalanced `]` inside math, as long as the reader has a math
+      // rule — a balanced pair (`\sqrt[3]{x}`) needs no shield, CommonMark pairs it itself.
+      const mathDelimiter: string = inner.type === 'inline_math' ? '$' : '$$';
+      text += mathDelimiter + (inner.content ?? '') + mathDelimiter;
     } else if (inner.type === 'image' || inner.type === 'includegraphics') {
       // Alt text as written, so a `]` in it already carries its backslash.
       text += inner.content ?? '';
     } else {
-      // Math latex, raw markup, anything else: escaped, or a `]` truncates the label downstream.
+      // Raw markup and anything else: escaped, or a `]` truncates the label downstream.
       text += escapeLabel(getMdForChild(inner) || (inner.content ?? ''));
     }
   }
@@ -109,6 +118,10 @@ export const getMdForChild = (child): string => {
     case 'strong':
     case 'mark':
     case 'code':
+    // Else a label flattens `H~2~O` to `H2O`.
+    case 'sub':
+    case 'sup':
+    case 'ins':
       res = child.markup;
       break;
 

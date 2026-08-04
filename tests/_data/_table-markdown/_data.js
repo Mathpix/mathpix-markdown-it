@@ -1012,12 +1012,12 @@ module.exports = [
       '| :--- |'
   },
   {
-    // Same for inline math: the label falls back to the latex source.
+    // Inline math keeps its latex and its `$` delimiters, so the label re-parses as math.
     id: 60,
     latex: '\\begin{tabular}{|l|}\n' +
       '[$x^2$](http://a.b) y\n' +
       '\\end{tabular}',
-    table_markdown: '| [x^2](http://a.b) y |\n' +
+    table_markdown: '| [$x^2$](http://a.b) y |\n' +
       '| :--- |'
   },
   {
@@ -1039,12 +1039,12 @@ module.exports = [
       '| :--- |'
   },
   {
-    // Same for a `]` that arrives inside math latex, not in a text token.
+    // A `]` inside math is NOT escaped: math is verbatim, so escaping it would alter the latex.
     id: 69,
     latex: '\\begin{tabular}{|l|}\n' +
       '[$a]b$](http://x.y) z\n' +
       '\\end{tabular}',
-    table_markdown: '| [a\\]b](http://x.y) z |\n' +
+    table_markdown: '| [$a]b$](http://x.y) z |\n' +
       '| :--- |'
   },
   {

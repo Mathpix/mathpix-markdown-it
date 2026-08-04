@@ -5,7 +5,7 @@
 Four independent groups in one publish. Read **Breaking changes** before upgrading.
 
 - **LaTeX lists.** Markers no longer clip their item text: width is measured per glyph class in `em` (non-ASCII by case, East-Asian Wide including emoji, monospace for code spans and `\texttt`, math by its rendered width), reserved per nesting level only when it overflows, and clamped at `20em`. Block-content items (`figure`, `tabular`, a code fence) are measured too. Also fixed: empty `<>` item bodies, `Figure N`/`Table N` shifted by a speculative parse, `\itemsep`/`\itemindent` mistaken for `\item`, and a list swallowed by a preceding `\footnote` scan. Core-markdown `<ul>`/`<ol>` indent `2.5em` instead of the browser default, scoped to `#preview-content`/`#setText`.
-- **Tabular cells.** Inline content sitting directly in a cell now reaches the `table-markdown`/`tsv`/`csv` export — a one-line list lost its item bodies there. A link no longer swallows the rest of the cell, exports its whole label, and no longer leaves an open `<a>` in the pptx output; `tsv`/`csv` still record a link by its href alone, by design.
+- **Tabular cells.** Inline content sitting directly in a cell now reaches the `table-markdown`/`tsv`/`csv` export — a one-line list lost its item bodies there. A link no longer swallows the rest of the cell, exports its whole label — math verbatim with its `$`/`$$`, `sub`/`sup`/`ins` markers kept, the rest escaped — and no longer leaves an open `<a>` in the pptx output; `tsv`/`csv` still record a link by its href alone, by design.
 - **Performance.** Repeated unclosed `\begin{itemize}` or `\begin{tabular}` units no longer parse quadratically; both shapes are guarded by tests.
 - **Code-block styles.** `pre`/`pre code` sizes are relative, so a code block scales with the container `font-size` (e.g. image export). Pixel-identical at a 16px base except code padding, 16px → 15px.
 
@@ -15,6 +15,7 @@ Four independent groups in one publish. Read **Breaking changes** before upgradi
 - **Custom-marker indents change size** — the width model was rewritten: a wide marker reserves ~21% more, a narrow or digit marker 36–70% less. The default indent and gap are pixel-identical at a 16px base.
 - **The wrapped-list indent rises to specificity `(1,0,1)`**, so a consumer rule at class specificity no longer wins.
 - **`table-markdown`/`tsv`/`csv` change for cells holding a one-line LaTeX list** (the fix above).
+- **A list inside a `tabular` cell now closes its last `<li>`** — four of our fifteen fixtures for that shape pinned an unclosed item (`<li>` 10 against `</li>` 9); the counts are balanced now, so a consumer diffing the HTML string sees it.
 - **A consumer's own `env` keeps the internal list/float keys with value `undefined`** after a parse instead of absent; value-level checks are unaffected.
 - **Deep imports:** `ClearTableNumbers`/`ClearFigureNumbers` → `clearTableNumbers`/`clearFigureNumbers`, moved to `lib/markdown/common/caption-counters` with no re-export; `ListItemsResult`/`ListInlineContext` dropped `padding` and gained required `openTokens`/`allListTokens`; `lib/styles/styles-code` alone no longer sizes code text (its `pre` base moved to `MathpixStyle`).
 

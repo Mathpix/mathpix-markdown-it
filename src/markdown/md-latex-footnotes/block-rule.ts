@@ -26,7 +26,7 @@ const FOOTNOTETEXT_TOKEN_SWEEP_G: RegExp = new RegExp(reFootnotetextToken.source
 const LIST_RULE_NAME = "Lists";
 const LIST_TERMINATOR_NAME = new Set<string>([LIST_RULE_NAME]);
 // Terminators for the \footnotetext scan. Neither set caches resolved fns: `rule.enabled` toggles
-// mid-parse (measured: no cost).
+// mid-parse. The walk stays off the hot path — see the scaling tests in _footnotes_latex.js.
 const FOOTNOTE_TERMINATOR_NAMES = new Set<string>([
   "table", "smilesDrawerBlock", "collapsible", "fence", "blockquote", "hr",
   "list", "Lists", "footnote_def", "heading", "svg_block", "html_block", "pageBreaksBlock", "deflist",

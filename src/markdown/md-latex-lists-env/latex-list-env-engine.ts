@@ -78,7 +78,6 @@ export const buildBlockStateFromRaw = (md: any, raw: string, baseEnv: any) => {
     if (i !== lines.length - 1) offset += 1;
   }
   st.push = (type: string, tag: string, nesting: number) => {
-    // const tok = new (Token as any)(type, tag, nesting);
     const tok = new TokenCtor(type, tag, nesting);
     tok.block = true;
     tok.level = st.level;
@@ -132,6 +131,7 @@ export const parseListEnvRawToTokens = (
   const blockState = buildBlockStateFromRaw(md, raw, baseEnv);
   // Roll back caption counters if the speculative parse is discarded (!ok / throw); on ok
   // the caller uses the tokens, so the numbers are kept. Mirrors the Lists block rule.
+  // No env rollback: this parse writes to a copy of env, not the caller's.
   // (This path is reached with a complete env, so !ok only fires on an internal abort — a
   // defensive rollback, not reachable via public input.)
   const captionSnap = getCaptionCounters();

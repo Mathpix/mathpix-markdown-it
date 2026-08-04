@@ -79,6 +79,8 @@ describe('display-width: tokenMarkerWidth (em)', () => {
     tokenMarkerWidth({ type: 'text', content: 'ab' }).should.be.closeTo(1.24, 1e-9));
   it('math token → widthEx × EX_TO_EM when present', () =>
     tokenMarkerWidth({ type: 'inline_math', widthEx: 8 }).should.be.closeTo(8 * EX_TO_EM, 1e-9));
+  it('widthEx is read for math only — a text token carrying one still measures its glyphs', () =>
+    tokenMarkerWidth({ type: 'text', content: 'ab', widthEx: 99 }).should.be.closeTo(1.24, 1e-9));
   it('math without widthEx → 0 (no measured width, so marker keeps the default indent)', () =>
     tokenMarkerWidth({ type: 'inline_math', content: 'x^2' }).should.equal(0));
   it('math without widthEx does not recurse into children → 0', () =>

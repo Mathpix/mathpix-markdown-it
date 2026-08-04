@@ -152,6 +152,56 @@ describe('Each inline type in a cell exports exactly once:', () => {
   });
 });
 
+// An inline type the label builder does not know falls back to its bare content, which silently
+// drops the markup around it (`H~2~O` → `H2O`). These two tests are the gate for that class.
+describe('The exported label has a decision for every inline construct:', () => {
+  // Every inline rule this plugin registers, reviewed against getMdLink/getMdForChild. A new rule
+  // fails the test until its tokens are handled there — or listed here as knowingly flattened.
+  const REVIEWED_INLINE_RULES = (
+    'InlineIncludeGraphics asciiMath autolink backtickAsAsciiMath backticks balance_pairs ' +
+    'captionLatex captionSetupLatex centeringLatex dotfill doubleSlashToSoftBreak emphasis ' +
+    'entity escape grab_footnote_ref html_inline html_inline2 html_inline_full_tag image ' +
+    'inlineDiagbox inlineMmdIcon inlineTabular labelLatex latex_footnote latex_footnotemark ' +
+    'latex_footnotetext latex_list_env_inline latex_lstlisting_env_inline link linkifyURL ' +
+    'list_begin_inline list_close_inline list_item_inline list_setcounter_inline mathML multiMath ' +
+    'newCommandQedSymbol newTheorem newline newlineToSpace pageBreaks refs refsInline ' +
+    'renewcommand_inline setCounterSection setCounterTheorem simpleMath smilesDrawerInline ' +
+    'strikethrough text textAuthor textMode textOut textTypes textUnderline ' +
+    'text_collapse theoremStyle toc tocHide usepackage'
+  ).split(' ');
+
+  it('no inline rule of this plugin is unreviewed', () => {
+    const md = markdownIt({ html: true }).use(mathpixMarkdownPlugin, { outMath: { include_svg: false } });
+    const live = md.inline.ruler.__rules__.concat(md.inline.ruler2.__rules__).map((r) => r.name);
+    const unreviewed = live.filter((name, i) => live.indexOf(name) === i
+      && REVIEWED_INLINE_RULES.indexOf(name) === -1);
+    unreviewed.should.deep.equal([],
+      'new inline rule(s): handle their tokens in getMdLink/getMdForChild, then list them here');
+  });
+
+  const labelMd = (body) => {
+    const src = '\\begin{tabular}{|l|}\n' + body + '\n\\end{tabular}';
+    const html = MM.markdownToHTML(src, { outMath: { include_svg: false, include_table_markdown: true } });
+    return MM.parseMarkdownByHTML(html, false)
+      .find((p) => p.type === 'table-markdown').value.split('\n')[0];
+  };
+  // Measured, not assumed: third-party markup (sub/sup/mark/ins) reaches the label as tokens too.
+  const KEEPS_ITS_MARKUP = ['**b**', '*i*', '~~s~~', '`c`', '==m==', '++ins++', 'H~2~O', 'x^2^',
+    ':smile:', '<b>h</b>', '$x$', '<smiles>CCO</smiles>'];
+  KEEPS_ITS_MARKUP.forEach((body) => {
+    it(`keeps its markup: ${body}`, () =>
+      labelMd(`[${body}](http://x.y)`).should.equal(`| [${body}](http://x.y) |`));
+  });
+  it('what the label drops, it drops knowingly', () => {
+    // No Markdown form for an underline; a nested image keeps its alt; a link title has nowhere to go.
+    labelMd('[\\underline{u}](http://x.y)').should.equal('| [u](http://x.y) |');
+    labelMd('[![alt](p.png)](http://x.y)').should.equal('| [alt](http://x.y) |');
+    labelMd('[a](http://x.y "t")').should.equal('| [a](http://x.y) |');
+    // \textbf maps onto the Markdown marker rather than staying LaTeX.
+    labelMd('[\\textbf{b}](http://x.y)').should.equal('| [**b**](http://x.y) |');
+  });
+});
+
 describe('A link in a tabular cell renders well-formed in every output:', () => {
   const src = '\\begin{tabular}{l}\n[**b** x](http://a.b) tail\n\\end{tabular}';
   it('the smoothed (pptx) cell closes the anchor and keeps its label', () => {
@@ -220,8 +270,8 @@ describe('A link in a tabular cell renders well-formed in every output:', () => 
   });
   it('every part of the label is escaped, except an image alt', () => {
     // A truncated label loses the whole link downstream, so `]` is escaped wherever it comes from —
-    // math latex and raw markup included. The cost is a stray backslash inside that payload; an
-    // image alt is exempt because it is raw source and already carries its own.
+    // raw markup included. Math and an image alt are exempt: both are latex/raw source, and a
+    // backslash added there would change what they mean (`\\` is a LaTeX line break).
     const inner = markdownIt({ html: true }).use(mathpixMarkdownPlugin, { outMath: { include_svg: false } });
     const label = (src) => {
       const tokens = [];
@@ -229,7 +279,21 @@ describe('A link in a tabular cell renders well-formed in every output:', () => 
       return getMdLink(tokens[0], { children: tokens }, 0);
     };
     label('[a\\]b](http://a.b)').should.equal('[a\\]b](http://a.b)');
-    label('[$a]b$](http://a.b)').should.equal('[a\\]b](http://a.b)');
+    // Math goes through verbatim, delimiters included — see the re-parse test below for why the
+    // unescaped `]` is safe here.
+    label('[$a]b$](http://a.b)').should.equal('[$a]b$](http://a.b)');
+    label('[$\\frac{a}{b}$](http://a.b)').should.equal('[$\\frac{a}{b}$](http://a.b)');
+    // Display math keeps `$$`, or the label would downgrade it to inline.
+    label('[$$x^2$$](http://a.b)').should.equal('[$$x^2$$](http://a.b)');
+
+    // The point of the delimiters: an exported math label reads back as a link, brackets and all.
+    ['[$\\sqrt[3]{x}$](http://a.b)', '[$a]b$](http://a.b)', '[$\\frac{a}{b}$](http://a.b)'].forEach((src) => {
+      const round = [];
+      inner.inline.parse(label(src), inner, {}, round);
+      const open = round.find((t) => t.type === 'link_open');
+      chai.expect(open, 'label stopped being a link: ' + src).to.not.be.undefined;
+      open.attrGet('href').should.equal('http://a.b');
+    });
     label('[<i title="x]y">t</i>](http://a.b)').should.equal('[<i title="x\\]y">t</i>](http://a.b)');
     label('[![a\\]b](i.png)](http://a.b)').should.equal('[a\\]b](http://a.b)');
 

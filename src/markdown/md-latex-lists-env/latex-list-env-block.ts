@@ -634,6 +634,7 @@ export const Lists: RuleBlock = (
   // same line numbers on the same state — so the key carries the first line's geometry too. The
   // later lines are not in it: the parser walks them from these same arrays, which markdown-it
   // shifts uniformly, so the first line pins the frame.
+  // No blkIndent/listIndent: the probe path never reads them (pinned in _parse-isolation.js).
   const probeKey: string = silent
     ? `${startLine}:${endLine}:${state.bMarks[startLine] + state.tShift[startLine]}:${state.eMarks[startLine]}` +
       `:${state.parentType}:${state.prentLevel}:${(state.env as any)?.inheritedListType}` +
