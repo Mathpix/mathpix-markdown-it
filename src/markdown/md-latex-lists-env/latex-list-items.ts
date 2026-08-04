@@ -33,8 +33,7 @@ export const ListItemsBlock = (
     return;
   }
   for (const item of items) {
-    const rawContent: string = item?.content ?? '';
-    const itemContent: string = rawContent.trim();
+    const itemContent: string = (item?.content ?? '').trim();
     SetTokensBlockParse(state, itemContent, {
       startLine: item.startLine,
       endLine: item.endLine + 1,

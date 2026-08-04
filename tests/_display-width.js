@@ -20,6 +20,14 @@ describe('display-width: isWideChar', () => {
     isWideChar(0x18D00).should.equal(true);  // Tangut Supplement
     isWideChar(0x1AFF0).should.equal(true);  // Kana Extended-B
   });
+  it('the Wide emoji sub-blocks below 1F200 are covered', () => {
+    isWideChar(0x1F004).should.equal(true);  // mahjong
+    isWideChar(0x1F1E6).should.equal(true);  // regional indicator
+    // Domino and playing cards are Neutral, so they stay in the cased fallback (already wider
+    // than they render) rather than claiming full width.
+    isWideChar(0x1F030).should.equal(false);
+    isWideChar(0x1F0A0).should.equal(false);
+  });
   it('astral blocks that are not Wide stay out', () => {
     isWideChar(0x1D400).should.equal(false); // math alphanumerics
     isWideChar(0x10400).should.equal(false); // Deseret
@@ -91,6 +99,12 @@ describe('display-width: tokenMarkerWidth (em)', () => {
       .should.be.closeTo(2 * tokenMarkerWidth({ type: 'texttt', content: 'ab' }), 1e-9);
     tokenMarkerWidth({ type: 'code_inline', content: '漢字' })
       .should.be.above(textReserveEm('漢字'));
+  });
+  it('a lone surrogate reserves nothing in the monospace branch either', () => {
+    // The two paths must agree on broken input, or the same marker measures differently by type.
+    tokenMarkerWidth({ type: 'code_inline', content: '\uD800' }).should.equal(0);
+    tokenMarkerWidth({ type: 'code_inline', content: 'a\uD800b' })
+      .should.be.closeTo(tokenMarkerWidth({ type: 'code_inline', content: 'ab' }), 1e-9);
   });
   it('a lone surrogate reserves nothing', () => {
     tokenMarkerWidth({ type: 'text', content: '\uD800' }).should.equal(0);

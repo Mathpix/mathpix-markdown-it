@@ -168,12 +168,24 @@ describe('a speculative list parse does not advance other global registries', ()
     const listKeys = new Set([...LIST_TRANSIENT_ENV_KEYS, ...LIST_SPECULATIVE_ENV_KEYS]);
     // Parser-wide registries, not list state. Keep closed: widening it hides the drift.
     const ignoredParserKeys = new Set(['__mathpix', 'currentTag', 'footnotes', 'mmd_footnotes']);
+    // One body per env LATEX_BLOCK_ENV_OPEN_RE admits inside an item, plus the other rules
+    // reachable from there. A rule left out of this list could leak its key unnoticed.
     const bodies = [
       '\\begin{figure}\n\\caption{c}\n\\end{figure}',
+      '\\begin{table}\n\\caption{t}\n\\begin{tabular}{|l|}\nq\n\\end{tabular}\n\\end{table}',
       '\\begin{tabular}{|l|}\nq\n\\end{tabular}',
+      '\\begin{center}\ncentred\n\\end{center}',
+      '\\begin{left}\nleft\n\\end{left}',
+      '\\begin{right}\nright\n\\end{right}',
+      '\\begin{lstlisting}\ncode\n\\end{lstlisting}',
       '\\begin{align}\nx=1\n\\end{align}',
+      '\\begin{proof}\nq\n\\end{proof}',
+      '\\newtheorem{thm}{Thm}\n\\begin{thm}\nq\n\\end{thm}',
+      '\\section{Head}',
       '```\ncode\n```',
       '\\begin{align}x=1\\label{e}\\end{align}',
+      '$$x^2$$',
+      '\\footnote{n}',
     ];
     bodies.forEach((body) => {
       const env = {};
@@ -276,9 +288,13 @@ describe('silent-mode Lists probe memo', () => {
       [1, 2, 3].forEach(() => listsRule(state, 0, state.lineMax, true).should.equal(expected));
     });
   });
-  // The key omits several fields ListsInternal reads. Pin that they really are irrelevant:
-  // a cached answer must equal what an unmemoized parse says under the same mutation.
+  // Two groups, one assertion: a cached answer must equal what an unmemoized parse says under the
+  // same mutation. For the fields the key omits that pins they are really irrelevant; for the ones
+  // it carries (the env flags a body parse reaches) it pins that the entry is invalidated, not stale.
   [
+    ['env.tabulare', (s) => { s.env.tabulare = true; }],
+    ['env.subTabular', (s) => { s.env.subTabular = true; }],
+    ['env.isInline', (s) => { s.env.isInline = true; }],
     ['env.isBlock', (s) => { s.env.isBlock = true; }],
     ['env.parentType', (s) => { s.env.parentType = 'itemize'; }],
     ['env.prentLevel', (s) => { s.env.prentLevel = 3; }],

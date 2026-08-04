@@ -1021,6 +1021,15 @@ module.exports = [
       '| :--- |'
   },
   {
+    // An opening bracket re-pairs with the label's closing one, so it is escaped too.
+    id: 71,
+    latex: '\\begin{tabular}{|l|}\n' +
+      '[a\\[b](http://a.b) z\n' +
+      '\\end{tabular}',
+    table_markdown: '| [a\\[b](http://a.b) z |\n' +
+      '| :--- |'
+  },
+  {
     // Raw markup in the label is kept as written, not stripped.
     id: 70,
     latex: '\\begin{tabular}{|l|}\n' +

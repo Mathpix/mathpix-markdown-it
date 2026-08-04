@@ -2,10 +2,11 @@
 const LINE_BREAKS_RE: RegExp = /[\r\n]+/g;
 const HREF_NEEDS_ANGLES_RE: RegExp = /[\s<>]/;
 const HREF_ANGLE_ESCAPE_RE: RegExp = /([<>\\])/g;
-const LABEL_BRACKET_RE: RegExp = /\]/g;
+// Everything that can end or re-cut a label: the closing bracket, an opening one (which
+// re-pairs with it), and a backslash (which would escape whatever we add after it).
+const LABEL_ESCAPE_RE: RegExp = /([\\\[\]])/g;
 
-// The label ends at the first unescaped `]`, so every part of it is escaped on the way out.
-const escapeLabel = (s: string): string => s.replace(LABEL_BRACKET_RE, '\\]');
+const escapeLabel = (s: string): string => s.replace(LABEL_ESCAPE_RE, '\\$1');
 
 // A bare destination ends at the first unbalanced `)`, so such an href needs the `<…>` form.
 const hasUnbalancedParens = (href: string): boolean => {
@@ -61,8 +62,8 @@ export const getMdLink = (child, token, j) => {
       // The other self-closing type getMdForChild gives a marker for; its closer is not in markup.
       text += getMdForChild(inner) + inner.content + '</smiles>';
     } else if (inner.type === 'link_open' || inner.type === 'link_close') {
-      // A nested link has no Markdown form; getMdForChild would emit a literal `<a>` here.
-      continue;
+      // Contributes nothing: a nested link has no Markdown form, and getMdForChild would hand
+      // back a literal `<a>`.
     } else if (inner.type === 'image' || inner.type === 'includegraphics') {
       // Alt text as written, so a `]` in it already carries its backslash.
       text += inner.content ?? '';

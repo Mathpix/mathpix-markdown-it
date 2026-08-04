@@ -638,7 +638,10 @@ export const Lists: RuleBlock = (
     ? `${startLine}:${endLine}:${state.bMarks[startLine] + state.tShift[startLine]}:${state.eMarks[startLine]}` +
       `:${state.parentType}:${state.prentLevel}:${(state.env as any)?.inheritedListType}` +
       // Module-global, so it is not implied by the state fields above; free to add (measured).
-      `:${getListDepth()}`
+      `:${getListDepth()}` +
+      // Read by rules the body parse reaches (begin-tabular). Booleans keep the key short.
+      `:${!!(state.env as any)?.tabulare}:${!!(state.env as any)?.subTabular}` +
+      `:${!!(state.env as any)?.isInline}:${!!(state.env as any)?.isBlock}`
     : '';
   if (silent) {
     const cached: boolean | undefined = getCachedListProbe(state, probeKey);

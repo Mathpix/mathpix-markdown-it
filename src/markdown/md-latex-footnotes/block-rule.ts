@@ -23,7 +23,8 @@ const FOOTNOTE_TOKEN_SWEEP_G: RegExp = new RegExp(reFootnoteToken.source, 'g');
 const FOOTNOTETEXT_TOKEN_SWEEP_G: RegExp = new RegExp(reFootnotetextToken.source, 'g');
 
 // Terminators for the \footnote scan, kept minimal alongside fence.
-const LIST_TERMINATOR_NAME = new Set<string>(["Lists"]);
+const LIST_RULE_NAME = "Lists";
+const LIST_TERMINATOR_NAME = new Set<string>([LIST_RULE_NAME]);
 // Terminators for the \footnotetext scan. Neither set caches resolved fns: `rule.enabled` toggles
 // mid-parse (measured: no cost).
 const FOOTNOTE_TERMINATOR_NAMES = new Set<string>([
@@ -36,40 +37,55 @@ const FOOTNOTE_TERMINATOR_NAMES = new Set<string>([
 ]);
 
 
-// `Lists` parses the body to answer, so a terminator probe can throw on malformed input: a probe
-// that cannot answer is not a terminator, and must not fail the document.
+// Only `guarded` may throw here by design: it parses the body to answer, and a probe that cannot
+// answer is not a terminator. Every other rule keeps propagating, so a bug in one stays visible.
 const anyTerminates = (
   rules: RuleBlock[],
   state: StateBlock,
   line: number,
   endLine: number,
+  guarded?: RuleBlock,
 ): boolean => {
   for (let i = 0; i < rules.length; i++) {
+    if (rules[i] !== guarded) {
+      if (rules[i](state, line, endLine, true)) {
+        return true;
+      }
+      continue;
+    }
     try {
       if (rules[i](state, line, endLine, true)) {
         return true;
       }
     } catch (e) {
-      // this rule does not answer; try the next
+      // the speculative parse blew up: treat as "no terminator here"
     }
   }
   return false;
 };
 
-// Resolve the enabled block-rule fns for the given names (in ruler order). Not cached —
-// see the FOOTNOTE_TERMINATOR_NAMES note.
-const resolveEnabledRuleFns = (ruler: Ruler, names: Set<string>): RuleBlock[] => {
+// One walk per entry: the terminator fns plus the one allowed to throw (`guardName`), so the caller
+// never walks again just to identify it. Not cached — see the FOOTNOTE_TERMINATOR_NAMES note.
+const resolveEnabledRuleFns = (
+  ruler: Ruler,
+  names: Set<string>,
+  guardName?: string,
+): { fns: RuleBlock[]; guarded?: RuleBlock } => {
   const rules = ruler.__rules__;
-  const res: RuleBlock[] = [];
+  const fns: RuleBlock[] = [];
+  let guarded: RuleBlock | undefined;
   if (rules?.length) {
     for (let i = 0; i < rules.length; i++) {
       const rule = rules[i];
       if (rule.enabled && names.has(rule.name)) {
-        res.push(rule.fn);
+        fns.push(rule.fn);
+        if (rule.name === guardName) {
+          guarded = rule.fn;
+        }
       }
     }
   }
-  return res;
+  return { fns, guarded };
 }
 
 export const latex_footnote_block: RuleBlock = (state, startLine, endLine, silent) => {
@@ -96,10 +112,11 @@ export const latex_footnote_block: RuleBlock = (state, startLine, endLine, silen
     if (!sawFootnoteToken || !reOpenTagFootnoteG.test(lineText)) {
       // Terminate on `fence` (original) plus the LaTeX list rule, so a `\begin{itemize}`
       // before the tag isn't swallowed — a minimal addition (fence + Lists, not the full set).
-      const [listRule] = resolveEnabledRuleFns(state.md.block.ruler, LIST_TERMINATOR_NAME);
+      const { guarded: listRule } = resolveEnabledRuleFns(
+        state.md.block.ruler, LIST_TERMINATOR_NAME, LIST_RULE_NAME);
       const probeRules: RuleBlock[] = listRule ? [fence as any, listRule] : [fence as any];
       for (; nextLine < endLine; nextLine++) {
-        if (anyTerminates(probeRules, state, nextLine, endLine)) {
+        if (anyTerminates(probeRules, state, nextLine, endLine, listRule)) {
           terminate = true;
         }
         if (terminate) { break; }
@@ -283,13 +300,14 @@ export const latex_footnotetext_block: RuleBlock = (state, startLine, endLine, s
     let hasOpenTag = false;
     let pending = '';
     let terminate = false;
-    const terminatorRules = resolveEnabledRuleFns(state.md.block.ruler, FOOTNOTE_TERMINATOR_NAMES);
+    const { fns: terminatorRules, guarded: listTerminator } = resolveEnabledRuleFns(
+      state.md.block.ruler, FOOTNOTE_TERMINATOR_NAMES, LIST_RULE_NAME);
     // Literal token can't span `\n` — gate the O(fullContent) regex on per-line presence.
     let sawFootnotetextToken: boolean = reFootnotetextToken.test(lineText);
     if (!sawFootnotetextToken || !reOpenTagFootnotetextG.test(lineText)) {
       // jump line-by-line until empty one or EOF
       for (; nextLine < endLine; nextLine++) {
-        if (anyTerminates(terminatorRules, state, nextLine, endLine)) {
+        if (anyTerminates(terminatorRules, state, nextLine, endLine, listTerminator)) {
           terminate = true;
         }
         if (terminate) {
