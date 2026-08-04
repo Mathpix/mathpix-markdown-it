@@ -157,6 +157,37 @@ describe('a speculative list parse does not advance other global registries', ()
   // No theorem case: a \begin{theorem} inside a list body is not rendered at all, so its counter
   // is unreachable from the speculative parse. See Non-Goals.
 
+  // LIST_SPECULATIVE_ENV_KEYS is hand-written, so a rule that starts writing a new env key inside a
+  // list body would leak it silently. Structural guard: every key a probed list parse leaves must be
+  // known here — a new one fails this test instead of waiting for someone to notice the drift.
+  it('a probed list body writes no env key outside the known set', () => {
+    const { LIST_TRANSIENT_ENV_KEYS, LIST_SPECULATIVE_ENV_KEYS } =
+      require('../lib/markdown/common/env-transient');
+    // Read from the source of truth, so an unregistered list key fails below.
+    const listKeys = new Set([...LIST_TRANSIENT_ENV_KEYS, ...LIST_SPECULATIVE_ENV_KEYS]);
+    // Parser-wide registries, not list state. Keep closed: widening it hides the drift.
+    const ignoredParserKeys = new Set(['__mathpix', 'currentTag', 'footnotes', 'mmd_footnotes']);
+    const bodies = [
+      '\\begin{figure}\n\\caption{c}\n\\end{figure}',
+      '\\begin{tabular}{|l|}\nq\n\\end{tabular}',
+      '\\begin{align}\nx=1\n\\end{align}',
+      '```\ncode\n```',
+      '\\begin{align}x=1\\label{e}\\end{align}',
+    ];
+    bodies.forEach((body) => {
+      const env = {};
+      // \footnotetext with no blank line makes the terminator scan probe every line.
+      md.render('Para \\footnotetext{f}\n\\begin{itemize}\n\\item[a] x\n' + body + '\n\\end{itemize}', env);
+      Object.keys(env).forEach((key) => {
+        if (ignoredParserKeys.has(key)) {
+          return;
+        }
+        listKeys.has(key).should.equal(true,
+          'env key after a probed list is neither a registered list key nor a known parser key: ' + key);
+      });
+    });
+  });
+
   // The caption counters are restored on a non-committing exit, which is only safe while no token
   // outside the discarded parse carries a number from it. Pin the observable form: numbers never
   // repeat, whatever the list body holds.

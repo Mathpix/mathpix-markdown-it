@@ -319,6 +319,16 @@ describe('processListChildToken — an unpaired close does not steal the outer l
     processListChildToken(state, { startLine: 0, endLine: 0 }, item, ctx);
     outer.padding.should.be.above(LIST_DEFAULT_INDENT_EM);
   });
+  it('unpaired closes do not drive the depth negative', () => {
+    // prentLevel is the level key resolveListPadding reads, so a negative would misattribute.
+    const state = mkState();
+    const ctx = mkCtx([]);
+    for (let i = 0; i < 3; i++) {
+      processListChildToken(state, { startLine: 0, endLine: 0 },
+        new Token('itemize_list_close', 'ul', -1), ctx);
+    }
+    state.prentLevel.should.equal(0);
+  });
   it('a same-kind close does pop the registry entry, matched or not', () => {
     // The known limitation, pinned rather than fixed: the block path compares identity, this one
     // only kind, so a stray itemize close drops the itemize entry that is open here.

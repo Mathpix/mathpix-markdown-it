@@ -117,11 +117,13 @@ export const renderTableCellContent = (
           csvCell += href;
           let link = getMdLink(child, token, j)
             .replace(/\|/g, '\\|');
+          // Outside the `if`: with link_open as the last child there is no label to emit, but the
+          // main loop already appended the opening `<a>`.
+          let depth = 1;
           if (link) {
             mdCell += link;
             // getMdLink already emitted [text](href). Render the rest of the link for HTML and
             // stop on its own link_close, so following siblings are not consumed.
-            let depth = 1;
             while (depth > 0 && j + 1 < token.children.length) {
               const inner = token.children[++j];
               if (inner.type === 'link_open') {
@@ -136,6 +138,11 @@ export const renderTableCellContent = (
               content += options.forPptx ? innerSmoothed : innerRendered;
               smoothedCell += innerSmoothed;
             }
+          }
+          // The stream is partly hand-stitched: a link_open with no close would stay open.
+          if (depth > 0) {
+            content += '</a>';
+            smoothedCell += '</a>';
           }
           continue;
         }

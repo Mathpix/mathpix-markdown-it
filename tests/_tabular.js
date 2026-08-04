@@ -158,6 +158,34 @@ describe('A link in a tabular cell renders well-formed in every output:', () => 
     const html = md.renderer.render(tokens, md.options, env);
     html.should.not.match(/<a [^>]*>\s*<div class="inline-tabular"/);
   });
+  it('a link_open with no close still closes its anchor', () => {
+    // Cell children are partly hand-stitched (sub-tabular, envToInline replay), so balance is not a
+    // parser guarantee here: the loop must not leave the anchor open when it runs out of tokens.
+    const { renderTableCellContent } = require('../lib/markdown/common/render-table-cell-content');
+    const inner = markdownIt({ html: true }).use(mathpixMarkdownPlugin, { outMath: { include_svg: false } });
+    const tokens = [];
+    inner.inline.parse('[label](http://a.b) tail', inner, {}, tokens);
+    const cell = (children) =>
+      renderTableCellContent({ children }, false, inner.options, {}, inner.renderer);
+    const balance = (res) =>
+      (res.content.match(/<a /g) || []).length - (res.content.match(/<\/a>/g) || []).length;
+
+    // No close: the loop runs to the end, so the tail joins the label. Pinned exactly — the chosen
+    // behaviour is "keep the content", and an assertion on substrings would allow either outcome.
+    const noClose = cell(tokens.filter((t) => t.type !== 'link_close'));
+    balance(noClose).should.equal(0);
+    noClose.tableMd.should.equal('[label tail](http://a.b)');
+
+    // link_open as the last child: no label at all, and the opening tag came from the main loop.
+    const onlyOpen = cell([tokens[0]]);
+    balance(onlyOpen).should.equal(0);
+    onlyOpen.tableMd.should.equal('');
+
+    // Control: a balanced stream keeps the tail outside the label.
+    const balanced = cell(tokens);
+    balance(balanced).should.equal(0);
+    balanced.tableMd.should.equal('[label](http://a.b) tail');
+  });
   it('a bracket inside raw markup in the label is escaped', () => {
     // Not reachable through a cell (such input is not parsed as a link there), so pinned at the unit.
     const { getMdLink } = require('../lib/markdown/common/table-markdown');

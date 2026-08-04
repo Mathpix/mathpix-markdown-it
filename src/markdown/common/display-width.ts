@@ -36,6 +36,7 @@ const WIDE_EM = 0.90;
 const XWIDE_EM = 1.10;
 const CJK_EM = 1.20;                               // East-Asian full-width glyph
 // Monospace advance, covering the faces `code` uses (Inconsolata 0.5em, DM Mono 0.6em).
+// Equal to NORMAL_EM by coincidence, not derivation — the two move independently.
 const MONO_EM = 0.62;
 const MONO_TOKEN_TYPES = new Set<string>(['code_inline', 'texttt']);
 

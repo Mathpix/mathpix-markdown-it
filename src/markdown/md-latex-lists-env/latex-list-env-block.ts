@@ -631,7 +631,8 @@ export const Lists: RuleBlock = (
   // `state.src` alone does not pin what a line contains — blockquote shifts bMarks/tShift for the
   // same line numbers on the same state — so the key carries the first line's geometry too. The
   // later lines are not in it: the parser walks them from these same arrays, which markdown-it
-  // shifts uniformly, so the first line pins the frame.
+  // shifts uniformly, so the first line pins the frame. The module-global list depth is out of the
+  // key on purpose — covered by the leaked-depth case in tests/_parse-isolation.js.
   const probeKey: string = silent
     ? `${startLine}:${endLine}:${state.bMarks[startLine] + state.tShift[startLine]}:${state.eMarks[startLine]}` +
       `:${state.parentType}:${state.prentLevel}:${(state.env as any)?.inheritedListType}`

@@ -31,6 +31,7 @@ export const getMdLink = (child, token, j) => {
   let depth = 1;
   for (let i = j + 1; i < token.children.length; i++) {
     const inner = token.children[i];
+    // No nested links in CommonMark; counted so a stitched stream can't end the label early.
     if (inner.type === 'link_open') {
       depth++;
     } else if (inner.type === 'link_close') {

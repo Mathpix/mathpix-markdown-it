@@ -243,6 +243,8 @@ describe('Footnote rule performance regression:', () => {
     samples.sort((a, b) => a - b);
     return samples[2];
   };
+  // These two keep the absolute limit: their immune twin (a paragraph without the literal) costs
+  // less than SMALL_FLOOR_MS, so a normalised ratio would measure the floor, not the defect.
   // Worst case: long paragraph with literal substring inline — forces regex backtracking on master's Phase 1.
   const buildBodyWithLiteral = (lineCount, literal) => {
     const lines = [];
@@ -272,28 +274,33 @@ describe('Footnote rule performance regression:', () => {
     });
   });
 
-  // Without the LaTeX list rule as a terminator, each footnotetext scan runs across
-  // the `\begin{itemize}` into the rest of the doc → O(N^2); the terminator bounds it → linear.
-  it('list + \\footnotetext units without blank separators scale linearly', function () {
+  // Without the list terminator each footnotetext scan ran into the rest of the doc — O(N^2).
+  // Normalised against the blank-separated form in the same run, so the bound is machine-free.
+  it('list + \\footnotetext units scale like blank-separated ones', function () {
     this.timeout(60000);
-    const unit =
-      'Paragraph text before the list with no blank line separator.\n' +
+    const unit = (sep) =>
+      'Paragraph text before the list with no blank line separator.' + sep +
       '\\begin{itemize}\n\\item[] \\footnotetext{\nA footnote note inside the item.\n}\n\\end{itemize}';
-    const build = (n) => Array.from({ length: n }, () => unit).join('\n');
-    // Same 10x growth as the cases above, so SCALING_RATIO_LIMIT means the same thing here.
-    const small = measureMs(build(200));
-    const large = measureMs(build(2000));
-    (large / Math.max(small, SMALL_FLOOR_MS)).should.be.below(SCALING_RATIO_LIMIT);
+    const growth = (sep) => {
+      const build = (n) => Array.from({ length: n }, () => unit(sep)).join('\n');
+      return measureMs(build(2000)) / Math.max(measureMs(build(200)), SMALL_FLOOR_MS);
+    };
+    (growth('\n') / growth('\n\n')).should.be.below(5);
   });
 
   // Without the closer lookahead, each probe of an unclosed env scans to EOF — O(N^2) over N starts.
-  it('unclosed \\begin{itemize} units scale linearly', function () {
+  // Normalised against the closed form measured in the same run, so the bound does not depend on
+  // machine speed: measured 0.6 with the lookahead, 51 without.
+  it('unclosed \\begin{itemize} units scale like closed ones', function () {
     this.timeout(60000);
-    const unit = '\\begin{itemize}\n\\item[a] x';
-    const build = (n) => Array.from({ length: n }, () => unit).join('\n');
-    const small = measureMs(build(100));
-    const large = measureMs(build(1000));
-    (large / Math.max(small, SMALL_FLOOR_MS)).should.be.below(SCALING_RATIO_LIMIT);
+    const growth = (unit) => {
+      const build = (n) => Array.from({ length: n }, () => unit).join('\n');
+      const small = measureMs(build(100));
+      return measureMs(build(1000)) / Math.max(small, SMALL_FLOOR_MS);
+    };
+    const unclosed = growth('\\begin{itemize}\n\\item[a] x');
+    const closed = growth('\\begin{itemize}\n\\item[a] x\n\\end{itemize}');
+    (unclosed / closed).should.be.below(5);
   });
 
   // The tabular shape stays super-linear for a reason outside this rule (unterminated forward scans

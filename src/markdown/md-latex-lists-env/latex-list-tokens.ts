@@ -338,7 +338,8 @@ export const processListChildToken = (
     ctx.allListTokens.push(token);
   } else {
     if (token.type === 'enumerate_list_close' || token.type === 'itemize_list_close') {
-      state.prentLevel--;
+      // Clamped like the block path: an unpaired close would make the level key negative.
+      state.prentLevel = Math.max(0, state.prentLevel - 1);
       if (state.types && state.types.length > 0) {
         state.types.pop();
       }
