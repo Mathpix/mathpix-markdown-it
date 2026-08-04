@@ -119,6 +119,30 @@ describe('Enabling the cell exports leaves the HTML untouched:', () => {
   });
 });
 
+// A run is fed to renderTableCellContent whole, so a member appearing twice would export twice.
+describe('Block leaves in a cell export exactly once:', () => {
+  const cellMd = (src) => {
+    const html = MM.markdownToHTML(src, { outMath: { include_svg: false, include_table_markdown: true } });
+    return ((html.match(/<table-markdown[^>]*>([\s\S]*?)<\/table-markdown>/) || [])[1] || '').split('\n')[0];
+  };
+  const cases = {
+    // lstlisting is a block leaf and a run member on purpose: this is where its markdown comes from.
+    'lstlisting': ['\\begin{tabular}{|l|}\n\\begin{itemize}\\item[x] a\n' +
+      '\\begin{lstlisting}\nz\n\\end{lstlisting}\n\\end{itemize}\n\\end{tabular}', 'z'],
+    'unsupported \\hrule': ['\\begin{tabular}{|l|}\n\\begin{itemize}\\item[x] a \\hrule b\\end{itemize}\n' +
+      '\\end{tabular}', '\\hrule'],
+    'fence': ['\\begin{tabular}{|l|}\n\\begin{itemize}\\item[x] a\n```\ncode\n```\n\\end{itemize}\n' +
+      '\\end{tabular}', 'code'],
+  };
+  Object.entries(cases).forEach(([name, [src, needle]]) => {
+    it(`${name}: its content appears once in table-markdown`, () => {
+      const md = cellMd(src);
+      md.should.include(needle);
+      md.split(needle).should.have.length(2);
+    });
+  });
+});
+
 describe('A link in a tabular cell renders well-formed in every output:', () => {
   const src = '\\begin{tabular}{l}\n[**b** x](http://a.b) tail\n\\end{tabular}';
   it('the smoothed (pptx) cell closes the anchor and keeps its label', () => {

@@ -15,6 +15,7 @@ import {
 } from "./latex-list-types";
 import { parseSetCounterNumber } from "./latex-list-common";
 import { getCaptionCounters, setCaptionCounters } from "../common/caption-counters";
+import { lastMatchPosCached } from "../common/src-pos-cache";
 import {
   LIST_TRANSIENT_ENV_KEYS,
   LIST_SPECULATIVE_ENV_KEYS,
@@ -584,24 +585,9 @@ const setCachedListProbe = (state: StateBlock, key: string, ok: boolean): void =
 const LIST_END_POS_KEY = Symbol('mmd.listEndPos');
 // Built from the unanchored closer regex, so the sweep cannot drift from what the parser accepts.
 const END_LIST_ENV_SWEEP_G: RegExp = new RegExp(END_LIST_ENV_INLINE_RE.source, 'g');
-type ListEndCache = { src: string; lastPos: number };
 
-const lastListEndPos = (state: StateBlock): number => {
-  const slot = state as unknown as Record<symbol, ListEndCache | undefined>;
-  const cached = slot[LIST_END_POS_KEY];
-  if (cached && cached.src === state.src) {
-    return cached.lastPos;
-  }
-  END_LIST_ENV_SWEEP_G.lastIndex = 0;
-  let lastPos: number = -1;
-  let m: RegExpExecArray | null;
-  while ((m = END_LIST_ENV_SWEEP_G.exec(state.src)) !== null) {
-    lastPos = m.index;
-  }
-  END_LIST_ENV_SWEEP_G.lastIndex = 0;
-  slot[LIST_END_POS_KEY] = { src: state.src, lastPos };
-  return lastPos;
-};
+const lastListEndPos = (state: StateBlock): number =>
+  lastMatchPosCached(state, LIST_END_POS_KEY, END_LIST_ENV_SWEEP_G);
 
 /**
  * Block rule that parses LaTeX list environments:

@@ -14,7 +14,7 @@ Four independent groups shipped in one publish. Read **Breaking changes** before
 - `\item` detection requires a real command, so `\itemsep` / `\itemindent` and the bare word "item" no longer split an item or break a multiline `\footnote` inside one.
 - `\footnote` / `\footnotetext` scans stop at a list start: a list right after a paragraph is no longer swallowed and shown as literal text.
 - Inline content sitting directly in a `\begin{tabular}` cell (no paragraph wrapper) now reaches the `table-markdown` / `tsv` / `csv` export — the reported case is a one-line list in a cell, whose item bodies were dropped. HTML is unchanged.
-- Core-markdown `<ul>` / `<ol>` indent `2.5em` instead of the browser default `40px`, scoped to `#preview-content` / `#setText`; the generated footnotes list is covered too.
+- Core-markdown `<ul>` / `<ol>` indent `2.5em` instead of the browser default `40px`, scoped to `#preview-content` / `#setText`; the numbered footnotes list is covered too (the no-numbers one keeps its inline `padding-left: 20px`, which wins over any stylesheet rule — unchanged, and a difference that pre-dates this release).
 - Faster where parsing used to degrade quadratically: unclosed `\begin{itemize}` units 4876 → 11 ms at n=400, paragraph + list + footnote units 152 → 43 ms, lists holding a figure 22 → 18 ms; a plain list-heavy document is unchanged. Both scaling shapes are guarded by tests.
 
 See `pr-specs/2026-07-list-rendering-robustness.md`.

@@ -85,6 +85,13 @@ describe('display-width: tokenMarkerWidth (em)', () => {
     tokenMarkerWidth({ type: 'texttt', content: 'iiiiiiiiii', children: [{ type: 'text', content: 'iiiiiiiiii' }] })
       .should.be.closeTo(6.2, 1e-9);
   });
+  it('a wide glyph takes two monospace cells', () => {
+    // Otherwise `\item[\texttt{漢字}]` reserves half of what it renders — the unsafe direction.
+    tokenMarkerWidth({ type: 'texttt', content: '漢字' })
+      .should.be.closeTo(2 * tokenMarkerWidth({ type: 'texttt', content: 'ab' }), 1e-9);
+    tokenMarkerWidth({ type: 'code_inline', content: '漢字' })
+      .should.be.above(textReserveEm('漢字'));
+  });
   it('a lone surrogate reserves nothing', () => {
     tokenMarkerWidth({ type: 'text', content: '\uD800' }).should.equal(0);
     tokenMarkerWidth({ type: 'text', content: 'a\uD800b' })

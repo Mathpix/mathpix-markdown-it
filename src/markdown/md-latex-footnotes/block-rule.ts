@@ -1,4 +1,4 @@
-import { Token, RuleBlock, Ruler, StateBlock } from 'markdown-it';
+import { Token, RuleBlock, Ruler } from 'markdown-it';
 import {
   reFootnoteToken,
   reFootnotetextToken,
@@ -12,6 +12,7 @@ import {
 import { findEndMarker } from "../common";
 import { findOpenCloseTags } from "../utils";
 import * as fence from 'markdown-it/lib/rules_block/fence.js'
+import { lastMatchPosCached } from "../common/src-pos-cache"
 
 // Symbol keys: collision-free on StateBlock; invisible to JSON.stringify/Object.keys (use `Object.getOwnPropertySymbols` to inspect).
 const FOOTNOTE_POS_KEY = Symbol('mmd.footnoteSrcPositions');
@@ -32,35 +33,7 @@ const FOOTNOTE_TERMINATOR_NAMES = new Set<string>([
   "abstractBlock",
   "image_with_size_block"
 ]);
-type FootnoteCacheEntry = { src: string; lastPos: number };
 
-// Per-state cache of the last match offset (-1 if none). `patternG` MUST be /g.
-// Nested `state.md.block.parse(...)` builds a fresh StateBlock with its own src, so the Symbol-keyed cache on the outer state never leaks into nested parses.
-const getCachedSrcPositions = (
-  state: StateBlock,
-  key: symbol,
-  patternG: RegExp,
-): number => {
-  const slot = state as unknown as Record<symbol, FootnoteCacheEntry | undefined>;
-  const cached = slot[key];
-  // JS strings are immutable — identity check correctly invalidates on any reassignment of `state.src`.
-  if (cached && cached.src === state.src) {
-    return cached.lastPos;
-  }
-  patternG.lastIndex = 0;
-  let lastPos = -1;
-  let m: RegExpExecArray | null;
-  while ((m = patternG.exec(state.src)) !== null) {
-    lastPos = m.index;
-    // Empty-match guard for future regex edits.
-    if (m.index === patternG.lastIndex) {
-      patternG.lastIndex++;
-    }
-  }
-  patternG.lastIndex = 0;
-  slot[key] = { src: state.src, lastPos };
-  return lastPos;
-};
 
 // Resolve the enabled block-rule fns for the given names (in ruler order). Not cached —
 // see the FOOTNOTE_TERMINATOR_NAMES note.
@@ -85,7 +58,7 @@ export const latex_footnote_block: RuleBlock = (state, startLine, endLine, silen
       pos: number = state.bMarks[startLine] + state.tShift[startLine],
       max: number = state.eMarks[startLine];
     // Bail when the last `\footnote` literal is strictly before this block's start. Equality keeps the literal in scope (token starts on this block). `-1` from cache means no match anywhere.
-    const lastFootnotePos = getCachedSrcPositions(state, FOOTNOTE_POS_KEY, FOOTNOTE_TOKEN_SWEEP_G);
+    const lastFootnotePos = lastMatchPosCached(state, FOOTNOTE_POS_KEY, FOOTNOTE_TOKEN_SWEEP_G);
     if (lastFootnotePos < state.bMarks[startLine]) {
       return false;
     }
@@ -277,7 +250,7 @@ export const latex_footnotetext_block: RuleBlock = (state, startLine, endLine, s
       pos: number = state.bMarks[startLine] + state.tShift[startLine],
       max: number = state.eMarks[startLine];
     // Bail when the last `\footnotetext`/`\blfootnotetext` literal is strictly before this block's start. Equality keeps it in scope. `-1` means no match anywhere.
-    const lastFootnotetextPos = getCachedSrcPositions(state, FOOTNOTETEXT_POS_KEY, FOOTNOTETEXT_TOKEN_SWEEP_G);
+    const lastFootnotetextPos = lastMatchPosCached(state, FOOTNOTETEXT_POS_KEY, FOOTNOTETEXT_TOKEN_SWEEP_G);
     if (lastFootnotetextPos < state.bMarks[startLine]) {
       return false;
     }

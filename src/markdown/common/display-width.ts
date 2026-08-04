@@ -121,7 +121,8 @@ const monoCells = (str: string): number => {
       i++;
     }
     if (!isZeroWidthChar(cp)) {
-      cells++;
+      // A wide glyph takes two cells in a monospace face.
+      cells += isWideChar(cp) ? 2 : 1;
     }
   }
   return cells;

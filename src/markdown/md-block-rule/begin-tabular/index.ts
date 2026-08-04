@@ -15,6 +15,7 @@ import {
 } from "../../common/consts";
 import { parseBlockIntoTokenChildren } from "../helper";
 import { snapshotEnvForInline } from "../../common/env-transient";
+import { lastMatchPosCached } from "../../common/src-pos-cache";
 
 // group 1 = bracket pos, group 2 = column spec.
 export const openTag: RegExp = BEGIN_TABULAR_BRACKET_RE;
@@ -308,30 +309,15 @@ export const StatePushTabularBlock = (state, startLine: number, nextLine: number
   }
 };
 
-// Per-state offset of the last tabular closer, invalidated when `state.src` is reassigned. Own
-// regex instance: `closeTagG` is used with `match` elsewhere and this one carries a lastIndex.
+// Per-state offset of the last tabular closer. Own regex instance: `closeTagG` is used with
+// `match` elsewhere and this one carries a lastIndex.
 const TABULAR_END_POS_KEY = Symbol('mmd.tabularEndPos');
 // Deliberately the unanchored `closeTag`, not the anchored `closeTagTabular` the scan uses: a wider
 // sweep can only over-report a closer, which keeps the bail conservative. Do not "align" them.
 const CLOSE_TAG_SWEEP_G: RegExp = new RegExp(closeTag.source, 'g');
-type TabularEndCache = { src: string; lastPos: number };
 
-const lastTabularEndPos = (state): number => {
-  const slot = state as unknown as Record<symbol, TabularEndCache | undefined>;
-  const cached = slot[TABULAR_END_POS_KEY];
-  if (cached && cached.src === state.src) {
-    return cached.lastPos;
-  }
-  CLOSE_TAG_SWEEP_G.lastIndex = 0;
-  let lastPos: number = -1;
-  let m: RegExpExecArray | null;
-  while ((m = CLOSE_TAG_SWEEP_G.exec(state.src)) !== null) {
-    lastPos = m.index;
-  }
-  CLOSE_TAG_SWEEP_G.lastIndex = 0;
-  slot[TABULAR_END_POS_KEY] = { src: state.src, lastPos };
-  return lastPos;
-};
+const lastTabularEndPos = (state): number =>
+  lastMatchPosCached(state, TABULAR_END_POS_KEY, CLOSE_TAG_SWEEP_G);
 
 export const BeginTabular: RuleBlock = (state, startLine: number, endLine: number, silent) => {
   let pos: number = state.bMarks[startLine] + state.tShift[startLine];

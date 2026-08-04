@@ -301,4 +301,24 @@ describe('processListChildToken — an unpaired close does not steal the outer l
     processListChildToken(state, { startLine: 0, endLine: 0 }, item, ctx);
     outer.padding.should.be.above(LIST_DEFAULT_INDENT_EM);
   });
+  it('a same-kind close does pop the registry entry, matched or not', () => {
+    // The known limitation, pinned rather than fixed: the block path compares identity, this one
+    // only kind, so a stray itemize close drops the itemize entry that is open here.
+    const outer = new Token('itemize_list_open', 'ul', 1);
+    const ctx = mkCtx([outer]);
+    processListChildToken(mkState(), { startLine: 0, endLine: 0 },
+      new Token('itemize_list_close', 'ul', -1), ctx);
+    ctx.openTokens.should.have.lengthOf(0);
+  });
+  // End to end the limitation is not observable on the shapes tried: an unpaired close ends the
+  // list, and a following wide marker is attributed to the list that holds it.
+  it('a wide marker after an inline close lands on the list that contains it', () => {
+    const wide = 'WWWWWWWWWWWW';
+    const html = render('\\begin{itemize}\\item[a] x \\begin{itemize}\\item[b] y\\end{itemize}\\item[' +
+      wide + '] z\\end{itemize}');
+    const opens = html.match(/<ul[^>]*>/g);
+    opens.should.have.length(2);
+    opens[0].should.match(/data-padding-inline-start="\d+(\.\d+)?em"/);
+    opens[1].should.not.match(/data-padding-inline-start/);
+  });
 });

@@ -7,7 +7,7 @@ const { ContainerStyle } = require('../lib/styles/styles-container');
 const { codeStyles } = require('../lib/styles/styles-code');
 const { tabularStyles } = require('../lib/styles/styles-tabular');
 const { listsStyles } = require('../lib/styles/styles-lists');
-const { MARKER_GAP_EM } = require('../lib/markdown/common/consts');
+const { MARKER_GAP_EM, LIST_DEFAULT_INDENT_EM } = require('../lib/markdown/common/consts');
 const { menuStyle } = require('../lib/contex-menu/styles');
 const { clipboardCopyStyles } = require('../lib/copy-to-clipboard/clipboard-copy-styles');
 let MM = require('../lib/mathpix-markdown-model/index').MathpixMarkdownModel;
@@ -109,6 +109,23 @@ describe('Style assembly methods — composition:', () => {
     });
     it('does NOT include ContainerStyle', () => {
       css.should.not.include('html,body');
+    });
+    // resolveListPadding subtracts exactly this per ancestor level when it sizes a nested reserve,
+    // so the number in the emitted CSS and the constant it reads must be the same.
+    it('emits the list indent the padding resolver assumes', () => {
+      const indent = 'padding-inline-start: ' + LIST_DEFAULT_INDENT_EM + 'em';
+      css.should.include('ol.enumerate, ul.itemize');
+      css.split(indent).length.should.be.above(2); // the class rule and the scoped generic rule
+      const nested = MM.markdownToHTML('\\begin{itemize}\\item[a] x \\begin{itemize}' +
+        '\\item[WWWWWWWWWWWW] y\\end{itemize}\\end{itemize}', { outMath: { include_svg: false } });
+      const values = (nested.match(/data-padding-inline-start="([\d.]+)em"/g) || [])
+        .map((s) => parseFloat(s.replace(/[^\d.]/g, '')));
+      values.should.have.length(1);
+      // The inner list reserves the marker width minus the one ancestor level, at that same value.
+      const flat = MM.markdownToHTML('\\begin{itemize}\\item[WWWWWWWWWWWW] y\\end{itemize}',
+        { outMath: { include_svg: false } });
+      const flatEm = parseFloat((flat.match(/data-padding-inline-start="([\d.]+)em"/) || [])[1]);
+      values[0].should.be.closeTo(flatEm - LIST_DEFAULT_INDENT_EM, 0.011);
     });
   });
   describe('getMathpixStyleOnly (useColors=false)', () => {
