@@ -184,6 +184,24 @@ describe('data-padding-inline-start is sanitized before it reaches inline style:
   });
 });
 
+describe('the clamp and an unclosed list do not disturb later lists:', () => {
+  const pads = (src) => (MM.markdownToHTML(src, { outMath: { include_svg: false } })
+    .match(/<[uo]l[^>]*>/g) || [])
+    .map((tag) => (tag.match(/data-padding-inline-start="([^"]+)"/) || [])[1]);
+  const wide = 'W'.repeat(12);
+  const fresh = '\\begin{itemize}\n\\item[' + wide + '] q\n\\end{itemize}';
+  it('a list after an unclosed one reserves what it would alone', () => {
+    // The leaked depth must not make the next list look nested (a smaller reserve would mean it
+    // subtracted a phantom ancestor).
+    const alone = pads(fresh);
+    alone.should.have.length(1);
+    pads('\\begin{itemize}\\item[a] x \\begin{itemize}\\item[' + wide + '] y\\end{itemize}\n\n' + fresh)
+      .should.contain(alone[0]);
+    pads('\\begin{itemize}\n\\item a\n\\begin{itemize}\n\\item b\n\\begin{itemize}\n\\item c\n\n' + fresh)
+      .should.contain(alone[0]);
+  });
+});
+
 // Migration says the attribute is now emitted on nested lists too; the docx path has its own
 // marker attributes, so pin that it carries this one as well.
 describe('forDocx keeps the per-level marker padding:', () => {

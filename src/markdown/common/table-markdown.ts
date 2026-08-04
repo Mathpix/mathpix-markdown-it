@@ -1,3 +1,22 @@
+// A bare destination ends at the first unbalanced `)`, so such an href needs the `<…>` form.
+const hasUnbalancedParens = (href: string): boolean => {
+  let depth = 0;
+  for (let i = 0; i < href.length; i++) {
+    if (href[i] === '(') { depth++; }
+    if (href[i] === ')' && --depth < 0) { return true; }
+  }
+  return depth !== 0;
+};
+
+const mdHref = (href: string): string => {
+  if (!href) {
+    return '';
+  }
+  return /[\s<>]/.test(href) || hasUnbalancedParens(href)
+    ? '<' + href.replace(/([<>])/g, '\\$1') + '>'
+    : href;
+};
+
 export const getMdLink = (child, token, j) => {
   if (child.type !== 'link_open') {
     return '';
@@ -29,13 +48,16 @@ export const getMdLink = (child, token, j) => {
     } else if (inner.type === 'smiles_inline') {
       // The other self-closing type getMdForChild gives a marker for; its closer is not in markup.
       text += getMdForChild(inner) + inner.content + '</smiles>';
+    } else if (inner.type === 'html_inline') {
+      // Raw markup, so `]` in it is not escaped yet — unlike an image alt or a math latex below.
+      text += (inner.content ?? '').replace(/\]/g, '\\]');
     } else {
       // Fall back to content: an image holds its alt there, inline math its latex.
       // Not escaped here: an image keeps the raw source in `content`, so a `]` is already escaped.
       text += getMdForChild(inner) || (inner.content ?? '');
     }
   }
-  return `[${text}](${child.attrGet('href')})`;
+  return `[${text}](${mdHref(child.attrGet('href'))})`;
 };
 
 export const getMdForChild = (child): string => {

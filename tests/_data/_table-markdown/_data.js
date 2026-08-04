@@ -1030,6 +1030,61 @@ module.exports = [
       '| :--- |'
   },
   {
+    // A bare destination ends at the first unbalanced `)`, so this href needs the angle form.
+    id: 63,
+    latex: '\\begin{tabular}{|l|}\n' +
+      '[t](<http://a/b)c>) z\n' +
+      '\\end{tabular}',
+    table_markdown: '| [t](<http://a/b)c>) z |\n' +
+      '| :--- |'
+  },
+  {
+    // Balanced parens are legal bare, so the angle form must not be forced on them.
+    id: 64,
+    latex: '\\begin{tabular}{|l|}\n' +
+      '[t](http://a/b(c)) z\n' +
+      '\\end{tabular}',
+    table_markdown: '| [t](http://a/b(c)) z |\n' +
+      '| :--- |'
+  },
+  {
+    // A continuation line is a separate cell token; without its line break the texts glue ("ab").
+    id: 65,
+    latex: '\\begin{tabular}{|l|}\n' +
+      '\\begin{itemize}\\item[x] a\nb\\end{itemize}\n' +
+      '\\end{tabular}',
+    table_markdown: '| x a b<br> |\n' +
+      '| :--- |'
+  },
+  {
+    // Unsupported command: literal text, once. Fails if a new type is made a run boundary and
+    // drops it, or joins a run twice.
+    id: 67,
+    latex: '\\begin{tabular}{|l|}\n' +
+      '\\begin{itemize}\\item[x] a \\hrule b\\end{itemize}\n' +
+      '\\end{tabular}',
+    table_markdown: '| x a \\hrule b<br> |\n' +
+      '| :--- |'
+  },
+  {
+    // A fence in a cell arrives as code_inline, so it stays a run member and exports once.
+    id: 68,
+    latex: '\\begin{tabular}{|l|}\n' +
+      '\\begin{itemize}\\item[x] a\n```\ncode\n```\n\\end{itemize}\n' +
+      '\\end{tabular}',
+    table_markdown: '| x a ```code```<br> |\n' +
+      '| :--- |'
+  },
+  {
+    // A block leaf is a run member on purpose — this is where its markdown comes from, once.
+    id: 66,
+    latex: '\\begin{tabular}{|l|}\n' +
+      '\\begin{itemize}\\item[x] a\n\\begin{lstlisting}\nz\n\\end{lstlisting}\n\\end{itemize}\n' +
+      '\\end{tabular}',
+    table_markdown: '| x a <pre><code>z</code></pre><br> |\n' +
+      '| :--- |'
+  },
+  {
     // A self-closing token with a marker: the marker must not replace the content.
     id: 62,
     latex: '\\begin{tabular}{|l|}\n' +

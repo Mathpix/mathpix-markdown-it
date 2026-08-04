@@ -156,6 +156,25 @@ describe('a speculative list parse does not advance other global registries', ()
   });
   // No theorem case: a \begin{theorem} inside a list body is not rendered at all, so its counter
   // is unreachable from the speculative parse. See Non-Goals.
+
+  // The caption counters are restored on a non-committing exit, which is only safe while no token
+  // outside the discarded parse carries a number from it. Pin the observable form: numbers never
+  // repeat, whatever the list body holds.
+  it('caption numbers keep increasing across a probed list holding a figure', () => {
+    const numbers = (src) => (md.render(src).match(/Figure\s*\d+|Table\s*\d+/g) || []);
+    const bodies = [
+      '\\begin{figure}\n\\caption{A}\n\\end{figure}',
+      '\\begin{tabular}{|l|}\n\\begin{figure}\\caption{A}\\end{figure}\n\\end{tabular}',
+      '\\begin{table}\n\\caption{A}\n\\end{table}',
+    ];
+    bodies.forEach((body) => {
+      const found = numbers('Para \\footnotetext{f}\n\\begin{itemize}\n\\item[a] x\n' + body +
+        '\n\\end{itemize}\n\n\\begin{figure}\n\\caption{B}\n\\end{figure}');
+      found.should.have.length.above(0);
+      const seen = new Set(found);
+      seen.size.should.equal(found.length, 'a caption number repeats: ' + found.join(','));
+    });
+  });
 });
 
 // An aborted parse leaks the module-global list depth — entered from two sites, so no local

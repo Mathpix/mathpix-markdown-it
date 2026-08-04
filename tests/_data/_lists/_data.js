@@ -1347,6 +1347,12 @@ module.exports = [
     html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">a</span>x<ul data-padding-inline-start=\"8.93em\" class=\"itemize\" style=\"padding-inline-start: 8.93em; list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">XXXXXXXXXXXX</span>w</li></ul></li><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">b</span>y<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">n</span>z</li></ul></li></ul>"
   },
   {
+    // 22 capitals want 24.03em; the reserve stops at LIST_MAX_INDENT_EM and stays a valid em value.
+    name: "marker wider than the clamp stops at 20em",
+    latex: "\\begin{itemize}\n\\item[" + "A".repeat(22) + "] x\n\\end{itemize}",
+    html: "<ul data-padding-inline-start=\"20em\" class=\"itemize\" style=\"padding-inline-start: 20em; list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">AAAAAAAAAAAAAAAAAAAAAA</span>x</li></ul>"
+  },
+  {
     name: "B2: sibling sublists narrow then wide",
     latex: "\\begin{itemize}\n\\item[a] x\n\\begin{itemize}\n\\item[n] z\n\\end{itemize}\n\\item[b] y\n\\begin{itemize}\n\\item[XXXXXXXXXXXX] w\n\\end{itemize}\n\\end{itemize}",
     html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">a</span>x<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">n</span>z</li></ul></li><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">b</span>y<ul data-padding-inline-start=\"8.93em\" class=\"itemize\" style=\"padding-inline-start: 8.93em; list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">XXXXXXXXXXXX</span>w</li></ul></li></ul>"

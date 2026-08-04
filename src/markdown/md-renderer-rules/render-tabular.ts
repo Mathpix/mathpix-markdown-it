@@ -22,9 +22,10 @@ const LIST_STITCH_TOKEN_TYPES: Set<string> = new Set([
   'itemize_list_close', 'enumerate_list_close',
 ]);
 
-// Block boundaries end a run: `block` cannot be tested instead, because createBufferedState marks
-// the unwrapped inline leaves this branch exists for as block too. Only the block leaves actually
-// observed in a cell stream are listed — add any new one here (hr, a fence, an lstlisting env).
+// Boundaries end a run — and a non-member has no other export path, so listing a type here drops
+// its Markdown/TSV. Hence only content-free tokens belong: paragraph markers, not a fence or an
+// lstlisting env. `block` cannot be tested instead: createBufferedState marks the unwrapped inline
+// leaves this branch exists for as block too.
 const RUN_BOUNDARY_TOKEN_TYPES: Set<string> = new Set(['paragraph_open', 'paragraph_close']);
 
 // A cell token that reaches the leaf branch below, so it may join a leaf run.
@@ -273,6 +274,12 @@ const renderNonTableTokenIntoCell = (
       acc.cellSmoothed += leaf.tableSmoothed;
     }
     if (needMd) {
+      // A continuation line is its own cell token and its line break is not, so restore the space.
+      const prev: any = ctx.tokens[ctx.idx - 1];
+      if (leaf.tableMd && acc.cellMd && !/[\s>]$/.test(acc.cellMd)
+          && (prev?.type === 'inline' || prev?.token === 'inline')) {
+        acc.cellMd += ' ';
+      }
       acc.cellMd += leaf.tableMd;
     }
   }

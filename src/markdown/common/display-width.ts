@@ -24,7 +24,8 @@ interface WidthToken {
   children?: WidthToken[] | null;
 }
 
-// Per-char text reserve in em by width class (safety margin over Helvetica advances).
+// Per-char reserve in em, over-estimating the widest glyph of each class against the bundled Arial
+// fixture at 16px (`A` advances ~0.72em, takes 0.90). Lower bound pinned in _list-marker-padding.js.
 // Thin glyphs; \t\r\n collapse to a single space when rendered, so they share the space's class.
 const NARROW_RE = /[ \t\r\n!'"(),.\/:;|\[\]ijltfrI]/;
 const WIDE_RE = /[A-HJ-Zmw]/;                      // most capitals (except I) + m, w
