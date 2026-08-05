@@ -5,22 +5,11 @@
 // unrelated later content and wake the inline fallback (empty `<>` list items).
 export const LIST_TRANSIENT_ENV_KEYS: readonly string[] = ['isBlock', 'inheritedListType', 'parentType', 'prentLevel'];
 
-// Env keys written by the rules reachable from a list body — floats, align, tabular, section
-// numbering; rolled back only when the speculative parse is discarded (else the tokens own them).
-// Hand-maintained, not derived from the write sites: a new key shows up as a failing probe case
-// in tests/_parse-isolation.js ("leaves state.env unchanged") and belongs in this list.
-export const LIST_SPECULATIVE_ENV_KEYS: readonly string[] =
-  ['caption', 'captionPos', 'captionIsLabelFormatEmpty', 'captionIsSingleLineCheck',
-   'envType', 'align', 'alignEnvBlock', 'number', 'type',
-   'isInline', 'subTabular', 'tabulare'];
-
 const TRANSIENT_KEY_SET: Set<string> = new Set(LIST_TRANSIENT_ENV_KEYS);
 
 // Rolled-back keys hold `undefined`; replaying that would clear a key that went live later.
 // The begin-tabular trio is exempt — it sets these undefined on purpose and needs the replay.
 const REPLAY_UNDEFINED_KEYS: Set<string> = new Set(['isInline', 'subTabular', 'tabulare']);
-const CLOBBER_PRONE_KEYS: Set<string> = new Set(
-  LIST_SPECULATIVE_ENV_KEYS.filter((k) => !REPLAY_UNDEFINED_KEYS.has(k)));
 
 // Snapshot of `env` for a token's `envToInline`, minus the transient list-parse flags. Copies
 // wanted keys instead of deleting from a spread: `delete` leaves it in dictionary mode (~13%).
@@ -30,7 +19,7 @@ export const snapshotEnvForInline = (env: any): any => {
     if (TRANSIENT_KEY_SET.has(k)) {
       continue;
     }
-    if (env[k] === undefined && CLOBBER_PRONE_KEYS.has(k)) {
+    if (env[k] === undefined && !REPLAY_UNDEFINED_KEYS.has(k)) {
       continue;
     }
     snap[k] = env[k];
@@ -43,6 +32,44 @@ export const snapshotEnvForInline = (env: any): any => {
     }
   }
   return snap;
+};
+
+// Every own string key and value of `env`, so a discarded parse can be undone without naming the
+// keys a rule might write. Symbol keys are out, as they were with the named list.
+export const snapshotEnvAll = (env: any): { keys: string[]; values: any[] } => {
+  const keys: string[] = Object.keys(env);
+  const values: any[] = new Array(keys.length);
+  for (let i = 0; i < keys.length; i++) {
+    values[i] = env[keys[i]];
+  }
+  return { keys, values };
+};
+
+// Puts back every value the parse changed and clears the keys it added (`undefined`, never `delete`
+// — see restoreEnvKeys). Same loop notices a key deleted by a foreign rule, so an equal key count
+// cannot hide one deletion plus one addition; without such a delete the sweep never runs.
+export const restoreEnvAll = (env: any, snap: { keys: string[]; values: any[] }): void => {
+  const { keys, values } = snap;
+  let vanished = false;
+  for (let i = 0; i < keys.length; i++) {
+    const key: string = keys[i];
+    if (!(key in env)) {
+      vanished = true;
+      env[key] = values[i];
+    } else if (env[key] !== values[i]) {
+      env[key] = values[i];
+    }
+  }
+  const current: string[] = Object.keys(env);
+  if (!vanished && current.length === keys.length) {
+    return;
+  }
+  const had: Set<string> = new Set(keys);
+  for (let i = 0; i < current.length; i++) {
+    if (!had.has(current[i])) {
+      env[current[i]] = undefined;
+    }
+  }
 };
 
 // Record presence and value of `keys` in `env`, so they can be restored later.

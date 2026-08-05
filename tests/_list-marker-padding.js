@@ -193,6 +193,99 @@ describe('data-padding-inline-start is sanitized before it reaches inline style:
   });
 });
 
+// Malformed input where the marker lands on the wrong level is a declared Non-Goal, so the shape of
+// the HTML is not pinned — but the guarantees are: no throw, no unclosed item, no NaN reaching the
+// attribute. A future rework of the openTokens registry has to keep these.
+describe('malformed list nesting degrades without breaking the document:', () => {
+  const shapes = {
+    'an extra \\end of the same kind': '\\begin{itemize}\n\\item[a] x\n\\end{itemize}\n\\end{itemize}\n',
+    'an extra \\end before a wide-marker list':
+      '\\begin{itemize}\n\\item[a] x\n\\end{itemize}\n\\end{itemize}\n' +
+      '\\begin{itemize}\n\\item[WWWWWWWWWW] y\n\\end{itemize}\n',
+    'an item body opening an inline list that never closes':
+      '\\begin{itemize}\n\\item[a] x \\begin{itemize} \\item[WWWWWWWWWW] y\n\\end{itemize}\n',
+    'an unclosed inline list followed by a normal one':
+      '\\begin{itemize}\n\\item[a] x \\begin{itemize} \\item[y] z\n\\end{itemize}\n\n' +
+      '\\begin{itemize}\n\\item[WWWWWWWWWW] q\n\\end{itemize}\n',
+  };
+  Object.entries(shapes).forEach(([name, src]) => {
+    it(`${name}: renders, closes every item, reserves a valid em`, () => {
+      const html = MM.markdownToHTML(src, { outMath: { include_svg: false } });
+      (html.match(/<li[ >]/g) || []).length
+        .should.equal((html.match(/<\/li>/g) || []).length, 'unbalanced items in ' + html);
+      html.should.not.match(/NaN|undefined/);
+      (html.match(/data-padding-inline-start="([^"]*)"/g) || []).forEach((attr) => {
+        attr.should.match(/data-padding-inline-start="\d+(\.\d+)?em"/);
+      });
+    });
+  });
+});
+
+describe('resolveListPadding over irregular depth sequences:', () => {
+  const listAt = (depth, padding) => {
+    const token = new Token('itemize_list_open', 'ul', 1);
+    token.prentLevel = depth;
+    token.padding = padding;
+    return token;
+  };
+  const padOf = (token) => token.attrGet('data-padding-inline-start');
+  it('a depth that drops back reserves the same as the first list at that depth', () => {
+    // [0,1,0,1]: the second level-1 list must not inherit the first one's ancestor sum.
+    const tokens = [listAt(0, 0), listAt(1, 8), listAt(0, 0), listAt(1, 8)];
+    resolveListPadding(tokens);
+    padOf(tokens[1]).should.equal('5.5em');
+    padOf(tokens[3]).should.equal('5.5em');
+  });
+  it('a skipped depth fills the gap with the default instead of producing NaN', () => {
+    // [0,2]: level 1 never appears, so its indent has to be assumed to sum the ancestors.
+    const tokens = [listAt(0, 0), listAt(2, 9)];
+    resolveListPadding(tokens);
+    padOf(tokens[1]).should.equal('4em');
+  });
+  it('a depth below the first list is clamped to zero rather than throwing', () => {
+    const tokens = [listAt(2, 0), listAt(0, 9)];
+    resolveListPadding(tokens);
+    (padOf(tokens[1]) === null || /^\d+(\.\d+)?em$/.test(padOf(tokens[1]))).should.equal(true);
+  });
+});
+
+// The point of resolveListPadding: the indents of levels 0..d together must cover the marker at
+// depth d. Per-level attributes are only the means, so assert the sum.
+describe('the reserved indent covers the marker at every depth:', () => {
+  const mdInline = markdownIt({ html: true }).use(mathpixMarkdownPlugin, {});
+  const markerTokensOf = (marker) => {
+    const tokens = [];
+    mdInline.inline.parse(marker, mdInline, {}, tokens);
+    return tokens;
+  };
+  const nested = (markers) => markers.map((m, i) => '\\begin{itemize}\n\\item[' + m + '] level' + i).join('\n')
+    + '\n' + markers.map(() => '\\end{itemize}').join('\n');
+  [['WWWWWWWW', 'a'], ['a', 'WWWWWWWWWW'], ['ПРИМЕЧАНИЕ', 'WWWW', '....'], ['漢字漢字漢字', 'W']]
+    .forEach((markers) => {
+      it('sum of indents covers each marker: [' + markers.join('] [') + ']', () => {
+        const html = MM.markdownToHTML(nested(markers), { outMath: { include_svg: false } });
+        const tags = html.match(/<ul[^>]*>/g) || [];
+        tags.should.have.length(markers.length);
+        let sum = 0;
+        tags.forEach((tag, depth) => {
+          const own = (tag.match(/data-padding-inline-start="([\d.]+)em"/) || [])[1];
+          sum += own ? parseFloat(own) : LIST_DEFAULT_INDENT_EM;
+          const need = computeMarkerPadding(markerTokensOf(markers[depth]));
+          if (need <= LIST_MAX_INDENT_EM) {
+            sum.should.be.at.least(need - 1e-9, 'depth ' + depth + ' reserves ' + sum + ' for ' + need);
+          }
+        });
+      });
+    });
+  it('past the clamp the total stops growing and stays at the maximum', () => {
+    const html = MM.markdownToHTML(nested(Array(9).fill('W'.repeat(20))), { outMath: { include_svg: false } });
+    const values = (html.match(/data-padding-inline-start="([\d.]+)em"/g) || [])
+      .map((a) => parseFloat(a.match(/([\d.]+)em/)[1]));
+    // One list carries the clamped reserve; the deeper ones fall back to the default indent.
+    values.should.deep.equal([LIST_MAX_INDENT_EM]);
+  });
+});
+
 describe('the clamp and an unclosed list do not disturb later lists:', () => {
   const pads = (src) => (MM.markdownToHTML(src, { outMath: { include_svg: false } })
     .match(/<[uo]l[^>]*>/g) || [])

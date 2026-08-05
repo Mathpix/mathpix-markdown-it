@@ -14,16 +14,16 @@ import {
   OpaqueStack, OpaqueEnvType
 } from "./latex-list-types";
 import { parseSetCounterNumber } from "./latex-list-common";
-import { getListDepth } from "./list-state";
+import { getListDepth, snapshotListLevels, restoreListLevels } from "./list-state";
 import { getCaptionCounters, setCaptionCounters } from "../common/caption-counters";
 import { warnDistinct } from "../common/warn-distinct";
-import { snapshotListLevels, restoreListLevels } from "./list-state";
 import { lastMatchPosCached } from "../common/src-pos-cache";
 import {
   LIST_TRANSIENT_ENV_KEYS,
-  LIST_SPECULATIVE_ENV_KEYS,
   snapshotEnvKeys,
   restoreEnvKeys,
+  snapshotEnvAll,
+  restoreEnvAll,
 } from "../common/env-transient";
 import { flushBufferedTokens, createBufferedState } from "./latex-list-env-engine";
 import {
@@ -657,10 +657,11 @@ export const Lists: RuleBlock = (
   // block, and a silent probe must not change state.
   const transientSnap = snapshotEnvKeys(state.env, LIST_TRANSIENT_ENV_KEYS);
   // The speculative parse runs the list body (incl. \begin{figure}/\begin{table}\caption),
-  // which bumps the module-global caption counters and writes float env. On a non-committing
-  // exit the tokens are discarded, so roll both back; on commit they match the flushed tokens.
+  // which bumps the module-global caption counters and writes env keys. On a non-committing exit
+  // the tokens are discarded, so roll both back; on commit they match the flushed tokens.
+  // Whole env, not a named list: any rule reachable from a body is covered without maintaining one.
   const captionSnap = getCaptionCounters();
-  const floatEnvSnap = snapshotEnvKeys(state.env, LIST_SPECULATIVE_ENV_KEYS);
+  const envSnap = snapshotEnvAll(state.env);
   // A discarded parse enters a level per `\begin` and, having no `\end`, never leaves it — without
   // this the depth grows with the number of probes, not with the real nesting.
   const listLevelSnap: number = snapshotListLevels();
@@ -685,19 +686,22 @@ export const Lists: RuleBlock = (
     state.prentLevel = bufferedState.prentLevel;
     return true;
   } catch (e) {
-    // A probe that cannot answer is not a list. Guarded here so every caller behaves the same.
-    if (!silent) {
+    // A failed rule does not apply. Past the commit point tokens are already in state — nothing to
+    // fall back to, so that one case propagates.
+    if (committed) {
       throw e;
     }
-    warnDistinct('list-probe-threw', '[list] terminator probe threw; treating as no list', e);
-    setCachedListProbe(state, probeKey, false);
+    warnDistinct('list-rule-failed:' + (e as Error)?.name, '[list] list rule failed; skipping the list', e);
+    if (silent) {
+      setCachedListProbe(state, probeKey, false);
+    }
     return false;
   } finally {
     restoreEnvKeys(state.env, LIST_TRANSIENT_ENV_KEYS, transientSnap.had, transientSnap.snap);
     if (!committed) {
       setCaptionCounters(captionSnap);
       restoreListLevels(listLevelSnap);
-      restoreEnvKeys(state.env, LIST_SPECULATIVE_ENV_KEYS, floatEnvSnap.had, floatEnvSnap.snap);
+      restoreEnvAll(state.env, envSnap);
     }
   }
 };

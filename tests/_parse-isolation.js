@@ -4,6 +4,8 @@ let should = chai.should();
 const markdownIt = require('markdown-it');
 const { mathpixMarkdownPlugin } = require('../lib/index.js');
 const { snapshotListLevels, getListDepth } = require('../lib/markdown/md-latex-lists-env/list-state');
+const listEnvEngine = require('../lib/markdown/md-latex-lists-env/latex-list-env-engine');
+const { LIST_TRANSIENT_ENV_KEYS } = require('../lib/markdown/common/env-transient');
 
 const { JSDOM } = require('jsdom');
 const jsdom = new JSDOM();
@@ -117,7 +119,8 @@ describe('silent-mode Lists does not mutate shared env', () => {
       name: 'unclosed list holding a table',
       src: '\\begin{itemize}\n\\item[a] x\n\\begin{table}\n\\caption{T}\n\\begin{tabular}{|l|}\nc\n\\end{tabular}\n\\end{table}\n',
     },
-    // Any rule reachable from a list body may write a new env key; cover the ones that do.
+    // One body per env the item content admits, plus the other rules reachable from there. The
+    // rollback covers whatever they write, so this list is coverage, not a registry of keys.
     ...[
       ['an align env', '\\begin{align}\na &= b\n\\end{align}'],
       ['a section', '\\section{Head}'],
@@ -126,6 +129,16 @@ describe('silent-mode Lists does not mutate shared env', () => {
       ['a tabular', '\\begin{tabular}{|l|}\nq\n\\end{tabular}'],
       ['a fence', '```\ncode\n```'],
       ['display math', '$$x^2$$'],
+      ['a centered block', '\\begin{center}\ncentred\n\\end{center}'],
+      ['a left block', '\\begin{left}\nleft\n\\end{left}'],
+      ['a right block', '\\begin{right}\nright\n\\end{right}'],
+      ['an lstlisting', '\\begin{lstlisting}\ncode\n\\end{lstlisting}'],
+      ['a proof', '\\begin{proof}\nq\n\\end{proof}'],
+      ['a theorem', '\\newtheorem{thm}{Thm}\n\\begin{thm}\nq\n\\end{thm}'],
+      ['an array', '\\begin{array}{cc}a & b\\end{array}'],
+      ['a cases env', '\\begin{cases}x & y\\end{cases}'],
+      ['an includegraphics', '\\includegraphics{img.png}'],
+      ['a labelled align', '\\begin{align}x=1\\label{e}\\end{align}'],
     ].map(([what, body]) => ({
       name: 'list holding ' + what,
       src: '\\begin{itemize}\n\\item[a] x\n' + body + '\n\\end{itemize}\n',
@@ -138,6 +151,30 @@ describe('silent-mode Lists does not mutate shared env', () => {
       listsRule(state, 0, state.lineMax, true); // silent probe
       snapshot(state.env).should.equal(before);
     });
+  });
+  // The rollback names no keys, so it also covers a rule the list code has never heard of — the case
+  // a hand-written key list could only lose.
+  it('a probe rolls back an env key written by an unknown rule', () => {
+    const own = markdownIt({ html: true }).use(mathpixMarkdownPlugin, {});
+    own.block.ruler.before('paragraph', 'novelEnvWriter', (state, startLine, endLine, silent) => {
+      const from = state.bMarks[startLine] + state.tShift[startLine];
+      if (state.src.slice(from, state.eMarks[startLine]).indexOf('\\novel') !== 0) {
+        return false;
+      }
+      state.env.brandNewKey = 'written by a rule no list knows';
+      state.env.caption = 'clobbered';
+      if (!silent) {
+        state.line = startLine + 1;
+      }
+      return true;
+    });
+    own.block.ruler.__cache__ = null;
+    const src = '\\begin{itemize}\n\\item[a] x\n\\novel\n\\end{itemize}\n';
+    const env = { caption: 'original' };
+    const state = new own.block.State(src, own, env, []);
+    own.block.ruler.__rules__.find((r) => r.name === 'Lists').fn(state, 0, state.lineMax, true);
+    (state.env.brandNewKey === undefined).should.equal(true, 'a new env key survived the probe');
+    state.env.caption.should.equal('original', 'a clobbered env value was not put back');
   });
 });
 
@@ -158,56 +195,6 @@ describe('a speculative list parse does not advance other global registries', ()
   // No theorem case: a \begin{theorem} inside a list body is not rendered at all, so its counter
   // is unreachable from the speculative parse. See Non-Goals.
 
-  // LIST_SPECULATIVE_ENV_KEYS is hand-written, so a rule that starts writing a new env key inside a
-  // list body would leak it silently. Structural guard: every key a probed list parse leaves must be
-  // known here — a new one fails this test instead of waiting for someone to notice the drift.
-  it('a probed list body writes no env key outside the known set', () => {
-    const { LIST_TRANSIENT_ENV_KEYS, LIST_SPECULATIVE_ENV_KEYS } =
-      require('../lib/markdown/common/env-transient');
-    // Read from the source of truth, so an unregistered list key fails below.
-    const listKeys = new Set([...LIST_TRANSIENT_ENV_KEYS, ...LIST_SPECULATIVE_ENV_KEYS]);
-    // Parser-wide registries, not list state. Keep closed: widening it hides the drift.
-    const ignoredParserKeys = new Set(['__mathpix', 'currentTag', 'footnotes', 'mmd_footnotes']);
-    // One body per env LATEX_BLOCK_ENV_OPEN_RE admits inside an item, plus the other rules
-    // reachable from there. A rule left out of this list could leak its key unnoticed.
-    const bodies = [
-      '\\begin{figure}\n\\caption{c}\n\\end{figure}',
-      '\\begin{table}\n\\caption{t}\n\\begin{tabular}{|l|}\nq\n\\end{tabular}\n\\end{table}',
-      '\\begin{tabular}{|l|}\nq\n\\end{tabular}',
-      '\\begin{center}\ncentred\n\\end{center}',
-      '\\begin{left}\nleft\n\\end{left}',
-      '\\begin{right}\nright\n\\end{right}',
-      '\\begin{lstlisting}\ncode\n\\end{lstlisting}',
-      '\\begin{align}\nx=1\n\\end{align}',
-      '\\begin{proof}\nq\n\\end{proof}',
-      '\\newtheorem{thm}{Thm}\n\\begin{thm}\nq\n\\end{thm}',
-      '\\section{Head}',
-      '```\ncode\n```',
-      '\\begin{align}x=1\\label{e}\\end{align}',
-      '$$x^2$$',
-      '\\footnote{n}',
-      '\\begin{array}{cc}a & b\\end{array}',
-      '\\begin{cases}x & y\\end{cases}',
-      '\\includegraphics{img.png}',
-    ];
-    // \footnotetext with no blank line makes the terminator scan probe every line.
-    const probeBody = (instance, body) => {
-      const env = {};
-      instance.render('Para \\footnotetext{f}\n\\begin{itemize}\n\\item[a] x\n' + body + '\n\\end{itemize}', env);
-      Object.keys(env).forEach((key) => {
-        if (ignoredParserKeys.has(key)) {
-          return;
-        }
-        listKeys.has(key).should.equal(true,
-          'env key after a probed list is neither a registered list key nor a known parser key: ' + key);
-      });
-    };
-    bodies.forEach((body) => probeBody(md, body));
-    // centerImages routes an image through a different renderer branch.
-    const centred = markdownIt({ html: true })
-      .use(mathpixMarkdownPlugin, { outMath: { include_svg: false }, centerImages: true });
-    probeBody(centred, '\\includegraphics{img.png}');
-  });
 
   // The caption counters are restored on a non-committing exit, which is only safe while no token
   // outside the discarded parse carries a number from it. Pin the observable form: numbers never
@@ -260,6 +247,82 @@ describe('a discarded list parse does not retain list levels', () => {
       snapshotListLevels().should.equal(0, `levels retained after ${n} units`);
       getListDepth().should.equal(-1);
     });
+  });
+});
+
+// A rule that fails does not apply, rather than failing the document. The one exception is a failure
+// past the commit point: its tokens are already in state, so there is nothing to fall back to.
+describe('a failing list rule does not fail the document', () => {
+  const src = '\\begin{itemize}\n\\item[a] visible text\n\\end{itemize}';
+  const breakAt = (name) => {
+    const md = markdownIt({ html: true }).use(mathpixMarkdownPlugin, { outMath: { include_svg: false } });
+    const original = listEnvEngine[name];
+    listEnvEngine[name] = function () { throw new Error('rule blew up in ' + name); };
+    const warn = console.warn;
+    const warnings = [];
+    console.warn = (...args) => warnings.push(String(args[0]));
+    try {
+      return { html: md.render(src), warnings };
+    } finally {
+      console.warn = warn;
+      listEnvEngine[name] = original;
+    }
+  };
+  it('a failure before the commit point keeps the content and warns once', () => {
+    const { html, warnings } = breakAt('createBufferedState');
+    html.should.include('visible text');
+    warnings.should.have.length(1);
+    getListDepth().should.equal(-1);
+  });
+  it('a failure past the commit point propagates, and still unwinds the levels', () => {
+    (() => breakAt('flushBufferedTokens')).should.throw(/flushBufferedTokens/);
+    getListDepth().should.equal(-1);
+  });
+});
+
+// The rule swallows a throwing probe, so the rollback runs from a `catch` — the path that silently
+// skips restore work if someone later moves it out of `finally`.
+describe('a probe that throws rolls back exactly like one that does not', () => {
+  const src = 'Para \\footnotetext{f}\n\\begin{itemize}\n\\item[a] x\n' +
+    '\\begin{figure}\\caption{c}\\end{figure}\n\\end{itemize}';
+  const parse = (breakProbe) => {
+    const md = markdownIt({ html: true }).use(mathpixMarkdownPlugin, { outMath: { include_svg: false } });
+    const rule = md.block.ruler.__rules__.find((r) => r.name === 'Lists');
+    const originalRule = rule.fn;
+    let probing = 0;
+    rule.fn = function (state, start, end, silent) {
+      if (silent) { probing++; }
+      try { return originalRule.apply(this, arguments); }
+      finally { if (silent) { probing--; } }
+    };
+    md.block.ruler.__cache__ = null;
+    const originalBuffered = listEnvEngine.createBufferedState;
+    if (breakProbe) {
+      listEnvEngine.createBufferedState = function () {
+        if (probing > 0) { throw new Error('probe blew up'); }
+        return originalBuffered.apply(this, arguments);
+      };
+    }
+    const warn = console.warn;
+    console.warn = () => {};
+    const env = {};
+    try {
+      const html = md.render(src, env);
+      return {
+        depth: getListDepth(),
+        levels: snapshotListLevels(),
+        transientLive: LIST_TRANSIENT_ENV_KEYS.filter((k) => env[k] !== undefined),
+        figure: (html.match(/Figure\s*(\d+)/) || [])[1],
+      };
+    } finally {
+      console.warn = warn;
+      listEnvEngine.createBufferedState = originalBuffered;
+      rule.fn = originalRule;
+    }
+  };
+  it('leaves no level, no live transient flag and no shifted caption number', () => {
+    parse(true).should.deep.equal(parse(false));
+    parse(true).should.deep.equal({ depth: -1, levels: 0, transientLive: [], figure: '1' });
   });
 });
 

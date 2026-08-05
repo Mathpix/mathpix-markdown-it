@@ -28,6 +28,15 @@ describe('display-width: isWideChar', () => {
     isWideChar(0x1F030).should.equal(false);
     isWideChar(0x1F0A0).should.equal(false);
   });
+  it('Wide code points below the CJK blocks are wide, their Neutral neighbours are not', () => {
+    // U+2329/232A are Wide since Unicode 3.0 and plausible in an OCR marker; the lookalike math
+    // brackets U+27E8/27E9 are Neutral and checked below.
+    [String.fromCodePoint(0x2329), String.fromCodePoint(0x232A), '⌚', '⏰', '♈', '⚡', '⚽', '⛄', '✅', '❓', '➕', '⬛', '⭐']
+      .forEach((ch) => isWideChar(ch.codePointAt(0)).should.equal(true, 'not wide: U+' +
+        ch.codePointAt(0).toString(16).toUpperCase()));
+    // Neutral in the same span, so they keep the cased fallback instead of claiming full width.
+    [0x2713, 0x2716, 0x2B54, 0x2600, 0x27E8, 0x27E9].forEach((cp) => isWideChar(cp).should.equal(false));
+  });
   it('astral blocks that are not Wide stay out', () => {
     isWideChar(0x1D400).should.equal(false); // math alphanumerics
     isWideChar(0x10400).should.equal(false); // Deseret
@@ -85,6 +94,15 @@ describe('display-width: tokenMarkerWidth (em)', () => {
     tokenMarkerWidth({ type: 'inline_math', content: 'x^2' }).should.equal(0));
   it('math without widthEx does not recurse into children → 0', () =>
     tokenMarkerWidth({ type: 'inline_math', children: [{ type: 'text', content: 'abc' }] }).should.equal(0));
+  it('children win over content — the branch order is significant', () => {
+    // A wrapper carries the raw source in `content`, so measuring both would double the reserve.
+    tokenMarkerWidth({ type: 'text', content: 'aaaaa', children: [{ type: 'text', content: 'a' }] })
+      .should.be.closeTo(textReserveEm('a'), 1e-9);
+  });
+  it('an emoji token is measured, unlike smiles whose content is not what renders', () => {
+    tokenMarkerWidth({ type: 'emoji', content: '⌚' }).should.be.closeTo(1.2, 1e-9);
+    tokenMarkerWidth({ type: 'smiles_inline', content: 'CCO' }).should.equal(0);
+  });
   it('wrapper token → sum of children', () =>
     tokenMarkerWidth({ type: 'textbf', children: [{ type: 'text', content: 'abc' }] }).should.be.closeTo(1.86, 1e-9));
   it('unknown non-math token with no children → 0', () =>
