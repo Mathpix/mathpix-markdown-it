@@ -970,8 +970,8 @@ The `MathpixMarkdown` React element accepts the following props:
 | `include_linearmath`     | boolean&nbsp;*`false`*       | outputs linearmath `<linearmath style="display: none">...</linearmath>`                                            |
 | `include_latex`          | boolean&nbsp;*`true`*        | outputs latex `<latex style="display: none">...</latex>`                                                          |
 | `include_svg`            | boolean&nbsp;*`true`*        | outputs svg `<svg>...</svg>`                                                                                      |
-| `include_tsv`            | boolean&nbsp;*`false`*       | outputs tsv `<tsv style="display: none">...</tsv>`                                                                |
-| `include_csv`            | boolean&nbsp;*`false`*       | outputs csv `<csv style="display: none">...</csv>`                                                                |
+| `include_tsv`            | boolean&nbsp;*`false`*       | outputs tsv `<tsv style="display: none">...</tsv>`. A link cell carries its `href` and an image cell its `src`, not the visible text — these formats hold no markup; use `include_table_markdown` for the label |
+| `include_csv`            | boolean&nbsp;*`false`*       | outputs csv `<csv style="display: none">...</csv>`. Same link/image rule as `include_tsv`                          |
 | `include_table_html`     | boolean&nbsp;*`true`*        | outputs html table `<table>...</table>`                                                                           |
 | `include_table_markdown` | boolean&nbsp;*`false`*       | outputs markdown table `<table-markdown>...</table-markdown>`                                                     |
 | `include_smiles`         | boolean&nbsp;*`false`*       | outputs smiles `<smiles>...</smiles>`                                                                             |

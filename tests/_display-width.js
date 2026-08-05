@@ -120,6 +120,10 @@ describe('display-width: tokenMarkerWidth (em)', () => {
     tokenMarkerWidth({ type: 'code_inline', content: '漢字' })
       .should.be.above(textReserveEm('漢字'));
   });
+  it('an ASCII control reserves nothing in the monospace branch either', () => {
+    tokenMarkerWidth({ type: 'code_inline', content: 'a\x01b' })
+      .should.be.closeTo(tokenMarkerWidth({ type: 'text', content: 'a\x01b' }), 1e-9);
+  });
   it('a lone surrogate reserves nothing in the monospace branch either', () => {
     // The two paths must agree on broken input, or the same marker measures differently by type.
     tokenMarkerWidth({ type: 'code_inline', content: '\uD800' }).should.equal(0);

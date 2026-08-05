@@ -18,7 +18,7 @@ import {
   closeOpenListItemIfNeeded,
   parseSetCounterNumber
 } from "./latex-list-common";
-import { parseListEnvRawToTokens, flushTokensToInline } from "./latex-list-env-engine";
+import { parseListEnvRawToTokens, flushTokensToInline, warnListRuleFailed } from "./latex-list-env-engine";
 import {
   LATEX_ITEM_COMMAND_RE,
   END_LIST_ENV_RE,
@@ -34,6 +34,10 @@ import {
 
 // Sticky-free closer search over the whole src, so the check needs no slice.
 const END_LIST_ENV_SEARCH_G: RegExp = new RegExp(END_LIST_ENV_INLINE_RE.source, 'g');
+// Same patterns applied at an index instead of to `src.slice(pos)`, which copied the rest of the
+// document on every call. Built from the shared sources, so they cannot drift.
+const ITEM_COMMAND_AT: RegExp = new RegExp(LATEX_ITEM_COMMAND_RE.source.replace(/^\^/, ''), 'y');
+const LIST_BOUNDARY_SEARCH_G: RegExp = new RegExp(LATEX_LIST_BOUNDARY_INLINE_RE.source, 'g');
 
 /**
  * Finds the first complete list environment starting at `startPos`.
@@ -162,8 +166,15 @@ export const latexListEnvInline: RuleInline = (
     state.pos = env.end;
     return true;
   }
-  // Parse raw env using block logic
-  const parsed: ParseListEnvResult = parseListEnvRawToTokens(state.md, env.raw, state.env);
+  // Parse raw env using block logic. A failure here does not apply the rule, as on the block path;
+  // the flush below stays unguarded — its tokens are already in the stream.
+  let parsed: ParseListEnvResult;
+  try {
+    parsed = parseListEnvRawToTokens(state.md, env.raw, state.env);
+  } catch (e) {
+    warnListRuleFailed(e);
+    return false;
+  }
   if (!parsed.ok) {
     return false;
   }
@@ -295,19 +306,18 @@ export const listItemInline: RuleInline = (
     return false;
   }
   // Try to match \item[...] command right after '\'
-  const itemMatch: RegExpMatchArray | null = state.src
-    .slice(startPos)
-    .match(LATEX_ITEM_COMMAND_RE);
+  ITEM_COMMAND_AT.lastIndex = startPos;
+  const itemMatch: RegExpExecArray | null = ITEM_COMMAND_AT.exec(state.src);
   if (!itemMatch) {
     return false;
   }
   // Find where this item ends: next \item or begin/end list env
-  const boundaryMatch: RegExpMatchArray | null = state.src
-    .slice(startPos + itemMatch.index! + itemMatch[0].length)
-    .match(LATEX_LIST_BOUNDARY_INLINE_RE);
-  const content: string = boundaryMatch && boundaryMatch.index! > 0
-    ? state.src.slice(startPos + itemMatch.index! + itemMatch[0].length, startPos + itemMatch.index! + itemMatch[0].length + boundaryMatch.index!)
-    : state.src.slice(startPos + itemMatch.index! + itemMatch[0].length);
+  const contentStart: number = startPos + itemMatch[0].length;
+  LIST_BOUNDARY_SEARCH_G.lastIndex = contentStart;
+  const boundaryMatch: RegExpExecArray | null = LIST_BOUNDARY_SEARCH_G.exec(state.src);
+  const content: string = boundaryMatch && boundaryMatch.index > contentStart
+    ? state.src.slice(contentStart, boundaryMatch.index)
+    : state.src.slice(contentStart);
   if (!silent) {
     // Close previous <li> if needed
     closeOpenListItemIfNeeded(state);
@@ -316,7 +326,7 @@ export const listItemInline: RuleInline = (
     incrementItemCount();
     token.parentType = state.parentType;
     token.inlinePos = {
-      start_content: startPos + itemMatch.index! + itemMatch[0].length,
+      start_content: contentStart,
     };
     // Skip leading spaces in content for accurate inline range
     token.inlinePos.start_content += getSpacesFromLeft(content);
@@ -348,7 +358,7 @@ export const listItemInline: RuleInline = (
     token.children = [];
   }
   // Advance parser position to after this item
-  state.pos = startPos + itemMatch.index! + itemMatch[0].length + content.length;
+  state.pos = contentStart + content.length;
   return true;
 };
 

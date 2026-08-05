@@ -47,9 +47,11 @@ export interface LstEndResult {
   lineText: string;
 }
 
-export const isListType = (value: string): value is ListType =>{
-  return Object.values(ListType).includes(value as ListType);
-}
+// Hoisted: the members never change, and `Object.values(...)` allocated an array per call — this one
+// is asked for every `\begin{…}` candidate.
+const LIST_TYPE_VALUES: Set<string> = new Set<string>(Object.values(ListType));
+
+export const isListType = (value: string): value is ListType => LIST_TYPE_VALUES.has(value);
 
 export interface CustomMarkerHtmlResult {
   htmlMarker: string;

@@ -154,6 +154,27 @@ describe('Each inline type in a cell exports exactly once:', () => {
 
 // An inline type the label builder does not know falls back to its bare content, which silently
 // drops the markup around it (`H~2~O` → `H2O`). These two tests are the gate for that class.
+// tsv/csv hold no markup, so a link cell carries its href and an image cell its src. The image used
+// to carry both, glued: the generic accumulator appended the alt before the branch appended the src.
+describe('tsv and csv carry the address of a link or image, once:', () => {
+  const plain = (body, kind) => {
+    const html = MM.markdownToHTML('\\begin{tabular}{|l|}\n' + body + '\n\\end{tabular}',
+      { outMath: { include_svg: false, include_tsv: true, include_csv: true } });
+    return MM.parseMarkdownByHTML(html, false).find((p) => p.type === kind).value.split('\n')[0];
+  };
+  it('a link cell holds the href alone', () => {
+    plain('[**bold** x](http://a.b)', 'tsv').should.equal('http://a.b');
+    plain('[**bold** x](http://a.b)', 'csv').should.equal('http://a.b');
+  });
+  it('an image cell holds the src alone, not alt glued to src', () => {
+    plain('![alt](i.png)', 'tsv').should.equal('i.png');
+    plain('![alt](i.png)', 'csv').should.equal('i.png');
+  });
+  it('text around a link survives on both sides', () => {
+    plain('text before [l](http://a.b) after', 'tsv').should.equal('text before http://a.b after');
+  });
+});
+
 describe('The exported label has a decision for every inline construct:', () => {
   // Every inline rule this plugin registers, reviewed against getMdLink/getMdForChild. A new rule
   // fails the test until its tokens are handled there — or listed here as knowingly flattened.
@@ -198,6 +219,34 @@ describe('The exported label has a decision for every inline construct:', () => 
     labelMd('[a](http://x.y "t")').should.equal('| [a](http://x.y) |');
     // \textbf maps onto the Markdown marker rather than staying LaTeX.
     labelMd('[\\textbf{b}](http://x.y)').should.equal('| [**b**](http://x.y) |');
+  });
+});
+
+// One document must not export two math syntaxes: a label used hardcoded `$` while the text beside
+// it honoured the config, so a consumer with its own delimiters got `$…$` inside labels only.
+describe('math in a label follows outMath.table_markdown:', () => {
+  const cellMd = (body, tableMarkdown) => {
+    const html = MM.markdownToHTML('\\begin{tabular}{|l|}\n' + body + '\n\\end{tabular}',
+      { outMath: { include_svg: false, include_table_markdown: true, table_markdown: tableMarkdown } });
+    return MM.parseMarkdownByHTML(html, false)
+      .find((p) => p.type === 'table-markdown').value.split('\n')[0];
+  };
+  const configs = {
+    'the default delimiters': [undefined, '$x^2$'],
+    'configured delimiters': [{ math_inline_delimiters: ['\\(', '\\)'] }, '\\(x^2\\)'],
+    'math_as_ascii': [{ math_as_ascii: true }, 'x^(2)'],
+  };
+  Object.entries(configs).forEach(([name, [tableMarkdown, math]]) => {
+    it(`${name}: a label and the text beside it come out alike`, () => {
+      cellMd('[see $x^2$ here](http://a.b)', tableMarkdown)
+        .should.equal(`| [see ${math} here](http://a.b) |`);
+      cellMd('see $x^2$ here', tableMarkdown).should.equal(`| see ${math} here |`);
+    });
+  });
+  it('display math keeps `$$` by default and takes the configured delimiters otherwise', () => {
+    cellMd('[$$\\sum x$$](http://a.b)').should.equal('| [$$\\sum x$$](http://a.b) |');
+    cellMd('[$$\\sum x$$](http://a.b)', { math_inline_delimiters: ['\\(', '\\)'] })
+      .should.equal('| [\\(\\sum x\\)](http://a.b) |');
   });
 });
 

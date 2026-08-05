@@ -430,7 +430,8 @@ module.exports = [
       '$","net book value \n' +
       '$"\n' +
       'non-current assets,250000,95000,155000',
-    table_markdown: '|  | $\\begin{array}{c}\\text { cost } \\\\ \\$\\end{array}$ | $\\begin{array}{c}\\text { depreciation } \\\\ \\$\\end{array}$ | $\\begin{array}{c}\\text { net book value } \\\\ \\$\\end{array}$ |\n' +
+    // The second cell is `$$…$$` in the source, so its export keeps the display delimiters.
+    table_markdown: '|  | $\\begin{array}{c}\\text { cost } \\\\ \\$\\end{array}$ | $$\\begin{array}{c}\\text { depreciation } \\\\ \\$\\end{array}$$ | $\\begin{array}{c}\\text { net book value } \\\\ \\$\\end{array}$ |\n' +
       '| :--- | :---: | :---: | :---: |\n' +
       '| non-current assets | 250000 | 95000 | 155000 |',
     include_sub_math: [

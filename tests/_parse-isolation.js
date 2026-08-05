@@ -4,8 +4,14 @@ let should = chai.should();
 const markdownIt = require('markdown-it');
 const { mathpixMarkdownPlugin } = require('../lib/index.js');
 const { snapshotListLevels, getListDepth } = require('../lib/markdown/md-latex-lists-env/list-state');
+const { resetWarnDistinct } = require('../lib/markdown/common/warn-distinct');
 const listEnvEngine = require('../lib/markdown/md-latex-lists-env/latex-list-env-engine');
-const { LIST_TRANSIENT_ENV_KEYS } = require('../lib/markdown/common/env-transient');
+const {
+  LIST_TRANSIENT_ENV_KEYS,
+  snapshotEnvAll,
+  releaseEnvSnapshot,
+  restoreEnvKeysFromAll,
+} = require('../lib/markdown/common/env-transient');
 
 const { JSDOM } = require('jsdom');
 const jsdom = new JSDOM();
@@ -152,6 +158,22 @@ describe('silent-mode Lists does not mutate shared env', () => {
       snapshot(state.env).should.equal(before);
     });
   });
+  // Snapshots come from a pool, so a shorter one must not answer from the tail of a longer one — the
+  // rollback would then restore keys the env never had, leaking the very flag it exists to contain.
+  it('a snapshot of a smaller env does not see the previous one', () => {
+    const rich = snapshotEnvAll({ isBlock: true, inheritedListType: 'itemize', prentLevel: 7, x: 1 });
+    rich.length.should.equal(4);
+    releaseEnvSnapshot();
+    const empty = snapshotEnvAll({});
+    empty.length.should.equal(0);
+    const target = {};
+    restoreEnvKeysFromAll(target, LIST_TRANSIENT_ENV_KEYS, empty);
+    releaseEnvSnapshot();
+    LIST_TRANSIENT_ENV_KEYS.forEach((key) => {
+      (target[key] === undefined).should.equal(true, key + ' came back from a stale snapshot');
+    });
+  });
+
   // The rollback names no keys, so it also covers a rule the list code has never heard of — the case
   // a hand-written key list could only lose.
   it('a probe rolls back an env key written by an unknown rule', () => {
@@ -274,6 +296,46 @@ describe('a failing list rule does not fail the document', () => {
     warnings.should.have.length(1);
     getListDepth().should.equal(-1);
   });
+  // The inline path parses the env through the engine, so it needs the same containment: whether the
+  // environment sits on its own line decides which path runs, and that must not decide the outcome.
+  const inlineShapes = {
+    'after text on the same line': 'text \\begin{itemize}\\item[x] visible text\\end{itemize}',
+    'inside a markdown table cell': '| h |\n| :-- |\n| \\begin{itemize}\\item[x] visible text\\end{itemize} |',
+  };
+  Object.entries(inlineShapes).forEach(([where, src]) => {
+    it(`a failure on the inline path ${where} keeps the document`, () => {
+      const md = markdownIt({ html: true }).use(mathpixMarkdownPlugin, { outMath: { include_svg: false } });
+      const original = listEnvEngine.parseListEnvRawToTokens;
+      listEnvEngine.parseListEnvRawToTokens = function () { throw new Error('inline path blew up'); };
+      const warn = console.warn;
+      const warnings = [];
+      console.warn = (...args) => warnings.push(String(args[0]));
+      try {
+        const html = md.render(src);
+        html.should.include('visible text');
+        warnings.should.have.length(1);
+      } finally {
+        console.warn = warn;
+        listEnvEngine.parseListEnvRawToTokens = original;
+      }
+    });
+  });
+  it('each distinct cause is reported once, not just each error name', () => {
+    // Most internal faults are plain `Error`, so a name-only key would hide every cause but the first.
+    resetWarnDistinct();
+    const warn = console.warn;
+    const warnings = [];
+    console.warn = (...args) => warnings.push(String(args[0]));
+    try {
+      listEnvEngine.warnListRuleFailed(new Error('first cause'));
+      listEnvEngine.warnListRuleFailed(new Error('first cause'));
+      listEnvEngine.warnListRuleFailed(new Error('second cause'));
+      listEnvEngine.warnListRuleFailed(new TypeError('third cause'));
+    } finally {
+      console.warn = warn;
+    }
+    warnings.should.have.length(3);
+  });
   it('a failure past the commit point propagates, and still unwinds the levels', () => {
     (() => breakAt('flushBufferedTokens')).should.throw(/flushBufferedTokens/);
     getListDepth().should.equal(-1);
@@ -343,9 +405,9 @@ describe('a rolled-back env key does not clobber a later live value', () => {
   });
 });
 
-// The silent probe answer is memoized per state, so terminator scans don't re-parse the same
-// list. The memo must not change the answer, nor short-circuit a real (non-silent) call.
-describe('silent-mode Lists probe memo', () => {
+// Terminator scans probe the same lines repeatedly, so a probe has to be idempotent and its answer
+// must depend on the source alone — nothing here is cached, and the answer may not drift.
+describe('silent-mode Lists probes', () => {
   const md = markdownIt({ html: true }).use(mathpixMarkdownPlugin, {});
   const listsRule = md.block.ruler.__rules__.find(r => r.name === 'Lists').fn;
   const closed = '\\begin{itemize}\n\\item a\n\\end{itemize}\n';
@@ -359,10 +421,9 @@ describe('silent-mode Lists probe memo', () => {
       [1, 2, 3].forEach(() => listsRule(state, 0, state.lineMax, true).should.equal(expected));
     });
   });
-  // Two groups, one assertion: a cached answer must equal what an unmemoized parse says under the
-  // same mutation. For the fields the key omits that pins they are really irrelevant; for the ones
-  // it carries (the env flags a body parse reaches) it pins that the entry is invalidated, not stale.
-  [
+  // A probe that has already run must not shift the answer of the next one, whatever else moved on
+  // the state in between — the answer is a function of the source, not of the caller's bookkeeping.
+  const mutations = [
     ['env.tabulare', (s) => { s.env.tabulare = true; }],
     ['env.subTabular', (s) => { s.env.subTabular = true; }],
     ['env.isInline', (s) => { s.env.isInline = true; }],
@@ -374,21 +435,20 @@ describe('silent-mode Lists probe memo', () => {
     ['state.blkIndent', (s) => { s.blkIndent = 4; }],
     ['state.listIndent', (s) => { s.listIndent = 4; }],
     ['state.sCount', (s) => { s.sCount = s.sCount.map((v) => v + 4); }],
-  ].forEach(([field, mutate]) => {
-    [{ name: 'closed', src: closed }, { name: 'unclosed', src: unclosed }].forEach(({ name, src }) => {
-      it(`a cached answer for a ${name} list survives a change to ${field}`, () => {
-        const cachedState = new md.block.State(src, md, {}, []);
-        listsRule(cachedState, 0, cachedState.lineMax, true); // fills the memo
-        mutate(cachedState);
-        const cached = listsRule(cachedState, 0, cachedState.lineMax, true);
+  ];
+  [{ name: 'closed', src: closed }, { name: 'unclosed', src: unclosed }].forEach(({ name, src }) => {
+    it(`a second probe over a ${name} list answers like a first one, whatever moved between them`, () => {
+      mutations.forEach(([field, mutate]) => {
+        const usedState = new md.block.State(src, md, {}, []);
+        listsRule(usedState, 0, usedState.lineMax, true);
+        mutate(usedState);
         const freshState = new md.block.State(src, md, {}, []);
         mutate(freshState);
-        cached.should.equal(listsRule(freshState, 0, freshState.lineMax, true));
+        listsRule(usedState, 0, usedState.lineMax, true)
+          .should.equal(listsRule(freshState, 0, freshState.lineMax, true), 'diverged after ' + field);
       });
     });
   });
-  // The other half: the fields the key does carry must separate the entries, so one call site
-  // never answers from another's. Both lists live on one state, so both share one memo.
   it('two list starts on one state keep separate answers', () => {
     const state = new md.block.State(closed + unclosed, md, {}, []);
     const probe = (line) => listsRule(state, line, state.lineMax, true);
@@ -403,7 +463,9 @@ describe('silent-mode Lists probe memo', () => {
     listsRule(state, 0, state.lineMax, false).should.equal(true);
     state.tokens.length.should.be.above(0);
   });
-  it('reassigning state.src invalidates the memo', () => {
+  // The closer-offset cache lives on the state and is keyed by src identity, so a reassigned source
+  // has to be swept again rather than answered from the old offsets.
+  it('reassigning state.src is answered from the new source', () => {
     const state = new md.block.State(closed, md, {}, []);
     listsRule(state, 0, state.lineMax, true).should.equal(true);
     const fresh = new md.block.State(unclosed, md, {}, []);

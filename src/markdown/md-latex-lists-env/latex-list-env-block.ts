@@ -14,18 +14,18 @@ import {
   OpaqueStack, OpaqueEnvType
 } from "./latex-list-types";
 import { parseSetCounterNumber } from "./latex-list-common";
-import { getListDepth, snapshotListLevels, restoreListLevels } from "./list-state";
+import { snapshotListLevels, restoreListLevels } from "./list-state";
 import { getCaptionCounters, setCaptionCounters } from "../common/caption-counters";
-import { warnDistinct } from "../common/warn-distinct";
 import { matchPositionsCached, countPositionsAtOrAfter } from "../common/src-pos-cache";
 import {
   LIST_TRANSIENT_ENV_KEYS,
-  snapshotEnvKeys,
-  restoreEnvKeys,
+  EnvSnapshot,
   snapshotEnvAll,
+  releaseEnvSnapshot,
   restoreEnvAll,
+  restoreEnvKeysFromAll,
 } from "../common/env-transient";
-import { flushBufferedTokens, createBufferedState } from "./latex-list-env-engine";
+import { flushBufferedTokens, createBufferedState, warnListRuleFailed } from "./latex-list-env-engine";
 import {
   BEGIN_LIST_ENV_INLINE_RE,
   BEGIN_LST_INLINE_RE,
@@ -387,6 +387,11 @@ export const ListsInternal = (
     if (opaqueRes.consumedLine) {
       return 'proceed';
     }
+    // Renders to nothing, so it joins without a line break — that break survived as an orphan `<br>`.
+    if (RENEWCOMMAND_LINE_RE.test(lineText)) {
+      items = ItemsAddToPrev(items, lineText, lineIdx, false);
+      return 'proceed';
+    }
     // Handle \setcounter lines
     if (reSetCounter.test(lineText)) {
       let match: RegExpMatchArray | null = lineText.match(reSetCounter);
@@ -568,26 +573,8 @@ export const ListsInternal = (
   return true;
 };
 
-// Per-state memo of silent-probe results, invalidated when `state.src` is reassigned. Unbounded
-// by design: it lives and dies with one parse, holding at most one entry per list-start line.
-const LIST_PROBE_KEY = Symbol('mmd.listProbe');
-type ListProbeCache = { src: string; map: Map<string, boolean> };
-
-const getCachedListProbe = (state: StateBlock, key: string): boolean | undefined => {
-  const slot = state as unknown as Record<symbol, ListProbeCache | undefined>;
-  const cached = slot[LIST_PROBE_KEY];
-  return cached && cached.src === state.src ? cached.map.get(key) : undefined;
-};
-
-const setCachedListProbe = (state: StateBlock, key: string, ok: boolean): void => {
-  const slot = state as unknown as Record<symbol, ListProbeCache | undefined>;
-  let cached = slot[LIST_PROBE_KEY];
-  if (!cached || cached.src !== state.src) {
-    cached = { src: state.src, map: new Map() };
-    slot[LIST_PROBE_KEY] = cached;
-  }
-  cached.map.set(key, ok);
-};
+// Matches what the `renewcommand` rule looks for, anchored: the whole line is that command.
+const RENEWCOMMAND_LINE_RE: RegExp = /^\s*\\renewcommand\b/;
 
 // Built from the unanchored closer regex, so the sweep cannot drift from what the parser accepts.
 const END_LIST_ENV_SWEEP_G: RegExp = new RegExp(END_LIST_ENV_INLINE_RE.source, 'g');
@@ -640,40 +627,14 @@ export const Lists: RuleBlock = (
   if (lastListEndPos(state) < state.bMarks[startLine]) {
     return false;
   }
-  // A silent probe answers "does a closed list env start here?", which needs the full
-  // speculative parse. Paragraph/footnote terminator scans re-ask it for the same line many
-  // times, so memoize per state. Key covers every input the answer depends on.
-  // `state.src` alone does not pin what a line contains — blockquote shifts bMarks/tShift for the
-  // same line numbers on the same state — so the key carries the first line's geometry too. The
-  // later lines are not in it: the parser walks them from these same arrays, which markdown-it
-  // shifts uniformly, so the first line pins the frame.
-  // No blkIndent/listIndent: the probe path never reads them (pinned in _parse-isolation.js).
-  const probeKey: string = silent
-    ? `${startLine}:${endLine}:${state.bMarks[startLine] + state.tShift[startLine]}:${state.eMarks[startLine]}` +
-      `:${state.parentType}:${state.prentLevel}:${(state.env as any)?.inheritedListType}` +
-      // Module-global, so it is not implied by the state fields above; free to add (measured).
-      `:${getListDepth()}` +
-      // Read by rules the body parse reaches (begin-tabular). Booleans keep the key short.
-      `:${!!(state.env as any)?.tabulare}:${!!(state.env as any)?.subTabular}` +
-      `:${!!(state.env as any)?.isInline}:${!!(state.env as any)?.isBlock}`
-    : '';
-  if (silent) {
-    const cached: boolean | undefined = getCachedListProbe(state, probeKey);
-    if (cached !== undefined) {
-      return cached;
-    }
-  }
-  // `bufferedState` shares `env` by prototype, so ListsInternal mutates the real env.
-  // Snapshot/restore its transient fields on every exit (abort, silent, commit): a list
-  // ending in a block item leaks isBlock=true and wakes the inline fallback on the next
-  // block, and a silent probe must not change state.
-  const transientSnap = snapshotEnvKeys(state.env, LIST_TRANSIENT_ENV_KEYS);
-  // The speculative parse runs the list body (incl. \begin{figure}/\begin{table}\caption),
-  // which bumps the module-global caption counters and writes env keys. On a non-committing exit
-  // the tokens are discarded, so roll both back; on commit they match the flushed tokens.
-  // Whole env, not a named list: any rule reachable from a body is covered without maintaining one.
+  // No memo of probe answers: the closer lookahead above and the depth check inside the body walk
+  // made repeated probes cheap enough that caching them measured slower on every shape, malformed
+  // included — and a memo key has to enumerate every input the answer depends on to stay correct.
+  // `bufferedState` shares `env` by prototype, so ListsInternal mutates the real env. One snapshot
+  // of the whole env serves both restores below — naming keys instead would miss whatever a rule
+  // reachable from the body writes. The body also bumps the module-global caption counters.
   const captionSnap = getCaptionCounters();
-  const envSnap = snapshotEnvAll(state.env);
+  const envSnap: EnvSnapshot = snapshotEnvAll(state.env);
   // A discarded parse enters a level per `\begin` and, having no `\end`, never leaves it — without
   // this the depth grows with the number of probes, not with the real nesting.
   const listLevelSnap: number = snapshotListLevels();
@@ -682,9 +643,6 @@ export const Lists: RuleBlock = (
     const bufferedState = createBufferedState(state);
     const ok: boolean = ListsInternal(bufferedState, startLine, endLine);
     if (!ok || silent) {
-      if (silent) {
-        setCachedListProbe(state, probeKey, ok);
-      }
       return ok;
     }
     // Set before flushing: once tokens (carrying caption numbers) start entering state,
@@ -703,17 +661,19 @@ export const Lists: RuleBlock = (
     if (committed) {
       throw e;
     }
-    warnDistinct('list-rule-failed:' + (e as Error)?.name, '[list] list rule failed; skipping the list', e);
-    if (silent) {
-      setCachedListProbe(state, probeKey, false);
-    }
+    warnListRuleFailed(e);
     return false;
   } finally {
-    restoreEnvKeys(state.env, LIST_TRANSIENT_ENV_KEYS, transientSnap.had, transientSnap.snap);
     if (!committed) {
       setCaptionCounters(captionSnap);
       restoreListLevels(listLevelSnap);
+    }
+    // Transient flags go back even on commit: a leaked isBlock=true wakes the inline fallback on the
+    // next block (empty `<>` items). Everything else only when the tokens are discarded.
+    restoreEnvKeysFromAll(state.env, LIST_TRANSIENT_ENV_KEYS, envSnap);
+    if (!committed) {
       restoreEnvAll(state.env, envSnap);
     }
+    releaseEnvSnapshot();
   }
 };

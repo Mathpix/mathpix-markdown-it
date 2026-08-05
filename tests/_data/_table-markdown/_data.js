@@ -1018,6 +1018,9 @@ module.exports = [
       '[$x^2$](http://a.b) y\n' +
       '\\end{tabular}',
     table_markdown: '| [$x^2$](http://a.b) y |\n' +
+      '| :--- |',
+    // Under math_as_ascii the label follows the option, like the text beside it.
+    table_markdown_math_as_ascii: '| [x^(2)](http://a.b) y |\n' +
       '| :--- |'
   },
   {
@@ -1045,6 +1048,10 @@ module.exports = [
       '[$a]b$](http://x.y) z\n' +
       '\\end{tabular}',
     table_markdown: '| [$a]b$](http://x.y) z |\n' +
+      '| :--- |',
+    // ascii drops the delimiters, so the `]` inside the math is exposed and truncates the label —
+    // the same exposure the option already causes outside a label.
+    table_markdown_math_as_ascii: '| [a]b](http://x.y) z |\n' +
       '| :--- |'
   },
   {

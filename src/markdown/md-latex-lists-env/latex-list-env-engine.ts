@@ -6,6 +6,15 @@ import { ListsInternal } from "./latex-list-env-block";
 import { getCaptionCounters, setCaptionCounters } from "../common/caption-counters";
 import { snapshotListLevels, restoreListLevels } from "./list-state";
 import { BufferedBlockState, PushFn } from "./latex-list-types";
+import { warnDistinct } from "../common/warn-distinct";
+
+// One report per distinct cause per parse: the name alone collapses to `Error` for most
+// internal faults, and the caller has no other signal (see the diagnostics Non-Goal).
+export const warnListRuleFailed = (e: unknown): void => {
+  const cause = e as Error;
+  warnDistinct('list-rule-failed:' + cause?.name + ':' + (cause?.message ?? ''),
+    '[list] list rule failed; skipping the list', e);
+};
 
 // Hoisted: safeAssignToken runs per flushed token, so a per-call Set would dominate the copy.
 const SAFE_ASSIGN_SKIP: Set<string> = new Set(["type", "tag", "nesting", "level", "block"]);
@@ -99,7 +108,8 @@ export const buildBlockStateFromRaw = (md: any, raw: string, baseEnv: any) => {
 export const createBufferedState = (state: StateBlock): BufferedBlockState => {
   // prototype-inherit all read-only properties (bMarks, eMarks, src, etc.)
   // `env` is deliberately left inherited, so the buffered parse writes straight to the real env
-  // and the commit path needs no copy-back. Give it an own `env` and those writes are lost.
+  // and the commit path needs no copy-back. Giving a probe its own child env was measured slower:
+  // the child allocation plus one extra prototype hop per read costs more than the snapshot.
   const tempState = Object.create(state) as BufferedBlockState;
   tempState.tokens = [];
   tempState.level = state.level;
@@ -198,8 +208,13 @@ export const flushBufferedTokens = (state: StateBlock, buffered: Token[]): void 
  * Safe assign: copy custom fields but do NOT overwrite core ones that markdown-it sets.
  */
 export const safeAssignToken = (target: any, src: any) => {
-  for (const key of Object.keys(src)) {
-    if (SAFE_ASSIGN_SKIP.has(key)) continue;
+  // Object.keys, not `for...in`: measured faster here even with the array it allocates.
+  const keys: string[] = Object.keys(src);
+  for (let i = 0; i < keys.length; i++) {
+    const key: string = keys[i];
+    if (SAFE_ASSIGN_SKIP.has(key)) {
+      continue;
+    }
     target[key] = src[key];
   }
   return target;

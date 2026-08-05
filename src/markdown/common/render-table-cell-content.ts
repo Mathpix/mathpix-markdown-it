@@ -1,6 +1,6 @@
 import { TsvJoin } from "./tsv";
 import { CsvJoin } from "./csv";
-import { getMdForChild, getMdLink } from "./table-markdown";
+import { getMdForChild, getMdLink, getMdMath, SMILES_CLOSE } from "./table-markdown";
 import { mathTokenTypes } from "./consts";
 import { isWhitespace } from "../common";
 const escapeHtml = require('markdown-it/lib/common/utils').escapeHtml;
@@ -94,7 +94,12 @@ export const renderTableCellContent = (
       const csvAscii = child.ascii_csv || child.ascii;
       const tsvData = child.tsv ? child.tsv.join(',') : child.content;
       const csvData = child.csv ? child.csv.join(',') : child.content;
-      if (ascii) {
+      // An image writes its own tsv/csv value (the `src`) in the switch below; letting the generic
+      // append run first glued the alt from `content` onto it — `alt` + `i.png` in one cell.
+      const writesOwnPlainText: boolean = child.type === 'image' || child.type === 'includegraphics';
+      if (writesOwnPlainText) {
+        // handled by the switch
+      } else if (ascii) {
         tsvCell += ascii;
         csvCell += csvAscii;
       } else if (token.type === 'subTabular') {
@@ -115,7 +120,7 @@ export const renderTableCellContent = (
           const href = child.attrGet('href');
           tsvCell += href;
           csvCell += href;
-          let link = getMdLink(child, token, j)
+          let link = getMdLink(child, token, j, options)
             .replace(/\|/g, '\\|');
           // Outside the `if`: with link_open as the last child there is no label to emit, but the
           // main loop already appended the opening `<a>`.
@@ -179,7 +184,7 @@ export const renderTableCellContent = (
         case 'smiles_inline':
           mdCell += getMdForChild(child);
           mdCell += child.content.replace(/\|/g, '\\|');
-          mdCell += '</smiles>';
+          mdCell += SMILES_CLOSE;
           continue;
         case "latex_lstlisting_env": {
           // codeText: mathescape \$ un-escaped + verbatim math; else raw content
@@ -203,19 +208,12 @@ export const renderTableCellContent = (
 
       mdCell += getMdForChild(child);
       if (child.latex) {
-        const { outMath } = options;
-        if (outMath?.table_markdown?.math_as_ascii && ascii) {
+        if (options.outMath?.table_markdown?.math_as_ascii && ascii) {
           mdCell += child.ascii_md || ascii;
           continue;
         }
-        let begin_math_inline_delimiters: string = '$';
-        let end_math_inline_delimiters: string = '$';
-        if (options.outMath?.table_markdown?.math_inline_delimiters?.length > 1) {
-          begin_math_inline_delimiters = options.outMath.table_markdown.math_inline_delimiters[0];
-          end_math_inline_delimiters = options.outMath.table_markdown.math_inline_delimiters[1];
-        }
-        let mdContent = mathTokenTypes.includes(child.type)
-          ? begin_math_inline_delimiters + child.content?.trim() + end_math_inline_delimiters
+        const mdContent: string = mathTokenTypes.includes(child.type)
+          ? getMdMath({ ...child, content: child.content?.trim() }, options)
           : child.latex;
         mdCell += mdContent
           .replace(/\|/g, '\\|')

@@ -149,7 +149,10 @@ const monoCells = (str: string): number => {
   for (let i = 0; i < str.length; i++) {
     const unit: number = str.charCodeAt(i);
     if (unit < 128) {
-      cells++;
+      // Controls render nothing here either, or the same junk marker measures differently by type.
+      if (ASCII_EM[unit] > 0) {
+        cells++;
+      }
       continue;
     }
     const cp: number = str.codePointAt(i) ?? 0;

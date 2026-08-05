@@ -1,4 +1,4 @@
-import { warnDistinct, resetWarnDistinct } from "../common/warn-distinct";
+import { warnDistinct } from "../common/warn-distinct";
 
 /**
  * State manager for nested LaTeX list environments (e.g., \begin{itemize}, \item).
@@ -26,7 +26,6 @@ let listLevels: ListLevelState[] = [];
  */
 export const resetListState = (): void => {
   listLevels = [];
-  resetWarnDistinct();
 };
 
 /**

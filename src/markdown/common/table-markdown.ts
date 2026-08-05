@@ -33,7 +33,28 @@ const mdHref = (href: string): string => {
     : flat;
 };
 
-export const getMdLink = (child, token, j) => {
+// `smiles_inline` is self-closing, so its closer is not in `markup` and both writers need it.
+export const SMILES_OPEN = '<smiles>';
+export const SMILES_CLOSE = '</smiles>';
+
+// Math per `outMath.table_markdown`: ascii if asked, else latex between the configured delimiters.
+// Shared with the cell loop, or a label and the text around it come out in two syntaxes.
+export const getMdMath = (token, options?): string => {
+  const tableMarkdown = options?.outMath?.table_markdown;
+  // Same chain the cell loop emits, or a token carrying only `ascii_tsv` differs inside a label.
+  const ascii: string = token.ascii_md || token.ascii_tsv || token.ascii;
+  if (tableMarkdown?.math_as_ascii && ascii) {
+    return ascii;
+  }
+  const configured: string[] = tableMarkdown?.math_inline_delimiters;
+  const isDisplay: boolean = token.type !== 'inline_math';
+  const [open, close]: string[] = configured?.length > 1
+    ? [configured[0], configured[1]]
+    : isDisplay ? ['$$', '$$'] : ['$', '$'];
+  return open + (token.content ?? '') + close;
+};
+
+export const getMdLink = (child, token, j, options?) => {
   if (child.type !== 'link_open') {
     return '';
   }
@@ -63,16 +84,14 @@ export const getMdLink = (child, token, j) => {
       text += getMdForChild(inner) + inner.content + inner.markup;
     } else if (inner.type === 'smiles_inline') {
       // The other self-closing type getMdForChild gives a marker for; its closer is not in markup.
-      text += getMdForChild(inner) + inner.content + '</smiles>';
-    } else if (inner.type === 'link_open' || inner.type === 'link_close') {
-      // Contributes nothing: a nested link has no Markdown form, and getMdForChild would hand
-      // back a literal `<a>`.
+      text += getMdForChild(inner) + inner.content + SMILES_CLOSE;
+    } else if (inner.type === 'link_open') {
+      // Only reachable in a stitched stream (CommonMark has no nested links): contributes nothing,
+      // since getMdForChild would hand back a literal `<a>`. A `link_close` exits at the break above.
     } else if (inner.type && MATH_TOKEN_TYPES.has(inner.type)) {
-      // Verbatim, delimiters restored by type: escaping would turn every `\frac` into a LaTeX line
-      // break. The `$` also shields an unbalanced `]` inside math, as long as the reader has a math
-      // rule — a balanced pair (`\sqrt[3]{x}`) needs no shield, CommonMark pairs it itself.
-      const mathDelimiter: string = inner.type === 'inline_math' ? '$' : '$$';
-      text += mathDelimiter + (inner.content ?? '') + mathDelimiter;
+      // Verbatim: escaping would turn `\frac` into a LaTeX line break. Delimiters shield an
+      // unbalanced `]` too, for a reader that has a math rule.
+      text += getMdMath(inner, options);
     } else if (inner.type === 'image' || inner.type === 'includegraphics') {
       // Whole image, like the main cell loop: alt alone loses `src`. Alt is raw source — not escaped.
       text += `![${inner.attrGet('alt') ?? inner.content ?? ''}](${mdHref(inner.attrGet('src'))})`;
@@ -104,7 +123,7 @@ export const getMdForChild = (child): string => {
         res = '`';
         break;
       case 'smiles_inline':
-        res = '<smiles>';
+        res = SMILES_OPEN;
         break;
       case 'link_open':
         res = '<a>';

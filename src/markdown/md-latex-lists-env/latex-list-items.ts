@@ -194,11 +194,13 @@ export const ItemsListPush = (
 export const ItemsAddToPrev = (
   items: ParsedListItem[],
   lineText: string,
-  nextLine: number
+  nextLine: number,
+  keepLineBreak: boolean = true
 ): ParsedListItem[] => {
   if (items.length > 0) {
     const lastIndex = items.length - 1;
-    items[lastIndex].content += "\n" + lineText;
+    // Without the break for a line that renders to nothing: the softbreak would outlive it as `<br>`.
+    items[lastIndex].content += (keepLineBreak ? "\n" : "") + lineText;
     items[lastIndex].endLine = nextLine;
     return items;
   }
@@ -239,8 +241,17 @@ export const finalizeListItems = (
  */
 export const resolveListPadding = (listTokens: Token[]): void => {
   if (!listTokens.length) return;
+  // No marker wider than the default can produce an attribute, so the arithmetic below is skipped.
+  let overflows = false;
+  for (let i = 0; i < listTokens.length; i++) {
+    if ((listTokens[i].padding || 0) > LIST_DEFAULT_INDENT_EM) {
+      overflows = true;
+      break;
+    }
+  }
+  if (!overflows) return;
   const baseDepth: number = listTokens[0].prentLevel || 0;
-  // prefix[d] = indent summed over the levels above d, so the ancestor sum is one lookup.
+  // prefix[d] = indent summed over the levels above d; after a token of depth d it is d+2 long.
   const prefix: number[] = [0];
   for (const token of listTokens) {
     // Clamp depth to >= 0 (a negative would throw on prefix.length below).

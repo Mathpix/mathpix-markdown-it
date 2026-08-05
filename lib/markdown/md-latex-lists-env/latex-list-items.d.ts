@@ -60,7 +60,7 @@ export declare const ItemsListPush: (items: ParsedListItem[], content: string, s
  * @param nextLine - Line number of the current line
  * @returns The updated list of parsed items
  */
-export declare const ItemsAddToPrev: (items: ParsedListItem[], lineText: string, nextLine: number) => ParsedListItem[];
+export declare const ItemsAddToPrev: (items: ParsedListItem[], lineText: string, nextLine: number, keepLineBreak?: boolean) => ParsedListItem[];
 export declare const finalizeListItems: (state: StateBlock | StateInline, items: ParsedListItem[], itemizeLevelTokens: Token[][], enumerateLevelTypes: string[], li: {
     value: number;
 } | null, iOpen: number, itemizeLevelContents: string[], openTokens: Token[], allListTokens: Token[]) => {

@@ -363,7 +363,7 @@ describe('Footnote rule performance regression:', () => {
     (html.match(/<li/g) || []).should.have.length(2);
     html.should.match(/<code/);
   });
-  it('a nested env whose only closer is the outer one still renders the outer list', () => {
+  it('a nested env whose only closer is the outer one leaves one list and the fence intact', () => {
     // Depth reaches 2 here, so the check runs: the fenced closer is counted and the walk goes on.
     const html = MM.markdownToHTML(
       '\\begin{itemize}\n\\item a\n\\begin{itemize}\n\\item b\n' + fence +

@@ -10,7 +10,7 @@ export const warnDistinct = (key: string, ...args: any[]): void => {
   console.warn(...args);
 };
 
-// Called per parse by resetListState(), the only caller — see md-latex-lists-env/list-state.ts.
+// Called per parse from resetMmdGlobalState, next to the other cross-parse resets.
 export const resetWarnDistinct = (): void => {
   warned.clear();
 };
