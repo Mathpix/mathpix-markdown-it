@@ -37,55 +37,35 @@ const FOOTNOTE_TERMINATOR_NAMES = new Set<string>([
 ]);
 
 
-// Only `guarded` may throw here by design: it parses the body to answer, and a probe that cannot
-// answer is not a terminator. Every other rule keeps propagating, so a bug in one stays visible.
+// No guard here: a rule that parses a body to answer swallows its own throw (see the `Lists`
+// probe), so every rule left in this loop propagating means a bug in it stays visible.
 const anyTerminates = (
   rules: RuleBlock[],
   state: StateBlock,
   line: number,
   endLine: number,
-  guarded?: RuleBlock,
 ): boolean => {
   for (let i = 0; i < rules.length; i++) {
-    if (rules[i] !== guarded) {
-      if (rules[i](state, line, endLine, true)) {
-        return true;
-      }
-      continue;
-    }
-    try {
-      if (rules[i](state, line, endLine, true)) {
-        return true;
-      }
-    } catch (e) {
-      // the speculative parse blew up: treat as "no terminator here"
+    if (rules[i](state, line, endLine, true)) {
+      return true;
     }
   }
   return false;
 };
 
-// One walk per entry: the terminator fns plus the one allowed to throw (`guardName`), so the caller
-// never walks again just to identify it. Not cached — see the FOOTNOTE_TERMINATOR_NAMES note.
-const resolveEnabledRuleFns = (
-  ruler: Ruler,
-  names: Set<string>,
-  guardName?: string,
-): { fns: RuleBlock[]; guarded?: RuleBlock } => {
+// One walk per entry. Not cached — see the FOOTNOTE_TERMINATOR_NAMES note.
+const resolveEnabledRuleFns = (ruler: Ruler, names: Set<string>): RuleBlock[] => {
   const rules = ruler.__rules__;
   const fns: RuleBlock[] = [];
-  let guarded: RuleBlock | undefined;
   if (rules?.length) {
     for (let i = 0; i < rules.length; i++) {
       const rule = rules[i];
       if (rule.enabled && names.has(rule.name)) {
         fns.push(rule.fn);
-        if (rule.name === guardName) {
-          guarded = rule.fn;
-        }
       }
     }
   }
-  return { fns, guarded };
+  return fns;
 }
 
 export const latex_footnote_block: RuleBlock = (state, startLine, endLine, silent) => {
@@ -112,11 +92,10 @@ export const latex_footnote_block: RuleBlock = (state, startLine, endLine, silen
     if (!sawFootnoteToken || !reOpenTagFootnoteG.test(lineText)) {
       // Terminate on `fence` (original) plus the LaTeX list rule, so a `\begin{itemize}`
       // before the tag isn't swallowed — a minimal addition (fence + Lists, not the full set).
-      const { guarded: listRule } = resolveEnabledRuleFns(
-        state.md.block.ruler, LIST_TERMINATOR_NAME, LIST_RULE_NAME);
-      const probeRules: RuleBlock[] = listRule ? [fence as any, listRule] : [fence as any];
+      const probeRules: RuleBlock[] = [fence as RuleBlock].concat(
+        resolveEnabledRuleFns(state.md.block.ruler, LIST_TERMINATOR_NAME));
       for (; nextLine < endLine; nextLine++) {
-        if (anyTerminates(probeRules, state, nextLine, endLine, listRule)) {
+        if (anyTerminates(probeRules, state, nextLine, endLine)) {
           terminate = true;
         }
         if (terminate) { break; }
@@ -300,14 +279,14 @@ export const latex_footnotetext_block: RuleBlock = (state, startLine, endLine, s
     let hasOpenTag = false;
     let pending = '';
     let terminate = false;
-    const { fns: terminatorRules, guarded: listTerminator } = resolveEnabledRuleFns(
-      state.md.block.ruler, FOOTNOTE_TERMINATOR_NAMES, LIST_RULE_NAME);
+    const terminatorRules: RuleBlock[] = resolveEnabledRuleFns(
+      state.md.block.ruler, FOOTNOTE_TERMINATOR_NAMES);
     // Literal token can't span `\n` — gate the O(fullContent) regex on per-line presence.
     let sawFootnotetextToken: boolean = reFootnotetextToken.test(lineText);
     if (!sawFootnotetextToken || !reOpenTagFootnotetextG.test(lineText)) {
       // jump line-by-line until empty one or EOF
       for (; nextLine < endLine; nextLine++) {
-        if (anyTerminates(terminatorRules, state, nextLine, endLine, listTerminator)) {
+        if (anyTerminates(terminatorRules, state, nextLine, endLine)) {
           terminate = true;
         }
         if (terminate) {

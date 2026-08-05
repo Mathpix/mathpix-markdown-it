@@ -74,8 +74,11 @@ export const getMdLink = (child, token, j) => {
       const mathDelimiter: string = inner.type === 'inline_math' ? '$' : '$$';
       text += mathDelimiter + (inner.content ?? '') + mathDelimiter;
     } else if (inner.type === 'image' || inner.type === 'includegraphics') {
-      // Alt text as written, so a `]` in it already carries its backslash.
-      text += inner.content ?? '';
+      // Whole image, like the main cell loop: alt alone loses `src`. Alt is raw source — not escaped.
+      text += `![${inner.attrGet('alt') ?? inner.content ?? ''}](${mdHref(inner.attrGet('src'))})`;
+    } else if (inner.type === 'softbreak' || inner.type === 'hardbreak') {
+      // Same as the main cell loop: without it the words on both sides glue together.
+      text += ' ';
     } else {
       // Raw markup and anything else: escaped, or a `]` truncates the label downstream.
       text += escapeLabel(getMdForChild(inner) || (inner.content ?? ''));

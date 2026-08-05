@@ -16,6 +16,7 @@ import {
 import { parseSetCounterNumber } from "./latex-list-common";
 import { getListDepth } from "./list-state";
 import { getCaptionCounters, setCaptionCounters } from "../common/caption-counters";
+import { warnDistinct } from "../common/warn-distinct";
 import { snapshotListLevels, restoreListLevels } from "./list-state";
 import { lastMatchPosCached } from "../common/src-pos-cache";
 import {
@@ -683,6 +684,14 @@ export const Lists: RuleBlock = (
     state.level = bufferedState.level;
     state.prentLevel = bufferedState.prentLevel;
     return true;
+  } catch (e) {
+    // A probe that cannot answer is not a list. Guarded here so every caller behaves the same.
+    if (!silent) {
+      throw e;
+    }
+    warnDistinct('list-probe-threw', '[list] terminator probe threw; treating as no list', e);
+    setCachedListProbe(state, probeKey, false);
+    return false;
   } finally {
     restoreEnvKeys(state.env, LIST_TRANSIENT_ENV_KEYS, transientSnap.had, transientSnap.snap);
     if (!committed) {

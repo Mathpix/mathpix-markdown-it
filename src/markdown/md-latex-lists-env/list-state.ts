@@ -1,3 +1,5 @@
+import { warnDistinct, resetWarnDistinct } from "../common/warn-distinct";
+
 /**
  * State manager for nested LaTeX list environments (e.g., \begin{itemize}, \item).
  *
@@ -18,24 +20,13 @@ export interface ListLevelState {
 // One entry per open list level, innermost last.
 let listLevels: ListLevelState[] = [];
 
-// Speculative parses reach these diagnostics once per offending line, so a desync would flood a
-// consumer's log. Report each distinct case once per parse (reset below); a repeat says nothing new.
-const warned: Set<string> = new Set();
-const warnDistinct = (key: string, ...args: any[]): void => {
-  if (warned.has(key)) {
-    return;
-  }
-  warned.add(key);
-  console.warn(...args);
-};
-
 /**
  * Reset all list-related state.
  * Should be called before starting a new parsing session.
  */
 export const resetListState = (): void => {
   listLevels = [];
-  warned.clear();
+  resetWarnDistinct();
 };
 
 /**

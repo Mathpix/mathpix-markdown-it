@@ -10,6 +10,7 @@ const {
   reOpenTagFootnoteG,
   reOpenTagFootnotetextG,
 } = require('../lib/markdown/common/consts');
+const listEnvEngine = require('../lib/markdown/md-latex-lists-env/latex-list-env-engine');
 
 const options = {
   cwidth: 800
@@ -225,34 +226,49 @@ describe('Footnote token-guard soundness:', () => {
   });
 });
 
-// A terminator probe runs the list rule, which parses the body and can therefore throw. Both scans
-// must treat that as "not a terminator" instead of failing the whole document.
+// The list rule parses a body to answer a probe, so it can throw. It swallows that itself, which is
+// what makes every prober behave alike — the footnote scans, markdown-it's paragraph chain, lheading.
 describe('A throwing terminator probe does not fail the render:', () => {
   const shapes = {
     '\\footnote': 'Para \\footnote\n\\begin{itemize}\n\\item[a] x\n\\end{itemize}\n{f}',
     '\\footnotetext': 'Para \\footnotetext\n\\begin{itemize}\n\\item[a] x\n\\end{itemize}\n{f}',
+    'paragraph chain': 'Paragraph text\n\\begin{itemize}\n\\item[a] x\n\\end{itemize}',
   };
   Object.entries(shapes).forEach(([name, src]) => {
-    it(`${name}: the scan swallows the throw and keeps scanning`, () => {
+    it(`${name}: the probe throw is contained and the document renders`, () => {
       const md = markdownIt({ html: true })
         .use(mathpixMarkdownPlugin, { outMath: { include_svg: false } });
+      // Break the speculative parse from inside — that is where the guard sits — and only while a
+      // probe is running: a real parse must keep failing loudly.
       const rule = md.block.ruler.__rules__.find((r) => r.name === 'Lists');
-      const original = rule.fn;
+      const originalRule = rule.fn;
+      let silentDepth = 0;
+      rule.fn = function (state, start, end, silent) {
+        if (silent) { silentDepth++; }
+        try { return originalRule.apply(this, arguments); }
+        finally { if (silent) { silentDepth--; } }
+      };
+      md.block.ruler.__cache__ = null;
+      const original = listEnvEngine.createBufferedState;
       let thrown = 0;
-      // Only from the footnote scan: markdown-it's own paragraph probes have no such guard, so
-      // throwing there would fail the render for an unrelated reason.
-      rule.fn = function throwingProbe(state, start, end, silent) {
-        if (silent && (new Error().stack || '').includes('md-latex-footnotes')) {
+      listEnvEngine.createBufferedState = function () {
+        if (silentDepth > 0) {
           thrown++;
           throw new Error('probe blew up');
         }
         return original.apply(this, arguments);
       };
-      md.block.ruler.__cache__ = null;
-      const html = md.render(src);
-      thrown.should.be.above(0, 'the scan never reached the list rule — the shape stopped exercising it');
-      html.should.be.a('string');
-      rule.fn = original;
+      const warn = console.warn;
+      console.warn = () => {};
+      try {
+        const html = md.render(src);
+        thrown.should.be.above(0, 'the shape stopped reaching the list rule');
+        html.should.be.a('string');
+      } finally {
+        console.warn = warn;
+        listEnvEngine.createBufferedState = original;
+        rule.fn = originalRule;
+      }
     });
   });
 });

@@ -186,11 +186,14 @@ describe('a speculative list parse does not advance other global registries', ()
       '\\begin{align}x=1\\label{e}\\end{align}',
       '$$x^2$$',
       '\\footnote{n}',
+      '\\begin{array}{cc}a & b\\end{array}',
+      '\\begin{cases}x & y\\end{cases}',
+      '\\includegraphics{img.png}',
     ];
-    bodies.forEach((body) => {
+    // \footnotetext with no blank line makes the terminator scan probe every line.
+    const probeBody = (instance, body) => {
       const env = {};
-      // \footnotetext with no blank line makes the terminator scan probe every line.
-      md.render('Para \\footnotetext{f}\n\\begin{itemize}\n\\item[a] x\n' + body + '\n\\end{itemize}', env);
+      instance.render('Para \\footnotetext{f}\n\\begin{itemize}\n\\item[a] x\n' + body + '\n\\end{itemize}', env);
       Object.keys(env).forEach((key) => {
         if (ignoredParserKeys.has(key)) {
           return;
@@ -198,7 +201,12 @@ describe('a speculative list parse does not advance other global registries', ()
         listKeys.has(key).should.equal(true,
           'env key after a probed list is neither a registered list key nor a known parser key: ' + key);
       });
-    });
+    };
+    bodies.forEach((body) => probeBody(md, body));
+    // centerImages routes an image through a different renderer branch.
+    const centred = markdownIt({ html: true })
+      .use(mathpixMarkdownPlugin, { outMath: { include_svg: false }, centerImages: true });
+    probeBody(centred, '\\includegraphics{img.png}');
   });
 
   // The caption counters are restored on a non-committing exit, which is only safe while no token

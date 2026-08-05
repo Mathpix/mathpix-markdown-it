@@ -187,15 +187,14 @@ describe('The exported label has a decision for every inline construct:', () => 
   };
   // Measured, not assumed: third-party markup (sub/sup/mark/ins) reaches the label as tokens too.
   const KEEPS_ITS_MARKUP = ['**b**', '*i*', '~~s~~', '`c`', '==m==', '++ins++', 'H~2~O', 'x^2^',
-    ':smile:', '<b>h</b>', '$x$', '<smiles>CCO</smiles>'];
+    ':smile:', '<b>h</b>', '$x$', '<smiles>CCO</smiles>', '![alt](p.png)'];
   KEEPS_ITS_MARKUP.forEach((body) => {
     it(`keeps its markup: ${body}`, () =>
       labelMd(`[${body}](http://x.y)`).should.equal(`| [${body}](http://x.y) |`));
   });
   it('what the label drops, it drops knowingly', () => {
-    // No Markdown form for an underline; a nested image keeps its alt; a link title has nowhere to go.
+    // No Markdown form for an underline; a link title has nowhere to go.
     labelMd('[\\underline{u}](http://x.y)').should.equal('| [u](http://x.y) |');
-    labelMd('[![alt](p.png)](http://x.y)').should.equal('| [alt](http://x.y) |');
     labelMd('[a](http://x.y "t")').should.equal('| [a](http://x.y) |');
     // \textbf maps onto the Markdown marker rather than staying LaTeX.
     labelMd('[\\textbf{b}](http://x.y)').should.equal('| [**b**](http://x.y) |');
@@ -295,7 +294,8 @@ describe('A link in a tabular cell renders well-formed in every output:', () => 
       open.attrGet('href').should.equal('http://a.b');
     });
     label('[<i title="x]y">t</i>](http://a.b)').should.equal('[<i title="x\\]y">t</i>](http://a.b)');
-    label('[![a\\]b](i.png)](http://a.b)').should.equal('[a\\]b](http://a.b)');
+    // The image survives whole; its alt is raw source, so its own escape is not doubled.
+    label('[![a\\]b](i.png)](http://a.b)').should.equal('[![a\\]b](i.png)](http://a.b)');
 
     // `[` and `\` belong to the same class: the first re-pairs with the closing bracket, the second
     // would escape whatever follows it. Not reachable through a cell (`\\` splits a tabular row),

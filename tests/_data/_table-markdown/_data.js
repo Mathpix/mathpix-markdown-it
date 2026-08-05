@@ -1003,12 +1003,12 @@ module.exports = [
       '| :--- |'
   },
   {
-    // A label with no markdown marker of its own: the alt text must survive.
+    // An image label keeps its `src`, so the exported label still shows the image.
     id: 59,
     latex: '\\begin{tabular}{|l|}\n' +
       '[![alt](i.png)](http://a.b) x\n' +
       '\\end{tabular}',
-    table_markdown: '| [alt](http://a.b) x |\n' +
+    table_markdown: '| [![alt](i.png)](http://a.b) x |\n' +
       '| :--- |'
   },
   {
