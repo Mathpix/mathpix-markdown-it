@@ -38,6 +38,24 @@ import {
   reSetCounter
 } from "../common/consts";
 
+// Matches what the `renewcommand` rule looks for, anchored: the whole line is that command.
+const RENEWCOMMAND_LINE_RE: RegExp = /^\s*\\renewcommand\b/;
+
+// Built from the unanchored closer regex, so the sweep cannot drift from what the parser accepts.
+const END_LIST_ENV_SWEEP_G: RegExp = new RegExp(END_LIST_ENV_INLINE_RE.source, 'g');
+
+// Offsets of every closer: the last one answers the early bail, the whole list feeds the depth check
+// inside the body walk. Cached on the state the rule receives — the buffered state reads it through
+// the prototype, so the sweep runs once per document rather than once per probe.
+const LIST_END_OFFSETS_KEY = Symbol('mmd.listEndOffsets');
+const listCloserOffsets = (state: StateBlock): readonly number[] =>
+  matchPositionsCached(state, LIST_END_OFFSETS_KEY, END_LIST_ENV_SWEEP_G);
+
+const lastListEndPos = (state: StateBlock): number => {
+  const offsets: readonly number[] = listCloserOffsets(state);
+  return offsets.length ? offsets[offsets.length - 1] : -1;
+};
+
 // A fenced code block (``` or ~~~) inside a list env is opaque like lstlisting: its lines are collected raw so
 // the code keeps its indentation (the normal content path de-indents via tShift, which `\item` detection needs).
 // Detection mirrors the core fence rule (mmd-fence.ts): marker ` (0x60) or ~ (0x7E), run length ≥ 3, ≤ 3 leading
@@ -571,24 +589,6 @@ export const ListsInternal = (
   }
   resolveListPadding(allListTokens);
   return true;
-};
-
-// Matches what the `renewcommand` rule looks for, anchored: the whole line is that command.
-const RENEWCOMMAND_LINE_RE: RegExp = /^\s*\\renewcommand\b/;
-
-// Built from the unanchored closer regex, so the sweep cannot drift from what the parser accepts.
-const END_LIST_ENV_SWEEP_G: RegExp = new RegExp(END_LIST_ENV_INLINE_RE.source, 'g');
-
-// Offsets of every closer: the last one answers the early bail, the whole list feeds the depth check
-// inside the body walk. Cached on the state the rule receives — the buffered state reads it through
-// the prototype, so the sweep runs once per document rather than once per probe.
-const LIST_END_OFFSETS_KEY = Symbol('mmd.listEndOffsets');
-const listCloserOffsets = (state: StateBlock): readonly number[] =>
-  matchPositionsCached(state, LIST_END_OFFSETS_KEY, END_LIST_ENV_SWEEP_G);
-
-const lastListEndPos = (state: StateBlock): number => {
-  const offsets: readonly number[] = listCloserOffsets(state);
-  return offsets.length ? offsets[offsets.length - 1] : -1;
 };
 
 /**

@@ -10,7 +10,8 @@ export const warnDistinct = (key: string, ...args: any[]): void => {
   console.warn(...args);
 };
 
-// Called per parse from resetMmdGlobalState, next to the other cross-parse resets.
+// Called per render from the `reset_mmd_global_state` rule, before its partial-render bail — so it is
+// not part of the public resetMmdGlobalState, which a partial render skips.
 export const resetWarnDistinct = (): void => {
   warned.clear();
 };

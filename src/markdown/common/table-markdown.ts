@@ -39,7 +39,7 @@ export const SMILES_CLOSE = '</smiles>';
 
 // Math per `outMath.table_markdown`: ascii if asked, else latex between the configured delimiters.
 // Shared with the cell loop, or a label and the text around it come out in two syntaxes.
-export const getMdMath = (token, options?): string => {
+export const getMdMath = (token, options?, content?: string): string => {
   const tableMarkdown = options?.outMath?.table_markdown;
   // Same chain the cell loop emits, or a token carrying only `ascii_tsv` differs inside a label.
   const ascii: string = token.ascii_md || token.ascii_tsv || token.ascii;
@@ -51,7 +51,7 @@ export const getMdMath = (token, options?): string => {
   const [open, close]: string[] = configured?.length > 1
     ? [configured[0], configured[1]]
     : isDisplay ? ['$$', '$$'] : ['$', '$'];
-  return open + (token.content ?? '') + close;
+  return open + (content ?? token.content ?? '') + close;
 };
 
 export const getMdLink = (child, token, j, options?) => {
@@ -85,9 +85,10 @@ export const getMdLink = (child, token, j, options?) => {
     } else if (inner.type === 'smiles_inline') {
       // The other self-closing type getMdForChild gives a marker for; its closer is not in markup.
       text += getMdForChild(inner) + inner.content + SMILES_CLOSE;
-    } else if (inner.type === 'link_open') {
-      // Only reachable in a stitched stream (CommonMark has no nested links): contributes nothing,
-      // since getMdForChild would hand back a literal `<a>`. A `link_close` exits at the break above.
+    } else if (inner.type === 'link_open' || inner.type === 'link_close') {
+      // Both reachable only in a stitched stream (CommonMark has no nested links); a nested closer
+      // never reaches the break above. Skipped explicitly: getMdForChild answers `<a>`/`</a>` for a
+      // token without a `tag`, and that markup has no place in a Markdown label.
     } else if (inner.type && MATH_TOKEN_TYPES.has(inner.type)) {
       // Verbatim: escaping would turn `\frac` into a LaTeX line break. Delimiters shield an
       // unbalanced `]` too, for a reader that has a math rule.

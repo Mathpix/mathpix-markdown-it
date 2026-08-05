@@ -213,7 +213,7 @@ export const renderTableCellContent = (
           continue;
         }
         const mdContent: string = mathTokenTypes.includes(child.type)
-          ? getMdMath({ ...child, content: child.content?.trim() }, options)
+          ? getMdMath(child, options, child.content?.trim())
           : child.latex;
         mdCell += mdContent
           .replace(/\|/g, '\\|')

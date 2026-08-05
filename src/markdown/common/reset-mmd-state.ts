@@ -7,7 +7,6 @@ import { clearLabelsList } from './labels';
 import { clearItemizeLevelTokens } from '../md-latex-lists-env/re-level';
 import { resetListState } from '../md-latex-lists-env/list-state';
 import { resetSizeCounter } from './counters';
-import { resetWarnDistinct } from './warn-distinct';
 import { MathJax } from '../../mathjax';
 
 /** Resets module-level cross-parse state: TOC slugs, labels, theorem/list/footnote counters, MathJax numbering.
@@ -21,7 +20,6 @@ export const resetMmdGlobalState = (): void => {
   rest_mmd_footnotes_list();
   clearItemizeLevelTokens();
   resetListState();
-  resetWarnDistinct();
   resetTextCounter();
   resetSizeCounter();
   MathJax.Reset();

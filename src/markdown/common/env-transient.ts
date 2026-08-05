@@ -69,14 +69,20 @@ export const snapshotEnvAll = (env: any): EnvSnapshot => {
 };
 
 export const releaseEnvSnapshot = (): void => {
-  if (snapshotDepth > 0) {
-    snapshotDepth--;
+  if (snapshotDepth === 0) {
+    return;
   }
+  snapshotDepth--;
+  // Drop the values: the slot outlives the parse and would hold that document's objects alive.
+  const released: EnvSnapshot = snapshotPool[snapshotDepth];
+  released.keys.length = 0;
+  released.values.length = 0;
+  released.length = 0;
 };
 
-// Puts back every value the parse changed and clears the keys it added (`undefined`, never `delete`
-// — see restoreEnvKeys). Same loop notices a key deleted by a foreign rule, so an equal key count
-// cannot hide one deletion plus one addition; without such a delete the sweep never runs.
+// Puts back every value the parse changed, clears the keys it added: `undefined`, never `delete`,
+// which drops `env` into dictionary mode. The count check also catches a key a foreign rule deleted.
+// Compared by identity, so an object mutated in place is not restored — that rule must undo it.
 export const restoreEnvAll = (env: any, snap: EnvSnapshot): void => {
   const { keys, values, length } = snap;
   let vanished = false;
@@ -117,24 +123,5 @@ export const restoreEnvKeysFromAll = (
     const key: string = keys[i];
     const index: number = snap.keys.lastIndexOf(key, snap.length - 1);
     env[key] = index === -1 ? undefined : snap.values[index];
-  }
-};
-
-// Record presence and value of `keys` in `env`, so they can be restored later.
-export const snapshotEnvKeys = (env: any, keys: readonly string[]): { had: { [k: string]: boolean }; snap: { [k: string]: any } } => {
-  const had: { [k: string]: boolean } = {};
-  const snap: { [k: string]: any } = {};
-  for (const k of keys) {
-    had[k] = k in env;
-    snap[k] = env[k];
-  }
-  return { had, snap };
-};
-
-// Absent keys get `undefined`, not `delete`: `delete` drops `env` into dictionary mode for the
-// rest of the parse (~20% on list-heavy input). Readers test the value, so it is equivalent.
-export const restoreEnvKeys = (env: any, keys: readonly string[], had: { [k: string]: boolean }, snap: { [k: string]: any }): void => {
-  for (const k of keys) {
-    env[k] = had[k] ? snap[k] : undefined;
   }
 };

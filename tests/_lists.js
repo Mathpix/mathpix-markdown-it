@@ -66,3 +66,38 @@ describe('A no-output command between items leaves no orphan <br>:', () => {
       .should.deep.equal(['a<br>\n\\itemsep 1pt', 'b']);
   });
 });
+
+// `\item` detection: the rule is `\item` not followed by a letter, so `\itemsep` stays text while
+// `\item2`/`\item*` open an item. Pinned as measured, so a regex refactor cannot change it silently.
+describe('What counts as \\item inside a list body:', () => {
+  const itemBodies = (line) => {
+    const html = MM.markdownToHTML('\\begin{itemize}\n\\item a\n' + line + '\n\\end{itemize}',
+      { outMath: { include_svg: false } });
+    return (html.match(/<li[\s\S]*?<\/li>/g) || []).map((li) => li
+      .replace(/<span class="li_level"[^>]*>[\s\S]*?<\/span>/g, '')
+      .replace(/<li[^>]*>/, '')
+      .replace('</li>', ''));
+  };
+  const staysText = {
+    '\\itemsep 1pt': 'a<br>\n\\itemsep 1pt',
+    '\\itemindent 2pt': 'a<br>\n\\itemindent 2pt',
+    '\\itemize x': 'a<br>\n\\itemize x',
+    'the word item here': 'a<br>\nthe word item here',
+  };
+  Object.entries(staysText).forEach(([line, expected]) => {
+    it(`"${line}" stays inside the item above it`, () => {
+      itemBodies(line).should.deep.equal([expected]);
+    });
+  });
+  // A digit or a star is a legal `\item` argument in LaTeX, so these do open an item.
+  it('"\\item2 b" opens an item whose body is "2 b"', () => {
+    itemBodies('\\item2 b').should.deep.equal(['a', '2 b']);
+  });
+  it('"\\item* b" opens an item whose body is "* b"', () => {
+    itemBodies('\\item* b').should.deep.equal(['a', '* b']);
+  });
+  // A trailing `\item` with nothing after it: the text before it stays, the empty item is emitted.
+  it('a line ending in "\\item" leaves the text and an empty item', () => {
+    itemBodies('text \\item').should.deep.equal(['a<br>\ntext', '']);
+  });
+});

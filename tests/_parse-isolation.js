@@ -10,6 +10,7 @@ const {
   LIST_TRANSIENT_ENV_KEYS,
   snapshotEnvAll,
   releaseEnvSnapshot,
+  restoreEnvAll,
   restoreEnvKeysFromAll,
 } = require('../lib/markdown/common/env-transient');
 
@@ -160,6 +161,31 @@ describe('silent-mode Lists does not mutate shared env', () => {
   });
   // Snapshots come from a pool, so a shorter one must not answer from the tail of a longer one — the
   // rollback would then restore keys the env never had, leaking the very flag it exists to contain.
+  it('releasing a snapshot lets go of the values it held', () => {
+    // The pool slot outlives the parse, so a released snapshot must not keep a document's objects.
+    const canary = { blob: new Array(1000).fill(0) };
+    const snapshot = snapshotEnvAll({ heavy: canary });
+    snapshot.length.should.equal(1);
+    releaseEnvSnapshot();
+    snapshot.length.should.equal(0);
+    snapshot.values.indexOf(canary).should.equal(-1);
+  });
+
+  // Values are compared by identity, so a key whose object is mutated in place is NOT rolled back.
+  // Pinned as a boundary, not a wish: a rule writing inside an object on `env` must undo it itself.
+  it('the rollback restores scalars and leaves an in-place mutation alone', () => {
+    const env = { ctx: { touched: false }, scalar: 'original' };
+    const snapshot = snapshotEnvAll(env);
+    env.ctx.touched = true;
+    env.scalar = 'written by the parse';
+    env.added = 'new key';
+    restoreEnvAll(env, snapshot);
+    releaseEnvSnapshot();
+    env.scalar.should.equal('original');
+    (env.added === undefined).should.equal(true);
+    env.ctx.touched.should.equal(true, 'in-place mutation is out of the rollback by design');
+  });
+
   it('a snapshot of a smaller env does not see the previous one', () => {
     const rich = snapshotEnvAll({ isBlock: true, inheritedListType: 'itemize', prentLevel: 7, x: 1 });
     rich.length.should.equal(4);
@@ -172,31 +198,6 @@ describe('silent-mode Lists does not mutate shared env', () => {
     LIST_TRANSIENT_ENV_KEYS.forEach((key) => {
       (target[key] === undefined).should.equal(true, key + ' came back from a stale snapshot');
     });
-  });
-
-  // The rollback names no keys, so it also covers a rule the list code has never heard of — the case
-  // a hand-written key list could only lose.
-  it('a probe rolls back an env key written by an unknown rule', () => {
-    const own = markdownIt({ html: true }).use(mathpixMarkdownPlugin, {});
-    own.block.ruler.before('paragraph', 'novelEnvWriter', (state, startLine, endLine, silent) => {
-      const from = state.bMarks[startLine] + state.tShift[startLine];
-      if (state.src.slice(from, state.eMarks[startLine]).indexOf('\\novel') !== 0) {
-        return false;
-      }
-      state.env.brandNewKey = 'written by a rule no list knows';
-      state.env.caption = 'clobbered';
-      if (!silent) {
-        state.line = startLine + 1;
-      }
-      return true;
-    });
-    own.block.ruler.__cache__ = null;
-    const src = '\\begin{itemize}\n\\item[a] x\n\\novel\n\\end{itemize}\n';
-    const env = { caption: 'original' };
-    const state = new own.block.State(src, own, env, []);
-    own.block.ruler.__rules__.find((r) => r.name === 'Lists').fn(state, 0, state.lineMax, true);
-    (state.env.brandNewKey === undefined).should.equal(true, 'a new env key survived the probe');
-    state.env.caption.should.equal('original', 'a clobbered env value was not put back');
   });
 });
 
@@ -319,6 +320,28 @@ describe('a failing list rule does not fail the document', () => {
         listEnvEngine.parseListEnvRawToTokens = original;
       }
     });
+  });
+  // An incremental host re-renders one block per keystroke with `renderElement.startLine`, and that
+  // path skips the global reset — so the diagnostic reset has to sit outside it, or the second render
+  // and every one after it degrade in silence.
+  it('a partial re-render warns every time, not once per process', () => {
+    const md = markdownIt({ html: true }).use(mathpixMarkdownPlugin,
+      { outMath: { include_svg: false }, renderElement: { startLine: 0 } });
+    const original = listEnvEngine.createBufferedState;
+    listEnvEngine.createBufferedState = function () { throw new Error('same cause every render'); };
+    const warn = console.warn;
+    const warnings = [];
+    console.warn = (...args) => warnings.push(String(args[0]));
+    try {
+      const src = '\\begin{itemize}\n\\item[a] visible text\n\\end{itemize}';
+      md.render(src).should.include('visible text');
+      warnings.should.have.length(1);
+      md.render(src).should.include('visible text');
+      warnings.should.have.length(2, 'the second render degraded without a word');
+    } finally {
+      console.warn = warn;
+      listEnvEngine.createBufferedState = original;
+    }
   });
   it('each distinct cause is reported once, not just each error name', () => {
     // Most internal faults are plain `Error`, so a name-only key would hide every cause but the first.
