@@ -1,6 +1,6 @@
 import { TsvJoin } from "./tsv";
 import { CsvJoin } from "./csv";
-import { getMdForChild, getMdLink, getMdMath, SMILES_CLOSE } from "./table-markdown";
+import { getMdForChild, getMdLink, getMdMath, mdHref, SMILES_CLOSE } from "./table-markdown";
 import { mathTokenTypes } from "./consts";
 import { isWhitespace } from "../common";
 const escapeHtml = require('markdown-it/lib/common/utils').escapeHtml;
@@ -97,22 +97,22 @@ export const renderTableCellContent = (
       // An image writes its own tsv/csv value (the `src`) in the switch below; letting the generic
       // append run first glued the alt from `content` onto it — `alt` + `i.png` in one cell.
       const writesOwnPlainText: boolean = child.type === 'image' || child.type === 'includegraphics';
-      if (writesOwnPlainText) {
-        // handled by the switch
-      } else if (ascii) {
-        tsvCell += ascii;
-        csvCell += csvAscii;
-      } else if (token.type === 'subTabular') {
-        if (token.parents?.length || ["backslashbox", "slashbox"].includes(child.type)) {
+      if (!writesOwnPlainText) {
+        if (ascii) {
+          tsvCell += ascii;
+          csvCell += csvAscii;
+        } else if (token.type === 'subTabular') {
+          if (token.parents?.length || ["backslashbox", "slashbox"].includes(child.type)) {
+            tsvCell += tsvData;
+            csvCell += csvData;
+          } else {
+            tsvCell += child.tsv ? `"${TsvJoin(child.tsv, options)}"` : child.content;
+            csvCell += child.csv ? CsvJoin(child.csv, options, true) : child.content;
+          }
+        } else {
           tsvCell += tsvData;
           csvCell += csvData;
-        } else {
-          tsvCell += child.tsv ? `"${TsvJoin(child.tsv, options)}"` : child.content;
-          csvCell += child.csv ? CsvJoin(child.csv, options, true) : child.content;
         }
-      } else {
-        tsvCell += tsvData;
-        csvCell += csvData;
       }
 
       switch (child.type) {
@@ -170,7 +170,8 @@ export const renderTableCellContent = (
           csvCell += src;
           mdCell += options?.forMD
             ? rendered
-            : `![${child.attrGet('alt') ?? ''}](${src})`.replace(/\|/g, '\\|');
+            // `mdHref` as inside a label, so both paths write the destination the same way.
+            : `![${child.attrGet('alt') ?? ''}](${mdHref(src)})`.replace(/\|/g, '\\|');
           continue;
         }
         case 'code':

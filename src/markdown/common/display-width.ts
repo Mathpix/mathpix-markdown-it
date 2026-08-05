@@ -58,9 +58,8 @@ const ASCII_EM: Float64Array = (() => {
   return widths;
 })();
 
-// Wide code points scattered below the CJK blocks: the angle brackets and Wide emoji. Listed range by
-// range, not as one span: their neighbours (`✓` U+2713, `✖` U+2716) are Neutral and must stay in the
-// cased fallback.
+// Wide code points scattered below the CJK blocks per EastAsianWidth 15.1: the angle brackets and
+// Wide emoji. Range by range, not one span — their neighbours (`✓` U+2713, `✖` U+2716) are Neutral.
 const WIDE_RANGES_BELOW_CJK: ReadonlyArray<readonly [number, number]> = [
   [0x231A, 0x231B], [0x2329, 0x232A], [0x23E9, 0x23EC], [0x23F0, 0x23F0], [0x23F3, 0x23F3], [0x25FD, 0x25FE],
   [0x2614, 0x2615], [0x2648, 0x2653], [0x267F, 0x267F], [0x2693, 0x2693], [0x26A1, 0x26A1],

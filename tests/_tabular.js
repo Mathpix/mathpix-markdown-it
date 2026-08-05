@@ -316,10 +316,10 @@ describe('A link in a tabular cell renders well-formed in every output:', () => 
     balance(balanced).should.equal(0);
     balanced.tableMd.should.equal('[label](http://a.b) tail');
   });
-  it('every part of the label is escaped, except an image alt', () => {
+  it('the label escapes what it must, and leaves source slices alone', () => {
     // A truncated label loses the whole link downstream, so `]` is escaped wherever it comes from —
-    // raw markup included. Math and an image alt are exempt: both are latex/raw source, and a
-    // backslash added there would change what they mean (`\\` is a LaTeX line break).
+    // raw markup included. Math and an image alt are exempt because they are source slices that
+    // already carry their escapes; escaping again would double them (`a\]b` → `a\\\]b`).
     const inner = markdownIt({ html: true }).use(mathpixMarkdownPlugin, { outMath: { include_svg: false } });
     const label = (src) => {
       const tokens = [];

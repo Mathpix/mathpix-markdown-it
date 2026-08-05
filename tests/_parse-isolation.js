@@ -9,6 +9,7 @@ const listEnvEngine = require('../lib/markdown/md-latex-lists-env/latex-list-env
 const {
   LIST_TRANSIENT_ENV_KEYS,
   snapshotEnvAll,
+  snapshotEnvForInline,
   releaseEnvSnapshot,
   restoreEnvAll,
   restoreEnvKeysFromAll,
@@ -161,6 +162,21 @@ describe('silent-mode Lists does not mutate shared env', () => {
   });
   // Snapshots come from a pool, so a shorter one must not answer from the tail of a longer one — the
   // rollback would then restore keys the env never had, leaking the very flag it exists to contain.
+  // A rolled-back key holds `undefined`, and `envToInline` is replayed onto the shared env, so
+  // replaying that would clear a key a later block set. The tabular trio is exempt because a nested
+  // `tabular` needs the cleared value to arrive — dropping it fails 12 fixtures in
+  // `_data/_tsv_with_array/`, which is a long way from this line. Pin the membership here instead.
+  it('only the tabular trio survives envToInline with value undefined', () => {
+    const replayed = (key) => Object.prototype.hasOwnProperty.call(
+      snapshotEnvForInline({ [key]: undefined }), key);
+    ['isInline', 'subTabular', 'tabulare'].forEach((key) => {
+      replayed(key).should.equal(true, key + ' must reach the replay even when cleared');
+    });
+    ['caption', 'envType', 'align', 'number', 'consumerKey'].forEach((key) => {
+      replayed(key).should.equal(false, key + ' must not clobber a later value with undefined');
+    });
+  });
+
   it('releasing a snapshot lets go of the values it held', () => {
     // The pool slot outlives the parse, so a released snapshot must not keep a document's objects.
     const canary = { blob: new Array(1000).fill(0) };

@@ -654,6 +654,7 @@ export const Lists: RuleBlock = (
     state.parentType = bufferedState.parentType;
     state.level = bufferedState.level;
     state.prentLevel = bufferedState.prentLevel;
+    // No `types` copy-back: a committed list is balanced, so the walk already popped what it pushed.
     return true;
   } catch (e) {
     // A failed rule does not apply. Past the commit point tokens are already in state — nothing to

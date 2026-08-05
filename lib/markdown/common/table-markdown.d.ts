@@ -1,3 +1,4 @@
+export declare const mdHref: (href: string) => string;
 export declare const SMILES_OPEN = "<smiles>";
 export declare const SMILES_CLOSE = "</smiles>";
 export declare const getMdMath: (token: any, options?: any, content?: string) => string;

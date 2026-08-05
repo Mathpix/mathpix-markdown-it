@@ -275,6 +275,7 @@ const renderNonTableTokenIntoCell = (
     }
     if (needMd) {
       // A continuation line is its own cell token and its line break is not, so restore the space.
+      // Misses when the previous token is not `inline`; never over-adds, a trailing space or `>` stops it.
       const prev: any = ctx.tokens[ctx.idx - 1];
       if (leaf.tableMd && acc.cellMd && !/[\s>]$/.test(acc.cellMd)
           && (prev?.type === 'inline' || prev?.token === 'inline')) {

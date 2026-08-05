@@ -21,7 +21,7 @@ const hasUnbalancedParens = (href: string): boolean => {
   return depth !== 0;
 };
 
-const mdHref = (href: string): string => {
+export const mdHref = (href: string): string => {
   if (!href) {
     return '';
   }
