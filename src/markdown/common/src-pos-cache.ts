@@ -38,3 +38,46 @@ export const lastMatchPosCached = (
   slot[key] = { src: state.src, lastPos };
   return lastPos;
 };
+
+/**
+ * Offsets of every `patternG` match in `state.src`, ascending, cached on the state under `key`.
+ * Same contract as lastMatchPosCached: /g required, invalidated when `state.src` is reassigned.
+ */
+export const matchPositionsCached = (
+  state: StateBlock,
+  key: symbol,
+  patternG: RegExp,
+): readonly number[] => {
+  const slot = state as unknown as Record<symbol, { src: string; positions: number[] } | undefined>;
+  const cached = slot[key];
+  if (cached && cached.src === state.src) {
+    return cached.positions;
+  }
+  patternG.lastIndex = 0;
+  const positions: number[] = [];
+  let match: RegExpExecArray | null;
+  while ((match = patternG.exec(state.src)) !== null) {
+    positions.push(match.index);
+    if (match.index === patternG.lastIndex) {
+      patternG.lastIndex++;
+    }
+  }
+  patternG.lastIndex = 0;
+  slot[key] = { src: state.src, positions };
+  return positions;
+};
+
+/** How many of the ascending `positions` are at or after `minOffset` — binary search, no allocation. */
+export const countPositionsAtOrAfter = (positions: readonly number[], minOffset: number): number => {
+  let firstIndex = 0;
+  let pastLastIndex = positions.length;
+  while (firstIndex < pastLastIndex) {
+    const middleIndex: number = (firstIndex + pastLastIndex) >> 1;
+    if (positions[middleIndex] < minOffset) {
+      firstIndex = middleIndex + 1;
+    } else {
+      pastLastIndex = middleIndex;
+    }
+  }
+  return positions.length - firstIndex;
+};

@@ -17,7 +17,7 @@ import { parseSetCounterNumber } from "./latex-list-common";
 import { getListDepth, snapshotListLevels, restoreListLevels } from "./list-state";
 import { getCaptionCounters, setCaptionCounters } from "../common/caption-counters";
 import { warnDistinct } from "../common/warn-distinct";
-import { lastMatchPosCached } from "../common/src-pos-cache";
+import { matchPositionsCached, countPositionsAtOrAfter } from "../common/src-pos-cache";
 import {
   LIST_TRANSIENT_ENV_KEYS,
   snapshotEnvKeys,
@@ -485,6 +485,12 @@ export const ListsInternal = (
           items = ItemsAddToPrev(items, sE, lineIdx);
         }
         iOpen++;
+        // Every open env needs a closer of its own, and only closers ahead can serve. The sweep
+        // over-counts (a `\end` inside a fence is not real), so a `<` here means closure is
+        // impossible — without this the walk runs to EOF once per probed line.
+        if (countPositionsAtOrAfter(listCloserOffsets(state), state.bMarks[lineIdx]) < iOpen) {
+          return 'abort';
+        }
       }
     } else {
       // Regular line inside list: either a new \item or continuation
@@ -583,14 +589,20 @@ const setCachedListProbe = (state: StateBlock, key: string, ok: boolean): void =
   cached.map.set(key, ok);
 };
 
-// Per-state offset of the last list closer, invalidated when `state.src` is reassigned. Without
-// it an unclosed env costs a speculative parse to EOF per probe — quadratic over a document.
-const LIST_END_POS_KEY = Symbol('mmd.listEndPos');
 // Built from the unanchored closer regex, so the sweep cannot drift from what the parser accepts.
 const END_LIST_ENV_SWEEP_G: RegExp = new RegExp(END_LIST_ENV_INLINE_RE.source, 'g');
 
-const lastListEndPos = (state: StateBlock): number =>
-  lastMatchPosCached(state, LIST_END_POS_KEY, END_LIST_ENV_SWEEP_G);
+// Offsets of every closer: the last one answers the early bail, the whole list feeds the depth check
+// inside the body walk. Cached on the state the rule receives — the buffered state reads it through
+// the prototype, so the sweep runs once per document rather than once per probe.
+const LIST_END_OFFSETS_KEY = Symbol('mmd.listEndOffsets');
+const listCloserOffsets = (state: StateBlock): readonly number[] =>
+  matchPositionsCached(state, LIST_END_OFFSETS_KEY, END_LIST_ENV_SWEEP_G);
+
+const lastListEndPos = (state: StateBlock): number => {
+  const offsets: readonly number[] = listCloserOffsets(state);
+  return offsets.length ? offsets[offsets.length - 1] : -1;
+};
 
 /**
  * Block rule that parses LaTeX list environments:

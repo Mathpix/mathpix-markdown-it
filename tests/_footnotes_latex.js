@@ -336,6 +336,52 @@ describe('Footnote rule performance regression:', () => {
     (growth('\n') / growth('\n\n')).should.be.below(5);
   });
 
+  // The closer lookahead alone bails only when the source holds no closer at all, so one valid list
+  // at the end of the document used to restore the quadratic cost. The depth check inside the body
+  // walk covers that shape: measured 12x faster at 400 units, and flat from 200 to 400.
+  it('unclosed units followed by a valid list still scale like closed ones', function () {
+    this.timeout(60000);
+    const closedUnit = '\\begin{itemize}\n\\item[a] x\n\\end{itemize}';
+    const growth = (unit, tail) => {
+      const build = (n) => Array.from({ length: n }, () => unit).join('\n\n') + tail;
+      return measureMs(build(1000)) / Math.max(measureMs(build(100)), SMALL_FLOOR_MS);
+    };
+    const trailing = growth('\\begin{itemize}\n\\item[a] x', '\n\n' + closedUnit);
+    const closed = growth(closedUnit, '');
+    (trailing / closed).should.be.below(5);
+  });
+
+  // The depth check counts closers with a source sweep that cannot tell a real `\end` from one
+  // written inside a fence. Over-counting only keeps the walk going, so making the sweep stricter
+  // would abort a walk that currently succeeds — these two shapes are what would break.
+  const fence = '```';
+  it('a fake closer inside a fence leaves the list around it intact', () => {
+    const html = MM.markdownToHTML(
+      '\\begin{itemize}\n\\item a\n' + fence + '\n\\end{itemize}\n' + fence + '\n\\item b\n\\end{itemize}\n',
+      { outMath: { include_svg: false } });
+    (html.match(/<ul/g) || []).should.have.length(1);
+    (html.match(/<li/g) || []).should.have.length(2);
+    html.should.match(/<code/);
+  });
+  it('a nested env whose only closer is the outer one still renders the outer list', () => {
+    // Depth reaches 2 here, so the check runs: the fenced closer is counted and the walk goes on.
+    const html = MM.markdownToHTML(
+      '\\begin{itemize}\n\\item a\n\\begin{itemize}\n\\item b\n' + fence +
+      '\n\\end{itemize}\n' + fence + '\n\\end{itemize}\n',
+      { outMath: { include_svg: false } });
+    (html.match(/<ul/g) || []).should.have.length(1);
+    (html.match(/<li/g) || []).should.have.length(1);
+    html.should.match(/<code/);
+  });
+  it('a fence mentioning an opener is opaque to the walk', () => {
+    const html = MM.markdownToHTML(
+      '\\begin{itemize}\n\\item a\n' + fence + '\n\\begin{itemize}\n' + fence + '\n\\item b\n\\end{itemize}\n',
+      { outMath: { include_svg: false } });
+    (html.match(/<ul/g) || []).should.have.length(1);
+    (html.match(/<li/g) || []).should.have.length(2);
+    html.should.match(/<code/);
+  });
+
   // Without the closer lookahead, each probe of an unclosed env scans to EOF — O(N^2) over N starts.
   // Normalised against the closed form measured in the same run, so the bound does not depend on
   // machine speed: measured 0.6 with the lookahead, 51 without.

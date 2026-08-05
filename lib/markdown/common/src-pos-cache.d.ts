@@ -11,3 +11,10 @@
  * (strings are immutable, so identity is a sound check).
  */
 export declare const lastMatchPosCached: (state: StateBlock, key: symbol, patternG: RegExp) => number;
+/**
+ * Offsets of every `patternG` match in `state.src`, ascending, cached on the state under `key`.
+ * Same contract as lastMatchPosCached: /g required, invalidated when `state.src` is reassigned.
+ */
+export declare const matchPositionsCached: (state: StateBlock, key: symbol, patternG: RegExp) => readonly number[];
+/** How many of the ascending `positions` are at or after `minOffset` — binary search, no allocation. */
+export declare const countPositionsAtOrAfter: (positions: readonly number[], minOffset: number) => number;
