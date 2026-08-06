@@ -243,10 +243,13 @@ describe('math in a label follows outMath.table_markdown:', () => {
       cellMd('see $x^2$ here', tableMarkdown).should.equal(`| see ${math} here |`);
     });
   });
-  it('display math keeps `$$` by default and takes the configured delimiters otherwise', () => {
-    cellMd('[$$\\sum x$$](http://a.b)').should.equal('| [$$\\sum x$$](http://a.b) |');
+  it('display math takes the cell delimiters, default or configured', () => {
+    // `$…$` by default, per the documented option; `['$$','$$']` is how a caller keeps the block form.
+    cellMd('[$$\\sum x$$](http://a.b)').should.equal('| [$\\sum x$](http://a.b) |');
     cellMd('[$$\\sum x$$](http://a.b)', { math_inline_delimiters: ['\\(', '\\)'] })
       .should.equal('| [\\(\\sum x\\)](http://a.b) |');
+    cellMd('[$$\\sum x$$](http://a.b)', { math_inline_delimiters: ['$$', '$$'] })
+      .should.equal('| [$$\\sum x$$](http://a.b) |');
   });
 });
 
@@ -331,8 +334,8 @@ describe('A link in a tabular cell renders well-formed in every output:', () => 
     // unescaped `]` is safe here.
     label('[$a]b$](http://a.b)').should.equal('[$a]b$](http://a.b)');
     label('[$\\frac{a}{b}$](http://a.b)').should.equal('[$\\frac{a}{b}$](http://a.b)');
-    // Display math keeps `$$`, or the label would downgrade it to inline.
-    label('[$$x^2$$](http://a.b)').should.equal('[$$x^2$$](http://a.b)');
+    // Display math takes the cell delimiters, like the text beside it.
+    label('[$$x^2$$](http://a.b)').should.equal('[$x^2$](http://a.b)');
 
     // The point of the delimiters: an exported math label reads back as a link, brackets and all.
     ['[$\\sqrt[3]{x}$](http://a.b)', '[$a]b$](http://a.b)', '[$\\frac{a}{b}$](http://a.b)'].forEach((src) => {

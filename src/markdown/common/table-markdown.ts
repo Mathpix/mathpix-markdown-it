@@ -47,10 +47,10 @@ export const getMdMath = (token, options?, content?: string): string => {
     return ascii;
   }
   const configured: string[] = tableMarkdown?.math_inline_delimiters;
-  const isDisplay: boolean = token.type !== 'inline_math';
+  // Display math too: `$…$` is the documented default; pass `['$$','$$']` for the block form.
   const [open, close]: string[] = configured?.length > 1
     ? [configured[0], configured[1]]
-    : isDisplay ? ['$$', '$$'] : ['$', '$'];
+    : ['$', '$'];
   return open + (content ?? token.content ?? '') + close;
 };
 
