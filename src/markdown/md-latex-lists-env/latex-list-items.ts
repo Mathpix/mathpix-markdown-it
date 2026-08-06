@@ -14,7 +14,6 @@ import {
   LATEX_ITEM_COMMAND_RE,
   LATEX_ITEM_SPLIT_RE,
   LATEX_BLOCK_ENV_OPEN_RE,
-  RE_BEGIN_FIGURE_OR_TABLE_ENV,
 } from "../common/consts";
 import { ListItemsResult, ParsedListItem, ListInlineContext } from "./latex-list-types";
 
@@ -103,8 +102,8 @@ export const ListItems = (
         continue;
       }
       // No marker here — the chunk follows a closed nested list, or precedes the first `\item`.
-      // Floats only: the rest already render from the inline path.
-      if (RE_BEGIN_FIGURE_OR_TABLE_ENV.test(listItem.content)) {
+      // Same path as the marker case above, so a block env renders alike wherever it sits.
+      if (LATEX_BLOCK_ENV_OPEN_RE.test(listItem.content)) {
         SetTokensBlockParse(state, listItem.content, { disableBlockRules: true });
         state.env.isBlock = false;
         continue;

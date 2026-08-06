@@ -495,6 +495,7 @@ module.exports = [
                                     '- item 2.1' +
                                   '</li>' +
                                 '</ul>' +
+                                '<div class="table_tabular">\n' +
                                 '<table class="tabular">\n' +
                                   '<tbody>\n' +
                                     '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
@@ -507,6 +508,7 @@ module.exports = [
                                     '</tr>\n' +
                                   '</tbody>\n' +
                                 '</table>\n' +
+                                '</div>\n' +
                               '</li>' +
                             '</ul>' +
                           '</td>\n' +
