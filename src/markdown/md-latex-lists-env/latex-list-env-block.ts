@@ -430,9 +430,9 @@ export const ListsInternal = (
     if (opaqueRes.consumedLine) {
       return 'proceed';
     }
-    // Renders to nothing, so it joins without a line break — that break survived as an orphan `<br>`.
+    // Renders to nothing: joins without a break, which survived as an orphan `<br>`. forLatex keeps it.
     if (RENEWCOMMAND_LINE_RE.test(lineText)) {
-      items = ItemsAddToPrev(items, lineText, lineIdx, false);
+      items = ItemsAddToPrev(items, lineText, lineIdx, !!state.md.options?.forLatex);
       return 'proceed';
     }
     // Handle \setcounter lines

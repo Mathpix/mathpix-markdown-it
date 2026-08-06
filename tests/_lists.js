@@ -57,6 +57,17 @@ describe('A no-output command between items leaves no orphan <br>:', () => {
     itemBodies('\\begin{itemize}\n\\item a\n\\renewcommand{\\labelitemi}{ZZZ}\n\\item b\n\\end{itemize}')
       .should.deep.equal(['a', 'b']);
   });
+  it('forLatex keeps the break, the line being source to rebuild', () => {
+    // Read through the plugin: `markdownToHTML` drops `forLatex` before the plugin sees it.
+    const markdownIt = require('markdown-it');
+    const { mathpixMarkdownPlugin } = require('../lib/index.js');
+    const content = (forLatex) => markdownIt({ html: true })
+      .use(mathpixMarkdownPlugin, { outMath: { include_svg: false }, forLatex })
+      .parse('\\begin{itemize}\n\\item a\n\\renewcommand{\\labelitemi}{ZZZ}\n\\item b\n\\end{itemize}', {})
+      .filter((t) => t.type === 'inline').map((t) => t.content);
+    content(true).should.deep.equal(['a\n\\renewcommand{\\labelitemi}{ZZZ}', 'b']);
+    content(false).should.deep.equal(['a\\renewcommand{\\labelitemi}{ZZZ}', 'b']);
+  });
   it('a plain continuation line keeps its break', () => {
     itemBodies('\\begin{itemize}\n\\item a\ntail text\n\\item b\n\\end{itemize}')
       .should.deep.equal(['a<br>\ntail text', 'b']);
