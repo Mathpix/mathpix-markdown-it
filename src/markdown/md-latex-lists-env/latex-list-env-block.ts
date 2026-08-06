@@ -35,6 +35,7 @@ import {
   BEGIN_LIST_ENV_RE,
   END_LIST_ENV_INLINE_RE,
   LATEX_ITEM_COMMAND_INLINE_RE,
+  LATEX_BLOCK_ENV_OPEN_RE,
   reSetCounter
 } from "../common/consts";
 
@@ -67,6 +68,30 @@ const lastListEndPos = (state: StateBlock): number => {
   const offsets: readonly number[] = listCloserOffsets(state);
   return offsets.length ? offsets[offsets.length - 1] : -1;
 };
+
+// Closer per opaque env: the stack top picks its own, so a nested `\end{tabular}` is raw content
+// inside a `table` rather than its closer.
+const END_OPAQUE_ENV_RE: Readonly<Record<OpaqueEnvType, RegExp>> = Object.freeze({
+  lstlisting: END_LST_INLINE_RE,
+  tabular: END_TABULAR_INLINE_RE,
+  table: /\\end\{table\}/,
+  figure: /\\end\{figure\}/,
+  center: /\\end\{center\}/,
+  left: /\\end\{left\}/,
+  right: /\\end\{right\}/,
+});
+
+// A wrapper env opening on this line, or null. `tabular`/`lstlisting` keep their own detection,
+// which is stricter — this one reuses the shared regex's name capture.
+const wrapperBeginAt = (lineText: string): RegExpExecArray | null => {
+  const mb: RegExpExecArray | null = LATEX_BLOCK_ENV_OPEN_RE.exec(lineText);
+  return mb && mb[1] !== 'tabular' && mb[1] !== 'lstlisting' ? mb : null;
+};
+
+// Opening a wrapper as opaque swallows every line until its closer, so require one ahead: without
+// it the rest of the list would be collected as raw text instead of rendering as it does today.
+const hasCloserAhead = (state: StateBlockLike, line: number, name: string): boolean =>
+  state.src.indexOf('\\end{' + name + '}', state.bMarks[line]) >= 0;
 
 // The leftmost inline \begin/\end in `s`, or null once none is left. Both patterns need their
 // literal plus a name, so a match is never empty and the caller's tail always shrinks.
@@ -149,11 +174,16 @@ const handleLstBeginInline = (
   items: any[],
   nextLine: number,
   dStart: number,
-  itemTag: RegExp
+  itemTag: RegExp,
+  state: StateBlockLike
 ): LstEndResult => {
   const top: OpaqueEnvType = stack[stack.length - 1];
-  // If we are inside lstlisting, ignore any begin markers.
-  if (top === "lstlisting") {
+  // Inside lstlisting or a wrapper, every line is raw until that env's own closer.
+  if (top && top !== "tabular") {
+    return { handled: false, stack, items, lineText };
+  }
+  // All three patterns below need the literal, so one scan answers for them.
+  if (lineText.indexOf('\\begin') < 0) {
     return { handled: false, stack, items, lineText };
   }
   // Reset regex lastIndex (important if /g/)
@@ -175,15 +205,18 @@ const handleLstBeginInline = (
     items = ItemsAddToPrev(items, beginAndRest, nextLine);
     return { handled: true, stack, items, lineText };
   }
+  // A wrapper opens only when its closer is ahead, or the rest of the list turns into raw text.
+  const mbWrapRaw: RegExpExecArray | null = wrapperBeginAt(lineText);
+  const mbWrap: RegExpExecArray | null =
+    mbWrapRaw && hasCloserAhead(state, nextLine, mbWrapRaw[1]) ? mbWrapRaw : null;
   // If stack is empty:
-  if (!mbLst && !mbTab) return { handled: false, stack, items, lineText };
-  // Choose earliest begin if both exist
-  const mb: RegExpMatchArray =
-    mbLst && mbTab
-      ? (mbLst.index <= mbTab.index ? mbLst : mbTab)
-      : (mbLst || mbTab)!;
+  if (!mbLst && !mbTab && !mbWrap) return { handled: false, stack, items, lineText };
+  // Choose earliest begin
+  const mb: RegExpMatchArray = [mbLst, mbTab, mbWrap]
+    .filter(Boolean)
+    .reduce((a, b) => (a.index <= b.index ? a : b));
   const openedType: OpaqueEnvType =
-    mb === mbLst ? "lstlisting" : "tabular";
+    mb === mbLst ? "lstlisting" : mb === mbTab ? "tabular" : mb[1] as OpaqueEnvType;
   const beginIndex: number = mb.index;
   const before: string = lineText.slice(0, beginIndex);
   const afterBegin: string = lineText.slice(beginIndex);
@@ -217,9 +250,7 @@ const handleLstEndInline = (
   if (!top) {
     return { handled: false, stack, items, lineText };
   }
-  const endRe: RegExp = top === "lstlisting"
-    ? END_LST_INLINE_RE
-    : END_TABULAR_INLINE_RE;
+  const endRe: RegExp = END_OPAQUE_ENV_RE[top];
   endRe.lastIndex = 0;
   const me: RegExpExecArray = endRe.exec(lineText);
   if (!me) {
@@ -307,7 +338,8 @@ const processOpaqueLine = (
             items,
             nextLine,
             renderStart,
-            LATEX_ITEM_COMMAND_INLINE_RE
+            LATEX_ITEM_COMMAND_INLINE_RE,
+            state
           );
           stack = beginRes.stack;
           items = beginRes.items;
@@ -345,7 +377,8 @@ const processOpaqueLine = (
       items,
       nextLine,
       renderStart,
-      LATEX_ITEM_COMMAND_INLINE_RE
+      LATEX_ITEM_COMMAND_INLINE_RE,
+      state
     );
     stack = beginRes.stack;
     items = beginRes.items;

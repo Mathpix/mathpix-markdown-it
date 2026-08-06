@@ -84,5 +84,5 @@ export type ParseListEnvResult = {
     /** Optional diagnostics for debugging/telemetry. */
     error?: string;
 };
-export type OpaqueEnvType = "lstlisting" | "tabular";
+export type OpaqueEnvType = "lstlisting" | "tabular" | "table" | "figure" | "center" | "left" | "right";
 export type OpaqueStack = OpaqueEnvType[];

@@ -1398,6 +1398,29 @@ module.exports = [
     latex: "\\begin{itemize}\n\\itemindent 2em\n\\item a\n\\end{itemize}",
     html: "<ul class=\"itemize\" style=\"list-style-type: none\">\\itemindent 2em<li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul>"
   },
+  // A wrapper env is opaque: its interior is collected raw, so a list command written inside it —
+  // invalid LaTeX, but common in OCR output — is text, not structure. Each of these kept 2 items.
+  {
+    name: "an \\item inside a caption is caption text, not a marker",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{table}\n\\caption{\\item[x]}\n\\begin{tabular}{|l|}\\hline c \\\\ \\hline\\end{tabular}\n\\end{table}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"table\" number=\"1\">\n<div class=\"caption_table\">Table 1: \\item[x]</div><div class=\"table_tabular\" style=\"text-align: center\">\n<div class=\"inline-tabular\"><table class=\"tabular\">\n<tbody>\n<tr style=\"border-top: none !important; border-bottom: none !important;\">\n<td style=\"text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; \">c</td>\n</tr>\n</tbody>\n</table>\n</div></div>\n</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    name: "an \\end{itemize} inside a caption does not close the list",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{table}\n\\caption{x \\end{itemize} y}\n\\begin{tabular}{|l|}\\hline c \\\\ \\hline\\end{tabular}\n\\end{table}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"table\" number=\"1\">\n<div class=\"caption_table\">Table 1: x \\end{itemize} y</div><div class=\"table_tabular\" style=\"text-align: center\">\n<div class=\"inline-tabular\"><table class=\"tabular\">\n<tbody>\n<tr style=\"border-top: none !important; border-bottom: none !important;\">\n<td style=\"text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; \">c</td>\n</tr>\n</tbody>\n</table>\n</div></div>\n</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    name: "an \\item inside a center env is not a marker",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{center}\n\\item[x] y\n\\end{center}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\">\\item[x] y</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    // The guard: opening it opaque would swallow the rest of the list, so it stays as it was.
+    name: "a wrapper with no closer leaves the list alone",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{table}\n\\caption{C}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div>\\begin{table}<br>\n</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
   // A closer mid-line can be followed by a sibling list, not only by a nested one.
   {
     name: "sibling list after a collapsed closer",

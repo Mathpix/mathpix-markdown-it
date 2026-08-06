@@ -117,6 +117,8 @@ export type ParseListEnvResult = {
   error?: string;
 };
 
-export type OpaqueEnvType = "lstlisting" | "tabular";
+// Wrapper envs are opaque like `lstlisting`: an `\item` inside their caption is not list structure.
+export type OpaqueEnvType = "lstlisting" | "tabular"
+  | "table" | "figure" | "center" | "left" | "right";
 export type OpaqueStack = OpaqueEnvType[];
 
