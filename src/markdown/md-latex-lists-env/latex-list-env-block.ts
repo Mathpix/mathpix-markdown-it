@@ -16,7 +16,7 @@ import {
 import { parseSetCounterNumber } from "./latex-list-common";
 import { snapshotListLevels, restoreListLevels } from "./list-state";
 import { getCaptionCounters, setCaptionCounters } from "../common/caption-counters";
-import { matchPositionsCached, countPositionsAtOrAfter } from "../common/src-pos-cache";
+import { matchPositionsCached, countPositionsAtOrAfter, firstPositionAtOrAfter } from "../common/src-pos-cache";
 import {
   LIST_TRANSIENT_ENV_KEYS,
   EnvSnapshot,
@@ -41,8 +41,13 @@ import {
 // Matches what the `renewcommand` rule looks for, anchored: the whole line is that command.
 const RENEWCOMMAND_LINE_RE: RegExp = /^\s*\\renewcommand\b/;
 
-// Built from the unanchored closer regex, so the sweep cannot drift from what the parser accepts.
+// Built from the unanchored env regexes, so a sweep cannot drift from what the parser accepts.
 const END_LIST_ENV_SWEEP_G: RegExp = new RegExp(END_LIST_ENV_INLINE_RE.source, 'g');
+const BEGIN_LIST_ENV_SWEEP_G: RegExp = new RegExp(BEGIN_LIST_ENV_INLINE_RE.source, 'g');
+
+// How many envs a line's tail leaves open: positive means it needs that many closers from ahead.
+const unclosedEnvsIn = (s: string): number =>
+  (s.match(BEGIN_LIST_ENV_SWEEP_G) || []).length - (s.match(END_LIST_ENV_SWEEP_G) || []).length;
 
 // Offsets of every closer: the last one answers the early bail, the whole list feeds the depth check
 // inside the body walk. Cached on the state the rule receives — the buffered state reads it through
@@ -51,9 +56,29 @@ const LIST_END_OFFSETS_KEY = Symbol('mmd.listEndOffsets');
 const listCloserOffsets = (state: StateBlock): readonly number[] =>
   matchPositionsCached(state, LIST_END_OFFSETS_KEY, END_LIST_ENV_SWEEP_G);
 
+// Fence openers, line-anchored like detectFenceOpen. Over-detecting is the safe direction: it only
+// makes the sibling check below decline, never trust a closer that is really code.
+const FENCE_OPEN_SWEEP_G: RegExp = /^ {0,3}(?:`{3,}|~{3,})/gm;
+const FENCE_OPEN_OFFSETS_KEY = Symbol('mmd.fenceOpenOffsets');
+const fenceOpenOffsets = (state: StateBlock): readonly number[] =>
+  matchPositionsCached(state, FENCE_OPEN_OFFSETS_KEY, FENCE_OPEN_SWEEP_G);
+
 const lastListEndPos = (state: StateBlock): number => {
   const offsets: readonly number[] = listCloserOffsets(state);
   return offsets.length ? offsets[offsets.length - 1] : -1;
+};
+
+// The leftmost inline \begin/\end in `s`, or null once none is left. Both patterns need their
+// literal plus a name, so a match is never empty and the caller's tail always shrinks.
+const nextListEnvMatch = (s: string): { match: RegExpMatchArray; isEnd: boolean } | null => {
+  const endMatch: RegExpMatchArray | null = s.match(END_LIST_ENV_INLINE_RE);
+  const beginMatch: RegExpMatchArray | null = s.match(BEGIN_LIST_ENV_INLINE_RE);
+  if (!endMatch && !beginMatch) {
+    return null;
+  }
+  // Source order: an `\end` ahead of a `\begin` closes before the next level opens.
+  const isEnd: boolean = !!endMatch && (!beginMatch || endMatch.index! < beginMatch.index!);
+  return { match: isEnd ? endMatch! : beginMatch!, isEnd };
 };
 
 // A fenced code block (``` or ~~~) inside a list env is opaque like lstlisting: its lines are collected raw so
@@ -430,22 +455,27 @@ export const ListsInternal = (
         return 'proceed';
       }
     }
-    // Handle inline \end{itemize}/\end{enumerate}
-    if (END_LIST_ENV_INLINE_RE.test(lineText)) {
-      const endMatch: RegExpMatchArray = lineText.match(END_LIST_ENV_INLINE_RE);
-      if (endMatch) {
-        const raw: string = endMatch[1].trim();
-        if (!isListType(raw)) {
-          return 'abort';
-        }
-        let { sB, sE, isBacktickEscapedPair } = splitInlineListEnv(lineText, endMatch);
-        if (isBacktickEscapedPair) {
-          items = ItemsListPush(items, lineText, lineIdx, lineIdx);
-          return 'proceed';
-        }
-        if (sB.length > 0) {
-          items = ItemsAddToPrev(items, sB, lineIdx);
-        }
+    // Every inline \begin/\end on the line, left to right. Handling only the first left the tail
+    // of a collapsed `\end{itemize}\end{itemize}` to ItemsAddToPrev, which drops a pure closer —
+    // so the outer list never closed and the strict `!haveClose` bail killed the whole rule.
+    let tail: string = lineText;
+    let env: { match: RegExpMatchArray; isEnd: boolean } | null = nextListEnvMatch(tail);
+    const sawListEnv: boolean = !!env;
+    while (env) {
+      const { match: envMatch, isEnd } = env;
+      const raw: string = envMatch[1].trim();
+      if (!isListType(raw)) {
+        return 'abort';
+      }
+      let { sB, sE, isBacktickEscapedPair } = splitInlineListEnv(tail, envMatch);
+      if (isBacktickEscapedPair) {
+        items = ItemsListPush(items, tail, lineIdx, lineIdx);
+        return 'proceed';
+      }
+      if (sB.length > 0) {
+        items = ItemsAddToPrev(items, sB, lineIdx);
+      }
+      if (isEnd) {
         // An inline `\end` in the item body may already have popped this list inside
         // finalizeListItems — pop by identity so we never pop a list this `\end` didn't close.
         const closingList: Token | undefined = openTokens[openTokens.length - 1];
@@ -463,34 +493,44 @@ export const ListsInternal = (
         if (closingList && openTokens[openTokens.length - 1] === closingList) {
           openTokens.pop();
         }
-        if (sE.length > 0) {
-          items = ItemsAddToPrev(items, sE, lineIdx);
-        }
         iOpen--;
         if (iOpen <= 0) {
-          haveClose = true;
-          return 'break';
+          // The tail may open a sibling list. Its closer must sit in the tail, or on a later line
+          // ahead of any fence — an unclosed sibling aborts the rule and drops this finished list.
+          const tailEnv: { match: RegExpMatchArray; isEnd: boolean } | null = nextListEnvMatch(sE);
+          let siblingClosable: boolean = false;
+          if (tailEnv && !tailEnv.isEnd) {
+            // Count, do not just look: a tail opening two levels needs two closers. Offsets only
+            // past this point — a plain closer with nothing behind it is the common case, and the
+            // fence sweep has no earlier warm-up, so it would run per rule entry.
+            const needed: number = unclosedEnvsIn(sE);
+            if (needed <= 0) {
+              siblingClosable = true;
+            } else {
+              const lineEnd: number = state.eMarks[lineIdx];
+              const closers: readonly number[] = listCloserOffsets(state);
+              // Only closers before the next fence opener count: one written inside code is text.
+              const nextFence: number = firstPositionAtOrAfter(fenceOpenOffsets(state), lineEnd);
+              const ahead: number = countPositionsAtOrAfter(closers, lineEnd) -
+                (nextFence < 0 ? 0 : countPositionsAtOrAfter(closers, nextFence));
+              siblingClosable = ahead >= needed;
+            }
+          }
+          if (siblingClosable) {
+            // The outermost list closed, so the sibling opens outside any list: applyListCloseState
+            // leaves `parentType` set, which would make it read as nested and lose 2.5em of indent.
+            state.parentType = oldParentType;
+          }
+          if (!siblingClosable) {
+            if (sE.length > 0) {
+              items = ItemsAddToPrev(items, sE, lineIdx);
+            }
+            haveClose = true;
+            return 'break';
+          }
         }
-      }
-      return 'proceed';
-    }
-    // Handle inline \begin{itemize}/\begin{enumerate}
-    if (BEGIN_LIST_ENV_INLINE_RE.test(lineText)) {
-      const beginMatch = lineText.match(BEGIN_LIST_ENV_INLINE_RE);
-      if (beginMatch) {
-        const raw = beginMatch[1].trim();
-        if (!isListType(raw)) {
-          return 'abort';
-        }
+      } else {
         const beginType: ListType = raw;
-        let { sB, sE, isBacktickEscapedPair } = splitInlineListEnv(lineText, beginMatch);
-        if (isBacktickEscapedPair) {
-          items = ItemsListPush(items, lineText, lineIdx, lineIdx);
-          return 'proceed';
-        }
-        if (sB.length > 0) {
-          items = ItemsAddToPrev(items, sB, lineIdx);
-        }
         ({ iOpen, items, li } = finalizeListItems(
           state,
           items,
@@ -504,9 +544,6 @@ export const ListsInternal = (
         const nestedOpen: Token = setTokenOpenList(state, -1, -1, beginType, itemizeLevelTokens, enumerateLevelTypes, itemizeLevelContents);
         openTokens.push(nestedOpen);
         allListTokens.push(nestedOpen);
-        if (sE.length > 0) {
-          items = ItemsAddToPrev(items, sE, lineIdx);
-        }
         iOpen++;
         // Every open env needs a closer of its own, and only closers ahead can serve. The sweep
         // over-counts (a `\end` inside a fence is not real), so a `<` here means closure is
@@ -515,13 +552,21 @@ export const ListsInternal = (
           return 'abort';
         }
       }
-    } else {
-      // Regular line inside list: either a new \item or continuation
-      if (LATEX_ITEM_COMMAND_INLINE_RE.test(lineText)) {
-        items = ItemsListPush(items, lineText, lineIdx + renderStart, lineIdx + renderStart);
-      } else {
-        items = ItemsAddToPrev(items, lineText, lineIdx);
+      tail = sE;
+      env = nextListEnvMatch(tail);
+    }
+    if (sawListEnv) {
+      // What is left after the last env: item text, as the single-pass tail was.
+      if (tail.length > 0) {
+        items = ItemsAddToPrev(items, tail, lineIdx);
       }
+      return 'proceed';
+    }
+    // Regular line inside list: either a new \item or continuation
+    if (LATEX_ITEM_COMMAND_INLINE_RE.test(lineText)) {
+      items = ItemsListPush(items, lineText, lineIdx + renderStart, lineIdx + renderStart);
+    } else {
+      items = ItemsAddToPrev(items, lineText, lineIdx);
     }
     return 'proceed';
   };

@@ -1079,5 +1079,38 @@ module.exports = [
       '</table>\n' +
       '</div>' +
       '</div>\n'
+  },
+  {
+    // Collapsed closers in a cell: the outer list used to leak as literal text.
+    mmd: '\\begin{tabular}{|l|}\n' +
+      '  \\begin{itemize}\\item[1.] a\n' +
+      '  \\begin{itemize}\n' +
+      '  \\item[x]d\\end{itemize}\\end{itemize}\n' +
+      '  \\end{tabular}',
+    html:
+      '<div class="table_tabular" style="text-align: center">\n' +
+        '<div class="inline-tabular">' +
+          '<table class="tabular">\n' +
+            '<tbody>\n' +
+              '<tr style="border-top: none !important; border-bottom: none !important;">\n' +
+                '<td style="text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; ">\n' +
+                  '<ul class="itemize" style="list-style-type: none">' +
+                    '<li class="li_itemize" data-custom-marker="true">' +
+                      '<span class="li_level" data-custom-marker="true">1.</span>' +
+                      'a' +
+                      '<ul class="itemize" style="list-style-type: none">' +
+                        '<li class="li_itemize" data-custom-marker="true">' +
+                          '<span class="li_level" data-custom-marker="true">x</span>' +
+                          'd' +
+                        '</li>' +
+                      '</ul>' +
+                    '</li>' +
+                  '</ul>' +
+                '</td>\n' +
+              '</tr>\n' +
+            '</tbody>\n' +
+          '</table>\n' +
+        '</div>' +
+      '</div>\n'
   }
 ]

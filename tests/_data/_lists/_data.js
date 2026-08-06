@@ -1261,7 +1261,7 @@ module.exports = [
   {
     name: "B2: nested same-line",
     latex: "\\begin{itemize}\n\\item[1.] a \\begin{itemize} \\item[XXXXXXXXXXXX] d \\end{itemize}\n\\end{itemize}",
-    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">1.</span>a<ul data-padding-inline-start=\"8.93em\" class=\"itemize\" style=\"padding-inline-start: 8.93em; list-style-type: none\"> <li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">XXXXXXXXXXXX</span>d</li></ul></li></ul>"
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">1.</span>a<ul data-padding-inline-start=\"8.93em\" class=\"itemize\" style=\"padding-inline-start: 8.93em; list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">XXXXXXXXXXXX</span>d</li></ul></li></ul>"
   },
   {
     name: "B2: nested own-line",
@@ -1356,5 +1356,70 @@ module.exports = [
     name: "B2: sibling sublists narrow then wide",
     latex: "\\begin{itemize}\n\\item[a] x\n\\begin{itemize}\n\\item[n] z\n\\end{itemize}\n\\item[b] y\n\\begin{itemize}\n\\item[XXXXXXXXXXXX] w\n\\end{itemize}\n\\end{itemize}",
     html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">a</span>x<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">n</span>z</li></ul></li><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">b</span>y<ul data-padding-inline-start=\"8.93em\" class=\"itemize\" style=\"padding-inline-start: 8.93em; list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">XXXXXXXXXXXX</span>w</li></ul></li></ul>"
+  },
+  // Collapsed closers: one line carries several \end, so a single pass per line left the outer
+  // list unclosed and the strict bail dropped it as literal text.
+  {
+    name: "collapsed closers: two levels",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{itemize}\n\\item b\\end{itemize}\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">–</span>b</li></ul></li></ul>"
+  },
+  {
+    name: "collapsed closers: three levels",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{itemize}\n\\item b\n\\begin{itemize}\n\\item c\\end{itemize}\\end{itemize}\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">–</span>b<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">∗</span>c</li></ul></li></ul></li></ul>"
+  },
+  {
+    name: "collapsed closers: enumerate",
+    latex: "\\begin{enumerate}\n\\item a\n\\begin{enumerate}\n\\item b\\end{enumerate}\\end{enumerate}",
+    html: "<ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li class=\"li_enumerate\">a<ol class=\"enumerate lower-alpha\" style=\"list-style-type: lower-alpha\"><li class=\"li_enumerate\">b</li></ol></li></ol>"
+  },
+  {
+    // Source order, not `\end` first: the second sublist was lost when the closer won the line.
+    name: "two sublists on one line",
+    latex: "\\begin{itemize}\n\\item a\\begin{itemize}\\item b\\end{itemize}\\begin{itemize}\\item c\\end{itemize}\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">–</span>b</li></ul><ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">–</span>c</li></ul></li></ul>"
+  },
+  // A closer mid-line can be followed by a sibling list, not only by a nested one.
+  {
+    name: "sibling list after a collapsed closer",
+    latex: "\\begin{itemize}\n\\item a\\end{itemize}\\begin{enumerate}\n\\item b\n\\end{enumerate}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul><ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li class=\"li_enumerate\">b</li></ol>"
+  },
+  {
+    name: "sibling list closed on the same line",
+    latex: "\\begin{itemize}\n\\item a\\end{itemize}\\begin{enumerate}\\item b\\end{enumerate}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul><ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li class=\"li_enumerate\">b</li></ol>"
+  },
+  {
+    // A sibling is not nested, so it reserves the full marker width — the same `11.43em` the
+    // standalone list with this marker gets. Reading as nested cost it one default indent.
+    name: "sibling list reserves a wide marker in full",
+    latex: "\\begin{itemize}\n\\item a\\end{itemize}\\begin{itemize}\n\\item[XXXXXXXXXXXX] b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul><ul data-padding-inline-start=\"11.43em\" class=\"itemize\" style=\"padding-inline-start: 11.43em; list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">XXXXXXXXXXXX</span>b</li></ul>"
+  },
+  {
+    // One closer against two openings in the tail: counted, so the sibling does not open.
+    name: "sibling needing two closers does not open",
+    latex: "\\begin{itemize}\n\\item a\\end{itemize}\\begin{enumerate}\\begin{enumerate}\\item b\\end{enumerate}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul>"
+  },
+  {
+    // Guard declines: opening a sibling that cannot close aborts the rule and drops the first list.
+    name: "unclosed sibling keeps the first list",
+    latex: "\\begin{itemize}\n\\item a\\end{itemize}\\begin{enumerate}\n\\item b",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul><div>\\item b</div>\n"
+  },
+  {
+    // The closer sweep is fence-blind, so the sibling check also asks which comes first.
+    name: "sibling closer inside a fence stays code",
+    latex: "\\begin{itemize}\n\\item a\\end{itemize}\\begin{enumerate}\n\\item b\n\n```\n\\end{enumerate}\n```",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul><div>\\item b</div>\n<pre><code class=\"hljs\">\\end{enumerate}\n</code></pre>\n"
+  },
+  {
+    // Text between the two envs is a paragraph in LaTeX and lands between the lists here.
+    name: "text between a closer and a sibling opener",
+    latex: "\\begin{itemize}\n\\item a\\end{itemize} middle \\begin{enumerate}\n\\item b\n\\end{enumerate}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul>middle<ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li class=\"li_enumerate\">b</li></ol>"
   },
 ];
