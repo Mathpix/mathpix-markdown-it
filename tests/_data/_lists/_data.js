@@ -1380,6 +1380,13 @@ module.exports = [
     latex: "\\begin{itemize}\n\\item a\\begin{itemize}\\item b\\end{itemize}\\begin{itemize}\\item c\\end{itemize}\n\\end{itemize}",
     html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">–</span>b</li></ul><ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">–</span>c</li></ul></li></ul>"
   },
+  {
+    // A float after a closed nested list has no `\item` in its chunk, so it used to be inline-parsed:
+    // the env leaked as text and the caption was dropped.
+    name: "a table float after a nested list keeps its wrapper and caption",
+    latex: "\\begin{itemize}\n\\item[-] text 1\n\\begin{itemize}\n\\item[-] text 2\n\\end{itemize}\n\\begin{table}\n\\captionsetup{labelformat=empty}\n\\caption{Cap}\n\\begin{tabular}{|l|}\n\\hline\ncell \\\\\n\\hline\n\\end{tabular}\n\\end{table}\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">-</span>text 1<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">-</span>text 2</li></ul><div class=\"table\" number=\"1\">\n<div class=\"caption_table\">Cap</div><div class=\"table_tabular\" style=\"text-align: center\">\n<div class=\"inline-tabular\"><table class=\"tabular\">\n<tbody>\n<tr style=\"border-top: none !important; border-bottom: none !important;\">\n<td style=\"text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; \">cell</td>\n</tr>\n</tbody>\n</table>\n</div></div>\n</div>\n</li></ul>"
+  },
   // No item to attach to, so it stays a direct child of `<ul>` — a Non-Goal, pinned so it cannot shift.
   {
     name: "\\itemsep before the first item stays a direct child of the list",

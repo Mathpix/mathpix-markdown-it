@@ -14,6 +14,7 @@ import {
   LATEX_ITEM_COMMAND_RE,
   LATEX_ITEM_SPLIT_RE,
   LATEX_BLOCK_ENV_OPEN_RE,
+  RE_BEGIN_FIGURE_OR_TABLE_ENV,
 } from "../common/consts";
 import { ListItemsResult, ParsedListItem, ListInlineContext } from "./latex-list-types";
 
@@ -98,6 +99,13 @@ export const ListItems = (
         SetTokensBlockParse(state, blockContent, {disableBlockRules: true});
         // Clears isBlock after the *last* block item; for earlier ones the next iteration sets it
         // back. The Lists rule's finally is the actual guarantee — do not drop it for this line.
+        state.env.isBlock = false;
+        continue;
+      }
+      // No marker here — the chunk follows a closed nested list, or precedes the first `\item`.
+      // Floats only: the rest already render from the inline path.
+      if (RE_BEGIN_FIGURE_OR_TABLE_ENV.test(listItem.content)) {
+        SetTokensBlockParse(state, listItem.content, { disableBlockRules: true });
         state.env.isBlock = false;
         continue;
       }
