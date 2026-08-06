@@ -166,6 +166,7 @@ describe('silent-mode Lists does not mutate shared env', () => {
   // replaying that would clear a key a later block set. The tabular trio is exempt because a nested
   // `tabular` needs the cleared value to arrive — dropping it fails 12 fixtures in
   // `_data/_tsv_with_array/`, which is a long way from this line. Pin the membership here instead.
+  // No rule in `src/` writes `undefined` into env, so only a foreign rule doing so would be missed.
   it('only the tabular trio survives envToInline with value undefined', () => {
     const replayed = (key) => Object.prototype.hasOwnProperty.call(
       snapshotEnvForInline({ [key]: undefined }), key);

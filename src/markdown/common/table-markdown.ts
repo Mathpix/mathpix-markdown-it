@@ -3,7 +3,8 @@ import { mathTokenTypes } from "./consts";
 const MATH_TOKEN_TYPES = new Set<string>(mathTokenTypes);
 // Used with `replace` only, so the /g lastIndex is reset by the call and cannot leak between them.
 const LINE_BREAKS_RE: RegExp = /[\r\n]+/g;
-const HREF_NEEDS_ANGLES_RE: RegExp = /[\s<>]/;
+// `\` included so the escape below reaches it: a bare `a\` leaves `](a\)` open.
+const HREF_NEEDS_ANGLES_RE: RegExp = /[\s<>\\]/;
 const HREF_ANGLE_ESCAPE_RE: RegExp = /([<>\\])/g;
 // Everything that can end or re-cut a label: the closing bracket, an opening one (which
 // re-pairs with it), and a backslash (which would escape whatever we add after it).

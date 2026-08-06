@@ -86,10 +86,10 @@ export const releaseEnvSnapshot = (): void => {
 export const restoreEnvAll = (env: any, snap: EnvSnapshot): void => {
   const { keys, values, length } = snap;
   let vanished = false;
-  let currentCount = 0;
   for (let i = 0; i < length; i++) {
     const key: string = keys[i];
-    if (!(key in env)) {
+    // Own keys only: `in` would read an inherited `toString` as still present.
+    if (!Object.prototype.hasOwnProperty.call(env, key)) {
       vanished = true;
       env[key] = values[i];
     } else if (env[key] !== values[i]) {
@@ -97,8 +97,7 @@ export const restoreEnvAll = (env: any, snap: EnvSnapshot): void => {
     }
   }
   const current: string[] = Object.keys(env);
-  currentCount = current.length;
-  if (!vanished && currentCount === length) {
+  if (!vanished && current.length === length) {
     return;
   }
   const had: Set<string> = new Set();

@@ -4,7 +4,7 @@ let should = chai.should();
 let MM = require('../lib/mathpix-markdown-model/index').MathpixMarkdownModel;
 const markdownIt = require('markdown-it');
 const { mathpixMarkdownPlugin } = require('../lib/index.js');
-const { getMdLink } = require('../lib/markdown/common/table-markdown');
+const { getMdLink, mdHref, getMdMath } = require('../lib/markdown/common/table-markdown');
 const { renderTableCellContent } = require('../lib/markdown/common/render-table-cell-content');
 
 const options = {
@@ -400,5 +400,37 @@ describe('A link in a tabular cell renders well-formed in every output:', () => 
     const tsv = (html.match(/<tsv[^>]*>([\s\S]*?)<\/tsv>/) || [])[1];
     tsv.should.include('http://a.b');
     tsv.should.include('tail');
+  });
+});
+
+// The two exported cell-export helpers, called directly: markdown-it normalizes a destination
+// before it reaches mdHref, so the `<…>` branch is unreachable from a document and would otherwise
+// never run in this suite.
+describe('Cell-export helpers:', () => {
+  it('mdHref picks the bare or the angle form and escapes inside it', () => {
+    // Angle form: whitespace, either angle bracket, a backslash, or unbalanced parens.
+    mdHref('a b').should.equal('<a b>');
+    mdHref('a<b').should.equal('<a\\<b>');
+    mdHref('a>b').should.equal('<a\\>b>');
+    mdHref('a\\').should.equal('<a\\\\>');
+    mdHref('a(b').should.equal('<a(b>');
+    mdHref('a)b').should.equal('<a)b>');
+    // Bare form: balanced parens and an ordinary URL need no wrapping.
+    mdHref('a(b)c').should.equal('a(b)c');
+    mdHref('http://x/y').should.equal('http://x/y');
+    // A line break is invalid in either form, so it goes before the decision.
+    mdHref('a\nb').should.equal('ab');
+    mdHref('').should.equal('');
+  });
+
+  it('getMdMath uses one delimiter pair for inline and display alike', () => {
+    getMdMath({ type: 'inline_math', content: 'x^2' }).should.equal('$x^2$');
+    getMdMath({ type: 'math_block', content: 'x^2' }).should.equal('$x^2$');
+    getMdMath({ type: 'inline_math', content: 'x^2' },
+      { outMath: { table_markdown: { math_inline_delimiters: ['\\(', '\\)'] } } })
+      .should.equal('\\(x^2\\)');
+    // ascii_tsv alone must satisfy math_as_ascii, or a label and the text beside it diverge.
+    getMdMath({ type: 'inline_math', content: 'x^2', ascii_tsv: 'x^(2)' },
+      { outMath: { table_markdown: { math_as_ascii: true } } }).should.equal('x^(2)');
   });
 });

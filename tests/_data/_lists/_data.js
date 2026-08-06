@@ -1380,6 +1380,17 @@ module.exports = [
     latex: "\\begin{itemize}\n\\item a\\begin{itemize}\\item b\\end{itemize}\\begin{itemize}\\item c\\end{itemize}\n\\end{itemize}",
     html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">–</span>b</li></ul><ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">–</span>c</li></ul></li></ul>"
   },
+  // No item to attach to, so it stays a direct child of `<ul>` — a Non-Goal, pinned so it cannot shift.
+  {
+    name: "\\itemsep before the first item stays a direct child of the list",
+    latex: "\\begin{itemize}\n\\itemsep 4pt\n\\item a\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\">\\itemsep 4pt<li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul>"
+  },
+  {
+    name: "\\itemindent before the first item stays a direct child of the list",
+    latex: "\\begin{itemize}\n\\itemindent 2em\n\\item a\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\">\\itemindent 2em<li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul>"
+  },
   // A closer mid-line can be followed by a sibling list, not only by a nested one.
   {
     name: "sibling list after a collapsed closer",
