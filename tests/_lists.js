@@ -112,3 +112,142 @@ describe('What counts as \\item inside a list body:', () => {
     itemBodies('text \\item').should.deep.equal(['a<br>\ntext', '']);
   });
 });
+
+// An unclosed wrapper inside a list must never take the list with it: the wrapper only becomes
+// opaque when a closer it can actually reach exists. An unbounded search matched a same-named env
+// further down the document, swallowed the list's own `\end{itemize}` and printed it all as LaTeX.
+describe('An unclosed wrapper env leaves the list rendering:', () => {
+  const fence = '```';
+  const rendered = (src) => {
+    const html = MM.markdownToHTML(src, { outMath: { include_svg: false } });
+    const outsideCode = html.replace(/<pre[\s\S]*?<\/pre>/g, '');
+    return {
+      items: (html.match(/<li[\s>]/g) || []).length,
+      leaked: /\\begin\{itemize\}|\\item(?![a-zA-Z])/.test(outsideCode),
+    };
+  };
+  const shapes = {
+    'a closed figure further down the document':
+      '\\begin{itemize}\n\\item a\n\\begin{figure}\n\\item b\n\\end{itemize}\n\n'
+      + '\\begin{figure}\n\\caption{other}\n\\end{figure}\n',
+    'a closed center further down the document':
+      '\\begin{itemize}\n\\item a\n\\begin{center}\nb\n\\end{itemize}\n\n'
+      + '\\begin{center}\nother\n\\end{center}\n',
+    'a lone \\end{center} in later text':
+      '\\begin{itemize}\n\\item a\n\\begin{center}\nb\n\\end{itemize}\n\ntext \\end{center} more\n',
+    'a \\end{center} inside a fenced code block':
+      '\\begin{itemize}\n\\item a\n\\begin{center}\nb\n\\end{itemize}\n\n'
+      + fence + '\n\\end{center}\n' + fence + '\n',
+    'no closer anywhere':
+      '\\begin{itemize}\n\\item a\n\\begin{center}\nb\n\\end{itemize}\n',
+    // No blank line before the foreign env, so the whole tail is one block: the guard has to weigh
+    // the closers it passes, not just find one.
+    'a figure straight after the list, no blank line':
+      '\\begin{itemize}\n\\item a\n\\begin{figure}\n\\item b\n\\end{itemize}\n'
+      + '\\begin{figure}\n\\caption{other}\n\\end{figure}\n',
+    'a center straight after the list, no blank line':
+      '\\begin{itemize}\n\\item a\n\\begin{center}\nb\n\\end{itemize}\n'
+      + '\\begin{center}\nother\n\\end{center}\n',
+    'a fenced \\end{center} with no blank line before it':
+      '\\begin{itemize}\n\\item a\n\\begin{center}\nb\n\\end{itemize}\n'
+      + fence + '\n\\end{center}\n' + fence + '\n',
+    'the closer sits on the same line as \\end{itemize}':
+      '\\begin{itemize}\n\\item a\n\\begin{center}\nb\n\\end{itemize} \\end{center}\n',
+  };
+  Object.entries(shapes).forEach(([name, src]) => {
+    it(name, () => {
+      const { items, leaked } = rendered(src);
+      items.should.be.greaterThan(0, 'the list did not render');
+      leaked.should.equal(false, 'the list fell out as literal LaTeX');
+    });
+  });
+  it('a wrapper closed within the list still becomes opaque', () => {
+    const src = '\\begin{itemize}\n\\item a\n\\begin{center}\n\\item[x] y\n\\end{center}\n\\item b\n\\end{itemize}';
+    const html = MM.markdownToHTML(src, { outMath: { include_svg: false } });
+    // Two items, not three: the `\item` inside the wrapper is text, and the wrapper is built.
+    (html.match(/<li[\s>]/g) || []).should.have.length(2);
+    html.should.include('class="center"');
+  });
+});
+
+// Marker macros are parsed once per macro per document and reused. Keyed by the macro itself, so a
+// `\renewcommand` mid-document must still switch markers — and switch back when it is restored.
+describe('Cached marker tokens follow \\renewcommand:', () => {
+  it('each list takes the marker in force where it sits', () => {
+    const src = '\\begin{itemize}\n\\item a\n\\end{itemize}\n\n'
+      + '\\renewcommand{\\labelitemi}{ZZZ}\n\n\\begin{itemize}\n\\item b\n\\end{itemize}\n\n'
+      + '\\renewcommand{\\labelitemi}{\\textbullet}\n\n\\begin{itemize}\n\\item c\n\\end{itemize}\n\n'
+      + '\\begin{itemize}\n\\item d\n\\begin{itemize}\n\\item e\n\\end{itemize}\n\\end{itemize}';
+    const html = MM.markdownToHTML(src, { outMath: { include_svg: false } });
+    [...html.matchAll(/<span class="li_level"[^>]*>([^<]*)<\/span>/g)].map((m) => m[1])
+      .should.deep.equal(['•', 'ZZZ', '•', '•', '–']);
+  });
+  // The shared tokens are rendered, never rewritten — a math marker, which carries the most token
+  // state, must come out the same in every list that uses it and again on the next render.
+  it('a math marker renders alike in every list, and twice', () => {
+    const src = '\\renewcommand{\\labelitemi}{$\\star$}\n\n'
+      + '\\begin{itemize}\n\\item a\n\\end{itemize}\n\n'
+      + '\\begin{itemize}\n\\item b\n\\begin{itemize}\n\\item c\n\\end{itemize}\n\\end{itemize}';
+    const first = MM.markdownToHTML(src, { outMath: { include_svg: false } });
+    MM.markdownToHTML(src, { outMath: { include_svg: false } }).should.equal(first);
+    // Two lists take the math marker; the deeper level keeps its own default.
+    (first.match(/class="math-inline/g) || []).should.have.length(2);
+    first.should.include('<span class="li_level">–</span>');
+  });
+});
+
+// A list inside a wrapper env is parsed from the wrapper's inline content, on a synthetic state that
+// cannot see the enclosing list — so it claims top level. The renderer must not reset its depth for
+// that: the nested list took a level-1 marker and left the counter negative for the item after it.
+describe('Marker depth survives a wrapper env between two list levels:', () => {
+  const markers = (src) => {
+    const html = MM.markdownToHTML(src, { outMath: { include_svg: false } });
+    return [...html.matchAll(/<span class="li_level"[^>]*>([^<]*)<\/span>/g)].map((m) => m[1]);
+  };
+  const inner = '\\begin{itemize}\n\\item inner\n\\end{itemize}';
+  const shape = (wrapper) => '\\begin{itemize}\n\\item a\n'
+    + (wrapper ? '\\begin{' + wrapper + '}\n' + inner + '\n\\end{' + wrapper + '}' : inner)
+    + '\n\\item b\n\\end{itemize}';
+  it('without a wrapper the sequence is outer, level 2, outer', () => {
+    markers(shape(null)).should.deep.equal(['•', '–', '•']);
+  });
+  ['center', 'left', 'right', 'table', 'figure'].forEach((wrapper) => {
+    it(`${wrapper} keeps the same sequence`, () => {
+      markers(shape(wrapper)).should.deep.equal(['•', '–', '•']);
+    });
+  });
+  it('three levels through a wrapper keep the itemize order', () => {
+    markers('\\begin{itemize}\n\\item a\n\\begin{center}\n\\begin{itemize}\n\\item i\n'
+      + '\\begin{itemize}\n\\item ii\n\\end{itemize}\n\\end{itemize}\n\\end{center}\n'
+      + '\\item b\n\\end{itemize}').should.deep.equal(['•', '–', '∗', '•']);
+  });
+  it('the next independent list starts at the top level again', () => {
+    markers(shape('center') + '\n\n\\begin{itemize}\n\\item next\n\\end{itemize}')
+      .should.deep.equal(['•', '–', '•', '•']);
+  });
+});
+
+// Same defect on the enumerate side, where the marker is the list style rather than a glyph: the
+// nested list restarted numbering at level 1 (`decimal | decimal`) through every wrapper env.
+describe('Numbering depth survives a wrapper env between two enumerate levels:', () => {
+  const styles = (src) => {
+    const html = MM.markdownToHTML(src, { outMath: { include_svg: false } });
+    return [...html.matchAll(/list-style-type: ([a-z-]+)/g)].map((m) => m[1]);
+  };
+  const inner = '\\begin{enumerate}\n\\item i\n\\end{enumerate}';
+  const shape = (wrapper) => '\\begin{enumerate}\n\\item a\n'
+    + (wrapper ? '\\begin{' + wrapper + '}\n' + inner + '\n\\end{' + wrapper + '}' : inner)
+    + '\n\\item b\n\\end{enumerate}';
+  it('without a wrapper the nested level is lower-alpha', () => {
+    styles(shape(null)).should.deep.equal(['decimal', 'lower-alpha']);
+  });
+  ['center', 'left', 'right', 'table', 'figure'].forEach((wrapper) => {
+    it(`${wrapper} keeps the same styles`, () => {
+      styles(shape(wrapper)).should.deep.equal(['decimal', 'lower-alpha']);
+    });
+  });
+  it('the next independent list starts at decimal again', () => {
+    styles(shape('center') + '\n\n\\begin{enumerate}\n\\item next\n\\end{enumerate}')
+      .should.deep.equal(['decimal', 'lower-alpha', 'decimal']);
+  });
+});

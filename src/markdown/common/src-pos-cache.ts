@@ -1,6 +1,22 @@
 import type StateBlock from 'markdown-it/lib/rules_block/state_block';
 
-type SrcPosEntry = { src: string; lastPos: number };
+// Hosted on `state.env`, which a buffered probe state inherits by reference: a cache written on the
+// probe itself dies with it, so the sweep reran for every probe and the scan stayed quadratic.
+// Keyed by `src`, so a nested parse cannot evict the outer document's entry.
+const MAX_SOURCES_PER_KEY = 8;
+const bucketOf = <T>(state: StateBlock, key: symbol): Map<string, T> => {
+  const host = ((state as any).env ?? state) as Record<symbol, Map<string, T> | undefined>;
+  return host[key] ?? (host[key] = new Map<string, T>());
+};
+
+// Insertion order is age order, so the oldest source goes and the current one stays cached.
+const remember = <T>(bucket: Map<string, T>, src: string, value: T): T => {
+  if (bucket.size >= MAX_SOURCES_PER_KEY) {
+    bucket.delete(bucket.keys().next().value);
+  }
+  bucket.set(src, value);
+  return value;
+};
 
 /**
  * Offset of the last `patternG` match in `state.src`, or -1, cached on the state under `key`.
@@ -10,19 +26,18 @@ type SrcPosEntry = { src: string; lastPos: number };
  * over a document.
  *
  * `patternG` MUST carry /g and must not be shared with a caller that relies on its `lastIndex`.
- * A nested `state.md.block.parse(...)` builds its own StateBlock, so a cache on the outer state is
- * never read by a nested parse; within one state, reassigning `state.src` invalidates the entry
- * (strings are immutable, so identity is a sound check).
+ * Entries are per `src`: a nested parse reads its own, and reassigning `state.src` picks a different
+ * one (strings are immutable, so identity is a sound key).
  */
 export const lastMatchPosCached = (
   state: StateBlock,
   key: symbol,
   patternG: RegExp,
 ): number => {
-  const slot = state as unknown as Record<symbol, SrcPosEntry | undefined>;
-  const cached = slot[key];
-  if (cached && cached.src === state.src) {
-    return cached.lastPos;
+  const bucket: Map<string, number> = bucketOf<number>(state, key);
+  const cached: number | undefined = bucket.get(state.src);
+  if (cached !== undefined) {
+    return cached;
   }
   patternG.lastIndex = 0;
   let lastPos: number = -1;
@@ -35,23 +50,22 @@ export const lastMatchPosCached = (
     }
   }
   patternG.lastIndex = 0;
-  slot[key] = { src: state.src, lastPos };
-  return lastPos;
+  return remember(bucket, state.src, lastPos);
 };
 
 /**
- * Offsets of every `patternG` match in `state.src`, ascending, cached on the state under `key`.
- * Same contract as lastMatchPosCached: /g required, invalidated when `state.src` is reassigned.
+ * Offsets of every `patternG` match in `state.src`, ascending, cached on `state.env` under `key`.
+ * Same contract as lastMatchPosCached: /g required, one entry per `src`.
  */
 export const matchPositionsCached = (
   state: StateBlock,
   key: symbol,
   patternG: RegExp,
 ): readonly number[] => {
-  const slot = state as unknown as Record<symbol, { src: string; positions: number[] } | undefined>;
-  const cached = slot[key];
-  if (cached && cached.src === state.src) {
-    return cached.positions;
+  const bucket: Map<string, number[]> = bucketOf<number[]>(state, key);
+  const cached: number[] | undefined = bucket.get(state.src);
+  if (cached) {
+    return cached;
   }
   patternG.lastIndex = 0;
   const positions: number[] = [];
@@ -63,8 +77,7 @@ export const matchPositionsCached = (
     }
   }
   patternG.lastIndex = 0;
-  slot[key] = { src: state.src, positions };
-  return positions;
+  return remember(bucket, state.src, positions);
 };
 
 /** How many of the ascending `positions` are at or after `minOffset` — binary search, no allocation. */

@@ -1463,4 +1463,67 @@ module.exports = [
     latex: "\\begin{itemize}\n\\item a\\end{itemize} middle \\begin{enumerate}\n\\item b\n\\end{enumerate}",
     html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul>middle<ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li class=\"li_enumerate\">b</li></ol>"
   },
+  // A wrapper that opens and closes on one line: the opaque stack stayed open for good and the
+  // whole list printed as literal LaTeX. Every wrapper name, since each picks its own closer.
+  {
+    name: "a one-line center in a list body",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{center}x\\end{center}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\">x</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    name: "a one-line left in a list body",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{left}x\\end{left}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: left\">x</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    name: "a one-line figure in a list body",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{figure}\\caption{q}\\end{figure}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"table\" number=\"1\">\n<div></div>\n<div class=\"caption_figure\">Figure 1: q</div></div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    name: "a one-line table in a list body",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{table}\\caption{q}\\end{table}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"table\" number=\"1\">\n<div></div>\n<div class=\"caption_table\">Table 1: q</div></div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    name: "a one-line tabular in a list body",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{tabular}{l}q\\end{tabular}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"table_tabular\">\n<div class=\"inline-tabular\"><table class=\"tabular\">\n<tbody>\n<tr style=\"border-top: none !important; border-bottom: none !important;\">\n<td style=\"text-align: left; border-left: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; \">q</td>\n</tr>\n</tbody>\n</table>\n</div></div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  // The chunk then held a block env and two markers, and only the first was read — `\item b`
+  // printed as text. `pdflatex` renders this input, so the second item is owed.
+  {
+    name: "a marker before a closer on one line, after a one-line wrapper",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{center}x\\end{center}\n\\item b \\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\">x</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  // A closer that ends its line is structure, not text: brace depth decides, not the column, or a
+  // wrapper reaching a later `\end{figure}` swallows the list. Compare the `\caption{}` fixture above.
+  {
+    name: "a closer ending its line, a figure following it",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{figure}\n\\item b \\end{itemize}\n\\begin{figure}\n\\caption{other}\n\\end{figure}\n",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div>\\begin{figure}</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul><div class=\"table\" number=\"1\">\n<div></div>\n<div class=\"caption_figure\">Figure 1: other</div></div>\n"
+  },
+  {
+    name: "a closer ending its line, a lone \\end{center} below",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{center}\nb \\end{itemize}\n\ntext \\end{center} more\n",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div>\\begin{center}<br>\nb</div>\n</li></ul><div>text \\end{center} more</div>\n"
+  },
+  {
+    name: "a closer ending its line, no foreign env",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{center}\nb \\end{itemize}\n",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div>\\begin{center}<br>\nb</div>\n</li></ul>"
+  },
+  // An unmatched `{` leaves the argument spans unknowable, so the wrapper declines rather than
+  // reach a later `\end{figure}` and swallow the list. Braces trusted blindly printed it all as LaTeX.
+  {
+    name: "an unclosed brace in a wrapper caption, a figure below",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{figure}\n\\caption{x\n\\end{itemize}\n\n\\begin{figure}\n\\caption{other}\n\\end{figure}\n",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div>\\begin{figure}<br>\n\\caption{x</div>\n</li></ul><div class=\"table\" number=\"1\">\n<div></div>\n<div class=\"caption_figure\">Figure 1: other</div></div>\n"
+  },
+  {
+    name: "a bare unclosed brace in a wrapper, a figure below",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{figure}\n{ x\n\\end{itemize}\n\n\\begin{figure}\n\\caption{other}\n\\end{figure}\n",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div>\\begin{figure}<br>\n{ x</div>\n</li></ul><div class=\"table\" number=\"1\">\n<div></div>\n<div class=\"caption_figure\">Figure 1: other</div></div>\n"
+  },
 ];

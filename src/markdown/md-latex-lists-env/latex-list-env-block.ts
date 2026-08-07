@@ -17,6 +17,7 @@ import { parseSetCounterNumber } from "./latex-list-common";
 import { snapshotListLevels, restoreListLevels } from "./list-state";
 import { getCaptionCounters, setCaptionCounters } from "../common/caption-counters";
 import { matchPositionsCached, countPositionsAtOrAfter, firstPositionAtOrAfter } from "../common/src-pos-cache";
+import { findEndMarker } from "../common";
 import {
   LIST_TRANSIENT_ENV_KEYS,
   EnvSnapshot,
@@ -81,6 +82,71 @@ const END_OPAQUE_ENV_RE: Readonly<Record<OpaqueEnvType, RegExp>> = Object.freeze
   right: /\\end\{right\}/,
 });
 
+// Closer offsets per wrapper name, cached like the list sweeps: no scan of the source tail per
+// `\begin`, which was O(remainder) on every occurrence.
+const WRAPPER_END_SWEEP_G: Readonly<Record<string, RegExp>> = Object.freeze({
+  table: /\\end\{table\}/g,
+  figure: /\\end\{figure\}/g,
+  center: /\\end\{center\}/g,
+  left: /\\end\{left\}/g,
+  right: /\\end\{right\}/g,
+});
+const WRAPPER_END_OFFSETS_KEYS: Readonly<Record<string, symbol>> = Object.freeze({
+  table: Symbol('mmd.endTable'),
+  figure: Symbol('mmd.endFigure'),
+  center: Symbol('mmd.endCenter'),
+  left: Symbol('mmd.endLeft'),
+  right: Symbol('mmd.endRight'),
+});
+
+const LIST_BEGIN_OFFSETS_KEY = Symbol('mmd.listBeginOffsets');
+const listOpenerOffsets = (state: StateBlock): readonly number[] =>
+  matchPositionsCached(state, LIST_BEGIN_OFFSETS_KEY, BEGIN_LIST_ENV_SWEEP_G);
+
+// Spans of every command argument, or null when a `{` never closes. Pairing is findEndMarker's job.
+const argumentSpans = (text: string): Array<[number, number]> | null => {
+  const spans: Array<[number, number]> = [];
+  for (let i = 0; i < text.length; i++) {
+    if (text[i] === '\\') {
+      i++;
+      continue;
+    }
+    if (text[i] !== '{') {
+      continue;
+    }
+    const found = findEndMarker(text, i) as { res: boolean; endPos?: number };
+    if (!found.res) {
+      return null;
+    }
+    spans.push([i, found.endPos]);
+    i = found.endPos;
+  }
+  return spans;
+};
+
+const positionsBetween = (positions: readonly number[], from: number, to: number): number[] =>
+  positions.slice(
+    positions.length - countPositionsAtOrAfter(positions, from),
+    positions.length - countPositionsAtOrAfter(positions, to)
+  );
+
+// Is a closer in `[from, to)` ours? `\item b \end{itemize}` ends the list, `\caption{x \end{itemize} y}`
+// is text. An unmatched `{` leaves spans unknowable, so then every closer counts — the safe side.
+const closesOurListWithin = (state: StateBlockLike, from: number, to: number): boolean => {
+  const closers: number[] = positionsBetween(listCloserOffsets(state as StateBlock), from, to);
+  if (!closers.length) {
+    return false;
+  }
+  const openers: number[] = positionsBetween(listOpenerOffsets(state as StateBlock), from, to);
+  const spans: Array<[number, number]> | null = argumentSpans(state.src.slice(from, to));
+  if (!spans) {
+    return closers.length > openers.length;
+  }
+  const isStructure = (offset: number): boolean =>
+    !spans.some(([open, close]) => offset - from > open && offset - from < close);
+  return closers.filter(isStructure).length > openers.filter(isStructure).length;
+};
+
 // A wrapper env opening on this line, or null. `tabular`/`lstlisting` keep their own detection,
 // which is stricter — this one reuses the shared regex's name capture.
 const wrapperBeginAt = (lineText: string): RegExpExecArray | null => {
@@ -88,10 +154,27 @@ const wrapperBeginAt = (lineText: string): RegExpExecArray | null => {
   return mb && mb[1] !== 'tabular' && mb[1] !== 'lstlisting' ? mb : null;
 };
 
-// Opening a wrapper as opaque swallows every line until its closer, so require one ahead: without
-// it the rest of the list would be collected as raw text instead of rendering as it does today.
-const hasCloserAhead = (state: StateBlockLike, line: number, name: string): boolean =>
-  state.src.indexOf('\\end{' + name + '}', state.bMarks[line]) >= 0;
+// Opening a wrapper as opaque swallows every line until its closer, so require one it can reach.
+// Reaching past a closer of our own list swallowed it too, and the whole list then printed as
+// literal LaTeX — that closer may be the last thing on its line, so position cannot decide it.
+const hasCloserAhead = (state: StateBlockLike, line: number, name: string): boolean => {
+  const sweep: RegExp | undefined = WRAPPER_END_SWEEP_G[name];
+  const key: symbol | undefined = WRAPPER_END_OFFSETS_KEYS[name];
+  if (!sweep || !key) {
+    return false;
+  }
+  const from: number = state.bMarks[line];
+  const at: number = firstPositionAtOrAfter(matchPositionsCached(state as StateBlock, key, sweep), from);
+  if (at < 0) {
+    return false;
+  }
+  if (closesOurListWithin(state, from, at)) {
+    return false;
+  }
+  // A closer written inside a code fence is text, so it cannot serve either.
+  const fence: number = firstPositionAtOrAfter(fenceOpenOffsets(state as StateBlock), from);
+  return fence < 0 || at < fence;
+};
 
 // The leftmost inline \begin/\end in `s`, or null once none is left. Both patterns need their
 // literal plus a name, so a match is never empty and the caller's tail always shrinks.
@@ -209,12 +292,12 @@ const handleLstBeginInline = (
   const mbWrapRaw: RegExpExecArray | null = wrapperBeginAt(lineText);
   const mbWrap: RegExpExecArray | null =
     mbWrapRaw && hasCloserAhead(state, nextLine, mbWrapRaw[1]) ? mbWrapRaw : null;
-  // If stack is empty:
-  if (!mbLst && !mbTab && !mbWrap) return { handled: false, stack, items, lineText };
-  // Choose earliest begin
-  const mb: RegExpMatchArray = [mbLst, mbTab, mbWrap]
+  // Earliest begin, or none. Seeded, so this stays a `null` the caller handles rather than a throw
+  // the rule would swallow if the guard above and this fold ever drifted apart.
+  const mb: RegExpMatchArray | null = [mbLst, mbTab, mbWrap]
     .filter(Boolean)
-    .reduce((a, b) => (a.index <= b.index ? a : b));
+    .reduce((a, b) => (a && a.index <= b.index ? a : b), null);
+  if (!mb) return { handled: false, stack, items, lineText };
   const openedType: OpaqueEnvType =
     mb === mbLst ? "lstlisting" : mb === mbTab ? "tabular" : mb[1] as OpaqueEnvType;
   const beginIndex: number = mb.index;
@@ -228,8 +311,26 @@ const handleLstBeginInline = (
     }
   }
   stack = [...stack, openedType];
-  items = ItemsAddToPrev(items, afterBegin, nextLine);
-  return { handled: true, stack, items, lineText };
+  // The env can close on this same line: a single-line `\begin{center}x\end{center}` left the stack
+  // open for good, and the list then bailed out as literal text. Same handling as on a later line.
+  const endRe: RegExp = END_OPAQUE_ENV_RE[openedType];
+  endRe.lastIndex = 0;
+  const meSameLine: RegExpExecArray | null = endRe.exec(afterBegin);
+  if (!meSameLine) {
+    items = ItemsAddToPrev(items, afterBegin, nextLine);
+    return { handled: true, stack, items, lineText };
+  }
+  const glue: string = openedType === "lstlisting" ? "\n" : "";
+  items = ItemsAddToPrev(
+    items,
+    afterBegin.slice(0, meSameLine.index) + glue + meSameLine[0],
+    nextLine
+  );
+  stack = stack.slice(0, -1);
+  const afterSameLineEnd: string = afterBegin.slice(meSameLine.index + meSameLine[0].length);
+  return afterSameLineEnd.trim().length
+    ? { handled: false, stack, items, lineText: afterSameLineEnd }
+    : { handled: true, stack, items, lineText: "" };
 }
 
 /**
@@ -506,7 +607,12 @@ export const ListsInternal = (
         return 'proceed';
       }
       if (sB.length > 0) {
-        items = ItemsAddToPrev(items, sB, lineIdx);
+        // A marker here starts its own item, as it does before a wrapper `\begin`: appended to the
+        // item above, `\item b \end{itemize}` reached the block path inside a chunk that already
+        // held a block env, where only the first marker is read and this one printed as text.
+        items = LATEX_ITEM_COMMAND_INLINE_RE.test(sB)
+          ? ItemsListPush(items, sB, lineIdx, lineIdx)
+          : ItemsAddToPrev(items, sB, lineIdx);
       }
       if (isEnd) {
         // An inline `\end` in the item body may already have popped this list inside

@@ -18,6 +18,12 @@ const markerPaddingStyle = (padAttr: string | null | undefined): string =>
 
 var level_itemize = 0;
 var level_enumerate = 0;
+/** Render-time list state, module-level like the marker registries — zeroed per render. */
+export const resetListRenderDepth = (): void => {
+  level_itemize = 0;
+  level_enumerate = 0;
+  resetAllEnumerateCounters();
+};
 type ListState = {
   enumerateCounters: number[]; // index = level-1
 };
@@ -126,8 +132,9 @@ export const render_itemize_list_open: Renderer.RenderRule = (
   slf: Renderer
 ): string => {
   const token: Token = tokens[idx];
-  // Reset nesting level for top-level lists
-  if ((token as any).isTopLevelList) {
+  // Not while a list is still open: one parsed from a wrapper's inline content claims top level on
+  // its synthetic state, and the reset gave it a level-1 marker and a negative counter after close.
+  if (token.isTopLevelList && level_itemize <= 0) {
     level_itemize = 0;
   }
   const prevToken: Token | undefined = tokens[idx - 1];
@@ -194,8 +201,9 @@ export const render_enumerate_list_open: Renderer.RenderRule = (
   slf: Renderer
 ): string => {
   const token: Token = tokens[idx];
-  // Reset nesting level for top-level enumerate lists
-  if ((token as any).isTopLevelList) {
+  // Not while a list is still open, as in the itemize branch: one parsed from a wrapper's inline
+  // content claims top level, and resetting here also wiped the counters of the open outer list.
+  if (token.isTopLevelList && level_enumerate <= 0) {
     level_enumerate = 0;
     resetAllEnumerateCounters();
   }

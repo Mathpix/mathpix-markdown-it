@@ -63,6 +63,30 @@ export interface ItemizeLevelTokenResult {
   contents: string[];
 }
 
+// Every list open re-parsed the same few marker macros, and that was most of the inline work in a
+// list-heavy document. Cached per parse on `env`, keyed by the macro itself; consumers only render.
+// A symbol, like the sweep caches: a string key lands in `Object.keys`, where the env snapshot blanks
+// it on every discarded probe.
+const MARKER_TOKENS_ENV_KEY = Symbol('mmd.markerTokens');
+const parseMarkerTokens = (
+  state: StateBlock | StateInline,
+  level: string,
+  cacheable: boolean
+): Token[] => {
+  const env: any = cacheable ? (state as any).env : null;
+  const bucket: Map<string, Token[]> | null = env
+    ? (env[MARKER_TOKENS_ENV_KEY] ?? (env[MARKER_TOKENS_ENV_KEY] = new Map<string, Token[]>()))
+    : null;
+  const cached: Token[] | undefined = bucket?.get(level);
+  if (cached) {
+    return cached;
+  }
+  const children: Token[] = [];
+  state.md.inline.parse(level, state.md, state.env, children);
+  bucket?.set(level, children);
+  return children;
+};
+
 /**
  * Parse bullet tokens for all itemize levels.
  */
@@ -79,11 +103,8 @@ export const SetItemizeLevelTokens = (
     beginCacheBypass(state);
   }
   try {
-    itemizeLevelTokens = itemizeLevel.map((level) => {
-      const children: Token[] = [];
-      state.md.inline.parse(level, state.md, state.env, children);
-      return children;
-    });
+    // forDocx parses with mutated outMath and no math cache, so it keeps its own uncached tokens.
+    itemizeLevelTokens = itemizeLevel.map((level) => parseMarkerTokens(state, level, !docxMutation));
   } finally {
     state.md.options.outMath = originalOutMath;
     if (docxMutation) endCacheBypass(state);
@@ -111,9 +132,7 @@ export const SetItemizeLevelTokensByIndex = (
     beginCacheBypass(state);
   }
   try {
-    const children: Token[] = [];
-    state.md.inline.parse(itemizeLevel[index], state.md, state.env, children);
-    itemizeLevelTokens[index] = children;
+    itemizeLevelTokens[index] = parseMarkerTokens(state, itemizeLevel[index], !docxMutation);
   } finally {
     state.md.options.outMath = originalOutMath;
     if (docxMutation) endCacheBypass(state);

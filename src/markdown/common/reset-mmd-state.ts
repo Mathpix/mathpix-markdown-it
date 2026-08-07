@@ -6,6 +6,7 @@ import { ClearParseErrorList } from '../md-block-rule/parse-error';
 import { clearLabelsList } from './labels';
 import { clearItemizeLevelTokens } from '../md-latex-lists-env/re-level';
 import { resetListState } from '../md-latex-lists-env/list-state';
+import { resetListRenderDepth } from '../md-latex-lists-env/render-latex-list-env';
 import { resetSizeCounter } from './counters';
 import { MathJax } from '../../mathjax';
 
@@ -20,6 +21,7 @@ export const resetMmdGlobalState = (): void => {
   rest_mmd_footnotes_list();
   clearItemizeLevelTokens();
   resetListState();
+  resetListRenderDepth();
   resetTextCounter();
   resetSizeCounter();
   MathJax.Reset();

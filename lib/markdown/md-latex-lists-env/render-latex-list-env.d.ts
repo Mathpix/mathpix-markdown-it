@@ -1,4 +1,6 @@
 import type Renderer from "markdown-it/lib/renderer";
+/** Render-time list state, module-level like the marker registries — zeroed per render. */
+export declare const resetListRenderDepth: () => void;
 /**
  * Renderer for opening an itemize list (`itemize_list_open`).
  *

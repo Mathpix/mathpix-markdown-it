@@ -40,6 +40,26 @@ describe('src-pos-cache boundary search:', () => {
     state.src = 'a--b';
     matchPositionsCached(state, key, /-/g).should.deep.equal([1, 2]);
   });
+  // Block rules ask through a buffered probe (`Object.create(state)`), whose own properties die with
+  // it. Hosting the cache on the shared `env` is what keeps the sweep from rerunning per probe.
+  it('a sweep run inside a buffered probe is reused afterwards', () => {
+    const key = Symbol('probe');
+    const state = { src: '-a-b', env: {} };
+    const fromProbe = matchPositionsCached(Object.create(state), key, /-/g);
+    fromProbe.should.deep.equal([0, 2]);
+    // Marking the stored array shows the next answers come from it rather than from a fresh sweep.
+    fromProbe.push(99);
+    matchPositionsCached(state, key, /-/g).should.deep.equal([0, 2, 99]);
+    matchPositionsCached(Object.create(state), key, /-/g).should.deep.equal([0, 2, 99]);
+  });
+  it('entries for different sources coexist, so nesting does not evict', () => {
+    const key = Symbol('nest');
+    const outer = { src: 'a-b-c', env: {} };
+    const inner = { src: 'x-y', env: outer.env };
+    matchPositionsCached(outer, key, /-/g).should.deep.equal([1, 3]);
+    matchPositionsCached(inner, key, /-/g).should.deep.equal([1]);
+    matchPositionsCached(outer, key, /-/g).should.deep.equal([1, 3]);
+  });
   it('a pattern that can match empty still terminates', () => {
     const state = { src: 'ab' };
     // `x*` matches the empty string at every offset: without the guard the sweep would not advance.
