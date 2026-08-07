@@ -517,3 +517,20 @@ describe('silent-mode Lists probes', () => {
     listsRule(state, 0, state.lineMax, true).should.equal(false);
   });
 });
+
+// Render depth is module state, so a render that ends with a list still open leaves it high. The
+// reset runs before the partial-render bail: behind it, the next top-level list read as nested.
+describe('render depth is reset even when the render is partial', () => {
+  const list = '\\begin{itemize}\n\\item a\n\\end{itemize}';
+  const marker = (html) => (html.match(/<span class="li_level">([^<]*)<\/span>/) || [])[1];
+  const build = (options) => markdownIt({ html: true }).use(mathpixMarkdownPlugin, options);
+  it('a top-level list keeps its own marker after a drifted render', () => {
+    const drifting = build({ outMath: { include_svg: false } });
+    // The close rule owns the decrement, so a no-op leaves the counter above zero.
+    drifting.renderer.rules.itemize_list_close = () => '</ul>';
+    drifting.render(list, {});
+    drifting.render(list, {});
+    const partial = build({ outMath: { include_svg: false }, renderElement: { startLine: 0 } });
+    marker(partial.render(list, {})).should.equal('•');
+  });
+});

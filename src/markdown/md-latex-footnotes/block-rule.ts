@@ -15,7 +15,8 @@ import * as fence from 'markdown-it/lib/rules_block/fence.js'
 import type StateBlock from 'markdown-it/lib/rules_block/state_block';
 import { lastMatchPosCached } from "../common/src-pos-cache"
 
-// Symbol keys: collision-free on StateBlock; invisible to JSON.stringify/Object.keys (use `Object.getOwnPropertySymbols` to inspect).
+// Symbol keys: collision-free on the shared `env` the cache lives on, and invisible to
+// `Object.keys`, so the env snapshot leaves them alone.
 const FOOTNOTE_POS_KEY = Symbol('mmd.footnoteSrcPositions');
 const FOOTNOTETEXT_POS_KEY = Symbol('mmd.footnotetextSrcPositions');
 // Helper-owned /g sweeps. lastIndex is reset in the helper before each scan; sync-only.

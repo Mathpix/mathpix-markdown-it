@@ -113,7 +113,7 @@ export const getInlineCodeListFromString = (str): Array<InlineCodeItem> => {
  *     content?: string, - Contains content between start and end markers
  *     nextPos?: number - Contains the position of the end marker in the string
  * */
-export const findEndMarker = (str: string, startPos: number = 0, beginMarker: string = "{", endMarker: string = "}", onlyEnd = false, openBracketsBefore = 0) => {
+export const findEndMarker = (str: string, startPos: number = 0, beginMarker: string = "{", endMarker: string = "}", onlyEnd = false, openBracketsBefore = 0, inlineCodePositions?: Set<number>) => {
   let content: string = '';
   let nextPos: number = 0;
   if (!str || !str.trim()) {
@@ -123,13 +123,17 @@ export const findEndMarker = (str: string, startPos: number = 0, beginMarker: st
     return { res: false }
   }
   let openBrackets = openBracketsBefore ? openBracketsBefore : 1;
-  let beforeCharCode: number = 0;
-  const inlineCodeList: Array<InlineCodeItem> = getInlineCodeListFromString(str);
-  const codePositions: Set<number> = buildInlineCodePositionSet(inlineCodeList);
+  // Shielded by an odd run of backslashes: `\}` is text, `\\}` closes. One `\` back lost `\caption{x \\}`.
+  let isShielded: boolean = false;
+  // Passed in by a caller pairing many markers in one string: this scan costs as much as the search.
+  const codePositions: Set<number> = inlineCodePositions
+    ?? buildInlineCodePositionSet(getInlineCodeListFromString(str));
   for (let i = startPos + 1; i < str.length; i++) {
     const chr = str[i];
     nextPos = i;
-    if (chr === beginMarker && beforeCharCode !== 0x5c /* \ */) {
+    const shielded: boolean = isShielded;
+    isShielded = chr === '\\' && !isShielded;
+    if (chr === beginMarker && !shielded) {
       content += chr;
       if (!codePositions.has(i)) {
         openBrackets++;
@@ -137,7 +141,7 @@ export const findEndMarker = (str: string, startPos: number = 0, beginMarker: st
       continue;
     }
     /** Found endMarker and it is not inline code (and it's not shielded '\}' ) */
-    if (chr === endMarker && beforeCharCode !== 0x5c /* \ */) {
+    if (chr === endMarker && !shielded) {
       if (!codePositions.has(i)) {
         openBrackets--;
       }
@@ -149,7 +153,6 @@ export const findEndMarker = (str: string, startPos: number = 0, beginMarker: st
       break;
     }
     content += chr;
-    beforeCharCode = str.charCodeAt(i);
   }
   if (openBrackets > 0) {
     return {

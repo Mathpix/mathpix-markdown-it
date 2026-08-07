@@ -52,6 +52,19 @@ describe('src-pos-cache boundary search:', () => {
     matchPositionsCached(state, key, /-/g).should.deep.equal([0, 2, 99]);
     matchPositionsCached(Object.create(state), key, /-/g).should.deep.equal([0, 2, 99]);
   });
+  // The bucket is capped, and the outer document's entry is the oldest by insertion — evicting by age
+  // alone dropped the one source asked over and over, bringing the per-probe sweep back.
+  it('the outer entry survives more nested sources than the cap', () => {
+    const key = Symbol('outer');
+    const env = {};
+    const outer = { src: 'a-b-c', env };
+    const cached = matchPositionsCached(outer, key, /-/g);
+    cached.push(99);                       // marking the stored array shows a re-sweep as a loss
+    for (let i = 0; i < 12; i++) {
+      matchPositionsCached({ src: `nested${i}-x`, env }, key, /-/g);
+      matchPositionsCached(outer, key, /-/g).should.deep.equal([1, 3, 99]);
+    }
+  });
   it('entries for different sources coexist, so nesting does not evict', () => {
     const key = Symbol('nest');
     const outer = { src: 'a-b-c', env: {} };

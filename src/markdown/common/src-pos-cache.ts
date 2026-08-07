@@ -2,11 +2,22 @@ import type StateBlock from 'markdown-it/lib/rules_block/state_block';
 
 // Hosted on `state.env`, which a buffered probe state inherits by reference: a cache written on the
 // probe itself dies with it, so the sweep reran for every probe and the scan stayed quadratic.
-// Keyed by `src`, so a nested parse cannot evict the outer document's entry.
+// One entry per `src`, oldest evicted — and a hit refreshes its slot, or a run of nested parses
+// would drop the outer document's entry, the one asked over and over.
 const MAX_SOURCES_PER_KEY = 8;
 const bucketOf = <T>(state: StateBlock, key: symbol): Map<string, T> => {
   const host = ((state as any).env ?? state) as Record<symbol, Map<string, T> | undefined>;
   return host[key] ?? (host[key] = new Map<string, T>());
+};
+
+// Re-inserting makes this the newest entry: insertion order is the age order eviction reads.
+const recall = <T>(bucket: Map<string, T>, src: string): T | undefined => {
+  const hit: T | undefined = bucket.get(src);
+  if (hit !== undefined) {
+    bucket.delete(src);
+    bucket.set(src, hit);
+  }
+  return hit;
 };
 
 // Insertion order is age order, so the oldest source goes and the current one stays cached.
@@ -19,7 +30,7 @@ const remember = <T>(bucket: Map<string, T>, src: string, value: T): T => {
 };
 
 /**
- * Offset of the last `patternG` match in `state.src`, or -1, cached on the state under `key`.
+ * Offset of the last `patternG` match in `state.src`, or -1, cached on `state.env` under `key`.
  *
  * Block rules use it to reject in O(1) what would otherwise cost a scan to end of source per
  * probe — terminator scans re-ask the same rule for every line, which makes such a scan quadratic
@@ -35,7 +46,7 @@ export const lastMatchPosCached = (
   patternG: RegExp,
 ): number => {
   const bucket: Map<string, number> = bucketOf<number>(state, key);
-  const cached: number | undefined = bucket.get(state.src);
+  const cached: number | undefined = recall(bucket, state.src);
   if (cached !== undefined) {
     return cached;
   }
@@ -63,7 +74,7 @@ export const matchPositionsCached = (
   patternG: RegExp,
 ): readonly number[] => {
   const bucket: Map<string, number[]> = bucketOf<number[]>(state, key);
-  const cached: number[] | undefined = bucket.get(state.src);
+  const cached: number[] | undefined = recall(bucket, state.src);
   if (cached) {
     return cached;
   }

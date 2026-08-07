@@ -152,9 +152,11 @@ export const LATEX_ITEM_COMMAND_INLINE_RE: RegExp = /(?:\\item\s*\[([^\]]*)\]|\\
 export const LATEX_LIST_BOUNDARY_INLINE_RE: RegExp = /\\begin\s*\{(itemize|enumerate)\}|\\end\s*\{(itemize|enumerate)\}|\\item(?![a-zA-Z])/;
 /** Where a chunk splits into items: a real `\item`, so `\itemsep` is not a split point. */
 export const LATEX_ITEM_SPLIT_RE: RegExp = /\\item(?:\s*\[|(?![a-zA-Z]))/;
-/** Matches \begin{center}, \begin{left}, \begin{right}, \begin{table}, \begin{figure}, \begin{tabular}, \begin{lstlisting} */
+/** Block envs the list scanner knows; the regex below is built from it, so the two cannot drift. */
+export const LATEX_BLOCK_ENV_NAMES: readonly string[] =
+  Object.freeze(['center', 'left', 'right', 'table', 'figure', 'tabular', 'lstlisting']);
 export const LATEX_BLOCK_ENV_OPEN_RE: RegExp =
-  /\\begin{(center|left|right|table|figure|tabular|lstlisting)}/;
+  new RegExp('\\\\begin{(' + LATEX_BLOCK_ENV_NAMES.join('|') + ')}');
 export const BLOCK_LATEX_RE: RegExp = /\\begin\{(tabular|itemize|enumerate|lstlisting)\}/;
 /**
  * Enumerate environment detection: \alph, \roman, \arabic, etc.

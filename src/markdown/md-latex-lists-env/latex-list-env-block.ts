@@ -17,7 +17,7 @@ import { parseSetCounterNumber } from "./latex-list-common";
 import { snapshotListLevels, restoreListLevels } from "./list-state";
 import { getCaptionCounters, setCaptionCounters } from "../common/caption-counters";
 import { matchPositionsCached, countPositionsAtOrAfter, firstPositionAtOrAfter } from "../common/src-pos-cache";
-import { findEndMarker } from "../common";
+import { findEndMarker, getInlineCodeListFromString, buildInlineCodePositionSet } from "../common";
 import {
   LIST_TRANSIENT_ENV_KEYS,
   EnvSnapshot,
@@ -37,6 +37,7 @@ import {
   END_LIST_ENV_INLINE_RE,
   LATEX_ITEM_COMMAND_INLINE_RE,
   LATEX_BLOCK_ENV_OPEN_RE,
+  LATEX_BLOCK_ENV_NAMES,
   reSetCounter
 } from "../common/consts";
 
@@ -70,51 +71,59 @@ const lastListEndPos = (state: StateBlock): number => {
   return offsets.length ? offsets[offsets.length - 1] : -1;
 };
 
-// Closer per opaque env: the stack top picks its own, so a nested `\end{tabular}` is raw content
-// inside a `table` rather than its closer.
-const END_OPAQUE_ENV_RE: Readonly<Record<OpaqueEnvType, RegExp>> = Object.freeze({
-  lstlisting: END_LST_INLINE_RE,
-  tabular: END_TABULAR_INLINE_RE,
-  table: /\\end\{table\}/,
-  figure: /\\end\{figure\}/,
-  center: /\\end\{center\}/,
-  left: /\\end\{left\}/,
-  right: /\\end\{right\}/,
-});
+
+// Wrapper names: the shared table minus the two that bring their own detection. Everything below is
+// derived from it, so a name added there cannot silently miss the guard.
+const WRAPPER_ENV_NAMES: readonly string[] = Object.freeze(
+  LATEX_BLOCK_ENV_NAMES.filter((name) => name !== 'tabular' && name !== 'lstlisting')
+);
 
 // Closer offsets per wrapper name, cached like the list sweeps: no scan of the source tail per
 // `\begin`, which was O(remainder) on every occurrence.
-const WRAPPER_END_SWEEP_G: Readonly<Record<string, RegExp>> = Object.freeze({
-  table: /\\end\{table\}/g,
-  figure: /\\end\{figure\}/g,
-  center: /\\end\{center\}/g,
-  left: /\\end\{left\}/g,
-  right: /\\end\{right\}/g,
-});
-const WRAPPER_END_OFFSETS_KEYS: Readonly<Record<string, symbol>> = Object.freeze({
-  table: Symbol('mmd.endTable'),
-  figure: Symbol('mmd.endFigure'),
-  center: Symbol('mmd.endCenter'),
-  left: Symbol('mmd.endLeft'),
-  right: Symbol('mmd.endRight'),
-});
+const WRAPPER_END_SWEEP_G: Readonly<Record<string, RegExp>> = Object.freeze(
+  WRAPPER_ENV_NAMES.reduce((acc, name) => {
+    acc[name] = new RegExp('\\\\end\\{' + name + '\\}', 'g');
+    return acc;
+  }, {} as Record<string, RegExp>)
+);
+const WRAPPER_END_OFFSETS_KEYS: Readonly<Record<string, symbol>> = Object.freeze(
+  WRAPPER_ENV_NAMES.reduce((acc, name) => {
+    acc[name] = Symbol('mmd.end_' + name);
+    return acc;
+  }, {} as Record<string, symbol>)
+);
+
+// Closer per opaque env: the stack top picks its own, so a nested `\end{tabular}` is raw content
+// inside a `table` rather than its closer. The two with their own patterns are named, the rest derived.
+const END_OPAQUE_ENV_RE: Readonly<Record<OpaqueEnvType, RegExp>> = Object.freeze(
+  WRAPPER_ENV_NAMES.reduce((acc, name) => {
+    acc[name] = new RegExp('\\\\end\\{' + name + '\\}');
+    return acc;
+  }, { lstlisting: END_LST_INLINE_RE, tabular: END_TABULAR_INLINE_RE } as Record<string, RegExp>)
+) as Readonly<Record<OpaqueEnvType, RegExp>>;
 
 const LIST_BEGIN_OFFSETS_KEY = Symbol('mmd.listBeginOffsets');
 const listOpenerOffsets = (state: StateBlock): readonly number[] =>
   matchPositionsCached(state, LIST_BEGIN_OFFSETS_KEY, BEGIN_LIST_ENV_SWEEP_G);
 
-// Spans of every command argument, or null when a `{` never closes. Pairing is findEndMarker's job.
+// How much source the guard below parses for argument spans; past it a closer reads as unmatched.
+const MAX_GUARD_WINDOW = 4096;
+
+// Outermost command-argument spans, or null when a `{` never closes. findEndMarker does the pairing,
+// with the code-span index computed once here — per call it would cost a scan of `text` each time.
 const argumentSpans = (text: string): Array<[number, number]> | null => {
   const spans: Array<[number, number]> = [];
+  const codePositions: Set<number> = buildInlineCodePositionSet(getInlineCodeListFromString(text));
   for (let i = 0; i < text.length; i++) {
     if (text[i] === '\\') {
-      i++;
+      i++;                        // an escaped brace opens nothing
       continue;
     }
     if (text[i] !== '{') {
       continue;
     }
-    const found = findEndMarker(text, i) as { res: boolean; endPos?: number };
+    const found = findEndMarker(text, i, "{", "}", false, 0, codePositions) as
+      { res: boolean; endPos?: number };
     if (!found.res) {
       return null;
     }
@@ -124,34 +133,67 @@ const argumentSpans = (text: string): Array<[number, number]> | null => {
   return spans;
 };
 
-const positionsBetween = (positions: readonly number[], from: number, to: number): number[] =>
-  positions.slice(
-    positions.length - countPositionsAtOrAfter(positions, from),
-    positions.length - countPositionsAtOrAfter(positions, to)
-  );
-
 // Is a closer in `[from, to)` ours? `\item b \end{itemize}` ends the list, `\caption{x \end{itemize} y}`
 // is text. An unmatched `{` leaves spans unknowable, so then every closer counts — the safe side.
+// Order decides, not counts: one closer and one opener balance out on a tally, yet a closer standing
+// first is still ours. Both offset lists and the spans are ascending, so one merge walk answers it,
+// stopping at that closer instead of classifying every transition in the window.
 const closesOurListWithin = (state: StateBlockLike, from: number, to: number): boolean => {
-  const closers: number[] = positionsBetween(listCloserOffsets(state as StateBlock), from, to);
-  if (!closers.length) {
+  const closerOffsets: readonly number[] = listCloserOffsets(state as StateBlock);
+  const closersAhead: number = countPositionsAtOrAfter(closerOffsets, from)
+    - countPositionsAtOrAfter(closerOffsets, to);
+  if (closersAhead <= 0) {
     return false;
   }
-  const openers: number[] = positionsBetween(listOpenerOffsets(state as StateBlock), from, to);
-  const spans: Array<[number, number]> | null = argumentSpans(state.src.slice(from, to));
-  if (!spans) {
-    return closers.length > openers.length;
+  const openerOffsets: readonly number[] = listOpenerOffsets(state as StateBlock);
+  const openersAhead: number = countPositionsAtOrAfter(openerOffsets, from)
+    - countPositionsAtOrAfter(openerOffsets, to);
+  // Bounded, or an unclosed wrapper reaching the document's end costs a full parse per wrapper.
+  const spans: Array<[number, number]> | null =
+    argumentSpans(state.src.slice(from, Math.min(to, from + MAX_GUARD_WINDOW)));
+  let closer: number = closerOffsets.length - countPositionsAtOrAfter(closerOffsets, from);
+  let opener: number = openerOffsets.length - countPositionsAtOrAfter(openerOffsets, from);
+  let span: number = 0;
+  let depth: number = 0;
+  for (let step: number = 0; step < closersAhead + openersAhead; step++) {
+    const nextCloser: number = closer < closerOffsets.length ? closerOffsets[closer] : Infinity;
+    const nextOpener: number = opener < openerOffsets.length ? openerOffsets[opener] : Infinity;
+    const isCloser: boolean = nextCloser <= nextOpener;
+    const at: number = (isCloser ? nextCloser : nextOpener) - from;
+    if (isCloser) {
+      closer++;
+    } else {
+      opener++;
+    }
+    if (spans) {
+      while (span < spans.length && spans[span][1] < at) {
+        span++;
+      }
+      if (span < spans.length && at > spans[span][0] && at < spans[span][1]) {
+        continue;                       // inside a command argument: text, not structure
+      }
+    }
+    depth += isCloser ? -1 : 1;
+    if (depth < 0) {
+      return true;
+    }
   }
-  const isStructure = (offset: number): boolean =>
-    !spans.some(([open, close]) => offset - from > open && offset - from < close);
-  return closers.filter(isStructure).length > openers.filter(isStructure).length;
+  return false;
 };
 
-// A wrapper env opening on this line, or null. `tabular`/`lstlisting` keep their own detection,
-// which is stricter — this one reuses the shared regex's name capture.
+// The first wrapper opening on this line, or null. Asking for the first block env instead let a
+// `\begin{tabular}` ahead of it decide the answer, by where it sits in the shared name list.
+const WRAPPER_BEGIN_SWEEP_G: RegExp = new RegExp(LATEX_BLOCK_ENV_OPEN_RE.source, 'g');
 const wrapperBeginAt = (lineText: string): RegExpExecArray | null => {
-  const mb: RegExpExecArray | null = LATEX_BLOCK_ENV_OPEN_RE.exec(lineText);
-  return mb && mb[1] !== 'tabular' && mb[1] !== 'lstlisting' ? mb : null;
+  WRAPPER_BEGIN_SWEEP_G.lastIndex = 0;
+  let mb: RegExpExecArray | null = WRAPPER_BEGIN_SWEEP_G.exec(lineText);
+  while (mb) {
+    if (WRAPPER_ENV_NAMES.indexOf(mb[1]) >= 0) {
+      return mb;
+    }
+    mb = WRAPPER_BEGIN_SWEEP_G.exec(lineText);
+  }
+  return null;
 };
 
 // Opening a wrapper as opaque swallows every line until its closer, so require one it can reach.
@@ -314,7 +356,6 @@ const handleLstBeginInline = (
   // The env can close on this same line: a single-line `\begin{center}x\end{center}` left the stack
   // open for good, and the list then bailed out as literal text. Same handling as on a later line.
   const endRe: RegExp = END_OPAQUE_ENV_RE[openedType];
-  endRe.lastIndex = 0;
   const meSameLine: RegExpExecArray | null = endRe.exec(afterBegin);
   if (!meSameLine) {
     items = ItemsAddToPrev(items, afterBegin, nextLine);
@@ -352,7 +393,6 @@ const handleLstEndInline = (
     return { handled: false, stack, items, lineText };
   }
   const endRe: RegExp = END_OPAQUE_ENV_RE[top];
-  endRe.lastIndex = 0;
   const me: RegExpExecArray = endRe.exec(lineText);
   if (!me) {
     // still inside opaque env → append raw line with indentation
@@ -607,9 +647,8 @@ export const ListsInternal = (
         return 'proceed';
       }
       if (sB.length > 0) {
-        // A marker here starts its own item, as it does before a wrapper `\begin`: appended to the
-        // item above, `\item b \end{itemize}` reached the block path inside a chunk that already
-        // held a block env, where only the first marker is read and this one printed as text.
+        // Any inline transition, not only one before a wrapper: appended to the item above, a marker
+        // reached the block path in a chunk that already held a block env, where it printed as text.
         items = LATEX_ITEM_COMMAND_INLINE_RE.test(sB)
           ? ItemsListPush(items, sB, lineIdx, lineIdx)
           : ItemsAddToPrev(items, sB, lineIdx);

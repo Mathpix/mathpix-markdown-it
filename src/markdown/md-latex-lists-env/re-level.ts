@@ -68,18 +68,32 @@ export interface ItemizeLevelTokenResult {
 // A symbol, like the sweep caches: a string key lands in `Object.keys`, where the env snapshot blanks
 // it on every discarded probe.
 const MARKER_TOKENS_ENV_KEY = Symbol('mmd.markerTokens');
+
+// `env` belongs to the consumer and may reach two md instances or two option sets, whose tokens are
+// not interchangeable — so the bucket is dropped when either changes.
+const markerBucket = (state: StateBlock | StateInline): Map<string, Token[]> => {
+  const env: any = state.env;
+  const cache = env[MARKER_TOKENS_ENV_KEY];
+  if (cache && cache.md === state.md && cache.outMath === state.md.options.outMath) {
+    return cache.byMacro;
+  }
+  const byMacro = new Map<string, Token[]>();
+  env[MARKER_TOKENS_ENV_KEY] = { md: state.md, outMath: state.md.options.outMath, byMacro };
+  return byMacro;
+};
+
 const parseMarkerTokens = (
   state: StateBlock | StateInline,
   level: string,
   cacheable: boolean
 ): Token[] => {
-  const env: any = cacheable ? (state as any).env : null;
-  const bucket: Map<string, Token[]> | null = env
-    ? (env[MARKER_TOKENS_ENV_KEY] ?? (env[MARKER_TOKENS_ENV_KEY] = new Map<string, Token[]>()))
-    : null;
+  const bucket: Map<string, Token[]> | null =
+    cacheable && state.env ? markerBucket(state) : null;
   const cached: Token[] | undefined = bucket?.get(level);
   if (cached) {
-    return cached;
+    // Copy: the array cannot be reordered from outside. Tokens stay shared — freezing them would
+    // throw inside a strict-mode renderer that writes to one.
+    return cached.slice();
   }
   const children: Token[] = [];
   state.md.inline.parse(level, state.md, state.env, children);

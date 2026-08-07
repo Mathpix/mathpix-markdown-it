@@ -21,7 +21,7 @@ export const resetMmdGlobalState = (): void => {
   rest_mmd_footnotes_list();
   clearItemizeLevelTokens();
   resetListState();
-  resetListRenderDepth();
+  resetListRenderDepth();   // also called from the plugin hook, which a partial render reaches
   resetTextCounter();
   resetSizeCounter();
   MathJax.Reset();

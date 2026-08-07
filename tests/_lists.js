@@ -2,6 +2,8 @@ let chai = require('chai');
 let should = chai.should();
 
 let MM = require('../lib/mathpix-markdown-model/index').MathpixMarkdownModel;
+const markdownIt = require('markdown-it');
+const { mathpixMarkdownPlugin } = require('../lib/index.js');
 
 const options = {
   cwidth: 800,
@@ -59,8 +61,6 @@ describe('A no-output command between items leaves no orphan <br>:', () => {
   });
   it('forLatex keeps the break, the line being source to rebuild', () => {
     // Read through the plugin: `markdownToHTML` drops `forLatex` before the plugin sees it.
-    const markdownIt = require('markdown-it');
-    const { mathpixMarkdownPlugin } = require('../lib/index.js');
     const content = (forLatex) => markdownIt({ html: true })
       .use(mathpixMarkdownPlugin, { outMath: { include_svg: false }, forLatex })
       .parse('\\begin{itemize}\n\\item a\n\\renewcommand{\\labelitemi}{ZZZ}\n\\item b\n\\end{itemize}', {})
@@ -126,40 +126,64 @@ describe('An unclosed wrapper env leaves the list rendering:', () => {
       leaked: /\\begin\{itemize\}|\\item(?![a-zA-Z])/.test(outsideCode),
     };
   };
+  // Each shape carries the item count `master` renders: a `> 0` assertion passed while an item was
+  // being lost inside the wrapper's raw content.
   const shapes = {
-    'a closed figure further down the document':
+    'a closed figure further down the document': [
       '\\begin{itemize}\n\\item a\n\\begin{figure}\n\\item b\n\\end{itemize}\n\n'
-      + '\\begin{figure}\n\\caption{other}\n\\end{figure}\n',
-    'a closed center further down the document':
+      + '\\begin{figure}\n\\caption{other}\n\\end{figure}\n', 2],
+    'a closed center further down the document': [
       '\\begin{itemize}\n\\item a\n\\begin{center}\nb\n\\end{itemize}\n\n'
-      + '\\begin{center}\nother\n\\end{center}\n',
-    'a lone \\end{center} in later text':
-      '\\begin{itemize}\n\\item a\n\\begin{center}\nb\n\\end{itemize}\n\ntext \\end{center} more\n',
-    'a \\end{center} inside a fenced code block':
+      + '\\begin{center}\nother\n\\end{center}\n', 1],
+    'a lone \\end{center} in later text': [
+      '\\begin{itemize}\n\\item a\n\\begin{center}\nb\n\\end{itemize}\n\ntext \\end{center} more\n', 1],
+    'a \\end{center} inside a fenced code block': [
       '\\begin{itemize}\n\\item a\n\\begin{center}\nb\n\\end{itemize}\n\n'
-      + fence + '\n\\end{center}\n' + fence + '\n',
-    'no closer anywhere':
-      '\\begin{itemize}\n\\item a\n\\begin{center}\nb\n\\end{itemize}\n',
+      + fence + '\n\\end{center}\n' + fence + '\n', 1],
+    'no closer anywhere': [
+      '\\begin{itemize}\n\\item a\n\\begin{center}\nb\n\\end{itemize}\n', 1],
     // No blank line before the foreign env, so the whole tail is one block: the guard has to weigh
     // the closers it passes, not just find one.
-    'a figure straight after the list, no blank line':
+    'a figure straight after the list, no blank line': [
       '\\begin{itemize}\n\\item a\n\\begin{figure}\n\\item b\n\\end{itemize}\n'
-      + '\\begin{figure}\n\\caption{other}\n\\end{figure}\n',
-    'a center straight after the list, no blank line':
+      + '\\begin{figure}\n\\caption{other}\n\\end{figure}\n', 2],
+    'a center straight after the list, no blank line': [
       '\\begin{itemize}\n\\item a\n\\begin{center}\nb\n\\end{itemize}\n'
-      + '\\begin{center}\nother\n\\end{center}\n',
-    'a fenced \\end{center} with no blank line before it':
+      + '\\begin{center}\nother\n\\end{center}\n', 1],
+    'a fenced \\end{center} with no blank line before it': [
       '\\begin{itemize}\n\\item a\n\\begin{center}\nb\n\\end{itemize}\n'
-      + fence + '\n\\end{center}\n' + fence + '\n',
-    'the closer sits on the same line as \\end{itemize}':
-      '\\begin{itemize}\n\\item a\n\\begin{center}\nb\n\\end{itemize} \\end{center}\n',
+      + fence + '\n\\end{center}\n' + fence + '\n', 1],
+    'the closer sits on the same line as \\end{itemize}': [
+      '\\begin{itemize}\n\\item a\n\\begin{center}\nb\n\\end{itemize} \\end{center}\n', 1],
+    // One closer and one opener between the wrapper and its candidate closer: equal counts, and the
+    // closer standing first is ours. Tallying them declined to decline, and item `b` was lost.
+    'env boundaries crossed, equal counts in the window': [
+      '\\begin{itemize}\n\\item a\n\\begin{center}\n\\end{itemize}\n'
+      + '\\begin{itemize}\n\\item b\n\\end{center}\n\\end{itemize}\n', 2],
   };
-  Object.entries(shapes).forEach(([name, src]) => {
+  Object.entries(shapes).forEach(([name, [src, expectedItems]]) => {
     it(name, () => {
       const { items, leaked } = rendered(src);
-      items.should.be.greaterThan(0, 'the list did not render');
+      items.should.equal(expectedItems, 'the list lost or gained an item');
       leaked.should.equal(false, 'the list fell out as literal LaTeX');
     });
+  });
+  // The guard parses at most 4096 characters for argument spans. Past that a closer reads as unmatched,
+  // which declines — so a wrapper whose closer sits far away still leaves the list rendering.
+  it('a closer beyond the guard window still leaves the list rendering', () => {
+    const filler = 'filler line to push the closer past the guard window\n'.repeat(120);
+    const far = '\\begin{itemize}\n\\item a\n\\begin{center}\nb\n\\end{itemize}\n' + filler + '\\end{center}\n';
+    far.length.should.be.greaterThan(4096, 'the window is not exceeded, so this proves nothing');
+    const { items, leaked } = rendered(far);
+    items.should.equal(1);
+    leaked.should.equal(false);
+    // A `{` opening near the bound is the truncation edge: its argument cannot be paired, and the
+    // conservative side is the same decline.
+    const atEdge = '\\begin{itemize}\n\\item a\n\\begin{center}\n\\caption{' + 'x'.repeat(4090)
+      + '\nb\n\\end{itemize}\n' + filler + '\\end{center}\n';
+    const edge = rendered(atEdge);
+    edge.items.should.equal(1);
+    edge.leaked.should.equal(false);
   });
   it('a wrapper closed within the list still becomes opaque', () => {
     const src = '\\begin{itemize}\n\\item a\n\\begin{center}\n\\item[x] y\n\\end{center}\n\\item b\n\\end{itemize}';
@@ -193,6 +217,22 @@ describe('Cached marker tokens follow \\renewcommand:', () => {
     // Two lists take the math marker; the deeper level keeps its own default.
     (first.match(/class="math-inline/g) || []).should.have.length(2);
     first.should.include('<span class="li_level">–</span>');
+  });
+  // The cache lives on `env`, which a consumer may hand to two instances: tokens parsed under one
+  // option set must not serve the other.
+  it('a shared env carries no marker tokens between md instances', () => {
+    const src = '\\renewcommand{\\labelitemi}{$\\star$}\n\n\\begin{itemize}\n\\item a\n\\end{itemize}';
+    const build = (outMath) => markdownIt({ html: true }).use(mathpixMarkdownPlugin, { outMath });
+    const plain = build({ include_svg: false });
+    const withMathml = build({ include_mathml: true, include_svg: false });
+    const marker = (html) => (html.match(/<span class="li_level"[\s\S]*?<\/li>/) || [''])[0];
+    const alonePlain = marker(plain.render(src, {}));
+    const aloneMathml = marker(withMathml.render(src, {}));
+    alonePlain.should.not.equal(aloneMathml, 'the option does not change the marker, so this proves nothing');
+    const shared = {};
+    marker(plain.render(src, shared)).should.equal(alonePlain);
+    marker(withMathml.render(src, shared)).should.equal(aloneMathml);
+    marker(plain.render(src, shared)).should.equal(alonePlain);
   });
 });
 

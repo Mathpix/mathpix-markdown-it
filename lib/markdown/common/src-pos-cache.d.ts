@@ -1,5 +1,5 @@
 /**
- * Offset of the last `patternG` match in `state.src`, or -1, cached on the state under `key`.
+ * Offset of the last `patternG` match in `state.src`, or -1, cached on `state.env` under `key`.
  *
  * Block rules use it to reject in O(1) what would otherwise cost a scan to end of source per
  * probe — terminator scans re-ask the same rule for every line, which makes such a scan quadratic

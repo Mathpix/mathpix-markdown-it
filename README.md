@@ -973,7 +973,7 @@ The `MathpixMarkdown` React element accepts the following props:
 | `include_tsv`            | boolean&nbsp;*`false`*       | outputs tsv `<tsv style="display: none">...</tsv>`. A link cell carries its `href` and an image cell its `src`, not the visible text — these formats hold no markup; use `include_table_markdown` for the label |
 | `include_csv`            | boolean&nbsp;*`false`*       | outputs csv `<csv style="display: none">...</csv>`. Same link/image rule as `include_tsv`                          |
 | `include_table_html`     | boolean&nbsp;*`true`*        | outputs html table `<table>...</table>`                                                                           |
-| `include_table_markdown` | boolean&nbsp;*`false`*       | outputs markdown table `<table-markdown>...</table-markdown>`                                                     |
+| `include_table_markdown` | boolean&nbsp;*`false`*       | outputs markdown table `<table-markdown>...</table-markdown>`. A link keeps its address as written — escaping guards the Markdown syntax, not the URL scheme, so validating `javascript:`/`data:` is the reader's job (the HTML path has `validateLink` for that) |
 | `include_smiles`         | boolean&nbsp;*`false`*       | outputs smiles `<smiles>...</smiles>`                                                                             |
 | `tsv_separators`         | `{column: '\t', row: '\n'}`  | Separators for tsv tables                                                                                         |
 | `csv_separators`         | `{column: ',', row: '\n', toQuoteAllFields: false}` | Separators for csv tables. If `toQuoteAllFields=true` - all fields will be enclosed in double quotes|
