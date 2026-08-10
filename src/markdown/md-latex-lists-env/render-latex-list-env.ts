@@ -427,6 +427,24 @@ const buildItemizeMarkerInfo = (token, options, env, slf, level_itemize: number)
   return { htmlMarker, dataAttr };
 }
 
+// The `<li>` open tag every item branch builds: class through the line-numbering path when it is on,
+// then the token's own attributes plus whatever the branch adds.
+const openItemTag = (
+  tokens: Token[],
+  index: number,
+  options,
+  slf: Renderer,
+  className: string,
+  extra: string = ""
+): string => {
+  if (options?.lineNumbering) {
+    list_injectLineNumbers(tokens, index, className);
+  } else {
+    tokens[index].attrJoin("class", className);
+  }
+  return `<li${slf.renderAttrs(tokens[index])}${extra}>`;
+};
+
 /**
  * Core renderer for LaTeX list items (both `enumerate` and `itemize`).
  *
@@ -470,6 +488,18 @@ const renderLatexListItemCore = (
     return isOpen ? "<li>" : `<li>${content}</li>`;
   }
   const isEnumerate: boolean = token.parentType === "enumerate";
+  // A chunk with no `\item` of its own: `<ul>` admits only `<li>`, but no marker and no number.
+  // Inside `<ol>` that takes the same shape as a custom marker, or the browser counts it as an item.
+  if (token.meta?.markerEmpty) {
+    // Same attribute pair the nested-list wrapper uses, so a consumer reading either tells this
+    // apart from a written item; line numbering is attached like every other `<li>`.
+    const base: string = isEnumerate ? 'li_enumerate not_number' : 'li_itemize';
+    const marks: string = ' data-custom-marker="true" data-marker-empty="true"'
+      + (isEnumerate ? ' style="display: block"' : '');
+    const emptyOpen: string = openItemTag(tokens, index, options, slf,
+      token.meta?.isBlock ? `${base} block` : base, marks);
+    return isOpen ? emptyOpen : `${emptyOpen}${content}</li>`;
+  }
   let dataAttr: string = "";
   let htmlMarker: string = "";
 
@@ -481,33 +511,21 @@ const renderLatexListItemCore = (
     token.meta = { ...(token.meta ?? {}), enumerateLevel, enumerateIndex };
     // Case 1: custom marker (e.g. \item[foo])
     if (hasCustomMarker) {
-      const className = 'li_enumerate not_number';
-      if (options?.lineNumbering) {
-        // line numbers
-        list_injectLineNumbers(tokens, index, className);
-      } else {
-        tokens[index].attrJoin("class", className);
-      }
       const markerInfo: MarkerInfo = buildCustomMarkerInfo(token, options, slf, env);
       dataAttr += markerInfo.dataAttr;
       htmlMarker = markerInfo.htmlMarker;
-      const prefix: string = `<li${slf.renderAttrs(token)}${dataAttr} style="display: block">` +
-        `<span class="li_level"${dataAttr}>${htmlMarker}</span>`;
+      const prefix: string =
+        openItemTag(tokens, index, options, slf, 'li_enumerate not_number',
+          `${dataAttr} style="display: block"`)
+        + `<span class="li_level"${dataAttr}>${htmlMarker}</span>`;
       if (isOpen) {
         return prefix;
       }
       return `${prefix}${sContent}</li>`;
     }
     // Case 2: regular numbered enumerate element
-    const className = token.meta?.isBlock
-      ? 'li_enumerate block'
-      : 'li_enumerate';
-    if (options?.lineNumbering) {
-      list_injectLineNumbers(tokens, index, className);
-    } else {
-      tokens[index].attrJoin("class", className);
-    }
-    const prefix = `<li${slf.renderAttrs(token)}>`;
+    const prefix = openItemTag(tokens, index, options, slf,
+      token.meta?.isBlock ? 'li_enumerate block' : 'li_enumerate');
     if (isOpen) {
       if (needsPptxLeadingSpace()) {
         return prefix + "<span>&nbsp;</span>";
@@ -521,17 +539,10 @@ const renderLatexListItemCore = (
   token.meta = {...(token.meta ?? {}), itemizeLevel: level_itemize};
   htmlMarker = itemizeInfo.htmlMarker;
   dataAttr += itemizeInfo.dataAttr || "";
-  const className = token.meta?.isBlock
-    ? 'li_itemize block'
-    : 'li_itemize';
-  if (options?.lineNumbering) {
-    list_injectLineNumbers(tokens, index, className);
-  } else {
-    tokens[index].attrJoin("class", className);
-  }
   const prefix =
-    `<li${slf.renderAttrs(token)}${dataAttr}>` +
-    `<span class="li_level"${dataAttr}>${htmlMarker}</span>`;
+    openItemTag(tokens, index, options, slf,
+      token.meta?.isBlock ? 'li_itemize block' : 'li_itemize', dataAttr)
+    + `<span class="li_level"${dataAttr}>${htmlMarker}</span>`;
   if (isOpen) {
     if (needsPptxLeadingSpace()) {
       return prefix + "<span>&nbsp;</span>";

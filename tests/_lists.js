@@ -155,6 +155,13 @@ describe('An unclosed wrapper env leaves the list rendering:', () => {
       + fence + '\n\\end{center}\n' + fence + '\n', 1],
     'the closer sits on the same line as \\end{itemize}': [
       '\\begin{itemize}\n\\item a\n\\begin{center}\nb\n\\end{itemize} \\end{center}\n', 1],
+    // The candidate closer must be ahead of the `\begin` itself: searching from the line start took an
+    // `\end{X}` written left of it — dangling, or already consumed by an earlier wrapper on that line.
+    'a dangling closer left of the opener on one line': [
+      '\\begin{itemize}\n\\item a\n\\end{center} \\begin{center}\n\\item b\n\\end{itemize}\n', 2],
+    'the closer left of the opener belongs to an earlier wrapper': [
+      '\\begin{itemize}\n\\item a\n\\begin{center}\nx\n\\end{center} \\begin{center}\n'
+      + '\\item b\n\\end{itemize}\n', 2],
     // One closer and one opener between the wrapper and its candidate closer: equal counts, and the
     // closer standing first is ours. Tallying them declined to decline, and item `b` was lost.
     'env boundaries crossed, equal counts in the window': [
@@ -184,6 +191,17 @@ describe('An unclosed wrapper env leaves the list rendering:', () => {
     const edge = rendered(atEdge);
     edge.items.should.equal(1);
     edge.leaked.should.equal(false);
+  });
+  // The stack pops on the first `\end{X}` with no depth count, so a same-name nest loses the inner
+  // opener and the outer closer to text. Valid LaTeX, identical on `master`, pinned as measured.
+  it('a same-name wrapper nested in itself keeps the list, not both frames', () => {
+    const html = MM.markdownToHTML(
+      '\\begin{itemize}\n\\item a\n\\begin{center}\nouter\n\\begin{center}\ninner\n\\end{center}\n'
+      + 'tail\n\\end{center}\n\\item b\n\\end{itemize}',
+      { outMath: { include_svg: false } });
+    (html.match(/<li[\s>]/g) || []).should.have.length(2);
+    (html.match(/class="center"/g) || []).should.have.length(1);
+    (html.match(/\\(begin|end)\{center\}/g) || []).should.have.length(2);
   });
   it('a wrapper closed within the list still becomes opaque', () => {
     const src = '\\begin{itemize}\n\\item a\n\\begin{center}\n\\item[x] y\n\\end{center}\n\\item b\n\\end{itemize}';
@@ -289,5 +307,91 @@ describe('Numbering depth survives a wrapper env between two enumerate levels:',
   it('the next independent list starts at decimal again', () => {
     styles(shape('center') + '\n\n\\begin{enumerate}\n\\item next\n\\end{enumerate}')
       .should.deep.equal(['decimal', 'lower-alpha', 'decimal']);
+  });
+});
+
+// `<ul>`/`<ol>` admit only `<li>`. A chunk before the first `\item` — a block env, a fence, an
+// unsupported command — used to land there as a text node or a `<div>`, so it now gets a marker-less
+// `<li>`. Every list fixture is swept, so a new one cannot bring the invalid shape back.
+describe('A list element holds nothing but <li>:', () => {
+  const invalidChild = (html) => {
+    // After each `<ul>`/`<ol>` open tag, the next tag must be `<li>`; text before it is invalid too.
+    const opens = /<(ul|ol)\b[^>]*>/g;
+    let match;
+    while ((match = opens.exec(html)) !== null) {
+      const rest = html.slice(match.index + match[0].length);
+      if (!/^\s*<li\b/.test(rest)) {
+        return rest.slice(0, 60);
+      }
+    }
+    return '';
+  };
+  it('holds across every list fixture', () => {
+    require('./_data/_lists/_data').forEach((test) => {
+      invalidChild(MM.markdownToHTML(test.latex, options))
+        .should.equal('', 'invalid child of a list element for ' + JSON.stringify(test.latex));
+    });
+  });
+  it('holds for the one-line form, where the chunk shares the \\begin line', () => {
+    const html = MM.markdownToHTML('\\begin{itemize} loose \\item x \\end{itemize}',
+      { outMath: { include_svg: false } });
+    invalidChild(html).should.equal('', 'the one-line form bypasses the wrap');
+    (html.match(/<li[\s>]/g) || []).should.have.length(2);
+  });
+  // Wrapped after the tokens are emitted, so a chunk that emits nothing gets no `<li>` — no predicate
+  // decides that from its text.
+  // The inline path builds its own state, and a token created through it threw there — the rule
+  // caught that and dropped the whole list to literal LaTeX, warning once.
+  it('holds on the inline path, where the list sits inside a paragraph or a cell', () => {
+    const shapes = [
+      'text before \\begin{itemize} loose \\item a \\end{itemize} after',
+      '| a |\n|---|\n| \\begin{itemize} loose \\item x \\end{itemize} |',
+    ];
+    shapes.forEach((src) => {
+      const warned = [];
+      const warn = console.warn;
+      console.warn = (...args) => warned.push(args.join(' '));
+      const html = MM.markdownToHTML(src, { outMath: { include_svg: false } });
+      console.warn = warn;
+      warned.should.have.length(0, 'the list rule failed for ' + JSON.stringify(src));
+      html.should.not.include('\\begin{itemize}');
+      invalidChild(html).should.equal('', 'invalid child for ' + JSON.stringify(src));
+      (html.match(/<li[\s>]/g) || []).should.have.length(2);
+    });
+  });
+  // A leading space is not content: the one-line form keeps its single item.
+  it('a whitespace-only run on the inline path gets no <li>', () => {
+    const html = MM.markdownToHTML('text \\begin{itemize} \\item a \\end{itemize} tail',
+      { outMath: { include_svg: false } });
+    (html.match(/<li[\s>]/g) || []).should.have.length(1);
+  });
+  it('a chunk that renders to nothing gets no <li>', () => {
+    const items = (src) => (MM.markdownToHTML(src, { outMath: { include_svg: false } })
+      .match(/<li[\s>]/g) || []).length;
+    items('\\begin{itemize}\n   \n\\item a\n\\end{itemize}').should.equal(1);
+    items('\\begin{itemize}\n\\renewcommand{\\labelitemi}{ZZ}\n\\item a\n\\end{itemize}').should.equal(1);
+  });
+  // The wrapper carries what a written item carries for the same content: the `block` class, the
+  // attribute pair a consumer reads, and line numbering.
+  it('the wrapper is marked like a written item holding the same content', () => {
+    const first = (src, opts) => (MM.markdownToHTML(src, opts).match(/<li[^>]*>/g) || [])[0];
+    const blockChunk = '\\begin{itemize}\n\\begin{center}q\\end{center}\n\\item a\n\\end{itemize}';
+    first(blockChunk, { outMath: { include_svg: false } }).should.include('li_itemize block');
+    first(blockChunk, { outMath: { include_svg: false } }).should.include('data-custom-marker="true"');
+    first('\\begin{itemize}\nloose\n\\item a\n\\end{itemize}',
+      { outMath: { include_svg: false }, lineNumbering: true }).should.include('data_line_start=');
+  });
+  it('holds for a chunk before the first \\item', () => {
+    const shapes = [
+      '\\begin{itemize}\n\\begin{table}\\caption{q}\\end{table}\n\\item a\n\\end{itemize}',
+      '\\begin{itemize}\n\\itemsep 0pt\n\\item a\n\\end{itemize}',
+      '\\begin{itemize}\nplain text\n\\item a\n\\end{itemize}',
+      '\\begin{enumerate}\n\\begin{center}q\\end{center}\n\\item a\n\\end{enumerate}',
+    ];
+    shapes.forEach((src) => {
+      const html = MM.markdownToHTML(src, { outMath: { include_svg: false } });
+      invalidChild(html).should.equal('', 'invalid child for ' + JSON.stringify(src));
+      html.should.include('data-marker-empty="true"');
+    });
   });
 });

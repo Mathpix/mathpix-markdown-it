@@ -397,6 +397,16 @@ describe('Footnote rule performance regression:', () => {
     (unclosed / closed).should.be.below(5);
   });
 
+  // The same lookahead cut unclosed `\begin{tabular}` by 12–50x, but its growth stays super-linear:
+  // measured 13x over a 4x input against 58x on `master`. The bound pins that gap, not linearity.
+  it('unclosed \\begin{tabular} units grow far slower than on master', function () {
+    this.timeout(60000);
+    const build = (n) => '\\begin{tabular}{l}\na\n'.repeat(n);
+    const small = measureMs(build(100));
+    const growth = measureMs(build(400)) / Math.max(small, SMALL_FLOOR_MS);
+    growth.should.be.below(25);
+  });
+
   // Counting work instead of timing it: the closer lookahead rejects an unclosed env before the
   // scan, so the tag scanner is never entered. Deterministic — 0 with the lookahead, 12M without
   // (counting rule invocations would not detect it: those are identical either way).

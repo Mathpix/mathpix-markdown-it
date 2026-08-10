@@ -9,6 +9,7 @@ import { ListType, ListInlineContext, ParsedListItem, ListOpenResult } from "./l
  * @returns Total marker reservation in em
  */
 export declare const computeMarkerPadding: (markerTokens: Token[] | undefined) => number;
+export declare const wrapLooseRun: (state: any, from: number, to?: number) => void;
 /**
  * Creates an opening list-item token (<li>) for block-style LaTeX list items.
  * Handles marker parsing, enumeration start values, nesting metadata,

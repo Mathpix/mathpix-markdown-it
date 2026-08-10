@@ -1,9 +1,12 @@
 // Speculative parses reach these diagnostics once per offending line, so a desync would flood a
 // consumer's log. Report each distinct case once per parse (reset below); a repeat says nothing new.
 const warned: Set<string> = new Set();
+// A key carries a list depth or an error message, so a pathological document can mint many. Past the
+// cap the set stops growing and reporting: it exists to dedupe a flood, not to itemise one.
+const MAX_DISTINCT_KEYS = 200;
 
 export const warnDistinct = (key: string, ...args: any[]): void => {
-  if (warned.has(key)) {
+  if (warned.has(key) || warned.size >= MAX_DISTINCT_KEYS) {
     return;
   }
   warned.add(key);

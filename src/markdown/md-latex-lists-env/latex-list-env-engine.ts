@@ -76,6 +76,7 @@ export const buildBlockStateFromRaw = (md: any, raw: string, baseEnv: any) => {
     parentType: "root",
     level: 0,
     prentLevel: 0,
+    Token: TokenCtor,   // a real StateBlock carries it; rules build tokens through it
   };
   let offset: number = 0;
   for (let i = 0; i < lines.length; i++) {

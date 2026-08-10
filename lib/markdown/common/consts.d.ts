@@ -107,6 +107,8 @@ export declare const END_LIST_ENV_RE: RegExp;
 export declare const LATEX_ITEM_COMMAND_RE: RegExp;
 export declare const LATEX_ITEM_COMMAND_INLINE_RE: RegExp;
 export declare const LATEX_LIST_BOUNDARY_INLINE_RE: RegExp;
+/** A line that is only `\renewcommand`: its own rule consumes it, so it renders to nothing. */
+export declare const RENEWCOMMAND_LINE_RE: RegExp;
 /** Where a chunk splits into items: a real `\item`, so `\itemsep` is not a split point. */
 export declare const LATEX_ITEM_SPLIT_RE: RegExp;
 /** Block envs the list scanner knows; the regex below is built from it, so the two cannot drift. */

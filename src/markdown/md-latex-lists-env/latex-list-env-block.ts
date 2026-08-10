@@ -38,11 +38,9 @@ import {
   LATEX_ITEM_COMMAND_INLINE_RE,
   LATEX_BLOCK_ENV_OPEN_RE,
   LATEX_BLOCK_ENV_NAMES,
+  RENEWCOMMAND_LINE_RE,
   reSetCounter
 } from "../common/consts";
-
-// Matches what the `renewcommand` rule looks for, anchored: the whole line is that command.
-const RENEWCOMMAND_LINE_RE: RegExp = /^\s*\\renewcommand\b/;
 
 // Built from the unanchored env regexes, so a sweep cannot drift from what the parser accepts.
 const END_LIST_ENV_SWEEP_G: RegExp = new RegExp(END_LIST_ENV_INLINE_RE.source, 'g');
@@ -196,16 +194,27 @@ const wrapperBeginAt = (lineText: string): RegExpExecArray | null => {
   return null;
 };
 
+// Where `match` sits in the source: `lineText` is a suffix of its line, so the line's end anchors it.
+const absoluteOffsetOf = (
+  state: StateBlockLike,
+  line: number,
+  lineText: string,
+  match: RegExpExecArray
+): number => {
+  const at: number = state.eMarks[line] - lineText.length + match.index;
+  // Past the end when it does not: the guard then finds no closer and declines, the safe side.
+  return state.src.slice(at, at + match[0].length) === match[0] ? at : state.src.length;
+};
+
 // Opening a wrapper as opaque swallows every line until its closer, so require one it can reach.
 // Reaching past a closer of our own list swallowed it too, and the whole list then printed as
 // literal LaTeX — that closer may be the last thing on its line, so position cannot decide it.
-const hasCloserAhead = (state: StateBlockLike, line: number, name: string): boolean => {
+const hasCloserAhead = (state: StateBlockLike, from: number, name: string): boolean => {
   const sweep: RegExp | undefined = WRAPPER_END_SWEEP_G[name];
   const key: symbol | undefined = WRAPPER_END_OFFSETS_KEYS[name];
   if (!sweep || !key) {
     return false;
   }
-  const from: number = state.bMarks[line];
   const at: number = firstPositionAtOrAfter(matchPositionsCached(state as StateBlock, key, sweep), from);
   if (at < 0) {
     return false;
@@ -330,10 +339,13 @@ const handleLstBeginInline = (
     items = ItemsAddToPrev(items, beginAndRest, nextLine);
     return { handled: true, stack, items, lineText };
   }
-  // A wrapper opens only when its closer is ahead, or the rest of the list turns into raw text.
+  // A wrapper opens only when its closer is ahead of the `\begin` itself: an `\end{X}` left of it read
+  // as reachable and cost the whole list.
   const mbWrapRaw: RegExpExecArray | null = wrapperBeginAt(lineText);
   const mbWrap: RegExpExecArray | null =
-    mbWrapRaw && hasCloserAhead(state, nextLine, mbWrapRaw[1]) ? mbWrapRaw : null;
+    mbWrapRaw && hasCloserAhead(state, absoluteOffsetOf(state, nextLine, lineText, mbWrapRaw), mbWrapRaw[1])
+      ? mbWrapRaw
+      : null;
   // Earliest begin, or none. Seeded, so this stays a `null` the caller handles rather than a throw
   // the rule would swallow if the guard above and this fold ever drifted apart.
   const mb: RegExpMatchArray | null = [mbLst, mbTab, mbWrap]

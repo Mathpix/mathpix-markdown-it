@@ -3,6 +3,7 @@ import type StateBlock from 'markdown-it/lib/rules_block/state_block';
 import type Token from 'markdown-it/lib/token';
 import {
   setTokenListItemOpenBlock,
+  wrapLooseRun,
   processListChildToken,
   computeMarkerPadding
 } from "./latex-list-tokens";
@@ -15,6 +16,7 @@ import {
   LATEX_ITEM_SPLIT_RE,
   LATEX_BLOCK_ENV_OPEN_RE,
 } from "../common/consts";
+import { getCurrentListLevelState } from "./list-state";
 import { ListItemsResult, ParsedListItem, ListInlineContext } from "./latex-list-types";
 
 /**
@@ -76,6 +78,13 @@ export const ListItems = (
     state.env.prentLevel = state.prentLevel;
     state.env.inheritedListType = state.parentType;
     listItem.content = listItem.content.trim();
+    // A chunk with no `\item` of its own, before the first one: its tokens went straight into the
+    // `<ul>`. Wrapped after they are emitted, below — a chunk that emits nothing gets no `<li>`.
+    const looseFrom: number = openTokens.length > 0
+      && !LATEX_ITEM_COMMAND_RE.test(listItem.content)
+      && !getCurrentListLevelState()?.openItems
+      ? state.tokens.length
+      : -1;
     // Detect block-level item content: a LaTeX block env, a backtick (code span/fence), or a tilde fence.
     if (LATEX_BLOCK_ENV_OPEN_RE.test(listItem.content) || listItem.content.indexOf('`') > -1 || listItem.content.indexOf('~~~') > -1) {
       let match: RegExpMatchArray = listItem.content.match(LATEX_ITEM_COMMAND_RE);
@@ -105,6 +114,9 @@ export const ListItems = (
       // Same path as the marker case above, so a block env renders alike wherever it sits.
       if (LATEX_BLOCK_ENV_OPEN_RE.test(listItem.content)) {
         SetTokensBlockParse(state, listItem.content, { disableBlockRules: true });
+        if (looseFrom >= 0) {
+          wrapLooseRun(state, looseFrom);
+        }
         state.env.isBlock = false;
         continue;
       }
@@ -117,6 +129,9 @@ export const ListItems = (
     // Process each inline child token
     for (const child of inlineChildren) {
       processListChildToken(state, listItem, child, ctx);
+    }
+    if (looseFrom >= 0) {
+      wrapLooseRun(state, looseFrom);
     }
     // Update context after processing children
     li = ctx.li;

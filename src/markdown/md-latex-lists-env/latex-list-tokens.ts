@@ -35,6 +35,36 @@ export const computeMarkerPadding = (markerTokens: Token[] | undefined): number 
   return em > 0 ? em + MARKER_GAP_EM : 0;
 };
 
+// Wraps the tokens emitted in `[from, to)` in a marker-less `<li>` — `<ul>` admits nothing else.
+// After the fact: a run that emitted nothing leaves nothing to wrap.
+export const wrapLooseRun = (state: any, from: number, to?: number): void => {
+  const end: number = to ?? state.tokens.length;
+  const run: Token[] = state.tokens.slice(from, end);
+  // Whitespace alone is not content: the same run reaches here trimmed from the block path.
+  if (!run.some((t: Token) => t.type !== 'text' || t.content.trim())) {
+    return;
+  }
+  const open: Token = new state.Token('latex_list_item_open', 'li', 1);
+  open.block = true;
+  open.level = state.level;
+  // `block` marks an item holding block markup, as the written-item path does for the same content.
+  const holdsBlock: boolean = run.some((t: Token) => t.block);
+  open.meta = { markerEmpty: true, isBlock: holdsBlock };
+  open.parentType = state.types?.length > 0
+    ? state.types[state.types.length - 1]
+    : state.parentType;
+  // Line span of what it wraps, so line numbering has the same anchor as a written item.
+  const mapped: Token[] = run.filter((t: Token) => t.map);
+  if (mapped.length) {
+    open.map = [mapped[0].map[0], mapped[mapped.length - 1].map[1]];
+  }
+  const close: Token = new state.Token('latex_list_item_close', 'li', -1);
+  close.block = true;
+  close.level = state.level;
+  state.tokens.splice(from, 0, open);
+  state.tokens.splice(end + 1, 0, close);
+};
+
 /**
  * Creates an opening list-item token (<li>) for block-style LaTeX list items.
  * Handles marker parsing, enumeration start values, nesting metadata,
@@ -196,6 +226,8 @@ export const ListOpen = (
   allListTokens.push(tokenStart);
   // Process inline content after \begin{...}
   if (strAfter && strAfter.trim().length > 0) {
+    // Same-line content before the first `\item` lands in the `<ul>` like a chunk does.
+    const looseFrom: number = state.tokens.length;
     let children: Token = [];
     state.env.parentType = state.parentType;
     state.env.isBlock = true;
@@ -220,6 +252,13 @@ export const ListOpen = (
         content: ''
       }, child, ctx);
     }
+    // Only what precedes the first item token is loose; the items carry their own `<li>`.
+    let firstItem: number = looseFrom;
+    while (firstItem < state.tokens.length
+      && state.tokens[firstItem].type !== 'latex_list_item_open') {
+      firstItem++;
+    }
+    wrapLooseRun(state, looseFrom, firstItem);
     // Update context after processing children
     li = ctx.li;
     iOpen = ctx.iOpen;

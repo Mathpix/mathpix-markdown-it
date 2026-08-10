@@ -41,6 +41,8 @@ const CJK_EM = 1.20;                               // East-Asian full-width glyp
 // Monospace advance, covering the faces `code` uses (Inconsolata 0.5em, DM Mono 0.6em).
 // Equal to NORMAL_EM by coincidence, not derivation — the two move independently.
 const MONO_EM = 0.62;
+/** Nesting a marker's tokens can reach before the estimate stops descending. */
+const MAX_MARKER_TOKEN_DEPTH = 16;
 const MONO_TOKEN_TYPES = new Set<string>(['code_inline', 'texttt']);
 
 // ASCII fast path — those classes are ASCII-only. Built from the same regexes, so it can't drift.
@@ -199,7 +201,11 @@ export const textReserveEm = (str: string): number => {
  * (font-based) — used where no font is loaded. Math without a `widthEx` (non-SVG output)
  * also contributes 0, so the marker keeps the default indent.
  */
-export const tokenMarkerWidth = (token: WidthToken): number => {
+export const tokenMarkerWidth = (token: WidthToken, depth: number = 0): number => {
+  // The recursion below follows consumer input; a marker is never deep, so stop rather than trust it.
+  if (depth > MAX_MARKER_TOKEN_DEPTH) {
+    return 0;
+  }
   // Only the math pipeline fills widthEx. Without it → 0, rather than a guess from the latex.
   if (token.type && MATH_TOKEN_TYPES.has(token.type)) {
     return typeof token.widthEx === 'number' ? token.widthEx * EX_TO_EM : 0;
@@ -211,7 +217,7 @@ export const tokenMarkerWidth = (token: WidthToken): number => {
   if (token.children && token.children.length) {
     let em = 0;
     for (let i = 0; i < token.children.length; i++) {
-      em += tokenMarkerWidth(token.children[i]);
+      em += tokenMarkerWidth(token.children[i], depth + 1);
     }
     return em;
   }

@@ -1108,7 +1108,7 @@ module.exports = [
   {
     // Fence before the first \item (no preceding item): list still renders, no crash.
     latex: "\\begin{itemize}\n```\n    code\n```\n\\item[] first\n\\end{itemize}",
-    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><code>    code</code><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\"><span class=\"li_level\" data-custom-marker=\"true\" data-marker-empty=\"true\"></span>first</li></ul>"
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\"><code>    code</code></li><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\"><span class=\"li_level\" data-custom-marker=\"true\" data-marker-empty=\"true\"></span>first</li></ul>"
   },
   {
     // Long custom markers must widen the list even when every long-marker item holds
@@ -1338,7 +1338,7 @@ module.exports = [
     // An unsupported command renders as literal text and must not become an item.
     name: "\\item detection: \\itemsep before the first item makes no item",
     latex: "\\begin{itemize}\n\\itemsep 1pt\n\\item[a] x\n\\end{itemize}",
-    html: "<ul class=\"itemize\" style=\"list-style-type: none\">\\itemsep 1pt<li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">a</span>x</li></ul>"
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\">\\itemsep 1pt</li><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">a</span>x</li></ul>"
   },
   {
     // Sibling sublists resolve independently: only the wide one reserves, either order.
@@ -1387,16 +1387,17 @@ module.exports = [
     latex: "\\begin{itemize}\n\\item[-] text 1\n\\begin{itemize}\n\\item[-] text 2\n\\end{itemize}\n\\begin{table}\n\\captionsetup{labelformat=empty}\n\\caption{Cap}\n\\begin{tabular}{|l|}\n\\hline\ncell \\\\\n\\hline\n\\end{tabular}\n\\end{table}\n\\end{itemize}",
     html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">-</span>text 1<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">-</span>text 2</li></ul><div class=\"table\" number=\"1\">\n<div class=\"caption_table\">Cap</div><div class=\"table_tabular\" style=\"text-align: center\">\n<div class=\"inline-tabular\"><table class=\"tabular\">\n<tbody>\n<tr style=\"border-top: none !important; border-bottom: none !important;\">\n<td style=\"text-align: left; border-left-style: solid !important; border-left-width: 1px !important; border-right-style: solid !important; border-right-width: 1px !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-top-style: solid !important; border-top-width: 1px !important; width: auto; vertical-align: middle; \">cell</td>\n</tr>\n</tbody>\n</table>\n</div></div>\n</div>\n</li></ul>"
   },
-  // No item to attach to, so it stays a direct child of `<ul>` — a Non-Goal, pinned so it cannot shift.
+  // No `\item` to attach to, so it gets a marker-less `<li>` — `<ul>` admits nothing else. The command
+  // itself stays visible: unsupported ones are shown, not swallowed.
   {
-    name: "\\itemsep before the first item stays a direct child of the list",
+    name: "\\itemsep before the first item stays visible, in a marker-less <li>",
     latex: "\\begin{itemize}\n\\itemsep 4pt\n\\item a\n\\end{itemize}",
-    html: "<ul class=\"itemize\" style=\"list-style-type: none\">\\itemsep 4pt<li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul>"
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\">\\itemsep 4pt</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul>"
   },
   {
-    name: "\\itemindent before the first item stays a direct child of the list",
+    name: "\\itemindent before the first item stays visible, in a marker-less <li>",
     latex: "\\begin{itemize}\n\\itemindent 2em\n\\item a\n\\end{itemize}",
-    html: "<ul class=\"itemize\" style=\"list-style-type: none\">\\itemindent 2em<li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul>"
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\">\\itemindent 2em</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul>"
   },
   // A wrapper env is opaque: its interior is collected raw, so a list command written inside it —
   // invalid LaTeX, but common in OCR output — is text, not structure. Each of these kept 2 items.
@@ -1525,5 +1526,64 @@ module.exports = [
     name: "a bare unclosed brace in a wrapper, a figure below",
     latex: "\\begin{itemize}\n\\item a\n\\begin{figure}\n{ x\n\\end{itemize}\n\n\\begin{figure}\n\\caption{other}\n\\end{figure}\n",
     html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div>\\begin{figure}<br>\n{ x</div>\n</li></ul><div class=\"table\" number=\"1\">\n<div></div>\n<div class=\"caption_figure\">Figure 1: other</div></div>\n"
+  },
+  // Every shape a chunk before the first `\item` can take. `<ul>` admits only `<li>`, so each gets a
+  // marker-less one — and a chunk that renders to nothing gets none, having emitted no tokens.
+  {
+    name: "plain text before the first item",
+    latex: "\\begin{itemize}\nloose text\n\\item a\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\">loose text</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul>"
+  },
+  {
+    name: "a block env before the first item",
+    latex: "\\begin{itemize}\n\\begin{center}q\\end{center}\n\\item a\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\" data-custom-marker=\"true\" data-marker-empty=\"true\"><div class=\"center\" style=\"text-align: center\">q</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul>"
+  },
+  {
+    name: "text before the first item of an enumerate",
+    latex: "\\begin{enumerate}\nloose text\n\\item a\n\\item b\n\\end{enumerate}",
+    html: "<ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li class=\"li_enumerate not_number\" data-custom-marker=\"true\" data-marker-empty=\"true\" style=\"display: block\">loose text</li><li class=\"li_enumerate\">a</li><li class=\"li_enumerate\">b</li></ol>"
+  },
+  {
+    name: "the whole list on one line, with text before the item",
+    latex: "\\begin{itemize} loose \\item x \\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\"> loose </li><li class=\"li_itemize\"><span class=\"li_level\">•</span>x</li></ul>"
+  },
+  {
+    name: "a whitespace-only chunk before the first item",
+    latex: "\\begin{itemize}\n   \n\\item a\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul>"
+  },
+  {
+    name: "a \\renewcommand before the first item",
+    latex: "\\begin{itemize}\n\\renewcommand{\\labelitemi}{ZZ}\n\\item a\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul>"
+  },
+  {
+    name: "text before the first item of a nested list",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{itemize}\nloose\n\\item i\n\\end{itemize}\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\">loose</li><li class=\"li_itemize\"><span class=\"li_level\">–</span>i</li></ul></li></ul>"
+  },
+  {
+    name: "a list holding text and no item at all",
+    latex: "\\begin{itemize}\nonly loose text\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\">only loose text</li></ul>"
+  },
+  // The inline path builds its own state: a token created through it threw there, the rule caught
+  // that, and the whole list dropped to literal LaTeX. A leading space alone stays unwrapped.
+  {
+    name: "a one-line list inside a paragraph, with text before its first item",
+    latex: "text before \\begin{itemize} loose \\item a \\end{itemize} after",
+    html: "<div>text before <ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\"> loose </li><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul> after</div>\n"
+  },
+  {
+    name: "a one-line list in a markdown table cell, with text before its first item",
+    latex: "| a |\n|---|\n| \\begin{itemize} loose \\item x \\end{itemize} |",
+    html: "<table align=\"center\">\n<thead>\n<tr>\n<th>a</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td><ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\"> loose </li><li class=\"li_itemize\"><span class=\"li_level\">•</span>x</li></ul></td>\n</tr>\n</tbody>\n</table>\n"
+  },
+  {
+    name: "a one-line list inside a paragraph, its first item straight after \\begin",
+    latex: "text before \\begin{itemize} \\item a \\end{itemize} after",
+    html: "<div>text before <ul class=\"itemize\" style=\"list-style-type: none\"> <li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul> after</div>\n"
   },
 ];

@@ -24,5 +24,5 @@ export declare const textReserveEm: (str: string) => number;
  * (font-based) — used where no font is loaded. Math without a `widthEx` (non-SVG output)
  * also contributes 0, so the marker keeps the default indent.
  */
-export declare const tokenMarkerWidth: (token: WidthToken) => number;
+export declare const tokenMarkerWidth: (token: WidthToken, depth?: number) => number;
 export {};
