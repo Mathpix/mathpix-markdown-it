@@ -1892,4 +1892,67 @@ module.exports = [
     latex: "\\begin{itemize}\n\\item a\n\\begin{center}\n\\begin{tabular}{l}\n\\end{itemize}\n\\end{tabular}\n\\caption{q \\end{itemize} w}\n\\end{center}\n\\item b\n\\end{itemize}",
     html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\">\n<div class=\"table_tabular\" style=\"text-align: center\">\n<div class=\"inline-tabular\"><table class=\"tabular\">\n<tbody>\n<tr style=\"border-top: none !important; border-bottom: none !important;\">\n<td style=\"text-align: left; border-left: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; \">\\end{itemize}</td>\n</tr>\n</tbody>\n</table>\n</div><br>\n w}</div>\n</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
   },
+  // Inline code opening before a fence and closing after it makes the verbatim sources overlap; the
+  // ranges are unioned for that reason, and these two shapes are what a wrong union costs.
+  {
+    name: "a closer inside a fence nested in inline code does not end the list",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{center}\n`x\n```\n\\end{itemize}\n```\ny`\n\\caption{q \\end{itemize} w}\n\\end{center}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\"><code>x ``` \\end{itemize} ``` y</code><br>\n w}</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    name: "inline code spanning two fenced blocks before a list",
+    latex: "a `x\n```\nq\n```\nw\n~~~\ne\n~~~\ny` z\n\n\\begin{itemize}\n\\item a\n\\begin{center}\n\\caption{q \\end{itemize} w}\n\\end{center}\n\\item b\n\\end{itemize}",
+    html: "<div>a `x</div>\n<pre><code class=\"hljs\">q\n</code></pre>\n<div>w</div>\n<pre><code class=\"hljs\">e\n</code></pre>\n<div>y` z</div>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\"> w}</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  // A backtick inside a listing opens no code span: the union takes the listing whole, so the span that
+  // would have run to the next backtick in the document never forms.
+  {
+    name: "a lone backtick inside an lstlisting in the wrapper",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{center}\n\\begin{lstlisting}\n` \\end{itemize}\n\\end{lstlisting}\n\\caption{q \\end{itemize} w}\n\\end{center}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\"><pre class=\"lstlisting\"><code class=\"hljs lstlisting-code\" style=\"text-align: left;\">` \\end{itemize}</code></pre>\n<br>\n w}</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    name: "a lone backtick and a brace inside an lstlisting before the list",
+    latex: "\\begin{lstlisting}\n` {\n\\end{lstlisting}\n\n\\begin{itemize}\n\\item a\n\\begin{center}\n\\caption{q \\end{itemize} w}\n\\end{center}\n\\item b\n\\end{itemize}",
+    html: "<pre class=\"lstlisting\"><code class=\"hljs lstlisting-code\" style=\"text-align: left;\">` {</code></pre>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\"> w}</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  // A brace inside inline code, an argument opening right where that code ends: skipping the first one
+  // must resume on that offset, not past it, or the argument never pairs and the list loses an item.
+  {
+    name: "a brace in inline code, an argument opening where it ends, a list inside the wrapper",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{center}\n`{`{q \\end{itemize} w}\n\\begin{itemize}\\item z\\end{itemize}\n\\end{center}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\"><code>{</code>{q \\end{itemize} w}<br>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">–</span>z</li></ul></div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  // A list opening inside the wrapper is the only transition argument spans decide, so it is the shape a
+  // brace left open elsewhere in the document can blind. `master` renders two items and leaks a closer.
+  {
+    name: "a list inside the wrapper survives, and its sibling closer stays content",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{center}\n\\caption{q \\end{itemize} w}\n\\begin{itemize}\\item z\\end{itemize}\n\\end{center}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\"> w}<br>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">–</span>z</li></ul></div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    name: "the same shape after an unmatched { renders identically",
+    latex: "text {\n\n\\begin{itemize}\n\\item a\n\\begin{center}\n\\caption{q \\end{itemize} w}\n\\begin{itemize}\\item z\\end{itemize}\n\\end{center}\n\\item b\n\\end{itemize}",
+    html: "<div>text {</div>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\"> w}<br>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">–</span>z</li></ul></div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  // Line numbering is off by default, so these carry their own options: a nested list used to reach the
+  // renderer with no `map` at all, and then with a zero-width one that read as `count_line="0"`.
+  {
+    name: "a nested list carries its own line range",
+    options: { lineNumbering: true },
+    latex: "\\begin{itemize}\n\\item a\n\\begin{itemize}\n\\item b\n\\end{itemize}\n\\item c\n\\end{itemize}",
+    html: "<ul class=\"itemize preview-paragraph-0 preview-line 0 1 2 3 4 5 6\" data_line_start=\"0\" data_line_end=\"6\" data_line=\"0,7\" count_line=\"7\" style=\"list-style-type: none\"><li class=\"li_itemize preview-paragraph-1 preview-line 1\" data_line_start=\"1\" data_line_end=\"1\" data_line=\"1,2\" count_line=\"1\" data_parent_line_start=\"0\"><span class=\"li_level\">•</span>a<ul class=\"itemize preview-paragraph-2 preview-line 2 3 4\" data_line_start=\"2\" data_line_end=\"4\" data_line=\"2,5\" count_line=\"3\" style=\"list-style-type: none\"><li class=\"li_itemize preview-paragraph-3 preview-line 3\" data_line_start=\"3\" data_line_end=\"3\" data_line=\"3,4\" count_line=\"1\" data_parent_line_start=\"0\"><span class=\"li_level\">–</span>b</li></ul></li><li class=\"li_itemize preview-paragraph-5 preview-line 5\" data_line_start=\"5\" data_line_end=\"5\" data_line=\"5,6\" count_line=\"1\" data_parent_line_start=\"0\"><span class=\"li_level\">•</span>c</li></ul>"
+  },
+  {
+    name: "a nested enumerate carries its own line range",
+    options: { lineNumbering: true },
+    latex: "\\begin{enumerate}\n\\item a\n\\begin{enumerate}\n\\item b\n\\end{enumerate}\n\\item c\n\\end{enumerate}",
+    html: "<ol class=\"enumerate decimal preview-paragraph-0 preview-line 0 1 2 3 4 5 6\" data_line_start=\"0\" data_line_end=\"6\" data_line=\"0,7\" count_line=\"7\" style=\"list-style-type: decimal\"><li class=\"li_enumerate preview-paragraph-1 preview-line 1\" data_line_start=\"1\" data_line_end=\"1\" data_line=\"1,2\" count_line=\"1\" data_parent_line_start=\"0\">a<ol class=\"enumerate lower-alpha preview-paragraph-2 preview-line 2 3 4\" data_line_start=\"2\" data_line_end=\"4\" data_line=\"2,5\" count_line=\"3\" style=\"list-style-type: lower-alpha\"><li class=\"li_enumerate preview-paragraph-3 preview-line 3\" data_line_start=\"3\" data_line_end=\"3\" data_line=\"3,4\" count_line=\"1\" data_parent_line_start=\"0\">b</li></ol></li><li class=\"li_enumerate preview-paragraph-5 preview-line 5\" data_line_start=\"5\" data_line_end=\"5\" data_line=\"5,6\" count_line=\"1\" data_parent_line_start=\"0\">c</li></ol>"
+  },
+  {
+    name: "two sibling lists each number their own lines",
+    options: { lineNumbering: true },
+    latex: "\\begin{itemize}\n\\item a\n\\end{itemize}\n\n\\begin{itemize}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize preview-paragraph-0 preview-line 0 1 2\" data_line_start=\"0\" data_line_end=\"2\" data_line=\"0,3\" count_line=\"3\" style=\"list-style-type: none\"><li class=\"li_itemize preview-paragraph-1 preview-line 1\" data_line_start=\"1\" data_line_end=\"1\" data_line=\"1,2\" count_line=\"1\" data_parent_line_start=\"0\"><span class=\"li_level\">•</span>a</li></ul><ul class=\"itemize preview-paragraph-4 preview-line 4 5 6\" data_line_start=\"4\" data_line_end=\"6\" data_line=\"4,7\" count_line=\"3\" style=\"list-style-type: none\"><li class=\"li_itemize preview-paragraph-5 preview-line 5\" data_line_start=\"5\" data_line_end=\"5\" data_line=\"5,6\" count_line=\"1\" data_parent_line_start=\"4\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
 ];

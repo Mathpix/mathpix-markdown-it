@@ -17,7 +17,6 @@ import { parseSetCounterNumber } from "./latex-list-common";
 import { snapshotListLevels, restoreListLevels } from "./list-state";
 import { getCaptionCounters, setCaptionCounters } from "../common/caption-counters";
 import { matchPositionsCached, countPositionsAtOrAfter, firstPositionAtOrAfter, srcValueCached } from "../common/src-pos-cache";
-import { findEndMarker, getInlineCodeListFromString, buildInlineCodePositionSet } from "../common";
 import {
   FenceMarker,
   detectFenceOpen,
@@ -109,42 +108,50 @@ const LIST_BEGIN_OFFSETS_KEY = Symbol('mmd.listBeginOffsets');
 const listOpenerOffsets = (state: StateBlock): readonly number[] =>
   matchPositionsCached(state, LIST_BEGIN_OFFSETS_KEY, BEGIN_LIST_ENV_SWEEP_G);
 
-// Pairing runs once per source: findEndMarker does it, with the code-span index built for the pass. A
-// `{` that never closes yields no span, so a transition there is judged by the verbatim ranges alone.
-const pairArgumentSpans = (text: string, verbatim: Array<[number, number]>): Array<[number, number]> => {
+// Outermost `{}` pairs in one pass; a `{` that never closes stays on the stack and yields no span.
+// Calling findEndMarker per brace rescanned the tail — `n^1.9` measured on a run of unmatched `{`.
+// Exported to be tested directly: its ascending, non-overlapping output is what the span search assumes.
+export const pairArgumentSpans = (text: string, verbatim: Array<[number, number]>): Array<[number, number]> => {
   const spans: Array<[number, number]> = [];
-  const codePositions: Set<number> = buildInlineCodePositionSet(getInlineCodeListFromString(text));
+  const open: number[] = [];
   let range: number = 0;
   for (let i = 0; i < text.length; i++) {
-    if (text[i] === '\\') {
-      i++;                        // an escaped brace opens nothing
+    const chr: string = text[i];
+    if (chr === '\\') {
+      i++;                        // an escaped brace opens and closes nothing
       continue;
     }
-    // A brace inside inline code is text: no span, and not counted as left open.
-    if (text[i] !== '{' || codePositions.has(i)) {
+    if (chr !== '{' && chr !== '}') {
       continue;
     }
-    // Same for a fenced block or an `lstlisting`: skip to its end rather than pair inside it.
+    // A fenced block or an `lstlisting` is text: skip it whole rather than pair inside it.
     while (range < verbatim.length && verbatim[range][1] <= i) {
       range++;
     }
     if (range < verbatim.length && i >= verbatim[range][0]) {
-      i = verbatim[range][1];
+      i = verbatim[range][1] - 1;
       continue;
     }
-    // No `}` left at all: nothing can pair from here, and asking would rescan the tail per brace.
-    if (text.indexOf('}', i) < 0) {
-      break;
-    }
-    const found = findEndMarker(text, i, "{", "}", false, 0, codePositions) as
-      { res: boolean; endPos?: number };
-    if (!found.res) {
+    if (chr === '{') {
+      open.push(i);
       continue;
     }
-    spans.push([i, found.endPos]);
-    i = found.endPos;
+    const from: number | undefined = open.pop();
+    if (from !== undefined) {
+      spans.push([from, i]);          // every pair: depth 1 alone would lose all pairs under a stray `{`
+    }
   }
-  return spans;
+  // Keep the outermost, as findEndMarker returned; ascending, so the span search stays a binary one.
+  spans.sort((a, b) => a[0] - b[0] || b[1] - a[1]);
+  const outer: Array<[number, number]> = [];
+  let reach = -1;
+  for (const span of spans) {
+    if (span[1] > reach) {
+      outer.push(span);
+      reach = span[1];
+    }
+  }
+  return outer;
 };
 
 const verbatimRangesOf = (state: StateBlockLike): Array<[number, number]> =>
@@ -665,6 +672,7 @@ export const ListsInternal = (
     while (env) {
       const { match: envMatch, isEnd } = env;
       const raw: string = envMatch[1].trim();
+      // Defensive: the patterns match `itemize|enumerate` only, so this fires only if one widens.
       if (!isListType(raw)) {
         return 'abort';
       }
@@ -696,6 +704,10 @@ export const ListsInternal = (
         ));
         setTokenCloseList(state, startLine + renderStart, lineIdx + renderStart);
         if (closingList && openTokens[openTokens.length - 1] === closingList) {
+          // The line it closed on, so its `map` spans what it holds rather than a single line.
+          if (closingList.map) {
+            closingList.map[1] = Math.max(closingList.map[1], lineIdx + renderStart + 1);
+          }
           openTokens.pop();
         }
         iOpen--;
@@ -751,7 +763,12 @@ export const ListsInternal = (
           itemizeLevelContents,
           openTokens, allListTokens
         ));
-        const nestedOpen: Token = setTokenOpenList(state, -1, -1, beginType, itemizeLevelTokens, enumerateLevelTypes, itemizeLevelContents);
+        // Real lines, or line numbering emits a bare class; the end is written when this list closes.
+        // `state.startLine` is put back: items read it for `parentStart`, which is the list they sit in.
+        const parentStartLine: number = state.startLine;
+        const nestedOpen: Token = setTokenOpenList(state, lineIdx + renderStart, lineIdx + renderStart + 1,
+          beginType, itemizeLevelTokens, enumerateLevelTypes, itemizeLevelContents);
+        state.startLine = parentStartLine;
         openTokens.push(nestedOpen);
         allListTokens.push(nestedOpen);
         iOpen++;

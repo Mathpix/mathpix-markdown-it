@@ -424,6 +424,30 @@ describe('a failing list rule does not fail the document', () => {
     });
   });
 
+  // The marker parse mutates `md.options` for `forDocx`; a throw there would leave the mutated `outMath`
+  // on the instance for every later render, so the restore sits in a `finally`.
+  it('a throw while parsing a marker leaves md.options as it was', () => {
+    const md = markdownIt({ html: true }).use(mathpixMarkdownPlugin,
+      { outMath: { include_svg: false, include_mathml_word: true }, forDocx: true });
+    const before = JSON.stringify(md.options.outMath);
+    const originalParse = md.inline.parse.bind(md.inline);
+    md.inline.parse = function (src, ...rest) {
+      if (src === 'boom') { throw new Error('marker parse blew up'); }
+      return originalParse(src, ...rest);
+    };
+    const warn = console.warn;
+    console.warn = () => {};
+    try {
+      md.render('text \\begin{itemize}\\item[boom] x\\end{itemize} tail', {});
+    } catch (e) {
+      // The rule swallows it; a propagated throw is equally fine for this assertion.
+    } finally {
+      console.warn = warn;
+      md.inline.parse = originalParse;
+    }
+    JSON.stringify(md.options.outMath).should.equal(before, 'outMath stayed mutated after the throw');
+  });
+
   // Past the 200-key cap the diagnostics go quiet, so the log has to say it is truncated.
   it('hitting the distinct-key cap is reported once', () => {
     resetWarnDistinct();

@@ -20,6 +20,17 @@ export const isSpace = (code) => {
 }
 
 export const isWhitespace = (s: string) => s == null || RE_EMPTY_TEXT.test(s);
+
+/** Position of the next `endMarker` at or after `i` that is not escaped by a `\`, or -1. */
+// Iterative: one frame per escaped marker overflowed the stack on a long run of them. Unlike
+// findEndMarker below it does not check escape parity, so `$a \\$` reads as unclosed — as it always did.
+export const findEndMarkerPos = (str: string, endMarker: string, i: number): number => {
+  let index: number = str.indexOf(endMarker, i);
+  while (index > 0 && str.charCodeAt(index - 1) === 0x5c /* \ */) {
+    index = str.indexOf(endMarker, index + 1);
+  }
+  return index;
+};
 export const slugify = (s: string) => encodeURIComponent(String(s).trim().toLowerCase().replace(/\s+/g, '-'));
 
 export const uniqueSlug = (slug: string, slugs) => {
@@ -116,7 +127,8 @@ export const getInlineCodeListFromString = (str): Array<InlineCodeItem> => {
 export const findEndMarker = (str: string, startPos: number = 0, beginMarker: string = "{", endMarker: string = "}", onlyEnd = false, openBracketsBefore = 0, inlineCodePositions?: Set<number>) => {
   let content: string = '';
   let nextPos: number = 0;
-  if (!str || !str.trim()) {
+  // Blank check without `trim()`: it copies the whole string, and a caller pairing many markers pays it per call.
+  if (!str || isWhitespace(str)) {
     return { res: false }
   }
   if (str[startPos] !== beginMarker && !onlyEnd) {

@@ -1,3 +1,5 @@
+import { warnDistinct } from "./warn-distinct";
+
 // Transient env flags set only while parsing inside a LaTeX list block. They gate the
 // inline list fallback (`if (!state.env.isBlock) ...`) and are valid only during that
 // parse. They must never be persisted into a token's `envToInline` snapshot: core-inline
@@ -87,6 +89,10 @@ export const releaseEnvSnapshot = (): void => {
 // which drops `env` into dictionary mode. The count check also catches a key a foreign rule deleted.
 // Compared by identity, so an object mutated in place is not restored — that rule must undo it.
 export const restoreEnvAll = (env: any, snap: EnvSnapshot): void => {
+  // LIFO holds only while both callers restore in a `finally`; say so rather than restore from a stale slot.
+  if (snapshotPool[snapshotDepth - 1] !== snap) {
+    warnDistinct('env-snapshot-order', '[env] restoring a snapshot that is not the innermost one');
+  }
   const { keys, values, length } = snap;
   let vanished = false;
   for (let i = 0; i < length; i++) {

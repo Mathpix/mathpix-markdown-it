@@ -1,6 +1,8 @@
 export declare const tocRegexp: RegExp;
 export declare const isSpace: (code: any) => boolean;
 export declare const isWhitespace: (s: string) => boolean;
+/** Position of the next `endMarker` at or after `i` that is not escaped by a `\`, or -1. */
+export declare const findEndMarkerPos: (str: string, endMarker: string, i: number) => number;
 export declare const slugify: (s: string) => string;
 export declare const uniqueSlug: (slug: string, slugs: any) => string;
 export interface InlineCodeItem {

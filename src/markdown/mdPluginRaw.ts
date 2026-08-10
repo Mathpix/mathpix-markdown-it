@@ -16,6 +16,7 @@ import {
   hasOddSimpleMathTag
 } from './utils';
 import { latexEnvironments, openTagMML } from './common/consts';
+import { findEndMarkerPos } from './common';
 import { imageWithSize, renderRuleImage } from './md-inline-rule/image';
 import { imageWithSizeBlock, renderRuleImageBlock } from './md-block-rule/image-block';
 import {setCounterSection} from './md-inline-rule/setcounter-section';
@@ -200,16 +201,9 @@ export const multiMath: RuleInline = (state, silent) => {
   return true;
 }
 
-export const findEndMarkerPos = (str: string, endMarker: string, i: number): number => {
-  let index: number;
-  index = str.indexOf(endMarker, i);
-  if (index > 0) {
-    if (str.charCodeAt(index-1) === 0x5c /* \ */) {
-      index = findEndMarkerPos(str, endMarker, index+1)
-    }
-  }
-  return index;
-};
+// Lives in common/ so `common/math-spans` can read it without importing this plugin, which would put a
+// cycle in the module graph. Re-exported here for the callers and deep imports that had it.
+export { findEndMarkerPos };
 
 export const simpleMath: RuleInline = (state, silent) => {
   let pos, afterStartMarker,

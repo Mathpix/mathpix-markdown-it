@@ -19,10 +19,14 @@ global.document = jsdom.window.document;
 global.DOMParser = jsdom.window.DOMParser;
 
 
+// A fixture may carry `options` of its own: line numbering has no effect under the defaults, so its
+// attributes are only pinnable this way.
+const fixtureOptions = (test) => (test.options ? Object.assign({}, options, test.options) : options);
+
 describe('Check Lists:', () => {
   const tests = require('./_data/_lists/_data');
   tests.forEach(function(test) {
-    const html = MM.markdownToHTML(test.latex, options);
+    const html = MM.markdownToHTML(test.latex, fixtureOptions(test));
     describe('Latex => ' + test.latex, () => {
       it('Checking result html', (done) => {
         html.should.equal(test.html);
@@ -175,6 +179,86 @@ describe('An unclosed wrapper env leaves the list rendering:', () => {
       leaked.should.equal(false, 'the list fell out as literal LaTeX');
     });
   });
+  // A list opened mid-line — a sibling or a nested one — got no `map`, so line numbering emitted a bare
+  // class for it while the outer list carried its attributes.
+  it('a sibling and a nested list carry line numbers that are valid, not just present', () => {
+    const numbered = (src) => MM.markdownToHTML(src,
+      { outMath: { include_svg: false }, lineNumbering: true });
+    const attr = (tag, name) => {
+      const found = tag.match(new RegExp(name + '="([^"]*)"'));
+      return found ? found[1] : null;
+    };
+    const shapes = [
+      '\\begin{itemize}\n\\item a\n\\end{itemize} \\begin{itemize}\n\\item b\n\\end{itemize}',
+      '\\begin{itemize}\n\\item a\n\\begin{itemize}\n\\item b\n\\end{itemize}\n\\item c\n\\end{itemize}',
+    ];
+    shapes.forEach((src) => {
+      const html = numbered(src);
+      const lists = html.match(/<ul[^>]*>/g) || [];
+      lists.should.have.length(2);
+      lists.forEach((tag) => {
+        const start = Number(attr(tag, 'data_line_start'));
+        const end = Number(attr(tag, 'data_line_end'));
+        // A zero-width map passed a presence check and left `end` below `start`, reading as data.
+        end.should.be.at.least(start, 'data_line_end below data_line_start in ' + tag);
+        Number(attr(tag, 'count_line')).should.be.at.least(1, 'count_line of zero in ' + tag);
+      });
+    });
+    // `parentStart` names the list an item sits in; opening a nested list used to move it, so the item
+    // after that list pointed at the sublist's line instead of its own list's.
+    const items = numbered(shapes[1]).match(/<li[^>]*>/g) || [];
+    items.map((tag) => attr(tag, 'data_parent_line_start')).should.deep.equal(['0', '0', '0']);
+  });
+  // The span search is a binary one, so ascending non-overlapping output is an assumption, not a nicety —
+  // a nested pair leaking in makes a brace inside an argument read as one that opens a new argument.
+  it('argument spans come back ascending, disjoint and balanced', () => {
+    const { pairArgumentSpans } = require('../lib/markdown/md-latex-lists-env/latex-list-env-block');
+    let seed = 20260810;
+    const rnd = (n) => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed % n; };
+    const alphabet = ['{', '}', '\\', '\\{', '\\\\', 'a', ' ', '\n', '`'];
+    // A range end is exclusive: skipping a brace inside one must resume on it, not past it.
+    pairArgumentSpans('a{b{c}', [[1, 3]]).should.deep.equal([[3, 5]]);
+    pairArgumentSpans('a{b}c}', [[1, 3]]).should.deep.equal([]);
+    for (let round = 0; round < 20000; round++) {
+      let text = '';
+      for (let i = rnd(24); i > 0; i--) {
+        text += alphabet[rnd(alphabet.length)];
+      }
+      // Half the rounds pass a verbatim range, the branch that skips ahead inside the same walk.
+      const cut = rnd(text.length + 1);
+      const verbatim = round % 2 && cut < text.length ? [[cut, Math.min(text.length, cut + rnd(6))]] : [];
+      const spans = pairArgumentSpans(text, verbatim);
+      let previousEnd = -1;
+      spans.forEach(([from, to]) => {
+        const where = ' in ' + JSON.stringify(text) + ' with ' + JSON.stringify(verbatim);
+        from.should.be.above(previousEnd, 'spans overlap or nest' + where);
+        to.should.be.above(from, 'a span ends where it starts' + where);
+        text[from].should.equal('{', 'a span starts off a brace' + where);
+        text[to].should.equal('}', 'a span ends off a brace' + where);
+        previousEnd = to;
+      });
+    }
+  });
+  // Argument pairing is one pass with a stack. Asking findEndMarker per brace made a long run of
+  // unmatched `{` rescan the tail each time — `n^1.9` measured, 12× master at 8000 braces.
+  it('a long run of unmatched braces parses linearly', () => {
+    const build = (n) => '\\begin{itemize}\n\\item a\n\\begin{center}\n' + '{'.repeat(n) + ' x\n'
+      + '\\caption{q \\end{itemize} w}\n\\end{center}\n\\item b\n\\end{itemize}';
+    const median = (src) => {
+      MM.markdownToHTML(src, { outMath: { include_svg: false } });      // warm up
+      const samples = [];
+      for (let i = 0; i < 5; i++) {
+        const started = Date.now();
+        MM.markdownToHTML(src, { outMath: { include_svg: false } });
+        samples.push(Date.now() - started);
+      }
+      return samples.sort((a, b) => a - b)[2];
+    };
+    const small = Math.max(median(build(2000)), 1);
+    const large = median(build(8000));
+    // Linear with room for noise: the quadratic version sat near 7× on this pair.
+    (large / small).should.be.below(6, 'growth is not linear: ' + small + ' ms → ' + large + ' ms');
+  });
   // Pairing runs over the whole source, so an unmatched `{` must stay local: judged document-wide it
   // blinded every list after it — the caption's closer read as structure and half the items were lost.
   it('an unmatched { before a list does not reach it', () => {
@@ -200,6 +284,25 @@ describe('An unclosed wrapper env leaves the list rendering:', () => {
     const middle = MM.markdownToHTML(unit + '\n\nstray {\n\n' + unit, { outMath: { include_svg: false } });
     (middle.match(/<li[\s>]/g) || []).should.have.length(4);
     wrappers(middle).should.equal(2);
+  });
+  // A list opening inside the wrapper is the one shape where argument spans decide the transition. A
+  // stray `{` that emptied the span list took this branch with it: the caption's closer read as ours.
+  it('an unmatched { does not blind a list that opens inside a wrapper', () => {
+    const unit = '\\begin{itemize}\n\\item a\n\\begin{center}\n\\caption{q \\end{itemize} w}\n'
+      + '\\begin{itemize}\\item z\\end{itemize}\n\\end{center}\n\\item b\n\\end{itemize}';
+    const prefixes = {
+      'none': '',
+      'a stray brace': 'text {\n\n',
+      'a stray brace and three hundred paragraphs': 'text {\n\n'
+        + Array.from({ length: 300 }, (_, i) => 'Para ' + i).join('\n\n') + '\n\n',
+    };
+    Object.entries(prefixes).forEach(([what, prefix]) => {
+      const html = MM.markdownToHTML(prefix + unit, { outMath: { include_svg: false } });
+      (html.match(/<li[\s>]/g) || []).should.have.length(3, 'items lost after ' + what);
+      (html.match(/class="center"/g) || []).should.have.length(1, 'the wrapper was lost after ' + what);
+      const outsideCode = html.replace(/<pre[\s\S]*?<\/pre>/g, '').replace(/<code[\s\S]*?<\/code>/g, '');
+      outsideCode.should.not.match(/\\end\{itemize\}/, 'a closer fell out as text after ' + what);
+    });
   });
   // Argument spans are paired over the whole source, so the length of an argument decides nothing: a
   // long balanced `\caption{}` holding a closer is text, an unmatched `{` before one is not knowable
@@ -384,7 +487,7 @@ describe('A list element holds nothing but <li>:', () => {
   };
   it('holds across every list fixture', () => {
     require('./_data/_lists/_data').forEach((test) => {
-      invalidChild(MM.markdownToHTML(test.latex, options))
+      invalidChild(MM.markdownToHTML(test.latex, fixtureOptions(test)))
         .should.equal('', 'invalid child of a list element for ' + JSON.stringify(test.latex));
     });
   });

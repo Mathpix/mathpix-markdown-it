@@ -1,5 +1,5 @@
 import { nextMathSpan } from "./math-spans";
-import { getInlineCodeListFromString, InlineCodeItem } from "../common";
+import { getInlineCodeListFromString } from "../common";
 import { BEGIN_LST_INLINE_RE, END_LST_INLINE_RE } from "./consts";
 
 /**
@@ -141,23 +141,16 @@ export const findVerbatimRanges = (text: string): Array<[number, number]> => {
     }
     lineStart = lineEnd + 1;
   }
-  // Inline code and math in what is left: both are read verbatim, and neither can start inside a block.
-  const inlineCode: Array<InlineCodeItem> = getInlineCodeListFromString(text);
-  const merged: Array<[number, number]> = [];
+  // Inline code is verbatim too; math is looked for outside the blocks above, a `$` in a fence opening nothing.
+  const spans: Array<[number, number]> = ranges.slice();
+  for (const item of getInlineCodeListFromString(text)) {
+    spans.push([item.posStart, item.posEnd]);
+  }
   let gapFrom = 0;
-  let codeAt = 0;
   let breakAt = 0;
   for (let i = 0; i <= ranges.length; i++) {
     const gapTo: number = i < ranges.length ? ranges[i][0] : text.length;
-    const gapSpans: Array<[number, number]> = [];
-    while (codeAt < inlineCode.length && inlineCode[codeAt].posStart < gapTo) {
-      if (inlineCode[codeAt].posStart >= gapFrom) {
-        gapSpans.push([inlineCode[codeAt].posStart, inlineCode[codeAt].posEnd]);
-      }
-      codeAt++;
-    }
-    // Per paragraph, not per gap: the inline rules pair math inside one paragraph token, so a `$` on
-    // either side of a blank line opens nothing — scanning across one marked whole lists as verbatim.
+    // Per paragraph: the inline rules pair math inside one token, so a `$` across a blank line opens nothing.
     let blockFrom: number = gapFrom;
     while (blockFrom < gapTo) {
       while (breakAt < blankLines.length && blankLines[breakAt] <= blockFrom) {
@@ -169,27 +162,31 @@ export const findVerbatimRanges = (text: string): Array<[number, number]> => {
       let seek: number = blockFrom;
       while (seek < blockTo) {
         const span = nextMathSpan(text, seek, true, blockTo);
-        if (!span || span.start >= blockTo) {
+        if (!span) {
           break;
         }
         // Clamped: display math that legitimately crosses a blank line is covered only to that line.
-        gapSpans.push([span.start, Math.min(span.end, blockTo)]);
+        spans.push([span.start, Math.min(span.end, blockTo)]);
         seek = span.end > seek ? span.end : seek + 1;
       }
       blockFrom = blockTo + 1;
     }
-    gapSpans.sort((a, b) => a[0] - b[0]);
-    // A `$` inside inline code opened no math: drop what a span already covers.
-    let reach = gapFrom;
-    for (const span of gapSpans) {
-      if (span[0] >= reach) {
-        merged.push(span);
-        reach = span[1];
-      }
-    }
     if (i < ranges.length) {
-      merged.push(ranges[i]);
       gapFrom = ranges[i][1];
+    }
+  }
+  // Union: sources do overlap — inline code can open before a fence and close after — and a binary
+  // search over overlapping ranges answers wrongly.
+  spans.sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+  const merged: Array<[number, number]> = [];
+  for (const span of spans) {
+    const last: [number, number] | undefined = merged[merged.length - 1];
+    if (last && span[0] <= last[1]) {
+      if (span[1] > last[1]) {
+        last[1] = span[1];
+      }
+    } else {
+      merged.push([span[0], span[1]]);
     }
   }
   return merged;

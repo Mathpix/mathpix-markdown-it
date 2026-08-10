@@ -339,17 +339,22 @@ export const listItemInline: RuleInline = (
       token.marker = trimmedMarker;
       const children: Token[] = [];
       const beforeOptions = {...state.md.options};
-      if (state.md.options.forDocx) {
-        state.md.options = {
-          ...state.md.options,
-          outMath: {
-            include_svg: true,
-            include_mathml_word: false,
-          },
-        };
+      // Restored in `finally`: a throw here would leave the mutated `outMath` on the md instance for
+      // every later render.
+      try {
+        if (state.md.options.forDocx) {
+          state.md.options = {
+            ...state.md.options,
+            outMath: {
+              include_svg: true,
+              include_mathml_word: false,
+            },
+          };
+        }
+        state.md.inline.parse(trimmedMarker, state.md, state.env, children);
+      } finally {
+        state.md.options = beforeOptions;
       }
-      state.md.inline.parse(trimmedMarker, state.md, state.env, children);
-      state.md.options = beforeOptions;
       token.markerTokens = children;
     }
     // Inline content inside the list item

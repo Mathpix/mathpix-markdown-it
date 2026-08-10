@@ -7,6 +7,7 @@ const {
   matchPositionsCached,
   lastMatchPosCached,
   clearSrcPosCaches,
+  srcValueCached,
 } = require('../lib/markdown/common/src-pos-cache');
 
 // Both are binary searches over a boundary, and both decide list structure: the count answers
@@ -83,9 +84,22 @@ describe('src-pos-cache boundary search:', () => {
     env[key].bySrc.size.should.equal(1);
     clearSrcPosCaches(env);
     env[key].bySrc.size.should.equal(0);
-    (env[key].hotSrc === null).should.equal(true, 'the hot slot still answers for the old document');
+    (env[key].hotSrc === null && env[key].hotSlot === null)
+      .should.equal(true, 'the hot slot still answers for the old document');
     Object.prototype.hasOwnProperty.call(env, key).should.equal(true, 'the key was deleted, not emptied');
     matchPositionsCached({ src: 'a-b-c', env }, key, /-/g).should.deep.equal([1, 3]);
+  });
+  // A slot carries presence, so a computed `undefined` is a hit. Read as a miss, its caller recomputed
+  // on every block-rule call — a full pass over the source per line of the document.
+  it('a value of undefined is computed once, not per ask', () => {
+    const env = {};
+    const key = Symbol('undef');
+    let calls = 0;
+    const compute = () => { calls++; return undefined; };
+    for (let i = 0; i < 10; i++) {
+      (srcValueCached({ src: 'a-b', env }, key, compute) === undefined).should.equal(true);
+    }
+    calls.should.equal(1);
   });
   it('clearing an env that never held a bucket is a no-op', () => {
     clearSrcPosCaches({});

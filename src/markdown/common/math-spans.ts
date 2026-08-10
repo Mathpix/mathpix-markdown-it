@@ -1,4 +1,4 @@
-import { findEndMarkerPos } from "../mdPluginRaw";
+import { findEndMarkerPos } from "../common";
 import { beginTag, endTag, findOpenCloseTagsMathEnvironment } from "../utils";
 import { mathEnvironments } from "./consts";
 

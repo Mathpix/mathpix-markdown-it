@@ -11,10 +11,14 @@ const bucketKeys: Set<symbol> = new Set();
 
 // A hot slot in front of the map: every call asks for the current `src`, and comparing that string by
 // identity beats hashing several KB of source per block rule call. A miss falls through to the map.
+// Slots, not bare values: a computed `undefined` must read as present, or its caller recomputes per ask.
+interface Slot<T> {
+  value: T;
+}
 interface Bucket<T> {
   hotSrc: string | null;
-  hotValue: T | undefined;
-  bySrc: Map<string, T>;
+  hotSlot: Slot<T> | null;
+  bySrc: Map<string, Slot<T>>;
 }
 
 const bucketOf = <T>(state: StateBlock, key: symbol): Bucket<T> => {
@@ -24,7 +28,7 @@ const bucketOf = <T>(state: StateBlock, key: symbol): Bucket<T> => {
     return bucket;
   }
   bucketKeys.add(key);
-  return (host[key] = { hotSrc: null, hotValue: undefined, bySrc: new Map<string, T>() });
+  return (host[key] = { hotSrc: null, hotSlot: null, bySrc: new Map<string, Slot<T>>() });
 };
 
 /** Empties the buckets on `env`: a host reusing one env would otherwise keep old documents alive.
@@ -37,7 +41,7 @@ export const clearSrcPosCaches = (env: any): void => {
     const bucket: Bucket<any> | undefined = env[key];
     if (bucket) {
       bucket.hotSrc = null;
-      bucket.hotValue = undefined;
+      bucket.hotSlot = null;
       bucket.bySrc.clear();
     }
   });
@@ -45,19 +49,20 @@ export const clearSrcPosCaches = (env: any): void => {
 
 // Re-inserting makes this the newest entry: insertion order is the age order eviction reads.
 // Skipped for a lone entry — nothing to age against, and this runs per block rule call.
-const recall = <T>(bucket: Bucket<T>, src: string): T | undefined => {
+const recall = <T>(bucket: Bucket<T>, src: string): Slot<T> | null => {
   if (bucket.hotSrc === src) {
-    return bucket.hotValue;
+    return bucket.hotSlot;
   }
-  const hit: T | undefined = bucket.bySrc.get(src);
-  if (hit !== undefined) {
-    if (bucket.bySrc.size > 1) {
-      bucket.bySrc.delete(src);
-      bucket.bySrc.set(src, hit);
-    }
-    bucket.hotSrc = src;
-    bucket.hotValue = hit;
+  const hit: Slot<T> | undefined = bucket.bySrc.get(src);
+  if (!hit) {
+    return null;
   }
+  if (bucket.bySrc.size > 1) {
+    bucket.bySrc.delete(src);
+    bucket.bySrc.set(src, hit);
+  }
+  bucket.hotSrc = src;
+  bucket.hotSlot = hit;
   return hit;
 };
 
@@ -67,9 +72,10 @@ const remember = <T>(bucket: Bucket<T>, src: string, value: T): T => {
   if (bucket.bySrc.size >= MAX_SOURCES_PER_KEY) {
     bucket.bySrc.delete(bucket.bySrc.keys().next().value);
   }
-  bucket.bySrc.set(src, value);
+  const slot: Slot<T> = { value };
+  bucket.bySrc.set(src, slot);
   bucket.hotSrc = src;
-  bucket.hotValue = value;
+  bucket.hotSlot = slot;
   return value;
 };
 
@@ -90,9 +96,9 @@ export const lastMatchPosCached = (
   patternG: RegExp,
 ): number => {
   const bucket: Bucket<number> = bucketOf<number>(state, key);
-  const cached: number | undefined = recall(bucket, state.src);
-  if (cached !== undefined) {
-    return cached;
+  const cached: Slot<number> | null = recall(bucket, state.src);
+  if (cached) {
+    return cached.value;
   }
   patternG.lastIndex = 0;
   let lastPos: number = -1;
@@ -118,9 +124,9 @@ export const matchPositionsCached = (
   patternG: RegExp,
 ): readonly number[] => {
   const bucket: Bucket<number[]> = bucketOf<number[]>(state, key);
-  const cached: number[] | undefined = recall(bucket, state.src);
+  const cached: Slot<number[]> | null = recall(bucket, state.src);
   if (cached) {
-    return cached;
+    return cached.value;
   }
   patternG.lastIndex = 0;
   const positions: number[] = [];
@@ -145,8 +151,8 @@ export const srcValueCached = <T>(
   compute: (src: string) => T,
 ): T => {
   const bucket: Bucket<T> = bucketOf<T>(state, key);
-  const cached: T | undefined = recall(bucket, state.src);
-  return cached !== undefined ? cached : remember(bucket, state.src, compute(state.src));
+  const cached: Slot<T> | null = recall(bucket, state.src);
+  return cached ? cached.value : remember(bucket, state.src, compute(state.src));
 };
 
 /** How many of the ascending `positions` are at or after `minOffset` — binary search, no allocation. */
