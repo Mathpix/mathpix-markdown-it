@@ -273,6 +273,42 @@ describe('A throwing terminator probe does not fail the render:', () => {
   });
 });
 
+// The terminator set is resolved once per ruler state rather than per block — a footnote at the end of
+// a document had every block ahead of it walk the whole ruler. The cache is keyed by the ruler's
+// compiled cache, so a rule enabled or disabled at runtime must stop or start being probed at once.
+describe('The resolved terminator set follows the ruler:', () => {
+  it('a rule disabled at runtime is no longer probed, and comes back when enabled', () => {
+    const md = markdownIt({ html: true }).use(mathpixMarkdownPlugin, { outMath: { include_svg: false } });
+    const rule = md.block.ruler.__rules__.find((r) => r.name === 'hr');
+    const original = rule.fn;
+    let calls = 0;
+    rule.fn = function counted() {
+      calls++;
+      return original.apply(this, arguments);
+    };
+    // An unclosed `\footnote{` makes the scan probe every line ahead, so the terminator set is used.
+    const src = 'Text.\\footnote{unclosed note\n' +
+      Array.from({ length: 30 }, (_, i) => 'line ' + i).join('\n') + '\n';
+    const warn = console.warn;
+    console.warn = () => {};
+    try {
+      md.render(src, {});
+      calls.should.be.above(0, 'the terminator set never reached the probed rule');
+      md.block.ruler.disable('hr');
+      calls = 0;
+      md.render(src, {});
+      calls.should.equal(0, 'a disabled rule was still served from the cache');
+      md.block.ruler.enable('hr');
+      calls = 0;
+      md.render(src, {});
+      calls.should.be.above(0, 'the rule did not come back after being enabled');
+    } finally {
+      console.warn = warn;
+      rule.fn = original;
+    }
+  });
+});
+
 describe('Footnote rule performance regression:', () => {
   // Parse-only timing — bypasses MathJax/render, isolates Phase 1 cost.
   const perfMd = markdownIt({ html: true, breaks: true, linkify: true })

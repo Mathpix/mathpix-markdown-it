@@ -1,7 +1,7 @@
 import type StateBlock from 'markdown-it/lib/rules_block/state_block';
 import type Token from 'markdown-it/lib/token';
 import type { RuleBlock } from 'markdown-it/lib/parser_block';
-import { setTokenOpenList, setTokenCloseList, ListOpen } from "./latex-list-tokens";
+import { setTokenOpenList, setTokenCloseList, ListOpen, absorbSublistIntoWrapper } from "./latex-list-tokens";
 import { ItemsListPush, ItemsAddToPrev, finalizeListItems, resolveListPadding, splitInlineListEnv } from "./latex-list-items";
 import { GetItemizeLevelTokensByState, GetEnumerateLevel, ItemizeLevelTokenResult } from "./re-level";
 import {
@@ -16,8 +16,15 @@ import {
 import { parseSetCounterNumber } from "./latex-list-common";
 import { snapshotListLevels, restoreListLevels } from "./list-state";
 import { getCaptionCounters, setCaptionCounters } from "../common/caption-counters";
-import { matchPositionsCached, countPositionsAtOrAfter, firstPositionAtOrAfter } from "../common/src-pos-cache";
+import { matchPositionsCached, countPositionsAtOrAfter, firstPositionAtOrAfter, srcValueCached } from "../common/src-pos-cache";
 import { findEndMarker, getInlineCodeListFromString, buildInlineCodePositionSet } from "../common";
+import {
+  FenceMarker,
+  detectFenceOpen,
+  isFenceClose,
+  findVerbatimRanges,
+  isInsideRanges,
+} from "../common/verbatim-ranges";
 import {
   LIST_TRANSIENT_ENV_KEYS,
   EnvSnapshot,
@@ -27,6 +34,7 @@ import {
   restoreEnvKeysFromAll,
 } from "../common/env-transient";
 import { flushBufferedTokens, createBufferedState, warnListRuleFailed } from "./latex-list-env-engine";
+import { warnDistinct } from "../common/warn-distinct";
 import {
   BEGIN_LIST_ENV_INLINE_RE,
   BEGIN_LST_INLINE_RE,
@@ -42,6 +50,10 @@ import {
   reSetCounter
 } from "../common/consts";
 
+// Outermost command-argument spans, ascending.
+const ARG_SPANS_KEY = Symbol('mmd.argumentSpans');
+const VERBATIM_KEY = Symbol('mmd.verbatimRanges');
+
 // Built from the unanchored env regexes, so a sweep cannot drift from what the parser accepts.
 const END_LIST_ENV_SWEEP_G: RegExp = new RegExp(END_LIST_ENV_INLINE_RE.source, 'g');
 const BEGIN_LIST_ENV_SWEEP_G: RegExp = new RegExp(BEGIN_LIST_ENV_INLINE_RE.source, 'g');
@@ -56,13 +68,6 @@ const unclosedEnvsIn = (s: string): number =>
 const LIST_END_OFFSETS_KEY = Symbol('mmd.listEndOffsets');
 const listCloserOffsets = (state: StateBlock): readonly number[] =>
   matchPositionsCached(state, LIST_END_OFFSETS_KEY, END_LIST_ENV_SWEEP_G);
-
-// Fence openers, line-anchored like detectFenceOpen. Over-detecting is the safe direction: it only
-// makes the sibling check below decline, never trust a closer that is really code.
-const FENCE_OPEN_SWEEP_G: RegExp = /^ {0,3}(?:`{3,}|~{3,})/gm;
-const FENCE_OPEN_OFFSETS_KEY = Symbol('mmd.fenceOpenOffsets');
-const fenceOpenOffsets = (state: StateBlock): readonly number[] =>
-  matchPositionsCached(state, FENCE_OPEN_OFFSETS_KEY, FENCE_OPEN_SWEEP_G);
 
 const lastListEndPos = (state: StateBlock): number => {
   const offsets: readonly number[] = listCloserOffsets(state);
@@ -104,26 +109,37 @@ const LIST_BEGIN_OFFSETS_KEY = Symbol('mmd.listBeginOffsets');
 const listOpenerOffsets = (state: StateBlock): readonly number[] =>
   matchPositionsCached(state, LIST_BEGIN_OFFSETS_KEY, BEGIN_LIST_ENV_SWEEP_G);
 
-// How much source the guard below parses for argument spans; past it a closer reads as unmatched.
-const MAX_GUARD_WINDOW = 4096;
-
-// Outermost command-argument spans, or null when a `{` never closes. findEndMarker does the pairing,
-// with the code-span index computed once here — per call it would cost a scan of `text` each time.
-const argumentSpans = (text: string): Array<[number, number]> | null => {
+// Pairing runs once per source: findEndMarker does it, with the code-span index built for the pass. A
+// `{` that never closes yields no span, so a transition there is judged by the verbatim ranges alone.
+const pairArgumentSpans = (text: string, verbatim: Array<[number, number]>): Array<[number, number]> => {
   const spans: Array<[number, number]> = [];
   const codePositions: Set<number> = buildInlineCodePositionSet(getInlineCodeListFromString(text));
+  let range: number = 0;
   for (let i = 0; i < text.length; i++) {
     if (text[i] === '\\') {
       i++;                        // an escaped brace opens nothing
       continue;
     }
-    if (text[i] !== '{') {
+    // A brace inside inline code is text: no span, and not counted as left open.
+    if (text[i] !== '{' || codePositions.has(i)) {
       continue;
+    }
+    // Same for a fenced block or an `lstlisting`: skip to its end rather than pair inside it.
+    while (range < verbatim.length && verbatim[range][1] <= i) {
+      range++;
+    }
+    if (range < verbatim.length && i >= verbatim[range][0]) {
+      i = verbatim[range][1];
+      continue;
+    }
+    // No `}` left at all: nothing can pair from here, and asking would rescan the tail per brace.
+    if (text.indexOf('}', i) < 0) {
+      break;
     }
     const found = findEndMarker(text, i, "{", "}", false, 0, codePositions) as
       { res: boolean; endPos?: number };
     if (!found.res) {
-      return null;
+      continue;
     }
     spans.push([i, found.endPos]);
     i = found.endPos;
@@ -131,11 +147,20 @@ const argumentSpans = (text: string): Array<[number, number]> | null => {
   return spans;
 };
 
+const verbatimRangesOf = (state: StateBlockLike): Array<[number, number]> =>
+  srcValueCached(state as StateBlock, VERBATIM_KEY, findVerbatimRanges);
+
+// Both are cached per source, and the pairing reads the ranges rather than finding them again.
+const argumentSpansOf = (state: StateBlockLike): Array<[number, number]> =>
+  srcValueCached(state as StateBlock, ARG_SPANS_KEY,
+    (src: string) => pairArgumentSpans(src, verbatimRangesOf(state)));
+
+const insideVerbatim = (state: StateBlockLike, at: number): boolean =>
+  isInsideRanges(verbatimRangesOf(state), at);
+
 // Is a closer in `[from, to)` ours? `\item b \end{itemize}` ends the list, `\caption{x \end{itemize} y}`
-// is text. An unmatched `{` leaves spans unknowable, so then every closer counts — the safe side.
-// Order decides, not counts: one closer and one opener balance out on a tally, yet a closer standing
-// first is still ours. Both offset lists and the spans are ascending, so one merge walk answers it,
-// stopping at that closer instead of classifying every transition in the window.
+// is text. Order decides, not counts: one closer and one opener balance out on a tally, yet a closer
+// standing first is still ours. Offsets and spans are ascending, so one merge walk answers it.
 const closesOurListWithin = (state: StateBlockLike, from: number, to: number): boolean => {
   const closerOffsets: readonly number[] = listCloserOffsets(state as StateBlock);
   const closersAhead: number = countPositionsAtOrAfter(closerOffsets, from)
@@ -146,9 +171,7 @@ const closesOurListWithin = (state: StateBlockLike, from: number, to: number): b
   const openerOffsets: readonly number[] = listOpenerOffsets(state as StateBlock);
   const openersAhead: number = countPositionsAtOrAfter(openerOffsets, from)
     - countPositionsAtOrAfter(openerOffsets, to);
-  // Bounded, or an unclosed wrapper reaching the document's end costs a full parse per wrapper.
-  const spans: Array<[number, number]> | null =
-    argumentSpans(state.src.slice(from, Math.min(to, from + MAX_GUARD_WINDOW)));
+  const spans: Array<[number, number]> = argumentSpansOf(state);
   let closer: number = closerOffsets.length - countPositionsAtOrAfter(closerOffsets, from);
   let opener: number = openerOffsets.length - countPositionsAtOrAfter(openerOffsets, from);
   let span: number = 0;
@@ -157,19 +180,22 @@ const closesOurListWithin = (state: StateBlockLike, from: number, to: number): b
     const nextCloser: number = closer < closerOffsets.length ? closerOffsets[closer] : Infinity;
     const nextOpener: number = opener < openerOffsets.length ? openerOffsets[opener] : Infinity;
     const isCloser: boolean = nextCloser <= nextOpener;
-    const at: number = (isCloser ? nextCloser : nextOpener) - from;
+    const at: number = isCloser ? nextCloser : nextOpener;
     if (isCloser) {
       closer++;
     } else {
       opener++;
     }
-    if (spans) {
-      while (span < spans.length && spans[span][1] < at) {
-        span++;
-      }
-      if (span < spans.length && at > spans[span][0] && at < spans[span][1]) {
-        continue;                       // inside a command argument: text, not structure
-      }
+    while (span < spans.length && spans[span][1] < at) {
+      span++;
+    }
+    // A balanced pair around it is knowledge, and it outranks the conservatism below: the `{` left open
+    // earlier may sit in math or code, where it opens nothing.
+    if (span < spans.length && at > spans[span][0] && at < spans[span][1]) {
+      continue;                         // inside a command argument: text, not structure
+    }
+    if (insideVerbatim(state, at)) {
+      continue;                         // written in code or math: text, whatever the braces say
     }
     depth += isCloser ? -1 : 1;
     if (depth < 0) {
@@ -206,6 +232,32 @@ const absoluteOffsetOf = (
   return state.src.slice(at, at + match[0].length) === match[0] ? at : state.src.length;
 };
 
+// Structural (not text) offsets of `all` inside `[from, to)`.
+const structuralCountIn = (
+  state: StateBlockLike,
+  all: readonly number[],
+  from: number,
+  to: number,
+): number => {
+  const spans: Array<[number, number]> = argumentSpansOf(state);
+  let found = 0;
+  for (let i: number = all.length - countPositionsAtOrAfter(all, from); i < all.length; i++) {
+    if (all[i] >= to) {
+      break;
+    }
+    if (!isInsideRanges(spans, all[i]) && !insideVerbatim(state, all[i])) {
+      found++;
+    }
+  }
+  return found;
+};
+
+// How many of the open lists the source past `at` can still close: structural closers there minus the
+// openers that claim them, since a closer of a list opened after the wrapper is not ours to use.
+const closersLeftAfter = (state: StateBlockLike, at: number): number =>
+  structuralCountIn(state, listCloserOffsets(state as StateBlock), at, Infinity)
+  - structuralCountIn(state, listOpenerOffsets(state as StateBlock), at, Infinity);
+
 // Opening a wrapper as opaque swallows every line until its closer, so require one it can reach.
 // Reaching past a closer of our own list swallowed it too, and the whole list then printed as
 // literal LaTeX — that closer may be the last thing on its line, so position cannot decide it.
@@ -219,12 +271,18 @@ const hasCloserAhead = (state: StateBlockLike, from: number, name: string): bool
   if (at < 0) {
     return false;
   }
+  // Swallowing our closer is allowed when the source past the wrapper still closes the open lists and
+  // no list starts inside it — eating another list's `\begin` would lose that list.
   if (closesOurListWithin(state, from, at)) {
-    return false;
+    const opensInside: number =
+      structuralCountIn(state, listOpenerOffsets(state as StateBlock), from, at);
+    if (opensInside > 0 || closersLeftAfter(state, at) < Math.max(1, snapshotListLevels())) {
+      return false;
+    }
   }
-  // A closer written inside a code fence is text, so it cannot serve either.
-  const fence: number = firstPositionAtOrAfter(fenceOpenOffsets(state as StateBlock), from);
-  return fence < 0 || at < fence;
+  // A closer inside a fenced block or an `lstlisting` is text. Asked of the ranges, so a closed block
+  // before it leaves the closer usable.
+  return !insideVerbatim(state, at);
 };
 
 // The leftmost inline \begin/\end in `s`, or null once none is left. Both patterns need their
@@ -240,58 +298,8 @@ const nextListEnvMatch = (s: string): { match: RegExpMatchArray; isEnd: boolean 
   return { match: isEnd ? endMatch! : beginMatch!, isEnd };
 };
 
-// A fenced code block (``` or ~~~) inside a list env is opaque like lstlisting: its lines are collected raw so
-// the code keeps its indentation (the normal content path de-indents via tShift, which `\item` detection needs).
-// Detection mirrors the core fence rule (mmd-fence.ts): marker ` (0x60) or ~ (0x7E), run length ≥ 3, ≤ 3 leading
-// spaces; a backtick open cannot carry a backtick in its info string; a close is same char, ≥ open length, blank tail.
-const BACKTICK: number = 0x60;
-const TILDE: number = 0x7E;
-type FenceMarker = { char: number; len: number };
-const skipUpTo3Spaces = (rawLine: string): number => {
-  let pos = 0;
-  while (pos < 3 && rawLine.charCodeAt(pos) === 0x20) {
-    pos++;
-  }
-  return pos;
-};
-const detectFenceOpen = (rawLine: string): FenceMarker | null => {
-  const pos: number = skipUpTo3Spaces(rawLine);
-  const char: number = rawLine.charCodeAt(pos);
-  if (char !== BACKTICK && char !== TILDE) {
-    return null;
-  }
-  let len = 0;
-  while (rawLine.charCodeAt(pos + len) === char) {
-    len++;
-  }
-  if (len < 3) {
-    return null;
-  }
-  if (char === BACKTICK && rawLine.indexOf('`', pos + len) >= 0) {
-    return null; // an info string on a backtick fence cannot contain a backtick
-  }
-  return { char, len };
-};
-const isFenceClose = (rawLine: string, fence: FenceMarker): boolean => {
-  const pos: number = skipUpTo3Spaces(rawLine);
-  if (rawLine.charCodeAt(pos) !== fence.char) {
-    return false;
-  }
-  let len = 0;
-  while (rawLine.charCodeAt(pos + len) === fence.char) {
-    len++;
-  }
-  if (len < fence.len) {
-    return false;
-  }
-  for (let i = pos + len; i < rawLine.length; i++) {
-    const c: number = rawLine.charCodeAt(i);
-    if (c !== 0x20 && c !== 0x09) {
-      return false; // tail must be blank
-    }
-  }
-  return true;
-};
+// A fenced code block or an `lstlisting` inside a list env is opaque: its lines are collected raw so
+// the code keeps its indentation (the normal content path de-indents via tShift, which `\item` needs).
 
 
 /**
@@ -448,7 +456,7 @@ type OpaqueProcessResult = {
  * - close an opaque env and return a remaining tail to be parsed again on the same line
  *   (e.g. `\end{tabular} & \begin{tabular}{l}`).
  *
- * Uses a guard to prevent infinite loops on malformed input.
+ * Each pass hands back a shorter tail, so malformed input cannot spin here.
  */
 const processOpaqueLine = (
   params: {
@@ -461,8 +469,11 @@ const processOpaqueLine = (
   }
 ): OpaqueProcessResult => {
   let { lineText, stack, items, nextLine, state, renderStart } = params;
-  let guard: number = 0;
-  while (guard++ < 50) {
+  // Termination is structural: every branch that keeps going hands back a shorter tail, so the loop
+  // ends when it stops shrinking. No step count — the number of envs on a line is the input's business.
+  let remaining: number = lineText.length + 1;
+  while (lineText.length < remaining) {
+    remaining = lineText.length;
     const top: OpaqueEnvType = stack[stack.length - 1];
     if (top) {
       // -------- inside opaque --------
@@ -541,7 +552,9 @@ const processOpaqueLine = (
     lineText = beginRes.lineText;
     return { consumedLine: false, lineText, stack, items };
   }
-  // safety: if guard exceeded, treat as consumed to avoid infinite loop
+  // The tail stopped shrinking, so it is taken as text rather than scanned again.
+  warnDistinct('opaque-stall:' + stack.join('>'),
+    '[list-env] an opaque line stopped shrinking; the tail is taken as text');
   items = ItemsAddToPrev(items, lineText, nextLine);
   return { consumedLine: true, lineText, stack, items };
 };
@@ -578,11 +591,13 @@ export const ListsInternal = (
   // order (resolved top-down at the end). ListOpen seeds them and handles same-line content.
   const openTokens: Token[] = [];
   const allListTokens: Token[] = [];
+  const listFrom: number = state.tokens.length;
   const openData: ListOpenResult = ListOpen(state, startLine + renderStart, lineText, itemizeLevelTokens, enumerateLevelTypes, itemizeLevelContents, openTokens, allListTokens);
   let { iOpen = 0, tokenStart = null } = openData;
   li = openData.li ?? null;
   if (iOpen === 0) {
     // A single-line list (\begin…\item…\end on one line) is fully built by ListOpen; resolve here.
+    absorbSublistIntoWrapper(state.tokens, listFrom);
     resolveListPadding(allListTokens);
     nextLine += 1;
     state.line = nextLine;
@@ -699,10 +714,15 @@ export const ListsInternal = (
             } else {
               const lineEnd: number = state.eMarks[lineIdx];
               const closers: readonly number[] = listCloserOffsets(state);
-              // Only closers before the next fence opener count: one written inside code is text.
-              const nextFence: number = firstPositionAtOrAfter(fenceOpenOffsets(state), lineEnd);
-              const ahead: number = countPositionsAtOrAfter(closers, lineEnd) -
-                (nextFence < 0 ? 0 : countPositionsAtOrAfter(closers, nextFence));
+              // Only closers outside verbatim content count: one written in code is text. Stops at
+              // `needed`, so a document full of closers is not walked for nothing.
+              let ahead: number = 0;
+              for (let k: number = closers.length - countPositionsAtOrAfter(closers, lineEnd);
+                   k < closers.length && ahead < needed; k++) {
+                if (!insideVerbatim(state, closers[k])) {
+                  ahead++;
+                }
+              }
               siblingClosable = ahead >= needed;
             }
           }
@@ -822,6 +842,7 @@ export const ListsInternal = (
   if (tokenStart) {
     tokenStart.map![1] = nextLine + renderStart;
   }
+  absorbSublistIntoWrapper(state.tokens, listFrom);
   resolveListPadding(allListTokens);
   return true;
 };
@@ -862,12 +883,9 @@ export const Lists: RuleBlock = (
   if (lastListEndPos(state) < state.bMarks[startLine]) {
     return false;
   }
-  // No memo of probe answers: the closer lookahead above and the depth check inside the body walk
-  // made repeated probes cheap enough that caching them measured slower on every shape, malformed
-  // included — and a memo key has to enumerate every input the answer depends on to stay correct.
-  // `bufferedState` shares `env` by prototype, so ListsInternal mutates the real env. One snapshot
-  // of the whole env serves both restores below — naming keys instead would miss whatever a rule
-  // reachable from the body writes. The body also bumps the module-global caption counters.
+  // Probe answers are not memoised: it measured slower on every shape (see the spec).
+  // `bufferedState` shares `env` by prototype, so ListsInternal mutates the real env: one whole-env
+  // snapshot serves both restores below, naming keys would miss what a rule in the body writes.
   const captionSnap = getCaptionCounters();
   const envSnap: EnvSnapshot = snapshotEnvAll(state.env);
   // A discarded parse enters a level per `\begin` and, having no `\end`, never leaves it — without

@@ -5,11 +5,14 @@
 // unrelated later content and wake the inline fallback (empty `<>` list items).
 export const LIST_TRANSIENT_ENV_KEYS: readonly string[] = ['isBlock', 'inheritedListType', 'parentType', 'prentLevel'];
 
+// Pool slots kept warm across parses; deeper ones are released.
+const MAX_WARM_SNAPSHOTS = 8;
+
 const TRANSIENT_KEY_SET: Set<string> = new Set(LIST_TRANSIENT_ENV_KEYS);
 
-// Rolled-back keys hold `undefined`; replaying that would clear a key that went live later.
-// The tabular trio is exempt: a nested `tabular` needs the cleared value to reach the replay, and
-// dropping it from this set changes 12 nested-table tsv/csv fixtures (measured).
+// Rolled-back keys hold `undefined`; replaying that would clear a key that went live later. The
+// tabular trio is exempt (dropping it changes 12 nested-table fixtures); the list is measured over
+// the shapes in `_parse-isolation.js`, so a key parked by a shape outside them needs adding there.
 const REPLAY_UNDEFINED_KEYS: Set<string> = new Set(['isInline', 'subTabular', 'tabulare']);
 
 // Snapshot of `env` for a token's `envToInline`, minus the transient list-parse flags. Copies
@@ -25,8 +28,8 @@ export const snapshotEnvForInline = (env: any): any => {
     }
     snap[k] = env[k];
   }
-  // Symbol entries (TOC tokens, math cache) are never list flags. Enumerable only, to keep the
-  // same reach the `{...env}` spread had.
+  // Symbol entries (TOC tokens, math cache, sweep buckets) are never list flags. Enumerable only, to
+  // keep the same reach the `{...env}` spread had; the buckets ride along by reference, keyed by src.
   for (const k of Object.getOwnPropertySymbols(env)) {
     if (Object.prototype.propertyIsEnumerable.call(env, k)) {
       snap[k] = env[k];
@@ -108,6 +111,21 @@ export const restoreEnvAll = (env: any, snap: EnvSnapshot): void => {
     if (!had.has(current[i])) {
       env[current[i]] = undefined;
     }
+  }
+};
+
+// Undoes depth drift left by a parse killed between snapshot and release.
+// Safe while no rule runs a full md.parse/md.render: a nested one would hit this hook mid-snapshot.
+export const resetEnvSnapshotPool = (): void => {
+  snapshotDepth = 0;
+  if (snapshotPool.length > MAX_WARM_SNAPSHOTS) {
+    snapshotPool.length = MAX_WARM_SNAPSHOTS;
+  }
+  for (let i = 0; i < snapshotPool.length; i++) {
+    const slot: EnvSnapshot = snapshotPool[i];
+    slot.keys.length = 0;
+    slot.values.length = 0;
+    slot.length = 0;
   }
 };
 

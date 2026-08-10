@@ -20,31 +20,6 @@ import { getCurrentListLevelState } from "./list-state";
 import { ListItemsResult, ParsedListItem, ListInlineContext } from "./latex-list-types";
 
 /**
- * Processes block-style LaTeX list items by parsing their content
- * using the block parser. This is used for items whose content
- * contains block environments (e.g., \begin{table}, \begin{figure}, etc.).
- *
- * @param state - Markdown-It processing state
- * @param items - Array of parsed list items
- */
-export const ListItemsBlock = (
-  state: any,
-  items: ParsedListItem[] | null | undefined
-): void => {
-  if (!items || items.length === 0) {
-    return;
-  }
-  for (const item of items) {
-    const itemContent: string = (item?.content ?? '').trim();
-    SetTokensBlockParse(state, itemContent, {
-      startLine: item.startLine,
-      endLine: item.endLine + 1,
-      disableBlockRules: true
-    });
-  }
-};
-
-/**
  * Processes LaTeX list items and generates Markdown-It tokens
  * for both inline content and nested list structures.
  *

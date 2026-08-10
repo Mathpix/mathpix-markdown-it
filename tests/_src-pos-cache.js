@@ -6,6 +6,7 @@ const {
   firstPositionAtOrAfter,
   matchPositionsCached,
   lastMatchPosCached,
+  clearSrcPosCaches,
 } = require('../lib/markdown/common/src-pos-cache');
 
 // Both are binary searches over a boundary, and both decide list structure: the count answers
@@ -72,6 +73,23 @@ describe('src-pos-cache boundary search:', () => {
     matchPositionsCached(outer, key, /-/g).should.deep.equal([1, 3]);
     matchPositionsCached(inner, key, /-/g).should.deep.equal([1]);
     matchPositionsCached(outer, key, /-/g).should.deep.equal([1, 3]);
+  });
+  // A host that hands the same `env` to every render would otherwise keep up to 8 documents' offset
+  // arrays alive; the render-time clear drops them without touching the env's shape.
+  it('clearing empties the buckets and keeps the env out of dictionary mode', () => {
+    const key = Symbol('clear');
+    const env = {};
+    matchPositionsCached({ src: 'a-b-c', env }, key, /-/g).should.deep.equal([1, 3]);
+    env[key].bySrc.size.should.equal(1);
+    clearSrcPosCaches(env);
+    env[key].bySrc.size.should.equal(0);
+    (env[key].hotSrc === null).should.equal(true, 'the hot slot still answers for the old document');
+    Object.prototype.hasOwnProperty.call(env, key).should.equal(true, 'the key was deleted, not emptied');
+    matchPositionsCached({ src: 'a-b-c', env }, key, /-/g).should.deep.equal([1, 3]);
+  });
+  it('clearing an env that never held a bucket is a no-op', () => {
+    clearSrcPosCaches({});
+    clearSrcPosCaches(undefined);
   });
   it('a pattern that can match empty still terminates', () => {
     const state = { src: 'ab' };

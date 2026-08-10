@@ -53,6 +53,7 @@ export declare const ChangeLevel: (state: StateBlock | StateInline, data: {
     params?: string;
 }) => boolean;
 /**
- * Clears stored itemize level token cache.
+ * Clears stored itemize level token cache. The definitions survive by design: set once per md
+ * instance, so a chunked host keeps a \renewcommand from an earlier chunk.
  */
 export declare const clearItemizeLevelTokens: () => void;

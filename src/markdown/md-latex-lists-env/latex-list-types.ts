@@ -80,6 +80,7 @@ export type StateBlockLike = Pick<
   | 'level'
   | 'prentLevel'
   | 'push'
+  | 'tokens'
 >;
 
 /** Token push signature used by markdown-it. */

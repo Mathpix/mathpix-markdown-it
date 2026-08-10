@@ -9,6 +9,7 @@ const MATH_TOKEN_TYPES = new Set<string>(mathTokenTypes);
 const TEXT_LIKE_TYPES = new Set<string>(['text', 'text_special', 'emoji']);
 
 // Code points that add no advance: they render over the base glyph, join it, or select a variant.
+// A static snapshot of Unicode 15.1, like the Wide ranges below; a newer code point reserves its class.
 const isZeroWidthChar = (cp: number): boolean =>
   (cp >= 0x0300 && cp <= 0x036F) ||   // Combining Diacritical Marks
   (cp >= 0x1AB0 && cp <= 0x1AFF) ||   // ... Extended

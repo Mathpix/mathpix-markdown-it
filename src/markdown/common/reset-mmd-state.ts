@@ -7,6 +7,7 @@ import { clearLabelsList } from './labels';
 import { clearItemizeLevelTokens } from '../md-latex-lists-env/re-level';
 import { resetListState } from '../md-latex-lists-env/list-state';
 import { resetListRenderDepth } from '../md-latex-lists-env/render-latex-list-env';
+import { resetEnvSnapshotPool } from './env-transient';
 import { resetSizeCounter } from './counters';
 import { MathJax } from '../../mathjax';
 
@@ -22,6 +23,7 @@ export const resetMmdGlobalState = (): void => {
   clearItemizeLevelTokens();
   resetListState();
   resetListRenderDepth();   // also called from the plugin hook, which a partial render reaches
+  resetEnvSnapshotPool();   // same: per-render, so the hook calls it too
   resetTextCounter();
   resetSizeCounter();
   MathJax.Reset();

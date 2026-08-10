@@ -7,7 +7,8 @@ import {
   reOpenTagFootnoteNumbered,
   reOpenTagFootnotetext,
   reOpenTagFootnotetextG,
-  reOpenTagFootnotetextNumbered
+  reOpenTagFootnotetextNumbered,
+  BEGIN_LIST_ENV_INLINE_RE
 } from "../common/consts";
 import { findEndMarker } from "../common";
 import { findOpenCloseTags } from "../utils";
@@ -22,12 +23,13 @@ const FOOTNOTETEXT_POS_KEY = Symbol('mmd.footnotetextSrcPositions');
 // Helper-owned /g sweeps. lastIndex is reset in the helper before each scan; sync-only.
 const FOOTNOTE_TOKEN_SWEEP_G: RegExp = new RegExp(reFootnoteToken.source, 'g');
 const FOOTNOTETEXT_TOKEN_SWEEP_G: RegExp = new RegExp(reFootnotetextToken.source, 'g');
+const LIST_BEGIN_POS_KEY = Symbol('mmd.footnoteListBeginPos');
+const LIST_BEGIN_SWEEP_G: RegExp = new RegExp(BEGIN_LIST_ENV_INLINE_RE.source, 'g');
 
 // Terminators for the \footnote scan, kept minimal alongside fence.
 const LIST_RULE_NAME = "Lists";
 const LIST_TERMINATOR_NAME = new Set<string>([LIST_RULE_NAME]);
-// Terminators for the \footnotetext scan. Neither set caches resolved fns: `rule.enabled` toggles
-// mid-parse. The walk stays off the hot path — see the scaling tests in _footnotes_latex.js.
+// Terminators for the \footnotetext scan.
 const FOOTNOTE_TERMINATOR_NAMES = new Set<string>([
   "table", "smilesDrawerBlock", "collapsible", "fence", "blockquote", "hr",
   "list", "Lists", "footnote_def", "heading", "svg_block", "html_block", "pageBreaksBlock", "deflist",
@@ -54,8 +56,24 @@ const anyTerminates = (
   return false;
 };
 
-// One walk per entry. Not cached — see the FOOTNOTE_TERMINATOR_NAMES note.
+// Asked per block while a footnote sits ahead: 200 walks over 6400 ruler entries on 200 paragraphs.
+// Kept on the ruler, keyed by its compiled cache — markdown-it nulls that on any enable/disable.
+// An `fn` swapped in place does not: patch before the first render, or go through `ruler.at`.
+const RESOLVED_RULES_KEY = Symbol('mmd.resolvedTerminators');
+
 const resolveEnabledRuleFns = (ruler: Ruler, names: Set<string>): RuleBlock[] => {
+  const token: any = (ruler as any).__cache__;
+  const host: any = ruler as any;
+  let byNames: Map<Set<string>, { token: any; fns: RuleBlock[] }> = host[RESOLVED_RULES_KEY];
+  if (!byNames) {
+    byNames = new Map();
+    host[RESOLVED_RULES_KEY] = byNames;
+  }
+  const cached = byNames.get(names);
+  // A null token means a toggle is in flight: resolve afresh.
+  if (token && cached && cached.token === token) {
+    return cached.fns;
+  }
   const rules = ruler.__rules__;
   const fns: RuleBlock[] = [];
   if (rules?.length) {
@@ -66,6 +84,7 @@ const resolveEnabledRuleFns = (ruler: Ruler, names: Set<string>): RuleBlock[] =>
       }
     }
   }
+  byNames.set(names, { token, fns });
   return fns;
 }
 
@@ -93,8 +112,11 @@ export const latex_footnote_block: RuleBlock = (state, startLine, endLine, silen
     if (!sawFootnoteToken || !reOpenTagFootnoteG.test(lineText)) {
       // Terminate on `fence` (original) plus the LaTeX list rule, so a `\begin{itemize}`
       // before the tag isn't swallowed — a minimal addition (fence + Lists, not the full set).
-      const probeRules: RuleBlock[] = [fence as RuleBlock].concat(
-        resolveEnabledRuleFns(state.md.block.ruler, LIST_TERMINATOR_NAME));
+      // With no list opener ahead the list probe cannot fire, and it costs a silent Lists run per line.
+      const probeRules: RuleBlock[] =
+        lastMatchPosCached(state, LIST_BEGIN_POS_KEY, LIST_BEGIN_SWEEP_G) >= state.bMarks[startLine]
+          ? [fence as RuleBlock].concat(resolveEnabledRuleFns(state.md.block.ruler, LIST_TERMINATOR_NAME))
+          : [fence as RuleBlock];
       for (; nextLine < endLine; nextLine++) {
         if (anyTerminates(probeRules, state, nextLine, endLine)) {
           terminate = true;

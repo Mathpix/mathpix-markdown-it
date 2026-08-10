@@ -57,7 +57,7 @@ export interface CustomMarkerHtmlResult {
  * - real markdown-it StateBlock (block rule)
  * - synthetic block state (inline rule wrapper)
  */
-export type StateBlockLike = Pick<StateBlock, 'md' | 'src' | 'env' | 'bMarks' | 'eMarks' | 'tShift' | 'line' | 'startLine' | 'parentType' | 'level' | 'prentLevel' | 'push'>;
+export type StateBlockLike = Pick<StateBlock, 'md' | 'src' | 'env' | 'bMarks' | 'eMarks' | 'tShift' | 'line' | 'startLine' | 'parentType' | 'level' | 'prentLevel' | 'push' | 'tokens'>;
 /** Token push signature used by markdown-it. */
 export type PushFn<TTok extends Token = Token> = (type: string, tag: string, nesting: number) => TTok;
 /**

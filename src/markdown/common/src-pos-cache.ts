@@ -5,27 +5,71 @@ import type StateBlock from 'markdown-it/lib/rules_block/state_block';
 // One entry per `src`, oldest evicted — and a hit refreshes its slot, or a run of nested parses
 // would drop the outer document's entry, the one asked over and over.
 const MAX_SOURCES_PER_KEY = 8;
-const bucketOf = <T>(state: StateBlock, key: symbol): Map<string, T> => {
-  const host = ((state as any).env ?? state) as Record<symbol, Map<string, T> | undefined>;
-  return host[key] ?? (host[key] = new Map<string, T>());
+
+// Which keys were ever used, so a render can empty the buckets without naming them.
+const bucketKeys: Set<symbol> = new Set();
+
+// A hot slot in front of the map: every call asks for the current `src`, and comparing that string by
+// identity beats hashing several KB of source per block rule call. A miss falls through to the map.
+interface Bucket<T> {
+  hotSrc: string | null;
+  hotValue: T | undefined;
+  bySrc: Map<string, T>;
+}
+
+const bucketOf = <T>(state: StateBlock, key: symbol): Bucket<T> => {
+  const host = ((state as any).env ?? state) as Record<symbol, Bucket<T> | undefined>;
+  const bucket: Bucket<T> | undefined = host[key];
+  if (bucket) {
+    return bucket;
+  }
+  bucketKeys.add(key);
+  return (host[key] = { hotSrc: null, hotValue: undefined, bySrc: new Map<string, T>() });
+};
+
+/** Empties the buckets on `env`: a host reusing one env would otherwise keep old documents alive.
+ *  Emptied, not deleted — `delete` would drop `env` into dictionary mode for the whole parse. */
+export const clearSrcPosCaches = (env: any): void => {
+  if (!env) {
+    return;
+  }
+  bucketKeys.forEach((key: symbol) => {
+    const bucket: Bucket<any> | undefined = env[key];
+    if (bucket) {
+      bucket.hotSrc = null;
+      bucket.hotValue = undefined;
+      bucket.bySrc.clear();
+    }
+  });
 };
 
 // Re-inserting makes this the newest entry: insertion order is the age order eviction reads.
-const recall = <T>(bucket: Map<string, T>, src: string): T | undefined => {
-  const hit: T | undefined = bucket.get(src);
+// Skipped for a lone entry — nothing to age against, and this runs per block rule call.
+const recall = <T>(bucket: Bucket<T>, src: string): T | undefined => {
+  if (bucket.hotSrc === src) {
+    return bucket.hotValue;
+  }
+  const hit: T | undefined = bucket.bySrc.get(src);
   if (hit !== undefined) {
-    bucket.delete(src);
-    bucket.set(src, hit);
+    if (bucket.bySrc.size > 1) {
+      bucket.bySrc.delete(src);
+      bucket.bySrc.set(src, hit);
+    }
+    bucket.hotSrc = src;
+    bucket.hotValue = hit;
   }
   return hit;
 };
 
-// Insertion order is age order, so the oldest source goes and the current one stays cached.
-const remember = <T>(bucket: Map<string, T>, src: string, value: T): T => {
-  if (bucket.size >= MAX_SOURCES_PER_KEY) {
-    bucket.delete(bucket.keys().next().value);
+// Insertion order is age order, so the oldest source goes and the current one stays cached. Eviction
+// leaves the hot slot alone, so a key holds at most nine sources until the per-render clear.
+const remember = <T>(bucket: Bucket<T>, src: string, value: T): T => {
+  if (bucket.bySrc.size >= MAX_SOURCES_PER_KEY) {
+    bucket.bySrc.delete(bucket.bySrc.keys().next().value);
   }
-  bucket.set(src, value);
+  bucket.bySrc.set(src, value);
+  bucket.hotSrc = src;
+  bucket.hotValue = value;
   return value;
 };
 
@@ -45,7 +89,7 @@ export const lastMatchPosCached = (
   key: symbol,
   patternG: RegExp,
 ): number => {
-  const bucket: Map<string, number> = bucketOf<number>(state, key);
+  const bucket: Bucket<number> = bucketOf<number>(state, key);
   const cached: number | undefined = recall(bucket, state.src);
   if (cached !== undefined) {
     return cached;
@@ -73,7 +117,7 @@ export const matchPositionsCached = (
   key: symbol,
   patternG: RegExp,
 ): readonly number[] => {
-  const bucket: Map<string, number[]> = bucketOf<number[]>(state, key);
+  const bucket: Bucket<number[]> = bucketOf<number[]>(state, key);
   const cached: number[] | undefined = recall(bucket, state.src);
   if (cached) {
     return cached;
@@ -89,6 +133,20 @@ export const matchPositionsCached = (
   }
   patternG.lastIndex = 0;
   return remember(bucket, state.src, positions);
+};
+
+/**
+ * Any value derived from `state.src`, cached on `state.env` under `key` — same contract as the sweeps
+ * above: one entry per `src`, computed on first ask, so a caller asked per block pays once.
+ */
+export const srcValueCached = <T>(
+  state: StateBlock,
+  key: symbol,
+  compute: (src: string) => T,
+): T => {
+  const bucket: Bucket<T> = bucketOf<T>(state, key);
+  const cached: T | undefined = recall(bucket, state.src);
+  return cached !== undefined ? cached : remember(bucket, state.src, compute(state.src));
 };
 
 /** How many of the ascending `positions` are at or after `minOffset` — binary search, no allocation. */

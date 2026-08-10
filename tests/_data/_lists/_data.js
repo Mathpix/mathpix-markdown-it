@@ -1586,4 +1586,310 @@ module.exports = [
     latex: "text before \\begin{itemize} \\item a \\end{itemize} after",
     html: "<div>text before <ul class=\"itemize\" style=\"list-style-type: none\"> <li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul> after</div>\n"
   },
+  // A sublist written in such a chunk goes inside its wrapper `<li>`: beside it, the `<ul>` would be
+  // a direct child of a `<ul>`. `master` leaves both the text and that `<ul>` bare.
+  {
+    name: "a chunk holding text and a sublist, the sublist inside its wrapper",
+    latex: "\\begin{itemize}\nloose \\begin{itemize}\\item inner\\end{itemize}\n\\item x\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\">loose<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">–</span>inner</li></ul></li><li class=\"li_itemize\"><span class=\"li_level\">•</span>x</li></ul>"
+  },
+  {
+    name: "the same chunk in an enumerate",
+    latex: "\\begin{enumerate}\nloose \\begin{itemize}\\item inner\\end{itemize}\n\\item x\n\\end{enumerate}",
+    html: "<ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li class=\"li_enumerate not_number\" data-custom-marker=\"true\" data-marker-empty=\"true\" style=\"display: block\">loose<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>inner</li></ul></li><li class=\"li_enumerate\">x</li></ol>"
+  },
+  {
+    name: "a chunk holding text and a sublist on the \\begin line",
+    latex: "\\begin{itemize} loose \\begin{itemize}\\item inner\\end{itemize}\n\\item x\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\"> loose <ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">–</span>inner</li></ul></li><li class=\"li_itemize\"><span class=\"li_level\">•</span>x</li></ul>"
+  },
+  {
+    name: "a chunk holding text and a sublist, with no \\item at all",
+    latex: "\\begin{itemize}\nloose \\begin{itemize}\\item inner\\end{itemize}\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\">loose<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">–</span>inner</li></ul></li></ul>"
+  },
+  {
+    name: "a sublist alone before the first \\item, on the \\begin line",
+    latex: "\\begin{itemize} \\begin{itemize}\\item inner\\end{itemize}\n\\item x\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\"> <ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">–</span>inner</li></ul></li><li class=\"li_itemize\"><span class=\"li_level\">•</span>x</li></ul>"
+  },
+  {
+    name: "a chunk holding text and a sublist in a markdown table cell",
+    latex: "| h |\n| :-- |\n| \\begin{itemize} loose \\begin{itemize}\\item inner\\end{itemize} \\item x\\end{itemize} |",
+    html: "<table align=\"center\">\n<thead>\n<tr>\n<th style=\"text-align:left\">h</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td style=\"text-align:left\"><ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\"> loose <ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">–</span>inner</li></ul> </li><li class=\"li_itemize\"><span class=\"li_level\">•</span>x</li></ul></td>\n</tr>\n</tbody>\n</table>\n"
+  },
+  // A closer inside a command argument is text whatever the argument's length: spans are paired over
+  // the whole source. `master` prints this wrapper as literal LaTeX with an unbalanced `</ul>`.
+  {
+    name: "a closer inside a long caption inside a wrapper stays text",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{center}\n\\caption{xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx \\end{itemize} tail}\n\\end{center}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\"> tail}</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  // Same for a fenced block and an `lstlisting`: their braces are literal, found with the helpers the
+  // body walk already uses. Counted as left open, each cost the list its second item.
+  {
+    name: "a brace in a fenced block inside a wrapper is not a brace left open",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{center}\n```\ncode {\n```\n\\caption{q \\end{itemize} w}\n\\end{center}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\"><code>code {</code><br>\n w}</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    name: "a brace in an lstlisting inside a wrapper is not a brace left open",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{center}\n\\begin{lstlisting}\n{\n\\end{lstlisting}\n\\caption{q \\end{itemize} w}\n\\end{center}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\"><pre class=\"lstlisting\"><code class=\"hljs lstlisting-code\" style=\"text-align: left;\">{</code></pre>\n<br>\n w}</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  // A brace inside inline code is text, so it opens no argument: counted as left open it made the
+  // caption's closer read as structure, and the second item was lost.
+  {
+    name: "a brace in inline code inside a wrapper is not a brace left open",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{center}\n`{` \\caption{q \\end{itemize} w}\n\\end{center}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\"><code>{</code>  w}</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  // A `{` left open earlier in the document must not reach this list: judged document-wide it made the
+  // caption's closer read as structure, and the second item was lost.
+  {
+    name: "a stray { before a list whose caption holds a closer",
+    latex: "text {\n\n\\begin{itemize}\n\\item a\n\\begin{center}\n\\caption{q \\end{itemize} w}\n\\end{center}\n\\item b\n\\end{itemize}",
+    html: "<div>text {</div>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\"> w}</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  // Verbatim content is text wherever it sits, and its shape decides nothing: a one-line
+  // `lstlisting` (any count of them), a fenced closer, an indented block, `\verb`, an html block and a
+  // `tabular` all used to make the caption's closer read as structure, costing the list its item.
+  {
+    name: "a one-line lstlisting before a list whose caption holds a closer",
+    latex: "\\begin{lstlisting}code\\end{lstlisting}\n\n\\begin{itemize}\n\\item a\n\\begin{center}\n\\caption{q \\end{itemize} w}\n\\end{center}\n\\item b\n\\end{itemize}",
+    html: "<div><pre class=\"lstlisting\"><code class=\"hljs lstlisting-code\" style=\"text-align: left;\">code</code></pre>\n</div>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\"> w}</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    name: "three one-line lstlisting before it, an odd count",
+    latex: "\\begin{lstlisting}code\\end{lstlisting}\n\n\\begin{lstlisting}code\\end{lstlisting}\n\n\\begin{lstlisting}code\\end{lstlisting}\n\n\\begin{itemize}\n\\item a\n\\begin{center}\n\\caption{q \\end{itemize} w}\n\\end{center}\n\\item b\n\\end{itemize}",
+    html: "<div><pre class=\"lstlisting\"><code class=\"hljs lstlisting-code\" style=\"text-align: left;\">code</code></pre>\n</div>\n<div><pre class=\"lstlisting\"><code class=\"hljs lstlisting-code\" style=\"text-align: left;\">code</code></pre>\n</div>\n<div><pre class=\"lstlisting\"><code class=\"hljs lstlisting-code\" style=\"text-align: left;\">code</code></pre>\n</div>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\"> w}</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    name: "a one-line lstlisting inside the list",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{lstlisting}code\\end{lstlisting}\n\\begin{center}\n\\caption{q \\end{itemize} w}\n\\end{center}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a<br>\n<pre class=\"lstlisting\"><code class=\"hljs lstlisting-code\" style=\"text-align: left;\">code</code></pre>\n</div>\n<div class=\"center\" style=\"text-align: center\"> w}</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    name: "sibling lists after a one-line lstlisting",
+    latex: "\\begin{lstlisting}code\\end{lstlisting}\n\n\\begin{itemize}\n\\item a\n\\end{itemize} \\begin{itemize}\n\\item b\n\\end{itemize}",
+    html: "<div><pre class=\"lstlisting\"><code class=\"hljs lstlisting-code\" style=\"text-align: left;\">code</code></pre>\n</div>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul><ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    name: "a \\verb argument holding a brace inside a wrapper",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{center}\n\\verb|{|\n\\caption{q \\end{itemize} w}\n\\end{center}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\">\\verb|{|<br>\n w}</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    name: "an indented code block holding a brace inside a wrapper",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{center}\n    code {\n\\caption{q \\end{itemize} w}\n\\end{center}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\">code {<br>\n w}</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    name: "an html block holding a brace inside a wrapper",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{center}\n<div>\ncode {\n</div>\n\\caption{q \\end{itemize} w}\n\\end{center}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\"><div><br>\ncode {<br>\n</div><br>\n w}</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    name: "a tabular holding a brace inside a wrapper",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{center}\n\\begin{tabular}{l}\n{\n\\end{tabular}\n\\caption{q \\end{itemize} w}\n\\end{center}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\">\n<div class=\"table_tabular\" style=\"text-align: center\">\n<div class=\"inline-tabular\"><table class=\"tabular\">\n<tbody>\n<tr style=\"border-top: none !important; border-bottom: none !important;\">\n<td style=\"text-align: left; border-left: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; \">{</td>\n</tr>\n</tbody>\n</table>\n</div><br>\n w}</div>\n</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    name: "a fenced closer before a list whose caption holds one",
+    latex: "```\n\\end{itemize}\n```\n\n\\begin{itemize}\n\\item a\n\\begin{center}\n\\caption{q \\end{itemize} w}\n\\end{center}\n\\item b\n\\end{itemize}",
+    html: "<pre><code class=\"hljs\">\\end{itemize}\n</code></pre>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\"> w}</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    name: "inline code holding a brace, with a real closing brace later",
+    latex: "text `{` then a real } here\n\n\\begin{itemize}\n\\item a\n\\begin{center}\n\\caption{q \\end{itemize} w}\n\\end{center}\n\\item b\n\\end{itemize}",
+    html: "<div>text <code>{</code> then a real } here</div>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\"> w}</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  // Escaping and every verbatim context, each holding what would otherwise read as structure: an escaped
+  // brace opens nothing, an escaped backslash leaves the brace real, and inline code, math, display math
+  // and an `align` are text. Each of these once cost the list its second item.
+  {
+    name: "a closer written in inline code inside a wrapper",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{center}\n`\\end{itemize}`\n\\caption{q \\end{itemize} w}\n\\end{center}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\"><code>\\end{itemize}</code><br>\n w}</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    name: "an \\item written in inline code inside a wrapper",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{center}\n`\\item fake`\n\\caption{q \\end{itemize} w}\n\\end{center}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\"><code>\\item fake</code><br>\n w}</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    name: "a dollar pair in inline code opens no math",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{center}\n`$x$`\n\\caption{q \\end{itemize} w}\n\\end{center}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\"><code>$x$</code><br>\n w}</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    name: "an escaped brace opens no argument",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{center}\ntext \\{ here\n\\caption{q \\end{itemize} w}\n\\end{center}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\">text { here<br>\n w}</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    name: "an escaped backslash leaves the brace real",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{center}\ntext \\\\{ here\n\\caption{q \\end{itemize} w}\n\\end{center}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\">text \\{ here<br>\n w}</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    name: "an escaped dollar opens no math",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{center}\nprice \\$5 here\n\\caption{q \\end{itemize} w}\n\\end{center}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\">price $5 here<br>\n w}</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    name: "a closer in inline code before the list",
+    latex: "`\\end{itemize}`\n\n\\begin{itemize}\n\\item a\n\\begin{center}\n\n\\caption{q \\end{itemize} w}\n\\end{center}\n\\item b\n\\end{itemize}",
+    html: "<div><code>\\end{itemize}</code></div>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\"> w}</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    name: "math holding a closer inside a wrapper",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{center}\n$a \\end{itemize} b$\n\\caption{q \\end{itemize} w}\n\\end{center}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\"><span class=\"math-inline \"></span><br>\n w}</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    name: "display math holding a brace inside a wrapper",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{center}\n$$\n\\frac{1}{2\n$$\n\\caption{q \\end{itemize} w}\n\\end{center}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\"><span class=\"math-block \"></span><br>\n w}</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    name: "an align env holding a brace inside a wrapper",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{center}\n\\begin{align}\nx_{1 &= 2\n\\end{align}\n\\caption{q \\end{itemize} w}\n\\end{center}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\"><span  class=\"math-block equation-number \" number=\"0\"></span><br>\n w}</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  // A closer of ours written inside a wrapper is content when the source past the wrapper still closes the
+  // open lists and no list starts inside it — how `tabular` always read it, now true of all six. With an
+  // opener inside, the wrapper stays transparent: swallowing it would lose that list.
+  {
+    name: "a real closer inside a center is content, the list still closes",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{center}\ntext \\end{itemize} here\n\\caption{q \\end{itemize} w}\n\\end{center}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\">text \\end{itemize} here<br>\n w}</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    name: "the same inside a left env",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{left}\ntext \\end{itemize} here\n\\end{left}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: left\">text \\end{itemize} here</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    name: "the same inside a right env",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{right}\ntext \\end{itemize} here\n\\end{right}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: right\">text \\end{itemize} here</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    name: "the same inside a table",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{table}\n\\caption{c}\ntext \\end{itemize} here\n\\begin{tabular}{l}\nq\n\\end{tabular}\n\\end{table}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"table\" number=\"1\">\n<div class=\"caption_table\">Table 1: c</div><div class=\"table_tabular\" style=\"text-align: center\">text \\end{itemize} here<br>\n<div class=\"inline-tabular\"><table class=\"tabular\">\n<tbody>\n<tr style=\"border-top: none !important; border-bottom: none !important;\">\n<td style=\"text-align: left; border-left: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; \">q</td>\n</tr>\n</tbody>\n</table>\n</div></div>\n</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    name: "the same inside a figure",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{figure}\n\\caption{c}\ntext \\end{itemize} here\n\\end{figure}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"table\" number=\"1\">text \\end{itemize} here<div class=\"caption_figure\">Figure 1: c</div></div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    name: "the same inside a tabular",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{tabular}{l}\nq \\end{itemize} r\n\\end{tabular}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"table_tabular\">\n<div class=\"inline-tabular\"><table class=\"tabular\">\n<tbody>\n<tr style=\"border-top: none !important; border-bottom: none !important;\">\n<td style=\"text-align: left; border-left: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; \">q \\end{itemize} r</td>\n</tr>\n</tbody>\n</table>\n</div></div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    name: "a list opened inside the wrapper keeps the wrapper transparent",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{center}\n\\end{itemize}\n\\begin{itemize}\n\\item b\n\\end{center}\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div>\\begin{center}</div>\n</li></ul><ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>b<br>\n\\end{center}</li></ul>"
+  },
+  // The same question asked from every distance and every context before the list: a brace left open in a
+  // formula or a caption, one between two lists, and a brace held by inline code, a fence or an
+  // `lstlisting` — none of them reaches the list, whatever their count.
+  {
+    name: "a brace left open in a broken formula before the list",
+    latex: "text $\\frac{1}{2$ here\n\n\\begin{itemize}\n\\item a\n\\begin{center}\n\\caption{q \\end{itemize} w}\n\\end{center}\n\\item b\n\\end{itemize}",
+    html: "<div>text <span class=\"math-inline \"></span> here</div>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\"> w}</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    name: "an unclosed caption before the list",
+    latex: "\\caption{unclosed\n\n\\begin{itemize}\n\\item a\n\\begin{center}\n\\caption{q \\end{itemize} w}\n\\end{center}\n\\item b\n\\end{itemize}",
+    html: "<div>\\caption{unclosed</div>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\"> w}</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    name: "a brace left open between two such lists",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{center}\n\\caption{q \\end{itemize} w}\n\\end{center}\n\\item b\n\\end{itemize}\n\nstray {\n\n\\begin{itemize}\n\\item a\n\\begin{center}\n\\caption{q \\end{itemize} w}\n\\end{center}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\"> w}</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul><div>stray {</div>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\"> w}</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    name: "inline code holding a brace before the list",
+    latex: "text `{` here\n\n\\begin{itemize}\n\\item a\n\\begin{center}\n\\caption{q \\end{itemize} w}\n\\end{center}\n\\item b\n\\end{itemize}",
+    html: "<div>text <code>{</code> here</div>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\"> w}</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    name: "a fenced block holding a brace before the list",
+    latex: "```\ncode {\n```\n\n\\begin{itemize}\n\\item a\n\\begin{center}\n\\caption{q \\end{itemize} w}\n\\end{center}\n\\item b\n\\end{itemize}",
+    html: "<pre><code class=\"hljs\">code {\n</code></pre>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\"> w}</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    name: "an lstlisting holding a brace before the list",
+    latex: "\\begin{lstlisting}\ncode {\n\\end{lstlisting}\n\n\\begin{itemize}\n\\item a\n\\begin{center}\n\\caption{q \\end{itemize} w}\n\\end{center}\n\\item b\n\\end{itemize}",
+    html: "<pre class=\"lstlisting\"><code class=\"hljs lstlisting-code\" style=\"text-align: left;\">code {</code></pre>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\"> w}</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    name: "a fenced block holding a brace inside the list, before the wrapper",
+    latex: "\\begin{itemize}\n\\item a\n```\ncode {\n```\n\\begin{center}\n\\caption{q \\end{itemize} w}\n\\end{center}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<pre><code class=\"hljs\">code {\n</code></pre>\n<div class=\"center\" style=\"text-align: center\"> w}</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    name: "inline math holding a brace inside a wrapper",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{center}\n$x_{1$\n\\caption{q \\end{itemize} w}\n\\end{center}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\"><span class=\"math-inline \"></span><br>\n w}</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    name: "two one-line lstlisting before the list, an even count",
+    latex: "\\begin{lstlisting}code\\end{lstlisting}\n\n\\begin{lstlisting}code\\end{lstlisting}\n\n\\begin{itemize}\n\\item a\n\\begin{center}\n\\caption{q \\end{itemize} w}\n\\end{center}\n\\item b\n\\end{itemize}",
+    html: "<div><pre class=\"lstlisting\"><code class=\"hljs lstlisting-code\" style=\"text-align: left;\">code</code></pre>\n</div>\n<div><pre class=\"lstlisting\"><code class=\"hljs lstlisting-code\" style=\"text-align: left;\">code</code></pre>\n</div>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\"> w}</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    name: "three lists in a row, each with a closer in its caption",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{center}\n\\caption{q \\end{itemize} w}\n\\end{center}\n\\item b\n\\end{itemize}\n\n\\begin{itemize}\n\\item a\n\\begin{center}\n\\caption{q \\end{itemize} w}\n\\end{center}\n\\item b\n\\end{itemize}\n\n\\begin{itemize}\n\\item a\n\\begin{center}\n\\caption{q \\end{itemize} w}\n\\end{center}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\"> w}</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul><ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\"> w}</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul><ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\"> w}</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  // Math pairs inside one paragraph, as its rules do: a `$` scanned across a blank line marked the list
+  // between them verbatim, and the guard then lost an item — while no parser read that as math at all.
+  {
+    name: "a dollar in one paragraph does not pair with one in another",
+    latex: "Open $a\n\n\\begin{itemize}\n\\item a\n\\begin{center}\n\\caption{q \\end{itemize} w}\n\\end{center}\n\\item b\n\\end{itemize}\n\nclose b$",
+    html: "<div>Open $a</div>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\"> w}</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul><div>close b$</div>\n"
+  },
+  {
+    name: "the same for $$ across a blank line",
+    latex: "Open $$a\n\n\\begin{itemize}\n\\item a\n\\begin{center}\n\\caption{q \\end{itemize} w}\n\\end{center}\n\\item b\n\\end{itemize}\n\nclose b$$",
+    html: "<div>Open $$a</div>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\"> w}</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul><div>close b$$</div>\n"
+  },
+  {
+    name: "the same for \\( across a blank line",
+    latex: "Open \\(a\n\n\\begin{itemize}\n\\item a\n\\begin{center}\n\\caption{q \\end{itemize} w}\n\\end{center}\n\\item b\n\\end{itemize}\n\nclose b\\)",
+    html: "<div>Open (a</div>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\"> w}</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul><div>close b)</div>\n"
+  },
+  {
+    name: "math inside one paragraph is still math",
+    latex: "Formula $a+b$ here\n\n\\begin{itemize}\n\\item a\n\\begin{center}\n\\caption{q \\end{itemize} w}\n\\end{center}\n\\item b\n\\end{itemize}",
+    html: "<div>Formula <span class=\"math-inline \">\n<mjx-container class=\"MathJax\" jax=\"SVG\"><svg style=\"vertical-align: -0.186ex;\" xmlns=\"http://www.w3.org/2000/svg\" width=\"4.933ex\" height=\"1.756ex\" role=\"img\" focusable=\"false\" viewBox=\"0 -694 2180.4 776\"><g stroke=\"currentColor\" fill=\"currentColor\" stroke-width=\"0\" transform=\"scale(1,-1)\"><g data-mml-node=\"math\"><g data-mml-node=\"mi\"><path data-c=\"1D44E\" d=\"M33 157Q33 258 109 349T280 441Q331 441 370 392Q386 422 416 422Q429 422 439 414T449 394Q449 381 412 234T374 68Q374 43 381 35T402 26Q411 27 422 35Q443 55 463 131Q469 151 473 152Q475 153 483 153H487Q506 153 506 144Q506 138 501 117T481 63T449 13Q436 0 417 -8Q409 -10 393 -10Q359 -10 336 5T306 36L300 51Q299 52 296 50Q294 48 292 46Q233 -10 172 -10Q117 -10 75 30T33 157ZM351 328Q351 334 346 350T323 385T277 405Q242 405 210 374T160 293Q131 214 119 129Q119 126 119 118T118 106Q118 61 136 44T179 26Q217 26 254 59T298 110Q300 114 325 217T351 328Z\"></path></g><g data-mml-node=\"mo\" transform=\"translate(751.2,0)\"><path data-c=\"2B\" d=\"M56 237T56 250T70 270H369V420L370 570Q380 583 389 583Q402 583 409 568V270H707Q722 262 722 250T707 230H409V-68Q401 -82 391 -82H389H387Q375 -82 369 -68V230H70Q56 237 56 250Z\"></path></g><g data-mml-node=\"mi\" transform=\"translate(1751.4,0)\"><path data-c=\"1D44F\" d=\"M73 647Q73 657 77 670T89 683Q90 683 161 688T234 694Q246 694 246 685T212 542Q204 508 195 472T180 418L176 399Q176 396 182 402Q231 442 283 442Q345 442 383 396T422 280Q422 169 343 79T173 -11Q123 -11 82 27T40 150V159Q40 180 48 217T97 414Q147 611 147 623T109 637Q104 637 101 637H96Q86 637 83 637T76 640T73 647ZM336 325V331Q336 405 275 405Q258 405 240 397T207 376T181 352T163 330L157 322L136 236Q114 150 114 114Q114 66 138 42Q154 26 178 26Q211 26 245 58Q270 81 285 114T318 219Q336 291 336 325Z\"></path></g></g></g></svg></mjx-container></span> here</div>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\"> w}</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  // `\verb`, an indented block, an html block and a `tabular` are not modelled as verbatim: a closer written
+  // there survives by the content rule — the source past the wrapper still closes the list.
+  {
+    name: "a closer inside \\verb keeps both items",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{center}\n\\verb|\\end{itemize}|\n\\caption{q \\end{itemize} w}\n\\end{center}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\">\\verb|\\end{itemize}|<br>\n w}</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    name: "a closer inside an indented block keeps both items",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{center}\n    \\end{itemize}\n\\caption{q \\end{itemize} w}\n\\end{center}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\">\\end{itemize}<br>\n w}</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    name: "a closer inside an html block keeps both items",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{center}\n<div>\n\\end{itemize}\n</div>\n\\caption{q \\end{itemize} w}\n\\end{center}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\"><div><br>\n\\end{itemize}<br>\n</div><br>\n w}</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    name: "a closer inside a tabular keeps both items",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{center}\n\\begin{tabular}{l}\n\\end{itemize}\n\\end{tabular}\n\\caption{q \\end{itemize} w}\n\\end{center}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\">\n<div class=\"table_tabular\" style=\"text-align: center\">\n<div class=\"inline-tabular\"><table class=\"tabular\">\n<tbody>\n<tr style=\"border-top: none !important; border-bottom: none !important;\">\n<td style=\"text-align: left; border-left: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; \">\\end{itemize}</td>\n</tr>\n</tbody>\n</table>\n</div><br>\n w}</div>\n</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
 ];

@@ -108,9 +108,8 @@ export const buildBlockStateFromRaw = (md: any, raw: string, baseEnv: any) => {
  */
 export const createBufferedState = (state: StateBlock): BufferedBlockState => {
   // prototype-inherit all read-only properties (bMarks, eMarks, src, etc.)
-  // `env` is deliberately left inherited, so the buffered parse writes straight to the real env
-  // and the commit path needs no copy-back. Giving a probe its own child env was measured slower:
-  // the child allocation plus one extra prototype hop per read costs more than the snapshot.
+  // `env` stays inherited, so the parse writes straight to the real env and the commit path needs no
+  // copy-back; a child env per probe measured slower than the snapshot (see the spec).
   const tempState = Object.create(state) as BufferedBlockState;
   tempState.tokens = [];
   tempState.level = state.level;

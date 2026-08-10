@@ -175,22 +175,54 @@ describe('An unclosed wrapper env leaves the list rendering:', () => {
       leaked.should.equal(false, 'the list fell out as literal LaTeX');
     });
   });
-  // The guard parses at most 4096 characters for argument spans. Past that a closer reads as unmatched,
-  // which declines — so a wrapper whose closer sits far away still leaves the list rendering.
-  it('a closer beyond the guard window still leaves the list rendering', () => {
-    const filler = 'filler line to push the closer past the guard window\n'.repeat(120);
+  // Pairing runs over the whole source, so an unmatched `{` must stay local: judged document-wide it
+  // blinded every list after it — the caption's closer read as structure and half the items were lost.
+  it('an unmatched { before a list does not reach it', () => {
+    const unit = '\\begin{itemize}\n\\item a\n\\begin{center}\n\\caption{q \\end{itemize} w}\n'
+      + '\\end{center}\n\\item b\n\\end{itemize}';
+    const three = [unit, unit, unit].join('\n\n');
+    const wrappers = (html) => (html.match(/class="center"/g) || []).length;
+    const prefixes = {
+      'none': '',
+      'a stray brace': 'Text with a stray {\n\n',
+      'a broken formula': 'Formula $\\frac{1}{2$ here\n\n',
+      'an unclosed caption': '\\caption{unclosed\n\n',
+      'three hundred paragraphs after one': 'stray {\n\n'
+        + Array.from({ length: 300 }, (_, i) => 'Paragraph ' + i).join('\n\n') + '\n\n',
+    };
+    Object.entries(prefixes).forEach(([what, prefix]) => {
+      const html = MM.markdownToHTML(prefix + three, { outMath: { include_svg: false } });
+      (html.match(/<li[\s>]/g) || []).should.have.length(6, 'items lost after ' + what);
+      wrappers(html).should.equal(3, 'wrappers lost after ' + what);
+      html.should.not.match(/\\item(?![a-zA-Z])/, 'the list fell out as literal LaTeX after ' + what);
+    });
+    // A brace between two lists reaches neither: the one before it is judged on its own stretch.
+    const middle = MM.markdownToHTML(unit + '\n\nstray {\n\n' + unit, { outMath: { include_svg: false } });
+    (middle.match(/<li[\s>]/g) || []).should.have.length(4);
+    wrappers(middle).should.equal(2);
+  });
+  // Argument spans are paired over the whole source, so the length of an argument decides nothing: a
+  // long balanced `\caption{}` holding a closer is text, an unmatched `{` before one is not knowable
+  // and every closer past it counts. Both sides checked at lengths a bounded window would have cut.
+  it('the length of a command argument does not decide whether a closer is ours', () => {
+    const filler = 'filler line between the list and the wrapper closer\n'.repeat(120);
+    [10, 4200, 20000].forEach((pad) => {
+      const balanced = '\\begin{itemize}\n\\item a\n\\begin{center}\n'
+        + '\\caption{' + 'x'.repeat(pad) + ' \\end{itemize} tail}\n'
+        + '\\end{center}\n\\item b\n\\end{itemize}\n';
+      const { items, leaked } = rendered(balanced);
+      items.should.equal(2, 'a closer inside a caption was taken as ours at pad ' + pad);
+      leaked.should.equal(false, 'the list fell out as literal LaTeX at pad ' + pad);
+    });
+    // A closer of ours ahead of the wrapper's own closer keeps the wrapper transparent, however far
+    // that closer sits, and an unmatched `{` before it leaves the same decline.
     const far = '\\begin{itemize}\n\\item a\n\\begin{center}\nb\n\\end{itemize}\n' + filler + '\\end{center}\n';
-    far.length.should.be.greaterThan(4096, 'the window is not exceeded, so this proves nothing');
-    const { items, leaked } = rendered(far);
-    items.should.equal(1);
-    leaked.should.equal(false);
-    // A `{` opening near the bound is the truncation edge: its argument cannot be paired, and the
-    // conservative side is the same decline.
-    const atEdge = '\\begin{itemize}\n\\item a\n\\begin{center}\n\\caption{' + 'x'.repeat(4090)
+    rendered(far).items.should.equal(1);
+    rendered(far).leaked.should.equal(false);
+    const unmatched = '\\begin{itemize}\n\\item a\n\\begin{center}\n\\caption{' + 'x'.repeat(4090)
       + '\nb\n\\end{itemize}\n' + filler + '\\end{center}\n';
-    const edge = rendered(atEdge);
-    edge.items.should.equal(1);
-    edge.leaked.should.equal(false);
+    rendered(unmatched).items.should.equal(1);
+    rendered(unmatched).leaked.should.equal(false);
   });
   // The stack pops on the first `\end{X}` with no depth count, so a same-name nest loses the inner
   // opener and the outer closer to text. Valid LaTeX, identical on `master`, pinned as measured.
@@ -312,19 +344,43 @@ describe('Numbering depth survives a wrapper env between two enumerate levels:',
 
 // `<ul>`/`<ol>` admit only `<li>`. A chunk before the first `\item` — a block env, a fence, an
 // unsupported command — used to land there as a text node or a `<div>`, so it now gets a marker-less
-// `<li>`. Every list fixture is swept, so a new one cannot bring the invalid shape back.
+// `<li>`, and a sublist written in that chunk goes inside it. Every direct child of every list
+// element in the fixtures is checked, so a fixture added later cannot record the invalid shape.
 describe('A list element holds nothing but <li>:', () => {
+  // Void and SVG leaf tags never open an element, so they must not go on the stack.
+  const CHILDLESS = new Set(['br', 'img', 'hr', 'input', 'meta', 'link', 'source', 'col', 'area',
+    'base', 'wbr', 'embed', 'track', 'path', 'use', 'rect', 'circle', 'ellipse', 'line',
+    'polyline', 'polygon', 'stop']);
+  // Every direct child, not just the first: reading one child passed while an invalid `<ul>` sat
+  // second. Whitespace between the tags is not a child — a fixture pins that shape.
   const invalidChild = (html) => {
-    // After each `<ul>`/`<ol>` open tag, the next tag must be `<li>`; text before it is invalid too.
-    const opens = /<(ul|ol)\b[^>]*>/g;
+    const tags = /<(\/?)([a-zA-Z][\w:-]*)\b[^>]*?(\/?)>/g;
+    const stack = [];
+    let last = 0;
     let match;
-    while ((match = opens.exec(html)) !== null) {
-      const rest = html.slice(match.index + match[0].length);
-      if (!/^\s*<li\b/.test(rest)) {
-        return rest.slice(0, 60);
+    const inList = () => stack.length > 0 && (stack[stack.length - 1] === 'ul' || stack[stack.length - 1] === 'ol');
+    while ((match = tags.exec(html)) !== null) {
+      const between = html.slice(last, match.index);
+      last = match.index + match[0].length;
+      if (inList() && between.trim()) {
+        return 'text: ' + between.trim().slice(0, 40);
+      }
+      const name = match[2].toLowerCase();
+      if (match[1]) {
+        const at = stack.lastIndexOf(name);
+        if (at >= 0) {
+          stack.length = at;
+        }
+        continue;
+      }
+      if (inList() && name !== 'li') {
+        return '<' + name + '>';
+      }
+      if (!match[3] && !CHILDLESS.has(name)) {
+        stack.push(name);
       }
     }
-    return '';
+    return inList() && html.slice(last).trim() ? 'tail: ' + html.slice(last).trim().slice(0, 40) : '';
   };
   it('holds across every list fixture', () => {
     require('./_data/_lists/_data').forEach((test) => {
@@ -380,6 +436,30 @@ describe('A list element holds nothing but <li>:', () => {
     first(blockChunk, { outMath: { include_svg: false } }).should.include('data-custom-marker="true"');
     first('\\begin{itemize}\nloose\n\\item a\n\\end{itemize}',
       { outMath: { include_svg: false }, lineNumbering: true }).should.include('data_line_start=');
+  });
+  // A list in a table cell renders its leaf tokens once per token for HTML and once more per run for
+  // the exports. Pinned per token, not in total: a rewrite that re-renders the run per member would
+  // be quadratic in the cell, and the HTML would gain a duplicate.
+  it('a leaf run in a cell costs a constant number of renders per token', () => {
+    const build = (exports_) => {
+      const md = markdownIt({ html: true }).use(mathpixMarkdownPlugin, {
+        outMath: Object.assign({ include_svg: false, include_table_html: true }, exports_),
+      });
+      let renders = 0;
+      md.renderer.rules.text = (tokens, idx) => { renders++; return tokens[idx].content; };
+      return { md, renders: () => renders };
+    };
+    const cell = (k) => '\\begin{tabular}{|l|}\n\\begin{itemize}\\item ' +
+      Array.from({ length: k }, (_, i) => 'w' + i).join(' [l](u) ') + '\\end{itemize}\n\\end{tabular}\n';
+    [{}, { include_tsv: true, include_csv: true, include_table_markdown: true }].forEach((exports_) => {
+      const perToken = [2, 16].map((k) => {
+        const { md, renders } = build(exports_);
+        const html = md.render(cell(k), {});
+        return { ratio: renders() / k, first: (html.match(/>w0/g) || []).length };
+      });
+      perToken[1].ratio.should.equal(perToken[0].ratio, 'renders per leaf token grew with the run');
+      perToken.forEach(({ first }) => first.should.equal(1, 'the leaf reached the visible HTML twice'));
+    });
   });
   it('holds for a chunk before the first \\item', () => {
     const shapes = [

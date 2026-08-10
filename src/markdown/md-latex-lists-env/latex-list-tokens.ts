@@ -35,13 +35,116 @@ export const computeMarkerPadding = (markerTokens: Token[] | undefined): number 
   return em > 0 ? em + MARKER_GAP_EM : 0;
 };
 
+// A token that ends the loose run: it carries its own `<li>`, or it closes the list the run sits in.
+const LIST_STRUCTURE_TYPES: ReadonlySet<string> = new Set([
+  'latex_list_item_open', 'latex_list_item_close',
+  'itemize_list_open', 'enumerate_list_open',
+  'itemize_list_close', 'enumerate_list_close',
+]);
+const LIST_OPEN_TYPES: ReadonlySet<string> = new Set(['itemize_list_open', 'enumerate_list_open']);
+const LIST_CLOSE_TYPES: ReadonlySet<string> = new Set(['itemize_list_close', 'enumerate_list_close']);
+
+// Where the loose run ends: a sublist written in the chunk belongs inside its `<li>`, so a balanced
+// open…close pair is taken whole. An unbalanced closer is the enclosing list's — stop before it.
+const looseRunEnd = (tokens: Token[], from: number, limit: number): number => {
+  let depth = 0;
+  for (let i = from; i < limit; i++) {
+    const type: string = tokens[i].type;
+    if (LIST_OPEN_TYPES.has(type)) {
+      depth++;
+      continue;
+    }
+    if (depth > 0) {
+      if (LIST_CLOSE_TYPES.has(type)) {
+        depth--;
+      }
+      continue;
+    }
+    if (LIST_STRUCTURE_TYPES.has(type)) {
+      return i;
+    }
+  }
+  // An unclosed sublist would cross the tags: keep what precedes it.
+  return depth > 0 ? looseRunEndBeforeOpen(tokens, from, limit) : limit;
+};
+
+// Falls back to the first list open, the run then holding no list at all.
+const looseRunEndBeforeOpen = (tokens: Token[], from: number, limit: number): number => {
+  for (let i = from; i < limit; i++) {
+    if (LIST_STRUCTURE_TYPES.has(tokens[i].type)) {
+      return i;
+    }
+  }
+  return limit;
+};
+
+// The open token of the item this close belongs to, or null.
+const matchingItemOpen = (tokens: Token[], closeIndex: number): Token | null => {
+  let depth = 0;
+  for (let i = closeIndex; i >= 0; i--) {
+    const type: string = tokens[i].type;
+    if (type === 'latex_list_item_close') {
+      depth++;
+    } else if (type === 'latex_list_item_open') {
+      depth--;
+      if (depth === 0) {
+        return tokens[i];
+      }
+    }
+  }
+  return null;
+};
+
+// Index of the close that balances the list opened at `openIndex`, or -1.
+const matchingListClose = (tokens: Token[], openIndex: number): number => {
+  let depth = 0;
+  for (let i = openIndex; i < tokens.length; i++) {
+    const type: string = tokens[i].type;
+    if (LIST_OPEN_TYPES.has(type)) {
+      depth++;
+    } else if (LIST_CLOSE_TYPES.has(type)) {
+      depth--;
+      if (depth === 0) {
+        return i;
+      }
+    }
+  }
+  return -1;
+};
+
+// A sublist emitted after a marker-less wrapper has closed is a bare `<ul>` inside `<ul>`. Moves that
+// close past the sublist, so it sits in the `<li>` — done on tokens, the exports walking those.
+export const absorbSublistIntoWrapper = (tokens: Token[], from: number): void => {
+  for (let i = Math.max(from, 1); i < tokens.length; i++) {
+    if (!LIST_OPEN_TYPES.has(tokens[i].type)) {
+      continue;
+    }
+    const close: Token = tokens[i - 1];
+    if (close?.type !== 'latex_list_item_close' || !matchingItemOpen(tokens, i - 1)?.meta?.markerEmpty) {
+      continue;
+    }
+    const end: number = matchingListClose(tokens, i);
+    if (end < 0) {
+      continue;
+    }
+    tokens.splice(i - 1, 1);
+    tokens.splice(end, 0, close);
+    i = end;
+  }
+};
+
 // Wraps the tokens emitted in `[from, to)` in a marker-less `<li>` — `<ul>` admits nothing else.
 // After the fact: a run that emitted nothing leaves nothing to wrap.
 export const wrapLooseRun = (state: any, from: number, to?: number): void => {
-  const end: number = to ?? state.tokens.length;
+  const limit: number = Math.min(to ?? state.tokens.length, state.tokens.length);
+  const end: number = looseRunEnd(state.tokens, from, limit);
   const run: Token[] = state.tokens.slice(from, end);
   // Whitespace alone is not content: the same run reaches here trimmed from the block path.
-  if (!run.some((t: Token) => t.type !== 'text' || t.content.trim())) {
+  if (!run.some((t: Token) => t.type !== 'text' || (t.content || '').trim())) {
+    return;
+  }
+  // Without the constructor the run stays where it is: a loose child renders, a thrown rule does not.
+  if (typeof state.Token !== 'function') {
     return;
   }
   const open: Token = new state.Token('latex_list_item_open', 'li', 1);
@@ -61,6 +164,7 @@ export const wrapLooseRun = (state: any, from: number, to?: number): void => {
   const close: Token = new state.Token('latex_list_item_close', 'li', -1);
   close.block = true;
   close.level = state.level;
+  // Spliced, not pushed, so `state.level` stays where the caller left it — the wrapped run keeps its own.
   state.tokens.splice(from, 0, open);
   state.tokens.splice(end + 1, 0, close);
 };
@@ -252,13 +356,7 @@ export const ListOpen = (
         content: ''
       }, child, ctx);
     }
-    // Only what precedes the first item token is loose; the items carry their own `<li>`.
-    let firstItem: number = looseFrom;
-    while (firstItem < state.tokens.length
-      && state.tokens[firstItem].type !== 'latex_list_item_open') {
-      firstItem++;
-    }
-    wrapLooseRun(state, looseFrom, firstItem);
+    wrapLooseRun(state, looseFrom);
     // Update context after processing children
     li = ctx.li;
     iOpen = ctx.iOpen;

@@ -10,6 +10,8 @@ import {
 } from "../common/consts";
 
 
+// Outside the Lists rollback: a discarded parse re-runs the `\renewcommand` when the source is parsed
+// for real. No repro of a leak found.
 /** Active itemize levels (mutable state) */
 export let itemizeLevel: string[] = [];
 /** Active enumerate levels (mutable state) */
@@ -213,7 +215,8 @@ export const ChangeLevel = (
 };
 
 /**
- * Clears stored itemize level token cache.
+ * Clears stored itemize level token cache. The definitions survive by design: set once per md
+ * instance, so a chunked host keeps a \renewcommand from an earlier chunk.
  */
 export const clearItemizeLevelTokens = () => {
   itemizeLevelTokens = [];

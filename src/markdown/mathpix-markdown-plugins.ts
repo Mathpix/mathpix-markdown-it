@@ -6,6 +6,8 @@ import { rest_mmd_footnotes_list } from './md-latex-footnotes/utils';
 import { resetMmdGlobalState } from './common/reset-mmd-state';
 import { resetListRenderDepth } from './md-latex-lists-env/render-latex-list-env';
 import { resetWarnDistinct } from './common/warn-distinct';
+import { resetEnvSnapshotPool } from './common/env-transient';
+import { clearSrcPosCaches } from './common/src-pos-cache';
 
 import {
   mdPluginMathJax,
@@ -97,6 +99,8 @@ export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
     // Before the partial check: both are per-render, and a drifted list depth would outlive it.
     resetWarnDistinct();
     resetListRenderDepth();
+    resetEnvSnapshotPool();
+    clearSrcPosCaches(state.env);
     const isPartial = state.md.options.renderElement
       && Object.prototype.hasOwnProperty.call(state.md.options.renderElement, 'startLine');
     if (isPartial) {

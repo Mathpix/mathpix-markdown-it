@@ -4,13 +4,14 @@ let should = chai.should();
 const markdownIt = require('markdown-it');
 const { mathpixMarkdownPlugin } = require('../lib/index.js');
 const { snapshotListLevels, getListDepth } = require('../lib/markdown/md-latex-lists-env/list-state');
-const { resetWarnDistinct } = require('../lib/markdown/common/warn-distinct');
+const { resetWarnDistinct, warnDistinct } = require('../lib/markdown/common/warn-distinct');
 const listEnvEngine = require('../lib/markdown/md-latex-lists-env/latex-list-env-engine');
 const {
   LIST_TRANSIENT_ENV_KEYS,
   snapshotEnvAll,
   snapshotEnvForInline,
   releaseEnvSnapshot,
+  resetEnvSnapshotPool,
   restoreEnvAll,
   restoreEnvKeysFromAll,
 } = require('../lib/markdown/common/env-transient');
@@ -63,6 +64,17 @@ describe('parse isolation: repeat-render of same source produces identical HTML'
     // Second parse's marker must come from srcB's \renewcommand, not from
     // srcA's stale cached itemizeLevelTokens.
     second.should.not.include('>*<');
+  });
+  // The marker definitions are per md instance, not per render: a host rendering one document in
+  // chunks has the \renewcommand in an earlier chunk. Only the parsed marker tokens are cleared.
+  it('a \\renewcommand marker carries to the next render, a fresh instance starts from the default', () => {
+    const marker = (html) => (html.match(/<span class="li_level">([^<]*)<\/span>/) || [])[1];
+    const list = '\\begin{itemize}\n\\item a\n\\end{itemize}\n';
+    const md = mkMd();
+    marker(md.render(list)).should.equal('•');
+    md.render('\\renewcommand{\\labelitemi}{*}\n\n' + list);
+    marker(md.render(list)).should.equal('*', 'the definition must outlive the render that set it');
+    marker(mkMd().render(list)).should.equal('•');
   });
   it('tabular parse error from doc 1 does not leak into doc 2', () => {
     const md = mkMd();
@@ -176,6 +188,38 @@ describe('silent-mode Lists does not mutate shared env', () => {
     ['caption', 'envType', 'align', 'number', 'consumerKey'].forEach((key) => {
       replayed(key).should.equal(false, key + ' must not clobber a later value with undefined');
     });
+  });
+
+  // The trio above was derived by measurement, so a rule that starts parking a NEW key at `undefined`
+  // has to be classified rather than silently dropped from the replay. This fails when one appears.
+  it('no key outside the known set is left holding undefined', () => {
+    const md = markdownIt({ html: true }).use(mathpixMarkdownPlugin, { outMath: { include_svg: false } });
+    const sources = [
+      '\\begin{itemize}\n\\item a\n\\end{itemize}\n',
+      '\\begin{itemize}\n\\item a\n\\begin{tabular}{|l|}\nq\n\\end{tabular}\n\\end{itemize}\n',
+      'Para\n\\begin{itemize}\n\\item a\n',
+      '\\begin{tabular}{|l|}\nq\n\\end{tabular}\n',
+      '\\begin{center}\n\\includegraphics{a.png}\n\\end{center}\n',
+      '[[toc]]\n\n\\section{S}\n\nText.\\footnote{n}\n',
+      '\\begin{table}\n\\caption{T}\n\\begin{tabular}{|l|}\nq\n\\end{tabular}\n\\end{table}\n',
+      '| h |\n| :-- |\n| \\begin{itemize}\\item x\\end{itemize} |\n',
+      '\\begin{enumerate}\n\\item a\n\\begin{lstlisting}\ncode\n\\end{lstlisting}\n\\end{enumerate}\n',
+    ];
+    const known = new Set([...LIST_TRANSIENT_ENV_KEYS, 'isInline', 'subTabular', 'tabulare']);
+    const warn = console.warn;
+    console.warn = () => {};
+    const surprises = new Set();
+    try {
+      sources.forEach((src) => {
+        const env = {};
+        md.render(src, env);
+        Object.keys(env).filter((k) => env[k] === undefined && !known.has(k))
+          .forEach((k) => surprises.add(k));
+      });
+    } finally {
+      console.warn = warn;
+    }
+    [...surprises].should.deep.equal([], 'classify these: replayed as undefined, or not written at all');
   });
 
   it('releasing a snapshot lets go of the values it held', () => {
@@ -360,6 +404,43 @@ describe('a failing list rule does not fail the document', () => {
       listEnvEngine.createBufferedState = original;
     }
   });
+  // The opaque loop ends when its tail stops shrinking, not after a step count, so how many envs a
+  // line closes decides nothing. A step count of 50 took the tail as text from the 50th pair on.
+  it('an opaque line closing many envs is processed whatever their number', () => {
+    const md = markdownIt({ html: true }).use(mathpixMarkdownPlugin, { outMath: { include_svg: false } });
+    const nested = (n) => '\\begin{itemize}\n\\item visible text\n' +
+      Array.from({ length: n }, () => '\\begin{tabular}{l}').join('\n') + '\ncell\n' +
+      Array.from({ length: n }, () => '\\end{tabular}').join(' ') + '\n\\end{itemize}\n';
+    [5, 60].forEach((n) => {
+      const warn = console.warn;
+      const warnings = [];
+      console.warn = (...args) => warnings.push(String(args[0]));
+      let html;
+      try { html = md.render(nested(n), {}); } finally { console.warn = warn; }
+      html.should.include('visible text');
+      html.should.include('cell');
+      (html.match(/<table/g) || []).should.have.length(n, 'tables lost at ' + n + ' nested envs');
+      warnings.filter((w) => w.includes('stopped shrinking')).should.have.length(0);
+    });
+  });
+
+  // Past the 200-key cap the diagnostics go quiet, so the log has to say it is truncated.
+  it('hitting the distinct-key cap is reported once', () => {
+    resetWarnDistinct();
+    const warn = console.warn;
+    const warnings = [];
+    console.warn = (...args) => warnings.push(String(args[0]));
+    try {
+      for (let i = 0; i < 260; i++) {
+        warnDistinct('cause:' + i, 'cause ' + i);
+      }
+    } finally {
+      console.warn = warn;
+    }
+    warnings.should.have.length(201);
+    warnings[200].should.include('the rest are silent');
+  });
+
   it('each distinct cause is reported once, not just each error name', () => {
     // Most internal faults are plain `Error`, so a name-only key would hide every cause but the first.
     resetWarnDistinct();
@@ -515,6 +596,32 @@ describe('silent-mode Lists probes', () => {
     state.tShift = fresh.tShift;
     state.lineMax = fresh.lineMax;
     listsRule(state, 0, state.lineMax, true).should.equal(false);
+  });
+});
+
+// The snapshot pool is module state too: a parse that dies between snapshot and release leaves the
+// depth raised, so every later parse takes a deeper slot and the abandoned ones hold its objects.
+describe('the env snapshot pool is reset even when the render is partial', () => {
+  const nested = '\\begin{itemize}\n\\item a\n\\begin{enumerate}\n\\item b\n\\end{enumerate}\n\\end{itemize}';
+  [{}, { renderElement: { startLine: 0 } }].forEach((extra, i) => {
+    it(`a ${i === 0 ? 'full' : 'partial'} render undoes a drifted depth`, () => {
+      const md = markdownIt({ html: true })
+        .use(mathpixMarkdownPlugin, Object.assign({ outMath: { include_svg: false } }, extra));
+      resetEnvSnapshotPool();
+      const clean = md.render(nested, {});
+      const slotZero = snapshotEnvAll({ a: 1 });
+      releaseEnvSnapshot();
+      // Three snapshots that never come back, the last holding a document-sized value.
+      snapshotEnvAll({ a: 1 });
+      snapshotEnvAll({ b: 2 });
+      const canary = { blob: new Array(1000).fill(0) };
+      const abandoned = snapshotEnvAll({ heavy: canary });
+      md.render(nested, {}).should.equal(clean);
+      abandoned.values.indexOf(canary).should.equal(-1, 'the abandoned slot still holds the document');
+      const after = snapshotEnvAll({ a: 1 });
+      after.should.equal(slotZero, 'the next snapshot came from a deeper slot');
+      releaseEnvSnapshot();
+    });
   });
 });
 

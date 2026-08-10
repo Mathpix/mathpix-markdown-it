@@ -3,15 +3,6 @@ import type StateBlock from 'markdown-it/lib/rules_block/state_block';
 import type Token from 'markdown-it/lib/token';
 import { ListItemsResult, ParsedListItem } from "./latex-list-types";
 /**
- * Processes block-style LaTeX list items by parsing their content
- * using the block parser. This is used for items whose content
- * contains block environments (e.g., \begin{table}, \begin{figure}, etc.).
- *
- * @param state - Markdown-It processing state
- * @param items - Array of parsed list items
- */
-export declare const ListItemsBlock: (state: any, items: ParsedListItem[] | null | undefined) => void;
-/**
  * Processes LaTeX list items and generates Markdown-It tokens
  * for both inline content and nested list structures.
  *
