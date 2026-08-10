@@ -219,6 +219,12 @@ describe('An unclosed wrapper env leaves the list rendering:', () => {
     // A range end is exclusive: skipping a brace inside one must resume on it, not past it.
     pairArgumentSpans('a{b{c}', [[1, 3]]).should.deep.equal([[3, 5]]);
     pairArgumentSpans('a{b}c}', [[1, 3]]).should.deep.equal([]);
+    // Escapes are counted in pairs, so `\\{` opens where `\{` does not, and a trailing `\` ends the walk.
+    pairArgumentSpans('a\\{b}', []).should.deep.equal([]);
+    pairArgumentSpans('a\\\\{b}', []).should.deep.equal([[3, 5]]);
+    pairArgumentSpans('{a\\', []).should.deep.equal([]);
+    // A backslash inside a verbatim range escapes nothing beyond it: the brace at its end still opens.
+    pairArgumentSpans('`\\`{a}', [[0, 3]]).should.deep.equal([[3, 5]]);
     for (let round = 0; round < 20000; round++) {
       let text = '';
       for (let i = rnd(24); i > 0; i--) {
@@ -304,6 +310,41 @@ describe('An unclosed wrapper env leaves the list rendering:', () => {
       outsideCode.should.not.match(/\\end\{itemize\}/, 'a closer fell out as text after ' + what);
     });
   });
+  // The wrapper guard counts the closers left against how many lists are open, and that count is module
+  // state — so the same body must decide the same way whatever depth it is written at.
+  it('a wrapper holding a closer decides the same way at every nesting depth', () => {
+    const body = '\\begin{center}\ntext \\end{itemize} here\n\\end{center}\n';
+    const at = (depth) => {
+      const open = '\\begin{itemize}\n\\item a\n'.repeat(depth + 1);
+      const close = '\\end{itemize}\n'.repeat(depth + 1);
+      const html = MM.markdownToHTML(open + body + '\\item b\n' + close, { outMath: { include_svg: false } });
+      return {
+        wrappers: (html.match(/class="center"/g) || []).length,
+        lists: (html.match(/<ul[\s>]/g) || []).length,
+        leaked: /\\begin\{itemize\}/.test(html),
+      };
+    };
+    const shallow = at(0);
+    [1, 2].forEach((depth) => {
+      const deeper = at(depth);
+      deeper.wrappers.should.equal(shallow.wrappers, 'the wrapper decision moved at depth ' + depth);
+      deeper.lists.should.equal(shallow.lists + depth, 'a list was lost at depth ' + depth);
+      deeper.leaked.should.equal(false, 'the list fell out as literal LaTeX at depth ' + depth);
+    });
+  });
+  // Marker tokens are cached and shared, and a cell render writes `isTableCell` onto them. Rendering a
+  // list in a cell must therefore not change how the next list outside a table draws its marker.
+  it('a list rendered in a table cell leaves the shared markers alone', () => {
+    const plain = '\\begin{itemize}\n\\item a\n\\end{itemize}';
+    const marker = (src) => {
+      const html = MM.markdownToHTML(src, { outMath: { include_svg: false } });
+      return (html.match(/<span class="li_level"[^>]*>[\s\S]*?<\/span>/) || [])[0];
+    };
+    const before = marker(plain);
+    MM.markdownToHTML('| a |\n|---|\n| \\begin{itemize}\\item x\\end{itemize} |',
+      { outMath: { include_svg: false } });
+    marker(plain).should.equal(before, 'the marker changed after one was rendered in a cell');
+  });
   // Argument spans are paired over the whole source, so the length of an argument decides nothing: a
   // long balanced `\caption{}` holding a closer is text, an unmatched `{` before one is not knowable
   // and every closer past it counts. Both sides checked at lengths a bounded window would have cut.
@@ -328,7 +369,7 @@ describe('An unclosed wrapper env leaves the list rendering:', () => {
     rendered(unmatched).leaked.should.equal(false);
   });
   // The stack pops on the first `\end{X}` with no depth count, so a same-name nest loses the inner
-  // opener and the outer closer to text. Valid LaTeX, identical on `master`, pinned as measured.
+  // opener and the outer closer to text. Valid LaTeX, pinned as measured in both written forms.
   it('a same-name wrapper nested in itself keeps the list, not both frames', () => {
     const html = MM.markdownToHTML(
       '\\begin{itemize}\n\\item a\n\\begin{center}\nouter\n\\begin{center}\ninner\n\\end{center}\n'
@@ -337,6 +378,14 @@ describe('An unclosed wrapper env leaves the list rendering:', () => {
     (html.match(/<li[\s>]/g) || []).should.have.length(2);
     (html.match(/class="center"/g) || []).should.have.length(1);
     (html.match(/\\(begin|end)\{center\}/g) || []).should.have.length(2);
+    // Written on one line the text after the inner closer is kept, where `master` drops it silently.
+    const oneLine = MM.markdownToHTML(
+      '\\begin{itemize}\n\\item a\n\\begin{center} outer \\begin{center} inner \\end{center} tail'
+      + ' \\end{center}\n\\item b\n\\end{itemize}',
+      { outMath: { include_svg: false } });
+    (oneLine.match(/<li[\s>]/g) || []).should.have.length(2);
+    (oneLine.match(/class="center"/g) || []).should.have.length(1);
+    oneLine.should.include('<div>tail \\end{center}</div>');
   });
   it('a wrapper closed within the list still becomes opaque', () => {
     const src = '\\begin{itemize}\n\\item a\n\\begin{center}\n\\item[x] y\n\\end{center}\n\\item b\n\\end{itemize}';

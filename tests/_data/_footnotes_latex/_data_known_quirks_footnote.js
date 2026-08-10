@@ -16,6 +16,19 @@ module.exports = [
       '</section>'
   },
   {
+    // `\\` at the end of the argument: the note renders (it used to print as literal LaTeX), but the
+    // break comes out as a literal `\` — a heading in the same position renders `<br>`.
+    mmd: 'Text\\footnote{note \\\\} here',
+    html: '<div>Text<sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup> here</div>\n' +
+      '<hr class="footnotes-sep">\n' +
+      '<section class="footnotes" style="margin-bottom: 1em;">\n' +
+      '<ol class="footnotes-list" style="margin-bottom: 0;">\n' +
+      '<li id="fn1" class="footnote-item"><div>note \\ <a href="#fnref1" class="footnote-backref">↩︎</a></div>\n' +
+      '</li>\n' +
+      '</ol>\n' +
+      '</section>'
+  },
+  {
     // Nested `\footnote{}`: inner gets [1] (id=fn1), outer gets [2] (id=fn2). The inner is processed
     // first by the recursive parse, so its number is assigned first — counter-intuitive but stable.
     mmd: 'Outer text \\footnote{outer body with nested \\footnote{inner} ref} after.',

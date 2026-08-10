@@ -247,6 +247,22 @@ describe('silent-mode Lists does not mutate shared env', () => {
     env.ctx.touched.should.equal(true, 'in-place mutation is out of the rollback by design');
   });
 
+  // Deleting and adding in one parse take different branches of the restore: the count check alone reads
+  // an env of the same size as untouched.
+  it('a key the parse deleted comes back, one it added is left present and undefined', () => {
+    const env = { kept: 'original', doomed: 'was here' };
+    const snapshot = snapshotEnvAll(env);
+    delete env.doomed;
+    env.fresh = 1;
+    restoreEnvAll(env, snapshot);
+    releaseEnvSnapshot();
+    env.doomed.should.equal('was here');
+    env.kept.should.equal('original');
+    (env.fresh === undefined).should.equal(true);
+    Object.prototype.hasOwnProperty.call(env, 'fresh')
+      .should.equal(true, 'the key was deleted, which drops env into dictionary mode');
+  });
+
   it('a snapshot of a smaller env does not see the previous one', () => {
     const rich = snapshotEnvAll({ isBlock: true, inheritedListType: 'itemize', prentLevel: 7, x: 1 });
     rich.length.should.equal(4);

@@ -423,7 +423,9 @@ export const processListChildToken = (
 ): void => {
   // 1. Handle \setcounter
   if (child.type === 'setcounter') {
-    ctx.li = { value: child.content };
+    // A number, as the block path stores it: the two agreed only because consumers stringify it.
+    const parsed: number = parseInt(child.content, 10);
+    ctx.li = { value: Number.isNaN(parsed) ? 1 : parsed };
     if (state.md.options?.forLatex && child.latex) {
       let token = state.push("setcounter", "", 0);
       token.latex = child.latex;

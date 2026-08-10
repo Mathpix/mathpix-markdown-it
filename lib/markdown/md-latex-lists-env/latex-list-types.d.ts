@@ -6,7 +6,7 @@ export declare enum ListType {
 }
 export interface ListInlineContext {
     li: {
-        value: any;
+        value: number;
     } | null;
     iOpen: number;
     itemizeLevelTokens: Token[][];

@@ -129,7 +129,7 @@ module.exports = [
     html: "<div>Para.</div>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">a</span><div>x</div>\n<div id=\"fig%3Aa\" class=\"figure fig%3Aa\" number=\"1\"><div class=\"caption_figure\">Figure 1: F</div></div>\n</li></ul><div>See <a href=\"#fig%3Aa\" style=\"cursor: pointer; text-decoration: none;\" class=\"clickable-link\" value=\"fig%3Aa\" data-parentheses=\"false\">1</a>.</div>"
   },
   // `\\` is a line break, not an escape for the brace after it: the argument used to read as unclosed
-  // and the whole caption was dropped, which also moved the number of every table below it.
+  // and the whole caption was dropped. It renders now, the break itself staying a literal `\` as below.
   {
     latex: "\\begin{table}\n\\caption{First line \\\\}\n\\begin{tabular}{l}a\\end{tabular}\n\\end{table}",
     html: "<div class=\"table\" number=\"1\">\n<div class=\"caption_table\">Table 1: First line \\</div><div class=\"table_tabular\" style=\"text-align: center\">\n<div class=\"inline-tabular\"><table class=\"tabular\">\n<tbody>\n<tr style=\"border-top: none !important; border-bottom: none !important;\">\n<td style=\"text-align: left; border-left: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; \">a</td>\n</tr>\n</tbody>\n</table>\n</div></div>\n</div>"

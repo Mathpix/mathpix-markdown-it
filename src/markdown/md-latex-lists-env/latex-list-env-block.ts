@@ -305,9 +305,30 @@ const nextListEnvMatch = (s: string): { match: RegExpMatchArray; isEnd: boolean 
   return { match: isEnd ? endMatch! : beginMatch!, isEnd };
 };
 
-// A fenced code block or an `lstlisting` inside a list env is opaque: its lines are collected raw so
-// the code keeps its indentation (the normal content path de-indents via tShift, which `\item` needs).
-
+// Opens `openedType` and decides in one place whether it closes on this same line — the nested-tabular
+// branch skipped that check, so its one-line form left the stack open for good.
+const openOpaqueEnv = (
+  stack: OpaqueStack,
+  items: any[],
+  openedType: OpaqueEnvType,
+  afterBegin: string,
+  nextLine: number
+): LstEndResult => {
+  stack = [...stack, openedType];
+  const endRe: RegExp = END_OPAQUE_ENV_RE[openedType];
+  const meSameLine: RegExpExecArray | null = endRe.exec(afterBegin);
+  if (!meSameLine) {
+    // `lineText` is a tail for the caller to re-parse, so it is only read when `handled` is false.
+    return { handled: true, stack, items: ItemsAddToPrev(items, afterBegin, nextLine), lineText: '' };
+  }
+  const glue: string = openedType === "lstlisting" ? "\n" : "";
+  items = ItemsAddToPrev(items, afterBegin.slice(0, meSameLine.index) + glue + meSameLine[0], nextLine);
+  stack = stack.slice(0, -1);
+  const afterSameLineEnd: string = afterBegin.slice(meSameLine.index + meSameLine[0].length);
+  return afterSameLineEnd.trim().length
+    ? { handled: false, stack, items, lineText: afterSameLineEnd }
+    : { handled: true, stack, items, lineText: "" };
+};
 
 /**
  * Detects \begin{lstlisting} or \begin{tabular} on a line and enters an opaque env.
@@ -345,14 +366,10 @@ const handleLstBeginInline = (
     if (!mbTab) return { handled: false, stack, items, lineText };
     // keep the prefix before \begin{tabular} (e.g. "\hline " or " & ")
     const prefix: string = lineText.slice(0, mbTab.index);
-    const beginAndRest: string = lineText.slice(mbTab.index);
-    // open nested tabular
-    stack = [...stack, "tabular"];
     if (prefix.length > 0) {
       items = ItemsAddToPrev(items, prefix, nextLine);
     }
-    items = ItemsAddToPrev(items, beginAndRest, nextLine);
-    return { handled: true, stack, items, lineText };
+    return openOpaqueEnv(stack, items, "tabular", lineText.slice(mbTab.index), nextLine);
   }
   // A wrapper opens only when its closer is ahead of the `\begin` itself: an `\end{X}` left of it read
   // as reachable and cost the whole list.
@@ -379,26 +396,7 @@ const handleLstBeginInline = (
       items = ItemsAddToPrev(items, before, nextLine);
     }
   }
-  stack = [...stack, openedType];
-  // The env can close on this same line: a single-line `\begin{center}x\end{center}` left the stack
-  // open for good, and the list then bailed out as literal text. Same handling as on a later line.
-  const endRe: RegExp = END_OPAQUE_ENV_RE[openedType];
-  const meSameLine: RegExpExecArray | null = endRe.exec(afterBegin);
-  if (!meSameLine) {
-    items = ItemsAddToPrev(items, afterBegin, nextLine);
-    return { handled: true, stack, items, lineText };
-  }
-  const glue: string = openedType === "lstlisting" ? "\n" : "";
-  items = ItemsAddToPrev(
-    items,
-    afterBegin.slice(0, meSameLine.index) + glue + meSameLine[0],
-    nextLine
-  );
-  stack = stack.slice(0, -1);
-  const afterSameLineEnd: string = afterBegin.slice(meSameLine.index + meSameLine[0].length);
-  return afterSameLineEnd.trim().length
-    ? { handled: false, stack, items, lineText: afterSameLineEnd }
-    : { handled: true, stack, items, lineText: "" };
+  return openOpaqueEnv(stack, items, openedType, afterBegin, nextLine);
 }
 
 /**
@@ -559,7 +557,7 @@ const processOpaqueLine = (
     lineText = beginRes.lineText;
     return { consumedLine: false, lineText, stack, items };
   }
-  // The tail stopped shrinking, so it is taken as text rather than scanned again.
+  // Unreachable today: every branch returns or shrinks the tail. Asserts that, rather than guarding it.
   warnDistinct('opaque-stall:' + stack.join('>'),
     '[list-env] an opaque line stopped shrinking; the tail is taken as text');
   items = ItemsAddToPrev(items, lineText, nextLine);

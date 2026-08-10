@@ -1916,6 +1916,13 @@ module.exports = [
     latex: "\\begin{lstlisting}\n` {\n\\end{lstlisting}\n\n\\begin{itemize}\n\\item a\n\\begin{center}\n\\caption{q \\end{itemize} w}\n\\end{center}\n\\item b\n\\end{itemize}",
     html: "<pre class=\"lstlisting\"><code class=\"hljs lstlisting-code\" style=\"text-align: left;\">` {</code></pre>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\"> w}</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
   },
+  // A tabular nested on one line inside another: the same-line close is decided in one place now, and the
+  // frame it used to leave open took the whole list down to literal LaTeX — as it still does on master.
+  {
+    name: "a one-line nested tabular in a list body",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{tabular}{l}\nA & \\begin{tabular}{l}x\\end{tabular} \\\\\n\\end{tabular}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"table_tabular\">\n<div class=\"inline-tabular\"><table class=\"tabular\">\n<tbody>\n<tr style=\"border-top: none !important; border-bottom: none !important;\">\n<td style=\"text-align: left; border-left: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; \">A</td>\n<td style=\"text-align: center; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; \"><div class=\"inline-tabular sub-table\"><table class=\"tabular\">\n<tbody>\n<tr style=\"border-top: none !important; border-bottom: none !important;\">\n<td style=\"text-align: left; border-left: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; \">x</td>\n</tr>\n</tbody>\n</table>\n</div></td>\n</tr>\n</tbody>\n</table>\n</div></div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
   // A brace inside inline code, an argument opening right where that code ends: skipping the first one
   // must resume on that offset, not past it, or the argument never pairs and the list loses an item.
   {
