@@ -774,17 +774,9 @@ export const ListsInternal = (
             if (needed <= 0) {
               siblingClosable = true;
             } else {
-              const lineEnd: number = state.eMarks[lineIdx];
-              const closers: readonly number[] = listCloserOffsets(state);
-              // Only closers outside verbatim content count: one written in code is text. Stops at
-              // `needed`, so a document full of closers is not walked for nothing.
-              let ahead: number = 0;
-              for (let k: number = closers.length - countPositionsAtOrAfter(closers, lineEnd);
-                   k < closers.length && ahead < needed; k++) {
-                if (!insideVerbatim(state, closers[k])) {
-                  ahead++;
-                }
-              }
+              // Structural only, by the same rule the other readers use: a closer in code or in an argument is text.
+              const ahead: number = structuralCountIn(
+                state, listCloserOffsets(state), CLOSER_SUFFIX_KEY, state.eMarks[lineIdx], Infinity);
               siblingClosable = ahead >= needed;
             }
           }

@@ -65,6 +65,14 @@ describe('math spans: the openers and end markers the owning rules use', () => {
     const run = '\\$$'.repeat(50000);
     findEndMarkerPos(run + ' $$', '$$', 0).should.equal(run.length + 1);
   });
+  // The digit guard is for currency after a single `$`. A `$$` pair is unambiguous, so a digit right after
+  // it keeps the span — the guard read the second `$` there and never a digit, and now says so.
+  it('a digit after a display closer keeps the span', () => {
+    nextMathSpan('$$x$$5', 0).end.should.equal('$$x$$'.length);
+    (nextMathSpan('$x$5', 0) === null).should.equal(true);
+    shouldSkipDollar('$$x$$5', '$$', 0, 4).should.equal(false);
+    shouldSkipDollar('$x$5', '$', 0, 2).should.equal(true);
+  });
   it('shouldSkipDollar names each reason', () => {
     shouldSkipDollar('$x$', '$', 0, 2).should.equal(false);
     shouldSkipDollar('$ x$', '$', 0, 3).should.equal(true);

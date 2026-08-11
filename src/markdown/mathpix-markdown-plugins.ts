@@ -117,6 +117,19 @@ export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
   } else {
     md.core.ruler.before('normalize', 'reset_mmd_global_state', resetHook);
   }
+  // Every reader of these caches is a block or inline rule, so they are dead once the chain ends — a
+  // consumer's `env` kept a document's offset arrays until the next render otherwise (~260 KB on 29 KB).
+  const releaseHook = (state) => {
+    clearSrcPosCaches(state.env);
+    clearMarkerTokens(state.env);
+  };
+  const hasReleaseHook = typeof md.core.ruler.__find__ === 'function'
+    && md.core.ruler.__find__('release_mmd_src_caches') >= 0;
+  if (hasReleaseHook) {
+    md.core.ruler.at('release_mmd_src_caches', releaseHook);
+  } else {
+    md.core.ruler.push('release_mmd_src_caches', releaseHook);
+  }
   if ( forDocx ) {
     md.use(mdPluginSvgToBase64);
   }

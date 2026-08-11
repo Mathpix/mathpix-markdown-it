@@ -1916,6 +1916,30 @@ module.exports = [
     latex: "\\begin{lstlisting}\n` {\n\\end{lstlisting}\n\n\\begin{itemize}\n\\item a\n\\begin{center}\n\\caption{q \\end{itemize} w}\n\\end{center}\n\\item b\n\\end{itemize}",
     html: "<pre class=\"lstlisting\"><code class=\"hljs lstlisting-code\" style=\"text-align: left;\">` {</code></pre>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\"> w}</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
   },
+  // A fence that swallowed the list's closer ends the replay, and the lines after it come out as text —
+  // `master` loses them and emits `<li><>` instead.
+  {
+    name: "lines after an unclosed fence that swallowed the closer",
+    latex: "\\begin{itemize}\n\\item a\n```\n\\end{itemize}\n\\item b\ntail\n",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<pre><code class=\"hljs\"></code></pre>\n</li></ul><div>\\item b<br>\ntail</div>\n"
+  },
+  // A mid-line closer may open a sibling, and whether the closer ahead is real is decided by the inline
+  // scanner: it skips a code span but not a command argument. Identical to `master`, pinned per shape.
+  {
+    name: "a sibling whose only closer sits in a caption argument",
+    latex: "\\begin{itemize}\\item a\\end{itemize} \\begin{itemize}\\item b\n\n\\caption{x \\end{itemize} y}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul> <ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>b\\caption{x</li></ul>"
+  },
+  {
+    name: "a sibling whose only closer sits in a code span",
+    latex: "\\begin{itemize}\\item a\\end{itemize} \\begin{itemize}\\item b\n\n`\\end{itemize}`",
+    html: "<div><ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul> \\begin{itemize}\\item b</div>\n<div><code>\\end{itemize}</code></div>\n"
+  },
+  {
+    name: "a sibling with a real closer below",
+    latex: "\\begin{itemize}\\item a\\end{itemize} \\begin{itemize}\\item b\n\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul> <ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
   // A closer inside a code span: the list survives, the code span does not — the wrapper's own block rule
   // truncates its content there. Identical to `master`; the third shape is the control that must stay clean.
   {

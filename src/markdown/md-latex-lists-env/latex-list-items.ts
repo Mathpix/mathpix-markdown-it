@@ -268,7 +268,7 @@ export const resolveListPadding = (listTokens: Token[]): void => {
     // Own indent for this level: the reserved em when the marker overflows, else the default.
     const indentEm: number = em > LIST_DEFAULT_INDENT_EM ? em : LIST_DEFAULT_INDENT_EM;
     if ((token.padding || 0) > LIST_MAX_INDENT_EM) {
-      // The clamp bit, so this level and the ones under it keep the default and their markers overlap.
+      // Clamped: this level gets the clamp itself, the levels under it the default, so a marker may overlap.
       warnDistinct('padding-clamped:' + depth,
         '[list] marker indent hit the ' + LIST_MAX_INDENT_EM + 'em clamp; markers may overlap their text',
         { depth });

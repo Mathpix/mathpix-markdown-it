@@ -89,12 +89,19 @@ export const releaseEnvSnapshot = (): void => {
 // Puts back every value the parse changed, clears the keys it added: `undefined`, never `delete`,
 // which drops `env` into dictionary mode. The count check also catches a key a foreign rule deleted.
 // Compared by identity, so an object mutated in place is not restored — that rule must undo it.
+// A slot that is not the innermost was already emptied by a pool reset, so restoring from it would blank
+// every key the consumer owns. Both restores ask this first and leave `env` alone when it says no.
+const snapshotIsUsable = (snap: EnvSnapshot): boolean => {
+  if (snapshotPool[snapshotDepth - 1] === snap) {
+    return true;
+  }
+  warnDistinct('env-snapshot-order',
+    '[env] the snapshot is not the innermost one; env is left as the parse wrote it');
+  return false;
+};
+
 export const restoreEnvAll = (env: any, snap: EnvSnapshot): void => {
-  // A slot that is not the innermost was already emptied by a pool reset: restoring from it blanks
-  // every key the consumer owns, so leave `env` alone instead.
-  if (snapshotPool[snapshotDepth - 1] !== snap) {
-    warnDistinct('env-snapshot-order',
-      '[env] the snapshot is not the innermost one; env is left as the parse wrote it');
+  if (!snapshotIsUsable(snap)) {
     return;
   }
   const { keys, values, length } = snap;
@@ -146,6 +153,9 @@ export const restoreEnvKeysFromAll = (
   keys: readonly string[],
   snap: EnvSnapshot,
 ): void => {
+  if (!snapshotIsUsable(snap)) {
+    return;
+  }
   for (let i = 0; i < keys.length; i++) {
     const key: string = keys[i];
     const index: number = snap.keys.lastIndexOf(key, snap.length - 1);

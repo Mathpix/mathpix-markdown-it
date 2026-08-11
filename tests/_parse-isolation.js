@@ -368,6 +368,25 @@ describe('silent-mode Lists does not mutate shared env', () => {
     env.added.should.equal('new');
   });
 
+  // The transient restore runs on every exit, commit included, so it needs the same guard: from a blanked
+  // snapshot it wrote `undefined` over a `parentType` the consumer owned.
+  it('the transient restore also refuses a snapshot the pool no longer owns', () => {
+    resetWarnDistinct();                 // the key is deduped per render, and a test above spent it
+    const env = { parentType: 'MINE' };
+    const snap = snapshotEnvAll(env);
+    resetEnvSnapshotPool();
+    const said = [];
+    const warn = console.warn;
+    console.warn = (...args) => said.push(String(args[0]));
+    try {
+      restoreEnvKeysFromAll(env, LIST_TRANSIENT_ENV_KEYS, snap);
+    } finally {
+      console.warn = warn;
+    }
+    said.join(' ').should.match(/not the innermost one/);
+    env.parentType.should.equal('MINE', 'a consumer key was blanked from an emptied snapshot');
+  });
+
   it('a snapshot of a smaller env does not see the previous one', () => {
     const rich = snapshotEnvAll({ isBlock: true, inheritedListType: 'itemize', prentLevel: 7, x: 1 });
     rich.length.should.equal(4);
@@ -801,6 +820,30 @@ describe('the env snapshot pool is reset even when the render is partial', () =>
       const after = snapshotEnvAll({ a: 1 });
       after.should.equal(slotZero, 'the next snapshot came from a deeper slot');
       releaseEnvSnapshot();
+    });
+  });
+});
+
+// The sweep caches live on the consumer's `env`, so they have to be let go when the chain ends: cleared
+// only on entry, a document's offset arrays stayed reachable until the next render — 260 KB on 29 KB here.
+describe('the source caches are released when the render ends', () => {
+  const md = markdownIt({ html: true }).use(mathpixMarkdownPlugin, { outMath: { include_svg: false } });
+  const unit = '\\begin{itemize}\n\\item a\n\\begin{center}\ntext \\end{itemize} here\n'
+    + '\\end{center}\n\\item b\n\\end{itemize}';
+  it('every bucket is empty and its hot slot dropped', () => {
+    const env = {};
+    const warn = console.warn;
+    console.warn = () => {};
+    md.render(Array.from({ length: 40 }, () => unit).join('\n\n'), env);
+    console.warn = warn;
+    const buckets = Object.getOwnPropertySymbols(env)
+      .map((key) => env[key])
+      .filter((value) => value && value.bySrc instanceof Map);
+    buckets.length.should.be.above(4, 'the caches did not run at all, so this proves nothing');
+    buckets.forEach((bucket) => {
+      bucket.bySrc.size.should.equal(0, 'a source outlived the render that parsed it');
+      (bucket.hotSrc === null).should.equal(true);
+      (bucket.hotSlot === null).should.equal(true);
     });
   });
 });

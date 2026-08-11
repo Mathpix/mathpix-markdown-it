@@ -1,5 +1,5 @@
 import { generateUniqueId, getContent } from './common';
-import {findEndMarkerPos} from "../../mdPluginRaw";
+import {findEndMarkerPos} from "../../common";
 import { beginTag, endTag, findOpenCloseTagsMathEnvironment } from "../../utils";
 import { RE_MATH_OPEN_G, getEndMarker, shouldSkipDollar } from "../../common/math-spans";
 import { addExtractedCodeBlock } from "./sub-code";

@@ -42,7 +42,8 @@ export const enterListLevel = (): void => {
  */
 export const leaveListLevel = (): void => {
   if (listLevels.length === 0) {
-    warnDistinct('leave', '[list-state] Attempt to leave list level while depth = -1');
+    warnDistinct('leave:' + getListDepth(),
+      '[list-state] leaving a list level while outside any list', { depth: getListDepth() });
     return;
   }
   listLevels.pop();

@@ -286,6 +286,24 @@ describe('resolveListPadding over irregular depth sequences:', () => {
     resolveListPadding(tokens);
     padOf(tokens[1]).should.equal('4em');
   });
+  // Past the clamp the level carries the clamp itself and its descendants the default — that is what
+  // makes a marker there able to overlap, and it is what the warning reports.
+  it('the clamped level carries the clamp, its descendants the default', () => {
+    resetWarnDistinct();
+    const said = [];
+    const warn = console.warn;
+    console.warn = (...args) => said.push(String(args[0]));
+    const tokens = [listAt(0, 40), listAt(1, 41), listAt(2, 42)];
+    try {
+      resolveListPadding(tokens);
+    } finally {
+      console.warn = warn;
+    }
+    padOf(tokens[0]).should.equal(LIST_MAX_INDENT_EM + 'em');
+    (padOf(tokens[1]) === null).should.equal(true);
+    (padOf(tokens[2]) === null).should.equal(true);
+    said.filter((line) => /em clamp/.test(line)).should.have.length(3, 'one per depth: ' + said.join(' | '));
+  });
   it('a depth below the first list is clamped to zero rather than throwing', () => {
     const tokens = [listAt(2, 0), listAt(0, 9)];
     resolveListPadding(tokens);
