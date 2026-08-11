@@ -28,6 +28,7 @@ export interface ItemizeLevelTokenResult {
     tokens: Token[][];
     contents: string[];
 }
+export declare const clearMarkerTokens: (env: any) => void;
 /**
  * Parse bullet tokens for all itemize levels.
  */

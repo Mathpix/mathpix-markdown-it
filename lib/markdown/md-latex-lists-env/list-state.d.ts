@@ -41,7 +41,7 @@ export declare const getCurrentListLevelState: () => ListLevelState | undefined;
 export declare const incrementItemCount: () => void;
 /** Current nesting depth (-1 outside any list). Read-only view for cache keys. */
 export declare const getListDepth: () => number;
-/** Open-level count, to hand back to restoreListLevels after a speculative parse. */
-export declare const snapshotListLevels: () => number;
-/** Drop levels entered since the snapshot. Only truncates, never re-creates. */
-export declare const restoreListLevels: (depth: number) => void;
+/** How many lists are open right now — a live count, not a snapshot. */
+export declare const getOpenListCount: () => number;
+export declare const snapshotListLevels: () => readonly ListLevelState[];
+export declare const restoreListLevels: (snapshot: readonly ListLevelState[]) => void;

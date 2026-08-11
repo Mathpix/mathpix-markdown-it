@@ -262,6 +262,8 @@ const renderNonTableTokenIntoCell = (
     for (let i = ctx.idx; i < ctx.tokens.length && isLeafRunMember(ctx.tokens[i]); i++) {
       run.push(ctx.tokens[i]);
     }
+    // No `type` on the literal, so the `subTabular` quoting branch is not reached for a run. Passing it
+    // is measured identical everywhere tried, `lstlisting` in a nested cell included (`_tabular.js`).
     const leaf: RenderTableCellContentResult =
       renderTableCellContent({ children: run }, !!ctx.isSubTable, options, env, slf);
     if (needTsv) {

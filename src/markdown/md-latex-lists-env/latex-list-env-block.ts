@@ -14,7 +14,7 @@ import {
   OpaqueStack, OpaqueEnvType
 } from "./latex-list-types";
 import { parseSetCounterNumber } from "./latex-list-common";
-import { snapshotListLevels, restoreListLevels } from "./list-state";
+import { snapshotListLevels, restoreListLevels, getOpenListCount, type ListLevelState } from "./list-state";
 import { getCaptionCounters, setCaptionCounters } from "../common/caption-counters";
 import { matchPositionsCached, countPositionsAtOrAfter, firstPositionAtOrAfter, srcValueCached } from "../common/src-pos-cache";
 import {
@@ -118,6 +118,7 @@ export const pairArgumentSpans = (text: string, verbatim: Array<[number, number]
   for (let i = 0; i < text.length; i++) {
     const chr: string = text[i];
     if (chr === '\\') {
+      // Before the verbatim skip, so a `\` just outside a range consumes its first character.
       i++;                        // an escaped brace opens and closes nothing
       continue;
     }
@@ -283,7 +284,8 @@ const hasCloserAhead = (state: StateBlockLike, from: number, name: string): bool
   if (closesOurListWithin(state, from, at)) {
     const opensInside: number =
       structuralCountIn(state, listOpenerOffsets(state as StateBlock), from, at);
-    if (opensInside > 0 || closersLeftAfter(state, at) < Math.max(1, snapshotListLevels())) {
+    // The live count, not this source's own depth: an ambient list from an outer parse still needs closing.
+    if (opensInside > 0 || closersLeftAfter(state, at) < Math.max(1, getOpenListCount())) {
       return false;
     }
   }
@@ -905,7 +907,7 @@ export const Lists: RuleBlock = (
   const envSnap: EnvSnapshot = snapshotEnvAll(state.env);
   // A discarded parse enters a level per `\begin` and, having no `\end`, never leaves it — without
   // this the depth grows with the number of probes, not with the real nesting.
-  const listLevelSnap: number = snapshotListLevels();
+  const listLevelSnap: readonly ListLevelState[] = snapshotListLevels();
   let committed = false;
   try {
     const bufferedState = createBufferedState(state);

@@ -465,11 +465,11 @@ export const processListChildToken = (
   // 7. Open / close list environments
   if (token.type === 'enumerate_list_open' || token.type === 'itemize_list_open') {
     state.prentLevel++;
-    if (token.type === 'itemize_list_open') {
-      state.types.push('itemize');
-    } else {
-      state.types.push('enumerate');
+    // Seeded like the close branch checks it: an inline state built by a foreign rule may have none.
+    if (!state.types) {
+      state.types = [];
     }
+    state.types.push(token.type === 'itemize_list_open' ? 'itemize' : 'enumerate');
     ctx.iOpen++;
     // Register in the shared registry so resolveListPadding sees inline-opened nested lists.
     token.prentLevel = state.prentLevel; // depth after entering, matching the block path

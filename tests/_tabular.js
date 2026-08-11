@@ -173,6 +173,26 @@ describe('tsv and csv carry the address of a link or image, once:', () => {
   it('text around a link survives on both sides', () => {
     plain('text before [l](http://a.b) after', 'tsv').should.equal('text before http://a.b after');
   });
+  // A leaf run is exported through a token literal that carries no `type`, so the `subTabular` quoting
+  // branch never sees it. Identical either way on every shape tried; pinned so a change is deliberate.
+  // The `lstlisting` case is here because that rule writes `tsv` onto a childless token — the one kind
+  // that could reach the branch — and a comma in its body is what quoting would show.
+  it('a leaf run in a nested cell exports as measured', () => {
+    const exported = (inner) => {
+      const html = MM.markdownToHTML('\\begin{tabular}{|l|l|}\nA & \\begin{tabular}{l}'
+        + inner + '\\end{tabular} \\\\\n\\end{tabular}',
+        { outMath: { include_svg: false, include_tsv: true, include_csv: true } });
+      const all = (kind) => (html.match(new RegExp('<' + kind + '[^>]*>([\\s\\S]*?)</' + kind + '>', 'g')) || [])
+        .map((one) => one.replace(/<[^>]*>/g, ''));
+      return { tsv: all('tsv'), csv: all('csv') };
+    };
+    const list = exported('\\begin{itemize}\\item x, y\\end{itemize}');
+    list.tsv.should.deep.equal(['A\t • x, y']);
+    list.csv.should.deep.equal(['A," • x, y"']);
+    const listing = exported('\\begin{lstlisting}a, b\\end{lstlisting}');
+    listing.tsv.should.deep.equal(['a, b', 'A\t"a, b"']);
+    listing.csv.should.deep.equal(['"a, b"', 'A,"a, b"']);
+  });
 });
 
 describe('The exported label has a decision for every inline construct:', () => {

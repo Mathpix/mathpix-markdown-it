@@ -3,7 +3,12 @@ let should = chai.should();
 
 const markdownIt = require('markdown-it');
 const { mathpixMarkdownPlugin } = require('../lib/index.js');
-const { snapshotListLevels, getListDepth } = require('../lib/markdown/md-latex-lists-env/list-state');
+const {
+  snapshotListLevels,
+  restoreListLevels,
+  getOpenListCount,
+  getListDepth,
+} = require('../lib/markdown/md-latex-lists-env/list-state');
 const { resetWarnDistinct, warnDistinct } = require('../lib/markdown/common/warn-distinct');
 const listEnvEngine = require('../lib/markdown/md-latex-lists-env/latex-list-env-engine');
 const {
@@ -247,6 +252,27 @@ describe('silent-mode Lists does not mutate shared env', () => {
     env.ctx.touched.should.equal(true, 'in-place mutation is out of the rollback by design');
   });
 
+  // The level snapshot is structural, not a count: `openItems` decides whether a chunk before the first
+  // `\item` gets a marker-less `<li>`, and a count puts back neither it nor a level the parse dropped.
+  it('the level rollback restores openItems and a level a parse removed', () => {
+    const before = snapshotListLevels();
+    try {
+      restoreListLevels([{ openItems: 3 }, { openItems: 7 }]);
+      const snap = snapshotListLevels();
+      restoreListLevels([]);
+      getOpenListCount().should.equal(0);
+      restoreListLevels(snap);
+      getOpenListCount().should.equal(2, 'a dropped level did not come back');
+      snapshotListLevels().map((level) => level.openItems).should.deep.equal([3, 7]);
+      // The snapshot is a copy, so a later parse counting more items cannot rewrite it.
+      const live = snapshotListLevels();
+      restoreListLevels([{ openItems: 99 }, { openItems: 7 }]);
+      live.map((level) => level.openItems).should.deep.equal([3, 7]);
+    } finally {
+      restoreListLevels(before);
+    }
+  });
+
   // Deleting and adding in one parse take different branches of the restore: the count check alone reads
   // an env of the same size as untouched.
   it('a key the parse deleted comes back, one it added is left present and undefined', () => {
@@ -344,7 +370,7 @@ describe('a discarded list parse does not retain list levels', () => {
     [10, 60].forEach((n) => {
       md.render(build(n));
       // Every level entered by a discarded parse is unwound, so nothing is retained.
-      snapshotListLevels().should.equal(0, `levels retained after ${n} units`);
+      getOpenListCount().should.equal(0, `levels retained after ${n} units`);
       getListDepth().should.equal(-1);
     });
   });
@@ -533,7 +559,7 @@ describe('a probe that throws rolls back exactly like one that does not', () => 
       const html = md.render(src, env);
       return {
         depth: getListDepth(),
-        levels: snapshotListLevels(),
+        levels: getOpenListCount(),
         transientLive: LIST_TRANSIENT_ENV_KEYS.filter((k) => env[k] !== undefined),
         figure: (html.match(/Figure\s*(\d+)/) || [])[1],
       };

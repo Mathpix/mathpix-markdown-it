@@ -79,12 +79,16 @@ export const incrementItemCount = (): void => {
 /** Current nesting depth (-1 outside any list). Read-only view for cache keys. */
 export const getListDepth = (): number => listLevels.length - 1;
 
-/** Open-level count, to hand back to restoreListLevels after a speculative parse. */
-export const snapshotListLevels = (): number => listLevels.length;
+/** How many lists are open right now — a live count, not a snapshot. */
+export const getOpenListCount = (): number => listLevels.length;
 
-/** Drop levels entered since the snapshot. Only truncates, never re-creates. */
-export const restoreListLevels = (depth: number): void => {
-  if (listLevels.length > depth) {
-    listLevels.length = depth;
-  }
+// Structural: a length puts back neither a dropped level nor the `openItems` of a surviving one.
+// The empty case is shared: a top-level list opens with no levels yet, and that is the common one.
+const NO_LEVELS: readonly ListLevelState[] = Object.freeze([]);
+
+export const snapshotListLevels = (): readonly ListLevelState[] =>
+  listLevels.length === 0 ? NO_LEVELS : listLevels.map((level) => ({ openItems: level.openItems }));
+
+export const restoreListLevels = (snapshot: readonly ListLevelState[]): void => {
+  listLevels = snapshot.map((level) => ({ openItems: level.openItems }));
 };

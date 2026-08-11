@@ -71,6 +71,13 @@ export interface ItemizeLevelTokenResult {
 // it on every discarded probe.
 const MARKER_TOKENS_ENV_KEY = Symbol('mmd.markerTokens');
 
+// Dropped per render: shared tokens would otherwise carry a rule's write into the next render.
+export const clearMarkerTokens = (env: any): void => {
+  if (env && env[MARKER_TOKENS_ENV_KEY]) {
+    env[MARKER_TOKENS_ENV_KEY] = undefined;
+  }
+};
+
 // `env` belongs to the consumer and may reach two md instances or two option sets, whose tokens are
 // not interchangeable — so the bucket is dropped when either changes.
 const markerBucket = (state: StateBlock | StateInline): Map<string, Token[]> => {
@@ -93,8 +100,8 @@ const parseMarkerTokens = (
     cacheable && state.env ? markerBucket(state) : null;
   const cached: Token[] | undefined = bucket?.get(level);
   if (cached) {
-    // Copy: the array cannot be reordered from outside. Tokens stay shared — freezing them would
-    // throw inside a strict-mode renderer that writes to one.
+    // The array is copied, the tokens are not: cloning them per open measured 12–29% slower on
+    // list-heavy input, so a render rule that writes into one still reaches every later list.
     return cached.slice();
   }
   const children: Token[] = [];

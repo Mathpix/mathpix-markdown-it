@@ -9,12 +9,23 @@ import convertSvgToBase64 from "../md-svg-to-base64/convert-scv-to-base64";
 import { mathTokenTypes } from "../common/consts";
 import { isMathInText } from "../utils";
 import {CustomMarkerHtmlResult} from "./latex-list-types";
+import { warnDistinct } from "../common/warn-distinct";
 
 // data-padding-inline-start holds a machine-generated `Nem` (sole writer: list-items).
 // Validate the shape before inlining, so only a bare em value can ever reach the style.
 const PADDING_EM_RE = /^\d+(\.\d+)?em$/;
-const markerPaddingStyle = (padAttr: string | null | undefined): string =>
-  padAttr && PADDING_EM_RE.test(padAttr) ? `padding-inline-start: ${padAttr}; ` : "";
+const markerPaddingStyle = (padAttr: string | null | undefined): string => {
+  if (!padAttr) {
+    return "";
+  }
+  if (!PADDING_EM_RE.test(padAttr)) {
+    // Dropped silently before, so an attribute a consumer set by hand read as no indent at all.
+    warnDistinct('padding-shape', '[list] data-padding-inline-start is not a bare em value, ignored',
+      { value: padAttr });
+    return "";
+  }
+  return `padding-inline-start: ${padAttr}; `;
+};
 
 var level_itemize = 0;
 var level_enumerate = 0;

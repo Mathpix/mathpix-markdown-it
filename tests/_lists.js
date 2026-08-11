@@ -332,6 +332,29 @@ describe('An unclosed wrapper env leaves the list rendering:', () => {
       deeper.leaked.should.equal(false, 'the list fell out as literal LaTeX at depth ' + depth);
     });
   });
+  // Marker tokens are shared between the lists of one render — cloning them per open measured 12–29%
+  // slower on list-heavy input. So the write is pinned where it lands, and where it must not: the
+  // bucket is dropped per render, or a host reusing one `env` would carry it into the next document.
+  it('a write into a marker token stays inside the render that made it', () => {
+    const list = '\\begin{itemize}\n\\item a\n\\end{itemize}';
+    const md = markdownIt({ html: true }).use(mathpixMarkdownPlugin, { outMath: { include_svg: false } });
+    const base = md.renderer.rules.text;
+    let fired = 0;
+    md.renderer.rules.text = (tokens, idx, opts, env, slf) => {
+      if (tokens[idx].content === '•' && fired++ === 0) {
+        tokens[idx].content = 'STAMPED';
+      }
+      return base ? base(tokens, idx, opts, env, slf) : tokens[idx].content;
+    };
+    const markers = (html) => html.match(/<span class="li_level">[\s\S]*?<\/span>/g) || [];
+    const env = {};
+    const inside = markers(md.render([list, list, list].join('\n\n'), env));
+    inside.should.have.length(3);
+    inside.every((m) => /STAMPED/.test(m))
+      .should.equal(true, 'the tokens are no longer shared — the clone cost belongs in the spec, not here');
+    markers(md.render(list, env)).should.deep.equal(['<span class="li_level">•</span>'],
+      'the write survived into the next render through the same env');
+  });
   // Marker tokens are cached and shared, and a cell render writes `isTableCell` onto them. Rendering a
   // list in a cell must therefore not change how the next list outside a table draws its marker.
   it('a list rendered in a table cell leaves the shared markers alone', () => {

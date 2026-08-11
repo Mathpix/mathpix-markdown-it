@@ -11,6 +11,7 @@ const { MARKER_GAP_EM, LIST_DEFAULT_INDENT_EM, LIST_MAX_INDENT_EM, DEFAULT_FONT_
 const { resolveListPadding } = require('../lib/markdown/md-latex-lists-env/latex-list-items');
 const { processListChildToken, computeMarkerPadding } = require('../lib/markdown/md-latex-lists-env/latex-list-tokens');
 const { render_itemize_list_open } = require('../lib/markdown/md-latex-lists-env/render-latex-list-env');
+const { resetWarnDistinct } = require('../lib/markdown/common/warn-distinct');
 const Token = require('markdown-it/lib/token');
 
 const { JSDOM } = require('jsdom');
@@ -169,6 +170,18 @@ describe('List marker padding — the default-indent threshold:', () => {
 describe('data-padding-inline-start is sanitized before it reaches inline style:', () => {
   // Locks the render-side guard: only a bare `Nem` may enter style="…"; anything else is dropped.
   const md = markdownIt();
+  // The renderer is called directly here, outside the per-render reset, so the dedupe is reset by hand
+  // and the warnings are captured — a rejected value reports itself instead of dropping in silence.
+  const warnings = [];
+  let baseWarn;
+  before(() => {
+    baseWarn = console.warn;
+    console.warn = (...args) => warnings.push(String(args[0]));
+    resetWarnDistinct();
+  });
+  after(() => {
+    console.warn = baseWarn;
+  });
   const styleOf = (padValue) => {
     const token = new Token('itemize_list_open', 'ul', 1);
     token.isTopLevelList = true;
@@ -190,6 +203,10 @@ describe('data-padding-inline-start is sanitized before it reaches inline style:
     ['', 'em', '-3em', '3.5.1em', '2 em', '2em ', '.5em', '2EM', '2em;'].forEach((v) => {
       styleOf(v).should.equal('list-style-type: none');
     });
+  });
+  it('a rejected value is reported once, an empty one not at all', () => {
+    warnings.filter((w) => /data-padding-inline-start is not a bare em/.test(w))
+      .should.have.length(1, 'reported per value instead of once per cause: ' + warnings.join(' | '));
   });
 });
 

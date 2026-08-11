@@ -88,6 +88,22 @@ const resolveEnabledRuleFns = (ruler: Ruler, names: Set<string>): RuleBlock[] =>
   return fns;
 }
 
+// `fence` plus the resolved terminators, built once per resolution rather than per rule call.
+const WITH_FENCE_KEY = Symbol('mmd.terminatorsWithFence');
+const FENCE_ONLY: RuleBlock[] = [fence as unknown as RuleBlock];
+
+const terminatorsWithFence = (ruler: Ruler, names: Set<string>, fence: RuleBlock): RuleBlock[] => {
+  const resolved: RuleBlock[] = resolveEnabledRuleFns(ruler, names);
+  const host: any = ruler as any;
+  const cached = host[WITH_FENCE_KEY];
+  if (cached && cached.resolved === resolved) {
+    return cached.withFence;
+  }
+  const withFence: RuleBlock[] = [fence].concat(resolved);
+  host[WITH_FENCE_KEY] = { resolved, withFence };
+  return withFence;
+}
+
 export const latex_footnote_block: RuleBlock = (state, startLine, endLine, silent) => {
   try {
     let token: Token,
@@ -115,8 +131,8 @@ export const latex_footnote_block: RuleBlock = (state, startLine, endLine, silen
       // With no list opener ahead the list probe cannot fire, and it costs a silent Lists run per line.
       const probeRules: RuleBlock[] =
         lastMatchPosCached(state, LIST_BEGIN_POS_KEY, LIST_BEGIN_SWEEP_G) >= state.bMarks[startLine]
-          ? [fence as RuleBlock].concat(resolveEnabledRuleFns(state.md.block.ruler, LIST_TERMINATOR_NAME))
-          : [fence as RuleBlock];
+          ? terminatorsWithFence(state.md.block.ruler, LIST_TERMINATOR_NAME, fence as RuleBlock)
+          : FENCE_ONLY;
       for (; nextLine < endLine; nextLine++) {
         if (anyTerminates(probeRules, state, nextLine, endLine)) {
           terminate = true;
