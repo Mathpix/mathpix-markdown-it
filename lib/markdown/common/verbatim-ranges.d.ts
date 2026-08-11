@@ -15,7 +15,7 @@ export declare const findVerbatimRanges: (text: string) => Array<[
     number,
     number
 ]>;
-/** Is `at` inside one of the ascending `ranges`? Binary search, no allocation. */
+/** Is `at` inside one of the ascending `ranges`? Half-open `[start, end)`. Binary search, no allocation. */
 export declare const isInsideRanges: (ranges: ReadonlyArray<readonly [
     number,
     number

@@ -990,6 +990,7 @@ The `MathpixMarkdown` React element accepts the following props:
 
 - A rejected link (`javascript:`, `data:`, or anything a custom `validateLink` refuses) produces no `<a>` and stays as the literal `[label](address)` — in the HTML output and in the export alike. A reader with a permissive validator will make it a link again, so **validating the scheme is the reader's job**.
 - An accepted link is exported with its address as written: escaping guards the Markdown syntax, not the URL scheme. `tsv`/`csv` carry the address without the label.
+- A cell's inline markup is exported as written, raw HTML included — `<b onclick="…">x</b>` in a cell, or in a link label, reaches the export verbatim, and only `\`, `[` and `]` are escaped. A reader that parses the result with HTML enabled will render it, so **sanitising HTML is the reader's job** as well. This branch widened only how much of a link label is exported, not what is escaped.
 
 Both are pinned by tests. If the reader cannot validate, treat the exported text as untrusted input or render from the HTML output.
 

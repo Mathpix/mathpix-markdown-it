@@ -183,6 +183,18 @@ describe('tsv and csv carry the address of a link or image, once:', () => {
     bare(accepted).should.match(/<a[^>]*href="http:\/\/a\.b"/);
     exported(accepted).should.equal('| [click](http://a.b) |');
   });
+  // Raw HTML in a cell, or in a link label, reaches the export verbatim — pre-existing, and the README
+  // says so; pinned because this branch widened how much of the label is exported.
+  it('inline markup in a cell is exported as written, HTML included', () => {
+    const exported = (body) => {
+      const html = MM.markdownToHTML('\\begin{tabular}{l}\n' + body + ' \\\\\n\\end{tabular}',
+        { outMath: { include_svg: false, include_table_markdown: true } });
+      return MM.parseMarkdownByHTML(html, false).find((p) => p.type === 'table-markdown').value.split('\n')[0];
+    };
+    exported('<b onx="1">plain</b> tail').should.equal('| <b onx="1">plain</b> tail |');
+    exported('[<b onx="1">lab</b> more](http://u.tld/a) tail')
+      .should.equal('| [<b onx="1">lab</b> more](http://u.tld/a) tail |');
+  });
   it('a link cell holds the href alone', () => {
     plain('[**bold** x](http://a.b)', 'tsv').should.equal('http://a.b');
     plain('[**bold** x](http://a.b)', 'csv').should.equal('http://a.b');

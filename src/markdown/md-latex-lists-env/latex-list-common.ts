@@ -32,6 +32,7 @@ export const applyListOpenState = (
   token: Token
 ): void => {
   const isTopLevel: boolean = state.parentType !== "itemize" && state.parentType !== "enumerate";
+  // Transient: see LIST_TRANSIENT_ENV_KEYS — cleared after every list, so it is only set mid-parse.
   const inheritedListType: string | undefined = (state as any).env?.inheritedListType;
   const isInheritedListContext: boolean = inheritedListType === "itemize" || inheritedListType === "enumerate";
   const isTopLevelList: boolean = isTopLevel && !isInheritedListContext;

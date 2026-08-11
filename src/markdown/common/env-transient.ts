@@ -90,9 +90,12 @@ export const releaseEnvSnapshot = (): void => {
 // which drops `env` into dictionary mode. The count check also catches a key a foreign rule deleted.
 // Compared by identity, so an object mutated in place is not restored — that rule must undo it.
 export const restoreEnvAll = (env: any, snap: EnvSnapshot): void => {
-  // LIFO holds only while both callers restore in a `finally`; say so rather than restore from a stale slot.
+  // A slot that is not the innermost was already emptied by a pool reset: restoring from it blanks
+  // every key the consumer owns, so leave `env` alone instead.
   if (snapshotPool[snapshotDepth - 1] !== snap) {
-    warnDistinct('env-snapshot-order', '[env] restoring a snapshot that is not the innermost one');
+    warnDistinct('env-snapshot-order',
+      '[env] the snapshot is not the innermost one; env is left as the parse wrote it');
+    return;
   }
   const { keys, values, length } = snap;
   let vanished = false;

@@ -65,6 +65,8 @@ const unclosedEnvsIn = (s: string): number =>
 // inside the body walk. Cached on the state the rule receives — the buffered state reads it through
 // the prototype, so the sweep runs once per document rather than once per probe.
 const LIST_END_OFFSETS_KEY = Symbol('mmd.listEndOffsets');
+const CLOSER_SUFFIX_KEY = Symbol('mmd.closerSuffix');
+const OPENER_SUFFIX_KEY = Symbol('mmd.openerSuffix');
 const listCloserOffsets = (state: StateBlock): readonly number[] =>
   matchPositionsCached(state, LIST_END_OFFSETS_KEY, END_LIST_ENV_SWEEP_G);
 
@@ -117,7 +119,7 @@ const listOpenerOffsets = (state: StateBlock): readonly number[] =>
 
 // Outermost `{}` pairs in one pass; a `{` that never closes stays on the stack and yields no span.
 // Calling findEndMarker per brace rescanned the tail — `n^1.9` measured on a run of unmatched `{`.
-// Exported to be tested directly: its ascending, non-overlapping output is what the span search assumes.
+// Every balanced pair, the env name in `\end{itemize}` included. Exported to be tested directly.
 export const pairArgumentSpans = (text: string, verbatim: Array<[number, number]>): Array<[number, number]> => {
   const spans: Array<[number, number]> = [];
   const open: number[] = [];
@@ -244,31 +246,42 @@ const absoluteOffsetOf = (
   return state.src.slice(at, at + text.length) === text ? at : state.src.length;
 };
 
-// Structural (not text) offsets of `all` inside `[from, to)`.
+// How many of `all` from index `i` on are structural, cached per source: a walk per wrapper made a
+// document of them super-linear — 1600 units went 2.25× slower than `master` before this.
+const structuralSuffix = (
+  state: StateBlockLike,
+  all: readonly number[],
+  key: symbol,
+): Int32Array =>
+  srcValueCached(state as StateBlock, key, () => {
+    const spans: Array<[number, number]> = argumentSpansOf(state);
+    const suffix: Int32Array = new Int32Array(all.length + 1);
+    for (let i: number = all.length - 1; i >= 0; i--) {
+      const structural: boolean = !isInsideRanges(spans, all[i]) && !insideVerbatim(state, all[i]);
+      suffix[i] = suffix[i + 1] + (structural ? 1 : 0);
+    }
+    return suffix;
+  });
+
+// Structural (not text) offsets of `all` inside `[from, to)`, as a difference of two suffix counts.
 const structuralCountIn = (
   state: StateBlockLike,
   all: readonly number[],
+  key: symbol,
   from: number,
   to: number,
 ): number => {
-  const spans: Array<[number, number]> = argumentSpansOf(state);
-  let found = 0;
-  for (let i: number = all.length - countPositionsAtOrAfter(all, from); i < all.length; i++) {
-    if (all[i] >= to) {
-      break;
-    }
-    if (!isInsideRanges(spans, all[i]) && !insideVerbatim(state, all[i])) {
-      found++;
-    }
-  }
-  return found;
+  const suffix: Int32Array = structuralSuffix(state, all, key);
+  const startAt: number = all.length - countPositionsAtOrAfter(all, from);
+  const endAt: number = to === Infinity ? all.length : all.length - countPositionsAtOrAfter(all, to);
+  return suffix[startAt] - suffix[endAt];
 };
 
 // How many of the open lists the source past `at` can still close: structural closers there minus the
 // openers that claim them, since a closer of a list opened after the wrapper is not ours to use.
 const closersLeftAfter = (state: StateBlockLike, at: number): number =>
-  structuralCountIn(state, listCloserOffsets(state as StateBlock), at, Infinity)
-  - structuralCountIn(state, listOpenerOffsets(state as StateBlock), at, Infinity);
+  structuralCountIn(state, listCloserOffsets(state as StateBlock), CLOSER_SUFFIX_KEY, at, Infinity)
+  - structuralCountIn(state, listOpenerOffsets(state as StateBlock), OPENER_SUFFIX_KEY, at, Infinity);
 
 // Opening a wrapper as opaque swallows every line until its closer, so require one it can reach.
 // Reaching past a closer of our own list swallowed it too, and the whole list then printed as
@@ -292,7 +305,7 @@ const hasCloserAhead = (state: StateBlockLike, from: number, name: string): bool
     // out swallows a superset, so failing here ends the search rather than moving it along.
     if (closesOurListWithin(state, from, at)) {
       const opensInside: number =
-        structuralCountIn(state, listOpenerOffsets(state as StateBlock), from, at);
+        structuralCountIn(state, listOpenerOffsets(state as StateBlock), OPENER_SUFFIX_KEY, from, at);
       // The live count, not this source's own depth: an ambient list from an outer parse still needs closing.
       if (opensInside > 0 || closersLeftAfter(state, at) < Math.max(1, getOpenListCount())) {
         return false;
@@ -344,7 +357,7 @@ const firstUsableCloser = (
 // branch skipped that check, so its one-line form left the stack open for good.
 const openOpaqueEnv = (
   stack: OpaqueStack,
-  items: any[],
+  items: ParsedListItem[],
   openedType: OpaqueEnvType,
   afterBegin: string,
   nextLine: number,
@@ -379,7 +392,7 @@ const openOpaqueEnv = (
 const handleLstBeginInline = (
   lineText: string,
   stack: OpaqueStack,
-  items: any[],
+  items: ParsedListItem[],
   nextLine: number,
   dStart: number,
   itemTag: RegExp,
@@ -440,7 +453,7 @@ const handleLstBeginInline = (
 
 /**
  * Detects \end{...} for the current opaque env (stack top).
- * - If not found, appends the full raw line (keeps indentation) as opaque text.
+ * - If not found, appends the full raw line: nothing opens on top of a non-`tabular` top, so there is no tail.
  * - If found, appends up to end marker, pops stack, and returns tail (if any).
  *
  * @returns Updated { handled, stack, items, lineText }.
@@ -448,9 +461,9 @@ const handleLstBeginInline = (
 const handleLstEndInline = (
   lineText: string,
   stack: OpaqueStack,
-  items: any[],
+  items: ParsedListItem[],
   nextLine: number,
-  state
+  state: StateBlockLike
 ): LstEndResult => {
   const top: OpaqueEnvType = stack[stack.length - 1];
   if (!top) {

@@ -276,6 +276,39 @@ describe('silent-mode Lists does not mutate shared env', () => {
     });
   });
 
+  // `snapshotEnvForInline` drops keys holding `undefined` except an allowlist of three, and that list was
+  // measured rather than derived. A rule that starts parking `undefined` in `env` would break nested
+  // tables silently, so the set of such keys is pinned here instead of trusted.
+  it('no key outside the two named sets is left holding undefined', () => {
+    const md = markdownIt({ html: true }).use(mathpixMarkdownPlugin, { outMath: { include_svg: false } });
+    const shapes = [
+      '\\begin{itemize}\n\\item a\n\\end{itemize}',
+      '\\begin{itemize}\n\\item a\n\\begin{center}\nq\n\\end{center}\n\\end{itemize}',
+      '\\begin{itemize}\n\\item a\n\\begin{tabular}{|l|}\nc\n\\end{tabular}\n\\end{itemize}',
+      '\\begin{itemize}\n\\item a\n\\begin{table}\n\\caption{T}\n\\begin{tabular}{|l|}\nc\n\\end{tabular}\n\\end{table}\n\\end{itemize}',
+      '| a |\n|---|\n| \\begin{itemize}\\item x\\end{itemize} |',
+      'text \\begin{itemize} loose \\item a \\end{itemize} tail',
+      'Para.\\footnote{n}\n\\begin{itemize}\n\\item a\n',
+    ];
+    const allowed = new Set(['isInline', 'subTabular', 'tabulare'].concat(LIST_TRANSIENT_ENV_KEYS));
+    const warn = console.warn;
+    console.warn = () => {};
+    const parked = new Set();
+    shapes.forEach((src) => {
+      const env = {};
+      md.render(src, env);
+      Object.keys(env).forEach((key) => {
+        if (env[key] === undefined) {
+          parked.add(key);
+        }
+      });
+    });
+    console.warn = warn;
+    const unexpected = [...parked].filter((key) => !allowed.has(key));
+    unexpected.should.deep.equal([],
+      'a key now parks `undefined` in env: add it to REPLAY_UNDEFINED_KEYS or stop writing undefined');
+  });
+
   // The level snapshot is structural, not a count: `openItems` decides whether a chunk before the first
   // `\item` gets a marker-less `<li>`, and a count puts back neither it nor a level the parse dropped.
   it('the level rollback restores openItems and a level a parse removed', () => {
@@ -311,6 +344,28 @@ describe('silent-mode Lists does not mutate shared env', () => {
     (env.fresh === undefined).should.equal(true);
     Object.prototype.hasOwnProperty.call(env, 'fresh')
       .should.equal(true, 'the key was deleted, which drops env into dictionary mode');
+  });
+
+  // A pool reset between snapshot and restore empties the slot, so restoring from it used to blank every
+  // key the consumer owns — worse than not restoring at all.
+  it('a snapshot the pool no longer owns is not used to restore', () => {
+    const env = { a: 'original' };
+    const snap = snapshotEnvAll(env);
+    snapshotEnvAll({ b: 1 });
+    resetEnvSnapshotPool();                 // as a nested render's reset hook would
+    env.a = 'written by the parse';
+    env.added = 'new';
+    const said = [];
+    const warn = console.warn;
+    console.warn = (...args) => said.push(String(args[0]));
+    try {
+      restoreEnvAll(env, snap);
+    } finally {
+      console.warn = warn;
+    }
+    said.join(' ').should.match(/not the innermost one/);
+    env.a.should.equal('written by the parse', 'the consumer key was blanked from an emptied snapshot');
+    env.added.should.equal('new');
   });
 
   it('a snapshot of a smaller env does not see the previous one', () => {
@@ -537,6 +592,33 @@ describe('a failing list rule does not fail the document', () => {
     warnings.should.include('a different subsystem still speaks');
     warnings.filter((line) => /^cause /.test(line)).should.have.length(40);
     warnings.filter((line) => /^other /.test(line)).should.have.length(40);
+  });
+
+  // The two caps interact: the family check runs first, and only a reported key counts toward either —
+  // so six families of 40 stay under the global 200 and the 41st of each is silent for its own reason.
+  it('the family cap and the global cap each speak for themselves', () => {
+    resetWarnDistinct();
+    const warn = console.warn;
+    const said = [];
+    console.warn = (...args) => said.push(String(args[0]));
+    try {
+      for (let family = 0; family < 6; family++) {
+        for (let i = 0; i < 41; i++) {
+          warnDistinct('f' + family + ':' + i, 'f' + family + ' ' + i);
+        }
+      }
+    } finally {
+      console.warn = warn;
+    }
+    for (let family = 0; family < 5; family++) {
+      said.filter((line) => line.startsWith('f' + family + ' ')).should.have.length(40,
+        'family f' + family + ' was cut by something other than its own cap');
+    }
+    said.filter((line) => /distinct 'f\d' diagnostics/.test(line)).should.have.length(5,
+      'each family that reached its own cap must say so once');
+    // Five families of 40 fill the global 200, so the sixth is silenced by that cap — with its own message.
+    said.filter((line) => line.startsWith('f5 ')).should.have.length(0);
+    said.filter((line) => /distinct diagnostics in one render/.test(line)).should.have.length(1);
   });
 
   it('each distinct cause is reported once, not just each error name', () => {

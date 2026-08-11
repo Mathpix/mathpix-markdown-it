@@ -152,8 +152,8 @@ const ITEM_COMMAND_BARE: string = '\\\\item(?![a-zA-Z])';
 const ITEM_COMMAND_SOURCE: string = '(?:\\\\item\\s*\\[([^\\]]*)\\]|' + ITEM_COMMAND_BARE + ')';
 export const LATEX_ITEM_COMMAND_RE: RegExp = new RegExp('^' + ITEM_COMMAND_SOURCE);
 export const LATEX_ITEM_COMMAND_INLINE_RE: RegExp = new RegExp(ITEM_COMMAND_SOURCE);
-/** Sticky and shared: the caller MUST set `lastIndex` before every `exec`. */
-export const LATEX_ITEM_COMMAND_STICKY_RE: RegExp = new RegExp(ITEM_COMMAND_SOURCE, 'y');
+/** A fresh sticky instance per caller: `lastIndex` is state, and sharing it across callers leaks. */
+export const makeItemCommandSticky = (): RegExp => new RegExp(ITEM_COMMAND_SOURCE, 'y');
 // Built from the same bare form, so the fourth copy cannot drift; its two capture groups are unchanged.
 export const LATEX_LIST_BOUNDARY_INLINE_RE: RegExp =
   new RegExp('\\\\begin\\s*\\{(itemize|enumerate)\\}|\\\\end\\s*\\{(itemize|enumerate)\\}|' + ITEM_COMMAND_BARE);

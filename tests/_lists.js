@@ -11,6 +11,33 @@ const options = {
 };
 
 
+// The clamp warning is exercised on purpose by the wide-marker shapes here; keep it out of the CI log
+// while anything else still shows.
+const clampWarnFilter = () => {
+  if (global.__mmdClampWarnFilter) {
+    return () => {};
+  }
+  const base = console.warn;
+  const filtered = (...args) => {
+    if (/em clamp/.test(String(args[0]))) {
+      return;
+    }
+    base(...args);
+  };
+  global.__mmdClampWarnFilter = filtered;
+  console.warn = filtered;
+  return () => {
+    if (console.warn === filtered) {
+      console.warn = base;
+    }
+    global.__mmdClampWarnFilter = null;
+  };
+};
+// Installed at load: the fixture renders below run while mocha is still collecting, before any hook. Both
+// list test files do this, so the second must not wrap the first — one filter, restored once.
+const restoreClampWarn = clampWarnFilter();
+after(() => { restoreClampWarn(); });
+
 const { JSDOM } = require("jsdom");
 const tests = require("./_data/_lists/_data");
 const jsdom = new JSDOM();
@@ -244,6 +271,29 @@ describe('An unclosed wrapper env leaves the list rendering:', () => {
         previousEnd = to;
       });
     }
+  });
+  // The guard asks how many closers are left after a wrapper, and a walk over every offset past it made a
+  // document of such wrappers super-linear — 1600 units were 2.25× slower than `master` before the
+  // suffix counts. Growth, not wall time, so the bound holds on a slower machine.
+  it('a document of wrappers each holding a foreign closer scans linearly', () => {
+    const unit = '\\begin{itemize}\n\\item a\n\\begin{center}\ntext \\end{itemize} here\n'
+      + '\\end{center}\n\\item b\n\\end{itemize}';
+    const median = (count) => {
+      const src = Array.from({ length: count }, () => unit).join('\n\n');
+      MM.markdownToHTML(src, { outMath: { include_svg: false } });      // warm up
+      const samples = [];
+      for (let i = 0; i < 3; i++) {
+        const started = Date.now();
+        MM.markdownToHTML(src, { outMath: { include_svg: false } });
+        samples.push(Date.now() - started);
+      }
+      return samples.sort((a, b) => a - b)[1];
+    };
+    const small = median(200);
+    const large = median(1600);
+    // Eight times the input: linear allows ~8, the walk gave ~11 and rising.
+    (large <= Math.max(60, small * 9)).should.equal(true,
+      'growth is not linear: ' + small + ' ms → ' + large + ' ms');
   });
   // A closer written in code is skipped and the scan resumes past it. Slicing the rest of the line per
   // skip made that quadratic; the sticky scan keeps it flat.

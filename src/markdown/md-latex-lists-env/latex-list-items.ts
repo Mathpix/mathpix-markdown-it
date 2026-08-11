@@ -18,6 +18,7 @@ import {
 } from "../common/consts";
 import { getCurrentListLevelState } from "./list-state";
 import { ListItemsResult, ParsedListItem, ListInlineContext } from "./latex-list-types";
+import { warnDistinct } from "../common/warn-distinct";
 
 /**
  * Processes LaTeX list items and generates Markdown-It tokens
@@ -266,6 +267,12 @@ export const resolveListPadding = (listTokens: Token[]): void => {
     const em: number = Math.ceil((total - ancestorSum) * 100) / 100;
     // Own indent for this level: the reserved em when the marker overflows, else the default.
     const indentEm: number = em > LIST_DEFAULT_INDENT_EM ? em : LIST_DEFAULT_INDENT_EM;
+    if ((token.padding || 0) > LIST_MAX_INDENT_EM) {
+      // The clamp bit, so this level and the ones under it keep the default and their markers overlap.
+      warnDistinct('padding-clamped:' + depth,
+        '[list] marker indent hit the ' + LIST_MAX_INDENT_EM + 'em clamp; markers may overlap their text',
+        { depth });
+    }
     if (em > LIST_DEFAULT_INDENT_EM) {
       // Matches PADDING_EM_RE by construction: clamped to (default, LIST_MAX_INDENT_EM] and ceiled
       // to two decimals, so never exponential or negative. The renderer drops a miss silently.

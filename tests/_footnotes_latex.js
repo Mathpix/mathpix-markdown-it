@@ -307,6 +307,26 @@ describe('The resolved terminator set follows the ruler:', () => {
       rule.fn = original;
     }
   });
+  // The set is keyed by the ruler's compiled cache, which markdown-it nulls on any enable/disable — the
+  // list rule's own block-content path toggles rules, and a nulled cache must still resolve correctly.
+  it('the set is resolved correctly with the ruler cache nulled', () => {
+    const md = markdownIt({ html: true }).use(mathpixMarkdownPlugin, { outMath: { include_svg: false } });
+    // No blank line, so the footnote scan runs into the list and must terminate at it.
+    const src = 'Para.\\footnote{note}\n\\begin{itemize}\n\\item a\n\\begin{center}\nq\n\\end{center}\n\\end{itemize}';
+    const warn = console.warn;
+    console.warn = () => {};
+    try {
+      const before = md.render(src, {});
+      before.should.match(/<ul[^>]*class="itemize/, 'the footnote scan swallowed the list');
+      md.block.ruler.__cache__ = null;
+      md.render(src, {}).should.equal(before, 'a nulled ruler cache changed the terminator set');
+      // A list whose item holds a block env toggles the block rules mid-render, nulling that cache too.
+      md.render('\\begin{itemize}\n\\item a\n\\begin{center}\nq\n\\end{center}\n\\end{itemize}', {});
+      md.render(src, {}).should.equal(before, 'the set went stale after an internal toggle');
+    } finally {
+      console.warn = warn;
+    }
+  });
 });
 
 describe('Footnote rule performance regression:', () => {

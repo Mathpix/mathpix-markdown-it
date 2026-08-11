@@ -14,6 +14,33 @@ const { render_itemize_list_open } = require('../lib/markdown/md-latex-lists-env
 const { resetWarnDistinct } = require('../lib/markdown/common/warn-distinct');
 const Token = require('markdown-it/lib/token');
 
+// The clamp warning is exercised on purpose by the wide-marker shapes here; keep it out of the CI log
+// while anything else still shows.
+const clampWarnFilter = () => {
+  if (global.__mmdClampWarnFilter) {
+    return () => {};
+  }
+  const base = console.warn;
+  const filtered = (...args) => {
+    if (/em clamp/.test(String(args[0]))) {
+      return;
+    }
+    base(...args);
+  };
+  global.__mmdClampWarnFilter = filtered;
+  console.warn = filtered;
+  return () => {
+    if (console.warn === filtered) {
+      console.warn = base;
+    }
+    global.__mmdClampWarnFilter = null;
+  };
+};
+// Installed at load: the fixture renders below run while mocha is still collecting, before any hook. Both
+// list test files do this, so the second must not wrap the first — one filter, restored once.
+const restoreClampWarn = clampWarnFilter();
+after(() => { restoreClampWarn(); });
+
 const { JSDOM } = require('jsdom');
 const jsdom = new JSDOM();
 global.window = jsdom.window;
@@ -307,6 +334,19 @@ describe('the clamp and an unclosed list do not disturb later lists:', () => {
   const pads = (src) => (MM.markdownToHTML(src, { outMath: { include_svg: false } })
     .match(/<[uo]l[^>]*>/g) || [])
     .map((tag) => (tag.match(/data-padding-inline-start="([^"]+)"/) || [])[1]);
+  // Hitting the clamp means the levels under it keep the default and their markers overlap, so it says so.
+  it('a marker wide enough to hit the clamp reports itself', () => {
+    const clamped = '\\begin{itemize}\n\\item[' + 'W'.repeat(60) + '] q\n\\end{itemize}';
+    const said = [];
+    const warn = console.warn;
+    console.warn = (...args) => said.push(String(args[0]));
+    try {
+      MM.markdownToHTML(clamped, { outMath: { include_svg: false } });
+    } finally {
+      console.warn = warn;
+    }
+    said.filter((line) => /em clamp/.test(line)).should.have.length(1);
+  });
   const wide = 'W'.repeat(12);
   const fresh = '\\begin{itemize}\n\\item[' + wide + '] q\n\\end{itemize}';
   it('a list after an unclosed one reserves what it would alone', () => {
