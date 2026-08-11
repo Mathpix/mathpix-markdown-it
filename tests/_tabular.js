@@ -162,6 +162,27 @@ describe('tsv and csv carry the address of a link or image, once:', () => {
       { outMath: { include_svg: false, include_tsv: true, include_csv: true } });
     return MM.parseMarkdownByHTML(html, false).find((p) => p.type === kind).value.split('\n')[0];
   };
+  // The exports are text, and a rejected link is text in both outputs — there is no link token to strip.
+  // Pinned on both sides so neither the HTML nor the export can start disagreeing with the README.
+  it('a rejected scheme is literal text in the HTML and in the export alike', () => {
+    const cell = (body, extra) => MM.markdownToHTML('\\begin{tabular}{l}\n' + body + ' \\\\\n\\end{tabular}',
+      Object.assign({ outMath: { include_svg: false, include_table_markdown: true } }, extra));
+    const exported = (html) => (html.match(/<table-markdown[^>]*>([\s\S]*?)<\/table-markdown>/) || [])[1]
+      .split('\n')[0];
+    const bare = (html) => html.replace(/<table-markdown[\s\S]*?<\/table-markdown>/, '');
+    const rejected = cell('[click](javascript:alert(1))', {});
+    bare(rejected).should.not.match(/<a\s/, 'the HTML path made a link out of a rejected scheme');
+    bare(rejected).should.include('[click](javascript:alert(1))', 'the rejected link lost its text');
+    exported(rejected).should.equal('| [click](javascript:alert(1)) |');
+    // A consumer's own validator is honoured the same way: no link, the text unchanged in both.
+    const refused = cell('[click](http://a.b)', { validateLink: () => false });
+    bare(refused).should.not.match(/<a\s/);
+    exported(refused).should.equal('| [click](http://a.b) |');
+    // An accepted link keeps its address as written, in the HTML and in the export.
+    const accepted = cell('[click](http://a.b)', {});
+    bare(accepted).should.match(/<a[^>]*href="http:\/\/a\.b"/);
+    exported(accepted).should.equal('| [click](http://a.b) |');
+  });
   it('a link cell holds the href alone', () => {
     plain('[**bold** x](http://a.b)', 'tsv').should.equal('http://a.b');
     plain('[**bold** x](http://a.b)', 'csv').should.equal('http://a.b');

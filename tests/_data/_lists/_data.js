@@ -1916,6 +1916,58 @@ module.exports = [
     latex: "\\begin{lstlisting}\n` {\n\\end{lstlisting}\n\n\\begin{itemize}\n\\item a\n\\begin{center}\n\\caption{q \\end{itemize} w}\n\\end{center}\n\\item b\n\\end{itemize}",
     html: "<pre class=\"lstlisting\"><code class=\"hljs lstlisting-code\" style=\"text-align: left;\">` {</code></pre>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\"> w}</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
   },
+  // A closer inside a code span: the list survives, the code span does not — the wrapper's own block rule
+  // truncates its content there. Identical to `master`; the third shape is the control that must stay clean.
+  {
+    name: "a closer in a code span inside a wrapper, on its own line",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{center}\nx `\\end{center}` y\n\\end{center}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\">x `</div>\n<div>x `\\end{center}</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    name: "a closer in a code span inside a one-line wrapper",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{center} x `\\end{center}` y \\end{center}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\"> x `</div>\n<div>` y \\end{center}</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    name: "a code span with no closer inside a wrapper renders whole",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{center}\nx `code` y\n\\end{center}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\">x <code>code</code> y</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  // The unclosed body prints as text, but `\renewcommand` inside it is applied and never printed.
+  // Identical to `master`; pinned because rolling it back made one source answer twice.
+  {
+    name: "a marker command in a body that never closes applies below, footnote above",
+    latex: "Para \\footnote{n}\n\\begin{itemize}\n\\renewcommand{\\labelitemi}{ZZZ}\n\\item a\n\n\\begin{itemize}\n\\item b\n\\end{itemize}",
+    html: "<div>Para <sup class=\"footnote-ref\"><a href=\"#fn1\" id=\"fnref1\">[1]</a></sup></div>\n<div>\\begin{itemize}<br>\n<br>\n\\item a</div>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">ZZZ</span>b</li></ul><hr class=\"footnotes-sep\">\n<section class=\"footnotes\" style=\"margin-bottom: 1em;\">\n<ol class=\"footnotes-list\" style=\"margin-bottom: 0;\">\n<li id=\"fn1\" class=\"footnote-item\"><div>n <a href=\"#fnref1\" class=\"footnote-backref\">↩︎</a></div>\n</li>\n</ol>\n</section>\n"
+  },
+  {
+    name: "a marker command in a body that never closes applies below, plain paragraph above",
+    latex: "Para\n\\begin{itemize}\n\\renewcommand{\\labelitemi}{ZZZ}\n\\item a\n\n\\begin{itemize}\n\\item b\n\\end{itemize}",
+    html: "<div>Para</div>\n<div>\\begin{itemize}<br>\n<br>\n\\item a</div>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">ZZZ</span>b</li></ul>"
+  },
+  // A wrapper closer written in code is not its closer — for the guard that opens the wrapper and for the
+  // walk that collects its body alike. Reading only the first closer left the wrapper transparent and
+  // popped it inside the fence: `master` loses an item and emits `<li><></li>` on three of these four.
+  {
+    name: "a closer in a fence, the real one below, a caption holding a closer",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{center}\n```\n\\end{center}\n```\n\\caption{q \\end{itemize} w}\n\\end{center}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\">```</div>\n<pre><code class=\"hljs\">\\caption{q \\end{itemize} w}\n\\end{center}</code></pre>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    name: "a closer in a fence, the real one below, an \\item inside the wrapper",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{center}\n```\n\\end{center}\n```\n\\item[x] y\n\\end{center}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\">```</div>\n<pre><code class=\"hljs\">\\item[x] y\n\\end{center}</code></pre>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    name: "a closer inside an lstlisting, the real one below",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{center}\n\\begin{lstlisting}\n\\end{center}\n\\end{lstlisting}\n\\caption{q \\end{itemize} w}\n\\end{center}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\">\\begin{lstlisting}</div>\n<div>\\end{lstlisting}<br>\n w}<br>\n\\end{center}</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    name: "two closers in a fence, the real one below",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{center}\n```\n\\end{center}\n\\end{center}\n```\n\\caption{q \\end{itemize} w}\n\\end{center}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\">```</div>\n<div>\\end{center}</div>\n<pre><code class=\"hljs\">\\caption{q \\end{itemize} w}\n\\end{center}</code></pre>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
   // A tabular nested on one line inside another: the same-line close is decided in one place now, and the
   // frame it used to leave open took the whole list down to literal LaTeX — as it still does on master.
   {

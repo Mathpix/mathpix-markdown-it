@@ -245,6 +245,27 @@ describe('An unclosed wrapper env leaves the list rendering:', () => {
       });
     }
   });
+  // A closer written in code is skipped and the scan resumes past it. Slicing the rest of the line per
+  // skip made that quadratic; the sticky scan keeps it flat.
+  it('a line full of closers written in code scans linearly', () => {
+    const build = (n) => '\\begin{itemize}\n\\item a\n\\begin{center}\n'
+      + '`\\end{center}` '.repeat(n) + 'tail\n\\end{center}\n\\item b\n\\end{itemize}';
+    const median = (src) => {
+      MM.markdownToHTML(src, { outMath: { include_svg: false } });      // warm up
+      const samples = [];
+      for (let i = 0; i < 5; i++) {
+        const started = Date.now();
+        MM.markdownToHTML(src, { outMath: { include_svg: false } });
+        samples.push(Date.now() - started);
+      }
+      return samples.sort((a, b) => a - b)[2];
+    };
+    const small = median(build(200));
+    const large = median(build(3200));
+    // Sixteen times the closers: linear allows ~16, quadratic would be ~256.
+    (large <= Math.max(20, small * 24)).should.equal(true,
+      'growth is not linear: ' + small + ' ms → ' + large + ' ms');
+  });
   // Argument pairing is one pass with a stack. Asking findEndMarker per brace made a long run of
   // unmatched `{` rescan the tail each time — `n^1.9` measured, 12× master at 8000 braces.
   it('a long run of unmatched braces parses linearly', () => {

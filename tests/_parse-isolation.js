@@ -252,6 +252,30 @@ describe('silent-mode Lists does not mutate shared env', () => {
     env.ctx.touched.should.equal(true, 'in-place mutation is out of the rollback by design');
   });
 
+  // The marker registries sit outside the rollback: a `\renewcommand` in a body that never closes is
+  // applied by its own block rule. What must hold is that the answer never depends on when that write
+  // lands — the same for a fresh instance, the first render and the next.
+  it('a marker command in a body that never closes applies alike on every render', () => {
+    const marker = (html) => (html.match(/<span class="li_level">([\s\S]*?)<\/span>/) || [])[1];
+    const build = () => markdownIt({ html: true }).use(mathpixMarkdownPlugin, { outMath: { include_svg: false } });
+    const source = (before) => before
+      + '\n\\begin{itemize}\n\\renewcommand{\\labelitemi}{ZZZ}\n\\item a\n\n\\begin{itemize}\n\\item b\n\\end{itemize}';
+    ['Para \\footnote{n}', 'Para', 'text'].forEach((before) => {
+      const warned = [];
+      const warn = console.warn;
+      console.warn = (...args) => warned.push(String(args[0]));
+      const shared = build();
+      const first = marker(shared.render(source(before), {}));
+      const second = marker(shared.render(source(before), {}));
+      const fresh = marker(build().render(source(before), {}));
+      console.warn = warn;
+      first.should.equal('ZZZ', 'the command in a discarded body did not apply after "' + before + '"');
+      second.should.equal(first, 'the second render on the same instance answered differently');
+      fresh.should.equal(first, 'a fresh instance answered differently');
+      warned.should.have.length(0, 'warned: ' + warned.join(' | '));
+    });
+  });
+
   // The level snapshot is structural, not a count: `openItems` decides whether a chunk before the first
   // `\item` gets a marker-less `<li>`, and a count puts back neither it nor a level the parse dropped.
   it('the level rollback restores openItems and a level a parse removed', () => {
@@ -490,8 +514,9 @@ describe('a failing list rule does not fail the document', () => {
     JSON.stringify(md.options.outMath).should.equal(before, 'outMath stayed mutated after the throw');
   });
 
-  // Past the 200-key cap the diagnostics go quiet, so the log has to say it is truncated.
-  it('hitting the distinct-key cap is reported once', () => {
+  // Past a cap the diagnostics go quiet, so the log has to say it is truncated — and one flooding family
+  // must not take another subsystem's single warning with it.
+  it('hitting a cap is reported once, per family and overall', () => {
     resetWarnDistinct();
     const warn = console.warn;
     const warnings = [];
@@ -500,11 +525,18 @@ describe('a failing list rule does not fail the document', () => {
       for (let i = 0; i < 260; i++) {
         warnDistinct('cause:' + i, 'cause ' + i);
       }
+      warnDistinct('padding-shape', 'a different subsystem still speaks');
+      for (let i = 0; i < 60; i++) {
+        warnDistinct('other:' + i, 'other ' + i);
+      }
     } finally {
       console.warn = warn;
     }
-    warnings.should.have.length(201);
-    warnings[200].should.include('the rest are silent');
+    warnings.filter((line) => /distinct 'cause' diagnostics/.test(line))
+      .should.have.length(1, 'the family cap was not reported exactly once');
+    warnings.should.include('a different subsystem still speaks');
+    warnings.filter((line) => /^cause /.test(line)).should.have.length(40);
+    warnings.filter((line) => /^other /.test(line)).should.have.length(40);
   });
 
   it('each distinct cause is reported once, not just each error name', () => {
@@ -688,6 +720,35 @@ describe('the env snapshot pool is reset even when the render is partial', () =>
       after.should.equal(slotZero, 'the next snapshot came from a deeper slot');
       releaseEnvSnapshot();
     });
+  });
+});
+
+// A rolled-back key is left present holding `undefined` rather than deleted, so a host reusing one `env`
+// must not see it grow render after render — the whole-env snapshot is linear in the number of keys.
+describe('a reused env does not grow across renders', () => {
+  const md = markdownIt({ html: true }).use(mathpixMarkdownPlugin, { outMath: { include_svg: false } });
+  const list = (n) => '\\begin{itemize}\n\\item item ' + n + '\n\\end{itemize}\n\nPara ' + n
+    + '\\footnote{n' + n + '}\n\n\\begin{itemize}\n\\item unclosed ' + n + '\n';
+  it('the key count settles and the last render is no slower than the second', () => {
+    const env = {};
+    const warn = console.warn;
+    console.warn = () => {};
+    md.render(list(0), env);
+    md.render(list(1), env);
+    const settled = Object.keys(env).length;
+    const early = Date.now();
+    md.render(list(2), env);
+    const earlyMs = Date.now() - early;
+    for (let i = 3; i < 50; i++) {
+      md.render(list(i), env);
+    }
+    const late = Date.now();
+    md.render(list(50), env);
+    const lateMs = Date.now() - late;
+    console.warn = warn;
+    Object.keys(env).length.should.equal(settled, 'env grew: ' + Object.keys(env).sort().join(','));
+    (lateMs <= Math.max(4, earlyMs * 1.5))
+      .should.equal(true, 'the 51st render cost ' + lateMs + 'ms against ' + earlyMs + 'ms for the 3rd');
   });
 });
 

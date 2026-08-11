@@ -146,10 +146,17 @@ export const BEGIN_LIST_ENV_INLINE_RE: RegExp = /\\begin\s*\{(itemize|enumerate)
 /** Matches \end{itemize} or \end{enumerate} */
 export const END_LIST_ENV_INLINE_RE: RegExp = /\\end\s*\{(itemize|enumerate)\}/;
 export const END_LIST_ENV_RE: RegExp = /^\\end\s*\{(itemize|enumerate)\}/;
-/** Matches \item or \item[optional] */
-export const LATEX_ITEM_COMMAND_RE: RegExp = /^(?:\\item\s*\[([^\]]*)\]|\\item(?![a-zA-Z]))/;
-export const LATEX_ITEM_COMMAND_INLINE_RE: RegExp = /(?:\\item\s*\[([^\]]*)\]|\\item(?![a-zA-Z]))/;
-export const LATEX_LIST_BOUNDARY_INLINE_RE: RegExp = /\\begin\s*\{(itemize|enumerate)\}|\\end\s*\{(itemize|enumerate)\}|\\item(?![a-zA-Z])/;
+/** `\item` not followed by a letter, so `\itemsep` is not one. Every pattern below is built from it. */
+const ITEM_COMMAND_BARE: string = '\\\\item(?![a-zA-Z])';
+/** `\item` or `\item[optional]`, the optional marker captured. */
+const ITEM_COMMAND_SOURCE: string = '(?:\\\\item\\s*\\[([^\\]]*)\\]|' + ITEM_COMMAND_BARE + ')';
+export const LATEX_ITEM_COMMAND_RE: RegExp = new RegExp('^' + ITEM_COMMAND_SOURCE);
+export const LATEX_ITEM_COMMAND_INLINE_RE: RegExp = new RegExp(ITEM_COMMAND_SOURCE);
+/** Sticky and shared: the caller MUST set `lastIndex` before every `exec`. */
+export const LATEX_ITEM_COMMAND_STICKY_RE: RegExp = new RegExp(ITEM_COMMAND_SOURCE, 'y');
+// Built from the same bare form, so the fourth copy cannot drift; its two capture groups are unchanged.
+export const LATEX_LIST_BOUNDARY_INLINE_RE: RegExp =
+  new RegExp('\\\\begin\\s*\\{(itemize|enumerate)\\}|\\\\end\\s*\\{(itemize|enumerate)\\}|' + ITEM_COMMAND_BARE);
 /** A line that is only `\renewcommand`: its own rule consumes it, so it renders to nothing. */
 export const RENEWCOMMAND_LINE_RE: RegExp = /^\s*\\renewcommand\b/;
 /** Where a chunk splits into items: a real `\item`, so `\itemsep` is not a split point. */

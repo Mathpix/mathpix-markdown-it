@@ -10,8 +10,6 @@ import {
 } from "../common/consts";
 
 
-// Outside the Lists rollback: a discarded parse re-runs the `\renewcommand` when the source is parsed
-// for real. No repro of a leak found.
 /** Active itemize levels (mutable state) */
 export let itemizeLevel: string[] = [];
 /** Active enumerate levels (mutable state) */
@@ -19,6 +17,8 @@ export let enumerateLevel: string[] = [];
 /** Parsed tokens for itemize bullets */
 export let itemizeLevelTokens: Token[][] = [];
 
+// Outside the Lists rollback on purpose: the `\renewcommand` line is document content either way, and
+// its own block rule applies it — rolling it back only moved the write, giving two renders two answers.
 /**
  * Reset and return default itemize bullet definitions.
  */

@@ -3,7 +3,6 @@ chai.should();
 
 const {
   countPositionsAtOrAfter,
-  firstPositionAtOrAfter,
   matchPositionsCached,
   lastMatchPosCached,
   clearSrcPosCaches,
@@ -25,15 +24,6 @@ describe('src-pos-cache boundary search:', () => {
     countPositionsAtOrAfter(positions, 21).should.equal(1);
     countPositionsAtOrAfter(positions, 30).should.equal(1);
     countPositionsAtOrAfter(positions, 31).should.equal(0);
-  });
-  it('firstPositionAtOrAfter returns the offset itself, or -1', () => {
-    firstPositionAtOrAfter([], 0).should.equal(-1);
-    firstPositionAtOrAfter(positions, 5).should.equal(10);
-    firstPositionAtOrAfter(positions, 10).should.equal(10);
-    firstPositionAtOrAfter(positions, 11).should.equal(20);
-    firstPositionAtOrAfter(positions, 20).should.equal(20);
-    firstPositionAtOrAfter(positions, 21).should.equal(30);
-    firstPositionAtOrAfter(positions, 31).should.equal(-1);
   });
   it('the cache is keyed on state.src, so reassigning it re-sweeps', () => {
     const key = Symbol('test');

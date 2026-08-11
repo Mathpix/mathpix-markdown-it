@@ -16,7 +16,7 @@ import {
 import { parseSetCounterNumber } from "./latex-list-common";
 import { snapshotListLevels, restoreListLevels, getOpenListCount, type ListLevelState } from "./list-state";
 import { getCaptionCounters, setCaptionCounters } from "../common/caption-counters";
-import { matchPositionsCached, countPositionsAtOrAfter, firstPositionAtOrAfter, srcValueCached } from "../common/src-pos-cache";
+import { matchPositionsCached, countPositionsAtOrAfter, srcValueCached } from "../common/src-pos-cache";
 import {
   FenceMarker,
   detectFenceOpen,
@@ -73,7 +73,6 @@ const lastListEndPos = (state: StateBlock): number => {
   return offsets.length ? offsets[offsets.length - 1] : -1;
 };
 
-
 // Wrapper names: the shared table minus the two that bring their own detection. Everything below is
 // derived from it, so a name added there cannot silently miss the guard.
 const WRAPPER_ENV_NAMES: readonly string[] = Object.freeze(
@@ -103,6 +102,14 @@ const END_OPAQUE_ENV_RE: Readonly<Record<OpaqueEnvType, RegExp>> = Object.freeze
     return acc;
   }, { lstlisting: END_LST_INLINE_RE, tabular: END_TABULAR_INLINE_RE } as Record<string, RegExp>)
 ) as Readonly<Record<OpaqueEnvType, RegExp>>;
+
+// Global clones of the same patterns, for a scan that resumes past a closer it rejected.
+const END_OPAQUE_ENV_SEARCH_G: Readonly<Record<OpaqueEnvType, RegExp>> = Object.freeze(
+  (Object.keys(END_OPAQUE_ENV_RE) as OpaqueEnvType[]).reduce((acc, name) => {
+    acc[name] = new RegExp(END_OPAQUE_ENV_RE[name].source, 'g');
+    return acc;
+  }, {} as Record<OpaqueEnvType, RegExp>)
+);
 
 const LIST_BEGIN_OFFSETS_KEY = Symbol('mmd.listBeginOffsets');
 const listOpenerOffsets = (state: StateBlock): readonly number[] =>
@@ -182,7 +189,6 @@ const closesOurListWithin = (state: StateBlockLike, from: number, to: number): b
   const spans: Array<[number, number]> = argumentSpansOf(state);
   let closer: number = closerOffsets.length - countPositionsAtOrAfter(closerOffsets, from);
   let opener: number = openerOffsets.length - countPositionsAtOrAfter(openerOffsets, from);
-  let span: number = 0;
   let depth: number = 0;
   for (let step: number = 0; step < closersAhead + openersAhead; step++) {
     const nextCloser: number = closer < closerOffsets.length ? closerOffsets[closer] : Infinity;
@@ -194,12 +200,9 @@ const closesOurListWithin = (state: StateBlockLike, from: number, to: number): b
     } else {
       opener++;
     }
-    while (span < spans.length && spans[span][1] < at) {
-      span++;
-    }
     // A balanced pair around it is knowledge, and it outranks the conservatism below: the `{` left open
-    // earlier may sit in math or code, where it opens nothing.
-    if (span < spans.length && at > spans[span][0] && at < spans[span][1]) {
+    // earlier may sit in math or code, where it opens nothing. One predicate for both readers of `spans`.
+    if (isInsideRanges(spans, at)) {
       continue;                         // inside a command argument: text, not structure
     }
     if (insideVerbatim(state, at)) {
@@ -233,11 +236,12 @@ const absoluteOffsetOf = (
   state: StateBlockLike,
   line: number,
   lineText: string,
-  match: RegExpExecArray
+  index: number,
+  text: string
 ): number => {
-  const at: number = state.eMarks[line] - lineText.length + match.index;
+  const at: number = state.eMarks[line] - lineText.length + index;
   // Past the end when it does not: the guard then finds no closer and declines, the safe side.
-  return state.src.slice(at, at + match[0].length) === match[0] ? at : state.src.length;
+  return state.src.slice(at, at + text.length) === text ? at : state.src.length;
 };
 
 // Structural (not text) offsets of `all` inside `[from, to)`.
@@ -275,23 +279,28 @@ const hasCloserAhead = (state: StateBlockLike, from: number, name: string): bool
   if (!sweep || !key) {
     return false;
   }
-  const at: number = firstPositionAtOrAfter(matchPositionsCached(state as StateBlock, key, sweep), from);
-  if (at < 0) {
-    return false;
-  }
-  // Swallowing our closer is allowed when the source past the wrapper still closes the open lists and
-  // no list starts inside it — eating another list's `\begin` would lose that list.
-  if (closesOurListWithin(state, from, at)) {
-    const opensInside: number =
-      structuralCountIn(state, listOpenerOffsets(state as StateBlock), from, at);
-    // The live count, not this source's own depth: an ambient list from an outer parse still needs closing.
-    if (opensInside > 0 || closersLeftAfter(state, at) < Math.max(1, getOpenListCount())) {
-      return false;
+  const offsets: readonly number[] = matchPositionsCached(state as StateBlock, key, sweep);
+  // Every closer ahead, not just the first: one written inside a fenced block or an `lstlisting` is
+  // text, and taking it as the answer left the wrapper transparent while a real closer stood below.
+  for (let i = offsets.length - countPositionsAtOrAfter(offsets, from); i < offsets.length; i++) {
+    const at: number = offsets[i];
+    if (insideVerbatim(state, at)) {
+      continue;
     }
+    // Swallowing our closer is allowed when the source past the wrapper still closes the open lists and
+    // no list starts inside it — eating another list's `\begin` would lose that list. A closer farther
+    // out swallows a superset, so failing here ends the search rather than moving it along.
+    if (closesOurListWithin(state, from, at)) {
+      const opensInside: number =
+        structuralCountIn(state, listOpenerOffsets(state as StateBlock), from, at);
+      // The live count, not this source's own depth: an ambient list from an outer parse still needs closing.
+      if (opensInside > 0 || closersLeftAfter(state, at) < Math.max(1, getOpenListCount())) {
+        return false;
+      }
+    }
+    return true;
   }
-  // A closer inside a fenced block or an `lstlisting` is text. Asked of the ranges, so a closed block
-  // before it leaves the closer usable.
-  return !insideVerbatim(state, at);
+  return false;
 };
 
 // The leftmost inline \begin/\end in `s`, or null once none is left. Both patterns need their
@@ -307,6 +316,30 @@ const nextListEnvMatch = (s: string): { match: RegExpMatchArray; isEnd: boolean 
   return { match: isEnd ? endMatch! : beginMatch!, isEnd };
 };
 
+// The first closer in `text` that is not written in code, or null. A wrapper's closer inside a fence, an
+// `lstlisting` or a code span is content — and a later one on the same line is still its closer.
+const firstUsableCloser = (
+  state: StateBlockLike,
+  line: number,
+  text: string,
+  env: OpaqueEnvType,
+  skipCodeClosers: boolean
+): { index: number; length: number } | null => {
+  const checkVerbatim: boolean = skipCodeClosers && WRAPPER_ENV_NAMES.indexOf(env) >= 0;
+  // Sticky, so a skipped closer costs no slice of the rest of the line.
+  const scan: RegExp = END_OPAQUE_ENV_SEARCH_G[env];
+  scan.lastIndex = 0;
+  let found: RegExpExecArray | null;
+  while ((found = scan.exec(text)) !== null) {
+    if (!checkVerbatim
+        || !insideVerbatim(state, absoluteOffsetOf(state, line, text, found.index, found[0]))) {
+      return { index: found.index, length: found[0].length };
+    }
+    scan.lastIndex = found.index + found[0].length;
+  }
+  return null;
+};
+
 // Opens `openedType` and decides in one place whether it closes on this same line — the nested-tabular
 // branch skipped that check, so its one-line form left the stack open for good.
 const openOpaqueEnv = (
@@ -314,19 +347,22 @@ const openOpaqueEnv = (
   items: any[],
   openedType: OpaqueEnvType,
   afterBegin: string,
-  nextLine: number
+  nextLine: number,
+  state: StateBlockLike
 ): LstEndResult => {
   stack = [...stack, openedType];
-  const endRe: RegExp = END_OPAQUE_ENV_RE[openedType];
-  const meSameLine: RegExpExecArray | null = endRe.exec(afterBegin);
+  // Not skipping a closer in code here: measured, the wrapper's own block rule truncates its content at
+  // that closer anyway, and refusing it lost the tail instead of showing it (Non-Goals).
+  const meSameLine = firstUsableCloser(state, nextLine, afterBegin, openedType, false);
   if (!meSameLine) {
     // `lineText` is a tail for the caller to re-parse, so it is only read when `handled` is false.
     return { handled: true, stack, items: ItemsAddToPrev(items, afterBegin, nextLine), lineText: '' };
   }
   const glue: string = openedType === "lstlisting" ? "\n" : "";
-  items = ItemsAddToPrev(items, afterBegin.slice(0, meSameLine.index) + glue + meSameLine[0], nextLine);
+  const endToken: string = afterBegin.slice(meSameLine.index, meSameLine.index + meSameLine.length);
+  items = ItemsAddToPrev(items, afterBegin.slice(0, meSameLine.index) + glue + endToken, nextLine);
   stack = stack.slice(0, -1);
-  const afterSameLineEnd: string = afterBegin.slice(meSameLine.index + meSameLine[0].length);
+  const afterSameLineEnd: string = afterBegin.slice(meSameLine.index + meSameLine.length);
   return afterSameLineEnd.trim().length
     ? { handled: false, stack, items, lineText: afterSameLineEnd }
     : { handled: true, stack, items, lineText: "" };
@@ -371,13 +407,14 @@ const handleLstBeginInline = (
     if (prefix.length > 0) {
       items = ItemsAddToPrev(items, prefix, nextLine);
     }
-    return openOpaqueEnv(stack, items, "tabular", lineText.slice(mbTab.index), nextLine);
+    return openOpaqueEnv(stack, items, "tabular", lineText.slice(mbTab.index), nextLine, state);
   }
   // A wrapper opens only when its closer is ahead of the `\begin` itself: an `\end{X}` left of it read
   // as reachable and cost the whole list.
   const mbWrapRaw: RegExpExecArray | null = wrapperBeginAt(lineText);
   const mbWrap: RegExpExecArray | null =
-    mbWrapRaw && hasCloserAhead(state, absoluteOffsetOf(state, nextLine, lineText, mbWrapRaw), mbWrapRaw[1])
+    mbWrapRaw && hasCloserAhead(
+      state, absoluteOffsetOf(state, nextLine, lineText, mbWrapRaw.index, mbWrapRaw[0]), mbWrapRaw[1])
       ? mbWrapRaw
       : null;
   // Earliest begin, or none. Seeded, so this stays a `null` the caller handles rather than a throw
@@ -398,8 +435,8 @@ const handleLstBeginInline = (
       items = ItemsAddToPrev(items, before, nextLine);
     }
   }
-  return openOpaqueEnv(stack, items, openedType, afterBegin, nextLine);
-}
+  return openOpaqueEnv(stack, items, openedType, afterBegin, nextLine, state);
+};
 
 /**
  * Detects \end{...} for the current opaque env (stack top).
@@ -419,8 +456,8 @@ const handleLstEndInline = (
   if (!top) {
     return { handled: false, stack, items, lineText };
   }
-  const endRe: RegExp = END_OPAQUE_ENV_RE[top];
-  const me: RegExpExecArray = endRe.exec(lineText);
+  // Same rule as when the env opened: a closer written in code is content, and the next one still closes.
+  const me = firstUsableCloser(state, nextLine, lineText, top, true);
   if (!me) {
     // still inside opaque env → append raw line with indentation
     const rawLine = state.src.slice(state.bMarks[nextLine], state.eMarks[nextLine]);
@@ -428,9 +465,9 @@ const handleLstEndInline = (
     return { handled: true, stack, items, lineText };
   }
   const endIndex: number = me.index;
-  const endToken: string = lineText.slice(endIndex, endIndex + me[0].length);
+  const endToken: string = lineText.slice(endIndex, endIndex + me.length);
   const beforeEnd: string = lineText.slice(0, endIndex);
-  const afterEnd: string = lineText.slice(endIndex + me[0].length);
+  const afterEnd: string = lineText.slice(endIndex + me.length);
   // Append code continuation
   if (beforeEnd.length > 0) {
     const glue = top === "lstlisting" ? "\n" : "";
@@ -446,7 +483,7 @@ const handleLstEndInline = (
   }
   // return remainder to be parsed normally
   return { handled: false, stack, items, lineText: afterEnd };
-}
+};
 
 type OpaqueProcessResult = {
   consumedLine: boolean;

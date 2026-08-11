@@ -20,7 +20,7 @@ import {
 } from "./latex-list-common";
 import { parseListEnvRawToTokens, flushTokensToInline, warnListRuleFailed } from "./latex-list-env-engine";
 import {
-  LATEX_ITEM_COMMAND_RE,
+  LATEX_ITEM_COMMAND_STICKY_RE,
   END_LIST_ENV_RE,
   BEGIN_LIST_ENV_RE,
   LATEX_LIST_BOUNDARY_INLINE_RE,
@@ -36,7 +36,7 @@ import {
 const END_LIST_ENV_SEARCH_G: RegExp = new RegExp(END_LIST_ENV_INLINE_RE.source, 'g');
 // Same patterns applied at an index instead of to `src.slice(pos)`, which copied the rest of the
 // document on every call. Built from the shared sources, so they cannot drift.
-const ITEM_COMMAND_AT: RegExp = new RegExp(LATEX_ITEM_COMMAND_RE.source.replace(/^\^/, ''), 'y');
+const ITEM_COMMAND_AT: RegExp = LATEX_ITEM_COMMAND_STICKY_RE;
 const LIST_BOUNDARY_SEARCH_G: RegExp = new RegExp(LATEX_LIST_BOUNDARY_INLINE_RE.source, 'g');
 
 /**

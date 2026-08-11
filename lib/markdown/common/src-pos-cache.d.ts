@@ -25,5 +25,3 @@ export declare const matchPositionsCached: (state: StateBlock, key: symbol, patt
 export declare const srcValueCached: <T>(state: StateBlock, key: symbol, compute: (src: string) => T) => T;
 /** How many of the ascending `positions` are at or after `minOffset` — binary search, no allocation. */
 export declare const countPositionsAtOrAfter: (positions: readonly number[], minOffset: number) => number;
-/** The nearest of the ascending `positions` at or after `minOffset`, or -1 when none is left. */
-export declare const firstPositionAtOrAfter: (positions: readonly number[], minOffset: number) => number;

@@ -4,11 +4,30 @@ const warned: Set<string> = new Set();
 // A key carries a list depth or an error message, so a pathological document can mint many. Past the
 // cap the set stops growing and reporting: it exists to dedupe a flood, not to itemise one.
 const MAX_DISTINCT_KEYS = 200;
+// Per cause family, so a document minting hundreds of `list-rule-failed:` keys cannot silence the one
+// warning another subsystem has to give. The family is the key up to its first colon.
+const MAX_KEYS_PER_FAMILY = 40;
 
 let capReported: boolean = false;
+const perFamily: Map<string, number> = new Map();
+const familyCapReported: Set<string> = new Set();
+
+const familyOf = (key: string): string => {
+  const at: number = key.indexOf(':');
+  return at < 0 ? key : key.slice(0, at);
+};
 
 export const warnDistinct = (key: string, ...args: any[]): void => {
   if (warned.has(key)) {
+    return;
+  }
+  const family: string = familyOf(key);
+  const usedByFamily: number = perFamily.get(family) ?? 0;
+  if (usedByFamily >= MAX_KEYS_PER_FAMILY) {
+    if (!familyCapReported.has(family)) {
+      familyCapReported.add(family);
+      console.warn(`[mmd] more than ${MAX_KEYS_PER_FAMILY} distinct '${family}' diagnostics in one render; the rest of that family are silent`);
+    }
     return;
   }
   if (warned.size >= MAX_DISTINCT_KEYS) {
@@ -20,6 +39,7 @@ export const warnDistinct = (key: string, ...args: any[]): void => {
     return;
   }
   warned.add(key);
+  perFamily.set(family, usedByFamily + 1);
   console.warn(...args);
 };
 
@@ -28,4 +48,6 @@ export const warnDistinct = (key: string, ...args: any[]): void => {
 export const resetWarnDistinct = (): void => {
   warned.clear();
   capReported = false;
+  perFamily.clear();
+  familyCapReported.clear();
 };

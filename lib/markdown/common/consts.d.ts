@@ -103,9 +103,10 @@ export declare const BEGIN_LIST_ENV_INLINE_RE: RegExp;
 /** Matches \end{itemize} or \end{enumerate} */
 export declare const END_LIST_ENV_INLINE_RE: RegExp;
 export declare const END_LIST_ENV_RE: RegExp;
-/** Matches \item or \item[optional] */
 export declare const LATEX_ITEM_COMMAND_RE: RegExp;
 export declare const LATEX_ITEM_COMMAND_INLINE_RE: RegExp;
+/** Sticky and shared: the caller MUST set `lastIndex` before every `exec`. */
+export declare const LATEX_ITEM_COMMAND_STICKY_RE: RegExp;
 export declare const LATEX_LIST_BOUNDARY_INLINE_RE: RegExp;
 /** A line that is only `\renewcommand`: its own rule consumes it, so it renders to nothing. */
 export declare const RENEWCOMMAND_LINE_RE: RegExp;

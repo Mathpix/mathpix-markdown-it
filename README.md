@@ -973,7 +973,7 @@ The `MathpixMarkdown` React element accepts the following props:
 | `include_tsv`            | boolean&nbsp;*`false`*       | outputs tsv `<tsv style="display: none">...</tsv>`. A link cell carries its `href` and an image cell its `src`, not the visible text — these formats hold no markup; use `include_table_markdown` for the label |
 | `include_csv`            | boolean&nbsp;*`false`*       | outputs csv `<csv style="display: none">...</csv>`. Same link/image rule as `include_tsv`                          |
 | `include_table_html`     | boolean&nbsp;*`true`*        | outputs html table `<table>...</table>`                                                                           |
-| `include_table_markdown` | boolean&nbsp;*`false`*       | outputs markdown table `<table-markdown>...</table-markdown>`. A link keeps its address as written — escaping guards the Markdown syntax, not the URL scheme, so validating `javascript:`/`data:` is the reader's job (the HTML path has `validateLink` for that) |
+| `include_table_markdown` | boolean&nbsp;*`false`*       | outputs markdown table `<table-markdown>...</table-markdown>`. A link keeps its address as written; see [Security notes on the Markdown exports](#security-notes-on-the-markdown-exports) |
 | `include_smiles`         | boolean&nbsp;*`false`*       | outputs smiles `<smiles>...</smiles>`                                                                             |
 | `tsv_separators`         | `{column: '\t', row: '\n'}`  | Separators for tsv tables                                                                                         |
 | `csv_separators`         | `{column: ',', row: '\n', toQuoteAllFields: false}` | Separators for csv tables. If `toQuoteAllFields=true` - all fields will be enclosed in double quotes|
@@ -983,6 +983,15 @@ The `MathpixMarkdown` React element accepts the following props:
 | `md_separators`          | `{column: ' ', row: ' <br> '}`| Separators for Markdown tables                                                                                   | 
 | `table_markdown`         | `{math_as_ascii: false, math_inline_delimiters: ['$','$']}`| By default, math goes into Markdown tables as latex and is enclosed in `$...$` delimiters. If `math_as_ascii` is set to `true`, then math will be represented as asciimath | 
 | `skipMathToHtml`         | boolean&nbsp;*`false`*       | When `true`, skips SVG serialization and `token.mathEquation` storage. Overrides `include_svg`; other MathJax outputs (`mathml`, `asciimath`, `linearmath`, etc.) still respect their own `include_*` flags. Intended for callers that walk the token tree directly and never read the serialized math HTML. |
+
+### Security notes on the Markdown exports
+
+`include_table_markdown`, `include_tsv` and `include_csv` return text, so the reader re-parses it.
+
+- A rejected link (`javascript:`, `data:`, or anything a custom `validateLink` refuses) produces no `<a>` and stays as the literal `[label](address)` — in the HTML output and in the export alike. A reader with a permissive validator will make it a link again, so **validating the scheme is the reader's job**.
+- An accepted link is exported with its address as written: escaping guards the Markdown syntax, not the URL scheme. `tsv`/`csv` carry the address without the label.
+
+Both are pinned by tests. If the reader cannot validate, treat the exported text as untrusted input or render from the HTML output.
 
 ### TOutputMathJax
 

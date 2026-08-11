@@ -170,8 +170,3 @@ export const countPositionsAtOrAfter = (positions: readonly number[], minOffset:
   return positions.length - firstIndex;
 };
 
-/** The nearest of the ascending `positions` at or after `minOffset`, or -1 when none is left. */
-export const firstPositionAtOrAfter = (positions: readonly number[], minOffset: number): number => {
-  const count: number = countPositionsAtOrAfter(positions, minOffset);
-  return count > 0 ? positions[positions.length - count] : -1;
-};
