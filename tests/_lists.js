@@ -4,6 +4,7 @@ let should = chai.should();
 let MM = require('../lib/mathpix-markdown-model/index').MathpixMarkdownModel;
 const markdownIt = require('markdown-it');
 const { mathpixMarkdownPlugin } = require('../lib/index.js');
+const { pairArgumentSpans } = require('../lib/markdown/md-latex-lists-env/list-source-model');
 
 const options = {
   cwidth: 800,
@@ -60,6 +61,15 @@ describe('Check Lists:', () => {
         done();
       });
      });
+  });
+});
+
+// Pinned-quirk fixtures: shapes whose markup is invalid on purpose, so they stay out of the sweep below.
+describe('Pre-existing list quirks (TO BE FIXED):', () => {
+  require('./_data/_lists/_data_known_quirks').forEach((test) => {
+    it(test.name, () => {
+      MM.markdownToHTML(test.latex, options).should.equal(test.html);
+    });
   });
 });
 
@@ -239,7 +249,6 @@ describe('An unclosed wrapper env leaves the list rendering:', () => {
   // The span search is a binary one, so ascending non-overlapping output is an assumption, not a nicety —
   // a nested pair leaking in makes a brace inside an argument read as one that opens a new argument.
   it('argument spans come back ascending, disjoint and balanced', () => {
-    const { pairArgumentSpans } = require('../lib/markdown/md-latex-lists-env/latex-list-env-block');
     let seed = 20260810;
     const rnd = (n) => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed % n; };
     const alphabet = ['{', '}', '\\', '\\{', '\\\\', 'a', ' ', '\n', '`'];
@@ -252,6 +261,9 @@ describe('An unclosed wrapper env leaves the list rendering:', () => {
     pairArgumentSpans('{a\\', []).should.deep.equal([]);
     // A backslash inside a verbatim range escapes nothing beyond it: the brace at its end still opens.
     pairArgumentSpans('`\\`{a}', [[0, 3]]).should.deep.equal([[3, 5]]);
+    // Including when the `\` is the last character of the range — it used to eat the brace after it.
+    pairArgumentSpans('`x\\{a}', [[0, 3]]).should.deep.equal([[3, 5]]);
+    pairArgumentSpans('`x\\{a}', [[0, 2]]).should.deep.equal([]);
     for (let round = 0; round < 20000; round++) {
       let text = '';
       for (let i = rnd(24); i > 0; i--) {

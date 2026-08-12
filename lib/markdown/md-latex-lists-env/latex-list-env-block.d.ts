@@ -1,12 +1,5 @@
 import type { RuleBlock } from 'markdown-it/lib/parser_block';
 import { StateBlockLike } from "./latex-list-types";
-export declare const pairArgumentSpans: (text: string, verbatim: Array<[
-    number,
-    number
-]>) => Array<[
-    number,
-    number
-]>;
 /**
  * Parse a LaTeX list environment starting at `startLine` and emit tokens into `state`.
  *

@@ -1916,6 +1916,13 @@ module.exports = [
     latex: "\\begin{lstlisting}\n` {\n\\end{lstlisting}\n\n\\begin{itemize}\n\\item a\n\\begin{center}\n\\caption{q \\end{itemize} w}\n\\end{center}\n\\item b\n\\end{itemize}",
     html: "<pre class=\"lstlisting\"><code class=\"hljs lstlisting-code\" style=\"text-align: left;\">` {</code></pre>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\"> w}</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
   },
+  // A top-level enumerate opening at depth zero clears the numbering the previous one left: the second
+  // list starts from one, with no `value` on its first item.
+  {
+    name: "an independent enumerate after one with a bumped counter starts from one",
+    latex: "\\begin{enumerate}\n\\setcounter{enumi}{5}\n\\item a\n\\end{enumerate}\n\n\\begin{enumerate}\n\\item b\n\\item c\n\\end{enumerate}",
+    html: "<ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li value=\"6\" class=\"li_enumerate\">a</li></ol><ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li class=\"li_enumerate\">b</li><li class=\"li_enumerate\">c</li></ol>"
+  },
   // A fence that swallowed the list's closer ends the replay, and the lines after it come out as text —
   // `master` loses them and emits `<li><>` instead.
   {

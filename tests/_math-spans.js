@@ -8,6 +8,7 @@ global.document = jsdom.window.document;
 global.DOMParser = jsdom.window.DOMParser;
 
 const { nextMathSpan, getEndMarker, shouldSkipDollar } = require('../lib/markdown/common/math-spans');
+const { findEndMarkerPos } = require('../lib/markdown/common');
 
 // One scanner answers two callers: the tabular path extracts math with it, the list guard asks whether a
 // closer sits inside math. Its markers and `$` guards are therefore load-bearing in two places.
@@ -59,7 +60,6 @@ describe('math spans: the openers and end markers the owning rules use', () => {
   // The span scanner finds its end marker through this helper. Skipping an escaped one used to recurse,
   // so a run of them overflowed the stack — mid-render on `master` that returned an empty document.
   it('skipping escaped end markers costs no stack', () => {
-    const { findEndMarkerPos } = require('../lib/markdown/common');
     findEndMarkerPos('a \\$$ b $$ c', '$$', 0).should.equal(8);
     findEndMarkerPos('\\$$ only', '$$', 0).should.equal(-1);
     const run = '\\$$'.repeat(50000);

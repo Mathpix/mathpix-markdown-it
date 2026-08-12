@@ -179,52 +179,24 @@ describe('silent-mode Lists does not mutate shared env', () => {
   });
   // Snapshots come from a pool, so a shorter one must not answer from the tail of a longer one — the
   // rollback would then restore keys the env never had, leaking the very flag it exists to contain.
-  // A rolled-back key holds `undefined`, and `envToInline` is replayed onto the shared env, so
-  // replaying that would clear a key a later block set. The tabular trio is exempt because a nested
-  // `tabular` needs the cleared value to arrive — dropping it fails 12 fixtures in
-  // `_data/_tsv_with_array/`, which is a long way from this line. Pin the membership here instead.
-  // No rule in `src/` writes `undefined` into env, so only a foreign rule doing so would be missed.
-  it('only the tabular trio survives envToInline with value undefined', () => {
+  // `envToInline` is replayed onto the shared env, so the four transient list flags must never reach it;
+  // every other key does, `undefined` included, as the `{...env}` spread this replaced always did.
+  it('the transient flags never reach envToInline, every other key does', () => {
     const replayed = (key) => Object.prototype.hasOwnProperty.call(
       snapshotEnvForInline({ [key]: undefined }), key);
-    ['isInline', 'subTabular', 'tabulare'].forEach((key) => {
-      replayed(key).should.equal(true, key + ' must reach the replay even when cleared');
+    LIST_TRANSIENT_ENV_KEYS.forEach((key) => {
+      replayed(key).should.equal(false, key + ' would wake the inline fallback on the next block');
     });
-    ['caption', 'envType', 'align', 'number', 'consumerKey'].forEach((key) => {
-      replayed(key).should.equal(false, key + ' must not clobber a later value with undefined');
-    });
-  });
-
-  // The trio above was derived by measurement, so a rule that starts parking a NEW key at `undefined`
-  // has to be classified rather than silently dropped from the replay. This fails when one appears.
-  it('no key outside the known set is left holding undefined', () => {
-    const md = markdownIt({ html: true }).use(mathpixMarkdownPlugin, { outMath: { include_svg: false } });
-    const sources = [
-      '\\begin{itemize}\n\\item a\n\\end{itemize}\n',
-      '\\begin{itemize}\n\\item a\n\\begin{tabular}{|l|}\nq\n\\end{tabular}\n\\end{itemize}\n',
-      'Para\n\\begin{itemize}\n\\item a\n',
-      '\\begin{tabular}{|l|}\nq\n\\end{tabular}\n',
-      '\\begin{center}\n\\includegraphics{a.png}\n\\end{center}\n',
-      '[[toc]]\n\n\\section{S}\n\nText.\\footnote{n}\n',
-      '\\begin{table}\n\\caption{T}\n\\begin{tabular}{|l|}\nq\n\\end{tabular}\n\\end{table}\n',
-      '| h |\n| :-- |\n| \\begin{itemize}\\item x\\end{itemize} |\n',
-      '\\begin{enumerate}\n\\item a\n\\begin{lstlisting}\ncode\n\\end{lstlisting}\n\\end{enumerate}\n',
-    ];
-    const known = new Set([...LIST_TRANSIENT_ENV_KEYS, 'isInline', 'subTabular', 'tabulare']);
-    const warn = console.warn;
-    console.warn = () => {};
-    const surprises = new Set();
-    try {
-      sources.forEach((src) => {
-        const env = {};
-        md.render(src, env);
-        Object.keys(env).filter((k) => env[k] === undefined && !known.has(k))
-          .forEach((k) => surprises.add(k));
+    ['isInline', 'subTabular', 'tabulare', 'caption', 'envType', 'align', 'number', 'consumerKey']
+      .forEach((key) => {
+        replayed(key).should.equal(true, key + ' must reach the replay, cleared or not');
       });
-    } finally {
-      console.warn = warn;
-    }
-    [...surprises].should.deep.equal([], 'classify these: replayed as undefined, or not written at all');
+    // A live value rides along unchanged, and symbol keys (caches, TOC tokens) keep their reach.
+    const marker = Symbol('probe');
+    const snap = snapshotEnvForInline({ live: 7, isBlock: true, [marker]: 'kept' });
+    snap.live.should.equal(7);
+    (snap.isBlock === undefined).should.equal(true);
+    snap[marker].should.equal('kept');
   });
 
   it('releasing a snapshot lets go of the values it held', () => {
@@ -274,39 +246,6 @@ describe('silent-mode Lists does not mutate shared env', () => {
       fresh.should.equal(first, 'a fresh instance answered differently');
       warned.should.have.length(0, 'warned: ' + warned.join(' | '));
     });
-  });
-
-  // `snapshotEnvForInline` drops keys holding `undefined` except an allowlist of three, and that list was
-  // measured rather than derived. A rule that starts parking `undefined` in `env` would break nested
-  // tables silently, so the set of such keys is pinned here instead of trusted.
-  it('no key outside the two named sets is left holding undefined', () => {
-    const md = markdownIt({ html: true }).use(mathpixMarkdownPlugin, { outMath: { include_svg: false } });
-    const shapes = [
-      '\\begin{itemize}\n\\item a\n\\end{itemize}',
-      '\\begin{itemize}\n\\item a\n\\begin{center}\nq\n\\end{center}\n\\end{itemize}',
-      '\\begin{itemize}\n\\item a\n\\begin{tabular}{|l|}\nc\n\\end{tabular}\n\\end{itemize}',
-      '\\begin{itemize}\n\\item a\n\\begin{table}\n\\caption{T}\n\\begin{tabular}{|l|}\nc\n\\end{tabular}\n\\end{table}\n\\end{itemize}',
-      '| a |\n|---|\n| \\begin{itemize}\\item x\\end{itemize} |',
-      'text \\begin{itemize} loose \\item a \\end{itemize} tail',
-      'Para.\\footnote{n}\n\\begin{itemize}\n\\item a\n',
-    ];
-    const allowed = new Set(['isInline', 'subTabular', 'tabulare'].concat(LIST_TRANSIENT_ENV_KEYS));
-    const warn = console.warn;
-    console.warn = () => {};
-    const parked = new Set();
-    shapes.forEach((src) => {
-      const env = {};
-      md.render(src, env);
-      Object.keys(env).forEach((key) => {
-        if (env[key] === undefined) {
-          parked.add(key);
-        }
-      });
-    });
-    console.warn = warn;
-    const unexpected = [...parked].filter((key) => !allowed.has(key));
-    unexpected.should.deep.equal([],
-      'a key now parks `undefined` in env: add it to REPLAY_UNDEFINED_KEYS or stop writing undefined');
   });
 
   // The level snapshot is structural, not a count: `openItems` decides whether a chunk before the first
@@ -891,5 +830,18 @@ describe('render depth is reset even when the render is partial', () => {
     drifting.render(list, {});
     const partial = build({ outMath: { include_svg: false }, renderElement: { startLine: 0 } });
     marker(partial.render(list, {})).should.equal('•');
+  });
+  // The enumerate branch tests `<= 0` where itemize tests `< 0`: at exactly zero the assignment is a
+  // no-op but the counter reset is not, so a top-level list must start its numbering afresh.
+  it('a top-level enumerate at depth zero restarts the numbering', () => {
+    const md = build({ outMath: { include_svg: false }, lineNumbering: false });
+    const numbers = (html) => (html.match(/<li[^>]*value="(\d+)"/g) || []);
+    const bumped = '\\begin{enumerate}\n\\setcounter{enumi}{5}\n\\item a\n\\end{enumerate}';
+    const plain = '\\begin{enumerate}\n\\item a\n\\item b\n\\end{enumerate}';
+    md.render(bumped, {});
+    const after = md.render(plain, {});
+    // Nothing carried over: the second list numbers from the start, with no explicit `value` on item one.
+    after.should.match(/<ol[^>]*class="enumerate decimal/);
+    numbers(after).should.deep.equal([], 'the previous list left its counter behind: ' + numbers(after));
   });
 });

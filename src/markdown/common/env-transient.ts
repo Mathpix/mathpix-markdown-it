@@ -12,21 +12,14 @@ const MAX_WARM_SNAPSHOTS = 8;
 
 const TRANSIENT_KEY_SET: Set<string> = new Set(LIST_TRANSIENT_ENV_KEYS);
 
-// Rolled-back keys hold `undefined`; replaying that would clear a key that went live later. The
-// tabular trio is exempt (dropping it changes 12 nested-table fixtures); the list is measured over
-// the shapes in `_parse-isolation.js`, so a key parked by a shape outside them needs adding there.
-// `tabulare` is the tabular rule's own spelling: renaming it here drops 12 fixtures.
-const REPLAY_UNDEFINED_KEYS: Set<string> = new Set(['isInline', 'subTabular', 'tabulare']);
-
-// Snapshot of `env` for a token's `envToInline`, minus the transient list-parse flags. Copies
-// wanted keys instead of deleting from a spread: `delete` leaves it in dictionary mode (~13%).
+// Snapshot of `env` for a token's `envToInline`, minus the transient list-parse flags. Every other key
+// is kept, `undefined` included, so the replay clears what the spread it replaced would have cleared —
+// dropping those by value instead needed an allowlist measured against fixtures. Copies wanted keys
+// rather than deleting from a spread: `delete` leaves the object in dictionary mode (~13%).
 export const snapshotEnvForInline = (env: any): any => {
   const snap: any = {};
   for (const k of Object.keys(env)) {
     if (TRANSIENT_KEY_SET.has(k)) {
-      continue;
-    }
-    if (env[k] === undefined && !REPLAY_UNDEFINED_KEYS.has(k)) {
       continue;
     }
     snap[k] = env[k];

@@ -95,12 +95,18 @@ const FENCE_ONLY: RuleBlock[] = [fence as unknown as RuleBlock];
 const terminatorsWithFence = (ruler: Ruler, names: Set<string>, fence: RuleBlock): RuleBlock[] => {
   const resolved: RuleBlock[] = resolveEnabledRuleFns(ruler, names);
   const host: any = ruler as any;
-  const cached = host[WITH_FENCE_KEY];
+  // Per name set, as above: one slot would miss on every call once a second set appeared.
+  let byNames: Map<Set<string>, { resolved: RuleBlock[]; withFence: RuleBlock[] }> = host[WITH_FENCE_KEY];
+  if (!byNames) {
+    byNames = new Map();
+    host[WITH_FENCE_KEY] = byNames;
+  }
+  const cached = byNames.get(names);
   if (cached && cached.resolved === resolved) {
     return cached.withFence;
   }
   const withFence: RuleBlock[] = [fence].concat(resolved);
-  host[WITH_FENCE_KEY] = { resolved, withFence };
+  byNames.set(names, { resolved, withFence });
   return withFence;
 }
 
