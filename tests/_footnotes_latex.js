@@ -329,7 +329,10 @@ describe('The resolved terminator set follows the ruler:', () => {
   });
 });
 
-describe('Footnote rule performance regression:', () => {
+describe('Footnote rule performance regression:', function () {
+  // Every assert here is a growth ratio with a wide margin, so a retry only absorbs a load spike on the
+  // runner; a real regression fails all three attempts.
+  this.retries(2);
   // Parse-only timing — bypasses MathJax/render, isolates Phase 1 cost.
   const perfMd = markdownIt({ html: true, breaks: true, linkify: true })
     .use(mathpixMarkdownPlugin, { width: 800 })

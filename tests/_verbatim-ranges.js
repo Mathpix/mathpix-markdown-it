@@ -13,6 +13,7 @@ const {
   detectFenceOpen,
   isFenceClose,
 } = require('../lib/markdown/common/verbatim-ranges');
+const consts = require('../lib/markdown/common/consts');
 const MM = require('../lib/mathpix-markdown-model/index').MathpixMarkdownModel;
 
 const f = '```';
@@ -72,6 +73,52 @@ describe('verbatim ranges: fence markers follow the core fence rule', () => {
     isFenceClose('``', fence).should.equal(false);
     isFenceClose('``` tail', fence).should.equal(false);
     isFenceClose('~~~', fence).should.equal(false);
+  });
+});
+
+// The list rule execs these four shared regexes without resetting lastIndex, which is sound only while
+// none of them carries `g`. Adding the flag would make every exec resume where the last one stopped.
+describe('the shared env regexes carry no `g`, so their exec sites need no reset', () => {
+  ['BEGIN_LST_INLINE_RE', 'END_LST_INLINE_RE', 'BEGIN_TABULAR_INLINE_RE', 'END_TABULAR_INLINE_RE']
+    .forEach((name) => {
+      it(name, () => {
+        consts[name].flags.should.equal('', 'add a lastIndex reset at every exec site, or clone per call');
+      });
+    });
+});
+
+// Math is asked for per block, and the scanner reads to EOF when no opener lies ahead — so a document
+// whose tail holds no math was re-read once per paragraph. Growth, not wall clock, is the gate.
+describe('verbatim ranges: a math-free tail is read once, not once per block', () => {
+  const head = '\\begin{itemize}\n\\item a\n\\begin{center}x\\end{center}\n\\end{itemize}\n\n';
+  const para = 'Lorem ipsum dolor sit amet.\n\n';
+  const median = (text) => {
+    findVerbatimRanges(text);
+    const runs = [];
+    for (let i = 0; i < 3; i++) {
+      const started = process.hrtime.bigint();
+      findVerbatimRanges(text);
+      runs.push(Number(process.hrtime.bigint() - started) / 1e6);
+    }
+    return Math.min(...runs);
+  };
+  it('quadrupling the prose does not multiply the cost by more than eight', function () {
+    this.retries(2);
+    const small = median(head + para.repeat(1000));
+    const large = median(head + para.repeat(4000));
+    (large / Math.max(small, 0.05)).should.be.below(8, `small ${small}ms, large ${large}ms`);
+  });
+  it('a `$` before a blank line still opens nothing in the next block', () => {
+    const src = 'text $x\n\n\\begin{itemize}\\item a\\end{itemize}\n\ny$ tail';
+    isInsideRanges(findVerbatimRanges(src), src.indexOf('\\begin{itemize}'))
+      .should.equal(false, 'the per-block clip must survive the opener cursor');
+  });
+  it('the returned ranges are not aliased to anything the next call reuses', () => {
+    const src = 'a `x\n' + f + '\ncode\n' + f + '\ny` z $m$';
+    const first = findVerbatimRanges(src);
+    const before = JSON.stringify(first);
+    first.forEach((range) => { range[0] = -1; range[1] = -1; });
+    JSON.stringify(findVerbatimRanges(src)).should.equal(before);
   });
 });
 

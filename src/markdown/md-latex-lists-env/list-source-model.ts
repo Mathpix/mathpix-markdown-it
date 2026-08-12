@@ -24,9 +24,38 @@ const VERBATIM_KEY = Symbol('mmd.verbatimRanges');
 const END_LIST_ENV_SWEEP_G: RegExp = new RegExp(END_LIST_ENV_INLINE_RE.source, 'g');
 const BEGIN_LIST_ENV_SWEEP_G: RegExp = new RegExp(BEGIN_LIST_ENV_INLINE_RE.source, 'g');
 
+/** Text around an inline transition. A transition with a backtick on both sides sits in a code span,
+ *  and the parse loop leaves the whole line to the inline path when it meets one. */
+export const splitInlineListEnv = (
+  lineText: string,
+  match
+) => {
+  const sB: string = match.index! > 0 ? lineText.slice(0, match.index).trim() : "";
+  const sE: string = match.index! + match[0].length < lineText.length
+    ? lineText.slice(match.index! + match[0].length).trim()
+    : "";
+  const isBacktickEscapedPair: boolean = sB.includes("`") && sE.includes("`");
+  return { sB, sE, isBacktickEscapedPair };
+};
+
 // How many envs a line's tail leaves open: positive means it needs that many closers from ahead.
-export const unclosedEnvsIn = (s: string): number =>
-  (s.match(BEGIN_LIST_ENV_SWEEP_G) || []).length - (s.match(END_LIST_ENV_SWEEP_G) || []).length;
+// Counted by walking the tail as the parse loop does — a plain text count called a closer in a code
+// span real, and the loop then opened a sibling it could never close.
+export const unclosedEnvsIn = (s: string): number => {
+  let depth = 0;
+  let tail: string = s;
+  let env: { match: RegExpMatchArray; isEnd: boolean } | null = nextListEnvMatch(tail);
+  while (env) {
+    const split = splitInlineListEnv(tail, env.match);
+    if (split.isBacktickEscapedPair) {
+      break;
+    }
+    depth += env.isEnd ? -1 : 1;
+    tail = split.sE;
+    env = nextListEnvMatch(tail);
+  }
+  return depth;
+};
 
 // Offsets of every closer: the last one answers the early bail, the whole list feeds the depth check
 // inside the body walk. Cached on the state the rule receives — the buffered state reads it through
@@ -141,6 +170,10 @@ const argumentSpansOf = (state: StateBlockLike): Array<[number, number]> =>
 const insideVerbatim = (state: StateBlockLike, at: number): boolean =>
   isInsideRanges(verbatimRangesOf(state), at);
 
+// Text, not structure: code, math, or a command argument. One predicate, so no reader asks half of it.
+const writtenAsText = (state: StateBlockLike, at: number): boolean =>
+  isInsideRanges(argumentSpansOf(state), at) || insideVerbatim(state, at);
+
 // Is a closer in `[from, to)` ours? `\item b \end{itemize}` ends the list, `\caption{x \end{itemize} y}`
 // is text. Order decides, not counts: one closer and one opener balance out on a tally, yet a closer
 // standing first is still ours. Offsets and spans are ascending, so one merge walk answers it.
@@ -168,13 +201,10 @@ const closesOurListWithin = (state: StateBlockLike, from: number, to: number): b
     } else {
       opener++;
     }
-    // A balanced pair around it is knowledge, and it outranks the conservatism below: the `{` left open
-    // earlier may sit in math or code, where it opens nothing. One predicate for both readers of `spans`.
-    if (isInsideRanges(spans, at)) {
-      continue;                         // inside a command argument: text, not structure
-    }
-    if (insideVerbatim(state, at)) {
-      continue;                         // written in code or math: text, whatever the braces say
+    // A balanced pair around it outranks conservatism: a `{` left open earlier may sit in math or code,
+    // where it opens nothing.
+    if (isInsideRanges(spans, at) || insideVerbatim(state, at)) {
+      continue;
     }
     depth += isCloser ? -1 : 1;
     if (depth < 0) {
@@ -239,7 +269,7 @@ export const structuralCountIn = (
 ): number => {
   const suffix: Int32Array = structuralSuffix(state, all, key);
   const startAt: number = all.length - countPositionsAtOrAfter(all, from);
-  const endAt: number = to === Infinity ? all.length : all.length - countPositionsAtOrAfter(all, to);
+  const endAt: number = all.length - countPositionsAtOrAfter(all, to);
   return suffix[startAt] - suffix[endAt];
 };
 
@@ -259,11 +289,11 @@ export const hasCloserAhead = (state: StateBlockLike, from: number, name: string
     return false;
   }
   const offsets: readonly number[] = matchPositionsCached(state as StateBlock, key, sweep);
-  // Every closer ahead, not just the first: one written inside a fenced block or an `lstlisting` is
-  // text, and taking it as the answer left the wrapper transparent while a real closer stood below.
+  // Every closer ahead, not just the first: one written as text — in code, math or an argument — left
+  // the wrapper transparent while a real closer stood below.
   for (let i = offsets.length - countPositionsAtOrAfter(offsets, from); i < offsets.length; i++) {
     const at: number = offsets[i];
-    if (insideVerbatim(state, at)) {
+    if (writtenAsText(state, at)) {
       continue;
     }
     // Swallowing our closer is allowed when the source past the wrapper still closes the open lists and
@@ -305,19 +335,18 @@ export const firstUsableCloser = (
   skipCodeClosers: boolean
 ): { index: number; length: number } | null => {
   const checkVerbatim: boolean = skipCodeClosers && WRAPPER_ENV_NAMES.indexOf(env) >= 0;
-  // Sticky, so a skipped closer costs no slice of the rest of the line.
+  // Global, so a skipped closer costs no slice of the rest of the line.
   const scan: RegExp = END_OPAQUE_ENV_SEARCH_G[env];
   scan.lastIndex = 0;
   let found: RegExpExecArray | null;
   while ((found = scan.exec(text)) !== null) {
-    // Unanchored (-1) counts as not verbatim: the closer is taken, as it was before the ranges existed.
+    // Unanchored (-1) counts as structure: the closer is taken, as it was before the ranges existed.
     const at: number = checkVerbatim
       ? absoluteOffsetOf(state, line, text, found.index, found[0])
       : -1;
-    if (at < 0 || !insideVerbatim(state, at)) {
+    if (at < 0 || !writtenAsText(state, at)) {
       return { index: found.index, length: found[0].length };
     }
-    scan.lastIndex = found.index + found[0].length;
   }
   return null;
 };

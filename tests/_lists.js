@@ -287,7 +287,8 @@ describe('An unclosed wrapper env leaves the list rendering:', () => {
   // The guard asks how many closers are left after a wrapper, and a walk over every offset past it made a
   // document of such wrappers super-linear — 1600 units were 2.25× slower than `master` before the
   // suffix counts. Growth, not wall time, so the bound holds on a slower machine.
-  it('a document of wrappers each holding a foreign closer scans linearly', () => {
+  it('a document of wrappers each holding a foreign closer scans linearly', function () {
+    this.retries(2);                    // a growth ratio with a wide margin: a retry absorbs load, not a regression
     const unit = '\\begin{itemize}\n\\item a\n\\begin{center}\ntext \\end{itemize} here\n'
       + '\\end{center}\n\\item b\n\\end{itemize}';
     const median = (count) => {
@@ -309,7 +310,8 @@ describe('An unclosed wrapper env leaves the list rendering:', () => {
   });
   // A closer written in code is skipped and the scan resumes past it. Slicing the rest of the line per
   // skip made that quadratic; the sticky scan keeps it flat.
-  it('a line full of closers written in code scans linearly', () => {
+  it('a line full of closers written in code scans linearly', function () {
+    this.retries(2);
     const build = (n) => '\\begin{itemize}\n\\item a\n\\begin{center}\n'
       + '`\\end{center}` '.repeat(n) + 'tail\n\\end{center}\n\\item b\n\\end{itemize}';
     const median = (src) => {
@@ -330,7 +332,8 @@ describe('An unclosed wrapper env leaves the list rendering:', () => {
   });
   // Argument pairing is one pass with a stack. Asking findEndMarker per brace made a long run of
   // unmatched `{` rescan the tail each time — `n^1.9` measured, 12× master at 8000 braces.
-  it('a long run of unmatched braces parses linearly', () => {
+  it('a long run of unmatched braces parses linearly', function () {
+    this.retries(2);
     const build = (n) => '\\begin{itemize}\n\\item a\n\\begin{center}\n' + '{'.repeat(n) + ' x\n'
       + '\\caption{q \\end{itemize} w}\n\\end{center}\n\\item b\n\\end{itemize}';
     const median = (src) => {
@@ -541,6 +544,23 @@ describe('Cached marker tokens follow \\renewcommand:', () => {
     marker(plain.render(src, shared)).should.equal(alonePlain);
     marker(withMathml.render(src, shared)).should.equal(aloneMathml);
     marker(plain.render(src, shared)).should.equal(alonePlain);
+  });
+  // The array is copied per list, the tokens are not — cloning them measured 12–29% slower on
+  // list-heavy input. So a rule that writes into a marker token reaches every later list: pinned here
+  // because nothing stops it, and a consumer plugin has to treat those tokens as read-only.
+  it('the tokens are shared between lists, so writing into one reaches the next', () => {
+    const md = markdownIt({ html: true }).use(mathpixMarkdownPlugin, { outMath: { include_svg: false } });
+    const src = '\\renewcommand{\\labelitemi}{Q}\n\n\\begin{itemize}\n\\item a\n\\end{itemize}\n\n'
+      + '\\begin{itemize}\n\\item b\n\\end{itemize}';
+    const tokens = md.parse(src, {});
+    const opens = tokens.filter((token) => token.type === 'itemize_list_open');
+    opens.should.have.lengthOf(2);
+    opens[0].itemizeLevel[0].should.not.equal(opens[1].itemizeLevel[0], 'the array is meant to be copied');
+    opens[0].itemizeLevel[0][0].should.equal(opens[1].itemizeLevel[0][0]);
+    opens[0].itemizeLevel[0][0].content = 'ZZZ';
+    [...md.renderer.render(tokens, md.options, {})
+      .matchAll(/<span class="li_level"[^>]*>([^<]*)<\/span>/g)].map((m) => m[1])
+      .should.deep.equal(['ZZZ', 'ZZZ']);
   });
 });
 

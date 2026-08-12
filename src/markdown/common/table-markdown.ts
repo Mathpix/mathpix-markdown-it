@@ -91,9 +91,9 @@ export const getMdLink = (child, token, j, options?) => {
       // never reaches the break above. Skipped explicitly: getMdForChild answers `<a>`/`</a>` for a
       // token without a `tag`, and that markup has no place in a Markdown label.
     } else if (inner.type && MATH_TOKEN_TYPES.has(inner.type)) {
-      // Verbatim: escaping would turn `\frac` into a LaTeX line break. Delimiters shield an
-      // unbalanced `]` too, for a reader that has a math rule.
-      text += getMdMath(inner, options);
+      // Verbatim: escaping would turn `\frac` into a LaTeX line break. Trimmed as the cell loop
+      // trims, or one formula exports two ways in one cell.
+      text += getMdMath(inner, options, inner.content?.trim());
     } else if (inner.type === 'image' || inner.type === 'includegraphics') {
       // Whole image, like the main cell loop: alt alone loses `src`. Alt is raw source — not escaped.
       text += `![${inner.attrGet('alt') ?? inner.content ?? ''}](${mdHref(inner.attrGet('src'))})`;

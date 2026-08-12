@@ -65,8 +65,3 @@ export declare const finalizeListItems: (state: StateBlock | StateInline, items:
  * shortfall; the total (ancestor + own) is clamped to LIST_MAX_INDENT_EM. Depth = prentLevel.
  */
 export declare const resolveListPadding: (listTokens: Token[]) => void;
-export declare const splitInlineListEnv: (lineText: string, match: any) => {
-    sB: string;
-    sE: string;
-    isBacktickEscapedPair: boolean;
-};

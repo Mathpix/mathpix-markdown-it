@@ -1119,6 +1119,17 @@ module.exports = [
       '| :--- |'
   },
   {
+    // One formula, two positions: a label used to keep the edge spaces the cell loop trims away.
+    id: 72,
+    latex: '\\begin{tabular}{|l|}\n' +
+      '\\hline\n\\( x \\) and [\\( y \\)](u) \\\\\\hline\n' +
+      '\\end{tabular}',
+    table_markdown: '| $x$ and [$y$](u) |\n' +
+      '| :--- |',
+    table_markdown_math_as_ascii: '| x and [y](u) |\n' +
+      '| :--- |'
+  },
+  {
     // A self-closing token with a marker: the marker must not replace the content.
     id: 62,
     latex: '\\begin{tabular}{|l|}\n' +

@@ -2,7 +2,9 @@ let chai = require('chai');
 let should = chai.should();
 
 const markdownIt = require('markdown-it');
+const Ruler = require('markdown-it/lib/ruler');
 const { mathpixMarkdownPlugin } = require('../lib/index.js');
+const MM = require('../lib/mathpix-markdown-model/index').MathpixMarkdownModel;
 const {
   snapshotListLevels,
   restoreListLevels,
@@ -285,13 +287,11 @@ describe('silent-mode Lists does not mutate shared env', () => {
       .should.equal(true, 'the key was deleted, which drops env into dictionary mode');
   });
 
-  // A pool reset between snapshot and restore empties the slot, so restoring from it used to blank every
-  // key the consumer owns — worse than not restoring at all.
-  it('a snapshot the pool no longer owns is not used to restore', () => {
+  // Restoring out of order would blank every key the consumer owns — worse than not restoring at all.
+  it('a snapshot that is not the innermost one is not used to restore', () => {
     const env = { a: 'original' };
     const snap = snapshotEnvAll(env);
     snapshotEnvAll({ b: 1 });
-    resetEnvSnapshotPool();                 // as a nested render's reset hook would
     env.a = 'written by the parse';
     env.added = 'new';
     const said = [];
@@ -301,31 +301,55 @@ describe('silent-mode Lists does not mutate shared env', () => {
       restoreEnvAll(env, snap);
     } finally {
       console.warn = warn;
+      releaseEnvSnapshot();
+      releaseEnvSnapshot();
     }
     said.join(' ').should.match(/not the innermost one/);
     env.a.should.equal('written by the parse', 'the consumer key was blanked from an emptied snapshot');
     env.added.should.equal('new');
   });
 
-  // The transient restore runs on every exit, commit included, so it needs the same guard: from a blanked
-  // snapshot it wrote `undefined` over a `parentType` the consumer owned.
-  it('the transient restore also refuses a snapshot the pool no longer owns', () => {
+  // A nested parse would hit the reset hook while the outer snapshot is live. Emptying that slot would
+  // leave the outer parse unable to put its keys back, so the reset is refused and says so.
+  it('a pool reset while a snapshot is live is refused, and the restore still works', () => {
     resetWarnDistinct();                 // the key is deduped per render, and a test above spent it
     const env = { parentType: 'MINE' };
     const snap = snapshotEnvAll(env);
-    resetEnvSnapshotPool();
     const said = [];
     const warn = console.warn;
     console.warn = (...args) => said.push(String(args[0]));
     try {
+      resetEnvSnapshotPool();
+      env.parentType = 'written by the parse';
       restoreEnvKeysFromAll(env, LIST_TRANSIENT_ENV_KEYS, snap);
     } finally {
       console.warn = warn;
+      releaseEnvSnapshot();
     }
-    said.join(' ').should.match(/not the innermost one/);
-    env.parentType.should.equal('MINE', 'a consumer key was blanked from an emptied snapshot');
+    said.join(' ').should.match(/pool reset while a snapshot is live/);
+    env.parentType.should.equal('MINE', 'the live snapshot must still restore the consumer key');
   });
 
+  // Drift costs slots, not correctness: the next snapshot is still the innermost one and still restores.
+  // But the pool reset leaves a live depth alone now, so a leaked slot per throw would never come back.
+  it('a getter that throws mid-snapshot leaks no pool slot', () => {
+    const hostile = new Proxy({ a: 1, boom: 2 }, {
+      get(target, key) {
+        if (key === 'boom') {
+          throw new Error('getter blew up');
+        }
+        return target[key];
+      },
+    });
+    const first = snapshotEnvAll({ a: 1 });
+    releaseEnvSnapshot();
+    for (let i = 0; i < 3; i++) {
+      (() => snapshotEnvAll(hostile)).should.throw(/getter blew up/);
+    }
+    const again = snapshotEnvAll({ a: 1 });
+    releaseEnvSnapshot();
+    again.should.equal(first, 'each throw kept its slot, so the pool grows per failed snapshot');
+  });
   it('a snapshot of a smaller env does not see the previous one', () => {
     const rich = snapshotEnvAll({ isBlock: true, inheritedListType: 'itemize', prentLevel: 7, x: 1 });
     rich.length.should.equal(4);
@@ -739,27 +763,119 @@ describe('silent-mode Lists probes', () => {
 
 // The snapshot pool is module state too: a parse that dies between snapshot and release leaves the
 // depth raised, so every later parse takes a deeper slot and the abandoned ones hold its objects.
-describe('the env snapshot pool is reset even when the render is partial', () => {
+// A released snapshot is emptied by the release itself, so drifted depth costs slots, never correctness:
+// the next snapshot is still the innermost one and still restores.
+describe('a snapshot left un-released does not break the renders after it', () => {
   const nested = '\\begin{itemize}\n\\item a\n\\begin{enumerate}\n\\item b\n\\end{enumerate}\n\\end{itemize}';
   [{}, { renderElement: { startLine: 0 } }].forEach((extra, i) => {
-    it(`a ${i === 0 ? 'full' : 'partial'} render undoes a drifted depth`, () => {
+    it(`a ${i === 0 ? 'full' : 'partial'} render is unaffected by a drifted depth`, () => {
       const md = markdownIt({ html: true })
         .use(mathpixMarkdownPlugin, Object.assign({ outMath: { include_svg: false } }, extra));
       resetEnvSnapshotPool();
       const clean = md.render(nested, {});
-      const slotZero = snapshotEnvAll({ a: 1 });
-      releaseEnvSnapshot();
       // Three snapshots that never come back, the last holding a document-sized value.
       snapshotEnvAll({ a: 1 });
       snapshotEnvAll({ b: 2 });
-      const canary = { blob: new Array(1000).fill(0) };
-      const abandoned = snapshotEnvAll({ heavy: canary });
-      md.render(nested, {}).should.equal(clean);
-      abandoned.values.indexOf(canary).should.equal(-1, 'the abandoned slot still holds the document');
-      const after = snapshotEnvAll({ a: 1 });
-      after.should.equal(slotZero, 'the next snapshot came from a deeper slot');
-      releaseEnvSnapshot();
+      snapshotEnvAll({ heavy: { blob: new Array(1000).fill(0) } });
+      const env = {};
+      md.render(nested, env).should.equal(clean);
+      (env.isBlock === undefined).should.equal(true, 'the transient flag survived the render');
+      const consumer = { parentType: 'MINE' };
+      const live = snapshotEnvAll(consumer);
+      consumer.parentType = 'written by the parse';
+      restoreEnvKeysFromAll(consumer, LIST_TRANSIENT_ENV_KEYS, live);
+      consumer.parentType.should.equal('MINE', 'a snapshot taken past the drift still restores');
+      for (let k = 0; k < 4; k++) {
+        releaseEnvSnapshot();
+      }
     });
+  });
+});
+
+// Render depth is reset per chain, and the in-render guard only heals negative drift — positive drift is
+// the reset's job, because a list from a wrapper's inline content also claims top level. Every path that
+// goes through the chain is therefore level-correct; a hand-sliced token array rendered directly is not.
+describe('render depth stays level-correct on every path through the chain', () => {
+  const nested = '\\begin{itemize}\n\\item a\n\\begin{itemize}\n\\item b\n\\end{itemize}\n\\item c\n\\end{itemize}';
+  const flat = '\\begin{itemize}\n\\item a\n\\end{itemize}';
+  const opts = { outMath: { include_svg: false } };
+  const marker = (html) => (html.match(/<span class="li_level">([^<]*)<\/span>/) || [])[1];
+  it('segments, a partial render and a full render all leave the next list at level 1', () => {
+    for (let i = 0; i < 4; i++) {
+      MM.markdownToHTMLSegments(nested, opts);
+      marker(MM.markdownToHTML(flat, opts)).should.equal('•', 'drifted after a segments render');
+      MM.markdownToHTML(nested, Object.assign({ renderElement: { startLine: 2 } }, opts));
+      marker(MM.markdownToHTML(flat, opts)).should.equal('•', 'drifted after a partial render');
+    }
+  });
+  it('an unbalanced token slice rendered straight through the renderer does drift', () => {
+    const md = markdownIt({ html: true }).use(mathpixMarkdownPlugin, opts);
+    const tokens = md.parse(nested, {});
+    // Parsed up front: a parse between the drift and the render would reset the depth itself.
+    const flatTokens = md.parse(flat, {});
+    const half = tokens.slice(0, tokens.findIndex((token) => token.type === 'itemize_list_close'));
+    md.renderer.render(half, md.options, {});
+    md.renderer.render(half, md.options, {});
+    marker(md.renderer.render(flatTokens, md.options, {}))
+      .should.not.equal('•', 'healing positive drift here would mis-level a wrapper inline list');
+  });
+});
+
+// Two caches ride on markdown-it internals: the footnote terminator list is keyed by `ruler.__cache__`,
+// and the release hook is deduped through `Ruler.prototype.__find__`. Both fail silently on an upgrade —
+// terminators would walk every rule per block again, and the hook would register twice.
+describe('the markdown-it ruler internals these caches ride on', () => {
+  const fresh = () => markdownIt({ html: true })
+    .use(mathpixMarkdownPlugin, { outMath: { include_svg: false } });
+  it('__rules__, __cache__ and __find__ are all still there', () => {
+    const md = fresh();
+    md.render('text\n');
+    Array.isArray(md.block.ruler.__rules__).should.equal(true, '__rules__ is gone');
+    (typeof Ruler.prototype.__find__).should.equal('function', '__find__ is gone');
+    (md.block.ruler.__cache__ == null).should.equal(false, '__cache__ is not compiled after a render');
+  });
+  it('a toggle nulls __cache__, which is what invalidates the terminator list', () => {
+    const md = fresh();
+    md.render('text\n');
+    md.block.ruler.disable(['fence']);
+    (md.block.ruler.__cache__ == null)
+      .should.equal(true, 'a toggle no longer invalidates the cache; it would serve stale rules');
+    md.block.ruler.enable(['fence']);
+  });
+  it('applying the plugin twice registers one of each hook, not two', () => {
+    const md = fresh().use(mathpixMarkdownPlugin, { outMath: { include_svg: false } });
+    const names = md.core.ruler.__rules__.map((rule) => rule.name);
+    names.filter((name) => name === 'release_mmd_src_caches').should.have.length(1);
+    names.filter((name) => name === 'reset_mmd_global_state').should.have.length(1);
+  });
+});
+
+// A consumer calling the reset from its own rule cannot reach the live snapshot window: a pushed block
+// or inline rule never runs (earlier rules take the line), and a core one runs past block parsing. The
+// guard in the pool covers the window; this pins that the reachable case disturbs nothing.
+describe('a pool reset from a consumer rule does not disturb the render', () => {
+  it('keeps the list whole and leaves env as the consumer owns it', () => {
+    const src = '\\begin{itemize}\n\\item a\n\\end{itemize}\n\nplain paragraph\n';
+    const clean = markdownIt({ html: true })
+      .use(mathpixMarkdownPlugin, { outMath: { include_svg: false } }).render(src, {});
+    const md = markdownIt({ html: true })
+      .use(mathpixMarkdownPlugin, { outMath: { include_svg: false } });
+    // A block rule, not a core one: the list's speculative parse tokenizes through the block ruler, so
+    // this is the only place a consumer can land inside the live snapshot window.
+    md.block.ruler.push('rogue_pool_reset', () => { resetEnvSnapshotPool(); return false; });
+    const env = { parentType: 'MINE' };
+    const warn = console.warn;
+    console.warn = () => {};
+    let html;
+    try {
+      html = md.render(src, env);
+    } finally {
+      console.warn = warn;
+    }
+    html.should.equal(clean);
+    env.parentType.should.equal('MINE');
+    (env.isBlock === undefined).should.equal(true, 'the transient flag outlived the list');
+    html.should.not.match(/<li[^>]*><\/li>/);
   });
 });
 

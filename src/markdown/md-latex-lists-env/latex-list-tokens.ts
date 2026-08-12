@@ -332,7 +332,7 @@ export const ListOpen = (
   if (strAfter && strAfter.trim().length > 0) {
     // Same-line content before the first `\item` lands in the `<ul>` like a chunk does.
     const looseFrom: number = state.tokens.length;
-    let children: Token = [];
+    const children: Token[] = [];
     state.env.parentType = state.parentType;
     state.env.isBlock = true;
     state.env.prentLevel = state.prentLevel;

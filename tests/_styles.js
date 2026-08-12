@@ -461,4 +461,11 @@ describe('Code-block styles scale with the em context (no absolute px/rem):', ()
     block.should.include('font-size: 0.9375em');
     block.should.not.include('font-size: 85%');
   });
+  // The `pre` base applies to a `pre` with no `code` child too, and raw HTML does produce one: that is
+  // the 13.6px → 15px the changelog names, so the markup path has to stay as documented.
+  it('a raw-HTML pre with no code child reaches the output and takes the pre base', () => {
+    const html = MM.markdownToHTML('<pre>x</pre>', { htmlTags: true, outMath: { include_svg: false } });
+    html.should.match(/<pre[^>]*>x<\/pre>/, 'the raw pre is rewritten or dropped');
+    html.should.not.match(/<pre[^>]*>\s*<code/, 'a code child would take the pre code rules instead');
+  });
 });

@@ -63,8 +63,9 @@ pixel-for-pixel no-op.
   (`lib/styles/styles-code`) without `MathpixStyle` gets `pre code` inheriting the UA `pre`
   default (~13px monospace), not `15px`.
 - **Styles only** — no change to `lstlisting` / fenced-code markup or `token.meta.codeText`.
-- `pre`'s own `font-size` changes 85% → 93.75%; observable only for a non-`code` child of a
-  `pre`, which is not emitted. Called out so it is not read as an unrelated tweak.
+- `pre`'s own `font-size` changes 85% → 93.75%, i.e. 13.6px → 15px at a 16px base. The library
+  never emits a `pre` without a `code` child, but raw HTML under `htmlTags: true` does reach the
+  output as written — `<pre>x</pre>` renders inside a `div` and takes the new size.
 
 ## Migration
 

@@ -1,4 +1,4 @@
-import { nextMathSpan } from "./math-spans";
+import { nextMathSpan, mathOpenerOffsets } from "./math-spans";
 import { getInlineCodeListFromString } from "../common";
 import { BEGIN_LST_INLINE_RE, END_LST_INLINE_RE } from "./consts";
 
@@ -142,10 +142,13 @@ export const findVerbatimRanges = (text: string): Array<[number, number]> => {
     lineStart = lineEnd + 1;
   }
   // Inline code is verbatim too; math is looked for outside the blocks above, a `$` in a fence opening nothing.
-  const spans: Array<[number, number]> = ranges.slice();
+  // Copied per tuple, not just the array: the merge below writes into what it keeps.
+  const spans: Array<[number, number]> = ranges.map((range) => [range[0], range[1]] as [number, number]);
   for (const item of getInlineCodeListFromString(text)) {
     spans.push([item.posStart, item.posEnd]);
   }
+  const openers: number[] = mathOpenerOffsets(text);
+  let openIdx = 0;
   let gapFrom = 0;
   let breakAt = 0;
   for (let i = 0; i <= ranges.length; i++) {
@@ -161,6 +164,16 @@ export const findVerbatimRanges = (text: string): Array<[number, number]> => {
         : gapTo;
       let seek: number = blockFrom;
       while (seek < blockTo) {
+        // Both cursors only advance, so a block with no opener costs nothing.
+        while (openIdx < openers.length && openers[openIdx] < seek) {
+          openIdx++;
+        }
+        if (openIdx >= openers.length || openers[openIdx] >= blockTo) {
+          break;
+        }
+        if (openers[openIdx] > seek) {
+          seek = openers[openIdx];
+        }
         const span = nextMathSpan(text, seek, true, blockTo);
         if (!span) {
           break;

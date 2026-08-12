@@ -2,7 +2,7 @@ import type StateBlock from 'markdown-it/lib/rules_block/state_block';
 import type Token from 'markdown-it/lib/token';
 import type { RuleBlock } from 'markdown-it/lib/parser_block';
 import { setTokenOpenList, setTokenCloseList, ListOpen, absorbSublistIntoWrapper } from "./latex-list-tokens";
-import { ItemsListPush, ItemsAddToPrev, finalizeListItems, resolveListPadding, splitInlineListEnv } from "./latex-list-items";
+import { ItemsListPush, ItemsAddToPrev, finalizeListItems, resolveListPadding } from "./latex-list-items";
 import { GetItemizeLevelTokensByState, GetEnumerateLevel, ItemizeLevelTokenResult } from "./re-level";
 import {
   ListType,
@@ -40,6 +40,7 @@ import {
 
 import {
   unclosedEnvsIn,
+  splitInlineListEnv,
   CLOSER_SUFFIX_KEY,
   listCloserOffsets,
   lastListEndPos,
@@ -109,9 +110,6 @@ const handleLstBeginInline = (
   if (lineText.indexOf('\\begin') < 0) {
     return { handled: false, stack, items, lineText };
   }
-  // Reset regex lastIndex (important if /g/)
-  BEGIN_LST_INLINE_RE.lastIndex = 0;
-  BEGIN_TABULAR_INLINE_RE.lastIndex = 0;
   const mbLst: RegExpExecArray = BEGIN_LST_INLINE_RE.exec(lineText);
   const mbTab: RegExpExecArray = BEGIN_TABULAR_INLINE_RE.exec(lineText);
   // If we are inside tabular, allow only nested tabular
@@ -238,8 +236,6 @@ const processOpaqueLine = (
     if (top) {
       // -------- inside opaque --------
       if (top === "tabular") {
-        END_TABULAR_INLINE_RE.lastIndex = 0;
-        BEGIN_TABULAR_INLINE_RE.lastIndex = 0;
         const me: RegExpExecArray = END_TABULAR_INLINE_RE.exec(lineText);
         const mb: RegExpExecArray = BEGIN_TABULAR_INLINE_RE.exec(lineText);
         // close if end exists before begin (or begin missing)
@@ -470,9 +466,8 @@ export const ListsInternal = (
           const tailEnv: { match: RegExpMatchArray; isEnd: boolean } | null = nextListEnvMatch(sE);
           let siblingClosable: boolean = false;
           if (tailEnv && !tailEnv.isEnd) {
-            // Count, do not just look: a tail opening two levels needs two closers. Offsets only
-            // past this point — a plain closer with nothing behind it is the common case, and the
-            // fence sweep has no earlier warm-up, so it would run per rule entry.
+            // Count, do not just look: a tail opening two levels needs two closers. The count walks
+            // the tail as this loop does, so both agree on which transitions are real.
             const needed: number = unclosedEnvsIn(sE);
             if (needed <= 0) {
               siblingClosable = true;
@@ -649,10 +644,11 @@ export const Lists: RuleBlock = (
   // `bufferedState` shares `env` by prototype, so ListsInternal mutates the real env: one whole-env
   // snapshot serves both restores below, naming keys would miss what a rule in the body writes.
   const captionSnap = getCaptionCounters();
-  const envSnap: EnvSnapshot = snapshotEnvAll(state.env);
   // A discarded parse enters a level per `\begin` and, having no `\end`, never leaves it — without
   // this the depth grows with the number of probes, not with the real nesting.
   const listLevelSnap: readonly ListLevelState[] = snapshotListLevels();
+  // Last, and nothing between it and the `try`: only the `finally` releases it back to the pool.
+  const envSnap: EnvSnapshot = snapshotEnvAll(state.env);
   let committed = false;
   try {
     const bufferedState = createBufferedState(state);

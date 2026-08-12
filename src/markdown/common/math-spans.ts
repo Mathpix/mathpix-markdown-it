@@ -15,9 +15,10 @@ const MATH_ENV_NAMES: ReadonlySet<string> = new Set(mathEnvironments);
 
 export const RE_MATH_OPEN = /\\\\\[|\\\[|\\\\\(|\\\(|\$\$|\$|\\begin\{([^}]*)\}|eqref\{([^}]*)\}|ref\{([^}]*)\}/;
 
-// One `/g` instance per caller: `lastIndex` is state, and the two scans below can interleave.
+// One `/g` instance per caller: `lastIndex` is state, and the scans below can interleave.
 export const RE_MATH_OPEN_G = new RegExp(RE_MATH_OPEN.source, 'g');
 const RE_MATH_SPAN_G = new RegExp(RE_MATH_OPEN.source, 'g');
+const RE_MATH_SWEEP_G = new RegExp(RE_MATH_OPEN.source, 'g');
 
 /**
  * End marker for a matched opening marker.
@@ -128,4 +129,19 @@ export const nextMathSpan = (
     return { start: beginMarkerPos, end: endMarkerPos + endMarker.length };
   }
   return null;
+};
+
+/** Offset of every math opener, ascending. `nextMathSpan` with no opener ahead scans to EOF, so a
+ *  caller asking per block needs these once instead. */
+export const mathOpenerOffsets = (str: string): number[] => {
+  const offsets: number[] = [];
+  RE_MATH_SWEEP_G.lastIndex = 0;
+  let match: RegExpExecArray | null;
+  while ((match = RE_MATH_SWEEP_G.exec(str)) !== null) {
+    offsets.push(match.index);
+    if (RE_MATH_SWEEP_G.lastIndex <= match.index) {
+      RE_MATH_SWEEP_G.lastIndex = match.index + 1;
+    }
+  }
+  return offsets;
 };

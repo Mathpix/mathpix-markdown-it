@@ -78,6 +78,13 @@ describe('display-width: textReserveEm (per-glyph-class em)', () => {
     ['\u2014', '\u2116'].forEach((ch) =>
       textReserveEm(ch).should.be.closeTo(0.90, 1e-9));
   });
+  // Scripts with no case land in the same wide class, and deliberately so: the reserve over-shoots a
+  // narrow letter like `\u0627`, but the Latin-`a` class would clip `\u0915` or `\u0e0d`, which are wider.
+  it('a script with no case reserves the wide class, not the narrow one', () => {
+    ['\u0e01', '\u0627', '\u0905', '\u05d0'].forEach((ch) =>
+      textReserveEm(ch).should.be.closeTo(0.90, 1e-9));
+    textReserveEm('\u0e01').should.be.above(textReserveEm('a'));
+  });
   it('a repeated non-ASCII char scales linearly (memo returns a stable width)', () =>
     textReserveEm('\u0416\u0416\u0416').should.be.closeTo(3 * textReserveEm('\u0416'), 1e-9));
 });

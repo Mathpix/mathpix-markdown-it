@@ -1,4 +1,11 @@
 import { StateBlockLike, OpaqueEnvType } from "./latex-list-types";
+/** Text around an inline transition. A transition with a backtick on both sides sits in a code span,
+ *  and the parse loop leaves the whole line to the inline path when it meets one. */
+export declare const splitInlineListEnv: (lineText: string, match: any) => {
+    sB: string;
+    sE: string;
+    isBacktickEscapedPair: boolean;
+};
 export declare const unclosedEnvsIn: (s: string) => number;
 export declare const CLOSER_SUFFIX_KEY: unique symbol;
 export declare const listCloserOffsets: (state: StateBlock) => readonly number[];

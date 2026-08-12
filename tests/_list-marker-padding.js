@@ -9,7 +9,7 @@ const { mathpixMarkdownPlugin } = require('../lib/index.js');
 const { FontMetrics } = require('../lib/markdown/common/text-dimentions');
 const { MARKER_GAP_EM, LIST_DEFAULT_INDENT_EM, LIST_MAX_INDENT_EM, DEFAULT_FONT_SIZE_PX, DEFAULT_EX_PX } = require('../lib/markdown/common/consts');
 const { resolveListPadding } = require('../lib/markdown/md-latex-lists-env/latex-list-items');
-const { processListChildToken, computeMarkerPadding } = require('../lib/markdown/md-latex-lists-env/latex-list-tokens');
+const { processListChildToken, computeMarkerPadding, wrapLooseRun } = require('../lib/markdown/md-latex-lists-env/latex-list-tokens');
 const { render_itemize_list_open } = require('../lib/markdown/md-latex-lists-env/render-latex-list-env');
 const { resetWarnDistinct } = require('../lib/markdown/common/warn-distinct');
 const Token = require('markdown-it/lib/token');
@@ -514,6 +514,24 @@ describe('processListChildToken — an unpaired close does not steal the outer l
     processListChildToken(mkState(), { startLine: 0, endLine: 0 },
       new Token('itemize_list_close', 'ul', -1), ctx);
     ctx.openTokens.should.have.lengthOf(0);
+  });
+  // A state with no Token constructor reaches here when a rule builds one by hand. The run then stays
+  // where it is — a loose child still renders, where a throw would cost the whole list.
+  it('a run is left unwrapped, and silently, when the state carries no Token constructor', () => {
+    const text = new Token('text', '', 0);
+    text.content = 'loose';
+    const state = { tokens: [text], level: 0, parentType: 'root', types: [] };
+    const said = [];
+    const warn = console.warn;
+    console.warn = (...args) => said.push(String(args[0]));
+    try {
+      wrapLooseRun(state, 0);
+    } finally {
+      console.warn = warn;
+    }
+    state.tokens.should.have.lengthOf(1, 'the run was wrapped without a constructor');
+    state.tokens[0].should.equal(text);
+    said.should.have.lengthOf(0, 'a missing constructor is a caller error, not a document one');
   });
   // End to end the limitation is not observable on the shapes tried: an unpaired close ends the
   // list, and a following wide marker is attributed to the list that holds it.

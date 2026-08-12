@@ -2025,6 +2025,29 @@ module.exports = [
     latex: "text {\n\n\\begin{itemize}\n\\item a\n\\begin{center}\n\\caption{q \\end{itemize} w}\n\\begin{itemize}\\item z\\end{itemize}\n\\end{center}\n\\item b\n\\end{itemize}",
     html: "<div>text {</div>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\"> w}<br>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">–</span>z</li></ul></div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
   },
+  // Whether a sibling can close is counted the way the parse loop consumes transitions, so a closer in
+  // a code span is not mistaken for the sibling's own.
+  {
+    name: "a sibling closed from a later line keeps both lists",
+    latex: "\\begin{itemize}\n\\item a\n\\end{itemize} \\begin{itemize} \\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul><ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    name: "a sibling closer in a code span is skipped for the real one below",
+    latex: "\\begin{itemize}\n\\item a\n\\end{itemize} \\begin{itemize} \\item b `\\end{itemize}`\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul><ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>b <code>\\end{itemize}</code></div>\n</li></ul>"
+  },
+  // Blocks with no math are skipped by an offset cursor now; these pin what it must not change.
+  {
+    name: "a wrapper list followed by prose that holds no math",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{center}x\\end{center}\n\\end{itemize}\n\nLorem ipsum dolor sit amet.\n\nLorem ipsum dolor sit amet.",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\">x</div>\n</li></ul><div>Lorem ipsum dolor sit amet.</div>\n<div>Lorem ipsum dolor sit amet.</div>\n"
+  },
+  {
+    name: "an unpaired $ before a blank line leaves the list below it structural",
+    latex: "text $x\n\n\\begin{itemize}\\item a\\end{itemize}\n\ny$ tail",
+    html: "<div>text $x</div>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul><div>y$ tail</div>\n"
+  },
   // Line numbering is off by default, so these carry their own options: a nested list used to reach the
   // renderer with no `map` at all, and then with a zero-width one that read as `count_line="0"`.
   {

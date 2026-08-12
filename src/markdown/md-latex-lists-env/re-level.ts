@@ -10,6 +10,9 @@ import {
 } from "../common/consts";
 
 
+// These registries stay outside the Lists rollback: `\renewcommand` is document content, and rolling
+// it back gave two renders two answers.
+
 /** Active itemize levels (mutable state) */
 export let itemizeLevel: string[] = [];
 /** Active enumerate levels (mutable state) */
@@ -17,8 +20,6 @@ export let enumerateLevel: string[] = [];
 /** Parsed tokens for itemize bullets */
 export let itemizeLevelTokens: Token[][] = [];
 
-// Outside the Lists rollback on purpose: the `\renewcommand` line is document content either way, and
-// its own block rule applies it — rolling it back only moved the write, giving two renders two answers.
 /**
  * Reset and return default itemize bullet definitions.
  */

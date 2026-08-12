@@ -18,3 +18,6 @@ export declare const nextMathSpan: (str: string, from: number, mathEnvsOnly?: bo
     start: number;
     end: number;
 } | null;
+/** Offset of every math opener, ascending. `nextMathSpan` with no opener ahead scans to EOF, so a
+ *  caller asking per block needs these once instead. */
+export declare const mathOpenerOffsets: (str: string) => number[];

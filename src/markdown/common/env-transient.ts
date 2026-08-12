@@ -7,6 +7,10 @@ import { warnDistinct } from "./warn-distinct";
 // unrelated later content and wake the inline fallback (empty `<>` list items).
 export const LIST_TRANSIENT_ENV_KEYS: readonly string[] = ['isBlock', 'inheritedListType', 'parentType', 'prentLevel'];
 
+// A discarded parse rolls back every own string key of `env`, the caption counters and the level stack.
+// The four keys above go back on every exit, commit included. Marker registries, TOC slugs, theorem and
+// section counters, labels, footnotes and warn dedup are not rolled back — their rules reset per render.
+
 // Pool slots kept warm across parses; deeper ones are released.
 const MAX_WARM_SNAPSHOTS = 8;
 
@@ -54,16 +58,23 @@ export const snapshotEnvAll = (env: any): EnvSnapshot => {
     snapshot = { keys: [], values: [], length: 0 };
     snapshotPool[snapshotDepth] = snapshot;
   }
+  // Claimed before the read, so a getter that re-enters gets the next slot and not this one; released
+  // again if that read throws, since the pool reset no longer undoes drift for a live snapshot.
   snapshotDepth++;
-  const keys: string[] = Object.keys(env);
-  for (let i = 0; i < keys.length; i++) {
-    snapshot.keys[i] = keys[i];
-    snapshot.values[i] = env[keys[i]];
+  try {
+    const keys: string[] = Object.keys(env);
+    for (let i = 0; i < keys.length; i++) {
+      snapshot.keys[i] = keys[i];
+      snapshot.values[i] = env[keys[i]];
+    }
+    // Truncate, not just count: a leftover tail from a longer snapshot would answer a later search.
+    snapshot.keys.length = keys.length;
+    snapshot.values.length = keys.length;
+    snapshot.length = keys.length;
+  } catch (e) {
+    snapshotDepth--;
+    throw e;
   }
-  // Truncate, not just count: a leftover tail from a longer snapshot would answer a later search.
-  snapshot.keys.length = keys.length;
-  snapshot.values.length = keys.length;
-  snapshot.length = keys.length;
   return snapshot;
 };
 
@@ -124,9 +135,14 @@ export const restoreEnvAll = (env: any, snap: EnvSnapshot): void => {
   }
 };
 
-// Undoes depth drift left by a parse killed between snapshot and release.
-// Safe while no rule runs a full md.parse/md.render: a nested one would hit this hook mid-snapshot.
+// Empties the warm pool between renders. A live snapshot here means a nested md.parse/md.render:
+// emptying its slot would blank the keys the outer parse must put back, so the pool is kept.
 export const resetEnvSnapshotPool = (): void => {
+  if (snapshotDepth > 0) {
+    warnDistinct('env-pool-nested',
+      '[env] snapshot pool reset while a snapshot is live; the pool is kept');
+    return;
+  }
   snapshotDepth = 0;
   if (snapshotPool.length > MAX_WARM_SNAPSHOTS) {
     snapshotPool.length = MAX_WARM_SNAPSHOTS;

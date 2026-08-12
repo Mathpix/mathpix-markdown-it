@@ -283,14 +283,3 @@ export const resolveListPadding = (listTokens: Token[]): void => {
   }
 };
 
-export const splitInlineListEnv = (
-  lineText: string,
-  match
-) => {
-  const sB: string = match.index! > 0 ? lineText.slice(0, match.index).trim() : "";
-  const sE: string = match.index! + match[0].length < lineText.length
-    ? lineText.slice(match.index! + match[0].length).trim()
-    : "";
-  const isBacktickEscapedPair: boolean = sB.includes("`") && sE.includes("`");
-  return { sB, sE, isBacktickEscapedPair };
-}
