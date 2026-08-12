@@ -168,6 +168,11 @@ export const restoreEnvKeysFromAll = (
   for (let i = 0; i < keys.length; i++) {
     const key: string = keys[i];
     const index: number = snap.keys.lastIndexOf(key, snap.length - 1);
-    env[key] = index === -1 ? undefined : snap.values[index];
+    if (index !== -1) {
+      env[key] = snap.values[index];
+    } else if (Object.prototype.hasOwnProperty.call(env, key)) {
+      // Added by the parse, so blanked rather than deleted; a key neither side has is left absent.
+      env[key] = undefined;
+    }
   }
 };

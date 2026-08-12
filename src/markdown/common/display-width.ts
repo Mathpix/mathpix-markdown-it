@@ -61,6 +61,7 @@ const ASCII_EM: Float64Array = (() => {
   return widths;
 })();
 
+// Snapshot of https://www.unicode.org/Public/15.1.0/ucd/EastAsianWidth.txt — regenerate from there.
 // Wide code points scattered below the CJK blocks per EastAsianWidth 15.1: the angle brackets and
 // Wide emoji. Range by range, not one span — their neighbours (`✓` U+2713, `✖` U+2716) are Neutral.
 const WIDE_RANGES_BELOW_CJK: ReadonlyArray<readonly [number, number]> = [

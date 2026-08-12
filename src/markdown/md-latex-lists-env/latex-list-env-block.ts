@@ -41,12 +41,11 @@ import {
 import {
   unclosedEnvsIn,
   splitInlineListEnv,
-  CLOSER_SUFFIX_KEY,
   listCloserOffsets,
   lastListEndPos,
   wrapperBeginAt,
   absoluteOffsetOf,
-  structuralCountIn,
+  closersLeftAfter,
   hasCloserAhead,
   nextListEnvMatch,
   firstUsableCloser,
@@ -173,7 +172,8 @@ const handleLstEndInline = (
   // Same rule as when the env opened: a closer written in code is content, and the next one still closes.
   const me = firstUsableCloser(state, nextLine, lineText, top, true);
   if (!me) {
-    // still inside opaque env → append raw line with indentation
+    // Raw, to keep the indentation. Safe only because `lineText` is the whole line here: handleLstBeginInline
+    // declines any non-tabular top, so nothing has consumed a prefix. Widening that would duplicate the tail.
     const rawLine = state.src.slice(state.bMarks[nextLine], state.eMarks[nextLine]);
     items = ItemsAddToPrev(items, rawLine, nextLine);
     return { handled: true, stack, items, lineText };
@@ -472,10 +472,8 @@ export const ListsInternal = (
             if (needed <= 0) {
               siblingClosable = true;
             } else {
-              // Structural only, by the same rule the other readers use: a closer in code or in an argument is text.
-              const ahead: number = structuralCountIn(
-                state, listCloserOffsets(state), CLOSER_SUFFIX_KEY, state.eMarks[lineIdx], Infinity);
-              siblingClosable = ahead >= needed;
+              // Free closers, not every closer: one claimed by a list opened further down is not ours.
+              siblingClosable = closersLeftAfter(state, state.eMarks[lineIdx]) >= needed;
             }
           }
           if (siblingClosable) {

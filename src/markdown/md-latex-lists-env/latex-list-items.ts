@@ -274,8 +274,8 @@ export const resolveListPadding = (listTokens: Token[]): void => {
         { depth });
     }
     if (em > LIST_DEFAULT_INDENT_EM) {
-      // Matches PADDING_EM_RE by construction: clamped to (default, LIST_MAX_INDENT_EM] and ceiled
-      // to two decimals, so never exponential or negative. The renderer drops a miss silently.
+      // Matches PADDING_EM_RE by construction: clamped to (default, LIST_MAX_INDENT_EM] and ceiled to
+      // two decimals, which `String` prints in full — no exponent, no sign. The renderer drops a miss.
       token.attrSet("data-padding-inline-start", String(em) + "em");
     }
     prefix.length = depth + 1;

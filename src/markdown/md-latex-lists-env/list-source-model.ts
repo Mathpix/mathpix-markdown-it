@@ -61,7 +61,7 @@ export const unclosedEnvsIn = (s: string): number => {
 // inside the body walk. Cached on the state the rule receives — the buffered state reads it through
 // the prototype, so the sweep runs once per document rather than once per probe.
 const LIST_END_OFFSETS_KEY = Symbol('mmd.listEndOffsets');
-export const CLOSER_SUFFIX_KEY = Symbol('mmd.closerSuffix');
+const CLOSER_SUFFIX_KEY = Symbol('mmd.closerSuffix');
 const OPENER_SUFFIX_KEY = Symbol('mmd.openerSuffix');
 export const listCloserOffsets = (state: StateBlock): readonly number[] =>
   matchPositionsCached(state, LIST_END_OFFSETS_KEY, END_LIST_ENV_SWEEP_G);
@@ -102,6 +102,8 @@ const END_OPAQUE_ENV_RE: Readonly<Record<OpaqueEnvType, RegExp>> = Object.freeze
 ) as Readonly<Record<OpaqueEnvType, RegExp>>;
 
 // Global clones of the same patterns, for a scan that resumes past a closer it rejected.
+// Clones, not the shared originals: a scan here returns mid-loop and leaves `lastIndex` set, and the
+// verbatim check it calls on the way execs the originals.
 const END_OPAQUE_ENV_SEARCH_G: Readonly<Record<OpaqueEnvType, RegExp>> = Object.freeze(
   (Object.keys(END_OPAQUE_ENV_RE) as OpaqueEnvType[]).reduce((acc, name) => {
     acc[name] = new RegExp(END_OPAQUE_ENV_RE[name].source, 'g');
@@ -260,7 +262,8 @@ const structuralSuffix = (
   });
 
 // Structural (not text) offsets of `all` inside `[from, to)`, as a difference of two suffix counts.
-export const structuralCountIn = (
+// Private: the suffix is cached under `key` but built from `all`, so only this module pairs the two.
+const structuralCountIn = (
   state: StateBlockLike,
   all: readonly number[],
   key: symbol,
@@ -275,7 +278,7 @@ export const structuralCountIn = (
 
 // How many of the open lists the source past `at` can still close: structural closers there minus the
 // openers that claim them, since a closer of a list opened after the wrapper is not ours to use.
-const closersLeftAfter = (state: StateBlockLike, at: number): number =>
+export const closersLeftAfter = (state: StateBlockLike, at: number): number =>
   structuralCountIn(state, listCloserOffsets(state as StateBlock), CLOSER_SUFFIX_KEY, at, Infinity)
   - structuralCountIn(state, listOpenerOffsets(state as StateBlock), OPENER_SUFFIX_KEY, at, Infinity);
 

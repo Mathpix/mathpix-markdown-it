@@ -350,6 +350,28 @@ describe('silent-mode Lists does not mutate shared env', () => {
     releaseEnvSnapshot();
     again.should.equal(first, 'each throw kept its slot, so the pool grows per failed snapshot');
   });
+  // Blanking is for a key the parse added. A key neither side ever had must stay absent, or a list whose
+  // body writes no flags — an empty one — would hand the consumer four own keys holding `undefined`.
+  it('a key neither the snapshot nor the parse has is not created', () => {
+    const env = { mine: 1 };
+    const snap = snapshotEnvAll(env);
+    env.isBlock = true;
+    try {
+      restoreEnvKeysFromAll(env, LIST_TRANSIENT_ENV_KEYS, snap);
+    } finally {
+      releaseEnvSnapshot();
+    }
+    Object.keys(env).should.deep.equal(['mine', 'isBlock']);
+    (env.isBlock === undefined).should.equal(true, 'the key the parse set is blanked, not left live');
+  });
+  it('an empty list body leaves the consumer env as it was', () => {
+    const md = markdownIt({ html: true }).use(mathpixMarkdownPlugin, { outMath: { include_svg: false } });
+    const env = { mine: 1 };
+    md.render('\\begin{itemize}\n\\end{itemize}', env);
+    LIST_TRANSIENT_ENV_KEYS.forEach((key) =>
+      Object.prototype.hasOwnProperty.call(env, key)
+        .should.equal(false, `${key} was created by the restore`));
+  });
   it('a snapshot of a smaller env does not see the previous one', () => {
     const rich = snapshotEnvAll({ isBlock: true, inheritedListType: 'itemize', prentLevel: 7, x: 1 });
     rich.length.should.equal(4);

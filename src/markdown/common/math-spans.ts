@@ -13,6 +13,8 @@ import { mathEnvironments } from "./consts";
 
 const MATH_ENV_NAMES: ReadonlySet<string> = new Set(mathEnvironments);
 
+// `ref{` is unanchored, so `\href{…}` reads as math. Only a lookbehind keeps `match.index`, and Safari
+// below 16.4 has none.
 export const RE_MATH_OPEN = /\\\\\[|\\\[|\\\\\(|\\\(|\$\$|\$|\\begin\{([^}]*)\}|eqref\{([^}]*)\}|ref\{([^}]*)\}/;
 
 // One `/g` instance per caller: `lastIndex` is state, and the scans below can interleave.

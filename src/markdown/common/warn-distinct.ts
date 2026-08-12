@@ -17,7 +17,7 @@ const familyOf = (key: string): string => {
   return at < 0 ? key : key.slice(0, at);
 };
 
-export const warnDistinct = (key: string, ...args: any[]): void => {
+export const warnDistinct = (key: string, message: string, ...args: any[]): void => {
   if (warned.has(key)) {
     return;
   }
@@ -40,7 +40,7 @@ export const warnDistinct = (key: string, ...args: any[]): void => {
   }
   warned.add(key);
   perFamily.set(family, usedByFamily + 1);
-  console.warn(...args);
+  console.warn(message, ...args);
 };
 
 // Called per render from the `reset_mmd_global_state` rule, before its partial-render bail — so it is

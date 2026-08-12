@@ -1119,6 +1119,15 @@ module.exports = [
       '| :--- |'
   },
   {
+    // The markup survives outside a link label too — the cell loop reads the same helper.
+    id: 73,
+    latex: '\\begin{tabular}{|l|}\n' +
+      '\\hline\nH~2~O and x^2^ and ++new++ \\\\\\hline\n' +
+      '\\end{tabular}',
+    table_markdown: '| H~2~O and x^2^ and ++new++ |\n' +
+      '| :--- |'
+  },
+  {
     // One formula, two positions: a label used to keep the edge spaces the cell loop trims away.
     id: 72,
     latex: '\\begin{tabular}{|l|}\n' +

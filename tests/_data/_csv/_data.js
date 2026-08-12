@@ -1193,6 +1193,15 @@ module.exports = [
     csvQuoteAllFields: '"1","Some text in math","3"\n' +
       '"4","xy","f(x)={[x^(2)+1,,x > 1],[1,,x=1],[x+1,,x < 1]:}"'
   },
+  {
+    // An image is its src alone: the alt used to be emitted first and glued to it (`the alti.png`).
+    latex: '\\begin{tabular}{|l|}\n' +
+      '![the alt](i.png)\n' +
+      '\\end{tabular}',
+    tsv: 'i.png',
+    csv: 'i.png',
+    csvQuoteAllFields: '"i.png"'
+  },
   // {
   //   latex: '',
   //   tsv: '',

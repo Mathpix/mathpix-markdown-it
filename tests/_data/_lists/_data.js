@@ -2025,6 +2025,18 @@ module.exports = [
     latex: "text {\n\n\\begin{itemize}\n\\item a\n\\begin{center}\n\\caption{q \\end{itemize} w}\n\\begin{itemize}\\item z\\end{itemize}\n\\end{center}\n\\item b\n\\end{itemize}",
     html: "<div>text {</div>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\"> w}<br>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">–</span>z</li></ul></div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
   },
+  // Closers a later list claims are not the sibling's: counting them all aborted the rule and took the
+  // finished list above into a paragraph with it. The pair differs only in what sits further down.
+  {
+    name: "an unrelated list further down does not make an unclosed sibling look closable",
+    latex: "\\begin{itemize}\n\\item a \\end{itemize} \\begin{itemize}\n\\item b\n\nplain\n\n\\begin{itemize}\n\\item c\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul><div>\\item b</div>\n<div>plain</div>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>c</li></ul>"
+  },
+  {
+    name: "the same tail with nothing below it",
+    latex: "\\begin{itemize}\n\\item a \\end{itemize} \\begin{itemize}\n\\item b\n\nplain\n",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul><div>\\item b</div>\n<div>plain</div>\n"
+  },
   // Whether a sibling can close is counted the way the parse loop consumes transitions, so a closer in
   // a code span is not mistaken for the sibling's own.
   {

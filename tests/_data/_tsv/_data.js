@@ -1627,5 +1627,12 @@ module.exports = [
       '[**b** x](http://a.b) tail\n' +
       '\\end{tabular}',
     tsv: 'http://a.b tail'
+  },
+  {
+    // An image is its src alone: the alt used to be emitted first and glued to it (`the alti.png`).
+    latex: '\\begin{tabular}{|l|}\n' +
+      '![the alt](i.png)\n' +
+      '\\end{tabular}',
+    tsv: 'i.png'
   }
 ];

@@ -142,7 +142,7 @@ export const getMdForChild = (child): string => {
     case 'strong':
     case 'mark':
     case 'code':
-    // Else a label flattens `H~2~O` to `H2O`.
+    // The cell loop reads this too, so `H~2~O` keeps its markup outside a label as well.
     case 'sub':
     case 'sup':
     case 'ins':

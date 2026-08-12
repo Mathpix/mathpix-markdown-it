@@ -84,6 +84,9 @@ const resolveEnabledRuleFns = (ruler: Ruler, names: Set<string>): RuleBlock[] =>
       }
     }
   }
+  if (!token) {
+    return fns;                         // a toggle is in flight: the entry could never be hit
+  }
   byNames.set(names, { token, fns });
   return fns;
 }
