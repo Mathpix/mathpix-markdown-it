@@ -143,7 +143,6 @@ export const resetEnvSnapshotPool = (): void => {
       '[env] snapshot pool reset while a snapshot is live; the pool is kept');
     return;
   }
-  snapshotDepth = 0;
   if (snapshotPool.length > MAX_WARM_SNAPSHOTS) {
     snapshotPool.length = MAX_WARM_SNAPSHOTS;
   }

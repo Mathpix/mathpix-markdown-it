@@ -27,6 +27,7 @@ import {
 } from "../common/env-transient";
 import { flushBufferedTokens, createBufferedState, warnListRuleFailed } from "./latex-list-env-engine";
 import { processOpaqueLine, OpaqueProcessResult } from "./latex-list-opaque";
+import { warnDistinct } from "../common/warn-distinct";
 import {
   BEGIN_LIST_ENV_RE,
   LATEX_ITEM_COMMAND_INLINE_RE,
@@ -403,18 +404,29 @@ export const Lists: RuleBlock = (
     warnListRuleFailed(e);
     return false;
   } finally {
-    if (!committed) {
-      setCaptionCounters(captionSnap);
-      restoreListLevels(listLevelSnap);
-    }
-    // Transient flags go back even on commit: a leaked isBlock=true wakes the inline fallback on the
-    // next block (empty `<>` items). Everything else only when the tokens are discarded.
-    if (envSnap) {
-      restoreEnvKeysFromAll(state.env, LIST_TRANSIENT_ENV_KEYS, envSnap);
+    try {
       if (!committed) {
-        restoreEnvAll(state.env, envSnap);
+        setCaptionCounters(captionSnap);
+        restoreListLevels(listLevelSnap);
       }
-      releaseEnvSnapshot();
+      // Transient flags go back even on commit: a leaked isBlock=true wakes the inline fallback on the
+      // next block (empty `<>` items). Everything else only when the tokens are discarded.
+      if (envSnap) {
+        restoreEnvKeysFromAll(state.env, LIST_TRANSIENT_ENV_KEYS, envSnap);
+        if (!committed) {
+          restoreEnvAll(state.env, envSnap);
+        }
+      }
+    } catch (e) {
+      // A getter-only or frozen key makes the write-back throw. Putting `env` back is ours, so a
+      // failure is reported, not propagated.
+      warnDistinct('env-restore-failed:' + (e?.name ?? 'Error'),
+        '[env] could not restore a key the consumer owns', { message: e?.message });
+    } finally {
+      // Always: a throw above would hold the slot for the process, and the reset declines while live.
+      if (envSnap) {
+        releaseEnvSnapshot();
+      }
     }
   }
 };

@@ -277,6 +277,11 @@ export const processOpaqueLine = (
       return { consumedLine: true, lineText, stack, items };
     }
     lineText = beginRes.lineText;
+    // A shorter tail means a wrapper closed on this line; look again, or a second one beside it reaches
+    // the caller as text and keeps the brace that opened it.
+    if (lineText.length < remaining) {
+      continue;
+    }
     return { consumedLine: false, lineText, stack, items };
   }
   // Unreachable today: every branch returns or shrinks the tail. Asserts that, rather than guarding it.

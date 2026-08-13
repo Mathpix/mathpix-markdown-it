@@ -404,6 +404,28 @@ describe('a speculative list parse does not advance other global registries', ()
   // No theorem case: a \begin{theorem} inside a list body is not rendered at all, so its counter
   // is unreachable from the speculative parse. See Non-Goals.
 
+  // The probe runs the whole body, so a registry written from inside it would take the entry twice.
+  // These three are not rolled back (see LIST_TRANSIENT_ENV_KEYS), so the absence of a double entry is
+  // the property to hold, not an assumption.
+  it('a heading inside a list body slugs and numbers once', () => {
+    const html = md.render('Para\n\\begin{itemize}\n\\item[1.] \\section{Alpha}\n\\end{itemize}\n\n\\section{Beta}');
+    (html.match(/id="alpha(-\d+)?"/g) || []).length.should.be.at.most(1, 'the slug was taken twice');
+    html.should.not.match(/id="alpha-2"/, 'a second slug means the probe registered one');
+    const numbers = (html.match(/class="section-number">([^<]*)</g) || []).map((m) => m.replace(/\D+/g, ''));
+    numbers.should.deep.equal([...new Set(numbers)], 'a section number repeated');
+  });
+  it('a \\label inside a list body registers once, so \\ref resolves', () => {
+    const html = md.render('Para\n\\begin{itemize}\n\\item[1.] \\begin{align}x=1\\label{eq:solo}\\end{align}\n'
+      + '\\end{itemize}\n\nSee \\ref{eq:solo}.');
+    (html.match(/id="eq:solo"/g) || []).length.should.be.at.most(1, 'the label was registered twice');
+    html.should.not.match(/\\ref\{eq:solo\}/, 'the ref stayed unresolved');
+  });
+  it('a footnote inside a list body appears once in the footnote section', () => {
+    const html = md.render('Para\n\\begin{itemize}\n\\item[1.] x\\footnote{once}\n\\end{itemize}');
+    (html.match(/once/g) || []).length.should.equal(1, 'the footnote body was emitted twice');
+    (html.match(/class="footnote-ref"/g) || []).length.should.equal(1);
+  });
+
 
   // The caption counters are restored on a non-committing exit, which is only safe while no token
   // outside the discarded parse carries a number from it. Pin the observable form: numbers never
@@ -840,6 +862,57 @@ describe('render depth stays level-correct on every path through the chain', () 
     md.renderer.render(half, md.options, {});
     marker(md.renderer.render(flatTokens, md.options, {}))
       .should.not.equal('•', 'healing positive drift here would mis-level a wrapper inline list');
+  });
+});
+
+// Putting `env` back is ours, and a getter-only key makes that write throw. It used to propagate and
+// skip the pool release with it — and since the per-render reset declines while a snapshot is live, the
+// slot stayed claimed for the process, warning on every render after.
+describe('a consumer env that refuses to be written back costs nothing', () => {
+  const src = '\\begin{itemize}\n\\item a\n\\end{itemize}';
+  it('the render finishes, the pool is released and later renders are unaffected', () => {
+    const md = markdownIt({ html: true }).use(mathpixMarkdownPlugin, { outMath: { include_svg: false } });
+    const env = { mine: 1 };
+    let reads = 0;
+    Object.defineProperty(env, 'shifty',
+      { get() { return ++reads; }, enumerable: true, configurable: true });
+    const real = console.warn;
+    const said = [];
+    console.warn = (...args) => said.push(String(args[0]));
+    let html;
+    const after = [];
+    try {
+      html = md.render(src, env);
+      for (let i = 0; i < 3; i++) {
+        after.push(md.render(src, {}));
+      }
+    } finally {
+      console.warn = real;
+    }
+    html.should.match(/<li[\s>]/, 'the hostile env cost the document its list');
+    said.join(' ').should.match(/could not restore a key/, 'the failure went unreported');
+    said.join(' ').should.not.match(/pool reset while a snapshot is live/, 'the pool slot leaked');
+    new Set(after).size.should.equal(1, 'later renders drifted');
+  });
+});
+
+// Reporting must not be what fails: the handler for a failing rule reports through here too, so an
+// absent `console.warn` threw from inside the catch and cost the document its whole list.
+describe('a missing console.warn does not cost the list', () => {
+  const wide = '\\begin{itemize}\n\\item[' + 'W'.repeat(60) + '] x\n\\end{itemize}';
+  [['undefined', undefined], ['null', null], ['not a function', 42]].forEach(([name, value]) => {
+    it(`renders with console.warn = ${name}`, () => {
+      const real = console.warn;
+      let html;
+      try {
+        console.warn = value;
+        html = MM.markdownToHTML(wide, { cwidth: 800, htmlTags: true });
+      } finally {
+        console.warn = real;
+      }
+      html.should.match(/<li[\s>]/, 'the list was lost');
+      html.should.not.match(/\\begin\{itemize\}/);
+    });
   });
 });
 

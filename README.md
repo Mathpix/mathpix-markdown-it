@@ -1001,6 +1001,13 @@ Malformed LaTeX makes the list rules report to the global `console.warn`, prefix
 - They are informational. `[list] marker indent hit the 20em clamp` means a custom marker asked for more room than the cap allows; it does not by itself mean anything overlaps. `[list] list rule failed` means one list was left as literal text while the rest of the document rendered.
 - Each distinct case is reported once per render, capped at 40 per family and 200 in total; past either cap one line says the rest are silent.
 - A failure never throws out of `markdownToHTML` — the rule declines and the document renders — so a warning is the only signal that a list degraded.
+- Deduplication counts per render, which is per call to `markdownToHTML`. A consumer driving `md.block.parse` or `md.inline.parse` directly never reaches the reset, so its keys accumulate until the per-family cap (40) reports and stops that family; the other families keep speaking.
+- MathJax reports invalid math on its own channel, prefixed `[TexConvert]`, not deduplicated and not covered by the caps above. Malformed math written inside a list wrapper env now reaches it, where `3.0.1` never built the wrapper and so never sent it.
+
+### Two notes for consumers who reach past the public API
+
+- **Toggle a rule, do not swap its `fn`.** The footnote rules cache which block rules terminate them, and that cache is dropped when markdown-it invalidates its own rule cache — which `enable`, `disable` and `ruler.at` do. Assigning `rule.fn` inside `md.block.ruler.__rules__` does not, so the cache would keep pointing at your old function. Use `md.block.ruler.at(name, fn)`.
+- **Keep `env` small.** A list parse snapshots every own string key of the `env` you pass, so that it can be put back exactly, and it does so once per line that opens a list. Measured on 200 list units: 62 ms with a plain `env`, 164 ms with a thousand extra keys on it.
 
 ### TOutputMathJax
 

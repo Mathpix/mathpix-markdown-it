@@ -2025,6 +2025,14 @@ module.exports = [
     latex: "text {\n\n\\begin{itemize}\n\\item a\n\\begin{center}\n\\caption{q \\end{itemize} w}\n\\begin{itemize}\\item z\\end{itemize}\n\\end{center}\n\\item b\n\\end{itemize}",
     html: "<div>text {</div>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\"> w}<br>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">–</span>z</li></ul></div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
   },
+  // A wrapper that closes on its own line hands back a shorter tail, and the opaque walk looks at it
+  // again: the second wrapper beside it used to reach the caller as text, keeping the brace that opened
+  // it (`}y`). `master` drops the second one entirely.
+  {
+    name: "two wrappers on one line in a list body both render",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{center}x\\end{center} \\begin{center}y\\end{center}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\">x</div>\n<div class=\"center\" style=\"text-align: center\">y</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
   // Whether a list needs a marker-less `<li>` to sit in is asked of the container it opens in, not of the
   // token before it: a list opening after a sibling closes is a direct child too, and got none. The tags
   // balanced either way, so only the `<li>`-only sweep catches it — hence these two.

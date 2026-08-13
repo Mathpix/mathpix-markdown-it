@@ -12,6 +12,14 @@ let capReported: boolean = false;
 const perFamily: Map<string, number> = new Map();
 const familyCapReported: Set<string> = new Set();
 
+// Checked per call: a runner may replace `console.warn` at any time, and an absent one threw from
+// inside the handler reporting a failing rule — costing the whole list.
+const warnIfConsoleCan = (message: string, ...args: any[]): void => {
+  if (typeof console !== 'undefined' && typeof console.warn === 'function') {
+    console.warn(message, ...args);
+  }
+};
+
 const familyOf = (key: string): string => {
   const at: number = key.indexOf(':');
   return at < 0 ? key : key.slice(0, at);
@@ -26,7 +34,7 @@ export const warnDistinct = (key: string, message: string, ...args: any[]): void
   if (usedByFamily >= MAX_KEYS_PER_FAMILY) {
     if (!familyCapReported.has(family)) {
       familyCapReported.add(family);
-      console.warn(`[mmd] more than ${MAX_KEYS_PER_FAMILY} distinct '${family}' diagnostics in one render; the rest of that family are silent`);
+      warnIfConsoleCan(`[mmd] more than ${MAX_KEYS_PER_FAMILY} distinct '${family}' diagnostics in one render; the rest of that family are silent`);
     }
     return;
   }
@@ -34,13 +42,13 @@ export const warnDistinct = (key: string, message: string, ...args: any[]): void
     // Said once, so a reader knows the log is truncated rather than complete.
     if (!capReported) {
       capReported = true;
-      console.warn(`[mmd] more than ${MAX_DISTINCT_KEYS} distinct diagnostics in one render; the rest are silent`);
+      warnIfConsoleCan(`[mmd] more than ${MAX_DISTINCT_KEYS} distinct diagnostics in one render; the rest are silent`);
     }
     return;
   }
   warned.add(key);
   perFamily.set(family, usedByFamily + 1);
-  console.warn(message, ...args);
+  warnIfConsoleCan(message, ...args);
 };
 
 // Called per render from the `reset_mmd_global_state` rule, before its partial-render bail — so it is

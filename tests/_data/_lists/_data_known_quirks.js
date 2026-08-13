@@ -11,6 +11,14 @@ module.exports = [
     latex: "\\begin{itemize}\n\\begin{enumerate} \\end{itemize} \\begin{itemize}\n\\end{itemize}\n",
     html: "<div>\\begin{itemize}</div>\n<ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"> </ol> <ul class=\"itemize\" style=\"list-style-type: none\"></ul>"
   },
+  // The body walk reads its line textually and asks only about paired backticks, so a closer written in
+  // `$…$` still ends the list there. Inside a wrapper env it is text, because the wrapper collects its
+  // interior raw. Byte-identical to `master`.
+  {
+    name: "a closer written in math outside a wrapper still ends the list",
+    latex: "\\begin{itemize}\n\\item a $x \\end{itemize} y$\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a $x</li></ul><div>\\item b<br>\n\\end{itemize}</div>\n"
+  },
   // The inline `\item` and `\end{}` rules fire with no list open — the `[list-state]` warnings say so —
   // and leave a stray `</ul>`, an unclosed `<li>` and an unclosed `<ol>`. Gating those rules is not
   // touched here. `master` is worse in kind on the same input: it closes the `<ul>` with `</ol>`, whose

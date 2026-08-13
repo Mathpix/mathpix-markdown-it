@@ -39,14 +39,17 @@ export const resetListRenderDepth = (): void => {
 
 // The host flag both list rules read, paired once per token array. Derived from the array rather than
 // carried between calls, so an unbalanced slice has no opener to pair with and its close stays bare.
-// Cached by array identity and length: reordering one in place between renders keeps the old answer.
-// Out of reach here — the only in-place edit is at parse time, on the buffered array, and the renderer
-// sees `state.tokens` — and re-rendering one array is already unsound (`attrJoin` piles up classes).
-const hostFlagsFor: WeakMap<Token[], { length: number; flags: Int8Array }> = new WeakMap();
+// Cached by array identity plus length and the two end types: reordering one in place keeps the old
+// answer. Out of reach here — the only in-place edit is at parse time, on the buffered array — and
+// re-rendering one array is already unsound anyway (`attrJoin` piles up classes).
+const hostFlagsFor: WeakMap<Token[], { sig: string; flags: Int8Array }> = new WeakMap();
+const signatureOf = (tokens: Token[]): string =>
+  tokens.length + ':' + (tokens[0]?.type ?? '') + ':' + (tokens[tokens.length - 1]?.type ?? '');
 const hostFlag = (tokens: Token[], idx: number): number => {
+  const sig: string = signatureOf(tokens);
   let cached = hostFlagsFor.get(tokens);
-  if (!cached || cached.length !== tokens.length) {
-    cached = { length: tokens.length, flags: listHostFlags(tokens) };
+  if (!cached || cached.sig !== sig) {
+    cached = { sig, flags: listHostFlags(tokens) };
     hostFlagsFor.set(tokens, cached);
   }
   return cached.flags[idx];
