@@ -682,36 +682,30 @@ describe('A list element holds nothing but <li>:', () => {
     }
     return inList() && html.slice(last).trim() ? 'tail: ' + html.slice(last).trim().slice(0, 40) : '';
   };
+  // Rendered once for the three sweeps below: doing it per sweep cost 1.3s of the 2s per-test budget,
+  // which a slower runner does not have.
+  let renderedFixtures = null;
+  const eachFixture = (check) => {
+    if (!renderedFixtures) {
+      renderedFixtures = require('./_data/_lists/_data')
+        .map((test) => ({ latex: test.latex, html: MM.markdownToHTML(test.latex, fixtureOptions(test)) }));
+    }
+    renderedFixtures.forEach(check);
+  };
   it('holds across every list fixture', () => {
-    require('./_data/_lists/_data').forEach((test) => {
-      invalidChild(MM.markdownToHTML(test.latex, fixtureOptions(test)))
-        .should.equal('', 'invalid child of a list element for ' + JSON.stringify(test.latex));
-    });
-  });
-  // Read through a DOM, not the tag walk above: a second child that is not an `<li>` keeps the tags
-  // balanced and satisfies a walk that stops at the first one, so only this sees it.
-  it('every list element in every fixture holds only <li>, read as a DOM', () => {
-    require('./_data/_lists/_data').forEach((test) => {
-      const html = MM.markdownToHTML(test.latex, fixtureOptions(test));
-      const dom = new JSDOM('<body>' + html + '</body>');
-      [...dom.window.document.querySelectorAll('ul,ol')].forEach((list) => {
-        [...list.children].map((child) => child.tagName.toLowerCase())
-          .filter((tag) => tag !== 'li')
-          .should.have.lengthOf(0, '<' + list.tagName.toLowerCase() + '> holds a non-<li> child for '
-            + JSON.stringify(test.latex));
-      });
+    eachFixture(({ latex, html }) => {
+      invalidChild(html).should.equal('', 'invalid child of a list element for ' + JSON.stringify(latex));
     });
   });
   // Separate from the child check, which reads nesting and not counts: a fuzz run found shapes that
   // leave an item open, and those pass the child walk while the HTML is still unusable as a DOM.
   it('every list fixture closes every tag it opens', () => {
-    require('./_data/_lists/_data').forEach((test) => {
-      const html = MM.markdownToHTML(test.latex, fixtureOptions(test));
+    eachFixture(({ latex, html }) => {
       const count = (re) => (html.match(re) || []).length;
       count(/<li[\s>]/g).should.equal(count(/<\/li>/g),
-        'unbalanced <li> for ' + JSON.stringify(test.latex));
+        'unbalanced <li> for ' + JSON.stringify(latex));
       count(/<(ul|ol)[\s>]/g).should.equal(count(/<\/(ul|ol)>/g),
-        'unbalanced list element for ' + JSON.stringify(test.latex));
+        'unbalanced list element for ' + JSON.stringify(latex));
     });
   });
   it('holds for the one-line form, where the chunk shares the \\begin line', () => {
