@@ -41,8 +41,43 @@ const LIST_STRUCTURE_TYPES: ReadonlySet<string> = new Set([
   'itemize_list_open', 'enumerate_list_open',
   'itemize_list_close', 'enumerate_list_close',
 ]);
-const LIST_OPEN_TYPES: ReadonlySet<string> = new Set(['itemize_list_open', 'enumerate_list_open']);
-const LIST_CLOSE_TYPES: ReadonlySet<string> = new Set(['itemize_list_close', 'enumerate_list_close']);
+export const LIST_OPEN_TYPES: ReadonlySet<string> = new Set(['itemize_list_open', 'enumerate_list_open']);
+export const LIST_CLOSE_TYPES: ReadonlySet<string> = new Set(['itemize_list_close', 'enumerate_list_close']);
+
+/** Per list open, and copied onto its matching close: 0 needs no host, 1 sits in an `itemize`, 2 in an
+ *  `enumerate`. A list is hosted when the container it opens in is a list rather than an item — reading
+ *  only the token before it missed a list opening after a sibling's close, which then had no `<li>`. */
+export const listHostFlags = (tokens: Token[]): Int8Array => {
+  const flags: Int8Array = new Int8Array(tokens.length);
+  // Open containers, innermost last. One stack, so a stream that closes a list with an item still open
+  // cannot desync it: that close drops the items inside, as HTML and the parse path both do.
+  const open: { isList: boolean; at: number }[] = [];
+  for (let i = 0; i < tokens.length; i++) {
+    const type: string = tokens[i].type;
+    if (LIST_OPEN_TYPES.has(type)) {
+      const parent = open[open.length - 1];
+      if (parent?.isList) {
+        flags[i] = tokens[parent.at].type === 'itemize_list_open' ? 1 : 2;
+      }
+      open.push({ isList: true, at: i });
+    } else if (LIST_CLOSE_TYPES.has(type)) {
+      while (open.length && !open[open.length - 1].isList) {
+        open.pop();
+      }
+      const list = open.pop();
+      if (list) {
+        flags[i] = flags[list.at];
+      }
+    } else if (type === 'latex_list_item_open') {
+      open.push({ isList: false, at: i });
+    } else if (type === 'latex_list_item_close') {
+      if (open.length && !open[open.length - 1].isList) {
+        open.pop();
+      }
+    }
+  }
+  return flags;
+};
 
 // Where the loose run ends: a sublist written in the chunk belongs inside its `<li>`, so a balanced
 // open…close pair is taken whole. An unbalanced closer is the enclosing list's — stop before it.
@@ -79,63 +114,84 @@ const looseRunEndBeforeOpen = (tokens: Token[], from: number, limit: number): nu
 };
 
 // The open token of the item this close belongs to, or null.
-const matchingItemOpen = (tokens: Token[], closeIndex: number): Token | null => {
-  let depth = 0;
-  for (let i = closeIndex; i >= 0; i--) {
-    const type: string = tokens[i].type;
-    if (type === 'latex_list_item_close') {
-      depth++;
-    } else if (type === 'latex_list_item_open') {
-      depth--;
-      if (depth === 0) {
-        return tokens[i];
-      }
-    }
-  }
-  return null;
-};
-
-// Index of the close that balances the list opened at `openIndex`, or -1.
-const matchingListClose = (tokens: Token[], openIndex: number): number => {
-  let depth = 0;
-  for (let i = openIndex; i < tokens.length; i++) {
+// Both pairings in one pass: item close → its open, and list open index → the index that balances it.
+// Searching per candidate cost 320k token steps on 200 wrappers, growing ×4 per doubling.
+const pairListTokens = (tokens: Token[]): { openerOf: Map<Token, Token>; closeAt: Int32Array } => {
+  const openerOf: Map<Token, Token> = new Map();
+  const closeAt: Int32Array = new Int32Array(tokens.length).fill(-1);
+  const lists: number[] = [];
+  const items: Token[] = [];
+  for (let i = 0; i < tokens.length; i++) {
     const type: string = tokens[i].type;
     if (LIST_OPEN_TYPES.has(type)) {
-      depth++;
+      lists.push(i);
     } else if (LIST_CLOSE_TYPES.has(type)) {
-      depth--;
-      if (depth === 0) {
-        return i;
+      const at: number | undefined = lists.pop();
+      if (at !== undefined) {
+        closeAt[at] = i;
+      }
+    } else if (type === 'latex_list_item_open') {
+      items.push(tokens[i]);
+    } else if (type === 'latex_list_item_close') {
+      const open: Token | undefined = items.pop();
+      if (open) {
+        openerOf.set(tokens[i], open);
       }
     }
   }
-  return -1;
+  return { openerOf, closeAt };
 };
 
 // A sublist emitted after a marker-less wrapper has closed is a bare `<ul>` inside `<ul>`. Moves that
 // close past the sublist, so it sits in the `<li>` — done on tokens, the exports walking those.
 export const absorbSublistIntoWrapper = (tokens: Token[], from: number): void => {
-  for (let i = Math.max(from, 1); i < tokens.length; i++) {
-    if (!LIST_OPEN_TYPES.has(tokens[i].type)) {
+  const start: number = Math.max(from, 1);
+  const { openerOf, closeAt } = pairListTokens(tokens);
+  // Rebuilt rather than spliced: a splice per wrapper is another O(n) each.
+  const out: Token[] = [];
+  let moved = false;
+  let i = 0;
+  while (i < tokens.length) {
+    // The tail of `out`, not `tokens[i - 1]`: a close already moved here is the one to move on.
+    const tail: Token | undefined = out[out.length - 1];
+    if (i >= start && LIST_OPEN_TYPES.has(tokens[i].type) && closeAt[i] >= 0
+      && tail?.type === 'latex_list_item_close' && openerOf.get(tail)?.meta?.markerEmpty) {
+      const end: number = closeAt[i];
+      out.pop();
+      for (let k = i; k <= end; k++) {
+        out.push(tokens[k]);
+      }
+      out.push(tail);
+      moved = true;
+      i = end + 1;
       continue;
     }
-    const close: Token = tokens[i - 1];
-    if (close?.type !== 'latex_list_item_close' || !matchingItemOpen(tokens, i - 1)?.meta?.markerEmpty) {
-      continue;
-    }
-    const end: number = matchingListClose(tokens, i);
-    if (end < 0) {
-      continue;
-    }
-    tokens.splice(i - 1, 1);
-    tokens.splice(end, 0, close);
-    i = end;
+    out.push(tokens[i]);
+    i++;
+  }
+  // The common list has no marker-less wrapper at all: nothing was moved, so nothing to write back.
+  if (!moved) {
+    return;
+  }
+  tokens.length = 0;
+  for (let k = 0; k < out.length; k++) {
+    tokens.push(out[k]);
   }
 };
 
 // Wraps the tokens emitted in `[from, to)` in a marker-less `<li>` — `<ul>` admits nothing else.
 // After the fact: a run that emitted nothing leaves nothing to wrap.
-export const wrapLooseRun = (state: any, from: number, to?: number): void => {
+/** What wrapping a run needs. `types` is the list stack these rules keep beside markdown-it's own, and
+ *  `Token` is optional because a hand-built state may not carry the constructor. */
+type LooseRunState = {
+  tokens: Token[];
+  level: number;
+  parentType: string;
+  types?: string[];
+  Token?: new (type: string, tag: string, nesting: number) => Token;
+};
+
+export const wrapLooseRun = (state: LooseRunState, from: number, to?: number): void => {
   const limit: number = Math.min(to ?? state.tokens.length, state.tokens.length);
   const end: number = looseRunEnd(state.tokens, from, limit);
   const run: Token[] = state.tokens.slice(from, end);
@@ -380,11 +436,16 @@ export const ListOpen = (
 export const setTokenCloseList = (
   state: StateBlock,
   startLine: number,
-  endLine: number
+  endLine: number,
+  opener?: Token
 ) => {
   // Close an open <li> if there is one
   closeOpenListItemIfNeeded(state);
-  const currentListType = state.types?.[state.types.length - 1];
+  // The opener's own kind when it is known: crossed env names put a different type on `state.types`,
+  // and the close then emitted `</ul>` for an `<ol>` — a tag with no opener of its own.
+  const currentListType = opener
+    ? (opener.type === 'itemize_list_open' ? ListType.itemize : ListType.enumerate)
+    : state.types?.[state.types.length - 1];
   const isItemize: boolean = currentListType === ListType.itemize;
   const { closeType, htmlTag } = getListTokenTypes(
     isItemize ? ListType.itemize : ListType.enumerate

@@ -349,15 +349,19 @@ const handleListTokensForCellMarkdown = (
     ensureTrailingEmptyLine(acc.cellTsvLines);
     ensureTrailingEmptyLine(acc.cellCsvLines);
     // Indent nested list items using non-breaking spaces (HTML).
-    const listLevel: number =  Math.max(1, isEnumerate ? token.meta?.enumerateLevel : token.meta?.itemizeLevel);
+    // `?? 1`: a marker-less item carries no level, and a marker looked up by NaN exported as `undefined`.
+    const level: number | undefined = isEnumerate ? token.meta?.enumerateLevel : token.meta?.itemizeLevel;
+    const listLevel: number = Math.max(1, level ?? 1);
     for (let i = 1; i < listLevel; i++) {
       mdPrefix += '&#160;&#160;';
       tsvPrefix += '  ';
       csvPrefix += '  ';
     }
+    // A marker-less item contributes nothing at all, not even the space a marker sits behind.
+    const markerLess: boolean = !!token.meta?.markerEmpty && !token.hasOwnProperty('marker');
     let markerMd: string = '';
-    let markerTsv: string = ' ';
-    let markerCsv: string = ' ';
+    let markerTsv: string = markerLess ? '' : ' ';
+    let markerCsv: string = markerLess ? '' : ' ';
     // If the token provides a custom marker, use it; otherwise default to bullet markers.
     if (token.hasOwnProperty('marker')) {
       if (token.markerTokens?.length > 0) {
@@ -372,7 +376,8 @@ const handleListTokensForCellMarkdown = (
         markerTsv += token.marker ?? '';
         markerCsv += token.marker ?? '';
       }
-    } else {
+    } else if (!token.meta?.markerEmpty) {
+      // A marker-less item has no marker to export; inventing one numbered what the document did not.
       const plainMarker: string = isEnumerate
         ? getEnumeratePlainMarker(Math.max(1, token.meta?.enumerateIndex ?? 1), listLevel)
         : getItemizePlainMarker(listLevel);

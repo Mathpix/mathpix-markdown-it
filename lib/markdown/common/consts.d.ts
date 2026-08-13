@@ -110,7 +110,8 @@ export declare const makeItemCommandSticky: () => RegExp;
 export declare const LATEX_LIST_BOUNDARY_INLINE_RE: RegExp;
 /** A line that is only `\renewcommand`: its own rule consumes it, so it renders to nothing. */
 export declare const RENEWCOMMAND_LINE_RE: RegExp;
-/** Where a chunk splits into items: a real `\item`, so `\itemsep` is not a split point. */
+/** Where a chunk splits into items, for `search`: a real `\item`, so `\itemsep` is not a split point.
+ *  Must answer like ITEM_COMMAND_SOURCE — pinned by a property test. */
 export declare const LATEX_ITEM_SPLIT_RE: RegExp;
 /** Block envs the list scanner knows; the regex below is built from it, so the two cannot drift. */
 export declare const LATEX_BLOCK_ENV_NAMES: readonly string[];

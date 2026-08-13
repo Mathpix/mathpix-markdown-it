@@ -248,7 +248,11 @@ export const resolveListPadding = (listTokens: Token[]): void => {
     }
   }
   if (!overflows) return;
-  const baseDepth: number = listTokens[0].prentLevel || 0;
+  // Shallowest, not first: on an unbalanced slice the first token can be the deeper one.
+  let baseDepth: number = listTokens[0].prentLevel || 0;
+  for (const token of listTokens) {
+    baseDepth = Math.min(baseDepth, token.prentLevel || 0);
+  }
   // prefix[d] = indent summed over the levels above d; after a token of depth d it is d+2 long.
   const prefix: number[] = [0];
   for (const token of listTokens) {

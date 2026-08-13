@@ -1194,6 +1194,17 @@ module.exports = [
       '"4","xy","f(x)={[x^(2)+1,,x > 1],[1,,x=1],[x+1,,x < 1]:}"'
   },
   {
+    // A marker-less item hosts a nested list and has no marker of its own. It carried no level either,
+    // so the plain marker was looked up by NaN and the word `undefined` reached the export.
+    latex: '\\begin{tabular}{|l|}\n' +
+      '\\hline\n' +
+      '\\begin{enumerate}\\begin{itemize}\\end{itemize}\\begin{itemize}\\end{itemize}\\end{enumerate} \\\\\\hline\n' +
+      '\\end{tabular}',
+    tsv: '',
+    csv: '',
+    csvQuoteAllFields: ''
+  },
+  {
     // An image is its src alone: the alt used to be emitted first and glued to it (`the alti.png`).
     latex: '\\begin{tabular}{|l|}\n' +
       '![the alt](i.png)\n' +

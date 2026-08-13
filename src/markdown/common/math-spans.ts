@@ -18,6 +18,8 @@ const MATH_ENV_NAMES: ReadonlySet<string> = new Set(mathEnvironments);
 export const RE_MATH_OPEN = /\\\\\[|\\\[|\\\\\(|\\\(|\$\$|\$|\\begin\{([^}]*)\}|eqref\{([^}]*)\}|ref\{([^}]*)\}/;
 
 // One `/g` instance per caller: `lastIndex` is state, and the scans below can interleave.
+/** For `getSubMath` only, which resets `lastIndex` on entry and is not reentrant. A second caller here
+ *  needs its own instance. */
 export const RE_MATH_OPEN_G = new RegExp(RE_MATH_OPEN.source, 'g');
 const RE_MATH_SPAN_G = new RegExp(RE_MATH_OPEN.source, 'g');
 const RE_MATH_SWEEP_G = new RegExp(RE_MATH_OPEN.source, 'g');

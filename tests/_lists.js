@@ -5,6 +5,7 @@ let MM = require('../lib/mathpix-markdown-model/index').MathpixMarkdownModel;
 const markdownIt = require('markdown-it');
 const { mathpixMarkdownPlugin } = require('../lib/index.js');
 const { pairArgumentSpans } = require('../lib/markdown/md-latex-lists-env/list-source-model');
+const { LATEX_ITEM_COMMAND_INLINE_RE, LATEX_ITEM_SPLIT_RE } = require('../lib/markdown/common/consts');
 
 const options = {
   cwidth: 800,
@@ -620,6 +621,27 @@ describe('Numbering depth survives a wrapper env between two enumerate levels:',
   });
 });
 
+// Two readers ask "is there a `\item` here": the split reader, which consumes only the command so its
+// offset is the item's own, and the marker reader, which consumes the optional argument as well. They
+// must agree on *whether* one is there — one saying yes where the other says no costs an item.
+describe('the two `\\item` readers agree on what an item is:', () => {
+  it('over the shapes that decide it', () => {
+    const tails = ['', ' x', 'sep 1pt', 'indent 2em', '[m] x', '[m]x', ' [m] x', '[unclosed x', '[] x',
+      '[m', '[[m]] x', 'ize x', 'X', '\n', '\t[m] x', '  ', '[a\\]b] x'];
+    tails.forEach((tail) => {
+      const text = '\\item' + tail;
+      LATEX_ITEM_SPLIT_RE.test(text)
+        .should.equal(LATEX_ITEM_COMMAND_INLINE_RE.test(text), 'disagree on ' + JSON.stringify(text));
+    });
+  });
+  it('and on text that only looks like one', () => {
+    ['item x', '\\\\itemx', 'a \\item b', '\\ item', '\\Item x'].forEach((text) => {
+      LATEX_ITEM_SPLIT_RE.test(text)
+        .should.equal(LATEX_ITEM_COMMAND_INLINE_RE.test(text), 'disagree on ' + JSON.stringify(text));
+    });
+  });
+});
+
 // `<ul>`/`<ol>` admit only `<li>`. A chunk before the first `\item` — a block env, a fence, an
 // unsupported command — used to land there as a text node or a `<div>`, so it now gets a marker-less
 // `<li>`, and a sublist written in that chunk goes inside it. Every direct child of every list
@@ -664,6 +686,32 @@ describe('A list element holds nothing but <li>:', () => {
     require('./_data/_lists/_data').forEach((test) => {
       invalidChild(MM.markdownToHTML(test.latex, fixtureOptions(test)))
         .should.equal('', 'invalid child of a list element for ' + JSON.stringify(test.latex));
+    });
+  });
+  // Read through a DOM, not the tag walk above: a second child that is not an `<li>` keeps the tags
+  // balanced and satisfies a walk that stops at the first one, so only this sees it.
+  it('every list element in every fixture holds only <li>, read as a DOM', () => {
+    require('./_data/_lists/_data').forEach((test) => {
+      const html = MM.markdownToHTML(test.latex, fixtureOptions(test));
+      const dom = new JSDOM('<body>' + html + '</body>');
+      [...dom.window.document.querySelectorAll('ul,ol')].forEach((list) => {
+        [...list.children].map((child) => child.tagName.toLowerCase())
+          .filter((tag) => tag !== 'li')
+          .should.have.lengthOf(0, '<' + list.tagName.toLowerCase() + '> holds a non-<li> child for '
+            + JSON.stringify(test.latex));
+      });
+    });
+  });
+  // Separate from the child check, which reads nesting and not counts: a fuzz run found shapes that
+  // leave an item open, and those pass the child walk while the HTML is still unusable as a DOM.
+  it('every list fixture closes every tag it opens', () => {
+    require('./_data/_lists/_data').forEach((test) => {
+      const html = MM.markdownToHTML(test.latex, fixtureOptions(test));
+      const count = (re) => (html.match(re) || []).length;
+      count(/<li[\s>]/g).should.equal(count(/<\/li>/g),
+        'unbalanced <li> for ' + JSON.stringify(test.latex));
+      count(/<(ul|ol)[\s>]/g).should.equal(count(/<\/(ul|ol)>/g),
+        'unbalanced list element for ' + JSON.stringify(test.latex));
     });
   });
   it('holds for the one-line form, where the chunk shares the \\begin line', () => {

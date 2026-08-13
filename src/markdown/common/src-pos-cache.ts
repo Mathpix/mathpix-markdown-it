@@ -22,6 +22,8 @@ interface Bucket<T> {
 }
 
 const bucketOf = <T>(state: StateBlock, key: symbol): Bucket<T> => {
+  // Falling back to `state` puts the cache outside the per-render clear, so it lives and dies with
+  // that state instead. Every real state carries an `env`; a hand-built one may not.
   const host = ((state as any).env ?? state) as Record<symbol, Bucket<T> | undefined>;
   const bucket: Bucket<T> | undefined = host[key];
   if (bucket) {

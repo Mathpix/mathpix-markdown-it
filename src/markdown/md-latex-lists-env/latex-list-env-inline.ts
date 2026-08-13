@@ -223,7 +223,12 @@ export const listCloseInline: RuleInline = (
     return false;
   }
   if (!silent) {
-    const listType: ListType = rawType;
+    // What is open, not what the command names: crossed env names made `\end{itemize}` emit `</ul>`
+    // over an open `<ol>`, leaving a tag with no opener and the `<ol>` never closed. `env.parentType`
+    // is read only while a list is open — the transient the opener wrote, restored after it — and
+    // `isListType` drops anything a consumer left under that name.
+    const openType = state.types?.[state.types.length - 1] ?? (state.env as any)?.parentType;
+    const listType: ListType = isListType(openType) ? openType : rawType;
     closeOpenListItemIfNeeded(state);
     const { closeType, htmlTag } = getListTokenTypes(listType);
     // itemize_list_close or enumerate_list_close

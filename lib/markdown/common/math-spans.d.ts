@@ -1,4 +1,6 @@
 export declare const RE_MATH_OPEN: RegExp;
+/** For `getSubMath` only, which resets `lastIndex` on entry and is not reentrant. A second caller here
+ *  needs its own instance. */
 export declare const RE_MATH_OPEN_G: RegExp;
 /**
  * End marker for a matched opening marker.

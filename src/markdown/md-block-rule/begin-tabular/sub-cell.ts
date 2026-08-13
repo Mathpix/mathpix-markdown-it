@@ -1,6 +1,6 @@
 import { generateUniqueId } from "./common";
 import { reDiagboxG } from "../../common/consts";
-import { getInlineCodeListFromString, buildInlineCodePositionSet } from "../../common";
+import { getInlineCodeListFromString, buildInlineCodePositionSet, findEndMarker } from "../../common";
 
 const diagboxTable = new Map<string, string>();
 const diagboxById = new Map<string, string>();
@@ -33,25 +33,15 @@ export const getSubDiagbox = (str: string): string => {
 };
 
 
+// Through the shared matcher, so `\backslashbox{a \\}{b}` pairs by backslash parity like every other
+// argument does: reading one `\` back made the `\\` shield the brace and cost both diagonal cells.
 export const extractNextBraceContent = (str: string, startIndex: number): [string, number] => {
-  let depth = 0, content = '', i = startIndex;
-  let firstChar = str[startIndex];
-  if (firstChar !== '{') {
+  if (str[startIndex] !== '{') {
     return ['', startIndex];
   }
-  let beforeCharCode: number = 0;
-  const codePositions = buildInlineCodePositionSet(getInlineCodeListFromString(str));
-  while (i < str.length) {
-    const char = str[i];
-    if (beforeCharCode !== 0x5c /* \ */ && !codePositions.has(i)) {
-      if (char === '{' && depth++ === 0) { i++; continue; }
-      if (char === '}' && --depth === 0) return [content, i + 1];
-    }
-    content += char;
-    beforeCharCode = str.charCodeAt(i);
-    i++;
-  }
-  return ['', startIndex];
+  const codePositions: Set<number> = buildInlineCodePositionSet(getInlineCodeListFromString(str));
+  const found = findEndMarker(str, startIndex, '{', '}', false, 0, codePositions);
+  return found.res ? [found.content, found.nextPos] : ['', startIndex];
 };
 
 export const findInDiagboxTable = (id: string): string | undefined =>

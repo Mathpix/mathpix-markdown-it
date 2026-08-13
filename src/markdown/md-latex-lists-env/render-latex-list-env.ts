@@ -3,6 +3,7 @@ import type Renderer from "markdown-it/lib/renderer";
 import type MarkdownIt from "markdown-it";
 import { PREVIEW_LINE_CLASS, PREVIEW_PARAGRAPH_PREFIX } from "../rules";
 import { GetItemizeLevelTokens, GetEnumerateLevel, GetItemizeLevel } from "./re-level";
+import { listHostFlags } from "./latex-list-tokens";
 import { renderTabularInline } from "../md-renderer-rules/render-tabular";
 import { needToHighlightAll, highlightText } from "../highlight/common";
 import convertSvgToBase64 from "../md-svg-to-base64/convert-scv-to-base64";
@@ -35,6 +36,26 @@ export const resetListRenderDepth = (): void => {
   level_enumerate = 0;
   resetAllEnumerateCounters();
 };
+
+// The host flag both list rules read, paired once per token array. Derived from the array rather than
+// carried between calls, so an unbalanced slice has no opener to pair with and its close stays bare.
+// Cached by array identity and length: reordering one in place between renders keeps the old answer.
+// Out of reach here — the only in-place edit is at parse time, on the buffered array, and the renderer
+// sees `state.tokens` — and re-rendering one array is already unsound (`attrJoin` piles up classes).
+const hostFlagsFor: WeakMap<Token[], { length: number; flags: Int8Array }> = new WeakMap();
+const hostFlag = (tokens: Token[], idx: number): number => {
+  let cached = hostFlagsFor.get(tokens);
+  if (!cached || cached.length !== tokens.length) {
+    cached = { length: tokens.length, flags: listHostFlags(tokens) };
+    hostFlagsFor.set(tokens, cached);
+  }
+  return cached.flags[idx];
+};
+
+// The `<li>` a hosted list sits in. Its class follows the list that holds it, not the one it opens.
+const hostItemOpen = (flag: number): string => (flag === 1
+  ? '<li class="li_itemize" data-custom-marker="true" data-marker-empty="true">'
+  : '<li class="li_enumerate not_number" data-custom-marker="true" data-marker-empty="true" style="display: block">');
 type ListState = {
   enumerateCounters: number[]; // index = level-1
 };
@@ -148,7 +169,6 @@ export const render_itemize_list_open: Renderer.RenderRule = (
   if (token.isTopLevelList && level_itemize < 0) {
     level_itemize = 0;
   }
-  const prevToken: Token | undefined = tokens[idx - 1];
   level_itemize++;
   let dataAttr = "";
   const className = "itemize";
@@ -182,13 +202,8 @@ export const render_itemize_list_open: Renderer.RenderRule = (
   // nested list reserves for its own markers instead of overflowing the container.
   const style: string = `${paddingInlineStyle}list-style-type: none`;
   const ulOpen: string = `<ul${attrs} style="${style}">`;
-  if (prevToken?.type === 'itemize_list_open') {
-    return `<li class="li_itemize" data-custom-marker="true" data-marker-empty="true">${ulOpen}`;
-  }
-  if (prevToken?.type === 'enumerate_list_open') {
-    return `<li class="li_enumerate not_number" data-custom-marker="true" data-marker-empty="true" style="display: block">${ulOpen}`;
-  }
-  return ulOpen;
+  const host: number = hostFlag(tokens, idx);
+  return host ? hostItemOpen(host) + ulOpen : ulOpen;
 };
 
 /**
@@ -218,7 +233,6 @@ export const render_enumerate_list_open: Renderer.RenderRule = (
     level_enumerate = 0;
     resetAllEnumerateCounters();
   }
-  const prevToken: Token | undefined = tokens[idx - 1];
   level_enumerate++;
   resetEnumerateCountersFromLevel(level_enumerate);
   let dataAttr = '';
@@ -244,13 +258,8 @@ export const render_enumerate_list_open: Renderer.RenderRule = (
   const attrs: string = slf.renderAttrs(token) + dataAttr;
   const style = `${paddingInlineStyle}list-style-type: ${currentStyle}`;
   const olOpen: string = `<ol${attrs} style="${style}">`;
-  if (prevToken?.type === 'itemize_list_open') {
-    return `<li class="li_itemize" data-custom-marker="true" data-marker-empty="true">${olOpen}`;
-  }
-  if (prevToken?.type === 'enumerate_list_open') {
-    return `<li class="li_enumerate not_number" data-custom-marker="true" data-marker-empty="true" style="display: block">${olOpen}`;
-  }
-  return olOpen;
+  const host: number = hostFlag(tokens, idx);
+  return host ? hostItemOpen(host) + olOpen : olOpen;
 };
 
 const generateHtmlForMarkerTokens = (markerTokens, slf, options, env): {htmlMarker: string, markerType: string, textContent: string} => {
@@ -660,14 +669,7 @@ export const render_itemize_list_close: Renderer.RenderRule = (
   slf: Renderer
 ): string => {
   level_itemize--;
-  const nextToken: Token | undefined = tokens[idx + 1];
-  if ((level_itemize > 0 || level_enumerate > 0)
-    && nextToken?.type
-    && ["enumerate_list_close", "itemize_list_close"].includes(nextToken.type)
-  ) {
-    return "</ul></li>";
-  }
-  return "</ul>";
+  return hostFlag(tokens, idx) ? "</ul></li>" : "</ul>";
 };
 
 export const render_enumerate_list_close: Renderer.RenderRule  = (
@@ -678,12 +680,5 @@ export const render_enumerate_list_close: Renderer.RenderRule  = (
   slf: Renderer
 ): string => {
   level_enumerate--;
-  const nextToken: Token | undefined = tokens[idx + 1];
-  if ((level_itemize > 0 || level_enumerate > 0)
-    && nextToken?.type
-    && ["enumerate_list_close", "itemize_list_close"].includes(nextToken.type)
-  ) {
-    return "</ol></li>";
-  }
-  return `</ol>`;
+  return hostFlag(tokens, idx) ? "</ol></li>" : "</ol>";
 };

@@ -30,7 +30,7 @@ export declare const getInlineCodeListFromString: (str: any) => Array<InlineCode
  * The function returns an object containing the information:
  *     res: boolean, - Contains false if the end marker could not be found
  *     content?: string, - Contains content between start and end markers
- *     nextPos?: number - Contains the position of the end marker in the string
+ *     nextPos?: number - Contains the position just past the end marker (`endPos` is the marker itself)
  * */
 export declare const findEndMarker: (str: string, startPos?: number, beginMarker?: string, endMarker?: string, onlyEnd?: boolean, openBracketsBefore?: number, inlineCodePositions?: Set<number>) => {
     res: boolean;

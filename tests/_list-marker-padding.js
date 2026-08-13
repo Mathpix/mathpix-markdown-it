@@ -9,7 +9,7 @@ const { mathpixMarkdownPlugin } = require('../lib/index.js');
 const { FontMetrics } = require('../lib/markdown/common/text-dimentions');
 const { MARKER_GAP_EM, LIST_DEFAULT_INDENT_EM, LIST_MAX_INDENT_EM, DEFAULT_FONT_SIZE_PX, DEFAULT_EX_PX } = require('../lib/markdown/common/consts');
 const { resolveListPadding } = require('../lib/markdown/md-latex-lists-env/latex-list-items');
-const { processListChildToken, computeMarkerPadding, wrapLooseRun } = require('../lib/markdown/md-latex-lists-env/latex-list-tokens');
+const { processListChildToken, computeMarkerPadding, wrapLooseRun, listHostFlags } = require('../lib/markdown/md-latex-lists-env/latex-list-tokens');
 const { render_itemize_list_open } = require('../lib/markdown/md-latex-lists-env/render-latex-list-env');
 const { resetWarnDistinct } = require('../lib/markdown/common/warn-distinct');
 const Token = require('markdown-it/lib/token');
@@ -514,6 +514,39 @@ describe('processListChildToken — an unpaired close does not steal the outer l
     processListChildToken(mkState(), { startLine: 0, endLine: 0 },
       new Token('itemize_list_close', 'ul', -1), ctx);
     ctx.openTokens.should.have.lengthOf(0);
+  });
+  // The written value must match PADDING_EM_RE, and it is produced by `String(Math.ceil(x * 100) / 100)`
+  // — float noise can add a hundredth, which is the safe direction, but never an exponent or a sign.
+  it('the emitted em value keeps its shape across the whole range, clamp included', () => {
+    [1, 2, 4, 8, 12, 16, 20, 30, 40, 80].forEach((count) => {
+      const html = render('\\begin{itemize}\n\\item[' + 'W'.repeat(count) + '] x\n\\end{itemize}');
+      const found = html.match(/data-padding-inline-start="([^"]*)"/);
+      if (!found) {
+        return;                           // narrow enough to need no reserve at all
+      }
+      found[1].should.match(/^\d+(\.\d+)?em$/, `W×${count} wrote ${found[1]}`);
+      parseFloat(found[1]).should.be.at.most(20, `W×${count} passed the clamp`);
+    });
+  });
+  // Read by four render rules, so a throw here escapes through `md.renderer.render`, where nothing
+  // catches it. A hand-built slice must come back with flags, not an exception.
+  it('the host flags are total over unbalanced token streams', () => {
+    const streams = {
+      'a list closing while an item is open': ['itemize_list_open', 'latex_list_item_open',
+        'itemize_list_close', 'itemize_list_open', 'itemize_list_close'],
+      'a lone item close': ['latex_list_item_close', 'itemize_list_open'],
+      'closes only': ['itemize_list_close', 'itemize_list_close'],
+      'opens only': ['itemize_list_open', 'enumerate_list_open'],
+      'crossed kinds': ['itemize_list_open', 'enumerate_list_close', 'itemize_list_open'],
+      'an item closed twice': ['itemize_list_open', 'latex_list_item_open', 'latex_list_item_close',
+        'latex_list_item_close', 'itemize_list_open'],
+      'empty': [],
+    };
+    Object.entries(streams).forEach(([name, types]) => {
+      const flags = listHostFlags(types.map((type) => ({ type })));
+      flags.should.have.lengthOf(types.length, name);
+      [...flags].forEach((flag) => [0, 1, 2].should.include(flag, name + ' produced ' + flag));
+    });
   });
   // A state with no Token constructor reaches here when a rule builds one by hand. The run then stays
   // where it is — a loose child still renders, where a throw would cost the whole list.

@@ -843,6 +843,32 @@ describe('render depth stays level-correct on every path through the chain', () 
   });
 });
 
+// The dedup set is cleared per parse, so a consumer that only ever calls `md.renderer.render` never
+// clears it. Safe while every render-time key is a constant: `padding-shape` is the only one, and a
+// variable-suffix key added there would fill the 200-key cap and silence every other subsystem.
+describe('the render-only path cannot exhaust the diagnostic cap', () => {
+  it('250 renders with distinct bad values warn once and leave the cap free', () => {
+    const md = markdownIt({ html: true }).use(mathpixMarkdownPlugin, { outMath: { include_svg: false } });
+    const tokens = md.parse('\\begin{itemize}\n\\item a\n\\end{itemize}', {});
+    const open = tokens.find((token) => token.type === 'itemize_list_open');
+    const said = [];
+    const warn = console.warn;
+    console.warn = (...args) => said.push(String(args[0]));
+    try {
+      for (let i = 0; i < 250; i++) {
+        open.attrSet('data-padding-inline-start', i + 'px');
+        md.renderer.render(tokens, md.options, {});
+      }
+      said.should.have.lengthOf(1, 'a render-time key carries a variable suffix');
+      warnDistinct('probe-after-renders', 'still speaking');
+      said.should.have.lengthOf(2, 'the cap was spent by the render path');
+    } finally {
+      console.warn = warn;
+      resetWarnDistinct();
+    }
+  });
+});
+
 // Two caches ride on markdown-it internals: the footnote terminator list is keyed by `ruler.__cache__`,
 // and the release hook is deduped through `Ruler.prototype.__find__`. Both fail silently on an upgrade —
 // terminators would walk every rule per block again, and the hook would register twice.

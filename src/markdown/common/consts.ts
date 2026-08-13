@@ -159,7 +159,8 @@ export const LATEX_LIST_BOUNDARY_INLINE_RE: RegExp =
   new RegExp('\\\\begin\\s*\\{(itemize|enumerate)\\}|\\\\end\\s*\\{(itemize|enumerate)\\}|' + ITEM_COMMAND_BARE);
 /** A line that is only `\renewcommand`: its own rule consumes it, so it renders to nothing. */
 export const RENEWCOMMAND_LINE_RE: RegExp = /^\s*\\renewcommand\b/;
-/** Where a chunk splits into items: a real `\item`, so `\itemsep` is not a split point. */
+/** Where a chunk splits into items, for `search`: a real `\item`, so `\itemsep` is not a split point.
+ *  Must answer like ITEM_COMMAND_SOURCE — pinned by a property test. */
 export const LATEX_ITEM_SPLIT_RE: RegExp = /\\item(?:\s*\[|(?![a-zA-Z]))/;
 /** Block envs the list scanner knows; the regex below is built from it, so the two cannot drift. */
 export const LATEX_BLOCK_ENV_NAMES: readonly string[] =

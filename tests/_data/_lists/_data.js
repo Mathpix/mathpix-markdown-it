@@ -2025,6 +2025,26 @@ module.exports = [
     latex: "text {\n\n\\begin{itemize}\n\\item a\n\\begin{center}\n\\caption{q \\end{itemize} w}\n\\begin{itemize}\\item z\\end{itemize}\n\\end{center}\n\\item b\n\\end{itemize}",
     html: "<div>text {</div>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\"> w}<br>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">–</span>z</li></ul></div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
   },
+  // Whether a list needs a marker-less `<li>` to sit in is asked of the container it opens in, not of the
+  // token before it: a list opening after a sibling closes is a direct child too, and got none. The tags
+  // balanced either way, so only the `<li>`-only sweep catches it — hence these two.
+  {
+    name: "a list opening after a sibling closes gets its own host item",
+    latex: "\\begin{itemize}\n\\begin{itemize}\\begin{itemize}\\end{itemize}\\end{itemize}\n\\begin{itemize}\\begin{itemize}\\end{itemize}\\end{itemize}\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\"><ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\"><ul class=\"itemize\" style=\"list-style-type: none\"></ul></li></ul></li><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\"><ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\"><ul class=\"itemize\" style=\"list-style-type: none\"></ul></li></ul></li></ul>"
+  },
+  {
+    name: "the host item takes the class of the list that holds it, not the one it opens",
+    latex: "\\begin{enumerate}\n\\begin{itemize}\\end{itemize}\n\\begin{itemize}\\end{itemize}\n\\end{enumerate}",
+    html: "<ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li class=\"li_enumerate not_number\" data-custom-marker=\"true\" data-marker-empty=\"true\" style=\"display: block\"><ul class=\"itemize\" style=\"list-style-type: none\"></ul></li><li class=\"li_enumerate not_number\" data-custom-marker=\"true\" data-marker-empty=\"true\" style=\"display: block\"><ul class=\"itemize\" style=\"list-style-type: none\"></ul></li></ol>"
+  },
+  // A nested list hosted by a marker-less `<li>` closes it: the close reads whether its own open emitted
+  // one, where it used to guess from the next token and left the item open before a sibling.
+  {
+    name: "a nested list inside a marker-less item closes that item before its sibling",
+    latex: "\\begin{itemize}\n\\begin{itemize}\n`\\end{itemize}`\n`\\end{itemize}`\n\\end{itemize}\n{\n\\begin{center}\n\\end{enumerate}\ntext\n\\end{center}\n",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\"><ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\"><code>\\end{itemize}</code></li><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\"><code>\\end{itemize}</code></li></ul></li><li class=\"li_itemize block\" data-custom-marker=\"true\" data-marker-empty=\"true\"><div>{</div>\n<div>\\begin{center}</div>\n</li></ul><div>text<br>\n\\end{center}</div>\n"
+  },
   // Closers a later list claims are not the sibling's: counting them all aborted the rule and took the
   // finished list above into a paragraph with it. The pair differs only in what sits further down.
   {
