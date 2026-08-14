@@ -408,7 +408,8 @@ export const listSetCounterInline: RuleInline = (
     return false;
   }
   if (!silent) {
-    const startNumber = parseSetCounterNumber(match);
+    // `?? 1` as the block path does: null comes back for a non-numeric argument like `{zz}`.
+    const startNumber: number = parseSetCounterNumber(match) ?? 1;
     const content: string = startNumber.toString();
     const token = state.push("setcounter", "", 0);
     token.content = content;

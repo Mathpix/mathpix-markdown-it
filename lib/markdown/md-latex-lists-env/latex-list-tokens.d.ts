@@ -25,7 +25,7 @@ type LooseRunState = {
     types?: string[];
     Token?: new (type: string, tag: string, nesting: number) => Token;
 };
-export declare const wrapLooseRun: (state: LooseRunState, from: number, to?: number) => void;
+export declare const wrapLooseRun: (state: LooseRunState, from: number) => void;
 /**
  * Creates an opening list-item token (<li>) for block-style LaTeX list items.
  * Handles marker parsing, enumeration start values, nesting metadata,

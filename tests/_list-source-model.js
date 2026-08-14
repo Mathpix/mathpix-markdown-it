@@ -18,6 +18,7 @@ const {
   nextListEnvMatch,
   splitInlineListEnv,
 } = require('../lib/markdown/md-latex-lists-env/list-source-model');
+const { absorbSublistIntoWrapper } = require('../lib/markdown/md-latex-lists-env/latex-list-tokens');
 const { processOpaqueLine } = require('../lib/markdown/md-latex-lists-env/latex-list-opaque');
 
 const md = markdownIt({ html: true }).use(mathpixMarkdownPlugin, { outMath: { include_svg: false } });
@@ -141,5 +142,64 @@ describe('list source model: the open-env count walks the tail as the parse loop
       }
       unclosedEnvsIn(text).should.equal(walk(text), 'disagree on ' + JSON.stringify(text));
     }
+  });
+});
+
+// The four guards below are unreachable from LaTeX: over every list fixture plus 160 generated shapes
+// of a list opening inside a list, dropping any one of them changes no rendered document. They hold
+// against a hand-built stream instead, which is what a caller passing tokens straight in can produce.
+describe('absorbSublistIntoWrapper: what the guards refuse to move', () => {
+  const tok = (type, meta) => {
+    const t = { type: type, tag: '', nesting: 0, meta: meta, attrs: null, content: '' };
+    return t;
+  };
+  const itemOpen = (markerEmpty) => tok('latex_list_item_open', markerEmpty ? { markerEmpty: true } : {});
+  const types = (tokens) => tokens.map((t) => t.type).join(',');
+
+  it('moves a sublist that follows a marker-less item close', () => {
+    const tokens = [tok('itemize_list_open'), itemOpen(true), tok('latex_list_item_close'),
+      tok('itemize_list_open'), itemOpen(false), tok('latex_list_item_close'), tok('itemize_list_close'),
+      tok('itemize_list_close')];
+    absorbSublistIntoWrapper(tokens, 1);
+    types(tokens).should.equal('itemize_list_open,latex_list_item_open,itemize_list_open,' +
+      'latex_list_item_open,latex_list_item_close,itemize_list_close,latex_list_item_close,itemize_list_close');
+  });
+
+  it('moves the second sublist into the close already moved, not past the first sublist', () => {
+    const sub = () => [tok('enumerate_list_open'), itemOpen(false), tok('latex_list_item_close'),
+      tok('enumerate_list_close')];
+    const tokens = [tok('itemize_list_open'), itemOpen(true), tok('latex_list_item_close')]
+      .concat(sub(), sub(), [tok('itemize_list_close')]);
+    absorbSublistIntoWrapper(tokens, 1);
+    // Both sublists sit in the one `<li>`, so its close lands after the second, not between them.
+    types(tokens).should.equal('itemize_list_open,latex_list_item_open,' +
+      'enumerate_list_open,latex_list_item_open,latex_list_item_close,enumerate_list_close,' +
+      'enumerate_list_open,latex_list_item_open,latex_list_item_close,enumerate_list_close,' +
+      'latex_list_item_close,itemize_list_close');
+  });
+
+  it('leaves a sublist after an item close that carries a marker', () => {
+    const tokens = [tok('itemize_list_open'), itemOpen(false), tok('latex_list_item_close'),
+      tok('itemize_list_open'), itemOpen(false), tok('latex_list_item_close'), tok('itemize_list_close'),
+      tok('itemize_list_close')];
+    const before = types(tokens);
+    absorbSublistIntoWrapper(tokens, 1);
+    types(tokens).should.equal(before);
+  });
+
+  it('leaves a sublist that never closes', () => {
+    const tokens = [tok('itemize_list_open'), itemOpen(true), tok('latex_list_item_close'),
+      tok('itemize_list_open'), itemOpen(false), tok('latex_list_item_close')];
+    const before = types(tokens);
+    absorbSublistIntoWrapper(tokens, 1);
+    types(tokens).should.equal(before);
+  });
+
+  it('moves nothing at index 0, where no item close can precede the list', () => {
+    const tokens = [tok('itemize_list_open'), itemOpen(true), tok('latex_list_item_close'),
+      tok('itemize_list_close')];
+    const before = types(tokens);
+    absorbSublistIntoWrapper(tokens, 0);
+    types(tokens).should.equal(before);
   });
 });

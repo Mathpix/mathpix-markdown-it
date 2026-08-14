@@ -1,6 +1,6 @@
 import { TsvJoin } from "./tsv";
 import { CsvJoin } from "./csv";
-import { getMdForChild, getMdLink, getMdMath, mdHref, SMILES_CLOSE } from "./table-markdown";
+import { asciiForMarkdown, getMdForChild, getMdLink, getMdMath, mdHref, SMILES_CLOSE } from "./table-markdown";
 import { mathTokenTypes } from "./consts";
 import { isWhitespace } from "../common";
 const escapeHtml = require('markdown-it/lib/common/utils').escapeHtml;
@@ -209,8 +209,12 @@ export const renderTableCellContent = (
 
       mdCell += getMdForChild(child);
       if (child.latex) {
-        if (options.outMath?.table_markdown?.math_as_ascii && ascii) {
-          mdCell += child.ascii_md || ascii;
+        // Escaped like the path below: the ascii for `$|x|$` is `|x|`, and bare pipes re-cut the row.
+        const mdAscii: string = asciiForMarkdown(child);
+        if (options.outMath?.table_markdown?.math_as_ascii && mdAscii) {
+          mdCell += mdAscii
+            .replace(/\|/g, '\\|')
+            .replace(/\n/g, ' ');
           continue;
         }
         const mdContent: string = mathTokenTypes.includes(child.type)

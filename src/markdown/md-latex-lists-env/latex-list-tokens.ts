@@ -144,6 +144,7 @@ const pairListTokens = (tokens: Token[]): { openerOf: Map<Token, Token>; closeAt
 
 // A sublist emitted after a marker-less wrapper has closed is a bare `<ul>` inside `<ul>`. Moves that
 // close past the sublist, so it sits in the `<li>` — done on tokens, the exports walking those.
+// `level` needs no fixing up: only the close moves, and it closes the same item either side.
 export const absorbSublistIntoWrapper = (tokens: Token[], from: number): void => {
   const start: number = Math.max(from, 1);
   const { openerOf, closeAt } = pairListTokens(tokens);
@@ -154,6 +155,7 @@ export const absorbSublistIntoWrapper = (tokens: Token[], from: number): void =>
   while (i < tokens.length) {
     // The tail of `out`, not `tokens[i - 1]`: a close already moved here is the one to move on.
     const tail: Token | undefined = out[out.length - 1];
+    // `closeAt[i] >= 0` keeps this terminating: an unpaired open would set `i` back to 0 and loop.
     if (i >= start && LIST_OPEN_TYPES.has(tokens[i].type) && closeAt[i] >= 0
       && tail?.type === 'latex_list_item_close' && openerOf.get(tail)?.meta?.markerEmpty) {
       const end: number = closeAt[i];
@@ -179,7 +181,7 @@ export const absorbSublistIntoWrapper = (tokens: Token[], from: number): void =>
   }
 };
 
-// Wraps the tokens emitted in `[from, to)` in a marker-less `<li>` — `<ul>` admits nothing else.
+// Wraps the tokens emitted from `from` on in a marker-less `<li>` — `<ul>` admits nothing else.
 // After the fact: a run that emitted nothing leaves nothing to wrap.
 /** What wrapping a run needs. `types` is the list stack these rules keep beside markdown-it's own, and
  *  `Token` is optional because a hand-built state may not carry the constructor. */
@@ -191,9 +193,8 @@ type LooseRunState = {
   Token?: new (type: string, tag: string, nesting: number) => Token;
 };
 
-export const wrapLooseRun = (state: LooseRunState, from: number, to?: number): void => {
-  const limit: number = Math.min(to ?? state.tokens.length, state.tokens.length);
-  const end: number = looseRunEnd(state.tokens, from, limit);
+export const wrapLooseRun = (state: LooseRunState, from: number): void => {
+  const end: number = looseRunEnd(state.tokens, from, state.tokens.length);
   const run: Token[] = state.tokens.slice(from, end);
   // Whitespace alone is not content: the same run reaches here trimmed from the block path.
   if (!run.some((t: Token) => t.type !== 'text' || (t.content || '').trim())) {

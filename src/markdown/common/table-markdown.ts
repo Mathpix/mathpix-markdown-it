@@ -38,12 +38,15 @@ export const mdHref = (href: string): string => {
 export const SMILES_OPEN = '<smiles>';
 export const SMILES_CLOSE = '</smiles>';
 
+// The ascii a Markdown reader gets; the cell loop gates `math_as_ascii` on the same answer.
+export const asciiForMarkdown = (token): string =>
+  token.ascii_md || token.ascii_tsv || token.ascii;
+
 // Math per `outMath.table_markdown`: ascii if asked, else latex between the configured delimiters.
 // Shared with the cell loop, or a label and the text around it come out in two syntaxes.
 export const getMdMath = (token, options?, content?: string): string => {
   const tableMarkdown = options?.outMath?.table_markdown;
-  // Same chain the cell loop emits, or a token carrying only `ascii_tsv` differs inside a label.
-  const ascii: string = token.ascii_md || token.ascii_tsv || token.ascii;
+  const ascii: string = asciiForMarkdown(token);
   if (tableMarkdown?.math_as_ascii && ascii) {
     return ascii;
   }

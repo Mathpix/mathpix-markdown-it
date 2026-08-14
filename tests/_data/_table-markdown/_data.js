@@ -1147,4 +1147,62 @@ module.exports = [
     table_markdown: '| [<smiles>CCO</smiles>](http://a.b) z |\n' +
       '| :--- |'
   },
+  {
+    // A pipe in the ascii must be escaped, or the row re-cuts into three cells.
+    id: 74,
+    latex: '\\begin{tabular}{ l c }\n' +
+      '  $|x|$ & 2 \\\\\n' +
+      '\\end{tabular}',
+    table_markdown: '| $\\|x\\|$ | 2 |\n' +
+      '| :--- | :---: |',
+    table_markdown_math_as_ascii: '| \\|x\\| | 2 |\n' +
+      '| :--- | :---: |'
+  },
+  {
+    // Determinant bars around an array: the ascii keeps both, the row keeps two columns.
+    id: 75,
+    latex: '\\begin{tabular}{ | l | c | }\\hline\n' +
+      '\\( \\left| \\begin{array}{c c}1 & 2 \\\\ 1 & 2 \\end{array} \\right| \\) & 2  \\\\ \\hline\n' +
+      '4 & 5 \\\\ \\hline\n' +
+      '\\end{tabular}',
+    table_markdown: '| $\\left\\| \\begin{array}{c c}1 & 2 \\\\ 1 & 2 \\end{array} \\right\\|$ | 2 |\n' +
+      '| :--- | :---: |\n' +
+      '| 4 | 5 |',
+    table_markdown_math_as_ascii: '| \\|[1,2],[1,2]\\| | 2 |\n' +
+      '| :--- | :---: |\n' +
+      '| 4 | 5 |'
+  },
+  {
+    // `\|` gives two bars, so all four are escaped.
+    id: 76,
+    latex: '\\begin{tabular}{ l c }\n' +
+      '  $\\|x\\|$ & 2 \\\\\n' +
+      '\\end{tabular}',
+    table_markdown: '| $\\\\|x\\\\|$ | 2 |\n' +
+      '| :--- | :---: |',
+    table_markdown_math_as_ascii: '| \\|\\|x\\|\\| | 2 |\n' +
+      '| :--- | :---: |'
+  },
+  {
+    // A pipe inside `\text` reaches the ascii too.
+    id: 77,
+    latex: '\\begin{tabular}{ l c }\n' +
+      '  $a \\text{x|y} b$ & 2 \\\\\n' +
+      '\\end{tabular}',
+    table_markdown: '| $a \\text{x\\|y} b$ | 2 |\n' +
+      '| :--- | :---: |',
+    table_markdown_math_as_ascii: '| ax\\|yb | 2 |\n' +
+      '| :--- | :---: |'
+  },
+  {
+    // `\mid` is U+2223, not a pipe — the escape stays narrow.
+    id: 78,
+    latex: '\\begin{tabular}{ l c }\n' +
+      '  $P(A \\mid B)$ & 2 \\\\\n' +
+      '\\end{tabular}',
+    table_markdown: '| $P(A \\mid B)$ | 2 |\n' +
+      '| :--- | :---: |',
+    table_markdown_math_as_ascii: '| P(A\u2223B) | 2 |\n' +
+      '| :--- | :---: |'
+  },
 ];

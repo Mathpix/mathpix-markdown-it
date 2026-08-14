@@ -167,9 +167,9 @@ export const render_itemize_list_open: Renderer.RenderRule = (
   slf: Renderer
 ): string => {
   const token: Token = tokens[idx];
-  // Negative drift only; positive is the per-render reset's job. A list from a wrapper's inline
-  // content claims top level, and resetting for it gave that list a level-1 marker.
-  if (token.isTopLevelList && level_itemize < 0) {
+  // Drift at or below zero; a positive level is the per-render reset's job. A list from a wrapper's
+  // inline content claims top level, and resetting for it gave that list a level-1 marker.
+  if (token.isTopLevelList && level_itemize <= 0) {
     level_itemize = 0;
   }
   level_itemize++;
@@ -230,8 +230,8 @@ export const render_enumerate_list_open: Renderer.RenderRule = (
   slf: Renderer
 ): string => {
   const token: Token = tokens[idx];
-  // `<= 0`, not `< 0` as in the itemize branch: at zero the assignment is a no-op but the counter
-  // reset below is not — it clears the numbering the previous list left.
+  // Same threshold as the itemize branch. The reset here is belt-and-braces: the per-level reset
+  // below runs on every open and already clears what a previous list left.
   if (token.isTopLevelList && level_enumerate <= 0) {
     level_enumerate = 0;
     resetAllEnumerateCounters();
