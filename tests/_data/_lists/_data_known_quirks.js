@@ -79,4 +79,11 @@ module.exports = [
     latex: "\\begin{itemize}\n\\item a\n\\end{itemize} \\begin{enumerate} \\item b `\\end{enumerate}`",
     html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul>"
   },
+  {
+    // An `\item` after the list closed emits an `<li>` with no list around it, and it stays open. The
+    // level stack reports the drift (`[list-state] incrementItemCount …`); the markup is unusable.
+    name: "an \\item after \\end{itemize} on one line leaves an <li> outside any list",
+    latex: "\\begin{itemize} \\item a \\end{itemize} \\item[X] b",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"> <li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul> <li>b"
+  },
 ];

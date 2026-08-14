@@ -2108,4 +2108,28 @@ module.exports = [
     latex: "\\begin{itemize}\n\\item a\n\\end{itemize}\n\n\\begin{itemize}\n\\item b\n\\end{itemize}",
     html: "<ul class=\"itemize preview-paragraph-0 preview-line 0 1 2\" data_line_start=\"0\" data_line_end=\"2\" data_line=\"0,3\" count_line=\"3\" style=\"list-style-type: none\"><li class=\"li_itemize preview-paragraph-1 preview-line 1\" data_line_start=\"1\" data_line_end=\"1\" data_line=\"1,2\" count_line=\"1\" data_parent_line_start=\"0\"><span class=\"li_level\">•</span>a</li></ul><ul class=\"itemize preview-paragraph-4 preview-line 4 5 6\" data_line_start=\"4\" data_line_end=\"6\" data_line=\"4,7\" count_line=\"3\" style=\"list-style-type: none\"><li class=\"li_itemize preview-paragraph-5 preview-line 5\" data_line_start=\"5\" data_line_end=\"5\" data_line=\"5,6\" count_line=\"1\" data_parent_line_start=\"4\"><span class=\"li_level\">•</span>b</li></ul>"
   },
+  {
+    // The pair below differs only by the trailing paragraph. Its `$` used to pair with the unpaired one
+    // in the item, marking the rest of that paragraph verbatim — the wrapper then leaked and `b` was lost.
+    name: "an unpaired $ in the item, no paragraph after it",
+    latex: "\\begin{itemize}\n\\item a$x\n\\begin{center}\nhere \\end{itemize} more\n\\end{center}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a$x</div>\n<div class=\"center\" style=\"text-align: center\">here \\end{itemize} more</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    name: "a later paragraph holding a $ leaves the list alone",
+    latex: "\\begin{itemize}\n\\item a$x\n\\begin{center}\nhere \\end{itemize} more\n\\end{center}\n\\item b\n\\end{itemize}\n\ntail b$c",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a$x</div>\n<div class=\"center\" style=\"text-align: center\">here \\end{itemize} more</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul><div>tail b$c</div>\n"
+  },
+  {
+    // The same pair for `\[`, which pairs inside one inline token as `$` does and so is dropped, not
+    // clipped, when its partner is a paragraph away.
+    name: "an unpaired \\[ in the item, no paragraph after it",
+    latex: "\\begin{itemize}\n\\item a\\[x\n\\begin{center}\nhere \\end{itemize} more\n\\end{center}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a[x</div>\n<div class=\"center\" style=\"text-align: center\">here \\end{itemize} more</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    name: "a later paragraph holding a \\] leaves the list alone",
+    latex: "\\begin{itemize}\n\\item a\\[x\n\\begin{center}\nhere \\end{itemize} more\n\\end{center}\n\\item b\n\\end{itemize}\n\ntail b\\] c",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a[x</div>\n<div class=\"center\" style=\"text-align: center\">here \\end{itemize} more</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul><div>tail b] c</div>\n"
+  },
 ];

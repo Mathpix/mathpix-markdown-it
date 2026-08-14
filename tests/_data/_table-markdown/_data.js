@@ -1195,6 +1195,16 @@ module.exports = [
       '| :--- | :---: |'
   },
   {
+    // A raw-HTML label and a `javascript:` href pass through as written: escapeLabel takes only
+    // `\`, `[`, `]`, and sanitising is the reader's job. Pinned so that cannot widen quietly.
+    id: 79,
+    latex: '\\begin{tabular}{|l|}\n' +
+      '[<b onclick="alert(1)">x</b> lbl](javascript:alert(1))\n' +
+      '\\end{tabular}',
+    table_markdown: '| [<b onclick="alert(1)">x</b> lbl](javascript:alert(1)) |\n' +
+      '| :--- |'
+  },
+  {
     // `\mid` is U+2223, not a pipe — the escape stays narrow.
     id: 78,
     latex: '\\begin{tabular}{ l c }\n' +

@@ -3,7 +3,7 @@ import type Renderer from "markdown-it/lib/renderer";
 import type MarkdownIt from "markdown-it";
 import { PREVIEW_LINE_CLASS, PREVIEW_PARAGRAPH_PREFIX } from "../rules";
 import { GetItemizeLevelTokens, GetEnumerateLevel, GetItemizeLevel } from "./re-level";
-import { listHostFlags } from "./latex-list-tokens";
+import { listHostFlags, LIST_OPEN_TYPES } from "./latex-list-tokens";
 import { renderTabularInline } from "../md-renderer-rules/render-tabular";
 import { needToHighlightAll, highlightText } from "../highlight/common";
 import convertSvgToBase64 from "../md-svg-to-base64/convert-scv-to-base64";
@@ -637,7 +637,9 @@ export const render_item_inline: Renderer.RenderRule = (
     renderedContent = '&nbsp';
   }
   let nextToken: Token | undefined = tokens[idx+1];
-  if (nextToken?.type === 'itemize_list_open') {
+  // Either kind: a sublist of either sort belongs inside the item. Equivalent today — no shape reaching
+  // here opens an `enumerate`.
+  if (nextToken && LIST_OPEN_TYPES.has(nextToken.type)) {
     return renderLatexListItemCore(tokens, idx, options, env, slf, renderedContent, 'open');
   }
   return renderLatexListItemCore(tokens, idx, options, env, slf, renderedContent, 'full');

@@ -13,33 +13,6 @@ const options = {
 };
 
 
-// The clamp warning is exercised on purpose by the wide-marker shapes here; keep it out of the CI log
-// while anything else still shows.
-const clampWarnFilter = () => {
-  if (global.__mmdClampWarnFilter) {
-    return () => {};
-  }
-  const base = console.warn;
-  const filtered = (...args) => {
-    if (/em clamp/.test(String(args[0]))) {
-      return;
-    }
-    base(...args);
-  };
-  global.__mmdClampWarnFilter = filtered;
-  console.warn = filtered;
-  return () => {
-    if (console.warn === filtered) {
-      console.warn = base;
-    }
-    global.__mmdClampWarnFilter = null;
-  };
-};
-// Installed at load: the fixture renders below run while mocha is still collecting, before any hook. Both
-// list test files do this, so the second must not wrap the first — one filter, restored once.
-const restoreClampWarn = clampWarnFilter();
-after(() => { restoreClampWarn(); });
-
 const { JSDOM } = require("jsdom");
 const tests = require("./_data/_lists/_data");
 const jsdom = new JSDOM();
@@ -675,6 +648,10 @@ describe('A list element holds nothing but <li>:', () => {
       }
       if (inList() && name !== 'li') {
         return '<' + name + '>';
+      }
+      // The converse, which the walk above cannot see: an `<li>` outside any list.
+      if (name === 'li' && !inList()) {
+        return '<li> outside any list';
       }
       if (!match[3] && !CHILDLESS.has(name)) {
         stack.push(name);

@@ -8,19 +8,18 @@ import {
   RenderTableCellContentResult
 } from "../common/render-table-cell-content";
 import { getItemizePlainMarker, getEnumeratePlainMarker } from "../common/list-markers";
-import { attrsSharedMarker } from "../common/consts";
+import {
+  attrsSharedMarker,
+  LIST_OPEN_TOKEN_TYPES, LIST_CLOSE_TOKEN_TYPES, LIST_STRUCTURE_TOKEN_TYPES,
+} from "../common/consts";
 
 const TABLE_TOKENS = new Set([
   'table_open','table_close','tbody_open','tbody_close','tr_open','tr_close','td_open','td_close',
 ]);
 
-// List-structural tokens whose cell Markdown/TSV is emitted by handleListTokensForCellMarkdown;
-// their body must not be double-appended as leaf content.
-const LIST_STITCH_TOKEN_TYPES: Set<string> = new Set([
-  'itemize_list_open', 'enumerate_list_open',
-  'latex_list_item_open', 'latex_list_item_close',
-  'itemize_list_close', 'enumerate_list_close',
-]);
+// Such a token has its cell Markdown/TSV emitted by handleListTokensForCellMarkdown; its body must not
+// be double-appended as leaf content.
+const LIST_STITCH_TOKEN_TYPES: ReadonlySet<string> = LIST_STRUCTURE_TOKEN_TYPES;
 
 // Boundaries end a run — and a non-member has no other export path, so listing a type here drops
 // its Markdown/TSV. Hence only content-free tokens belong: paragraph markers, not a fence or an
@@ -316,7 +315,7 @@ const handleListTokensForCellMarkdown = (
     }
     acc.cellMd += '<br>';
   };
-  if (token?.type && ["itemize_list_open", "enumerate_list_open"].includes(token.type)) {
+  if (token?.type && LIST_OPEN_TOKEN_TYPES.has(token.type)) {
     const level = token?.prentLevel ?? 0;
     const prevType = prevToken?.type;
     const prevLevel = prevToken?.prentLevel ?? 0;
@@ -329,7 +328,7 @@ const handleListTokensForCellMarkdown = (
       addBr();
     }
     // Add a break between top-level lists.
-    const prevIsListClose: boolean = prevType === 'enumerate_list_close' || prevType === 'itemize_list_close';
+    const prevIsListClose: boolean = !!prevType && LIST_CLOSE_TOKEN_TYPES.has(prevType);
     if (prevIsListClose && prevLevel === 0) {
       addBr();
     }
@@ -403,7 +402,7 @@ const handleListTokensForCellMarkdown = (
   if (token?.type === "latex_list_item_close") {
     const prevType = prevToken?.type;
     // Add a break between list items unless the list ends immediately after the item.
-    const shouldBreak: boolean = prevType !== 'itemize_list_close' && prevType !== 'enumerate_list_close';
+    const shouldBreak: boolean = !prevType || !LIST_CLOSE_TOKEN_TYPES.has(prevType);
     if (shouldBreak) {
       addBr();
     }

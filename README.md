@@ -998,7 +998,7 @@ Both are pinned by tests. If the reader cannot validate, treat the exported text
 
 Malformed LaTeX makes the list rules report to the global `console.warn`, prefixed `[list]`, `[list-state]`, `[env]` or `[mmd]`. There is **no option to silence or redirect them** — a server that renders untrusted input at volume should expect them in its log.
 
-- They are informational. `[list] marker indent hit the 20em clamp` means a custom marker asked for more room than the cap allows; it does not by itself mean anything overlaps. `[list] list rule failed` means one list was left as literal text while the rest of the document rendered.
+- They are informational. `[list] list rule failed` means one list was left as literal text while the rest of the document rendered. A marker asking for more room than the `20em` cap allows is **not** reported: the reserve is generous enough that the chain usually still fits, so the line said nothing a consumer could act on.
 - Each distinct case is reported once per render, capped at 40 per family and 200 in total; past either cap one line says the rest are silent.
 - A failure never throws out of `markdownToHTML` — the rule declines and the document renders — so a warning is the only signal that a list degraded.
 - Deduplication counts per render, which is per call to `markdownToHTML`. A consumer driving `md.block.parse` or `md.inline.parse` directly never reaches the reset, so its keys accumulate until the per-family cap (40) reports and stops that family; the other families keep speaking.

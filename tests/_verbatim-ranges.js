@@ -113,6 +113,28 @@ describe('verbatim ranges: a math-free tail is read once, not once per block', (
     isInsideRanges(findVerbatimRanges(src), src.indexOf('\\begin{itemize}'))
       .should.equal(false, 'the per-block clip must survive the opener cursor');
   });
+  // The closer used to be covered: the opener took a marker from a later paragraph as its own, and the
+  // span was clipped to the blank line rather than dropped — so its whole paragraph tail read as math.
+  // Every marker that pairs inside one inline token, not just `$`.
+  [['$', '$'], ['\\[', '\\]'], ['\\(', '\\)']].forEach(([open, close]) => {
+    it('a `' + open + '` that pairs only past a blank line covers nothing in its own block', () => {
+      const src = 'para one has a' + open + 'dangling opener and \\end{itemize} here\n\n'
+        + 'second para b' + close + ' ends it\n';
+      isInsideRanges(findVerbatimRanges(src), src.indexOf('\\end{itemize}'))
+        .should.equal(false, 'an opener with no partner in its own block is not math');
+    });
+    it('a `' + open + '` pair inside one block still covers what it holds', () => {
+      const src = 'text ' + open + 'x \\end{itemize} y' + close + ' tail\n';
+      isInsideRanges(findVerbatimRanges(src), src.indexOf('\\end{itemize}'))
+        .should.equal(true, 'a real pair must stay verbatim');
+    });
+  });
+  // An env may legitimately span paragraphs, so it keeps the clipped span the `$` no longer gets.
+  it('a math env still covers the closer written in its first block', () => {
+    const src = '\\begin{align}\na &= \\end{itemize} \\\\\n\nc &= d\n\\end{align}\n';
+    isInsideRanges(findVerbatimRanges(src), src.indexOf('\\end{itemize}'))
+      .should.equal(true, 'an env body is verbatim up to the blank line');
+  });
   it('the returned ranges are not aliased to anything the next call reuses', () => {
     const src = 'a `x\n' + f + '\ncode\n' + f + '\ny` z $m$';
     const first = findVerbatimRanges(src);

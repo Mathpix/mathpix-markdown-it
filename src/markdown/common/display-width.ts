@@ -86,14 +86,8 @@ const wideBelowCjkFlags: Uint8Array = (() => {
   return flags;
 })();
 
-/**
- * Whether a code point is an East-Asian Wide/Fullwidth character, which renders
- * roughly twice as wide as an ASCII character. Block-level approximation of Unicode's
- * East Asian Width property, over the BMP and the astral blocks that are Wide.
- * Zero-advance code points are excluded here and reserve 0 — see isZeroWidthChar.
- */
-export const isWideChar = (cp: number): boolean =>
-  !isZeroWidthChar(cp) &&
+// The ranges alone, for callers that already excluded zero-advance code points.
+const inWideRange = (cp: number): boolean =>
   ((cp >= 0x1100 && cp <= 0x115F) ||   // Hangul Jamo
   (cp >= 0x2E80 && cp <= 0x303E) ||   // CJK radicals, Kangxi, CJK symbols/punctuation
   (cp >= 0x3041 && cp <= 0x33FF) ||   // Hiragana, Katakana, CJK symbols
@@ -114,6 +108,14 @@ export const isWideChar = (cp: number): boolean =>
   // Last: the ranges above short-circuit for CJK, everything else exits on one comparison.
   (cp >= WIDE_BELOW_CJK_LO && cp <= WIDE_BELOW_CJK_HI && wideBelowCjkFlags[cp - WIDE_BELOW_CJK_LO] === 1));
 
+/**
+ * Whether a code point is an East-Asian Wide/Fullwidth character, which renders
+ * roughly twice as wide as an ASCII character. Block-level approximation of Unicode's
+ * East Asian Width property, over the BMP and the astral blocks that are Wide.
+ * Zero-advance code points are excluded here and reserve 0 — see isZeroWidthChar.
+ */
+export const isWideChar = (cp: number): boolean => !isZeroWidthChar(cp) && inWideRange(cp);
+
 // The ASCII classes can't see these letters; uppercase runs widest (`Љ` is 1.06em in Arial).
 const casedEmFor = (cp: number): number => {
   const ch: string = String.fromCodePoint(cp);
@@ -132,7 +134,7 @@ const nonAsciiEm = (cp: number): number => {
   if (isZeroWidthChar(cp) || (cp >= 0xD800 && cp <= 0xDFFF)) {
     return 0;
   }
-  if (isWideChar(cp)) {
+  if (inWideRange(cp)) {
     return CJK_EM;
   }
   if (cp >= CASED_CACHE_MAX) {
@@ -168,7 +170,7 @@ const monoCells = (str: string): number => {
     }
     if (!isZeroWidthChar(cp)) {
       // A wide glyph takes two cells in a monospace face.
-      cells += isWideChar(cp) ? 2 : 1;
+      cells += inWideRange(cp) ? 2 : 1;
     }
   }
   return cells;

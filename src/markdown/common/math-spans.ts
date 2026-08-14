@@ -97,10 +97,15 @@ export const nextMathSpan = (
     }
     let endMarker: string | null | undefined = getEndMarker(match[0], envGroup, match[2], match[3]);
     let endMarkerPos = -1;
+    // `$`, `$$`, `\[`, `\(` pair inside one inline token; an env body may span paragraphs, and a
+    // self-closing match has nothing to pair with.
+    let pairsInline = true;
     if (endMarker === null) {
       endMarkerPos = startMathPos;
       endMarker = '';
+      pairsInline = false;
     } else if (endMarker === undefined) {
+      pairsInline = false;
       if (envGroup && envGroup !== 'abstract' && envGroup !== 'tabular') {
         const environment: string = envGroup.trim();
         const openTag: RegExp = beginTag(environment, true);
@@ -122,6 +127,11 @@ export const nextMathSpan = (
       endMarkerPos = findEndMarkerPos(str, endMarker, startMathPos);
     }
     if (endMarkerPos === -1) {
+      RE_MATH_SPAN_G.lastIndex = startMathPos;
+      continue;
+    }
+    // A closer past the window belongs to another opener, so this one is not math.
+    if (pairsInline && endMarkerPos + endMarker.length > until) {
       RE_MATH_SPAN_G.lastIndex = startMathPos;
       continue;
     }

@@ -89,6 +89,16 @@ export const preserveNewlineUnlessDoubleAngleUuidRegex: RegExp = new RegExp(Stri
 export const ANGLE_BRACKETS_RE: RegExp = /[<>]/g;
 // Clone-on-write marker for shared tabular attrs arrays.
 export const attrsSharedMarker: symbol = Symbol.for('mathpix.tabular.attrsShared');
+// A token that is list structure rather than content. Shared: the list rules and the tabular renderer
+// both ask it, and two copies drift when a type is added.
+export const LIST_OPEN_TOKEN_TYPES: ReadonlySet<string> =
+  new Set<string>(['itemize_list_open', 'enumerate_list_open']);
+export const LIST_CLOSE_TOKEN_TYPES: ReadonlySet<string> =
+  new Set<string>(['itemize_list_close', 'enumerate_list_close']);
+export const LIST_STRUCTURE_TOKEN_TYPES: ReadonlySet<string> = new Set<string>([
+  'latex_list_item_open', 'latex_list_item_close',
+  ...LIST_OPEN_TOKEN_TYPES, ...LIST_CLOSE_TOKEN_TYPES,
+]);
 export const RE_TAG_WITH_HLINE: RegExp = /\[(.*?)\]\s{0,}\\hline/;
 export const RE_TAG_WITH_HHLINE: RegExp = /\[(.*?)\]\s{0,}\\hhline/;
 export const RE_TAG_WITH_HDASHLINE: RegExp = /\[(.*?)\]\s{0,}\\hdashline/;

@@ -3,6 +3,7 @@ import { StateBlockLike, OpaqueEnvType } from "./latex-list-types";
 import { getOpenListCount } from "./list-state";
 import { matchPositionsCached, countPositionsAtOrAfter, srcValueCached } from "../common/src-pos-cache";
 import { findVerbatimRanges, isInsideRanges } from "../common/verbatim-ranges";
+import { warnDistinct } from "../common/warn-distinct";
 import {
   BEGIN_LIST_ENV_INLINE_RE,
   END_LIST_ENV_INLINE_RE,
@@ -244,25 +245,39 @@ export const absoluteOffsetOf = (
   return state.src.slice(at, at + text.length) === text ? at : -1;
 };
 
-// How many of `all` from index `i` on are structural, cached per source: a walk per wrapper made a
-// document of them super-linear — 1600 units went 2.25× slower than `master` before this.
+// How many of `all` from index `i` on are structural. Cached per source: a walk per wrapper made a
+// document of them quadratic in the wrapper count.
+const buildStructuralSuffix = (
+  state: StateBlockLike,
+  all: readonly number[],
+): { all: readonly number[]; suffix: Int32Array } => {
+  const spans: Array<[number, number]> = argumentSpansOf(state);
+  const suffix: Int32Array = new Int32Array(all.length + 1);
+  for (let i: number = all.length - 1; i >= 0; i--) {
+    const structural: boolean = !isInsideRanges(spans, all[i]) && !insideVerbatim(state, all[i]);
+    suffix[i] = suffix[i + 1] + (structural ? 1 : 0);
+  }
+  return { all, suffix };
+};
+
 const structuralSuffix = (
   state: StateBlockLike,
   all: readonly number[],
   key: symbol,
-): Int32Array =>
-  srcValueCached(state as StateBlock, key, () => {
-    const spans: Array<[number, number]> = argumentSpansOf(state);
-    const suffix: Int32Array = new Int32Array(all.length + 1);
-    for (let i: number = all.length - 1; i >= 0; i--) {
-      const structural: boolean = !isInsideRanges(spans, all[i]) && !insideVerbatim(state, all[i]);
-      suffix[i] = suffix[i + 1] + (structural ? 1 : 0);
-    }
-    return suffix;
-  });
+): Int32Array => {
+  const cached = srcValueCached(state as StateBlock, key,
+    () => buildStructuralSuffix(state, all));
+  if (cached.all === all) {
+    return cached.suffix;
+  }
+  // Keyed by `(src, key)` but counted from `all`: a mismatched pair would read the wrong offsets.
+  // Recounting is correct but drops the cache, so a standing mismatch is worth a line.
+  warnDistinct('suffix-key-mismatch', '[list] structural suffix asked with a key from another array',
+    { size: all.length });
+  return buildStructuralSuffix(state, all).suffix;
+};
 
 // Structural (not text) offsets of `all` inside `[from, to)`, as a difference of two suffix counts.
-// Private: the suffix is cached under `key` but built from `all`, so only this module pairs the two.
 const structuralCountIn = (
   state: StateBlockLike,
   all: readonly number[],

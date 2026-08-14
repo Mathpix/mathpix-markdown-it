@@ -15,7 +15,10 @@ import {
   applyListCloseState,
   closeOpenListItemIfNeeded,
 } from "./latex-list-common";
-import { BEGIN_LIST_ENV_RE, MARKER_GAP_EM } from "../common/consts";
+import {
+  BEGIN_LIST_ENV_RE, MARKER_GAP_EM,
+  LIST_OPEN_TOKEN_TYPES, LIST_CLOSE_TOKEN_TYPES, LIST_STRUCTURE_TOKEN_TYPES,
+} from "../common/consts";
 import { tokenMarkerWidth } from "../common/display-width";
 
 /**
@@ -35,14 +38,10 @@ export const computeMarkerPadding = (markerTokens: Token[] | undefined): number 
   return em > 0 ? em + MARKER_GAP_EM : 0;
 };
 
-// A token that ends the loose run: it carries its own `<li>`, or it closes the list the run sits in.
-const LIST_STRUCTURE_TYPES: ReadonlySet<string> = new Set([
-  'latex_list_item_open', 'latex_list_item_close',
-  'itemize_list_open', 'enumerate_list_open',
-  'itemize_list_close', 'enumerate_list_close',
-]);
-export const LIST_OPEN_TYPES: ReadonlySet<string> = new Set(['itemize_list_open', 'enumerate_list_open']);
-export const LIST_CLOSE_TYPES: ReadonlySet<string> = new Set(['itemize_list_close', 'enumerate_list_close']);
+// Such a token ends the loose run: it carries its own `<li>`, or it closes the list the run sits in.
+const LIST_STRUCTURE_TYPES: ReadonlySet<string> = LIST_STRUCTURE_TOKEN_TYPES;
+export const LIST_OPEN_TYPES: ReadonlySet<string> = LIST_OPEN_TOKEN_TYPES;
+export const LIST_CLOSE_TYPES: ReadonlySet<string> = LIST_CLOSE_TOKEN_TYPES;
 
 /** Per list open, and copied onto its matching close: 0 needs no host, 1 sits in an `itemize`, 2 in an
  *  `enumerate`. A list is hosted when the container it opens in is a list rather than an item — reading
@@ -201,6 +200,7 @@ export const wrapLooseRun = (state: LooseRunState, from: number): void => {
     return;
   }
   // Without the constructor the run stays where it is: a loose child renders, a thrown rule does not.
+  // Silent by decision — a missing constructor is a caller error, not a document one; pinned by a test.
   if (typeof state.Token !== 'function') {
     return;
   }
@@ -525,7 +525,7 @@ export const processListChildToken = (
     ? state.prentLevel + 1
     : state.prentLevel;
   // 7. Open / close list environments
-  if (token.type === 'enumerate_list_open' || token.type === 'itemize_list_open') {
+  if (LIST_OPEN_TYPES.has(token.type)) {
     state.prentLevel++;
     // Seeded like the close branch checks it: an inline state built by a foreign rule may have none.
     if (!state.types) {
@@ -538,7 +538,7 @@ export const processListChildToken = (
     ctx.openTokens.push(token);
     ctx.allListTokens.push(token);
   } else {
-    if (token.type === 'enumerate_list_close' || token.type === 'itemize_list_close') {
+    if (LIST_CLOSE_TYPES.has(token.type)) {
       // Clamped like the block path: an unpaired close would make the level key negative.
       state.prentLevel = Math.max(0, state.prentLevel - 1);
       if (state.types && state.types.length > 0) {
