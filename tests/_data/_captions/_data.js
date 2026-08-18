@@ -138,4 +138,16 @@ module.exports = [
     latex: "\\begin{table}\n\\caption{a \\\\{b} c}\n\\begin{tabular}{l}a\\end{tabular}\n\\end{table}",
     html: "<div class=\"table\" number=\"1\">\n<div class=\"caption_table\">Table 1: a \\{b} c</div><div class=\"table_tabular\" style=\"text-align: center\">\n<div class=\"inline-tabular\"><table class=\"tabular\">\n<tbody>\n<tr style=\"border-top: none !important; border-bottom: none !important;\">\n<td style=\"text-align: left; border-left: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; \">a</td>\n</tr>\n</tbody>\n</table>\n</div></div>\n</div>"
   },
+  // A brace group inside the argument. On its own line the caption is read through `findEndMarker`,
+  // which pairs braces, so the whole argument arrives.
+  {
+    latex: "\\begin{figure}\n\\caption{c A{B} C}\n\\end{figure}",
+    html: "<div class=\"table\" number=\"1\">\n<div></div>\n<div class=\"caption_figure\">Figure 1: c A{B} C</div></div>"
+  },
+  // On the env's own line `captionLatex` and `InlineBlockBeginTable` read the argument by `[^}]*`,
+  // so it is cut at the first `}` and `C}` renders as text. Wrong by LaTeX, pinned as on 3.0.1.
+  {
+    latex: "\\begin{figure} \\caption{c A{B} C} \\end{figure}",
+    html: "<div class=\"table\" number=\"1\">C} <div class=\"caption_figure\">Figure 1: c A{B</div></div>"
+  },
 ];

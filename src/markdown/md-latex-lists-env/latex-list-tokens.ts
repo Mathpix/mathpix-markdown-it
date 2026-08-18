@@ -237,6 +237,22 @@ export const wrapLooseRun = (state: LooseRunState, from: number): void => {
   state.tokens.splice(end + 1, 0, close);
 };
 
+// Every run sitting at list level — after a list open or an item close — where `<ul>` admits only
+// `<li>`. Read from the tokens, not hooked to a rule: the item close belongs to whichever rule owns
+// the list. Deepest first, so the outer indices still hold; an empty run is a no-op in wrapLooseRun.
+export const wrapListLevelRuns = (state: LooseRunState, from: number): void => {
+  const starts: number[] = [];
+  for (let i = from; i < state.tokens.length; i++) {
+    const type: string = state.tokens[i].type;
+    if (LIST_OPEN_TYPES.has(type) || type === 'latex_list_item_close') {
+      starts.push(i + 1);
+    }
+  }
+  for (let i = starts.length - 1; i >= 0; i--) {
+    wrapLooseRun(state, starts[i]);
+  }
+};
+
 /**
  * Creates an opening list-item token (<li>) for block-style LaTeX list items.
  * Handles marker parsing, enumeration start values, nesting metadata,
@@ -429,6 +445,7 @@ export const ListOpen = (
         content: ''
       }, child, ctx);
     }
+    wrapListLevelRuns(state, looseFrom);
     wrapLooseRun(state, looseFrom);
     // Update context after processing children
     li = ctx.li;

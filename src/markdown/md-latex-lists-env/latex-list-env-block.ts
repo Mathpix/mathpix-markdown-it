@@ -90,7 +90,7 @@ export const ListsInternal = (
     state.line = nextLine;
     state.startLine = startLine;
     state.parentType = oldParentType;
-    state.level = state.prentLevel < 0 ? 0 : state.prentLevel;
+    state.level = state.prentLevel > 0 ? state.prentLevel : 0;
     return true;
   } else {
     nextLine += 1;
@@ -199,6 +199,9 @@ export const ListsInternal = (
       // The match came from the masked line, so it is never inside a code span — asking again here
       // parsed the whole line's spans per match.
       let { sB, sE } = splitInlineListEnv(tail, envMatch);
+      // Masking keeps length, so one cut fits both strings.
+      const cut: number = (envMatch.index ?? 0) + envMatch[0].length;
+      const maskedSE: string = maskedTail.slice(cut).trim();
       if (sB.length > 0) {
         // Any inline transition, not only one before a wrapper: appended to the item above, a marker
         // reached the block path in a chunk that already held a block env, where it printed as text.
@@ -232,7 +235,8 @@ export const ListsInternal = (
         if (iOpen <= 0) {
           // The tail may open a sibling list. Its closer must sit in the tail, or on a later line
           // ahead of any fence — an unclosed sibling aborts the rule and drops this finished list.
-          const tailEnv: { match: RegExpMatchArray; isEnd: boolean } | null = nextListEnvMatch(sE);
+          // Masked: an opener in a code span read as a sibling, and the next closer emitted a bare tag.
+          const tailEnv: { match: RegExpMatchArray; isEnd: boolean } | null = nextListEnvMatch(maskedSE);
           let siblingClosable: boolean = false;
           if (tailEnv && !tailEnv.isEnd) {
             // Count, do not just look: a tail opening two levels needs two closers. The count walks
@@ -288,11 +292,10 @@ export const ListsInternal = (
       }
       tail = sE;
       // A zero step would spin, so the walk ends rather than trust the pattern to advance.
-      const cut: number = (envMatch.index ?? 0) + envMatch[0].length;
       if (cut <= 0) {
         break;
       }
-      maskedTail = maskedTail.slice(cut).trim();
+      maskedTail = maskedSE;
       env = nextListEnvMatch(maskedTail);
     }
     if (sawListEnv) {
@@ -371,7 +374,7 @@ export const ListsInternal = (
   state.line = nextLine;
   state.startLine = startLine;
   state.parentType = oldParentType;
-  state.level = state.prentLevel < 0 ? 0 : state.prentLevel;
+  state.level = state.prentLevel > 0 ? state.prentLevel : 0;
   if (tokenStart) {
     tokenStart.map![1] = nextLine + renderStart;
   }

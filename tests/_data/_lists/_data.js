@@ -2413,6 +2413,29 @@ module.exports = [
     html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\">loose<ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li class=\"li_enumerate\">x</li></ol></li></ul>"
   },
   {
+    // A closer anywhere in the raw chunk dropped it whole, so the text vanished with no warning and
+    // an empty `<ul>` was left. The drop reads the masked text now.
+    name: "a chunk holding a closer in a code span keeps its text",
+    latex: "\\begin{itemize}\nkeep `\\end{itemize}` me \\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\">keep <code>\\end{itemize}</code> me</li></ul>"
+  },
+  {
+    name: "the same in an enumerate",
+    latex: "\\begin{enumerate}\nkeep `\\end{enumerate}` me \\end{enumerate}",
+    html: "<ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li class=\"li_enumerate not_number\" data-custom-marker=\"true\" data-marker-empty=\"true\" style=\"display: block\">keep <code>\\end{enumerate}</code> me</li></ol>"
+  },
+  {
+    name: "the same with the span holding the other list's closer",
+    latex: "\\begin{enumerate}\nkeep `\\end{itemize}` me \\end{enumerate}",
+    html: "<ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li class=\"li_enumerate not_number\" data-custom-marker=\"true\" data-marker-empty=\"true\" style=\"display: block\">keep <code>\\end{itemize}</code> me</li></ol>"
+  },
+  {
+    // The control the drop exists for: a chunk that is a closer and nothing else takes no `<li>`.
+    name: "a chunk that is only a closer is still dropped",
+    latex: "\\begin{itemize}\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"></ul>"
+  },
+  {
     // A closer past the last open list has nothing to close and stays text: it used to emit a bare
     // `</ul>`. The list below it is unaffected.
     name: "a second closer on the opening line stays text",
@@ -2530,6 +2553,21 @@ module.exports = [
     name: "\\renewcommand with an unclosed bracket, closer on its line",
     latex: "\\begin{itemize}\n\\item a\n\\renewcommand{\\x}[1{#1}\\end{itemize}\n\\end{enumerate}",
     html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a<br>\n</li></ul><div>\\end{enumerate}</div>\n"
+  },
+  {
+    name: "a nested list opened flush wraps its loose content in an <li>",
+    latex: "\\begin{enumerate}\\begin{itemize}```\n\\end{itemize}\n\\end{enumerate}",
+    html: "<ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li class=\"li_enumerate not_number\" data-custom-marker=\"true\" data-marker-empty=\"true\" style=\"display: block\"><ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\">```</li></ul></li></ol>"
+  },
+  {
+    name: "the same with plain text, not a fence",
+    latex: "\\begin{enumerate}\\begin{itemize}text\n\\end{itemize}\n\\end{enumerate}",
+    html: "<ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li class=\"li_enumerate not_number\" data-custom-marker=\"true\" data-marker-empty=\"true\" style=\"display: block\"><ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\">text</li></ul></li></ol>"
+  },
+  {
+    name: "an opener in a code span in the tail is not a sibling, and the closer after it emits no tag",
+    latex: "\\begin{enumerate}\n\\item[W] \\end{enumerate} `\\begin{itemize}` \\end{itemize}",
+    html: "<ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li class=\"li_enumerate not_number\" data-custom-marker=\"true\" style=\"display: block\"><span class=\"li_level\" data-custom-marker=\"true\">W</span></li></ol>"
   },
   {
     name: "a later paragraph holding a \\] leaves the list alone",

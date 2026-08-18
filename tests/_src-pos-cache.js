@@ -91,6 +91,23 @@ describe('src-pos-cache boundary search:', () => {
     }
     calls.should.equal(1);
   });
+  // The structural-suffix counts depend on the offsets array as well as on `src`; a stale slot must be
+  // rewritten, or every later ask pays the whole walk again.
+  it('a stale value is recomputed once and stored', () => {
+    const env = {};
+    const key = Symbol('stale');
+    let calls = 0;
+    const state = { src: 'a-b', env };
+    let owner = 'first';
+    const compute = () => { calls++; return { owner, n: calls }; };
+    srcValueCached(state, key, compute, (c) => c.owner === owner).n.should.equal(1);
+    owner = 'second';
+    srcValueCached(state, key, compute, (c) => c.owner === owner).n.should.equal(2);
+    for (let i = 0; i < 5; i++) {
+      srcValueCached(state, key, compute, (c) => c.owner === owner).n.should.equal(2);
+    }
+    calls.should.equal(2, 'the stale slot was not repaired');
+  });
   it('clearing an env that never held a bucket is a no-op', () => {
     clearSrcPosCaches({});
     clearSrcPosCaches(undefined);

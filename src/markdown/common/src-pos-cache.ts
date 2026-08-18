@@ -149,15 +149,26 @@ export const matchPositionsCached = (
 /**
  * Any value derived from `state.src`, cached on `state.env` under `key` — same contract as the sweeps
  * above: one entry per `src`, computed on first ask, so a caller asked per block pays once.
+ *
+ * `isFresh` is for a value that depends on more than `src`: false recomputes and rewrites the slot.
  */
 export const srcValueCached = <T>(
   state: SrcState,
   key: symbol,
   compute: (src: string) => T,
+  isFresh?: (cached: T) => boolean,
 ): T => {
   const bucket: Bucket<T> = bucketOf<T>(state, key);
   const cached: Slot<T> | null = recall(bucket, state.src);
-  return cached ? cached.value : remember(bucket, state.src, compute(state.src));
+  if (cached && (!isFresh || isFresh(cached.value))) {
+    return cached.value;
+  }
+  if (cached) {
+    // Rewritten in place: a recompute that skips the slot pays the full walk on every later ask.
+    cached.value = compute(state.src);
+    return cached.value;
+  }
+  return remember(bucket, state.src, compute(state.src));
 };
 
 /** How many of the ascending `positions` are at or after `minOffset` — binary search, no allocation. */

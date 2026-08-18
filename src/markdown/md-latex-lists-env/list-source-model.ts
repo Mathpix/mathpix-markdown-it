@@ -5,7 +5,6 @@ import { matchPositionsCached, countPositionsAtOrAfter, srcValueCached } from ".
 import { getInlineCodeListFromString } from "../common";
 import { LATEX_ITEM_MARKER_G } from "../common/consts";
 import { findVerbatimRanges, isInsideRanges } from "../common/verbatim-ranges";
-import { warnDistinct } from "../common/warn-distinct";
 import {
   BEGIN_LIST_ENV_INLINE_RE,
   END_LIST_ENV_INLINE_RE,
@@ -287,22 +286,16 @@ const buildStructuralSuffix = (
   return { all, suffix };
 };
 
+// Keyed by `(src, key)` but counted from `all`: the counts only apply to the array they were built
+// from, so a slot holding another one is recounted and rewritten, not read.
 const structuralSuffix = (
   state: StateBlockLike,
   all: readonly number[],
   key: symbol,
-): Int32Array => {
-  const cached = srcValueCached(state as StateBlock, key,
-    () => buildStructuralSuffix(state, all));
-  if (cached.all === all) {
-    return cached.suffix;
-  }
-  // Keyed by `(src, key)` but counted from `all`: a mismatched pair would read the wrong offsets.
-  // Recounting is correct but drops the cache, so a standing mismatch is worth a line.
-  warnDistinct('suffix-key-mismatch', '[list] structural suffix asked with a key from another array',
-    { size: all.length });
-  return buildStructuralSuffix(state, all).suffix;
-};
+): Int32Array =>
+  srcValueCached(state as StateBlock, key,
+    () => buildStructuralSuffix(state, all),
+    (cached) => cached.all === all).suffix;
 
 // Structural (not text) offsets of `all` inside `[from, to)`, as a difference of two suffix counts.
 const structuralCountIn = (

@@ -4,6 +4,7 @@ import type Token from 'markdown-it/lib/token';
 import {
   setTokenListItemOpenBlock,
   wrapLooseRun,
+  wrapListLevelRuns,
   processListChildToken,
   computeMarkerPadding
 } from "./latex-list-tokens";
@@ -17,6 +18,7 @@ import {
   LATEX_BLOCK_ENV_OPEN_RE,
 } from "../common/consts";
 import { getCurrentListLevelState } from "./list-state";
+import { maskNonStructure } from "./list-source-model";
 import { ListItemsResult, ParsedListItem, ListInlineContext } from "./latex-list-types";
 
 /**
@@ -98,6 +100,7 @@ export const ListItems = (
     }
     // Parse inline children
     let inlineChildren = [];
+    const chunkFrom: number = state.tokens.length;
     state.md.inline.parse(listItem.content.trim(), state.md, state.env, inlineChildren);
     // Context shared across child token processing
     const ctx: ListInlineContext = { li, iOpen, itemizeLevelTokens, enumerateLevelTypes, itemizeLevelContents, openTokens, allListTokens };
@@ -105,6 +108,7 @@ export const ListItems = (
     for (const child of inlineChildren) {
       processListChildToken(state, listItem, child, ctx);
     }
+    wrapListLevelRuns(state, chunkFrom);
     if (looseFrom >= 0) {
       wrapLooseRun(state, looseFrom);
     }
@@ -201,9 +205,9 @@ export const ItemsAddToPrev = (
     items[lastIndex].endLine = nextLine;
     return items;
   }
-  // No previous items: optionally create a new item,
-  // but skip pure inline end-of-list commands.
-  if (!END_LIST_ENV_INLINE_RE.test(lineText)) {
+  // No previous items: optionally create a new item, but skip a chunk that is only end-of-list
+  // commands. Anything else in it is text — dropping the chunk for the closer beside it lost that.
+  if (!END_LIST_ENV_INLINE_RE.test(maskNonStructure(lineText))) {
     ItemsListPush(items, lineText, nextLine, nextLine);
   }
   return items;

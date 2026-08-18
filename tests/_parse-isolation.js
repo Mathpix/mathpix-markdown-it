@@ -10,7 +10,9 @@ const {
   restoreListLevels,
   getOpenListCount,
   getListDepth,
+  resetListState,
 } = require('../lib/markdown/md-latex-lists-env/list-state');
+const { applyListOpenState } = require('../lib/markdown/md-latex-lists-env/latex-list-common');
 const { resetWarnDistinct, warnDistinct } = require('../lib/markdown/common/warn-distinct');
 const listEnvEngine = require('../lib/markdown/md-latex-lists-env/latex-list-env-engine');
 const {
@@ -1063,26 +1065,46 @@ describe('a reused env does not grow across renders', () => {
   const md = markdownIt({ html: true }).use(mathpixMarkdownPlugin, { outMath: { include_svg: false } });
   const list = (n) => '\\begin{itemize}\n\\item item ' + n + '\n\\end{itemize}\n\nPara ' + n
     + '\\footnote{n' + n + '}\n\n\\begin{itemize}\n\\item unclosed ' + n + '\n';
-  it('the key count settles and the last render is no slower than the second', () => {
-    const env = {};
+  const quiet = (fn) => {
     const warn = console.warn;
     console.warn = () => {};
-    md.render(list(0), env);
-    md.render(list(1), env);
-    const settled = Object.keys(env).length;
-    const early = Date.now();
-    md.render(list(2), env);
-    const earlyMs = Date.now() - early;
-    for (let i = 3; i < 50; i++) {
-      md.render(list(i), env);
+    try { return fn(); } finally { console.warn = warn; }
+  };
+  const median = (run, times) => {
+    const ms = [];
+    for (let i = 0; i < times; i++) {
+      const started = Date.now();
+      run(i);
+      ms.push(Date.now() - started);
     }
-    const late = Date.now();
-    md.render(list(50), env);
-    const lateMs = Date.now() - late;
-    console.warn = warn;
-    Object.keys(env).length.should.equal(settled, 'env grew: ' + Object.keys(env).sort().join(','));
-    (lateMs <= Math.max(4, earlyMs * 1.5))
-      .should.equal(true, 'the 51st render cost ' + lateMs + 'ms against ' + earlyMs + 'ms for the 3rd');
+    return ms.sort((a, b) => a - b)[ms.length >> 1];
+  };
+  it('the key count settles', () => {
+    const env = {};
+    quiet(() => {
+      md.render(list(0), env);
+      md.render(list(1), env);
+      const settled = Object.keys(env).length;
+      for (let i = 2; i < 50; i++) {
+        md.render(list(i), env);
+      }
+      Object.keys(env).length.should.equal(settled, 'env grew: ' + Object.keys(env).sort().join(','));
+    });
+  });
+  // A median of five each side and a wide margin: one GC pause must read as load, not as a regression.
+  it('the last render is no slower than the second', function () {
+    this.retries(2);
+    const env = {};
+    quiet(() => {
+      md.render(list(0), env);
+      const earlyMs = median((i) => md.render(list(1 + i), env), 5);
+      for (let i = 6; i < 50; i++) {
+        md.render(list(i), env);
+      }
+      const lateMs = median((i) => md.render(list(50 + i), env), 5);
+      (lateMs <= Math.max(20, earlyMs * 2))
+        .should.equal(true, 'the late renders cost ' + lateMs + 'ms against ' + earlyMs + 'ms early on');
+    });
   });
 });
 
@@ -1189,5 +1211,22 @@ describe('the marker-parse flag does not survive a render:', () => {
     resetListState();
     MM.markdownToHTML('\\begin{itemize}\n\\item a\n\\end{itemize}', { outMath: { include_svg: false } })
       .should.include('<li', 'the inline list rules stayed off');
+  });
+});
+
+// No document reaches this: `prentLevel` is this lib's own field and every state that opens a list
+// through the rules carries it. It guards the exported helpers against a state built elsewhere.
+describe('a state without prentLevel does not turn the depth into NaN:', () => {
+  const stub = () => ({ attrSet() {}, attrJoin() {}, meta: {} });
+  afterEach(() => resetListState());
+  it('an open inside a list starts from zero instead of NaN', () => {
+    const state = { parentType: 'itemize', types: ['itemize'], env: {}, push: stub };
+    applyListOpenState(state, 'itemize', stub());
+    state.prentLevel.should.equal(1, 'the depth came out ' + state.prentLevel);
+  });
+  it('a top-level open is unaffected', () => {
+    const state = { parentType: 'root', types: [], env: {}, push: stub };
+    applyListOpenState(state, 'itemize', stub());
+    state.prentLevel.should.equal(0);
   });
 });

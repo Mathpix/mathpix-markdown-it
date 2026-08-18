@@ -25,8 +25,10 @@ export declare const matchPositionsCached: (state: SrcState, key: symbol, patter
 /**
  * Any value derived from `state.src`, cached on `state.env` under `key` — same contract as the sweeps
  * above: one entry per `src`, computed on first ask, so a caller asked per block pays once.
+ *
+ * `isFresh` is for a value that depends on more than `src`: false recomputes and rewrites the slot.
  */
-export declare const srcValueCached: <T>(state: SrcState, key: symbol, compute: (src: string) => T) => T;
+export declare const srcValueCached: <T>(state: SrcState, key: symbol, compute: (src: string) => T, isFresh?: (cached: T) => boolean) => T;
 /** How many of the ascending `positions` are at or after `minOffset` — binary search, no allocation. */
 export declare const countPositionsAtOrAfter: (positions: readonly number[], minOffset: number) => number;
 export {};

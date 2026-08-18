@@ -36,7 +36,8 @@ export const applyListOpenState = (
   const inheritedListType: string | undefined = (state as any).env?.inheritedListType;
   const isInheritedListContext: boolean = inheritedListType === "itemize" || inheritedListType === "enumerate";
   const isTopLevelList: boolean = isTopLevel && !isInheritedListContext;
-  state.prentLevel = isTopLevel ? 0 : state.prentLevel + 1;
+  // `?? 0`: without the field this reads NaN, and the rule copies that back to the real state.
+  state.prentLevel = isTopLevel ? 0 : (state.prentLevel ?? 0) + 1;
   state.parentType = listType;
   state.types = state.types?.length
     ? [...state.types, listType]

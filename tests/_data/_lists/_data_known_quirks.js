@@ -90,4 +90,11 @@ module.exports = [
     latex: "text \\begin{enumerate}\\item a\\setcounter{enumi}{7}\\end{enumerate} tail",
     html: "<div>text <ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li class=\"li_enumerate\">a\\setcounter{enumi}{7}</li></ol> tail</div>\n"
   },
+  {
+    // The unclosed `\caption{c` leaves a `}` that lands after its item close, so it sits in the `<ul>`.
+    // `master` builds no list here at all.
+    name: "a brace left over by an unclosed caption sits in the list",
+    latex: "\\begin{figure} \\begin{itemize}\n\\renewcommand{\\labelitemi}{\\begin{itemize}}\\renewcommand{\\labelitemi}{\\begin{itemize}}\n\\caption{c\n\\renewcommand*{\\x}{\\end{itemize}} \\end{itemize}",
+    html: "<div>\\begin{figure} <ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\"><br>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\">}<br>\n{</li></ul></li>}</ul></div>\n"
+  },
 ];
