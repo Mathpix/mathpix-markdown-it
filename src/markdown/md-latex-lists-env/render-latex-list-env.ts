@@ -40,6 +40,15 @@ export const resetListRenderDepth = (): void => {
   renderEpoch++;
 };
 
+// A lone surrogate makes `encodeURI` throw, and that took the whole document down.
+const encodedMarker = (content: string): string => {
+  try {
+    return encodeURI(content ?? '');
+  } catch (e) {
+    return '';
+  }
+};
+
 // The host flag both list rules read, paired once per token array. Derived from the array rather than
 // carried between calls, so an unbalanced slice has no opener to pair with and its close stays bare.
 // Keyed by array identity, render epoch, and length plus the two end types. Reordering one in place
@@ -195,9 +204,9 @@ export const render_itemize_list_open: Renderer.RenderRule = (
         let markerInfo = isTextMarkerTokens(itemizeLevelTokens[levelIndex], slf, options, env);
         dataAttr += ` data-custom-marker-type="${markerInfo.markerType}"`;
         if (markerInfo.markerType === 'text') {
-          dataAttr += ` data-custom-marker-content="${encodeURI(markerInfo.textContent)}"`;
+          dataAttr += ` data-custom-marker-content="${encodedMarker(markerInfo.textContent)}"`;
         } else {
-          dataAttr += ` data-custom-marker-content="${encodeURI(itemizeLevelContents[levelIndex])}"`;
+          dataAttr += ` data-custom-marker-content="${encodedMarker(itemizeLevelContents[levelIndex])}"`;
         }
       }
     }
@@ -412,7 +421,7 @@ const buildCustomMarkerInfo = (token, options, slf, env): MarkerInfo => {
     const content = data.markerType === 'text'
       ? data.textContent
       : token.marker;
-    dataAttrs.push(`data-custom-marker-content="${encodeURI(content)}"`);
+    dataAttrs.push(`data-custom-marker-content="${encodedMarker(content)}"`);
   }
   const dataAttr: string = dataAttrs.length ? ' ' + dataAttrs.join(' ') : '';
   return { htmlMarker, dataAttr };
@@ -440,7 +449,7 @@ const buildItemizeMarkerInfo = (token, options, env, slf, level_itemize: number)
       if (data.markerType === 'math') {
         const itemizeLevel = GetItemizeLevel(token.itemizeLevelContents);
         if (itemizeLevel.length >= level_itemize) {
-          dataAttr += ` data-custom-marker-content="${encodeURI(itemizeLevel[level_itemize - 1])}"`;
+          dataAttr += ` data-custom-marker-content="${encodedMarker(itemizeLevel[level_itemize - 1])}"`;
         }
         dataAttr += ' data-custom-marker="true"';
         dataAttr += ` data-custom-marker-type="${data.markerType}"`;

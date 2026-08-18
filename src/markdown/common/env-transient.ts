@@ -9,7 +9,8 @@ export const LIST_TRANSIENT_ENV_KEYS: readonly string[] = ['isBlock', 'inherited
 
 // A discarded parse rolls back every own string key of `env`, the caption counters and the level stack.
 // The four keys above go back on every exit, commit included. Marker registries, TOC slugs, theorem and
-// section counters, labels, footnotes and warn dedup are not rolled back — their rules reset per render.
+// section counters, labels, footnotes and warn dedup are not rolled back. Their per-render reset is no
+// guard: a probe runs inside the render, so a `\section` it reaches counts twice — `1.` becomes `3.`.
 
 // Pool slots kept warm across parses; deeper ones are released.
 const MAX_WARM_SNAPSHOTS = 8;

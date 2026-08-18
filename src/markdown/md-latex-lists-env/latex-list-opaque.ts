@@ -153,20 +153,17 @@ const handleLstEndInline = (
   const endToken: string = lineText.slice(endIndex, endIndex + me.length);
   const beforeEnd: string = lineText.slice(0, endIndex);
   const afterEnd: string = lineText.slice(endIndex + me.length);
-  // Append code continuation
   if (beforeEnd.length > 0) {
+    // `lstlisting` keeps its own line breaks, `tabular` does not.
     const glue = top === "lstlisting" ? "\n" : "";
     items = ItemsAddToPrev(items, beforeEnd + glue + endToken, nextLine);
   } else {
     items = ItemsAddToPrev(items, endToken, nextLine);
   }
-  // pop matching env
   stack = stack.slice(0, -1);
-  // If nothing meaningful after end tag, consume line
   if (!afterEnd?.trim()?.length) {
     return { handled: true, stack, items, lineText: "" };
   }
-  // return remainder to be parsed normally
   return { handled: false, stack, items, lineText: afterEnd };
 };
 

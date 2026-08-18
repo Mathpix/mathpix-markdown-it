@@ -14,7 +14,7 @@ import {
 } from "./latex-list-types";
 import { parseSetCounterNumber } from "./latex-list-common";
 import { renewCommandSpanEnd } from "../common";
-import { snapshotListLevels, restoreListLevels, type ListLevelState } from "./list-state";
+import { snapshotListLevels, restoreListLevels, getOpenListCount, type ListLevelState } from "./list-state";
 import { getCaptionCounters, setCaptionCounters } from "../common/caption-counters";
 import { countPositionsAtOrAfter } from "../common/src-pos-cache";
 import { FenceMarker, detectFenceOpen, isFenceClose } from "../common/verbatim-ranges";
@@ -223,7 +223,11 @@ export const ListsInternal = (
           itemizeLevelContents,
           openTokens, allListTokens
         ));
-        setTokenCloseList(state, startLine + renderStart, lineIdx + renderStart, closingList);
+        // Asked after the parse, and of the level stack rather than of the handle above: an inline
+        // `\end` in the body closes the list there, and a second tag for it reaches the page.
+        if (getOpenListCount() > 0) {
+          setTokenCloseList(state, startLine + renderStart, lineIdx + renderStart, closingList);
+        }
         if (closingList && openTokens[openTokens.length - 1] === closingList) {
           // The line it closed on, so its `map` spans what it holds rather than a single line.
           if (closingList.map) {

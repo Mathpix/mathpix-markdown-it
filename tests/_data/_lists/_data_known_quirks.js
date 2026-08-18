@@ -91,6 +91,13 @@ module.exports = [
     html: "<div>text <ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li class=\"li_enumerate\">a\\setcounter{enumi}{7}</li></ol> tail</div>\n"
   },
   {
+    // `\caption` takes the closer into its argument and renders nothing here, so `\caption{c` is lost.
+    // `master` keeps it: it builds the list without requiring a reachable closer.
+    name: "a caption swallowing the only closer loses its own text",
+    latex: "\\begin{itemize} \\itemsep 1pt \\caption{c \\end{itemize} d}",
+    html: "<div>\\begin{itemize} \\itemsep 1pt  d}</div>\n"
+  },
+  {
     // The unclosed `\caption{c` leaves a `}` that lands after its item close, so it sits in the `<ul>`.
     // `master` builds no list here at all.
     name: "a brace left over by an unclosed caption sits in the list",

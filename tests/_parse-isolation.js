@@ -576,9 +576,8 @@ describe('a failing list rule does not fail the document', () => {
   // The marker parse mutates `md.options` for `forDocx`; a throw there would leave the mutated `outMath`
   // on the instance for every later render, so the restore sits in a `finally`.
   // Marker tokens parsed from one macro are shared by every list of that parse — deliberate, since
-  // cloning per read measured 12–29% slower. What must hold is the boundary: a render rule writing to
-  // such a token restamps that parse and nothing after it, because the bucket goes with the parse.
-  it('marker tokens are shared inside one parse and rebuilt for the next', () => {
+  // cloning per read measured 12–29% slower. They are frozen, so the sharing cannot carry a write.
+  it('marker tokens are shared inside one parse and refuse a write', () => {
     const md = markdownIt({ html: true }).use(mathpixMarkdownPlugin, {});
     const src = '\\renewcommand{\\labelitemi}{$x$}\n\n\\begin{itemize}\n\\item a\n\\end{itemize}\n\n'
       + '\\begin{itemize}\n\\item b\n\\end{itemize}';
@@ -589,7 +588,9 @@ describe('a failing list rule does not fail the document', () => {
     const first = markersOf(env);
     first.should.have.lengthOf(2);
     first[0].should.equal(first[1], 'both lists take the marker from one macro');
-    first[0].attrSet('data-probe', '1');
+    Object.isFrozen(first[0]).should.equal(true, 'a cached marker token is writable');
+    // Strict mode throws on the write, sloppy swallows it; neither may leave a mark.
+    try { first[0].attrSet('data-probe', '1'); } catch (e) { /* strict-mode caller */ }
     const again = markersOf(env);
     (again[0].attrGet('data-probe') === null).should.equal(true, 'the write outlived its parse');
     const fresh = markersOf({});
@@ -1182,6 +1183,35 @@ describe('the host-flag cache does not answer across renders:', () => {
     } finally {
       console.warn = warn;
     }
+  });
+});
+
+// The level stack and the per-parse token registry answer "is a list open?" separately, and
+// leaveListLevel reports when they disagree. It only warns, so without this the disagreement — and
+// the unpaired `</ul>` it produced — reaches a consumer with nothing failing.
+describe('the two accounts of an open list agree on every fixture:', () => {
+  const shapes = require('./_data/_lists/_data').map((t) => t.latex)
+    .concat(require('./_data/_lists/_data_known_quirks').map((t) => t.latex));
+  it('no fixture reports leaving a list level while outside any list', () => {
+    const warn = console.warn;
+    const offenders = [];
+    shapes.forEach((latex) => {
+      let seen = false;
+      console.warn = (...args) => {
+        if (/leaving a list level/.test(args.join(' '))) {
+          seen = true;
+        }
+      };
+      try {
+        MM.markdownToHTML(latex, { cwidth: 800, htmlTags: true });
+      } finally {
+        console.warn = warn;
+      }
+      if (seen) {
+        offenders.push(latex);
+      }
+    });
+    offenders.length.should.equal(0, offenders.slice(0, 2).map((s) => JSON.stringify(s)).join('\n'));
   });
 });
 

@@ -1213,6 +1213,32 @@ module.exports = [
     csv: 'i.png',
     csvQuoteAllFields: '"i.png"'
   },
+  // Content before the first `\item` exports as its own line; 3.0.1 dropped it. The last one is the
+  // control: nothing before the first `\item`, unchanged.
+  {
+    latex: '\\begin{tabular}{|l|}\\begin{itemize} loose \\item a\\end{itemize}\\end{tabular}',
+    tsv: '" loose \n • a"',
+    csv: '" loose \n • a"',
+    csvQuoteAllFields: '" loose \n • a"'
+  },
+  {
+    latex: '\\begin{tabular}{|l|}\\begin{itemize}\\itemsep 2pt \\item a\\end{itemize}\\end{tabular}',
+    tsv: '"\\itemsep 2pt \n • a"',
+    csv: '"\\itemsep 2pt \n • a"',
+    csvQuoteAllFields: '"\\itemsep 2pt \n • a"'
+  },
+  {
+    latex: '\\begin{tabular}{|l|}\\begin{enumerate} intro \\item a\\end{enumerate}\\end{tabular}',
+    tsv: '" intro \n 1. a"',
+    csv: '" intro \n 1. a"',
+    csvQuoteAllFields: '" intro \n 1. a"'
+  },
+  {
+    latex: '\\begin{tabular}{|l|}\\begin{itemize}\\item a\\item b\\end{itemize}\\end{tabular}',
+    tsv: '" • a\n • b"',
+    csv: '" • a\n • b"',
+    csvQuoteAllFields: '" • a\n • b"'
+  }
   // {
   //   latex: '',
   //   tsv: '',

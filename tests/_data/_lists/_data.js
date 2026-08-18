@@ -2565,6 +2565,18 @@ module.exports = [
     html: "<ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li class=\"li_enumerate not_number\" data-custom-marker=\"true\" data-marker-empty=\"true\" style=\"display: block\"><ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\">text</li></ul></li></ol>"
   },
   {
+    // `encodeURI` throws on a lone surrogate, and the throw used to take the whole render with it.
+    name: "a lone surrogate in a marker empties its docx attribute, not the document",
+    options: { forDocx: true },
+    latex: "\\begin{itemize}\n\\item[x\ud800y] a\n\\item[ok] b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" data-custom-marker-type=\"text\" data-custom-marker-content=\"%E2%80%A2\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-custom-marker-type=\"text\" data-custom-marker-content=\"\"><span class=\"li_level\" data-custom-marker=\"true\" data-custom-marker-type=\"text\" data-custom-marker-content=\"\">x\ud800y</span>a</li><li class=\"li_itemize\" data-custom-marker=\"true\" data-custom-marker-type=\"text\" data-custom-marker-content=\"ok\"><span class=\"li_level\" data-custom-marker=\"true\" data-custom-marker-type=\"text\" data-custom-marker-content=\"ok\">ok</span>b</li></ul>"
+  },
+  {
+    name: "a list closed by an inline \\end in the body gets no second closing tag",
+    latex: "\\begin{itemize}\n\\caption{c\n\\renewcommand{\\x}{\\end{itemize}}\n\\caption{\\end{itemize}}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\">{</li></ul>}<br>\n\\caption{"
+  },
+  {
     name: "an opener in a code span in the tail is not a sibling, and the closer after it emits no tag",
     latex: "\\begin{enumerate}\n\\item[W] \\end{enumerate} `\\begin{itemize}` \\end{itemize}",
     html: "<ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li class=\"li_enumerate not_number\" data-custom-marker=\"true\" style=\"display: block\"><span class=\"li_level\" data-custom-marker=\"true\">W</span></li></ol>"

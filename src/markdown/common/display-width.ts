@@ -17,7 +17,18 @@ const isZeroWidthChar = (cp: number): boolean =>
   (cp >= 0x20D0 && cp <= 0x20F0) ||   // ... for Symbols
   (cp >= 0xFE00 && cp <= 0xFE0F) ||   // Variation Selectors
   (cp >= 0xFE20 && cp <= 0xFE2F) ||   // Combining Half Marks (Vertical Forms sit between: wide)
-  cp === 0x3099 || cp === 0x309A;     // Katakana voiced marks (inside the wide range below)
+  cp === 0x3099 || cp === 0x309A ||   // Katakana voiced marks (inside the wide range below)
+  // Marks sitting on the base letter, and two format characters: each reserved 0.90em before.
+  cp === 0x00AD || cp === 0xFEFF ||   // soft hyphen, BOM
+  (cp >= 0x0591 && cp <= 0x05BD) || cp === 0x05BF ||                       // Hebrew points
+  (cp >= 0x05C1 && cp <= 0x05C2) || (cp >= 0x05C4 && cp <= 0x05C5) || cp === 0x05C7 ||
+  (cp >= 0x0610 && cp <= 0x061A) || (cp >= 0x064B && cp <= 0x065F) ||      // Arabic marks
+  cp === 0x0670 || (cp >= 0x06D6 && cp <= 0x06DC) || (cp >= 0x06DF && cp <= 0x06E4) ||
+  (cp >= 0x06E7 && cp <= 0x06E8) || (cp >= 0x06EA && cp <= 0x06ED) ||
+  (cp >= 0x0900 && cp <= 0x0902) || cp === 0x093A || cp === 0x093C ||      // Devanagari marks
+  (cp >= 0x0941 && cp <= 0x0948) || (cp >= 0x094D && cp <= 0x094D) ||
+  (cp >= 0x0951 && cp <= 0x0957) ||
+  cp === 0x0E31 || (cp >= 0x0E34 && cp <= 0x0E3A) || (cp >= 0x0E47 && cp <= 0x0E4E); // Thai marks
 
 // Minimal shape tokenMarkerWidth reads (a subset of markdown-it's Token).
 interface WidthToken {

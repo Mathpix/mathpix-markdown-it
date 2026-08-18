@@ -93,6 +93,36 @@ const markerBucket = (state: StateBlock | StateInline): Map<string, Token[]> => 
   return byMacro;
 };
 
+// The token and what hangs off it: `attrSet` pushes into an existing `attrs`, so freezing the token
+// alone still let a link or an `\includegraphics` marker carry a write into the next list.
+const freezeMarkerToken = (token: Token): void => {
+  if (token.attrs) {
+    token.attrs.forEach((attr) => Object.freeze(attr));
+    Object.freeze(token.attrs);
+  }
+  if (token.children) {
+    token.children.forEach(freezeMarkerToken);
+    Object.freeze(token.children);
+  }
+  Object.freeze(token);
+};
+
+// Read back from the cache: a render rule pushes attrs onto a link or an image marker, so those come
+// out as a copy with their own arrays. A plain text or math marker carries neither and is shared.
+const readableMarker = (token: Token): Token => {
+  if (!token.attrs && !token.children) {
+    return token;
+  }
+  const copy: Token = Object.assign(Object.create(Object.getPrototypeOf(token)), token);
+  if (token.attrs) {
+    copy.attrs = token.attrs.map((attr) => attr.slice() as [string, string]);
+  }
+  if (token.children) {
+    copy.children = token.children.map(readableMarker);
+  }
+  return copy;
+};
+
 const parseMarkerTokens = (
   state: StateBlock | StateInline,
   level: string,
@@ -102,9 +132,8 @@ const parseMarkerTokens = (
     cacheable && state.env ? markerBucket(state) : null;
   const cached: Token[] | undefined = bucket?.get(level);
   if (cached) {
-    // The array is copied, the tokens are not: cloning them per open measured 12–29% slower on
-    // list-heavy input, so a render rule that writes into one still reaches every later list.
-    return cached.slice();
+    // Cloning every token per open measured 12–29% slower, so only the ones a rule writes to are.
+    return cached.map(readableMarker);
   }
   const children: Token[] = [];
   beginMarkerParse();
@@ -113,7 +142,13 @@ const parseMarkerTokens = (
   } finally {
     endMarkerParse();
   }
-  bucket?.set(level, children);
+  if (bucket) {
+    // Only what is cached: a write into a shared token reached every later list with the same marker.
+    children.forEach(freezeMarkerToken);
+    bucket.set(level, children);
+    // Read back as any other list: the first must not get the frozen originals.
+    return children.map(readableMarker);
+  }
   return children;
 };
 

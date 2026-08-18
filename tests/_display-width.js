@@ -72,6 +72,17 @@ describe('display-width: textReserveEm (per-glyph-class em)', () => {
       textReserveEm(ch).should.equal(0));
     textReserveEm('e\u0301').should.be.closeTo(textReserveEm('e'), 1e-9);
   });
+  // The marks of these scripts sit on the base letter, so a vowelled word measures as the bare one.
+  it('marks outside Latin reserve nothing either (Hebrew, Arabic, Devanagari, Thai)', () => {
+    ['\u05b0', '\u05c7', '\u064b', '\u0670', '\u0902', '\u094d', '\u0e31', '\u0e48']
+      .forEach((ch) => textReserveEm(ch).should.equal(0));
+    textReserveEm('\u05d0\u05b0').should.be.closeTo(textReserveEm('\u05d0'), 1e-9);
+    textReserveEm('\u0627\u064b').should.be.closeTo(textReserveEm('\u0627'), 1e-9);
+  });
+  it('a soft hyphen and a BOM reserve nothing', () => {
+    textReserveEm('\u00ad').should.equal(0);
+    textReserveEm('\ufeff').should.equal(0);
+  });
   it('caseless non-ASCII lands in the wide class (\u2014 \u2116)', () => {
     // Pins the approximation, not exactness: these two are 1.00/1.07em in Arial, so a marker
     // made only of them under-reserves by \u22640.2em \u2014 see the width-model Non-Goal.

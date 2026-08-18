@@ -434,9 +434,8 @@ describe('An unclosed wrapper env leaves the list rendering:', () => {
     });
   });
   // Marker tokens are shared between the lists of one render — cloning them per open measured 12–29%
-  // slower on list-heavy input. So the write is pinned where it lands, and where it must not: the
-  // bucket is dropped per render, or a host reusing one `env` would carry it into the next document.
-  it('a write into a marker token stays inside the render that made it', () => {
+  // slower. Frozen instead, so a consumer's write reaches no list at all rather than every later one.
+  it('a write into a marker token reaches no list', () => {
     const list = '\\begin{itemize}\n\\item a\n\\end{itemize}';
     const md = markdownIt({ html: true }).use(mathpixMarkdownPlugin, { outMath: { include_svg: false } });
     const base = md.renderer.rules.text;
@@ -451,8 +450,8 @@ describe('An unclosed wrapper env leaves the list rendering:', () => {
     const env = {};
     const inside = markers(md.render([list, list, list].join('\n\n'), env));
     inside.should.have.length(3);
-    inside.every((m) => /STAMPED/.test(m))
-      .should.equal(true, 'the tokens are no longer shared — the clone cost belongs in the spec, not here');
+    inside.some((m) => /STAMPED/.test(m))
+      .should.equal(false, 'a write into a frozen marker token reached a list');
     markers(md.render(list, env)).should.deep.equal(['<span class="li_level">•</span>'],
       'the write survived into the next render through the same env');
   });
@@ -560,10 +559,21 @@ describe('Cached marker tokens follow \\renewcommand:', () => {
     marker(withMathml.render(src, shared)).should.equal(aloneMathml);
     marker(plain.render(src, shared)).should.equal(alonePlain);
   });
-  // The array is copied per list, the tokens are not — cloning them measured 12–29% slower on
-  // list-heavy input. So a rule that writes into a marker token reaches every later list: pinned here
-  // because nothing stops it, and a consumer plugin has to treat those tokens as read-only.
-  it('the tokens are shared between lists, so writing into one reaches the next', () => {
+  // `link_open` pushes `target`/`style` on every render, so a shared token collected them per list:
+  // the second `<a>` carried each twice, the third three times. Such a token is handed out as a copy.
+  it('a marker a render rule writes to is copied, so its attributes do not pile up', () => {
+    const list = '\\begin{itemize}\n\\item x\n\\end{itemize}';
+    const src = '\\renewcommand{\\labelitemi}{[a](http://u)}\n\n' + [list, list, list].join('\n\n');
+    const html = MM.markdownToHTML(src, { outMath: { include_svg: false } });
+    const anchors = [...html.matchAll(/<a [^>]*>/g)].map((a) => a[0]);
+    anchors.should.have.lengthOf(3);
+    anchors.forEach((a, i) => {
+      (a.match(/target=/g) || []).should.have.lengthOf(1, 'attributes piled up on marker ' + (i + 1));
+    });
+  });
+  // The array is copied per list, the tokens are not — cloning them measured 12–29% slower. They are
+  // frozen, so a write into one changes neither this list nor the next.
+  it('the tokens are shared between lists, and frozen against a write', () => {
     const md = markdownIt({ html: true }).use(mathpixMarkdownPlugin, { outMath: { include_svg: false } });
     const src = '\\renewcommand{\\labelitemi}{Q}\n\n\\begin{itemize}\n\\item a\n\\end{itemize}\n\n'
       + '\\begin{itemize}\n\\item b\n\\end{itemize}';
@@ -572,10 +582,12 @@ describe('Cached marker tokens follow \\renewcommand:', () => {
     opens.should.have.lengthOf(2);
     opens[0].itemizeLevel[0].should.not.equal(opens[1].itemizeLevel[0], 'the array is meant to be copied');
     opens[0].itemizeLevel[0][0].should.equal(opens[1].itemizeLevel[0][0]);
-    opens[0].itemizeLevel[0][0].content = 'ZZZ';
+    Object.isFrozen(opens[0].itemizeLevel[0][0]).should.equal(true, 'a cached marker token is writable');
+    // Sloppy mode swallows the write, strict throws — either way it must not reach the output.
+    try { opens[0].itemizeLevel[0][0].content = 'ZZZ'; } catch (e) { /* strict-mode caller */ }
     [...md.renderer.render(tokens, md.options, {})
       .matchAll(/<span class="li_level"[^>]*>([^<]*)<\/span>/g)].map((m) => m[1])
-      .should.deep.equal(['ZZZ', 'ZZZ']);
+      .should.deep.equal(['Q', 'Q']);
   });
 });
 

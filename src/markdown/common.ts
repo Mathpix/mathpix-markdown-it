@@ -11,6 +11,10 @@ const hasProp = Object.prototype.hasOwnProperty;
 
 export const tocRegexp = /^\[\[toc\]\]/im;
 
+// A control word's name: ASCII letters only, as TeX reads it.
+const isAsciiLetter = (code: number): boolean =>
+  (code >= 0x41 && code <= 0x5A) || (code >= 0x61 && code <= 0x7A);
+
 export const isSpace = (code) => {
     switch (code) {
         case 0x09:
@@ -223,7 +227,7 @@ export const renewCommandSpanEnd = (text: string): number => {
     // `\renewcommand\labelitemii{Q}`: the first argument may be a bare command name.
     if (arg === 0 && text[pos] === '\\') {
       pos++;
-      while (pos < text.length && /[a-zA-Z]/.test(text[pos])) {
+      while (pos < text.length && isAsciiLetter(text.charCodeAt(pos))) {
         pos++;
       }
       continue;

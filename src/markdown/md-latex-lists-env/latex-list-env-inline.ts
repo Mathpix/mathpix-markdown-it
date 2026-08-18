@@ -48,6 +48,14 @@ const ITEM_COMMAND_AT: RegExp = makeItemCommandSticky();
 // The scan needs its own: `lastIndex` is state, and the rule above walks a different position.
 const ITEM_COMMAND_IN_SCAN: RegExp = makeItemCommandSticky();
 const LIST_BOUNDARY_SEARCH_G: RegExp = new RegExp(LATEX_LIST_BOUNDARY_INLINE_RE.source, 'g');
+// Asked at a position instead of of `src.slice(pos)` — a copy of the tail per character. Sticky where
+// a match at the position was required (`^` drops: /y is the anchor), global for the opaque search.
+const BEGIN_LIST_ENV_AT: RegExp = new RegExp(BEGIN_LIST_ENV_RE.source.replace(/^\^/, ''), 'y');
+const END_LIST_ENV_AT: RegExp = new RegExp(END_LIST_ENV_RE.source.replace(/^\^/, ''), 'y');
+const BEGIN_LST_AT: RegExp = new RegExp(BEGIN_LST_INLINE_RE.source, 'y');
+const BEGIN_TABULAR_AT: RegExp = new RegExp(BEGIN_TABULAR_INLINE_RE.source, 'y');
+const END_LST_SEARCH_G: RegExp = new RegExp(END_LST_INLINE_RE.source, 'g');
+const END_TABULAR_SEARCH_G: RegExp = new RegExp(END_TABULAR_INLINE_RE.source, 'g');
 
 // Cached per src, and empty for a source without the command: finding the nearest one by scanning
 // backwards cost a walk of the prefix per item boundary.
@@ -118,26 +126,26 @@ export const findFirstCompleteListEnv = (src: string, startPos: number): EnvMatc
         continue;
       }
     }
-    const rest: string = src.slice(pos);
     // 2) If inside opaque → only look for END of the current opaque
     if (opaqueStack.length > 0) {
       const top: OpaqueEnvType = opaqueStack[opaqueStack.length - 1];
-      const endRe: RegExp = top === "lstlisting" ? END_LST_INLINE_RE : END_TABULAR_INLINE_RE;
-      endRe.lastIndex = 0;
-      const me: RegExpExecArray = endRe.exec(rest);
+      const endRe: RegExp = top === "lstlisting" ? END_LST_SEARCH_G : END_TABULAR_SEARCH_G;
+      endRe.lastIndex = pos;
+      const me: RegExpExecArray = endRe.exec(src);
       if (!me) {
         // continue scanning char-by-char until we find the end
         pos += 1;
         continue;
       }
       // Found opaque end, pop stack and jump after it
-      pos += me.index + me[0].length;
+      pos = me.index + me[0].length;
       opaqueStack = opaqueStack.slice(0, -1);
       continue;
     }
     // 3) Nested begin list (must be exactly at pos)
-    const mbList: RegExpMatchArray = rest.match(BEGIN_LIST_ENV_RE);
-    if (mbList && mbList.index === 0) {
+    BEGIN_LIST_ENV_AT.lastIndex = pos;
+    const mbList: RegExpExecArray = BEGIN_LIST_ENV_AT.exec(src);
+    if (mbList) {
       const tRaw: string = (mbList[1] ?? "").trim();
       if (tRaw && isListType(tRaw)) {
         listStack.push(tRaw);
@@ -146,8 +154,9 @@ export const findFirstCompleteListEnv = (src: string, startPos: number): EnvMatc
       }
     }
     // 4) End list (must be exactly at pos)
-    const meList: RegExpMatchArray = rest.match(END_LIST_ENV_RE);
-    if (meList && meList.index === 0) {
+    END_LIST_ENV_AT.lastIndex = pos;
+    const meList: RegExpExecArray = END_LIST_ENV_AT.exec(src);
+    if (meList) {
       const tRaw: string = (meList[1] ?? "").trim();
       if (!tRaw || !isListType(tRaw)) {
         return null;
@@ -164,12 +173,10 @@ export const findFirstCompleteListEnv = (src: string, startPos: number): EnvMatc
       continue;
     }
     // 5) Opaque begin (ONLY if starts exactly at pos)
-    BEGIN_LST_INLINE_RE.lastIndex = 0;
-    BEGIN_TABULAR_INLINE_RE.lastIndex = 0;
-    const mbLst: RegExpExecArray = BEGIN_LST_INLINE_RE.exec(rest);
-    const mbTab: RegExpExecArray = BEGIN_TABULAR_INLINE_RE.exec(rest);
-    const mbLst0: RegExpExecArray = mbLst && mbLst.index === 0 ? mbLst : null;
-    const mbTab0: RegExpExecArray = mbTab && mbTab.index === 0 ? mbTab : null;
+    BEGIN_LST_AT.lastIndex = pos;
+    BEGIN_TABULAR_AT.lastIndex = pos;
+    const mbLst0: RegExpExecArray = BEGIN_LST_AT.exec(src);
+    const mbTab0: RegExpExecArray = BEGIN_TABULAR_AT.exec(src);
     if (mbLst0 || mbTab0) {
       const opened: OpaqueEnvType = mbLst0 ? "lstlisting" : "tabular";
       opaqueStack = [...opaqueStack, opened];

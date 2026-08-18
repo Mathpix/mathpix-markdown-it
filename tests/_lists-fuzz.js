@@ -14,10 +14,11 @@ const host = jsdom.window.document.getElementById('host');
 // may produce — a tag with no partner, a list with no item, an item outside a list. Every defect this
 // branch fixed showed up here first, and each one came from a shape nobody thought to write down.
 //
-// Deterministic: same seed, same documents, same run every time. Raise the count locally to search
-// wider (LIST_FUZZ_DOCS=6000 npm test); a failure prints the source, which is enough to reproduce.
+// Deterministic: same seed, same documents, same run every time, and a failure prints the source.
+// The default is what the suite carries; `npm run test:fuzz` searches 25000, where the last defect
+// sat at document 24057 — no default catches everything, so the deep sweep is its own script.
 const SEED = 987654321;
-const DOCS = Number(process.env.LIST_FUZZ_DOCS || 500);
+const DOCS = Number(process.env.LIST_FUZZ_DOCS || 2000);
 const FENCE = '```';
 // Chosen to reach what the list rules read: markers, wrapper envs, verbatim, crossed and unclosed
 // envs, and commands whose argument holds list markup.

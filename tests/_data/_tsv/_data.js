@@ -1634,5 +1634,23 @@ module.exports = [
       '![the alt](i.png)\n' +
       '\\end{tabular}',
     tsv: 'i.png'
+  },
+  // Content before the first `\item` exports as its own line; 3.0.1 dropped it. The last one is the
+  // control: nothing before the first `\item`, unchanged.
+  {
+    latex: '\\begin{tabular}{|l|}\\begin{itemize} loose \\item a\\end{itemize}\\end{tabular}',
+    tsv: '" loose \n • a"'
+  },
+  {
+    latex: '\\begin{tabular}{|l|}\\begin{itemize}\\itemsep 2pt \\item a\\end{itemize}\\end{tabular}',
+    tsv: '"\\itemsep 2pt \n • a"'
+  },
+  {
+    latex: '\\begin{tabular}{|l|}\\begin{enumerate} intro \\item a\\end{enumerate}\\end{tabular}',
+    tsv: '" intro \n 1. a"'
+  },
+  {
+    latex: '\\begin{tabular}{|l|}\\begin{itemize}\\item a\\item b\\end{itemize}\\end{tabular}',
+    tsv: '" • a\n • b"'
   }
 ];
