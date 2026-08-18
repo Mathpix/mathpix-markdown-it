@@ -17,6 +17,7 @@ const {
   unclosedEnvsIn,
   nextListEnvMatch,
   splitInlineListEnv,
+  maskNonStructure,
 } = require('../lib/markdown/md-latex-lists-env/list-source-model');
 const { absorbSublistIntoWrapper } = require('../lib/markdown/md-latex-lists-env/latex-list-tokens');
 const { processOpaqueLine } = require('../lib/markdown/md-latex-lists-env/latex-list-opaque');
@@ -114,26 +115,33 @@ describe('list source model: an opaque line hands its tail back', () => {
 // The parse loop counts what a tail leaves open, and consumes transitions by its own rule. The comment
 // beside it claims the two walk alike; a claim about an invariant belongs in a test.
 describe('list source model: the open-env count walks the tail as the parse loop does', () => {
+  // Mirrors the implementation: matches come from the masked text, the tail is cut in step with it.
   const walk = (text) => {
     let depth = 0;
+    let masked = maskNonStructure(text);
     let tail = text;
-    let env = nextListEnvMatch(tail);
+    let env = nextListEnvMatch(masked);
     while (env) {
-      const split = splitInlineListEnv(tail, env.match);
-      if (split.isBacktickEscapedPair) {
-        break;
-      }
       depth += env.isEnd ? -1 : 1;
-      tail = split.sE;
-      env = nextListEnvMatch(tail);
+      const cut = env.match.index + env.match[0].length;
+      tail = splitInlineListEnv(tail, env.match).sE;
+      masked = masked.slice(cut).trim();
+      env = nextListEnvMatch(masked);
     }
     return depth;
   };
   it('agrees with a step-by-step walk over 5000 random tails', () => {
     const parts = ['\\begin{itemize}', '\\end{itemize}', '\\begin{enumerate}', '\\end{enumerate}',
       '`', 'text', ' ', '\\item a'];
-    let seed = 424242;
-    const rnd = (n) => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed % n; };
+    // xorshift32: the plain LCG below it degenerated — three of the eight parts ever appeared, and a
+    // backtick was never one of them.
+    let seed = 424242 >>> 0;
+    const rnd = (n) => {
+      seed ^= seed << 13; seed >>>= 0;
+      seed ^= seed >> 17;
+      seed ^= seed << 5; seed >>>= 0;
+      return seed % n;
+    };
     for (let i = 0; i < 5000; i++) {
       const count = rnd(6);
       let text = '';
@@ -175,6 +183,23 @@ describe('absorbSublistIntoWrapper: what the guards refuse to move', () => {
     types(tokens).should.equal('itemize_list_open,latex_list_item_open,' +
       'enumerate_list_open,latex_list_item_open,latex_list_item_close,enumerate_list_close,' +
       'enumerate_list_open,latex_list_item_open,latex_list_item_close,enumerate_list_close,' +
+      'latex_list_item_close,itemize_list_close');
+  });
+
+  // A wrapper inside a range that was itself moved: copying the range verbatim left this one behind,
+  // so the shape differed between the first level and the ones under it.
+  it('moves a wrapper that sits inside a range it already moved', () => {
+    const inner = [tok('enumerate_list_open'), itemOpen(true), tok('latex_list_item_close'),
+      tok('itemize_list_open'), itemOpen(false), tok('latex_list_item_close'),
+      tok('itemize_list_close'), tok('enumerate_list_close')];
+    const tokens = [tok('itemize_list_open'), itemOpen(true), tok('latex_list_item_close')]
+      .concat(inner, [tok('itemize_list_close')]);
+    absorbSublistIntoWrapper(tokens, 1);
+    // Both wrappers keep their sublist: neither item close sits before the list it wraps.
+    types(tokens).should.equal('itemize_list_open,latex_list_item_open,' +
+      'enumerate_list_open,latex_list_item_open,' +
+      'itemize_list_open,latex_list_item_open,latex_list_item_close,itemize_list_close,' +
+      'latex_list_item_close,enumerate_list_close,' +
       'latex_list_item_close,itemize_list_close');
   });
 

@@ -51,6 +51,10 @@ export declare const findEndMarker: (str: string, startPos?: number, beginMarker
     endPos: number;
     openBrackets?: undefined;
 };
+/** Offset past `\renewcommand{\name}{body}` — also the starred form, `[n]` and `[n][default]`, and a
+ *  bare `\name` as the first argument — or -1 when the arguments do not close in `text`. Braces are
+ *  paired, so a closer or an `\item` in the body is part of the command, not structure. */
+export declare const renewCommandSpanEnd: (text: string) => number;
 export declare const getTerminatedRules: (rule: string) => any[];
 export declare const removeCaptionsFromTableAndFigure: (content: string) => {
     content: string;

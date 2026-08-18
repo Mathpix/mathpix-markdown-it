@@ -45,3 +45,6 @@ export declare const getListDepth: () => number;
 export declare const getOpenListCount: () => number;
 export declare const snapshotListLevels: () => readonly ListLevelState[];
 export declare const restoreListLevels: (snapshot: readonly ListLevelState[]) => void;
+export declare const isParsingMarker: () => boolean;
+export declare const beginMarkerParse: () => void;
+export declare const endMarkerParse: () => void;

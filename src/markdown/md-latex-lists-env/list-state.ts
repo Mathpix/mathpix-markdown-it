@@ -17,6 +17,9 @@ export interface ListLevelState {
   openItems: number;
 }
 
+// Counted, not boolean: a marker parsed inside another must not clear the flag early.
+let markerParseDepth = 0;
+
 // One entry per open list level, innermost last.
 let listLevels: ListLevelState[] = [];
 
@@ -92,4 +95,16 @@ export const snapshotListLevels = (): readonly ListLevelState[] =>
 
 export const restoreListLevels = (snapshot: readonly ListLevelState[]): void => {
   listLevels = snapshot.map((level) => ({ openItems: level.openItems }));
+};
+
+// A marker body is parsed with the block flag still set on `env`, so a list written there became a
+// real list inside the marker's `<span>`.
+export const isParsingMarker = (): boolean => markerParseDepth > 0;
+
+export const beginMarkerParse = (): void => {
+  markerParseDepth++;
+};
+
+export const endMarkerParse = (): void => {
+  markerParseDepth--;
 };

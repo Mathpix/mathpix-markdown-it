@@ -26,7 +26,7 @@ module.exports = [
   {
     name: "inline \\item and \\end fire outside any list and leave tags open",
     latex: "\\begin{itemize} \\item[X] b \\end{enumerate} \\end{itemize} \\item a \\begin{enumerate}",
-    html: "<ul class=\"itemize\" style=\"list-style-type: none\"> <li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">X</span>b</li></ul> </ul> <li>a<ol class=\"enumerate decimal\" style=\"list-style-type: decimal\">"
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"> <li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">X</span>b</li></ul> </ul> \\item a <ol class=\"enumerate decimal\" style=\"list-style-type: decimal\">"
   },
   // The only invariant violation left in 24k fuzzed documents: on one line the inline path emits the
   // gap as text, so it lands directly in the `<ul>`. The two-line form is already clean.
@@ -80,10 +80,23 @@ module.exports = [
     html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul>"
   },
   {
-    // An `\item` after the list closed emits an `<li>` with no list around it, and it stays open. The
-    // level stack reports the drift (`[list-state] incrementItemCount …`); the markup is unusable.
-    name: "an \\item after \\end{itemize} on one line leaves an <li> outside any list",
-    latex: "\\begin{itemize} \\item a \\end{itemize} \\item[X] b",
-    html: "<ul class=\"itemize\" style=\"list-style-type: none\"> <li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul> <li>b"
+    // One command is read off the line, so the first wins and the second shows. LaTeX applies the last.
+    name: "two \\setcounter left of a wrapper: the first applies, the second shows",
+    latex: "\\begin{enumerate}\n\\item a\n\\setcounter{enumi}{3}\\setcounter{enumi}{9}\\begin{center}\nc\n\\end{center}\n\\end{enumerate}",
+    html: "<ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li value=\"4\" class=\"li_enumerate block\"><div>a<br>\n\\setcounter{enumi}{9}</div>\n<div class=\"center\" style=\"text-align: center\">c</div>\n</li></ol>"
+  },
+  {
+    // A wrapper body is opaque, so a command inside it is content: no counter, and it shows. `master`
+    // does not apply it either and emits `<>` instead. Left of the `\begin` it works (`_data.js`).
+    name: "\\setcounter inside a wrapper body renders as text",
+    latex: "\\begin{enumerate}\n\\item a\n\\begin{center}\\setcounter{enumi}{3}\nc\n\\end{center}\n\\end{enumerate}",
+    html: "<ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li class=\"li_enumerate block\"><div>a</div>\n<div class=\"center\" style=\"text-align: center\">\\setcounter{enumi}{3}<br>\nc</div>\n</li></ol>"
+  },
+  {
+    // On the inline path the command is read before the items, so one following an item is left in its
+    // content and the counter is not applied. Preceding the item it works — pinned in `_data.js`.
+    name: "\\setcounter after the item in a one-line list stays as text",
+    latex: "text \\begin{enumerate}\\item a\\setcounter{enumi}{7}\\end{enumerate} tail",
+    html: "<div>text <ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li class=\"li_enumerate\">a\\setcounter{enumi}{7}</li></ol> tail</div>\n"
   },
 ];

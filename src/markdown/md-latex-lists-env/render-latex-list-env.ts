@@ -30,26 +30,28 @@ const markerPaddingStyle = (padAttr: string | null | undefined): string => {
 
 var level_itemize = 0;
 var level_enumerate = 0;
+// Bumped per render, so a cache entry paired in an earlier one is not reused.
+let renderEpoch = 0;
 /** Render-time list state, module-level like the marker registries — zeroed per render. */
 export const resetListRenderDepth = (): void => {
   level_itemize = 0;
   level_enumerate = 0;
   resetAllEnumerateCounters();
+  renderEpoch++;
 };
 
 // The host flag both list rules read, paired once per token array. Derived from the array rather than
 // carried between calls, so an unbalanced slice has no opener to pair with and its close stays bare.
-// Cached by array identity plus length and the two end types: reordering one in place keeps the old
-// answer. Out of reach here — the only in-place edit is at parse time, on the buffered array — and
-// re-rendering one array is already unsound anyway (`attrJoin` piles up classes).
-const hostFlagsFor: WeakMap<Token[], { sig: string; flags: Int8Array }> = new WeakMap();
+// Keyed by array identity, render epoch, and length plus the two end types. Reordering one in place
+// and re-rendering it within the same render keeps the old answer, as `attrJoin` keeps old classes.
+const hostFlagsFor: WeakMap<Token[], { epoch: number; sig: string; flags: Int8Array }> = new WeakMap();
 const signatureOf = (tokens: Token[]): string =>
   tokens.length + ':' + (tokens[0]?.type ?? '') + ':' + (tokens[tokens.length - 1]?.type ?? '');
 const hostFlag = (tokens: Token[], idx: number): number => {
   const sig: string = signatureOf(tokens);
   let cached = hostFlagsFor.get(tokens);
-  if (!cached || cached.sig !== sig) {
-    cached = { sig, flags: listHostFlags(tokens) };
+  if (!cached || cached.epoch !== renderEpoch || cached.sig !== sig) {
+    cached = { epoch: renderEpoch, sig, flags: listHostFlags(tokens) };
     hostFlagsFor.set(tokens, cached);
   }
   return cached.flags[idx];

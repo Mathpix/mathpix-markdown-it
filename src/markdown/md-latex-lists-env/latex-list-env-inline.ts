@@ -2,7 +2,15 @@ import { RuleInline } from 'markdown-it';
 import type StateInline from 'markdown-it/lib/rules_inline/state_inline';
 import * as Token from 'markdown-it/lib/token';
 import { getSpacesFromLeft, skipBackticks } from "../utils";
-import { incrementItemCount } from "./list-state";
+import { renewCommandSpanEnd } from "../common";
+import { matchPositionsCached, countPositionsAtOrAfter } from "../common/src-pos-cache";
+import {
+  incrementItemCount,
+  isParsingMarker,
+  getOpenListCount,
+  beginMarkerParse,
+  endMarkerParse,
+} from "./list-state";
 import {
   ListType,
   isListType,
@@ -37,7 +45,27 @@ const END_LIST_ENV_SEARCH_G: RegExp = new RegExp(END_LIST_ENV_INLINE_RE.source, 
 // Same patterns applied at an index instead of to `src.slice(pos)`, which copied the rest of the
 // document on every call. Built from the shared sources, so they cannot drift.
 const ITEM_COMMAND_AT: RegExp = makeItemCommandSticky();
+// The scan needs its own: `lastIndex` is state, and the rule above walks a different position.
+const ITEM_COMMAND_IN_SCAN: RegExp = makeItemCommandSticky();
 const LIST_BOUNDARY_SEARCH_G: RegExp = new RegExp(LATEX_LIST_BOUNDARY_INLINE_RE.source, 'g');
+
+// Cached per src, and empty for a source without the command: finding the nearest one by scanning
+// backwards cost a walk of the prefix per item boundary.
+const RENEWCOMMAND_POSITIONS: symbol = Symbol('renewcommand-positions');
+const RENEWCOMMAND_SEARCH_G: RegExp = /\\renewcommand\b/g;
+
+// Does `at` fall inside the arguments of the nearest `\renewcommand` before it?
+const insideRenewCommand = (state: StateInline, at: number): boolean => {
+  const positions: readonly number[] =
+    matchPositionsCached(state, RENEWCOMMAND_POSITIONS, RENEWCOMMAND_SEARCH_G);
+  const before: number = positions.length - countPositionsAtOrAfter(positions, at + 1);
+  if (before === 0) {
+    return false;
+  }
+  const cmdAt: number = positions[before - 1];
+  const span: number = renewCommandSpanEnd(state.src.slice(cmdAt));
+  return span > 0 && at < cmdAt + span;
+};
 
 /**
  * Finds the first complete list environment starting at `startPos`.
@@ -72,6 +100,23 @@ export const findFirstCompleteListEnv = (src: string, startPos: number): EnvMatc
     if (codePos !== pos) {
       pos = codePos;
       continue;
+    }
+    // A closer in a `\renewcommand` body belongs to the macro, as the item scan already reads it.
+    if (opaqueStack.length === 0 && src.startsWith('\\renewcommand', pos)) {
+      const macroEnd: number = renewCommandSpanEnd(src.slice(pos));
+      if (macroEnd > 0) {
+        pos += macroEnd;
+        continue;
+      }
+    }
+    // The optional marker is an argument: a list command written in it is text, not structure.
+    if (opaqueStack.length === 0) {
+      ITEM_COMMAND_IN_SCAN.lastIndex = pos;
+      const itemAt: RegExpExecArray | null = ITEM_COMMAND_IN_SCAN.exec(src);
+      if (itemAt && itemAt[1] !== undefined) {
+        pos += itemAt[0].length;
+        continue;
+      }
     }
     const rest: string = src.slice(pos);
     // 2) If inside opaque → only look for END of the current opaque
@@ -205,7 +250,7 @@ export const listCloseInline: RuleInline = (
 ): boolean => {
   const startPos: number = state.pos;
   // Only handle in block/list context
-  if (!state.env.isBlock) {
+  if (!state.env.isBlock || isParsingMarker()) {
     return false;
   }
   // Must start with backslash
@@ -258,7 +303,7 @@ export const listBeginInline: RuleInline = (
 ): boolean => {
   const startPos: number = state.pos;
   // Only inside block/list context
-  if (!state.env.isBlock) {
+  if (!state.env.isBlock || isParsingMarker()) {
     return false;
   }
   // Must start with backslash
@@ -307,7 +352,11 @@ export const listItemInline: RuleInline = (
     return false;
   }
   // Only handle in block/list context
-  if (!state.env.isBlock) {
+  if (!state.env.isBlock || isParsingMarker()) {
+    return false;
+  }
+  // No list open: the `<li>` would have nothing to sit in.
+  if (getOpenListCount() === 0) {
     return false;
   }
   // Try to match \item[...] command right after '\'
@@ -319,7 +368,12 @@ export const listItemInline: RuleInline = (
   // Find where this item ends: next \item or begin/end list env
   const contentStart: number = startPos + itemMatch[0].length;
   LIST_BOUNDARY_SEARCH_G.lastIndex = contentStart;
-  const boundaryMatch: RegExpExecArray | null = LIST_BOUNDARY_SEARCH_G.exec(state.src);
+  let boundaryMatch: RegExpExecArray | null = LIST_BOUNDARY_SEARCH_G.exec(state.src);
+  // A closer in a `\renewcommand` body belongs to the macro: taking it emitted a close with no opener.
+  while (boundaryMatch && insideRenewCommand(state, boundaryMatch.index)) {
+    LIST_BOUNDARY_SEARCH_G.lastIndex = boundaryMatch.index + boundaryMatch[0].length;
+    boundaryMatch = LIST_BOUNDARY_SEARCH_G.exec(state.src);
+  }
   const content: string = boundaryMatch && boundaryMatch.index > contentStart
     ? state.src.slice(contentStart, boundaryMatch.index)
     : state.src.slice(contentStart);
@@ -343,11 +397,12 @@ export const listItemInline: RuleInline = (
       const trimmedMarker: string = itemMatch[1] ? itemMatch[1].trim() : "";
       token.marker = trimmedMarker;
       const children: Token[] = [];
-      const beforeOptions = {...state.md.options};
-      // Restored in `finally`: a throw here would leave the mutated `outMath` on the md instance for
-      // every later render.
+      // Only when they are about to be replaced. Restored in `finally`, or a throw leaves the mutated
+      // `outMath` on the md instance for every later render.
+      const beforeOptions = state.md.options.forDocx ? {...state.md.options} : null;
+      beginMarkerParse();
       try {
-        if (state.md.options.forDocx) {
+        if (beforeOptions) {
           state.md.options = {
             ...state.md.options,
             outMath: {
@@ -358,7 +413,10 @@ export const listItemInline: RuleInline = (
         }
         state.md.inline.parse(trimmedMarker, state.md, state.env, children);
       } finally {
-        state.md.options = beforeOptions;
+        endMarkerParse();
+        if (beforeOptions) {
+          state.md.options = beforeOptions;
+        }
       }
       token.markerTokens = children;
     }
@@ -393,7 +451,7 @@ export const listSetCounterInline: RuleInline = (
   silent: boolean
 ): boolean => {
   // Only handle in block/list context (not in pure inline text)
-  if (!state.env.isBlock) {
+  if (!state.env.isBlock || isParsingMarker()) {
     return false;
   }
   const startPos: number = state.pos;

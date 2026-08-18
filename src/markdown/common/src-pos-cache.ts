@@ -21,7 +21,10 @@ interface Bucket<T> {
   bySrc: Map<string, Slot<T>>;
 }
 
-const bucketOf = <T>(state: StateBlock, key: symbol): Bucket<T> => {
+// Read structurally, so an inline state — same `src`, same `env` — can use the cache as well.
+type SrcState = { src: string; env?: any };
+
+const bucketOf = <T>(state: SrcState, key: symbol): Bucket<T> => {
   // Falling back to `state` puts the cache outside the per-render clear, so it lives and dies with
   // that state instead. Every real state carries an `env`; a hand-built one may not.
   const host = ((state as any).env ?? state) as Record<symbol, Bucket<T> | undefined>;
@@ -121,7 +124,7 @@ export const lastMatchPosCached = (
  * Same contract as lastMatchPosCached: /g required, one entry per `src`.
  */
 export const matchPositionsCached = (
-  state: StateBlock,
+  state: SrcState,
   key: symbol,
   patternG: RegExp,
 ): readonly number[] => {
@@ -148,7 +151,7 @@ export const matchPositionsCached = (
  * above: one entry per `src`, computed on first ask, so a caller asked per block pays once.
  */
 export const srcValueCached = <T>(
-  state: StateBlock,
+  state: SrcState,
   key: symbol,
   compute: (src: string) => T,
 ): T => {

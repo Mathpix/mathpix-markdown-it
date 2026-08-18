@@ -1,3 +1,7 @@
+type SrcState = {
+    src: string;
+    env?: any;
+};
 /** Empties the buckets on `env`: a host reusing one env would otherwise keep old documents alive.
  *  Emptied, not deleted — `delete` would drop `env` into dictionary mode for the whole parse. */
 export declare const clearSrcPosCaches: (env: any) => void;
@@ -17,11 +21,12 @@ export declare const lastMatchPosCached: (state: StateBlock, key: symbol, patter
  * Offsets of every `patternG` match in `state.src`, ascending, cached on `state.env` under `key`.
  * Same contract as lastMatchPosCached: /g required, one entry per `src`.
  */
-export declare const matchPositionsCached: (state: StateBlock, key: symbol, patternG: RegExp) => readonly number[];
+export declare const matchPositionsCached: (state: SrcState, key: symbol, patternG: RegExp) => readonly number[];
 /**
  * Any value derived from `state.src`, cached on `state.env` under `key` — same contract as the sweeps
  * above: one entry per `src`, computed on first ask, so a caller asked per block pays once.
  */
-export declare const srcValueCached: <T>(state: StateBlock, key: symbol, compute: (src: string) => T) => T;
+export declare const srcValueCached: <T>(state: SrcState, key: symbol, compute: (src: string) => T) => T;
 /** How many of the ascending `positions` are at or after `minOffset` — binary search, no allocation. */
 export declare const countPositionsAtOrAfter: (positions: readonly number[], minOffset: number) => number;
+export {};

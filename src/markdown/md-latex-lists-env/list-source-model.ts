@@ -2,6 +2,8 @@ import type StateBlock from 'markdown-it/lib/rules_block/state_block';
 import { StateBlockLike, OpaqueEnvType } from "./latex-list-types";
 import { getOpenListCount } from "./list-state";
 import { matchPositionsCached, countPositionsAtOrAfter, srcValueCached } from "../common/src-pos-cache";
+import { getInlineCodeListFromString } from "../common";
+import { LATEX_ITEM_MARKER_G } from "../common/consts";
 import { findVerbatimRanges, isInsideRanges } from "../common/verbatim-ranges";
 import { warnDistinct } from "../common/warn-distinct";
 import {
@@ -25,8 +27,8 @@ const VERBATIM_KEY = Symbol('mmd.verbatimRanges');
 const END_LIST_ENV_SWEEP_G: RegExp = new RegExp(END_LIST_ENV_INLINE_RE.source, 'g');
 const BEGIN_LIST_ENV_SWEEP_G: RegExp = new RegExp(BEGIN_LIST_ENV_INLINE_RE.source, 'g');
 
-/** Text around an inline transition. A transition with a backtick on both sides sits in a code span,
- *  and the parse loop leaves the whole line to the inline path when it meets one. */
+/** Text around an inline transition. Callers match on `maskNonStructure`, so a transition reaching
+ *  here is structure — what is written in a code span or an `\item[...]` marker never does. */
 export const splitInlineListEnv = (
   lineText: string,
   match
@@ -35,8 +37,28 @@ export const splitInlineListEnv = (
   const sE: string = match.index! + match[0].length < lineText.length
     ? lineText.slice(match.index! + match[0].length).trim()
     : "";
-  const isBacktickEscapedPair: boolean = sB.includes("`") && sE.includes("`");
-  return { sB, sE, isBacktickEscapedPair };
+  return { sB, sE };
+};
+
+/** A command in a code span or an `\item[...]` marker is text. Blanked, not removed: the length and
+ *  the spaces hold, so a match on the result still applies to `text` itself. */
+export const maskNonStructure = (text: string): string => {
+  const masked: string = text.indexOf('\\item') < 0
+    ? text
+    : text.replace(LATEX_ITEM_MARKER_G, (m) => m.replace(/\S/g, 'x'));
+  const codes = getInlineCodeListFromString(masked);
+  if (codes.length === 0) {
+    return masked;
+  }
+  // One pass: rebuilding per span is quadratic in their number on a line.
+  let out: string = '';
+  let at: number = 0;
+  codes.forEach((code) => {
+    out += masked.slice(at, code.posStart)
+      + masked.slice(code.posStart, code.posEnd).replace(/\S/g, 'x');
+    at = code.posEnd;
+  });
+  return out + masked.slice(at);
 };
 
 // How many envs a line's tail leaves open: positive means it needs that many closers from ahead.
@@ -44,16 +66,18 @@ export const splitInlineListEnv = (
 // span real, and the loop then opened a sibling it could never close.
 export const unclosedEnvsIn = (s: string): number => {
   let depth = 0;
-  let tail: string = s;
-  let env: { match: RegExpMatchArray; isEnd: boolean } | null = nextListEnvMatch(tail);
+  // Only the masked text: the count needs the transitions, not the text around them.
+  let masked: string = maskNonStructure(s);
+  let env: { match: RegExpMatchArray; isEnd: boolean } | null = nextListEnvMatch(masked);
   while (env) {
-    const split = splitInlineListEnv(tail, env.match);
-    if (split.isBacktickEscapedPair) {
+    depth += env.isEnd ? -1 : 1;
+    // A zero step would spin, so the walk ends rather than trust the pattern to advance.
+    const cut: number = (env.match.index ?? 0) + env.match[0].length;
+    if (cut <= 0) {
       break;
     }
-    depth += env.isEnd ? -1 : 1;
-    tail = split.sE;
-    env = nextListEnvMatch(tail);
+    masked = masked.slice(cut).trim();
+    env = nextListEnvMatch(masked);
   }
   return depth;
 };
@@ -240,6 +264,8 @@ export const absoluteOffsetOf = (
   index: number,
   text: string
 ): number => {
+  // Callers pass the line or a suffix of it, which is what makes this exact; a middle slice would shift
+  // every offset. Not asserted: `endsWith` is O(lineText) and this is called per closer on the line.
   const at: number = state.eMarks[line] - lineText.length + index;
   // -1 when the anchor does not hold; each caller decides what that means.
   return state.src.slice(at, at + text.length) === text ? at : -1;

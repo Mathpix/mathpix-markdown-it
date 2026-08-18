@@ -4,20 +4,40 @@ const reTag: RegExp = /\\renewcommand/;
 const reTagG: RegExp = /\\renewcommand/g;
 
 const parseCommand = (str: string):{command: string, params: string, endPos: number}  => {
-  str = str.trim();
   let command = '';
   let params = '';
   let s = '';
   let isOpen = 0;
   let endPos = str.length;
 
-  for (let i = 0; i < str.length; i++) {
+  // Space is skipped, not trimmed: the caller adds `endPos` to `state.pos`, so it must stay in the
+  // coordinates of the string passed in. `*` is not part of the name.
+  let start = 0;
+  while (start < str.length && (str[start] === ' ' || str[start] === '\t')) {
+    start++;
+  }
+  if (str[start] === '*') {
+    start++;
+  }
+  for (let i = start; i < str.length; i++) {
     if (!command && (str[i] === '{' || str.charCodeAt(i) === 0x5c /* \ */ || str[i] === '}' )) {
       if (s && s.trim().length > 0) {
         command = s;
         s = '';
+        // `\renewcommand\x{a{b}c}`: this brace opens the body — uncounted, the first inner `}` ended it.
+        if (str[i] === '{') {
+          isOpen++;
+        }
       }
       continue;
+    }
+    // `\renewcommand{\x}[1]{Z}`: the optional argument is not part of the body.
+    if (command && !s && !isOpen && str[i] === '[') {
+      const close: number = str.indexOf(']', i);
+      if (close > 0) {
+        i = close;
+        continue;
+      }
     }
     if (command) {
       if (str[i] === '{' ) {

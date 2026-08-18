@@ -1,11 +1,13 @@
 import { StateBlockLike, OpaqueEnvType } from "./latex-list-types";
-/** Text around an inline transition. A transition with a backtick on both sides sits in a code span,
- *  and the parse loop leaves the whole line to the inline path when it meets one. */
+/** Text around an inline transition. Callers match on `maskNonStructure`, so a transition reaching
+ *  here is structure — what is written in a code span or an `\item[...]` marker never does. */
 export declare const splitInlineListEnv: (lineText: string, match: any) => {
     sB: string;
     sE: string;
-    isBacktickEscapedPair: boolean;
 };
+/** A command in a code span or an `\item[...]` marker is text. Blanked, not removed: the length and
+ *  the spaces hold, so a match on the result still applies to `text` itself. */
+export declare const maskNonStructure: (text: string) => string;
 export declare const unclosedEnvsIn: (s: string) => number;
 export declare const listCloserOffsets: (state: StateBlock) => readonly number[];
 export declare const lastListEndPos: (state: StateBlock) => number;

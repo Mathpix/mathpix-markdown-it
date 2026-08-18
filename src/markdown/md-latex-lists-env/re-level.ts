@@ -8,6 +8,7 @@ import {
   LATEX_ENUM_STYLE_KEY_RE,
   LATEX_ENUM_STYLE_RE
 } from "../common/consts";
+import { beginMarkerParse, endMarkerParse } from "./list-state";
 
 
 // These registries stay outside the Lists rollback: `\renewcommand` is document content, and rolling
@@ -106,7 +107,12 @@ const parseMarkerTokens = (
     return cached.slice();
   }
   const children: Token[] = [];
-  state.md.inline.parse(level, state.md, state.env, children);
+  beginMarkerParse();
+  try {
+    state.md.inline.parse(level, state.md, state.env, children);
+  } finally {
+    endMarkerParse();
+  }
   bucket?.set(level, children);
   return children;
 };

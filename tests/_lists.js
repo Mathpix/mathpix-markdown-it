@@ -93,6 +93,47 @@ describe('A no-output command between items leaves no orphan <br>:', () => {
   });
 });
 
+// Two readers measure a macro body: the block walk and the inline scanner. They disagreed once — the
+// inline one ended the list on a closer written in the body — so the property is checked over
+// generated forms, not over the shapes that happened to fail.
+describe('Both paths read a \\renewcommand body as the macro:', () => {
+  const { renewCommandSpanEnd } = require('../lib/markdown/common');
+  const bodies = (html) => (html.match(/<li[\s\S]*?<\/li>/g) || []).map((li) => li
+    .replace(/<span class="li_level"[^>]*>[\s\S]*?<\/span>/g, '')
+    .replace(/<li[^>]*>/, '')
+    .replace('</li>', ''));
+  const forms = [];
+  // TeX skips spaces after a control word, so each gap is a place the two readers can part ways.
+  // `{\labelitemi}` among the names: only a marker command puts the body inside `<span class="li_level">`.
+  ['', '*', ' *', '* ', ' '].forEach((star) => ['{\\x}', '\\x', '{\\labelitemi}'].forEach((name) => {
+    ['', '[1]', '[1][d]'].forEach((optional) => {
+      ['{y}', '{\\end{itemize}}', '{\\end{enumerate}}', '{\\begin{itemize}}', '{\\item}', '{a{b}c}']
+        .forEach((body) => forms.push('\\renewcommand' + star + name + optional + body));
+    });
+  }));
+  forms.forEach((macro) => {
+    it(macro, () => {
+      // The property holds for a measurable span: an unmeasurable one has no known body to protect.
+      renewCommandSpanEnd(macro).should.equal(macro.length, 'the form is not measured whole');
+      const block = MM.markdownToHTML(
+        '\\begin{itemize}\n\\item a\n' + macro + '\n\\item b\n\\end{itemize}', options);
+      const inline = MM.markdownToHTML(
+        'text \\begin{itemize}\\item a' + macro + '\\item b\\end{itemize} tail', options);
+      bodies(block).should.deep.equal(['a', 'b'], 'block path');
+      bodies(inline).should.deep.equal(['a', 'b'], 'inline path');
+      inline.should.include(' tail', 'the inline path dropped what follows the list');
+      [block, inline].forEach((html) => {
+        const count = (re) => (html.match(re) || []).length;
+        count(/<ul[\s>]/g).should.equal(count(/<\/ul>/g), 'unbalanced <ul>');
+        count(/<li[\s>]/g).should.equal(count(/<\/li>/g), 'unbalanced <li>');
+        // The block flag is still set while a marker body is parsed: a list written there opened here.
+        (html.match(/<span class="li_level"[^>]*>((?:(?!<\/span>)[\s\S])*)<\/span>/g) || [])
+          .forEach((span) => span.should.not.match(/<(ul|ol|li)\b/, 'a list inside the marker'));
+      });
+    });
+  });
+});
+
 // `\item` detection: the rule is `\item` not followed by a letter, so `\itemsep` stays text while
 // `\item2`/`\item*` open an item. Pinned as measured, so a regex refactor cannot change it silently.
 describe('What counts as \\item inside a list body:', () => {

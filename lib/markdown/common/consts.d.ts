@@ -106,6 +106,8 @@ export declare const BEGIN_LIST_ENV_INLINE_RE: RegExp;
 /** Matches \end{itemize} or \end{enumerate} */
 export declare const END_LIST_ENV_INLINE_RE: RegExp;
 export declare const END_LIST_ENV_RE: RegExp;
+/** The marker with its payload, for masking: a command written there is text, not structure. */
+export declare const LATEX_ITEM_MARKER_G: RegExp;
 export declare const LATEX_ITEM_COMMAND_RE: RegExp;
 export declare const LATEX_ITEM_COMMAND_INLINE_RE: RegExp;
 /** A fresh sticky instance per caller: `lastIndex` is state, and sharing it across callers leaks. */

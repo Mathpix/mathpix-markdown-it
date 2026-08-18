@@ -3,6 +3,7 @@ import {
   RE_CAPTION_SETUP_TAG_BEGIN,
   RE_CAPTION_TAG_BEGIN,
   RE_EMPTY_TEXT,
+  RENEWCOMMAND_LINE_RE,
   terminatedRules
 } from './common/consts';
 
@@ -179,6 +180,57 @@ export const findEndMarker = (str: string, startPos: number = 0, beginMarker: st
     nextPos: nextPos + endMarker.length,
     endPos: nextPos
   };
+};
+
+/** Offset past `\renewcommand{\name}{body}` — also the starred form, `[n]` and `[n][default]`, and a
+ *  bare `\name` as the first argument — or -1 when the arguments do not close in `text`. Braces are
+ *  paired, so a closer or an `\item` in the body is part of the command, not structure. */
+export const renewCommandSpanEnd = (text: string): number => {
+  const match: RegExpMatchArray | null = text.match(RENEWCOMMAND_LINE_RE);
+  if (!match) {
+    return -1;
+  }
+  let pos: number = match.index + match[0].length;
+  const skipSpaces = (): void => {
+    while (pos < text.length && (text[pos] === ' ' || text[pos] === '\t')) {
+      pos++;
+    }
+  };
+  // `\renewcommand *{\x}{y}`: TeX skips spaces after a control word, so the star may sit past one.
+  skipSpaces();
+  if (text[pos] === '*') {
+    pos++;
+  }
+  for (let arg = 0; arg < 2; arg++) {
+    skipSpaces();
+    // `\renewcommand{\x}[1][d]{#1}`: LaTeX allows two optional arguments here, not one.
+    while (arg === 1 && text[pos] === '[') {
+      const arity = findEndMarker(text, pos, '[', ']') as { res: boolean; nextPos?: number };
+      if (!arity.res || typeof arity.nextPos !== 'number') {
+        return -1;
+      }
+      pos = arity.nextPos;
+      skipSpaces();
+    }
+    if (text[pos] === '{') {
+      const paired = findEndMarker(text, pos) as { res: boolean; nextPos?: number };
+      if (!paired.res || typeof paired.nextPos !== 'number') {
+        return -1;
+      }
+      pos = paired.nextPos;
+      continue;
+    }
+    // `\renewcommand\labelitemii{Q}`: the first argument may be a bare command name.
+    if (arg === 0 && text[pos] === '\\') {
+      pos++;
+      while (pos < text.length && /[a-zA-Z]/.test(text[pos])) {
+        pos++;
+      }
+      continue;
+    }
+    return -1;
+  }
+  return pos;
 };
 
 export const getTerminatedRules = (rule: string) => {

@@ -1,6 +1,6 @@
 import type StateBlock from 'markdown-it/lib/rules_block/state_block';
 import type Token from 'markdown-it/lib/token';
-import { incrementItemCount } from "./list-state";
+import { incrementItemCount, beginMarkerParse, endMarkerParse } from "./list-state";
 import {
   ListType,
   ListInlineContext,
@@ -145,30 +145,41 @@ const pairListTokens = (tokens: Token[]): { openerOf: Map<Token, Token>; closeAt
 // close past the sublist, so it sits in the `<li>` — done on tokens, the exports walking those.
 // `level` needs no fixing up: only the close moves, and it closes the same item either side.
 export const absorbSublistIntoWrapper = (tokens: Token[], from: number): void => {
+  // Nothing moves without a marker-less wrapper, and everything below allocates.
+  let hasWrapper = false;
+  for (let i = 0; i < tokens.length && !hasWrapper; i++) {
+    hasWrapper = tokens[i].type === 'latex_list_item_open' && !!tokens[i].meta?.markerEmpty;
+  }
+  if (!hasWrapper) {
+    return;
+  }
   const start: number = Math.max(from, 1);
   const { openerOf, closeAt } = pairListTokens(tokens);
   // Rebuilt rather than spliced: a splice per wrapper is another O(n) each.
   const out: Token[] = [];
+  // Closes waiting for the sublist they now wrap to end, innermost last. Deferring rather than copying
+  // the sublist verbatim is what lets a wrapper inside it be moved too — the shapes differed by depth.
+  const pending: Array<{ at: number; token: Token }> = [];
   let moved = false;
   let i = 0;
   while (i < tokens.length) {
+    while (pending.length && pending[pending.length - 1].at === i) {
+      out.push(pending.pop()!.token);
+    }
     // The tail of `out`, not `tokens[i - 1]`: a close already moved here is the one to move on.
     const tail: Token | undefined = out[out.length - 1];
-    // `closeAt[i] >= 0` keeps this terminating: an unpaired open would set `i` back to 0 and loop.
+    // `closeAt[i] >= 0`: an unpaired open has no end to defer the close to.
     if (i >= start && LIST_OPEN_TYPES.has(tokens[i].type) && closeAt[i] >= 0
       && tail?.type === 'latex_list_item_close' && openerOf.get(tail)?.meta?.markerEmpty) {
-      const end: number = closeAt[i];
       out.pop();
-      for (let k = i; k <= end; k++) {
-        out.push(tokens[k]);
-      }
-      out.push(tail);
+      pending.push({ at: closeAt[i] + 1, token: tail });
       moved = true;
-      i = end + 1;
-      continue;
     }
     out.push(tokens[i]);
     i++;
+  }
+  while (pending.length) {
+    out.push(pending.pop()!.token);
   }
   // The common list has no marker-less wrapper at all: nothing was moved, so nothing to write back.
   if (!moved) {
@@ -266,7 +277,12 @@ export const setTokenListItemOpenBlock = (
     const trimmedMarker: string = marker.trim();
     token.marker = trimmedMarker;
     const parsedMarkerTokens: Token[] = [];
-    state.md.inline.parse(trimmedMarker, state.md, state.env, parsedMarkerTokens);
+    beginMarkerParse();
+    try {
+      state.md.inline.parse(trimmedMarker, state.md, state.env, parsedMarkerTokens);
+    } finally {
+      endMarkerParse();
+    }
     token.markerTokens = parsedMarkerTokens;
   }
   // Apply enumeration start value

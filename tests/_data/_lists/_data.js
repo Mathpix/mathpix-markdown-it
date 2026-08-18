@@ -2121,11 +2121,401 @@ module.exports = [
     html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a$x</div>\n<div class=\"center\" style=\"text-align: center\">here \\end{itemize} more</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul><div>tail b$c</div>\n"
   },
   {
+    // The remaining three openers that pair inside one inline token, so the rule holds for every
+    // marker `RE_MATH_OPEN` admits rather than the two the fixtures happened to name.
+    name: "a later paragraph holding a \\) leaves the list alone",
+    latex: "\\begin{itemize}\n\\item a\\(x\n\\begin{center}\nhere \\end{itemize} more\n\\end{center}\n\\item b\n\\end{itemize}\n\ntail b\\) c",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a(x</div>\n<div class=\"center\" style=\"text-align: center\">here \\end{itemize} more</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul><div>tail b) c</div>\n"
+  },
+  {
+    name: "a later paragraph holding a $$ leaves the list alone",
+    latex: "\\begin{itemize}\n\\item a$$x\n\\begin{center}\nhere \\end{itemize} more\n\\end{center}\n\\item b\n\\end{itemize}\n\ntail b$$ c",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a$$x</div>\n<div class=\"center\" style=\"text-align: center\">here \\end{itemize} more</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul><div>tail b$$ c</div>\n"
+  },
+  {
+    name: "a later paragraph holding a \\\\] leaves the list alone",
+    latex: "\\begin{itemize}\n\\item a\\\\[x\n\\begin{center}\nhere \\end{itemize} more\n\\end{center}\n\\item b\n\\end{itemize}\n\ntail b\\\\] c",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a\\[x</div>\n<div class=\"center\" style=\"text-align: center\">here \\end{itemize} more</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul><div>tail b\\] c</div>\n"
+  },
+  {
+    // The inline path applies the counter when the command precedes the item — `value="8"`.
+    name: "\\setcounter before the item in a one-line list",
+    latex: "text \\begin{enumerate}\\setcounter{enumi}{7}\\item a\\end{enumerate} tail",
+    html: "<div>text <ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li value=\"8\" class=\"li_enumerate\">a</li></ol> tail</div>\n"
+  },
+  {
     // The same pair for `\[`, which pairs inside one inline token as `$` does and so is dropped, not
     // clipped, when its partner is a paragraph away.
     name: "an unpaired \\[ in the item, no paragraph after it",
     latex: "\\begin{itemize}\n\\item a\\[x\n\\begin{center}\nhere \\end{itemize} more\n\\end{center}\n\\item b\n\\end{itemize}",
     html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a[x</div>\n<div class=\"center\" style=\"text-align: center\">here \\end{itemize} more</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    // A chunk's sublist goes inside that chunk's `<li>` at every depth. The absorb used to copy a moved
+    // range verbatim, so a wrapper inside it was never moved and level 3 landed in an empty sibling.
+    name: "a loose chunk at two levels keeps each sublist in its own item",
+    latex: "\\begin{itemize}\nloose A\n\\begin{itemize}\nloose B\n\\begin{itemize}\n\\item x\n\\end{itemize}\n\\end{itemize}\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\">loose A<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\">loose B<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">∗</span>x</li></ul></li></ul></li></ul>"
+  },
+  {
+    // Four levels, because the old shape degraded with depth: it left one empty wrapper per level below
+    // the first (15 items at depth 8 against 9), so a depth-2 fixture alone would not hold this.
+    name: "a loose chunk at four levels leaves no empty wrapper",
+    latex: "\\begin{itemize}\nloose A\n\\begin{itemize}\nloose B\n\\begin{itemize}\nloose C\n\\begin{itemize}\nloose D\n\\item leaf\n\\end{itemize}\n\\end{itemize}\n\\end{itemize}\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\">loose A<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\">loose B<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\">loose C<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\">loose D</li><li class=\"li_itemize\"><span class=\"li_level\">·</span>leaf</li></ul></li></ul></li></ul></li></ul>"
+  },
+  {
+    name: "the same across itemize and enumerate levels",
+    latex: "\\begin{itemize}\nloose A\n\\begin{enumerate}\nloose B\n\\begin{itemize}\n\\item leaf\n\\end{itemize}\n\\end{enumerate}\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\">loose A<ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li class=\"li_enumerate not_number\" data-custom-marker=\"true\" data-marker-empty=\"true\" style=\"display: block\">loose B<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">–</span>leaf</li></ul></li></ol></li></ul>"
+  },
+  {
+    // The depth-1 control: unchanged by that fix, and it is what made the two shapes disagree.
+    name: "a loose chunk at one level keeps its sublist inside its item",
+    latex: "\\begin{itemize}\nloose A\n\\begin{itemize}\n\\item x\n\\end{itemize}\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\">loose A<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">–</span>x</li></ul></li></ul>"
+  },
+  {
+    // A one-line `tabular` glued to the closer, which `master` dropped the list over. Named by the
+    // glued-line sweep as the one shape left in this class that no fixture held.
+    name: "a one-line tabular sharing its line with \\end{itemize}",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{tabular}{l}x\\end{tabular}\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"table_tabular\">\n<div class=\"inline-tabular\"><table class=\"tabular\">\n<tbody>\n<tr style=\"border-top: none !important; border-bottom: none !important;\">\n<td style=\"text-align: left; border-left: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; \">x</td>\n</tr>\n</tbody>\n</table>\n</div></div>\n</li></ul>"
+  },
+  {
+    name: "a one-line tabular sharing its line with the next \\item",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{tabular}{l}x\\end{tabular}\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"table_tabular\">\n<div class=\"inline-tabular\"><table class=\"tabular\">\n<tbody>\n<tr style=\"border-top: none !important; border-bottom: none !important;\">\n<td style=\"text-align: left; border-left: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; \">x</td>\n</tr>\n</tbody>\n</table>\n</div></div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    // A wrapper is opaque, so its line is consumed before the counter branch runs — the counter has to
+    // be read ahead of that. One per wrapper env: the five behave alike and each takes its own path.
+    name: "\\setcounter left of \\begin{center}",
+    latex: "\\begin{enumerate}\n\\item a\n\\setcounter{enumi}{3}\\begin{center}\nc\n\\end{center}\n\\end{enumerate}",
+    html: "<ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li value=\"4\" class=\"li_enumerate block\"><div>a</div>\n<div class=\"center\" style=\"text-align: center\">c</div>\n</li></ol>"
+  },
+  {
+    name: "\\setcounter left of \\begin{left}",
+    latex: "\\begin{enumerate}\n\\item a\n\\setcounter{enumi}{3}\\begin{left}\nc\n\\end{left}\n\\end{enumerate}",
+    html: "<ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li value=\"4\" class=\"li_enumerate block\"><div>a</div>\n<div class=\"center\" style=\"text-align: left\">c</div>\n</li></ol>"
+  },
+  {
+    name: "\\setcounter left of \\begin{right}",
+    latex: "\\begin{enumerate}\n\\item a\n\\setcounter{enumi}{3}\\begin{right}\nc\n\\end{right}\n\\end{enumerate}",
+    html: "<ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li value=\"4\" class=\"li_enumerate block\"><div>a</div>\n<div class=\"center\" style=\"text-align: right\">c</div>\n</li></ol>"
+  },
+  {
+    name: "\\setcounter left of \\begin{table}",
+    latex: "\\begin{enumerate}\n\\item a\n\\setcounter{enumi}{3}\\begin{table}\nc\n\\end{table}\n\\end{enumerate}",
+    html: "<ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li value=\"4\" class=\"li_enumerate block\"><div>a</div>\n<div class=\"table\">\n<div>c</div>\n</div>\n</li></ol>"
+  },
+  {
+    // `tabular` takes the same opaque path as the five wrappers, and so does `lstlisting`.
+    name: "\\setcounter left of \\begin{tabular}",
+    latex: "\\begin{enumerate}\n\\item a\n\\setcounter{enumi}{3}\\begin{tabular}{l}q\\end{tabular}\n\\end{enumerate}",
+    html: "<ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li value=\"4\" class=\"li_enumerate block\"><div>a</div>\n<div class=\"table_tabular\">\n<div class=\"inline-tabular\"><table class=\"tabular\">\n<tbody>\n<tr style=\"border-top: none !important; border-bottom: none !important;\">\n<td style=\"text-align: left; border-left: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; \">q</td>\n</tr>\n</tbody>\n</table>\n</div></div>\n</li></ol>"
+  },
+  {
+    name: "\\setcounter left of \\begin{figure}",
+    latex: "\\begin{enumerate}\n\\item a\n\\setcounter{enumi}{3}\\begin{figure}\nc\n\\end{figure}\n\\end{enumerate}",
+    html: "<ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li value=\"4\" class=\"li_enumerate block\"><div>a</div>\n<div class=\"table\">c</div>\n</li></ol>"
+  },
+  {
+    // `\setcounter` keeps its effect (`value="4"`) while the closer sharing its line still reaches the
+    // walk. Both were lost before: the remainder went into the item above and the list was dropped.
+    name: "\\setcounter sharing its line with \\end{enumerate}",
+    latex: "\\begin{enumerate}\n\\item a\n\\setcounter{enumi}{3}\\end{enumerate}",
+    html: "<ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li value=\"4\" class=\"li_enumerate\">a</li></ol>"
+  },
+  {
+    name: "\\setcounter sharing its line with the next \\item",
+    latex: "\\begin{enumerate}\n\\item a\n\\setcounter{enumi}{3}\\item b\n\\end{enumerate}",
+    html: "<ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li value=\"4\" class=\"li_enumerate\">a</li><li class=\"li_enumerate\">b</li></ol>"
+  },
+  {
+    // A closer inside a code span is not one: the walk sees it escaped and the span stays content.
+    name: "\\setcounter then a closer written in a code span",
+    latex: "\\begin{enumerate}\n\\item a\n\\setcounter{enumi}{3}`\\end{enumerate}`\n\\item b\n\\end{enumerate}",
+    html: "<ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li value=\"4\" class=\"li_enumerate\">a<code>\\end{enumerate}</code></li><li class=\"li_enumerate\">b</li></ol>"
+  },
+  {
+    // Spaces between the command and the closer: the remainder handed on keeps them, so the offsets
+    // the walk anchors on the line's end still hold.
+    name: "\\setcounter, spaces, then \\end{enumerate}",
+    latex: "\\begin{enumerate}\n\\item a\n\\setcounter{enumi}{3}   \\end{enumerate}",
+    html: "<ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li value=\"4\" class=\"li_enumerate\">a</li></ol>"
+  },
+  {
+    name: "\\setcounter, text, then \\end{enumerate}",
+    latex: "\\begin{enumerate}\n\\item a\n\\setcounter{enumi}{3} tail \\end{enumerate}",
+    html: "<ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li value=\"4\" class=\"li_enumerate\">a<br>\ntail</li></ol>"
+  },
+  {
+    name: "\\setcounter sharing its line with a nested \\begin{enumerate}",
+    latex: "\\begin{enumerate}\n\\item a\n\\setcounter{enumi}{3}\\begin{enumerate}\n\\item b\n\\end{enumerate}\n\\end{enumerate}",
+    html: "<ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li value=\"4\" class=\"li_enumerate\">a<ol class=\"enumerate lower-alpha\" style=\"list-style-type: lower-alpha\"><li class=\"li_enumerate\">b</li></ol></li></ol>"
+  },
+  {
+    // A `\renewcommand` renders to nothing, but it must not take the rest of its line with it: the
+    // structure sharing the line has to reach the walk, or the list finds no closer and is dropped.
+    // The command renders to nothing on every shape, glued or alone: it is measured by its own span,
+    // so what follows is read on its own and no line break survives.
+    name: "\\renewcommand sharing its line with \\end{itemize}",
+    latex: "\\begin{itemize}\n\\item a\n\\renewcommand{\\labelitemi}{Z}\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul>"
+  },
+  {
+    name: "\\renewcommand sharing its line with \\end{enumerate}",
+    latex: "\\begin{enumerate}\n\\item a\n\\renewcommand{\\labelenumi}{Z}\\end{enumerate}",
+    html: "<ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li class=\"li_enumerate\">a</li></ol>"
+  },
+  {
+    // The line numbers the editors sync on: `b` gets line 2, its own, not the range of the item above.
+    // Only a `lineNumbering` variant can see this — the plain HTML was already right.
+    name: "\\renewcommand glued with \\item attributes its own line",
+    options: { lineNumbering: true },
+    latex: "\\begin{itemize}\n\\item a\n\\renewcommand{\\x}{y}\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize preview-paragraph-0 preview-line 0 1 2 3\" data_line_start=\"0\" data_line_end=\"3\" data_line=\"0,4\" count_line=\"4\" style=\"list-style-type: none\"><li class=\"li_itemize preview-paragraph-1 preview-line 1 2\" data_line_start=\"1\" data_line_end=\"2\" data_line=\"1,3\" count_line=\"2\" data_parent_line_start=\"0\"><span class=\"li_level\">•</span>a</li><li class=\"li_itemize preview-paragraph-2 preview-line 2\" data_line_start=\"2\" data_line_end=\"2\" data_line=\"2,3\" count_line=\"1\" data_parent_line_start=\"0\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    // Nested braces in the body: `\Roman{enumii}` must be measured whole, or the stray `}` reaches
+    // the walk. A regex without brace pairing gets this one wrong.
+    name: "\\renewcommand with nested braces, then \\item",
+    latex: "\\begin{enumerate}\n\\item a\n\\renewcommand{\\labelenumii}{\\Roman{enumii}}\\item b\n\\end{enumerate}",
+    html: "<ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li class=\"li_enumerate\">a</li><li class=\"li_enumerate\">b</li></ol>"
+  },
+  {
+    // The second form: a bare command name as the first argument.
+    name: "\\renewcommand\\name{body}, then \\item",
+    latex: "\\begin{itemize}\n\\item a\n\\renewcommand\\labelitemii{Q}\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    // Arguments that never close: the span is unknown, so the whole line takes the old path.
+    name: "\\renewcommand whose braces do not close on the line",
+    latex: "\\begin{itemize}\n\\item a\n\\renewcommand{\\labelitemi}{Z\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    // No `<br>` from the command: only a closer sharing the line has to reach the walk, so the gate
+    // asks about that alone. Testing for `\item` too sent this shape to the walk and left the break.
+    name: "\\renewcommand sharing its line with the next \\item",
+    latex: "\\begin{itemize}\n\\item a\n\\renewcommand{\\labelitemi}{Z}\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    name: "\\renewcommand sharing its line with the next \\item, enumerate",
+    latex: "\\begin{enumerate}\n\\item a\n\\renewcommand{\\labelenumi}{Z}\\item b\n\\end{enumerate}",
+    html: "<ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li class=\"li_enumerate\">a</li><li class=\"li_enumerate\">b</li></ol>"
+  },
+  {
+    // A closer in the macro body used to end the item and emit a close with no opener: `</ul>` landed
+    // early, a stray `}` and an `<li>` came out of any list. The three bodies behave alike now.
+    name: "\\renewcommand whose body is \\end{itemize}",
+    latex: "\\begin{itemize}\n\\item a\n\\renewcommand{\\x}{\\end{itemize}}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    name: "\\renewcommand whose body is \\end{enumerate}",
+    latex: "\\begin{enumerate}\n\\item a\n\\renewcommand{\\x}{\\end{enumerate}}\n\\item b\n\\end{enumerate}",
+    html: "<ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li class=\"li_enumerate\">a</li><li class=\"li_enumerate\">b</li></ol>"
+  },
+  {
+    name: "\\renewcommand whose body is \\begin{itemize}",
+    latex: "\\begin{itemize}\n\\item a\n\\renewcommand{\\x}{\\begin{itemize}}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    // `\item` inside the macro body is part of the macro on both paths, so no third item made of the
+    // leftover `}` — `master` and the earlier branch state both emitted one.
+    name: "\\renewcommand whose body holds \\item, alone on its line",
+    latex: "\\begin{itemize}\n\\item a\n\\renewcommand{\\x}{\\item}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    name: "\\renewcommand sharing its line with a nested \\begin{itemize}",
+    latex: "\\begin{itemize}\n\\item a\n\\renewcommand{\\labelitemi}{Z}\\begin{itemize}\n\\item b\n\\end{itemize}\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">–</span>b</li></ul></li></ul>"
+  },
+  {
+    // The inline path: the whole list, the command included, on one line inside a paragraph.
+    name: "\\renewcommand inside a one-line list",
+    latex: "text \\begin{itemize}\\item a\\renewcommand{\\x}{y}\\end{itemize} tail",
+    html: "<div>text <ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul> tail</div>\n"
+  },
+  {
+    // Opener in a span, closer outside it: judging the line by the first match deferred that closer
+    // into item content, where it closed a second list and left a stray `</ul>`.
+    name: "an opener in a code span does not carry the closer beside it into the item",
+    latex: "\\begin{itemize}\n\\item[\\begin{itemize}] k\n\\begin{itemize}\n\\end{enumerate}\n`\\begin{itemize}` \\end{itemize}\n\\end{itemize}",
+    html: "<ul data-padding-inline-start=\"9.33em\" class=\"itemize\" style=\"padding-inline-start: 9.33em; list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">\\begin{itemize}</span>k<ul class=\"itemize\" style=\"list-style-type: none\"></ul><code>\\begin{itemize}</code></li></ul><div>\\end{itemize}</div>\n"
+  },
+  {
+    // Between two closed spans, not inside one: structure. Read as text, the tags crossed.
+    name: "an opener between two code spans opens a sublist",
+    latex: "\\begin{itemize}\n\\item a\n`x` \\begin{itemize} `y`\n\\item inner\n\\end{itemize}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a<br>\n<code>x</code></div>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\"><code>y</code></li><li class=\"li_itemize\"><span class=\"li_level\">–</span>inner</li></ul></li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    name: "a closer between two code spans closes the list",
+    latex: "\\begin{itemize}\n\\item a\n`p` \\end{itemize} `q`\n\\item b",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a<br>\n<code>p</code></div>\n</li></ul><div>\\item b</div>\n"
+  },
+  {
+    // The converse the same predicate must keep answering.
+    name: "a closer inside a code span leaves the list alone",
+    latex: "\\begin{itemize}\n\\item a\n`\\end{itemize}`\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a<code>\\end{itemize}</code></li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    // The marker is an argument, so the opener written there is its text. Counted as structure, it
+    // cost the whole list: 3.0.1 printed the source and left `] a` bare inside the `<ul>`.
+    name: "\\item[\\begin{itemize}] keeps the list, marker as text",
+    latex: "\\begin{itemize}\n\\item[\\begin{itemize}] a\n\\item b\n\\end{itemize}",
+    html: "<ul data-padding-inline-start=\"9.33em\" class=\"itemize\" style=\"padding-inline-start: 9.33em; list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">\\begin{itemize}</span>a</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    // The scan skips the optional marker, so the opener written there is the marker's text and the
+    // list keeps both items. The block path still loses it — pinned above.
+    name: "\\item[\\begin{itemize}] keeps the list, marker as text, on the inline path",
+    latex: "text \\begin{itemize}\\item[\\begin{itemize}] a\\item b\\end{itemize} tail",
+    html: "<div>text <ul data-padding-inline-start=\"9.33em\" class=\"itemize\" style=\"padding-inline-start: 9.33em; list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">\\begin{itemize}</span>a</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul> tail</div>\n"
+  },
+  {
+    // Same for a closer: it used to end the list before the marker was read, leaving `[` as the item
+    // text and printing the rest literally.
+    name: "\\item[\\end{itemize}] keeps the list, marker as text",
+    latex: "\\begin{itemize}\n\\item[\\end{itemize}] a\n\\item b\n\\end{itemize}",
+    html: "<ul data-padding-inline-start=\"8.31em\" class=\"itemize\" style=\"padding-inline-start: 8.31em; list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">\\end{itemize}</span>a</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    // A custom marker is a second entrance to the same marker parse: structure written there is
+    // text, or the `<li>` it opened landed inside `<span class="li_level">`.
+    name: "\\item[\\item] keeps the marker as text, on the block path",
+    latex: "\\begin{itemize}\n\\item[\\item] a\n\\item b\n\\end{itemize}",
+    html: "<ul data-padding-inline-start=\"3.57em\" class=\"itemize\" style=\"padding-inline-start: 3.57em; list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">\\item</span>a</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    name: "\\item[\\item] keeps the marker as text, on the inline path",
+    latex: "text \\begin{itemize}\\item[\\item] a\\item b\\end{itemize} tail",
+    html: "<div>text <ul data-padding-inline-start=\"3.57em\" class=\"itemize\" style=\"padding-inline-start: 3.57em; list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">\\item</span>a</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul> tail</div>\n"
+  },
+  {
+    // The two container pairs the loose-chunk host was not pinned for. The host `<li>` follows the
+    // list that holds it, and the sublist keeps its own nesting level.
+    name: "a sublist after a loose chunk, enumerate inside enumerate",
+    latex: "\\begin{enumerate}\nloose\n\\begin{enumerate}\n\\item x\n\\end{enumerate}\n\\end{enumerate}",
+    html: "<ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li class=\"li_enumerate not_number\" data-custom-marker=\"true\" data-marker-empty=\"true\" style=\"display: block\">loose<ol class=\"enumerate lower-alpha\" style=\"list-style-type: lower-alpha\"><li class=\"li_enumerate\">x</li></ol></li></ol>"
+  },
+  {
+    name: "a sublist after a loose chunk, enumerate inside itemize",
+    latex: "\\begin{itemize}\nloose\n\\begin{enumerate}\n\\item x\n\\end{enumerate}\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\">loose<ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li class=\"li_enumerate\">x</li></ol></li></ul>"
+  },
+  {
+    // An `\item` past the closer has no list to sit in, so it stays text: it used to emit an `<li>`
+    // outside any list, which left the markup unusable.
+    name: "an \\item after \\end{itemize} on one line stays text",
+    latex: "\\begin{itemize} \\item a \\end{itemize} \\item[X] b",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"> <li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul> \\item[X] b"
+  },
+  {
+    // A marker body is parsed with the block flag still set, so the list written here opened a real
+    // one inside the `<span>` and left the markup crossed.
+    name: "a list written in a marker body stays text in the marker",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{enumerate}\n\\renewcommand{\\labelitemi}{\\begin{itemize}}\\end{itemize}\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">\\begin{itemize}</span>a<ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"></ol></li></ul>"
+  },
+  {
+    name: "\\item written in a marker body stays text in the marker",
+    latex: "\\renewcommand{\\labelitemi}{\\item x}\n\n\\begin{itemize}\n\\item a\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">\\item x</span>a</li></ul>"
+  },
+  {
+    // The span reader measures `[1]`, so the rule applying the command has to skip it too — it used
+    // to take `[1]{Z` for the marker.
+    name: "a marker command with an optional argument",
+    latex: "\\renewcommand{\\labelitemi}[1]{Z}\n\n\\begin{itemize}\n\\item a\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">Z</span>a</li></ul>"
+  },
+  {
+    // Bare command name: the brace opening the body was not counted, so the argument ended at the
+    // first inner `}` and the rest of it joined the item above.
+    name: "\\renewcommand with a bare name and a nested brace in its body",
+    latex: "\\begin{itemize}\n\\item a\n\\renewcommand\\x{p{q}r}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    // Both scanners read a macro body the same way now: the inline one used to end the list on the
+    // closer written there, which dropped every item after it.
+    name: "a closer in a \\renewcommand body does not end a one-line list",
+    latex: "text \\begin{itemize}\\item a\\renewcommand{\\x}{\\end{itemize}}\\item b\\end{itemize} tail",
+    html: "<div>text <ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul> tail</div>\n"
+  },
+  {
+    // A list whose only closer sits in a macro body is unterminated, so it stays literal LaTeX —
+    // the same answer a list with no closer at all gets.
+    name: "a list whose only closer is inside a \\renewcommand body stays literal",
+    latex: "\\begin{itemize}\n\\item a\n\\renewcommand{\\x}{\\end{itemize}}",
+    html: "<div>\\begin{itemize}<br>\n\\item a<br>\n</div>\n"
+  },
+  {
+    // The star is part of the command, not of its name: read as a name it left the definition
+    // unconsumed, and the closer in its body escaped the list as a stray `</ul>`.
+    name: "\\renewcommand* whose body holds a closer, after a loose chunk",
+    latex: "\\begin{itemize}\nloose\n\\renewcommand*{\\x}{\\end{itemize}}\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\">loose</li></ul>"
+  },
+  {
+    name: "\\renewcommand* whose body holds a closer, after an item",
+    latex: "\\begin{itemize}\n\\item a\n\\renewcommand*{\\x}{\\end{itemize}}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    name: "\\renewcommand* whose body holds a closer, in an enumerate",
+    latex: "\\begin{enumerate}\nloose\n\\renewcommand*{\\x}{\\end{enumerate}}\n\\end{enumerate}",
+    html: "<ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li class=\"li_enumerate not_number\" data-custom-marker=\"true\" data-marker-empty=\"true\" style=\"display: block\">loose</li></ol>"
+  },
+  {
+    // Item-less list: the same empty `<ol>` the bare and the unstarred forms give. The starred one
+    // used to leave its definition behind as a fake item.
+    name: "\\renewcommand* alone in a list leaves it item-less",
+    latex: "\\begin{enumerate}\n\\renewcommand*{\\labelitemi}{Z}\n\\end{enumerate}",
+    html: "<ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"></ol>"
+  },
+  {
+    name: "\\renewcommand* switches the marker, like the unstarred form",
+    latex: "\\renewcommand*{\\labelitemi}{Z}\n\n\\begin{itemize}\n\\item a\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">Z</span>a</li></ul>"
+  },
+  {
+    name: "\\renewcommand* inside a one-line list",
+    latex: "text \\begin{itemize}\\item a\\renewcommand*{\\x}{y}\\end{itemize} tail",
+    html: "<div>text <ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul> tail</div>\n"
+  },
+  {
+    // LaTeX allows two optional arguments here. Measuring one left the span unknown, and the line was
+    // then swallowed whole — the closer on it with it, so the list stayed open.
+    name: "\\renewcommand with two optional arguments, closer on its line",
+    latex: "\\begin{itemize}\n\\item a\n\\renewcommand{\\x}[1][d]{#1}\\end{itemize}\n\\end{enumerate}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul><div>\\end{enumerate}</div>\n"
+  },
+  {
+    name: "\\renewcommand with two optional arguments, cross-named closer",
+    latex: "\\begin{enumerate}\n\\renewcommand{\\labelitemi}{Z}\\begin{itemize}\n\\renewcommand{\\x}[1][d]{#1}\\end{itemize}\n\\end{itemize}",
+    html: "<ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li class=\"li_enumerate not_number\" data-custom-marker=\"true\" data-marker-empty=\"true\" style=\"display: block\"><ul class=\"itemize\" style=\"list-style-type: none\"></ul></li></ol>"
+  },
+  {
+    // A span that cannot be measured leaves the body's end unknown, so the line goes to the walk and
+    // keeps its `<br>`: losing the closer would leave the list open, which is the worse trade.
+    name: "\\renewcommand with an unclosed brace, closer on its line",
+    latex: "\\begin{itemize}\n\\item a\n\\renewcommand{\\x}{oops\\end{itemize}\n\\end{enumerate}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a<br>\n</li></ul><div>\\end{enumerate}</div>\n"
+  },
+  {
+    name: "\\renewcommand with an unclosed bracket, closer on its line",
+    latex: "\\begin{itemize}\n\\item a\n\\renewcommand{\\x}[1{#1}\\end{itemize}\n\\end{enumerate}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a<br>\n</li></ul><div>\\end{enumerate}</div>\n"
   },
   {
     name: "a later paragraph holding a \\] leaves the list alone",

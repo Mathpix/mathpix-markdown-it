@@ -13,6 +13,7 @@ import {
   OpaqueStack
 } from "./latex-list-types";
 import { parseSetCounterNumber } from "./latex-list-common";
+import { renewCommandSpanEnd } from "../common";
 import { snapshotListLevels, restoreListLevels, type ListLevelState } from "./list-state";
 import { getCaptionCounters, setCaptionCounters } from "../common/caption-counters";
 import { countPositionsAtOrAfter } from "../common/src-pos-cache";
@@ -30,6 +31,7 @@ import { processOpaqueLine, OpaqueProcessResult } from "./latex-list-opaque";
 import { warnDistinct } from "../common/warn-distinct";
 import {
   BEGIN_LIST_ENV_RE,
+  LATEX_BLOCK_ENV_OPEN_RE,
   LATEX_ITEM_COMMAND_INLINE_RE,
   RENEWCOMMAND_LINE_RE,
   reSetCounter
@@ -42,6 +44,7 @@ import {
   lastListEndPos,
   closersLeftAfter,
   nextListEnvMatch,
+  maskNonStructure,
 } from "./list-source-model";
 
 /**
@@ -100,6 +103,17 @@ export const ListsInternal = (
   // Process one ordinary (non-fence) list line: opaque envs, \setcounter, inline \begin/\end, \item, content.
   // Returns 'abort' (bail, emit nothing), 'break' (list closed — caller advances past this line) or 'proceed'.
   const processLine = (lineText: string, lineIdx: number): 'abort' | 'break' | 'proceed' => {
+    // An opaque env on this line consumes it below, so the counter branch never sees it — all seven,
+    // `tabular` included. `reSetCounter` is anchored: one inside the env body does not match.
+    const counterMatch: RegExpMatchArray | null = lineText.match(reSetCounter);
+    if (counterMatch && counterMatch[2] && LATEX_BLOCK_ENV_OPEN_RE.test(lineText)) {
+      li = { value: parseSetCounterNumber(counterMatch) ?? 1 };
+      if (state.md.options?.forLatex) {
+        const token = state.push("setcounter", "", 0) as any;
+        token.latex = counterMatch[0].trim();
+      }
+      lineText = lineText.slice(counterMatch.index! + counterMatch[0].length);
+    }
     // Handle opaque envs; may consume the line or return a tail to re-parse.
     const opaqueRes: OpaqueProcessResult = processOpaqueLine({
       lineText,
@@ -116,9 +130,22 @@ export const ListsInternal = (
       return 'proceed';
     }
     // Renders to nothing: joins without a break, which survived as an orphan `<br>`. forLatex keeps it.
+    // Measured by its own span, so structure after it reaches the walk with its own line, and an
+    // `\item` inside the macro body stays part of the macro.
     if (RENEWCOMMAND_LINE_RE.test(lineText)) {
-      items = ItemsAddToPrev(items, lineText, lineIdx, !!state.md.options?.forLatex);
-      return 'proceed';
+      const spanEnd: number = renewCommandSpanEnd(lineText);
+      const rest: string = spanEnd > 0 ? lineText.slice(spanEnd) : '';
+      // Span unmeasurable: only a line carrying structure goes to the walk, or that closer is lost.
+      const keepForWalk: boolean = spanEnd < 0
+        && (!!nextListEnvMatch(lineText) || LATEX_ITEM_COMMAND_INLINE_RE.test(lineText));
+      if (rest.trim() && (!!nextListEnvMatch(rest) || LATEX_ITEM_COMMAND_INLINE_RE.test(rest))) {
+        items = ItemsAddToPrev(items, lineText.slice(0, spanEnd), lineIdx,
+          !!state.md.options?.forLatex);
+        lineText = rest;
+      } else if (!keepForWalk) {
+        items = ItemsAddToPrev(items, lineText, lineIdx, !!state.md.options?.forLatex);
+        return 'proceed';
+      }
     }
     // Handle \setcounter lines
     if (reSetCounter.test(lineText)) {
@@ -128,23 +155,39 @@ export const ListsInternal = (
         token.latex = match[0].trim();
       }
       if (match && match[2]) {
-        let sE: string = match.index! + match[0].length < lineText.length
+        // Whole for the walk, which anchors offsets on the line's end and needs a suffix; trimmed
+        // only for the content path.
+        const rest: string = match.index! + match[0].length < lineText.length
             ? lineText.slice(match.index! + match[0].length)
             : "";
-        sE = sE.trim();
+        const sE: string = rest.trim();
         const startNumber = parseSetCounterNumber(match) ?? 1;
         li = { value: startNumber };
-        if (sE.length > 0) {
-          items = ItemsAddToPrev(items, sE, lineIdx);
+        // The counter is set either way; structure sharing the line goes to the walk, not into the
+        // item above — that is where a closer was lost and the list dropped.
+        if (sE.length > 0 && (!!nextListEnvMatch(sE) || LATEX_ITEM_COMMAND_INLINE_RE.test(sE))) {
+          lineText = rest;
+        } else {
+          if (sE.length > 0) {
+            items = ItemsAddToPrev(items, sE, lineIdx);
+          }
+          return 'proceed';
         }
-        return 'proceed';
       }
     }
     // Every inline \begin/\end on the line, left to right. Handling only the first left the tail
     // of a collapsed `\end{itemize}\end{itemize}` to ItemsAddToPrev, which drops a pure closer —
     // so the outer list never closed and the strict `!haveClose` bail killed the whole rule.
     let tail: string = lineText;
-    let env: { match: RegExpMatchArray; isEnd: boolean } | null = nextListEnvMatch(tail);
+    // Masked once, then cut in step with `tail`: masking keeps length and spaces, so the same slice
+    // and trim keep the two aligned. Re-masking per match was quadratic over the line.
+    let maskedTail: string = maskNonStructure(tail);
+    let env: { match: RegExpMatchArray; isEnd: boolean } | null = nextListEnvMatch(maskedTail);
+    // Every command on the line is written as text: kept as one chunk, the way it was before masking.
+    if (!env && nextListEnvMatch(tail)) {
+      items = ItemsListPush(items, tail, lineIdx, lineIdx);
+      return 'proceed';
+    }
     const sawListEnv: boolean = !!env;
     while (env) {
       const { match: envMatch, isEnd } = env;
@@ -153,11 +196,9 @@ export const ListsInternal = (
       if (!isListType(raw)) {
         return 'abort';
       }
-      let { sB, sE, isBacktickEscapedPair } = splitInlineListEnv(tail, envMatch);
-      if (isBacktickEscapedPair) {
-        items = ItemsListPush(items, tail, lineIdx, lineIdx);
-        return 'proceed';
-      }
+      // The match came from the masked line, so it is never inside a code span — asking again here
+      // parsed the whole line's spans per match.
+      let { sB, sE } = splitInlineListEnv(tail, envMatch);
       if (sB.length > 0) {
         // Any inline transition, not only one before a wrapper: appended to the item above, a marker
         // reached the block path in a chunk that already held a block env, where it printed as text.
@@ -246,12 +287,21 @@ export const ListsInternal = (
         }
       }
       tail = sE;
-      env = nextListEnvMatch(tail);
+      // A zero step would spin, so the walk ends rather than trust the pattern to advance.
+      const cut: number = (envMatch.index ?? 0) + envMatch[0].length;
+      if (cut <= 0) {
+        break;
+      }
+      maskedTail = maskedTail.slice(cut).trim();
+      env = nextListEnvMatch(maskedTail);
     }
     if (sawListEnv) {
-      // What is left after the last env: item text, as the single-pass tail was.
+      // What is left after the last env: item text. A tail holding an `\item` opens one, as `sB`
+      // above does — appended to a list just opened, it had nothing to attach to and was lost.
       if (tail.length > 0) {
-        items = ItemsAddToPrev(items, tail, lineIdx);
+        items = LATEX_ITEM_COMMAND_INLINE_RE.test(tail)
+          ? ItemsListPush(items, tail, lineIdx, lineIdx)
+          : ItemsAddToPrev(items, tail, lineIdx);
       }
       return 'proceed';
     }

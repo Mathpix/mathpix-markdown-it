@@ -573,6 +573,36 @@ describe('a failing list rule does not fail the document', () => {
 
   // The marker parse mutates `md.options` for `forDocx`; a throw there would leave the mutated `outMath`
   // on the instance for every later render, so the restore sits in a `finally`.
+  // Marker tokens parsed from one macro are shared by every list of that parse — deliberate, since
+  // cloning per read measured 12–29% slower. What must hold is the boundary: a render rule writing to
+  // such a token restamps that parse and nothing after it, because the bucket goes with the parse.
+  it('marker tokens are shared inside one parse and rebuilt for the next', () => {
+    const md = markdownIt({ html: true }).use(mathpixMarkdownPlugin, {});
+    const src = '\\renewcommand{\\labelitemi}{$x$}\n\n\\begin{itemize}\n\\item a\n\\end{itemize}\n\n'
+      + '\\begin{itemize}\n\\item b\n\\end{itemize}';
+    const markersOf = (env) => md.parse(src, env)
+      .filter((t) => t.type === 'itemize_list_open')
+      .map((t) => t.itemizeLevel && t.itemizeLevel[0] && t.itemizeLevel[0][0]);
+    const env = {};
+    const first = markersOf(env);
+    first.should.have.lengthOf(2);
+    first[0].should.equal(first[1], 'both lists take the marker from one macro');
+    first[0].attrSet('data-probe', '1');
+    const again = markersOf(env);
+    (again[0].attrGet('data-probe') === null).should.equal(true, 'the write outlived its parse');
+    const fresh = markersOf({});
+    (fresh[0].attrGet('data-probe') === null).should.equal(true, 'the write reached another env');
+  });
+  // Only the `forDocx` path replaces the options, so without it the object a consumer holds — and
+  // anything keyed on its identity — must be the same one after the render.
+  it('a marker parse leaves md.options the same object when forDocx is off', () => {
+    const md = markdownIt({ html: true }).use(mathpixMarkdownPlugin, { outMath: { include_svg: false } });
+    const before = md.options;
+    const beforeOutMath = md.options.outMath;
+    md.render('text \\begin{itemize}\\item[WIDE] x\\item[$y$] z\\end{itemize} tail', {});
+    md.options.should.equal(before, 'md.options was replaced');
+    md.options.outMath.should.equal(beforeOutMath, 'outMath was replaced');
+  });
   it('a throw while parsing a marker leaves md.options as it was', () => {
     const md = markdownIt({ html: true }).use(mathpixMarkdownPlugin,
       { outMath: { include_svg: false, include_mathml_word: true }, forDocx: true });
@@ -593,6 +623,9 @@ describe('a failing list rule does not fail the document', () => {
       md.inline.parse = originalParse;
     }
     JSON.stringify(md.options.outMath).should.equal(before, 'outMath stayed mutated after the throw');
+    // The flag that switches the list rules off during a marker parse, stuck on, kills every later list.
+    md.render('\\begin{itemize}\n\\item a\n\\end{itemize}', {})
+      .should.include('<li', 'the list rules stayed off after the throw');
   });
 
   // Past a cap the diagnostics go quiet, so the log has to say it is truncated — and one flooding family
@@ -1080,5 +1113,52 @@ describe('render depth is reset even when the render is partial', () => {
     // Nothing carried over: the second list numbers from the start, with no explicit `value` on item one.
     after.should.match(/<ol[^>]*class="enumerate decimal/);
     numbers(after).should.deep.equal([], 'the previous list left its counter behind: ' + numbers(after));
+  });
+});
+
+// The host flag says whether a list needs an `<li>` of its own; it is cached per token array, so an
+// entry paired in an earlier render must not answer for one reordered since.
+describe('the host-flag cache does not answer across renders:', () => {
+  const invalidChild = (html) => {
+    const tags = /<(\/?)([a-zA-Z][\w:-]*)\b[^>]*?(\/?)>/g;
+    const childless = new Set(['br', 'img', 'hr', 'input', 'meta', 'link']);
+    const stack = [];
+    let last = 0;
+    let match;
+    const inList = () => stack.length > 0 && (stack[stack.length - 1] === 'ul' || stack[stack.length - 1] === 'ol');
+    while ((match = tags.exec(html)) !== null) {
+      const between = html.slice(last, match.index);
+      last = match.index + match[0].length;
+      if (inList() && between.trim()) { return 'text in a list'; }
+      const name = match[2].toLowerCase();
+      if (match[1]) {
+        const at = stack.lastIndexOf(name);
+        if (at >= 0) { stack.length = at; }
+        continue;
+      }
+      if (inList() && name !== 'li') { return '<' + name + '> as a direct child of a list'; }
+      if (name === 'li' && !inList()) { return '<li> outside any list'; }
+      if (!match[3] && !childless.has(name)) { stack.push(name); }
+    }
+    return '';
+  };
+  it('a list moved out of its item is hosted again on the next render', () => {
+    const md = markdownIt({ html: true }).use(mathpixMarkdownPlugin, { outMath: { include_svg: false } });
+    const warn = console.warn;
+    console.warn = () => {};
+    try {
+      const tokens = md.parse('\\begin{itemize}\nloose\n\\begin{itemize}\n\\item x\n\\end{itemize}\n\\end{itemize}', {});
+      invalidChild(md.renderer.render(tokens, md.options, {})).should.equal('', 'the first render already differs');
+      // Same length and end types, so only the order tells the two apart: the sublist now opens
+      // directly inside the outer list and needs an `<li>` of its own.
+      const closeAt = tokens.map((t) => t.type).lastIndexOf('latex_list_item_close');
+      const openAt = tokens.map((t) => t.type).indexOf('itemize_list_open', 1);
+      tokens.splice(openAt, 0, tokens.splice(closeAt, 1)[0]);
+      md.render('plain text', {});
+      invalidChild(md.renderer.render(tokens, md.options, {}))
+        .should.equal('', 'the render answered from the entry paired before the edit');
+    } finally {
+      console.warn = warn;
+    }
   });
 });
