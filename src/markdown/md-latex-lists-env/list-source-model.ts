@@ -267,7 +267,8 @@ export const absoluteOffsetOf = (
   // Callers pass the line or a suffix of it, which is what makes this exact; a middle slice would shift
   // every offset. Not asserted: `endsWith` is O(lineText) and this is called per closer on the line.
   const at: number = state.eMarks[line] - lineText.length + index;
-  // -1 when the anchor does not hold; each caller decides what that means.
+  // -1 when the anchor does not hold; each caller decides what that means. Pinned by a test, not a
+  // warning: only our own callers can break the suffix invariant, and CI is where that should show.
   return state.src.slice(at, at + text.length) === text ? at : -1;
 };
 

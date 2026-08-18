@@ -2413,6 +2413,20 @@ module.exports = [
     html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\">loose<ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li class=\"li_enumerate\">x</li></ol></li></ul>"
   },
   {
+    // A closer past the last open list has nothing to close and stays text: it used to emit a bare
+    // `</ul>`. The list below it is unaffected.
+    name: "a second closer on the opening line stays text",
+    latex: "\\begin{itemize} \\end{itemize} \\end{itemize}\n\\begin{enumerate}\n\\item a\n\\end{enumerate}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"> </ul> \\end{itemize}<ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li class=\"li_enumerate\">a</li></ol>"
+  },
+  {
+    // Every command on this line fires with no list open, so the whole line stays literal where it
+    // used to leave a stray `</ul>`, an unclosed `<li>` and an unclosed `<ol>`.
+    name: "\\item and \\end with no list open leave the line literal",
+    latex: "\\begin{itemize} \\item[X] b \\end{enumerate} \\end{itemize} \\item a \\begin{enumerate}",
+    html: "<div>\\begin{itemize} \\item[X] b \\end{enumerate} \\end{itemize} \\item a \\begin{enumerate}</div>\n"
+  },
+  {
     // An `\item` past the closer has no list to sit in, so it stays text: it used to emit an `<li>`
     // outside any list, which left the markup unusable.
     name: "an \\item after \\end{itemize} on one line stays text",

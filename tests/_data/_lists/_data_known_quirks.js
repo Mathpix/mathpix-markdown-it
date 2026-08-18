@@ -19,17 +19,8 @@ module.exports = [
     latex: "\\begin{itemize}\n\\item a $x \\end{itemize} y$\n\\item b\n\\end{itemize}",
     html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a $x</li></ul><div>\\item b<br>\n\\end{itemize}</div>\n"
   },
-  // The inline `\item` and `\end{}` rules fire with no list open — the `[list-state]` warnings say so —
-  // and leave a stray `</ul>`, an unclosed `<li>` and an unclosed `<ol>`. Gating those rules is not
-  // touched here. `master` is worse in kind on the same input: it closes the `<ul>` with `</ol>`, whose
-  // count then balances against the unrelated `<ol>`, and writes `class="enumerate undefined"`.
-  {
-    name: "inline \\item and \\end fire outside any list and leave tags open",
-    latex: "\\begin{itemize} \\item[X] b \\end{enumerate} \\end{itemize} \\item a \\begin{enumerate}",
-    html: "<ul class=\"itemize\" style=\"list-style-type: none\"> <li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">X</span>b</li></ul> </ul> \\item a <ol class=\"enumerate decimal\" style=\"list-style-type: decimal\">"
-  },
-  // The only invariant violation left in 24k fuzzed documents: on one line the inline path emits the
-  // gap as text, so it lands directly in the `<ul>`. The two-line form is already clean.
+  // On one line the inline path emits the gap as text, so it lands directly in the `<ul>`. The
+  // two-line form is already clean.
   {
     name: "an empty list written on one line keeps its whitespace inside the <ul>",
     latex: "\\begin{itemize}     \\end{itemize}",

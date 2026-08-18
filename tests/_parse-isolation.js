@@ -1162,3 +1162,32 @@ describe('the host-flag cache does not answer across renders:', () => {
     }
   });
 });
+
+// The flag that mutes the inline list rules during a marker parse is per render, like the level
+// stack: stuck above zero it would silence them for the rest of the process.
+describe('the marker-parse flag does not survive a render:', () => {
+  const {
+    beginMarkerParse,
+    endMarkerParse,
+    isParsingMarker,
+    resetListState,
+  } = require('../lib/markdown/md-latex-lists-env/list-state');
+  afterEach(() => resetListState());
+  it('a reset clears a flag left set', () => {
+    beginMarkerParse();
+    isParsingMarker().should.equal(true);
+    resetListState();
+    isParsingMarker().should.equal(false, 'the flag outlived the render');
+  });
+  it('an unpaired end does not push the count below zero', () => {
+    endMarkerParse();
+    beginMarkerParse();
+    isParsingMarker().should.equal(true, 'a negative count swallowed the next marker parse');
+  });
+  it('a list still renders after a reset that follows a set flag', () => {
+    beginMarkerParse();
+    resetListState();
+    MM.markdownToHTML('\\begin{itemize}\n\\item a\n\\end{itemize}', { outMath: { include_svg: false } })
+      .should.include('<li', 'the inline list rules stayed off');
+  });
+});

@@ -29,6 +29,8 @@ let listLevels: ListLevelState[] = [];
  */
 export const resetListState = (): void => {
   listLevels = [];
+  // Stuck above zero, the flag mutes the inline list rules for good.
+  markerParseDepth = 0;
 };
 
 /**
@@ -106,5 +108,8 @@ export const beginMarkerParse = (): void => {
 };
 
 export const endMarkerParse = (): void => {
-  markerParseDepth--;
+  // Clamped: one unpaired end would leave it negative, and the next marker parse would not register.
+  if (markerParseDepth > 0) {
+    markerParseDepth--;
+  }
 };

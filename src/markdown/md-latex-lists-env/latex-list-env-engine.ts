@@ -113,6 +113,10 @@ export const createBufferedState = (state: StateBlock): BufferedBlockState => {
   const tempState = Object.create(state) as BufferedBlockState;
   tempState.tokens = [];
   tempState.level = state.level;
+  // Own copy: `types` is popped in place, so a pop before the first open would reach the real state.
+  if (Array.isArray((state as any).types)) {
+    tempState.types = (state as any).types.slice();
+  }
   tempState.push = ((type: string, tag: string, nesting: number) => {
     const tok = new TokenCtor(type, tag, nesting);
     tok.block = true;

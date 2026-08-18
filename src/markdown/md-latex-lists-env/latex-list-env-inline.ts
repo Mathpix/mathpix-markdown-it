@@ -253,6 +253,10 @@ export const listCloseInline: RuleInline = (
   if (!state.env.isBlock || isParsingMarker()) {
     return false;
   }
+  // No list open: the closer emitted a bare `</ul>`.
+  if (getOpenListCount() === 0) {
+    return false;
+  }
   // Must start with backslash
   if (state.src.charCodeAt(startPos) !== 0x5c /* '\' */) {
     return false;

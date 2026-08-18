@@ -153,9 +153,9 @@ describe('list source model: the open-env count walks the tail as the parse loop
   });
 });
 
-// The four guards below are unreachable from LaTeX: over every list fixture plus 160 generated shapes
-// of a list opening inside a list, dropping any one of them changes no rendered document. They hold
-// against a hand-built stream instead, which is what a caller passing tokens straight in can produce.
+// The four guards below are unreachable from LaTeX: over every list fixture, dropping any one of them
+// changes no rendered document. They hold against a hand-built stream instead, which is what a caller
+// passing tokens straight in can produce.
 describe('absorbSublistIntoWrapper: what the guards refuse to move', () => {
   const tok = (type, meta) => {
     const t = { type: type, tag: '', nesting: 0, meta: meta, attrs: null, content: '' };
@@ -226,5 +226,30 @@ describe('absorbSublistIntoWrapper: what the guards refuse to move', () => {
     const before = types(tokens);
     absorbSublistIntoWrapper(tokens, 0);
     types(tokens).should.equal(before);
+  });
+});
+
+// Two readers act on the -1 this returns — one takes the closer as structure, the other opens no
+// wrapper — so the suffix invariant its callers keep is pinned here rather than left to a comment.
+describe('list source model: the offset anchor answers only for a suffix of its own line', () => {
+  const { absoluteOffsetOf } = require('../lib/markdown/md-latex-lists-env/list-source-model');
+  const src = '\\begin{itemize}\n\\item a \\end{itemize} tail\n';
+  const state = stateOf(src);
+  const line = 1;
+  const whole = '\\item a \\end{itemize} tail';
+  it('a whole line resolves to the offset the source holds', () => {
+    const at = absoluteOffsetOf(state, line, whole, whole.indexOf('\\end'), '\\end{itemize}');
+    at.should.be.above(0, 'the anchor missed on the line itself');
+    src.substr(at, 13).should.equal('\\end{itemize}');
+  });
+  it('a suffix of it resolves to the same offset', () => {
+    const suffix = whole.slice(8);
+    const at = absoluteOffsetOf(state, line, suffix, suffix.indexOf('\\end'), '\\end{itemize}');
+    at.should.equal(src.indexOf('\\end{itemize}', 1), 'a suffix must anchor like the line');
+  });
+  it('a middle slice answers -1 rather than a shifted offset', () => {
+    const middle = whole.slice(0, whole.length - 5);
+    absoluteOffsetOf(state, line, middle, middle.indexOf('\\end'), '\\end{itemize}')
+      .should.equal(-1, 'a shifted anchor passed as a real offset');
   });
 });
