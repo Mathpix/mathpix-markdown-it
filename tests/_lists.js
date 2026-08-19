@@ -4,8 +4,9 @@ let should = chai.should();
 let MM = require('../lib/mathpix-markdown-model/index').MathpixMarkdownModel;
 const markdownIt = require('markdown-it');
 const { mathpixMarkdownPlugin } = require('../lib/index.js');
-const { pairArgumentSpans } = require('../lib/markdown/md-latex-lists-env/list-source-model');
-const { LATEX_ITEM_COMMAND_INLINE_RE, LATEX_ITEM_SPLIT_RE } = require('../lib/markdown/common/consts');
+const { braceMatches, commandArgumentSpans } = require('../lib/markdown/common/argument-spans');
+const { LATEX_ITEM_COMMAND_INLINE_RE, LATEX_ITEM_SPLIT_RE,
+  LATEX_BRACE_ARG_COMMANDS } = require('../lib/markdown/common/consts');
 
 const options = {
   cwidth: 800,
@@ -218,17 +219,20 @@ describe('An unclosed wrapper env leaves the list rendering:', () => {
     'the closer left of the opener belongs to an earlier wrapper': [
       '\\begin{itemize}\n\\item a\n\\begin{center}\nx\n\\end{center} \\begin{center}\n'
       + '\\item b\n\\end{itemize}\n', 2],
-    // One closer and one opener between the wrapper and its candidate closer: equal counts, and the
-    // closer standing first is ours. Tallying them declined to decline, and item `b` was lost.
+    // Boundaries crossed: the wrapper opens, our closer stands inside it, another list opens after that.
+    // The wrapper owns its body, so both go to its rule — the inner list is left open there and reads
+    // as text, while the item before the wrapper stays an item.
     'env boundaries crossed, equal counts in the window': [
       '\\begin{itemize}\n\\item a\n\\begin{center}\n\\end{itemize}\n'
-      + '\\begin{itemize}\n\\item b\n\\end{center}\n\\end{itemize}\n', 2],
+      + '\\begin{itemize}\n\\item b\n\\end{center}\n\\end{itemize}\n', 1, true],
   };
-  Object.entries(shapes).forEach(([name, [src, expectedItems]]) => {
+  Object.entries(shapes).forEach(([name, [src, expectedItems, bodyIsLiteral]]) => {
     it(name, () => {
       const { items, leaked } = rendered(src);
       items.should.equal(expectedItems, 'the list lost or gained an item');
-      leaked.should.equal(false, 'the list fell out as literal LaTeX');
+      leaked.should.equal(!!bodyIsLiteral, bodyIsLiteral
+        ? 'the wrapper body stopped reading as text'
+        : 'the list fell out as literal LaTeX');
     });
   });
   // A list opened mid-line — a sibling or a nested one — got no `map`, so line numbering emitted a bare
@@ -261,24 +265,53 @@ describe('An unclosed wrapper env leaves the list rendering:', () => {
     const items = numbered(shapes[1]).match(/<li[^>]*>/g) || [];
     items.map((tag) => attr(tag, 'data_parent_line_start')).should.deep.equal(['0', '0', '0']);
   });
+  // Every name on the list must actually shield: nine were missing — the underline and `\author` rules
+  // build their names by alternation, so a sweep for `\\name` in the source does not see them — and a
+  // closer written in their argument ended the list where the same closer in `\caption{…}` did not.
+  it('a closer in the argument of every supported command is text', () => {
+    const shielded = (name) => {
+      const html = MM.markdownToHTML('\\begin{itemize}\n\\item a\n\\end{itemize} \\begin{itemize}\n'
+        + '\\item b\n\\' + name + '{ \\end{itemize} }', { outMath: { include_svg: false } });
+      return (html.match(/<ul/g) || []).length;
+    };
+    LATEX_BRACE_ARG_COMMANDS.forEach((name) => {
+      // `\begin` and `\end` name the structure itself, so their own argument is not asked about.
+      if (name === 'begin' || name === 'end') {
+        return;
+      }
+      shielded(name).should.equal(1, 'the closer inside \\' + name + ' ended the list');
+    });
+    shielded('foo').should.equal(2, 'an unsupported name shielded a closer');
+  });
   // The span search is a binary one, so ascending non-overlapping output is an assumption, not a nicety —
   // a nested pair leaking in makes a brace inside an argument read as one that opens a new argument.
   it('argument spans come back ascending, disjoint and balanced', () => {
     let seed = 20260810;
     const rnd = (n) => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed % n; };
-    const alphabet = ['{', '}', '\\', '\\{', '\\\\', 'a', ' ', '\n', '`'];
-    // A range end is exclusive: skipping a brace inside one must resume on it, not past it.
-    pairArgumentSpans('a{b{c}', [[1, 3]]).should.deep.equal([[3, 5]]);
-    pairArgumentSpans('a{b}c}', [[1, 3]]).should.deep.equal([]);
-    // Escapes are counted in pairs, so `\\{` opens where `\{` does not, and a trailing `\` ends the walk.
-    pairArgumentSpans('a\\{b}', []).should.deep.equal([]);
-    pairArgumentSpans('a\\\\{b}', []).should.deep.equal([[3, 5]]);
-    pairArgumentSpans('{a\\', []).should.deep.equal([]);
+    // Command names among the pieces: without one the spans come back empty and the invariants below
+    // hold over nothing.
+    const alphabet = ['{', '}', '\\', '\\{', '\\\\', 'a', ' ', '\n', '`',
+      '\\label', '\\caption', '\\renewcommand', '\\foo'];
+    // The pairing itself, over the same shapes: a range end is exclusive, so skipping a brace inside one
+    // must resume on it rather than past it, and escapes count in pairs — `\\{` opens where `\{` does not.
+    const pairsOf = (text, verbatim) => [...braceMatches(text, verbatim).entries()].sort((a, b) => a[0] - b[0]);
+    pairsOf('a{b{c}', [[1, 3]]).should.deep.equal([[3, 5]]);
+    pairsOf('a{b}c}', [[1, 3]]).should.deep.equal([]);
+    pairsOf('a\\{b}', []).should.deep.equal([]);
+    pairsOf('a\\\\{b}', []).should.deep.equal([[3, 5]]);
+    pairsOf('{a\\', []).should.deep.equal([]);
     // A backslash inside a verbatim range escapes nothing beyond it: the brace at its end still opens.
-    pairArgumentSpans('`\\`{a}', [[0, 3]]).should.deep.equal([[3, 5]]);
+    pairsOf('`\\`{a}', [[0, 3]]).should.deep.equal([[3, 5]]);
     // Including when the `\` is the last character of the range — it used to eat the brace after it.
-    pairArgumentSpans('`x\\{a}', [[0, 3]]).should.deep.equal([[3, 5]]);
-    pairArgumentSpans('`x\\{a}', [[0, 2]]).should.deep.equal([]);
+    pairsOf('`x\\{a}', [[0, 3]]).should.deep.equal([[3, 5]]);
+    pairsOf('`x\\{a}', [[0, 2]]).should.deep.equal([]);
+    // And the rule on top of it: a group is an argument only of a command the package parses.
+    commandArgumentSpans('a{b}', []).should.deep.equal([], 'a group in prose is not an argument');
+    commandArgumentSpans('\\foo{b}', []).should.deep.equal([], 'an unsupported name is text');
+    commandArgumentSpans('\\label{b}', []).should.deep.equal([[6, 8]]);
+    commandArgumentSpans('\\caption*[1]{b}{c}', []).should.deep.equal([[12, 14], [15, 17]]);
+    commandArgumentSpans('\\label{b', []).should.deep.equal([], 'an argument left open marks nothing');
+    commandArgumentSpans('`\\label{b}`', [[0, 11]]).should.deep.equal([], 'a command in code is text');
     for (let round = 0; round < 20000; round++) {
       let text = '';
       for (let i = rnd(24); i > 0; i--) {
@@ -287,7 +320,7 @@ describe('An unclosed wrapper env leaves the list rendering:', () => {
       // Half the rounds pass a verbatim range, the branch that skips ahead inside the same walk.
       const cut = rnd(text.length + 1);
       const verbatim = round % 2 && cut < text.length ? [[cut, Math.min(text.length, cut + rnd(6))]] : [];
-      const spans = pairArgumentSpans(text, verbatim);
+      const spans = commandArgumentSpans(text, verbatim);
       let previousEnd = -1;
       spans.forEach(([from, to]) => {
         const where = ' in ' + JSON.stringify(text) + ' with ' + JSON.stringify(verbatim);
@@ -436,9 +469,9 @@ describe('An unclosed wrapper env leaves the list rendering:', () => {
       deeper.leaked.should.equal(false, 'the list fell out as literal LaTeX at depth ' + depth);
     });
   });
-  // Marker tokens are shared between the lists of one render — cloning them per open measured 12–29%
-  // slower. Frozen instead, so a consumer's write reaches no list at all rather than every later one.
-  it('a write into a marker token reaches no list', () => {
+  // The cache holds one frozen set per macro and hands out a copy per list, so a consumer's write
+  // lands on the list it was made in — as on 3.0.1 — and reaches no other, and no render throws.
+  it('a write into a marker token stays in the list that took it', () => {
     const list = '\\begin{itemize}\n\\item a\n\\end{itemize}';
     const md = markdownIt({ html: true }).use(mathpixMarkdownPlugin, { outMath: { include_svg: false } });
     const base = md.renderer.rules.text;
@@ -453,8 +486,8 @@ describe('An unclosed wrapper env leaves the list rendering:', () => {
     const env = {};
     const inside = markers(md.render([list, list, list].join('\n\n'), env));
     inside.should.have.length(3);
-    inside.some((m) => /STAMPED/.test(m))
-      .should.equal(false, 'a write into a frozen marker token reached a list');
+    inside.filter((m) => /STAMPED/.test(m))
+      .should.have.length(1, 'the write reached more lists than the one it was made in');
     markers(md.render(list, env)).should.deep.equal(['<span class="li_level">•</span>'],
       'the write survived into the next render through the same env');
   });
@@ -574,9 +607,9 @@ describe('Cached marker tokens follow \\renewcommand:', () => {
       (a.match(/target=/g) || []).should.have.lengthOf(1, 'attributes piled up on marker ' + (i + 1));
     });
   });
-  // The array is copied per list, the tokens are not — cloning them measured 12–29% slower. They are
-  // frozen, so a write into one changes neither this list nor the next.
-  it('the tokens are shared between lists, and frozen against a write', () => {
+  // Each list gets its own copy of the cached tokens, so a write into one reaches that list and no
+  // other. The cached originals stay frozen, which is what makes the copy the only writable thing.
+  it('each list gets its own copy of the marker tokens', () => {
     const md = markdownIt({ html: true }).use(mathpixMarkdownPlugin, { outMath: { include_svg: false } });
     const src = '\\renewcommand{\\labelitemi}{Q}\n\n\\begin{itemize}\n\\item a\n\\end{itemize}\n\n'
       + '\\begin{itemize}\n\\item b\n\\end{itemize}';
@@ -584,13 +617,13 @@ describe('Cached marker tokens follow \\renewcommand:', () => {
     const opens = tokens.filter((token) => token.type === 'itemize_list_open');
     opens.should.have.lengthOf(2);
     opens[0].itemizeLevel[0].should.not.equal(opens[1].itemizeLevel[0], 'the array is meant to be copied');
-    opens[0].itemizeLevel[0][0].should.equal(opens[1].itemizeLevel[0][0]);
-    Object.isFrozen(opens[0].itemizeLevel[0][0]).should.equal(true, 'a cached marker token is writable');
-    // Sloppy mode swallows the write, strict throws — either way it must not reach the output.
-    try { opens[0].itemizeLevel[0][0].content = 'ZZZ'; } catch (e) { /* strict-mode caller */ }
+    opens[0].itemizeLevel[0][0].should.not.equal(opens[1].itemizeLevel[0][0], 'the tokens are meant to be copied too');
+    Object.isFrozen(opens[0].itemizeLevel[0][0]).should.equal(false, 'a copy handed out must be writable');
+    // Written on one list's copy: it renders there and nowhere else, and the write does not throw.
+    opens[0].itemizeLevel[0][0].content = 'ZZZ';
     [...md.renderer.render(tokens, md.options, {})
       .matchAll(/<span class="li_level"[^>]*>([^<]*)<\/span>/g)].map((m) => m[1])
-      .should.deep.equal(['Q', 'Q']);
+      .should.deep.equal(['ZZZ', 'Q']);
   });
 });
 

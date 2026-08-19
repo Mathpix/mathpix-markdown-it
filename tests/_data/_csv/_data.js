@@ -1238,6 +1238,20 @@ module.exports = [
     tsv: '" • a\n • b"',
     csv: '" • a\n • b"',
     csvQuoteAllFields: '" • a\n • b"'
+  },
+  // A fence in the cell joins the leaf run and exports its content; the second shape is the control
+  // without a list. Quoting comes from the newline in the value, and from the option in the last column.
+  {
+    latex: '\\begin{tabular}{|l|}\n\\begin{itemize}\\item a\\end{itemize} ```\ncode\n``` \\\\\n\\end{tabular}',
+    tsv: '" • acode\n"',
+    csv: '" • acode\n"',
+    csvQuoteAllFields: '" • acode\n"'
+  },
+  {
+    latex: '\\begin{tabular}{|l|}\n```\ncode\n``` \\\\\n\\end{tabular}',
+    tsv: 'code',
+    csv: 'code',
+    csvQuoteAllFields: '"code"'
   }
   // {
   //   latex: '',

@@ -93,8 +93,9 @@ const markerBucket = (state: StateBlock | StateInline): Map<string, Token[]> => 
   return byMacro;
 };
 
-// The token and what hangs off it: `attrSet` pushes into an existing `attrs`, so freezing the token
-// alone still let a link or an `\includegraphics` marker carry a write into the next list.
+// The cached originals, which no reader ever receives — every read takes a copy below. Frozen so that a
+// path returning one uncopied, or our own code writing into the cache, fails here instead of leaking
+// into the next list: that is how `link_open` was caught piling `target` onto a shared marker.
 const freezeMarkerToken = (token: Token): void => {
   if (token.attrs) {
     token.attrs.forEach((attr) => Object.freeze(attr));
@@ -107,12 +108,10 @@ const freezeMarkerToken = (token: Token): void => {
   Object.freeze(token);
 };
 
-// Read back from the cache: a render rule pushes attrs onto a link or an image marker, so those come
-// out as a copy with their own arrays. A plain text or math marker carries neither and is shared.
+// A copy per read, always. Handing out the shared token cost either a leak into every later list with
+// the same marker, or — once the cache was frozen — a `TypeError` out of `md.render` when a consumer's
+// rule wrote to it. The copy carries its own `attrs` and `children`, so a write travels nowhere.
 const readableMarker = (token: Token): Token => {
-  if (!token.attrs && !token.children) {
-    return token;
-  }
   const copy: Token = Object.assign(Object.create(Object.getPrototypeOf(token)), token);
   if (token.attrs) {
     copy.attrs = token.attrs.map((attr) => attr.slice() as [string, string]);
@@ -132,7 +131,8 @@ const parseMarkerTokens = (
     cacheable && state.env ? markerBucket(state) : null;
   const cached: Token[] | undefined = bucket?.get(level);
   if (cached) {
-    // Cloning every token per open measured 12–29% slower, so only the ones a rule writes to are.
+    // Measured: not distinguishable over the corpus; on 400 lists of five items the copies cost about
+    // 2 ms of 22 when the marker is math — its children are the parsed formula — and noise otherwise.
     return cached.map(readableMarker);
   }
   const children: Token[] = [];

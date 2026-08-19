@@ -1652,5 +1652,15 @@ module.exports = [
   {
     latex: '\\begin{tabular}{|l|}\\begin{itemize}\\item a\\item b\\end{itemize}\\end{tabular}',
     tsv: '" • a\n • b"'
+  },
+  // A fence in the cell joins the leaf run and exports its content. Only content-free tokens end a run,
+  // so listing `fence` among them would drop this silently; the second shape is the control without a list.
+  {
+    latex: '\\begin{tabular}{|l|}\n\\begin{itemize}\\item a\\end{itemize} ```\ncode\n``` \\\\\n\\end{tabular}',
+    tsv: '" • acode\n"'
+  },
+  {
+    latex: '\\begin{tabular}{|l|}\n```\ncode\n``` \\\\\n\\end{tabular}',
+    tsv: 'code'
   }
 ];

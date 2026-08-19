@@ -11,16 +11,10 @@ export declare const maskNonStructure: (text: string) => string;
 export declare const unclosedEnvsIn: (s: string) => number;
 export declare const listCloserOffsets: (state: StateBlock) => readonly number[];
 export declare const lastListEndPos: (state: StateBlock) => number;
-export declare const pairArgumentSpans: (text: string, verbatim: Array<[
-    number,
-    number
-]>) => Array<[
-    number,
-    number
-]>;
 export declare const wrapperBeginAt: (lineText: string) => RegExpExecArray | null;
 export declare const absoluteOffsetOf: (state: StateBlockLike, line: number, lineText: string, index: number, text: string) => number;
 export declare const closersLeftAfter: (state: StateBlockLike, at: number) => number;
+export declare const canCloseAfter: (state: StateBlockLike, from: number, needed: number) => boolean;
 export declare const hasCloserAhead: (state: StateBlockLike, from: number, name: string) => boolean;
 export declare const nextListEnvMatch: (s: string) => {
     match: RegExpMatchArray;

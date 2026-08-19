@@ -1,4 +1,5 @@
 export declare const tocRegexp: RegExp;
+export declare const isAsciiLetter: (code: number) => boolean;
 export declare const isSpace: (code: any) => boolean;
 export declare const isWhitespace: (s: string) => boolean;
 /** Position of the next `endMarker` at or after `i` that is not escaped by a `\`, or -1. */

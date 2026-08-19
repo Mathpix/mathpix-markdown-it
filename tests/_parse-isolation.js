@@ -596,9 +596,9 @@ describe('a failing list rule does not fail the document', () => {
 
   // The marker parse mutates `md.options` for `forDocx`; a throw there would leave the mutated `outMath`
   // on the instance for every later render, so the restore sits in a `finally`.
-  // Marker tokens parsed from one macro are shared by every list of that parse — deliberate, since
-  // cloning per read measured 12–29% slower. They are frozen, so the sharing cannot carry a write.
-  it('marker tokens are shared inside one parse and refuse a write', () => {
+  // One macro is parsed once and its tokens are cached frozen; every list reads a copy, so a write
+  // into what a consumer holds cannot travel to another list, another parse, or another `env`.
+  it('a write into a marker token stays in the copy that took it', () => {
     const md = markdownIt({ html: true }).use(mathpixMarkdownPlugin, {});
     const src = '\\renewcommand{\\labelitemi}{$x$}\n\n\\begin{itemize}\n\\item a\n\\end{itemize}\n\n'
       + '\\begin{itemize}\n\\item b\n\\end{itemize}';
@@ -608,10 +608,10 @@ describe('a failing list rule does not fail the document', () => {
     const env = {};
     const first = markersOf(env);
     first.should.have.lengthOf(2);
-    first[0].should.equal(first[1], 'both lists take the marker from one macro');
-    Object.isFrozen(first[0]).should.equal(true, 'a cached marker token is writable');
-    // Strict mode throws on the write, sloppy swallows it; neither may leave a mark.
-    try { first[0].attrSet('data-probe', '1'); } catch (e) { /* strict-mode caller */ }
+    first[0].should.not.equal(first[1], 'each list must read its own copy');
+    first[0].content.should.equal(first[1].content, 'both copies come from one macro');
+    // A copy is writable, and `attrSet` on it must not throw the way it did on the frozen original.
+    first[0].attrSet('data-probe', '1');
     const again = markersOf(env);
     (again[0].attrGet('data-probe') === null).should.equal(true, 'the write outlived its parse');
     const fresh = markersOf({});

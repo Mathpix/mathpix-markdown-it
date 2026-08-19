@@ -26,7 +26,7 @@ const isZeroWidthChar = (cp: number): boolean =>
   cp === 0x0670 || (cp >= 0x06D6 && cp <= 0x06DC) || (cp >= 0x06DF && cp <= 0x06E4) ||
   (cp >= 0x06E7 && cp <= 0x06E8) || (cp >= 0x06EA && cp <= 0x06ED) ||
   (cp >= 0x0900 && cp <= 0x0902) || cp === 0x093A || cp === 0x093C ||      // Devanagari marks
-  (cp >= 0x0941 && cp <= 0x0948) || (cp >= 0x094D && cp <= 0x094D) ||
+  (cp >= 0x0941 && cp <= 0x0948) || cp === 0x094D ||
   (cp >= 0x0951 && cp <= 0x0957) ||
   cp === 0x0E31 || (cp >= 0x0E34 && cp <= 0x0E3A) || (cp >= 0x0E47 && cp <= 0x0E4E); // Thai marks
 

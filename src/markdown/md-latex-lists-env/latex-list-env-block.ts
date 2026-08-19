@@ -42,7 +42,7 @@ import {
   splitInlineListEnv,
   listCloserOffsets,
   lastListEndPos,
-  closersLeftAfter,
+  canCloseAfter,
   nextListEnvMatch,
   maskNonStructure,
 } from "./list-source-model";
@@ -246,12 +246,9 @@ export const ListsInternal = (
             // Count, do not just look: a tail opening two levels needs two closers. The count walks
             // the tail as this loop does, so both agree on which transitions are real.
             const needed: number = unclosedEnvsIn(sE);
-            if (needed <= 0) {
-              siblingClosable = true;
-            } else {
-              // Free closers, not every closer: one claimed by a list opened further down is not ours.
-              siblingClosable = closersLeftAfter(state, state.eMarks[lineIdx]) >= needed;
-            }
+            // In order, not by balance: a net count let an unclosed env below subtract a closer this
+            // sibling reaches first.
+            siblingClosable = canCloseAfter(state, state.eMarks[lineIdx], needed);
           }
           if (siblingClosable) {
             // The outermost list closed, so the sibling opens outside any list: applyListCloseState

@@ -5,6 +5,7 @@ import { matchPositionsCached, countPositionsAtOrAfter, srcValueCached } from ".
 import { getInlineCodeListFromString } from "../common";
 import { LATEX_ITEM_MARKER_G } from "../common/consts";
 import { findVerbatimRanges, isInsideRanges } from "../common/verbatim-ranges";
+import { commandArgumentSpans } from "../common/argument-spans";
 import {
   BEGIN_LIST_ENV_INLINE_RE,
   END_LIST_ENV_INLINE_RE,
@@ -87,6 +88,7 @@ export const unclosedEnvsIn = (s: string): number => {
 const LIST_END_OFFSETS_KEY = Symbol('mmd.listEndOffsets');
 const CLOSER_SUFFIX_KEY = Symbol('mmd.closerSuffix');
 const OPENER_SUFFIX_KEY = Symbol('mmd.openerSuffix');
+const DEPTH_STEPS_KEY = Symbol('mmd.listDepthSteps');
 export const listCloserOffsets = (state: StateBlock): readonly number[] =>
   matchPositionsCached(state, LIST_END_OFFSETS_KEY, END_LIST_ENV_SWEEP_G);
 
@@ -139,59 +141,13 @@ const LIST_BEGIN_OFFSETS_KEY = Symbol('mmd.listBeginOffsets');
 const listOpenerOffsets = (state: StateBlock): readonly number[] =>
   matchPositionsCached(state, LIST_BEGIN_OFFSETS_KEY, BEGIN_LIST_ENV_SWEEP_G);
 
-// Outermost `{}` pairs in one pass; a `{` that never closes stays on the stack and yields no span.
-// Calling findEndMarker per brace rescanned the tail — `n^1.9` measured on a run of unmatched `{`.
-// Every balanced pair, the env name in `\end{itemize}` included. Exported to be tested directly.
-export const pairArgumentSpans = (text: string, verbatim: Array<[number, number]>): Array<[number, number]> => {
-  const spans: Array<[number, number]> = [];
-  const open: number[] = [];
-  let range: number = 0;
-  for (let i = 0; i < text.length; i++) {
-    const chr: string = text[i];
-    if (chr !== '{' && chr !== '}' && chr !== '\\') {
-      continue;
-    }
-    // Verbatim is text: skip it whole. Before the escape check, or a `\` ending a range escapes past it.
-    while (range < verbatim.length && verbatim[range][1] <= i) {
-      range++;
-    }
-    if (range < verbatim.length && i >= verbatim[range][0]) {
-      i = verbatim[range][1] - 1;
-      continue;
-    }
-    if (chr === '\\') {
-      i++;                        // an escaped brace opens and closes nothing
-      continue;
-    }
-    if (chr === '{') {
-      open.push(i);
-      continue;
-    }
-    const from: number | undefined = open.pop();
-    if (from !== undefined) {
-      spans.push([from, i]);          // every pair: depth 1 alone would lose all pairs under a stray `{`
-    }
-  }
-  // Keep the outermost, as findEndMarker returned; ascending, so the span search stays a binary one.
-  spans.sort((a, b) => a[0] - b[0] || b[1] - a[1]);
-  const outer: Array<[number, number]> = [];
-  let reach = -1;
-  for (const span of spans) {
-    if (span[1] > reach) {
-      outer.push(span);
-      reach = span[1];
-    }
-  }
-  return outer;
-};
-
 const verbatimRangesOf = (state: StateBlockLike): Array<[number, number]> =>
   srcValueCached(state as StateBlock, VERBATIM_KEY, findVerbatimRanges);
 
 // Both are cached per source, and the pairing reads the ranges rather than finding them again.
 const argumentSpansOf = (state: StateBlockLike): Array<[number, number]> =>
   srcValueCached(state as StateBlock, ARG_SPANS_KEY,
-    (src: string) => pairArgumentSpans(src, verbatimRangesOf(state)));
+    (src: string) => commandArgumentSpans(src, verbatimRangesOf(state)));
 
 const insideVerbatim = (state: StateBlockLike, at: number): boolean =>
   isInsideRanges(verbatimRangesOf(state), at);
@@ -317,6 +273,46 @@ export const closersLeftAfter = (state: StateBlockLike, at: number): number =>
   structuralCountIn(state, listCloserOffsets(state as StateBlock), CLOSER_SUFFIX_KEY, at, Infinity)
   - structuralCountIn(state, listOpenerOffsets(state as StateBlock), OPENER_SUFFIX_KEY, at, Infinity);
 
+// Every structural list transition in the source, ascending, as (offset, +1 for an open / -1 for a
+// close). Built once per source, so the walk below costs a binary search and the steps it takes.
+const buildListDepthSteps = (state: StateBlockLike): { offsets: number[]; steps: number[] } => {
+  const spans: Array<[number, number]> = argumentSpansOf(state);
+  const isStructural = (offset: number): boolean =>
+    !isInsideRanges(spans, offset) && !insideVerbatim(state, offset);
+  const openerOffsets: number[] = listOpenerOffsets(state as StateBlock).filter(isStructural);
+  const closerOffsets: number[] = listCloserOffsets(state as StateBlock).filter(isStructural);
+  const offsets: number[] = [];
+  const steps: number[] = [];
+  let nextOpener = 0;
+  let nextCloser = 0;
+  while (nextOpener < openerOffsets.length || nextCloser < closerOffsets.length) {
+    const openerIsFirst: boolean = nextOpener < openerOffsets.length
+      && (nextCloser >= closerOffsets.length || openerOffsets[nextOpener] < closerOffsets[nextCloser]);
+    offsets.push(openerIsFirst ? openerOffsets[nextOpener++] : closerOffsets[nextCloser++]);
+    steps.push(openerIsFirst ? 1 : -1);
+  }
+  return { offsets, steps };
+};
+
+// Can the source after `from` close `needed` levels? A net count cannot answer that: an opener standing
+// after the closers a sibling list needs costs that list nothing, yet subtracting it declined a
+// closable sibling whenever an unclosed env sat further down the document.
+export const canCloseAfter = (state: StateBlockLike, from: number, needed: number): boolean => {
+  if (needed <= 0) {
+    return true;
+  }
+  const { offsets, steps } = srcValueCached(state as StateBlock, DEPTH_STEPS_KEY,
+    () => buildListDepthSteps(state));
+  let levelsToClose: number = needed;
+  for (let i = offsets.length - countPositionsAtOrAfter(offsets, from); i < offsets.length; i++) {
+    levelsToClose += steps[i];
+    if (levelsToClose === 0) {
+      return true;
+    }
+  }
+  return false;
+};
+
 // Opening a wrapper as opaque swallows every line until its closer, so require one it can reach.
 // Reaching past a closer of our own list swallowed it too, and the whole list then printed as
 // literal LaTeX — that closer may be the last thing on its line, so position cannot decide it.
@@ -334,14 +330,12 @@ export const hasCloserAhead = (state: StateBlockLike, from: number, name: string
     if (writtenAsText(state, at)) {
       continue;
     }
-    // Swallowing our closer is allowed when the source past the wrapper still closes the open lists and
-    // no list starts inside it — eating another list's `\begin` would lose that list. A closer farther
-    // out swallows a superset, so failing here ends the search rather than moving it along.
+    // Swallowing our closer is allowed when the source past the wrapper still closes the open lists: the
+    // wrapper owns its body, and what stands inside goes to the wrapper's own rule. A closer farther out
+    // swallows a superset, so failing here ends the search rather than moving it along.
     if (closesOurListWithin(state, from, at)) {
-      const opensInside: number =
-        structuralCountIn(state, listOpenerOffsets(state as StateBlock), OPENER_SUFFIX_KEY, from, at);
       // The live count, not this source's own depth: an ambient list from an outer parse still needs closing.
-      if (opensInside > 0 || closersLeftAfter(state, at) < Math.max(1, getOpenListCount())) {
+      if (closersLeftAfter(state, at) < Math.max(1, getOpenListCount())) {
         return false;
       }
     }

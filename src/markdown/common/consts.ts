@@ -176,6 +176,26 @@ export const RENEWCOMMAND_LINE_RE: RegExp = /^\s*\\renewcommand\b/;
 /** Where a chunk splits into items, for `search`: a real `\item`, so `\itemsep` is not a split point.
  *  Must answer like ITEM_COMMAND_SOURCE — pinned by a property test. */
 export const LATEX_ITEM_SPLIT_RE: RegExp = /\\item(?:\s*\[|(?![a-zA-Z]))/;
+/** Commands whose `{...}` argument this package parses — and only they take a brace group as one:
+ *  Markdown keeps braces in prose, so `{a}` and an unsupported `\foo{a}` are text. Add a name when its
+ *  argument starts being read: a name here can shield an `\end{itemize}` inside it, a missing one cannot. */
+export const LATEX_BRACE_ARG_COMMANDS: readonly string[] = Object.freeze([
+  'begin', 'end',
+  'label', 'ref', 'eqref',
+  'caption', 'captionsetup',
+  'footnote', 'footnotetext', 'blfootnotetext',
+  'newtheorem', 'theoremstyle', 'setcounter', 'addcontentsline',
+  'renewcommand', 'qedsymbol',
+  'multirow', 'multicolumn', 'cline',
+  'includegraphics', 'icon',
+  'diagbox', 'backslashbox', 'slashbox',
+  'title', 'section', 'subsection', 'subsubsection',
+  'url', 'text', 'textbf', 'textit', 'textrm', 'texttt', 'textsf',
+  'underline', 'uline', 'uuline', 'uwave', 'dashuline', 'dotuline', 'sout', 'xout',
+  'author',
+  'colorbox', 'textcolor',
+]);
+
 /** Block envs the list scanner knows; the regex below is built from it, so the two cannot drift. */
 export const LATEX_BLOCK_ENV_NAMES: readonly string[] =
   Object.freeze(['center', 'left', 'right', 'table', 'figure', 'tabular', 'lstlisting']);

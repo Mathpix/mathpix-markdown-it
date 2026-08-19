@@ -1637,6 +1637,38 @@ module.exports = [
     latex: "\\begin{itemize}\n\\item a\n\\begin{center}\n\\begin{lstlisting}\n{\n\\end{lstlisting}\n\\caption{q \\end{itemize} w}\n\\end{center}\n\\item b\n\\end{itemize}",
     html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\"><pre class=\"lstlisting\"><code class=\"hljs lstlisting-code\" style=\"text-align: left;\">{</code></pre>\n<br>\n w}</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
   },
+  // Markdown keeps braces in prose, so a group is an argument only of a command the package parses.
+  // Read as one, the braces around the list held its closer, and the list lost its second item.
+  {
+    name: "braces in prose around the list are prose",
+    latex: "opens {\n\\begin{itemize}\n\\item a\n\\begin{center}\\end{itemize}\\end{center}\n\\item b\n\\end{itemize}\ncloses }",
+    html: "<div>opens {</div>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\">\\end{itemize}</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul><div>closes }</div>\n"
+  },
+  {
+    name: "an unsupported command takes no argument, so its group shields nothing",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{center}\n\\foo{q \\end{itemize} w}\n\\end{center}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\">\\foo{q \\end{itemize} w}</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  // The same pair where the rule decides the output: the sibling list opens only if a closer is left for
+  // it, and the only one stands inside a group. Under an unsupported name it counts, under `\caption` it
+  // is that caption's text.
+  {
+    name: "a closer inside an unsupported command's group still opens the sibling list",
+    latex: "\\begin{itemize}\n\\item a\n\\end{itemize} \\begin{itemize}\n\\item b\n\\foo{ \\end{itemize} }",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul><ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>b<br>\n\\foo{</li></ul>"
+  },
+  {
+    name: "the same closer inside a caption does not",
+    latex: "\\begin{itemize}\n\\item a\n\\end{itemize} \\begin{itemize}\n\\item b\n\\caption{ \\end{itemize} }",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul><div>\\item b<br>\n }</div>\n"
+  },
+  // Nor inside `\underline`: the underline rules read their argument through the same `findEndMarker`, so
+  // every name they match belongs to the list. Left out, they shielded nothing and this list lost its item.
+  {
+    name: "the same closer inside an underline does not either",
+    latex: "\\begin{itemize}\n\\item a\n\\end{itemize} \\begin{itemize}\n\\item b\n\\underline{ \\end{itemize} }",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul><div>\\item b<br>\n<span data-underline-level=\"1\" data-underline-type=\"underline\" style=\"border-bottom: 1px solid;background-position: 0 -1px;\">\\end{itemize}</span></div>\n"
+  },
   // A brace inside inline code is text, so it opens no argument: counted as left open it made the
   // caption's closer read as structure, and the second item was lost.
   {
@@ -1791,9 +1823,17 @@ module.exports = [
     html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"table_tabular\">\n<div class=\"inline-tabular\"><table class=\"tabular\">\n<tbody>\n<tr style=\"border-top: none !important; border-bottom: none !important;\">\n<td style=\"text-align: left; border-left: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; \">q \\end{itemize} r</td>\n</tr>\n</tbody>\n</table>\n</div></div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
   },
   {
-    name: "a list opened inside the wrapper keeps the wrapper transparent",
+    // Our closer stands first inside the wrapper, two openers follow it and nothing closes the list after
+    // the wrapper: on a tally the closers do not outnumber the openers, the wrapper opens and takes the
+    // list start with it. Order decides instead, and the first item survives.
+    name: "a closer standing first inside the wrapper is ours, openers after it notwithstanding",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{center}\n\\end{itemize}\n\\begin{itemize}\n\\begin{itemize}\n\\item b\n\\end{center}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div>\\begin{center}</div>\n</li></ul><div>\\begin{itemize}</div>\n<div>\\begin{itemize}<br>\n\\item b<br>\n\\end{center}</div>\n"
+  },
+  {
+    name: "a list opened inside the wrapper goes to the wrapper with the rest of its body",
     latex: "\\begin{itemize}\n\\item a\n\\begin{center}\n\\end{itemize}\n\\begin{itemize}\n\\item b\n\\end{center}\n\\end{itemize}",
-    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div>\\begin{center}</div>\n</li></ul><ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>b<br>\n\\end{center}</li></ul>"
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\">\\end{itemize}<br>\n\\begin{itemize}<br>\n\\item b</div>\n</li></ul>"
   },
   // The same question asked from every distance and every context before the list: a brace left open in a
   // formula or a caption, one between two lists, and a brace held by inline code, a fence or an
@@ -2563,6 +2603,20 @@ module.exports = [
     name: "the same with plain text, not a fence",
     latex: "\\begin{enumerate}\\begin{itemize}text\n\\end{itemize}\n\\end{enumerate}",
     html: "<ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li class=\"li_enumerate not_number\" data-custom-marker=\"true\" data-marker-empty=\"true\" style=\"display: block\"><ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\">text</li></ul></li></ol>"
+  },
+  {
+    // A net count of closers ahead let the unclosed list below subtract the one the sibling reaches
+    // first, and both lists fell out as literal LaTeX. The unclosed tail stays literal, as it must.
+    name: "a sibling list is built even with an unclosed list below it",
+    latex: "\\begin{itemize}\n\\item a\n\\end{itemize} \\begin{itemize}\n\\item b\n\\end{itemize}\n\\begin{itemize}\n\\item c\n",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul><ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul><div>\\begin{itemize}<br>\n\\item c</div>\n"
+  },
+  {
+    // The word `item` inside a continuation line used to make it a new chunk, so the two lines were
+    // joined with nothing between them (`asome item text`). It is a line like any other now.
+    name: "a continuation line holding the word item keeps its break",
+    latex: "\\begin{itemize}\n\\item a\nsome item text\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a<br>\nsome item text</li></ul>"
   },
   {
     // `encodeURI` throws on a lone surrogate, and the throw used to take the whole render with it.

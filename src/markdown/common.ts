@@ -12,7 +12,7 @@ const hasProp = Object.prototype.hasOwnProperty;
 export const tocRegexp = /^\[\[toc\]\]/im;
 
 // A control word's name: ASCII letters only, as TeX reads it.
-const isAsciiLetter = (code: number): boolean =>
+export const isAsciiLetter = (code: number): boolean =>
   (code >= 0x41 && code <= 0x5A) || (code >= 0x61 && code <= 0x7A);
 
 export const isSpace = (code) => {

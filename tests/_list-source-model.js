@@ -12,6 +12,7 @@ const { mathpixMarkdownPlugin } = require('../lib/index.js');
 const { buildBlockStateFromRaw } = require('../lib/markdown/md-latex-lists-env/latex-list-env-engine');
 const {
   closersLeftAfter,
+  canCloseAfter,
   hasCloserAhead,
   firstUsableCloser,
   unclosedEnvsIn,
@@ -53,6 +54,30 @@ describe('list source model: closers a sibling may use', () => {
   cases.forEach(({ name, src, from, expect }) => {
     it(name, () => {
       closersLeftAfter(stateOf(src), at(src, from)).should.equal(expect);
+    });
+  });
+});
+
+describe('list source model: can the tail close what a sibling leaves open', () => {
+  // Order, not balance: the sibling takes the closers it reaches first, so an env opened below it —
+  // unclosed, or closed later — cannot subtract one. Counting the net cost the sibling its list.
+  const cases = [
+    { name: 'one closer ahead closes one level', needed: 1, expect: true,
+      src: '\\begin{itemize}\n\\item a\n\\end{itemize}\n' },
+    { name: 'an unclosed env below does not take it', needed: 1, expect: true,
+      src: '\\begin{itemize}\n\\item a\n\\end{itemize}\n\\begin{itemize}\n\\item b\n' },
+    { name: 'two levels need two closers, and the order gives them', needed: 2, expect: true,
+      src: '\\begin{itemize}\n\\begin{itemize}\n\\item a\n\\end{itemize}\n\\end{itemize}\n' },
+    { name: 'a closer that a list opened first has claimed is not reached', needed: 1, expect: false,
+      src: '\\begin{itemize}\n\\item a\n\\begin{itemize}\n\\item b\n\\end{itemize}\n' },
+    { name: 'nothing ahead closes nothing', needed: 1, expect: false,
+      src: '\\begin{itemize}\n\\item a\n' },
+    { name: 'nothing to close is answered without a walk', needed: 0, expect: true,
+      src: '\\begin{itemize}\n\\item a\n' },
+  ];
+  cases.forEach(({ name, src, needed, expect }) => {
+    it(name, () => {
+      canCloseAfter(stateOf(src), at(src, '\\item'), needed).should.equal(expect);
     });
   });
 });

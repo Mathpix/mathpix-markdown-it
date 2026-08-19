@@ -104,10 +104,25 @@ const violations = (html) => {
   if (item !== itemEnd) {
     bad.push('unbalanced <li>: ' + item + '/' + itemEnd);
   }
-  const list = (html.match(/<(ul|ol)[\s>]/g) || []).length;
-  const listEnd = (html.match(/<\/(ul|ol)>/g) || []).length;
-  if (list !== listEnd) {
-    bad.push('unbalanced list: ' + list + '/' + listEnd);
+  // Per tag, and in order: counting `ul` and `ol` together let `<ul>…</ol>` pass as balanced, which is
+  // the shape the crossed-name fix is about — `\end{itemize}` over an open `<ol>` used to emit `</ul>`.
+  const stack = [];
+  let crossed = '';
+  [...html.matchAll(/<(\/?)(ul|ol)[\s>]/g)].forEach((m) => {
+    if (m[1]) {
+      const open = stack.pop();
+      if (open !== m[2] && !crossed) {
+        crossed = '</' + m[2] + '> closes <' + (open || 'nothing') + '>';
+      }
+    } else {
+      stack.push(m[2]);
+    }
+  });
+  if (crossed) {
+    bad.push('crossed list tags: ' + crossed);
+  }
+  if (stack.length) {
+    bad.push('list left open: <' + stack.join('><') + '>');
   }
   // A marker holding list markup: the marker parse escaped into the document.
   const markers = html.match(/<span class="li_level"[^>]*>((?:(?!<\/span>)[\s\S])*)<\/span>/g) || [];

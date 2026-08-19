@@ -118,6 +118,10 @@ export declare const RENEWCOMMAND_LINE_RE: RegExp;
 /** Where a chunk splits into items, for `search`: a real `\item`, so `\itemsep` is not a split point.
  *  Must answer like ITEM_COMMAND_SOURCE — pinned by a property test. */
 export declare const LATEX_ITEM_SPLIT_RE: RegExp;
+/** Commands whose `{...}` argument this package parses — and only they take a brace group as one:
+ *  Markdown keeps braces in prose, so `{a}` and an unsupported `\foo{a}` are text. Add a name when its
+ *  argument starts being read: a name here can shield an `\end{itemize}` inside it, a missing one cannot. */
+export declare const LATEX_BRACE_ARG_COMMANDS: readonly string[];
 /** Block envs the list scanner knows; the regex below is built from it, so the two cannot drift. */
 export declare const LATEX_BLOCK_ENV_NAMES: readonly string[];
 export declare const LATEX_BLOCK_ENV_OPEN_RE: RegExp;
