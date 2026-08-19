@@ -79,6 +79,9 @@ export const snapshotEnvAll = (env: any): EnvSnapshot => {
   return snapshot;
 };
 
+/** Live snapshots. Zero between parses; above it, one was never released. */
+export const envSnapshotDepth = (): number => snapshotDepth;
+
 export const releaseEnvSnapshot = (): void => {
   if (snapshotDepth === 0) {
     return;

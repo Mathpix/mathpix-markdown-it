@@ -361,9 +361,12 @@ describe('An unclosed wrapper env leaves the list rendering:', () => {
       }
       return samples.sort((a, b) => a - b)[2];
     };
-    const small = Math.max(median(build(2000)), 1);
-    const large = median(build(8000));
-    // Linear with room for noise: the quadratic version sat near 7× on this pair.
+    // Sizes chosen so both sides clear the millisecond clock — 5ms and 17ms here. On the old 2000/8000
+    // pair they were 1ms and 6ms, where one tick of quantization alone reads as the whole bound.
+    const small = Math.max(median(build(8000)), 1);
+    const large = median(build(32000));
+    // Four times the input: linear allows ~4, measured 1.9–3.4, and the quadratic version sat near 7×
+    // on the pair it was written for.
     (large / small).should.be.below(6, 'growth is not linear: ' + small + ' ms → ' + large + ' ms');
   });
   // Pairing runs over the whole source, so an unmatched `{` must stay local: judged document-wide it

@@ -195,6 +195,15 @@ export const renewCommandSpanEnd = (text: string): number => {
     return -1;
   }
   let pos: number = match.index + match[0].length;
+  // Once for up to four pairings, and only if one happens: each `findEndMarker` rebuilt the index over
+  // the whole string, and a command with no argument to pair must not pay for it at all.
+  let codeSpans: Set<number> | null = null;
+  const codePositions = (): Set<number> => {
+    if (!codeSpans) {
+      codeSpans = buildInlineCodePositionSet(getInlineCodeListFromString(text));
+    }
+    return codeSpans;
+  };
   const skipSpaces = (): void => {
     while (pos < text.length && (text[pos] === ' ' || text[pos] === '\t')) {
       pos++;
@@ -209,7 +218,8 @@ export const renewCommandSpanEnd = (text: string): number => {
     skipSpaces();
     // `\renewcommand{\x}[1][d]{#1}`: LaTeX allows two optional arguments here, not one.
     while (arg === 1 && text[pos] === '[') {
-      const arity = findEndMarker(text, pos, '[', ']') as { res: boolean; nextPos?: number };
+      const arity = findEndMarker(text, pos, '[', ']', false, 0, codePositions()) as
+        { res: boolean; nextPos?: number };
       if (!arity.res || typeof arity.nextPos !== 'number') {
         return -1;
       }
@@ -217,7 +227,8 @@ export const renewCommandSpanEnd = (text: string): number => {
       skipSpaces();
     }
     if (text[pos] === '{') {
-      const paired = findEndMarker(text, pos) as { res: boolean; nextPos?: number };
+      const paired = findEndMarker(text, pos, '{', '}', false, 0, codePositions()) as
+        { res: boolean; nextPos?: number };
       if (!paired.res || typeof paired.nextPos !== 'number') {
         return -1;
       }

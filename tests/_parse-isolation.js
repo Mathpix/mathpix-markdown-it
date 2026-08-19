@@ -23,6 +23,7 @@ const {
   resetEnvSnapshotPool,
   restoreEnvAll,
   restoreEnvKeysFromAll,
+  envSnapshotDepth,
 } = require('../lib/markdown/common/env-transient');
 
 const { JSDOM } = require('jsdom');
@@ -30,6 +31,26 @@ const jsdom = new JSDOM();
 global.window = jsdom.window;
 global.document = jsdom.window.document;
 global.DOMParser = jsdom.window.DOMParser;
+
+// The snapshot depth is module state: a test that dies before its release leaves it raised, and from
+// then on `resetEnvSnapshotPool` declines and the restores decline with it — so one failure showed up
+// as four in tests that do nothing wrong. Both hooks are root-level, so the drain covers every test of
+// the run and the report comes after the last of them; throwing from the hook would abort the rest.
+const snapshotLeaks = [];
+afterEach(function () {
+  const leaked = envSnapshotDepth();
+  if (leaked === 0) {
+    return;
+  }
+  for (let i = 0; i < leaked; i++) {
+    releaseEnvSnapshot();
+  }
+  resetEnvSnapshotPool();
+  snapshotLeaks.push(this.currentTest.fullTitle() + ' left ' + leaked);
+});
+after(function () {
+  snapshotLeaks.should.deep.equal([], 'a test left a snapshot un-released');
+});
 
 // Each sub-plugin (TOC, theorem, labels, footnotes, lists, text counters)
 // holds module-level state. If those aren't reset per parse, re-rendering the

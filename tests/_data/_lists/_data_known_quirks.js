@@ -91,6 +91,14 @@ module.exports = [
     html: "<div>text <ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li class=\"li_enumerate\">a\\setcounter{enumi}{7}</li></ol> tail</div>\n"
   },
   {
+    // The probe's section counter is not rolled back, so both headings read higher: `1.`/`2.` with no
+    // block above the list. Same on `master`; pinned under `\footnotetext`, whose terminators now hold
+    // `Lists`.
+    name: "a speculative parse above a list shifts the section numbers",
+    latex: "\\footnotetext{f}\n\\begin{itemize}\n\\item \\begin{center}c\\end{center}\n\\section{Inner}\n\\end{itemize}\n\n\\section{After}",
+    html: "<div></div>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div class=\"center\" style=\"text-align: center\">c</div>\n<h2 type=\"section\" class=\"section-title\" id=\"inner\">\n<span class=\"section-number\">3. </span>Inner</h2>\n</li></ul><h2 type=\"section\" class=\"section-title\" id=\"after\">\n<span class=\"section-number\">4. </span>After</h2>\n<hr class=\"footnotes-sep\">\n<section class=\"footnotes\" style=\"margin-bottom: 1em;\">\n<ol class=\"footnotes-list\" style=\"padding-left: 20px; margin-bottom: 0;\">\n<li id=\"fn1\" class=\"footnote-item\" style=\"list-style-type: none;\"><div>f</div>\n</li>\n</ol>\n</section>\n"
+  },
+  {
     // `\caption` takes the closer into its argument and renders nothing here, so `\caption{c` is lost.
     // `master` keeps it: it builds the list without requiring a reachable closer.
     name: "a caption swallowing the only closer loses its own text",

@@ -6,6 +6,8 @@ export interface EnvSnapshot {
     length: number;
 }
 export declare const snapshotEnvAll: (env: any) => EnvSnapshot;
+/** Live snapshots. Zero between parses; above it, one was never released. */
+export declare const envSnapshotDepth: () => number;
 export declare const releaseEnvSnapshot: () => void;
 export declare const restoreEnvAll: (env: any, snap: EnvSnapshot) => void;
 export declare const resetEnvSnapshotPool: () => void;
