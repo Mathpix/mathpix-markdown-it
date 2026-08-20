@@ -1,5 +1,6 @@
 import { RuleBlock } from 'markdown-it';
 import { ChangeLevel } from "../md-latex-lists-env/re-level";
+import { skipOptionalArg } from "../common";
 const reTag: RegExp = /\\renewcommand/;
 const reTagG: RegExp = /\\renewcommand/g;
 
@@ -34,9 +35,9 @@ const parseCommand = (str: string):{command: string, params: string, endPos: num
     // `\renewcommand{\x}[1]{Z}`: the optional argument is not part of the body. Space between the two is
     // legal, so `s` may hold it — dropped with the argument, or the `{` after it read as body text.
     if (command && !s.trim() && !isOpen && str[i] === '[') {
-      const close: number = str.indexOf(']', i);
-      if (close > 0) {
-        i = close;
+      const past: number = skipOptionalArg(str, i, true);
+      if (past > 0) {
+        i = past - 1;
         s = '';
         continue;
       }

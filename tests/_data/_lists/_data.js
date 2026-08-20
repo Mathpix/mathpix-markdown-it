@@ -1657,6 +1657,14 @@ module.exports = [
     latex: "\\begin{itemize}\n\\item a\n\\end{itemize} \\begin{itemize}\n\\item b\n\\foo{ \\end{itemize} }",
     html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul><ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>b<br>\n\\foo{</li></ul><div>}</div>\n"
   },
+  // A brace in prose after a command's own argument is prose, not a second argument: taken as one, the
+  // closer written in it read as text, and this sibling list lost its item — where the same source
+  // without the `\label{L}` before the brace kept it.
+  {
+    name: "a brace in prose after a command argument does not shield a closer",
+    latex: "\\begin{itemize}\n\\item a\n\\end{itemize} \\begin{itemize} \\item b\n\\label{L} {x\n\\end{itemize} y}\n",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul><ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>b<br>\n {x</li></ul><div>y}</div>\n"
+  },
   {
     name: "the same closer inside a caption does not",
     latex: "\\begin{itemize}\n\\item a\n\\end{itemize} \\begin{itemize}\n\\item b\n\\caption{ \\end{itemize} }",
@@ -2682,6 +2690,14 @@ module.exports = [
     name: "text after the closer renders instead of being dropped",
     latex: "\\begin{itemize}\n\\item a\n\\end{itemize} tail text",
     html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul><div>tail text</div>\n"
+  },
+  {
+    // The control for the one-level form pinned as a quirk: two closers for two levels leave a leftover
+    // the walk can hand back, where an extra closer over one level makes the whole chunk read as
+    // end-of-list commands and drops it.
+    name: "collapsed closers for two levels keep the text beside them",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{itemize}\n\\item b\n\\end{itemize}\\end{itemize} trailing\n",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">–</span>b</li></ul></li></ul><div>trailing</div>\n"
   },
   {
     name: "the same inside a markdown item stays in that item",

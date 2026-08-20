@@ -269,9 +269,9 @@ export const ListsInternal = (
             if (sE.length > 0 && lineIdx > startLine
               && !nextListEnvMatch(maskNonStructure(sE))) {
               state.listTailFrom = { line: lineIdx, at: tailFrom };
-            } else if (sE.length > 0) {
-              items = ItemsAddToPrev(items, sE, lineIdx);
             }
+            // No else: items are flushed above, so a leftover added here reaches no token. One holding
+            // list structure is dropped by decision (Non-Goals).
             haveClose = true;
             return 'break';
           }

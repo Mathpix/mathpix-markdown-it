@@ -5,6 +5,7 @@ let MM = require('../lib/mathpix-markdown-model/index').MathpixMarkdownModel;
 const markdownIt = require('markdown-it');
 const { mathpixMarkdownPlugin } = require('../lib/index.js');
 const { braceMatches, commandArgumentSpans } = require('../lib/markdown/common/argument-spans');
+const { skipOptionalArg } = require('../lib/markdown/common');
 const { LATEX_ITEM_COMMAND_INLINE_RE, LATEX_ITEM_SPLIT_RE,
   LATEX_BRACE_ARG_COMMANDS } = require('../lib/markdown/common/consts');
 
@@ -334,6 +335,11 @@ describe('An unclosed wrapper env leaves the list rendering:', () => {
     commandArgumentSpans('\\caption*[1]{b}{c}', []).should.deep.equal([[12, 14], [15, 17]]);
     commandArgumentSpans('\\label{b', []).should.deep.equal([], 'an argument left open marks nothing');
     commandArgumentSpans('`\\label{b}`', [[0, 11]]).should.deep.equal([], 'a command in code is text');
+    // A further group counts only with no space before it: `\textbf{x} {prose}` is one argument and a
+    // brace in prose, and taking the second hid a closer written there — the unsafe side.
+    commandArgumentSpans('\\textbf{x}{y}', []).should.deep.equal([[7, 9], [10, 12]]);
+    commandArgumentSpans('\\textbf{x} {y}', []).should.deep.equal([[7, 9]], 'space ends the arguments');
+    commandArgumentSpans('\\author{A} {B} {C}', []).should.deep.equal([[7, 9]]);
     for (let round = 0; round < 20000; round++) {
       let text = '';
       for (let i = rnd(24); i > 0; i--) {
@@ -780,6 +786,31 @@ describe('a closer sharing its line with the env after it:', () => {
         });
       });
     });
+  });
+});
+
+// Three places skip a `[...]` option — the `\renewcommand` span reader, the argument-span sweep and the
+// rule applying the command — and each had its own version: they disagreed on a `]` inside a code span,
+// on `\]`, on `[[m]]` and on a `]` one line down. One reader now, with the line rule as its parameter.
+describe('one reader for a `[...]` option:', () => {
+  it('answers the shapes the three used to differ on', () => {
+    const forms = {
+      '[1]x': [3, 3],
+      '[1][d]x': [3, 3],
+      '[ x': [-1, -1],
+      '[] x': [2, 2],
+      '[[m]] x': [5, 5],
+      '[a\\]b] x': [6, 6],
+      '[`]` ] x': [6, 6],
+      // The one place they may still differ: an option that runs onto the next line.
+      '[a\nb] x': [5, -1],
+    };
+    Object.entries(forms).forEach(([text, [anyLine, sameLine]]) => {
+      skipOptionalArg(text, 0, false).should.equal(anyLine, 'across lines in ' + JSON.stringify(text));
+      skipOptionalArg(text, 0, true).should.equal(sameLine, 'same line in ' + JSON.stringify(text));
+    });
+    // No option at all: the offset comes back untouched, so a caller may pass any position.
+    skipOptionalArg('{a}', 0, true).should.equal(0);
   });
 });
 

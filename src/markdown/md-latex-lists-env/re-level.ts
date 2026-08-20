@@ -105,6 +105,14 @@ const freezeMarkerToken = (token: Token): void => {
     token.children.forEach(freezeMarkerToken);
     Object.freeze(token.children);
   }
+  // `Object.freeze` is shallow: without these a write into `meta` or `map` would reach every list of the
+  // render. Measured, no marker body produces either today — the guarantee, not a fixed defect.
+  if (token.meta) {
+    Object.freeze(token.meta);
+  }
+  if (token.map) {
+    Object.freeze(token.map);
+  }
   Object.freeze(token);
 };
 
@@ -118,6 +126,13 @@ const readableMarker = (token: Token): Token => {
   }
   if (token.children) {
     copy.children = token.children.map(readableMarker);
+  }
+  // `meta` and `map` too: shared, a write into them would reach the frozen original and throw.
+  if (token.meta) {
+    copy.meta = { ...token.meta };
+  }
+  if (token.map) {
+    copy.map = token.map.slice() as [number, number];
   }
   return copy;
 };

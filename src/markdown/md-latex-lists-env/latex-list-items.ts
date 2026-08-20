@@ -12,7 +12,7 @@ import { SetTokensBlockParse } from "../md-block-rule/helper";
 import {
   LIST_DEFAULT_INDENT_EM,
   LIST_MAX_INDENT_EM,
-  END_LIST_ENV_INLINE_RE,
+  ONLY_LIST_CLOSERS_RE,
   LATEX_ITEM_COMMAND_RE,
   LATEX_ITEM_SPLIT_RE,
   LATEX_BLOCK_ENV_OPEN_RE,
@@ -205,9 +205,10 @@ export const ItemsAddToPrev = (
     items[lastIndex].endLine = nextLine;
     return items;
   }
-  // No previous items: optionally create a new item, but skip a chunk that is only end-of-list
-  // commands. Anything else in it is text — dropping the chunk for the closer beside it lost that.
-  if (!END_LIST_ENV_INLINE_RE.test(maskNonStructure(lineText))) {
+  // No previous items: optionally create a new item, but skip a chunk that is *only* end-of-list
+  // commands. Asked as "contains one" instead, a line holding a closer beside real content was dropped
+  // whole — `\begin{center} keep \end{itemize} me` took the wrapper's opener with it.
+  if (!ONLY_LIST_CLOSERS_RE.test(maskNonStructure(lineText))) {
     ItemsListPush(items, lineText, nextLine, nextLine);
   }
   return items;

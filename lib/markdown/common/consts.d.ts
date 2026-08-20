@@ -105,6 +105,9 @@ export declare const BEGIN_LIST_ENV_RE: RegExp;
 export declare const BEGIN_LIST_ENV_INLINE_RE: RegExp;
 /** Matches \end{itemize} or \end{enumerate} */
 export declare const END_LIST_ENV_INLINE_RE: RegExp;
+/** A chunk that is nothing but end-of-list commands: dropped, since no item can hold it. Anchored, so a
+ *  line holding a closer beside real content is kept — asked as "contains one", it was dropped whole. */
+export declare const ONLY_LIST_CLOSERS_RE: RegExp;
 export declare const END_LIST_ENV_RE: RegExp;
 /** The marker with its payload, for masking: a command written there is text, not structure. */
 export declare const LATEX_ITEM_MARKER_G: RegExp;

@@ -155,6 +155,10 @@ export const BEGIN_LIST_ENV_RE: RegExp = /^\\begin\s*\{(itemize|enumerate)\}/;
 export const BEGIN_LIST_ENV_INLINE_RE: RegExp = /\\begin\s*\{(itemize|enumerate)\}/;
 /** Matches \end{itemize} or \end{enumerate} */
 export const END_LIST_ENV_INLINE_RE: RegExp = /\\end\s*\{(itemize|enumerate)\}/;
+/** A chunk that is nothing but end-of-list commands: dropped, since no item can hold it. Anchored, so a
+ *  line holding a closer beside real content is kept — asked as "contains one", it was dropped whole. */
+export const ONLY_LIST_CLOSERS_RE: RegExp =
+  /^(?:\s*\\end\s*\{(?:itemize|enumerate)\})+\s*$/;
 export const END_LIST_ENV_RE: RegExp = /^\\end\s*\{(itemize|enumerate)\}/;
 /** `\item` not followed by a letter, so `\itemsep` is not one. Every pattern below is built from it. */
 const ITEM_COMMAND_BARE: string = '\\\\item(?![a-zA-Z])';

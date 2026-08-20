@@ -1,5 +1,5 @@
 import { isInsideRanges } from "./verbatim-ranges";
-import { isAsciiLetter } from "../common";
+import { isAsciiLetter, skipOptionalArg } from "../common";
 import { LATEX_BRACE_ARG_COMMANDS } from "./consts";
 
 // Where a command's argument begins and ends, for readers that must tell a written `\end{itemize}` from
@@ -51,11 +51,11 @@ export const braceMatches = (
 };
 
 /** Past a command name: a star, `[...]` options, a bare name as in `\renewcommand\qedsymbol{Q}`, and the
- *  spaces between. Options do not span lines, so a `[` whose `]` sits on another line is text. */
-const afterCommandOptions = (text: string, from: number): number => {
+ *  spaces between when `skipSpace`. Options do not span lines, so a `]` on another line is text. */
+const afterCommandOptions = (text: string, from: number, skipSpace: boolean = true): number => {
   let at: number = from;
   for (;;) {
-    while (at < text.length && (text[at] === ' ' || text[at] === '\t')) {
+    while (skipSpace && at < text.length && (text[at] === ' ' || text[at] === '\t')) {
       at++;
     }
     if (text[at] === '*') {
@@ -70,12 +70,12 @@ const afterCommandOptions = (text: string, from: number): number => {
       continue;
     }
     if (text[at] === '[') {
-      const lineEnd: number = text.indexOf('\n', at);
-      const close: number = text.indexOf(']', at);
-      if (close < 0 || (lineEnd >= 0 && close > lineEnd)) {
+      // An option that does not close on this line is text, and the group after it is not an argument.
+      const past: number = skipOptionalArg(text, at, true);
+      if (past < 0) {
         return at;
       }
-      at = close + 1;
+      at = past;
       continue;
     }
     return at;
@@ -100,14 +100,15 @@ export const commandArgumentSpans = (
       continue;
     }
     let at: number = afterCommandOptions(text, command.index + command[0].length);
-    // `\renewcommand{\x}{y}`: every group that follows the name is an argument of it.
+    // `\renewcommand{\x}{y}`: a further group counts only with no space before it. Skipping space took
+    // `\textbf{x} {prose}` as two arguments, hiding a closer written in that prose.
     while (text[at] === '{') {
       const close: number | undefined = closeOf.get(at);
       if (close === undefined) {
         break;                      // an argument left open marks nothing
       }
       spans.push([at, close]);
-      at = afterCommandOptions(text, close + 1);
+      at = afterCommandOptions(text, close + 1, false);
     }
   }
   // Keep the outermost; ascending, so a search over them stays a binary one.

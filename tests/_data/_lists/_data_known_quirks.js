@@ -116,6 +116,17 @@ module.exports = [
     // A wrapper env on its own line ends the paragraph (`pickStartTag` in mdPluginRaw), so a list opened
     // mid-paragraph above it is split: the inner level renders, the outer stays text. Guarding that break
     // was measured to cost more — an unclosed list then swallowed a valid `figure` float.
+    name: "a closer past the last open list eats the text beside it",
+    // `\end{itemize}\end{itemize} trailing` over one level: the extra closer makes the chunk read as
+    // end-of-list commands, and `ItemsAddToPrev` drops it with the text. Byte-identical to `master`.
+    // The two-level form beside it in `_data.js` keeps `trailing`, and the difference is this drop.
+    latex: "\\begin{itemize}\n\\item a\n\\end{itemize}\\end{itemize} trailing\n",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul>"
+  },
+  {
+    // The wrapper's own block rule ends the paragraph (`pickStartTag` in mdPluginRaw), so a list opened
+    // mid-paragraph above it is split: the inner level renders, the outer stays text. Guarding that break
+    // was measured to cost more — an unclosed list then swallowed a valid `figure` float.
     name: "a wrapper on its own line splits a list opened mid-paragraph",
     latex: "text \\begin{itemize}\n\\item i0\n\\begin{itemize}\n\\item i1\n\\end{itemize}\n\\begin{center}x\\end{center}\n\\end{itemize}\n",
     html: "<div>text \\begin{itemize}<br>\n\\item i0<br>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">\u2022</span>i1</li></ul></div>\n<div class=\"center\" style=\"text-align: center\">x</div>\n<div>\\end{itemize}</div>\n"

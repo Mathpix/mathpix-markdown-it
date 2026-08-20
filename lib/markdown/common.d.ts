@@ -52,6 +52,10 @@ export declare const findEndMarker: (str: string, startPos?: number, beginMarker
     endPos: number;
     openBrackets?: undefined;
 };
+/** Offset past a `[...]` option at `at`, `at` itself when there is none, -1 when it does not close.
+ *  One reader for all three places that skip one: their own versions disagreed on `]` in a code span,
+ *  on `\]`, on `[[m]]` and on a `]` one line down — the last of which `sameLine` still decides. */
+export declare const skipOptionalArg: (text: string, at: number, sameLine: boolean, codePositions?: Set<number>) => number;
 /** Offset past `\renewcommand{\name}{body}` — also the starred form, `[n]` and `[n][default]`, and a
  *  bare `\name` as the first argument — or -1 when the arguments do not close in `text`. Braces are
  *  paired, so a closer or an `\item` in the body is part of the command, not structure. */
