@@ -43,6 +43,7 @@ import {
   listCloserOffsets,
   lastListEndPos,
   canCloseAfter,
+  listDepthBetween,
   nextListEnvMatch,
   maskNonStructure,
 } from "./list-source-model";
@@ -56,6 +57,9 @@ import {
  *
  * @returns true if the environment was successfully parsed and closed, otherwise false.
  */
+const LEADING_SPACE_RE: RegExp = /^\s*/;
+const leadingSpaceOf = (text: string): number => LEADING_SPACE_RE.exec(text)[0].length;
+
 export const ListsInternal = (
   state: StateBlockLike,
   startLine: number,
@@ -179,6 +183,8 @@ export const ListsInternal = (
     // of a collapsed `\end{itemize}\end{itemize}` to ItemsAddToPrev, which drops a pure closer —
     // so the outer list never closed and the strict `!haveClose` bail killed the whole rule.
     let tail: string = lineText;
+    // Where `tail` sits in the source, so a leftover can be handed back by offset rather than by text.
+    let tailAt: number = state.bMarks[lineIdx] + state.tShift[lineIdx];
     // Masked once, then cut in step with `tail`: masking keeps length and spaces, so the same slice
     // and trim keep the two aligned. Re-masking per match was quadratic over the line.
     let maskedTail: string = maskNonStructure(tail);
@@ -256,7 +262,14 @@ export const ListsInternal = (
             state.parentType = oldParentType;
           }
           if (!siblingClosable) {
-            if (sE.length > 0) {
+            // Nothing emits a leftover after the outermost closer, so hand that stretch of the line back
+            // to the block phase — by offset, on commit. A leftover holding list structure stays here:
+            // re-read as a document it would open as a top-level list, skipping the closer count above.
+            const tailFrom: number = tailAt + cut + leadingSpaceOf(tail.slice(cut));
+            if (sE.length > 0 && lineIdx > startLine
+              && !nextListEnvMatch(maskNonStructure(sE))) {
+              state.listTailFrom = { line: lineIdx, at: tailFrom };
+            } else if (sE.length > 0) {
               items = ItemsAddToPrev(items, sE, lineIdx);
             }
             haveClose = true;
@@ -291,6 +304,8 @@ export const ListsInternal = (
           return 'abort';
         }
       }
+      // `sE` is trimmed, so the offset follows the untrimmed cut plus the leading space it dropped.
+      tailAt = tailAt + cut + leadingSpaceOf(tail.slice(cut));
       tail = sE;
       // A zero step would spin, so the walk ends rather than trust the pattern to advance.
       if (cut <= 0) {
@@ -416,6 +431,13 @@ export const Lists: RuleBlock = (
   if (!isListType(typeList)) {
     return false;
   }
+  // Asked as a paragraph terminator: a paragraph holding an unclosed opener above owns this list in its
+  // own content, and ending it here left the env split between two blocks, each with half of it.
+  const inParagraph: number | undefined = (state as StateBlockLike).listParagraphStart;
+  if (silent && inParagraph !== undefined
+    && listDepthBetween(state, inParagraph, state.bMarks[startLine]) > 0) {
+    return false;
+  }
   // No closer left in the source: the strict rule can only answer false, so skip the parse.
   if (lastListEndPos(state) < state.bMarks[startLine]) {
     return false;
@@ -442,7 +464,16 @@ export const Lists: RuleBlock = (
     // a mid-flush throw must not roll the counters back out from under them.
     committed = true;
     flushBufferedTokens(state, bufferedState.tokens);
-    state.line = bufferedState.line;
+    // Only here: the line marks are shared with the real state by prototype, so a probe writing them
+    // would move the document's own lines under a parse that never applied.
+    const tailFrom = (bufferedState as StateBlockLike).listTailFrom;
+    if (tailFrom) {
+      state.bMarks[tailFrom.line] = tailFrom.at;
+      state.tShift[tailFrom.line] = 0;
+      // `sCount` stays: it names the container, and zeroed it read as dedented — the leftover left its
+      // markdown item and broke that list in two.
+    }
+    state.line = tailFrom ? tailFrom.line : bufferedState.line;
     state.startLine = bufferedState.startLine;
     state.parentType = bufferedState.parentType;
     state.level = bufferedState.level;

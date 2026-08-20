@@ -17,7 +17,11 @@ import {
   absoluteOffsetOf,
   hasCloserAhead,
   firstUsableCloser,
+  nextListEnvMatch,
+  maskNonStructure,
+  unclosedEnvsIn,
 } from "./list-source-model";
+import { getOpenListCount } from "./list-state";
 
 // Lines the list rule must not read as structure: a fence, an `lstlisting` body, a `tabular`. The
 // stack, the items and the rest of the line go in and come back out — the parse loop owns them.
@@ -111,6 +115,14 @@ const handleLstBeginInline = (
     mb === mbLst ? "lstlisting" : mb === mbTab ? "tabular" : mb[1] as OpaqueEnvType;
   const beginIndex: number = mb.index;
   const before: string = lineText.slice(0, beginIndex);
+  // A transition in the prefix belongs to the line walk, but only while a list stays open past it: the
+  // walk cannot emit a tail after the last closer, and this pass reads it as env content.
+  const maskedBefore: string = before.length > 0 ? maskNonStructure(before) : '';
+  if (maskedBefore.length > 0
+    && nextListEnvMatch(maskedBefore)
+    && getOpenListCount() + unclosedEnvsIn(maskedBefore) > 0) {
+    return { handled: false, stack, items, lineText };
+  }
   const afterBegin: string = lineText.slice(beginIndex);
   if (before.length > 0) {
     if (itemTag.test(before)) {

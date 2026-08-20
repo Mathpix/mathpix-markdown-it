@@ -15,6 +15,7 @@ export declare const wrapperBeginAt: (lineText: string) => RegExpExecArray | nul
 export declare const absoluteOffsetOf: (state: StateBlockLike, line: number, lineText: string, index: number, text: string) => number;
 export declare const closersLeftAfter: (state: StateBlockLike, at: number) => number;
 export declare const canCloseAfter: (state: StateBlockLike, from: number, needed: number) => boolean;
+export declare const listDepthBetween: (state: StateBlockLike, from: number, to: number) => number;
 export declare const hasCloserAhead: (state: StateBlockLike, from: number, name: string) => boolean;
 export declare const nextListEnvMatch: (s: string) => {
     match: RegExpMatchArray;

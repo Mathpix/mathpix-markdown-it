@@ -82,8 +82,10 @@ const afterCommandOptions = (text: string, from: number): number => {
   }
 };
 
-/** Outermost command-argument spans, ascending, `[openBrace, closeBrace]` inclusive. Read forward from
- *  the commands: a group with no command before it — `opens {` … `closes }` in prose — is not one. */
+/** Outermost command-argument spans, ascending, `[openBrace, closeBrace]` **inclusive** — `isInsideRanges`
+ *  is half-open, so the closing brace's own offset reads as outside. Harmless for the readers there are,
+ *  which ask about a backslash, always strictly inside; a reader asking about that brace needs `close + 1`.
+ *  Read forward from the commands: a group with no command before it — `opens {` … `closes }` — is not one. */
 export const commandArgumentSpans = (
   text: string,
   verbatim: Array<[number, number]>

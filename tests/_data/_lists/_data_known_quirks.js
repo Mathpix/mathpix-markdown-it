@@ -17,7 +17,7 @@ module.exports = [
   {
     name: "a closer written in math outside a wrapper still ends the list",
     latex: "\\begin{itemize}\n\\item a $x \\end{itemize} y$\n\\item b\n\\end{itemize}",
-    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a $x</li></ul><div>\\item b<br>\n\\end{itemize}</div>\n"
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a $x</li></ul><div>y$<br>\n\\item b<br>\n\\end{itemize}</div>\n"
   },
   // On one line the inline path emits the gap as text, so it lands directly in the `<ul>`. The
   // two-line form is already clean.
@@ -111,5 +111,13 @@ module.exports = [
     name: "a brace left over by an unclosed caption sits in the list",
     latex: "\\begin{figure} \\begin{itemize}\n\\renewcommand{\\labelitemi}{\\begin{itemize}}\\renewcommand{\\labelitemi}{\\begin{itemize}}\n\\caption{c\n\\renewcommand*{\\x}{\\end{itemize}} \\end{itemize}",
     html: "<div>\\begin{figure} <ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\"><br>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\">}<br>\n{</li></ul></li>}</ul></div>\n"
+  },
+  {
+    // A wrapper env on its own line ends the paragraph (`pickStartTag` in mdPluginRaw), so a list opened
+    // mid-paragraph above it is split: the inner level renders, the outer stays text. Guarding that break
+    // was measured to cost more — an unclosed list then swallowed a valid `figure` float.
+    name: "a wrapper on its own line splits a list opened mid-paragraph",
+    latex: "text \\begin{itemize}\n\\item i0\n\\begin{itemize}\n\\item i1\n\\end{itemize}\n\\begin{center}x\\end{center}\n\\end{itemize}\n",
+    html: "<div>text \\begin{itemize}<br>\n\\item i0<br>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">\u2022</span>i1</li></ul></div>\n<div class=\"center\" style=\"text-align: center\">x</div>\n<div>\\end{itemize}</div>\n"
   },
 ];

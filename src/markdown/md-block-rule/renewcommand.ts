@@ -10,8 +10,8 @@ const parseCommand = (str: string):{command: string, params: string, endPos: num
   let isOpen = 0;
   let endPos = str.length;
 
-  // Space is skipped, not trimmed: the caller adds `endPos` to `state.pos`, so it must stay in the
-  // coordinates of the string passed in. `*` is not part of the name.
+  // Space is skipped, not trimmed, so offsets stay in the coordinates of the string passed in.
+  // `*` is not part of the name.
   let start = 0;
   while (start < str.length && (str[start] === ' ' || str[start] === '\t')) {
     start++;
@@ -31,11 +31,13 @@ const parseCommand = (str: string):{command: string, params: string, endPos: num
       }
       continue;
     }
-    // `\renewcommand{\x}[1]{Z}`: the optional argument is not part of the body.
-    if (command && !s && !isOpen && str[i] === '[') {
+    // `\renewcommand{\x}[1]{Z}`: the optional argument is not part of the body. Space between the two is
+    // legal, so `s` may hold it — dropped with the argument, or the `{` after it read as body text.
+    if (command && !s.trim() && !isOpen && str[i] === '[') {
       const close: number = str.indexOf(']', i);
       if (close > 0) {
         i = close;
+        s = '';
         continue;
       }
     }

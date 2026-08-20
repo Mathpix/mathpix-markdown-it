@@ -1655,7 +1655,7 @@ module.exports = [
   {
     name: "a closer inside an unsupported command's group still opens the sibling list",
     latex: "\\begin{itemize}\n\\item a\n\\end{itemize} \\begin{itemize}\n\\item b\n\\foo{ \\end{itemize} }",
-    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul><ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>b<br>\n\\foo{</li></ul>"
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul><ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>b<br>\n\\foo{</li></ul><div>}</div>\n"
   },
   {
     name: "the same closer inside a caption does not",
@@ -1975,7 +1975,7 @@ module.exports = [
   {
     name: "a sibling whose only closer sits in a caption argument",
     latex: "\\begin{itemize}\\item a\\end{itemize} \\begin{itemize}\\item b\n\n\\caption{x \\end{itemize} y}",
-    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul> <ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>b\\caption{x</li></ul>"
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul> <ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>b\\caption{x</li></ul><div>y}</div>\n"
   },
   {
     name: "a sibling whose only closer sits in a code span",
@@ -2399,7 +2399,7 @@ module.exports = [
   {
     name: "a closer between two code spans closes the list",
     latex: "\\begin{itemize}\n\\item a\n`p` \\end{itemize} `q`\n\\item b",
-    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a<br>\n<code>p</code></div>\n</li></ul><div>\\item b</div>\n"
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a<br>\n<code>p</code></div>\n</li></ul><div><code>q</code><br>\n\\item b</div>\n"
   },
   {
     // The converse the same predicate must keep answering.
@@ -2515,6 +2515,18 @@ module.exports = [
     latex: "\\renewcommand{\\labelitemi}[1]{Z}\n\n\\begin{itemize}\n\\item a\n\\end{itemize}",
     html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">Z</span>a</li></ul>"
   },
+  // Space before that argument is legal LaTeX, and the span reader already measured these — the rule
+  // applying the command took `[1]{Z` for the marker, so the two readers of one syntax disagreed.
+  {
+    name: "the same with a space before the optional argument",
+    latex: "\\renewcommand{\\labelitemi} [1]{Z}\n\n\\begin{itemize}\n\\item a\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">Z</span>a</li></ul>"
+  },
+  {
+    name: "the same with a tab before it",
+    latex: "\\renewcommand{\\labelitemi}\t[1]{Z}\n\n\\begin{itemize}\n\\item a\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">Z</span>a</li></ul>"
+  },
   {
     // Bare command name: the brace opening the body was not counted, so the argument ended at the
     // first inner `}` and the rest of it joined the item above.
@@ -2628,12 +2640,87 @@ module.exports = [
   {
     name: "a list closed by an inline \\end in the body gets no second closing tag",
     latex: "\\begin{itemize}\n\\caption{c\n\\renewcommand{\\x}{\\end{itemize}}\n\\caption{\\end{itemize}}",
-    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\">{</li></ul>}<br>\n\\caption{"
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\">{</li></ul>}<br>\n\\caption{<div>}</div>\n"
   },
   {
     name: "an opener in a code span in the tail is not a sibling, and the closer after it emits no tag",
     latex: "\\begin{enumerate}\n\\item[W] \\end{enumerate} `\\begin{itemize}` \\end{itemize}",
     html: "<ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li class=\"li_enumerate not_number\" data-custom-marker=\"true\" style=\"display: block\"><span class=\"li_level\" data-custom-marker=\"true\">W</span></li></ol>"
+  },
+  // An opener written mid-paragraph: the env spans the paragraph's own lines, so the paragraph must not
+  // end inside it — cut there, half of the env went to a block below and the rest printed as LaTeX.
+  // The second shape is the control: a list on its own line after a paragraph is still its own block.
+  {
+    name: "a list opened mid-paragraph keeps its levels",
+    latex: "text \\begin{itemize}\\item a\n\\begin{itemize}\\item b\\end{itemize} \\begin{center}x\\end{center}\n\\end{itemize} tail",
+    html: "<div>text <ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">–</span>b</li></ul><div class=\"center\" style=\"text-align: center\">x</div></li></ul> tail</div>\n"
+  },
+  {
+    // The fence opens where it is written — right after the closer — because the leftover of that line is
+    // handed back to the block phase, so `q` is its content and the list's outer closer stays text. Read
+    // from the line below instead, the fence started late and swallowed that closer.
+    name: "a fence written after the closer opens where it stands",
+    latex: "text \\begin{itemize}\n\\item i0\n\\begin{itemize}\n\\item i1\n\\end{itemize} ```\nq\n```\n\\end{itemize}\n",
+    html: "<div>text \\begin{itemize}<br>\n\\item i0</div>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>i1</li></ul><pre><code class=\"hljs\">q\n</code></pre>\n<div>\\end{itemize}</div>\n"
+  },
+  {
+    // A backtick run with no partner is text, so nothing after it is code — read as code to the end of
+    // the source, it hid this list's own `\end` from the inline scanner and the whole env was text.
+    name: "an unmatched backtick run does not hide the closer from the inline scanner",
+    latex: "text \\begin{itemize}\n\\item i0\n\\begin{itemize}\n\\item i1\n\\end{itemize} ```\nq\n\\end{itemize}",
+    html: "<div>text <ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>i0<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">–</span>i1</li></ul>```<br>\nq</li></ul></div>\n"
+  },
+  {
+    name: "a list after a paragraph stays a block of its own",
+    latex: "para text\n\\begin{itemize}\n\\item a\n\\end{itemize}",
+    html: "<div>para text</div>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul>"
+  },
+  // Text after the outermost closer is handed back to the block phase by offset, so it renders instead of
+  // being dropped. The line keeps its `sCount`, which names the container: zeroed, the leftover read as
+  // dedented and left its markdown item, breaking that list in two — hence the nested shapes here.
+  {
+    name: "text after the closer renders instead of being dropped",
+    latex: "\\begin{itemize}\n\\item a\n\\end{itemize} tail text",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul><div>tail text</div>\n"
+  },
+  {
+    name: "the same inside a markdown item stays in that item",
+    latex: "- \\begin{itemize}\n  \\item a\n  \\end{itemize} tail text\n- second",
+    html: "<ul>\n<li>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul>tail text</li>\n<li>second</li>\n</ul>\n"
+  },
+  {
+    name: "the same inside a blockquote stays in the quote",
+    latex: "> \\begin{itemize}\n> \\item a\n> \\end{itemize} tail text\n> after",
+    html: "<blockquote>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul><div>tail text<br>\nafter</div>\n</blockquote>\n"
+  },
+  // A closer sharing its line with the env after it: the opaque pass read the whole line first and took
+  // the closer into the item body, so the level went missing and the rest came out as literal LaTeX.
+  // Valid LaTeX, and the tags balanced either way, so only these pin it. The last two render a level
+  // `master` loses as well.
+  {
+    name: "a closer followed by a wrapper on one line keeps its level",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{itemize}\n\\item b\n\\end{itemize} \\begin{center}x\\end{center}\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">–</span>b</li></ul><div class=\"center\" style=\"text-align: center\">x</div>\n</li></ul>"
+  },
+  {
+    name: "an item before that closer is still an item",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{itemize}\n\\item b\n\\item c \\end{itemize} \\begin{center}x\\end{center}\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">–</span>b</li><li class=\"li_itemize\"><span class=\"li_level\">–</span>c</li></ul><div class=\"center\" style=\"text-align: center\">x</div>\n</li></ul>"
+  },
+  {
+    name: "the same for an enumerate, which keeps its numbering depth",
+    latex: "\\begin{enumerate}\n\\item a\n\\begin{enumerate}\n\\item b\n\\end{enumerate} \\begin{center}x\\end{center}\n\\end{enumerate}",
+    html: "<ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li class=\"li_enumerate\">a<ol class=\"enumerate lower-alpha\" style=\"list-style-type: lower-alpha\"><li class=\"li_enumerate\">b</li></ol><div class=\"center\" style=\"text-align: center\">x</div>\n</li></ol>"
+  },
+  {
+    name: "a closer followed by a tabular on one line keeps its level",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{itemize}\n\\item b\n\\end{itemize} \\begin{tabular}{l}q\\end{tabular}\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">–</span>b</li></ul><div class=\"table_tabular\">\n<div class=\"inline-tabular\"><table class=\"tabular\">\n<tbody>\n<tr style=\"border-top: none !important; border-bottom: none !important;\">\n<td style=\"text-align: left; border-left: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; \">q</td>\n</tr>\n</tbody>\n</table>\n</div></div>\n</li></ul>"
+  },
+  {
+    name: "two closers and a wrapper on one line keep all three levels",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{itemize}\n\\item b\n\\begin{itemize}\n\\item c\n\\end{itemize}\\end{itemize} \\begin{center}x\\end{center}\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">–</span>b<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">∗</span>c</li></ul></li></ul><div class=\"center\" style=\"text-align: center\">x</div>\n</li></ul>"
   },
   {
     name: "a later paragraph holding a \\] leaves the list alone",

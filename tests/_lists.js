@@ -683,6 +683,84 @@ describe('Numbering depth survives a wrapper env between two enumerate levels:',
   });
 });
 
+// The opaque pass reads the whole line before the walk reads its transitions, so a closer sharing its
+// line with a following `\begin` was taken into an item body: the level went missing and the rest of the
+// list came out as literal LaTeX. Every input here is well-formed by construction, which is what makes
+// the counts exact — as many lists out as openers in, and no list command left as text. Deterministic, so
+// a failure names its shape; the seeded fuzz cannot replace it, its oracle reading only tag validity.
+describe('a closer sharing its line with the env after it:', () => {
+  const FENCE = '```';
+  // `rendered` is the third invariant: the follower must reach the output. Without it a lost env keeps
+  // the level count and the no-literal check happy while disappearing — which is how a regression that
+  // dropped a `tabular` and an `lstlisting` at depth 1 got through this very grid.
+  const FOLLOWERS = {
+    nothing: { src: '', rendered: null },
+    text: { src: 'zq', rendered: /zq/ },
+    center: { src: '\\begin{center}x\\end{center}', rendered: /class="center"/ },
+    figure: { src: '\\begin{figure}\\caption{c}\\end{figure}', rendered: /caption_figure/ },
+    tabular: { src: '\\begin{tabular}{l}q\\end{tabular}', rendered: /<table/ },
+    lstlisting: { src: '\\begin{lstlisting}\nq\n\\end{lstlisting}', rendered: /lstlisting-code/ },
+    fence: { src: FENCE + '\nq\n' + FENCE, rendered: /<pre>/ },
+  };
+  // Shapes where the follower still does not reach the output, each with an owner of its own (Non-Goals),
+  // and all of them byte-identical to `master`: a `center`/`figure` line goes to the align/float rule
+  // before this one is asked, and a fence sharing the closer's line while a list is still open is item
+  // content, where it re-parses as an inline code span. Listed, so the grid stays red for anything else.
+  const LOST = new Set([
+    'itemize|1|center|none', 'itemize|1|center|space',
+    'enumerate|1|center|none', 'enumerate|1|center|space',
+    'itemize|1|figure|none', 'itemize|1|figure|space',
+    'enumerate|1|figure|none', 'enumerate|1|figure|space',
+    'itemize|2|fence|none', 'itemize|2|fence|space', 'itemize|2|fence|newline',
+    'itemize|3|fence|none', 'itemize|3|fence|space', 'itemize|3|fence|newline',
+    'enumerate|2|fence|none', 'enumerate|2|fence|space', 'enumerate|2|fence|newline',
+    'enumerate|3|fence|none', 'enumerate|3|fence|space', 'enumerate|3|fence|newline',
+  ]);
+  const build = (env, depth, follower, sep, extraItem) => {
+    let src = '';
+    for (let d = 0; d < depth; d++) {
+      src += '\\begin{' + env + '}\n\\item i' + d + '\n';
+    }
+    if (extraItem) {
+      src += '\\item extra ';
+    }
+    src += '\\end{' + env + '}' + (follower ? sep + follower : '') + '\n';
+    for (let d = 1; d < depth; d++) {
+      src += '\\end{' + env + '}\n';
+    }
+    return src;
+  };
+  ['itemize', 'enumerate'].forEach((env) => {
+    [1, 2, 3].forEach((depth) => {
+      Object.entries(FOLLOWERS).forEach(([name, follower]) => {
+        it(`${env}, ${depth} deep, ${name} after the closer`, () => {
+          ['', ' ', '\n'].forEach((sep) => {
+            [false, true].forEach((extraItem) => {
+              if (!follower.src && sep !== '') {
+                return;
+              }
+              const src = build(env, depth, follower.src, sep, extraItem);
+              const html = MM.markdownToHTML(src, { outMath: { include_svg: false } });
+              const where = ' in ' + JSON.stringify(src);
+              (html.match(/<[uo]l[\s>]/g) || []).should.have.lengthOf(depth, 'levels lost' + where);
+              // Inside a fence such text is content; anywhere else it is the list that fell out.
+              const outsideCode = html.replace(/<pre[\s\S]*?<\/pre>/g, '');
+              /\\begin\{(itemize|enumerate)\}|\\item(?![a-zA-Z])/.test(outsideCode)
+                .should.equal(false, 'literal LaTeX' + where);
+              if (follower.rendered) {
+                const key = [env, depth, name,
+                  sep === '' ? 'none' : sep === ' ' ? 'space' : 'newline'].join('|');
+                follower.rendered.test(html)
+                  .should.equal(!LOST.has(key), 'follower reached the output' + where);
+              }
+            });
+          });
+        });
+      });
+    });
+  });
+});
+
 // Two readers ask "is there a `\item` here": the split reader, which consumes only the command so its
 // offset is the item's own, and the marker reader, which consumes the optional argument as well. They
 // must agree on *whether* one is there — one saying yes where the other says no costs an item.

@@ -313,6 +313,13 @@ export const canCloseAfter = (state: StateBlockLike, from: number, needed: numbe
   return false;
 };
 
+// Net list depth over `[from, to)`, by the same structural rule as the counters above: an opener written
+// in code, in math or inside a supported command's argument counts for neither. Asked by the paragraph
+// rule, which owns block boundaries and must not cut a paragraph inside a list env.
+export const listDepthBetween = (state: StateBlockLike, from: number, to: number): number =>
+  structuralCountIn(state, listOpenerOffsets(state as StateBlock), OPENER_SUFFIX_KEY, from, to)
+  - structuralCountIn(state, listCloserOffsets(state as StateBlock), CLOSER_SUFFIX_KEY, from, to);
+
 // Opening a wrapper as opaque swallows every line until its closer, so require one it can reach.
 // Reaching past a closer of our own list swallowed it too, and the whole list then printed as
 // literal LaTeX — that closer may be the last thing on its line, so position cannot decide it.

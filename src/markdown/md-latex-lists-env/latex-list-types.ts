@@ -66,7 +66,14 @@ export interface CustomMarkerHtmlResult {
  * - real markdown-it StateBlock (block rule)
  * - synthetic block state (inline rule wrapper)
  */
-export type StateBlockLike = Pick<
+/** `listParagraphStart` is the paragraph rule's handoff: the offset a paragraph holding an unclosed list
+ *  env starts at, set for the terminator call alone so the list rule can decline to end that paragraph.
+ *  `listTailFrom` goes the other way: where the text after the outermost closer starts, for the commit
+ *  branch to hand that stretch of the line back to the block phase instead of dropping it. */
+export type StateBlockLike = {
+  listParagraphStart?: number;
+  listTailFrom?: { line: number; at: number };
+} & Pick<
   StateBlock,
   | 'md'
   | 'src'
