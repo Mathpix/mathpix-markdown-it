@@ -84,6 +84,28 @@ describe('A no-output command between items leaves no orphan <br>:', () => {
     content(true).should.deep.equal(['a\n\\renewcommand{\\labelitemi}{ZZZ}', 'b']);
     content(false).should.deep.equal(['a\\renewcommand{\\labelitemi}{ZZZ}', 'b']);
   });
+  // Asserted on the token stream, not on HTML: a command configuring the list renders to nothing inside
+  // one, so a marker-less `<li>` around it is invisible in the output — while a consumer walking the
+  // tokens for LaTeX prints an `\item` for it, one the source never had.
+  it('a list-configuration command gets no item of its own', () => {
+    const listTokens = (src) => markdownIt({ html: true })
+      .use(mathpixMarkdownPlugin, { outMath: { include_svg: false }, forLatex: true })
+      .parse(src, {})
+      .filter((t) => /^(itemize|enumerate)_list_|^latex_list_item_|^setcounter$|^renewcommand$/.test(t.type))
+      .map((t) => t.type);
+    // On the opener's line and on its own line: the inline and the block path reach this separately.
+    listTokens('\\begin{enumerate}\\setcounter{enumi}{35}\n\\item Test36\n\\end{enumerate}')
+      .should.deep.equal(['enumerate_list_open', 'setcounter',
+        'latex_list_item_open', 'latex_list_item_close', 'enumerate_list_close']);
+    listTokens('\\begin{enumerate}\n\\renewcommand{\\labelenumii}{(\\Roman{enumii})}\n\\item b\n\\end{enumerate}')
+      .should.deep.equal(['enumerate_list_open', 'renewcommand',
+        'latex_list_item_open', 'latex_list_item_close', 'enumerate_list_close']);
+    // A run that does render still gets its item, or `<ul>` would hold a non-`<li>` child.
+    listTokens('\\begin{enumerate}loose\n\\item b\n\\end{enumerate}')
+      .should.deep.equal(['enumerate_list_open',
+        'latex_list_item_open', 'latex_list_item_close',
+        'latex_list_item_open', 'latex_list_item_close', 'enumerate_list_close']);
+  });
   it('a plain continuation line keeps its break', () => {
     itemBodies('\\begin{itemize}\n\\item a\ntail text\n\\item b\n\\end{itemize}')
       .should.deep.equal(['a<br>\ntail text', 'b']);

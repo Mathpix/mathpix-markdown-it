@@ -42,6 +42,8 @@ export const computeMarkerPadding = (markerTokens: Token[] | undefined): number 
 const LIST_STRUCTURE_TYPES: ReadonlySet<string> = LIST_STRUCTURE_TOKEN_TYPES;
 export const LIST_OPEN_TYPES: ReadonlySet<string> = LIST_OPEN_TOKEN_TYPES;
 export const LIST_CLOSE_TYPES: ReadonlySet<string> = LIST_CLOSE_TOKEN_TYPES;
+// Applied to the list rather than printed: inside one they render to nothing.
+const LIST_CONFIG_TOKEN_TYPES: ReadonlySet<string> = new Set(['setcounter', 'renewcommand']);
 
 /** Per list open, and copied onto its matching close: 0 needs no host, 1 sits in an `itemize`, 2 in an
  *  `enumerate`. A list is hosted when the container it opens in is a list rather than an item — reading
@@ -206,8 +208,10 @@ type LooseRunState = {
 export const wrapLooseRun = (state: LooseRunState, from: number): void => {
   const end: number = looseRunEnd(state.tokens, from, state.tokens.length);
   const run: Token[] = state.tokens.slice(from, end);
-  // Whitespace alone is not content: the same run reaches here trimmed from the block path.
-  if (!run.some((t: Token) => t.type !== 'text' || (t.content || '').trim())) {
+  // Whitespace alone is not content, nor is a command configuring the list: it renders to nothing here,
+  // and the wrapper made a LaTeX consumer print an `\item` the source never had.
+  if (!run.some((t: Token) => !LIST_CONFIG_TOKEN_TYPES.has(t.type)
+    && (t.type !== 'text' || (t.content || '').trim()))) {
     return;
   }
   // Without the constructor the run stays where it is: a loose child renders, a thrown rule does not.
