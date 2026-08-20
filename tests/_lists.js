@@ -360,75 +360,55 @@ describe('An unclosed wrapper env leaves the list rendering:', () => {
       });
     }
   });
+  // Growth of the shape divided by growth of a plainly linear one, measured in the same run: the
+  // machine's speed cancels, so the bound needs no absolute threshold and no `retries`. Counting rule
+  // invocations was tried instead and dropped — it sees only work that crosses a rule boundary, and
+  // measured the same ×8.0 with the quadratic walk this bound exists to catch as without it.
+  const CONTROL_UNIT = '\\begin{itemize}\n\\item a\n\\item b\n\\end{itemize}';
+  const medianMs = (src) => {
+    MM.markdownToHTML(src, { outMath: { include_svg: false } });      // warm up
+    const samples = [];
+    for (let i = 0; i < 3; i++) {
+      const started = Date.now();
+      MM.markdownToHTML(src, { outMath: { include_svg: false } });
+      samples.push(Date.now() - started);
+    }
+    return Math.max(samples.sort((a, b) => a - b)[1], 1);
+  };
+  const growthOf = (build, small, large) => medianMs(build(large)) / medianMs(build(small));
+  const repeated = (unit) => (n) => Array.from({ length: n }, () => unit).join('\n\n');
+  // Against the control taken in this very process: 1.0–1.4 measured here, 2.8–3.7 with the walk.
+  const growthAgainstControl = (build, small, large) =>
+    growthOf(build, small, large) / growthOf(repeated(CONTROL_UNIT), small, large);
   // The guard asks how many closers are left after a wrapper, and a walk over every offset past it made a
   // document of such wrappers super-linear — 1600 units were 2.25× slower than `master` before the
-  // suffix counts. Growth, not wall time, so the bound holds on a slower machine.
-  it('a document of wrappers each holding a foreign closer scans linearly', function () {
-    this.retries(2);                    // a growth ratio with a wide margin: a retry absorbs load, not a regression
+  // suffix counts.
+  it('a document of wrappers each holding a foreign closer scans linearly', () => {
     const unit = '\\begin{itemize}\n\\item a\n\\begin{center}\ntext \\end{itemize} here\n'
       + '\\end{center}\n\\item b\n\\end{itemize}';
-    const median = (count) => {
-      const src = Array.from({ length: count }, () => unit).join('\n\n');
-      MM.markdownToHTML(src, { outMath: { include_svg: false } });      // warm up
-      const samples = [];
-      for (let i = 0; i < 3; i++) {
-        const started = Date.now();
-        MM.markdownToHTML(src, { outMath: { include_svg: false } });
-        samples.push(Date.now() - started);
-      }
-      return samples.sort((a, b) => a - b)[1];
-    };
-    const small = median(200);
-    const large = median(1600);
-    // Eight times the input: linear allows ~8, the walk gave ~11 and rising.
-    (large <= Math.max(60, small * 9)).should.equal(true,
-      'growth is not linear: ' + small + ' ms → ' + large + ' ms');
+    const relative = growthAgainstControl(repeated(unit), 200, 1600);
+    relative.should.be.below(2.2, 'grows faster than a plain list: ×' + relative.toFixed(2));
   });
   // A closer written in code is skipped and the scan resumes past it. Slicing the rest of the line per
-  // skip made that quadratic; the sticky scan keeps it flat.
-  it('a line full of closers written in code scans linearly', function () {
-    this.retries(2);
+  // skip made that quadratic; the sticky scan keeps it flat. On the clock, unlike the two beside it: all
+  // of this happens inside one rule call, so counting calls sees none of it (measured, ×1.0 at ×8 input).
+  it('a line full of closers written in code scans linearly', () => {
     const build = (n) => '\\begin{itemize}\n\\item a\n\\begin{center}\n'
       + '`\\end{center}` '.repeat(n) + 'tail\n\\end{center}\n\\item b\n\\end{itemize}';
-    const median = (src) => {
-      MM.markdownToHTML(src, { outMath: { include_svg: false } });      // warm up
-      const samples = [];
-      for (let i = 0; i < 5; i++) {
-        const started = Date.now();
-        MM.markdownToHTML(src, { outMath: { include_svg: false } });
-        samples.push(Date.now() - started);
-      }
-      return samples.sort((a, b) => a - b)[2];
-    };
-    const small = median(build(200));
-    const large = median(build(3200));
-    // Sixteen times the closers: linear allows ~16, quadratic would be ~256.
-    (large <= Math.max(20, small * 24)).should.equal(true,
-      'growth is not linear: ' + small + ' ms → ' + large + ' ms');
+    // Closers per line, so the control grows by units: sixteen times either way, and quadratic here
+    // would be ~256.
+    const relative = growthOf(build, 200, 3200) / growthOf(repeated(CONTROL_UNIT), 100, 1600);
+    relative.should.be.below(3, 'grows faster than the input: ×' + relative.toFixed(2));
   });
   // Argument pairing is one pass with a stack. Asking findEndMarker per brace made a long run of
   // unmatched `{` rescan the tail each time — `n^1.9` measured, 12× master at 8000 braces.
-  it('a long run of unmatched braces parses linearly', function () {
-    this.retries(2);
+  it('a long run of unmatched braces parses linearly', () => {
     const build = (n) => '\\begin{itemize}\n\\item a\n\\begin{center}\n' + '{'.repeat(n) + ' x\n'
       + '\\caption{q \\end{itemize} w}\n\\end{center}\n\\item b\n\\end{itemize}';
-    const median = (src) => {
-      MM.markdownToHTML(src, { outMath: { include_svg: false } });      // warm up
-      const samples = [];
-      for (let i = 0; i < 5; i++) {
-        const started = Date.now();
-        MM.markdownToHTML(src, { outMath: { include_svg: false } });
-        samples.push(Date.now() - started);
-      }
-      return samples.sort((a, b) => a - b)[2];
-    };
-    // Sizes chosen so both sides clear the millisecond clock — 5ms and 17ms here. On the old 2000/8000
-    // pair they were 1ms and 6ms, where one tick of quantization alone reads as the whole bound.
-    const small = Math.max(median(build(8000)), 1);
-    const large = median(build(32000));
-    // Four times the input: linear allows ~4, measured 1.9–3.4, and the quadratic version sat near 7×
-    // on the pair it was written for.
-    (large / small).should.be.below(6, 'growth is not linear: ' + small + ' ms → ' + large + ' ms');
+    // The pairing this replaced asked `findEndMarker` per brace and rescanned the tail each time:
+    // `n^1.9`, 12× `master` at 8000 braces. Braces per document, so the control grows by units instead.
+    const relative = growthOf(build, 8000, 32000) / growthOf(repeated(CONTROL_UNIT), 200, 800);
+    relative.should.be.below(3, 'grows faster than the input: ×' + relative.toFixed(2));
   });
   // Pairing runs over the whole source, so an unmatched `{` must stay local: judged document-wide it
   // blinded every list after it — the caption's closer read as structure and half the items were lost.
@@ -780,6 +760,65 @@ describe('a closer sharing its line with the env after it:', () => {
                   sep === '' ? 'none' : sep === ' ' ? 'space' : 'newline'].join('|');
                 follower.rendered.test(html)
                   .should.equal(!LOST.has(key), 'follower reached the output' + where);
+              }
+            });
+          });
+        });
+      });
+    });
+  });
+});
+
+// The grid above builds multi-line documents, so it exercises the block path only. The inline one — a
+// whole env inside a single line, at a line start or mid-paragraph — has its own scanner and its own
+// owner for the line, and no grid reached it. Same three invariants, plus the text after the env.
+describe('an env written inside one line:', () => {
+  const FOLLOWERS = {
+    nothing: { src: '', rendered: null },
+    text: { src: 'zq', rendered: /zq/ },
+    center: { src: '\\begin{center}x\\end{center}', rendered: /class="center"/ },
+    tabular: { src: '\\begin{tabular}{l}q\\end{tabular}', rendered: /<table/ },
+  };
+  // `center` after a one-line env is lost whichever way it is written: the align rule takes the line
+  // before this one is asked, as it does in the block grid. Byte-identical to `master` in all eight.
+  const LOST = new Set([
+    'itemize|1|center|start', 'itemize|1|center|paragraph',
+    'itemize|2|center|start', 'itemize|2|center|paragraph',
+    'enumerate|1|center|start', 'enumerate|1|center|paragraph',
+    'enumerate|2|center|start', 'enumerate|2|center|paragraph',
+  ]);
+  const build = (env, depth, follower, lead, tail) => {
+    let src = lead;
+    for (let d = 0; d < depth; d++) {
+      src += '\\begin{' + env + '}\\item i' + d + ' ';
+    }
+    for (let d = 0; d < depth; d++) {
+      src += '\\end{' + env + '}';
+    }
+    return src + (follower ? ' ' + follower : '') + tail;
+  };
+  ['itemize', 'enumerate'].forEach((env) => {
+    [1, 2].forEach((depth) => {
+      Object.entries(FOLLOWERS).forEach(([name, follower]) => {
+        it(`${env}, ${depth} deep, ${name} after it`, () => {
+          ['', 'text '].forEach((lead) => {
+            ['', ' tail'].forEach((tail) => {
+              const src = build(env, depth, follower.src, lead, tail);
+              const html = MM.markdownToHTML(src, { outMath: { include_svg: false } });
+              const where = ' in ' + JSON.stringify(src);
+              const key = [env, depth, name, lead === '' ? 'start' : 'paragraph'].join('|');
+              if (LOST.has(key)) {
+                return;
+              }
+              (html.match(/<[uo]l[\s>]/g) || []).should.have.lengthOf(depth, 'levels lost' + where);
+              const outsideCode = html.replace(/<pre[\s\S]*?<\/pre>/g, '');
+              /\\begin\{(itemize|enumerate)\}|\\item(?![a-zA-Z])/.test(outsideCode)
+                .should.equal(false, 'literal LaTeX' + where);
+              if (follower.rendered) {
+                follower.rendered.test(html).should.equal(true, 'follower lost' + where);
+              }
+              if (tail !== '') {
+                /tail/.test(html).should.equal(true, 'the text after the env is gone' + where);
               }
             });
           });
