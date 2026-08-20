@@ -198,6 +198,14 @@ export const skipOptionalArg = (
   if (text[at] !== '[') {
     return at;
   }
+  if (sameLine) {
+    // No `]` on the line: pairing can only fail, and it walked the whole document per `[` to say so.
+    const lineEnd: number = text.indexOf('\n', at);
+    const close: number = text.indexOf(']', at);
+    if (close < 0 || (lineEnd >= 0 && close > lineEnd)) {
+      return -1;
+    }
+  }
   const found = findEndMarker(text, at, '[', ']', false, 0, codePositions) as
     { res: boolean; nextPos?: number };
   if (!found.res || typeof found.nextPos !== 'number') {

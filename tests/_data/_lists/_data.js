@@ -2739,6 +2739,22 @@ module.exports = [
     html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">–</span>b<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">∗</span>c</li></ul></li></ul><div class=\"center\" style=\"text-align: center\">x</div>\n</li></ul>"
   },
   {
+    // Three branches of the `[...]` reader, each deciding whether the sibling's closer is an argument.
+    name: "a sibling closer inside a command argument does not open it",
+    latex: "\\begin{itemize}\n\\item a\\end{itemize}\\begin{enumerate}\n\\item b\n\\caption[o]{\\end{enumerate}}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul><div>\\item b<br>\n\\caption[o]{\\end{enumerate}}</div>\n"
+  },
+  {
+    name: "an option with no ] leaves the group after it an argument of nothing",
+    latex: "\\begin{itemize}\n\\item a\\end{itemize}\\begin{enumerate}\n\\item b\n\\caption[o {\\end{enumerate}}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul><ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li class=\"li_enumerate\">b<br>\n\\caption[o {</li></ol><div>}</div>\n"
+  },
+  {
+    name: "an option closing a line below is text, and the sibling opens",
+    latex: "\\begin{itemize}\n\\item a\\end{itemize}\\begin{enumerate}\n\\item b\n\\caption[o\nq]{\\end{enumerate}}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul><ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li class=\"li_enumerate\">b<br>\n\\caption[o<br>\nq]{</li></ol><div>}</div>\n"
+  },
+  {
     name: "a later paragraph holding a \\] leaves the list alone",
     latex: "\\begin{itemize}\n\\item a\\[x\n\\begin{center}\nhere \\end{itemize} more\n\\end{center}\n\\item b\n\\end{itemize}\n\ntail b\\] c",
     html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a[x</div>\n<div class=\"center\" style=\"text-align: center\">here \\end{itemize} more</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul><div>tail b] c</div>\n"

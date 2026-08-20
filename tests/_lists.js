@@ -410,6 +410,16 @@ describe('An unclosed wrapper env leaves the list rendering:', () => {
     const relative = growthOf(build, 8000, 32000) / growthOf(repeated(CONTROL_UNIT), 200, 800);
     relative.should.be.below(3, 'grows faster than the input: ×' + relative.toFixed(2));
   });
+  // An option with no `]` on its line is text. Pairing it to say so walked the rest of the document and
+  // rebuilt the code index per `[` — ×4.9–7.3 measured here, ×1.8–2.2 with the line check answering first.
+  it('a run of unclosed options parses linearly', () => {
+    const build = (n) => '\\begin{itemize}\n\\item a\n\\begin{center}\n'
+      + Array.from({ length: n }, (_, i) => '\\caption[c' + i).join('\n')
+      + '\ntail\n\\end{center}\n\\item b\n\\end{itemize}';
+    // Options per document, so the control grows by units instead.
+    const relative = growthOf(build, 400, 3200) / growthOf(repeated(CONTROL_UNIT), 200, 1600);
+    relative.should.be.below(3, 'grows faster than the input: ×' + relative.toFixed(2));
+  });
   // Pairing runs over the whole source, so an unmatched `{` must stay local: judged document-wide it
   // blinded every list after it — the caption's closer read as structure and half the items were lost.
   it('an unmatched { before a list does not reach it', () => {

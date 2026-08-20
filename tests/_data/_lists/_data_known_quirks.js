@@ -117,9 +117,9 @@ module.exports = [
     // mid-paragraph above it is split: the inner level renders, the outer stays text. Guarding that break
     // was measured to cost more — an unclosed list then swallowed a valid `figure` float.
     name: "a closer past the last open list eats the text beside it",
-    // `\end{itemize}\end{itemize} trailing` over one level: the extra closer makes the chunk read as
-    // end-of-list commands, and `ItemsAddToPrev` drops it with the text. Byte-identical to `master`.
-    // The two-level form beside it in `_data.js` keeps `trailing`, and the difference is this drop.
+    // `\end{itemize}\end{itemize} trailing` over one level: the leftover holds list structure, so the
+    // handoff declines it (Non-Goals) and nothing else emits it — measured, no `ItemsAddToPrev` call.
+    // Byte-identical to `master`; the two-level form beside it in `_data.js` keeps `trailing`.
     latex: "\\begin{itemize}\n\\item a\n\\end{itemize}\\end{itemize} trailing\n",
     html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul>"
   },
