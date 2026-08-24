@@ -131,4 +131,23 @@ module.exports = [
     latex: "text \\begin{itemize}\n\\item i0\n\\begin{itemize}\n\\item i1\n\\end{itemize}\n\\begin{center}x\\end{center}\n\\end{itemize}\n",
     html: "<div>text \\begin{itemize}<br>\n\\item i0<br>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">\u2022</span>i1</li></ul></div>\n<div class=\"center\" style=\"text-align: center\">x</div>\n<div>\\end{itemize}</div>\n"
   },
+  {
+    // The shape whose output changed: `Lists` declines a closer line holding a wrapper, `paragraphDiv`
+    // takes the document, and `\begin{center}` has no inline rule — `master` dropped it instead.
+    name: "a wrapper after the outermost closer is kept as literal LaTeX",
+    latex: "\\begin{itemize}\n\\item i0\n\\end{itemize} \\begin{center}x\\end{center}",
+    html: "<div><ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">\u2022</span>i0</li></ul> \\begin{center}x\\end{center}</div>\n"
+  },
+  {
+    // The align rule takes the whole line: list and trailing text go with it, only `center` renders.
+    name: "a one-line env before a center loses the list and the text after it",
+    latex: "\\begin{itemize}\\item i0 \\end{itemize} \\begin{center}x\\end{center} tail",
+    html: "<div class=\"center\" style=\"text-align: center\">x</div>\n"
+  },
+  {
+    // Mid-paragraph the list survives, and there too `\begin{center}` has no inline rule to render it.
+    name: "the same env mid-paragraph keeps the list and leaves the center as text",
+    latex: "text \\begin{itemize}\\item i0 \\end{itemize} \\begin{center}x\\end{center} tail",
+    html: "<div>text <ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">\u2022</span>i0</li></ul> \\begin{center}x\\end{center} tail</div>\n"
+  },
 ];

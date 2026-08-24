@@ -8,9 +8,18 @@ import { snapshotListLevels, restoreListLevels, type ListLevelState } from "./li
 import { BufferedBlockState, PushFn } from "./latex-list-types";
 import { warnDistinct } from "../common/warn-distinct";
 
+// Raw count, not the distinct causes `warnDistinct` keeps: a failed rule renders literal LaTeX, which
+// every net reads as valid output, so the suite needs a detector of its own.
+let ruleFailures: number = 0;
+export const listRuleFailureCount = (): number => ruleFailures;
+export const resetListRuleFailures = (): void => {
+  ruleFailures = 0;
+};
+
 // One report per distinct cause per parse: the name alone collapses to `Error` for most
 // internal faults, and the caller has no other signal (see the diagnostics Non-Goal).
 export const warnListRuleFailed = (e: unknown): void => {
+  ruleFailures++;
   const cause = e as Error;
   warnDistinct('list-rule-failed:' + cause?.name + ':' + (cause?.message ?? ''),
     '[list] list rule failed; skipping the list', e);
@@ -113,6 +122,9 @@ export const createBufferedState = (state: StateBlock): BufferedBlockState => {
   const tempState = Object.create(state) as BufferedBlockState;
   tempState.tokens = [];
   tempState.level = state.level;
+  // Own, not inherited: the commit branch rewrites real `bMarks` from it, so a nested parse must not see
+  // the parent's. Unreachable today only by call order.
+  tempState.listTailFrom = undefined;
   // Own copy: `types` is popped in place, so a pop before the first open would reach the real state.
   if (Array.isArray((state as any).types)) {
     tempState.types = (state as any).types.slice();

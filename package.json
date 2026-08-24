@@ -37,7 +37,7 @@
     "build": "tsc && webpack --mode=production --config webpack.config.js",
     "dev": "tsc &&  webpack --mode=development --config webpack.dev.js --watch",
     "test": "mocha tests/*.js --exit",
-    "test:fuzz": "LIST_FUZZ_DOCS=25000 mocha tests/_lists-fuzz.js --exit"
+    "test:fuzz": "LIST_FUZZ_DOCS=25000 mocha tests/_lists-fuzz.js tests/_parse-isolation.js --exit"
   },
   "dependencies": {
     "@babel/runtime": "^7.17.2",

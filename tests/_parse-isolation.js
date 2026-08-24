@@ -52,6 +52,20 @@ after(function () {
   snapshotLeaks.should.deep.equal([], 'a test left a snapshot un-released');
 });
 
+// A failed rule renders literal LaTeX, which every net reads as valid output. Root-level, so it covers
+// fixtures, grids and fuzz; a test degrading on purpose resets the counter itself.
+const degraded = [];
+afterEach(function () {
+  if (listEnvEngine.listRuleFailureCount() === 0) {
+    return;
+  }
+  degraded.push(this.currentTest.fullTitle());
+  listEnvEngine.resetListRuleFailures();
+});
+after(function () {
+  degraded.should.deep.equal([], 'the list rule failed and fell back to literal LaTeX');
+});
+
 // Each sub-plugin (TOC, theorem, labels, footnotes, lists, text counters)
 // holds module-level state. If those aren't reset per parse, re-rendering the
 // same source on one md instance drifts — extra `-2` slugs, bumped section
@@ -520,6 +534,7 @@ describe('a failing list rule does not fail the document', () => {
     } finally {
       console.warn = warn;
       listEnvEngine[name] = original;
+      listEnvEngine.resetListRuleFailures();      // degraded on purpose; the root hook holds the rest
     }
   };
   it('a failure before the commit point keeps the content and warns once', () => {
@@ -549,6 +564,7 @@ describe('a failing list rule does not fail the document', () => {
       } finally {
         console.warn = warn;
         listEnvEngine.parseListEnvRawToTokens = original;
+        listEnvEngine.resetListRuleFailures();
       }
     });
   });
@@ -572,6 +588,7 @@ describe('a failing list rule does not fail the document', () => {
     } finally {
       console.warn = warn;
       listEnvEngine.createBufferedState = original;
+      listEnvEngine.resetListRuleFailures();
     }
   });
   // The opaque loop ends when its tail stops shrinking, not after a step count, so how many envs a
@@ -645,6 +662,7 @@ describe('a failing list rule does not fail the document', () => {
     } finally {
       console.warn = warn;
       md.inline.parse = originalParse;
+      listEnvEngine.resetListRuleFailures();
     }
     JSON.stringify(md.options.outMath).should.equal(before, 'outMath stayed mutated after the throw');
     // The flag that switches the list rules off during a marker parse, stuck on, kills every later list.
@@ -717,6 +735,7 @@ describe('a failing list rule does not fail the document', () => {
       listEnvEngine.warnListRuleFailed(new TypeError('third cause'));
     } finally {
       console.warn = warn;
+      listEnvEngine.resetListRuleFailures();
     }
     warnings.should.have.length(3);
   });
@@ -764,6 +783,7 @@ describe('a probe that throws rolls back exactly like one that does not', () => 
       console.warn = warn;
       listEnvEngine.createBufferedState = originalBuffered;
       rule.fn = originalRule;
+      listEnvEngine.resetListRuleFailures();
     }
   };
   it('leaves no level, no live transient flag and no shifted caption number', () => {

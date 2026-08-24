@@ -1,5 +1,7 @@
 import type Token from 'markdown-it/lib/token';
 import { BufferedBlockState } from "./latex-list-types";
+export declare const listRuleFailureCount: () => number;
+export declare const resetListRuleFailures: () => void;
 export declare const warnListRuleFailed: (e: unknown) => void;
 /** Shallow clone but shift known position fields by baseOffset */
 export declare const shiftTokenAbsolutePositions: (tok: any, baseOffset: number) => any;

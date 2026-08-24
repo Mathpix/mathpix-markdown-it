@@ -18,7 +18,9 @@ const host = jsdom.window.document.getElementById('host');
 // The default is what the suite carries; `npm run test:fuzz` searches 25000, where the last defect
 // sat at document 24057 — no default catches everything, so the deep sweep is its own script.
 const SEED = 987654321;
-const DOCS = Number(process.env.LIST_FUZZ_DOCS || 2000);
+const DEFAULT_DOCS = 2000;
+// Falls back: a non-numeric value read as `NaN`, built no documents and passed all three tests in 2ms.
+const DOCS = Number(process.env.LIST_FUZZ_DOCS) || DEFAULT_DOCS;
 const FENCE = '```';
 // Chosen to reach what the list rules read: markers, wrapper envs, verbatim, crossed and unclosed
 // envs, and commands whose argument holds list markup.
@@ -148,9 +150,13 @@ describe('seeded fuzz over list shapes:', () => {
       const warn = console.warn;
       console.warn = () => {};
       const failures = [];
+      // An entry is an exact source: a changed seed or fragment list makes it stop matching, and the
+      // exclusion would go quiet instead of going away.
+      const matched = new Set();
       try {
         docs.forEach((src, i) => {
           if (KNOWN.has(src)) {
+            matched.add(src);
             return;
           }
           let bad;
@@ -167,6 +173,11 @@ describe('seeded fuzz over list shapes:', () => {
         console.warn = warn;
       }
       failures.length.should.equal(0, failures.slice(0, 3).join('\n'));
+      // Full corpus only: a shortened one misses entries harmlessly, and the check read that as stale.
+      if (DOCS >= DEFAULT_DOCS) {
+        [...KNOWN].filter((src) => !matched.has(src))
+          .should.deep.equal([], 'a KNOWN entry matched no document of the corpus');
+      }
     });
   });
 });

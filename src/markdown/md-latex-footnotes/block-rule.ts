@@ -96,7 +96,8 @@ const resolveEnabledRuleFns = (ruler: Ruler, names: Set<string>): RuleBlock[] =>
 const WITH_FENCE_KEY = Symbol('mmd.terminatorsWithFence');
 const FENCE_ONLY: RuleBlock[] = [fence as unknown as RuleBlock];
 
-const terminatorsWithFence = (ruler: Ruler, names: Set<string>, fence: RuleBlock): RuleBlock[] => {
+// Not `fence`: that name is the module import above, and a parameter shadowing it reads as the same rule.
+const terminatorsWithFence = (ruler: Ruler, names: Set<string>, fenceRule: RuleBlock): RuleBlock[] => {
   const resolved: RuleBlock[] = resolveEnabledRuleFns(ruler, names);
   const host: any = ruler as any;
   // Per name set, as above: one slot would miss on every call once a second set appeared.
@@ -109,7 +110,7 @@ const terminatorsWithFence = (ruler: Ruler, names: Set<string>, fence: RuleBlock
   if (cached && cached.resolved === resolved) {
     return cached.withFence;
   }
-  const withFence: RuleBlock[] = [fence].concat(resolved);
+  const withFence: RuleBlock[] = [fenceRule].concat(resolved);
   byNames.set(names, { resolved, withFence });
   return withFence;
 }

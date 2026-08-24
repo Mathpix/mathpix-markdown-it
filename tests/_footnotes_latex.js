@@ -268,6 +268,7 @@ describe('A throwing terminator probe does not fail the render:', () => {
         console.warn = warn;
         listEnvEngine.createBufferedState = original;
         rule.fn = originalRule;
+        listEnvEngine.resetListRuleFailures();   // degraded on purpose; the root hook holds the rest
       }
     });
   });

@@ -365,15 +365,17 @@ describe('An unclosed wrapper env leaves the list rendering:', () => {
   // invocations was tried instead and dropped — it sees only work that crosses a rule boundary, and
   // measured the same ×8.0 with the quadratic walk this bound exists to catch as without it.
   const CONTROL_UNIT = '\\begin{itemize}\n\\item a\n\\item b\n\\end{itemize}';
+  // Fractional ms and five samples: whole ones read the small side as 1–2, where one GC pause tripled
+  // the ratio and failed the run once in three.
   const medianMs = (src) => {
     MM.markdownToHTML(src, { outMath: { include_svg: false } });      // warm up
     const samples = [];
-    for (let i = 0; i < 3; i++) {
-      const started = Date.now();
+    for (let i = 0; i < 5; i++) {
+      const started = performance.now();
       MM.markdownToHTML(src, { outMath: { include_svg: false } });
-      samples.push(Date.now() - started);
+      samples.push(performance.now() - started);
     }
-    return Math.max(samples.sort((a, b) => a - b)[1], 1);
+    return Math.max(samples.sort((a, b) => a - b)[2], 0.001);
   };
   const growthOf = (build, small, large) => medianMs(build(large)) / medianMs(build(small));
   const repeated = (unit) => (n) => Array.from({ length: n }, () => unit).join('\n\n');
@@ -720,10 +722,9 @@ describe('a closer sharing its line with the env after it:', () => {
     lstlisting: { src: '\\begin{lstlisting}\nq\n\\end{lstlisting}', rendered: /lstlisting-code/ },
     fence: { src: FENCE + '\nq\n' + FENCE, rendered: /<pre>/ },
   };
-  // Shapes where the follower still does not reach the output, each with an owner of its own (Non-Goals),
-  // and all of them byte-identical to `master`: a `center`/`figure` line goes to the align/float rule
-  // before this one is asked, and a fence sharing the closer's line while a list is still open is item
-  // content, where it re-parses as an inline code span. Listed, so the grid stays red for anything else.
+  // Followers that still do not reach the output, each with an owner (Non-Goals): with a `center`/`figure`
+  // there this rule declines the line and `paragraphDiv` takes it, where the wrapper has no inline rule —
+  // literal LaTeX, so those eight are not at parity with `master`; a fence is item content, and is.
   const LOST = new Set([
     'itemize|1|center|none', 'itemize|1|center|space',
     'enumerate|1|center|none', 'enumerate|1|center|space',
@@ -789,13 +790,15 @@ describe('an env written inside one line:', () => {
     center: { src: '\\begin{center}x\\end{center}', rendered: /class="center"/ },
     tabular: { src: '\\begin{tabular}{l}q\\end{tabular}', rendered: /<table/ },
   };
-  // `center` after a one-line env is lost whichever way it is written: the align rule takes the line
-  // before this one is asked, as it does in the block grid. Byte-identical to `master` in all eight.
-  const LOST = new Set([
-    'itemize|1|center|start', 'itemize|1|center|paragraph',
-    'itemize|2|center|start', 'itemize|2|center|paragraph',
-    'enumerate|1|center|start', 'enumerate|1|center|paragraph',
-    'enumerate|2|center|start', 'enumerate|2|center|paragraph',
+  // Two different losses, and one set for both hid that: the align rule owns a line starting with the
+  // env, so the list goes with it; mid-paragraph the list survives and the wrapper stays text.
+  const LOST_LIST = new Set([
+    'itemize|1|center|start', 'itemize|2|center|start',
+    'enumerate|1|center|start', 'enumerate|2|center|start',
+  ]);
+  const LOST_FOLLOWER = new Set([
+    'itemize|1|center|paragraph', 'itemize|2|center|paragraph',
+    'enumerate|1|center|paragraph', 'enumerate|2|center|paragraph',
   ]);
   const build = (env, depth, follower, lead, tail) => {
     let src = lead;
@@ -817,15 +820,23 @@ describe('an env written inside one line:', () => {
               const html = MM.markdownToHTML(src, { outMath: { include_svg: false } });
               const where = ' in ' + JSON.stringify(src);
               const key = [env, depth, name, lead === '' ? 'start' : 'paragraph'].join('|');
-              if (LOST.has(key)) {
+              const outsideCode = html.replace(/<pre[\s\S]*?<\/pre>/g, '');
+              // Asserted, not skipped: skipping these left it unpinned that the list goes missing whole.
+              const noLatexLeft = () => /\\begin\{(itemize|enumerate)\}|\\item(?![a-zA-Z])/
+                .test(outsideCode).should.equal(false, 'literal LaTeX' + where);
+              if (LOST_LIST.has(key)) {
+                (html.match(/<[uo]l[\s>]/g) || []).should.have.lengthOf(0, 'a level survived' + where);
+                follower.rendered.test(html).should.equal(true, 'follower lost too' + where);
+                // The whole line goes to the align rule, so the text after the env goes with the list.
+                /tail/.test(html).should.equal(false, 'the text after the env survived' + where);
+                noLatexLeft();
                 return;
               }
               (html.match(/<[uo]l[\s>]/g) || []).should.have.lengthOf(depth, 'levels lost' + where);
-              const outsideCode = html.replace(/<pre[\s\S]*?<\/pre>/g, '');
-              /\\begin\{(itemize|enumerate)\}|\\item(?![a-zA-Z])/.test(outsideCode)
-                .should.equal(false, 'literal LaTeX' + where);
+              noLatexLeft();
               if (follower.rendered) {
-                follower.rendered.test(html).should.equal(true, 'follower lost' + where);
+                follower.rendered.test(html)
+                  .should.equal(!LOST_FOLLOWER.has(key), 'follower reached the output' + where);
               }
               if (tail !== '') {
                 /tail/.test(html).should.equal(true, 'the text after the env is gone' + where);
