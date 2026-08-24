@@ -382,10 +382,16 @@ describe('An unclosed wrapper env leaves the list rendering:', () => {
   // Against the control taken in this very process: 1.0–1.4 measured here, 2.8–3.7 with the walk.
   const growthAgainstControl = (build, small, large) =>
     growthOf(build, small, large) / growthOf(repeated(CONTROL_UNIT), small, large);
+  // Not on mocha's 2s default: ~1s here, past it on a shared CI runner, where all four timed out.
+  // The bound is a ratio, so a generous cap measures the same thing.
+  const itScales = (title, body) => it(title, function () {
+    this.timeout(60000);
+    body();
+  });
   // The guard asks how many closers are left after a wrapper, and a walk over every offset past it made a
   // document of such wrappers super-linear — 1600 units were 2.25× slower than `master` before the
   // suffix counts.
-  it('a document of wrappers each holding a foreign closer scans linearly', () => {
+  itScales('a document of wrappers each holding a foreign closer scans linearly', () => {
     const unit = '\\begin{itemize}\n\\item a\n\\begin{center}\ntext \\end{itemize} here\n'
       + '\\end{center}\n\\item b\n\\end{itemize}';
     const relative = growthAgainstControl(repeated(unit), 200, 1600);
@@ -394,7 +400,7 @@ describe('An unclosed wrapper env leaves the list rendering:', () => {
   // A closer written in code is skipped and the scan resumes past it. Slicing the rest of the line per
   // skip made that quadratic; the sticky scan keeps it flat. On the clock, unlike the two beside it: all
   // of this happens inside one rule call, so counting calls sees none of it (measured, ×1.0 at ×8 input).
-  it('a line full of closers written in code scans linearly', () => {
+  itScales('a line full of closers written in code scans linearly', () => {
     const build = (n) => '\\begin{itemize}\n\\item a\n\\begin{center}\n'
       + '`\\end{center}` '.repeat(n) + 'tail\n\\end{center}\n\\item b\n\\end{itemize}';
     // Closers per line, so the control grows by units: sixteen times either way, and quadratic here
@@ -404,7 +410,7 @@ describe('An unclosed wrapper env leaves the list rendering:', () => {
   });
   // Argument pairing is one pass with a stack. Asking findEndMarker per brace made a long run of
   // unmatched `{` rescan the tail each time — `n^1.9` measured, 12× master at 8000 braces.
-  it('a long run of unmatched braces parses linearly', () => {
+  itScales('a long run of unmatched braces parses linearly', () => {
     const build = (n) => '\\begin{itemize}\n\\item a\n\\begin{center}\n' + '{'.repeat(n) + ' x\n'
       + '\\caption{q \\end{itemize} w}\n\\end{center}\n\\item b\n\\end{itemize}';
     // The pairing this replaced asked `findEndMarker` per brace and rescanned the tail each time:
@@ -414,7 +420,7 @@ describe('An unclosed wrapper env leaves the list rendering:', () => {
   });
   // An option with no `]` on its line is text. Pairing it to say so walked the rest of the document and
   // rebuilt the code index per `[` — ×4.9–7.3 measured here, ×1.8–2.2 with the line check answering first.
-  it('a run of unclosed options parses linearly', () => {
+  itScales('a run of unclosed options parses linearly', () => {
     const build = (n) => '\\begin{itemize}\n\\item a\n\\begin{center}\n'
       + Array.from({ length: n }, (_, i) => '\\caption[c' + i).join('\n')
       + '\ntail\n\\end{center}\n\\item b\n\\end{itemize}';
