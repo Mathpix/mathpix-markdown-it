@@ -403,6 +403,9 @@ describe('An unclosed wrapper env leaves the list rendering:', () => {
   // Against the control taken in this very process: 1.0–1.4 measured here, 2.8–3.7 with the walk.
   const growthAgainstControl = (build, small, large) =>
     growthOf(build, small, large) / growthOf(repeated(CONTROL_UNIT), small, large);
+  // Lowest of three: measured once the ratio reads 0.6 idle and 1.23 under the deep fuzz in the
+  // same process, which flakes at any threshold tight enough to catch the shape.
+  const lowestRatio = (measure) => Math.min(measure(), measure(), measure());
   // Not on mocha's 2s default: ~1s here, past it on a shared CI runner, where all four timed out.
   // The bound is a ratio, so a generous cap measures the same thing.
   const itScales = (title, body) => it(title, function () {
@@ -433,8 +436,10 @@ describe('An unclosed wrapper env leaves the list rendering:', () => {
   // A slice per command rebuilt the code-span index over the rest — 1215ms on 8000 against 3, `n^1.85`.
   itScales('a line of \\renewcommand beside a code span parses linearly', () => {
     const build = (n) => '\\renewcommand{\\x}{y}'.repeat(n) + ' `c`';
-    // Both sides grow ×4 in bytes: 0.77 measured here, 4.08 with the index rebuilt per command.
-    const relative = growthOf(build, 1000, 4000) / growthOf(repeated(CONTROL_UNIT), 100, 400);
+    // Both sides grow ×4 in bytes: 0.8–1.0 measured under the deep fuzz, 4.08 with the index rebuilt
+    // per command.
+    const relative = lowestRatio(() =>
+      growthOf(build, 1000, 4000) / growthOf(repeated(CONTROL_UNIT), 100, 400));
     relative.should.be.below(2, 'grows faster than the input: ×' + relative.toFixed(2));
   });
   // The inline scanner steps past a `\renewcommand` and the item scan asks where each one ends. Both
@@ -442,9 +447,10 @@ describe('An unclosed wrapper env leaves the list rendering:', () => {
   itScales('\\renewcommand inside a list scanned inline parses linearly', () => {
     const build = (n) => 'text \\begin{itemize}'
       + '\\renewcommand{\\x}{y}\\item i '.repeat(n) + '`c`\\end{itemize} tail';
-    // 0.51–0.63 measured over four runs, against 1.92–2.00 with the slices and 2.58 on `master`.
-    const relative = growthOf(build, 400, 1600) / growthOf(repeated(CONTROL_UNIT), 100, 400);
-    relative.should.be.below(1.2, 'grows faster than the input: ×' + relative.toFixed(2));
+    // 0.9–1.0 measured under the deep fuzz, against 3.25–3.45 with the slices and 2.58 on `master`.
+    const relative = lowestRatio(() =>
+      growthOf(build, 400, 1600) / growthOf(repeated(CONTROL_UNIT), 100, 400));
+    relative.should.be.below(1.6, 'grows faster than the input: ×' + relative.toFixed(2));
   });
   // Argument pairing is one pass with a stack. Asking findEndMarker per brace made a long run of
   // unmatched `{` rescan the tail each time — `n^1.9` measured, 12× master at 8000 braces.
