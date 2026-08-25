@@ -71,7 +71,7 @@ export const unclosedEnvsIn = (s: string): number => {
   let env: { match: RegExpMatchArray; isEnd: boolean } | null = nextListEnvMatch(masked);
   while (env) {
     depth += env.isEnd ? -1 : 1;
-    // A zero step would spin, so the walk ends rather than trust the pattern to advance.
+    // Defensive only: the shortest match is 13 characters. Kept so a pattern matching empty cannot spin.
     const cut: number = (env.match.index ?? 0) + env.match[0].length;
     if (cut <= 0) {
       break;
@@ -211,6 +211,14 @@ export const wrapperBeginAt = (lineText: string): RegExpExecArray | null => {
   return null;
 };
 
+// Counted, not warned: the branch is never taken today, and a caller breaking the suffix invariant would
+// otherwise decline a wrapper in silence. The suite asserts zero.
+let unanchored: number = 0;
+export const unanchoredOffsetCount = (): number => unanchored;
+export const resetUnanchoredOffsets = (): void => {
+  unanchored = 0;
+};
+
 // Where `match` sits in the source: `lineText` is a suffix of its line, so the line's end anchors it.
 export const absoluteOffsetOf = (
   state: StateBlockLike,
@@ -222,9 +230,13 @@ export const absoluteOffsetOf = (
   // Callers pass the line or a suffix of it, which is what makes this exact; a middle slice would shift
   // every offset. Not asserted: `endsWith` is O(lineText) and this is called per closer on the line.
   const at: number = state.eMarks[line] - lineText.length + index;
-  // -1 when the anchor does not hold; each caller decides what that means. Pinned by a test, not a
-  // warning: only our own callers can break the suffix invariant, and CI is where that should show.
-  return state.src.slice(at, at + text.length) === text ? at : -1;
+  // -1 when the anchor does not hold; each caller decides what that means. Only our own callers can break
+  // the suffix invariant, so it is counted for the suite rather than reported to a consumer.
+  if (state.src.slice(at, at + text.length) === text) {
+    return at;
+  }
+  unanchored++;
+  return -1;
 };
 
 // How many of `all` from index `i` on are structural. Cached per source: a walk per wrapper made a
@@ -364,6 +376,18 @@ export const nextListEnvMatch = (s: string): { match: RegExpMatchArray; isEnd: b
   return { match: isEnd ? endMatch! : beginMatch!, isEnd };
 };
 
+// A closer whose offset will not confirm counts as structure, as it read before verbatim ranges existed.
+// Named, so the `-1` stays here and not at the call site.
+const closerIsWrittenAsText = (
+  state: StateBlockLike,
+  line: number,
+  text: string,
+  found: RegExpExecArray
+): boolean => {
+  const at: number = absoluteOffsetOf(state, line, text, found.index, found[0]);
+  return at >= 0 && writtenAsText(state, at);
+};
+
 // The first closer in `text` that is not written in code, or null. A wrapper's closer inside a fence, an
 // `lstlisting` or a code span is content — and a later one on the same line is still its closer.
 export const firstUsableCloser = (
@@ -379,11 +403,8 @@ export const firstUsableCloser = (
   scan.lastIndex = 0;
   let found: RegExpExecArray | null;
   while ((found = scan.exec(text)) !== null) {
-    // Unanchored (-1) counts as structure: the closer is taken, as it was before the ranges existed.
-    const at: number = checkVerbatim
-      ? absoluteOffsetOf(state, line, text, found.index, found[0])
-      : -1;
-    if (at < 0 || !writtenAsText(state, at)) {
+    // Not asking was `-1` too, so one test stood for both that and an anchor that did not hold.
+    if (!checkVerbatim || !closerIsWrittenAsText(state, line, text, found)) {
       return { index: found.index, length: found[0].length };
     }
   }

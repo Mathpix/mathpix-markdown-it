@@ -42,3 +42,32 @@ describe('findEndMarker shields a marker by backslash parity:', () => {
     found.endPos.should.equal(8);
   });
 });
+
+// `onlyEnd` seeks a closer with no opener, `openBracketsBefore` carries the depth a previous line left
+// open. The footnote scans use both, and the parity change above was measured against neither.
+describe('findEndMarker without an opener, and with a depth from elsewhere:', () => {
+  const seek = (str, depth = 0, startPos = -1) => {
+    const found = findEndMarker(str, startPos, '{', '}', true, depth);
+    return found.res ? found.endPos : 'no match: ' + found.openBrackets;
+  };
+  const cases = [
+    { name: 'a bare closer ends the span', str: 'a}', want: 1 },
+    { name: 'a shielded one does not', str: 'a\\}', want: 'no match: 1' },
+    { name: 'and `\\\\` is not a shield, so the closer after it does', str: 'a\\\\}', want: 3 },
+    { name: 'three backslashes shield it again', str: 'a\\\\\\}', want: 'no match: 1' },
+    { name: 'a depth of two needs two closers', str: 'a}}', depth: 2, want: 2 },
+    { name: 'one closer leaves the depth at one', str: 'a}', depth: 2, want: 'no match: 1' },
+    { name: 'an opener raises the depth it was handed', str: 'a{}}}', depth: 2, want: 4 },
+    { name: 'a shielded closer does not spend the handed depth', str: 'a\\}}}', depth: 2, want: 4 },
+  ];
+  cases.forEach(({ name, str, depth, want }) => {
+    it(name, () => {
+      seek(str, depth).should.equal(want);
+    });
+  });
+  it('a positive startPos skips the character standing there', () => {
+    // The scan begins past `startPos`, which in the normal mode holds the opening marker — so a `\` there
+    // does not shield. Every caller passes -1 for that reason.
+    seek('\\}', 0, 0).should.equal(1);
+  });
+});

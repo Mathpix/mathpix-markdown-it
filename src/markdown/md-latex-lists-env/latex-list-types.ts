@@ -69,10 +69,14 @@ export interface CustomMarkerHtmlResult {
 /** `listParagraphStart` is the paragraph rule's handoff: the offset a paragraph holding an unclosed list
  *  env starts at, set for the terminator call alone so the list rule can decline to end that paragraph.
  *  `listTailFrom` goes the other way: where the text after the outermost closer starts, for the commit
- *  branch to hand that stretch of the line back to the block phase instead of dropping it. */
+ *  branch to hand that stretch of the line back to the block phase instead of dropping it.
+ *  `listTailMarks` is what that hand-back has to put back: present while the outermost leftover walks the
+ *  rest of the phase, so a later one records its marks there instead of nesting a walk of its own. */
+export type SavedLineMarks = { line: number; bMark: number; tShift: number };
 export type StateBlockLike = {
   listParagraphStart?: number;
   listTailFrom?: { line: number; at: number };
+  listTailMarks?: SavedLineMarks[];
 } & Pick<
   StateBlock,
   | 'md'

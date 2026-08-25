@@ -2755,6 +2755,28 @@ module.exports = [
     html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul><ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li class=\"li_enumerate\">b<br>\n\\caption[o<br>\nq]{</li></ol><div>}</div>\n"
   },
   {
+    // One per branch that eats a prefix of the line: the leftover was handed back by an offset counted
+    // from the line start, so the block phase re-read the middle of the eaten command.
+    name: "a leftover after a \\renewcommand sharing the closer's line",
+    latex: "\\begin{itemize}\n\\item a\n\\renewcommand{\\labelitemi}{Z} \\end{itemize} TAIL",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul><div>TAIL</div>\n"
+  },
+  {
+    name: "a leftover after a wrapper closed on the closer's line",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{center}c\\end{center} \\end{itemize} TAIL",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\">c</div>\n</li></ul><div>TAIL</div>\n"
+  },
+  {
+    name: "a leftover after a tabular closed on the closer's line",
+    latex: "\\begin{itemize}\n\\item a \\begin{tabular}{l}CELL\\end{tabular} \\end{itemize} TAIL",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"table_tabular\">\n<div class=\"inline-tabular\"><table class=\"tabular\">\n<tbody>\n<tr style=\"border-top: none !important; border-bottom: none !important;\">\n<td style=\"text-align: left; border-left: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; \">CELL</td>\n</tr>\n</tbody>\n</table>\n</div></div>\n</li></ul><div>TAIL</div>\n"
+  },
+  {
+    name: "a leftover after a \\setcounter sharing the closer's line",
+    latex: "\\begin{enumerate}\n\\item a\n\\setcounter{enumi}{5} \\end{enumerate} TAIL",
+    html: "<ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li value=\"6\" class=\"li_enumerate\">a</li></ol><div>TAIL</div>\n"
+  },
+  {
     name: "a later paragraph holding a \\] leaves the list alone",
     latex: "\\begin{itemize}\n\\item a\\[x\n\\begin{center}\nhere \\end{itemize} more\n\\end{center}\n\\item b\n\\end{itemize}\n\ntail b\\] c",
     html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a[x</div>\n<div class=\"center\" style=\"text-align: center\">here \\end{itemize} more</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul><div>tail b] c</div>\n"

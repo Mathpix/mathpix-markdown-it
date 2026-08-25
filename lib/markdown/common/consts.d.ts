@@ -51,6 +51,8 @@ export declare const reOpenTagFootnotetextNumbered: RegExp;
 export declare const reFootNoteMark: RegExp;
 export declare const reFootNoteText: RegExp;
 export declare const reDiagboxG: RegExp;
+/** Anchored: the inline rule asks whether one starts at its position. Unanchored it took a later one and
+ *  ate the text between. */
 export declare const reDiagbox: RegExp;
 export declare const reNumber: RegExp;
 export declare const svgRegex: RegExp;

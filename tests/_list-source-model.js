@@ -257,7 +257,8 @@ describe('absorbSublistIntoWrapper: what the guards refuse to move', () => {
 // Two readers act on the -1 this returns — one takes the closer as structure, the other opens no
 // wrapper — so the suffix invariant its callers keep is pinned here rather than left to a comment.
 describe('list source model: the offset anchor answers only for a suffix of its own line', () => {
-  const { absoluteOffsetOf } = require('../lib/markdown/md-latex-lists-env/list-source-model');
+  const { absoluteOffsetOf, resetUnanchoredOffsets } =
+    require('../lib/markdown/md-latex-lists-env/list-source-model');
   const src = '\\begin{itemize}\n\\item a \\end{itemize} tail\n';
   const state = stateOf(src);
   const line = 1;
@@ -276,5 +277,6 @@ describe('list source model: the offset anchor answers only for a suffix of its 
     const middle = whole.slice(0, whole.length - 5);
     absoluteOffsetOf(state, line, middle, middle.indexOf('\\end'), '\\end{itemize}')
       .should.equal(-1, 'a shifted anchor passed as a real offset');
+    resetUnanchoredOffsets();      // broke the invariant on purpose; the root hook holds the rest
   });
 });

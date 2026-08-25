@@ -19,6 +19,8 @@ const host = jsdom.window.document.getElementById('host');
 // sat at document 24057 — no default catches everything, so the deep sweep is its own script.
 const SEED = 987654321;
 const DEFAULT_DOCS = 2000;
+// What `test:fuzz` searches: the zone the default leaves untouched, reported below when it was not run.
+const DEEP_DOCS = 25000;
 // Falls back: a non-numeric value read as `NaN`, built no documents and passed all three tests in 2ms.
 const DOCS = Number(process.env.LIST_FUZZ_DOCS) || DEFAULT_DOCS;
 const FENCE = '```';
@@ -179,5 +181,12 @@ describe('seeded fuzz over list shapes:', () => {
           .should.deep.equal([], 'a KNOWN entry matched no document of the corpus');
       }
     });
+  });
+  // Pending, not silent: the last defect sat at document 24057, which a default run never reaches.
+  it(`reaches past document ${DEEP_DOCS}: run \`npm run test:fuzz\``, function () {
+    if (DOCS < DEEP_DOCS) {
+      this.skip();
+    }
+    docs.length.should.equal(DOCS, 'the deep run built a shorter corpus than it asked for');
   });
 });

@@ -10,6 +10,7 @@ import {
   ListOpenResult,
   isListType,
   StateBlockLike,
+  SavedLineMarks,
   OpaqueStack
 } from "./latex-list-types";
 import { parseSetCounterNumber } from "./latex-list-common";
@@ -142,7 +143,10 @@ export const ListsInternal = (
       // Span unmeasurable: only a line carrying structure goes to the walk, or that closer is lost.
       const keepForWalk: boolean = spanEnd < 0
         && (!!nextListEnvMatch(lineText) || LATEX_ITEM_COMMAND_INLINE_RE.test(lineText));
-      if (rest.trim() && (!!nextListEnvMatch(rest) || LATEX_ITEM_COMMAND_INLINE_RE.test(rest))) {
+      // `spanEnd > 0` said outright: without it the slice below was safe only because `rest` is empty then,
+      // and `slice(0, -1)` would drop the line's last character.
+      if (spanEnd > 0 && rest.trim()
+        && (!!nextListEnvMatch(rest) || LATEX_ITEM_COMMAND_INLINE_RE.test(rest))) {
         items = ItemsAddToPrev(items, lineText.slice(0, spanEnd), lineIdx,
           !!state.md.options?.forLatex);
         lineText = rest;
@@ -183,8 +187,9 @@ export const ListsInternal = (
     // of a collapsed `\end{itemize}\end{itemize}` to ItemsAddToPrev, which drops a pure closer —
     // so the outer list never closed and the strict `!haveClose` bail killed the whole rule.
     let tail: string = lineText;
-    // Where `tail` sits in the source, so a leftover can be handed back by offset rather than by text.
-    let tailAt: number = state.bMarks[lineIdx] + state.tShift[lineIdx];
+    // Where `tail` sits, for a leftover handed back by offset. On the line's end: the branches above may
+    // have eaten a prefix, so the line start is not where `tail` begins.
+    let tailAt: number = state.eMarks[lineIdx] - tail.length;
     // Masked once, then cut in step with `tail`: masking keeps length and spaces, so the same slice
     // and trim keep the two aligned. Re-masking per match was quadratic over the line.
     let maskedTail: string = maskNonStructure(tail);
@@ -266,7 +271,10 @@ export const ListsInternal = (
             // to the block phase — by offset, on commit. A leftover holding list structure stays here:
             // re-read as a document it would open as a top-level list, skipping the closer count above.
             const tailFrom: number = tailAt + cut + leadingSpaceOf(tail.slice(cut));
-            if (sE.length > 0 && lineIdx > startLine
+            // Inside the line, or drop the leftover: this offset is written into the real state and never
+            // rolled back, so a wrong one costs the document, not the leftover.
+            const insideLine: boolean = tailFrom > tailAt && tailFrom < state.eMarks[lineIdx];
+            if (insideLine && sE.length > 0 && lineIdx > startLine
               && !nextListEnvMatch(maskNonStructure(sE))) {
               state.listTailFrom = { line: lineIdx, at: tailFrom };
             }
@@ -307,7 +315,7 @@ export const ListsInternal = (
       // `sE` is trimmed, so the offset follows the untrimmed cut plus the leading space it dropped.
       tailAt = tailAt + cut + leadingSpaceOf(tail.slice(cut));
       tail = sE;
-      // A zero step would spin, so the walk ends rather than trust the pattern to advance.
+      // Defensive only: the shortest match is 13 characters. Kept so a pattern matching empty cannot spin.
       if (cut <= 0) {
         break;
       }
@@ -365,7 +373,8 @@ export const ListsInternal = (
       break;
     }
   }
-  // Unclosed fence: buffered lines are ordinary content — replay them through the normal path.
+  // Unclosed fence: buffered lines are ordinary content, replayed by `lineText` as that path reads every
+  // other line. `rawLine` keeps the indent, which outside a fence is an indented code block.
   if (fenceMarker) {
     fenceMarker = null;
     for (const b of fenceBuffer) {
@@ -467,17 +476,44 @@ export const Lists: RuleBlock = (
     // Only here: the line marks are shared with the real state by prototype, so a probe writing them
     // would move the document's own lines under a parse that never applied.
     const tailFrom = (bufferedState as StateBlockLike).listTailFrom;
-    if (tailFrom) {
-      state.bMarks[tailFrom.line] = tailFrom.at;
-      state.tShift[tailFrom.line] = 0;
-      // `sCount` stays: it names the container, and zeroed it read as dedented — the leftover left its
-      // markdown item and broke that list in two.
-    }
-    state.line = tailFrom ? tailFrom.line : bufferedState.line;
+    // Before the leftover is parsed: it must see the container the outer loop would have given it.
     state.startLine = bufferedState.startLine;
     state.parentType = bufferedState.parentType;
     state.level = bufferedState.level;
     state.prentLevel = bufferedState.prentLevel;
+    if (tailFrom) {
+      // `sCount` stays: zeroed it read as a dedent, and the leftover left its markdown item.
+      const marks = (state as StateBlockLike).listTailMarks;
+      const saved: SavedLineMarks = {
+        line: tailFrom.line,
+        bMark: state.bMarks[tailFrom.line],
+        tShift: state.tShift[tailFrom.line],
+      };
+      state.bMarks[tailFrom.line] = tailFrom.at;
+      state.tShift[tailFrom.line] = 0;
+      if (marks) {
+        // A walk is already running and restores this too. Tokenizing again nests a frame per leftover:
+        // 3000 of them overflowed the stack and lost the document.
+        marks.push(saved);
+        state.line = tailFrom.line;
+      } else {
+        // The outermost leftover owns the walk: to the end, so a fence opening there still spans lines.
+        const pending: SavedLineMarks[] = [saved];
+        (state as StateBlockLike).listTailMarks = pending;
+        try {
+          (state as StateBlock).md.block.tokenize(state as StateBlock, tailFrom.line, endLine);
+        } finally {
+          (state as StateBlockLike).listTailMarks = undefined;
+          // Backwards: two hand-backs on one line then end on the first value, the original.
+          for (let i = pending.length - 1; i >= 0; i--) {
+            state.bMarks[pending[i].line] = pending[i].bMark;
+            state.tShift[pending[i].line] = pending[i].tShift;
+          }
+        }
+      }
+    } else {
+      state.line = bufferedState.line;
+    }
     // No `types` copy-back: a committed list is balanced, so the walk already popped what it pushed.
     return true;
   } catch (e) {

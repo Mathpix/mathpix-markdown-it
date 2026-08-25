@@ -89,7 +89,7 @@ describe('the shared env regexes carry no `g`, so their exec sites need no reset
 
 // Math is asked for per block, and the scanner reads to EOF when no opener lies ahead — so a document
 // whose tail holds no math was re-read once per paragraph. Growth, not wall clock, is the gate.
-describe('verbatim ranges: a math-free tail is read once, not once per block', () => {
+describe('verbatim ranges: a long tail is read once, not once per block', () => {
   const head = '\\begin{itemize}\n\\item a\n\\begin{center}x\\end{center}\n\\end{itemize}\n\n';
   const para = 'Lorem ipsum dolor sit amet.\n\n';
   const median = (text) => {
@@ -106,6 +106,25 @@ describe('verbatim ranges: a math-free tail is read once, not once per block', (
     this.retries(2);
     const small = median(head + para.repeat(1000));
     const large = median(head + para.repeat(4000));
+    (large / Math.max(small, 0.05)).should.be.below(8, `small ${small}ms, large ${large}ms`);
+  });
+  // The closer is sought by `findOpenCloseTagsMathEnvironment`, which slices at every backslash —
+  // affordable only because its patterns are anchored. Asked here: end to end it is 0.2ms of 1000ms.
+  it('quadrupling a backslash-heavy math tail does not multiply the cost by more than eight', function () {
+    this.retries(2);
+    const withTail = (n) => '\\begin{align}\nx = 1\n\\end{align}\n\n'
+      + Array.from({ length: n }, (_, i) => '\\alpha_{' + i + '} \\beta \\\\').join(' ');
+    const small = median(withTail(1000));
+    const large = median(withTail(4000));
+    (large / Math.max(small, 0.05)).should.be.below(8, `small ${small}ms, large ${large}ms`);
+  });
+  // The same with no closer: the scan runs to the end of the source instead of stopping at `\end`.
+  it('nor does it when that environment never closes', function () {
+    this.retries(2);
+    const unclosed = (n) => '\\begin{align}\nx = 1\n\n'
+      + Array.from({ length: n }, (_, i) => '\\alpha_{' + i + '} \\beta \\\\').join(' ');
+    const small = median(unclosed(1000));
+    const large = median(unclosed(4000));
     (large / Math.max(small, 0.05)).should.be.below(8, `small ${small}ms, large ${large}ms`);
   });
   it('a `$` before a blank line still opens nothing in the next block', () => {

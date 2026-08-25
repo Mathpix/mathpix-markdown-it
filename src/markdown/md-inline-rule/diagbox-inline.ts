@@ -46,8 +46,8 @@ export const inlineDiagbox: RuleInline = (state: StateInline, silent: boolean): 
 
     if (!match) return false;
 
-    const { index } = match;
-    let [left, newIndex] = extractNextBraceContent(str, index + match[0].length);
+    // The pattern is anchored, so the command sits at the start of `str` and its arguments follow it.
+    let [left, newIndex] = extractNextBraceContent(str, match[0].length);
     let [right, endIndex] = extractNextBraceContent(str, newIndex);
 
     if (!silent) {

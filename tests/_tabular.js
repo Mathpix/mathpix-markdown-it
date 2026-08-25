@@ -95,6 +95,20 @@ describe('Check tabular with diagbox:', () => {
   });
 });
 
+// The inline rule runs at every backslash and asked an unanchored pattern, so standing at one backslash
+// it matched a `\diagbox` further on and consumed everything between — the text in the middle was lost.
+describe('a diagbox is only recognised where the rule stands:', () => {
+  const tests = require('./_data/_tabular/_data_diagbox_inline');
+  tests.forEach((test) => {
+    describe(test.title, () => {
+      it('Checking result html', () => {
+        MM.markdownToHTML(test.mmd, { outMath: { include_svg: false } })
+          .trim().should.equal(test.html);
+      });
+    });
+  });
+});
+
 // Leaf runs are rendered a second time to collect the export formats; that pass throws its HTML
 // away, but it re-runs render rules, and some hold module state (marker levels). Pin that turning
 // the exports on cannot change the HTML — the double render must stay invisible.

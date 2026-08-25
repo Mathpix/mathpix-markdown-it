@@ -58,6 +58,18 @@ const openOpaqueEnv = (
     : { handled: true, stack, items, lineText: "" };
 };
 
+// A wrapper whose offset will not confirm opens nothing: with no offset there is no closer to reach.
+// The opposite policy to the closer scan's, so each is named where it is decided.
+const wrapperReachesCloser = (
+  state: StateBlockLike,
+  line: number,
+  lineText: string,
+  found: RegExpExecArray
+): boolean => {
+  const at: number = absoluteOffsetOf(state, line, lineText, found.index, found[0]);
+  return at >= 0 && hasCloserAhead(state, at, found[1]);
+};
+
 /**
  * Detects \begin{lstlisting} or \begin{tabular} on a line and enters an opaque env.
  * - Uses `stack` to track nesting (tabular can nest, lstlisting cannot).
@@ -99,12 +111,8 @@ const handleLstBeginInline = (
   // A wrapper opens only when its closer is ahead of the `\begin` itself: an `\end{X}` left of it read
   // as reachable and cost the whole list.
   const mbWrapRaw: RegExpExecArray | null = wrapperBeginAt(lineText);
-  // Unanchored (-1) declines the wrapper: with no offset to search from, no closer can be shown reachable.
-  const wrapAt: number = mbWrapRaw
-    ? absoluteOffsetOf(state, nextLine, lineText, mbWrapRaw.index, mbWrapRaw[0])
-    : -1;
   const mbWrap: RegExpExecArray | null =
-    mbWrapRaw && wrapAt >= 0 && hasCloserAhead(state, wrapAt, mbWrapRaw[1]) ? mbWrapRaw : null;
+    mbWrapRaw && wrapperReachesCloser(state, nextLine, lineText, mbWrapRaw) ? mbWrapRaw : null;
   // Earliest begin, or none. Seeded, so this stays a `null` the caller handles rather than a throw
   // the rule would swallow if the guard above and this fold ever drifted apart.
   const mb: RegExpMatchArray | null = [mbLst, mbTab, mbWrap]

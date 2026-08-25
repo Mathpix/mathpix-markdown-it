@@ -75,7 +75,9 @@ export const reOpenTagFootnotetextNumbered: RegExp = /\\footnotetext\s{0,}\[(?<n
 export const reFootNoteMark: RegExp = /^\\footnotemark/;
 export const reFootNoteText: RegExp = /^\\footnotetext|\\blfootnotetext/;
 export const reDiagboxG: RegExp = /\\(diagbox|backslashbox|slashbox)(\[[^\]]*\])?/g;
-export const reDiagbox: RegExp = /\\(diagbox|backslashbox|slashbox)(?:\[(.*?)\])?/;
+/** Anchored: the inline rule asks whether one starts at its position. Unanchored it took a later one and
+ *  ate the text between. */
+export const reDiagbox: RegExp = /^\\(diagbox|backslashbox|slashbox)(?:\[(.*?)\])?/;
 export const reNumber = /^-?\d+$/;
 export const svgRegex: RegExp = /^<svg\b[^>]*>[\s\S]*<\/svg>$/;
 export const svgInlineRegex: RegExp = /^<svg\b[^>]*>[\s\S]*<\/svg>/;

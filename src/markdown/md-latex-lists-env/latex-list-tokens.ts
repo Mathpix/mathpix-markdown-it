@@ -147,15 +147,16 @@ const pairListTokens = (tokens: Token[]): { openerOf: Map<Token, Token>; closeAt
 // close past the sublist, so it sits in the `<li>` — done on tokens, the exports walking those.
 // `level` needs no fixing up: only the close moves, and it closes the same item either side.
 export const absorbSublistIntoWrapper = (tokens: Token[], from: number): void => {
-  // Nothing moves without a marker-less wrapper, and everything below allocates.
+  const start: number = Math.max(from, 1);
+  // Nothing moves without a marker-less wrapper, and everything below allocates. Over the region that is
+  // rebuilt, not the whole array — the scan ignored `from`, which read as if the parameter did nothing.
   let hasWrapper = false;
-  for (let i = 0; i < tokens.length && !hasWrapper; i++) {
+  for (let i = start; i < tokens.length && !hasWrapper; i++) {
     hasWrapper = tokens[i].type === 'latex_list_item_open' && !!tokens[i].meta?.markerEmpty;
   }
   if (!hasWrapper) {
     return;
   }
-  const start: number = Math.max(from, 1);
   const { openerOf, closeAt } = pairListTokens(tokens);
   // Rebuilt rather than spliced: a splice per wrapper is another O(n) each.
   const out: Token[] = [];
@@ -582,9 +583,8 @@ export const processListChildToken = (
         state.types.pop();
       }
       ctx.iOpen--;
-      // Pop only a list of the matching kind. Weaker than the block path, which compares the
-      // token itself: an unpaired close of the *same* kind still pops an outer list here, since
-      // a close token carries no link to its opener in the inline stream.
+      // Pop only a list of the matching kind: a close token has no link to its opener here. Refusing to
+      // reach past this stream is not the fix — 12333 of 13815 pops close a list opened outside it.
       const openType: string = token.type === 'itemize_list_close' ? 'itemize_list_open' : 'enumerate_list_open';
       if (ctx.openTokens[ctx.openTokens.length - 1]?.type === openType) {
         ctx.openTokens.pop();

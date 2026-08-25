@@ -23,7 +23,6 @@ const {
   resetEnvSnapshotPool,
   restoreEnvAll,
   restoreEnvKeysFromAll,
-  envSnapshotDepth,
 } = require('../lib/markdown/common/env-transient');
 
 const { JSDOM } = require('jsdom');
@@ -32,38 +31,73 @@ global.window = jsdom.window;
 global.document = jsdom.window.document;
 global.DOMParser = jsdom.window.DOMParser;
 
-// The snapshot depth is module state: a test that dies before its release leaves it raised, and from
-// then on `resetEnvSnapshotPool` declines and the restores decline with it — so one failure showed up
-// as four in tests that do nothing wrong. Both hooks are root-level, so the drain covers every test of
-// the run and the report comes after the last of them; throwing from the hook would abort the rest.
-const snapshotLeaks = [];
-afterEach(function () {
-  const leaked = envSnapshotDepth();
-  if (leaked === 0) {
-    return;
-  }
-  for (let i = 0; i < leaked; i++) {
-    releaseEnvSnapshot();
-  }
-  resetEnvSnapshotPool();
-  snapshotLeaks.push(this.currentTest.fullTitle() + ' left ' + leaked);
-});
-after(function () {
-  snapshotLeaks.should.deep.equal([], 'a test left a snapshot un-released');
+// The snapshot drain and the degradation counters live in `tests/hooks/root-hooks.js` now: registered
+// from here they covered `npm test` alone, and a run of one file is the development loop.
+
+// The list rule moves a line's marks to hand its leftover back, as `blockquote` does for its own range.
+// Left moved they would hold for the rest of the phase, and `getLines` reads `bMarks` as the line start.
+describe('the block phase leaves the line marks as it found them', () => {
+  const shapes = {
+    'a leftover after the closer': '\\begin{itemize}\n\\item a\n\\end{itemize} TAIL',
+    'a leftover after an eaten prefix':
+      '\\begin{itemize}\n\\item a\n\\renewcommand{\\labelitemi}{Z} \\end{itemize} TAIL',
+    'a leftover inside a markdown item':
+      '- \\begin{itemize}\n  \\item a\n  \\end{itemize} tail text\n- second',
+  };
+  Object.entries(shapes).forEach(([name, src]) => {
+    it(name, () => {
+      const md = markdownIt({ html: true }).use(mathpixMarkdownPlugin, { outMath: { include_svg: false } });
+      const parser = md.block;
+      const realTokenize = parser.tokenize.bind(parser);
+      let before = null;
+      let state = null;
+      parser.tokenize = function (blockState, from, to) {
+        if (!before) {
+          before = { b: Array.from(blockState.bMarks), t: Array.from(blockState.tShift) };
+          state = blockState;
+        }
+        return realTokenize(blockState, from, to);
+      };
+      const warn = console.warn;
+      console.warn = () => {};
+      try {
+        md.render(src);
+      } finally {
+        console.warn = warn;
+        parser.tokenize = realTokenize;
+      }
+      before.b.filter((v, i) => v !== state.bMarks[i]).should.have.lengthOf(0, 'bMarks left moved');
+      before.t.filter((v, i) => v !== state.tShift[i]).should.have.lengthOf(0, 'tShift left moved');
+    });
+  });
 });
 
-// A failed rule renders literal LaTeX, which every net reads as valid output. Root-level, so it covers
-// fixtures, grids and fuzz; a test degrading on purpose resets the counter itself.
-const degraded = [];
-afterEach(function () {
-  if (listEnvEngine.listRuleFailureCount() === 0) {
-    return;
-  }
-  degraded.push(this.currentTest.fullTitle());
-  listEnvEngine.resetListRuleFailures();
-});
-after(function () {
-  degraded.should.deep.equal([], 'the list rule failed and fell back to literal LaTeX');
+// Private to markdown-it, and read in a dozen places. An upgrade renaming them leaves every guard
+// falling back in silence — the footnote terminator cache would simply stop caching.
+describe('the private markdown-it internals we read still behave as assumed', () => {
+  const md = markdownIt({ html: true }).use(mathpixMarkdownPlugin, { outMath: { include_svg: false } });
+  it('__find__ answers an index for a known rule and -1 for an unknown one', () => {
+    [md.block.ruler, md.inline.ruler, md.core.ruler].forEach((ruler) => {
+      (typeof ruler.__find__).should.equal('function');
+      ruler.__find__('нет-такого-правила').should.equal(-1);
+    });
+    md.block.ruler.__find__('paragraph').should.be.at.least(0);
+    md.core.ruler.__find__('normalize').should.be.at.least(0);
+  });
+  it('__rules__ is an array of entries carrying name, enabled and fn', () => {
+    const rules = md.block.ruler.__rules__;
+    Array.isArray(rules).should.equal(true);
+    Object.keys(rules[0]).should.include.members(['name', 'enabled', 'fn']);
+  });
+  // What the footnote cache keys on: the token is the cache object, and a toggle drops it.
+  it('__cache__ is filled by getRules and nulled by a toggle', () => {
+    const ruler = md.block.ruler;
+    ruler.getRules('');
+    (ruler.__cache__ === null).should.equal(false, 'getRules left no cache to key on');
+    md.disable('paragraph');
+    (ruler.__cache__ === null).should.equal(true, 'a toggle no longer invalidates the cache');
+    md.enable('paragraph');
+  });
 });
 
 // Each sub-plugin (TOC, theorem, labels, footnotes, lists, text counters)

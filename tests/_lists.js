@@ -418,8 +418,8 @@ describe('An unclosed wrapper env leaves the list rendering:', () => {
     const relative = growthOf(build, 8000, 32000) / growthOf(repeated(CONTROL_UNIT), 200, 800);
     relative.should.be.below(3, 'grows faster than the input: ×' + relative.toFixed(2));
   });
-  // An option with no `]` on its line is text. Pairing it to say so walked the rest of the document and
-  // rebuilt the code index per `[` — ×4.9–7.3 measured here, ×1.8–2.2 with the line check answering first.
+  // An option with no `]` on its line is text, and pairing it to say so walked the rest of the document:
+  // ×4.9–7.3 measured, ×1.8–2.2 with the line check that answers before any pairing.
   itScales('a run of unclosed options parses linearly', () => {
     const build = (n) => '\\begin{itemize}\n\\item a\n\\begin{center}\n'
       + Array.from({ length: n }, (_, i) => '\\caption[c' + i).join('\n')
@@ -427,6 +427,26 @@ describe('An unclosed wrapper env leaves the list rendering:', () => {
     // Options per document, so the control grows by units instead.
     const relative = growthOf(build, 400, 3200) / growthOf(repeated(CONTROL_UNIT), 200, 1600);
     relative.should.be.below(3, 'grows faster than the input: ×' + relative.toFixed(2));
+  });
+  // Only the closed form pairs, and its code index was rebuilt per option: ×3.9–5.1 measured, ×1.2–1.4
+  // built once. The bound above reaches no index at all (measured, 0 calls), so it cannot see this.
+  itScales('a run of closed options parses linearly', () => {
+    const build = (n) => '\\begin{itemize}\n\\item a\n\\begin{center}\n'
+      + Array.from({ length: n },
+        (_, i) => '\\caption[s' + i + ']{Table ' + i + '} prose `code' + i + '` here').join('\n')
+      + '\ntail\n\\end{center}\n\\item b\n\\end{itemize}';
+    // Backticks on every line: an option with none never asks for the index this bound is about.
+    const relative = growthOf(build, 250, 1000) / growthOf(repeated(CONTROL_UNIT), 250, 1000);
+    relative.should.be.below(2.5, 'grows faster than the input: ×' + relative.toFixed(2));
+  });
+  // The leftover is parsed by a walk the outermost one owns; a walk per leftover nested a frame each and
+  // overflowed the stack at 3000, losing the whole document rather than one line.
+  itScales('a document of leftovers keeps every one of them', () => {
+    const n = 4000;
+    const src = Array.from({ length: n },
+      (_, i) => '\\begin{itemize}\n\\item a' + i + '\n\\end{itemize} TAIL' + i).join('\n\n');
+    const html = MM.markdownToHTML(src, { outMath: { include_svg: false } });
+    (html.match(/TAIL/g) || []).should.have.lengthOf(n, 'leftovers lost');
   });
   // Pairing runs over the whole source, so an unmatched `{` must stay local: judged document-wide it
   // blinded every list after it — the caption's closer read as structure and half the items were lost.
@@ -848,6 +868,54 @@ describe('an env written inside one line:', () => {
                 /tail/.test(html).should.equal(true, 'the text after the env is gone' + where);
               }
             });
+          });
+        });
+      });
+    });
+  });
+});
+
+// Four branches leave the line a suffix of itself. The leftover was handed back by an offset counted from
+// the line start, so the block phase re-read the eaten command: 52 of these 104 cells broke.
+describe('a closer whose line lost a prefix:', () => {
+  const PREFIXES = {
+    'setcounter before a block env': '\\setcounter{enumi}{5}\\begin{center}c\\end{center} ',
+    center: '\\begin{center}c\\end{center} ',
+    left: '\\begin{left}c\\end{left} ',
+    right: '\\begin{right}c\\end{right} ',
+    table: '\\begin{table}c\\end{table} ',
+    figure: '\\begin{figure}c\\end{figure} ',
+    tabular: '\\begin{tabular}{l}CELL\\end{tabular} ',
+    lstlisting: '\\begin{lstlisting}q\\end{lstlisting} ',
+    renewcommand: '\\renewcommand{\\labelitemi}{Z} ',
+    'starred renewcommand': '\\renewcommand*{\\labelitemi}{Z} ',
+    'renewcommand with an option': '\\renewcommand{\\x}[1]{y} ',
+    setcounter: '\\setcounter{enumi}{5} ',
+    'setcounter and renewcommand': '\\setcounter{enumi}{5}\\renewcommand{\\labelitemi}{Z} ',
+  };
+  const build = (env, depth, prefix, leftover) => {
+    let src = '';
+    for (let d = 0; d < depth; d++) { src += '\\begin{' + env + '}\n\\item i' + d + '\n'; }
+    src += prefix + '\\end{' + env + '}';
+    for (let d = 1; d < depth; d++) { src += '\\end{' + env + '}'; }
+    return src + leftover + '\n';
+  };
+  ['itemize', 'enumerate'].forEach((env) => {
+    [1, 2].forEach((depth) => {
+      Object.entries(PREFIXES).forEach(([name, prefix]) => {
+        it(`${env}, ${depth} deep, ${name} before the closer`, () => {
+          ['', ' TAIL'].forEach((leftover) => {
+            const src = build(env, depth, prefix, leftover);
+            const html = MM.markdownToHTML(src, { outMath: { include_svg: false } });
+            const where = ' in ' + JSON.stringify(src);
+            (html.match(/<[uo]l[\s>]/g) || []).should.have.lengthOf(depth, 'levels lost' + where);
+            // A truncated command name lands here as literal LaTeX, which is the defect's own signature.
+            const outsideCode = html.replace(/<pre[\s\S]*?<\/pre>/g, '');
+            /\\begin\{(itemize|enumerate)\}|\\item(?![a-zA-Z])|\\end\{(itemize|enumerate)\}/
+              .test(outsideCode).should.equal(false, 'literal LaTeX' + where);
+            if (leftover !== '') {
+              /TAIL/.test(html).should.equal(true, 'the leftover after the closer is gone' + where);
+            }
           });
         });
       });

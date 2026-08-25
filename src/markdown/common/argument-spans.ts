@@ -1,5 +1,10 @@
 import { isInsideRanges } from "./verbatim-ranges";
-import { isAsciiLetter, skipOptionalArg } from "../common";
+import {
+  isAsciiLetter,
+  skipOptionalArg,
+  buildInlineCodePositionSet,
+  getInlineCodeListFromString,
+} from "../common";
 import { LATEX_BRACE_ARG_COMMANDS } from "./consts";
 
 // Where a command's argument begins and ends, for readers that must tell a written `\end{itemize}` from
@@ -7,7 +12,8 @@ import { LATEX_BRACE_ARG_COMMANDS } from "./consts";
 // a group that follows a command name is an argument. Verbatim ranges — inline code, fences, math,
 // `lstlisting` — are handed in by the caller and take precedence: a brace there is neither.
 
-// Built from the supported names, so the sweep cannot drift from what the package parses.
+/** Built from the supported names, so the sweep cannot drift from what the package parses. For
+ *  `commandArgumentSpans` only, which resets `lastIndex` on entry: a second caller needs its own. */
 const COMMAND_SWEEP_G: RegExp =
   new RegExp('\\\\(?:' + LATEX_BRACE_ARG_COMMANDS.join('|') + ')(?![a-zA-Z])', 'g');
 
@@ -52,7 +58,12 @@ export const braceMatches = (
 
 /** Past a command name: a star, `[...]` options, a bare name as in `\renewcommand\qedsymbol{Q}`, and the
  *  spaces between when `skipSpace`. Options do not span lines, so a `]` on another line is text. */
-const afterCommandOptions = (text: string, from: number, skipSpace: boolean = true): number => {
+const afterCommandOptions = (
+  text: string,
+  from: number,
+  skipSpace: boolean = true,
+  codePositions?: () => Set<number>
+): number => {
   let at: number = from;
   for (;;) {
     while (skipSpace && at < text.length && (text[at] === ' ' || text[at] === '\t')) {
@@ -71,7 +82,8 @@ const afterCommandOptions = (text: string, from: number, skipSpace: boolean = tr
     }
     if (text[at] === '[') {
       // An option that does not close on this line is text, and the group after it is not an argument.
-      const past: number = skipOptionalArg(text, at, true);
+      // The index comes in built: rebuilt per option it cost 367ms at 1000 of them.
+      const past: number = skipOptionalArg(text, at, true, codePositions && codePositions());
       if (past < 0) {
         return at;
       }
@@ -92,6 +104,14 @@ export const commandArgumentSpans = (
 ): Array<[number, number]> => {
   const closeOf: Map<number, number> = braceMatches(text, verbatim);
   const spans: Array<[number, number]> = [];
+  // Once per source, and only if an option turns up: a document with none must not pay for it.
+  let codeSpans: Set<number> | null = null;
+  const codePositions = (): Set<number> => {
+    if (!codeSpans) {
+      codeSpans = buildInlineCodePositionSet(getInlineCodeListFromString(text));
+    }
+    return codeSpans;
+  };
   COMMAND_SWEEP_G.lastIndex = 0;
   let command: RegExpExecArray | null;
   while ((command = COMMAND_SWEEP_G.exec(text)) !== null) {
@@ -99,7 +119,7 @@ export const commandArgumentSpans = (
     if (isInsideRanges(verbatim, command.index)) {
       continue;
     }
-    let at: number = afterCommandOptions(text, command.index + command[0].length);
+    let at: number = afterCommandOptions(text, command.index + command[0].length, true, codePositions);
     // `\renewcommand{\x}{y}`: a further group counts only with no space before it. Skipping space took
     // `\textbf{x} {prose}` as two arguments, hiding a closer written in that prose.
     while (text[at] === '{') {
@@ -108,7 +128,7 @@ export const commandArgumentSpans = (
         break;                      // an argument left open marks nothing
       }
       spans.push([at, close]);
-      at = afterCommandOptions(text, close + 1, false);
+      at = afterCommandOptions(text, close + 1, false, codePositions);
     }
   }
   // Keep the outermost; ascending, so a search over them stays a binary one.
