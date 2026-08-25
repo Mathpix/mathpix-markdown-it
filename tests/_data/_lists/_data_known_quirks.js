@@ -132,6 +132,13 @@ module.exports = [
     html: "<div>text \\begin{itemize}<br>\n\\item i0<br>\n<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">\u2022</span>i1</li></ul></div>\n<div class=\"center\" style=\"text-align: center\">x</div>\n<div>\\end{itemize}</div>\n"
   },
   {
+    // LaTeX gives the 6 to `b`; here the walk holds the value in a closure and the flush applies it to the
+    // first item of the batch, which is `a`. Byte-identical to `master`.
+    name: "\\setcounter between items numbers the item before it",
+    latex: "\\begin{enumerate}\n\\item a\n\\setcounter{enumi}{5}\n\\item b\n\\end{enumerate}",
+    html: "<ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li value=\"6\" class=\"li_enumerate\">a</li><li class=\"li_enumerate\">b</li></ol>"
+  },
+  {
     // The shape whose output changed: `Lists` declines a closer line holding a wrapper, `paragraphDiv`
     // takes the document, and `\begin{center}` has no inline rule — `master` dropped it instead.
     name: "a wrapper after the outermost closer is kept as literal LaTeX",

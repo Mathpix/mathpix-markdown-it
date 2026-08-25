@@ -58,8 +58,9 @@ export declare const findEndMarker: (str: string, startPos?: number, beginMarker
 export declare const skipOptionalArg: (text: string, at: number, sameLine: boolean, codePositions?: Set<number>) => number;
 /** Offset past `\renewcommand{\name}{body}` — also the starred form, `[n]` and `[n][default]`, and a
  *  bare `\name` as the first argument — or -1 when the arguments do not close in `text`. Braces are
- *  paired, so a closer or an `\item` in the body is part of the command, not structure. */
-export declare const renewCommandSpanEnd: (text: string) => number;
+ *  paired, so a closer or an `\item` in the body is part of the command, not structure.
+ *  Answers at `from`, absolute: a slice per command made reading a line of them quadratic. */
+export declare const renewCommandSpanEnd: (text: string, from?: number, codeIndex?: Set<number>) => number;
 export declare const getTerminatedRules: (rule: string) => any[];
 export declare const removeCaptionsFromTableAndFigure: (content: string) => {
     content: string;

@@ -107,6 +107,27 @@ describe('A no-output command between items leaves no orphan <br>:', () => {
         'latex_list_item_open', 'latex_list_item_close',
         'latex_list_item_open', 'latex_list_item_close', 'enumerate_list_close']);
   });
+  // Read by the LaTeX converter: the block rule writes the command, the inline one everything past the
+  // name. Changing either shape broke its .tex.
+  it('a renewcommand token keeps the latex shape each rule writes', () => {
+    const latexOf = (src) => {
+      const md = markdownIt({ html: true })
+        .use(mathpixMarkdownPlugin, { outMath: { include_svg: false }, forLatex: true });
+      const found = [];
+      const walk = (tokens) => tokens.forEach((t) => {
+        if (t.type === 'renewcommand') { found.push(t.latex); }
+        if (t.children) { walk(t.children); }
+      });
+      walk(md.parse(src, {}));
+      return found;
+    };
+    // Alone on its line the block rule takes it; sharing the line or a paragraph, the inline rule does.
+    latexOf('\\renewcommand{\\x}{y}').should.deep.equal(['\\renewcommand{\\x}{y}']);
+    latexOf('\\renewcommand{\\x}{y} FFF').should.deep.equal(['{\\x}{y} FFF']);
+    latexOf('text \\renewcommand{\\x}{y} FFF').should.deep.equal(['{\\x}{y} FFF']);
+    latexOf('\\renewcommand{\\a}{1}\\renewcommand{\\b}{2} FFF')
+      .should.deep.equal(['{\\a}{1}\\renewcommand{\\b}{2} FFF', '{\\b}{2} FFF']);
+  });
   it('a plain continuation line keeps its break', () => {
     itemBodies('\\begin{itemize}\n\\item a\ntail text\n\\item b\n\\end{itemize}')
       .should.deep.equal(['a<br>\ntail text', 'b']);
@@ -408,6 +429,23 @@ describe('An unclosed wrapper env leaves the list rendering:', () => {
     const relative = growthOf(build, 200, 3200) / growthOf(repeated(CONTROL_UNIT), 100, 1600);
     relative.should.be.below(3, 'grows faster than the input: ×' + relative.toFixed(2));
   });
+  // The block rule reads past every `\renewcommand` of its line to see whether anything else shares it.
+  // A slice per command rebuilt the code-span index over the rest — 1215ms on 8000 against 3, `n^1.85`.
+  itScales('a line of \\renewcommand beside a code span parses linearly', () => {
+    const build = (n) => '\\renewcommand{\\x}{y}'.repeat(n) + ' `c`';
+    // Both sides grow ×4 in bytes: 0.77 measured here, 4.08 with the index rebuilt per command.
+    const relative = growthOf(build, 1000, 4000) / growthOf(repeated(CONTROL_UNIT), 100, 400);
+    relative.should.be.below(2, 'grows faster than the input: ×' + relative.toFixed(2));
+  });
+  // The inline scanner steps past a `\renewcommand` and the item scan asks where each one ends. Both
+  // read by offset with one index per source now: 1079 and 1515 ms on `master`, 5 and 18 here.
+  itScales('\\renewcommand inside a list scanned inline parses linearly', () => {
+    const build = (n) => 'text \\begin{itemize}'
+      + '\\renewcommand{\\x}{y}\\item i '.repeat(n) + '`c`\\end{itemize} tail';
+    // 0.51–0.63 measured over four runs, against 1.92–2.00 with the slices and 2.58 on `master`.
+    const relative = growthOf(build, 400, 1600) / growthOf(repeated(CONTROL_UNIT), 100, 400);
+    relative.should.be.below(1.2, 'grows faster than the input: ×' + relative.toFixed(2));
+  });
   // Argument pairing is one pass with a stack. Asking findEndMarker per brace made a long run of
   // unmatched `{` rescan the tail each time — `n^1.9` measured, 12× master at 8000 braces.
   itScales('a long run of unmatched braces parses linearly', () => {
@@ -438,6 +476,24 @@ describe('An unclosed wrapper env leaves the list rendering:', () => {
     // Backticks on every line: an option with none never asks for the index this bound is about.
     const relative = growthOf(build, 250, 1000) / growthOf(repeated(CONTROL_UNIT), 250, 1000);
     relative.should.be.below(2.5, 'grows faster than the input: ×' + relative.toFixed(2));
+  });
+  // Every item boundary after a `\renewcommand` asks how far its arguments reach, and the reader built a
+  // code-span index over the tail each time: 758ms at 1600 items against 10.7ms, with the answer cached.
+  itScales('items after a \\renewcommand parse linearly', () => {
+    const build = (n) => 'text \\begin{itemize}\\renewcommand{\\x}{y}'
+      + Array.from({ length: n }, (_, i) => '\\item a' + i + ' `c' + i + '` ').join('')
+      + '\\end{itemize}';
+    // Backticks on every item: with none the index is never built and the shape says nothing.
+    const relative = growthOf(build, 400, 3200) / growthOf(repeated(CONTROL_UNIT), 250, 2000);
+    relative.should.be.below(3, 'grows faster than the input: ×' + relative.toFixed(2));
+  });
+  // An opaque env with no closer ahead: the inline scanner asked for one from every position, and each
+  // ask read to the end of the source. ×4.3–7.2 measured, ×0.3–0.4 once the first answer is taken as final.
+  itScales('an unclosed opaque env in an inline list scans linearly', () => {
+    const build = (n) => 'text \\begin{itemize}\\item a \\begin{tabular}{l}'
+      + Array.from({ length: n }, (_, i) => 'cell' + i).join(' ') + '\\end{itemize} tail';
+    const relative = growthOf(build, 2000, 16000) / growthOf(repeated(CONTROL_UNIT), 250, 2000);
+    relative.should.be.below(2, 'grows faster than the input: ×' + relative.toFixed(2));
   });
   // The leftover is parsed by a walk the outermost one owns; a walk per leftover nested a frame each and
   // overflowed the stack at 3000, losing the whole document rather than one line.

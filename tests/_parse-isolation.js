@@ -72,6 +72,38 @@ describe('the block phase leaves the line marks as it found them', () => {
   });
 });
 
+// The host flag decides whether a list gets an `<li>` of its own, and it is cached per token array. Keyed
+// by length and end types alone it served one document's flags to another that collided on both, and the
+// flags pair the tags: the second render emitted an `<li>` with no close.
+describe('the host-flag cache does not outlive its token array', () => {
+  const md = markdownIt({ html: true }).use(mathpixMarkdownPlugin, { outMath: { include_svg: false } });
+  // Same length and end types, and the flags differ at an index the second shape asks about: warming with
+  // the first leaves a 0 where the second needs a host item, so its closing `</li>` never comes.
+  const hosted = '\\begin{itemize}\n\\begin{itemize}\n\\item[] a0\n\\end{itemize}\n\\item[] z\n\\end{itemize}';
+  const plain = '\\begin{itemize}\n\\begin{itemize}\n\\item[] a0\n\\item[] a1\n\\end{itemize}\n\\end{itemize}';
+  const quiet = (fn) => {
+    const warn = console.warn;
+    console.warn = () => {};
+    try { return fn(); } finally { console.warn = warn; }
+  };
+  it('a second walk over a rewritten array reads its own flags', () => {
+    const envA = {};
+    const envFresh = {};
+    const envSwap = {};
+    const tokensA = quiet(() => md.parse(hosted, envA));
+    const tokensFresh = quiet(() => md.parse(plain, envFresh));
+    const tokensSwap = quiet(() => md.parse(plain, envSwap));
+    tokensA.should.have.lengthOf(tokensSwap.length, 'the two shapes stopped colliding on length');
+    const fresh = quiet(() => md.renderer.render(tokensFresh, md.options, envFresh));
+    quiet(() => md.renderer.render(tokensA, md.options, envA));
+    for (let i = 0; i < tokensA.length; i++) { tokensA[i] = tokensSwap[i]; }
+    const swapped = quiet(() => md.renderer.render(tokensA, md.options, envA));
+    (swapped.match(/<li[\s>]/g) || []).should.have.lengthOf((swapped.match(/<\/li>/g) || []).length,
+      'the flags left an <li> unclosed');
+    swapped.should.equal(fresh, 'the array kept the flags of what it held before');
+  });
+});
+
 // Private to markdown-it, and read in a dozen places. An upgrade renaming them leaves every guard
 // falling back in silence — the footnote terminator cache would simply stop caching.
 describe('the private markdown-it internals we read still behave as assumed', () => {

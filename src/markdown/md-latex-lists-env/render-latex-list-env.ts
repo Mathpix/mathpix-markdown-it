@@ -55,15 +55,20 @@ const encodedMarker = (content: string): string => {
 // and re-rendering it within the same render keeps the old answer, as `attrJoin` keeps old classes.
 // The signature is O(1) by necessity: a checksum over the tokens would cost per query what this saves —
 // 3200 queries over 9600 tokens at 800 lists.
-const hostFlagsFor: WeakMap<Token[], { epoch: number; sig: string; flags: Int8Array }> = new WeakMap();
+const hostFlagsFor: WeakMap<Token[],
+  { epoch: number; sig: string; flags: Int8Array; lastIdx: number }> = new WeakMap();
 const signatureOf = (tokens: Token[]): string =>
   tokens.length + ':' + (tokens[0]?.type ?? '') + ':' + (tokens[tokens.length - 1]?.type ?? '');
 const hostFlag = (tokens: Token[], idx: number): number => {
   const sig: string = signatureOf(tokens);
   let cached = hostFlagsFor.get(tokens);
-  if (!cached || cached.epoch !== renderEpoch || cached.sig !== sig) {
-    cached = { epoch: renderEpoch, sig, flags: listHostFlags(tokens) };
+  // `idx <= lastIdx` means a new walk: the renderer only moves forward, measured over 2760 queries. On
+  // length and end types alone flags from the wrong content emitted an `<li>` with no close.
+  if (!cached || cached.epoch !== renderEpoch || cached.sig !== sig || idx <= cached.lastIdx) {
+    cached = { epoch: renderEpoch, sig, flags: listHostFlags(tokens), lastIdx: idx };
     hostFlagsFor.set(tokens, cached);
+  } else {
+    cached.lastIdx = idx;
   }
   return cached.flags[idx];
 };

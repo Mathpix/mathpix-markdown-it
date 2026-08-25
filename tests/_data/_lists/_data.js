@@ -2755,6 +2755,30 @@ module.exports = [
     html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul><ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li class=\"li_enumerate\">b<br>\n\\caption[o<br>\nq]{</li></ol><div>}</div>\n"
   },
   {
+    // Both keep the leftover, by different paths: `ListOpen` finishes the one-line env and its tail stays
+    // inline, the multi-line one hands the tail to the block phase.
+    name: "a leftover after a one-line env stays inline",
+    latex: "\\begin{itemize}\\item a\\end{itemize} TAIL",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul> TAIL"
+  },
+  {
+    name: "a leftover after a multi-line env becomes its own block",
+    latex: "\\begin{itemize}\n\\item a\n\\end{itemize} TAIL",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul><div>TAIL</div>\n"
+  },
+  {
+    // The two shapes the host flag decides between, and they collide on length and end types: a list
+    // opening straight inside a list needs an `<li>` of its own, one opening after an item does not.
+    name: "a list opening straight inside a list takes a host item",
+    latex: "\\begin{itemize}\n\\begin{itemize}\n\\item[] a0\n\\end{itemize}\n\\item[] z\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\"><ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\"><span class=\"li_level\" data-custom-marker=\"true\" data-marker-empty=\"true\"></span>a0</li></ul></li><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\"><span class=\"li_level\" data-custom-marker=\"true\" data-marker-empty=\"true\"></span>z</li></ul>"
+  },
+  {
+    name: "the same tokens in the other order take none",
+    latex: "\\begin{itemize}\n\\item[] z\n\\begin{itemize}\n\\item[] a0\n\\end{itemize}\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\"><span class=\"li_level\" data-custom-marker=\"true\" data-marker-empty=\"true\"></span>z<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\"><span class=\"li_level\" data-custom-marker=\"true\" data-marker-empty=\"true\"></span>a0</li></ul></li></ul>"
+  },
+  {
     // One per branch that eats a prefix of the line: the leftover was handed back by an offset counted
     // from the line start, so the block phase re-read the middle of the eaten command.
     name: "a leftover after a \\renewcommand sharing the closer's line",
@@ -2775,6 +2799,66 @@ module.exports = [
     name: "a leftover after a \\setcounter sharing the closer's line",
     latex: "\\begin{enumerate}\n\\item a\n\\setcounter{enumi}{5} \\end{enumerate} TAIL",
     html: "<ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li value=\"6\" class=\"li_enumerate\">a</li></ol><div>TAIL</div>\n"
+  },
+  {
+    name: "a tail after \\renewcommand reaches a chunk with a block env",
+    latex: "\\begin{itemize}\n\\renewcommand{\\x}{y} FFF\n\\begin{center}c\\end{center}\n\\item Z\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\" data-custom-marker=\"true\" data-marker-empty=\"true\"><div> FFF</div>\n<div class=\"center\" style=\"text-align: center\">c</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>Z</li></ul>"
+  },
+  {
+    name: "a tail after \\renewcommand in a chunk following a closed sublist",
+    latex: "\\begin{itemize}\n\\item A\n\\begin{itemize}\n\\item B\n\\end{itemize}\n\\renewcommand{\\x}{y} FFF\n\\begin{table}t\\end{table}\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>A<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">–</span>B</li></ul><div> FFF</div>\n<div class=\"table\">\n<div>t</div>\n</div>\n</li></ul>"
+  },
+  {
+    name: "a tail after \\renewcommand with no block env is untouched",
+    latex: "\\begin{itemize}\n\\renewcommand{\\x}{y} FFF\n\\item Z\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\"> FFF</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>Z</li></ul>"
+  },
+  {
+    name: "a \\renewcommand with no body keeps the line below",
+    latex: "\\begin{itemize}\n\\renewcommand{\\x}\nplain\n\\item Z\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\"><br>\nplain</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>Z</li></ul>"
+  },
+  {
+    name: "a heading marker in a \\renewcommand tail stays text",
+    latex: "\\begin{itemize}\n\\renewcommand{\\x}{y} # HEAD\n\\begin{center}c\\end{center}\n\\item Z\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\" data-custom-marker=\"true\" data-marker-empty=\"true\"><div> # HEAD</div>\n<div class=\"center\" style=\"text-align: center\">c</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>Z</li></ul>"
+  },
+  {
+    name: "a quote marker in a \\renewcommand tail stays text",
+    latex: "\\begin{itemize}\n\\renewcommand{\\x}{y} > Q\n\\begin{center}c\\end{center}\n\\item Z\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\" data-custom-marker=\"true\" data-marker-empty=\"true\"><div> &gt; Q</div>\n<div class=\"center\" style=\"text-align: center\">c</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>Z</li></ul>"
+  },
+  {
+    name: "a fence opening in a \\renewcommand tail stays text",
+    latex: "\\begin{itemize}\n\\renewcommand{\\x}{y} ```js\n\\begin{center}c\\end{center}\n\\item Z\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\" data-custom-marker=\"true\" data-marker-empty=\"true\"><div> ```js</div>\n<div class=\"center\" style=\"text-align: center\">c</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>Z</li></ul>"
+  },
+  {
+    name: "an indented \\renewcommand tail is no code block",
+    latex: "\\begin{itemize}\n\\renewcommand{\\x}{y}     FFF\n\\begin{center}c\\end{center}\n\\item Z\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\" data-custom-marker=\"true\" data-marker-empty=\"true\"><div>     FFF</div>\n<div class=\"center\" style=\"text-align: center\">c</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>Z</li></ul>"
+  },
+  {
+    name: "a \\renewcommand tail underlined by === is a heading, as any line would be",
+    latex: "\\begin{itemize}\n\\renewcommand{\\x}{y} FFF\n===\n\\begin{center}c\\end{center}\n\\item Z\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\" data-custom-marker=\"true\" data-marker-empty=\"true\"><h1 id=\"fff\"> FFF</h1>\n<div class=\"center\" style=\"text-align: center\">c</div>\n</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>Z</li></ul>"
+  },
+  {
+    name: "a \\renewcommand inside a fence keeps its line whole",
+    latex: "\\begin{itemize}\n\\item a\n```\n\\renewcommand{\\x}{y} FFF\n```\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<pre><code class=\"hljs\">\\renewcommand{\\x}{y} FFF\n</code></pre>\n</li></ul>"
+  },
+  {
+    name: "a \\renewcommand inside lstlisting keeps its line whole",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{lstlisting}\n\\renewcommand{\\x}{y} TAILMARK\n\\end{lstlisting}\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<pre class=\"lstlisting\"><code class=\"hljs lstlisting-code\" style=\"text-align: left;\">\\renewcommand{\\x}{y} TAILMARK</code></pre>\n</li></ul>"
+  },
+  {
+    name: "a \\renewcommand inside a tabular cell keeps its line whole",
+    latex: "\\begin{itemize}\n\\item a\n\\begin{tabular}{l}\n\\renewcommand{\\x}{y} FFF\\\\\n\\end{tabular}\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"table_tabular\">\n<div class=\"inline-tabular\"><table class=\"tabular\">\n<tbody>\n<tr style=\"border-top: none !important; border-bottom: none !important;\">\n<td style=\"text-align: left; border-left: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; \"> FFF</td>\n</tr>\n</tbody>\n</table>\n</div></div>\n</li></ul>"
   },
   {
     name: "a later paragraph holding a \\] leaves the list alone",

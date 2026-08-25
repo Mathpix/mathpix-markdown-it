@@ -163,10 +163,12 @@ const handleLstEndInline = (
   // Same rule as when the env opened: a closer written in code is content, and the next one still closes.
   const me = firstUsableCloser(state, nextLine, lineText, top, true);
   if (!me) {
-    // Raw, to keep the indentation. Safe only because `lineText` is the whole line here: handleLstBeginInline
-    // declines any non-tabular top, so nothing has consumed a prefix. Widening that would duplicate the tail.
-    const rawLine = state.src.slice(state.bMarks[nextLine], state.eMarks[nextLine]);
-    items = ItemsAddToPrev(items, rawLine, nextLine);
+    // Raw to keep the indentation, but only while `lineText` is the whole line — asked rather than assumed,
+    // as the plain-line branch does. A tail reached here would otherwise repeat the prefix already taken.
+    const rawLine: string = state.src.slice(state.bMarks[nextLine], state.eMarks[nextLine]);
+    const rawLineNoIndent: string = state.src.slice(
+      state.bMarks[nextLine] + state.tShift[nextLine], state.eMarks[nextLine]);
+    items = ItemsAddToPrev(items, lineText === rawLineNoIndent ? rawLine : lineText, nextLine);
     return { handled: true, stack, items, lineText };
   }
   const endIndex: number = me.index;

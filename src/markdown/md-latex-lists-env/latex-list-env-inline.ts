@@ -2,8 +2,8 @@ import { RuleInline } from 'markdown-it';
 import type StateInline from 'markdown-it/lib/rules_inline/state_inline';
 import * as Token from 'markdown-it/lib/token';
 import { getSpacesFromLeft, skipBackticks } from "../utils";
-import { renewCommandSpanEnd } from "../common";
-import { matchPositionsCached, countPositionsAtOrAfter } from "../common/src-pos-cache";
+import { renewCommandSpanEnd, buildInlineCodePositionSet, getInlineCodeListFromString } from "../common";
+import { matchPositionsCached, countPositionsAtOrAfter, srcValueCached } from "../common/src-pos-cache";
 import {
   incrementItemCount,
   isParsingMarker,
@@ -62,6 +62,27 @@ const END_TABULAR_SEARCH_G: RegExp = new RegExp(END_TABULAR_INLINE_RE.source, 'g
 const RENEWCOMMAND_POSITIONS: symbol = Symbol('renewcommand-positions');
 const RENEWCOMMAND_SEARCH_G: RegExp = /\\renewcommand\b/g;
 
+// Per source and per command: the reader builds a code-span index over the tail on each ask, and every
+// item boundary after one `\renewcommand` asks about the same offset — 758ms at 1600 items against 9ms.
+const RENEWCOMMAND_SPANS: symbol = Symbol('renewcommand-spans');
+// One index per source too: the memo spares a repeat at the same offset, not the next offset.
+const RENEWCOMMAND_CODE_POSITIONS: symbol = Symbol('renewcommand-code-positions');
+/** Where the command at `cmdAt` ends, absolute, or -1. */
+const renewCommandSpanAt = (state: StateInline, cmdAt: number): number => {
+  const cached = state as unknown as Parameters<typeof srcValueCached>[0];
+  const spans: Map<number, number> = srcValueCached(cached, RENEWCOMMAND_SPANS,
+    () => new Map<number, number>());
+  const known: number | undefined = spans.get(cmdAt);
+  if (known !== undefined) {
+    return known;
+  }
+  const codeIndex: Set<number> = srcValueCached(cached, RENEWCOMMAND_CODE_POSITIONS,
+    (src: string) => buildInlineCodePositionSet(getInlineCodeListFromString(src)));
+  const span: number = renewCommandSpanEnd(state.src, cmdAt, codeIndex);
+  spans.set(cmdAt, span);
+  return span;
+};
+
 // Does `at` fall inside the arguments of the nearest `\renewcommand` before it?
 const insideRenewCommand = (state: StateInline, at: number): boolean => {
   const positions: readonly number[] =
@@ -71,8 +92,8 @@ const insideRenewCommand = (state: StateInline, at: number): boolean => {
     return false;
   }
   const cmdAt: number = positions[before - 1];
-  const span: number = renewCommandSpanEnd(state.src.slice(cmdAt));
-  return span > 0 && at < cmdAt + span;
+  const spanEnd: number = renewCommandSpanAt(state, cmdAt);
+  return spanEnd > 0 && at < spanEnd;
 };
 
 /**
@@ -99,6 +120,14 @@ export const findFirstCompleteListEnv = (src: string, startPos: number): EnvMatc
   }
   const rootType: ListType = rootTypeRaw;
   const listStack: ListType[] = [rootType];
+  // Once per walk, and only if a macro is met: built per macro it cost 311ms at 4000 of them against 5.
+  let codeSpans: Set<number> | null = null;
+  const codePositions = (): Set<number> => {
+    if (!codeSpans) {
+      codeSpans = buildInlineCodePositionSet(getInlineCodeListFromString(src));
+    }
+    return codeSpans;
+  };
   let pos: number = startPos + begin[0].length;
   // Opaque env stack: tabular can nest; lstlisting cannot.
   let opaqueStack: OpaqueStack = [];
@@ -111,9 +140,10 @@ export const findFirstCompleteListEnv = (src: string, startPos: number): EnvMatc
     }
     // A closer in a `\renewcommand` body belongs to the macro, as the item scan already reads it.
     if (opaqueStack.length === 0 && src.startsWith('\\renewcommand', pos)) {
-      const macroEnd: number = renewCommandSpanEnd(src.slice(pos));
-      if (macroEnd > 0) {
-        pos += macroEnd;
+      const macroEnd: number = renewCommandSpanEnd(src, pos, codePositions());
+      // Past `pos`, not just positive: the answer is absolute, and the walk must move on.
+      if (macroEnd > pos) {
+        pos = macroEnd;
         continue;
       }
     }
@@ -133,9 +163,9 @@ export const findFirstCompleteListEnv = (src: string, startPos: number): EnvMatc
       endRe.lastIndex = pos;
       const me: RegExpExecArray = endRe.exec(src);
       if (!me) {
-        // continue scanning char-by-char until we find the end
-        pos += 1;
-        continue;
+        // No closer ahead, and nothing here pops the stack: every later position answers the same.
+        // Walking on was quadratic — 2245ms at 512KB.
+        return null;
       }
       // Found opaque end, pop stack and jump after it
       pos = me.index + me[0].length;

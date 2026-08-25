@@ -457,6 +457,31 @@ describe('Footnote rule performance regression:', function () {
     (unclosed / closed).should.be.below(5);
   });
 
+  // The scan asks for the terminator set per line while a footnote sits ahead. Counted, not timed: the
+  // walk is ~300k comparisons on 3200 lines, which a clock cannot separate from noise.
+  it('the terminator set is resolved once, not once per line', () => {
+    const md = markdownIt({ html: true }).use(mathpixMarkdownPlugin, { outMath: { include_svg: false } });
+    const ruler = md.block.ruler;
+    const rules = ruler.__rules__;
+    let reads = 0;
+    Object.defineProperty(ruler, '__rules__', { get() { reads += 1; return rules; }, configurable: true });
+    // Both must sit ahead of the blocks: the rule bails when the last footnote is behind, and takes the
+    // fence-only set when no list opener follows — either way it never asks for the terminators.
+    const doc = (n) => Array.from({ length: n }, (_, i) => 'Line ' + i + ' of prose.').join('\n\n')
+      + '\n\n\\begin{itemize}\n\\item x\n\\end{itemize}\n\nTail \\footnote{a note}';
+    const warn = console.warn;
+    console.warn = () => {};
+    try {
+      md.render(doc(200));
+      reads = 0;
+      md.render(doc(3200));
+    } finally {
+      console.warn = warn;
+      Object.defineProperty(ruler, '__rules__', { value: rules, writable: true, configurable: true });
+    }
+    reads.should.be.below(20, 'the ruler was walked per line: ' + reads + ' times');
+  });
+
   // The same lookahead cut unclosed `\begin{tabular}` by 12–50x, but its growth stays super-linear:
   // measured 13x over a 4x input against 58x on `master`. The bound pins that gap, not linearity.
   it('unclosed \\begin{tabular} units grow far slower than on master', function () {

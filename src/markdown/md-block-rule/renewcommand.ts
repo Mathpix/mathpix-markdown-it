@@ -1,8 +1,30 @@
 import { RuleBlock } from 'markdown-it';
 import { ChangeLevel } from "../md-latex-lists-env/re-level";
-import { skipOptionalArg } from "../common";
+import { skipOptionalArg, renewCommandSpanEnd, buildInlineCodePositionSet,
+  getInlineCodeListFromString, isAsciiLetter } from "../common";
 const reTag: RegExp = /\\renewcommand/;
 const reTagG: RegExp = /\\renewcommand/g;
+const TAG: string = '\\renewcommand';
+// Sticky, so it carries a lastIndex — set it before every `exec`.
+const BLANKS_STICKY_RE: RegExp = /\s*/y;
+
+/** Does a `\renewcommand` start at `at`? With the `\b` the span reader requires: the two disagreeing
+ *  on `\renewcommandfoo` cost the line its text. */
+export const startsCommandAt = (text: string, at: number): boolean => {
+  if (!text.startsWith(TAG, at)) {
+    return false;
+  }
+  const next: number = text.charCodeAt(at + TAG.length);
+  return !isAsciiLetter(next) && !(next >= 0x30 && next <= 0x39) && next !== 0x5f /* _ */;
+};
+
+/** First non-blank at or after `from`, or -1 when only blanks follow. No slice: this runs per command. */
+const skipBlanksFrom = (text: string, from: number): number => {
+  BLANKS_STICKY_RE.lastIndex = from;
+  BLANKS_STICKY_RE.exec(text);
+  const at: number = BLANKS_STICKY_RE.lastIndex;
+  return at < text.length ? at : -1;
+};
 
 const parseCommand = (str: string):{command: string, params: string, endPos: number}  => {
   let command = '';
@@ -90,6 +112,27 @@ export const reNewCommand = (state, lineText: string) => {
   }
 };
 
+/** Where the text after every `\renewcommand` begins, or the line's length when they are all it holds.
+ *  One code-span index for the whole line: built per command it cost 1215ms on 8000 of them against 3. */
+const tailStartOnLine = (lineText: string, from: number): number => {
+  const codeIndex: Set<number> = buildInlineCodePositionSet(getInlineCodeListFromString(lineText));
+  let at: number = from;
+  while (startsCommandAt(lineText, at)) {
+    const span: number = renewCommandSpanEnd(lineText, at, codeIndex);
+    // Arguments not closing on the line: the rest of it is the body, as this rule always read it.
+    if (span <= 0) {
+      return lineText.length;
+    }
+    at = span;
+    const blank: number = skipBlanksFrom(lineText, at);
+    if (blank < 0) {
+      return lineText.length;
+    }
+    at = blank;
+  }
+  return at;
+};
+
 export const ReNewCommand:RuleBlock = (state, startLine: number) => {
   let pos: number = state.bMarks[startLine] + state.tShift[startLine];
   let max: number = state.eMarks[startLine];
@@ -108,6 +151,11 @@ export const ReNewCommand:RuleBlock = (state, startLine: number) => {
     }
   }
   reNewCommand(state, lineText.slice(match.index).trim());
+  // Applied, but the line is not ours when something else shares it: this rule renders to nothing, so
+  // claiming the line dropped that text. The paragraph takes it, inline reads the command there.
+  if (tailStartOnLine(lineText, match.index) < lineText.length) {
+    return false;
+  }
   if (state.md.options && state.md.options.forLatex) {
     let token = state.push("renewcommand", "", 0);
     token.latex = lineText.slice(match.index).trim();

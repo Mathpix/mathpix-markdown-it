@@ -3,7 +3,7 @@ import {
   RE_CAPTION_SETUP_TAG_BEGIN,
   RE_CAPTION_TAG_BEGIN,
   RE_EMPTY_TEXT,
-  RENEWCOMMAND_LINE_RE,
+  RENEWCOMMAND_STICKY_RE,
   terminatedRules
 } from './common/consts';
 
@@ -222,16 +222,21 @@ export const skipOptionalArg = (
 
 /** Offset past `\renewcommand{\name}{body}` — also the starred form, `[n]` and `[n][default]`, and a
  *  bare `\name` as the first argument — or -1 when the arguments do not close in `text`. Braces are
- *  paired, so a closer or an `\item` in the body is part of the command, not structure. */
-export const renewCommandSpanEnd = (text: string): number => {
-  const match: RegExpMatchArray | null = text.match(RENEWCOMMAND_LINE_RE);
+ *  paired, so a closer or an `\item` in the body is part of the command, not structure.
+ *  Answers at `from`, absolute: a slice per command made reading a line of them quadratic. */
+export const renewCommandSpanEnd = (
+  text: string, from: number = 0, codeIndex?: Set<number>
+): number => {
+  RENEWCOMMAND_STICKY_RE.lastIndex = from;
+  const match: RegExpExecArray | null = RENEWCOMMAND_STICKY_RE.exec(text);
   if (!match) {
     return -1;
   }
-  let pos: number = match.index + match[0].length;
+  let pos: number = from + match[0].length;
   // Once for up to four pairings, and only if one happens: each `findEndMarker` rebuilt the index over
   // the whole string, and a command with no argument to pair must not pay for it at all.
-  let codeSpans: Set<number> | null = null;
+  // A caller reading several commands of one string hands its index in, or each paid for the whole.
+  let codeSpans: Set<number> | null = codeIndex ?? null;
   const codePositions = (): Set<number> => {
     if (!codeSpans) {
       codeSpans = buildInlineCodePositionSet(getInlineCodeListFromString(text));

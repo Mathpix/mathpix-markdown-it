@@ -523,6 +523,30 @@ describe('processListChildToken — an unpaired close does not steal the outer l
     state.tokens[0].should.equal(text);
     said.should.have.lengthOf(0, 'a missing constructor is a caller error, not a document one');
   });
+  // The writer says its output matches `PADDING_EM_RE` by construction, and the renderer drops anything
+  // that does not — so a value the writer stops formatting that way turns into no indent at all, silently.
+  it('every width the writer emits is a value the renderer accepts', () => {
+    const values = new Set();
+    let dropped = 0;
+    for (let width = 1; width <= 60; width++) {
+      [1, 2, 3].forEach((depth) => {
+        let src = '';
+        for (let d = 0; d < depth; d++) { src += '\\begin{itemize}\n\\item[' + 'W'.repeat(width) + '] a' + d + '\n'; }
+        for (let d = 0; d < depth; d++) { src += '\\end{itemize}\n'; }
+        const html = render(src);
+        (html.match(/data-padding-inline-start="([^"]*)"/g) || []).forEach((attr) => {
+          const value = attr.match(/"([^"]*)"/)[1];
+          values.add(value);
+          value.should.match(/^\d+(\.\d+)?em$/, 'the writer emitted a shape the renderer refuses');
+          if (!html.includes('padding-inline-start: ' + value)) { dropped += 1; }
+        });
+      });
+    }
+    values.size.should.be.above(10, 'the sweep produced too few values to say anything');
+    dropped.should.equal(0, 'the renderer refused a value the writer produced');
+    Math.max(...[...values].map((v) => parseFloat(v)))
+      .should.be.at.most(LIST_MAX_INDENT_EM, 'a value came out past the clamp');
+  });
   // End to end the limitation is not observable on the shapes tried: an unpaired close ends the
   // list, and a following wide marker is attributed to the list that holds it.
   it('a wide marker after an inline close lands on the list that contains it', () => {

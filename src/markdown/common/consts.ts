@@ -179,6 +179,9 @@ export const LATEX_LIST_BOUNDARY_INLINE_RE: RegExp =
   new RegExp('\\\\begin\\s*\\{(itemize|enumerate)\\}|\\\\end\\s*\\{(itemize|enumerate)\\}|' + ITEM_COMMAND_BARE);
 /** A line that is only `\renewcommand`: its own rule consumes it, so it renders to nothing. */
 export const RENEWCOMMAND_LINE_RE: RegExp = /^\s*\\renewcommand\b/;
+/** The same, asked at an offset. Blanks only: `\s` would reach a command one line down.
+ *  Sticky, so it carries a lastIndex — set it before every `exec`. */
+export const RENEWCOMMAND_STICKY_RE: RegExp = /[ \t]*\\renewcommand\b/y;
 /** Where a chunk splits into items, for `search`: a real `\item`, so `\itemsep` is not a split point.
  *  Must answer like ITEM_COMMAND_SOURCE — pinned by a property test. */
 export const LATEX_ITEM_SPLIT_RE: RegExp = /\\item(?:\s*\[|(?![a-zA-Z]))/;
