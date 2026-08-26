@@ -81,6 +81,9 @@ export const nextMathSpan = (
   until: number = str.length,
 ): { start: number; end: number } | null => {
   RE_MATH_SPAN_G.lastIndex = from > 0 ? from : 0;
+  // Every closer starts with `\end`, whatever the env or the spacing inside its braces, so none of them
+  // past here means none for any opener past here either.
+  const lastEndAt: number = str.lastIndexOf('\\end');
   let match: RegExpExecArray | null;
   while ((match = RE_MATH_SPAN_G.exec(str)) !== null) {
     // Past what the caller asked about: scanning on would walk the whole tail for every block.
@@ -111,10 +114,14 @@ export const nextMathSpan = (
         const openTag: RegExp = beginTag(environment, true);
         const closeTag: RegExp = endTag(environment, true);
         if (closeTag && openTag) {
-          const data = findOpenCloseTagsMathEnvironment(str.slice(beginMarkerPos), openTag, closeTag);
-          const lastClose = data?.arrClose?.length ? data.arrClose[data.arrClose.length - 1] : null;
-          if (lastClose && typeof lastClose.posStart === 'number') {
-            endMarkerPos = beginMarkerPos + lastClose.posStart;
+          // Nothing to pair with past here: the reader below copies the tail and rescans it to say so,
+          // which a run of unclosed openers paid per opener — 1884ms at 8000 of them.
+          if (lastEndAt > beginMarkerPos) {
+            const data = findOpenCloseTagsMathEnvironment(str.slice(beginMarkerPos), openTag, closeTag);
+            const lastClose = data?.arrClose?.length ? data.arrClose[data.arrClose.length - 1] : null;
+            if (lastClose && typeof lastClose.posStart === 'number') {
+              endMarkerPos = beginMarkerPos + lastClose.posStart;
+            }
           }
           endMarker = `\\end{${envGroup}}`;
         }
@@ -123,7 +130,8 @@ export const nextMathSpan = (
         continue;
       }
     }
-    if (endMarkerPos === -1) {
+    // Reads the tail per opener, so ask only when one can be there. `$`-like markers are not `\end`.
+    if (endMarkerPos === -1 && (!endMarker.startsWith('\\end') || lastEndAt > startMathPos)) {
       endMarkerPos = findEndMarkerPos(str, endMarker, startMathPos);
     }
     if (endMarkerPos === -1) {

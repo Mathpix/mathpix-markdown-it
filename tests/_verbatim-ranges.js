@@ -127,6 +127,17 @@ describe('verbatim ranges: a long tail is read once, not once per block', () => 
     const large = median(unclosed(4000));
     (large / Math.max(small, 0.05)).should.be.below(8, `small ${small}ms, large ${large}ms`);
   });
+  // The other axis: openers, not tail length. Each resolved its closer from a copy of the tail and then
+  // asked `findEndMarkerPos` over it again — 28/106/425/1884ms at 1000…8000, against 1/1/2/4 once an
+  // opener with no `\end` past it skips both.
+  it('quadrupling the number of unclosed math openers does not multiply the cost by more than eight',
+    function () {
+      this.retries(2);
+      const openers = (n) => '\\begin{equation} y \n'.repeat(n);
+      const small = median(openers(1000));
+      const large = median(openers(4000));
+      (large / Math.max(small, 0.05)).should.be.below(8, `small ${small}ms, large ${large}ms`);
+    });
   it('a `$` before a blank line still opens nothing in the next block', () => {
     const src = 'text $x\n\n\\begin{itemize}\\item a\\end{itemize}\n\ny$ tail';
     isInsideRanges(findVerbatimRanges(src), src.indexOf('\\begin{itemize}'))
