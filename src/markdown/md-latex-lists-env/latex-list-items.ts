@@ -3,41 +3,23 @@ import type StateBlock from 'markdown-it/lib/rules_block/state_block';
 import type Token from 'markdown-it/lib/token';
 import {
   setTokenListItemOpenBlock,
-  processListChildToken
+  wrapLooseRun,
+  wrapListLevelRuns,
+  processListChildToken,
+  computeMarkerPadding
 } from "./latex-list-tokens";
 import { SetTokensBlockParse } from "../md-block-rule/helper";
-import { ListItemsResult, ParsedListItem, ListInlineContext } from "./latex-list-types";
 import {
-  END_LIST_ENV_INLINE_RE,
+  LIST_DEFAULT_INDENT_EM,
+  LIST_MAX_INDENT_EM,
+  ONLY_LIST_CLOSERS_RE,
   LATEX_ITEM_COMMAND_RE,
+  LATEX_ITEM_SPLIT_RE,
   LATEX_BLOCK_ENV_OPEN_RE,
 } from "../common/consts";
-
-/**
- * Processes block-style LaTeX list items by parsing their content
- * using the block parser. This is used for items whose content
- * contains block environments (e.g., \begin{table}, \begin{figure}, etc.).
- *
- * @param state - Markdown-It processing state
- * @param items - Array of parsed list items
- */
-export const ListItemsBlock = (
-  state: any,
-  items: ParsedListItem[] | null | undefined
-): void => {
-  if (!items || items.length === 0) {
-    return;
-  }
-  for (const item of items) {
-    const rawContent: string = item?.content ?? '';
-    const itemContent: string = rawContent.trim();
-    SetTokensBlockParse(state, itemContent, {
-      startLine: item.startLine,
-      endLine: item.endLine + 1,
-      disableBlockRules: true
-    });
-  }
-};
+import { getCurrentListLevelState, setListInlineSrc } from "./list-state";
+import { maskNonStructure } from "./list-source-model";
+import { ListItemsResult, ParsedListItem, ListInlineContext } from "./latex-list-types";
 
 /**
  * Processes LaTeX list items and generates Markdown-It tokens
@@ -60,11 +42,12 @@ export const ListItems = (
   enumerateLevelTypes: string[],
   li: { value: number } | null,
   iOpen: number,
-  itemizeLevelContents: string[]
+  itemizeLevelContents: string[],
+  openTokens: Token[],
+  allListTokens: Token[]
 ): ListItemsResult => {
-  let padding = 0;
   if (!items || items.length === 0) {
-    return { iOpen, padding };
+    return { iOpen };
   }
   for (const listItem of items) {
     state.env.parentType = state.parentType;
@@ -72,39 +55,75 @@ export const ListItems = (
     state.env.prentLevel = state.prentLevel;
     state.env.inheritedListType = state.parentType;
     listItem.content = listItem.content.trim();
+    // A chunk with no `\item` of its own, before the first one: its tokens went straight into the
+    // `<ul>`. Wrapped after they are emitted, below — a chunk that emits nothing gets no `<li>`.
+    const looseFrom: number = openTokens.length > 0
+      && !LATEX_ITEM_COMMAND_RE.test(listItem.content)
+      && !getCurrentListLevelState()?.openItems
+      ? state.tokens.length
+      : -1;
     // Detect block-level item content: a LaTeX block env, a backtick (code span/fence), or a tilde fence.
     if (LATEX_BLOCK_ENV_OPEN_RE.test(listItem.content) || listItem.content.indexOf('`') > -1 || listItem.content.indexOf('~~~') > -1) {
       let match: RegExpMatchArray = listItem.content.match(LATEX_ITEM_COMMAND_RE);
       if (match) {
-        setTokenListItemOpenBlock(state, listItem.startLine, listItem.endLine + 1, match[1], li, itemizeLevelTokens, enumerateLevelTypes, itemizeLevelContents);
+        const itemToken = setTokenListItemOpenBlock(state, listItem.startLine, listItem.endLine + 1, match[1], li, itemizeLevelTokens, enumerateLevelTypes, itemizeLevelContents);
+        // Block items skip the inline path, so measure the marker here too — attribute to the
+        // innermost open list (this item's list), not always the outer one.
+        if (itemToken.hasOwnProperty('marker')) {
+          const paddingChild: number = computeMarkerPadding(itemToken.markerTokens);
+          const top: Token = openTokens[openTokens.length - 1];
+          if (top && (!top.padding || top.padding < paddingChild)) {
+            top.padding = paddingChild;
+          }
+        }
         if (li && li.hasOwnProperty('value')) {
           li = null;
         }
         const rawContent: string = listItem?.content?.slice(match.index + match[0].length) ?? '';
         const blockContent: string = rawContent.trim();
         SetTokensBlockParse(state, blockContent, {disableBlockRules: true});
+        // Clears isBlock after the *last* block item; for earlier ones the next iteration sets it
+        // back. The Lists rule's finally is the actual guarantee — do not drop it for this line.
+        state.env.isBlock = false;
+        continue;
+      }
+      // No marker here — the chunk follows a closed nested list, or precedes the first `\item`.
+      // Same path as the marker case above, so a block env renders alike wherever it sits.
+      if (LATEX_BLOCK_ENV_OPEN_RE.test(listItem.content)) {
+        SetTokensBlockParse(state, listItem.content, { disableBlockRules: true });
+        if (looseFrom >= 0) {
+          wrapLooseRun(state, looseFrom);
+        }
+        state.env.isBlock = false;
         continue;
       }
     }
     // Parse inline children
     let inlineChildren = [];
-    state.md.inline.parse(listItem.content.trim(), state.md, state.env, inlineChildren);
+    const chunkFrom: number = state.tokens.length;
+    const chunk: string = listItem.content.trim();
+    const outerSrc: string | null = setListInlineSrc(state.env, chunk);
+    try {
+      state.md.inline.parse(chunk, state.md, state.env, inlineChildren);
+    } finally {
+      setListInlineSrc(state.env, outerSrc);
+    }
     // Context shared across child token processing
-    const ctx: ListInlineContext = { li, padding, iOpen, itemizeLevelTokens, enumerateLevelTypes, itemizeLevelContents };
+    const ctx: ListInlineContext = { li, iOpen, itemizeLevelTokens, enumerateLevelTypes, itemizeLevelContents, openTokens, allListTokens };
     // Process each inline child token
     for (const child of inlineChildren) {
       processListChildToken(state, listItem, child, ctx);
     }
+    wrapListLevelRuns(state, chunkFrom);
+    if (looseFrom >= 0) {
+      wrapLooseRun(state, looseFrom);
+    }
     // Update context after processing children
     li = ctx.li;
-    padding = ctx.padding;
     iOpen = ctx.iOpen;
     state.env.isBlock = false;
   }
-  return {
-    iOpen: iOpen,
-    padding: padding
-  };
+  return { iOpen };
 };
 
 /**
@@ -132,7 +151,7 @@ export const ItemsListPush = (
   startLine: number,
   endLine: number
 ): ParsedListItem[] => {
-  const index: number = content.indexOf('\\item');
+  const index: number = content.search(LATEX_ITEM_SPLIT_RE);
   // No "\item" in the line or at the very start: treat whole line as one chunk
   if (index <= 0) {
     items.push({ content, startLine, endLine });
@@ -182,17 +201,20 @@ export const ItemsListPush = (
 export const ItemsAddToPrev = (
   items: ParsedListItem[],
   lineText: string,
-  nextLine: number
+  nextLine: number,
+  keepLineBreak: boolean = true
 ): ParsedListItem[] => {
   if (items.length > 0) {
     const lastIndex = items.length - 1;
-    items[lastIndex].content += "\n" + lineText;
+    // Without the break for a line that renders to nothing: the softbreak would outlive it as `<br>`.
+    items[lastIndex].content += (keepLineBreak ? "\n" : "") + lineText;
     items[lastIndex].endLine = nextLine;
     return items;
   }
-  // No previous items: optionally create a new item,
-  // but skip pure inline end-of-list commands.
-  if (!END_LIST_ENV_INLINE_RE.test(lineText)) {
+  // No previous items: optionally create a new item, but skip a chunk that is *only* end-of-list
+  // commands. Asked as "contains one" instead, a line holding a closer beside real content was dropped
+  // whole — `\begin{center} keep \end{itemize} me` took the wrapper's opener with it.
+  if (!ONLY_LIST_CLOSERS_RE.test(maskNonStructure(lineText))) {
     ItemsListPush(items, lineText, nextLine, nextLine);
   }
   return items;
@@ -206,18 +228,13 @@ export const finalizeListItems = (
   li: { value: number } | null,
   iOpen: number,
   itemizeLevelContents: string[],
-  tokenStart: Token | null
+  openTokens: Token[],
+  allListTokens: Token[]
 ) =>  {
-  const dataItems: ListItemsResult = ListItems(state, items, itemizeLevelTokens, enumerateLevelTypes, li, iOpen, itemizeLevelContents);
-  if (tokenStart) {
-    const p = tokenStart;
-    if (!p.padding || p.padding < dataItems.padding) {
-      p.padding = dataItems.padding;
-      if (p.padding > 3) {
-        p.attrSet("data-padding-inline-start", String(dataItems.padding * 14));
-      }
-    }
-  }
+  // ListItems records each marker's width on its innermost open list (openTokens[last]) — both
+  // block items here and inline-opened nested lists — so the indent is resolved later, top-down,
+  // once every list's final width is known (see resolveListPadding), independent of item order.
+  const dataItems: ListItemsResult = ListItems(state, items, itemizeLevelTokens, enumerateLevelTypes, li, iOpen, itemizeLevelContents, openTokens, allListTokens);
   return {
     iOpen: dataItems.iOpen,
     items: [],
@@ -225,14 +242,53 @@ export const finalizeListItems = (
   };
 }
 
-export const splitInlineListEnv = (
-  lineText: string,
-  match
-) => {
-  const sB: string = match.index! > 0 ? lineText.slice(0, match.index).trim() : "";
-  const sE: string = match.index! + match[0].length < lineText.length
-    ? lineText.slice(match.index! + match[0].length).trim()
-    : "";
-  const isBacktickEscapedPair: boolean = sB.includes("`") && sE.includes("`");
-  return { sB, sE, isBacktickEscapedPair };
-}
+/**
+ * Resolve per-list padding top-down (doc order) once every list's width is recorded. A list keeps
+ * the default unless its marker overflows the ancestor indent + default, then reserves the
+ * shortfall; the total (ancestor + own) is clamped to LIST_MAX_INDENT_EM. Depth = prentLevel.
+ */
+export const resolveListPadding = (listTokens: Token[]): void => {
+  if (!listTokens.length) return;
+  // No marker wider than the default can produce an attribute, so the arithmetic below is skipped.
+  let overflows = false;
+  for (let i = 0; i < listTokens.length; i++) {
+    if ((listTokens[i].padding || 0) > LIST_DEFAULT_INDENT_EM) {
+      overflows = true;
+      break;
+    }
+  }
+  if (!overflows) return;
+  // Shallowest, not first: on an unbalanced slice the first token can be the deeper one.
+  let baseDepth: number = listTokens[0].prentLevel || 0;
+  for (const token of listTokens) {
+    baseDepth = Math.min(baseDepth, token.prentLevel || 0);
+  }
+  // prefix[d] = indent summed over the levels above d; after a token of depth d it is d+2 long.
+  const prefix: number[] = [0];
+  for (const token of listTokens) {
+    // Clamp depth to >= 0 (a negative would throw on prefix.length below).
+    const depth: number = Math.max(0, (token.prentLevel || 0) - baseDepth);
+    // Fill any skipped level with the default FIRST, so the ancestor sum has no holes (no NaN).
+    for (let d = prefix.length; d <= depth; d++) {
+      prefix[d] = prefix[d - 1] + LIST_DEFAULT_INDENT_EM;
+    }
+    // Ancestor indent counts toward the marker's room: it sits at `right: 100%` of the item, so it
+    // grows leftwards into what the ancestors already reserved (see .li_level in styles-lists.ts).
+    const ancestorSum: number = prefix[depth];
+    const total: number = Math.min(token.padding || 0, LIST_MAX_INDENT_EM);
+    // Ceil, never round: the reserve must not fall below the need — float noise can add one
+    // hundredth on top, which is the safe direction. Negative past the clamp.
+    const em: number = Math.ceil((total - ancestorSum) * 100) / 100;
+    // Own indent for this level: the reserved em when the marker overflows, else the default.
+    const indentEm: number = em > LIST_DEFAULT_INDENT_EM ? em : LIST_DEFAULT_INDENT_EM;
+    // Past the clamp this level takes the clamp and the ones under it the default; a marker may overlap.
+    if (em > LIST_DEFAULT_INDENT_EM) {
+      // Matches PADDING_EM_RE by construction: clamped to (default, LIST_MAX_INDENT_EM] and ceiled to
+      // two decimals, which `String` prints in full — no exponent, no sign. The renderer drops a miss.
+      token.attrSet("data-padding-inline-start", String(em) + "em");
+    }
+    prefix.length = depth + 1;
+    prefix[depth + 1] = ancestorSum + indentEm;
+  }
+};
+

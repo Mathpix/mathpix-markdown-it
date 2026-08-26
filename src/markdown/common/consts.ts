@@ -75,7 +75,9 @@ export const reOpenTagFootnotetextNumbered: RegExp = /\\footnotetext\s{0,}\[(?<n
 export const reFootNoteMark: RegExp = /^\\footnotemark/;
 export const reFootNoteText: RegExp = /^\\footnotetext|\\blfootnotetext/;
 export const reDiagboxG: RegExp = /\\(diagbox|backslashbox|slashbox)(\[[^\]]*\])?/g;
-export const reDiagbox: RegExp = /\\(diagbox|backslashbox|slashbox)(?:\[(.*?)\])?/;
+/** Anchored: the inline rule asks whether one starts at its position. Unanchored it took a later one and
+ *  ate the text between. */
+export const reDiagbox: RegExp = /^\\(diagbox|backslashbox|slashbox)(?:\[(.*?)\])?/;
 export const reNumber = /^-?\d+$/;
 export const svgRegex: RegExp = /^<svg\b[^>]*>[\s\S]*<\/svg>$/;
 export const svgInlineRegex: RegExp = /^<svg\b[^>]*>[\s\S]*<\/svg>/;
@@ -89,6 +91,16 @@ export const preserveNewlineUnlessDoubleAngleUuidRegex: RegExp = new RegExp(Stri
 export const ANGLE_BRACKETS_RE: RegExp = /[<>]/g;
 // Clone-on-write marker for shared tabular attrs arrays.
 export const attrsSharedMarker: symbol = Symbol.for('mathpix.tabular.attrsShared');
+// A token that is list structure rather than content. Shared: the list rules and the tabular renderer
+// both ask it, and two copies drift when a type is added.
+export const LIST_OPEN_TOKEN_TYPES: ReadonlySet<string> =
+  new Set<string>(['itemize_list_open', 'enumerate_list_open']);
+export const LIST_CLOSE_TOKEN_TYPES: ReadonlySet<string> =
+  new Set<string>(['itemize_list_close', 'enumerate_list_close']);
+export const LIST_STRUCTURE_TOKEN_TYPES: ReadonlySet<string> = new Set<string>([
+  'latex_list_item_open', 'latex_list_item_close',
+  ...LIST_OPEN_TOKEN_TYPES, ...LIST_CLOSE_TOKEN_TYPES,
+]);
 export const RE_TAG_WITH_HLINE: RegExp = /\[(.*?)\]\s{0,}\\hline/;
 export const RE_TAG_WITH_HHLINE: RegExp = /\[(.*?)\]\s{0,}\\hhline/;
 export const RE_TAG_WITH_HDASHLINE: RegExp = /\[(.*?)\]\s{0,}\\hdashline/;
@@ -145,14 +157,59 @@ export const BEGIN_LIST_ENV_RE: RegExp = /^\\begin\s*\{(itemize|enumerate)\}/;
 export const BEGIN_LIST_ENV_INLINE_RE: RegExp = /\\begin\s*\{(itemize|enumerate)\}/;
 /** Matches \end{itemize} or \end{enumerate} */
 export const END_LIST_ENV_INLINE_RE: RegExp = /\\end\s*\{(itemize|enumerate)\}/;
+/** A chunk that is nothing but end-of-list commands: dropped, since no item can hold it. Anchored, so a
+ *  line holding a closer beside real content is kept — asked as "contains one", it was dropped whole. */
+export const ONLY_LIST_CLOSERS_RE: RegExp =
+  /^(?:\s*\\end\s*\{(?:itemize|enumerate)\})+\s*$/;
 export const END_LIST_ENV_RE: RegExp = /^\\end\s*\{(itemize|enumerate)\}/;
-/** Matches \item or \item[optional] */
-export const LATEX_ITEM_COMMAND_RE: RegExp = /^(?:\\item\s*\[([^\]]*)\]|\\item)/;
-export const LATEX_ITEM_COMMAND_INLINE_RE: RegExp = /(?:item\s*\[([^\]]*)\]|item)/;
-export const LATEX_LIST_BOUNDARY_INLINE_RE: RegExp = /\\begin\s*\{(itemize|enumerate)\}|\\end\s*\{(itemize|enumerate)\}|\\item/;
-/** Matches \begin{center}, \begin{left}, \begin{right}, \begin{table}, \begin{figure}, \begin{tabular}, \begin{lstlisting} */
+/** `\item` not followed by a letter, so `\itemsep` is not one. Every pattern below is built from it. */
+const ITEM_COMMAND_BARE: string = '\\\\item(?![a-zA-Z])';
+/** `\item[optional]`, the marker captured. */
+const ITEM_COMMAND_MARKER: string = '\\\\item\\s*\\[([^\\]]*)\\]';
+/** `\item` or `\item[optional]`, the optional marker captured. */
+const ITEM_COMMAND_SOURCE: string = '(?:' + ITEM_COMMAND_MARKER + '|' + ITEM_COMMAND_BARE + ')';
+/** The marker with its payload, for masking: a command written there is text, not structure. */
+export const LATEX_ITEM_MARKER_G: RegExp = new RegExp(ITEM_COMMAND_MARKER, 'g');
+export const LATEX_ITEM_COMMAND_RE: RegExp = new RegExp('^' + ITEM_COMMAND_SOURCE);
+export const LATEX_ITEM_COMMAND_INLINE_RE: RegExp = new RegExp(ITEM_COMMAND_SOURCE);
+/** A fresh sticky instance per caller: `lastIndex` is state, and sharing it across callers leaks. */
+export const makeItemCommandSticky = (): RegExp => new RegExp(ITEM_COMMAND_SOURCE, 'y');
+// Built from the same bare form, so the fourth copy cannot drift; its two capture groups are unchanged.
+export const LATEX_LIST_BOUNDARY_INLINE_RE: RegExp =
+  new RegExp('\\\\begin\\s*\\{(itemize|enumerate)\\}|\\\\end\\s*\\{(itemize|enumerate)\\}|' + ITEM_COMMAND_BARE);
+/** A line that is only `\renewcommand`: its own rule consumes it, so it renders to nothing. */
+export const RENEWCOMMAND_LINE_RE: RegExp = /^\s*\\renewcommand\b/;
+/** The same, asked at an offset. Blanks only: `\s` would reach a command one line down.
+ *  Sticky, so it carries a lastIndex — set it before every `exec`. */
+export const RENEWCOMMAND_STICKY_RE: RegExp = /[ \t]*\\renewcommand\b/y;
+/** Where a chunk splits into items, for `search`: a real `\item`, so `\itemsep` is not a split point.
+ *  Must answer like ITEM_COMMAND_SOURCE — pinned by a property test. */
+export const LATEX_ITEM_SPLIT_RE: RegExp = /\\item(?:\s*\[|(?![a-zA-Z]))/;
+/** Commands whose `{...}` argument this package parses — and only they take a brace group as one:
+ *  Markdown keeps braces in prose, so `{a}` and an unsupported `\foo{a}` are text. Add a name when its
+ *  argument starts being read: a name here can shield an `\end{itemize}` inside it, a missing one cannot. */
+export const LATEX_BRACE_ARG_COMMANDS: readonly string[] = Object.freeze([
+  'begin', 'end',
+  'label', 'ref', 'eqref',
+  'caption', 'captionsetup',
+  'footnote', 'footnotetext', 'blfootnotetext',
+  'newtheorem', 'theoremstyle', 'setcounter', 'addcontentsline',
+  'renewcommand', 'qedsymbol',
+  'multirow', 'multicolumn', 'cline',
+  'includegraphics', 'icon',
+  'diagbox', 'backslashbox', 'slashbox',
+  'title', 'section', 'subsection', 'subsubsection',
+  'url', 'text', 'textbf', 'textit', 'textrm', 'texttt', 'textsf',
+  'underline', 'uline', 'uuline', 'uwave', 'dashuline', 'dotuline', 'sout', 'xout',
+  'author',
+  'colorbox', 'textcolor',
+]);
+
+/** Block envs the list scanner knows; the regex below is built from it, so the two cannot drift. */
+export const LATEX_BLOCK_ENV_NAMES: readonly string[] =
+  Object.freeze(['center', 'left', 'right', 'table', 'figure', 'tabular', 'lstlisting']);
 export const LATEX_BLOCK_ENV_OPEN_RE: RegExp =
-  /\\begin{(center|left|right|table|figure|tabular|lstlisting)}/;
+  new RegExp('\\\\begin{(' + LATEX_BLOCK_ENV_NAMES.join('|') + ')}');
 export const BLOCK_LATEX_RE: RegExp = /\\begin\{(tabular|itemize|enumerate|lstlisting)\}/;
 /**
  * Enumerate environment detection: \alph, \roman, \arabic, etc.
@@ -335,6 +392,18 @@ export const terminatedRules = {
 
 
 export const mathTokenTypes = ["display_math", "inline_math", "equation_math_not_number", "equation_math"];
+
+// Default font metrics (px), single source — also used by FontMetrics in text-dimentions.ts.
+export const DEFAULT_FONT_SIZE_PX = 16;
+export const DEFAULT_EX_PX = 8.296875;
+// ex→em for exact math (widthEx) marker widths.
+export const EX_TO_EM = DEFAULT_EX_PX / DEFAULT_FONT_SIZE_PX;
+// Marker→content gap and default list indent, em (10px/40px at 16px). Emit only above default.
+export const MARKER_GAP_EM = 0.625;
+export const LIST_DEFAULT_INDENT_EM = 2.5;
+// Upper bound so a pathological marker can't blow out the content column (above it the
+// marker may overlap — see spec Non-Goals).
+export const LIST_MAX_INDENT_EM = 20;
 
 export const codeHighlightDef = {
   auto: false,

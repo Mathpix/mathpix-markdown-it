@@ -928,4 +928,291 @@ module.exports = [
       '| :--- | :--- |\n' +
       '| LaTeX image without options (should be resolved) | ![](https://mathpix-ocr-examples.s3.amazonaws.com/cases_printed_1.jpg) |'
   },
+  {
+    // Nested list on one line: item body ("d") must survive extraction, same as the block form below.
+    id: 51,
+    latex: '\\begin{tabular}{|l|}\n' +
+      '\\begin{itemize}\\item[1.] a \\begin{itemize}\\item[x] d\\end{itemize}\\end{itemize}\n' +
+      '\\end{tabular}',
+    table_markdown: '| 1. a<br>&#160;&#160;x d<br> |\n' +
+      '| :--- |'
+  },
+  {
+    id: 52,
+    latex: '\\begin{tabular}{|l|}\n' +
+      '\\begin{itemize}\n' +
+      '\\item[1.] a\n' +
+      '\\begin{itemize}\n' +
+      '\\item[x] d\n' +
+      '\\end{itemize}\n' +
+      '\\end{itemize}\n' +
+      '\\end{tabular}',
+    table_markdown: '| 1. a<br>&#160;&#160;x d<br> |\n' +
+      '| :--- |'
+  },
+  {
+    // Link in a single-line nested item: the href must survive extraction.
+    id: 53,
+    latex: '\\begin{tabular}{|l|}\n' +
+      '\\begin{itemize}\\item[1.] a \\begin{itemize}\\item[y] [t](http://a.b)\\end{itemize}\\end{itemize}\n' +
+      '\\end{tabular}',
+    table_markdown: '| 1. a<br>&#160;&#160;y [t](http://a.b)<br> |\n' +
+      '| :--- |'
+  },
+  {
+    id: 54,
+    latex: '\\begin{tabular}{|l|}\n' +
+      '\\begin{itemize}\\item[1.] a \\begin{itemize}\\item[y] ![alt](http://a/b.png)\\end{itemize}\\end{itemize}\n' +
+      '\\end{tabular}',
+    table_markdown: '| 1. a<br>&#160;&#160;y ![alt](http://a/b.png)<br> |\n' +
+      '| :--- |'
+  },
+  {
+    id: 55,
+    latex: '\\begin{tabular}{|l|}\n' +
+      '\\begin{itemize}\\item[1.] a \\begin{itemize}\\item[y] **b** c\\end{itemize}\\end{itemize}\n' +
+      '\\end{tabular}',
+    table_markdown: '| 1. a<br>&#160;&#160;y **b** c<br> |\n' +
+      '| :--- |'
+  },
+  {
+    // Formatted link text spans several tokens; the whole label must survive the export.
+    id: 58,
+    latex: '\\begin{tabular}{|l|}\n' +
+      '[**bold** x](http://a.b) and [*it* `c` y](http://c.d)\n' +
+      '\\end{tabular}',
+    table_markdown: '| [**bold** x](http://a.b) and [*it* `c` y](http://c.d) |\n' +
+      '| :--- |'
+  },
+  {
+    // A leaf run is collected per cell: td_open/td_close bound it, so cell 2 stays out of cell 1.
+    id: 57,
+    latex: '\\begin{tabular}{|l|l|}\n' +
+      '[t](http://a.b) x & **b** y\n' +
+      '\\end{tabular}',
+    table_markdown: '| [t](http://a.b) x | **b** y |\n' +
+      '| :--- | :--- |'
+  },
+  {
+    // A link must not swallow the siblings that follow it in the cell.
+    id: 56,
+    latex: '\\begin{tabular}{|l|}\n' +
+      '[t](http://a.b) tail [u](http://c.d) **b** c\n' +
+      '\\end{tabular}',
+    table_markdown: '| [t](http://a.b) tail [u](http://c.d) **b** c |\n' +
+      '| :--- |'
+  },
+  {
+    // An image label keeps its `src`, so the exported label still shows the image.
+    id: 59,
+    latex: '\\begin{tabular}{|l|}\n' +
+      '[![alt](i.png)](http://a.b) x\n' +
+      '\\end{tabular}',
+    table_markdown: '| [![alt](i.png)](http://a.b) x |\n' +
+      '| :--- |'
+  },
+  {
+    // Inline math keeps its latex and its `$` delimiters, so the label re-parses as math.
+    id: 60,
+    latex: '\\begin{tabular}{|l|}\n' +
+      '[$x^2$](http://a.b) y\n' +
+      '\\end{tabular}',
+    table_markdown: '| [$x^2$](http://a.b) y |\n' +
+      '| :--- |',
+    // Under math_as_ascii the label follows the option, like the text beside it.
+    table_markdown_math_as_ascii: '| [x^(2)](http://a.b) y |\n' +
+      '| :--- |'
+  },
+  {
+    // An opening bracket re-pairs with the label's closing one, so it is escaped too.
+    id: 71,
+    latex: '\\begin{tabular}{|l|}\n' +
+      '[a\\[b](http://a.b) z\n' +
+      '\\end{tabular}',
+    table_markdown: '| [a\\[b](http://a.b) z |\n' +
+      '| :--- |'
+  },
+  {
+    // Raw markup in the label is kept as written, not stripped.
+    id: 70,
+    latex: '\\begin{tabular}{|l|}\n' +
+      '[a <i>it</i> b](http://a.b) z\n' +
+      '\\end{tabular}',
+    table_markdown: '| [a <i>it</i> b](http://a.b) z |\n' +
+      '| :--- |'
+  },
+  {
+    // A `]` inside math is NOT escaped: math is verbatim, so escaping it would alter the latex.
+    id: 69,
+    latex: '\\begin{tabular}{|l|}\n' +
+      '[$a]b$](http://x.y) z\n' +
+      '\\end{tabular}',
+    table_markdown: '| [$a]b$](http://x.y) z |\n' +
+      '| :--- |',
+    // ascii drops the delimiters, so the `]` inside the math is exposed and truncates the label —
+    // the same exposure the option already causes outside a label.
+    table_markdown_math_as_ascii: '| [a]b](http://x.y) z |\n' +
+      '| :--- |'
+  },
+  {
+    // A `]` in the label reaches markdown-it unescaped; re-escape it or it closes the label early.
+    id: 61,
+    latex: '\\begin{tabular}{|l|}\n' +
+      '[a\\]b](http://a.b) z\n' +
+      '\\end{tabular}',
+    table_markdown: '| [a\\]b](http://a.b) z |\n' +
+      '| :--- |'
+  },
+  {
+    // A bare destination ends at the first unbalanced `)`, so this href needs the angle form.
+    id: 63,
+    latex: '\\begin{tabular}{|l|}\n' +
+      '[t](<http://a/b)c>) z\n' +
+      '\\end{tabular}',
+    table_markdown: '| [t](<http://a/b)c>) z |\n' +
+      '| :--- |'
+  },
+  {
+    // Balanced parens are legal bare, so the angle form must not be forced on them.
+    id: 64,
+    latex: '\\begin{tabular}{|l|}\n' +
+      '[t](http://a/b(c)) z\n' +
+      '\\end{tabular}',
+    table_markdown: '| [t](http://a/b(c)) z |\n' +
+      '| :--- |'
+  },
+  {
+    // A continuation line is a separate cell token; without its line break the texts glue ("ab").
+    id: 65,
+    latex: '\\begin{tabular}{|l|}\n' +
+      '\\begin{itemize}\\item[x] a\nb\\end{itemize}\n' +
+      '\\end{tabular}',
+    table_markdown: '| x a b<br> |\n' +
+      '| :--- |'
+  },
+  {
+    // Unsupported command: literal text, once. Fails if a new type is made a run boundary and
+    // drops it, or joins a run twice.
+    id: 67,
+    latex: '\\begin{tabular}{|l|}\n' +
+      '\\begin{itemize}\\item[x] a \\hrule b\\end{itemize}\n' +
+      '\\end{tabular}',
+    table_markdown: '| x a \\hrule b<br> |\n' +
+      '| :--- |'
+  },
+  {
+    // A fence in a cell arrives as code_inline, so it stays a run member and exports once.
+    id: 68,
+    latex: '\\begin{tabular}{|l|}\n' +
+      '\\begin{itemize}\\item[x] a\n```\ncode\n```\n\\end{itemize}\n' +
+      '\\end{tabular}',
+    table_markdown: '| x a ```code```<br> |\n' +
+      '| :--- |'
+  },
+  {
+    // A block leaf is a run member on purpose — this is where its markdown comes from, once.
+    id: 66,
+    latex: '\\begin{tabular}{|l|}\n' +
+      '\\begin{itemize}\\item[x] a\n\\begin{lstlisting}\nz\n\\end{lstlisting}\n\\end{itemize}\n' +
+      '\\end{tabular}',
+    table_markdown: '| x a <pre><code>z</code></pre><br> |\n' +
+      '| :--- |'
+  },
+  {
+    // The markup survives outside a link label too — the cell loop reads the same helper.
+    id: 73,
+    latex: '\\begin{tabular}{|l|}\n' +
+      '\\hline\nH~2~O and x^2^ and ++new++ \\\\\\hline\n' +
+      '\\end{tabular}',
+    table_markdown: '| H~2~O and x^2^ and ++new++ |\n' +
+      '| :--- |'
+  },
+  {
+    // One formula, two positions: a label used to keep the edge spaces the cell loop trims away.
+    id: 72,
+    latex: '\\begin{tabular}{|l|}\n' +
+      '\\hline\n\\( x \\) and [\\( y \\)](u) \\\\\\hline\n' +
+      '\\end{tabular}',
+    table_markdown: '| $x$ and [$y$](u) |\n' +
+      '| :--- |',
+    table_markdown_math_as_ascii: '| x and [y](u) |\n' +
+      '| :--- |'
+  },
+  {
+    // A self-closing token with a marker: the marker must not replace the content.
+    id: 62,
+    latex: '\\begin{tabular}{|l|}\n' +
+      '[<smiles>CCO</smiles>](http://a.b) z\n' +
+      '\\end{tabular}',
+    table_markdown: '| [<smiles>CCO</smiles>](http://a.b) z |\n' +
+      '| :--- |'
+  },
+  {
+    // A pipe in the ascii must be escaped, or the row re-cuts into three cells.
+    id: 74,
+    latex: '\\begin{tabular}{ l c }\n' +
+      '  $|x|$ & 2 \\\\\n' +
+      '\\end{tabular}',
+    table_markdown: '| $\\|x\\|$ | 2 |\n' +
+      '| :--- | :---: |',
+    table_markdown_math_as_ascii: '| \\|x\\| | 2 |\n' +
+      '| :--- | :---: |'
+  },
+  {
+    // Determinant bars around an array: the ascii keeps both, the row keeps two columns.
+    id: 75,
+    latex: '\\begin{tabular}{ | l | c | }\\hline\n' +
+      '\\( \\left| \\begin{array}{c c}1 & 2 \\\\ 1 & 2 \\end{array} \\right| \\) & 2  \\\\ \\hline\n' +
+      '4 & 5 \\\\ \\hline\n' +
+      '\\end{tabular}',
+    table_markdown: '| $\\left\\| \\begin{array}{c c}1 & 2 \\\\ 1 & 2 \\end{array} \\right\\|$ | 2 |\n' +
+      '| :--- | :---: |\n' +
+      '| 4 | 5 |',
+    table_markdown_math_as_ascii: '| \\|[1,2],[1,2]\\| | 2 |\n' +
+      '| :--- | :---: |\n' +
+      '| 4 | 5 |'
+  },
+  {
+    // `\|` gives two bars, so all four are escaped.
+    id: 76,
+    latex: '\\begin{tabular}{ l c }\n' +
+      '  $\\|x\\|$ & 2 \\\\\n' +
+      '\\end{tabular}',
+    table_markdown: '| $\\\\|x\\\\|$ | 2 |\n' +
+      '| :--- | :---: |',
+    table_markdown_math_as_ascii: '| \\|\\|x\\|\\| | 2 |\n' +
+      '| :--- | :---: |'
+  },
+  {
+    // A pipe inside `\text` reaches the ascii too.
+    id: 77,
+    latex: '\\begin{tabular}{ l c }\n' +
+      '  $a \\text{x|y} b$ & 2 \\\\\n' +
+      '\\end{tabular}',
+    table_markdown: '| $a \\text{x\\|y} b$ | 2 |\n' +
+      '| :--- | :---: |',
+    table_markdown_math_as_ascii: '| ax\\|yb | 2 |\n' +
+      '| :--- | :---: |'
+  },
+  {
+    // A raw-HTML label and a `javascript:` href pass through as written: escapeLabel takes only
+    // `\`, `[`, `]`, and sanitising is the reader's job. Pinned so that cannot widen quietly.
+    id: 79,
+    latex: '\\begin{tabular}{|l|}\n' +
+      '[<b onclick="alert(1)">x</b> lbl](javascript:alert(1))\n' +
+      '\\end{tabular}',
+    table_markdown: '| [<b onclick="alert(1)">x</b> lbl](javascript:alert(1)) |\n' +
+      '| :--- |'
+  },
+  {
+    // `\mid` is U+2223, not a pipe — the escape stays narrow.
+    id: 78,
+    latex: '\\begin{tabular}{ l c }\n' +
+      '  $P(A \\mid B)$ & 2 \\\\\n' +
+      '\\end{tabular}',
+    table_markdown: '| $P(A \\mid B)$ | 2 |\n' +
+      '| :--- | :---: |',
+    table_markdown_math_as_ascii: '| P(A\u2223B) | 2 |\n' +
+      '| :--- | :---: |'
+  },
 ];

@@ -7,6 +7,7 @@ const { ContainerStyle } = require('../lib/styles/styles-container');
 const { codeStyles } = require('../lib/styles/styles-code');
 const { tabularStyles } = require('../lib/styles/styles-tabular');
 const { listsStyles } = require('../lib/styles/styles-lists');
+const { MARKER_GAP_EM, LIST_DEFAULT_INDENT_EM } = require('../lib/markdown/common/consts');
 const { menuStyle } = require('../lib/contex-menu/styles');
 const { clipboardCopyStyles } = require('../lib/copy-to-clipboard/clipboard-copy-styles');
 let MM = require('../lib/mathpix-markdown-model/index').MathpixMarkdownModel;
@@ -18,14 +19,20 @@ global.DOMParser = jsdom.window.DOMParser;
 const SNAP_DIR = path.join(__dirname, '_data', '_styles');
 const t = (s) => s.trim();
 
+// Writing a missing snapshot and comparing against what was just written passes for any CSS at all, so
+// a deleted or never-reviewed file read as green. Missing is a failure; `UPDATE_SNAPSHOTS=1` writes.
 function assertSnapshot(name, actual) {
   const snapPath = path.join(SNAP_DIR, name + '.snap.css');
-  if (!fs.existsSync(snapPath)) {
+  if (process.env.UPDATE_SNAPSHOTS) {
     fs.writeFileSync(snapPath, actual, 'utf8');
-    console.log(`    [snapshot created] ${name}.snap.css`);
+    console.log(`    [snapshot written] ${name}.snap.css`);
+    return;
   }
+  fs.existsSync(snapPath).should.equal(true,
+    `No snapshot for "${name}". Review the output, then run with UPDATE_SNAPSHOTS=1 to write ${snapPath}.`);
   const expected = fs.readFileSync(snapPath, 'utf8');
-  actual.should.equal(expected, `Snapshot mismatch for "${name}". Delete ${snapPath} to update.`);
+  actual.should.equal(expected,
+    `Snapshot mismatch for "${name}". Run with UPDATE_SNAPSHOTS=1 to update ${snapPath}.`);
 }
 
 describe('Style snapshots — individual functions:', () => {
@@ -68,6 +75,15 @@ describe('Style snapshots — individual functions:', () => {
   it('listsStyles', () => {
     assertSnapshot('listsStyles', listsStyles);
   });
+  it('listsStyles marker gap matches MARKER_GAP_EM', () => {
+    // The CSS gap and the padding reservation are in separate files; keep them in sync.
+    listsStyles.should.include('padding-right: ' + MARKER_GAP_EM + 'em');
+  });
+  it('listsStyles has no bare ul/ol selector (generic elements must stay scoped)', () => {
+    // Generic elements must be scoped-only; MMD classes stay bare + scoped on purpose, so
+    // `ul.itemize` is fine and only an unqualified `ul`/`ol` fails (2026-03-mmd-css-scoping).
+    listsStyles.should.not.match(/(^|,)\s*(ul|ol)\s*[,{>+~]/m);
+  });
   it('PreviewStyle', () => {
     assertSnapshot('PreviewStyle', PreviewStyle);
   });
@@ -99,6 +115,23 @@ describe('Style assembly methods — composition:', () => {
     });
     it('does NOT include ContainerStyle', () => {
       css.should.not.include('html,body');
+    });
+    // resolveListPadding subtracts exactly this per ancestor level when it sizes a nested reserve,
+    // so the number in the emitted CSS and the constant it reads must be the same.
+    it('emits the list indent the padding resolver assumes', () => {
+      const indent = 'padding-inline-start: ' + LIST_DEFAULT_INDENT_EM + 'em';
+      css.should.include('ol.enumerate, ul.itemize');
+      css.split(indent).length.should.be.above(2); // the class rule and the scoped generic rule
+      const nested = MM.markdownToHTML('\\begin{itemize}\\item[a] x \\begin{itemize}' +
+        '\\item[WWWWWWWWWWWW] y\\end{itemize}\\end{itemize}', { outMath: { include_svg: false } });
+      const values = (nested.match(/data-padding-inline-start="([\d.]+)em"/g) || [])
+        .map((s) => parseFloat(s.replace(/[^\d.]/g, '')));
+      values.should.have.length(1);
+      // The inner list reserves the marker width minus the one ancestor level, at that same value.
+      const flat = MM.markdownToHTML('\\begin{itemize}\\item[WWWWWWWWWWWW] y\\end{itemize}',
+        { outMath: { include_svg: false } });
+      const flatEm = parseFloat((flat.match(/data-padding-inline-start="([\d.]+)em"/) || [])[1]);
+      values[0].should.be.closeTo(flatEm - LIST_DEFAULT_INDENT_EM, 0.011);
     });
   });
   describe('getMathpixStyleOnly (useColors=false)', () => {
@@ -402,5 +435,43 @@ describe('getMaxWidthStyle:', () => {
   it('omits scrollbar hiding when isHideScroll=false', () => {
     const css = getMaxWidthStyle('800px', false);
     css.should.not.include('::-webkit-scrollbar');
+  });
+});
+
+describe('Code-block styles scale with the em context (no absolute px/rem):', () => {
+  // Extract the declaration body of the first rule whose selector contains `needle`,
+  // so assertions are scoped to that rule and not the whole stylesheet.
+  const blockFor = (css, needle) => {
+    const start = css.indexOf(needle);
+    if (start < 0) return '';
+    const open = css.indexOf('{', start);
+    return css.slice(open + 1, css.indexOf('}', open));
+  };
+  it('pre code font-size is inherited, not absolute px', () => {
+    const block = blockFor(codeStyles(), '#preview-content pre code, #setText pre code');
+    block.should.not.equal(''); // selector must exist, else the negative asserts pass vacuously
+    block.should.include('font-size: inherit');
+    block.should.not.match(/font-size:\s*\d+px/);
+  });
+  it('pre code line-height/padding are relative (no px line-height, no rem padding)', () => {
+    const block = blockFor(MathpixStyle(), '#preview-content pre code, #setText pre code');
+    block.should.not.equal('');
+    block.should.include('line-height: 1.6');
+    block.should.include('padding: 1em');
+    block.should.not.match(/line-height:\s*\d+px/);
+    block.should.not.include('1rem');
+  });
+  it('pre font-size is em-relative, not a percentage', () => {
+    const block = blockFor(MathpixStyle(), '#preview-content pre, #setText pre');
+    block.should.not.equal('');
+    block.should.include('font-size: 0.9375em');
+    block.should.not.include('font-size: 85%');
+  });
+  // The `pre` base applies to a `pre` with no `code` child too, and raw HTML does produce one: that is
+  // the 13.6px → 15px the changelog names, so the markup path has to stay as documented.
+  it('a raw-HTML pre with no code child reaches the output and takes the pre base', () => {
+    const html = MM.markdownToHTML('<pre>x</pre>', { htmlTags: true, outMath: { include_svg: false } });
+    html.should.match(/<pre[^>]*>x<\/pre>/, 'the raw pre is rewritten or dropped');
+    html.should.not.match(/<pre[^>]*>\s*<code/, 'a code child would take the pre code rules instead');
   });
 });

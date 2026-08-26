@@ -1,4 +1,39 @@
-# July 2026
+# August 2026
+
+## [3.1.0] - List rendering robustness fixes
+
+Malformed LaTeX lists rendered incorrectly in several unrelated ways. Details and measurements: `pr-specs/2026-07-list-rendering-robustness.md`, `pr-specs/2026-07-code-block-font-scaling.md`.
+
+A minor by decision: strict semver would call it a major, `tsv`/`csv` cells and `data-padding-inline-start` being documented output that changed shape. Pin the exact version if you need to review the diff before taking it.
+
+### Breaking changes
+
+- **`data-padding-inline-start` carries its unit** (`"56"` → `"4.23em"`) and appears on nested lists too. Parse it as an em value; a value we cannot parse is ignored with a warning.
+- **`tsv`/`csv` cells are not addresses.** An image exports its src alone (`![the alt](i.png)` → `i.png`); a link exports its href and then the rest of the cell (`[a](http://u) tail` → `http://u tail`, was `http://u`).
+- **`table-markdown`/`tsv`/`csv` for a cell holding a one-line list**: a sublist's item bodies now appear, and a flat list exports what sits before its first `\item`.
+- **A `ul`/`ol` without our `.itemize`/`.enumerate` class indents `2.5em` inside `#preview-content`/`#setText`**, where the UA `40px` applied — core-markdown lists, and lists passed as HTML under `htmlTags: true`. The rule outranks a consumer rule at class specificity. A TOC keeps `padding: 0` under `#toc_container` or `.table-of-contents`; copied elsewhere, give your container `padding: 0`.
+- **A failing list rule warns and returns degraded HTML** instead of throwing, so a `catch` around `markdownToHTML` for that case will not fire.
+- **New `console.warn` diagnostics**, deduplicated per render, with no option to silence them.
+- **Your `env` comes back as the list rule found it**, with one shape difference: a key the parse added comes back holding `undefined` rather than removed, so read values, not key presence. The rule's own caches sit under symbols, invisible to `Object.keys` and `JSON.stringify`.
+- **Deep imports.** `ClearTableNumbers`/`ClearFigureNumbers` → `clearTableNumbers`/`clearFigureNumbers` in `lib/markdown/common/caption-counters`; `getListLevelState` and `ListItemsBlock` are gone (read the depth through `getListDepth`); `ListItemsResult`/`ListInlineContext` dropped `padding` and require `openTokens`/`allListTokens`; `skipBackticks` answers past an unmatched run of backticks, not at the end of the string; `LATEX_ITEM_COMMAND_INLINE_RE` needs a real `\item`; `OpaqueEnvType` gains `table`, `figure`, `center`, `left`, `right`; `lib/styles/styles-code` no longer sizes code text.
+
+### Fixes that change existing output
+
+Nothing to do — these replace output that was broken or invalid.
+
+- **Markers no longer clip their item text**: the reserve is per glyph class in `em`, per level, capped at `20em`. Default indent and gap are pixel-identical at a 16px base.
+- **A `table`, `figure`, `center`, `left`, `right` or `tabular` in a list body gains its wrapper and caption wherever it sits**, and a list written inside one keeps its nesting depth.
+- **Content sitting directly in a list is wrapped in an `<li>`** — except a chunk holding only `\setcounter` or `\renewcommand`, which print nothing.
+- **A closer or an `\item` in the wrong place no longer breaks the tags.** Crossed names, collapsed closers, a mid-line closer opening a sibling, a list opened mid-paragraph, a list in a `tabular` cell, an empty `\item` and a closer written in `\item[…]`, in a code span or in a `\renewcommand` body all parse.
+- **Text is no longer dropped** beside a `\renewcommand`, after the outermost `\end{itemize}`, between a backslash command and a `\diagbox`, or by a `\\` ending a caption, heading or footnote argument. Two of those move numbering: that argument now renders, shifting `Table N`, `Figure N` and the section numbers below it, and a leftover after the closer is read as a block, so `\end{itemize} # H` becomes a heading.
+- **Every list reads its own copy of the marker tokens**, so a marker no longer leaks into a later list. Within one list the accumulation remains, as on 3.0.1.
+- **`table-markdown` exports what the cell holds** — a link's whole label, `sub`/`sup`/`ins` markup, math under `math_inline_delimiters`/`math_as_ascii`. Escaping guards Markdown syntax, not the URL scheme or HTML: see **Security notes on the Markdown exports** in the README.
+- **`prentLevel` on an inline-opened `*_list_open` is the real nesting depth**, was always `0`, and the depth is reset per parse rather than healed mid-render.
+- **Also fixed:** empty `<>` item bodies, `\itemsep`/`\itemindent` read as `\item`, a continuation line containing the word `item` losing its break, a list swallowed by a `\footnote`/`\footnotetext` scan, an orphan `<br>` after a `\renewcommand` line, whitespace-only text nodes between `<ul>` and `<li>`, edge whitespace in a custom marker, nested lists missing line numbers under `lineNumbering`, and a marker-less `<li>` exporting a marker looked up by `NaN`.
+- **Malformed input costs less**, and well-formed lists parse faster than 3.0.1. Unclosed `\begin{tabular}`, and unclosed envs with no blank line between them, stay super-linear.
+- **Code blocks scale with their container**: `pre`/`pre code` sizes are relative. Pixel-identical at a 16px base except code padding (16px → 15px) and a raw-HTML `<pre>` with no `<code>` child (13.6px → 15px).
+
+What malformed input still costs is in the spec under **Boundaries**, and every shape of it is pinned in `tests/_data/_lists/_data_known_quirks.js`.
 
 ## [3.0.1] - Preserve code indentation inside list/table/align env wrappers
 

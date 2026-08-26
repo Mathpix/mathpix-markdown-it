@@ -8,7 +8,11 @@ import {
   LATEX_ENUM_STYLE_KEY_RE,
   LATEX_ENUM_STYLE_RE
 } from "../common/consts";
+import { beginMarkerParse, endMarkerParse } from "./list-state";
 
+
+// These registries stay outside the Lists rollback: `\renewcommand` is document content, and rolling
+// it back gave two renders two answers.
 
 /** Active itemize levels (mutable state) */
 export let itemizeLevel: string[] = [];
@@ -63,6 +67,106 @@ export interface ItemizeLevelTokenResult {
   contents: string[];
 }
 
+// Every list open re-parsed the same few marker macros, and that was most of the inline work in a
+// list-heavy document. Cached per parse on `env`, keyed by the macro itself; consumers only render.
+// A symbol, like the sweep caches: a string key lands in `Object.keys`, where the env snapshot blanks
+// it on every discarded probe.
+const MARKER_TOKENS_ENV_KEY = Symbol('mmd.markerTokens');
+
+// Dropped per render: shared tokens would otherwise carry a rule's write into the next render.
+export const clearMarkerTokens = (env: any): void => {
+  if (env && env[MARKER_TOKENS_ENV_KEY]) {
+    env[MARKER_TOKENS_ENV_KEY] = undefined;
+  }
+};
+
+// `env` belongs to the consumer and may reach two md instances or two option sets, whose tokens are
+// not interchangeable — so the bucket is dropped when either changes.
+const markerBucket = (state: StateBlock | StateInline): Map<string, Token[]> => {
+  const env: any = state.env;
+  const cache = env[MARKER_TOKENS_ENV_KEY];
+  if (cache && cache.md === state.md && cache.outMath === state.md.options.outMath) {
+    return cache.byMacro;
+  }
+  const byMacro = new Map<string, Token[]>();
+  env[MARKER_TOKENS_ENV_KEY] = { md: state.md, outMath: state.md.options.outMath, byMacro };
+  return byMacro;
+};
+
+// The cached originals, which no reader ever receives — every read takes a copy below. Frozen so that a
+// path returning one uncopied, or our own code writing into the cache, fails here instead of leaking
+// into the next list: that is how `link_open` was caught piling `target` onto a shared marker.
+const freezeMarkerToken = (token: Token): void => {
+  if (token.attrs) {
+    token.attrs.forEach((attr) => Object.freeze(attr));
+    Object.freeze(token.attrs);
+  }
+  if (token.children) {
+    token.children.forEach(freezeMarkerToken);
+    Object.freeze(token.children);
+  }
+  // `Object.freeze` is shallow: without these a write into `meta` or `map` would reach every list of the
+  // render. Measured, no marker body produces either today — the guarantee, not a fixed defect.
+  if (token.meta) {
+    Object.freeze(token.meta);
+  }
+  if (token.map) {
+    Object.freeze(token.map);
+  }
+  Object.freeze(token);
+};
+
+// A copy per read, always. Handing out the shared token cost either a leak into every later list with
+// the same marker, or — once the cache was frozen — a `TypeError` out of `md.render` when a consumer's
+// rule wrote to it. The copy carries its own `attrs` and `children`, so a write travels nowhere.
+const readableMarker = (token: Token): Token => {
+  const copy: Token = Object.assign(Object.create(Object.getPrototypeOf(token)), token);
+  if (token.attrs) {
+    copy.attrs = token.attrs.map((attr) => attr.slice() as [string, string]);
+  }
+  if (token.children) {
+    copy.children = token.children.map(readableMarker);
+  }
+  // `meta` and `map` too: shared, a write into them would reach the frozen original and throw.
+  if (token.meta) {
+    copy.meta = { ...token.meta };
+  }
+  if (token.map) {
+    copy.map = token.map.slice() as [number, number];
+  }
+  return copy;
+};
+
+const parseMarkerTokens = (
+  state: StateBlock | StateInline,
+  level: string,
+  cacheable: boolean
+): Token[] => {
+  const bucket: Map<string, Token[]> | null =
+    cacheable && state.env ? markerBucket(state) : null;
+  const cached: Token[] | undefined = bucket?.get(level);
+  if (cached) {
+    // Measured: not distinguishable over the corpus; on 400 lists of five items the copies cost about
+    // 2 ms of 22 when the marker is math — its children are the parsed formula — and noise otherwise.
+    return cached.map(readableMarker);
+  }
+  const children: Token[] = [];
+  beginMarkerParse();
+  try {
+    state.md.inline.parse(level, state.md, state.env, children);
+  } finally {
+    endMarkerParse();
+  }
+  if (bucket) {
+    // Only what is cached: a write into a shared token reached every later list with the same marker.
+    children.forEach(freezeMarkerToken);
+    bucket.set(level, children);
+    // Read back as any other list: the first must not get the frozen originals.
+    return children.map(readableMarker);
+  }
+  return children;
+};
+
 /**
  * Parse bullet tokens for all itemize levels.
  */
@@ -79,11 +183,8 @@ export const SetItemizeLevelTokens = (
     beginCacheBypass(state);
   }
   try {
-    itemizeLevelTokens = itemizeLevel.map((level) => {
-      const children: Token[] = [];
-      state.md.inline.parse(level, state.md, state.env, children);
-      return children;
-    });
+    // forDocx parses with mutated outMath and no math cache, so it keeps its own uncached tokens.
+    itemizeLevelTokens = itemizeLevel.map((level) => parseMarkerTokens(state, level, !docxMutation));
   } finally {
     state.md.options.outMath = originalOutMath;
     if (docxMutation) endCacheBypass(state);
@@ -111,9 +212,7 @@ export const SetItemizeLevelTokensByIndex = (
     beginCacheBypass(state);
   }
   try {
-    const children: Token[] = [];
-    state.md.inline.parse(itemizeLevel[index], state.md, state.env, children);
-    itemizeLevelTokens[index] = children;
+    itemizeLevelTokens[index] = parseMarkerTokens(state, itemizeLevel[index], !docxMutation);
   } finally {
     state.md.options.outMath = originalOutMath;
     if (docxMutation) endCacheBypass(state);
@@ -180,7 +279,8 @@ export const ChangeLevel = (
 };
 
 /**
- * Clears stored itemize level token cache.
+ * Clears stored itemize level token cache. The definitions survive by design: set once per md
+ * instance, so a chunked host keeps a \renewcommand from an earlier chunk.
  */
 export const clearItemizeLevelTokens = () => {
   itemizeLevelTokens = [];

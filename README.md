@@ -970,10 +970,10 @@ The `MathpixMarkdown` React element accepts the following props:
 | `include_linearmath`     | boolean&nbsp;*`false`*       | outputs linearmath `<linearmath style="display: none">...</linearmath>`                                            |
 | `include_latex`          | boolean&nbsp;*`true`*        | outputs latex `<latex style="display: none">...</latex>`                                                          |
 | `include_svg`            | boolean&nbsp;*`true`*        | outputs svg `<svg>...</svg>`                                                                                      |
-| `include_tsv`            | boolean&nbsp;*`false`*       | outputs tsv `<tsv style="display: none">...</tsv>`                                                                |
-| `include_csv`            | boolean&nbsp;*`false`*       | outputs csv `<csv style="display: none">...</csv>`                                                                |
+| `include_tsv`            | boolean&nbsp;*`false`*       | outputs tsv `<tsv style="display: none">...</tsv>`. A link contributes its `href` and an image its `src` in place of the visible text — these formats hold no markup; use `include_table_markdown` for the label. Whatever else the cell holds is still exported beside it, space-separated, so a cell is not an address even when it starts with one (`[a](http://u) tail` → `http://u tail`) |
+| `include_csv`            | boolean&nbsp;*`false`*       | outputs csv `<csv style="display: none">...</csv>`. Same link/image rule as `include_tsv`                          |
 | `include_table_html`     | boolean&nbsp;*`true`*        | outputs html table `<table>...</table>`                                                                           |
-| `include_table_markdown` | boolean&nbsp;*`false`*       | outputs markdown table `<table-markdown>...</table-markdown>`                                                     |
+| `include_table_markdown` | boolean&nbsp;*`false`*       | outputs markdown table `<table-markdown>...</table-markdown>`. A link keeps its address as written; see [Security notes on the Markdown exports](#security-notes-on-the-markdown-exports) |
 | `include_smiles`         | boolean&nbsp;*`false`*       | outputs smiles `<smiles>...</smiles>`                                                                             |
 | `tsv_separators`         | `{column: '\t', row: '\n'}`  | Separators for tsv tables                                                                                         |
 | `csv_separators`         | `{column: ',', row: '\n', toQuoteAllFields: false}` | Separators for csv tables. If `toQuoteAllFields=true` - all fields will be enclosed in double quotes|
@@ -983,6 +983,32 @@ The `MathpixMarkdown` React element accepts the following props:
 | `md_separators`          | `{column: ' ', row: ' <br> '}`| Separators for Markdown tables                                                                                   | 
 | `table_markdown`         | `{math_as_ascii: false, math_inline_delimiters: ['$','$']}`| By default, math goes into Markdown tables as latex and is enclosed in `$...$` delimiters. If `math_as_ascii` is set to `true`, then math will be represented as asciimath | 
 | `skipMathToHtml`         | boolean&nbsp;*`false`*       | When `true`, skips SVG serialization and `token.mathEquation` storage. Overrides `include_svg`; other MathJax outputs (`mathml`, `asciimath`, `linearmath`, etc.) still respect their own `include_*` flags. Intended for callers that walk the token tree directly and never read the serialized math HTML. |
+
+### Security notes on the Markdown exports
+
+`include_table_markdown`, `include_tsv` and `include_csv` return text, so the reader re-parses it.
+
+- A rejected link (`javascript:`, `data:`, or anything a custom `validateLink` refuses) produces no `<a>` and stays as the literal `[label](address)` — in the HTML output and in the export alike. A reader with a permissive validator will make it a link again, so **validating the scheme is the reader's job**.
+- An accepted link is exported with its address as written: escaping guards the Markdown syntax, not the URL scheme. `tsv`/`csv` carry the address without the label.
+- A cell's inline markup is exported as written, raw HTML included — `<b onclick="…">x</b>` in a cell, or in a link label, reaches the export verbatim. Escaping is narrow: `\`, `[` and `]` inside a link label in the `table-markdown` export, nothing at all in a plain cell or in `tsv`/`csv`. A reader that parses the result with HTML enabled will render it, so **sanitising HTML is the reader's job** as well. This branch widened only how much of a link label is exported, not what is escaped.
+
+Both are pinned by tests. If the reader cannot validate, treat the exported text as untrusted input or render from the HTML output.
+
+### Diagnostics
+
+Malformed LaTeX makes the list rules report to the global `console.warn`, prefixed `[list]`, `[list-state]`, `[env]` or `[mmd]`. There is **no option to silence or redirect them** — a server that renders untrusted input at volume should expect them in its log.
+
+- They are informational. `[list] list rule failed` means one list was left as literal text while the rest of the document rendered. A marker asking for more room than the `20em` cap allows is **not** reported: the reserve is generous enough that the chain usually still fits, so the line said nothing a consumer could act on.
+- Each distinct case is reported once per render, capped at 40 per family and 200 in total; past either cap one line says the rest are silent.
+- A failure never throws out of `markdownToHTML` — the rule declines and the document renders — so a warning is the only signal that a list degraded.
+- Deduplication counts per render, which is per call to `markdownToHTML`. A consumer driving `md.block.parse` or `md.inline.parse` directly never reaches the reset, so its keys accumulate until the per-family cap (40) reports and stops that family; the other families keep speaking.
+- MathJax reports invalid math on its own channel, prefixed `[TexConvert]`, not deduplicated and not covered by the caps above. Malformed math written inside a list wrapper env now reaches it, where `3.0.1` never built the wrapper and so never sent it.
+
+### Three notes for consumers who reach past the public API
+
+- **Toggle a rule, do not swap its `fn`.** The footnote rules cache which block rules terminate them, and that cache is dropped when markdown-it invalidates its own rule cache — which `enable`, `disable` and `ruler.at` do. Assigning `rule.fn` inside `md.block.ruler.__rules__` does not, so the cache would keep pointing at your old function. Use `md.block.ruler.at(name, fn)`.
+- **Keep `env` small.** A list parse snapshots every own string key of the `env` you pass, so that it can be put back exactly, and it does so once per line that opens a list. Measured on 200 list units: 62 ms with a plain `env`, 164 ms with a thousand extra keys on it.
+- **Your `env` comes back as the parse found it, with one shape difference.** A key the parse added comes back as an own key holding `undefined` rather than removed, so `'key' in env` answers `true` where `env.key` is `undefined` — `delete` drops the object into dictionary mode, and this runs per line that opens a list. Read values, not key presence. The parse's own caches live under symbols, invisible to `Object.keys` and `JSON.stringify`.
 
 ### TOutputMathJax
 
@@ -1150,6 +1176,11 @@ Build the es5 file for node.
 ```shell
 $ npm run build
 ```
+
+`lib/` and `es5/` are committed, and only `npm run build` produces what is committed. `npm run compile`
+is for iterating: it skips `es5/`, and it prints tuple types in `.d.ts` on one line where the build's
+`ts-loader` prints them across several — so its output shows up as a diff in files no source change
+touched.
 
 # Testing
 

@@ -1,0 +1,244 @@
+import { mathTokenTypes, EX_TO_EM } from "./consts";
+
+const MATH_TOKEN_TYPES = new Set<string>(mathTokenTypes);
+// Leaf tokens whose `content` is visible text (measured); others (e.g. `html_inline`, whose
+// content is raw markup) contribute 0.
+// `code_inline` is absent on purpose: it is handled earlier, by the monospace branch.
+// `emoji` belongs here: its content is the glyph itself. `smiles_inline` does not — its content is a
+// SMILES string that renders as a drawing, so measuring the string would reserve the wrong width.
+const TEXT_LIKE_TYPES = new Set<string>(['text', 'text_special', 'emoji']);
+
+// Code points that add no advance: they render over the base glyph, join it, or select a variant.
+// A static snapshot of Unicode 15.1, like the Wide ranges below; a newer code point reserves its class.
+const isZeroWidthChar = (cp: number): boolean =>
+  (cp >= 0x0300 && cp <= 0x036F) ||   // Combining Diacritical Marks
+  (cp >= 0x1AB0 && cp <= 0x1AFF) ||   // ... Extended
+  (cp >= 0x200B && cp <= 0x200F) ||   // zero-width space/non-joiner/joiner, bidi marks
+  (cp >= 0x20D0 && cp <= 0x20F0) ||   // ... for Symbols
+  (cp >= 0xFE00 && cp <= 0xFE0F) ||   // Variation Selectors
+  (cp >= 0xFE20 && cp <= 0xFE2F) ||   // Combining Half Marks (Vertical Forms sit between: wide)
+  cp === 0x3099 || cp === 0x309A ||   // Katakana voiced marks (inside the wide range below)
+  // Marks sitting on the base letter, and two format characters: each reserved 0.90em before.
+  cp === 0x00AD || cp === 0xFEFF ||   // soft hyphen, BOM
+  cp === 0x2028 || cp === 0x2029 ||   // line and paragraph separators, printing nothing
+  (cp >= 0x0591 && cp <= 0x05BD) || cp === 0x05BF ||                       // Hebrew points
+  (cp >= 0x05C1 && cp <= 0x05C2) || (cp >= 0x05C4 && cp <= 0x05C5) || cp === 0x05C7 ||
+  (cp >= 0x0610 && cp <= 0x061A) || (cp >= 0x064B && cp <= 0x065F) ||      // Arabic marks
+  cp === 0x0670 || (cp >= 0x06D6 && cp <= 0x06DC) || (cp >= 0x06DF && cp <= 0x06E4) ||
+  (cp >= 0x06E7 && cp <= 0x06E8) || (cp >= 0x06EA && cp <= 0x06ED) ||
+  (cp >= 0x0900 && cp <= 0x0902) || cp === 0x093A || cp === 0x093C ||      // Devanagari marks
+  (cp >= 0x0941 && cp <= 0x0948) || cp === 0x094D ||
+  (cp >= 0x0951 && cp <= 0x0957) ||
+  cp === 0x0E31 || (cp >= 0x0E34 && cp <= 0x0E3A) || (cp >= 0x0E47 && cp <= 0x0E4E); // Thai marks
+
+// Minimal shape tokenMarkerWidth reads (a subset of markdown-it's Token).
+interface WidthToken {
+  type?: string;
+  content?: string;
+  widthEx?: number;
+  children?: WidthToken[] | null;
+}
+
+// Per-char reserve in em, over-estimating the widest glyph of each class at 16px (`A` advances
+// ~0.72em, takes 0.90). Pinned in _list-marker-padding.js against
+// tests/_data/_markdownToHTMLWithSize/fonts/Arial.ttf.
+// Thin glyphs; \t\r\n collapse to a single space when rendered, so they share the space's class.
+const NARROW_RE = /[ \t\r\n!'"(),.\/:;|\[\]ijltfrI]/;
+const WIDE_RE = /[A-HJ-Zmw]/;                      // most capitals (except I) + m, w
+const XWIDE_RE = /[W@%]/;                           // widest glyphs
+const NARROW_EM = 0.40;
+const NORMAL_EM = 0.62;
+const WIDE_EM = 0.90;
+const XWIDE_EM = 1.10;
+const CJK_EM = 1.20;                               // East-Asian full-width glyph
+// Monospace advance, covering the faces `code` uses (Inconsolata 0.5em, DM Mono 0.6em).
+// Equal to NORMAL_EM by coincidence, not derivation — the two move independently.
+const MONO_EM = 0.62;
+/** Nesting a marker's tokens can reach before the estimate stops descending. */
+const MAX_MARKER_TOKEN_DEPTH = 16;
+const MONO_TOKEN_TYPES = new Set<string>(['code_inline', 'texttt']);
+
+// ASCII fast path — those classes are ASCII-only. Built from the same regexes, so it can't drift.
+const ASCII_EM: Float64Array = (() => {
+  const widths = new Float64Array(128);
+  for (let cp = 0; cp < 128; cp++) {
+    const ch: string = String.fromCharCode(cp);
+    // Controls render nothing (the whitespace ones are in NARROW_RE, which runs first).
+    widths[cp] = !NARROW_RE.test(ch) && (cp < 0x20 || cp === 0x7F) ? 0
+      : NARROW_RE.test(ch) ? NARROW_EM
+      : XWIDE_RE.test(ch) ? XWIDE_EM
+      : WIDE_RE.test(ch) ? WIDE_EM
+      : NORMAL_EM;
+  }
+  return widths;
+})();
+
+// Snapshot of https://www.unicode.org/Public/15.1.0/ucd/EastAsianWidth.txt — regenerate from there.
+// Wide code points scattered below the CJK blocks per EastAsianWidth 15.1: the angle brackets and
+// Wide emoji. Range by range, not one span — their neighbours (`✓` U+2713, `✖` U+2716) are Neutral.
+const WIDE_RANGES_BELOW_CJK: ReadonlyArray<readonly [number, number]> = [
+  [0x231A, 0x231B], [0x2329, 0x232A], [0x23E9, 0x23EC], [0x23F0, 0x23F0], [0x23F3, 0x23F3], [0x25FD, 0x25FE],
+  [0x2614, 0x2615], [0x2648, 0x2653], [0x267F, 0x267F], [0x2693, 0x2693], [0x26A1, 0x26A1],
+  [0x26AA, 0x26AB], [0x26BD, 0x26BE], [0x26C4, 0x26C5], [0x26CE, 0x26CE], [0x26D4, 0x26D4],
+  [0x26EA, 0x26EA], [0x26F2, 0x26F3], [0x26F5, 0x26F5], [0x26FA, 0x26FA], [0x26FD, 0x26FD],
+  [0x2705, 0x2705], [0x270A, 0x270B], [0x2728, 0x2728], [0x274C, 0x274C], [0x274E, 0x274E],
+  [0x2753, 0x2755], [0x2757, 0x2757], [0x2795, 0x2797], [0x27B0, 0x27B0], [0x27BF, 0x27BF],
+  [0x2B1B, 0x2B1C], [0x2B50, 0x2B50], [0x2B55, 0x2B55],
+];
+const WIDE_BELOW_CJK_LO = 0x231A;
+const WIDE_BELOW_CJK_HI = 0x2B55;
+// One byte per code point of that span (~2.4KB) so the check is an index, not 30 comparisons.
+const wideBelowCjkFlags: Uint8Array = (() => {
+  const flags = new Uint8Array(WIDE_BELOW_CJK_HI - WIDE_BELOW_CJK_LO + 1);
+  for (const [from, to] of WIDE_RANGES_BELOW_CJK) {
+    for (let cp = from; cp <= to; cp++) {
+      flags[cp - WIDE_BELOW_CJK_LO] = 1;
+    }
+  }
+  return flags;
+})();
+
+// The ranges alone, for callers that already excluded zero-advance code points.
+const inWideRange = (cp: number): boolean =>
+  ((cp >= 0x1100 && cp <= 0x115F) ||   // Hangul Jamo
+  (cp >= 0x2E80 && cp <= 0x303E) ||   // CJK radicals, Kangxi, CJK symbols/punctuation
+  (cp >= 0x3041 && cp <= 0x33FF) ||   // Hiragana, Katakana, CJK symbols
+  (cp >= 0x3400 && cp <= 0x4DBF) ||   // CJK Unified Ideographs Extension A
+  (cp >= 0x4E00 && cp <= 0x9FFF) ||   // CJK Unified Ideographs
+  (cp >= 0xA000 && cp <= 0xA4CF) ||   // Yi
+  (cp >= 0xAC00 && cp <= 0xD7A3) ||   // Hangul Syllables
+  (cp >= 0xF900 && cp <= 0xFAFF) ||   // CJK Compatibility Ideographs
+  (cp >= 0xFE10 && cp <= 0xFE4F) ||   // Vertical Forms, CJK Compatibility Forms
+  (cp >= 0xFF00 && cp <= 0xFF60) ||   // Fullwidth Forms
+  (cp >= 0xFFE0 && cp <= 0xFFE6) ||   // Fullwidth signs
+  (cp >= 0x16FE0 && cp <= 0x18D08) || // Ideographic Symbols, Tangut (+Supplement), Khitan
+  (cp >= 0x1AFF0 && cp <= 0x1B2FF) || // Kana Extended-B, Kana Supplement/Extended-A, Nushu
+  (cp >= 0x1F000 && cp <= 0x1F02F) || // Mahjong Tiles
+  (cp >= 0x1F1E6 && cp <= 0x1F1FF) || // Regional Indicators
+  (cp >= 0x1F200 && cp <= 0x1FAFF) || // Enclosed Ideographic Supplement, emoji pictographs
+  (cp >= 0x20000 && cp <= 0x3FFFD) || // CJK Unified Ideographs Extension B–G
+  // Last: the ranges above short-circuit for CJK, everything else exits on one comparison.
+  (cp >= WIDE_BELOW_CJK_LO && cp <= WIDE_BELOW_CJK_HI && wideBelowCjkFlags[cp - WIDE_BELOW_CJK_LO] === 1));
+
+/**
+ * Whether a code point is an East-Asian Wide/Fullwidth character, which renders
+ * roughly twice as wide as an ASCII character. Block-level approximation of Unicode's
+ * East Asian Width property, over the BMP and the astral blocks that are Wide.
+ * Zero-advance code points are excluded here and reserve 0 — see isZeroWidthChar.
+ */
+export const isWideChar = (cp: number): boolean => !isZeroWidthChar(cp) && inWideRange(cp);
+
+// The ASCII classes can't see these letters; uppercase runs widest (`Љ` is 1.06em in Arial).
+const casedEmFor = (cp: number): number => {
+  const ch: string = String.fromCodePoint(cp);
+  return ch !== ch.toLowerCase() && ch === ch.toUpperCase() ? XWIDE_EM : WIDE_EM;
+};
+
+// Only the case test allocates, so only it is worth caching — the wide and zero-width checks are
+// range comparisons. One byte per code point over the dense range (0 = unseen), so the cache has a
+// fixed size and needs no lifecycle owner; above it the class is computed per occurrence.
+const CASED_CACHE_MAX = 0x3000;
+const casedClass: Uint8Array = new Uint8Array(CASED_CACHE_MAX);
+
+// Reserve for one non-ASCII code point in em.
+const nonAsciiEm = (cp: number): number => {
+  // A combining mark renders over the base glyph; a lone surrogate is broken input, not a glyph.
+  if (isZeroWidthChar(cp) || (cp >= 0xD800 && cp <= 0xDFFF)) {
+    return 0;
+  }
+  if (inWideRange(cp)) {
+    return CJK_EM;
+  }
+  if (cp >= CASED_CACHE_MAX) {
+    return casedEmFor(cp);
+  }
+  let cls: number = casedClass[cp];
+  if (cls === 0) {
+    cls = casedEmFor(cp) === XWIDE_EM ? 1 : 2;
+    casedClass[cp] = cls;
+  }
+  return cls === 1 ? XWIDE_EM : WIDE_EM;
+};
+
+// Monospace cells in a run: code points, not UTF-16 units, and combining marks take none.
+const monoCells = (str: string): number => {
+  let cells = 0;
+  for (let i = 0; i < str.length; i++) {
+    const unit: number = str.charCodeAt(i);
+    if (unit < 128) {
+      // Controls render nothing here either, or the same junk marker measures differently by type.
+      if (ASCII_EM[unit] > 0) {
+        cells++;
+      }
+      continue;
+    }
+    const cp: number = str.codePointAt(i) ?? 0;
+    if (cp > 0xFFFF) {
+      i++;
+    }
+    // A lone surrogate is broken input, not a glyph — same call as nonAsciiEm makes.
+    if (cp >= 0xD800 && cp <= 0xDFFF) {
+      continue;
+    }
+    if (!isZeroWidthChar(cp)) {
+      // A wide glyph takes two cells in a monospace face.
+      cells += inWideRange(cp) ? 2 : 1;
+    }
+  }
+  return cells;
+};
+
+/**
+ * Reserve for a run of text in em: sum of per-char class widths. ASCII by the class table,
+ * combining marks 0, East-Asian wide CJK_EM, other non-ASCII by case (see nonAsciiEm).
+ */
+export const textReserveEm = (str: string): number => {
+  let em = 0;
+  for (let i = 0; i < str.length; i++) {
+    const unit: number = str.charCodeAt(i);
+    if (unit < 128) {
+      em += ASCII_EM[unit];
+      continue;
+    }
+    const cp: number = str.codePointAt(i) ?? 0;
+    if (cp > 0xFFFF) {
+      i++; // consume the low surrogate; an astral char counts once
+    }
+    em += nonAsciiEm(cp);
+  }
+  return em;
+};
+
+/**
+ * Width of one inline marker token in em: math by its rendered `widthEx` (converted to em),
+ * `code_inline`/`texttt` by monospace cells, wrappers (e.g. `\textbf{…}`) by recursing into
+ * children, text-like leaves (`text` / `text_special`) by per-char class widths, everything
+ * else (e.g. `html_inline`, whose content is markup) 0. The counterpart of `getTextWidthByTokens`
+ * (font-based) — used where no font is loaded. Math without a `widthEx` (non-SVG output)
+ * also contributes 0, so the marker keeps the default indent.
+ */
+export const tokenMarkerWidth = (token: WidthToken, depth: number = 0): number => {
+  // The recursion below follows consumer input; a marker is never deep, so stop rather than trust it.
+  if (depth > MAX_MARKER_TOKEN_DEPTH) {
+    return 0;
+  }
+  // Only the math pipeline fills widthEx. Without it → 0, rather than a guess from the latex.
+  if (token.type && MATH_TOKEN_TYPES.has(token.type)) {
+    return typeof token.widthEx === 'number' ? token.widthEx * EX_TO_EM : 0;
+  }
+  // These render as `<code>` in a monospace face, where the glyph-class estimate underreserves.
+  if (token.type && MONO_TOKEN_TYPES.has(token.type)) {
+    return monoCells(token.content ?? '') * MONO_EM;
+  }
+  if (token.children && token.children.length) {
+    let em = 0;
+    for (let i = 0; i < token.children.length; i++) {
+      em += tokenMarkerWidth(token.children[i], depth + 1);
+    }
+    return em;
+  }
+  if (token.type && TEXT_LIKE_TYPES.has(token.type)) {
+    return textReserveEm(token.content ?? '');
+  }
+  return 0;
+};

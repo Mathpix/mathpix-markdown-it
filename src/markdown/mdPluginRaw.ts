@@ -15,7 +15,8 @@ import {
   isMathInText,
   hasOddSimpleMathTag
 } from './utils';
-import { latexEnvironments, openTagMML } from './common/consts';
+import { latexEnvironments, openTagMML, BEGIN_LIST_ENV_INLINE_RE } from './common/consts';
+import { findEndMarkerPos } from './common';
 import { imageWithSize, renderRuleImage } from './md-inline-rule/image';
 import { imageWithSizeBlock, renderRuleImageBlock } from './md-block-rule/image-block';
 import {setCounterSection} from './md-inline-rule/setcounter-section';
@@ -53,6 +54,7 @@ import { html_inline_full_tag } from "./md-inline-rule/html_inline_full_tag";
 import { inlineMmdIcon } from "./md-inline-rule/mmd-icon";
 import { inlineDiagbox } from "./md-inline-rule/diagbox-inline";
 import { renderDiagbox, renderDiagBoxItem } from "./md-renderer-rules/render-diagbox";
+import { listDepthBetween, closersLeftAfter, maskNonStructure } from "./md-latex-lists-env/list-source-model";
 const isSpace = require('markdown-it/lib/common/utils').isSpace;
 
 const getMathEnvironment = (str: string): string => {
@@ -200,16 +202,9 @@ export const multiMath: RuleInline = (state, silent) => {
   return true;
 }
 
-export const findEndMarkerPos = (str: string, endMarker: string, i: number): number => {
-  let index: number;
-  index = str.indexOf(endMarker, i);
-  if (index > 0) {
-    if (str.charCodeAt(index-1) === 0x5c /* \ */) {
-      index = findEndMarkerPos(str, endMarker, index+1)
-    }
-  }
-  return index;
-};
+// Lives in common/ so `common/math-spans` can read it without importing this plugin, which would put a
+// cycle in the module graph. Re-exported here for the callers and deep imports that had it.
+export { findEndMarkerPos };
 
 export const simpleMath: RuleInline = (state, silent) => {
   let pos, afterStartMarker,
@@ -579,6 +574,22 @@ function paragraphDiv(state, startLine/*, endLine*/) {
   }
 
   let listOpen = false;
+  const paragraphStart: number = state.bMarks[startLine] + state.tShift[startLine];
+  // Cleared on entry, once per paragraph: the per-line clear below is what neighbouring lines need, and
+  // this is what a paragraph never reached by it starts from.
+  state.listParagraphStart = undefined;
+  // Only a paragraph holding an opener written mid-line can carry an env the block phase would split, and
+  // only it pays the model a question per line: block-rule calls are super-linear without blank lines.
+  const hasMidLineOpener = (text: string): boolean => {
+    const found: RegExpExecArray | null = BEGIN_LIST_ENV_INLINE_RE.exec(text);
+    if (!found || found.index === 0) {
+      return false;
+    }
+    // Masked only after a raw match, so the cost lands on the rare line: an opener in code opens nothing.
+    const masked: RegExpExecArray | null = BEGIN_LIST_ENV_INLINE_RE.exec(maskNonStructure(text));
+    return !!masked && masked.index > 0;
+  };
+  let midLineOpenerSeen: boolean = hasMidLineOpener(lineText);
   let isMath = false;
   let mathEndTag: RegExp | null = null;
   let terminatedLine: number = -1;
@@ -630,7 +641,15 @@ function paragraphDiv(state, startLine/*, endLine*/) {
     max = state.eMarks[nextLine];
     lineText = state.src.slice(pos, max);
 
-    if (listStartTag.test(prewLineText)) {
+    midLineOpenerSeen = midLineOpenerSeen || hasMidLineOpener(prewLineText);
+    if (midLineOpenerSeen) {
+      // Asked of the list model by offset: an opener written mid-line read as closed here, and the break
+      // below then cut the paragraph in half of its env. Only an env the source can still close holds the
+      // paragraph — one whose closer sits in a fence renders as a block below instead.
+      const listDepth: number = listDepthBetween(state, paragraphStart, state.bMarks[nextLine]);
+      listOpen = listDepth > 0
+        && closersLeftAfter(state, state.bMarks[nextLine]) >= listDepth;
+    } else if (listStartTag.test(prewLineText)) {
       listOpen = true;
     }
 
@@ -673,6 +692,11 @@ function paragraphDiv(state, startLine/*, endLine*/) {
     if (state.sCount[nextLine] < 0) { continue; }
     // Some tags can terminate paragraph without empty line.
     terminate = false;
+    // A list env opened above is unfinished: the list rule reads it from the paragraph's own content, so
+    // it must not end the paragraph here. Set for these calls only — left behind, a footnote scan asking
+    // the same rule on the same state read it and declined a list of its own. No `finally`: the field
+    // lives on this render's state, and a terminator that throws ends the render along with it.
+    state.listParagraphStart = midLineOpenerSeen && listOpen ? paragraphStart : undefined;
     for (i = 0, l = terminatorRules.length; i < l; i++) {
       if (terminatorRules[i](state, nextLine, endLine, true)) {
         if (terminatedLine === -1) {
@@ -682,6 +706,7 @@ function paragraphDiv(state, startLine/*, endLine*/) {
         }
       }
     }
+    state.listParagraphStart = undefined;
     if (!isMath && !isMathOpen) {
       if (terminate) { break; }
     }

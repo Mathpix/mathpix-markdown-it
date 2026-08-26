@@ -28,6 +28,7 @@ export interface ItemizeLevelTokenResult {
     tokens: Token[][];
     contents: string[];
 }
+export declare const clearMarkerTokens: (env: any) => void;
 /**
  * Parse bullet tokens for all itemize levels.
  */
@@ -53,6 +54,7 @@ export declare const ChangeLevel: (state: StateBlock | StateInline, data: {
     params?: string;
 }) => boolean;
 /**
- * Clears stored itemize level token cache.
+ * Clears stored itemize level token cache. The definitions survive by design: set once per md
+ * instance, so a chunked host keeps a \renewcommand from an earlier chunk.
  */
 export declare const clearItemizeLevelTokens: () => void;

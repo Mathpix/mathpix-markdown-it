@@ -1,6 +1,7 @@
 import { generateUniqueId, getContent } from './common';
-import {findEndMarkerPos} from "../../mdPluginRaw";
+import {findEndMarkerPos} from "../../common";
 import { beginTag, endTag, findOpenCloseTagsMathEnvironment } from "../../utils";
+import { RE_MATH_OPEN_G, getEndMarker, shouldSkipDollar } from "../../common/math-spans";
 import { addExtractedCodeBlock } from "./sub-code";
 import {
   LATEX_BLOCK_ENV,
@@ -8,11 +9,8 @@ import {
   singleCurlyBracketPattern
 } from "../../common/consts";
 
-const RE_MATH_OPEN = /\\\\\[|\\\[|\\\\\(|\\\(|\$\$|\$|\\begin\{([^}]*)\}|eqref\{([^}]*)\}|ref\{([^}]*)\}/;
-
-// Shared `/g`-flag scanner reused across calls — getSubMath is not reentrant
-// (no recursion, no callbacks out), so we just reset lastIndex on entry.
-const RE_MATH_OPEN_G = new RegExp(RE_MATH_OPEN.source, 'g');
+// Openers, end markers and the `$` guards come from common/math-spans: the list guard reads the same
+// ones, and a second copy is what makes two readers of one construct disagree.
 
 const mathTable: Map<string, string> = new Map();
 
@@ -57,48 +55,6 @@ export const getMathTableContent = (sub: string, i: number): string => {
   }
   parts.push(sub.slice(lastIdx));
   return getContent(parts.join(''));
-};
-
-/**
- * Returns the end marker for a matched opening marker.
- * - string: end marker to search for (e.g. "\\]", "$")
- * - null: self-closing match (eqref/ref) — no end marker needed, content = match itself
- * - undefined: \begin{env} — caller must resolve via balanced tag search
- */
-const getEndMarker = (
-  matchStr: string, envGroup: string | undefined,
-  eqrefGroup: string | undefined, refGroup: string | undefined,
-): string | null | undefined => {
-  if (matchStr === "\\\\[") return "\\\\]";
-  if (matchStr === "\\[") return "\\]";
-  if (matchStr === "\\\\(") return "\\\\)";
-  if (matchStr === "\\(") return "\\)";
-  if (eqrefGroup !== undefined || refGroup !== undefined) return null;
-  if (matchStr === "$$") return "$$";
-  if (matchStr === "$") return "$";
-  return undefined;
-};
-
-const shouldSkipDollar = (
-  str: string, marker: string, beginMarkerPos: number, endMarkerPos: number
-): boolean => {
-  const beforeEnd = str.charCodeAt(endMarkerPos - 1);
-  if (beforeEnd === 0x5c ||
-    (beginMarkerPos > 0 && str.charCodeAt(beginMarkerPos - 1) === 0x5c)) {
-    return true;
-  }
-  if (marker === "$") {
-    const afterStart = str.charCodeAt(beginMarkerPos + 1);
-    if (beforeEnd === 0x20 || beforeEnd === 0x09 || beforeEnd === 0x0a ||
-      afterStart === 0x20 || afterStart === 0x09 || afterStart === 0x0a) {
-      return true;
-    }
-  }
-  const suffix = str.charCodeAt(endMarkerPos + 1);
-  if (suffix >= 0x30 && suffix < 0x3a) {
-    return true;
-  }
-  return false;
 };
 
 /**

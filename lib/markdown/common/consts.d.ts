@@ -51,6 +51,8 @@ export declare const reOpenTagFootnotetextNumbered: RegExp;
 export declare const reFootNoteMark: RegExp;
 export declare const reFootNoteText: RegExp;
 export declare const reDiagboxG: RegExp;
+/** Anchored: the inline rule asks whether one starts at its position. Unanchored it took a later one and
+ *  ate the text between. */
 export declare const reDiagbox: RegExp;
 export declare const reNumber: RegExp;
 export declare const svgRegex: RegExp;
@@ -64,6 +66,9 @@ export declare const singleCurlyBracketPattern: RegExp;
 export declare const preserveNewlineUnlessDoubleAngleUuidRegex: RegExp;
 export declare const ANGLE_BRACKETS_RE: RegExp;
 export declare const attrsSharedMarker: symbol;
+export declare const LIST_OPEN_TOKEN_TYPES: ReadonlySet<string>;
+export declare const LIST_CLOSE_TOKEN_TYPES: ReadonlySet<string>;
+export declare const LIST_STRUCTURE_TOKEN_TYPES: ReadonlySet<string>;
 export declare const RE_TAG_WITH_HLINE: RegExp;
 export declare const RE_TAG_WITH_HHLINE: RegExp;
 export declare const RE_TAG_WITH_HDASHLINE: RegExp;
@@ -102,12 +107,31 @@ export declare const BEGIN_LIST_ENV_RE: RegExp;
 export declare const BEGIN_LIST_ENV_INLINE_RE: RegExp;
 /** Matches \end{itemize} or \end{enumerate} */
 export declare const END_LIST_ENV_INLINE_RE: RegExp;
+/** A chunk that is nothing but end-of-list commands: dropped, since no item can hold it. Anchored, so a
+ *  line holding a closer beside real content is kept — asked as "contains one", it was dropped whole. */
+export declare const ONLY_LIST_CLOSERS_RE: RegExp;
 export declare const END_LIST_ENV_RE: RegExp;
-/** Matches \item or \item[optional] */
+/** The marker with its payload, for masking: a command written there is text, not structure. */
+export declare const LATEX_ITEM_MARKER_G: RegExp;
 export declare const LATEX_ITEM_COMMAND_RE: RegExp;
 export declare const LATEX_ITEM_COMMAND_INLINE_RE: RegExp;
+/** A fresh sticky instance per caller: `lastIndex` is state, and sharing it across callers leaks. */
+export declare const makeItemCommandSticky: () => RegExp;
 export declare const LATEX_LIST_BOUNDARY_INLINE_RE: RegExp;
-/** Matches \begin{center}, \begin{left}, \begin{right}, \begin{table}, \begin{figure}, \begin{tabular}, \begin{lstlisting} */
+/** A line that is only `\renewcommand`: its own rule consumes it, so it renders to nothing. */
+export declare const RENEWCOMMAND_LINE_RE: RegExp;
+/** The same, asked at an offset. Blanks only: `\s` would reach a command one line down.
+ *  Sticky, so it carries a lastIndex — set it before every `exec`. */
+export declare const RENEWCOMMAND_STICKY_RE: RegExp;
+/** Where a chunk splits into items, for `search`: a real `\item`, so `\itemsep` is not a split point.
+ *  Must answer like ITEM_COMMAND_SOURCE — pinned by a property test. */
+export declare const LATEX_ITEM_SPLIT_RE: RegExp;
+/** Commands whose `{...}` argument this package parses — and only they take a brace group as one:
+ *  Markdown keeps braces in prose, so `{a}` and an unsupported `\foo{a}` are text. Add a name when its
+ *  argument starts being read: a name here can shield an `\end{itemize}` inside it, a missing one cannot. */
+export declare const LATEX_BRACE_ARG_COMMANDS: readonly string[];
+/** Block envs the list scanner knows; the regex below is built from it, so the two cannot drift. */
+export declare const LATEX_BLOCK_ENV_NAMES: readonly string[];
 export declare const LATEX_BLOCK_ENV_OPEN_RE: RegExp;
 export declare const BLOCK_LATEX_RE: RegExp;
 /**
@@ -219,6 +243,12 @@ export declare const terminatedRules: {
     };
 };
 export declare const mathTokenTypes: string[];
+export declare const DEFAULT_FONT_SIZE_PX = 16;
+export declare const DEFAULT_EX_PX = 8.296875;
+export declare const EX_TO_EM: number;
+export declare const MARKER_GAP_EM = 0.625;
+export declare const LIST_DEFAULT_INDENT_EM = 2.5;
+export declare const LIST_MAX_INDENT_EM = 20;
 export declare const codeHighlightDef: {
     auto: boolean;
     code: boolean;

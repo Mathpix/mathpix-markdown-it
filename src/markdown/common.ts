@@ -3,12 +3,17 @@ import {
   RE_CAPTION_SETUP_TAG_BEGIN,
   RE_CAPTION_TAG_BEGIN,
   RE_EMPTY_TEXT,
+  RENEWCOMMAND_STICKY_RE,
   terminatedRules
 } from './common/consts';
 
 const hasProp = Object.prototype.hasOwnProperty;
 
 export const tocRegexp = /^\[\[toc\]\]/im;
+
+// A control word's name: ASCII letters only, as TeX reads it.
+export const isAsciiLetter = (code: number): boolean =>
+  (code >= 0x41 && code <= 0x5A) || (code >= 0x61 && code <= 0x7A);
 
 export const isSpace = (code) => {
     switch (code) {
@@ -20,6 +25,17 @@ export const isSpace = (code) => {
 }
 
 export const isWhitespace = (s: string) => s == null || RE_EMPTY_TEXT.test(s);
+
+/** Position of the next `endMarker` at or after `i` that is not escaped by a `\`, or -1. */
+// Iterative: one frame per escaped marker overflowed the stack on a long run of them. Unlike
+// findEndMarker below it does not check escape parity, so `$a \\$` reads as unclosed — as it always did.
+export const findEndMarkerPos = (str: string, endMarker: string, i: number): number => {
+  let index: number = str.indexOf(endMarker, i);
+  while (index > 0 && str.charCodeAt(index - 1) === 0x5c /* \ */) {
+    index = str.indexOf(endMarker, index + 1);
+  }
+  return index;
+};
 export const slugify = (s: string) => encodeURIComponent(String(s).trim().toLowerCase().replace(/\s+/g, '-'));
 
 export const uniqueSlug = (slug: string, slugs) => {
@@ -111,25 +127,30 @@ export const getInlineCodeListFromString = (str): Array<InlineCodeItem> => {
  * The function returns an object containing the information:
  *     res: boolean, - Contains false if the end marker could not be found
  *     content?: string, - Contains content between start and end markers
- *     nextPos?: number - Contains the position of the end marker in the string
+ *     nextPos?: number - Contains the position just past the end marker (`endPos` is the marker itself)
  * */
-export const findEndMarker = (str: string, startPos: number = 0, beginMarker: string = "{", endMarker: string = "}", onlyEnd = false, openBracketsBefore = 0) => {
+export const findEndMarker = (str: string, startPos: number = 0, beginMarker: string = "{", endMarker: string = "}", onlyEnd = false, openBracketsBefore = 0, inlineCodePositions?: Set<number>) => {
   let content: string = '';
   let nextPos: number = 0;
-  if (!str || !str.trim()) {
+  // Blank check without `trim()`: it copies the whole string, and a caller pairing many markers pays it per call.
+  if (!str || isWhitespace(str)) {
     return { res: false }
   }
   if (str[startPos] !== beginMarker && !onlyEnd) {
     return { res: false }
   }
   let openBrackets = openBracketsBefore ? openBracketsBefore : 1;
-  let beforeCharCode: number = 0;
-  const inlineCodeList: Array<InlineCodeItem> = getInlineCodeListFromString(str);
-  const codePositions: Set<number> = buildInlineCodePositionSet(inlineCodeList);
+  // Shielded by an odd run of backslashes: `\}` is text, `\\}` closes. One `\` back lost `\caption{x \\}`.
+  let isShielded: boolean = false;
+  // Passed in by a caller pairing many markers in one string: this scan costs as much as the search.
+  const codePositions: Set<number> = inlineCodePositions
+    ?? buildInlineCodePositionSet(getInlineCodeListFromString(str));
   for (let i = startPos + 1; i < str.length; i++) {
     const chr = str[i];
     nextPos = i;
-    if (chr === beginMarker && beforeCharCode !== 0x5c /* \ */) {
+    const shielded: boolean = isShielded;
+    isShielded = chr === '\\' && !isShielded;
+    if (chr === beginMarker && !shielded) {
       content += chr;
       if (!codePositions.has(i)) {
         openBrackets++;
@@ -137,7 +158,7 @@ export const findEndMarker = (str: string, startPos: number = 0, beginMarker: st
       continue;
     }
     /** Found endMarker and it is not inline code (and it's not shielded '\}' ) */
-    if (chr === endMarker && beforeCharCode !== 0x5c /* \ */) {
+    if (chr === endMarker && !shielded) {
       if (!codePositions.has(i)) {
         openBrackets--;
       }
@@ -149,7 +170,6 @@ export const findEndMarker = (str: string, startPos: number = 0, beginMarker: st
       break;
     }
     content += chr;
-    beforeCharCode = str.charCodeAt(i);
   }
   if (openBrackets > 0) {
     return {
@@ -164,6 +184,108 @@ export const findEndMarker = (str: string, startPos: number = 0, beginMarker: st
     nextPos: nextPos + endMarker.length,
     endPos: nextPos
   };
+};
+
+/** Offset past a `[...]` option at `at`, `at` itself when there is none, -1 when it does not close.
+ *  One reader for all three places that skip one: their own versions disagreed on `]` in a code span,
+ *  on `\]`, on `[[m]]` and on a `]` one line down — the last of which `sameLine` still decides. */
+export const skipOptionalArg = (
+  text: string,
+  at: number,
+  sameLine: boolean,
+  codePositions?: Set<number>
+): number => {
+  if (text[at] !== '[') {
+    return at;
+  }
+  if (sameLine) {
+    // No `]` on the line: pairing can only fail, and it walked the whole document per `[` to say so.
+    const lineEnd: number = text.indexOf('\n', at);
+    const close: number = text.indexOf(']', at);
+    if (close < 0 || (lineEnd >= 0 && close > lineEnd)) {
+      return -1;
+    }
+  }
+  const found = findEndMarker(text, at, '[', ']', false, 0, codePositions) as
+    { res: boolean; nextPos?: number };
+  if (!found.res || typeof found.nextPos !== 'number') {
+    return -1;
+  }
+  if (sameLine) {
+    const lineEnd: number = text.indexOf('\n', at);
+    if (lineEnd >= 0 && found.nextPos > lineEnd) {
+      return -1;
+    }
+  }
+  return found.nextPos;
+};
+
+/** Offset past `\renewcommand{\name}{body}` — also the starred form, `[n]` and `[n][default]`, and a
+ *  bare `\name` as the first argument — or -1 when the arguments do not close in `text`. Braces are
+ *  paired, so a closer or an `\item` in the body is part of the command, not structure.
+ *  Answers at `from`, absolute: a slice per command made reading a line of them quadratic. */
+export const renewCommandSpanEnd = (
+  text: string, from: number = 0, codeIndex?: Set<number>
+): number => {
+  RENEWCOMMAND_STICKY_RE.lastIndex = from;
+  const match: RegExpExecArray | null = RENEWCOMMAND_STICKY_RE.exec(text);
+  // Left hot, a shared regex is one missing assignment away from starting mid-string.
+  RENEWCOMMAND_STICKY_RE.lastIndex = 0;
+  if (!match) {
+    return -1;
+  }
+  let pos: number = from + match[0].length;
+  // Once for up to four pairings, and only if one happens: each `findEndMarker` rebuilt the index over
+  // the whole string, and a command with no argument to pair must not pay for it at all.
+  // A caller reading several commands of one string hands its index in, or each paid for the whole.
+  let codeSpans: Set<number> | null = codeIndex ?? null;
+  const codePositions = (): Set<number> => {
+    if (!codeSpans) {
+      codeSpans = buildInlineCodePositionSet(getInlineCodeListFromString(text));
+    }
+    return codeSpans;
+  };
+  const skipSpaces = (): void => {
+    while (pos < text.length && (text[pos] === ' ' || text[pos] === '\t')) {
+      pos++;
+    }
+  };
+  // `\renewcommand *{\x}{y}`: TeX skips spaces after a control word, so the star may sit past one.
+  skipSpaces();
+  if (text[pos] === '*') {
+    pos++;
+  }
+  for (let arg = 0; arg < 2; arg++) {
+    skipSpaces();
+    // `\renewcommand{\x}[1][d]{#1}`: LaTeX allows two optional arguments here, not one.
+    while (arg === 1 && text[pos] === '[') {
+      const past: number = skipOptionalArg(text, pos, false, codePositions());
+      if (past < 0) {
+        return -1;
+      }
+      pos = past;
+      skipSpaces();
+    }
+    if (text[pos] === '{') {
+      const paired = findEndMarker(text, pos, '{', '}', false, 0, codePositions()) as
+        { res: boolean; nextPos?: number };
+      if (!paired.res || typeof paired.nextPos !== 'number') {
+        return -1;
+      }
+      pos = paired.nextPos;
+      continue;
+    }
+    // `\renewcommand\labelitemii{Q}`: the first argument may be a bare command name.
+    if (arg === 0 && text[pos] === '\\') {
+      pos++;
+      while (pos < text.length && isAsciiLetter(text.charCodeAt(pos))) {
+        pos++;
+      }
+      continue;
+    }
+    return -1;
+  }
+  return pos;
 };
 
 export const getTerminatedRules = (rule: string) => {

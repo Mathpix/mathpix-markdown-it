@@ -4,6 +4,11 @@ import { resetTextCounter } from './mdPluginText';
 import { resetTheoremEnvironments } from './md-theorem/helper';
 import { rest_mmd_footnotes_list } from './md-latex-footnotes/utils';
 import { resetMmdGlobalState } from './common/reset-mmd-state';
+import { resetListRenderDepth } from './md-latex-lists-env/render-latex-list-env';
+import { clearMarkerTokens } from './md-latex-lists-env/re-level';
+import { resetWarnDistinct } from './common/warn-distinct';
+import { resetEnvSnapshotPool } from './common/env-transient';
+import { clearSrcPosCaches } from './common/src-pos-cache';
 
 import {
   mdPluginMathJax,
@@ -22,6 +27,11 @@ import { validateLinkEnableFile } from "./mdOptions";
 import { injectLabelIdToParagraph } from "./rules";
 import { eMmdRuleType } from "./common/mmdRules";
 import { getDisableRuleTypes } from "./common/mmdRulesToDisable";
+
+// Asked because markdown-it accepts a duplicate name: the hooks below would fire twice. `__find__` is
+// private, but `at`/`before` call it themselves, so a fallback reading `__rules__` could not help.
+const coreRuleExists = (ruler: any, name: string): boolean =>
+  typeof ruler?.__find__ === 'function' && ruler.__find__(name) >= 0;
 
 export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
   const {width = 1200,  outMath = {}, smiles = {}, mathJax = {}, renderElement = {},
@@ -92,6 +102,12 @@ export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
   // Per-parse reset of sub-plugins' module-level state. Skipped for partial
   // re-renders so cross-refs survive.
   const resetHook = (state) => {
+    // Before the partial check: both are per-render, and a drifted list depth would outlive it.
+    resetWarnDistinct();
+    resetListRenderDepth();
+    resetEnvSnapshotPool();
+    clearSrcPosCaches(state.env);
+    clearMarkerTokens(state.env);
     const isPartial = state.md.options.renderElement
       && Object.prototype.hasOwnProperty.call(state.md.options.renderElement, 'startLine');
     if (isPartial) {
@@ -99,12 +115,23 @@ export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
     }
     resetMmdGlobalState();
   };
-  const hasGlobalHook = typeof md.core.ruler.__find__ === 'function'
-    && md.core.ruler.__find__('reset_mmd_global_state') >= 0;
-  if (hasGlobalHook) {
+  if (coreRuleExists(md.core.ruler, 'reset_mmd_global_state')) {
     md.core.ruler.at('reset_mmd_global_state', resetHook);
   } else {
     md.core.ruler.before('normalize', 'reset_mmd_global_state', resetHook);
+  }
+  // Every reader of these caches is a block or inline rule, so they are dead once the chain ends — a
+  // consumer's `env` kept a document's offset arrays until the next render otherwise (~260 KB on 29 KB).
+  const releaseHook = (state) => {
+    clearSrcPosCaches(state.env);
+    clearMarkerTokens(state.env);
+  };
+  if (coreRuleExists(md.core.ruler, 'release_mmd_src_caches')) {
+    md.core.ruler.at('release_mmd_src_caches', releaseHook);
+  } else {
+    // At the end of the chain as it stands: a core rule a consumer adds after this plugin runs later and
+    // would find the buckets emptied. Every reader today is a block or inline rule, so none does.
+    md.core.ruler.push('release_mmd_src_caches', releaseHook);
   }
   if ( forDocx ) {
     md.use(mdPluginSvgToBase64);

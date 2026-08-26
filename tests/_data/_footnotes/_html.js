@@ -52,7 +52,7 @@ const htmlContent = '<div>First <sup class="footnote-ref"><a href="#fn1" id="fnr
   '<span class="section-number">1.</span><span class="sub_section-number">1.1.</span>  Subsubsection <br>\n' +
   'multiline <sup class="footnote-ref"><a href="#fn5" id="fnref5">[5]</a></sup> </h4>\n' +
   '<div>Change the <sup class="footnote-ref"><a href="#fn6" id="fnref6">[6]</a></sup> labels using <code>\\item[label text]</code> in an <code>itemize</code> environment</div>\n' +
-  '<ul data-padding-inline-start="56" class="itemize" style="padding-inline-start: 56px; list-style-type: none">' +
+  '<ul data-padding-inline-start="4.23em" class="itemize" style="padding-inline-start: 4.23em; list-style-type: none">' +
     '<li class="li_itemize">' +
       '<span class="li_level">•</span>' +
       'This is my first point' +
@@ -87,7 +87,7 @@ const htmlContent = '<div>First <sup class="footnote-ref"><a href="#fn1" id="fnr
     '</li>' +
   '</ul>' +
   '<div><sup class="footnote-ref"><a href="#fn7" id="fnref7">[7]</a></sup>Change the labels using <code>\\item[label text]</code> in an <code>enumerate</code> environment</div>\n' +
-  '<ol data-padding-inline-start="56" class="enumerate decimal" style="padding-inline-start: 56px; list-style-type: decimal">' +
+  '<ol data-padding-inline-start="4.23em" class="enumerate decimal" style="padding-inline-start: 4.23em; list-style-type: decimal">' +
     '<li class="li_enumerate">' +
       'This is my first point' +
     '</li>' +
@@ -202,7 +202,7 @@ const htmlContentFootnote_compact_refs = '<div>First <sup class="footnote-ref"><
   '<span class="section-number">1.</span><span class="sub_section-number">1.1.</span>  Subsubsection <br>\n' +
   'multiline <sup class="footnote-ref"><a href="#fn5" id="fnref5">[5]</a></sup> </h4>\n' +
   '<div>Change the <sup class="footnote-ref"><a href="#fn6" id="fnref6">[6]</a></sup> labels using <code>\\item[label text]</code> in an <code>itemize</code> environment</div>\n' +
-  '<ul data-padding-inline-start="56" class="itemize" style="padding-inline-start: 56px; list-style-type: none">' +
+  '<ul data-padding-inline-start="4.23em" class="itemize" style="padding-inline-start: 4.23em; list-style-type: none">' +
     '<li class="li_itemize">' +
       '<span class="li_level">•</span>' +
       'This is my first point' +
@@ -237,7 +237,7 @@ const htmlContentFootnote_compact_refs = '<div>First <sup class="footnote-ref"><
     '</li>' +
   '</ul>' +
   '<div><sup class="footnote-ref"><a href="#fn7" id="fnref7">[7]</a></sup>Change the labels using <code>\\item[label text]</code> in an <code>enumerate</code> environment</div>\n' +
-  '<ol data-padding-inline-start="56" class="enumerate decimal" style="padding-inline-start: 56px; list-style-type: decimal">' +
+  '<ol data-padding-inline-start="4.23em" class="enumerate decimal" style="padding-inline-start: 4.23em; list-style-type: decimal">' +
     '<li class="li_enumerate">' +
       'This is my first point' +
     '</li>' +
