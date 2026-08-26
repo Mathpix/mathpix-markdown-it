@@ -48,3 +48,10 @@ export declare const restoreListLevels: (snapshot: readonly ListLevelState[]) =>
 export declare const isParsingMarker: () => boolean;
 export declare const beginMarkerParse: () => void;
 export declare const endMarkerParse: () => void;
+export declare const setListInlineSrc: (env: any, src: string | null) => string | null;
+/** Is this parse the list's own, rather than a command argument nested inside it? A closer written in
+ *  `\footnote{…}` took the list's level from in there, leaving the real closer none to write. */
+export declare const isListOwnParse: (state: {
+    src: string;
+    env: any;
+}) => boolean;

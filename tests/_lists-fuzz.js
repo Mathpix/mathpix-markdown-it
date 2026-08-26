@@ -2,6 +2,10 @@ const chai = require('chai');
 chai.should();
 
 const MM = require('../lib/mathpix-markdown-model/index').MathpixMarkdownModel;
+const markdownIt = require('markdown-it');
+const { mathpixMarkdownPlugin } = require('../lib/index.js');
+const LIST_OPEN = new Set(['itemize_list_open', 'enumerate_list_open']);
+const LIST_CLOSE = new Set(['itemize_list_close', 'enumerate_list_close']);
 const { JSDOM } = require('jsdom');
 const jsdom = new JSDOM('<body><div id="host"></div></body>');
 global.window = jsdom.window;
@@ -41,6 +45,11 @@ const FRAGMENTS = [
   '\\renewcommand{\\x}{oops', '\\renewcommand{\\x}[1{#1}',
   '\\item[\\begin{itemize}]', '\\item[\\item]',
   '`x` \\begin{itemize} `y`', '`\\begin{itemize}` \\end{itemize}', '`p` \\end{itemize} `q`',
+  // Arguments re-parsed by their own rule: a closer in there took the list's level from inside the
+  // nested parse, which `\caption` above cannot reach — its rule eats the argument first.
+  '\\footnote{f \\end{itemize} g}', '\\footnotetext{f \\end{itemize} g}',
+  '\\footnote{\\begin{itemize}\\item n\\end{itemize}}', '\\text{f \\end{itemize} g}',
+  '\\textbf{f \\end{enumerate} g}', '\\footnote{note}',
 ];
 const SEPARATORS = ['\n', '\n', ' ', ''];
 const OPTIONS = {
@@ -138,9 +147,40 @@ const violations = (html) => {
 
 // Open shapes, each pinned in `_data/_lists/_data_known_quirks.js` with what it renders and why.
 // Listed by source, so any other document violating an invariant still fails.
-const KNOWN = new Set([
-  "\\begin{figure} \\begin{itemize}\n\\renewcommand{\\labelitemi}{\\begin{itemize}}\\renewcommand{\\labelitemi}{\\begin{itemize}}\n\\caption{c\n\\renewcommand*{\\x}{\\end{itemize}} \\end{itemize}",
-]);
+// Empty: the one entry left when the command-argument fragments joined the alphabet — measured, that
+// shape now balances on its own, so the exclusion went away rather than going quiet.
+const KNOWN = new Set([]);
+
+// The stream, not the HTML: a closer taken inside a nested parse leaves the open token unpaired, and
+// a consumer walking tokens sees it before any tag does. Own level only — a list built inside a
+// command's argument is that argument's, and its pair sits in the children.
+const tokenViolations = (src, options) => {
+  const md = markdownIt({ html: true }).use(mathpixMarkdownPlugin, options);
+  let depth = 0;
+  let crossed = '';
+  const stack = [];
+  md.parse(src, {}).forEach((token) => {
+    if (LIST_OPEN.has(token.type)) {
+      depth++;
+      stack.push(token.type.split('_')[0]);
+    } else if (LIST_CLOSE.has(token.type)) {
+      depth--;
+      const open = stack.pop();
+      const name = token.type.split('_')[0];
+      if (open !== name && !crossed) {
+        crossed = name + ' closes ' + (open || 'nothing');
+      }
+    }
+  });
+  const bad = [];
+  if (depth !== 0) {
+    bad.push('unbalanced list tokens: depth ' + depth);
+  }
+  if (crossed) {
+    bad.push('crossed list tokens: ' + crossed);
+  }
+  return bad;
+};
 
 describe('seeded fuzz over list shapes:', () => {
   const docs = documents();
@@ -164,6 +204,7 @@ describe('seeded fuzz over list shapes:', () => {
           let bad;
           try {
             bad = violations(MM.markdownToHTML(src, OPTIONS[mode]));
+            bad = bad.concat(tokenViolations(src, OPTIONS[mode]));
           } catch (e) {
             bad = ['threw ' + e.name + ': ' + e.message];
           }

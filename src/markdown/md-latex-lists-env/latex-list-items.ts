@@ -17,7 +17,7 @@ import {
   LATEX_ITEM_SPLIT_RE,
   LATEX_BLOCK_ENV_OPEN_RE,
 } from "../common/consts";
-import { getCurrentListLevelState } from "./list-state";
+import { getCurrentListLevelState, setListInlineSrc } from "./list-state";
 import { maskNonStructure } from "./list-source-model";
 import { ListItemsResult, ParsedListItem, ListInlineContext } from "./latex-list-types";
 
@@ -101,7 +101,13 @@ export const ListItems = (
     // Parse inline children
     let inlineChildren = [];
     const chunkFrom: number = state.tokens.length;
-    state.md.inline.parse(listItem.content.trim(), state.md, state.env, inlineChildren);
+    const chunk: string = listItem.content.trim();
+    const outerSrc: string | null = setListInlineSrc(state.env, chunk);
+    try {
+      state.md.inline.parse(chunk, state.md, state.env, inlineChildren);
+    } finally {
+      setListInlineSrc(state.env, outerSrc);
+    }
     // Context shared across child token processing
     const ctx: ListInlineContext = { li, iOpen, itemizeLevelTokens, enumerateLevelTypes, itemizeLevelContents, openTokens, allListTokens };
     // Process each inline child token

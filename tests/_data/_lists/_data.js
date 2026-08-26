@@ -2816,6 +2816,37 @@ module.exports = [
     html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\"> FFF</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>Z</li></ul>"
   },
   {
+    name: "a closer in a \\footnote argument does not close the list",
+    latex: "\\begin{itemize} \\footnote{f \\end{itemize} g}\n\\item a\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\"> <sup class=\"footnote-ref\"><a href=\"#fn1\" id=\"fnref1\">[1]</a></sup></li><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul>"
+  },
+  {
+    // The footnote itself builds no section from this position — as on 3.0.1, and not what this pins.
+    name: "a closer in a \\footnotetext argument does not close the list, section or not",
+    latex: "\\begin{itemize} \\footnotetext{f \\end{itemize} g}\n\\item a\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\"> </li><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul>"
+  },
+  {
+    name: "a closer in a \\text argument does not close the list",
+    latex: "\\begin{itemize} \\text{f \\end{itemize} g}\n\\item a\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\"> f \\end{itemize} g</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul>"
+  },
+  {
+    name: "a closer in a \\textbf argument does not close the list",
+    latex: "\\begin{itemize} \\textbf{f \\end{itemize} g}\n\\item a\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\"> <strong>f \\end{itemize} g</strong></li><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul>"
+  },
+  {
+    name: "a closer in a \\footnote argument, enumerate",
+    latex: "\\begin{enumerate} \\footnote{f \\end{enumerate} g}\n\\item a\n\\end{enumerate}",
+    html: "<ol class=\"enumerate decimal\" style=\"list-style-type: decimal\"><li class=\"li_enumerate not_number\" data-custom-marker=\"true\" data-marker-empty=\"true\" style=\"display: block\"> <sup class=\"footnote-ref\"><a href=\"#fn1\" id=\"fnref1\">[1]</a></sup></li><li class=\"li_enumerate\">a</li></ol>"
+  },
+  {
+    name: "a list written in a \\footnotetext argument on its own lines still renders",
+    latex: "\\begin{itemize}\n\\item 1\n\\footnotetext{\n\\begin{itemize}\n\\item 2 f\n\\end{itemize} g\n}\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>1<br>\n\\footnotetext{<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">–</span>2 f</li></ul>g<br>\n}</li></ul>"
+  },
+  {
     name: "a \\renewcommand with no body keeps the line below",
     latex: "\\begin{itemize}\n\\renewcommand{\\x}\nplain\n\\item Z\n\\end{itemize}",
     html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\"><br>\nplain</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>Z</li></ul>"

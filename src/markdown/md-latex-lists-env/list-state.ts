@@ -113,3 +113,18 @@ export const endMarkerParse = (): void => {
     markerParseDepth--;
   }
 };
+
+/** The source the list itself handed to the inline parser: a command re-parsing its argument shares
+ *  `env`, so only the source tells the two apart. A symbol — a string key shows in `Object.keys`. */
+const LIST_INLINE_SRC: unique symbol = Symbol('mmd.listInlineSrc');
+
+export const setListInlineSrc = (env: any, src: string | null): string | null => {
+  const previous: string | null = env[LIST_INLINE_SRC] ?? null;
+  env[LIST_INLINE_SRC] = src;
+  return previous;
+};
+
+/** Is this parse the list's own, rather than a command argument nested inside it? A closer written in
+ *  `\footnote{…}` took the list's level from in there, leaving the real closer none to write. */
+export const isListOwnParse = (state: { src: string; env: any }): boolean =>
+  state.env[LIST_INLINE_SRC] === state.src;

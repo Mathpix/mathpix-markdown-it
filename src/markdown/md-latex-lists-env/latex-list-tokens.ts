@@ -1,6 +1,6 @@
 import type StateBlock from 'markdown-it/lib/rules_block/state_block';
 import type Token from 'markdown-it/lib/token';
-import { incrementItemCount, beginMarkerParse, endMarkerParse } from "./list-state";
+import { incrementItemCount, beginMarkerParse, endMarkerParse, setListInlineSrc } from "./list-state";
 import {
   ListType,
   ListInlineContext,
@@ -431,7 +431,12 @@ export const ListOpen = (
     state.env.isBlock = true;
     state.env.prentLevel = state.prentLevel;
     state.env.inheritedListType = state.parentType;
-    state.md.inline.parse(strAfter, state.md, state.env, children);
+    const outerSrc: string | null = setListInlineSrc(state.env, strAfter);
+    try {
+      state.md.inline.parse(strAfter, state.md, state.env, children);
+    } finally {
+      setListInlineSrc(state.env, outerSrc);
+    }
     // Context shared across child token processing
     const ctx: ListInlineContext = {
       li,
