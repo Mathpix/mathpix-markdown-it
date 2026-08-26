@@ -50,6 +50,8 @@ const FRAGMENTS = [
   '\\footnote{f \\end{itemize} g}', '\\footnotetext{f \\end{itemize} g}',
   '\\footnote{\\begin{itemize}\\item n\\end{itemize}}', '\\text{f \\end{itemize} g}',
   '\\textbf{f \\end{enumerate} g}', '\\footnote{note}',
+  // Arguments paired against one code index per source, and the rule ends at an absolute offset.
+  '\\diagbox{a}{b}', '\\diagbox{a`}{b}', '\\diagbox{a \\end{itemize}}{b}', '\\diagbox{a',
 ];
 const SEPARATORS = ['\n', '\n', ' ', ''];
 const OPTIONS = {

@@ -56,24 +56,25 @@ export const braceMatches = (
   return closeOf;
 };
 
-/** Past a command name: a star, `[...]` options, a bare name as in `\renewcommand\qedsymbol{Q}`, and the
- *  spaces between when `skipSpace`. Options do not span lines, so a `]` on another line is text. */
+/** Past a command name: a star, `[...]` options, and where `atName` also spaces and a bare name as in
+ *  `\renewcommand\qedsymbol{Q}`. Between arguments there is no such form: skipping one there took
+ *  `\textbf{x}\unknown{q}` as two arguments of `\textbf`. Options do not span lines. */
 const afterCommandOptions = (
   text: string,
   from: number,
-  skipSpace: boolean = true,
+  atName: boolean = true,
   codePositions?: () => Set<number>
 ): number => {
   let at: number = from;
   for (;;) {
-    while (skipSpace && at < text.length && (text[at] === ' ' || text[at] === '\t')) {
+    while (atName && at < text.length && (text[at] === ' ' || text[at] === '\t')) {
       at++;
     }
     if (text[at] === '*') {
       at++;
       continue;
     }
-    if (text[at] === '\\' && isAsciiLetter(text.charCodeAt(at + 1))) {
+    if (atName && text[at] === '\\' && isAsciiLetter(text.charCodeAt(at + 1))) {
       at++;
       while (at < text.length && isAsciiLetter(text.charCodeAt(at))) {
         at++;

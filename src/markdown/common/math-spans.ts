@@ -79,11 +79,12 @@ export const nextMathSpan = (
   from: number,
   mathEnvsOnly = false,
   until: number = str.length,
+  lastEnd?: number,
 ): { start: number; end: number } | null => {
   RE_MATH_SPAN_G.lastIndex = from > 0 ? from : 0;
-  // Every closer starts with `\end`, whatever the env or the spacing inside its braces, so none of them
-  // past here means none for any opener past here either.
-  const lastEndAt: number = str.lastIndexOf('\\end');
+  // Every closer starts with `\end`, so none past here means none for any opener past here. Handed in
+  // because it depends on `str` alone: computed per call, it scanned the whole string for every span.
+  const lastEndAt: number = lastEnd ?? str.lastIndexOf('\\end');
   let match: RegExpExecArray | null;
   while ((match = RE_MATH_SPAN_G.exec(str)) !== null) {
     // Past what the caller asked about: scanning on would walk the whole tail for every block.

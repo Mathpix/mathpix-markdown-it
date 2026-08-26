@@ -501,3 +501,32 @@ describe('Cell-export helpers:', () => {
       { outMath: { table_markdown: { math_as_ascii: true } } }).should.equal('x^(2)');
   });
 });
+
+// Both `\diagbox` readers built the inline-code index over the whole string per argument, twice per
+// command: a line of them with a code span past it was `n^1.85`, 342 ms at 3200 against 31 here. The
+// index is built once per source now, so the bound is a ratio against a plainly linear control.
+describe('a line of \\diagbox with a code span past it scales linearly:', () => {
+  const CONTROL_UNIT = '\\diagbox{a}{b} ';
+  const medianMs = (src) => {
+    MM.markdownToHTML(src, { outMath: { include_svg: false } });      // warm up
+    const samples = [];
+    for (let i = 0; i < 5; i++) {
+      const started = performance.now();
+      MM.markdownToHTML(src, { outMath: { include_svg: false } });
+      samples.push(performance.now() - started);
+    }
+    return Math.max(samples.sort((a, b) => a - b)[2], 0.001);
+  };
+  const growthOf = (build, small, large) => medianMs(build(large)) / medianMs(build(small));
+  // The same units without the code span: with none in the string the index build exits at once, so
+  // this is the axis with the work in it divided by the axis without.
+  const withCode = (n) => CONTROL_UNIT.repeat(n) + ' `c`';
+  const plain = (n) => CONTROL_UNIT.repeat(n);
+  it('grows no faster than the same line without one', function () {
+    this.timeout(60000);
+    // 0.9–1.2 measured, against 5.8–6.3 with the index rebuilt per argument.
+    const relative = [0, 0, 0].map(() => growthOf(withCode, 200, 3200) / growthOf(plain, 200, 3200))
+      .sort((a, b) => a - b)[1];
+    relative.should.be.below(2.5, 'the code span costs more than the units do: ×' + relative.toFixed(2));
+  });
+});

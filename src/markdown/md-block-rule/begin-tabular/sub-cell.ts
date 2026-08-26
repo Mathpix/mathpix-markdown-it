@@ -14,10 +14,18 @@ export const getSubDiagbox = (str: string): string => {
   let result: string = '';
   let lastIndex: number = 0;
   let match;
+  // Once per string, and only if a `\diagbox` turns up: it was rebuilt twice per command.
+  let codeIndex: Set<number> | null = null;
+  const codePositions = (): Set<number> => {
+    if (!codeIndex) {
+      codeIndex = buildInlineCodePositionSet(getInlineCodeListFromString(str));
+    }
+    return codeIndex;
+  };
   while ((match = reDiagboxG.exec(str))) {
     const { index } = match;
-    const [left, newIndex] = extractNextBraceContent(str, index + match[0].length);
-    const [right, endIndex] = extractNextBraceContent(str, newIndex);
+    const [left, newIndex] = extractNextBraceContent(str, index + match[0].length, codePositions());
+    const [right, endIndex] = extractNextBraceContent(str, newIndex, codePositions());
     const fullMatch = `${match[0]}{${left}}{${right}}`;
     let id = diagboxTable.get(fullMatch);
     if (!id) {
@@ -35,11 +43,15 @@ export const getSubDiagbox = (str: string): string => {
 
 // Through the shared matcher, so `\backslashbox{a \\}{b}` pairs by backslash parity like every other
 // argument does: reading one `\` back made the `\\` shield the brace and cost both diagonal cells.
-export const extractNextBraceContent = (str: string, startIndex: number): [string, number] => {
+export const extractNextBraceContent = (
+  str: string, startIndex: number, codeIndex?: Set<number>
+): [string, number] => {
   if (str[startIndex] !== '{') {
     return ['', startIndex];
   }
-  const codePositions: Set<number> = buildInlineCodePositionSet(getInlineCodeListFromString(str));
+  // Handed in by a caller reading several commands of one string: built here it cost the whole string.
+  const codePositions: Set<number> = codeIndex
+    ?? buildInlineCodePositionSet(getInlineCodeListFromString(str));
   const found = findEndMarker(str, startIndex, '{', '}', false, 0, codePositions);
   return found.res ? [found.content, found.nextPos] : ['', startIndex];
 };

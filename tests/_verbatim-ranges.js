@@ -87,6 +87,28 @@ describe('the shared env regexes carry no `g`, so their exec sites need no reset
     });
 });
 
+// A `g` or `y` regex shared between call sites carries `lastIndex` across them: left hot by one render,
+// the next starts mid-string. Every exec site either resets it or is the loop that owns it — asserted
+// over the whole module, so a constant added later is covered without a test of its own.
+describe('no shared regex is left hot by a render', () => {
+  const source = '\\renewcommand{\\labelitemi}{x} tail\n'
+    + '\\begin{itemize}\n\\item a \\caption{q \\end{itemize} w}\n'
+    + '\\begin{tabular}[t]{|l|}\\hline c \\\\ \\hline\\end{tabular}\n'
+    + '\\item[m] b\n\\end{itemize}\n\n\\begin{enumerate}[label=(\\alph*)]\n\\item z\n\\end{enumerate}';
+  const options = { outMath: { include_svg: false } };
+  const hot = () => Object.keys(consts)
+    .filter((name) => consts[name] instanceof RegExp && /[gy]/.test(consts[name].flags))
+    .filter((name) => consts[name].lastIndex !== 0);
+  it('every g/y constant comes back with lastIndex at zero', () => {
+    MM.markdownToHTML(source, options);
+    hot().should.deep.equal([], 'left mid-string, so the next render starts there');
+  });
+  it('the same source renders identically twice in a row', () => {
+    const first = MM.markdownToHTML(source, options);
+    MM.markdownToHTML(source, options).should.equal(first, 'state carried over from the first render');
+  });
+});
+
 // Math is asked for per block, and the scanner reads to EOF when no opener lies ahead — so a document
 // whose tail holds no math was re-read once per paragraph. Growth, not wall clock, is the gate.
 describe('verbatim ranges: a long tail is read once, not once per block', () => {
@@ -138,6 +160,25 @@ describe('verbatim ranges: a long tail is read once, not once per block', () => 
       const large = median(openers(4000));
       (large / Math.max(small, 0.05)).should.be.below(8, `small ${small}ms, large ${large}ms`);
     });
+  // The axis the two above miss, and the commonest input there is: inline `$…$` and nothing else. A
+  // per-call `lastIndexOf('\\end')` scanned the whole string for every span — ×42 over ×8 of input.
+  it('quadrupling the number of inline math spans does not multiply the cost by more than eight',
+    function () {
+      this.retries(2);
+      const spans = (n) => '$x$ text '.repeat(n);
+      const small = median(spans(1000));
+      const large = median(spans(4000));
+      (large / Math.max(small, 0.05)).should.be.below(8, `small ${small}ms, large ${large}ms`);
+    });
+  // The same value read past a closed env, where the second gate does ask for it.
+  it('nor does a run of closed envs before a long tail of prose', function () {
+    this.retries(2);
+    const closed = (n) => '\\begin{equation}x\\end{equation}'.repeat(Math.floor(n / 4))
+      + ' prose'.repeat(n);
+    const small = median(closed(1000));
+    const large = median(closed(4000));
+    (large / Math.max(small, 0.05)).should.be.below(8, `small ${small}ms, large ${large}ms`);
+  });
   it('a `$` before a blank line still opens nothing in the next block', () => {
     const src = 'text $x\n\n\\begin{itemize}\\item a\\end{itemize}\n\ny$ tail';
     isInsideRanges(findVerbatimRanges(src), src.indexOf('\\begin{itemize}'))

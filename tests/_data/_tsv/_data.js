@@ -1662,5 +1662,12 @@ module.exports = [
   {
     latex: '\\begin{tabular}{|l|}\n```\ncode\n``` \\\\\n\\end{tabular}',
     tsv: 'code'
+  },
+  {
+    // The href and what follows it; the label is dropped by decision. 3.0.1 dropped the text after the
+    // link too. Pinned so restoring the label reads as a change of mind.
+    latex: '\\begin{tabular}{ l }\n[Q3 revenue](http://example.com/q3) trailing \\\\\n\\end{tabular}',
+    tsv: 'http://example.com/q3 trailing',
+    html: "<table class=\"tabular\">\n<tbody>\n<tr style=\"border-top: none !important; border-bottom: none !important;\">\n<td style=\"text-align: left; border-left: none !important; border-bottom: none !important; border-top: none !important; width: auto; vertical-align: middle; \"><a href=\"http://example.com/q3\" target=\"_blank\" rel=\"noopener\" style=\"word-break: break-word\">Q3 revenue</a> trailing</td>\n</tr>\n</tbody>\n</table>"
   }
 ];

@@ -19,14 +19,20 @@ global.DOMParser = jsdom.window.DOMParser;
 const SNAP_DIR = path.join(__dirname, '_data', '_styles');
 const t = (s) => s.trim();
 
+// Writing a missing snapshot and comparing against what was just written passes for any CSS at all, so
+// a deleted or never-reviewed file read as green. Missing is a failure; `UPDATE_SNAPSHOTS=1` writes.
 function assertSnapshot(name, actual) {
   const snapPath = path.join(SNAP_DIR, name + '.snap.css');
-  if (!fs.existsSync(snapPath)) {
+  if (process.env.UPDATE_SNAPSHOTS) {
     fs.writeFileSync(snapPath, actual, 'utf8');
-    console.log(`    [snapshot created] ${name}.snap.css`);
+    console.log(`    [snapshot written] ${name}.snap.css`);
+    return;
   }
+  fs.existsSync(snapPath).should.equal(true,
+    `No snapshot for "${name}". Review the output, then run with UPDATE_SNAPSHOTS=1 to write ${snapPath}.`);
   const expected = fs.readFileSync(snapPath, 'utf8');
-  actual.should.equal(expected, `Snapshot mismatch for "${name}". Delete ${snapPath} to update.`);
+  actual.should.equal(expected,
+    `Snapshot mismatch for "${name}". Run with UPDATE_SNAPSHOTS=1 to update ${snapPath}.`);
 }
 
 describe('Style snapshots — individual functions:', () => {

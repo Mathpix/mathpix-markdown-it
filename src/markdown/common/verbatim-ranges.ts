@@ -148,6 +148,8 @@ export const findVerbatimRanges = (text: string): Array<[number, number]> => {
     spans.push([item.posStart, item.posEnd]);
   }
   const openers: number[] = mathOpenerOffsets(text);
+  // Once per text, like the openers above: `nextMathSpan` is asked per span and scanned for it each time.
+  const lastEndAt: number = text.lastIndexOf('\\end');
   let openIdx = 0;
   let gapFrom = 0;
   let breakAt = 0;
@@ -174,7 +176,7 @@ export const findVerbatimRanges = (text: string): Array<[number, number]> => {
         if (openers[openIdx] > seek) {
           seek = openers[openIdx];
         }
-        const span = nextMathSpan(text, seek, true, blockTo);
+        const span = nextMathSpan(text, seek, true, blockTo, lastEndAt);
         if (!span) {
           break;
         }

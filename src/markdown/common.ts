@@ -229,6 +229,8 @@ export const renewCommandSpanEnd = (
 ): number => {
   RENEWCOMMAND_STICKY_RE.lastIndex = from;
   const match: RegExpExecArray | null = RENEWCOMMAND_STICKY_RE.exec(text);
+  // Left hot, a shared regex is one missing assignment away from starting mid-string.
+  RENEWCOMMAND_STICKY_RE.lastIndex = 0;
   if (!match) {
     return -1;
   }

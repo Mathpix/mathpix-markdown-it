@@ -416,7 +416,9 @@ export const listItemInline: RuleInline = (
     LIST_BOUNDARY_SEARCH_G.lastIndex = boundaryMatch.index + boundaryMatch[0].length;
     boundaryMatch = LIST_BOUNDARY_SEARCH_G.exec(state.src);
   }
-  const content: string = boundaryMatch && boundaryMatch.index > contentStart
+  // Cut at the boundary even when it stands here: an empty `\item` took the rest of the source, and
+  // `state.pos` with it, so the whole list came out as literal LaTeX.
+  const content: string = boundaryMatch
     ? state.src.slice(contentStart, boundaryMatch.index)
     : state.src.slice(contentStart);
   if (!silent) {

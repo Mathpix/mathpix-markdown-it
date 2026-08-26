@@ -396,7 +396,8 @@ export const ListOpen = (
   if (!match && state.parentType !== "itemize" && state.parentType !== "enumerate") {
     return { iOpen, tokenStart, li };
   }
-  // Ensure itemize level tokens are prepared
+  // Before the early return below, not after: moved past it, a second list of the document read the
+  // first one's marker instead of its own.
   SetItemizeLevelTokens(state);
   if (!match) {
     // Already in a list, but no new begin here — nothing more to do

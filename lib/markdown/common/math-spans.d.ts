@@ -16,7 +16,7 @@ export declare const shouldSkipDollar: (str: string, marker: string, beginMarker
  * First math span at or after `from`, or null. Same openers, end markers and `$` guards the extraction
  * uses, with nothing extracted and no state touched.
  */
-export declare const nextMathSpan: (str: string, from: number, mathEnvsOnly?: boolean, until?: number) => {
+export declare const nextMathSpan: (str: string, from: number, mathEnvsOnly?: boolean, until?: number, lastEnd?: number) => {
     start: number;
     end: number;
 } | null;

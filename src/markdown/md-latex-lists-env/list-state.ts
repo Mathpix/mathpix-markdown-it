@@ -115,12 +115,18 @@ export const endMarkerParse = (): void => {
 };
 
 /** The source the list itself handed to the inline parser: a command re-parsing its argument shares
- *  `env`, so only the source tells the two apart. A symbol — a string key shows in `Object.keys`. */
+ *  `env`, so only the source tells the two apart. A symbol keeps it out of `Object.keys` and JSON,
+ *  non-enumerable also out of `snapshotEnvForInline`, which copies a token's enumerable symbols. */
 const LIST_INLINE_SRC: unique symbol = Symbol('mmd.listInlineSrc');
 
 export const setListInlineSrc = (env: any, src: string | null): string | null => {
   const previous: string | null = env[LIST_INLINE_SRC] ?? null;
-  env[LIST_INLINE_SRC] = src;
+  // Own, not `in`: assigning through an inherited one makes an own enumerable property.
+  if (Object.prototype.hasOwnProperty.call(env, LIST_INLINE_SRC)) {
+    env[LIST_INLINE_SRC] = src;
+  } else {
+    Object.defineProperty(env, LIST_INLINE_SRC, { value: src, writable: true, configurable: true });
+  }
   return previous;
 };
 

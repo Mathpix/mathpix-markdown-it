@@ -403,9 +403,9 @@ describe('An unclosed wrapper env leaves the list rendering:', () => {
   // Against the control taken in this very process: 1.0–1.4 measured here, 2.8–3.7 with the walk.
   const growthAgainstControl = (build, small, large) =>
     growthOf(build, small, large) / growthOf(repeated(CONTROL_UNIT), small, large);
-  // Lowest of three: measured once the ratio reads 0.6 idle and 1.23 under the deep fuzz in the
-  // same process, which flakes at any threshold tight enough to catch the shape.
-  const lowestRatio = (measure) => Math.min(measure(), measure(), measure());
+  // Median of three: the ratio reads 0.73–1.10 idle and 1.23 under the deep fuzz, which flakes on one
+  // sample. Not the lowest — that biases down, the direction that hides a regression.
+  const medianRatio = (measure) => [measure(), measure(), measure()].sort((a, b) => a - b)[1];
   // Not on mocha's 2s default: ~1s here, past it on a shared CI runner, where all four timed out.
   // The bound is a ratio, so a generous cap measures the same thing.
   const itScales = (title, body) => it(title, function () {
@@ -438,7 +438,7 @@ describe('An unclosed wrapper env leaves the list rendering:', () => {
     const build = (n) => '\\renewcommand{\\x}{y}'.repeat(n) + ' `c`';
     // Both sides grow ×4 in bytes: 0.8–1.0 measured under the deep fuzz, 4.08 with the index rebuilt
     // per command.
-    const relative = lowestRatio(() =>
+    const relative = medianRatio(() =>
       growthOf(build, 1000, 4000) / growthOf(repeated(CONTROL_UNIT), 100, 400));
     relative.should.be.below(2, 'grows faster than the input: ×' + relative.toFixed(2));
   });
@@ -448,7 +448,7 @@ describe('An unclosed wrapper env leaves the list rendering:', () => {
     const build = (n) => 'text \\begin{itemize}'
       + '\\renewcommand{\\x}{y}\\item i '.repeat(n) + '`c`\\end{itemize} tail';
     // 0.9–1.0 measured under the deep fuzz, against 3.25–3.45 with the slices and 2.58 on `master`.
-    const relative = lowestRatio(() =>
+    const relative = medianRatio(() =>
       growthOf(build, 400, 1600) / growthOf(repeated(CONTROL_UNIT), 100, 400));
     relative.should.be.below(1.6, 'grows faster than the input: ×' + relative.toFixed(2));
   });

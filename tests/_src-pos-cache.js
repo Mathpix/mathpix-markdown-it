@@ -108,6 +108,21 @@ describe('src-pos-cache boundary search:', () => {
     }
     calls.should.equal(2, 'the stale slot was not repaired');
   });
+  // The recompute path rewrites the slot in place and does not re-insert it. That is only sound while
+  // `recall` runs before the freshness check, as it re-inserts and sets the hot slot on any hit —
+  // reordering the two would age the recomputed source towards eviction instead.
+  it('a recomputed source is the newest entry and the hot one', () => {
+    const env = {};
+    const key = Symbol('lru');
+    const compute = (src) => ({ src });
+    srcValueCached({ src: 'aaa', env }, key, compute);
+    srcValueCached({ src: 'bb', env }, key, compute);
+    srcValueCached({ src: 'aaa', env }, key, compute, () => false);
+    const bucket = env[Object.getOwnPropertySymbols(env)[0]];
+    [...bucket.bySrc.keys()].should.deep.equal(['bb', 'aaa'], 'the recomputed source did not move');
+    bucket.hotSrc.should.equal('aaa');
+    bucket.hotSlot.should.equal(bucket.bySrc.get('aaa'), 'the hot slot points at another source');
+  });
   it('clearing an env that never held a bucket is a no-op', () => {
     clearSrcPosCaches({});
     clearSrcPosCaches(undefined);

@@ -38,4 +38,21 @@ module.exports = [
     mmd: '\\backslashbox{a}{b} tail',
     html: '<div>' + NE + ' tail</div>',
   },
+  // The arguments are read by offset in `src` now, so the position the rule ends at is absolute: added
+  // to `state.pos` instead of assigned, it doubled and everything past the command went missing.
+  {
+    title: 'a code span after the diagbox keeps its place',
+    mmd: '\\diagbox{a}{b} tail `c`',
+    html: '<div>' + NE + ' tail <code>c</code></div>',
+  },
+  {
+    title: 'two diagboxes on a line with a code span after them',
+    mmd: '\\diagbox{a}{b} \\diagbox{a}{b} `c`',
+    html: '<div>' + NE + ' ' + NE + ' <code>c</code></div>',
+  },
+  {
+    title: 'a backtick inside an argument is content, and the tail survives',
+    mmd: '\\diagbox{a`}{b} tail',
+    html: '<div>' + NE.replace('>a</div>', '>a`</div>') + ' tail</div>',
+  },
 ];

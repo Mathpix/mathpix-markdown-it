@@ -2815,6 +2815,59 @@ module.exports = [
     latex: "\\begin{itemize}\n\\renewcommand{\\x}{y} FFF\n\\item Z\n\\end{itemize}",
     html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\"> FFF</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>Z</li></ul>"
   },
+  // The leftover past the outermost closer goes back to the block phase, which reads it as it would any
+  // line — so a marker that only means something at a line start is taken there. Decided, not incidental:
+  // `master` dropped the leftover entirely. Pinned so a change of mind reads as one.
+  {
+    name: "a leftover heading marker after the outermost closer becomes a heading",
+    latex: "\\begin{itemize}\n\\item a\n\\end{itemize} # H",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul><h1 id=\"h\">H</h1>\n"
+  },
+  {
+    name: "a leftover quote marker after the outermost closer becomes a blockquote",
+    latex: "\\begin{itemize}\n\\item a\n\\end{itemize} > q",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul><blockquote>\n<div>q</div>\n</blockquote>\n"
+  },
+  {
+    name: "a leftover list marker after the outermost closer opens a markdown list",
+    latex: "\\begin{itemize}\n\\item a\n\\end{itemize} - item",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul><ul>\n<li>item</li>\n</ul>\n"
+  },
+  {
+    name: "a leftover fence opening after the outermost closer opens a fence",
+    latex: "\\begin{itemize}\n\\item a\n\\end{itemize} ```\ncode\n```",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul><pre><code class=\"hljs\">code\n</code></pre>\n"
+  },
+  {
+    name: "a leftover table row after the outermost closer stays a paragraph",
+    latex: "\\begin{itemize}\n\\item a\n\\end{itemize} | a | b |",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul><div>| a | b |</div>\n"
+  },
+  {
+    name: "an empty \\item first on a one-line list",
+    latex: "\\begin{itemize}\\item\\item x\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span></li><li class=\"li_itemize\"><span class=\"li_level\">•</span>x</li></ul>"
+  },
+  {
+    name: "an empty \\item last on a one-line list",
+    latex: "\\begin{itemize}\\item x\\item\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>x</li><li class=\"li_itemize\"><span class=\"li_level\">•</span></li></ul>"
+  },
+  {
+    name: "an empty \\item between two others",
+    latex: "\\begin{itemize}\\item a\\item\\item b\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li><li class=\"li_itemize\"><span class=\"li_level\">•</span></li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    name: "a one-line list of one empty \\item",
+    latex: "\\begin{itemize}\\item\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span></li></ul>"
+  },
+  {
+    name: "an empty \\item with a marker",
+    latex: "\\begin{itemize}\\item[x]\\item y\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\"><span class=\"li_level\" data-custom-marker=\"true\">x</span></li><li class=\"li_itemize\"><span class=\"li_level\">•</span>y</li></ul>"
+  },
   {
     name: "a closer in a \\footnote argument does not close the list",
     latex: "\\begin{itemize} \\footnote{f \\end{itemize} g}\n\\item a\n\\end{itemize}",
@@ -2835,6 +2888,32 @@ module.exports = [
     name: "a closer in a \\textbf argument does not close the list",
     latex: "\\begin{itemize} \\textbf{f \\end{itemize} g}\n\\item a\n\\end{itemize}",
     html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\"> <strong>f \\end{itemize} g</strong></li><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul>"
+  },
+  // `\verb` is not modelled as verbatim, so the closer written in it ends the list there — inherited, and
+  // pinned so it reads as a decision. `master` dropped the `| b` after that closer; it is a block now.
+  {
+    name: "a closer in \\verb ends the list, as on master",
+    latex: "\\begin{itemize}\n\\item a \\verb|\\end{itemize}| b\n\\item c\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a \\verb|</li></ul><div>| b<br>\n\\item c<br>\n\\end{itemize}</div>\n"
+  },
+  // Each `<li>` re-renders the same marker tokens, so `attrJoin` piles the link's attributes up down the
+  // list: once, twice, three times. Byte-identical to `master` — pinned so a change here reads as one.
+  {
+    name: "a link marker accumulates its attributes down one list, as on master",
+    latex: "\\renewcommand{\\labelitemi}{[m](http://u)}\n\\begin{itemize}\n\\item a\n\\item b\n\\item c\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\"><a href=\"http://u\" target=\"_blank\" rel=\"noopener\" style=\"display: inline-block\">m</a></span>a</li><li class=\"li_itemize\"><span class=\"li_level\"><a href=\"http://u\" target=\"_blank\" rel=\"noopener\" style=\"display: inline-block\" target=\"_blank\" rel=\"noopener\" style=\"display: inline-block\">m</a></span>b</li><li class=\"li_itemize\"><span class=\"li_level\"><a href=\"http://u\" target=\"_blank\" rel=\"noopener\" style=\"display: inline-block\" target=\"_blank\" rel=\"noopener\" style=\"display: inline-block\" target=\"_blank\" rel=\"noopener\" style=\"display: inline-block\">m</a></span>c</li></ul>"
+  },
+  // Only a supported command's argument is text. Glued or spaced reads the same: a bare name is skipped
+  // at the command name, not between arguments, where it took `{q …}` for a second `\textbf` argument.
+  {
+    name: "a closer in an unknown command glued to a supported one closes the list",
+    latex: "\\begin{itemize}\n\\item a \\textbf{x}\\unknown{q \\end{itemize} w}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a <strong>x</strong>\\unknown{q</li></ul><div>w}<br>\n\\item b<br>\n\\end{itemize}</div>\n"
+  },
+  {
+    name: "a closer in an unknown command spaced from a supported one closes the list",
+    latex: "\\begin{itemize}\n\\item a \\textbf{x} \\unknown{q \\end{itemize} w}\n\\item b\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a <strong>x</strong> \\unknown{q</li></ul><div>w}<br>\n\\item b<br>\n\\end{itemize}</div>\n"
   },
   {
     name: "a closer in a \\footnote argument, enumerate",
