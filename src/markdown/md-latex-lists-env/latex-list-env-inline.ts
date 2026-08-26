@@ -288,7 +288,7 @@ export const listCloseInline: RuleInline = (
 ): boolean => {
   const startPos: number = state.pos;
   // Only handle in block/list context
-  if (!state.env.isBlock || isParsingMarker() || !isListOwnParse(state)) {
+  if (!state.env?.isBlock || isParsingMarker() || !isListOwnParse(state)) {
     return false;
   }
   // No list open: the closer emitted a bare `</ul>`.
@@ -345,7 +345,7 @@ export const listBeginInline: RuleInline = (
 ): boolean => {
   const startPos: number = state.pos;
   // Only inside block/list context
-  if (!state.env.isBlock || isParsingMarker() || !isListOwnParse(state)) {
+  if (!state.env?.isBlock || isParsingMarker() || !isListOwnParse(state)) {
     return false;
   }
   // Must start with backslash
@@ -394,7 +394,7 @@ export const listItemInline: RuleInline = (
     return false;
   }
   // Only handle in block/list context
-  if (!state.env.isBlock || isParsingMarker() || !isListOwnParse(state)) {
+  if (!state.env?.isBlock || isParsingMarker() || !isListOwnParse(state)) {
     return false;
   }
   // No list open: the `<li>` would have nothing to sit in.
@@ -493,7 +493,7 @@ export const listSetCounterInline: RuleInline = (
   silent: boolean
 ): boolean => {
   // Only handle in block/list context (not in pure inline text)
-  if (!state.env.isBlock || isParsingMarker() || !isListOwnParse(state)) {
+  if (!state.env?.isBlock || isParsingMarker() || !isListOwnParse(state)) {
     return false;
   }
   const startPos: number = state.pos;

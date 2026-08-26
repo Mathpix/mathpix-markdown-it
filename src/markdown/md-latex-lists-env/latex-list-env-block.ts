@@ -454,6 +454,11 @@ export const Lists: RuleBlock = (
   // Probe answers are not memoised: it measured slower on every shape (see the spec).
   // `bufferedState` shares `env` by prototype, so ListsInternal mutates the real env: one whole-env
   // snapshot serves both restores below, naming keys would miss what a rule in the body writes.
+  // The rule writes here throughout, and `md.block.parse` hands on whatever it was given: without an
+  // object every list degraded to literal LaTeX. `init_math_cache` normalises it the same way.
+  if (!state.env) {
+    state.env = {};
+  }
   const captionSnap = getCaptionCounters();
   // A discarded parse enters a level per `\begin` and, having no `\end`, never leaves it — without
   // this the depth grows with the number of probes, not with the real nesting.

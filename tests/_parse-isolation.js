@@ -36,6 +36,56 @@ global.DOMParser = jsdom.window.DOMParser;
 
 // The list rule moves a line's marks to hand its leftover back, as `blockquote` does for its own range.
 // Left moved they would hold for the rest of the phase, and `getLines` reads `bMarks` as the line start.
+// `md.block.parse` hands its fourth argument on as it got it, and the rule both reads and writes there.
+// Without an object every list of the document came out as literal LaTeX, with one warning to say why.
+describe('a list parses with no env of its own', () => {
+  it('builds the list instead of warning and declining', () => {
+    const md = markdownIt({ html: true })
+      .use(mathpixMarkdownPlugin, { outMath: { include_svg: false } });
+    const tokens = [];
+    const warns = [];
+    const warn = console.warn;
+    console.warn = (...args) => warns.push(String(args[0]));
+    try {
+      md.block.parse('\\begin{itemize}\n\\item a\n\\item b\n\\end{itemize}', md, undefined, tokens);
+    } finally {
+      console.warn = warn;
+    }
+    warns.should.deep.equal([], 'the rule declined: ' + warns.join('; '));
+    tokens.map((t) => t.type).should.include('itemize_list_open');
+    tokens.filter((t) => t.type === 'latex_list_item_open').should.have.lengthOf(2);
+  });
+});
+
+// `parseOneCommand` reads to the end of `src`, which is past `posMax` inside a link label or an option.
+// A `state.pos` beyond it ends the tokenizer loop, which is how the rest of a document went missing.
+describe('the inline renewcommand rule leaves pos inside the window', () => {
+  it('stops at posMax, closed arguments or not', () => {
+    const md = markdownIt({ html: true })
+      .use(mathpixMarkdownPlugin, { outMath: { include_svg: false } });
+    const seen = [];
+    const rules = md.inline.ruler.getRules('');
+    md.inline.ruler.at('renewcommand_inline', (state, silent) => {
+      const before = state.posMax;
+      const ok = rules.find((fn) => fn.name === 'reNewCommandInLine')(state, silent);
+      if (ok) { seen.push([state.pos, before]); }
+      return ok;
+    });
+    const warn = console.warn;
+    console.warn = () => {};
+    try {
+      ['[label \\renewcommand{\\u}{unc](http://a) tail',
+        '[label \\renewcommand{\\x}{y} tail](http://a)',
+        'text \\renewcommand{\\x}{y} tail'].forEach((src) => md.parse(src, {}));
+    } finally {
+      console.warn = warn;
+    }
+    seen.length.should.be.above(0, 'the rule never fired');
+    seen.filter(([pos, max]) => pos > max)
+      .should.deep.equal([], 'pos ran past posMax: ' + JSON.stringify(seen));
+  });
+});
+
 describe('the block phase leaves the line marks as it found them', () => {
   const shapes = {
     'a leftover after the closer': '\\begin{itemize}\n\\item a\n\\end{itemize} TAIL',

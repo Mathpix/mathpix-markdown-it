@@ -475,7 +475,6 @@ export const ListOpen = (
  * @param state - Markdown-It processing state
  * @param startLine - Line where the list block starts
  * @param endLine - Line where the list block ends
- * @returns The created closing list token
  */
 export const setTokenCloseList = (
   state: StateBlock,

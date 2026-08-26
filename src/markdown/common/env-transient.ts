@@ -50,6 +50,7 @@ export interface EnvSnapshot {
 // by releaseEnvSnapshot in the same `finally` that restores.
 const snapshotPool: EnvSnapshot[] = [];
 let snapshotDepth = 0;
+const EMPTY_KEYS: readonly string[] = Object.freeze([]);
 
 // Every own string key and value of `env`, so a discarded parse can be undone without naming the
 // keys a rule might write. Symbol keys are out, as they were with the named list.
@@ -63,7 +64,9 @@ export const snapshotEnvAll = (env: any): EnvSnapshot => {
   // again if that read throws, since the pool reset no longer undoes drift for a live snapshot.
   snapshotDepth++;
   try {
-    const keys: string[] = Object.keys(env);
+    // `Object.keys(undefined)` threw, and the catch outside turned every list of the document into
+    // literal LaTeX. `md.block.parse` passes on whatever it was given.
+    const keys: readonly string[] = env ? Object.keys(env) : EMPTY_KEYS;
     for (let i = 0; i < keys.length; i++) {
       snapshot.keys[i] = keys[i];
       snapshot.values[i] = env[keys[i]];
