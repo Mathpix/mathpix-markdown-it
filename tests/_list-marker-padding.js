@@ -505,9 +505,9 @@ describe('processListChildToken — an unpaired close does not steal the outer l
       [...flags].forEach((flag) => [0, 1, 2].should.include(flag, name + ' produced ' + flag));
     });
   });
-  // A state with no Token constructor reaches here when a rule builds one by hand. The run then stays
-  // where it is — a loose child still renders, where a throw would cost the whole list.
-  it('a run is left unwrapped, and silently, when the state carries no Token constructor', () => {
+  // A hand-built state can carry no Token constructor. The run stays where it is — a loose child still
+  // renders, where a throw would cost the whole list — and says so, that child being invalid HTML.
+  it('a run is left unwrapped, with one warning, when the state carries no Token constructor', () => {
     const text = new Token('text', '', 0);
     text.content = 'loose';
     const state = { tokens: [text], level: 0, parentType: 'root', types: [] };
@@ -521,7 +521,8 @@ describe('processListChildToken — an unpaired close does not steal the outer l
     }
     state.tokens.should.have.lengthOf(1, 'the run was wrapped without a constructor');
     state.tokens[0].should.equal(text);
-    said.should.have.lengthOf(0, 'a missing constructor is a caller error, not a document one');
+    said.should.have.lengthOf(1, 'the unwrapped run was left without a word');
+    said[0].should.include('Token constructor');
   });
   // The writer says its output matches `PADDING_EM_RE` by construction, and the renderer drops anything
   // that does not — so a value the writer stops formatting that way turns into no indent at all, silently.

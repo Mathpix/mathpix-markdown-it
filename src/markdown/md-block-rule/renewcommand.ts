@@ -133,7 +133,7 @@ const tailStartOnLine = (lineText: string, from: number): number => {
   return at;
 };
 
-export const ReNewCommand:RuleBlock = (state, startLine: number) => {
+export const ReNewCommand:RuleBlock = (state, startLine: number, endLine: number, silent: boolean) => {
   let pos: number = state.bMarks[startLine] + state.tShift[startLine];
   let max: number = state.eMarks[startLine];
   let nextLine: number = startLine + 1;
@@ -150,9 +150,12 @@ export const ReNewCommand:RuleBlock = (state, startLine: number) => {
       return false;
     }
   }
+  // Same verdict, no macro: it writes marker state no rollback covers.
+  if (silent) {
+    return tailStartOnLine(lineText, match.index) >= lineText.length;
+  }
   // Applied before the tail is read, and the rule declines after: a later list reads the marker this
-  // set, as on 3.0.1. Only the '' chain has this rule, so no probe asks it — measured, 0 silent calls
-  // of 229282 over the suite.
+  // set, as on 3.0.1.
   reNewCommand(state, lineText.slice(match.index).trim());
   // The line is not ours when something shares it: this rule renders to nothing, so claiming the line
   // dropped that text. The paragraph takes it, inline reads the command there.

@@ -24,9 +24,20 @@ interface Bucket<T> {
 // Read structurally, so an inline state — same `src`, same `env` — can use the cache as well.
 type SrcState = { src: string; env?: any };
 
+// Counted, not warned: a cache on the state is outside the per-render clear, and the suite asserts zero
+// so a parse path that loses `env` is loud rather than quietly uncleared.
+let stateHosted: number = 0;
+export const stateHostedCacheCount = (): number => stateHosted;
+export const resetStateHostedCaches = (): void => {
+  stateHosted = 0;
+};
+
 const bucketOf = <T>(state: SrcState, key: symbol): Bucket<T> => {
   // Falling back to `state` puts the cache outside the per-render clear, so it lives and dies with
   // that state instead. Every real state carries an `env`; a hand-built one may not.
+  if (!(state as any).env) {
+    stateHosted++;
+  }
   const host = ((state as any).env ?? state) as Record<symbol, Bucket<T> | undefined>;
   const bucket: Bucket<T> | undefined = host[key];
   if (bucket) {

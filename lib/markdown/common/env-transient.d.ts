@@ -4,6 +4,7 @@ export interface EnvSnapshot {
     keys: string[];
     values: any[];
     length: number;
+    takeId: number;
 }
 export declare const snapshotEnvAll: (env: any) => EnvSnapshot;
 /** Live snapshots. Zero between parses; above it, one was never released. */

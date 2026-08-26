@@ -2,6 +2,8 @@ type SrcState = {
     src: string;
     env?: any;
 };
+export declare const stateHostedCacheCount: () => number;
+export declare const resetStateHostedCaches: () => void;
 /** Empties the buckets on `env`: a host reusing one env would otherwise keep old documents alive.
  *  Emptied, not deleted — `delete` would drop `env` into dictionary mode for the whole parse. */
 export declare const clearSrcPosCaches: (env: any) => void;

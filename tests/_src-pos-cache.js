@@ -7,12 +7,16 @@ const {
   lastMatchPosCached,
   clearSrcPosCaches,
   srcValueCached,
+  resetStateHostedCaches,
 } = require('../lib/markdown/common/src-pos-cache');
 
 // Both are binary searches over a boundary, and both decide list structure: the count answers
 // whether a sibling list may open and whether the body walk can still close, the first-position
 // answers whether a closer sits ahead of a fence. An off-by-one here changes HTML, not a test.
 describe('src-pos-cache boundary search:', () => {
+  // Several tests here hand in a state with no `env`, so the cache lands on the state — the root hook
+  // asserts that no other test does.
+  afterEach(() => resetStateHostedCaches());
   const positions = [10, 20, 20, 30];
   it('countPositionsAtOrAfter is inclusive at the boundary', () => {
     countPositionsAtOrAfter([], 0).should.equal(0);

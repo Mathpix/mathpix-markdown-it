@@ -8,6 +8,10 @@ const {
   releaseEnvSnapshot,
   resetEnvSnapshotPool,
 } = require('../../lib/markdown/common/env-transient');
+const {
+  stateHostedCacheCount,
+  resetStateHostedCaches,
+} = require('../../lib/markdown/common/src-pos-cache');
 
 // Root hook plugins, required through the `mocha` key in `package.json`, so they run whichever files
 // mocha is given: registered from a test file they covered `npm test` alone, and a run of one file is
@@ -15,6 +19,7 @@ const {
 const snapshotLeaks = [];
 const degraded = [];
 const unanchored = [];
+const stateHosted = [];
 
 // The snapshot depth is module state: a test that dies before its release leaves it raised, and from then
 // on `resetEnvSnapshotPool` declines and the restores decline with it — so one failure showed up as four
@@ -42,12 +47,18 @@ const countDegradations = function () {
     unanchored.push(this.currentTest.fullTitle());
     listSourceModel.resetUnanchoredOffsets();
   }
+  // A cache on the state instead of `env` is never cleared; only a hand-built state reaches it.
+  if (stateHostedCacheCount() > 0) {
+    stateHosted.push(this.currentTest.fullTitle());
+    resetStateHostedCaches();
+  }
 };
 
 const report = () => {
   snapshotLeaks.should.deep.equal([], 'a test left a snapshot un-released');
   degraded.should.deep.equal([], 'the list rule failed and fell back to literal LaTeX');
   unanchored.should.deep.equal([], 'absoluteOffsetOf could not anchor a line it was handed');
+  stateHosted.should.deep.equal([], 'a per-source cache was hosted on the state, where nothing clears it');
 };
 
 exports.mochaHooks = {

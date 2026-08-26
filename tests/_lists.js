@@ -8,6 +8,7 @@ const { braceMatches, commandArgumentSpans } = require('../lib/markdown/common/a
 const { skipOptionalArg } = require('../lib/markdown/common');
 const { LATEX_ITEM_COMMAND_INLINE_RE, LATEX_ITEM_SPLIT_RE,
   LATEX_BRACE_ARG_COMMANDS } = require('../lib/markdown/common/consts');
+const knownQuirks = require('./_data/_lists/_data_known_quirks.js');
 
 const options = {
   cwidth: 800,
@@ -355,6 +356,12 @@ describe('An unclosed wrapper env leaves the list rendering:', () => {
     commandArgumentSpans('\\label{b}', []).should.deep.equal([[6, 8]]);
     commandArgumentSpans('\\caption*[1]{b}{c}', []).should.deep.equal([[12, 14], [15, 17]]);
     commandArgumentSpans('\\label{b', []).should.deep.equal([], 'an argument left open marks nothing');
+    // A star, a space and a bare name belong at the command name; between arguments they belong to
+    // whatever follows, and skipping them there took the next command's argument for a second one.
+    commandArgumentSpans('\\text{a}*{b}', []).should.deep.equal([[5, 7]], 'a star bound a second argument');
+    commandArgumentSpans('\\text{a}\\unknown{b}', []).should.deep.equal([[5, 7]], 'a bare name bound one');
+    commandArgumentSpans('\\renewcommand*{\\x}{y}', []).should.deep.equal([[14, 17], [18, 20]],
+      'the star at the name stopped being skipped');
     commandArgumentSpans('`\\label{b}`', [[0, 11]]).should.deep.equal([], 'a command in code is text');
     // A further group counts only with no space before it: `\textbf{x} {prose}` is one argument and a
     // brace in prose, and taking the second hid a closer written there — the unsafe side.
@@ -1089,6 +1096,26 @@ describe('A list element holds nothing but <li>:', () => {
     eachFixture(({ latex, html }) => {
       invalidChild(html).should.equal('', 'invalid child of a list element for ' + JSON.stringify(latex));
     });
+  });
+  // The quirks file is where an invalid shape is allowed to be pinned, so the sweep has to reach it or
+  // the invariant holds nowhere it matters. Named, and each name must still violate: a quirk fixed
+  // later would otherwise sit here as a silent exemption.
+  const QUIRKS_WITH_AN_INVALID_CHILD = [
+    'a brace left over by an unclosed caption sits in the list',
+  ];
+  it('holds across every quirk but the ones named', () => {
+    const violating = [];
+    knownQuirks.forEach((test) => {
+      const found = invalidChild(MM.markdownToHTML(test.latex, fixtureOptions(test)));
+      if (!found) {
+        return;
+      }
+      violating.push(test.name);
+      QUIRKS_WITH_AN_INVALID_CHILD.should.include(test.name,
+        'a quirk holds an invalid child of a list element and is not named: ' + found);
+    });
+    violating.sort().should.deep.equal([...QUIRKS_WITH_AN_INVALID_CHILD].sort(),
+      'a named quirk no longer violates the invariant — drop it from the list');
   });
   // Separate from the child check, which reads nesting and not counts: a fuzz run found shapes that
   // leave an item open, and those pass the child walk while the HTML is still unusable as a DOM.

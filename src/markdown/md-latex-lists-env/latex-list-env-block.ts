@@ -455,7 +455,9 @@ export const Lists: RuleBlock = (
   // `bufferedState` shares `env` by prototype, so ListsInternal mutates the real env: one whole-env
   // snapshot serves both restores below, naming keys would miss what a rule in the body writes.
   // The rule writes here throughout, and `md.block.parse` hands on whatever it was given: without an
-  // object every list degraded to literal LaTeX. `init_math_cache` normalises it the same way.
+  // object every list degraded to literal LaTeX. `init_math_cache` normalises it the same way, and a
+  // discarded parse puts back what it was given.
+  const envAsGiven: any = state.env;
   if (!state.env) {
     state.env = {};
   }
@@ -552,6 +554,9 @@ export const Lists: RuleBlock = (
       // Always: a throw above would hold the slot for the process, and the reset declines while live.
       if (envSnap) {
         releaseEnvSnapshot();
+      }
+      if (!committed && !envAsGiven) {
+        state.env = envAsGiven;
       }
     }
   }

@@ -13,8 +13,9 @@ export declare const shiftTokenAbsolutePositions: (tok: any, baseOffset: number)
  * - Computes `bMarks/eMarks/tShift` so `state.src.slice(bMarks[i]+tShift[i], eMarks[i])`
  *   matches each logical line (without a trailing "\n" after the last line).
  * - `env` is shallow-copied and forced to `{ isBlock: true }` for downstream checks. The copy carries the
- *   source-position buckets by reference, symbol keys and all, but this path reaches none of them:
- *   measured over four shapes that ask the model on the block path, zero lookups here.
+ *   source-position buckets by reference, symbol keys and all, and this path does reach them — 1 of 25
+ *   lookups on a nested inline list — writing under the raw string as its own key, evicted by the same
+ *   LRU and released with the render.
  */
 export declare const buildBlockStateFromRaw: (md: any, raw: string, baseEnv: any) => any;
 /**

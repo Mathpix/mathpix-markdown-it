@@ -91,10 +91,16 @@ describe('the shared env regexes carry no `g`, so their exec sites need no reset
 // the next starts mid-string. Every exec site either resets it or is the loop that owns it — asserted
 // over the whole module, so a constant added later is covered without a test of its own.
 describe('no shared regex is left hot by a render', () => {
+  // One line per reader: the macro span, a command argument, a wrapper env and its caption, a
+  // `tabular`, an `lstlisting`, math, a code span, an `\item[…]` marker and a nested list.
   const source = '\\renewcommand{\\labelitemi}{x} tail\n'
     + '\\begin{itemize}\n\\item a \\caption{q \\end{itemize} w}\n'
+    + '\\begin{center}\ncentred $x^2$ text \\caption{c}\n\\end{center}\n'
     + '\\begin{tabular}[t]{|l|}\\hline c \\\\ \\hline\\end{tabular}\n'
-    + '\\item[m] b\n\\end{itemize}\n\n\\begin{enumerate}[label=(\\alph*)]\n\\item z\n\\end{enumerate}';
+    + '\\begin{lstlisting}\ncode \\end{itemize}\n\\end{lstlisting}\n'
+    + '\\item[m] b `\\end{itemize}` $y_1$\n'
+    + '\\begin{itemize}\n\\item nested\n\\end{itemize}\n'
+    + '\\end{itemize}\n\n\\begin{enumerate}[label=(\\alph*)]\n\\item z\n\\end{enumerate}';
   const options = { outMath: { include_svg: false } };
   const hot = () => Object.keys(consts)
     .filter((name) => consts[name] instanceof RegExp && /[gy]/.test(consts[name].flags))

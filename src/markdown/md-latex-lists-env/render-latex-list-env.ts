@@ -7,7 +7,7 @@ import { listHostFlags, LIST_OPEN_TYPES } from "./latex-list-tokens";
 import { renderTabularInline } from "../md-renderer-rules/render-tabular";
 import { needToHighlightAll, highlightText } from "../highlight/common";
 import convertSvgToBase64 from "../md-svg-to-base64/convert-scv-to-base64";
-import { mathTokenTypes } from "../common/consts";
+import { mathTokenTypes, LIST_MAX_INDENT_EM } from "../common/consts";
 import { isMathInText } from "../utils";
 import {CustomMarkerHtmlResult} from "./latex-list-types";
 import { warnDistinct } from "../common/warn-distinct";
@@ -25,19 +25,24 @@ const markerPaddingStyle = (padAttr: string | null | undefined): string => {
       { value: padAttr });
     return "";
   }
+  // Our own writer clamps already; a hand-set value is clamped here rather than indenting off-screen.
+  if (parseFloat(padAttr) > LIST_MAX_INDENT_EM) {
+    return `padding-inline-start: ${LIST_MAX_INDENT_EM}em; `;
+  }
   return `padding-inline-start: ${padAttr}; `;
 };
 
 var level_itemize = 0;
 var level_enumerate = 0;
-// Bumped per render, so a cache entry paired in an earlier one is not reused.
-let renderEpoch = 0;
+// Bumped where the parse phase resets, not on entry to the renderer: parse once and render twice stays
+// on one epoch, and the walk check below carries it.
+let parseEpoch = 0;
 /** Render-time list state, module-level like the marker registries — zeroed per render. */
 export const resetListRenderDepth = (): void => {
   level_itemize = 0;
   level_enumerate = 0;
   resetAllEnumerateCounters();
-  renderEpoch++;
+  parseEpoch++;
 };
 
 // A lone surrogate makes `encodeURI` throw, and that took the whole document down.
@@ -63,9 +68,10 @@ const hostFlag = (tokens: Token[], idx: number): number => {
   const sig: string = signatureOf(tokens);
   let cached = hostFlagsFor.get(tokens);
   // `idx <= lastIdx` means a new walk: the renderer only moves forward, measured over 2760 queries. On
-  // length and end types alone flags from the wrong content emitted an `<li>` with no close.
-  if (!cached || cached.epoch !== renderEpoch || cached.sig !== sig || idx <= cached.lastIdx) {
-    cached = { epoch: renderEpoch, sig, flags: listHostFlags(tokens), lastIdx: idx };
+  // length and end types alone flags from the wrong content emitted an `<li>` with no close. Asking out
+  // of order costs a pairing per query — the price of re-rendering one array, unsupported either way.
+  if (!cached || cached.epoch !== parseEpoch || cached.sig !== sig || idx <= cached.lastIdx) {
+    cached = { epoch: parseEpoch, sig, flags: listHostFlags(tokens), lastIdx: idx };
     hostFlagsFor.set(tokens, cached);
   } else {
     cached.lastIdx = idx;

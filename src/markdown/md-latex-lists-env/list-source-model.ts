@@ -26,6 +26,10 @@ const VERBATIM_KEY = Symbol('mmd.verbatimRanges');
 // Built from the unanchored env regexes, so a sweep cannot drift from what the parser accepts.
 const END_LIST_ENV_SWEEP_G: RegExp = new RegExp(END_LIST_ENV_INLINE_RE.source, 'g');
 const BEGIN_LIST_ENV_SWEEP_G: RegExp = new RegExp(BEGIN_LIST_ENV_INLINE_RE.source, 'g');
+// `unclosedEnvsIn` walks with two cursors of its own: `lastIndex` is state, and the sweeps above are
+// asked of a whole source while it counts within one line.
+const UNCLOSED_END_SWEEP_G: RegExp = new RegExp(END_LIST_ENV_INLINE_RE.source, 'g');
+const UNCLOSED_BEGIN_SWEEP_G: RegExp = new RegExp(BEGIN_LIST_ENV_INLINE_RE.source, 'g');
 
 /** Text around an inline transition. Callers match on `maskNonStructure`, so a transition reaching
  *  here is structure — what is written in a code span or an `\item[...]` marker never does. */
@@ -65,20 +69,24 @@ export const maskNonStructure = (text: string): string => {
 // Counted by walking the tail as the parse loop does — a plain text count called a closer in a code
 // span real, and the loop then opened a sibling it could never close.
 export const unclosedEnvsIn = (s: string): number => {
-  let depth = 0;
   // Only the masked text: the count needs the transitions, not the text around them. One caller hands in
   // masked text already — idempotent, measured over 60000 forms.
-  let masked: string = maskNonStructure(s);
-  let env: { match: RegExpMatchArray; isEnd: boolean } | null = nextListEnvMatch(masked);
-  while (env) {
-    depth += env.isEnd ? -1 : 1;
-    // Defensive only: the shortest match is 13 characters. Kept so a pattern matching empty cannot spin.
-    const cut: number = (env.match.index ?? 0) + env.match[0].length;
-    if (cut <= 0) {
-      break;
+  const masked: string = maskNonStructure(s);
+  UNCLOSED_BEGIN_SWEEP_G.lastIndex = 0;
+  UNCLOSED_END_SWEEP_G.lastIndex = 0;
+  let begin: RegExpExecArray | null = UNCLOSED_BEGIN_SWEEP_G.exec(masked);
+  let end: RegExpExecArray | null = UNCLOSED_END_SWEEP_G.exec(masked);
+  let depth = 0;
+  while (begin || end) {
+    // Source order, and `\end` first when they tie: an `\end` ahead of a `\begin` closes before the
+    // next level opens. The two patterns cannot overlap, so taking one cannot hide the other.
+    if (end && (!begin || end.index <= begin.index)) {
+      depth -= 1;
+      end = UNCLOSED_END_SWEEP_G.exec(masked);
+    } else {
+      depth += 1;
+      begin = UNCLOSED_BEGIN_SWEEP_G.exec(masked);
     }
-    masked = masked.slice(cut).trim();
-    env = nextListEnvMatch(masked);
   }
   return depth;
 };

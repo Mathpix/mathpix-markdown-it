@@ -20,6 +20,7 @@ import {
   LIST_OPEN_TOKEN_TYPES, LIST_CLOSE_TOKEN_TYPES, LIST_STRUCTURE_TOKEN_TYPES,
 } from "../common/consts";
 import { tokenMarkerWidth } from "../common/display-width";
+import { warnDistinct } from "../common/warn-distinct";
 
 /**
  * Marker reservation for a custom `\item[...]` in `em`: sum of per-token widths (text by
@@ -216,8 +217,9 @@ export const wrapLooseRun = (state: LooseRunState, from: number): void => {
     return;
   }
   // Without the constructor the run stays where it is: a loose child renders, a thrown rule does not.
-  // Silent by decision — a missing constructor is a caller error, not a document one; pinned by a test.
+  // Said once, since that child is invalid HTML — a caller error, and unreachable from a document.
   if (typeof state.Token !== 'function') {
+    warnDistinct('loose-run-no-token', '[list] no Token constructor on the state, run left unwrapped');
     return;
   }
   const open: Token = new state.Token('latex_list_item_open', 'li', 1);

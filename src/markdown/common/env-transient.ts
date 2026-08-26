@@ -43,6 +43,9 @@ export interface EnvSnapshot {
   keys: string[];
   values: any[];
   length: number;
+  // Which take of this pool slot the handle belongs to: the slot object is reused, so identity alone
+  // let a handle kept past its parse restore over the next one's values.
+  takeId: number;
 }
 
 // Snapshots are taken and released in LIFO order (a nested list is strictly inside its parent), so
@@ -50,6 +53,9 @@ export interface EnvSnapshot {
 // by releaseEnvSnapshot in the same `finally` that restores.
 const snapshotPool: EnvSnapshot[] = [];
 let snapshotDepth = 0;
+// The take each live slot is on, so a released handle cannot pass as the innermost one.
+const liveTakeId: number[] = [];
+let takes = 0;
 const EMPTY_KEYS: readonly string[] = Object.freeze([]);
 
 // Every own string key and value of `env`, so a discarded parse can be undone without naming the
@@ -57,9 +63,11 @@ const EMPTY_KEYS: readonly string[] = Object.freeze([]);
 export const snapshotEnvAll = (env: any): EnvSnapshot => {
   let snapshot: EnvSnapshot = snapshotPool[snapshotDepth];
   if (!snapshot) {
-    snapshot = { keys: [], values: [], length: 0 };
+    snapshot = { keys: [], values: [], length: 0, takeId: 0 };
     snapshotPool[snapshotDepth] = snapshot;
   }
+  snapshot.takeId = ++takes;
+  liveTakeId[snapshotDepth] = snapshot.takeId;
   // Claimed before the read, so a getter that re-enters gets the next slot and not this one; released
   // again if that read throws, since the pool reset no longer undoes drift for a live snapshot.
   snapshotDepth++;
@@ -77,6 +85,7 @@ export const snapshotEnvAll = (env: any): EnvSnapshot => {
     snapshot.length = keys.length;
   } catch (e) {
     snapshotDepth--;
+    liveTakeId[snapshotDepth] = 0;
     throw e;
   }
   return snapshot;
@@ -90,6 +99,8 @@ export const releaseEnvSnapshot = (): void => {
     return;
   }
   snapshotDepth--;
+  // The take ends here, so the handle just released can no longer pass as live.
+  liveTakeId[snapshotDepth] = 0;
   // Drop the values: the slot outlives the parse and would hold that document's objects alive.
   const released: EnvSnapshot = snapshotPool[snapshotDepth];
   released.keys.length = 0;
@@ -102,10 +113,10 @@ export const releaseEnvSnapshot = (): void => {
 // Compared by identity, so an object mutated in place is not restored — that rule must undo it.
 // A slot that is not the innermost was already emptied by a pool reset, so restoring from it would blank
 // every key the consumer owns. Both restores ask this first and leave `env` alone when it says no.
-// Depth, not age: the pool hands the same object back at one depth, so a handle kept past its parse
-// and asked at that depth would pass. Every caller restores in the `finally` that took it.
+// The take, not just the slot: identity alone passed a handle kept past its parse. Catches a released
+// take, not a re-taken one — the handle is that same object. Callers restore in the `finally` that took it.
 const snapshotIsUsable = (snap: EnvSnapshot): boolean => {
-  if (snapshotPool[snapshotDepth - 1] === snap) {
+  if (snapshotPool[snapshotDepth - 1] === snap && snap.takeId === liveTakeId[snapshotDepth - 1]) {
     return true;
   }
   warnDistinct('env-snapshot-order',

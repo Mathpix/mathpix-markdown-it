@@ -13,6 +13,12 @@ const {
   resetListState,
 } = require('../lib/markdown/md-latex-lists-env/list-state');
 const { applyListOpenState } = require('../lib/markdown/md-latex-lists-env/latex-list-common');
+const { ReNewCommand } = require('../lib/markdown/md-block-rule/renewcommand');
+const { Lists } = require('../lib/markdown/md-latex-lists-env/latex-list-env-block');
+const {
+  SetDefaultItemizeLevel,
+  GetItemizeLevel,
+} = require('../lib/markdown/md-latex-lists-env/re-level');
 const { resetWarnDistinct, warnDistinct } = require('../lib/markdown/common/warn-distinct');
 const listEnvEngine = require('../lib/markdown/md-latex-lists-env/latex-list-env-engine');
 const {
@@ -24,6 +30,7 @@ const {
   restoreEnvAll,
   restoreEnvKeysFromAll,
 } = require('../lib/markdown/common/env-transient');
+const { resetStateHostedCaches } = require('../lib/markdown/common/src-pos-cache');
 
 const { JSDOM } = require('jsdom');
 const jsdom = new JSDOM();
@@ -39,6 +46,8 @@ global.DOMParser = jsdom.window.DOMParser;
 // `md.block.parse` hands its fourth argument on as it got it, and the rule both reads and writes there.
 // Without an object every list of the document came out as literal LaTeX, with one warning to say why.
 describe('a list parses with no env of its own', () => {
+  // No `env` means the per-source caches land on the state; the root hook asserts nothing else does that.
+  afterEach(() => resetStateHostedCaches());
   it('builds the list instead of warning and declining', () => {
     const md = markdownIt({ html: true })
       .use(mathpixMarkdownPlugin, { outMath: { include_svg: false } });
@@ -1415,5 +1424,115 @@ describe('a state without prentLevel does not turn the depth into NaN:', () => {
     const state = { parentType: 'root', types: [], env: {}, push: stub };
     applyListOpenState(state, 'itemize', stub());
     state.prentLevel.should.equal(0);
+  });
+});
+
+// The footnote scan resolves its terminator set once per ruler state, keyed by the ruler's compiled
+// cache — a private field markdown-it nulls on enable/disable. Should it stop doing that, the set would
+// freeze and a rule toggled at runtime would keep being probed, or stop being probed, in silence.
+describe('the footnote terminator set follows the ruler:', () => {
+  const source = 'para \\footnote{n}\n\\begin{itemize}\n\\item a\n\\end{itemize}';
+  const options = { outMath: { include_svg: false } };
+  it('disabling the list rule changes what the scan swallows', () => {
+    const md = markdownIt({ html: true })
+      .use(mathpixMarkdownPlugin, { outMath: { include_svg: false } });
+    const withList = md.render(source, {});
+    withList.should.include('<li', 'the list did not render in the first place');
+    md.block.ruler.disable('Lists');
+    const withoutList = md.render(source, {});
+    withoutList.should.not.equal(withList, 'the terminator set was resolved from a stale cache');
+    md.block.ruler.enable('Lists');
+    md.render(source, {}).should.equal(withList, 'enabling it back did not restore the set');
+  });
+});
+
+// Two writes on a path that may still answer "no list". The macro reaches module-level marker state,
+// which no rollback covers; the `env` object reaches the caller's own state. Nothing probes the
+// `\renewcommand` rule today — it sits in the '' chain — and these keep that harmless if a terminator
+// set gains it.
+describe('a declining rule leaves no trace of its own:', () => {
+  const md = markdownIt({ html: true })
+    .use(mathpixMarkdownPlugin, { outMath: { include_svg: false } });
+  const quiet = (fn) => {
+    const warn = console.warn;
+    console.warn = () => {};
+    try { return fn(); } finally { console.warn = warn; }
+  };
+  const applyMacro = (silent) => {
+    SetDefaultItemizeLevel();
+    const state = new md.block.State('\\renewcommand{\\labelitemi}{ZZZ}\n', md, {}, []);
+    const verdict = quiet(() => ReNewCommand(state, 0, 1, silent));
+    return { verdict, marker: GetItemizeLevel()[0] };
+  };
+  afterEach(() => {
+    SetDefaultItemizeLevel();
+    resetListState();
+    // The two env tests below hand in none, so their caches land on the state.
+    resetStateHostedCaches();
+  });
+
+  it('a probe of the \\renewcommand rule does not apply the macro', () => {
+    applyMacro(true).marker.should.equal('\\textbullet', 'a probe redefined the document marker');
+  });
+  it('and answers the verdict the real call answers', () => {
+    applyMacro(true).verdict.should.equal(applyMacro(false).verdict);
+  });
+  it('the real call still applies it', () => {
+    applyMacro(false).marker.should.equal('ZZZ', 'the rule stopped applying the macro');
+  });
+
+  [undefined, null].forEach((given) => {
+    it('a discarded list parse puts back env === ' + String(given), () => {
+      const state = new md.block.State('\\begin{itemize}\n\\item a\n\\end{itemize}\n', md, given, []);
+      state.env = given;
+      quiet(() => Lists(state, 0, 3, true));
+      (state.env === given).should.equal(true,
+        'the rule left the caller an object it never had: ' + JSON.stringify(state.env));
+    });
+  });
+});
+
+// The rollback covers the caption counters and the level stack; the footnote list, labels and the
+// section counters it does not, so the guarantee for those is that no probe reaches them. A blank line
+// above the list is what removes the probe — the paragraph rule then needs no terminator — and the
+// counted artifacts must not know the difference. Fixtures cannot see this: they compare output with an
+// expectation, not with the same document parsed without a probe.
+describe('a speculative probe over a list changes no numbering:', () => {
+  const quietRender = (src) => {
+    const warn = console.warn;
+    const error = console.error;
+    console.warn = () => {};
+    console.error = () => {};
+    try {
+      return MM.markdownToHTML(src, { outMath: { include_svg: false } });
+    } finally {
+      console.warn = warn;
+      console.error = error;
+    }
+  };
+  const withList = (body) => '\\begin{itemize}\n\\item ' + body + '\n\\end{itemize}';
+  const shapes = {
+    'a footnote in the paragraph and in an item':
+      ['para \\footnote{outer}', 'a \\footnote{inner}'],
+    'a label and a reference to it': ['para \\label{k} see \\ref{k}', 'a \\label{m} see \\ref{m}'],
+    'a section above the list': ['\\section{S}', 'a'],
+    'a figure with a caption in an item': ['para', 'a\n\\begin{figure}\n\\caption{c}\n\\end{figure}'],
+    'a table with a caption in an item': ['para', 'a\n\\begin{table}\n\\caption{t}\n\\end{table}'],
+  };
+  // Counted artifacts only: the structure legitimately differs between the two layouts.
+  const numbering = (html) => ({
+    footnoteRefs: (html.match(/href="#fn\d+"/g) || []).sort().join(','),
+    footnoteItems: (html.match(/id="fn\d+"/g) || []).sort().join(','),
+    captions: (html.match(/(Table|Figure)\s+\d+/g) || []).join(','),
+    headings: (html.match(/<h\d[^>]*>[^<]*/g) || []).join('|'),
+  });
+  Object.keys(shapes).forEach((name) => {
+    it(name, () => {
+      const [head, body] = shapes[name];
+      const probed = quietRender(head + '\n' + withList(body));
+      const plain = quietRender(head + '\n\n' + withList(body));
+      numbering(probed).should.deep.equal(numbering(plain),
+        'the probe left something behind for the real parse to read');
+    });
   });
 });

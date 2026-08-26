@@ -56,9 +56,9 @@ export const braceMatches = (
   return closeOf;
 };
 
-/** Past a command name: a star, `[...]` options, and where `atName` also spaces and a bare name as in
- *  `\renewcommand\qedsymbol{Q}`. Between arguments there is no such form: skipping one there took
- *  `\textbf{x}\unknown{q}` as two arguments of `\textbf`. Options do not span lines. */
+/** Past a command name: `[...]` options, and where `atName` also spaces, a star and a bare name as in
+ *  `\renewcommand\qedsymbol{Q}`. Between arguments there is none of the three: skipping them there took
+ *  `\textbf{x}\unknown{q}` and `\text{a}*{b}` as two arguments. Options do not span lines. */
 const afterCommandOptions = (
   text: string,
   from: number,
@@ -70,7 +70,7 @@ const afterCommandOptions = (
     while (atName && at < text.length && (text[at] === ' ' || text[at] === '\t')) {
       at++;
     }
-    if (text[at] === '*') {
+    if (atName && text[at] === '*') {
       at++;
       continue;
     }

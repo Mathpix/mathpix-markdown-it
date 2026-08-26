@@ -163,6 +163,12 @@ describe('display-width: tokenMarkerWidth (em)', () => {
     textReserveEm('️').should.equal(0);
     textReserveEm('︠').should.equal(0);
   });
+  // Separators, not letters: they print nothing, and the snapshot claims to be complete on zero width.
+  it('the line and paragraph separators reserve nothing', () => {
+    isWideChar(0x2028).should.equal(false);
+    textReserveEm(' ').should.equal(0);
+    textReserveEm(' ').should.equal(0);
+  });
   it('a tab or newline measures like the space it collapses into', () => {
     ['\t', '\n', '\r'].forEach((ws) => {
       textReserveEm('a' + ws + 'b').should.be.closeTo(textReserveEm('a b'), 1e-9);

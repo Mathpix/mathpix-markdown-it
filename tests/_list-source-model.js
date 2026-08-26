@@ -280,3 +280,42 @@ describe('list source model: the offset anchor answers only for a suffix of its 
     resetUnanchoredOffsets();      // broke the invariant on purpose; the root hook holds the rest
   });
 });
+
+// The count is read in source order, `\end` first on a tie, and it walks with two cursors instead of
+// re-matching a shorter copy per transition — slicing made a line of openers quadratic.
+describe('unclosedEnvsIn counts transitions in order, at any length:', () => {
+  it('counts what the line leaves open', () => {
+    unclosedEnvsIn('\\begin{itemize}').should.equal(1);
+    unclosedEnvsIn('\\begin{itemize}\\begin{enumerate}').should.equal(2);
+    unclosedEnvsIn('\\end{itemize} \\begin{itemize}').should.equal(0);
+    unclosedEnvsIn('\\begin{itemize} \\end{itemize} \\begin{enumerate}').should.equal(1);
+    unclosedEnvsIn('plain text').should.equal(0);
+  });
+  it('an opener written as text is not a transition', () => {
+    unclosedEnvsIn('`\\begin{itemize}`').should.equal(0, 'a code span counted');
+    unclosedEnvsIn('\\item[\\begin{itemize}]').should.equal(0, 'a marker counted');
+    unclosedEnvsIn('`\\begin{itemize}` \\begin{enumerate}').should.equal(1);
+  });
+  it('and it is idempotent on already masked text', () => {
+    const line = '\\begin{itemize} `\\end{itemize}` \\begin{enumerate}';
+    unclosedEnvsIn(maskNonStructure(line)).should.equal(unclosedEnvsIn(line));
+  });
+  it('scales with the transitions, not with their square', function () {
+    this.timeout(60000);
+    const line = (n) => Array.from({ length: n }, () => '\\begin{itemize}').join(' ');
+    const median = (text) => {
+      for (let i = 0; i < 3; i++) { unclosedEnvsIn(text); }
+      const runs = [];
+      for (let i = 0; i < 5; i++) {
+        const started = process.hrtime.bigint();
+        unclosedEnvsIn(text);
+        runs.push(Number(process.hrtime.bigint() - started) / 1e6);
+      }
+      return Math.max(runs.sort((a, b) => a - b)[2], 0.001);
+    };
+    // Both sides clear of the clock: at 800 the small side measured 0.0 ms and the floor below turned
+    // noise into a ratio of hundreds. ×8 of the input reads 5.7 here, 64 with the slicing walk.
+    const growth = median(line(25600)) / median(line(3200));
+    growth.should.be.below(24, 'grows like the square of the transitions: ×' + growth.toFixed(1));
+  });
+});

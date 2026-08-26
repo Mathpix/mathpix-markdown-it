@@ -19,6 +19,25 @@ module.exports = [
     latex: "\\begin{itemize}\n\\item a $x \\end{itemize} y$\n\\item b\n\\end{itemize}",
     html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a $x</li></ul><div>y$<br>\n\\item b<br>\n\\end{itemize}</div>\n"
   },
+  // An argument is text to the readers that ask the source model, not to the item-content path — so the
+  // same closer ends the list once an `\item` precedes it. `master` ends it too, dropping the tail.
+  {
+    name: "a closer in \\caption after \\item on the opening line still ends the list",
+    latex: "\\begin{itemize}\\item a \\caption{x \\end{itemize} y}\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a \\caption{x</li></ul> y}\\end{itemize}"
+  },
+  {
+    name: "the same closer before the first \\item is content, and the list survives",
+    latex: "\\begin{itemize} \\caption{x \\end{itemize} y}\n\\item AAA\n\\item BBB\n\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\" data-custom-marker=\"true\" data-marker-empty=\"true\">  y}</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>AAA</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>BBB</li></ul>"
+  },
+  // One entry per command whose rule re-parses its argument, on a body line.
+  ...['caption', 'footnote', 'footnotetext', 'text', 'textbf'].map((name) => ({
+    name: 'a closer in \\' + name + ' on a body line still ends the list',
+    latex: '\\begin{itemize}\n\\item AAA \\' + name + '{x \\end{itemize} y}\n\\item BBB\n\\end{itemize}',
+    html: '<ul class="itemize" style="list-style-type: none"><li class="li_itemize"><span class="li_level">•</span>AAA \\'
+      + name + '{x</li></ul><div>y}<br>\n\\item BBB<br>\n\\end{itemize}</div>\n'
+  })),
   // On one line the inline path emits the gap as text, so it lands directly in the `<ul>`. The
   // two-line form is already clean.
   {
