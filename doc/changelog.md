@@ -1,8 +1,8 @@
 # August 2026
 
-## [3.1.0] - List rendering robustness fixes
+## [3.1.0] - List rendering robustness, and a tabular grid a consumer can build
 
-Malformed LaTeX lists rendered incorrectly in several unrelated ways. Details and measurements: `pr-specs/2026-07-list-rendering-robustness.md`, `pr-specs/2026-07-code-block-font-scaling.md`.
+Malformed LaTeX lists rendered incorrectly in several unrelated ways, and a tabular whose spans overlap came out as a grid no consumer can build. Details and measurements: `pr-specs/2026-07-list-rendering-robustness.md`, `pr-specs/2026-08-tabular-span-grid-invariant.md`, `pr-specs/2026-07-code-block-font-scaling.md`.
 
 A minor by decision: strict semver would call it a major, `tsv`/`csv` cells and `data-padding-inline-start` being documented output that changed shape. Pin the exact version if you need to review the diff before taking it.
 
@@ -31,9 +31,16 @@ Nothing to do — these replace output that was broken or invalid.
 - **`prentLevel` on an inline-opened `*_list_open` is the real nesting depth**, was always `0`, and the depth is reset per parse rather than healed mid-render.
 - **Also fixed:** empty `<>` item bodies, `\itemsep`/`\itemindent` read as `\item`, a continuation line containing the word `item` losing its break, a list swallowed by a `\footnote`/`\footnotetext` scan, an orphan `<br>` after a `\renewcommand` line, whitespace-only text nodes between `<ul>` and `<li>`, edge whitespace in a custom marker, nested lists missing line numbers under `lineNumbering`, and a marker-less `<li>` exporting a marker looked up by `NaN`.
 - **Malformed input costs less**, and well-formed lists parse faster than 3.0.1. Unclosed `\begin{tabular}`, and unclosed envs with no blank line between them, stay super-linear.
+- **A tabular's structure is decided once, before anything is emitted.** A `\multicolumn` running into columns a `\multirow` still covers is narrowed by the columns it cannot have, a `\multirow` deeper than the rows below it is clamped, and a span count that is not a positive whole number is read the way a table can honour it — `\multicolumn{0}`, `\multicolumn{q}`, `\multicolumn{2.5}` claim the one column the cell sits in instead of emitting `colspan="0"`, and `\multirow{0}`, `\multirow{q}`, `\multirow{2.5}` claim no rows, so no `rowspan` is written — a `colspan=4` beside 4 carried slots gave 8 effective columns in a 5-column table, which a browser absorbs by widening the row and a grid consumer cannot build. That is a valid width, not the intended layout: a cell that asked for 4 columns gets 1, and if the narrowing leaves it nothing, the cell is not emitted at all. The narrowed span also keeps its right edge, so it may still cover a slot carried from above — moving it onto the free run and keeping every cell is what `tabularGridMode: 'strict'` is for. Tables whose spans do not overlap render byte-identically to 3.0.1.
 - **Code blocks scale with their container**: `pre`/`pre code` sizes are relative. Pixel-identical at a 16px base except code padding (16px → 15px) and a raw-HTML `<pre>` with no `<code>` child (13.6px → 15px).
 
 What malformed input still costs is in the spec under **Boundaries**, and every shape of it is pinned in `tests/_data/_lists/_data_known_quirks.js`.
+
+### New option
+
+Nothing changes unless you ask for it.
+
+- **`tabularGridMode: 'source' | 'strict'`**, default `source`, which renders what earlier versions rendered. `strict` reconciles the grid for a consumer that needs one — CALS, DocBook, `docx`: a row every column of which a span holds and which prints nothing is dropped and those spans lose a row with it, a span holding a slot the row writes into gives the slot up, a clipped span takes only free columns, and every free column gets a cell. The table comes out shorter and its spans narrower than the source says, and no cell's content is lost. `forLatex` ignores the mode, so a `.tex` round-trip still rebuilds the source. See `pr-specs/2026-08-tabular-span-grid-invariant.md`.
 
 ## [3.0.1] - Preserve code indentation inside list/table/align env wrappers
 
