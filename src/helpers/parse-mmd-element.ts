@@ -100,3 +100,40 @@ export const parseMarkdownByElement = (el: HTMLElement | Document, include_sub_m
   }
   return res;
 };
+
+/**
+ * Builds a single Word-pasteable HTML document from a rendered MMD element.
+ *
+ * `parseMarkdownByElement` returns one entry per math element, which is what a
+ * per-equation copy needs. This instead keeps the surrounding prose and replaces
+ * every math container in place with the Word-flavoured MathML already embedded
+ * in it, so the result carries the whole snip in document order.
+ *
+ * The source element is never modified: the walk runs over a clone.
+ */
+export const parseMathmlWordDocument = (el: HTMLElement | Document): string => {
+  if (!el) return '';
+  const root: HTMLElement = (el as Document).body ? (el as Document).body : el as HTMLElement;
+  if (!root) return '';
+  const clone = root.cloneNode(true) as HTMLElement;
+  const doc = clone.ownerDocument;
+  if (!doc) return '';
+  const containers = Array.from(clone.querySelectorAll('.math-inline, .math-block'));
+  for (const node of containers) {
+    /** An outer container is replaced first, which detaches any nested one. */
+    if (!node.parentNode) continue;
+    const mathmlword = node.querySelector('mathmlword');
+    if (!mathmlword) {
+      node.parentNode.replaceChild(doc.createTextNode(node.textContent || ''), node);
+      continue;
+    }
+    const holder = doc.createElement('span');
+    holder.innerHTML = formatSourceHtmlWord(mathmlword.innerHTML);
+    const fragment = doc.createDocumentFragment();
+    while (holder.firstChild) {
+      fragment.appendChild(holder.firstChild);
+    }
+    node.parentNode.replaceChild(fragment, node);
+  }
+  return clone.innerHTML;
+};
