@@ -236,16 +236,15 @@ declare class MathpixMarkdown_Model {
     getMaxWidthStyle: (maxWidth?: string, isHideScroll?: boolean) => string;
     parseMarkdownByHTML: (html: string, include_sub_math?: boolean) => any[];
     parseMarkdownByElement: (el: Document | HTMLElement, include_sub_math?: boolean) => any[];
+    parseMathmlWordDocumentByHTML: (html: string) => string;
+    parseMathmlWordDocument: (el: Document | HTMLElement) => string;
     markdownToHTMLWithSize: (markdown: string, options?: TMarkdownItOptions, fontMetricsOptions?: IFontMetricsOptions) => {
         html: string;
         size: ISize;
     };
     markdownToHTMLSegments: (markdown: string, options?: TMarkdownItOptions) => {
         content: string;
-        map: [
-            number,
-            number
-        ][];
+        map: [number, number][];
     };
     markdownToHTML: (markdown: string, options?: TMarkdownItOptions) => string;
     showTocInContainer: (html: string, containerName?: string) => void;

@@ -1,3 +1,13 @@
+# September 2026
+
+## [3.0.2] - Whole-document Word MathML export
+
+New `parseMathmlWordDocument(el)` (and `parseMathmlWordDocumentByHTML(html)` on `MathpixMarkdownModel`) returns the whole rendered document as Word-pasteable HTML: prose plus every equation as Word-flavoured MathML, in rendered order.
+
+`parseMarkdownByElement` returns one entry per math element and carries no prose, so a client copying "for Word" could only ever paste a single equation. This walks a clone of the rendered tree instead, replacing each `.math-inline` / `.math-block` with the contents of its hidden `<mathmlword>` child, so inline math stays inline and display math keeps `display="block"`. A container without `<mathmlword>` degrades to its text content; the source element is never mutated.
+
+See `pr-specs/2026-09-mathmlword-whole-document.md`.
+
 # July 2026
 
 ## [3.0.1] - Preserve code indentation inside list/table/align env wrappers

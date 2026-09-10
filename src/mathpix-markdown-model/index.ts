@@ -12,7 +12,7 @@ import { ISmilesOptions } from '../markdown/md-chemistry';
 import { yamlParser } from '../yaml-parser';
 import { generateHtmlPage } from './html-page';
 import { getMaxWidthStyle } from '../styles/helpers';
-import { parseMarkdownByElement } from '../helpers/parse-mmd-element';
+import { parseMarkdownByElement, parseMathmlWordDocument } from '../helpers/parse-mmd-element';
 import { menuStyle } from '../contex-menu/styles';
 import { clipboardCopyStyles } from '../copy-to-clipboard/clipboard-copy-styles';
 import { eMmdRuleType } from "../markdown/common/mmdRules";
@@ -289,6 +289,15 @@ class MathpixMarkdown_Model {
   };
   
   parseMarkdownByElement = parseMarkdownByElement;
+
+  parseMathmlWordDocumentByHTML = (html: string): string => {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, "text/html");
+
+    return this.parseMathmlWordDocument(doc)
+  };
+
+  parseMathmlWordDocument = parseMathmlWordDocument;
 
   markdownToHTMLWithSize = (
     markdown: string,
