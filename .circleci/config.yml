@@ -4,7 +4,7 @@ jobs:
     working_directory: ~/app
 
     docker:
-    - image: cimg/node:20.9
+    - image: cimg/node:20.19
 
     steps:
     - checkout
@@ -19,15 +19,14 @@ jobs:
         command: |
           npm run build
 
-    - run: sudo npm install -g mocha
-    - run: sudo npm install -g mocha-junit-reporter
+    - run: sudo npm install -g mocha@12
 
     - run: mkdir reports
 
     # Run mocha
     - run:
         name: npm test
-        command: mocha tests/*.js --reporter mocha-junit-reporter --reporter-options mochaFile=reports/mocha/test-results.xml
+        command: mocha tests/*.js --exit --reporter xunit --reporter-options output=reports/mocha/test-results.xml
         when: always
         # Upload results
 
@@ -41,7 +40,7 @@ jobs:
     working_directory: ~/app
 
     docker:
-    - image: cimg/node:20.9
+    - image: cimg/node:20.19
 
     steps:
     - checkout
@@ -56,15 +55,14 @@ jobs:
         command: |
           npm run build
 
-    - run: sudo npm install -g mocha
-    - run: sudo npm install -g mocha-junit-reporter
+    - run: sudo npm install -g mocha@12
 
     - run: mkdir reports
 
     # Run mocha
     - run:
         name: npm test
-        command: mocha tests/*.js --reporter mocha-junit-reporter --reporter-options mochaFile=reports/mocha/test-results.xml
+        command: mocha tests/*.js --exit --reporter xunit --reporter-options output=reports/mocha/test-results.xml
         when: always
         # Upload results
 
