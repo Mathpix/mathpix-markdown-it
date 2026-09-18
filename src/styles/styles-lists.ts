@@ -1,43 +1,35 @@
+import {
+  cssBlock, LIST_ROOT_STYLE, NESTED_LIST_STYLE, LIST_ITEM_STYLE,
+  LIST_MARKER_STYLE, LIST_ITEM_CUSTOM_STYLE, LIST_ITEM_ENUMERATE_STYLE,
+} from "./structural";
+
 export const listsStyles = `
 ol.enumerate, ul.itemize,
 #preview-content ol.enumerate, #setText ol.enumerate,
 #preview-content ul.itemize, #setText ul.itemize {
-  padding-inline-start: 40px;
-  margin: 0 0 1em 0;
+  ${cssBlock(LIST_ROOT_STYLE)}
 }
 li > ol.enumerate, li > ul.itemize,
 #preview-content li > ol.enumerate, #setText li > ol.enumerate,
 #preview-content li > ul.itemize, #setText li > ul.itemize {
-  margin: 0;
+  ${cssBlock(NESTED_LIST_STYLE)}
 }
 ul.itemize > li,
 #preview-content ul.itemize > li, #setText ul.itemize > li {
-  position: relative;
-  min-height: 1.4em;
-  margin-bottom: 0;
+  ${cssBlock(LIST_ITEM_STYLE)}
 }
 .enumerate > .li_enumerate,
 #preview-content .enumerate > .li_enumerate, #setText .enumerate > .li_enumerate {
-  margin-bottom: 0;
+  ${cssBlock(LIST_ITEM_ENUMERATE_STYLE)}
 }
 .itemize > li > span.li_level, .li_enumerate.not_number > span.li_level,
 #preview-content .itemize > li > span.li_level, #setText .itemize > li > span.li_level,
 #preview-content .li_enumerate.not_number > span.li_level, #setText .li_enumerate.not_number > span.li_level {
-  position: absolute;
-  right: 100%;
-  white-space: nowrap;
-  width: max-content;
-  display: flex;
-  justify-content: flex-end;
-  padding-right: 10px;
-  box-sizing: border-box;
+  ${cssBlock(LIST_MARKER_STYLE)}
 }
 .li_enumerate.not_number,
 #preview-content .li_enumerate.not_number, #setText .li_enumerate.not_number {
-  position: relative;
-  display: inline-block;
-  list-style-type: none;
-  min-height: 1.4em;
+  ${cssBlock(LIST_ITEM_CUSTOM_STYLE)}
 }
 .itemize > li > span.li_level .math-inline,
 .enumerate > li > span.li_level .math-inline,

@@ -5,6 +5,21 @@ import { PREVIEW_LINE_CLASS, PREVIEW_PARAGRAPH_PREFIX } from "../rules";
 import { uid } from '../utils';
 import convertSvgToBase64 from "../md-svg-to-base64/convert-scv-to-base64";
 import { reOpenTagSmiles } from "../common/consts";
+import { smilesSourceForCanvas } from "../canvas/render-helpers";
+
+/**
+ * The visible source under Canvas, the hidden copy otherwise. That copy is not allowlisted either,
+ * so Canvas would unwrap it and its payload would become body text.
+ */
+const renderSmilesSource = (smiles: string, options, include_smiles: boolean): string => {
+  if (options.forCanvas) {
+    return smilesSourceForCanvas(smiles);
+  }
+  if (include_smiles) {
+    return '<smiles style="display: none;">' + smiles + '</smiles>';
+  }
+  return '';
+};
 
 export interface ISmilesOptions extends ISmilesOptionsDef {
   theme?: string,
@@ -187,7 +202,7 @@ const renderSmilesDrawerBlock = (tokens, idx, options, env, slf) => {
     ? uid()
     : '';
 
-  let resSvg = include_svg || options.forDocx
+  let resSvg = !options.forCanvas && (include_svg || options.forDocx)
     ? ChemistryDrawer.drawSvgSync(token.content.trim(), id, options, options.forPptx)
     : '';
 
@@ -200,9 +215,7 @@ const renderSmilesDrawerBlock = (tokens, idx, options, env, slf) => {
   const attrs = options?.lineNumbering
     ? injectLineNumbersSmiles(tokens, idx, options, env, slf)
     : '';
-  const outputSmiles = include_smiles
-    ? '<smiles style="display: none;">' + token.content.trim() + '</smiles>'
-    : '';
+  const outputSmiles = renderSmilesSource(token.content.trim(), options, include_smiles);
 
   const maxWidth = options.maxWidth ? ` max-width: ${options.maxWidth}; overflow-x: auto;` : '';
   if (attrs) {
@@ -226,7 +239,7 @@ const renderSmilesDrawerInline = (tokens, idx, options, env, slf) => {
     ? uid()
     : '';
 
-  let resSvg = include_svg || options.forDocx
+  let resSvg = !options.forCanvas && (include_svg || options.forDocx)
     ? ChemistryDrawer.drawSvgSync(token.content.trim(), id, options, options.forPptx)
     : '';
 
@@ -235,9 +248,7 @@ const renderSmilesDrawerInline = (tokens, idx, options, env, slf) => {
     resSvg = convertSvgToBase64(resSvg, imgId);
   }
 
-  const outputSmiles = include_smiles
-    ? '<smiles style="display: none;">' + token.content.trim() + '</smiles>'
-    : '';
+  const outputSmiles = renderSmilesSource(token.content.trim(), options, include_smiles);
 
   const maxWidth = options.maxWidth ? ` max-width: ${options.maxWidth}; overflow-x: auto;` : '';
   return maxWidth

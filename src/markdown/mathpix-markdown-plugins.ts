@@ -25,7 +25,7 @@ import { getDisableRuleTypes } from "./common/mmdRulesToDisable";
 
 export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
   const {width = 1200,  outMath = {}, smiles = {}, mathJax = {}, renderElement = {},
-    forDocx = false, forLatex = false, forMD = false, forPptx = false,
+    forDocx = false, forLatex = false, forMD = false, forPptx = false, forCanvas = false,
     maxWidth = '',
     enableFileLinks = false, validateLink = null,
     toc = {},
@@ -57,6 +57,7 @@ export const mathpixMarkdownPlugin = (md: MarkdownIt, options) => {
     forLatex: forLatex,
     forMD: forMD,
     forPptx: forPptx,
+    forCanvas: forCanvas,
     maxWidth: maxWidth,
     enableFileLinks: enableFileLinks,
     accessibility: accessibility,

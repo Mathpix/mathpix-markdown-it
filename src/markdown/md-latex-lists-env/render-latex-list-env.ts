@@ -6,9 +6,14 @@ import { GetItemizeLevelTokens, GetEnumerateLevel, GetItemizeLevel } from "./re-
 import { renderTabularInline } from "../md-renderer-rules/render-tabular";
 import { needToHighlightAll, highlightText } from "../highlight/common";
 import convertSvgToBase64 from "../md-svg-to-base64/convert-scv-to-base64";
+import {
+  canvasListRootStyle, canvasListStyles, skipEmptyMarker,
+} from "../canvas/render-helpers";
 import { mathTokenTypes } from "../common/consts";
 import { isMathInText } from "../utils";
 import {CustomMarkerHtmlResult} from "./latex-list-types";
+
+const styleAttr = (style: string): string => style ? ` style="${style}"` : '';
 
 var level_itemize = 0;
 var level_enumerate = 0;
@@ -158,8 +163,8 @@ export const render_itemize_list_open: Renderer.RenderRule = (
   }
   const attrs: string = slf.renderAttrs(token) + dataAttr;
   const style: string = level_itemize > 1
-    ? 'list-style-type: none'
-    : `${paddingInlineStyle}list-style-type: none`;
+    ? `${canvasListRootStyle(options, '', true)}list-style-type: none`
+    : `${canvasListRootStyle(options, paddingInlineStyle, false)}list-style-type: none`;
   const ulOpen: string = `<ul${attrs} style="${style}">`;
   if (prevToken?.type === 'itemize_list_open') {
     return `<li class="li_itemize" data-custom-marker="true" data-marker-empty="true">${ulOpen}`;
@@ -224,8 +229,8 @@ export const render_enumerate_list_open: Renderer.RenderRule = (
   }
   const attrs: string = slf.renderAttrs(token) + dataAttr;
   const style = level_enumerate > 1
-    ? `list-style-type: ${currentStyle}`
-    : `${paddingInlineStyle}list-style-type: ${currentStyle}`;
+    ? `${canvasListRootStyle(options, '', true)}list-style-type: ${currentStyle}`
+    : `${canvasListRootStyle(options, paddingInlineStyle, false)}list-style-type: ${currentStyle}`;
   const olOpen: string = `<ol${attrs} style="${style}">`;
   if (prevToken?.type === 'itemize_list_open') {
     return `<li class="li_itemize" data-custom-marker="true" data-marker-empty="true">${olOpen}`;
@@ -485,8 +490,13 @@ const renderLatexListItemCore = (
       const markerInfo: MarkerInfo = buildCustomMarkerInfo(token, options, slf, env);
       dataAttr += markerInfo.dataAttr;
       htmlMarker = markerInfo.htmlMarker;
-      const prefix: string = `<li${slf.renderAttrs(token)}${dataAttr} style="display: block">` +
-        `<span class="li_level"${dataAttr}>${htmlMarker}</span>`;
+      const canvasStyles = canvasListStyles(options);
+      /** The Canvas style sets its own `display`, so keeping `display: block` would be dead. */
+      const liStyle: string = canvasStyles.itemCustom || 'display: block';
+      const prefix: string = `<li${slf.renderAttrs(token)}${dataAttr} style="${liStyle}">` +
+        (skipEmptyMarker(options, dataAttr)
+          ? ''
+          : `<span class="li_level"${dataAttr}${styleAttr(canvasStyles.marker)}>${htmlMarker}</span>`);
       if (isOpen) {
         return prefix;
       }
@@ -523,9 +533,12 @@ const renderLatexListItemCore = (
   } else {
     tokens[index].attrJoin("class", className);
   }
+  const canvasStyles = canvasListStyles(options);
   const prefix =
-    `<li${slf.renderAttrs(token)}${dataAttr}>` +
-    `<span class="li_level"${dataAttr}>${htmlMarker}</span>`;
+    `<li${slf.renderAttrs(token)}${dataAttr}${styleAttr(canvasStyles.item)}>` +
+    (skipEmptyMarker(options, dataAttr)
+      ? ''
+      : `<span class="li_level"${dataAttr}${styleAttr(canvasStyles.marker)}>${htmlMarker}</span>`);
   if (isOpen) {
     if (needsPptxLeadingSpace()) {
       return prefix + "<span>&nbsp;</span>";

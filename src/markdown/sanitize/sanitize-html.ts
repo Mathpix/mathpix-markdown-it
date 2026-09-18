@@ -468,7 +468,10 @@ function sanitizeHtml(html, options, _recursing) {
               try {
                 const abstractSyntaxTree = postcssParse(name + ' {' + value + '}');
                 const filteredAST = filterCss(abstractSyntaxTree, options.allowedStyles);
-
+                /** Rewrites declarations inside the parse that already happens here. */
+                if (options.transformStyle) {
+                  options.transformStyle(filteredAST.nodes[0]);
+                }
                 value = stringifyStyleAttributes(filteredAST);
 
                 if (value.length === 0) {

@@ -5,6 +5,11 @@ import {
   COLOR_LINK, COLOR_MARK_BG, COLOR_MATH_ERROR_BG, COLOR_MATH_ERROR_TEXT,
   COLOR_TOC_SUBTITLE, COLOR_TOC_LINK, COLOR_TOC_LINK_HOVER, COLOR_TOC_LINK_ACTIVE,
 } from "./colors";
+import {
+  MAIN_TITLE_STYLE, AUTHOR_STYLE, AUTHOR_COLUMN_STYLE, AUTHOR_ITEM_STYLE,
+  ABSTRACT_STYLE, SECTION_TITLE_STYLE, MATH_INLINE_STYLE, MATH_BLOCK_STYLE,
+  TABLE_STYLE, TABLE_HEADER_STYLE, tableCellStyle, DEFAULT_BORDER_COLOR, cssBlock,
+} from "./structural";
 
 export { COLOR_CODE_BG } from "./colors";
 
@@ -91,15 +96,10 @@ mjx-container[jax="SVG"] > svg {
   max-width: 100%;
 }
 .math-block {
-  align-items: center;
-  page-break-after: auto;
-  page-break-inside: avoid;
-  margin: 0;
-  display: block;
+  ${cssBlock(MATH_BLOCK_STYLE)}
 }
 .math-inline {
-  display: inline-flex;
-  max-width: 100%;
+  ${cssBlock(MATH_INLINE_STYLE)}
 }
 .math-block[data-width="full"] {
   overflow-x: auto;
@@ -186,21 +186,14 @@ const codeBlockStyles = (useColors: boolean): string => `
 
 const tableStyles = (useColors: boolean): string => `
 #preview-content table, #setText table {
-  display: table;
-  overflow: auto;
-  max-width: 100%;
-  border-collapse: collapse;
-  page-break-inside: avoid;
-  margin-bottom: 1em;
+  ${cssBlock(TABLE_STYLE)}
 }
 #preview-content table th, #setText table th {
-  text-align: center;
-  font-weight: bold;
+  ${cssBlock(TABLE_HEADER_STYLE)}
 }
 #preview-content table td, #setText table td,
 #preview-content table th, #setText table th {
-  border: 1px solid ${useColors ? COLOR_TABLE_BORDER : 'currentColor'};
-  padding: 6px 13px;
+  ${cssBlock(tableCellStyle(useColors ? COLOR_TABLE_BORDER : DEFAULT_BORDER_COLOR))}
 }
 #preview-content table tr, #setText table tr {
   ${useColors ? `background-color: ${COLOR_TABLE_ROW_BG};` : ''}
@@ -213,37 +206,27 @@ const tableStyles = (useColors: boolean): string => `
 const docStructureStyles = (): string => `
 .main-title,
 #preview-content .main-title, #setText .main-title {
-  text-align: center;
-  line-height: 1.2;
-  margin: 0 auto 1em auto;
+  ${cssBlock(MAIN_TITLE_STYLE)}
 }
 .author,
 #preview-content .author, #setText .author {
-  text-align: center;
-  margin: 0 auto;
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
+  ${cssBlock(AUTHOR_STYLE)}
 }
 .author p,
 #preview-content .author p, #setText .author p {
-  min-width: 30%;
-  max-width: 50%;
-  padding: 0 7px;
+  ${cssBlock(AUTHOR_COLUMN_STYLE)}
 }
 .author > p > span,
 #preview-content .author > p > span, #setText .author > p > span {
-  display: block;
-  text-align: center;
+  ${cssBlock(AUTHOR_ITEM_STYLE)}
 }
 .section-title,
 #preview-content .section-title, #setText .section-title {
-  margin-top: 1.5em;
+  ${cssBlock(SECTION_TITLE_STYLE)}
 }
 .abstract,
 #preview-content .abstract, #setText .abstract {
-  text-align: justify;
-  margin-bottom: 1em;
+  ${cssBlock(ABSTRACT_STYLE)}
 }
 .abstract p,
 #preview-content .abstract p, #setText .abstract p {

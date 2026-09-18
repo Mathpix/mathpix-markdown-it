@@ -2,6 +2,12 @@ import { renderTabularInline } from "./render-tabular";
 import { renderInlineContent } from "../mdPluginText";
 import { isMathInText } from "../utils";
 
+const XOUT_STYLE =
+  'background: repeating-linear-gradient(-60deg, currentcolor, currentcolor, transparent 1px, transparent 6px);';
+const LINE_THROUGH_STYLE = 'text-decoration: line-through;';
+/** Canvas has no `text-decoration-thickness` in its allowlist, so it is left out there. */
+const LINE_THROUGH_FROM_FONT_STYLE = 'text-decoration: line-through; text-decoration-thickness: from-font;';
+
 const htmlUnderlineOpen = (underlineLevel, underlineType = 'underline', underlinePadding = 0): string => {
   if (underlineType === 'uwave') {
     let html = `<span data-underline-level="${underlineLevel}" `;
@@ -125,9 +131,13 @@ export const renderOutOpen = (tokens, idx, options, env, slf) => {
   let html = `<span `;
   html += `data-out-type="${token.underlineType}" `;
   html += 'style="';
-  html += token.underlineType === 'xout' 
-    ? 'background: repeating-linear-gradient(-60deg, currentcolor, currentcolor, transparent 1px, transparent 6px);'
-    : 'text-decoration: line-through; text-decoration-thickness: from-font;';
+  if (token.underlineType === 'xout') {
+    html += XOUT_STYLE;
+  } else if (options?.forCanvas) {
+    html += LINE_THROUGH_STYLE;
+  } else {
+    html += LINE_THROUGH_FROM_FONT_STYLE;
+  }
   html += '">';
   return html;
 };

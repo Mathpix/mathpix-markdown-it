@@ -18,6 +18,7 @@ import { newlineToSpace } from "./md-inline-rule/new-line-to-space";
 import { getStyleFromHighlight } from "./highlight/common";
 import {ParserErrors} from "../mathpix-markdown-model";
 import { textMode } from "./md-inline-rule/text-mode";
+import { AUTHOR_STYLE, AUTHOR_COLUMN_STYLE, AUTHOR_ITEM_STYLE } from "../styles/structural";
 
 export let sectionCount: number = 0;
 export let subCount: number = 0;
@@ -762,11 +763,12 @@ const textAuthor: RuleInline = (state, silent) => {
   }
 
   const type = "author";
-  const arrtStyle = 'text-align: center; margin: 0 auto; display: flex; justify-content: center; flex-wrap: wrap;';
+  const arrtStyle = AUTHOR_STYLE;
 
   if (!silent) {
     const token = state.push(type, "", 0);
-    if (state.md.options?.forDocx && arrtStyle) {
+    /** Canvas takes no stylesheet, so the structure of the block has to travel inline. */
+    if ((state.md.options?.forDocx || state.md.options?.forCanvas) && arrtStyle) {
       token.attrSet('style', arrtStyle);
     }
     token.content = content;
@@ -1212,9 +1214,10 @@ const getAuthorItemToken = (tokens, index, options, env, slf) => {
   const token = tokens[index];
   const content = renderInlineContent(token, options, env, slf);
 
+  /** The leading space is what DOCX has always been given; its output is a contract. */
   let attrStyle = options.forDocx
-    ? ' display: block; text-align: center;'
-    : '';
+    ? ` ${AUTHOR_ITEM_STYLE}`
+    : options.forCanvas ? AUTHOR_ITEM_STYLE : '';
 
   res += attrStyle
     ? `<span style="${attrStyle}">${content}</span>`
@@ -1226,8 +1229,8 @@ const getAuthorItemToken = (tokens, index, options, env, slf) => {
 const getAuthorColumnToken = (tokens, index, options, env, slf) => {
   let res = '';
   const token = tokens[index];
-  let attrStyle = options.forDocx
-    ? 'min-width: 30%; max-width: 50%; padding: 0 7px;'
+  let attrStyle = options.forDocx || options.forCanvas
+    ? AUTHOR_COLUMN_STYLE
     : '';
 
   const content: string = token.children && token.children.length
@@ -1245,7 +1248,7 @@ const getAuthorColumnToken = (tokens, index, options, env, slf) => {
 
 const renderAuthorToken: Renderer = (tokens, index, options, env, slf) => {
   const token = tokens[index];
-  let divStyle: string = options.forDocx
+  let divStyle: string = options.forDocx || options.forCanvas
     ? token.attrGet('style')
     : '';
 
@@ -1515,25 +1518,27 @@ export default () => {
         tokens[idx].attrPush(['target', '_self']);
       }
 
+      /** Canvas has no `word-break` in its CSS allowlist, so it would be stripped on save. */
+      const pushWordBreak = (value: string): void => {
+        if (options.forCanvas) {
+          return;
+        }
+        tokens[idx].attrPush(['style', value]);
+      };
+
       if (!tokens[idx + 1] || !tokens[idx + 1].content) {
-          tokens[idx].attrPush([
-            'style', 'word-break: break-word'
-          ]);
+          pushWordBreak('word-break: break-word');
           return self.renderToken(tokens, idx, options)
       }
 
       if (tokens[idx + 1].content.length > 40 && !tokens[idx + 1].content.includes(' ')) {
-        tokens[idx].attrPush([
-          'style', 'word-break: break-all'
-        ]);
+        pushWordBreak('word-break: break-all');
       } else if (!tokens[idx + 1].content.includes(' ')) {
         tokens[idx].attrPush([
           'style', 'display: inline-block'
         ]);
       } else {
-        tokens[idx].attrPush([
-          'style', 'word-break: break-word'
-        ]);
+        pushWordBreak('word-break: break-word');
       }
       return self.renderToken(tokens, idx, options)
     }

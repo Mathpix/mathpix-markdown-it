@@ -1,5 +1,6 @@
 import {checkFormula} from './check-formula';
 import {markdownToHTML as markdownHTML, markdownToHTMLSegments} from "../markdown";
+import {applyCanvasProfile, canvasWarnings, ICanvasWarnings} from "../markdown/canvas";
 import {MathpixStyle, PreviewStyle, TocStyle, resetBodyStyles} from "../styles";
 import { ContainerStyle } from "../styles/styles-container";
 import { codeStyles } from "../styles/styles-code";
@@ -123,6 +124,11 @@ export type TMarkdownItOptions = {
   forLatex?: boolean;
   forMD?: boolean;
   forPptx?: boolean;
+  /**
+   * Internal. Set by `markdownToCanvasHTML`, which is the entry point for the Canvas profile.
+   * It only reaches the render rules; on its own it applies none of the profile.
+   */
+  forCanvas?: boolean;
   openLinkInNewWindow?: boolean;
   maxWidth?: string;
   htmlWrapper?: THtmlWrapper | boolean;
@@ -147,6 +153,13 @@ export type TMarkdownItOptions = {
   previewUuid?: string;
   enableSizeCalculation?: boolean;
 }
+
+/**
+ * What a caller may set. `forCanvas` is not among them: on its own it reaches only the render rules
+ * and applies none of the profile, so `markdownToCanvasHTML` is the way in. Structural typing makes
+ * this a signpost rather than a barrier — a value already typed `TMarkdownItOptions` still passes.
+ */
+export type TPublicMarkdownItOptions = Omit<TMarkdownItOptions, 'forCanvas'>;
 
 export type TOutputMath = {
   output_format?: 'svg' | 'mathml' | 'latex';
@@ -292,7 +305,7 @@ class MathpixMarkdown_Model {
 
   markdownToHTMLWithSize = (
     markdown: string,
-    options: TMarkdownItOptions = {},
+    options: TPublicMarkdownItOptions = {},
     fontMetricsOptions: IFontMetricsOptions = null
   ): {html: string, size: ISize} => {
     resetSizeCounter();
@@ -307,14 +320,51 @@ class MathpixMarkdown_Model {
     }
   }
 
-  markdownToHTMLSegments = (markdown: string, options: TMarkdownItOptions = {}): {content: string, map: [number, number][]} => {
+  markdownToHTMLSegments = (markdown: string, options: TPublicMarkdownItOptions = {}): {content: string, map: [number, number][]} => {
     const { isDisableFancy = false } = options;
     const disableRules = isDisableFancy ? this.disableFancyArrayDef : options ? options.disableRules || [] : [];
     this.setOptions(disableRules);
     return markdownToHTMLSegments(markdown, options);
   }
 
-  markdownToHTML = (markdown: string, options: TMarkdownItOptions = {}):string => {
+  /**
+   * Renders markdown into the HTML a Canvas LMS page keeps verbatim, with what the caller should be
+   * told before publishing it. The only entry point for the profile: it fixes the math format and
+   * returns a fragment, so those options are not the caller's to set here.
+   *
+   * It does not sanitize. Raw HTML in the document is handled by `htmlSanitize` exactly as in
+   * `markdownToHTML`, and turning that off lets a script through here too — Canvas deletes one on
+   * save, but anything that shows the result before then would not.
+   */
+  markdownToCanvasHTML = (
+    markdown: string,
+    options: TPublicMarkdownItOptions = {}
+  ): { html: string, warnings: ICanvasWarnings } => {
+    const { lineNumbering = false, isDisableFancy = false } = options;
+    const disableRules = isDisableFancy ? this.disableFancyArrayDef : options ? options.disableRules || [] : [];
+    this.setOptions(disableRules);
+    MathJax.beginRender(options?.previewUuid);
+    /**
+     * Canvas deletes SVG, so any other math format would leave the page with no formulas at all.
+     * The `include_*` flags are left to the caller: under this format none of them reaches the
+     * output, and the hidden copies they would otherwise add are dropped by the profile anyway.
+     */
+    const canvasOptions: TMarkdownItOptions = {
+      ...options,
+      forCanvas: true,
+      htmlWrapper: false,
+      outMath: { ...options.outMath, output_format: 'mathml' },
+    };
+    /** Runs on the finished HTML so raw HTML from the document is covered too. */
+    const rendered = markdownHTML(markdown, canvasOptions);
+    const html = applyCanvasProfile(rendered);
+    if (!lineNumbering) {
+      MathJax.Reset();
+    }
+    return { html: html, warnings: canvasWarnings(html, rendered) };
+  };
+
+  markdownToHTML = (markdown: string, options: TPublicMarkdownItOptions = {}):string => {
     const { lineNumbering = false, isDisableFancy = false,  htmlWrapper = false } = options;
     const disableRules = isDisableFancy ? this.disableFancyArrayDef : options ? options.disableRules || [] : [];
     this.setOptions(disableRules);
@@ -495,7 +545,7 @@ class MathpixMarkdown_Model {
         }
     };
 
-    convertToHTML = (str:string, options: TMarkdownItOptions = {}) => {
+    convertToHTML = (str:string, options: TPublicMarkdownItOptions = {}) => {
       try {
         const startTime = new Date().getTime();
         const  mathString =  this.isCheckFormula ? this.checkFormula(str, this.showTimeLog): str;
@@ -707,7 +757,7 @@ class MathpixMarkdown_Model {
         );
     };
 
-  mmdYamlToHTML = (mmd: string, options: TMarkdownItOptions = {}, isAddYamlToHtml = false) => {
+  mmdYamlToHTML = (mmd: string, options: TPublicMarkdownItOptions = {}, isAddYamlToHtml = false) => {
     try {
       MathJax.Reset();
       const { isDisableFancy = false } = options;
@@ -733,7 +783,7 @@ class MathpixMarkdown_Model {
     }
   }
 
-  renderTitleMmd = (title: string, options: TMarkdownItOptions = {}, className = 'article-title', isOnlyInner = false): string => {
+  renderTitleMmd = (title: string, options: TPublicMarkdownItOptions = {}, className = 'article-title', isOnlyInner = false): string => {
     try {
       if (!title) {
         return '';
@@ -753,7 +803,7 @@ class MathpixMarkdown_Model {
     }
   };
 
-  renderAuthorsMmd = (authors: string, options: TMarkdownItOptions = {}, className = 'article-author', isOnlyInner = false) => {
+  renderAuthorsMmd = (authors: string, options: TPublicMarkdownItOptions = {}, className = 'article-author', isOnlyInner = false) => {
     try {
       if (!authors) {
         return '';
