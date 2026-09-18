@@ -13,6 +13,8 @@ import {
 export const PREVIEW_PARAGRAPH_PREFIX = "preview-paragraph-";
 export const PREVIEW_LINE_CLASS = "preview-line";
 
+const STYLE_END_RE = /\s*;?\s*$/;
+
 const escapeHtml = require('markdown-it/lib/common/utils').escapeHtml;
 
 /** custom rules to inject in the renderer pipeline (aka mini plugin) */
@@ -81,12 +83,25 @@ function injectLabelIdToParagraphOPen(tokens, idx, options, env, slf) {
   return slf.renderToken(tokens, idx, options, env, slf);
 }
 
+/** Prepends, so a declaration the document wrote wins over the default put here. */
+const prependStyle = (token, style: string): void => {
+  if (!style) {
+    return;
+  }
+  const current = token.attrGet("style");
+  if (!current) {
+    token.attrSet("style", style);
+    return;
+  }
+  token.attrSet("style", style.replace(STYLE_END_RE, "; ") + current);
+};
+
 function injectCenterTables(tokens, idx, options, env, slf) {
   const token = tokens[idx];
   if (token.level === 0) {
     /** Canvas does not allow `align` on a table; the equivalent margin is. */
     if (options.forCanvas) {
-      token.attrJoin("style", TABLE_CENTER_STYLE);
+      prependStyle(token, TABLE_CENTER_STYLE);
     } else {
       token.attrJoin("align", "center");
     }
@@ -244,7 +259,7 @@ const injectCanvasTableStyles = (renderer) => {
   for (const name of Object.keys(styles)) {
     const previous = renderer.renderer.rules[name];
     renderer.renderer.rules[name] = function (tokens, idx, options, env, slf) {
-      tokens[idx].attrJoin('style', styles[name]);
+      prependStyle(tokens[idx], styles[name]);
       return previous
         ? previous(tokens, idx, options, env, slf)
         : slf.renderToken(tokens, idx, options, env, slf);

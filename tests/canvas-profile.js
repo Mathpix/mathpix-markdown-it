@@ -56,6 +56,12 @@ const CORPUS = [
   '| --- | --- |',
   '| 1 | 2 |',
   '',
+  'A table keeps consuming rows across a blank line, so the aligned one needs a paragraph first.',
+  '',
+  '| left | centre | right |',
+  '| :--- | :----: | ----: |',
+  '| 1 | 2 | 3 |',
+  '',
   '\\begin{tabular}{|l|c|}',
   '\\hline',
   'H & V \\\\',
@@ -263,8 +269,27 @@ describe('Canvas profile', () => {
   it('gives every cell the grid its stylesheet rule carries', () => {
     const cells = html.match(/<t[dh]\b[^>]*>/g) || [];
     assert.ok(cells.length > 0, 'the corpus must exercise a table');
-    const unpadded = cells.filter(cell => !/padding/.test(cell));
-    assert.deepStrictEqual(unpadded, [], `${unpadded.length} cells carry no padding`);
+    const unstyled = cells.filter(cell => !/padding/.test(cell) || !/border/.test(cell));
+    assert.deepStrictEqual(unstyled, [], `${unstyled.length} cells carry no grid`);
+  });
+
+  /**
+   * markdown-it writes the column alignment into the same attribute, without a closing `;`, so a
+   * default joined on carelessly runs into it and the whole attribute is dropped as unparsable.
+   */
+  it('keeps both the column alignment and the defaults on an aligned cell', () => {
+    const aligned = (html.match(/<t[dh]\b[^>]*>/g) || []).filter(cell =>
+      /text-align:\s*right/.test(cell)
+    );
+    assert.ok(aligned.length > 0, 'the corpus must exercise an aligned column');
+    for (const cell of aligned) {
+      assert.ok(/border/.test(cell) && /padding/.test(cell), `alignment ate the defaults: ${cell}`);
+      /** The document's own alignment has to come last, or the header default would win. */
+      assert.ok(
+        cell.lastIndexOf('text-align:right') > cell.indexOf('text-align:center'),
+        `the default alignment overrode the column: ${cell}`
+      );
+    }
   });
 
   /**
