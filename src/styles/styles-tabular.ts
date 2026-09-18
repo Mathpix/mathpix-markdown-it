@@ -2,30 +2,26 @@ import {
   COLOR_TABULAR_TD_BG, COLOR_TABULAR_TD_BORDER,
   COLOR_DARK_BG, COLOR_DARK_TABULAR_TD_BORDER,
 } from "./colors";
+import {
+  FIGURE_IMG_STYLE, TABULAR_STYLE, TABULAR_EMPTY_CELL_STYLE, TABLE_TABULAR_STYLE,
+  TABULAR_CELL_PADDING, TABULAR_HEADER_PADDING, cssBlock,
+} from "./structural";
 
 export const tabularStyles = (useColors: boolean = true, isPptx: boolean = false): string => {
   const cellColors = useColors && !isPptx;
   return `
 .table_tabular,
 #preview-content .table_tabular, #setText .table_tabular {
-  overflow-x: auto;
-  padding: 0 2px 0.5em 2px;
+  ${cssBlock(TABLE_TABULAR_STYLE)}
 }
 .tabular,
 #preview-content .tabular, #setText .tabular {
-  display: inline-table !important;
-  width: auto;
-  table-layout: auto;
-  border-collapse: collapse;
-  border-spacing: 0;
-  margin: 0 0 1em;
-  font-size: inherit;
-  height: fit-content;
+  ${cssBlock(TABULAR_STYLE)}
 }
 .tabular th,
 #preview-content .tabular th, #setText .tabular th {
   border: none !important;
-  padding: 6px 13px;
+  ${TABULAR_HEADER_PADDING}
   background-color: transparent;
   font-weight: bold;
 }
@@ -41,7 +37,7 @@ export const tabularStyles = (useColors: boolean = true, isPptx: boolean = false
   ${cellColors ? `background-color: ${COLOR_TABULAR_TD_BG};` : 'background-color: transparent;'}
   ${cellColors ? `border-color: ${COLOR_TABULAR_TD_BORDER} !important;` : 'border-color: currentColor !important;'}
   word-break: keep-all;
-  padding: 0.1em 0.5em !important;
+  ${TABULAR_CELL_PADDING}
 }
 .tabular td > p,
 #preview-content .tabular td > p, #setText .tabular td > p {
@@ -50,7 +46,7 @@ export const tabularStyles = (useColors: boolean = true, isPptx: boolean = false
 }
 .tabular td._empty,
 #preview-content .tabular td._empty, #setText .tabular td._empty {
-  height: 1.3em;
+  ${cssBlock(TABULAR_EMPTY_CELL_STYLE)}
 }
 .tabular td .f,
 #preview-content .tabular td .f, #setText .tabular td .f {
@@ -68,8 +64,7 @@ html[data-theme="dark"] #preview-content .tabular td, html[data-theme="dark"] #s
 }
 .figure_img,
 #preview-content .figure_img, #setText .figure_img {
-  margin-bottom: 0.5em;
-  overflow-x: auto;
+  ${cssBlock(FIGURE_IMG_STYLE)}
 }
 div.figure_img img,
 #preview-content div.figure_img img, #setText div.figure_img img {

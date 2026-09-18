@@ -1,3 +1,22 @@
+# September 2026
+
+## [3.0.2] - Canvas-compatible HTML output
+
+New render method `markdownToCanvasHTML(str, options)`, returning `{ html, warnings }`: the HTML a Canvas LMS page keeps verbatim, plus what the caller should know before publishing it.
+
+Canvas sanitizes page HTML against a fixed allowlist and takes no stylesheet, so the default output loses formulas and layout there — a single formula reaches a page as six visible copies, because the hidden source elements are unwrapped and their payload becomes body text.
+
+- Math is native MathML: Canvas deletes `svg` with its contents, so the format is fixed by the method rather than left to the caller. Hidden source copies are dropped, and chemistry travels as its SMILES source in a `<code>` element.
+- Structure travels inline, since a Canvas page has no stylesheet: the title and author block, abstract, section titles, display math, figures, list markers, and the borders and padding of both markdown and `tabular` tables. Those declarations now have a single definition in `src/styles/structural.ts`, shared by the stylesheet and the inline output, so the two cannot drift.
+- Elements and attributes Canvas would drop or unwrap are replaced: `s` becomes `del`, a bold `span` becomes `strong`, a sized `mspace` becomes `mpadded`, `align` becomes the equivalent declaration, and headings shift down one level so the page title stays the only top-level heading. A sub-property Canvas rejects travels inside the shorthand it allows, so a diagonal table cell keeps its diagonal and a wavy underline stays wavy.
+- `warnings` reports the size in bytes against the 500 KB page cap, structures degraded to their source, images without alt text, and bold that could not be carried. `CANVAS_PAGE_BODY_LIMIT` and `ICanvasWarnings` are exported.
+
+Verified against a live Canvas page: the output survives a save and read-back with no element, attribute, CSS declaration or text lost.
+
+Every other output is unchanged: `markdownToHTML` and the `forDocx` / `forPptx` / `forLatex` / `forMD` targets render byte-identically to 3.0.1.
+
+See `pr-specs/2026-09-canvas-accessible-html.md`.
+
 # July 2026
 
 ## [3.0.1] - Preserve code indentation inside list/table/align env wrappers

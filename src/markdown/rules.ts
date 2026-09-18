@@ -5,6 +5,10 @@ import { attrSetToBegin } from "./utils";
 import { codeHighlightDef, svgRegex } from "./common/consts";
 import { eMmdRuleType } from "./common/mmdRules";
 import { getDisableRuleTypes } from "./common/mmdRulesToDisable";
+import {
+  canvasInlineStyle, TABLE_STYLE, TABLE_HEADER_STYLE, TABLE_CENTER_STYLE,
+  tableCellStyle, DEFAULT_BORDER_COLOR,
+} from "../styles/structural";
 
 export const PREVIEW_PARAGRAPH_PREFIX = "preview-paragraph-";
 export const PREVIEW_LINE_CLASS = "preview-line";
@@ -80,7 +84,12 @@ function injectLabelIdToParagraphOPen(tokens, idx, options, env, slf) {
 function injectCenterTables(tokens, idx, options, env, slf) {
   const token = tokens[idx];
   if (token.level === 0) {
-    token.attrJoin("align", "center");
+    /** Canvas does not allow `align` on a table; the equivalent margin is. */
+    if (options.forCanvas) {
+      token.attrJoin("style", TABLE_CENTER_STYLE);
+    } else {
+      token.attrJoin("align", "center");
+    }
   }
   return slf.renderToken(tokens, idx, options, env, slf);
 }
@@ -225,11 +234,32 @@ export function injectLabelIdToParagraph(renderer) {
   return renderer;
 }
 
+/** A markdown table takes its grid from the stylesheet, which a Canvas page does not have. */
+const injectCanvasTableStyles = (renderer) => {
+  const styles = {
+    table_open: canvasInlineStyle(TABLE_STYLE),
+    td_open: canvasInlineStyle(tableCellStyle(DEFAULT_BORDER_COLOR)),
+    th_open: canvasInlineStyle(tableCellStyle(DEFAULT_BORDER_COLOR) + TABLE_HEADER_STYLE),
+  };
+  for (const name of Object.keys(styles)) {
+    const previous = renderer.renderer.rules[name];
+    renderer.renderer.rules[name] = function (tokens, idx, options, env, slf) {
+      tokens[idx].attrJoin('style', styles[name]);
+      return previous
+        ? previous(tokens, idx, options, env, slf)
+        : slf.renderToken(tokens, idx, options, env, slf);
+    };
+  }
+};
+
 export const injectRenderRules = (renderer) => {
-  const { lineNumbering = false, htmlSanitize = {}, html = false, forDocx = false, centerTables = true, renderOptions = null } = renderer.options;
+  const { lineNumbering = false, htmlSanitize = {}, html = false, forDocx = false, forCanvas = false, centerTables = true, renderOptions = null } = renderer.options;
   const disableRuleTypes: eMmdRuleType[] = renderOptions ? getDisableRuleTypes(renderOptions) : [];
   if (centerTables) {
     renderer.renderer.rules.table_open = injectCenterTables;
+  }
+  if (forCanvas) {
+    injectCanvasTableStyles(renderer);
   }
   if (forDocx) {
     injectInlineStyles(renderer);

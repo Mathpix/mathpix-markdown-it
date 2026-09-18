@@ -22,6 +22,7 @@ import {
 import {
   MathpixMarkdownModel,
   TMarkdownItOptions,
+  TPublicMarkdownItOptions,
   optionsMathpixMarkdown,
   TOutputMath,
   TOutputMathJax,
@@ -34,6 +35,7 @@ import {
   RenderOptions
 } from "./mathpix-markdown-model";
 
+import { ICanvasWarnings, CANVAS_PAGE_BODY_LIMIT } from './markdown/canvas';
 import { ISmilesOptions } from './markdown/md-chemistry';
 import { resetTheoremEnvironments } from './markdown/md-theorem/helper';
 import { rest_mmd_footnotes_list } from './markdown/md-latex-footnotes/utils';
@@ -56,7 +58,8 @@ export {
   mdSetPositionsAndHighlight,
   initMathpixMarkdown,
   mdPluginMathJax, mdPluginHighlightCode, mdPluginText, mdPluginTOC, mdPluginAnchor, mdPluginTableTabular, mdPluginLatexCodeEnvs, mdPluginList, mdPluginChemistry,
-  TMarkdownItOptions, optionsMathpixMarkdown, TOutputMath, TOutputMathJax, THtmlSanitize,
+  TMarkdownItOptions, TPublicMarkdownItOptions, optionsMathpixMarkdown, TOutputMath, TOutputMathJax, THtmlSanitize,
+  ICanvasWarnings, CANVAS_PAGE_BODY_LIMIT,
   ISmilesOptions,
   resetTheoremEnvironments,
   rest_mmd_footnotes_list, FootnoteItem,

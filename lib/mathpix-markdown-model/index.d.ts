@@ -1,3 +1,4 @@
+import { ICanvasWarnings } from "../markdown/canvas";
 import { Property } from 'csstype';
 import { ISmilesOptions } from '../markdown/md-chemistry';
 import { IFontMetricsOptions } from "../markdown/common/text-dimentions";
@@ -100,6 +101,11 @@ export type TMarkdownItOptions = {
     forLatex?: boolean;
     forMD?: boolean;
     forPptx?: boolean;
+    /**
+     * Internal. Set by `markdownToCanvasHTML`, which is the entry point for the Canvas profile.
+     * It only reaches the render rules; on its own it applies none of the profile.
+     */
+    forCanvas?: boolean;
     openLinkInNewWindow?: boolean;
     maxWidth?: string;
     htmlWrapper?: THtmlWrapper | boolean;
@@ -122,6 +128,12 @@ export type TMarkdownItOptions = {
     previewUuid?: string;
     enableSizeCalculation?: boolean;
 };
+/**
+ * What a caller may set. `forCanvas` is not among them: on its own it reaches only the render rules
+ * and applies none of the profile, so `markdownToCanvasHTML` is the way in. Structural typing makes
+ * this a signpost rather than a barrier — a value already typed `TMarkdownItOptions` still passes.
+ */
+export type TPublicMarkdownItOptions = Omit<TMarkdownItOptions, 'forCanvas'>;
 export type TOutputMath = {
     output_format?: 'svg' | 'mathml' | 'latex';
     include_mathml?: boolean;
@@ -236,18 +248,31 @@ declare class MathpixMarkdown_Model {
     getMaxWidthStyle: (maxWidth?: string, isHideScroll?: boolean) => string;
     parseMarkdownByHTML: (html: string, include_sub_math?: boolean) => any[];
     parseMarkdownByElement: (el: Document | HTMLElement, include_sub_math?: boolean) => any[];
-    markdownToHTMLWithSize: (markdown: string, options?: TMarkdownItOptions, fontMetricsOptions?: IFontMetricsOptions) => {
+    markdownToHTMLWithSize: (markdown: string, options?: TPublicMarkdownItOptions, fontMetricsOptions?: IFontMetricsOptions) => {
         html: string;
         size: ISize;
     };
-    markdownToHTMLSegments: (markdown: string, options?: TMarkdownItOptions) => {
+    markdownToHTMLSegments: (markdown: string, options?: TPublicMarkdownItOptions) => {
         content: string;
         map: [
             number,
             number
         ][];
     };
-    markdownToHTML: (markdown: string, options?: TMarkdownItOptions) => string;
+    /**
+     * Renders markdown into the HTML a Canvas LMS page keeps verbatim, with what the caller should be
+     * told before publishing it. The only entry point for the profile: it fixes the math format and
+     * returns a fragment, so those options are not the caller's to set here.
+     *
+     * It does not sanitize. Raw HTML in the document is handled by `htmlSanitize` exactly as in
+     * `markdownToHTML`, and turning that off lets a script through here too — Canvas deletes one on
+     * save, but anything that shows the result before then would not.
+     */
+    markdownToCanvasHTML: (markdown: string, options?: TPublicMarkdownItOptions) => {
+        html: string;
+        warnings: ICanvasWarnings;
+    };
+    markdownToHTML: (markdown: string, options?: TPublicMarkdownItOptions) => string;
     showTocInContainer: (html: string, containerName?: string) => void;
     getTocContainerHTML: (html: string, onlyContent?: boolean) => string;
     checkEquationNumber: (html: string) => string;
@@ -255,7 +280,7 @@ declare class MathpixMarkdown_Model {
     scrollPage: (parent: any, offsetTarget: any) => void;
     /** Browser runtime: injects SVG-styles + Mathpix-styles into DOM. Includes: core, code, tabular, lists, toc, menu. No container/mathjax (SVG injected separately). */
     loadMathJax: (notScrolling?: boolean, setTextAlignJustify?: boolean, isResetBodyStyles?: boolean, maxWidth?: string, useColors?: boolean) => boolean;
-    convertToHTML: (str: string, options?: TMarkdownItOptions) => string;
+    convertToHTML: (str: string, options?: TPublicMarkdownItOptions) => string;
     getMathjaxStyle: () => string;
     /**
      * Single CSS builder. All style assembly methods delegate here.
@@ -275,14 +300,14 @@ declare class MathpixMarkdown_Model {
     getMathpixMarkdownStyles: (useColors?: boolean) => string;
     getMathpixFontsStyle: () => string;
     render: (text: string, options?: optionsMathpixMarkdown) => string;
-    mmdYamlToHTML: (mmd: string, options?: TMarkdownItOptions, isAddYamlToHtml?: boolean) => {
+    mmdYamlToHTML: (mmd: string, options?: TPublicMarkdownItOptions, isAddYamlToHtml?: boolean) => {
         html: string;
         metadata: any;
         content: string;
         error: string;
     };
-    renderTitleMmd: (title: string, options?: TMarkdownItOptions, className?: string, isOnlyInner?: boolean) => string;
-    renderAuthorsMmd: (authors: string, options?: TMarkdownItOptions, className?: string, isOnlyInner?: boolean) => string;
+    renderTitleMmd: (title: string, options?: TPublicMarkdownItOptions, className?: string, isOnlyInner?: boolean) => string;
+    renderAuthorsMmd: (authors: string, options?: TPublicMarkdownItOptions, className?: string, isOnlyInner?: boolean) => string;
 }
 export declare const MathpixMarkdownModel: MathpixMarkdown_Model;
 export {};

@@ -863,10 +863,31 @@ The `MathpixMarkdown` React element accepts the following props:
 | **Render methods:**                                |         |                                                                                                                           |         |
 | markdownToHTML(str, options: [TMarkdownItOptions](https://github.com/Mathpix/mathpix-markdown-it#tmarkdownitoptions)) | string  | Renders input text to html element as a string.                                                                           |[example](https://github.com/Mathpix/mathpix-markdown-it/tree/master/examples/react-app/use-markdownToHTML-method)|
 | render(str, options: [optionsMathpixMarkdown](https://github.com/Mathpix/mathpix-markdown-it#optionsmathpixmarkdown))     | string  | Renders input text to  HTML element as a string and wraps it in a container. Should be used to render the entire document.|[example](https://github.com/Mathpix/mathpix-markdown-it/tree/master/examples/react-app/use-render-method)|
+| markdownToCanvasHTML(str, options: [TPublicMarkdownItOptions](https://github.com/Mathpix/mathpix-markdown-it#tmarkdownitoptions)) | { html, warnings } | Renders input text to HTML a [Canvas LMS](https://github.com/Mathpix/mathpix-markdown-it#canvas-lms-output) page keeps verbatim, with warnings about what a page cannot show. |         |
 | **Parser methods:**                                |         |                                                                                                                           |         |
 | parseMarkdownByHTML(htmlString)                    | Array   | parses input html string and returns array of formats.                                                                    |[examples](https://github.com/Mathpix/mathpix-markdown-it/tree/master/examples/react-app/use-parseMarkdownByHTML-method)|
 | parseMarkdownByElement(htmlElement)                | Array   | parses input html element and returns array of formats.                                                                   |         |
 
+
+### Canvas LMS output
+
+Renders MMD into HTML a Canvas page keeps as it is: MathML math, layout as inline styles, a fragment rather than a document. The math format and the wrapper are fixed by the method, so `outMath.output_format` and `htmlWrapper` are ignored here.
+
+```js
+const { html, warnings } = MathpixMarkdownModel.markdownToCanvasHTML(mmd, { htmlTags: true, width: 1200 });
+```
+
+`warnings` is an `ICanvasWarnings`:
+
+| field | meaning |
+|---|---|
+| `bytes` | size of the result, in the unit Canvas caps |
+| `overPageLimit` | exceeds `CANVAS_PAGE_BODY_LIMIT`, so a page refuses it on save |
+| `chemistry` | structures carried as SMILES source instead of a drawing |
+| `imagesWithoutAlt` | images with no alt text |
+| `boldDropped` | bold a page will render unweighted |
+
+Raw HTML is handled by `htmlSanitize`, as in `markdownToHTML`.
 
 
 ### StyleBundleOpts

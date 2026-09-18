@@ -9,6 +9,7 @@ import {
 } from "../common/render-table-cell-content";
 import { getItemizePlainMarker, getEnumeratePlainMarker } from "../common/list-markers";
 import { attrsSharedMarker } from "../common/consts";
+import { TABULAR_CELL_PADDING, TABULAR_HEADER_PADDING } from "../../styles/structural";
 
 const TABLE_TOKENS = new Set([
   'table_open','table_close','tbody_open','tbody_close','tr_open','tr_close','td_open','td_close',
@@ -474,6 +475,13 @@ export const renderInlineTokenBlock = (
         }
       }
 
+    }
+    if (token.token === 'td_open' || token.token === 'th_open') {
+      /** Cell padding is a descendant rule of `.tabular`, which a Canvas page has no stylesheet for. */
+      if (options?.forCanvas) {
+        const padding = token.token === 'th_open' ? TABULAR_HEADER_PADDING : TABULAR_CELL_PADDING;
+        tokenAttrSet(token, 'style', (tokenAttrGet(token, 'style') || '') + padding);
+      }
     }
     if (token.token === 'td_open') {
       let nextToken = tokens[idx+1];
