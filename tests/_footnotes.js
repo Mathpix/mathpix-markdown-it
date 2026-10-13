@@ -33,3 +33,13 @@ describe('Check Footnotes with compact_refs option set to true:', () => {
   });
   MM.texReset();
 });
+
+describe('Inline footnote on a LaTeX list line, parsed before the core inline rule:', () => {
+  it('renders the list and one footnote', (done) => {
+    MM.texReset();
+    const html = MM.markdownToHTML('\\begin{itemize}\n^[x]\n\\end{itemize}');
+    html.should.include('<ul class="itemize"');
+    (html.match(/class="footnote-item"/g) || []).length.should.equal(1);
+    done();
+  });
+});

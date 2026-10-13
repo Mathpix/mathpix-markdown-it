@@ -35,6 +35,13 @@ export const grab_footnote_ref = (state) => {
       }
     }
     if (token.type === "footnote_ref") {
+      // LaTeX list items are parsed inline during block parsing, before coreInline sets up mmd_footnotes.
+      if (!state.env.mmd_footnotes) {
+        state.env.mmd_footnotes = {};
+      }
+      if (!state.env.mmd_footnotes.list) {
+        state.env.mmd_footnotes.list = [];
+      }
       let footnote: FootnoteItem = state.env.footnotes?.list?.length > token.meta.id
         ? state.env.footnotes?.list[token.meta.id] : null;
       if (footnote) {
