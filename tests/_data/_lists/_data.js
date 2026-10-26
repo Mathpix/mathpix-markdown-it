@@ -2125,6 +2125,17 @@ module.exports = [
     latex: "\\begin{itemize}\n\\item a\n\\end{itemize} \\begin{itemize} \\item b `\\end{itemize}`\n\\end{itemize}",
     html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>a</li></ul><ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>b <code>\\end{itemize}</code></div>\n</li></ul>"
   },
+  // On one line too: the item ends at the next real boundary, not at the closer in its code span.
+  {
+    name: "a closer in a code span inside a one-line list stays in its item",
+    latex: "\\begin{itemize}\\item use `\\end{itemize}` here\\item b\\end{itemize}",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>use <code>\\end{itemize}</code> here</li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul>"
+  },
+  {
+    name: "the same after text, with the code span ending the item",
+    latex: "text \\begin{itemize}\\item use `\\end{itemize}`\\item b\\end{itemize}",
+    html: "<div>text <ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize\"><span class=\"li_level\">•</span>use <code>\\end{itemize}</code></li><li class=\"li_itemize\"><span class=\"li_level\">•</span>b</li></ul></div>\n"
+  },
   // Blocks with no math are skipped by an offset cursor now; these pin what it must not change.
   {
     name: "a wrapper list followed by prose that holds no math",

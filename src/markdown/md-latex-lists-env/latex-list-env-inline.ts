@@ -66,8 +66,11 @@ const RENEWCOMMAND_SEARCH_G: RegExp = /\\renewcommand\b/g;
 // Per source and per command: the reader builds a code-span index over the tail on each ask, and every
 // item boundary after one `\renewcommand` asks about the same offset — 758ms at 1600 items against 9ms.
 const RENEWCOMMAND_SPANS: symbol = Symbol('renewcommand-spans');
-// One index per source too: the memo spares a repeat at the same offset, not the next offset.
-const RENEWCOMMAND_CODE_POSITIONS: symbol = Symbol('renewcommand-code-positions');
+// One code-span index per source too: the memo spares a repeat at the same offset, not the next offset.
+const CODE_POSITIONS: symbol = Symbol('list-inline-code-positions');
+const codePositionsOf = (state: StateInline): Set<number> =>
+  srcValueCached(state as unknown as Parameters<typeof srcValueCached>[0], CODE_POSITIONS,
+    (src: string) => buildInlineCodePositionSet(getInlineCodeListFromString(src)));
 /** Where the command at `cmdAt` ends, absolute, or -1. */
 const renewCommandSpanAt = (state: StateInline, cmdAt: number): number => {
   const cached = state as unknown as Parameters<typeof srcValueCached>[0];
@@ -77,9 +80,7 @@ const renewCommandSpanAt = (state: StateInline, cmdAt: number): number => {
   if (known !== undefined) {
     return known;
   }
-  const codeIndex: Set<number> = srcValueCached(cached, RENEWCOMMAND_CODE_POSITIONS,
-    (src: string) => buildInlineCodePositionSet(getInlineCodeListFromString(src)));
-  const span: number = renewCommandSpanEnd(state.src, cmdAt, codeIndex);
+  const span: number = renewCommandSpanEnd(state.src, cmdAt, codePositionsOf(state));
   spans.set(cmdAt, span);
   return span;
 };
@@ -411,8 +412,9 @@ export const listItemInline: RuleInline = (
   const contentStart: number = startPos + itemMatch[0].length;
   LIST_BOUNDARY_SEARCH_G.lastIndex = contentStart;
   let boundaryMatch: RegExpExecArray | null = LIST_BOUNDARY_SEARCH_G.exec(state.src);
-  // A closer in a `\renewcommand` body belongs to the macro: taking it emitted a close with no opener.
-  while (boundaryMatch && insideRenewCommand(state, boundaryMatch.index)) {
+  // A boundary in a `\renewcommand` body or a code span is text, as the env scan reads it.
+  while (boundaryMatch && (insideRenewCommand(state, boundaryMatch.index)
+    || codePositionsOf(state).has(boundaryMatch.index))) {
     LIST_BOUNDARY_SEARCH_G.lastIndex = boundaryMatch.index + boundaryMatch[0].length;
     boundaryMatch = LIST_BOUNDARY_SEARCH_G.exec(state.src);
   }
