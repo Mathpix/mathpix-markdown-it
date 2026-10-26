@@ -1,103 +1,96 @@
-// Structure of a tabular decided in one place: which cell lands in which column, how wide and how tall,
-// and which cells the grid has no room for. Borders, alignment and content stay in the emitter.
-//
-// Rules the emitter has always applied: a `\multicolumn` running into columns a `\multirow` covers is
-// clipped, a `\multirow` deeper than the rows left is clamped, a cell whose column is covered is
-// dropped, a row with fewer cells than columns is padded. `strict` adds what the source cannot express:
-// a span gives way to the content it covers, a row left without cells is not a row, a clip lands on
-// free columns only, the last row of a span is free again, and every free column gets a cell.
+// Structure of a tabular: which cell lands in which column, how wide and how tall, and which cells are
+// dropped. Borders, alignment and content stay in the emitter.
 
 // One cell as the parse leaves it.
 export type AnalysedCell = {
-  // What the source asks for; 0 without `\multicolumn`/`\multirow`.
+  // From `\multicolumn`/`\multirow`; 0 without.
   mc: number;
   mr: number;
-  // Puts something on the page. False for a placeholder like `\multirow{2}{*}{}`; true for a nested
-  // tabular, whose text the parse moves out of the cell's content.
+  // False for an empty placeholder like `\multirow{2}{*}{}`; true for a nested tabular.
   prints: boolean;
-  // Index in the row's cells.
-  index: number;
 };
 
-// One row as the parse leaves it — everything the plan reads.
 export type AnalysedRow = {
-  // Null for a line carrying no cells (a lone `\hline`), rendered as a row of empty cells.
+  // Null for a line with no cells (a lone `\hline`).
   cells: AnalysedCell[] | null;
-  // Column each index lands in, spans of its own row counted; a missing cell still counts for one.
+  // Column each cell index lands in, counting the row's own spans.
   targets: number[] | null;
-  // Rows the emitter will produce at or after this one, this row included.
-  rowsLeft: number;
 };
+
+export type DropReason = 'clipped' | 'covered';
 
 export type PlannedCell = {
   // First column occupied.
   col: number;
+  // Columns taken from the grid.
+  covers: number;
+  // Emitted attributes: `source` writes what the source asked for, `strict` what the cell took.
   colspan: number;
-  // As emitted: 0 for one row, and what `strict` leaves of `claimed`.
+  // 0 for none.
   rowspan: number;
-  // Rows claimed when placed: the rule under the cell and the column that styles it follow this.
+  // Rows taken from the grid; the rule under the cell follows it.
   claimed: number;
-  // Index in the row's cells, -1 for a cell added to fill a column.
+  // Index in the row's cells, -1 for a filler.
   index: number;
-  // No room: nothing emitted. `clipped` — the span ran into covered columns; `covered` — its column
-  // is held.
-  dropped?: 'clipped' | 'covered';
+  dropped?: DropReason;
 };
 
 export type PlannedRow = {
-  // Emission order, dropped cells included so a round-trip keeps them.
+  // Emission order; dropped cells stay for the `.tex` round-trip.
   cells: PlannedCell[];
-  // `strict`: fully covered and printing nothing, so it has no cells — CALS has no such row
-  // (`row ::= (entry|entrytbl)+`). Not emitted; the spans that counted it are one row shorter.
+  // `strict`: fully covered and printing nothing, so not emitted — CALS needs a cell in every row.
   collapsed: boolean;
 };
 
-export type TabularGrid = {
-  cols: number;
-  rows: PlannedRow[];
-};
-
 export type GridOptions = {
-  // Reconcile the grid: content wins over the span holding its slot, a row left without cells is
-  // dropped, a clip lands on free columns only, and every free column gets a cell.
+  // Reconcile the grid; off, the legacy arithmetic is kept as is.
   strict?: boolean;
-  // A line without cells of its own skips the columns a span covers instead of filling them.
-  pptx?: boolean;
+  // Source line count, the `source` ceiling for a `\multirow`; defaults to the row count.
+  lines?: number;
+  // A line without cells skips held columns instead of filling them.
+  skipHeldOnBareLine?: boolean;
 };
 
-/** The structure of one tabular from the analysed rows. */
+// A span of one row or less is written as none.
+const spanRows = (rows: number): number => (rows > 1 ? rows : 0);
+
+// First column of a span ending at `at`.
+const spanStart = (at: number, width: number): number => (width > 1 ? Math.max(0, at - width + 1) : at);
+
+// A one-column cell taking no rows: a filler (index -1) or a dropped cell.
+const singleCell = (col: number, index: number, dropped?: DropReason): PlannedCell => {
+  const cell: PlannedCell = { col, covers: 1, colspan: 1, rowspan: 0, claimed: 0, index };
+  if (dropped) {
+    cell.dropped = dropped;
+  }
+  return cell;
+};
+
+/** Plans every row of one tabular from the analysed rows. */
 export const buildTabularGrid = (
   cols: number,
   rows: AnalysedRow[],
   options: GridOptions = {},
-): TabularGrid => {
-  // An empty cell the plan adds to fill a column, and a cell the grid had no room for.
-  const filler = (col: number): PlannedCell => ({ col, colspan: 1, rowspan: 0, claimed: 0, index: -1 });
-  const dropCell = (col: number, index: number, why: 'clipped' | 'covered'): PlannedCell =>
-    ({ col, colspan: 1, rowspan: 0, claimed: 0, index, dropped: why });
-  // Rows still covered per column; every cell landing on a column takes one row off.
+): PlannedRow[] => {
+  // Rows still covered per column, the anchor row included.
   const covering: number[] = new Array(cols).fill(0);
-  // The span holding each column, so `strict` can shorten the one it takes the column from.
+  // The span holding each column, so `strict` can shorten it.
   const spanAt: Array<PlannedCell | null> = new Array(cols).fill(null);
   const cover = (col: number, left: number, span: PlannedCell | null): void => {
     covering[col] = left;
     spanAt[col] = left > 0 ? span : null;
   };
-  // One row of coverage consumed: what a cell landing on the column costs it.
+  // One row of coverage consumed.
   const uncover = (col: number): void => {
     cover(col, covering[col] > 0 ? covering[col] - 1 : 0, spanAt[col]);
   };
-  // Held at the start of this row. `covering` counts the anchor row, so one row left means free here —
-  // as a cell placed on the column already reads it, testing after the decrement. `source` keeps its
-  // older reading, which counts that last row as held.
+  // Held at the start of the row. `strict` reads the span's last row as free; `source` does not.
   const held = (col: number): boolean => covering[col] > (options.strict ? 1 : 0);
-  // `strict`: the span gives way to the content it covers, dropping text being the worse trade, and
-  // every column it covers goes with it — spans are rectangular.
+  // `strict`: the span gives way to content it covers, on every column it holds.
   const release = (col: number): void => {
     const span: PlannedCell | null = spanAt[col];
     if (span) {
-      const shortened: number = span.rowspan - (covering[col] - 1);
-      span.rowspan = shortened > 1 ? shortened : 0;
+      span.rowspan = spanRows(span.rowspan - (covering[col] - 1));
     }
     for (let k = 0; k < cols; k++) {
       if (k === col || (span && spanAt[k] === span)) {
@@ -106,126 +99,105 @@ export const buildTabularGrid = (
     }
   };
   const planned: PlannedRow[] = [];
-  rows.forEach(({cells, targets, rowsLeft}) => {
+  rows.forEach(({cells, targets}, rowIndex) => {
     const row: PlannedRow = { cells: [], collapsed: false };
-    const targetCols: number[] = targets || [];
-    const prints: boolean = !!cells && cells.some((cell) => cell.prints);
+    // Past the last target the row has no cell.
+    const targetOf = (j: number): number => (targets && j < targets.length ? targets[j] : cols);
+    // How deep a `\multirow` may reach from this row.
+    const ceiling: number = options.strict ? rows.length - rowIndex : (options.lines ?? rows.length);
     if (options.strict) {
-      let allHeld: boolean = true;
-      for (let c = 0; c < cols && allHeld; c++) {
-        allHeld = held(c);
-      }
-      if (!prints && allHeld) {
+      const prints: boolean = !!cells && cells.some((cell) => cell.prints);
+      if (!prints && covering.every((_, c) => held(c))) {
         const shortenedSpans: Set<PlannedCell> = new Set();
-        for (let k = 0; k < cols; k++) {
-          const span: PlannedCell | null = spanAt[k];
+        for (let c = 0; c < cols; c++) {
+          const span: PlannedCell | null = spanAt[c];
           if (span && !shortenedSpans.has(span)) {
             shortenedSpans.add(span);
-            span.rowspan = span.rowspan - 1 > 1 ? span.rowspan - 1 : 0;
+            span.rowspan = spanRows(span.rowspan - 1);
           }
-          uncover(k);
+          uncover(c);
         }
         row.collapsed = true;
         planned.push(row);
         return;
       }
       if (cells) {
-        // Before the walk places anything: released mid-walk, a span leaves the columns already passed
-        // unfilled. Every column the cell asks for, not only the one it ends on.
+        // Before placing anything, or a span released mid-walk leaves passed columns empty.
         for (let j = 0; j < cols && j < cells.length; j++) {
-          const at: number = j < targetCols.length ? targetCols[j] : cols;
+          const at: number = targetOf(j);
           if (at >= cols) {
             break;
           }
           if (!cells[j] || !cells[j].prints) {
             continue;
           }
-          const wide: number = cells[j].mc > cols ? cols : cells[j].mc;
-          for (let c = wide > 1 ? at - wide + 1 : at; c <= at; c++) {
-            if (c >= 0 && held(c)) {
+          for (let c = spanStart(at, Math.min(cells[j].mc, cols)); c <= at; c++) {
+            if (held(c)) {
               release(c);
             }
           }
         }
       }
     }
-    // After any release, before the walk moves anything: what a filler must not take.
-    const heldAtStart: boolean[] = new Array(cols);
-    for (let c = 0; c < cols; c++) {
-      heldAtStart[c] = held(c);
-    }
-    if (!cells) {
-      // A lone `\hline`: one empty cell per column, and `strict` and `pptx` skip the held ones.
-      for (let c = 0; c < cols; c++) {
-        if (options.pptx || options.strict) {
-          const holds: boolean = heldAtStart[c];
+    // After any release: columns a filler must not take.
+    const heldAtStart: boolean[] = covering.map((_, c) => held(c));
+    // Fills columns `from` onwards with empty cells, held ones skipped when `skipHeld`.
+    const pad = (from: number, skipHeld: boolean): void => {
+      for (let c = from; c < cols; c++) {
+        if (skipHeld) {
           uncover(c);
-          if (holds) {
+          if (heldAtStart[c]) {
             continue;
           }
         }
-        row.cells.push(filler(c));
+        row.cells.push(singleCell(c, -1));
       }
+    };
+    if (!cells) {
+      pad(0, !!options.skipHeldOnBareLine || !!options.strict);
       planned.push(row);
       return;
     }
     for (let j = 0; j < cols; j++) {
-      // Where this index lands, spans of its own row counted — a missing cell still counts for one.
-      const at: number = j < targetCols.length ? targetCols[j] : cols;
+      const at: number = targetOf(j);
       if (at >= cols) {
         break;
       }
       const cell: AnalysedCell | undefined = cells[j];
       if (!cell) {
-        // Fewer cells than columns: the rest of the row is padded from here on.
-        for (let c = at; c < cols; c++) {
-          const holds: boolean = heldAtStart[c];
-          uncover(c);
-          if (holds) {
-            continue;
-          }
-          row.cells.push(filler(c));
-        }
+        pad(at, true);
         break;
       }
-      const mr: number = cell.mr > rowsLeft ? rowsLeft : cell.mr;
-      // A floor, not a reachable case: the column count comes from the widest row, spans counted.
-      let mc: number = cell.mc > cols ? cols : cell.mc;
-      // Whether the span ran into a held column, which is what narrowed it.
-      let coveredHere = false;
+      const mr: number = Math.min(cell.mr, ceiling);
+      const asked: number = Math.min(cell.mc, cols);
+      let mc: number = asked;
       if (mc > 1) {
-        // Never left of the table: unreachable from the parse, where the target already counts the span.
-        const from: number = Math.max(0, at - mc + 1);
-        for (let k = 0; k < mc; k++) {
-          if (covering[from + k] > 0) {
-            coveredHere = true;
-            break;
-          }
+        const from: number = spanStart(at, mc);
+        // `source` tests the first column only; `strict` every column.
+        let coveredHere: boolean = covering[from] > 0;
+        for (let k = 1; options.strict && !coveredHere && k < mc; k++) {
+          coveredHere = covering[from + k] > 0;
         }
         if (coveredHere) {
-          const reach: number = mc;
+          for (let k = 0; k < asked; k++) {
+            uncover(from + k);
+          }
           if (options.strict) {
-            // Only the free columns next to the one it ends on: a held column inside would be booked
-            // twice. `reach` keeps the run inside the requested span, clear of the cell before it.
-            for (let k = 0; k < reach; k++) {
-              uncover(from + k);
-            }
+            // The free run ending at `at`: a held column inside would be booked twice.
             mc = 0;
-            while (mc < reach && at - mc >= 0 && covering[at - mc] === 0) {
+            while (mc < asked && at - mc >= 0 && covering[at - mc] === 0) {
               mc += 1;
             }
           } else {
-            // Shortened by every column that stays covered, keeping its right edge where the source
-            // put it: moving it, measured against 3.0.1, drops far more cells than it saves.
-            for (let k = 0; k < reach; k++) {
-              uncover(from + k);
+            // Shortened by each column still covered; the right edge stays.
+            for (let k = 0; k < asked; k++) {
               if (covering[from + k] > 0) {
                 mc -= 1;
               }
             }
           }
           if (mc < 1) {
-            row.cells.push(dropCell(at, cell.index, 'clipped'));
+            row.cells.push(singleCell(at, j, 'clipped'));
             continue;
           }
         } else {
@@ -234,41 +206,46 @@ export const buildTabularGrid = (
       } else {
         uncover(at);
         if (covering[at] > 0) {
-          row.cells.push(dropCell(at, cell.index, 'covered'));
+          row.cells.push(singleCell(at, j, 'covered'));
           continue;
         }
       }
-      // A second row off the column, as the emitter has always taken it: a no-op unless the clip above
-      // left it covered.
+      // Legacy second decrement; a no-op unless the clip left the column covered.
       uncover(at);
-      // The span sits where the clip left it, not where the source asked for it.
-      const col: number = mc > 1 ? Math.max(0, at - mc + 1) : at;
+      const col: number = spanStart(at, mc);
+      const width: number = options.strict ? mc : asked;
+      const depth: number = options.strict ? mr : cell.mr;
       const placed: PlannedCell = {
         col,
-        colspan: mc > 1 ? mc : 1,
-        // `rowspan="1"` covers nothing, but `source` writes it and the modes must agree on a sound grid.
-        rowspan: mr > 0 ? mr : 0,
+        covers: mc > 1 ? mc : 1,
+        colspan: width > 1 ? width : 1,
+        // `source` writes `rowspan="1"`, so a one-row span is kept here.
+        rowspan: depth > 0 ? depth : 0,
         claimed: mr > 0 ? mr : 0,
-        index: cell.index,
+        index: j,
       };
       if (mr > 0) {
-        for (let k = 0; k < (mc > 1 ? mc : 1); k++) {
+        for (let k = 0; k < placed.covers; k++) {
           cover(col + k, mr, placed);
         }
       } else if (mc > 1) {
+        // A narrowed span keeps its cell; the columns it lost were taken off above.
         for (let k = 0; k < mc; k++) {
           uncover(col + k);
         }
-        // A narrowed span keeps its cell: taking the width and the cell both loses the text.
-        if (covering[col] > 0 && !coveredHere) {
-          placed.dropped = 'covered';
-        }
+      } else if (!options.strict) {
+        // Legacy third decrement.
+        uncover(at);
+      }
+      if (!options.strict && mr < 1 && covering[col] > 0) {
+        // Legacy: still covered, so dropped.
+        row.cells.push(singleCell(at, j, 'covered'));
+        continue;
       }
       row.cells.push(placed);
     }
     if (options.strict) {
-      // A clipped span or a dropped cell leaves a free column with nothing in it, and a row narrower
-      // than the table is not a grid. Rebuilt in column order, dropped cells gone.
+      // Column order, dropped cells gone, every free column filled.
       const byCol: Array<PlannedCell | undefined> = new Array(cols);
       row.cells.forEach((cell) => {
         if (!cell.dropped) {
@@ -280,17 +257,16 @@ export const buildTabularGrid = (
         const placed: PlannedCell | undefined = byCol[c];
         if (placed) {
           ordered.push(placed);
-          c += placed.colspan - 1;
+          c += placed.covers - 1;
           continue;
         }
-        if (heldAtStart[c]) {
-          continue;
+        if (!heldAtStart[c]) {
+          ordered.push(singleCell(c, -1));
         }
-        ordered.push(filler(c));
       }
       row.cells = ordered;
     }
     planned.push(row);
   });
-  return { cols, rows: planned };
+  return planned;
 };

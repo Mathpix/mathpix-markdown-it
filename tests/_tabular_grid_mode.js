@@ -9,9 +9,10 @@ global.DOMParser = jsdom.window.DOMParser;
 
 const markdownIt = require('markdown-it');
 const { mathpixMarkdownPlugin } = require('../lib/index.js');
+const { markdownToHTML: markdownEntry } = require('../lib/markdown/index.js');
 const MM = require('../lib/mathpix-markdown-model/index').MathpixMarkdownModel;
 const fixtures = require('./_data/_tabular/_data_grid_mode');
-const { gridProblems: checkGrid } = require('./_data/_tabular/_grid_invariant');
+const { gridProblems } = require('./_data/_tabular/_grid_invariant');
 
 const html = (latex, mode) => MM.markdownToHTML(latex,
   mode ? { outMath: { include_svg: false }, tabularGridMode: mode } : { outMath: { include_svg: false } });
@@ -23,8 +24,6 @@ const exported = (latex, flag, mode) => {
   const parsed = MM.parseMarkdownByHTML(rendered, false);
   return parsed.length ? parsed[0].value : '';
 };
-
-const gridProblems = (rendered) => checkGrid(rendered, new global.DOMParser());
 
 describe('tabularGridMode: the same source in both modes', () => {
   fixtures.forEach((test) => {
@@ -59,8 +58,19 @@ describe('tabularGridMode: the same source in both modes', () => {
           .render(test.latex, {});
         rendered('strict').should.equal(rendered('source'));
       });
+      // The option is read where the options are unpacked, which is three places besides the model:
+      // a consumer holding the plugin, or `lib/markdown`, must not silently get `source`.
+      it('every entry point honours the mode', () => {
+        ['source', 'strict'].forEach((mode) => {
+          const options = { outMath: { include_svg: false }, tabularGridMode: mode };
+          markdownIt({ html: true }).use(mathpixMarkdownPlugin, options).render(test.latex, {})
+            .should.equal(html(test.latex, mode), 'the plugin dropped the mode');
+          markdownEntry(test.latex, options)
+            .should.equal(html(test.latex, mode), 'lib/markdown dropped the mode');
+        });
+      });
       it('strict satisfies the grid invariant', () => {
-        gridProblems(html(test.latex, 'strict'))
+        gridProblems(html(test.latex, 'strict'), test.latex)
           .should.deep.equal([], 'strict left a grid a CALS consumer cannot build');
       });
       // `forPptx` decides a line without cells differently and writes no span of one, so the shapes
@@ -74,7 +84,8 @@ describe('tabularGridMode: the same source in both modes', () => {
     });
   });
 
-  // The invariant is what a CALS consumer needs; this is the shape that fails it.
+  // The shape that fails the invariant. Markup alone, no declared count: the width `source` overruns is
+  // a class of its own, pinned in `_tabular_grid.js`.
   it('source keeps the row that strict drops, and only that', () => {
     const reported = fixtures.find((f) => f.name === 'the reported five-column page');
     gridProblems(reported.html_source)

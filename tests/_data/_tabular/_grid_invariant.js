@@ -32,14 +32,20 @@ const colsOf = (rows) => {
 };
 
 /** Every distinct problem in the rendered HTML, `[]` when a consumer can build every table in it.
- *  `parse` is a DOMParser, which the caller has set up with its own JSDOM. */
-const gridProblems = (html, parse) => {
-  const doc = parse.parseFromString('<body>' + html + '</body>', 'text/html');
+ *  Needs `global.DOMParser`. With `latex`, the outer table is also held against the columns the source
+ *  declares: a table narrowed in every row otherwise reads as consistent. */
+const gridProblems = (html, latex) => {
+  const doc = new global.DOMParser().parseFromString('<body>' + html + '</body>', 'text/html');
+  const declared = latex ? declaredCols(latex) : undefined;
   const problems = [];
   [...doc.querySelectorAll('table')].forEach((table, ti) => {
     const rows = [...table.querySelectorAll('tr')].filter((r) => r.closest('table') === table);
     const cols = colsOf(rows);
     const where = (ri) => 'table ' + ti + ' row ' + ri + ': ';
+    if (ti === 0 && declared && cols !== declared) {
+      problems.push('table ' + ti + ': ' + cols + ' columns in the markup against ' + declared
+        + ' the source declares');
+    }
     let covered = new Array(cols).fill(0);
     rows.forEach((tr, ri) => {
       const cells = cellsOf(tr);
@@ -80,5 +86,31 @@ const gridProblems = (html, parse) => {
   });
   return [...new Set(problems)];
 };
+
+// A nested tabular is one cell, and its own `\\` and `&` are not the outer table's. Innermost first,
+// down to the outer `\begin{tabular}`, which stays.
+const flatten = (latex) => {
+  const inner = /\\begin\{tabular\}(?:(?!\\begin\{tabular\})[\s\S])*?\\end\{tabular\}/;
+  let flat = latex;
+  while ((flat.match(/\\begin\{tabular\}/g) || []).length > 1) {
+    const shorter = flat.replace(inner, 'T');
+    if (shorter === flat) { break; }
+    flat = shorter;
+  }
+  return flat;
+};
+
+/** Columns the source asks for, read the way the emitter reads them: the widest row, spans counted.
+ *  An escaped `\&` is text, not a cell boundary. The preamble is not it — a table whose rows carry
+ *  fewer cells than `{|l|l|}` declares renders as narrow as its rows, which is older than this branch. */
+const declaredCols = (latex) => flatten(latex).split('\\\\').reduce((most, line) => {
+  const cells = line.replace(/\\&/g, '').split('&').length;
+  // Read the count the way `positiveCount` does, or the two disagree on `\multicolumn{+2}`.
+  const spans = (line.match(/\\multicolumn\s*\{([^}]*)\}/g) || []).reduce((sum, m) => {
+    const count = Number(m.slice(m.indexOf('{') + 1, -1));
+    return sum + (Number.isInteger(count) && count > 0 ? count : 1) - 1;
+  }, 0);
+  return line.trim().length ? Math.max(most, cells + spans) : most;
+}, 0);
 
 module.exports = { gridProblems };

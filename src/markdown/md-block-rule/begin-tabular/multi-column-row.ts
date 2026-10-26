@@ -6,17 +6,10 @@ import {getContent, getColumnAlign, getColumnLines, parseTabularPos, bracketToVA
 import { reMultiRowWithVPos, reMultiRow } from "../../common/consts";
 import { getExtractedCodeBlockContent } from "./sub-code";
 
-/** Columns a `\multicolumn` claims: a count that is not a positive whole number claims one. */
-const spanCount = (raw: string): number => {
+/** A span count as a positive whole number, `fallback` for anything else. */
+const positiveCount = (raw: string, fallback: number): number => {
   const count: number = Number(raw);
-  return Number.isInteger(count) && count > 0 ? count : 1;
-};
-
-/** Rows a `\multirow` claims, 0 for a count that is not a positive whole number — such a cell spans no
- *  rows at all, which is how `\multirow{0}` has always read. */
-const rowCount = (raw: string): number => {
-  const count: number = Number(raw);
-  return Number.isInteger(count) && count > 0 ? count : 0;
+  return Number.isInteger(count) && count > 0 ? count : fallback;
 };
 
 export const getMC = (cell: string): number => {
@@ -24,26 +17,15 @@ export const getMC = (cell: string): number => {
   let match = cell
     .match(/(?:\\multicolumn\s{0,}\{([^}]*)\})/);
   if (match) {
-    return spanCount(match[1]) - 1;
+    return positiveCount(match[1], 1) - 1;
   } else return 0;
 };
 
+/** Column index `i` ends on: one per index before it, plus the extra width of every span up to it. */
 export const getCurrentMC = (cells: string[], i: number): number => {
-  let res: number = 0;
+  let res: number = i;
   for (let j = 0; j <= i; j++) {
-    if (!cells[j]) {
-      res += j > 0 ? 1 : 0;
-      continue;
-    }
-    const cell = cells[j].trim();
-    let match = cell
-      .match(/(?:\\multicolumn\s{0,}\{([^}]*)\})/);
-    if (match) {
-      const mc: number = spanCount(match[1]);
-      res += j > 0 ? mc : mc > 1 ? mc-1: 0;
-    } else {
-      res += j > 0 ? 1 : 0;
-    }
+    res += getMC(cells[j] || '');
   }
   return res;
 };
@@ -79,7 +61,7 @@ export const getMultiColumnMultiRow = (str: string, params: {lLines: string, ali
   const cellV: string = effectiveBracket ? bracketToVAlign(effectiveBracket) : '';
 
   if (matchMC) {
-    mc = spanCount(matchMC[1]);
+    mc = positiveCount(matchMC[1], 1);
     const align = matchMC[2];
     const cLines: Array<string> = getColumnLines(align);
     const cAlign: Array<string> = getColumnAlign(align);
@@ -98,7 +80,8 @@ export const getMultiColumnMultiRow = (str: string, params: {lLines: string, ali
   }
 
   if (matchMR) {
-    mr = rowCount(nrows);
+    // A malformed count spans no rows, as `\multirow{0}` always has.
+    mr = positiveCount(nrows, 0);
     let w: string = width || '';
     if (!matchMC && !skipVisual) {
       attrs.push(setColumnLines(

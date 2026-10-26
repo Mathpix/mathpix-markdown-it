@@ -1,4 +1,4 @@
-import { TTokenTabular, TMulti } from "./index";
+import { TTokenTabular, TMulti, TAttrs } from "./index";
 import {
   addHLineIntoStyle, AddTd, AddTdSubTable,
   getSharedTableOpenAttrs, getSharedTbodyOpenAttrs, getSharedTrOpenAttrs,
@@ -14,9 +14,7 @@ import { getSubTabular, pushSubTabular, getSubTabularBracket } from './sub-tabul
 import { getMultiColumnMultiRow, getCurrentMC, getMC } from './multi-column-row';
 import { getSubDiagbox } from "./sub-cell";
 import { isEscapedAt } from "../../utils";
-import {
-  AnalysedCell, AnalysedRow, PlannedRow, TabularGrid, buildTabularGrid,
-} from "./grid-model";
+import { AnalysedCell, AnalysedRow, PlannedRow, buildTabularGrid } from "./grid-model";
 import { BEGIN_TABULAR_BRACKET_RE, doubleAngleBracketUuidPattern } from "../../common/consts";
 
 // Column spec letters that carry explicit vertical alignment.
@@ -98,6 +96,10 @@ const markColIfHasList = (
   colsToFixWidth.add(colIndex);
 };
 
+// Vertical rule to the right of column `col`.
+const ruleRightOf = (cLines: string[], col: number, numCol: number): string =>
+  col === numCol - 1 ? cLines[cLines.length - 1] : cLines[col + 1];
+
 // A row as the parse leaves it: what the plan reads, plus what the emitter writes it out with.
 type ParsedRow = AnalysedRow & {
   // Index in `rows`, for the horizontal rules and the `.tex` line.
@@ -123,7 +125,7 @@ const parseTabularRows = (
     if (!cellsAll[i] || cellsAll[i].length === 0) {
       // A trailing line without cells is not a row.
       if (i < cellsAll.length - 1) {
-        parsedRows.push({line: i, raw: [], multi: [], cells: null, targets: null, rowsLeft: 0});
+        parsedRows.push({line: i, raw: [], multi: [], cells: null, targets: null});
       }
       continue;
     }
@@ -142,12 +144,11 @@ const parseTabularRows = (
         break;
       }
       if (!raw[j] || !raw[j].trim().length) {
-        cells[j] = {mc: 0, mr: 0, prints: false, index: j};
+        cells[j] = {mc: 0, mr: 0, prints: false};
         continue;
       }
-      const rLines: string = col === numCol - 1 ? cLines[cLines.length - 1] : cLines[col + 1];
       const parsedCell: TMulti | null = getMultiColumnMultiRow(raw[j],
-        {lLines: cLines[col], align: cAlign[col], rLines, bracketDefault: bracket},
+        {lLines: cLines[col], align: cAlign[col], rLines: ruleRightOf(cLines, col, numCol), bracketDefault: bracket},
         flags.forLatex, flags.forPptx, flags.skipVisual);
       multi[j] = parsedCell;
       // `\multirow{2}{*}{}` is a placeholder for a row the serializer has nothing for: non-empty as
@@ -155,16 +156,10 @@ const parseTabularRows = (
       const prints: boolean = parsedCell
         ? !!parsedCell.content?.trim().length || !!parsedCell.subTable?.length
         : true;
-      cells[j] = {mc: parsedCell ? parsedCell.mc : 0, mr: parsedCell ? parsedCell.mr : 0,
-        prints, index: j};
+      cells[j] = {mc: parsedCell ? parsedCell.mc : 0, mr: parsedCell ? parsedCell.mr : 0, prints};
     }
-    parsedRows.push({line: i, raw, multi, cells, targets, rowsLeft: 0});
+    parsedRows.push({line: i, raw, multi, cells, targets});
   }
-  // Rows the emitter will produce at or after this one: a `\multirow` deeper than that reaches rows the
-  // table does not have. A line carrying no cells of its own still becomes one.
-  parsedRows.forEach((row, r) => {
-    row.rowsLeft = parsedRows.length - r;
-  });
   return parsedRows;
 };
 
@@ -218,12 +213,29 @@ const setTokensTabular = (str: string, {
     {cLines, cAlign, bracket: latexBracket},
     {forLatex, forPptx: !!options?.forPptx, skipVisual});
   // `strict` reconciles the grid, which rewrites the source; a `.tex` round-trip must not.
-  const grid: TabularGrid = buildTabularGrid(numCol, parsedRows,
-    {strict: options?.tabularGridMode === 'strict' && !forLatex, pptx: !!options?.forPptx});
-  // `forPptx` writes no span of one, so a span the plan brought down to one loses the attribute there.
-  const keeps = (span: number): boolean => span > 1 || (span === 1 && !options?.forPptx);
-  for (let r = 0; r < grid.rows.length; r++) {
-    const plan: PlannedRow = grid.rows[r];
+  const plannedRows: PlannedRow[] = buildTabularGrid(numCol, parsedRows, {
+    strict: options?.tabularGridMode === 'strict' && !forLatex,
+    lines: rows.length,
+    skipHeldOnBareLine: !!options?.forPptx,
+  });
+  // `forPptx` writes no span of one.
+  const writesSpan = (span: number): boolean => span > 1 || (span === 1 && !options?.forPptx);
+  // Puts the planned span over the one parsed from the source, or removes it.
+  const setSpanAttr = (attrs: Array<TAttrs>, name: string, span: number): void => {
+    const at: number = attrs.findIndex((attr) => attr[0] === name);
+    if (at < 0) {
+      return;
+    }
+    if (writesSpan(span)) {
+      attrs[at][1] = span.toString();
+    } else {
+      attrs.splice(at, 1);
+    }
+  };
+  // The rule above `line` in column `col`.
+  const hLine = (line: number, col: number): string => CellsHLines[line] ? CellsHLines[line][col] : 'none';
+  for (let r = 0; r < plannedRows.length; r++) {
+    const plan: PlannedRow = plannedRows[r];
     if (plan.collapsed) {
       continue;
     }
@@ -236,7 +248,8 @@ const setTokensTabular = (str: string, {
     for (const cell of plan.cells) {
       const multi: TMulti | null = cell.index >= 0 ? (row.multi[cell.index] ?? null) : null;
       if (cell.dropped) {
-        // A `.tex` round-trip writes the source back for a cell the grid had no room for.
+        // A `.tex` round-trip gets the command back, not the body: the writer reads a cell's body from
+        // the token after `td_skip`, and putting one there swallows the `&` it writes between cells.
         if (forLatex && (cell.dropped === 'covered' || (multi && multi.latex))) {
           res.push({token:'td_skip', type:'td_skip', tag: 'td', n: -1,
             latex: multi && multi.latex ? multi.latex : ''});
@@ -244,39 +257,23 @@ const setTokensTabular = (str: string, {
         continue;
       }
       // A `\multirow` is styled by the last column of its span, every other cell by its own.
-      const styleCol: number = cell.claimed > 0 && cell.colspan > 1 ? cell.col + cell.colspan - 1 : cell.col;
-      const cRight = styleCol === numCol-1 ?  cLines[cLines.length-1] :cLines[styleCol+1];
-      const cLeft = styleCol === 0 ? cLines[0] : '';
+      const styleCol: number = cell.claimed > 0 && cell.covers > 1 ? cell.col + cell.covers - 1 : cell.col;
 
       if (multi) {
         // The attributes were built from the source, before the grid was known.
-        const csIndex: number = multi.attrs.findIndex((a) => a[0] === 'colspan');
-        if (csIndex >= 0) {
-          if (keeps(cell.colspan)) {
-            multi.attrs[csIndex][1] = cell.colspan.toString();
-          } else {
-            multi.attrs.splice(csIndex, 1);
-          }
-        }
-        const rsIndex: number = multi.attrs.findIndex((a) => a[0] === 'rowspan');
-        if (rsIndex >= 0) {
-          if (cell.rowspan > 0 && keeps(cell.rowspan)) {
-            multi.attrs[rsIndex][1] = cell.rowspan.toString();
-          } else {
-            multi.attrs.splice(rsIndex, 1);
-          }
-        }
-        // The rule under the cell sits at the row the span claimed, not at the one `strict` left it: the
-        // row above was already drawn against that geometry.
-        const under: number = cell.claimed > 0 ? cell.claimed + line : line + 1;
-        if (cell.claimed > 0 && under >= rows.length-1 && !skipVisual) {
-          multi.attrs = addHLineIntoStyle(multi.attrs, CellsHLines[under] ? CellsHLines[under][styleCol] : 'none');
-        }
+        setSpanAttr(multi.attrs, 'colspan', cell.colspan);
+        setSpanAttr(multi.attrs, 'rowspan', cell.rowspan);
         if (!skipVisual) {
-          if (line === 0){
-            multi.attrs = addHLineIntoStyle(multi.attrs, CellsHLines[line] ? CellsHLines[line][styleCol] : 'none', 'top');
+          // The rule under the cell sits where the span claimed to end, not where `strict` left it.
+          const under: number = cell.claimed > 0 ? cell.claimed + line : line + 1;
+          // Legacy: a span reaching the last rows gets its bottom rule twice; kept for identical output.
+          if (cell.claimed > 0 && under >= rows.length - 1) {
+            multi.attrs = addHLineIntoStyle(multi.attrs, hLine(under, styleCol));
           }
-          multi.attrs = addHLineIntoStyle(multi.attrs, CellsHLines[under] ? CellsHLines[under][styleCol] : 'none');
+          if (line === 0) {
+            multi.attrs = addHLineIntoStyle(multi.attrs, hLine(line, styleCol), 'top');
+          }
+          multi.attrs = addHLineIntoStyle(multi.attrs, hLine(under, styleCol));
         }
 
         const tdOpen: TTokenTabular = {
@@ -298,53 +295,34 @@ const setTokensTabular = (str: string, {
             isSubTabular,
           }
         }
-        if (multi.subTable) {
-          if (multi.subTable.some((item: TTokenTabular) => detectLocalBlock(item.content))) {
-            colsToFixWidth.add(styleCol);
-            if (forLatex) {
-              tdOpen.meta.forceMultiFixedWidth = true;
-            }
+        // A list inside fixes the column width.
+        const hasLocalBlock: boolean = multi.subTable
+          ? multi.subTable.some((item: TTokenTabular) => detectLocalBlock(item.content))
+          : !!multi.content && detectLocalBlock(multi.content);
+        if (hasLocalBlock) {
+          colsToFixWidth.add(styleCol);
+          if (forLatex) {
+            tdOpen.meta.forceMultiFixedWidth = true;
           }
+        }
+        if (multi.subTable) {
           for (const t of multi.subTable) {
             res.push(t);
           }
-        } else {
-          if (multi.content) {
-            if (detectLocalBlock(multi.content)) {
-              colsToFixWidth.add(styleCol);
-              if (forLatex) {
-                tdOpen.meta.forceMultiFixedWidth = true;
-              }
-            }
-            res.push({token:'inline', type:'inline', tag: '', n: 0, content: multi.content});
-          }
+        } else if (multi.content) {
+          res.push({token:'inline', type:'inline', tag: '', n: 0, content: multi.content});
         }
         res.push(SHARED_TD_CLOSE);
         continue;
       }
 
+      const aligns = {h: cAlign[styleCol], v: vAlign[styleCol], w: cWidth[styleCol]};
+      const borders = {left: styleCol === 0 ? cLines[0] : '', right: ruleRightOf(cLines, styleCol, numCol),
+        bottom: hLine(line + 1, styleCol), top: line === 0 ? hLine(line, styleCol) : ''};
       const cellText: string = cell.index >= 0 ? row.raw[cell.index] : '';
-      if (cellText && cellText.trim().length > 0) {
-        const parseMath = getMathTableContent(cellText, 0);
-        let content = parseMath || getContent(cellText);
-
-        const handleSubTable = (subTable: Array<TTokenTabular>, vOverride: string) => {
-          if (!colsToFixWidth.has(styleCol)
-            && subTable.some((item: TTokenTabular) => detectLocalBlock(item.content))) {
-            colsToFixWidth.add(styleCol);
-          }
-          return AddTdSubTable(subTable,
-            { h: cAlign[styleCol], v: vOverride, w: cWidth[styleCol] },
-            {
-              left: cLeft,
-              right: cRight,
-              bottom: CellsHLines[line + 1] ? CellsHLines[line + 1][styleCol] : 'none',
-              top: line === 0 ? (CellsHLines[line] ? CellsHLines[line][styleCol] : 'none') : ''
-            },
-            skipVisual,
-            tdMeta
-          );
-        }
+      const hasText: boolean = !!cellText && cellText.trim().length > 0;
+      const content: string = hasText ? getMathTableContent(cellText, 0) || getContent(cellText) : '';
+      if (hasText) {
         const parseSub = getSubTabular(content, 0, true, forLatex);
         if (parseSub && parseSub.length > 0) {
           let cellV: string = vAlign[styleCol];
@@ -359,32 +337,20 @@ const setTokensTabular = (str: string, {
             const cellBracket = placeholder ? getSubTabularBracket(placeholder) : undefined;
             if (cellBracket) cellV = bracketToVAlign(cellBracket);
           }
-          for (const t of handleSubTable(parseSub, cellV)) {
+          if (parseSub.some((item: TTokenTabular) => detectLocalBlock(item.content))) {
+            colsToFixWidth.add(styleCol);
+          }
+          for (const t of AddTdSubTable(parseSub, {...aligns, v: cellV}, borders, skipVisual, tdMeta)) {
             res.push(t);
           }
           continue;
         }
-        const td = AddTd(content,
-          {h: cAlign[styleCol], v: vAlign[styleCol], w: cWidth[styleCol]},
-           {left: cLeft, right: cRight, bottom: CellsHLines[line+1] ? CellsHLines[line+1][styleCol]: 'none',
-             top: line === 0 ? CellsHLines[line] ? CellsHLines[line][styleCol] : 'none' : ''},
-            CellsHLSpaces[line+1][styleCol], decimal[styleCol], skipVisual, tdMeta
-          );
-        markColIfHasList(colsToFixWidth, styleCol, td.content);
-        for (const t of td.res) {
-          res.push(t);
-        }
-        continue;
       }
-      // A cell with nothing in it, or a column the row has no cell for.
-      const td = AddTd('',
-        {h: cAlign[styleCol], v: vAlign[styleCol], w: cWidth[styleCol]},
-         {left: cLeft, right: cRight, bottom: CellsHLines[line+1] ? CellsHLines[line+1][styleCol] : 'none',
-           top: line === 0 ? CellsHLines[line] ? CellsHLines[line][styleCol] : 'none' : ''},
-          CellsHLSpaces[line+1][styleCol], null, skipVisual, tdMeta
-        );
-      markColIfHasList(colsToFixWidth, styleCol, td.content);
-      for (const t of td.res) {
+      // Plain text, or empty for a blank cell or a column the row has no cell for.
+      const addedTd = AddTd(content, aligns, borders, CellsHLSpaces[line+1][styleCol],
+        hasText ? decimal[styleCol] : null, skipVisual, tdMeta);
+      markColIfHasList(colsToFixWidth, styleCol, addedTd.content);
+      for (const t of addedTd.res) {
         res.push(t);
       }
     }
