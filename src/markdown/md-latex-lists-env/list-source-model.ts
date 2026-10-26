@@ -384,7 +384,7 @@ export const hasCloserAhead = (state: StateBlockLike, from: number, name: string
     // Swallowing our closer is allowed when the source past the wrapper still closes the open lists: the
     // wrapper owns its body. The live count, since an ambient list from an outer parse needs closing too.
     return !closesOurListWithin(state, from, at)
-      || closersLeftAfter(state, at) >= Math.max(1, getOpenListCount());
+      || canCloseAfter(state, at, Math.max(1, getOpenListCount()));
   }
   return false;
 };

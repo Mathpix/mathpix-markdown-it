@@ -1510,6 +1510,12 @@ module.exports = [
     latex: "\\begin{itemize}\n\\item a\n\\begin{center}\nb \\end{itemize}\n\ntext \\end{center} more\n",
     html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div>\\begin{center}<br>\nb</div>\n</li></ul><div>text \\end{center} more</div>\n"
   },
+  // An opener after the closer the list needs does not claim it, so the wrapper still takes our closer.
+  {
+    name: "a wrapper swallowing our closer, an unclosed opener further down",
+    latex: "\\begin{itemize}\n\\item a \\begin{center}\nb\n\\end{itemize}\nc\n\\end{center}\n\\end{itemize}\n\nlater text \\begin{itemize} never closed",
+    html: "<ul class=\"itemize\" style=\"list-style-type: none\"><li class=\"li_itemize block\"><span class=\"li_level\">•</span><div>a</div>\n<div class=\"center\" style=\"text-align: center\">b<br>\n\\end{itemize}<br>\nc</div>\n</li></ul><div>later text \\begin{itemize} never closed</div>\n"
+  },
   {
     name: "a closer ending its line, no foreign env",
     latex: "\\begin{itemize}\n\\item a\n\\begin{center}\nb \\end{itemize}\n",
