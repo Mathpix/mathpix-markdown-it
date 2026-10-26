@@ -141,6 +141,19 @@ describe('List marker padding — reserve covers the true glyph width (Arial):',
       wide + '] y\\end{itemize}\n\\end{tabular}\n\\end{itemize}');
     chainIndentEm(html).should.be.at.least(trueEm(wide) + MARKER_GAP_EM);
   });
+  // A nested list on one line is parsed alone first, as if top-level; the outer pass must have the
+  // last word, or the sublist keeps a reserve its ancestors already cover.
+  const paddingsOf = (html) => [...html.matchAll(/<ul[^>]*>/g)]
+    .map((m) => (m[0].match(/data-padding-inline-start="([^"]*)"/) || [])[1] || null);
+  ['short', wide].forEach((marker) => {
+    it('a nested list on one line reserves what it does on several, marker "' + marker + '"', () => {
+      const oneLine = render('\\begin{itemize}\\item a \\begin{itemize}\\item[' + marker
+        + '] b\\end{itemize}\\end{itemize}');
+      const multiLine = render('\\begin{itemize}\n\\item a\n\\begin{itemize}\n\\item[' + marker
+        + '] b\n\\end{itemize}\n\\end{itemize}');
+      paddingsOf(oneLine).should.deep.equal(paddingsOf(multiLine));
+    });
+  });
 });
 
 describe('List marker padding — the default-indent threshold:', () => {

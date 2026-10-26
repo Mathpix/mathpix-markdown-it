@@ -286,6 +286,9 @@ export const resolveListPadding = (listTokens: Token[]): void => {
       // Matches PADDING_EM_RE by construction: clamped to (default, LIST_MAX_INDENT_EM] and ceiled to
       // two decimals, which `String` prints in full — no exponent, no sign. The renderer drops a miss.
       token.attrSet("data-padding-inline-start", String(em) + "em");
+    } else if (token.attrs) {
+      // Set by an earlier pass that read this list as top-level: an inline env parsed on its own.
+      token.attrs = token.attrs.filter((attr) => attr[0] !== "data-padding-inline-start");
     }
     prefix.length = depth + 1;
     prefix[depth + 1] = ancestorSum + indentEm;
