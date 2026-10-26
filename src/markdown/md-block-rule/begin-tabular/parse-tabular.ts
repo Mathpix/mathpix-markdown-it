@@ -1,4 +1,4 @@
-import { TTokenTabular } from "./index";
+import { TTokenTabular, TMulti, TAttrs } from "./index";
 import {
   addHLineIntoStyle, AddTd, AddTdSubTable,
   getSharedTableOpenAttrs, getSharedTbodyOpenAttrs, getSharedTrOpenAttrs,
@@ -14,6 +14,7 @@ import { getSubTabular, pushSubTabular, getSubTabularBracket } from './sub-tabul
 import { getMultiColumnMultiRow, getCurrentMC, getMC } from './multi-column-row';
 import { getSubDiagbox } from "./sub-cell";
 import { isEscapedAt } from "../../utils";
+import { AnalysedCell, AnalysedRow, PlannedRow, buildTabularGrid } from "./grid-model";
 import { BEGIN_TABULAR_BRACKET_RE, doubleAngleBracketUuidPattern } from "../../common/consts";
 
 // Column spec letters that carry explicit vertical alignment.
@@ -95,6 +96,73 @@ const markColIfHasList = (
   colsToFixWidth.add(colIndex);
 };
 
+// Vertical rule to the right of column `col`.
+const ruleRightOf = (cLines: string[], col: number, numCol: number): string =>
+  col === numCol - 1 ? cLines[cLines.length - 1] : cLines[col + 1];
+
+// A row as the parse leaves it: what the plan reads, plus what the emitter writes it out with.
+type ParsedRow = AnalysedRow & {
+  // Index in `rows`, for the horizontal rules and the `.tex` line.
+  line: number;
+  // Cell text as split, and the `\multicolumn`/`\multirow` parsed out of it.
+  raw: string[];
+  multi: Array<TMulti | null>;
+};
+
+/** Every row parsed before anything is placed: a span reaches rows a row-at-a-time walk has not seen.
+ *  A cell is parsed once and only where the emitter used to reach it, so nested tabular ids keep their
+ *  order. */
+const parseTabularRows = (
+  rows: string[],
+  cellsAll: string[],
+  numCol: number,
+  spec: {cLines: string[]; cAlign: string[]; bracket?: TVerticalPos},
+  flags: {forLatex: boolean; forPptx: boolean; skipVisual: boolean},
+): ParsedRow[] => {
+  const {cLines, cAlign, bracket} = spec;
+  const parsedRows: ParsedRow[] = [];
+  for (let i = 0; i < rows.length; i++) {
+    if (!cellsAll[i] || cellsAll[i].length === 0) {
+      // A trailing line without cells is not a row.
+      if (i < cellsAll.length - 1) {
+        parsedRows.push({line: i, raw: [], multi: [], cells: null, targets: null});
+      }
+      continue;
+    }
+    const raw: string[] = separateByColumns(cellsAll[i]);
+    // One past the last cell is where padding starts, and nothing reads further: `getCurrentMC` walks
+    // the row's cells for every index it is asked about.
+    const targets: number[] = [];
+    for (let j = 0; j < numCol && j <= raw.length; j++) {
+      targets[j] = getCurrentMC(raw, j);
+    }
+    const multi: Array<TMulti | null> = [];
+    const cells: AnalysedCell[] = [];
+    for (let j = 0; j < numCol; j++) {
+      const col: number = targets[j];
+      if (col >= numCol || j >= raw.length) {
+        break;
+      }
+      if (!raw[j] || !raw[j].trim().length) {
+        cells[j] = {mc: 0, mr: 0, prints: false};
+        continue;
+      }
+      const parsedCell: TMulti | null = getMultiColumnMultiRow(raw[j],
+        {lLines: cLines[col], align: cAlign[col], rLines: ruleRightOf(cLines, col, numCol), bracketDefault: bracket},
+        flags.forLatex, flags.forPptx, flags.skipVisual);
+      multi[j] = parsedCell;
+      // `\multirow{2}{*}{}` is a placeholder for a row the serializer has nothing for: non-empty as
+      // text, empty once parsed. A nested tabular leaves the content empty and fills `subTable`.
+      const prints: boolean = parsedCell
+        ? !!parsedCell.content?.trim().length || !!parsedCell.subTable?.length
+        : true;
+      cells[j] = {mc: parsedCell ? parsedCell.mc : 0, mr: parsedCell ? parsedCell.mr : 0, prints};
+    }
+    parsedRows.push({line: i, raw, multi, cells, targets});
+  }
+  return parsedRows;
+};
+
 const setTokensTabular = (str: string, {
   align = '',
   options = {},
@@ -141,282 +209,150 @@ const setTokensTabular = (str: string, {
     res.push({token:'tbody_open', type:'tbody_open', tag: 'tbody', n: 1});
   }
 
-  let MR: Array<number> = new Array(numCol).fill(0);
-  for (let i = 0; i < rows.length; i++) {
-    if (!cellsAll[i] || cellsAll[i].length === 0) {
-      if (i < cellsAll.length-1) {
-        res.push({token:'tr_open', type:'tr_open', tag: 'tr', n: 1,
-          attrs: getSharedTrOpenAttrs(skipVisual),
-          latex: forLatex && data && data.sLines && data.sLines.length > i ? data.sLines[i] : ''
-        });
-        for (let k = 0; k < numCol; k++) {
-          if (options?.forPptx && MR[k] && MR[k] > 0) {
-            MR[k] = MR[k] > 0 ? MR[k] - 1 : 0;
-            continue;
-          }
-          let cRight = k === numCol-1 ?  cLines[cLines.length-1] :cLines[k+1];
-          let cLeft = k === 0 ? cLines[0] : '';
-          const data = AddTd('', {h: cAlign[k], v: vAlign[k], w: cWidth[k]},
-            {left: cLeft, right: cRight, bottom: CellsHLines[i+1] ? CellsHLines[i+1][k] : 'none',
-              top: i === 0 ? CellsHLines[i] ? CellsHLines[i][k] : 'none' : ''},
-            CellsHLSpaces[i+1][k], null, skipVisual, tdMeta
-          );
-          markColIfHasList(colsToFixWidth, k, data.content);
-          for (const t of data.res) {
-            res.push(t);
-          }
-        }
-        res.push(SHARED_TR_CLOSE);
-      }
+  const parsedRows: ParsedRow[] = parseTabularRows(rows, cellsAll, numCol,
+    {cLines, cAlign, bracket: latexBracket},
+    {forLatex, forPptx: !!options?.forPptx, skipVisual});
+  // `strict` reconciles the grid, which rewrites the source; a `.tex` round-trip must not.
+  const plannedRows: PlannedRow[] = buildTabularGrid(numCol, parsedRows, {
+    strict: options?.tabularGridMode === 'strict' && !forLatex,
+    lines: rows.length,
+    skipHeldOnBareLine: !!options?.forPptx,
+  });
+  // `forPptx` writes no span of one.
+  const writesSpan = (span: number): boolean => span > 1 || (span === 1 && !options?.forPptx);
+  // Puts the planned span over the one parsed from the source, or removes it.
+  const setSpanAttr = (attrs: Array<TAttrs>, name: string, span: number): void => {
+    const at: number = attrs.findIndex((attr) => attr[0] === name);
+    if (at < 0) {
+      return;
+    }
+    if (writesSpan(span)) {
+      attrs[at][1] = span.toString();
+    } else {
+      attrs.splice(at, 1);
+    }
+  };
+  // The rule above `line` in column `col`.
+  const hLine = (line: number, col: number): string => CellsHLines[line] ? CellsHLines[line][col] : 'none';
+  for (let r = 0; r < plannedRows.length; r++) {
+    const plan: PlannedRow = plannedRows[r];
+    if (plan.collapsed) {
       continue;
     }
+    const row: ParsedRow = parsedRows[r];
+    const line: number = row.line;
     res.push({token:'tr_open', type:'tr_open', tag: 'tr', n: 1,
       attrs: getSharedTrOpenAttrs(skipVisual),
-      latex: forLatex && data && data.sLines && data.sLines.length > i ? data.sLines[i] : ''
+      latex: forLatex && data && data.sLines && data.sLines.length > line ? data.sLines[line] : ''
     });
-
-    let cells = separateByColumns(cellsAll[i]);
-    for (let j = 0; j < numCol; j++) {
-      let ic: number = getCurrentMC(cells, j);
-      if (ic >= numCol) {
-        break;
+    for (const cell of plan.cells) {
+      const multi: TMulti | null = cell.index >= 0 ? (row.multi[cell.index] ?? null) : null;
+      if (cell.dropped) {
+        // A `.tex` round-trip gets the command back, not the body: the writer reads a cell's body from
+        // the token after `td_skip`, and putting one there swallows the `&` it writes between cells.
+        if (forLatex && (cell.dropped === 'covered' || (multi && multi.latex))) {
+          res.push({token:'td_skip', type:'td_skip', tag: 'td', n: -1,
+            latex: multi && multi.latex ? multi.latex : ''});
+        }
+        continue;
       }
-      if (j >= (cells.length) && ic < numCol) {
-        for (let k = ic; k < numCol; k++) {
-          if (MR[k] && MR[k] > 0) {
-            MR[k] = MR[k] > 0 ? MR[k] - 1 : 0;
-            continue
+      // A `\multirow` is styled by the last column of its span, every other cell by its own.
+      const styleCol: number = cell.claimed > 0 && cell.covers > 1 ? cell.col + cell.covers - 1 : cell.col;
+
+      if (multi) {
+        // The attributes were built from the source, before the grid was known.
+        setSpanAttr(multi.attrs, 'colspan', cell.colspan);
+        setSpanAttr(multi.attrs, 'rowspan', cell.rowspan);
+        if (!skipVisual) {
+          // The rule under the cell sits where the span claimed to end, not where `strict` left it.
+          const under: number = cell.claimed > 0 ? cell.claimed + line : line + 1;
+          // Legacy: a span reaching the last rows gets its bottom rule twice; kept for identical output.
+          if (cell.claimed > 0 && under >= rows.length - 1) {
+            multi.attrs = addHLineIntoStyle(multi.attrs, hLine(under, styleCol));
           }
-          let cRight = k === numCol-1 ?  cLines[cLines.length-1] :cLines[k+1];
-          let cLeft = k === 0 ? cLines[0] : '';
-          const data = AddTd('', {h: cAlign[k], v: vAlign[k], w: cWidth[k]},
-            {left: cLeft, right: cRight, bottom: CellsHLines[i+1] ? CellsHLines[i+1][k] : 'none',
-              top: i === 0 ? CellsHLines[i] ? CellsHLines[i][k] : 'none' : ''},
-            CellsHLSpaces[i+1][k], null, skipVisual, tdMeta
-          );
-          markColIfHasList(colsToFixWidth, k, data.content);
-          for (const t of data.res) {
+          if (line === 0) {
+            multi.attrs = addHLineIntoStyle(multi.attrs, hLine(line, styleCol), 'top');
+          }
+          multi.attrs = addHLineIntoStyle(multi.attrs, hLine(under, styleCol));
+        }
+
+        const tdOpen: TTokenTabular = {
+          token:'td_open',
+          type:'td_open',
+          tag: 'td',
+          n: 1,
+          attrs: multi.attrs,
+          latex: forLatex && multi.latex ? multi.latex : ''
+        }
+        res.push(tdOpen);
+        if (forLatex) {
+          tdOpen.meta = {
+            ...tdMeta,
+            multi: multi.multi,
+            colCount: numCol,
+            colSpecs: colSpec,
+            currentColIndex: styleCol,
+            isSubTabular,
+          }
+        }
+        // A list inside fixes the column width.
+        const hasLocalBlock: boolean = multi.subTable
+          ? multi.subTable.some((item: TTokenTabular) => detectLocalBlock(item.content))
+          : !!multi.content && detectLocalBlock(multi.content);
+        if (hasLocalBlock) {
+          colsToFixWidth.add(styleCol);
+          if (forLatex) {
+            tdOpen.meta.forceMultiFixedWidth = true;
+          }
+        }
+        if (multi.subTable) {
+          for (const t of multi.subTable) {
             res.push(t);
           }
+        } else if (multi.content) {
+          res.push({token:'inline', type:'inline', tag: '', n: 0, content: multi.content});
         }
-        break;
+        res.push(SHARED_TD_CLOSE);
+        continue;
       }
 
-      let cRight = ic === numCol-1 ?  cLines[cLines.length-1] :cLines[ic+1];
-      let cLeft = ic === 0 ? cLines[0] : '';
-
-
-      if (cells[j] && cells[j].trim().length > 0) {
-        // Multicol inherits only non-default brackets (option 'middle' stays no-op).
-        const multi = getMultiColumnMultiRow(cells[j], {lLines: cLines[ic], align: cAlign[ic], rLines: cRight, bracketDefault: latexBracket}, forLatex, options?.forPptx, skipVisual);
-        if (multi) {
-          let mr = multi.mr > rows.length ? rows.length : multi.mr;
-          let mc = multi.mc > numCol ? numCol : multi.mc;
-
-          if (mc && mc > 1) {
-            let d = ic - mc + 1;
-            if (MR[d] && MR[d] > 0) {
-              let maxK = mc;
-              for (let k = 0; k < maxK; k++) {
-                MR[d+k] = MR[d+k] > 0 ? MR[d+k] - 1 : 0;
-                if (MR[d+k] > 0) {
-                  mc -= 1;
-                }
-              }
-              if (mc < 1) {
-                if (forLatex && multi.latex) {
-                  res.push({token:'td_skip', type:'td_skip', tag: 'td', n: -1,
-                    latex: multi.latex});
-                }
-                continue
-              }
-            } else {
-              MR[ic] = MR[ic] > 0 ? MR[ic] - 1 : 0;
-            }
-
-          } else {
-            MR[ic] = MR[ic] > 0 ? MR[ic] - 1 : 0;
-            if (MR[ic] && MR[ic] > 0) {
-              if (forLatex) {
-                res.push({token:'td_skip', type:'td_skip', tag: 'td', n: -1,
-                  latex: multi && multi.latex ? multi.latex : ''});
-              }
-              continue
-            }
-          }
-
-          MR[ic] = MR[ic] > 0 ? MR[ic] - 1 : 0;
-
-          if (mr && mr > 0) {
-            if (mc && mc > 1) {
-              let d = ic - mc + 1;
-              for (let k = 0; k < mc; k++) {
-                MR[ d+k ] = mr;
-              }
-            } else {
-              MR[ic] = mr;
-            }
-
-            if (mr+i >= rows.length-1 && !skipVisual) {
-              multi.attrs = addHLineIntoStyle(multi.attrs, CellsHLines[mr+i] ? CellsHLines[mr+i][ic] : 'none');
-            }
-
-          } else {
-            if (mc && mc > 1) {
-              let d = ic - mc + 1;
-              for (let k = 0; k < mc; k++) {
-                MR[d+k] = MR[d+k] > 0 ? MR[d+k] - 1 : 0;
-              }
-              ic = d
-            } else {
-              MR[ic] = MR[ic] > 0 ? MR[ic] - 1 : 0;
-            }
-
-            if (MR[ic] && MR[ic] > 0) {
-              if (forLatex) {
-                res.push({token:'td_skip', type:'td_skip', tag: 'td', n: -1,
-                  latex: multi && multi.latex ? multi.latex : ''});
-              }
-              continue
-            }
-
-          }
-
-
-          if (!skipVisual) {
-            if (i === 0){
-              multi.attrs = addHLineIntoStyle(multi.attrs, CellsHLines[i] ? CellsHLines[i][ic] : 'none', 'top');
-            }
-            if (mr && mr > 0) {
-              multi.attrs = addHLineIntoStyle(multi.attrs, CellsHLines[mr+i] ? CellsHLines[mr+i][ic] : 'none');
-            } else {
-              multi.attrs = addHLineIntoStyle(multi.attrs, CellsHLines[i+1] ? CellsHLines[i+1][ic] : 'none');
-            }
-          }
-
-          const tdOpen: TTokenTabular = {
-            token:'td_open',
-            type:'td_open',
-            tag: 'td',
-            n: 1,
-            attrs: multi.attrs,
-            latex: forLatex && multi && multi.latex ? multi.latex : ''
-          }
-          res.push(tdOpen);
-          if (forLatex) {
-            tdOpen.meta = {
-              ...tdMeta,
-              multi: multi.multi,
-              colCount: numCol,
-              colSpecs: colSpec,
-              currentColIndex: ic,
-              isSubTabular,
-            }
-          }
-          if (multi.subTable) {
-            if (multi.subTable.some((item: TTokenTabular) => detectLocalBlock(item.content))) {
-              colsToFixWidth.add(ic);
-              if (forLatex) {
-                tdOpen.meta.forceMultiFixedWidth = true;
-              }
-            }
-            for (const t of multi.subTable) {
-              res.push(t);
-            }
-          } else {
-            if (multi.content) {
-              if (detectLocalBlock(multi.content)) {
-                colsToFixWidth.add(ic);
-                if (forLatex) {
-                  tdOpen.meta.forceMultiFixedWidth = true;
-                }
-              }
-              res.push({token:'inline', type:'inline', tag: '', n: 0, content: multi.content});
-            }
-          }
-          res.push(SHARED_TD_CLOSE);
-          continue;
-        }
-
-        MR[ic] = MR[ic] > 0 ? MR[ic] - 1 : 0;
-
-        if (MR[ic] && MR[ic] > 0) {
-          if (forLatex) {
-            res.push({token:'td_skip', type:'td_skip', tag: 'td', n: -1,
-              latex: multi && multi.latex ? multi.latex : ''});
-          }
-          continue
-        }
-
-        const parseMath = getMathTableContent(cells[j], 0);
-        let content = parseMath || getContent(cells[j]);
-
-        const handleSubTable = (subTable: Array<TTokenTabular>, vOverride: string) => {
-          if (!colsToFixWidth.has(ic)
-            && subTable.some((item: TTokenTabular) => detectLocalBlock(item.content))) {
-            colsToFixWidth.add(ic);
-          }
-          return AddTdSubTable(subTable,
-            { h: cAlign[ic], v: vOverride, w: cWidth[ic] },
-            {
-              left: cLeft,
-              right: cRight,
-              bottom: CellsHLines[i + 1] ? CellsHLines[i + 1][ic] : 'none',
-              top: i === 0 ? (CellsHLines[i] ? CellsHLines[i][ic] : 'none') : ''
-            },
-            skipVisual,
-            tdMeta
-          );
-        }
+      const aligns = {h: cAlign[styleCol], v: vAlign[styleCol], w: cWidth[styleCol]};
+      const borders = {left: styleCol === 0 ? cLines[0] : '', right: ruleRightOf(cLines, styleCol, numCol),
+        bottom: hLine(line + 1, styleCol), top: line === 0 ? hLine(line, styleCol) : ''};
+      const cellText: string = cell.index >= 0 ? row.raw[cell.index] : '';
+      const hasText: boolean = !!cellText && cellText.trim().length > 0;
+      const content: string = hasText ? getMathTableContent(cellText, 0) || getContent(cellText) : '';
+      if (hasText) {
         const parseSub = getSubTabular(content, 0, true, forLatex);
         if (parseSub && parseSub.length > 0) {
-          let cellV: string = vAlign[ic];
+          let cellV: string = vAlign[styleCol];
           // Diagbox always centers, ignoring outer bracket.
           // getSubTabular returns a single wrapper; hasDiagbox is OR'd across all placeholders.
           if (parseSub[0]?.hasDiagbox) {
             cellV = 'middle';
           // colSpec may be 'p{2cm}'.
-          } else if (!EXPLICIT_V_COL_SPEC.includes(colSpec[ic]?.[0] || '')) {
+          } else if (!EXPLICIT_V_COL_SPEC.includes(colSpec[styleCol]?.[0] || '')) {
             // First nested tabular wins if a cell contains several.
             const placeholder = content.match(doubleAngleBracketUuidPattern)?.[0];
             const cellBracket = placeholder ? getSubTabularBracket(placeholder) : undefined;
             if (cellBracket) cellV = bracketToVAlign(cellBracket);
           }
-          for (const t of handleSubTable(parseSub, cellV)) {
+          if (parseSub.some((item: TTokenTabular) => detectLocalBlock(item.content))) {
+            colsToFixWidth.add(styleCol);
+          }
+          for (const t of AddTdSubTable(parseSub, {...aligns, v: cellV}, borders, skipVisual, tdMeta)) {
             res.push(t);
           }
           continue;
         }
-        const data = AddTd(content,
-          {h: cAlign[ic], v: vAlign[ic], w: cWidth[ic]},
-           {left: cLeft, right: cRight, bottom: CellsHLines[i+1] ? CellsHLines[i+1][ic]: 'none',
-             top: i === 0 ? CellsHLines[i] ? CellsHLines[i][ic] : 'none' : ''},
-            CellsHLSpaces[i+1][ic], decimal[ic], skipVisual, tdMeta
-          );
-        markColIfHasList(colsToFixWidth, ic, data.content);
-        for (const t of data.res) {
-          res.push(t);
-        }
-      } else {
-        MR[ic] = MR[ic] > 0 ? MR[ic] - 1 : 0;
-        if (MR[ic] && MR[ic] > 0) {
-          if (forLatex) {
-            res.push({token:'td_skip', type:'td_skip', tag: 'td', n: -1});
-          }
-          continue
-        }
-        const data = AddTd('',
-          {h: cAlign[ic], v: vAlign[ic], w: cWidth[ic]},
-           {left: cLeft, right: cRight, bottom: CellsHLines[i+1] ? CellsHLines[i+1][ic] : 'none',
-             top: i === 0 ? CellsHLines[i] ? CellsHLines[i][ic] : 'none' : ''},
-            CellsHLSpaces[i+1][ic], null, skipVisual, tdMeta
-          );
-        markColIfHasList(colsToFixWidth, ic, data.content);
-        for (const t of data.res) {
-          res.push(t);
-        }
       }
-
+      // Plain text, or empty for a blank cell or a column the row has no cell for.
+      const addedTd = AddTd(content, aligns, borders, CellsHLSpaces[line+1][styleCol],
+        hasText ? decimal[styleCol] : null, skipVisual, tdMeta);
+      markColIfHasList(colsToFixWidth, styleCol, addedTd.content);
+      for (const t of addedTd.res) {
+        res.push(t);
+      }
     }
     res.push(SHARED_TR_CLOSE);
   }

@@ -78,6 +78,8 @@ export interface optionsMathpixMarkdown {
     centerImages?: boolean;
     centerTables?: boolean;
     defaultCellVerticalAlign?: 'top' | 'middle' | 'bottom';
+    // source (default): the grid the LaTeX declares; strict: a row is never left without cells
+    tabularGridMode?: 'source' | 'strict';
     // strict (default): single-backslash only; legacy: also accept \\( \\[
     mathDelimiterMode?: 'strict' | 'legacy';
     enableCodeBlockRuleForLatexCommands?: boolean;
@@ -134,6 +136,8 @@ export type TMarkdownItOptions = {
   centerTables?: boolean;
   // Fallback vertical alignment for tabular cells without an explicit \begin{tabular}[pos]{...} bracket.
   defaultCellVerticalAlign?: 'top' | 'middle' | 'bottom';
+  // source (default): the grid the LaTeX declares; strict: a row is never left without cells
+  tabularGridMode?: 'source' | 'strict';
   // strict (default): single-backslash only; legacy: also accept \\( \\[
   mathDelimiterMode?: 'strict' | 'legacy';
   enableCodeBlockRuleForLatexCommands?: boolean;
@@ -627,6 +631,7 @@ class MathpixMarkdown_Model {
           centerImages = true,
           centerTables = true,
           defaultCellVerticalAlign = undefined,
+          tabularGridMode = 'source',
           mathDelimiterMode = 'strict',
           enableCodeBlockRuleForLatexCommands = false,
           addPositionsToTokens = false,
@@ -682,6 +687,7 @@ class MathpixMarkdown_Model {
           centerImages: centerImages,
           centerTables: centerTables,
           defaultCellVerticalAlign: defaultCellVerticalAlign,
+          tabularGridMode: tabularGridMode,
           mathDelimiterMode: mathDelimiterMode,
           enableCodeBlockRuleForLatexCommands: enableCodeBlockRuleForLatexCommands,
           addPositionsToTokens: addPositionsToTokens,
