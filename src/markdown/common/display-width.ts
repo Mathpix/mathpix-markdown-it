@@ -209,6 +209,21 @@ export const textReserveEm = (str: string): number => {
   return em;
 };
 
+// The text a token shows: its text-like leaves, not the source a command token keeps in `content`.
+const shownText = (token: WidthToken, depth: number): string => {
+  if (depth > MAX_MARKER_TOKEN_DEPTH) {
+    return '';
+  }
+  if (token.children && token.children.length) {
+    let text = '';
+    for (let i = 0; i < token.children.length; i++) {
+      text += shownText(token.children[i], depth + 1);
+    }
+    return text;
+  }
+  return token.type && TEXT_LIKE_TYPES.has(token.type) ? (token.content ?? '') : '';
+};
+
 /**
  * Width of one inline marker token in em: math by its rendered `widthEx` (converted to em),
  * `code_inline`/`texttt` by monospace cells, wrappers (e.g. `\textbf{…}`) by recursing into
@@ -227,8 +242,12 @@ export const tokenMarkerWidth = (token: WidthToken, depth: number = 0): number =
     return typeof token.widthEx === 'number' ? token.widthEx * EX_TO_EM : 0;
   }
   // These render as `<code>` in a monospace face, where the glyph-class estimate underreserves.
+  // A `texttt` keeps its source in `content`; what it shows is in its children.
   if (token.type && MONO_TOKEN_TYPES.has(token.type)) {
-    return monoCells(token.content ?? '') * MONO_EM;
+    const shown: string = token.children && token.children.length
+      ? shownText(token, depth)
+      : (token.content ?? '');
+    return monoCells(shown) * MONO_EM;
   }
   if (token.children && token.children.length) {
     let em = 0;

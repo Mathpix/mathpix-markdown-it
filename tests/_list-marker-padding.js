@@ -136,6 +136,10 @@ describe('List marker padding — reserve covers the true glyph width (Arial):',
     // Monospace is per cell, so glyph class does not matter.
     indentEm('\\texttt{WWWWWWWWWW}').should.equal(indentEm('\\texttt{iiiiiiiiii}'));
   });
+  it('a command inside \\texttt counts by the text it shows, not its source', () => {
+    indentEm('\\texttt{abc \\textbf{WWW}}').should.equal(indentEm('\\texttt{abc WWW}'));
+    indentEm('\\texttt{\\textit{abc WWW}}').should.equal(indentEm('\\texttt{abc WWW}'));
+  });
   it('resolves the nested reserve for a sublist inside a tabular cell in an item', () => {
     const html = render('\\begin{itemize}\n\\item[a]\n\\begin{tabular}{|l|}\n\\begin{itemize}\\item[' +
       wide + '] y\\end{itemize}\n\\end{tabular}\n\\end{itemize}');
