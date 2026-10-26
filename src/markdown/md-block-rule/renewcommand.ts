@@ -1,5 +1,5 @@
 import { RuleBlock } from 'markdown-it';
-import { ChangeLevel } from "../md-latex-lists-env/re-level";
+import { ChangeLevel, isListLabelCommand } from "../md-latex-lists-env/re-level";
 import { skipOptionalArg, renewCommandSpanEnd, buildInlineCodePositionSet,
   getInlineCodeListFromString, isAsciiLetter } from "../common";
 const reTag: RegExp = /\\renewcommand/;
@@ -26,12 +26,15 @@ const skipBlanksFrom = (text: string, from: number): number => {
   return at < text.length ? at : -1;
 };
 
-const parseCommand = (str: string):{command: string, params: string, endPos: number}  => {
+// Reads `str` up to `limit`; `closed` is false when the body did not close before it.
+const parseCommand = (str: string, limit: number = str.length)
+  : {command: string, params: string, endPos: number, closed: boolean} => {
   let command = '';
   let params = '';
   let s = '';
   let isOpen = 0;
   let endPos = str.length;
+  let closed = false;
 
   // Space is skipped, not trimmed, so offsets stay in the coordinates of the string passed in.
   // `*` is not part of the name.
@@ -42,7 +45,7 @@ const parseCommand = (str: string):{command: string, params: string, endPos: num
   if (str[start] === '*') {
     start++;
   }
-  for (let i = start; i < str.length; i++) {
+  for (let i = start; i < limit; i++) {
     if (!command && (str[i] === '{' || str.charCodeAt(i) === 0x5c /* \ */ || str[i] === '}' )) {
       if (s && s.trim().length > 0) {
         command = s;
@@ -56,7 +59,8 @@ const parseCommand = (str: string):{command: string, params: string, endPos: num
     }
     // `\renewcommand{\x}[1]{Z}`: the optional argument is not part of the body. Space between the two is
     // legal, so `s` may hold it — dropped with the argument, or the `{` after it read as body text.
-    if (command && !s.trim() && !isOpen && str[i] === '[') {
+    // `s.trim()` last: it costs the body's length.
+    if (command && str[i] === '[' && !isOpen && !s.trim()) {
       const past: number = skipOptionalArg(str, i, true);
       if (past > 0) {
         i = past - 1;
@@ -76,6 +80,7 @@ const parseCommand = (str: string):{command: string, params: string, endPos: num
         if ( isOpen <= 0) {
           params = s;
           endPos = i;
+          closed = true;
           break;
         }
       }
@@ -85,13 +90,24 @@ const parseCommand = (str: string):{command: string, params: string, endPos: num
   if (!params) {
     params = s;
   }
-  return { command: command.trim(), params: params.trim(), endPos: endPos }
+  return { command: command.trim(), params: params.trim(), endPos: endPos, closed }
 };
 
 export const parseOneCommand = (state, str) => {
   const data = parseCommand(str);
   ChangeLevel(state, data);
   return data.endPos
+};
+
+/** `parseOneCommand` for a caller that clamps the result to `limit`: past it only the value of a list
+ *  label still matters, so the rest of `str` is read for that alone — or for a name not yet read. */
+export const parseOneCommandWithin = (state, str: string, limit: number): number => {
+  let data = parseCommand(str, limit);
+  if (!data.closed && limit < str.length && (!data.command || isListLabelCommand(data.command))) {
+    data = parseCommand(str);
+  }
+  ChangeLevel(state, data);
+  return data.endPos;
 };
 
 export const reNewCommand = (state, lineText: string) => {

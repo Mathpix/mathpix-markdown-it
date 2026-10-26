@@ -220,6 +220,60 @@ export const skipOptionalArg = (
   return found.nextPos;
 };
 
+// Offset of the marker closing each `open`, by `findEndMarker`'s rules: a `\`-shielded marker or one in
+// code is not counted, and the scan from an `open` ends where the depth first drops below its own.
+const buildCloseOffsets = (
+  text: string, open: string, close: string, codePositions: Set<number>
+): Map<number, number> => {
+  const closeOf: Map<number, number> = new Map();
+  const pendingAt: number[] = [];
+  const pendingDepth: number[] = [];
+  let depth: number = 0;
+  let shielded: boolean = false;
+  for (let i = 0; i < text.length; i++) {
+    const chr: string = text[i];
+    const counted: boolean = !shielded && !codePositions.has(i);
+    shielded = chr === '\\' && !shielded;
+    if (chr === open) {
+      if (counted) {
+        depth++;
+      }
+      pendingAt.push(i);
+      pendingDepth.push(depth);
+    } else if (chr === close && counted) {
+      depth--;
+      while (pendingDepth.length && pendingDepth[pendingDepth.length - 1] > depth) {
+        pendingDepth.pop();
+        closeOf.set(pendingAt.pop(), i);
+      }
+    }
+  }
+  return closeOf;
+};
+
+// Per code index, since that is what callers cache per text; the text is checked on every read.
+const closeOffsetsCache: WeakMap<Set<number>, Map<string, { text: string; closeOf: Map<number, number> }>> =
+  new WeakMap();
+
+/** `findEndMarker(text, at, open, close, false, 0, codePositions).nextPos`, or -1 when it does not
+ *  close: a lookup, so pairing many markers of one text costs one pass. `text[at]` must be `open`. */
+const pairedEndAfter = (
+  text: string, at: number, open: string, close: string, codePositions: Set<number>
+): number => {
+  let byMarker = closeOffsetsCache.get(codePositions);
+  if (!byMarker) {
+    byMarker = new Map();
+    closeOffsetsCache.set(codePositions, byMarker);
+  }
+  let entry = byMarker.get(open);
+  if (!entry || entry.text !== text) {
+    entry = { text, closeOf: buildCloseOffsets(text, open, close, codePositions) };
+    byMarker.set(open, entry);
+  }
+  const closeAt: number | undefined = entry.closeOf.get(at);
+  return closeAt === undefined ? -1 : closeAt + close.length;
+};
+
 /** Offset past `\renewcommand{\name}{body}` — also the starred form, `[n]` and `[n][default]`, and a
  *  bare `\name` as the first argument — or -1 when the arguments do not close in `text`. Braces are
  *  paired, so a closer or an `\item` in the body is part of the command, not structure.
@@ -235,9 +289,7 @@ export const renewCommandSpanEnd = (
     return -1;
   }
   let pos: number = from + match[0].length;
-  // Once for up to four pairings, and only if one happens: each `findEndMarker` rebuilt the index over
-  // the whole string, and a command with no argument to pair must not pay for it at all.
-  // A caller reading several commands of one string hands its index in, or each paid for the whole.
+  // Built only if a pairing happens; a caller reading many commands of one text passes its own.
   let codeSpans: Set<number> | null = codeIndex ?? null;
   const codePositions = (): Set<number> => {
     if (!codeSpans) {
@@ -259,7 +311,7 @@ export const renewCommandSpanEnd = (
     skipSpaces();
     // `\renewcommand{\x}[1][d]{#1}`: LaTeX allows two optional arguments here, not one.
     while (arg === 1 && text[pos] === '[') {
-      const past: number = skipOptionalArg(text, pos, false, codePositions());
+      const past: number = pairedEndAfter(text, pos, '[', ']', codePositions());
       if (past < 0) {
         return -1;
       }
@@ -267,12 +319,11 @@ export const renewCommandSpanEnd = (
       skipSpaces();
     }
     if (text[pos] === '{') {
-      const paired = findEndMarker(text, pos, '{', '}', false, 0, codePositions()) as
-        { res: boolean; nextPos?: number };
-      if (!paired.res || typeof paired.nextPos !== 'number') {
+      const past: number = pairedEndAfter(text, pos, '{', '}', codePositions());
+      if (past < 0) {
         return -1;
       }
-      pos = paired.nextPos;
+      pos = past;
       continue;
     }
     // `\renewcommand\labelitemii{Q}`: the first argument may be a bare command name.

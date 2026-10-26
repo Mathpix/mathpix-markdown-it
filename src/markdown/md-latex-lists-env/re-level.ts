@@ -244,6 +244,10 @@ export const GetItemizeLevelTokensByState = (
   return SetItemizeLevelTokens(state);
 };
 
+/** Does `ChangeLevel` act on this command? */
+export const isListLabelCommand = (command: string): boolean =>
+  ENUM_LEVEL_COMMANDS.indexOf(command as any) >= 0 || ITEM_LEVEL_COMMANDS.indexOf(command as any) >= 0;
+
 /**
  * Change list style for \labelitemi, \labelenumi etc.
  * Supports both itemize and enumerate levels.

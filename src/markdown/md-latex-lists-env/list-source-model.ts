@@ -98,6 +98,7 @@ const LIST_END_OFFSETS_KEY = Symbol('mmd.listEndOffsets');
 const CLOSER_SUFFIX_KEY = Symbol('mmd.closerSuffix');
 const OPENER_SUFFIX_KEY = Symbol('mmd.openerSuffix');
 const DEPTH_STEPS_KEY = Symbol('mmd.listDepthSteps');
+const DEPTH_MODEL_KEY = Symbol('mmd.listDepthModel');
 export const listCloserOffsets = (state: StateBlock): readonly number[] =>
   matchPositionsCached(state, LIST_END_OFFSETS_KEY, END_LIST_ENV_SWEEP_G);
 
@@ -123,6 +124,13 @@ const WRAPPER_END_SWEEP_G: Readonly<Record<string, RegExp>> = Object.freeze(
 const WRAPPER_END_OFFSETS_KEYS: Readonly<Record<string, symbol>> = Object.freeze(
   WRAPPER_ENV_NAMES.reduce((acc, name) => {
     acc[name] = Symbol('mmd.end_' + name);
+    return acc;
+  }, {} as Record<string, symbol>)
+);
+// The structural ones among those closers.
+const WRAPPER_STRUCTURAL_END_KEYS: Readonly<Record<string, symbol>> = Object.freeze(
+  WRAPPER_ENV_NAMES.reduce((acc, name) => {
+    acc[name] = Symbol('mmd.structuralEnd_' + name);
     return acc;
   }, {} as Record<string, symbol>)
 );
@@ -165,44 +173,51 @@ const insideVerbatim = (state: StateBlockLike, at: number): boolean =>
 const writtenAsText = (state: StateBlockLike, at: number): boolean =>
   isInsideRanges(argumentSpansOf(state), at) || insideVerbatim(state, at);
 
+// The list depth after each structural transition (`depth[0]` is the depth before the first), with
+// range minimums over it: whether a stretch of source drops below a depth is one lookup.
+type ListDepthModel = { offsets: number[]; minDepth: Int32Array[] };
+
+const buildListDepthModel = (state: StateBlockLike): ListDepthModel => {
+  const { offsets, steps } = srcValueCached(state as StateBlock, DEPTH_STEPS_KEY,
+    () => buildListDepthSteps(state));
+  const depth: Int32Array = new Int32Array(steps.length + 1);
+  for (let i = 0; i < steps.length; i++) {
+    depth[i + 1] = depth[i] + steps[i];
+  }
+  // `minDepth[k][i]` is the lowest of `depth[i .. i + 2^k - 1]`.
+  const minDepth: Int32Array[] = [depth];
+  for (let level = 1; (1 << level) <= depth.length; level++) {
+    const half: number = 1 << (level - 1);
+    const prev: Int32Array = minDepth[level - 1];
+    const next: Int32Array = new Int32Array(depth.length - (1 << level) + 1);
+    for (let i = 0; i < next.length; i++) {
+      next[i] = Math.min(prev[i], prev[i + half]);
+    }
+    minDepth.push(next);
+  }
+  return { offsets, minDepth };
+};
+
+const listDepthModel = (state: StateBlockLike): ListDepthModel =>
+  srcValueCached(state as StateBlock, DEPTH_MODEL_KEY, () => buildListDepthModel(state));
+
+// Lowest of `depth[from .. to]`, inclusive.
+const lowestDepthIn = (minDepth: Int32Array[], from: number, to: number): number => {
+  const level: number = 31 - Math.clz32(to - from + 1);
+  return Math.min(minDepth[level][from], minDepth[level][to - (1 << level) + 1]);
+};
+
+// Index of the first of the ascending `offsets` at or after `offset`.
+const firstIndexAtOrAfter = (offsets: readonly number[], offset: number): number =>
+  offsets.length - countPositionsAtOrAfter(offsets, offset);
+
 // Is a closer in `[from, to)` ours? `\item b \end{itemize}` ends the list, `\caption{x \end{itemize} y}`
-// is text. Order decides, not counts: one closer and one opener balance out on a tally, yet a closer
-// standing first is still ours. Offsets and spans are ascending, so one merge walk answers it.
+// is text. Order decides, not counts: a closer standing before an opener is ours even though they balance.
 const closesOurListWithin = (state: StateBlockLike, from: number, to: number): boolean => {
-  const closerOffsets: readonly number[] = listCloserOffsets(state as StateBlock);
-  const closersAhead: number = countPositionsAtOrAfter(closerOffsets, from)
-    - countPositionsAtOrAfter(closerOffsets, to);
-  if (closersAhead <= 0) {
-    return false;
-  }
-  const openerOffsets: readonly number[] = listOpenerOffsets(state as StateBlock);
-  const openersAhead: number = countPositionsAtOrAfter(openerOffsets, from)
-    - countPositionsAtOrAfter(openerOffsets, to);
-  const spans: Array<[number, number]> = argumentSpansOf(state);
-  let closer: number = closerOffsets.length - countPositionsAtOrAfter(closerOffsets, from);
-  let opener: number = openerOffsets.length - countPositionsAtOrAfter(openerOffsets, from);
-  let depth: number = 0;
-  for (let step: number = 0; step < closersAhead + openersAhead; step++) {
-    const nextCloser: number = closer < closerOffsets.length ? closerOffsets[closer] : Infinity;
-    const nextOpener: number = opener < openerOffsets.length ? openerOffsets[opener] : Infinity;
-    const isCloser: boolean = nextCloser <= nextOpener;
-    const at: number = isCloser ? nextCloser : nextOpener;
-    if (isCloser) {
-      closer++;
-    } else {
-      opener++;
-    }
-    // A balanced pair around it outranks conservatism: a `{` left open earlier may sit in math or code,
-    // where it opens nothing.
-    if (isInsideRanges(spans, at) || insideVerbatim(state, at)) {
-      continue;
-    }
-    depth += isCloser ? -1 : 1;
-    if (depth < 0) {
-      return true;
-    }
-  }
-  return false;
+  const { offsets, minDepth } = listDepthModel(state);
+  const start: number = firstIndexAtOrAfter(offsets, from);
+  const end: number = firstIndexAtOrAfter(offsets, to);
+  return end > start && lowestDepthIn(minDepth, start + 1, end) < minDepth[0][start];
 };
 
 // The first wrapper opening on this line, or null. Asking for the first block env instead let a
@@ -288,6 +303,16 @@ const structuralCountIn = (
   return suffix[startAt] - suffix[endAt];
 };
 
+// The structural ones of `all`, ascending; cached like `structuralSuffix`.
+const structuralOffsets = (
+  state: StateBlockLike,
+  all: readonly number[],
+  key: symbol,
+): readonly number[] =>
+  srcValueCached(state as StateBlock, key,
+    () => ({ all, structural: all.filter((at) => !writtenAsText(state, at)) }),
+    (cached) => cached.all === all).structural;
+
 // How many of the open lists the source past `at` can still close: structural closers there minus the
 // openers that claim them, since a closer of a list opened after the wrapper is not ours to use.
 export const closersLeftAfter = (state: StateBlockLike, at: number): number =>
@@ -350,24 +375,16 @@ export const hasCloserAhead = (state: StateBlockLike, from: number, name: string
   if (!sweep || !key) {
     return false;
   }
-  const offsets: readonly number[] = matchPositionsCached(state as StateBlock, key, sweep);
-  // Every closer ahead, not just the first: one written as text — in code, math or an argument — left
-  // the wrapper transparent while a real closer stood below.
-  for (let i = offsets.length - countPositionsAtOrAfter(offsets, from); i < offsets.length; i++) {
-    const at: number = offsets[i];
-    if (writtenAsText(state, at)) {
-      continue;
-    }
+  // The first closer not written as text: one in code, math or an argument does not close the wrapper.
+  const structural: readonly number[] = structuralOffsets(state,
+    matchPositionsCached(state as StateBlock, key, sweep), WRAPPER_STRUCTURAL_END_KEYS[name]);
+  const first: number = firstIndexAtOrAfter(structural, from);
+  if (first < structural.length) {
+    const at: number = structural[first];
     // Swallowing our closer is allowed when the source past the wrapper still closes the open lists: the
-    // wrapper owns its body, and what stands inside goes to the wrapper's own rule. A closer farther out
-    // swallows a superset, so failing here ends the search rather than moving it along.
-    if (closesOurListWithin(state, from, at)) {
-      // The live count, not this source's own depth: an ambient list from an outer parse still needs closing.
-      if (closersLeftAfter(state, at) < Math.max(1, getOpenListCount())) {
-        return false;
-      }
-    }
-    return true;
+    // wrapper owns its body. The live count, since an ambient list from an outer parse needs closing too.
+    return !closesOurListWithin(state, from, at)
+      || closersLeftAfter(state, at) >= Math.max(1, getOpenListCount());
   }
   return false;
 };

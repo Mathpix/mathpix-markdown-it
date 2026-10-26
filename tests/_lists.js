@@ -500,6 +500,30 @@ describe('An unclosed wrapper env leaves the list rendering:', () => {
     const relative = growthOf(build, 400, 3200) / growthOf(repeated(CONTROL_UNIT), 250, 2000);
     relative.should.be.below(3, 'grows faster than the input: ×' + relative.toFixed(2));
   });
+  // An unclosed body ends with its line, so each command reads its own line, not the rest of the paragraph.
+  itScales('a paragraph of unclosed \\renewcommand parses linearly', () => {
+    const build = (n) => 't \\renewcommand{\\x}{a\n'.repeat(n);
+    const relative = medianRatio(() =>
+      growthOf(build, 250, 2000) / growthOf(repeated(CONTROL_UNIT), 250, 2000));
+    relative.should.be.below(2.5, 'grows faster than the input: ×' + relative.toFixed(2));
+  });
+  // Each wrapper looks up its first structural closer instead of walking the ones written as text.
+  itScales('wrappers beside a closer in code parse linearly', () => {
+    const build = (n) => '\\begin{itemize}\n'
+      + '\\item a \\begin{center} `\\end{center}`\n'.repeat(n) + '\\end{itemize}\n';
+    const relative = medianRatio(() =>
+      growthOf(build, 250, 2000) / growthOf(repeated(CONTROL_UNIT), 250, 2000));
+    relative.should.be.below(2.5, 'grows faster than the input: ×' + relative.toFixed(2));
+  });
+  // Whether a wrapper swallows our closer is one range lookup, not a walk over the lists inside it.
+  itScales('a wrapper holding many lists parses linearly', () => {
+    const build = (n) => '\\begin{itemize}\n'
+      + '\\item a \\begin{center} x\n\\begin{itemize}\n\\item b\n\\end{itemize}\n'.repeat(n)
+      + '\\end{itemize}\n\\end{center}\n';
+    const relative = medianRatio(() =>
+      growthOf(build, 250, 2000) / growthOf(repeated(CONTROL_UNIT), 250, 2000));
+    relative.should.be.below(2.5, 'grows faster than the input: ×' + relative.toFixed(2));
+  });
   // An opaque env with no closer ahead: the inline scanner asked for one from every position, and each
   // ask read to the end of the source. ×4.3–7.2 measured, ×0.3–0.4 once the first answer is taken as final.
   itScales('an unclosed opaque env in an inline list scans linearly', () => {
